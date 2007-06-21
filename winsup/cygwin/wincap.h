@@ -18,6 +18,7 @@ struct wincaps
   unsigned is_server                                    : 1;
   unsigned has_security_descriptor_control              : 1;
   unsigned has_ip_helper_lib                            : 1;
+  unsigned has_broken_if_oper_status                    : 1;
   unsigned has_physical_mem_access                      : 1;
   unsigned has_process_io_counters                      : 1;
   unsigned has_terminal_services			: 1;
@@ -61,6 +62,7 @@ public:
   bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_ip_helper_lib)
+  bool  IMPLEMENT (has_broken_if_oper_status)
   bool  IMPLEMENT (has_physical_mem_access)
   bool  IMPLEMENT (has_process_io_counters)
   bool  IMPLEMENT (has_terminal_services)

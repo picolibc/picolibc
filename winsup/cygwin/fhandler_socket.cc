@@ -1455,7 +1455,7 @@ struct __old_ifreq {
 int
 fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
-  extern int get_ifconf (SOCKET s, struct ifconf *ifc, int what); /* net.cc */
+  extern int get_ifconf (struct ifconf *ifc, int what); /* net.cc */
   int res;
   struct ifconf ifc, *ifcp;
   struct ifreq *ifrp;
@@ -1480,7 +1480,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  ifc.ifc_len = ifcp->ifc_len;
 	  ifc.ifc_buf = ifcp->ifc_buf;
 	}
-      res = get_ifconf (get_socket (), &ifc, cmd);
+      res = get_ifconf (&ifc, cmd);
       if (res)
 	debug_printf ("error in get_ifconf");
       if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
@@ -1544,7 +1544,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	      ifc.ifc_req[i].ifr_frndlyname = &iff[i];
 	  }
 
-	res = get_ifconf (get_socket (), &ifc, cmd);
+	res = get_ifconf (&ifc, cmd);
 	if (res)
 	  {
 	    debug_printf ("error in get_ifconf");

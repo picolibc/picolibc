@@ -41,6 +41,7 @@ details. */
 #include "registry.h"
 #include "cygtls.h"
 #include "cygwin/in6.h"
+#include "ifaddrs.h"
 
 extern "C"
 {
@@ -1195,7 +1196,7 @@ static int in_are_prefix_equal (struct in_addr *p1, struct in_addr *p2, int len)
   if (0 > len || len > 32)
     return 0;
   uint32_t pfxmask = 0xffffffff << (32 - len);
-  return (p1->s_addr & pfxmask) == (p2->s_addr & pfxmask);
+  return (ntohl (p1->s_addr) & pfxmask) == (ntohl (p2->s_addr) & pfxmask);
 }
 
 extern "C" int
@@ -1207,8 +1208,8 @@ ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
     {
     case AF_INET:
       /* Prior to Vista, the loopback prefix is not available. */
-      if (IN_LOOPBACK (((struct sockaddr_in *)
-			pua->Address.lpSockaddr)->sin_addr.s_addr))
+      if (IN_LOOPBACK (ntohl (((struct sockaddr_in *)
+			      pua->Address.lpSockaddr)->sin_addr.s_addr)))
 	return 8;
       for ( ; pap; pap = pap->Next)
 	if (in_are_prefix_equal (
@@ -1302,166 +1303,192 @@ get_routedst (DWORD if_index)
   return INADDR_ANY;
 }
 
-/*
- * IFCONF XP SP1 and above.
- * Use IP Helpper function GetAdaptersAddresses.
- */
+struct ifall {
+  struct ifaddrs          ifa_ifa;
+  char                    ifa_name[IFNAMSIZ];
+  struct sockaddr_storage ifa_addr;
+  struct sockaddr_storage ifa_brddstaddr;
+  struct sockaddr_storage ifa_netmask;
+  struct sockaddr         ifa_hwaddr;
+  int                     ifa_metric;
+  int                     ifa_mtu;
+  int                     ifa_ifindex;
+  struct ifreq_frndlyname ifa_frndlyname;
+};
 
-static void
-get_xp_ifconf (SOCKET s, struct ifconf *ifc, int what)
+/*
+ * Get network interfaces XP SP1 and above.
+ * Use IP Helper function GetAdaptersAddresses.
+ */
+static struct ifall *
+get_xp_ifs (ULONG family)
 {
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   PIP_ADAPTER_UNICAST_ADDRESS pua;
-  LPINTERFACE_INFO iie;
   int cnt = 0;
-  DWORD size = 0;
+  struct ifall *ifret = NULL, *ifp;
+  struct sockaddr_in *if_sin;
+  struct sockaddr_in6 *if_sin6;
 
-  if (!get_adapters_addresses (&pa0, AF_INET))
+  if (!get_adapters_addresses (&pa0, family))
     goto done;
 
   for (pap = pa0; pap; pap = pap->Next)
     for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
       ++cnt;
-  /* If the size matches exactly the number of interfaces, WSAIoctl fails
-     with WSAError set to WSAEFAULT, for no apparent reason.  So we allocate
-     space for one more INTERFACE_INFO structure here. */
-  iie = (LPINTERFACE_INFO) alloca ((cnt + 1) * sizeof (INTERFACE_INFO));
-  if (WSAIoctl (s, SIO_GET_INTERFACE_LIST, NULL, 0, iie,
-		(cnt + 1) * sizeof (INTERFACE_INFO), &size, NULL, NULL))
-    {
-      set_winsock_errno ();
-      cnt = 0;
-      goto done;
-    }
 
-  struct ifreq *ifr = ifc->ifc_req;
+  if (!(ifret = (struct ifall *) calloc (cnt, sizeof (struct ifall))))
+    goto done;
+  ifp = ifret;
+
   for (pap = pa0; pap; pap = pap->Next)
     {
       int idx = 0;
       for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
 	{
-	  int iinf_idx;
-	  for (iinf_idx = 0; iinf_idx < cnt; ++iinf_idx)
-	    if (iie[iinf_idx].iiAddress.AddressIn.sin_addr.s_addr
-		==  ((sockaddr_in *) pua->Address.lpSockaddr)->sin_addr.s_addr)
-	      break;
-	  if (iinf_idx >= cnt)
-	    continue;
+	  struct sockaddr *sa = (struct sockaddr *) pua->Address.lpSockaddr;
+#         define sin	((struct sockaddr_in *) sa)
+#         define sin6	((struct sockaddr_in6 *) sa)
+	  size_t sa_size = (sa->sa_family == AF_INET6
+			    ? sizeof *sin6 : sizeof *sin);
+	  /* Next in chain */
+	  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+	  /* Interface name */
 	  if (!idx)
-	    strcpy (ifr->ifr_name, pap->AdapterName);
+	    strcpy (ifp->ifa_name, pap->AdapterName);
 	  else
-	    __small_sprintf (ifr->ifr_name, "%s:%u", pap->AdapterName, idx);
+	    __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
+	  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
 	  ++idx;
-	  switch (what)
+	  /* Flags */
+	  ifp->ifa_ifa.ifa_flags = IFF_UP;
+	  if (pap->IfType == IF_TYPE_SOFTWARE_LOOPBACK)
+	    ifp->ifa_ifa.ifa_flags |= IFF_LOOPBACK;
+	  else if (pap->IfType == IF_TYPE_PPP)
+	    ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT;
+	  else if (sa->sa_family == AF_INET)
+	    ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
+	  if (!(pap->Flags & IP_ADAPTER_NO_MULTICAST))
+	    ifp->ifa_ifa.ifa_flags |= IFF_MULTICAST;
+	  if (pap->OperStatus == IfOperStatusUp
+	      || pap->OperStatus == IfOperStatusUnknown)
+	    ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
+	  if (pap->OperStatus != IfOperStatusLowerLayerDown)
+	    ifp->ifa_ifa.ifa_flags |= IFF_LOWER_UP;
+	  if (pap->OperStatus == IfOperStatusDormant)
+	    ifp->ifa_ifa.ifa_flags |= IFF_DORMANT;
+	  if (sa->sa_family == AF_INET)
 	    {
-	    case SIOCGIFFLAGS:
-	      {
-		ifr->ifr_flags = convert_ifr_flags (iie[iinf_idx].iiFlags);
-		if (pap->OperStatus == IfOperStatusUp
-		    || pap->OperStatus == IfOperStatusUnknown)
-		  ifr->ifr_flags |= IFF_RUNNING;
-		if (pap->OperStatus != IfOperStatusLowerLayerDown)
-		  ifr->ifr_flags |= IFF_LOWER_UP;
-		if (pap->OperStatus == IfOperStatusDormant)
-		  ifr->ifr_flags |= IFF_DORMANT;
-		ULONG hwaddr[2], hwlen = 6;
-		if (SendARP (iie[iinf_idx].iiAddress.AddressIn.sin_addr.s_addr,
-			     0, hwaddr, &hwlen))
-		  ifr->ifr_flags |= IFF_NOARP;
-	      }
+	      ULONG hwaddr[2], hwlen = 6;
+	      if (SendARP (sin->sin_addr.s_addr, 0, hwaddr, &hwlen))
+		ifp->ifa_ifa.ifa_flags |= IFF_NOARP;
+	    }
+	  /* Address */
+	  memcpy (&ifp->ifa_addr, sa, sa_size);
+	  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	  /* Netmask */
+	  int prefix = ip_addr_prefix (pua, pap->FirstPrefix);
+	  switch (sa->sa_family)
+	    {
+	    case AF_INET:
+	      if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
+	      if_sin->sin_addr.s_addr = htonl (UINT32_MAX << (32 - prefix));
+	      if_sin->sin_family = AF_INET;
 	      break;
-	    case SIOCGIFCONF:
-	    case SIOCGIFADDR:
-	      memcpy (&ifr->ifr_addr,
-		      &iie[iinf_idx].iiAddress.AddressIn,
-		      sizeof (struct sockaddr_in));
-	      break;
-	    case SIOCGIFBRDADDR:
-	      memcpy (&ifr->ifr_broadaddr,
-		      &iie[iinf_idx].iiBroadcastAddress.AddressIn,
-		      sizeof (struct sockaddr_in));
-	      break;
-	    case SIOCGIFDSTADDR:
-	      if (pap->IfType == IF_TYPE_PPP)
-		{
-		  struct sockaddr_in *sa = (struct sockaddr_in *)
-					   &ifr->ifr_dstaddr;
-		  sa->sin_addr.s_addr = get_routedst (pap->IfIndex);
-		  sa->sin_family = AF_INET;
-		  sa->sin_port = 0;
-		}
-	      else
-		memcpy (&ifr->ifr_addr,
-			&iie[iinf_idx].iiAddress.AddressIn,
-			sizeof (struct sockaddr_in));
-	      break;
-	    case SIOCGIFNETMASK:
-	      memcpy (&ifr->ifr_netmask,
-		      &iie[iinf_idx].iiNetmask.AddressIn,
-		      sizeof (struct sockaddr_in));
-	      break;
-	    case SIOCGIFHWADDR:
-	      for (UINT i = 0; i < IFHWADDRLEN; ++i)
-		if (i >= pap->PhysicalAddressLength)
-		  ifr->ifr_hwaddr.sa_data[i] = '\0';
-		else
-		  ifr->ifr_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
-	      ifr->ifr_hwaddr.sa_family = AF_INET;
-	      break;
-	    case SIOCGIFMETRIC:
-	      if (wincap.has_gaa_on_link_prefix ())
-		ifr->ifr_metric = ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric;
-	      else
-		ifr->ifr_metric = 1;
-	      break;
-	    case SIOCGIFMTU:
-	      ifr->ifr_mtu = pap->Mtu;
-	      break;
-	    case SIOCGIFINDEX:
-	      ifr->ifr_ifindex = pap->IfIndex;
-	      break;
-	    case SIOCGIFFRNDLYNAM:
-	      {
-		struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-					       ifr->ifr_frndlyname;
-		iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
-					      IFRF_FRIENDLYNAMESIZ,
-					      pap->FriendlyName);
-	      }
+	    case AF_INET6:
+	      if_sin6 = (struct sockaddr_in6 *) &ifp->ifa_netmask;
+	      for (cnt = 0; cnt < 4 && prefix; ++cnt, prefix -= 32)
+		if_sin6->sin6_addr.s6_addr32[cnt] = UINT32_MAX;
+		if (prefix < 32)
+		  if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
 	      break;
 	    }
-	  if ((caddr_t) ++ifr >
-	      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
-	    goto done;
+	  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	  if (pap->IfType == IF_TYPE_PPP)
+	    {
+	      /* Destination address */
+	      if (sa->sa_family == AF_INET)
+	        {
+		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		  if_sin->sin_addr.s_addr = get_routedst (pap->IfIndex);
+		  if_sin->sin_family = AF_INET;
+		}
+	      else
+		/* FIXME: No official way to get the dstaddr for ipv6? */
+		memcpy (&ifp->ifa_addr, sa, sa_size);
+	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
+	      				 &ifp->ifa_brddstaddr;
+	    }
+	  else
+	    {
+	      /* Broadcast address  */
+	      if (sa->sa_family == AF_INET)
+		{
+		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		  uint32_t mask = 
+		  ((struct sockaddr_in *) &ifp->ifa_netmask)->sin_addr.s_addr;
+		  if_sin->sin_addr.s_addr = sin->sin_addr.s_addr & mask | ~mask;
+		  if_sin->sin_family = AF_INET;
+		  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
+					       &ifp->ifa_brddstaddr;
+		}
+	      else /* No IPv6 broadcast */
+		ifp->ifa_ifa.ifa_broadaddr = NULL;
+	    }
+	  /* Hardware address */
+	  for (UINT i = 0; i < IFHWADDRLEN; ++i)
+	    if (i >= pap->PhysicalAddressLength)
+	      ifp->ifa_hwaddr.sa_data[i] = '\0';
+	    else
+	      ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
+	  /* Metric */
+	  if (wincap.has_gaa_on_link_prefix ())
+	    ifp->ifa_metric = (sa->sa_family == AF_INET
+			      ? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
+			      : ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric);
+	  else
+	    ifp->ifa_metric = 1;
+	  /* MTU */
+	  ifp->ifa_mtu = pap->Mtu;
+	  /* Interface index */
+	  ifp->ifa_ifindex = pap->IfIndex;
+	  /* Friendly name */
+	  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+					 &ifp->ifa_frndlyname;
+	  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
+					IFRF_FRIENDLYNAMESIZ,
+					pap->FriendlyName);
+	  ++ifp;
+#         undef sin
+#         undef sin6
 	}
     }
+  /* Since every entry is set to the next entry, the last entry points to an
+     invalid next entry now.  Fix it retroactively. */
+  if (ifp > ifret)
+    ifp[-1].ifa_ifa.ifa_next = NULL;
 
 done:
   if (pa0)
     free (pa0);
-  /* Set the correct length */
-  ifc->ifc_len = cnt * sizeof (struct ifreq);
+  return ifret;
 }
 
 /*
- * IFCONF NTSP4, W2K:
+ * Get network interfaces NTSP4, W2K, XP w/o service packs.
  * Use IP Helper Library
  */
-static void
-get_2k_ifconf (struct ifconf *ifc, int what)
+static struct ifall *
+get_2k_ifs ()
 {
-  int cnt = 0;
   int ethId = 0, pppId = 0, slpId = 0, tokId = 0;
 
-  /* Union maps buffer to correct struct */
-  struct ifreq *ifr = ifc->ifc_req;
-
-  DWORD ip_cnt, lip, lnp;
+  DWORD ip_cnt;
   DWORD siz_ip_table = 0;
   PMIB_IPADDRTABLE ipt;
   PMIB_IFROW ifrow;
-  struct sockaddr_in *sa = NULL;
-  struct sockaddr *so = NULL;
+  struct ifall *ifret = NULL, *ifp = NULL;
+  struct sockaddr_in *if_sin;
 
   typedef struct ifcount_t
   {
@@ -1478,6 +1505,10 @@ get_2k_ifconf (struct ifconf *ifc, int what)
       && (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table))
       && !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
     {
+      if (!(ifret = (struct ifall *) calloc (ipt->dwNumEntries, sizeof (struct ifall))))
+	goto done;
+      ifp = ifret;
+
       iflist =
 	(ifcount_t *) alloca (sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
       memset (iflist, 0, sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
@@ -1501,7 +1532,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 	      ifEntry->count++;
 	    }
 	}
-      // reset the last element. This is just the stopper for the loop.
+      /* reset the last element. This is just the stopper for the loop. */
       iflist[ipt->dwNumEntries].count = 0;
 
       /* Iterate over all configured IP-addresses */
@@ -1522,30 +1553,32 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 	      ifEntry++;
 	    }
 
-	  /* Setup the interface name */
-	  if (ifrow->dwType == MIB_IF_TYPE_LOOPBACK)
-	    strcpy (ifr->ifr_name, "lo");
+	  /* Next in chain */
+	  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+	  /* Interface name */
+	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
+	    strcpy (ifp->ifa_name, "lo");
 	  else
 	    {
 	      const char *name = "";
 	      switch (ifrow->dwType)
 		{
-		  case MIB_IF_TYPE_TOKENRING:
+		  case IF_TYPE_ISO88025_TOKENRING:
 		    name = "tok";
 		    if (ifEntry->enumerated == 0)
 		      ifEntry->classId = tokId++;
 		    break;
-		  case MIB_IF_TYPE_ETHERNET:
+		  case IF_TYPE_ETHERNET_CSMACD:
 		    name = "eth";
 		    if (ifEntry->enumerated == 0)
 		      ifEntry->classId = ethId++;
 		    break;
-		  case MIB_IF_TYPE_PPP:
+		  case IF_TYPE_PPP:
 		    name = "ppp";
 		    if (ifEntry->enumerated == 0)
 		      ifEntry->classId = pppId++;
 		    break;
-		  case MIB_IF_TYPE_SLIP:
+		  case IF_TYPE_SLIP:
 		    name = "slp";
 		    if (ifEntry->enumerated == 0)
 		      ifEntry->classId = slpId++;
@@ -1553,99 +1586,96 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		  default:
 		    continue;
 		}
-	      if (ifEntry->enumerated == 0)
-		__small_sprintf (ifr->ifr_name, "%s%u", name, ifEntry->classId);
-	      else
-		__small_sprintf (ifr->ifr_name, "%s%u:%u", name,
-				 ifEntry->classId, ifEntry->enumerated);
+	      __small_sprintf (ifp->ifa_name,
+			       ifEntry->enumerated ? "%s%u:%u" : "%s%u",
+			       name, ifEntry->classId, ifEntry->enumerated);
 	      ifEntry->enumerated++;
 	    }
-
-	      /* setup sockaddr struct */
-	  switch (what)
+	  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
+	  /* Flags */
+	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
+	    ifp->ifa_ifa.ifa_flags |= IFF_LOOPBACK;
+	  else if (ifrow->dwType == IF_TYPE_PPP
+		   || ifrow->dwType == IF_TYPE_SLIP)
+	    ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT | IFF_NOARP;
+	  else
+	    ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
+	  if (ifrow->dwAdminStatus == IF_ADMIN_STATUS_UP)
 	    {
-	      case SIOCGIFFLAGS:
-		if (ifrow->dwType == MIB_IF_TYPE_LOOPBACK)
-		  ifr->ifr_flags = IFF_LOOPBACK;
-		else
-		  ifr->ifr_flags = IFF_BROADCAST | IFF_MULTICAST;
-		if (ifrow->dwAdminStatus == MIB_IF_ADMIN_STATUS_UP)
-		  {
-		    ifr->ifr_flags |= IFF_UP;
-		    if (ifrow->dwOperStatus >= MIB_IF_OPER_STATUS_CONNECTED)
-		      ifr->ifr_flags |= IFF_RUNNING;
-		  }
-		break;
-	      case SIOCGIFCONF:
-	      case SIOCGIFADDR:
-		sa = (struct sockaddr_in *) &ifr->ifr_addr;
-		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-		break;
-	      case SIOCGIFBRDADDR:
-		sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-#if 0
-		/* Unfortunately, the field returns only crap. */
-		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
-#else
-		lip = ipt->table[ip_cnt].dwAddr;
-		lnp = ipt->table[ip_cnt].dwMask;
-		sa->sin_addr.s_addr = lip & lnp | ~lnp;
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-#endif
-		break;
-	      case SIOCGIFDSTADDR:
-		sa = (struct sockaddr_in *) &ifr->ifr_dstaddr;
-		if (ifrow->dwType == MIB_IF_TYPE_PPP
-		    || ifrow->dwType == MIB_IF_TYPE_SLIP)
-		  sa->sin_addr.s_addr =
-		  	get_routedst (ipt->table[ip_cnt].dwIndex);
-		else
-		  sa->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-	        break;
-	      case SIOCGIFNETMASK:
-		sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-		sa->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
-		sa->sin_family = AF_INET;
-		sa->sin_port = 0;
-		break;
-	      case SIOCGIFHWADDR:
-		so = &ifr->ifr_hwaddr;
-		for (UINT i = 0; i < IFHWADDRLEN; ++i)
-		  if (i >= ifrow->dwPhysAddrLen)
-		    so->sa_data[i] = '\0';
-		  else
-		    so->sa_data[i] = ifrow->bPhysAddr[i];
-		so->sa_family = AF_INET;
-		break;
-	      case SIOCGIFMETRIC:
-		ifr->ifr_metric = 1;
-		break;
-	      case SIOCGIFMTU:
-		ifr->ifr_mtu = ifrow->dwMtu;
-		break;
-	      case SIOCGIFINDEX:
-		ifr->ifr_ifindex = ifrow->dwIndex;
-		break;
+	      ifp->ifa_ifa.ifa_flags |= IFF_UP | IFF_LOWER_UP;
+	      /* Bug in NT4's IP Helper lib.  The dwOperStatus has just
+	         two values, 0 or 1, non operational, operational. */
+	      if (ifrow->dwOperStatus >= (wincap.has_broken_if_oper_status ()
+					  ? 1 : IF_OPER_STATUS_CONNECTED))
+		ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
 	    }
-	  ++cnt;
-	  if ((caddr_t) ++ifr >
-	      ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
-	    goto done;
+	  /* Address */
+	  if_sin = (struct sockaddr_in *) &ifp->ifa_addr;
+	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
+	  if_sin->sin_family = AF_INET;
+	  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	  /* Netmask */
+	  if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
+	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
+	  if_sin->sin_family = AF_INET;
+	  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+	  if (ifrow->dwType == IF_TYPE_PPP
+	      || ifrow->dwType == IF_TYPE_SLIP)
+	    {
+	      /* Destination address */
+	      if_sin->sin_addr.s_addr =
+	      	get_routedst (ipt->table[ip_cnt].dwIndex);
+	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
+					 &ifp->ifa_brddstaddr;
+	    }
+	  else
+	    {
+	      /* Broadcast address */
+#if 0
+	      /* Unfortunately, the field returns only crap. */
+	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
+#else
+	      uint32_t mask = ipt->table[ip_cnt].dwMask;
+	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr
+					& mask | ~mask;
+#endif
+	      ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
+					   &ifp->ifa_brddstaddr;
+	    }
+	  if_sin->sin_family = AF_INET;
+	  /* Hardware address */
+	  for (UINT i = 0; i < IFHWADDRLEN; ++i)
+	    if (i >= ifrow->dwPhysAddrLen)
+	      ifp->ifa_hwaddr.sa_data[i] = '\0';
+	    else
+	      ifp->ifa_hwaddr.sa_data[i] = ifrow->bPhysAddr[i];
+	  /* Metric */
+	  ifp->ifa_metric = 1;
+	  /* MTU */
+	  ifp->ifa_mtu = ifrow->dwMtu;
+	  /* Interface index */
+	  ifp->ifa_ifindex = ifrow->dwIndex;
+	  /* Friendly name */
+	  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+					 &ifp->ifa_frndlyname;
+	  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
+					IFRF_FRIENDLYNAMESIZ,
+					ifrow->wszName);
+	  ++ifp;
 	}
     }
+  /* Since every entry is set to the next entry, the last entry points to an
+     invalid next entry now.  Fix it retroactively. */
+  if (ifp > ifret)
+    ifp[-1].ifa_ifa.ifa_next = NULL;
 
 done:
-  /* Set the correct length */
-  ifc->ifc_len = cnt * sizeof (struct ifreq);
+  return ifret;
 }
 
 /*
- * IFCONF Windows NT < SP4:
+ * Get network interfaces Windows NT < SP4:
  * Look at the Bind value in
  * HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Linkage\
  * This is a REG_MULTI_SZ with strings of the form:
@@ -1655,286 +1685,353 @@ done:
  *							Parameters\Tcpip
  * at the IPAddress, Subnetmask and DefaultGateway values for the
  * required values.
+ * Also fake "lo" since there's no representation in the registry.
  */
-static void
-get_nt_ifconf (struct ifconf *ifc, int what)
+static struct ifall *
+get_nt_ifs ()
 {
   HKEY key;
+  LONG ret;
+  struct ifall *ifret = NULL, *ifp;
   unsigned long lip, lnp;
-  struct sockaddr_in *sa = NULL;
-  struct sockaddr *so = NULL;
+  struct sockaddr_in *sin = NULL;
   DWORD size;
-  int cnt = 1;
-  char *binding = (char *) 0;
+  int cnt = 0, idx;
+  char *binding = NULL;
 
-  /* Union maps buffer to correct struct */
-  struct ifreq *ifr = ifc->ifc_req;
-
-  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
-		    "SYSTEM\\"
-		    "CurrentControlSet\\"
-		    "Services\\"
-		    "Tcpip\\" "Linkage",
-		    0, KEY_READ, &key) == ERROR_SUCCESS)
+  if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+			   "SYSTEM\\"
+			   "CurrentControlSet\\"
+			   "Services\\"
+			   "Tcpip\\" "Linkage",
+			   0, KEY_READ, &key)) == ERROR_SUCCESS)
     {
-      if (RegQueryValueEx (key, "Bind",
-			   NULL, NULL,
-			   NULL, &size) == ERROR_SUCCESS)
+      if ((ret = RegQueryValueEx (key, "Bind", NULL, NULL,
+				  NULL, &size)) == ERROR_SUCCESS)
 	{
 	  binding = (char *) alloca (size);
-	  if (RegQueryValueEx (key, "Bind",
-			       NULL, NULL,
-			       (unsigned char *) binding,
-			       &size) != ERROR_SUCCESS)
-	    {
-	      binding = NULL;
-	    }
+	  if ((ret = RegQueryValueEx (key, "Bind", NULL, NULL,
+				      (unsigned char *) binding,
+				      &size)) != ERROR_SUCCESS)
+	    binding = NULL;
 	}
       RegCloseKey (key);
     }
 
-  if (binding)
+  if (!binding)
     {
-      char *bp, eth[2] = "/";
-      char cardkey[256], ipaddress[256], netmask[256];
-
-      for (bp = binding; *bp; bp += strlen (bp) + 1)
-	{
-	  bp += strlen ("\\Device\\");
-	  strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
-	  strcat (cardkey, bp);
-	  strcat (cardkey, "\\Parameters\\Tcpip");
-
-	  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, cardkey,
-			    0, KEY_READ, &key) != ERROR_SUCCESS)
-	    continue;
-
-	  if (RegQueryValueEx (key, "IPAddress",
-			       NULL, NULL,
-			       (unsigned char *) ipaddress,
-			       (size = 256, &size)) == ERROR_SUCCESS
-	      && RegQueryValueEx (key, "SubnetMask",
-				  NULL, NULL,
-				  (unsigned char *) netmask,
-				  (size = 256, &size)) == ERROR_SUCCESS)
-	    {
-	      char *ip, *np;
-	      char dhcpaddress[256], dhcpnetmask[256];
-
-	      for (ip = ipaddress, np = netmask;
-		   *ip && *np;
-		   ip += strlen (ip) + 1, np += strlen (np) + 1)
-		{
-		  if ((caddr_t) ++ifr > ifc->ifc_buf
-		      + ifc->ifc_len - sizeof (struct ifreq))
-		    break;
-
-		  if (!strncmp (bp, "NdisWan", 7))
-		    {
-		      strcpy (ifr->ifr_name, "ppp");
-		      strcat (ifr->ifr_name, bp + 7);
-		    }
-		  else
-		    {
-		      ++*eth;
-		      strcpy (ifr->ifr_name, "eth");
-		      strcat (ifr->ifr_name, eth);
-		    }
-		  memset (&ifr->ifr_addr, '\0', sizeof ifr->ifr_addr);
-		  if (cygwin_inet_addr (ip) == 0L
-		      && RegQueryValueEx (key, "DhcpIPAddress",
-					  NULL, NULL,
-					  (unsigned char *) dhcpaddress,
-					  (size = 256, &size))
-		      == ERROR_SUCCESS
-		      && RegQueryValueEx (key, "DhcpSubnetMask",
-					  NULL, NULL,
-					  (unsigned char *) dhcpnetmask,
-					  (size = 256, &size))
-		      == ERROR_SUCCESS)
-		    {
-		      switch (what)
-			{
-			  case SIOCGIFFLAGS:
-			    ifr->ifr_flags = IFF_UP | IFF_RUNNING
-					     | IFF_BROADCAST;
-			    break;
-			  case SIOCGIFCONF:
-			  case SIOCGIFADDR:
-			  case SIOCGIFDSTADDR:
-			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			    sa->sin_addr.s_addr =
-			      cygwin_inet_addr (dhcpaddress);
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFBRDADDR:
-			    lip = cygwin_inet_addr (dhcpaddress);
-			    lnp = cygwin_inet_addr (dhcpnetmask);
-			    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			    sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFNETMASK:
-			    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			    sa->sin_addr.s_addr =
-			      cygwin_inet_addr (dhcpnetmask);
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFHWADDR:
-			    so = &ifr->ifr_hwaddr;
-			    memset (so->sa_data, 0, IFHWADDRLEN);
-			    so->sa_family = AF_INET;
-			    break;
-			  case SIOCGIFMETRIC:
-			    ifr->ifr_metric = 1;
-			    break;
-			  case SIOCGIFMTU:
-			    ifr->ifr_mtu = 1500;
-			    break;
-			  case SIOCGIFINDEX:
-			    ifr->ifr_ifindex = -1;
-			    break;
-			}
-		    }
-		  else
-		    {
-		      switch (what)
-			{
-			  case SIOCGIFFLAGS:
-			    ifr->ifr_flags = IFF_UP | IFF_RUNNING
-					     | IFF_BROADCAST;
-			    break;
-			  case SIOCGIFCONF:
-			  case SIOCGIFADDR:
-			  case SIOCGIFDSTADDR:
-			    sa = (struct sockaddr_in *) &ifr->ifr_addr;
-			    sa->sin_addr.s_addr = cygwin_inet_addr (ip);
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFBRDADDR:
-			    lip = cygwin_inet_addr (ip);
-			    lnp = cygwin_inet_addr (np);
-			    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-			    sa->sin_addr.s_addr = lip & lnp | ~lnp;
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFNETMASK:
-			    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-			    sa->sin_addr.s_addr = cygwin_inet_addr (np);
-			    sa->sin_family = AF_INET;
-			    sa->sin_port = 0;
-			    break;
-			  case SIOCGIFHWADDR:
-			    so = &ifr->ifr_hwaddr;
-			    memset (so->sa_data, 0, IFHWADDRLEN);
-			    so->sa_family = AF_INET;
-			    break;
-			  case SIOCGIFMETRIC:
-			    ifr->ifr_metric = 1;
-			    break;
-			  case SIOCGIFMTU:
-			    ifr->ifr_mtu = 1500;
-			    break;
-			  case SIOCGIFINDEX:
-			    ifr->ifr_ifindex = -1;
-			    break;
-			}
-		    }
-		  ++cnt;
-		}
-	    }
-	  RegCloseKey (key);
-	}
+      __seterrno_from_win_error (ret);
+      return NULL;
     }
 
-  /* Set the correct length */
-  ifc->ifc_len = cnt * sizeof (struct ifreq);
+  char *bp, eth[2] = "/";
+  char cardkey[256], ipaddress[256], netmask[256];
+
+  for (bp = binding; *bp; bp += strlen (bp) + 1)
+    {
+      bp += strlen ("\\Device\\");
+      strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
+      strcat (cardkey, bp);
+      strcat (cardkey, "\\Parameters\\Tcpip");
+
+      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, cardkey,
+			0, KEY_READ, &key) != ERROR_SUCCESS)
+	continue;
+
+      if (RegQueryValueEx (key, "IPAddress",
+			   NULL, NULL,
+			   (unsigned char *) ipaddress,
+			   (size = 256, &size)) == ERROR_SUCCESS
+	  && RegQueryValueEx (key, "SubnetMask",
+			      NULL, NULL,
+			      (unsigned char *) netmask,
+			      (size = 256, &size)) == ERROR_SUCCESS)
+        ++cnt;
+      RegCloseKey (key);
+    }
+  ++cnt; /* loopback */
+  if (!(ifret = (struct ifall *) malloc (cnt * sizeof (struct ifall))))
+    return NULL;
+  /* Set up lo interface first */
+  idx = 0;
+  ifp = ifret + idx;
+  memset (ifp, 0, sizeof *ifp);
+  /* Next in chain */
+  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+  /* Interface name */
+  strcpy (ifp->ifa_name, "lo");
+  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
+  /* Flags */
+  ifp->ifa_ifa.ifa_flags = IFF_UP | IFF_LOWER_UP | IFF_RUNNING | IFF_LOOPBACK;
+  /* Address */
+  sin = (struct sockaddr_in *) &ifp->ifa_addr;
+  sin->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  sin->sin_family = AF_INET;
+  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+  /* Netmask */
+  sin = (struct sockaddr_in *) &ifp->ifa_netmask;
+  sin->sin_addr.s_addr = htonl (IN_CLASSA_NET);
+  sin->sin_family = AF_INET;
+  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+  /* Broadcast address  */
+  sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+  sin->sin_addr.s_addr = htonl (INADDR_LOOPBACK | IN_CLASSA_HOST);
+  sin->sin_family = AF_INET;
+  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *) &ifp->ifa_brddstaddr;
+  /* Hardware address */
+  ; // Nothing to do... */
+  /* Metric */
+  ifp->ifa_metric = 1;
+  /* MTU */
+  ifp->ifa_mtu = 1520; /* Default value for MS TCP Loopback interface. */
+  /* Interface index */
+  ifp->ifa_ifindex = -1;
+  /* Friendly name */
+  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+  				  &ifp->ifa_frndlyname;
+  strcpy (iff->ifrf_friendlyname, "Default loopback");
+  iff->ifrf_len = 16;
+
+  for (bp = binding; *bp; bp += strlen (bp) + 1)
+    {
+      bp += strlen ("\\Device\\");
+      strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
+      strcat (cardkey, bp);
+      strcat (cardkey, "\\Parameters\\Tcpip");
+
+      if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, cardkey,
+			0, KEY_READ, &key) != ERROR_SUCCESS)
+	continue;
+
+      if (RegQueryValueEx (key, "IPAddress",
+			   NULL, NULL,
+			   (unsigned char *) ipaddress,
+			   (size = 256, &size)) == ERROR_SUCCESS
+	  && RegQueryValueEx (key, "SubnetMask",
+			      NULL, NULL,
+			      (unsigned char *) netmask,
+			      (size = 256, &size)) == ERROR_SUCCESS)
+	{
+	  char *ip, *np;
+	  char dhcpaddress[256], dhcpnetmask[256];
+	  bool ppp = false;
+
+	  for (ip = ipaddress, np = netmask;
+	       *ip && *np;
+	       ip += strlen (ip) + 1, np += strlen (np) + 1)
+	    {
+	      bool dhcp = false;
+	      if (cygwin_inet_addr (ip) == 0L
+		  && RegQueryValueEx (key, "DhcpIPAddress",
+				      NULL, NULL,
+				      (unsigned char *) dhcpaddress,
+				      (size = 256, &size))
+		  == ERROR_SUCCESS
+		  && RegQueryValueEx (key, "DhcpSubnetMask",
+				      NULL, NULL,
+				      (unsigned char *) dhcpnetmask,
+				      (size = 256, &size))
+		  == ERROR_SUCCESS)
+		dhcp = true;
+	      if (++idx == cnt
+		  && !(ifp = (struct ifall *)
+			     realloc (ifret, ++cnt * sizeof (struct ifall))))
+		  {
+		    free (ifret);
+		    return NULL;
+		  }
+	      ifp = ifret + idx;
+	      memset (ifp, 0, sizeof *ifp);
+	      /* Next in chain */
+	      ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+	      /* Interface name */
+	      if (!strncmp (bp, "NdisWan", 7))
+		{
+		  strcpy (ifp->ifa_name, "ppp");
+		  strcat (ifp->ifa_name, bp + 7);
+		  ppp = true;
+		}
+	      else
+		{
+		  ++*eth;
+		  strcpy (ifp->ifa_name, "eth");
+		  strcat (ifp->ifa_name, eth);
+		}
+	      ifp->ifa_ifa.ifa_name = ifp->ifa_name;
+	      /* Flags */
+	      ifp->ifa_ifa.ifa_flags = IFF_UP | IFF_LOWER_UP | IFF_RUNNING;
+	      if (ppp)
+		ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT | IFF_NOARP;
+	      else
+		ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
+	      /* Address */
+	      sin = (struct sockaddr_in *) &ifp->ifa_addr;
+	      sin->sin_addr.s_addr = cygwin_inet_addr (dhcp ? dhcpaddress : ip);
+	      sin->sin_family = AF_INET;
+	      ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	      /* Netmask */
+	      sin = (struct sockaddr_in *) &ifp->ifa_netmask;
+	      sin->sin_addr.s_addr = cygwin_inet_addr (dhcp ? dhcpnetmask : np);
+	      sin->sin_family = AF_INET;
+	      ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	      if (ppp)
+	        {
+		  /* Destination address */
+		  sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		  sin->sin_addr.s_addr =
+		    cygwin_inet_addr (dhcp ? dhcpaddress : ip);
+		  sin->sin_family = AF_INET;
+		  ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
+					     &ifp->ifa_brddstaddr;
+		}
+	      else
+	        {
+		  /* Broadcast address */
+		  lip = cygwin_inet_addr (dhcp ? dhcpaddress : ip);
+		  lnp = cygwin_inet_addr (dhcp ? dhcpnetmask : np);
+		  sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		  sin->sin_addr.s_addr = lip & lnp | ~lnp;
+		  sin->sin_family = AF_INET;
+		  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
+					       &ifp->ifa_brddstaddr;
+		}
+	      /* Hardware address */
+	      ; // Nothing to do... */
+	      /* Metric */
+	      ifp->ifa_metric = 1;
+	      /* MTU */
+	      ifp->ifa_mtu = 1500;
+	      /* Interface index */
+	      ifp->ifa_ifindex = -1;
+	      /* Friendly name */
+	      struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+					     &ifp->ifa_frndlyname;
+	      strcpy (iff->ifrf_friendlyname, bp);
+	      iff->ifrf_len = strlen (iff->ifrf_friendlyname);
+	    }
+	}
+      RegCloseKey (key);
+    }
+  /* Since every entry is set to the next entry, the last entry points to an
+     invalid next entry now.  Fix it retroactively. */
+  if (ifp > ifret)
+    ifp->ifa_ifa.ifa_next = NULL;
+  return ifret;
+}
+
+extern "C" int
+getifaddrs (struct ifaddrs **ifap)
+{
+  if (!ifap)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  struct ifall *ifp;
+  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+    ifp = get_xp_ifs (AF_UNSPEC);
+  else if (wincap.has_ip_helper_lib ())
+    ifp = get_2k_ifs ();
+  else
+    ifp = get_nt_ifs ();
+  *ifap = &ifp->ifa_ifa;
+  return ifp ? 0 : -1;
+}
+
+extern "C" void
+freeifaddrs (struct ifaddrs *ifp)
+{
+  if (ifp)
+    free (ifp);
 }
 
 int
-get_ifconf (SOCKET s, struct ifconf *ifc, int what)
+get_ifconf (struct ifconf *ifc, int what)
 {
-  unsigned long lip, lnp;
-  struct sockaddr_in *sa;
-
   sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
-  /* Union maps buffer to correct struct */
-  struct ifreq *ifr = ifc->ifc_req;
-
-  /* Ensure we have space for two struct ifreqs, fail if not. */
-  if (ifc->ifc_len < (int) (2 * sizeof (struct ifreq)))
+  /* Ensure we have space for at least one struct ifreqs, fail if not. */
+  if (ifc->ifc_len < (int) sizeof (struct ifreq))
     {
-      set_errno (EFAULT);
+      set_errno (EINVAL);
       return -1;
     }
 
-  if (!wincap.has_ip_helper_lib ())
-    {
-      /* Set up interface lo0 first */
-      strcpy (ifr->ifr_name, "lo");
-      memset (&ifr->ifr_addr, '\0', sizeof (ifr->ifr_addr));
-      switch (what)
-	{
-	  case SIOCGIFFLAGS:
-	    ifr->ifr_flags = IFF_UP | IFF_RUNNING | IFF_LOOPBACK;
-	    break;
-	  case SIOCGIFCONF:
-	  case SIOCGIFADDR:
-	  case SIOCGIFDSTADDR:
-	    sa = (struct sockaddr_in *) &ifr->ifr_addr;
-	    sa->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	    sa->sin_family = AF_INET;
-	    sa->sin_port = 0;
-	    break;
-	  case SIOCGIFBRDADDR:
-	    lip = htonl (INADDR_LOOPBACK);
-	    lnp = cygwin_inet_addr ("255.0.0.0");
-	    sa = (struct sockaddr_in *) &ifr->ifr_broadaddr;
-	    sa->sin_addr.s_addr = lip & lnp | ~lnp;
-	    sa->sin_family = AF_INET;
-	    sa->sin_port = 0;
-	    break;
-	  case SIOCGIFNETMASK:
-	    sa = (struct sockaddr_in *) &ifr->ifr_netmask;
-	    sa->sin_addr.s_addr = cygwin_inet_addr ("255.0.0.0");
-	    sa->sin_family = AF_INET;
-	    sa->sin_port = 0;
-	    break;
-	  case SIOCGIFHWADDR:
-	    ifr->ifr_hwaddr.sa_family = AF_INET;
-	    memset (ifr->ifr_hwaddr.sa_data, 0, IFHWADDRLEN);
-	    break;
-	  case SIOCGIFMETRIC:
-	    ifr->ifr_metric = 1;
-	    break;
-	  case SIOCGIFMTU:
-	    /* Default value for MS TCP Loopback interface. */
-	    ifr->ifr_mtu = 1520;
-	    break;
-	  case SIOCGIFINDEX:
-	    ifr->ifr_ifindex = -1;
-	    break;
-	  default:
-	    set_errno (EINVAL);
-	    return -1;
-	}
-    }
-
+  struct ifall *ifret, *ifp;
   if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-    get_xp_ifconf (s, ifc, what);
+    ifret = get_xp_ifs (AF_INET);
   else if (wincap.has_ip_helper_lib ())
-    get_2k_ifconf (ifc, what);
+    ifret = get_2k_ifs ();
   else
-    get_nt_ifconf (ifc, what);
+    ifret = get_nt_ifs ();
+  if (!ifret)
+    return -1;
+
+  struct sockaddr_in *sin;
+  struct ifreq *ifr = ifc->ifc_req;
+  int cnt = 0;
+  for (ifp = ifret; ifp; ifp = (struct ifall *) ifp->ifa_ifa.ifa_next)
+    {
+      ++cnt;
+      strcpy (ifr->ifr_name, ifp->ifa_name);
+      switch (what)
+        {
+	case SIOCGIFFLAGS:
+	  ifr->ifr_flags = ifp->ifa_ifa.ifa_flags;
+	  break;
+	case SIOCGIFCONF:
+	case SIOCGIFADDR:
+	  sin = (struct sockaddr_in *) &ifr->ifr_addr;
+	  memcpy (sin, &ifp->ifa_addr, sizeof *sin);
+	  break;
+	case SIOCGIFNETMASK:
+	  sin = (struct sockaddr_in *) &ifr->ifr_netmask;
+	  memcpy (sin, &ifp->ifa_netmask, sizeof *sin);
+	  break;
+	case SIOCGIFDSTADDR:
+	  sin = (struct sockaddr_in *) &ifr->ifr_dstaddr;
+	  if (ifp->ifa_ifa.ifa_flags & IFF_POINTOPOINT)
+	    memcpy (sin, &ifp->ifa_brddstaddr, sizeof *sin);
+	  else /* Return addr as on Linux. */
+	    memcpy (sin, &ifp->ifa_addr, sizeof *sin);
+	  break;
+	case SIOCGIFBRDADDR:
+	  sin = (struct sockaddr_in *) &ifr->ifr_broadaddr;
+	  if (!(ifp->ifa_ifa.ifa_flags & IFF_POINTOPOINT))
+	    memcpy (sin, &ifp->ifa_brddstaddr, sizeof *sin);
+	  else
+	    {
+	      sin->sin_addr.s_addr = INADDR_ANY;
+	      sin->sin_family = AF_INET;
+	      sin->sin_port = 0;
+	    }
+	  break;
+	case SIOCGIFHWADDR:
+	  memcpy (&ifr->ifr_hwaddr, &ifp->ifa_hwaddr, sizeof ifr->ifr_hwaddr);
+	  break;
+	case SIOCGIFMETRIC:
+	  ifr->ifr_metric = ifp->ifa_metric;
+	  break;
+	case SIOCGIFMTU:
+	  ifr->ifr_mtu = ifp->ifa_mtu;
+	  break;
+	case SIOCGIFINDEX:
+	  ifr->ifr_ifindex = ifp->ifa_ifindex;
+	  break;
+	case SIOCGIFFRNDLYNAM:
+	  memcpy (ifr->ifr_frndlyname, &ifp->ifa_frndlyname,
+		  sizeof (struct ifreq_frndlyname));
+	}
+      if ((caddr_t) ++ifr >
+	  ifc->ifc_buf + ifc->ifc_len - sizeof (struct ifreq))
+	break;
+    }
+  /* Set the correct length */
+  ifc->ifc_len = cnt * sizeof (struct ifreq);
+  free (ifret);
   return 0;
 }
 

@@ -836,6 +836,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fiprintf
     flock
     forkpty
+    freeifaddrs
     fstatfs
     fts_children
     fts_close
@@ -851,6 +852,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     gammaf
     gammaf_r
     getdtablesize
+    getifaddrs
     getpagesize
     getpeereid
     getprogname

@@ -489,6 +489,7 @@ _fread = fread SIGFE
 free SIGFE
 _free = free SIGFE
 freeaddrinfo = cygwin_freeaddrinfo SIGFE
+freeifaddrs SIGFE
 freopen SIGFE
 _freopen = freopen SIGFE
 _freopen64 = freopen64 SIGFE
@@ -605,6 +606,7 @@ gethostbyname = cygwin_gethostbyname SIGFE
 gethostid SIGFE
 gethostname = cygwin_gethostname SIGFE
 _gethostname = cygwin_gethostname SIGFE
+getifaddrs SIGFE
 getitimer SIGFE
 getline = __getline SIGFE
 __getline SIGFE
