@@ -1,3 +1,7 @@
+2007-06-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_NOTHROW): Define.
+
 2007-06-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (vsnprintf): Remove inline definition.

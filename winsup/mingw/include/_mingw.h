@@ -23,6 +23,9 @@
 #ifndef __MINGW_H
 #define __MINGW_H
 
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
 
 /* These are defined by the user (or the compiler)
    to specify how identifiers are imported from a DLL.
@@ -79,8 +82,14 @@
 #   define _CRTIMP
 #  endif
 # endif /* __declspec */
-# ifndef __cdecl
-#  define __cdecl __attribute__ ((__cdecl__))
+
+/*
+   The next two defines can cause problems if user code adds the __cdecl attribute
+   like so:
+   void __attribute__ ((__cdecl)) foo(void); 
+*/
+# ifndef __cdecl 
+#  define __cdecl  __attribute__ ((__cdecl__))
 # endif
 # ifndef __stdcall
 #  define __stdcall __attribute__ ((__stdcall__))
@@ -163,6 +172,16 @@
 #else
 #define __MINGW_ATTRIB_DEPRECATED
 #endif /* GNUC >= 3.1 */
+ 
+#if  __MINGW_GNUC_PREREQ (3, 3)
+#define __MINGW_NOTHROW __attribute__ ((__nothrow__))
+#else
+#define __MINGW_NOTHROW
+#endif /* GNUC >= 3.3 */
+
+
+/* TODO: Mark (almost) all CRT functions as __MINGW_NOTHROW.  This will
+allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
 
 #ifndef __MSVCRT_VERSION__
 /*  High byte is the major version, low byte is the minor. */
