@@ -1,5 +1,24 @@
 2007-06-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	Add POSIX binary tree search API.
+
+	* mingwex/tfind.c: New file.
+	* mingwex/tdelete.c: New file.
+	* mingwex/tsearch.c: New file.
+	* mingwex/twalk.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add tsearch.c twalk.c tdelete.c tfind.c.
+	* mingwex/Makefile.in (POSIX_OBJS): Add tsearch.o twalk.o tdelete.o tfind.o.
+	* include/search.h (tfind): Declare.
+	(tdelete): Declare.
+	(tsearch): Declare.
+	(twalk): Declare.
+	(ENTRY): Define.
+	(ACTION): Define.
+	(VISIT): Define.
+	(node_t): Define, on condition of _SEARCH_PRIVATE.
+
+2007-06-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h (__MINGW_NOTHROW): Define.
 
 2007-06-18  Danny Smith  <dannysmith@users.sourceforge.net>

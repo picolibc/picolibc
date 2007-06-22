@@ -37,7 +37,8 @@ DISTFILES = Makefile.in configure configure.in aclocal.m4 \
 	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
 	gettimeofday.c isblank.c iswblank.c \
-	basename.c dirname.c
+	basename.c dirname.c \
+        tsearch.c twalk.c tdelete.c tfind.c
 
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
@@ -90,7 +91,6 @@ GDTOA_DISTFILES = \
 	gd_arith.h  gd_qnan.h gdtoa.c gdtoa.h gdtoaimp.h gethex.c gmisc.c \
 	hd_init.c hexnan.c  misc.c qnan.c README smisc.c strtodg.c strtodnrp.c \
 	strtof.c strtopx.c sum.c ulp.c
-
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
@@ -174,7 +174,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
 	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o \
-	basename.o dirname.o
+	basename.o dirname.o tsearch.o twalk.o tdelete.o tfind.o
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
@@ -191,7 +191,6 @@ GDTOA_OBJS = \
 	dmisc.o dtoa.o g__fmt.o g_dfmt.o g_ffmt.o g_xfmt.o gdtoa.o \
 	gethex.o gmisc.o hd_init.o hexnan.o misc.o smisc.o \
 	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o
-LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
 	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS) \
 	$(GDTOA_OBJS)
