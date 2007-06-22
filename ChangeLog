@@ -1,3 +1,7 @@
+2007-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (DEVO_SUPPORT): Correct typos.
+
 2007-06-18  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* Makefile.def: Add dependency from configure-gdb to all-bfd.
