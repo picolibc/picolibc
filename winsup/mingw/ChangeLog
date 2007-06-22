@@ -1,5 +1,9 @@
 2007-06-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/Makefile.in (LIB_OBJS): Revert accidental removal.
+
+2007-06-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	Add POSIX binary tree search API.
 
 	* mingwex/tfind.c: New file.
