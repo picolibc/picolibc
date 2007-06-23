@@ -1,6 +1,8 @@
 #ifndef _FENV_H_
 #define _FENV_H_
 
+#include <_mingw.h>
+
 /* FPU status word exception flags */
 #define FE_INVALID	0x01
 #define FE_DENORMAL	0x02
@@ -79,23 +81,23 @@ extern "C" {
 /*TODO: Some of these could be inlined */
 /* 7.6.2 Exception */
 
-extern int __cdecl feclearexcept (int);
-extern int __cdecl fegetexceptflag (fexcept_t * flagp, int excepts);
-extern int __cdecl feraiseexcept (int excepts );
-extern int __cdecl fesetexceptflag (const fexcept_t *, int);
-extern int __cdecl fetestexcept (int excepts);
+extern int __cdecl __MINGW_NOTHROW feclearexcept (int);
+extern int __cdecl __MINGW_NOTHROW fegetexceptflag (fexcept_t * flagp, int excepts);
+extern int __cdecl __MINGW_NOTHROW feraiseexcept (int excepts );
+extern int __cdecl __MINGW_NOTHROW fesetexceptflag (const fexcept_t *, int);
+extern int __cdecl __MINGW_NOTHROW fetestexcept (int excepts);
 
 /* 7.6.3 Rounding */
 
-extern int __cdecl fegetround (void);
-extern int __cdecl fesetround (int mode);
+extern int __cdecl __MINGW_NOTHROW fegetround (void);
+extern int __cdecl __MINGW_NOTHROW fesetround (int mode);
 
 /* 7.6.4 Environment */
 
-extern int __cdecl fegetenv (fenv_t * envp);
-extern int __cdecl fesetenv (const fenv_t * );
-extern int __cdecl feupdateenv (const fenv_t *);
-extern int __cdecl feholdexcept (fenv_t *);
+extern int __cdecl __MINGW_NOTHROW fegetenv (fenv_t * envp);
+extern int __cdecl __MINGW_NOTHROW fesetenv (const fenv_t * );
+extern int __cdecl __MINGW_NOTHROW feupdateenv (const fenv_t *);
+extern int __cdecl __MINGW_NOTHROW feholdexcept (fenv_t *);
 
 #ifdef __cplusplus
 }

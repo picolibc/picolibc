@@ -20,8 +20,8 @@
 extern "C" {
 #endif
 
-extern __cdecl char *basename (char *);
-extern __cdecl char *dirname  (char *);
+extern __cdecl __MINGW_NOTHROW char *basename (char *);
+extern __cdecl __MINGW_NOTHROW char *dirname  (char *);
 
 #ifdef __cplusplus
 }
