@@ -1,3 +1,12 @@
+2007-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add heap_slop_inited member.
+	* shared.cc (shared_info::heap_slop_size): Use heap_slop_inited to
+	track initializing heap_slop since 0 is a valid value for heap_slop.
+	Drop useless < 0 consideration.
+
 2007-06-27  Eric Blake  <ebb9@byu.net>
 
 	* assert.cc (__assert_func): New function, to match newlib header
