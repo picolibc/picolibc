@@ -118,6 +118,7 @@ _asprintf = asprintf SIGFE
 asprintf_r = _asprintf_r SIGFE
 _asprintf_r SIGFE
 __assert SIGFE
+__assert_func SIGFE
 __assertfail SIGFE
 atan NOSIGFE
 _atan = atan NOSIGFE

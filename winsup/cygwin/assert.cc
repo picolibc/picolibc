@@ -1,6 +1,6 @@
 /* assert.cc: Handle the assert macro for WIN32.
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,6 +23,13 @@ details. */
 extern "C" void
 __assert (const char *file, int line, const char *failedexpr)
 {
+  __assert_func (file, line, NULL, failedexpr);
+}
+
+extern "C" void
+__assert_func (const char *file, int line, const char *func,
+	       const char *failedexpr)
+{
   HANDLE h;
 
   /* If we don't have a console in a Windows program, then bring up a
@@ -35,15 +42,17 @@ __assert (const char *file, int line, const char *failedexpr)
       char *buf;
 
       buf = (char *) alloca (100 + strlen (failedexpr));
-      __small_sprintf (buf, "Failed assertion\n\t%s\nat line %d of file %s",
-		failedexpr, line, file);
+      __small_sprintf (buf, "Failed assertion\n\t%s\nat line %d of file %s%s%s",
+		       failedexpr, line, file,
+		       func ? "\nin function " : "", func ? func : "");
       MessageBox (NULL, buf, NULL, MB_OK | MB_ICONERROR | MB_TASKMODAL);
     }
   else
     {
       CloseHandle (h);
-      small_printf ("assertion \"%s\" failed: file \"%s\", line %d\n",
-		    failedexpr, file, line);
+      small_printf ("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
+		    failedexpr, file, line,
+		    func ? ", function: " : "", func ? func : "");
     }
 
 #ifdef DEBUGGING

@@ -1,3 +1,10 @@
+2007-06-27  Eric Blake  <ebb9@byu.net>
+
+	* assert.cc (__assert_func): New function, to match newlib header
+	change.
+	* cygwin.din: Export __assert_func.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (WSAIoctl): Remove.
@@ -536,7 +543,7 @@
 	* Makefile.in (DLL_IMPORTS): Add libntdll.a.
 	* autoload.cc: Remove all symbols from advapi32.dll, kernel32.dll and
 	ntdll.dll available on all platforms since NT4.
-	
+
 	Throughout remove all usage of wincap.is_winnt.
 	* dcrt0.cc (dll_crt0_0): Remove call to mmap_init.
 	* fhandler.h (class fhandler_base): Remove has_changed flag.

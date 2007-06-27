@@ -313,12 +313,13 @@ details. */
       171: Export exp10, exp10f, pow10, pow10f, strcasestr, funopen,
            fopencookie.
       172: Export getifaddrs, freeifaddrs.
+      173: Export __assert_func.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 172
+#define CYGWIN_VERSION_API_MINOR 173
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
