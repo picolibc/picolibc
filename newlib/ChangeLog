@@ -1,3 +1,11 @@
+2007-06-27  Eric Blake  <ebb9@byu.net>
+
+	Support __func__ in assert, as required by C99.
+	* libc/stdlib/assert.c (__assert_func): New function.
+	(__assert): Use __assert_func.
+	* libc/include/assert.h (assert) [!NDEBUG]: Use __assert_func when
+	possible.
+
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/perror.c: Pass errno as the second argument to
@@ -11,7 +19,7 @@
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/include/sys/unistd.h[__SPU__]: Make fchdir prototype visible.
-	* libc/include/sys/stat.h[__SPU__]: Make mknod and lstat prototypes 
+	* libc/include/sys/stat.h[__SPU__]: Make mknod and lstat prototypes
 	visible.
 
 2007-06-15  Patrick Mansfield  <patmans@us.ibm.com>
@@ -23,7 +31,7 @@
 2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/creat.c: New file copied from libc/posix/creat.c,
-	it just calls open with appropriate arguments. 
+	it just calls open with appropriate arguments.
 	* libc/machine/spu/Makefile.am: Add creat.c.
 	* libc/machine/spu/Makefile.in: Regenerate.
 
@@ -77,7 +85,7 @@
 
 2007-06-05  Christian Groessler  <chris@groessler.org>
 
-	* libc/argz/argz_insert.c (argz_insert): Move delta variable 
+	* libc/argz/argz_insert.c (argz_insert): Move delta variable
 	declaration to top of function in keeping with C89 standard.
 
 2007-06-04  Eric Blake  <ebb9@byu.net>
