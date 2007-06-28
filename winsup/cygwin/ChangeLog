@@ -1,3 +1,10 @@
+2007-06-28  Brian Dessent  <brian@dessent.net>
+
+	Backport documentation changes from HEAD.
+        * ansi.sgml: Delete.
+        * misc-std.sgml: Delete.
+        * posix.sgml: Rework entirely.
+
 2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sigproc.cc (child_info::child_info): Set msv_count to non-zero
