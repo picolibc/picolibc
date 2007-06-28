@@ -1,3 +1,10 @@
+2007-06-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export stpcpy, stpncpy.
+	* posix.sgml: Add stpcpy and stpncpy to list of implemented
+	GNU extensions.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.

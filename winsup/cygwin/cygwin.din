@@ -1424,6 +1424,8 @@ _stat64 = stat64 SIGFE
 statfs SIGFE
 _statfs = statfs SIGFE
 statvfs SIGFE
+stpcpy NOSIGFE
+stpncpy NOSIGFE
 strcasecmp NOSIGFE
 _strcasecmp = strcasecmp NOSIGFE
 strcasestr NOSIGFE
