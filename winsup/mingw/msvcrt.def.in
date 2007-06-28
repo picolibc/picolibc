@@ -5,7 +5,7 @@
 ;* This file is a part of the mingw-runtime package.
 ;* No warranty is given; refer to the file DISCLAIMER within the package.
 ;
-; Exports from msvcrt.dll, msvcr70.dll and msvcr71.dll
+; Exports from msvcrt.dll, msvcr70.dll, msvcr71.dll and msvcr80.dll
 ;
 ; NOTE: All exports, except for what appeared to be C++ mangled names,
 ;       are included. Not all functions have prototypes in the headers
@@ -148,7 +148,9 @@ _cprintf
 _cputs
 _creat
 _cscanf
+#if  !(__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
 _ctype DATA
+#endif
 _cwait
 _daylight DATA
 _dstbias DATA

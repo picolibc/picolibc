@@ -1,3 +1,10 @@
+2007-06-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* msvcrt.def.in: Update comment.
+	Exclude _ctype stub if using msvcr71.dll or newer.
+	* include/ctype.h: Don't declare _ctype if using msvcr71.dll or newer.
+	* include/wctype.h: Likewise.
+
 2007-06-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	*include/wctype.h: Qualify all functions with __MINGW_NOTHROW.

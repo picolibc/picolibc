@@ -95,7 +95,9 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	isleadbyte (int);
 /* Also in ctype.h */
 
 #ifdef __DECLSPEC_SUPPORTED
-__MINGW_IMPORT unsigned short _ctype[];
+# if __MSVCRT_VERSION__ <= 0x0700
+  __MINGW_IMPORT unsigned short _ctype[];
+# endif 
 # ifdef __MSVCRT__
   __MINGW_IMPORT unsigned short* _pctype;
 # else	/* CRTDLL */
@@ -104,8 +106,10 @@ __MINGW_IMPORT unsigned short _ctype[];
 # endif
 
 #else		/* ! __DECLSPEC_SUPPORTED */
-extern unsigned short** _imp___ctype;
-#define _ctype (*_imp___ctype)
+# if __MSVCRT_VERSION__ <= 0x0700
+  extern unsigned short** _imp___ctype;
+# define _ctype (*_imp___ctype)
+# endif
 # ifdef __MSVCRT__
   extern unsigned short** _imp___pctype;
 # define _pctype (*_imp___pctype)
