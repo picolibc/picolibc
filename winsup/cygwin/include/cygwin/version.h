@@ -297,7 +297,7 @@ details. */
       158: Export bindresvport, bindresvport_sa, iruserok_sa, rcmd_af,
 	   rresvport_af.
       159: Export posix_openpt.
-      160: Export posix_fadvice, posix_fallocate.
+      160: Export posix_fadvise, posix_fallocate.
       161: Export resolver functions.
       162: New struct ifreq.  Export if_nametoindex, if_indextoname,
 	   if_nameindex, if_freenameindex.

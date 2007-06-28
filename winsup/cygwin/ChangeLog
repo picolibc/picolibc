@@ -1,3 +1,7 @@
+2007-06-28  Brian Dessent  <brian@dessent.net>
+
+	* include/cygwin/version.h: Fix comment typo.
+
 2007-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export stpcpy, stpncpy.
