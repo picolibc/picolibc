@@ -90,6 +90,8 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-stpcpy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-stpncpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strcasestr.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT)
@@ -100,19 +102,20 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libstring_la_LIBADD =
 am__objects_3 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	memcpy.lo memmove.lo memset.lo rindex.lo strcasecmp.lo \
-	strcat.lo strchr.lo strcmp.lo strcoll.lo strcpy.lo strcspn.lo \
-	strdup.lo strdup_r.lo strerror.lo strerror_r.lo strlcat.lo \
-	strlcpy.lo strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
-	strncmp.lo strncpy.lo strnlen.lo strpbrk.lo strrchr.lo \
-	strsep.lo strspn.lo strtok.lo strtok_r.lo strupr.lo strxfrm.lo \
-	strstr.lo swab.lo u_strerr.lo wcscat.lo wcschr.lo wcscmp.lo \
-	wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo wcslcpy.lo \
-	wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo wcsnlen.lo \
-	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo \
-	wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
-	wmemset.lo
+	strcat.lo strchr.lo strcmp.lo strcoll.lo strcpy.lo \
+	strcspn.lo strdup.lo strdup_r.lo strerror.lo strerror_r.lo \
+	strlcat.lo strlcpy.lo strlen.lo strlwr.lo strncasecmp.lo \
+	strncat.lo strncmp.lo strncpy.lo strnlen.lo strpbrk.lo \
+	strrchr.lo strsep.lo strspn.lo strtok.lo strtok_r.lo \
+	strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo wcscat.lo \
+	wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo wcscspn.lo \
+	wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo \
+	wcsncpy.lo wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo \
+	wcswidth.lo wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo \
+	wmemmove.lo wmemset.lo
 @ELIX_LEVEL_1_FALSE@am__objects_4 = bcmp.lo memccpy.lo mempcpy.lo \
-@ELIX_LEVEL_1_FALSE@	strndup.lo strcasestr.lo strndup_r.lo
+@ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
+@ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo
 @USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libstring_la_OBJECTS = $(am_libstring_la_OBJECTS)
@@ -360,6 +363,8 @@ GENERAL_SOURCES = \
 
 @ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	bcmp.c \
+@ELIX_LEVEL_1_FALSE@	stpcpy.c \
+@ELIX_LEVEL_1_FALSE@	stpncpy.c \
 @ELIX_LEVEL_1_FALSE@	memccpy.c \
 @ELIX_LEVEL_1_FALSE@	mempcpy.c \
 @ELIX_LEVEL_1_FALSE@	strndup.c \
@@ -383,7 +388,7 @@ index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
-memccpy.def 	mempcpy.def \
+memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def \
 wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
 wcscpy.def	wcscspn.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
@@ -864,6 +869,18 @@ lib_a-mempcpy.o: mempcpy.c
 
 lib_a-mempcpy.obj: mempcpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mempcpy.obj `if test -f 'mempcpy.c'; then $(CYGPATH_W) 'mempcpy.c'; else $(CYGPATH_W) '$(srcdir)/mempcpy.c'; fi`
+
+lib_a-stpcpy.o: stpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy.o `test -f 'stpcpy.c' || echo '$(srcdir)/'`stpcpy.c
+
+lib_a-stpcpy.obj: stpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy.obj `if test -f 'stpcpy.c'; then $(CYGPATH_W) 'stpcpy.c'; else $(CYGPATH_W) '$(srcdir)/stpcpy.c'; fi`
+
+lib_a-stpncpy.o: stpncpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy.o `test -f 'stpncpy.c' || echo '$(srcdir)/'`stpncpy.c
+
+lib_a-stpncpy.obj: stpncpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpncpy.obj `if test -f 'stpncpy.c'; then $(CYGPATH_W) 'stpncpy.c'; else $(CYGPATH_W) '$(srcdir)/stpncpy.c'; fi`
 
 lib_a-strndup.o: strndup.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup.o `test -f 'strndup.c' || echo '$(srcdir)/'`strndup.c

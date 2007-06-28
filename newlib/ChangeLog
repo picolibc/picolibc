@@ -1,3 +1,14 @@
+2007-06-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/string.h: Add prototypes for stpcpy and stpncpy.
+	* libc/string/Makefile.am (ELIX_SOURCES): Add stpcpy.c and
+	stpncpy.c.
+	(CHEWOUT_FILES): Add stpcpy.def and stpncpy.def.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/string/stpcpy.c: New file.
+	* libc/string/stpncpy.c: New file.
+	* libc/string/strings.tex: Add stpcpy and stpncpy.
+
 2007-06-27  Eric Blake  <ebb9@byu.net>
 
 	Support __func__ in assert, as required by C99.
