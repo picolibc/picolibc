@@ -1,5 +1,10 @@
 2007-06-28  Brian Dessent  <brian@dessent.net>
 
+	* posix.sgml: Add functions implemented on HEAD to unimplemented
+	section on branch.
+
+2007-06-28  Brian Dessent  <brian@dessent.net>
+
 	Backport documentation changes from HEAD.
         * ansi.sgml: Delete.
         * misc-std.sgml: Delete.

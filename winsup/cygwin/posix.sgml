@@ -963,6 +963,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
 <sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 3:</title>
 
 <screen>
+    _Exit
     acoshl
     acosl
     aio_cancel
@@ -974,9 +975,12 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     aio_write
     asinhl
     asinl
+    asnprintf
     atan2l
     atanhl
     atanl
+    bindresvport
+    bindresvport_sa
     bsd_signal
     cabsl
     cacos
@@ -1018,6 +1022,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     clog
     clogf
     clogl
+    confstr
     conj
     conjf
     conjl
@@ -1048,9 +1053,15 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ctanhf
     ctanhl
     ctanl
+    dn_comp
+    dn_expand
+    dn_skipname
+    dprintf
     endnetent
     erfcl
     erfl
+    exp10
+    exp10f
     exp2l
     expl
     expm1l
@@ -1076,17 +1087,25 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fminl
     fmodl
     fmtmsg
+    fopencookie
     fputwc
     fputws
+    freeaddrinfo
+    freeifaddrs
     frexpl
+    funopen
     fwide
     fwprintf
     fwscanf
+    gai_strerror
+    getaddrinfo
     getcontext
     getdate
     getdate_err
     gethostent
+    getifaddrs
     getmsg
+    getnameinfo
     getnetbyaddr
     getnetbyname
     getnetent
@@ -1094,8 +1113,14 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     getwc
     getwchar
     hypotl
+    if_freenameindex
+    if_indextoname
+    if_nameindex
+    if_nametoindex
     ilogbl
     initstate
+    insque
+    iruserok_sa
     isastream
     ldexpl
     lgammal
@@ -1117,15 +1142,32 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     makecontext
     mlockall
     modfl
+    mq_close
+    mq_getattr
+    mq_notify
+    mq_open
+    mq_receive
+    mq_send
+    mq_setattr
+    mq_timedreceive
+    mq_timedsend
+    mq_unlink
     munlockall
     nanl
     nearbyintl
     nextafterl
     nexttowardl
+    posix_fadvise
+    posix_fallocate
+    posix_madvise
     posix_mem_offset
+    posix_memalign
+    posix_openpt
     posix_spawn[...]
     posix_trace[...]
     posix_typed_[...]
+    pow10
+    pow10f
     powl
     pthread_attr_getguardsize
     pthread_attr_getstack
@@ -1143,20 +1185,43 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     pthread_setschedprio
     pthread_spin_[...]
     putmsg
+    rcmd_af
     reminderl
+    remque
     remquol
+    res_close
+    res_init
+    res_mkquery
+    res_nclose
+    res_ninit
+    res_nmkquery
+    res_nquery
+    res_nquerydomain
+    res_nsearch
+    res_nsend
+    res_query
+    res_querydomain
+    res_search
+    res_send
     rintl
     roundl
+    rresvport_af
     scalblnl
     scalbnl
+    sem_unlink
     setcontext
     setnetent
+    shm_open
+    shm_unlink
     sigaltstack
     sigtimedwait
     sinhl
     sinl
     sockatmark
     sqrtl
+    stpcpy
+    stpncpy
+    strcasestr
     strfmon
     strtold
     swabcontext
@@ -1169,6 +1234,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     timer_getoverrun
     truncl
     ulimit
+    vasnprintf
+    vdprintf
     vfwprintf
     vfwscanf
     vswprintf
