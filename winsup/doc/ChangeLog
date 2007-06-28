@@ -1,3 +1,8 @@
+2007-06-28  Brian Dessent  <brian@dessent.net>
+
+        Backport documentation changes from HEAD.
+        * cygwin-api.in.sgml: Accommodate new "Compatibility" section layout.
+
 2006-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml: Change text for the order in which executables
