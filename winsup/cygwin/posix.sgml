@@ -993,6 +993,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     acltotext
     endmntent
     facl
+    fdopendir
     getmntent
     memalign
     setmntent

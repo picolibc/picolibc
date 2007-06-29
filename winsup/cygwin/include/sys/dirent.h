@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -56,6 +56,7 @@ typedef struct __DIR
 #pragma pack(pop)
 
 DIR *opendir (const char *);
+DIR *fdopendir (int);
 struct dirent *readdir (DIR *);
 int readdir_r (DIR *, struct dirent *, struct dirent **);
 void rewinddir (DIR *);

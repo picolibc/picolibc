@@ -1514,7 +1514,7 @@ struct __DIR_cache
 #define d_mounts(d)	((__DIR_mounts *) (d)->__d_internal)
 
 DIR *
-fhandler_disk_file::opendir ()
+fhandler_disk_file::opendir (int fd)
 {
   DIR *dir;
   DIR *res = NULL;
@@ -1542,9 +1542,9 @@ fhandler_disk_file::opendir ()
     {
       strcpy (d_dirname (dir), get_win32_name ());
       dir->__d_dirent->__d_version = __DIRENT_VERSION;
-      cygheap_fdnew fd;
+      cygheap_fdnew cfd;
 
-      if (fd < 0)
+      if (cfd < 0 && fd < 0)
 	goto free_dirent;
 
       /* FindFirstFile doesn't seem to like duplicate /'s.
@@ -1569,15 +1569,28 @@ fhandler_disk_file::opendir ()
       if (!pc.iscygdrive ())
 	{
 	  OBJECT_ATTRIBUTES attr;
-	  WCHAR wpath[CYG_MAX_PATH + 10];
-	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-	  IO_STATUS_BLOCK io;
 	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  WCHAR wpath[CYG_MAX_PATH + 10] = { 0 };
+	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
 	  SECURITY_ATTRIBUTES sa = sec_none;
-	  pc.get_nt_native_path (upath);
-	  InitializeObjectAttributes (&attr, &upath,
-				      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-				      NULL, sa.lpSecurityDescriptor);
+
+	  if (fd >= 0 && get_handle ())
+	    {
+	      /* fdopendir() case.  Just initialize with the emtpy upath
+		 and reuse the exisiting handle. */
+	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+					  get_handle (), NULL);
+	    }
+	  else
+	    {
+	      /* opendir() case.  Initialize with given directory name and
+	         NULL directory handle. */
+	      pc.get_nt_native_path (upath);
+	      InitializeObjectAttributes (&attr, &upath,
+					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+					  NULL, sa.lpSecurityDescriptor);
+	    }
 	  status = NtOpenFile (&dir->__handle,
 			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
@@ -1605,13 +1618,22 @@ fhandler_disk_file::opendir ()
 		dir->__flags |= dirent_get_d_ino;
 	    }
 	}
-      /* Filling fd with `this' (aka storing this in the file descriptor table
-	 should only happen after it's clear that opendir doesn't fail,
-	 otherwise we end up cfree'ing the fhandler twice, once in opendir()
-	 in dir.cc, the second time on exit.  Nasty, nasty... */
-      fd = this;
-      fd->nohandle (true);
-      dir->__d_fd = fd;
+      if (fd >= 0)
+        {
+	  dir->__flags |= dirent_valid_fd;
+	  dir->__d_fd = fd;
+	}
+      else
+        {
+	  /* Filling cfd with `this' (aka storing this in the file
+	     descriptor table should only happen after it's clear that
+	     opendir doesn't fail, otherwise we end up cfree'ing the
+	     fhandler twice, once in opendir() in dir.cc, the second
+	     time on exit.  Nasty, nasty... */
+	  cfd = this;
+	  cfd->nohandle (true);
+	  dir->__d_fd = cfd;
+	}
       dir->__fh = this;
       res = dir;
     }
@@ -2011,11 +2033,11 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
 }
 
 DIR *
-fhandler_cygdrive::opendir ()
+fhandler_cygdrive::opendir (int fd)
 {
   DIR *dir;
 
-  dir = fhandler_disk_file::opendir ();
+  dir = fhandler_disk_file::opendir (fd);
   if (dir && !ndrives)
     set_drives ();
 

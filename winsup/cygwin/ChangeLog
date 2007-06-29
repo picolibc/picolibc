@@ -1,3 +1,29 @@
+2007-06-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export fdopendir.
+	* dir.cc (opendir): Call fhandler's opendir with fd set to -1.
+	(fdopendir): New function.
+	(seekdir64): Use dirent_info_mask.
+	(rewinddir): Ditto.
+	(closedir): Only release underlying file descriptor if it has been
+	reserved by opendir itself.
+	* fhandler.cc (fhandler_base::opendir): Accommodate new parameter.
+	* fhandler.h (dirent_states): Add dirent_valid_fd and dirent_info_mask.
+	(fhander_XXX::opendir): Add file descriptor parameter.  Use regparms.
+	(fhandler_procnet::opendir): Drop declaration.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Ditto.
+	If called from fdopendir, use existing handle to re-open directory
+	with valid flags.  Rename fd to cfd.  Use only if no valid incoming fd.
+	(fhandler_cygdrive::opendir): Accommodate new parameter.
+	* fhandler_process.cc (fhandler_process::opendir): Ditto.
+	* fhandler_procnet.cc (fhandler_procnet::opendir): Drop definition.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Accommodate new
+	parameter.  Only create new file descriptor entry if called from
+	opendir.  Remove duplicated setting of dir->__flags.
+	* posix.sgml: Add fdopendir to list of implemented Solaris functions.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/dirent.h: Declare fdopendir.
+
 2007-06-28  Brian Dessent  <brian@dessent.net>
 
 	* include/cygwin/version.h: Fix comment typo.

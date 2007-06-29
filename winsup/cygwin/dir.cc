@@ -61,7 +61,7 @@ opendir (const char *name)
   if (!fh)
     res = NULL;
   else if (fh->exists ())
-    res = fh->opendir ();
+    res = fh->opendir (-1);
   else
     {
       set_errno (ENOENT);
@@ -70,6 +70,17 @@ opendir (const char *name)
 
   if (!res && fh)
     delete fh;
+  return res;
+}
+
+extern "C" DIR *
+fdopendir (int fd)
+{
+  DIR *res = NULL;
+
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = cfd->opendir (fd);
   return res;
 }
 
@@ -204,7 +215,7 @@ seekdir64 (DIR *dir, _off64_t loc)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags &= (dirent_isroot | dirent_get_d_ino | dirent_set_d_ino);
+  dir->__flags &= dirent_info_mask;
   return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 
@@ -225,7 +236,7 @@ rewinddir (DIR *dir)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  dir->__flags &= (dirent_isroot | dirent_get_d_ino | dirent_set_d_ino);
+  dir->__flags &= dirent_info_mask;
   return ((fhandler_base *) dir->__fh)->rewinddir (dir);
 }
 
@@ -249,7 +260,11 @@ closedir (DIR *dir)
 
   int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
-  cygheap->fdtab.release (dir->__d_fd);
+  /* If the directory has been opened by fdopendir, the descriptor
+     entry is used elsewhere in the application and must not be removed
+     from the descriptor table. */
+  if (!(dir->__flags & dirent_valid_fd))
+    cygheap->fdtab.release (dir->__d_fd);
 
   free (dir->__d_dirname);
   free (dir->__d_dirent);

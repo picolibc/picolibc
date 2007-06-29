@@ -51,7 +51,11 @@ enum dirent_states
   dirent_saw_eof	= 0x0004,
   dirent_isroot		= 0x0008,
   dirent_set_d_ino	= 0x0010,
-  dirent_get_d_ino	= 0x0020
+  dirent_get_d_ino	= 0x0020,
+  dirent_valid_fd	= 0x0040,
+
+  /* Global flags which must not be deleted on rewinddir or seekdir. */
+  dirent_info_mask	= 0x0078
 };
 
 enum conn_state
@@ -356,7 +360,7 @@ class fhandler_base
   virtual void set_eof () {}
   virtual int mkdir (mode_t mode);
   virtual int rmdir ();
-  virtual DIR *opendir ();
+  virtual DIR *opendir (int fd) __attribute__ ((regparm (2)));
   virtual int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   virtual _off64_t telldir (DIR *);
   virtual void seekdir (DIR *, _off64_t);
@@ -705,7 +709,7 @@ class fhandler_disk_file: public fhandler_base
 			      _off64_t offset, DWORD size, void *address);
   int mkdir (mode_t mode);
   int rmdir ();
-  DIR *opendir ();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   _off64_t telldir (DIR *);
   void seekdir (DIR *, _off64_t);
@@ -725,7 +729,7 @@ class fhandler_cygdrive: public fhandler_disk_file
   fhandler_cygdrive ();
   int open (int flags, mode_t mode);
   int close ();
-  DIR *opendir ();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void rewinddir (DIR *);
   int closedir (DIR *);
@@ -1221,7 +1225,7 @@ class fhandler_virtual : public fhandler_base
   virtual ~fhandler_virtual();
 
   virtual int exists();
-  virtual DIR *opendir ();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
   _off64_t telldir (DIR *);
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
@@ -1297,7 +1301,7 @@ class fhandler_process: public fhandler_proc
  public:
   fhandler_process ();
   int exists();
-  DIR *opendir ();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -1310,7 +1314,6 @@ class fhandler_procnet: public fhandler_proc
  public:
   fhandler_procnet ();
   int exists();
-  DIR *opendir ();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

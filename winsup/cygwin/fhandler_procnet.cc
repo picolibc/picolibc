@@ -107,15 +107,6 @@ fhandler_procnet::fstat (struct __stat64 *buf)
     }
 }
 
-DIR *
-fhandler_procnet::opendir ()
-{
-  DIR *dir = fhandler_virtual::opendir ();
-  if (dir)
-    dir->__flags = 0;
-  return dir;
-}
-
 int
 fhandler_procnet::readdir (DIR *dir, dirent *de)
 {

@@ -1444,7 +1444,7 @@ fhandler_base::rmdir ()
 }
 
 DIR *
-fhandler_base::opendir ()
+fhandler_base::opendir (int fd)
 {
   set_errno (ENOTDIR);
   return NULL;

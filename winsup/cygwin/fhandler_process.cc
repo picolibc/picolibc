@@ -198,15 +198,11 @@ fhandler_process::fstat (struct __stat64 *buf)
 }
 
 DIR *
-fhandler_process::opendir ()
+fhandler_process::opendir (int fd)
 {
-  DIR *dir = fhandler_virtual::opendir ();
-  if (dir)
-    {
-      if (fileid == PROCESS_FD)
-	fill_filebuf ();
-      dir->__flags = 0;
-    }
+  DIR *dir = fhandler_virtual::opendir (fd);
+  if (dir && fileid == PROCESS_FD)
+    fill_filebuf ();
   return dir;
 }
 
