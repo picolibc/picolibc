@@ -237,22 +237,12 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
 END_RELOC_NUMBERS (R_ARM_max)
 
 #ifdef BFD_ARCH_SIZE
-/* Routines for manipulating EABI object attributes.  */
-void elf32_arm_add_eabi_attr_int (bfd *, int, unsigned int);
-void elf32_arm_add_eabi_attr_string (bfd *, int, const char *);
-void elf32_arm_add_eabi_attr_compat (bfd *, unsigned int, const char *);
-int elf32_arm_get_eabi_attr_int (bfd *, int);
-
-void elf32_arm_set_eabi_attr_contents (bfd *, bfd_byte *, bfd_vma);
-bfd_vma elf32_arm_eabi_attr_size (bfd *);
+/* EABI object attributes.  */
 
 enum
 {
-  Tag_NULL,
-  Tag_File,
-  Tag_Section,
-  Tag_Symbol,
-  Tag_CPU_raw_name,
+  /* 0-3 are generic.  */
+  Tag_CPU_raw_name = 4,
   Tag_CPU_name,
   Tag_CPU_arch,
   Tag_CPU_arch_profile,
@@ -280,7 +270,7 @@ enum
   Tag_ABI_WMMX_args,
   Tag_ABI_optimization_goals,
   Tag_ABI_FP_optimization_goals,
-  Tag_compatibility,
+  /* 32 is generic.  */
 };
 
 #endif

@@ -1,3 +1,12 @@
+2007-06-29  Joseph Myers  <joseph@codesourcery.com>
+
+	* arm.h (elf32_arm_add_eabi_attr_int,
+	elf32_arm_add_eabi_attr_string, elf32_arm_add_eabi_attr_compat,
+	elf32_arm_get_eabi_attr_int, elf32_arm_set_eabi_attr_contents,
+	elf32_arm_eabi_attr_size, Tag_NULL, Tag_File, Tag_Section,
+	Tag_Symbol, Tag_compatibility): Remove.
+	* common.h (SHT_GNU_ATTRIBUTES): Define.
+
 2007-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
 
 	* common.h (EM_CR16): New entry for CR16 cpu.
