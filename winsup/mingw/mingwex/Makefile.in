@@ -38,7 +38,7 @@ DISTFILES = Makefile.in configure configure.in aclocal.m4 \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
 	gettimeofday.c isblank.c iswblank.c \
 	basename.c dirname.c \
-        tsearch.c twalk.c tdelete.c tfind.c
+	tsearch.c twalk.c tdelete.c tfind.c
 
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
@@ -90,7 +90,7 @@ GDTOA_DISTFILES = \
 	arithchk.c dmisc.c dtoa.c  g__fmt.c g_dfmt.c g_ffmt.c g_xfmt.c \
 	gd_arith.h  gd_qnan.h gdtoa.c gdtoa.h gdtoaimp.h gethex.c gmisc.c \
 	hd_init.c hexnan.c  misc.c qnan.c README smisc.c strtodg.c strtodnrp.c \
-	strtof.c strtopx.c sum.c ulp.c
+	strtof.c strtopx.c sum.c ulp.c mingw_snprintf.c
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
@@ -190,7 +190,8 @@ COMPLEX_OBJS = \
 GDTOA_OBJS = \
 	dmisc.o dtoa.o g__fmt.o g_dfmt.o g_ffmt.o g_xfmt.o gdtoa.o \
 	gethex.o gmisc.o hd_init.o hexnan.o misc.o smisc.o \
-	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o
+	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o \
+	mingw_snprintf.o
 
 LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
