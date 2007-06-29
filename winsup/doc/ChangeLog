@@ -1,3 +1,10 @@
+2007-06-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin-api.in.sgml: Remove authorgroup and revhistory.
+	* cygwin-ug.in.sgml: Add Joshua Daniel Franklin to authorgroup.
+	Remove revhistory.
+	* legal.sgml: Update dates.
+
 2007-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin-api.in.sgml: Accommodate new "Compatibility" section layout.
