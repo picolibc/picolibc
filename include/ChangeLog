@@ -1,3 +1,7 @@
+2007-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
+
+        * dis-asm.h (print_insn_cr16): New prototype.
+
 2007-06-01  Noah Misch  <noah@cs.caltech.edu>
 	    Alan Modra  <amodra@bigpond.net.au>
 

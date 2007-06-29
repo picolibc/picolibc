@@ -1,3 +1,8 @@
+2007-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
+
+	* common.h (EM_CR16): New entry for CR16 cpu.
+	* cr16.h: New file.
+
 2007-06-11  Sterling Augustine  <sterling@tensilica.com>
 	    Bob Wilson  <bob.wilson@acm.org>
 	

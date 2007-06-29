@@ -1,3 +1,7 @@
+2006-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
+
+	* cr16.h: New file for CR16 target.
+
 2007-05-02  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (PPC_OPERAND_PLUS1): Update comment.
