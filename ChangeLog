@@ -1,3 +1,9 @@
+2007-06-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* configure.ac: Don't add target-libmudflap to noconfigdirs for
+	uclinux and linux-uclibc targets.
+	* configure: Regenerate.
+
 2007-06-28  DJ Delorie  <dj@redhat.com>
 
 	* configure.ac (arm*-*-linux-gnueabi): Don't build libgloss if we're
