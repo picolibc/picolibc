@@ -1,3 +1,8 @@
+2007-06-29  Brian Dessent  <brian@dessent.net>
+
+	* posix.sgml: List resolver functions in BSD section with reference
+	to minires.
+
 2007-06-28  Brian Dessent  <brian@dessent.net>
 
 	* posix.sgml: Add functions implemented on HEAD to unimplemented

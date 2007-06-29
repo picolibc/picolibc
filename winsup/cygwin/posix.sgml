@@ -833,6 +833,20 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     mkdtemp
     openpty
     rcmd
+    res_close			(available in external "libminires" library)
+    res_init			(available in external "libminires" library)
+    res_mkquery			(available in external "libminires" library)
+    res_nclose			(available in external "libminires" library)
+    res_ninit			(available in external "libminires" library)
+    res_nmkquery		(available in external "libminires" library)
+    res_nquery			(available in external "libminires" library)
+    res_nquerydomain		(available in external "libminires" library)
+    res_nsearch			(available in external "libminires" library)
+    res_nsend			(available in external "libminires" library)
+    res_query			(available in external "libminires" library)
+    res_querydomain		(available in external "libminires" library)
+    res_search			(available in external "libminires" library)
+    res_send			(available in external "libminires" library)
     revoke
     rexec
     rresvport
@@ -1189,20 +1203,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     reminderl
     remque
     remquol
-    res_close
-    res_init
-    res_mkquery
-    res_nclose
-    res_ninit
-    res_nmkquery
-    res_nquery
-    res_nquerydomain
-    res_nsearch
-    res_nsend
-    res_query
-    res_querydomain
-    res_search
-    res_send
     rintl
     roundl
     rresvport_af
