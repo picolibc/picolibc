@@ -7,35 +7,9 @@
   <bookinfo>
     <date>1998-08-31</date>
     <title>Cygwin API Reference</title>
-    <authorgroup>
-      <author>
-        <firstname>DJ</firstname>
-        <surname>Delorie</surname>
-      </author>
-      <author>
-        <firstname>Geoffrey</firstname>
-        <surname>Noer</surname>
-      </author>
-    </authorgroup>
 
     DOCTOOL-INSERT-legal
 
-    <revhistory>
-      <revision>
-	<revnumber>0.0</revnumber>
-	<date>1998-08-31</date>
-	<authorinitials>dj</authorinitials>
-	<revremark>Initial revision</revremark>
-      </revision>
-      <revision>
-	<revnumber>0.5.0</revnumber>
-	<date>1998-12-17</date>
-	<authorinitials>noer</authorinitials>
-	<revremark>Add pthread, sem calls.  Change revnumber to
-	three-part number: Cygwin API major, Cygwin API minor, Doc rev
-	number.  Starts out at 0.5.0.</revremark>
-      </revision>
-    </revhistory>
   </bookinfo>
 
   <toc></toc>

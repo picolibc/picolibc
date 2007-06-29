@@ -1,3 +1,11 @@
+2007-06-29  Brian Dessent  <brian@dessent.net>
+
+	Backport from HEAD:
+	* cygwin-api.in.sgml: Remove authorgroup and revhistory.
+	* cygwin-ug.in.sgml: Add Joshua Daniel Franklin to authorgroup.
+	Remove revhistory.
+	* legal.sgml: Update dates.
+
 2007-06-28  Brian Dessent  <brian@dessent.net>
 
         Backport documentation changes from HEAD.
