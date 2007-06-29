@@ -1,5 +1,9 @@
 2007-06-29  Joseph Myers  <joseph@codesourcery.com>
 
+	* mips.h (Tag_GNU_MIPS_ABI_FP): Define.
+
+2007-06-29  Joseph Myers  <joseph@codesourcery.com>
+
 	* arm.h (elf32_arm_add_eabi_attr_int,
 	elf32_arm_add_eabi_attr_string, elf32_arm_add_eabi_attr_compat,
 	elf32_arm_get_eabi_attr_int, elf32_arm_set_eabi_attr_contents,
