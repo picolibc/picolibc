@@ -1,5 +1,9 @@
 2007-06-29  Joseph Myers  <joseph@codesourcery.com>
 
+	* ppc.h (Tag_GNU_Power_ABI_FP): Define.
+
+2007-06-29  Joseph Myers  <joseph@codesourcery.com>
+
 	* mips.h (Tag_GNU_MIPS_ABI_FP): Define.
 
 2007-06-29  Joseph Myers  <joseph@codesourcery.com>
