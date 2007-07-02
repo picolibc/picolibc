@@ -1,3 +1,12 @@
+2007-07-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oaidl.h: Include windows.h and ole2.h,
+	unless COM_NO_WINDOWS_H.
+
+	[mingw-Bugs-1742130]
+	* include/oaidl.h (struct tagVARIANT): Add union members
+	LONGLONG  * pllVal and ULONGLONG * pullVal.
+
 2007-07-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ws2tcpip.h (s6_addr32): Correct definition.
