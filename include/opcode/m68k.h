@@ -96,10 +96,15 @@ struct m68k_opcode_alias
 
    The args field is a string containing two characters for each
    operand of the instruction.  The first specifies the kind of
-   operand; the second, the place it is stored.  */
+   operand; the second, the place it is stored.
+
+   If the first char of args is '.', it indicates that the opcode is
+   two words.  This is only necessary when the match field does not
+   have any bits set in the second opcode word.  Such a '.' is skipped
+   for operand processing.  */
 
 /* Kinds of operands:
-   Characters used: AaBbCcDdEeFfGgHIiJkLlMmnOopQqRrSsTtU VvWwXxYyZz01234|*~%;@!&$?/<>#^+-
+   Characters used: AaBbCcDdEeFfGgHIiJjKkLlMmnOopQqRrSsTtUuVvWwXxYyZz01234|*~%;@!&$?/<>#^+-
 
    D  data register only.  Stored as 3 bits.
    A  address register only.  Stored as 3 bits.
@@ -234,6 +239,8 @@ struct m68k_opcode_alias
    y						(modes 2,5)
    z						(modes 2,5,7.2)
    x  mov3q immediate operand.
+   j  coprocessor ET operand.
+   K  coprocessor command number.
    4						(modes 2,3,4,5)
   */
 
@@ -301,6 +308,7 @@ struct m68k_opcode_alias
    7  second word, shifted 7
    8  second word, shifted 10
    9  second word, shifted 5
+   E  second word, shifted 9
    D  store in both place 1 and place 3; for divul and divsl.
    B  first word, low byte, for branch displacements
    W  second word (entire), for branch displacements
