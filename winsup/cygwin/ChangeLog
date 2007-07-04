@@ -1,5 +1,10 @@
 2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* times.cc: Define __timezonefunc__ before including time.h to protect
+	definition of timezone function.
+
+2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/time.h: Switch to timezone variable by default.  Add
 	comment.
 

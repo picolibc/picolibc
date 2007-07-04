@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#define __timezonefunc__
 #include <time.h>
 #include <sys/times.h>
 #include <sys/timeb.h>
