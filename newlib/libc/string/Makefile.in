@@ -84,9 +84,10 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-wcsnlen.$(OBJEXT) lib_a-wcspbrk.$(OBJEXT) \
 	lib_a-wcsrchr.$(OBJEXT) lib_a-wcsspn.$(OBJEXT) \
 	lib_a-wcsstr.$(OBJEXT) lib_a-wcswidth.$(OBJEXT) \
-	lib_a-wcwidth.$(OBJEXT) lib_a-wmemchr.$(OBJEXT) \
-	lib_a-wmemcmp.$(OBJEXT) lib_a-wmemcpy.$(OBJEXT) \
-	lib_a-wmemmove.$(OBJEXT) lib_a-wmemset.$(OBJEXT)
+	lib_a-wcsxfrm.$(OBJEXT) lib_a-wcwidth.$(OBJEXT) \
+	lib_a-wmemchr.$(OBJEXT) lib_a-wmemcmp.$(OBJEXT) \
+	lib_a-wmemcpy.$(OBJEXT) lib_a-wmemmove.$(OBJEXT) \
+	lib_a-wmemset.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
@@ -111,8 +112,8 @@ am__objects_3 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo wcscspn.lo \
 	wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo \
 	wcsncpy.lo wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo \
-	wcswidth.lo wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo \
-	wmemmove.lo wmemset.lo
+	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
+	wmemcpy.lo wmemmove.lo wmemset.lo
 @ELIX_LEVEL_1_FALSE@am__objects_4 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo
@@ -354,6 +355,7 @@ GENERAL_SOURCES = \
 	wcsspn.c \
 	wcsstr.c \
 	wcswidth.c \
+	wcsxfrm.c \
 	wcwidth.c \
 	wmemchr.c \
 	wmemcmp.c \
@@ -394,7 +396,7 @@ wcscpy.def	wcscspn.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def \
-wcswidth.def	wcwidth.def	wmemchr.def \
+wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
 
 SUFFIXES = .def
@@ -815,6 +817,12 @@ lib_a-wcswidth.o: wcswidth.c
 
 lib_a-wcswidth.obj: wcswidth.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcswidth.obj `if test -f 'wcswidth.c'; then $(CYGPATH_W) 'wcswidth.c'; else $(CYGPATH_W) '$(srcdir)/wcswidth.c'; fi`
+
+lib_a-wcsxfrm.o: wcsxfrm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsxfrm.o `test -f 'wcsxfrm.c' || echo '$(srcdir)/'`wcsxfrm.c
+
+lib_a-wcsxfrm.obj: wcsxfrm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsxfrm.obj `if test -f 'wcsxfrm.c'; then $(CYGPATH_W) 'wcsxfrm.c'; else $(CYGPATH_W) '$(srcdir)/wcsxfrm.c'; fi`
 
 lib_a-wcwidth.o: wcwidth.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcwidth.o `test -f 'wcwidth.c' || echo '$(srcdir)/'`wcwidth.c

@@ -71,6 +71,7 @@ wchar_t	*_EXFUN(wcsrchr, (const wchar_t *, wchar_t));
 size_t	_EXFUN(wcsspn, (const wchar_t *, const wchar_t *));
 wchar_t	*_EXFUN(wcsstr, (const wchar_t *, const wchar_t *));
 int	_EXFUN(wcswidth, (const wchar_t *, size_t));
+size_t	_EXFUN(wcsxfrm, (wchar_t *, const wchar_t *, size_t));
 int	_EXFUN(wcwidth, (const wchar_t));
 wchar_t	*_EXFUN(wmemchr, (const wchar_t *, wchar_t, size_t));
 int	_EXFUN(wmemcmp, (const wchar_t *, const wchar_t *, size_t));

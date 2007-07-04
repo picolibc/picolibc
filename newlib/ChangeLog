@@ -1,3 +1,12 @@
+2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h: Add prototype for wcsxfrm.
+	* libc/string/Makefile.am (GENERAL_SOURCES): Add wcsxfrm.c.
+	(CHEWOUT_FILES): Add wcsxfrm.def.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/string/wcsxfrm.c: New file.
+	* libc/string/wcstrings.tex: Add wcsxfrm.
+
 2007-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/string.h: Add prototypes for stpcpy and stpncpy.
