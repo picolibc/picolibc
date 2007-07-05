@@ -1,3 +1,9 @@
+2007-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Add missing
+	OBJ_INHERIT flag when creating OBJECT_ATTRIBUTES.
+	(fhandler_disk_file::rewinddir): Ditto.
+
 2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc: Define __timezonefunc__ before including time.h to protect

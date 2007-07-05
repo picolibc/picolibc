@@ -1579,7 +1579,8 @@ fhandler_disk_file::opendir (int fd)
 	    {
 	      /* fdopendir() case.  Just initialize with the emtpy upath
 		 and reuse the exisiting handle. */
-	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+	      InitializeObjectAttributes (&attr, &upath,
+					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 					  get_handle (), NULL);
 	    }
 	  else
@@ -1939,7 +1940,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
       IO_STATUS_BLOCK io;
       HANDLE new_dir;
 
-      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+      InitializeObjectAttributes (&attr, &fname,
+				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 				  dir->__handle, NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
