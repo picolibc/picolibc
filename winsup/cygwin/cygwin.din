@@ -423,6 +423,7 @@ _fcvtbuf = fcvtbuf SIGFE
 fcvtf SIGFE
 _fcvtf = fcvtf SIGFE
 fdatasync SIGFE
+fdopendir SIGFE
 fdim NOSIGFE
 fdimf NOSIGFE
 fdopen SIGFE
