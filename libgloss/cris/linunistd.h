@@ -413,7 +413,7 @@ static inline _syscall1(long,mmap,long *, buf)
 struct timeval;
 struct timezone;
 static inline _syscall2(int,gettimeofday,struct timeval *,tp,
-                        struct timezone *, tzp)
+                        void *, tzp)
 static inline _syscall2(int,link,const char *,old,const char *,new)
 static inline _syscall1(int,unlink,const char *, f)
 struct rusage;

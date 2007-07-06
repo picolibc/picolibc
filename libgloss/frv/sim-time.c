@@ -67,8 +67,9 @@ _DEFUN (_times, _times (buf),
 int
 _DEFUN (_gettimeofday, _gettimeofday (tv, tz),
 	struct timeval *tv _AND
-	struct timezone *tz)
+	void *tzvp)
 {
+  struct timezone *tz = tzvp;
   if (tz)
     tz->tz_minuteswest = tz->tz_dsttime = 0;
 

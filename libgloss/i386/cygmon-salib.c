@@ -40,7 +40,7 @@ _syscall1(char **,__get_program_arguments,int *,argc);
 _syscall1(void,__sys_exit,int,exitcode);
 _syscall1(void,putTtyChar,int,character);
 _syscall1(time_t,time,time_t *,ptr);
-_syscall2(int, gettimeofday, struct timeval *,time, struct timezone *,z);
+_syscall2(int, gettimeofday, struct timeval *,time, void *,z);
 _syscall3(int, __open, const char *, filename, int, mode, int, filemode);
 _syscall4(void, profil, unsigned short *, buff, unsigned int, bufsiz,
 	  unsigned int, offset, unsigned int, scale);

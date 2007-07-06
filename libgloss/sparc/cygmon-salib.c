@@ -168,7 +168,7 @@ __install_signal_handler (void *func)
 }
 
 int
-gettimeofday (struct timeval *tp, struct timezone *tzp)
+gettimeofday (struct timeval *tp, void *tzp)
 {
   asm ("or %g0, 156, %g1	\n\
 	ta 8			\n\

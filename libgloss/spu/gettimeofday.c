@@ -43,7 +43,7 @@ typedef struct
 } syscall_gettimeofday_t;
 
 int
-gettimeofday (struct timeval *tv, struct timezone *tz)
+gettimeofday (struct timeval *tv, void *tz)
 {
 	syscall_gettimeofday_t sys;
 

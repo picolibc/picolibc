@@ -43,8 +43,9 @@ clock_t times (struct tms *buf)
 }
 
 /* _gettimeofday -- implement in terms of time.  */
-int gettimeofday (struct timeval *tv, struct timezone *tz)
+int gettimeofday (struct timeval *tv, void *tzvp)
 {
+  struct timezone *tz = tzvp;
   if (tz)
     tz->tz_minuteswest = tz->tz_dsttime = 0;
 

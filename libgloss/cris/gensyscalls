@@ -93,7 +93,7 @@ cat > gettod.c <<EOF
 $lu#include <sys/time.h>
 #include <sys/times.h>
 int
-_gettimeofday (struct timeval *tp, struct timezone *tzp
+_gettimeofday (struct timeval *tp, void *tzp
 ${r}gettimeofday (tp, tzp))
 EOF
 cat > isatty.c <<EOF

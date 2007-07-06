@@ -22,7 +22,7 @@ int     _system     _PARAMS ((const char *));
 int     _rename     _PARAMS ((const char *, const char *));
 int     _isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
-int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
+int     _gettimeofday	_PARAMS ((struct timeval *, void *));
 int     _unlink		_PARAMS ((const char *));
 int     _link 		_PARAMS ((void));
 int     _stat 		_PARAMS ((const char *, struct stat *));
@@ -525,9 +525,9 @@ _unlink (const char *path)
 }
 
 int
-_gettimeofday (struct timeval * tp, struct timezone * tzp)
+_gettimeofday (struct timeval * tp, void * tzvp)
 {
-
+  struct timezone *tzp = tzvp;
   if (tp)
     {
     /* Ask the host for the seconds since the Unix epoch.  */

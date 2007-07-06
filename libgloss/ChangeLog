@@ -1,3 +1,18 @@
+2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/syscalls.c (gettimeofday): Change to POSIX signature
+	where second argument is passed as void *.
+	* bfin/syscalls.c (gettimeofday): Ditto.
+	* cris/gensyscalls (gettimeofday): Ditto.
+	* cris/linunistd.h (gettimeofday): Ditto.
+	* crx/time.c (gettimeofday): Ditto.
+	* frv/sim-time.c (gettimeofday): Ditto.
+	* i386/cygmon-salib.c (gettimeofday): Ditto.
+	* libnosys/gettod.c (gettimeofday): Ditto.
+	* m68k/io-gettimeofday.c (gettimeofday): Ditto.
+	* sparc/cygmon-salib.c (gettimeofday): Ditto.
+	* spu/gettimeofday.c (gettimeofday): Ditto.
+
 2007-06-20  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/jsre.h: Add JSRE_MKSTEMP and JSRE_MKTEMP values.

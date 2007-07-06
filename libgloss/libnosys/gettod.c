@@ -13,12 +13,11 @@ extern int errno;
 #include "warning.h"
 
 struct timeval;
-struct timezone;
 
 int
 _DEFUN (_gettimeofday, (ptimeval, ptimezone),
         struct timeval  *ptimeval  _AND
-        struct timezone *ptimezone)
+        void *ptimezone)
 {
   errno = ENOSYS;
   return -1;
