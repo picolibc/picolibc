@@ -1,34 +1,34 @@
 /*
 FUNCTION
-   <<strtoll>>---string to long long
+   <<wcstoll>>---wide string to long long
 
 INDEX
-	strtoll
+	wcstoll
 INDEX
-	_strtoll_r
+	_wcstoll_r
 
 ANSI_SYNOPSIS
-	#include <stdlib.h>
-        long long strtoll(const char *<[s]>, char **<[ptr]>,int <[base]>);
+	#include <wchar.h>
+        long long wcstoll(const wchar_t *<[s]>, wchar_t **<[ptr]>,int <[base]>);
 
-        long long _strtoll_r(void *<[reent]>, 
-                       const char *<[s]>, char **<[ptr]>,int <[base]>);
+        long long _wcstoll_r(void *<[reent]>, 
+                       const wchar_t *<[s]>, wchar_t **<[ptr]>,int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
-	long long strtoll (<[s]>, <[ptr]>, <[base]>)
-        const char *<[s]>;
-        char **<[ptr]>;
+	long long wcstoll (<[s]>, <[ptr]>, <[base]>)
+        const wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
-	long long _strtoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	char *<[reent]>;
-        const char *<[s]>;
-        char **<[ptr]>;
+	long long _wcstoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
+	wchar_t *<[reent]>;
+        const wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
 DESCRIPTION
-The function <<strtoll>> converts the string <<*<[s]>>> to
+The function <<wcstoll>> converts the wide string <<*<[s]>>> to
 a <<long long>>. First, it breaks down the string into three parts:
 leading whitespace, which is ignored; a subject string consisting
 of characters resembling an integer in the radix specified by <[base]>;
@@ -54,7 +54,7 @@ of whitespace, or if the first non-whitespace character is not a
 permissible letter or digit, the subject string is empty.
 
 If the subject string is acceptable, and the value of <[base]> is zero,
-<<strtoll>> attempts to determine the radix from the input string. A
+<<wcstoll>> attempts to determine the radix from the input string. A
 string with a leading <<0x>> is treated as a hexadecimal value; a string with
 a leading 0 and no <<x>> is treated as octal; all other strings are
 treated as decimal. If <[base]> is between 2 and 36, it is used as the
@@ -67,18 +67,18 @@ If the subject string is empty (or not in acceptable form), no conversion
 is performed and the value of <[s]> is stored in <[ptr]> (if <[ptr]> is
 not <<NULL>>).
 
-The alternate function <<_strtoll_r>> is a reentrant version.  The
+The alternate function <<_wcstoll_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
-<<strtoll>> returns the converted value, if any. If no conversion was
+<<wcstoll>> returns the converted value, if any. If no conversion was
 made, 0 is returned.
 
-<<strtoll>> returns <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>> if the magnitude of
+<<wcstoll>> returns <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>> if the magnitude of
 the converted value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
-<<strtoll>> is ANSI.
+<<wcstoll>> is ANSI.
 
 No supporting OS subroutines are required.
 */
@@ -119,20 +119,20 @@ No supporting OS subroutines are required.
 
 #include <_ansi.h>
 #include <limits.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <errno.h>
-#include <stdlib.h>
+#include <wchar.h>
 #include <reent.h>
 
 #ifndef _REENT_ONLY
 
 long long
-_DEFUN (strtoll, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+_DEFUN (wcstoll, (s, ptr, base),
+	_CONST wchar_t *s _AND
+	wchar_t **ptr _AND
 	int base)
 {
-	return _strtoll_r (_REENT, s, ptr, base);
+	return _wcstoll_r (_REENT, s, ptr, base);
 }
 
 #endif

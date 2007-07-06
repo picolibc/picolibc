@@ -1,3 +1,22 @@
+2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h: Declare wcstol, wcstoll, wcstoul,
+	wcstoull, _wcstol_r, _wcstoll_r, _wcstoul_r and _wcstoull_r.
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add wcstol.c and wcstoul.c.
+	(EXTENDED_SOURCES): Add wcstoll.c, wcstoll_r.c, wcstoull.c and
+	wcstoull_r.c.
+	(CHEWOUT_FILES): Add .def files accordingly.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/stdlib.tex: Add documentation links for above functions.
+	* libc/stdlib/strtoll.c: Fix portability note.
+	* libc/stdlib/strtoull.c: Ditto.
+	* libc/stdlib/wcstol.c: New file.
+	* libc/stdlib/wcstoll.c: New file.
+	* libc/stdlib/wcstoll_r.c: New file.
+	* libc/stdlib/wcstoul.c: New file.
+	* libc/stdlib/wcstoull.c: New file.
+	* libc/stdlib/wcstoull_r.c: New file.
+
 2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/time.h (gettimeofday): Change to proper

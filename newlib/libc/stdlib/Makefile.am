@@ -50,6 +50,8 @@ GENERAL_SOURCES = \
 	strtod.c	\
 	strtol.c	\
 	strtoul.c	\
+	wcstol.c	\
+	wcstoul.c	\
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
@@ -76,6 +78,10 @@ EXTENDED_SOURCES = \
 	strtoll_r.c	\
 	strtoull.c	\
 	strtoull_r.c	\
+	wcstoll.c	\
+	wcstoll_r.c	\
+	wcstoull.c	\
+	wcstoull_r.c	\
 	atoll.c		\
 	llabs.c		\
 	lldiv.c
@@ -231,7 +237,12 @@ CHEWOUT_FILES= \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
+	wcstol.def 	\
+	wcstoll.def 	\
+	wcstoul.def 	\
+	wcstoull.def 	\
 	system.def	\
+	wcstol.def 	\
 	wcstombs.def	\
 	wctomb.def	
 

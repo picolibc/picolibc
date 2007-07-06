@@ -1,42 +1,42 @@
 /*
 FUNCTION
-	<<strtoull>>---string to unsigned long long
+	<<wcstoul>>---wide string to unsigned long
 
 INDEX
-	strtoull
+	wcstoul
 INDEX
-	_strtoull_r
+	_wcstoul_r
 
 ANSI_SYNOPSIS
-	#include <stdlib.h>
-        unsigned long long strtoull(const char *<[s]>, char **<[ptr]>,
+	#include <wchar.h>
+        unsigned long wcstoul(const wchar_t *<[s]>, wchar_t **<[ptr]>,
                               int <[base]>);
 
-        unsigned long long _strtoull_r(void *<[reent]>, const char *<[s]>,
-                              char **<[ptr]>, int <[base]>);
+        unsigned long _wcstoul_r(void *<[reent]>, const wchar_t *<[s]>,
+                              wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
-        unsigned long long strtoull(<[s]>, <[ptr]>, <[base]>)
-        char *<[s]>;
-        char **<[ptr]>;
+        unsigned long wcstoul(<[s]>, <[ptr]>, <[base]>)
+        wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
-        unsigned long long _strtoull_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
+        unsigned long _wcstoul_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
+	wchar_t *<[reent]>;
+        wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
 DESCRIPTION
-The function <<strtoull>> converts the string <<*<[s]>>> to
-an <<unsigned long long>>. First, it breaks down the string into three parts:
+The function <<wcstoul>> converts the wide string <<*<[s]>>> to
+an <<unsigned long>>. First, it breaks down the string into three parts:
 leading whitespace, which is ignored; a subject string consisting
 of the digits meaningful in the radix specified by <[base]>
 (for example, <<0>> through <<7>> if the value of <[base]> is 8);
 and a trailing portion consisting of one or more unparseable characters,
 which always includes the terminating null character. Then, it attempts
-to convert the subject string into an unsigned long long integer, and returns the
+to convert the subject string into an unsigned long integer, and returns the
 result.
 
 If the value of <[base]> is zero, the subject string is expected to look
@@ -55,7 +55,7 @@ of whitespace, or if the first non-whitespace character is not a
 permissible digit, the subject string is empty.
 
 If the subject string is acceptable, and the value of <[base]> is zero,
-<<strtoull>> attempts to determine the radix from the input string. A
+<<wcstoul>> attempts to determine the radix from the input string. A
 string with a leading <<0x>> is treated as a hexadecimal value; a string with
 a leading <<0>> and no <<x>> is treated as octal; all other strings are
 treated as decimal. If <[base]> is between 2 and 36, it is used as the
@@ -68,21 +68,21 @@ with a substring in acceptable form), no conversion
 is performed and the value of <[s]> is stored in <[ptr]> (if <[ptr]> is
 not <<NULL>>).
 
-The alternate function <<_strtoull_r>> is a reentrant version.  The
+The alternate function <<_wcstoul_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 
 RETURNS
-<<strtoull>> returns the converted value, if any. If no conversion was
+<<wcstoul>> returns the converted value, if any. If no conversion was
 made, <<0>> is returned.
 
-<<strtoull>> returns <<ULONG_LONG_MAX>> if the magnitude of the converted
+<<wcstoul>> returns <<ULONG_MAX>> if the magnitude of the converted
 value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
-<<strtoull>> is ANSI.
+<<wcstoul>> is ANSI.
 
-<<strtoull>> requires no supporting OS subroutines.
+<<wcstoul>> requires no supporting OS subroutines.
 */
 
 /*
@@ -120,20 +120,87 @@ PORTABILITY
 
 #include <_ansi.h>
 #include <limits.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>
 
-#ifndef _REENT_ONLY
-
-unsigned long long
-_DEFUN (strtoull, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+/*
+ * Convert a wide string to an unsigned long integer.
+ *
+ * Ignores `locale' stuff.  Assumes that the upper and lower case
+ * alphabets and digits are each contiguous.
+ */
+unsigned long
+_DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST wchar_t *nptr _AND
+	wchar_t **endptr _AND
 	int base)
 {
-	return _strtoull_r (_REENT, s, ptr, base);
+	register const wchar_t *s = nptr;
+	register unsigned long acc;
+	register int c;
+	register unsigned long cutoff;
+	register int neg = 0, any, cutlim;
+
+	/*
+	 * See strtol for comments as to the logic used.
+	 */
+	do {
+		c = *s++;
+	} while (iswspace(c));
+	if (c == L'-') {
+		neg = 1;
+		c = *s++;
+	} else if (c == L'+')
+		c = *s++;
+	if ((base == 0 || base == 16) &&
+	    c == L'0' && (*s == L'x' || *s == L'X')) {
+		c = s[1];
+		s += 2;
+		base = 16;
+	}
+	if (base == 0)
+		base = c == L'0' ? 8 : 10;
+	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
+	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
+	for (acc = 0, any = 0;; c = *s++) {
+		if (iswdigit(c))
+			c -= L'0';
+		else if (iswalpha(c))
+			c -= iswupper(c) ? L'A' - 10 : L'a' - 10;
+		else
+			break;
+		if (c >= base)
+			break;
+               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+			any = -1;
+		else {
+			any = 1;
+			acc *= base;
+			acc += c;
+		}
+	}
+	if (any < 0) {
+		acc = ULONG_MAX;
+		rptr->_errno = ERANGE;
+	} else if (neg)
+		acc = -acc;
+	if (endptr != 0)
+		*endptr = (wchar_t *) (any ? s - 1 : nptr);
+	return (acc);
+}
+
+#ifndef _REENT_ONLY
+
+unsigned long
+_DEFUN (wcstoul, (s, ptr, base),
+	_CONST wchar_t *s _AND
+	wchar_t **ptr _AND
+	int base)
+{
+	return _wcstoul_r (_REENT, s, ptr, base);
 }
 
 #endif

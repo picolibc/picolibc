@@ -79,6 +79,15 @@ wchar_t	*_EXFUN(wmemcpy, (wchar_t * , const wchar_t * , size_t));
 wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
 
+long    _EXFUN(wcstol, (const wchar_t *, wchar_t **, int));
+long long _EXFUN(wcstoll, (const wchar_t *, wchar_t **, int));
+unsigned long _EXFUN(wcstoul, (const wchar_t *, wchar_t **, int));
+unsigned long long _EXFUN(wcstoull, (const wchar_t *, wchar_t **, int));
+long    _EXFUN(_wcstol_r, (struct _reent *, const wchar_t *, wchar_t **, int));
+long long _EXFUN(_wcstoll_r, (struct _reent *, const wchar_t *, wchar_t **, int));
+unsigned long _EXFUN(_wcstoul_r, (struct _reent *, const wchar_t *, wchar_t **, int));
+unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_t **, int));
+
 _END_STD_C
 
 #endif /* _WCHAR_H_ */

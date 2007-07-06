@@ -1,90 +1,92 @@
 /*
 FUNCTION
-   <<strtoll>>---string to long long
+	<<wcstoull>>---wide string to unsigned long long
 
 INDEX
-	strtoll
+	wcstoull
 INDEX
-	_strtoll_r
+	_wcstoull_r
 
 ANSI_SYNOPSIS
-	#include <stdlib.h>
-        long long strtoll(const char *<[s]>, char **<[ptr]>,int <[base]>);
+	#include <wchar.h>
+        unsigned long long wcstoull(const wchar_t *<[s]>, wchar_t **<[ptr]>,
+                              int <[base]>);
 
-        long long _strtoll_r(void *<[reent]>, 
-                       const char *<[s]>, char **<[ptr]>,int <[base]>);
+        unsigned long long _wcstoull_r(void *<[reent]>, const wchar_t *<[s]>,
+                              wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
-	long long strtoll (<[s]>, <[ptr]>, <[base]>)
-        const char *<[s]>;
-        char **<[ptr]>;
+        unsigned long long wcstoull(<[s]>, <[ptr]>, <[base]>)
+        wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
-	long long _strtoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	char *<[reent]>;
-        const char *<[s]>;
-        char **<[ptr]>;
+        unsigned long long _wcstoull_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
+	wchar_t *<[reent]>;
+        wchar_t *<[s]>;
+        wchar_t **<[ptr]>;
         int <[base]>;
 
 DESCRIPTION
-The function <<strtoll>> converts the string <<*<[s]>>> to
-a <<long long>>. First, it breaks down the string into three parts:
+The function <<wcstoull>> converts the wide string <<*<[s]>>> to
+an <<unsigned long long>>. First, it breaks down the string into three parts:
 leading whitespace, which is ignored; a subject string consisting
-of characters resembling an integer in the radix specified by <[base]>;
-and a trailing portion consisting of zero or more unparseable characters,
-and always including the terminating null character. Then, it attempts
-to convert the subject string into a <<long long>> and returns the
+of the digits meaningful in the radix specified by <[base]>
+(for example, <<0>> through <<7>> if the value of <[base]> is 8);
+and a trailing portion consisting of one or more unparseable characters,
+which always includes the terminating null character. Then, it attempts
+to convert the subject string into an unsigned long long integer, and returns the
 result.
 
-If the value of <[base]> is 0, the subject string is expected to look
-like a normal C integer constant: an optional sign, a possible `<<0x>>'
-indicating a hexadecimal base, and a number. If <[base]> is between
-2 and 36, the expected form of the subject is a sequence of letters
-and digits representing an integer in the radix specified by <[base]>,
-with an optional plus or minus sign. The letters <<a>>--<<z>> (or,
-equivalently, <<A>>--<<Z>>) are used to signify values from 10 to 35;
-only letters whose ascribed values are less than <[base]> are
-permitted. If <[base]> is 16, a leading <<0x>> is permitted.
+If the value of <[base]> is zero, the subject string is expected to look
+like a normal C integer constant (save that no optional sign is permitted):
+a possible <<0x>> indicating hexadecimal radix, and a number.
+If <[base]> is between 2 and 36, the expected form of the subject is a
+sequence of digits (which may include letters, depending on the
+base) representing an integer in the radix specified by <[base]>.
+The letters <<a>>--<<z>> (or <<A>>--<<Z>>) are used as digits valued from
+10 to 35. If <[base]> is 16, a leading <<0x>> is permitted.
 
 The subject sequence is the longest initial sequence of the input
 string that has the expected form, starting with the first
 non-whitespace character.  If the string is empty or consists entirely
 of whitespace, or if the first non-whitespace character is not a
-permissible letter or digit, the subject string is empty.
+permissible digit, the subject string is empty.
 
 If the subject string is acceptable, and the value of <[base]> is zero,
-<<strtoll>> attempts to determine the radix from the input string. A
+<<wcstoull>> attempts to determine the radix from the input string. A
 string with a leading <<0x>> is treated as a hexadecimal value; a string with
-a leading 0 and no <<x>> is treated as octal; all other strings are
+a leading <<0>> and no <<x>> is treated as octal; all other strings are
 treated as decimal. If <[base]> is between 2 and 36, it is used as the
-conversion radix, as described above. If the subject string begins with
-a minus sign, the value is negated. Finally, a pointer to the first
+conversion radix, as described above. Finally, a pointer to the first
 character past the converted subject string is stored in <[ptr]>, if
 <[ptr]> is not <<NULL>>.
 
-If the subject string is empty (or not in acceptable form), no conversion
+If the subject string is empty (that is, if <<*>><[s]> does not start
+with a substring in acceptable form), no conversion
 is performed and the value of <[s]> is stored in <[ptr]> (if <[ptr]> is
 not <<NULL>>).
 
-The alternate function <<_strtoll_r>> is a reentrant version.  The
+The alternate function <<_wcstoull_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
-RETURNS
-<<strtoll>> returns the converted value, if any. If no conversion was
-made, 0 is returned.
 
-<<strtoll>> returns <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>> if the magnitude of
-the converted value is too large, and sets <<errno>> to <<ERANGE>>.
+RETURNS
+<<wcstoull>> returns the converted value, if any. If no conversion was
+made, <<0>> is returned.
+
+<<wcstoull>> returns <<ULONG_LONG_MAX>> if the magnitude of the converted
+value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
-<<strtoll>> is ANSI.
+<<wcstoull>> is ANSI.
 
-No supporting OS subroutines are required.
+<<wcstoull>> requires no supporting OS subroutines.
 */
 
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
+/*
+ * Copyright (c) 1990 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -116,23 +118,22 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-
 #include <_ansi.h>
 #include <limits.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>
 
 #ifndef _REENT_ONLY
 
-long long
-_DEFUN (strtoll, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+unsigned long long
+_DEFUN (wcstoull, (s, ptr, base),
+	_CONST wchar_t *s _AND
+	wchar_t **ptr _AND
 	int base)
 {
-	return _strtoll_r (_REENT, s, ptr, base);
+	return _wcstoull_r (_REENT, s, ptr, base);
 }
 
 #endif

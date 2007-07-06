@@ -86,7 +86,8 @@ am__objects_1 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-mstats.$(OBJEXT) lib_a-rand.$(OBJEXT) \
 	lib_a-rand_r.$(OBJEXT) lib_a-realloc.$(OBJEXT) \
 	lib_a-strtod.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
-	lib_a-strtoul.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
+	lib_a-strtoul.$(OBJEXT) lib_a-wcstol.$(OBJEXT) \
+	lib_a-wcstoul.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
 	lib_a-wcstombs_r.$(OBJEXT) lib_a-wctomb.$(OBJEXT) \
 	lib_a-wctomb_r.$(OBJEXT)
 am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
@@ -100,6 +101,8 @@ am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-srand48.$(OBJEXT) lib_a-strtoll.$(OBJEXT) \
 	lib_a-strtoll_r.$(OBJEXT) lib_a-strtoull.$(OBJEXT) \
 	lib_a-strtoull_r.$(OBJEXT) lib_a-atoll.$(OBJEXT) \
+	lib_a-wcstoll.$(OBJEXT) lib_a-wcstoll_r.$(OBJEXT) \
+	lib_a-wcstoull.$(OBJEXT) lib_a-wcstoull_r.$(OBJEXT) \
 	lib_a-llabs.$(OBJEXT) lib_a-lldiv.$(OBJEXT)
 am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
@@ -131,12 +134,14 @@ am__objects_7 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo mbstowcs.lo \
 	mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo \
 	mstats.lo rand.lo rand_r.lo realloc.lo strtod.lo strtol.lo \
-	strtoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo wctomb_r.lo
+	strtoul.lo wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo \
+	wctomb.lo wctomb_r.lo
 am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
 	srand48.lo strtoll.lo strtoll_r.lo strtoull.lo strtoull_r.lo \
-	atoll.lo llabs.lo lldiv.lo
+	wcstoll.lo wcstoll_r.lo wcstoull.o wcstoull_r.lo atoll.lo \
+	llabs.lo lldiv.lo
 am__objects_9 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
 	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsrtowcs.lo \
 	on_exit.lo valloc.lo wcrtomb.lo wcsrtombs.lo wctob.lo
@@ -374,6 +379,8 @@ GENERAL_SOURCES = \
 	strtod.c	\
 	strtol.c	\
 	strtoul.c	\
+	wcstol.c	\
+	wcstoul.c	\
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
@@ -400,6 +407,10 @@ EXTENDED_SOURCES = \
 	strtoll_r.c	\
 	strtoull.c	\
 	strtoull_r.c	\
+	wcstoll.c	\
+	wcstoll_r.c	\
+	wcstoull.c	\
+	wcstoull_r.c	\
 	atoll.c		\
 	llabs.c		\
 	lldiv.c
@@ -503,6 +514,10 @@ CHEWOUT_FILES = \
 	strtoul.def 	\
 	strtoull.def 	\
 	system.def	\
+	wcstol.def 	\
+	wcstoll.def 	\
+	wcstoul.def 	\
+	wcstoull.def 	\
 	wcstombs.def	\
 	wctomb.def	
 
@@ -847,6 +862,18 @@ lib_a-strtoul.o: strtoul.c
 lib_a-strtoul.obj: strtoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoul.obj `if test -f 'strtoul.c'; then $(CYGPATH_W) 'strtoul.c'; else $(CYGPATH_W) '$(srcdir)/strtoul.c'; fi`
 
+lib_a-wcstol.o: wcstol.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstol.o `test -f 'wcstol.c' || echo '$(srcdir)/'`wcstol.c
+
+lib_a-wcstol.obj: wcstol.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstol.obj `if test -f 'wcstol.c'; then $(CYGPATH_W) 'wcstol.c'; else $(CYGPATH_W) '$(srcdir)/wcstol.c'; fi`
+
+lib_a-wcstoul.o: wcstoul.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoul.o `test -f 'wcstoul.c' || echo '$(srcdir)/'`wcstoul.c
+
+lib_a-wcstoul.obj: wcstoul.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoul.obj `if test -f 'wcstoul.c'; then $(CYGPATH_W) 'wcstoul.c'; else $(CYGPATH_W) '$(srcdir)/wcstoul.c'; fi`
+
 lib_a-wcstombs.o: wcstombs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstombs.o `test -f 'wcstombs.c' || echo '$(srcdir)/'`wcstombs.c
 
@@ -990,6 +1017,30 @@ lib_a-strtoull_r.o: strtoull_r.c
 
 lib_a-strtoull_r.obj: strtoull_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoull_r.obj `if test -f 'strtoull_r.c'; then $(CYGPATH_W) 'strtoull_r.c'; else $(CYGPATH_W) '$(srcdir)/strtoull_r.c'; fi`
+
+lib_a-wcstoll.o: wcstoll.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoll.o `test -f 'wcstoll.c' || echo '$(srcdir)/'`wcstoll.c
+
+lib_a-wcstoll.obj: wcstoll.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoll.obj `if test -f 'wcstoll.c'; then $(CYGPATH_W) 'wcstoll.c'; else $(CYGPATH_W) '$(srcdir)/wcstoll.c'; fi`
+
+lib_a-wcstoll_r.o: wcstoll_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoll_r.o `test -f 'wcstoll_r.c' || echo '$(srcdir)/'`wcstoll_r.c
+
+lib_a-wcstoll_r.obj: wcstoll_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoll_r.obj `if test -f 'wcstoll_r.c'; then $(CYGPATH_W) 'wcstoll_r.c'; else $(CYGPATH_W) '$(srcdir)/wcstoll_r.c'; fi`
+
+lib_a-wcstoull.o: wcstoull.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoull.o `test -f 'wcstoull.c' || echo '$(srcdir)/'`wcstoull.c
+
+lib_a-wcstoull.obj: wcstoull.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoull.obj `if test -f 'wcstoull.c'; then $(CYGPATH_W) 'wcstoull.c'; else $(CYGPATH_W) '$(srcdir)/wcstoull.c'; fi`
+
+lib_a-wcstoull_r.o: wcstoull_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoull_r.o `test -f 'wcstoull_r.c' || echo '$(srcdir)/'`wcstoull_r.c
+
+lib_a-wcstoull_r.obj: wcstoull_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoull_r.obj `if test -f 'wcstoull_r.c'; then $(CYGPATH_W) 'wcstoull_r.c'; else $(CYGPATH_W) '$(srcdir)/wcstoull_r.c'; fi`
 
 lib_a-atoll.o: atoll.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoll.o `test -f 'atoll.c' || echo '$(srcdir)/'`atoll.c
