@@ -1,3 +1,8 @@
+2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/intl/dcigettext.c: Define HAVE_STPCPY.
+	* libc/sys/linux/intl/l10nflist.c: Ditto.
+
 2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h: Add prototype for wcsxfrm.
