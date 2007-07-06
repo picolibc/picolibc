@@ -1683,9 +1683,14 @@ wcsrchr NOSIGFE
 wcsrtombs NOSIGFE
 wcsspn NOSIGFE
 wcsstr NOSIGFE
+wcstol NOSIGFE
+wcstoll NOSIGFE
 wcstombs NOSIGFE
 _wcstombs = wcstombs NOSIGFE
+wcstoul NOSIGFE
+wcstoull NOSIGFE
 wcswidth NOSIGFE
+wcsxfrm NOSIGFE
 wctob NOSIGFE
 wctomb NOSIGFE
 _wctomb = wctomb NOSIGFE
