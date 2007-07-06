@@ -150,8 +150,9 @@ hires_ms NO_COPY gtod;
 
 /* FIXME: Make thread safe */
 extern "C" int
-gettimeofday (struct timeval *tv, struct timezone *tz)
+gettimeofday (struct timeval *tv, void *tzvp)
 {
+  struct timezone *tz = (struct timezone *) tzvp;
   static bool tzflag;
   LONGLONG now = gtod.usecs ();
 
