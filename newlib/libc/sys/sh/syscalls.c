@@ -185,7 +185,7 @@ _times (struct tms *tp)
 }
 
 int
-_gettimeofday (struct timeval *tv, struct timezone *tz)
+_gettimeofday (struct timeval *tv, void *tz)
 {
   tv->tv_usec = 0;
   tv->tv_sec = __trap34 (SYS_time);

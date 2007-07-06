@@ -43,7 +43,7 @@ _DEFUN (time, (t),
 {
   struct timeval now;
 
-  if (_gettimeofday_r (_REENT, &now, (struct timezone *) 0) >= 0)
+  if (_gettimeofday_r (_REENT, &now, NULL) >= 0)
     {
       if (t)
 	*t = now.tv_sec;

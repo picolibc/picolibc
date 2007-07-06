@@ -1,5 +1,18 @@
 2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/time.h (gettimeofday): Change to proper
+	prototype where second parameter is void *.
+	* libc/reent/gettimeofdayr.c (_gettimeofday_r): Change prototype
+	accordingly.
+	* libc/include/reent.h: Fix prototype for _gettimeofday_r.
+	* libc/sys/arm/syscalls.c: Fix gettimeofday function signature.
+	* libc/sys/rdos/gettod.c: Ditto.
+	* libc/sys/sh/syscalls.c: Ditto.
+	* libc/time/time.c (time): Change call to _gettimeofday_r
+	to pass NULL as 2nd argument.
+
+2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/intl/dcigettext.c: Define HAVE_STPCPY.
 	* libc/sys/linux/intl/l10nflist.c: Ditto.
 
