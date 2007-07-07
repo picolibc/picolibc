@@ -316,13 +316,12 @@ details. */
       173: Export __assert_func.
       174: Export stpcpy, stpncpy.
       175: Export fdopendir.
-      176: Export wcstol, wcstoll, wcstoul, wcstoull, wcsxfrm.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 176
+#define CYGWIN_VERSION_API_MINOR 175
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
