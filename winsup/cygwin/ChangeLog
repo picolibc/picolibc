@@ -1,5 +1,10 @@
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* path.cc (symlink_info::check_shortcut): Handle device "symlinks"
+	specially - don't posixify them.
+
+2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler_disk_file.cc: White space.
 	* fhandler_proc.cc: Ditto.
 	* fhandler_virtual.cc: Ditto.

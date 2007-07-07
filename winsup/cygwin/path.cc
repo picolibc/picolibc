@@ -3064,7 +3064,11 @@ symlink_info::check_shortcut (const char *path, HANDLE h)
     goto file_not_symlink;
   cp += 2;
   cp[len] = '\0';
-  res = posixify (cp);
+  /* Check if this is a device file - these start with the sequence :\\ */
+  if (strncmp (cp, ":\\", 2) == 0)
+    res = strlen (strcpy (contents, cp)); /* Don't try to mess with device files */
+  else
+    res = posixify (cp);
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
   goto close_it;
@@ -4235,7 +4239,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	       privilege enabled.  The reason is apparently that
 	       SetCurrentDirectory calls NtOpenFile without the
 	       FILE_OPEN_FOR_BACKUP_INTENT flag set.
- 
+
 	     - Unlinking a cwd fails because SetCurrentDirectory seems to
 	       open directories so that deleting the directory is disallowed.
 	       The below code opens with *all* sharing flags set. */
