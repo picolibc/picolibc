@@ -98,10 +98,10 @@ public: /* DELETEME*/
   bool& ischild;
   /* Note the order of the locks below.  It is important,
      to avoid races, that the lock order be preserved.
-     
+
      pthread is first because it serves as a master lock
      against other forks being attempted while this one is active.
-     
+
      signals is next to stop signal processing for the duration
      of the fork.
 

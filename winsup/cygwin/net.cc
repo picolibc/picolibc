@@ -1296,7 +1296,7 @@ get_routedst (DWORD if_index)
       && GetIpForwardTable (pift, &size, FALSE) == NO_ERROR)
     for (DWORD i = 0; i < pift->dwNumEntries; ++i)
       {
-        if (pift->table[i].dwForwardIfIndex == if_index
+	if (pift->table[i].dwForwardIfIndex == if_index
 	    && pift->table[i].dwForwardMask == INADDR_BROADCAST)
 	  return pift->table[i].dwForwardDest;
       }
@@ -1408,7 +1408,7 @@ get_xp_ifs (ULONG family)
 	    {
 	      /* Destination address */
 	      if (sa->sa_family == AF_INET)
-	        {
+		{
 		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
 		  if_sin->sin_addr.s_addr = get_routedst (pap->IfIndex);
 		  if_sin->sin_family = AF_INET;
@@ -1417,7 +1417,7 @@ get_xp_ifs (ULONG family)
 		/* FIXME: No official way to get the dstaddr for ipv6? */
 		memcpy (&ifp->ifa_addr, sa, sa_size);
 	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
-	      				 &ifp->ifa_brddstaddr;
+					 &ifp->ifa_brddstaddr;
 	    }
 	  else
 	    {
@@ -1425,7 +1425,7 @@ get_xp_ifs (ULONG family)
 	      if (sa->sa_family == AF_INET)
 		{
 		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-		  uint32_t mask = 
+		  uint32_t mask =
 		  ((struct sockaddr_in *) &ifp->ifa_netmask)->sin_addr.s_addr;
 		  if_sin->sin_addr.s_addr = sin->sin_addr.s_addr & mask | ~mask;
 		  if_sin->sin_family = AF_INET;
@@ -1604,7 +1604,7 @@ get_2k_ifs ()
 	    {
 	      ifp->ifa_ifa.ifa_flags |= IFF_UP | IFF_LOWER_UP;
 	      /* Bug in NT4's IP Helper lib.  The dwOperStatus has just
-	         two values, 0 or 1, non operational, operational. */
+		 two values, 0 or 1, non operational, operational. */
 	      if (ifrow->dwOperStatus >= (wincap.has_broken_if_oper_status ()
 					  ? 1 : IF_OPER_STATUS_CONNECTED))
 		ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
@@ -1625,7 +1625,7 @@ get_2k_ifs ()
 	    {
 	      /* Destination address */
 	      if_sin->sin_addr.s_addr =
-	      	get_routedst (ipt->table[ip_cnt].dwIndex);
+		get_routedst (ipt->table[ip_cnt].dwIndex);
 	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
 					 &ifp->ifa_brddstaddr;
 	    }
@@ -1746,7 +1746,7 @@ get_nt_ifs ()
 			      NULL, NULL,
 			      (unsigned char *) netmask,
 			      (size = 256, &size)) == ERROR_SUCCESS)
-        ++cnt;
+	++cnt;
       RegCloseKey (key);
     }
   ++cnt; /* loopback */
@@ -1788,7 +1788,7 @@ get_nt_ifs ()
   ifp->ifa_ifindex = -1;
   /* Friendly name */
   struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-  				  &ifp->ifa_frndlyname;
+				  &ifp->ifa_frndlyname;
   strcpy (iff->ifrf_friendlyname, "Default loopback");
   iff->ifrf_len = 16;
 
@@ -1875,7 +1875,7 @@ get_nt_ifs ()
 	      sin->sin_family = AF_INET;
 	      ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
 	      if (ppp)
-	        {
+		{
 		  /* Destination address */
 		  sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
 		  sin->sin_addr.s_addr =
@@ -1885,7 +1885,7 @@ get_nt_ifs ()
 					     &ifp->ifa_brddstaddr;
 		}
 	      else
-	        {
+		{
 		  /* Broadcast address */
 		  lip = cygwin_inet_addr (dhcp ? dhcpaddress : ip);
 		  lnp = cygwin_inet_addr (dhcp ? dhcpnetmask : np);
@@ -1978,7 +1978,7 @@ get_ifconf (struct ifconf *ifc, int what)
       ++cnt;
       strcpy (ifr->ifr_name, ifp->ifa_name);
       switch (what)
-        {
+	{
 	case SIOCGIFFLAGS:
 	  ifr->ifr_flags = ifp->ifa_ifa.ifa_flags;
 	  break;

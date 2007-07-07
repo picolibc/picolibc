@@ -105,7 +105,7 @@ ipc_mutex_lock (HANDLE mtx)
   HANDLE h[2] = { mtx, signal_arrived };
 
   switch (WaitForMultipleObjects (2, h, FALSE, INFINITE))
-    {     
+    {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:
       return 0;
@@ -114,7 +114,7 @@ ipc_mutex_lock (HANDLE mtx)
       return 1;
     default:
       break;
-    }     
+    }
   return geterrno_from_win_error ();
 }
 
@@ -168,7 +168,7 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
   if (ipc_mutex_unlock (mtx))
     return -1;
   switch (WaitForMultipleObjects (2, h, TRUE, timeout))
-    {     
+    {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:
       ResetEvent (evt);
@@ -178,7 +178,7 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
       return ETIMEDOUT;
     default:
       break;
-    }     
+    }
   return geterrno_from_win_error ();
 }
 
@@ -266,7 +266,7 @@ struct mq_hdr
   long            mqh_nwait;	 /* #threads blocked in mq_receive() */
   pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
   char            mqh_uname[36]; /* unique name used to identify synchronization
-  				    objects connected to this queue */
+				    objects connected to this queue */
   struct sigevent mqh_event;	 /* for mq_notify() */
 };
 
@@ -339,7 +339,7 @@ again:
       /* Open and specify O_EXCL and user-execute */
       fd = open (mqname, oflag | O_EXCL | O_RDWR, mode | S_IXUSR);
       if (fd < 0)
-        {
+	{
 	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
 	    goto exists;		/* already exists, OK */
 	  return (mqd_t) -1;
@@ -356,7 +356,7 @@ again:
       /* Calculate and set the file size */
       msgsize = MSGSIZE (attr->mq_msgsize);
       filesize = sizeof (struct mq_hdr)
-      		 + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
+		 + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
       if (lseek64 (fd, filesize - 1, SEEK_SET) == -1)
 	goto err;
       if (write (fd, "", 1) == -1)
@@ -384,7 +384,7 @@ again:
       mqhdr->mqh_nwait = 0;
       mqhdr->mqh_pid = 0;
       if (!AllocateLocallyUniqueId (&luid))
-        {
+	{
 	  __seterrno ();
 	  goto err;
 	}
@@ -497,7 +497,7 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
   struct mq_hdr *mqhdr;
   struct mq_attr *attr;
   struct mq_info *mqinfo;
-  
+
   myfault efault;
   if (efault.faulted (EBADF))
       return -1;
@@ -514,7 +514,7 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
     {
       errno = n;
       return -1;
-    }       
+    }
   mqstat->mq_flags = mqinfo->mqi_flags;   /* per-open */
   mqstat->mq_maxmsg = attr->mq_maxmsg;    /* remaining three per-queue */
   mqstat->mq_msgsize = attr->mq_msgsize;
@@ -522,13 +522,13 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
 
   ipc_mutex_unlock (mqinfo->mqi_lock);
   return 0;
-}               
+}
 
 extern "C" int
 mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
 {
   int n;
-  struct mq_hdr *mqhdr; 
+  struct mq_hdr *mqhdr;
   struct mq_attr *attr;
   struct mq_info *mqinfo;
 
@@ -574,7 +574,7 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
   pid_t pid;
   struct mq_hdr *mqhdr;
   struct mq_info *mqinfo;
-  
+
   myfault efault;
   if (efault.faulted (EBADF))
       return -1;
@@ -582,16 +582,16 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
   mqinfo = (struct mq_info *) mqd;
   if (mqinfo->mqi_magic != MQI_MAGIC)
     {
-      set_errno (EBADF);  
+      set_errno (EBADF);
       return -1;
     }
-  mqhdr = mqinfo->mqi_hdr; 
+  mqhdr = mqinfo->mqi_hdr;
   if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
     {
       errno = n;
       return -1;
     }
-  
+
   pid = getpid ();
   if (!notification)
     {
@@ -611,10 +611,10 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
 	}
       mqhdr->mqh_pid = pid;
       mqhdr->mqh_event = *notification;
-    }                                        
+    }
   ipc_mutex_unlock (mqinfo->mqi_lock);
   return 0;
-}                       
+}
 
 static int
 _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
@@ -747,7 +747,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   long index;
   int8_t *mptr;
   ssize_t len;
-  struct mq_hdr *mqhdr; 
+  struct mq_hdr *mqhdr;
   struct mq_attr *attr;
   struct msg_hdr *msghdr;
   struct mq_info *mqinfo;
@@ -926,7 +926,7 @@ again:
       /* Open and specify O_EXCL and user-execute */
       fd = open (semname, oflag | O_EXCL | O_RDWR, mode | S_IXUSR);
       if (fd < 0)
-        {
+	{
 	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
 	    goto exists;		/* already exists, OK */
 	  return SEM_FAILED;
@@ -934,17 +934,17 @@ again:
       created = 1;
       /* First one to create the file initializes it. */
       if (!AllocateLocallyUniqueId (&sf.luid))
-        {
+	{
 	  __seterrno ();
 	  goto err;
 	}
       sf.value = value;
       sf.hash = hash_path_name (0, semname);
       if (write (fd, &sf, sizeof sf) != sizeof sf)
-        goto err;
+	goto err;
       sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, value, wasopen);
       if (sem == SEM_FAILED)
-        goto err;
+	goto err;
       /* Initialization complete, turn off user-execute bit */
       if (fchmod (fd, mode) == -1)
 	goto err;

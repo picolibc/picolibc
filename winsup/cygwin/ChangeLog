@@ -1,3 +1,9 @@
+2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fork.cc: White space.
+	* net.cc: Ditto. 
+	* posix_ipc.cc: Ditto.
+
 2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (gettimeofday): Align definition to POSIX.
