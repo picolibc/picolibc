@@ -1,5 +1,11 @@
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base::write): Remove __stdcall decoration.
+	(fhandler_pipe::write): Ditto.
+	(fhandler_fifo::write): Ditto.
+
+2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	Preliminary change to make pipes interruptible and fifos reliable.
 	* dtable.cc (dtable::find_fifo): Eliminate definition.
 	* dtable.h (dtable::find_fifo): Ditto for declaration.

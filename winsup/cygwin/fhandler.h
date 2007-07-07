@@ -298,7 +298,7 @@ class fhandler_base
   virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  virtual int __stdcall write (const void *ptr, size_t len);
+  virtual int write (const void *ptr, size_t len);
   virtual int __stdcall write_overlapped (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
@@ -539,7 +539,7 @@ public:
   select_record *select_except (select_record *s);
   char *get_proc_fd_name (char *buf);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  int __stdcall write (const void *, size_t);
+  int write (const void *, size_t);
   int open (int flags, mode_t mode = 0);
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
@@ -567,7 +567,7 @@ class fhandler_fifo: public fhandler_base
 public:
   fhandler_fifo ();
   void __stdcall read (void *, size_t&) __attribute__ ((regparm (3)));
-  int __stdcall write (const void *, size_t);
+  int write (const void *, size_t);
   int open (int, mode_t);
   bool isfifo () { return true; }
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
