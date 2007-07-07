@@ -28,8 +28,9 @@ details. */
 #include "ntdll.h"
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), guard (NULL), broken_pipe (false), popen_pid (0)
+  : fhandler_base (), popen_pid (0)
 {
+  get_overlapped ()->hEvent = NULL;
   need_fork_fixup (true);
 }
 
@@ -97,18 +98,6 @@ fhandler_pipe::open (int flags, mode_t mode)
       __seterrno ();
       goto out;
     }
-  if (!fh->guard)
-    /* nothing to do */;
-  else if (DuplicateHandle (proc, fh->guard, hMainProc, &guard,
-			    0, inh, DUPLICATE_SAME_ACCESS))
-    ProtectHandle (guard);
-  else
-    {
-      __seterrno ();
-      goto out;
-    }
-  if (fh->read_state)
-    create_read_state (2);
   init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
   if (flags & O_NOINHERIT)
     close_on_exec (true);
@@ -117,8 +106,6 @@ fhandler_pipe::open (int flags, mode_t mode)
   CloseHandle (proc);
   return 1;
 out:
-  if (guard)
-    CloseHandle (guard);
   if (nio_hdl)
     CloseHandle (nio_hdl);
   if (fh)
@@ -150,17 +137,6 @@ fhandler_pipe::ftruncate (_off64_t length, bool allow_truncate)
   return -1;
 }
 
-void
-fhandler_pipe::set_close_on_exec (bool val)
-{
-  fhandler_base::set_close_on_exec (val);
-  if (guard)
-    {
-      set_no_inheritance (guard, val);
-      ModifyHandle (guard, !val);
-    }
-}
-
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
@@ -168,120 +144,30 @@ fhandler_pipe::get_proc_fd_name (char *buf)
   return buf;
 }
 
-struct pipeargs
-{
-  fhandler_base *fh;
-  void *ptr;
-  size_t *len;
-};
-
-static DWORD WINAPI
-read_pipe (void *arg)
-{
-  pipeargs *pi = (pipeargs *) arg;
-  pi->fh->fhandler_base::read (pi->ptr, *pi->len);
-  return 0;
-}
-
 void __stdcall
 fhandler_pipe::read (void *in_ptr, size_t& in_len)
 {
-  if (broken_pipe)
-    in_len = 0;
-  else
-    {
-      pipeargs pi = {dynamic_cast<fhandler_base *>(this), in_ptr, &in_len};
-      cygthread *th = new cygthread (read_pipe, 0, &pi, "read_pipe");
-      if (th->detach (read_state) && !in_len)
-	in_len = (size_t) -1;	/* received a signal */
-    }
-  ReleaseMutex (guard);
+  return read_overlapped (in_ptr, in_len);
 }
 
 int
-fhandler_pipe::close ()
+fhandler_pipe::write (const void *ptr, size_t len)
 {
-  if (guard)
-    ForceCloseHandle (guard);
-#ifndef NEWVFORK
-  if (read_state)
-#else
-  // FIXME is this vfork_cleanup test right?  Is it responsible for some of
-  // the strange pipe behavior that has been reported in the cygwin mailing
-  // list?
-  if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
-#endif
-    ForceCloseHandle (read_state);
-  return fhandler_base::close ();
-}
-
-void
-fhandler_pipe::fixup_in_child ()
-{
-  if (read_state)
-    create_read_state (2);
-}
-
-void
-fhandler_pipe::fixup_after_exec ()
-{
-  if (!close_on_exec ())
-    fixup_in_child ();
-}
-
-void
-fhandler_pipe::fixup_after_fork (HANDLE parent)
-{
-  fhandler_base::fixup_after_fork (parent);
-  if (guard && fork_fixup (parent, guard, "guard"))
-    ProtectHandle (guard);
-  fixup_in_child ();
+  return write_overlapped (ptr, len);
 }
 
 int
 fhandler_pipe::dup (fhandler_base *child)
 {
-  int res = -1;
   fhandler_pipe *ftp = (fhandler_pipe *) child;
   ftp->set_popen_pid (0);
-  ftp->guard = ftp->read_state = NULL;
 
+  int res;
   if (get_handle () && fhandler_base::dup (child))
-    goto err;
-
-  if (!guard)
-    /* nothing to do */;
-  else if (DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, true,
-			    DUPLICATE_SAME_ACCESS))
-    ProtectHandle1 (ftp->guard, guard);
+    res = -1;
   else
-    {
-      debug_printf ("couldn't duplicate guard %p, %E", guard);
-      goto err;
-    }
+    res = 0;
 
-  if (!read_state)
-    /* nothing to do */;
-  else if (DuplicateHandle (hMainProc, read_state, hMainProc,
-			    &ftp->read_state, 0, false,
-			    DUPLICATE_SAME_ACCESS))
-    ProtectHandle1 (ftp->read_state, read_state);
-  else
-    {
-      debug_printf ("couldn't duplicate read_state %p, %E", read_state);
-      goto err;
-    }
-
-  res = 0;
-  goto out;
-
-err:
-  if (ftp->guard)
-    ForceCloseHandle1 (ftp->guard, guard);
-  if (ftp->read_state)
-    ForceCloseHandle1 (ftp->read_state, read_state);
-
-out:
   debug_printf ("res %d", res);
   return res;
 }
@@ -327,7 +213,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	 the pipe was not created earlier by some other process, even if
 	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
 	 because that is only available for Win2k SP2 and WinXP.  */
-      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND,
+      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
 			   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
@@ -352,19 +238,11 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	  debug_printf ("pipe access denied, retrying");
 	  break;
 	default:
-	  /* CreateNamePipe failed.  Maybe we are on an older Win9x platform without
-	     named pipes.  Return an anonymous pipe as the best approximation.  */
-	  debug_printf ("CreateNamedPipe failed, resorting to CreatePipe size %lu",
-			psize);
-	  if (CreatePipe (&r, &w, sa_ptr, psize))
-	    {
-	      debug_printf ("pipe read handle %p", r);
-	      debug_printf ("pipe write handle %p", w);
-	      return 0;
-	    }
-	  err = GetLastError ();
-	  debug_printf ("CreatePipe failed, %E");
-	  return err;
+	  {
+	    err = GetLastError ();
+	    debug_printf ("CreatePipe failed, %E");
+	    return err;
+	  }
 	}
     }
 
@@ -373,7 +251,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   /* Open the named pipe for writing.
      Be sure to permit FILE_READ_ATTRIBUTES access.  */
   w = CreateFile (pipename, GENERIC_WRITE | FILE_READ_ATTRIBUTES, 0, sa_ptr,
-		  OPEN_EXISTING, 0, 0);
+		  OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
 
   if (!w || w == INVALID_HANDLE_VALUE)
     {
@@ -414,10 +292,9 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
 	 fhs[1]->close_on_exec (true);
        }
 
-      fhs[0]->create_read_state (2);
-
+      fhs[0]->setup_overlapped ();
+      fhs[1]->setup_overlapped ();
       res = 0;
-      fhs[0]->create_guard (sa);
     }
 
   syscall_printf ("%d = pipe ([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);

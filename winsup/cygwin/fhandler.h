@@ -141,6 +141,9 @@ class fhandler_base
   DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
+  bool wait_overlapped (bool&, bool) __attribute__ ((regparm (2)));
+  bool setup_overlapped () __attribute__ ((regparm (1)));
+  void destroy_overlapped () __attribute__ ((regparm (1)));
 
  public:
   class fhandler_base *archetype;
@@ -294,7 +297,9 @@ class fhandler_base
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  virtual int write (const void *ptr, size_t len);
+  virtual void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  virtual int __stdcall write (const void *ptr, size_t len);
+  virtual int __stdcall write_overlapped (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t __stdcall pread (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
@@ -334,6 +339,7 @@ class fhandler_base
 
   virtual void raw_read (void *ptr, size_t& ulen);
   virtual int raw_write (const void *ptr, size_t ulen);
+  virtual OVERLAPPED *get_overlapped () {return NULL;}
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
@@ -356,7 +362,6 @@ class fhandler_base
     rabuf = NULL;
   }
   void operator delete (void *);
-  virtual HANDLE get_guard () const {return NULL;}
   virtual void set_eof () {}
   virtual int mkdir (mode_t mode);
   virtual int rmdir ();
@@ -372,7 +377,6 @@ class fhandler_base
   bool issymlink () {return pc.issymlink ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
   int fhaccess (int flags) __attribute__ ((regparm (2)));
-  friend class fhandler_fifo;
 };
 
 class fhandler_mailslot : public fhandler_base
@@ -521,13 +525,12 @@ class fhandler_socket: public fhandler_base
 
 class fhandler_pipe: public fhandler_base
 {
-protected:
-  HANDLE guard;
-  bool broken_pipe;
 private:
   pid_t popen_pid;
+  OVERLAPPED io_status;
 public:
   fhandler_pipe ();
+  OVERLAPPED *get_overlapped () {return &io_status;}
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}
   _off64_t lseek (_off64_t offset, int whence);
@@ -535,53 +538,40 @@ public:
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   char *get_proc_fd_name (char *buf);
-  void set_close_on_exec (bool val);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  int __stdcall write (const void *, size_t);
   int open (int flags, mode_t mode = 0);
-  int close ();
-  void create_guard (SECURITY_ATTRIBUTES *sa)
-  {
-    guard = CreateMutex (sa, FALSE, NULL);
-    ProtectHandleINH (guard);
-  }
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
-  void fixup_in_child ();
-  virtual void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
-  bool hit_eof () {return broken_pipe;}
-  void set_eof () {broken_pipe = true;}
-  HANDLE get_guard () const {return guard;}
   int ready_for_read (int fd, DWORD howlong);
   static int create (fhandler_pipe *[2], unsigned, int, bool = false);
-  bool is_slow () {return true;}
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, bool);
-  friend class fhandler_fifo;
 };
 
-class fhandler_fifo: public fhandler_pipe
+enum fifo_state
 {
-  HANDLE output_handle;
-  long read_use;
-  long write_use;
-  virtual HANDLE& get_io_handle () { return io_handle ?: output_handle; }
+  fifo_unknown,
+  fifo_wait_for_client,
+  fifo_wait_for_server,
+  fifo_ok
+};
+class fhandler_fifo: public fhandler_base
+{
+  fifo_state wait_state;
+  HANDLE open_nonserver (const char *, unsigned, LPSECURITY_ATTRIBUTES);
+  OVERLAPPED io_status;
+  bool wait (bool) __attribute__ ((regparm (1)));
 public:
   fhandler_fifo ();
-  int open (int flags, mode_t mode = 0);
-  int open_not_mine (int flags) __attribute__ ((regparm (2)));
-  int close ();
-  void set_use (int flags) __attribute__ ((regparm (2)));
+  void __stdcall read (void *, size_t&) __attribute__ ((regparm (3)));
+  int __stdcall write (const void *, size_t);
+  int open (int, mode_t);
   bool isfifo () { return true; }
-  HANDLE& get_output_handle () { return output_handle; }
-  void set_output_handle (HANDLE h) { output_handle = h; }
-  void set_use ();
-  int dup (fhandler_base *child);
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
-  bool is_slow () {return true;}
-  void close_one_end ();
+  OVERLAPPED *get_overlapped () {return &io_status;}
 };
 
 class fhandler_dev_raw: public fhandler_base

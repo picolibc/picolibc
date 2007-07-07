@@ -22,223 +22,143 @@
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "sigproc.h"
+#include "cygtls.h"
 
-fhandler_fifo::fhandler_fifo ()
-  : fhandler_pipe (), output_handle (NULL),
-    read_use (0), write_use (0)
+fhandler_fifo::fhandler_fifo ():
+  wait_state (fifo_unknown)
 {
+  get_overlapped ()->hEvent = NULL;
+  need_fork_fixup (true);
 }
 
-void
-fhandler_fifo::set_use (int incr)
+HANDLE
+fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
+			       LPSECURITY_ATTRIBUTES sa_buf)
 {
-  long oread_use = read_use;
-
-  if (get_flags () & (O_WRONLY | O_APPEND))
-    write_use += incr;
-  else if (get_flags () & O_RDWR)
-    {
-      write_use += incr;
-      read_use += incr;
-    }
+  DWORD mode = 0;
+  if (low_flags == O_RDONLY)
+    mode = GENERIC_READ;
+  else if (low_flags = O_WRONLY)
+    mode = GENERIC_WRITE;
   else
-    read_use += incr;
-
-  if (incr >= 0)
-    return;
-  if (read_use <= 0 && oread_use != read_use)
+    mode = GENERIC_READ | GENERIC_WRITE;
+  while (1)
     {
-      HANDLE h = get_handle ();
-      if (h)
+      HANDLE h = CreateFile (npname, mode, 0, sa_buf, OPEN_EXISTING,
+			     FILE_FLAG_OVERLAPPED, NULL);
+      if (h != INVALID_HANDLE_VALUE || GetLastError () != ERROR_PIPE_NOT_CONNECTED)
+	return h;
+      if (&_my_tls != _main_tls)
+	low_priority_sleep (0);
+      else if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
 	{
-	  set_io_handle (NULL);
-	  CloseHandle (h);
+	  set_errno (EINTR);
+	  return NULL;
 	}
     }
 }
 
-int
-fhandler_fifo::close ()
-{
-  fhandler_pipe::close ();
-  if (get_output_handle ())
-    CloseHandle (get_output_handle ());
-  if (!hExeced)
-    set_use (-1);
-  return 0;
-}
-
-#define DUMMY_O_RDONLY 4
-
-void
-fhandler_fifo::close_one_end ()
-{
-  int testflags = (get_flags () & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
-  static int flagtypes[] = {DUMMY_O_RDONLY | O_RDWR, O_WRONLY | O_APPEND | O_RDWR};
-  HANDLE *handles[2] = {&(get_handle ()), &(get_output_handle ())};
-  for (int i = 0; i < 2; i++)
-    if (!(testflags & flagtypes[i]))
-      {
-	CloseHandle (*handles[i]);
-	*handles[i] = NULL;
-      }
-    else if (i == 0 && !read_state)
-      {
-	create_read_state (2);
-	need_fork_fixup (true);
-      }
-}
-int
-fhandler_fifo::open_not_mine (int flags)
-{
-  winpids pids ((DWORD) 0);
-  int res = 0;
-
-  for (unsigned i = 0; i < pids.npids; i++)
-    {
-      _pinfo *p = pids[i];
-      commune_result r;
-      if (p->pid != myself->pid)
-	{
-	  r = p->commune_request (PICOM_FIFO, get_win32_name ());
-	  if (r.handles[0] == NULL)
-	    continue;		// process doesn't own fifo
-	  debug_printf ("pid %d, handles[0] %p, handles[1] %p", p->pid,
-			r.handles[0], r.handles[1]);
-	}
-      else
-	{
-	  /* FIXME: racy? */
-	  fhandler_fifo *fh = cygheap->fdtab.find_fifo (get_win32_name ());
-	  if (!fh)
-	    continue;
-	  if (!DuplicateHandle (hMainProc, fh->get_handle (), hMainProc,
-				&r.handles[0], 0, false, DUPLICATE_SAME_ACCESS))
-	    {
-	      __seterrno ();
-	      goto out;
-	    }
-	  if (!DuplicateHandle (hMainProc, fh->get_output_handle (), hMainProc,
-				&r.handles[1], 0, false, DUPLICATE_SAME_ACCESS))
-	    {
-	      CloseHandle (r.handles[0]);
-	      __seterrno ();
-	      goto out;
-	    }
-	}
-
-      set_io_handle (r.handles[0]);
-      set_output_handle (r.handles[1]);
-      set_flags (flags);
-      close_one_end ();
-      res = 1;
-      goto out;
-    }
-
-  set_errno (EAGAIN);
-
-out:
-  debug_printf ("res %d", res);
-  return res;
-}
-
-#define FIFO_PREFIX "_cygfifo_"
+#define FIFO_PIPE_MODE (PIPE_TYPE_BYTE | PIPE_READMODE_BYTE)
 
 int
 fhandler_fifo::open (int flags, mode_t)
 {
-  int res = 1;
-  char mutex[CYG_MAX_PATH];
-  char *emutex = mutex + CYG_MAX_PATH;
-  char *p, *p1;
-  DWORD resw;
+  int res;
+  char npname[CYG_MAX_PATH];
+  DWORD mode = 0;
 
-  /* Generate a semi-unique name to associate with this fifo but try to ensure
-     that it is no larger than CYG_MAX_PATH */
-  strcpy (mutex, cygheap->shared_prefix);
-  for (p = mutex + strlen (mutex), p1 = strchr (get_name (), '\0');
-       --p1 >= get_name () && p < emutex ; p++)
-    *p = (*p1 == '/') ? '_' : *p1;
-  strncpy (p, FIFO_PREFIX, emutex - p);
-  mutex[CYG_MAX_PATH - 1] = '\0';
+  /* Generate a semi-unique name to associate with this fifo.
+     FIXME: Probably should use "inode" and "dev" from stat for this. */
+  __small_sprintf (npname, "\\\\.\\pipe\\__cygfifo__%lx", get_namehash ());
 
-  /* Create a mutex lock access to this fifo to prevent a race by two processes
-     trying to figure out if they own the fifo or if they should create it. */
-  HANDLE h = CreateMutex (&sec_none_nih, false, mutex);
-  if (!h)
+  unsigned low_flags = flags & O_ACCMODE;
+  if (low_flags == O_RDONLY)
+    mode = PIPE_ACCESS_INBOUND;
+  else if (low_flags == O_WRONLY)
+    mode = PIPE_ACCESS_OUTBOUND;
+  else if (low_flags == O_RDWR)
+    mode = PIPE_ACCESS_DUPLEX;
+
+  if (!mode)
     {
-      __seterrno ();
-      system_printf ("couldn't open fifo mutex '%s', %E", mutex);
-      res = 0;
-      goto out;
-    }
-
-  lock_process::locker.release ();	/* Since we may be a while, release the
-					   process lock that is held when we
-					   open an fd. */
-  /* FIXME? Need to wait for signal here?
-     This shouldn't block for long, but... */
-  resw = WaitForSingleObject (h, INFINITE);
-  lock_process::locker.acquire ();	/* Restore the lock */
-  if (resw != WAIT_OBJECT_0 && resw != WAIT_ABANDONED_0)
-    {
-      __seterrno ();
-      system_printf ("Wait for fifo mutex '%s' failed, %E", mutex);
-      goto out;
-    }
-
-  set_io_handle (NULL);
-  set_output_handle (NULL);
-  if (open_not_mine (flags))
-    goto out;
-
-  fhandler_pipe *fhs[2];
-  if (create (fhs, 1, flags, true))
-    {
-      __seterrno ();
+      set_errno (EINVAL);
       res = 0;
     }
   else
     {
-      set_flags (flags);
-      set_io_handle (fhs[0]->get_handle ());
-      set_output_handle (fhs[1]->get_handle ());
-      guard = fhs[0]->guard;
-      read_state = fhs[0]->read_state;
-      delete (fhs[0]);
-      delete (fhs[1]);
-      set_use (1);
-      need_fork_fixup (true);
+      char char_sa_buf[1024];
+      LPSECURITY_ATTRIBUTES sa_buf =
+	sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+      mode |= FILE_FLAG_OVERLAPPED;
+      HANDLE h = CreateNamedPipe(npname, mode, FIFO_PIPE_MODE,
+				 PIPE_UNLIMITED_INSTANCES, 0, 0,
+				 NMPWAIT_WAIT_FOREVER, sa_buf);
+      if (h != INVALID_HANDLE_VALUE)
+	wait_state = fifo_wait_for_client;
+      else
+	  switch (GetLastError ())
+	    {
+	    case ERROR_ACCESS_DENIED:
+	      h = open_nonserver (npname, low_flags, sa_buf);
+	      if (h != INVALID_HANDLE_VALUE)
+		{
+		  wait_state = fifo_wait_for_server;
+		  break;
+		}
+	      /* fall through intentionally */
+	    default:
+	      __seterrno ();
+	      break;
+	    }
+      if (!h || h == INVALID_HANDLE_VALUE)
+	res = 0;
+      else if (!setup_overlapped ())
+	{
+	  __seterrno ();
+	  res = 0;
+	}
+      else
+	{
+	  set_io_handle (h);
+	  set_flags (flags);
+	  res = 1;
+	}
     }
 
-out:
-  if (h)
-    {
-      ReleaseMutex (h);
-      CloseHandle (h);
-    }
   debug_printf ("returning %d, errno %d", res, get_errno ());
   return res;
 }
 
-int
-fhandler_fifo::dup (fhandler_base *child)
+bool
+fhandler_fifo::wait (bool iswrite)
 {
-  int res = fhandler_pipe::dup (child);
-  if (!res)
+  switch (wait_state)
     {
-      fhandler_fifo *ff = (fhandler_fifo *) child;
-      if (get_output_handle ()
-	  && !DuplicateHandle (hMainProc, get_output_handle (), hMainProc,
-			       &ff->get_output_handle (), false, true,
-			       DUPLICATE_SAME_ACCESS))
-	{
-	  __seterrno ();
-	  child->close ();
-	  res = -1;
-	}
+    case fifo_wait_for_client:
+      bool res = ConnectNamedPipe (get_handle (), get_overlapped ());
+      if (res || GetLastError () == ERROR_PIPE_CONNECTED)
+	return true;
+      return wait_overlapped (res, iswrite);
+    default:
+      break;
     }
-  return res;
+    return true;
+}
+
+void
+fhandler_fifo::read (void *in_ptr, size_t& len)
+{
+  if (!wait (false))
+    len = 0;
+  else
+    read_overlapped (in_ptr, len);
+}
+
+int
+fhandler_fifo::write (const void *ptr, size_t len)
+{
+  return wait (true) ? write_overlapped (ptr, len) : -1;
 }
 
 int __stdcall

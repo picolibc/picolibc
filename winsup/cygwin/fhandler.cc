@@ -32,6 +32,8 @@ details. */
 #include <winioctl.h>
 #include <ntdef.h>
 #include "ntdll.h"
+#include "cygtls.h"
+#include "sigproc.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -222,26 +224,12 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 {
 #define bytes_read ulen
 
-  HANDLE h = NULL;	/* grumble */
-  int prio = 0;		/* ditto */
   int try_noreserve = 1;
   DWORD len = ulen;
 
 retry:
   ulen = (size_t) -1;
-  if (read_state)
-    {
-      h = GetCurrentThread ();
-      prio = GetThreadPriority (h);
-      SetThreadPriority (h, THREAD_PRIORITY_TIME_CRITICAL);
-      signal_read_state (1);
-    }
-  BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, 0);
-  if (read_state)
-    {
-      signal_read_state (1);
-      SetThreadPriority (h, prio);
-    }
+  BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, NULL);
   if (!res)
     {
       /* Some errors are not really errors.  Detect such cases here.  */
@@ -713,7 +701,7 @@ fhandler_base::write (const void *ptr, size_t len)
       LONG off_high = 0;
       DWORD ret = SetFilePointer (get_output_handle (), 0, &off_high, FILE_END);
       if (ret == INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-        {
+	{
 	  debug_printf ("Seeking to EOF in append mode failed");
 	  __seterrno ();
 	  return -1;
@@ -996,6 +984,7 @@ fhandler_base::close ()
 
       __seterrno ();
     }
+  destroy_overlapped ();
   return res;
 }
 
@@ -1201,6 +1190,8 @@ fhandler_base::dup (fhandler_base *child)
       VerifyHandle (nh);
       child->set_io_handle (nh);
     }
+  if (get_overlapped ())
+    child->setup_overlapped ();
   set_flags (child->get_flags ());
   return 0;
 }
@@ -1332,7 +1323,6 @@ fhandler_base::fhandler_base () :
   raixput (0),
   rabuflen (0),
   fs_flags (0),
-  read_state (NULL),
   archetype (NULL),
   usecount (0)
 {
@@ -1381,6 +1371,8 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 	VerifyHandle (h);
       res = true;
     }
+  if (get_overlapped ())
+    setup_overlapped ();
   return res;
 }
 
@@ -1399,12 +1391,16 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   debug_printf ("inheriting '%s' from parent", get_name ());
   if (!nohandle ())
     fork_fixup (parent, io_handle, "io_handle");
+  if (get_overlapped ())
+    setup_overlapped ();
 }
 
 void
 fhandler_base::fixup_after_exec ()
 {
   debug_printf ("here for '%s'", get_name ());
+  if (get_overlapped ())
+    setup_overlapped ();
 }
 
 bool
@@ -1677,4 +1673,87 @@ fhandler_base::fpathconf (int v)
       break;
     }
   return -1;
+}
+
+/* Overlapped I/O */
+
+bool
+fhandler_base::setup_overlapped ()
+{
+  OVERLAPPED *ov = get_overlapped ();
+  memset (ov, 0, sizeof (*ov));
+  return ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL);
+}
+
+void
+fhandler_base::destroy_overlapped ()
+{
+  OVERLAPPED *ov = get_overlapped ();
+  if (ov && ov->hEvent)
+    {
+      CloseHandle (ov->hEvent);
+      ov->hEvent = NULL;
+    }
+}
+
+bool
+fhandler_base::wait_overlapped (bool& res, bool writing)
+{
+  if (!res && GetLastError () != ERROR_IO_PENDING)
+    __seterrno ();
+  else
+    {
+#ifdef DEBUGGING
+      if (!get_overlapped ())
+	system_printf ("get_overlapped is zero?");
+      if (!get_overlapped ()->hEvent)
+	system_printf ("hEvent is zero?");
+#endif
+      DWORD n = 1;
+      HANDLE w4[2];
+      w4[0] = get_overlapped ()->hEvent;
+      if (&_my_tls == _main_tls)
+	w4[n++] = signal_arrived;
+      switch (WaitForMultipleObjects (n, w4, false, INFINITE))
+	{
+	case WAIT_OBJECT_0:
+	  res = true;
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  CancelIo (writing ? get_output_handle () : get_handle ());
+	  set_errno (EINTR);
+	  res = false;
+	  break;
+	}
+    }
+  ResetEvent (get_overlapped ()->hEvent);
+  return res;
+}
+
+void
+fhandler_base::read_overlapped (void *ptr, size_t& len)
+{
+#ifdef DEBUGGING
+  assert (get_overlapped ());
+  assert (get_overlapped ()->hEvent);
+#endif
+  bool res = ReadFile (get_handle (), ptr, len, (DWORD *) &len,
+		       get_overlapped ());
+  if (!wait_overlapped (res, false)
+      || !GetOverlappedResult (get_handle (), get_overlapped (), (DWORD *) &len, false))
+    len = 0;
+}
+
+int
+fhandler_base::write_overlapped (const void *ptr, size_t len)
+{
+  DWORD bytes_written;
+
+  bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
+			get_overlapped ());
+  if (!wait_overlapped (res, true)
+      || !GetOverlappedResult (get_handle (), get_overlapped (),
+			       &bytes_written, false))
+    return -1;
+  return bytes_written;
 }

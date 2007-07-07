@@ -517,31 +517,6 @@ commune_process (void *arg)
 	  sigproc_printf ("WriteFile fd failed, %E");
 	break;
       }
-    case PICOM_FIFO:
-      {
-	sigproc_printf ("processing PICOM_FIFO for %s", si._si_commune._si_str);
-	fhandler_fifo *fh = cygheap->fdtab.find_fifo (si._si_commune._si_str);
-	HANDLE it[2];
-	if (fh == NULL)
-	  it[0] = it[1] = NULL;
-	else
-	  {
-	    it[0] = fh->get_handle ();
-	    it[1] = fh->get_output_handle ();
-	  }
-
-	debug_printf ("fifo %sfound %p, %p", fh ? "" : "not ", it[0], it[1]);
-	if (!WriteFile (tothem, it, sizeof (it), &nr, NULL))
-	  {
-	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    sigproc_printf ("WriteFile read handle failed, %E");
-	  }
-	WaitForSingleObject (process_sync, INFINITE);
-	process_sync = NULL;
-	if (fh)
-	  fh->close_one_end ();
-	break;
-      }
     }
   if (process_sync)
     {
@@ -591,8 +566,6 @@ _pinfo::commune_request (__uint32_t code, ...)
       si._si_commune._si_fd = va_arg (args, int);
       break;
 
-    case PICOM_FIFO:
-      si._si_commune._si_str = va_arg (args, char *);
     break;
     }
 
@@ -642,26 +615,6 @@ _pinfo::commune_request (__uint32_t code, ...)
 	  res.n = p - res.s;
 	}
       break;
-    case PICOM_FIFO:
-      {
-	lock_process now ();
-	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
-	if (!x || nr != sizeof (res.handles))
-	  {
-	    __seterrno ();
-	    goto err;
-	  }
-	for (int i = 0; i < 2; i++)
-	  if (!DuplicateHandle (hp, res.handles[i], hMainProc, &res.handles[i],
-				0, false, DUPLICATE_SAME_ACCESS))
-	    {
-	      if (i)
-		CloseHandle (res.handles[0]);
-	      res.handles[0] = res.handles[1] = NULL;	/* FIXME: possibly left a handle open in child? */
-	      goto err;
-	    }
-	break;
-      }
     }
   goto out;
 

@@ -1,5 +1,62 @@
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	Preliminary change to make pipes interruptible and fifos reliable.
+	* dtable.cc (dtable::find_fifo): Eliminate definition.
+	* dtable.h (dtable::find_fifo): Ditto for declaration.
+	* fhandler.cc (fhandler_base::raw_read): Remove pipe-specific stuff.
+	(fhandler_base::fhandler_base): Ditto.
+	(fhandler_base::close): Handle overlapped I/O structure if appropriate.
+	(fhandler_base::dup): Ditto.
+	(fhandler_base::fork_fixup): Ditto.
+	(fhandler_base::setup_overlapped): Define new function.
+	(fhandler_base::destroy_overlapped): Ditto.
+	(fhandler_base::wait_overlapped): Ditto.
+	(fhandler_base::read_overlapped): Ditto.
+	(fhandler_base::write_overlapped): Ditto.
+	* fhandler.h (fhandler_base::get_overlapped): Declare new function.
+	(fhandler_base::setup_overlapped): Ditto.
+	(fhandler_base::destroy_overlapped): Ditto.
+	(fhandler_base::wait_overlapped): Ditto.
+	(fhandler_base::read_overlapped): Ditto.
+	(fhandler_base::write_overlapped): Ditto.
+	(fhandler_base::get_guard): Eliminate.
+	(fhandler_pipe::*): Rework to eliminate most Win9x related cruft,
+	removing many variables and defining a new overlapped capability.
+	(fhandler_fifo::*): Ditto.
+	(fifo_state): Declare new enum.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Remove old Win9x
+	stuff.  Initialize overlapped handle to NULL.
+	(fhandler_fifo::set_use): Eliminate.
+	(fhandler_fifo::open_nonserver): Define.
+	(fhandler_fifo::open): Rework to use named pipes and overlapped I/O.
+	(fhandler_fifo::wait): Define new function to wait for named pipe
+	connection.
+	(fhandler_fifo::read): Rework to use wait() and new overlapped I/O
+	functionality.
+	(fhandler_fifo::write): Ditto.
+	(fhandler_fifo::dup): Eliminate.
+	* pinfo.cc (commune_process): Remove fifo handling.
+	(_pinfo::commune_request): Ditto.
+	* pinfo.h (picom): Ditto.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Remove Win9x stuff.
+	Initialize overlapped handle to NULL.
+	(fhandler_pipe::open): Eliminate Win9x stuff.
+	(fhandler_pipe::set_close_on_exec): Eliminate.
+	(read_pipe): Eliminate.
+	(fhandler_pipe::close): Ditto.
+	(fhandler_pipe::fixup_after_exec): Ditto.
+	(fhandler_pipe::fixup_in_child): Ditto.
+	(fhandler_pipe::read): Rework to use overlapped I/O.
+	(fhandler_pipe::write): New function using overlapped I/O.
+	(fhandler_pipe::dup): Rework to eliminate Win9x stuff.
+	(fhandler_pipe::create_selectable): Rework to eliminate Win9x and use
+	overlapped I/O.
+	* select.cc (peek_pipe): Rework to eliminate Win9x stuff and use
+	overlapped I/O.
+	(fhandler_base::ready_for_read): Ditto.
+
+2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* path.cc (symlink_info::check_shortcut): Handle device "symlinks"
 	specially - don't posixify them.
 
@@ -12,7 +69,7 @@
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fork.cc: White space.
-	* net.cc: Ditto. 
+	* net.cc: Ditto.
 	* posix_ipc.cc: Ditto.
 
 2007-07-06  Corinna Vinschen  <corinna@vinschen.de>

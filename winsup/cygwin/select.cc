@@ -429,15 +429,6 @@ peek_pipe (select_record *s, bool from_select)
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
 
-  /* pipes require a guard mutex to guard against the situation where multiple
-     readers are attempting to read from the same pipe.  In this scenario, it
-     is possible for PeekNamedPipe to report available data to two readers but
-     only one will actually get the data.  This will result in the other reader
-     entering fhandler_base::raw_read and blocking indefinitely in an interruptible
-     state.  This causes things like "make -j2" to hang.  So, for the non-select case
-     we use the pipe mutex, if it is available. */
-  HANDLE guard_mutex = from_select ? NULL : fh->get_guard ();
-
   /* Don't perform complicated tests if we don't need to. */
   if (!s->read_selected && !s->except_selected)
     goto out;
@@ -484,30 +475,9 @@ peek_pipe (select_record *s, bool from_select)
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
       n = -1;
     }
-  else if (!n || !guard_mutex)
-    /* no guard mutex or nothing to read from the pipe. */;
-  else if (WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
-    {
-      select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
-		     guard_mutex);
-      n = 0;
-    }
-  else
-    {
-      /* Now that we have the mutex, make sure that no one else has snuck
-	 in and grabbed the data that we originally saw. */
-      if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
-	{
-	  select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
-	  n = -1;
-	}
-      if (n <= 0)
-	ReleaseMutex (guard_mutex);	/* Oops.  We lost the race.  */
-    }
 
   if (n < 0)
     {
-      fh->set_eof ();		/* Flag that other end of pipe is gone */
       select_printf ("%s, n %d", fh->get_name (), n);
       if (s->except_selected)
 	gotone += s->except_ready = true;
@@ -545,10 +515,6 @@ out:
 #if 0
 /* FIXME: This code is not quite correct.  There's no better solution
    so far but to always treat the write side of the pipe as writable. */
-
-	  /* We don't worry about the guard mutex, because that only applies
-	     when from_select is false, and peek_pipe is never called that
-	     way for writes.  */
 
 	  IO_STATUS_BLOCK iosb = {0};
 	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
@@ -685,25 +651,8 @@ fhandler_pipe::ready_for_read (int fd, DWORD howlong)
   int res;
   if (!howlong)
     res = fhandler_base::ready_for_read (fd, howlong);
-  else if (!get_guard ())
-    res = 1;
   else
-    {
-      const HANDLE w4[2] = {get_guard (), signal_arrived};
-      switch (WaitForMultipleObjects (2, w4, 0, INFINITE))
-	{
-	case WAIT_OBJECT_0:
-	  res = 1;
-	  break;
-	case WAIT_OBJECT_0 + 1:
-	  set_sig_errno (EINTR);
-	  res = 0;
-	  break;
-	default:
-	  __seterrno ();
-	  res = 0;
-	}
-    }
+    res = 1;
   return res;
 }
 
@@ -1201,9 +1150,6 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 	  break;
 	}
     }
-
-  if (get_guard () && !avail && me.read_ready)
-    ReleaseMutex (get_guard ());
 
   select_printf ("read_ready %d, avail %d", me.read_ready, avail);
   return avail;
