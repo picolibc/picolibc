@@ -1,5 +1,11 @@
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler_disk_file.cc: White space.
+	* fhandler_proc.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+
+2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fork.cc: White space.
 	* net.cc: Ditto. 
 	* posix_ipc.cc: Ditto.

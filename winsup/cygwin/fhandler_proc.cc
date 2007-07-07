@@ -355,7 +355,7 @@ fhandler_proc::fill_filebuf ()
 		       + strlen (uts_name.version) + 2;
 	    filebuf = (char *) crealloc (filebuf, bufalloc);
 	    filesize = __small_sprintf (filebuf, "%s %s %s\n",
-	    				uts_name.sysname, uts_name.release,
+					uts_name.sysname, uts_name.release,
 					uts_name.version);
 	  }
 	break;
@@ -636,7 +636,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
   for (cpu_number = 0; ; cpu_number++)
     {
       if (cpu_number)
-        print ("\n");
+	print ("\n");
 
       __small_sprintf (szBuffer, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
 
@@ -734,9 +734,9 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      //unsigned cpu_count	= (extra_info & 0x00ff0000) >> 16;
 	      unsigned apic_id		= (extra_info & 0xff000000) >> 24;
 	      if (family == 15)
-	      	family += (cpuid_sig >> 20) & 0xff;
+		family += (cpuid_sig >> 20) & 0xff;
 	      if (family >= 6)
-	      	model += ((cpuid_sig >> 16) & 0x0f) << 4;
+		model += ((cpuid_sig >> 16) & 0x0f) << 4;
 	      unsigned maxe = 0;
 	      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
 	      if (maxe >= 0x80000004)
@@ -760,11 +760,11 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  clflush = 64,
 		  cache_alignment = 64;
 	      if (features1 & (1 << 19)) // CLFSH
-	        clflush = ((extra_info >> 8) & 0xff) << 3;
+		clflush = ((extra_info >> 8) & 0xff) << 3;
 	      if (is_intel && family == 15)
-	        cache_alignment = clflush * 2;
+		cache_alignment = clflush * 2;
 	      if (maxe >= 0x80000005) // L1 Cache and TLB Identifiers
-	        {
+		{
 		  unsigned data_cache, inst_cache;
 		  cpuid (&unused, &unused, &data_cache, &inst_cache,
 			 0x80000005);
@@ -773,7 +773,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  tlb_size = 0;
 		}
 	      if (maxe >= 0x80000006) // L2 Cache and L2 TLB Identifiers
-	        {
+		{
 		  unsigned tlb, l2;
 		  cpuid (&unused, &tlb, &l2, &unused, 0x80000006);
 
@@ -791,12 +791,12 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 					 stepping,
 					 cpu_mhz);
 	      if (cache_size >= 0)
-	        bufptr += __small_sprintf (bufptr, "cache size\t: %d KB\n",
+		bufptr += __small_sprintf (bufptr, "cache size\t: %d KB\n",
 					   cache_size);
 
 	      // Recognize multi-core CPUs
 	      if (is_amd && maxe >= 0x80000008)
-	        {
+		{
 		  unsigned core_info;
 		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
 
@@ -818,12 +818,12 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		}
 	      // Recognize Intel Hyper-Transport CPUs
 	      else if (is_intel && (features1 & (1 << 28)) && maxf >= 4)
-	        {
+		{
 		  /* TODO */
 		}
 
 	      bufptr += __small_sprintf (bufptr, "fpu\t\t: %s\n"
-	      					 "fpu_exception\t: %s\n"
+						 "fpu_exception\t: %s\n"
 						 "cpuid level\t: %d\n"
 						 "wp\t\t: yes\n",
 					 (features1 & (1 << 0)) ? "yes" : "no",
@@ -957,16 +957,16 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      /* TODO: bogomips */
 
 	      if (tlb_size >= 0)
-	        bufptr += __small_sprintf (bufptr,
+		bufptr += __small_sprintf (bufptr,
 					   "TLB size\t: %d 4K pages\n",
 					   tlb_size);
 	      bufptr += __small_sprintf (bufptr, "clflush size\t: %d\n"
-	      					 "cache_alignment\t: %d\n",
+						 "cache_alignment\t: %d\n",
 					 clflush,
 					 cache_alignment);
 
 	      if (maxe >= 0x80000008) // Address size
-	        {
+		{
 		  unsigned addr_size, phys, virt;
 		  cpuid (&addr_size, &unused, &unused, &unused, 0x80000008);
 

@@ -558,8 +558,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
       query_open (query_read_control);
       oret = open_fs (O_RDONLY | O_BINARY, 0);
       if (!oret)
-        {
-          /* Can't open file.  Try again with rootdir. */
+	{
+	  /* Can't open file.  Try again with rootdir. */
 	  char root[CYG_MAX_PATH];
 	  if (!rootdir (get_win32_name (), root))
 	    goto out;
@@ -595,7 +595,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
      first, which is only available since W2K.  If that fails, try to
      retrieve normal allocation information. */
   status = NtQueryVolumeInformationFile (get_handle (), &io, &full_fsi,
-  					 sizeof full_fsi,
+					 sizeof full_fsi,
 					 FileFsFullSizeInformation);
   if (NT_SUCCESS (status))
     {
@@ -605,7 +605,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
       sfs->f_bfree = full_fsi.ActualAvailableAllocationUnits.LowPart;
       sfs->f_bavail = full_fsi.CallerAvailableAllocationUnits.LowPart;
       if (sfs->f_bfree > sfs->f_bavail)
-        {
+	{
 	  /* Quotas active.  We can't trust TotalAllocationUnits. */
 	  NTFS_VOLUME_DATA_BUFFER nvdb;
 	  DWORD bytes;
@@ -1586,7 +1586,7 @@ fhandler_disk_file::opendir (int fd)
 	  else
 	    {
 	      /* opendir() case.  Initialize with given directory name and
-	         NULL directory handle. */
+		 NULL directory handle. */
 	      pc.get_nt_native_path (upath);
 	      InitializeObjectAttributes (&attr, &upath,
 					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
@@ -1620,12 +1620,12 @@ fhandler_disk_file::opendir (int fd)
 	    }
 	}
       if (fd >= 0)
-        {
+	{
 	  dir->__flags |= dirent_valid_fd;
 	  dir->__d_fd = fd;
 	}
       else
-        {
+	{
 	  /* Filling cfd with `this' (aka storing this in the file
 	     descriptor table should only happen after it's clear that
 	     opendir doesn't fail, otherwise we end up cfree'ing the

@@ -79,7 +79,7 @@ fhandler_virtual::opendir (int fd)
       dir->__flags = 0;
 
       if (fd >= 0)
-        {
+	{
 	  dir->__flags |= dirent_valid_fd;
 	  dir->__d_fd = fd;
 	  res = dir;
@@ -87,7 +87,7 @@ fhandler_virtual::opendir (int fd)
 	  res = dir;
 	}
       else
-        {
+	{
 	  cygheap_fdnew cfd;
 	  if (cfd >= 0)
 	    {
