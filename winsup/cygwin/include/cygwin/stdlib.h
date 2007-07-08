@@ -24,8 +24,8 @@ void	setprogname (const char *);
 #ifndef __STRICT_ANSI__
 char *realpath (const char *, char *);
 int unsetenv (const char *);
-int random (void);
-long srandom (unsigned);
+long random (void);
+void srandom (unsigned);
 char *ptsname (int);
 int grantpt (int);
 int unlockpt (int);

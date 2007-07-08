@@ -27,20 +27,19 @@
  * SUCH DAMAGE.
  */
 
+extern "C" {
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: src/lib/libc/stdlib/random.c,v 1.25 2007/01/09 00:28:10 imp Exp $");
 
-#include "namespace.h"
 #include <sys/time.h>          /* for srandomdev() */
 #include <fcntl.h>             /* for srandomdev() */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>            /* for srandomdev() */
-#include "un-namespace.h"
 
 /*
  * random.c:
@@ -216,10 +215,7 @@ static int rand_deg = DEG_3;
 static int rand_sep = SEP_3;
 static uint32_t *end_ptr = &randtbl[DEG_3 + 1];
 
-static inline uint32_t good_rand(int32_t);
-
-static inline uint32_t good_rand (x)
-	int32_t x;
+static inline uint32_t good_rand (int32_t x)
 {
 #ifdef  USE_WEAK_SEEDING
 /*
@@ -264,8 +260,7 @@ static inline uint32_t good_rand (x)
  * for default usage relies on values produced by this routine.
  */
 void
-srandom(x)
-	unsigned long x;
+srandom(unsigned x)
 {
 	int i, lim;
 
@@ -281,6 +276,14 @@ srandom(x)
 	}
 	for (i = 0; i < lim; i++)
 		(void)random();
+}
+
+/* Avoid a compiler warning when we really want to get at the junk in
+   an uninitialized variable. */
+static unsigned long
+dummy (unsigned long *x)
+{
+  return *x;
 }
 
 /*
@@ -306,11 +309,11 @@ srandomdev()
 		len = rand_deg * sizeof state[0];
 
 	done = 0;
-	fd = _open("/dev/random", O_RDONLY, 0);
+	fd = open("/dev/random", O_RDONLY, 0);
 	if (fd >= 0) {
-		if (_read(fd, (void *) state, len) == (ssize_t) len)
+		if (read(fd, (void *) state, len) == (ssize_t) len)
 			done = 1;
-		_close(fd);
+		close(fd);
 	}
 
 	if (!done) {
@@ -318,7 +321,7 @@ srandomdev()
 		unsigned long junk;
 
 		gettimeofday(&tv, NULL);
-		srandom((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
+		srandom((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ dummy(&junk));
 		return;
 	}
 
@@ -352,10 +355,9 @@ srandomdev()
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-initstate(seed, arg_state, n)
-	unsigned long seed;		/* seed for R.N.G. */
-	char *arg_state;		/* pointer to state array */
-	long n;				/* # bytes of state info */
+initstate(unsigned long seed,		/* seed for R.N.G. */
+	  char *arg_state,		/* pointer to state array */
+	  long n)			/* # bytes of state info */
 {
 	char *ostate = (char *)(&state[-1]);
 	uint32_t *int_arg_state = (uint32_t *)arg_state;
@@ -420,8 +422,7 @@ initstate(seed, arg_state, n)
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-setstate(arg_state)
-	char *arg_state;		/* pointer to state array */
+setstate(char *arg_state /* pointer to state array */)
 {
 	uint32_t *new_state = (uint32_t *)arg_state;
 	uint32_t type = new_state[0] % MAX_TYPES;
@@ -499,4 +500,5 @@ random()
 		fptr = f; rptr = r;
 	}
 	return((long)i);
+}
 }

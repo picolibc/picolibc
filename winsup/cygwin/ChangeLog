@@ -1,3 +1,12 @@
+2007-07-08  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in (DLL_OFILES): Add newly-imported random.o.  Eliminate
+	reliance on libiberty.
+	* random.cc: Import from FreeBSD.  Modify for Cygwin environment.
+	* include/cygwin/stdlib.h (random): Reflect change in return value to
+	be more linux/freebsd-like.
+	(srandom): Ditto.
+
 2007-07-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.h (fhandler_base::write): Remove __stdcall decoration.
