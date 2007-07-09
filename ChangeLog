@@ -1,3 +1,11 @@
+2007-07-09  Kai Tietz   <kai.tietz@onevision.com>
+
+        * Makefile.def: Add windmc tool to build.
+        * Makefile.tpl: Likewise.
+        * configure.ac: Likewise.
+        * Makefile.in: Regenerate.
+        * configure: Regenerate.
+
 2007-07-05  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* lt~obsolete.m4: New. Import from 20070318 libtool.
