@@ -80,7 +80,6 @@ fhandler_virtual::opendir (int fd)
 
       if (fd >= 0)
 	{
-	  dir->__flags |= dirent_valid_fd;
 	  dir->__d_fd = fd;
 	  res = dir;
 	  dir->__fh = this;
@@ -98,6 +97,7 @@ fhandler_virtual::opendir (int fd)
 	      res = dir;
 	    }
 	}
+      close_on_exec (true);
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());

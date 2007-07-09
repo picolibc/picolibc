@@ -260,11 +260,7 @@ closedir (DIR *dir)
 
   int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
-  /* If the directory has been opened by fdopendir, the descriptor
-     entry is used elsewhere in the application and must not be removed
-     from the descriptor table. */
-  if (!(dir->__flags & dirent_valid_fd))
-    cygheap->fdtab.release (dir->__d_fd);
+  cygheap->fdtab.release (dir->__d_fd);
 
   free (dir->__d_dirname);
   free (dir->__d_dirent);

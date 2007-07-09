@@ -1566,42 +1566,35 @@ fhandler_disk_file::opendir (int fd)
       dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
       d_cachepos (dir) = 0;
 
-      if (!pc.iscygdrive ())
+      if (pc.iscygdrive ())
+        cfd->nohandle (true);
+      else
 	{
-	  OBJECT_ATTRIBUTES attr;
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
-	  WCHAR wpath[CYG_MAX_PATH + 10] = { 0 };
-	  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-	  SECURITY_ATTRIBUTES sa = sec_none;
-
-	  if (fd >= 0 && get_handle ())
-	    {
-	      /* fdopendir() case.  Just initialize with the emtpy upath
-		 and reuse the exisiting handle. */
-	      InitializeObjectAttributes (&attr, &upath,
-					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-					  get_handle (), NULL);
-	    }
-	  else
+	  if (fd < 0)
 	    {
 	      /* opendir() case.  Initialize with given directory name and
 		 NULL directory handle. */
+	      OBJECT_ATTRIBUTES attr;
+	      NTSTATUS status;
+	      IO_STATUS_BLOCK io;
+	      WCHAR wpath[CYG_MAX_PATH + 10] = { 0 };
+	      UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+	      SECURITY_ATTRIBUTES sa = sec_none;
+
 	      pc.get_nt_native_path (upath);
-	      InitializeObjectAttributes (&attr, &upath,
-					  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 					  NULL, sa.lpSecurityDescriptor);
-	    }
-	  status = NtOpenFile (&dir->__handle,
-			       SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       &attr, &io, FILE_SHARE_VALID_FLAGS,
-			       FILE_SYNCHRONOUS_IO_NONALERT
-			       | FILE_OPEN_FOR_BACKUP_INTENT
-			       | FILE_DIRECTORY_FILE);
-	  if (!NT_SUCCESS (status))
-	    {
-	      __seterrno_from_nt_status (status);
-	      goto free_mounts;
+	      status = NtOpenFile (&get_handle (),
+				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
+				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_SYNCHRONOUS_IO_NONALERT
+				   | FILE_OPEN_FOR_BACKUP_INTENT
+				   | FILE_DIRECTORY_FILE);
+	      if (!NT_SUCCESS (status))
+		{
+		  __seterrno_from_nt_status (status);
+		  goto free_mounts;
+		}
 	    }
 
 	  /* FileIdBothDirectoryInformation is apparently unsupported on
@@ -1620,10 +1613,7 @@ fhandler_disk_file::opendir (int fd)
 	    }
 	}
       if (fd >= 0)
-	{
-	  dir->__flags |= dirent_valid_fd;
-	  dir->__d_fd = fd;
-	}
+	dir->__d_fd = fd;
       else
 	{
 	  /* Filling cfd with `this' (aka storing this in the file
@@ -1632,9 +1622,9 @@ fhandler_disk_file::opendir (int fd)
 	     fhandler twice, once in opendir() in dir.cc, the second
 	     time on exit.  Nasty, nasty... */
 	  cfd = this;
-	  cfd->nohandle (true);
 	  dir->__d_fd = cfd;
 	}
+      set_close_on_exec (true);
       dir->__fh = this;
       res = dir;
     }
@@ -1717,31 +1707,26 @@ readdir_get_ino (DIR *dir, const char *path, bool dot_dot)
   HANDLE hdl;
   __ino64_t ino = 0;
 
-  if (!(dir->__flags & dirent_isroot))
+  strcpy (fname, path);
+  if (dot_dot)
+    strcat (fname, (*fname && fname[strlen (fname) - 1] == '/')
+		   ? ".." : "/..");
+  path_conv pc (fname, PC_SYM_NOFOLLOW);
+  if (pc.isspecial ())
     {
-      strcpy (fname, path);
-      if (dot_dot)
-	strcat (fname, (*fname && fname[strlen (fname) - 1] == '/')
-		       ? ".." : "/..");
-      path_conv pc (fname, PC_SYM_NOFOLLOW);
-      if (pc.isspecial ())
-	{
-	  if (!lstat64 (fname, &st))
-	    ino = st.st_ino;
-	}
-      else if (!pc.hasgood_inode ())
-	ino = hash_path_name (0, pc);
-      else if ((hdl = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
-				  NULL, OPEN_EXISTING,
-				  FILE_FLAG_BACKUP_SEMANTICS, NULL))
-	       != INVALID_HANDLE_VALUE)
-	{
-	  ino = readdir_get_ino_by_handle (hdl);
-	  CloseHandle (hdl);
-	}
+      if (!lstat64 (fname, &st))
+	ino = st.st_ino;
     }
-  else
-    ino = readdir_get_ino_by_handle (dir->__handle);
+  else if (!pc.hasgood_inode ())
+    ino = hash_path_name (0, pc);
+  else if ((hdl = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
+			      NULL, OPEN_EXISTING,
+			      FILE_FLAG_BACKUP_SEMANTICS, NULL))
+	   != INVALID_HANDLE_VALUE)
+    {
+      ino = readdir_get_ino_by_handle (hdl);
+      CloseHandle (hdl);
+    }
   return ino;
 }
 
@@ -1761,7 +1746,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
     {
       if ((dir->__flags & dirent_get_d_ino))
 	{
-	  status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
+	  status = NtQueryDirectoryFile (get_handle (), NULL, NULL, 0, &io,
 					 d_cache (dir), DIR_BUF_SIZE,
 					 FileIdBothDirectoryInformation,
 					 FALSE, NULL, dir->__d_position == 0);
@@ -1804,7 +1789,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		{
 		  if (d_cachepos (dir) == 0)
 		    {
-		      status = NtQueryDirectoryFile (dir->__handle, NULL, NULL,
+		      status = NtQueryDirectoryFile (get_handle (), NULL, NULL,
 					   0, &io, d_cache (dir), DIR_BUF_SIZE,
 					   FileBothDirectoryInformation,
 					   FALSE, NULL, cnt == 0);
@@ -1822,7 +1807,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	    }
 	}
       if (!(dir->__flags & dirent_get_d_ino))
-	status = NtQueryDirectoryFile (dir->__handle, NULL, NULL, 0, &io,
+	status = NtQueryDirectoryFile (get_handle (), NULL, NULL, 0, &io,
 				       d_cache (dir), DIR_BUF_SIZE,
 				       FileBothDirectoryInformation,
 				       FALSE, NULL, dir->__d_position == 0);
@@ -1857,17 +1842,20 @@ go_ahead:
 
 	  if (dir->__d_position == 0 && buf->FileNameLength == 2
 	      && FileName[0] == '.')
-	    de->d_ino = readdir_get_ino_by_handle (dir->__handle);
+	    de->d_ino = readdir_get_ino_by_handle (get_handle ());
 	  else if (dir->__d_position == 1 && buf->FileNameLength == 4
 		   && FileName[0] == '.' && FileName[1] == '.')
-	    de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+	    if (!(dir->__flags & dirent_isroot))
+	      de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+	    else
+	      de->d_ino = readdir_get_ino_by_handle (get_handle ());
 	  else
 	    {
 	      HANDLE hdl;
 	      UNICODE_STRING upath = {buf->FileNameLength, CYG_MAX_PATH * 2,
 				      FileName};
 	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-					  dir->__handle , NULL);
+					  get_handle () , NULL);
 	      if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
 			       FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT))
@@ -1891,7 +1879,7 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
-      de->d_ino = readdir_get_ino_by_handle (dir->__handle);
+      de->d_ino = readdir_get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;
@@ -1899,7 +1887,10 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot_dot))
     {
       strcpy (de->d_name , "..");
-      de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+      if (!(dir->__flags & dirent_isroot))
+	de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+      else
+	de->d_ino = readdir_get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;
@@ -1940,9 +1931,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
       IO_STATUS_BLOCK io;
       HANDLE new_dir;
 
-      InitializeObjectAttributes (&attr, &fname,
-				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-				  dir->__handle, NULL);
+      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+				  get_handle (), NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
@@ -1954,8 +1944,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
 		      RtlNtStatusToDosError (status));
       else
 	{
-	  CloseHandle (dir->__handle);
-	  dir->__handle = new_dir;
+	  NtClose (get_handle ());
+	  set_io_handle (new_dir);
 	}
     }
   dir->__d_position = 0;
@@ -1969,14 +1959,14 @@ fhandler_disk_file::closedir (DIR *dir)
   NTSTATUS status;
 
   delete d_mounts (dir);
-  if (!dir->__handle)
+  if (!get_handle ())
     /* ignore */;
-  else if (dir->__handle == INVALID_HANDLE_VALUE)
+  else if (get_handle () == INVALID_HANDLE_VALUE)
     {
       set_errno (EBADF);
       res = -1;
     }
-  else if (!NT_SUCCESS (status = NtClose (dir->__handle)))
+  else if (!NT_SUCCESS (status = NtClose (get_handle ())))
     {
       __seterrno_from_nt_status (status);
       res = -1;

@@ -1,3 +1,19 @@
+2007-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (closedir): Revert change from 2007-06-29.
+	* fhandler.h (dirent_valid_fd): Drop.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): If opening a
+	real dir, use the underlying fhandler to keep track of the directory
+	handle.  In fdopendir case use original io_handle from fhandler.  Use
+	fhandler's io_handle in subsequent directory functions throughout.
+	Create handle non-inheritable and set close-on-exec flag.
+	(readdir_get_ino): Drop dirent_isroot case.
+	(fhandler_disk_file::readdir): Handle dirent_isroot case here.
+	(fhandler_disk_file::rewinddir): Revert change from 2007-07-05.  Use
+	NtClose instead of CloseHandle.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Drop adding
+	dirent_valid_fd flag.  Set close-on-exec flag.
+
 2007-07-08  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in (DLL_OFILES): Add newly-imported random.o.  Eliminate
