@@ -348,6 +348,9 @@ struct bfd_link_info
      --dynamic-list command line options.  */
   unsigned int dynamic: 1;
 
+  /* Non-NULL if .note.gnu.build-id section should be created.  */
+  char *emit_note_gnu_build_id;
+
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The
