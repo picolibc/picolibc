@@ -1,3 +1,8 @@
+2007-07-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1749305]
+	* lib/kernel32.def (GetConsoleProcessList@8):  Add export. 
+
 2007-07-02  Przemek Czerkas  <pczerkas@gmail.com>
 
 	* include/shlobj.h: Add CSIDL_MYMUSIC and CSIDL_MYVIDEO.
