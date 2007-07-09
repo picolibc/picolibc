@@ -1,3 +1,7 @@
+2007-07-09  Roland McGrath  <roland@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add member emit_note_gnu_build_id.
+
 2007-07-06  Nick Clifton  <nickc@redhat.com>
 
 	* bfdlink.h: Update copyright notice to refer to GPLv3.
@@ -68,7 +72,7 @@
 	* dis-asm.h (print_i386_disassembler_options): New.
 
 2007-01-31  Vladimir Prus  <vladimir@codesourcery.com>
-	
+
 	* libiberty.h (PEX_STDERR_TO_PIPE): New define.
 	(PEX_BINARY_ERROR): New define.
 	(pex_read_err): New function.
@@ -83,7 +87,7 @@
 
 	PR ld/3831
 	* bfdlink.h (bfd_link_info): Rename dynamic to dynamic_list.
-	Add dynamic and dynamic_data. 
+	Add dynamic and dynamic_data.
 
 2006-12-05  Michael Tautschnig  <tautschn@model.in.tum.de>
 	    Nick Clifton  <nickc@redhat.com>
@@ -296,7 +300,7 @@
 
 2005-06-20  Geoffrey Keating  <geoffk@apple.com>
 
-	* libiberty.h (strverscmp): Prototype. 
+	* libiberty.h (strverscmp): Prototype.
 
 2005-06-17  Jakub Jelinek  <jakub@redhat.com>
 

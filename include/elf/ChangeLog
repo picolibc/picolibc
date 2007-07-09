@@ -1,3 +1,7 @@
+2007-07-09  Roland McGrath  <roland@redhat.com>
+
+	* common.h (NT_GNU_HWCAP, NT_GNU_BUILD_ID): New macros.
+
 2007-06-29  Joseph Myers  <joseph@codesourcery.com>
 
 	* ppc.h (Tag_GNU_Power_ABI_FP): Define.
@@ -22,13 +26,13 @@
 
 2007-06-11  Sterling Augustine  <sterling@tensilica.com>
 	    Bob Wilson  <bob.wilson@acm.org>
-	
+
 	* xtensa.h (XTENSA_PROP_INSN_NO_TRANSFORM): Renamed to...
 	(XTENSA_PROP_NO_TRANSFORM): ...this.
-	
+
 2007-05-18  Caroline Tice  <ctice@apple.com>
 
-	* dwarf2.h: (enum dwarf_location_atom): Add new DW_OP, 
+	* dwarf2.h: (enum dwarf_location_atom): Add new DW_OP,
 	DW_OP_GNU_uninit.
 
 2007-05-12  Alan Modra  <amodra@bigpond.net.au>
@@ -153,15 +157,15 @@
 	    Randolph Chung  <randolph@tausq.org>
 	* hppa.h (R_PARISC_TLS_GD21L, R_PARISC_TLS_GD14R, R_PARISC_TLS_GDCALL,
 	R_PARISC_TLS_LDM21L, R_PARISC_TLS_LDM14R, R_PARISC_TLS_LDMCALL,
-	R_PARISC_TLS_LDO21L, R_PARISC_TLS_LDO14R, R_PARISC_TLS_DTPMOD32, 
-	R_PARISC_TLS_DTPMOD64, R_PARISC_TLS_DTPOFF32, R_PARISC_TLS_DTPOFF64): 
+	R_PARISC_TLS_LDO21L, R_PARISC_TLS_LDO14R, R_PARISC_TLS_DTPMOD32,
+	R_PARISC_TLS_DTPMOD64, R_PARISC_TLS_DTPOFF32, R_PARISC_TLS_DTPOFF64):
 	New TLS relocs.
 	(R_PARISC_TLS_LE21L, R_PARISC_TLS_LE14R, R_PARISC_TLS_IE21L,
 	R_PARISC_TLS_IE14R, R_PARISC_TLS_TPREL32, R_PARISC_TLS_TPREL64):
 	Define TLS relocs using existing equivalents.
 
-2006-05-24  Bjoern Haase  <bjoern.m.haase@web.de> 
-	
+2006-05-24  Bjoern Haase  <bjoern.m.haase@web.de>
+
 	* avr.h: Add E_AVR_MACH_AVR6, R_AVR_LO8_LDI_GS and R_AVR_HI8_LDI_GS.
 
 2006-03-22  Richard Sandiford  <richard@codesourcery.com>
@@ -234,7 +238,7 @@
 	* common.h (EM_XC16X): New entry for xc16x cpu.
 	Sort other EM_* numbers into numerical order.
 	* xc16x.h: New file.
-   	
+
 2006-02-10  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR binutils/2258
@@ -337,7 +341,7 @@
 	Add support for Renesas M32C and M16C.
 	* common.h (EM_M32C): New machine number.
 	* m32c.h: New file.
-	
+
 2005-06-17  Jan Beulich  <jbeulich@novell.com>
 
 	* x86-64.h (elf_x86_64_reloc_type): Adjust comment for
