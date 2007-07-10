@@ -181,13 +181,13 @@ fhandler_pipe::dup (fhandler_base *child)
    unlike CreatePipe, which returns a bool for success or failure.  */
 int
 fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
-				  HANDLE& w, DWORD psize, bool fifo)
+				  HANDLE& w, DWORD psize)
 {
   /* Default to error. */
   r = w = INVALID_HANDLE_VALUE;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
-  if (!fifo && psize < PIPE_BUF)
+  if (psize < PIPE_BUF)
     psize = PIPE_BUF;
 
   char pipename[CYG_MAX_PATH];
@@ -269,13 +269,13 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 }
 
 int
-fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fifo)
+fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 {
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
   int res = -1;
 
-  int ret = create_selectable (sa, r, w, psize, fifo);
+  int ret = create_selectable (sa, r, w, psize);
   if (ret)
     __seterrno_from_win_error (ret);
   else

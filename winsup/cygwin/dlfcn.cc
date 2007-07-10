@@ -145,12 +145,10 @@ int
 dlclose (void *handle)
 {
   int ret = -1;
-  void *temphandle = (void *) GetModuleHandle (NULL);
-  if (temphandle == handle || FreeLibrary ((HMODULE) handle))
+  if (handle == GetModuleHandle (NULL) || FreeLibrary ((HMODULE) handle))
     ret = 0;
   if (ret)
     set_dl_error ("dlclose");
-  CloseHandle ((HMODULE) temphandle);
   return ret;
 }
 

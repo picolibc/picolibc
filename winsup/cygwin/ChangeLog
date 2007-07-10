@@ -1,5 +1,17 @@
 2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* debug.cc (close_handle): Change debug output format slightly.
+
+	* dlfcn.cc (dlclose): Don't close handle returned from
+	GetModuleHandle(NULL).
+
+	* fhandler.h (fhandler_pipe::create): Remove obsolete argument.
+	(fhandler_pipe::create): Ditto.
+	* fhandler.cc (fhandler_pipe::create): Ditto.
+	(fhandler_pipe::create): Ditto.
+
+2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* strsig.cc (__signals): New macro.
 	(sys_sigabbrev): New array of signal strings, patterned after linux.
 	(siglist): Use __signals.

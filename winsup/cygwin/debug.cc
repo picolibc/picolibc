@@ -1,6 +1,7 @@
 /* debug.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+   Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -240,7 +241,7 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
 
 #if 1 /* Uncomment to see CloseHandle failures */
   if (!ret)
-    small_printf ("CloseHandle(%s) %p failed %s:%d, %E\n", name, h, func, ln);
+    small_printf ("CloseHandle(%s<%p>) failed %s:%d, %E\n", name, h, func, ln);
 #endif
   return ret;
 }

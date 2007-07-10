@@ -546,8 +546,8 @@ public:
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int ready_for_read (int fd, DWORD howlong);
-  static int create (fhandler_pipe *[2], unsigned, int, bool = false);
-  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, bool);
+  static int create (fhandler_pipe *[2], unsigned, int);
+  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD);
 };
 
 enum fifo_state
