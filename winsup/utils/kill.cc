@@ -34,8 +34,6 @@ static struct option longopts[] =
 
 static char opts[] = "hl::fs:v";
 
-extern "C" const char *strsigno (int);
-
 static void
 usage (FILE *where = stderr)
 {
@@ -74,6 +72,16 @@ Process Signaller\n\
 Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", prog_name, len, v, __DATE__);
+}
+
+static const char *
+strsigno (int signo)
+{
+  if (signo >= 0 && signo < NSIG)
+    return sys_sigabbrev[signo];
+  static char buf[sizeof ("Unknown signal") + 32];
+  sprintf (buf, "Unknown signal %d", signo);
+  return buf;
 }
 
 static int

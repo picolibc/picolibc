@@ -1,3 +1,11 @@
+2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* strsig.cc (__signals): New macro.
+	(sys_sigabbrev): New array of signal strings, patterned after linux.
+	(siglist): Use __signals.
+	* include/cygwin/signal.h (sys_sigabbrev): Define.
+	* include/cygwin/version.h: Bump API minor version to 177.
+
 2007-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dir.cc (closedir): Revert change from 2007-06-29.

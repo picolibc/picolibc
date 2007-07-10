@@ -269,6 +269,8 @@ _sig_func_ptr sigset (int, _sig_func_ptr);
 
 int sigqueue(pid_t, int, const union sigval);
 int siginterrupt (int, int);
+extern const char __declspec(dllimport) *sys_sigabbrev[];
+
 #ifdef __cplusplus
 }
 #endif

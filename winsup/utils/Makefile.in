@@ -166,7 +166,7 @@ else
 	$(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 endif
 
-kill.exe: kill.o $(bupdir1)/libiberty/strsignal.o
+kill.exe: kill.o
 ifdef VERBOSE
 	$(CXX) -o $@ $^ -B$(cygwin_build)/ $(ALL_LDFLAGS) $(KILL_LIB)
 else
