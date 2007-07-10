@@ -1,3 +1,9 @@
+2007-07-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1750898]
+	* include/mmsystem.h (MIXERCONTROL): Correct UNICODE mapping.
+	Thanks to Yuji Kuwabara  <yujikuwabara at sf dot net>.
+
 2007-07-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1749305]
