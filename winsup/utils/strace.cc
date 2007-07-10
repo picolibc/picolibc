@@ -1,6 +1,6 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -826,6 +826,7 @@ Trace system calls and signals\n\
                                numbers for Windows errors\n\
   -o, --output=FILENAME        set output file to FILENAME\n\
   -p, --pid=n                  attach to executing program with cygwin pid n\n\
+  -q, --quiet                  suppress messages about attaching, detaching, etc.\n\
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of \n\
                                the default microsecond timestamp.  Implies -d\n\

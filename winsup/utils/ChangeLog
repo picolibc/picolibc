@@ -1,5 +1,9 @@
 2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* strace.cc (usage): Add missing description for -q.
+
+2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* Makefile.in (kill.exe): Remove reliance on libiberty.
 	* kill.cc (strsigno): New function patterned after libiberty but using
 	newly exported cygwin array.
