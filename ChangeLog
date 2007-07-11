@@ -1,3 +1,13 @@
+2007-07-11  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac: Rewrite 'configure --help' strings to look nicer.
+	* configure: Regenerate.
+
+2007-07-11  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac: Add some missing m4 quotation.
+	* configure: Regenerate.
+
 2007-07-09  Kai Tietz   <kai.tietz@onevision.com>
 
         * Makefile.def: Add windmc tool to build.
