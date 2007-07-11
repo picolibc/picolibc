@@ -1,4 +1,5 @@
 #ifndef  _MATH_H_
+
 #define  _MATH_H_
 
 #include <sys/reent.h>
@@ -109,7 +110,7 @@ extern double fmod _PARAMS((double, double));
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
 
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus)
+#if !defined(__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 
 /* ISO C99 types and macros. */
 
@@ -231,15 +232,6 @@ extern double fdim _PARAMS((double, double));
 extern double fmax _PARAMS((double, double));
 extern double fmin _PARAMS((double, double));
 extern double fma _PARAMS((double, double, double));
-extern void sincos _PARAMS((double, double *, double *));
-
-/* GNU extensions */
-# ifndef exp10
-extern double exp10 _PARAMS((double));
-# endif
-# ifndef pow10
-extern double pow10 _PARAMS((double));
-# endif
 
 #ifndef __math_68881
 extern double log1p _PARAMS((double));
@@ -251,31 +243,16 @@ extern double acosh _PARAMS((double));
 extern double atanh _PARAMS((double));
 extern double remainder _PARAMS((double, double));
 extern double gamma _PARAMS((double));
-extern double gamma_r _PARAMS((double, int *));
 extern double lgamma _PARAMS((double));
-extern double lgamma_r _PARAMS((double, int *));
 extern double erf _PARAMS((double));
 extern double erfc _PARAMS((double));
-extern double y0 _PARAMS((double));
-extern double y1 _PARAMS((double));
-extern double yn _PARAMS((int, double));
-extern double j0 _PARAMS((double));
-extern double j1 _PARAMS((double));
-extern double jn _PARAMS((int, double));
 #define log2(x) (log (x) / M_LOG2_E)
 
 #ifndef __math_68881
 extern double hypot _PARAMS((double, double));
 #endif
 
-extern double cabs();
-extern double drem _PARAMS((double, double));
-
 #endif /* ! defined (_REENT_ONLY) */
-
-#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus)  */
-
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus)
 
 /* Single precision versions of ANSI functions.  */
 
@@ -304,10 +281,6 @@ extern float powf _PARAMS((float, float));
 extern float sqrtf _PARAMS((float));
 extern float fmodf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
-
-#endif /* !defined(__STRICT_ANSI__) || defined(__cplusplus) */
-
-#ifndef __STRICT_ANSI__
 
 /* Other single precision functions.  */
 
@@ -341,9 +314,56 @@ extern float rintf _PARAMS((float));
 extern float scalbnf _PARAMS((float, int));
 extern float log1pf _PARAMS((float));
 extern float expm1f _PARAMS((float));
+
+#ifndef _REENT_ONLY
+extern float acoshf _PARAMS((float));
+extern float atanhf _PARAMS((float));
+extern float remainderf _PARAMS((float, float));
+extern float gammaf _PARAMS((float));
+extern float lgammaf _PARAMS((float));
+extern float erff _PARAMS((float));
+extern float erfcf _PARAMS((float));
+#define log2f(x) (logf (x) / (float) M_LOG2_E)
+extern float hypotf _PARAMS((float, float));
+#endif /* ! defined (_REENT_ONLY) */
+
+#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L */
+
+#if !defined (__STRICT_ANSI__) || defined(__cplusplus)
+
+extern double cabs();
+extern double drem _PARAMS((double, double));
+extern void sincos _PARAMS((double, double *, double *));
+extern double gamma_r _PARAMS((double, int *));
+extern double lgamma_r _PARAMS((double, int *));
+
+extern double y0 _PARAMS((double));
+extern double y1 _PARAMS((double));
+extern double yn _PARAMS((int, double));
+extern double j0 _PARAMS((double));
+extern double j1 _PARAMS((double));
+extern double jn _PARAMS((int, double));
+
+extern float cabsf();
+extern float dremf _PARAMS((float, float));
 extern void sincosf _PARAMS((float, float *, float *));
+extern float gammaf_r _PARAMS((float, int *));
+extern float lgammaf_r _PARAMS((float, int *));
+
+extern float y0f _PARAMS((float));
+extern float y1f _PARAMS((float));
+extern float ynf _PARAMS((int, float));
+extern float j0f _PARAMS((float));
+extern float j1f _PARAMS((float));
+extern float jnf _PARAMS((int, float));
 
 /* GNU extensions */
+# ifndef exp10
+extern double exp10 _PARAMS((double));
+# endif
+# ifndef pow10
+extern double pow10 _PARAMS((double));
+# endif
 # ifndef exp10f
 extern float exp10f _PARAMS((float));
 # endif
@@ -351,29 +371,9 @@ extern float exp10f _PARAMS((float));
 extern float pow10f _PARAMS((float));
 # endif
 
-#ifndef _REENT_ONLY
-extern float acoshf _PARAMS((float));
-extern float atanhf _PARAMS((float));
-extern float remainderf _PARAMS((float, float));
-extern float gammaf _PARAMS((float));
-extern float gammaf_r _PARAMS((float, int *));
-extern float lgammaf _PARAMS((float));
-extern float lgammaf_r _PARAMS((float, int *));
-extern float erff _PARAMS((float));
-extern float erfcf _PARAMS((float));
-extern float y0f _PARAMS((float));
-extern float y1f _PARAMS((float));
-extern float ynf _PARAMS((int, float));
-extern float j0f _PARAMS((float));
-extern float j1f _PARAMS((float));
-extern float jnf _PARAMS((int, float));
-#define log2f(x) (logf (x) / (float) M_LOG2_E)
-extern float hypotf _PARAMS((float, float));
+#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) */
 
-extern float cabsf();
-extern float dremf _PARAMS((float, float));
-
-#endif /* ! defined (_REENT_ONLY) */
+#ifndef __STRICT_ANSI__
 
 /* The gamma functions use a global variable, signgam.  */
 #ifndef _REENT_ONLY

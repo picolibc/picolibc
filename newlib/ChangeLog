@@ -1,3 +1,8 @@
+2007-07-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h: Fix so C99 functions/macros are accessible
+	when -std=c99 is used when compiling and not when using C89.
+
 2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h: Declare wcstol, wcstoll, wcstoul,
