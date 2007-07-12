@@ -318,14 +318,22 @@ _CRTIMP unsigned long __cdecl __MINGW_NOTHROW	strtoul	(const char*, char**, int)
 
 #ifndef _WSTDLIB_DEFINED
 /*  also declared in wchar.h */
+_CRTIMP long __cdecl __MINGW_NOTHROW	wcstol	(const wchar_t*, wchar_t**, int);
+_CRTIMP unsigned long __cdecl __MINGW_NOTHROW	wcstoul (const wchar_t*, wchar_t**, int);
 _CRTIMP double __cdecl __MINGW_NOTHROW	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /*  in libmingwex.a */
 float __cdecl __MINGW_NOTHROW wcstof( const wchar_t * __restrict__, wchar_t ** __restrict__);
 long double __cdecl __MINGW_NOTHROW wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
-
-_CRTIMP long __cdecl __MINGW_NOTHROW	wcstol	(const wchar_t*, wchar_t**, int);
-_CRTIMP unsigned long __cdecl __MINGW_NOTHROW	wcstoul (const wchar_t*, wchar_t**, int);
+#ifdef __MSVCRT__ 
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _wgetenv(const wchar_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_wputenv(const wchar_t*);
+_CRTIMP void __cdecl __MINGW_NOTHROW	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW   	_wsystem(const wchar_t*);
+_CRTIMP void __cdecl __MINGW_NOTHROW    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
+_CRTIMP void __cdecl __MINGW_NOTHROW	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW   _wfullpath (wchar_t*, const wchar_t*, size_t);
+#endif
 #define _WSTDLIB_DEFINED
 #endif
 
@@ -420,12 +428,6 @@ _CRTIMP __int64 __cdecl __MINGW_NOTHROW	_wtoi64(const wchar_t *);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _i64tow(__int64, wchar_t *, int);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _ui64tow(unsigned __int64, wchar_t *, int);
 
-_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _wgetenv(const wchar_t*);
-_CRTIMP int __cdecl __MINGW_NOTHROW	 _wputenv(const wchar_t*);
-_CRTIMP void __cdecl __MINGW_NOTHROW	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
-_CRTIMP void __cdecl __MINGW_NOTHROW    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
-_CRTIMP void __cdecl __MINGW_NOTHROW	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
-_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW    _wfullpath (wchar_t*, const wchar_t*, size_t);
 
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;

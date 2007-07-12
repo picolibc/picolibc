@@ -1,3 +1,17 @@
+2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* incude/wchar.h (_wsystem) Declare.
+	(_wputenv) Declare.
+	(_wgetenv): Declare.
+	(_wsearchenv): Declare.
+	(_wmakepath): Declare.
+	(_wsplitpath): Declare.
+	(_wfullpath): Declare.
+	* incude/stdlib.h (_wsystem) Declare.
+	(_wputenv, _wgetenv, _wsearchenv, _wmakepath, _wsplitpath,
+	_wfullpath): Move into _WSTDLIB_DEFINED guard.
+	* include/tchar.h (_tsystem): New UNICODE mapping define.
+
 2007-06-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/mingw_snprintf.c: New file.
