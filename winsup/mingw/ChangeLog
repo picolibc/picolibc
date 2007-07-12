@@ -1,13 +1,14 @@
 2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* incude/wchar.h (_wsystem) Declare.
+	[mingw-Bugs-1734142]
+	* include/wchar.h (_wsystem) Declare.
 	(_wputenv) Declare.
 	(_wgetenv): Declare.
 	(_wsearchenv): Declare.
 	(_wmakepath): Declare.
 	(_wsplitpath): Declare.
 	(_wfullpath): Declare.
-	* incude/stdlib.h (_wsystem) Declare.
+	* include/stdlib.h (_wsystem) Declare.
 	(_wputenv, _wgetenv, _wsearchenv, _wmakepath, _wsplitpath,
 	_wfullpath): Move into _WSTDLIB_DEFINED guard.
 	* include/tchar.h (_tsystem): New UNICODE mapping define.
