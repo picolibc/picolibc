@@ -1,7 +1,18 @@
 2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/pbt.h (PBT_APMRESUMEAUTOMATIC) Define.
+	* include/winuser.h: (PBT_APMQUERYSUSPEND, PBT_APMQUERYSTANDBY,
+	PBT_APMQUERYSUSPENDFAILED, PBT_APMQUERYSTANDBYFAILED,
+	PBT_APMSUSPEND, PBT_APMSTANDBY, PBT_APMRESUMECRITICAL,
+	PBT_APMRESUMESUSPEND, PBT_APMRESUMESTANDBY, PBT_APMBATTERYLOW,
+	PBT_APMPOWERSTATUSCHANGE, PBT_APMOEMEVENT, PBT_APMRESUMEAUTOMATIC):
+	Sync with include/pbt.h.
+
+2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	[mingw-Bugs-1751518]
-	* include/mshtml.h (IHTMLDocument2): Correct spelling of put_URL, get_URL.
+	* include/mshtml.h (IHTMLDocument2): Correct spelling of put_URL,
+	get_URL.
 
 	[mingw-Bugs-1751565]
 	* include/basetyps.h (IID); Guard with __IID_DEFINED__.
