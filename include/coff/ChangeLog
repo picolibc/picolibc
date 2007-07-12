@@ -1,3 +1,8 @@
+2007-07-12  Kai Tietz   <kai.tietz@onevision.com>
+
+	* internal.h (struct internal_syment): Use bfd_hostptr_t for
+	_n_zeroes and _n_offset fields.
+
 2007-04-27  Alan Modra  <amodra@bigpond.net.au>
 
 	* rs6000.h: Write Mimi's name in ASCII.

@@ -1,7 +1,7 @@
 /* Internal format of COFF object file data structures, for GNU BFD.
    This file is part of BFD, the Binary File Descriptor library.
    
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004. 2005, 2006
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004. 2005, 2006, 2007
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -416,15 +416,15 @@ struct internal_syment
 {
   union
   {
-    char _n_name[SYMNMLEN];	/* old COFF version	*/
+    char _n_name[SYMNMLEN];	/* old COFF version		*/
     struct
     {
-      long _n_zeroes;		/* new == 0		*/
-      long _n_offset;		/* offset into string table */
+      bfd_hostptr_t _n_zeroes;	/* new == 0			*/
+      bfd_hostptr_t _n_offset;	/* offset into string table	*/
     }      _n_n;
     char *_n_nptr[2];		/* allows for overlaying	*/
   }     _n;
-  bfd_vma n_value;			/* value of symbol		*/
+  bfd_vma n_value;		/* value of symbol		*/
   short n_scnum;		/* section number		*/
   unsigned short n_flags;	/* copy of flags from filhdr	*/
   unsigned short n_type;	/* type and derived type	*/
