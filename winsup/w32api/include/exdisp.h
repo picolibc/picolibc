@@ -205,8 +205,6 @@ DECLARE_INTERFACE_(IWebBrowser2,IWebBrowserApp)
 };
 #undef INTERFACE
 
-#define STDDISP(m) STDMETHOD_(void,m)
-
 EXTERN_C const IID DIID_DWebBrowserEvents2;
 #define INTERFACE DWebBrowserEvents2
 DECLARE_INTERFACE_(DWebBrowserEvents2,IDispatch)
@@ -218,38 +216,8 @@ DECLARE_INTERFACE_(DWebBrowserEvents2,IDispatch)
 	STDMETHOD(GetTypeInfo)(THIS_ UINT,LCID,LPTYPEINFO*) PURE;
 	STDMETHOD(GetIDsOfNames)(THIS_ REFIID,LPOLESTR*,UINT,LCID,DISPID*) PURE;
 	STDMETHOD(Invoke)(THIS_ DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*) PURE;
-
-	STDDISP(StatusTextChange)(THIS_ BSTR) PURE;
-	STDDISP(ProgressChange)(THIS_ long,long) PURE;
-	STDDISP(CommandStateChange)(THIS_ long,VARIANT_BOOL) PURE;
-	STDDISP(DownloadBegin)(THIS) PURE;
-	STDDISP(DownloadComplete)(THIS) PURE;
-	STDDISP(TitleChange)(THIS_ BSTR) PURE;
-	STDDISP(PropertyChange)(THIS_ BSTR) PURE;
-	STDDISP(BeforeNavigate2)(THIS_ IDispatch*,VARIANT*,VARIANT*,VARIANT*,VARIANT*,VARIANT*,VARIANT_BOOL*) PURE;
-	STDDISP(NewWindow2)(THIS_ IDispatch**,VARIANT_BOOL*) PURE;
-	STDDISP(NavigateComplete)(THIS_ IDispatch*,VARIANT*) PURE;
-	STDDISP(DocumentComplete)(THIS_ IDispatch*,VARIANT*) PURE;
-	STDDISP(OnQuit)(THIS) PURE;
-	STDDISP(OnVisible)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(OnToolBar)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(OnMenuBar)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(OnStatusBar)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(OnFullScreen)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(OnTheaterMode)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(WindowSetResizable)(THIS_ VARIANT_BOOL) PURE;
-	STDDISP(WindowSetLeft)(THIS_ long) PURE;
-	STDDISP(WindowSetTop)(THIS_ long) PURE;
-	STDDISP(WindowSetWidth)(THIS_ long) PURE;
-	STDDISP(WindowSetHeight)(THIS_ long) PURE;
-	STDDISP(WindowClosing)(THIS_ VARIANT_BOOL,VARIANT_BOOL*) PURE;
-	STDDISP(ClientToHostWindow)(THIS_ long*,long*) PURE;
-	STDDISP(SetSecureLockIcon)(THIS_ long) PURE;
-	STDDISP(FileDownload)(THIS_ VARIANT_BOOL*) PURE;
 };
 #undef INTERFACE
-
-#undef STDDISP
 
 #ifdef __cplusplus
 }

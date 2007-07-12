@@ -1,3 +1,17 @@
+2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1751518]
+	* include/mshtml.h (IHTMLDocument2): Correct spelling of put_URL, get_URL.
+
+	[mingw-Bugs-1751565]
+	* include/basetyps.h (IID); Guard with __IID_DEFINED__.
+
+	[mingw-Bugs-1751595] 
+	* include/exdisp.h (DWebBrowserEvents2): Remove undocumented STDDISP
+	methods.
+
+	Thanks to Yuji Kuwabara  <yujikuwabara at sf dot net>.
+
 2007-07-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1750898]
