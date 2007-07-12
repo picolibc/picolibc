@@ -1,3 +1,8 @@
+2007-07-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* configure.ac: Fix my previous change to really match GCC.
+	* configure: Regenerate.
+
 2007-07-11  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure.ac: Rewrite 'configure --help' strings to look nicer.
