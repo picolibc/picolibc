@@ -111,11 +111,22 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   struct stat64 st;
   int havepos;
 
+  /* Only do 64-bit seek on large file.  */
+  if (!(fp->_flags & __SL64))
+    {
+      if ((_off_t) offset != offset)
+	{
+	  ptr->_errno = EOVERFLOW;
+	  return EOF;
+	}
+      return (_off64_t) _fseeko_r (ptr, fp, offset, whence);
+    }
+
   /* Make sure stdio is set up.  */
 
   CHECK_INIT (ptr, fp);
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   curoff = fp->_offset;
 
@@ -125,12 +136,12 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      fflush (fp);
+      _fflush_r (ptr, fp);
     }
 
   /* Have to be able to seek.  */
 
-  if ((seekfn = fp->_seek64) == NULL || !(fp->_flags & __SL64))
+  if ((seekfn = fp->_seek64) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
       _funlockfile(fp);
@@ -150,7 +161,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      fflush(fp);   /* may adjust seek offset on append stream */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
@@ -323,7 +334,8 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
+  if (_fflush_r (ptr, fp)
+      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile(fp);
       return EOF;

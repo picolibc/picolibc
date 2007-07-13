@@ -1,5 +1,25 @@
 2007-07-13  Eric Blake  <ebb9@byu.net>
 
+	Fix fflush issues.
+	* libc/stdio/fflush.c (_fflush_r): New function.
+	(fflush): Fix reentrancy and large offset behavior.
+	* libc/include/stdio.h (_fflush_r): Add prototype.
+	* libc/stdio/fclose.c (_fclose_r): All fflush callers changed.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/fseek.c (_fseek_r): Likewise.
+	* libc/stdio/ftell.c (_ftell_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Likewise.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/setvbuf.c (setvbuf): Likewise.
+	* libc/stdio/ungetc.c (_ungetc_r): Likewise.
+	* libc/stdio/vfprintf.c (__sbprintf): Likewise.
+	* libc/stdio/wbuf.c (__swbuf_r): Likewise.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.  Defer to
+	32-bit version if not large file.
+	* libc/stdio64/ftello64.c (_ftello64_r): Likewise.
+	* libc/stdio64/tmpfile64.c (_tmpfile64_r): Avoid compile warning.
+
 	Documentation updates.
 	* libc/stdio/ungetc.c: Document ungetc.
 	* libc/stdio/Makefile.am (CHEWOUT_FILES): Sort, match current list

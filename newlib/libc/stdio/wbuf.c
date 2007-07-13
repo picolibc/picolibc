@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -74,14 +74,14 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
   n = fp->_p - fp->_bf._base;
   if (n >= fp->_bf._size)
     {
-      if (fflush (fp))
+      if (_fflush_r (ptr, fp))
 	return EOF;
       n = 0;
     }
   fp->_w--;
   *fp->_p++ = c;
   if (++n == fp->_bf._size || (fp->_flags & __SLBF && c == '\n'))
-    if (fflush (fp))
+    if (_fflush_r (ptr, fp))
       return EOF;
   return c;
 }

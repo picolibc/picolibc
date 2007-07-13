@@ -120,7 +120,7 @@ _DEFUN(_ftell_r, (ptr, fp),
 
   /* Find offset of underlying I/O object, then
      adjust for buffered bytes.  */
-  fflush(fp);           /* may adjust seek offset on append stream */
+  _fflush_r (ptr, fp);           /* may adjust seek offset on append stream */
   if (fp->_flags & __SOFF)
     pos = fp->_offset;
   else

@@ -145,7 +145,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      fflush (fp);
+      _fflush_r (ptr, fp);
     }
 
   /* Have to be able to seek.  */
@@ -170,7 +170,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      fflush (fp);   /* may adjust seek offset on append stream */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
@@ -356,7 +356,8 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
+  if (_fflush_r (ptr, fp)
+      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile (fp);
       return EOF;

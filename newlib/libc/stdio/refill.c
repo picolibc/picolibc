@@ -65,7 +65,7 @@ _DEFUN(__srefill_r, (ptr, fp),
       /* switch to reading */
       if (fp->_flags & __SWR)
 	{
-	  if (fflush (fp))
+	  if (_fflush_r (ptr, fp))
 	    return EOF;
 	  fp->_flags &= ~__SWR;
 	  fp->_w = 0;

@@ -91,6 +91,10 @@ _DEFUN (_ftello64_r, (ptr, fp),
 {
   _fpos64_t pos;
 
+  /* Only do 64-bit tell on large file.  */
+  if (!(fp->_flags & __SL64))
+    return (_off64_t) _ftello_r (ptr, fp);
+
   /* Ensure stdio is set up.  */
 
   CHECK_INIT (ptr, fp);
@@ -106,7 +110,7 @@ _DEFUN (_ftello64_r, (ptr, fp),
 
   /* Find offset of underlying I/O object, then
      adjust for buffered bytes.  */
-  fflush(fp);           /* may adjust seek offset on append stream */
+  _fflush_r (ptr, fp);           /* may adjust seek offset on append stream */
   if (fp->_flags & __SOFF)
     pos = fp->_offset;
   else

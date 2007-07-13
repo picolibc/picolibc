@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -185,7 +185,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	      COPY (w);
 	      /* fp->_w -= w; *//* unneeded */
 	      fp->_p += w;
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	    }
 	  else if (len >= (w = fp->_bf._size))
@@ -235,7 +235,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	      COPY (w);
 	      /* fp->_w -= w; */
 	      fp->_p += w;
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	    }
 	  else if (s >= (w = fp->_bf._size))
@@ -254,7 +254,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	  if ((nldist -= w) == 0)
 	    {
 	      /* copied the newline: flush and forget */
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	      nlknown = 0;
 	    }

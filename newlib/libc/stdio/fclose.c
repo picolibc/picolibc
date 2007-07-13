@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -89,7 +89,7 @@ _DEFUN(_fclose_r, (rptr, fp),
   /* Unconditionally flush to allow special handling for seekable read
      files to reposition file to last byte processed as opposed to
      last byte read ahead into the buffer.  */
-  r = fflush (fp);
+  r = _fflush_r (rptr, fp);
   if (fp->_close != NULL && fp->_close (rptr, fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)

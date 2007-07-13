@@ -348,12 +348,13 @@ int	_EXFUN(_dprintf_r, (struct _reent *, int, const char *, ...)
 int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
 int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
-FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
+int	_EXFUN(_fflush_r, (struct _reent *, FILE *));
 char *  _EXFUN(_fgets_r, (struct _reent *, char *, int, FILE *));
 int	_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
+FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));

@@ -26,10 +26,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fflush(FILE *<[fp]>);
 
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fflush(<[fp]>)
-	FILE *<[fp]>;
+	int _fflush_r(struct _reent *<[reent]>, FILE *<[fp]>);
 
 DESCRIPTION
 The <<stdio>> output functions can buffer output before delivering it
@@ -41,31 +38,40 @@ or stream identified by <[fp]>) to the host system.
 If <[fp]> is <<NULL>>, <<fflush>> delivers pending output from all
 open files.
 
+Additionally, if <[fp]> is a seekable input stream visiting a file
+descriptor, set the position of the file descriptor to match next
+unread byte, useful for obeying POSIX semantics when ending a process
+without consuming all input from the stream.
+
+The alternate function <<_fflush_r>> is a reentrant version, where the
+extra argument <[reent]> is a pointer to a reentrancy structure, and
+<[fp]> must not be NULL.
+
 RETURNS
 <<fflush>> returns <<0>> unless it encounters a write error; in that
 situation, it returns <<EOF>>.
 
 PORTABILITY
-ANSI C requires <<fflush>>.
+ANSI C requires <<fflush>>.  The behavior on input streams is only
+specified by POSIX, and not all implementations follow POSIX rules.
 
 No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
 #include <stdio.h>
+#include <errno.h>
 #include "local.h"
 
 /* Flush a single file, or (if fp is NULL) all files.  */
 
 int
-_DEFUN(fflush, (fp),
+_DEFUN(_fflush_r, (ptr, fp),
+       struct _reent *ptr _AND
        register FILE * fp)
 {
   register unsigned char *p;
   register int n, t;
-
-  if (fp == NULL)
-    return _fwalk (_GLOBAL_REENT, fflush);
 
 #ifdef _REENT_SMALL
   /* For REENT_SMALL platforms, it is possible we are being
@@ -83,15 +89,13 @@ _DEFUN(fflush, (fp),
     return 0;
 #endif /* _REENT_SMALL  */
 
-  CHECK_INIT (_REENT, fp);
+  CHECK_INIT (ptr, fp);
 
   _flockfile (fp);
 
   t = fp->_flags;
   if ((t & __SWR) == 0)
     {
-      _fpos_t _EXFUN((*seekfn), (struct _reent *, _PTR, _fpos_t, int));
-
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
          to the POSIX and SUSv3 standards.  */
@@ -104,22 +108,38 @@ _DEFUN(fflush, (fp),
          this seek to be deferred until necessary, but we choose to do it here
          to make the change simpler, more contained, and less likely
          to miss a code scenario.  */
-      if ((fp->_r > 0 || fp->_ur > 0) && (seekfn = fp->_seek) != NULL)
-        {
-          _fpos_t curoff;
+      if ((fp->_r > 0 || fp->_ur > 0) && fp->_seek != NULL)
+	{
+	  int tmp;
+#ifdef __LARGE64_FILES
+	  _fpos64_t curoff;
+#else
+	  _fpos_t curoff;
+#endif
 
-          /* Get the physical position we are at in the file.  */
-          if (fp->_flags & __SOFF)
-            curoff = fp->_offset;
-          else
-            {
-              /* We don't know current physical offset, so ask for it.  */
-              curoff = seekfn (_REENT, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
-              if (curoff == -1L)
-                {
-                  _funlockfile (fp);
-                  return 0;
-                }
+	  /* Get the physical position we are at in the file.  */
+	  if (fp->_flags & __SOFF)
+	    curoff = fp->_offset;
+	  else
+	    {
+	      /* We don't know current physical offset, so ask for it.
+		 Only ESPIPE is ignorable.  */
+#ifdef __LARGE64_FILES
+	      if (fp->_flags & __SL64)
+		curoff = fp->_seek64 (ptr, fp->_cookie, 0, SEEK_CUR);
+	      else
+#endif
+		curoff = fp->_seek (ptr, fp->_cookie, 0, SEEK_CUR);
+	      if (curoff == -1L)
+		{
+		  int result = EOF;
+		  if (ptr->_errno == ESPIPE)
+		    result = 0;
+		  else
+		    fp->_flags |= __SERR;
+		  _funlockfile (fp);
+		  return result;
+		}
             }
           if (fp->_flags & __SRD)
             {
@@ -129,17 +149,29 @@ _DEFUN(fflush, (fp),
               if (HASUB (fp))
                 curoff -= fp->_ur;
             }
-          /* Now physically seek to after byte last read.  */
-          if (seekfn (_REENT, fp->_cookie, curoff, SEEK_SET) != -1)
-            {
-              /* Seek successful.  We can clear read buffer now.  */
-              fp->_flags &= ~__SNPT;
-              fp->_r = 0;
-              fp->_p = fp->_bf._base;
-              if (fp->_flags & __SOFF)
-                fp->_offset = curoff;
-            }
-        }
+	  /* Now physically seek to after byte last read.  */
+#ifdef __LARGE64_FILES
+	  if (fp->_flags & __SL64)
+	    tmp = (fp->_seek64 (ptr, fp->_cookie, curoff, SEEK_SET) == curoff);
+	  else
+#endif
+	    tmp = (fp->_seek (ptr, fp->_cookie, curoff, SEEK_SET) == curoff);
+	  if (tmp)
+	    {
+	      /* Seek successful.  We can clear read buffer now.  */
+	      fp->_flags &= ~__SNPT;
+	      fp->_r = 0;
+	      fp->_p = fp->_bf._base;
+	      if (fp->_flags & __SOFF)
+		fp->_offset = curoff;
+	    }
+	  else
+	    {
+	      fp->_flags |= __SERR;
+	      _funlockfile (fp);
+	      return EOF;
+	    }
+	}
       _funlockfile (fp);
       return 0;
     }
@@ -161,7 +193,7 @@ _DEFUN(fflush, (fp),
 
   while (n > 0)
     {
-      t = fp->_write (_REENT, fp->_cookie, (char *) p, n);
+      t = fp->_write (ptr, fp->_cookie, (char *) p, n);
       if (t <= 0)
 	{
           fp->_flags |= __SERR;
@@ -174,3 +206,17 @@ _DEFUN(fflush, (fp),
   _funlockfile (fp);
   return 0;
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN(fflush, (fp),
+       register FILE * fp)
+{
+  if (fp == NULL)
+    return _fwalk_reent (_GLOBAL_REENT, _fflush_r);
+
+  return _fflush_r (_REENT, fp);
+}
+
+#endif /* _REENT_ONLY */

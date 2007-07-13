@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006, 2007 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -124,7 +124,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   else
     {
       if (fp->_flags & __SWR)
-	fflush (fp);
+	_fflush_r (ptr, fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.

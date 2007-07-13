@@ -124,7 +124,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   else
     {
       if (fp->_flags & __SWR)
-	 fflush (fp);
+	_fflush_r (ptr, fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.

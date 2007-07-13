@@ -212,7 +212,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 	/* do the work, then copy any error status */
 	ret = _VFPRINTF_R (rptr, &fake, fmt, ap);
-	if (ret >= 0 && fflush(&fake))
+	if (ret >= 0 && _fflush_r (rptr, &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;

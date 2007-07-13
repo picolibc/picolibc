@@ -143,7 +143,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
         }
       if (fp->_flags & __SWR)
 	{
-	  if (fflush (fp))
+	  if (_fflush_r (rptr, fp))
             {
               _funlockfile (fp);
               return EOF;
