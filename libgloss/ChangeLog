@@ -1,3 +1,8 @@
+2007-07-13  Kevin Buettner  <kevinb@redhat.com>
+
+	* mep/fmax.ld, mep/gmap_default.ld, mep/min.ld, mep/simple.ld
+	(.gcc_except_table): Add pattern for .gcc_except_table.*.
+
 2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/syscalls.c (gettimeofday): Change to POSIX signature

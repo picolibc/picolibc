@@ -80,7 +80,7 @@ SECTIONS
   } >RAM1 /* DATA-section */
   .data1   : { *(.data1) } >RAM1 /* DATA-section */
   .eh_frame : { KEEP (*(.eh_frame))} >RAM1 /* DATA-section */
-  .gcc_except_table : { *(.gcc_except_table) } >RAM1 /* DATA-section */
+  .gcc_except_table : { *(.gcc_except_table) *(.gcc_except_table.*) } >RAM1 /* DATA-section */
   .dynamic       : { *(.dynamic) } >RAM1 /* DATA-section */
   .ctors   : 
   {

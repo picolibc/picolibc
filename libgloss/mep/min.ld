@@ -77,7 +77,7 @@ SECTIONS
   }
   .data1   : { *(.data1) }
   .eh_frame : { KEEP (*(.eh_frame)) }
-  .gcc_except_table : { *(.gcc_except_table) }
+  .gcc_except_table : { *(.gcc_except_table) *(.gcc_except_table.*) }
   . = ALIGN(4);
   __tpbase = .;
   .based : { *(.based) *(.based.*) *(.gnu.linkonce.based.*) }
