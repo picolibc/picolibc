@@ -1,3 +1,12 @@
+2007-07-13  Eric Blake  <ebb9@byu.net>
+
+	Documentation updates.
+	* libc/stdio/ungetc.c: Document ungetc.
+	* libc/stdio/Makefile.am (CHEWOUT_FILES): Sort, match current list
+	of files with documentation.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/stdio.tex: Sort and update stdio documentation index.
+
 2007-07-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h: Fix so C99 functions/macros are accessible

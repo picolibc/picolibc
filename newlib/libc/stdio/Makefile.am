@@ -179,7 +179,6 @@ CHEWOUT_FILES = \
 	fgetpos.def		\
 	fgets.def		\
 	fileno.def		\
-	fiprintf.def		\
 	fopen.def		\
 	fopencookie.def		\
 	fputc.def		\
@@ -192,8 +191,8 @@ CHEWOUT_FILES = \
 	funopen.def		\
 	fwrite.def		\
 	getc.def		\
-	getchar.def		\
 	getc_u.def		\
+	getchar.def		\
 	getchar_u.def		\
 	getdelim.def		\
 	getline.def		\
@@ -202,8 +201,8 @@ CHEWOUT_FILES = \
 	mktemp.def		\
 	perror.def		\
 	putc.def		\
-	putchar.def		\
 	putc_u.def		\
+	putchar.def		\
 	putchar_u.def		\
 	puts.def		\
 	putw.def		\
@@ -220,6 +219,7 @@ CHEWOUT_FILES = \
 	sscanf.def		\
 	tmpfile.def		\
 	tmpnam.def		\
+	ungetc.def		\
 	vfprintf.def		\
 	vfscanf.def		\
 	viprintf.def		\

@@ -14,6 +14,48 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/*
+FUNCTION
+<<ungetc>>---push data back into a stream
+
+INDEX
+	ungetc
+INDEX
+	_ungetc_r
+
+ANSI_SYNOPSIS
+	#include <stdio.h>
+	int ungetc(int <[c]>, FILE *<[stream]>);
+
+	int _ungetc_r(struct _reent *<[reent]>, int <[c]>, FILE *<[stream]>);
+
+DESCRIPTION
+<<ungetc>> is used to return bytes back to <[stream]> to be read again.
+If <[c]> is EOF, the stream is unchanged.  Otherwise, the unsigned
+char <[c]> is put back on the stream, and subsequent reads will see
+the bytes pushed back in reverse order.  Pushed byes are lost if the
+stream is repositioned, such as by <<fseek>>, <<fsetpos>>, or
+<<rewind>>.
+
+The underlying file is not changed, but it is possible to push back
+something different than what was originally read.  Ungetting a
+character will clear the end-of-stream marker, and decrement the file
+position indicator.  Pushing back beyond the beginning of a file gives
+unspecified behavior.
+
+The alternate function <<_ungetc_r>> is a reentrant version.  The
+extra argument <[reent]> is a pointer to a reentrancy structure.
+
+RETURNS
+The character pushed back, or <<EOF>> on error.
+
+PORTABILITY
+ANSI C requires <<ungetc>>, but only requires a pushback buffer of one
+byte; although this implementation can handle multiple bytes, not all
+can.  Pushing back a signed char is a common application bug.
+
+Supporting OS subroutines required: <<sbrk>>.
+*/
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
@@ -84,7 +126,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
   CHECK_INIT (rptr, fp);
 
   _flockfile (fp);
-  
+
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 
@@ -171,4 +213,3 @@ _DEFUN(ungetc, (c, fp),
   return _ungetc_r (_REENT, c, fp);
 }
 #endif /* !_REENT_ONLY */
-

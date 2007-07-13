@@ -1,9 +1,9 @@
 @node Stdio
-@chapter Input and Output (@file{stdio.h}) 
+@chapter Input and Output (@file{stdio.h})
 
 This chapter comprises functions to manage files
 or other input/output streams. Among these functions are subroutines
-to generate or scan strings according to specifications from a format string. 
+to generate or scan strings according to specifications from a format string.
 
 The underlying facilities for input and output depend on the host
 system, but these functions provide a uniform interface.
@@ -22,12 +22,14 @@ _stderr_r(@var{reent})
 instead of the globals @code{stdin}, @code{stdout}, and
 @code{stderr}.  The argument <[reent]> is a pointer to a reentrancy
 structure.
- 
-@menu  
+
+@menu
 * clearerr::    Clear file or stream error indicator
+* diprintf::    Print to a file descriptor (integer only)
 * dprintf::     Print to a file descriptor
 * fclose::      Close a file
 * fcloseall::   Close all files
+* fdopen::      Turn an open file into a stream
 * feof::        Test for end of file
 * ferror::      Test whether read/write error has occurred
 * fflush::      Flush buffered file output
@@ -36,7 +38,7 @@ structure.
 * fgets::       Get character string from a file or stream
 * fileno::      Get file descriptor associated with stream
 * fopen::       Open a file
-* fdopen::	Turn an open file into a stream
+* fopencookie:: Open a stream with custom callbacks
 * fputc::       Write a character on a stream or file
 * fputs::       Write a character string in a file or stream
 * fread::       Read array elements from a file
@@ -44,6 +46,7 @@ structure.
 * fseek::       Set file position
 * fsetpos::     Restore position of a stream or file
 * ftell::       Return position in a stream or file
+* funopen::     Open a stream with custom callbacks
 * fwrite::      Write array elements from memory to a file or stream
 * getc::        Get a character from a file or stream (macro)
 * getc_unlocked::	Get a character from a file or stream (macro)
@@ -68,20 +71,24 @@ structure.
 * setbuffer::   Specify full buffering for a file or stream with size
 * setlinebuf::  Specify line buffering for a file or stream
 * setvbuf::     Specify buffering for a file or stream
-* printf::      Write formatted output
-* scanf::       Scan and format input
-* iprintf::     Write formatted output (integer only)
-* iscanf::      Scan and format input (integer only)
+* siprintf::    Write formatted output (integer only)
+* siscanf::     Scan and format input (integer only)
+* sprintf::     Write formatted output
+* sscanf::      Scan and format input
 * tmpfile::     Create a temporary file
 * tmpnam::      Generate name for a temporary file
-* viprintf::    Format variable argument list for non-floating-point output
-* viscanf::     Scan variable format list for non-floating-point input
-* vprintf::     Format variable argument list
-* vscanf::      Format variable argument list
-@end menu 
+* ungetc::      Push data back into a stream
+* vfprintf::    Format variable argument list
+* vfscanf::     Scan variable argument list
+* viprintf::    Format variable argument list (integer only)
+* viscanf::     Scan variable format list (integer only)
+@end menu
 
 @page
 @include stdio/clearerr.def
+
+@page
+@include stdio/diprintf.def
 
 @page
 @include stdio/dprintf.def
@@ -93,6 +100,9 @@ structure.
 @include stdio/fcloseall.def
 
 @page
+@include stdio/fdopen.def
+
+@page
 @include stdio/feof.def
 
 @page
@@ -101,14 +111,14 @@ structure.
 @page
 @include stdio/fflush.def
 
-@page 
-@include stdio/fgetc.def 
+@page
+@include stdio/fgetc.def
 
 @page
 @include stdio/fgetpos.def
 
-@page 
-@include stdio/fgets.def 
+@page
+@include stdio/fgets.def
 
 @page
 @include stdio/fileno.def
@@ -117,7 +127,7 @@ structure.
 @include stdio/fopen.def
 
 @page
-@include stdio/fdopen.def
+@include stdio/fopencookie.def
 
 @page
 @include stdio/fputc.def
@@ -143,14 +153,14 @@ structure.
 @page
 @include stdio/fwrite.def
 
-@page 
-@include stdio/getc.def 
+@page
+@include stdio/getc.def
 
 @page
 @include stdio/getc_u.def
 
 @page
-@include stdio/getchar.def 
+@include stdio/getchar.def
 
 @page
 @include stdio/getchar_u.def
@@ -161,11 +171,11 @@ structure.
 @page
 @include stdio/getline.def
 
-@page 
+@page
 @include stdio/gets.def
 
-@page 
-@include stdio/getw.def 
+@page
+@include stdio/getw.def
 
 @page
 @include stdio/mktemp.def
@@ -188,8 +198,8 @@ structure.
 @page
 @include stdio/puts.def
 
-@page 
-@include stdio/putw.def 
+@page
+@include stdio/putw.def
 
 @page
 @include stdio/remove.def
@@ -212,17 +222,17 @@ structure.
 @page
 @include stdio/setvbuf.def
 
-@page 
-@include stdio/sprintf.def 
+@page
+@include stdio/siprintf.def
 
 @page
-@include stdio/sscanf.def 
+@include stdio/siscanf.def
 
-@page 
-@include stdio/siprintf.def 
+@page
+@include stdio/sprintf.def
 
-@page 
-@include stdio/siscanf.def 
+@page
+@include stdio/sscanf.def
 
 @page
 @include stdio/tmpfile.def
@@ -230,15 +240,17 @@ structure.
 @page
 @include stdio/tmpnam.def
 
-@page 
-@include stdio/vfprintf.def 
+@page
+@include stdio/ungetc.def
+
+@page
+@include stdio/vfprintf.def
 
 @page
 @include stdio/vfscanf.def
 
-@page 
-@include stdio/viprintf.def 
+@page
+@include stdio/viprintf.def
 
-@page 
-@include stdio/viscanf.def 
-
+@page
+@include stdio/viscanf.def
