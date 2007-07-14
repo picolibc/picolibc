@@ -1,3 +1,8 @@
+2007-07-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* init.cc (in_dllentry): Make NO_COPY to avoid spurious false
+	positives.
+
 2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* debug.cc (close_handle): Change debug output format slightly.

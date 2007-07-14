@@ -118,7 +118,7 @@ respawn_wow64_process ()
 extern void __stdcall dll_crt0_0 ();
 
 HMODULE NO_COPY cygwin_hmodule;
-bool in_dllentry;
+bool NO_COPY in_dllentry;
 
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
