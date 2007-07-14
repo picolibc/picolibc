@@ -1,3 +1,11 @@
+2007-07-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* init.cc (in_dllentry): Delete.
+	(dll_entry): Remove assignment to deleted variable.
+	* winsup.h (in_dllentry): Delete declaration.
+	* exceptions.cc (inside_kernel): Use another method to see if we are in
+	dll_entry phase.
+
 2007-07-13  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* init.cc (in_dllentry): Make NO_COPY to avoid spurious false

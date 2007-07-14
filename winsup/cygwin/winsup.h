@@ -353,7 +353,6 @@ extern bool display_title;
 extern bool transparent_exe;
 
 extern bool in_forkee;
-extern bool in_dllentry;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;

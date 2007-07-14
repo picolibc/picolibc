@@ -288,7 +288,7 @@ inside_kernel (CONTEXT *cx)
   int res;
   MEMORY_BASIC_INFORMATION m;
 
-  if (in_dllentry)
+  if (!_my_tls.isinitialized ())
     return true;
 
   memset (&m, 0, sizeof m);
