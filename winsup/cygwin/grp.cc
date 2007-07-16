@@ -360,7 +360,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 
   /* If impersonated, use impersonation token. */
   if (cygheap->user.issetuid ())
-    hToken = cygheap->user.token ();
+    hToken = cygheap->user.primary_token ();
   else
     hToken = hProcToken;
 

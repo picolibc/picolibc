@@ -128,7 +128,7 @@ public:
   HANDLE external_token;
   HANDLE internal_token;
   HANDLE curr_primary_token;
-  HANDLE current_token;
+  HANDLE curr_imp_token;
 
   /* CGF 2002-06-27.  I removed the initializaton from this constructor
      since this class is always allocated statically.  That means that everything
@@ -176,9 +176,9 @@ public:
   PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
 #define NO_IMPERSONATION NULL
-  bool issetuid () const { return current_token != NO_IMPERSONATION; }
+  bool issetuid () const { return curr_imp_token != NO_IMPERSONATION; }
   HANDLE primary_token () { return curr_primary_token; }
-  HANDLE token () { return current_token; }
+  HANDLE imp_token () { return curr_imp_token; }
   void deimpersonate ()
   {
     RevertToSelf ();
@@ -186,7 +186,7 @@ public:
   bool reimpersonate ()
   {
     if (issetuid ())
-      return ImpersonateLoggedOnUser (token ());
+      return ImpersonateLoggedOnUser (primary_token ());
     return true;
   }
   bool has_impersonation_tokens ()
@@ -195,8 +195,8 @@ public:
 	     || curr_primary_token != NO_IMPERSONATION; }
   void close_impersonation_tokens ()
   {
-    if (current_token != NO_IMPERSONATION)
-      CloseHandle (current_token);
+    if (curr_imp_token != NO_IMPERSONATION)
+      CloseHandle (curr_imp_token);
     if (curr_primary_token != NO_IMPERSONATION
     	&& curr_primary_token != external_token
 	&& curr_primary_token != internal_token)

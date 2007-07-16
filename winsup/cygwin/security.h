@@ -388,7 +388,7 @@ void set_cygwin_privileges (HANDLE token);
 #define _push_thread_privilege(_priv, _val, _check) { \
     HANDLE _dup_token = NULL; \
     HANDLE _token = (cygheap->user.issetuid () && (_check)) \
-		    ? cygheap->user.token () : hProcToken; \
+		    ? cygheap->user.primary_token () : hProcToken; \
     if (!DuplicateTokenEx (_token, MAXIMUM_ALLOWED, NULL, \
 			   SecurityImpersonation, TokenImpersonation, \
 			   &_dup_token)) \

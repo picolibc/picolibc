@@ -1943,7 +1943,7 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
   DWORD granted;
   DWORD plen = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
   PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plen);
-  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.token ()
+  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.imp_token ()
 					 : hProcImpToken;
 
   if (!tok && !DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,

@@ -2228,22 +2228,22 @@ seteuid32 (__uid32_t uid)
   cygheap->user.set_sid (usersid);
   cygheap->user.curr_primary_token = new_token == hProcToken ? NO_IMPERSONATION
 							: new_token;
-  if (cygheap->user.current_token != NO_IMPERSONATION)
+  if (cygheap->user.curr_imp_token != NO_IMPERSONATION)
     {
-      CloseHandle (cygheap->user.current_token);
-      cygheap->user.current_token = NO_IMPERSONATION;
+      CloseHandle (cygheap->user.curr_imp_token);
+      cygheap->user.curr_imp_token = NO_IMPERSONATION;
     }
   if (cygheap->user.curr_primary_token != NO_IMPERSONATION)
     {
       if (!DuplicateTokenEx (cygheap->user.curr_primary_token, MAXIMUM_ALLOWED,
 			     &sec_none, SecurityImpersonation,
-			     TokenImpersonation, &cygheap->user.current_token))
+			     TokenImpersonation, &cygheap->user.curr_imp_token))
 	{
 	  __seterrno ();
 	  cygheap->user.curr_primary_token = NO_IMPERSONATION;
 	  return -1;
 	}
-      set_cygwin_privileges (cygheap->user.current_token);
+      set_cygwin_privileges (cygheap->user.curr_imp_token);
     }
   if (!cygheap->user.reimpersonate ())
     {
@@ -2338,7 +2338,7 @@ setegid32 (__gid32_t gid)
 				TokenPrimaryGroup, &gsid, sizeof gsid))
 	debug_printf ("SetTokenInformation(primary_token, "
 		      "TokenPrimaryGroup), %E");
-      if (!SetTokenInformation (cygheap->user.token (), TokenPrimaryGroup,
+      if (!SetTokenInformation (cygheap->user.imp_token (), TokenPrimaryGroup,
 				&gsid, sizeof gsid))
 	debug_printf ("SetTokenInformation(token, TokenPrimaryGroup), %E");
     }

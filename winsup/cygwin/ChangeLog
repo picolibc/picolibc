@@ -1,3 +1,15 @@
+2007-07-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cygheap_user::curr_imp_token): Rename from current_token.
+	Accommodate changge throughout Cygwin.
+	(cygheap_user::imp_token): Rename from token.  Accommodate changge
+	throughout Cygwin.
+	(rcygheap_user::eimpersonate): Use primary token for impersonation.
+	* grp.cc (internal_getgroups): Use primary impersonation token when
+	impersonated.
+	* security.h (_push_thread_privilege): Use primary impersonation token
+	when impersonated.
+
 2007-07-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* init.cc (in_dllentry): Delete.
