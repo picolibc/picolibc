@@ -2044,7 +2044,10 @@ check_registry_access (HANDLE hdl, int flags)
     ret = check_access (sd, mapping, desired, flags);
   /* As long as we can't write the registry... */
   if (flags & W_OK)
-    ret = -1;
+    {
+      set_errno (EROFS);
+      ret = -1;
+    }
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;
 }

@@ -443,6 +443,12 @@ fhandler_base::fhaccess (int flags)
 eaccess_done:
   set_errno (EACCES);
 done:
+  if (!res && (flags & W_OK) && get_device () == FH_FS
+      && (pc.fs_flags () & FILE_READ_ONLY_VOLUME))
+    {
+      set_errno (EROFS);
+      res = -1;
+    }
   debug_printf ("returning %d", res);
   return res;
 }

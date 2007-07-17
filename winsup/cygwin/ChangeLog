@@ -1,5 +1,11 @@
 2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fhaccess): Add check for R/O file system.
+	* security.cc (check_registry_access): Set errno to EROFS when checking
+	for W_OK.
+
+2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Move setting
 	cfd->nohandle where it won't crash.
 
