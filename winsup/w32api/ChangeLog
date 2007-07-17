@@ -1,3 +1,8 @@
+2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (FILE_READ_ONLY_VOLUME): Define.
+	* include/ddk/ntifs.h (FILE_READ_ONLY_VOLUME): Define.
+
 2007-07-12  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winuser.h (FE_FONTSMOOTHINGSTANDARD, FE_FONTSMOOTHINGCLEARTYPE):
