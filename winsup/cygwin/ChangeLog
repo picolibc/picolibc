@@ -1,3 +1,8 @@
+2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Move setting
+	cfd->nohandle where it won't crash.
+
 2007-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_user::curr_imp_token): Rename from current_token.

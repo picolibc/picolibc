@@ -1566,9 +1566,7 @@ fhandler_disk_file::opendir (int fd)
       dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
       d_cachepos (dir) = 0;
 
-      if (pc.iscygdrive ())
-        cfd->nohandle (true);
-      else
+      if (!pc.iscygdrive ())
 	{
 	  if (fd < 0)
 	    {
@@ -1623,6 +1621,8 @@ fhandler_disk_file::opendir (int fd)
 	     time on exit.  Nasty, nasty... */
 	  cfd = this;
 	  dir->__d_fd = cfd;
+	  if (pc.iscygdrive ())
+	    cfd->nohandle (true);
 	}
       set_close_on_exec (true);
       dir->__fh = this;
