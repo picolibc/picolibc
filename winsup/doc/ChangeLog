@@ -1,3 +1,8 @@
+2007-07-18  Brian Dessent  <brian@dessent.net>
+
+	* faq-using.xml (faq.using.console-window): Mention FHS location of
+	docs and remove outdated reference to ash.
+
 2007-06-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin-api.in.sgml: Remove authorgroup and revhistory.

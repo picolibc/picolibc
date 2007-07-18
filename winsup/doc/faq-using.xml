@@ -859,11 +859,8 @@ this message from the Cygwin mailing list:
 You can use it with or without X11.  You can resize it easily by
 dragging an edge or corner.  Copy and paste is easy with the left and
 middle mouse buttons, respectively.  It will honor settings in your
-~/.Xdefaults file, even without X.
-</para>
-<para>Don't invoke as simply ``rxvt'' because that will run /bin/sh (really
-ash) which is not a good interactive shell.  For details see
-<literal>/usr/doc/Cygwin/rxvt-&lt;ver&gt;.README</literal>.
+~/.Xdefaults file, even without X.  For details see
+<literal>/usr/share/doc/Cygwin/rxvt-&lt;ver&gt;.README</literal>.
 </para>
 </answer></qandaentry>
 
