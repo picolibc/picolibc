@@ -1295,7 +1295,7 @@
 	* doc/makedoc.c: Include <stdlib.h>.
 	(malloc, realloc): Remove extern declarations.
 
-2005-12-18  Jeff Johnston  <jjohnstn@redhat.com>
+2006-12-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* NEWS: Update with 1.15.0 info.
 	* README: Ditto.
