@@ -163,8 +163,10 @@ cygheap_init ()
   if (!cygheap->sigs)
     sigalloc ();
 
+  /* Should this ever change, keep in mind that shared_prefix_buf is exactly
+     8 bytes long, just enough to match the size of the "Global\\" string. */
   if (!cygheap->shared_prefix)
-    cygheap->shared_prefix = cstrdup (
+    strcpy (cygheap->shared_prefix = cygheap->shared_prefix_buf,
 	    wincap.has_terminal_services () ? "Global\\" : "");
 }
 

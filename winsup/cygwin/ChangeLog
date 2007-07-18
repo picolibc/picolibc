@@ -1,3 +1,11 @@
+2007-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (shared_prefix): De-const.
+	(shared_prefix_buf): Add static buffer for shared prefix to avoid
+	additional allocation.
+	* cygheap.cc (cygheap_init): Set cygheap->shared_prefix to
+	cygheap->shared_prefix_buf and strcpy.
+
 2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fhaccess): Add check for R/O file system.

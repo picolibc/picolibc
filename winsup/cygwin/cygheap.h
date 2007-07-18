@@ -279,7 +279,8 @@ struct init_cygheap
   cwdstuff cwd;
   dtable fdtab;
   LUID luid[SE_NUM_PRIVS];
-  const char *shared_prefix;
+  char *shared_prefix;
+  char shared_prefix_buf[8];
 #ifdef DEBUGGING
   cygheap_debug debug;
 #endif
