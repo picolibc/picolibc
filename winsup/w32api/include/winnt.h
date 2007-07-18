@@ -504,6 +504,7 @@ typedef DWORD FLONG;
 #define SE_IMPERSONATE_NAME TEXT("SeImpersonatePrivilege")
 #define SE_ENABLE_DELEGATION_NAME TEXT("SeEnableDelegationPrivilege")
 #define SE_SYNC_AGENT_NAME TEXT("SeSyncAgentPrivilege")
+#define SE_TRUSTED_CREDMAN_ACCESS_NAME	TEXT("SeTrustedCredManAccessPrivilege")
 #define SE_RELABEL_NAME TEXT("SeRelabelPrivilege")
 #define SE_INCREASE_WORKING_SET_NAME TEXT("SeIncreaseWorkingSetPrivilege")
 #define SE_TIME_ZONE_NAME TEXT("SeTimeZonePrivilege")

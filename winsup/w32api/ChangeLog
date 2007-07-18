@@ -1,3 +1,7 @@
+2007-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (SE_TRUSTED_CREDMAN_ACCESS_NAME): Define.
+
 2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (FILE_READ_ONLY_VOLUME): Define.
