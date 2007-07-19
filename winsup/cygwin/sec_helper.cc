@@ -530,8 +530,6 @@ init_global_security ()
   sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
   sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
     get_null_sd ();
-
-  set_cygwin_privileges (hProcToken);
 }
 
 bool

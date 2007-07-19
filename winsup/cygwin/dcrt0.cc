@@ -734,7 +734,9 @@ dll_crt0_0 ()
 
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
+
   OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
+  set_cygwin_privileges (hProcToken);
 
   device::init ();
   do_global_ctors (&__CTOR_LIST__, 1);

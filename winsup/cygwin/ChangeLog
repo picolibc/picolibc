@@ -1,3 +1,9 @@
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_0): Call set_cygwin_privileges here, after
+	initializing hProcToken.
+	* sec_helper.cc (init_global_security): Don't call set_cygwin_privileges        here.
+
 2007-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (shared_prefix): De-const.
