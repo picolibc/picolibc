@@ -1,5 +1,9 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_helper.cc: Remove unused code.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (SetSecurityDescriptorControl): Drop.
 	* security.cc (alloc_sd): Set security descriptor control flag without
 	calling SetSecurityDescriptorControl function.
