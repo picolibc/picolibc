@@ -272,34 +272,35 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 int __stdcall
 fhandler_base::fstat_by_name (struct __stat64 *buf)
 {
-  int res;
-  HANDLE handle;
-  WIN32_FIND_DATA local;
+  int res = -1;
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  FILE_NETWORK_OPEN_INFORMATION fnoi;
 
   if (!pc.exists ())
     {
       debug_printf ("already determined that pc does not exist");
       set_errno (ENOENT);
-      res = -1;
     }
-  else if ((handle = FindFirstFile (pc, &local)) != INVALID_HANDLE_VALUE)
+  else if (NT_SUCCESS (status = NtQueryFullAttributesFile (
+			      pc.get_object_attr (attr, sec_none_nih), &fnoi)))
     {
-      FindClose (handle);
       if (pc.is_rep_symlink ())
-	local.dwFileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-      pc.file_attributes (local.dwFileAttributes);
+	fnoi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+      pc.file_attributes (fnoi.FileAttributes);
       res = fstat_helper (buf,
-			  local.ftLastWriteTime, /* see fstat_helper comment */
-			  local.ftLastAccessTime,
-			  local.ftLastWriteTime,
-			  local.ftCreationTime,
-			  pc.volser (),
-			  (ULONGLONG) local.nFileSizeHigh << 32
-				      | local.nFileSizeLow,
-			  -1LL,
-			  0ULL,
-			  1,
-			  local.dwFileAttributes);
+			  *(FILETIME *) (fnoi.ChangeTime.QuadPart
+					 ?  &fnoi.ChangeTime
+					 : &fnoi.LastWriteTime),
+		       *(FILETIME *) &fnoi.LastAccessTime,
+		       *(FILETIME *) &fnoi.LastWriteTime,
+		       *(FILETIME *) &fnoi.CreationTime,
+		       pc.volser (),
+		       fnoi.EndOfFile.QuadPart,
+		       fnoi.AllocationSize.QuadPart,
+		       0ULL,
+		       1,
+		       fnoi.FileAttributes);
     }
   else if (pc.isdir ())
     {
@@ -309,8 +310,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     }
   else
     {
-      debug_printf ("FindFirstFile failed for '%s', %E", (char *) pc);
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       res = -1;
     }
   return res;
@@ -330,14 +330,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       else
 	return fstat_by_handle (buf);
     }
-  /* If we don't care if the file is executable or we already know if it is,
-     then just do a "query open" as it is apparently much faster. */
-  if (pc.exec_state () != dont_know_if_executable)
-    {
-      if (pc.fs_is_fat () && !strpbrk (get_win32_name (), "?*|<>"))
-	return fstat_by_name (buf);
-      query_open (query_stat_control);
-    }
+  query_open (query_stat_control);
   if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
     {
       /* If we couldn't open the file, try a query open with no permissions.
