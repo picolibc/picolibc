@@ -291,6 +291,7 @@ pinfo::set_acl()
 {
   PACL acl_buf = (PACL) alloca (1024);
   SECURITY_DESCRIPTOR sd;
+  NTSTATUS status;
 
   sec_acl (acl_buf, true, true, cygheap->user.sid (),
 	   well_known_world_sid, FILE_MAP_READ);
@@ -298,8 +299,8 @@ pinfo::set_acl()
     debug_printf ("InitializeSecurityDescriptor %E");
   else if (!SetSecurityDescriptorDacl (&sd, TRUE, acl_buf, FALSE))
     debug_printf ("SetSecurityDescriptorDacl %E");
-  else if (!SetKernelObjectSecurity (h, DACL_SECURITY_INFORMATION, &sd))
-    debug_printf ("SetKernelObjectSecurity %E");
+  else if ((status = NtSetSecurityObject (h, DACL_SECURITY_INFORMATION, &sd)))
+    debug_printf ("NtSetSecurityObject %lx", status);
 }
 
 const char *

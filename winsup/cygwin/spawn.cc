@@ -34,6 +34,7 @@ details. */
 #include "environ.h"
 #include "cygtls.h"
 #include "winf.h"
+#include "ntdll.h"
 
 static suffix_info exe_suffixes[] =
 {
@@ -514,15 +515,18 @@ loop:
       /* allow the child to interact with our window station/desktop */
       HANDLE hwst, hdsk;
       SECURITY_INFORMATION dsi = DACL_SECURITY_INFORMATION;
+      NTSTATUS status;
       DWORD n;
       char wstname[1024];
       char dskname[1024];
 
       hwst = GetProcessWindowStation ();
-      SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
+      if ((status = NtSetSecurityObject (hwst, dsi, get_null_sd ())))
+	system_printf ("NtSetSecurityObject, %lx", status);
       GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);
       hdsk = GetThreadDesktop (GetCurrentThreadId ());
-      SetUserObjectSecurity (hdsk, &dsi, get_null_sd ());
+      if ((status = NtSetSecurityObject (hdsk, dsi, get_null_sd ())))
+	system_printf ("NtSetSecurityObject, %lx", status);
       GetUserObjectInformation (hdsk, UOI_NAME, dskname, 1024, &n);
       strcat (wstname, "\\");
       strcat (wstname, dskname);

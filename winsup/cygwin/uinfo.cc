@@ -30,6 +30,7 @@ details. */
 #include "child_info.h"
 #include "environ.h"
 #include "pwdgrp.h"
+#include "ntdll.h"
 
 /* Initialize the part of cygheap_user that does not depend on files.
    The information is used in shared.cc for the user shared.
@@ -72,12 +73,15 @@ cygheap_user::init ()
   if (GetSecurityDescriptorDacl (psd, &acl_exists, &dacl.DefaultDacl, &dummy)
       && acl_exists && dacl.DefaultDacl)
     {
+      NTSTATUS status;
+
       /* Set the default DACL and the process DACL */
       if (!SetTokenInformation (hProcToken, TokenDefaultDacl, &dacl,
       				sizeof (dacl)))
 	system_printf ("SetTokenInformation (TokenDefaultDacl), %E");
-      if (!SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION, psd))
-	system_printf ("SetKernelObjectSecurity, %E");
+      if ((status = NtSetSecurityObject (hMainProc, DACL_SECURITY_INFORMATION,
+					 psd)))
+	system_printf ("NtSetSecurityObject, %lx", status);
     }
   else
     system_printf("Cannot get dacl, %E");

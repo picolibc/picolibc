@@ -357,7 +357,6 @@ LoadDLLfunc (SendMessageA, 16, user32)
 LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetTimer, 16, user32)
-LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)

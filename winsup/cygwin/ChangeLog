@@ -1,5 +1,14 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (SetUserObjectSecurity): Drop.
+	* pinfo.cc (pinfo::set_acl): Use NtSetSecurityObject instead of
+	SetKernelObjectSecurity.
+	* spawn.cc (spawn_guts): Use NtSetSecurityObject instead of
+	SetUserObjectSecurity.
+	* uinfo.cc (cygheap_user::init): Ditto.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (init_cygheap::luid): Remove.
 	* mmap.cc (mlock): Accommodate parameter change in call to
 	push_thread_privilege.
