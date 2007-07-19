@@ -1,3 +1,8 @@
+2007-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/fcntl.h (_O_WTEXT, _O_U16TEXT, _O_U8TEXT) Define for
+	Vista.
+
 2007-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1734142]
@@ -17,7 +22,7 @@
 
 	* mingwex/gdtoa/mingw_snprintf.c: New file.
 	* mingwex/Makefile.in (GDTOA_DISTFILES): Add mingw_snprintf.c.
-	(GDTOA_OBJS): Add mingw_snprintf.O.
+	(GDTOA_OBJS): Add mingw_snprintf.o.
 
 2007-06-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
