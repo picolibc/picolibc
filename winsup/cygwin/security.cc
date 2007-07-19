@@ -562,46 +562,50 @@ get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid, struct passwd *pw,
   tmp_list += groups.pgsid;
 }
 
-static const cygpriv_idx sys_privs[] = {
-  SE_TCB_PRIV,
-  SE_ASSIGNPRIMARYTOKEN_PRIV,
-  SE_CREATE_TOKEN_PRIV,
-  SE_CHANGE_NOTIFY_PRIV,
-  SE_SECURITY_PRIV,
-  SE_BACKUP_PRIV,
-  SE_RESTORE_PRIV,
-  SE_SYSTEMTIME_PRIV,
-  SE_SHUTDOWN_PRIV,
-  SE_REMOTE_SHUTDOWN_PRIV,
-  SE_TAKE_OWNERSHIP_PRIV,
-  SE_DEBUG_PRIV,
-  SE_SYSTEM_ENVIRONMENT_PRIV,
-  SE_SYSTEM_PROFILE_PRIV,
-  SE_PROF_SINGLE_PROCESS_PRIV,
-  SE_INC_BASE_PRIORITY_PRIV,
-  SE_LOAD_DRIVER_PRIV,
-  SE_CREATE_PAGEFILE_PRIV,
-  SE_INCREASE_QUOTA_PRIV,
-  SE_LOCK_MEMORY_PRIV,
-  SE_CREATE_PERMANENT_PRIV,
-  SE_AUDIT_PRIV,
-  SE_UNDOCK_PRIV,
-  SE_MANAGE_VOLUME_PRIV,
-  SE_IMPERSONATE_PRIV,
-  SE_CREATE_GLOBAL_PRIV,
-  SE_INCREASE_WORKING_SET_PRIV,
-  SE_TIME_ZONE_PRIV,
-  SE_CREATE_SYMBOLIC_LINK_PRIV
+static ULONG sys_privs[] = {
+  SE_CREATE_TOKEN_PRIVILEGE,
+  SE_ASSIGNPRIMARYTOKEN_PRIVILEGE,		
+  SE_LOCK_MEMORY_PRIVILEGE,		
+  SE_INCREASE_QUOTA_PRIVILEGE,		
+  SE_TCB_PRIVILEGE,		
+  SE_SECURITY_PRIVILEGE,		
+  SE_TAKE_OWNERSHIP_PRIVILEGE,		
+  SE_LOAD_DRIVER_PRIVILEGE,		
+  SE_SYSTEM_PROFILE_PRIVILEGE,		/* Vista ONLY */
+  SE_SYSTEMTIME_PRIVILEGE,		
+  SE_PROF_SINGLE_PROCESS_PRIVILEGE,		
+  SE_INC_BASE_PRIORITY_PRIVILEGE,		
+  SE_CREATE_PAGEFILE_PRIVILEGE,		
+  SE_CREATE_PERMANENT_PRIVILEGE,		
+  SE_BACKUP_PRIVILEGE,		
+  SE_RESTORE_PRIVILEGE,		
+  SE_SHUTDOWN_PRIVILEGE,		
+  SE_DEBUG_PRIVILEGE,		
+  SE_AUDIT_PRIVILEGE,		
+  SE_SYSTEM_ENVIRONMENT_PRIVILEGE,		
+  SE_CHANGE_NOTIFY_PRIVILEGE,		
+  SE_UNDOCK_PRIVILEGE,
+  SE_MANAGE_VOLUME_PRIVILEGE,
+  SE_IMPERSONATE_PRIVILEGE,
+  SE_CREATE_GLOBAL_PRIVILEGE,
+  SE_INCREASE_WORKING_SET_PRIVILEGE,
+  SE_TIME_ZONE_PRIVILEGE,
+  SE_CREATE_SYMBOLIC_LINK_PRIVILEGE
 };
 
 #define SYSTEM_PRIVILEGES_COUNT (sizeof sys_privs / sizeof *sys_privs)
 
 static PTOKEN_PRIVILEGES
-get_system_priv_list (cygsidlist &grp_list, size_t &size)
+get_system_priv_list (size_t &size)
 {
-  const LUID *priv;
-  size = sizeof (ULONG)
-	 + SYSTEM_PRIVILEGES_COUNT * sizeof (LUID_AND_ATTRIBUTES);
+  ULONG max_idx = 0;
+  while (max_idx < SYSTEM_PRIVILEGES_COUNT
+  	 && sys_privs[max_idx] != wincap.max_sys_priv ())
+    ++max_idx;
+  if (max_idx >= SYSTEM_PRIVILEGES_COUNT)
+    api_fatal ("Coding error: wincap privilege %u doesn't exist in sys_privs",
+	       wincap.max_sys_priv ());
+  size = sizeof (ULONG) + (max_idx + 1) * sizeof (LUID_AND_ATTRIBUTES);
   PTOKEN_PRIVILEGES privs = (PTOKEN_PRIVILEGES) malloc (size);
   if (!privs)
     {
@@ -609,15 +613,14 @@ get_system_priv_list (cygsidlist &grp_list, size_t &size)
       return NULL;
     }
   privs->PrivilegeCount = 0;
-
-  for (DWORD i = 0; i < SYSTEM_PRIVILEGES_COUNT; ++i)
-    if ((priv = privilege_luid (sys_privs[i])))
-      {
-	privs->Privileges[privs->PrivilegeCount].Luid = *priv;
-	privs->Privileges[privs->PrivilegeCount].Attributes =
-	  SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
-	++privs->PrivilegeCount;
-      }
+  for (ULONG i = 0; i <= max_idx; ++i)
+    {
+      privs->Privileges[privs->PrivilegeCount].Luid.HighPart = 0L;
+      privs->Privileges[privs->PrivilegeCount].Luid.LowPart = sys_privs[i];
+      privs->Privileges[privs->PrivilegeCount].Attributes =
+	SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
+      ++privs->PrivilegeCount;
+    }
   return privs;
 }
 
@@ -632,7 +635,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
   char buf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 
   if (usersid == well_known_system_sid)
-    return get_system_priv_list (grp_list, size);
+    return get_system_priv_list (size);
 
   for (int grp = -1; grp < grp_list.count (); ++grp)
     {
@@ -648,13 +651,13 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	continue;
       for (ULONG i = 0; i < cnt; ++i)
 	{
-	  const LUID *priv;
+	  LUID priv;
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
 
 	  sys_wcstombs (buf, sizeof (buf),
 			privstrs[i].Buffer, privstrs[i].Length / 2);
-	  if (!(priv = privilege_luid_by_name (buf)))
+	  if (!privilege_luid (buf, &priv))
 	    continue;
 
 	  if (privs)
@@ -662,8 +665,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	      DWORD pcnt = privs->PrivilegeCount;
 	      LUID_AND_ATTRIBUTES *p = privs->Privileges;
 	      for (; pcnt > 0; --pcnt, ++p)
-		if (priv->HighPart == p->Luid.HighPart
-		    && priv->LowPart == p->Luid.LowPart)
+		if (priv.HighPart == p->Luid.HighPart
+		    && priv.LowPart == p->Luid.LowPart)
 		  goto next_account_right;
 	    }
 
@@ -681,7 +684,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	    }
 	  tmp->PrivilegeCount = tmp_count;
 	  privs = tmp;
-	  privs->Privileges[privs->PrivilegeCount].Luid = *priv;
+	  privs->Privileges[privs->PrivilegeCount].Luid = priv;
 	  privs->Privileges[privs->PrivilegeCount].Attributes =
 	    SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	  ++privs->PrivilegeCount;
@@ -827,7 +830,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   size_t psize = 0;
 
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
-  push_self_privilege (SE_CREATE_TOKEN_PRIV, true);
+  push_self_privilege (SE_CREATE_TOKEN_PRIVILEGE, true);
 
   /* Open policy object. */
   if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
@@ -964,7 +967,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   HANDLE user_token = NULL;
 
-  push_self_privilege (SE_TCB_PRIV, true);
+  push_self_privilege (SE_TCB_PRIVILEGE, true);
 
   /* Register as logon process. */
   str2lsa (name, "Cygwin");
@@ -1978,7 +1981,8 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 	{
 	  pset->PrivilegeCount = 1;
 	  pset->Control = 0;
-	  pset->Privilege[0].Luid = *privilege_luid (SE_BACKUP_PRIV);
+	  pset->Privilege[0].Luid.HighPart = 0L;
+	  pset->Privilege[0].Luid.LowPart = SE_BACKUP_PRIVILEGE;
 	  pset->Privilege[0].Attributes = 0;
 	  if (PrivilegeCheck (tok, pset, &status) && status)
 	    granted_flags |= R_OK;
@@ -1987,7 +1991,8 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 	{
 	  pset->PrivilegeCount = 1;
 	  pset->Control = 0;
-	  pset->Privilege[0].Luid = *privilege_luid (SE_RESTORE_PRIV);
+	  pset->Privilege[0].Luid.HighPart = 0L;
+	  pset->Privilege[0].Luid.LowPart = SE_RESTORE_PRIVILEGE;
 	  pset->Privilege[0].Attributes = 0;
 	  if (PrivilegeCheck (tok, pset, &status) && status)
 	    granted_flags |= W_OK;

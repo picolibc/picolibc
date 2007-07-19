@@ -23,6 +23,49 @@ details. */
 #define ACL_DEFAULT_SIZE 3072
 #define NO_SID ((PSID)NULL)
 
+#ifndef SE_CREATE_TOKEN_PRIVILEGE
+#define SE_CREATE_TOKEN_PRIVILEGE            2UL
+#define SE_ASSIGNPRIMARYTOKEN_PRIVILEGE      3UL
+#define SE_LOCK_MEMORY_PRIVILEGE             4UL
+#define SE_INCREASE_QUOTA_PRIVILEGE          5UL
+#define SE_MACHINE_ACCOUNT_PRIVILEGE         6UL
+#define SE_TCB_PRIVILEGE                     7UL
+#define SE_SECURITY_PRIVILEGE                8UL
+#define SE_TAKE_OWNERSHIP_PRIVILEGE          9UL
+#define SE_LOAD_DRIVER_PRIVILEGE            10UL
+#define SE_SYSTEM_PROFILE_PRIVILEGE         11UL
+#define SE_SYSTEMTIME_PRIVILEGE             12UL
+#define SE_PROF_SINGLE_PROCESS_PRIVILEGE    13UL
+#define SE_INC_BASE_PRIORITY_PRIVILEGE      14UL
+#define SE_CREATE_PAGEFILE_PRIVILEGE        15UL
+#define SE_CREATE_PERMANENT_PRIVILEGE       16UL
+#define SE_BACKUP_PRIVILEGE                 17UL
+#define SE_RESTORE_PRIVILEGE                18UL
+#define SE_SHUTDOWN_PRIVILEGE               19UL
+#define SE_DEBUG_PRIVILEGE                  20UL
+#define SE_AUDIT_PRIVILEGE                  21UL
+#define SE_SYSTEM_ENVIRONMENT_PRIVILEGE     22UL
+#define SE_CHANGE_NOTIFY_PRIVILEGE          23UL
+#define SE_REMOTE_SHUTDOWN_PRIVILEGE        24UL
+/* Starting with Windows 2000 */
+#define SE_UNDOCK_PRIVILEGE                 25UL
+#define SE_SYNC_AGENT_PRIVILEGE             26UL
+#define SE_ENABLE_DELEGATION_PRIVILEGE      27UL
+#define SE_MANAGE_VOLUME_PRIVILEGE          28UL
+/* Starting with Windows 2000 SP4, XP SP2, 2003 Server */
+#define SE_IMPERSONATE_PRIVILEGE            29UL
+#define SE_CREATE_GLOBAL_PRIVILEGE          30UL
+/* Starting with Vista */
+#define SE_TRUSTED_CREDMAN_ACCESS_PRIVILEGE 31UL
+#define SE_RELABEL_PRIVILEGE                32UL
+#define SE_INCREASE_WORKING_SET_PRIVILEGE   33UL
+#define SE_TIME_ZONE_PRIVILEGE              34UL
+#define SE_CREATE_SYMBOLIC_LINK_PRIVILEGE   35UL
+
+#define SE_MAX_WELL_KNOWN_PRIVILEGE SE_CREATE_SYMBOLIC_LINK_PRIVILEGE
+
+#endif /* ! SE_CREATE_TOKEN_PRIVILEGE */
+
 /* Added for debugging purposes. */
 typedef struct {
   BYTE  Revision;
@@ -279,48 +322,7 @@ extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
 extern cygpsid fake_logon_sid;
 
-/* Order must be same as cygpriv in sec_helper.cc. */
-enum cygpriv_idx {
-  SE_CREATE_TOKEN_PRIV = 0,
-  SE_ASSIGNPRIMARYTOKEN_PRIV,
-  SE_LOCK_MEMORY_PRIV,
-  SE_INCREASE_QUOTA_PRIV,
-  SE_UNSOLICITED_INPUT_PRIV,
-  SE_MACHINE_ACCOUNT_PRIV,
-  SE_TCB_PRIV,
-  SE_SECURITY_PRIV,
-  SE_TAKE_OWNERSHIP_PRIV,
-  SE_LOAD_DRIVER_PRIV,
-  SE_SYSTEM_PROFILE_PRIV,
-  SE_SYSTEMTIME_PRIV,
-  SE_PROF_SINGLE_PROCESS_PRIV,
-  SE_INC_BASE_PRIORITY_PRIV,
-  SE_CREATE_PAGEFILE_PRIV,
-  SE_CREATE_PERMANENT_PRIV,
-  SE_BACKUP_PRIV,
-  SE_RESTORE_PRIV,
-  SE_SHUTDOWN_PRIV,
-  SE_DEBUG_PRIV,
-  SE_AUDIT_PRIV,
-  SE_SYSTEM_ENVIRONMENT_PRIV,
-  SE_CHANGE_NOTIFY_PRIV,
-  SE_REMOTE_SHUTDOWN_PRIV,
-  SE_CREATE_GLOBAL_PRIV,
-  SE_UNDOCK_PRIV,
-  SE_MANAGE_VOLUME_PRIV,
-  SE_IMPERSONATE_PRIV,
-  SE_ENABLE_DELEGATION_PRIV,
-  SE_SYNC_AGENT_PRIV,
-  SE_RELABEL_PRIV,
-  SE_INCREASE_WORKING_SET_PRIV,
-  SE_TIME_ZONE_PRIV,
-  SE_CREATE_SYMBOLIC_LINK_PRIV,
-
-  SE_NUM_PRIVS
-};
-
-const LUID *privilege_luid (enum cygpriv_idx idx);
-const LUID *privilege_luid_by_name (const char *pname);
+bool privilege_luid (const char *pname, LUID *luid);
 
 inline BOOL
 legal_sid_type (SID_NAME_USE type)
@@ -380,10 +382,8 @@ bool get_logon_server (const char * domain, char * server, WCHAR *wserver,
 		       bool rediscovery);
 
 /* sec_helper.cc: Security helper functions. */
-int set_privilege (HANDLE token, const LUID *priv_luid, bool enable);
+int set_privilege (HANDLE token, DWORD privilege, bool enable);
 void set_cygwin_privileges (HANDLE token);
-
-#define set_process_privilege(p,v) set_privilege (hProcToken, privilege_luid (p), (v))
 
 #define _push_thread_privilege(_priv, _val, _check) { \
     HANDLE _dup_token = NULL; \
@@ -396,7 +396,7 @@ void set_cygwin_privileges (HANDLE token);
     else if (!ImpersonateLoggedOnUser (_dup_token)) \
       debug_printf ("ImpersonateLoggedOnUser: %E"); \
     else \
-      set_privilege (_dup_token, privilege_luid (_priv), (_val));
+      set_privilege (_dup_token, (_priv), (_val));
 
 #define push_thread_privilege(_priv, _val) _push_thread_privilege(_priv,_val,1)
 #define push_self_privilege(_priv, _val)   _push_thread_privilege(_priv,_val,0)

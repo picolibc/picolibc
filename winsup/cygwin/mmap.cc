@@ -1309,7 +1309,7 @@ mlock (const void *addr, size_t len)
      POSIX systems does.  On NT, this requires SeLockMemoryPrivilege,
      which is given only to SYSTEM by default. */
 
-  push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
+  push_thread_privilege (SE_LOCK_MEMORY_PRIVILEGE, true);
 
   /* Align address and length values to page size. */
   size_t pagesize = getpagesize ();
@@ -1368,7 +1368,7 @@ munlock (const void *addr, size_t len)
 {
   int ret = -1;
 
-  push_thread_privilege (SE_LOCK_MEMORY_PRIV, true);
+  push_thread_privilege (SE_LOCK_MEMORY_PRIVILEGE, true);
 
   /* Align address and length values to page size. */
   size_t pagesize = getpagesize ();

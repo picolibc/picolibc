@@ -10,11 +10,13 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "security.h"
 
 /* Minimal set of capabilities which is equivalent to NT4. */
 static NO_COPY wincaps wincap_unknown = {
   chunksize:0,
   heapslop:0x0,
+  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:false,
   has_ip_helper_lib:false,
@@ -43,6 +45,7 @@ static NO_COPY wincaps wincap_unknown = {
 static NO_COPY wincaps wincap_nt4 = {
   chunksize:0,
   heapslop:0x0,
+  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:false,
   has_ip_helper_lib:false,
@@ -71,6 +74,7 @@ static NO_COPY wincaps wincap_nt4 = {
 static NO_COPY wincaps wincap_nt4sp4 = {
   chunksize:0,
   heapslop:0x0,
+  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:false,
   has_ip_helper_lib:true,
@@ -99,6 +103,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
 static NO_COPY wincaps wincap_2000 = {
   chunksize:0,
   heapslop:0x0,
+  max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
@@ -124,9 +129,68 @@ static NO_COPY wincaps wincap_2000 = {
   supports_all_posix_ai_flags:false,
 };
 
+static NO_COPY wincaps wincap_2000sp4 = {
+  chunksize:0,
+  heapslop:0x0,
+  max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
+  is_server:false,
+  has_security_descriptor_control:true,
+  has_ip_helper_lib:true,
+  has_broken_if_oper_status:false,
+  has_physical_mem_access:true,
+  has_process_io_counters:true,
+  has_terminal_services:true,
+  has_create_global_privilege:true,
+  has_ioctl_storage_get_media_types_ex:false,
+  has_extended_priority_class:true,
+  has_guid_volumes:true,
+  has_disk_ex_ioctls:false,
+  has_disabled_user_tos_setting:true,
+  has_fileid_dirinfo:true,
+  has_exclusiveaddruse:true,
+  has_buggy_restart_scan:true,
+  has_mandatory_integrity_control:false,
+  needs_logon_sid_in_sid_list:true,
+  needs_count_in_si_lpres2:false,
+  has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
+};
+
 static NO_COPY wincaps wincap_xp = {
   chunksize:0,
   heapslop:0x0,
+  max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
+  is_server:false,
+  has_security_descriptor_control:true,
+  has_ip_helper_lib:true,
+  has_broken_if_oper_status:false,
+  has_physical_mem_access:true,
+  has_process_io_counters:true,
+  has_terminal_services:true,
+  has_create_global_privilege:false,
+  has_ioctl_storage_get_media_types_ex:true,
+  has_extended_priority_class:true,
+  has_guid_volumes:true,
+  has_disk_ex_ioctls:true,
+  has_disabled_user_tos_setting:true,
+  has_fileid_dirinfo:true,
+  has_exclusiveaddruse:true,
+  has_buggy_restart_scan:false,
+  has_mandatory_integrity_control:false,
+  needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
+  has_recycle_dot_bin:false,
+  has_gaa_prefixes:false,
+  has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
+};
+
+static NO_COPY wincaps wincap_xpsp1 = {
+  chunksize:0,
+  heapslop:0x0,
+  max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
@@ -152,9 +216,39 @@ static NO_COPY wincaps wincap_xp = {
   supports_all_posix_ai_flags:false,
 };
 
+static NO_COPY wincaps wincap_xpsp2 = {
+  chunksize:0,
+  heapslop:0x0,
+  max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
+  is_server:false,
+  has_security_descriptor_control:true,
+  has_ip_helper_lib:true,
+  has_broken_if_oper_status:false,
+  has_physical_mem_access:true,
+  has_process_io_counters:true,
+  has_terminal_services:true,
+  has_create_global_privilege:true,
+  has_ioctl_storage_get_media_types_ex:true,
+  has_extended_priority_class:true,
+  has_guid_volumes:true,
+  has_disk_ex_ioctls:true,
+  has_disabled_user_tos_setting:true,
+  has_fileid_dirinfo:true,
+  has_exclusiveaddruse:true,
+  has_buggy_restart_scan:false,
+  has_mandatory_integrity_control:false,
+  needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:false,
+  has_recycle_dot_bin:false,
+  has_gaa_prefixes:true,
+  has_gaa_on_link_prefix:false,
+  supports_all_posix_ai_flags:false,
+};
+
 static NO_COPY wincaps wincap_2003 = {
   chunksize:0,
   heapslop:0x4,
+  max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:true,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
@@ -183,6 +277,7 @@ static NO_COPY wincaps wincap_2003 = {
 static NO_COPY wincaps wincap_vista = {
   chunksize:0,
   heapslop:0x4,
+  max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_security_descriptor_control:true,
   has_ip_helper_lib:true,
@@ -248,13 +343,23 @@ wincapc::init ()
 	      switch (version.dwMinorVersion)
 		{
 		  case 0:
-		    caps = &wincap_2000;
+		    if (version.wServicePackMajor < 4)
+		      caps = &wincap_2000;
+		    else
+		      caps = &wincap_2000sp4;
 		    break;
 
 		  case 1:
 		    caps = &wincap_xp;
-		    if (version.wServicePackMajor < 1)
-		      ((wincaps *)this->caps)->has_gaa_prefixes = false;
+		    switch (version.wServicePackMajor)
+		      {
+		      case 0:
+			caps = &wincap_xp;
+		      case 1:
+			caps = &wincap_xpsp1;
+		      default:
+			caps = &wincap_xpsp2;
+		      }
 		    break;
 
 		  default:

@@ -1,5 +1,48 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (init_cygheap::luid): Remove.
+	* mmap.cc (mlock): Accommodate parameter change in call to
+	push_thread_privilege.
+	(munlock): Ditto.
+	* ntdll.h (STATUS_NOT_ALL_ASSIGNED): Define.
+	(NtAdjustPrivilegesToken): Declare.
+	* sec_helper.cc (cygpriv): Reorder to match numerical privilege order.
+	(privilege_luid): Take job of privilege_luid_by_name, using new
+	cygpriv.
+	(privilege_luid_by_name): Remove.
+	(privilege_name): Accommodate new cygpriv array.
+	(set_privilege): Call NtAdjustPrivilegesToken to avoid using advapi32.
+	Accommodate changes to privilege_name.
+	(set_cygwin_privileges): Simplify.  Don't try to set
+	SE_CREATE_GLOBAL_PRIVILEGE on systems not supporting it.
+	* security.cc (sys_privs): Reorder to match numerical privilege order.
+	Use real privilege values as defined in security.h.
+	(get_system_priv_list): Drop unused grp_list argument.  Create
+	list of privileges according to new wincapc::max_sys_priv value.
+	(get_priv_list): Call privilege_luid instead of privilege_luid_by_name.
+	Make priv a local value instead of a pointer.
+	(create_token): Accommodate parameter change in call to
+	push_self_privilege.
+	(lsaauth): Ditto.
+	(check_access): Use privilege values directly instead of calling
+	privilege_luid.
+	* security.h: Define real privilege values.
+	(cygpriv_idx): Remove.
+	(privilege_luid): Change declaration.
+	(privilege_luid_by_name): Drop declaration.
+	(set_privilege): Change declaration.
+	(set_process_privilege): Drop definition.
+	(_push_thread_privilege): Accomodate new set_privilege parameters.
+	* wincap.h (wincapc::max_sys_priv): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincap_2000sp4): New wincaps structure.
+	(wincap_xpsp1): Ditto.
+	(wincap_xpsp2): Ditto.
+	(wincapc::init): Use new wincaps.
+	(wincapc::max_sys_priv): New element.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (dll_crt0_0): Call set_cygwin_privileges here, after
 	initializing hProcToken.
 	* sec_helper.cc (init_global_security): Don't call set_cygwin_privileges        here.

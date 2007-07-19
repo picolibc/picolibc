@@ -31,6 +31,7 @@ details. */
 #include "cygheap.h"
 #include "cygtls.h"
 #include "pwdgrp.h"
+#include "ntdll.h"
 
 /* General purpose security attribute objects for global use. */
 SECURITY_ATTRIBUTES NO_COPY sec_none;
@@ -361,14 +362,15 @@ got_it:
 #undef DOMLEN
 #endif //unused
 
-/* Order must be same as cygpriv_idx in security.h. */
+/* Index must match the correspoding foo_PRIVILEGE value, see security.h. */
 static const char *cygpriv[] =
 {
+  "",
+  "",
   SE_CREATE_TOKEN_NAME,
   SE_ASSIGNPRIMARYTOKEN_NAME,
   SE_LOCK_MEMORY_NAME,
   SE_INCREASE_QUOTA_NAME,
-  SE_UNSOLICITED_INPUT_NAME,
   SE_MACHINE_ACCOUNT_NAME,
   SE_TCB_NAME,
   SE_SECURITY_NAME,
@@ -388,81 +390,62 @@ static const char *cygpriv[] =
   SE_SYSTEM_ENVIRONMENT_NAME,
   SE_CHANGE_NOTIFY_NAME,
   SE_REMOTE_SHUTDOWN_NAME,
-  SE_CREATE_GLOBAL_NAME,
   SE_UNDOCK_NAME,
+  SE_SYNC_AGENT_NAME,
+  SE_ENABLE_DELEGATION_NAME,
   SE_MANAGE_VOLUME_NAME,
   SE_IMPERSONATE_NAME,
-  SE_ENABLE_DELEGATION_NAME,
-  SE_SYNC_AGENT_NAME,
+  SE_CREATE_GLOBAL_NAME,
+  SE_TRUSTED_CREDMAN_ACCESS_NAME,
   SE_RELABEL_NAME,
   SE_INCREASE_WORKING_SET_NAME,
   SE_TIME_ZONE_NAME,
   SE_CREATE_SYMBOLIC_LINK_NAME
 };
 
-const LUID *
-privilege_luid (cygpriv_idx idx)
+bool
+privilege_luid (const char *pname, LUID *luid)
 {
-  if (idx < 0 || idx >= SE_NUM_PRIVS)
-    return NULL;
-  if (!cygheap->luid[idx].LowPart && !cygheap->luid[idx].HighPart
-      && !LookupPrivilegeValue (NULL, cygpriv[idx], &cygheap->luid[idx]))
-    {
-      __seterrno ();
-      return NULL;
-    }
-  return &cygheap->luid[idx];
-}
-
-const LUID *
-privilege_luid_by_name (const char *pname)
-{
-  int idx;
-
-  if (!pname)
-    return NULL;
-  for (idx = 0; idx < SE_NUM_PRIVS; ++idx)
-    if (!strcmp (pname, cygpriv[idx]))
-      return privilege_luid ((cygpriv_idx) idx);
-  return NULL;
+  ULONG idx;
+  for (idx = SE_CREATE_TOKEN_PRIVILEGE;
+       idx <= SE_MAX_WELL_KNOWN_PRIVILEGE;
+       ++idx)
+    if (!strcmp (cygpriv[idx], pname))
+      {
+	luid->HighPart = 0;
+	luid->LowPart = idx;
+	return true;
+      }
+  return false;
 }
 
 static const char *
-privilege_name (const LUID *priv_luid, char *buf, DWORD *size)
+privilege_name (const LUID &priv_luid)
 {
-  if (!priv_luid || !LookupPrivilegeName (NULL, (LUID *) priv_luid, buf, size))
+  if (priv_luid.HighPart || priv_luid.LowPart < SE_CREATE_TOKEN_PRIVILEGE
+      || priv_luid.LowPart > SE_MAX_WELL_KNOWN_PRIVILEGE)
     return "<unknown privilege>";
-  return buf;
+  return cygpriv[priv_luid.LowPart];
 }
 
 int
-set_privilege (HANDLE token, const LUID *priv_luid, bool enable)
+set_privilege (HANDLE token, DWORD privilege, bool enable)
 {
   int ret = -1;
   TOKEN_PRIVILEGES new_priv, orig_priv;
-  DWORD size;
-
-  if (!priv_luid)
-    {
-      __seterrno ();
-      goto out;
-    }
+  ULONG size;
+  NTSTATUS status;
 
   new_priv.PrivilegeCount = 1;
-  new_priv.Privileges[0].Luid = *priv_luid;
+  new_priv.Privileges[0].Luid.HighPart = 0L;
+  new_priv.Privileges[0].Luid.LowPart = privilege;
   new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
 
-  if (!AdjustTokenPrivileges (token, FALSE, &new_priv,
-			      sizeof orig_priv, &orig_priv, &size))
+  status = NtAdjustPrivilegesToken (token, FALSE, &new_priv, sizeof orig_priv,
+				    &orig_priv, &size);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
-      goto out;
-    }
-  /* AdjustTokenPrivileges returns TRUE even if the privilege could not
-     be enabled. GetLastError () returns an correct error code, though. */
-  if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
-    {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       goto out;
     }
 
@@ -474,12 +457,8 @@ set_privilege (HANDLE token, const LUID *priv_luid, bool enable)
 
 out:
   if (ret < 0)
-    {
-      DWORD siz = 256;
-      char buf[siz];
-      debug_printf ("%d = set_privilege ((token %x) %s, %d)",
-		    ret, token, privilege_name (priv_luid, buf, &siz), enable);
-    }
+    debug_printf ("%d = set_privilege ((token %x) %s, %d)\n", ret, token,
+		  privilege_name (new_priv.Privileges[0].Luid), enable);
   return ret;
 }
 
@@ -488,14 +467,10 @@ out:
 void
 set_cygwin_privileges (HANDLE token)
 {
-  LUID priv_luid;
-
-  if (LookupPrivilegeValue (NULL, SE_RESTORE_NAME, &priv_luid))
-    set_privilege (token, &priv_luid, true);
-  if (LookupPrivilegeValue (NULL, SE_BACKUP_NAME, &priv_luid))
-    set_privilege (token, &priv_luid, true);
-  if (LookupPrivilegeValue (NULL, SE_CREATE_GLOBAL_NAME, &priv_luid))
-    set_privilege (token, &priv_luid, true);
+  set_privilege (token, SE_RESTORE_PRIVILEGE, true);
+  set_privilege (token, SE_BACKUP_PRIVILEGE, true);
+  if (wincap.has_create_global_privilege ())
+    set_privilege (token, SE_CREATE_GLOBAL_PRIVILEGE, true);
 }
 
 /* Function to return a common SECURITY_DESCRIPTOR that
