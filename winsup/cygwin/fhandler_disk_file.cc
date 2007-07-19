@@ -1575,16 +1575,11 @@ fhandler_disk_file::opendir (int fd)
 	      OBJECT_ATTRIBUTES attr;
 	      NTSTATUS status;
 	      IO_STATUS_BLOCK io;
-	      WCHAR wpath[CYG_MAX_PATH + 10] = { 0 };
-	      UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-	      SECURITY_ATTRIBUTES sa = sec_none;
 
-	      pc.get_nt_native_path (upath);
-	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-					  NULL, sa.lpSecurityDescriptor);
 	      status = NtOpenFile (&get_handle (),
 				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
-				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   pc.get_object_attr (attr, sec_none_nih),
+				   &io, FILE_SHARE_VALID_FLAGS,
 				   FILE_SYNCHRONOUS_IO_NONALERT
 				   | FILE_OPEN_FOR_BACKUP_INTENT
 				   | FILE_DIRECTORY_FILE);

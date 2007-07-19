@@ -156,6 +156,8 @@ class path_conv
 {
   DWORD fileattr;
   fs_info fs;
+  PWCHAR wide_path;
+  UNICODE_STRING uni_path;
   void add_ext_from_sym (symlink_info&);
  public:
 
@@ -236,7 +238,8 @@ class path_conv
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
 
   path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
-     path_flags (0), known_suffix (NULL), error (0), dev (in_dev)
+     wide_path (NULL), path_flags (0), known_suffix (NULL), error (0),
+     dev (in_dev)
     {
       strcpy (path, in_dev.native);
     }
@@ -253,14 +256,18 @@ class path_conv
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
-  path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), path_flags (0),
-  		known_suffix (NULL), error (0), normalized_path (NULL)
+  path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL),
+  		path_flags (0), known_suffix (NULL), error (0),
+		normalized_path (NULL)
     {path[0] = '\0';}
 
   ~path_conv ();
   void set_name (const char *win32, const char *posix);
   inline char *get_win32 () { return path; }
-  PUNICODE_STRING get_nt_native_path (UNICODE_STRING &upath);
+  PUNICODE_STRING get_nt_native_path ();
+  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
+				      SECURITY_ATTRIBUTES &sa);
+  PWCHAR get_wide_win32_path (PWCHAR wc);
   operator char *() {return path;}
   operator const char *() {return path;}
   operator DWORD &() {return fileattr;}

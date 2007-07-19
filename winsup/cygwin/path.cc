@@ -79,6 +79,7 @@ details. */
 #include "environ.h"
 #include <assert.h>
 #include <ntdll.h>
+#include <wchar.h>
 
 bool dos_file_warning = true;
 static int normalize_win32_path (const char *, char *, char *&);
@@ -539,6 +540,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
     }
 
   memcpy (normalized_path, path_copy, n);
+  wide_path = NULL;
 }
 
 PUNICODE_STRING
@@ -566,9 +568,40 @@ get_nt_native_path (const char *path, UNICODE_STRING &upath)
 }
 
 PUNICODE_STRING
-path_conv::get_nt_native_path (UNICODE_STRING &upath)
+path_conv::get_nt_native_path ()
 {
-  return ::get_nt_native_path (path, upath);
+  if (!wide_path)
+    {
+      uni_path.Length = 0;
+      uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
+      wide_path = (PWCHAR) cmalloc (HEAP_STR, uni_path.MaximumLength);
+      uni_path.Buffer = wide_path;
+      ::get_nt_native_path (path, uni_path);
+    }
+  return &uni_path;
+}
+
+POBJECT_ATTRIBUTES
+path_conv::get_object_attr (OBJECT_ATTRIBUTES &attr, SECURITY_ATTRIBUTES &sa)
+{
+  if (!get_nt_native_path ())
+    return NULL;
+  InitializeObjectAttributes (&attr, &uni_path,
+			      OBJ_CASE_INSENSITIVE
+			      | (sa.bInheritHandle ? OBJ_INHERIT : 0),
+			      NULL, sa.lpSecurityDescriptor);
+  return &attr;
+}
+
+PWCHAR
+path_conv::get_wide_win32_path (PWCHAR wc)
+{
+  get_nt_native_path ();
+  if (!wide_path || wide_path[1] != L'?') /* Native NT device path */
+    return NULL;
+  wcscpy (wc, wide_path);
+  wc[1] = L'\\';
+  return wc;
 }
 
 void
@@ -640,6 +673,7 @@ path_conv::check (const char *src, unsigned opt,
   path_flags = 0;
   known_suffix = NULL;
   fileattr = INVALID_FILE_ATTRIBUTES;
+  wide_path = NULL;
   case_clash = false;
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
@@ -1146,6 +1180,11 @@ path_conv::~path_conv ()
     {
       cfree (normalized_path);
       normalized_path = NULL;
+    }
+  if (wide_path)
+    {
+      cfree (wide_path);
+      wide_path = NULL;
     }
 }
 

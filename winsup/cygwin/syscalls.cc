@@ -234,8 +234,6 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 DWORD
 unlink_nt (path_conv &win32_name, bool setattrs)
 {
-  WCHAR wpath[CYG_MAX_PATH + 10];
-  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
@@ -269,9 +267,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
   if (win32_name.is_rep_symlink ())
     flags |= FILE_OPEN_REPARSE_POINT;
 
-  win32_name.get_nt_native_path (upath);
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			      NULL, sec_none_nih.lpSecurityDescriptor);
+  win32_name.get_object_attr (attr, sec_none_nih);
   /* First try to open the file with sharing not allowed.  If the file
      has an open handle on it, this will fail.  That indicates that the
      file has to be moved to the recycle bin so that it actually disappears

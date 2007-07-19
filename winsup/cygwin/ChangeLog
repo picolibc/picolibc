@@ -1,5 +1,23 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Drop local wpath and upath
+	variables.  Call pc.get_object_attr to create object attributes.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Ditto.
+	* syscalls.cc (unlink_nt): Ditto.
+	* path.cc (path_conv::set_normalized_path): Set wide_path to NULL.
+	(path_conv::get_nt_native_path): Drop parameter.  Create path in
+	wide_path/uni_path members.
+	(path_conv::get_object_attr): New method to create object attributes.
+	(path_conv::get_wide_win32_path): New method to create Win32 wide path.
+	(path_conv::check): Initialize wide_path to NULL.
+	(path_conv::~path_conv): cfree wide_path.
+	* path.h (class path_conv): New members wide_path and uni_path.
+	Add declarations of get_object_attr and get_wide_win32_path.
+	(path_conv::path_conv): Initialize wide_path to NULL.
+	(path_conv::get_nt_native_path): Drop parameter.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_helper.cc: Remove unused code.
 
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>

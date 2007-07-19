@@ -457,10 +457,6 @@ done:
 int
 fhandler_base::open (int flags, mode_t mode)
 {
-  WCHAR wpath[CYG_MAX_PATH + 10];
-  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
-  pc.get_nt_native_path (upath);
-
   int res = 0;
   HANDLE x;
   ULONG file_attributes = 0;
@@ -475,8 +471,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			      NULL, sa.lpSecurityDescriptor);
+  pc.get_object_attr (attr, sa);
 
   switch (query_open ())
     {
