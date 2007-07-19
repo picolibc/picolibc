@@ -1892,32 +1892,21 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 					attribute, sd);
 }
 
-static int
-set_nt_attribute (HANDLE handle, const char *file,
-		  __uid32_t uid, __gid32_t gid, int attribute)
-{
-  security_descriptor sd;
-
-  if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd))
-      && read_sd (file, sd) <= 0)
-    {
-      debug_printf ("read_sd %E");
-      return -1;
-    }
-
-  if (!alloc_sd (uid, gid, attribute, sd))
-    return -1;
-
-  return write_sd (handle, file, sd);
-}
-
 int
 set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
 		    __uid32_t uid, __gid32_t gid, int attribute)
 {
-  int ret;
+  int ret = -1;
+
   if (use_ntsec && allow_ntsec)
-    ret = set_nt_attribute (handle, file, uid, gid, attribute);
+    {
+      security_descriptor sd;
+
+      if (((handle && !get_nt_object_security (handle, SE_FILE_OBJECT, sd))
+	   || read_sd (file, sd) > 0)
+	  && alloc_sd (uid, gid, attribute, sd))
+	ret = write_sd (handle, file, sd);
+    }
   else
     ret = 0;
   syscall_printf ("%d = set_file_attribute (%s, %d, %d, %p)",

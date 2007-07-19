@@ -1,5 +1,11 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (set_nt_attribute): Remove.
+	(set_file_attribute): Do it yourself instead of calling
+	set_nt_attribute.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_name): Use
 	NtQueryFullAttributesFile instead of FindFirstFile.
 	(fhandler_base::fstat_fs): Drop check for exec_state.  Drop check for
