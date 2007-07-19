@@ -1631,14 +1631,10 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       return NULL;
     }
 
-  /*
-   * We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
-   * modified by inheritable ACEs.
-   * This flag as well as the SetSecurityDescriptorControl call are available
-   * only since Win2K.
-   */
-  if (wincap.has_security_descriptor_control ())
-    SetSecurityDescriptorControl (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
+  /* We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
+   * modified by inheritable ACEs.  This flag is available since Win2K.  */
+  if (wincap.has_dacl_protect ())
+    sd.Control |= SE_DACL_PROTECTED;
 
   /* Create owner for local security descriptor. */
   if (!SetSecurityDescriptorOwner (&sd, owner_sid, FALSE))

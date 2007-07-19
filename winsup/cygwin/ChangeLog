@@ -1,5 +1,14 @@
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (SetSecurityDescriptorControl): Drop.
+	* security.cc (alloc_sd): Set security descriptor control flag without
+	calling SetSecurityDescriptorControl function.
+	* wincap.h (wincapc::has_dacl_protect): Rename from
+	has_security_descriptor_control.
+	* wincap.cc: Ditto throughout.
+
+2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (SetUserObjectSecurity): Drop.
 	* pinfo.cc (pinfo::set_acl): Use NtSetSecurityObject instead of
 	SetKernelObjectSecurity.
