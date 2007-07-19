@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<iscanf>>, <<fiscanf>>, <<siscanf>>---scan and format non-floating input
+<<siscanf>>, <<fiscanf>>, <<iscanf>>---scan and format non-floating input
 
 INDEX
 	iscanf

@@ -17,12 +17,12 @@
 
 /*
 FUNCTION
-<<vscanf>>, <<vfscanf>>, <<vsscanf>>---format argument list
+<<vfscanf>>, <<vscanf>>, <<vsscanf>>---format argument list
 
 INDEX
-	vscanf
-INDEX
 	vfscanf
+INDEX
+	vscanf
 INDEX
 	vsscanf
 

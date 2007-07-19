@@ -19,21 +19,24 @@ ANSI_SYNOPSIS
 	typedef int (*cookie_seek_function_t)(void *_cookie, off_t *_off,
 					      int _whence);
 	typedef int (*cookie_close_function_t)(void *_cookie);
-	typedef struct
-	{
-		cookie_read_function_t	*read;
-		cookie_write_function_t *write;
-		cookie_seek_function_t	*seek;
-		cookie_close_function_t *close;
-	} cookie_io_functions_t;
 	FILE *fopencookie(const void *<[cookie]>, const char *<[mode]>,
 			  cookie_io_functions_t <[functions]>);
 
 DESCRIPTION
 <<fopencookie>> creates a <<FILE>> stream where I/O is performed using
-custom callbacks.  The stream is opened with <[mode]> treated as in
-<<fopen>>.  The callbacks <[functions.read]> and <[functions.write]>
-may only be NULL when <[mode]> does not require them.
+custom callbacks.  The callbacks are registered via the structure:
+
+.	typedef struct
+.	{
+.		cookie_read_function_t	*read;
+.		cookie_write_function_t *write;
+.		cookie_seek_function_t	*seek;
+.		cookie_close_function_t *close;
+.	} cookie_io_functions_t;
+
+The stream is opened with <[mode]> treated as in <<fopen>>.  The
+callbacks <[functions.read]> and <[functions.write]> may only be NULL
+when <[mode]> does not require them.
 
 <[functions.read]> should return -1 on failure, or else the number of
 bytes read (0 on EOF).  It is similar to <<read>>, except that

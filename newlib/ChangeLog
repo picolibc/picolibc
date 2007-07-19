@@ -1,3 +1,16 @@
+2007-07-18  Eric Blake  <ebb9@byu.net>
+
+	Fix 'make info'.
+	* libc/stdio/stdio.tex: Add missing include.
+	* libc/stdio/vfprintf.c: Use expected node name.
+	* libc/stdio/vfscanf.c: Likewise.
+	* libc/stdio/sscanf.c: Likewise.
+	* libc/stdio/sprintf.c: Likewise.
+	* libc/stdio/siscanf.c: Likewise.
+	* libc/stdio/siprintf.c: Likewise.
+	* libc/stdio/fopencookie.c: Quote raw {}.
+	Reported by DJ Delorie.
+
 2007-07-13  Eric Blake  <ebb9@byu.net>
 
 	Fix fflush issues.

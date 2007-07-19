@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<printf>>, <<fprintf>>, <<sprintf>>, <<snprintf>>, <<asprintf>>, <<asnprintf>>---format output
+<<sprintf>>, <<fprintf>>, <<printf>>, <<snprintf>>, <<asprintf>>, <<asnprintf>>---format output
 
 INDEX
 	fprintf

@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<scanf>>, <<fscanf>>, <<sscanf>>---scan and format input
+<<sscanf>>, <<fscanf>>, <<scanf>>---scan and format input
 
 INDEX
 	scanf

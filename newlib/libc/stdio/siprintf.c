@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<iprintf>>, <<fiprintf>>, <<siprintf>>, <<sniprintf>>, <<asiprintf>>, <<asniprintf>>---format output (integer only)
+<<siprintf>>, <<fiprintf>>, <<iprintf>>, <<sniprintf>>, <<asiprintf>>, <<asniprintf>>---format output (integer only)
 
 INDEX
 	fiprintf
