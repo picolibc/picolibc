@@ -139,12 +139,12 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	minires.o miscfuncs.o mktemp.o mmap.o msg.o net.o netdb.o nftw.o \
 	passwd.o path.o pinfo.o pipe.o poll.o posix_ipc.o pthread.o random.o \
 	regcomp.o regerror.o regexec.o regfree.o registry.o resource.o rexec.o \
-	rcmd.o scandir.o sched.o sec_acl.o sec_helper.o security.o select.o \
-	sem.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o spawn.o \
-	strace.o strptime.o strsep.o strsig.o sync.o syscalls.o sysconf.o \
-	syslog.o termios.o thread.o timelocal.o timer.o times.o tty.o uinfo.o \
-	uname.o v8_regexp.o v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
-	winf.o xsique.o \
+	rcmd.o scandir.o sched.o sec_acl.o sec_auth.o sec_helper.o security.o \
+	select.o sem.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o \
+	spawn.o strace.o strptime.o strsep.o strsig.o sync.o syscalls.o \
+	sysconf.o syslog.o termios.o thread.o timelocal.o timer.o times.o \
+	tty.o uinfo.o uname.o v8_regexp.o v8_regerror.o v8_regsub.o wait.o \
+	wincap.o window.o winf.o xsique.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o

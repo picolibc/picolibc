@@ -11,17 +11,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <grp.h>
-#include <pwd.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <sys/stat.h>
 #include <sys/acl.h>
-#include <ctype.h>
-#include <wingdi.h>
-#include <winuser.h>
-#include <wininet.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -29,7 +20,6 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "cygtls.h"
 #include "pwdgrp.h"
 #include "ntdll.h"
 

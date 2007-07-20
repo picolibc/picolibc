@@ -269,9 +269,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		}
 	      __uid32_t uid;
 	      __gid32_t gid;
-	      if (get_object_attribute
-		  ((HANDLE) hKey, SE_REGISTRY_KEY, &buf->st_mode, &uid,
-		   &gid) == 0)
+	      if (get_reg_attribute (hKey, &buf->st_mode, &uid, &gid) == 0)
 		{
 		  buf->st_uid = uid;
 		  buf->st_gid = gid;

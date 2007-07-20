@@ -11,17 +11,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <grp.h>
-#include <pwd.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/acl.h>
 #include <ctype.h>
-#include <wingdi.h>
-#include <winuser.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -44,17 +36,13 @@ searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UI
 }
 
 int
-setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp,
+setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 	bool &writable)
 {
   security_descriptor sd_ret;
 
-  if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd_ret))
-      && read_sd (file, sd_ret) <= 0)
-    {
-      debug_printf ("read_sd %E");
-      return -1;
-    }
+  if (get_file_sd (handle, pc, sd_ret))
+    return -1;
 
   BOOL dummy;
 
@@ -227,7 +215,7 @@ setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp,
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_ret.size ());
-  return write_sd (handle, file, sd_ret);
+  return set_file_sd (handle, pc, sd_ret);
 }
 
 /* Temporary access denied bits */
@@ -262,17 +250,12 @@ getace (__aclent32_t &acl, int type, int id, DWORD win_ace_mask,
 }
 
 int
-getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
-	__aclent32_t *aclbufp)
+getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 {
   security_descriptor sd;
 
-  if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd))
-      && read_sd (file, sd) <= 0)
-    {
-      debug_printf ("read_sd %E");
-      return -1;
-    }
+  if (get_file_sd (handle, pc, sd))
+    return -1;
 
   cygpsid owner_sid;
   cygpsid group_sid;
@@ -372,7 +355,7 @@ getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
 		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 	    }
 	  if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
-	      && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	      && pc.isdir ())
 	    {
 	      if (type == USER_OBJ)
 		type = USER;
@@ -408,7 +391,7 @@ getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
       aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
     aclsort32 (pos, 0, aclbufp);
   }
-  syscall_printf ("%d = getacl (%s)", pos, file);
+  syscall_printf ("%d = getacl (%s)", pos, pc.get_win32 ());
   return pos;
 }
 

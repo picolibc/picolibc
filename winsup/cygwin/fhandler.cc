@@ -374,7 +374,7 @@ fhandler_base::fhaccess (int flags)
     goto eaccess_done;
   else if (has_acls () && allow_ntsec)
     {
-      res = check_file_access (get_win32_name (), flags);
+      res = check_file_access (pc, flags);
       goto done;
     }
   else if (get_device () == FH_REGISTRY && allow_ntsec && open (O_RDONLY, 0)

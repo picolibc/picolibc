@@ -335,19 +335,16 @@ extern bool allow_ntsec;
 extern bool allow_smbntsec;
 
 /* File manipulation */
-int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
-				  __uid32_t * = NULL, __gid32_t * = NULL);
-int __stdcall set_file_attribute (bool, HANDLE, const char *, int);
-int __stdcall set_file_attribute (bool, HANDLE, const char *, __uid32_t, __gid32_t, int);
-int __stdcall get_nt_object_security (HANDLE, SE_OBJECT_TYPE,
-				      security_descriptor &);
-int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, mode_t *,
-				  __uid32_t * = NULL, __gid32_t * = NULL);
-LONG __stdcall read_sd (const char *file, security_descriptor &sd);
-LONG __stdcall write_sd (HANDLE fh, const char *file, security_descriptor &sd);
+int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
+				  __uid32_t *, __gid32_t *);
+int __stdcall set_file_attribute (HANDLE, path_conv &,
+				  __uid32_t, __gid32_t, int);
+int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *);
+LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
+LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
 bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
-int __stdcall check_file_access (const char *, int);
+int __stdcall check_file_access (path_conv &, int);
 int __stdcall check_registry_access (HANDLE, int);
 
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
@@ -359,8 +356,8 @@ bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
 struct __acl32;
 extern "C" int aclsort32 (int, int, __acl32 *);
 extern "C" int acl32 (const char *, int, int, __acl32 *);
-int getacl (HANDLE, const char *, DWORD, int, __acl32 *);
-int setacl (HANDLE, const char *, int, __acl32 *, bool &);
+int getacl (HANDLE, path_conv &, int, __acl32 *);
+int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
 
 struct _UNICODE_STRING;
 void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));

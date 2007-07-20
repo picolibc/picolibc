@@ -433,17 +433,15 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       buf->st_size = pc.get_symlink_length ();
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
-			  NULL, &buf->st_uid, &buf->st_gid);
+      get_file_attribute (get_io_handle (), pc, NULL,
+			  &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (pc.has_acls (),
-			   is_fs_special () ? NULL: get_io_handle (),
-			   get_win32_name (), &buf->st_mode,
-			   &buf->st_uid, &buf->st_gid))
+  if (!get_file_attribute (is_fs_special () ? NULL: get_io_handle (), pc,
+			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
@@ -660,7 +658,7 @@ fhandler_disk_file::fchmod (mode_t mode)
     {
       if (pc.isdir ())
 	mode |= S_IFDIR;
-      if (!set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+      if (!set_file_attribute (get_io_handle (), pc,
 			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
@@ -706,7 +704,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   mode_t attrib = 0;
   if (pc.isdir ())
     attrib |= S_IFDIR;
-  int res = get_file_attribute (pc.has_acls (), get_io_handle (), pc, &attrib);
+  int res = get_file_attribute (get_io_handle (), pc, &attrib, NULL, NULL);
   if (!res)
     {
       /* Typical Windows default ACLs can contain permissions for one
@@ -718,8 +716,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 	 world to read the symlink and only the new owner to change it. */
       if (pc.issymlink ())
 	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
-      res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
-				uid, gid, attrib);
+      res = set_file_attribute (get_io_handle (), pc, uid, gid, attrib);
     }
   if (oret)
     close ();
@@ -808,10 +805,10 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    if (!aclbufp)
 	      set_errno(EFAULT);
 	    else
-	      res = getacl (get_io_handle (), pc, pc, nentries, aclbufp);
+	      res = getacl (get_io_handle (), pc, nentries, aclbufp);
 	    break;
 	  case GETACLCNT:
-	    res = getacl (get_io_handle (), pc, pc, 0, NULL);
+	    res = getacl (get_io_handle (), pc, 0, NULL);
 	    break;
 	  default:
 	    set_errno (EINVAL);

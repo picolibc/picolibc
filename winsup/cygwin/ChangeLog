@@ -1,3 +1,36 @@
+2007-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add sec_auth.o.
+
+
+	* fhandler.cc (fhandler_base::fhaccess): Accommodate interface changes
+	of access control functions throughout.
+	* fhandler_disk_file.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+	* sec_acl.cc: Drop unnecessary includes.
+	(setacl): Take path_conv instead of file name as parameter.
+	Accommodate interface changes of access control functions.
+	(getacl): Ditto.
+	* sec_auth.cc: New file, taking over all authentication related
+	functions from security.cc.
+	* sec_helper.cc: Drop unnecessary includes.
+	* security.cc: Ditto.  Move all authentication related functions to
+	sec_auth.cc.
+	(ALL_SECURITY_INFORMATION): New define.  Use throughout.
+	(set_file_sd): New function, replacing read_sd and the file related
+	part of get_nt_object_security.
+	(get_reg_sd): Rename from get_reg_security.  Drop type parameter.
+	(get_reg_attribute): New function, replacing the registry related part
+	of get_nt_object_security.
+	(get_file_attribute): Take path_conv instead of file name as parameter.
+	Use new get_file_sd call.
+	(set_file_attribute): Ditto plus new set_file_sd.  Drop unnecessary
+	implementation without uid/gid parameters.
+	(check_file_access): Take path_conv instead of file name as parameter.
+	Use new get_file_sd call.
+	(check_registry_access): Use new get_reg_sd call.
+	* security.h: Accommodate above interface changes.
+
 2007-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (set_nt_attribute): Remove.
