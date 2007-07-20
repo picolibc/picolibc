@@ -1,8 +1,6 @@
 2007-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add sec_auth.o.
-
-
 	* fhandler.cc (fhandler_base::fhaccess): Accommodate interface changes
 	of access control functions throughout.
 	* fhandler_disk_file.cc: Ditto.
