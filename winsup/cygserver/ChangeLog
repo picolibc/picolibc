@@ -1,3 +1,7 @@
+2007-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc: Drop unnecessary security.h include.
+
 2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout remove using wincap.

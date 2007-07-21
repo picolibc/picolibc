@@ -24,7 +24,6 @@ details. */
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "security.h"
 #include "cygserver.h"
 #include "process.h"
 #include "cygserver_ipc.h"
