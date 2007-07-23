@@ -313,7 +313,8 @@ create_child (char **argv)
   BOOL ret;
   DWORD flags;
 
-  *argv = cygpath (*argv, NULL);
+  if (strchr (*argv, '/'))
+      *argv = cygpath (*argv, NULL);
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
 

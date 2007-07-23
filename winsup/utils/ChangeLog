@@ -1,3 +1,8 @@
+2007-07-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* strace.cc (create_child): Don't convert a path from cygwin format
+	unless it has a slash.
+
 2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strace.cc (usage): Add missing description for -q.
