@@ -1,3 +1,9 @@
+2007-07-23 Keith Marshall <keithmarshall@users.sourceforge.net>
+
+	* Makefile.in (SUBDIRS): Delete stray line continuation artifact,
+	resulting from incomplete removal of enclosing `for ...; do ...; done'
+	loop from compound command; (reported by Greg Chicares).
+
 2007-07-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/fcntl.h (_O_WTEXT, _O_U16TEXT, _O_U8TEXT) Define for

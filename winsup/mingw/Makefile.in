@@ -472,8 +472,10 @@ subdirs: $(SUBDIRS)
 	    rootsrc=`cd $(srcdir); pwd`/ ; export rootsrc ; \
 	    cd ./$@; \
 	    $(MAKE) $(FLAGS_TO_PASS) $(DO)) ; then true ; \
-	  else exit 1 ; fi ; \
-	else true ; fi ; \
+	  else exit 1 ; \
+	  fi ; \
+	else true ; \
+	fi
 
 force:
 
