@@ -1,3 +1,9 @@
+2007-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dumper.cc: Change license to plain GPLv2 + later.
+	* dumper.h: Ditto.
+	* parse_pe.cc: Ditto.
+
 2007-07-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strace.cc (create_child): Don't convert a path from cygwin format
