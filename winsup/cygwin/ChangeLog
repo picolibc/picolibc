@@ -1,3 +1,11 @@
+2007-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NetWkstaUserGetInfo): Remove.
+	(CharToOemBuffA): Remove.
+	(KillTimer): Remove.
+	(OemToCharBuffA): Remove.
+	(SetTimer): Remove.
+
 2007-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add sec_auth.o.
