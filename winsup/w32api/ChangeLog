@@ -1,3 +1,8 @@
+2007-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wtypes.h (LPDECIMAL): Define.
+	(DECIMAL_NEG, DECIMAL_SETZERO): Move definitions.
+
 2007-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (SE_TRUSTED_CREDMAN_ACCESS_NAME): Define.
