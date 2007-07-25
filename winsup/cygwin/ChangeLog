@@ -1,5 +1,10 @@
 2007-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (Process32First): Remove.
+	(Process32Next): Remove.
+
+2007-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (NetWkstaUserGetInfo): Remove.
 	(CharToOemBuffA): Remove.
 	(KillTimer): Remove.

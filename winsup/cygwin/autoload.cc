@@ -401,8 +401,6 @@ LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)
 LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
 LoadDLLfuncEx (GetVolumeNameForVolumeMountPointA, 12, kernel32, 1)
 LoadDLLfuncEx (IsWow64Process, 8, kernel32, 1);
-LoadDLLfuncEx (Process32First, 8, kernel32, 1)
-LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
 LoadDLLfuncEx (Wow64DisableWow64FsRedirection, 4, kernel32, 1)
 LoadDLLfuncEx (Wow64RevertWow64FsRedirection, 4, kernel32, 1)
 
