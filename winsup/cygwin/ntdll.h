@@ -88,6 +88,20 @@ typedef struct _FILE_NAMES_INFORMATION
   WCHAR  FileName[1];
 } FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
 
+typedef struct _FILE_DIRECTORY_INFORMATION {
+  ULONG  NextEntryOffset;
+  ULONG  FileIndex;
+  LARGE_INTEGER  CreationTime;
+  LARGE_INTEGER  LastAccessTime;
+  LARGE_INTEGER  LastWriteTime;
+  LARGE_INTEGER  ChangeTime;
+  LARGE_INTEGER  EndOfFile;
+  LARGE_INTEGER  AllocationSize;
+  ULONG  FileAttributes;
+  ULONG  FileNameLength;
+  WCHAR  FileName[1];
+} FILE_DIRECTORY_INFORMATION, *PFILE_DIRECTORY_INFORMATION;
+
 typedef struct _FILE_BOTH_DIR_INFORMATION
 {
   ULONG  NextEntryOffset;
@@ -709,6 +723,9 @@ extern "C"
 				PTOKEN_GROUPS, PTOKEN_PRIVILEGES, PTOKEN_OWNER,
 				PTOKEN_PRIMARY_GROUP, PTOKEN_DEFAULT_DACL,
 				PTOKEN_SOURCE);
+  NTSTATUS NTAPI NtFsControlFile (HANDLE, HANDLE, PVOID, PVOID,
+				  PIO_STATUS_BLOCK, ULONG, PVOID, ULONG,
+				  PVOID, ULONG);
   NTSTATUS NTAPI NtLockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
   NTSTATUS NTAPI NtMapViewOfSection (HANDLE, HANDLE, PVOID *, ULONG, ULONG,
 				     PLARGE_INTEGER, PULONG, SECTION_INHERIT,
@@ -750,11 +767,42 @@ extern "C"
 				      PSECURITY_DESCRIPTOR);
   NTSTATUS NTAPI NtUnlockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
+  NTSTATUS NTAPI RtlAppendUnicodeToString (PUNICODE_STRING, PCWSTR);
+  NTSTATUS NTAPI RtlAppendUnicodeStringToString (PUNICODE_STRING,
+						 PUNICODE_STRING);
   NTSTATUS NTAPI RtlAnsiStringToUnicodeString (PUNICODE_STRING, PANSI_STRING,
 					       BOOLEAN);
+  LONG NTAPI RtlCompareUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
+				      BOOLEAN);
+  VOID NTAPI RtlCopyUnicodeString (PUNICODE_STRING, PUNICODE_STRING);
+  ULONG WINAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
+  BOOLEAN NTAPI RtlEqualUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
+				       BOOLEAN);
+  VOID NTAPI RtlFreeUnicodeString (PUNICODE_STRING);
+  VOID NTAPI RtlInitEmptyUnicodeString (PUNICODE_STRING, PCWSTR, USHORT);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   ULONG NTAPI RtlIsDosDeviceName_U (PCWSTR);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   NTSTATUS NTAPI RtlOemStringToUnicodeString (PUNICODE_STRING, POEM_STRING,
 					       BOOLEAN);
+  VOID NTAPI RtlSecondsSince1970ToTime (ULONG, PLARGE_INTEGER);
+
+  /* A few Rtl functions are either actually macros, or they just don't
+     exist even though they would be a big help.  We implement them here
+     as inline functions. */
+  inline
+  VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
+				       USHORT len)
+  {
+    dest->Length = 0;
+    dest->MaximumLength = len;
+    dest->Buffer = (PWSTR) buf;
+  }
+  inline
+  VOID NTAPI RtlInitCountedUnicodeString (PUNICODE_STRING dest, USHORT len,
+					  PCWSTR buf)
+  {
+    dest->Length = dest->MaximumLength = len;
+    dest->Buffer = (PWSTR) buf;
+  }
 }

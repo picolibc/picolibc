@@ -637,6 +637,23 @@ warn_msdos (const char *src)
 	SYMLINK_CONTENTS    - just return symlink contents
 */
 
+/* TODO: This implementation is only preliminary.  For internal
+   purposes it's necessary to have a path_conv::check function which
+   takes a UNICODE_STRING src path, otherwise we waste a lot of time
+   for converting back and forth.  The below implementation does
+   realy nothing but converting to char *, until path_conv handles
+   wide-char paths directly. */
+void
+path_conv::check (PUNICODE_STRING src, unsigned opt,
+		  const suffix_info *suffixes)
+{
+  char path[CYG_MAX_PATH];
+
+  user_shared->warned_msdos = true;
+  sys_wcstombs (path, CYG_MAX_PATH, src->Buffer, src->Length / 2);
+  path_conv::check (path, opt, suffixes);
+}
+
 void
 path_conv::check (const char *src, unsigned opt,
 		  const suffix_info *suffixes)
@@ -1840,7 +1857,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
 int
 mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
-			     char **mount_points)
+			     PUNICODE_STRING mount_points,
+			     PUNICODE_STRING cygd)
 {
   int n_mounts = 0;
 
@@ -1853,12 +1871,16 @@ mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
       if (last_slash == mi->posix_path)
 	{
 	  if (parent_dir_len == 1 && mi->posix_pathlen > 1)
-	    mount_points[n_mounts++] = last_slash + 1;
+	    RtlCreateUnicodeStringFromAsciiz (&mount_points[n_mounts++],
+					      last_slash + 1);
 	}
       else if (parent_dir_len == last_slash - mi->posix_path
 	       && strncasematch (parent_dir, mi->posix_path, parent_dir_len))
-	mount_points[n_mounts++] = last_slash + 1;
+	RtlCreateUnicodeStringFromAsciiz (&mount_points[n_mounts++],
+					  last_slash + 1);
     }
+  RtlCreateUnicodeStringFromAsciiz (cygd, cygdrive + 1);
+  cygd->Length -= 2;	// Strip trailing slash
   return n_mounts;
 }
 
@@ -2794,8 +2816,7 @@ is_floppy (const char *dos)
   char dev[256];
   if (!QueryDosDevice (dos, dev, 256))
     return false;
-  return strncasematch (dev, "\\Device\\Floppy", 14)
-	 || strcasematch (dev, "A:");
+  return strncasematch (dev, "\\Device\\Floppy", 14);
 }
 
 extern "C" FILE *

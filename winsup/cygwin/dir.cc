@@ -132,8 +132,7 @@ readdir_worker (DIR *dir, dirent *de)
 	}
 
       if (is_dot_dot && !(dir->__flags & dirent_isroot))
-	de->d_ino = readdir_get_ino (dir,
-				     ((fhandler_base *) dir->__fh)->get_name (),
+	de->d_ino = readdir_get_ino (((fhandler_base *) dir->__fh)->get_name (),
 				     true);
       else
 	{

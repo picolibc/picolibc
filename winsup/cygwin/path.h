@@ -13,7 +13,6 @@ details. */
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <ntdef.h>
 
 #define isproc_dev(devn) \
   (devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS || \
@@ -234,8 +233,10 @@ class path_conv
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
 
+  void check (PUNICODE_STRING upath, unsigned opt = PC_SYM_FOLLOW,
+	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
-	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
+	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
 
   path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
      wide_path (NULL), path_flags (0), known_suffix (NULL), error (0),
@@ -248,6 +249,12 @@ class path_conv
 	     const suffix_info *suffixes = NULL)
   {
     check (src, opt, suffixes);
+  }
+
+  path_conv (PUNICODE_STRING src, unsigned opt = PC_SYM_FOLLOW,
+	     const suffix_info *suffixes = NULL)
+  {
+    check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,

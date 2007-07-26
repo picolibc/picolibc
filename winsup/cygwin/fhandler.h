@@ -671,7 +671,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
 class fhandler_disk_file: public fhandler_base
 {
-  int readdir_helper (DIR *, dirent *, DWORD, DWORD, char *) __attribute__ ((regparm (3)));
+  int readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname) __attribute__ ((regparm (3)));
 
  public:
   fhandler_disk_file ();

@@ -65,6 +65,8 @@ static const char *proc_listing[] = {
   NULL
 };
 
+#define PROC_DIR_COUNT 4
+
 static const int PROC_LINK_COUNT = (sizeof (proc_listing) / sizeof (const char *)) - 1;
 
 /* FH_PROC in the table below means the file/directory is handles by
@@ -178,8 +180,10 @@ fhandler_proc::fstat (struct __stat64 *buf)
 
   if (!*path)
     {
-      buf->st_nlink = 1;
+      winpids pids ((DWORD) 0);
+      buf->st_ino = 2;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+      buf->st_nlink = PROC_DIR_COUNT + 2 + pids.npids;
       return 0;
     }
   else

@@ -26,7 +26,6 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "pinfo.h"
-#include <ntdef.h>
 #include "ntdll.h"
 #include <assert.h>
 #include <ctype.h>
@@ -37,11 +36,12 @@ details. */
 
 class __DIR_mounts
 {
-  int	      count;
-  const char *parent_dir;
-  int	      parent_dir_len;
-  char	     *mounts[MAX_MOUNTS];
-  bool	      found[MAX_MOUNTS + 2];
+  int		 count;
+  const char	*parent_dir;
+  int		 parent_dir_len;
+  UNICODE_STRING mounts[MAX_MOUNTS];
+  bool		 found[MAX_MOUNTS + 2];
+  UNICODE_STRING cygdrive;
 
 #define __DIR_PROC	(MAX_MOUNTS)
 #define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
@@ -49,15 +49,16 @@ class __DIR_mounts
   __ino64_t eval_ino (int idx)
     {
       __ino64_t ino = 0;
-      char fname[CYG_MAX_PATH];
+      char fname[parent_dir_len + mounts[idx].Length / sizeof (WCHAR) + 2];
       struct __stat64 st;
-      int len = parent_dir_len;
 
-      strcpy (fname, parent_dir);
-      if (fname[len - 1] != '/')
-	fname[len++] = '/';
-      strcpy (fname + len, mounts[idx]);
-      if (!lstat64 (fname, &st))
+      char *c = stpcpy (fname, parent_dir);
+      if (c[- 1] != '/')
+	*c++ = '/';
+      sys_wcstombs (c, mounts[idx].Length / sizeof (WCHAR) + 1,
+		    mounts[idx].Buffer, mounts[idx].Length / sizeof (WCHAR));
+      path_conv pc (fname, PC_SYM_NOFOLLOW | PC_POSIX);
+      if (!stat_worker (pc, &st))
 	ino = st.st_ino;
       return ino;
     }
@@ -67,59 +68,73 @@ public:
   : parent_dir (posix_path)
     {
       parent_dir_len = strlen (parent_dir);
-      count = mount_table->get_mounts_here (parent_dir, parent_dir_len, mounts);
+      count = mount_table->get_mounts_here (parent_dir, parent_dir_len, mounts,
+					    &cygdrive);
       rewind ();
     }
-  __ino64_t check_mount (const char *name, __ino64_t ino, bool eval = true)
+  ~__DIR_mounts ()
+    {
+      for (int i = 0; i < count; ++i)
+        RtlFreeUnicodeString (&mounts[i]);
+      RtlFreeUnicodeString (&cygdrive);
+    }
+  __ino64_t check_mount (PUNICODE_STRING fname, __ino64_t ino,
+			 bool eval = true)
     {
       if (parent_dir_len == 1)	/* root dir */
 	{
-	  if (strcasematch (name, "proc"))
+	  UNICODE_STRING proc;
+
+	  RtlInitUnicodeString (&proc, L"proc");
+	  if (RtlEqualUnicodeString (fname, &proc, TRUE))
 	    {
 	      found[__DIR_PROC] = true;
-	      return hash_path_name (0, "/proc");
+	      return 2;
 	    }
-	  if (strlen (name) == mount_table->cygdrive_len - 2
-	      && strncasematch (name, mount_table->cygdrive + 1,
-				mount_table->cygdrive_len - 2))
+	  if (fname->Length / sizeof (WCHAR) == mount_table->cygdrive_len - 2
+	      && RtlEqualUnicodeString (fname, &cygdrive, TRUE))
 	    {
 	      found[__DIR_CYGDRIVE] = true;
 	      return 2;
 	    }
 	}
       for (int i = 0; i < count; ++i)
-	if (strcasematch (name, mounts[i]))
+	if (RtlEqualUnicodeString (fname, &mounts[i], TRUE))
 	  {
 	    found[i] = true;
 	    return eval ? eval_ino (i) : 1;
 	  }
       return ino;
     }
-  __ino64_t check_missing_mount (char *ret_name, bool eval = true)
+  __ino64_t check_missing_mount (PUNICODE_STRING retname = NULL)
     {
       for (int i = 0; i < count; ++i)
 	if (!found[i])
 	  {
 	    found[i] = true;
-	    strcpy (ret_name, mounts[i]);
-	    return eval ? eval_ino (i) : 1;
+	    if (retname)
+	      {
+		*retname = mounts[i];
+		return eval_ino (i);
+	      }
+	    return 1;
 	  }
       if (parent_dir_len == 1)  /* root dir */
 	{
 	  if (!found[__DIR_PROC])
 	    {
 	      found[__DIR_PROC] = true;
-	      strcpy (ret_name, "proc");
-	      return hash_path_name (0, "/proc");
+	      if (retname)
+		RtlInitUnicodeString (retname, L"proc");
+	      return 2;
 	    }
 	  if (!found[__DIR_CYGDRIVE])
 	    {
 	      found[__DIR_CYGDRIVE] = true;
-	      if (mount_table->cygdrive_len > 1)
+	      if (cygdrive.Length > 0)
 		{
-		  strncpy (ret_name, mount_table->cygdrive + 1,
-			   mount_table->cygdrive_len - 2);
-		  ret_name[mount_table->cygdrive_len - 2] = '\0';
+		  if (retname)
+		    *retname = cygdrive;
 		  return 2;
 		}
 	    }
@@ -135,66 +150,91 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   if (!isdir () || isremote ())
     return nNumberOfLinks;
 
-  int len = strlen (*this);
-  char fn[len + 3];
-  strcpy (fn, *this);
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  HANDLE fh;
 
-  const char *s;
-  unsigned count;
+  if (!NT_SUCCESS (NtOpenFile (&fh, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       get_object_attr (attr, sec_none_nih),
+			       &io, FILE_SHARE_VALID_FLAGS,
+			       FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_DIRECTORY_FILE)))
+    return nNumberOfLinks;
+
+  unsigned count = 0;
+  bool first = true;
+		NTSTATUS status;
+  PFILE_DIRECTORY_INFORMATION fdibuf = (PFILE_DIRECTORY_INFORMATION)
+				       alloca (65536);
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
-  if (nNumberOfLinks <= 1)
+  while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, 0, &io, fdibuf,
+					   65536, FileDirectoryInformation,
+					   FALSE, NULL, first)))
     {
-      s = "\\*";
-      count = 0;
-    }
-  else
-    {
-      s = "\\..";
-      count = nNumberOfLinks;
-    }
+      if (first)
+	{
+	  first = false;
+	  /* All directories have . and .. as their first entries.
+	     If . is not present as first entry, we're on a drive's
+	     root direcotry, which doesn't have these entries. */
+	  if (fdibuf->FileNameLength != 2 || fdibuf->FileName[0] != L'.')
+	    count = 2;
+	}
+      for (PFILE_DIRECTORY_INFORMATION pfdi = fdibuf;
+	   pfdi;
+	   pfdi = (PFILE_DIRECTORY_INFORMATION)
+		  (pfdi->NextEntryOffset ? (PBYTE) pfdi + pfdi->NextEntryOffset
+					 : NULL))
+	{
+	  switch (pfdi->FileAttributes
+		  & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
+	    {
+	    case FILE_ATTRIBUTE_DIRECTORY:
+	      /* Just a directory */
+	      ++count;
+	      break;
+	    case FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT:
+	      /* Volume mount point or symlink to directory */
+	      {
+		HANDLE reph;
+		UNICODE_STRING fname;
 
-  if (len == 0 || isdirsep (fn[len - 1]))
-    strcpy (fn + len, s + 1);
-  else
-    strcpy (fn + len, s);
-
-  WIN32_FIND_DATA buf;
-  HANDLE h = FindFirstFile (fn, &buf);
-
-  int saw_dot = 2;
-  if (h != INVALID_HANDLE_VALUE)
-    {
-      if (nNumberOfLinks > 1)
-	saw_dot--;
-      else
-	do
-	  {
-	    if (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	      count++;
-	    if (buf.cFileName[0] == '.'
-		&& (buf.cFileName[1] == '\0'
-		    || (buf.cFileName[1] == '.' && buf.cFileName[2] == '\0')))
-	      saw_dot--;
-	    dir->check_mount (buf.cFileName, 0, false);
-	  }
-	while (FindNextFileA (h, &buf));
-      FindClose (h);
+		RtlInitCountedUnicodeString (&fname, pfdi->FileNameLength,
+					     pfdi->FileName);
+		InitializeObjectAttributes (&attr, &fname,
+					    OBJ_CASE_INSENSITIVE, fh, NULL);
+		if (NT_SUCCESS (status = NtOpenFile (&reph, READ_CONTROL, &attr, &io,
+					    FILE_SHARE_VALID_FLAGS,
+					    FILE_OPEN_FOR_BACKUP_INTENT
+					    | FILE_OPEN_REPARSE_POINT)))
+		  {
+		    PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
+				alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+		    if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
+				&io, FSCTL_GET_REPARSE_POINT, NULL, 0,
+				(LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
+			&& rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
+			&& rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+		      ++count;
+		    NtClose (reph);
+		  }
+	      }
+	      break;
+	    default:
+	      break;
+	    }
+	  UNICODE_STRING fname;
+	  RtlInitCountedUnicodeString (&fname, pfdi->FileNameLength,
+				       pfdi->FileName);
+	  dir->check_mount (&fname, 0, false);
+	}
     }
-
-  if (nNumberOfLinks > 1)
-    {
-      fn[len + 2] = '\0';
-      h = FindFirstFile (fn, &buf);
-      if (h)
-	saw_dot--;
-      FindClose (h);
-    }
-  while (dir->check_missing_mount (buf.cFileName, false))
+  while (dir->check_missing_mount ())
     ++count;
-
+  NtClose (dir);
   delete dir;
-
-  return count + saw_dot;
+  return count;
 }
 
 inline bool
@@ -214,9 +254,10 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   /* The entries potentially contain a name of MAX_PATH wide characters. */
-  const DWORD fvi_size = 2 * CYG_MAX_PATH
+  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
 			 + sizeof (FILE_FS_VOLUME_INFORMATION);
-  const DWORD fai_size = 2 * CYG_MAX_PATH + sizeof (FILE_ALL_INFORMATION);
+  const DWORD fai_size = (NAME_MAX + 1) * sizeof (WCHAR)
+			 + sizeof (FILE_ALL_INFORMATION);
 
   PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
 				     alloca (fvi_size);
@@ -228,7 +269,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
     {
       debug_printf ("%u = NtQueryVolumeInformationFile)",
 		    RtlNtStatusToDosError (status));
-      pfvi->VolumeSerialNumber = 0; /* Set to pc.volser () in helper. */
+      pfvi->VolumeSerialNumber = pc.volser ();
     }
   status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
 				   FileAllInformation);
@@ -241,9 +282,9 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	pfai->BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
       pc.file_attributes (pfai->BasicInformation.FileAttributes);
       return fstat_helper (buf,
-		       pfai->BasicInformation.ChangeTime.QuadPart ?
-		       *(FILETIME *) &pfai->BasicInformation.ChangeTime :
-		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
+		       pfai->BasicInformation.ChangeTime.QuadPart
+		       ? *(FILETIME *) &pfai->BasicInformation.ChangeTime
+		       : *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
 		       *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
 		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
 		       *(FILETIME *) &pfai->BasicInformation.CreationTime,
@@ -254,66 +295,119 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       pfai->StandardInformation.NumberOfLinks,
 		       pfai->BasicInformation.FileAttributes);
     }
-
   debug_printf ("%u = NtQueryInformationFile)",
 		RtlNtStatusToDosError (status));
-
-  /* Last resort */
-  FILETIME ft = { 0, 0 };
-  DWORD lowfs, highfs;
-
-  lowfs = GetFileSize (get_handle (), &highfs);
-  if (lowfs == 0xffffffff && GetLastError ())
-    lowfs = highfs = 0;
-  return fstat_helper (buf, ft, ft, ft, ft, 0, (ULONGLONG) highfs << 32 | lowfs,
-		       -1LL, 0ULL, 1, DWORD (pc));
+  return -1;
 }
 
 int __stdcall
 fhandler_base::fstat_by_name (struct __stat64 *buf)
 {
-  int res = -1;
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
-  FILE_NETWORK_OPEN_INFORMATION fnoi;
+  IO_STATUS_BLOCK io;
+  UNICODE_STRING dirname;
+  UNICODE_STRING basename;
+  HANDLE dir;
+  const DWORD fdi_size = (NAME_MAX + 1) * sizeof (WCHAR)
+			 + sizeof (FILE_ID_BOTH_DIR_INFORMATION);
+  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
+			 + sizeof (FILE_FS_VOLUME_INFORMATION);
+  PFILE_ID_BOTH_DIR_INFORMATION pfdi = (PFILE_ID_BOTH_DIR_INFORMATION)
+				       alloca (fdi_size);
+  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
+				     alloca (fvi_size);
+  LARGE_INTEGER FileId;
 
   if (!pc.exists ())
     {
       debug_printf ("already determined that pc does not exist");
       set_errno (ENOENT);
+      return -1;
     }
-  else if (NT_SUCCESS (status = NtQueryFullAttributesFile (
-			      pc.get_object_attr (attr, sec_none_nih), &fnoi)))
+  /* Split path in dirname and basename */
+  dirname = *pc.get_nt_native_path ();
+  USHORT len = dirname.Length / sizeof (WCHAR);
+  while (len > 0 && dirname.Buffer[--len] != L'\\')
+    ;
+  ++len;
+  RtlInitCountedUnicodeString (&basename,
+			       dirname.Length - len * sizeof (WCHAR),
+			       &dirname.Buffer[len]);
+  dirname.Length = len * sizeof (WCHAR);
+  InitializeObjectAttributes (&attr, &dirname, OBJ_CASE_INSENSITIVE,
+			      NULL, NULL);
+  if (!NT_SUCCESS (status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+				       &attr, &io, FILE_SHARE_VALID_FLAGS,
+				       FILE_SYNCHRONOUS_IO_NONALERT
+				       | FILE_OPEN_FOR_BACKUP_INTENT
+				       | FILE_DIRECTORY_FILE)))
     {
-      if (pc.is_rep_symlink ())
-	fnoi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-      pc.file_attributes (fnoi.FileAttributes);
-      res = fstat_helper (buf,
-			  *(FILETIME *) (fnoi.ChangeTime.QuadPart
-					 ?  &fnoi.ChangeTime
-					 : &fnoi.LastWriteTime),
-		       *(FILETIME *) &fnoi.LastAccessTime,
-		       *(FILETIME *) &fnoi.LastWriteTime,
-		       *(FILETIME *) &fnoi.CreationTime,
+      debug_printf ("%u = NtOpenFile)", RtlNtStatusToDosError (status));
+      goto too_bad;
+    }
+  if (wincap.has_fileid_dirinfo ()
+      && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
+						 pfdi, fdi_size,
+						 FileIdBothDirectoryInformation,
+						 TRUE, &basename, TRUE)))
+    FileId = pfdi->FileId;
+  else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
+  						 pfdi, fdi_size,
+						 FileBothDirectoryInformation,
+						 TRUE, &basename, TRUE)))
+    FileId.QuadPart = 0; /* get_namehash is called in fstat_helper. */
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("%u = NtQueryDirectoryFile)",
+		    RtlNtStatusToDosError (status));
+      NtClose (dir);
+      goto too_bad;
+    }
+  status = NtQueryVolumeInformationFile (dir, &io, pfvi, fvi_size,
+					 FileFsVolumeInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("%u = NtQueryVolumeInformationFile)",
+		    RtlNtStatusToDosError (status));
+      pfvi->VolumeSerialNumber = pc.volser ();
+    }
+  NtClose (dir);
+  /* If the change time is 0, it's a file system which doesn't
+     support a change timestamp.  In that case use the LastWriteTime
+     entry, as in other calls to fstat_helper. */
+  if (pc.is_rep_symlink ())
+    pfdi->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+  pc.file_attributes (pfdi->FileAttributes);
+  return fstat_helper (buf,
+		       pfdi->ChangeTime.QuadPart ?
+		       *(FILETIME *) &pfdi->ChangeTime :
+		       *(FILETIME *) &pfdi->LastWriteTime,
+		       *(FILETIME *) &pfdi->LastAccessTime,
+		       *(FILETIME *) &pfdi->LastWriteTime,
+		       *(FILETIME *) &pfdi->CreationTime,
+		       pfvi->VolumeSerialNumber,
+		       pfdi->EndOfFile.QuadPart,
+		       pfdi->AllocationSize.QuadPart,
+		       pfdi->FileId.QuadPart,
+		       1,
+		       pfdi->FileAttributes);
+
+too_bad:
+  LARGE_INTEGER ft;
+  /* Arbitrary value: 2006-12-01 */
+  RtlSecondsSince1970ToTime (1164931200L, &ft);
+  return fstat_helper (buf,
+		       *(FILETIME *) &ft,
+		       *(FILETIME *) &ft,
+		       *(FILETIME *) &ft,
+		       *(FILETIME *) &ft,
 		       pc.volser (),
-		       fnoi.EndOfFile.QuadPart,
-		       fnoi.AllocationSize.QuadPart,
+		       0ULL,
+		       -1LL,
 		       0ULL,
 		       1,
-		       fnoi.FileAttributes);
-    }
-  else if (pc.isdir ())
-    {
-      FILETIME ft = {};
-      res = fstat_helper (buf, ft, ft, ft, ft, pc.volser (), 0ULL, -1LL, 0ULL,
-			  1, FILE_ATTRIBUTE_DIRECTORY);
-    }
-  else
-    {
-      __seterrno_from_nt_status (status);
-      res = -1;
-    }
-  return res;
+		       pc.file_attributes ());
 }
 
 int __stdcall
@@ -325,10 +419,11 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 
   if (get_io_handle ())
     {
-      if (nohandle () || is_fs_special ())
-	return fstat_by_name (buf);
-      else
-	return fstat_by_handle (buf);
+      if (!nohandle () && !is_fs_special ())
+        res = fstat_by_handle (buf);
+      if (res)
+	res = fstat_by_name (buf);
+      return res;
     }
   query_open (query_stat_control);
   if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
@@ -353,7 +448,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       nohandle (no_handle);
       set_io_handle (NULL);
     }
-  else
+  if (res)
     res = fstat_by_name (buf);
 
   return res;
@@ -389,7 +484,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftChangeTime, &buf->st_ctim);
   to_timestruc_t (&ftCreationTime, &buf->st_birthtim);
-  buf->st_dev = dwVolumeSerialNumber ?: pc.volser ();
+  buf->st_dev = dwVolumeSerialNumber;
   buf->st_size = (_off64_t) nFileSize;
   /* The number of links to a directory includes the
      number of subdirectories in the directory, since all
@@ -753,10 +848,10 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 		if (!get_io_handle ())
 		  {
 		    query_open (query_read_attributes);
-		    if (!(oret = open (O_BINARY, 0)))
-		      return -1;
+		    oret = open (O_BINARY, 0);
 		  }
-		if (!fstat_by_handle (&st))
+		if ((!oret && !fstat_by_handle (&st))
+		    || !fstat_by_name (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
 		    aclbufp[0].a_id = st.st_uid;
@@ -1482,22 +1577,20 @@ fhandler_disk_file::rmdir ()
 /* This is the minimal number of entries which fit into the readdir cache.
    The number of bytes allocated by the cache is determined by this number,
    To tune caching, just tweak this number.  To get a feeling for the size,
-   the size of the readdir cache is DIR_NUM_ENTRIES * 632 + 264 bytes.  */
+   the size of the readdir cache is DIR_NUM_ENTRIES * 624 + 4 bytes.  */
 
-#define DIR_NUM_ENTRIES	100		/* Cache size 63464 bytes */
+#define DIR_NUM_ENTRIES	100		/* Cache size 62404 bytes */
 
 #define DIR_BUF_SIZE	(DIR_NUM_ENTRIES \
 			 * (sizeof (FILE_ID_BOTH_DIR_INFORMATION) \
-			    + 2 * CYG_MAX_PATH))
+			    + 2 * (NAME_MAX + 1)))
 
 struct __DIR_cache
 {
-  char  __name[CYG_MAX_PATH];
   ULONG __pos;
   char  __cache[DIR_BUF_SIZE];
 };
 
-#define d_dirname(d)	(((__DIR_cache *) (d)->__d_dirname)->__name)
 #define d_cachepos(d)	(((__DIR_cache *) (d)->__d_dirname)->__pos)
 #define d_cache(d)	(((__DIR_cache *) (d)->__d_dirname)->__cache)
 
@@ -1508,12 +1601,9 @@ fhandler_disk_file::opendir (int fd)
 {
   DIR *dir;
   DIR *res = NULL;
-  size_t len;
 
   if (!pc.isdir ())
     set_errno (ENOTDIR);
-  else if ((len = strlen (pc)) > CYG_MAX_PATH - 3)
-    set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
   else if ((dir->__d_dirname = (char *) malloc ( sizeof (struct __DIR_cache)))
@@ -1530,30 +1620,17 @@ fhandler_disk_file::opendir (int fd)
     }
   else
     {
-      strcpy (d_dirname (dir), get_win32_name ());
-      dir->__d_dirent->__d_version = __DIRENT_VERSION;
       cygheap_fdnew cfd;
-
       if (cfd < 0 && fd < 0)
 	goto free_dirent;
 
-      /* FindFirstFile doesn't seem to like duplicate /'s.
-	 The dirname is generated with trailing backslash here which
-	 simplifies later usage of dirname for checking symlinks.
-	 Appending a "*" is moved right before calling FindFirstFile.
-	 Since FindFirstFile is only called once, this should even be a
-	 teeny little bit faster. */
-      len = strlen (d_dirname (dir));
-      if (len && !isdirsep (d_dirname (dir)[len - 1]))
-	strcpy (d_dirname (dir) + len, "\\");
+      dir->__d_dirent->__d_version = __DIRENT_VERSION;
       dir->__d_cookie = __DIRENT_COOKIE;
       dir->__handle = INVALID_HANDLE_VALUE;
       dir->__d_position = 0;
-
-      dir->__flags = (pc.normalized_path[0] == '/'
-		      && pc.normalized_path[1] == '\0')
+      dir->__flags = (get_name ()[0] == '/' && get_name ()[1] == '\0')
 		     ? dirent_isroot : 0;
-      dir->__d_internal = (unsigned) new __DIR_mounts (pc.normalized_path);
+      dir->__d_internal = (unsigned) new __DIR_mounts (get_name ());
       d_cachepos (dir) = 0;
 
       if (!pc.iscygdrive ())
@@ -1628,50 +1705,6 @@ free_dir:
   return res;
 }
 
-int
-fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
-				    DWORD attr, char *fname)
-{
-  if (w32_err)
-    {
-      bool added = false;
-      if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
-	added = true;
-      if (!added)
-	return geterrno_from_win_error (w32_err);
-
-      attr = 0;
-      dir->__flags &= ~dirent_set_d_ino;
-    }
-
-  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
-     symlink, drop the .lnk suffix. */
-  if (attr & FILE_ATTRIBUTE_READONLY)
-    {
-      char *c = fname;
-      char *e = strchr (fname, '\0') - 4;
-      if (e > c && strcasematch (e, ".lnk"))
-	{
-	  char fbuf[CYG_MAX_PATH];
-	  strcpy (fbuf, d_dirname (dir));
-	  strcat (fbuf, c);
-	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink () || fpath.is_fs_special ())
-	    *e = '\0';
-	}
-    }
-
-  if (pc.isencoded ())
-    fnunmunge (de->d_name, fname);
-  else
-    strcpy (de->d_name, fname);
-  if (dir->__d_position == 0 && !strcmp (fname, "."))
-    dir->__flags |= dirent_saw_dot;
-  else if (dir->__d_position == 1 && !strcmp (fname, ".."))
-    dir->__flags |= dirent_saw_dot_dot;
-  return 0;
-}
-
 static inline __ino64_t
 readdir_get_ino_by_handle (HANDLE hdl)
 {
@@ -1685,34 +1718,139 @@ readdir_get_ino_by_handle (HANDLE hdl)
 }
 
 __ino64_t __stdcall
-readdir_get_ino (DIR *dir, const char *path, bool dot_dot)
+readdir_get_ino (const char *path, bool dot_dot)
 {
-  char fname[CYG_MAX_PATH];
+  char *fname;
   struct __stat64 st;
   HANDLE hdl;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
   __ino64_t ino = 0;
 
-  strcpy (fname, path);
   if (dot_dot)
-    strcat (fname, (*fname && fname[strlen (fname) - 1] == '/')
-		   ? ".." : "/..");
-  path_conv pc (fname, PC_SYM_NOFOLLOW);
+    {
+      fname = (char *) alloca (strlen (path) + 4);
+      char *c = stpcpy (fname, path);
+      if (c[-1] != '/')
+        *c++ = '/';
+      strcpy (c, "..");
+      path = fname;
+    }
+  path_conv pc (path, PC_SYM_NOFOLLOW | PC_POSIX);
   if (pc.isspecial ())
     {
-      if (!lstat64 (fname, &st))
+      if (!stat_worker (pc, &st))
 	ino = st.st_ino;
     }
   else if (!pc.hasgood_inode ())
     ino = hash_path_name (0, pc);
-  else if ((hdl = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
-			      NULL, OPEN_EXISTING,
-			      FILE_FLAG_BACKUP_SEMANTICS, NULL))
-	   != INVALID_HANDLE_VALUE)
+  else if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL,
+				   pc.get_object_attr (attr, sec_none_nih),
+				   &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_OPEN_FOR_BACKUP_INTENT)))
     {
       ino = readdir_get_ino_by_handle (hdl);
-      CloseHandle (hdl);
+      NtClose (hdl);
     }
   return ino;
+}
+
+int
+fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
+				    DWORD attr, PUNICODE_STRING fname)
+{
+  if (w32_err)
+    {
+      bool added = false;
+      if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
+	added = true;
+      if (!added)
+	return geterrno_from_win_error (w32_err);
+
+      attr = 0;
+      dir->__flags &= ~dirent_set_d_ino;
+    }
+
+  /* Check for directory reparse point.  These are potential volume mount
+     points which have another inode than the underlying directory. */
+  if ((attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
+      == (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
+    {
+      HANDLE reph;
+      OBJECT_ATTRIBUTES attr;
+      IO_STATUS_BLOCK io;
+
+      InitializeObjectAttributes (&attr, fname, OBJ_CASE_INSENSITIVE,
+				  get_handle (), NULL);
+      if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
+				  FILE_SHARE_VALID_FLAGS,
+				  FILE_OPEN_FOR_BACKUP_INTENT
+				  | FILE_OPEN_REPARSE_POINT)))
+	{
+	  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
+		      alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+	  if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
+		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
+		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
+	      && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
+	      && rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+	    {
+	      NtClose (reph);
+	      if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
+					  FILE_SHARE_VALID_FLAGS,
+					  FILE_OPEN_FOR_BACKUP_INTENT)))
+		{
+		  de->d_ino = readdir_get_ino_by_handle (reph);
+		  NtClose (reph);
+		}
+	    }
+	  else
+	    NtClose (reph);
+	}
+    }
+
+  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
+     symlink, drop the .lnk suffix. */
+  if ((attr & FILE_ATTRIBUTE_READONLY) && fname->Length > 4 * sizeof (WCHAR))
+    {
+      UNICODE_STRING uname;
+      UNICODE_STRING lname;
+
+      RtlInitCountedUnicodeString (&uname, 4 * sizeof (WCHAR),
+				   fname->Buffer +
+				   fname->Length / sizeof (WCHAR) - 4);
+      RtlInitCountedUnicodeString (&lname, 4 * sizeof (WCHAR),
+				   (PWCHAR) L".lnk");
+
+      if (RtlEqualUnicodeString (&uname, &lname, TRUE))
+	{
+	  UNICODE_STRING dirname = *pc.get_nt_native_path ();
+	  dirname.Buffer += 4; /* Skip leading \??\ */
+	  dirname.Length -= 4 * sizeof (WCHAR);
+	  UNICODE_STRING fbuf;
+	  ULONG len = dirname.Length + fname->Length + 2 * sizeof (WCHAR);
+
+	  RtlInitEmptyUnicodeString (&fbuf, (PCWSTR) alloca (len), len);
+	  RtlCopyUnicodeString (&fbuf, &dirname);
+	  RtlAppendUnicodeToString (&fbuf, L"\\");
+	  RtlAppendUnicodeStringToString (&fbuf, fname);
+	  path_conv fpath (&fbuf, PC_SYM_NOFOLLOW);
+	  if (fpath.issymlink () || fpath.is_fs_special ())
+	    fname->Length -= 4 * sizeof (WCHAR);
+	}
+    }
+
+  char tmp[NAME_MAX + 1];
+  sys_wcstombs (tmp, NAME_MAX, fname->Buffer, fname->Length / sizeof (WCHAR)); 
+  if (pc.isencoded ())
+    fnunmunge (de->d_name, tmp);
+  else
+    strcpy (de->d_name, tmp);
+  if (dir->__d_position == 0 && !strcmp (tmp, "."))
+    dir->__flags |= dirent_saw_dot;
+  else if (dir->__d_position == 1 && !strcmp (tmp, ".."))
+    dir->__flags |= dirent_saw_dot_dot;
+  return 0;
 }
 
 int
@@ -1721,9 +1859,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   int res = 0;
   NTSTATUS status = STATUS_SUCCESS;
   PFILE_ID_BOTH_DIR_INFORMATION buf = NULL;
-  wchar_t *FileName;
-  char fname[CYG_MAX_PATH];
+  PWCHAR FileName;
   IO_STATUS_BLOCK io;
+  UNICODE_STRING fname;
 
   /* d_cachepos always refers to the next cache entry to use.  If it's 0
      we must reload the cache. */
@@ -1818,9 +1956,8 @@ go_ahead:
 	}
       else
 	FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
-      sys_wcstombs (fname, CYG_MAX_PATH - 1, FileName, buf->FileNameLength / 2);
-
-      de->d_ino = d_mounts (dir)->check_mount (fname, de->d_ino);
+      RtlInitCountedUnicodeString (&fname, buf->FileNameLength, FileName);
+      de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{
 	  OBJECT_ATTRIBUTES attr;
@@ -1829,24 +1966,23 @@ go_ahead:
 	      && FileName[0] == '.')
 	    de->d_ino = readdir_get_ino_by_handle (get_handle ());
 	  else if (dir->__d_position == 1 && buf->FileNameLength == 4
-		   && FileName[0] == '.' && FileName[1] == '.')
+		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    if (!(dir->__flags & dirent_isroot))
-	      de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+	      de->d_ino = readdir_get_ino (get_name (), true);
 	    else
 	      de->d_ino = readdir_get_ino_by_handle (get_handle ());
 	  else
 	    {
 	      HANDLE hdl;
-	      UNICODE_STRING upath = {buf->FileNameLength, CYG_MAX_PATH * 2,
-				      FileName};
-	      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-					  get_handle () , NULL);
-	      if (!NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
-			       FILE_SHARE_VALID_FLAGS,
-			       FILE_OPEN_FOR_BACKUP_INTENT))
+
+	      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+					  get_handle (), NULL);
+	      if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
+					  FILE_SHARE_VALID_FLAGS,
+					  FILE_OPEN_FOR_BACKUP_INTENT)))
 		{
 		  de->d_ino = readdir_get_ino_by_handle (hdl);
-		  CloseHandle (hdl);
+		  NtClose (hdl);
 		}
 	    }
 	  /* Enforce namehash as inode number on untrusted file systems. */
@@ -1859,7 +1995,7 @@ go_ahead:
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
-			      buf ? buf->FileAttributes : 0, fname)))
+			      buf ? buf->FileAttributes : 0, &fname)))
     dir->__d_position++;
   else if (!(dir->__flags & dirent_saw_dot))
     {
@@ -1873,7 +2009,7 @@ go_ahead:
     {
       strcpy (de->d_name , "..");
       if (!(dir->__flags & dirent_isroot))
-	de->d_ino = readdir_get_ino (dir, pc.normalized_path, true);
+	de->d_ino = readdir_get_ino (get_name (), true);
       else
 	de->d_ino = readdir_get_ino_by_handle (get_handle ());
       dir->__d_position++;
@@ -1910,12 +2046,13 @@ fhandler_disk_file::rewinddir (DIR *dir)
 	 to NtQueryDirectoryFile on remote shares is ignored, thus
 	 resulting in not being able to rewind on remote shares.  By
 	 reopening the directory, we get a fresh new directory pointer. */
-      UNICODE_STRING fname = {0, CYG_MAX_PATH * 2, (WCHAR *) L""};
+      UNICODE_STRING fname;
       OBJECT_ATTRIBUTES attr;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       HANDLE new_dir;
 
+      RtlInitUnicodeString (&fname, L"");
       InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
 				  get_handle (), NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
@@ -2003,9 +2140,18 @@ fhandler_cygdrive::set_drives ()
 int
 fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
-  buf->st_mode = S_IFDIR | 0555;
+  fhandler_base::fstat (buf);
   buf->st_ino = 2;
-  buf->st_nlink = 1;
+  buf->st_mode = S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+  if (!ndrives)
+    set_drives ();
+  char flptst[] = "X:";
+  int n = ndrives;
+  for (const char *p = pdrive; p && *p; p = strchr (p, '\0') + 1)
+    if (is_floppy ((flptst[0] = *p, flptst))
+	|| GetFileAttributes (p) == INVALID_FILE_ATTRIBUTES)
+      --n;
+  buf->st_nlink = n + 2;
   return 0;
 }
 
@@ -2024,6 +2170,8 @@ fhandler_cygdrive::opendir (int fd)
 int
 fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 {
+  char flptst[] = "X:";
+
   while (true)
     {
       if (!pdrive || !*pdrive)
@@ -2036,13 +2184,15 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 	    }
 	  return ENMFILE;
 	}
-      if (GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
+      if (!is_floppy ((flptst[0] = *pdrive, flptst))
+	  && GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
 	break;
       pdrive = strchr (pdrive, '\0') + 1;
     }
   *de->d_name = cyg_tolower (*pdrive);
   de->d_name[1] = '\0';
-  de->d_ino = readdir_get_ino (dir, pdrive, false);
+  user_shared->warned_msdos = true;
+  de->d_ino = readdir_get_ino (pdrive, false);
   dir->__d_position++;
   pdrive = strchr (pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &de, dir, de->d_name);

@@ -96,9 +96,6 @@ SYSTEM_INFO system_info;
 static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
 				   _minor_t);
 
-static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
-				  int nofollow) __attribute__ ((regparm (3)));
-
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
@@ -1225,8 +1222,8 @@ sync ()
 }
 
 /* Cygwin internal */
-static int __stdcall
-stat_worker (const char *name, struct __stat64 *buf, int nofollow)
+int __stdcall
+stat_worker (path_conv &pc, struct __stat64 *buf)
 {
   int res = -1;
   fhandler_base *fh = NULL;
@@ -1235,8 +1232,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   if (efault.faulted (EFAULT))
     goto error;
 
-  if (!(fh = build_fh_name (name, NULL, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
-			    stat_suffixes)))
+  if (!(fh = build_fh_pc (pc)))
     goto error;
 
   if (fh->error ())
@@ -1246,8 +1242,8 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
     }
   else if (fh->exists ())
     {
-      debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
-		    fh, (DWORD) *fh);
+      debug_printf ("(%s, %p, %p), file_attributes %d",
+		    pc.normalized_path, buf, fh, (DWORD) *fh);
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf);
       if (!res)
@@ -1266,7 +1262,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   delete fh;
  error:
   MALLOC_CHECK;
-  syscall_printf ("%d = (%s, %p)", res, name, buf);
+  syscall_printf ("%d = (%s, %p)", res, pc.normalized_path, buf);
   return res;
 }
 
@@ -1274,7 +1270,8 @@ extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
   syscall_printf ("entering");
-  return stat_worker (name, buf, 0);
+  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+  return stat_worker (pc, buf);
 }
 
 extern "C" int
@@ -1312,7 +1309,8 @@ extern "C" int
 lstat64 (const char *name, struct __stat64 *buf)
 {
   syscall_printf ("entering");
-  return stat_worker (name, buf, 1);
+  path_conv pc (name, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
+  return stat_worker (pc, buf);
 }
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */

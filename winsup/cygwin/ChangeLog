@@ -1,3 +1,75 @@
+2007-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (readdir_worker): Drop dir parameter from call to
+	readdir_get_ino.
+	* fhandler.h (fhandler_disk_file::readdir_helper): Switch file name
+	parameter to PUNICODE_STRING.
+	* fhandler_disk_file.cc: Drop including ntdef.h.
+	(class __DIR_mounts): Store mount points in UNICODE.  Additionally
+	store cygdrive prefix in unicode here.  Change methods accordingly.
+	(__DIR_mounts::eval_ino): Call new stat_worker instead of lstat64.
+	(__DIR_mounts::~__DIR_mounts): New destructor to free UNICODE buffers.
+	(path_conv::ndisk_links): Rewrite using native NT functions.
+	(fhandler_base::fstat_by_handle): Use NAME_MAX instead of CYG_MAX_PATH.
+	Always set pfvi->VolumeSerialNumber to non-0.  Remove last resort
+	code.
+	(fhandler_base::fstat_by_name): Rewrite using native NT functions.
+	(fhandler_base::fstat_fs): Always call fstat_by_name if fstat_by_handle
+	fails.
+	(fhandler_base::fstat_helper): Rely on dwVolumeSerialNumber.
+	(fhandler_disk_file::facl): Call fstat_by_name if fstat_by_handle fails.
+	(DIR_BUF_SIZE): Define using NAME_MAX instead of CYG_MAX_PATH.
+	(__DIR_cache): Remove __name.
+	(d_dirname): Remove.
+	(fhandler_disk_file::opendir): Drop pathname length check.
+	Remove outdated comment.  Use get_name method instead of accessing
+	pc.normalized_path directly.
+	(readdir_get_ino): Drop unused dir parameter.  Accomodate throughout.
+	Allocate fname dynamically.  Call new stat_worker instead of lstat64.
+	Call NtOpenFile instead of CreateFile.  Call NtClose instead of
+	CloseHandle.
+	(fhandler_disk_file::readdir_helper): Use native NT functions.
+	Check for volume mount points and use correct inode number.
+	(fhandler_disk_file::readdir): Simplify slightly.
+	Use get_name instead of pc.normalized_path.
+	(fhandler_disk_file::rewinddir): Use RtlInitUnicodeString.
+	(fhandler_cygdrive::fstat): Ignore floppy drives.  Set st_nlink
+	correctly.
+	(fhandler_cygdrive::readdir): Ignore floppy drives.
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Accommodate
+	change to readdir_get_ino.
+	* fhandler_proc.cc (PROC_DIR_COUNT): Define.
+	(fhandler_proc::fstat): Evaluate correct link count for /proc.
+	* ntdll.h (struct _FILE_DIRECTORY_INFORMATION): Define.
+	(NtFsControlFile): Declare.
+	(RtlAppendUnicodeToString): Declare.
+	(RtlAppendUnicodeStringToString): Declare.
+	(RtlCompareUnicodeString): Declare.
+	(RtlCopyUnicodeString): Declare.
+	(RtlCreateUnicodeStringFromAsciiz): Declare.
+	(RtlEqualUnicodeString): Declare.
+	(RtlFreeUnicodeString): Declare.
+	(RtlInitEmptyUnicodeString): Declare.
+	(RtlSecondsSince1970ToTime): Declare.
+	(RtlInitEmptyUnicodeString): Define as inline function.
+	(RtlInitCountedUnicodeString): Define as inline function.
+	* path.cc (path_conv::check): New method with PUNICODE_STRING as path,
+	preliminary implementation.
+	(mount_info::get_mounts_here): Change to create UNICODE_STRINGs.
+	Also copy cygpath prefix into UNICODE_STRING.
+	(is_floppy): Drop 9x consideration.
+	* path.h: Drop including ntdef.h.
+	(path_conv::check): Add declaration.
+	(path_conv::path_conv): Add constructor for UNICODE_STRING paths.
+	* shared_info.h (mount_info::get_mounts_here): Change declaration.
+	* syscalls.cc: Drop forward declaration of stat_worker.
+	(stat_worke): Take path_conv as parameter.  Drop nofollow flag.
+	(stat64): Create matching path_conv and call stat_worker with it.
+	(lstat64): Ditto.
+	* winsup.h: Include ntdef.h.
+	(stat_worker): Declare.
+	(readdir_get_ino): Change declaration.
+
 2007-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CreateToolhelp32Snapshot): Remove.
@@ -172,8 +244,8 @@
 2007-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_user::curr_imp_token): Rename from current_token.
-	Accommodate changge throughout Cygwin.
-	(cygheap_user::imp_token): Rename from token.  Accommodate changge
+	Accommodate change throughout Cygwin.
+	(cygheap_user::imp_token): Rename from token.  Accommodate change
 	throughout Cygwin.
 	(rcygheap_user::eimpersonate): Use primary token for impersonation.
 	* grp.cc (internal_getgroups): Use primary impersonation token when

@@ -97,6 +97,7 @@ extern const char case_folded_upper[];
 #include <windows.h>
 #include <wincrypt.h>
 #include <lmcons.h>
+#include <ntdef.h>
 #undef _WINGDI_H
 #undef _WINUSER_H
 #undef _WINNLS_H
@@ -290,8 +291,9 @@ int symlink_worker (const char *, const char *, bool, bool)
 class path_conv;
 
 int fcntl_worker (int fd, int cmd, void *arg);
+int __stdcall stat_worker (path_conv &pc, struct __stat64 *buf) __attribute__ ((regparm (2)));
 
-__ino64_t __stdcall readdir_get_ino (struct __DIR *dir, const char *path, bool dot_dot) __attribute__ ((regparm (3)));
+__ino64_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));
 
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
