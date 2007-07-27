@@ -144,6 +144,31 @@ public:
     void rewind () { memset (found, 0, sizeof found); }
 };
 
+static inline bool
+is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
+{
+  bool ret = false;
+  IO_STATUS_BLOCK io;
+  HANDLE reph;
+
+  if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, attr, &io,
+			      FILE_SHARE_VALID_FLAGS,
+			      FILE_OPEN_FOR_BACKUP_INTENT
+			      | FILE_OPEN_REPARSE_POINT)))
+    {
+      PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
+		  alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+      if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
+		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
+		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
+	  && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
+	  && rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+	ret = true;
+      NtClose (reph);
+    }
+  return ret;
+}
+
 unsigned __stdcall
 path_conv::ndisk_links (DWORD nNumberOfLinks)
 {
@@ -164,7 +189,6 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 
   unsigned count = 0;
   bool first = true;
-		NTSTATUS status;
   PFILE_DIRECTORY_INFORMATION fdibuf = (PFILE_DIRECTORY_INFORMATION)
 				       alloca (65536);
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
@@ -197,28 +221,14 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	    case FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT:
 	      /* Volume mount point or symlink to directory */
 	      {
-		HANDLE reph;
 		UNICODE_STRING fname;
 
 		RtlInitCountedUnicodeString (&fname, pfdi->FileNameLength,
 					     pfdi->FileName);
 		InitializeObjectAttributes (&attr, &fname,
 					    OBJ_CASE_INSENSITIVE, fh, NULL);
-		if (NT_SUCCESS (status = NtOpenFile (&reph, READ_CONTROL, &attr, &io,
-					    FILE_SHARE_VALID_FLAGS,
-					    FILE_OPEN_FOR_BACKUP_INTENT
-					    | FILE_OPEN_REPARSE_POINT)))
-		  {
-		    PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
-				alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-		    if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
-				&io, FSCTL_GET_REPARSE_POINT, NULL, 0,
-				(LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
-			&& rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
-			&& rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
-		      ++count;
-		    NtClose (reph);
-		  }
+		if (is_volume_mountpoint (&attr))
+		  ++count;
 	      }
 	      break;
 	    default:
@@ -1774,30 +1784,13 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 
       InitializeObjectAttributes (&attr, fname, OBJ_CASE_INSENSITIVE,
 				  get_handle (), NULL);
-      if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
-				  FILE_SHARE_VALID_FLAGS,
-				  FILE_OPEN_FOR_BACKUP_INTENT
-				  | FILE_OPEN_REPARSE_POINT)))
+      if (is_volume_mountpoint (&attr)
+	  && (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
+				      FILE_SHARE_VALID_FLAGS,
+				      FILE_OPEN_FOR_BACKUP_INTENT))))
 	{
-	  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
-		      alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-	  if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
-		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
-		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
-	      && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
-	      && rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
-	    {
-	      NtClose (reph);
-	      if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
-					  FILE_SHARE_VALID_FLAGS,
-					  FILE_OPEN_FOR_BACKUP_INTENT)))
-		{
-		  de->d_ino = readdir_get_ino_by_handle (reph);
-		  NtClose (reph);
-		}
-	    }
-	  else
-	    NtClose (reph);
+	  de->d_ino = readdir_get_ino_by_handle (reph);
+	  NtClose (reph);
 	}
     }
 
