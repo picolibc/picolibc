@@ -971,18 +971,22 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
     set_errno (EBADF);
   else
     {
-      _off64_t actual_length;
-      DWORD size_high = 0;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
+      FILE_STANDARD_INFORMATION fsi;
       FILE_END_OF_FILE_INFORMATION feofi;
 
-      actual_length = GetFileSize (get_handle (), &size_high);
-      actual_length += ((_off64_t) size_high) << 32;
+      status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				       FileStandardInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
 
       /* If called through posix_fallocate, silently succeed if length
 	 is less than the file's actual length. */
-      if (!allow_truncate && length < actual_length)
+      if (!allow_truncate && length < fsi.EndOfFile.QuadPart)
 	return 0;
 
       feofi.EndOfFile.QuadPart = length;
@@ -990,14 +994,12 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 	 called through posix_fallocate. */
       if (allow_truncate
 	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES)
-	  && length >= actual_length + (128 * 1024))
+	  && length >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
-	  DWORD dw;
-	  BOOL r = DeviceIoControl (get_handle (),
-				    FSCTL_SET_SPARSE, NULL, 0, NULL,
-				    0, &dw, NULL);
-	  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-			      r, get_handle ());
+	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
+				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	  syscall_printf ("0x%08X = NtFsControlFile (%p, FSCTL_SET_SPARSE)",
+			  status, get_handle ());
 	}
       status = NtSetInformationFile (get_handle (), &io,
 				     &feofi, sizeof feofi,

@@ -1,5 +1,11 @@
 2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Use
+	NtQueryInformationFile instead of GetFileSize, NtFsControlFile instead
+	of DeviceIoControl.
+
+2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_name): Use
 	RtlSplitUnicodePath.
 	(fhandler_disk_file::fstat): Rename oret to opened.  Open file using NT
