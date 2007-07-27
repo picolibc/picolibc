@@ -335,16 +335,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       set_errno (ENOENT);
       return -1;
     }
-  /* Split path in dirname and basename */
-  dirname = *pc.get_nt_native_path ();
-  USHORT len = dirname.Length / sizeof (WCHAR);
-  while (len > 0 && dirname.Buffer[--len] != L'\\')
-    ;
-  ++len;
-  RtlInitCountedUnicodeString (&basename,
-			       dirname.Length - len * sizeof (WCHAR),
-			       &dirname.Buffer[len]);
-  dirname.Length = len * sizeof (WCHAR);
+  RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
   InitializeObjectAttributes (&attr, &dirname, OBJ_CASE_INSENSITIVE,
 			      NULL, NULL);
   if (!NT_SUCCESS (status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
@@ -627,46 +618,51 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
 int __stdcall
 fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 {
-  int ret = -1, oret = 0;
+  int ret = -1, opened = 0;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   const size_t fvi_size = sizeof (FILE_FS_VOLUME_INFORMATION)
-			  + 256 * sizeof (WCHAR);
+			  + (NAME_MAX + 1) * sizeof (WCHAR);
   PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
 				     alloca (fvi_size);
   const size_t fai_size = sizeof (FILE_FS_ATTRIBUTE_INFORMATION)
-			  + 256 * sizeof (WCHAR);
+			  + (NAME_MAX + 1) * sizeof (WCHAR);
   PFILE_FS_ATTRIBUTE_INFORMATION pfai = (PFILE_FS_ATTRIBUTE_INFORMATION)
 					alloca (fai_size);
   FILE_FS_FULL_SIZE_INFORMATION full_fsi;
   FILE_FS_SIZE_INFORMATION fsi;
+  HANDLE fh = get_handle ();
 
-  if (!get_io_handle ())
+  if (!fh)
     {
-      query_open (query_read_control);
-      oret = open_fs (O_RDONLY | O_BINARY, 0);
-      if (!oret)
+      OBJECT_ATTRIBUTES attr;
+      opened = NT_SUCCESS (NtOpenFile (&fh, READ_CONTROL,
+				     pc.get_object_attr (attr, sec_none_nih),
+				     &io, FILE_SHARE_VALID_FLAGS,
+				     FILE_OPEN_FOR_BACKUP_INTENT));
+      if (!opened)
 	{
-	  /* Can't open file.  Try again with rootdir. */
-	  char root[CYG_MAX_PATH];
-	  if (!rootdir (get_win32_name (), root))
-	    goto out;
-	  pc.check (root, PC_SYM_NOFOLLOW);
-	  oret = open_fs (O_RDONLY | O_BINARY, 0);
-	  if (!oret)
+	  /* Can't open file.  Try again with parent dir. */
+	  UNICODE_STRING dirname;
+	  RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, NULL);
+	  attr.ObjectName = &dirname;
+	  opened = NT_SUCCESS (NtOpenFile (&fh, READ_CONTROL, &attr, &io,
+					 FILE_SHARE_VALID_FLAGS,
+					 FILE_OPEN_FOR_BACKUP_INTENT));
+	  if (!opened)
 	    goto out;
 	}
     }
 
   /* Get basic volume information. */
-  status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
+  status = NtQueryVolumeInformationFile (fh, &io, pfvi, fvi_size,
 					 FileFsVolumeInformation);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
       goto out;
     }
-  status = NtQueryVolumeInformationFile (get_handle (), &io, pfai, fai_size,
+  status = NtQueryVolumeInformationFile (fh, &io, pfai, fai_size,
 					 FileFsAttributeInformation);
   if (!NT_SUCCESS (status))
     {
@@ -682,8 +678,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   /* Get allocation related information.  Try to get "full" information
      first, which is only available since W2K.  If that fails, try to
      retrieve normal allocation information. */
-  status = NtQueryVolumeInformationFile (get_handle (), &io, &full_fsi,
-					 sizeof full_fsi,
+  status = NtQueryVolumeInformationFile (fh, &io, &full_fsi, sizeof full_fsi,
 					 FileFsFullSizeInformation);
   if (NT_SUCCESS (status))
     {
@@ -696,11 +691,12 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	{
 	  /* Quotas active.  We can't trust TotalAllocationUnits. */
 	  NTFS_VOLUME_DATA_BUFFER nvdb;
-	  DWORD bytes;
 
-	  if (!DeviceIoControl (get_handle (), FSCTL_GET_NTFS_VOLUME_DATA, NULL,
-				0, &nvdb, sizeof nvdb, &bytes, NULL))
-	    debug_printf ("DeviceIoControl (%s) failed, %E", get_name ());
+	  status = NtFsControlFile (fh, NULL, NULL, NULL, &io,
+				    FSCTL_GET_NTFS_VOLUME_DATA,
+				    NULL, 0, &nvdb, sizeof nvdb);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("NtFsControlFile (%s) failed, status %lx", status);
 	  else
 	    sfs->f_blocks = nvdb.TotalClusters.QuadPart;
 	}
@@ -708,8 +704,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
     }
   else
     {
-      status = NtQueryVolumeInformationFile (get_handle (), &io, &fsi,
-					     sizeof fsi, FileFsSizeInformation);
+      status = NtQueryVolumeInformationFile (fh, &io, &fsi, sizeof fsi,
+					     FileFsSizeInformation);
       if (!NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
@@ -723,8 +719,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
       ret = 0;
     }
 out:
-  if (oret)
-    close_fs ();
+  if (opened)
+    NtClose (fh);
   syscall_printf ("%d = fstatvfs (%s, %p)", ret, get_name (), sfs);
   return ret;
 }

@@ -805,4 +805,18 @@ extern "C"
     dest->Length = dest->MaximumLength = len;
     dest->Buffer = (PWSTR) buf;
   }
+  inline
+  VOID NTAPI RtlSplitUnicodePath (PUNICODE_STRING path, PUNICODE_STRING dir,
+				  PUNICODE_STRING file)
+  {
+    USHORT len = path->Length / sizeof (WCHAR);
+    while (len > 0 && path->Buffer[--len] != L'\\')
+      ;
+    ++len;
+    if (dir)
+      RtlInitCountedUnicodeString (dir, len * sizeof (WCHAR), path->Buffer);
+    if (file)
+      RtlInitCountedUnicodeString (file, path->Length - len * sizeof (WCHAR),
+				   &path->Buffer[len]);
+  }
 }
