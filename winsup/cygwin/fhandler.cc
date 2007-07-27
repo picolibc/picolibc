@@ -483,10 +483,6 @@ fhandler_base::open (int flags, mode_t mode)
 	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
-      case query_stat_control:
-	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
-	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
-	break;
       case query_write_control:
 	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
@@ -503,8 +499,9 @@ fhandler_base::open (int flags, mode_t mode)
 	  }
 	else if ((flags & O_ACCMODE) == O_WRONLY)
 	  {
-	    access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
-	    create_options = FILE_OPEN_FOR_RECOVERY;
+	    access = GENERIC_WRITE | READ_CONTROL | FILE_READ_ATTRIBUTES;
+	    create_options = FILE_OPEN_FOR_BACKUP_INTENT
+			     | FILE_OPEN_FOR_RECOVERY;
 	  }
 	else
 	  {
@@ -560,7 +557,7 @@ fhandler_base::open (int flags, mode_t mode)
 
       /* If the file should actually be created and ntsec is on,
 	 set files attributes. */
-      if (allow_ntsec && has_acls ())
+      if (allow_ntsec)
 	{
 	  set_security_attribute (mode, &sa, sd);
 	  attr.SecurityDescriptor = sa.lpSecurityDescriptor;

@@ -425,16 +425,8 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 	res = fstat_by_name (buf);
       return res;
     }
-  query_open (query_stat_control);
-  if (!(oret = open_fs (open_flags, 0)) && get_errno () == EACCES)
-    {
-      /* If we couldn't open the file, try a query open with no permissions.
-	 This allows us to determine *some* things about the file, at least. */
-      pc.set_exec (0);
-      query_open (query_read_attributes);
-      oret = open_fs (open_flags, 0);
-    }
-
+  query_open (query_read_attributes);
+  oret = open_fs (open_flags, 0);
   if (oret)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.

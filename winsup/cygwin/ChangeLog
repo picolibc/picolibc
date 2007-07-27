@@ -1,3 +1,13 @@
+2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (enum query_state): Drop redundant query_stat_control.
+	* fhandler.cc (fhandler_base::open): Ditto.  Add READ_CONTROL to
+	access and FILE_OPEN_FOR_BACKUP_INTENT to create_options when opening
+	for writing.  Always set security attributes to avoid calling
+	has_acls.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Don't try to
+	open file twice.
+
 2007-07-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dir.cc (readdir_worker): Drop dir parameter from call to

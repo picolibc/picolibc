@@ -86,9 +86,8 @@ enum query_state {
   no_query = 0,
   query_read_control = 1,
   query_read_attributes = 2,
-  query_stat_control = 3,
-  query_write_control = 4,
-  query_write_attributes = 5
+  query_write_control = 3,
+  query_write_attributes = 4
 };
 
 class fhandler_base
