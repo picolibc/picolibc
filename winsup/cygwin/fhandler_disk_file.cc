@@ -1028,7 +1028,7 @@ fhandler_disk_file::link (const char *newpath)
 
   if (newpc.exists ())
     {
-      syscall_printf ("file '%s' exists?", (char *) newpc);
+      syscall_printf ("file '%s' exists?", newpc.get_win32 ());
       set_errno (EEXIST);
       return -1;
     }
@@ -1040,140 +1040,73 @@ fhandler_disk_file::link (const char *newpath)
       return -1;
     }
 
-  char new_buf[CYG_MAX_PATH + 5];
+  char new_buf[strlen (newpath) + 5];
   if (!newpc.error && !newpc.case_clash)
     {
-      DWORD bintype;
       int len;
 
       if (allow_winsymlinks && pc.is_lnk_special ())
 	{
 	  /* Shortcut hack. */
-	  strcpy (new_buf, newpath);
-	  strcat (new_buf, ".lnk");
+	  stpcpy (stpcpy (new_buf, newpath), ".lnk");
 	  newpath = new_buf;
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	}
-      else if (transparent_exe
-	       && !pc.isdir ()
-	       && GetBinaryType (pc, &bintype)
-	       && (len = strlen (newpc)) > 4
-	       && !strcasematch ((const char *) newpc + len - 4, ".exe"))
+      else if (!pc.isdir ()
+	       && (len = strlen (pc.get_win32 ())) > 4
+	       && strcasematch (pc.get_win32 () + len - 4, ".exe")
+	       && (len = strlen (newpc.get_win32 ())) > 4
+	       && !strcasematch (newpc.get_win32 () + len - 4, ".exe"))
 	{
 	  /* Executable hack. */
-	  strcpy (new_buf, newpath);
-	  strcat (new_buf, ".exe");
+	  stpcpy (stpcpy (new_buf, newpath), ".exe");
 	  newpath = new_buf;
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	}
     }
 
-  query_open (query_write_attributes);
-  if (!open (O_BINARY, 0))
+  HANDLE fh;
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  status = NtOpenFile (&fh, 0,
+		       pc.get_object_attr (attr, sec_none_nih), &io,
+		       FILE_SHARE_VALID_FLAGS,
+		       FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_REPARSE_POINT);
+  if (!NT_SUCCESS (status))
     {
-      syscall_printf ("Opening file failed");
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
-
-  if (CreateHardLinkA (newpc, pc, NULL))
-    goto success;
-
-  /* There are two cases to consider:
-     - The FS doesn't support hard links ==> ERROR_INVALID_FUNCTION
-       We copy the file.
-     - CreateHardLinkA is not supported  ==> ERROR_PROC_NOT_FOUND
-       In that case (<= NT4) we try the old-style method.
-     Any other error should be taken seriously. */
-  if (GetLastError () == ERROR_INVALID_FUNCTION)
+  PUNICODE_STRING tgt = newpc.get_nt_native_path ();
+  ULONG size = sizeof (FILE_LINK_INFORMATION) + tgt->Length;
+  PFILE_LINK_INFORMATION pfli = (PFILE_LINK_INFORMATION) alloca (size);
+  pfli->ReplaceIfExists = FALSE;
+  pfli->RootDirectory = NULL;
+  memcpy (pfli->FileName, tgt->Buffer, pfli->FileNameLength = tgt->Length);
+  status = NtSetInformationFile (fh, &io, pfli, size, FileLinkInformation);
+  NtClose (fh);
+  if (!NT_SUCCESS (status))
     {
-      syscall_printf ("FS doesn't support hard links: Copy file");
-      goto docopy;
-    }
-  if (GetLastError () != ERROR_PROC_NOT_FOUND)
-    {
-      syscall_printf ("CreateHardLinkA failed");
-      __seterrno ();
-      close ();
-      return -1;
-    }
-
-  WIN32_STREAM_ID stream_id;
-  LPVOID context;
-  WCHAR wbuf[CYG_MAX_PATH];
-  BOOL ret;
-  DWORD written, write_err, path_len, size;
-
-  path_len = sys_mbstowcs (wbuf, newpc, CYG_MAX_PATH) * sizeof (WCHAR);
-
-  stream_id.dwStreamId = BACKUP_LINK;
-  stream_id.dwStreamAttributes = 0;
-  stream_id.dwStreamNameSize = 0;
-  stream_id.Size.HighPart = 0;
-  stream_id.Size.LowPart = path_len;
-  size = sizeof (WIN32_STREAM_ID) - sizeof (WCHAR**)
-	 + stream_id.dwStreamNameSize;
-  context = NULL;
-  write_err = 0;
-  /* Write WIN32_STREAM_ID */
-  ret = BackupWrite (get_handle (), (LPBYTE) &stream_id, size,
-		     &written, FALSE, FALSE, &context);
-  if (ret)
-    {
-      /* write the buffer containing the path */
-      /* FIXME: BackupWrite sometimes traps if linkname is invalid.
-	 Need to handle. */
-      ret = BackupWrite (get_handle (), (LPBYTE) wbuf, path_len,
-			 &written, FALSE, FALSE, &context);
-      if (!ret)
-	{
-	  write_err = GetLastError ();
-	  syscall_printf ("cannot write linkname, %E");
+      if (status == STATUS_INVALID_DEVICE_REQUEST)
+        {
+	  /* FS doesn't support hard links.  Try to copy file. */
+	  if (!CopyFileA (pc, newpc, TRUE))
+	    {
+	      __seterrno ();
+	      return -1;
+	    }
 	}
-      /* Free context */
-      BackupWrite (get_handle (), NULL, 0, &written,
-		   TRUE, FALSE, &context);
-    }
-  else
-    {
-      write_err = GetLastError ();
-      syscall_printf ("cannot write stream_id, %E");
-    }
-
-  if (!ret)
-    {
-      /* Only copy file if FS doesn't support hard links */
-      if (write_err == ERROR_INVALID_FUNCTION)
-	{
-	  syscall_printf ("FS doesn't support hard links: Copy file");
-	  goto docopy;
+      else
+        {
+	  __seterrno_from_nt_status (status);
+	  return -1;
 	}
-
-      close ();
-      __seterrno_from_win_error (write_err);
-      return -1;
     }
-
-success:
-  close ();
   if (!allow_winsymlinks && pc.is_lnk_special ())
     SetFileAttributes (newpc, (DWORD) pc
 			       | FILE_ATTRIBUTE_SYSTEM
 			       | FILE_ATTRIBUTE_READONLY);
-  return 0;
-
-docopy:
-  /* do this with a copy */
-  if (!CopyFileA (pc, newpc, 1))
-    {
-      __seterrno ();
-      return -1;
-    }
-  close ();
-  fhandler_disk_file fh (newpc);
-  fh.query_open (query_write_attributes);
-  if (fh.open (O_BINARY, 0))
-    fh.close ();
   return 0;
 }
 
