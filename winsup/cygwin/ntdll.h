@@ -828,8 +828,8 @@ extern "C"
 				   path->Length - len * sizeof (WCHAR));
   }
   inline
-  BOOLEAN NTAPI RtlEqualPathPrefix (PUNICODE_STRING path, PCWSTR prefix,
-				    BOOLEAN caseinsensitive)
+  BOOLEAN NTAPI RtlEqualUnicodePathPrefix (PUNICODE_STRING path, PCWSTR prefix,
+					   BOOLEAN caseinsensitive)
   {
     UNICODE_STRING p, pref;
 
@@ -840,8 +840,8 @@ extern "C"
     return RtlEqualUnicodeString (&p, &pref, caseinsensitive);
   }
   inline
-  BOOL NTAPI RtlEqualPathSuffix (PUNICODE_STRING path, PCWSTR suffix,
-				 BOOLEAN caseinsensitive)
+  BOOL NTAPI RtlEqualUnicodePathSuffix (PUNICODE_STRING path, PCWSTR suffix,
+					BOOLEAN caseinsensitive)
   {
     UNICODE_STRING p, suf;
 

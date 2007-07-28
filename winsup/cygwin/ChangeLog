@@ -1,4 +1,11 @@
-2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
+2007-07-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (RtlEqualUnicodePathPrefix): Rename from RtlEqualPathPrefix.
+	(RtlEqualUnicodePathSuffix): Rename from RtlEqualPathSuffix.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Accommodate above
+	change.
+
+2007-07-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (RtlInitCountedUnicodeString): Swap order of string and length
 	parameters to be the same as for RtlInitEmptyUnicodeString.
