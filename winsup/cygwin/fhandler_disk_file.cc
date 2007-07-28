@@ -223,8 +223,8 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	      {
 		UNICODE_STRING fname;
 
-		RtlInitCountedUnicodeString (&fname, pfdi->FileNameLength,
-					     pfdi->FileName);
+		RtlInitCountedUnicodeString (&fname, pfdi->FileName,
+					     pfdi->FileNameLength);
 		InitializeObjectAttributes (&attr, &fname,
 					    OBJ_CASE_INSENSITIVE, fh, NULL);
 		if (is_volume_mountpoint (&attr))
@@ -235,8 +235,8 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	      break;
 	    }
 	  UNICODE_STRING fname;
-	  RtlInitCountedUnicodeString (&fname, pfdi->FileNameLength,
-				       pfdi->FileName);
+	  RtlInitCountedUnicodeString (&fname, pfdi->FileName,
+				       pfdi->FileNameLength);
 	  dir->check_mount (&fname, 0, false);
 	}
     }
@@ -1043,8 +1043,6 @@ fhandler_disk_file::link (const char *newpath)
   char new_buf[strlen (newpath) + 5];
   if (!newpc.error && !newpc.case_clash)
     {
-      int len;
-
       if (allow_winsymlinks && pc.is_lnk_special ())
 	{
 	  /* Shortcut hack. */
@@ -1053,10 +1051,9 @@ fhandler_disk_file::link (const char *newpath)
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	}
       else if (!pc.isdir ()
-	       && (len = strlen (pc.get_win32 ())) > 4
-	       && strcasematch (pc.get_win32 () + len - 4, ".exe")
-	       && (len = strlen (newpc.get_win32 ())) > 4
-	       && !strcasematch (newpc.get_win32 () + len - 4, ".exe"))
+	       && RtlEqualPathSuffix (pc.get_nt_native_path (), L".exe", TRUE)
+	       && !RtlEqualPathSuffix (newpc.get_nt_native_path (), L".exe",
+				       TRUE))
 	{
 	  /* Executable hack. */
 	  stpcpy (stpcpy (new_buf, newpath), ".exe");
@@ -1091,7 +1088,10 @@ fhandler_disk_file::link (const char *newpath)
       if (status == STATUS_INVALID_DEVICE_REQUEST)
         {
 	  /* FS doesn't support hard links.  Try to copy file. */
-	  if (!CopyFileA (pc, newpc, TRUE))
+	  WCHAR pcw[pc.get_nt_native_path ()->Length + 1];
+	  WCHAR newpcw[newpc.get_nt_native_path ()->Length + 1];
+	  if (!CopyFileW (pc.get_wide_win32_path (pcw),
+			  newpc.get_wide_win32_path (newpcw), TRUE))
 	    {
 	      __seterrno ();
 	      return -1;
@@ -1732,11 +1732,12 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       UNICODE_STRING uname;
       UNICODE_STRING lname;
 
-      RtlInitCountedUnicodeString (&uname, 4 * sizeof (WCHAR),
-				   fname->Buffer +
-				   fname->Length / sizeof (WCHAR) - 4);
-      RtlInitCountedUnicodeString (&lname, 4 * sizeof (WCHAR),
-				   (PWCHAR) L".lnk");
+      RtlInitCountedUnicodeString (&uname,
+				   fname->Buffer
+				   + fname->Length / sizeof (WCHAR) - 4,
+				   4 * sizeof (WCHAR));
+      RtlInitCountedUnicodeString (&lname, (PWCHAR) L".lnk",
+				   4 * sizeof (WCHAR));
 
       if (RtlEqualUnicodeString (&uname, &lname, TRUE))
 	{
@@ -1872,7 +1873,7 @@ go_ahead:
 	}
       else
 	FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
-      RtlInitCountedUnicodeString (&fname, buf->FileNameLength, FileName);
+      RtlInitCountedUnicodeString (&fname, FileName, buf->FileNameLength);
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{

@@ -1,5 +1,16 @@
 2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (RtlInitCountedUnicodeString): Swap order of string and length
+	parameters to be the same as for RtlInitEmptyUnicodeString.
+	(RtlEqualPathPrefix): New inline function.
+	(RtlEqualPathSuffix): New inline function.
+	* fhandler_disk_file.cc: Accommodate parameter order change of
+	RtlInitEmptyUnicodeString throughout.
+	(fhandler_disk_file::link): Do path checking in unicode.  Call
+	CopyFileW instead of CopyFileA.
+
+2007-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (CreateHardLinkA): Remove.
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Drop GetBinaryType
 	test.  Just check exe suffix instead.  Tune creating new file name.

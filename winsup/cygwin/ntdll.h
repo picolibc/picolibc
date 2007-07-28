@@ -807,8 +807,8 @@ extern "C"
     dest->Buffer = (PWSTR) buf;
   }
   inline
-  VOID NTAPI RtlInitCountedUnicodeString (PUNICODE_STRING dest, USHORT len,
-					  PCWSTR buf)
+  VOID NTAPI RtlInitCountedUnicodeString (PUNICODE_STRING dest, PCWSTR buf,
+  					  USHORT len)
   {
     dest->Length = dest->MaximumLength = len;
     dest->Buffer = (PWSTR) buf;
@@ -822,9 +822,36 @@ extern "C"
       ;
     ++len;
     if (dir)
-      RtlInitCountedUnicodeString (dir, len * sizeof (WCHAR), path->Buffer);
+      RtlInitCountedUnicodeString (dir, path->Buffer, len * sizeof (WCHAR));
     if (file)
-      RtlInitCountedUnicodeString (file, path->Length - len * sizeof (WCHAR),
-				   &path->Buffer[len]);
+      RtlInitCountedUnicodeString (file, &path->Buffer[len],
+				   path->Length - len * sizeof (WCHAR));
+  }
+  inline
+  BOOLEAN NTAPI RtlEqualPathPrefix (PUNICODE_STRING path, PCWSTR prefix,
+				    BOOLEAN caseinsensitive)
+  {
+    UNICODE_STRING p, pref;
+
+    RtlInitUnicodeString (&pref, prefix);
+    RtlInitCountedUnicodeString (&p, path->Buffer,
+				 pref.Length < path->Length
+				 ? pref.Length : path->Length);
+    return RtlEqualUnicodeString (&p, &pref, caseinsensitive);
+  }
+  inline
+  BOOL NTAPI RtlEqualPathSuffix (PUNICODE_STRING path, PCWSTR suffix,
+				 BOOLEAN caseinsensitive)
+  {
+    UNICODE_STRING p, suf;
+
+    RtlInitUnicodeString (&suf, suffix);
+    if (suf.Length < path->Length)
+      RtlInitCountedUnicodeString (&p, (PWCHAR) ((PBYTE) path->Buffer
+				       + path->Length - suf.Length),
+				   suf.Length);
+    else
+      RtlInitCountedUnicodeString (&p, path->Buffer, path->Length);
+    return RtlEqualUnicodeString (&p, &suf, caseinsensitive);
   }
 }
