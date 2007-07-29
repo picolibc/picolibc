@@ -418,7 +418,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   int oret;
   int open_flags = O_RDONLY | O_BINARY;
 
-  if (get_io_handle ())
+  if (get_handle ())
     {
       if (!nohandle () && !is_fs_special ())
         res = fstat_by_handle (buf);
@@ -501,8 +501,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
   else if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_COMPRESSED
 					      | FILE_ATTRIBUTE_SPARSE_FILE)
-	   && get_io_handle () && !is_fs_special ()
-	   && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
+	   && get_handle () && !is_fs_special ()
+	   && !NtQueryInformationFile (get_handle (), &st, (PVOID) &fci,
 				      sizeof fci, FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
        compressed and sparsed files. */
@@ -521,14 +521,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       buf->st_size = pc.get_symlink_length ();
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (get_io_handle (), pc, NULL,
+      get_file_attribute (get_handle (), pc, NULL,
 			  &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (is_fs_special () ? NULL: get_io_handle (), pc,
+  if (!get_file_attribute (is_fs_special () ? NULL: get_handle (), pc,
 			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
@@ -569,6 +569,12 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       else
 	{
 	  buf->st_mode |= S_IFREG;
+#if 0
+	  /* FIXME: Is this code really necessary?  There are already
+	     two places in path_conv which look for executability.
+	     Also, by using the fhandler's io HANDLE, a stat call might
+	     change the file position for a short period of time in
+	     a not thread-safe way. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      DWORD cur, done;
@@ -593,8 +599,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		  SetFilePointer (get_handle (), cur, &curhigh, FILE_BEGIN);
 		}
 	    }
+#endif
 	}
-
       if (pc.exec_state () == is_executable)
 	buf->st_mode |= STD_XBITS;
 
@@ -735,14 +741,17 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
-  if (!get_io_handle ())
+  if (!get_handle ())
     {
       query_open (query_write_control);
       if (!(oret = open (O_BINARY, 0)))
 	{
-	  /* If the file couldn't be opened, that's really only a problem if
-	     ACLs or EAs should get written. */
+	  /* Need WRITE_DAC|WRITE_OWNER to write ACLs. */
 	  if (allow_ntsec && pc.has_acls ())
+	    return -1;
+	  /* Otherwise FILE_WRITE_ATTRIBUTES is sufficient. */
+	  query_open (query_write_attributes);
+	  if (!(oret = open (O_BINARY, 0)))
 	    return -1;
 	}
     }
@@ -751,7 +760,7 @@ fhandler_disk_file::fchmod (mode_t mode)
     {
       if (pc.isdir ())
 	mode |= S_IFDIR;
-      if (!set_file_attribute (get_io_handle (), pc,
+      if (!set_file_attribute (get_handle (), pc,
 			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
@@ -763,8 +772,15 @@ fhandler_disk_file::fchmod (mode_t mode)
   else
     pc |= (DWORD) FILE_ATTRIBUTE_READONLY;
 
-  if (!SetFileAttributes (pc, pc))
-    __seterrno ();
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
+  fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
+  = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+  fbi.FileAttributes = pc.file_attributes ();
+  NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+					  FileBasicInformation);
+  if (!NT_SUCCESS (status))
+    __seterrno_from_nt_status (status);
   else if (!allow_ntsec || !pc.has_acls ())
     /* Correct NTFS security attributes have higher priority */
     res = 0;
@@ -787,7 +803,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       return 0;
     }
 
-  if (!get_io_handle ())
+  if (!get_handle ())
     {
       query_open (query_write_control);
       if (!(oret = fhandler_disk_file::open (O_BINARY, 0)))
@@ -797,7 +813,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   mode_t attrib = 0;
   if (pc.isdir ())
     attrib |= S_IFDIR;
-  int res = get_file_attribute (get_io_handle (), pc, &attrib, NULL, NULL);
+  int res = get_file_attribute (get_handle (), pc, &attrib, NULL, NULL);
   if (!res)
     {
       /* Typical Windows default ACLs can contain permissions for one
@@ -809,7 +825,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 	 world to read the symlink and only the new owner to change it. */
       if (pc.issymlink ())
 	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
-      res = set_file_attribute (get_io_handle (), pc, uid, gid, attrib);
+      res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
     }
   if (oret)
     close ();
@@ -832,7 +848,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	  case SETACL:
 	    /* Open for writing required to be able to set ctime
 	       (even though setting the ACL is just pretended). */
-	    if (!get_io_handle ())
+	    if (!get_handle ())
 	      oret = open (O_WRONLY | O_BINARY, 0);
 	    res = 0;
 	    break;
@@ -843,7 +859,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	      set_errno (ENOSPC);
 	    else
 	      {
-		if (!get_io_handle ())
+		if (!get_handle ())
 		  {
 		    query_open (query_read_attributes);
 		    oret = open (O_BINARY, 0);
@@ -877,7 +893,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     }
   else
     {
-      if (!get_io_handle ())
+      if (!get_handle ())
 	{
 	  query_open (cmd == SETACL ? query_write_control : query_read_attributes);
 	  if (!(oret = open (O_BINARY, 0)))
@@ -889,19 +905,30 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    if (!aclsort32 (nentries, 0, aclbufp))
 	      {
 		bool rw = false;
-		res = setacl (get_io_handle (), pc, nentries, aclbufp, rw);
+		res = setacl (get_handle (), pc, nentries, aclbufp, rw);
 		if (rw)
-		  SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+		  {
+		    IO_STATUS_BLOCK io;
+		    FILE_BASIC_INFORMATION fbi;
+		    fbi.CreationTime.QuadPart
+		    = fbi.LastAccessTime.QuadPart
+		    = fbi.LastWriteTime.QuadPart
+		    = fbi.ChangeTime.QuadPart = 0LL;
+		    fbi.FileAttributes = pc.file_attributes ()
+		    			 & ~FILE_ATTRIBUTE_READONLY;
+		    NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+					  FileBasicInformation);
+		  }
 	      }
 	    break;
 	  case GETACL:
 	    if (!aclbufp)
 	      set_errno(EFAULT);
 	    else
-	      res = getacl (get_io_handle (), pc, nentries, aclbufp);
+	      res = getacl (get_handle (), pc, nentries, aclbufp);
 	    break;
 	  case GETACLCNT:
-	    res = getacl (get_io_handle (), pc, 0, NULL);
+	    res = getacl (get_handle (), pc, 0, NULL);
 	    break;
 	  default:
 	    set_errno (EINVAL);
@@ -1119,13 +1146,11 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
 int
 fhandler_base::utimes_fs (const struct timeval *tvp)
 {
-  FILETIME lastaccess, lastwrite;
+  LARGE_INTEGER lastaccess, lastwrite;
   struct timeval tmp[2];
-  bool closeit;
+  bool closeit = false;
 
-  if (get_handle ())
-    closeit = false;
-  else
+  if (!get_handle ())
     {
       query_open (query_write_attributes);
       if (!open_fs (O_BINARY, 0))
@@ -1144,34 +1169,34 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
       closeit = true;
     }
 
-  if (nohandle ())	/* Directory query_open on 9x. */
-    return 0;
-
   gettimeofday (&tmp[0], 0);
   if (!tvp)
     {
       tmp[1] = tmp[0];
       tvp = tmp;
     }
-  timeval_to_filetime (&tvp[0], &lastaccess);
-  timeval_to_filetime (&tvp[1], &lastwrite);
+  timeval_to_filetime (&tvp[0], (FILETIME *) &lastaccess);
+  timeval_to_filetime (&tvp[1], (FILETIME *) &lastwrite);
   debug_printf ("incoming lastaccess %08x %08x", tvp[0].tv_sec, tvp[0].tv_usec);
 
-  if (is_fs_special ())
-    SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
-  BOOL res = SetFileTime (get_handle (), NULL, &lastaccess, &lastwrite);
-  DWORD errcode = GetLastError ();
-  if (is_fs_special ())
-    SetFileAttributes (pc, pc);
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
+  fbi.CreationTime.QuadPart = 0LL;
+  fbi.LastAccessTime= lastaccess;
+  fbi.LastWriteTime = lastwrite;
+  fbi.ChangeTime.QuadPart = 0LL;
+  fbi.FileAttributes = 0;
+  NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+					  FileBasicInformation);
   /* Opening a directory on a 9x share from a NT machine works(!), but
-     then the SetFileTimes fails with ERROR_NOT_SUPPORTED.  Oh well... */
-  if (!res && errcode != ERROR_NOT_SUPPORTED)
+     then NtSetInformationFile fails with STATUS_NOT_SUPPORTED.  Oh well... */
+  if (!NT_SUCCESS (status) && status != STATUS_NOT_SUPPORTED)
     {
-      close ();
-      __seterrno_from_win_error (errcode);
+      if (closeit)
+	close ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
-
   if (closeit)
     close ();
   return 0;

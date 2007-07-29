@@ -1,3 +1,17 @@
+2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc: Use get_handle throughout.
+	(fhandler_disk_file::fchmod): Always try to open file with required
+	access rights.  Use NtSetInformationFile instead of SetFileAttributes.
+	(fhandler_disk_file::facl): Use NtSetInformationFile instead of
+	SetFileAttributes.
+	(fhandler_base::utimes_fs): Change lastaccess and lastwrite to
+	LARGE_INTEGER.  Drop 9x directory case.  Use NtSetInformationFile
+	instead of SetFileAttributes.  Drop temporarily changing R/O attribute
+	since NtSetInformationFile(FileBasicInformation) also works on R/O
+	files.
+	* ntdll.h (STATUS_NOT_SUPPORTED): Define.
+
 2007-07-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::inside_kernel): Move function declaration into
