@@ -228,43 +228,31 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 		  recycler, status);
 }
 
-DWORD
-unlink_nt (path_conv &win32_name, bool setattrs)
+NTSTATUS
+unlink_nt (path_conv &pc)
 {
+  NTSTATUS status;
+  HANDLE fh;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  NTSTATUS status;
-  HANDLE h;
+  FILE_BASIC_INFORMATION fbi;
+
+  ACCESS_MASK access = DELETE;
+  /* If one of the R/O attributes is set, we have to open the file with
+     FILE_WRITE_ATTRIBUTES to be able to remove these flags before trying
+     to delete it. */
+  if (pc.file_attributes () & (FILE_ATTRIBUTE_READONLY
+			       | FILE_ATTRIBUTE_SYSTEM
+			       | FILE_ATTRIBUTE_HIDDEN))
+    access |= FILE_WRITE_ATTRIBUTES;
 
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
-  /* Don't open directories with "delete on close", because the NT internal
-     semantic is apparently different from the file semantic.  If a directory
-     is opened "delete on close", the rename operation in try_to_bin fails
-     with STATUS_ACCESS_DENIED.  So directories must be deleted using
-     NtSetInformationFile, class FileDispositionInformation, which works fine.
-
-     Correction, moving a directory opened with delete-on-close fails ONLY
-     on XP.  Note to myself: Never take anything for granted on Windows!
-
-     Don't try "delete on close" if the file is on a remote share.  If two
-     processes have open handles on a file and one of them calls unlink, then
-     it happens that the file is removed from the remote share even though the
-     other process still has an open handle.  This other process than gets
-     Win32 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.  That
-     does not happen when using NtSetInformationFile, class
-     FileDispositionInformation, which nicely succeeds but still, the file is
-     available for the other process.  Microsoft KB 837665 describes this
-     problem as a bug in 2K3, but I have reproduced it on shares on Samba
-     2.2.8, Samba 3.0.2, NT4SP6, XP64SP1 and 2K3 and in all cases, DeleteFile
-     works, "delete on close" does not. */
-  if (!win32_name.isdir () && !win32_name.isremote ())
-    flags |= FILE_DELETE_ON_CLOSE;
   /* Add the reparse point flag to native symlinks, otherwise we remove the
      target, not the symlink. */
-  if (win32_name.is_rep_symlink ())
+  if (pc.is_rep_symlink ())
     flags |= FILE_OPEN_REPARSE_POINT;
 
-  win32_name.get_object_attr (attr, sec_none_nih);
+  pc.get_object_attr (attr, sec_none_nih);
   /* First try to open the file with sharing not allowed.  If the file
      has an open handle on it, this will fail.  That indicates that the
      file has to be moved to the recycle bin so that it actually disappears
@@ -272,13 +260,13 @@ unlink_nt (path_conv &win32_name, bool setattrs)
      doesn't fail, the file is not in use and by simply closing the handle
      the file will disappear. */
   bool move_to_bin = false;
-  status = NtOpenFile (&h, DELETE, &attr, &io, 0, flags);
+  status = NtOpenFile (&fh, access, &attr, &io, 0, flags);
   if (status == STATUS_SHARING_VIOLATION)
     {
       move_to_bin = true;
-      if (!win32_name.isdir () || win32_name.isremote ())
-	status = NtOpenFile (&h, DELETE, &attr, &io, FILE_SHARE_VALID_FLAGS,
-			     flags);
+      if (!pc.isdir () || pc.isremote ())
+	status = NtOpenFile (&fh, access, &attr, &io,
+			     FILE_SHARE_VALID_FLAGS, flags);
       else
 	{
 	  /* It's getting tricky.  The directory is opened in some process,
@@ -293,7 +281,7 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 	     and another one.  Three entries means, not empty.  This doesn't
 	     work for the root directory of a drive, but the root dir can
 	     neither be deleted, nor moved anyway. */
-	  status = NtOpenFile (&h, DELETE | SYNCHRONIZE | FILE_LIST_DIRECTORY,
+	  status = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
 	  if (NT_SUCCESS (status))
@@ -302,15 +290,15 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 				   + 3 * NAME_MAX * sizeof (WCHAR);
 	      PFILE_NAMES_INFORMATION pfni = (PFILE_NAMES_INFORMATION)
 					     alloca (bufsiz);
-	      status = NtQueryDirectoryFile (h, NULL, NULL, 0, &io, pfni,
+	      status = NtQueryDirectoryFile (fh, NULL, NULL, 0, &io, pfni,
 					     bufsiz, FileNamesInformation,
 					     FALSE, NULL, TRUE);
 	      if (!NT_SUCCESS (status))
 	        {
-		  NtClose (h);
+		  NtClose (fh);
 		  syscall_printf ("Checking if directory is empty failed, "
 				  "status = %p", status);
-		  return RtlNtStatusToDosError (status);
+		  return status;
 		}
 	      int cnt = 1;
 	      while (pfni->NextEntryOffset)
@@ -321,9 +309,9 @@ unlink_nt (path_conv &win32_name, bool setattrs)
 		}
 	      if (cnt > 2)
 	        {
-		  NtClose (h);
+		  NtClose (fh);
 		  syscall_printf ("Directory not empty");
-		  return ERROR_DIR_NOT_EMPTY;
+		  return STATUS_DIRECTORY_NOT_EMPTY;
 		}
 	    }
 	}
@@ -332,46 +320,46 @@ unlink_nt (path_conv &win32_name, bool setattrs)
     {
       if (status == STATUS_DELETE_PENDING)
 	{
-	  syscall_printf ("Delete already pending, status = %p", status);
+	  syscall_printf ("Delete already pending");
 	  return 0;
 	}
       syscall_printf ("Opening file for delete failed, status = %p", status);
-      return RtlNtStatusToDosError (status);
+      return status;
     }
 
-  if (setattrs)
-    SetFileAttributes (win32_name, (DWORD) win32_name);
+  if (move_to_bin && !pc.isremote ())
+    try_to_bin (pc, fh);
 
-  if (move_to_bin && !win32_name.isremote ())
-    try_to_bin (win32_name, h);
-
-  DWORD lasterr = 0;
-
-  if (win32_name.isdir () || win32_name.isremote ())
+  /* Get rid of read-only attributes. */
+  if (access & FILE_WRITE_ATTRIBUTES)
     {
-      FILE_DISPOSITION_INFORMATION disp = { TRUE };
-      status = NtSetInformationFile (h, &io, &disp, sizeof disp,
-				     FileDispositionInformation);
-      if (!NT_SUCCESS (status))
-	{
-	  syscall_printf ("Setting delete disposition failed, status = %p",
-			  status);
-	  lasterr = RtlNtStatusToDosError (status);
+      FILE_BASIC_INFORMATION fbi;
+      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
+      fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+      fbi.FileAttributes = pc.file_attributes ()
+			   & ~(FILE_ATTRIBUTE_READONLY
+			       | FILE_ATTRIBUTE_SYSTEM
+			       | FILE_ATTRIBUTE_HIDDEN);
+      NtSetInformationFile (fh, &io,  &fbi, sizeof fbi, FileBasicInformation);
+    }
+
+  FILE_DISPOSITION_INFORMATION disp = { TRUE };
+  status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
+				 FileDispositionInformation);
+  if (!NT_SUCCESS (status))
+    {
+      syscall_printf ("Setting delete disposition failed, status = %p", status);
+      /* Restore R/O attributes. */
+      if (access & FILE_WRITE_ATTRIBUTES)
+        {
+	  fbi.FileAttributes = pc.file_attributes ();
+	  NtSetInformationFile (fh, &io,  &fbi, sizeof fbi,
+				FileBasicInformation);
 	}
     }
 
-  status = NtClose (h);
-  if (!NT_SUCCESS (status))
-    {
-      /* Maybe that's really paranoid, but not being able to close the file
-	 also means that deleting fails. */
-      syscall_printf ("%p = NtClose (%p)", status, h);
-      if (!lasterr)
-	lasterr = RtlNtStatusToDosError (status);
-    }
-
-  syscall_printf ("Deleting succeeded");
-  return lasterr;
+  NtClose (fh);
+  return status;
 }
 
 extern "C" int
@@ -379,7 +367,7 @@ unlink (const char *ourname)
 {
   int res = -1;
   DWORD devn;
-  DWORD lasterr;
+  NTSTATUS status;
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW,
 			transparent_exe ? stat_suffixes : NULL);
@@ -412,30 +400,13 @@ unlink (const char *ourname)
       goto done;
     }
 
-  bool setattrs;
-  if (!((DWORD) win32_name & (FILE_ATTRIBUTE_READONLY
-			      | FILE_ATTRIBUTE_SYSTEM
-			      | FILE_ATTRIBUTE_HIDDEN)))
-    setattrs = false;
-  else
-    {
-      /* Allow us to delete even if read-only */
-      setattrs = SetFileAttributes (win32_name,
-				    (DWORD) win32_name
-				    & ~(FILE_ATTRIBUTE_READONLY
-					| FILE_ATTRIBUTE_SYSTEM
-					| FILE_ATTRIBUTE_HIDDEN));
-    }
-
-  lasterr = unlink_nt (win32_name, setattrs);
-  if (!lasterr)
+  status = unlink_nt (win32_name);
+  if (NT_SUCCESS (status))
     res = 0;
   else
     {
-      SetFileAttributes (win32_name, (DWORD) win32_name);
-
       /* FIXME: Can we get rid of the delqueue now? */
-      if (lasterr == ERROR_SHARING_VIOLATION)
+      if (status == STATUS_SHARING_VIOLATION)
 	{
 	  /* Add file to the "to be deleted" queue. */
 	  syscall_printf ("Sharing violation, couldn't delete file");
@@ -443,7 +414,7 @@ unlink (const char *ourname)
 	  res = 0;
 	}
       else
-	__seterrno_from_win_error (lasterr);
+	__seterrno_from_nt_status (status);
     }
 
  done:
@@ -1467,7 +1438,7 @@ rename (const char *oldpath, const char *newpath)
   else if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
 		       MOVEFILE_REPLACE_EXISTING))
     res = 0;
-  else if ((lasterr = unlink_nt (real_new, false)))
+  else if ((lasterr = unlink_nt (real_new)))
     {
       SetLastError (lasterr);
       syscall_printf ("Can't remove target file/dir, %E");
@@ -1503,7 +1474,7 @@ done:
       if (lnk_suffix)
 	{
 	  *lnk_suffix = '.';
-	  unlink_nt (real_new, false);
+	  unlink_nt (real_new);
 	}
       /* Shortcut hack, No. 3, part 2 */
       /* If a file with the given name exists, it must be deleted after the
@@ -1515,7 +1486,7 @@ done:
 	{
 	  lnk_suffix = strrchr (real_new.get_win32 (), '.');
 	  *lnk_suffix = '\0';
-	  unlink_nt (real_new, false);
+	  unlink_nt (real_new);
 	}
     }
 

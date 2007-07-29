@@ -1094,7 +1094,8 @@ fhandler_disk_file::link (const char *newpath)
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  status = NtOpenFile (&fh, 0, pc.get_object_attr (attr, sec_none_nih), &io,
+  status = NtOpenFile (&fh, FILE_ANY_ACCESS,
+		       pc.get_object_attr (attr, sec_none_nih), &io,
 		       FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_REPARSE_POINT);
   if (!NT_SUCCESS (status))
@@ -1182,7 +1183,7 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
   fbi.CreationTime.QuadPart = 0LL;
-  fbi.LastAccessTime= lastaccess;
+  fbi.LastAccessTime = lastaccess;
   fbi.LastWriteTime = lastwrite;
   fbi.ChangeTime.QuadPart = 0LL;
   fbi.FileAttributes = 0;
@@ -1318,11 +1319,7 @@ fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 /* FIXME: The correct way to do this to get POSIX locking semantics is to
    keep a linked list of posix lock requests and map them into Win32 locks.
    he problem is that Win32 does not deal correctly with overlapping lock
-   requests. Also another pain is that Win95 doesn't do non-blocking or
-   non-exclusive locks at all. For '95 just convert all lock requests into
-   blocking,exclusive locks.  This shouldn't break many apps but denying all
-   locking would.  For now just convert to Win32 locks and hope for
-   the best.  */
+   requests. */
 
 int
 fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
@@ -1471,17 +1468,31 @@ fhandler_disk_file::mkdir (mode_t mode)
     set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
 			    &sa, sd);
 
-  if (CreateDirectoryA (get_win32_name (), &sa))
-    {
+  NTSTATUS status;
+  HANDLE dir;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  ULONG fattr = FILE_ATTRIBUTE_DIRECTORY;
 #ifdef HIDDEN_DOT_FILES
-      char *c = strrchr (real_dir.get_win32 (), '\\');
-      if ((c && c[1] == '.') || *get_win32_name () == '.')
-	SetFileAttributes (get_win32_name (), FILE_ATTRIBUTE_HIDDEN);
+  UNICODE_STRING basename;
+
+  RtlSplitUnicodePath (pc.get_nt_native_path (), NULL, &basename);
+  if (basename.Buffer[0] == L'.')
+    fattr |= FILE_ATTRIBUTE_HIDDEN;
 #endif
+  status = NtCreateFile (&dir, FILE_LIST_DIRECTORY | SYNCHRONIZE,
+			 pc.get_object_attr (attr, sa), &io, NULL,
+			 fattr, FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			 FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT
+			 | FILE_OPEN_FOR_BACKUP_INTENT,
+			 NULL, 0);
+  if (NT_SUCCESS (status))
+    {
+      NtClose (dir);
       res = 0;
     }
   else
-    __seterrno ();
+    __seterrno_from_nt_status (status);
 
   return res;
 }
@@ -1489,47 +1500,43 @@ fhandler_disk_file::mkdir (mode_t mode)
 int
 fhandler_disk_file::rmdir ()
 {
-  extern DWORD unlink_nt (path_conv &win32_name, bool setattrs);
-
-  int res = -1;
+  extern NTSTATUS unlink_nt (path_conv &pc);
 
   if (!pc.isdir ())
     {
       set_errno (ENOTDIR);
       return -1;
     }
-  /* Even own directories can't be removed if R/O attribute is set. */
-  if (pc.has_attribute (FILE_ATTRIBUTE_READONLY))
-    SetFileAttributes (get_win32_name (),
-		       (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
-
-  DWORD err, att = 0;
-
-  int rc = !(err = unlink_nt (pc, pc.has_attribute (FILE_ATTRIBUTE_READONLY)));
-  if (err)
-    SetLastError (err);
-
-  if (isremote () && exists ())
-    att = GetFileAttributes (get_win32_name ());
-
-  /* Sometimes smb indicates failure when it really succeeds, so check for
-     this case specifically. */
-  if (rc || att == INVALID_FILE_ATTRIBUTES)
+  if (!pc.exists ())
     {
-      /* RemoveDirectory on a samba drive doesn't return an error if the
-	 directory can't be removed because it's not empty. Checking for
-	 existence afterwards keeps us informed about success. */
-      if (!isremote () || att == INVALID_FILE_ATTRIBUTES)
-	return 0;
-
-      err = ERROR_DIR_NOT_EMPTY;
+      set_errno (ENOENT);
+      return -1;
     }
-  else
-    err = GetLastError ();
 
-  __seterrno_from_win_error (err);
+  NTSTATUS status = unlink_nt (pc);
 
-  return res;
+  /* Check for existence of remote dirs after trying to delete them.
+     Two reasons:
+     - Sometimes SMB indicates failure when it really succeeds.
+     - Removeing a directory on a samba drive doesn't return an error if the
+       directory can't be removed because it's not empty.  */
+  if (isremote ())
+    {
+      OBJECT_ATTRIBUTES attr;
+      FILE_BASIC_INFORMATION fbi;
+
+      if (NT_SUCCESS (NtQueryAttributesFile
+			    (pc.get_object_attr (attr, sec_none_nih), &fbi)))
+	status = STATUS_DIRECTORY_NOT_EMPTY;
+      else
+        status = STATUS_SUCCESS;
+    }
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
 }
 
 /* This is the minimal number of entries which fit into the readdir cache.

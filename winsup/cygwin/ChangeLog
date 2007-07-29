@@ -1,5 +1,25 @@
 2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Use FILE_ANY_ACCESS.
+	(fhandler_base::utimes_fs): Fix white space.
+	(fhandler_disk_file::lock): Remove 9x blurb from comment.
+	(fhandler_disk_file::mkdir): Use NtCreateFile/NtClose instead of
+	CreateDirectoryA.
+	(fhandler_disk_file::rmdir): Accommodate changes to unlink_nt.
+	Simplify post-delete SMB-related tests.  Use NtQueryAttributesFile
+	instead of GetFileAttributes.
+	* ntdll.h (STATUS_DIRECTORY_NOT_EMPTY): Define.
+	(NtQueryAttributesFile): Declare.
+	* syscalls.cc (unlink_nt): Return NTSTATUS.  Drop setattrs parameter.
+	Never use FILE_DELETE_ON_CLOSE, always use
+	NtSetInformationFile(FileDispositionInformation) instead.
+	Check for R/O attributes and open file with FILE_WRITE_ATTRIBUTES
+	access if any of them are set.  Remove R/O attributes before
+	marking for delete if necessary.  Revert them afterwards if necessary.
+	(unlink): Accommodate changes to unlink_nt.
+
+2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc: Use get_handle throughout.
 	(fhandler_disk_file::fchmod): Always try to open file with required
 	access rights.  Use NtSetInformationFile instead of SetFileAttributes.
