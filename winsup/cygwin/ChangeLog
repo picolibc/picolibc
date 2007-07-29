@@ -1,3 +1,8 @@
+2007-07-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Handle read EOF better
+	and issue a SIGPIPE when we get ERROR_NO_DATA.
+
 2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Don't allow

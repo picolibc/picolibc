@@ -1699,8 +1699,15 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 {
   if (bytes)
     *bytes = (DWORD) -1;
-  if (!res && GetLastError () != ERROR_IO_PENDING)
-    __seterrno ();
+  DWORD err = GetLastError ();
+  if (!res && err != ERROR_IO_PENDING)
+    {
+      if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
+	goto err;
+      res = 1;
+      if (*bytes)
+	*bytes = 0;
+    }
   else
     {
 #ifdef DEBUGGING
@@ -1723,8 +1730,8 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 	    res = 1;
 	  else
 	    {
-	      __seterrno ();
-	      res = -1;
+	      err = GetLastError ();
+	      goto err;
 	    }
 	  break;
 	case WAIT_OBJECT_0 + 1:
@@ -1733,11 +1740,19 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 	  res = 0;
 	  break;
 	default:
-	  __seterrno ();
-	  res = -1;
+	  err = GetLastError ();
+	  goto err;
 	  break;
 	}
     }
+  goto out;
+
+err:
+  __seterrno_from_win_error (err);
+  res = -1;
+  if (err == ERROR_NO_DATA)
+    raise (SIGPIPE);
+out:
   ResetEvent (get_overlapped ()->hEvent);
   return res;
 }
