@@ -238,12 +238,10 @@ unlink_nt (path_conv &pc)
   FILE_BASIC_INFORMATION fbi;
 
   ACCESS_MASK access = DELETE;
-  /* If one of the R/O attributes is set, we have to open the file with
-     FILE_WRITE_ATTRIBUTES to be able to remove these flags before trying
+  /* If the R/O attribute is set, we have to open the file with
+     FILE_WRITE_ATTRIBUTES to be able to remove this flags before trying
      to delete it. */
-  if (pc.file_attributes () & (FILE_ATTRIBUTE_READONLY
-			       | FILE_ATTRIBUTE_SYSTEM
-			       | FILE_ATTRIBUTE_HIDDEN))
+  if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
     access |= FILE_WRITE_ATTRIBUTES;
 
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
@@ -330,16 +328,14 @@ unlink_nt (path_conv &pc)
   if (move_to_bin && !pc.isremote ())
     try_to_bin (pc, fh);
 
-  /* Get rid of read-only attributes. */
+  /* Get rid of read-only attribute. */
   if (access & FILE_WRITE_ATTRIBUTES)
     {
       FILE_BASIC_INFORMATION fbi;
       fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
       fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-      fbi.FileAttributes = pc.file_attributes ()
-			   & ~(FILE_ATTRIBUTE_READONLY
-			       | FILE_ATTRIBUTE_SYSTEM
-			       | FILE_ATTRIBUTE_HIDDEN);
+      fbi.FileAttributes = (pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY)
+			   ?: FILE_ATTRIBUTE_NORMAL;
       NtSetInformationFile (fh, &io,  &fbi, sizeof fbi, FileBasicInformation);
     }
 
@@ -349,13 +345,22 @@ unlink_nt (path_conv &pc)
   if (!NT_SUCCESS (status))
     {
       syscall_printf ("Setting delete disposition failed, status = %p", status);
-      /* Restore R/O attributes. */
       if (access & FILE_WRITE_ATTRIBUTES)
-        {
+	{
+	  /* Restore R/O attributes. */
 	  fbi.FileAttributes = pc.file_attributes ();
 	  NtSetInformationFile (fh, &io,  &fbi, sizeof fbi,
 				FileBasicInformation);
 	}
+    }
+  else if ((access & FILE_WRITE_ATTRIBUTES) && !pc.isdir ())
+    {
+      /* Restore R/O attribute to accommodate hardlinks.  Don't try this
+	 with directories!  For some reason the below NtSetInformationFile
+	 changes the disposition for delete back to FALSE, at least on XP. */
+      fbi.FileAttributes = pc.file_attributes ();
+      NtSetInformationFile (fh, &io,  &fbi, sizeof fbi,
+			    FileBasicInformation);
     }
 
   NtClose (fh);

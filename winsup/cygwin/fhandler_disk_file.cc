@@ -776,7 +776,7 @@ fhandler_disk_file::fchmod (mode_t mode)
   FILE_BASIC_INFORMATION fbi;
   fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
   = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-  fbi.FileAttributes = pc.file_attributes ();
+  fbi.FileAttributes = pc.file_attributes () ?: FILE_ATTRIBUTE_NORMAL;
   NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
 					  FileBasicInformation);
   if (!NT_SUCCESS (status))
@@ -914,8 +914,9 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 		    = fbi.LastAccessTime.QuadPart
 		    = fbi.LastWriteTime.QuadPart
 		    = fbi.ChangeTime.QuadPart = 0LL;
-		    fbi.FileAttributes = pc.file_attributes ()
-		    			 & ~FILE_ATTRIBUTE_READONLY;
+		    fbi.FileAttributes = (pc.file_attributes ()
+					  & ~FILE_ATTRIBUTE_READONLY)
+					 ?: FILE_ATTRIBUTE_NORMAL;
 		    NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
 					  FileBasicInformation);
 		  }
@@ -1124,6 +1125,10 @@ fhandler_disk_file::link (const char *newpath)
 	      __seterrno ();
 	      return -1;
 	    }
+	  if (!allow_winsymlinks && pc.is_lnk_special ())
+	    SetFileAttributesW (newpcw, pc.file_attributes ()
+					| FILE_ATTRIBUTE_SYSTEM
+					| FILE_ATTRIBUTE_READONLY);
 	}
       else
         {
@@ -1131,10 +1136,6 @@ fhandler_disk_file::link (const char *newpath)
 	  return -1;
 	}
     }
-  if (!allow_winsymlinks && pc.is_lnk_special ())
-    SetFileAttributes (newpc, (DWORD) pc
-			       | FILE_ATTRIBUTE_SYSTEM
-			       | FILE_ATTRIBUTE_READONLY);
   return 0;
 }
 

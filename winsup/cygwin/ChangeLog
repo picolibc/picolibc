@@ -1,5 +1,18 @@
 2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Don't allow
+	FileAttributes set to 0 when calling NtSetInformationFile since it has
+	a special meaning.
+	(fhandler_disk_file::facl): Ditto.
+	(fhandler_disk_file::link): Only set attributes after copying files.
+	Use SetFileAttributesW.
+	* syscalls.cc (unlink_nt): Only care for actual FILE_ATTRIBUTE_READONLY.
+	Don't allow FileAttributes set to 0 when calling NtSetInformationFile.
+	After marking for deletion, restore R/O attribute on files to
+	accommodate hardlinks.
+
+2007-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Use FILE_ANY_ACCESS.
 	(fhandler_base::utimes_fs): Fix white space.
 	(fhandler_disk_file::lock): Remove 9x blurb from comment.
