@@ -139,7 +139,7 @@ class fhandler_base
   DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
-  bool wait_overlapped (bool&, bool) __attribute__ ((regparm (2)));
+  int wait_overlapped (bool&, bool, DWORD *) __attribute__ ((regparm (3)));
   bool setup_overlapped () __attribute__ ((regparm (1)));
   void destroy_overlapped () __attribute__ ((regparm (1)));
 

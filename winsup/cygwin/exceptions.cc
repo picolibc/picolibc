@@ -282,13 +282,13 @@ stackdump (DWORD ebp, int open_file, bool isexception)
 	      i == 16 ? " (more stack frames may be present)" : "");
 }
 
-static bool
-inside_kernel (CONTEXT *cx)
+bool
+_cygtls::inside_kernel (CONTEXT *cx)
 {
   int res;
   MEMORY_BASIC_INFORMATION m;
 
-  if (!_my_tls.isinitialized ())
+  if (!isinitialized ())
     return true;
 
   memset (&m, 0, sizeof m);
@@ -627,7 +627,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	    error_code |= 1;
 	  if (e->ExceptionInformation[0])	/* Write access */
 	    error_code |= 2;
-	  if (!inside_kernel (in))		/* User space */
+	  if (!me.inside_kernel (in))		/* User space */
 	    error_code |= 4;
 	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
 			  __progname, myself->pid,

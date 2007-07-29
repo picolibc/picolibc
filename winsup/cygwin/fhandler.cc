@@ -1694,9 +1694,11 @@ fhandler_base::destroy_overlapped ()
     }
 }
 
-bool
-fhandler_base::wait_overlapped (bool& res, bool writing)
+int
+fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 {
+  if (bytes)
+    *bytes = (DWORD) -1;
   if (!res && GetLastError () != ERROR_IO_PENDING)
     __seterrno ();
   else
@@ -1712,15 +1714,27 @@ fhandler_base::wait_overlapped (bool& res, bool writing)
       w4[0] = get_overlapped ()->hEvent;
       if (&_my_tls == _main_tls)
 	w4[n++] = signal_arrived;
+      HANDLE h = writing ? get_output_handle () : get_handle ();
       switch (WaitForMultipleObjects (n, w4, false, INFINITE))
 	{
 	case WAIT_OBJECT_0:
-	  res = true;
+	  if (!bytes ||
+	      GetOverlappedResult (h, get_overlapped (), bytes, false))
+	    res = 1;
+	  else
+	    {
+	      __seterrno ();
+	      res = -1;
+	    }
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  CancelIo (writing ? get_output_handle () : get_handle ());
+	  CancelIo (h);
 	  set_errno (EINTR);
-	  res = false;
+	  res = 0;
+	  break;
+	default:
+	  __seterrno ();
+	  res = -1;
 	  break;
 	}
     }
@@ -1735,11 +1749,14 @@ fhandler_base::read_overlapped (void *ptr, size_t& len)
   assert (get_overlapped ());
   assert (get_overlapped ()->hEvent);
 #endif
-  bool res = ReadFile (get_handle (), ptr, len, (DWORD *) &len,
-		       get_overlapped ());
-  if (!wait_overlapped (res, false)
-      || !GetOverlappedResult (get_handle (), get_overlapped (), (DWORD *) &len, false))
-    len = 0;
+  while (1)
+    {
+      bool res = ReadFile (get_handle (), ptr, len, (DWORD *) &len,
+			   get_overlapped ());
+      int wres = wait_overlapped (res, false, (DWORD *) &len);
+      if (wres || !_my_tls.call_signal_handler ())
+	break;
+    }
 }
 
 int
@@ -1747,11 +1764,15 @@ fhandler_base::write_overlapped (const void *ptr, size_t len)
 {
   DWORD bytes_written;
 
-  bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
-			get_overlapped ());
-  if (!wait_overlapped (res, true)
-      || !GetOverlappedResult (get_handle (), get_overlapped (),
-			       &bytes_written, false))
-    return -1;
+  while (1)
+    {
+      bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
+			    get_overlapped ());
+      int wres = wait_overlapped (res, true, &bytes_written);
+      if (wres < 0)
+	return -1;
+      if (wres || !_my_tls.call_signal_handler ())
+	break;
+    }
   return bytes_written;
 }

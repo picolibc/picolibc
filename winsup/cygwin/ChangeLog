@@ -1,3 +1,19 @@
+2007-07-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.h (_cygtls::inside_kernel): Move function declaration into
+	_cygtls class.
+	* exceptions.cc (_cygtls::inside_kernel): Move function definition into
+	_cygtls class.
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Make return tri-state
+	to detect when there is a EINTR situation.  Add a pointer to a length
+	parameter.  Move GetOverlappedResult into this function.
+	(fhandler_base::read_overlapped): Accommodate above changes and loop if
+	we receive a restartable signal.
+	(fhandler_base::write_overlapped): Ditto.
+	* fhandler.h (fhandler_base::wait_overlapped): Reflect above changes.
+	* fhandler_fifo.cc (fhandler_fifo::wait): Ditto.
+
 2007-07-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (RtlEqualUnicodePathPrefix): Rename from RtlEqualPathPrefix.
