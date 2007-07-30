@@ -1202,22 +1202,23 @@ int __stdcall
 stat_worker (path_conv &pc, struct __stat64 *buf)
 {
   int res = -1;
-  fhandler_base *fh = NULL;
 
   myfault efault;
   if (efault.faulted (EFAULT))
     goto error;
 
-  if (!(fh = build_fh_pc (pc)))
-    goto error;
-
-  if (fh->error ())
+  if (pc.error)
     {
-      debug_printf ("got %d error from build_fh_name", fh->error ());
-      set_errno (fh->error ());
+      debug_printf ("got %d error from build_fh_name", pc.error);
+      set_errno (pc.error);
     }
-  else if (fh->exists ())
+  else if (pc.exists ())
     {
+      fhandler_base *fh;
+
+      if (!(fh = build_fh_pc (pc)))
+	goto error;
+
       debug_printf ("(%s, %p, %p), file_attributes %d",
 		    pc.normalized_path, buf, fh, (DWORD) *fh);
       memset (buf, 0, sizeof (*buf));
@@ -1231,14 +1232,14 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
+      delete fh;
     }
   else
     set_errno (ENOENT);
 
-  delete fh;
  error:
   MALLOC_CHECK;
-  syscall_printf ("%d = (%s, %p)", res, pc.normalized_path, buf);
+  syscall_printf ("%d = (%s, %p)", res, pc.normalized_path ?: "", buf);
   return res;
 }
 

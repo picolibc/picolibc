@@ -1,3 +1,7 @@
+2007-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (stat_worker): Don't call build_fh_pc with invalid pc.
+
 2007-07-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::wait_overlapped): Handle read EOF better
