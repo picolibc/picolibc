@@ -841,6 +841,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 
   if (!pc.has_acls () || !allow_ntsec)
     {
+cant_access_acl:
       switch (cmd)
 	{
 	  struct __stat64 st;
@@ -895,9 +896,13 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     {
       if (!get_handle ())
 	{
-	  query_open (cmd == SETACL ? query_write_control : query_read_attributes);
+	  query_open (cmd == SETACL ? query_write_control : query_read_control);
 	  if (!(oret = open (O_BINARY, 0)))
-	    return -1;
+	    {
+	      if (cmd == GETACL || cmd == GETACLCNT)
+		goto cant_access_acl;
+	      return -1;
+	    }
 	}
       switch (cmd)
 	{

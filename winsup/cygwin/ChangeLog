@@ -1,5 +1,13 @@
 2007-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): If file can't be
+	opened for reading the ACLs, fall back to faking them.
+	* sec_acl.cc (acl_worker): Handle non-existing files.
+	* security.cc (get_file_attribute): Return ILLEGAL_UID/ILLEGAL_GID
+	as owner/group for non-readable ACLs on file systems supporting them.
+
+2007-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (stat_worker): Don't call build_fh_pc with invalid pc.
 
 2007-07-29  Christopher Faylor  <me+cygwin@cgf.cx>

@@ -336,6 +336,15 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 	  get_info_from_sd (sd, attribute, uidret, gidret);
 	  return 0;
 	}
+      else
+        {
+	  if (uidret)
+	    *uidret = ILLEGAL_UID;
+	  if (gidret)
+	    *gidret = ILLEGAL_GID;
+
+	  return -1;
+	}
     }
 
   if (uidret)

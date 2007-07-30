@@ -407,6 +407,8 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
+  else if (!fh->exists ())
+    set_errno (ENOENT);
   else
     res = fh->facl (cmd, nentries, aclbufp);
 
