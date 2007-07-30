@@ -210,6 +210,7 @@ GetTextCharsetInfo@12
 GetTextColor@4
 GetTextExtentExPointA@28
 GetTextExtentExPointW@28
+GetTextExtentExPointI@28
 GetTextExtentPoint32A@16
 GetTextExtentPoint32W@16
 GetTextExtentPointA@16

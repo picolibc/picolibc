@@ -1,3 +1,8 @@
+2007-7-30  Martijn Wargers  <martijnw22@users.sourceforge.net>
+
+	* include/wingdi.h (GetTextExtentExPointI): Add prototype.
+	* lib/gdi32.def (GetTextExtentExPointI@28): Add export.
+
 2007-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wtypes.h (LPDECIMAL): Define.
