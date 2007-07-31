@@ -34,7 +34,8 @@ BOOL WINAPI WTSUnRegisterSessionNotification(HWND hWnd);
 #if (_WIN32_WINNT >= 0x0500)
 
 // WTSWaitSystemEvent local server handle
-#define WTS_CURRENT_SERVER_HANDLE	0
+#define WTS_CURRENT_SERVER_HANDLE 0
+#define WTS_CURRENT_SESSION       0
 
 // WTSWaitSystemEvent flags
 #define WTS_EVENT_NONE				0x00000000
@@ -51,6 +52,7 @@ BOOL WINAPI WTSUnRegisterSessionNotification(HWND hWnd);
 #define WTS_EVENT_FLUSH				0x80000000
 
 BOOL WINAPI WTSWaitSystemEvent(HANDLE hServer, DWORD EventMask, DWORD* pEventFlags);
+BOOL WINAPI WTSDisconnectSession(HANDLE hServer, DWORD SessionId, BOOL bWait);
 #endif /* _WIN32_WINNT >= 0x0500 */
 
 #ifdef __cplusplus
