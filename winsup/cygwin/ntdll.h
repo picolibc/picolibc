@@ -790,6 +790,8 @@ extern "C"
   ULONG WINAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
   BOOLEAN NTAPI RtlEqualUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 				       BOOLEAN);
+  VOID NTAPI RtlFreeAnsiString (PANSI_STRING);
+  VOID NTAPI RtlFreeOemString (POEM_STRING);
   VOID NTAPI RtlFreeUnicodeString (PUNICODE_STRING);
   VOID NTAPI RtlInitEmptyUnicodeString (PUNICODE_STRING, PCWSTR, USHORT);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
@@ -800,6 +802,10 @@ extern "C"
   BOOLEAN NTAPI RtlPrefixUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 					BOOLEAN);
   VOID NTAPI RtlSecondsSince1970ToTime (ULONG, PLARGE_INTEGER);
+  NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,
+					       BOOLEAN);
+  NTSTATUS NTAPI RtlUnicodeStringToOemString (PANSI_STRING, PUNICODE_STRING,
+					      BOOLEAN);
 
   /* A few Rtl functions are either actually macros, or they just don't
      exist even though they would be a big help.  We implement them here

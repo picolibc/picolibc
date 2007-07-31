@@ -1,6 +1,6 @@
-/* smallprint.c: small print routines for WIN32
+/* smallprint.cc: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,14 +9,10 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "ntdll.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-int __small_sprintf (char *dst, const char *fmt, ...);
-int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)
@@ -30,7 +26,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
   unsigned long long uval = 0;
   char res[20];
-  static const char str[16] = "0123456789ABCDEF";
+  static const char str[] = "0123456789ABCDEF";
   int l = 0;
 
   if (dosign && val < 0)
@@ -64,7 +60,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
   return dst;
 }
 
-int
+extern "C" int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
   char tmp[CYG_MAX_PATH + 1];
@@ -125,6 +121,21 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		      }
 		  }
 		  break;
+		case 'C':
+		  {
+		    WCHAR wc = (WCHAR) va_arg (ap, int);
+		    char buf[4], *c;
+		    sys_wcstombs (buf, 4, &wc, 1);
+		    for (c = buf; *c; ++c)
+		      if (isprint (*c))
+			*dst++ = *c;
+		      else
+			{
+			  *dst++ = '0';
+			  *dst++ = 'x';
+			  dst = __rn (dst, 16, 0, *c, len, pad, LMASK);
+			}
+		  }
 		case 'E':
 		  strcpy (dst, "Win32 error ");
 		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
@@ -160,6 +171,29 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  else
 		    s = tmp;
 		  goto fillin;
+		case 'S':
+		  {
+		    PUNICODE_STRING us = va_arg (ap, PUNICODE_STRING);
+		    ANSI_STRING as = { 0, 0, NULL };
+		    NTSTATUS status;
+
+		    if (current_codepage == ansi_cp)
+		      status = RtlUnicodeStringToAnsiString (&as, us, TRUE);
+		    else
+		      status = RtlUnicodeStringToOemString (&as, us, TRUE);
+		    if (!NT_SUCCESS (status))
+		      {
+			s = "invalid UNICODE_STRING";
+			goto fillin;
+		      }
+		    for (i = 0; i < as.Length; ++i)
+		      *dst++ = as.Buffer[i];
+		    if (current_codepage == ansi_cp)
+		      RtlFreeAnsiString (&as);
+		    else
+		      RtlFreeOemString (&as);
+		  }
+		  break;
 		case '.':
 		  n = strtol (fmt, (char **) &fmt, 10);
 		  if (*fmt++ != 's')
@@ -186,7 +220,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   return dst - orig;
 }
 
-int
+extern "C" int
 __small_sprintf (char *dst, const char *fmt, ...)
 {
   int r;
@@ -197,7 +231,7 @@ __small_sprintf (char *dst, const char *fmt, ...)
   return r;
 }
 
-void
+extern "C" void
 small_printf (const char *fmt, ...)
 {
   char buf[16384];
@@ -224,7 +258,7 @@ small_printf (const char *fmt, ...)
 
 #ifdef DEBUGGING
 static HANDLE NO_COPY console_handle = NULL;
-void
+extern "C" void
 console_printf (const char *fmt, ...)
 {
   char buf[16384];

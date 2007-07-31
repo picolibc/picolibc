@@ -1,5 +1,16 @@
 2007-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (RtlFreeAnsiString): Declare.
+	* ntdll.h (RtlFreeOemString): Declare.
+	* ntdll.h (RtlUnicodeStringToAnsiString): Declare.
+	* ntdll.h (RtlUnicodeStringToOemString): Declare.
+	* smallprint.cc: Renamed from smallprint.c.  Drop unnecessary
+	forward declarations.
+	(__small_vsprintf): Add format specifiers 'C' for WCHAR arguments
+	and 'S' for PUNICODE_STRING arguments.
+
+2007-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Revert to checking
 	for binary in case of .exe files.
 	* ntdll.h (RtlPrefixUnicodeString): Declare.
