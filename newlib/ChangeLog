@@ -1,3 +1,11 @@
+2007-07-31  Eric Blake  <ebb9@byu.net>
+
+	More POSIX stream corner cases.
+	* libc/stdio/findfp.c (__sinit): Open stderr read/write.
+	* libc/stdio/fdopen.c (_fdopen_r): Set O_APPEND on fd when
+	requested.
+	* libc/stdio64/fdopen64.c (_fdopen64_r): Likewise.
+
 2007-07-18  Eric Blake  <ebb9@byu.net>
 
 	Fix 'make info'.

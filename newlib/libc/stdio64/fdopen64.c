@@ -67,17 +67,14 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
   _flockfile(fp);
 
   fp->_flags = flags;
-  /*
-   * If opened for appending, but underlying descriptor
-   * does not have O_APPEND bit set, assert __SAPP so that
-   * __swrite() will lseek to end before each write.
-   */
-  if ((oflags & O_APPEND)
+  /* POSIX recommends setting the O_APPEND bit on fd to match append
+     streams.  Someone may later clear O_APPEND on fileno(fp), but the
+     stream must still remain in append mode.  Rely on __sflags
+     setting __SAPP properly.  */
 #ifdef HAVE_FCNTL
-       && !(fdflags & O_APPEND)
+  if ((oflags & O_APPEND) && !(fdflags & O_APPEND))
+    _fcntl_r (ptr, fd, F_SETFL, fdflags | O_APPEND);
 #endif
-      )
-    fp->_flags |= __SAPP;
   fp->_file = fd;
   fp->_cookie = (_PTR) fp;
 

@@ -204,16 +204,21 @@ _DEFUN(__sinit, (s),
 
   std (s->_stdin,  __SRD, 0, s);
 
-  /* on platforms that have true file system I/O, we can verify whether stdout
-     is an interactive terminal or not.  For all other platforms, we will
-     default to line buffered mode here.  */
+  /* On platforms that have true file system I/O, we can verify
+     whether stdout is an interactive terminal or not, as part of
+     __smakebuf on first use of the stream.  For all other platforms,
+     we will default to line buffered mode here.  Technically, POSIX
+     requires both stdin and stdout to be line-buffered, but tradition
+     leaves stdin alone on systems without fcntl.  */
 #ifdef HAVE_FCNTL
   std (s->_stdout, __SWR, 1, s);
 #else
   std (s->_stdout, __SWR | __SLBF, 1, s);
 #endif
 
-  std (s->_stderr, __SWR | __SNBF, 2, s);
+  /* POSIX requires stderr to be opened for reading and writing, even
+     when the underlying fd 2 is write-only.  */
+  std (s->_stderr, __SRW | __SNBF, 2, s);
 
   __sinit_lock_release ();
 }
