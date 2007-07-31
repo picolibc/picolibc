@@ -1,3 +1,14 @@
+2007-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Revert to checking
+	for binary in case of .exe files.
+	* ntdll.h (RtlPrefixUnicodeString): Declare.
+	* path.cc (path_conv::is_binary): New method.
+	* path.h (path_conv::is_binary): Declare.
+	* syscalls.cc (rename_append_suffix): New static helper function for
+	rename.
+	(rename): Rewrite.  New suffix tests.  Use native NT functions.
+
 2007-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::facl): If file can't be

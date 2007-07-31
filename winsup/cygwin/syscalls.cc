@@ -1321,184 +1321,199 @@ access (const char *fn, int flags)
   return res;
 }
 
+static void
+rename_append_suffix (path_conv &pc, const char *path, size_t len,
+		      const char *suffix)
+{
+  char buf[len + 5];
+
+  if (strcasematch (path + len - 4, ".lnk")
+      || strcasematch (path + len - 4, ".exe"))
+    len -= 4;
+  stpcpy (stpncpy (buf, path, len), suffix);
+  pc.check (buf, PC_SYM_NOFOLLOW);
+}
+
 extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
-  int res = 0;
-  char *lnk_suffix = NULL;
-  bool no_lnk_file_exists = false;
-
-  path_conv real_old (oldpath, PC_SYM_NOFOLLOW,
-		      transparent_exe ? stat_suffixes : NULL);
-
-  if (real_old.error)
+  int res = -1;
+  path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
+  bool old_explicit_suffix = false, new_explicit_suffix = false;
+  size_t olen, nlen;
+  NTSTATUS status;
+  HANDLE fh;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  ULONG size;
+  PFILE_RENAME_INFORMATION pfri;
+  
+  oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+  if (oldpc.error)
     {
-      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
-      set_errno (real_old.error);
-      return -1;
+      set_errno (oldpc.error);
+      goto out;
     }
-
-  if (!real_old.exists ()) /* file to move doesn't exist */
+  if (!oldpc.exists ())
     {
-      syscall_printf ("file to move doesn't exist");
       set_errno (ENOENT);
-      return -1;
+      goto out;
     }
+  olen = strlen (oldpath);
+  if (oldpc.known_suffix
+      && (strcasematch (oldpath + olen - 4, ".lnk")
+	  || strcasematch (oldpath + olen - 4, ".exe")))
+    old_explicit_suffix = true;
 
-  path_conv real_new (newpath, PC_SYM_NOFOLLOW,
-		      transparent_exe ? stat_suffixes : NULL);
-
-  char new_buf[CYG_MAX_PATH + 5];
-  if (!real_new.error && !real_new.case_clash)
+  newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
+  if (newpc.error)
     {
-      DWORD bintype;
-      int len;
+      set_errno (newpc.error);
+      goto out;
+    }
+  if (newpc.isspecial ()) /* No renames out of the FS */
+    {
+      set_errno (EROFS);
+      goto out;
+    }
+  nlen = strlen (newpath);
+  if (newpc.known_suffix
+      && (strcasematch (newpath + nlen - 4, ".lnk")
+	  || strcasematch (newpath + nlen - 4, ".exe")))
+    new_explicit_suffix = true;
 
-      if (real_old.is_lnk_special ())
+  if (oldpc.isdir ())
+    {
+      if (newpc.exists () && !newpc.isdir ())
 	{
-	  if (real_new.exists ())
+	  set_errno (ENOTDIR);
+	  goto out;
+	}
+      /* Check for newpath being a subdir of oldpath. */
+      if (RtlPrefixUnicodeString (oldpc.get_nt_native_path (),
+				  newpc.get_nt_native_path (),
+				  TRUE)
+	  && newpc.get_nt_native_path ()->Length >
+	     oldpc.get_nt_native_path ()->Length
+	  && *(PWCHAR) ((PBYTE) newpc.get_nt_native_path ()->Buffer
+	  		+ oldpc.get_nt_native_path ()->Length) == L'\\')
+	{
+	  set_errno (EINVAL);
+	  goto out;
+	}
+    }
+  else if (!newpc.exists ())
+    {
+      if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				 newpc.get_nt_native_path (),
+				 TRUE)
+	  && old_explicit_suffix != new_explicit_suffix)
+	{
+	  newpc.check (newpath, PC_SYM_NOFOLLOW);
+	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				     newpc.get_nt_native_path (),
+				     TRUE))
 	    {
-	      /* This early directory test is necessary because the below test
-		 tests against the name with attached .lnk suffix.  To avoid
-		 name collisions, we shouldn't rename a file to "foo.lnk"
-		 if a "foo" directory exists. */
-	      if (real_new.isdir ())
-		{
-		  syscall_printf ("newpath is directory, but oldpath is not");
-		  set_errno (EISDIR);
-		  return -1;
-		}
-	      /* Shortcut hack, No. 3, part 1 */
-	      no_lnk_file_exists = true;
+	      res = 0;
+	      goto out;
 	    }
-	  /* Shortcut hack. */
-	  strcpy (new_buf, newpath);
-	  strcat (new_buf, ".lnk");
-	  newpath = new_buf;
-	  real_new.check (newpath, PC_SYM_NOFOLLOW);
 	}
-      else if (transparent_exe
-	       && !real_old.isdir ()
-	       && GetBinaryType (real_old, &bintype)
-	       && (len = strlen (real_new)) > 4
-	       && !strcasematch ((const char *) real_new + len - 4, ".exe"))
-	{
-	  /* Executable hack. */
-	  strcpy (new_buf, newpath);
-	  strcat (new_buf, ".exe");
-	  newpath = new_buf;
-	  real_new.check (newpath, PC_SYM_NOFOLLOW);
-	}
+      else if (oldpc.is_lnk_symlink ()
+	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					      L".lnk", TRUE))
+      	rename_append_suffix (newpc, newpath, nlen, ".lnk");
+      else if (oldpc.is_binary ()
+	   && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					  L".exe", TRUE))
+	/* NOTE: No way to rename an executable foo.exe to foo. */
+      	rename_append_suffix (newpc, newpath, nlen, ".exe");
     }
-
-  if (real_new.error || real_new.case_clash)
+  else if (newpc.isdir ())
     {
-      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
-      set_errno (real_new.case_clash ? ECASECLASH : real_new.error);
-      return -1;
-    }
-
-  if (real_new.isdir () && !real_old.isdir ())
-    {
-      syscall_printf ("newpath is directory, but oldpath is not");
       set_errno (EISDIR);
-      return -1;
-    }
-
-  /* Destination file exists and is read only, change that or else
-     the rename won't work. */
-  if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
-    SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
-
-  /* Shortcut hack No. 2, part 1 */
-  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_special ()
-      && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
-     *lnk_suffix = '\0';
-
-  if (MoveFile (real_old, real_new))
-    goto done;
-
-  res = -1;
-
-  /* Test for an attempt to make a directory a subdirectory of itself first.
-     This test has to be made before any attempt to remove the potentially
-     existing file or directory real_new.  Otherwise we end up with a
-     non-moved directory *and* a deleted read_new path.  Also this case
-     has to generate an EINVAL in all circumstances,
-
-     NB: We could test this also before calling MoveFile but the idea is
-     that this is a somewhat seldom case and we like to avoid expensive
-     string comparison.  So we allow MoveFile to fail and test the error
-     code instead.
-
-     The order in the condition is (hopefully) trimmed for doing the least
-     expensive stuff first. */
-  int len;
-  DWORD lasterr;
-  lasterr = GetLastError ();
-  if (real_old.isdir ()
-      && lasterr == ERROR_SHARING_VIOLATION
-      && (len = strlen (real_old), strncasematch (real_old, real_new, len))
-      && real_new[len] == '\\')
-    SetLastError (ERROR_INVALID_PARAMETER);
-  else if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
-		       MOVEFILE_REPLACE_EXISTING))
-    res = 0;
-  else if ((lasterr = unlink_nt (real_new)))
-    {
-      SetLastError (lasterr);
-      syscall_printf ("Can't remove target file/dir, %E");
-    }
-  else if (MoveFile (real_old, real_new))
-    res = 0;
-
-done:
-  if (res)
-    {
-      __seterrno ();
-      /* Reset R/O attributes if neccessary. */
-      if (real_new.has_attribute (FILE_ATTRIBUTE_READONLY))
-	SetFileAttributes (real_new, real_new);
+      goto out;
     }
   else
     {
-      /* make the new file have the permissions of the old one */
-      DWORD attr = real_old;
-#ifdef HIDDEN_DOT_FILES
-      char *c = strrchr (real_old.get_win32 (), '\\');
-      if ((c && c[1] == '.') || *real_old.get_win32 () == '.')
-	attr &= ~FILE_ATTRIBUTE_HIDDEN;
-      c = strrchr (real_new.get_win32 (), '\\');
-      if ((c && c[1] == '.') || *real_new.get_win32 () == '.')
-	attr |= FILE_ATTRIBUTE_HIDDEN;
-#endif
-      SetFileAttributes (real_new, attr);
-
-      /* Shortcut hack, No. 2, part 2 */
-      /* if the new filename was an existing shortcut, remove it now if the
-	 new filename is equal to the shortcut name without .lnk suffix. */
-      if (lnk_suffix)
+      if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				 newpc.get_nt_native_path (),
+				 TRUE)
+	  && old_explicit_suffix != new_explicit_suffix)
 	{
-	  *lnk_suffix = '.';
-	  unlink_nt (real_new);
+	  newpc.check (newpath, PC_SYM_NOFOLLOW);
+	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				     newpc.get_nt_native_path (),
+				     TRUE))
+	    {
+	      res = 0;
+	      goto out;
+	    }
 	}
-      /* Shortcut hack, No. 3, part 2 */
-      /* If a file with the given name exists, it must be deleted after the
-	 symlink has been renamed.  Otherwise we end up with two files of
-	 the same name in the directory, one file "newpath", which already
-	 exited before rename has been called, and one file "newpath.lnk",
-	 which is the result of the rename operation. */
-      else if (no_lnk_file_exists)
+      else if (oldpc.is_lnk_symlink ())
+        {
+	  if (!newpc.is_lnk_symlink ()
+	      && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					     L".lnk", TRUE))
+	    {
+	      rename_append_suffix (new2pc, newpath, nlen, ".lnk");
+	      removepc = &newpc;
+	    }
+	}
+      else if (oldpc.is_binary ())
 	{
-	  lnk_suffix = strrchr (real_new.get_win32 (), '.');
-	  *lnk_suffix = '\0';
-	  unlink_nt (real_new);
+	  if (!RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					  L".exe", TRUE))
+	    {
+	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
+	      removepc = &newpc;
+	    }
+      	}
+      else
+        {
+	  if ((RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					  L".lnk", TRUE)
+	       || RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
+					     L".exe", TRUE))
+	      && !new_explicit_suffix)
+	    {
+	      new2pc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
+	      newpc.get_nt_native_path ()->Length -= 4 * sizeof (WCHAR);
+	      if (newpc.is_binary () || newpc.is_lnk_symlink ())
+		removepc = &new2pc;
+	    }
 	}
     }
+  dstpc = (removepc == &newpc) ? &new2pc : &newpc;
+  
+  /* DELETE is required to rename a file. */
+  status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
+		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+  size = sizeof (FILE_RENAME_INFORMATION)
+	 + dstpc->get_nt_native_path ()->Length;
+  pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+  pfri->ReplaceIfExists = TRUE;
+  pfri->RootDirectory = NULL;
+  pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
+  memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
+	  pfri->FileNameLength);
+  status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
+  if (NT_SUCCESS (status))
+    {
+      if (removepc)
+	unlink_nt (*removepc);
+      res = 0;
+    }
+  else
+    __seterrno_from_nt_status (status);
+  NtClose (fh);
 
-  syscall_printf ("%d = rename (%s, %s)", res, (char *) real_old,
-		  (char *) real_new);
-
+out:
+  syscall_printf ("%d = rename (%s, %s)", res, oldpath, newpath);
   return res;
 }
 

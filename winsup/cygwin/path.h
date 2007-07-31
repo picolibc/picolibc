@@ -300,6 +300,7 @@ class path_conv
   {
     return (sizeof (*this) - sizeof (path)) + strlen (path) + 1 + normalized_path_size;
   }
+  bool is_binary ();
 
   unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;

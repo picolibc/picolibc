@@ -1205,6 +1205,16 @@ path_conv::~path_conv ()
     }
 }
 
+bool
+path_conv::is_binary ()
+{
+  DWORD bin;
+  PBYTE bintest[get_nt_native_path ()->Length + sizeof (WCHAR)];
+  return exec_state () == is_executable
+	 && RtlEqualUnicodePathSuffix (get_nt_native_path (), L".exe", TRUE)
+	 && GetBinaryTypeW (get_wide_win32_path ((PWCHAR) bintest), &bin);
+}
+
 /* Return true if src_path is a valid, internally supported device name.
    In that case, win32_path gets the corresponding NT device name and
    dev is appropriately filled with device information. */

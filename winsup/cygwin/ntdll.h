@@ -797,6 +797,8 @@ extern "C"
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   NTSTATUS NTAPI RtlOemStringToUnicodeString (PUNICODE_STRING, POEM_STRING,
 					       BOOLEAN);
+  BOOLEAN NTAPI RtlPrefixUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
+					BOOLEAN);
   VOID NTAPI RtlSecondsSince1970ToTime (ULONG, PLARGE_INTEGER);
 
   /* A few Rtl functions are either actually macros, or they just don't

@@ -1084,8 +1084,7 @@ fhandler_disk_file::link (const char *newpath)
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	}
       else if (!pc.isdir ()
-	       && RtlEqualUnicodePathSuffix (pc.get_nt_native_path (),
-					     L".exe", TRUE)
+	       && pc.is_binary ()
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					      L".exe", TRUE))
 	{
