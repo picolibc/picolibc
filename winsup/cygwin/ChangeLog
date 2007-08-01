@@ -1,5 +1,9 @@
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* localtime.cc (tzsetwall): Don't set TZ.
+
+2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop
 	usage of path_conv::volser().
 	(fhandler_base::fstat_by_name): Ditto.
