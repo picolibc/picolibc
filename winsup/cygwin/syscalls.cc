@@ -228,6 +228,38 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 		  recycler, status);
 }
 
+static NTSTATUS
+check_dir_not_empty (HANDLE dir)
+{
+  IO_STATUS_BLOCK io;
+  const ULONG bufsiz = 3 * sizeof (FILE_NAMES_INFORMATION)
+		       + 3 * NAME_MAX * sizeof (WCHAR);
+  PFILE_NAMES_INFORMATION pfni = (PFILE_NAMES_INFORMATION)
+				 alloca (bufsiz);
+  NTSTATUS status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni,
+					  bufsiz, FileNamesInformation,
+					  FALSE, NULL, TRUE);
+  if (!NT_SUCCESS (status))
+    {
+      syscall_printf ("Checking if directory is empty failed, "
+		      "status = %p", status);
+      return status;
+    }
+  int cnt = 1;
+  while (pfni->NextEntryOffset)
+    {
+      pfni = (PFILE_NAMES_INFORMATION)
+	     ((caddr_t) pfni + pfni->NextEntryOffset);
+      ++cnt;
+    }
+  if (cnt > 2)
+    {
+      syscall_printf ("Directory not empty");
+      return STATUS_DIRECTORY_NOT_EMPTY;
+    }
+  return STATUS_SUCCESS;
+}
+
 NTSTATUS
 unlink_nt (path_conv &pc)
 {
@@ -284,32 +316,11 @@ unlink_nt (path_conv &pc)
 			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
 	  if (NT_SUCCESS (status))
 	    {
-	      const ULONG bufsiz = 3 * sizeof (FILE_NAMES_INFORMATION)
-				   + 3 * NAME_MAX * sizeof (WCHAR);
-	      PFILE_NAMES_INFORMATION pfni = (PFILE_NAMES_INFORMATION)
-					     alloca (bufsiz);
-	      status = NtQueryDirectoryFile (fh, NULL, NULL, 0, &io, pfni,
-					     bufsiz, FileNamesInformation,
-					     FALSE, NULL, TRUE);
+	      status = check_dir_not_empty (fh);
 	      if (!NT_SUCCESS (status))
 	        {
 		  NtClose (fh);
-		  syscall_printf ("Checking if directory is empty failed, "
-				  "status = %p", status);
 		  return status;
-		}
-	      int cnt = 1;
-	      while (pfni->NextEntryOffset)
-	        {
-		  pfni = (PFILE_NAMES_INFORMATION)
-			 ((caddr_t) pfni + pfni->NextEntryOffset);
-		  ++cnt;
-		}
-	      if (cnt > 2)
-	        {
-		  NtClose (fh);
-		  syscall_printf ("Directory not empty");
-		  return STATUS_DIRECTORY_NOT_EMPTY;
 		}
 	    }
 	}
@@ -1347,7 +1358,18 @@ rename (const char *oldpath, const char *newpath)
   IO_STATUS_BLOCK io;
   ULONG size;
   PFILE_RENAME_INFORMATION pfri;
-  
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  if (has_dot_last_component (oldpath, true)
+      || has_dot_last_component (newpath, true))
+    {
+      set_errno (EINVAL);
+      goto out;
+    }
+
   oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
   if (oldpc.error)
     {
@@ -1357,6 +1379,11 @@ rename (const char *oldpath, const char *newpath)
   if (!oldpc.exists ())
     {
       set_errno (ENOENT);
+      goto out;
+    }
+  if (oldpc.isspecial ()) /* No renames from virtual FS */
+    {
+      set_errno (EROFS);
       goto out;
     }
   olen = strlen (oldpath);
@@ -1371,7 +1398,7 @@ rename (const char *oldpath, const char *newpath)
       set_errno (newpc.error);
       goto out;
     }
-  if (newpc.isspecial ()) /* No renames out of the FS */
+  if (newpc.isspecial ()) /* No renames to virtual FSes */
     {
       set_errno (EROFS);
       goto out;
@@ -1509,7 +1536,22 @@ rename (const char *oldpath, const char *newpath)
       res = 0;
     }
   else
-    __seterrno_from_nt_status (status);
+    {
+      /* Check in case of STATUS_ACCESS_DENIED and pc.isdir(),
+         whether we tried to rename to an existing non-empty dir.
+	 In this case we have to set errno to EEXIST. */
+      if (status == STATUS_ACCESS_DENIED && dstpc->isdir ()
+	  && NT_SUCCESS (NtOpenFile (&fh, FILE_LIST_DIRECTORY | SYNCHRONIZE,
+				    dstpc->get_object_attr (attr, sec_none_nih),
+				    &io, FILE_SHARE_VALID_FLAGS,
+				    FILE_OPEN_FOR_BACKUP_INTENT
+				    | FILE_SYNCHRONOUS_IO_NONALERT)))
+	{
+	  status = check_dir_not_empty (fh);
+	  NtClose (fh);
+	}
+      __seterrno_from_nt_status (status);
+    }
   NtClose (fh);
 
 out:

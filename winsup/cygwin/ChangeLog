@@ -1,5 +1,17 @@
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (STATUS_ACCESS_DENIED): Define.
+	* syscalls.cc (check_dir_not_empty): New static function.
+	(unlink_nt): Move code checking for non-empty dir to check_dir_not_empty
+	and call check_dir_not_empty instead.
+	(rename): Add fault handler.  Check oldpath and newpath for trailing
+	. and .. path components and return EINVAL if so.  Check oldpath
+	for being on a vrtual file system.  If renaming a dir fails with
+	STATUS_ACCESS_DENIED, check if the target dir is non-empty and return
+	ENOTEMPTY if so.
+
+2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc (tzsetwall): Don't set TZ.
 
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
