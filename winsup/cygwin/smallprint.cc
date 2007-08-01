@@ -66,6 +66,8 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   char tmp[CYG_MAX_PATH + 1];
   char *orig = dst;
   const char *s;
+  PWCHAR w;
+  UNICODE_STRING uw, *us;
 
   DWORD err = GetLastError ();
 
@@ -171,9 +173,27 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  else
 		    s = tmp;
 		  goto fillin;
+		case '.':
+		  n = strtol (fmt, (char **) &fmt, 10);
+		  if (*fmt++ != 's')
+		    goto endfor;
+		case 's':
+		  s = va_arg (ap, char *);
+		  if (s == NULL)
+		    s = "(null)";
+		fillin:
+		  for (i = 0; *s && i < n; i++)
+		    *dst++ = *s++;
+		  break;
+		case 'W':
+		  w = va_arg (ap, PWCHAR);
+		  RtlInitUnicodeString (&uw, w);
+		  us = &uw;
+		  goto wfillin;
 		case 'S':
+		  us = va_arg (ap, PUNICODE_STRING);
+		wfillin:
 		  {
-		    PUNICODE_STRING us = va_arg (ap, PUNICODE_STRING);
 		    ANSI_STRING as = { 0, 0, NULL };
 		    NTSTATUS status;
 
@@ -193,18 +213,6 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		    else
 		      RtlFreeOemString (&as);
 		  }
-		  break;
-		case '.':
-		  n = strtol (fmt, (char **) &fmt, 10);
-		  if (*fmt++ != 's')
-		    goto endfor;
-		case 's':
-		  s = va_arg (ap, char *);
-		  if (s == NULL)
-		    s = "(null)";
-		fillin:
-		  for (i = 0; *s && i < n; i++)
-		    *dst++ = *s++;
 		  break;
 		default:
 		  *dst++ = '?';
