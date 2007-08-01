@@ -1,4 +1,8 @@
-2006-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
+2007-07-03  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h: Document j K & E.
+
+2007-06-29  M R Swami Reddy  <MR.Swami.Reddy@nsc.com>
 
 	* cr16.h: New file for CR16 target.
 
