@@ -1584,31 +1584,6 @@ fhandler_base::fsync ()
   return -1;
 }
 
-/* Helper function for Cygwin specific pathconf flags _PC_POSIX_PERMISSIONS
-   and _PC_POSIX_SECURITY. */
-static int
-check_posix_perm (const char *fname, int v)
-{
-  if (!allow_ntsec)
-    return 0;
-
-  char *root = rootdir (fname, (char *)alloca (strlen (fname) + 2));
-
-  if (!allow_smbntsec
-      && ((root[0] == '\\' && root[1] == '\\')
-	  || GetDriveType (root) == DRIVE_REMOTE))
-    return 0;
-
-  DWORD vsn, len, flags;
-  if (!GetVolumeInformation (root, NULL, 0, &vsn, &len, &flags, NULL, 16))
-    {
-      __seterrno ();
-      return 0;
-    }
-
-  return (flags & FS_PERSISTENT_ACLS) ? 1 : 0;
-}
-
 int
 fhandler_base::fpathconf (int v)
 {
@@ -1663,7 +1638,7 @@ fhandler_base::fpathconf (int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       if (get_device () == FH_FS)
-	return check_posix_perm (get_win32_name (), v);
+	return pc.has_acls ();
       set_errno (EINVAL);
       break;
     default:

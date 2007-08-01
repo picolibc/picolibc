@@ -1,5 +1,11 @@
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (check_posix_perms): Remove.
+	(fhandler_base::fpathconf): Return value of pc.has_acls () instead
+	of calling check_posix_perms.
+
+2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Use unchanged path_conv in condition.
 
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
