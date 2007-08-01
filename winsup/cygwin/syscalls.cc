@@ -1478,13 +1478,13 @@ rename (const char *oldpath, const char *newpath)
 	    {
 	      new2pc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
 	      newpc.get_nt_native_path ()->Length -= 4 * sizeof (WCHAR);
-	      if (newpc.is_binary () || newpc.is_lnk_symlink ())
+	      if (new2pc.is_binary () || new2pc.is_lnk_symlink ())
 		removepc = &new2pc;
 	    }
 	}
     }
   dstpc = (removepc == &newpc) ? &new2pc : &newpc;
-  
+
   /* DELETE is required to rename a file. */
   status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
 		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
