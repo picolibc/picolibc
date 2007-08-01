@@ -279,7 +279,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
     {
       debug_printf ("%u = NtQueryVolumeInformationFile)",
 		    RtlNtStatusToDosError (status));
-      pfvi->VolumeSerialNumber = pc.volser ();
+      pfvi->VolumeSerialNumber = 0;
     }
   status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
 				   FileAllInformation);
@@ -371,7 +371,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     {
       debug_printf ("%u = NtQueryVolumeInformationFile)",
 		    RtlNtStatusToDosError (status));
-      pfvi->VolumeSerialNumber = pc.volser ();
+      pfvi->VolumeSerialNumber = 0;
     }
   NtClose (dir);
   /* If the change time is 0, it's a file system which doesn't
@@ -403,7 +403,7 @@ too_bad:
 		       *(FILETIME *) &ft,
 		       *(FILETIME *) &ft,
 		       *(FILETIME *) &ft,
-		       pc.volser (),
+		       0,
 		       0ULL,
 		       -1LL,
 		       0ULL,

@@ -98,13 +98,10 @@ struct fs_info
   struct status_flags
   {
     DWORD flags;  /* Volume flags */
-    DWORD serial; /* Volume serial number */
     unsigned is_remote_drive : 1;
     unsigned has_buggy_open  : 1;
-    unsigned has_ea	     : 1;
     unsigned has_acls	     : 1;
     unsigned hasgood_inode   : 1;
-    unsigned drive_type      : 3;
     unsigned is_fat	     : 1;
     unsigned is_ntfs	     : 1;
     unsigned is_samba	     : 1;
@@ -117,13 +114,11 @@ struct fs_info
   {
     name_hash = 0;
     root_len = 0;
-    flags () = serial () = 0;
+    flags () = 0;
     is_remote_drive (false);
     has_buggy_open (false);
-    has_ea (false);
     has_acls (false);
     hasgood_inode (false);
-    drive_type (false);
     is_fat (false);
     is_ntfs (false);
     is_samba (false);
@@ -132,15 +127,12 @@ struct fs_info
     is_cdrom (false);
   }
   inline DWORD& flags () {return status.flags;};
-  inline DWORD& serial () {return status.serial;};
   inline int length () const {return root_len;}
 
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
-  IMPLEMENT_STATUS_FLAG (bool, has_ea)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
-  IMPLEMENT_STATUS_FLAG (DWORD, drive_type)
   IMPLEMENT_STATUS_FLAG (bool, is_fat)
   IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
   IMPLEMENT_STATUS_FLAG (bool, is_samba)
@@ -148,7 +140,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_netapp)
   IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
 
-  bool update (const char *);
+  bool update (PUNICODE_STRING, bool) __attribute__ ((regparm (3)));
 };
 
 class path_conv
@@ -284,9 +276,7 @@ class path_conv
   short get_unitn () const {return dev.minor;}
   DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
-  DWORD drive_type () const {return fs.drive_type ();}
   DWORD fs_flags () {return fs.flags ();}
-  bool fs_has_ea () const {return fs.has_ea ();}
   bool fs_is_fat () const {return fs.is_fat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
   bool fs_is_samba () const {return fs.is_samba ();}
@@ -294,7 +284,6 @@ class path_conv
   bool fs_is_netapp () const {return fs.is_netapp ();}
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
   void set_path (const char *p) {strcpy (path, p);}
-  DWORD volser () { return fs.serial (); }
   void fillin (HANDLE h);
   inline size_t size ()
   {

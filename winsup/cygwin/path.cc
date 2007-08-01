@@ -377,61 +377,74 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
-#define MAX_FS_INFO_CNT 25
-fs_info fsinfo[MAX_FS_INFO_CNT];
-LONG fsinfo_cnt;
-
 bool
-fs_info::update (const char *win32_path)
+fs_info::update (PUNICODE_STRING upath, bool exists)
 {
-  char fsname [CYG_MAX_PATH];
-  char root_dir [CYG_MAX_PATH];
-  bool ret;
+  NTSTATUS status = STATUS_OBJECT_NAME_NOT_FOUND;
+  HANDLE vol;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  bool no_media = false;
+  FILE_FS_DEVICE_INFORMATION ffdi;
+  PFILE_FS_ATTRIBUTE_INFORMATION pffai;
+  UNICODE_STRING fsname, testname;
 
-  if (!::rootdir (win32_path, root_dir))
+  InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  if (exists)
+    status = NtOpenFile (&vol, READ_CONTROL, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			 FILE_OPEN_FOR_BACKUP_INTENT);
+  while (!NT_SUCCESS (status) && attr.ObjectName->Length > 6 * sizeof (WCHAR))
     {
-      debug_printf ("Cannot get root component of path %s", win32_path);
+      UNICODE_STRING dir;
+      RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
+      dir.Length -= sizeof (WCHAR);
+      attr.ObjectName = &dir;
+      if (status == STATUS_NO_MEDIA_IN_DEVICE)
+        {
+	  no_media = true;
+	  dir.Length = 6 * sizeof (WCHAR);
+	}
+      status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+    }
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("Cannot access path %S, status %08lx", attr.ObjectName,
+							   status);
       clear ();
+      NtClose (vol);
       return false;
     }
+  status = NtQueryVolumeInformationFile (vol, &io, &ffdi, sizeof ffdi,
+  					 FileFsDeviceInformation);
+  if (!NT_SUCCESS (status))
+    ffdi.DeviceType = ffdi.Characteristics = 0;
 
-  __ino64_t tmp_name_hash = hash_path_name (1, root_dir);
-  if (tmp_name_hash == name_hash)
-    return true;
-  int idx = 0;
-  LONG cur_fsinfo_cnt = fsinfo_cnt;
-  while (idx < cur_fsinfo_cnt && fsinfo[idx].name_hash)
-    {
-      if (tmp_name_hash == fsinfo[idx].name_hash)
-	{
-	  *this = fsinfo[idx];
-	  return true;
-	}
-      ++idx;
-    }
-  name_hash = tmp_name_hash;
-  root_len = strlen (root_dir);
-
-  drive_type (GetDriveType (root_dir));
-  if (drive_type () == DRIVE_REMOTE
-      || (drive_type () == DRIVE_UNKNOWN
-	  && (root_dir[0] == '\\' && root_dir[1] == '\\')))
+  if (ffdi.Characteristics & FILE_REMOTE_DEVICE
+      || (!ffdi.DeviceType
+	  && RtlEqualUnicodePathPrefix (attr.ObjectName, L"\\??\\UNC\\", TRUE)))
     is_remote_drive (true);
   else
     is_remote_drive (false);
 
-  ret = GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
-			      &status.flags, fsname, sizeof (fsname));
-
-  if (!ret && !is_remote_drive ())
+  if (!no_media)
     {
-      debug_printf ("Cannot get volume information (%s), %E", root_dir);
+      const ULONG size = sizeof (FILE_FS_ATTRIBUTE_INFORMATION)
+			 + NAME_MAX * sizeof (WCHAR);
+      pffai = (PFILE_FS_ATTRIBUTE_INFORMATION) alloca (size);
+      status = NtQueryVolumeInformationFile (vol, &io, pffai, size,
+					     FileFsAttributeInformation);
+    }
+  if (no_media || !NT_SUCCESS (status))
+    {
+      debug_printf ("Cannot get volume attributes (%S), %08lx",
+		    attr.ObjectName, status);
       has_buggy_open (false);
-      has_ea (false);
-      flags () = serial () = 0;
+      flags () = 0;
+      NtClose (vol);
       return false;
     }
-
+   flags () = pffai->FileSystemAttributes;
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
@@ -455,63 +468,46 @@ fs_info::update (const char *win32_path)
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_PERSISTENT_ACLS \
 			     | FILE_NAMED_STREAMS)
-  is_fat (strncasematch (fsname, "FAT", 3));
-  is_samba (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
+  RtlInitCountedUnicodeString (&fsname, pffai->FileSystemName,
+			       pffai->FileSystemNameLength);
+  is_fat (RtlEqualUnicodePathPrefix (&fsname, L"FAT", TRUE));
+  RtlInitUnicodeString (&testname, L"NTFS");
+  is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+	    && (ffdi.Characteristics & FILE_REMOTE_DEVICE)
 	    && (FS_IS_SAMBA || FS_IS_SAMBA_WITH_QUOTA));
-  is_netapp (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
+  is_netapp (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+	     && (ffdi.Characteristics & FILE_REMOTE_DEVICE)
 	     && FS_IS_NETAPP_DATAONTAP);
-  is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba () && !is_netapp ());
-  is_nfs (strcmp (fsname, "NFS") == 0);
-  is_cdrom (drive_type () == DRIVE_CDROM);
+  is_ntfs (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+	   && !is_samba () && !is_netapp ());
+  RtlInitUnicodeString (&testname, L"NFS");
+  is_nfs (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+  is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
 
-  has_ea (is_ntfs ());
   has_acls ((flags () & FS_PERSISTENT_ACLS)
 	    && (allow_smbntsec || !is_remote_drive ()));
-  hasgood_inode (((flags () & FILE_PERSISTENT_ACLS)
-		  && drive_type () != DRIVE_UNKNOWN
-		  && !is_netapp ())
+  hasgood_inode (((flags () & FILE_PERSISTENT_ACLS) && !is_netapp ())
 		 || is_nfs ());
   /* Known file systems with buggy open calls. Further explanation
      in fhandler.cc (fhandler_disk_file::open). */
-  has_buggy_open (!strcmp (fsname, "SUNWNFS"));
+  RtlInitUnicodeString (&testname, L"SUNWNFS");
+  has_buggy_open (RtlEqualUnicodeString (&fsname, &testname, FALSE));
 
-  /* Only append non-removable drives to the global fsinfo storage */
-  if (drive_type () != DRIVE_REMOVABLE && !is_cdrom () && idx < MAX_FS_INFO_CNT)
-    {
-      LONG exc_cnt;
-      while ((exc_cnt = InterlockedExchange (&fsinfo_cnt, -1)) == -1)
-	low_priority_sleep (0);
-      if (exc_cnt < MAX_FS_INFO_CNT)
-	{
-	  /* Check if another thread has already appended that very drive */
-	  while (idx < exc_cnt)
-	    {
-	      if (fsinfo[idx++].name_hash == name_hash)
-		goto done;
-	    }
-	  fsinfo[exc_cnt++] = *this;
-	}
-     done:
-      InterlockedExchange (&fsinfo_cnt, exc_cnt);
-    }
+  NtClose (vol);
   return true;
 }
 
 void
 path_conv::fillin (HANDLE h)
 {
-  BY_HANDLE_FILE_INFORMATION local;
-  if (!GetFileInformationByHandle (h, &local))
-    {
-      fileattr = INVALID_FILE_ATTRIBUTES;
-      fs.serial () = 0;
-    }
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
+
+  if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+					  FileBasicInformation)))
+    fileattr = fbi.FileAttributes;
   else
-    {
-      fileattr = local.dwFileAttributes;
-      fs.serial () = local.dwVolumeSerialNumber;
-    }
-    fs.drive_type (DRIVE_UNKNOWN);
+    fileattr = INVALID_FILE_ATTRIBUTES;
 }
 
 void
@@ -1111,7 +1107,7 @@ out:
 	    }
 	}
 
-      if (fs.update (path))
+      if (fs.update (get_nt_native_path (), exists ()))
 	{
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
 	  if (fs.has_acls () && allow_ntsec)
@@ -2628,7 +2624,11 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      reasonable guesses for popular types. */
 
   fs_info mntinfo;
-  mntinfo.update (native_path);  /* this pulls from a cache, usually. */
+  UNICODE_STRING unat;
+  size_t size = (strlen (native_path) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&unat, (PWSTR) alloca (size), size);
+  get_nt_native_path (native_path, unat);
+  mntinfo.update (&unat, true);  /* this pulls from a cache, usually. */
 
   if (mntinfo.is_samba())
     strcpy (_my_tls.locals.mnt_type, (char *) "smbfs");
