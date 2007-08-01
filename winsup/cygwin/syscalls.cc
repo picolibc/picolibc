@@ -1353,7 +1353,7 @@ rename (const char *oldpath, const char *newpath)
   bool old_explicit_suffix = false, new_explicit_suffix = false;
   size_t olen, nlen;
   NTSTATUS status;
-  HANDLE fh;
+  HANDLE fh, nfh;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG size;
@@ -1519,6 +1519,40 @@ rename (const char *oldpath, const char *newpath)
     {
       __seterrno_from_nt_status (status);
       goto out;
+    }
+  if ((removepc || dstpc->exists ())
+      && NT_SUCCESS (NtOpenFile (&nfh, READ_CONTROL,
+		     (removepc ?: dstpc)->get_object_attr (attr, sec_none_nih),
+		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT)))
+    {
+      size_t size = sizeof (FILE_FS_VOLUME_INFORMATION) + 32 * sizeof (WCHAR);
+      PFILE_FS_VOLUME_INFORMATION opffvi = (PFILE_FS_VOLUME_INFORMATION)
+					   alloca (size);
+      PFILE_FS_VOLUME_INFORMATION npffvi = (PFILE_FS_VOLUME_INFORMATION)
+					   alloca (size);
+      FILE_INTERNAL_INFORMATION ofii, nfii;
+
+      /* SUSv3: If the old argument and the new argument resolve to the same
+	 existing file, rename() shall return successfully and perform no
+	 other action. */
+      if (NT_SUCCESS (NtQueryVolumeInformationFile (fh, &io, opffvi, size,
+						    FileFsVolumeInformation))
+	  && NT_SUCCESS (NtQueryVolumeInformationFile (nfh, &io, npffvi, size,
+						    FileFsVolumeInformation))
+	  && opffvi->VolumeSerialNumber == npffvi->VolumeSerialNumber
+	  && NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofii, sizeof ofii,
+						    FileInternalInformation))
+	  && NT_SUCCESS (NtQueryInformationFile (nfh, &io, &nfii, sizeof nfii,
+	  					    FileInternalInformation))
+	  && ofii.FileId.QuadPart == nfii.FileId.QuadPart)
+	{
+	  debug_printf ("%s and %s are the same file", oldpath, newpath);
+	  NtClose (nfh);
+	  NtClose (fh);
+	  res = 0;
+	  goto out;
+	}
+      NtClose (nfh);
     }
   size = sizeof (FILE_RENAME_INFORMATION)
 	 + dstpc->get_nt_native_path ()->Length;

@@ -1,5 +1,11 @@
 2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Check if oldpath and newpath refer to the
+	same file.  If so, return successfully and perform no other action,
+	as per SUSv3.
+
+2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (STATUS_ACCESS_DENIED): Define.
 	* syscalls.cc (check_dir_not_empty): New static function.
 	(unlink_nt): Move code checking for non-empty dir to check_dir_not_empty
