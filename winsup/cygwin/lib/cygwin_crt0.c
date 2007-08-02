@@ -10,6 +10,8 @@ details. */
 
 #undef __INSIDE_CYGWIN__
 #include <windows.h>
+#include <time.h>	/* Needed since call to sys/time.h via sys/cygwin.h
+			   complains otherwise */
 #include <sys/cygwin.h>
 #include <stdlib.h>
 #include "crt0.h"

@@ -1,5 +1,10 @@
 2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* lib/cygwin_attach_dll.c: Fix compiler warning.
+	* lib/cygwin_crt0.c: Ditto.
+
+2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* dcrt0.cc (codepage_type): Remove definition.
 	* strfuncs.cc: Move it here.  New file with bits of miscfuncs.cc.
 	* miscfuncs.cc: Remove wide character stuff.
