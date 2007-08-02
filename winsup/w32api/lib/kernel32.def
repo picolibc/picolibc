@@ -633,6 +633,7 @@ ReleaseSemaphore@12
 RemoveDirectoryA@4
 RemoveDirectoryW@4
 RemoveVectoredExceptionHandler@4
+ReOpenFile@16
 ReplaceFile@24
 ReplaceFileA@24
 ReplaceFileW@24

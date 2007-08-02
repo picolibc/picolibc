@@ -1,3 +1,8 @@
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (ReOpenFile): Add prototype.
+	* lib/kernel32.def (ReOpenFile@16): Add export.
+
 2007-07-31  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wtsapi32.h (WTS_CURRENT_SESSION, WTSDisconnectSession): Define.
