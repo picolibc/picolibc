@@ -1,3 +1,18 @@
+2007-08-02  Eric Blake  <ebb9@byu.net>
+
+	Implement fmemopen and open_memstream.
+	* libc/stdio/fmemopen.c (_fmemopen_r, fmemopen): New file.
+	* libc/stdio/open_memstream.c (_open_memstream_r, open_memstream):
+	New file.
+	* libc/stdio/fopencookie.c (fcwriter): Minor optimization.
+	* libc/include/stdio.h (dprintf, vdprintf): Group all POSIX 200x
+	functions together.
+	(fmemopen, open_memstream): Declare new functions.
+	* libc/stdio/stdio.tex: Document them.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES, CHEWOUT_FILES): Add
+	fmemopen and open_memstream.
+	* libc/stdio/Makefile.in: Regenerate.
+
 2007-07-31  Eric Blake  <ebb9@byu.net>
 
 	More POSIX stream corner cases.

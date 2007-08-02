@@ -122,9 +122,9 @@ _DEFUN(fcwriter, (ptr, cookie, buf, n),
   if (c->fp->_flags & __SAPP && c->fp->_seek)
     {
 #ifdef __LARGE64_FILES
-      c->fp->_seek64 (ptr, c->fp->_cookie, 0, SEEK_END);
+      c->fp->_seek64 (ptr, cookie, 0, SEEK_END);
 #else
-      c->fp->_seek (ptr, c->fp->_cookie, 0, SEEK_END);
+      c->fp->_seek (ptr, cookie, 0, SEEK_END);
 #endif
     }
   errno = 0;
@@ -134,7 +134,7 @@ _DEFUN(fcwriter, (ptr, cookie, buf, n),
 }
 
 static _fpos_t
-_DEFUN(fcseeker, (ptr, cookie, off, whence),
+_DEFUN(fcseeker, (ptr, cookie, pos, whence),
        struct _reent *ptr _AND
        void *cookie _AND
        _fpos_t pos _AND
@@ -162,7 +162,7 @@ _DEFUN(fcseeker, (ptr, cookie, off, whence),
 
 #ifdef __LARGE64_FILES
 static _fpos64_t
-_DEFUN(fcseeker64, (ptr, cookie, off, whence),
+_DEFUN(fcseeker64, (ptr, cookie, pos, whence),
        struct _reent *ptr _AND
        void *cookie _AND
        _fpos64_t pos _AND

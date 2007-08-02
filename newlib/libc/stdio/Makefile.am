@@ -117,8 +117,10 @@ ELIX_4_SOURCES = \
 	asnprintf.c		\
 	diprintf.c		\
 	dprintf.c		\
+	fmemopen.c		\
 	fopencookie.c		\
 	funopen.c		\
+	open_memstream.c	\
 	vasniprintf.c		\
 	vasnprintf.c
 endif !ELIX_LEVEL_3
@@ -179,6 +181,7 @@ CHEWOUT_FILES = \
 	fgetpos.def		\
 	fgets.def		\
 	fileno.def		\
+	fmemopen.def		\
 	fopen.def		\
 	fopencookie.def		\
 	fputc.def		\
@@ -199,6 +202,7 @@ CHEWOUT_FILES = \
 	gets.def		\
 	getw.def		\
 	mktemp.def		\
+	open_memstream.def	\
 	perror.def		\
 	putc.def		\
 	putc_u.def		\
@@ -244,6 +248,7 @@ $(lpfx)fclose.$(oext): local.h
 $(lpfx)fdopen.$(oext): local.h
 $(lpfx)fflush.$(oext): local.h
 $(lpfx)findfp.$(oext): local.h
+$(lpfx)fmemopen.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
 $(lpfx)fopencookie.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
@@ -257,6 +262,7 @@ $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)iscanf.$(oext): local.h
 $(lpfx)makebuf.$(oext): local.h
+$(lpfx)open_memstream.$(oext): local.h
 $(lpfx)puts.$(oext): fvwrite.h
 $(lpfx)refill.$(oext): local.h
 $(lpfx)scanf.$(oext): local.h

@@ -244,10 +244,8 @@ char *	_EXFUN(asnprintf, (char *, size_t *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(asprintf, (char **, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
-#ifndef dprintf
+#ifndef diprintf
 int	_EXFUN(diprintf, (int, const char *, ...)
-               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
-int	_EXFUN(dprintf, (int, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 #endif
 int	_EXFUN(fcloseall, (_VOID));
@@ -278,8 +276,6 @@ int	_EXFUN(vasprintf, (char **, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 int	_EXFUN(vdiprintf, (int, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
-int	_EXFUN(vdprintf, (int, const char *, __VALIST)
-               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 int	_EXFUN(vfiscanf, (FILE *, const char *, __VALIST)
@@ -306,7 +302,7 @@ int	_EXFUN(vsscanf, (const char *, const char *, __VALIST)
 #endif /* !__STRICT_ANSI__ */
 
 /*
- * Routines in POSIX 1003.1.
+ * Routines in POSIX 1003.1:2001.
  */
 
 #ifndef __STRICT_ANSI__
@@ -328,6 +324,26 @@ void	_EXFUN(funlockfile, (FILE *));
 int	_EXFUN(putc_unlocked, (int, FILE *));
 int	_EXFUN(putchar_unlocked, (int));
 #endif /* ! __STRICT_ANSI__ */
+
+/*
+ * Routines in POSIX 1003.1:200x.
+ */
+
+#ifndef __STRICT_ANSI__
+# ifndef _REENT_ONLY
+#  ifndef dprintf
+int	_EXFUN(dprintf, (int, const char *, ...)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
+#  endif
+FILE *	_EXFUN(fmemopen, (void *, size_t, const char *));
+/* getdelim - see __getdelim for now */
+/* getline - see __getline for now */
+FILE *	_EXFUN(open_memstream, (char **, size_t *));
+/* renameat - unimplemented for now */
+int	_EXFUN(vdprintf, (int, const char *, __VALIST)
+               _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
+# endif
+#endif
 
 /*
  * Recursive versions of the above.
@@ -354,6 +370,7 @@ int	_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
+FILE *	_EXFUN(_fmemopen_r, (struct _reent *, void *, size_t, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
@@ -376,6 +393,7 @@ int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *));
+FILE *	_EXFUN(_open_memstream_r, (struct _reent *, char **, size_t *));
 void	_EXFUN(_perror_r, (struct _reent *, const char *));
 int	_EXFUN(_printf_r, (struct _reent *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));

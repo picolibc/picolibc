@@ -37,6 +37,7 @@ structure.
 * fgetpos::     Record position in a stream or file
 * fgets::       Get character string from a file or stream
 * fileno::      Get file descriptor associated with stream
+* fmemopen::    Open a stream around a fixed-length buffer
 * fopen::       Open a file
 * fopencookie:: Open a stream with custom callbacks
 * fputc::       Write a character on a stream or file
@@ -57,6 +58,7 @@ structure.
 * gets::        Get character string from standard input (obsolete)
 * getw::        Get a word (int) from a file or stream
 * mktemp::      Generate unused file name
+* open_memstream::	Open a write stream around an arbitrary-length buffer
 * perror::      Print an error message on standard error
 * putc::        Write a character on a stream or file (macro)
 * putc_unlocked::	Write a character on a stream or file (macro)
@@ -124,6 +126,9 @@ structure.
 @include stdio/fileno.def
 
 @page
+@include stdio/fmemopen.def
+
+@page
 @include stdio/fopen.def
 
 @page
@@ -182,6 +187,9 @@ structure.
 
 @page
 @include stdio/mktemp.def
+
+@page
+@include stdio/open_memstream.def
 
 @page
 @include stdio/perror.def
