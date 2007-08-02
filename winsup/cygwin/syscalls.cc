@@ -1516,7 +1516,9 @@ rename (const char *oldpath, const char *newpath)
 
   /* DELETE is required to rename a file. */
   status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
-		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+		     &io, FILE_SHARE_VALID_FLAGS,
+		     FILE_OPEN_FOR_BACKUP_INTENT
+		     | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0));
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
@@ -1535,7 +1537,10 @@ rename (const char *oldpath, const char *newpath)
       && ofsi.NumberOfLinks > 1
       && NT_SUCCESS (NtOpenFile (&nfh, READ_CONTROL,
 		     (removepc ?: dstpc)->get_object_attr (attr, sec_none_nih),
-		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT)))
+		     &io, FILE_SHARE_VALID_FLAGS,
+		     FILE_OPEN_FOR_BACKUP_INTENT
+		     | ((removepc ?: dstpc)->is_rep_symlink ()
+		     	? FILE_OPEN_REPARSE_POINT : 0))))
     {
       static const size_t vsiz = sizeof (FILE_FS_VOLUME_INFORMATION)
 				 + 32 * sizeof (WCHAR);

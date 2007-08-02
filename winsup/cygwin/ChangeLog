@@ -1,3 +1,8 @@
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (readdir_get_ino): Accommodate native symlinks.
+	* syscalls.cc (rename): Ditto.
+
 2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* lib/Makefile: Add missed file to accommodate below changes.

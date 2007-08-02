@@ -1717,7 +1717,9 @@ readdir_get_ino (const char *path, bool dot_dot)
   else if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL,
 				   pc.get_object_attr (attr, sec_none_nih),
 				   &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_OPEN_FOR_BACKUP_INTENT)))
+				   FILE_OPEN_FOR_BACKUP_INTENT
+				   | (pc.is_rep_symlink ()
+				      ? FILE_OPEN_REPARSE_POINT : 0))))
     {
       ino = readdir_get_ino_by_handle (hdl);
       NtClose (hdl);
