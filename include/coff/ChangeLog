@@ -1,3 +1,25 @@
+2007-08-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* pe.h (IMAGE_SCN_ALIGN_POWER_BIT_POS): New.
+	(IMAGE_SCN_ALIGN_POWER_BIT_MASK): Likewise.
+	(IMAGE_SCN_ALIGN_POWER_NUM): Likewise.
+	(IMAGE_SCN_ALIGN_POWER_CONST): Likewise.
+	(IMAGE_SCN_ALIGN_128BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_256BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_512BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_1024BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_2048BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_4096BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_8192BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_1BYTES): Redefined with
+	IMAGE_SCN_ALIGN_POWER_CONST.
+	(IMAGE_SCN_ALIGN_2BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_4BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_8BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_16BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_32BYTES): Likewise.
+	(IMAGE_SCN_ALIGN_64BYTES): Likewise.
+
 2007-07-12  Kai Tietz   <kai.tietz@onevision.com>
 
 	* internal.h (struct internal_syment): Use bfd_hostptr_t for
