@@ -1,5 +1,9 @@
 2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* lib/Makefile: Add missed file to accommodate below changes.
+
+2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* lib/cygwin_attach_dll.c: Fix compiler warning.
 	* lib/cygwin_crt0.c: Ditto.
 
