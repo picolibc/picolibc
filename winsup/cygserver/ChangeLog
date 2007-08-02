@@ -1,3 +1,9 @@
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.c: New file.
+	* Makefile.in (OBJS): Add smallprint.o.
+	(CYGWIN_OBJS): Remove smallprint.o from Cygwin dir.
+
 2007-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc: Drop unnecessary security.h include.

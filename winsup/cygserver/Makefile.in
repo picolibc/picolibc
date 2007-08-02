@@ -38,12 +38,12 @@ override CXXFLAGS+=-MMD -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="
 .SUFFIXES: .c .cc .a .o .d
 
 OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
-	transport.o transport_pipes.o \
+	transport.o transport_pipes.o smallprint.o \
 	bsd_helper.o bsd_log.o bsd_mutex.o \
 	sysv_msg.o sysv_sem.o sysv_shm.o
 LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
-CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o
+CYGWIN_OBJS:=$(cygwin_build)/version.o
 
 CYGWIN_LIB:=$(cygwin_build)/libcygwin.a
 
