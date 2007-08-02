@@ -1,5 +1,13 @@
 2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.h (struct fs_info): Drop root_len and name_hash members.
+	(fsinfo::length): Remove.
+	(path_conv::rootdir): Remove.
+	* syscalls.cc (try_to_bin): Use rootdir function instead of
+	path_conv::rootdir method.
+
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix typo in call to
 	NtClose.
 

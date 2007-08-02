@@ -146,7 +146,8 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   IO_STATUS_BLOCK io;
   char recycler[CYG_MAX_PATH + 20];
 
-  char *c = recycler + win32_path.rootdir (recycler);
+  rootdir (win32_path, recycler);
+  char *c = recycler + strlen (recycler);
   if (wincap.has_recycle_dot_bin ())
     {
       strcpy (c, "$Recycle.Bin");	/* NTFS and FAT since Vista */
