@@ -1358,6 +1358,7 @@ rename (const char *oldpath, const char *newpath)
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG size;
+  FILE_STANDARD_INFORMATION ofsi;
   PFILE_RENAME_INFORMATION pfri;
 
   myfault efault;
@@ -1521,31 +1522,38 @@ rename (const char *oldpath, const char *newpath)
       __seterrno_from_nt_status (status);
       goto out;
     }
+  /* SUSv3: If the old argument and the new argument resolve to the same
+     existing file, rename() shall return successfully and perform no
+     other action.
+     The test tries to be as quick as possible.  First it tests if oldpath
+     has more than 1 hardlink, then it opens newpath and tests for identical
+     file ids.  If so, it tests for identical volume serial numbers,  If so,
+     oldpath and newpath refer to the same file. */
   if ((removepc || dstpc->exists ())
+      && NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofsi, sizeof ofsi,
+					     FileStandardInformation))
+      && ofsi.NumberOfLinks > 1
       && NT_SUCCESS (NtOpenFile (&nfh, READ_CONTROL,
 		     (removepc ?: dstpc)->get_object_attr (attr, sec_none_nih),
 		     &io, FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT)))
     {
-      size_t size = sizeof (FILE_FS_VOLUME_INFORMATION) + 32 * sizeof (WCHAR);
-      PFILE_FS_VOLUME_INFORMATION opffvi = (PFILE_FS_VOLUME_INFORMATION)
-					   alloca (size);
-      PFILE_FS_VOLUME_INFORMATION npffvi = (PFILE_FS_VOLUME_INFORMATION)
-					   alloca (size);
+      static const size_t vsiz = sizeof (FILE_FS_VOLUME_INFORMATION)
+				 + 32 * sizeof (WCHAR);
       FILE_INTERNAL_INFORMATION ofii, nfii;
+      PFILE_FS_VOLUME_INFORMATION opffvi, npffvi;
 
-      /* SUSv3: If the old argument and the new argument resolve to the same
-	 existing file, rename() shall return successfully and perform no
-	 other action. */
-      if (NT_SUCCESS (NtQueryVolumeInformationFile (fh, &io, opffvi, size,
-						    FileFsVolumeInformation))
-	  && NT_SUCCESS (NtQueryVolumeInformationFile (nfh, &io, npffvi, size,
-						    FileFsVolumeInformation))
-	  && opffvi->VolumeSerialNumber == npffvi->VolumeSerialNumber
-	  && NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofii, sizeof ofii,
-						    FileInternalInformation))
+      if (NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofii, sizeof ofii,
+					      FileInternalInformation))
 	  && NT_SUCCESS (NtQueryInformationFile (nfh, &io, &nfii, sizeof nfii,
-	  					    FileInternalInformation))
-	  && ofii.FileId.QuadPart == nfii.FileId.QuadPart)
+						 FileInternalInformation))
+	  && ofii.FileId.QuadPart == nfii.FileId.QuadPart
+	  && (opffvi = (PFILE_FS_VOLUME_INFORMATION) alloca (vsiz))
+	  && (npffvi = (PFILE_FS_VOLUME_INFORMATION) alloca (vsiz))
+	  && NT_SUCCESS (NtQueryVolumeInformationFile (fh, &io, opffvi, vsiz,
+						    FileFsVolumeInformation))
+	  && NT_SUCCESS (NtQueryVolumeInformationFile (nfh, &io, npffvi, vsiz,
+						    FileFsVolumeInformation))
+	  && opffvi->VolumeSerialNumber == npffvi->VolumeSerialNumber)
 	{
 	  debug_printf ("%s and %s are the same file", oldpath, newpath);
 	  NtClose (nfh);
