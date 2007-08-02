@@ -15,8 +15,6 @@ details. */
 #include <sys/uio.h>
 #include <assert.h>
 #include <limits.h>
-#include <winbase.h>
-#include <winnls.h>
 #include "cygthread.h"
 #include "cygtls.h"
 
@@ -163,6 +161,7 @@ dummytest (volatile char *p)
 {
   return *p;
 }
+
 ssize_t
 check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 {
@@ -201,35 +200,6 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   assert (tot <= SSIZE_MAX);
 
   return (ssize_t) tot;
-}
-
-UINT
-get_cp ()
-{
-  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
-}
-
-/* tlen is always treated as the maximum buffer size, including the '\0'
-   character.  sys_wcstombs will always return a 0-terminated result, no
-   matter what. */
-int __stdcall
-sys_wcstombs (char *tgt, int tlen, const WCHAR *src, int slen)
-{
-  int ret;
-
-  ret = WideCharToMultiByte (get_cp (), 0, src, slen, tgt, tlen, NULL, NULL);
-  if (ret)
-    tgt[ret < tlen ? ret : tlen - 1] = '\0';
-  return ret;
-}
-
-int __stdcall
-sys_mbstowcs (WCHAR *tgt, const char *src, int len)
-{
-  int res = MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
-  if (!res)
-    debug_printf ("MultiByteToWideChar %E");
-  return res;
 }
 
 extern "C" int

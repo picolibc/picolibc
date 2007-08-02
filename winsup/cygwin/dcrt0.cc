@@ -55,7 +55,6 @@ bool display_title;
 bool strip_title_path;
 bool allow_glob = true;
 bool NO_COPY in_forkee;
-codepage_type current_codepage = ansi_cp;
 
 int __argc_safe;
 int _declspec(dllexport) __argc;

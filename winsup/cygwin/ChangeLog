@@ -1,3 +1,9 @@
+2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (codepage_type): Remove definition.
+	* strfuncs.cc: Move it here.  New file with bits of miscfuncs.cc.
+	* miscfuncs.cc: Remove wide character stuff.
+
 2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Move and add text to comment about testing
