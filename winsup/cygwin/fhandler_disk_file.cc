@@ -242,7 +242,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
     }
   while (dir->check_missing_mount ())
     ++count;
-  NtClose (dir);
+  NtClose (fh);
   delete dir;
   return count;
 }
