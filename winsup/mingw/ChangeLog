@@ -1,6 +1,7 @@
 2007-03-25 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.13.
+	* Makefile.in: Reset CYGRELEASE to 1
 
 2007-07-23 Keith Marshall <keithmarshall@users.sourceforge.net>
 

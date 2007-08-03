@@ -19,7 +19,7 @@
 
 PACKAGE = mingw-runtime
 VERSION = @PACKAGE_VERSION@
-CYGRELEASE = 3
+CYGRELEASE = 1
 
 VPATH = @srcdir@
 srcdir = @srcdir@
