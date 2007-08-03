@@ -1,3 +1,7 @@
+2007-03-25 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.13.
+
 2007-07-23 Keith Marshall <keithmarshall@users.sourceforge.net>
 
 	* Makefile.in (SUBDIRS): Delete stray line continuation artifact,
