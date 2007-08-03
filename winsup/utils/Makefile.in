@@ -1,6 +1,6 @@
 # Makefile for Cygwin utilities
 # Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006 Red Hat, Inc.
+# 2005, 2006, 2007 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -99,15 +99,15 @@ else
 	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
-cygcheck.exe: cygcheck.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
+cygcheck.exe: cygcheck.o bloda.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
 ifeq "$(libz)" ""
 	@echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
 endif
 ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz) -lntdll
 else
-	@echo $(CXX) -o $@ ${wordlist 1,3,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz);\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
+	@echo $(CXX) -o $@ ${wordlist 1,4,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz) -lntdll;\
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz) -lntdll
 endif
 
 dumper.o: dumper.cc dumper.h
@@ -148,6 +148,14 @@ ifdef VERBOSE
 else
 	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
 	$(MINGW_CXX) $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+endif
+
+bloda.o: bloda.cc
+ifdef VERBOSE
+	${MINGW_CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
+else
+	@echo $(MINGW_CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${MINGW_CXX} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) -I$(updir) $<
 endif
 
 cygcheck.o: cygcheck.cc

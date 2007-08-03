@@ -50,9 +50,13 @@ typedef long long longlong;
 typedef __int64 longlong;
 #endif
 
+/* In dump_setup.cc  */
 void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
+/* In bloda.cc  */
+void dump_dodgy_apps (int verbose);
+
 
 static const char version[] = "$Revision$";
 
@@ -1622,6 +1626,8 @@ dump_sysinfo ()
     puts ("Warning: There are multiple cygwin1.dlls on your path");
   if (!cygwin_dll_count)
     puts ("Warning: cygwin1.dll not found on your path");
+
+  dump_dodgy_apps (verbose);
 
   if (is_nt)
     dump_sysinfo_services ();

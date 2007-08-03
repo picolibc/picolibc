@@ -1,3 +1,12 @@
+2007-08-03  Dave Korn  <dave.korn@artimi.com>
+
+	* Makefile.in (cygcheck.exe):  Add bloda.o as prerequisite, adjusting
+	dependency-filtering $(wordlist ...) call appropriately.  Link ntdll.
+	(bloda.o):  New rule to build bloda.o
+	* cygcheck.cc (dump_sysinfo):  Call bloda function dump_dodgy_apps().
+	* bloda.cc:  New file implements detection of applications from the
+	Big List Of Dodgy Apps.
+
 2007-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* COPYING.dumper: New file.
