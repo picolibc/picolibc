@@ -1,3 +1,11 @@
+2007-08-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/intl/Makefile.am: Change stpcpy reference to
+	lcl_stpcpy to avoid conflict with new stpcpy.c in libc/string.
+	* libc/sys/linux/intl/Makefile.in: Regenerated.
+	* libc/sys/linux/intl/stpcpy.c: Renamed to...
+	* libc/sys/linux/intl/lcl_stpcpy.c: ..this.
+
 2007-08-02  Eric Blake  <ebb9@byu.net>
 
 	Implement fmemopen and open_memstream.

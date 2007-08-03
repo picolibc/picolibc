@@ -62,19 +62,19 @@ am__objects_1 = lib_a-bindtextdom.$(OBJEXT) lib_a-catgets.$(OBJEXT) \
 	lib_a-gettext.$(OBJEXT) lib_a-dcigettext.$(OBJEXT) \
 	lib_a-dcngettext.$(OBJEXT) lib_a-dngettext.$(OBJEXT) \
 	lib_a-ngettext.$(OBJEXT) lib_a-open_catalog.$(OBJEXT) \
-	lib_a-finddomain.$(OBJEXT) lib_a-loadmsgcat.$(OBJEXT) \
-	lib_a-localealias.$(OBJEXT) lib_a-textdomain.$(OBJEXT) \
-	lib_a-l10nflist.$(OBJEXT) lib_a-explodename.$(OBJEXT) \
-	lib_a-plural.$(OBJEXT) lib_a-stpcpy.$(OBJEXT)
+	lib_a-finddomain.$(OBJEXT) lib_a-lcl_stpcpy.$(OBJEXT) \
+	lib_a-loadmsgcat.$(OBJEXT) lib_a-localealias.$(OBJEXT) \
+	lib_a-textdomain.$(OBJEXT) lib_a-l10nflist.$(OBJEXT) \
+	lib_a-explodename.$(OBJEXT) lib_a-plural.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libintl_la_LIBADD =
 am__objects_2 = bindtextdom.lo catgets.lo dcgettext.lo dgettext.lo \
 	gettext.lo dcigettext.lo dcngettext.lo dngettext.lo \
-	ngettext.lo open_catalog.lo finddomain.lo loadmsgcat.lo \
-	localealias.lo textdomain.lo l10nflist.lo explodename.lo \
-	plural.lo stpcpy.lo
+	ngettext.lo open_catalog.lo finddomain.lo lcl_stpcpy.lo \
+	loadmsgcat.lo localealias.lo textdomain.lo l10nflist.lo \
+	explodename.lo plural.lo
 @USE_LIBTOOL_TRUE@am_libintl_la_OBJECTS = $(am__objects_2)
 libintl_la_OBJECTS = $(am_libintl_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libintl_la_rpath =
@@ -230,8 +230,8 @@ INCLUDES = -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 LIB_SOURCES = \
 	bindtextdom.c catgets.c dcgettext.c dgettext.c gettext.c       \
 	dcigettext.c dcngettext.c dngettext.c ngettext.c open_catalog.c \
-	finddomain.c loadmsgcat.c localealias.c textdomain.c \
-	l10nflist.c explodename.c plural.c stpcpy.c
+	finddomain.c lcl_stpcpy.c loadmsgcat.c localealias.c textdomain.c \
+	l10nflist.c explodename.c plural.c
 
 libintl_la_LDFLAGS = -Xcompiler -nostdlib
 msgcatdir = /usr/share/locale
@@ -379,6 +379,12 @@ lib_a-finddomain.o: finddomain.c
 lib_a-finddomain.obj: finddomain.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-finddomain.obj `if test -f 'finddomain.c'; then $(CYGPATH_W) 'finddomain.c'; else $(CYGPATH_W) '$(srcdir)/finddomain.c'; fi`
 
+lib_a-lcl_stpcpy.o: lcl_stpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.o `test -f 'lcl_stpcpy.c' || echo '$(srcdir)/'`lcl_stpcpy.c
+
+lib_a-lcl_stpcpy.obj: lcl_stpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcl_stpcpy.obj `if test -f 'lcl_stpcpy.c'; then $(CYGPATH_W) 'lcl_stpcpy.c'; else $(CYGPATH_W) '$(srcdir)/lcl_stpcpy.c'; fi`
+
 lib_a-loadmsgcat.o: loadmsgcat.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-loadmsgcat.o `test -f 'loadmsgcat.c' || echo '$(srcdir)/'`loadmsgcat.c
 
@@ -414,12 +420,6 @@ lib_a-plural.o: plural.c
 
 lib_a-plural.obj: plural.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-plural.obj `if test -f 'plural.c'; then $(CYGPATH_W) 'plural.c'; else $(CYGPATH_W) '$(srcdir)/plural.c'; fi`
-
-lib_a-stpcpy.o: stpcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy.o `test -f 'stpcpy.c' || echo '$(srcdir)/'`stpcpy.c
-
-lib_a-stpcpy.obj: stpcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy.obj `if test -f 'stpcpy.c'; then $(CYGPATH_W) 'stpcpy.c'; else $(CYGPATH_W) '$(srcdir)/stpcpy.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

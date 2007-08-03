@@ -7,8 +7,8 @@ INCLUDES = -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 LIB_SOURCES = \
 	bindtextdom.c catgets.c dcgettext.c dgettext.c gettext.c       \
 	dcigettext.c dcngettext.c dngettext.c ngettext.c open_catalog.c \
-	finddomain.c loadmsgcat.c localealias.c textdomain.c \
-	l10nflist.c explodename.c plural.c stpcpy.c
+	finddomain.c lcl_stpcpy.c loadmsgcat.c localealias.c textdomain.c \
+	l10nflist.c explodename.c plural.c
 
 
 libintl_la_LDFLAGS = -Xcompiler -nostdlib
