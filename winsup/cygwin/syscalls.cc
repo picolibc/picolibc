@@ -1577,6 +1577,7 @@ rename (const char *oldpath, const char *newpath)
   memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
 	  pfri->FileNameLength);
   status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
+  NtClose (fh);
   if (NT_SUCCESS (status))
     {
       if (removepc)
@@ -1589,18 +1590,18 @@ rename (const char *oldpath, const char *newpath)
          whether we tried to rename to an existing non-empty dir.
 	 In this case we have to set errno to EEXIST. */
       if (status == STATUS_ACCESS_DENIED && dstpc->isdir ()
-	  && NT_SUCCESS (NtOpenFile (&fh, FILE_LIST_DIRECTORY | SYNCHRONIZE,
+	  && NT_SUCCESS (NtOpenFile (&nfh, FILE_LIST_DIRECTORY | SYNCHRONIZE,
 				    dstpc->get_object_attr (attr, sec_none_nih),
 				    &io, FILE_SHARE_VALID_FLAGS,
 				    FILE_OPEN_FOR_BACKUP_INTENT
 				    | FILE_SYNCHRONOUS_IO_NONALERT)))
 	{
-	  status = check_dir_not_empty (fh);
-	  NtClose (fh);
+	  if (check_dir_not_empty (nfh) == STATUS_DIRECTORY_NOT_EMPTY)
+	    status = STATUS_DIRECTORY_NOT_EMPTY;
+	  NtClose (nfh);
 	}
       __seterrno_from_nt_status (status);
     }
-  NtClose (fh);
 
 out:
   syscall_printf ("%d = rename (%s, %s)", res, oldpath, newpath);

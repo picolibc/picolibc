@@ -1,3 +1,10 @@
+2007-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Close oldpath file handle immediately after
+	trying to rename it.  Use nfh handle when checking for non-empty
+	newpath directory.  Only change status if check_dir_not_empty really
+	returns STATUS_DIRECTORY_NOT_EMPTY.
+
 2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (readdir_get_ino): Accommodate native symlinks.
