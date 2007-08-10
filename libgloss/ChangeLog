@@ -1,8 +1,43 @@
-2007-07-13  Kevin Buettner  <kevinb@redhat.com>
+2007-08-10  Carlos O'Donell  <carlos@codesourcery.com>
 
-	* mep/fmax.ld, mep/gmap_default.ld, mep/min.ld, mep/simple.ld
-	(.gcc_except_table): Add pattern for .gcc_except_table.*.
+	2007-07-12  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* arm/syscalls.c (_stat): Use _close
+	
+	* arm/syscalls.c (struct poslog): Rename to...
+	(struct fdent): ... this.
+	(FILE_HANDLE_OFFSET): Remove.
+	(findslot): Return a struct fdent* if fd is valid, otherwise return NULL.  
+	(newslot): New function.  
+	(remap_handle): Remove.  
+	(initialise_monitor_handles): Use stdout as fallback for stderr.  
+	(wrap): Rename to...  
+	(checkerror): ...  this.  
+	(_swiread): Use checkerror() for the return of SWI calls.  Correct the use of r0.  
+	(_read): Use findslot().  Return EBADF on bad handle.  
+	(_swilseek): Call findslot().  Check for valid whence.  Check for negative offset when using 
+	SEEK_CUR, and check for overflow.  Use checkerror().  Check *_Flen calls for errors.  
+	(_swiwrite): Correct the use of r0.  
+	(_write): Call findslot().  
+	(_swiopen): Call findslot().  Check for valid flags.  Use checkerror().  Call newslot().  
+	Handle O_TRUNC, and O_WRONLY.  Return index into openfiles[] for fd.  
+	(_swiclose): Correct the use of r0.  
+	(_close): Handle stderr == stdout case.  Only reclaim handle if _swiclose succeeded.  
+	(_getpid): Use __attribute__((unused)).  
+	(_sbrk): Fix formatting.  
+	(_swistat): New function.  
+	(_stat): Call _swistat().  
+	(_fstat): Call _swistat().  
+	(_unlink): Correct the use of r0.  
+	(isatty): Call finslot().  Correct the use of r0.  
+	(_system): Call checkerror().  Correct the use of r0.  
+	(_rename): Correct the use of r0.  
+	
+2007-07-13  Kevin Buettner  <kevinb@redhat.com> 
+
+	* mep/fmax.ld, mep/gmap_default.ld, mep/min.ld, mep/simple.ld (.gcc_except_table): Add pattern 
+	for .gcc_except_table.*.  
+					
 2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/syscalls.c (gettimeofday): Change to POSIX signature
