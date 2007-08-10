@@ -1350,11 +1350,14 @@ extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
   int res = -1;
+  char *oldbuf, *newbuf;
   path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
+  bool old_dir_requested = false, new_dir_requested = false;
   bool old_explicit_suffix = false, new_explicit_suffix = false;
   size_t olen, nlen;
+  bool equal_path;
   NTSTATUS status;
-  HANDLE fh, nfh;
+  HANDLE fh = NULL, nfh;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG size;
@@ -1372,6 +1375,18 @@ rename (const char *oldpath, const char *newpath)
       goto out;
     }
 
+  /* A trailing slash requires that the pathname points to an existing
+     directory.  If it's not, it's a ENOTDIR condition.  The same goes
+     for newpath a bit further down this function. */
+  olen = strlen (oldpath);
+  if (isdirsep (oldpath[olen - 1]))
+    {
+      stpcpy (oldbuf = (char *) alloca (olen + 1), oldpath);
+      while (olen > 0 && isdirsep (oldbuf[olen - 1]))
+        oldbuf[--olen] = '\0';
+      oldpath = oldbuf;
+      old_dir_requested = true;
+    }
   oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
   if (oldpc.error)
     {
@@ -1388,12 +1403,25 @@ rename (const char *oldpath, const char *newpath)
       set_errno (EROFS);
       goto out;
     }
-  olen = strlen (oldpath);
+  if (old_dir_requested && !oldpc.isdir ())
+    {
+      set_errno (ENOTDIR);
+      goto out;
+    }
   if (oldpc.known_suffix
       && (strcasematch (oldpath + olen - 4, ".lnk")
 	  || strcasematch (oldpath + olen - 4, ".exe")))
     old_explicit_suffix = true;
 
+  nlen = strlen (newpath);
+  if (isdirsep (newpath[nlen - 1]))
+    {
+      stpcpy (newbuf = (char *) alloca (nlen + 1), newpath);
+      while (nlen > 0 && isdirsep (newbuf[nlen - 1]))
+        newbuf[--nlen] = '\0';
+      newpath = newbuf;
+      new_dir_requested = true;
+    }
   newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
   if (newpc.error)
     {
@@ -1405,13 +1433,32 @@ rename (const char *oldpath, const char *newpath)
       set_errno (EROFS);
       goto out;
     }
-  nlen = strlen (newpath);
+  if (new_dir_requested && !newpc.isdir ())
+    {
+      set_errno (ENOTDIR);
+      goto out;
+    }
   if (newpc.known_suffix
       && (strcasematch (newpath + nlen - 4, ".lnk")
 	  || strcasematch (newpath + nlen - 4, ".exe")))
     new_explicit_suffix = true;
 
-  if (oldpc.isdir ())
+  /* This test is necessary in almost every case, so just do it once here. */
+  equal_path = RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				      newpc.get_nt_native_path (),
+				      TRUE);
+
+  /* First check if oldpath and newpath only differ by case.  If so, it's
+     just a request to change the case of the filename.  By simply setting
+     the file attributes to INVALID_FILE_ATTRIBUTES (which translates to
+     "file doesn't exist"), all later tests are skipped. */
+  if (newpc.exists ()
+      && equal_path
+      && !RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+				 newpc.get_nt_native_path (),
+				 FALSE))
+    newpc.file_attributes (INVALID_FILE_ATTRIBUTES);
+  else if (oldpc.isdir ())
     {
       if (newpc.exists () && !newpc.isdir ())
 	{
@@ -1433,10 +1480,7 @@ rename (const char *oldpath, const char *newpath)
     }
   else if (!newpc.exists ())
     {
-      if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
-				 newpc.get_nt_native_path (),
-				 TRUE)
-	  && old_explicit_suffix != new_explicit_suffix)
+      if (equal_path && old_explicit_suffix != new_explicit_suffix)
 	{
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
@@ -1464,10 +1508,7 @@ rename (const char *oldpath, const char *newpath)
     }
   else
     {
-      if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
-				 newpc.get_nt_native_path (),
-				 TRUE)
-	  && old_explicit_suffix != new_explicit_suffix)
+      if (equal_path && old_explicit_suffix != new_explicit_suffix)
 	{
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
@@ -1524,6 +1565,52 @@ rename (const char *oldpath, const char *newpath)
       __seterrno_from_nt_status (status);
       goto out;
     }
+
+  /* Renaming a dir to another, existing dir fails always, even if
+     ReplaceIfExists is set to TRUE and the existing dir is empty.  So
+     we have to remove the destination dir first.  This also covers the
+     case that the destination directory is not empty.  In that case,
+     unlink_nt returns with STATUS_DIRECTORY_NOT_EMPTY. */
+  if (dstpc->isdir ())
+    {
+      status = unlink_nt (*dstpc);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+  /* You can't copy a file if the destination exists and has the R/O
+     attribute set.  Remove the R/O attribute first. */
+  else if (dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))
+    {
+      status = NtOpenFile (&nfh, FILE_WRITE_ATTRIBUTES,
+			   dstpc->get_object_attr (attr, sec_none_nih),
+			   &io, FILE_SHARE_VALID_FLAGS,
+			   FILE_OPEN_FOR_BACKUP_INTENT
+			   | (dstpc->is_rep_symlink ()
+			      ? FILE_OPEN_REPARSE_POINT : 0));
+      if (!NT_SUCCESS (status))
+        {
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+      FILE_BASIC_INFORMATION fbi;
+      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
+      fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+      fbi.FileAttributes = (dstpc->file_attributes ()
+			    & ~FILE_ATTRIBUTE_READONLY)
+			   ?: FILE_ATTRIBUTE_NORMAL;
+      status = NtSetInformationFile (nfh, &io,  &fbi, sizeof fbi,
+				     FileBasicInformation);
+      NtClose (nfh);
+      if (!NT_SUCCESS (status))
+        {
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+
   /* SUSv3: If the old argument and the new argument resolve to the same
      existing file, rename() shall return successfully and perform no
      other action.
@@ -1532,6 +1619,7 @@ rename (const char *oldpath, const char *newpath)
      file ids.  If so, it tests for identical volume serial numbers,  If so,
      oldpath and newpath refer to the same file. */
   if ((removepc || dstpc->exists ())
+      && !oldpc.isdir ()
       && NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofsi, sizeof ofsi,
 					     FileStandardInformation))
       && ofsi.NumberOfLinks > 1
@@ -1562,7 +1650,6 @@ rename (const char *oldpath, const char *newpath)
 	{
 	  debug_printf ("%s and %s are the same file", oldpath, newpath);
 	  NtClose (nfh);
-	  NtClose (fh);
 	  res = 0;
 	  goto out;
 	}
@@ -1577,7 +1664,16 @@ rename (const char *oldpath, const char *newpath)
   memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
 	  pfri->FileNameLength);
   status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
-  NtClose (fh);
+  /* This happens if the access rights don't allow deleting the destination.
+     Even if the handle to the original file is opened with BACKUP
+     and/or RECOVERY, these flags don't apply to the destination of the
+     rename operation.  So, a privileged user can't rename a file to an
+     existing file, if the permissions of the existing file aren't right.
+     Like directories, we have to handle this separately by removing the
+     destination before renaming. */
+  if (status == STATUS_ACCESS_DENIED && dstpc->exists () && !dstpc->isdir ()
+      && NT_SUCCESS (status = unlink_nt (*dstpc)))
+    status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
   if (NT_SUCCESS (status))
     {
       if (removepc)
@@ -1585,25 +1681,11 @@ rename (const char *oldpath, const char *newpath)
       res = 0;
     }
   else
-    {
-      /* Check in case of STATUS_ACCESS_DENIED and pc.isdir(),
-         whether we tried to rename to an existing non-empty dir.
-	 In this case we have to set errno to EEXIST. */
-      if (status == STATUS_ACCESS_DENIED && dstpc->isdir ()
-	  && NT_SUCCESS (NtOpenFile (&nfh, FILE_LIST_DIRECTORY | SYNCHRONIZE,
-				    dstpc->get_object_attr (attr, sec_none_nih),
-				    &io, FILE_SHARE_VALID_FLAGS,
-				    FILE_OPEN_FOR_BACKUP_INTENT
-				    | FILE_SYNCHRONOUS_IO_NONALERT)))
-	{
-	  if (check_dir_not_empty (nfh) == STATUS_DIRECTORY_NOT_EMPTY)
-	    status = STATUS_DIRECTORY_NOT_EMPTY;
-	  NtClose (nfh);
-	}
-      __seterrno_from_nt_status (status);
-    }
+    __seterrno_from_nt_status (status);
 
 out:
+  if (fh)
+    NtClose (fh);
   syscall_printf ("%d = rename (%s, %s)", res, oldpath, newpath);
   return res;
 }

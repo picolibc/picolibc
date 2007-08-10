@@ -1,3 +1,17 @@
+2007-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Check oldpath and newpath for trailing dir
+	separators, require them to be existing directories if so.  Check
+	for a request to change only the case of the filename.  Check paths
+	for case insensitve equality only once.  Handle renaming a directory
+	to another, existing directory by unlinking the destination directory
+	first.  If newpath points to an existing file with R/O attribute set,
+	try to unset R/O attribute first.  Augment hardlink test by not
+	checking directories.  If renaming fails with STATUS_ACCESS_DENIED,
+	try to unlink existing destination filename and try renaming again.
+	Drop useless test for non-empty directory.  Always close fh at the
+	end of the function.
+
 2007-08-09  Ernie Coskrey  <Ernie.Coskrey@steeleye.com>
 
 	* gendef (sigbe): Reset "incyg" while the stack lock is active to avoid
