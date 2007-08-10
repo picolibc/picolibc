@@ -1,5 +1,9 @@
 2007-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (fillout_mntent): Fix calculation of unicode buffer size.
+
+2007-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Check oldpath and newpath for trailing dir
 	separators, require them to be existing directories if so.  Check
 	for a request to change only the case of the filename.  Check paths

@@ -2625,7 +2625,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   fs_info mntinfo;
   UNICODE_STRING unat;
-  size_t size = (strlen (native_path) + 1) * sizeof (WCHAR);
+  /* Size must allow prepending the native NT path prefixes. */
+  size_t size = (strlen (native_path) + 10) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&unat, (PWSTR) alloca (size), size);
   get_nt_native_path (native_path, unat);
   mntinfo.update (&unat, true);  /* this pulls from a cache, usually. */
