@@ -468,8 +468,9 @@ cd build
 make install &gt; install.log 2&gt;&amp;1
 </screen>
 
-<para>To check a cygwin1.dll, run "make check" in the winsup/testsuite
-directory.  If that works, install everything <emphasis>except</emphasis> the dll (if
+<para>To check a cygwin1.dll, run "make check" in the build/i?86*cygwin/winsup
+directory created after running make above.
+If that works, install everything <emphasis>except</emphasis> the dll (if
 you can).  Then, close down all cygwin programs (including bash windows,
 inetd, etc.), save your old dll, and copy the new dll to the correct
 place.  Then start up a bash window, or  run a cygwin program from the
