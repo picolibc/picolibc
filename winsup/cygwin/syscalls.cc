@@ -2736,45 +2736,6 @@ __assertfail ()
   exit (99);
 }
 
-extern "C" int
-getw (FILE *fp)
-{
-  int w, ret;
-  ret = fread (&w, sizeof (int), 1, fp);
-  return ret != 1 ? EOF : w;
-}
-
-extern "C" int
-putw (int w, FILE *fp)
-{
-  int ret;
-  ret = fwrite (&w, sizeof (int), 1, fp);
-  if (feof (fp) || ferror (fp))
-    return -1;
-  return 0;
-}
-
-extern "C" int
-wcscmp (const wchar_t *s1, const wchar_t *s2)
-{
-  while (*s1  && *s1 == *s2)
-    {
-      s1++;
-      s2++;
-    }
-
-  return (* (unsigned short *) s1) - (* (unsigned short *) s2);
-}
-
-extern "C" size_t
-wcslen (const wchar_t *s1)
-{
-  int l = 0;
-  while (s1[l])
-    l++;
-  return l;
-}
-
 /* FIXME: to do this right, maybe work out the usoft va_list machine
    and use wsvprintfW instead?
 */
@@ -2795,23 +2756,6 @@ vhangup ()
 {
   set_errno (ENOSYS);
   return -1;
-}
-
-extern "C" _PTR
-memccpy (_PTR out, const _PTR in, int c, size_t len)
-{
-  const char *inc = (char *) in;
-  char *outc = (char *) out;
-
-  while (len)
-    {
-      char x = *inc++;
-      *outc++ = x;
-      if (x == c)
-	return outc;
-      len --;
-    }
-  return 0;
 }
 
 extern "C" int

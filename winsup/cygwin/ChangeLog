@@ -1,5 +1,13 @@
 2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (getw): Remove redundant implementation.
+	(putw): Ditto.
+	(wcscmp): Ditto.
+	(wcslen): Ditto.
+	(memccpy): Ditto.
+
+2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h: Add descriptive comments to special Rtl functions.
 	(STATUS_OBJECT_PATH_NOT_FOUND): Define.
 	(STATUS_BUFFER_OVERFLOW): Define.
