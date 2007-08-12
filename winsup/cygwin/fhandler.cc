@@ -542,11 +542,6 @@ fhandler_base::open (int flags, mode_t mode)
       /* If mode has no write bits set, we set the R/O attribute. */
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	file_attributes |= FILE_ATTRIBUTE_READONLY;
-#ifdef HIDDEN_DOT_FILES
-      char *c = strrchr (get_win32_name (), '\\');
-      if ((c && c[1] == '.') || *get_win32_name () == '.')
-	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
-#endif
       /* Starting with Windows 2000, when trying to overwrite an already
 	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
 	 attribute set, CreateFile fails with ERROR_ACCESS_DENIED.

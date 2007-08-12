@@ -3072,11 +3072,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  CloseHandle (h);
 	  DWORD attr = use_winsym ? FILE_ATTRIBUTE_READONLY
 				  : FILE_ATTRIBUTE_SYSTEM;
-#ifdef HIDDEN_DOT_FILES
-	  cp = strrchr (win32_path, '\\');
-	  if ((cp && cp[1] == '.') || *win32_path == '.')
-	    attr |= FILE_ATTRIBUTE_HIDDEN;
-#endif
 	  SetFileAttributes (win32_path, attr);
 
 	  res = 0;

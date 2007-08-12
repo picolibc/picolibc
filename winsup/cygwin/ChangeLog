@@ -1,5 +1,11 @@
 2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Remove HIDDEN_DOT_FILES code.
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Ditto.
+	* path.cc (symlink_worker): Ditto.
+
+2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (getw): Remove redundant implementation.
 	(putw): Ditto.
 	(wcscmp): Ditto.

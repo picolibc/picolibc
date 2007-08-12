@@ -1478,13 +1478,6 @@ fhandler_disk_file::mkdir (mode_t mode)
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG fattr = FILE_ATTRIBUTE_DIRECTORY;
-#ifdef HIDDEN_DOT_FILES
-  UNICODE_STRING basename;
-
-  RtlSplitUnicodePath (pc.get_nt_native_path (), NULL, &basename);
-  if (basename.Buffer[0] == L'.')
-    fattr |= FILE_ATTRIBUTE_HIDDEN;
-#endif
   status = NtCreateFile (&dir, FILE_LIST_DIRECTORY | SYNCHRONIZE,
 			 pc.get_object_attr (attr, sa), &io, NULL,
 			 fattr, FILE_SHARE_VALID_FLAGS, FILE_CREATE,
