@@ -20,6 +20,7 @@
 #define STATUS_ACCESS_DENIED          ((NTSTATUS) 0xc0000022)
 #define STATUS_BUFFER_TOO_SMALL       ((NTSTATUS) 0xc0000023)
 #define STATUS_OBJECT_NAME_NOT_FOUND  ((NTSTATUS) 0xc0000034)
+#define STATUS_OBJECT_PATH_NOT_FOUND  ((NTSTATUS) 0xc000003A)
 #define STATUS_SHARING_VIOLATION      ((NTSTATUS) 0xc0000043)
 #define STATUS_DELETE_PENDING         ((NTSTATUS) 0xc0000056)
 #define STATUS_WORKING_SET_QUOTA      ((NTSTATUS) 0xc00000a1)
@@ -27,6 +28,7 @@
 #define STATUS_DIRECTORY_NOT_EMPTY    ((NTSTATUS) 0xc0000101)
 #define STATUS_NOT_ALL_ASSIGNED       ((NTSTATUS) 0x00000106)
 #define STATUS_INVALID_LEVEL          ((NTSTATUS) 0xc0000148)
+#define STATUS_BUFFER_OVERFLOW        ((NTSTATUS) 0x80000005)
 #define STATUS_NO_MORE_FILES          ((NTSTATUS) 0x80000006)
 #define PDI_MODULES 0x01
 #define PDI_HEAPS 0x04
@@ -40,6 +42,13 @@
 #define WSLE_PAGE_EXECUTE_WRITECOPY 0x007
 #define WSLE_PAGE_SHARE_COUNT_MASK 0x0E0
 #define WSLE_PAGE_SHAREABLE 0x100
+
+#define FILE_SUPERSEDED     0
+#define FILE_OPENED         1
+#define FILE_CREATED        2
+#define FILE_OVERWRITTEN    3
+#define FILE_EXISTS         4
+#define FILE_DOES_NOT_EXIST 5
 
 /* Device Characteristics. */
 #define FILE_REMOVABLE_MEDIA           0x00000001
@@ -736,6 +745,8 @@ typedef struct _FILE_FULL_EA_INFORMATION
   CHAR EaName[1];
 } FILE_FULL_EA_INFORMATION, *PFILE_FULL_EA_INFORMATION;
 
+typedef VOID NTAPI (*PIO_APC_ROUTINE)(PVOID, PIO_STATUS_BLOCK, ULONG);
+
 /* Function declarations for ntdll.dll.  These don't appear in any
    standard Win32 header.  */
 extern "C"
@@ -753,7 +764,7 @@ extern "C"
 				PTOKEN_GROUPS, PTOKEN_PRIVILEGES, PTOKEN_OWNER,
 				PTOKEN_PRIMARY_GROUP, PTOKEN_DEFAULT_DACL,
 				PTOKEN_SOURCE);
-  NTSTATUS NTAPI NtFsControlFile (HANDLE, HANDLE, PVOID, PVOID,
+  NTSTATUS NTAPI NtFsControlFile (HANDLE, HANDLE, PIO_APC_ROUTINE, PVOID,
 				  PIO_STATUS_BLOCK, ULONG, PVOID, ULONG,
 				  PVOID, ULONG);
   NTSTATUS NTAPI NtLockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
@@ -799,6 +810,9 @@ extern "C"
 				      PSECURITY_DESCRIPTOR);
   NTSTATUS NTAPI NtUnlockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
+  NTSTATUS NTAPI NtWriteFile (HANDLE, HANDLE, PIO_APC_ROUTINE, PVOID,
+			      PIO_STATUS_BLOCK, PVOID, ULONG, PLARGE_INTEGER,
+			      PULONG);
   NTSTATUS NTAPI RtlAppendUnicodeToString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlAppendUnicodeStringToString (PUNICODE_STRING,
 						 PUNICODE_STRING);
@@ -830,8 +844,11 @@ extern "C"
 					      BOOLEAN);
 
   /* A few Rtl functions are either actually macros, or they just don't
-     exist even though they would be a big help.  We implement them here
-     as inline functions. */
+     exist even though they would be a big help.  We implement them here,
+     partly as inline functions. */
+
+  /* RtlInitEmptyUnicodeString is defined as a macro in wdm.h, but that file
+     is missing entirely in w32api. */
   inline
   VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
 				       USHORT len)
@@ -840,6 +857,11 @@ extern "C"
     dest->MaximumLength = len;
     dest->Buffer = (PWSTR) buf;
   }
+  /* Like RtlInitEmptyUnicodeString, but initialize Length to len, too.
+     This is for instance useful when creating a UNICODE_STRING from an
+     NtQueryInformationFile info buffer, where the length of the filename
+     is known, but you can't rely on the string being 0-terminated.
+     If you know it's 0-terminated, just use RtlInitUnicodeString(). */
   inline
   VOID NTAPI RtlInitCountedUnicodeString (PUNICODE_STRING dest, PCWSTR buf,
   					  USHORT len)
@@ -847,20 +869,29 @@ extern "C"
     dest->Length = dest->MaximumLength = len;
     dest->Buffer = (PWSTR) buf;
   }
+  /* Split path into dirname and basename part.  This function does not
+     copy anything!  It just initializes the dirname and basename
+     UNICODE_STRINGs so that their Buffer members point to the right spot
+     into path's Buffer, and the Length (and MaximumLength) members are set 
+     to match the dirname part and the basename part.
+     Note that dirname's Length is set so that it also includes the trailing
+     backslash.  If you don't need it, just subtract sizeof(WCHAR) from
+     dirname.Length. */
   inline
-  VOID NTAPI RtlSplitUnicodePath (PUNICODE_STRING path, PUNICODE_STRING dir,
-				  PUNICODE_STRING file)
+  VOID NTAPI RtlSplitUnicodePath (PUNICODE_STRING path, PUNICODE_STRING dirname,
+				  PUNICODE_STRING basename)
   {
     USHORT len = path->Length / sizeof (WCHAR);
     while (len > 0 && path->Buffer[--len] != L'\\')
       ;
     ++len;
-    if (dir)
-      RtlInitCountedUnicodeString (dir, path->Buffer, len * sizeof (WCHAR));
-    if (file)
-      RtlInitCountedUnicodeString (file, &path->Buffer[len],
+    if (dirname)
+      RtlInitCountedUnicodeString (dirname, path->Buffer, len * sizeof (WCHAR));
+    if (basename)
+      RtlInitCountedUnicodeString (basename, &path->Buffer[len],
 				   path->Length - len * sizeof (WCHAR));
   }
+  /* Check if prefix is a prefix of path. */
   inline
   BOOLEAN NTAPI RtlEqualUnicodePathPrefix (PUNICODE_STRING path, PCWSTR prefix,
 					   BOOLEAN caseinsensitive)
@@ -873,6 +904,7 @@ extern "C"
 				 ? pref.Length : path->Length);
     return RtlEqualUnicodeString (&p, &pref, caseinsensitive);
   }
+  /* Check if sufffix is a sufffix of path. */
   inline
   BOOL NTAPI RtlEqualUnicodePathSuffix (PUNICODE_STRING path, PCWSTR suffix,
 					BOOLEAN caseinsensitive)
@@ -888,4 +920,12 @@ extern "C"
       RtlInitCountedUnicodeString (&p, path->Buffer, path->Length);
     return RtlEqualUnicodeString (&p, &suf, caseinsensitive);
   }
+  /* Implemented in strfuncs.cc.  Create a Hex UNICODE_STRING from a given
+     64 bit integer value.  If append is TRUE, append the hex string,
+     otherwise overwrite dest.  Returns either STAUTUS_SUCCESS, or
+     STATUS_BUFFER_OVERFLOW, if the unicode buffer is too small (hasn't
+     room for 16 WCHARs). */
+  NTSTATUS NTAPI RtlInt64ToHexUnicodeString (ULONGLONG value,
+					     PUNICODE_STRING dest,
+					     BOOLEAN append);
 }

@@ -139,94 +139,231 @@ dup2 (int oldfd, int newfd)
   return cygheap->fdtab.dup2 (oldfd, newfd);
 }
 
+static char desktop_ini[] =
+  "[.ShellClassInfo]\r\nCLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n";
+static BYTE info2[] =
+{
+  0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x20, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 static void
 try_to_bin (path_conv &win32_path, HANDLE h)
 {
   NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  char recycler[CYG_MAX_PATH + 20];
+  HANDLE rootdir = NULL, recyclerdir = NULL;
+  USHORT recycler_base_len = 0, recycler_user_len = 0;
+  UNICODE_STRING root, recycler, fname;
+  WCHAR recyclerbuf[NAME_MAX + 1]; /* Enough for recycler + SID + filename */
+  PFILE_NAME_INFORMATION pfni;
+  PFILE_INTERNAL_INFORMATION pfii;
+  PFILE_RENAME_INFORMATION pfri;
+  BYTE infobuf[sizeof (FILE_NAME_INFORMATION ) + 32767 * sizeof (WCHAR)];
 
-  rootdir (win32_path, recycler);
-  char *c = recycler + strlen (recycler);
-  if (wincap.has_recycle_dot_bin ())
+  pfni = (PFILE_NAME_INFORMATION) infobuf;
+  status = NtQueryInformationFile (h, &io, pfni, sizeof infobuf,
+				   FileNameInformation);
+  if (!NT_SUCCESS (status))
     {
-      strcpy (c, "$Recycle.Bin");	/* NTFS and FAT since Vista */
-      c += 12;
+      debug_printf ("NtQueryInformationFile (FileNameInformation) failed, %08x",
+		    status);
+      goto out;
     }
-  else if (win32_path.fs_is_ntfs ())
-    {
-      strcpy (c, "RECYCLER");		/* NTFS up to 2K3 */
-      c += 8;
-    }
-  else if (win32_path.fs_is_fat ())
-    {
-      strcpy (c, "Recycled");		/* FAT up to 2K3 */
-      c += 8;
-    }
+  /* The filename could change, the parent dir not.  So we split both paths
+     and take the prefix.  However, there are two special cases:
+     - The handle refers to the root dir of the volume.
+     - The handle refers to the recycler or a subdir.
+     Both cases are handled by just returning and not even trying to move
+     them into the recycler. */
+  if (pfni->FileNameLength == 2) /* root dir. */
+    goto out;
+  /* Initialize recycler path. */
+  RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
+  if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
+    RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
+  else if (win32_path.fs_is_ntfs ())	/* NTFS up to 2K3 */
+    RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");	
+  else if (win32_path.fs_is_fat ())	/* FAT up to 2K3 */
+    RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");	
   else
-    return;
+    goto out;
+  /* Is the file a subdir of the recycler? */
+  RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
+  if (RtlEqualUnicodePathPrefix (&fname, recycler.Buffer, TRUE))
+    goto out;
+  /* Is fname the recycler?  Temporarily hide trailing backslash. */
+  recycler.Length -= sizeof (WCHAR);
+  if (RtlEqualUnicodeString (&fname, &recycler, TRUE))
+    goto out;
 
-  /* Yes, we can really do that.  Typically the recycle bin is created
-     by the first user actually using the bin.  The permissions are the
-     default permissions propagated from the root directory. */
-  if (GetFileAttributes (recycler) == INVALID_FILE_ATTRIBUTES)
+  /* Create root dir path from file name information. */
+  RtlSplitUnicodePath (&fname, &fname, NULL);
+  RtlSplitUnicodePath (win32_path.get_nt_native_path (), &root, NULL);
+  root.Length -= fname.Length - sizeof (WCHAR);
+
+  /* Open root directory. */
+  InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  status = NtOpenFile (&rootdir, FILE_TRAVERSE, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+  if (!NT_SUCCESS (status))
     {
-      if (!CreateDirectory (recycler, NULL))
-	{
-	  debug_printf ("Can't create folder %s, %E", recycler);
-	  return;
-	}
-      SetFileAttributes (recycler,
-      			 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
+      debug_printf ("NtOpenFile (%S) failed, %08x", &root, status);
+      goto out;
     }
 
-  /* Up to Windows 2003 Server, the default settings for the top level recycle
-     bin are so that everybody has the right to create files in it.  Starting
-     with Vista, users are by default not allowed to create files in that
-     directory, only subdirectories.  Too bad, but that requires to move
-     files to the user's own recycler subdir.  Instead of adding yet another
-     special case, we just move the stuff to the user's recycler, especially
-     since only shared files are moved at all. */
+  /* Strip leading backslash */
+  ++recycler.Buffer;
+  recycler.Length -= sizeof (WCHAR);
+  /* Store length of recycler base dir, should it be necessary to create it. */
+  recycler_base_len = recycler.Length;
+  /* On NTFS the recycler dir contains user specific subdirs, which are the
+     actual recycle bins per user.  The name if this dir is the string
+     representation of the user SID. */
   if (win32_path.fs_is_ntfs ())
     {
-      *c++ = '\\';
-      cygheap->user.get_windows_id (c);
-      while (*c)
-       ++c;
-      if (GetFileAttributes (recycler) == INVALID_FILE_ATTRIBUTES)
-	{
-	  if (!CreateDirectory (recycler,
-				sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
-					  cygheap->user.sid ())))
-	    {
-	      debug_printf ("Can't create folder %s, %E", recycler);
-	      return;
-	    }
-	  SetFileAttributes (recycler,
-			     FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN);
-	}
+      UNICODE_STRING sid;
+      WCHAR sidbuf[128];
+      /* Unhide trailing backslash. */
+      recycler.Length += sizeof (WCHAR);
+      RtlInitEmptyUnicodeString (&sid, sidbuf, sizeof sidbuf);
+      /* In contrast to what MSDN claims, this function is already available
+	 since NT4. */
+      RtlConvertSidToUnicodeString (&sid, cygheap->user.sid (), FALSE);
+      RtlAppendUnicodeStringToString (&recycler, &sid);
+      recycler_user_len = recycler.Length;
     }
-
   /* Create hopefully unique filename. */
-  __small_sprintf (c, "\\cyg%016X", hash_path_name (myself->uid,
-						    win32_path.get_win32 ()));
-  c += 20;
-
-  /* Length of the WCHAR path in bytes. */
-  ULONG len = 2 * (c - recycler);
-  /* Choose size big enough to fit a local native NT path into it. */
-  ULONG size = sizeof (FILE_RENAME_INFORMATION) + len + 10;
-  PFILE_RENAME_INFORMATION pfri = (PFILE_RENAME_INFORMATION) alloca (size);
-
+  RtlAppendUnicodeToString (&recycler, L"\\cyg");
+  pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
+  status = NtQueryInformationFile (h, &io, pfii, sizeof infobuf,
+				   FileInternalInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQueryInformationFile (FileInternalInformation) failed, "
+		    "%08x", status);
+      goto out;
+    }
+  RtlInt64ToHexUnicodeString (pfii->FileId.QuadPart, &recycler, TRUE);
+  /* Shoot. */
+  pfri = (PFILE_RENAME_INFORMATION) infobuf;
   pfri->ReplaceIfExists = TRUE;
-  pfri->RootDirectory = NULL;
-  UNICODE_STRING uname = { 0, len + 10, pfri->FileName };
-  get_nt_native_path (recycler, uname);
-  pfri->FileNameLength = uname.Length;
-  status = NtSetInformationFile (h, &io, pfri, size, FileRenameInformation);
+  pfri->RootDirectory = rootdir;
+  pfri->FileNameLength = recycler.Length;
+  memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
+  status = NtSetInformationFile (h, &io, pfri, sizeof infobuf,
+				 FileRenameInformation);
+  if (status == STATUS_OBJECT_PATH_NOT_FOUND)
+    {
+      /* Ok, so the recycler and/or the recycler/SID directory don't exist.
+	 First reopen root dir with permission to create subdirs. */
+      NtClose (rootdir);
+      status = NtOpenFile (&rootdir, FILE_ADD_SUBDIRECTORY, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtOpenFile (%S) failed, %08x", &recycler, status);
+	  goto out;
+	}
+      /* Then check if recycler exists by opening and potentially creating it.
+	 Yes, we can really do that.  Typically the recycle bin is created
+	 by the first user actually using the bin.  The permissions are the
+	 default permissions propagated from the root directory. */
+      InitializeObjectAttributes (&attr, &recycler, OBJ_CASE_INSENSITIVE,
+				  rootdir, NULL);
+      recycler.Length = recycler_base_len;
+      status = NtCreateFile (&recyclerdir,
+			     READ_CONTROL
+			     | (win32_path.fs_is_ntfs () ? 0 : FILE_ADD_FILE),
+			     &attr, &io, NULL,
+			     FILE_ATTRIBUTE_DIRECTORY
+			     | FILE_ATTRIBUTE_SYSTEM
+			     | FILE_ATTRIBUTE_HIDDEN,
+			     FILE_SHARE_VALID_FLAGS, FILE_OPEN_IF,
+			     FILE_DIRECTORY_FILE, NULL, 0);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtCreateFile (%S) failed, %08x", &recycler, status);
+	  goto out;
+	}
+      /* Next, if necessary, check if the recycler/SID dir exists and
+         create it if not. */
+      if (win32_path.fs_is_ntfs ())
+        {
+	  NtClose (recyclerdir);
+	  recycler.Length = recycler_user_len;
+	  status = NtCreateFile (&recyclerdir, READ_CONTROL | FILE_ADD_FILE,
+				 &attr, &io, NULL, FILE_ATTRIBUTE_DIRECTORY
+						   | FILE_ATTRIBUTE_SYSTEM
+						   | FILE_ATTRIBUTE_HIDDEN,
+				 FILE_SHARE_VALID_FLAGS, FILE_OPEN_IF,
+				 FILE_DIRECTORY_FILE, NULL, 0);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("NtCreateFile (%S) failed, %08x",
+			    &recycler, status);
+	      goto out;
+	    }
+	}
+      /* The desktop.ini and INFO2 (pre-Vista) files are expected by
+         Windows Explorer.  Otherwise, the created bin is treated as
+	 corrupted */
+      if (io.Information == FILE_CREATED)
+        {
+	  HANDLE fh;
+	  RtlInitUnicodeString (&fname, L"desktop.ini");
+	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+				      recyclerdir, NULL);
+	  status = NtCreateFile (&fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
+				 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN,
+				 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+				 FILE_SYNCHRONOUS_IO_NONALERT
+				 | FILE_NON_DIRECTORY_FILE, NULL, 0);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("NtCreateFile (%S) failed, %08x", &recycler, status);
+	  else
+	    {
+	      status = NtWriteFile (fh, NULL, NULL, NULL, &io, desktop_ini,
+				    sizeof desktop_ini - 1, NULL, NULL);
+	      if (!NT_SUCCESS (status))
+	        debug_printf ("NtWriteFile (%S) failed, %08x", &fname, status);
+	      NtClose (fh);
+	    }
+	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */
+	    {
+	      RtlInitUnicodeString (&fname, L"INFO2");
+	      status = NtCreateFile (&fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
+				     FILE_ATTRIBUTE_ARCHIVE
+				     | FILE_ATTRIBUTE_HIDDEN,
+				     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+				     FILE_SYNCHRONOUS_IO_NONALERT
+				     | FILE_NON_DIRECTORY_FILE, NULL, 0);
+		if (!NT_SUCCESS (status))
+		  debug_printf ("NtCreateFile (%S) failed, %08x",
+				&recycler, status);
+		else
+		{
+		  status = NtWriteFile (fh, NULL, NULL, NULL, &io, info2,
+					sizeof info2, NULL, NULL);
+		  if (!NT_SUCCESS (status))
+		    debug_printf ("NtWriteFile (%S) failed, %08x",
+				  &fname, status);
+		  NtClose (fh);
+		}
+	    }
+	}
+      NtClose (recyclerdir);
+      /* Shoot again. */
+      status = NtSetInformationFile (h, &io, pfri, sizeof infobuf,
+				     FileRenameInformation);
+    }
   if (!NT_SUCCESS (status))
     debug_printf ("Move %s to %s failed, status = %p", win32_path.get_win32 (),
 		  recycler, status);
+out:
+  if (rootdir)
+    NtClose (rootdir);
 }
 
 static NTSTATUS

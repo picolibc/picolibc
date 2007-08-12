@@ -1,3 +1,25 @@
+2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h: Add descriptive comments to special Rtl functions.
+	(STATUS_OBJECT_PATH_NOT_FOUND): Define.
+	(STATUS_BUFFER_OVERFLOW): Define.
+	(FILE_SUPERSEDED): Define.
+	(FILE_OPENED): Define.
+	(FILE_CREATED): Define.
+	(FILE_OVERWRITTEN): Define.
+	(FILE_EXISTS): Define.
+	(FILE_DOES_NOT_EXIST): Define.
+	(PIO_APC_ROUTINE): Typedef.
+	(NtFsControlFile): Fix parameter types to use PIO_APC_ROUTINE.
+	(NtWriteFile): Declare.
+	(RtlInt64ToHexUnicodeString): Declare.
+	* strfuncs.cc: Include ntdll.h.
+	(RtlInt64ToHexUnicodeString): New function.
+	* syscalls.cc (try_to_bin): Rewrite using native NT functions.
+	Only try to create recycle bin after unsuccessfully trying to move
+	file.  Also try to create special files in recycle bin so that Windows
+	Explorer isn't unnecessarily stampeded.
+
 2007-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (fillout_mntent): Fix calculation of unicode buffer size.

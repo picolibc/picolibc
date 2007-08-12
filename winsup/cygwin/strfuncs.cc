@@ -12,6 +12,7 @@ details. */
 #include "winsup.h"
 #include <winbase.h>
 #include <winnls.h>
+#include <ntdll.h>
 
 codepage_type current_codepage = ansi_cp;
 
@@ -40,4 +41,24 @@ sys_mbstowcs (WCHAR *tgt, const char *src, int len)
 {
   int res = MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
   return res;
+}
+
+static WCHAR hex_wchars[] = L"0123456789abcdef";
+
+NTSTATUS NTAPI
+RtlInt64ToHexUnicodeString (ULONGLONG value, PUNICODE_STRING dest,
+			    BOOLEAN append)
+{
+  USHORT len = append ? dest->Length : 0;
+  if (dest->MaximumLength - len < 16 * (int) sizeof (WCHAR))
+    return STATUS_BUFFER_OVERFLOW;
+  PWCHAR end = (PWCHAR) ((PBYTE) dest->Buffer + len);
+  register PWCHAR p = end + 16;
+  while (p-- > end)
+    {
+      *p = hex_wchars[value & 0xf];
+      value >>= 4;
+    }
+  dest->Length += 16 * sizeof (WCHAR);
+  return STATUS_SUCCESS;
 }
