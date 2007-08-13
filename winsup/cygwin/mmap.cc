@@ -136,7 +136,7 @@ gen_protect (int prot, int flags)
 
 static HANDLE
 CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
-	       int prot, int flags, const char *)
+	       int prot, int flags)
 {
   HANDLE h;
   NTSTATUS ret;
@@ -166,7 +166,7 @@ CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
 			     &sectionsize, PAGE_READWRITE, attributes, fhdl);
       if (NT_SUCCESS (ret) && protect != PAGE_READWRITE)
 	{
-	  CloseHandle (h);
+	  NtClose (h);
 	  ret = NtCreateSection (&h, SECTION_ALL_ACCESS, &oa,
 				 &sectionsize, protect, attributes, fhdl);
 	}
@@ -872,11 +872,21 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
       /* You can't create mappings with PAGE_EXECUTE protection if
 	 the file isn't explicitely opened with EXECUTE access. */
-      HANDLE h = CreateFile (fh->get_win32_name (),
-			     fh->get_access () | GENERIC_EXECUTE,
-			     FILE_SHARE_VALID_FLAGS, &sec_none_nih,
-			     OPEN_EXISTING, 0, NULL);
-      if (h != INVALID_HANDLE_VALUE)
+      UNICODE_STRING fname;
+      OBJECT_ATTRIBUTES attr;
+      NTSTATUS status;
+      HANDLE h;
+      IO_STATUS_BLOCK io;
+
+      RtlInitUnicodeString (&fname, L"");
+      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+				  fh->get_handle (), NULL);
+      status = NtOpenFile (&h,
+			   fh->get_access () | GENERIC_EXECUTE | SYNCHRONIZE,
+			   &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT);
+      if (NT_SUCCESS (status))
 	{
 	  fh_disk_file.set_io_handle (h);
 	  fh_disk_file.set_access (fh->get_access () | GENERIC_EXECUTE);
@@ -1065,7 +1075,7 @@ out:
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
   if (fh_disk_file.get_handle ())
-    CloseHandle (fh_disk_file.get_handle ());
+    NtClose (fh_disk_file.get_handle ());
 
   syscall_printf ("%p = mmap() ", ret);
   return ret;
@@ -1495,8 +1505,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
     }
   else
     {
-      h = CreateMapping (get_handle (), len, off, get_access (),
-			 prot, flags, get_win32_name ());
+      h = CreateMapping (get_handle (), len, off, get_access (), prot, flags);
       if (!h)
 	{
 	  __seterrno ();
@@ -1515,7 +1524,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	      set_errno (EINVAL);
 	      debug_printf ("MapView: address shift with MAP_FIXED given");
 	    }
-	  CloseHandle (h);
+	  NtClose (h);
 	  return INVALID_HANDLE_VALUE;
 	}
     }
@@ -1531,7 +1540,7 @@ fhandler_dev_zero::munmap (HANDLE h, caddr_t addr, size_t len)
   else
     {
       UnmapViewOfFile (addr);
-      CloseHandle (h);
+      NtClose (h);
     }
   return 0;
 }
@@ -1576,7 +1585,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 			  int flags, _off64_t off)
 {
   HANDLE h = CreateMapping (get_handle (), len, off, get_access (),
-			    prot, flags, get_win32_name ());
+			    prot, flags);
   if (!h)
     {
       __seterrno ();
@@ -1595,7 +1604,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 	  set_errno (EINVAL);
 	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
-      CloseHandle (h);
+      NtClose (h);
       return INVALID_HANDLE_VALUE;
     }
 
@@ -1607,7 +1616,7 @@ int
 fhandler_disk_file::munmap (HANDLE h, caddr_t addr, size_t len)
 {
   UnmapViewOfFile (addr);
-  CloseHandle (h);
+  NtClose (h);
   return 0;
 }
 
@@ -1692,7 +1701,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
 	  set_errno (EINVAL);
 	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
-      CloseHandle (h);
+      NtClose (h);
       return INVALID_HANDLE_VALUE;
     }
 
@@ -1709,7 +1718,7 @@ fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
       __seterrno_from_nt_status (ret);
       return -1;
     }
-  CloseHandle (h);
+  NtClose (h);
   return 0;
 }
 

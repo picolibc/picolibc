@@ -1,5 +1,11 @@
 2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc: Call NtClose instead of CloseHandle throughout.
+	(CreateMapping): Drop unused last argument.  Accommodate throughout.
+	(mmap64): Re-open file with execute permissions using NtOpenFile.
+
+2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::close_fs): Reintroduce (as inline function)
 	for clearness.
 	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Revert previous
