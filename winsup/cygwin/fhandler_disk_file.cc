@@ -437,7 +437,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
       res = fstat_by_handle (buf);
       bool no_handle = nohandle ();
       nohandle (false);
-      close ();
+      close_fs ();
       nohandle (no_handle);
       set_io_handle (NULL);
     }
@@ -1257,7 +1257,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
   if (pc.has_buggy_open () && !pc.exists ())
     {
       debug_printf ("Buggy open detected.");
-      close ();
+      close_fs ();
       set_errno (ENOENT);
       return 0;
     }

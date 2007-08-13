@@ -264,6 +264,7 @@ class fhandler_base
   virtual int open (int, mode_t = 0);
   int open_fs (int, mode_t = 0);
   virtual int close ();
+  int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_helper (struct __stat64 *buf,
