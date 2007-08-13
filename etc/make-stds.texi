@@ -8,11 +8,11 @@
 @cindex conventions for makefiles
 @cindex standards for makefiles
 
-@c Copyright 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2000, 2001 Free
-@c Software Foundation, Inc.
+@c Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2000, 2001,
+@c 2004, 2005, 2006 Free Software Foundation, Inc.
 
 @c Permission is granted to copy, distribute and/or modify this document
-@c under the terms of the GNU Free Documentation License, Version 1.1
+@c under the terms of the GNU Free Documentation License, Version 1.2
 @c or any later version published by the Free Software Foundation;
 @c with no Invariant Sections, with no
 @c Front-Cover Texts, and with no Back-Cover Texts.
@@ -36,11 +36,12 @@ Using Automake will help you write a Makefile that follows these
 conventions.
 
 @menu
-* Makefile Basics::             General Conventions for Makefiles
-* Utilities in Makefiles::      Utilities in Makefiles
-* Command Variables::           Variables for Specifying Commands
-* Directory Variables::         Variables for Installation Directories
-* Standard Targets::            Standard Targets for Users
+* Makefile Basics::             General conventions for Makefiles.
+* Utilities in Makefiles::      Utilities to be used in Makefiles.
+* Command Variables::           Variables for specifying commands.
+* DESTDIR::                     Supporting staged installs.
+* Directory Variables::         Variables for installation directories.
+* Standard Targets::            Standard targets for users.
 * Install Command Categories::  Three categories of commands in the `install'
                                   rule: normal, pre-install and post-install.
 @end menu
@@ -263,43 +264,102 @@ Every Makefile should also define the variables @code{INSTALL_PROGRAM}
 and @code{INSTALL_DATA}.  (The default for @code{INSTALL_PROGRAM} should
 be @code{$(INSTALL)}; the default for @code{INSTALL_DATA} should be
 @code{$@{INSTALL@} -m 644}.)  Then it should use those variables as the
-commands for actual installation, for executables and nonexecutables
-respectively.  Use these variables as follows:
+commands for actual installation, for executables and non-executables
+respectively.  Minimal use of these variables is as follows:
 
 @example
 $(INSTALL_PROGRAM) foo $(bindir)/foo
 $(INSTALL_DATA) libfoo.a $(libdir)/libfoo.a
 @end example
 
-Optionally, you may prepend the value of @code{DESTDIR} to the target
-filename.  Doing this allows the installer to create a snapshot of the
-installation to be copied onto the real target filesystem later.  Do not
-set the value of @code{DESTDIR} in your Makefile, and do not include it
-in any installed files.  With support for @code{DESTDIR}, the above
-examples become:
-
-@example
-$(INSTALL_PROGRAM) foo $(DESTDIR)$(bindir)/foo
-$(INSTALL_DATA) libfoo.a $(DESTDIR)$(libdir)/libfoo.a
-@end example
+However, it is preferable to support a @code{DESTDIR} prefix on the
+target files, as explained in the next section.
 
 @noindent
 Always use a file name, not a directory name, as the second argument of
 the installation commands.  Use a separate command for each file to be
 installed.
 
+
+@node DESTDIR
+@section @code{DESTDIR}: support for staged installs
+
+@vindex DESTDIR
+@cindex staged installs
+@cindex installations, staged
+
+@code{DESTDIR} is a variable prepended to each installed target file,
+like this:
+
+@example
+$(INSTALL_PROGRAM) foo $(DESTDIR)$(bindir)/foo
+$(INSTALL_DATA) libfoo.a $(DESTDIR)$(libdir)/libfoo.a
+@end example
+
+The @code{DESTDIR} variable is specified by the user on the @code{make}
+command line.  For example:
+
+@example
+make DESTDIR=/tmp/stage install
+@end example
+
+@noindent
+@code{DESTDIR} should be supported only in the @code{install*} and
+@code{uninstall*} targets, as those are the only targets where it is
+useful.
+
+If your installation step would normally install
+@file{/usr/local/bin/foo} and @file{/usr/local/lib/libfoo.a}, then an
+installation invoked as in the example above would install
+@file{/tmp/stage/usr/local/bin/foo} and
+@file{/tmp/stage/usr/local/lib/libfoo.a} instead.
+
+Prepending the variable @code{DESTDIR} to each target in this way
+provides for @dfn{staged installs}, where the installed files are not
+placed directly into their expected location but are instead copied
+into a temporary location (@code{DESTDIR}).  However, installed files
+maintain their relative directory structure and any embedded file names
+will not be modified.
+
+You should not set the value of @code{DESTDIR} in your @file{Makefile}
+at all; then the files are installed into their expected locations by
+default.  Also, specifying @code{DESTDIR} should not change the
+operation of the software in any way, so its value should not be
+included in any file contents.
+
+@code{DESTDIR} support is commonly used in package creation.  It is
+also helpful to users who want to understand what a given package will
+install where, and to allow users who don't normally have permissions
+to install into protected areas to build and install before gaining
+those permissions.  Finally, it can be useful with tools such as
+@code{stow}, where code is installed in one place but made to appear
+to be installed somewhere else using symbolic links or special mount
+operations.  So, we strongly recommend GNU packages support
+@code{DESTDIR}, though it is not an absolute requirement.
+
+
 @node Directory Variables
 @section Variables for Installation Directories
 
 Installation directories should always be named by variables, so it is
 easy to install in a nonstandard place.  The standard names for these
-variables are described below.  They are based on a standard filesystem
-layout; variants of it are used in SVR4, 4.4BSD, GNU/Linux, Ultrix v4,
-and other modern operating systems.
+variables and the values they should have in GNU packages are
+described below.  They are based on a standard file system layout;
+variants of it are used in GNU/Linux and other modern operating
+systems.
 
-These two variables set the root for the installation.  All the other
-installation directories should be subdirectories of one of these two,
-and nothing should be directly installed into these two directories.
+Installers are expected to override these values when calling
+@command{make} (e.g., @kbd{make prefix=/usr install} or
+@command{configure} (e.g., @kbd{configure --prefix=/usr}).  GNU
+packages should not try to guess which value should be appropriate for
+these variables on the system they are being installed onto: use the
+default settings specified here so that all GNU packages behave
+identically, allowing the installer to achieve any desired layout.
+
+These first two variables set the root for the installation.  All the
+other installation directories should be subdirectories of one of
+these two, and nothing should be directly installed into these two
+directories.
 
 @table @code
 @item prefix
@@ -355,6 +415,12 @@ The directory for installing executable programs to be run by other
 programs rather than by users.  This directory should normally be
 @file{/usr/local/libexec}, but write it as @file{$(exec_prefix)/libexec}.
 (If you are using Autoconf, write it as @samp{@@libexecdir@@}.)
+
+The definition of @samp{libexecdir} is the same for all packages, so
+you should install your data in a subdirectory thereof.  Most packages
+install their data under @file{$(libexecdir)/@var{package-name}/},
+possibly within additional subdirectories thereof, such as
+@file{$(libexecdir)/@var{package-name}/@var{machine}/@var{version}}.
 @end table
 
 Data files used by the program during its execution are divided into
@@ -377,17 +443,32 @@ discourage the use of architecture-dependent files, aside from object
 files and libraries.  It is much cleaner to make other data files
 architecture-independent, and it is generally not hard.
 
-Therefore, here are the variables Makefiles should use to specify
-directories:
+Here are the variables Makefiles should use to specify directories
+to put these various kinds of files in:
 
 @table @samp
+@item datarootdir
+The root of the directory tree for read-only architecture-independent
+data files.  This should normally be @file{/usr/local/share}, but
+write it as @file{$(prefix)/share}.  (If you are using Autoconf, write
+it as @samp{@@datarootdir@@}.)  @samp{datadir}'s default value is
+based on this variable; so are @samp{infodir}, @samp{mandir}, and
+others.
+
 @item datadir
-The directory for installing read-only architecture independent data
-files.  This should normally be @file{/usr/local/share}, but write it as
-@file{$(prefix)/share}.
-(If you are using Autoconf, write it as @samp{@@datadir@@}.)
-As a special exception, see @file{$(infodir)}
-and @file{$(includedir)} below.
+The directory for installing idiosyncratic read-only
+architecture-independent data files for this program.  This is usually
+the same place as @samp{datarootdir}, but we use the two separate
+variables so that you can move these program-specific files without
+altering the location for Info files, man pages, etc.
+
+This should normally be @file{/usr/local/share}, but write it as
+@file{$(datarootdir)}.  (If you are using Autoconf, write it as
+@samp{@@datadir@@}.)
+
+The definition of @samp{datadir} is the same for all packages, so you
+should install your data in a subdirectory thereof.  Most packages
+install their data under @file{$(datadir)/@var{package-name}/}.
 
 @item sysconfdir
 The directory for installing read-only data files that pertain to a
@@ -419,34 +500,14 @@ in @file{$(datadir)} or @file{$(sysconfdir)}.  @file{$(localstatedir)}
 should normally be @file{/usr/local/var}, but write it as
 @file{$(prefix)/var}.
 (If you are using Autoconf, write it as @samp{@@localstatedir@@}.)
+@end table
 
-@item libdir
-The directory for object files and libraries of object code.  Do not
-install executables here, they probably ought to go in @file{$(libexecdir)}
-instead.  The value of @code{libdir} should normally be
-@file{/usr/local/lib}, but write it as @file{$(exec_prefix)/lib}.
-(If you are using Autoconf, write it as @samp{@@libdir@@}.)
+These variables specify the directory for installing certain specific
+types of files, if your program has them.  Every GNU package should
+have Info files, so every program needs @samp{infodir}, but not all
+need @samp{libdir} or @samp{lispdir}.
 
-@item infodir
-The directory for installing the Info files for this package.  By
-default, it should be @file{/usr/local/info}, but it should be written
-as @file{$(prefix)/info}.
-(If you are using Autoconf, write it as @samp{@@infodir@@}.)
-
-@item lispdir
-The directory for installing any Emacs Lisp files in this package.  By
-default, it should be @file{/usr/local/share/emacs/site-lisp}, but it
-should be written as @file{$(prefix)/share/emacs/site-lisp}.
-
-If you are using Autoconf, write the default as @samp{@@lispdir@@}.
-In order to make @samp{@@lispdir@@} work, you need the following lines
-in your @file{configure.in} file:
-
-@example
-lispdir='$@{datadir@}/emacs/site-lisp'
-AC_SUBST(lispdir)
-@end example
-
+@table @samp
 @item includedir
 @c rewritten to avoid overfull hbox --roland
 The directory for installing header files to be included by user
@@ -481,6 +542,62 @@ package.
 
 To tell whether @file{foo.h} came from the Foo package, put a magic
 string in the file---part of a comment---and @code{grep} for that string.
+
+@item docdir
+The directory for installing documentation files (other than Info) for
+this package.  By default, it should be
+@file{/usr/local/share/doc/@var{yourpkg}}, but it should be written as
+@file{$(datarootdir)/doc/@var{yourpkg}}.  (If you are using Autoconf,
+write it as @samp{@@docdir@@}.)  The @var{yourpkg} subdirectory, which
+may include a version number, prevents collisions among files with
+common names, such as @file{README}.
+
+@item infodir
+The directory for installing the Info files for this package.  By
+default, it should be @file{/usr/local/share/info}, but it should be
+written as @file{$(datarootdir)/info}.  (If you are using Autoconf,
+write it as @samp{@@infodir@@}.)  @code{infodir} is separate from
+@code{docdir} for compatibility with existing practice.
+
+@item htmldir
+@itemx dvidir
+@itemx pdfdir
+@itemx psdir
+Directories for installing documentation files in the particular
+format.  They should all be set to @code{$(docdir)} by default.  (If
+you are using Autoconf, write them as @samp{@@htmldir@@},
+@samp{@@dvidir@@}, etc.)  Packages which supply several translations
+of their documentation should install them in
+@samp{$(htmldir)/}@var{ll}, @samp{$(pdfdir)/}@var{ll}, etc. where
+@var{ll} is a locale abbreviation such as @samp{en} or @samp{pt_BR}.
+
+@item libdir
+The directory for object files and libraries of object code.  Do not
+install executables here, they probably ought to go in @file{$(libexecdir)}
+instead.  The value of @code{libdir} should normally be
+@file{/usr/local/lib}, but write it as @file{$(exec_prefix)/lib}.
+(If you are using Autoconf, write it as @samp{@@libdir@@}.)
+
+@item lispdir
+The directory for installing any Emacs Lisp files in this package.  By
+default, it should be @file{/usr/local/share/emacs/site-lisp}, but it
+should be written as @file{$(datarootdir)/emacs/site-lisp}.
+
+If you are using Autoconf, write the default as @samp{@@lispdir@@}.
+In order to make @samp{@@lispdir@@} work, you need the following lines
+in your @file{configure.in} file:
+
+@example
+lispdir='$@{datarootdir@}/emacs/site-lisp'
+AC_SUBST(lispdir)
+@end example
+
+@item localedir
+The directory for installing locale-specific message catalogs for this
+package.  By default, it should be @file{/usr/local/share/locale}, but
+it should be written as @file{$(datarootdir)/locale}.  (If you are
+using Autoconf, write it as @samp{@@localedir@@}.)  This directory
+usually has a subdirectory per locale.
 @end table
 
 Unix-style man pages are installed in one of the following:
@@ -488,9 +605,9 @@ Unix-style man pages are installed in one of the following:
 @table @samp
 @item mandir
 The top-level directory for installing the man pages (if any) for this
-package.  It will normally be @file{/usr/local/man}, but you should
-write it as @file{$(prefix)/man}.
-(If you are using Autoconf, write it as @samp{@@mandir@@}.)
+package.  It will normally be @file{/usr/local/share/man}, but you
+should write it as @file{$(datarootdir)/man}.  (If you are using
+Autoconf, write it as @samp{@@mandir@@}.)
 
 @item man1dir
 The directory for installing section 1 man pages.  Write it as
@@ -524,7 +641,7 @@ And finally, you should set the following variable:
 @item srcdir
 The directory for the sources being compiled.  The value of this
 variable is normally inserted by the @code{configure} shell script.
-(If you are using Autconf, use @samp{srcdir = @@srcdir@@}.)
+(If you are using Autoconf, use @samp{srcdir = @@srcdir@@}.)
 @end table
 
 For example:
@@ -535,13 +652,15 @@ For example:
 # Common prefix for installation directories.
 # NOTE: This directory must exist when you start the install.
 prefix = /usr/local
+datarootdir = $(prefix)/share
+datadir = $(datarootdir)
 exec_prefix = $(prefix)
 # Where to put the executable for the command `gcc'.
 bindir = $(exec_prefix)/bin
 # Where to put the directories used by the compiler.
 libexecdir = $(exec_prefix)/libexec
 # Where to put the Info files.
-infodir = $(prefix)/info
+infodir = $(datarootdir)/info
 @end smallexample
 
 If your program installs a large number of files into one of the
@@ -556,6 +675,15 @@ specify the exact same values for several different GNU packages.  In
 order for this to be useful, all the packages must be designed so that
 they will work sensibly when the user does so.
 
+At times, not all of these variables may be implemented in the current
+release of Autoconf and/or Automake; but as of Autoconf@tie{}2.60, we
+believe all of them are.  When any are missing, the descriptions here
+serve as specifications for what Autoconf will implement.  As a
+programmer, you can either use a development version of Autoconf or
+avoid using these variables until a stable release is made which
+supports them.
+
+
 @node Standard Targets
 @section Standard Targets for Users
 
@@ -565,8 +693,9 @@ All GNU programs should have the following targets in their Makefiles:
 @item all
 Compile the entire program.  This should be the default target.  This
 target need not rebuild any documentation files; Info files should
-normally be included in the distribution, and DVI files should be made
-only when explicitly asked for.
+normally be included in the distribution, and DVI (and other
+documentation format) files should be made only when explicitly asked
+for.
 
 By default, the Make rules should compile and link with @samp{-g}, so
 that executable programs have debugging symbols.  Users who don't mind
@@ -605,7 +734,7 @@ menu entry for the given Info file; it is part of the Texinfo package.
 Here is a sample rule to install an Info file:
 
 @comment This example has been carefully formatted for the Make manual.
-@comment Please do not reformat it without talking to roland@gnu.ai.mit.edu.
+@comment Please do not reformat it without talking to bug-make@gnu.org.
 @smallexample
 $(DESTDIR)$(infodir)/foo.info: foo.info
         $(POST_INSTALL)
@@ -630,9 +759,31 @@ commands into three categories: normal ones, @dfn{pre-installation}
 commands and @dfn{post-installation} commands.  @xref{Install Command
 Categories}.
 
+@item install-html
+@itemx install-dvi
+@itemx install-pdf
+@itemx install-ps
+These targets install documentation in formats other than Info;
+they're intended to be called explicitly by the person installing the
+package, if that format is desired.  GNU prefers Info files, so these
+must be installed by the @code{install} target.
+
+When you have many documentation files to install, we recommend that
+you avoid collisions and clutter by arranging for these targets to
+install in subdirectories of the appropriate installation directory,
+such as @code{htmldir}.  As one example, if your package has multiple
+manuals, and you wish to install HTML documentation with many files
+(such as the ``split'' mode output by @code{makeinfo --html}), you'll
+certainly want to use subdirectories, or two nodes with the same name
+in different manuals will overwrite each other.
+
+Please make these @code{install-@var{format}} targets invoke the
+commands for the @var{format} target, for example, by making
+@var{format} a dependency.
+
 @item uninstall
 Delete all the installed files---the copies that the @samp{install}
-target creates.
+and @samp{install-*} targets create.
 
 This rule should not modify the directories where compilation is done,
 only the directories where files are installed.
@@ -668,18 +819,24 @@ executable elsewhere in case there is a bug.
 @comment in the printed Make manual.  Please leave it in.
 @item clean
 
-Delete all files from the current directory that are normally created by
-building the program.  Don't delete the files that record the
-configuration.  Also preserve files that could be made by building, but
-normally aren't because the distribution comes with them.
+Delete all files in the current directory that are normally created by
+building the program.  Also delete files in other directories if they
+are created by this makefile.  However, don't delete the files that
+record the configuration.  Also preserve files that could be made by
+building, but normally aren't because the distribution comes with
+them.  There is no need to delete parent directories that were created
+with @samp{mkdir -p}, since they could have existed anyway.
 
 Delete @file{.dvi} files here if they are not part of the distribution.
 
 @item distclean
-Delete all files from the current directory that are created by
-configuring or building the program.  If you have unpacked the source
-and built the program without creating any other files, @samp{make
-distclean} should leave only the files that were in the distribution.
+Delete all files in the current directory (or created by this
+makefile) that are created by configuring or building the program.  If
+you have unpacked the source and built the program without creating
+any other files, @samp{make distclean} should leave only the files
+that were in the distribution.  However, there is no need to delete
+parent directories that were created with @samp{mkdir -p}, since they
+could have existed anyway.
 
 @item mostlyclean
 Like @samp{clean}, but may refrain from deleting a few files that people
@@ -688,18 +845,21 @@ target for GCC does not delete @file{libgcc.a}, because recompiling it
 is rarely necessary and takes a lot of time.
 
 @item maintainer-clean
-Delete almost everything from the current directory that can be
-reconstructed with this Makefile.  This typically includes everything
-deleted by @code{distclean}, plus more: C source files produced by
-Bison, tags tables, Info files, and so on.
+Delete almost everything that can be reconstructed with this Makefile.
+This typically includes everything deleted by @code{distclean}, plus
+more: C source files produced by Bison, tags tables, Info files, and
+so on.
 
 The reason we say ``almost everything'' is that running the command
-@samp{make maintainer-clean} should not delete @file{configure} even if
-@file{configure} can be remade using a rule in the Makefile.  More generally,
-@samp{make maintainer-clean} should not delete anything that needs to
-exist in order to run @file{configure} and then begin to build the
-program.  This is the only exception; @code{maintainer-clean} should
-delete everything else that can be rebuilt.
+@samp{make maintainer-clean} should not delete @file{configure} even
+if @file{configure} can be remade using a rule in the Makefile.  More
+generally, @samp{make maintainer-clean} should not delete anything
+that needs to exist in order to run @file{configure} and then begin to
+build the program.  Also, there is no need to delete parent
+directories that were created with @samp{mkdir -p}, since they could
+have existed anyway.  These are the only exceptions;
+@code{maintainer-clean} should delete everything else that can be
+rebuilt.
 
 The @samp{maintainer-clean} target is intended to be used by a maintainer of
 the package, not by ordinary users.  You may need special tools to
@@ -743,8 +903,15 @@ users build the package, ordinarily Make will not update the Info files
 because they will already be up to date.
 
 @item dvi
-Generate DVI files for all Texinfo documentation.
-For example:
+@itemx html
+@itemx pdf
+@itemx ps
+Generate documentation files in the given format.  These targets
+should always exist, but any or all can be a no-op if the given output
+format cannot be generated.  These targets should not be dependencies
+of the @code{all} target; the user must manually invoke them.
+
+Here's an example rule for generating DVI files from Texinfo:
 
 @smallexample
 dvi: foo.dvi
@@ -759,6 +926,20 @@ run the program @code{texi2dvi}, which is part of the Texinfo
 distribution.@footnote{@code{texi2dvi} uses @TeX{} to do the real work
 of formatting. @TeX{} is not distributed with Texinfo.}  Alternatively,
 write just the dependencies, and allow GNU @code{make} to provide the command.
+
+Here's another example, this one for generating HTML from Texinfo:
+
+@smallexample
+html: foo.html
+
+foo.html: foo.texi chap1.texi chap2.texi
+        $(TEXI2HTML) $(srcdir)/foo.texi
+@end smallexample
+
+@noindent
+Again, you would define the variable @code{TEXI2HTML} in the Makefile;
+for example, it might run @code{makeinfo --no-split --html}
+(@command{makeinfo} is part of the Texinfo distribution).
 
 @item dist
 Create a distribution tar file for this program.  The tar file should be
@@ -932,10 +1113,12 @@ execute the pre-installation and post-installation commands.
 
 Programs to build binary packages work by extracting the
 pre-installation and post-installation commands.  Here is one way of
-extracting the pre-installation commands:
+extracting the pre-installation commands (the @option{-s} option to
+@command{make} is needed to silence messages about entering
+subdirectories):
 
 @smallexample
-make -n install -o all \
+make -s -n install -o all \
       PRE_INSTALL=pre-install \
       POST_INSTALL=post-install \
       NORMAL_INSTALL=normal-install \
@@ -946,10 +1129,7 @@ make -n install -o all \
 where the file @file{pre-install.awk} could contain this:
 
 @smallexample
-$0 ~ /^\t[ \t]*(normal_install|post_install)[ \t]*$/ @{on = 0@}
+$0 ~ /^(normal-install|post-install)[ \t]*$/ @{on = 0@}
 on @{print $0@}
-$0 ~ /^\t[ \t]*pre_install[ \t]*$/ @{on = 1@}
+$0 ~ /^pre-install[ \t]*$/ @{on = 1@}
 @end smallexample
-
-The resulting file of pre-installation commands is executed as a shell
-script as part of installing the binary package.

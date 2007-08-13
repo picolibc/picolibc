@@ -1,3 +1,9 @@
+2007-08-13  Nick Clifton  <nickc@redhat.com>
+
+	* standards.texi: Import 22 July 2007 version.
+	* fdl.texi: Import version 1.2.
+	* make-stds.texi: Import 2006 version.
+
 2007-04-04  Eric Christopher  <echristo@apple.com>
 
 	Move from gcc:
