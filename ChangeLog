@@ -1,3 +1,10 @@
+2007-08-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+	    Ben Elliston  <bje@au.ibm.com>
+
+	* configure.ac (TOPLEVEL_CONFIGURE_ARGUMENTS, baseargs): Pass
+	--silent if $silent.
+	* configure: Regenerate.
+
 2007-08-12  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* src-release (DEVO_SUPPORT): Add COPYING3 and COPYING3.LIB.
