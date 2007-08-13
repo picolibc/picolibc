@@ -104,7 +104,7 @@ static const device dev_storage[] =
   {"/dev/fifo", BRACK(FH_FIFO), "\\dev\\fifo"},
   {"/dev/full", BRACK(FH_FULL), "\\dev\\full"},
   {"/dev/kmem", BRACK(FH_KMEM), "\\dev\\mem"},
-  {"/dev/kmsg", BRACK(FH_KMSG), "\\\\.\\mailslot\\cygwin\\dev\\kmsg"},
+  {"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg"},
   {"/dev/mem", BRACK(FH_MEM), "\\dev\\mem"},
   {"/dev/nst0", BRACK(FHDEV(DEV_TAPE_MAJOR, 128)), "\\Device\\Tape0"},
   {"/dev/nst1", BRACK(FHDEV(DEV_TAPE_MAJOR, 129)), "\\Device\\Tape1"},

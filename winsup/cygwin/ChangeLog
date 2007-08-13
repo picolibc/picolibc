@@ -1,3 +1,19 @@
+2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.in (dev_storage): Use native NT device name for kmsg mailslot.
+	* devices.cc: Regenerate.
+	* fhandler.cc (fhandler_base::operator =): Use path_conv assignment
+	operator.
+	(fhandler_base::set_name): Ditto.
+	(fhandler_base::open): Use NT native path in debug output.
+	* fhandler_mailslot.cc: Convert to NT native function calls.
+	* ntdll.h (struct _FILE_MAILSLOT_SET_INFORMATION): Define.
+	(NtCreateMailslotFile): Declare.
+	* path.cc (path_conv::set_normalized_path): Don't set wide_path to NULL.
+	(path_conv::set_name): Remove unused function.
+	* path.h (path_conv::set_name): Drop declaration.
+	(path_conv::operator =): Define.
+
 2007-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Remove HIDDEN_DOT_FILES code.

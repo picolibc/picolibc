@@ -53,39 +53,45 @@ int
 fhandler_mailslot::open (int flags, mode_t mode)
 {
   int res = 0;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  OBJECT_ATTRIBUTES attr;
   HANDLE x;
+  LARGE_INTEGER timeout;
 
   switch (flags & O_ACCMODE)
     {
     case O_RDONLY:	/* Server */
-      x = CreateMailslot (get_win32_name (),
-			  0, /* Any message size */
-			  (flags & O_NONBLOCK) ? 0 : MAILSLOT_WAIT_FOREVER,
-			  &sec_none);
-      if (x == INVALID_HANDLE_VALUE)
+      timeout.QuadPart = (flags & O_NONBLOCK) ? 0LL : 0x8000000000000000LL;
+      status = NtCreateMailslotFile (&x, GENERIC_READ | SYNCHRONIZE,
+				     pc.get_object_attr (attr, sec_none),
+				     &io, FILE_SYNCHRONOUS_IO_NONALERT,
+				     0, 0, &timeout);
+      if (!NT_SUCCESS (status))
 	{
 	  /* FIXME: It's not possible to open the read side of an existing
-	     mailslot using CreateFile.  You'll get a handle, but using it
-	     in ReadFile returns ERROR_INVALID_PARAMETER.  On the other
-	     hand, CreateMailslot returns with ERROR_ALREADY_EXISTS if the
-	     mailslot has been created already.
+	     mailslot again.  You'll get a handle, but using it in ReadFile
+	     returns ERROR_INVALID_PARAMETER.  On the other hand,
+	     NtCreateMailslotFile returns with STATUS_OBJECT_NAME_EXISTS if
+	     the mailslot has been created already.
 	     So this is an exclusive open for now.  *Duplicating* read side
 	     handles works, though, so it might be an option to duplicate
 	     the handle from the first process to the current process for
 	     opening the mailslot. */
 #if 0
-	  if (GetLastError () != ERROR_ALREADY_EXISTS)
+	  if (status != STATUS_OBJECT_NAME_COLLISION)
 	    {
-	      __seterrno ();
+	      __seterrno_from_nt_status (status);
 	      break;
 	    }
-	  x = CreateFile (get_win32_name (), GENERIC_READ,
-			  FILE_SHARE_VALID_FLAGS,
-			  &sec_none, OPEN_EXISTING, 0, 0);
+	  status = NtOpenFile (&x, GENERIC_READ | SYNCHRONIZE,
+			       pc.get_object_attr (attr, sec_none), &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_SYNCHRONOUS_IO_NONALERT);
 #endif
-	  if (x == INVALID_HANDLE_VALUE)
+	  if (!NT_SUCCESS (status))
 	    {
-	      __seterrno ();
+	      __seterrno_from_nt_status (status);
 	      break;
 	    }
 	}
@@ -103,11 +109,13 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	  set_errno (EPERM);	/* As on Linux. */
 	  break;
 	}
-      x = CreateFile (get_win32_name (), GENERIC_WRITE, FILE_SHARE_VALID_FLAGS,
-		      &sec_none, OPEN_EXISTING, 0, 0);
-      if (x == INVALID_HANDLE_VALUE)
+      status = NtOpenFile (&x, GENERIC_WRITE | SYNCHRONIZE,
+			   pc.get_object_attr (attr, sec_none), &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT);
+      if (!NT_SUCCESS (status))
 	{
-	  __seterrno ();
+	  __seterrno_from_nt_status (status);
 	  break;
 	}
       set_io_handle (x);
@@ -140,15 +148,22 @@ int
 fhandler_mailslot::ioctl (unsigned int cmd, void *buf)
 {
   int res = -1;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
 
   switch (cmd)
     {
     case FIONBIO:
       {
-	DWORD timeout = buf ? 0 : MAILSLOT_WAIT_FOREVER;
-	if (!SetMailslotInfo (get_handle (), timeout))
+	FILE_MAILSLOT_SET_INFORMATION fmsi;
+	fmsi.ReadTimeout.QuadPart = buf ? 0LL : 0x8000000000000000LL;
+	status = NtSetInformationFile (get_handle (), &io, &fmsi, sizeof fmsi,
+				       FileMailslotSetInformation);
+	if (!NT_SUCCESS (status))
 	  {
-	    debug_printf ("SetMailslotInfo (%u): %E", timeout);
+	    debug_printf ("NtSetInformationFile (%X): %08x",
+			  fmsi.ReadTimeout.QuadPart, status);
+	    __seterrno_from_nt_status (status);
 	    break;
 	  }
       }

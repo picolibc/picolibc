@@ -536,7 +536,6 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
     }
 
   memcpy (normalized_path, path_copy, n);
-  wide_path = NULL;
 }
 
 PUNICODE_STRING
@@ -1176,15 +1175,6 @@ out:
       strcpy (last_src, src);
     }
 #endif
-}
-
-void
-path_conv::set_name (const char *win32, const char *posix)
-{
-  if (!normalized_path_size && normalized_path)
-    cfree (normalized_path);
-  strcpy (path, win32);
-  set_normalized_path (posix, false);
 }
 
 path_conv::~path_conv ()

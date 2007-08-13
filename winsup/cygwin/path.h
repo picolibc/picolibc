@@ -245,7 +245,6 @@ class path_conv
     {path[0] = '\0';}
 
   ~path_conv ();
-  void set_name (const char *win32, const char *posix);
   inline char *get_win32 () { return path; }
   PUNICODE_STRING get_nt_native_path ();
   POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
@@ -256,6 +255,13 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
+  path_conv &operator =(path_conv &pc)
+  {
+    memcpy (this, &pc, pc.size ());
+    set_normalized_path (pc.normalized_path, false);
+    wide_path = NULL;
+    return *this;
+  }
   DWORD get_devn () const {return dev.devn;}
   short get_unitn () const {return dev.minor;}
   DWORD file_attributes () const {return fileattr;}

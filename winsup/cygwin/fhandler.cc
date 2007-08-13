@@ -45,7 +45,7 @@ inline fhandler_base&
 fhandler_base::operator =(fhandler_base& x)
 {
   memcpy (this, &x, sizeof *this);
-  pc.set_normalized_path (x.pc.normalized_path, false);
+  pc = x.pc;
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -154,8 +154,7 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 void
 fhandler_base::set_name (path_conv &in_pc)
 {
-  memcpy (&pc, &in_pc, in_pc.size ());
-  pc.set_normalized_path (in_pc.normalized_path, false);
+  pc = in_pc;
 }
 
 char *fhandler_base::get_proc_fd_name (char *buf)
@@ -469,7 +468,7 @@ fhandler_base::open (int flags, mode_t mode)
   IO_STATUS_BLOCK io;
   NTSTATUS status;
 
-  syscall_printf ("(%s, %p)", get_win32_name (), flags);
+  syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
 
   pc.get_object_attr (attr, sa);
 
@@ -577,12 +576,12 @@ fhandler_base::open (int flags, mode_t mode)
   set_open_status ();
 done:
   debug_printf ("%x = NtCreateFile "
-		"(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
-		status, x, access, get_win32_name (), file_attributes, shared,
-		create_disposition, create_options);
+		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
+		status, x, access, pc.get_nt_native_path (), file_attributes,
+		shared, create_disposition, create_options);
 
-  syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
-		  flags);
+  syscall_printf ("%d = fhandler_base::open (%s, %p)",
+		  res, pc.get_nt_native_path (), flags);
   return res;
 }
 
