@@ -352,10 +352,6 @@ change_back:
 	   and only if, a normal version of the same symbol isn't provided
 	   e.g. by a linker script or another object file.) */	
 
-	.set __stack, 0
-	.set FUNCTION (hardware_init_hook), 0
-	.set FUNCTION (software_init_hook), 0
-	
 	.weak __stack
 	.weak FUNCTION (hardware_init_hook) 
 	.weak FUNCTION (software_init_hook)
