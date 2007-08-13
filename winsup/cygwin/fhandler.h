@@ -264,7 +264,6 @@ class fhandler_base
   virtual int open (int, mode_t = 0);
   int open_fs (int, mode_t = 0);
   virtual int close ();
-  int close_fs ();
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_helper (struct __stat64 *buf,
@@ -677,7 +676,6 @@ class fhandler_disk_file: public fhandler_base
   fhandler_disk_file (path_conv &pc);
 
   int open (int flags, mode_t mode);
-  int close ();
   int lock (int, struct __flock64 *);
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

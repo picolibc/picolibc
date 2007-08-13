@@ -432,12 +432,12 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.
 	 Since fhandler_base::open only calls CloseHandle if !nohandle,
-	 we have to set it to false before calling close_fs and restore
+	 we have to set it to false before calling close and restore
 	 the state afterwards. */
       res = fstat_by_handle (buf);
       bool no_handle = nohandle ();
       nohandle (false);
-      close_fs ();
+      close ();
       nohandle (no_handle);
       set_io_handle (NULL);
     }
@@ -528,7 +528,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (is_fs_special () ? NULL: get_handle (), pc,
+  if (!get_file_attribute (is_fs_special () && !pc.issocket ()
+			   ? NULL : get_handle (), pc,
 			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
@@ -1256,7 +1257,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
   if (pc.has_buggy_open () && !pc.exists ())
     {
       debug_printf ("Buggy open detected.");
-      close_fs ();
+      close ();
       set_errno (ENOENT);
       return 0;
     }
@@ -1266,21 +1267,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
 out:
   syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,
 		  get_win32_name (), flags);
-  return res;
-}
-
-int
-fhandler_disk_file::close ()
-{
-  return close_fs ();
-}
-
-int
-fhandler_base::close_fs ()
-{
-  int res = fhandler_base::close ();
-  if (!res)
-    user_shared->delqueue.process_queue ();
   return res;
 }
 

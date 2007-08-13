@@ -198,7 +198,6 @@ user_shared_initialize (bool reinit)
     {
       debug_printf ("initializing user shared");
       user_shared->mountinfo.init ();	/* Initialize the mount table.  */
-      user_shared->delqueue.init (); /* Initialize the queue of deleted files.  */
       user_shared->cb =  sizeof (*user_shared);
     }
   else

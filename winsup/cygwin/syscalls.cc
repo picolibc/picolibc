@@ -124,7 +124,6 @@ close_all_files (bool norelease)
     cygheap->close_ctty ();
 
   cygheap->fdtab.unlock ();
-  user_shared->delqueue.process_queue ();
 }
 
 int
@@ -558,18 +557,7 @@ unlink (const char *ourname)
   if (NT_SUCCESS (status))
     res = 0;
   else
-    {
-      /* FIXME: Can we get rid of the delqueue now? */
-      if (status == STATUS_SHARING_VIOLATION)
-	{
-	  /* Add file to the "to be deleted" queue. */
-	  syscall_printf ("Sharing violation, couldn't delete file");
-	  user_shared->delqueue.queue_file (win32_name);
-	  res = 0;
-	}
-      else
-	__seterrno_from_nt_status (status);
-    }
+    __seterrno_from_nt_status (status);
 
  done:
   syscall_printf ("%d = unlink (%s)", res, ourname);

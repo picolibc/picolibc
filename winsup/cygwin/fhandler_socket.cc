@@ -1391,6 +1391,9 @@ fhandler_socket::close ()
 {
   int res = 0;
 
+  if (get_device () == FH_UNIX)
+    return fhandler_base::close ();
+
   /* HACK to allow a graceful shutdown even if shutdown() hasn't been
      called by the application. Note that this isn't the ultimate
      solution but it helps in many cases. */

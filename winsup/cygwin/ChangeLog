@@ -1,5 +1,30 @@
 2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Remove delqueue.o.
+	* delqueue.cc: Delete.
+	* fhandler.h (fhandler_base::close_fs): Drop declaration.
+	(fhandler_disk_file::close): Drop declaration.
+	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Call close instead of
+	close_fs.
+	(fhandler_base::fstat_helper): Use open FH_UNIX handle in call to
+	get_file_attribute.
+	(fhandler_base::open_fs): Call close instead of get_file_attribute.
+	(fhandler_disk_file::close): Remove.
+	(fhandler_base::close_fs): Remove.
+	* fhandler_socket.cc (fhandler_socket::close): Just call
+	fhandler_base::close for FH_UNIX sockets.
+	* shared.cc (user_shared_initialize): Drop call to
+	user_shared->delqueue.init.
+	* shared_info.h (CURR_USER_MAGIC): Change according to below change.
+	(MAX_DELQUEUES_PENDING): Remove.
+	(class delqueue_list): Remove.
+	(class user_info): Remove delqueue.
+	* syscalls.cc (close_all_files): Drop call to
+	user_shared->delqueue.process_queue.
+	(unlink): Drop delqueue handling.
+
+2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in (dev_storage): Use native NT device name for kmsg mailslot.
 	* devices.cc: Regenerate.
 	* fhandler.cc (fhandler_base::operator =): Use path_conv assignment

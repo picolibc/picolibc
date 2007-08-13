@@ -44,7 +44,7 @@ class mount_item
 
 #define USER_VERSION	1	// increment when mount table changes and
 #define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
-#define CURR_USER_MAGIC 0x38edd704U
+#define CURR_USER_MAGIC 0xb2232e71U
 
 class reg_key;
 struct device;
@@ -106,35 +106,11 @@ class mount_info
   void read_cygdrive_info_from_registry ();
 };
 
-/******** Close-on-delete queue ********/
-
-/* First pass at a file deletion queue structure.
-
-   We can't keep this list in the per-process info, since
-   one process may open a file, and outlive a process which
-   wanted to unlink the file - and the data would go away.
-*/
-
-#define MAX_DELQUEUES_PENDING 100
-
-class delqueue_list
-{
-  char name[MAX_DELQUEUES_PENDING][CYG_MAX_PATH];
-  char inuse[MAX_DELQUEUES_PENDING];
-  int empty;
-
-public:
-  void init ();
-  void queue_file (const char *dosname);
-  void process_queue ();
-};
-
 class user_info
 {
 public:
   DWORD version;
   DWORD cb;
-  delqueue_list delqueue;
   bool warned_msdos;
   mount_info mountinfo;
 };
