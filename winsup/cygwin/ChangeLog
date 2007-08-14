@@ -1,3 +1,19 @@
+2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::pc): Make public.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Drop extern
+	declaration of stat_suffixes.  Use NT native path in debug output.
+	(fhandler_base::utimes_fs): Simplify closeit case.  Use close_fs
+	to close newly opened file handle.
+	(fhandler_base::open_fs): Use NT native path in debug output.
+	* path.cc: Throughout drop extern declaration of stat_suffixes.
+	* path.h (stat_suffixes): Declare.
+	* sec_acl.cc (acl_worker): Drop extern declaration of stat_suffixes.
+	* times.cc (utimes_worker): Take path_conv as parameter instead of
+	single-byte pathnam, drop nofollow argument, accommodate throughout.
+	Compare UNICODE paths when enumerating file descriptors.  Fix
+	formatting.  Use NT native path in debug output.
+
 2007-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc: Call NtClose instead of CloseHandle throughout.

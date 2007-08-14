@@ -2863,8 +2863,6 @@ int
 symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		bool isdevice)
 {
-  extern suffix_info stat_suffixes[];
-
   HANDLE h;
   int res = -1;
   path_conv win32_path, win32_oldpath;
@@ -3682,8 +3680,6 @@ symlink_info::case_check (char *path)
 extern "C" int
 readlink (const char *path, char *buf, int buflen)
 {
-  extern suffix_info stat_suffixes[];
-
   if (buflen < 0)
     {
       set_errno (ENAMETOOLONG);
@@ -3968,8 +3964,6 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 extern "C" char *
 realpath (const char *path, char *resolved)
 {
-  extern suffix_info stat_suffixes[];
-
   /* Make sure the right errno is returned if path is NULL. */
   if (!path)
     {

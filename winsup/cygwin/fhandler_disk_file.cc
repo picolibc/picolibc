@@ -1050,7 +1050,6 @@ int
 fhandler_disk_file::link (const char *newpath)
 {
   extern bool allow_winsymlinks;
-  extern suffix_info stat_suffixes[];
 
   path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX,
 		   transparent_exe ? stat_suffixes : NULL);
@@ -1062,7 +1061,7 @@ fhandler_disk_file::link (const char *newpath)
 
   if (newpc.exists ())
     {
-      syscall_printf ("file '%s' exists?", newpc.get_win32 ());
+      syscall_printf ("file '%S' exists?", newpc.get_nt_native_path ());
       set_errno (EEXIST);
       return -1;
     }
@@ -1195,17 +1194,15 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
   fbi.FileAttributes = 0;
   NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
 					  FileBasicInformation);
+  if (closeit)
+    close_fs ();
   /* Opening a directory on a 9x share from a NT machine works(!), but
      then NtSetInformationFile fails with STATUS_NOT_SUPPORTED.  Oh well... */
   if (!NT_SUCCESS (status) && status != STATUS_NOT_SUPPORTED)
     {
-      if (closeit)
-	close ();
       __seterrno_from_nt_status (status);
       return -1;
     }
-  if (closeit)
-    close ();
   return 0;
 }
 
@@ -1265,8 +1262,8 @@ fhandler_base::open_fs (int flags, mode_t mode)
   set_fs_flags (pc.fs_flags ());
 
 out:
-  syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,
-		  get_win32_name (), flags);
+  syscall_printf ("%d = fhandler_disk_file::open (%S, %p)", res,
+		  pc.get_nt_native_path (), flags);
   return res;
 }
 

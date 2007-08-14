@@ -45,6 +45,8 @@ struct suffix_info
   suffix_info (const char *s, int addit = 0): name (s), addon (addit) {}
 };
 
+extern suffix_info stat_suffixes[];
+
 enum pathconv_arg
 {
   PC_SYM_FOLLOW		= 0x0001,

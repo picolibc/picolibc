@@ -29,6 +29,7 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "sync.h"
+#include "ntdll.h"
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
@@ -445,10 +446,9 @@ gmtime (const time_t *tim_p)
 #endif /* POSIX_LOCALTIME */
 
 static int
-utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
+utimes_worker (path_conv &win32, const struct timeval *tvp)
 {
   int res = -1;
-  path_conv win32 (path, PC_POSIX | (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW));
 
   if (win32.error)
     set_errno (win32.error);
@@ -460,7 +460,9 @@ utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
       cygheap_fdenum cfd (true);
       while (cfd.next () >= 0)
 	if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
-	    && strcmp (cfd->get_win32_name (), win32) == 0)
+	    && RtlEqualUnicodeString (cfd->pc.get_nt_native_path (),
+				      win32.get_nt_native_path (),
+				      TRUE))
 	  {
 	    fh = cfd;
 	    fromfd = true;
@@ -476,7 +478,7 @@ utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
 	    {
 	      debug_printf ("got %d error from build_fh_name", fh->error ());
 	      set_errno (fh->error ());
-	  }
+	    }
 	}
 
       res = fh->utimes (tvp);
@@ -486,7 +488,8 @@ utimes_worker (const char *path, const struct timeval *tvp, int nofollow)
     }
 
 error:
-  syscall_printf ("%d = utimes (%s, %p)", res, path, tvp);
+  syscall_printf ("%d = utimes (%S, %p)",
+		  res, win32.get_nt_native_path (), tvp);
   return res;
 }
 
@@ -494,14 +497,16 @@ error:
 extern "C" int
 utimes (const char *path, const struct timeval *tvp)
 {
-  return utimes_worker (path, tvp, 0);
+  path_conv win32 (path, PC_POSIX | PC_SYM_FOLLOW, stat_suffixes);
+  return utimes_worker (win32, tvp);
 }
 
 /* BSD */
 extern "C" int
 lutimes (const char *path, const struct timeval *tvp)
 {
-  return utimes_worker (path, tvp, 1);
+  path_conv win32 (path, PC_POSIX | PC_SYM_NOFOLLOW, stat_suffixes);
+  return utimes_worker (win32, tvp);
 }
 
 /* BSD */
@@ -516,7 +521,7 @@ futimes (int fd, const struct timeval *tvp)
   else if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE))
     res = cfd->utimes (tvp);
   else
-    res = utimes_worker (cfd->get_win32_name (), tvp, 1);
+    res = utimes_worker (cfd->pc, tvp);
   syscall_printf ("%d = futimes (%d, %p)", res, fd, tvp);
   return res;
 }
