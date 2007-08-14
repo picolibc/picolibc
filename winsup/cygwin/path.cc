@@ -3518,16 +3518,29 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	     GetFileAttributes for a non-existant file an a Win9x share,
 	     GetLastError returns ERROR_INVALID_FUNCTION.  Go figure!
 	     Also, GetFileAttributes fails with ERROR_SHARING_VIOLATION
-	     if the file is locked exclusively by another process.
+	     if the file is locked exclusively by another process, or with
+	     ERROR_ACCESS_DENIED if the file exists but the user has no right
+	     to open the file with FILE_READ_ATTRIBUTES.
 	     If we don't special handle this here, the file is accidentally
 	     treated as non-existant. */
 	  DWORD win_error = GetLastError ();
 	  if (win_error == ERROR_INVALID_FUNCTION)
 	    win_error = ERROR_FILE_NOT_FOUND;
-	  else if (win_error == ERROR_SHARING_VIOLATION)
+	  else if (win_error == ERROR_SHARING_VIOLATION
+		   || win_error == ERROR_ACCESS_DENIED)
 	    {
+	      /* This is easily converted to NT functions at one point,
+	         see fhandler_base::fstat_by_name. */
+	      WIN32_FIND_DATA data;
+	      HANDLE f = FindFirstFile (suffix.path, &data);
+	      if (f != INVALID_HANDLE_VALUE)
+		{
+		  FindClose (f);
+		  fileattr = data.dwFileAttributes;
+		}
+	      else
+		fileattr = 0;
 	      ext_tacked_on = !!*ext_here;
-	      fileattr = 0;
 	      goto file_not_symlink;
 	    }
 	  if (set_error (geterrno_from_win_error (win_error, EACCES)))

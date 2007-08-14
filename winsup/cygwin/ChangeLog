@@ -1,5 +1,11 @@
 2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check): In case of ERROR_SHARING_VIOLATION and
+	ERROR_ACCESS_DENIED, try to get file attributes by using directory
+	functions.
+
+2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (fs_info::update): Correctly handle the volume root directory.
 
 2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
