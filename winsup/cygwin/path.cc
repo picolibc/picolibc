@@ -393,17 +393,20 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
   if (exists)
     status = NtOpenFile (&vol, READ_CONTROL, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			 FILE_OPEN_FOR_BACKUP_INTENT);
-  while (!NT_SUCCESS (status) && attr.ObjectName->Length > 6 * sizeof (WCHAR))
+  while (!NT_SUCCESS (status)
+	 && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
+	     || status == STATUS_NO_MEDIA_IN_DEVICE))
     {
       UNICODE_STRING dir;
       RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
-      dir.Length -= sizeof (WCHAR);
       attr.ObjectName = &dir;
       if (status == STATUS_NO_MEDIA_IN_DEVICE)
         {
 	  no_media = true;
 	  dir.Length = 6 * sizeof (WCHAR);
 	}
+      else if (dir.Length > 7 * sizeof (WCHAR))
+	dir.Length -= sizeof (WCHAR);
       status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
     }

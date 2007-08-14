@@ -1,5 +1,9 @@
 2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (fs_info::update): Correctly handle the volume root directory.
+
+2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::pc): Make public.
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Drop extern
 	declaration of stat_suffixes.  Use NT native path in debug output.
