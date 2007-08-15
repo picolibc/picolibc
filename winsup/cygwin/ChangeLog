@@ -1,5 +1,11 @@
 2007-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Drop superfluous
+	test for trailing dot.
+	* path.h (path_conv::operator []): Remove.
+
+2007-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (get_inet_addr): Use NT native functions for
 	accessing the file representing the local socket.
 	(fhandler_socket::bind): Ditto.

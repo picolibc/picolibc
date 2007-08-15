@@ -256,7 +256,6 @@ class path_conv
   operator const char *() {return path;}
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
-  char operator [](int i) const {return path[i];}
   path_conv &operator =(path_conv &pc)
   {
     memcpy (this, &pc, pc.size ());

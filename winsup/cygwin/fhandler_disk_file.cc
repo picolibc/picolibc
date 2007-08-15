@@ -1066,13 +1066,6 @@ fhandler_disk_file::link (const char *newpath)
       return -1;
     }
 
-  if (newpc[strlen (newpc) - 1] == '.')
-    {
-      syscall_printf ("trailing dot, bailing out");
-      set_errno (EINVAL);
-      return -1;
-    }
-
   char new_buf[strlen (newpath) + 5];
   if (!newpc.error && !newpc.case_clash)
     {
