@@ -1,3 +1,10 @@
+2007-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Use NT native functions for
+	accessing the file representing the local socket.
+	(fhandler_socket::bind): Ditto.
+	* ntdll.h: Declare NtReadFile.
+
 2007-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): In case of ERROR_SHARING_VIOLATION and

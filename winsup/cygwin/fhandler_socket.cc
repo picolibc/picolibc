@@ -39,6 +39,7 @@
 #include <sys/statvfs.h>
 #include "cygtls.h"
 #include "cygwin/in6.h"
+#include "ntdll.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 #define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
@@ -79,6 +80,11 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_LOCAL)
     {
+      NTSTATUS status;
+      HANDLE fh;
+      OBJECT_ATTRIBUTES attr;
+      IO_STATUS_BLOCK io;
+
       path_conv pc (in->sa_data, PC_SYM_FOLLOW);
       if (pc.error)
 	{
@@ -95,19 +101,22 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  set_errno (EBADF);
 	  return 0;
 	}
-      HANDLE fh = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
-			      &sec_none, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-			      0);
-      if (fh == INVALID_HANDLE_VALUE)
+      status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE,
+			   pc.get_object_attr (attr, sec_none_nih), &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
 	{
-	  __seterrno ();
+	  __seterrno_from_nt_status (status);
 	  return 0;
 	}
       int ret = 0;
-      DWORD len = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
-      if (ReadFile (fh, buf, 128, &len, 0))
+      status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, 128, NULL, NULL);
+      NtClose (fh);
+      if (NT_SUCCESS (status))
 	{
 	  struct sockaddr_in sin;
 	  char ctype;
@@ -127,8 +136,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  ret = 1;
 	}
       else
-	__seterrno ();
-      CloseHandle (fh);
+	__seterrno_from_nt_status (status);
       return ret;
     }
   else
@@ -813,35 +821,47 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	}
       mode_t mode = adjust_socket_file_mode ((S_IRWXU | S_IRWXG | S_IRWXO)
 					     & ~cygheap->umask);
-      DWORD attr = FILE_ATTRIBUTE_SYSTEM;
+      DWORD fattr = FILE_ATTRIBUTE_SYSTEM;
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-	attr |= FILE_ATTRIBUTE_READONLY;
-      SECURITY_ATTRIBUTES sa = sec_none;
+	fattr |= FILE_ATTRIBUTE_READONLY;
+      SECURITY_ATTRIBUTES sa = sec_none_nih;
       security_descriptor sd;
       if (allow_ntsec && pc.has_acls ())
 	set_security_attribute (mode, &sa, sd);
-      HANDLE fh = CreateFile (pc, GENERIC_WRITE, 0, &sa, CREATE_NEW, attr, 0);
-      if (fh == INVALID_HANDLE_VALUE)
+      NTSTATUS status;
+      HANDLE fh;
+      OBJECT_ATTRIBUTES attr;
+      IO_STATUS_BLOCK io;
+      status = NtCreateFile (&fh, GENERIC_WRITE | SYNCHRONIZE,
+			     pc.get_object_attr (attr, sa), &io, NULL, fattr,
+			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			     FILE_NON_DIRECTORY_FILE
+			     | FILE_SYNCHRONOUS_IO_NONALERT
+			     | FILE_OPEN_FOR_BACKUP_INTENT,
+			     NULL, 0);
+      if (!NT_SUCCESS (status))
 	{
-	  if (GetLastError () == ERROR_ALREADY_EXISTS)
+	  if (io.Information == FILE_EXISTS)
 	    set_errno (EADDRINUSE);
 	  else
-	    __seterrno ();
+	    __seterrno_from_nt_status (status);
 	}
 
       char buf[sizeof (SOCKET_COOKIE) + 80];
       __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port, get_socket_type () == SOCK_STREAM ? 's' : get_socket_type () == SOCK_DGRAM ? 'd' : '-');
       af_local_set_secret (strchr (buf, '\0'));
       DWORD blen = strlen (buf) + 1;
-      if (!WriteFile (fh, buf, blen, &blen, 0))
+      status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, blen, NULL, 0);
+      NtClose (fh);
+      if (!NT_SUCCESS (status))
 	{
-	  __seterrno ();
-	  CloseHandle (fh);
-	  DeleteFile (pc);
+	  extern NTSTATUS unlink_nt (path_conv &pc);
+
+	  __seterrno_from_nt_status (status);
+	  unlink_nt (pc);
 	}
       else
 	{
-	  CloseHandle (fh);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
 	}
