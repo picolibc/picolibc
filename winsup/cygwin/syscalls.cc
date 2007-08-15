@@ -538,8 +538,6 @@ unlink (const char *ourname)
       goto done;
     }
 
-  syscall_printf ("_unlink (%s)", win32_name.get_win32 ());
-
   if (!win32_name.exists ())
     {
       syscall_printf ("unlinking a nonexistent file");
@@ -1356,8 +1354,8 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
       if (!(fh = build_fh_pc (pc)))
 	goto error;
 
-      debug_printf ("(%s, %p, %p), file_attributes %d",
-		    pc.normalized_path, buf, fh, (DWORD) *fh);
+      debug_printf ("(%S, %p, %p), file_attributes %d",
+		    pc.get_nt_native_path (), buf, fh, (DWORD) *fh);
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf);
       if (!res)
@@ -1376,7 +1374,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 
  error:
   MALLOC_CHECK;
-  syscall_printf ("%d = (%s, %p)", res, pc.normalized_path ?: "", buf);
+  syscall_printf ("%d = (%S, %p)", res, pc.get_nt_native_path (), buf);
   return res;
 }
 
@@ -2057,8 +2055,9 @@ setmode (int fd, int mode)
   else
     cfd->set_flags ((cfd->get_flags () & ~(O_TEXT | O_BINARY)) | mode);
 
-  syscall_printf ("(%d<%s>, %p) returning %s", fd, cfd->get_name (),
-		  mode, res & O_TEXT ? "text" : "binary");
+  syscall_printf ("(%d<%s>, %p) returning %s", fd,
+		  cfd->pc.get_nt_native_path (), mode,
+		  res & O_TEXT ? "text" : "binary");
   return res;
 }
 

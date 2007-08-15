@@ -544,20 +544,22 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 PUNICODE_STRING
 get_nt_native_path (const char *path, UNICODE_STRING &upath)
 {
-  if (path[0] != '\\')			/* X:\...  or NUL, etc. */
+  if (path[0] == '/')		/* special path w/o NT path representation. */
+    str2uni_cat (upath, path);
+  else if (path[0] != '\\')	/* X:\...  or NUL, etc. */
     {
       str2uni_cat (upath, "\\??\\");
       str2uni_cat (upath, path);
     }
-  else if (path[1] != '\\')		/* \Device\... */
+  else if (path[1] != '\\')	/* \Device\... */
     str2uni_cat (upath, path);
   else if ((path[2] != '.' && path[2] != '?')
-	   || path[3] != '\\')		/* \\server\share\... */
+	   || path[3] != '\\')	/* \\server\share\... */
     {
       str2uni_cat (upath, "\\??\\UNC\\");
       str2uni_cat (upath, path + 2);
     }
-  else					/* \\.\device or \\?\foo */
+  else				/* \\.\device or \\?\foo */
     {
       str2uni_cat (upath, "\\??\\");
       str2uni_cat (upath, path + 4);
