@@ -833,7 +833,7 @@ extern "C"
 				      BOOLEAN);
   NTSTATUS NTAPI RtlConvertSidToUnicodeString (PUNICODE_STRING, PSID, BOOLEAN);
   VOID NTAPI RtlCopyUnicodeString (PUNICODE_STRING, PUNICODE_STRING);
-  ULONG WINAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
+  BOOLEAN NTAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
   BOOLEAN NTAPI RtlEqualUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 				       BOOLEAN);
   VOID NTAPI RtlFreeAnsiString (PANSI_STRING);
@@ -853,6 +853,7 @@ extern "C"
 					       BOOLEAN);
   NTSTATUS NTAPI RtlUnicodeStringToOemString (PANSI_STRING, PUNICODE_STRING,
 					      BOOLEAN);
+  WCHAR NTAPI RtlUpcaseUnicodeChar (WCHAR);
 
   /* A few Rtl functions are either actually macros, or they just don't
      exist even though they would be a big help.  We implement them here,

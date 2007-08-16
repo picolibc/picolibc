@@ -143,6 +143,12 @@ extern HANDLE tty_mutex;
   type flag () const { return (type) status.flag; }
 
 /* Used when treating / and \ as equivalent. */
+#define iswdirsep(ch) \
+    ({ \
+	WCHAR __c = (ch); \
+	((__c) == L'/' || (__c) == L'\\'); \
+    })
+
 #define isdirsep(ch) \
     ({ \
 	char __c = (ch); \
@@ -159,6 +165,18 @@ extern int __api_fatal_exit_val;
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
+
+/* Every path beginning with / or \, as well as every path being X:
+   or starting with X:/ or X:\ */
+#define isabspath_u(p) \
+  ((p)->Length && \
+   (iswdirsep ((p)->Buffer[0]) || \
+    ((p)->Length > sizeof (WCHAR) && iswalpha ((p)->Buffer[0]) \
+    && (p)->Buffer[1] == L':' && \
+    ((p)->Length == 2 * sizeof (WCHAR) || iswdirsep ((p)->Buffer[2])))))
+
+#define iswabspath(p) \
+  (iswdirsep (*(p)) || (iswalpha (*(p)) && (p)[1] == L':' && (!(p)[2] || iswdirsep ((p)[2]))))
 
 #define isabspath(p) \
   (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
@@ -239,6 +257,8 @@ extern bool cygwin_finished_initializing;
 void __stdcall set_std_handle (int);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 
+__ino64_t __stdcall hash_path_name (__ino64_t hash, PUNICODE_STRING name) __attribute__ ((regparm(2)));
+__ino64_t __stdcall hash_path_name (__ino64_t hash, PCWSTR name) __attribute__ ((regparm(2)));
 __ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
 extern "C" char *__stdcall rootdir (const char *full_path, char *root_path) __attribute__ ((regparm(2)));

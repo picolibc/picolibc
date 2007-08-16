@@ -1,3 +1,16 @@
+2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (RtlCreateUnicodeStringFromAsciiz): Fix declaration.
+	(RtlUpcaseUnicodeChar): Declare.
+	* path.cc (hash_path_name): Split into three functions, taking
+	the path as char *, PWCSTR, or PUNICODE_STRING.  Move implementation
+	into PUNICODE_STRING-based function.  Drop old drive-relative path
+	consideration.
+	* winsup.h (iswdirsep): Like isdirsep but for WCHARs.
+	(isabspath_u): Like isabspath, for PUNICODE_STRINGs.
+	(iswabspath): Like isabspath, for PWCHARs.
+	(hash_path_name): Add new declarations.
+
 2007-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (get_nt_native_path): Allow to convert special paths which

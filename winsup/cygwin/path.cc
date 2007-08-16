@@ -80,6 +80,7 @@ details. */
 #include <assert.h>
 #include <ntdll.h>
 #include <wchar.h>
+#include <wctype.h>
 
 bool dos_file_warning = true;
 static int normalize_win32_path (const char *, char *, char *&);
@@ -3740,60 +3741,49 @@ readlink (const char *path, char *buf, int buflen)
    done during the opendir call and the hash or the filename within
    the directory.  FIXME: Not bullet-proof. */
 /* Cygwin internal */
-
 __ino64_t __stdcall
-hash_path_name (__ino64_t hash, const char *name)
+hash_path_name (__ino64_t hash, PUNICODE_STRING name)
 {
-  if (!*name)
+  if (name->Length == 0)
     return hash;
 
-  /* Perform some initial permutations on the pathname if this is
-     not "seeded" */
-  if (!hash)
+  /* Fill out the hashed path name with the current working directory if
+     this is not an absolute path and there is no pre-specified hash value.
+     Otherwise the inodes same will differ depending on whether a file is
+     referenced with an absolute value or relatively. */
+  if (!hash && !isabspath_u (name))
     {
-      /* Simplistic handling of drives.  If there is a drive specified,
-	 make sure that the initial letter is upper case.  If there is
-	 no \ after the ':' assume access through the root directory
-	 of that drive.
-	 FIXME:  Should really honor MS-Windows convention of using
-	 the environment to track current directory on various drives. */
-      if (name[1] == ':')
-	{
-	  char *nn, *newname = (char *) alloca (strlen (name) + 2);
-	  nn = newname;
-	  *nn = isupper (*name) ? cyg_tolower (*name) : *name;
-	  *++nn = ':';
-	  name += 2;
-	  if (*name != '\\')
-	    *++nn = '\\';
-	  strcpy (++nn, name);
-	  name = newname;
-	  goto hashit;
-	}
-
-      /* Fill out the hashed path name with the current working directory if
-	 this is not an absolute path and there is no pre-specified hash value.
-	 Otherwise the inodes same will differ depending on whether a file is
-	 referenced with an absolute value or relatively. */
-
-      if (!hash && !isabspath (name))
-	{
-	  hash = cygheap->cwd.get_hash ();
-	  if (name[0] == '.' && name[1] == '\0')
-	    return hash;
-	  hash = '\\' + (hash << 6) + (hash << 16) - hash;
-	}
+      hash = cygheap->cwd.get_hash ();
+      if (name->Length == sizeof (WCHAR) && name->Buffer[0] == L'.')
+	return hash;
+      hash = L'\\' + (hash << 6) + (hash << 16) - hash;
     }
 
 hashit:
   /* Build up hash. Name is already normalized */
-  do
-    {
-      int ch = cyg_tolower (*name);
-      hash = ch + (hash << 6) + (hash << 16) - hash;
-    }
-  while (*++name != '\0');
+  USHORT len = name->Length / sizeof (WCHAR);
+  for (USHORT idx = 0; idx < len; ++idx)
+    hash = RtlUpcaseUnicodeChar (name->Buffer[idx])
+	   + (hash << 6) + (hash << 16) - hash;
   return hash;
+}
+
+__ino64_t __stdcall
+hash_path_name (__ino64_t hash, PCWSTR name)
+{
+  UNICODE_STRING uname;
+  RtlInitUnicodeString (&uname, name);
+  return hash_path_name (hash, &uname);
+}
+
+__ino64_t __stdcall
+hash_path_name (__ino64_t hash, const char *name)
+{
+  UNICODE_STRING uname;
+  RtlCreateUnicodeStringFromAsciiz (&uname, name);
+  __ino64_t ret = hash_path_name (hash, &uname);
+  RtlFreeUnicodeString (&uname);
+  return ret;
 }
 
 char *
