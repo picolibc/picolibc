@@ -251,7 +251,7 @@ class fhandler_base
   bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
-  __ino64_t get_namehash () { return namehash ?: namehash = hash_path_name (0, get_win32_name ()); }
+  __ino64_t get_namehash () { return namehash ?: namehash = hash_path_name (0, pc.get_nt_native_path ()); }
   /* Returns name used for /proc/<pid>/fd in buf. */
   virtual char *get_proc_fd_name (char *buf);
 

@@ -1682,7 +1682,7 @@ readdir_get_ino (const char *path, bool dot_dot)
 	ino = st.st_ino;
     }
   else if (!pc.hasgood_inode ())
-    ino = hash_path_name (0, pc);
+    ino = hash_path_name (0, pc.get_nt_native_path ());
   else if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL,
 				   pc.get_object_attr (attr, sec_none_nih),
 				   &io, FILE_SHARE_VALID_FLAGS,
