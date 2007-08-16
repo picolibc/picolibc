@@ -1,5 +1,12 @@
 2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Handle S_IFSOCK
+	mode bit by setting the SYSTEM attribute.
+	* fhandler_socket.cc (fhandler_socket::fchmod): Add S_IFSOCK mode bit
+	when calling fhandler_disk_file::fchmod.  Don't set attributes here.
+
+2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.h (path_conv::operator char *): Delete.
 	(path_conv::operator const char *): Delete.
 	* dlfcn.cc: Throughout, replace path_conv::operator char * and

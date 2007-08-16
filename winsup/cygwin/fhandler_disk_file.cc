@@ -772,6 +772,8 @@ fhandler_disk_file::fchmod (mode_t mode)
     pc &= (DWORD) ~FILE_ATTRIBUTE_READONLY;
   else
     pc |= (DWORD) FILE_ATTRIBUTE_READONLY;
+  if (mode & S_IFSOCK)
+    pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
 
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
