@@ -72,7 +72,7 @@ get_full_path_of_dll (const char* str, char *name)
     real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);	/* Convert */
 
   if (!real_filename.error)
-    ret = strcpy (name, real_filename);
+    ret = strcpy (name, real_filename.get_win32 ());
   else
     {
       set_errno (real_filename.error);

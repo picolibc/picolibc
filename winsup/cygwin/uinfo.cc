@@ -518,7 +518,7 @@ pwdgrp::load (const char *posix_fname)
   curr_lines = 0;
 
   pc.check (posix_fname);
-  etc_ix = etc::init (etc_ix, pc);
+  etc_ix = etc::init (etc_ix, pc.get_win32 ());
 
   paranoid_printf ("%s", posix_fname);
 
@@ -529,8 +529,9 @@ pwdgrp::load (const char *posix_fname)
     }
   else
     {
-      HANDLE fh = CreateFile (pc, GENERIC_READ, FILE_SHARE_VALID_FLAGS, NULL,
-			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      HANDLE fh = CreateFile (pc.get_win32 (), GENERIC_READ,
+			      FILE_SHARE_VALID_FLAGS, NULL, OPEN_EXISTING,
+			      FILE_ATTRIBUTE_NORMAL, 0);
       if (fh == INVALID_HANDLE_VALUE)
 	{
 	  paranoid_printf ("%s CreateFile failed, %E");

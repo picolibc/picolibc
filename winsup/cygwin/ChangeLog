@@ -1,5 +1,19 @@
 2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.h (path_conv::operator char *): Delete.
+	(path_conv::operator const char *): Delete.
+	* dlfcn.cc: Throughout, replace path_conv::operator char * and
+	path_conv::operator const char * by call to path_conv::get_win32
+	for easier transition to UNICODE_PATHs.
+	* fhandler_socket.cc: Ditto.
+	* hookapi.cc: Ditto.
+	* path.cc: Ditto.
+	* spawn.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* uinfo.cc: Ditto.
+
+2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (readdir_worker): Convert w32name to PUNICODE_STRING.
 	* sec_acl.cc (getacl): Convert debug output to print native NT path.
 	* security.cc (set_file_attribute): Ditto.

@@ -2929,7 +2929,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     {
       strcpy (w32oldpath, oldpath);
       create_how = CREATE_ALWAYS;
-      SetFileAttributes (win32_path, FILE_ATTRIBUTE_NORMAL);
+      SetFileAttributes (win32_path.get_win32 (), FILE_ATTRIBUTE_NORMAL);
     }
   else
     {
@@ -2952,7 +2952,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
 				   transparent_exe ? stat_suffixes : NULL);
 	      if (win32_oldpath.error != ENOENT)
-		strcpy (use_winsym ? reloldpath : w32oldpath, win32_oldpath);
+		strcpy (use_winsym ? reloldpath : w32oldpath,
+			win32_oldpath.get_win32 ());
 	    }
 	  else if (!use_winsym)
 	    strcpy (w32oldpath, reloldpath);
@@ -2960,7 +2961,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	    {
 	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
 				   transparent_exe ? stat_suffixes : NULL);
-	      strcpy (w32oldpath, win32_oldpath);
+	      strcpy (w32oldpath, win32_oldpath.get_win32 ());
 	    }
 	  if (cp)
 	    {
@@ -2972,7 +2973,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	{
 	  win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
 			       transparent_exe ? stat_suffixes : NULL);
-	  strcpy (w32oldpath, win32_oldpath);
+	  strcpy (w32oldpath, win32_oldpath.get_win32 ());
 	}
       create_how = CREATE_NEW;
     }
@@ -2981,7 +2982,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
 			    &sa, sd);
 
-  h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa, create_how,
+  h = CreateFile (win32_path.get_win32 (), GENERIC_WRITE, 0, &sa, create_how,
 		  FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
     __seterrno ();
@@ -3066,7 +3067,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  CloseHandle (h);
 	  DWORD attr = use_winsym ? FILE_ATTRIBUTE_READONLY
 				  : FILE_ATTRIBUTE_SYSTEM;
-	  SetFileAttributes (win32_path, attr);
+	  SetFileAttributes (win32_path.get_win32 (), attr);
 
 	  res = 0;
 	}
@@ -3759,7 +3760,6 @@ hash_path_name (__ino64_t hash, PUNICODE_STRING name)
       hash = L'\\' + (hash << 6) + (hash << 16) - hash;
     }
 
-hashit:
   /* Build up hash. Name is already normalized */
   USHORT len = name->Length / sizeof (WCHAR);
   for (USHORT idx = 0; idx < len; ++idx)
@@ -3834,7 +3834,7 @@ chdir (const char *in_dir)
 
   int res = -1;
   bool doit = false;
-  const char *native_dir = path, *posix_cwd = NULL;
+  const char *native_dir = path.get_win32 (), *posix_cwd = NULL;
   int devn = path.get_devn ();
   if (!isvirtual_dev (devn))
     {
@@ -3918,7 +3918,8 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
     }
 
 
-  strcpy (win32_path, strcmp ((char *) p, ".\\") == 0 ? "." : (char *) p);
+  strcpy (win32_path,
+	  strcmp (p.get_win32 (), ".\\") == 0 ? "." : p.get_win32 ());
   return 0;
 }
 
@@ -3933,7 +3934,7 @@ cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
       return -1;
     }
 
-  strcpy (win32_path, p);
+  strcpy (win32_path, p.get_win32 ());
   return 0;
 }
 
@@ -4506,7 +4507,7 @@ etc::dir_changed (int n)
       if (!changed_h)
 	{
 	  path_conv pwd ("/etc");
-	  changed_h = FindFirstChangeNotification (pwd, FALSE,
+	  changed_h = FindFirstChangeNotification (pwd.get_win32 (), FALSE,
 						  FILE_NOTIFY_CHANGE_LAST_WRITE
 						  | FILE_NOTIFY_CHANGE_FILE_NAME);
 #ifdef DEBUGGING

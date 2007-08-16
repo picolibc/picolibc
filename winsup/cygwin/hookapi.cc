@@ -219,7 +219,7 @@ ld_preload ()
   for (p = strtok_r (s, ":\t\n", &here); p; p = strtok_r (NULL, ":\t\n", &here))
     {
       path_conv lib (p);
-      if (!LoadLibrary (lib))
+      if (!LoadLibrary (lib.get_win32 ()))
 	{
 	  __seterrno ();
 	  api_fatal ("error while loading shared libraries: %s: "

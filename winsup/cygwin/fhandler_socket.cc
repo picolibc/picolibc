@@ -708,7 +708,9 @@ fhandler_socket::fchmod (mode_t mode)
       fhandler_disk_file fh (pc);
       fh.get_device () = FH_FS;
       int ret = fh.fchmod (adjust_socket_file_mode (mode));
-      SetFileAttributes	(pc, GetFileAttributes (pc) | FILE_ATTRIBUTE_SYSTEM);
+      SetFileAttributesA (pc.get_win32 (),
+			  GetFileAttributesA (pc.get_win32 ())
+			  | FILE_ATTRIBUTE_SYSTEM);
       return ret;
     }
   set_errno (EBADF);

@@ -82,11 +82,11 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
       ext = NULL;
     }
   else if (buf.known_suffix)
-    ext = (char *) buf + (buf.known_suffix - buf.get_win32 ());
+    ext = buf.get_win32 () + (buf.known_suffix - buf.get_win32 ());
   else
-    ext = strchr (buf, '\0');
+    ext = strchr (buf.get_win32 (), '\0');
 
-  debug_printf ("buf %s, suffix found '%s'", (char *) buf, ext);
+  debug_printf ("buf %s, suffix found '%s'", (char *) buf.get_win32 (), ext);
   return ext;
 }
 
@@ -104,7 +104,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 {
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
-  const char *retval = buf;
+  const char *retval = buf.get_win32 ();
   char tmp[CYG_MAX_PATH];
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
@@ -200,9 +200,9 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
  out:
   if (posix)
     buf.set_path (posix);
-  debug_printf ("%s = find_exec (%s)", (char *) buf, name);
+  debug_printf ("%s = find_exec (%s)", (char *) buf.get_win32 (), name);
   if (known_suffix)
-    *known_suffix = suffix ?: strchr (buf, '\0');
+    *known_suffix = suffix ?: strchr (buf.get_win32 (), '\0');
   if (!retval && err)
     set_errno (err);
   return retval;
@@ -367,7 +367,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       real_path.check (prog_arg);
       one_line.add ("\"");
       if (!real_path.error)
-	one_line.add (real_path);
+	one_line.add (real_path.get_win32 ());
       else
 	one_line.add (argv[0]);
       one_line.add ("\"");
@@ -375,14 +375,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       one_line.add (argv[1]);
       one_line.add (" ");
       one_line.add (argv[2]);
-      strcpy (real_path, argv[0]);
+      strcpy (real_path.get_win32 (), argv[0]);
       null_app_name = true;
     }
   else
     {
       if (wascygexec)
 	newargv.dup_all ();
-      else if (!one_line.fromargv (newargv, real_path, real_path.iscygexec ()))
+      else if (!one_line.fromargv (newargv, real_path.get_win32 (), real_path.iscygexec ()))
 	{
 	  res = -1;
 	  goto out;
@@ -459,7 +459,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       && (!ch.iscygwin () || mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
-  runpath = null_app_name ? NULL : (const char *) real_path;
+  runpath = null_app_name ? NULL : real_path.get_win32 ();
 
   syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
 
@@ -597,7 +597,7 @@ loop:
       myself->dwProcessId = pi.dwProcessId;
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
-      strcpy (myself->progname, real_path); // FIXME: race?
+      strcpy (myself->progname, real_path.get_win32 ()); // FIXME: race?
       sigproc_printf ("new process name %s", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
@@ -638,7 +638,7 @@ loop:
       child->dwProcessId = pi.dwProcessId;
       child.hProcess = pi.hProcess;
 
-      strcpy (child->progname, real_path);
+      strcpy (child->progname, real_path.get_win32 ());
       /* FIXME: This introduces an unreferenced, open handle into the child.
 	 The purpose is to keep the pid shared memory open so that all of
 	 the fields filled out by child.remember do not disappear and so there
@@ -910,7 +910,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
   bool exeext = strcasematch (ext, ".exe");
   if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat"))
     return 0;
-  if (!*ext && ((p = ext - 4) > (char *) real_path)
+  if (!*ext && ((p = ext - 4) > real_path.get_win32 ())
       && (strcasematch (p, ".bat") || strcasematch (p, ".cmd")
 	  || strcasematch (p, ".btm")))
     return 0;
@@ -920,7 +920,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
       char *arg1 = NULL;
       char *ptr, *buf;
 
-      HANDLE h = CreateFile (real_path, GENERIC_READ,
+      HANDLE h = CreateFile (real_path.get_win32 (), GENERIC_READ,
 			       FILE_SHARE_READ | FILE_SHARE_WRITE,
 			       &sec_none_nih, OPEN_EXISTING,
 			       FILE_ATTRIBUTE_NORMAL, 0);
@@ -966,7 +966,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 	  }
       }
 
-      debug_printf ("%s is possibly a script", (char *) real_path);
+      debug_printf ("%s is possibly a script", real_path.get_win32 ());
 
       ptr = buf;
       if (*ptr++ == '#' && *ptr++ == '!')
@@ -1019,7 +1019,7 @@ just_shell:
       /* FIXME: This should not be using FE_NATIVE.  It should be putting
 	 the posix path on the argv list. */
       find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
-      unshift (real_path, 1);
+      unshift (real_path.get_win32 (), 1);
     }
   return 0;
 

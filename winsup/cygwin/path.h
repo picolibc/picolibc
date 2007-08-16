@@ -252,8 +252,6 @@ class path_conv
   POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
 				      SECURITY_ATTRIBUTES &sa);
   PWCHAR get_wide_win32_path (PWCHAR wc);
-  operator char *() {return path;}
-  operator const char *() {return path;}
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   path_conv &operator =(path_conv &pc)

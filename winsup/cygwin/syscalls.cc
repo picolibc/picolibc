@@ -1125,7 +1125,7 @@ umask (mode_t mask)
 int
 chmod_device (path_conv& pc, mode_t mode)
 {
-  return mknod_worker (pc, pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
+  return mknod_worker (pc.get_win32 (), pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
 }
 
 /* chmod: POSIX 5.6.4.1 */
@@ -2395,7 +2395,7 @@ mknod32 (const char *path, mode_t mode, __dev32_t dev)
       return -1;
     }
 
-  return mknod_worker (w32path, type, mode, major, minor);
+  return mknod_worker (w32path.get_win32 (), type, mode, major, minor);
 }
 
 extern "C" int
@@ -2702,7 +2702,7 @@ chroot (const char *newroot)
   else
     {
       getwinenv("PATH="); /* Save the native PATH */
-      cygheap->root.set (path.normalized_path, path);
+      cygheap->root.set (path.normalized_path, path.get_win32 ());
       ret = 0;
     }
 
