@@ -358,8 +358,8 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 				     FileRenameInformation);
     }
   if (!NT_SUCCESS (status))
-    debug_printf ("Move %s to %s failed, status = %p", win32_path.get_win32 (),
-		  recycler, status);
+    debug_printf ("Move %S to %S failed, status = %p",
+		  win32_path.get_nt_native_path (), &recycler, status);
 out:
   if (rootdir)
     NtClose (rootdir);

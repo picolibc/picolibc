@@ -140,14 +140,15 @@ readdir_worker (DIR *dir, dirent *de)
 	  de->d_ino = ((fhandler_base *) dir->__fh)->get_namehash ();
 	  if (!is_dot && !is_dot_dot)
 	    {
-	      const char *w32name = ((fhandler_base *) dir->__fh)->get_win32_name ();
+	      PUNICODE_STRING w32name =
+		  ((fhandler_base *) dir->__fh)->pc.get_nt_native_path ();
 	      DWORD devn = ((fhandler_base *) dir->__fh)->get_device ();
 	      /* Paths below /proc don't have a Win32 pendant. */
 	      if (isproc_dev (devn))
-		de->d_ino = hash_path_name (de->d_ino, "/");
-	      /* A drive's root dir has a trailing backslash already. */
-	      else if (w32name[1] != ':' || w32name[2] != '\\' || w32name[3])
-		de->d_ino = hash_path_name (de->d_ino, "\\");
+		de->d_ino = hash_path_name (de->d_ino, L"/");
+	      else if (w32name->Buffer[w32name->Length / sizeof (WCHAR) - 1]
+		       != L'\\')
+		de->d_ino = hash_path_name (de->d_ino, L"\\");
 	      de->d_ino = hash_path_name (de->d_ino, de->d_name);
 	    }
 	}

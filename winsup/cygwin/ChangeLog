@@ -1,5 +1,12 @@
 2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dir.cc (readdir_worker): Convert w32name to PUNICODE_STRING.
+	* sec_acl.cc (getacl): Convert debug output to print native NT path.
+	* security.cc (set_file_attribute): Ditto.
+	* syscalls.cc (try_to_bin): Ditto and fix buggy debug statement.
+
+2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (RtlAcquirePebLock): Declare.
 	(RtlReleasePebLock): Declare.
 	* path.cc (cwdstuff::set): Change PEB only while it's locked.

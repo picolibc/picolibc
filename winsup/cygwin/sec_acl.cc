@@ -391,7 +391,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
       aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
     aclsort32 (pos, 0, aclbufp);
   }
-  syscall_printf ("%d = getacl (%s)", pos, pc.get_win32 ());
+  syscall_printf ("%d = getacl (%S)", pos, pc.get_nt_native_path ());
   return pos;
 }
 
