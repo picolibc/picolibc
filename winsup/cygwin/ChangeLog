@@ -1,5 +1,11 @@
 2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (RtlAcquirePebLock): Declare.
+	(RtlReleasePebLock): Declare.
+	* path.cc (cwdstuff::set): Change PEB only while it's locked.
+
+2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::get_namehash): Use NT native path.
 	* fhandler_disk_file.cc (readdir_get_ino): Ditto in call to
 	hash_path_name.

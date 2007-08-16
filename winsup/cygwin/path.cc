@@ -4329,6 +4329,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 	      strcpy (as.Buffer + len, "\\");
 	      ++as.Length;
 	    }
+	  RtlAcquirePebLock ();
 	  if (current_codepage == ansi_cp)
 	    RtlAnsiStringToUnicodeString (
 			&get_user_proc_parms ()->CurrentDirectoryName,
@@ -4339,11 +4340,9 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 			&as, FALSE);
 	  PHANDLE phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
 	  if (*phdl)
-	    {
-	      HANDLE old_h = *phdl;
-	      *phdl = h;
-	      CloseHandle (old_h);
-	    }
+	    CloseHandle (*phdl);
+	  *phdl = h;
+	  RtlReleasePebLock ();
 	}
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */

@@ -827,6 +827,7 @@ extern "C"
   NTSTATUS NTAPI RtlAppendUnicodeToString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlAppendUnicodeStringToString (PUNICODE_STRING,
 						 PUNICODE_STRING);
+  VOID NTAPI RtlAcquirePebLock ();
   NTSTATUS NTAPI RtlAnsiStringToUnicodeString (PUNICODE_STRING, PANSI_STRING,
 					       BOOLEAN);
   LONG NTAPI RtlCompareUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
@@ -848,6 +849,7 @@ extern "C"
 					       BOOLEAN);
   BOOLEAN NTAPI RtlPrefixUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 					BOOLEAN);
+  VOID NTAPI RtlReleasePebLock ();
   VOID NTAPI RtlSecondsSince1970ToTime (ULONG, PLARGE_INTEGER);
   NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,
 					       BOOLEAN);
