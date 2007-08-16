@@ -1,3 +1,9 @@
+2007-08-16  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (PT_GNU_STACK): Renamed to ...
+	(PT_GNU_ATTR): This.
+	(PT_GNU_STACK): New.  Make an alias of PT_GNU_ATTR.
+
 2007-07-09  Roland McGrath  <roland@redhat.com>
 
 	* common.h (NT_GNU_HWCAP, NT_GNU_BUILD_ID): New macros.

@@ -307,7 +307,8 @@
 
 #define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550) /* Frame unwind information */
 #define PT_SUNW_EH_FRAME PT_GNU_EH_FRAME      /* Solaris uses the same value */
-#define PT_GNU_STACK	(PT_LOOS + 0x474e551) /* Stack flags */
+#define PT_GNU_ATTR	(PT_LOOS + 0x474e551) /* Attribute info */
+#define PT_GNU_STACK	PT_GNU_ATTR	      /* Stack flags */
 #define PT_GNU_RELRO	(PT_LOOS + 0x474e552) /* Read-only after relocation */
 
 /* Program segment permissions, in program header p_flags field.  */
