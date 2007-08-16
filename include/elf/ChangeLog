@@ -1,5 +1,9 @@
 2007-08-16  H.J. Lu  <hongjiu.lu@intel.com>
 
+	* common.h: Revert last change.
+
+2007-08-16  H.J. Lu  <hongjiu.lu@intel.com>
+
 	* common.h (PT_GNU_STACK): Renamed to ...
 	(PT_GNU_ATTR): This.
 	(PT_GNU_STACK): New.  Make an alias of PT_GNU_ATTR.
