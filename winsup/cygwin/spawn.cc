@@ -533,7 +533,7 @@ loop:
 
 	  sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
 			 cygheap->user.sid ());
-	  /* We're create a window station per user, not per logon session.
+	  /* We're creating a window station per user, not per logon session.
 	     First of all we might not have a valid logon session for
 	     the user (logon by create_token), and second, it doesn't
 	     make sense in terms of security to create a new window

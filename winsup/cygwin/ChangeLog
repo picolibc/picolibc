@@ -1,5 +1,9 @@
 2007-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (spawn_guts): Fix typo in comment.
+
+2007-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (CloseDesktop): Define.
 	(CreateDesktopA): Define.
 	(SetThreadDesktop): Define.
