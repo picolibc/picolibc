@@ -1,3 +1,13 @@
+2007-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (CloseDesktop): Define.
+	(CreateDesktopA): Define.
+	(SetThreadDesktop): Define.
+	* spawn.cc (spawn_guts): When starting a process under another user
+	account, don't open up permissions on current window station and
+	desktop.  Instead, if not in interactive session, create a new per-user
+	window station plus default desktop and use that for the child process.
+
 2007-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Handle S_IFSOCK

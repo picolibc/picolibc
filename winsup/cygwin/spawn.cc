@@ -512,25 +512,49 @@ loop:
       if (mode == _P_OVERLAY)
 	myself.set_acl();
 
-      /* allow the child to interact with our window station/desktop */
-      HANDLE hwst, hdsk;
-      SECURITY_INFORMATION dsi = DACL_SECURITY_INFORMATION;
-      NTSTATUS status;
+      char wstname[1024] = { '\0' };
+      HWINSTA hwst_orig = NULL, hwst = NULL;
+      HDESK hdsk_orig = NULL, hdsk = NULL;
+      PSECURITY_ATTRIBUTES sa;
       DWORD n;
-      char wstname[1024];
-      char dskname[1024];
 
-      hwst = GetProcessWindowStation ();
-      if ((status = NtSetSecurityObject (hwst, dsi, get_null_sd ())))
-	system_printf ("NtSetSecurityObject, %lx", status);
-      GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);
-      hdsk = GetThreadDesktop (GetCurrentThreadId ());
-      if ((status = NtSetSecurityObject (hdsk, dsi, get_null_sd ())))
-	system_printf ("NtSetSecurityObject, %lx", status);
-      GetUserObjectInformation (hdsk, UOI_NAME, dskname, 1024, &n);
-      strcat (wstname, "\\");
-      strcat (wstname, dskname);
-      si.lpDesktop = wstname;
+      hwst_orig = GetProcessWindowStation ();
+      hdsk_orig = GetThreadDesktop (GetCurrentThreadId ());
+      GetUserObjectInformation (hwst_orig, UOI_NAME, wstname, 1024, &n);
+      /* Prior to Vista it was possible to start a service with the
+	 "Interact with desktop" flag.  This started the service in the
+	 interactive window station of the console.  A big security
+	 risk, but we don't want to disable this behaviour for older
+	 OSes because it's still heavily used by some users.  They have
+	 been warned. */
+      if (!strcasematch (wstname, "WinSta0"))
+	{
+	  char sid[128];
+
+	  sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
+			 cygheap->user.sid ());
+	  /* We're create a window station per user, not per logon session.
+	     First of all we might not have a valid logon session for
+	     the user (logon by create_token), and second, it doesn't
+	     make sense in terms of security to create a new window
+	     station for every logon of the same user.  It just fills up
+	     the system with window stations for no good reason. */
+	  hwst = CreateWindowStationA (cygheap->user.get_windows_id (sid), 0,
+				       GENERIC_READ | GENERIC_WRITE, sa);
+	  if (!hwst)
+	    system_printf ("CreateWindowStation failed, %E");
+	  else if (!SetProcessWindowStation (hwst))
+	    system_printf ("SetProcessWindowStation failed, %E");
+	  else if (!(hdsk = CreateDesktopA ("Default", NULL, NULL, 0,
+					    GENERIC_ALL, sa)))
+	    system_printf ("CreateDesktop failed, %E");
+	  else
+	    {
+	      stpcpy (stpcpy (wstname, sid), "\\Default");
+	      si.lpDesktop = wstname;
+	      debug_printf ("Desktop: %s", si.lpDesktop);
+	    }
+	}
 
       rc = CreateProcessAsUser (cygheap->user.primary_token (),
 		       runpath,		/* image name - with full path */
@@ -543,6 +567,16 @@ loop:
 		       NULL,
 		       &si,
 		       &pi);
+      if (hwst)
+	{
+	  SetProcessWindowStation (hwst_orig);
+	  CloseWindowStation (hwst);
+	}
+      if (hdsk)
+	{
+	  SetThreadDesktop (hdsk_orig);
+	  CloseDesktop (hdsk);
+	}
     }
 
   /* Restore impersonation. In case of _P_OVERLAY this isn't
