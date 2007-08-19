@@ -110,20 +110,9 @@ struct fs_info
     unsigned is_cdrom	     : 1;
   } status;
  public:
-  void clear ()
-  {
-    flags () = 0;
-    is_remote_drive (false);
-    has_buggy_open (false);
-    has_acls (false);
-    hasgood_inode (false);
-    is_fat (false);
-    is_ntfs (false);
-    is_samba (false);
-    is_nfs (false);
-    is_netapp (false);
-    is_cdrom (false);
-  }
+  void clear () { memset (this, 0 , sizeof *this); }
+  fs_info () { clear (); }
+
   inline DWORD& flags () {return status.flags;};
 
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)

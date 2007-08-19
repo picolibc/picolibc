@@ -2596,6 +2596,7 @@ static mntent *
 fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 {
   struct mntent& ret=_my_tls.locals.mntbuf;
+  bool append_bs = false;
 
   /* Remove drivenum from list if we see a x: style path */
   if (strlen (native_path) == 2 && native_path[1] == ':')
@@ -2603,6 +2604,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
       int drivenum = cyg_tolower (native_path[0]) - 'a';
       if (drivenum >= 0 && drivenum <= 31)
 	_my_tls.locals.available_drives &= ~(1 << drivenum);
+      append_bs = true;
     }
 
   /* Pass back pointers to mount_table strings reserved for use by
@@ -2625,6 +2627,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   size_t size = (strlen (native_path) + 10) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&unat, (PWSTR) alloca (size), size);
   get_nt_native_path (native_path, unat);
+  if (append_bs)
+    RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, true);  /* this pulls from a cache, usually. */
 
   if (mntinfo.is_samba())

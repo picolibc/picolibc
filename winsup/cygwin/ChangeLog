@@ -1,3 +1,10 @@
+2007-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fillout_mntent): Append backslash to drive-only paths before
+	calling fs_info::update.
+	* path.h (fs_info::clear): Simplify.
+	(fs_info::fs_info): Add constructor.
+
 2007-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Fix typo in comment.
