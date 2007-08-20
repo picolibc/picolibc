@@ -240,6 +240,12 @@ class path_conv
   PUNICODE_STRING get_nt_native_path ();
   POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
 				      SECURITY_ATTRIBUTES &sa);
+  inline size_t get_wide_win32_path_len ()
+  {
+    get_nt_native_path ();
+    return uni_path.Length / sizeof (WCHAR);
+  }
+
   PWCHAR get_wide_win32_path (PWCHAR wc);
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
