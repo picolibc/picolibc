@@ -1,3 +1,8 @@
+2007-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (rootdir): Delete.
+	* winsup.h (rootdir): Drop declaration.
+
 2007-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (fillout_mntent): Append backslash to drive-only paths before
