@@ -508,9 +508,16 @@ pwdgrp::add_line (char *eptr)
 void
 pwdgrp::load (const char *posix_fname)
 {
-  const char *res;
   static const char failed[] = "failed";
   static const char succeeded[] = "succeeded";
+  const char *res = failed;
+  HANDLE fh = NULL;
+  LARGE_INTEGER off = { QuadPart:0LL };
+
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
 
   if (buf)
     free (buf);
@@ -525,44 +532,54 @@ pwdgrp::load (const char *posix_fname)
   if (pc.error || !pc.exists () || pc.isdir ())
     {
       paranoid_printf ("strange path_conv problem");
-      res = failed;
+      goto out;
     }
-  else
+  status = NtOpenFile (&fh, FILE_READ_DATA,
+		       pc.get_object_attr (attr, sec_none_nih), &io,
+		       FILE_SHARE_VALID_FLAGS, 0);
+  if (!NT_SUCCESS (status))
     {
-      HANDLE fh = CreateFile (pc.get_win32 (), GENERIC_READ,
-			      FILE_SHARE_VALID_FLAGS, NULL, OPEN_EXISTING,
-			      FILE_ATTRIBUTE_NORMAL, 0);
-      if (fh == INVALID_HANDLE_VALUE)
-	{
-	  paranoid_printf ("%s CreateFile failed, %E");
-	  res = failed;
-	}
-      else
-	{
-	  DWORD size = GetFileSize (fh, NULL), read_bytes;
-	  buf = (char *) malloc (size + 1);
-	  if (!ReadFile (fh, buf, size, &read_bytes, NULL))
-	    {
-	      paranoid_printf ("ReadFile failed, %E");
-	      CloseHandle (fh);
-	      if (buf)
-		free (buf);
-	      buf = NULL;
-	      res = failed;
-	    }
-	  else
-	    {
-	      CloseHandle (fh);
-	      buf[read_bytes] = '\0';
-	      char *eptr = buf;
-	      while ((eptr = add_line (eptr)))
-		continue;
-	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
-	      res = succeeded;
-	    }
-	}
+      paranoid_printf ("NtOpenFile(%S) failed, status %p",
+			pc.get_nt_native_path (), status);
+      goto out;
     }
+  status = NtQueryInformationFile (fh, &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    {
+      paranoid_printf ("NtQueryInformationFile(%S) failed, status %p",
+		       pc.get_nt_native_path (), status);
+      goto out;
+    }
+  /* FIXME: Should we test for HighPart set?  If so, the
+     passwd or group file is way beyond what we can handle. */
+  /* FIXME 2: It's still ugly that we keep the file in memory.
+     Big organizations have naturally large passwd files. */
+  buf = (char *) malloc (fsi.EndOfFile.LowPart + 1);
+  if (!buf)
+    {
+      paranoid_printf ("malloc (%d) failed", fsi.EndOfFile.LowPart);
+      goto out;
+    }
+  status = NtReadFile (fh, NULL, NULL, NULL, &io, buf,
+		       fsi.EndOfFile.LowPart, &off, NULL);
+  if (!NT_SUCCESS (status))
+    {
+      paranoid_printf ("NtReadFile(%S) failed, status %p",
+		       pc.get_nt_native_path (), status);
+      free (buf);
+      goto out;
+    }
+  buf[fsi.EndOfFile.LowPart] = '\0';
+  char *eptr = buf;
+  while ((eptr = add_line (eptr)))
+    continue;
+  debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
+  res = succeeded;
 
+out:
+  if (fh)
+    NtClose (fh);
   debug_printf ("%s load %s", posix_fname, res);
   initialized = true;
 }

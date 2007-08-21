@@ -1,5 +1,9 @@
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::load): Use NT native functions.
+
+2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Rewrite checking
 	for executable file magic using a thread safe method and re-enable this
 	code.
