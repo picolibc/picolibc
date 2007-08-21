@@ -1,5 +1,11 @@
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Rewrite checking
+	for executable file magic using a thread safe method and re-enable this
+	code.
+
+2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (unlink_nt): Drop one local FILE_BASIC_INFORMATION struct.
 
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>

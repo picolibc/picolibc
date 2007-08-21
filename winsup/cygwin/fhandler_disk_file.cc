@@ -570,37 +570,31 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       else
 	{
 	  buf->st_mode |= S_IFREG;
-#if 0
-	  /* FIXME: Is this code really necessary?  There are already
-	     two places in path_conv which look for executability.
-	     Also, by using the fhandler's io HANDLE, a stat call might
-	     change the file position for a short period of time in
-	     a not thread-safe way. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
-	      DWORD cur, done;
-	      LONG curhigh = 0;
-	      char magic[3];
+	      UNICODE_STRING same;
+	      OBJECT_ATTRIBUTES attr;
+	      HANDLE h;
+	      IO_STATUS_BLOCK io;
 
-	      /* First retrieve current position, set to beginning
-		 of file if not already there. */
-	      cur = SetFilePointer (get_handle (), 0, &curhigh, FILE_CURRENT);
-	      if ((cur != INVALID_SET_FILE_POINTER || GetLastError () == NO_ERROR)
-		  && ((!cur && !curhigh) || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
-		      != INVALID_SET_FILE_POINTER))
-		{
-		  /* FIXME should we use /etc/magic ? */
-		  magic[0] = magic[1] = magic[2] = '\0';
-		  if (ReadFile (get_handle (), magic, 3, &done, NULL)
-		      && has_exec_chars (magic, done))
+	      RtlInitUnicodeString (&same, L"");
+	      InitializeObjectAttributes (&attr, &same, 0, get_handle (), NULL);
+	      if (NT_SUCCESS (NtOpenFile (&h, FILE_READ_DATA, &attr, &io,
+					  FILE_SHARE_VALID_FLAGS, 0)))
+	        {
+		  LARGE_INTEGER off = { QuadPart:0LL };
+		  char magic[3];
+
+		  if (NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io, magic,
+					      3, &off, NULL))
+		      && has_exec_chars (magic, io.Information))
 		    {
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
-		  SetFilePointer (get_handle (), cur, &curhigh, FILE_BEGIN);
+		  NtClose (h);
 		}
 	    }
-#endif
 	}
       if (pc.exec_state () == is_executable)
 	buf->st_mode |= STD_XBITS;
