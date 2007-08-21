@@ -1,5 +1,9 @@
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (unlink_nt): Drop one local FILE_BASIC_INFORMATION struct.
+
+2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (NtNotifyChangeDirectoryFile): Declare.
 	(NtQueryAttributesFile): Move to maintain alphabetical order of
 	declarations.  Add comment to note that timestamp information returned

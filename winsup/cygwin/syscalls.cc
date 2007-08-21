@@ -479,7 +479,6 @@ unlink_nt (path_conv &pc)
   /* Get rid of read-only attribute. */
   if (access & FILE_WRITE_ATTRIBUTES)
     {
-      FILE_BASIC_INFORMATION fbi;
       fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
       fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
       fbi.FileAttributes = (pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY)
