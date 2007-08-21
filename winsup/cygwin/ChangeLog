@@ -1,5 +1,20 @@
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (NtNotifyChangeDirectoryFile): Declare.
+	(NtQueryAttributesFile): Move to maintain alphabetical order of
+	declarations.  Add comment to note that timestamp information returned
+	by NtQueryAttributesFile is unreliable.
+	* path.h (etc::changed_h): Move here.
+	(etc::fn): Change type to OBJECT_ATTRIBUTES.
+	(etc::last_modified): Change type to LARGE_INTEGER.
+	(etc::init): Take PUNICODE_STRING as second argument.
+	* path.cc: Accomodate above changes.
+	(etc::test_file_change): Use NT native functions.
+	(etc::dir_changed): Ditto.
+	* uinfo.cc (pwdgrp::load): Call etc::init with NT native path.
+
+2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc: Change debugging output througout to print
 	the NT status consistently.  Use UNICODE path information if available.
 

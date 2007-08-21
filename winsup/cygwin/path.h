@@ -336,11 +336,12 @@ class etc
 {
   friend class dtable;
   static int curr_ix;
+  static HANDLE changed_h;
   static bool change_possible[MAX_ETC_FILES + 1];
-  static const char *fn[MAX_ETC_FILES + 1];
-  static FILETIME last_modified[MAX_ETC_FILES + 1];
+  static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
+  static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];
   static bool dir_changed (int);
-  static int init (int, const char *);
+  static int init (int, PUNICODE_STRING);
   static bool file_changed (int);
   static bool test_file_change (int);
   friend class pwdgrp;

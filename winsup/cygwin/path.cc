@@ -4456,11 +4456,11 @@ out:
 int etc::curr_ix = 0;
 /* Note that the first elements of the below arrays are unused */
 bool etc::change_possible[MAX_ETC_FILES + 1];
-const char *etc::fn[MAX_ETC_FILES + 1];
-FILETIME etc::last_modified[MAX_ETC_FILES + 1];
+OBJECT_ATTRIBUTES etc::fn[MAX_ETC_FILES + 1];
+LARGE_INTEGER etc::last_modified[MAX_ETC_FILES + 1];
 
 int
-etc::init (int n, const char *etc_fn)
+etc::init (int n, PUNICODE_STRING etc_fn)
 {
   if (n > 0)
     /* ok */;
@@ -4469,35 +4469,36 @@ etc::init (int n, const char *etc_fn)
   else
     api_fatal ("internal error");
 
-  fn[n] = etc_fn;
+  InitializeObjectAttributes (&fn[n], etc_fn, OBJ_CASE_INSENSITIVE, NULL, NULL);
   change_possible[n] = false;
   test_file_change (n);
-  paranoid_printf ("fn[%d] %s, curr_ix %d", n, fn[n], curr_ix);
+  paranoid_printf ("fn[%d] %S, curr_ix %d", n, fn[n].ObjectName, curr_ix);
   return n;
 }
 
 bool
 etc::test_file_change (int n)
 {
-  HANDLE h;
-  WIN32_FIND_DATA data;
+  NTSTATUS status;
+  FILE_NETWORK_OPEN_INFORMATION fnoi;
   bool res;
 
-  if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
+  status = NtQueryFullAttributesFile (&fn[n], &fnoi);
+  if (!NT_SUCCESS (status))
     {
       res = true;
       memset (last_modified + n, 0, sizeof (last_modified[n]));
-      debug_printf ("FindFirstFile failed, %E");
+      debug_printf ("NtQueryFullAttributesFile (%S) failed, %p",
+		    fn[n].ObjectName, status);
     }
   else
     {
-      FindClose (h);
-      res = CompareFileTime (&data.ftLastWriteTime, last_modified + n) > 0;
-      last_modified[n] = data.ftLastWriteTime;
-      debug_printf ("FindFirstFile succeeded");
+      res = CompareFileTime ((FILETIME *) &fnoi.LastWriteTime,
+			     (FILETIME *) last_modified + n) > 0;
+      last_modified[n].QuadPart = fnoi.LastWriteTime.QuadPart;
     }
 
-  paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
+  paranoid_printf ("fn[%d] %S res %d", n, fn[n].ObjectName, res);
   return res;
 }
 
@@ -4507,17 +4508,42 @@ etc::dir_changed (int n)
   if (!change_possible[n])
     {
       static HANDLE changed_h NO_COPY;
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{
-	  path_conv pwd ("/etc");
-	  changed_h = FindFirstChangeNotification (pwd.get_win32 (), FALSE,
-						  FILE_NOTIFY_CHANGE_LAST_WRITE
-						  | FILE_NOTIFY_CHANGE_FILE_NAME);
+	  OBJECT_ATTRIBUTES attr;
+
+	  path_conv dir ("/etc");
+	  status = NtOpenFile (&changed_h, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			       dir.get_object_attr (attr, sec_none_nih), &io,
+			       FILE_SHARE_VALID_FLAGS, FILE_DIRECTORY_FILE);
+	  if (!NT_SUCCESS (status))
+	    {
 #ifdef DEBUGGING
-	  if (changed_h == INVALID_HANDLE_VALUE)
-	    system_printf ("Can't open %s for checking, %E", (char *) pwd);
+	      system_printf ("NtOpenFile (%S) failed, %p",
+			     dir.get_nt_native_path (), status);
 #endif
+	      changed_h = INVALID_HANDLE_VALUE;
+	    }
+	  else
+	    {
+	      status = NtNotifyChangeDirectoryFile (changed_h, NULL, NULL,
+						NULL, &io, NULL, 0,
+						FILE_NOTIFY_CHANGE_LAST_WRITE
+						| FILE_NOTIFY_CHANGE_FILE_NAME,
+						FALSE);
+	      if (!NT_SUCCESS (status))
+		{
+#ifdef DEBUGGING
+		  system_printf ("NtNotifyChangeDirectoryFile (1) failed, %p",
+				 status);
+#endif
+		  NtClose (changed_h);
+		  changed_h = INVALID_HANDLE_VALUE;
+		}
+	    }
 	  memset (change_possible, true, sizeof (change_possible));
 	}
 
@@ -4525,12 +4551,26 @@ etc::dir_changed (int n)
 	change_possible[n] = true;
       else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
 	{
-	  FindNextChangeNotification (changed_h);
+	  status = NtNotifyChangeDirectoryFile (changed_h, NULL, NULL,
+						NULL, &io, NULL, 0,
+						FILE_NOTIFY_CHANGE_LAST_WRITE
+						| FILE_NOTIFY_CHANGE_FILE_NAME,
+						FALSE);
+	  if (!NT_SUCCESS (status))
+	    {
+#ifdef DEBUGGING
+	      system_printf ("NtNotifyChangeDirectoryFile (2) failed, %p",
+			     status);
+#endif
+	      NtClose (changed_h);
+	      changed_h = INVALID_HANDLE_VALUE;
+	    }
 	  memset (change_possible, true, sizeof change_possible);
 	}
     }
 
-  paranoid_printf ("fn[%d] %s change_possible %d", n, fn[n], change_possible[n]);
+  paranoid_printf ("fn[%d] %S change_possible %d",
+		   n, fn[n].ObjectName, change_possible[n]);
   return change_possible[n];
 }
 
@@ -4541,7 +4581,7 @@ etc::file_changed (int n)
   if (dir_changed (n) && test_file_change (n))
     res = true;
   change_possible[n] = false;	/* Change is no longer possible */
-  paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
+  paranoid_printf ("fn[%d] %S res %d", n, fn[n].ObjectName, res);
   return res;
 }
 
