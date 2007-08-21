@@ -277,8 +277,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 					 FileFsVolumeInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("%u = NtQueryVolumeInformationFile)",
-		    RtlNtStatusToDosError (status));
+      debug_printf ("%p = NtQueryVolumeInformationFile(%S)", status,
+		    pc.get_nt_native_path ());
       pfvi->VolumeSerialNumber = 0;
     }
   status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
@@ -305,8 +305,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       pfai->StandardInformation.NumberOfLinks,
 		       pfai->BasicInformation.FileAttributes);
     }
-  debug_printf ("%u = NtQueryInformationFile)",
-		RtlNtStatusToDosError (status));
+  debug_printf ("%p = NtQueryInformationFile(%S)",
+  		status, pc.get_nt_native_path ());
   return -1;
 }
 
@@ -344,7 +344,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 				       | FILE_OPEN_FOR_BACKUP_INTENT
 				       | FILE_DIRECTORY_FILE)))
     {
-      debug_printf ("%u = NtOpenFile)", RtlNtStatusToDosError (status));
+      debug_printf ("%p = NtOpenFile(%S)", status, pc.get_nt_native_path ());
       goto too_bad;
     }
   if (wincap.has_fileid_dirinfo ()
@@ -360,8 +360,8 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     FileId.QuadPart = 0; /* get_namehash is called in fstat_helper. */
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("%u = NtQueryDirectoryFile)",
-		    RtlNtStatusToDosError (status));
+      debug_printf ("%p = NtQueryDirectoryFile(%S)", status,
+		    pc.get_nt_native_path ());
       NtClose (dir);
       goto too_bad;
     }
@@ -369,8 +369,8 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 					 FileFsVolumeInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("%u = NtQueryVolumeInformationFile)",
-		    RtlNtStatusToDosError (status));
+      debug_printf ("%p = NtQueryVolumeInformationFile(%S)",
+		    status, pc.get_nt_native_path ());
       pfvi->VolumeSerialNumber = 0;
     }
   NtClose (dir);
@@ -703,7 +703,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 				    FSCTL_GET_NTFS_VOLUME_DATA,
 				    NULL, 0, &nvdb, sizeof nvdb);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("NtFsControlFile (%s) failed, status %lx", status);
+	    debug_printf ("%p = NtFsControlFile(%S,FSCTL_GET_NTFS_VOLUME_DATA)",
+			  status, pc.get_nt_native_path ());
 	  else
 	    sfs->f_blocks = nvdb.TotalClusters.QuadPart;
 	}
@@ -1034,8 +1035,8 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
-	  syscall_printf ("0x%08X = NtFsControlFile (%p, FSCTL_SET_SPARSE)",
-			  status, get_handle ());
+	  syscall_printf ("%p = NtFsControlFile(%S,FSCTL_SET_SPARSE)",
+			  status, pc.get_nt_native_path ());
 	}
       status = NtSetInformationFile (get_handle (), &io,
 				     &feofi, sizeof feofi,
@@ -1988,9 +1989,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
       if (!NT_SUCCESS (stat))
-	debug_printf ("Unable to reopen dir %s, NT error: 0x%08x, "
-		      "win32: %lu", get_name (), status,
-		      RtlNtStatusToDosError (status));
+	debug_printf ("Unable to reopen dir %s, NT error: %p",
+		      get_name (), status);
       else
 	{
 	  NtClose (get_handle ());
