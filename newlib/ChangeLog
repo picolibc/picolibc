@@ -1,3 +1,9 @@
+2007-08-24  Hans-Peter Nilsson  <hp@axis.com>
+
+	* libc/machine/cris/sys/errno.h (ECANCELED, ENOKEY, EKEYEXPIRED)
+	(EKEYREVOKED, EKEYREJECTED, EOWNERDEAD, ENOTRECOVERABLE, ENOTSUP):
+	Define.
+
 2007-08-23  Hidetaka Takano  <hidetaka.takano@glb.toshiba.co.jp>
 
 	Reduce the memory consumption of variable argument functions
