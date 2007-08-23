@@ -1,3 +1,7 @@
+2007-08-23  Joel Brobecker  <brobecker@adacore.com>
+
+	Switch the license of all .h files to GPLv3.
+
 2007-01-09  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Updated copyright notices for most files.
