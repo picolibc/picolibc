@@ -30,8 +30,10 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Joel Schopp <jschopp@austin.ibm.com>
 */
 
+#ifndef __ASSEMBLER__
 #include <errno.h>
 #include <sys/syscall.h>
+#endif /* !__ASSEMBLER__ */
 
 #define SPE_C99_SIGNALCODE 0x2100
 
@@ -39,50 +41,49 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #define SPE_C99_OP_MASK	    	0xff
 #define SPE_C99_DATA_MASK   	0xffffff
 
-enum {
-	SPE_C99_CLEARERR=0x01,
-	SPE_C99_FCLOSE,
-	SPE_C99_FEOF,
-	SPE_C99_FERROR,
-	SPE_C99_FFLUSH,
-	SPE_C99_FGETC,
-	SPE_C99_FGETPOS,
-	SPE_C99_FGETS,
-	SPE_C99_FILENO,
-	SPE_C99_FOPEN, //implemented
-	SPE_C99_FPUTC,
-	SPE_C99_FPUTS,
-	SPE_C99_FREAD,
-	SPE_C99_FREOPEN,
-	SPE_C99_FSEEK,
-	SPE_C99_FSETPOS,
-	SPE_C99_FTELL,
-	SPE_C99_FWRITE,
-	SPE_C99_GETC,
-	SPE_C99_GETCHAR,
-	SPE_C99_GETS,
-	SPE_C99_PERROR,
-	SPE_C99_PUTC,
-	SPE_C99_PUTCHAR,
-	SPE_C99_PUTS,
-	SPE_C99_REMOVE,
-	SPE_C99_RENAME,
-	SPE_C99_REWIND,
-	SPE_C99_SETBUF,
-	SPE_C99_SETVBUF,
-	SPE_C99_SYSTEM, //not yet implemented in newlib
-	SPE_C99_TMPFILE,
-	SPE_C99_TMPNAM,
-	SPE_C99_UNGETC,
-	SPE_C99_VFPRINTF,
-	SPE_C99_VFSCANF,
-	SPE_C99_VPRINTF,
-	SPE_C99_VSCANF,
-	SPE_C99_VSNPRINTF,
-	SPE_C99_VSPRINTF,
-	SPE_C99_VSSCANF,
-	SPE_C99_LAST_OPCODE,
-};
+#define SPE_C99_CLEARERR    1
+#define SPE_C99_FCLOSE      2
+#define SPE_C99_FEOF        3
+#define SPE_C99_FERROR      4
+#define SPE_C99_FFLUSH      5
+#define SPE_C99_FGETC       6
+#define SPE_C99_FGETPOS     7
+#define SPE_C99_FGETS       8
+#define SPE_C99_FILENO      9
+#define SPE_C99_FOPEN       10 //implemented
+#define SPE_C99_FPUTC       11
+#define SPE_C99_FPUTS       12
+#define SPE_C99_FREAD       13
+#define SPE_C99_FREOPEN     14
+#define SPE_C99_FSEEK       15
+#define SPE_C99_FSETPOS     16
+#define SPE_C99_FTELL       17
+#define SPE_C99_FWRITE      18
+#define SPE_C99_GETC        19
+#define SPE_C99_GETCHAR     20
+#define SPE_C99_GETS        21
+#define SPE_C99_PERROR      22
+#define SPE_C99_PUTC        23
+#define SPE_C99_PUTCHAR     24
+#define SPE_C99_PUTS        25
+#define SPE_C99_REMOVE      26
+#define SPE_C99_RENAME      27
+#define SPE_C99_REWIND      28
+#define SPE_C99_SETBUF      29
+#define SPE_C99_SETVBUF     30
+#define SPE_C99_SYSTEM      31 //not yet implemented in newlib
+#define SPE_C99_TMPFILE     32
+#define SPE_C99_TMPNAM      33
+#define SPE_C99_UNGETC      34
+#define SPE_C99_VFPRINTF    35
+#define SPE_C99_VFSCANF     36
+#define SPE_C99_VPRINTF     37
+#define SPE_C99_VSCANF      38
+#define SPE_C99_VSNPRINTF   39
+#define SPE_C99_VSPRINTF    40
+#define SPE_C99_VSSCANF     41
+#define SPE_C99_LAST_OPCODE 42
+
 #define SPE_C99_NR_OPCODES 	((SPE_C99_LAST_OPCODE - SPE_C99_CLEARERR) + 1)
 
 #define SPE_STDIN                   1
@@ -90,6 +91,10 @@ enum {
 #define SPE_STDERR                  3
 #define SPE_FOPEN_MAX               FOPEN_MAX
 
+#ifdef __ASSEMBLER__
+#define SPE_STACK_REGS      72 /* Number of registers preserved in stack
+                                  in case of variable argument API. */
+#else /* !__ASSEMBLER__ */
 struct spe_reg128{
   unsigned int slot[4];
 };
@@ -102,3 +107,4 @@ FILE  *_EXFUN(__sfp,(struct _reent *));
   do { if ((ptr) && !(ptr)->__sdidinit) __sinit (ptr); } while (0)
 #define CHECK_STD_INIT(ptr) /* currently, do nothing */
 #define CHECK_STR_INIT(ptr) /* currently, do nothing */
+#endif /* __ASSEMBLER__ */

@@ -73,13 +73,6 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -135,7 +128,8 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-clearerr.$(OBJEXT) \
 	lib_a-vprintf.$(OBJEXT) lib_a-vscanf.$(OBJEXT) \
 	lib_a-vsiprintf.$(OBJEXT) lib_a-vsiscanf.$(OBJEXT) \
 	lib_a-vsniprintf.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
-	lib_a-vsprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT)
+	lib_a-vsprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT) \
+	lib_a-stack_reg_va.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -261,18 +255,18 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 AM_CCASFLAGS = $(INCLUDES)
 lib_a_SOURCES = setjmp.S clearerr.c creat.c fclose.c feof.c ferror.c fflush.c \
-	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.c fiscanf.c fopen.c \
-	fprintf.c fputc.c fputs.c fread.c freopen.c fscanf.c fseek.c \
-	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.c \
-	iscanf.c memcpy.c memmove.c memset.c perror.c printf.c \
-	putc.c putchar.c puts.c remove.c rename.c rewind.c scanf.c \
-	setbuf.c setvbuf.c siprintf.c siscanf.c sleep.c sniprintf.c \
-	snprintf.c sprintf.c sscanf.c stdio.c strcat.c strchr.c strcmp.c \
+	fgetc.c fgetpos.c fgets.c fileno.c fiprintf.S fiscanf.S fopen.c \
+	fprintf.S fputc.c fputs.c fread.c freopen.c fscanf.S fseek.c \
+	fsetpos.c ftell.c fwrite.c getc.c getchar.c gets.c iprintf.S \
+	iscanf.S memcpy.c memmove.c memset.c perror.c printf.S \
+	putc.c putchar.c puts.c remove.c rename.c rewind.c scanf.S \
+	setbuf.c setvbuf.c siprintf.S siscanf.S sleep.c sniprintf.S \
+	snprintf.S sprintf.S sscanf.S stdio.c strcat.c strchr.c strcmp.c \
 	strcpy.c strcspn.c strlen.c strncat.c strncmp.c strncpy.c strpbrk.c \
 	strrchr.c strspn.c strxfrm.c tmpfile.c tmpnam.c ungetc.c usleep.c \
 	vfiprintf.c vfiscanf.c vfprintf.c vfscanf.c viprintf.c viscanf.c \
 	vprintf.c vscanf.c vsiprintf.c vsiscanf.c vsniprintf.c vsnprintf.c \
-	vsprintf.c vsscanf.c
+	vsprintf.c vsscanf.c stack_reg_va.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -341,6 +335,96 @@ lib_a-setjmp.o: setjmp.S
 lib_a-setjmp.obj: setjmp.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
 
+lib_a-fiprintf.o: fiprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.S' || echo '$(srcdir)/'`fiprintf.S
+
+lib_a-fiprintf.obj: fiprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.S'; then $(CYGPATH_W) 'fiprintf.S'; else $(CYGPATH_W) '$(srcdir)/fiprintf.S'; fi`
+
+lib_a-fiscanf.o: fiscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.S' || echo '$(srcdir)/'`fiscanf.S
+
+lib_a-fiscanf.obj: fiscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.S'; then $(CYGPATH_W) 'fiscanf.S'; else $(CYGPATH_W) '$(srcdir)/fiscanf.S'; fi`
+
+lib_a-fprintf.o: fprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fprintf.o `test -f 'fprintf.S' || echo '$(srcdir)/'`fprintf.S
+
+lib_a-fprintf.obj: fprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fprintf.obj `if test -f 'fprintf.S'; then $(CYGPATH_W) 'fprintf.S'; else $(CYGPATH_W) '$(srcdir)/fprintf.S'; fi`
+
+lib_a-fscanf.o: fscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fscanf.o `test -f 'fscanf.S' || echo '$(srcdir)/'`fscanf.S
+
+lib_a-fscanf.obj: fscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-fscanf.obj `if test -f 'fscanf.S'; then $(CYGPATH_W) 'fscanf.S'; else $(CYGPATH_W) '$(srcdir)/fscanf.S'; fi`
+
+lib_a-iprintf.o: iprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.S' || echo '$(srcdir)/'`iprintf.S
+
+lib_a-iprintf.obj: iprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.S'; then $(CYGPATH_W) 'iprintf.S'; else $(CYGPATH_W) '$(srcdir)/iprintf.S'; fi`
+
+lib_a-iscanf.o: iscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.S' || echo '$(srcdir)/'`iscanf.S
+
+lib_a-iscanf.obj: iscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.S'; then $(CYGPATH_W) 'iscanf.S'; else $(CYGPATH_W) '$(srcdir)/iscanf.S'; fi`
+
+lib_a-printf.o: printf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-printf.o `test -f 'printf.S' || echo '$(srcdir)/'`printf.S
+
+lib_a-printf.obj: printf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-printf.obj `if test -f 'printf.S'; then $(CYGPATH_W) 'printf.S'; else $(CYGPATH_W) '$(srcdir)/printf.S'; fi`
+
+lib_a-scanf.o: scanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-scanf.o `test -f 'scanf.S' || echo '$(srcdir)/'`scanf.S
+
+lib_a-scanf.obj: scanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-scanf.obj `if test -f 'scanf.S'; then $(CYGPATH_W) 'scanf.S'; else $(CYGPATH_W) '$(srcdir)/scanf.S'; fi`
+
+lib_a-siprintf.o: siprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.S' || echo '$(srcdir)/'`siprintf.S
+
+lib_a-siprintf.obj: siprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.S'; then $(CYGPATH_W) 'siprintf.S'; else $(CYGPATH_W) '$(srcdir)/siprintf.S'; fi`
+
+lib_a-siscanf.o: siscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.S' || echo '$(srcdir)/'`siscanf.S
+
+lib_a-siscanf.obj: siscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.S'; then $(CYGPATH_W) 'siscanf.S'; else $(CYGPATH_W) '$(srcdir)/siscanf.S'; fi`
+
+lib_a-sniprintf.o: sniprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.S' || echo '$(srcdir)/'`sniprintf.S
+
+lib_a-sniprintf.obj: sniprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.S'; then $(CYGPATH_W) 'sniprintf.S'; else $(CYGPATH_W) '$(srcdir)/sniprintf.S'; fi`
+
+lib_a-snprintf.o: snprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-snprintf.o `test -f 'snprintf.S' || echo '$(srcdir)/'`snprintf.S
+
+lib_a-snprintf.obj: snprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-snprintf.obj `if test -f 'snprintf.S'; then $(CYGPATH_W) 'snprintf.S'; else $(CYGPATH_W) '$(srcdir)/snprintf.S'; fi`
+
+lib_a-sprintf.o: sprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sprintf.o `test -f 'sprintf.S' || echo '$(srcdir)/'`sprintf.S
+
+lib_a-sprintf.obj: sprintf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sprintf.obj `if test -f 'sprintf.S'; then $(CYGPATH_W) 'sprintf.S'; else $(CYGPATH_W) '$(srcdir)/sprintf.S'; fi`
+
+lib_a-sscanf.o: sscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sscanf.o `test -f 'sscanf.S' || echo '$(srcdir)/'`sscanf.S
+
+lib_a-sscanf.obj: sscanf.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-sscanf.obj `if test -f 'sscanf.S'; then $(CYGPATH_W) 'sscanf.S'; else $(CYGPATH_W) '$(srcdir)/sscanf.S'; fi`
+
+lib_a-stack_reg_va.o: stack_reg_va.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stack_reg_va.o `test -f 'stack_reg_va.S' || echo '$(srcdir)/'`stack_reg_va.S
+
+lib_a-stack_reg_va.obj: stack_reg_va.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-stack_reg_va.obj `if test -f 'stack_reg_va.S'; then $(CYGPATH_W) 'stack_reg_va.S'; else $(CYGPATH_W) '$(srcdir)/stack_reg_va.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -407,29 +491,11 @@ lib_a-fileno.o: fileno.c
 lib_a-fileno.obj: fileno.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fileno.obj `if test -f 'fileno.c'; then $(CYGPATH_W) 'fileno.c'; else $(CYGPATH_W) '$(srcdir)/fileno.c'; fi`
 
-lib_a-fiprintf.o: fiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.c' || echo '$(srcdir)/'`fiprintf.c
-
-lib_a-fiprintf.obj: fiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.c'; then $(CYGPATH_W) 'fiprintf.c'; else $(CYGPATH_W) '$(srcdir)/fiprintf.c'; fi`
-
-lib_a-fiscanf.o: fiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.c' || echo '$(srcdir)/'`fiscanf.c
-
-lib_a-fiscanf.obj: fiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.c'; then $(CYGPATH_W) 'fiscanf.c'; else $(CYGPATH_W) '$(srcdir)/fiscanf.c'; fi`
-
 lib_a-fopen.o: fopen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopen.o `test -f 'fopen.c' || echo '$(srcdir)/'`fopen.c
 
 lib_a-fopen.obj: fopen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fopen.obj `if test -f 'fopen.c'; then $(CYGPATH_W) 'fopen.c'; else $(CYGPATH_W) '$(srcdir)/fopen.c'; fi`
-
-lib_a-fprintf.o: fprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fprintf.o `test -f 'fprintf.c' || echo '$(srcdir)/'`fprintf.c
-
-lib_a-fprintf.obj: fprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fprintf.obj `if test -f 'fprintf.c'; then $(CYGPATH_W) 'fprintf.c'; else $(CYGPATH_W) '$(srcdir)/fprintf.c'; fi`
 
 lib_a-fputc.o: fputc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fputc.o `test -f 'fputc.c' || echo '$(srcdir)/'`fputc.c
@@ -454,12 +520,6 @@ lib_a-freopen.o: freopen.c
 
 lib_a-freopen.obj: freopen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-freopen.obj `if test -f 'freopen.c'; then $(CYGPATH_W) 'freopen.c'; else $(CYGPATH_W) '$(srcdir)/freopen.c'; fi`
-
-lib_a-fscanf.o: fscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fscanf.o `test -f 'fscanf.c' || echo '$(srcdir)/'`fscanf.c
-
-lib_a-fscanf.obj: fscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fscanf.obj `if test -f 'fscanf.c'; then $(CYGPATH_W) 'fscanf.c'; else $(CYGPATH_W) '$(srcdir)/fscanf.c'; fi`
 
 lib_a-fseek.o: fseek.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseek.o `test -f 'fseek.c' || echo '$(srcdir)/'`fseek.c
@@ -503,18 +563,6 @@ lib_a-gets.o: gets.c
 lib_a-gets.obj: gets.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets.obj `if test -f 'gets.c'; then $(CYGPATH_W) 'gets.c'; else $(CYGPATH_W) '$(srcdir)/gets.c'; fi`
 
-lib_a-iprintf.o: iprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.c' || echo '$(srcdir)/'`iprintf.c
-
-lib_a-iprintf.obj: iprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.c'; then $(CYGPATH_W) 'iprintf.c'; else $(CYGPATH_W) '$(srcdir)/iprintf.c'; fi`
-
-lib_a-iscanf.o: iscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.c' || echo '$(srcdir)/'`iscanf.c
-
-lib_a-iscanf.obj: iscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.c'; then $(CYGPATH_W) 'iscanf.c'; else $(CYGPATH_W) '$(srcdir)/iscanf.c'; fi`
-
 lib_a-memcpy.o: memcpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.c' || echo '$(srcdir)/'`memcpy.c
 
@@ -538,12 +586,6 @@ lib_a-perror.o: perror.c
 
 lib_a-perror.obj: perror.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-perror.obj `if test -f 'perror.c'; then $(CYGPATH_W) 'perror.c'; else $(CYGPATH_W) '$(srcdir)/perror.c'; fi`
-
-lib_a-printf.o: printf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-printf.o `test -f 'printf.c' || echo '$(srcdir)/'`printf.c
-
-lib_a-printf.obj: printf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-printf.obj `if test -f 'printf.c'; then $(CYGPATH_W) 'printf.c'; else $(CYGPATH_W) '$(srcdir)/printf.c'; fi`
 
 lib_a-putc.o: putc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putc.o `test -f 'putc.c' || echo '$(srcdir)/'`putc.c
@@ -581,12 +623,6 @@ lib_a-rewind.o: rewind.c
 lib_a-rewind.obj: rewind.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rewind.obj `if test -f 'rewind.c'; then $(CYGPATH_W) 'rewind.c'; else $(CYGPATH_W) '$(srcdir)/rewind.c'; fi`
 
-lib_a-scanf.o: scanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scanf.o `test -f 'scanf.c' || echo '$(srcdir)/'`scanf.c
-
-lib_a-scanf.obj: scanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scanf.obj `if test -f 'scanf.c'; then $(CYGPATH_W) 'scanf.c'; else $(CYGPATH_W) '$(srcdir)/scanf.c'; fi`
-
 lib_a-setbuf.o: setbuf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setbuf.o `test -f 'setbuf.c' || echo '$(srcdir)/'`setbuf.c
 
@@ -599,47 +635,11 @@ lib_a-setvbuf.o: setvbuf.c
 lib_a-setvbuf.obj: setvbuf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setvbuf.obj `if test -f 'setvbuf.c'; then $(CYGPATH_W) 'setvbuf.c'; else $(CYGPATH_W) '$(srcdir)/setvbuf.c'; fi`
 
-lib_a-siprintf.o: siprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.c' || echo '$(srcdir)/'`siprintf.c
-
-lib_a-siprintf.obj: siprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.c'; then $(CYGPATH_W) 'siprintf.c'; else $(CYGPATH_W) '$(srcdir)/siprintf.c'; fi`
-
-lib_a-siscanf.o: siscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.c' || echo '$(srcdir)/'`siscanf.c
-
-lib_a-siscanf.obj: siscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.c'; then $(CYGPATH_W) 'siscanf.c'; else $(CYGPATH_W) '$(srcdir)/siscanf.c'; fi`
-
 lib_a-sleep.o: sleep.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sleep.o `test -f 'sleep.c' || echo '$(srcdir)/'`sleep.c
 
 lib_a-sleep.obj: sleep.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sleep.obj `if test -f 'sleep.c'; then $(CYGPATH_W) 'sleep.c'; else $(CYGPATH_W) '$(srcdir)/sleep.c'; fi`
-
-lib_a-sniprintf.o: sniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.c' || echo '$(srcdir)/'`sniprintf.c
-
-lib_a-sniprintf.obj: sniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.c'; then $(CYGPATH_W) 'sniprintf.c'; else $(CYGPATH_W) '$(srcdir)/sniprintf.c'; fi`
-
-lib_a-snprintf.o: snprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf.o `test -f 'snprintf.c' || echo '$(srcdir)/'`snprintf.c
-
-lib_a-snprintf.obj: snprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf.obj `if test -f 'snprintf.c'; then $(CYGPATH_W) 'snprintf.c'; else $(CYGPATH_W) '$(srcdir)/snprintf.c'; fi`
-
-lib_a-sprintf.o: sprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf.o `test -f 'sprintf.c' || echo '$(srcdir)/'`sprintf.c
-
-lib_a-sprintf.obj: sprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sprintf.obj `if test -f 'sprintf.c'; then $(CYGPATH_W) 'sprintf.c'; else $(CYGPATH_W) '$(srcdir)/sprintf.c'; fi`
-
-lib_a-sscanf.o: sscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sscanf.o `test -f 'sscanf.c' || echo '$(srcdir)/'`sscanf.c
-
-lib_a-sscanf.obj: sscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sscanf.obj `if test -f 'sscanf.c'; then $(CYGPATH_W) 'sscanf.c'; else $(CYGPATH_W) '$(srcdir)/sscanf.c'; fi`
 
 lib_a-stdio.o: stdio.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stdio.o `test -f 'stdio.c' || echo '$(srcdir)/'`stdio.c

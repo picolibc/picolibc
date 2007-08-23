@@ -80,3 +80,9 @@ _DEFUN (__sinit, (s),
   s->_stderr = &s->__sf[2];
   s->_stderr->_fp = SPE_STDERR;
 }
+
+_VOID
+_DEFUN_VOID (__check_init)
+{
+    CHECK_INIT(_REENT);
+}

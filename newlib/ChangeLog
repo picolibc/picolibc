@@ -1,3 +1,45 @@
+2007-08-23  Hidetaka Takano  <hidetaka.takano@glb.toshiba.co.jp>
+
+	Reduce the memory consumption of variable argument functions
+	for SPU (cell):
+	* libc/machine/spu/Makefile.am: Replace printf/scanf family C sources
+	  to assembler sources.
+	* libc/machine/spu/Makefile.in: Regenerated.
+	* libc/machine/spu/stdio.c: Add __check_init function wrapping
+	  CHECK_INIT macro to use from assembler routines.
+	* libc/machine/spu/c99ppe.h: Add definitions for assembler code.
+	* libc/machine/spu/fiprintf.S: New file.
+	* libc/machine/spu/fiscanf.S: Ditto.
+	* libc/machine/spu/fprintf.S: Ditto.
+	* libc/machine/spu/fscanf.S: Ditto.
+	* libc/machine/spu/iprintf.S: Ditto.
+	* libc/machine/spu/iscanf.S: Ditto.
+	* libc/machine/spu/printf.S: Ditto.
+	* libc/machine/spu/scanf.S: Ditto.
+	* libc/machine/spu/siprintf.S: Ditto.
+	* libc/machine/spu/siscanf.S: Ditto.
+	* libc/machine/spu/sniprintf.S: Ditto.
+	* libc/machine/spu/snprintf.S: Ditto.
+	* libc/machine/spu/sprintf.S: Ditto.
+	* libc/machine/spu/sscanf.S: Ditto.
+	* libc/machine/spu/stack_reg_va.S: Ditto.
+	* libc/machine/spu/syscall.def: Ditto. (for maintenance)
+	* libc/machine/spu/mk_syscalls: Ditto. (for maintenance)
+	* libc/machine/spu/fiprintf.c: Removed. (Replaced by .S)
+	* libc/machine/spu/fiscanf.c: Ditto.
+	* libc/machine/spu/fprintf.c: Ditto.
+	* libc/machine/spu/fscanf.c: Ditto.
+	* libc/machine/spu/iprintf.c: Ditto.
+	* libc/machine/spu/iscanf.c: Ditto.
+	* libc/machine/spu/printf.c: Ditto.
+	* libc/machine/spu/scanf.c: Ditto.
+	* libc/machine/spu/siprintf.c: Ditto.
+	* libc/machine/spu/siscanf.c: Ditto.
+	* libc/machine/spu/sniprintf.c: Ditto.
+	* libc/machine/spu/snprintf.c: Ditto.
+	* libc/machine/spu/sprintf.c: Ditto.
+	* libc/machine/spu/sscanf.c: Ditto.
+
 2007-08-03  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/include/tar.h: New.
