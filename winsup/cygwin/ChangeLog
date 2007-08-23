@@ -1,3 +1,10 @@
+2007-08-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_NO_SUCH_FILE): Define.
+	* path.cc (get_nt_native_path): Reset upath.Length to 0 on each
+	invocation.
+	(symlink_info::check): Use NT native functions.
+
 2007-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::load): Use NT native functions.

@@ -545,6 +545,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 PUNICODE_STRING
 get_nt_native_path (const char *path, UNICODE_STRING &upath)
 {
+  upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
     str2uni_cat (upath, path);
   else if (path[0] != '\\')	/* X:\...  or NUL, etc. */
@@ -3511,47 +3512,91 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   pflags &= ~(PATH_SYMLINK | PATH_LNK | PATH_REP);
   case_clash = false;
 
+  /* TODO: Temporarily do all char->UNICODE conversion here.  This should
+     already be slightly faster than using Ascii functions. */
+  UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
+  size_t len = (strlen (path) + 8 + 8 + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&upath, (PCWSTR) alloca (len), len);
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+
   while (suffix.next ())
     {
-      error = 0;
-      fileattr = GetFileAttributes (suffix.path);
-      if (fileattr == INVALID_FILE_ATTRIBUTES)
-	{
-	  /* The GetFileAttributes call can fail for reasons that don't
-	     matter, so we just return 0.  For example, getting the
-	     attributes of \\HOST will typically fail.  */
-	  debug_printf ("GetFileAttributes (%s) failed", suffix.path);
+      FILE_BASIC_INFORMATION fbi;
+      NTSTATUS status;
 
-	  /* The above comment is not *quite* right.  When calling
-	     GetFileAttributes for a non-existant file an a Win9x share,
-	     GetLastError returns ERROR_INVALID_FUNCTION.  Go figure!
-	     Also, GetFileAttributes fails with ERROR_SHARING_VIOLATION
-	     if the file is locked exclusively by another process, or with
-	     ERROR_ACCESS_DENIED if the file exists but the user has no right
-	     to open the file with FILE_READ_ATTRIBUTES.
-	     If we don't special handle this here, the file is accidentally
-	     treated as non-existant. */
-	  DWORD win_error = GetLastError ();
-	  if (win_error == ERROR_INVALID_FUNCTION)
-	    win_error = ERROR_FILE_NOT_FOUND;
-	  else if (win_error == ERROR_SHARING_VIOLATION
-		   || win_error == ERROR_ACCESS_DENIED)
+      error = 0;
+      get_nt_native_path (suffix.path, upath);
+      status = NtQueryAttributesFile (&attr, &fbi);
+      if (NT_SUCCESS (status))
+        fileattr = fbi.FileAttributes;
+      else
+	{
+	  debug_printf ("%p = NtQueryAttributesFile (%S)", status, &upath);
+	  fileattr = INVALID_FILE_ATTRIBUTES;
+
+	  /* One of the inner path components is invalid.  Bail out. */
+	  if (status == STATUS_OBJECT_PATH_NOT_FOUND)
 	    {
-	      /* This is easily converted to NT functions at one point,
-	         see fhandler_base::fstat_by_name. */
-	      WIN32_FIND_DATA data;
-	      HANDLE f = FindFirstFile (suffix.path, &data);
-	      if (f != INVALID_HANDLE_VALUE)
-		{
-		  FindClose (f);
-		  fileattr = data.dwFileAttributes;
+	      set_error (ENOENT);
+	      break;
+	    }
+	  if (status != STATUS_OBJECT_NAME_NOT_FOUND
+	      && status != STATUS_NO_SUCH_FILE) /* File not found on 9x share */
+	    {
+	      /* The file exists, but the user can't access it for one reason
+		 or the other.  To get the file attributes we try to access the
+		 information by opening the parent directory and getting the
+		 file attributes using a matching NtQueryDirectoryFile call. */
+	      UNICODE_STRING dirname, basename;
+	      OBJECT_ATTRIBUTES dattr;
+	      HANDLE dir;
+	      IO_STATUS_BLOCK io;
+	      FILE_DIRECTORY_INFORMATION fdi;
+
+	      RtlSplitUnicodePath (&upath, &dirname, &basename);
+	      InitializeObjectAttributes (&dattr, &dirname,
+					  OBJ_CASE_INSENSITIVE, NULL, NULL);
+	      status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+				   &dattr, &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_SYNCHRONOUS_IO_NONALERT
+				   | FILE_OPEN_FOR_BACKUP_INTENT
+				   | FILE_DIRECTORY_FILE);
+	      if (!NT_SUCCESS (status))
+	        {
+		  debug_printf ("%p = NtOpenFile(%S)", status, &dirname);
+		  fileattr = 0;
 		}
 	      else
-		fileattr = 0;
+	        {
+		  status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
+						 &fdi, sizeof fdi,
+						 FileDirectoryInformation,
+						 TRUE, &basename, TRUE);
+		  NtClose (dir);
+		  /* Per MSDN, ZwQueryDirectoryFile allows to specify a buffer
+		     which only fits the static parts of the structure (without
+		     filename that is) in the first call.  The buffer actually
+		     contains valid data, even though ZwQueryDirectoryFile
+		     returned STATUS_BUFFER_OVERFLOW.
+
+		     Please note that this doesn't work for the info class
+		     FileIdBothDirectoryInformation, unfortunately, so we don't
+		     use this technique in fhandler_base::fstat_by_name, */
+		  if (!NT_SUCCESS (status) && status != STATUS_BUFFER_OVERFLOW)
+		    {
+		      debug_printf ("%p = NtQueryDirectoryFile(%S)",
+				    status, &dirname);
+		      fileattr = 0;
+		    }
+		  else
+		    fileattr = fdi.FileAttributes;
+		}
 	      ext_tacked_on = !!*ext_here;
 	      goto file_not_symlink;
 	    }
-	  if (set_error (geterrno_from_win_error (win_error, EACCES)))
+	  if (set_error (geterrno_from_win_error
+	  			(RtlNtStatusToDosError (status), EACCES)))
 	    continue;
 	}
 
