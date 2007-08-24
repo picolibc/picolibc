@@ -1,3 +1,8 @@
+2007-08-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/common/sf_lround.c (lroundf): Cast sizeof calculation
+	to int before comparing it to a signed int value.
+
 2007-08-24  Hans-Peter Nilsson  <hp@axis.com>
 
 	* libc/machine/cris/sys/errno.h (ECANCELED, ENOKEY, EKEYEXPIRED)
