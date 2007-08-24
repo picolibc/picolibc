@@ -1,3 +1,7 @@
+2007-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (open): Don't follow symlinks if O_EXCL is given.
+
 2007-08-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (STATUS_NO_SUCH_FILE): Define.
