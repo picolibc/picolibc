@@ -1,3 +1,7 @@
+2007-08-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dll.sgml: myprog.ca -> myprog.c
+
 2007-08-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* faq-programming.xml: Clarify where to run "make check".

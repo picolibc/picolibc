@@ -83,7 +83,7 @@ main ()
 Then link to your dll with a command like:
 </para>
 
-<screen>gcc -o myprog myprog.ca -L./ -lmydll</screen>
+<screen>gcc -o myprog myprog.c -L./ -lmydll</screen>
 
 <para>However, if you are building a dll as an export library,
 you will probably want to use the complete syntax:</para>
