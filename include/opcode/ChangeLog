@@ -1,3 +1,7 @@
+2007-08-08  Ben Elliston  <bje@au.ibm.com>
+
+	* ppc.h (PPC_OPCODE_PPCPS): New.
+
 2007-07-03  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h: Document j K & E.
