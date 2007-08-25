@@ -1,3 +1,7 @@
+2007-08-25  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* common.h (NT_SPU): Define.
+
 2007-08-16  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h: Revert last change.
