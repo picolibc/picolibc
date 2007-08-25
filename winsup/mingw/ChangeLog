@@ -1,4 +1,21 @@
-2007-03-25 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+2007-08-25 Keith Marshall <keithmarshall@users.sourceforge.net>
+
+	Make snprintf() and vsnprintf() conform to C99.
+
+	* include/stdio.h: Add note about incompatibility between...
+	(snprintf, vsnprintf): These two mingwex functions, and...
+	(_snprintf, _vsnprintf): these MSVCRT counterparts.
+
+	* mingwex/Makefile.in (STDIO_OBJS): Remove snprintf.o and vsnprintf.o
+	(STDIO_DISTFILES): Remove snprintf.c and vsnprintf.c
+
+	* mingwex/stdio/snprintf.c: Delete.
+	* mingwex/stdio/vsnprintf.c: Delete.
+
+	* mingwex/gdtoa/mingw_snprintf.c (snprintf): Alias to __mingw_snprintf
+	(vsnprintf): Alias to __mingw_vsnprintf.
+
+2007-07-25 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.13.
 	* Makefile.in: Reset CYGRELEASE to 1

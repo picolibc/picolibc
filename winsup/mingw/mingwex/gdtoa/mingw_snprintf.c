@@ -96,8 +96,16 @@ THIS SOFTWARE.
 #include "gdtoa.h"
 
 
-#define Snprintf __mingw_snprintf
-#define Vsnprintf __mingw_vsnprintf
+/*
+ * For a MinGW build, we provide the implementation dependent entries
+ * `__mingw_snprintf' and `__mingw_vsnprintf', then alias them to provide
+ * the C99 conforming implementations of `snprintf()' and `vsnprintf()'.
+ */
+#  define Snprintf   __mingw_snprintf
+#  define Vsnprintf  __mingw_vsnprintf
+
+int __cdecl snprintf()__attribute__((alias("__mingw_snprintf")));
+int __cdecl vsnprintf()__attribute__((alias("__mingw_vsnprintf")));
 
 
 static char* __ldtoa  (long double ld, int mode, int ndig, int *decpt,

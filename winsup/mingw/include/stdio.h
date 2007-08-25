@@ -206,6 +206,13 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	vsprintf (char*, const char*, __VALIST);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+/*
+ * Microsoft does not provide implementations for the following,
+ * which are required by C99.  Note in particular that the corresponding
+ * Microsoft implementations of _snprintf() and _vsnprintf() are *not*
+ * compatible with C99, but the following are; if you want the MSVCRT
+ * behaviour, you *must* use the Microsoft uglified names.
+ */
 int __cdecl __MINGW_NOTHROW snprintf(char *, size_t, const char *, ...);
 int __cdecl __MINGW_NOTHROW vsnprintf (char *, size_t, const char *, __VALIST);
 
@@ -214,7 +221,8 @@ int __cdecl __MINGW_NOTHROW vfscanf (FILE * __restrict__, const char * __restric
 		     __VALIST);
 int __cdecl __MINGW_NOTHROW vsscanf (const char * __restrict__,
 		     const char * __restrict__, __VALIST);
-#endif
+
+#endif  /* !__NO_ISOCEXT */
 
 /*
  * Formatted Input
