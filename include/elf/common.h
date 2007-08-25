@@ -407,6 +407,10 @@
 #define NT_NETBSDCORE_PROCINFO	1	/* Has a struct procinfo */
 #define NT_NETBSDCORE_FIRSTMACH	32	/* start of machdep note types */
 
+/* Note segments for core files on SPU systems.  Note name
+   must start with "SPU/".  */
+
+#define NT_SPU		1
 
 /* Values of note segment descriptor types for object files.  */
 

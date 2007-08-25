@@ -1,3 +1,7 @@
+2007-08-25  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* common.h (NT_SPU): Define.
+
 2007-07-09  Roland McGrath  <roland@redhat.com>
 
 	* common.h (NT_GNU_HWCAP, NT_GNU_BUILD_ID): New macros.
