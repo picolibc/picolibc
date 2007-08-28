@@ -67,6 +67,11 @@ _BEGIN_STD_C
 #endif
 #endif
 
+#ifdef __x86_64__
+#define _JBTYPE long long
+#define _JBLEN  8
+#endif
+
 #ifdef __i960__
 #define _JBLEN 35
 #endif

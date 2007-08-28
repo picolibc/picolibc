@@ -1,3 +1,19 @@
+2007-08-28  Hans Kester  <hans.kester@ellips.nl>
+
+	* configure.host: Added support for x86_64.
+	* libc/include/machine/ieeefp.h: Define __IEEE_LITTLE_ENDIAN for x86_64.
+	* libc/include/machine/setjmp.h: Define _JBTYPE and _JBLEN for x86_64.
+	* libc/machine/x86_64/aclocal.m4: Generated.
+	* libc/machine/x86_64/configure.in: New.
+	* libc/machine/x86_64/configure: Generated.
+	* libc/machine/x86_64/Makefile.am: New.
+	* libc/machine/x86_64/Makefile.in: Generated.
+	* libc/machine/x86_64/setjmp.S: New.
+	* libc/machine/x86_64/memcpy.S: New.
+	* libc/machine/x86_64/memset.S: New.
+	* libc/machine/configure.in: Added support for x86_64.
+	* libc/machine/configure: Regenerated.
+
 2007-08-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/common/sf_lround.c (lroundf): Cast sizeof calculation

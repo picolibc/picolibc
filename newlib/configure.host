@@ -250,6 +250,9 @@ case "${host_cpu}" in
   w65*)
 	machine_dir=w65
 	;;
+  x86_64)
+	machine_dir=x86_64
+	;;
   xstormy16)
 	machine_dir=xstormy16
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"

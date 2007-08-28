@@ -55,6 +55,7 @@ if test -n "${machine_dir}"; then
 	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
 	v850) AC_CONFIG_SUBDIRS(v850) ;;
 	w65) AC_CONFIG_SUBDIRS(w65) ;;
+	x86_64) AC_CONFIG_SUBDIRS(x86_64) ;;
 	xscale) AC_CONFIG_SUBDIRS(xscale) ;;
 	xstormy16) AC_CONFIG_SUBDIRS(xstormy16) ;;
 	z8k) AC_CONFIG_SUBDIRS(z8k) ;;
