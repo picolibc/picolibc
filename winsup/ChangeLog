@@ -1,3 +1,7 @@
+2007-08-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* configure: Regenerate.
+
 2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* CYGWIN_LICENSE: Fix URL to world-wide offices.
