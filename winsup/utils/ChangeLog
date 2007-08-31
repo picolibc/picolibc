@@ -1,3 +1,8 @@
+2007-08-31  Dave Korn  <dave.korn@artimi.com>
+
+	* mkgroup.c (enum_groups):  Use MAX_PREFERRED_LENGTH in netgroupenum
+	call so that it will automatically size returned buffer sufficiently.
+
 2007-08-03  Dave Korn  <dave.korn@artimi.com>
 
 	* Makefile.in (cygcheck.exe):  Add bloda.o as prerequisite, adjusting
