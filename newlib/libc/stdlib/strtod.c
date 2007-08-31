@@ -386,7 +386,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					if (!match(&s,"inity"))
 						++s;
 					dword0(rv) = 0x7ff00000;
+#ifndef _DOUBLE_IS_32BITS
 					dword1(rv) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 					goto ret;
 					}
 				break;
@@ -398,12 +400,16 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					 && hexnan(&s, &fpinan, bits)
 							== STRTOG_NaNbits) {
 						dword0(rv) = 0x7ff00000 | bits[1];
+#ifndef _DOUBLE_IS_32BITS
 						dword1(rv) = bits[0];
+#endif /*!_DOUBLE_IS_32BITS*/
 						}
 					else {
 #endif
 						dword0(rv) = NAN_WORD0;
+#ifndef _DOUBLE_IS_32BITS
 						dword1(rv) = NAN_WORD1;
+#endif /*!_DOUBLE_IS_32BITS*/
 #ifndef No_Hex_NaN
 						}
 #endif
@@ -627,8 +633,8 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifndef _DOUBLE_IS_32BITS
 				else
 					dword1(rv) &= 0xffffffff << j;
-				}
 #endif /*!_DOUBLE_IS_32BITS*/
+				}
 #else
 			for(j = 0; e1 > 1; j++, e1 >>= 1)
 				if (e1 & 1)
@@ -1109,7 +1115,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	if (inexact) {
 		if (!oldinexact) {
 			dword0(rv0) = Exp_1 + (70 << Exp_shift);
+#ifndef _DOUBLE_IS_32BITS
 			dword1(rv0) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 			dval(rv0) += 1.;
 			}
 		}
@@ -1119,7 +1127,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef Avoid_Underflow
 	if (scale) {
 		dword0(rv0) = Exp_1 - 2*P*Exp_msk1;
+#ifndef _DOUBLE_IS_32BITS
 		dword1(rv0) = 0;
+#endif /*!_DOUBLE_IS_32BITS*/
 		dval(rv) *= dval(rv0);
 #ifndef NO_ERRNO
 		/* try to avoid the bug of testing an 8087 register value */

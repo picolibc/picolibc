@@ -170,9 +170,7 @@ union double_union
 #define Exp_mask    ((__uint32_t)0x7f800000L)
 #define P    	    24
 #define Bias 	    127
-#if 0
-#define IEEE_Arith  /* it is, but the code doesn't handle IEEE singles yet */
-#endif
+#define IEEE_Arith
 #define Emin        (-126)
 #define Exp_1       ((__uint32_t)0x3f800000L)
 #define Exp_11      ((__uint32_t)0x3f800000L)
