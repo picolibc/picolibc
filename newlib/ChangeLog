@@ -1,3 +1,7 @@
+2007-09-04  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libm/math/wf_tgamma.c: Add missing include.
+
 2007-08-31  Antony King  <antony.king@st.com>
 
         * libc/stdlib/mprec.h [_DOUBLE_IS_32BITS}: Define IEEE_Arith
