@@ -14,15 +14,21 @@ details. */
 #include <sys/cdefs.h>
 #include <sys/lock.h>
 
+/* These definitions should be kept in sync with those in the newlib
+   header of the same name (newlib/libc/include/sys/stdio.h).  */
+
 #if !defined(__SINGLE_THREAD__)
 #  if !defined(_flockfile)
-#    define _flockfile(fp) __cygwin_lock_lock ((_LOCK_T *)&(fp)->_lock)
+#    define _flockfile(fp) ({ if (!((fp)->_flags & __SSTR)) \
+                  __cygwin_lock_lock ((_LOCK_T *)&(fp)->_lock); })
 #  endif
 #  if !defined(_ftrylockfile)
-#    define _ftrylockfile(fp) __cygwin_lock_trylock ((_LOCK_T *)&(fp)->_lock)
+#    define _ftrylockfile(fp) (((fp)->_flags & __SSTR) ? 0 : \
+                  __cygwin_lock_trylock ((_LOCK_T *)&(fp)->_lock))
 #  endif
 #  if !defined(_funlockfile)
-#    define _funlockfile(fp) __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock)
+#    define _funlockfile(fp) ({ if (!((fp)->_flags & __SSTR)) \
+                  __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock); })
 #  endif
 #endif
 

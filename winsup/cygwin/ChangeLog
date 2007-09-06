@@ -1,3 +1,10 @@
+2007-09-06  Brian Dessent  <brian@dessent.net>
+
+	* include/sys/stdio.h (_flockfile): Don't try to lock a FILE
+	that has the __SSTR flag set.
+	(_ftrylockfile): Likewise.
+	(_funlockfile): Likewise.
+
 2007-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (open): Don't follow symlinks if O_EXCL is given.
