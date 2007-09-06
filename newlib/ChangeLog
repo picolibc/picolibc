@@ -1,3 +1,10 @@
+2007-09-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h (_M_LOG2E): New log2 of e macro.
+	(log2): Use _M_LOG2E instead of M_LOG2E.
+	(log2f): Ditto.
+	(M_LOG2E): Define to be _M_LOG2E.
+
 2007-09-04  Kazunori Asayama <asayama@sm.sony.co.jp>
 
 	* libm/math/wf_tgamma.c: Add missing include.
