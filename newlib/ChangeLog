@@ -1,5 +1,10 @@
 2007-09-07  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/_types.h: Protect all types with flag
+	checks to allow definition in machine/_types.h.
+
+2007-09-07  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/sys/_types.h: Add _fpos_t and _fpos64_t
 	definitions in light of the previous change.
 
