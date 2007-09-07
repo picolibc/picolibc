@@ -1,3 +1,8 @@
+2007-09-06  Brian Dessent  <brian@dessent.net>
+
+	* libc/reent/getreent.c: Allow for case where __getreent is
+	defined as a macro.
+
 2007-09-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (_M_LOG2E): New log2 of e macro.
