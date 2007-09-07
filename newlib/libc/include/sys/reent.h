@@ -108,18 +108,6 @@ struct __sbuf {
 };
 
 /*
- * We need fpos_t for the following, but it doesn't have a leading "_",
- * so we use _fpos_t instead.
- */
-
-typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
-				/* (and must be `long' for now) */
-
-#ifdef __LARGE64_FILES
-typedef _off64_t _fpos64_t;
-#endif
-
-/*
  * Stdio state variables.
  *
  * The following always hold:

@@ -9,10 +9,26 @@
 #ifndef	_SYS__TYPES_H
 #define _SYS__TYPES_H
 
+#include <machine/_types.h>
 #include <sys/lock.h>
 
 typedef long _off_t;
 __extension__ typedef long long _off64_t;
+
+/*
+ * We need fpos_t for the following, but it doesn't have a leading "_",
+ * so we use _fpos_t instead.
+ */
+#ifndef __FPOS_T_DEFINED
+typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
+				/* (and must be `long' for now) */
+#endif
+
+#ifdef __LARGE64_FILES
+#ifndef __FPOS64_T_DEFINED
+typedef _off64_t _fpos64_t;
+#endif
+#endif
 
 #if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int _ssize_t;

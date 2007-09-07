@@ -1,3 +1,15 @@
+2007-09-07 Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/machine/_default_types.h: New file, contains what
+	was previously in libc/include/machine/_types.h.
+	* libc/include/machine/_types.h: Now only includes
+	machine/_default_types.h.
+	* libc/include/sys/reent.h: Remove _fpos_t and _fpos64_t.
+	* libc/include/sys/_types.h: Move _fpos_t and _fpos64_t to here,
+	with conditional declarations.
+	* libc/machine/spu/machine/_types.h: New file, add SPU specific
+	typedefs for _fpos_t and _fpos64_t.
+
 2007-09-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (_M_LOG2E): Replace with..
