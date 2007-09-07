@@ -1,5 +1,9 @@
 2007-09-06  Brian Dessent  <brian@dessent.net>
 
+	* include/cygwin/config.h (__getreent): Define inline version.
+
+2007-09-06  Brian Dessent  <brian@dessent.net>
+
 	* include/sys/stdio.h (_flockfile): Don't try to lock a FILE
 	that has the __SSTR flag set.
 	(_ftrylockfile): Likewise.
