@@ -37,9 +37,11 @@ extern "C" {
    compute these offsets already exists for the sake of gendef so
    we might as well just use it here.  */
 
+#ifdef _COMPILING_NEWLIB
 #include "../tlsoffsets.h"
 extern char *_tlsbase __asm__ ("%fs:4");
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
+#endif  /* _COMPILING_NEWLIB */
 
 #define __FILENAME_MAX__ (260 - 1 /* NUL */)
 #define _READ_WRITE_RETURN_TYPE _ssize_t

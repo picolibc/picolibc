@@ -1,3 +1,8 @@
+2007-09-08  Brian Dessent  <brian@dessent.net>
+
+	* include/cygwin/config.h: Conditionalize inline __getreent()
+	definition on _COMPILING_NEWLIB.
+
 2007-09-06  Brian Dessent  <brian@dessent.net>
 
 	* include/cygwin/config.h (__getreent): Define inline version.
