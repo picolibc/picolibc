@@ -1,3 +1,7 @@
+2007-09-11  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* m68k.h (EF_M68K_CF_ISA_C_NODIV): New.
+
 2007-08-25  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (NT_SPU): Define.
