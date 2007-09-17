@@ -551,7 +551,17 @@ fhandler_base::open (int flags, mode_t mode)
 
       /* If the file should actually be created and ntsec is on,
 	 set files attributes. */
-      if (allow_ntsec)
+      /* TODO: Don't remove the call to has_acls() unless there's a
+	 solution for the security descriptor problem on remote samba
+	 drives.  The local user SID is used in set_security_attribute,
+	 but the actual owner on the Samba share is the SID of the Unix
+	 account.  There's no transparent mapping between these accounts.
+	 And Samba has a strange behaviour when creating a file.  Apparently
+	 it *first*( creates the file, *then* it looks if the security
+	 descriptor matches.  The result is that the file gets created, but
+	 then NtCreateFile doesn't return a handle to the file and fails
+	 with STATUS_ACCESS_DENIED.  Go figure! */
+      if (allow_ntsec && has_acls ())
 	{
 	  set_security_attribute (mode, &sa, sd);
 	  attr.SecurityDescriptor = sa.lpSecurityDescriptor;

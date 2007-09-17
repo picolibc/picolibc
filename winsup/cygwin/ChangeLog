@@ -1,3 +1,9 @@
+2007-09-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Partly revert change from
+	2007-08-24:  Call has_acls to avoid permission problems getting
+	a handle to a file on a remote share.  Add comment.
+
 2007-09-08  Brian Dessent  <brian@dessent.net>
 
 	* include/cygwin/config.h: Conditionalize inline __getreent()
