@@ -1029,10 +1029,17 @@ reswitch:	switch (ch) {
 		case 'S':
 #endif
 			sign = '\0';
-			if ((cp = GET_ARG (N, ap, char_ptr_t)) == NULL) {
+			cp = GET_ARG (N, ap, char_ptr_t);
+#ifndef __OPTIMIZE_SIZE__
+			/* Behavior is undefined if the user passed a
+			   NULL string when precision is not 0.
+			   However, if we are not optimizing for size,
+			   we might as well mirror glibc behavior.  */
+			if (cp == NULL) {
 				cp = "(null)";
-				size = 6;
+				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
+#endif /* __OPTIMIZE_SIZE__ */
 #ifdef _MB_CAPABLE
 			else if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
