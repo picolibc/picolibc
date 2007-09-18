@@ -21,24 +21,14 @@ FUNCTION
 
 INDEX
 	rename
-INDEX
-	_rename_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int rename(const char *<[old]>, const char *<[new]>);
 
-	int _rename_r(struct _reent *<[reent]>, 
-                      const char *<[old]>, const char *<[new]>);
-
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int rename(<[old]>, <[new]>)
-	char *<[old]>;
-	char *<[new]>;
-
-	int _rename_r(<[reent]>, <[old]>, <[new]>)
-	struct _reent *<[reent]>;
 	char *<[old]>;
 	char *<[new]>;
 
@@ -49,9 +39,6 @@ file now known by the string at <[old]>.  After a successful
 
 If <<rename>> fails, the file named <<*<[old]>>> is unaffected.  The
 conditions for failure depend on the host operating system.
-
-The alternate function <<_rename_r>> is a reentrant version.  The
-extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
 The result is either <<0>> (when successful) or <<-1>> (when the file
@@ -69,27 +56,6 @@ Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 #include <reent.h>
 #include <stdio.h>
 #include <sys/unistd.h>
-
-int
-_DEFUN(_rename_r, (ptr, old, new),
-       struct _reent *ptr _AND
-       _CONST char *old   _AND
-       _CONST char *new)
-{
-#ifdef HAVE_RENAME
-  return _rename (old,new);
-#else
-  if (_link_r (ptr, old, new) == -1)
-    return -1;
-
-  if (_unlink_r (ptr, old) == -1)
-    {
-      /* ??? Should we unlink new? (rhetorical question) */
-      return -1;
-    }
-#endif
-  return 0;
-}
 
 #ifndef _REENT_ONLY
 

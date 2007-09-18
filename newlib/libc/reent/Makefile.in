@@ -60,10 +60,11 @@ am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-fstatr.$(OBJEXT) lib_a-getreent.$(OBJEXT) \
 	lib_a-gettimeofdayr.$(OBJEXT) lib_a-linkr.$(OBJEXT) \
 	lib_a-lseekr.$(OBJEXT) lib_a-openr.$(OBJEXT) \
-	lib_a-readr.$(OBJEXT) lib_a-signalr.$(OBJEXT) \
-	lib_a-signgam.$(OBJEXT) lib_a-sbrkr.$(OBJEXT) \
-	lib_a-statr.$(OBJEXT) lib_a-timesr.$(OBJEXT) \
-	lib_a-unlinkr.$(OBJEXT) lib_a-writer.$(OBJEXT)
+	lib_a-readr.$(OBJEXT) lib_a-renamer.$(OBJEXT) \
+	lib_a-signalr.$(OBJEXT) lib_a-signgam.$(OBJEXT) \
+	lib_a-sbrkr.$(OBJEXT) lib_a-statr.$(OBJEXT) \
+	lib_a-timesr.$(OBJEXT) lib_a-unlinkr.$(OBJEXT) \
+	lib_a-writer.$(OBJEXT)
 @HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-open64r.$(OBJEXT)
@@ -81,8 +82,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libreent_la_LIBADD =
 am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
 	getreent.lo gettimeofdayr.lo linkr.lo lseekr.lo openr.lo \
-	readr.lo signalr.lo signgam.lo sbrkr.lo statr.lo timesr.lo \
-	unlinkr.lo writer.lo
+	readr.lo renamer.lo signalr.lo signgam.lo sbrkr.lo statr.lo \
+	timesr.lo unlinkr.lo writer.lo
 @HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
 @HAVE_STDIO64_DIR_TRUE@	open64r.lo
 am__objects_8 = $(am__objects_7)
@@ -298,6 +299,7 @@ GENERAL_SOURCES = \
 	lseekr.c \
 	openr.c \
 	readr.c \
+	renamer.c \
 	signalr.c \
 	signgam.c \
 	sbrkr.c \
@@ -325,6 +327,7 @@ CHEWOUT_FILES = \
 	lseekr.def \
 	openr.def \
 	readr.def \
+	renamer.def \
 	signalr.def \
 	sbrkr.def \
 	statr.def \
@@ -469,6 +472,12 @@ lib_a-readr.o: readr.c
 
 lib_a-readr.obj: readr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readr.obj `if test -f 'readr.c'; then $(CYGPATH_W) 'readr.c'; else $(CYGPATH_W) '$(srcdir)/readr.c'; fi`
+
+lib_a-renamer.o: renamer.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.o `test -f 'renamer.c' || echo '$(srcdir)/'`renamer.c
+
+lib_a-renamer.obj: renamer.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-renamer.obj `if test -f 'renamer.c'; then $(CYGPATH_W) 'renamer.c'; else $(CYGPATH_W) '$(srcdir)/renamer.c'; fi`
 
 lib_a-signalr.o: signalr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-signalr.o `test -f 'signalr.c' || echo '$(srcdir)/'`signalr.c

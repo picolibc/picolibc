@@ -41,6 +41,7 @@ GENERAL_SOURCES = \
 	lseekr.c \
 	openr.c \
 	readr.c \
+	renamer.c \
 	signalr.c \
 	signgam.c \
 	sbrkr.c \
@@ -75,6 +76,7 @@ CHEWOUT_FILES = \
 	lseekr.def \
 	openr.def \
 	readr.def \
+	renamer.def \
 	signalr.def \
 	sbrkr.def \
 	statr.def \
