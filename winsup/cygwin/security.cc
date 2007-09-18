@@ -114,7 +114,8 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	  status = NtOpenFile (&fh, WRITE_OWNER | WRITE_DAC,
 			       pc.get_object_attr (attr, sec_none_nih),
 			       &io, FILE_SHARE_VALID_FLAGS,
-			       FILE_OPEN_FOR_RECOVERY);
+			       FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_OPEN_FOR_RECOVERY);
 	  if (!NT_SUCCESS (status))
 	    {
 	      fh = NULL;
