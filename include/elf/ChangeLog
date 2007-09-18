@@ -1,3 +1,11 @@
+2007-09-17  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR binutils/3281
+	PR binutils/5037
+	* internal.h (elf_segment_map): Add p_size and p_size_valid.
+	(ELF_IS_SECTION_IN_SEGMENT): Allow SHF_TLS sections in
+	PT_GNU_RELRO segments.
+
 2007-09-11  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* m68k.h (EF_M68K_CF_ISA_C_NODIV): New.
