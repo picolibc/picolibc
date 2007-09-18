@@ -1,5 +1,13 @@
 2007-09-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (fh_disk_file): Delete as global static variable and...
+	(mmap64): ...define as local pointer to make mmap thread-safe.
+	Accommodate throughout.  Only initialize fh_disk_file after file could
+	be opened with GENERIC_EXECUTE access.  Call fstat_by_handle instead of
+	fstat to avoid overhead.
+
+2007-09-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (set_file_sd): Open file with FILE_OPEN_FOR_BACKUP_INTENT
 	too.
 

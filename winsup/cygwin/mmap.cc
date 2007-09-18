@@ -49,8 +49,6 @@ details. */
 
 /* Used for anonymous mappings. */
 static fhandler_dev_zero fh_anonymous;
-/* Used for reopening a disk file when necessary. */
-static fhandler_disk_file fh_disk_file;
 
 /* Small helpers to avoid having lots of flag bit tests in the code. */
 static inline bool
@@ -807,6 +805,8 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   caddr_t ret = (caddr_t) MAP_FAILED;
   fhandler_base *fh = NULL;
+  fhandler_disk_file *fh_disk_file = NULL; /* Used for reopening a disk file
+					      when necessary. */
   list *map_list = NULL;
   size_t orig_len = 0;
   caddr_t base = NULL;
@@ -816,7 +816,6 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
-  fh_disk_file.set_io_handle (NULL);
 
   SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
@@ -888,9 +887,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 			   | FILE_OPEN_FOR_BACKUP_INTENT);
       if (NT_SUCCESS (status))
 	{
-	  fh_disk_file.set_io_handle (h);
-	  fh_disk_file.set_access (fh->get_access () | GENERIC_EXECUTE);
-	  fh = &fh_disk_file;
+	  fh_disk_file = new (alloca (sizeof *fh_disk_file)) fhandler_disk_file;
+	  fh_disk_file->set_name (fh->pc);
+	  fh_disk_file->set_io_handle (h);
+	  fh_disk_file->set_access (fh->get_access () | GENERIC_EXECUTE);
+	  fh = fh_disk_file;
 	}
       else if (prot & PROT_EXEC)
 	{
@@ -901,7 +902,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  goto out;
 	}
 
-      if (fh->fstat (&st))
+      if (fh->fstat_by_handle (&st))
 	{
 	  __seterrno ();
 	  goto out;
@@ -1074,8 +1075,8 @@ out:
 
   ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
-  if (fh_disk_file.get_handle ())
-    NtClose (fh_disk_file.get_handle ());
+  if (fh_disk_file)
+    NtClose (fh_disk_file->get_handle ());
 
   syscall_printf ("%p = mmap() ", ret);
   return ret;
