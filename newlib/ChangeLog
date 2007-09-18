@@ -1,3 +1,14 @@
+2007-09-18 Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/sys/types.h: Use __dev_t, __uid_t, and __gid_t to
+	typedef dev_t, gid_t, and uid_t.
+	* libc/include/sys/_types.h: Move previous dev_t, uid_t and gid_t
+	types.h code to here, but typedef __dev_t, __uid_t, and __gid_t instead.
+	Change to lower case for all __foo_t_defined names.
+	* libc/machine/spu/machine/_types.h: Add SPU specific __dev_t,
+	__uid_t, and __gid_t making them all four bytes. Change to lower case
+	for all __foo_t_defined names.
+
 2007-09-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/reent/renamer.c: New file.
