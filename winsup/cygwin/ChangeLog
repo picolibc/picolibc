@@ -1,3 +1,7 @@
+2007-09-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_OBJECT_NAME_INVALID): Define.
+
 2007-09-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (fh_disk_file): Delete as global static variable and...
