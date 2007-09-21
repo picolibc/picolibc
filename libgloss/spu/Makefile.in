@@ -55,7 +55,7 @@ OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
 
 # object files needed
 OBJS = \
-	access.o chdir.o chmod.o chown.o close.o conv_stat.o dup.o \
+	access.o chdir.o chmod.o chown.o close.o conv_stat.o dirfuncs.o dup.o \
 	dup2.o exit.o fchdir.o fchmod.o fchown.o fdatasync.o fstat.o \
 	fsync.o ftruncate.o getcwd.o getpagesize.o getpid.o \
 	gettimeofday.o isatty.o kill.o lchown.o link.o lockf.o lseek.o \

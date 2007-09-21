@@ -78,6 +78,12 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_TRUNCATE 52
 #define JSRE_MKSTEMP 53
 #define JSRE_MKTEMP 54
+#define JSRE_OPENDIR 55
+#define JSRE_CLOSEDIR 56
+#define JSRE_READDIR 57
+#define JSRE_REWINDDIR 58
+#define JSRE_SEEKDIR 59
+#define JSRE_TELLDIR 60
 
 struct jsre_stat {
     unsigned int dev;
