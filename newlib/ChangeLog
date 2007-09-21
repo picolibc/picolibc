@@ -1,5 +1,13 @@
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libc/include/sched.h: New file, just include sys/sched.h.
+	* libc/machine/spu/sys/sched.h: New file, has just sched_yield
+	prototype.
+	* libc/machine/spu/sys/utime.h: New file, has utime prototype and
+	struct utimbuf definition.
+
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libc/machine/spu/sys/dirent.h: New file, add prototypes and SPU
 	specific struct and typedef.
 
