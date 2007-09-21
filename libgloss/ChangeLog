@@ -1,5 +1,12 @@
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add JSRE_SHM_OPEN and JSRE_SHM_UNLINK opcodes.
+	* spu/shm_open.c: New file to add shm_open via assist call.
+	* spu/shm_unlink.c: New file to add shm_unlink via assist call.
+	* spu/Makefile.in: Add shm_open.o and shm_unlink.o
+
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/dirfuncs.c: New file, holds the opendir, closedir, readdir,
 	rewinddir, seekdir and telldir implementations. These are
 	grouped in one file so that we do not need a separate file for

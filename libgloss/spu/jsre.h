@@ -48,6 +48,8 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_LSTAT 10
 #define JSRE_OPEN 15
 #define JSRE_READ 16
+#define JSRE_SHM_OPEN 21
+#define JSRE_SHM_UNLINK 22
 #define JSRE_STAT 23
 #define JSRE_UNLINK 24
 #define JSRE_WRITE 27
