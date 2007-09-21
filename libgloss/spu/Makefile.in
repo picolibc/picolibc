@@ -60,8 +60,9 @@ OBJS = \
 	fsync.o ftruncate.o getcwd.o getpagesize.o getpid.o \
 	gettimeofday.o isatty.o kill.o lchown.o link.o lockf.o lseek.o \
 	lstat.o mkdir.o mknod.o mkstemp.o mktemp.o nanosleep.o open.o \
-	read.o readlink.o rmdir.o sbrk.o shm_open.o shm_unlink.o stat.o \
-	symlink.o sync.o syscalls.o truncate.o unlink.o write.o
+	read.o readlink.o rmdir.o sbrk.o sched_yield.o shm_open.o \
+	shm_unlink.o stat.o symlink.o sync.o syscalls.o truncate.o umask.o \
+	unlink.o utime.o utimes.o write.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}

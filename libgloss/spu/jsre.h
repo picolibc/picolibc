@@ -86,6 +86,10 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_REWINDDIR 58
 #define JSRE_SEEKDIR 59
 #define JSRE_TELLDIR 60
+#define JSRE_SCHED_YIELD 61
+#define JSRE_UMASK 62
+#define JSRE_UTIME 63
+#define JSRE_UTIMES 64
 
 struct jsre_stat {
     unsigned int dev;

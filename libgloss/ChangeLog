@@ -1,5 +1,15 @@
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/jsre.h: Add JSRE_SCHED_YIELD, JSRE_UMASK, JSRE_UTIME, and
+	JSRE_UTIMES.
+	* spu/sched_yield.c: New file add sched_yield via assist call.
+	* spu/umask.c: New file add umask via assist call.
+	* spu/utime.c: New file add utime via assist call.
+	* spu/utimes.c: New file add utimes via assist call.
+	* spu/Makefile.in: Add new files.
+							
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add JSRE_SHM_OPEN and JSRE_SHM_UNLINK opcodes.
 	* spu/shm_open.c: New file to add shm_open via assist call.
 	* spu/shm_unlink.c: New file to add shm_unlink via assist call.
