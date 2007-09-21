@@ -90,6 +90,10 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_UMASK 62
 #define JSRE_UTIME 63
 #define JSRE_UTIMES 64
+#define JSRE_PREAD 65
+#define JSRE_PWRITE 66
+#define JSRE_READV 67
+#define JSRE_WRITEV 68
 
 struct jsre_stat {
     unsigned int dev;

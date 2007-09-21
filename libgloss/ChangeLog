@@ -1,5 +1,15 @@
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* spu/Makefile.in: Add new files.
+	* spu/jsre.h: Add JSRE_PREAD, JSRE_PWRITE, JSRE_READV, and
+	JSRE_WRITEV opcodes.
+	* spu/pread.c: New file to add pread via assist call.
+	* spu/pwrite.c: New file to add pwrite via assist call.
+	* spu/readv.c: New file to add readv via assist call.
+	* spu/writev.c: New file to add writev via assist call.
+
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* spu/jsre.h: Add JSRE_SCHED_YIELD, JSRE_UMASK, JSRE_UTIME, and
 	JSRE_UTIMES.
 	* spu/sched_yield.c: New file add sched_yield via assist call.
