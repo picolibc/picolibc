@@ -1,5 +1,9 @@
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libc/machine/spu/sys/uio.h: New file for readv and writev use.
+
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libc/include/sched.h: New file, just include sys/sched.h.
 	* libc/machine/spu/sys/sched.h: New file, has just sched_yield
 	prototype.
