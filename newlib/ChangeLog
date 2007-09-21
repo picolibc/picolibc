@@ -1,4 +1,9 @@
-2007-09-18 Patrick Mansfield <patmans@us.ibm.com>
+2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/machine/spu/sys/dirent.h: New file, add prototypes and SPU
+	specific struct and typedef.
+
+2007-09-18  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/include/sys/types.h: Use __dev_t, __uid_t, and __gid_t to
 	typedef dev_t, gid_t, and uid_t.
