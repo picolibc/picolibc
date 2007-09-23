@@ -1,3 +1,8 @@
+2007-09-24  David C. Daeschler <daveregs@rsaisp.com>
+
+	* mingwex/gdtoa/mingw_snprintf.c (x_sprintf): Correct LEN_L typo in 'l'
+	case.  Add missing break in 's'/LEN_S case.
+
 2007-08-25 Keith Marshall <keithmarshall@users.sourceforge.net>
 
 	Make snprintf() and vsnprintf() conform to C99.

@@ -465,7 +465,7 @@ x_sprintf
 				    len = LEN_LL;
 				  }
   				else
-				  len = LEN_LL;
+				  len = LEN_L;
 				goto fmtloop;
 			case 'L':
 				flag_ld++;
@@ -617,6 +617,7 @@ x_sprintf
 					break;
 				  case LEN_S:
 					*(short*)ip = c;
+					break;
 				  case LEN_LL:
 					*(long long*) ip = c;
 					break;
