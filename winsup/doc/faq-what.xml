@@ -107,13 +107,6 @@ more information about using Cygwin's <filename>setup.exe</filename>, see
 in the Cygwin User's Guide. 
 </para></answer></qandaentry>
 
-<qandaentry id="faq.what.history">
-<question><para>History</para></question>
-<answer>
-<para>See <ulink url="http://cygwin.com/history.html">http://cygwin.com/history.html</ulink>.
-</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.what.who">
 <question><para>Who's behind the project?</para></question>
 <answer>

@@ -1,3 +1,8 @@
+2007-09-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-what.xml: Remove paragraph about and link to stoneage old
+	history.html file.
+
 2007-08-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll.sgml: myprog.ca -> myprog.c
