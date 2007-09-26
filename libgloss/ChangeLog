@@ -1,3 +1,7 @@
+2007-09-26  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/sched_yield.c: New file (missed on 2007-09-21).
+
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/Makefile.in: Add new files.
