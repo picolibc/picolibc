@@ -506,7 +506,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 				      sizeof fci, FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
        compressed and sparsed files. */
-    buf->st_blocks = (fci.CompressedSize.QuadPart + S_BLKSIZE - 1) / S_BLKSIZE;
+    buf->st_blocks = (fci.CompressedFileSize.QuadPart + S_BLKSIZE - 1)
+		     / S_BLKSIZE;
   else
     /* Otherwise compute no. of blocks from file size. */
     buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;

@@ -651,11 +651,12 @@ typedef struct _FILE_PIPE_LOCAL_INFORMATION
 
 typedef struct _FILE_COMPRESSION_INFORMATION
 {
-  LARGE_INTEGER CompressedSize;
+  LARGE_INTEGER CompressedFileSize;
   USHORT CompressionFormat;
   UCHAR	CompressionUnitShift;
-  UCHAR Unknown;
-  UCHAR ClusterSizeShift;
+  UCHAR ChunkShift;
+  UCHAR ClusterShift;
+  UCHAR Reserved[3];
 } FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
 
 typedef struct _FILE_FS_DEVICE_INFORMATION

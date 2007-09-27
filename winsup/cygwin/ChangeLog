@@ -1,3 +1,10 @@
+2007-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (struct _FILE_COMPRESSION_INFORMATION): Align with definition
+	in w32api / MSDN.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Accommodate
+	change to struct _FILE_COMPRESSION_INFORMATION.
+
 2007-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* termios.cc (setspeed): Support new baud rates introduced 2007-02-05.
