@@ -33,6 +33,7 @@
 #ifndef _FMODF_H_
 #define _FMODF_H_	1
 
+#include <errno.h>
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
@@ -83,6 +84,10 @@ static __inline float _fmodf(float x, float y)
   vec_uint4 sign_mask = VEC_SPLAT_U32(0x80000000);
   vec_uint4 implied_1 = VEC_SPLAT_U32(0x00800000);
   vec_uint4 mant_mask = VEC_SPLAT_U32(0x007FFFFF);
+  vec_uint4 domain;
+  vec_int4 verrno;
+  vec_float4 vc = { 0.0, 0.0, 0.0, 0.0 };
+  vec_int4 fail = { EDOM, EDOM, EDOM, EDOM };
 
   vx = (vec_uint4)spu_promote(x, 0);
   vy = (vec_uint4)spu_promote(y, 0);
@@ -149,6 +154,15 @@ static __inline float _fmodf(float x, float y)
 
   result = spu_sel(spu_andc(result, spu_rlmask(result0, -1)), vx,
                    resultx);
+
+#ifndef _IEEE_LIBM
+  /*
+   * If y is zero, set errno to EDOM
+   */
+  domain = spu_cmpeq(vc, (vec_float4) vy);
+  verrno = spu_splats(errno);
+  errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int) domain), 0);
+#endif
 
   return (spu_extract((vec_float4)result, 0));
 #endif /* FMODF_INTEGER_RANGE */

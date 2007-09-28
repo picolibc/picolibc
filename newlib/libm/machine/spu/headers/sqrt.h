@@ -43,6 +43,7 @@
  */
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
+#include "headers/dom_chkd_less_than.h"
 
 static __inline double _sqrt(double in)
 {
@@ -53,6 +54,7 @@ static __inline double _sqrt(double in)
   vec_ullong2 mask = VEC_SPLAT_U64(0x7FE0000000000000ULL);
   vec_double2 x, dx, de, dd, dy, dg, dy2, dhalf;
   vec_double2 denorm, neg;
+  vec_double2 vc = { 0.0, 0.0 };
 
   fhalf = VEC_SPLAT_F32(0.5f);
   dhalf = VEC_SPLAT_F64(0.5);
@@ -124,6 +126,9 @@ static __inline double _sqrt(double in)
 
   dg = spu_sel(spu_andc(spu_or(dg, neg), denorm), x, nochange);
 
+#ifndef _IEEE_LIBM
+  dom_chkd_less_than(spu_splats(in), vc);
+#endif
   return (spu_extract(dg, 0));
 }
 #endif /* _SQRT_H_ */

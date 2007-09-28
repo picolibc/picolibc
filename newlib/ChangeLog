@@ -1,5 +1,32 @@
 2007-09-28  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libm/machine/spu/headers/dom_chkd_less_than.h: New file.
+	* libm/machine/spu/headers/dom_chkd_negone_one.h: Ditto.
+	* libm/machine/spu/headers/dom_chkf_less_than.h: Ditto.
+	* libm/machine/spu/headers/dom_chkf_negone_one.h: Ditto.
+	* libm/machine/spu/headers/acos.h: Add domain check.
+	* libm/machine/spu/headers/acosf.h: Ditto.
+	* libm/machine/spu/headers/acosh.h: Ditto.
+	* libm/machine/spu/headers/acoshf.h: Ditto.
+	* libm/machine/spu/headers/asin.h: Ditto.
+	* libm/machine/spu/headers/asinf.h: Ditto.
+	* libm/machine/spu/headers/atanh.h: Ditto.
+	* libm/machine/spu/headers/atanhf.h: Ditto.
+	* libm/machine/spu/headers/fmod.h: Ditto.
+	* libm/machine/spu/headers/fmodf.h: Ditto.
+	* libm/machine/spu/headers/log.h: Ditto.
+	* libm/machine/spu/headers/log10.h: Ditto.
+	* libm/machine/spu/headers/log1p.h: Ditto.
+	* libm/machine/spu/headers/log1pf.h: Ditto.
+	* libm/machine/spu/headers/log2.h: Ditto.
+	* libm/machine/spu/headers/log2f.h: Ditto.
+	* libm/machine/spu/headers/sqrt.h: Ditto.
+	* libm/machine/spu/headers/sqrtf.h: Ditto.
+	* libm/machine/spu/headers/tgamma.h: Ditto.
+	* libm/machine/spu/headers/tgammaf.h: Ditto.
+
+2007-09-28  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libm/machine/spu/Makefile.am: Add new C files.
 	* libm/machine/spu/Makefile.in: Regenerate.
 	* libm/machine/spu/headers/acos.h: New file.

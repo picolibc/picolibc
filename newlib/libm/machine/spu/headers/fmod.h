@@ -34,6 +34,7 @@
 #define _FMOD_H_	1
 
 #include <spu_intrinsics.h>
+#include <errno.h>
 #include "headers/vec_literal.h"
 
 /* This implementation returns zero if y is a denorm or zero.
@@ -57,6 +58,10 @@ static __inline double _fmod(double x, double y)
   vec_uint4 sign_mask = (vec_uint4)(VEC_SPLAT_U64(0x8000000000000000ULL));
   vec_uint4 implied_1 = (vec_uint4)(VEC_SPLAT_U64(0x0010000000000000ULL));
   vec_uint4 mant_mask = (vec_uint4)(VEC_SPLAT_U64(0x000FFFFFFFFFFFFFULL));
+  vec_ullong2 domain;
+  vec_int4 verrno;
+  vec_double2 vc = { 0.0, 0.0 };
+  vec_int4 fail = { EDOM, EDOM, EDOM, EDOM };
 
   vx = (vec_uint4)spu_promote(x, 0);
   vy = (vec_uint4)spu_promote(y, 0);
@@ -146,6 +151,15 @@ static __inline double _fmod(double x, double y)
 
   result = spu_sel(spu_andc(result, spu_rlmask(result0, -1)), vx,
                    resultx);
+
+#ifndef _IEEE_LIBM
+  /*
+   * If y is zero, set errno to EDOM
+   */
+  domain = spu_cmpeq(vc, (vec_double2) vy);
+  verrno = spu_splats(errno);
+  errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int) domain), 0);
+#endif
 
   return (spu_extract((vec_double2)result, 0));
 }

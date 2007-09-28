@@ -33,6 +33,9 @@
 #ifndef _LOG2F_H_
 #define _LOG2F_H_	1
 
+#include <spu_intrinsics.h>
+#include "headers/dom_chkf_less_than.h"
+
 /*
  * FUNCTION
  *	float _log2f(float x)
@@ -73,6 +76,8 @@ static __inline float _log2f(float x)
   float result;
   float x2, x4;
   float hi, lo;
+  vector float vx;
+  vector float vc = { 0.0, 0.0, 0.0, 0.0 };
 
   in.f = x;
 
@@ -109,6 +114,10 @@ static __inline float _log2f(float x)
    */
   result += (float)(exponent);
 
+#ifndef _IEEE_LIBM
+  vx = spu_promote(x, 0);
+  dom_chkf_less_than(vx, vc);
+#endif
   return (result);
 }
 
