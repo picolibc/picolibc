@@ -51,7 +51,33 @@ DIST_COMMON = $(srcdir)/../../../Makefile.shared \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -72,10 +98,37 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-feholdexcept.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
-	lib_a-feupdateenv.$(OBJEXT) lib_a-sf_finite.$(OBJEXT) \
-	lib_a-sf_fpclassify.$(OBJEXT) lib_a-sf_isinf.$(OBJEXT) \
-	lib_a-sf_isinff.$(OBJEXT) lib_a-sf_isnanf.$(OBJEXT) \
-	lib_a-sf_isnan.$(OBJEXT) lib_a-sf_nan.$(OBJEXT)
+	lib_a-feupdateenv.$(OBJEXT) lib_a-llrint.$(OBJEXT) \
+	lib_a-llrintf.$(OBJEXT) lib_a-llround.$(OBJEXT) \
+	lib_a-llroundf.$(OBJEXT) lib_a-log2f.$(OBJEXT) \
+	lib_a-s_cbrt.$(OBJEXT) lib_a-s_ceil.$(OBJEXT) \
+	lib_a-s_copysign.$(OBJEXT) lib_a-s_fabs.$(OBJEXT) \
+	lib_a-sf_atan.$(OBJEXT) lib_a-sf_cbrt.$(OBJEXT) \
+	lib_a-sf_ceil.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
+	lib_a-s_fdim.$(OBJEXT) lib_a-sf_fabs.$(OBJEXT) \
+	lib_a-sf_fdim.$(OBJEXT) lib_a-sf_finite.$(OBJEXT) \
+	lib_a-sf_floor.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
+	lib_a-sf_fmax.$(OBJEXT) lib_a-sf_fmin.$(OBJEXT) \
+	lib_a-sf_fpclassify.$(OBJEXT) lib_a-sf_frexp.$(OBJEXT) \
+	lib_a-sf_ilogb.$(OBJEXT) lib_a-sf_isinf.$(OBJEXT) \
+	lib_a-sf_isinff.$(OBJEXT) lib_a-sf_isnan.$(OBJEXT) \
+	lib_a-sf_isnanf.$(OBJEXT) lib_a-sf_ldexp.$(OBJEXT) \
+	lib_a-s_floor.$(OBJEXT) lib_a-sf_lrint.$(OBJEXT) \
+	lib_a-sf_lround.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
+	lib_a-s_fmax.$(OBJEXT) lib_a-s_fmin.$(OBJEXT) \
+	lib_a-sf_nan.$(OBJEXT) lib_a-sf_remquo.$(OBJEXT) \
+	lib_a-s_frexp.$(OBJEXT) lib_a-sf_round.$(OBJEXT) \
+	lib_a-sf_scalbn.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT) \
+	lib_a-s_ilogb.$(OBJEXT) lib_a-s_ldexp.$(OBJEXT) \
+	lib_a-s_lrint.$(OBJEXT) lib_a-s_lround.$(OBJEXT) \
+	lib_a-s_nearbyint.$(OBJEXT) lib_a-s_remquo.$(OBJEXT) \
+	lib_a-s_rint.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
+	lib_a-s_scalbn.$(OBJEXT) lib_a-s_trunc.$(OBJEXT) \
+	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_exp.$(OBJEXT) \
+	lib_a-wf_fmod.$(OBJEXT) lib_a-wf_log10.$(OBJEXT) \
+	lib_a-wf_log.$(OBJEXT) lib_a-w_fmod.$(OBJEXT) \
+	lib_a-wf_remainder.$(OBJEXT) lib_a-w_remainder.$(OBJEXT) \
+	lib_a-w_sqrt.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -150,11 +203,6 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -170,18 +218,23 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 machine_dir = @machine_dir@
@@ -190,8 +243,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sys_dir = @sys_dir@
@@ -205,8 +260,17 @@ LIB_SOURCES = \
 	feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
-	sf_finite.c sf_fpclassify.c sf_isinf.c sf_isinff.c sf_isnanf.c \
-	sf_isnan.c sf_nan.c
+	llrint.c llrintf.c llround.c llroundf.c log2f.c s_cbrt.c s_ceil.c \
+	s_copysign.c s_fabs.c sf_atan.c sf_cbrt.c sf_ceil.c sf_copysign.c \
+	s_fdim.c sf_fabs.c sf_fdim.c sf_finite.c sf_floor.c sf_fma.c \
+	sf_fmax.c sf_fmin.c sf_fpclassify.c sf_frexp.c sf_ilogb.c \
+	sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c sf_ldexp.c s_floor.c \
+	sf_lrint.c sf_lround.c s_fma.c s_fmax.c s_fmin.c sf_nan.c \
+	sf_remquo.c s_frexp.c sf_round.c sf_scalbn.c sf_trunc.c s_ilogb.c \
+	s_ldexp.c s_lrint.c s_lround.c s_nearbyint.c s_remquo.c s_rint.c \
+	s_round.c s_scalbn.c s_trunc.c wf_exp2.c wf_exp.c wf_fmod.c \
+	wf_log10.c wf_log.c w_fmod.c wf_remainder.c w_remainder.c \
+	w_sqrt.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -344,17 +408,149 @@ lib_a-feupdateenv.o: feupdateenv.c
 lib_a-feupdateenv.obj: feupdateenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
 
+lib_a-llrint.o: llrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrint.o `test -f 'llrint.c' || echo '$(srcdir)/'`llrint.c
+
+lib_a-llrint.obj: llrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrint.obj `if test -f 'llrint.c'; then $(CYGPATH_W) 'llrint.c'; else $(CYGPATH_W) '$(srcdir)/llrint.c'; fi`
+
+lib_a-llrintf.o: llrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrintf.o `test -f 'llrintf.c' || echo '$(srcdir)/'`llrintf.c
+
+lib_a-llrintf.obj: llrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrintf.obj `if test -f 'llrintf.c'; then $(CYGPATH_W) 'llrintf.c'; else $(CYGPATH_W) '$(srcdir)/llrintf.c'; fi`
+
+lib_a-llround.o: llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llround.o `test -f 'llround.c' || echo '$(srcdir)/'`llround.c
+
+lib_a-llround.obj: llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llround.obj `if test -f 'llround.c'; then $(CYGPATH_W) 'llround.c'; else $(CYGPATH_W) '$(srcdir)/llround.c'; fi`
+
+lib_a-llroundf.o: llroundf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llroundf.o `test -f 'llroundf.c' || echo '$(srcdir)/'`llroundf.c
+
+lib_a-llroundf.obj: llroundf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llroundf.obj `if test -f 'llroundf.c'; then $(CYGPATH_W) 'llroundf.c'; else $(CYGPATH_W) '$(srcdir)/llroundf.c'; fi`
+
+lib_a-log2f.o: log2f.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2f.o `test -f 'log2f.c' || echo '$(srcdir)/'`log2f.c
+
+lib_a-log2f.obj: log2f.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2f.obj `if test -f 'log2f.c'; then $(CYGPATH_W) 'log2f.c'; else $(CYGPATH_W) '$(srcdir)/log2f.c'; fi`
+
+lib_a-s_cbrt.o: s_cbrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_cbrt.o `test -f 's_cbrt.c' || echo '$(srcdir)/'`s_cbrt.c
+
+lib_a-s_cbrt.obj: s_cbrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_cbrt.obj `if test -f 's_cbrt.c'; then $(CYGPATH_W) 's_cbrt.c'; else $(CYGPATH_W) '$(srcdir)/s_cbrt.c'; fi`
+
+lib_a-s_ceil.o: s_ceil.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ceil.o `test -f 's_ceil.c' || echo '$(srcdir)/'`s_ceil.c
+
+lib_a-s_ceil.obj: s_ceil.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ceil.obj `if test -f 's_ceil.c'; then $(CYGPATH_W) 's_ceil.c'; else $(CYGPATH_W) '$(srcdir)/s_ceil.c'; fi`
+
+lib_a-s_copysign.o: s_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_copysign.o `test -f 's_copysign.c' || echo '$(srcdir)/'`s_copysign.c
+
+lib_a-s_copysign.obj: s_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_copysign.obj `if test -f 's_copysign.c'; then $(CYGPATH_W) 's_copysign.c'; else $(CYGPATH_W) '$(srcdir)/s_copysign.c'; fi`
+
+lib_a-s_fabs.o: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.o `test -f 's_fabs.c' || echo '$(srcdir)/'`s_fabs.c
+
+lib_a-s_fabs.obj: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.obj `if test -f 's_fabs.c'; then $(CYGPATH_W) 's_fabs.c'; else $(CYGPATH_W) '$(srcdir)/s_fabs.c'; fi`
+
+lib_a-sf_atan.o: sf_atan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_atan.o `test -f 'sf_atan.c' || echo '$(srcdir)/'`sf_atan.c
+
+lib_a-sf_atan.obj: sf_atan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_atan.obj `if test -f 'sf_atan.c'; then $(CYGPATH_W) 'sf_atan.c'; else $(CYGPATH_W) '$(srcdir)/sf_atan.c'; fi`
+
+lib_a-sf_cbrt.o: sf_cbrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_cbrt.o `test -f 'sf_cbrt.c' || echo '$(srcdir)/'`sf_cbrt.c
+
+lib_a-sf_cbrt.obj: sf_cbrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_cbrt.obj `if test -f 'sf_cbrt.c'; then $(CYGPATH_W) 'sf_cbrt.c'; else $(CYGPATH_W) '$(srcdir)/sf_cbrt.c'; fi`
+
+lib_a-sf_ceil.o: sf_ceil.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ceil.o `test -f 'sf_ceil.c' || echo '$(srcdir)/'`sf_ceil.c
+
+lib_a-sf_ceil.obj: sf_ceil.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ceil.obj `if test -f 'sf_ceil.c'; then $(CYGPATH_W) 'sf_ceil.c'; else $(CYGPATH_W) '$(srcdir)/sf_ceil.c'; fi`
+
+lib_a-sf_copysign.o: sf_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_copysign.o `test -f 'sf_copysign.c' || echo '$(srcdir)/'`sf_copysign.c
+
+lib_a-sf_copysign.obj: sf_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_copysign.obj `if test -f 'sf_copysign.c'; then $(CYGPATH_W) 'sf_copysign.c'; else $(CYGPATH_W) '$(srcdir)/sf_copysign.c'; fi`
+
+lib_a-s_fdim.o: s_fdim.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fdim.o `test -f 's_fdim.c' || echo '$(srcdir)/'`s_fdim.c
+
+lib_a-s_fdim.obj: s_fdim.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fdim.obj `if test -f 's_fdim.c'; then $(CYGPATH_W) 's_fdim.c'; else $(CYGPATH_W) '$(srcdir)/s_fdim.c'; fi`
+
+lib_a-sf_fabs.o: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.o `test -f 'sf_fabs.c' || echo '$(srcdir)/'`sf_fabs.c
+
+lib_a-sf_fabs.obj: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.obj `if test -f 'sf_fabs.c'; then $(CYGPATH_W) 'sf_fabs.c'; else $(CYGPATH_W) '$(srcdir)/sf_fabs.c'; fi`
+
+lib_a-sf_fdim.o: sf_fdim.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fdim.o `test -f 'sf_fdim.c' || echo '$(srcdir)/'`sf_fdim.c
+
+lib_a-sf_fdim.obj: sf_fdim.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fdim.obj `if test -f 'sf_fdim.c'; then $(CYGPATH_W) 'sf_fdim.c'; else $(CYGPATH_W) '$(srcdir)/sf_fdim.c'; fi`
+
 lib_a-sf_finite.o: sf_finite.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.o `test -f 'sf_finite.c' || echo '$(srcdir)/'`sf_finite.c
 
 lib_a-sf_finite.obj: sf_finite.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.obj `if test -f 'sf_finite.c'; then $(CYGPATH_W) 'sf_finite.c'; else $(CYGPATH_W) '$(srcdir)/sf_finite.c'; fi`
 
+lib_a-sf_floor.o: sf_floor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_floor.o `test -f 'sf_floor.c' || echo '$(srcdir)/'`sf_floor.c
+
+lib_a-sf_floor.obj: sf_floor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_floor.obj `if test -f 'sf_floor.c'; then $(CYGPATH_W) 'sf_floor.c'; else $(CYGPATH_W) '$(srcdir)/sf_floor.c'; fi`
+
+lib_a-sf_fma.o: sf_fma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.o `test -f 'sf_fma.c' || echo '$(srcdir)/'`sf_fma.c
+
+lib_a-sf_fma.obj: sf_fma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.obj `if test -f 'sf_fma.c'; then $(CYGPATH_W) 'sf_fma.c'; else $(CYGPATH_W) '$(srcdir)/sf_fma.c'; fi`
+
+lib_a-sf_fmax.o: sf_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmax.o `test -f 'sf_fmax.c' || echo '$(srcdir)/'`sf_fmax.c
+
+lib_a-sf_fmax.obj: sf_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmax.obj `if test -f 'sf_fmax.c'; then $(CYGPATH_W) 'sf_fmax.c'; else $(CYGPATH_W) '$(srcdir)/sf_fmax.c'; fi`
+
+lib_a-sf_fmin.o: sf_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmin.o `test -f 'sf_fmin.c' || echo '$(srcdir)/'`sf_fmin.c
+
+lib_a-sf_fmin.obj: sf_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmin.obj `if test -f 'sf_fmin.c'; then $(CYGPATH_W) 'sf_fmin.c'; else $(CYGPATH_W) '$(srcdir)/sf_fmin.c'; fi`
+
 lib_a-sf_fpclassify.o: sf_fpclassify.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.o `test -f 'sf_fpclassify.c' || echo '$(srcdir)/'`sf_fpclassify.c
 
 lib_a-sf_fpclassify.obj: sf_fpclassify.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.obj `if test -f 'sf_fpclassify.c'; then $(CYGPATH_W) 'sf_fpclassify.c'; else $(CYGPATH_W) '$(srcdir)/sf_fpclassify.c'; fi`
+
+lib_a-sf_frexp.o: sf_frexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_frexp.o `test -f 'sf_frexp.c' || echo '$(srcdir)/'`sf_frexp.c
+
+lib_a-sf_frexp.obj: sf_frexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_frexp.obj `if test -f 'sf_frexp.c'; then $(CYGPATH_W) 'sf_frexp.c'; else $(CYGPATH_W) '$(srcdir)/sf_frexp.c'; fi`
+
+lib_a-sf_ilogb.o: sf_ilogb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ilogb.o `test -f 'sf_ilogb.c' || echo '$(srcdir)/'`sf_ilogb.c
+
+lib_a-sf_ilogb.obj: sf_ilogb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ilogb.obj `if test -f 'sf_ilogb.c'; then $(CYGPATH_W) 'sf_ilogb.c'; else $(CYGPATH_W) '$(srcdir)/sf_ilogb.c'; fi`
 
 lib_a-sf_isinf.o: sf_isinf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinf.o `test -f 'sf_isinf.c' || echo '$(srcdir)/'`sf_isinf.c
@@ -368,23 +564,209 @@ lib_a-sf_isinff.o: sf_isinff.c
 lib_a-sf_isinff.obj: sf_isinff.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinff.obj `if test -f 'sf_isinff.c'; then $(CYGPATH_W) 'sf_isinff.c'; else $(CYGPATH_W) '$(srcdir)/sf_isinff.c'; fi`
 
-lib_a-sf_isnanf.o: sf_isnanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.o `test -f 'sf_isnanf.c' || echo '$(srcdir)/'`sf_isnanf.c
-
-lib_a-sf_isnanf.obj: sf_isnanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.obj `if test -f 'sf_isnanf.c'; then $(CYGPATH_W) 'sf_isnanf.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnanf.c'; fi`
-
 lib_a-sf_isnan.o: sf_isnan.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.o `test -f 'sf_isnan.c' || echo '$(srcdir)/'`sf_isnan.c
 
 lib_a-sf_isnan.obj: sf_isnan.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.obj `if test -f 'sf_isnan.c'; then $(CYGPATH_W) 'sf_isnan.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnan.c'; fi`
 
+lib_a-sf_isnanf.o: sf_isnanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.o `test -f 'sf_isnanf.c' || echo '$(srcdir)/'`sf_isnanf.c
+
+lib_a-sf_isnanf.obj: sf_isnanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnanf.obj `if test -f 'sf_isnanf.c'; then $(CYGPATH_W) 'sf_isnanf.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnanf.c'; fi`
+
+lib_a-sf_ldexp.o: sf_ldexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ldexp.o `test -f 'sf_ldexp.c' || echo '$(srcdir)/'`sf_ldexp.c
+
+lib_a-sf_ldexp.obj: sf_ldexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ldexp.obj `if test -f 'sf_ldexp.c'; then $(CYGPATH_W) 'sf_ldexp.c'; else $(CYGPATH_W) '$(srcdir)/sf_ldexp.c'; fi`
+
+lib_a-s_floor.o: s_floor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_floor.o `test -f 's_floor.c' || echo '$(srcdir)/'`s_floor.c
+
+lib_a-s_floor.obj: s_floor.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_floor.obj `if test -f 's_floor.c'; then $(CYGPATH_W) 's_floor.c'; else $(CYGPATH_W) '$(srcdir)/s_floor.c'; fi`
+
+lib_a-sf_lrint.o: sf_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lrint.o `test -f 'sf_lrint.c' || echo '$(srcdir)/'`sf_lrint.c
+
+lib_a-sf_lrint.obj: sf_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lrint.obj `if test -f 'sf_lrint.c'; then $(CYGPATH_W) 'sf_lrint.c'; else $(CYGPATH_W) '$(srcdir)/sf_lrint.c'; fi`
+
+lib_a-sf_lround.o: sf_lround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lround.o `test -f 'sf_lround.c' || echo '$(srcdir)/'`sf_lround.c
+
+lib_a-sf_lround.obj: sf_lround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lround.obj `if test -f 'sf_lround.c'; then $(CYGPATH_W) 'sf_lround.c'; else $(CYGPATH_W) '$(srcdir)/sf_lround.c'; fi`
+
+lib_a-s_fma.o: s_fma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma.o `test -f 's_fma.c' || echo '$(srcdir)/'`s_fma.c
+
+lib_a-s_fma.obj: s_fma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma.obj `if test -f 's_fma.c'; then $(CYGPATH_W) 's_fma.c'; else $(CYGPATH_W) '$(srcdir)/s_fma.c'; fi`
+
+lib_a-s_fmax.o: s_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmax.o `test -f 's_fmax.c' || echo '$(srcdir)/'`s_fmax.c
+
+lib_a-s_fmax.obj: s_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmax.obj `if test -f 's_fmax.c'; then $(CYGPATH_W) 's_fmax.c'; else $(CYGPATH_W) '$(srcdir)/s_fmax.c'; fi`
+
+lib_a-s_fmin.o: s_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmin.o `test -f 's_fmin.c' || echo '$(srcdir)/'`s_fmin.c
+
+lib_a-s_fmin.obj: s_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmin.obj `if test -f 's_fmin.c'; then $(CYGPATH_W) 's_fmin.c'; else $(CYGPATH_W) '$(srcdir)/s_fmin.c'; fi`
+
 lib_a-sf_nan.o: sf_nan.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nan.o `test -f 'sf_nan.c' || echo '$(srcdir)/'`sf_nan.c
 
 lib_a-sf_nan.obj: sf_nan.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nan.obj `if test -f 'sf_nan.c'; then $(CYGPATH_W) 'sf_nan.c'; else $(CYGPATH_W) '$(srcdir)/sf_nan.c'; fi`
+
+lib_a-sf_remquo.o: sf_remquo.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_remquo.o `test -f 'sf_remquo.c' || echo '$(srcdir)/'`sf_remquo.c
+
+lib_a-sf_remquo.obj: sf_remquo.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_remquo.obj `if test -f 'sf_remquo.c'; then $(CYGPATH_W) 'sf_remquo.c'; else $(CYGPATH_W) '$(srcdir)/sf_remquo.c'; fi`
+
+lib_a-s_frexp.o: s_frexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_frexp.o `test -f 's_frexp.c' || echo '$(srcdir)/'`s_frexp.c
+
+lib_a-s_frexp.obj: s_frexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_frexp.obj `if test -f 's_frexp.c'; then $(CYGPATH_W) 's_frexp.c'; else $(CYGPATH_W) '$(srcdir)/s_frexp.c'; fi`
+
+lib_a-sf_round.o: sf_round.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_round.o `test -f 'sf_round.c' || echo '$(srcdir)/'`sf_round.c
+
+lib_a-sf_round.obj: sf_round.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_round.obj `if test -f 'sf_round.c'; then $(CYGPATH_W) 'sf_round.c'; else $(CYGPATH_W) '$(srcdir)/sf_round.c'; fi`
+
+lib_a-sf_scalbn.o: sf_scalbn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_scalbn.o `test -f 'sf_scalbn.c' || echo '$(srcdir)/'`sf_scalbn.c
+
+lib_a-sf_scalbn.obj: sf_scalbn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_scalbn.obj `if test -f 'sf_scalbn.c'; then $(CYGPATH_W) 'sf_scalbn.c'; else $(CYGPATH_W) '$(srcdir)/sf_scalbn.c'; fi`
+
+lib_a-sf_trunc.o: sf_trunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_trunc.o `test -f 'sf_trunc.c' || echo '$(srcdir)/'`sf_trunc.c
+
+lib_a-sf_trunc.obj: sf_trunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_trunc.obj `if test -f 'sf_trunc.c'; then $(CYGPATH_W) 'sf_trunc.c'; else $(CYGPATH_W) '$(srcdir)/sf_trunc.c'; fi`
+
+lib_a-s_ilogb.o: s_ilogb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ilogb.o `test -f 's_ilogb.c' || echo '$(srcdir)/'`s_ilogb.c
+
+lib_a-s_ilogb.obj: s_ilogb.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ilogb.obj `if test -f 's_ilogb.c'; then $(CYGPATH_W) 's_ilogb.c'; else $(CYGPATH_W) '$(srcdir)/s_ilogb.c'; fi`
+
+lib_a-s_ldexp.o: s_ldexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ldexp.o `test -f 's_ldexp.c' || echo '$(srcdir)/'`s_ldexp.c
+
+lib_a-s_ldexp.obj: s_ldexp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ldexp.obj `if test -f 's_ldexp.c'; then $(CYGPATH_W) 's_ldexp.c'; else $(CYGPATH_W) '$(srcdir)/s_ldexp.c'; fi`
+
+lib_a-s_lrint.o: s_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lrint.o `test -f 's_lrint.c' || echo '$(srcdir)/'`s_lrint.c
+
+lib_a-s_lrint.obj: s_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lrint.obj `if test -f 's_lrint.c'; then $(CYGPATH_W) 's_lrint.c'; else $(CYGPATH_W) '$(srcdir)/s_lrint.c'; fi`
+
+lib_a-s_lround.o: s_lround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lround.o `test -f 's_lround.c' || echo '$(srcdir)/'`s_lround.c
+
+lib_a-s_lround.obj: s_lround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lround.obj `if test -f 's_lround.c'; then $(CYGPATH_W) 's_lround.c'; else $(CYGPATH_W) '$(srcdir)/s_lround.c'; fi`
+
+lib_a-s_nearbyint.o: s_nearbyint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_nearbyint.o `test -f 's_nearbyint.c' || echo '$(srcdir)/'`s_nearbyint.c
+
+lib_a-s_nearbyint.obj: s_nearbyint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_nearbyint.obj `if test -f 's_nearbyint.c'; then $(CYGPATH_W) 's_nearbyint.c'; else $(CYGPATH_W) '$(srcdir)/s_nearbyint.c'; fi`
+
+lib_a-s_remquo.o: s_remquo.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_remquo.o `test -f 's_remquo.c' || echo '$(srcdir)/'`s_remquo.c
+
+lib_a-s_remquo.obj: s_remquo.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_remquo.obj `if test -f 's_remquo.c'; then $(CYGPATH_W) 's_remquo.c'; else $(CYGPATH_W) '$(srcdir)/s_remquo.c'; fi`
+
+lib_a-s_rint.o: s_rint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_rint.o `test -f 's_rint.c' || echo '$(srcdir)/'`s_rint.c
+
+lib_a-s_rint.obj: s_rint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_rint.obj `if test -f 's_rint.c'; then $(CYGPATH_W) 's_rint.c'; else $(CYGPATH_W) '$(srcdir)/s_rint.c'; fi`
+
+lib_a-s_round.o: s_round.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_round.o `test -f 's_round.c' || echo '$(srcdir)/'`s_round.c
+
+lib_a-s_round.obj: s_round.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_round.obj `if test -f 's_round.c'; then $(CYGPATH_W) 's_round.c'; else $(CYGPATH_W) '$(srcdir)/s_round.c'; fi`
+
+lib_a-s_scalbn.o: s_scalbn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_scalbn.o `test -f 's_scalbn.c' || echo '$(srcdir)/'`s_scalbn.c
+
+lib_a-s_scalbn.obj: s_scalbn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_scalbn.obj `if test -f 's_scalbn.c'; then $(CYGPATH_W) 's_scalbn.c'; else $(CYGPATH_W) '$(srcdir)/s_scalbn.c'; fi`
+
+lib_a-s_trunc.o: s_trunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_trunc.o `test -f 's_trunc.c' || echo '$(srcdir)/'`s_trunc.c
+
+lib_a-s_trunc.obj: s_trunc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_trunc.obj `if test -f 's_trunc.c'; then $(CYGPATH_W) 's_trunc.c'; else $(CYGPATH_W) '$(srcdir)/s_trunc.c'; fi`
+
+lib_a-wf_exp2.o: wf_exp2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_exp2.o `test -f 'wf_exp2.c' || echo '$(srcdir)/'`wf_exp2.c
+
+lib_a-wf_exp2.obj: wf_exp2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_exp2.obj `if test -f 'wf_exp2.c'; then $(CYGPATH_W) 'wf_exp2.c'; else $(CYGPATH_W) '$(srcdir)/wf_exp2.c'; fi`
+
+lib_a-wf_exp.o: wf_exp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_exp.o `test -f 'wf_exp.c' || echo '$(srcdir)/'`wf_exp.c
+
+lib_a-wf_exp.obj: wf_exp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_exp.obj `if test -f 'wf_exp.c'; then $(CYGPATH_W) 'wf_exp.c'; else $(CYGPATH_W) '$(srcdir)/wf_exp.c'; fi`
+
+lib_a-wf_fmod.o: wf_fmod.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_fmod.o `test -f 'wf_fmod.c' || echo '$(srcdir)/'`wf_fmod.c
+
+lib_a-wf_fmod.obj: wf_fmod.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_fmod.obj `if test -f 'wf_fmod.c'; then $(CYGPATH_W) 'wf_fmod.c'; else $(CYGPATH_W) '$(srcdir)/wf_fmod.c'; fi`
+
+lib_a-wf_log10.o: wf_log10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log10.o `test -f 'wf_log10.c' || echo '$(srcdir)/'`wf_log10.c
+
+lib_a-wf_log10.obj: wf_log10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log10.obj `if test -f 'wf_log10.c'; then $(CYGPATH_W) 'wf_log10.c'; else $(CYGPATH_W) '$(srcdir)/wf_log10.c'; fi`
+
+lib_a-wf_log.o: wf_log.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log.o `test -f 'wf_log.c' || echo '$(srcdir)/'`wf_log.c
+
+lib_a-wf_log.obj: wf_log.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log.obj `if test -f 'wf_log.c'; then $(CYGPATH_W) 'wf_log.c'; else $(CYGPATH_W) '$(srcdir)/wf_log.c'; fi`
+
+lib_a-w_fmod.o: w_fmod.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_fmod.o `test -f 'w_fmod.c' || echo '$(srcdir)/'`w_fmod.c
+
+lib_a-w_fmod.obj: w_fmod.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_fmod.obj `if test -f 'w_fmod.c'; then $(CYGPATH_W) 'w_fmod.c'; else $(CYGPATH_W) '$(srcdir)/w_fmod.c'; fi`
+
+lib_a-wf_remainder.o: wf_remainder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_remainder.o `test -f 'wf_remainder.c' || echo '$(srcdir)/'`wf_remainder.c
+
+lib_a-wf_remainder.obj: wf_remainder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_remainder.obj `if test -f 'wf_remainder.c'; then $(CYGPATH_W) 'wf_remainder.c'; else $(CYGPATH_W) '$(srcdir)/wf_remainder.c'; fi`
+
+lib_a-w_remainder.o: w_remainder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_remainder.o `test -f 'w_remainder.c' || echo '$(srcdir)/'`w_remainder.c
+
+lib_a-w_remainder.obj: w_remainder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_remainder.obj `if test -f 'w_remainder.c'; then $(CYGPATH_W) 'w_remainder.c'; else $(CYGPATH_W) '$(srcdir)/w_remainder.c'; fi`
+
+lib_a-w_sqrt.o: w_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_sqrt.o `test -f 'w_sqrt.c' || echo '$(srcdir)/'`w_sqrt.c
+
+lib_a-w_sqrt.obj: w_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-w_sqrt.obj `if test -f 'w_sqrt.c'; then $(CYGPATH_W) 'w_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/w_sqrt.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
