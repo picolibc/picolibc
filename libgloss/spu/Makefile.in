@@ -121,16 +121,16 @@ libgloss.a: $(EVALOBJS)
 	${RANLIB} $@
 
 # C Runtime Library startup code.
-crti.o:
+crti.o: $(srcdir)/crti.S
 	$(CC) $(srcdir)/crti.S -c -o crti.o 
 
-crtn.o:
+crtn.o: $(srcdir)/crtn.S
 	$(CC) $(srcdir)/crtn.S -c -o crtn.o 
 
-crt1.o:
+crt1.o: $(srcdir)/crt0.S
 	$(CC) $(srcdir)/crt0.S -c -o crt1.o
 
-crt2.o:
+crt2.o: $(srcdir)/crt0.S
 	$(CC) $(srcdir)/crt0.S -D_STD_MAIN -c -o crt2.o
 
 doc:	

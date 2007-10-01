@@ -1,3 +1,7 @@
+2007-10-01  Markus Deuling  <deuling@de.ibm.com>
+
+	* spu/Makefile.in: add dependencies for crt files.
+
 2007-10-01  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/sbrk.c: Use the current stack pointer value rather than the
