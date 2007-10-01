@@ -239,6 +239,8 @@ struct elf_segment_map
   bfd_vma p_vaddr_offset;
   /* Program segment alignment.  */
   bfd_vma p_align;
+  /* Segment size in file and memory */
+  bfd_vma p_size;
   /* Whether the p_flags field is valid; if not, the flags are based
      on the section flags.  */
   unsigned int p_flags_valid : 1;
@@ -248,6 +250,9 @@ struct elf_segment_map
   /* Whether the p_align field is valid; if not, PT_LOAD segment
      alignment is based on the default maximum page size.  */
   unsigned int p_align_valid : 1;
+  /* Whether the p_size field is valid; if not, the size are based
+     on the section sizes.  */
+  unsigned int p_size_valid : 1;
   /* Whether this segment includes the file header.  */
   unsigned int includes_filehdr : 1;
   /* Whether this segment includes the program headers.  */
@@ -266,11 +271,12 @@ struct elf_segment_map
      || segment->p_type == PT_TLS) ? sec_hdr->sh_size : 0)
 
 /* Decide if the given sec_hdr is in the given segment.  PT_TLS segment
-   contains only SHF_TLS sections.  Only PT_LOAD and PT_TLS segments
-   can contain SHF_TLS sections.  */
+   contains only SHF_TLS sections.  Only PT_LOAD, PT_GNU_RELRO and
+   and PT_TLS segments can contain SHF_TLS sections.  */
 #define ELF_IS_SECTION_IN_SEGMENT(sec_hdr, segment)			\
   (((((sec_hdr->sh_flags & SHF_TLS) != 0)				\
      && (segment->p_type == PT_TLS					\
+	 || segment->p_type == PT_GNU_RELRO				\
 	 || segment->p_type == PT_LOAD))				\
     || ((sec_hdr->sh_flags & SHF_TLS) == 0				\
 	&& segment->p_type != PT_TLS))					\
