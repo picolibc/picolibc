@@ -1,3 +1,7 @@
+2007-10-01  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
+
+	* cr16.h: Updated with new relocaction macros.
+
 2007-09-17  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR binutils/3281
