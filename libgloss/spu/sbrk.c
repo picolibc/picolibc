@@ -37,7 +37,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 extern int errno;
 
 extern caddr_t  _end;
-#define RAMSIZE 262144
 #define STACKSIZE 4096
 
 void *
@@ -47,6 +46,7 @@ sbrk (ptrdiff_t increment)
 	caddr_t base;
 	vector unsigned int sp_reg, sp_delta;
 	vector unsigned int *sp_ptr;
+	caddr_t sps;
 
 	/* The stack pointer register.  */
 	volatile register vector unsigned int sp_r1 __asm__("1");
@@ -54,7 +54,8 @@ sbrk (ptrdiff_t increment)
 	if (heap_ptr == NULL)
 	  heap_ptr = (caddr_t) & _end;
 	
-	if (((RAMSIZE - STACKSIZE) - (int) heap_ptr) >= increment)
+	sps = (caddr_t) spu_extract (sp_r1, 0);
+	if (((int) sps - STACKSIZE - (int) heap_ptr) >= increment)
 	  {
 	    base = heap_ptr;
 	    heap_ptr += increment;

@@ -1,3 +1,10 @@
+2007-10-01  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/sbrk.c: Use the current stack pointer value rather than the
+	maximum available memory to determine the amount of heap space
+	left. Without this change calling sbrk() can allocate space that
+	is currently in use on the stack.
+
 2007-09-26  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/sched_yield.c: New file (missed on 2007-09-21).
