@@ -204,15 +204,17 @@ static int LaunchScreenSaver(HWND hParent)
   else
     {
       style = WS_POPUP;
-      rc.right = GetSystemMetrics(SM_CXSCREEN);
-      rc.bottom = GetSystemMetrics(SM_CYSCREEN);
+      rc.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+      rc.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+      rc.right = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+      rc.bottom = GetSystemMetrics(SM_CYVIRTUALSCREEN);
       style |= WS_VISIBLE;
     }
 
   /* create main screen saver window */
   hMainWindow = CreateWindowEx(hParent ? 0 : WS_EX_TOPMOST, CLASS_SCRNSAVE,
                                TEXT("SCREENSAVER"), style,
-                               0, 0, rc.right, rc.bottom, hParent, NULL,
+                               rc.left, rc.top, rc.right, rc.bottom, hParent, NULL,
                                hMainInstance, NULL);
 
   /* display window and start pumping messages */

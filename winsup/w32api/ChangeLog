@@ -1,3 +1,7 @@
+2007-10-03  Frank Fesevur  <ffes@users.sourceforge.net>
+
+	* lib/scnsave.c: Multi-monitor support.
+
 2007-08-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.10.
