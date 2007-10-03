@@ -1,3 +1,7 @@
+2007-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/gdtoa/mingw_snprintf.c: fixed warning during compile.
+
 2007-10-03  Bernd Becker <hugin@users.sourceforge.net>
 
 	* include/io.h (__finddata64_t, __wfinddata64_t): changed member 'size'

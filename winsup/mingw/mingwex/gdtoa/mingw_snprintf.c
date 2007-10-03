@@ -51,9 +51,7 @@ THIS SOFTWARE.
 #include "stdlib.h"
 #endif
 
-#define VA_LIST va_list
-
-/* #include "stdio1.h" */
+#include <stdio.h>
 #include "string.h"
 #include "errno.h"
 
@@ -104,8 +102,10 @@ THIS SOFTWARE.
 #  define Snprintf   __mingw_snprintf
 #  define Vsnprintf  __mingw_vsnprintf
 
-int __cdecl snprintf()__attribute__((alias("__mingw_snprintf")));
-int __cdecl vsnprintf()__attribute__((alias("__mingw_vsnprintf")));
+int __cdecl __MINGW_NOTHROW
+snprintf(char *, size_t, const char *, ...) __attribute__((alias("__mingw_snprintf")));
+int __cdecl __MINGW_NOTHROW
+vsnprintf (char *, size_t, const char *, __VALIST) __attribute__((alias("__mingw_vsnprintf")));
 
 
 static char* __ldtoa  (long double ld, int mode, int ndig, int *decpt,
