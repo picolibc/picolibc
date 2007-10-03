@@ -1,5 +1,9 @@
-2007-10-03  Frank Fesevur  <ffes@users.sourceforge.net>
+2007-10-03  Jiri Malak  <Jiri.Malak@iol.cz>
 
+	* include/rpcndr.h: Missing NdrClientCall2 entry.
+	* lib/rpcrt4.def: Ditto.
+
+2007-10-03  Frank Fesevur  <ffes@users.sourceforge.net> 
 	* lib/scnsave.c: Multi-monitor support.
 
 2007-08-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>

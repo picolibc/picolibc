@@ -79,6 +79,7 @@ NdrCStdStubBuffer2_Release@8
 NdrCStdStubBuffer_Release@8
 NdrClearOutParameters@12
 NdrClientCall
+NdrClientCall2
 NdrClientContextMarshall@12
 NdrClientContextUnmarshall@12
 NdrClientInitialize@16
