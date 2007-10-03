@@ -59,7 +59,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -115,7 +115,7 @@ _CRTIMP wint_t __cdecl __MINGW_NOTHROW	fgetwc (FILE*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	fputwc (wchar_t, FILE*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	ungetwc (wchar_t, FILE*);
 
-#ifdef __MSVCRT__ 
+#ifdef __MSVCRT__
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW fgetws (wchar_t*, int, FILE*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	fputws (const wchar_t*, FILE*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	getwc (FILE*);
@@ -152,6 +152,7 @@ int __cdecl __MINGW_NOTHROW vswscanf (const wchar_t * __restrict__,
 
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
+
 #ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
 _CRTIMP long __cdecl __MINGW_NOTHROW 	wcstol (const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl __MINGW_NOTHROW wcstoul (const wchar_t*, wchar_t**, int);
@@ -187,7 +188,7 @@ _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW	_wctime64 (const __time64_t*);
 #endif /* __STRICT_ANSI__ */
 _CRTIMP size_t __cdecl __MINGW_NOTHROW	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
-#endif /* _WTIME_DEFINED */ 
+#endif /* _WTIME_DEFINED */
 
 
 #ifndef _WSTRING_DEFINED
@@ -288,7 +289,7 @@ int __cdecl __MINGW_NOTHROW wctob(wint_t);
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
 __CRT_INLINE int __cdecl __MINGW_NOTHROW fwide(FILE* __UNUSED_PARAM(stream),
 			       int __UNUSED_PARAM(mode))
-  {return -1;} /* limited to byte orientation */ 
+  {return -1;} /* limited to byte orientation */
 __CRT_INLINE int __cdecl __MINGW_NOTHROW mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
   {return 1;}
 wchar_t* __cdecl __MINGW_NOTHROW wmemset(wchar_t *, wchar_t, size_t);
@@ -329,14 +330,17 @@ struct _wfinddatai64_t {
 	__int64     size;
 	wchar_t     name[260];
 };
+#if __MSVCRT_VERSION__ >= 0x0601
 struct __wfinddata64_t {
         unsigned    attrib;
-        __time64_t  time_create;    
+        __time64_t  time_create;
         __time64_t  time_access;
         __time64_t  time_write;
-        _fsize_t    size;
+/* 8 bytes are returned so it can't be _fsize_t */
+        __int64    size;
         wchar_t     name[260];
 };
+#endif
 #define _WFINDDATA_T_DEFINED
 #endif
 
@@ -367,7 +371,7 @@ _CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindnext64(intptr_t, struct __wfindda
 
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
-#ifdef __MSVCRT__ 
+#ifdef __MSVCRT__
 _CRTIMP int __cdecl __MINGW_NOTHROW	  _wchdir (const wchar_t*);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW  _wgetcwd (wchar_t*, int);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW  _wgetdcwd (int, wchar_t*, int);
@@ -405,14 +409,14 @@ struct _stat
 /* NOTE: Must be the same as _stat above. */
 struct stat
 {
-	_dev_t	st_dev;		/* Equivalent to drive number 0=A 1=B ... */
-	_ino_t	st_ino;		/* Always zero ? */
-	_mode_t	st_mode;	/* See above constants */
+	dev_t	st_dev;		/* Equivalent to drive number 0=A 1=B ... */
+	ino_t	st_ino;		/* Always zero ? */
+	mode_t	st_mode;	/* See above constants */
 	short	st_nlink;	/* Number of links. */
 	short	st_uid;		/* User: Maybe significant on NT ? */
 	short	st_gid;		/* Group: Ditto */
-	_dev_t	st_rdev;	/* Seems useless (not even filled in) */
-	_off_t	st_size;	/* File size in bytes */
+	dev_t	st_rdev;	/* Seems useless (not even filled in) */
+	off_t	st_size;	/* File size in bytes */
 	time_t	st_atime;	/* Accessed date (always 00:00 hrs local
 				 * on FAT) */
 	time_t	st_mtime;	/* Modified time */
@@ -433,8 +437,9 @@ struct _stati64 {
     time_t st_atime;
     time_t st_mtime;
     time_t st_ctime;
-    };
+};
 
+#if __MSVCRT_VERSION__ >= 0x0601
 struct __stat64
 {
     _dev_t st_dev;
@@ -449,6 +454,7 @@ struct __stat64
     __time64_t st_mtime;
     __time64_t st_ctime;
 };
+#endif  /* __MSVCRT_VERSION__ */
 #endif  /* __MSVCRT__ */
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
@@ -471,6 +477,28 @@ _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _wsetlocale (int, const wchar_t*);
 #endif
 
 #endif /* not __STRICT_ANSI__ */
+
+#ifndef _WPROCESS_DEFINED  /* also declared in process.h */
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecl	(const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecle	(const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexeclp	(const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexeclpe	(const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecv	(const wchar_t*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecve	(const wchar_t*, const wchar_t* const*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecvp	(const wchar_t*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wexecvpe	(const wchar_t*, const wchar_t* const*, const wchar_t* const*);
+
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnl	(int, const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnle	(int, const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnlp	(int, const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnlpe	(int, const wchar_t*, const wchar_t*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnv	(int, const wchar_t*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnve	(int, const wchar_t*, const wchar_t* const*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnvp	(int, const wchar_t*, const wchar_t* const*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wspawnvpe	(int, const wchar_t*, const wchar_t* const*, const wchar_t* const*);
+
+#define _WPROCESS_DEFINED
+#endif
 
 #ifdef __cplusplus
 }	/* end of extern "C" */

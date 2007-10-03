@@ -22,7 +22,7 @@
  */
 struct _timeb
 {
-	long	time;
+	time_t	time;
 	short	millitm;
 	short	timezone;
 	short	dstflag;
@@ -34,20 +34,12 @@ struct _timeb
  */
 struct timeb
 {
-	long	time;
+	time_t	time;
 	short	millitm;
 	short	timezone;
 	short	dstflag;
 };
 #endif
-
-struct __timeb64
-{
-	__time64_t time;
-	short millitm;
-	short timezone;
-	short dstflag;
-};
 
 #ifdef	__cplusplus
 extern "C" {
@@ -62,6 +54,14 @@ _CRTIMP void __cdecl __MINGW_NOTHROW	ftime (struct timeb*);
 
 /* This requires newer versions of msvcrt.dll (6.10 or higher).  */ 
 #if __MSVCRT_VERSION__ >= 0x0601
+struct __timeb64
+{
+  __time64_t time;
+  short millitm;
+  short timezone;
+  short dstflag;
+};
+
 _CRTIMP void __cdecl __MINGW_NOTHROW	_ftime64 (struct __timeb64*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
 

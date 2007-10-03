@@ -1,4 +1,4 @@
-/* 
+/*
  * io.h
  * This file has no copyright assigned and is placed in the Public Domain.
  * This file is a part of the mingw-runtime package.
@@ -50,7 +50,7 @@ typedef	unsigned long	_fsize_t;
 /*
  * The maximum length of a file name. You should use GetVolumeInformation
  * instead of this constant. But hey, this works.
- * Also defined in stdio.h. 
+ * Also defined in stdio.h.
  */
 #ifndef FILENAME_MAX
 #define	FILENAME_MAX	(260)
@@ -79,14 +79,17 @@ struct _finddatai64_t {
     char        name[FILENAME_MAX];
 };
 
+#if __MSVCRT_VERSION__ >= 0x0601
 struct __finddata64_t {
         unsigned    attrib;
-        __time64_t  time_create;    
-        __time64_t  time_access;    
+        __time64_t  time_create;
+        __time64_t  time_access;
         __time64_t  time_write;
-        _fsize_t    size;
+/* 8 bytes are returned so it can't be _fsize_t */
+        __int64    size;
          char       name[FILENAME_MAX];
 };
+#endif
 
 #ifndef _WFINDDATA_T_DEFINED
 struct _wfinddata_t {
@@ -107,14 +110,17 @@ struct _wfinddatai64_t {
     wchar_t     name[FILENAME_MAX];
 };
 
+#if __MSVCRT_VERSION__ >= 0x0601
 struct __wfinddata64_t {
         unsigned    attrib;
-        __time64_t  time_create;    
+        __time64_t  time_create;
         __time64_t  time_access;
         __time64_t  time_write;
-        _fsize_t    size;
+/* 8 bytes are returned so it can't be _fsize_t */
+        __int64    size;
         wchar_t     name[FILENAME_MAX];
 };
+#endif
 
 #define _WFINDDATA_T_DEFINED
 #endif
@@ -152,10 +158,9 @@ _CRTIMP __int64 __cdecl __MINGW_NOTHROW _telli64(int);
 _CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst64(const char*, struct __finddata64_t*);
 _CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findnext64(intptr_t, struct __finddata64_t*); 
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
-
 #ifndef __NO_MINGW_LFS
 __CRT_INLINE off64_t lseek64 (int, off64_t, int);
-__CRT_INLINE off64_t lseek64 (int fd, off64_t offset, int whence) 
+__CRT_INLINE off64_t lseek64 (int fd, off64_t offset, int whence)
 {
   return _lseeki64(fd, (__int64) offset, whence);
 }

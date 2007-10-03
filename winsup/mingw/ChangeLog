@@ -1,3 +1,38 @@
+2007-10-03  Bernd Becker <hugin@users.sourceforge.net>
+
+	* include/io.h (__finddata64_t, __wfinddata64_t): changed member 'size'
+	from '_fsize_t' to '__int64' to be consistent with the other ...64
+	structures and the value set there is 8 bytes not 4.  Add guard for both
+	as the are only used by functions available from 6.1 on.
+
+	* include/malloc.h (_HEAP_MAXREQ): Define.
+	(_aligned_offset_recalloc): Define.
+	(_aligned_recalloc()): Define.
+
+	* include/math.h: fixed a typo in a comment.
+	(atanhf): Fixed declaration.
+
+	* include/wchar.h (__wfinddata64_t): changed member 'size' from '_fsize_t'
+	to '__int64' to be consistent with the other ...64 structures and the value
+	set there is 8 bytes not 4.  Added guard as this function is only used by
+	functions available from 6.1 on.
+
+	* include/sys/stat.h: some members of 'stat' were declared with types with
+	a prefixed underscore, while the ones without the underscore should have
+	been used.  Added guard to '__stat64' as it is only used by functions
+	available from 6.1 on.  Added the wide character versions of the
+	exec()/spawn() family for completion
+	(_stati64): changed the type of the 'st_mode' member from 'unsigned int' to
+	'_mode_t'
+
+	* include/sys/timeb.h (timeb, _timb): changed the type of the 'time' member
+	from 'long' to 'time_t'
+	(__timeb64): moved declaration of structure directly before the declaration
+	of the function '_ftime64()', so it is guarded as well
+
+	* include/sys/utime.h (__utimbuf64): moved declaration of structure directly
+	before the declaration of the functions using it, so it is guarded as well
+
 2007-09-24  David C. Daeschler <daveregs@rsaisp.com>
 
 	* mingwex/gdtoa/mingw_snprintf.c (x_sprintf): Correct LEN_L typo in 'l'

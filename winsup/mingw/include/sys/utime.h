@@ -41,13 +41,6 @@ struct utimbuf
 };
 #endif	/* Not _NO_OLDNAMES */
 
-struct __utimbuf64
-{
-	__time64_t actime;
-	__time64_t modtime;
-};
-
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -68,6 +61,12 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_wutime (const wchar_t*, struct _utimbuf*);
 
 /* These require newer versions of msvcrt.dll (6.10 or higher).  */ 
 #if __MSVCRT_VERSION__ >= 0x0601
+struct __utimbuf64
+{
+	__time64_t actime;
+	__time64_t modtime;
+};
+
 _CRTIMP int __cdecl __MINGW_NOTHROW	_utime64 (const char*, struct __utimbuf64*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wutime64 (const wchar_t*, struct __utimbuf64*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_futime64 (int, struct __utimbuf64*);

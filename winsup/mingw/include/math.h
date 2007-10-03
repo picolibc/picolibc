@@ -346,7 +346,7 @@ __CRT_INLINE int __cdecl __fpclassifyl (long double x){
 #define isinf(x) (fpclassify(x) == FP_INFINITE)
 
 /* 7.12.3.4 */
-/* We don't need to worry about trucation here:
+/* We don't need to worry about truncation here:
    A NaN stays a NaN. */
 
 __CRT_INLINE int __cdecl __isnan (double _x)
@@ -455,7 +455,7 @@ extern long double __cdecl asinhl (long double);
 
 /* 7.12.5.3 */
 extern double __cdecl atanh (double);
-extern float __cdecl atanf  (float);
+extern float __cdecl atanhf  (float);
 extern long double __cdecl atanhl (long double);
 
 /* Exponentials and logarithms  */

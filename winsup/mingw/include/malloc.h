@@ -43,6 +43,9 @@ typedef	struct _heapinfo
 #define _HEAPEND	(-5)
 #define _HEAPBADPTR	(-6)
 
+/* maximum size of a user request for memory */
+#define _HEAP_MAXREQ  0xFFFFFFE0
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -75,9 +78,11 @@ _CRTIMP void* __cdecl __MINGW_NOTHROW _expand (void*, size_t);
 #if __MSVCRT_VERSION__ >= 0x0700
 _CRTIMP void * __cdecl __MINGW_NOTHROW _aligned_offset_malloc(size_t, size_t, size_t);
 _CRTIMP void * __cdecl __MINGW_NOTHROW _aligned_offset_realloc(void*, size_t, size_t, size_t);
+_CRTIMP void * __cdecl __MINGW_NOTHROW _aligned_offset_recalloc(void*, size_t, size_t, size_t, size_t);
 
 _CRTIMP void * __cdecl __MINGW_NOTHROW _aligned_malloc (size_t, size_t);
 _CRTIMP void * __cdecl __MINGW_NOTHROW _aligned_realloc (void*, size_t, size_t);
+_CRTIMP void* __cdecl __MINGW_NOTHROW _aligned_recalloc(void*, size_t, size_t, size_t);
 _CRTIMP void __cdecl __MINGW_NOTHROW _aligned_free (void*);
 #endif /* __MSVCRT_VERSION__ >= 0x0700 */
 
