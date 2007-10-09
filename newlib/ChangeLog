@@ -1,3 +1,9 @@
+2007-10-09  Ben Elliston  <bje@au.ibm.com>
+
+	* libm/machine/spu/headers/acosd2.h: Include spu_intrinsics.h
+	before simdmath.h to get a definition for `vector'.
+	* libm/machine/spu/headers/asind2.h: Likewise.
+
 2007-09-28  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libm/machine/spu/headers/dom_chkd_less_than.h: New file.
