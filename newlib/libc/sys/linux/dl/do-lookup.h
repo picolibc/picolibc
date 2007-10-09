@@ -83,9 +83,10 @@ FCT (const char *undef_name, unsigned long int hash, const ElfW(Sym) *ref,
 	      (type_class & (sym->st_shndx == SHN_UNDEF)))
 	    continue;
 
-	  if (ELFW(ST_TYPE) (sym->st_info) > STT_FUNC)
-	    /* Ignore all but STT_NOTYPE, STT_OBJECT and STT_FUNC entries
-	       since these are no code/data definitions.  */
+	  if (ELFW(ST_TYPE) (sym->st_info) > STT_FUNC
+	      && ELFW(ST_TYPE) (sym->st_info) != STT_COMMON)
+	    /* Ignore all but STT_NOTYPE, STT_OBJECT, STT_COMMON and
+	       STT_FUNC entries since these are no code/data definitions.  */
 	    continue;
 
 	  if (sym != ref && strcmp (strtab + sym->st_name, undef_name))
