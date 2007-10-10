@@ -89,7 +89,7 @@ static void backslashify (const char *, char *, int);
 
 struct symlink_info
 {
-  char contents[CYG_MAX_PATH + 4];
+  char contents[SYMLINK_MAX + 1];
   char *ext_here;
   int extn;
   unsigned pflags;
@@ -106,9 +106,9 @@ struct symlink_info
   int set (char *path);
   bool parse_device (const char *);
   bool case_check (char *path);
-  int check_sysfile (const char *path, HANDLE h);
-  int check_shortcut (const char *path, HANDLE h);
-  int check_reparse_point (const char *path, HANDLE h);
+  int check_sysfile (HANDLE h);
+  int check_shortcut (HANDLE h);
+  int check_reparse_point (HANDLE h);
   int posixify (char *srcbuf);
   bool set_error (int);
 };
@@ -2874,16 +2874,17 @@ int
 symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		bool isdevice)
 {
-  HANDLE h;
   int res = -1;
-  path_conv win32_path, win32_oldpath;
-  char from[CYG_MAX_PATH + 5];
-  char cwd[CYG_MAX_PATH], *cp = NULL, c = 0;
-  char w32oldpath[CYG_MAX_PATH];
-  char reloldpath[CYG_MAX_PATH] = { 0 };
-  DWORD written;
+  size_t len;
+  path_conv win32_newpath, win32_oldpath;
+  char *buf, *cp;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  HANDLE fh;
+  FILE_BASIC_INFORMATION fbi;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -2897,192 +2898,239 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  if (strlen (oldpath) >= CYG_MAX_PATH)
+  if (strlen (oldpath) > SYMLINK_MAX)
     {
       set_errno (ENAMETOOLONG);
       goto done;
     }
 
-  win32_path.check (newpath, PC_SYM_NOFOLLOW,
-		    transparent_exe ? stat_suffixes : NULL);
-  if (use_winsym && !win32_path.exists ())
+  len = strlen (newpath);
+  /* Trailing dirsep is a no-no. */
+  if (isdirsep (newpath[len - 1]))
     {
-      strcpy (from, newpath);
-      strcat (from, ".lnk");
-      win32_path.check (from, PC_SYM_NOFOLLOW);
+      set_errno (ENOENT);
+      goto done;
+    }
+  /* We need the normalized full path below. */
+  win32_newpath.check (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
+  if (use_winsym && !win32_newpath.exists ())
+    {
+      char *newplnk = (char *) alloca (len + 5);
+      stpcpy (stpcpy (newplnk, newpath), ".lnk");
+      win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX);
     }
 
-  if (win32_path.error)
+  if (win32_newpath.error)
     {
-      set_errno (win32_path.case_clash ? ECASECLASH : win32_path.error);
+      set_errno (win32_newpath.case_clash ? ECASECLASH : win32_newpath.error);
       goto done;
     }
 
-  syscall_printf ("symlink (%s, %s)", oldpath, win32_path.get_win32 ());
+  syscall_printf ("symlink (%s, %S)", oldpath,
+  		  win32_newpath.get_nt_native_path ());
 
-  if ((!isdevice && win32_path.exists ())
-      || win32_path.is_auto_device ())
+  if ((!isdevice && win32_newpath.exists ())
+      || win32_newpath.is_auto_device ())
     {
       set_errno (EEXIST);
       goto done;
     }
 
-  DWORD create_how;
-  if (!use_winsym)
-    create_how = CREATE_NEW;
-  else if (isdevice)
+  if (use_winsym)
     {
-      strcpy (w32oldpath, oldpath);
-      create_how = CREATE_ALWAYS;
-      SetFileAttributes (win32_path.get_win32 (), FILE_ATTRIBUTE_NORMAL);
-    }
-  else
-    {
-      if (!isabspath (oldpath))
-	{
-	  getcwd (cwd, CYG_MAX_PATH);
-	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
-	    {
-	      c = *cp;
-	      *cp = '\0';
-	      chdir (from);
-	    }
-	  backslashify (oldpath, reloldpath, 0);
-	  /* Creating an ITEMIDLIST requires an absolute path.  So if we
-	     create a shortcut file, we create relative and absolute Win32
-	     paths, the first for the relpath field and the latter for the
-	     ITEMIDLIST field. */
-	  if (GetFileAttributes (reloldpath) == INVALID_FILE_ATTRIBUTES)
-	    {
-	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
-				   transparent_exe ? stat_suffixes : NULL);
-	      if (win32_oldpath.error != ENOENT)
-		strcpy (use_winsym ? reloldpath : w32oldpath,
-			win32_oldpath.get_win32 ());
-	    }
-	  else if (!use_winsym)
-	    strcpy (w32oldpath, reloldpath);
-	  if (use_winsym)
-	    {
-	      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
-				   transparent_exe ? stat_suffixes : NULL);
-	      strcpy (w32oldpath, win32_oldpath.get_win32 ());
-	    }
-	  if (cp)
-	    {
-	      *cp = c;
-	      chdir (cwd);
-	    }
-	}
-      else
-	{
-	  win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW,
-			       transparent_exe ? stat_suffixes : NULL);
-	  strcpy (w32oldpath, win32_oldpath.get_win32 ());
-	}
-      create_how = CREATE_NEW;
-    }
+      ITEMIDLIST *pidl = NULL;
+      size_t full_len = 0;
+      unsigned short oldpath_len, desc_len, relpath_len, pidl_len = 0;
+      char desc[MAX_PATH + 1], *relpath;
 
-  if (allow_ntsec && win32_path.has_acls ())
-    set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
-			    &sa, sd);
-
-  h = CreateFile (win32_path.get_win32 (), GENERIC_WRITE, 0, &sa, create_how,
-		  FILE_ATTRIBUTE_NORMAL, 0);
-  if (h == INVALID_HANDLE_VALUE)
-    __seterrno ();
-  else
-    {
-      bool success = false;
-
-      if (use_winsym)
-	{
-	  /* A path of 240 chars with 120 one character directories in it
-	     can result in a 6K shortcut. */
-	  char *buf = (char *) alloca (8192);
-	  win_shortcut_hdr *shortcut_header = (win_shortcut_hdr *) buf;
-	  HRESULT hres;
+      if (!isdevice)
+        {
+	  /* First create an IDLIST to learn how big our shortcut is
+	     going to be. */
 	  IShellFolder *psl;
-	  WCHAR wc_path[CYG_MAX_PATH];
-	  ITEMIDLIST *pidl = NULL, *p;
-	  unsigned short len;
-
-	  memset (shortcut_header, 0, sizeof *shortcut_header);
-	  shortcut_header->size = sizeof *shortcut_header;
-	  shortcut_header->magic = GUID_shortcut;
-	  shortcut_header->flags = (WSH_FLAG_DESC | WSH_FLAG_RELPATH);
-	  shortcut_header->run = SW_NORMAL;
-	  cp = buf + sizeof (win_shortcut_hdr);
-	  /* Creating an IDLIST */
-	  hres = SHGetDesktopFolder (&psl);
-	  if (SUCCEEDED (hres))
+	  
+	  /* The symlink target is relative to the directory in which
+	     the symlink gets created, not relative to the cwd.  Therefore
+	     we have to mangle the path quite a bit before calling path_conv. */
+	  if (!isabspath (oldpath))
 	    {
-	      MultiByteToWideChar (CP_ACP, 0, w32oldpath, -1, wc_path,
-				   CYG_MAX_PATH);
-	      hres = psl->ParseDisplayName (NULL, NULL, wc_path, NULL,
-					    &pidl, NULL);
-	      if (SUCCEEDED (hres))
+	      len = strrchr (win32_newpath.normalized_path, '/')
+		    - win32_newpath.normalized_path + 1;
+	      char *absoldpath = (char *) alloca (len + strlen (oldpath) + 1);
+	      stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path, len),
+		      oldpath);
+	      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+	    }
+	  else
+	    win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+	  if (SUCCEEDED (SHGetDesktopFolder (&psl)))
+	    {
+	      WCHAR wc_path[win32_oldpath.get_wide_win32_path_len () + 1];
+	      win32_oldpath.get_wide_win32_path (wc_path);
+	      /* Amazing but true:  Even though the ParseDisplayName method
+		 takes a wide char path name, it does not understand the
+		 Win32 prefix for long pathnames!  So we have to tack off
+		 the prefix and convert tyhe path to the "normal" syntax
+		 for ParseDisplayName.  I have no idea if it's able to take
+		 long path names at all since I can't test it right now. */
+	      WCHAR *wc = wc_path + 4;
+	      if (!wcscmp (wc, L"UNC\\"))
+		*(wc += 2) = L'\\';
+	      HRESULT res;
+	      if (SUCCEEDED (res = psl->ParseDisplayName (NULL, NULL, wc, NULL,
+						    &pidl, NULL)))
 		{
-		  shortcut_header->flags |= WSH_FLAG_IDLIST;
+		  ITEMIDLIST *p;
+
 		  for (p = pidl; p->mkid.cb > 0;
 		       p = (ITEMIDLIST *)((char *) p + p->mkid.cb))
 		    ;
-		  len = (char *) p - (char *) pidl + 2;
-		  *(unsigned short *)cp = len;
-		  memcpy (cp += 2, pidl, len);
-		  cp += len;
-		  CoTaskMemFree (pidl);
+		  pidl_len = (char *) p - (char *) pidl + 2;
 		}
 	      psl->Release ();
 	    }
-	  /* Creating a description */
-	  *(unsigned short *)cp = len = strlen (oldpath);
-	  memcpy (cp += 2, oldpath, len);
-	  cp += len;
-	  /* Creating a relpath */
-	  if (reloldpath[0])
-	    {
-	      *(unsigned short *)cp = len = strlen (reloldpath);
-	      memcpy (cp += 2, reloldpath, len);
-	    }
-	  else
-	    {
-	      *(unsigned short *)cp = len = strlen (w32oldpath);
-	      memcpy (cp += 2, w32oldpath, len);
-	    }
-	  cp += len;
-	  success = WriteFile (h, buf, cp - buf, &written, NULL)
-		    && written == (DWORD) (cp - buf);
+	}
+      /* Compute size of shortcut file. */
+      full_len = sizeof (win_shortcut_hdr);
+      if (pidl_len)
+	full_len += sizeof (unsigned short) + pidl_len;
+      oldpath_len = strlen (oldpath);
+      /* Unfortunately the length of the description is restricted to a
+	 length of MAX_PATH up to NT4, and to a length of 2000 bytes
+	 since W2K.  We don't want to add considerations for the different
+	 lengths and even 2000 bytes is not enough for long path names.
+	 So what we do here is to set the description to the POSIX path
+	 only if the path is not longer than MAX_PATH characters.  We
+	 append the full path name after the regular shortcut data
+	 (see below), which works fine with Windows Explorer as well
+	 as older Cygwin versions (as long as the whole file isn't bigger
+	 than 8K).  The description field is only used for backward
+	 compatibility to older Cygwin versions and those versions are
+	 not capable of handling long path names anyway. */
+      desc_len = stpcpy (desc, oldpath_len > MAX_PATH
+			       ? "[path too long]" : oldpath) - desc;
+      full_len += sizeof (unsigned short) + desc_len;
+      /* Devices get the oldpath string unchanged as relative path. */
+      if (isdevice)
+	{
+	  relpath_len = oldpath_len;
+	  stpcpy (relpath = (char *) alloca (relpath_len + 1), oldpath);
 	}
       else
 	{
-	  /* This is the old technique creating a symlink. */
-	  char buf[sizeof (SYMLINK_COOKIE) + CYG_MAX_PATH + 10];
-
-	  __small_sprintf (buf, "%s%s", SYMLINK_COOKIE, oldpath);
-	  DWORD len = strlen (buf) + 1;
-
-	  /* Note that the terminating nul is written.  */
-	  success = WriteFile (h, buf, len, &written, NULL)
-		    || written != len;
-
+	  relpath_len = strlen (win32_oldpath.get_win32 ());
+	  stpcpy (relpath = (char *) alloca (relpath_len + 1),
+		  win32_oldpath.get_win32 ());
 	}
-      if (success)
-	{
-	  CloseHandle (h);
-	  DWORD attr = use_winsym ? FILE_ATTRIBUTE_READONLY
-				  : FILE_ATTRIBUTE_SYSTEM;
-	  SetFileAttributes (win32_path.get_win32 (), attr);
+      full_len += sizeof (unsigned short) + relpath_len;
+      full_len += sizeof (unsigned short) + oldpath_len;
+      /* 1 byte more for trailing 0 written by stpcpy. */
+      buf = (char *) alloca (full_len + 1);
 
-	  res = 0;
-	}
-      else
+      /* Create shortcut header */
+      win_shortcut_hdr *shortcut_header = (win_shortcut_hdr *) buf;
+      memset (shortcut_header, 0, sizeof *shortcut_header);
+      shortcut_header->size = sizeof *shortcut_header;
+      shortcut_header->magic = GUID_shortcut;
+      shortcut_header->flags = (WSH_FLAG_DESC | WSH_FLAG_RELPATH);
+      if (pidl)
+	shortcut_header->flags |= WSH_FLAG_IDLIST;
+      shortcut_header->run = SW_NORMAL;
+      cp = buf + sizeof (win_shortcut_hdr);
+
+      /* Create IDLIST */
+      if (pidl)
 	{
-	  __seterrno ();
-	  CloseHandle (h);
-	  DeleteFileA (win32_path.get_win32 ());
+	  *(unsigned short *)cp = pidl_len;
+	  memcpy (cp += 2, pidl, pidl_len);
+	  cp += pidl_len;
+	  CoTaskMemFree (pidl);
+	}
+
+      /* Create description */
+      *(unsigned short *)cp = desc_len;
+      cp = stpcpy (cp += 2, desc);
+
+      /* Create relpath */
+      *(unsigned short *)cp = relpath_len;
+      cp = stpcpy (cp += 2, relpath);
+
+      /* Append the POSIX path after the regular shortcut data for
+	 the long path support. */
+      *(unsigned short *)cp = oldpath_len;
+      cp = stpcpy (cp += 2, oldpath);
+    }
+  else
+    {
+      /* This is the old technique creating a symlink. */
+      unsigned short oldpath_len = strlen (oldpath);
+      buf = (char *) alloca (sizeof (SYMLINK_COOKIE) + oldpath_len + 1);
+      /* Note that the terminating nul is written.  */
+      cp = stpcpy (stpcpy (buf, SYMLINK_COOKIE), oldpath) + 1;
+    }
+  
+  if (isdevice && win32_newpath.exists ())
+    {
+      status = NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
+			   win32_newpath.get_object_attr (attr, sa),
+			   &io, 0, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto done;
+	}
+      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
+      = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+      fbi.FileAttributes = FILE_ATTRIBUTE_NORMAL;
+      status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
+				     FileBasicInformation);
+      NtClose (fh);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status  (status);
+	  goto done;
 	}
     }
+  if (allow_ntsec && win32_newpath.has_acls ())
+    set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
+			    &sa, sd);
+  status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
+			 win32_newpath.get_object_attr (attr, sa),
+			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
+			 FILE_SHARE_VALID_FLAGS,
+			 isdevice ? FILE_OVERWRITE_IF : FILE_CREATE,
+			 FILE_SYNCHRONOUS_IO_NONALERT
+			 | FILE_NON_DIRECTORY_FILE
+			 | FILE_OPEN_FOR_BACKUP_INTENT,
+			 NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      goto done;
+    }
+  status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
+  if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
+    {
+      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
+      = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+      fbi.FileAttributes = use_winsym ? FILE_ATTRIBUTE_READONLY
+				      : FILE_ATTRIBUTE_SYSTEM;
+      status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
+				     FileBasicInformation);
+      if (!NT_SUCCESS (status))
+        debug_printf ("Setting attributes failed, status = %p", status);
+      res = 0;
+    }
+  else
+    {
+      __seterrno_from_nt_status (status);
+      FILE_DISPOSITION_INFORMATION fdi = { TRUE };
+      status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
+				     FileDispositionInformation);
+      if (!NT_SUCCESS (status))
+        debug_printf ("Setting delete dispostion failed, status = %p", status);
+    }
+  NtClose (fh);
 
 done:
   syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, oldpath,
@@ -3104,80 +3152,98 @@ cmp_shortcut_header (win_shortcut_hdr *file_header)
 }
 
 int
-symlink_info::check_shortcut (const char *path, HANDLE h)
+symlink_info::check_shortcut (HANDLE h)
 {
   win_shortcut_hdr *file_header;
   char *buf, *cp;
   unsigned short len;
   int res = 0;
-  DWORD size, got = 0;
+  DWORD size;
+  IO_STATUS_BLOCK io;
 
-  if ((size = GetFileSize (h, NULL)) > 8192) /* Not a Cygwin symlink. */
-    goto file_not_symlink;
+  size = GetFileSize (h, NULL);
   buf = (char *) alloca (size + 1);
-  if (!ReadFile (h, buf, size, &got, 0))
+  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL,
+			       &io, buf, size, NULL, NULL)))
     {
       set_error (EIO);
       goto close_it;
     }
   file_header = (win_shortcut_hdr *) buf;
-  if (got != size || !cmp_shortcut_header (file_header))
+  if (io.Information != size || !cmp_shortcut_header (file_header))
     goto file_not_symlink;
   cp = buf + sizeof (win_shortcut_hdr);
   if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
     cp += *(unsigned short *) cp + 2;
-  if ((len = *(unsigned short *) cp) == 0 || len >= CYG_MAX_PATH)
+  if (!(len = *(unsigned short *) cp))
     goto file_not_symlink;
   cp += 2;
-  cp[len] = '\0';
   /* Check if this is a device file - these start with the sequence :\\ */
   if (strncmp (cp, ":\\", 2) == 0)
-    res = strlen (strcpy (contents, cp)); /* Don't try to mess with device files */
+    res = strlen (strcpy (contents, cp)); /* Don't mess with device files */
   else
-    res = posixify (cp);
+    {
+      /* Has appended full path?  If so, use it instead of description. */
+      unsigned short relpath_len = *(unsigned short *) (cp + len);
+      if (cp + len + 2 + relpath_len < buf + size)
+	{
+	  cp += len + 2 + relpath_len;
+	  len = *(unsigned short *) cp;
+	  cp += 2;
+	}
+      if (len > SYMLINK_MAX)
+	goto file_not_symlink;
+      cp[len] = '\0';
+      res = posixify (cp);
+    }
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
   goto close_it;
 
 file_not_symlink:
   /* Not a symlink, see if executable.  */
-  if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, got))
+  if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, io.Information))
     pflags |= PATH_EXEC;
 
 close_it:
-  CloseHandle (h);
   return res;
 }
 
 int
-symlink_info::check_sysfile (const char *path, HANDLE h)
+symlink_info::check_sysfile (HANDLE h)
 {
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
-  char srcbuf[CYG_MAX_PATH];
-  DWORD got;
+  char srcbuf[SYMLINK_MAX + 2];
+  IO_STATUS_BLOCK io;
   int res = 0;
 
-  if (!ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
+  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io,
+			       cookie_buf, sizeof (cookie_buf), NULL, NULL)))
     {
       debug_printf ("ReadFile1 failed");
       set_error (EIO);
     }
-  else if (got == sizeof (cookie_buf)
+  else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
     {
       /* It's a symlink.  */
       pflags = PATH_SYMLINK;
 
-      res = ReadFile (h, srcbuf, CYG_MAX_PATH, &got, 0);
-      if (!res)
+      if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io,
+				   srcbuf, SYMLINK_MAX + 2, NULL, NULL)))
 	{
 	  debug_printf ("ReadFile2 failed");
+	  set_error (EIO);
+	}
+      else if (io.Information > SYMLINK_MAX + 1)
+        {
+	  debug_printf ("symlink string too long");
 	  set_error (EIO);
 	}
       else
 	res = posixify (srcbuf);
     }
-  else if (got == sizeof (cookie_buf)
+  else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
     pflags |= PATH_SOCKET;
   else
@@ -3185,44 +3251,32 @@ symlink_info::check_sysfile (const char *path, HANDLE h)
       /* Not a symlink, see if executable.  */
       if (pflags & PATH_ALL_EXEC)
 	/* Nothing to do */;
-      else if (has_exec_chars (cookie_buf, got))
+      else if (has_exec_chars (cookie_buf, io.Information))
 	pflags |= PATH_EXEC;
       else
 	pflags |= PATH_NOTEXEC;
       }
-  syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
-		  res, path, contents, pflags);
-
-  CloseHandle (h);
   return res;
 }
 
 int
-symlink_info::check_reparse_point (const char *path, HANDLE h)
+symlink_info::check_reparse_point (HANDLE h)
 {
-  int res = 0;
   PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
 			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
   DWORD size;
-  char srcbuf[CYG_MAX_PATH + 6];
+  char srcbuf[SYMLINK_MAX + 7];
 
   if (!DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
 			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
     {
       debug_printf ("DeviceIoControl(FSCTL_GET_REPARSE_POINT) failed, %E");
       set_error (EIO);
-      goto close_it;
+      return 0;
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
     {
-      if (rp->SymbolicLinkReparseBuffer.SubstituteNameLength
-	  > 2 * (CYG_MAX_PATH + 6))
-	{
-	  debug_printf ("Symlink name too long");
-	  set_error (EIO);
-	  goto close_it;
-	}
-      sys_wcstombs (srcbuf, CYG_MAX_PATH,
+      sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
 		    (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
 			  + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
 		    rp->SymbolicLinkReparseBuffer.SubstituteNameLength / 2);
@@ -3234,26 +3288,16 @@ symlink_info::check_reparse_point (const char *path, HANDLE h)
       if (rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
 	{
 	  /* Likely a volume mount point.  Not treated as symlink. */
-	  goto close_it;
+	  return 0;
 	}
-      if (rp->MountPointReparseBuffer.SubstituteNameLength
-	  > 2 * (CYG_MAX_PATH + 6))
-	{
-	  debug_printf ("Symlink name too long");
-	  set_error (EIO);
-	  goto close_it;
-	}
-      sys_wcstombs (srcbuf, CYG_MAX_PATH,
+      sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
 		    (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
 		    rp->MountPointReparseBuffer.SubstituteNameLength / 2);
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
-  res = posixify (srcbuf);
-close_it:
-  CloseHandle (h);
-  return res;
+  return posixify (srcbuf);
 }
 
 int
@@ -3297,7 +3341,7 @@ symlink_info::posixify (char *srcbuf)
 	slashify (srcbuf, contents, 0);
       else /* Paths starting with \ are current drive relative. */
 	{
-	  char cvtbuf[CYG_MAX_PATH + 6];
+	  char cvtbuf[SYMLINK_MAX + 1];
 
 	  strncpy (cvtbuf, cygheap->cwd.win32, 2);
 	  strcpy (cvtbuf + 2, srcbuf);
@@ -3524,6 +3568,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
     {
       FILE_BASIC_INFORMATION fbi;
       NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       error = 0;
       get_nt_native_path (suffix.path, upath);
@@ -3561,7 +3606,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      UNICODE_STRING dirname, basename;
 	      OBJECT_ATTRIBUTES dattr;
 	      HANDLE dir;
-	      IO_STATUS_BLOCK io;
 	      FILE_DIRECTORY_INFORMATION fdi;
 
 	      RtlSplitUnicodePath (&upath, &dirname, &basename);
@@ -3624,9 +3668,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  == FILE_ATTRIBUTE_DIRECTORY)
 	goto file_not_symlink;
 
-      /* Reparse points are potentially symlinks. */
-      if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
-	sym_check = 3;
+      /* Windows shortcuts are potentially treated as symlinks. */
+      /* Valid Cygwin & U/WIN shortcuts are R/O. */
+      if ((fileattr & FILE_ATTRIBUTE_READONLY) && suffix.lnk_match ())
+	sym_check = 1;
 
       /* This is the old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
@@ -3634,29 +3679,29 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       else if (fileattr & FILE_ATTRIBUTE_SYSTEM)
 	sym_check = 2;
 
-      /* Windows shortcuts are potentially treated as symlinks. */
-      /* Valid Cygwin & U/WIN shortcuts are R/O. */
-      else if ((fileattr & FILE_ATTRIBUTE_READONLY) && suffix.lnk_match ())
-	sym_check = 1;
+      /* Reparse points are potentially symlinks. */
+      else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
+	sym_check = 3;
 
       if (!sym_check)
 	goto file_not_symlink;
 
-      /* Open the file.  */
-
-      h = CreateFile (suffix.path, GENERIC_READ, FILE_SHARE_READ,
-		      &sec_none_nih, OPEN_EXISTING,
-		      sym_check == 3 ? FILE_FLAG_OPEN_REPARSE_POINT
-				       | FILE_FLAG_BACKUP_SEMANTICS
-				     : FILE_ATTRIBUTE_NORMAL, 0);
       res = -1;
-      if (h == INVALID_HANDLE_VALUE)
+
+      /* Open the file.  */
+      status = NtOpenFile (&h, FILE_GENERIC_READ, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT
+			   | (sym_check == 3 ? FILE_OPEN_REPARSE_POINT : 0));
+      if (!NT_SUCCESS (status))
 	goto file_not_symlink;
 
       switch (sym_check)
 	{
 	case 1:
-	  res = check_shortcut (suffix.path, h);
+	  res = check_shortcut (h);
+	  NtClose (h);
 	  if (!res)
 	    /* check more below */;
 	  else if (contents[0] == ':' && contents[1] == '\\' && parse_device (contents))
@@ -3671,12 +3716,14 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
 	case 2:
-	  res = check_sysfile (suffix.path, h);
+	  res = check_sysfile (h);
+	  NtClose (h);
 	  if (!res)
 	    goto file_not_symlink;
 	  break;
 	case 3:
-	  res = check_reparse_point (suffix.path, h);
+	  res = check_reparse_point (h);
+	  NtClose (h);
 	  if (!res)
 	    goto file_not_symlink;
 	  break;

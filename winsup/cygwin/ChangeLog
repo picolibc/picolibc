@@ -1,5 +1,28 @@
 2007-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (struct symlink_info): Change size of contents member to
+	be able to keep SYMLINK_MAX sized strings.
+	(symlink_worker): Rework for long path names.  When writing windows
+	shortcuts, store pathname additionally "hidden" after the actual
+	shortcut data to workaround size limitations of the description field.
+	(symlink_info::check_shortcut): Drop file name parameter.  Drop max
+	file size check.  Use NT functions.  Use appended full path if
+	available, description otherwise.  Check symlink string length for
+	not exceeding SYMLINK_MAX.  Don't close file here.
+	(symlink_info::check_sysfile): Drop file name parameter.  Use NT
+	functions.  Check symlink string length for not exceeding SYMLINK_MAX.
+	Don't close file here.
+	(symlink_info::check_reparse_point): Drop file name parameter.  Drop
+	useless length checks.  Allow SYMLINK_MAX length symlink strings.
+	Don't close file here.
+	(symlink_info::posixify): Allow SYMLINK_MAX length symlink strings.
+	(symlink_info::check): Turn around checking for symlink file attributes.
+	Use NT functions.  Close symlink file here.
+	* include/limits.h (PATH_MAX): Define as 32760.  Change comment.
+	(SYMLINK_MAX): Define as PATH_MAX - 1.
+
+2007-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::bind): Open file for deletion,
 	too.  Don't write to file and especially don't close handle if file
 	couldn't be created.  Set delete disposition if writing failed,

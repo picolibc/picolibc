@@ -318,9 +318,10 @@ details. */
 #undef NAME_MAX
 #define NAME_MAX 255
 
-/* Maximum length of a path */
+/* Maximum length of a path including trailing NUL.
+   (32767 - max. native NT path prefix) */
 #undef PATH_MAX
-#define PATH_MAX 260
+#define PATH_MAX 32760
 
 /* # of bytes in a pipe buf. This is the max # of bytes which can be
    written to a pipe in one atomic operation. */
@@ -352,7 +353,7 @@ details. */
 
 /* Maximum number of bytes in a symbolic link. */
 #undef SYMLINK_MAX
-#define SYMLINK_MAX PATH_MAX
+#define SYMLINK_MAX (PATH_MAX - 1)
 
 
 /* Runtime Increasable Values */
