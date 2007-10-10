@@ -831,7 +831,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       HANDLE fh;
       OBJECT_ATTRIBUTES attr;
       IO_STATUS_BLOCK io;
-      status = NtCreateFile (&fh, GENERIC_WRITE | SYNCHRONIZE,
+      status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
 			     pc.get_object_attr (attr, sa), &io, NULL, fattr,
 			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 			     FILE_NON_DIRECTORY_FILE
@@ -845,24 +845,31 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	  else
 	    __seterrno_from_nt_status (status);
 	}
-
-      char buf[sizeof (SOCKET_COOKIE) + 80];
-      __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port, get_socket_type () == SOCK_STREAM ? 's' : get_socket_type () == SOCK_DGRAM ? 'd' : '-');
-      af_local_set_secret (strchr (buf, '\0'));
-      DWORD blen = strlen (buf) + 1;
-      status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, blen, NULL, 0);
-      NtClose (fh);
-      if (!NT_SUCCESS (status))
-	{
-	  extern NTSTATUS unlink_nt (path_conv &pc);
-
-	  __seterrno_from_nt_status (status);
-	  unlink_nt (pc);
-	}
       else
 	{
-	  set_sun_path (un_addr->sun_path);
-	  res = 0;
+	  char buf[sizeof (SOCKET_COOKIE) + 80];
+	  __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port,
+			   get_socket_type () == SOCK_STREAM ? 's'
+			   : get_socket_type () == SOCK_DGRAM ? 'd' : '-');
+	  af_local_set_secret (strchr (buf, '\0'));
+	  DWORD blen = strlen (buf) + 1;
+	  status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, blen, NULL, 0);
+	  if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      FILE_DISPOSITION_INFORMATION fdi = { TRUE };
+	      status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
+					     FileDispositionInformation);
+	      if (!NT_SUCCESS (status))
+		debug_printf ("Setting delete dispostion failed, status = %p",
+			      status);
+	    }
+	  else
+	    {
+	      set_sun_path (un_addr->sun_path);
+	      res = 0;
+	    }
+	  NtClose (fh);
 	}
 #undef un_addr
     }
