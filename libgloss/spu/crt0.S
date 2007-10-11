@@ -138,6 +138,7 @@ _start:
 	 */
 	ila 	$3,_end
 	sf	$3,$3,$SP
+	rotqbyi	$3,$3,12
 
         /* The BE Linux ABI passes the stack size in $2, or use
          * the default if $2 == 0.

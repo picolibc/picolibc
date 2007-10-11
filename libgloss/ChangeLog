@@ -1,3 +1,8 @@
+2007-10-11  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* spu/crt0.S: Fix so element one of register one is correctly set
+	when compiled with -mstdmain and -fstack-check.
+
 2007-10-02  Markus Deuling  <deuling@de.ibm.com>
 
 	* spu/crt0.S: Initialize __ea_local_store (EA address of the LS)
