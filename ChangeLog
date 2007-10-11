@@ -1,3 +1,8 @@
+2007-10-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (GDB_SUPPORT_DIRS): Add libdecnumber.
+	* libdecnumber: New directory, imported from GCC.
+
 2007-10-08  Mike Frysinger  <vapier@gentoo.org>
 
 	* configure.ac (CFLAGS_FOR_BUILD, CXXFLAGS_FOR_BUILD,
