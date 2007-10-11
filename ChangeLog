@@ -1,5 +1,10 @@
 2007-10-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* Makefile.def (dependencies): Add all-gdb -> all-libdecnumber.
+	* Makefile.in: Regenerate.
+
+2007-10-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* src-release (GDB_SUPPORT_DIRS): Add libdecnumber.
 	* libdecnumber: New directory, imported from GCC.
 
