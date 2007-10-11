@@ -1,3 +1,7 @@
+2007-10-11  Jesper Nilsson  <jesper.nilsson@axis.com>
+
+	* callback.h (cb_is_stdin): Add prototype.
+
 2007-08-23  Joel Brobecker  <brobecker@adacore.com>
 
 	Switch the license of all .h files to GPLv3.
