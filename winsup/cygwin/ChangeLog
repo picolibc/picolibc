@@ -1,3 +1,9 @@
+2007-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (basename): Return pointer into the path argument itself.
+	Shrink buf to 4 bytes.  Use buf only for border cases.
+	(dirname): Ditto.
+
 2007-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (struct symlink_info): Change size of contents member to

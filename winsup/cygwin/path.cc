@@ -4694,15 +4694,14 @@ etc::file_changed (int n)
 extern "C" char *
 basename (char *path)
 {
-  static char buf[CYG_MAX_PATH];
-  char *c, *d, *bs = buf;
+  static char buf[4];
+  char *c, *d, *bs = path;
 
   if (!path || !*path)
     return strcpy (buf, ".");
-  strncpy (buf, path, CYG_MAX_PATH);
-  if (isalpha (buf[0]) && buf[1] == ':')
+  if (isalpha (path[0]) && path[1] == ':')
     bs += 2;
-  else if (strspn (buf, "/\\") > 1)
+  else if (strspn (path, "/\\") > 1)
     ++bs;
   c = strrchr (bs, '/');
   if ((d = strrchr (c ?: bs, '\\')) > c)
@@ -4720,9 +4719,13 @@ basename (char *path)
       if (c && (c > bs || c[1]))
 	return c + 1;
     }
-  else if (!bs[0])
-    strcpy (bs, ".");
-  return buf;
+  else if (!bs[0]) 
+    {
+      stpncpy (buf, path, bs - path);
+      stpcpy (buf + (bs - path), ".");
+      return buf;
+    }
+  return path;
 }
 
 /* No need to be reentrant or thread-safe according to SUSv3.
@@ -4732,15 +4735,14 @@ basename (char *path)
 extern "C" char *
 dirname (char *path)
 {
-  static char buf[CYG_MAX_PATH];
-  char *c, *d, *bs = buf;
+  static char buf[4];
+  char *c, *d, *bs = path;
 
   if (!path || !*path)
     return strcpy (buf, ".");
-  strncpy (buf, path, CYG_MAX_PATH);
-  if (isalpha (buf[0]) && buf[1] == ':')
+  if (isalpha (path[0]) && path[1] == ':')
     bs += 2;
-  else if (strspn (buf, "/\\") > 1)
+  else if (strspn (path, "/\\") > 1)
     ++bs;
   c = strrchr (bs, '/');
   if ((d = strrchr (c ?: bs, '\\')) > c)
@@ -4767,6 +4769,10 @@ dirname (char *path)
 	c[1] = '\0';
     }
   else
-    strcpy (bs, ".");
-  return buf;
+    {
+      stpncpy (buf, path, bs - path);
+      stpcpy (buf + (bs - path), ".");
+      return buf;
+    }
+  return path;
 }
