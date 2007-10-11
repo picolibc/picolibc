@@ -1,6 +1,6 @@
 2007-10-11  Jesper Nilsson  <jesper.nilsson@axis.com>
 
-	* callback.h (cb_is_stdin): Add prototype.
+	* callback.h (cb_is_stdin, cb_is_stdout, cb_is_stderr): Add prototypes.
 
 2007-08-23  Joel Brobecker  <brobecker@adacore.com>
 
