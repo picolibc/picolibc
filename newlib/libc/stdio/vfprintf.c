@@ -1039,9 +1039,10 @@ reswitch:	switch (ch) {
 				cp = "(null)";
 				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
+			else
 #endif /* __OPTIMIZE_SIZE__ */
 #ifdef _MB_CAPABLE
-			else if (ch == 'S' || (flags & LONGINT)) {
+			if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
 				_CONST wchar_t *wcp;
 
@@ -1101,8 +1102,9 @@ reswitch:	switch (ch) {
 				}
 				cp[size] = '\0';
 			}
+			else
 #endif /* _MB_CAPABLE */
-			else if (prec >= 0) {
+			if (prec >= 0) {
 				/*
 				 * can't use strlen; can only look for the
 				 * NUL in the first `prec' characters, and

@@ -1,3 +1,9 @@
+2007-10-13  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [__OPTIMIZE_SIZE__]:
+	Correctly nest else within conditionals.
+	Reported by Artur Lipowski.
+
 2007-10-09  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/linux/dl/do-lookup.h (FCT): Support symbols with
@@ -341,7 +347,7 @@
 	* libm/machine/spu/wf_log.c: Ditto.
 	* libm/machine/spu/wf_log10.c: Ditto.
 	* libm/machine/spu/wf_remainder.c: Ditto.
-	
+
 2007-09-21  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/sys/uio.h: New file for readv and writev use.
