@@ -3158,19 +3158,30 @@ symlink_info::check_shortcut (HANDLE h)
   char *buf, *cp;
   unsigned short len;
   int res = 0;
-  DWORD size;
+  NTSTATUS status;
   IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
 
-  size = GetFileSize (h, NULL);
-  buf = (char *) alloca (size + 1);
-  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL,
-			       &io, buf, size, NULL, NULL)))
+  status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
     {
       set_error (EIO);
-      goto close_it;
+      return 0;
+    }
+  if (fsi.EndOfFile.QuadPart <= sizeof (win_shortcut_hdr)
+      || fsi.EndOfFile.QuadPart > 4 * 65536)
+    return 0;
+  buf = (char *) alloca (fsi.EndOfFile.LowPart + 1);
+  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL,
+			       &io, buf, fsi.EndOfFile.LowPart, NULL, NULL)))
+    {
+      set_error (EIO);
+      return 0;
     }
   file_header = (win_shortcut_hdr *) buf;
-  if (io.Information != size || !cmp_shortcut_header (file_header))
+  if (io.Information != fsi.EndOfFile.LowPart
+      || !cmp_shortcut_header (file_header))
     goto file_not_symlink;
   cp = buf + sizeof (win_shortcut_hdr);
   if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
@@ -3185,7 +3196,7 @@ symlink_info::check_shortcut (HANDLE h)
     {
       /* Has appended full path?  If so, use it instead of description. */
       unsigned short relpath_len = *(unsigned short *) (cp + len);
-      if (cp + len + 2 + relpath_len < buf + size)
+      if (cp + len + 2 + relpath_len < buf + fsi.EndOfFile.LowPart)
 	{
 	  cp += len + 2 + relpath_len;
 	  len = *(unsigned short *) cp;
@@ -3198,15 +3209,13 @@ symlink_info::check_shortcut (HANDLE h)
     }
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
-  goto close_it;
+  return res;
 
 file_not_symlink:
   /* Not a symlink, see if executable.  */
   if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, io.Information))
     pflags |= PATH_EXEC;
-
-close_it:
-  return res;
+  return 0;
 }
 
 int
@@ -3214,14 +3223,17 @@ symlink_info::check_sysfile (HANDLE h)
 {
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
   char srcbuf[SYMLINK_MAX + 2];
+  NTSTATUS status;
   IO_STATUS_BLOCK io;
   int res = 0;
 
-  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io,
-			       cookie_buf, sizeof (cookie_buf), NULL, NULL)))
+  status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
+		       sizeof (cookie_buf), NULL, NULL);
+  if (!NT_SUCCESS (status))
     {
       debug_printf ("ReadFile1 failed");
-      set_error (EIO);
+      if (status != STATUS_END_OF_FILE)
+	set_error (EIO);
     }
   else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
@@ -3229,16 +3241,18 @@ symlink_info::check_sysfile (HANDLE h)
       /* It's a symlink.  */
       pflags = PATH_SYMLINK;
 
-      if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io,
-				   srcbuf, SYMLINK_MAX + 2, NULL, NULL)))
+      status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
+			   SYMLINK_MAX + 2, NULL, NULL);
+      if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("ReadFile2 failed");
-	  set_error (EIO);
+	  if (status != STATUS_END_OF_FILE)
+	    set_error (EIO);
 	}
       else if (io.Information > SYMLINK_MAX + 1)
         {
 	  debug_printf ("symlink string too long");
-	  set_error (EIO);
+	  
 	}
       else
 	res = posixify (srcbuf);
