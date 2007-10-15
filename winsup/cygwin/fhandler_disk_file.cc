@@ -698,7 +698,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 				    FSCTL_GET_NTFS_VOLUME_DATA,
 				    NULL, 0, &nvdb, sizeof nvdb);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("%p = NtFsControlFile(%S,FSCTL_GET_NTFS_VOLUME_DATA)",
+	    debug_printf ("%p = NtFsControlFile(%S, FSCTL_GET_NTFS_VOLUME_DATA)",
 			  status, pc.get_nt_native_path ());
 	  else
 	    sfs->f_blocks = nvdb.TotalClusters.QuadPart;
@@ -1030,7 +1030,7 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
-	  syscall_printf ("%p = NtFsControlFile(%S,FSCTL_SET_SPARSE)",
+	  syscall_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			  status, pc.get_nt_native_path ());
 	}
       status = NtSetInformationFile (get_handle (), &io,

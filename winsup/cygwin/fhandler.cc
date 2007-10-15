@@ -171,17 +171,16 @@ char *fhandler_base::get_proc_fd_name (char *buf)
 static int __stdcall
 is_at_eof (HANDLE h, DWORD err)
 {
-  DWORD size, upper1, curr;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi;
+  FILE_STANDARD_INFORMATION fsi;
 
-  size = GetFileSize (h, &upper1);
-  if (size != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
-    {
-      LONG upper2 = 0;
-      curr = SetFilePointer (h, 0, &upper2, FILE_CURRENT);
-      if (curr == size && upper1 == (DWORD) upper2)
-	return 1;
-    }
-
+  if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
+					  FileStandardInformation))
+      && NT_SUCCESS (NtQueryInformationFile (h, &io, &fpi, sizeof fpi,
+					     FilePositionInformation))
+      && fsi.EndOfFile.QuadPart == fpi.CurrentByteOffset.QuadPart)
+    return 1;
   SetLastError (err);
   return 0;
 }
@@ -284,22 +283,30 @@ retry:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
+static LARGE_INTEGER off_current = { QuadPart:FILE_USE_FILE_POINTER_POSITION };
+static LARGE_INTEGER off_append = { QuadPart:FILE_WRITE_TO_END_OF_FILE };
+
 int
 fhandler_base::raw_write (const void *ptr, size_t len)
 {
-  DWORD bytes_written;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
 
-  if (!WriteFile (get_output_handle (), ptr, len, &bytes_written, 0))
+  status = NtWriteFile (get_output_handle (), NULL, NULL, NULL, &io,
+			(PVOID) ptr, len,
+			(get_flags () & O_APPEND) ? &off_append : &off_current,
+			NULL);
+  if (!NT_SUCCESS (status))
     {
-      if (GetLastError () == ERROR_DISK_FULL && bytes_written > 0)
+      if (status == STATUS_DISK_FULL && io.Information > 0)
 	goto written;
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       if (get_errno () == EPIPE)
 	raise (SIGPIPE);
       return -1;
     }
 written:
-  return bytes_written;
+  return io.Information;
 }
 
 int
@@ -697,45 +704,33 @@ int
 fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi;
+  FILE_STANDARD_INFORMATION fsi;
 
-  if (get_flags () & O_APPEND)
+  if (did_lseek ())
     {
-      LONG off_high = 0;
-      DWORD ret = SetFilePointer (get_output_handle (), 0, &off_high, FILE_END);
-      if (ret == INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-	{
-	  debug_printf ("Seeking to EOF in append mode failed");
-	  __seterrno ();
-	  return -1;
-	}
-    }
-  else if (did_lseek ())
-    {
-      _off64_t actual_length, current_position;
-      DWORD size_high = 0;
-      LONG pos_high = 0;
-
       did_lseek (false); /* don't do it again */
 
-      actual_length = GetFileSize (get_output_handle (), &size_high);
-      actual_length += ((_off64_t) size_high) << 32;
-
-      current_position = SetFilePointer (get_output_handle (), 0, &pos_high,
-					 FILE_CURRENT);
-      current_position += ((_off64_t) pos_high) << 32;
-
-      if (current_position >= actual_length + (128 * 1024)
+      if (!(get_flags () & O_APPEND)
+	  && NT_SUCCESS (NtQueryInformationFile (get_output_handle (),
+						 &io, &fsi, sizeof fsi,
+						 FileStandardInformation))
+	  && NT_SUCCESS (NtQueryInformationFile (get_output_handle (),
+						 &io, &fpi, sizeof fpi,
+						 FilePositionInformation))
+	  && fpi.CurrentByteOffset.QuadPart
+	     >= fsi.EndOfFile.QuadPart + (128 * 1024)
 	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
 	{
 	  /* If the file system supports sparse files and the application
 	     is writing after a long seek beyond EOF, convert the file to
 	     a sparse file. */
-	  DWORD dw;
-	  HANDLE h = get_output_handle ();
-	  BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
-				    0, &dw, NULL);
-	  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-			  r, h);
+	  NTSTATUS status;
+	  status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
+				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	  syscall_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+			  status, pc.get_nt_native_path ());
 	}
     }
 
@@ -912,7 +907,10 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
 _off64_t
 fhandler_base::lseek (_off64_t offset, int whence)
 {
-  _off64_t res;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi;
+  FILE_STANDARD_INFORMATION fsi;
 
   /* Seeks on text files is tough, we rewind and read till we get to the
      right place.  */
@@ -924,35 +922,52 @@ fhandler_base::lseek (_off64_t offset, int whence)
       set_readahead_valid (0);
     }
 
-  debug_printf ("lseek (%s, %D, %d)", get_name (), offset, whence);
-
-  DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
-		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
-
-  LONG off_low = ((__uint64_t) offset) & UINT32_MAX;
-  LONG off_high = ((__uint64_t) offset) >> 32LL;
-
-  debug_printf ("setting file pointer to %u (high), %u (low)", off_high, off_low);
-  res = SetFilePointer (get_handle (), off_low, &off_high, win32_whence);
-  if (res == INVALID_SET_FILE_POINTER && GetLastError ())
+  switch (whence)
     {
-      __seterrno ();
-      res = -1;
+    case SEEK_SET:
+      fpi.CurrentByteOffset.QuadPart = offset;
+      break;
+    case SEEK_CUR:
+      status = NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				       FilePositionInformation);
+      if (!NT_SUCCESS (status))
+        {
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      fpi.CurrentByteOffset.QuadPart += offset;
+      break;
+    default: /* SEEK_END */
+      status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				       FileStandardInformation);
+      if (!NT_SUCCESS (status))
+        {
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      fpi.CurrentByteOffset.QuadPart = fsi.EndOfFile.QuadPart + offset;
+      break;
     }
-  else
+
+  debug_printf ("setting file pointer to %U", fpi.CurrentByteOffset.QuadPart);
+  status = NtSetInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				 FilePositionInformation);
+  if (!NT_SUCCESS (status))
     {
-      res += (_off64_t) off_high << 32;
-
-      /* When next we write(), we will check to see if *this* seek went beyond
-	 the end of the file and if so, potentially sparsify the file. */
-      did_lseek (true);
-
-      /* If this was a SEEK_CUR with offset 0, we still might have
-	 readahead that we have to take into account when calculating
-	 the actual position for the application.  */
-      if (whence == SEEK_CUR)
-	res -= ralen - raixget;
+      __seterrno_from_nt_status (status);
+      return -1;
     }
+  _off64_t res = fpi.CurrentByteOffset.QuadPart;
+
+  /* When next we write(), we will check to see if *this* seek went beyond
+     the end of the file and if so, potentially sparsify the file. */
+  did_lseek (true);
+
+  /* If this was a SEEK_CUR with offset 0, we still might have
+     readahead that we have to take into account when calculating
+     the actual position for the application.  */
+  if (whence == SEEK_CUR)
+    res -= ralen - raixget;
 
   return res;
 }

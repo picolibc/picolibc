@@ -1,4 +1,19 @@
-2007-10-12  Corinna Vinschen  <corinna@vinschen.de>
+2007-10-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (is_at_eof): Rewrite using NT functions.
+	(off_current): New static variable.
+	(off_append): Ditto.
+	(fhandler_base::raw_write): Use NtWriteFile.  Accommodate O_APPEND here.
+	(fhandler_base::write): Drop O_APPEND hack.  Use NT functions.
+	(fhandler_base::lseek): Rewrite using NT functions.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Add space in
+	debug output.
+	(fhandler_disk_file::ftruncate): Ditto.
+	* ntdll.h (STATUS_DISK_FULL): Define.
+	(FILE_USE_FILE_POINTER_POSITION): Define.
+	(FILE_WRITE_TO_END_OF_FILE): Define.
+
+2007-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (STATUS_END_OF_FILE): Define.
 	* path.cc (symlink_info::check_shortcut): Use NT function to get file
