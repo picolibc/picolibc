@@ -1,5 +1,11 @@
 2007-10-17  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libm/mathfp/s_logarithm.c: Fix case where input is 0 to
+	return -inf.
+	* libm/mathfp/sf_logarithm.c: Ditto.
+
+2007-10-17  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/machine/i386/machine/fastmath.h: New file.
 
 2007-10-13  Eric Blake  <ebb9@byu.net>

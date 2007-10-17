@@ -104,7 +104,7 @@ _DEFUN (logarithm, (double, int),
   if (x <= 0.0)
     {
       errno = ERANGE;
-      return (z_notanum.d);
+      return (-z_infinity.d);
     }
 
   /* Get the exponent and mantissa where x = f * 2^N. */
