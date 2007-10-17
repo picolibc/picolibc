@@ -3,7 +3,7 @@
 
 #if defined(__GNUC__) && __STDC__ - 0 > 0
 
-#define __str1__(__x) #x
+#define __str1__(__x) #__x
 #define __str2__(__x) __str1__(__x)
 #define __U_L_PREFIX__ __str2__(__USER_LABEL_PREFIX__)
 
