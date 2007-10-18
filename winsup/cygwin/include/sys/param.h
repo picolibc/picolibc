@@ -1,6 +1,6 @@
 /* sys/param.h
 
-   Copyright 2001, 2003 Red Hat, Inc.
+   Copyright 2001, 2003, 2007 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -29,9 +29,8 @@
 /* FIXME: is this the appropriate value? */
 #define MAXHOSTNAMELEN	64
 
-/* This is defined to be the same as MAX_PATH which is used internally.
-   The Posix version is PATH_MAX.  */
-#define MAXPATHLEN      (260 - 1 /*NUL*/)
+/* The Posix version is PATH_MAX.  MAXPATHLEN is the BSD variant. */
+#define MAXPATHLEN      PATH_MAX
 
 /* This is the number of bytes per block given in the st_blocks stat member.
    It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the
