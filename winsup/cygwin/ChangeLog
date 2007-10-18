@@ -1,5 +1,10 @@
 2007-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Open native symlinks with
+	FILE_OPEN_REPARSE_POINT flag.  Fix typo in comment.
+
+2007-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/param.h (MAXPATHLEN): Define as PATH_MAX.
 
 2007-10-14  Corinna Vinschen  <corinna@vinschen.de>

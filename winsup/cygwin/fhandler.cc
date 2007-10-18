@@ -542,39 +542,47 @@ fhandler_base::open (int flags, mode_t mode)
   if ((flags & O_EXCL) && (flags & O_CREAT))
     create_disposition = FILE_CREATE;
 
-  if (flags & O_CREAT && get_device () == FH_FS)
+  if (get_device () == FH_FS)
     {
-      file_attributes = FILE_ATTRIBUTE_NORMAL;
-      /* If mode has no write bits set, we set the R/O attribute. */
-      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-	file_attributes |= FILE_ATTRIBUTE_READONLY;
-      /* Starting with Windows 2000, when trying to overwrite an already
-	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
-	 attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
-	 Per MSDN you have to create the file with the same attributes as
-	 already specified for the file. */
-      if (has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
-	file_attributes |= pc.file_attributes ();
+      /* Add the reparse point flag to native symlinks, otherwise we open the
+	 target, not the symlink.  This would break lstat. */
+      if (pc.is_rep_symlink ())
+	create_options |= FILE_OPEN_REPARSE_POINT;
 
-      /* If the file should actually be created and ntsec is on,
-	 set files attributes. */
-      /* TODO: Don't remove the call to has_acls() unless there's a
-	 solution for the security descriptor problem on remote samba
-	 drives.  The local user SID is used in set_security_attribute,
-	 but the actual owner on the Samba share is the SID of the Unix
-	 account.  There's no transparent mapping between these accounts.
-	 And Samba has a strange behaviour when creating a file.  Apparently
-	 it *first*( creates the file, *then* it looks if the security
-	 descriptor matches.  The result is that the file gets created, but
-	 then NtCreateFile doesn't return a handle to the file and fails
-	 with STATUS_ACCESS_DENIED.  Go figure! */
-      if (allow_ntsec && has_acls ())
+      if (flags & O_CREAT)
 	{
-	  set_security_attribute (mode, &sa, sd);
-	  attr.SecurityDescriptor = sa.lpSecurityDescriptor;
+	  file_attributes = FILE_ATTRIBUTE_NORMAL;
+	  /* If mode has no write bits set, we set the R/O attribute. */
+	  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+	    file_attributes |= FILE_ATTRIBUTE_READONLY;
+	  /* Starting with Windows 2000, when trying to overwrite an already
+	     existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
+	     attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
+	     Per MSDN you have to create the file with the same attributes as
+	     already specified for the file. */
+	  if (has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
+	    file_attributes |= pc.file_attributes ();
+
+	  /* If the file should actually be created and ntsec is on,
+	     set files attributes. */
+	  /* TODO: Don't remove the call to has_acls() unless there's a
+	     solution for the security descriptor problem on remote samba
+	     drives.  The local user SID is used in set_security_attribute,
+	     but the actual owner on the Samba share is the SID of the Unix
+	     account.  There's no transparent mapping between these accounts.
+	     And Samba has a strange behaviour when creating a file.  Apparently
+	     it *first* creates the file, *then* it looks if the security
+	     descriptor matches.  The result is that the file gets created, but
+	     then NtCreateFile doesn't return a handle to the file and fails
+	     with STATUS_ACCESS_DENIED.  Go figure! */
+	  if (allow_ntsec && has_acls ())
+	    {
+	      set_security_attribute (mode, &sa, sd);
+	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
+	    }
+	  /* The file attributes are needed for later use in, e.g. fchmod. */
+	  pc.file_attributes (file_attributes);
 	}
-      /* The file attributes are needed for later use in, e.g. fchmod. */
-      pc.file_attributes (file_attributes);
     }
 
   status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,
