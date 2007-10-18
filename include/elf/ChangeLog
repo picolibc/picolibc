@@ -1,3 +1,7 @@
+2007-10-18  Roland McGrath  <roland@redhat.com>
+
+	* common.h (NT_PPC_VMX): New macro.
+
 2007-10-01  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
 
 	* cr16.h: Updated with new relocaction macros.
