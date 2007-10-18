@@ -38,11 +38,23 @@ _DEFUN (logarithmf, (float, int),
   int N;
   float f, w, z;
 
-  /* Check for domain error here. */
-  if (x <= 0.0)
+  /* Check for domain/range errors here. */
+  if (x == 0.0)
     {
       errno = ERANGE;
       return (-z_infinity_f.f);
+    }
+  else if (x < 0.0)
+    {
+      errno = EDOM;
+      return (z_notanum_f.f);
+    }
+  else if (!isfinitef(x))
+    {
+      if (isnanf(x)) 
+        return (z_notanum_f.f);
+      else
+        return (z_infinity_f.f);
     }
 
   /* Get the exponent and mantissa where x = f * 2^N. */

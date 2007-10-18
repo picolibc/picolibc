@@ -1,5 +1,18 @@
 2007-10-17  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libm/mathfp/s_logarithm.c: Fix error introduced by previous
+	fix when handling negative input values.  Make function
+	consistent with math directory and glibc version such that
+	inf and nan values return inf and nan respectively with no
+	errno setting.
+	* libm/mathfp/sf_logarithm.c: Ditto.
+	* libm/math/w_log.c: Set errno to ERANGE when input is 0.0.
+	* libm/math/wf_log.c: Ditto.
+	* libm/math/w_log10.c: Ditto.
+	* libm/math/wf_log10.c: Ditto.
+
+2007-10-17  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libm/mathfp/s_logarithm.c: Fix case where input is 0 to
 	return -inf.
 	* libm/mathfp/sf_logarithm.c: Ditto.

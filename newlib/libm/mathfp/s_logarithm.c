@@ -100,11 +100,23 @@ _DEFUN (logarithm, (double, int),
   int N;
   double f, w, z;
 
-  /* Check for domain error here. */
-  if (x <= 0.0)
+  /* Check for range and domain errors here. */
+  if (x == 0.0)
     {
       errno = ERANGE;
       return (-z_infinity.d);
+    }
+  else if (x < 0.0)
+    {
+      errno = EDOM;
+      return (z_notanum.d);
+    }
+  else if (!isfinite(x))
+    {
+      if (isnan(x))
+        return (z_notanum.d);
+      else
+        return (z_infinity.d);
     }
 
   /* Get the exponent and mantissa where x = f * 2^N. */
