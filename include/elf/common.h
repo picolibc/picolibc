@@ -390,6 +390,8 @@
 #define NT_AUXV		6		/* Contains copy of Elfxx_auxv_t */
 #define NT_PRXFPREG	0x46e62b7f	/* Contains a user_xfpregs_struct; */
 					/*   note name must be "LINUX".  */
+#define NT_PPC_VMX	0x100		/* PowerPC Altivec/VMX registers */
+					/*   note name must be "LINUX".  */
 
 /* Note segments for core files on dir-style procfs systems.  */
 
