@@ -49,13 +49,13 @@ class __DIR_mounts
   __ino64_t eval_ino (int idx)
     {
       __ino64_t ino = 0;
-      char fname[parent_dir_len + mounts[idx].Length / sizeof (WCHAR) + 2];
+      char fname[parent_dir_len + mounts[idx].Length + 2];
       struct __stat64 st;
 
       char *c = stpcpy (fname, parent_dir);
       if (c[- 1] != '/')
 	*c++ = '/';
-      sys_wcstombs (c, mounts[idx].Length / sizeof (WCHAR) + 1,
+      sys_wcstombs (c, mounts[idx].Length + 1,
 		    mounts[idx].Buffer, mounts[idx].Length / sizeof (WCHAR));
       path_conv pc (fname, PC_SYM_NOFOLLOW | PC_POSIX);
       if (!stat_worker (pc, &st))

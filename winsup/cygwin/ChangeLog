@@ -1,3 +1,8 @@
+2007-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (__DIR_mounts::eval_ino): Make fname big enough
+	to allow multibyte chars.
+
 2007-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Open native symlinks with
