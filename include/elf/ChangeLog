@@ -1,3 +1,7 @@
+2007-10-19  Nick Clifton  <nickc@redhat.com>
+
+	* mn10300.h: Add R_MN10300_SYM_DIFF reloc.
+
 2007-10-18  Roland McGrath  <roland@redhat.com>
 
 	* common.h (NT_PPC_VMX): New macro.
