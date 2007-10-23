@@ -222,23 +222,19 @@ class muto;
 struct cwdstuff
 {
   char *posix;
-  char *win32;
-  DWORD hash;
+  UNICODE_STRING win32;
   DWORD drive_length;
   static muto cwd_lock;
   char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
-  DWORD get_hash ();
   DWORD get_drive (char * dst)
   {
-    get_initial ();
-    memcpy (dst, win32, drive_length);
+    cwd_lock.acquire ();
+    DWORD ret = sys_wcstombs (dst, PATH_MAX, win32.Buffer, drive_length);
     cwd_lock.release ();
-    return drive_length;
+    return ret;
   }
   void init ();
-  void fixup_after_exec (char *, char *, DWORD);
-  bool get_initial ();
-  int set (const char *, const char *, bool);
+  int set (PUNICODE_STRING, const char *, bool);
 };
 
 #ifdef DEBUGGING

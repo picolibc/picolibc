@@ -527,6 +527,14 @@ typedef struct _PEB
   ULONG SessionId;
 } PEB, *PPEB;
 
+/* Simplifed definition, just to get the PEB pointer. */
+typedef struct _TEB
+{
+  PVOID dummy[12];
+  PPEB                    Peb;
+  /* A lot more follows... */
+} TEB, *PTEB;
+
 typedef struct _PROCESS_BASIC_INFORMATION
 {
   NTSTATUS ExitStatus;

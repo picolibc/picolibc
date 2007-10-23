@@ -32,7 +32,10 @@ sys_wcstombs (char *tgt, int tlen, const WCHAR *src, int slen)
 
   ret = WideCharToMultiByte (get_cp (), 0, src, slen, tgt, tlen, NULL, NULL);
   if (ret)
-    tgt[ret < tlen ? ret : tlen - 1] = '\0';
+    {
+      ret = (ret < tlen) ? ret : tlen - 1;
+      tgt[ret] = '\0';
+    }
   return ret;
 }
 
