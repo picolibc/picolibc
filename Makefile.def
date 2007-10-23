@@ -316,16 +316,16 @@ dependencies = { module=all-gnattools; on=all-target-libada; };
 dependencies = { module=configure-mpfr; on=all-gmp; };
 
 // Host modules specific to gdb.
-dependencies = { module=configure-gdb; on=configure-intl; };
+dependencies = { module=configure-gdb; on=all-intl; };
 dependencies = { module=configure-gdb; on=configure-sim; };
 dependencies = { module=configure-gdb; on=all-bfd; };
-dependencies = { module=all-gdb; on=all-intl; };
 dependencies = { module=all-gdb; on=all-libiberty; };
 dependencies = { module=all-gdb; on=all-opcodes; };
 dependencies = { module=all-gdb; on=all-readline; };
 dependencies = { module=all-gdb; on=all-build-bison; };
 dependencies = { module=all-gdb; on=all-build-byacc; };
 dependencies = { module=all-gdb; on=all-sim; };
+dependencies = { module=all-gdb; on=all-libdecnumber; };
 
 dependencies = { module=configure-libgui; on=configure-tcl; };
 dependencies = { module=configure-libgui; on=configure-tk; };
@@ -486,6 +486,7 @@ dependencies = { module=configure-target-libobjc; on=configure-target-boehm-gc; 
 dependencies = { module=all-target-libobjc; on=all-target-libiberty; };
 dependencies = { module=all-target-libobjc; on=all-target-boehm-gc; };
 dependencies = { module=all-target-libstdc++-v3; on=all-target-libiberty; };
+dependencies = { module=configure-target-libstdc++-v3; on=configure-target-libgomp; };
 
 // Target modules in the 'src' repository.
 lang_env_dependencies = { module=examples; };
@@ -494,7 +495,7 @@ lang_env_dependencies = { module=rda; };
 lang_env_dependencies = { module=winsup; };
 lang_env_dependencies = { module=qthreads; };
 
-dependencies = { module=all-target-libgloss; on=configure-target-newlib; };
+dependencies = { module=all-target-libgloss; on=all-target-newlib; };
 dependencies = { module=all-target-winsup; on=all-target-libiberty; };
 dependencies = { module=all-target-winsup; on=all-target-libtermcap; };
 

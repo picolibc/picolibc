@@ -1,3 +1,107 @@
+2007-10-23  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def (dependencies): Make configure-gdb depend on
+	all-intl.
+	* Makefile.in: Regenerated.
+
+2007-10-15  Patrick Mansfield <patmans@us.ibm.com>
+
+	* Makefile.def: To avoid problems running with parallel makes,
+	build newlib before libgloss so that target specific header
+	files are availble.
+	* Makefile.in: Regenerate.
+
+2007-10-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.def (dependencies): Add all-gdb -> all-libdecnumber.
+	* Makefile.in: Regenerate.
+
+2007-10-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (GDB_SUPPORT_DIRS): Add libdecnumber.
+	* libdecnumber: New directory, imported from GCC.
+
+2007-10-08  Mike Frysinger  <vapier@gentoo.org>
+
+	* configure.ac (CFLAGS_FOR_BUILD, CXXFLAGS_FOR_BUILD,
+	LDFLAGS_FOR_BUILD): Default them to host flags only for $host = $build.
+	Set default CXXFLAGS_FOR_BUILD to CXXFLAGS, not CFLAGS.  Set default
+	LDFLAGS_FOR_BUILD to LDFLAGS, not CFLAGS.
+	* configure: Regenerate.
+
+2007-10-01  Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.tpl (AR_FOR_BUILD, AS_FOR_BUILD, CXX_FOR_BUILD,
+	DLLTOOL_FOR_BUILD, GCJ_FOR_BUILD, GFORTRAN_FOR_BUILD,
+	LDFLAGS_FOR_BUILD, LD_FOR_BUILD, NM_FOR_BUILD, RANLIB_FOR_BUILD,
+	WINDMC_FOR_BUILD, WINDRES_FOR_BUILD): Use autoconf substitutions.
+	* configure.ac: Default them to host tools for $host = $build.
+	Subst them.
+
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+
+2007-09-20  Richard Sandiford  <rsandifo@nildram.co.uk>
+
+	* configure.ac (mipsisa*-*-elfoabi*): New stanza.
+	* configure: Regenerate.
+
+2007-09-19  Benjamin Kosnik  <bkoz@redhat.com>
+
+	* configure.ac (TOPLEVEL_CONFIGURE_ARGUMENTS): Move libgomp before
+	libstdc++.
+	* Makefile.def: Add libgomp config as a maybe dependency for libstdc++.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+	
+2007-09-17  Andreas Schwab  <schwab@suse.de>
+
+	* configure.ac: Raise minimum makeinfo version to 4.6.
+	* configure: Regenerate.
+
+2007-09-15  Alan Modra  <amodra@bigpond.net.au>
+
+	* configure.ac: Correct makeinfo version check.
+	* configure: Regenerate.
+
+2007-09-14  Richard Sandiford  <richard@codesourcery.com>
+
+	* configure.ac (mips*-sde-elf*): New stanza.  Add target-libiberty
+	to $skipdirs and only disable gprof for newlib.  Use the normal
+	mips*-elf* handling in other respects.
+	* configure: Regnerate.
+
+2007-09-12  David Daney  <ddaney@avtrex.com>
+
+	* configure.ac: Remove mips64*-*-linux* noconfigdirs section, thus
+	enabling libgcj.
+	* configure: Regenerate.
+
+2007-09-12  Richard Guenther  <rguenther@suse.de>
+
+	* configure.ac (--enable-stage1-checking): If neither --enable-checking
+	nor --disable-checking is provided also turn on yes and types
+	checking for stage1.
+	* configure: Re-generate.
+
+2007-09-11  Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
+
+	PR target/33281
+	* configure.ac: Use config/mh-mingw on mingw.
+	* configure: Regenerate.
+
+2007-09-10  Rask Ingemann Lambertsen  <rask@sygehus.dk>
+
+	PR other/32154
+	* configure.ac: For libgloss targets, point the linker to the linker
+	script, startup code and simulator library.
+	* configure: Regenerate.
+
+2007-09-09  Andrew Haley  <aph@redhat.com>
+
+	* configure.ac (noconfigdirs): Remove target-libffi and
+	target-libjava.
+
 2007-08-29  Nick Clifton  <nickc@redhat.com>
 
 	* config.sub, config.guess: Update from upstream sources.

@@ -1,10 +1,44 @@
+2007-10-15  Maciej W. Rozycki  <macro@linux-mips.org>
+
+	* tls.m4 (GCC_CHECK_TLS): Rename have_tls to gcc_cv_have_tls.
+	(GCC_CHECK_CC_TLS): Rename have_cc_tls to gcc_cv_have_cc_tls.
+
+2007-10-03  Richard Sandiford  <richard@codesourcery.com>
+
+	* no-executables.m4 (GCC_TRY_COMPILE_OR_LINK): New function.
+
+2007-10-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	Revert:
+	2007-10-02  Richard Sandiford  <richard@codesourcery.com>
+	* no-executables.m4 (GCC_TRY_COMPILE_OR_LINK): New function.
+
+2007-10-02  Richard Sandiford  <richard@codesourcery.com>
+
+	* no-executables.m4 (GCC_TRY_COMPILE_OR_LINK): New function.
+
+2007-09-21  Richard Sandiford  <rsandifo@nildram.co.uk>
+
+	* mt-sde (CFLAGS_FOR_TARGET): Replace -fno-optimize-sibling-calls
+	with -minterlink-mips16.
+	(CXXFLAGS_FOR_TARGET): Likewise.
+
+2007-09-20  Richard Sandiford  <rsandifo@nildram.co.uk>
+
+	* mt-mips-elfoabi: New file.
+
 2007-09-07  Richard Sandiford  <richard@codesourcery.com>
 
 	* mt-sde (CFLAGS_FOR_TARGET): Add -mno-gpopt.
 	(CXXFLAGS_FOR_TARGET): Likewise.
 
+2007-09-06  Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
+
+	PR target/33281
+	* mh-mingw: New host makefile fragment.
+
 2007-08-18  Paul Brook  <paul@codesourcery.com>
-            Joseph Myers  <joseph@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
 
 	* mt-gnu (CXXFLAGS_FOR_TARGET): Add
 	$(DEBUG_PREFIX_CFLAGS_FOR_TARGET).
