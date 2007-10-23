@@ -1,3 +1,8 @@
+2007-10-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/wcstombs_r.c: Add SUSV2 support for calculating
+	size if output buffer is NULL.
+
 2007-10-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/mathfp/s_logarithm.c: Fix error introduced by previous
