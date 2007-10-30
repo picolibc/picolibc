@@ -376,7 +376,8 @@ fhandler_base::fhaccess (int flags)
 
   if (is_fs_special ())
     /* short circuit */;
-  else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+  else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK)
+	   && !pc.isdir ())
     goto eaccess_done;
   else if (has_acls () && allow_ntsec)
     {

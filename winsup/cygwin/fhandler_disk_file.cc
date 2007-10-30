@@ -535,7 +535,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.issymlink ())
+	  && !pc.isdir () && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (buf->st_mode & S_IFMT)
@@ -554,7 +554,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       buf->st_mode |= STD_RBITS;
 
       if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.issymlink ())
+	  && !pc.isdir () && !pc.issymlink ())
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
