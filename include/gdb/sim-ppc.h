@@ -762,6 +762,10 @@ enum
   };
 
 
+/* Return the register name for the supplied SPR number if any, or
+   NULL if none.  */
+extern const char *sim_spr_register_name (int);
+
 #ifdef __cplusplus
 }
 #endif

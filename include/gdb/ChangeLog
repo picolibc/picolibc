@@ -1,3 +1,11 @@
+2007-10-15  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* sim-ppc.h (sim_spr_register_name): New prototype.
+
+2007-10-11  Jesper Nilsson  <jesper.nilsson@axis.com>
+
+	* callback.h (cb_is_stdin, cb_is_stdout, cb_is_stderr): Add prototypes.
+
 2007-08-23  Joel Brobecker  <brobecker@adacore.com>
 
 	Switch the license of all .h files to GPLv3.

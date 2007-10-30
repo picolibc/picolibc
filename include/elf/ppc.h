@@ -180,6 +180,11 @@ enum
 			       soft-float; 0 for not tagged or not
 			       using any ABIs affected by the
 			       differences.  */
+
+  /* Value 1 for general purpose registers only, 2 for AltiVec
+     registers, 3 for SPE registers; 0 for not tagged or not using any
+     ABIs affected by the differences.  */
+  Tag_GNU_Power_ABI_Vector = 8,
 };
 
 #endif /* _ELF_PPC_H */
