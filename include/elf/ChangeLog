@@ -1,3 +1,7 @@
+2007-10-30  Nick Clifton  <nickc@redhat.com>
+
+	* mn10300.h (R_MN10300_ALIGN): Define.
+
 2007-10-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* ppc.h (Tag_GNU_Power_ABI_Vector): New.
