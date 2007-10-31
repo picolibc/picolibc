@@ -2379,7 +2379,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, CYG_MAX_PATH, "");
 
   /* Get the user flags, if appropriate */
-  if (res == ERROR_SUCCESS)
+  if (user_flags && res == ERROR_SUCCESS)
     {
       int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       strcpy (user_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
@@ -2390,7 +2390,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, CYG_MAX_PATH, "");
 
   /* Get the system flags, if appropriate */
-  if (res2 == ERROR_SUCCESS)
+  if (system_flags && res2 == ERROR_SUCCESS)
     {
       int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
       strcpy (system_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");

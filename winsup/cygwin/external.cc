@@ -109,22 +109,13 @@ fillout_pinfo (pid_t pid, int winpid)
   return &ep;
 }
 
-static DWORD
+static inline DWORD
 get_cygdrive_info (char *user, char *system, char *user_flags,
 		   char *system_flags)
 {
   int res = mount_table->get_cygdrive_info (user, system, user_flags,
 					    system_flags);
   return (res == ERROR_SUCCESS) ? 1 : 0;
-}
-
-static DWORD
-get_cygdrive_prefixes (char *user, char *system)
-{
-  char user_flags[CYG_MAX_PATH];
-  char system_flags[CYG_MAX_PATH];
-  DWORD res = get_cygdrive_info (user, system, user_flags, system_flags);
-  return res;
 }
 
 static DWORD
@@ -211,7 +202,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  char *user = va_arg (arg, char *);
 	  char *system = va_arg (arg, char *);
-	  return get_cygdrive_prefixes (user, system);
+	  return get_cygdrive_info (user, system, NULL, NULL);
 	}
 
       case CW_GETPINFO_FULL:
