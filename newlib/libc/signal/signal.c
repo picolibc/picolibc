@@ -154,10 +154,11 @@ _DEFUN (_raise_r, (ptr, sig),
       return -1;
     }
 
-  if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
-    return -1;
-  
-  func = ptr->_sig_func[sig];
+  if (ptr->_sig_func == NULL)
+    func = SIG_DFL;
+  else
+    func = ptr->_sig_func[sig];
+
   if (func == SIG_DFL)
     return _kill_r (ptr, _getpid_r (ptr), sig);
   else if (func == SIG_IGN)

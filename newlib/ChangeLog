@@ -1,3 +1,9 @@
+2007-10-31  DJ Delorie  <dj@redhat.com>
+
+	* libc/signal/signal.c (_raise_r): Don't attempt to initialize the
+	signal table, just use a default, in case initialization cause
+	recursion.
+
 2007-10-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/wcstombs_r.c: Add SUSV2 support for calculating
