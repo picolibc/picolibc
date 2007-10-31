@@ -3833,7 +3833,7 @@ static void
 load_ipv6_funcs ()
 {
 
-  char lib_name[CYG_MAX_PATH];
+  char lib_name[MAX_PATH];
   size_t len;
   HMODULE lib;
 
@@ -3841,7 +3841,7 @@ load_ipv6_funcs ()
   if (ipv6_inited)
     goto out;
   WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
-  if (GetSystemDirectory (lib_name, CYG_MAX_PATH))
+  if (GetSystemDirectory (lib_name, MAX_PATH))
     {
       len = strlen (lib_name);
       strcpy (lib_name + len, "\\ws2_32.dll");
@@ -3900,75 +3900,74 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	return EAI_NONAME;
     }
   load_ipv6 ();
-  if (getaddrinfo)
-    {
-      struct addrinfo nhints, *dupres;
+  if (!getaddrinfo)
+    return ipv4_getaddrinfo (hostname, servname, hints, res);
 
-      /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
-	 the default and only possible setting.
-	 On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
-	 apparently for performance reasons.  To get the POSIX default
-	 behaviour, the AI_ALL flag has to be set. */
-      if (wincap.supports_all_posix_ai_flags ()
-	  && hints && hints->ai_family == PF_UNSPEC)
-	{
-	  nhints = *hints;
-	  hints = &nhints;
-	  nhints.ai_flags |= AI_ALL;
-	}
-      int ret = w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
-      /* Always copy over to self-allocated memory. */
-      if (!ret)
-	{
-	  dupres = ga_duplist (*res, false);
-	  freeaddrinfo (*res);
-	  *res = dupres;
-	  if (!dupres)
-	    return EAI_MEMORY;
-	}
-      /* AI_V4MAPPED and AI_ALL are not supported prior to Vista.  So, what
-	 we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
-	 returned, or the AI_ALL flag is set, we try with AF_INET again, and
-	 convert the returned IPv4 addresses into v4-in-v6 entries.  This
-	 is done in ga_dup if the v4mapped flag is set. */
-      if (!wincap.supports_all_posix_ai_flags ()
-	  && hints->ai_family == AF_INET6
-	  && (hints->ai_flags & AI_V4MAPPED)
-	  && (ret == EAI_NODATA || ret == EAI_NONAME
-	      || (hints->ai_flags & AI_ALL)))
-	{
-	  struct addrinfo *v4res;
-	  nhints = *hints;
-	  nhints.ai_family = AF_INET;
-	  int ret2 = w32_to_gai_err (getaddrinfo (hostname, servname,
-						  &nhints, &v4res));
-	  if (!ret2)
-	    {
-	      dupres = ga_duplist (v4res, true);
-	      freeaddrinfo (v4res);
-	      if (!dupres)
-		{
-		  if (!ret)
-		    ipv4_freeaddrinfo (*res);
-		  return EAI_MEMORY;
-		}
-	      /* If a list of v6 addresses exists, append the v4-in-v6 address
-		 list.  Otherwise just return the v4-in-v6 address list. */
-	      if (!ret)
-		{
-		  struct addrinfo *ptr;
-		  for (ptr = *res; ptr->ai_next; ptr = ptr->ai_next)
-		    ;
-		  ptr->ai_next = dupres;
-		}
-	      else
-		*res = dupres;
-	      ret = 0;
-	    }
-	}
-      return ret;
+  struct addrinfo nhints, *dupres;
+
+  /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
+     the default and only possible setting.
+     On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
+     apparently for performance reasons.  To get the POSIX default
+     behaviour, the AI_ALL flag has to be set. */
+  if (wincap.supports_all_posix_ai_flags ()
+      && hints && hints->ai_family == PF_UNSPEC)
+    {
+      nhints = *hints;
+      hints = &nhints;
+      nhints.ai_flags |= AI_ALL;
     }
-  return ipv4_getaddrinfo (hostname, servname, hints, res);
+  int ret = w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
+  /* Always copy over to self-allocated memory. */
+  if (!ret)
+    {
+      dupres = ga_duplist (*res, false);
+      freeaddrinfo (*res);
+      *res = dupres;
+      if (!dupres)
+	return EAI_MEMORY;
+    }
+  /* AI_V4MAPPED and AI_ALL are not supported prior to Vista.  So, what
+     we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
+     returned, or the AI_ALL flag is set, we try with AF_INET again, and
+     convert the returned IPv4 addresses into v4-in-v6 entries.  This
+     is done in ga_dup if the v4mapped flag is set. */
+  if (!wincap.supports_all_posix_ai_flags ()
+      && hints->ai_family == AF_INET6
+      && (hints->ai_flags & AI_V4MAPPED)
+      && (ret == EAI_NODATA || ret == EAI_NONAME
+	  || (hints->ai_flags & AI_ALL)))
+    {
+      struct addrinfo *v4res;
+      nhints = *hints;
+      nhints.ai_family = AF_INET;
+      int ret2 = w32_to_gai_err (getaddrinfo (hostname, servname,
+					      &nhints, &v4res));
+      if (!ret2)
+	{
+	  dupres = ga_duplist (v4res, true);
+	  freeaddrinfo (v4res);
+	  if (!dupres)
+	    {
+	      if (!ret)
+		ipv4_freeaddrinfo (*res);
+	      return EAI_MEMORY;
+	    }
+	  /* If a list of v6 addresses exists, append the v4-in-v6 address
+	     list.  Otherwise just return the v4-in-v6 address list. */
+	  if (!ret)
+	    {
+	      struct addrinfo *ptr;
+	      for (ptr = *res; ptr->ai_next; ptr = ptr->ai_next)
+		;
+	      ptr->ai_next = dupres;
+	    }
+	  else
+	    *res = dupres;
+	  ret = 0;
+	}
+    }
+  return ret;
 }
 
 extern "C" int
@@ -3980,30 +3979,29 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   if (efault.faulted (EFAULT))
     return EAI_SYSTEM;
   load_ipv6 ();
-  if (getnameinfo)
+  if (!getnameinfo)
+    return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
+
+  /* When the incoming port number is set to 0, Winsock's getnameinfo
+     returns with error WSANO_DATA instead of simply ignoring the port.
+     To avoid this strange behaviour, we check manually, if the port number
+     is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
+  switch (sa->sa_family)
     {
-      /* When the incoming port number is set to 0, Winsock's getnameinfo
-	 returns with error WSANO_DATA instead of simply ignoring the port.
-	 To avoid this strange behaviour, we check manually, if the port number
-	 is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
-      switch (sa->sa_family)
-	{
-	case AF_INET:
-	  if (((struct sockaddr_in *) sa)->sin_port == 0)
-	    flags |= NI_NUMERICSERV;
-	  break;
-	case AF_INET6:
-	  if (((struct sockaddr_in6 *) sa)->sin6_port == 0)
-	    flags |= NI_NUMERICSERV;
-	  break;
-	}
-      int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
-					     servlen, flags));
-      if (ret)
-	set_winsock_errno ();
-      return ret;
+    case AF_INET:
+      if (((struct sockaddr_in *) sa)->sin_port == 0)
+	flags |= NI_NUMERICSERV;
+      break;
+    case AF_INET6:
+      if (((struct sockaddr_in6 *) sa)->sin6_port == 0)
+	flags |= NI_NUMERICSERV;
+      break;
     }
-  return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
+  int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
+					 servlen, flags));
+  if (ret)
+    set_winsock_errno ();
+  return ret;
 }
 
 /* The below function has been taken from OpenBSD's src/sys/netinet6/in6.c. */

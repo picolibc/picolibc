@@ -1,5 +1,11 @@
 2007-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (load_ipv6_funcs): Use MAX_PATH instead of CYG_MAX_PATH.
+	(cygwin_getaddrinfo): Simplify formatting.
+	(cygwin_getnameinfo): Ditto.
+
+2007-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (get_cygdrive_info): Make inline.
 	(get_cygdrive_prefixes): Remove.
 	(cygwin_internal): Call get_cygdrive_info with NULL flag parameters
