@@ -90,6 +90,10 @@
 #define IMAGE_SCN_ALIGN_4096BYTES	     IMAGE_SCN_ALIGN_POWER_CONST (12)
 #define IMAGE_SCN_ALIGN_8192BYTES	     IMAGE_SCN_ALIGN_POWER_CONST (13)
 
+/* Encode alignment power into IMAGE_SCN_ALIGN bits of s_flags */
+#define COFF_ENCODE_ALIGNMENT(SECTION, ALIGNMENT_POWER) \
+  ((SECTION).s_flags |= IMAGE_SCN_ALIGN_POWER_CONST ((ALIGNMENT_POWER)))
+
 #define IMAGE_SCN_LNK_NRELOC_OVFL            0x01000000  /* Section contains extended relocations. */
 #define IMAGE_SCN_MEM_NOT_CACHED             0x04000000  /* Section is not cachable.               */
 #define IMAGE_SCN_MEM_NOT_PAGED              0x08000000  /* Section is not pageable.               */
