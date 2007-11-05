@@ -952,6 +952,7 @@ void
 shminit(void)
 {
 	int i;
+	tun_bool_t shm_ar;
 
 	TUNABLE_INT_FETCH("kern.ipc.shmmaxpgs", &shminfo.shmall);
 	for (i = PAGE_SIZE; i > 0; i--) {
@@ -962,8 +963,9 @@ shminit(void)
 	TUNABLE_INT_FETCH("kern.ipc.shmmin", &shminfo.shmmin);
 	TUNABLE_INT_FETCH("kern.ipc.shmmni", &shminfo.shmmni);
 	TUNABLE_INT_FETCH("kern.ipc.shmseg", &shminfo.shmseg);
-	TUNABLE_INT_FETCH("kern.ipc.shm_use_phys", &shm_use_phys);
-
+	TUNABLE_BOOL_FETCH("kern.ipc.shm_allow_removed", &shm_ar);
+	if (shm_ar == TUN_TRUE)
+	  shm_allow_removed = 1;
 	shmalloced = shminfo.shmmni;
 	shmsegs = (struct shmid_ds *) sys_malloc(shmalloced * sizeof(shmsegs[0]), M_SHM, M_WAITOK);
 	if (shmsegs == NULL)

@@ -582,6 +582,7 @@ static tun_struct tunable_params[] =
   //{ "kern.ipc.shmmin", TUN_INT, {0}, {1}, {32767}, default_tun_check},
   { "kern.ipc.shmmni", TUN_INT, {0}, {1}, {32767}, default_tun_check},
   { "kern.ipc.shmseg", TUN_INT, {0}, {1}, {32767}, default_tun_check},
+  { "kern.ipc.shm_allow_removed", TUN_BOOL, {TUN_UNDEF}, {TUN_FALSE}, {TUN_TRUE}, default_tun_check},
   //{ "kern.ipc.shm_use_phys", TUN_INT, {0}, {1}, {32767}, default_tun_check},
   { NULL, TUN_NULL, {0}, {0}, {0}, NULL}
 };
