@@ -265,6 +265,19 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	{
 	  if (ssh_entry->shmid == shmid)
 	    {
+	      shm_attached_list *sph_entry, *sph_next_entry;
+	      SLIST_FOREACH_SAFE (sph_entry, &sph_list, sph_next,
+				  sph_next_entry)
+		{
+		  if (sph_entry->hdl == ssh_entry->hdl)
+		    {
+		      SLIST_REMOVE (&sph_list, sph_entry, shm_attached_list,
+				    sph_next);
+		      /* ...unmap all views for this handle... */
+		      UnmapViewOfFile (sph_entry->ptr);
+		      delete sph_entry;
+		    }
+		}
 	      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
 	      /* ...and close the handle. */
 	      CloseHandle (ssh_entry->hdl);

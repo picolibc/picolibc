@@ -1,3 +1,8 @@
+2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmctl): On IPC_RMID also unmap all views on shared mem
+	as well as connected shm_attached_list entry.
+
 2007-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (load_ipv6_funcs): Use MAX_PATH instead of CYG_MAX_PATH.
