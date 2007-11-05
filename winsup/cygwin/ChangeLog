@@ -1,5 +1,10 @@
 2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* shm.cc (shmctl): On IPC_RMID don't unmap views and don't close handle
+	if the map is still referenced to emulate Linux and BSD behaviour.
+
+2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shm.cc (shmctl): On IPC_RMID also unmap all views on shared mem
 	as well as connected shm_attached_list entry.
 
