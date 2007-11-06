@@ -1,5 +1,9 @@
 2007-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread_key_create): Drop check for incoming valid object.
+
+2007-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shm.cc: Include sync.h
 	(struct shm_shmid_list): Add ref_count member.
 	(struct shm_attached_list): Remove hdl and size members.  Add a parent

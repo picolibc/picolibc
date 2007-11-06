@@ -2250,11 +2250,6 @@ pthread_getschedparam (pthread_t thread, int *policy,
 extern "C" int
 pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 {
-  /* The opengroup docs don't define if we should check this or not,
-     but creation is relatively rare.  */
-  if (pthread_key::is_good_object (key))
-    return EBUSY;
-
   *key = new pthread_key (destructor);
 
   if (!pthread_key::is_good_object (key))
