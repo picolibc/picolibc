@@ -51,4 +51,8 @@
 #define SYS_argc	 22
 #define SYS_argnlen	 23
 #define SYS_argn	 24
+
+/* SID simulator runtime reconfiguration. */
+#define SYS_reconfig	 25
+
 #endif

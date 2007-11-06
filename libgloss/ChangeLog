@@ -1,3 +1,7 @@
+2007-11-06  Dave Brolley  <brolley@redhat.com>
+ 
+	* syscall.h (SYS_reconfig): New macro.
+
 2007-10-11  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* spu/crt0.S: Fix so element one of register one is correctly set
