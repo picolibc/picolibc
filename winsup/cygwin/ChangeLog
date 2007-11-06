@@ -1,3 +1,20 @@
+2007-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc: Include sync.h
+	(struct shm_shmid_list): Add ref_count member.
+	(struct shm_attached_list): Remove hdl and size members.  Add a parent
+	member pointing to referenced shm_shmid_list entry.
+	(shm_guard): New muto.
+	(SLIST_LOCK): Define.
+	(SLIST_UNLOCK): Define.
+	(fixup_shms_after_fork): Use hdl and size members of parent
+	shm_shmid_list entry.
+	(shmat): Access sequential bookkeeping lists in a thread safe way.
+	Accommodate change in list element layout.  Align comments.
+	(shmctl): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+
 2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shm.cc (shmctl): On IPC_RMID don't unmap views and don't close handle

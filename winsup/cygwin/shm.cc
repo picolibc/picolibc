@@ -23,6 +23,7 @@ details. */
 #include "cygserver_ipc.h"
 #include "cygserver_shm.h"
 #include "cygtls.h"
+#include "sync.h"
 
 /*
  * client_request_shm Constructors
@@ -99,6 +100,7 @@ struct shm_shmid_list {
   int shmid;
   vm_object_t hdl;
   size_t size;
+  int ref_count;
 };
 
 static SLIST_HEAD (, shm_shmid_list) ssh_list;
@@ -107,12 +109,15 @@ static SLIST_HEAD (, shm_shmid_list) ssh_list;
 struct shm_attached_list {
   SLIST_ENTRY (shm_attached_list) sph_next;
   vm_object_t ptr;
-  vm_object_t hdl;
-  size_t size;
+  shm_shmid_list *parent;
   int access;
 };
 
 static SLIST_HEAD (, shm_attached_list) sph_list;
+
+static NO_COPY muto shm_guard;
+#define SLIST_LOCK()	(shm_guard.init ("shm_guard")->acquire ())
+#define SLIST_UNLOCK()	(shm_guard.release ())
 
 int __stdcall
 fixup_shms_after_fork ()
@@ -133,8 +138,10 @@ fixup_shms_after_fork ()
   /* Remove map from list... */
   SLIST_FOREACH (sph_entry, &sph_list, sph_next)
     {
-      vm_object_t ptr = MapViewOfFileEx (sph_entry->hdl, sph_entry->access,
-					 0, 0, sph_entry->size, sph_entry->ptr);
+      vm_object_t ptr = MapViewOfFileEx (sph_entry->parent->hdl,
+					 sph_entry->access, 0, 0,
+					 sph_entry->parent->size,
+					 sph_entry->ptr);
       if (ptr != sph_entry->ptr)
 	api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
     }
@@ -153,6 +160,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0x%x)",
 		  shmid, shmaddr, shmflg);
 
+  SLIST_LOCK ();
   shm_shmid_list *ssh_entry;
   SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
     {
@@ -179,9 +187,16 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 	{
 	  /* Invalid shmid */
 	  set_errno (EINVAL);
+	  SLIST_UNLOCK ();
 	  return (void *) -1;
 	}
     }
+  /* Early increment ref counter.  This allows further actions to run with
+     unlocked lists, because shmdt or shmctl(IPC_RMID) won't delete this
+     ssh_entry. */
+  ++ssh_entry->ref_count;
+  SLIST_UNLOCK ();
+
   vm_object_t attach_va = NULL;
   if (shmaddr)
     {
@@ -194,6 +209,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       if (!attach_va || (vm_offset_t)attach_va % SHMLBA)
 	{
 	  set_errno (EINVAL);
+	  --ssh_entry->ref_count;
 	  return (void *) -1;
 	}
     }
@@ -202,6 +218,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (!sph_entry)
     {
       set_errno (ENOMEM);
+      --ssh_entry->ref_count;
       return (void *) -1;
     }
   DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
@@ -211,6 +228,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     {
       __seterrno ();
       delete sph_entry;
+      --ssh_entry->ref_count;
       return (void *) -1;
     }
   /* Use returned ptr address as is, so it's stored using the exact value
@@ -222,15 +240,17 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       UnmapViewOfFile (ptr);
       delete sph_entry;
       set_errno (request.error_code ());
+      --ssh_entry->ref_count;
       if (request.error_code () == ENOSYS)
 	raise (SIGSYS);
       return (void *) -1;
     }
   sph_entry->ptr = ptr;
-  sph_entry->hdl = ssh_entry->hdl;
-  sph_entry->size = ssh_entry->size;
+  sph_entry->parent = ssh_entry;
   sph_entry->access = access;
+  SLIST_LOCK ();
   SLIST_INSERT_HEAD (&sph_list, sph_entry, sph_next);
+  SLIST_UNLOCK ();
   return ptr;
 #else
   set_errno (ENOSYS);
@@ -259,30 +279,25 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
     }
   if (cmd == IPC_RMID)
     {
-      /* The process must cleanup its own storage... */
+      /* Cleanup */
       shm_shmid_list *ssh_entry, *ssh_next_entry;
+      SLIST_LOCK ();
       SLIST_FOREACH_SAFE (ssh_entry, &ssh_list, ssh_next, ssh_next_entry)
 	{
 	  if (ssh_entry->shmid == shmid)
 	    {
-	      bool in_use = false;
-	      shm_attached_list *sph_entry;
-	      SLIST_FOREACH (sph_entry, &sph_list, sph_next)
+	      /* Remove this entry from the list and close the handle
+		 only if it's not in use anymore. */
+	      if (ssh_entry->ref_count <= 0)
 		{
-		  if (sph_entry->hdl == ssh_entry->hdl)
-		    {
-		      in_use = true;
-		      break;
-		    }
+		  SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
+		  CloseHandle (ssh_entry->hdl);
+		  delete ssh_entry;
 		}
-	      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
-	      /* ...and close the handle if it's not in use anymore. */
-	      if (!in_use)
-		CloseHandle (ssh_entry->hdl);
-	      delete ssh_entry;
 	      break;
 	    }
 	}
+      SLIST_UNLOCK ();
     }
   return request.retval ();
 #else
@@ -308,17 +323,28 @@ shmdt (const void *shmaddr)
     }
   shm_attached_list *sph_entry, *sph_next_entry;
   /* Remove map from list... */
+  SLIST_LOCK ();
   SLIST_FOREACH_SAFE (sph_entry, &sph_list, sph_next, sph_next_entry)
     {
       if (sph_entry->ptr == shmaddr)
 	{
 	  SLIST_REMOVE (&sph_list, sph_entry, shm_attached_list, sph_next);
-	  /* ...and unmap view. */
+	  /* ...unmap view... */
 	  UnmapViewOfFile (sph_entry->ptr);
+	  /* ...and, if this was the last reference to this shared section... */
+	  shm_shmid_list *ssh_entry = sph_entry->parent;
+	  if (--ssh_entry->ref_count <= 0)
+	    {
+	      /* ...delete parent entry and close handle. */
+	      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
+	      CloseHandle (ssh_entry->hdl);
+	      delete ssh_entry;
+	    }
 	  delete sph_entry;
 	  break;
 	}
     }
+  SLIST_UNLOCK ();
   return request.retval ();
 #else
   set_errno (ENOSYS);
@@ -353,6 +379,7 @@ shmget (key_t key, size_t size, int shmflg)
   int shmid = request.retval ();	/* Shared mem ID */
   vm_object_t hdl = request.objval ();	/* HANDLE associated with it. */
   shm_shmid_list *ssh_entry;
+  SLIST_LOCK ();
   SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
     {
       if (ssh_entry->shmid == shmid)
@@ -363,6 +390,7 @@ shmget (key_t key, size_t size, int shmflg)
 	     delete it. */
 	  CloseHandle (hdl);
 	  delete ssh_new_entry;
+	  SLIST_UNLOCK ();
 	  return shmid;
 	}
     }
@@ -371,7 +399,9 @@ shmget (key_t key, size_t size, int shmflg)
   ssh_new_entry->shmid = shmid;
   ssh_new_entry->hdl = hdl;
   ssh_new_entry->size = size;
+  ssh_new_entry->ref_count = 0;
   SLIST_INSERT_HEAD (&ssh_list, ssh_new_entry, ssh_next);
+  SLIST_UNLOCK ();
   return shmid;
 #else
   set_errno (ENOSYS);
