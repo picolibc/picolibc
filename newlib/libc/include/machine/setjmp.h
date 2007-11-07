@@ -223,6 +223,11 @@ _BEGIN_STD_C
 #define _JBLEN 8
 #endif
 
+#ifdef __mep__
+/* 16 GPRs, pc, hi, lo */
+#define _JBLEN 19
+#endif
+
 #ifdef __CRIS__
 #define _JBLEN 18
 #endif

@@ -190,6 +190,9 @@ case "${host_cpu}" in
 	;;
   mcore)
 	;;
+  mep)
+	machine_dir=mep
+	;;
   mips*)
 	machine_dir=mips
 	;;
@@ -427,6 +430,10 @@ case "${host}" in
 	;;
   m8*-bug-*)
 	sys_dir=m88kbug
+	;;
+  mep-*-*)
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
   mips*-dec-*)
 	sys_dir=decstation

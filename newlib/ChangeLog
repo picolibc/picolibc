@@ -1,3 +1,32 @@
+2007-11-07  Dave Brolley  <brolley@redhat.com>
+
+	* libc/machine/configure: Regenerated to pick up mep-elf changes.
+	
+	* Contribute mep-elf from Red Hat
+	2006-10-27  DJ Delorie  <dj@redhat.com>
+
+	* libc/include/machine/setjmp.h: Add MeP support.
+
+	2003-04-17  DJ Delorie  <dj@redhat.com>
+
+	* configure.host (mep-*-*): Support "long long" type.
+
+	2001-06-06  DJ Delorie  <dj@redhat.com>
+
+	* libc/include/machine/ieeefp.h (mep): Support little endian too.
+
+	2001-05-14  DJ Delorie  <dj@redhat.com>
+
+	* configure.host: Add mep's machine_dir.
+	* libc/include/setjmp.h: Add mep support.
+	* libc/machine/mep: New.
+	* libc/machine/mep/setjmp.S: New, support mep's setjmp/longjmp.
+
+	2001-05-04  DJ Delorie  <dj@redhat.com>
+
+	* configure.host: Add mep.
+	* libc/include/machine/ieeefp.h: Ditto.
+
 2007-10-31  DJ Delorie  <dj@redhat.com>
 
 	* libc/signal/signal.c (_raise_r): Don't attempt to initialize the
