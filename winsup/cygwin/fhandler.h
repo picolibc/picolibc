@@ -149,6 +149,7 @@ class fhandler_base
   path_conv pc;
 
   virtual void set_name (path_conv &pc);
+  virtual void set_name (const char *s) {pc.set_normalized_path (s, false);}
   int error () const {return pc.error;}
   void set_error (int error) {pc.error = error;}
   bool exists () const {return pc.exists ();}
@@ -546,6 +547,7 @@ public:
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int ready_for_read (int fd, DWORD howlong);
+  void init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD);
 };

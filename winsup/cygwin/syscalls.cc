@@ -743,8 +743,6 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 
   while (1)
     {
-      sig_dispatch_pending ();
-
       cygheap_fdget cfd (fd);
       if (cfd < 0)
 	break;
@@ -814,7 +812,6 @@ extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   int res = -1;
-  sig_dispatch_pending ();
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   cygheap_fdget cfd (fd);

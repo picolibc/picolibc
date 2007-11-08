@@ -1639,6 +1639,7 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
       switch (WaitForMultipleObjects (n, w4, false, INFINITE))
 	{
 	case WAIT_OBJECT_0:
+	  debug_printf ("normal read");
 	  if (!bytes ||
 	      GetOverlappedResult (h, get_overlapped (), bytes, false))
 	    res = 1;
@@ -1649,12 +1650,14 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 	    }
 	  break;
 	case WAIT_OBJECT_0 + 1:
+	  debug_printf ("got a signal");
 	  CancelIo (h);
 	  set_errno (EINTR);
 	  res = 0;
 	  break;
 	default:
 	  err = GetLastError ();
+	  debug_printf ("WFMO error, %E");
 	  goto err;
 	  break;
 	}

@@ -543,7 +543,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 }
 
 PUNICODE_STRING
-get_nt_native_path (const char *path, UNICODE_STRING &upath)
+get_nt_native_path (const char *path, UNICODE_STRING& upath)
 {
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
