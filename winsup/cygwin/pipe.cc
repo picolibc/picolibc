@@ -34,53 +34,6 @@ fhandler_pipe::fhandler_pipe ()
   need_fork_fixup (true);
 }
 
-void
-fhandler_pipe::init (HANDLE f, DWORD a, mode_t bin)
-{
-  // FIXME: Have to clean this up someday
-  if (!*get_win32_name () && get_name ())
-    {
-      char *hold_normalized_name = (char *) alloca (strlen (get_name ()) + 1);
-      strcpy (hold_normalized_name, get_name ());
-      char *s, *d;
-      for (s = hold_normalized_name, d = (char *) get_win32_name (); *s; s++, d++)
-	if (*s == '/')
-	  *d = '\\';
-	else
-	  *d = *s;
-      set_name (hold_normalized_name);
-    }
-
-  bool opened_properly = a & FILE_CREATE_PIPE_INSTANCE;
-  a &= ~FILE_CREATE_PIPE_INSTANCE;
-  if (!opened_properly)
-    {
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      HANDLE h = NULL;
-      DWORD access = SYNCHRONIZE;
-      if (a & GENERIC_READ)
-	access |= FILE_READ_DATA | FILE_READ_ATTRIBUTES;
-      if (a & GENERIC_WRITE)
-	access |= FILE_WRITE_DATA | FILE_WRITE_ATTRIBUTES;
-      OBJECT_ATTRIBUTES attr;
-      static UNICODE_STRING fname;
-      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE, f, NULL);
-small_printf ("f %p, h %p\n", f, h);
-      status = NtOpenFile (&h, a | SYNCHRONIZE, &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   FILE_SEQUENTIAL_ONLY | FILE_SYNCHRONOUS_IO_ALERT);
-      if (!NT_SUCCESS (status))
-	system_printf ("Unable to reopen pipe %s, attributes %p, NT error: %p win32: %lu",
-		       get_win32_name (), access, status, RtlNtStatusToDosError (status));
-small_printf ("f %p, h %p\n", f, h);
-      CloseHandle (f);
-      f = h;
-    }
-
-  fhandler_base::init (f, a, bin);
-  setup_overlapped ();
-}
-
 extern "C" int sscanf (const char *, const char *, ...);
 
 int
@@ -331,14 +284,16 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
 
       int binmode = mode & O_TEXT ?: O_BINARY;
-      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, binmode);
-      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, binmode);
+      fhs[0]->init (r, GENERIC_READ, binmode);
+      fhs[1]->init (w, GENERIC_WRITE, binmode);
       if (mode & O_NOINHERIT)
        {
 	 fhs[0]->close_on_exec (true);
 	 fhs[1]->close_on_exec (true);
        }
 
+      fhs[0]->setup_overlapped ();
+      fhs[1]->setup_overlapped ();
       res = 0;
     }
 
