@@ -1,3 +1,7 @@
+2007-11-08  Corinna Vinschen
+
+	* libc/include/sys/unistd.h: Remove Cygwin definition of MAXPATHLEN.
+
 2007-11-07  Dave Brolley  <brolley@redhat.com>
 
 	* libc/machine/configure: Regenerated to pick up mep-elf changes.

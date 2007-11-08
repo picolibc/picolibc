@@ -443,10 +443,7 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS    17
 #endif
 
-/* FIXME: This is temporary until winsup gets sorted out.  */
-#ifdef __CYGWIN__
-#define MAXPATHLEN (260 - 1 /* NUL */)
-#else
+#ifndef __CYGWIN__
 # define	MAXPATHLEN	1024
 #endif
 
