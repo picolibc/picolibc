@@ -1,3 +1,7 @@
+2007-11-08  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* vxworks.h: New.
+
 2007-10-30  Nick Clifton  <nickc@redhat.com>
 
 	* mn10300.h (R_MN10300_ALIGN): Define.
