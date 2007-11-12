@@ -48,9 +48,13 @@ typedef long long longlong;
 typedef __int64 longlong;
 #endif
 
+/* In dump_setup.cc  */
 void dump_setup (int, char **, bool);
 void package_find (int, char **);
 void package_list (int, char **);
+/* In bloda.cc  */
+void dump_dodgy_apps (int verbose);
+
 
 static const char version[] = "$Revision$";
 
@@ -1492,6 +1496,8 @@ dump_sysinfo ()
   if (!cygwin_dll_count)
     puts ("Warning: cygwin1.dll not found on your path");
 
+  dump_dodgy_apps (verbose);
+
   if (is_nt)
     dump_sysinfo_services ();
 }
@@ -1835,7 +1841,11 @@ main (int argc, char **argv)
   bool ok = true;
   load_cygwin (argc, argv);
 
-  (void) putenv("POSIXLY_CORRECT=1");
+  /* Need POSIX sorting while parsing args, but don't forget the
+     user's original environment.  */
+  char *posixly = getenv ("POSIXLY_CORRECT");
+  if (posixly == NULL)
+    (void) putenv("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
@@ -1877,6 +1887,8 @@ main (int argc, char **argv)
        /*NOTREACHED*/}
   argc -= optind;
   argv += optind;
+  if (posixly == NULL)
+    putenv ("POSIXLY_CORRECT=");
 
   if (argc == 0 && !sysinfo && !keycheck && !check_setup && !list_package)
     if (givehelp)

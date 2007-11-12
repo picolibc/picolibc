@@ -229,9 +229,6 @@ vconcat (const char *s, va_list v)
   va_end (v);
 
   char *d, *p;
-  for (p = rv; *p; p++)
-    if (*p == '\\')
-      *p = '/';
 
   /* concat is only used for urls and files, so we can safely
      canonicalize the results */
@@ -301,7 +298,7 @@ cygpath (const char *s, ...)
   else if (max_len == (int) strlen (path))
     native = strdup (match->native);
   else
-    native = concat (match->native, "/", path + max_len, NULL);
+    native = concat (match->native, "\\", path + max_len, NULL);
   free (path);
 
   return native;

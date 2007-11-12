@@ -350,7 +350,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
 	  entriesread=1;
 	}
       else 
-	rc = netgroupenum (servername, 2, (void *) & buffer, 1024,
+	rc = netgroupenum (servername, 2, (void *) & buffer, MAX_PREFERRED_LENGTH,
 			   &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
