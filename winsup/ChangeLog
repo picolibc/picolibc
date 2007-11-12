@@ -1,3 +1,7 @@
+2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* CYGWIN_LICENSE: Fix URL to open source definition.
+
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Update copyright.  Fix 'check' target so that it will
