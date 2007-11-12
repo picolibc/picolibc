@@ -200,7 +200,7 @@ int     _EXFUN(truncate, (const char *, off_t __length));
 int	_EXFUN(getdtablesize, (void));
 int	_EXFUN(setdtablesize, (int));
 useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
-unsigned _EXFUN(usleep, (unsigned int __useconds));
+int	_EXFUN(usleep, (useconds_t __useconds));
 #if !(defined  (_WINSOCK_H) || defined (__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));

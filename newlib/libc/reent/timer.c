@@ -77,7 +77,7 @@ ANSI_SYNOPSIS
 	#include <time.h>
 	int _gettimeofday_r(struct _reent *<[ptr]>,
 		struct timeval *<[ptimeval]>,
-		struct timezone *<[ptimezone]>);
+		void *<[ptimezone]>);
 
 TRAD_SYNOPSIS
 	#include <reent.h>
@@ -85,7 +85,7 @@ TRAD_SYNOPSIS
 	int _gettimeofday_r(<[ptr]>, <[ptimeval]>, <[ptimezone]>)
 	struct _reent *<[ptr]>;
 	struct timeval *<[ptimeval]>;
-	struct timezone *<[ptimezone]>;
+	void *<[ptimezone]>;
 
 DESCRIPTION
 	This is a reentrant version of <<gettimeofday>>.  It
@@ -100,7 +100,7 @@ int
 _DEFUN (_gettimeofday_r, (ptr, ptimeval, ptimezone),
      struct _reent *ptr _AND
      struct timeval *ptimeval _AND
-     struct timezone *ptimezone)
+     void *ptimezone)
 {
   int ret;
 

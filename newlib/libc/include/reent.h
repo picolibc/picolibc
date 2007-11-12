@@ -80,7 +80,7 @@ extern int _wait_r _PARAMS ((struct _reent *, int *));
 extern _ssize_t _write_r _PARAMS ((struct _reent *, int, const void *, size_t));
 
 /* This one is not guaranteed to be available on all targets.  */
-extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *tp, struct timezone *tzp));
+extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *__tp, void *__tzp));
 
 #ifdef __LARGE64_FILES
 

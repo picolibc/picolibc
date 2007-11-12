@@ -1,3 +1,18 @@
+2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/time.h (gettimeofday): Change to proper
+	prototype where second parameter is void *.
+	* libc/include/reent.h: Fix prototype for _gettimeofday_r.
+	* libc/time/timer.c (_gettimeofday_r): Change prototype accordingly.
+
+2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/include/sys/unistd.h: Change usleep prototype to Posix.
+
+2007-01-05  Brian Ford  <Brian.Ford@FlightSafety.com>
+
+	* configure.host (*-*-cygwin*): Define HAVE_BLKSIZE.
+
 2006-12-14  Jeff Johnston  <jjohnstn@redhat.com>
             Eric Blake  <ebb9@byu.net>
 
