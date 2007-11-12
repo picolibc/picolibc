@@ -1456,7 +1456,11 @@ tzsetwall P((void))
 		settzname();
 		lcl_is_set = 1;
 		strlcpy(lcl_TZname, buf, sizeof (lcl_TZname));
+#if 0
+		/* Huh?  POSIX doesn't mention anywhere that tzset should
+		   set $TZ.  That's not right. */
 		setenv("TZ", lcl_TZname, 1);
+#endif
 		return;
 	    }
 	}

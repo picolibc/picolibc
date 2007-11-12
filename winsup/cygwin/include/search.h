@@ -57,6 +57,7 @@ void  hdestroy (void);
 ENTRY *hsearch (ENTRY, ACTION);
 int hcreate_r (size_t, struct hsearch_data *);
 void hdestroy_r (struct hsearch_data *);
+int hsearch_r (ENTRY, ACTION, ENTRY **, struct hsearch_data *);
 void *tdelete (const void * __restrict, void ** __restrict,
 	       int (*) (const void *, const void *));
 void tdestroy (void *, void (*)(void *));

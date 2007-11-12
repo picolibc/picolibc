@@ -1,3 +1,116 @@
+2007-11-08  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dllfixdbg: Eliminate extra objcopy step.
+
+2007-11-07  Pedro Alves  <pedro_alves@portugalmail.pt>
+
+	* dllfixdbg: Pass --only-keep-debug to objcopy, instead of
+	selecting the sections manually.
+
+2007-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread_key_create): Drop check for incoming valid object.
+
+2007-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc: Include sync.h
+	(struct shm_shmid_list): Add ref_count member.
+	(struct shm_attached_list): Remove hdl and size members.  Add a parent
+	member pointing to referenced shm_shmid_list entry.
+	(shm_guard): New muto.
+	(SLIST_LOCK): Define.
+	(SLIST_UNLOCK): Define.
+	(fixup_shms_after_fork): Use hdl and size members of parent
+	shm_shmid_list entry.
+	(shmat): Access sequential bookkeeping lists in a thread safe way.
+	Accommodate change in list element layout.  Align comments.
+	(shmctl): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+
+2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmctl): On IPC_RMID don't unmap views and don't close handle
+	if the map is still referenced to emulate Linux and BSD behaviour.
+
+2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmctl): On IPC_RMID also unmap all views on shared mem
+	as well as connected shm_attached_list entry.
+
+2007-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Don't remove
+	write bits for directories with R/O attribute.
+	(fhandler_base::fhaccess): Don't shortcircuit R/O attribute with W_OK
+	scenarios for directories.
+
+2007-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* termios.cc (setspeed): Support new baud rates introduced 2007-02-05.
+
+2007-09-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (fh_disk_file): Delete as global static variable and...
+	(mmap64): ...define as local pointer to make mmap thread-safe.
+	Accommodate throughout.  Only initialize fh_disk_file after file could
+	be opened with GENERIC_EXECUTE access.
+
+2007-09-06  Brian Dessent  <brian@dessent.net>
+
+	* include/sys/stdio.h (_flockfile): Don't try to lock a FILE
+	that has the __SSTR flag set.
+	(_ftrylockfile): Likewise.
+	(_funlockfile): Likewise.
+
+2007-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (open): Don't follow symlinks if O_EXCL is given.
+
+2007-08-09  Ernie Coskrey  <Ernie.Coskrey@steeleye.com>
+
+	* gendef (sigbe): Reset "incyg" while the stack lock is active to avoid
+	a potential race.
+
+2007-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (tzsetwall): Don't set TZ.
+
+2007-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fhaccess): Add check for R/O file system.
+
+2007-07-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* init.cc (in_dllentry): Delete.
+	(dll_entry): Remove assignment to deleted variable.
+	* winsup.h (in_dllentry): Delete declaration.
+	* exceptions.cc (inside_kernel): Use another method to see if we are in
+	dll_entry phase.
+
+2007-07-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* init.cc (in_dllentry): Make NO_COPY to avoid spurious false positives.
+
+2007-07-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dlfcn.cc (dlclose): Don't close handle returned from
+	GetModuleHandle(NULL).
+
+2007-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (gettimeofday): Align definition to POSIX.
+
+2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc: Define __timezonefunc__ before including time.h to protect
+	definition of timezone function.
+
+2007-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/time.h: Switch to timezone variable by default.  Add
+	comment.
+
 2007-06-29  Brian Dessent  <brian@dessent.net>
 
 	* posix.sgml: List resolver functions in BSD section with reference
@@ -11,9 +124,111 @@
 2007-06-28  Brian Dessent  <brian@dessent.net>
 
 	Backport documentation changes from HEAD.
-        * ansi.sgml: Delete.
-        * misc-std.sgml: Delete.
-        * posix.sgml: Rework entirely.
+	* ansi.sgml: Delete.
+	* misc-std.sgml: Delete.
+	* posix.sgml: Rework entirely.
+
+2007-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add heap_slop_inited member.
+	* shared.cc (shared_info::heap_slop_size): Use heap_slop_inited to
+	track initializing heap_slop since 0 is a valid value for heap_slop.
+	Drop useless < 0 consideration.
+
+2007-06-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* signal.cc (usleep): Use useconds_t for the type as per POSIX.
+
+2007-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fstat): Set pipe permission bits more
+	correctly.
+
+2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::set_file_pointers_for_exec): Call SetFilePointer
+	correctly for 64 bit file access.  Comment out functionality.
+	* fhandler.cc (fhandler_base::open): Don't set append_mode.
+	(fhandler_base::write): Check for O_APPEND instead of append_mode.
+	Call SetFilePointer correctly for 64 bit file access.  Handle
+	errors from SetFilePointer.
+	* fhandler.h (class fhandler_base): Drop append_mode status flag.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Handle
+	seeking correctly for 64 bit file access.
+
+2007-05-21  Christian Franke <franke@computer.org>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Don't invalidate
+	devbuf if new position is within buffered range.
+
+2007-05-21  Eric Blake  <ebb9@byu.net>
+
+	* include/search.h (hsearch_r): Provide declaration.
+
+2007-05-21  Christian Franke <franke@computer.org>
+            Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Set buf size to
+	sector size.  Simplify non-sector aligned case.  Handle errors from
+	raw_read.
+
+2007-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (adjust_socket_file_mode): New inline function.
+	(fhandler_socket::fchmod): Squeeze mode through adjust_socket_file_mode
+	before using it.
+	(fhandler_socket::bind): Ditto.
+
+2007-04-18  Brian Dessent  <brian@dessent.net>
+
+	* cygwin.sc: Remove duplicated .debug_macinfo section.
+	* dllfixdbg: Also copy DWARF-2 sections into .dbg file.
+
+2007-04-06  Eric Blake  <ebb9@byu.net>
+
+	* include/stdint.h (WINT_MIN): Fix sign.
+
+2007-04-04  Eric Blake  <ebb9@byu.net>
+
+	* include/stdint.h (WINT_MIN, WINT_MAX): Fix definition.
+
+2007-03-28  Christopher Faylor  <me@cgf.cx>
+
+	* spawn.cc (spawn_guts): Start pure-windows processes in a suspended
+	state to avoid potential DuplicateHandle problems.
+
+2007-03-07  Christopher Faylor  <me@cgf.cx>
+
+	* signal.cc (handle_sigprocmask): Remove extraneous
+	sig_dispatch_pending.
+
+2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fstat): Set all file times to arbitrary
+	fixed value.
+
+2007-02-20  Christopher Faylor  <me@cgf.cx>
+
+	* exceptions.cc (_cygtls::signal_exit): Only call myself.exit when when
+	exit_state indicates that we've visited do_exit.
+	* sync.h (lock_process::lock_process): Use renamed exit_state -
+	ES_PROCESS_LOCKED.
+	* winsup.h: Rename ES_MUTO_SET to ES_PROCESS_LOCKED.
+
+2007-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::bind): Remove printing wrong
+	errno in debug output.
+
+2007-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add support for
+	baud rates up to 3000000 baud.  Add missing 128K and 256K cases.
+	(fhandler_serial::tcgetattr): Ditto.
+	* include/sys/termios.h: Add baud rate definitions from B460800 up to
+	B3000000.
 
 2007-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -67,6 +282,16 @@
 2007-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc: Do bookkeeping in 4K pages, rather than in 64K chunks.
+
+2007-01-04  Brian Ford  <Brian.Ford@FlightSafety.com>
+            Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (PREFERRED_IO_BLKSIZE): Define as 64K.
+	* fhandler.cc (fhandler_base::fstat): Set st_blksize to
+	PREFERRED_IO_BLKSIZE.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Ditto.
+	* fhandler_mailslot.cc (fhandler_mailslot::fstat): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): Ditto.
 
 2007-01-01  Christopher Faylor  <me@cgf.cx>
 
@@ -165,6 +390,11 @@
 2006-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 23.
+
+2006-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_token_group_sidlist): Always add the local
+	group to the token.
 
 2006-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -347,6 +577,12 @@
 	* cygwin.sc: Make sure there's something in the cygheap.
 	* dllfixdbg: Accommodate newer binutils which put the gnu_debuglink at
 	the end rather than at the beginning.
+
+2006-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_token_group_sidlist): Always add the interactive
+	group to the token.  Create logon_id group SID by copying it from
+	incoming group list.
 
 2006-07-13  Christopher Faylor  <cgf@timesys.com>
 

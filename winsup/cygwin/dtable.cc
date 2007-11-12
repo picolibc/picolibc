@@ -681,12 +681,16 @@ dtable::fixup_before_exec (DWORD target_proc_id)
 void
 dtable::set_file_pointers_for_exec ()
 {
+/* This is not POSIX-compliant. */
+#if 0
+  LONG off_high = 0;
   lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
-      SetFilePointer (fh->get_handle (), 0, 0, FILE_END);
+      SetFilePointer (fh->get_handle (), 0, &off_high, FILE_END);
   unlock ();
+#endif
 }
 
 void

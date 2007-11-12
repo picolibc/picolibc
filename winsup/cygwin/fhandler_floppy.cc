@@ -408,10 +408,11 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
-  char buf[512];
+  char buf[bytes_per_sector];
   _off64_t lloffset = offset;
+  _off64_t current_pos = (_off64_t) -1;
   LARGE_INTEGER sector_aligned_offset;
-  _off64_t bytes_left;
+  size_t bytes_left;
 
   if (whence == SEEK_END)
     {
@@ -420,7 +421,8 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
     }
   else if (whence == SEEK_CUR)
     {
-      lloffset += get_current_position () - (devbufend - devbufstart);
+      current_pos = get_current_position ();
+      lloffset += current_pos - (devbufend - devbufstart);
       whence = SEEK_SET;
     }
 
@@ -428,6 +430,18 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
     {
       set_errno (EINVAL);
       return -1;
+    }
+
+  /* If new position is in buffered range, adjust buffer and return */
+  if (devbufstart < devbufend)
+    {
+      if (current_pos == (_off64_t) -1)
+	current_pos = get_current_position ();
+      if (current_pos - devbufend <= lloffset && lloffset <= current_pos)
+	{
+	  devbufstart = devbufend - (current_pos - lloffset);
+	  return lloffset;
+	}
     }
 
   sector_aligned_offset.QuadPart = (lloffset / bytes_per_sector)
@@ -453,9 +467,11 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 
   if (bytes_left)
     {
-      size_t len = bytes_left;
-      raw_read (buf, len);
+      raw_read (buf, bytes_left);
+      if (bytes_left == (size_t) -1)
+	return -1;
     }
+
   return sector_aligned_offset.QuadPart + bytes_left;
 }
 

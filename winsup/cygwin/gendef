@@ -158,9 +158,9 @@ __sigbe:						# return here after cygwin syscall
 	xorl	%edx,%edx
 	xchgl	%edx,-4(%eax)				# get return address from signal stack
 	xchgl	%edx,8(%esp)				# restore edx/real return address
+	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)			# release lock
 	popl	%eax
-	decl	$tls::incyg(%ebx)
 	popl	%ebx
 	ret
 

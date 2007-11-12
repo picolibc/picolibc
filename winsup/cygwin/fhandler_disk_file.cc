@@ -1,7 +1,7 @@
 /* fhandler_disk_file.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -428,7 +428,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   else
     buf->st_ino = get_namehash ();
 
-  buf->st_blksize = S_BLKSIZE;
+  buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
   if (nAllocSize >= 0LL)
     /* A successful NtQueryInformationFile returns the allocation size
@@ -470,7 +470,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.issymlink ())
+	  && !pc.isdir () && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (buf->st_mode & S_IFMT)
@@ -489,7 +489,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       buf->st_mode |= STD_RBITS;
 
       if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.issymlink ())
+	  && !pc.isdir () && !pc.issymlink ())
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
@@ -509,13 +509,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      DWORD cur, done;
+	      LONG curhigh = 0;
 	      char magic[3];
 
 	      /* First retrieve current position, set to beginning
 		 of file if not already there. */
-	      cur = SetFilePointer (get_handle (), 0, NULL, FILE_CURRENT);
-	      if (cur != INVALID_SET_FILE_POINTER
-		  && (!cur || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
+	      cur = SetFilePointer (get_handle (), 0, &curhigh, FILE_CURRENT);
+	      if ((cur != INVALID_SET_FILE_POINTER || GetLastError () == NO_ERROR)
+		  && ((!cur && !curhigh) || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
 		      != INVALID_SET_FILE_POINTER))
 		{
 		  /* FIXME should we use /etc/magic ? */
@@ -526,7 +527,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
-		  SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
+		  SetFilePointer (get_handle (), cur, &curhigh, FILE_BEGIN);
 		}
 	    }
 	}

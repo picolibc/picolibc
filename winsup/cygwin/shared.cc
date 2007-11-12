@@ -262,7 +262,7 @@ memory_init ()
 unsigned
 shared_info::heap_slop_size ()
 {
-  if (!heap_slop)
+  if (!heap_slop_inited)
     {
       /* Fetch from registry, first user then local machine.  */
       for (int i = 0; i < 2; i++)
@@ -273,11 +273,8 @@ shared_info::heap_slop_size ()
 	    break;
 	  heap_slop = wincap.heapslop ();
 	}
-
-      if (heap_slop < 0)
-	heap_slop = 0;
-      else
-	heap_slop <<= 20;
+      heap_slop <<= 20;
+      heap_slop_inited = true;
     }
 
   return heap_slop;

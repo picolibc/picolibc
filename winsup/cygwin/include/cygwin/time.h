@@ -30,8 +30,10 @@ time_t timegm (struct tm *);
 #   define daylight _daylight
 # endif
 
-# ifndef timezonevar
-char *timezone (void);
+/* The timezone function is only kept for backward compatibility.
+   POSIX expects the timezone variable as XSI extension. */
+# ifdef __timezonefunc__
+char __cdecl *timezone (void);
 # elif !defined(timezone)
 #   define timezone _timezone
 # endif

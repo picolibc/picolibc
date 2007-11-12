@@ -177,12 +177,25 @@ POSIX commands */
 #define PARODD	 0x00200
 #define HUPCL	 0x00400
 #define CLOCAL	 0x00800
+
+/* Extended baud rates above 37K. */
 #define CBAUDEX	 0x0100f
 #define B57600	 0x01001
 #define B115200	 0x01002
 #define B128000	 0x01003
 #define B230400  0x01004
 #define B256000	 0x01005
+#define B460800  0x01006
+#define B500000  0x01007
+#define B576000  0x01008
+#define B921600  0x01009
+#define B1000000 0x0100a
+#define B1152000 0x0100b
+#define B1500000 0x0100c
+#define B2000000 0x0100d
+#define B2500000 0x0100e
+#define B3000000 0x0100f
+
 #define CRTSXOFF 0x04000
 #define CRTSCTS	 0x08000
 

@@ -635,8 +635,44 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     case B115200:
       state.BaudRate = CBR_115200;
       break;
+    case B128000:
+      state.BaudRate = CBR_128000;
+      break;
     case B230400:
       state.BaudRate = 230400 /* CBR_230400 - not defined */;
+      break;
+    case B256000:
+      state.BaudRate = CBR_256000;
+      break;
+    case B460800:
+      state.BaudRate = 460800 /* CBR_460800 - not defined */;
+      break;
+    case B500000:
+      state.BaudRate = 500000 /* CBR_500000 - not defined */;
+      break;
+    case B576000:
+      state.BaudRate = 576000 /* CBR_576000 - not defined */;
+      break;
+    case B921600:
+      state.BaudRate = 921600 /* CBR_921600 - not defined */;
+      break;
+    case B1000000:
+      state.BaudRate = 1000000 /* CBR_1000000 - not defined */;
+      break;
+    case B1152000:
+      state.BaudRate = 1152000 /* CBR_1152000 - not defined */;
+      break;
+    case B1500000:
+      state.BaudRate = 1500000 /* CBR_1500000 - not defined */;
+      break;
+    case B2000000:
+      state.BaudRate = 2000000 /* CBR_2000000 - not defined */;
+      break;
+    case B2500000:
+      state.BaudRate = 2500000 /* CBR_2500000 - not defined */;
+      break;
+    case B3000000:
+      state.BaudRate = 3000000 /* CBR_3000000 - not defined */;
       break;
     default:
       /* Unsupported baud rate! */
@@ -942,8 +978,44 @@ fhandler_serial::tcgetattr (struct termios *t)
     case CBR_115200:
 	t->c_ospeed = t->c_ispeed = B115200;
 	break;
+    case CBR_128000:
+	t->c_ospeed = t->c_ispeed = B128000;
+	break;
     case 230400: /* CBR_230400 - not defined */
 	t->c_ospeed = t->c_ispeed = B230400;
+	break;
+    case CBR_256000:
+	t->c_ospeed = t->c_ispeed = B256000;
+	break;
+    case 460800: /* CBR_460000 - not defined */
+	t->c_ospeed = t->c_ispeed = B460800;
+	break;
+    case 500000: /* CBR_500000 - not defined */
+	t->c_ospeed = t->c_ispeed = B500000;
+	break;
+    case 576000: /* CBR_576000 - not defined */
+	t->c_ospeed = t->c_ispeed = B576000;
+	break;
+    case 921600: /* CBR_921600 - not defined */
+	t->c_ospeed = t->c_ispeed = B921600;
+	break;
+    case 1000000: /* CBR_1000000 - not defined */
+	t->c_ospeed = t->c_ispeed = B1000000;
+	break;
+    case 1152000: /* CBR_1152000 - not defined */
+	t->c_ospeed = t->c_ispeed = B1152000;
+	break;
+    case 1500000: /* CBR_1500000 - not defined */
+	t->c_ospeed = t->c_ispeed = B1500000;
+	break;
+    case 2000000: /* CBR_2000000 - not defined */
+	t->c_ospeed = t->c_ispeed = B2000000;
+	break;
+    case 2500000: /* CBR_2500000 - not defined */
+	t->c_ospeed = t->c_ispeed = B2500000;
+	break;
+    case 3000000: /* CBR_3000000 - not defined */
+	t->c_ospeed = t->c_ispeed = B3000000;
 	break;
     default:
 	/* Unsupported baud rate! */

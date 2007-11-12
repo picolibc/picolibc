@@ -465,16 +465,14 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
   auth_pos = -1;
   if (my_grps)
     {
-      if (sid_in_token_groups (my_grps, well_known_local_sid))
-	grp_list += well_known_local_sid;
+      grp_list += well_known_local_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
 	grp_list += well_known_dialup_sid;
       if (sid_in_token_groups (my_grps, well_known_network_sid))
 	grp_list += well_known_network_sid;
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
 	grp_list += well_known_batch_sid;
-      if (sid_in_token_groups (my_grps, well_known_interactive_sid))
-	grp_list += well_known_interactive_sid;
+      grp_list += well_known_interactive_sid;
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list += well_known_service_sid;
     }
@@ -485,11 +483,13 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
     }
   if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
-      char buf[64];
-      __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,
-		       auth_luid.LowPart);
-      grp_list += buf;
-      auth_pos = grp_list.count - 1;
+      for (DWORD i = 0; i < my_grps->GroupCount; ++i)
+	if (my_grps->Groups[i].Attributes & SE_GROUP_LOGON_ID)
+	  {
+	    grp_list += my_grps->Groups[i].Sid;
+	    auth_pos = grp_list.count - 1;
+	    break;
+	  }
     }
 }
 

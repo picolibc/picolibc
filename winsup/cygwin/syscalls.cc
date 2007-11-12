@@ -602,8 +602,9 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
-	  if (!(fh = build_fh_name (unix_path, NULL, (flags & O_NOFOLLOW) ?
-				    PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
+	  if (!(fh = build_fh_name (unix_path, NULL,
+				    (flags & (O_NOFOLLOW | O_EXCL))
+				    ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
 				    transparent_exe ? stat_suffixes : NULL)))
 	    res = -1;		// errno already set
 	  else if ((flags & O_NOFOLLOW) && fh->issymlink ())

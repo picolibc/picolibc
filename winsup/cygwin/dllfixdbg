@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2006 Red Hat, Inc.
+# Copyright 2006, 2007 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -16,7 +16,7 @@ my $objdump = shift;
 my @objcopy = ((shift));
 my $dll = shift;
 my $dbg = shift;
-xit 0, @objcopy, '-j', '.stab', '-j', '.stabstr', $dll, $dbg;
+xit 0, @objcopy, '-R', '.gnu_debuglink_overlay', '--only-keep-debug', $dll, $dbg;
 xit 0, @objcopy, '-g', '--add-gnu-debuglink=' . $dbg, $dll;
 open(OBJDUMP, '-|', "$objdump --headers $dll");
 my %section;

@@ -142,9 +142,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 19988
+#define SHARED_INFO_CB 19992
 
-#define CURR_SHARED_MAGIC 0x87c42d1eU
+#define CURR_SHARED_MAGIC 0xb7048a88U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -155,6 +155,7 @@ class shared_info
   DWORD cb;
  public:
   unsigned heap_chunk;
+  bool heap_slop_inited;
   unsigned heap_slop;
   DWORD sys_mount_table_counter;
 

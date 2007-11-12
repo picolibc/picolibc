@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,6 +24,11 @@ details. */
 /* Care for the old O_NDELAY flag. If one of the flags is set,
    both flags are set. */
 #define O_NONBLOCK_MASK (O_NONBLOCK | OLD_O_NDELAY)
+
+/* It appears that 64K is the block size used for buffered I/O on NT.
+   Using this blocksize in read/write calls in the application results
+   in a much better performance than using smaller values. */
+#define PREFERRED_IO_BLKSIZE ((blksize_t) 65536)
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
@@ -95,7 +100,6 @@ class fhandler_base
     unsigned wbinset            : 1; /* binary write mode explicitly set */
     unsigned nohandle           : 1; /* No handle associated with fhandler. */
     unsigned uninterruptible_io : 1; /* Set if I/O should be uninterruptible. */
-    unsigned append_mode        : 1; /* always append */
     unsigned did_lseek          : 1; /* set when lseek is called as a flag that
 					_write should check if we've moved
 					beyond EOF, zero filling or making
@@ -109,7 +113,7 @@ class fhandler_base
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
-      uninterruptible_io (0), append_mode (0), did_lseek (0),
+      uninterruptible_io (0), did_lseek (0),
       query_open (no_query), close_on_exec (0), need_fork_fixup (0),
       has_changed (0)
       {}
@@ -187,7 +191,6 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, rbinset)
   IMPLEMENT_STATUS_FLAG (bool, nohandle)
   IMPLEMENT_STATUS_FLAG (bool, uninterruptible_io)
-  IMPLEMENT_STATUS_FLAG (bool, append_mode)
   IMPLEMENT_STATUS_FLAG (bool, did_lseek)
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)

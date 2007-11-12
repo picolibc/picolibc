@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#define __timezonefunc__
 #include <time.h>
 #include <sys/times.h>
 #include <sys/timeb.h>
@@ -161,8 +162,9 @@ hires_ms NO_COPY gtod;
 
 /* FIXME: Make thread safe */
 extern "C" int
-gettimeofday (struct timeval *tv, struct timezone *tz)
+gettimeofday (struct timeval *tv, void *tzvp)
 {
+  struct timezone *tz = (struct timezone *) tzvp;
   static bool tzflag;
   LONGLONG now = gtod.usecs ();
 

@@ -55,9 +55,9 @@ public:
   {
     locker.acquire ();
     skip_unlock = exiting;
-    if (exiting && exit_state < ES_SET_MUTO)
+    if (exiting && exit_state < ES_PROCESS_LOCKED)
       {
-	exit_state = ES_SET_MUTO;
+	exit_state = ES_PROCESS_LOCKED;
 	muto::set_exiting_thread ();
       }
   }

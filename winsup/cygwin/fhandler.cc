@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005 Red Hat, Inc.
+   2005, 2006, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -365,7 +365,8 @@ fhandler_base::fhaccess (int flags)
 
   if (is_fs_special ())
     /* short circuit */;
-  else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+  else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK)
+	   && !pc.isdir ())
     goto eaccess_done;
   else if (has_acls () && allow_ntsec)
     {
@@ -431,6 +432,15 @@ fhandler_base::fhaccess (int flags)
 eaccess_done:
   set_errno (EACCES);
 done:
+#ifndef FILE_READ_ONLY_VOLUME
+#define FILE_READ_ONLY_VOLUME 0x80000
+#endif
+  if (!res && (flags & W_OK) && get_device () == FH_FS
+      && (pc.fs_flags () & FILE_READ_ONLY_VOLUME))
+    {
+      set_errno (EROFS);
+      res = -1;
+    }
   debug_printf ("returning %d", res);
   return res;
 }
@@ -482,9 +492,6 @@ fhandler_base::open_9x (int flags, mode_t mode)
 
   if ((flags & O_EXCL) && (flags & O_CREAT))
     creation_distribution = CREATE_NEW;
-
-  if (flags & O_APPEND)
-    append_mode (true);
 
   /* These flags are host dependent. */
   shared = wincap.shared ();
@@ -646,9 +653,6 @@ fhandler_base::open (int flags, mode_t mode)
 
   if ((flags & O_EXCL) && (flags & O_CREAT))
     create_disposition = FILE_CREATE;
-
-  if (flags & O_APPEND)
-    append_mode (true);
 
   if (flags & O_CREAT && get_device () == FH_FS)
     {
@@ -817,8 +821,17 @@ fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
 
-  if (append_mode ())
-    SetFilePointer (get_output_handle (), 0, 0, FILE_END);
+  if (get_flags () & O_APPEND)
+    {
+      LONG off_high = 0;
+      DWORD ret = SetFilePointer (get_output_handle (), 0, &off_high, FILE_END);
+      if (ret == INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
+        {
+	  debug_printf ("Seeking to EOF in append mode failed");
+	  __seterrno ();
+	  return -1;
+	}
+    }
   else if (did_lseek ())
     {
       _off64_t actual_length, current_position;
@@ -1239,13 +1252,13 @@ fhandler_base::fstat (struct __stat64 *buf)
   switch (get_device ())
     {
     case FH_PIPE:
-      buf->st_mode = S_IFIFO | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFIFO | S_IRUSR | S_IWUSR;
       break;
     case FH_PIPEW:
-      buf->st_mode = S_IFIFO | STD_WBITS | S_IWGRP | S_IWOTH;
+      buf->st_mode = S_IFIFO | S_IWUSR;
       break;
     case FH_PIPER:
-      buf->st_mode = S_IFIFO | STD_RBITS;
+      buf->st_mode = S_IFIFO | S_IRUSR;
       break;
     case FH_FULL:
       buf->st_mode = S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP | S_IWOTH;
@@ -1258,8 +1271,9 @@ fhandler_base::fstat (struct __stat64 *buf)
   buf->st_uid = geteuid32 ();
   buf->st_gid = getegid32 ();
   buf->st_nlink = 1;
-  buf->st_blksize = S_BLKSIZE;
-  time_as_timestruc_t (&buf->st_ctim);
+  buf->st_blksize = PREFERRED_IO_BLKSIZE;
+  buf->st_ctim.tv_sec = 1164931200L;   /* Arbitrary value: 2006-12-01 */
+  buf->st_ctim.tv_nsec = 0L;
   buf->st_atim = buf->st_mtim = buf->st_ctim;
   return 0;
 }

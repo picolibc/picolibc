@@ -135,7 +135,7 @@ sleep (unsigned int seconds)
 }
 
 extern "C" unsigned int
-usleep (unsigned int useconds)
+usleep (useconds_t useconds)
 {
   struct timespec req;
   req.tv_sec = useconds / 1000000;
@@ -153,7 +153,6 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 int __stdcall
 handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
-  sig_dispatch_pending ();
   /* check that how is in right range */
   if (how != SIG_BLOCK && how != SIG_UNBLOCK && how != SIG_SETMASK)
     {

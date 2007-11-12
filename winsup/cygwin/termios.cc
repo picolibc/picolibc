@@ -274,6 +274,16 @@ setspeed (speed_t &set_speed, speed_t from_speed)
     case B128000:
     case B230400:
     case B256000:
+    case B460800:
+    case B500000:
+    case B576000:
+    case B921600:
+    case B1000000:
+    case B1152000:
+    case B1500000:
+    case B2000000:
+    case B2500000:
+    case B3000000:
       set_speed = from_speed;
       res = 0;
       break;
