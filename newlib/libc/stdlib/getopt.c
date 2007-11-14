@@ -153,7 +153,7 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
   char *possible_arg = NULL;
   int longopt_match = -1;
   int has_arg = -1;
-  char *cp;
+  char *cp = NULL;
   int arg_next = 0;
 
   /* first, deal with silly parameters and easy stuff */

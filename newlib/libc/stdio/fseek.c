@@ -32,9 +32,9 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
 	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
-	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseek_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	             long <[offset]>, int <[whence]>)
-	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	             off_t <[offset]>, int <[whence]>)
 
 TRAD_SYNOPSIS
@@ -122,11 +122,15 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
        long offset        _AND
        int whence)
 {
-  _fpos_t _EXFUN((*seekfn), (_PTR, _fpos_t, int));
+  _fpos_t _EXFUN((*seekfn), (struct _reent *, _PTR, _fpos_t, int));
   _fpos_t target;
   _fpos_t curoff = 0;
   size_t n;
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 st;
+#else
   struct stat st;
+#endif
   int havepos;
 
   /* Make sure stdio is set up.  */
@@ -141,7 +145,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      fflush (fp);
+      _fflush_r (ptr, fp);
     }
 
   /* Have to be able to seek.  */
@@ -166,12 +170,12 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      fflush (fp);   /* may adjust seek offset on append stream */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _funlockfile (fp);
@@ -213,7 +217,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
   if (fp->_bf._base == NULL)
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
@@ -255,6 +259,11 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	goto dumb;
       target = st.st_size + offset;
     }
+  if ((long)target != target)
+    {
+      ptr->_errno = EOVERFLOW;
+      return EOF;
+    }
 
   if (!havepos)
     {
@@ -262,7 +271,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, 0L, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, 0L, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -307,7 +316,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       fp->_p = fp->_bf._base + o;
       fp->_r = n - o;
       if (HASUB (fp))
-	FREEUB (fp);
+	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
       _funlockfile (fp);
       return 0;
@@ -323,12 +332,12 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
   curoff = target & ~(fp->_blksize - 1);
-  if ((*seekfn) (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_flags &= ~__SEOF;
   n = target - curoff;
   if (n)
@@ -347,14 +356,15 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
+  if (_fflush_r (ptr, fp)
+      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile (fp);
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_p = fp->_bf._base;
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */

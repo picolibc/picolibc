@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -24,31 +24,17 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <_ansi.h>
 #include <stdio.h>
 #include <limits.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
 #ifndef _REENT_ONLY
 
 int
 _DEFUN(vasprintf, (strp, fmt, ap),
        char **strp      _AND
-       _CONST char *fmt _AND
+       const char *fmt _AND
        va_list ap)
 {
-  int ret;
-  FILE f;
-
-  f._flags = __SWR | __SSTR | __SMBF;
-  f._bf._base = f._p = NULL;
-  f._bf._size = f._w = 0;
-  f._file = -1;  /* No file. */
-  ret = _vfprintf_r (_REENT, &f, fmt, ap);
-  *f._p = 0;
-  *strp = f._bf._base;
-  return ret;
+  return _vasprintf_r (_REENT, strp, fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
@@ -57,7 +43,7 @@ int
 _DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
        struct _reent *ptr _AND
        char **strp        _AND
-       _CONST char *fmt   _AND
+       const char *fmt   _AND
        va_list ap)
 {
   int ret;
@@ -68,8 +54,10 @@ _DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   ret = _vfprintf_r (ptr, &f, fmt, ap);
-  *f._p = 0;
-  *strp = f._bf._base;
+  if (ret >= 0)
+    {
+      *f._p = 0;
+      *strp = f._bf._base;
+    }
   return ret;
 }
-

@@ -53,7 +53,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
    */
 
   fp->_w = fp->_lbfsize;
-  if (cantwrite (fp))
+  if (cantwrite (ptr, fp))
     {
       fp->_flags |= __SERR;
       ptr->_errno = EBADF;
@@ -74,14 +74,14 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
   n = fp->_p - fp->_bf._base;
   if (n >= fp->_bf._size)
     {
-      if (fflush (fp))
+      if (_fflush_r (ptr, fp))
 	return EOF;
       n = 0;
     }
   fp->_w--;
   *fp->_p++ = c;
   if (++n == fp->_bf._size || (fp->_flags & __SLBF && c == '\n'))
-    if (fflush (fp))
+    if (_fflush_r (ptr, fp))
       return EOF;
   return c;
 }

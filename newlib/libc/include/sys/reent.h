@@ -32,6 +32,8 @@ typedef unsigned __Long __ULong;
 typedef __uint32_t __ULong;
 #endif
 
+struct _reent;
+
 /*
  * If _REENT_SMALL is defined, we make struct _reent as small as possible,
  * by having nearly everything possible allocated at first use.
@@ -179,11 +181,12 @@ struct __sFILE {
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(_PTR _cookie, char *_buf, int _n));
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(_PTR _cookie, const char *_buf,
-					    int _n));
-  _fpos_t _EXFUN((*_seek),(_PTR _cookie, _fpos_t _offset, int _whence));
-  int	_EXFUN((*_close),(_PTR _cookie));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(struct _reent *, _PTR,
+					   char *, int));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(struct _reent *, _PTR,
+					    const char *, int));
+  _fpos_t _EXFUN((*_seek),(struct _reent *, _PTR, _fpos_t, int));
+  int _EXFUN((*_close),(struct _reent *, _PTR));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -225,11 +228,12 @@ struct __sFILE64 {
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(_PTR _cookie, char *_buf, int _n));
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(_PTR _cookie, const char *_buf,
-					    int _n));
-  _fpos_t _EXFUN((*_seek),(_PTR _cookie, _fpos_t _offset, int _whence));
-  int	_EXFUN((*_close),(_PTR _cookie));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(struct _reent *, _PTR,
+					   char *, int));
+  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(struct _reent *, _PTR,
+					    const char *, int));
+  _fpos_t _EXFUN((*_seek),(struct _reent *, _PTR, _fpos_t, int));
+  int _EXFUN((*_close),(struct _reent *, _PTR));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -248,7 +252,7 @@ struct __sFILE64 {
   int   _flags2;        /* for future use */
 
   _off64_t _offset;     /* current lseek offset */
-  _fpos64_t _EXFUN((*_seek64),(_PTR _cookie, _fpos64_t _offset, int _whence));
+  _fpos64_t _EXFUN((*_seek64),(struct _reent *, _PTR, _fpos64_t, int));
 
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */

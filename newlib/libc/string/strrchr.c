@@ -44,7 +44,7 @@ _DEFUN (strrchr, (s, i),
 
   if (i)
     {
-      while (s=strchr(s, i))
+      while ((s=strchr(s, i)))
 	{
 	  last = s;
 	  s++;

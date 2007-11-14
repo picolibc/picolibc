@@ -126,7 +126,7 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
    * non buffer flags, and clear malloc flag.
    */
 
-  _CAST_VOID fflush (fp);
+  _fflush_r (_REENT, fp);
   fp->_r = 0;
   fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)

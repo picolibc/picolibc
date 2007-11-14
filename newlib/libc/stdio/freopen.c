@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -28,8 +28,8 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen(const char *<[file]>, const char *<[mode]>,
 		      FILE *<[fp]>);
-	FILE *_freopen_r(struct _reent *<[ptr]>, const char *<[file]>, 
-	              const char *<[mode]>, FILE *<[fp]>);
+	FILE *_freopen_r(struct _reent *<[ptr]>, const char *<[file]>,
+		      const char *<[mode]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -89,8 +89,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 FILE *
 _DEFUN(_freopen_r, (ptr, file, mode, fp),
        struct _reent *ptr _AND
-       _CONST char *file _AND
-       _CONST char *mode _AND
+       const char *file _AND
+       const char *mode _AND
        register FILE *fp)
 {
   register int f;
@@ -106,7 +106,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
       _funlockfile (fp);
-      _CAST_VOID _fclose_r (ptr, fp);
+      _fclose_r (ptr, fp);
       __sfp_lock_release ();
       return NULL;
     }
@@ -124,13 +124,13 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   else
     {
       if (fp->_flags & __SWR)
-	_CAST_VOID fflush (fp);
+	_fflush_r (ptr, fp);
       /*
        * If close is NULL, closing is a no-op, hence pointless.
        * If file is NULL, the file should not be closed.
        */
       if (fp->_close != NULL && file != NULL)
-	_CAST_VOID (*fp->_close) (fp->_cookie);
+	fp->_close (ptr, fp->_cookie);
     }
 
   /*
@@ -154,10 +154,10 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
        */
       f = fp->_file;
       if ((oldflags = _fcntl_r (ptr, f, F_GETFL, 0)) == -1
-          || ! ((oldflags & O_ACCMODE) == O_RDWR
-                || ((oldflags ^ oflags) & O_ACCMODE) == 0)
-          || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
-        f = -1;
+	  || ! ((oldflags & O_ACCMODE) == O_RDWR
+		|| ((oldflags ^ oflags) & O_ACCMODE) == 0)
+	  || _fcntl_r (ptr, f, F_SETFL, oflags) == -1)
+	f = -1;
 #else
       /* We cannot modify without fcntl support.  */
       f = -1;
@@ -168,16 +168,16 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
        * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
        */
       if (0 <= f && ! isatty (f)
-          && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
-        f = -1;
+	  && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
+	f = -1;
 #endif
 
       if (f < 0)
-        {
-          e = EBADF;
-          if (fp->_close != NULL)
-            _CAST_VOID (*fp->_close) (fp->_cookie);
-        }
+	{
+	  e = EBADF;
+	  if (fp->_close != NULL)
+	    fp->_close (ptr, fp->_cookie);
+	}
     }
 
   /*
@@ -196,10 +196,10 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   fp->_bf._size = 0;
   fp->_lbfsize = 0;
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_ub._size = 0;
   if (HASLB (fp))
-    FREELB (fp);
+    FREELB (ptr, fp);
   fp->_lb._size = 0;
 
   if (f < 0)

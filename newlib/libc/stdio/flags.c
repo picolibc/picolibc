@@ -62,7 +62,7 @@ _DEFUN(__sflags, (ptr, mode, optr),
     }
   if (mode[1] && (mode[1] == '+' || mode[2] == '+'))
     {
-      ret = __SRW;
+      ret = (ret & ~(__SRD | __SWR)) | __SRW;
       m = O_RDWR;
     }
   if (mode[1] && (mode[1] == 'b' || mode[2] == 'b'))

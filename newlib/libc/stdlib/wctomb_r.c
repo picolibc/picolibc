@@ -13,9 +13,14 @@ int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
         struct _reent *r     _AND 
         char          *s     _AND
-        wchar_t        wchar _AND
+        wchar_t        _wchar _AND
         mbstate_t     *state)
 {
+  /* Avoids compiler warnings about comparisons that are always false
+     due to limited range when sizeof(wchar_t) is 2 but sizeof(wint_t)
+     is 4, as is the case on cygwin.  */
+  wint_t wchar = _wchar;
+
   if (strlen (__lc_ctype) <= 1)
     { /* fall-through */ }
   else if (!strcmp (__lc_ctype, "C-UTF-8"))
@@ -171,4 +176,3 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
   return 1;
 }
     
-

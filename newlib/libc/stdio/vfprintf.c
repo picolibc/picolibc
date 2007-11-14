@@ -161,18 +161,18 @@ static char *rcsid = "$Id$";
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
-#define VFPRINTF vfiprintf
-#define _VFPRINTF_R _vfiprintf_r
+# define VFPRINTF vfiprintf
+# define _VFPRINTF_R _vfiprintf_r
 #else
-#define VFPRINTF vfprintf
-#define _VFPRINTF_R _vfprintf_r
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
-#endif
+# define VFPRINTF vfprintf
+# define _VFPRINTF_R _vfprintf_r
+# ifndef NO_FLOATING_POINT
+#  define FLOATING_POINT
+# endif
 #endif
 
-#define _NO_POS_ARGS 
-#if defined _WANT_IO_POS_ARGS
+#define _NO_POS_ARGS
+#ifdef _WANT_IO_POS_ARGS
 # undef _NO_POS_ARGS
 #endif
 
@@ -262,7 +262,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 	/* do the work, then copy any error status */
 	ret = _VFPRINTF_R (rptr, &fake, fmt, ap);
-	if (ret >= 0 && fflush(&fake))
+	if (ret >= 0 && _fflush_r (rptr, &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
@@ -275,34 +275,41 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 
 #ifdef FLOATING_POINT
-#include <locale.h>
-#include <math.h>
-#include "floatio.h"
+# include <locale.h>
+# include <math.h>
 
-#if ((MAXEXP+MAXFRACT+1) > MB_LEN_MAX)
-#  define BUF (MAXEXP+MAXFRACT+1) /* + decimal point */
-#else 
-#  define BUF MB_LEN_MAX
-#endif
+/* For %La, an exponent of 15 bits occupies the exponent character, a
+   sign, and up to 5 digits.  */
+# define	MAXEXP		7
+# define	DEFPREC		6
 
-#define	DEFPREC		6
-
-#ifdef _NO_LONGDBL
+# ifdef _NO_LONGDBL
 static char *
 _EXFUN(cvt, (struct _reent *, double, int, int, char *, int *, int, int *));
-#else
+# else
 static char *
 _EXFUN(cvt, (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
 extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
-#endif
+# endif
 
 static int _EXFUN(exponent, (char *, int, int));
 
-#else /* no FLOATING_POINT */
-
-#define	BUF		40
-
 #endif /* FLOATING_POINT */
+
+/* BUF must be big enough for the maximum %#llo (assuming long long is
+   at most 64 bits, this would be 23 characters), the maximum
+   multibyte character, and the maximum precision of %La (assuming
+   long double is at most 128 bits with 113 bits of mantissa, this
+   would be 31 characters).  %e, %f, and %g use reentrant storage
+   shared with mprec.  All other formats that use buf get by with
+   fewer characters.  Making BUF slightly bigger reduces the need for
+   malloc in %a and %S, when large precision or long strings are
+   processed.  */
+#define	BUF		40
+#if defined _MB_CAPABLE && MB_LEN_MAX > BUF
+# undef BUF
+# define BUF MB_LEN_MAX
+#endif
 
 #ifndef _NO_LONGLONG
 #define quad_t long long
@@ -320,7 +327,11 @@ typedef int  *   int_ptr_t;
 typedef short *  short_ptr_t;
 
 #ifndef _NO_POS_ARGS
-#define MAX_POS_ARGS 32
+# ifdef NL_ARGMAX
+#  define MAX_POS_ARGS NL_ARGMAX
+# else
+#  define MAX_POS_ARGS 32
+# endif
 
 union arg_val
 {
@@ -402,9 +413,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	register struct __siov *iovp;/* for PRINT macro */
 	register int flags;	/* flags as above */
 	char *fmt_anchor;       /* current format spec being processed */
+#ifndef _NO_POS_ARGS
 	int N;                  /* arg number */
 	int arg_index;          /* index into args processed directly */
-#ifndef _NO_POS_ARGS
 	int numargs;            /* number of varargs read */
 	char *saved_fmt;        /* saved fmt pointer */
 	union arg_val args[MAX_POS_ARGS];
@@ -417,20 +428,20 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef FLOATING_POINT
-	char *decimal_point = localeconv()->decimal_point;
+	char *decimal_point = _localeconv_r (data)->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
-#ifdef _NO_LONGDBL
+# ifdef _NO_LONGDBL
 	union { int i; double d; } _double_ = {0};
-	#define _fpvalue (_double_.d)
-#else
+#  define _fpvalue (_double_.d)
+# else
 	union { int i; _LONG_DOUBLE ld; } _long_double_ = {0};
-	#define _fpvalue (_long_double_.ld)
-	int tmp;  
-#endif
+#  define _fpvalue (_long_double_.ld)
+	int tmp;
+# endif
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
 	int ndig = 0;		/* actual number of digits returned by cvt */
-	char expstr[7];		/* buffer for exponent string */
+	char expstr[MAXEXP];	/* buffer for exponent string */
 #endif
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
@@ -441,7 +452,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
-	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
+	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
 	char ox[2];		/* space for 0x hex-prefix */
 #ifdef _MB_CAPABLE
 	wchar_t wc;
@@ -544,7 +555,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	_flockfile (fp);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
-	if (cantwrite (fp)) {
+	if (cantwrite (data, fp)) {
 		_funlockfile (fp);	
 		return (EOF);
 	}
@@ -561,8 +572,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
 	ret = 0;
-	arg_index = 0;
 #ifndef _NO_POS_ARGS
+	arg_index = 0;
 	saved_fmt = NULL;
 	arg_type[0] = -1;
 	numargs = 0;
@@ -603,8 +614,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		width = 0;
 		prec = -1;
 		sign = '\0';
-		N = arg_index;
 #ifndef _NO_POS_ARGS
+		N = arg_index;
 		is_pos_arg = 0;
 #endif
 
@@ -629,9 +640,9 @@ reswitch:	switch (ch) {
 			flags |= ALT;
 			goto rflag;
 		case '*':
-			n = N;
 #ifndef _NO_POS_ARGS
 			/* we must check for positional arg used for dynamic width */
+			n = N;
 			old_is_pos_arg = is_pos_arg;
 			is_pos_arg = 0;
 			if (is_digit (*fmt)) {
@@ -681,9 +692,9 @@ reswitch:	switch (ch) {
 			goto rflag;
 		case '.':
 			if ((ch = *fmt++) == '*') {
-				n = N;
 #ifndef _NO_POS_ARGS
 				/* we must check for positional arg used for dynamic width */
+				n = N;
 				old_is_pos_arg = is_pos_arg;
 				is_pos_arg = 0;
 				if (is_digit (*fmt)) {
@@ -817,18 +828,21 @@ reswitch:	switch (ch) {
 		case 'c':
 		case 'C':
 			cp = buf;
+#ifdef _MB_CAPABLE
 			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if ((size = (int)_wcrtomb_r (data, cp, 
-				    	       (wchar_t)GET_ARG (N, ap, wint_t), 
-					        &ps)) == -1) {
+				if ((size = (int)_wcrtomb_r (data, cp,
+					       (wchar_t)GET_ARG (N, ap, wint_t),
+						&ps)) == -1) {
 					fp->_flags |= __SERR;
 					goto error; 
 				}
 			}
-			else {
+			else
+#endif /* _MB_CAPABLE */
+			{
 				*cp = GET_ARG (N, ap, int);
 				size = 1;
 			}
@@ -872,28 +886,35 @@ reswitch:	switch (ch) {
 				_fpvalue = GET_ARG (N, ap, double);
 			}
 
-			/* do this before tricky precision changes */
+			/* do this before tricky precision changes
+
+			   If the output is infinite or NaN, leading
+			   zeros are not permitted.  Otherwise, scanf
+			   could not read what printf wrote.
+			 */
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 
 #else /* !_NO_LONGDBL */
-			
+
 			if (flags & LONGDBL) {
 				_fpvalue = GET_ARG (N, ap, _LONG_DOUBLE);
 			} else {
@@ -905,19 +926,21 @@ reswitch:	switch (ch) {
 			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "INF";
 				else
 					cp = "inf";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 			if (tmp == 1) {
-				if (ch == 'E' || ch == 'F' || ch == 'G')
+				if (ch <= 'G') /* 'E', 'F', or 'G' */
 					cp = "NAN";
 				else
 					cp = "nan";
 				size = 3;
+				flags &= ~ZEROPAD;
 				break;
 			}
 #endif /* !_NO_LONGDBL */
@@ -929,10 +952,12 @@ reswitch:	switch (ch) {
 
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
-					ch = (ch == 'g') ? 'e' : 'E';
+					ch -= 2; /* 'e' or 'E' */
 				else
 					ch = 'g';
-			} 
+			}
+			else if (ch == 'F')
+				ch = 'f';
 			if (ch <= 'e') {	/* 'e' or 'E' fmt */
 				--expt;
 				expsize = exponent (expstr, expt, ch);
@@ -991,31 +1016,41 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 */
 			/* NOSTRICT */
-			_uquad = (u_long)(unsigned _POINTER_INT)GET_ARG (N, ap, void_ptr_t);
+			_uquad = (uintptr_t) GET_ARG (N, ap, void_ptr_t);
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;
-			ch = 'x';
+			ox[0] = '0';
+			ox[1] = ch = 'x';
 			goto nosign;
 		case 's':
 		case 'S':
 			sign = '\0';
-			if ((cp = GET_ARG (N, ap, char_ptr_t)) == NULL) {
+			cp = GET_ARG (N, ap, char_ptr_t);
+#ifndef __OPTIMIZE_SIZE__
+			/* Behavior is undefined if the user passed a
+			   NULL string when precision is not 0.
+			   However, if we are not optimizing for size,
+			   we might as well mirror glibc behavior.  */
+			if (cp == NULL) {
 				cp = "(null)";
-				size = 6;
+				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
-			else if (ch == 'S' || (flags & LONGINT)) {
+			else
+#endif /* __OPTIMIZE_SIZE__ */
+#ifdef _MB_CAPABLE
+			if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
 				_CONST wchar_t *wcp;
- 
+
 				wcp = (_CONST wchar_t *)cp;
 				size = m = 0;
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
- 
+
 				/* Count number of bytes needed for multibyte
 				   string that will be produced from widechar
 				   string.  */
-  				if (prec >= 0) {
+				if (prec >= 0) {
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
@@ -1033,34 +1068,40 @@ reswitch:	switch (ch) {
 					}
 				}
 				else {
-					if ((size = (int)_wcsrtombs_r (data, 
+					if ((size = (int)_wcsrtombs_r (data,
                                                    NULL, &wcp, 0, &ps)) == -1) {
 						fp->_flags |= __SERR;
 						goto error;
 					}
 					wcp = (_CONST wchar_t *)cp;
 				}
- 
+
 				if (size == 0)
 					break;
- 
-				if ((malloc_buf = 
-				    (char *)_malloc_r (data, size + 1)) == NULL) {
-					fp->_flags |= __SERR;
-					goto error;
-				}
-                             
+
+				if (size >= BUF) {
+					if ((malloc_buf =
+					     (char *)_malloc_r (data, size + 1))
+					    == NULL) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
+					cp = malloc_buf;
+				} else
+					cp = buf;
+
 				/* Convert widechar string to multibyte string. */
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, malloc_buf, 
-                                                 &wcp, size, &ps) != size) {
+				if (_wcsrtombs_r (data, cp,
+						  &wcp, size, &ps) != size) {
 					fp->_flags |= __SERR;
 					goto error;
 				}
-				cp = malloc_buf;
 				cp[size] = '\0';
 			}
-			else if (prec >= 0) {
+			else
+#endif /* _MB_CAPABLE */
+			if (prec >= 0) {
 				/*
 				 * can't use strlen; can only look for the
 				 * NUL in the first `prec' characters, and
@@ -1187,6 +1228,7 @@ number:			if ((dprec = prec) >= 0)
 		 * required by a decimal [diouxX] precision, then print the
 		 * string proper, then emit zeroes required by any leftover
 		 * floating precision; finally, if LADJUST, pad with blanks.
+		 * If flags&FPT, ch must be in [eEfg].
 		 *
 		 * Compute actual size, so we know how much to pad.
 		 * size excludes decimal prec; realsz includes it.
@@ -1232,7 +1274,7 @@ number:			if ((dprec = prec) >= 0)
 					}
 				} else if (expt <= 0) {
 					PRINT ("0", 1);
-					if(expt || ndig) {
+					if(expt || ndig || (flags & ALT)) {
 						PRINT (decimal_point, 1);
 						PAD (-expt, zeroes);
 						PRINT (cp, ndig);
@@ -1241,20 +1283,20 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (cp, ndig);
 					PAD (expt - ndig, zeroes);
 					if (flags & ALT)
-						PRINT (".", 1);
+						PRINT (decimal_point, 1);
 				} else {
 					PRINT (cp, expt);
 					cp += expt;
-					PRINT (".", 1);
-					PRINT (cp, ndig-expt);
+					PRINT (decimal_point, 1);
+					PRINT (cp, ndig - expt);
 				}
 			} else {	/* 'e' or 'E' */
 				if (ndig > 1 || flags & ALT) {
-					ox[0] = *cp++;
-					ox[1] = '.';
-					PRINT (ox, 2);
-                                       if (_fpvalue) {
-						PRINT (cp, ndig-1);
+					PRINT (cp, 1);
+					cp++;
+					PRINT (decimal_point, 1);
+					if (_fpvalue) {
+						PRINT (cp, ndig - 1);
 					} else	/* 0.[0..] */
 						/* __dtoa irregularity */
 						PAD (ndig - 1, zeroes);
@@ -1338,7 +1380,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 	} ld;
 #endif
 
-	if (ch == 'f') {
+	if (ch == 'f' || ch == 'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
 		/* To obtain ndigits after the decimal point for the 'e' 
@@ -1374,7 +1416,7 @@ _DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
-		if (ch == 'f') {
+		if (ch == 'f' || ch == 'F') {
 			if (*digits == '0' && value)
 				*decpt = -ndigits + 1;
 			bp += *decpt;
@@ -1395,7 +1437,7 @@ _DEFUN(exponent, (p0, exp, fmtch),
        int fmtch)
 {
 	register char *p, *t;
-	char expbuf[40];
+	char expbuf[MAXEXP];
 
 	p = p0;
 	*p++ = fmtch;
@@ -1405,13 +1447,13 @@ _DEFUN(exponent, (p0, exp, fmtch),
 	}
 	else
 		*p++ = '+';
-	t = expbuf + 40;
+	t = expbuf + MAXEXP;
 	if (exp > 9) {
 		do {
 			*--t = to_char (exp % 10);
 		} while ((exp /= 10) > 9);
 		*--t = to_char (exp);
-		for (; t < expbuf + 40; *p++ = *t++);
+		for (; t < expbuf + MAXEXP; *p++ = *t++);
 	}
 	else {
 		*p++ = '0';
@@ -1505,12 +1547,12 @@ _CONST static CH_CLASS chclass[256] = {
   /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
   /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
   /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    OTHER,   SPEC, 
+  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
   /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
-  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   SPEC, 
-  /* 58-5f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
+  /* 58-5f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
-  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
+  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   SPEC,    SPEC,
   /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    MODFR,   SPEC,    OTHER,   OTHER,
   /* 78-7f */  SPEC,    OTHER,   MODFR,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 80-87 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -1582,7 +1624,8 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   ACTION action;
   int pos, last_arg;
   int max_pos_arg = n;
-  enum types { INT, LONG_INT, SHORT_INT, CHAR_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
+  /* Only need types that can be reached via vararg promotions.  */
+  enum types { INT, LONG_INT, QUAD_INT, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
 #ifdef _MB_CAPABLE
   wchar_t wc;
   mbstate_t wc_state;
@@ -1641,13 +1684,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	      switch (ch)
 		{
 		case 'h':
-		  if (*fmt == 'h')
-		    {
-		      flags |= CHARINT;
-		      ++fmt;
-		    }
-		  else
-		    flags |= SHORTINT;
+                  /* No flag needed, since short and char promote to int.  */
 		  break;
 		case 'L':
 		  flags |= LONGDBL;
@@ -1662,10 +1699,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    flags |= QUADINT;
 		  break;
 		case 'z':
-		  if (sizeof (size_t) < sizeof (int))
-		    /* POSIX states size_t is 16 or more bits, as is short.  */
-		    flags |= SHORTINT;
-		  else if (sizeof (size_t) == sizeof (int))
+		  if (sizeof (size_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (size_t) <= sizeof (long))
 		    flags |= LONGINT;
@@ -1677,11 +1711,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    flags |= QUADINT;
 		  break;
 		case 't':
-		  if (sizeof (ptrdiff_t) < sizeof (int))
-		    /* POSIX states ptrdiff_t is 16 or more bits, as
-		       is short.  */
-		    flags |= SHORTINT;
-		  else if (sizeof (ptrdiff_t) == sizeof (int))
+		  if (sizeof (ptrdiff_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (ptrdiff_t) <= sizeof (long))
 		    flags |= LONGINT;
@@ -1718,10 +1748,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 'u':
 		    if (flags & LONGINT)
 		      spec_type = LONG_INT;
-		    else if (flags & SHORTINT)
-		      spec_type = SHORT_INT;
-		    else if (flags & CHARINT)
-		      spec_type = CHAR_INT;
 #ifndef _NO_LONGLONG
 		    else if (flags & QUADINT)
 		      spec_type = QUAD_INT;
@@ -1735,6 +1761,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    spec_type = LONG_INT;
 		    break;
 		  case 'f':
+		  case 'F':
 		  case 'g':
 		  case 'G':
 		  case 'E':
@@ -1749,10 +1776,14 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		  case 's':
 		  case 'S':
 		  case 'p':
+		  case 'n':
 		    spec_type = CHAR_PTR;
 		    break;
 		  case 'c':
-		    spec_type = CHAR;
+		    if (flags & LONGINT)
+		      spec_type = WIDE_CHAR;
+		    else
+		      spec_type = INT;
 		    break;
 		  case 'C':
 		    spec_type = WIDE_CHAR;
@@ -1776,9 +1807,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		      case WIDE_CHAR:
 			args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 			break;
-		      case CHAR:
-		      case CHAR_INT:
-		      case SHORT_INT:
 		      case INT:
 			args[numargs++].val_int = va_arg (*ap, int);
 			break;
@@ -1863,9 +1891,6 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	  args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 	  break;
 	case INT:
-	case CHAR_INT:
-	case SHORT_INT:
-	case CHAR:
 	default:
 	  args[numargs++].val_int = va_arg (*ap, int);
 	  break;

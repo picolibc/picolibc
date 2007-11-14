@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -35,12 +35,17 @@
  */
 
 _VOID
-_DEFUN(__smakebuf, (fp),
+_DEFUN(__smakebuf_r, (ptr, fp),
+       struct _reent *ptr _AND
        register FILE *fp)
 {
   register size_t size, couldbetty;
   register _PTR p;
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 st;
+#else
   struct stat st;
+#endif
 
   if (fp->_flags & __SNBF)
     {
@@ -49,9 +54,9 @@ _DEFUN(__smakebuf, (fp),
       return;
     }
 #ifdef __USE_INTERNAL_STAT64
-  if (fp->_file < 0 || _fstat64_r (_REENT, fp->_file, &st) < 0)
+  if (fp->_file < 0 || _fstat64_r (ptr, fp->_file, &st) < 0)
 #else
-  if (fp->_file < 0 || _fstat_r (_REENT, fp->_file, &st) < 0)
+  if (fp->_file < 0 || _fstat_r (ptr, fp->_file, &st) < 0)
 #endif
     {
       couldbetty = 0;
@@ -87,15 +92,18 @@ _DEFUN(__smakebuf, (fp),
       else
 	fp->_flags |= __SNPT;
     }
-  if ((p = _malloc_r (_REENT, size)) == NULL)
+  if ((p = _malloc_r (ptr, size)) == NULL)
     {
-      fp->_flags |= __SNBF;
-      fp->_bf._base = fp->_p = fp->_nbuf;
-      fp->_bf._size = 1;
+      if (!(fp->_flags & __SSTR))
+	{
+	  fp->_flags |= __SNBF;
+	  fp->_bf._base = fp->_p = fp->_nbuf;
+	  fp->_bf._size = 1;
+	}
     }
   else
     {
-      _REENT->__cleanup = _cleanup_r;
+      ptr->__cleanup = _cleanup_r;
       fp->_flags |= __SMBF;
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;

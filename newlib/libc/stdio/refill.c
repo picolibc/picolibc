@@ -43,7 +43,7 @@ _DEFUN(__srefill_r, (ptr, fp),
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (_REENT);
+  CHECK_INIT (ptr);
 
   fp->_r = 0;			/* largely a convenience for callers */
 
@@ -65,7 +65,7 @@ _DEFUN(__srefill_r, (ptr, fp),
       /* switch to reading */
       if (fp->_flags & __SWR)
 	{
-	  if (fflush (fp))
+	  if (_fflush_r (ptr, fp))
 	    return EOF;
 	  fp->_flags &= ~__SWR;
 	  fp->_w = 0;
@@ -83,7 +83,7 @@ _DEFUN(__srefill_r, (ptr, fp),
        */
       if (HASUB (fp))
 	{
-	  FREEUB (fp);
+	  FREEUB (ptr, fp);
 	  if ((fp->_r = fp->_ur) != 0)
 	    {
 	      fp->_p = fp->_up;
@@ -93,7 +93,7 @@ _DEFUN(__srefill_r, (ptr, fp),
     }
 
   if (fp->_bf._base == NULL)
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
 
   /*
    * Before reading from a line buffered or unbuffered file,
@@ -104,7 +104,7 @@ _DEFUN(__srefill_r, (ptr, fp),
   if (fp->_flags & (__SLBF | __SNBF))
     _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
   fp->_p = fp->_bf._base;
-  fp->_r = (*fp->_read) (fp->_cookie, (char *) fp->_p, fp->_bf._size);
+  fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
   fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
 #ifndef __CYGWIN__
   if (fp->_r <= 0)

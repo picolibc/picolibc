@@ -26,11 +26,11 @@
 
 #ifdef __LARGE64_FILES
 _fpos64_t
-__sseek64_r (ptr, cookie, offset, whence)
-     struct _reent *ptr;
-     _PTR cookie;
-     _fpos64_t offset;
-     int whence;
+_DEFUN(__sseek64, (ptr, cookie, offset, whence),
+       struct _reent *ptr _AND
+       void *cookie _AND
+       _fpos64_t offset _AND
+       int whence)
 {
   register FILE *fp = (FILE *) cookie;
   register _off64_t ret;
@@ -47,11 +47,11 @@ __sseek64_r (ptr, cookie, offset, whence)
 }
 
 _READ_WRITE_RETURN_TYPE
-__swrite64_r (ptr, cookie, buf, n)
-     struct _reent *ptr;
-     _PTR cookie;
-     char _CONST *buf;
-     int n;
+_DEFUN(__swrite64, (ptr, cookie, buf, n),
+       struct _reent *ptr _AND
+       void *cookie _AND
+       char const *buf _AND
+       int n)
 {
   register FILE *fp = (FILE *) cookie;
   int w;
@@ -78,26 +78,4 @@ __swrite64_r (ptr, cookie, buf, n)
   return w;
 }
 
-#ifndef _REENT_ONLY
-_fpos64_t
-__sseek64 (cookie, offset, whence)
-     _PTR cookie;
-     _fpos64_t offset;
-     int whence;
-{
-  return __sseek64_r (_REENT, cookie, offset, whence);
-}
-
-_READ_WRITE_RETURN_TYPE
-__swrite64 (cookie, buf, n)
-     _PTR cookie;
-     char _CONST *buf;
-     int n;
-{
-  return __swrite64_r (_REENT, cookie, buf, n);
-}
-
-#endif /* !_REENT_ONLY */
-
 #endif /* __LARGE64_FILES */
-

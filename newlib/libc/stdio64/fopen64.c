@@ -27,7 +27,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen64(const char *<[file]>, const char *<[mode]>);
-	FILE *_fopen64_r(void *<[reent]>, 
+	FILE *_fopen64_r(void *<[reent]>,
                        const char *<[file]>, const char *<[mode]>);
 
 TRAD_SYNOPSIS
@@ -66,7 +66,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <stdio.h>
 #include <errno.h>
-#include "local64.h"
+#include "local.h"
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
@@ -91,12 +91,12 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
 
   if ((f = _open64_r (ptr, file, oflags, 0666)) < 0)
     {
-      __sfp_lock_acquire (); 
+      __sfp_lock_acquire ();
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      __sfp_lock_release (); 
+      __sfp_lock_release ();
       return NULL;
     }
 

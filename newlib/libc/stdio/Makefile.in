@@ -55,39 +55,40 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 = $(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
 	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
-am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-dprintf.$(OBJEXT) \
-	lib_a-fclose.$(OBJEXT) lib_a-fdopen.$(OBJEXT) \
-	lib_a-feof.$(OBJEXT) lib_a-ferror.$(OBJEXT) \
-	lib_a-fflush.$(OBJEXT) lib_a-fgetc.$(OBJEXT) \
-	lib_a-fgetpos.$(OBJEXT) lib_a-fgets.$(OBJEXT) \
-	lib_a-fileno.$(OBJEXT) lib_a-findfp.$(OBJEXT) \
-	lib_a-fiprintf.$(OBJEXT) lib_a-flags.$(OBJEXT) \
-	lib_a-fopen.$(OBJEXT) lib_a-fprintf.$(OBJEXT) \
-	lib_a-fputc.$(OBJEXT) lib_a-fputs.$(OBJEXT) \
-	lib_a-fread.$(OBJEXT) lib_a-freopen.$(OBJEXT) \
-	lib_a-fscanf.$(OBJEXT) lib_a-fiscanf.$(OBJEXT) \
-	lib_a-fseek.$(OBJEXT) lib_a-fsetpos.$(OBJEXT) \
-	lib_a-ftell.$(OBJEXT) lib_a-fvwrite.$(OBJEXT) \
-	lib_a-fwalk.$(OBJEXT) lib_a-fwrite.$(OBJEXT) \
-	lib_a-getc.$(OBJEXT) lib_a-getchar.$(OBJEXT) \
-	lib_a-getc_u.$(OBJEXT) lib_a-getchar_u.$(OBJEXT) \
-	lib_a-getdelim.$(OBJEXT) lib_a-getline.$(OBJEXT) \
-	lib_a-gets.$(OBJEXT) lib_a-iprintf.$(OBJEXT) \
-	lib_a-iscanf.$(OBJEXT) lib_a-makebuf.$(OBJEXT) \
-	lib_a-perror.$(OBJEXT) lib_a-printf.$(OBJEXT) \
-	lib_a-putc.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
-	lib_a-putc_u.$(OBJEXT) lib_a-putchar_u.$(OBJEXT) \
-	lib_a-puts.$(OBJEXT) lib_a-refill.$(OBJEXT) \
-	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-rewind.$(OBJEXT) lib_a-rget.$(OBJEXT) \
-	lib_a-scanf.$(OBJEXT) lib_a-sccl.$(OBJEXT) \
-	lib_a-setbuf.$(OBJEXT) lib_a-setbuffer.$(OBJEXT) \
-	lib_a-setlinebuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
-	lib_a-siprintf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
-	lib_a-sniprintf.$(OBJEXT) lib_a-snprintf.$(OBJEXT) \
-	lib_a-sprintf.$(OBJEXT) lib_a-sscanf.$(OBJEXT) \
-	lib_a-stdio.$(OBJEXT) lib_a-tmpfile.$(OBJEXT) \
-	lib_a-tmpnam.$(OBJEXT) lib_a-ungetc.$(OBJEXT) \
+am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-diprintf.$(OBJEXT) \
+	lib_a-dprintf.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
+	lib_a-fdopen.$(OBJEXT) lib_a-feof.$(OBJEXT) \
+	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
+	lib_a-fgetc.$(OBJEXT) lib_a-fgetpos.$(OBJEXT) \
+	lib_a-fgets.$(OBJEXT) lib_a-fileno.$(OBJEXT) \
+	lib_a-findfp.$(OBJEXT) lib_a-fiprintf.$(OBJEXT) \
+	lib_a-flags.$(OBJEXT) lib_a-fopen.$(OBJEXT) \
+	lib_a-fprintf.$(OBJEXT) lib_a-fputc.$(OBJEXT) \
+	lib_a-fputs.$(OBJEXT) lib_a-fread.$(OBJEXT) \
+	lib_a-freopen.$(OBJEXT) lib_a-fscanf.$(OBJEXT) \
+	lib_a-fiscanf.$(OBJEXT) lib_a-fseek.$(OBJEXT) \
+	lib_a-fsetpos.$(OBJEXT) lib_a-ftell.$(OBJEXT) \
+	lib_a-fvwrite.$(OBJEXT) lib_a-fwalk.$(OBJEXT) \
+	lib_a-fwrite.$(OBJEXT) lib_a-getc.$(OBJEXT) \
+	lib_a-getchar.$(OBJEXT) lib_a-getc_u.$(OBJEXT) \
+	lib_a-getchar_u.$(OBJEXT) lib_a-getdelim.$(OBJEXT) \
+	lib_a-getline.$(OBJEXT) lib_a-gets.$(OBJEXT) \
+	lib_a-iprintf.$(OBJEXT) lib_a-iscanf.$(OBJEXT) \
+	lib_a-makebuf.$(OBJEXT) lib_a-perror.$(OBJEXT) \
+	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
+	lib_a-putchar.$(OBJEXT) lib_a-putc_u.$(OBJEXT) \
+	lib_a-putchar_u.$(OBJEXT) lib_a-puts.$(OBJEXT) \
+	lib_a-refill.$(OBJEXT) lib_a-remove.$(OBJEXT) \
+	lib_a-rename.$(OBJEXT) lib_a-rewind.$(OBJEXT) \
+	lib_a-rget.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
+	lib_a-sccl.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
+	lib_a-setbuffer.$(OBJEXT) lib_a-setlinebuf.$(OBJEXT) \
+	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+	lib_a-siscanf.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
+	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
+	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
+	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
+	lib_a-ungetc.$(OBJEXT) lib_a-vdiprintf.$(OBJEXT) \
 	lib_a-vdprintf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
 	lib_a-viscanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
 	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
@@ -109,21 +110,21 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-dprintf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_3 = clearerr.lo dprintf.lo fclose.lo fdopen.lo feof.lo \
-	ferror.lo fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo \
-	findfp.lo fiprintf.lo flags.lo fopen.lo fprintf.lo fputc.lo \
-	fputs.lo fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo \
-	fsetpos.lo ftell.lo fvwrite.lo fwalk.lo fwrite.lo getc.lo \
-	getchar.lo getc_u.lo getchar_u.lo getdelim.lo getline.lo \
-	gets.lo iprintf.lo iscanf.lo makebuf.lo perror.lo printf.lo \
-	putc.lo putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo \
-	remove.lo rename.lo rewind.lo rget.lo scanf.lo sccl.lo \
-	setbuf.lo setbuffer.lo setlinebuf.lo setvbuf.lo siprintf.lo \
-	siscanf.lo sniprintf.lo snprintf.lo sprintf.lo sscanf.lo \
-	stdio.lo tmpfile.lo tmpnam.lo ungetc.lo vdprintf.lo \
-	viprintf.lo viscanf.lo vprintf.lo vscanf.lo vsiprintf.lo \
-	vsiscanf.lo vsnprintf.lo vsniprintf.lo vsprintf.lo vsscanf.lo \
-	wbuf.lo wsetup.lo
+am__objects_3 = clearerr.lo diprintf.lo dprintf.lo fclose.lo fdopen.lo \
+	feof.lo ferror.lo fflush.lo fgetc.lo fgetpos.lo fgets.lo \
+	fileno.lo findfp.lo fiprintf.lo flags.lo fopen.lo fprintf.lo \
+	fputc.lo fputs.lo fread.lo freopen.lo fscanf.lo fiscanf.lo \
+	fseek.lo fsetpos.lo ftell.lo fvwrite.lo fwalk.lo fwrite.lo \
+	getc.lo getchar.lo getc_u.lo getchar_u.lo getdelim.lo \
+	getline.lo gets.lo iprintf.lo iscanf.lo makebuf.lo perror.lo \
+	printf.lo putc.lo putchar.lo putc_u.lo putchar_u.lo puts.lo \
+	refill.lo remove.lo rename.lo rewind.lo rget.lo scanf.lo \
+	sccl.lo setbuf.lo setbuffer.lo setlinebuf.lo setvbuf.lo \
+	siprintf.lo siscanf.lo sniprintf.lo snprintf.lo sprintf.lo \
+	sscanf.lo stdio.lo tmpfile.lo tmpnam.lo ungetc.lo vdiprintf.lo \
+	vdprintf.lo viprintf.lo viscanf.lo vprintf.lo vscanf.lo \
+	vsiprintf.lo vsiscanf.lo vsnprintf.lo vsniprintf.lo \
+	vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
 @ELIX_LEVEL_1_FALSE@am__objects_4 = asiprintf.lo asprintf.lo \
 @ELIX_LEVEL_1_FALSE@	fcloseall.lo fseeko.lo ftello.lo getw.lo \
 @ELIX_LEVEL_1_FALSE@	mktemp.lo putw.lo vasiprintf.lo \
@@ -289,6 +290,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
 	clearerr.c 			\
+	diprintf.c			\
 	dprintf.c			\
 	fclose.c 			\
 	fdopen.c 			\
@@ -354,6 +356,7 @@ GENERAL_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
+	vdiprintf.c			\
 	vdprintf.c			\
 	viprintf.c 			\
 	viscanf.c			\
@@ -366,7 +369,7 @@ GENERAL_SOURCES = \
 	vsprintf.c 			\
 	vsscanf.c			\
 	wbuf.c 				\
-	wsetup.c 
+	wsetup.c
 
 @ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	asiprintf.c		\
@@ -532,6 +535,12 @@ lib_a-clearerr.o: clearerr.c
 
 lib_a-clearerr.obj: clearerr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clearerr.obj `if test -f 'clearerr.c'; then $(CYGPATH_W) 'clearerr.c'; else $(CYGPATH_W) '$(srcdir)/clearerr.c'; fi`
+
+lib_a-diprintf.o: diprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.o `test -f 'diprintf.c' || echo '$(srcdir)/'`diprintf.c
+
+lib_a-diprintf.obj: diprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.obj `if test -f 'diprintf.c'; then $(CYGPATH_W) 'diprintf.c'; else $(CYGPATH_W) '$(srcdir)/diprintf.c'; fi`
 
 lib_a-dprintf.o: dprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.o `test -f 'dprintf.c' || echo '$(srcdir)/'`dprintf.c
@@ -922,6 +931,12 @@ lib_a-ungetc.o: ungetc.c
 
 lib_a-ungetc.obj: ungetc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ungetc.obj `if test -f 'ungetc.c'; then $(CYGPATH_W) 'ungetc.c'; else $(CYGPATH_W) '$(srcdir)/ungetc.c'; fi`
+
+lib_a-vdiprintf.o: vdiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.o `test -f 'vdiprintf.c' || echo '$(srcdir)/'`vdiprintf.c
+
+lib_a-vdiprintf.obj: vdiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.obj `if test -f 'vdiprintf.c'; then $(CYGPATH_W) 'vdiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vdiprintf.c'; fi`
 
 lib_a-vdprintf.o: vdprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdprintf.o `test -f 'vdprintf.c' || echo '$(srcdir)/'`vdprintf.c

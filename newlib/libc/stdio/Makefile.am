@@ -6,6 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
 	clearerr.c 			\
+	diprintf.c			\
 	dprintf.c			\
 	fclose.c 			\
 	fdopen.c 			\
@@ -71,6 +72,7 @@ GENERAL_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
+	vdiprintf.c			\
 	vdprintf.c			\
 	viprintf.c 			\
 	viscanf.c			\
@@ -83,7 +85,7 @@ GENERAL_SOURCES = \
 	vsprintf.c 			\
 	vsscanf.c			\
 	wbuf.c 				\
-	wsetup.c 
+	wsetup.c
 
 ## The following are EL/IX level 2 interfaces
 if ELIX_LEVEL_1

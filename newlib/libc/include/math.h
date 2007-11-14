@@ -1,4 +1,3 @@
-
 #ifndef  _MATH_H_
 #define  _MATH_H_
 
@@ -13,13 +12,13 @@ union __dmath
   __ULong i[2];
   double d;
 };
- 
+
 union __fmath
 {
   __ULong i[1];
   float f;
 };
- 
+
 union __ldmath
 {
   __ULong i[4];
@@ -32,23 +31,31 @@ union __ldmath
 
  /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
 
- #ifndef HUGE_VAL
-  #define HUGE_VAL (__builtin_huge_val())
- #endif
+# ifndef HUGE_VAL
+#  define HUGE_VAL (__builtin_huge_val())
+# endif
 
- #ifndef HUGE_VALF
-  #define HUGE_VALF (__builtin_huge_valf())
- #endif
+# ifndef HUGE_VALF
+#  define HUGE_VALF (__builtin_huge_valf())
+# endif
 
- #ifndef HUGE_VALL
-  #define HUGE_VALL (__builtin_huge_vall())
- #endif
+# ifndef HUGE_VALL
+#  define HUGE_VALL (__builtin_huge_vall())
+# endif
+
+# ifndef INFINITY
+#  define INFINITY (__builtin_inff())
+# endif
+
+# ifndef NAN
+#  define NAN (__builtin_nanf(""))
+# endif
 
 #else /* !gcc >= 3.3  */
 
- /* No builtins.  Use floating-point unions instead.  Declare as an array 
-    without bounds so no matter what small data support a port and/or 
-    library has, the reference will be via the general method for accessing 
+ /* No builtins.  Use floating-point unions instead.  Declare as an array
+    without bounds so no matter what small data support a port and/or
+    library has, the reference will be via the general method for accessing
     globals. */
 
  #ifndef HUGE_VAL
@@ -117,6 +124,23 @@ typedef double double_t;
 #define FP_ZERO        2
 #define FP_SUBNORMAL   3
 #define FP_NORMAL      4
+
+#ifndef FP_ILOGB0
+# define FP_ILOGB0 (-INT_MAX)
+#endif
+#ifndef FP_ILOGBNAN
+# define FP_ILOGBNAN INT_MAX
+#endif
+
+#ifndef MATH_ERRNO
+# define MATH_ERRNO 1
+#endif
+#ifndef MATH_ERREXCEPT
+# define MATH_ERREXCEPT 2
+#endif
+#ifndef math_errhandling
+# define math_errhandling MATH_ERRNO
+#endif
 
 extern int __isinff (float x);
 extern int __isinfd (double x);
@@ -339,9 +363,9 @@ extern int *__signgam _PARAMS((void));
 /* We have a problem when using C++ since `exception' is a reserved
    name in C++.  */
 #ifdef __cplusplus
-struct __exception 
+struct __exception
 #else
-struct exception 
+struct exception
 #endif
 {
   int type;
@@ -389,7 +413,7 @@ extern int matherr _PARAMS((struct exception *e));
 #define M_SQRT1_2	0.70710678118654752440
 #define M_LN2LO         1.9082149292705877000E-10
 #define M_LN2HI         6.9314718036912381649E-1
-#define M_SQRT3   	1.73205080756887719000
+#define M_SQRT3	1.73205080756887719000
 #define M_IVLN10        0.43429448190325182765 /* 1 / log(10) */
 #define M_LOG2_E        0.693147180559945309417
 #define M_INVLN2        1.4426950408889633870E0  /* 1 / log(2) */

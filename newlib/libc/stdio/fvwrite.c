@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2006 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -60,7 +60,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
     return 0;
 
   /* make sure we can write */
-  if (cantwrite (fp))
+  if (cantwrite (ptr, fp))
     {
       fp->_flags |= __SERR;
       ptr->_errno = EBADF;
@@ -98,7 +98,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
       do
 	{
 	  GETIOV (;);
-	  w = (*fp->_write) (fp->_cookie, p, MIN (len, BUFSIZ));
+	  w = fp->_write (ptr, fp->_cookie, p, MIN (len, BUFSIZ));
 	  if (w <= 0)
 	    goto err;
 	  p += w;
@@ -129,7 +129,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	    {
 	      if (len >= w && fp->_flags & __SMBF)
 		{ /* must be asprintf family */
-		  unsigned char *ptr;
+		  unsigned char *str;
 		  int curpos = (fp->_p - fp->_bf._base);
 		  /* Choose a geometric growth factor to avoid
 		     quadratic realloc behavior, but use a rate less
@@ -141,17 +141,18 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 		  int newsize = fp->_bf._size * 3 / 2;
 		  if (newsize < curpos + len + 1)
 		    newsize = curpos + len + 1;
-		  ptr = (unsigned char *)_realloc_r (_REENT, 
-                                                     fp->_bf._base, 
-                                                     newsize);
-		  if (!ptr)
+		  str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+						     newsize);
+		  if (!str)
 		    {
 		      /* Free buffer which is no longer used.  */
-		      _free_r (_REENT, fp->_bf._base);
+		      _free_r (ptr, fp->_bf._base);
+                      /* Ensure correct errno, even if free changed it.  */
+                      ptr->_errno = ENOMEM;
 		      goto err;
 		    }
-		  fp->_bf._base = ptr;
-		  fp->_p = ptr + curpos;
+		  fp->_bf._base = str;
+		  fp->_p = str + curpos;
 		  fp->_bf._size = newsize;
 		  w = len;
 		  fp->_w = newsize - curpos;
@@ -169,13 +170,13 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	      COPY (w);
 	      /* fp->_w -= w; *//* unneeded */
 	      fp->_p += w;
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	    }
 	  else if (len >= (w = fp->_bf._size))
 	    {
 	      /* write directly */
-	      w = (*fp->_write) (fp->_cookie, p, w);
+	      w = fp->_write (ptr, fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }
@@ -219,12 +220,12 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	      COPY (w);
 	      /* fp->_w -= w; */
 	      fp->_p += w;
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	    }
 	  else if (s >= (w = fp->_bf._size))
 	    {
-	      w = (*fp->_write) (fp->_cookie, p, w);
+	      w = fp->_write (ptr, fp->_cookie, p, w);
 	      if (w <= 0)
 		goto err;
 	    }
@@ -238,7 +239,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	  if ((nldist -= w) == 0)
 	    {
 	      /* copied the newline: flush and forget */
-	      if (fflush (fp))
+	      if (_fflush_r (ptr, fp))
 		goto err;
 	      nlknown = 0;
 	    }

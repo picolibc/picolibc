@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990 The Regents of the University of California.
+ * Copyright (c) 1990, 2007 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -168,7 +168,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 
       /* If still more data needed, free any allocated ungetc buffer.  */
       if (HASUB (fp) && resid > 0)
-	FREEUB (fp);
+	FREEUB (ptr, fp);
 
       /* Finally read directly into user's buffer if needed.  */
       while (resid > 0)

@@ -120,12 +120,12 @@ _DEFUN(_ftell_r, (ptr, fp),
 
   /* Find offset of underlying I/O object, then
      adjust for buffered bytes.  */
-  fflush(fp);           /* may adjust seek offset on append stream */
+  _fflush_r (ptr, fp);           /* may adjust seek offset on append stream */
   if (fp->_flags & __SOFF)
     pos = fp->_offset;
   else
     {
-      pos = (*fp->_seek) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+      pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
           _funlockfile (fp);
@@ -154,6 +154,11 @@ _DEFUN(_ftell_r, (ptr, fp),
     }
 
   _funlockfile (fp);
+  if ((long)pos != pos)
+    {
+      pos = -1;
+      ptr->_errno = EOVERFLOW;
+    }
   return pos;
 }
 

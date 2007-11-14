@@ -147,9 +147,9 @@ DESCRIPTION
 		Then <<scanf>> proceeds to the next format specification.
 
         o size
-		<<h>>, <<l>>, and <<L>> are optional size characters which
-		override the default way that <<scanf>> interprets the
-		data type of the corresponding argument.
+		<<h>>, <<j>>, <<l>>, <<L>>, <<t>>, and <<z>> are optional size
+		characters which override the default way that <<scanf>>
+		interprets the data type of the corresponding argument.
 
 
 .Modifier   Type(s)
@@ -161,6 +161,11 @@ DESCRIPTION
 .
 .   h       D, I, O, U, X     no effect
 .           e, f, c, s, p
+.
+.   j       d, i, o, u, x, n  convert input to intmax_t,
+.                             store in intmax_t object
+.
+.   j       all others        no effect
 .
 .   l       d, i, o, u, x, n  convert input to long,
 .                             store in long object
@@ -180,7 +185,18 @@ DESCRIPTION
 .   L       e, f, g, E, G     convert to long double,
 .                             store in long double
 .
-.   L      all others         no effect
+.   L       all others        no effect
+.
+.   t       d, i, o, u, x, n  convert input to ptrdiff_t,
+.                             store in ptrdiff_t object
+.
+.   t       all others        no effect
+.
+.   z       d, i, o, u, x, n  convert input to size_t,
+.                             store in size_t object
+.
+.   z       all others        no effect
+.
 
 
         o <[type]>
@@ -377,7 +393,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 /* | ARGSUSED */
 /*SUPPRESS 590*/
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(eofread, (cookie, buf, len),
+_DEFUN(eofread, (ptr, cookie, buf, len),
+       struct _reent *ptr _AND
        _PTR cookie _AND
        char *buf   _AND
        int len)

@@ -109,14 +109,12 @@ Supporting OS subroutines required:
 #include <wctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <limits.h>
 #include <wchar.h>
 #include <string.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
+#include <errno.h>
 #include "local.h"
 
 #ifdef INTEGER_ONLY
@@ -166,6 +164,18 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #if defined _WANT_IO_LONG_LONG && defined __GNUC__
 # undef _NO_LONGLONG
 #endif
+
+#define _NO_POS_ARGS
+#ifdef _WANT_IO_POS_ARGS
+# undef _NO_POS_ARGS
+# ifdef NL_ARGMAX
+#  define MAX_POS_ARGS NL_ARGMAX
+# else
+#  define MAX_POS_ARGS 32
+# endif
+
+static void * get_arg (int, va_list *, int *, void **);
+#endif /* _WANT_IO_POS_ARGS */
 
 /*
  * Flags used during conversion.
@@ -274,6 +284,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   register char *p0;		/* saves original value of p when necessary */
   int nassigned;		/* number of fields assigned */
   int nread;			/* number of characters consumed from fp */
+#ifndef _NO_POS_ARGS
+  int N;			/* arg number */
+  int arg_index = 0;		/* index into args processed directly */
+  int numargs = 0;		/* number of varargs read */
+  void *args[MAX_POS_ARGS];	/* positional args read */
+  int is_pos_arg;		/* is current format positional? */
+#endif
   int base = 0;			/* base argument to strtol/strtoul */
   int nbytes = 1;               /* number of bytes read from fmt string */
   wchar_t wc;                   /* wchar to use to read format string */
@@ -289,9 +306,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   char *cp;
   short *sp;
   int *ip;
+#ifdef FLOATING_POINT
   float *flp;
   _LONG_DOUBLE *ldp;
   double *dp;
+#endif
   long *lp;
 #ifndef _NO_LONGLONG
   long long *llp;
@@ -300,6 +319,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   /* `basefix' is used to avoid `if' tests in the integer scanner */
   static _CONST short basefix[17] =
     {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+
+  /* Macro to support positional arguments */
+#ifndef _NO_POS_ARGS
+# define GET_ARG(n, ap, type)					\
+  ((type) (is_pos_arg						\
+	   ? (n < numargs					\
+	      ? args[n]						\
+	      : get_arg (n, &ap, &numargs, args))		\
+	   : (arg_index++ < numargs				\
+	      ? args[n]						\
+	      : (numargs < MAX_POS_ARGS				\
+		 ? args[numargs++] = va_arg (ap, void *)	\
+		 : va_arg (ap, void *)))))
+#else
+# define GET_ARG(n, ap, type) (va_arg (ap, type))
+#endif
 
   _flockfile (fp);
  
@@ -330,6 +365,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	goto literal;
       width = 0;
       flags = 0;
+#ifndef _NO_POS_ARGS
+      N = arg_index;
+      is_pos_arg = 0;
+#endif
 
       /*
        * switch on the format.  continue if done; break once format
@@ -380,6 +419,43 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  else
 	    flags |= SHORT;
 	  goto again;
+        case 'j':               /* intmax_t */
+	  if (sizeof (intmax_t) == sizeof (long))
+	    flags |= LONG;
+	  else
+	    flags |= LONGDBL;
+	  goto again;
+        case 't':               /* ptrdiff_t */
+	  if (sizeof (ptrdiff_t) < sizeof (int))
+	    /* POSIX states ptrdiff_t is 16 or more bits, as
+	       is short.  */
+	    flags |= SHORT;
+	  else if (sizeof (ptrdiff_t) == sizeof (int))
+	    /* no flag needed */;
+	  else if (sizeof (ptrdiff_t) <= sizeof (long))
+	    flags |= LONG;
+	  else
+	    /* POSIX states that at least one programming
+	       environment must support ptrdiff_t no wider than
+	       long, but that means other environments can
+	       have ptrdiff_t as wide as long long.  */
+	    flags |= LONGDBL;
+	  goto again;
+        case 'z':               /* size_t */
+	  if (sizeof (size_t) < sizeof (int))
+	    /* POSIX states size_t is 16 or more bits, as is short.  */
+	    flags |= SHORT;
+	  else if (sizeof (size_t) == sizeof (int))
+	    /* no flag needed */;
+	  else if (sizeof (size_t) <= sizeof (long))
+	    flags |= LONG;
+	  else
+	    /* POSIX states that at least one programming
+	       environment must support size_t no wider than
+	       long, but that means other environments can
+	       have size_t as wide as long long.  */
+	    flags |= LONGDBL;
+	  goto again;
 
 	case '0':
 	case '1':
@@ -393,6 +469,19 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	case '9':
 	  width = width * 10 + c - '0';
 	  goto again;
+
+#ifndef _NO_POS_ARGS
+	case '$':
+	  if (width <= MAX_POS_ARGS)
+	    {
+	      N = width - 1;
+	      is_pos_arg = 1;
+	      width = 0;
+	      goto again;
+	    }
+	  rptr->_errno = EINVAL;
+	  goto input_failure;
+#endif /* !_NO_POS_ARGS */
 
 	  /*
 	   * Conversions. Those marked `compat' are for
@@ -486,29 +575,29 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    continue;
 	  if (flags & CHAR)
 	    {
-	      cp = va_arg (ap, char *);
+	      cp = GET_ARG (N, ap, char *);
 	      *cp = nread;
 	    }
 	  else if (flags & SHORT)
 	    {
-	      sp = va_arg (ap, short *);
+	      sp = GET_ARG (N, ap, short *);
 	      *sp = nread;
 	    }
 	  else if (flags & LONG)
 	    {
-	      lp = va_arg (ap, long *);
+	      lp = GET_ARG (N, ap, long *);
 	      *lp = nread;
 	    }
 #ifndef _NO_LONGLONG
 	  else if (flags & LONGDBL)
 	    {
-	      llp = va_arg (ap, long long*);
+	      llp = GET_ARG (N, ap, long long*);
 	      *llp = nread;
 	    }
 #endif
 	  else
 	    {
-	      ip = va_arg (ap, int *);
+	      ip = GET_ARG (N, ap, int *);
 	      *ip = nread;
 	    }
 	  continue;
@@ -570,7 +659,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
           if (flags & LONG) 
             {
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = GET_ARG (N, ap, wchar_t *);
               else
                 wcp = NULL;
               n = 0;
@@ -634,7 +723,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      size_t r = fread ((_PTR) va_arg (ap, char *), 1, width, fp);
+	      size_t r = fread ((_PTR) GET_ARG (N, ap, char *), 1, width, fp);
 
 	      if (r == 0)
 		goto input_failure;
@@ -668,7 +757,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = va_arg (ap, char *);
+	      p0 = p = GET_ARG (N, ap, char *);
 	      while (ccltab[*fp->_p])
 		{
 		  fp->_r--;
@@ -699,7 +788,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
             {
               /* Process %S and %ls placeholders */
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg (ap, wchar_t *);
+                wcp = GET_ARG (N, ap, wchar_t *);
               else
                 wcp = &wc;
               n = 0;
@@ -718,10 +807,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      if (iswspace(*wcp)) 
+                      if (iswspace(*wcp))
                         {
                           while (n != 0)
-                            ungetc (buf[--n], fp);
+                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
                           break;
                         }
                       nread += n;
@@ -758,7 +847,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = va_arg (ap, char *);
+	      p0 = p = GET_ARG (N, ap, char *);
 	      while (!isspace (*fp->_p))
 		{
 		  fp->_r--;
@@ -880,15 +969,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    }
 		  break;
 
-		  /* x ok iff flag still set & 2nd char */
+		  /* x ok iff flag still set & single 0 seen */
 		case 'x':
 		case 'X':
-		  if (flags & PFXOK && p == buf + 1)
+		  if ((flags & (PFXOK | NZDIGITS)) == PFXOK)
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
 		      /* We must reset the NZDIGITS and NDIGITS
-		         flags that would have been unset by seeing
+			 flags that would have been unset by seeing
 			 the zero that preceded the X or x.  */
 		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
@@ -917,18 +1006,16 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	   * If we had only a sign, it is no good; push back the sign.
 	   * If the number ends in `x', it was [sign] '0' 'x', so push back
 	   * the x and treat it as [sign] '0'.
+	   * Use of ungetc here and below assumes ASCII encoding; we are only
+	   * pushing back 7-bit characters, so casting to unsigned char is
+	   * not necessary.
 	   */
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_CAST_VOID ungetc (*(u_char *)-- p, fp);
-	      goto match_failure;
-	    }
-	  c = ((u_char *) p)[-1];
-	  if (c == 'x' || c == 'X')
-	    {
-	      --p;
-	      /*(void)*/ ungetc (c, fp);
+		_ungetc_r (rptr, *--p, fp); /* [-+xX] */
+	      if (p == buf)
+		goto match_failure;
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -937,20 +1024,32 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      *p = 0;
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if (flags & POINTER)
-		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+		{
+		  void **vp = GET_ARG (N, ap, void **);
+#ifndef _NO_LONGLONG
+		  if (sizeof (uintptr_t) > sizeof (u_long))
+		    {
+		      u_long_long resll;
+		      resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		      *vp = (void *) (uintptr_t) resll;
+		    }
+		  else
+#endif /* !_NO_LONGLONG */
+		    *vp = (void *) (uintptr_t) res;
+		}
 	      else if (flags & CHAR)
 		{
-		  cp = va_arg (ap, char *);
+		  cp = GET_ARG (N, ap, char *);
 		  *cp = res;
 		}
 	      else if (flags & SHORT)
 		{
-		  sp = va_arg (ap, short *);
+		  sp = GET_ARG (N, ap, short *);
 		  *sp = res;
 		}
 	      else if (flags & LONG)
 		{
-		  lp = va_arg (ap, long *);
+		  lp = GET_ARG (N, ap, long *);
 		  *lp = res;
 		}
 #ifndef _NO_LONGLONG
@@ -961,13 +1060,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    resll = _strtoull_r (rptr, buf, (char **) NULL, base);
 		  else
 		    resll = _strtoll_r (rptr, buf, (char **) NULL, base);
-		  llp = va_arg (ap, long long*);
+		  llp = GET_ARG (N, ap, long long*);
 		  *llp = resll;
 		}
 #endif
 	      else
 		{
-		  ip = va_arg (ap, int *);
+		  ip = GET_ARG (N, ap, int *);
 		  *ip = res;
 		}
 	      nassigned++;
@@ -987,7 +1086,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
 	  unsigned width_left = 0;
-	  int nancount = 0;
+	  char nancount = 0;
+	  char infcount = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -1032,7 +1132,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case '7':
 		case '8':
 		case '9':
-		  if (nancount == 0)
+		  if (nancount + infcount == 0)
 		    {
 		      flags &= ~(SIGNOK | NDIGITS);
 		      goto fok;
@@ -1050,16 +1150,21 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		case 'n':
 		case 'N':
 	          if (nancount == 0
-		      && (flags & (SIGNOK | NDIGITS | DPTOK | EXPOK)) ==
-		      	          (SIGNOK | NDIGITS | DPTOK | EXPOK))
+		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
+				  (NDIGITS | DPTOK | EXPOK))
 		    {
 		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
 		      nancount = 1;
 		      goto fok;
 		    }
-		  else if (nancount == 2)
+		  if (nancount == 2)
 		    {
 		      nancount = 3;
+		      goto fok;
+		    }
+		  if (infcount == 1 || infcount == 4)
+		    {
+		      infcount++;
 		      goto fok;
 		    }
 		  break;
@@ -1068,6 +1173,46 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  if (nancount == 1)
 		    {
 		      nancount = 2;
+		      goto fok;
+		    }
+		  break;
+		case 'i':
+		case 'I':
+		  if (infcount == 0
+		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
+				  (NDIGITS | DPTOK | EXPOK))
+		    {
+		      flags &= ~(SIGNOK | DPTOK | EXPOK | NDIGITS);
+		      infcount = 1;
+		      goto fok;
+		    }
+		  if (infcount == 3 || infcount == 5)
+		    {
+		      infcount++;
+		      goto fok;
+		    }
+		  break;
+		case 'f':
+		case 'F':
+		  if (infcount == 2)
+		    {
+		      infcount = 3;
+		      goto fok;
+		    }
+		  break;
+		case 't':
+		case 'T':
+		  if (infcount == 6)
+		    {
+		      infcount = 7;
+		      goto fok;
+		    }
+		  break;
+		case 'y':
+		case 'Y':
+		  if (infcount == 7)
+		    {
+		      infcount = 8;
 		      goto fok;
 		    }
 		  break;
@@ -1103,7 +1248,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      *p++ = c;
 	    fskip:
 	      width--;
-              ++nread;
+	      ++nread;
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -1112,24 +1257,48 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
-          /* We may have a 'N' or possibly even a 'Na' as the start of 'NaN', 
-	     only to run out of chars before it was complete (or having 
-	     encountered a non- matching char).  So check here if we have an 
-	     outstanding nancount, and if so put back the chars we did 
-	     swallow and treat as a failed match. */
-          if (nancount && nancount != 3)
-            {
-              /* Ok... what are we supposed to do in the event that the
-              __srefill call above was triggered in the middle of the partial
-              'NaN' and so we can't put it all back? */
-              while (nancount-- && (p > buf))
-                {
-                  ungetc (*(u_char *)--p, fp);
-                  --nread;
-                }
-              goto match_failure;
-            }
-          /*
+	  /* We may have a 'N' or possibly even [sign] 'N' 'a' as the
+	     start of 'NaN', only to run out of chars before it was
+	     complete (or having encountered a non-matching char).  So
+	     check here if we have an outstanding nancount, and if so
+	     put back the chars we did swallow and treat as a failed
+	     match.
+
+	     FIXME - we still don't handle NAN([0xdigits]).  */
+	  if (nancount - 1U < 2U) /* nancount && nancount < 3 */
+	    {
+	      /* Newlib's ungetc works even if we called __srefill in
+		 the middle of a partial parse, but POSIX does not
+		 guarantee that in all implementations of ungetc.  */
+	      while (p > buf)
+		{
+		  _ungetc_r (rptr, *--p, fp); /* [-+nNaA] */
+		  --nread;
+		}
+	      goto match_failure;
+	    }
+	  /* Likewise for 'inf' and 'infinity'.	 But be careful that
+	     'infinite' consumes only 3 characters, leaving the stream
+	     at the second 'i'.	 */
+	  if (infcount - 1U < 7U) /* infcount && infcount < 8 */
+	    {
+	      if (infcount >= 3) /* valid 'inf', but short of 'infinity' */
+		while (infcount-- > 3)
+		  {
+		    _ungetc_r (rptr, *--p, fp); /* [iInNtT] */
+		    --nread;
+		  }
+	      else
+		{
+		  while (p > buf)
+		    {
+		      _ungetc_r (rptr, *--p, fp); /* [-+iInN] */
+		      --nread;
+		    }
+		  goto match_failure;
+		}
+	    }
+	  /*
 	   * If no digits, might be missing exponent digits
 	   * (just give back the exponent) or might be missing
 	   * regular digits, but had sign and/or decimal point.
@@ -1140,22 +1309,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		{
 		  /* no digits at all */
 		  while (p > buf)
-                    {
-		      ungetc (*(u_char *)--p, fp);
-                      --nread;
-                    }
+		    {
+		      _ungetc_r (rptr, *--p, fp); /* [-+.] */
+		      --nread;
+		    }
 		  goto match_failure;
 		}
 	      /* just a bad exponent (e and maybe sign) */
-	      c = *(u_char *)-- p;
-              --nread;
+	      c = *--p;
+	      --nread;
 	      if (c != 'e' && c != 'E')
 		{
-		  _CAST_VOID ungetc (c, fp);	/* sign */
-		  c = *(u_char *)-- p;
-                  --nread;
+		  _ungetc_r (rptr, c, fp); /* [-+] */
+		  c = *--p;
+		  --nread;
 		}
-	      _CAST_VOID ungetc (c, fp);
+	      _ungetc_r (rptr, c, fp); /* [eE] */
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -1199,17 +1368,17 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 
 	      if (flags & LONG)
 		{
-		  dp = va_arg (ap, double *);
+		  dp = GET_ARG (N, ap, double *);
 		  *dp = res;
 		}
 	      else if (flags & LONGDBL)
 		{
-		  ldp = va_arg (ap, _LONG_DOUBLE *);
+		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
 		  *ldp = QUAD_RES;
 		}
 	      else
 		{
-		  flp = va_arg (ap, float *);
+		  flp = GET_ARG (N, ap, float *);
 		  if (isnan (res))
 		    *flp = nanf (NULL);
 		  else
@@ -1223,10 +1392,30 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	}
     }
 input_failure:
+  /* On read failure, return EOF failure regardless of matches; errno
+     should have been set prior to here.  On EOF failure (including
+     invalid format string), return EOF if no matches yet, else number
+     of matches made prior to failure.  */
   _funlockfile (fp);
-  return nassigned ? nassigned : -1;
+  return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
+  /* Return number of matches, which can be 0 on match failure.  */
   _funlockfile (fp);
   return nassigned;
 }
+
+#ifndef _NO_POS_ARGS
+/* Process all intermediate arguments.  Fortunately, with scanf, all
+   intermediate arguments are sizeof(void*), so we don't need to scan
+   ahead.  */
+static void *
+get_arg (int n, va_list *ap, int *numargs_p, void **args)
+{
+  int numargs = *numargs_p;
+  while (n >= numargs)
+    args[numargs++] = va_arg (*ap, void *);
+  *numargs_p = numargs;
+  return args[n];
+}
+#endif /* !_NO_POS_ARGS */

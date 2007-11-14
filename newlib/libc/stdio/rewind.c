@@ -75,7 +75,7 @@ _VOID
 _DEFUN(rewind, (fp),
        register FILE * fp)
 {
-  _CAST_VOID _fseek_r (_REENT, fp, 0L, SEEK_SET);
+  _rewind_r (_REENT, fp);
 }
 
 #endif /* !_REENT_ONLY */

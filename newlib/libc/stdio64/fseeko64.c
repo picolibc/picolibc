@@ -27,7 +27,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>)
-	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>, 
+	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>,
                          _off64_t <[offset]>, int <[whence]>)
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -49,8 +49,8 @@ of the file your program has already read.  Many of the <<stdio>> functions
 depend on this position, and many change it as a side effect.
 
 You can use <<fseeko64>> to set the position for the file identified by
-<[fp]> that was opened via <<fopen64>>.  The value of <[offset]> determines 
-the new position, in one of three ways selected by the value of <[whence]> 
+<[fp]> that was opened via <<fopen64>>.  The value of <[offset]> determines
+the new position, in one of three ways selected by the value of <[whence]>
 (defined as macros in `<<stdio.h>>'):
 
 <<SEEK_SET>>---<[offset]> is the absolute file position (an offset
@@ -69,7 +69,7 @@ RETURNS
 <<fseeko64>> returns <<0>> when successful.  On failure, the
 result is <<EOF>>.  The reason for failure is indicated in <<errno>>:
 either <<ESPIPE>> (the stream identified by <[fp]> doesn't support
-repositioning or wasn't opened via <<fopen64>>) or <<EINVAL>> 
+repositioning or wasn't opened via <<fopen64>>) or <<EINVAL>>
 (invalid file position).
 
 PORTABILITY
@@ -86,7 +86,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "local64.h"
+#include "local.h"
 
 #define	POS_ERR	(-(_fpos64_t)1)
 
@@ -104,18 +104,29 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
      _off64_t offset _AND
      int whence)
 {
-  _fpos64_t _EXFUN ((*seekfn), (void *, _fpos64_t, int));
+  _fpos64_t _EXFUN ((*seekfn), (struct _reent *, void *, _fpos64_t, int));
   _fpos64_t target, curoff;
   size_t n;
 
   struct stat64 st;
   int havepos;
 
+  /* Only do 64-bit seek on large file.  */
+  if (!(fp->_flags & __SL64))
+    {
+      if ((_off_t) offset != offset)
+	{
+	  ptr->_errno = EOVERFLOW;
+	  return EOF;
+	}
+      return (_off64_t) _fseeko_r (ptr, fp, offset, whence);
+    }
+
   /* Make sure stdio is set up.  */
 
   CHECK_INIT (ptr);
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   curoff = fp->_offset;
 
@@ -125,12 +136,12 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   if (fp->_flags & __SAPP && fp->_flags & __SWR)
     {
       /* So flush the buffer and seek to the end.  */
-      fflush (fp);
+      _fflush_r (ptr, fp);
     }
 
   /* Have to be able to seek.  */
 
-  if ((seekfn = fp->_seek64) == NULL || !(fp->_flags & __SL64))
+  if ((seekfn = fp->_seek64) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
       _funlockfile(fp);
@@ -150,12 +161,12 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      fflush(fp);   /* may adjust seek offset on append stream */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
 	      _funlockfile(fp);
@@ -197,7 +208,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
   if (fp->_bf._base == NULL)
-    __smakebuf (fp);
+    __smakebuf_r (ptr, fp);
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
@@ -238,7 +249,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 	curoff = fp->_offset;
       else
 	{
-	  curoff = (*seekfn) (fp->_cookie, (_fpos64_t)0, SEEK_CUR);
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t)0, SEEK_CUR);
 	  if (curoff == POS_ERR)
 	    goto dumb;
 	}
@@ -283,7 +294,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
       fp->_p = fp->_bf._base + o;
       fp->_r = n - o;
       if (HASUB (fp))
-	FREEUB (fp);
+	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
       _funlockfile(fp);
       return 0;
@@ -299,12 +310,12 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
   curoff = target & ~((_fpos64_t)(fp->_blksize - 1));
-  if ((*seekfn) (fp->_cookie, curoff, SEEK_SET) == POS_ERR)
+  if (seekfn (ptr, fp->_cookie, curoff, SEEK_SET) == POS_ERR)
     goto dumb;
   fp->_r = 0;
   fp->_p = fp->_bf._base;
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_flags &= ~__SEOF;
   n = target - curoff;
   if (n)
@@ -323,14 +334,15 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    */
 
 dumb:
-  if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
+  if (_fflush_r (ptr, fp)
+      || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile(fp);
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
   if (HASUB (fp))
-    FREEUB (fp);
+    FREEUB (ptr, fp);
   fp->_p = fp->_bf._base;
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */

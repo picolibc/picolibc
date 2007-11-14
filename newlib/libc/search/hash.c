@@ -110,7 +110,11 @@ __hash_open(file, flags, mode, info, dflags)
 {
 	HTAB *hashp;
 
+#ifdef __USE_INTERNAL_STAT64
+        struct stat64 statbuf;
+#else
 	struct stat statbuf;
+#endif
 	DB *dbp;
 	int bpages, hdrsize, new_table, nsegs, save_errno;
 

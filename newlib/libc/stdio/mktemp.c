@@ -60,7 +60,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<mktemp>> and <<mkstemp>> attempt to generate a file name that is not
-yet in use for any existing file.  <<mkstemp>> creates the file and 
+yet in use for any existing file.  <<mkstemp>> creates the file and
 opens it for reading and writing; <<mktemp>> simply generates the file name.
 
 You supply a simple pattern for the generated file name, as the string
@@ -108,7 +108,11 @@ _DEFUN(_gettemp, (ptr, path, doopen),
        register int *doopen)
 {
   register char *start, *trv;
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 sbuf;
+#else
   struct stat sbuf;
+#endif
   unsigned int pid;
 
   pid = _getpid_r (ptr);

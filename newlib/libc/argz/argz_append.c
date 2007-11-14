@@ -16,13 +16,16 @@ _DEFUN (argz_append, (argz, argz_len, buf, buf_len),
        const char *buf _AND
        size_t buf_len)
 {
-  size_t last = *argz_len;
+  if (buf_len)
+    {
+      size_t last = *argz_len;
 
-  *argz_len += buf_len;
+      *argz_len += buf_len;
 
-  if(!(*argz = (char *)realloc(*argz, *argz_len)))
-    return ENOMEM;
+      if(!(*argz = (char *)realloc(*argz, *argz_len)))
+	return ENOMEM;
 
-  memcpy(*argz + last, buf, buf_len);
+      memcpy(*argz + last, buf, buf_len);
+    }
   return 0;
 }

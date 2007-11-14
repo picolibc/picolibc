@@ -49,6 +49,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #include <reent.h>
 #include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#ifndef O_BINARY
+# define O_BINARY 0
+#endif
 
 FILE *
 _DEFUN(_tmpfile_r, (ptr),
@@ -58,11 +64,22 @@ _DEFUN(_tmpfile_r, (ptr),
   int e;
   char *f;
   char buf[L_tmpnam];
+  int fd;
 
-  if ((f = _tmpnam_r (ptr, buf)) == NULL)
+  do
+    {
+      if ((f = _tmpnam_r (ptr, buf)) == NULL)
+	return NULL;
+      fd = _open_r (ptr, f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
+		    S_IRUSR | S_IWUSR);
+    }
+  while (fd < 0 && ptr->_errno == EEXIST);
+  if (fd < 0)
     return NULL;
-  fp = _fopen_r (ptr, f, "wb+");
+  fp = _fdopen_r (ptr, fd, "wb+");
   e = ptr->_errno;
+  if (!fp)
+    _close_r (ptr, fd);
   _CAST_VOID _remove_r (ptr, f);
   ptr->_errno = e;
   return fp;

@@ -1,3 +1,50 @@
+2007-10-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/wcstombs_r.c: Add SUSV2 support for calculating
+	size if output buffer is NULL.
+
+2007-10-13  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [__OPTIMIZE_SIZE__]:
+	Correctly nest else within conditionals.
+	Reported by Artur Lipowski.
+
+2007-09-17  Eric Blake  <ebb9@byu.net>
+
+	Obey POSIX on printf("%.s", (char*)NULL).
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Take precision into account
+	for %s on NULL.  Skip NULL check when optimizing for size.
+
+2007-07-31  Eric Blake  <ebb9@byu.net>
+
+	More POSIX stream corner cases.
+	* libc/stdio/findfp.c (__sinit): Open stderr read/write.
+	* libc/stdio/fdopen.c (_fdopen_r): Set O_APPEND on fd when
+	requested.
+	* libc/stdio64/fdopen64.c (_fdopen64_r): Likewise.
+
+2007-07-13  Eric Blake  <ebb9@byu.net>
+
+	Fix fflush issues.
+	* libc/stdio/fflush.c (_fflush_r): New function.
+	(fflush): Fix reentrancy and large offset behavior.
+	* libc/include/stdio.h (_fflush_r): Add prototype.
+	* libc/stdio/fclose.c (_fclose_r): All fflush callers changed.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/fseek.c (_fseek_r): Likewise.
+	* libc/stdio/ftell.c (_ftell_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Likewise.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/setvbuf.c (setvbuf): Likewise.
+	* libc/stdio/ungetc.c (_ungetc_r): Likewise.
+	* libc/stdio/vfprintf.c (__sbprintf): Likewise.
+	* libc/stdio/wbuf.c (__swbuf_r): Likewise.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.  Defer to
+	32-bit version if not large file.
+	* libc/stdio64/ftello64.c (_ftello64_r): Likewise.
+	* libc/stdio64/tmpfile64.c (_tmpfile64_r): Avoid compile warning.
+
 2007-07-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/time.h (gettimeofday): Change to proper
@@ -8,6 +55,269 @@
 2007-06-13  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/include/sys/unistd.h: Change usleep prototype to Posix.
+
+2007-06-04  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/sys/reent.h (struct __sFILE, struct __sFILE64):
+	Switch to reentrant callbacks.
+	* libc/stdio/local.h (__sread, __swrite, __sseek, __sclose)
+	(__sseek64, __swrite64): Fix prototypes.
+	[__SCLE]: Pull in setmode declaration.
+	* libc/stdio/stdio.c (__sread, __swrite, __sseek, __sclose): Fix
+	reentrancy.
+	* libc/stdio64/stdio64.c (__sseek64_r, __swrite64_r): Delete.
+	(__sseek64, __swrite64): Fix reentrancy.
+	* libc/stdio/fseek.c (_fseek_r): Account for overflow, and fix
+	reentrancy.
+	* libc/stdio/ftell.c (_ftell_r): Likewise.
+	* libc/stdio/flags.c (__sflags): Don't lose __SAPP on "a+".
+	* libc/stdio/fclose.c (_fclose_r): Fix reentrancy.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Likewise.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/siscanf.c (eofread): Likewise.
+	* libc/stdio/sscanf.c (eofread): Likewise.
+	* libc/stdio/vsiscanf.c (eofread1): Likewise.
+	* libc/stdio/vsscanf.c (eofread1): Likewise.
+	* libc/stdio64/freopen64.c (_freopen64_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.
+	* libc/stdio64/ftello64.c (_ftello64_r): Likewise.
+	* libc/stdio/fflush.c (fflush): Improve reentrancy, although more
+	could be fixed.
+
+2007-05-29  Eric Blake  <ebb9@byu.net>
+
+	Avoid more compiler warnings.
+	* libc/stdlib/btowc.c: Add missing header.
+	* libc/stdlib/getopt.c (getopt_internal): Initialize variable.
+	* libc/stdlib/system.c (do_system) [__CYGWIN__]: Add declaration.
+	* libc/stdlib/wctob.c: Add missing header.
+	* libc/string/strcpy.c (strcpy): Avoid warnings.
+	* libc/string/strrchr.c (strrchr): Likewise.
+
+2007-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/argz/argz_add_sep.c (argz_add_sep): Handle empty string
+	argument.
+	* libc/argz/argz_append.c (argz_append): Handle empty buf argument.
+	* libc/argz/argz_create_sep.c (argz_create_sep): Return (NULL, 0)
+	on empty input strings.
+	* libc/argz/argz_extract.c (argz_extract): Check argz_len before
+	looping through argz.
+	* libc/argz/argz_stringify.c (argz_stringify): Ditto.
+
+2007-05-27  Brian Dessent  <brian@dessent.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Populate 'ox' when
+	handling %p.
+
+2007-05-25  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/rewind.c (rewind): Fix regression of 2003-08-22.
+
+2007-05-23  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't truncate %p when
+	sizeof(void*) is 8 but sizeof(long) is 4.
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Likewise.  Fix %i scanning
+	of "-0x".  Support "-nan" and "inf" for %e.  Audit usage of ungetc
+	to fix reentrancy and bug on encoding error in multibyte locales.
+	Always return EOF on read error.
+
+2007-05-23  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Support scanf(%1$s).
+	Avoid warning when !FLOATING_POINT.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Simplify _NO_POS_ARGS
+	slightly.
+
+2007-05-23  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/argz/argz_create_sep.c (argz_create_sep): Initialize *argz_len
+	to zero.
+	* libc/include/argz.h: Guard against multiple inclusion.  Guard for
+	use with C++.
+
+2007-05-17  Charles Wilson  <cygwin@...>
+
+	* stdio/tmpfile.c: Include <sys/stat.h>.
+	* stdio64/tmpfile64.c: Ditto.
+
+2007-05-16  Eric Blake  <ebb9@byu.net>
+
+	Close security hole in tmpfile.
+	* libc/stdio/tmpfile.c (_tmpfile_r): Avoid window between filename
+	generation and opening the fd.
+	* libc/stdio64/tmpfile64.c (_tmpfile64_r): Likewise.
+
+	* libc/include/math.h (INFINITY, NAN, FP_ILOGB0, FP_ILOGBNAN)
+	(MATH_ERRNO, MATH_ERREXCEPT, math_errhandling): Add macros
+	required by POSIX.
+	* libc/stdlib/ldtoa.c (USE_INFINITY): Rename from INFINITY, to
+	avoid clash with <math.h>.
+
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Avoid gcc warnings on cygwin.
+	* libc/search/hash.c (__hash_open): Likewise.
+
+2007-05-10  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Fix use of decimal point
+	in %f and %e.  Avoid malloc when possible for %S.
+	(BUF): Improve stack locality by using smaller size.
+	(MAXEXP): Define.
+	(exponent): Use for smaller stack size.
+
+2007-05-01  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio64/local64.h: Delete, move contents to...
+	* libc/stdio/local.h: ...here.
+	* libc/stdio64/fdopen64.c: Update includes.
+	* libc/stdio64/fopen64.c: Likewise.
+	* libc/stdio64/freopen64.c: Likewise.
+	* libc/stdio64/fseeko64.c: Likewise.
+	* libc/stdio64/ftello64.c: Likewise.
+	* libc/stdio/findfp.c (std) [__LARGE64_FILES]: Open stdin, stdout,
+	and stderr with 64-bit offset.
+	* libc/stdio/fseek.c (_fseek_r): Avoid compile warning.
+	* libc/stdio/makebuf.c (__smakebuf_r): Likewise.
+	* libc/stdio/mktemp.c (_gettemp): Likewise.
+
+2007-04-25  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (get_arg): Support %1$lc.  Simplify types
+	that promote to int.
+
+2007-04-24  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't zero pad on infinity
+	or NaN with %05f.
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Avoid multibyte when not
+	_MB_CAPABLE.
+
+	* libc/include/limits.h (NL_ARGMAX): Define a default value.
+	* libc/stdio/vfprintf.c (MAX_POS_ARGS): Define in terms of
+	NL_ARGMAX, if present.
+
+2007-04-23  Brian Dessent  <brian@dessent.net>
+
+	* libc/stdio/vfprintf.c (_vfprintf_r): When the alternate-form flag
+	has been specified with types 'f', 'F', 'g', or 'G', ensure the
+	trailing decimal is printed.
+
+2007-04-17  Brian Dessent  <brian@dessent.net>
+
+	* libc/stdio/sscanf.c: Update documentation comments.
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Handle j, t, and z modifiers.
+
+2007-04-12  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_F, cvt): Don't confuse %F with %e.
+	(chclass): Recognize 'F', 'X', 'n', and not 'W'.
+	(get_arg): Handle %1$F, %1$n.
+
+2007-04-10  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/stdio.h (_ELIDABLE_INLINE): Work even when using
+	CFLAGS=-O0.
+
+2007-04-09  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/stdio.h: Add gcc format attributes to printf and
+	scanf families.
+
+2007-04-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/argz/argz_insert.c: Add stddef.h to get ptrdiff_t type.
+
+2007-04-04  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/asiprintf.c (_asiprintf_r): Fix reentrancy.
+	(asiprintf): Avoid overhead.
+	* libc/stdio/asprintf.c (_asprintf_r): Fix reentrancy.
+	(asprintf): Avoid overhead.
+	* libc/stdio/diprintf.c (_diprintf_r, diprintf): New file.
+	* libc/stdio/dprintf.c (_dprintf_r, dprintf): Use _DEFUN.
+	* libc/stdio/fiprintf.c (_fiprintf_r): Add reentrant version.
+	(fiprintf): Avoid overhead.
+	* libc/stdio/fprintf.c (_fprintf_r): Add reentrant version.
+	(fprintf): Avoid overhead.
+	* libc/stdio/iprintf.c (_iprintf_r): Use _DEFUN.
+	(iprintf): Avoid overhead.
+	* libc/stdio/printf.c (_printf_r): Use _DEFUN.
+	(printf): Avoid overhead.
+	* libc/stdio/vasiprintf.c (vasiprintf): Reduce binary size.
+	* libc/stdio/vasprintf.c (vasprintf): Reduce binary size.
+	* libc/stdio/vdiprintf.c (_vdiprintf_r, vdiprintf): New file.
+	* libc/stdio/vdprintf.c (vdprintf): Avoid overhead.
+	* libc/stdio/vsiprintf.c (vsiprintf): Reduce binary size.
+	* libc/stdio/vsniprintf.c (vsniprintf): Reduce binary size.
+	* libc/stdio/vsnprintf.c (vsnprintf): Reduce binary size.
+	* libc/stdio/vsprintf.c (vsprintf): Reduce binary size.
+	* libc/stdio/Makefile.am (GENERAL_SOURCES): Add diprintf.c,
+	vdiprintf.c.
+	* libc/include/stdio.h (diprintf, _diprintf_r, vdiprintf)
+	(_vdiprintf_r, _fiprintf_r, _vfiprintf_r): Add prototypes.
+
+2007-03-30  Dave Korn  <dave.korn@artimi.com>
+
+	* libc/include/stdio.h (_ELIDABLE_INLINE):  New macro to conceal
+	conflicting inline semantics between C99 and GNU89.
+	(__sgetc_r):  Replace static inline with _ELIDABLE_INLINE to be
+	compatible with -fkeep-inline-functions usage.
+	(__sputc_r):  Likewise for consistency even though disabled.
+
+2007-03-16  Charles Wilson  <cygwin@...>
+
+	* libc/argz/argz_insert.c: "before" pointer is
+	invalid after *argz realloc.  Compute offset
+	between "before" and *argz, and use it after
+	reallocation instead.
+
+2007-03-16  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio64/fseek064.c (_fseeko64_r): Fix reentrancy.
+	* libc/stdio64/freopen64.c (_freopen64_r): Ditto.
+
+2007-03-15  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/local.h (cantwrite, FREEUB, FREELB): Make reentrant.
+	(__smakebuf): Rename...
+	(__smakebuf_r): to this.
+	* libc/stdio/fvwrite.h (__swsetup_r): Rename, from __swsetup.
+	* libc/stdio/makebuf.c (__smakebuf): Detect failed asprint
+	allocation, then rename...
+	(__smakebuf_r): ...to this and fix reentrancy.
+	* libc/stdio/wsetup.c (__swsetup): Detect failed asprintf
+	allocation, then rename...
+	(__swsetup_r): ...to this and fix reentrancy.
+	* libc/stdio/fseek.c (_fseek_r): Fix reentrancy.
+	* libc/stdio/refill.c (__srefill_r): Likewise.
+	* libc/stdio/fclose.c (_fclose_r): Likewise.
+	* libc/stdio/fread.c (_fread_r): Likewise.
+	* libc/stdio/freopen.c (_freopen_r): Likewise.
+	* libc/stdio/wbuf.c (__swbuf_r): Likewise.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Likewise.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Set errno properly on
+	failed asprintf allocation, and fix reentrancy.
+	* libc/stdio/snprintf.c (snprintf, _snprintf_r): Report overflow,
+	as required by POSIX.
+	* libc/stdio/sniprintf.c (sniprintf, _sniprintf_r): Likewise.
+	* libc/stdio/vsnprintf.c (vsnprintf, _vsnprintf_r): Likewise.
+	* libc/stdio/vsniprintf.c (vsniprintf, _vsniprintf_r): Likewise.
+
+2007-03-12  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Fix reentrancy.
+	* libc/stdio/vasprintf.c (vasprintf, _vasprintf_r): Pass failed
+	allocation to caller.
+	* libc/stdio/asprintf.c (_asprintf_r, asprintf): Likewise.
+	* libc/stdio/asiprintf.c (_asiprintf_r, asiprintf): Likewise.
+	* libc/stdio/vasiprintf.c (vasiprintf, _vasiprintf_r): Likewise.
+
+2007-02-20  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libc/include/stdio.h: Add declaration for vsiprintf.
 
 2007-01-05  Brian Ford  <Brian.Ford@FlightSafety.com>
 
