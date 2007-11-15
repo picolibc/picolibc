@@ -45,9 +45,86 @@ class frok
   const char *error;
   int child_pid;
   int this_errno;
-  int __stdcall parent (void *esp);
-  int __stdcall child (void *esp);
+  int __stdcall parent (volatile char * volatile here);
+  int __stdcall child (volatile char * volatile here);
   friend int fork ();
+};
+
+class lock_signals
+{
+  bool worked;
+public:
+  lock_signals ()
+  {
+    worked = sig_send (NULL, __SIGHOLD) == 0;
+  }
+  operator int () const
+  {
+    return worked;
+  }
+  void dont_bother ()
+  {
+    worked = false;
+  }
+  ~lock_signals ()
+  {
+    if (worked)
+      sig_send (NULL, __SIGNOHOLD);
+  }
+};
+
+class lock_pthread
+{
+  bool bother;
+public:
+  lock_pthread (): bother (1)
+  {
+    pthread::atforkprepare ();
+  }
+  void dont_bother ()
+  {
+    bother = false;
+  }
+  ~lock_pthread ()
+  {
+    if (bother)
+      pthread::atforkparent ();
+  }
+};
+
+class hold_everything
+{
+public: /* DELETEME*/
+  bool& ischild;
+  /* Note the order of the locks below.  It is important,
+     to avoid races, that the lock order be preserved.
+     
+     pthread is first because it serves as a master lock
+     against other forks being attempted while this one is active.
+     
+     signals is next to stop signal processing for the duration
+     of the fork.
+
+     process is last.  If it is put before signals, then a deadlock
+     could be introduced if the process attempts to exit due to a signal. */
+  lock_pthread pthread;
+  lock_signals signals;
+  lock_process process;
+
+public:
+  hold_everything (bool& x): ischild (x) {}
+  operator int () const {return signals;}
+
+  ~hold_everything()
+  {
+    if (ischild)
+      {
+	pthread.dont_bother ();
+	process.dont_bother ();
+	signals.dont_bother ();
+      }
+  }
+
 };
 
 static void
@@ -92,7 +169,7 @@ sync_with_parent (const char *s, bool hang_self)
 }
 
 int __stdcall
-frok::child (void *)
+frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
   extern void fixup_hooks_after_fork ();
@@ -212,7 +289,7 @@ slow_pid_reuse (HANDLE h)
 #endif
 
 int __stdcall
-frok::parent (void *stack_here)
+frok::parent (volatile char * volatile stack_here)
 {
   HANDLE forker_finished;
   DWORD rc;
@@ -222,8 +299,6 @@ frok::parent (void *stack_here)
   bool fix_impersonation = false;
   pinfo child;
   static char errbuf[256];
-
-  pthread::atforkprepare ();
 
   int c_flags = GetPriorityClass (hMainProc);
   debug_printf ("priority class %d", c_flags);
@@ -270,7 +345,7 @@ frok::parent (void *stack_here)
   ch.forker_finished = forker_finished;
 
   ch.stackbottom = _tlsbase;
-  ch.stacktop = stack_here;
+  ch.stacktop = (void *) stack_here;
   ch.stacksize = (char *) ch.stackbottom - (char *) stack_here;
   debug_printf ("stack - bottom %p, top %p, size %d",
 		ch.stackbottom, ch.stacktop, ch.stacksize);
@@ -491,7 +566,6 @@ frok::parent (void *stack_here)
 
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
-  pthread::atforkparent ();
 
   return child_pid;
 
@@ -515,14 +589,13 @@ extern "C" int
 fork ()
 {
   frok grouped;
-  MALLOC_CHECK;
 
   debug_printf ("entering");
   grouped.first_dll = NULL;
   grouped.load_dlls = 0;
 
   int res;
-  int ischild;
+  bool ischild = false;
 
   myself->set_has_pgid_children ();
 
@@ -534,30 +607,30 @@ fork ()
       return -1;
     }
 
-  lock_process now;
-  if (sig_send (NULL, __SIGHOLD))
-    {
-      if (exit_state)
-	Sleep (INFINITE);
-      set_errno (EAGAIN);
-      return -1;
-    }
+  {
+    hold_everything held_everything (ischild);
 
-  ischild = setjmp (grouped.ch.jmp);
+    if (!held_everything)
+      {
+	if (exit_state)
+	  Sleep (INFINITE);
+	set_errno (EAGAIN);
+	return -1;
+      }
 
-  void *esp;
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+    ischild = !!setjmp (grouped.ch.jmp);
 
-  if (ischild)
-    {
-      res = grouped.child (esp);
-      now.dont_bother ();
-    }
-  else
-    {
+    volatile char * volatile esp;
+    __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+
+    if (!ischild)
       res = grouped.parent (esp);
-      sig_send (NULL, __SIGNOHOLD);
-    }
+    else
+      {
+	res = grouped.child (esp);
+	ischild = true;	/* might have been reset by fork mem copy */
+      }
+  }
 
   MALLOC_CHECK;
   if (ischild || res > 0)

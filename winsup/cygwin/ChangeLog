@@ -208,10 +208,28 @@
 	* signal.cc (handle_sigprocmask): Remove extraneous
 	sig_dispatch_pending.
 
+2007-03-01  Christopher Faylor  <me@cgf.cx>
+
+	* fork.cc (fork): Reset child to true after fork since it may have been
+	reset by fork memory copies.
+
 2007-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fstat): Set all file times to arbitrary
 	fixed value.
+
+2007-02-22  Christopher Faylor  <me@cgf.cx>
+
+	* fork.cc (frok::parent): Make argument volatile.
+	(frok::child): Ditto.
+	(lock_signals): New class.
+	(lock_pthread): Ditto.
+	(hold_everhthing): Ditto.
+	(frok::parent): Move atforkprepare and atforkparent to lock_pthread
+	class.
+	(fork): Make ischild boolean.  Use hold_everything variable within
+	limited scope to set various mutexes in such a way as to avoid
+	deadlocks.
 
 2007-02-20  Christopher Faylor  <me@cgf.cx>
 
