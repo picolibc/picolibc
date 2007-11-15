@@ -1,5 +1,12 @@
 2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
 
+	Make mark_breakpoints_out static.
+	* breakpoint.h (mark_breakpoints_out): Remove
+	declaration.
+	* breakpoint.c (mark_breakpoints_out): Make static.
+
+2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
+
 	Prevent clear_command from directly modifying breakpoint list.
 	* Makefile.in (breakpoint_h): Update dependency.
 	* breakpoint.c (clear_command): Do not remove
