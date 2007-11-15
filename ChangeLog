@@ -1,5 +1,20 @@
 2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
 
+	Remove 'run_cleanup'.
+	* defs.h (do_run_cleanups, make_run_cleanup): Remove
+	declarations.
+	* infcmd.c (run_command_1): Call clear_solib instead
+	of do_run_cleanups.
+	* jv-lang.c (java_rerun_cleanup): Remove, for lack of
+	any use.
+	* solib.c (solib_cleanup_queued, do_clear_solib): Remove.
+	(update_solib_lib): Don't setup run cleanup.
+	(no_shared_libraries): Call clear_solib, not do_clear_solib.
+	* utils.c (run_cleanup_chain, make_run_cleanup)
+	(do_run_cleanups): Remove.
+		
+2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
+
 	Remove CLEAR_SOLIB use.
 	* corelow.c (core_close): Don't check for CLEAR_SOLIB.
 	* infcmd.c (attach_command): Likewise.
