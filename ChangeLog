@@ -1,5 +1,15 @@
 2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
 
+	Prevent clear_command from directly modifying breakpoint list.
+	* Makefile.in (breakpoint_h): Update dependency.
+	* breakpoint.c (clear_command): Do not remove
+	breakpoints from breakpoint_chain.  Collect breakpoints
+	to delete in a vector.
+	* breakpoint.h (breakpoint_p): New typedef for pointer to
+	breakpoint.  Register vector of breakpoint_p.
+
+2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
+
 	Remove 'run_cleanup'.
 	* defs.h (do_run_cleanups, make_run_cleanup): Remove
 	declarations.
