@@ -1,5 +1,20 @@
 2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
 
+	Apply const qualifier to some users of bp_location.
+	* breakpoint.h (struct bpstats): Make
+	the breakpoint_at field point at const bp_location.
+	* breakpoint.c (bpstat_alloc): Accept const
+	bp_location.
+	(breakpoint_here_p, breakpoint_inserted_here_p)
+	(software_breakpoint_inserted_here_p)
+	(breakpoint_thread_match, bpstat_stop_status)
+	(read_memory_nobpt, bpstat_have_active_hw_watchpoints): Use
+	const bp_location for iteration.
+	(print_it_typical, print_bp_stop_message): Use
+	const bp_location variable.
+
+2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
+
 	Make mark_breakpoints_out static.
 	* breakpoint.h (mark_breakpoints_out): Remove
 	declaration.
