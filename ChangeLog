@@ -1,3 +1,9 @@
+2007-10-15  Vladimir Prus  <vladimir@codesourcery.com>
+
+	Remove CLEAR_SOLIB use.
+	* corelow.c (core_close): Don't check for CLEAR_SOLIB.
+	* infcmd.c (attach_command): Likewise.
+	
 2007-10-23  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* Makefile.def (dependencies): Make configure-gdb depend on
