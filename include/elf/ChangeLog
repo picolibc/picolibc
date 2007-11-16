@@ -1,3 +1,9 @@
+2007-11-16  Nick Clifton  <nickc@redhat.com>
+
+	* dwarf2.h: Mention the location of the DWARF3 spec on the web.
+	(DW_AT_stride_size): Rename to DW_AT_bit_stride.
+	(DW_AT_stride): Rename to DW_AT_byte_stride.
+
 2007-11-08  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* vxworks.h: New.

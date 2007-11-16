@@ -33,7 +33,8 @@
    by UNIX International.  Copies of this specification are available from
    UNIX International, 20 Waterview Boulevard, Parsippany, NJ, 07054.
 
-   This file also now contains definitions from the DWARF 3 specification.  */
+   This file also now contains definitions from the DWARF 3 specification
+   published Dec 20, 2005, available from: http://dwarf.freestandards.org.  */
 
 /* This file is shared between GCC and GDB, and should not contain
    prototypes.  */
@@ -275,7 +276,8 @@ enum dwarf_attribute
     DW_AT_prototyped = 0x27,
     DW_AT_return_addr = 0x2a,
     DW_AT_start_scope = 0x2c,
-    DW_AT_stride_size = 0x2e,
+    DW_AT_bit_stride = 0x2e,
+#define DW_AT_stride_size   DW_AT_bit_stride  /* Note: The use of DW_AT_stride_size is deprecated.  */
     DW_AT_upper_bound = 0x2f,
     DW_AT_abstract_origin = 0x31,
     DW_AT_accessibility = 0x32,
@@ -310,7 +312,8 @@ enum dwarf_attribute
     DW_AT_allocated     = 0x4e,
     DW_AT_associated    = 0x4f,
     DW_AT_data_location = 0x50,
-    DW_AT_stride        = 0x51,
+    DW_AT_byte_stride        = 0x51,
+#define DW_AT_stride   DW_AT_byte_stride  /* Note: The use of DW_AT_stride is deprecated.  */
     DW_AT_entry_pc      = 0x52,
     DW_AT_use_UTF8      = 0x53,
     DW_AT_extension     = 0x54,
