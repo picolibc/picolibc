@@ -1012,9 +1012,9 @@ enum
   /* 0-3 are generic.  */
   Tag_GNU_MIPS_ABI_FP = 4, /* Value 1 for hard-float -mdouble-float, 2
 			      for hard-float -msingle-float, 3 for
-			      soft-float; 0 for not tagged or not
-			      using any ABIs affected by the
-			      differences.  */
+			      soft-float, 4 for -mips32r2 -mfp64; 0 for
+			      not tagged or not using any ABIs affected
+			      by the differences.  */
 };
 
 #endif /* _ELF_MIPS_H */
