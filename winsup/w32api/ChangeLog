@@ -1,3 +1,7 @@
+2007-11-21  Kevin Conaway  <kevin_conaway@users.sourceforge.net>
+
+	* include/wincrypt.h (CryptProtectData, CryptUnprotectData): define.
+
 2007-11-21  elsapo  <elsapo@users.sourceforge.net>
 
 	* include/wincrypt.h (CERT_NAME_STR_COMMA_FLAG,

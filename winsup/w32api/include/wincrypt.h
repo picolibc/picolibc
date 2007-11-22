@@ -1119,6 +1119,14 @@ typedef struct _CRYPTPROTECT_PROMPTSTRUCT {
    LPCWSTR szPrompt;
 } CRYPTPROTECT_PROMPTSTRUCT, 
 *PCRYPTPROTECT_PROMPTSTRUCT;
+
+
+/* from http://msdn2.microsoft.com/en-us/library/aa380261.aspx */
+BOOL WINAPI CryptProtectData (DATA_BLOB*, LPCWSTR, DATA_BLOB*, PVOID, CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
+
+/* http://msdn2.microsoft.com/en-us/library/aa380882.aspx */
+BOOL WINAPI CryptUnprotectData (DATA_BLOB*, LPWSTR*, DATA_BLOB*, PVOID, CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
+
 /* from http://msdn2.microsoft.com/en-us/library/aa302402.aspx: */
 #define CRYPTPROTECT_UI_FORBIDDEN 0x1
 #define CRYPTPROTECT_LOCAL_MACHINE 0x4
