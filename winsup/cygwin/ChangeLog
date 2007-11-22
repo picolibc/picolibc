@@ -1,3 +1,14 @@
+2007-11-22  Christian Franke  <franke@computer.org>
+
+	* fhandler_registry.cc (must_encode): New function.
+	(encode_regname): Ditto.
+	(decode_regname): Ditto.
+	(fhandler_registry::exists): Encode name before path compare.
+	(fhandler_registry::fstat): Pass decoded name to win32 registry call.
+	(fhandler_registry::readdir): Return encoded name to user.
+	(fhandler_registry::open): Store decoded name into value_name.
+	(open_key): Pass decoded name to win32 registry call.
+
 2007-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 25.

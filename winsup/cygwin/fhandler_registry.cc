@@ -86,6 +86,69 @@ static const char *DEFAULT_VALUE_NAME = "@";
 
 static HKEY open_key (const char *name, REGSAM access, bool isValue);
 
+/* Return true if char must be encoded.
+ */
+static inline bool
+must_encode (char c)
+{
+  return (isdirsep (c) || c == ':' || c == '%');
+}
+
+/* Encode special chars in registry key or value name.
+ */
+static int
+encode_regname (char * dst, const char * src)
+{
+  int di = 0;
+  for (int si = 0; src[si]; si++)
+    {
+      char c = src[si];
+      if (must_encode (c) ||
+	  (c == '.' && si == 0 && (!src[1] || (src[1] == '.' && !src[2]))))
+	{
+	  if (di + 3 >= CYG_MAX_PATH)
+	    return ENAMETOOLONG;
+	  __small_sprintf (dst + di, "%%%02x", c);
+	  di += 3;
+	}
+      else
+	dst[di++] = c;
+    }
+  dst[di] = 0;
+  return 0;
+}
+
+/* Decode special chars in registry key or value name.
+ */
+static int
+decode_regname (char * dst, const char * src, int len = -1)
+{
+  if (len < 0)
+    len = strlen (src);
+  int di = 0;
+  for (int si = 0; si < len; si++)
+    {
+      char c = src[si];
+      if (c == '%')
+	{
+	  if (si + 2 >= len)
+	    return EINVAL;
+	  char s[] = {src[si+1], src[si+2], '\0'};
+	  char *p;
+	  c = strtoul (s, &p, 16);
+	  if (!(must_encode (c) ||
+	        (c == '.' && si == 0 && (len == 3 || (src[3] == '.' && len == 4)))))
+	    return EINVAL;
+	  dst[di++] = c;
+	  si += 2;
+	}
+      else
+	dst[di++] = c;
+    }
+  dst[di] = 0;
+  return 0;
+}
+
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
  *
@@ -166,8 +229,9 @@ fhandler_registry::exists ()
 				    NULL, NULL))
 	     || (error == ERROR_MORE_DATA))
 	{
-	  if (pathmatch (buf, file) || (buf[0] == '\0' &&
-					pathmatch (file, DEFAULT_VALUE_NAME)))
+	  char enc_buf[CYG_MAX_PATH];
+	  if (   (buf[0] == '\0' && pathmatch (file, DEFAULT_VALUE_NAME))
+	      || (!encode_regname (enc_buf, buf) && pathmatch (enc_buf, file)))
 	    {
 	      file_type = -1;
 	      goto out;
@@ -246,9 +310,11 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		  while (!isdirsep (*value_name))
 		    value_name--;
 		  value_name++;
+		  char dec_value_name[CYG_MAX_PATH];
 		  DWORD dwSize;
-		  if (ERROR_SUCCESS ==
-		      RegQueryValueEx (hKey, value_name, NULL, NULL, NULL,
+		  if (!decode_regname (dec_value_name, value_name) &&
+		      ERROR_SUCCESS ==
+		      RegQueryValueEx (hKey, dec_value_name, NULL, NULL, NULL,
 				       &dwSize))
 		    buf->st_size = dwSize;
 		}
@@ -338,8 +404,8 @@ retry:
   /* We get here if `buf' contains valid data.  */
   if (*buf == 0)
     strcpy (de->d_name, DEFAULT_VALUE_NAME);
-  else
-    strcpy (de->d_name, buf);
+  else if (encode_regname (de->d_name, buf))
+    goto retry;
 
   dir->__d_position++;
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
@@ -482,6 +548,14 @@ fhandler_registry::open (int flags, mode_t mode)
       goto out;
     }
 
+  char dec_file[CYG_MAX_PATH];
+  if (decode_regname (dec_file, file))
+    {
+      set_errno (EINVAL);
+      res = 0;
+      goto out;
+    }
+
   handle = open_key (path, KEY_READ, false);
   if (handle == (HKEY) INVALID_HANDLE_VALUE)
     {
@@ -497,10 +571,10 @@ fhandler_registry::open (int flags, mode_t mode)
 
   set_io_handle (handle);
 
-  if (pathmatch (file, DEFAULT_VALUE_NAME))
+  if (pathmatch (dec_file, DEFAULT_VALUE_NAME))
     value_name = cstrdup ("");
   else
-    value_name = cstrdup (file);
+    value_name = cstrdup (dec_file);
 
   if (!(flags & O_DIROPEN) && !fill_filebuf ())
     {
@@ -638,8 +712,14 @@ open_key (const char *name, REGSAM access, bool isValue)
       const char *anchor = name;
       while (*name && !isdirsep (*name))
 	name++;
-      strncpy (component, anchor, name - anchor);
-      component[name - anchor] = '\0';
+      if (decode_regname (component, anchor, name - anchor))
+        {
+	  set_errno (EINVAL);
+	  if (parentOpened)
+	    RegCloseKey (hParentKey);
+	  hKey = (HKEY) INVALID_HANDLE_VALUE;
+	  break;
+	}
       if (*name)
 	name++;
       if (*name == 0 && isValue == true)
