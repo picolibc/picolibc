@@ -1,3 +1,7 @@
+2007-11-21  Brian Dessent <dessent@users.sourceforge.net>
+
+	* include/winbase.h (CheckTokenMembership): define.
+
 2007-10-03  Jiri Malak  <Jiri.Malak@iol.cz>
 
 	* include/rpcndr.h: Missing NdrClientCall2 entry.
