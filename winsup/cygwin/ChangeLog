@@ -1,3 +1,7 @@
+2007-11-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.cc (_crealloc): Avoid memcpy when _cmalloc returns NULL.
+
 2007-11-08  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dllfixdbg: Eliminate extra objcopy step.

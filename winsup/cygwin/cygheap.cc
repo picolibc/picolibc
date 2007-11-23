@@ -232,8 +232,11 @@ _crealloc (void *ptr, unsigned size)
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);
-      memcpy (newptr, ptr, oldsize);
-      _cfree (ptr);
+      if (newptr)
+	{
+	  memcpy (newptr, ptr, oldsize);
+	  _cfree (ptr);
+	}
     }
   return newptr;
 }
