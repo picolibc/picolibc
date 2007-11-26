@@ -1241,7 +1241,7 @@ fhandler_console::char_command (char c)
 
 	      if (dev_state->savebuf)
 		cfree (dev_state->savebuf);
-	      dev_state->savebuf = (PCHAR_INFO) cmalloc (HEAP_1_BUF, sizeof (CHAR_INFO) *
+	      dev_state->savebuf = (PCHAR_INFO) cmalloc_abort (HEAP_1_BUF, sizeof (CHAR_INFO) *
 					     dev_state->savebufsiz.X * dev_state->savebufsiz.Y);
 
 	      ReadConsoleOutputA (get_output_handle (), dev_state->savebuf,

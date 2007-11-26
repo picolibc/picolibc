@@ -113,7 +113,7 @@ void __stdcall
 sigalloc ()
 {
   cygheap->sigs = global_sigs =
-    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+    (struct sigaction *) ccalloc_abort (HEAP_SIGS, NSIG, sizeof (struct sigaction));
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
 }
 

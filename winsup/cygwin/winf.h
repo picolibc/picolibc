@@ -30,7 +30,7 @@ class av
   av (): argv (NULL) {}
   av (int ac_in, const char * const *av_in) : calloced (0), argc (ac_in), win16_exe (false)
   {
-    argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
+    argv = (char **) cmalloc_abort (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
   }
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}

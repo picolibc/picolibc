@@ -601,7 +601,7 @@ fhandler_tty_slave::open (int flags, mode_t)
     fhandler_console::need_invisible ();
 
   // FIXME: Do this better someday
-  arch = (fhandler_tty_slave *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+  arch = (fhandler_tty_slave *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
   *((fhandler_tty_slave **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;
   *arch = *this;
@@ -1127,7 +1127,7 @@ fhandler_pty_master::open (int flags, mode_t)
   set_open_status ();
   //
   // FIXME: Do this better someday
-  fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+  fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
   *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;
   *arch = *this;

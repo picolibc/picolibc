@@ -333,7 +333,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
+  moreinfo = (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   moreinfo->old_title = NULL;
 
   /* CreateProcess takes one long string that is the command line (sigh).

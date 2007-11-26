@@ -357,7 +357,7 @@ fhandler_proc::fill_filebuf ()
 	    bufalloc = strlen (uts_name.sysname) + 1
 		       + strlen (uts_name.release) + 1
 		       + strlen (uts_name.version) + 2;
-	    filebuf = (char *) crealloc (filebuf, bufalloc);
+	    filebuf = (char *) crealloc_abort (filebuf, bufalloc);
 	    filesize = __small_sprintf (filebuf, "%s %s %s\n",
 					uts_name.sysname, uts_name.release,
 					uts_name.version);
@@ -366,13 +366,13 @@ fhandler_proc::fill_filebuf ()
       }
     case PROC_UPTIME:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 80);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 80);
 	filesize = format_proc_uptime (filebuf, bufalloc);
 	break;
       }
     case PROC_STAT:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 16384);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16384);
 	filesize = format_proc_stat (filebuf, bufalloc);
 	break;
       }
@@ -383,32 +383,32 @@ fhandler_proc::fill_filebuf ()
 	 * Windows 95/98/me does have the KERNEL/CPUUsage performance counter
 	 * which is similar.
 	 */
-	filebuf = (char *) crealloc (filebuf, bufalloc = 16);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16);
 	filesize = __small_sprintf (filebuf, "%u.%02u %u.%02u %u.%02u\n",
 				    0, 0, 0, 0, 0, 0);
 	break;
       }
     case PROC_MEMINFO:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
 	filesize = format_proc_meminfo (filebuf, bufalloc);
 	break;
       }
     case PROC_CPUINFO:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 16384);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16384);
 	filesize = format_proc_cpuinfo (filebuf, bufalloc);
 	break;
       }
     case PROC_PARTITIONS:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 4096);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 4096);
 	filesize = format_proc_partitions (filebuf, bufalloc);
 	break;
       }
     case PROC_SELF:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 32);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 32);
 	filesize = __small_sprintf (filebuf, "%d", getpid ());
       }
     }

@@ -446,7 +446,7 @@ cygheap_user::env_systemroot (const char *name, size_t namelen)
       int size = GetWindowsDirectory (NULL, 0);
       if (size > 0)
 	{
-	  psystemroot = (char *) cmalloc (HEAP_STR, ++size);
+	  psystemroot = (char *) cmalloc_abort (HEAP_STR, ++size);
 	  size = GetWindowsDirectory (psystemroot, size);
 	  if (size <= 0)
 	    {

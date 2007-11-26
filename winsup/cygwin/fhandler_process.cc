@@ -379,7 +379,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_CTTY:
     case PROCESS_PPID:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 40);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 40);
 	int num;
 	switch (fileid)
 	  {
@@ -442,7 +442,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
     case PROCESS_EXE:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = CYG_MAX_PATH);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = CYG_MAX_PATH);
 	if (p->process_state & PID_EXITED)
 	  strcpy (filebuf, "<defunct>");
 	else
@@ -466,7 +466,7 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_WINPID:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 40);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 40);
 	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
@@ -474,7 +474,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_WINEXENAME:
       {
 	int len = strlen (p->progname);
-	filebuf = (char *) crealloc (filebuf, bufalloc = (len + 2));
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = (len + 2));
 	strcpy (filebuf, p->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
@@ -482,25 +482,25 @@ fhandler_process::fill_filebuf ()
       }
     case PROCESS_STATUS:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
 	filesize = format_process_status (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
 	filesize = format_process_stat (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
 	filesize = format_process_statm (*p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_MAPS:
       {
-	filebuf = (char *) crealloc (filebuf, bufalloc = 2048);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
 	filesize = format_process_maps (*p, filebuf, bufalloc);
 	break;
       }
@@ -563,7 +563,7 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 	    st.st_ino = 0;
 	  }
 	if (len + strlen (posix_modname) + 62 > maxsize - 1)
-	  destbuf = (char *) crealloc (destbuf, maxsize += 2048);
+	  destbuf = (char *) crealloc_abort (destbuf, maxsize += 2048);
 	if (workingset)
 	  for (unsigned i = 1; i <= wset_size; ++i)
 	    {

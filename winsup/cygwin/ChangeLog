@@ -1,3 +1,10 @@
+2007-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Change many cygheap allocation routines to their *_abort analogs.
+	* cygheap.cc (cmalloc_abort): New function.
+	(crealloc_abort): Ditto.
+	(ccalloc_abort): Ditto.
+
 2007-11-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.cc (_crealloc): Avoid memcpy when _cmalloc returns NULL.

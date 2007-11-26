@@ -535,7 +535,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
     normalized_path_size = n;
   else
     {
-      normalized_path = (char *) cmalloc (HEAP_STR, n);
+      normalized_path = (char *) cmalloc_abort (HEAP_STR, n);
       normalized_path_size = 0;
     }
 
@@ -543,7 +543,7 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 }
 
 PUNICODE_STRING
-get_nt_native_path (const char *path, UNICODE_STRING &upath)
+get_nt_native_path (const char *path, UNICODE_STRING& upath)
 {
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
@@ -576,7 +576,7 @@ path_conv::get_nt_native_path ()
     {
       uni_path.Length = 0;
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
-      wide_path = (PWCHAR) cmalloc (HEAP_STR, uni_path.MaximumLength);
+      wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
       ::get_nt_native_path (path, uni_path);
     }
@@ -4479,8 +4479,8 @@ skip_peb_storing:
 	  RtlAcquirePebLock ();
 	  pdir = &get_user_proc_parms ()->CurrentDirectoryName;
 	  RtlInitEmptyUnicodeString (&win32,
-				     (PWCHAR) crealloc (win32.Buffer,
-				     			pdir->Length + 2),
+				     (PWCHAR) crealloc_abort (win32.Buffer,
+							      pdir->Length + 2),
 				     pdir->Length + 2);
 	  RtlCopyUnicodeString (&win32, pdir);
 	  RtlReleasePebLock ();
@@ -4504,8 +4504,8 @@ skip_peb_storing:
 	  else if (upath.Length > 3 * sizeof (WCHAR))
 	    upath.Length -= sizeof (WCHAR); /* Strip trailing backslash */
 	  RtlInitEmptyUnicodeString (&win32,
-				     (PWCHAR) crealloc (win32.Buffer,
-				     			upath.Length + 2),
+				     (PWCHAR) crealloc_abort (win32.Buffer,
+							      upath.Length + 2),
 				     upath.Length + 2);
 	  RtlCopyUnicodeString (&win32, &upath);
 	}
@@ -4531,7 +4531,7 @@ skip_peb_storing:
 	  posix_cwd = (const char *) alloca (PATH_MAX);
 	  mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
 	}
-      posix = (char *) crealloc (posix, strlen (posix_cwd) + 1);
+      posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
       stpcpy (posix, posix_cwd);
     }
 

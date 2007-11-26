@@ -164,7 +164,7 @@ fhandler_virtual::dup (fhandler_base * child)
   if (!ret)
     {
       fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
-      fhproc_child->filebuf = (char *) cmalloc (HEAP_BUF, filesize);
+      fhproc_child->filebuf = (char *) cmalloc_abort (HEAP_BUF, filesize);
       fhproc_child->bufalloc = fhproc_child->filesize = filesize;
       fhproc_child->position = position;
       memcpy (fhproc_child->filebuf, filebuf, filesize);

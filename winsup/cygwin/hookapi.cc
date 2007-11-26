@@ -107,7 +107,7 @@ RedirectIAT (function_hook& fh, PIMAGE_IMPORT_DESCRIPTOR pImportDesc,
 	  hook_chain *hc;
 	  for (hc = &cygheap->hooks; hc->next; hc = hc->next)
 	    continue;
-	  hc->next = (hook_chain *) cmalloc (HEAP_1_HOOK, sizeof (hook_chain));
+	  hc->next = (hook_chain *) cmalloc_abort (HEAP_1_HOOK, sizeof (hook_chain));
 	  hc->next->loc = (void **) pi;
 	  hc->next->func = fh.hookfn;
 	  hc->next->next = NULL;

@@ -604,7 +604,7 @@ _pinfo::commune_request (__uint32_t code, ...)
 	res.s = NULL;
       else
 	{
-	  res.s = (char *) cmalloc (HEAP_COMMUNE, n);
+	  res.s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
 	  char *p;
 	  for (p = res.s; n && ReadFile (fromthem, p, n, &nr, NULL); p += nr, n -= nr)
 	    continue;
@@ -666,7 +666,7 @@ _pinfo::fd (int fd, size_t &n)
       if (cfd < 0)
 	s = cstrdup ("");
       else
-	s = cfd->get_proc_fd_name ((char *) cmalloc (HEAP_COMMUNE, CYG_MAX_PATH));
+	s = cfd->get_proc_fd_name ((char *) cmalloc_abort (HEAP_COMMUNE, CYG_MAX_PATH));
       n = strlen (s) + 1;
     }
   return s;
@@ -692,7 +692,7 @@ _pinfo::fds (size_t &n)
       while ((fd = cfd.next ()) >= 0)
 	n += sizeof (int);
       cfd.rewind ();
-      s = (char *) cmalloc (HEAP_COMMUNE, n);
+      s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
       int *p = (int *) s;
       while ((fd = cfd.next ()) >= 0 && (char *) p - s < (int) n)
 	*p++ = fd;
@@ -737,7 +737,7 @@ _pinfo::cwd (size_t& n)
     }
   else
     {
-      s = (char *) cmalloc (HEAP_COMMUNE, CYG_MAX_PATH);
+      s = (char *) cmalloc_abort (HEAP_COMMUNE, CYG_MAX_PATH);
       cygheap->cwd.get (s, 1, 1, CYG_MAX_PATH);
       n = strlen (s) + 1;
     }
@@ -762,7 +762,7 @@ _pinfo::cmdline (size_t& n)
       for (char **a = __argv; *a; a++)
 	n += strlen (*a) + 1;
       char *p;
-      p = s = (char *) cmalloc (HEAP_COMMUNE, n);
+      p = s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
       for (char **a = __argv; *a; a++)
 	{
 	  strcpy (p, *a);

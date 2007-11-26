@@ -249,13 +249,16 @@ _crealloc (void *ptr, unsigned size)
 #define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
 
 inline static void *
-creturn (cygheap_types x, cygheap_entry * c, unsigned len)
+creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL)
 {
   if (!c)
-    {
-      set_errno (ENOMEM);
-      return NULL;
-    }
+    if (fn)
+      api_fatal ("%s would have returned NULL", fn);
+    else
+      {
+	set_errno (ENOMEM);
+	return NULL;
+      }
   c->type = x;
   char *cend = ((char *) c + sizeof (*c) + len);
   if (cygheap_max < cend)
@@ -264,24 +267,29 @@ creturn (cygheap_types x, cygheap_entry * c, unsigned len)
   return (void *) c->data;
 }
 
-extern "C" void *__stdcall
-cmalloc (cygheap_types x, DWORD n)
+inline static void *
+cmalloc (cygheap_types x, DWORD n, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
-  if (!c)
-    {
-#ifdef DEBUGGING
-      system_printf ("cmalloc returned NULL");
-      try_to_debug ();
-#endif
-    }
-  return creturn (x, c, n);
+  return creturn (x, c, n, fn);
 }
 
-extern "C" void *__stdcall
-crealloc (void *s, DWORD n)
+extern "C" void *
+cmalloc (cygheap_types x, DWORD n)
+{
+  return cmalloc (x, n, NULL);
+}
+
+extern "C" void *
+cmalloc_abort (cygheap_types x, DWORD n)
+{
+  return cmalloc (x, n, "cmalloc");
+}
+
+inline static void *
+crealloc (void *s, DWORD n, const char *fn)
 {
   MALLOC_CHECK;
   if (s == NULL)
@@ -291,11 +299,19 @@ crealloc (void *s, DWORD n)
   cygheap_entry *c = tocygheap (s);
   cygheap_types t = (cygheap_types) c->type;
   c = (cygheap_entry *) _crealloc (c, sizeof_cygheap (n));
-#ifdef DEBUGGING
-  if (!c)
-    system_printf ("crealloc returned NULL");
-#endif
-  return creturn (t, c, n);
+  return creturn (t, c, n, fn);
+}
+
+extern "C" void *__stdcall
+crealloc (void *s, DWORD n)
+{
+  return crealloc (s, n, NULL);
+}
+
+extern "C" void *__stdcall
+crealloc_abort (void *s, DWORD n)
+{
+  return crealloc (s, n, "crealloc");
 }
 
 extern "C" void __stdcall
@@ -314,8 +330,8 @@ cfree_and_set (char *&s, char *what)
   s = what;
 }
 
-extern "C" void *__stdcall
-ccalloc (cygheap_types x, DWORD n, DWORD size)
+inline static void *
+ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
@@ -323,11 +339,19 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (c)
     memset (c->data, 0, n);
-#ifdef DEBUGGING
-  if (!c)
-    system_printf ("ccalloc returned NULL");
-#endif
-  return creturn (x, c, n);
+  return creturn (x, c, n, fn);
+}
+
+extern "C" void *__stdcall
+ccalloc (cygheap_types x, DWORD n, DWORD size)
+{
+  return ccalloc (x, n, size, NULL);
+}
+
+extern "C" void *__stdcall
+ccalloc_abort (cygheap_types x, DWORD n, DWORD size)
+{
+  return ccalloc (x, n, size, "ccalloc");
 }
 
 extern "C" char *__stdcall

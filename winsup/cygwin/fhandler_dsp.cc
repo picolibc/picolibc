@@ -983,7 +983,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
       nohandle (true);
 
       // FIXME: Do this better someday
-      fhandler_dev_dsp *arch = (fhandler_dev_dsp *) cmalloc (HEAP_ARCHETYPES, sizeof (*this));
+      fhandler_dev_dsp *arch = (fhandler_dev_dsp *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
       archetype = arch;
       *((fhandler_dev_dsp **) cygheap->fdtab.add_archetype ()) = arch;
       *arch = *this;

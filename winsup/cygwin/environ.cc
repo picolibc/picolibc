@@ -248,7 +248,7 @@ getearly (const char * name, int *)
 	  return *ptr + len + 1;
     }
   else if ((len = GetEnvironmentVariable (name, NULL, 0))
-	   && (ret = (char *) cmalloc (HEAP_2_STR, len))
+	   && (ret = (char *) cmalloc_abort (HEAP_2_STR, len))
 	   && GetEnvironmentVariable (name, ret, len))
     return ret;
 
@@ -848,7 +848,7 @@ getwinenveq (const char *name, size_t namelen, int x)
 	totlen += namelen;
       else
 	namelen = 0;
-      char *p = (char *) cmalloc ((cygheap_types) x, totlen);
+      char *p = (char *) cmalloc_abort ((cygheap_types) x, totlen);
       if (namelen)
 	strcpy (p, name);
       if (GetEnvironmentVariable (name0, p + namelen, totlen))
@@ -919,7 +919,7 @@ spenv::retrieve (bool no_envblock, const char *const env)
       p = (cygheap->user.*from_cygheap) (name, namelen);
       if (!p || (no_envblock && !env) || (p == env_dontadd))
 	return env_dontadd;
-      char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
+      char *s = (char *) cmalloc_abort (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
       strcpy (s + namelen, p);
       debug_printf ("using computed value for '%s'", name);
@@ -954,7 +954,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     continue;
 
   /* Allocate a new "argv-style" environ list with room for extra stuff. */
-  char **newenv = (char **) cmalloc (HEAP_1_ARGV, sizeof (char *) *
+  char **newenv = (char **) cmalloc_abort (HEAP_1_ARGV, sizeof (char *) *
 				     (n + SPENVS_SIZE + 1));
 
   int tl = 0;

@@ -53,8 +53,8 @@ _cygtls::init ()
   else
     {
       cygheap->sthreads = THREADLIST_CHUNK;
-      cygheap->threadlist = (_cygtls **) ccalloc (HEAP_TLS, cygheap->sthreads,
-						     sizeof (cygheap->threadlist[0]));
+      cygheap->threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
+							sizeof (cygheap->threadlist[0]));
     }
   sentry::lock.init ("sentry_lock");
 }
@@ -119,8 +119,8 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
   if (nthreads >= cygheap->sthreads)
     {
       cygheap->threadlist = (_cygtls **)
-	crealloc (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)
-		 * sizeof (cygheap->threadlist[0]));
+	crealloc_abort (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)
+			* sizeof (cygheap->threadlist[0]));
       memset (cygheap->threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (cygheap->threadlist[0]));
     }
 
