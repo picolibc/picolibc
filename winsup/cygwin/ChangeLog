@@ -1,3 +1,7 @@
+2007-11-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.cc (_crealloc): Avoid memcpy when _cmalloc returns NULL.
+
 2007-11-22  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (must_encode): New function.
