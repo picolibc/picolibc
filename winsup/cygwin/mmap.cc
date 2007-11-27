@@ -51,6 +51,11 @@ details. */
 /* Used for anonymous mappings. */
 static fhandler_dev_zero fh_anonymous;
 
+/* Used for thread synchronization while accessing mmap bookkeeping lists. */
+static NO_COPY muto mmap_guard;
+#define LIST_LOCK()    (mmap_guard.init ("mmap_guard")->acquire ())
+#define LIST_UNLOCK()  (mmap_guard.release ())
+
 /* Small helpers to avoid having lots of flag bit tests in the code. */
 static inline bool
 priv (int flags)
@@ -333,7 +338,6 @@ class mmap_list
     void set (int nfd, struct __stat64 *st);
     mmap_record *add_record (mmap_record r);
     bool del_record (mmap_record *rec);
-    mmap_record *search_record (_off64_t off, DWORD len);
     caddr_t try_map (void *addr, size_t len, int flags, _off64_t off);
 };
 
@@ -552,31 +556,6 @@ mmap_list::add_record (mmap_record r)
   return rec;
 }
 
-/* Used in mmap() */
-mmap_record *
-mmap_list::search_record (_off64_t off, DWORD len)
-{
-  mmap_record *rec;
-
-  if (anonymous () && !off)
-    {
-      len = PAGE_CNT (len);
-      LIST_FOREACH (rec, &recs, mr_next)
-	if (rec->find_unused_pages (len) != (DWORD)-1)
-	  return rec;
-    }
-  else
-    {
-      LIST_FOREACH (rec, &recs, mr_next)
-	if (off >= rec->get_offset ()
-	    && off + len
-	       <= rec->get_offset ()
-		  + (PAGE_CNT (rec->get_len ()) * getsystempagesize ()))
-	  return rec;
-    }
-  return NULL;
-}
-
 void
 mmap_list::set (int nfd, struct __stat64 *st)
 {
@@ -611,10 +590,13 @@ mmap_list::try_map (void *addr, size_t len, int flags, _off64_t off)
     {
       /* If MAP_FIXED isn't given, check if this mapping matches into the
 	 chunk of another already performed mapping. */
-      if ((rec = search_record (off, len)) != NULL
-	  && rec->compatible_flags (flags))
+      DWORD plen = PAGE_CNT (len);
+      LIST_FOREACH (rec, &recs, mr_next)
+	if (rec->find_unused_pages (plen) != (DWORD) -1)
+	  break;
+      if (rec && rec->compatible_flags (flags))
 	{
-	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+	  if ((off = rec->map_pages (off, len)) == (_off64_t) -1)
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) rec->get_address () + off;
 	}
@@ -705,6 +687,9 @@ mmap_areas::del_list (mmap_list *ml)
 mmap_region_status
 mmap_is_attached_or_noreserve (void *addr, size_t len)
 {
+  mmap_region_status ret = MMAP_NONE;
+
+  LIST_LOCK ();
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
   size_t pagesize = getpagesize ();
@@ -713,7 +698,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
   len = roundup2 (len, pagesize);
 
   if (map_list == NULL)
-    return MMAP_NONE;
+    goto out;
 
   mmap_record *rec;
   caddr_t u_addr;
@@ -724,9 +709,12 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
       if (!rec->match (start_addr, len, u_addr, u_len))
 	continue;
       if (rec->attached ())
-	return MMAP_RAISE_SIGBUS;
+	{
+	  ret = MMAP_RAISE_SIGBUS;
+	  break;
+	}
       if (!rec->noreserve ())
-	return MMAP_NONE;
+	break;
 
       size_t commit_len = u_len - (start_addr - u_addr);
       if (commit_len > len)
@@ -734,14 +722,22 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 
       if (!VirtualAlloc (start_addr, commit_len, MEM_COMMIT,
 			 rec->gen_protect ()))
-	return MMAP_RAISE_SIGBUS;
+	{
+	  ret = MMAP_RAISE_SIGBUS;
+	  break;
+	}
 
       start_addr += commit_len;
       len -= commit_len;
       if (!len)
-	return MMAP_NORESERVE_COMMITED;
+	{
+	  ret = MMAP_NORESERVE_COMMITED;
+	  break;
+	}
     }
-  return MMAP_NONE;
+out:
+  LIST_UNLOCK ();
+  return ret;
 }
 
 static caddr_t
@@ -787,8 +783,6 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
-
-  SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
   /* EINVAL error conditions. */
   if (off % pagesize
@@ -939,6 +933,7 @@ go_ahead:
   if (noreserve (flags) && (!anonymous (flags) || !priv (flags)))
     flags &= ~MAP_NORESERVE;
 
+  LIST_LOCK ();
   map_list = mmapped_areas.get_list_by_fd (fd, &st);
 
   /* Test if an existing anonymous mapping can be recycled. */
@@ -946,11 +941,11 @@ go_ahead:
     {
       caddr_t tried = map_list->try_map (addr, len, flags, off);
       /* try_map returns NULL if no map matched, otherwise it returns
-	 a valid address, of MAP_FAILED in case of a fatal error. */
+	 a valid address, or MAP_FAILED in case of a fatal error. */
       if (tried)
 	{
 	  ret = tried;
-	  goto out;
+	  goto out_with_unlock;
 	}
     }
 
@@ -974,13 +969,13 @@ go_ahead:
 	  if (!newaddr)
 	    {
 	      __seterrno ();
-	      goto out;
+	      goto out_with_unlock;
 	    }
 	}
       if (!VirtualFree (newaddr, 0, MEM_RELEASE))
 	{
 	  __seterrno ();
-	  goto out;
+	  goto out_with_unlock;
 	}
       addr = newaddr;
     }
@@ -988,7 +983,7 @@ go_ahead:
   base = mmap_worker (map_list, fh, (caddr_t) addr, len, prot, flags, fd, off,
 		      &st);
   if (!base)
-    goto out;
+    goto out_with_unlock;
 
   if (orig_len)
     {
@@ -1024,7 +1019,7 @@ go_ahead:
 		{
 		  fh->munmap (fh->get_handle (), base, len);
 		  set_errno (ENOMEM);
-		  goto out;
+		  goto out_with_unlock;
 		}
 	      at_base += valid_page_len;
 	    }
@@ -1042,9 +1037,10 @@ go_ahead:
 
   ret = base;
 
-out:
+out_with_unlock:
+  LIST_UNLOCK ();
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+out:
 
   if (fh_disk_file)
     NtClose (fh_disk_file->get_handle ());
@@ -1080,7 +1076,7 @@ munmap (void *addr, size_t len)
     }
   len = roundup2 (len, pagesize);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  LIST_LOCK ();
 
   /* Iterate through the map, unmap pages between addr and addr+len
      in all maps. */
@@ -1117,7 +1113,7 @@ munmap (void *addr, size_t len)
 	}
     }
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  LIST_UNLOCK ();
   syscall_printf ("0 = munmap(): %x", addr);
   return 0;
 }
@@ -1132,7 +1128,7 @@ msync (void *addr, size_t len, int flags)
 
   syscall_printf ("msync (addr: %p, len %u, flags %x)", addr, len, flags);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+  LIST_LOCK ();
 
   if (((uintptr_t) addr % getpagesize ())
       || (flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
@@ -1173,8 +1169,8 @@ msync (void *addr, size_t len, int flags)
   set_errno (ENOMEM);
 
 out:
+  LIST_UNLOCK ();
   syscall_printf ("%d = msync()", ret);
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   return ret;
 }
 
@@ -1199,7 +1195,7 @@ mprotect (void *addr, size_t len, int prot)
     }
   len = roundup2 (len, pagesize);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
+  LIST_LOCK ();
 
   /* Iterate through the map, protect pages between addr and addr+len
      in all maps. */
@@ -1235,7 +1231,7 @@ mprotect (void *addr, size_t len, int prot)
 	}
     }
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
+  LIST_UNLOCK ();
 
   if (!in_mapped)
     {

@@ -35,13 +35,6 @@ enum cw_cancel_action
   cw_no_cancel
 };
 
-extern "C"
-{
-void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
-void ReleaseResourceLock (int, int, const char *)
-  __attribute__ ((regparm (3)));
-}
-
 DWORD cancelable_wait (HANDLE, DWORD, const cw_cancel_action = cw_cancel_self,
 		       const enum cw_sig_wait = cw_sig_nosig)
   __attribute__ ((regparm (3)));
@@ -91,17 +84,6 @@ private:
 
 class per_process;
 class pinfo;
-
-class ResourceLocks
-{
-public:
-  LPCRITICAL_SECTION Lock (int);
-  void Init ();
-  void Delete ();
-private:
-  CRITICAL_SECTION lock;
-  bool inited;
-};
 
 #define PTHREAD_MAGIC 0xdf0df045
 #define PTHREAD_MUTEX_MAGIC PTHREAD_MAGIC+1

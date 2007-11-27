@@ -286,43 +286,6 @@ semaphore::is_good_object (sem_t const * sem)
   return true;
 }
 
-LPCRITICAL_SECTION
-ResourceLocks::Lock (int _resid)
-{
-  return &lock;
-}
-
-void
-SetResourceLock (int _res_id, int _mode, const char *_function)
-{
-  EnterCriticalSection (user_data->resourcelocks->Lock (_res_id));
-}
-
-void
-ReleaseResourceLock (int _res_id, int _mode, const char *_function)
-{
-  LeaveCriticalSection (user_data->resourcelocks->Lock (_res_id));
-}
-
-void
-ResourceLocks::Init ()
-{
-  InitializeCriticalSection (&lock);
-  inited = true;
-  thread_printf ("lock %p inited by %p , %d", &lock, user_data, myself->pid);
-}
-
-void
-ResourceLocks::Delete ()
-{
-  if (inited)
-    {
-      thread_printf ("Close Resource Locks %p ", &lock);
-      DeleteCriticalSection (&lock);
-      inited = false;
-    }
-}
-
 void
 MTinterface::Init ()
 {

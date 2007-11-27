@@ -80,7 +80,6 @@ bool NO_COPY cygwin_finished_initializing;
    measure to allow an orderly transfer to the new, correct sigmask method. */
 unsigned NO_COPY int signal_shift_subtract = 1;
 
-ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
@@ -113,8 +112,8 @@ extern "C"
    /* hmodule */ NULL,
    /* api_major */ CYGWIN_VERSION_API_MAJOR,
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
-   /* unused2 */ {0, 0, 0, 0, 0},
-   /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
+   /* unused2 */ {0, 0, 0, 0, 0, 0},
+   /* threadinterface */ &_mtinterf,
    /* impure_ptr */ _GLOBAL_REENT,
   };
   bool ignore_case_with_glob;
@@ -759,7 +758,6 @@ dll_crt0_0 ()
 	}
     }
 
-  user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();
 
   _cygtls::init ();

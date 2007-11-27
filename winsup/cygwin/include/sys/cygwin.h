@@ -140,7 +140,6 @@ extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
 */
 
 #ifdef __cplusplus
-class ResourceLocks;
 class MTinterface;
 #endif
 
@@ -198,18 +197,16 @@ struct per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-  DWORD unused2[5];
+  DWORD unused2[6];
 
 #if defined (__INSIDE_CYGWIN__) && defined (__cplusplus)
-  ResourceLocks *resourcelocks;
   MTinterface *threadinterface;
 #else
-  void *resourcelocks;
   void *threadinterface;
 #endif
   struct _reent *impure_ptr;
 };
-#define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->resourcelocks))
+#define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->threadinterface))
 
 extern void cygwin_premain0 (int argc, char **argv, struct per_process *);
 extern void cygwin_premain1 (int argc, char **argv, struct per_process *);
