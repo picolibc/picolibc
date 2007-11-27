@@ -5,7 +5,7 @@
 ;* This file is a part of the mingw-runtime package.
 ;* No warranty is given; refer to the file DISCLAIMER within the package.
 ;
-; Exports from msvcrt.dll, msvcr70.dll, msvcr71.dll and msvcr80.dll
+; Exports from msvcrt.dll, msvcr70.dll, msvcr71.dll, msvcr80.dll and msvcr90.dll
 ;
 ; NOTE: All exports, except for what appeared to be C++ mangled names,
 ;       are included. Not all functions have prototypes in the headers
@@ -148,7 +148,7 @@ _cprintf
 _cputs
 _creat
 _cscanf
-#if  !(__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
+#if  !(__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || msvcr90d__)
 _ctype DATA
 #endif
 _cwait
@@ -743,7 +743,7 @@ _wfindfirst64
 _wfindnext64
 _wstat64
 _wutime64
-#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
+#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr70.dll amd later
 __buffer_overrun
 __CxxDetectRethrow
@@ -787,7 +787,7 @@ _wcstoui64
 _wctype
 _wtof
 #endif  /* 7.0 */
-#if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__)
+#if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr71.dll
 ___lc_codepage_func
 ___lc_collate_cp_func
@@ -808,7 +808,7 @@ _get_heap_handle
 _set_purecall_handler
 _set_SSE2_enable
 #endif /* 7.1  */
-#if ( __msvcr80__ || __msvcr80d__)
+#if ( __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr80.dll
 _get_printf_count_output
 _set_printf_count_output

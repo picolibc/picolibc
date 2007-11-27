@@ -21,20 +21,20 @@ limit:	.double 0.29
 .globl _logl
 	.def	_logl;	.scl	2;	.type	32;	.endef
 _logl:
-	fldln2			// log(2)
-	fldt	4(%esp)		// x : log(2)
-	fld	%st		// x : x : log(2)
-	fsubl	one		// x-1 : x : log(2)
-	fld	%st		// x-1 : x-1 : x : log(2)
-	fabs			// |x-1| : x-1 : x : log(2)
-	fcompl	limit		// x-1 : x : log(2)
-	fnstsw			// x-1 : x : log(2)
+	fldln2			/* log(2) */
+	fldt	4(%esp)		/* x : log(2) */
+	fld	%st		/* x : x : log(2) */
+	fsubl	one		/* x-1 : x : log(2) */
+	fld	%st		/* x-1 : x-1 : x : log(2) */
+	fabs			/* |x-1| : x-1 : x : log(2) */
+	fcompl	limit		/* x-1 : x : log(2) */
+	fnstsw			/* x-1 : x : log(2) */
 	andb	$0x45, %ah
 	jz	2f
-	fstp	%st(1)		// x-1 : log(2)
-	fyl2xp1			// log(x)
+	fstp	%st(1)		/* x-1 : log(2) */
+	fyl2xp1			/* log(x) */
 	ret
 
-2:	fstp	%st(0)		// x : log(2)
-	fyl2x			// log(x)
+2:	fstp	%st(0)		/* x : log(2) */
+	fyl2x			/* log(x) */
 	ret

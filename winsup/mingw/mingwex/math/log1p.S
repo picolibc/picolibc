@@ -27,7 +27,7 @@ _log1p:
 	fnstsw
 	fld	%st
 	sahf
-	jc	3f	// in case x is NaN or ±Inf
+	jc	3f	/* in case x is NaN or ±Inf */
 
 4:	fabs
 	fcompl	limit
@@ -41,7 +41,7 @@ _log1p:
 2:	fyl2xp1
 	ret
 
-3:	jp	4b	// in case x is ±Inf
+3:	jp	4b	/* in case x is ±Inf */
 	fstp	%st(1)
 	fstp	%st(1)
 	ret

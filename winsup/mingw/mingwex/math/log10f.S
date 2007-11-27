@@ -20,29 +20,29 @@ limit:	.double 0.29
 .globl _log10f
 	.def	_log10f;	.scl	2;	.type	32;	.endef
 _log10f:
-	fldlg2			// log10(2)
-	flds	4(%esp)		// x : log10(2)
+	fldlg2			/* log10(2) */
+	flds	4(%esp)		/* x : log10(2) */
 	fxam
 	fnstsw
-	fld	%st		// x : x : log10(2)
+	fld	%st		/* x : x : log10(2) */
 	sahf
-	jc	3f		// in case x is NaN or ±Inf
-4:	fsubl	one		// x-1 : x : log10(2)
-	fld	%st		// x-1 : x-1 : x : log10(2)
-	fabs			// |x-1| : x-1 : x : log10(2)
-	fcompl	limit		// x-1 : x : log10(2)
-	fnstsw			// x-1 : x : log10(2)
+	jc	3f		/* in case x is NaN or ±Inf */
+4:	fsubl	one		/* x-1 : x : log10(2) */
+	fld	%st		/* x-1 : x-1 : x : log10(2) */
+	fabs			/* |x-1| : x-1 : x : log10(2) */
+	fcompl	limit		/* x-1 : x : log10(2) */
+	fnstsw			/* x-1 : x : log10(2) */
 	andb	$0x45, %ah
 	jz	2f
-	fstp	%st(1)		// x-1 : log10(2)
-	fyl2xp1			// log10(x)
+	fstp	%st(1)		/* x-1 : log10(2) */
+	fyl2xp1			/* log10(x) */
 	ret
 
-2:	fstp	%st(0)		// x : log10(2)
-	fyl2x			// log10(x)
+2:	fstp	%st(0)		/* x : log10(2) */
+	fyl2x			/* log10(x) */
 	ret
 
-3:	jp	4b		// in case x is ±Inf
+3:	jp	4b		/* in case x is ±Inf */
 	fstp	%st(1)
 	fstp	%st(1)
 	ret

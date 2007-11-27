@@ -1,3 +1,18 @@
+2007-11-26  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Add libmsvcr90.a and libmsvcr90d.a targets.
+	* msvcrt.def.in: Add support for __msvcr90__ and __msvcr90d__ defines.
+	* mingwex/math/log10f.S: Correct issue with comments.
+	* mingwex/math/log10l.S: Ditto.
+	* mingwex/math/log1p.S: Ditto.
+	* mingwex/math/log1pf.S: Ditto.
+	* mingwex/math/log1pl.S: Ditto.
+	* mingwex/math/log2.S: Ditto.
+	* mingwex/math/log2f.S: Ditto.
+	* mingwex/math/log2l.S: Ditto.
+	* mingwex/math/logf.S: Ditto.
+	* mingwex/math/logl.S: Ditto.
+
 2007-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/mingw_snprintf.c: fixed warning during compile.
