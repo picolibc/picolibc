@@ -30,15 +30,17 @@ details. */
 #include <mqueue.h>
 #include <semaphore.h>
 
+/* The prefix_len is the length of the path prefix ncluding trailing "/"
+   (or "/sem." for semaphores) as well as the trailing NUL. */
 struct
 {
   const char *prefix;
-  const size_t max_len;
+  const size_t prefix_len;
   const char *description;
 } ipc_names[] = {
-  { "/dev/shm", CYG_MAX_PATH - 10, "POSIX shared memory object" },
-  { "/dev/mqueue", CYG_MAX_PATH - 13, "POSIX message queue" },
-  { "/dev/shm", CYG_MAX_PATH - 14, "POSIX semaphore" }
+  { "/dev/shm", 10, "POSIX shared memory object" },
+  { "/dev/mqueue", 13, "POSIX message queue" },
+  { "/dev/shm", 14, "POSIX semaphore" }
 };
 
 enum ipc_type_t
@@ -49,7 +51,7 @@ enum ipc_type_t
 };
 
 static bool
-check_path (char *res_name, ipc_type_t type, const char *name)
+check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
 {
   /* Note that we require the existance of the apprpriate /dev subdirectories
      for POSIX IPC object support, similar to Linux (which supports the
@@ -76,7 +78,7 @@ check_path (char *res_name, ipc_type_t type, const char *name)
       set_errno (EINVAL);
       return false;
     }
-  if (strlen (name) > ipc_names[type].max_len)
+  if (len > PATH_MAX - ipc_names[type].prefix_len)
     {
       debug_printf ("%s name '%s' too long", ipc_names[type].description, name);
       set_errno (ENAMETOOLONG);
@@ -91,7 +93,7 @@ check_path (char *res_name, ipc_type_t type, const char *name)
 static int
 ipc_mutex_init (HANDLE *pmtx, const char *name)
 {
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
   __small_sprintf (buf, "%scyg_pmtx/%s", cygheap->shared_prefix, name);
   *pmtx = CreateMutex (&sec_all, FALSE, buf);
   if (!*pmtx)
@@ -133,7 +135,7 @@ ipc_mutex_close (HANDLE mtx)
 static int
 ipc_cond_init (HANDLE *pevt, const char *name)
 {
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
   __small_sprintf (buf, "%scyg_pevt/%s", cygheap->shared_prefix, name);
   *pevt = CreateEvent (&sec_all, TRUE, FALSE, buf);
   if (!*pevt)
@@ -223,9 +225,10 @@ public:
 extern "C" int
 shm_open (const char *name, int oflag, mode_t mode)
 {
-  char shmname[CYG_MAX_PATH];
+  size_t len = strlen (name);
+  char shmname[ipc_names[shmem].prefix_len + len];
 
-  if (!check_path (shmname, shmem, name))
+  if (!check_path (shmname, shmem, name, len))
     return -1;
 
   /* Check for valid flags. */
@@ -243,9 +246,10 @@ shm_open (const char *name, int oflag, mode_t mode)
 extern "C" int
 shm_unlink (const char *name)
 {
-  char shmname[CYG_MAX_PATH];
+  size_t len = strlen (name);
+  char shmname[ipc_names[shmem].prefix_len + len];
 
-  if (!check_path (shmname, shmem, name))
+  if (!check_path (shmname, shmem, name, len))
     return -1;
 
   return unlink (shmname);
@@ -312,9 +316,11 @@ mq_open (const char *name, int oflag, ...)
   struct mq_attr *attr;
   struct mq_info *mqinfo;
   LUID luid;
-  char mqname[CYG_MAX_PATH];
 
-  if (!check_path (mqname, mqueue, name))
+  size_t len = strlen (name);
+  char mqname[ipc_names[mqueue].prefix_len + len];
+
+  if (!check_path (mqname, mqueue, name, len))
     return (mqd_t) -1;
 
   myfault efault;
@@ -870,9 +876,10 @@ mq_close (mqd_t mqd)
 extern "C" int
 mq_unlink (const char *name)
 {
-  char mqname[CYG_MAX_PATH];
+  size_t len = strlen (name);
+  char mqname[ipc_names[mqueue].prefix_len + len];
 
-  if (!check_path (mqname, mqueue, name))
+  if (!check_path (mqname, mqueue, name, len))
     return -1;
   if (unlink (mqname) == -1)
     return -1;
@@ -901,11 +908,13 @@ sem_open (const char *name, int oflag, ...)
   struct __stat64 statbuff;
   sem_t *sem = SEM_FAILED;
   sem_finfo sf;
-  char semname[CYG_MAX_PATH];
   bool wasopen = false;
   ipc_flock file;
 
-  if (!check_path (semname, semaphore, name))
+  size_t len = strlen (name);
+  char semname[ipc_names[semaphore].prefix_len + len];
+
+  if (!check_path (semname, semaphore, name, len))
     return SEM_FAILED;
 
   myfault efault;
@@ -1041,9 +1050,10 @@ sem_close (sem_t *sem)
 extern "C" int
 sem_unlink (const char *name)
 {
-  char semname[CYG_MAX_PATH];
+  size_t len = strlen (name);
+  char semname[ipc_names[semaphore].prefix_len + len];
 
-  if (!check_path (semname, semaphore, name))
+  if (!check_path (semname, semaphore, name, len))
     return -1;
   if (unlink (semname) == -1)
     return -1;

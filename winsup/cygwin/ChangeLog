@@ -1,5 +1,21 @@
 2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc (ipc_names): Rename max_len to prefix_len.  Store
+	the prefix len in it.
+	(check_path): Take length parameter.  Use this length insetad of
+	calling strlen.  Allow PATH_MAX length paths.
+	(ipc_mutex_init): Use MAX_PATH instead of CYG_MAX_PATH.
+	(ipc_cond_init): Ditto.
+	(shm_open): Allocate local name buffer not bigger than necessary.  Call
+	check_path with additional length argument.
+	(shm_unlink): Ditto.
+	(mq_open): Ditto.
+	(mq_unlink): Ditto.
+	(sem_open): Ditto.
+	(sem_unlink): Ditto.
+
+2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	Drop old SetResourceLock stuff in favor of mutos.
 	* dcrt0.cc (_reslock): Remove.
 	(__cygwin_user_data): Accommodate removal of resourcelocks member.
