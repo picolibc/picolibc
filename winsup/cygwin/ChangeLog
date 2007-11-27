@@ -1,3 +1,21 @@
+2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Convert usage of dynamically growing cmalloced arrays to
+	cmalloced linked lists throughout.
+	(class mmap_record): Add LIST_ENTRY element.
+	(mmap_record::match): New method, taking over match algorithm from
+	list::search_record.
+	(class mmap_list): Rename from class list.  Add LIST_ENTRY.  Convert
+	recs to a LIST_HEAD.  Drop nrecs and maxrecs members.
+	(mmap_list::get_record): Drop entirely.
+	(mmap_list::free_recs): Drop entirely.
+	(mmap_list::del_record): Take mmap_record to delete as parameter.
+	(mmap_list::search_record): Convert to mmap_record::match.
+	(class mmap_areas): Rename from class map.  Convert lists to LIST_HEAD.
+	(mmap_areas::get_list): Drop entirely.
+	(mmap_areas::del_list): Take mmap_list to delete as parameter.
+	(mprotect): Fix indentation.
+
 2007-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Change many cygheap allocation routines to their *_abort analogs.
