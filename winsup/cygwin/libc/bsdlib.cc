@@ -108,7 +108,7 @@ openpty (int *amaster, int *aslave, char *name, struct termios *termp,
 	 struct winsize *winp)
 {
   int master, slave;
-  char pts[CYG_MAX_PATH];
+  char pts[TTY_NAME_MAX];
 
   if ((master = open ("/dev/ptmx", O_RDWR | O_NOCTTY)) >= 0)
     {

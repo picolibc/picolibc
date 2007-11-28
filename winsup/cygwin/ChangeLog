@@ -1,5 +1,15 @@
 2007-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tape.cc (mtinfo::initialize): Use MAX_PATH instead of
+	CYG_MAX_PATH.
+	* fhandler_tty.cc (fhandler_pty_master::ptsname): Set buffer size to
+	TTY_NAME_MAX.
+	* syscalls.cc (ttyname): Eliminate the `+ 1' from the name buffer size
+	since TTY_NAME_MAX already counts the trailing NUL.
+	* libc/bsdlib.cc (openpty): Set pts buffer size to TTY_NAME_MAX.
+
+2007-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::recv_internal): Add MSG_WAITALL
 	handling.  Use explicit flag values instead of MSG_WINMASK.
 	(fhandler_socket::send_internal): Use explicit flag values instead of

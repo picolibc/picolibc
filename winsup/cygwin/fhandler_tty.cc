@@ -1300,7 +1300,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 char *
 fhandler_pty_master::ptsname ()
 {
-  static char buf[32];
+  static char buf[TTY_NAME_MAX];
 
   __small_sprintf (buf, "/dev/tty%d", get_unit ());
   return buf;

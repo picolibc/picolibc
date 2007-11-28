@@ -1130,7 +1130,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 void
 mtinfo::initialize ()
 {
-  char name[CYG_MAX_PATH];
+  char name[MAX_PATH];
   HANDLE mtx;
 
   shared_name (name, "mtinfo_mutex", 0);

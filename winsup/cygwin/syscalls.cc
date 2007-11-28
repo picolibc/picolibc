@@ -1931,8 +1931,8 @@ ttyname_r (int fd, char *buf, size_t buflen)
 extern "C" char *
 ttyname (int fd)
 {
-  static char name[TTY_NAME_MAX + 1];
-  int ret = ttyname_r (fd, name, TTY_NAME_MAX + 1);
+  static char name[TTY_NAME_MAX];
+  int ret = ttyname_r (fd, name, TTY_NAME_MAX);
   if (ret)
     {
       set_errno (ret);
