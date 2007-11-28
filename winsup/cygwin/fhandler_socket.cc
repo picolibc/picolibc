@@ -1210,23 +1210,59 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
 				struct sockaddr *from, int *fromlen)
 {
   ssize_t res = 0;
-  DWORD ret = 0;
+  DWORD ret = 0, wret;
   int evt_mask = FD_READ | ((flags & MSG_OOB) ? FD_OOB : 0);
 
-  flags &= MSG_WINMASK;
+  bool waitall = (flags & MSG_WAITALL);
+  flags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
+  if (waitall)
+    {
+      if (get_socket_type () != SOCK_STREAM)
+        {
+	  WSASetLastError (WSAEOPNOTSUPP);
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
+	}
+      if (is_nonblocking () || (flags & (MSG_OOB | MSG_PEEK)))
+        waitall = false;
+    }
+
   /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
      waiting in the buffers, otherwise the event handling gets messed up
      for some reason. */
   while (!(res = wait_for_events (evt_mask | FD_CLOSE))
 	 || saw_shutdown_read ())
     {
-      res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &ret,
+      res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &wret,
 			 &flags, from, fromlen, NULL, NULL);
-      if (!res || WSAGetLastError () != WSAEWOULDBLOCK)
+      if (!res)
+	{
+	  ret += wret;
+	  if (!waitall)
+	    break;
+	  while (wret && wsacnt)
+	    {
+	      if (wsabuf->len > wret)
+		{
+		  wsabuf->len -= wret;
+		  wsabuf->buf += wret;
+		  wret = 0;
+		}
+	      else
+	        {
+		  wret -= wsabuf->len;
+		  ++wsabuf;
+		  --wsacnt;
+		}
+	    }
+	  if (!wret)
+	    break;
+	}
+      else if (WSAGetLastError () != WSAEWOULDBLOCK)
 	break;
     }
 
-  if (res == SOCKET_ERROR)
+  if (!ret && res == SOCKET_ERROR)
     {
       /* According to SUSv3, errno isn't set in that case and no error
 	 condition is returned. */
@@ -1239,11 +1275,10 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
 	return 0;
 
       set_winsock_errno ();
+      return SOCKET_ERROR;
     }
-  else
-    res = ret;
 
-  return res;
+  return ret;
 }
 
 int
@@ -1317,7 +1352,7 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
   do
     {
       if ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
-			    flags & MSG_WINMASK, to, tolen, NULL, NULL))
+			    flags & (MSG_OOB | MSG_DONTROUTE), to, tolen, NULL, NULL))
 	  && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
 	{
 	  LOCK_EVENTS;

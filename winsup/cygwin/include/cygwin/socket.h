@@ -189,7 +189,7 @@ struct OLD_msghdr
 #define MSG_OOB         0x1             /* process out-of-band data */
 #define MSG_PEEK        0x2             /* peek at incoming message */
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
-#define MSG_WINMASK     0x7             /* flags understood by WinSock calls */
+#define MSG_WAITALL     0x8             /* wait for all requested bytes */
 #define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 #define MSG_TRUNC       0x0100          /* Normal data truncated */
 #define MSG_CTRUNC      0x0200          /* Control data truncated */

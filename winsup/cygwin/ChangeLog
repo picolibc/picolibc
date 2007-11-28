@@ -1,3 +1,12 @@
+2007-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Add MSG_WAITALL
+	handling.  Use explicit flag values instead of MSG_WINMASK.
+	(fhandler_socket::send_internal): Use explicit flag values instead of
+	MSG_WINMASK.
+	* include/cygwin/socket.h (MSG_WINMASK): Remove definition.
+	(MSG_WAITALL): Define.
+
 2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (ipc_names): Rename max_len to prefix_len.  Store
