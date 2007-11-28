@@ -1,3 +1,8 @@
+2007-11-28  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* internal.h (ELF_IS_SECTION_IN_SEGMENT): Adjust to cope with
+	segments at the end of memory.
+
 2007-11-16  Nick Clifton  <nickc@redhat.com>
 
 	* dwarf2.h: Mention the location of the DWARF3 spec on the web.

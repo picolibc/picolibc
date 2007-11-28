@@ -286,11 +286,12 @@ struct elf_segment_map
        || ((bfd_vma) sec_hdr->sh_offset >= segment->p_offset		\
 	   && (sec_hdr->sh_offset + ELF_SECTION_SIZE(sec_hdr, segment)	\
 	       <= segment->p_offset + segment->p_filesz)))		\
-   /* SHF_ALLOC sections must have VMAs within the segment.  */		\
+   /* SHF_ALLOC sections must have VMAs within the segment.  Be		\
+      careful about segments right at the end of memory.  */		\
    && ((sec_hdr->sh_flags & SHF_ALLOC) == 0				\
        || (sec_hdr->sh_addr >= segment->p_vaddr				\
-	   && (sec_hdr->sh_addr + ELF_SECTION_SIZE(sec_hdr, segment)	\
-	       <= segment->p_vaddr + segment->p_memsz))))
+	   && (sec_hdr->sh_addr - segment->p_vaddr			\
+	       + ELF_SECTION_SIZE(sec_hdr, segment) <= segment->p_memsz))))
 
 /* Decide if the given sec_hdr is in the given segment in file.  */
 #define ELF_IS_SECTION_IN_SEGMENT_FILE(sec_hdr, segment)	\
