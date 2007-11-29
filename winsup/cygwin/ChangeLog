@@ -1,3 +1,55 @@
+2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	Drop old SetResourceLock stuff in favor of mutos.
+	* dcrt0.cc (_reslock): Remove.
+	(__cygwin_user_data): Accommodate removal of resourcelocks member.
+	(dll_crt0_0): Don't initialize resourcelocks.
+	* exceptions.cc (_cygtls::signal_exit): Drop resourcelocks handling.
+	* mmap.cc (mmap_guard): New muto.
+	(LIST_LOCK): Define.
+	(LIST_UNLOCK): Define.
+	(mmap_list::search_record): Remove.
+	(mmap_list::try_map): Include code for anonymous case from
+	mmap_list::search_record.
+	(mmap_is_attached_or_noreserve): Access bookkeeping lists in a thread
+	safe way.
+	(mmap64): Replace SetResourceLock/ReleaseResourceLock by
+	LIST_LOCK/LIST_UNLOCK.  Lock at the latest possible point.
+	(munmap): Replace SetResourceLock/ReleaseResourceLock by
+	LIST_LOCK/LIST_UNLOCK.
+	(msync): Ditto. 
+	(mprotect): Ditto.
+	* thread.cc (ResourceLocks::Lock): Remove.
+	(SetResourceLock): Remove.
+	(ReleaseResourceLock): Remove.
+	(ResourceLocks::Init): Remove.
+	(ResourceLocks::Delete): Remove.
+	* thread.h (SetResourceLock): Drop declaration.
+	(ReleaseResourceLock): Ditto.
+	(class ResourceLocks): Drop definition.
+	* include/sys/cygwin.h (class ResourceLocks): Drop forward declaration.
+	(struct per_process): Replace resourcelocks with additional unused2
+	element.
+	(per_process_overwrite): Accommodate above change.
+
+2007-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Convert usage of dynamically growing cmalloced arrays to
+	cmalloced linked lists throughout.
+	(class mmap_record): Add LIST_ENTRY element.
+	(mmap_record::match): New method, taking over match algorithm from
+	list::search_record.
+	(class mmap_list): Rename from class list.  Add LIST_ENTRY.  Convert
+	recs to a LIST_HEAD.  Drop nrecs and maxrecs members.
+	(mmap_list::get_record): Drop entirely.
+	(mmap_list::free_recs): Drop entirely.
+	(mmap_list::del_record): Take mmap_record to delete as parameter.
+	(mmap_list::search_record): Convert to mmap_record::match.
+	(class mmap_areas): Rename from class map.  Convert lists to LIST_HEAD.
+	(mmap_areas::get_list): Drop entirely.
+	(mmap_areas::del_list): Take mmap_list to delete as parameter.
+	(mprotect): Fix indentation.
+
 2007-11-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.cc (_crealloc): Avoid memcpy when _cmalloc returns NULL.

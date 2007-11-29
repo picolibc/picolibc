@@ -1294,9 +1294,6 @@ _cygtls::signal_exit (int rc)
      stupid. */
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
 
-  user_data->resourcelocks->Delete ();
-  user_data->resourcelocks->Init ();
-
   sigproc_printf ("about to call do_exit (%x)", rc);
   SetEvent (signal_arrived);
   do_exit (rc);

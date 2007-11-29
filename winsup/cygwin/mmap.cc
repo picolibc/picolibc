@@ -24,6 +24,7 @@ details. */
 #include "pinfo.h"
 #include "sys/cygwin.h"
 #include "ntdll.h"
+#include <sys/queue.h>
 
 /* __PROT_ATTACH indicates an anonymous mapping which is supposed to be
    attached to a file mapping for pages beyond the file's EOF.  The idea
@@ -49,6 +50,11 @@ details. */
 
 /* Used for anonymous mappings. */
 static fhandler_dev_zero fh_anonymous;
+
+/* Used for thread synchronization while accessing mmap bookkeeping lists. */
+static NO_COPY muto mmap_guard;
+#define LIST_LOCK()    (mmap_guard.init ("mmap_guard")->acquire ())
+#define LIST_UNLOCK()  (mmap_guard.release ())
 
 /* Small helpers to avoid having lots of flag bit tests in the code. */
 static inline bool
@@ -422,16 +428,20 @@ mmap_init ()
    The class structure:
 
    One member of class map per process, global variable mmapped_areas.
-   Contains a dynamic class list array.  Each list entry represents all
-   mapping to a file, keyed by file descriptor and file name hash.
-   Each list entry contains a dynamic class mmap_record array.  Each
-   mmap_record represents exactly one mapping.  For each mapping, there's
+   Contains a singly-linked list of type class mmap_list.  Each mmap_list
+   entry represents all mapping to a file, keyed by file descriptor and
+   file name hash.
+   Each list entry contains a singly-linked list of type class mmap_record.
+   Each mmap_record represents exactly one mapping.  For each mapping, there's
    an additional so called `page_map'.  It's an array of bits, one bit
    per mapped memory page.  The bit is set if the page is accessible,
    unset otherwise. */
 
 class mmap_record
 {
+  public:
+    LIST_ENTRY (mmap_record) mr_next;
+
   private:
     int fd;
     HANDLE mapping_hdl;
@@ -485,6 +495,7 @@ class mmap_record
     void free_page_map () { if (page_map) cfree (page_map); }
 
     DWORD find_unused_pages (DWORD pages) const;
+    bool match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len);
     _off64_t map_pages (_off64_t off, DWORD len);
     bool map_pages (caddr_t addr, DWORD len);
     bool unmap_pages (caddr_t addr, DWORD len);
@@ -502,45 +513,39 @@ class mmap_record
     bool compatible_flags (int fl) const;
 };
 
-class list
+class mmap_list
 {
+  public:
+    LIST_ENTRY (mmap_list) ml_next;
+    LIST_HEAD (, mmap_record) recs;
+
   private:
-    mmap_record *recs;
-    int nrecs, maxrecs;
     int fd;
     __ino64_t hash;
 
   public:
     int get_fd () const { return fd; }
     __ino64_t get_hash () const { return hash; }
-    mmap_record *get_record (int i) { return i >= nrecs ? NULL : recs + i; }
 
     bool anonymous () const { return fd == -1; }
     void set (int nfd);
     mmap_record *add_record (mmap_record r);
-    bool del_record (int i);
-    void free_recs () { if (recs) cfree (recs); }
-    mmap_record *search_record (_off64_t off, DWORD len);
-    long search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
-		long start);
+    bool del_record (mmap_record *rec);
     caddr_t try_map (void *addr, size_t len, int flags, _off64_t off);
 };
 
-class map
+class mmap_areas
 {
-  private:
-    list *lists;
-    unsigned nlists, maxlists;
-
   public:
-    list *get_list (unsigned i) { return i >= nlists ? NULL : lists + i; }
-    list *get_list_by_fd (int fd);
-    list *add_list (int fd);
-    void del_list (unsigned i);
+    LIST_HEAD (, mmap_list) lists;
+
+    mmap_list *get_list_by_fd (int fd);
+    mmap_list *add_list (int fd);
+    void del_list (mmap_list *ml);
 };
 
 /* This is the global map structure pointer. */
-static map mmapped_areas;
+static mmap_areas mmapped_areas;
 
 bool
 mmap_record::compatible_flags (int fl) const
@@ -568,6 +573,25 @@ mmap_record::find_unused_pages (DWORD pages) const
 	  return start;
       }
   return (DWORD)-1;
+}
+
+bool
+mmap_record::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len)
+{
+  caddr_t low = (addr >= get_address ()) ? addr : get_address ();
+  caddr_t high = get_address ();
+  if (filler ())
+    high += get_len ();
+  else
+    high += (PAGE_CNT (get_len ()) * getsystempagesize ());
+  high = (addr + len < high) ? addr + len : high;
+  if (low < high)
+    {
+      m_addr = low;
+      m_len = high - low;
+      return true;
+    }
+  return false;
 }
 
 bool
@@ -710,79 +734,23 @@ mmap_record::free_fh (fhandler_base *fh)
 }
 
 mmap_record *
-list::add_record (mmap_record r)
+mmap_list::add_record (mmap_record r)
 {
-  if (nrecs == maxrecs)
-    {
-      mmap_record *new_recs;
-      if (maxrecs == 0)
-	new_recs = (mmap_record *)
-			cmalloc (HEAP_MMAP, 5 * sizeof (mmap_record));
-      else
-	new_recs = (mmap_record *)
-			crealloc (recs, (maxrecs + 5) * sizeof (mmap_record));
-      if (!new_recs)
-	return NULL;
-      maxrecs += 5;
-      recs = new_recs;
-    }
-  recs[nrecs] = r;
-  if (!recs[nrecs].alloc_page_map ())
+  mmap_record *rec = (mmap_record *) cmalloc (HEAP_MMAP, sizeof (mmap_record));
+  if (!rec)
     return NULL;
-  return recs + nrecs++;
-}
-
-/* Used in mmap() */
-mmap_record *
-list::search_record (_off64_t off, DWORD len)
-{
-  if (anonymous () && !off)
+  *rec = r;
+  if (!rec->alloc_page_map ())
     {
-      len = PAGE_CNT (len);
-      for (int i = 0; i < nrecs; ++i)
-	if (recs[i].find_unused_pages (len) != (DWORD)-1)
-	  return recs + i;
+      cfree (rec);
+      return NULL;
     }
-  else
-    {
-      for (int i = 0; i < nrecs; ++i)
-	if (off >= recs[i].get_offset ()
-	    && off + len
-	       <= recs[i].get_offset ()
-		  + (PAGE_CNT (recs[i].get_len ()) * getsystempagesize ()))
-	  return recs + i;
-    }
-  return NULL;
-}
-
-/* Used in munmap() */
-long
-list::search_record (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
-		     long start)
-{
-  caddr_t low, high;
-
-  for (long i = start + 1; i < nrecs; ++i)
-    {
-      low = (addr >= recs[i].get_address ()) ? addr : recs[i].get_address ();
-      high = recs[i].get_address ();
-      if (recs[i].filler ())
-	high += recs[i].get_len ();
-      else
-	high += (PAGE_CNT (recs[i].get_len ()) * getsystempagesize ());
-      high = (addr + len < high) ? addr + len : high;
-      if (low < high)
-	{
-	  m_addr = low;
-	  m_len = high - low;
-	  return i;
-	}
-    }
-  return -1;
+  LIST_INSERT_HEAD (&recs, rec, mr_next);
+  return rec;
 }
 
 void
-list::set (int nfd)
+mmap_list::set (int nfd)
 {
   fd = nfd;
   if (!anonymous ())
@@ -794,27 +762,22 @@ list::set (int nfd)
       fstat (nfd, &st);
       hash = st.st_ino;
     }
-  nrecs = maxrecs = 0;
-  recs = NULL;
+  LIST_INIT (&recs);
 }
 
 bool
-list::del_record (int i)
+mmap_list::del_record (mmap_record *rec)
 {
-  if (i < nrecs)
-    {
-      recs[i].free_page_map ();
-      for (; i < nrecs - 1; i++)
-	recs[i] = recs[i + 1];
-      nrecs--;
-    }
+  rec->free_page_map ();
+  LIST_REMOVE (rec, mr_next);
+  cfree (rec);
   /* Return true if the list is empty which allows the caller to remove
-     this list from the list array. */
-  return !nrecs;
+     this list from the list of lists. */
+  return !LIST_FIRST(&recs);
 }
 
 caddr_t
-list::try_map (void *addr, size_t len, int flags, _off64_t off)
+mmap_list::try_map (void *addr, size_t len, int flags, _off64_t off)
 {
   mmap_record *rec;
 
@@ -822,10 +785,13 @@ list::try_map (void *addr, size_t len, int flags, _off64_t off)
     {
       /* If MAP_FIXED isn't given, check if this mapping matches into the
 	 chunk of another already performed mapping. */
-      if ((rec = search_record (off, len)) != NULL
-	  && rec->compatible_flags (flags))
+      DWORD plen = PAGE_CNT (len);
+      LIST_FOREACH (rec, &recs, mr_next)
+	if (rec->find_unused_pages (plen) != (DWORD) -1)
+	  break;
+      if (rec && rec->compatible_flags (flags))
 	{
-	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+	  if ((off = rec->map_pages (off, len)) == (_off64_t) -1)
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) rec->get_address () + off;
 	}
@@ -837,11 +803,11 @@ list::try_map (void *addr, size_t len, int flags, _off64_t off)
 	 if a memory region is unmapped and remapped with MAP_FIXED. */
       caddr_t u_addr;
       DWORD u_len;
-      long record_idx = -1;
-      if ((record_idx = search_record ((caddr_t) addr, len, u_addr, u_len,
-				       record_idx)) >= 0)
+      LIST_FOREACH (rec, &recs, mr_next)
+	if (rec->match ((caddr_t) addr, len, u_addr, u_len))
+	  break;
+      if (rec)
 	{
-	  rec = get_record (record_idx);
 	  if (u_addr > (caddr_t) addr || u_addr + len < (caddr_t) addr + len
 	      || !rec->compatible_flags (flags))
 	    {
@@ -859,53 +825,40 @@ list::try_map (void *addr, size_t len, int flags, _off64_t off)
   return NULL;
 }
 
-list *
-map::get_list_by_fd (int fd)
+mmap_list *
+mmap_areas::get_list_by_fd (int fd)
 {
-  unsigned i;
-  for (i = 0; i < nlists; i++)
+  mmap_list *ml;
+  LIST_FOREACH (ml, &lists, ml_next)
     {
-      if (fd == -1 && lists[i].anonymous ())
-	return lists + i;
+      if (fd == -1 && ml->anonymous ())
+	return ml;
       /* The fd isn't sufficient since it could already be the fd of another
 	 file.  So we use the inode number as evaluated by fstat to identify
 	 the file. */
       struct stat st;
-      if (fd != -1 && !fstat (fd, &st) && lists[i].get_hash () == st.st_ino)
-	return lists + i;
+      if (fd != -1 && !fstat (fd, &st) && ml->get_hash () == st.st_ino)
+	return ml;
     }
   return 0;
 }
 
-list *
-map::add_list (int fd)
+mmap_list *
+mmap_areas::add_list (int fd)
 {
-  if (nlists == maxlists)
-    {
-      list *new_lists;
-      if (maxlists == 0)
-	new_lists = (list *) cmalloc (HEAP_MMAP, 5 * sizeof (list));
-      else
-	new_lists = (list *) crealloc (lists, (maxlists + 5) * sizeof (list));
-      if (!new_lists)
-	return NULL;
-      maxlists += 5;
-      lists = new_lists;
-    }
-  lists[nlists].set (fd);
-  return lists + nlists++;
+  mmap_list *ml = (mmap_list *) cmalloc (HEAP_MMAP, sizeof (mmap_list));
+  if (!ml)
+    return NULL;
+  ml->set (fd);
+  LIST_INSERT_HEAD (&lists, ml, ml_next);
+  return ml;
 }
 
 void
-map::del_list (unsigned i)
+mmap_areas::del_list (mmap_list *ml)
 {
-  if (i < nlists)
-    {
-      lists[i].free_recs ();
-      for (; i < nlists - 1; i++)
-	lists[i] = lists[i + 1];
-      nlists--;
-    }
+  LIST_REMOVE (ml, ml_next);
+  cfree (ml);
 }
 
 /* This function is called from exception_handler when a segmentation
@@ -929,31 +882,42 @@ map::del_list (unsigned i)
 int
 mmap_is_attached_or_noreserve_page (ULONG_PTR addr)
 {
-  list *map_list;
-  long record_idx;
+  mmap_list *map_list;
+  mmap_record *rec;
   caddr_t u_addr;
   DWORD u_len;
   DWORD pagesize = getsystempagesize ();
+  int ret;
 
   addr = rounddown (addr, pagesize);
+  LIST_LOCK ();
   if (!(map_list = mmapped_areas.get_list_by_fd (-1)))
-    return 0;
-  if ((record_idx = map_list->search_record ((caddr_t)addr, pagesize,
-					     u_addr, u_len, -1)) < 0)
-    return 0;
-  if (map_list->get_record (record_idx)->attached ())
-    return 1;
-  if (!map_list->get_record (record_idx)->noreserve ())
-    return 0;
-  DWORD new_prot = map_list->get_record (record_idx)->gen_protect ();
-  return VirtualAlloc ((void *)addr, pagesize, MEM_COMMIT, new_prot) ? 2 : 1;
+    ret = 0;
+  else
+    {
+      LIST_FOREACH (rec, &map_list->recs, mr_next)
+	if (rec->match ((caddr_t) addr, pagesize, u_addr, u_len))
+	  break;
+      if (!rec)
+	ret = 0;
+      else if (rec->attached ())
+	ret = 1;
+      else if (!rec->noreserve ())
+	ret = 0;
+      else
+	ret = VirtualAlloc ((void *)addr, pagesize, MEM_COMMIT,
+			    rec->gen_protect ())
+	      ? 2 : 1;
+    }
+  LIST_UNLOCK ();
+  return ret;
 }
 
 static caddr_t
 mmap_worker (fhandler_base *fh, caddr_t base, size_t len, int prot, int flags,
 	     int fd, _off64_t off)
 {
-  list *map_list;
+  mmap_list *map_list;
   HANDLE h = fh->mmap (&base, len, prot, flags, off);
   if (h == INVALID_HANDLE_VALUE)
     return NULL;
@@ -983,7 +947,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   fhandler_base *fh = NULL;
   fhandler_disk_file *fh_disk_file = NULL; /* Used for reopening a disk file
 					      when necessary. */
-  list *map_list = NULL;
+  mmap_list *map_list = NULL;
   size_t orig_len = 0;
   caddr_t base = NULL;
 
@@ -992,8 +956,6 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
-
-  SetResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
   /* EINVAL error conditions.  Note that the addr%pagesize test is deferred
      to workaround a serious alignment problem in Windows 98.  */
@@ -1184,6 +1146,7 @@ go_ahead:
   if (noreserve (flags) && (!anonymous (flags) || !priv (flags)))
     flags &= ~MAP_NORESERVE;
 
+  LIST_LOCK ();
   map_list = mmapped_areas.get_list_by_fd (fd);
 
   /* Test if an existing anonymous mapping can be recycled. */
@@ -1195,7 +1158,7 @@ go_ahead:
       if (tried)
 	{
 	  ret = tried;
-	  goto out;
+	  goto out_with_unlock;
 	}
     }
 
@@ -1204,7 +1167,7 @@ go_ahead:
       && fixed (flags) && ((uintptr_t) addr % pagesize))
     {
       set_errno (EINVAL);
-      goto out;
+      goto out_with_unlock;
     }
 
   if (orig_len)
@@ -1227,20 +1190,20 @@ go_ahead:
 	  if (!newaddr)
 	    {
 	      __seterrno ();
-	      goto out;
+	      goto out_with_unlock;
 	    }
 	}
       if (!VirtualFree (newaddr, 0, MEM_RELEASE))
         {
 	  __seterrno ();
-	  goto out;
+	  goto out_with_unlock;
 	}
       addr = newaddr;
     }
 
   base = mmap_worker (fh, (caddr_t) addr, len, prot, flags, fd, off);
   if (!base)
-    goto out;
+    goto out_with_unlock;
 
   if (orig_len)
     {
@@ -1276,7 +1239,7 @@ go_ahead:
 		{
 		  fh->munmap (fh->get_handle (), base, len);
 		  set_errno (ENOMEM);
-		  goto out;
+		  goto out_with_unlock;
 		}
 	      at_base += valid_page_len;
 	    }
@@ -1294,9 +1257,10 @@ go_ahead:
 
   ret = base;
 
-out:
+out_with_unlock:
+  LIST_UNLOCK ();
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+out:
 
   if (fh_disk_file)
     CloseHandle (fh_disk_file->get_handle ());
@@ -1334,23 +1298,21 @@ munmap (void *addr, size_t len)
     }
   len = roundup2 (len, pagesize);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  LIST_LOCK ();
 
   /* Iterate through the map, unmap pages between addr and addr+len
      in all maps. */
-  list *map_list;
-  for (unsigned list_idx = 0;
-       (map_list = mmapped_areas.get_list (list_idx));
-       ++list_idx)
+  mmap_list *map_list, *next_map_list;
+  LIST_FOREACH_SAFE (map_list, &mmapped_areas.lists, ml_next, next_map_list)
     {
-      long record_idx = -1;
+      mmap_record *rec, *next_rec;
       caddr_t u_addr;
       DWORD u_len;
 
-      while ((record_idx = map_list->search_record((caddr_t)addr, len, u_addr,
-						   u_len, record_idx)) >= 0)
+      LIST_FOREACH_SAFE (rec, &map_list->recs, mr_next, next_rec)
 	{
-	  mmap_record *rec = map_list->get_record (record_idx);
+	  if (!rec->match ((caddr_t) addr, len, u_addr, u_len))
+	    continue;
 	  if (rec->unmap_pages (u_addr, u_len))
 	    {
 	      /* The whole record has been unmapped, so we now actually
@@ -1362,18 +1324,18 @@ munmap (void *addr, size_t len)
 	      rec->free_fh (fh);
 
 	      /* ...and delete the record. */
-	      if (map_list->del_record (record_idx--))
+	      if (map_list->del_record (rec))
 		{
 		  /* Yay, the last record has been removed from the list,
 		     we can remove the list now, too. */
-		  mmapped_areas.del_list (list_idx--);
+		  mmapped_areas.del_list (map_list);
 		  break;
 		}
 	    }
 	}
     }
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
+  LIST_UNLOCK ();
   syscall_printf ("0 = munmap(): %x", addr);
   return 0;
 }
@@ -1384,11 +1346,11 @@ extern "C" int
 msync (void *addr, size_t len, int flags)
 {
   int ret = -1;
-  list *map_list;
+  mmap_list *map_list;
 
   syscall_printf ("msync (addr: %p, len %u, flags %x)", addr, len, flags);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+  LIST_LOCK ();
 
   /* See comment in mmap64 for a description. */
   size_t pagesize = wincap.has_mmap_alignment_bug () ?
@@ -1406,26 +1368,22 @@ msync (void *addr, size_t len, int flags)
 
   /* Iterate through the map, looking for the mmapped area.
      Error if not found. */
-  for (unsigned list_idx = 0;
-       (map_list = mmapped_areas.get_list (list_idx));
-       ++list_idx)
+  LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
     {
       mmap_record *rec;
-      for (int record_idx = 0;
-	   (rec = map_list->get_record (record_idx));
-	   ++record_idx)
+      LIST_FOREACH (rec, &map_list->recs, mr_next)
 	{
-	  if (rec->access ((caddr_t)addr))
+	  if (rec->access ((caddr_t) addr))
 	    {
 	      /* Check whole area given by len. */
 	      for (DWORD i = getpagesize (); i < len; i += getpagesize ())
-		if (!rec->access ((caddr_t)addr + i))
+		if (!rec->access ((caddr_t) addr + i))
 		  {
 		    set_errno (ENOMEM);
 		    goto out;
 		  }
 	      fhandler_base *fh = rec->alloc_fh ();
-	      ret = fh->msync (rec->get_handle (), (caddr_t)addr, len, flags);
+	      ret = fh->msync (rec->get_handle (), (caddr_t) addr, len, flags);
 	      rec->free_fh (fh);
 	      goto out;
 	    }
@@ -1437,7 +1395,7 @@ msync (void *addr, size_t len, int flags)
 
 out:
   syscall_printf ("%d = msync()", ret);
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
+  LIST_UNLOCK ();
   return ret;
 }
 
@@ -1463,46 +1421,43 @@ mprotect (void *addr, size_t len, int prot)
     }
   len = roundup2 (len, pagesize);
 
-  SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
+  LIST_LOCK ();
 
   /* Iterate through the map, protect pages between addr and addr+len
      in all maps. */
-  list *map_list;
-  for (unsigned list_idx = 0;
-      (map_list = mmapped_areas.get_list (list_idx));
-      ++list_idx)
-   {
-     long record_idx = -1;
-     caddr_t u_addr;
-     DWORD u_len;
+  mmap_list *map_list;
+  LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
+    {
+      mmap_record *rec;
+      caddr_t u_addr;
+      DWORD u_len;
 
-     while ((record_idx = map_list->search_record((caddr_t)addr, len,
-						  u_addr, u_len,
-						  record_idx)) >= 0)
-       {
-	 mmap_record *rec = map_list->get_record (record_idx);
-	 in_mapped = true;
-	 if (rec->attached ())
-	   continue;
-	 new_prot = gen_protect (prot, rec->get_flags ());
-	 if (rec->noreserve ())
-	   {
-	     if (new_prot == PAGE_NOACCESS)
-	       ret = VirtualFree (u_addr, u_len, MEM_DECOMMIT);
-	     else
-	       ret = !!VirtualAlloc (u_addr, u_len, MEM_COMMIT, new_prot);
-	   }
-	 else
-	   ret = VirtualProtect (u_addr, u_len, new_prot, &old_prot);
-	 if (!ret)
-	   {
-	     __seterrno ();
-	     break;
-	   }
-       }
-   }
+      LIST_FOREACH (rec, &map_list->recs, mr_next)
+	{
+	  if (!rec->match ((caddr_t) addr, len, u_addr, u_len))
+	    continue;
+	  in_mapped = true;
+	  if (rec->attached ())
+	    continue;
+	  new_prot = gen_protect (prot, rec->get_flags ());
+	  if (rec->noreserve ())
+	    {
+	      if (new_prot == PAGE_NOACCESS)
+		ret = VirtualFree (u_addr, u_len, MEM_DECOMMIT);
+	      else
+		ret = !!VirtualAlloc (u_addr, u_len, MEM_COMMIT, new_prot);
+	    }
+	  else
+	    ret = VirtualProtect (u_addr, u_len, new_prot, &old_prot);
+	  if (!ret)
+	    {
+	      __seterrno ();
+	      break;
+	    }
+	}
+    }
 
-  ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "mprotect");
+  LIST_UNLOCK ();
 
   if (!in_mapped)
     {
@@ -1973,15 +1928,11 @@ int __stdcall
 fixup_mmaps_after_fork (HANDLE parent)
 {
   /* Iterate through the map */
-  list *map_list;
-  for (unsigned list_idx = 0;
-       (map_list = mmapped_areas.get_list (list_idx));
-       ++list_idx)
+  mmap_list *map_list;
+  LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
     {
       mmap_record *rec;
-      for (int record_idx = 0;
-	   (rec = map_list->get_record (record_idx));
-	   ++record_idx)
+      LIST_FOREACH (rec, &map_list->recs, mr_next)
 	{
 	  debug_printf ("fd %d, h 0x%x, address %p, len 0x%x, prot: 0x%x, "
 			"flags: 0x%x, offset %X",
