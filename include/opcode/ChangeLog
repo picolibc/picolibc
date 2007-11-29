@@ -1,5 +1,13 @@
 2007-11-29  Mark Shinwell  <shinwell@codesourcery.com>
 
+	* mips.h (INSN_LOONGSON_2E): New.
+	(INSN_LOONGSON_2F): New.
+	(CPU_LOONGSON_2E): New.
+	(CPU_LOONGSON_2F): New.
+	(OPCODE_IS_MEMBER): Update for Loongson-2E and -2F flags.
+
+2007-11-29  Mark Shinwell  <shinwell@codesourcery.com>
+
 	* mips.h (INSN_ISA*): Redefine certain values as an
 	enumeration.  Update comments.
 	(mips_isa_table): New.

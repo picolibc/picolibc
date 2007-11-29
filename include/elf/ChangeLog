@@ -1,3 +1,8 @@
+2007-11-29  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* mips.h (E_MIPS_MACH_LS2E): New.
+	(E_MIPS_MACH_LS2F): New.
+
 2007-11-28  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* internal.h (ELF_IS_SECTION_IN_SEGMENT): Adjust to cope with

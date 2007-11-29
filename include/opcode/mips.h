@@ -552,6 +552,10 @@ static const unsigned int mips_isa_table[] =
 #define INSN_SMARTMIPS            0x10000000
 /* DSP R2 ASE  */
 #define INSN_DSPR2                0x20000000
+/* ST Microelectronics Loongson 2E.  */
+#define INSN_LOONGSON_2E          0x40000000
+/* ST Microelectronics Loongson 2F.  */
+#define INSN_LOONGSON_2F          0x80000000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -599,6 +603,8 @@ static const unsigned int mips_isa_table[] =
 #define CPU_MIPS64      64
 #define CPU_MIPS64R2	65
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
+#define CPU_LOONGSON_2E 3001
+#define CPU_LOONGSON_2F 3002
 
 /* Test for membership in an ISA including chip specific ISAs.  INSN
    is pointer to an element of the opcode table; ISA is the specified
@@ -625,6 +631,10 @@ static const unsigned int mips_isa_table[] =
      || (cpu == CPU_VR4120 && ((insn)->membership & INSN_4120) != 0)	\
      || (cpu == CPU_VR5400 && ((insn)->membership & INSN_5400) != 0)	\
      || (cpu == CPU_VR5500 && ((insn)->membership & INSN_5500) != 0)	\
+     || (cpu == CPU_LOONGSON_2E                                         \
+         && ((insn)->membership & INSN_LOONGSON_2E) != 0)               \
+     || (cpu == CPU_LOONGSON_2F                                         \
+         && ((insn)->membership & INSN_LOONGSON_2F) != 0)               \
      || 0)	/* Please keep this term for easier source merging.  */
 
 /* This is a list of macro expanded instructions.
