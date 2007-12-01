@@ -1,4 +1,15 @@
 2007-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/time.h (daylight): Declare as extern symbol referring
+	_daylight variable.
+	(timezone): Only define if __timezonefunc__ is undefined.
+
+2007-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/time.h: Only define timezone if __timezonefunc__
+	is undefined.
+
+2007-12-01  Corinna Vinschen  <corinna@vinschen.de>
 	    Brian Dessent <brian@dessent.net>
 
 	* Makefile.in (OBSOLETE_FUNCTIONS): Add timezone.

@@ -26,11 +26,12 @@ time_t timegm (struct tm *);
 #define TIMER_RELTIME  0 /* For compatibility with HP/UX, Solaris, others? */
 
 #ifndef __STRICT_ANSI__
-# ifndef daylight
-#   define daylight _daylight
-# endif
 
+extern int daylight __asm__ ("__daylight");
+
+#ifndef __timezonefunc__
 extern long timezone __asm__ ("__timezone");
+#endif
 
 #endif /*__STRICT_ANSI__*/
 
