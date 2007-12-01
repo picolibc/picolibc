@@ -158,7 +158,7 @@ OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
 		    getgroups getpwuid getpwuid_r getuid initgroups \
 		    lchown lseek lstat mknod mmap seekdir setegid seteuid \
 		    setgid setgroups setregid setreuid setuid stat \
-		    telldir tmpfile truncate
+		    telldir tmpfile truncate timezone
 
 NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       regerror posix_regerror \
