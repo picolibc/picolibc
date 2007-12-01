@@ -1,3 +1,7 @@
+2007-12-01  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris/Makefile.in (crt0.o): Add CFLAGS when compiling crt0.S.
+
 2007-11-06  Dave Brolley  <brolley@redhat.com>
  
 	* syscall.h (SYS_reconfig): New macro.

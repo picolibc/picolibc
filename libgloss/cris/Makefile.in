@@ -182,7 +182,7 @@ crt0.o: lcrt0.o crt0.S
           *) \
            case "$?" in \
             *crt0.S) \
-	     $(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -xassembler-with-cpp -c $(srcdir)/crt0.S;; \
+	     $(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c -xassembler-with-cpp $(srcdir)/crt0.S;; \
             *) touch $@;; \
             esac; \
 	   st=$$?;; \
