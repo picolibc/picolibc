@@ -5,11 +5,6 @@
 	(timezone): Only define if __timezonefunc__ is undefined.
 
 2007-12-01  Corinna Vinschen  <corinna@vinschen.de>
-
-	* include/cygwin/time.h: Only define timezone if __timezonefunc__
-	is undefined.
-
-2007-12-01  Corinna Vinschen  <corinna@vinschen.de>
 	    Brian Dessent <brian@dessent.net>
 
 	* Makefile.in (OBSOLETE_FUNCTIONS): Add timezone.
@@ -341,6 +336,10 @@
 
 	* sigproc.cc (child_info::child_info): Set msv_count to non-zero
 	value only on systems requiring it.
+
+2007-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/ftw.h: Include sys/cdefs.h.
 
 2007-01-18  Corinna Vinschen  <corinna@vinschen.de>
 

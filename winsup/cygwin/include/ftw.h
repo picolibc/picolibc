@@ -27,6 +27,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/cdefs.h>
 
 /*
  * Valid flags for the 3rd argument to the function that is passed as the
