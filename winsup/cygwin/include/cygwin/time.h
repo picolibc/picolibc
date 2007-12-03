@@ -31,7 +31,6 @@ extern int daylight __asm__ ("__daylight");
 #ifndef __timezonefunc__
 extern long timezone __asm__ ("__timezone");
 #endif
-#endif
 
 #endif /*__STRICT_ANSI__*/
 
