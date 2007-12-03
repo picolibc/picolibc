@@ -1966,7 +1966,7 @@ mount_info::conv_to_posix_path (PWCHAR src_path, char *posix_path,
 	}
     }
   char buf[PATH_MAX];
-  sys_wcstombs (buf, PATH_MAX, src_path, 0);
+  sys_wcstombs (buf, PATH_MAX, src_path);
   int ret = conv_to_posix_path (buf, posix_path, keep_rel_p);
   if (changed)
     src_path[0] = L'C';

@@ -1,5 +1,20 @@
 2007-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetModuleFileNameExW): Replace definition of
+	GetModuleFileNameExA.
+	* fhandler_process.cc (format_process_maps): Change modname type to
+	WCHAR.  Set buffer sizes to PATH_MAX.  Call GetModuleFileNameExW
+	instead of GetModuleFileNameExA.  Call mount_info::conv_to_posix_path
+	instead of cygwin_conv_to_full_posix_path.  Set posix_modname to
+	modname if that call fails.
+	(format_process_stat): Set cmd buffer size to NAME_MAX + 1.  Simplify
+	setting cmd to process name.
+	(format_process_status): Ditto.
+	* path.cc (mount_info::conv_to_posix_path): Call sys_wcstombs
+	correctly.
+
+2007-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/time.h: Remove redundant #endif.
 
 2007-12-01  Corinna Vinschen  <corinna@vinschen.de>

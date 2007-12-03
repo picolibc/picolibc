@@ -309,7 +309,7 @@ LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 
 LoadDLLfuncEx (EnumProcessModules, 16, psapi, 1)
-LoadDLLfuncEx (GetModuleFileNameExA, 16, psapi, 1)
+LoadDLLfuncEx (GetModuleFileNameExW, 16, psapi, 1)
 LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)
 LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)

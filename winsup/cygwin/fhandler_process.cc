@@ -524,8 +524,8 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
   DWORD_PTR wset_size;
   DWORD_PTR *workingset = NULL;
   MODULEINFO info;
-  char modname[CYG_MAX_PATH];
-  char posix_modname[CYG_MAX_PATH];
+  WCHAR modname[PATH_MAX];
+  char posix_modname[PATH_MAX];
 
   if (!EnumProcessModules (proc, NULL, 0, &needed))
     {
@@ -551,12 +551,13 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
     }
   for (i = 0; i < needed / sizeof (HMODULE); i++)
     if (GetModuleInformation (proc, modules[i], &info, sizeof info)
-	&& GetModuleFileNameEx (proc, modules[i], modname, sizeof modname))
+	&& GetModuleFileNameExW (proc, modules[i], modname, sizeof modname))
       {
 	char access[5];
 	strcpy (access, "r--p");
 	struct __stat64 st;
-	cygwin_conv_to_full_posix_path (modname, posix_modname);
+	if (mount_table->conv_to_posix_path (modname, posix_modname, 0))
+	  sys_wcstombs (posix_modname, PATH_MAX, modname);
 	if (stat64 (posix_modname, &st))
 	  {
 	    st.st_dev = 0;
@@ -600,7 +601,7 @@ out:
 static _off64_t
 format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 {
-  char cmd[CYG_MAX_PATH];
+  char cmd[NAME_MAX + 1];
   int state = 'R';
   unsigned long fault_count = 0UL,
 		utime = 0UL, stime = 0UL,
@@ -611,10 +612,8 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     strcpy (cmd, "<defunct>");
   else
     {
-      strcpy (cmd, p->progname);
-      char *last_slash = strrchr (cmd, '\\');
-      if (last_slash != NULL)
-	strcpy (cmd, last_slash + 1);
+      char *last_slash = strrchr (p->progname, '\\');
+      strcpy (cmd, last_slash ? last_slash + 1 : p->progname);
       int len = strlen (cmd);
       if (len > 4)
 	{
@@ -730,7 +729,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 static _off64_t
 format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 {
-  char cmd[CYG_MAX_PATH];
+  char cmd[NAME_MAX + 1];
   int state = 'R';
   const char *state_str = "unknown";
   unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,
@@ -739,10 +738,8 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
     strcpy (cmd, "<defunct>");
   else
     {
-      strcpy (cmd, p->progname);
-      char *last_slash = strrchr (cmd, '\\');
-      if (last_slash != NULL)
-	strcpy (cmd, last_slash + 1);
+      char *last_slash = strrchr (p->progname, '\\');
+      strcpy (cmd, last_slash ? last_slash + 1 : p->progname);
       int len = strlen (cmd);
       if (len > 4)
 	{
