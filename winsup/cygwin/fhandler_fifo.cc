@@ -65,7 +65,7 @@ int
 fhandler_fifo::open (int flags, mode_t)
 {
   int res;
-  char npname[CYG_MAX_PATH];
+  char npname[MAX_PATH];
   DWORD mode = 0;
 
   /* Generate a semi-unique name to associate with this fifo.
@@ -164,14 +164,7 @@ fhandler_fifo::write (const void *ptr, size_t len)
 int __stdcall
 fhandler_fifo::fstatvfs (struct statvfs *sfs)
 {
-  /* Call statvfs on parent dir. */
-  char *c, dir[CYG_MAX_PATH];
-  strcpy (dir, get_name ());
-  if ((c = strrchr (dir, '/')))
-    {
-      *c = '\0';
-      return statvfs (dir, sfs);
-    }
-  set_errno (EBADF);
-  return -1;
+  fhandler_disk_file fh (pc);
+  fh.get_device () = FH_FS;
+  return fh.fstatvfs (sfs);
 }

@@ -1030,14 +1030,14 @@ format_proc_partitions (char *destbuf, size_t maxsize)
   char *bufptr = destbuf;
   print ("major minor  #blocks  name\n\n");
 
-  char devname[CYG_MAX_PATH];
+  char devname[NAME_MAX + 1];
   OBJECT_ATTRIBUTES attr;
   HANDLE dirhdl, devhdl;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
 
   /* Open \Device object directory. */
-  wchar_t wpath[CYG_MAX_PATH] = L"\\Device";
+  wchar_t wpath[MAX_PATH] = L"\\Device";
   UNICODE_STRING upath = {14, 16, wpath};
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenDirectoryObject (&dirhdl, DIRECTORY_QUERY, &attr);
@@ -1056,7 +1056,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 					     &context, NULL)))
     {
       restart = FALSE;
-      sys_wcstombs (devname, CYG_MAX_PATH - 1, dbi->ObjectName.Buffer,
+      sys_wcstombs (devname, NAME_MAX + 1, dbi->ObjectName.Buffer,
 		    dbi->ObjectName.Length / 2);
       /* ... and check for a "Harddisk[0-9]*" entry. */
       if (!strncasematch (devname, "Harddisk", 8)
