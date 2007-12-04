@@ -1,3 +1,7 @@
+2007-12-03  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/wingdi.h: Change WINVER guard to _WIN32_WINNT.
+
 2007-12-03  techrazy  <techrazy@users.sourceforge.net>
 
 	* include/wingdi.h (NTM_NONNEGATIVE_AC, NTM_PS_OPENTYPE, NTM_TT_OPENTYPE,
