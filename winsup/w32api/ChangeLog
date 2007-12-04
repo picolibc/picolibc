@@ -1,3 +1,8 @@
+2007-12-03  techrazy  <techrazy@users.sourceforge.net>
+
+	* include/wingdi.h (NTM_NONNEGATIVE_AC, NTM_PS_OPENTYPE, NTM_TT_OPENTYPE,
+	NTM_MULTIPLEMASTER, NTM_TYPE1, NTM_DSIG): define.
+
 2007-11-21  Kevin Conaway  <kevin_conaway@users.sourceforge.net>
 
 	* include/wincrypt.h (CryptProtectData, CryptUnprotectData): define.
