@@ -23,23 +23,19 @@ details. */
  "networks"
  "hosts"
 
- This routine will try to locate these files based on system type.
- Currently the only distinction made is between NT and non-NT systems.
-
  It is the callers responsibility to close the file.  */
 static FILE *
 open_system_file (const char *relative_path)
 {
-  char win32_name[CYG_MAX_PATH];
-  char posix_name[CYG_MAX_PATH];
+  /* system dir path is never longer. */
+  char win32_name[MAX_PATH];
 
-  if (!GetSystemDirectory (win32_name, CYG_MAX_PATH))
+  if (!GetSystemDirectory (win32_name, MAX_PATH))
     return NULL;
   strcat (win32_name, "\\drivers\\etc\\");
   strcat (win32_name, relative_path);
-  cygwin_conv_to_full_posix_path (win32_name, posix_name);
   debug_printf ("netdb file to open %s", win32_name);
-  FILE *result = fopen (posix_name, "rt");
+  FILE *result = fopen (win32_name, "rt");
   debug_printf ("handle to netdb file %p", result);
   return result;
 }

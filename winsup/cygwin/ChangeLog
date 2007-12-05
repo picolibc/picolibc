@@ -1,9 +1,20 @@
 2007-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_tty_slave::open): Use MAX_PATH instead of
+	CYG_MAX_PATH for event name buffer size.
+	(fhandler_pty_master::setup): Use MAX_PATH instead of CYG_MAX_PATH for
+	mutex name buffer size.
+	* netdb.cc: Drop old comment.
+	(open_system_file): Set path buffer size to MAX_PATH instead of
+	CYG_MAX_PATH.  Drop conversion to posix path.  Open file using win32
+	path.
+
+2007-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_registry.cc: Use NAME_MAX + 1 instead of CYG_MAX_PATH
 	throughout for subkey name buffer size.
 	* fhandler_socket.cc (search_wsa_event_slot): Use MAX_PATH instead of
-	CYG_MAX_PATH for mutext name buffer size.
+	CYG_MAX_PATH for mutex name buffer size.
 	(fhandler_socket::init_events): Ditto.
 	* fhandler_virtual.cc (fhandler_virtual::opendir): Check path length
 	against PATH_MAX instead of against CYG_MAX_PATH.

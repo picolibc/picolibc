@@ -478,7 +478,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
 
   /* output_done_event may or may not exist.  It will exist if the tty
      was opened by fhandler_tty_master::init, normally called at
@@ -1402,7 +1402,7 @@ fhandler_pty_master::setup (bool ispty)
   if (!(input_available_event = t.get_event (errstr = INPUT_AVAILABLE_EVENT, TRUE)))
     goto err;
 
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
   errstr = shared_name (buf, OUTPUT_MUTEX, t.ntty);
   if (!(output_mutex = CreateMutex (&sec_all, FALSE, buf)))
     goto err;
