@@ -1,3 +1,11 @@
+2007-12-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_fifo.cc (fhandler_fifo::open): Use MAX_NAME for pipe name
+	buffer size.
+	(fhandler_fifo::fstatvfs): Use same technique as in fhandler_socket.
+	* fhandler_proc.cc (format_proc_partitions): Use NAME_MAX+1 for
+	device name buffer size.  Use MAX_PATH for device path buffer size.
+
 2007-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetModuleFileNameExW): Replace definition of
