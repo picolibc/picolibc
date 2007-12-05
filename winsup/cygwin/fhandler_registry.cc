@@ -94,7 +94,7 @@ int
 fhandler_registry::exists ()
 {
   int file_type = 0, index = 0, pathlen;
-  DWORD buf_size = CYG_MAX_PATH;
+  DWORD buf_size = NAME_MAX + 1;
   LONG error;
   char buf[buf_size];
   const char *file;
@@ -141,7 +141,7 @@ fhandler_registry::exists ()
 
       while (ERROR_SUCCESS ==
 	     (error = RegEnumKeyEx (hKey, index++, buf, &buf_size, NULL, NULL,
-				    NULL, NULL))
+				     NULL, NULL))
 	     || (error == ERROR_MORE_DATA))
 	{
 	  if (pathmatch (buf, file))
@@ -149,7 +149,7 @@ fhandler_registry::exists ()
 	      file_type = 1;
 	      goto out;
 	    }
-	  buf_size = CYG_MAX_PATH;
+	  buf_size = NAME_MAX + 1;
 	}
       if (error != ERROR_NO_MORE_ITEMS)
 	{
@@ -157,7 +157,7 @@ fhandler_registry::exists ()
 	  goto out;
 	}
       index = 0;
-      buf_size = CYG_MAX_PATH;
+      buf_size = NAME_MAX + 1;
       while (ERROR_SUCCESS ==
 	     (error = RegEnumValue (hKey, index++, buf, &buf_size, NULL, NULL,
 				    NULL, NULL))
@@ -169,7 +169,7 @@ fhandler_registry::exists ()
 	      file_type = -1;
 	      goto out;
 	    }
-	  buf_size = CYG_MAX_PATH;
+	  buf_size = NAME_MAX + 1;
 	}
       if (error != ERROR_NO_MORE_ITEMS)
 	{
@@ -302,7 +302,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 int
 fhandler_registry::readdir (DIR *dir, dirent *de)
 {
-  DWORD buf_size = CYG_MAX_PATH;
+  DWORD buf_size = NAME_MAX + 1;
   char buf[buf_size];
   HANDLE handle;
   const char *path = dir->__d_dirname + proc_len + 1 + prefix_len;
@@ -349,7 +349,7 @@ retry:
     {
       /* If we're finished with sub-keys, start on values under this key.  */
       dir->__d_position |= REG_ENUM_VALUES_MASK;
-      buf_size = CYG_MAX_PATH;
+      buf_size = NAME_MAX + 1;
       goto retry;
     }
   if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
@@ -628,7 +628,7 @@ fhandler_registry::fill_filebuf ()
     }
   return true;
 value_not_found:
-  DWORD buf_size = CYG_MAX_PATH;
+  DWORD buf_size = NAME_MAX + 1;
   char buf[buf_size];
   int index = 0;
   while (ERROR_SUCCESS ==
@@ -640,7 +640,7 @@ value_not_found:
 	  set_errno (EISDIR);
 	  return false;
 	}
-      buf_size = CYG_MAX_PATH;
+      buf_size = NAME_MAX + 1;
     }
   if (error != ERROR_NO_MORE_ITEMS)
     {
@@ -658,7 +658,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
   HKEY hParentKey = (HKEY) INVALID_HANDLE_VALUE;
   bool parentOpened = false;
-  char component[CYG_MAX_PATH];
+  char component[NAME_MAX + 1];
 
   while (*name)
     {

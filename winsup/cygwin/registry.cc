@@ -219,13 +219,13 @@ get_registry_hive_path (const char *name, char *path)
   			"ProfileList\\%s", name);
   if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
-      char buf[256];
+      char buf[PATH_MAX];
       DWORD type, siz;
 
       path[0] = '\0';
       if (!RegQueryValueExA (hkey, "ProfileImagePath", 0, &type,
 			     (BYTE *)buf, (siz = sizeof (buf), &siz)))
-	ExpandEnvironmentStringsA (buf, path, CYG_MAX_PATH);
+	ExpandEnvironmentStringsA (buf, path, PATH_MAX);
       RegCloseKey (hkey);
       if (path[0])
 	return path;
@@ -237,7 +237,7 @@ get_registry_hive_path (const char *name, char *path)
 void
 load_registry_hive (const char * name)
 {
-  char path[CYG_MAX_PATH];
+  char path[PATH_MAX];
   HKEY hkey;
   LONG ret;
 

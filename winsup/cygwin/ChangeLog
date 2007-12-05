@@ -1,3 +1,24 @@
+2007-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_registry.cc: Use NAME_MAX + 1 instead of CYG_MAX_PATH
+	throughout for subkey name buffer size.
+	* fhandler_socket.cc (search_wsa_event_slot): Use MAX_PATH instead of
+	CYG_MAX_PATH for mutext name buffer size.
+	(fhandler_socket::init_events): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Check path length
+	against PATH_MAX instead of against CYG_MAX_PATH.
+	* registry.cc (get_registry_hive_path): Use PATH_MAX instead of
+	CYG_MAX_PATH for registry value path buffer size.
+	* shared.cc (open_shared): Use MAX_PATH instead of CYG_MAX_PATH
+	for shared memory name buffer size.
+	* thread.cc (semaphore::semaphore): Use MAX_PATH instead of CYG_MAX_PATH
+	for semaphore name buffer size.
+	* uinfo.cc (cygheap_user::env_userprofile): Use PATH_MAX instead of
+	CYG_MAX_PATH for temporary path name buffer size.
+	* winf.h (LINE_BUF_CHUNK): Define as MAX_PATH * 2.
+	* include/sys/dirent.h: Include sys/limits.h.  Define name buffer sizes
+	using NAME_MAX.
+
 2007-12-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_fifo.cc (fhandler_fifo::open): Use MAX_NAME for pipe name

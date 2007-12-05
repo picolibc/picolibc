@@ -54,7 +54,7 @@ fhandler_virtual::opendir (int fd)
 
   if (exists () <= 0)
     set_errno (ENOTDIR);
-  else if ((len = strlen (get_name ())) > CYG_MAX_PATH - 3)
+  else if ((len = strlen (get_name ())) > PATH_MAX - 3)
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);

@@ -408,7 +408,7 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  char userprofile_env_buf[CYG_MAX_PATH];
+  char userprofile_env_buf[PATH_MAX];
   char win_id[UNLEN + 1]; /* Large enough for SID */
 
   cfree_and_set (puserprof, almost_null);

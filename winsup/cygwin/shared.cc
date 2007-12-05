@@ -77,7 +77,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       VirtualFree (addr, 0, MEM_RELEASE);
     }
 
-  char map_buf[CYG_MAX_PATH];
+  char map_buf[MAX_PATH];
   char *mapname = NULL;
 
   if (shared_h)

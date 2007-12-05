@@ -2928,7 +2928,7 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
   luid (sluid),
   sem (ssem)
 {
-  char name[CYG_MAX_PATH];
+  char name[MAX_PATH];
 
   __small_sprintf (name, "%scyg_psem/cyg%016X%08x%08x", cygheap->shared_prefix,
 		   hash, luid.HighPart, luid.LowPart);

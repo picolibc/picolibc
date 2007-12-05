@@ -421,7 +421,7 @@ static HANDLE wsa_slot_mtx;
 static wsa_event *
 search_wsa_event_slot (LONG new_serial_number)
 {
-  char name[CYG_MAX_PATH], searchname[CYG_MAX_PATH];
+  char name[MAX_PATH], searchname[MAX_PATH];
 
   if (!wsa_slot_mtx)
     {
@@ -467,7 +467,7 @@ bool
 fhandler_socket::init_events ()
 {
   LONG new_serial_number;
-  char name[CYG_MAX_PATH];
+  char name[MAX_PATH];
   DWORD err = 0;
 
   do

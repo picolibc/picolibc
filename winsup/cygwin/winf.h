@@ -18,7 +18,7 @@ details. */
 #define MAXCYGWINCMDLEN 30000
 
 #define MAXWINCMDLEN 32767
-#define LINE_BUF_CHUNK (CYG_MAX_PATH * 2)
+#define LINE_BUF_CHUNK (MAX_PATH * 2)
 
 class av
 {

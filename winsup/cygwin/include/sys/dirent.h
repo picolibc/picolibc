@@ -12,6 +12,7 @@
 #define _SYS_DIRENT_H
 
 #include <sys/types.h>
+#include <sys/limits.h>
 
 #define __DIRENT_VERSION	2
 
@@ -23,7 +24,7 @@ struct dirent
   __ino64_t d_ino;
   __uint32_t __d_unused1;
   __uint32_t __d_internal1;
-  char d_name[256];			/* FIXME: use NAME_MAX? */
+  char d_name[NAME_MAX + 1];
 };
 #else
 struct dirent
@@ -32,7 +33,7 @@ struct dirent
   long d_reserved[2];
   long d_fd;
   ino_t d_ino;
-  char d_name[256];
+  char d_name[NAME_MAX + 1];
 };
 #endif
 #pragma pack(pop)
