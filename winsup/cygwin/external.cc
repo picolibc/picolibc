@@ -88,7 +88,8 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.start_time = p->start_time;
 	  ep.rusage_self = p->rusage_self;
 	  ep.rusage_children = p->rusage_children;
-	  strcpy (ep.progname, p->progname);
+	  ep.progname[0] = '\0';
+	  strncat (ep.progname, p->progname, MAX_PATH - 1);
 	  ep.strace_mask = 0;
 	  ep.version = EXTERNAL_PINFO_VERSION;
 
@@ -96,6 +97,8 @@ fillout_pinfo (pid_t pid, int winpid)
 
 	  ep.uid32 = p->uid;
 	  ep.gid32 = p->gid;
+
+	  strcpy (ep.progname_long, p->progname);
 	  break;
 	}
     }

@@ -12,7 +12,7 @@
 #define _SYS_DIRENT_H
 
 #include <sys/types.h>
-#include <sys/limits.h>
+#include <limits.h>
 
 #define __DIRENT_VERSION	2
 

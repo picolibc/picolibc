@@ -442,7 +442,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
     case PROCESS_EXE:
       {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = CYG_MAX_PATH);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = PATH_MAX);
 	if (p->process_state & PID_EXITED)
 	  strcpy (filebuf, "<defunct>");
 	else

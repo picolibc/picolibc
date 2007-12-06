@@ -1,3 +1,26 @@
+2007-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (initial_env): Use PATH_MAX instead of CYG_MAX_PATH for path
+	name buffer size.
+	(dll_crt0_1): Allocate new_argv0 with PATH_MAX size.
+	* exceptions.cc (debugger_command): Set size to 2 * PATH_MAX + 20;
+	(error_start_init): Use PATH_MAX instead of CYG_MAX_PATH for path
+	name buffer size.
+	* external.cc (fillout_pinfo): Always fill out ep.progname 0-terminated.
+	Fill out ep.progname_long.
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Allocate
+	buffer for executable filename with PATH_MAX size.
+	* pinfo.cc: Throughout use PATH_MAX instead of CYG_MAX_PATH.
+	* pinfo.h (class _pinfo): Set progname size to PATH_MAX.
+	* smallprint.cc: Include limits.h.  Use PATH_MAX instead of CYG_MAX_PATH
+	for path name buffer size.
+	* strace.cc (strace::vsprntf): Ditto.
+	* include/sys/cygwin.h (EXTERNAL_PINFO_VERSION_32_LP): Define.
+	(EXTERNAL_PINFO_VERSION): Set to EXTERNAL_PINFO_VERSION_32_LP.
+	(struct external_pinfo): Add progname_long member.
+	* include/sys/dirent.h: Correctly include limits.h instead of
+	sys/limits.h.
+
 2007-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Use MAX_PATH instead of

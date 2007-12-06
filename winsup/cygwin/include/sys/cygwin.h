@@ -226,7 +226,8 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #define EXTERNAL_PINFO_VERSION_16_BIT 0
 #define EXTERNAL_PINFO_VERSION_32_BIT 1
-#define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_BIT
+#define EXTERNAL_PINFO_VERSION_32_LP  2
+#define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_LP
 
 #ifndef _SYS_TYPES_H
 typedef unsigned short __uid16_t;
@@ -262,6 +263,9 @@ struct external_pinfo
   /* Only available if version >= EXTERNAL_PINFO_VERSION_32_BIT */
   __uid32_t uid32;
   __gid32_t gid32;
+
+  /* Only available if version >= EXTERNAL_PINFO_VERSION_32_LP */
+  char progname_long[PATH_MAX];
 };
 #endif /*__CYGWIN__*/
 #endif /*WINVER*/
