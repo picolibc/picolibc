@@ -15,6 +15,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <pwd.h>
+#include <limits.h>
 #include <sys/cygwin.h>
 #include <tlhelp32.h>
 #include <psapi.h>
@@ -354,14 +355,17 @@ main (int argc, char *argv[])
       else if (p->process_state & PID_TTYOU)
 	status = 'O';
 
-      char pname[MAX_PATH];
+      char pname[PATH_MAX];
       if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
 	strcpy (pname, "<defunct>");
       else if (p->ppid)
 	{
 	  char *s;
 	  pname[0] = '\0';
-	  cygwin_conv_to_posix_path (p->progname, pname);
+	  if (p->version >= EXTERNAL_PINFO_VERSION_32_LP)
+	    cygwin_conv_to_posix_path (p->progname_long, pname);
+	  else
+	    cygwin_conv_to_posix_path (p->progname, pname);
 	  s = strchr (pname, '\0') - 4;
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
 	    *s = '\0';
@@ -376,7 +380,7 @@ main (int argc, char *argv[])
 	  DWORD n = p->dwProcessId;
 	  if (!myEnumProcessModules (h, hm, sizeof (hm), &n))
 	    n = 0;
-	  if (!n || !myGetModuleFileNameEx (h, hm[0], pname, MAX_PATH))
+	  if (!n || !myGetModuleFileNameEx (h, hm[0], pname, PATH_MAX))
 	    strcpy (pname, "*** unknown ***");
 	  FILETIME ct, et, kt, ut;
 	  if (GetProcessTimes (h, &ct, &et, &kt, &ut))

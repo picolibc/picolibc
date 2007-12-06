@@ -1,3 +1,10 @@
+2007-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ps.cc: Include limits.h.
+	(main): Set file name buffer size to PATH_MAX.  Use progname or
+	progname_long member of struct external_pinfo dependent of the value of
+	the struct's version member.
+
 2007-08-31  Dave Korn  <dave.korn@artimi.com>
 
 	* mkgroup.c (enum_groups):  Use MAX_PREFERRED_LENGTH in netgroupenum
