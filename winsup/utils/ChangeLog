@@ -1,3 +1,9 @@
+2007-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (KEY_WOW64_64KEY): Define conditionally.
+	(KEY_WOW64_32KEY): Ditto.
+	(opts): Add missing 'W'.
+
 2007-08-31  Dave Korn  <dave.korn@artimi.com>
 
 	* mkgroup.c (enum_groups):  Use MAX_PREFERRED_LENGTH in netgroupenum
@@ -36,6 +42,56 @@
 
 	* utils/cygpath.cc (get_long_path_name_w32impl): Close handles returned
 	by FindFirstFile.
+
+2006-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (key_type): Drop.
+	(REG_AUTO): Define.
+	(value_type): Replace key_type.  Use REG_xxx values directly.
+	Accomodate change throughout.
+	(longopts): Add --dword, --dword-le, --none, --qword and --hex options.
+	(opts): Add -d, -D, -n, -Q and -x options.
+	(types): Array to convert REG_xxx into strings.
+	(hex): New variable to keep value of --hex option.
+	(usage): Accomodate new options.  Print only the necessary by default.
+	Only be verbose in case of -h/--help option.
+	(cmd_list): Use key separator from -K option when printing.
+	Print value type when verbose option is given.  Handle so far not
+	handled REG_xxx types.
+	(cmd_set): Avoid SEGV due to missing argument.  Handle so far not
+	handled REG_xxx types.
+	(cmd_get): Handle --binary option type agnostic.  Handle so far not
+	handled REG_xxx types.
+	(main): Handle new options.
+
+2006-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (longopts): Add --wow32 option.
+	(opts): Add -W option.
+	(usage): Add text for --wow32/-W option.
+	(main): Handle --wow32/-W option.
+	* utils.sgml: Document the new -W option.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (KEY_WOW64_64KEY): Drop definition.  Instead define
+	WINVER to 0x0502 before including windows.h.
+
+2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (KEY_WOW64_64KEY): Define.
+	(longopts): Add --wow64 option.
+	(opts): Add -w option.
+	(wow64): New variable to control usage of KEY_WOW64_64KEY access flag.
+	(usage): Add text for --wow64/-w option.
+	(print_version): Fix copyright.
+	(find_key): Use wow64 value in calls to RegOpenKeyEx and RegCreateKeyEx.
+	(cmd_add): Use wow64 value in call to RegCreateKeyEx.
+	(regDeleteKeyEx): New function pointer to load RegDeleteKeyEx function
+	dynamically.
+	(cmd_remove): Load and use regDeleteKeyEx when wow64 is set.
+	(main): Handle --wow64/-w option.
+	* utils.sgml: Document the new -w option.
 
 2006-09-11  Eric Blake  <ebb9@byu.net>
 

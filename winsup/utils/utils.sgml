@@ -1060,6 +1060,8 @@ Other Options:
  -h, --help     output usage information and exit
  -q, --quiet    no error output, just nonzero return if KEY/VALUE missing
  -v, --verbose  verbose output, including VALUE contents when applicable
+ -w, --wow64    access 64 bit registry view (ignored on 32 bit Windows)
+ -W, --wow32    access 32 bit registry view (ignored on 32 bit Windows)
  -V, --version  output version information and exit
 
 KEY is in the format [host]\prefix\KEY\KEY\VALUE, where host is optional
@@ -1085,6 +1087,20 @@ commands, this causes additional or lengthier messages to be printed.
 Conversely, the <literal>-q</literal> option supresses error messages,
 so you can use the exit status of the program to detect if a key
 exists or not (for example).</para>
+
+<para>The <literal>-w</literal> option allows to access the 64 bit view
+on the registry.  Several subkeys exist in a 32 bit and a 64 bit version
+when running on Windows 64.  Since Cygwin is running in 32 bit mode, it
+has only access to the 32 bit view of these registry keys.  When using
+the <literal>-w</literal> the 64 bit view is used and
+<command>regtool</command> can access the entire registry.
+This option is simply ignored when running on 32 bit Windows versions.
+</para>
+
+<para>The <literal>-W</literal> option allows to access the 32 bit view
+on the registry.  The purpose of this  option is mainly symmetry.  It
+allows to create OS agnostic scripts which would also work in a hypothetic
+64 bit version of Cygwin.</para>
 
 <para>You must provide <command>regtool</command> with an 
 <emphasis>action</emphasis> following options (if any). Currently,
