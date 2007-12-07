@@ -12,6 +12,7 @@ details. */
 #define _SYS_CYGWIN_H
 
 #include <sys/types.h>
+#include <limits.h>
 
 #ifdef __cplusplus
 extern "C" {
