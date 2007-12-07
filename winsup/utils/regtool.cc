@@ -57,7 +57,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "bdDehiklmnpqQsvVwxK:";
+static char opts[] = "bdDehiklmnpqQsvVwWxK:";
 
 const char *types[] =
 {

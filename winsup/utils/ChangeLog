@@ -1,3 +1,7 @@
+2007-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (opts): Add missing 'W'.
+
 2007-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ps.cc: Include limits.h.
