@@ -1476,7 +1476,8 @@ tzset P((void))
 	const char *	name = getenv("TZ");
 
 	if (name == NULL) {
-		tzsetwall();
+		if (!lcl_is_set)
+			tzsetwall();
 		return;
 	}
 
