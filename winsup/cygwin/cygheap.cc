@@ -129,7 +129,7 @@ _csbrk (int sbs)
 	newbase = _cygheap_end;
 
       DWORD adjsbs = allocsize ((char *) cygheap_max - newbase);
-      if (!VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
+      if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
 	{
 	  MEMORY_BASIC_INFORMATION m;
 	  if (!VirtualQuery (newbase, &m, sizeof m))
