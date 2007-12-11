@@ -488,13 +488,12 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.isdir () && !pc.issymlink ())
+      if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
-      if (S_ISDIR (buf->st_mode))
-	buf->st_mode |= S_IFDIR | STD_XBITS;
+      if (pc.isdir ())
+	buf->st_mode |= S_IFDIR | STD_WBITS | STD_XBITS;
       else if (buf->st_mode & S_IFMT)
 	/* nothing */;
       else if (is_fs_special ())

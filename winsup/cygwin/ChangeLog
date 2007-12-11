@@ -1,5 +1,10 @@
 2007-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix R/O bit
+	handling on filesystems without ACL support.
+
+2007-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc (tzset): Guard by a muto for thread safety.
 
 2007-12-11  Dave Korn  <dave.korn@artimi.com>
