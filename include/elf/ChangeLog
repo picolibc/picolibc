@@ -1,3 +1,7 @@
+2007-12-11  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* dwarf2.h (DW_AT_hi_user): Correct value.
+
 2007-12-07  Bob Wilson  <bob.wilson@acm.org>
 	
 	* xtensa.h (R_XTENSA_32_PCREL): New.

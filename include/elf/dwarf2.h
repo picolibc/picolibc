@@ -383,7 +383,7 @@ enum dwarf_attribute
   };
 
 #define DW_AT_lo_user	0x2000	/* Implementation-defined range start.  */
-#define DW_AT_hi_user	0x3ff0	/* Implementation-defined range end.  */
+#define DW_AT_hi_user	0x3fff	/* Implementation-defined range end.  */
 
 /* Location atom names and codes.  */
 enum dwarf_location_atom
