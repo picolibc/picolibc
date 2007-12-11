@@ -1,3 +1,8 @@
+2007-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (tzset): Call tzsetwall only if it hasn't been
+	called before.
+
 2007-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h: Include limits.h.
