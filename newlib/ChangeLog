@@ -138,6 +138,12 @@
 	* libc/include/argz.h: Guard against multiple inclusion.  Guard for
 	use with C++.
 
+2007-05-17  Cary R.  <cygcary <at> yahoo.com>
+
+	* libm/math/w_atan2.c: Fix atan2 to be consistent with glibc
+	(atan2(+0,-0), atan2(-0,-0) and atan(-0,+0))
+	* libm/math/wf_atan2.c: Ditto.
+
 2007-05-17  Charles Wilson  <cygwin@...>
 
 	* stdio/tmpfile.c: Include <sys/stat.h>.
@@ -181,6 +187,22 @@
 	* libc/stdio/fseek.c (_fseek_r): Avoid compile warning.
 	* libc/stdio/makebuf.c (__smakebuf_r): Likewise.
 	* libc/stdio/mktemp.c (_gettemp): Likewise.
+
+2007-05-01  Cary R.  <cygcary <at> yahoo.com>
+
+	* libm/math/e_pow.c: Fix to be consistent with glibc with regards to
+	treatment of NaN and +-inf arguments.
+	* libm/math/ef_pow.c: Ditto.
+	* libm/math/w_pow.c: Ditto.
+	* libm/math/wf_pow.c: Ditto.
+	* libm/math/w_acos.c: Fix domain errors to return NaN.
+	* libm/math/w_asin.c: Ditto.
+	* libm/math/wf_acos.c: Ditto.
+	* libm/math/wf_asin.c: Ditto.
+	* libm/math/w_log.c: Fix to return NaN for negative number inputs.
+	* libm/math/wf_log.c: Ditto.
+	* libm/math/wf_log10.c: Ditto.
+	* libm/math/w_log10.c: Ditto.
 
 2007-04-25  Eric Blake  <ebb9@byu.net>
 

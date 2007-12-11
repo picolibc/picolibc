@@ -93,7 +93,7 @@ PORTABILITY
 		exc.err = 0;
 		exc.arg1 = x;
 		exc.arg2 = y;
-		exc.retval = x;
+		exc.retval = 1.0;
 		if (_LIB_VERSION == _IEEE_ ||
 		    _LIB_VERSION == _POSIX_) exc.retval = 1.0;
 		else if (!matherr(&exc)) {

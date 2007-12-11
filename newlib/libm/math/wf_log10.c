@@ -64,6 +64,7 @@
 	        else if (!matherr(&exc)) {
 	           errno = EDOM;
 	        }
+                exc.retval = nan("");
             }
 	    if (exc.err != 0)
                errno = exc.err;

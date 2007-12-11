@@ -28,32 +28,7 @@
 	float y,x;
 #endif
 {
-#ifdef _IEEE_LIBM
 	return __ieee754_atan2f(y,x);
-#else
-	float z;
-	struct exception exc;
-	z = __ieee754_atan2f(y,x);
-	if(_LIB_VERSION == _IEEE_||isnanf(x)||isnanf(y)) return z;
-	if(x==(float)0.0&&y==(float)0.0) {
-	    /* atan2f(+-0,+-0) */
-	    exc.arg1 = y;
-	    exc.arg2 = x;
-	    exc.err = 0;
-	    exc.type = DOMAIN;
-	    exc.name = "atan2f";
-	    exc.retval = 0.0;
-	    if(_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return (float)exc.retval;
-	} else
-	    return z;
-#endif
 }
 
 #ifdef _DOUBLE_IS_32BITS

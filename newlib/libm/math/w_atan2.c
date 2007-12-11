@@ -60,8 +60,6 @@ RETURNS
 $-\pi$ to $\pi$.
 @end tex
 
-If both <[x]> and <[y]> are 0.0, <<atan2>> causes a <<DOMAIN>> error.
-
 You can modify error handling for these functions using <<matherr>>.
 
 PORTABILITY
@@ -86,32 +84,7 @@ PORTABILITY
 	double y,x;
 #endif
 {
-#ifdef _IEEE_LIBM
 	return __ieee754_atan2(y,x);
-#else
-	double z;
-	struct exception exc;
-	z = __ieee754_atan2(y,x);
-	if(_LIB_VERSION == _IEEE_||isnan(x)||isnan(y)) return z;
-	if(x==0.0&&y==0.0) {
-	    /* atan2(+-0,+-0) */
-	    exc.arg1 = y;
-	    exc.arg2 = x;
-	    exc.type = DOMAIN;
-	    exc.name = "atan2";
-	    exc.err = 0;
-	    exc.retval = 0.0;
-	    if(_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return exc.retval; 
-	} else
-	    return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
