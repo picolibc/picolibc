@@ -14,6 +14,7 @@
  */
 
 #include "math.h"
+#include "fdlibm.h"
 
 #ifdef __STDC__
 	float tgammaf(float x)

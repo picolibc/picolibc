@@ -15,6 +15,10 @@
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Take precision into account
 	for %s on NULL.  Skip NULL check when optimizing for size.
 
+2007-09-04  Kazunori Asayama <asayama@sm.sony.co.jp>
+
+	* libm/math/wf_tgamma.c: Add missing include.
+
 2007-07-31  Eric Blake  <ebb9@byu.net>
 
 	More POSIX stream corner cases.
