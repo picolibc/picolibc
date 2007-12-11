@@ -6,6 +6,7 @@
 
 #include "winsup.h"
 #include "cygerrno.h"
+#include "sync.h"
 #include <windows.h>
 #define STD_INSPIRED
 #define lint
@@ -1470,19 +1471,22 @@ tzsetwall P((void))
 	settzname();
 }
 
+static NO_COPY muto tzset_guard;
+
 extern "C" void
 tzset P((void))
 {
+	tzset_guard.init ("tzset_guard")->acquire ();
 	const char *	name = getenv("TZ");
 
 	if (name == NULL) {
 		if (!lcl_is_set)
 			tzsetwall();
-		return;
+		goto out;
 	}
 
 	if (lcl_is_set > 0  &&  strcmp(lcl_TZname, name) == 0)
-		return;
+		goto out;
 	lcl_is_set = (strlen(name) < sizeof (lcl_TZname));
 	if (lcl_is_set)
 		strcpy(lcl_TZname, name);
@@ -1492,7 +1496,7 @@ tzset P((void))
 		lclptr = (struct state *) malloc(sizeof *lclptr);
 		if (lclptr == NULL) {
 			settzname();	/* all we can do */
-			return;
+			goto out;
 		}
 	}
 #endif /* defined ALL_STATE */
@@ -1510,6 +1514,8 @@ tzset P((void))
 			gmtload(lclptr);
 	}
 	settzname();
+out:
+	tzset_guard.release ();
 }
 
 /*
