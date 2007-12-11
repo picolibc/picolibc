@@ -1,3 +1,8 @@
+2007-12-11  Dave Korn  <dave.korn@artimi.com>
+
+	* include/wincrypt.h (PCRYPT_DECODE_PARA):  Add missing typedef.
+	(CERT_POLICY_MAPPINGS_INFO):  Move before CERT_POLICY_MAPPING.
+
 2007-12-03  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wingdi.h: Change WINVER guard to _WIN32_WINNT.

@@ -658,6 +658,8 @@ typedef struct _CRYPT_ENCODE_PARA {
 } CRYPT_ENCODE_PARA, 
  *PCRYPT_ENCODE_PARA;
 
+/* Definition missing. */
+typedef struct _CRYPT_DECODE_PARA *PCRYPT_DECODE_PARA;
 
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
@@ -982,16 +984,16 @@ typedef struct _CERT_POLICY_CONSTRAINTS_INFO {
  *PCERT_POLICY_CONSTRAINTS_INFO;
 #endif /* (WINVER >= 0x0410) */ /* Windows 98 */
 #if (WINVER >= 0x0501) /* Windows Server 2003, Windows XP */
-typedef struct _CERT_POLICY_MAPPINGS_INFO {
-  DWORD cPolicyMapping;
-  PCERT_POLICY_MAPPING rgPolicyMapping;
-} CERT_POLICY_MAPPINGS_INFO, 
- *PCERT_POLICY_MAPPINGS_INFO;
 typedef struct _CERT_POLICY_MAPPING {
   LPSTR pszIssuerDomainPolicy;
   LPSTR pszSubjectDomainPolicy;
 } CERT_POLICY_MAPPING, 
  *PCERT_POLICY_MAPPING;
+typedef struct _CERT_POLICY_MAPPINGS_INFO {
+  DWORD cPolicyMapping;
+  PCERT_POLICY_MAPPING rgPolicyMapping;
+} CERT_POLICY_MAPPINGS_INFO, 
+ *PCERT_POLICY_MAPPINGS_INFO;
 #endif /* (WINVER >= 0x0501) */ /* Windows Server 2003, Windows XP */
 
 BOOL WINAPI CertCloseStore(HCERTSTORE,DWORD);
