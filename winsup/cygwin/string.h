@@ -1,6 +1,6 @@
 /* string.h: Extra string defs
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2007 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,6 +59,8 @@ strechr (const char *s, int c)
   return res;
 }
 
+/* Don't use.  Not NLS aware. */
+#if 0 // Not NLS aware
 extern const char isalpha_array[];
 
 #undef strcasematch
@@ -122,6 +124,26 @@ cygwin_strncasematch (const char *cs, const char *ct, size_t n)
 
   return __res;
 }
+#else
+#undef strcasecmp
+#define strcasecmp cygwin_strcasecmp
+int __stdcall cygwin_strcasecmp (const char *, const char *);
+
+#undef strncasecmp
+#define strncasecmp cygwin_strncasecmp
+int __stdcall cygwin_strncasecmp (const char *, const char *, size_t);
+
+#define strcasematch(s1,s2)	(!cygwin_strcasecmp ((s1),(s2)))
+#define strncasematch(s1,s2,n)	(!cygwin_strncasecmp ((s1),(s2),(n)))
+#endif
+
+#undef strlwr
+#define strlwr cygwin_strlwr
+char * __stdcall cygwin_strlwr (char *);
+
+#undef strupr
+#define strupr cygwin_strupr
+char * __stdcall cygwin_strupr (char *);
 
 #ifdef __cplusplus
 }

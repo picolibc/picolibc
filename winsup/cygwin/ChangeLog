@@ -1,3 +1,48 @@
+2007-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc: Include string.h.
+	(initial_env): Use small_printf's %P specifier.
+	* dll_init.cc (dll_list::alloc): Use PATH_MAX instead of CYG_MAX_PATH
+	for path name buffer size.
+	* dll_init.h (struct dll): Ditto.
+	* environ.cc: Include string.h.
+	(win_env::add_cache): Use temporary local buffer for path conversion.
+	(posify): Ditto.
+	* exceptions.cc (try_to_debug): Use CreateProcessW to allow long path
+	names.
+	* miscfuncs.cc: Drop unused implementations of strcasematch and
+	strncasematch.
+	(ch_case_eq): Drop.
+	(strcasestr): Drop.
+	(cygwin_wcscasecmp): New function.
+	(cygwin_wcsncasecmp): New function.
+	(cygwin_strcasecmp): New function.
+	(cygwin_strncasecmp): New function.
+	(cygwin_wcslwr): New function.
+	(cygwin_wcsupr): New function.
+	(cygwin_strlwr): New function.
+	(cygwin_strupr): New function.
+	* ntdll.h (RtlDowncaseUnicodeString): Declare.
+	(RtlUpcaseUnicodeString): Declare.
+	(RtlInt64ToHexUnicodeString): Fix typo in comment.
+	* string.h: Disable not NLS aware implementations of strcasematch
+	and strncasematch.
+	(cygwin_strcasecmp): Declare.
+	(strcasecmp): Define as cygwin_strcasecmp.
+	(cygwin_strncasecmp): Declare.
+	(strncasecmp): Define as cygwin_strncasecmp.
+	(strcasematch):Define using cygwin_strcasecmp.
+	(strncasematch):Define using cygwin_strncasecmp.
+	(cygwin_strlwr): Declare.
+	(strlwr): Define as cygwin_strlwr.
+	(cygwin_strupr): Declare.
+	(strupr): Define as cygwin_strupr.
+	* wchar.h: New file.
+	* wincap.cc (wincapc::init): Use "NT" as fix OS string.
+	* winsup.h (strcasematch): Drop declaration.
+	(strncasematch): Ditto.
+	(strcasestr): Ditto.
+
 2007-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix R/O bit

@@ -331,6 +331,8 @@ cygwin_stackdump ()
 extern "C" int
 try_to_debug (bool waitloop)
 {
+  WCHAR dbg_cmd[sizeof debugger_command];
+
   debug_printf ("debugger_command '%s'", debugger_command);
   if (*debugger_command == '\0')
     return 0;
@@ -347,7 +349,7 @@ try_to_debug (bool waitloop)
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
-  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+  STARTUPINFOW si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = 0;
@@ -382,16 +384,17 @@ try_to_debug (bool waitloop)
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
-  dbg = CreateProcess (NULL,
-		       debugger_command,
-		       NULL,
-		       NULL,
-		       FALSE,
-		       CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP,
-		       NULL,
-		       NULL,
-		       &si,
-		       &pi);
+  sys_mbstowcs (dbg_cmd, debugger_command, sizeof debugger_command);
+  dbg = CreateProcessW (NULL,
+			dbg_cmd,
+			NULL,
+			NULL,
+			FALSE,
+			CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP,
+			NULL,
+			NULL,
+			&si,
+			&pi);
 
   if (!dbg)
     system_printf ("Failed to start debugger, %E");

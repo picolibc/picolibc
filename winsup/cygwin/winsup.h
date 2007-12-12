@@ -264,9 +264,6 @@ void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm
 
 /* String manipulation */
 extern "C" char *__stdcall strccpy (char *s1, const char **s2, char c);
-extern "C" int __stdcall strcasematch (const char *s1, const char *s2) __attribute__ ((regparm(2)));
-extern "C" int __stdcall strncasematch (const char *s1, const char *s2, size_t n) __attribute__ ((regparm(3)));
-extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor) __attribute__ ((regparm(2)));
 
 void *hook_or_detect_cygwin (const char *, const void *, WORD&) __attribute__ ((regparm (3)));
 

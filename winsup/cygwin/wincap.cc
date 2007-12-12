@@ -308,7 +308,6 @@ wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
 void
 wincapc::init ()
 {
-  const char *os;
   bool has_osversioninfoex = true;
 
   if (caps)
@@ -331,7 +330,6 @@ wincapc::init ()
 	switch (version.dwMajorVersion)
 	  {
 	    case 4:
-	      os = "NT";
 	      if (!has_osversioninfoex
 		  && strcmp (version.szCSDVersion, "Service Pack 4") < 0)
 		caps = &wincap_nt4;
@@ -339,7 +337,6 @@ wincapc::init ()
 		caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
-	      os = "NT";
 	      switch (version.dwMinorVersion)
 		{
 		  case 0:
@@ -367,11 +364,9 @@ wincapc::init ()
 		}
 	      break;
 	    case 6:
-	      os = "NT";
 	      caps = &wincap_vista;
 	      break;
 	    default:
-	      os = "??";
 	      caps = &wincap_unknown;
 	      break;
 	  }
@@ -382,7 +377,6 @@ wincapc::init ()
 	api_fatal ("Windows 95/98/Me are not supported.");
 	break;
       default:
-	os = "??";
 	caps = &wincap_unknown;
 	break;
     }
@@ -396,7 +390,7 @@ wincapc::init ()
   else
     ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
 
-  __small_sprintf (osnam, "%s-%d.%d", os, version.dwMajorVersion,
+  __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
 }
 

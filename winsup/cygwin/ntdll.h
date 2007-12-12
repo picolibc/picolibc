@@ -857,6 +857,8 @@ extern "C"
   NTSTATUS NTAPI RtlConvertSidToUnicodeString (PUNICODE_STRING, PSID, BOOLEAN);
   VOID NTAPI RtlCopyUnicodeString (PUNICODE_STRING, PUNICODE_STRING);
   BOOLEAN NTAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
+  NTSTATUS NTAPI RtlDowncaseUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
+					   BOOLEAN);
   BOOLEAN NTAPI RtlEqualUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 				       BOOLEAN);
   VOID NTAPI RtlFreeAnsiString (PANSI_STRING);
@@ -878,6 +880,8 @@ extern "C"
   NTSTATUS NTAPI RtlUnicodeStringToOemString (PANSI_STRING, PUNICODE_STRING,
 					      BOOLEAN);
   WCHAR NTAPI RtlUpcaseUnicodeChar (WCHAR);
+  NTSTATUS NTAPI RtlUpcaseUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
+					 BOOLEAN);
 
   /* A few Rtl functions are either actually macros, or they just don't
      exist even though they would be a big help.  We implement them here,
@@ -958,7 +962,7 @@ extern "C"
   }
   /* Implemented in strfuncs.cc.  Create a Hex UNICODE_STRING from a given
      64 bit integer value.  If append is TRUE, append the hex string,
-     otherwise overwrite dest.  Returns either STAUTUS_SUCCESS, or
+     otherwise overwrite dest.  Returns either STATUS_SUCCESS, or
      STATUS_BUFFER_OVERFLOW, if the unicode buffer is too small (hasn't
      room for 16 WCHARs). */
   NTSTATUS NTAPI RtlInt64ToHexUnicodeString (ULONGLONG value,

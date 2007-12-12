@@ -13,6 +13,7 @@ details. */
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "glob.h"
 #include "exceptions.h"
 #include <ctype.h>
@@ -552,9 +553,7 @@ initial_env ()
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
-      buf[0] = '\0';
-      len = GetModuleFileName (NULL, buf, PATH_MAX);
-      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
+      console_printf ("Sleeping %d, pid %u %P\n", ms, GetCurrentProcessId ());
       Sleep (ms);
       if (!strace.active () && !dynamically_loaded)
 	strace.hello ();

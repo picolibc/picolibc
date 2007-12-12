@@ -14,9 +14,12 @@ details. */
 #include <sys/errno.h>
 #include <sys/uio.h>
 #include <assert.h>
+#include <alloca.h>
 #include <limits.h>
+#include <wchar.h>
 #include "cygthread.h"
 #include "cygtls.h"
+#include "ntdll.h"
 
 long tls_ix = -1;
 
@@ -77,70 +80,112 @@ const char isalpha_array[] NO_COPY = {
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
-#define ch_case_eq(ch1, ch2) (cyg_tolower(ch1) == cyg_tolower(ch2))
-
-#if 0
-
-/* Return TRUE if two strings match up to length n */
 extern "C" int __stdcall
-strncasematch (const char *s1, const char *s2, size_t n)
+cygwin_wcscasecmp (const wchar_t *ws, const wchar_t *wt)
 {
-  if (s1 == s2)
-    return 1;
+  UNICODE_STRING us, ut;
 
-  n++;
-  while (--n && *s1)
-    {
-      if (!ch_case_eq (*s1, *s2))
-	return 0;
-      s1++; s2++;
-    }
-  return !n || *s2 == '\0';
+  RtlInitUnicodeString (&us, ws);
+  RtlInitUnicodeString (&ut, wt);
+  return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-/* Return TRUE if two strings match */
 extern "C" int __stdcall
-strcasematch (const char *s1, const char *s2)
+cygwin_wcsncasecmp (const wchar_t  *ws, const wchar_t *wt, size_t n)
 {
-  if (s1 == s2)
-    return 1;
+  UNICODE_STRING us, ut;
 
-  while (*s1)
-    {
-      if (!ch_case_eq (*s1, *s2))
-	return 0;
-      s1++; s2++;
-    }
-  return *s2 == '\0';
+  n *= sizeof (WCHAR);
+  RtlInitUnicodeString (&us, ws);
+  if (us.Length > n)
+    us.Length = n;
+  RtlInitUnicodeString (&ut, wt);
+  if (ut.Length > n)
+    ut.Length = n;
+  return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
-#endif
+
+extern "C" int __stdcall
+cygwin_strcasecmp (const char *cs, const char *ct)
+{
+  UNICODE_STRING us, ut;
+  ULONG len;
+
+  len = (strlen (cs) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
+  us.Length = sys_mbstowcs (us.Buffer, cs, us.MaximumLength) * sizeof (WCHAR);
+  len = (strlen (ct) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
+  ut.Length = sys_mbstowcs (ut.Buffer, ct, ut.MaximumLength) * sizeof (WCHAR);
+  return RtlCompareUnicodeString (&us, &ut, TRUE);
+}
+
+extern "C" int __stdcall
+cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
+{
+  UNICODE_STRING us, ut;
+  ULONG len;
+  
+  n *= sizeof (WCHAR);
+  len = (strlen (cs) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
+  us.Length = sys_mbstowcs (us.Buffer, cs, us.MaximumLength) * sizeof (WCHAR);
+  if (us.Length > n)
+    us.Length = n;
+  len = (strlen (ct) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
+  ut.Length = sys_mbstowcs (ut.Buffer, ct, ut.MaximumLength) * sizeof (WCHAR);
+  if (ut.Length > n)
+    ut.Length = n;
+  return RtlCompareUnicodeString (&us, &ut, TRUE);
+}
+
+extern "C" wchar_t * __stdcall
+cygwin_wcslwr (wchar_t *string)
+{
+  UNICODE_STRING us;
+
+  RtlInitUnicodeString (&us, string);
+  RtlDowncaseUnicodeString (&us, &us, FALSE);
+  return string;
+}
+
+extern "C" wchar_t * __stdcall
+cygwin_wcsupr (wchar_t *string)
+{
+  UNICODE_STRING us;
+
+  RtlInitUnicodeString (&us, string);
+  RtlUpcaseUnicodeString (&us, &us, FALSE);
+  return string;
+}
 
 extern "C" char * __stdcall
-strcasestr (const char *searchee, const char *lookfor)
+cygwin_strlwr (char *string)
 {
-  if (*searchee == 0)
-    {
-      if (*lookfor)
-	return NULL;
-      return (char *) searchee;
-    }
+  UNICODE_STRING us;
+  size_t len = (strlen (string) + 1) * sizeof (WCHAR);
 
-  while (*searchee)
-    {
-      int i = 0;
-      while (1)
-	{
-	  if (lookfor[i] == 0)
-	    return (char *) searchee;
+  us.MaximumLength = len; us.Buffer = (PWCHAR) alloca (len);
+  us.Length = sys_mbstowcs (us.Buffer, string, len) * sizeof (WCHAR)
+	      - sizeof (WCHAR);
+  RtlDowncaseUnicodeString (&us, &us, FALSE);
+  sys_wcstombs (string, len / sizeof (WCHAR), us.Buffer);
+  return string;
+}
 
-	  if (!ch_case_eq (lookfor[i], searchee[i]))
-	    break;
-	  lookfor++;
-	}
-      searchee++;
-    }
+extern "C" char * __stdcall
+cygwin_strupr (char *string)
+{
+  UNICODE_STRING us;
+  size_t len = (strlen (string) + 1) * sizeof (WCHAR);
 
-  return NULL;
+  us.MaximumLength = len; us.Buffer = (PWCHAR) alloca (len);
+  us.Length = sys_mbstowcs (us.Buffer, string, len) * sizeof (WCHAR)
+	      - sizeof (WCHAR);
+  RtlUpcaseUnicodeString (&us, &us, FALSE);
+  sys_wcstombs (string, len / sizeof (WCHAR), us.Buffer);
+  return string;
 }
 
 int __stdcall

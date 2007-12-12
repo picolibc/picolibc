@@ -11,6 +11,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 #include <ctype.h>
 #include <assert.h>
 #include <sys/cygwin.h>
@@ -114,9 +115,12 @@ win_env::add_cache (const char *in_posix, const char *in_native)
     }
   else
     {
-      native = (char *) realloc (native, namelen + 1 + win32_len (in_posix));
+      char buf[PATH_MAX];
+      strcpy (buf, name + namelen);
+      towin32 (in_posix, buf);
+      native = (char *) realloc (native, namelen + 1 + strlen (buf));
       strcpy (native, name);
-      towin32 (in_posix, native + namelen);
+      strcpy (native + namelen, buf);
     }
   MALLOC_CHECK;
   if (immediate && cygwin_finished_initializing)
@@ -180,7 +184,7 @@ posify (char **here, const char *value)
   /* Turn all the items from c:<foo>;<bar> into their
      mounted equivalents - if there is one.  */
 
-  char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
+  char outenv[1 + len + PATH_MAX];
   memcpy (outenv, src, len);
   char *newvalue = outenv + len;
   if (!conv->toposix (value, newvalue) || _impure_ptr->_errno != EIDRM)
@@ -195,7 +199,7 @@ posify (char **here, const char *value)
     }
 
   debug_printf ("env var converted to %s", outenv);
-  *here = outenv;
+  *here = strdup (outenv);
   free (src);
   MALLOC_CHECK;
 }
