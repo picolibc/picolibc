@@ -1,3 +1,9 @@
+2007-12-13  Craig MacGregor  <cmacgreg@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Return count of fds with events instead of total
+	event count.
+
 2007-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix R/O bit
@@ -631,6 +637,12 @@
 
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Handle
 	ERROR_NOT_LOCKED returned from UnlockFileEx.
+
+2006-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Use POSIX type nfds_t for second parameter.
+	* include/sys/poll.h: Declare nfds_t.  Use as type for second parameter
+	in poll(2) declaration.
 
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
