@@ -1,3 +1,8 @@
+2007-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* string.h: Guard cygwin internal string function definitions with
+	__INSIDE_CYGWIN__.
+
 2007-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc: Include string.h.

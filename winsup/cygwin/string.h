@@ -59,6 +59,8 @@ strechr (const char *s, int c)
   return res;
 }
 
+#ifdef __INSIDE_CYGWIN__
+
 /* Don't use.  Not NLS aware. */
 #if 0 // Not NLS aware
 extern const char isalpha_array[];
@@ -145,7 +147,10 @@ char * __stdcall cygwin_strlwr (char *);
 #define strupr cygwin_strupr
 char * __stdcall cygwin_strupr (char *);
 
+#endif /* __INSIDE_CYGWIN__ */
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* _CYGWIN_STRING_H */
