@@ -1,3 +1,9 @@
+2007-12-13  Craig MacGregor  <cmacgreg@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Return count of fds with events instead of total
+	event count.
+
 2007-12-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* string.h: Guard cygwin internal string function definitions with
