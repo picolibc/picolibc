@@ -681,8 +681,8 @@ dtable::fixup_before_exec (DWORD target_proc_id)
 void
 dtable::set_file_pointers_for_exec ()
 {
-/* This is not POSIX-compliant. */
-#if 0
+/* This is not POSIX-compliant so the function is only called for
+   non-Cygwin processes. */
   LONG off_high = 0;
   lock ();
   fhandler_base *fh;
@@ -690,7 +690,6 @@ dtable::set_file_pointers_for_exec ()
     if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
       SetFilePointer (fh->get_handle (), 0, &off_high, FILE_END);
   unlock ();
-#endif
 }
 
 void

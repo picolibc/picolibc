@@ -470,7 +470,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   cygbench ("spawn-guts");
 
-  cygheap->fdtab.set_file_pointers_for_exec ();
+  if (!real_path.iscygexec())
+    cygheap->fdtab.set_file_pointers_for_exec ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
   if (!moreinfo->envp || !envblock)

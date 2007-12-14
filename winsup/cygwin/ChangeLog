@@ -1,3 +1,10 @@
+2007-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::set_file_pointers_for_exec): Reenable.  Fix
+	comment.
+	* spawn.cc (spawn_guts): Call cygheap->fdtab.set_file_pointers_for_exec
+	only for non-Cygwin processes.
+
 2007-12-13  Craig MacGregor  <cmacgreg@gmail.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
