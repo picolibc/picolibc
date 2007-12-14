@@ -47,7 +47,7 @@ struct sockaddr_storage {
 
 #include <asm/socket.h>			/* arch-dependent defines	*/
 #include <cygwin/sockios.h>		/* the SIOCxxx I/O controls	*/
-#include <cygwin/uio.h>			/* iovec support		*/
+#include <sys/uio.h>			/* iovec support		*/
 #include <sys/types.h>
 
 struct ucred {
