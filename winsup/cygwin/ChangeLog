@@ -1,5 +1,10 @@
 2007-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/socket.h: Include sys/uio.h instead of cygwin/uio.h.
+	* include/cygwin/uio.h: Remove.
+
+2007-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::set_file_pointers_for_exec): Reenable.  Fix
 	comment.
 	* spawn.cc (spawn_guts): Call cygheap->fdtab.set_file_pointers_for_exec
