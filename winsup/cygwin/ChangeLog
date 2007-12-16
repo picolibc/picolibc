@@ -1,3 +1,31 @@
+2007-12-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (POSIX_NAMED_PIPE): New define.
+	(POSIX_NAMED_PIPE_LEN): Ditto.
+	(dtable::add_archetype): Use crealloc_abort.
+	(dtable::init_std_file_from_handle): Specifically detect pipe
+	stdin/stdout.  Pass name to build_fh_dev so that proper name is
+	recorded.  Use binmode of fh if it is set before using
+	get_default_mode.  Set proper read/write access when calling init().
+	(handle_to_fn): Handle pipes.
+	* fhandler.cc (fhandler_base::wait_overlapped): Add some debugging.
+	* fhandler.h (fhandler_base::set_name): Default to just setting the
+	path_conv name.
+	(fhandler_pipe::init): Declare.
+	* pipe.cc (struct pipesync): New struct.
+	(getov_result): New function.  Blocks and retrieves the result of an
+	overlay I/O operation.
+	(pipe_handler): New function.
+	(pipesync::pipesync): New function.  Initializer for pipesync struct.
+	(handler_pipe::init): Define.  Detects attempts to set up a "native"
+	pipe fhandler and creates a thread which accepts input from or output
+	to the non-cygwin pipe, creating a cygwin pipe wrapper around the
+	non-cygwin pipe.
+	(fhandler_pipe::create): Add pipe-specific flags to call to init().
+
+	* exceptions.cc (ctrl_c_handler): Lock process while we determine what
+	to do.
+
 2007-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/socket.h: Include sys/uio.h instead of cygwin/uio.h.

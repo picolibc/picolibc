@@ -34,6 +34,157 @@ fhandler_pipe::fhandler_pipe ()
   need_fork_fixup (true);
 }
 
+struct pipesync
+{
+  bool reader;
+  HANDLE ev, non_cygwin_h, ret_handle;
+  pipesync(HANDLE, DWORD);
+  int operator == (int x) const {return !!ev;}
+  static DWORD WINAPI handler (LPVOID *);
+};
+
+inline bool
+getov_result (HANDLE h, DWORD& nbytes, LPOVERLAPPED ov)
+{
+  if (ov && (GetLastError () != ERROR_IO_PENDING
+	     || !GetOverlappedResult (h, ov, &nbytes, true)))
+    {
+      __seterrno ();
+      return false;
+    }
+  return true;
+}
+
+static DWORD WINAPI
+pipe_handler (LPVOID in_ps)
+{
+  pipesync ps = *(pipesync *) in_ps;
+  HANDLE in, out;
+  DWORD err = fhandler_pipe::create_selectable (&sec_none_nih, in, out, 0);
+  if (err)
+    {
+      SetLastError (err);
+      system_printf ("couldn't create a shadow pipe for non-cygwin pipe I/O, %E");
+      return 0;
+    }
+  ((pipesync *) in_ps)->ret_handle = ps.reader ? in : out;
+  SetEvent (ps.ev);
+
+  char buf[4096];
+  DWORD read_bytes, write_bytes;
+  HANDLE hread, hwrite, hclose;
+  OVERLAPPED ov, *rov, *wov;
+  memset (&ov, 0, sizeof (ov));
+  ov.hEvent = CreateEvent (&sec_none_nih, true, false, NULL);
+  if (ps.reader)
+    {
+      hread = ps.non_cygwin_h;
+      hclose = hwrite = out;
+      wov = &ov;
+      rov = NULL;
+    }
+  else
+    {
+      hclose = hread = in;
+      hwrite = ps.non_cygwin_h;
+      rov = &ov;
+      wov = NULL;
+    }
+
+  while (1)
+    {
+      ResetEvent (ov.hEvent);
+      BOOL res = ReadFile (hread, buf, 4096, &read_bytes, rov);
+      if (!res && !getov_result (hread, read_bytes, rov))
+	break;
+      if (!read_bytes)
+	break;
+
+      res = WriteFile (hwrite, buf, read_bytes, &write_bytes, wov);
+      if (!res && !getov_result (hwrite, write_bytes, wov))
+	break;
+      if (write_bytes != read_bytes)
+	break;
+    }
+
+  err = GetLastError ();
+  CloseHandle (ov.hEvent);
+  CloseHandle (hclose);
+  CloseHandle (ps.non_cygwin_h);
+  SetLastError (err);
+  return 0;
+}
+      
+
+pipesync::pipesync (HANDLE f, DWORD is_reader):
+  reader (false), ret_handle (NULL)
+{
+  ev = CreateEvent (&sec_none_nih, true, false, NULL);
+  if (!ev)
+    {
+      system_printf ("couldn't create synchronization event for non-cygwin pipe, %E");
+      goto out;
+    }
+  non_cygwin_h = f;
+  reader = !!is_reader;
+  ret_handle = NULL;
+
+  DWORD tid;
+  HANDLE ht = CreateThread (&sec_none_nih, 0, pipe_handler, this, 0, &tid);
+
+  if (!ht)
+    goto out;
+  CloseHandle (ht);
+
+  switch (WaitForSingleObject (ev, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+      break;
+    default:
+      system_printf ("WFSO failed waiting for synchronization event for non-cygwin pipe, %E");
+      break;
+    }
+
+out:
+  if (ev)
+    {
+      CloseHandle (ev);
+      ev = NULL;
+    }
+  return;
+}
+
+#define WINPIPE "\\\\.\\pipe\\"
+void
+fhandler_pipe::init (HANDLE f, DWORD a, mode_t bin)
+{
+  // FIXME: Have to clean this up someday
+  if (!*get_win32_name () && get_name ())
+    {
+      char *hold_normalized_name = (char *) alloca (strlen (get_name ()) + 1);
+      strcpy (hold_normalized_name, get_name ());
+      char *s, *d;
+      for (s = hold_normalized_name, d = (char *) get_win32_name (); *s; s++, d++)
+	if (*s == '/')
+	  *d = '\\';
+	else
+	  *d = *s;
+      *d = '\0';
+      set_name (hold_normalized_name);
+    }
+
+  bool opened_properly = a & FILE_CREATE_PIPE_INSTANCE;
+  a &= ~FILE_CREATE_PIPE_INSTANCE;
+  if (!opened_properly)
+    {
+      pipesync ps (f, a & GENERIC_READ);
+      f = ps.ret_handle;
+    }
+
+  fhandler_base::init (f, a, bin);
+  setup_overlapped ();
+}
+
 extern "C" int sscanf (const char *, const char *, ...);
 
 int
@@ -284,16 +435,14 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
 
       int binmode = mode & O_TEXT ?: O_BINARY;
-      fhs[0]->init (r, GENERIC_READ, binmode);
-      fhs[1]->init (w, GENERIC_WRITE, binmode);
+      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, binmode);
+      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, binmode);
       if (mode & O_NOINHERIT)
        {
 	 fhs[0]->close_on_exec (true);
 	 fhs[1]->close_on_exec (true);
        }
 
-      fhs[0]->setup_overlapped ();
-      fhs[1]->setup_overlapped ();
       res = 0;
     }
 
