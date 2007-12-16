@@ -268,7 +268,7 @@ ln -s /dev/nst0  /dev/tape
 
 <warning>
 <para>
-Note that you can't use the mount table to map from fixed device name
+Note that you can't use the mount table to map from a fixed device name
 to your own device name or to map from internal NT device name to
 your own device name.  Also using symbolic links to map from the internal
 NT device name to your own device name will not do what you want.

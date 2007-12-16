@@ -1,3 +1,7 @@
+2007-12-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pathnames.xml: Fix a typo.
+
 2007-09-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-what.xml: Remove paragraph about and link to stoneage old
