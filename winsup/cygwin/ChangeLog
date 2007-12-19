@@ -1,3 +1,8 @@
+2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export wcpcpy, wcpncpy.
+	* include/cygwin/version.h: Bump API minor number.
+
 2007-12-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (POSIX_NAMED_PIPE): New define.

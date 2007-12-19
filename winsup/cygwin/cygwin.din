@@ -1663,6 +1663,8 @@ waitpid SIGFE
 _waitpid = waitpid SIGFE
 warn SIGFE
 warnx SIGFE
+wcpcpy NOSIGFE
+wcpncpy NOSIGFE
 wcrtomb NOSIGFE
 wcscat NOSIGFE
 wcschr NOSIGFE
