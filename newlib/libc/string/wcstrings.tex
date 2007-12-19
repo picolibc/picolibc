@@ -16,6 +16,7 @@ declarations are in @file{wchar.h}.
 * wcscmp::      Wide-character string compare
 * wcscoll::     Locale-specific wide-character string compare
 * wcscpy::      Copy wide-character string
+* wcpcpy::      Copy a wide-character string returning a pointer to its end
 * wcscspn::     Count wide characters not in string
 * wcslcat::     Concatenate wide-character strings to specified length
 * wcslcpy::     Copy wide-character string to specified length
@@ -23,6 +24,7 @@ declarations are in @file{wchar.h}.
 * wcsncat::     Concatenate wide-character strings
 * wcsncmp::     Wide-character string compare
 * wcsncpy::     Counted copy wide-character string
+* wcpncpy::     Copy part of a wide-character string returning a pointer to its end
 * wcsnlen::     Wide-character string length with maximum limit
 * wcspbrk::     Find wide characters in string
 * wcsrchr::     Reverse search for wide character in string
@@ -64,6 +66,9 @@ declarations are in @file{wchar.h}.
 @include string/wcscpy.def
 
 @page
+@include string/wcpcpy.def
+
+@page
 @include string/wcscspn.def
 
 @page
@@ -83,6 +88,9 @@ declarations are in @file{wchar.h}.
 
 @page
 @include string/wcsncpy.def
+
+@page
+@include string/wcpncpy.def
 
 @page
 @include string/wcsnlen.def

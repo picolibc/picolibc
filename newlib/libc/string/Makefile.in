@@ -95,7 +95,9 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-stpncpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strcasestr.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-wcpcpy.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-wcpncpy.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -116,7 +118,8 @@ am__objects_3 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	wmemcpy.lo wmemmove.lo wmemset.lo
 @ELIX_LEVEL_1_FALSE@am__objects_4 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
-@ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo
+@ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo wcpcpy.lo \
+@ELIX_LEVEL_1_FALSE@	wcpncpy.lo
 @USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libstring_la_OBJECTS = $(am_libstring_la_OBJECTS)
@@ -371,7 +374,9 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	mempcpy.c \
 @ELIX_LEVEL_1_FALSE@	strndup.c \
 @ELIX_LEVEL_1_FALSE@	strcasestr.c \
-@ELIX_LEVEL_1_FALSE@	strndup_r.c
+@ELIX_LEVEL_1_FALSE@	strndup_r.c \
+@ELIX_LEVEL_1_FALSE@	wcpcpy.c \
+@ELIX_LEVEL_1_FALSE@	wcpncpy.c
 
 @ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
@@ -392,7 +397,7 @@ memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
 memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def \
 wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
-wcscpy.def	wcscspn.def \
+wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def \
@@ -907,6 +912,18 @@ lib_a-strndup_r.o: strndup_r.c
 
 lib_a-strndup_r.obj: strndup_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup_r.obj `if test -f 'strndup_r.c'; then $(CYGPATH_W) 'strndup_r.c'; else $(CYGPATH_W) '$(srcdir)/strndup_r.c'; fi`
+
+lib_a-wcpcpy.o: wcpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcpcpy.o `test -f 'wcpcpy.c' || echo '$(srcdir)/'`wcpcpy.c
+
+lib_a-wcpcpy.obj: wcpcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcpcpy.obj `if test -f 'wcpcpy.c'; then $(CYGPATH_W) 'wcpcpy.c'; else $(CYGPATH_W) '$(srcdir)/wcpcpy.c'; fi`
+
+lib_a-wcpncpy.o: wcpncpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcpncpy.o `test -f 'wcpncpy.c' || echo '$(srcdir)/'`wcpncpy.c
+
+lib_a-wcpncpy.obj: wcpncpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcpncpy.obj `if test -f 'wcpncpy.c'; then $(CYGPATH_W) 'wcpncpy.c'; else $(CYGPATH_W) '$(srcdir)/wcpncpy.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

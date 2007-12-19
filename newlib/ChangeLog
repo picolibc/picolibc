@@ -1,5 +1,16 @@
 2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/wchar.h: Add prototypes for wcpcpy and wcpncpy.
+	* libc/string/Makefile.am (ELIX_SOURCES): Add wcpcpy.c and
+	wcpncpy.c.
+	(CHEWOUT_FILES): Add wcpcpy.def and wcpncpy.def.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/string/wcpcpy.c: New file.
+	* libc/string/wcpncpy.c: New file.
+	* libc/string/wcstrings.tex: Add wcpcpy and wcpncpy.
+
+2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Use correct pointer in call to
 	_wcsrtombs_r.
 
