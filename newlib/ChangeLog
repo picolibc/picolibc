@@ -1,3 +1,8 @@
+2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/features.h: Add checks for C90 compilers using
+	-ansi.
+
 2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h: Add prototypes for wcpcpy and wcpncpy.
