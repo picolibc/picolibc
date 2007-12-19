@@ -26,7 +26,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/collate.c,v 1.24 2002/03/29 22:43:42 markm Exp $");
 
 #include "namespace.h"
 #include <rune.h>

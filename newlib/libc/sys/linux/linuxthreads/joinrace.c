@@ -35,7 +35,7 @@ main (void)
 	  return 1;
 	}
 
-      sp1.sched_priority = 0;
+      sp1.__sched_priority = 0;
       istatus = pthread_setschedparam (thread1, SCHED_OTHER, &sp1);
       if (istatus != ESRCH)
 	{

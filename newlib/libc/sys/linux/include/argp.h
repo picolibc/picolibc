@@ -39,6 +39,14 @@ char *program_invocation_short_name;
 typedef int error_t;
 # define __error_t_defined
 #endif
+
+#undef __THROW
+#define __THROW
+
+#ifndef __NTH
+# define __NTH(fct) fct __THROW
+#endif
+
 
 #ifdef  __cplusplus
 extern "C" {

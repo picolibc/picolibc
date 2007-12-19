@@ -1,3 +1,26 @@
+2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/strcasestr.c: Remove id macro.
+	* libc/sys/linux/linuxthreads/attr.c: Fix up sched_priority
+	field reference to be __sched_priority.
+	* libc/sys/linux/linuxthreads/joinrace.c: Ditto.
+	* libc/sys/linux/linuxthreads/manager.c: Ditto.
+	* libc/sys/linux/stdlib/collate.c: Remove id macro.
+	* libc/sys/linux/stdlib/collcmp.c: Ditto.
+	* libc/sys/linux/stdlib/engine.c: Ditto.
+	* libc/sys/linux/stdlib/fnmatch.c: Ditto.
+	* libc/sys/linux/stdlib/glob.c: Ditto.
+	* libc/sys/linux/stdlib/reallocf.c: Ditto.
+	* libc/sys/linux/stdlib/regcomp.c: Ditto.
+	* libc/sys/linux/stdlib/regerror.c: Ditto.
+	* libc/sys/linux/stdlib/regexec.c: Ditto.
+	* libc/sys/linux/stdlib/regfree.c: Ditto.
+	* libc/sys/linux/sys/cdefs.h: Replace with latest version.
+	* libc/sys/linux/include/argp.h: Ditto.
+	* libc/sys/linux/sys/libc-lock.h: New file.
+	* libc/sys/linux/sys/stdint.h: Ditto.
+	* libc/sys/linux/include/sched.h: New file.
+
 2007-12-19  Dave Korn  <dave.korn@artimi.com>
 	    Jeff Johnston  <jjohnstn@redhhat.com>
 

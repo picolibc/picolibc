@@ -29,7 +29,7 @@ int __pthread_attr_init_2_1(pthread_attr_t *attr)
 
   attr->__detachstate = PTHREAD_CREATE_JOINABLE;
   attr->__schedpolicy = SCHED_OTHER;
-  attr->__schedparam.sched_priority = 0;
+  attr->__schedparam.__sched_priority = 0;
   attr->__inheritsched = PTHREAD_EXPLICIT_SCHED;
   attr->__scope = PTHREAD_SCOPE_SYSTEM;
   attr->__guardsize = ps;
@@ -47,7 +47,7 @@ int __pthread_attr_init_2_0(pthread_attr_t *attr)
 {
   attr->__detachstate = PTHREAD_CREATE_JOINABLE;
   attr->__schedpolicy = SCHED_OTHER;
-  attr->__schedparam.sched_priority = 0;
+  attr->__schedparam.__sched_priority = 0;
   attr->__inheritsched = PTHREAD_EXPLICIT_SCHED;
   attr->__scope = PTHREAD_SCOPE_SYSTEM;
   return 0;

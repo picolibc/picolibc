@@ -15,6 +15,7 @@
 /* The "thread manager" thread: manages creation and termination of threads */
 
 #include <errno.h>
+#define __USE_MISC
 #include <sched.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -594,7 +595,7 @@ static int pthread_handle_create(pthread_t *thread, const pthread_attr_t *attr,
       break;
     }
     new_thread->p_priority =
-      new_thread->p_start_args.schedparam.sched_priority;
+      new_thread->p_start_args.schedparam.__sched_priority;
   }
   /* Finish setting up arguments to pthread_start_thread */
   new_thread->p_start_args.start_routine = start_routine;
