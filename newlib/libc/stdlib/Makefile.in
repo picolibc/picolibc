@@ -46,7 +46,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../../libtool.m4 \
 	$(top_srcdir)/../../ltoptions.m4 \
 	$(top_srcdir)/../../ltsugar.m4 \
 	$(top_srcdir)/../../ltversion.m4 $(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/../confsubdir.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
@@ -100,9 +100,9 @@ am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-rand48.$(OBJEXT) lib_a-seed48.$(OBJEXT) \
 	lib_a-srand48.$(OBJEXT) lib_a-strtoll.$(OBJEXT) \
 	lib_a-strtoll_r.$(OBJEXT) lib_a-strtoull.$(OBJEXT) \
-	lib_a-strtoull_r.$(OBJEXT) lib_a-atoll.$(OBJEXT) \
-	lib_a-wcstoll.$(OBJEXT) lib_a-wcstoll_r.$(OBJEXT) \
-	lib_a-wcstoull.$(OBJEXT) lib_a-wcstoull_r.$(OBJEXT) \
+	lib_a-strtoull_r.$(OBJEXT) lib_a-wcstoll.$(OBJEXT) \
+	lib_a-wcstoll_r.$(OBJEXT) lib_a-wcstoull.$(OBJEXT) \
+	lib_a-wcstoull_r.$(OBJEXT) lib_a-atoll.$(OBJEXT) \
 	lib_a-llabs.$(OBJEXT) lib_a-lldiv.$(OBJEXT)
 am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
@@ -140,7 +140,7 @@ am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
 	srand48.lo strtoll.lo strtoll_r.lo strtoull.lo strtoull_r.lo \
-	wcstoll.lo wcstoll_r.lo wcstoull.o wcstoull_r.lo atoll.lo \
+	wcstoll.lo wcstoll_r.lo wcstoull.lo wcstoull_r.lo atoll.lo \
 	llabs.lo lldiv.lo
 am__objects_9 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
 	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsrtowcs.lo \
@@ -277,15 +277,8 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -301,6 +294,9 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 extra_dir = @extra_dir@
 host = @host@
@@ -308,12 +304,14 @@ host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 lt_ECHO = @lt_ECHO@
@@ -323,8 +321,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
@@ -513,11 +513,12 @@ CHEWOUT_FILES = \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
-	system.def	\
 	wcstol.def 	\
 	wcstoll.def 	\
 	wcstoul.def 	\
 	wcstoull.def 	\
+	system.def	\
+	wcstol.def 	\
 	wcstombs.def	\
 	wctomb.def	
 

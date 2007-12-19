@@ -1,5 +1,22 @@
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * NEWS: Update with 1.16.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 1.16.0.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+        * doc/aclocal.m4: Ditto.
+        * doc/configure: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/configure: Ditto.
+        * libc/libc.texinfo: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+        * libm/*/configure: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_1.16.
+
+2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/string/strcasestr.c: Remove id macro.
 	* libc/sys/linux/linuxthreads/attr.c: Fix up sched_priority
 	field reference to be __sched_priority.

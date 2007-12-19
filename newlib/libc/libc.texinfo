@@ -84,8 +84,8 @@ into another language, under the above conditions for modified versions.
 @title The Red Hat newlib C Library
 @subtitle Full Configuration
 @sp 1
-@subtitle @code{libc} 1.15.0
-@subtitle December 2006
+@subtitle @code{libc} 1.16.0
+@subtitle December 2007
 @author {Steve Chamberlain}
 @author {Roland Pesch}
 @author {Red Hat Support}

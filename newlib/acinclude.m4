@@ -2,7 +2,7 @@ dnl This provides configure definitions used by all the newlib
 dnl configure.in files.
 
 AC_DEFUN([DEF_NEWLIB_VERSION],
-m4_define([NEWLIB_VERSION],[1.15.0]))
+m4_define([NEWLIB_VERSION],[1.16.0]))
 
 dnl Basic newlib configury.  This calls basic introductory stuff,
 dnl including AM_INIT_AUTOMAKE and AC_CANONICAL_HOST.  It also runs

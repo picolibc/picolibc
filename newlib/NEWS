@@ -1,3 +1,14 @@
+*** Major changes in newlib version 1.16.0:
+
+* mep-elf support contributed
+* x86_64 support added
+* reentrant I/O clean-up
+* various new C functions added from C99, POSIX, SUSV, etc..
+* switch to use top-level libtool
+* spu floating-point environment and stdio enhancement
+* fastmath support
+* various bug fixes
+
 *** Major changes in newlib version 1.15.0:
 
 * new platforms added (bfin, spu, fido)
