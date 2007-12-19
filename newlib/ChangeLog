@@ -1,3 +1,8 @@
+2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Use correct pointer in call to
+	_wcsrtombs_r.
+
 2007-11-19  Nick Clifton  <nickc@redhat.com>
 
 	* libc/machine/mn10300/Makefile.am (CCASFLAGS): Add -Wa,--gdwarf-2.
@@ -21,7 +26,7 @@
 	* libc/sys/arm/sys/fcntl.h: New file that includes
 	sys/_default_fcntl.h and defines O_BINARY.
 
-2007-11-08  Corinna Vinschen
+2007-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Remove Cygwin definition of MAXPATHLEN.
 

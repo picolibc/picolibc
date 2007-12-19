@@ -1095,8 +1095,8 @@ reswitch:	switch (ch) {
 
 				/* Convert widechar string to multibyte string. */
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, malloc_buf,
-						 &wcp, size, &ps) != size) {
+				if (_wcsrtombs_r (data, cp, &wcp, size, &ps)
+				    != size) {
 					fp->_flags |= __SERR;
 					goto error;
 				}
