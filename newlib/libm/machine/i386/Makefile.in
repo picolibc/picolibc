@@ -45,7 +45,11 @@ DIST_COMMON = $(srcdir)/../../../Makefile.shared \
 	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../ltmain.sh \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../ltmain.sh \
 	$(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub
 subdir = .
@@ -68,18 +72,25 @@ lib_a_LIBADD =
 am__objects_1 = lib_a-f_atan2.$(OBJEXT) lib_a-f_atan2f.$(OBJEXT) \
 	lib_a-f_exp.$(OBJEXT) lib_a-f_expf.$(OBJEXT) \
 	lib_a-f_frexp.$(OBJEXT) lib_a-f_frexpf.$(OBJEXT) \
-	lib_a-f_log.$(OBJEXT) lib_a-f_logf.$(OBJEXT) \
-	lib_a-f_log10.$(OBJEXT) lib_a-f_log10f.$(OBJEXT) \
-	lib_a-f_ldexp.$(OBJEXT) lib_a-f_ldexpf.$(OBJEXT) \
+	lib_a-f_llrint.$(OBJEXT) lib_a-f_llrintf.$(OBJEXT) \
+	lib_a-f_llrintl.$(OBJEXT) lib_a-f_log.$(OBJEXT) \
+	lib_a-f_logf.$(OBJEXT) lib_a-f_log10.$(OBJEXT) \
+	lib_a-f_log10f.$(OBJEXT) lib_a-f_ldexp.$(OBJEXT) \
+	lib_a-f_ldexpf.$(OBJEXT) lib_a-f_lrint.$(OBJEXT) \
+	lib_a-f_lrintf.$(OBJEXT) lib_a-f_lrintl.$(OBJEXT) \
 	lib_a-f_pow.$(OBJEXT) lib_a-f_powf.$(OBJEXT) \
-	lib_a-f_tan.$(OBJEXT) lib_a-f_tanf.$(OBJEXT)
+	lib_a-f_rint.$(OBJEXT) lib_a-f_rintf.$(OBJEXT) \
+	lib_a-f_rintl.$(OBJEXT) lib_a-f_tan.$(OBJEXT) \
+	lib_a-f_tanf.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libi386_la_LIBADD =
 am__objects_2 = f_atan2.lo f_atan2f.lo f_exp.lo f_expf.lo f_frexp.lo \
-	f_frexpf.lo f_log.lo f_logf.lo f_log10.lo f_log10f.lo \
-	f_ldexp.lo f_ldexpf.lo f_pow.lo f_powf.lo f_tan.lo f_tanf.lo
+	f_frexpf.lo f_llrint.lo f_llrintf.lo f_llrintl.lo f_log.lo \
+	f_logf.lo f_log10.lo f_log10f.lo f_ldexp.lo f_ldexpf.lo \
+	f_lrint.lo f_lrintf.lo f_lrintl.lo f_pow.lo f_powf.lo \
+	f_rint.lo f_rintf.lo f_rintl.lo f_tan.lo f_tanf.lo
 @USE_LIBTOOL_TRUE@am_libi386_la_OBJECTS = $(am__objects_2)
 libi386_la_OBJECTS = $(am_libi386_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libi386_la_rpath =
@@ -177,15 +188,8 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -201,18 +205,23 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 lt_ECHO = @lt_ECHO@
@@ -222,8 +231,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sys_dir = @sys_dir@
@@ -234,8 +245,12 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) $(CROSS_C
 AM_CCASFLAGS = $(INCLUDES)
 LIB_SOURCES = \
 	f_atan2.S f_atan2f.S f_exp.c f_expf.c \
-	f_frexp.S f_frexpf.S f_log.S f_logf.S f_log10.S f_log10f.S \
-	f_ldexp.S f_ldexpf.S f_pow.c f_powf.c f_tan.S f_tanf.S f_math.h i386mach.h
+	f_frexp.S f_frexpf.S f_llrint.c f_llrintf.c f_llrintl.c \
+	f_log.S f_logf.S f_log10.S f_log10f.S \
+	f_ldexp.S f_ldexpf.S f_lrint.c f_lrintf.c f_lrintl.c \
+	f_pow.c f_powf.c f_rint.c f_rintf.c f_rintl.c \
+	f_tan.S f_tanf.S f_math.h \
+	i386mach.h 
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libi386.la
@@ -412,6 +427,42 @@ lib_a-f_expf.o: f_expf.c
 lib_a-f_expf.obj: f_expf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_expf.obj `if test -f 'f_expf.c'; then $(CYGPATH_W) 'f_expf.c'; else $(CYGPATH_W) '$(srcdir)/f_expf.c'; fi`
 
+lib_a-f_llrint.o: f_llrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrint.o `test -f 'f_llrint.c' || echo '$(srcdir)/'`f_llrint.c
+
+lib_a-f_llrint.obj: f_llrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrint.obj `if test -f 'f_llrint.c'; then $(CYGPATH_W) 'f_llrint.c'; else $(CYGPATH_W) '$(srcdir)/f_llrint.c'; fi`
+
+lib_a-f_llrintf.o: f_llrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrintf.o `test -f 'f_llrintf.c' || echo '$(srcdir)/'`f_llrintf.c
+
+lib_a-f_llrintf.obj: f_llrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrintf.obj `if test -f 'f_llrintf.c'; then $(CYGPATH_W) 'f_llrintf.c'; else $(CYGPATH_W) '$(srcdir)/f_llrintf.c'; fi`
+
+lib_a-f_llrintl.o: f_llrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrintl.o `test -f 'f_llrintl.c' || echo '$(srcdir)/'`f_llrintl.c
+
+lib_a-f_llrintl.obj: f_llrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_llrintl.obj `if test -f 'f_llrintl.c'; then $(CYGPATH_W) 'f_llrintl.c'; else $(CYGPATH_W) '$(srcdir)/f_llrintl.c'; fi`
+
+lib_a-f_lrint.o: f_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrint.o `test -f 'f_lrint.c' || echo '$(srcdir)/'`f_lrint.c
+
+lib_a-f_lrint.obj: f_lrint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrint.obj `if test -f 'f_lrint.c'; then $(CYGPATH_W) 'f_lrint.c'; else $(CYGPATH_W) '$(srcdir)/f_lrint.c'; fi`
+
+lib_a-f_lrintf.o: f_lrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrintf.o `test -f 'f_lrintf.c' || echo '$(srcdir)/'`f_lrintf.c
+
+lib_a-f_lrintf.obj: f_lrintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrintf.obj `if test -f 'f_lrintf.c'; then $(CYGPATH_W) 'f_lrintf.c'; else $(CYGPATH_W) '$(srcdir)/f_lrintf.c'; fi`
+
+lib_a-f_lrintl.o: f_lrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrintl.o `test -f 'f_lrintl.c' || echo '$(srcdir)/'`f_lrintl.c
+
+lib_a-f_lrintl.obj: f_lrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_lrintl.obj `if test -f 'f_lrintl.c'; then $(CYGPATH_W) 'f_lrintl.c'; else $(CYGPATH_W) '$(srcdir)/f_lrintl.c'; fi`
+
 lib_a-f_pow.o: f_pow.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_pow.o `test -f 'f_pow.c' || echo '$(srcdir)/'`f_pow.c
 
@@ -423,6 +474,24 @@ lib_a-f_powf.o: f_powf.c
 
 lib_a-f_powf.obj: f_powf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_powf.obj `if test -f 'f_powf.c'; then $(CYGPATH_W) 'f_powf.c'; else $(CYGPATH_W) '$(srcdir)/f_powf.c'; fi`
+
+lib_a-f_rint.o: f_rint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rint.o `test -f 'f_rint.c' || echo '$(srcdir)/'`f_rint.c
+
+lib_a-f_rint.obj: f_rint.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rint.obj `if test -f 'f_rint.c'; then $(CYGPATH_W) 'f_rint.c'; else $(CYGPATH_W) '$(srcdir)/f_rint.c'; fi`
+
+lib_a-f_rintf.o: f_rintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rintf.o `test -f 'f_rintf.c' || echo '$(srcdir)/'`f_rintf.c
+
+lib_a-f_rintf.obj: f_rintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rintf.obj `if test -f 'f_rintf.c'; then $(CYGPATH_W) 'f_rintf.c'; else $(CYGPATH_W) '$(srcdir)/f_rintf.c'; fi`
+
+lib_a-f_rintl.o: f_rintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rintl.o `test -f 'f_rintl.c' || echo '$(srcdir)/'`f_rintl.c
+
+lib_a-f_rintl.obj: f_rintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-f_rintl.obj `if test -f 'f_rintl.c'; then $(CYGPATH_W) 'f_rintl.c'; else $(CYGPATH_W) '$(srcdir)/f_rintl.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

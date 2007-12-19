@@ -1,3 +1,19 @@
+2007-12-19  Dave Korn  <dave.korn@artimi.com>
+	    Jeff Johnston  <jjohnstn@redhhat.com>
+
+	* libc/include/_ansi.h: Add _LONG_LONG definition.
+	* libc/include/math.h (llrint, llrintf, rintl, lrintl, llrintl): Add
+	prototypes.
+	* libc/machine/i386/machine/fastmath.h: Add support for new i386
+	fast math versions of rint, lrint, and llrint family functions.
+	* libm/machine/i386/Makefile.am: Add new files.
+	* libm/machine/i386/Makefile.in: Regenerated.
+	* libm/machine/i386/f_llrint.c, libm/machine/i386/f_lrint.c,
+	libm/machine/i386/f_rint.c, libm/machine/i386/f_llrintf.c,
+	libm/machine/i386/f_lrintf.c, libm/machine/i386/f_rintf.c,
+	libm/machine/i386/f_llrintl.c, libm/machine/i386/f_lrintl.c,
+	libm/machine/i386/f_rintl.c:  New files with fast math implementations.
+
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/features.h: Add checks for C90 compilers using
