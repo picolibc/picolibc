@@ -1,5 +1,9 @@
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* COPYING.LIBGLOSS: Update default copyright.
+
+2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* COPYING.NEWLIB: Update default copyright.
 
 2007-12-17  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
