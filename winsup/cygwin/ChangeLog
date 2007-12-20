@@ -1,3 +1,7 @@
+2007-12-20  Eric Blake  <ebb9@byu.net>
+
+	* libc/memmem.cc (memmem): Fix bug when searching for empty string.
+
 2007-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export wcpcpy, wcpncpy.

@@ -45,8 +45,8 @@ memmem (const void *l, size_t l_len,
   const char *cs = (const char *)s;
 
   /* we need something to compare */
-  if (l_len == 0 || s_len == 0)
-    return NULL;
+  if (s_len == 0)
+    return (void *) l;
 
   /* "s" must be smaller or equal to "l" */
   if (l_len < s_len)
