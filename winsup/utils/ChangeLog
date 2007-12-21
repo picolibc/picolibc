@@ -1,3 +1,12 @@
+2007-12-20  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in (cygcheck.exe): Don't link to ntdll.
+	* bloda.cc (pNtQuerySystemInformation): Add.
+	(pRtlAnsiStringToUnicodeString): Add.
+	(get_process_list): Use function pointers for NT functions.
+	(dump_dodgy_apps): Skip dodgy app check on non-NT platforms.
+	Use GetProcAddress for NT-specific functions.
+
 2007-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (opts): Add missing 'W'.
