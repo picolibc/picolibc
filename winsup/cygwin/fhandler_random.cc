@@ -12,6 +12,7 @@ details. */
 
 #include "winsup.h"
 #include <limits.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -34,6 +35,7 @@ fhandler_dev_random::open (int flags, mode_t)
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   nohandle (true);
   set_open_status ();
+  dummy_offset = 0;
   return 1;
 }
 
@@ -140,9 +142,31 @@ fhandler_dev_random::read (void *ptr, size_t& len)
 }
 
 _off64_t
-fhandler_dev_random::lseek (_off64_t, int)
+fhandler_dev_random::lseek (_off64_t off, int whence)
 {
-  return 0;
+  /* As on Linux, fake being able to set an offset.  The fact that neither
+     reading nor writing changes the dummy offset is also the same as on
+     Linux (tested with kernel 2.6.23). */
+  _off64_t new_off;
+
+  switch (whence)
+    {
+    case SEEK_SET:
+      new_off = off;
+      break;
+    case SEEK_CUR:
+      new_off = dummy_offset + off;
+      break;
+    default:
+      set_errno (EINVAL);
+      return (_off64_t) -1;
+    }
+  if (new_off < 0)
+    {
+      set_errno (EINVAL);
+      return (_off64_t) -1;
+    }
+  return dummy_offset = new_off;
 }
 
 int

@@ -1,3 +1,9 @@
+2007-12-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_random): Add dummy_offset member.
+	* fhandler_random.cc (fhandler_dev_random::lseek): Fake seeking
+	capability as on Linux.
+
 2007-12-20  Eric Blake  <ebb9@byu.net>
 
 	* libc/memmem.cc (memmem): Fix bug when searching for empty string.

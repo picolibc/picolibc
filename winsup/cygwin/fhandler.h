@@ -1090,6 +1090,7 @@ class fhandler_dev_random: public fhandler_base
  protected:
   HCRYPTPROV crypt_prov;
   long pseudo;
+  _off64_t dummy_offset;
 
   bool crypt_gen_random (void *ptr, size_t len);
   int pseudo_write (const void *ptr, size_t len);
