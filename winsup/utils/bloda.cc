@@ -104,13 +104,20 @@ static const size_t num_of_dodgy_apps = sizeof (big_list_of_dodgy_apps) / sizeof
   to be looked up at runtime and called through a pointer.  */
 VOID NTAPI (*pRtlFreeUnicodeString)(PUNICODE_STRING) = NULL;
 
+NTSTATUS NTAPI (*pNtQuerySystemInformation) (SYSTEM_INFORMATION_CLASS,
+                                             PVOID, ULONG, PULONG) = NULL;
+
+NTSTATUS NTAPI (*pRtlAnsiStringToUnicodeString) (PUNICODE_STRING, PANSI_STRING,
+                                               BOOLEAN) = NULL;
+
+
 static PSYSTEM_PROCESSES
 get_process_list (void)
 {
   int n_procs = 0x100;
   PSYSTEM_PROCESSES pslist = (PSYSTEM_PROCESSES) malloc (n_procs * sizeof *pslist);
 
-  while (NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+  while (pNtQuerySystemInformation (SystemProcessesAndThreadsInformation,
     pslist, n_procs * sizeof *pslist, 0) == STATUS_INFO_LENGTH_MISMATCH)
     {
       n_procs *= 2;
@@ -126,7 +133,7 @@ get_module_list (void)
   int modsize = 0x1000;
   PSYSTEM_MODULE_INFORMATION modlist = (PSYSTEM_MODULE_INFORMATION) malloc (modsize);
 
-  while (NtQuerySystemInformation (SystemModuleInformation,
+  while (pNtQuerySystemInformation (SystemModuleInformation,
     modlist, modsize, NULL) == STATUS_INFO_LENGTH_MISMATCH)
     {
       modsize *= 2;
@@ -284,19 +291,14 @@ detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESSES pslist, PSYST
       /* Equivalent of RtlInitAnsiString.  */
       ansiname.Length = ansiname.MaximumLength = strlen (det->param);
       ansiname.Buffer = (CHAR *) det->param;
-      rv = RtlAnsiStringToUnicodeString (&unicodename, &ansiname, TRUE);
+      rv = pRtlAnsiStringToUnicodeString (&unicodename, &ansiname, TRUE);
       if (rv != STATUS_SUCCESS)
         {
           printf ("Ansi to unicode conversion failure $%08x\n", (unsigned int) rv);
           break;
         }
       found = find_process_in_list (pslist, &unicodename);
-      if (!pRtlFreeUnicodeString)
-          pRtlFreeUnicodeString = (VOID NTAPI (*)(PUNICODE_STRING)) GetProcAddress (LoadLibrary ("ntdll.dll"), "RtlFreeUnicodeString");
-      if (pRtlFreeUnicodeString)
-        pRtlFreeUnicodeString (&unicodename);
-      else
-        printf ("leaking mem...oops\n");
+      pRtlFreeUnicodeString (&unicodename);
       if (found)
         {
           dbg_printf (("found!\n"));
@@ -337,6 +339,25 @@ dump_dodgy_apps (int verbose)
   size_t i, n_det = 0;
   PSYSTEM_PROCESSES pslist;
   PSYSTEM_MODULE_INFORMATION modlist;
+  HMODULE ntdll;
+
+  if ((ntdll = LoadLibrary ("ntdll.dll")) == NULL)
+    {
+      puts ("Skipping dodgy app check on Win9x/ME.");
+      return;
+    }
+
+#define GPA(func,rv) \
+      if ((p##func = (rv) GetProcAddress (ntdll, #func)) == NULL) \
+        { \
+          puts ("Can't GetProcAddress() for " #func ", " \
+                "skipping dodgy app check."); \
+          return; \
+        }
+  GPA(NtQuerySystemInformation, NTSTATUS NTAPI (*) (SYSTEM_INFORMATION_CLASS,PVOID,ULONG,PULONG));
+  GPA(RtlFreeUnicodeString, VOID NTAPI (*)(PUNICODE_STRING));
+  GPA(RtlAnsiStringToUnicodeString, NTSTATUS NTAPI (*)(PUNICODE_STRING,PANSI_STRING,BOOLEAN));
+#undef GPA
 
   /* Read system info for detect testing.  */
   pslist = get_process_list ();
