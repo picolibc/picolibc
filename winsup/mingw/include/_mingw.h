@@ -188,8 +188,8 @@ allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
 # define __MSVCRT_VERSION__ 0x0600
 #endif
 
-#define __MINGW32_VERSION 3.13
+#define __MINGW32_VERSION 3.14
 #define __MINGW32_MAJOR_VERSION 3
-#define __MINGW32_MINOR_VERSION 13
+#define __MINGW32_MINOR_VERSION 14
 
 #endif /* __MINGW_H */

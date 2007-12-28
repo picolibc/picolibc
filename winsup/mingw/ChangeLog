@@ -1,3 +1,7 @@
+2007-12-27 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.14.
+
 2007-11-26  Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Add libmsvcr90.a and libmsvcr90d.a targets.
