@@ -1,3 +1,8 @@
+2007-12-27  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.11.
+	* Makefile.in: Ditto.
+
 2007-12-11  Dave Korn  <dave.korn@artimi.com>
 
 	* include/wincrypt.h (PCRYPT_DECODE_PARA):  Add missing typedef.
