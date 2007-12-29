@@ -633,6 +633,10 @@ of poorly written firewall-type software that causes things to break.
 Note that with many of these products, simply disabling the firewall
 does not remove these changes; it must be completely uninstalled.
 </para>
+<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+for a list of applications that have been known, at one time or another, to 
+interfere with the normal functioning of Cygwin.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.sharing-files">
@@ -781,6 +785,10 @@ software completely, it may be possible to specify directories whose
 contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
+</para>
+<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+for a list of applications that have been known, at one time or another, to
+interfere with the normal functioning of Cygwin.
 </para>
 </answer></qandaentry>
 
@@ -950,3 +958,86 @@ means they do not understand Cygwin mounts or symbolic links.
 elsewhere in this FAQ.
 </para></answer></qandaentry>
 
+<qandaentry id="faq.using.bloda">
+<question><para>What applications have been found to interfere with Cygwin?</para></question>
+<answer>
+
+<para>From time to time, people have reported strange failures and problems in
+Cygwin and Cygwin packages that seem to have no rational explanation.  Among
+the most common symptoms they report are fork failures, memory leaks, and file
+access denied problems.  These problems, when they have been traced, often appear
+to be caused by interference from other software installed on the same PC.  Security
+software, in particular, such as anti-virus, anti-spyware, and firewall applications,
+often implements its functions by installing hooks into various parts of the system,
+including both the Explorer shell and the underlying kernel.  Sometimes these hooks
+are not implemented in an entirely transparent fashion, and cause changes in the
+behaviour which affect the operation of other programs, such as Cygwin.
+</para>
+<para>Among the software that has been found to cause difficulties are:</para>
+<para><itemizedlist>
+<listitem><para>Sonic Solutions burning software containing DLA component</para></listitem>
+<listitem><para>Norton/MacAffee/Symantec antivirus or antispyware</para></listitem>
+<listitem><para>Logitech webcam software with "Logitech process monitor" service</para></listitem>
+<listitem><para>Kerio, Agnitum or ZoneAlarm Personal Firewall</para></listitem>
+<listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
+<listitem><para>LanDesk</para></listitem>
+<listitem><para>Windows Defender </para></listitem>
+<listitem><para>Embassy Trust Suite fingerprint reader software wxvault.dll</para></listitem>
+<listitem><para>NOD32 Antivirus</para></listitem>
+<listitem><para>ByteMobile laptop optimization client</para></listitem>
+</itemizedlist></para>
+<para>Sometimes these problems can be worked around, by temporarily or partially
+disabling the offending software.  For instance, it may be possible to disable
+on-access scanning in your antivirus, or configure it to ignore files under the
+Cygwin installation root.  Often, unfortunately, this is not possible; even disabling
+the software may not work, since many applications that hook the operating system
+leave their hooks installed when disabled, and simply set them into what is intended
+to be a completely transparent pass-through mode.  Sometimes this pass-through is not
+as transparent as all that, and the hooks still interfere with Cygwin; in these cases,
+it may be necessary to uninstall the software altogether to restore normal operation.
+</para>
+<para>Some of the symptoms you may experience are:</para>
+<para><itemizedlist>
+<listitem>
+<para>Random fork() failures.</para>
+<para>Caused by hook DLLs that load themselves into every process in the
+system.  POSIX fork() semantics require that the memory map of the child process
+must be an exact duplicate of the parent process' layout.  If one of these DLLs
+loads itself at a different base address in the child's memory space as compared
+to the address it was loaded at in the parent, it can end up taking the space that
+belonged to a different DLL in the parent.  When Cygwin can't load the original
+DLL at that same address in the child, the fork() call has to fail.
+</para>
+</listitem>
+<listitem>
+<para>File access problems.</para>
+<para>Some programs (e.g., virus scanners with on-access scanning) scan or
+otherwise operate on every file accessed by all the other software running on
+your computer.  In some cases they may retain an open handle on the file even
+after the software that is really using the file has closed it.  This has been
+known to cause operations such as deletes, renames and moves to fail with
+access denied errors.  In extreme cases it has been known for scanners to leak
+file handles, leading to kernel memory starvation.
+</para>
+</listitem>
+<listitem>
+<para>Networking issues</para>
+<para>Firewall software sometimes gets a bit funny about Cygwin.  It's not
+currently understood why; Cygwin only uses the standard Winsock2 API, but
+perhaps in some less-commonly used fashion that doesn't get as well tested
+by the publishers of firewalls.  Symptoms include mysterious failures to
+connect, or corruption of network data being sent or received.</para>
+</listitem>
+<listitem>
+<para>Memory and/or handle leaks</para>
+<para>Some applications that hook into the Windows operating system exhibit
+bugs when interacting with Cygwin that cause them to leak allocated memory
+or other system resources.  Symptoms include complaints about out-of-memory
+errors and even virtual memory exhaustion dialog boxes from the O/S; it is
+often possible to see the excess memory allocation using a tool such as
+Task Manager or Sysinternals' Process Explorer, although interpreting the
+statistics they present is not always straightforward owing to complications
+such as virtual memory paging and file caching.</para>
+</listitem>
+</itemizedlist></para>
+</answer></qandaentry>

@@ -155,6 +155,10 @@ disk if you are paranoid.
 <para>This should be safe, but only if Cygwin Setup is not substituted by
 something malicious, and no mirror has been compromised.
 </para>
+<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+for a list of applications that have been known, at one time or another, to
+interfere with the normal functioning of Cygwin.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.setup.what-packages">
