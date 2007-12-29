@@ -1,3 +1,9 @@
+2007-12-29  Dave Korn  <dave.korn@artimi.com>
+
+	* bloda.cc (enum bad_app):  Add BYTEMOBILE.
+	(dodgy_app_detects[]):  Add FILENAME entry to detect bmnet.dll.
+	(big_list_of_dodgy_apps[]):  Add description for BYTEMOBILE.
+
 2007-12-20  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in (cygcheck.exe): Don't link to ntdll.

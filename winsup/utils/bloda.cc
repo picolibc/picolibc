@@ -41,13 +41,19 @@
     LanDesk
     Windows Defender 
     Embassy Trust Suite fingerprint reader software containing wxvault.dll
+    ByteMobile laptop optimization client
+
+  A live version is now being maintained in the Cygwin FAQ, at
+    http://cygwin.com/faq/faq.using.html#faq.using.bloda
+
 */
 
 enum bad_app
 {
   SONIC,    NORTON,  MACAFFEE,    SYMANTEC,
   LOGITECH, KERIO,   AGNITUM,     ZONEALARM,
-  IOLO,     LANDESK, WINDEFENDER, EMBASSYTS
+  IOLO,     LANDESK, WINDEFENDER, EMBASSYTS,
+  BYTEMOBILE
 };
 
 struct bad_app_info
@@ -78,6 +84,7 @@ static const struct bad_app_det dodgy_app_detects[] =
   { HKLMKEY,     "SYSTEM\\CurrentControlSet\\Services\\lvprcsrv",                LOGITECH   },
   { PROCESSNAME, "LVPrcSrv.exe",                                                 LOGITECH   },
   { FILENAME,    "%programfiles%\\common files\\logitech\\lvmvfm\\LVPrcSrv.exe", LOGITECH   },
+  { FILENAME,    "%windir%\\System32\\bmnet.dll",                                BYTEMOBILE },
 }; 
 
 static const size_t num_of_detects = sizeof (dodgy_app_detects) / sizeof (dodgy_app_detects[0]);
@@ -96,6 +103,7 @@ static struct bad_app_info big_list_of_dodgy_apps[] =
   { LANDESK,     "Landesk"                                                                },
   { WINDEFENDER, "Windows Defender"                                                       },
   { EMBASSYTS,   "Embassy Trust Suite fingerprint reader software containing wxvault.dll" },
+  { BYTEMOBILE,  "ByteMobile laptop optimization client"                                  },
 };
 
 static const size_t num_of_dodgy_apps = sizeof (big_list_of_dodgy_apps) / sizeof (big_list_of_dodgy_apps[0]);
