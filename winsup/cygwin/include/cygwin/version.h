@@ -319,12 +319,15 @@ details. */
       176: Export wcstol, wcstoll, wcstoul, wcstoull, wcsxfrm.
       177: Export sys_sigabbrev
       178: Export wcpcpy, wcpncpy.
+      179: Export _f_llrint, _f_llrintf, _f_llrintl, _f_lrint, _f_lrintf,
+	   _f_lrintl, _f_rint, _f_rintf, _f_rintl, llrint, llrintf, llrintl,
+	   rintl, lrintl, and redirect exports of lrint, lrintf, rint, rintf.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 178
+#define CYGWIN_VERSION_API_MINOR 179
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

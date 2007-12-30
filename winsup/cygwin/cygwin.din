@@ -377,6 +377,9 @@ _f_ldexp NOSIGFE
 __f_ldexp = _f_ldexp NOSIGFE
 _f_ldexpf NOSIGFE
 __f_ldexpf = _f_ldexpf NOSIGFE
+_f_llrint NOSIGFE
+_f_llrintf NOSIGFE
+_f_llrintl NOSIGFE
 _f_log NOSIGFE
 __f_log = _f_log NOSIGFE
 _f_log10 NOSIGFE
@@ -385,10 +388,16 @@ _f_log10f NOSIGFE
 __f_log10f = _f_log10f NOSIGFE
 _f_logf NOSIGFE
 __f_logf = _f_logf NOSIGFE
+_f_lrint NOSIGFE
+_f_lrintf NOSIGFE
+_f_lrintl NOSIGFE
 _f_pow NOSIGFE
 __f_pow = _f_pow NOSIGFE
 _f_powf NOSIGFE
 __f_powf = _f_powf NOSIGFE
+_f_rint NOSIGFE
+_f_rintf NOSIGFE
+_f_rintl NOSIGFE
 _f_tan NOSIGFE
 __f_tan = _f_tan NOSIGFE
 _f_tanf NOSIGFE
@@ -845,6 +854,9 @@ _link = link SIGFE
 listen = cygwin_listen SIGFE
 llabs NOSIGFE
 lldiv NOSIGFE
+llrint = _f_llrint NOSIGFE
+llrintf = _f_llrintf NOSIGFE
+llrintl = _f_llrintl NOSIGFE
 localeconv NOSIGFE
 _localeconv = localeconv NOSIGFE
 localtime SIGFE
@@ -875,8 +887,9 @@ longjmp NOSIGFE
 _longjmp = longjmp NOSIGFE
 lrand48 NOSIGFE
 _lrand48 = lrand48 NOSIGFE
-lrint NOSIGFE
-lrintf NOSIGFE
+lrint = _f_lrint NOSIGFE
+lrintf = _f_lrintf NOSIGFE
+lrintl = _f_lrintl NOSIGFE
 lround NOSIGFE
 lroundf NOSIGFE
 lsearch NOSIGFE
@@ -1199,10 +1212,9 @@ _rewinddir = rewinddir SIGFE
 rexec = cygwin_rexec SIGFE
 rindex NOSIGFE
 _rindex = rindex NOSIGFE
-rint NOSIGFE
-_rint = rint NOSIGFE
-rintf NOSIGFE
-_rintf = rintf NOSIGFE
+rint = _f_rint NOSIGFE
+rintf = _f_rintf NOSIGFE
+rintl = _f_rintl NOSIGFE
 rmdir SIGFE
 _rmdir = rmdir SIGFE
 round NOSIGFE

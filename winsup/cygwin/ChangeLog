@@ -1,3 +1,12 @@
+2007-12-30  Dave Korn  <dave.korn@artimi.com>
+
+	* cygwin.din (_f_llrint, _f_llrintf, _f_llrintl, _f_lrint, _f_lrintf,
+	_f_lrintl, _f_rint, _f_rintf, _f_rintl):  Export fast *rint* functions.
+	(lrint, lrintf, rint, rintf):  Redirect exports to alias _f_ versions.
+	(llrint, llrintf, llrintl, lrintl, rintl):  Add exports aliasing _f_*
+	versions likewise.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR):  Bump.
+
 2007-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_random): Add dummy_offset member.
