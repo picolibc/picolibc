@@ -1,3 +1,7 @@
+2008-01-01  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Updated copyright notices for most files.
+
 2007-10-15  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* sim-ppc.h (sim_spr_register_name): New prototype.
