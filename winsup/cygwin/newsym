@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 lib=$1; shift
 as=$1; shift
 ar=$1; shift
@@ -8,17 +8,23 @@ mkdir newsym.dir
 while [ -n "$1" ]; do
     newsym=$1; shift
     oldsym=$1; shift
-    cat <<EOF > newsym.dir/$newsym.s
-	.section .text
+    if [[ "$newsym" = *:d ]]; then
+	newsym=${newsym%:d}
+    else
+	cat <<EOF
+	.text
 	.global	_$newsym
-	.global	__imp__$newsym
 _$newsym:
 	jmp	*__imp__$oldsym
+EOF
+    fi > newsym.dir/$newsym.s
 
+    cat <<EOF >> newsym.dir/$newsym.s
 	.section .idata\$7
 	.long	__head_cygwin1_dll
 
-	.section        .idata\$5
+	.section .idata\$5
+	.global	__imp__$newsym
 __imp__$newsym:	.rva    1f
 
 	.section .idata\$4

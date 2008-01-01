@@ -227,31 +227,8 @@ tty_list::allocate (bool with_console)
     console = NULL;
   else if (!(console = GetConsoleWindow ()))
     {
-      char oldtitle[TITLESIZE];
-
-      if (!GetConsoleTitle (oldtitle, TITLESIZE))
-	{
-	  termios_printf ("Can't read console title");
-	  goto out;
-	}
-
-      char buf[40];
-
-      __small_sprintf (buf, "cygwin.find.console.%d", myself->pid);
-      SetConsoleTitle (buf);
-      for (int times = 0; times < 25; times++)
-	{
-	  Sleep (10);
-	  if ((console = FindWindow (NULL, buf)))
-	    break;
-	}
-      SetConsoleTitle (oldtitle);
-      Sleep (40);
-      if (console == NULL)
-	{
-	  termios_printf ("Can't find console window");
-	  goto out;
-	}
+      termios_printf ("Can't find console window");
+      goto out;
     }
 
   /* Is a tty allocated for console? */

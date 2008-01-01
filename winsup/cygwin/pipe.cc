@@ -156,7 +156,7 @@ out:
 
 #define WINPIPE "\\\\.\\pipe\\"
 void
-fhandler_pipe::init (HANDLE f, DWORD a, mode_t bin)
+fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
 {
   // FIXME: Have to clean this up someday
   if (!*get_win32_name () && get_name ())
@@ -181,7 +181,9 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t bin)
       f = ps.ret_handle;
     }
 
-  fhandler_base::init (f, a, bin);
+  fhandler_base::init (f, a, mode);
+  if (mode & O_NOINHERIT)
+    close_on_exec (true);
   setup_overlapped ();
 }
 
@@ -424,25 +426,22 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 {
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
-  int res = -1;
+  int res;
 
   int ret = create_selectable (sa, r, w, psize);
   if (ret)
-    __seterrno_from_win_error (ret);
+    {
+      __seterrno_from_win_error (ret);
+      res = -1;
+    }
   else
     {
       fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev);
       fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
 
-      int binmode = mode & O_TEXT ?: O_BINARY;
-      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, binmode);
-      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, binmode);
-      if (mode & O_NOINHERIT)
-       {
-	 fhs[0]->close_on_exec (true);
-	 fhs[1]->close_on_exec (true);
-       }
-
+      mode |= mode & O_TEXT ?: O_BINARY;
+      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode);
+      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode);
       res = 0;
     }
 
