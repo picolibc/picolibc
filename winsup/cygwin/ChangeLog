@@ -1,5 +1,10 @@
 2008-01-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* tty.cc: Update copyright.
+	* pipe.cc: Ditto.
+
+2008-01-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* newsym: First stab at understanding data as well as functions.
 
 	* pipe.cc (fhandler_pipe::init): Move more intelligence here.
