@@ -58,13 +58,13 @@ lib_a_LIBADD =
 am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-impure.$(OBJEXT) lib_a-fcntlr.$(OBJEXT) \
 	lib_a-fstatr.$(OBJEXT) lib_a-getreent.$(OBJEXT) \
-	lib_a-gettimeofdayr.$(OBJEXT) lib_a-linkr.$(OBJEXT) \
-	lib_a-lseekr.$(OBJEXT) lib_a-openr.$(OBJEXT) \
-	lib_a-readr.$(OBJEXT) lib_a-renamer.$(OBJEXT) \
-	lib_a-signalr.$(OBJEXT) lib_a-signgam.$(OBJEXT) \
-	lib_a-sbrkr.$(OBJEXT) lib_a-statr.$(OBJEXT) \
-	lib_a-timesr.$(OBJEXT) lib_a-unlinkr.$(OBJEXT) \
-	lib_a-writer.$(OBJEXT)
+	lib_a-gettimeofdayr.$(OBJEXT) lib_a-isattyr.$(OBJEXT) \
+	lib_a-linkr.$(OBJEXT) lib_a-lseekr.$(OBJEXT) \
+	lib_a-openr.$(OBJEXT) lib_a-readr.$(OBJEXT) \
+	lib_a-renamer.$(OBJEXT) lib_a-signalr.$(OBJEXT) \
+	lib_a-signgam.$(OBJEXT) lib_a-sbrkr.$(OBJEXT) \
+	lib_a-statr.$(OBJEXT) lib_a-timesr.$(OBJEXT) \
+	lib_a-unlinkr.$(OBJEXT) lib_a-writer.$(OBJEXT)
 @HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-open64r.$(OBJEXT)
@@ -81,9 +81,9 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libreent_la_LIBADD =
 am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
-	getreent.lo gettimeofdayr.lo linkr.lo lseekr.lo openr.lo \
-	readr.lo renamer.lo signalr.lo signgam.lo sbrkr.lo statr.lo \
-	timesr.lo unlinkr.lo writer.lo
+	getreent.lo gettimeofdayr.lo isattyr.lo linkr.lo lseekr.lo \
+	openr.lo readr.lo renamer.lo signalr.lo signgam.lo sbrkr.lo \
+	statr.lo timesr.lo unlinkr.lo writer.lo
 @HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
 @HAVE_STDIO64_DIR_TRUE@	open64r.lo
 am__objects_8 = $(am__objects_7)
@@ -295,6 +295,7 @@ GENERAL_SOURCES = \
 	fstatr.c \
 	getreent.c \
 	gettimeofdayr.c \
+	isattyr.c \
 	linkr.c \
 	lseekr.c \
 	openr.c \
@@ -448,6 +449,12 @@ lib_a-gettimeofdayr.o: gettimeofdayr.c
 
 lib_a-gettimeofdayr.obj: gettimeofdayr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettimeofdayr.obj `if test -f 'gettimeofdayr.c'; then $(CYGPATH_W) 'gettimeofdayr.c'; else $(CYGPATH_W) '$(srcdir)/gettimeofdayr.c'; fi`
+
+lib_a-isattyr.o: isattyr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.o `test -f 'isattyr.c' || echo '$(srcdir)/'`isattyr.c
+
+lib_a-isattyr.obj: isattyr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isattyr.obj `if test -f 'isattyr.c'; then $(CYGPATH_W) 'isattyr.c'; else $(CYGPATH_W) '$(srcdir)/isattyr.c'; fi`
 
 lib_a-linkr.o: linkr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-linkr.o `test -f 'linkr.c' || echo '$(srcdir)/'`linkr.c

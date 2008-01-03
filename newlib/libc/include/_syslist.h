@@ -11,6 +11,7 @@
 #define _fstat fstat
 #define _getpid getpid
 #define _gettimeofday gettimeofday
+#define _isatty isatty
 #define _kill kill
 #define _link link
 #define _lseek lseek

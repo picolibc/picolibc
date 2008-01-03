@@ -1,3 +1,32 @@
+2008-01-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	Make isatty syscall handling consistent with other newlib syscalls.
+
+	* libc/include/_syslist.h: Add _isatty.
+	* libc/include/reent.h: Add _isatty_r.
+	* libc/include/sys/unistd.h: Add _isatty.
+	* libc/posix/Makefile.am: Add new _isatty.c file.
+	* libc/posix/Makefile.in: Regenerated.
+	* libc/posix/_isatty.c: New file.
+	* libc/posix/isatty.c: Changed to call _isatty().
+	* libc/reent/Makefile.am: Add new isattyr.c file.
+	* libc/reent/Makefile.in: Regenerated.
+	* libc/reent/isattyr.c: New file.
+	* libc/stdio/freopen.c: Changed to call _isatty_r().
+	* libc/stdio/makebuf.c: Ditto.
+	* libc/sys/a29khif/_isatty.S: Change isatty to _isatty.
+	* libc/sys/arc/isatty.c: Ditto.
+	* libc/sys/arm/syscalls.c: Ditto.
+	* libc/sys/d10v/syscalls.c: Ditto.
+	* libc/sys/h8300hms/syscalls.c: Ditto.
+	* libc/sys/h8500hms/syscalls.c: Ditto.
+	* libc/sys/linux/Makefile.am: Add new isatty.c file.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/isatty.c: New file.
+	* libc/syscalls/Makefile.am: Add new sysisatty.c file.
+	* libc/syscalls/Makefile.in: Regenerated.
+	* libc/syscalls/sysisatty.c: New file.
+
 2008-01-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/syscalls/sysclose.c: Always call reentrant version of the

@@ -47,6 +47,7 @@ GENERAL_SOURCES = \
 	inode.c \
 	io.c \
 	ipc.c \
+	isatty.c \
 	linux.c \
 	mallinfor.c \
 	malloc.c \

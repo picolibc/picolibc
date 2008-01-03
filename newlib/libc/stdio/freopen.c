@@ -167,7 +167,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
       /*
        * F_SETFL doesn't change textmode.  Don't mess with modes of ttys.
        */
-      if (0 <= f && ! isatty (f)
+      if (0 <= f && ! _isatty_r (ptr, f)
 	  && setmode (f, oflags & (O_BINARY | O_TEXT)) == -1)
 	f = -1;
 #endif

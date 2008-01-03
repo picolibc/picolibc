@@ -20,7 +20,7 @@
 /* Forward prototypes.  */
 int     _system     _PARAMS ((const char *));
 int     _rename     _PARAMS ((const char *, const char *));
-int     isatty		_PARAMS ((int));
+int     _isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, void *));
 void    _raise 		_PARAMS ((void));
@@ -612,7 +612,7 @@ _times (struct tms * tp)
 
 
 int
-isatty (int fd)
+_isatty (int fd)
 {
 #ifdef ARM_RDI_MONITOR
   int fh = remap_handle (fd);

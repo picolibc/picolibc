@@ -64,7 +64,7 @@ _unlink ()
 }
 
 int
-isatty (int fd)
+_isatty (int fd)
 {
   return 1;
 }

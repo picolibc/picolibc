@@ -56,10 +56,11 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-creat.$(OBJEXT) \
-	lib_a-isatty.$(OBJEXT) lib_a-opendir.$(OBJEXT) \
-	lib_a-readdir.$(OBJEXT) lib_a-readdir_r.$(OBJEXT) \
-	lib_a-rewinddir.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT)
+	lib_a-_isatty.$(OBJEXT) lib_a-isatty.$(OBJEXT) \
+	lib_a-opendir.$(OBJEXT) lib_a-readdir.$(OBJEXT) \
+	lib_a-readdir_r.$(OBJEXT) lib_a-rewinddir.$(OBJEXT) \
+	lib_a-sleep.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
+	lib_a-telldir.$(OBJEXT)
 am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
 am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
 	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
@@ -77,8 +78,9 @@ am__objects_4 = lib_a-popen.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libposix_la_LIBADD =
-am__objects_6 = closedir.lo creat.lo isatty.lo opendir.lo readdir.lo \
-	readdir_r.lo rewinddir.lo sleep.lo usleep.lo telldir.lo
+am__objects_6 = closedir.lo creat.lo _isatty.lo isatty.lo opendir.lo \
+	readdir.lo readdir_r.lo rewinddir.lo sleep.lo usleep.lo \
+	telldir.lo
 am__objects_7 = scandir.lo seekdir.lo
 am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
 	execvp.lo
@@ -270,7 +272,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-	closedir.c creat.c isatty.c \
+	closedir.c creat.c _isatty.c isatty.c \
 	opendir.c readdir.c \
 	readdir_r.c rewinddir.c sleep.c usleep.c \
 	telldir.c
@@ -380,6 +382,12 @@ lib_a-creat.o: creat.c
 
 lib_a-creat.obj: creat.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.obj `if test -f 'creat.c'; then $(CYGPATH_W) 'creat.c'; else $(CYGPATH_W) '$(srcdir)/creat.c'; fi`
+
+lib_a-_isatty.o: _isatty.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_isatty.o `test -f '_isatty.c' || echo '$(srcdir)/'`_isatty.c
+
+lib_a-_isatty.obj: _isatty.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_isatty.obj `if test -f '_isatty.c'; then $(CYGPATH_W) '_isatty.c'; else $(CYGPATH_W) '$(srcdir)/_isatty.c'; fi`
 
 lib_a-isatty.o: isatty.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isatty.o `test -f 'isatty.c' || echo '$(srcdir)/'`isatty.c

@@ -10,6 +10,7 @@ GENERAL_SOURCES = \
 	sysfstat.c	\
 	sysgetpid.c	\
 	sysgettod.c	\
+	sysisatty.c	\
 	syskill.c	\
 	syslink.c	\
 	syslseek.c	\

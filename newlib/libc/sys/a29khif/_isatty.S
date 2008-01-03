@@ -4,10 +4,8 @@ gcc2_compiled.:
 	.text
 	.align 4
 	.global __isatty
-	.global _isatty
 	.word 0x30000
 __isatty:
-_isatty:
 	sub gr1,gr1,16
 	asgeu V_SPILL,gr1,gr126
 	add lr1,gr1,28

@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
-	closedir.c creat.c isatty.c \
+	closedir.c creat.c _isatty.c isatty.c \
 	opendir.c readdir.c \
 	readdir_r.c rewinddir.c sleep.c usleep.c \
 	telldir.c

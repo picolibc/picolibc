@@ -107,7 +107,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
       fp->_flags |= __SMBF;
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;
-      if (couldbetty && isatty (fp->_file))
+      if (couldbetty && _isatty_r (ptr, fp->_file))
 	fp->_flags |= __SLBF;
     }
 }

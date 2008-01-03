@@ -46,7 +46,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../../libtool.m4 \
 	$(top_srcdir)/../../ltoptions.m4 \
 	$(top_srcdir)/../../ltsugar.m4 \
 	$(top_srcdir)/../../ltversion.m4 $(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/../confsubdir.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
@@ -57,12 +57,12 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-sysclose.$(OBJEXT) lib_a-sysfcntl.$(OBJEXT) \
 	lib_a-sysfstat.$(OBJEXT) lib_a-sysgetpid.$(OBJEXT) \
-	lib_a-sysgettod.$(OBJEXT) lib_a-syskill.$(OBJEXT) \
-	lib_a-syslink.$(OBJEXT) lib_a-syslseek.$(OBJEXT) \
-	lib_a-sysopen.$(OBJEXT) lib_a-sysread.$(OBJEXT) \
-	lib_a-syssbrk.$(OBJEXT) lib_a-sysstat.$(OBJEXT) \
-	lib_a-systimes.$(OBJEXT) lib_a-sysunlink.$(OBJEXT) \
-	lib_a-syswrite.$(OBJEXT)
+	lib_a-sysgettod.$(OBJEXT) lib_a-sysisatty.$(OBJEXT) \
+	lib_a-syskill.$(OBJEXT) lib_a-syslink.$(OBJEXT) \
+	lib_a-syslseek.$(OBJEXT) lib_a-sysopen.$(OBJEXT) \
+	lib_a-sysread.$(OBJEXT) lib_a-syssbrk.$(OBJEXT) \
+	lib_a-sysstat.$(OBJEXT) lib_a-systimes.$(OBJEXT) \
+	lib_a-sysunlink.$(OBJEXT) lib_a-syswrite.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_2 = lib_a-sysexecve.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	lib_a-sysfork.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	lib_a-syswait.$(OBJEXT)
@@ -72,9 +72,9 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsyscalls_la_LIBADD =
 am__objects_3 = sysclose.lo sysfcntl.lo sysfstat.lo sysgetpid.lo \
-	sysgettod.lo syskill.lo syslink.lo syslseek.lo sysopen.lo \
-	sysread.lo syssbrk.lo sysstat.lo systimes.lo sysunlink.lo \
-	syswrite.lo
+	sysgettod.lo sysisatty.lo syskill.lo syslink.lo syslseek.lo \
+	sysopen.lo sysread.lo syssbrk.lo sysstat.lo systimes.lo \
+	sysunlink.lo syswrite.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_4 = sysexecve.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@	sysfork.lo syswait.lo
 @USE_LIBTOOL_TRUE@am_libsyscalls_la_OBJECTS = $(am__objects_3) \
@@ -200,15 +200,8 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -224,6 +217,9 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 extra_dir = @extra_dir@
 host = @host@
@@ -231,12 +227,14 @@ host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 lt_ECHO = @lt_ECHO@
@@ -246,8 +244,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
@@ -262,6 +262,7 @@ GENERAL_SOURCES = \
 	sysfstat.c	\
 	sysgetpid.c	\
 	sysgettod.c	\
+	sysisatty.c	\
 	syskill.c	\
 	syslink.c	\
 	syslseek.c	\
@@ -389,6 +390,12 @@ lib_a-sysgettod.o: sysgettod.c
 
 lib_a-sysgettod.obj: sysgettod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysgettod.obj `if test -f 'sysgettod.c'; then $(CYGPATH_W) 'sysgettod.c'; else $(CYGPATH_W) '$(srcdir)/sysgettod.c'; fi`
+
+lib_a-sysisatty.o: sysisatty.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysisatty.o `test -f 'sysisatty.c' || echo '$(srcdir)/'`sysisatty.c
+
+lib_a-sysisatty.obj: sysisatty.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sysisatty.obj `if test -f 'sysisatty.c'; then $(CYGPATH_W) 'sysisatty.c'; else $(CYGPATH_W) '$(srcdir)/sysisatty.c'; fi`
 
 lib_a-syskill.o: syskill.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-syskill.o `test -f 'syskill.c' || echo '$(srcdir)/'`syskill.c
