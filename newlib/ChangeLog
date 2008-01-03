@@ -1,3 +1,25 @@
+2008-01-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/syscalls/sysclose.c: Always call reentrant version of the
+	underlying syscall since one is guaranteed to exist in libc/reent.
+	* libc/syscalls/sysexecve.c: Ditto.
+	* libc/syscalls/sysfcntl.c: Ditto.
+	* libc/syscalls/sysfork.c: Ditto.
+	* libc/syscalls/sysfstat.c: Ditto.
+	* libc/syscalls/sysgetpid.c: Ditto.
+	* libc/syscalls/sysgettod.c: Ditto.
+	* libc/syscalls/syskill.c: Ditto.
+	* libc/syscalls/syslink.c: Ditto.
+	* libc/syscalls/syslseek.c: Ditto.
+	* libc/syscalls/sysopen.c: Ditto.
+	* libc/syscalls/sysread.c: Ditto.
+	* libc/syscalls/syssbrk.c: Ditto.
+	* libc/syscalls/sysstat.c: Ditto.
+	* libc/syscalls/systimes.c: Ditto.
+	* libc/syscalls/sysunlink.c: Ditto.
+	* libc/syscalls/syswait.c: Ditto.
+	* libc/syscalls/syswrite.c: Ditto.
+
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
         * NEWS: Update with 1.16.0 info.

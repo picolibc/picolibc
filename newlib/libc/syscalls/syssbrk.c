@@ -10,9 +10,5 @@ void *
 _DEFUN (sbrk, (incr),
      ptrdiff_t incr)
 {
-#ifdef REENTRANT_SYSCALLS_PROVIDED
   return _sbrk_r (_REENT, incr);
-#else
-  return _sbrk (incr);
-#endif
 }

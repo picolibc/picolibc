@@ -9,9 +9,5 @@ _DEFUN (lseek, (fd, pos, whence),
      off_t pos _AND
      int whence)
 {
-#ifdef REENTRANT_SYSCALLS_PROVIDED
   return _lseek_r (_REENT, fd, pos, whence);
-#else
-  return _lseek (fd, pos, whence);
-#endif
 }
