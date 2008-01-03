@@ -211,7 +211,7 @@ _times (struct tms * tp)
 }
 
 int
-isatty (int fd)
+_isatty (int fd)
 {
   return 1;
 }

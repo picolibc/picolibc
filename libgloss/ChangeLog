@@ -1,3 +1,18 @@
+2008-01-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/redboot-syscalls.c: Consistently supply _isatty if syscalls
+	dir is used in newlib.
+	* bfin/syscalls.c: Ditto.
+	* cris/gensyscalls: Ditto.
+	* fr30/syscalls.c: Ditto.
+	* frv/isatty.c: Ditto.
+	* iq2000/isatty.c: Ditto.
+	* libnosys/isatty.c: Ditto.
+	* m32r/isatty.c: Ditto.
+	* mn10200/isatty.c: Ditto.
+	* mn10300/isatty.c: Ditto.
+	* xstormy16/isatty.c: New file with _isatty function.
+
 2007-12-01  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris/Makefile.in (crt0.o): Add CFLAGS when compiling crt0.S.

@@ -1,6 +1,6 @@
 /* isatty.c -- chek the terminal device.
  * 
- * Copyright (c) 2002 Red Hat, Inc
+ * Copyright (c) 1995 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
