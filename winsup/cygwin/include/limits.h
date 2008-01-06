@@ -289,7 +289,7 @@ details. */
 
 /* Maximum number of characters in a tty name. */
 #undef TTY_NAME_MAX
-#define TTY_NAME_MAX 12
+#define TTY_NAME_MAX 32
 
 /* Maximum number of bytes supported for the name of a timezone (not of the TZ variable).  Not implemented. */
 #undef TZNAME_MAX
