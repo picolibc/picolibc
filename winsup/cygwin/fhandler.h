@@ -329,7 +329,7 @@ class fhandler_base
   virtual int tcgetattr (struct termios *t);
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
-  virtual int is_tty () { return 0; }
+  virtual bool is_tty () const { return false; }
   virtual bool isdevice () { return true; }
   virtual bool isfifo () { return false; }
   virtual char *ptsname () { return NULL;}
@@ -371,7 +371,7 @@ class fhandler_base
   virtual void seekdir (DIR *, _off64_t);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
-  virtual bool is_slow () {return 0;}
+  virtual bool is_slow () {return false;}
   bool is_auto_device () {return isdevice () && !dev ().isfs ();}
   bool is_fs_special () {return pc.is_fs_special ();}
   bool issymlink () {return pc.issymlink ();}
@@ -520,7 +520,7 @@ class fhandler_socket: public fhandler_base
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
 };
 
 class fhandler_pipe: public fhandler_base
@@ -759,7 +759,7 @@ class fhandler_serial: public fhandler_base
   int tcgetattr (struct termios *t);
   _off64_t lseek (_off64_t, int) { return 0; }
   int tcflush (int);
-  int is_tty () { return 1; }
+  bool is_tty () const { return true; }
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
 
@@ -771,7 +771,7 @@ class fhandler_serial: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
 };
 
 #define acquire_output_mutex(ms) \
@@ -799,7 +799,7 @@ class fhandler_termios: public fhandler_base
   line_edit_status line_edit (const char *rptr, int nread, termios&);
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (tty_min *this_tc, bool force = false);
-  virtual int is_tty () { return 1; }
+  bool is_tty () const { return true; }
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
   bg_check_types bg_check (int sig);
@@ -946,7 +946,7 @@ class fhandler_console: public fhandler_termios
   void set_input_state ();
   void send_winch_maybe ();
   static tty_min *get_tty_stuff (int);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}
 };
@@ -981,7 +981,7 @@ class fhandler_tty_common: public fhandler_termios
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
 };
 
 class fhandler_tty_slave: public fhandler_tty_common
@@ -1054,7 +1054,7 @@ class fhandler_tty_master: public fhandler_pty_master
   int init ();
   int init_console ();
   void set_winsize (bool);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
 };
 
 class fhandler_dev_null: public fhandler_base
@@ -1169,7 +1169,7 @@ class fhandler_windows: public fhandler_base
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  bool is_slow () {return 1;}
+  bool is_slow () {return true;}
 };
 
 class fhandler_dev_dsp: public fhandler_base

@@ -1,5 +1,18 @@
 2008-01-06  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base::is_tty): Make bool.
+	(fhandler_serial::is_tty): Ditto.
+	(fhandler_termios::is_tty): Ditto.
+	(fhandler_base::is_slow): Return bool value.
+	(fhandler_socket::is_slow): Ditto.
+	(fhandler_serial::is_slow): Ditto.
+	(fhandler_console::is_slow): Ditto.
+	(fhandler_tty_common::is_slow): Ditto.
+	(fhandler_tty_master::is_slow): Ditto.
+	(fhandler_dev_null::is_slow): Ditto.
+
+2008-01-06  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* include/limits.h (TTY_NAME_MAX): Increase size to same as linux to
 	allow for (at least) null terminating byte for "/dev/console".
 
