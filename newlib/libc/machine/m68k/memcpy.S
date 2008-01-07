@@ -13,11 +13,13 @@
  * they apply.
  */
 
+#include "m68kasm.h"
+
 	.text
 	.align	4
 
-	.globl	memcpy
-	.type	memcpy, @function
+	.globl	SYM(memcpy)
+	.type	SYM(memcpy), @function
 
 /*   memcpy, optimised
  *
@@ -31,7 +33,7 @@
  *         to further improve speed.
  */
 
-memcpy:
+SYM(memcpy):
 	move.l	4(%sp),%a0	| dest ptr
 	move.l	8(%sp),%a1	| src ptr
 	move.l	12(%sp),%d1	| len

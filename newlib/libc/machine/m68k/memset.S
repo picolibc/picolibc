@@ -13,11 +13,13 @@
  * they apply.
  */
 
+#include "m68kasm.h"
+
 	.text
 	.align	4
 
-	.globl	memset
-	.type	memset, @function
+	.globl	SYM(memset)
+	.type	SYM(memset), @function
 
 |   memset, optimised
 |
@@ -38,7 +40,7 @@
 |
 |	VG, April 2007
 |
-memset:
+SYM(memset):
 	move.l	4(%sp),%a0	| dest ptr
 	move.l	8(%sp),%d0	| value
 	move.l	12(%sp),%d1	| len
