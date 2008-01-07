@@ -1,3 +1,8 @@
+2008-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h: Update copyright.
+	* include/limits.h: Ditto.
+
 2008-01-06  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.h (fhandler_base::is_tty): Make bool.
