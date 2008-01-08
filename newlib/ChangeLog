@@ -1,3 +1,9 @@
+2008-01-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/m68k/memcpy.S: Remove % from register references
+	as this is already handled by m68kasm.h.
+	* libc/machine/m68k/memset.S: Ditto.
+
 2008-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/m68k/m68kasm.h: New file.

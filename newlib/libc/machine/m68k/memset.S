@@ -41,60 +41,60 @@
 |	VG, April 2007
 |
 SYM(memset):
-	move.l	4(%sp),%a0	| dest ptr
-	move.l	8(%sp),%d0	| value
-	move.l	12(%sp),%d1	| len
-	cmp.l	#16,%d1
+	move.l	4(sp),a0	| dest ptr
+	move.l	8(sp),d0	| value
+	move.l	12(sp),d1	| len
+	cmp.l	#16,d1
 	blo	.Lbset		| below, byte fills
 	|
-	move.l	%d2,-(%sp)	| need a register
-	move.b	%d0,%d2		| distribute low byte to all byte in word
-	lsl.l	#8,%d0
-	move.b	%d2,%d0
-	move.w	%d0,%d2
-	swap	%d0		| rotate 16
-	move.w	%d2,%d0
+	move.l	d2,-(sp)	| need a register
+	move.b	d0,d2		| distribute low byte to all byte in word
+	lsl.l	#8,d0
+	move.b	d2,d0
+	move.w	d0,d2
+	swap	d0		| rotate 16
+	move.w	d2,d0
 	|
-	move.l	%a0,%d2		| copy of src
-	neg.l	%d2		| 1 2 3 ==> 3 2 1
-	and.l	#3,%d2
+	move.l	a0,d2		| copy of src
+	neg.l	d2		| 1 2 3 ==> 3 2 1
+	and.l	#3,d2
 	beq	2f		| is aligned
 	|
-	sub.l	%d2,%d1		| fix length
-	lsr.l	#1,%d2		| word align needed?
+	sub.l	d2,d1		| fix length
+	lsr.l	#1,d2		| word align needed?
 	bcc	1f
-	move.b	%d0,(%a0)+	| fill byte
+	move.b	d0,(a0)+	| fill byte
 1:
-	lsr.l	#1,%d2		| long align needed?
+	lsr.l	#1,d2		| long align needed?
 	bcc	2f
-	move.w	%d0,(%a0)+	| fill word
+	move.w	d0,(a0)+	| fill word
 2:
-	move.l	%d1,%d2		| number of long transfers (at least 3)
-	lsr.l	#2,%d2
-	subq.l	#1,%d2
+	move.l	d1,d2		| number of long transfers (at least 3)
+	lsr.l	#2,d2
+	subq.l	#1,d2
 
 1:
-	move.l	%d0,(%a0)+	| fill long words
+	move.l	d0,(a0)+	| fill long words
 .Llset:
 #if !defined (__mcoldfire__)
-	dbra	%d2,1b		| loop until done
-	sub.l	#0x10000,%d2
+	dbra	d2,1b		| loop until done
+	sub.l	#0x10000,d2
 #else
-	subq.l	#1,%d2
+	subq.l	#1,d2
 #endif
 	bpl	1b
-	and.l	#3,%d1		| residue byte transfers, fixed
-	move.l	(%sp)+,%d2	| restore d2
+	and.l	#3,d1		| residue byte transfers, fixed
+	move.l	(sp)+,d2	| restore d2
 	bra	.Lbset
 
 1:
-	move.b	%d0,(%a0)+	| fill residue bytes
+	move.b	d0,(a0)+	| fill residue bytes
 .Lbset:
 #if !defined (__mcoldfire__)
-	dbra	%d1,1b		| loop until done
+	dbra	d1,1b		| loop until done
 #else
-	subq.l	#1,%d1
+	subq.l	#1,d1
 	bpl	1b
 #endif
-	move.l	4(%sp),%d0	| return value
+	move.l	4(sp),d0	| return value
 	rts
