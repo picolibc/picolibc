@@ -1,3 +1,7 @@
+2008-01-10  DJ Delorie  <dj@redhat.com>
+
+	* m32c/exit.S (__exit): preserve both argument registers.
+
 2008-01-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/redboot-syscalls.c: Consistently supply _isatty if syscalls
