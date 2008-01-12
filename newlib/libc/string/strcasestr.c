@@ -1,7 +1,7 @@
 /*
 FUNCTION
 	<<strcasestr>>---case-insensitive character string search
-	
+
 INDEX
 	strcasestr
 
@@ -21,9 +21,9 @@ DESCRIPTION
 	is identical to <<strstr>> except the search is
 	case-insensitive.
 
-RETURNS 
+RETURNS
 
-	A pointer to the first case-insensitive occurrence of the sequence 
+	A pointer to the first case-insensitive occurrence of the sequence
 	<[find]> or <<NULL>> if no match was found.
 
 PORTABILITY
@@ -40,7 +40,7 @@ QUICKREF
  * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
- * This code is derived from software contributed to Berkeley by
+ * The quadratic code is derived from software contributed to Berkeley by
  * Chris Torek.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,11 +67,25 @@ QUICKREF
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+/* Linear algorithm Copyright (C) 2008 Eric Blake
+ * Permission to use, copy, modify, and distribute the linear portion of
+ * software is freely granted, provided that this notice is preserved.
+ */
 
 #include <sys/cdefs.h>
 
 #include <ctype.h>
 #include <string.h>
+
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+# define RETURN_TYPE char *
+# define AVAILABLE(h, h_l, j, n_l)			\
+  (!memchr ((h) + (h_l), '\0', (j) + (n_l) - (h_l))	\
+   && ((h_l) = (j) + (n_l)))
+# define CANON_ELEMENT(c) tolower (c)
+# define CMP_FUNC strncasecmp
+# include "str-two-way.h"
+#endif
 
 /*
  * Find the first occurrence of find in s, ignore case.
@@ -80,6 +94,9 @@ char *
 strcasestr(s, find)
 	const char *s, *find;
 {
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+
+  /* Less code size, but quadratic performance in the worst case.  */
 	char c, sc;
 	size_t len;
 
@@ -95,4 +112,36 @@ strcasestr(s, find)
 		s--;
 	}
 	return ((char *)s);
+
+#else /* compilation for speed */
+
+  /* Larger code size, but guaranteed linear performance.  */
+  const char *haystack = s;
+  const char *needle = find;
+  size_t needle_len; /* Length of NEEDLE.  */
+  size_t haystack_len; /* Known minimum length of HAYSTACK.  */
+  int ok = 1; /* True if NEEDLE is prefix of HAYSTACK.  */
+
+  /* Determine length of NEEDLE, and in the process, make sure
+     HAYSTACK is at least as long (no point processing all of a long
+     NEEDLE if HAYSTACK is too short).  */
+  while (*haystack && *needle)
+    ok &= (tolower ((unsigned char) *haystack++)
+	   == tolower ((unsigned char) *needle++));
+  if (*needle)
+    return NULL;
+  if (ok)
+    return (char *) s;
+  needle_len = needle - find;
+  haystack = s + 1;
+  haystack_len = needle_len - 1;
+
+  /* Perform the search.  */
+  if (needle_len < LONG_NEEDLE_THRESHOLD)
+    return two_way_short_needle ((const unsigned char *) haystack,
+				 haystack_len,
+				 (const unsigned char *) find, needle_len);
+  return two_way_long_needle ((const unsigned char *) haystack, haystack_len,
+			      (const unsigned char *) find, needle_len);
+#endif /* compilation for speed */
 }

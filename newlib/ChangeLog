@@ -1,3 +1,19 @@
+2008-01-11  Eric Blake  <ebb9@byu.net>
+
+	Make strstr and strcasestr O(n), not O(n^2); add memmem.
+	* libc/string/str-two-way.h: New file.
+	* libc/string/memmem.c (memmem): New file.
+	* libc/include/string.h (memmem): Declare for all platforms.
+	* libc/string/strstr.c (strstr): Provide O(n) implementation when
+	not optimizing for space.
+	* libc/string/strcasestr.c (strcasestr): Likewise.
+	* libc/string/Makefile.am (ELIX_SOURCES): Rename to...
+	(ELIX_2_SOURCES): ...this.
+	(ELIX_4_SOURCES): New category, for memmem.
+	(lib_a_SOURCES, libstring_la_SOURCES): Build new file.
+	(CHEWOUT_FILES): Build documentation for memmem.
+	* libc/string/strings.tex: Include new docs.
+
 2008-01-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/m68k/memcpy.S: Remove % from register references
@@ -171,7 +187,7 @@
 2007-11-07  Dave Brolley  <brolley@redhat.com>
 
 	* libc/machine/configure: Regenerated to pick up mep-elf changes.
-	
+
 	* Contribute mep-elf from Red Hat
 	2006-10-27  DJ Delorie  <dj@redhat.com>
 

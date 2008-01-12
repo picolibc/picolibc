@@ -56,9 +56,7 @@ int	 _EXFUN(ffs,(int));
 char 	*_EXFUN(index,(const char *, int));
 _PTR	 _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));
 _PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
-#ifdef __CYGWIN__
-extern void *memmem (__const void *, size_t,  __const void *, size_t);
-#endif
+_PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
 char 	*_EXFUN(rindex,(const char *, int));
 char 	*_EXFUN(stpcpy,(char *, const char *));
 char 	*_EXFUN(stpncpy,(char *, const char *, size_t));
