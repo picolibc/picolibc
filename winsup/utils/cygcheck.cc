@@ -1179,98 +1179,156 @@ dump_sysinfo ()
   time_t now;
   char *found_cygwin_dll;
   bool is_nt = false;
+  bool more_info = true;
+  char osname[80];
 
   printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
   printf ("Current System Time: %s\n", ctime (&now));
 
-  OSVERSIONINFO osversion;
-  osversion.dwOSVersionInfoSize = sizeof (osversion);
-  if (!GetVersionEx (&osversion))
-    display_error ("dump_sysinfo: GetVersionEx()");
-  const char *osname = "unknown OS";
+  OSVERSIONINFOEX osversion;
+  osversion.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
+  if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&osversion)))
+    {
+      more_info = false;
+      osversion.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+      if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&osversion)))
+	display_error ("dump_sysinfo: GetVersionEx()");
+    }
+
+  HMODULE k32 = LoadLibrary ("kernel32.dll");
+
   switch (osversion.dwPlatformId)
     {
     case VER_PLATFORM_WIN32s:
-      osname = "32s";
+      strcpy (osname, "32s (not supported)");
       break;
     case VER_PLATFORM_WIN32_WINDOWS:
-      switch (osversion.dwMinorVersion)
-	{
-	case 0:
-	  osname = "95 (not supported)";
-	  break;
-	case 10:
-	  osname = "98 (not supported)";
-	  break;
-	case 90:
-	  osname = "ME (not supported)";
-	  break;
-	default:
-	  osname = "9X (not supported)";
-	  break;
-	}
+      strcpy (osname, "95/98/Me (not supported)");
       break;
     case VER_PLATFORM_WIN32_NT:
       is_nt = true;
       if (osversion.dwMajorVersion == 6)
-	osname = "Vista";
+	{
+	  BOOL (WINAPI *GetProductInfo) (DWORD, DWORD, DWORD, DWORD, PDWORD) =
+		  (BOOL (WINAPI *)(DWORD, DWORD, DWORD, DWORD, PDWORD))
+		  GetProcAddress (k32, "GetProductInfo");
+	  if (osversion.wProductType == VER_NT_WORKSTATION)
+	    strcpy (osname, "Vista");
+	  else
+	    strcpy (osname, "2008");
+	  DWORD prod;
+	  if (GetProductInfo (osversion.dwMajorVersion,
+			      osversion.dwMinorVersion,
+			      osversion.wServicePackMajor,
+			      osversion.wServicePackMinor,
+			      &prod))
+	    {
+#define       PRODUCT_UNLICENSED 0xabcdabcd
+#define       PRODUCT_SMALLBUSINESS_SERVER_PREMIUM 0x19
+	      const char *products[] =
+	        {
+		  "",
+		  " Ultimate Edition",
+		  " Home Basic Edition",
+		  " Home Premium Edition",
+		  " Enterprise Edition",
+		  " Home Basic N Edition",
+		  " Business Edition",
+		  " Server Standard Edition",
+		  " Server Datacenter Edition",
+		  " Small Business Server",
+		  " Server Enterprise Edition",
+		  " Starter Edition",
+		  " Server Datacenter Edition Core",
+		  " Server Standard Edition Core",
+		  " Server Enterprise Edition Core",
+		  " Server Enterprise Edition for Itanium-based Systems",
+		  " Business N Edition",
+		  " Web Server Edition",
+		  " Cluster Server Edition",
+		  " Home Server Edition",
+		  " Storage Server Express Edition",
+		  " Storage Server Standard Edition",
+		  " Storage Server Workgroup Edition",
+		  " Storage Server Enterprise Edition",
+		  " Server for Small Business Edition",
+		  " Small Business Server Premium Edition"
+		};
+	      if (prod == PRODUCT_UNLICENSED)
+	        strcat (osname, "Unlicensed");
+	      else if (prod > PRODUCT_SMALLBUSINESS_SERVER_PREMIUM)
+	        strcat (osname, "");
+	      else
+	        strcat (osname, products[prod]);
+	    }
+	  else
+	    {
+	    }
+	}
       else if (osversion.dwMajorVersion == 5)
 	{
-	  BOOL more_info = FALSE;
-	  OSVERSIONINFOEX osversionex;
-	  osversionex.dwOSVersionInfoSize = sizeof (osversionex);
-	  if (GetVersionEx ((OSVERSIONINFO *) &osversionex))
-	    more_info = TRUE;
 	  if (osversion.dwMinorVersion == 0)
 	    {
-	      if (!more_info)
-		osname = "2000";
-	      else if (osversionex.wProductType == VER_NT_SERVER
-		       || osversionex.wProductType == VER_NT_DOMAIN_CONTROLLER)
-		{
-		  if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
-		    osname = "2000 Datacenter Server";
-		  else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
-		    osname = "2000 Advanced Server";
-		  else
-		    osname = "2000 Server";
-		}
+	      strcpy (osname, "2000");
+	      if (osversion.wProductType == VER_NT_WORKSTATION)
+	        strcat (osname, " Professional");
+	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
+		strcat (osname, " Datacenter Server");
+	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
+		strcat (osname, " Advanced Server");
 	      else
-		osname = "2000 Professional";
+		strcat (osname, " Server");
 	    }
 	  else if (osversion.dwMinorVersion == 1)
 	    {
+	      strcpy (osname, "XP");
 	      if (GetSystemMetrics (SM_MEDIACENTER))
-		osname = "XP Media Center Edition";
+		strcat (osname, " Media Center Edition");
 	      else if (GetSystemMetrics (SM_TABLETPC))
-		osname = "XP Tablet PC Edition";
-	      else if (!more_info)
-		osname = "XP";
-	      else if (osversionex.wSuiteMask & VER_SUITE_PERSONAL)
-		osname = "XP Home Edition";
+		strcat (osname, " Tablet PC Edition");
+	      else if (GetSystemMetrics (SM_STARTER))
+		strcat (osname, " Starter Edition");
+	      else if (osversion.wSuiteMask & VER_SUITE_PERSONAL)
+		strcat (osname, " Home Edition");
 	      else
-		osname = "XP Professional";
+		strcat (osname, " Professional");
 	    }
 	  else if (osversion.dwMinorVersion == 2)
 	    {
-	      if (!more_info)
-		osname = "2003 Server";
-	      else if (osversionex.wSuiteMask & VER_SUITE_BLADE)
-		osname = "2003 Web Server";
-	      else if (osversionex.wSuiteMask & VER_SUITE_DATACENTER)
-		osname = "2003 Datacenter Server";
-	      else if (osversionex.wSuiteMask & VER_SUITE_ENTERPRISE)
-		osname = "2003 Enterprise Server";
+	      strcpy (osname, "2003 Server");
+	      if (GetSystemMetrics (SM_SERVERR2))
+	        strcat (osname, " R2");
+	      if (osversion.wSuiteMask & VER_SUITE_BLADE)
+		strcat (osname, " Web Edition");
+	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
+		strcat (osname, " Datacenter Edition");
+	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
+		strcat (osname, " Enterprise Edition");
+	      else if (osversion.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
+	        strcat (osname, " Compute Cluster Edition");
+	    }
+	}
+      else if (osversion.dwMajorVersion == 4)
+        {
+	  strcpy (osname, "NT 4");
+	  if (more_info)
+	    {
+	      if (osversion.wProductType == VER_NT_WORKSTATION)
+	        strcat (osname, " Workstation");
 	      else
-		osname = "2003 Server";
+	      	{
+		  strcat (osname, " Server");
+		  if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
+		    strcat (osname, " Enterprise Edition");
+		}
 	    }
 	}
       else
-	osname = "NT";
+	strcpy (osname, "NT");
       break;
     default:
-      osname = "??";
+      strcpy (osname, "??");
       break;
     }
   printf ("Windows %s Ver %lu.%lu Build %lu %s\n", osname,
@@ -1280,7 +1338,9 @@ dump_sysinfo ()
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.szCSDVersion : "");
 
-  HMODULE k32 = LoadLibrary ("kernel32.dll");
+  if (osversion.dwPlatformId == VER_PLATFORM_WIN32s
+      || osversion.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    exit (EXIT_FAILURE);
 
   BOOL (WINAPI *wow64_func) (HANDLE, PBOOL) = (BOOL (WINAPI *) (HANDLE, PBOOL))
     GetProcAddress (k32, "IsWow64Process");

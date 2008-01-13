@@ -1,3 +1,10 @@
+2008-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Always try to get a OSVERSIONINFOEX
+	first.  Load kernel32.dll earlier.  Make osname a buffer.  Simplify
+	Non-NT code.  Use GetProductInfo in Vista/2008 case.  Clean up
+	non-Vista version info.  Exit early if not on NT.
+
 2007-12-29  Dave Korn  <dave.korn@artimi.com>
 
 	* bloda.cc (enum bad_app):  Add BYTEMOBILE.
