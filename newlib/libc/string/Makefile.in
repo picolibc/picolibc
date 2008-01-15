@@ -46,7 +46,7 @@ am__aclocal_m4_deps = $(top_srcdir)/../../libtool.m4 \
 	$(top_srcdir)/../../ltoptions.m4 \
 	$(top_srcdir)/../../ltsugar.m4 \
 	$(top_srcdir)/../../ltversion.m4 $(top_srcdir)/../acinclude.m4 \
-	$(top_srcdir)/../confsubdir.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
@@ -98,30 +98,32 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpcpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpncpy.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-memmem.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libstring_la_LIBADD =
-am__objects_3 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
+am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	memcpy.lo memmove.lo memset.lo rindex.lo strcasecmp.lo \
-	strcat.lo strchr.lo strcmp.lo strcoll.lo strcpy.lo \
-	strcspn.lo strdup.lo strdup_r.lo strerror.lo strerror_r.lo \
-	strlcat.lo strlcpy.lo strlen.lo strlwr.lo strncasecmp.lo \
-	strncat.lo strncmp.lo strncpy.lo strnlen.lo strpbrk.lo \
-	strrchr.lo strsep.lo strspn.lo strtok.lo strtok_r.lo \
-	strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo wcscat.lo \
-	wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo wcscspn.lo \
-	wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo \
-	wcsncpy.lo wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo \
-	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
-	wmemcpy.lo wmemmove.lo wmemset.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = bcmp.lo memccpy.lo mempcpy.lo \
+	strcat.lo strchr.lo strcmp.lo strcoll.lo strcpy.lo strcspn.lo \
+	strdup.lo strdup_r.lo strerror.lo strerror_r.lo strlcat.lo \
+	strlcpy.lo strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
+	strncmp.lo strncpy.lo strnlen.lo strpbrk.lo strrchr.lo \
+	strsep.lo strspn.lo strtok.lo strtok_r.lo strupr.lo strxfrm.lo \
+	strstr.lo swab.lo u_strerr.lo wcscat.lo wcschr.lo wcscmp.lo \
+	wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo wcslcpy.lo \
+	wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo wcsnlen.lo \
+	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo \
+	wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo \
+	wmemmove.lo wmemset.lo
+@ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo wcpcpy.lo \
 @ELIX_LEVEL_1_FALSE@	wcpncpy.lo
-@USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = memmem.lo
+@USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libstring_la_OBJECTS = $(am_libstring_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstring_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -366,26 +368,32 @@ GENERAL_SOURCES = \
 	wmemmove.c \
 	wmemset.c
 
-@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@ELIX_2_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	bcmp.c \
-@ELIX_LEVEL_1_FALSE@	stpcpy.c \
-@ELIX_LEVEL_1_FALSE@	stpncpy.c \
 @ELIX_LEVEL_1_FALSE@	memccpy.c \
 @ELIX_LEVEL_1_FALSE@	mempcpy.c \
+@ELIX_LEVEL_1_FALSE@	stpcpy.c \
+@ELIX_LEVEL_1_FALSE@	stpncpy.c \
 @ELIX_LEVEL_1_FALSE@	strndup.c \
 @ELIX_LEVEL_1_FALSE@	strcasestr.c \
 @ELIX_LEVEL_1_FALSE@	strndup_r.c \
 @ELIX_LEVEL_1_FALSE@	wcpcpy.c \
 @ELIX_LEVEL_1_FALSE@	wcpncpy.c
 
-@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memmem.c
+
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_4_SOURCES = 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstring.la
-@USE_LIBTOOL_TRUE@libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 CHEWOUT_FILES = \
 bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
@@ -402,7 +410,8 @@ wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
-wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
+wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
+memmem.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -924,6 +933,12 @@ lib_a-wcpncpy.o: wcpncpy.c
 
 lib_a-wcpncpy.obj: wcpncpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcpncpy.obj `if test -f 'wcpncpy.c'; then $(CYGPATH_W) 'wcpncpy.c'; else $(CYGPATH_W) '$(srcdir)/wcpncpy.c'; fi`
+
+lib_a-memmem.o: memmem.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmem.o `test -f 'memmem.c' || echo '$(srcdir)/'`memmem.c
+
+lib_a-memmem.obj: memmem.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmem.obj `if test -f 'memmem.c'; then $(CYGPATH_W) 'memmem.c'; else $(CYGPATH_W) '$(srcdir)/memmem.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

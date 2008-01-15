@@ -84,8 +84,8 @@ ELIX_2_SOURCES = \
 	strcasestr.c \
 	strndup_r.c \
 	wcpcpy.c \
-	wcpncpy.c \
-endif
+	wcpncpy.c
+endif !ELIX_LEVEL_1
 
 if ELIX_LEVEL_1
 ELIX_4_SOURCES =

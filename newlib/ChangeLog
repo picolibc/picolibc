@@ -1,3 +1,8 @@
+2008-01-15  Eric Blake  <ebb9@byu.net>
+
+	* libc/string/Makefile.am (ELIX_2_SOURCES): Fix definition.
+	* libc/string/Makefile: Regenerate.
+
 2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/machine/setjmp.h (__SIGMASK_FUNC): Define as
