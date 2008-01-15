@@ -1,3 +1,8 @@
+2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (install-libs): Overwrite newlib's libg.a with symlink
+	to libcygwin.a.
+
 2007-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/socket.h: Include sys/uio.h instead of cygwin/uio.h.
