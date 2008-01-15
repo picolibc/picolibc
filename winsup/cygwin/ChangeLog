@@ -1,3 +1,8 @@
+2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Remove memmem.o.
+	* memmem.cc: Remove in favor of newlib implementation.
+
 2008-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h: Update copyright.
