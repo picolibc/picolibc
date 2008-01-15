@@ -1,3 +1,12 @@
+2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/machine/setjmp.h (__SIGMASK_FUNC): Define as
+	pthread_sigmask or sigprocmask depending on _POSIX_THREADS.
+	(sigsetjmp): Use __SIGMASK_FUNC.
+	(siglongjmp): Ditto.
+	(_setjmp): Define as macro.
+	(_longjmp): Ditto.
+
 2008-01-11  Eric Blake  <ebb9@byu.net>
 
 	Make strstr and strcasestr O(n), not O(n^2); add memmem.

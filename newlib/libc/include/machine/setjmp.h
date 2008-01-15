@@ -268,6 +268,12 @@ typedef int sigjmp_buf[_JBLEN+2];
 # define _CYGWIN_WORKING_SIGSETJMP
 #endif
 
+#ifdef _POSIX_THREADS
+#define __SIGMASK_FUNC pthread_sigmask
+#else
+#define __SIGMASK_FUNC sigprocmask
+#endif
+
 #if defined(__GNUC__)
 
 #define sigsetjmp(env, savemask) \
@@ -275,7 +281,7 @@ typedef int sigjmp_buf[_JBLEN+2];
             ({ \
               sigjmp_buf *_sjbuf = &(env); \
               ((*_sjbuf)[_SAVEMASK] = savemask,\
-              sigprocmask (SIG_SETMASK, 0, (sigset_t *)((*_sjbuf) + _SIGMASK)),\
+              __SIGMASK_FUNC (SIG_SETMASK, 0, (sigset_t *)((*_sjbuf) + _SIGMASK)),\
               setjmp (*_sjbuf)); \
             })
 
@@ -284,7 +290,7 @@ typedef int sigjmp_buf[_JBLEN+2];
             ({ \
               sigjmp_buf *_sjbuf = &(env); \
               ((((*_sjbuf)[_SAVEMASK]) ? \
-               sigprocmask (SIG_SETMASK, (sigset_t *)((*_sjbuf) + _SIGMASK), 0)\
+               __SIGMASK_FUNC (SIG_SETMASK, (sigset_t *)((*_sjbuf) + _SIGMASK), 0)\
                : 0), \
                longjmp (*_sjbuf, val)); \
             })
@@ -292,14 +298,20 @@ typedef int sigjmp_buf[_JBLEN+2];
 #else /* !__GNUC__ */
 
 #define sigsetjmp(env, savemask) ((env)[_SAVEMASK] = savemask,\
-               sigprocmask (SIG_SETMASK, 0, (sigset_t *) ((env) + _SIGMASK)),\
+               __SIGMASK_FUNC (SIG_SETMASK, 0, (sigset_t *) ((env) + _SIGMASK)),\
                setjmp (env))
 
 #define siglongjmp(env, val) ((((env)[_SAVEMASK])?\
-               sigprocmask (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
+               __SIGMASK_FUNC (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
                longjmp (env, val))
 
 #endif
+
+/* POSIX _setjmp/_longjmp macros, maintained for XSI compatibility.  These
+   are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
+   New applications should use sigsetjmp/siglongjmp instead. */
+#define _setjmp(env)		sigsetjmp ((env), 0)
+#define _longjmp(env, val)	siglongjmp ((env), (val))
 
 #ifdef __cplusplus
 }
