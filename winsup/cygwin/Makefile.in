@@ -306,6 +306,7 @@ install-libs: $(TARGET_LIBS)
 	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
 	done
+	cd $(tooldir)/lib && ln -sf libcygwin.a libg.a
 
 install-headers:
 	cd $(srcdir); \
