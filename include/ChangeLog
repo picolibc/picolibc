@@ -1,3 +1,8 @@
+2008-01-03  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* opcode/avr.h (AVR_ISA_USB162): Add new opcode set.
+	(AVR_ISA_AVR3): Likewise.
+
 2007-11-17  Thiemo Seufer  <ths@mips.com>
 
 	* elf/mips.h (Tag_GNU_MIPS_ABI_FP): Mention -mips32r2 -mfp64 variant

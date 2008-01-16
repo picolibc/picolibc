@@ -40,6 +40,10 @@
                        AVR_ISA_LPMX | AVR_ISA_SPM)
 #define AVR_ISA_M603  (AVR_ISA_2xxx | AVR_ISA_MEGA)
 #define AVR_ISA_M103  (AVR_ISA_M603 | AVR_ISA_ELPM)
+#define AVR_ISA_USB162 (AVR_ISA_M603 | AVR_ISA_MOVW | \
+                       AVR_ISA_LPMX | AVR_ISA_SPM)
+#define AVR_ISA_AVR3 (AVR_ISA_M603 | AVR_ISA_MOVW | \
+                       AVR_ISA_LPMX | AVR_ISA_SPM  | AVR_ISA_ELPM)
 #define AVR_ISA_M161  (AVR_ISA_M603 | AVR_ISA_MUL | AVR_ISA_MOVW | \
                        AVR_ISA_LPMX | AVR_ISA_SPM)
 #define AVR_ISA_94K   (AVR_ISA_M603 | AVR_ISA_MUL | AVR_ISA_MOVW | AVR_ISA_LPMX)
