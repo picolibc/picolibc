@@ -782,6 +782,7 @@
 #define AT_SUN_EXECNAME 2014    /* Canonicalized file name given to execve.  */
 #define AT_SUN_MMU      2015    /* String for name of MMU module.   */
 #define AT_SUN_LDDATA   2016    /* Dynamic linker's data segment address.  */
+#define AT_SUN_AUXFLAGS	2017	/* AF_SUN_ flags passed from the kernel.  */
 
 
 #endif /* _ELF_COMMON_H */

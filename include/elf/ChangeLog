@@ -1,3 +1,7 @@
+2008-01-16  Mark Kettenis  <kettenis@gnu.org>
+
+	* common.h (AT_SUN_AUXFLAGS): Define.
+
 2007-12-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* dwarf2.h (DW_AT_hi_user): Correct value.
