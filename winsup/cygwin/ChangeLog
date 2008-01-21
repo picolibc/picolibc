@@ -1,3 +1,8 @@
+2008-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Open file with
+	READ_CONTROL for Vista/Longhorn's sake.
+
 2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install-libs): Overwrite newlib's libg.a with symlink

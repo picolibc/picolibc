@@ -1089,7 +1089,7 @@ fhandler_disk_file::link (const char *newpath)
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  status = NtOpenFile (&fh, FILE_ANY_ACCESS,
+  status = NtOpenFile (&fh, READ_CONTROL,
 		       pc.get_object_attr (attr, sec_none_nih), &io,
 		       FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_REPARSE_POINT);
