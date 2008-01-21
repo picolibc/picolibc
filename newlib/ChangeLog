@@ -1,3 +1,8 @@
+2008-01-21  Neal H. Walfield  <neal@gnu.org>
+
+	* Makefile.am (crt1.o): Use correct source.
+	* Makefile.in: Regenerated.
+
 2008-01-15  Eric Blake  <ebb9@byu.net>
 
 	* libc/string/Makefile.am (ELIX_2_SOURCES): Fix definition.
@@ -28,6 +33,7 @@
 	(CHEWOUT_FILES): Build documentation for memmem.
 	* libc/string/strings.tex: Include new docs.
 
+>>>>>>> 1.1116
 2008-01-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/m68k/memcpy.S: Remove % from register references
