@@ -99,6 +99,13 @@ isatty (fd)
   return 1;
 }
 
+_isatty (fd)
+     int fd;
+{
+  return 1;
+}
+
+
 _exit (n)
 {
   return __trap34 (SYS_exit, n, 0, 0);

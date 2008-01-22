@@ -1,3 +1,7 @@
+2008-01-21  DJ Delorie  <dj@redhat.com>
+
+	* libc/sys/sh/syscalls.c (_isatty): New.
+
 2008-01-21  Neal H. Walfield  <neal@gnu.org>
 
 	* Makefile.am (crt1.o): Use correct source.
