@@ -712,6 +712,11 @@ typedef struct _FILE_FS_FULL_SIZE_INFORMATION
   ULONG BytesPerSector;
 } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
+typedef struct _FILE_FS_OBJECTID_INFORMATION {
+    UCHAR ObjectId[16];
+    UCHAR ExtendedInfo[48];
+} FILE_FS_OBJECTID_INFORMATION, *PFILE_FS_OBJECTID_INFORMATION;
+
 typedef enum _FSINFOCLASS {
   FileFsVolumeInformation = 1,
   FileFsLabelInformation,

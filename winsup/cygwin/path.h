@@ -97,7 +97,8 @@ struct fs_info
  private:
   struct status_flags
   {
-    DWORD flags;  /* Volume flags */
+    DWORD flags;                  /* Volume flags */
+    DWORD samba_version;          /* Samba version if available */
     unsigned is_remote_drive : 1;
     unsigned has_buggy_open  : 1;
     unsigned has_acls	     : 1;
@@ -110,11 +111,11 @@ struct fs_info
     unsigned is_cdrom	     : 1;
   } status;
  public:
-  void clear () { memset (this, 0 , sizeof *this); }
+  void clear () { memset (&status, 0 , sizeof status); }
   fs_info () { clear (); }
 
-  inline DWORD& flags () {return status.flags;};
-
+  IMPLEMENT_STATUS_FLAG (DWORD, flags)
+  IMPLEMENT_STATUS_FLAG (DWORD, samba_version)
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)

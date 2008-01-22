@@ -378,6 +378,22 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
+/* Beginning with Samba 3.2, Samba allows to get version information using
+   the ExtendedInfo member returned by a FileFsObjectIdInformation request.
+   We just store the samba_version information for now.  Older versions than
+   3.2 are still guessed at by testing the file system flags. */
+#define SAMBA_EXTENDED_INFO_MAGIC 0x536d4261 /* "SmBa" */
+#define SAMBA_EXTENDED_INFO_VERSION_STRING_LENGTH 28
+#pragma pack(push,4)
+struct smb_extended_info {
+  DWORD         samba_magic;             /* Always SAMBA_EXTENDED_INFO_MAGIC */
+  DWORD         samba_version;           /* Major/Minor/Release/Revision */
+  DWORD         samba_subversion;        /* Prerelease/RC/Vendor patch */
+  LARGE_INTEGER samba_gitcommitdate;
+  char          samba_version_string[SAMBA_EXTENDED_INFO_VERSION_STRING_LENGTH];
+};
+#pragma pack(pop)
+
 bool
 fs_info::update (PUNICODE_STRING upath, bool exists)
 {
@@ -387,6 +403,7 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
   IO_STATUS_BLOCK io;
   bool no_media = false;
   FILE_FS_DEVICE_INFORMATION ffdi;
+  FILE_FS_OBJECTID_INFORMATION ffoi;
   PFILE_FS_ATTRIBUTE_INFORMATION pffai;
   UNICODE_STRING fsname, testname;
 
@@ -444,11 +461,11 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
       debug_printf ("Cannot get volume attributes (%S), %08lx",
 		    attr.ObjectName, status);
       has_buggy_open (false);
-      flags () = 0;
+      flags (0);
       NtClose (vol);
       return false;
     }
-   flags () = pffai->FileSystemAttributes;
+   flags (pffai->FileSystemAttributes);
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
@@ -476,12 +493,30 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
 			       pffai->FileSystemNameLength);
   is_fat (RtlEqualUnicodePathPrefix (&fsname, L"FAT", TRUE));
   RtlInitUnicodeString (&testname, L"NTFS");
-  is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
-	    && (ffdi.Characteristics & FILE_REMOTE_DEVICE)
-	    && (FS_IS_SAMBA || FS_IS_SAMBA_WITH_QUOTA));
-  is_netapp (RtlEqualUnicodeString (&fsname, &testname, FALSE)
-	     && (ffdi.Characteristics & FILE_REMOTE_DEVICE)
-	     && FS_IS_NETAPP_DATAONTAP);
+  if (is_remote_drive ())
+    {
+      /* This always fails on NT4. */
+      status = NtQueryVolumeInformationFile (vol, &io, &ffoi, sizeof ffoi,
+					     FileFsObjectIdInformation);
+      if (NT_SUCCESS (status))
+	{
+	  smb_extended_info *extended_info = (smb_extended_info *)
+					     &ffoi.ExtendedInfo;
+	  if (extended_info->samba_magic == SAMBA_EXTENDED_INFO_MAGIC)
+	    {
+	      is_samba (true);
+	      samba_version (extended_info->samba_version);
+	    }
+	}
+      /* Test for older Samba releases not supporting the extended info. */
+      if (!is_samba ())
+	is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+		  && (FS_IS_SAMBA || FS_IS_SAMBA_WITH_QUOTA));
+
+      is_netapp (!is_samba ()
+		 && RtlEqualUnicodeString (&fsname, &testname, FALSE)
+		 && FS_IS_NETAPP_DATAONTAP);
+    }
   is_ntfs (RtlEqualUnicodeString (&fsname, &testname, FALSE)
 	   && !is_samba () && !is_netapp ());
   RtlInitUnicodeString (&testname, L"NFS");

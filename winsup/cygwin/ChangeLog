@@ -1,3 +1,12 @@
+2008-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (struct _FILE_FS_OBJECTID_INFORMATION): Define.
+	* path.cc (struct smb_extended_info): Define.
+	(fs_info::update): Request object id info to get Samba information.
+	Set flags according to new implementation.
+	* path.h (struct fs_info): Add samba_version to status_flags.
+	Implement flags() and samba_version() using IMPLEMENT_STATUS_FLAG.
+
 2008-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Open file with
