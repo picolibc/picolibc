@@ -1,3 +1,8 @@
+2008-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fs_info::update): Fix old-style Samba test to support
+	recent as well as upcoming Samba releases.
+
 2008-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (struct _FILE_FS_OBJECTID_INFORMATION): Define.

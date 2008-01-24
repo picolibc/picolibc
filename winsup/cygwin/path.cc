@@ -474,15 +474,15 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
 #define GETVOLINFO_VALID_MASK (0x003701ffUL)
 #define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
 
-#define FS_IS_SAMBA TEST_GVI(flags (), \
+/* Volume quotas are potentially supported since Samba 3.0, object ids and
+   the unicode on disk flag since Samba 3.2. */
+#define SAMBA_IGNORE (FILE_VOLUME_QUOTAS \
+		      | FILE_SUPPORTS_OBJECT_IDS \
+		      | FILE_UNICODE_ON_DISK)
+#define FS_IS_SAMBA TEST_GVI(flags () & ~SAMBA_IGNORE, \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_PERSISTENT_ACLS)
-#define FS_IS_SAMBA_WITH_QUOTA TEST_GVI(flags (), \
-			     FILE_CASE_SENSITIVE_SEARCH \
-			     | FILE_CASE_PRESERVED_NAMES \
-			     | FILE_PERSISTENT_ACLS \
-			     | FILE_VOLUME_QUOTAS)
 #define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags (), \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
@@ -508,10 +508,11 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
 	      samba_version (extended_info->samba_version);
 	    }
 	}
-      /* Test for older Samba releases not supporting the extended info. */
+      /* Test for Samba on NT4 or for older Samba releases not supporting
+	 extended info. */
       if (!is_samba ())
 	is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
-		  && (FS_IS_SAMBA || FS_IS_SAMBA_WITH_QUOTA));
+		  && FS_IS_SAMBA);
 
       is_netapp (!is_samba ()
 		 && RtlEqualUnicodeString (&fsname, &testname, FALSE)
