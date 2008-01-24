@@ -423,17 +423,23 @@ fs_info::update (const char *win32_path)
       return false;
     }
 
-#define FS_IS_SAMBA (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS)
-#define FS_IS_SAMBA_WITH_QUOTA \
-		    (FILE_CASE_SENSITIVE_SEARCH \
-		     | FILE_CASE_PRESERVED_NAMES \
-		     | FILE_PERSISTENT_ACLS \
-		     | FILE_VOLUME_QUOTAS)
+/* Test only flags indicating capabilities, ignore flags indicating a specific
+   state of the volume.  At present ignore FILE_VOLUME_IS_COMPRESSED and
+   FILE_READ_ONLY_VOLUME. */
+#define GETVOLINFO_VALID_MASK (0x003701ffUL)
+/* Volume quotas are potentially supported since Samba 3.0, object ids and
+   the unicode on disk flag since Samba 3.2. */
+#define SAMBA_IGNORE (FILE_VOLUME_QUOTAS \
+			| FILE_SUPPORTS_OBJECT_IDS \
+			| FILE_UNICODE_ON_DISK)
+#define SAMBA_REQIURED (FILE_CASE_SENSITIVE_SEARCH \
+			| FILE_CASE_PRESERVED_NAMES \
+			| FILE_PERSISTENT_ACLS)
+#define FS_IS_SAMBA	((flags () & GETVOLINFO_VALID_MASK & ~SAMBA_IGNORE) \
+			 ==  SAMBA_REQIURED)
+
   is_fat (strncasematch (fsname, "FAT", 3));
-  is_samba (strcmp (fsname, "NTFS") == 0 && is_remote_drive ()
-	    && (flags () == FS_IS_SAMBA || flags () == FS_IS_SAMBA_WITH_QUOTA));
+  is_samba (strcmp (fsname, "NTFS") == 0 && is_remote_drive () && FS_IS_SAMBA);
   is_ntfs (strcmp (fsname, "NTFS") == 0 && !is_samba ());
   is_nfs (strcmp (fsname, "NFS") == 0);
 

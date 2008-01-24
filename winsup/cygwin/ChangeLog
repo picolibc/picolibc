@@ -1,3 +1,8 @@
+2008-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fs_info::update): Fix Samba test to support recent as well
+	as upcoming Samba releases.
+
 2008-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install-libs): Overwrite newlib's libg.a with symlink
