@@ -1,6 +1,6 @@
 /* isatty for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2008 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -16,8 +16,8 @@
 #include <sys/stat.h>
 #include "sys/syscall.h"
 
-isatty (fd)
-     int fd;
+int
+_isatty (int fd)
 {
   return fd == 0 || fd == 1 || fd == 2;
 }

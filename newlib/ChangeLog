@@ -1,3 +1,8 @@
+2008-01-25  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* libc/sys/mmixware/isatty.c (_isatty): Renamed from isatty.
+	Make ISO C.
+
 2008-01-21  DJ Delorie  <dj@redhat.com>
 
 	* libc/sys/sh/syscalls.c (_isatty): New.
