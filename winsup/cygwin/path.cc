@@ -378,7 +378,7 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
-/* Beginning with Samba 3.2, Samba allows to get version information using
+/* Beginning with Samba 3.0.28a, Samba allows to get version information using
    the ExtendedInfo member returned by a FileFsObjectIdInformation request.
    We just store the samba_version information for now.  Older versions than
    3.2 are still guessed at by testing the file system flags. */

@@ -1,3 +1,7 @@
+2008-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc: Fix Samba version in comment.
+
 2008-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (fs_info::update): Fix old-style Samba test to support
