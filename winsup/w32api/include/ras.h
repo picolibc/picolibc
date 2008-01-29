@@ -35,6 +35,7 @@ typedef unsigned long ULONG_PTR, *PULONG_PTR;
 #define RAS_MaxFacilities     200
 #define RAS_MaxUserData       200
 #define RAS_MaxReplyMessage   1024
+#define RAX_MaxDnsSuffix      256
 #define RDEOPT_UsePrefixSuffix           0x00000001
 #define RDEOPT_PausedStates              0x00000002
 #define RDEOPT_IgnoreModemSpeaker        0x00000004

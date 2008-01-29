@@ -1,5 +1,9 @@
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 
+	* include/ras.h (RAS_MaxDnsSuffix): define.
+
+2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
+
 	* include/psapi.h (GetProcessImageFileNameA, GetProcessImageFileNameW): 
 	Add prototypes.
 	* lib/psapi.def (GetProcessImageFileNameA@12, GetProcessImageFileNameW@12):
