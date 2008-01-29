@@ -1,3 +1,10 @@
+2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
+
+	* include/psapi.h (GetProcessImageFileNameA, GetProcessImageFileNameW): 
+	Add prototypes.
+	* lib/psapi.def (GetProcessImageFileNameA@12, GetProcessImageFileNameW@12):
+	Add exports.
+
 2007-12-27  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.11.

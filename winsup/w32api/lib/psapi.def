@@ -16,6 +16,8 @@ GetModuleFileNameExA@16
 GetModuleFileNameExW@16
 GetModuleInformation@16
 GetProcessMemoryInfo@12
+GetProcessImageFileNameA@12
+GetProcessImageFileNameW@12
 GetWsChanges@12
 InitializeProcessForWsWatch@4
 QueryWorkingSet@12
