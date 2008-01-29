@@ -126,7 +126,7 @@ UUID_OBJS = mshtml-uuid.o msxml-uuid.o unknwn-uuid.o \
 			objsafe-uuid.o oaidl-uuid.o docobj-uuid.o comcat-uuid.o \
 			exdisp-uuid.o mlang-uuid.o objidl-uuid.o cguid-uuid.o \
 			olectlid-uuid.o ativscp-uuid.o urlmon-uuid.o hlink-uuid.o \
-			hlguids-uuid.o extras-uuid.o devguid.o
+			hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o
 EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o \
 	$(UUID_OBJS) ws2_32.o
 UUID_SOURCES = mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
@@ -134,7 +134,7 @@ UUID_SOURCES = mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
 			   objsafe-uuid.c oaidl-uuid.c docobj-uuid.c comcat-uuid.c \
 			   exdisp-uuid.c mlang-uuid.c objidl-uuid.c cguid-uuid.c \
 			   olectlid-uuid.c ativscp-uuid.c urlmon-uuid.c hlink-uuid.c \
-			   hlguids-uuid.c extras-uuid.c devguid.c
+			   hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c
 SOURCES = scrnsave.c shell32.c  largeint.c $(UUID_SOURCES)\
 res.rc test.c ws2_32.c
 

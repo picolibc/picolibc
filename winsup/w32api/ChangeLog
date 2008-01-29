@@ -1,5 +1,22 @@
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 
+	* include/winnt.h (SYSTEM_POWER_CONDITION): typedef.
+	* include/winuser.h (PBT_POWERSETTINGCHANGE, DEVICE_NOTIFY_WINDOW_HANDLE,
+	DEVICE_NOTIFY_SERVICE_HANDLE): define.
+	* include/winuser.h (LPCGUID, HPOWERNOTIFY, POWERBROADCAST_SETTING): typedefs.
+	* include/winuser.h (GUID_POWERSCHEME_PERSONALITY, GUID_MIN_POWER_SAVINGS,
+	GUID_MAX_POWER_SAVINGS, GUID_TYPICAL_POWER_SAVINGS, GUID_ACDC_POWER_SOURCE,
+	GUID_BATTERY_PERCENTAGE_REMAINING, GUID_IDLE_BACKGROUND_TASK,
+	GUID_SYSTEM_AWAYMODE, GUID_MONITOR_POWER_ON): added externs for GUIDs.
+	* include/winuser.h (RegisterPowerSettingNotification,
+	UnregisterPowerSettingNotification): Add prototypes.
+	* lib/user32.def: Added imports for the above prototypes.
+	* lib/Makefile.in: Added build support for power-uuid.c.
+	* lib/power-uuid.c: New file containing power GUID definitions.
+
+
+2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
+
 	* include/ras.h (RAS_MaxDnsSuffix): define.
 
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>

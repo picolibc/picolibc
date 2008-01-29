@@ -484,6 +484,7 @@ RegisterClipboardFormatA@4
 RegisterClipboardFormatW@4
 RegisterDeviceNotificationA@12
 RegisterDeviceNotificationW@12
+RegisterPowerSettingNotification@12
 RegisterHotKey@16
 RegisterRawInputDevices@12
 RegisterWindowMessageA@4
@@ -613,6 +614,7 @@ UnpackDDElParam@16
 UnregisterClassA@8
 UnregisterClassW@8
 UnregisterDeviceNotification@4
+UnregisterPowerSettingNotification@4
 UnregisterHotKey@8
 UpdateLayeredWindow@36
 UpdateWindow@4
