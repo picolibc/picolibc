@@ -1,0 +1,8 @@
+LIBRARY BTHPROPS.CPL
+EXPORTS
+BluetoothFindFirstRadio@8
+BluetoothFindFirstDevice@8
+BluetoothFindNextDevice@8
+BluetoothFindDeviceClose@4
+BluetoothFindNextRadio@8
+BluetoothFindRadioClose@4

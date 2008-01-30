@@ -1,5 +1,9 @@
 2008-01-30  Brandon Sneed  <nivenh@sourceware.org>
 
+	* lib/bthprops.def: new file, bluetooth imports.
+
+2008-01-30  Brandon Sneed  <nivenh@sourceware.org>
+
 	* include/windef.h (__in, __inout, __in_opt, __in_bcound, __in_ecount,
 	__out, __out_ecount_part, __struct_bcount, __field_ecount_opt,
 	__out_bcount_opt): Defined additional pseudo-modifiers.
