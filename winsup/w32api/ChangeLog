@@ -1,4 +1,10 @@
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
+	* include/ras.h (RAS_MaxDnsSuffix): corrected typo, was RAX_MaxDnsSuffix.
+	(RASENTRYA, RASENTRYW): Added members (dwfOptions2, dwfOptions3, szDnsSuffix, 
+	dwTcpWindowSize, szPrerequisitePbk, szPrerequisiteEntry, dwRedialCount,
+	dwRedialPause.	
+
+2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 
 	* include/winnt.h (SYSTEM_POWER_CONDITION): typedef.
 	* include/winuser.h (PBT_POWERSETTINGCHANGE, DEVICE_NOTIFY_WINDOW_HANDLE,
@@ -13,7 +19,6 @@
 	* lib/user32.def: Added imports for the above prototypes.
 	* lib/Makefile.in: Added build support for power-uuid.c.
 	* lib/power-uuid.c: New file containing power GUID definitions.
-
 
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 

@@ -35,7 +35,7 @@ typedef unsigned long ULONG_PTR, *PULONG_PTR;
 #define RAS_MaxFacilities     200
 #define RAS_MaxUserData       200
 #define RAS_MaxReplyMessage   1024
-#define RAX_MaxDnsSuffix      256
+#define RAS_MaxDnsSuffix      256
 #define RDEOPT_UsePrefixSuffix           0x00000001
 #define RDEOPT_PausedStates              0x00000002
 #define RDEOPT_IgnoreModemSpeaker        0x00000004
@@ -73,6 +73,18 @@ typedef unsigned long ULONG_PTR, *PULONG_PTR;
 #define RASEO_NetworkLogon              0x00002000
 #define RASEO_UseLogonCredentials       0x00004000
 #define RASEO_PromoteAlternates         0x00008000
+#if (WINVER >= 0x501)
+#define RASEO2_SecureFileAndPrint       0x00000001
+#define RASEO2_SecureClientForMSNet     0x00000002
+#define RASEO2_DontNegotiateMultilink   0x00000004
+#define RASEO2_DontUseRasCredentials    0x00000008
+#define RASEO2_UsePreSharedKey          0x00000010
+#define RASEO2_Internet                 0x00000020
+#define RASEO2_DisableNbtOverIP         0x00000040
+#define RASEO2_UseGlobalDeviceSettings  0x00000080
+#define RASEO2_ReconnectIfDropped       0x00000100
+#define RASEO2_SharePhoneNumbers        0x00000200
+#endif		
 #define RASNP_NetBEUI                   0x00000001
 #define RASNP_Ipx                       0x00000002
 #define RASNP_Ip                        0x00000004
@@ -545,6 +557,16 @@ typedef struct tagRASENTRYW {
     WCHAR szCustomDialDll[MAX_PATH];
     DWORD dwVpnStrategy;
 #endif
+#if (WINVER >= 0x501)
+	DWORD dwfOptions2;
+	DWORD dwfOptions3;
+	WCHAR szDnsSuffix[RAS_MaxDnsSuffix];
+	DWORD dwTcpWindowSize;
+	WCHAR szPrerequisitePbk[MAX_PATH];
+	WCHAR szPrerequisiteEntry[RAS_MaxEntryName + 1];
+	DWORD dwRedialCount;
+	DWORD dwRedialPause;
+#endif	
 } RASENTRYW, *LPRASENTRYW;
 
 typedef struct tagRASENTRYA {
@@ -592,6 +614,16 @@ typedef struct tagRASENTRYA {
     CHAR szCustomDialDll[MAX_PATH];
     DWORD dwVpnStrategy;
 #endif
+#if (WINVER >= 0x501)
+	DWORD dwfOptions2;
+	DWORD dwfOptions3;
+	CHAR szDnsSuffix[RAS_MaxDnsSuffix];
+	DWORD dwTcpWindowSize;
+	CHAR szPrerequisitePbk[MAX_PATH];
+	CHAR szPrerequisiteEntry[RAS_MaxEntryName + 1];
+	DWORD dwRedialCount;
+	DWORD dwRedialPause;
+#endif		
 } RASENTRYA, *LPRASENTRYA;
 
 
