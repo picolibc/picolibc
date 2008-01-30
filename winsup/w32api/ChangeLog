@@ -1,3 +1,9 @@
+2008-01-30  Brandon Sneed  <nivenh@sourceware.org>
+
+	* include/windef.h (__in, __inout, __in_opt, __in_bcound, __in_ecount,
+	__out, __out_ecount_part, __struct_bcount, __field_ecount_opt,
+	__out_bcount_opt): Defined additional pseudo-modifiers.
+
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 	* include/ras.h (RAS_MaxDnsSuffix): corrected typo, was RAX_MaxDnsSuffix.
 	(RASENTRYA, RASENTRYW): Added members (dwfOptions2, dwfOptions3, szDnsSuffix, 
