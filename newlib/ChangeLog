@@ -42,7 +42,6 @@
 	(CHEWOUT_FILES): Build documentation for memmem.
 	* libc/string/strings.tex: Include new docs.
 
->>>>>>> 1.1116
 2008-01-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/m68k/memcpy.S: Remove % from register references
