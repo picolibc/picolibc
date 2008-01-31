@@ -506,7 +506,7 @@ set_file_api_mode (codepage_type cp)
       SetFileApisToOEM ();
       debug_printf ("File APIs set to OEM");
     }
-  else if (cp == ansi_cp)
+  else
     {
       SetFileApisToANSI ();
       debug_printf ("File APIs set to ANSI");
@@ -520,17 +520,14 @@ codepage_init (const char *buf)
     return;
 
   if (strcasematch (buf, "oem"))
-    {
-      current_codepage = oem_cp;
-      set_file_api_mode (current_codepage);
-    }
+    current_codepage = oem_cp;
   else if (strcasematch (buf, "ansi"))
-    {
-      current_codepage = ansi_cp;
-      set_file_api_mode (current_codepage);
-    }
+    current_codepage = ansi_cp;
+  else if (strcasematch (buf, "utf8"))
+    current_codepage = utf8_cp;
   else
     debug_printf ("Wrong codepage name: %s", buf);
+  set_file_api_mode (current_codepage);
 }
 
 static void

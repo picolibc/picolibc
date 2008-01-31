@@ -527,7 +527,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  else if (res == line_edit_input_done)
 	    break;
 	}
-#undef ich
     }
 
   while (buflen)

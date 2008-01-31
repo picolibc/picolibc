@@ -1,5 +1,30 @@
 2008-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_1): Use GetCommandLineW and convert to current
+	codepage.
+	* environ.cc (set_file_api_mode): Always set file api to ANSI if not
+	using the OEM codepage.
+	(codepage_init): Allow "utf8" codepage.
+	* fhandler_clipboard.cc (set_clipboard): Convert clipbuf to void and
+	cast as needed.  Always convert input to wide char and write
+	CF_UNICODETEXT to clipboard.
+	(fhandler_dev_clipboard::read): Read CF_UNICODETEXT from clipboard and
+	convert to current codepage if CYGWIN_NATIVE format is not available.
+	* fhandler_console.cc: Drop redundant undef.
+	* smallprint.cc (__small_vsprintf): Convert PWCHAR and UNICODE_STRING
+	to current codepage for printing.
+	* strfuncs.cc: Use PWCHAR throughout.
+	(get_cp): Return CP_UTF8 for utf8_cp codepage setting.
+	(sys_wcstombs): Allow NULL target buffer.
+	(sys_wcstombs_alloc): New function.
+	(sys_mbstowcs_alloc): Ditto.
+	* winsup.h (codepage_type): Add utf8_cp.
+	(HEAP_NOTHEAP): Define.
+	(sys_wcstombs_alloc): Declare.
+	(sys_mbstowcs_alloc): Declare.
+
+2008-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (struct cwdstuff): Add dir member to store cwd handle.
 	(cwdstuff::get_handle): New method.
 	* path.cc (cwdstuff::set): When doit is true, always try to get

@@ -110,15 +110,23 @@ extern const char case_folded_upper[];
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
-enum codepage_type {ansi_cp, oem_cp};
+enum codepage_type {ansi_cp, oem_cp, utf8_cp};
 extern codepage_type current_codepage;
 
 UINT get_cp ();
 
-int __stdcall sys_wcstombs(char *, int, const WCHAR *, int = -1)
+/* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
+   description see there. */
+#define HEAP_NOTHEAP -1
+
+int __stdcall sys_wcstombs (char *, int, const PWCHAR, int = -1)
+  __attribute__ ((regparm(3)));
+int __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR, int = -1)
   __attribute__ ((regparm(3)));
 
-int __stdcall sys_mbstowcs(WCHAR *, const char *, int)
+int __stdcall sys_mbstowcs (PWCHAR, const char *, int)
+  __attribute__ ((regparm(3)));
+int __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *)
   __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */

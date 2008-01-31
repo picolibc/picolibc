@@ -14,7 +14,9 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <wchar.h>
 #include <windows.h>
+#include <winnls.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
@@ -82,7 +84,7 @@ static int
 set_clipboard (const void *buf, size_t len)
 {
   HGLOBAL hmem;
-  unsigned char *clipbuf;
+  void *clipbuf;
   /* Native CYGWIN format */
   OpenClipboard (0);
   hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
@@ -91,8 +93,8 @@ set_clipboard (const void *buf, size_t len)
       system_printf ("Couldn't allocate global buffer for write");
       return -1;
     }
-  clipbuf = (unsigned char *) GlobalLock (hmem);
-  memcpy (clipbuf + sizeof (size_t), buf, len);
+  clipbuf = GlobalLock (hmem);
+  memcpy ((unsigned char *) clipbuf + sizeof (size_t), buf, len);
   *(size_t *) (clipbuf) = len;
   GlobalUnlock (hmem);
   EmptyClipboard ();
@@ -118,19 +120,24 @@ set_clipboard (const void *buf, size_t len)
   /* CF_TEXT/CF_OEMTEXT for copying to wordpad and the like */
 
   OpenClipboard (0);
-  hmem = GlobalAlloc (GMEM_MOVEABLE, len + 2);
+
+  len = MultiByteToWideChar (get_cp (), 0, (const char *) buf, len, NULL, 0);
+  if (!len)
+    {
+      system_printf ("Invalid string");
+      return -1;
+    }
+  hmem = GlobalAlloc (GMEM_MOVEABLE, (len + 1) * sizeof (WCHAR));
   if (!hmem)
     {
       system_printf ("Couldn't allocate global buffer for write");
       return -1;
     }
-  clipbuf = (unsigned char *) GlobalLock (hmem);
-  memcpy (clipbuf, buf, len);
-  *(clipbuf + len) = '\0';
-  *(clipbuf + len + 1) = '\0';
+  clipbuf = GlobalLock (hmem);
+  sys_mbstowcs ((PWCHAR) clipbuf, (const char *) buf, len);
+  *((PWCHAR) clipbuf + len) = L'\0';
   GlobalUnlock (hmem);
-  if (!SetClipboardData
-      ((current_codepage == ansi_cp ? CF_TEXT : CF_OEMTEXT), hmem))
+  if (!SetClipboardData (CF_UNICODETEXT, hmem))
     {
       system_printf ("Couldn't write to the clipboard");
 /* FIXME: return an appriate error code &| set_errno(); */
@@ -196,7 +203,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   else
     {
       formatlist[0] = cygnativeformat;
-      formatlist[1] = current_codepage == ansi_cp ? CF_TEXT : CF_OEMTEXT;
+      formatlist[1] = CF_UNICODETEXT;
       OpenClipboard (0);
       if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0)
 	{
@@ -222,16 +229,24 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 	    }
 	  else
 	    {
-	      LPSTR lpstr;
-	      lpstr = (LPSTR) GlobalLock (hglb);
-
-	      ret = ((len > (strlen (lpstr) - pos)) ? (strlen (lpstr) - pos)
-		     : len);
-
-	      memcpy (ptr, lpstr + pos, ret);
-	      //ret = snprintf((char *) ptr, len, "%s", lpstr);//+pos);
+	      int wret;
+	      PWCHAR buf;
+	      buf = (PWCHAR) GlobalLock (hglb);
+	      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
+	      
+	      /* This loop is necessary because the number of bytes returned
+		 by WideCharToMultiByte does not indicate the number of wide
+		 chars used for it, so we could potentially drop wide chars. */
+	      if (glen - pos > len)
+	        glen = pos + len;
+	      while ((wret = sys_wcstombs (NULL, 0, buf + pos, glen - pos))
+		      != -1
+		     && (size_t) wret > len)
+	      	--glen;
+	      ret = sys_wcstombs ((char *) ptr, len, buf + pos, glen - pos);
+	      //ret = snprintf((char *) ptr, len, "%s", buf);//+pos);
 	      pos += ret;
-	      if (pos + len - ret >= strlen (lpstr))
+	      if (pos + len - ret >= wcslen (buf))
 		eof = true;
 	      GlobalUnlock (hglb);
 	    }

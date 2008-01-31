@@ -18,6 +18,7 @@ details. */
 #include "exceptions.h"
 #include <ctype.h>
 #include <limits.h>
+#include <winnls.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include "sigproc.h"
@@ -855,11 +856,10 @@ dll_crt0_1 (void *)
 
   if (!__argc)
     {
-      char *line = GetCommandLineA ();
-      line = strcpy ((char *) alloca (strlen (line) + 1), line);
-
-      if (current_codepage == oem_cp)
-	CharToOemA (line, line);
+      PWCHAR wline = GetCommandLineW ();
+      size_t size = sys_wcstombs (NULL, size, wline);
+      char *line = (char *) alloca (size);
+      sys_wcstombs (line, size, wline);
 
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */

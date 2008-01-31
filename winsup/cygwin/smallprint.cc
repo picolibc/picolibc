@@ -195,24 +195,17 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  us = va_arg (ap, PUNICODE_STRING);
 		wfillin:
 		  {
-		    ANSI_STRING as = { 0, 0, NULL };
-		    NTSTATUS status;
+		    char *tmp;
 
-		    if (current_codepage == ansi_cp)
-		      status = RtlUnicodeStringToAnsiString (&as, us, TRUE);
-		    else
-		      status = RtlUnicodeStringToOemString (&as, us, TRUE);
-		    if (!NT_SUCCESS (status))
+		    if (!sys_wcstombs_alloc (&tmp, PATH_MAX, us->Buffer,
+					     us->Length / sizeof (WCHAR)))
 		      {
 			s = "invalid UNICODE_STRING";
 			goto fillin;
 		      }
-		    for (i = 0; i < as.Length; ++i)
-		      *dst++ = as.Buffer[i];
-		    if (current_codepage == ansi_cp)
-		      RtlFreeAnsiString (&as);
-		    else
-		      RtlFreeOemString (&as);
+		    for (i = 0; *tmp && i < n; i++)
+		      *dst++ = *tmp++;
+		    free (tmp);
 		  }
 		  break;
 		default:
