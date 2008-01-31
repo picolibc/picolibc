@@ -1,3 +1,11 @@
+2008-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct cwdstuff): Add dir member to store cwd handle.
+	(cwdstuff::get_handle): New method.
+	* path.cc (cwdstuff::set): When doit is true, always try to get
+	directory handle.  Fail if duplicating handle fails.  Store handle
+	in dir.  Fix potential SEGV when setting drive_length. 
+
 2008-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc: Fix Samba version in comment.

@@ -223,9 +223,11 @@ struct cwdstuff
 {
   char *posix;
   UNICODE_STRING win32;
+  HANDLE dir;
   DWORD drive_length;
   static muto cwd_lock;
   char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
+  HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
   {
     cwd_lock.acquire ();

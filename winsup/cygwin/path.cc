@@ -4431,7 +4431,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	 - Unlinking a cwd fails because SetCurrentDirectory seems to
 	   open directories so that deleting the directory is disallowed.
 	   The below code opens with *all* sharing flags set. */
-      HANDLE h;
+      HANDLE h, h_copy;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       OBJECT_ATTRIBUTES attr;
@@ -4441,18 +4441,6 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
       phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
       if (!nat_cwd) /* On init, just reopen CWD with desired access flags. */
 	RtlInitUnicodeString (&upath, L"");
-      else
-	{
-	  /* TODO:
-	     Check the length of the new CWD.  Windows can only handle
-	     CWDs of up to MAX_PATH length, including a trailing backslash.
-	     If the path is longer, it's not an error condition for Cygwin,
-	     so we don't fail.  Windows on the other hand has a problem now.
-	     For now, we just don't store the path in the PEB and proceed as
-	     usual. */
-	  if (len > MAX_PATH - (nat_cwd->Buffer[len - 1] == L'\\' ? 1 : 2))
-	    goto skip_peb_storing;
-	}
       InitializeObjectAttributes (&attr, &upath,
 				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 				  nat_cwd ? NULL : *phdl, NULL);
@@ -4468,8 +4456,36 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  res = -1;
 	  goto out;
 	}
+      /* Workaround a problem in Vista which fails in subsequent calls to
+	 CreateFile with ERROR_INVALID_HANDLE if the handle in
+	 CurrentDirectoryHandle changes without calling SetCurrentDirectory,
+	 and the filename given to CreateFile is a relative path.  It looks
+	 like Vista stores a copy of the CWD handle in some other undocumented
+	 place.  The NtClose/DuplicateHandle reuses the original handle for
+	 the copy of the new handle and the next CreateFile works.
+	 Note that this is not thread-safe (yet?) */
+      if (!DuplicateHandle (GetCurrentProcess (), h, GetCurrentProcess (),
+			    &h_copy, 0, TRUE, DUPLICATE_SAME_ACCESS))
+	{
+	  RtlReleasePebLock ();
+	  __seterrno ();
+	  NtClose (h);
+	  res = -1;
+	  goto out;
+	}
+      NtClose (*phdl);
+      dir = *phdl = h;
 
-      if (nat_cwd) /* No need to set path on init. */
+      /* No need to set path on init. */
+      if (nat_cwd
+	  /* TODO:
+	     Check the length of the new CWD.  Windows can only handle
+	     CWDs of up to MAX_PATH length, including a trailing backslash.
+	     If the path is longer, it's not an error condition for Cygwin,
+	     so we don't fail.  Windows on the other hand has a problem now.
+	     For now, we just don't store the path in the PEB and proceed as
+	     usual. */
+	  && len <= MAX_PATH - (nat_cwd->Buffer[len - 1] == L'\\' ? 1 : 2))
         {
 	  /* Convert to a Win32 path. */
 	  upath.Buffer += upath.Length / sizeof (WCHAR) - len;
@@ -4485,22 +4501,6 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  RtlCopyUnicodeString (&get_user_proc_parms ()->CurrentDirectoryName,
 				&upath);
 	}
-      NtClose (*phdl);
-      /* Workaround a problem in Vista which fails in subsequent calls to
-	 CreateFile with ERROR_INVALID_HANDLE if the handle in
-	 CurrentDirectoryHandle changes without calling SetCurrentDirectory,
-	 and the filename given to CreateFile is a relative path.  It looks
-	 like Vista stores a copy of the CWD handle in some other undocumented
-	 place.  The NtClose/DuplicateHandle reuses the original handle for
-	 the copy of the new handle and the next CreateFile works.
-	 Note that this is not thread-safe (yet?) */
-      if (DuplicateHandle (GetCurrentProcess (), h, GetCurrentProcess (), phdl,
-			   0, TRUE, DUPLICATE_SAME_ACCESS))
-	NtClose (h);
-      else
-	*phdl = h;
-
-skip_peb_storing:
 
       RtlReleasePebLock ();
     }
@@ -4552,7 +4552,7 @@ skip_peb_storing:
       else if (win32.Buffer[1] == L'\\')
 	{
 	  PWCHAR ptr = wcschr (win32.Buffer + 2, L'\\');
-	  if (*ptr)
+	  if (ptr)
 	    ptr = wcschr (ptr + 1, L'\\');
 	  if (ptr)
 	    drive_length = ptr - win32.Buffer;
