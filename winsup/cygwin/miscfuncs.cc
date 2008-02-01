@@ -17,6 +17,8 @@ details. */
 #include <alloca.h>
 #include <limits.h>
 #include <wchar.h>
+#include <winbase.h>
+#include <winnls.h>
 #include "cygthread.h"
 #include "cygtls.h"
 #include "ntdll.h"
@@ -94,14 +96,14 @@ extern "C" int __stdcall
 cygwin_wcsncasecmp (const wchar_t  *ws, const wchar_t *wt, size_t n)
 {
   UNICODE_STRING us, ut;
+  size_t ls = 0, lt = 0;
 
-  n *= sizeof (WCHAR);
-  RtlInitUnicodeString (&us, ws);
-  if (us.Length > n)
-    us.Length = n;
-  RtlInitUnicodeString (&ut, wt);
-  if (ut.Length > n)
-    ut.Length = n;
+  while (ws[ls] && ls < n)
+    ++ls;
+  RtlInitCountedUnicodeString (&us, ws, ls * sizeof (WCHAR));
+  while (wt[lt] && lt < n)
+    ++lt;
+  RtlInitCountedUnicodeString (&ut, wt, lt * sizeof (WCHAR));
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
@@ -125,18 +127,20 @@ cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
 {
   UNICODE_STRING us, ut;
   ULONG len;
-  
-  n *= sizeof (WCHAR);
-  len = (strlen (cs) + 1) * sizeof (WCHAR);
+  size_t ls = 0, lt = 0;
+
+  while (cs[ls] && ls < n)
+    ++ls;
+  len = ls * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
-  us.Length = sys_mbstowcs (us.Buffer, cs, us.MaximumLength) * sizeof (WCHAR);
-  if (us.Length > n)
-    us.Length = n;
-  len = (strlen (ct) + 1) * sizeof (WCHAR);
+  us.Length = MultiByteToWideChar (get_cp (), 0, cs, ls, us.Buffer,
+				   us.MaximumLength)  * sizeof (WCHAR);
+  while (ct[lt] && lt < n)
+    ++lt;
+  len = lt * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
-  ut.Length = sys_mbstowcs (ut.Buffer, ct, ut.MaximumLength) * sizeof (WCHAR);
-  if (ut.Length > n)
-    ut.Length = n;
+  ut.Length = MultiByteToWideChar (get_cp (), 0, ct, lt, ut.Buffer,
+				   ut.MaximumLength)  * sizeof (WCHAR);
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 

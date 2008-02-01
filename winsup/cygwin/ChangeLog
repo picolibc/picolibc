@@ -1,5 +1,11 @@
 2008-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (cygwin_wcsncasecmp): Never access more than n
+	characters.
+	(cygwin_strncasecmp): Ditto.  Fix for strings longer than n.
+
+2008-02-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* string.h: Re-enable inline strcasematch and strncasematch
 	implementations and rename to ascii_strcasematch/ascii_strncasematch.
 	* dcrt0.cc: Replace str[n]casematch with ascii_str[n]casematch where
