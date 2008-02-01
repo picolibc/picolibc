@@ -61,15 +61,10 @@ strechr (const char *s, int c)
 
 #ifdef __INSIDE_CYGWIN__
 
-/* Don't use.  Not NLS aware. */
-#if 0 // Not NLS aware
 extern const char isalpha_array[];
 
-#undef strcasematch
-#define strcasematch cygwin_strcasematch
-
 static inline int
-cygwin_strcasematch (const char *cs, const char *ct)
+ascii_strcasematch (const char *cs, const char *ct)
 {
   register int __res;
   int d0, d1;
@@ -95,11 +90,8 @@ cygwin_strcasematch (const char *cs, const char *ct)
   return __res;
 }
 
-#undef strncasematch
-#define strncasematch cygwin_strncasematch
-
 static inline int
-cygwin_strncasematch (const char *cs, const char *ct, size_t n)
+ascii_strncasematch (const char *cs, const char *ct, size_t n)
 {
   register int __res;
   int d0, d1, d2;
@@ -126,7 +118,7 @@ cygwin_strncasematch (const char *cs, const char *ct, size_t n)
 
   return __res;
 }
-#else
+
 #undef strcasecmp
 #define strcasecmp cygwin_strcasecmp
 int __stdcall cygwin_strcasecmp (const char *, const char *);
@@ -137,7 +129,6 @@ int __stdcall cygwin_strncasecmp (const char *, const char *, size_t);
 
 #define strcasematch(s1,s2)	(!cygwin_strcasecmp ((s1),(s2)))
 #define strncasematch(s1,s2,n)	(!cygwin_strncasecmp ((s1),(s2),(n)))
-#endif
 
 #undef strlwr
 #define strlwr cygwin_strlwr

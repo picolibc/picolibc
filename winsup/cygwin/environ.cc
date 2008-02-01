@@ -459,7 +459,7 @@ glob_init (const char *buf)
       allow_glob = false;
       ignore_case_with_glob = false;
     }
-  else if (strncasematch (buf, "ignorecase", 10))
+  else if (ascii_strncasematch (buf, "ignorecase", 10))
     {
       allow_glob = true;
       ignore_case_with_glob = true;
@@ -477,17 +477,17 @@ check_case_init (const char *buf)
   if (!buf || !*buf)
     return;
 
-  if (strncasematch (buf, "relax", 5))
+  if (ascii_strncasematch (buf, "relax", 5))
     {
       pcheck_case = PCHECK_RELAXED;
       debug_printf ("File case checking set to RELAXED");
     }
-  else if (strcasematch (buf, "adjust"))
+  else if (ascii_strcasematch (buf, "adjust"))
     {
       pcheck_case = PCHECK_ADJUST;
       debug_printf ("File case checking set to ADJUST");
     }
-  else if (strcasematch (buf, "strict"))
+  else if (ascii_strcasematch (buf, "strict"))
     {
       pcheck_case = PCHECK_STRICT;
       debug_printf ("File case checking set to STRICT");
@@ -519,11 +519,11 @@ codepage_init (const char *buf)
   if (!buf || !*buf)
     return;
 
-  if (strcasematch (buf, "oem"))
+  if (ascii_strcasematch (buf, "oem"))
     current_codepage = oem_cp;
-  else if (strcasematch (buf, "ansi"))
+  else if (ascii_strcasematch (buf, "ansi"))
     current_codepage = ansi_cp;
-  else if (strcasematch (buf, "utf8"))
+  else if (ascii_strcasematch (buf, "utf8"))
     current_codepage = utf8_cp;
   else
     debug_printf ("Wrong codepage name: %s", buf);
@@ -545,13 +545,13 @@ set_proc_retry (const char *buf)
 static void
 set_ntsec (const char *buf)
 {
-  allow_ntsec = (buf && strcasematch (buf, "yes"));
+  allow_ntsec = (buf && ascii_strcasematch (buf, "yes"));
 }
 
 static void
 set_smbntsec (const char *buf)
 {
-  allow_smbntsec = (buf && strcasematch (buf, "yes"));
+  allow_smbntsec = (buf && ascii_strcasematch (buf, "yes"));
 }
 
 /* The structure below is used to set up an array which is used to
@@ -636,7 +636,7 @@ parse_options (char *buf)
        p = strtok_r (NULL, " \t", &lasts))
     {
       char *keyword_here = p;
-      if (!(istrue = !strncasematch (p, "no", 2)))
+      if (!(istrue = !ascii_strncasematch (p, "no", 2)))
 	p += 2;
       else if (!(istrue = *p != '-'))
 	p++;
@@ -648,7 +648,7 @@ parse_options (char *buf)
 	ch = 0;
 
       for (parse_thing *k = known; k->name != NULL; k++)
-	if (strcasematch (p, k->name))
+	if (ascii_strcasematch (p, k->name))
 	  {
 	    switch (k->disposition)
 	      {
@@ -901,7 +901,7 @@ static NO_COPY spenv spenvs[] =
 char *
 spenv::retrieve (bool no_envblock, const char *const env)
 {
-  if (env && !strncasematch (env, name, namelen))
+  if (env && !ascii_strncasematch (env, name, namelen))
     return NULL;
 
   debug_printf ("no_envblock %d", no_envblock);

@@ -55,7 +55,7 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva)
   for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
     if (section[i].VirtualAddress <= import_rva
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
-    // if (strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
+    // if (ascii_strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
       return section[i].VirtualAddress - section[i].PointerToRawData;
   return -1;
 }
@@ -190,7 +190,7 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
-      if (!strcasematch (rva (PSTR, hm, pd->Name - delta), "cygwin1.dll"))
+      if (!ascii_strcasematch (rva (PSTR, hm, pd->Name - delta), "cygwin1.dll"))
 	continue;
       if (!fn)
 	return (void *) "found it";	// just checking if executable used cygwin1.dll

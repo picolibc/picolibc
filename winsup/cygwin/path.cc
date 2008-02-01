@@ -1194,9 +1194,9 @@ out:
     {
       const char *p = strchr (path, '\0') - 4;
       if (p >= path &&
-	  (strcasematch (".exe", p) ||
-	   strcasematch (".bat", p) ||
-	   strcasematch (".com", p)))
+	  (ascii_strcasematch (".exe", p) ||
+	   ascii_strcasematch (".bat", p) ||
+	   ascii_strcasematch (".com", p)))
 	path_flags |= PATH_EXEC;
     }
 
@@ -1562,20 +1562,21 @@ special_name (const char *s, int inc = 1)
 
   int n;
   const char *p = NULL;
-  if (strncasematch (s, "conin$", n = 5)
-      || strncasematch (s, "conout$", n = 7)
-      || strncasematch (s, "nul", n = 3)
-      || strncasematch (s, "aux", 3)
-      || strncasematch (s, "prn", 3)
-      || strncasematch (s, "con", 3))
+  if (ascii_strncasematch (s, "conin$", n = 5)
+      || ascii_strncasematch (s, "conout$", n = 7)
+      || ascii_strncasematch (s, "nul", n = 3)
+      || ascii_strncasematch (s, "aux", 3)
+      || ascii_strncasematch (s, "prn", 3)
+      || ascii_strncasematch (s, "con", 3))
     p = s + n;
-  else if (strncasematch (s, "com", 3) || strncasematch (s, "lpt", 3))
+  else if (ascii_strncasematch (s, "com", 3)
+	   || ascii_strncasematch (s, "lpt", 3))
     strtoul (s + 3, (char **) &p, 10);
   if (p && (*p == '\0' || *p == '.'))
     return -1;
 
   return (strchr (s, '\0')[-1] == '.')
-	 || (strpbrk (s, special_chars) && !strncasematch (s, "%2f", 3));
+	 || (strpbrk (s, special_chars) && !ascii_strncasematch (s, "%2f", 3));
 }
 
 bool
@@ -2890,7 +2891,7 @@ is_floppy (const char *dos)
   char dev[256];
   if (!QueryDosDevice (dos, dev, 256))
     return false;
-  return strncasematch (dev, "\\Device\\Floppy", 14);
+  return ascii_strncasematch (dev, "\\Device\\Floppy", 14);
 }
 
 extern "C" FILE *
@@ -3468,7 +3469,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
     {
       /* Check if the extension matches a known extension */
       for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
-	if (strcasematch (ext_here, ex->name))
+	if (ascii_strcasematch (ext_here, ex->name))
 	  {
 	    nextstate = SCAN_JUSTCHECK;
 	    suffixes = NULL;	/* Has an extension so don't scan for one. */
@@ -3477,7 +3478,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
     }
 
   /* Didn't match.  Use last resort -- .lnk. */
-  if (strcasematch (ext_here, ".lnk"))
+  if (ascii_strcasematch (ext_here, ".lnk"))
     {
       nextstate = SCAN_HASLNK;
       suffixes = NULL;
@@ -4173,7 +4174,7 @@ realpath (const char *path, char *resolved)
       if (!transparent_exe && real_path.known_suffix)
 	{
 	  char *c = strrchr (real_path.normalized_path, '.');
-	  if (!c || !strcasematch (c, real_path.known_suffix))
+	  if (!c || !ascii_strcasematch (c, real_path.known_suffix))
 	    tack_on = strlen (real_path.known_suffix);
 	}
 

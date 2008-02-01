@@ -456,7 +456,7 @@ fhandler_process::fill_filebuf ()
 		if (len > 4)
 		  {
 		    char *s = filebuf + len - 4;
-		    if (strcasematch (s, ".exe"))
+		    if (ascii_strcasematch (s, ".exe"))
 		      *s = 0;
 		  }
 	      }
@@ -618,7 +618,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
       if (len > 4)
 	{
 	  char *s = cmd + len - 4;
-	  if (strcasematch (s, ".exe"))
+	  if (ascii_strcasematch (s, ".exe"))
 	    *s = 0;
 	 }
     }
@@ -744,7 +744,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
       if (len > 4)
 	{
 	  char *s = cmd + len - 4;
-	  if (strcasematch (s, ".exe"))
+	  if (ascii_strcasematch (s, ".exe"))
 	    *s = 0;
 	 }
     }

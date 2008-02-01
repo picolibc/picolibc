@@ -1459,8 +1459,8 @@ rename_append_suffix (path_conv &pc, const char *path, size_t len,
 {
   char buf[len + 5];
 
-  if (strcasematch (path + len - 4, ".lnk")
-      || strcasematch (path + len - 4, ".exe"))
+  if (ascii_strcasematch (path + len - 4, ".lnk")
+      || ascii_strcasematch (path + len - 4, ".exe"))
     len -= 4;
   stpcpy (stpncpy (buf, path, len), suffix);
   pc.check (buf, PC_SYM_NOFOLLOW);
@@ -1529,8 +1529,8 @@ rename (const char *oldpath, const char *newpath)
       goto out;
     }
   if (oldpc.known_suffix
-      && (strcasematch (oldpath + olen - 4, ".lnk")
-	  || strcasematch (oldpath + olen - 4, ".exe")))
+      && (ascii_strcasematch (oldpath + olen - 4, ".lnk")
+	  || ascii_strcasematch (oldpath + olen - 4, ".exe")))
     old_explicit_suffix = true;
 
   nlen = strlen (newpath);
@@ -1559,8 +1559,8 @@ rename (const char *oldpath, const char *newpath)
       goto out;
     }
   if (newpc.known_suffix
-      && (strcasematch (newpath + nlen - 4, ".lnk")
-	  || strcasematch (newpath + nlen - 4, ".exe")))
+      && (ascii_strcasematch (newpath + nlen - 4, ".lnk")
+	  || ascii_strcasematch (newpath + nlen - 4, ".exe")))
     new_explicit_suffix = true;
 
   /* This test is necessary in almost every case, so just do it once here. */

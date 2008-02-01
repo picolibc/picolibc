@@ -367,7 +367,7 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
 
   const char *mydomain = domain ();
   const char *myname = winname ();
-  if (!mydomain || strcasematch (myname, "SYSTEM"))
+  if (!mydomain || ascii_strcasematch (myname, "SYSTEM"))
     return almost_null;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];

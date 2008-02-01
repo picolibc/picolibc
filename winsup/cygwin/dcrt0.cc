@@ -892,7 +892,7 @@ dll_crt0_1 (void *)
   if (__progname)
     {
       char *cp = strchr (__progname, '\0') - 4;
-      if (cp > __progname && strcasematch (cp, ".exe"))
+      if (cp > __progname && ascii_strcasematch (cp, ".exe"))
 	*cp = '\0';
     }
 

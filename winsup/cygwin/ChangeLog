@@ -1,3 +1,19 @@
+2008-02-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* string.h: Re-enable inline strcasematch and strncasematch
+	implementations and rename to ascii_strcasematch/ascii_strncasematch.
+	* dcrt0.cc: Replace str[n]casematch with ascii_str[n]casematch where
+	applicable.
+	* environ.cc: Ditto.
+	* fhandler_process.cc: Ditto.
+	* hookapi.cc: Ditto.
+	* path.cc: Ditto.
+	* spawn.cc: Ditto.
+	* strace.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* uinfo.cc: Ditto.
+	* winf.cc: Ditto.
+
 2008-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_1): Use GetCommandLineW and convert to current

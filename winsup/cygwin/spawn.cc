@@ -528,7 +528,7 @@ loop:
 	 risk, but we don't want to disable this behaviour for older
 	 OSes because it's still heavily used by some users.  They have
 	 been warned. */
-      if (!strcasematch (wstname, "WinSta0"))
+      if (!ascii_strcasematch (wstname, "WinSta0"))
 	{
 	  char sid[128];
 
@@ -942,12 +942,12 @@ int
 av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 {
   const char *p;
-  bool exeext = strcasematch (ext, ".exe");
-  if (exeext && real_path.iscygexec () || strcasematch (ext, ".bat"))
+  bool exeext = ascii_strcasematch (ext, ".exe");
+  if (exeext && real_path.iscygexec () || ascii_strcasematch (ext, ".bat"))
     return 0;
   if (!*ext && ((p = ext - 4) > real_path.get_win32 ())
-      && (strcasematch (p, ".bat") || strcasematch (p, ".cmd")
-	  || strcasematch (p, ".btm")))
+      && (ascii_strcasematch (p, ".bat") || ascii_strcasematch (p, ".cmd")
+	  || ascii_strcasematch (p, ".btm")))
     return 0;
   while (1)
     {
@@ -1034,7 +1034,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 just_shell:
       if (!pgm)
 	{
-	  if (strcasematch (ext, ".com"))
+	  if (ascii_strcasematch (ext, ".com"))
 	    break;
 	  pgm = (char *) "/bin/sh";
 	  arg1 = NULL;

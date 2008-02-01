@@ -167,7 +167,8 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 	p = pn;
       if (p != progname)
 	strcpy (progname, p);
-      if ((p = strrchr (progname, '.')) != NULL && strcasematch (p, ".exe"))
+      if ((p = strrchr (progname, '.')) != NULL
+	  && ascii_strcasematch (p, ".exe"))
 	*p = '\000';
       p = progname;
       char tmpbuf[20];
