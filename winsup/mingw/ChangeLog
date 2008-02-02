@@ -1,3 +1,8 @@
+2008-02-01  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in: Add rules to generate multiple versions of libmoldname.a for
+	the different runtime versions.
+
 2007-12-27 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.14.

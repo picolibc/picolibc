@@ -1,5 +1,5 @@
 # Makefile.in for the winsup/mingw directory.
-# Copyright (c) 1995, 1996, 1997, 1998 Cygnus Solutions
+# Copyright (c) 1995-2008, 1996, 1997, 1998 Cygnus Solutions
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -188,6 +188,10 @@ LIBS = libcrtdll.a \
        libmingw32.a \
        libcoldname.a \
        libmoldname.a libmoldnamed.a \
+       libmoldname70.a libmoldname70d.a \
+       libmoldname71.a libmoldname71d.a \
+       libmoldname80.a libmoldname80d.a \
+       libmoldname90.a libmoldname90d.a \
        $(LIBM_A) \
        libmingwthrd.a
 
@@ -301,17 +305,17 @@ libcoldname.a: moldname-crtdll.def $(MOLD_OBJS)
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-libmoldname.a: moldname-msvcrt.def $(MOLD_OBJS)
+libmoldname.a libmoldnamed.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
-		--dllname msvcrt.dll	\
+		--dllname msvcrt$(@:libmoldname%a=%)dll \
 		--def moldname-msvcrt.def	\
 		--output-lib $@
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-libmoldnamed.a: moldname-msvcrt.def $(MOLD_OBJS)
+libmoldname70.a libmoldname70d.a libmoldname71.a libmoldname71d.a libmoldname80.a libmoldname80d.a libmoldname90.a libmoldname90d.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
-		--dllname msvcrtd.dll	\
+		--dllname msvcr$(@:libmoldname%a=%)dll  \
 		--def moldname-msvcrt.def	\
 		--output-lib $@
 	$(AR) rc $@ $(MOLD_OBJS)
