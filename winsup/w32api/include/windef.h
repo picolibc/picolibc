@@ -55,29 +55,6 @@ extern "C" {
 #define TRUE 1
 #endif
 
-/* Pseudo modifiers for parameters 
-   We don't use these unnecessary defines in the w32api headers. Define
-   them by default since that is what people expect, but allow users
-   to avoid the pollution.  */
-#ifndef _NO_W32_PSEUDO_MODIFIERS
-#define IN
-#define OUT
-#define __in
-#define __inout
-#define __in_opt
-#define __in_bcount(x)
-#define __in_ecount(x)
-#define __out
-#define __out_ecount_part(x)
-#define __out_ecount_part(x,y)
-#define __struct_bcount(x)
-#define __field_ecount_opt(x)
-#define __out_bcount_opt(x)
-#ifndef OPTIONAL
-#define OPTIONAL
-#endif
-#endif
-
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))
 #ifndef _fastcall

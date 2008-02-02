@@ -1,3 +1,10 @@
+2008-02-02  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/specstrings.h: new file, move pseudo modifiers from windef.h.
+	* include/windef.h (__in, __inout, __in_opt, __in_bcound, __in_ecount,
+	__out, __out_ecount_part, __struct_bcount, __field_ecount_opt,
+	__out_bcount_opt): Move to specstrings.h.
+
 2008-01-30  Brandon Sneed  <nivenh@sourceware.org>
 
 	* lib/bthprops.def: new file, bluetooth imports.
