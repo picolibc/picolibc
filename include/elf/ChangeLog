@@ -1,3 +1,8 @@
+2008-02-04  Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips.h: Update copyright.
+	(E_MIPS_MACH_OCTEON): New macro.
+
 2008-01-30  Tristan Gingold  <gingold@adacore.com>
 
 	Add OpenVMS extensions.
