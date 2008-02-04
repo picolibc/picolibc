@@ -1,6 +1,6 @@
 /* mips.h.  Mips opcode list for GDB, the GNU debugger.
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005
+   2003, 2004, 2005, 2008
    Free Software Foundation, Inc.
    Contributed by Ralph Campbell and OSF
    Commented and modified by Ian Lance Taylor, Cygnus Support
@@ -510,6 +510,12 @@ struct mips_opcode
 static const unsigned int mips_isa_table[] =
   { 0x0001, 0x0003, 0x0607, 0x1e0f, 0x3e1f, 0x0a23, 0x3e63, 0x3ebf, 0x3fff };
 
+/* Masks used for Chip specific instructions.  */
+#define INSN_CHIP_MASK		  0xc3ff0800
+
+/* Cavium Networks Octeon instructions.  */
+#define INSN_OCTEON		  0x00000800
+
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x3c00f000
 
@@ -520,8 +526,6 @@ static const unsigned int mips_isa_table[] =
 #define INSN_MIPS16               0x00004000
 /* MIPS-3D ASE */
 #define INSN_MIPS3D               0x00008000
-
-/* Chip specific instructions.  These are bitmasks.  */
 
 /* MIPS R4650 instruction.  */
 #define INSN_4650                 0x00010000
@@ -605,6 +609,7 @@ static const unsigned int mips_isa_table[] =
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
 #define CPU_LOONGSON_2E 3001
 #define CPU_LOONGSON_2F 3002
+#define CPU_OCTEON	6501
 
 /* Test for membership in an ISA including chip specific ISAs.  INSN
    is pointer to an element of the opcode table; ISA is the specified
@@ -635,6 +640,8 @@ static const unsigned int mips_isa_table[] =
          && ((insn)->membership & INSN_LOONGSON_2E) != 0)               \
      || (cpu == CPU_LOONGSON_2F                                         \
          && ((insn)->membership & INSN_LOONGSON_2F) != 0)               \
+     || (cpu == CPU_OCTEON						\
+	 && ((insn)->membership & INSN_OCTEON) != 0)			\
      || 0)	/* Please keep this term for easier source merging.  */
 
 /* This is a list of macro expanded instructions.
