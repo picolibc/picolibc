@@ -1,3 +1,8 @@
+2008-02-03  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in: Don't link strfuncs.o from the Cygwin build dir.
+	Build it again with __OUTSIDE_CYGWIN__ defined.
+
 2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (tunable_params): Add kern.ipc.shm_allow_removed as
