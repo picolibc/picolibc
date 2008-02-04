@@ -197,7 +197,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  {
 		    char *tmp;
 
-		    if (!sys_wcstombs_alloc (&tmp, PATH_MAX, us->Buffer,
+		    if (!sys_wcstombs_alloc (&tmp, HEAP_NOTHEAP, us->Buffer,
 					     us->Length / sizeof (WCHAR)))
 		      {
 			s = "invalid UNICODE_STRING";

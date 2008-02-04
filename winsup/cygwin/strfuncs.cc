@@ -60,7 +60,11 @@ sys_wcstombs (char *tgt, int tlen, const PWCHAR src, int slen)
    value is the number of bytes written to the buffer, as usual.
    The "type" argument determines where the resulting buffer is stored.
    It's either one of the cygheap_types values, or it's "HEAP_NOTHEAP".
-   In the latter case the allocation uses simple calloc. */
+   In the latter case the allocation uses simple calloc.
+   
+   Note that this code is shared by cygserver (which requires it via
+   __small_vsprintf) and so when built there plain calloc is the 
+   only choice.  */
 int __stdcall
 sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
 {
@@ -71,10 +75,14 @@ sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
     {
       size_t tlen = (slen == -1 ? ret : ret + 1);
 
+#ifndef __OUTSIDE_CYGWIN__
       if (type == HEAP_NOTHEAP)
+#endif
         *tgt_p = (char *) calloc (tlen, sizeof (char));
+#ifndef __OUTSIDE_CYGWIN__
       else
       	*tgt_p = (char *) ccalloc ((cygheap_types) type, tlen, sizeof (char));
+#endif
       if (!*tgt_p)
         return 0;
       ret = sys_wcstombs (*tgt_p, tlen, src, slen);
@@ -98,10 +106,14 @@ sys_mbstowcs_alloc (PWCHAR *tgt_p, int type, const char *src)
   ret = MultiByteToWideChar (get_cp (), 0, src, -1, NULL, 0);
   if (ret)
     {
+#ifndef __OUTSIDE_CYGWIN__
       if (type == HEAP_NOTHEAP)
+#endif
         *tgt_p = (PWCHAR) calloc (ret, sizeof (WCHAR));
+#ifndef __OUTSIDE_CYGWIN__
       else
       	*tgt_p = (PWCHAR) ccalloc ((cygheap_types) type, ret, sizeof (WCHAR));
+#endif
       if (!*tgt_p)
         return 0;
       ret = sys_mbstowcs (*tgt_p, src, ret);

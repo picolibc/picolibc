@@ -1,3 +1,10 @@
+2008-02-03  Brian Dessent  <brian@dessent.net>
+
+	* smallprint.cc (__small_vsprintf): Use HEAP_NOTHEAP for type.
+	* strfuncs.cc (sys_wcstombs_alloc): Guard use of ccalloc
+	to !__OUTSIDE_CYGWIN__ for use in cygserver.
+	(sys_mbstowcs_alloc): Ditto.
+
 2008-02-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (cygwin_wcsncasecmp): Never access more than n
