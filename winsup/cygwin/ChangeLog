@@ -1,3 +1,36 @@
+2008-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (CharToOemA): Remove.
+	(CharNextExA): Define.
+	* environ.cc (codepage_init): Un-static.  Set active_codepage to
+	active codepage.  Default to ansi regardless of buf pointer.
+	* fhandler.h (dev_console::get_console_cp): New method.
+	(dev_console::con_to_str): Change declaration according to new
+	implementation.
+	(dev_console::str_to_con): Ditto.
+	* fhandler_console.cc (cp_convert): Remove.
+	(dev_console::con_to_str): Redefine to take WCHAR as incoming console
+	char.
+	(dev_console::get_console_cp): Return correct codepage according to
+	alternate_charset_active setting.
+	(dev_console::str_to_con): Redefine to create WCHAR buffer for console
+	output.
+	(fhandler_console::read): Read console input as WCHARs.
+	(base_chars): Fix typo in comment.
+	(fhandler_console::char_command): Save and restore console output
+	buffer using UNICODE functions.
+	(fhandler_console::write_normal): Convert to write output in UNICODE.
+	Use CharNextExA to recognize multibyte characters in input.  Workaround
+	problem with UTF-8 and MultiByteToWideChar.  Simplify the loop for
+	printing "normal" characters.
+	* strfuncs.cc (active_codepage): New variable to store active codepage.
+	(get_cp): Call codepage_init() if active_codepage is uninitialized.
+	Just return active_codepage.
+	(is_cp_multibyte): New function.
+	* winsup.h (active_codepage): Declare.
+	(codepage_init): Declare.
+	(is_cp_multibyte): Declare.
+
 2008-02-03  Brian Dessent  <brian@dessent.net>
 
 	* smallprint.cc (__small_vsprintf): Use HEAP_NOTHEAP for type.

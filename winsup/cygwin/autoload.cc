@@ -320,7 +320,7 @@ LoadDLLfuncEx (LsaLogonUser, 56, secur32, 1)
 LoadDLLfuncEx (LsaLookupAuthenticationPackage, 12, secur32, 1)
 LoadDLLfuncEx (LsaRegisterLogonProcess, 12, secur32, 1)
 
-LoadDLLfunc (CharToOemA, 8, user32)
+LoadDLLfunc (CharNextExA, 12, user32)
 LoadDLLfunc (CloseClipboard, 0, user32)
 LoadDLLfunc (CloseDesktop, 4, user32)
 LoadDLLfunc (CloseWindowStation, 4, user32)

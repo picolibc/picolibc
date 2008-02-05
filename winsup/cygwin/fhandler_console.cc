@@ -35,28 +35,6 @@ details. */
 
 #define CONVERT_LIMIT 16384
 
-static bool
-cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
-{
-  if (!size)
-    /* no action */;
-  else if (destcp == srccp)
-    {
-      if (dest != src)
-	memcpy (dest, src, size);
-    }
-  else
-    {
-      WCHAR wbuffer[CONVERT_LIMIT]; /* same size as the maximum input, s.b. */
-      if (!MultiByteToWideChar (srccp, 0, src, size, wbuffer, sizeof (wbuffer)))
-	return false;
-      if (!WideCharToMultiByte (destcp, 0, wbuffer, size, dest, size,
-				NULL, NULL))
-	return false;
-    }
-  return true;
-}
-
 /*
  * Scroll the screen context.
  * x1, y1 - ul corner
@@ -175,21 +153,21 @@ set_console_state_for_spawn (bool iscyg)
    cached, because a program or the user can change these values at
    any time. */
 inline bool
-dev_console::con_to_str (char *d, const char *s, DWORD sz)
+dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
+  return !!sys_wcstombs (d, dlen, &w, 1);
 }
 
-inline bool
-dev_console::str_to_con (char *d, const char *s, DWORD sz)
+inline UINT
+dev_console::get_console_cp ()
 {
-  if (alternate_charset_active)
-    {
-      /* no translation when alternate charset is active */
-      memcpy(d, s, sz);
-      return true;
-    }
-  return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
+  return alternate_charset_active ? GetConsoleOutputCP () : get_cp ();
+}
+
+inline DWORD
+dev_console::str_to_con (PWCHAR d, const char *s, DWORD sz)
+{
+  return MultiByteToWideChar (get_console_cp (), 0, s, sz, d, CONVERT_LIMIT);
 }
 
 bool
@@ -292,7 +270,7 @@ fhandler_console::read (void *pv, size_t& buflen)
       INPUT_RECORD input_rec;
       const char *toadd = NULL;
 
-      if (!ReadConsoleInput (h, &input_rec, 1, &nread))
+      if (!ReadConsoleInputW (h, &input_rec, 1, &nread))
 	{
 	  syscall_printf ("ReadConsoleInput failed, %E");
 	  goto err;		/* seems to be failure */
@@ -376,18 +354,14 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 	  else
 	    {
-	      tmp[1] = ich;
-	      /* Need this check since US code page seems to have a bug when
-		 converting a CTRL-U. */
-	      if ((unsigned char) ich > 0x7f)
-		dev_state->con_to_str (tmp + 1, tmp + 1, 1);
+	      dev_state->con_to_str (tmp + 1, 59, wch);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
 	      bool meta;
 	      meta = (control_key_state & ALT_PRESSED) != 0
 		     && ((control_key_state & CTRL_PRESSED) == 0
-			 || ((signed char) ich >= 0 && ich <= 0x1f || ich == 0x7f));
+			 || (wch <= 0x1f || wch == 0x7f));
 	      if (!meta)
 		toadd = tmp + 1;
 	      else if (dev_state->metabit)
@@ -1081,7 +1055,7 @@ static const char base_chars[256] =
 /*10 11 12 13 14 15 16 17 */ NOR, NOR, ERR, ERR, ERR, ERR, ERR, ERR,
 /*18 19 1A 1B 1C 1D 1E 1F */ NOR, NOR, ERR, ESC, ERR, ERR, ERR, ERR,
 /*   !  "  #  $  %  &  '  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
-/*()  *  +  ,  -  .  /  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
+/*(  )  *  +  ,  -  .  /  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*0  1  2  3  4  5  6  7  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*8  9  :  ;  <  =  >  ?  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*@  A  B  C  D  E  F  G  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
@@ -1243,7 +1217,7 @@ fhandler_console::char_command (char c)
 	      dev_state->savebuf = (PCHAR_INFO) cmalloc_abort (HEAP_1_BUF, sizeof (CHAR_INFO) *
 					     dev_state->savebufsiz.X * dev_state->savebufsiz.Y);
 
-	      ReadConsoleOutputA (get_output_handle (), dev_state->savebuf,
+	      ReadConsoleOutputW (get_output_handle (), dev_state->savebuf,
 				  dev_state->savebufsiz, cob, &now.srWindow);
 	    }
 	  else		/* restore */
@@ -1257,7 +1231,7 @@ fhandler_console::char_command (char c)
 	      if (!dev_state->savebuf)
 		break;
 
-	      WriteConsoleOutputA (get_output_handle (), dev_state->savebuf,
+	      WriteConsoleOutputW (get_output_handle (), dev_state->savebuf,
 				   dev_state->savebufsiz, cob, &now.srWindow);
 
 	      cfree (dev_state->savebuf);
@@ -1457,50 +1431,66 @@ fhandler_console::write_normal (const unsigned char *src,
 {
   /* Scan forward to see what a char which needs special treatment */
   DWORD done;
-  const unsigned char *found = src;
+  unsigned char *found = (unsigned char *) src;
+  UINT cp = dev_state->get_console_cp ();
+  bool mb = is_cp_multibyte (cp);
 
-  while (found < end)
+  while (found < end
+	 && found - src < CONVERT_LIMIT
+	 && base_chars[*found] == NOR)
     {
-      char ch = base_chars[*found];
-      if (ch != NOR)
-	break;
-      found++;
+      if (mb && *found && *found >= 0x80)
+	{
+	  unsigned char *nfound = (unsigned char *)
+				  CharNextExA (cp, (const CHAR *) found, 0);
+	  /* Sanity check for UTF-8 to workaround the problem in
+	     MultiByteToWideChar, that it's not capable of using replacement
+	     characters for invalid source chars in the given codepage. */
+	  if (nfound == found + 1 && cp == CP_UTF8)
+	    *found++ = '?';
+	  else
+	    found = nfound;
+	}
+      else
+	++found;
     }
 
   /* Print all the base ones out */
   if (found != src)
     {
       DWORD len = found - src;
+      DWORD buf_len;
+      PWCHAR buf = (PWCHAR) alloca (CONVERT_LIMIT * sizeof (WCHAR));
+
+      buf_len = dev_state->str_to_con (buf, (const char *) src, len);
+      if (!buf_len)
+	{
+	  debug_printf ("conversion error, handle %p",
+			get_output_handle ());
+	  __seterrno ();
+	  return 0;
+	}
+
+      if (dev_state->insert_mode)
+	{
+	  int x, y;
+	  cursor_get (&x, &y);
+	  scroll_screen (x, y, -1, y, x + buf_len, y);
+	}
+
       do
 	{
-	  DWORD buf_len;
-	  char buf[CONVERT_LIMIT];
-	  done = buf_len = min (sizeof (buf), len);
-	  if (!dev_state->str_to_con (buf, (const char *) src, buf_len))
-	    {
-	      debug_printf ("conversion error, handle %p",
-			    get_output_handle ());
-	      __seterrno ();
-	      return 0;
-	    }
-
-	  if (dev_state->insert_mode)
-	    {
-	      int x, y;
-	      cursor_get (&x, &y);
-	      scroll_screen (x, y, -1, y, x + buf_len, y);
-	    }
-
-	  if (!WriteFile (get_output_handle (), buf, buf_len, &done, 0))
+	  if (!WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0))
 	    {
 	      debug_printf ("write failed, handle %p", get_output_handle ());
 	      __seterrno ();
 	      return 0;
 	    }
-	  len -= done;
-	  src += done;
+	  buf_len -= done;
+	  buf += done;
 	}
-      while (len > 0);
+      while (buf_len > 0);
+      src = found;
     }
 
   if (src < end)
@@ -1519,7 +1509,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  if (y >= srBottom)
 	    {
 	      if (y >= dev_state->info.winBottom && !dev_state->scroll_region.Top)
-		WriteFile (get_output_handle (), "\n", 1, &done, 0);
+		WriteConsoleW (get_output_handle (), L"\n", 1, &done, 0);
 	      else
 		{
 		  scroll_screen (0, srTop + 1, -1, srBottom, 0, srTop);

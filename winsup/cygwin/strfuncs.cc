@@ -22,20 +22,26 @@ details. */
 #include "cygheap.h"
 
 codepage_type current_codepage = ansi_cp;
+UINT active_codepage = 0;
+
+#ifdef __OUTSIDE_CYGWIN__
+#define codepage_init(cp)	(active_codepage = GetACP ())
+#endif
 
 UINT
 get_cp ()
 {
-  switch (current_codepage)
-    {
-      case oem_cp:
-	return GetOEMCP ();
-      case utf8_cp:
-	return CP_UTF8;
-      case ansi_cp:
-      default:
-	return GetACP ();
-    }
+  if (!active_codepage)
+    codepage_init ("ansi");
+  return active_codepage;
+}
+
+bool
+is_cp_multibyte (UINT cp)
+{
+  CPINFO cpi; 
+  GetCPInfo (cp, &cpi);
+  return cpi.MaxCharSize > 1;
 }
 
 /* tlen is always treated as the maximum buffer size, including the '\0'

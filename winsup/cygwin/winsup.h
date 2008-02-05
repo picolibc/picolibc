@@ -112,8 +112,11 @@ extern "C" DWORD WINAPI GetLastError (void);
 
 enum codepage_type {ansi_cp, oem_cp, utf8_cp};
 extern codepage_type current_codepage;
+extern UINT active_codepage;
 
+void codepage_init (const char *buf);
 UINT get_cp ();
+bool is_cp_multibyte (UINT cp);
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */

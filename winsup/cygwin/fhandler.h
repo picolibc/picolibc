@@ -879,8 +879,9 @@ class dev_console
   bool use_mouse;
   bool raw_win32_keyboard_mode;
 
-  bool con_to_str (char *d, const char *s, DWORD sz);
-  bool str_to_con (char *d, const char *s, DWORD sz);
+  inline UINT get_console_cp ();
+  bool con_to_str (char *d, int dlen, WCHAR w);
+  DWORD str_to_con (PWCHAR d, const char *s, DWORD sz);
   void set_color (HANDLE);
   bool fillin_info (HANDLE);
   void set_default_attr ();

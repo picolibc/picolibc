@@ -16,6 +16,7 @@ details. */
 #include <assert.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
+#include <winnls.h>
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"
@@ -513,20 +514,30 @@ set_file_api_mode (codepage_type cp)
     }
 }
 
-static void
+void
 codepage_init (const char *buf)
 {
-  if (!buf || !*buf)
-    return;
+  if (!buf)
+    buf = "ansi";
 
   if (ascii_strcasematch (buf, "oem"))
-    current_codepage = oem_cp;
-  else if (ascii_strcasematch (buf, "ansi"))
-    current_codepage = ansi_cp;
+    {
+      current_codepage = oem_cp;
+      active_codepage = GetOEMCP ();
+    }
   else if (ascii_strcasematch (buf, "utf8"))
-    current_codepage = utf8_cp;
+    {
+      current_codepage = utf8_cp;
+      active_codepage = CP_UTF8;
+    }
   else
-    debug_printf ("Wrong codepage name: %s", buf);
+    {
+      if (!ascii_strcasematch (buf, "ansi"))
+	debug_printf ("Wrong codepage name: %s", buf);
+      /* Fallback to ANSI */
+      current_codepage = ansi_cp;
+      active_codepage = GetACP ();
+    }
   set_file_api_mode (current_codepage);
 }
 
