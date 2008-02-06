@@ -17,7 +17,8 @@ details. */
 #include <alloca.h>
 #include <limits.h>
 #include <wchar.h>
-#include <winbase.h>
+#include <wingdi.h>
+#include <winuser.h>
 #include <winnls.h>
 #include "cygthread.h"
 #include "cygtls.h"
@@ -190,6 +191,118 @@ cygwin_strupr (char *string)
   RtlUpcaseUnicodeString (&us, &us, FALSE);
   sys_wcstombs (string, len / sizeof (WCHAR), us.Buffer);
   return string;
+}
+
+/* FIXME?  We only support standard ANSI/OEM codepages according to
+   http://www.microsoft.com/globaldev/reference/cphome.mspx as well
+   as UTF-8 and codepage 1361, which is also mentioned as valid
+   doublebyte codepage in MSDN man pages (e.g. IsDBCSLeadByteEx).
+   Everything else will be hosed. */
+
+bool
+is_cp_multibyte (UINT cp)
+{
+  switch (cp)
+    {
+    case 932:
+    case 936:
+    case 949:
+    case 950:
+    case 1361:
+    case 65001:
+      return true;
+    }
+  return false;
+}
+
+/* OMYGOD!  CharNextExA is not UTF-8 aware!  It only works fine with
+   double byte charsets.  So we have to do it ourselves for UTF-8.
+   
+   While being at it, we do more.  If a double-byte or multibyte
+   sequence is trucated due to an early end, we need a way to recognize
+   it.  The reason is that multiple buffered write statements might
+   accidentally stop and start in the middle of a single character byte
+   sequence.  If we have to interpret the byte sequences (as in
+   fhandler_console, we would print wrong output in these cases.
+   
+   So we have four possible return values here:
+
+   ret = end      if str >= end
+   ret = NULL	  if we encounter an invalid byte sequence
+   ret = str      if we encounter the start byte of a truncated byte sequence
+   ret = str + n  if we encounter a vaild byte sequence
+*/
+
+const unsigned char *
+next_char (UINT cp, const unsigned char *str, const unsigned char *end)
+{
+  const unsigned char *ret;
+
+  if (str >= end)
+    return end;
+
+  switch (cp)
+    {
+    case 932:
+    case 936:
+    case 949:
+    case 950:
+    case 1361:
+      if (*str <= 0x7f)
+        ret = str + 1;
+      else if (str == end - 1 && IsDBCSLeadByteEx (cp, *str))
+	ret = str;
+      else
+	ret = (const unsigned char *) CharNextExA (cp, (const CHAR *) str, 0);
+      break;
+    case CP_UTF8:
+      switch (str[0] >> 4)
+	{
+	case 0x0 ... 0x7:	/* One byte character. */
+	  ret = str + 1;
+	  break;
+	case 0x8 ... 0xb:	/* Followup byte.  Invalid as first byte. */
+	  ret = NULL;
+	  break;
+	case 0xc ... 0xd:	/* Two byte character. */
+	  /* Check followup bytes for validity. */
+	  if (str >= end - 1)
+	    ret = str;
+	  else if (str[1] <= 0xbf)
+	    ret = str + 2;
+	  else
+	    ret = NULL;
+	  break;
+	case 0xe:		/* Three byte character. */
+	  if (str >= end - 2)
+	    ret = str;
+	  else if ((str[1] & 0xc0) == 0x80 && (str[2] & 0xc0) == 0x80
+		   && (str[0] != 0xe0 || str[1] >= 0xa0)
+		   && (str[0] != 0xed || str[1] <= 0x9f))
+	    ret = str + 3;
+	  else
+	    ret = NULL;
+	  break;
+	case 0xf:		/* Four byte character. */
+	  if (str[0] >= 0xf8)
+	    ret = NULL;
+	  else if (str >= end - 3)
+	    ret = str;
+	  else if ((str[1] & 0xc0) == 0x80 && (str[2] & 0xc0) == 0x80
+		   && (str[3] & 0xc0) == 0x80
+		   && (str[0] == 0xf0 || str[1] >= 0x90)
+		   && (str[0] == 0xf4 || str[1] <= 0x8f))
+	    ret = str + 4;
+	  else
+	    ret = NULL;
+	  break;
+	}
+      break;
+    default:
+      ret = str + 1;
+      break;
+    }
+  return ret;
 }
 
 int __stdcall

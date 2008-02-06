@@ -1,3 +1,26 @@
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_console::trunc_buf): Add to use as cache for
+	truncated multibyte characters on input.
+	(fhandler_console::write_replacement_char): Declare new method.
+	* fhandler_console.cc (CONVERT_LIMIT): Raise to 64K.
+	(fhandler_console::fhandler_console): Initialize trunc_buf.
+	(ERR): Define as independent value again.
+	(fhandler_console::write_replacement_char): New method to print
+	replacement chars.
+	(fhandler_console::write_normal): Add handling for truncated multibyte
+	sequences.  Call next_char instead of pathetic CharNextExA function.
+	Don't change src, rather just work with found later on.
+	* miscfuncs.cc (is_cp_multibyte): Move here from strfuncs.cc.
+	Don't call Windows function, restrict to well-known ANSI/OEM codepages
+	and UTF-8.
+	(next_char): Call CharNextExA only for doublebyte codepages.
+	Implement for UTF-8 here.
+	* strfuncs.cc (is_cp_multibyte): Move to miscfuncs.cc.
+	* winsup.h (next_char): Declare.
+	* include/limits.h (MB_LEN_MAX): Set to maximum value of MB_CUR_MAX
+	as defined by newlib for now.
+
 2008-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CharToOemA): Remove.

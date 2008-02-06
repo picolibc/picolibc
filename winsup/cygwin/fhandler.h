@@ -896,6 +896,13 @@ class fhandler_console: public fhandler_termios
   static dev_console *dev_state;
   static bool invisible_console;
 
+  /* Used when we encounter a truncated multi-byte sequence.  The
+     lead bytes are stored here and revisited in the next write call. */
+  struct {
+    int len;
+    unsigned char buf[4]; /* Max len of valid UTF-8 sequence. */
+  } trunc_buf;
+
 /* Output calls */
   void set_default_attr ();
 
@@ -904,6 +911,7 @@ class fhandler_console: public fhandler_termios
   void cursor_set (bool, int, int);
   void cursor_get (int *, int *);
   void cursor_rel (int, int);
+  void write_replacement_char (const unsigned char *);
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
   void char_command (char);
   bool set_raw_win32_keyboard_mode (bool);

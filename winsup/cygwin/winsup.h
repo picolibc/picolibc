@@ -110,6 +110,7 @@ extern const char case_folded_upper[];
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
+/* Codepage and multibyte string specific stuff. */
 enum codepage_type {ansi_cp, oem_cp, utf8_cp};
 extern codepage_type current_codepage;
 extern UINT active_codepage;
@@ -117,6 +118,8 @@ extern UINT active_codepage;
 void codepage_init (const char *buf);
 UINT get_cp ();
 bool is_cp_multibyte (UINT cp);
+const unsigned char *next_char (UINT cp, const unsigned char *str,
+				const unsigned char *end);
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */

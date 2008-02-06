@@ -33,7 +33,7 @@ details. */
 #include "cygtls.h"
 #include "registry.h"
 
-#define CONVERT_LIMIT 16384
+#define CONVERT_LIMIT 65536
 
 /*
  * Scroll the screen context.
@@ -895,7 +895,9 @@ fhandler_console::tcgetattr (struct termios *t)
 fhandler_console::fhandler_console () :
   fhandler_termios ()
 {
+  trunc_buf.len = 0;
 }
+
 void
 dev_console::set_color (HANDLE h)
 {
@@ -1037,7 +1039,7 @@ fhandler_console::cursor_get (int *x, int *y)
 #define ESC 2
 #define NOR 0
 #define IGN 4
-#if 0
+#if 1
 #define ERR 5
 #else
 #define ERR NOR
@@ -1425,41 +1427,86 @@ beep ()
   MessageBeep (MB_OK);
 }
 
+/* This gets called when we found an invalid UTF-8 character.  We try with
+   the default ANSI codepage.  If that fails we just print a question mark. 
+   Looks ugly but is a neat and alomst sane fallback for many languages. */
+void
+fhandler_console::write_replacement_char (const unsigned char *char_p)
+{
+  int n;
+  WCHAR def_cp_chars[2];
+  DWORD done;
+
+  n = MultiByteToWideChar (GetACP (), 0, (const CHAR *) char_p, 1,
+			   def_cp_chars, 2);
+  if (n)
+    WriteConsoleW (get_output_handle (), def_cp_chars, n, &done, 0);
+  else
+    WriteConsoleW (get_output_handle (), L"?", 1, &done, 0);
+}
+
 const unsigned char *
 fhandler_console::write_normal (const unsigned char *src,
 				const unsigned char *end)
 {
   /* Scan forward to see what a char which needs special treatment */
   DWORD done;
-  unsigned char *found = (unsigned char *) src;
+  DWORD buf_len;
+  const unsigned char *found = src;
+  const unsigned char *nfound;
   UINT cp = dev_state->get_console_cp ();
-  bool mb = is_cp_multibyte (cp);
+
+  /* First check if we have cached lead bytes of a former try to write 
+     a truncated multibyte sequence.  If so, process it. */
+  if (trunc_buf.len)
+    {
+      int cp_len = min (end - src, 4 - trunc_buf.len);
+      memcpy (trunc_buf.buf + trunc_buf.len, src, cp_len);
+      nfound = next_char (cp, trunc_buf.buf,
+			  trunc_buf.buf + trunc_buf.len + cp_len);
+      if (!nfound)		/* Invalid multibyte sequence. */
+        {			/* Give up and print replacement chars. */
+	  for (int i = 0; i < trunc_buf.len; ++i)
+	    write_replacement_char (trunc_buf.buf + i);
+	}
+      else if (nfound == trunc_buf.buf)
+	{			/* Still truncated multibyte sequence. */
+	  trunc_buf.len += cp_len;
+	  return end;
+	}
+      else
+	{
+	  /* Valid multibyte sequence.  Process. */
+	  WCHAR buf[2];
+	  buf_len = dev_state->str_to_con (buf, (const char *) trunc_buf.buf,
+					   nfound - trunc_buf.buf);
+	  WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0);
+	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
+	}
+      /* Mark trunc_buf as unused. */
+      trunc_buf.len = 0;
+    }
 
   while (found < end
 	 && found - src < CONVERT_LIMIT
 	 && base_chars[*found] == NOR)
     {
-      if (mb && *found && *found >= 0x80)
-	{
-	  unsigned char *nfound = (unsigned char *)
-				  CharNextExA (cp, (const CHAR *) found, 0);
-	  /* Sanity check for UTF-8 to workaround the problem in
-	     MultiByteToWideChar, that it's not capable of using replacement
-	     characters for invalid source chars in the given codepage. */
-	  if (nfound == found + 1 && cp == CP_UTF8)
-	    *found++ = '?';
-	  else
-	    found = nfound;
+      nfound = next_char (cp, found, end);
+      if (!nfound)		/* Invalid multibyte sequence. */
+	break;
+      if (nfound == found)	/* Truncated multibyte sequence. */
+        {			/* Stick to it until the next write. */
+	  trunc_buf.len = end - found;
+	  memcpy (trunc_buf.buf, found, trunc_buf.len);
+	  return end;
 	}
-      else
-	++found;
+      found = nfound;
     }
 
   /* Print all the base ones out */
   if (found != src)
     {
       DWORD len = found - src;
-      DWORD buf_len;
       PWCHAR buf = (PWCHAR) alloca (CONVERT_LIMIT * sizeof (WCHAR));
 
       buf_len = dev_state->str_to_con (buf, (const char *) src, len);
@@ -1490,13 +1537,14 @@ fhandler_console::write_normal (const unsigned char *src,
 	  buf += done;
 	}
       while (buf_len > 0);
-      src = found;
+      if (len >= CONVERT_LIMIT)
+	return found;
     }
 
-  if (src < end)
+  if (found < end)
     {
       int x, y;
-      switch (base_chars[*src])
+      switch (base_chars[*found])
 	{
 	case BEL:
 	  beep ();
@@ -1529,16 +1577,19 @@ fhandler_console::write_normal (const unsigned char *src,
 	  cursor_set (false, 0, y);
 	  break;
 	case ERR:
-	  WriteFile (get_output_handle (), src, 1, &done, 0);
+	  WriteFile (get_output_handle (), found, 1, &done, 0);
 	  break;
 	case TAB:
 	  cursor_get (&x, &y);
 	  cursor_set (false, 8 * (x / 8 + 1), y);
 	  break;
+	case NOR:
+	  write_replacement_char (found);
+	  break;
 	}
-      src ++;
+      found++;
     }
-  return src;
+  return found;
 }
 
 int

@@ -36,14 +36,6 @@ get_cp ()
   return active_codepage;
 }
 
-bool
-is_cp_multibyte (UINT cp)
-{
-  CPINFO cpi; 
-  GetCPInfo (cp, &cpi);
-  return cpi.MaxCharSize > 1;
-}
-
 /* tlen is always treated as the maximum buffer size, including the '\0'
    character.  sys_wcstombs will always return a 0-terminated result, no
    matter what. */
