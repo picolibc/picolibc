@@ -12,6 +12,7 @@
 
 #ifdef __OUTSIDE_CYGWIN__
 #include "woutsup.h"
+#include <stdio.h>
 #include <sys/cygwin.h>
 #include <sys/cdefs.h>
 #ifndef __FBSDID
@@ -247,8 +248,8 @@ seminit(void)
 	}
 	for (i = 0; i < seminfo.semmni; i++)
 	{
-	   char *buf = (char *)malloc (16);
-	   __small_sprintf (buf, "semid[%d]", i);
+		char *buf = (char *) sys_malloc(16, M_SEM, M_WAITOK);
+		snprintf(buf, 16, "semid[%d]", i);
 		mtx_init(&sema_mtx[i], buf, NULL, MTX_DEF);
 	}
 	for (i = 0; i < seminfo.semmnu; i++) {
@@ -280,8 +281,10 @@ semunload(void)
 	sys_free(sem, M_SEM);
 	sys_free(sema, M_SEM);
 	sys_free(semu, M_SEM);
-	for (int i = 0; i < seminfo.semmni; i++)
+	for (int i = 0; i < seminfo.semmni; i++) {
+		sys_free((void *) sema_mtx[i].name, M_SEM);
 		mtx_destroy(&sema_mtx[i]);
+	}
 	mtx_destroy(&sem_mtx);
 	return (0);
 }

@@ -43,7 +43,7 @@ OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
 	sysv_msg.o sysv_sem.o sysv_shm.o
 LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
-CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o
+CYGWIN_OBJS:=$(cygwin_build)/version.o
 
 CYGWIN_LIB:=$(cygwin_build)/libcygwin.a
 
@@ -67,7 +67,7 @@ libclean:
 
 fullclean: clean libclean
 
-cygserver.exe: $(CYGWIN_LIB) $(OBJS) $(CYGWIN_OBJS) strfuncs.o
+cygserver.exe: $(CYGWIN_LIB) $(OBJS) $(CYGWIN_OBJS)
 	$(CXX) -o $@ ${wordlist 2,999,$^} -L$(cygwin_build) -lntdll
 
 $(cygwin_build)/%.o: $(cygwin_source)/%.cc
@@ -80,9 +80,6 @@ Makefile: Makefile.in configure
 
 lib%.o: %.cc
 	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE_CXX)} -I$(updir)/cygwin -o $(@D)/${basename $(@F)}$o $<
-
-strfuncs.o: $(cygwin_source)/strfuncs.cc
-	$(COMPILE_CXX) -I$(updir)/cygwin -o $(@D)/$(*F)$o $<
 
 libcygserver.a: $(LIBOBJS)
 	$(AR) crus $@ $?

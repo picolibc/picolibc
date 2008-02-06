@@ -1,3 +1,15 @@
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove dependency from Cygwin internal code.
+	* Makefile.in (CYGWIN_OBJS): Remove smallprint.o.
+	(cygserver.exe): Remove strfuncs.o
+	(strfuncs.o): Drop rule.
+	* bsd_log.cc (_vlog): Use snprintf/vsnprintf instead of
+	__small_sprintf/__small_vsprintf.
+	* sysv_sem.cc (seminit): Use sys_malloc instead of malloc.  Use
+	snprintf instead of __small_sprintf.
+	(semunload): Free the above allocated sema_mtx names here.
+
 2008-02-03  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in: Don't link strfuncs.o from the Cygwin build dir.

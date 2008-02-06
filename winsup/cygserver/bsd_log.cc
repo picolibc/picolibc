@@ -11,7 +11,6 @@ details. */
 #include "woutsup.h"
 #define _KERNEL 1
 #define __BSD_VISIBLE 1
-#include <sys/smallprint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -53,14 +52,15 @@ _vlog (const char *file, int line, int level,
 	const char *fmt, va_list ap)
 {
   char buf[16384];
+  char *pos;
 
   if ((level == LOG_DEBUG && log_debug != TUN_TRUE)
       || (level != LOG_DEBUG && level >= log_level))
     return;
-  strcpy (buf, "cygserver: ");
+  pos = stpcpy (buf, "cygserver: ");
   if (file && log_debug == TUN_TRUE)
-    __small_sprintf (strchr (buf, '\0'), "%s, line %d: ", file, line);
-  __small_vsprintf (strchr (buf, '\0'), fmt, ap);
+    pos += snprintf (pos, 16384 - (pos - buf), "%s, line %d: ", file, line);
+  vsnprintf (pos, 16384 - (pos - buf), fmt, ap);
   if (log_syslog == TUN_TRUE && level != LOG_DEBUG)
     syslog (level, buf);
   if (log_stderr == TUN_TRUE || level == LOG_DEBUG)
