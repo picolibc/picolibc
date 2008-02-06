@@ -24,10 +24,6 @@ details. */
 codepage_type current_codepage = ansi_cp;
 UINT active_codepage = 0;
 
-#ifdef __OUTSIDE_CYGWIN__
-#define codepage_init(cp)	(active_codepage = GetACP ())
-#endif
-
 UINT
 get_cp ()
 {
@@ -73,14 +69,10 @@ sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
     {
       size_t tlen = (slen == -1 ? ret : ret + 1);
 
-#ifndef __OUTSIDE_CYGWIN__
       if (type == HEAP_NOTHEAP)
-#endif
         *tgt_p = (char *) calloc (tlen, sizeof (char));
-#ifndef __OUTSIDE_CYGWIN__
       else
       	*tgt_p = (char *) ccalloc ((cygheap_types) type, tlen, sizeof (char));
-#endif
       if (!*tgt_p)
         return 0;
       ret = sys_wcstombs (*tgt_p, tlen, src, slen);
@@ -104,14 +96,10 @@ sys_mbstowcs_alloc (PWCHAR *tgt_p, int type, const char *src)
   ret = MultiByteToWideChar (get_cp (), 0, src, -1, NULL, 0);
   if (ret)
     {
-#ifndef __OUTSIDE_CYGWIN__
       if (type == HEAP_NOTHEAP)
-#endif
         *tgt_p = (PWCHAR) calloc (ret, sizeof (WCHAR));
-#ifndef __OUTSIDE_CYGWIN__
       else
       	*tgt_p = (PWCHAR) ccalloc ((cygheap_types) type, ret, sizeof (WCHAR));
-#endif
       if (!*tgt_p)
         return 0;
       ret = sys_mbstowcs (*tgt_p, src, ret);

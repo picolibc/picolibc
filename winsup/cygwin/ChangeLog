@@ -1,5 +1,10 @@
 2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (next_char): Fix typos in comment.
+	* strfuncs.cc: Remove cygserver guards.
+
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_console::trunc_buf): Add to use as cache for
 	truncated multibyte characters on input.
 	(fhandler_console::write_replacement_char): Declare new method.

@@ -219,11 +219,11 @@ is_cp_multibyte (UINT cp)
    double byte charsets.  So we have to do it ourselves for UTF-8.
    
    While being at it, we do more.  If a double-byte or multibyte
-   sequence is trucated due to an early end, we need a way to recognize
+   sequence is truncated due to an early end, we need a way to recognize
    it.  The reason is that multiple buffered write statements might
    accidentally stop and start in the middle of a single character byte
    sequence.  If we have to interpret the byte sequences (as in
-   fhandler_console, we would print wrong output in these cases.
+   fhandler_console), we would print wrong output in these cases.
    
    So we have four possible return values here:
 
