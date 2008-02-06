@@ -451,7 +451,7 @@ _vm_pager_allocate (int size, int shmflg)
   vm_object_t object = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all_nih,
 					  PAGE_READWRITE, 0, size, NULL);
   if (!object)
-    panic ("CreateFileMapping in _vm_pager_allocate failed, %E");
+    panic ("CreateFileMapping in _vm_pager_allocate failed, %lu", GetLastError ());
   return object;
 }
 
@@ -462,7 +462,7 @@ vm_object_duplicate (struct thread *td, vm_object_t object)
   if (!DuplicateHandle (GetCurrentProcess (), object,
 		        td->client->handle (), &dup_object,
 		        0, TRUE, DUPLICATE_SAME_ACCESS))
-    panic ("!DuplicateHandle in vm_object_duplicate failed, %E");
+    panic ("!DuplicateHandle in vm_object_duplicate failed, %lu", GetLastError ());
   return dup_object;
 }
 

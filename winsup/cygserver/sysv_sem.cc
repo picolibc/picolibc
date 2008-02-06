@@ -875,7 +875,7 @@ semget(struct thread *td, struct semget_args *uap)
 	struct ucred *cred = td->td_ucred;
 #endif
 
-	DPRINTF(("semget(0x%X, %d, 0%o)\n", key, nsems, semflg));
+	DPRINTF(("semget(0x%llx, %d, 0%o)\n", key, nsems, semflg));
 	if (!jail_sysvipc_allowed && jailed(td->td_ucred))
 		return (ENOSYS);
 

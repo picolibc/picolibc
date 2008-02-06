@@ -34,7 +34,7 @@ mtx_init (mtx *m, const char *name, const void *, int)
      unlockable by the lock owner. */
   m->h = CreateSemaphore (NULL, 1, 1, NULL);
   if (!m->h)
-    panic ("couldn't allocate %s mutex, %E\n", name);
+    panic ("couldn't allocate %s mutex, %lu\n", name, GetLastError ());
 }
 
 void
@@ -43,7 +43,8 @@ _mtx_lock (mtx *m, DWORD winpid, const char *file, int line)
   _log (file, line, LOG_DEBUG, "Try locking mutex %s (%u) (hold: %u)",
 	m->name, winpid, m->owner);
   if (WaitForSingleObject (m->h, INFINITE) != WAIT_OBJECT_0)
-    _panic (file, line, "wait for %s in %d failed, %E", m->name, winpid);
+    _panic (file, line, "wait for %s in %d failed, %lu", m->name, winpid,
+	    GetLastError ());
   m->owner = winpid;
   _log (file, line, LOG_DEBUG, "Locked      mutex %s/%u (%u)",
 	m->name, ++m->cnt, winpid);
@@ -85,7 +86,8 @@ _mtx_unlock (mtx *m, const char *file, int line)
     {
       /* Check if the semaphore was already on it's max value. */
       if (GetLastError () != ERROR_TOO_MANY_POSTS)
-	_panic (file, line, "release of mutex %s failed, %E", m->name);
+	_panic (file, line, "release of mutex %s failed, %lu", m->name,
+		GetLastError ());
     }
   _log (file, line, LOG_DEBUG, "Unlocked    mutex %s/%u (owner: %u)",
   	m->name, cnt, owner);
@@ -199,7 +201,7 @@ class msleep_sync_array
     a[i].ident = ident;
     a[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
     if (!a[i].wakeup_evt)
-      panic ("CreateEvent failed: %E");
+      panic ("CreateEvent failed: %lu", GetLastError ());
     debug ("i = %d, CreateEvent: %x", i, a[i].wakeup_evt);
     a[i].threads = 1;
     ++cnt;
@@ -282,7 +284,7 @@ msleep_init (void)
 
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
-    panic ("CreateEvent in msleep_init failed: %E");
+    panic ("CreateEvent in msleep_init failed: %lu", GetLastError ());
   long msgmni = support_msgqueues ? msginfo.msgmni : 0;
   long semmni = support_semaphores ? seminfo.semmni : 0;
   TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
@@ -346,9 +348,9 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	   treat an ERROR_INVALID_HANDLE as a normal process termination and
 	   hope for the best. */
 	if (GetLastError () != ERROR_INVALID_HANDLE)
-	  panic ("wait in msleep (%s) failed, %E", wmesg);
-	debug ("wait in msleep (%s) failed for %d, %E", wmesg,
-							td->td_proc->winpid);
+	  panic ("wait in msleep (%s) failed, %lu", wmesg, GetLastError ());
+	debug ("wait in msleep (%s) failed for %d, %lu", wmesg,
+	       td->td_proc->winpid, GetLastError ());
 	ret = EIDRM;
 	break;
     }

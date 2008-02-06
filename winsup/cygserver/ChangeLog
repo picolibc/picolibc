@@ -1,5 +1,13 @@
 2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* bsd_helper.cc: Replace %E __small_printf format specifier with %lu
+	and call to GetLastError throughout.
+	* bsd_mutex.cc: Ditto.
+	* sysv_sem.cc (semget): Replace %X __small_printf format specifier
+	with %llx.
+
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	Remove dependency from Cygwin internal code.
 	* Makefile.in (CYGWIN_OBJS): Remove smallprint.o.
 	(cygserver.exe): Remove strfuncs.o
