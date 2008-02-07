@@ -928,6 +928,7 @@ fhandler_tty_slave::dup (fhandler_base *child)
 {
   fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
   *(fhandler_tty_slave *) child = *arch;
+  child->set_flags (get_flags ());
   child->usecount = 0;
   arch->usecount++;
   cygheap->manage_console_count ("fhandler_tty_slave::dup", 1);
@@ -940,6 +941,7 @@ fhandler_pty_master::dup (fhandler_base *child)
 {
   fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
   *(fhandler_tty_master *) child = *arch;
+  child->set_flags (get_flags ());
   child->usecount = 0;
   arch->usecount++;
   report_tty_counts (child, "duped master", "");
