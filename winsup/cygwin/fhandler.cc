@@ -1476,6 +1476,21 @@ fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
   return res;
 }
 
+ssize_t
+fhandler_base::fgetxattr (const char *name, void *value, size_t size)
+{
+  set_errno (ENOTSUP);
+  return -1;
+}
+
+int
+fhandler_base::fsetxattr (const char *name, const void *value, size_t size,
+			  int flags)
+{
+  set_errno (ENOTSUP);
+  return -1;
+}
+
 int
 fhandler_base::fadvise (_off64_t offset, _off64_t length, int advice)
 {

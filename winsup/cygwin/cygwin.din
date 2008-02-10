@@ -28,6 +28,7 @@ sys_nerr = _sys_nerr DATA
 _sys_nerr DATA
 _timezone DATA
 _tzname DATA
+_Exit SIGFE
 a64l NOSIGFE
 abort NOSIGFE
 _abort = abort SIGFE
@@ -348,7 +349,6 @@ execvp SIGFE
 _execvp = execvp SIGFE
 exit = cygwin_exit SIGFE
 _exit SIGFE
-_Exit SIGFE
 exp NOSIGFE
 _exp = exp NOSIGFE
 exp10 NOSIGFE
@@ -432,12 +432,12 @@ _fcvtbuf = fcvtbuf SIGFE
 fcvtf SIGFE
 _fcvtf = fcvtf SIGFE
 fdatasync SIGFE
-fdopendir SIGFE
 fdim NOSIGFE
 fdimf NOSIGFE
 fdopen SIGFE
 _fdopen = fdopen SIGFE
 _fdopen64 = fdopen64 SIGFE
+fdopendir SIGFE
 feof SIGFE
 _feof = feof SIGFE
 ferror SIGFE
@@ -453,6 +453,7 @@ _fgetpos = fgetpos SIGFE
 _fgetpos64 = fgetpos64 SIGFE
 fgets SIGFE
 _fgets = fgets SIGFE
+fgetxattr SIGFE
 fileno SIGFE
 _fileno = fileno SIGFE
 finite NOSIGFE
@@ -461,6 +462,7 @@ finitef NOSIGFE
 _finitef = finitef NOSIGFE
 fiprintf SIGFE
 _fiprintf = fiprintf SIGFE
+flistxattr SIGFE
 flock SIGFE
 flockfile SIGFE
 floor NOSIGFE
@@ -501,6 +503,7 @@ free SIGFE
 _free = free SIGFE
 freeaddrinfo = cygwin_freeaddrinfo SIGFE
 freeifaddrs SIGFE
+fremovexattr SIGFE
 freopen SIGFE
 _freopen = freopen SIGFE
 _freopen64 = freopen64 SIGFE
@@ -520,6 +523,7 @@ _fseeko64 = fseeko64 SIGFE
 fsetpos SIGFE
 _fsetpos = fsetpos SIGFE
 _fsetpos64 = fsetpos64 SIGFE
+fsetxattr SIGFE
 fstat SIGFE
 _fstat = fstat SIGFE
 _fstat64 = fstat64 SIGFE
@@ -695,6 +699,7 @@ getw SIGFE
 _getw = getw SIGFE
 getwd SIGFE
 _getwd = getwd SIGFE
+getxattr SIGFE
 glob SIGFE
 _glob = glob SIGFE
 globfree SIGFE
@@ -849,11 +854,14 @@ lgammaf NOSIGFE
 _lgammaf = lgammaf NOSIGFE
 lgammaf_r NOSIGFE
 _lgammaf_r = lgammaf_r NOSIGFE
+lgetxattr SIGFE
 link SIGFE
 _link = link SIGFE
 listen = cygwin_listen SIGFE
+listxattr SIGFE
 llabs NOSIGFE
 lldiv NOSIGFE
+llistxattr SIGFE
 llrint = _f_llrint NOSIGFE
 llrintf = _f_llrintf NOSIGFE
 llrintl = _f_llrintl NOSIGFE
@@ -887,6 +895,7 @@ longjmp NOSIGFE
 _longjmp = longjmp NOSIGFE
 lrand48 NOSIGFE
 _lrand48 = lrand48 NOSIGFE
+lremovexattr SIGFE
 lrint = _f_lrint NOSIGFE
 lrintf = _f_lrintf NOSIGFE
 lrintl = _f_lrintl NOSIGFE
@@ -896,6 +905,7 @@ lsearch NOSIGFE
 lseek SIGFE
 _lseek = lseek SIGFE
 _lseek64 = lseek64 SIGFE
+lsetxattr SIGFE
 lstat SIGFE
 _lstat = lstat SIGFE
 _lstat64 = lstat64 SIGFE
@@ -1170,6 +1180,7 @@ remainderf NOSIGFE
 _remainderf = remainderf NOSIGFE
 remove SIGFE
 _remove = remove SIGFE
+removexattr SIGFE
 remque NOSIGFE
 remquo NOSIGFE
 remquof NOSIGFE
@@ -1341,6 +1352,7 @@ _setutent = setutent SIGFE
 setutxent SIGFE
 setvbuf SIGFE
 _setvbuf = setvbuf SIGFE
+setxattr SIGFE
 sexecl = sexecve_is_bad SIGFE
 sexecle = sexecve_is_bad SIGFE
 sexeclp = sexecve_is_bad SIGFE
@@ -1349,12 +1361,12 @@ sexecp = sexecve_is_bad SIGFE
 sexecv = sexecve_is_bad SIGFE
 sexecve = sexecve_is_bad SIGFE
 sexecvpe = sexecve_is_bad SIGFE
+shm_open SIGFE
+shm_unlink SIGFE
 shmat SIGFE
 shmctl SIGFE
 shmdt SIGFE
 shmget SIGFE
-shm_open SIGFE
-shm_unlink SIGFE
 shutdown = cygwin_shutdown SIGFE
 sigaction SIGFE
 sigaddset SIGFE

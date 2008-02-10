@@ -1,5 +1,46 @@
 2008-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add ntea.o.
+	* cygwin.din (getxattr, listxattr, removexattr, setxattr, lgetxattr,
+	llistxattr, lremovexattr, lsetxattr, fgetxattr, flistxattr,
+	fremovexattr, fsetxattr): Export Linux extended attribute functions.
+	Sort.
+	* errno.cc (errmap): Add mappings for ERROR_EAS_DIDNT_FIT,
+	ERROR_EAS_NOT_SUPPORTED, ERROR_EA_LIST_INCONSISTENT,
+	ERROR_EA_TABLE_FULL, ERROR_FILE_CORRUPT, ERROR_INVALID_EA_NAME.
+	* fhandler.h (class fhandler_base): Declare new fgetxattr and
+	fsetxattr methods.
+	(class fhandler_disk_file): Ditto.
+	* fhandler.cc (fhandler_base::fgetxattr): New method.
+	(fhandler_base::fsetxattr): New method.
+	* fhandler_disk_file.cc (fhandler_disk_file::fgetxattr): New method.
+	(fhandler_disk_file::fsetxattr): New method.
+	* ntdll.h (STATUS_EA_TOO_LARGE): Define.
+	(STATUS_NONEXISTENT_EA_ENTRY): Define.
+	(STATUS_NO_EAS_ON_FILE): Define.
+	* ntea.cc (read_ea): Rewrite for long pathnames and for using with
+	Linux extended attribute functions.
+	(write_ea): Ditto.
+	(getxattr_worker): New static function.
+	(getxattr): New function.
+	(lgetxattr): New function.
+	(fgetxattr): New function.
+	(listxattr): New function.
+	(llistxattr): New function.
+	(flistxattr): New function.
+	(setxattr_worker): New static function.
+	(setxattr): New function.
+	(lsetxattr): New function.
+	(fsetxattr): New function.
+	(removexattr): New function.
+	(lsetxattr): New function.
+	(fsetxattr): New function.
+	* security.h (read_ea): Change declaration according to above changes.
+	(write_ea): Ditto.
+	* include/cygwin/version.h: Bump API minor version.
+
+2008-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/ftw.cc (ftw): Allow nfds < 0 for glibc compatibility.
 	* libc/nftw.c (nftw): Ditto.
 

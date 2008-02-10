@@ -288,6 +288,8 @@ class fhandler_base
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  virtual ssize_t __stdcall fgetxattr (const char *, void *, size_t) __attribute__ ((regparm (3)));
+  virtual int __stdcall fsetxattr (const char *, const void *, size_t, int) __attribute__ ((regparm (3)));
   virtual int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   virtual int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
@@ -686,6 +688,8 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  ssize_t __stdcall fgetxattr (const char *, void *, size_t) __attribute__ ((regparm (3)));
+  int __stdcall fsetxattr (const char *, const void *, size_t, int) __attribute__ ((regparm (3)));
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));

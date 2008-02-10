@@ -946,6 +946,33 @@ cant_access_acl:
   return res;
 }
 
+ssize_t
+fhandler_disk_file::fgetxattr (const char *name, void *value, size_t size)
+{
+  OBJECT_ATTRIBUTES attr;
+
+  if (pc.is_fs_special ())
+    {
+      set_errno (ENOTSUP);
+      return -1;
+    }
+  return read_ea (get_handle (), pc, name, (char *) value, size);
+}
+
+int
+fhandler_disk_file::fsetxattr (const char *name, const void *value, size_t size,
+			       int flags)
+{
+  OBJECT_ATTRIBUTES attr;
+
+  if (pc.is_fs_special ())
+    {
+      set_errno (ENOTSUP);
+      return -1;
+    }
+  return write_ea (get_handle (), pc, name, (const char *) value, size, flags);
+}
+
 int
 fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
 {

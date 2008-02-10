@@ -322,12 +322,15 @@ details. */
       179: Export _f_llrint, _f_llrintf, _f_llrintl, _f_lrint, _f_lrintf,
 	   _f_lrintl, _f_rint, _f_rintf, _f_rintl, llrint, llrintf, llrintl,
 	   rintl, lrintl, and redirect exports of lrint, lrintf, rint, rintf.
+      180: Export getxattr, lgetxattr, fgetxattr, listxattr, llistxattr,
+	   flistxattr, setxattr, lsetxattr, fsetxattr, removexattr,
+	   lremovexattr, fremovexattr.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 179
+#define CYGWIN_VERSION_API_MINOR 180
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
