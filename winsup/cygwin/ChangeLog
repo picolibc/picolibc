@@ -1,3 +1,8 @@
+2008-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ftw.cc (ftw): Allow nfds < 0 for glibc compatibility.
+	* libc/nftw.c (nftw): Ditto.
+
 2008-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Set access to

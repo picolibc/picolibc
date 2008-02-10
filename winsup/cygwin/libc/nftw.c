@@ -50,11 +50,16 @@ nftw(const char *path, int (*fn)(const char *, const struct __stat64 *, int,
 	FTS *ftsp;
 	int error = 0, ftsflags, fnflag, postorder, sverrno;
 
+#if 0
+	/* GLibc allows nfds < 1 and treats it as nfds == 1.  Since nfds is
+	   not used in this OpenBSD version anyway, just ignore it for
+	   Linux compatibility. */
 	/* XXX - nfds is currently unused */
 	if (nfds < 1 || nfds > OPEN_MAX) {
 		errno = EINVAL;
 		return (-1);
 	}
+#endif
 
 	ftsflags = FTS_COMFOLLOW;
 	if (!(ftwflags & FTW_CHDIR))
