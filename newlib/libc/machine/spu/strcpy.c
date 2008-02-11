@@ -1,9 +1,6 @@
 /*
-  (C) Copyright 2001,2006,
+  (C) Copyright 2008
   International Business Machines Corporation,
-  Sony Computer Entertainment, Incorporated,
-  Toshiba Corporation,
-
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,19 +27,15 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#include <spu_intrinsics.h>
 #include <stddef.h>
+#include "strcpy.h"
 
-/* Copy the string pointed to by src (up to and including the /0
+/*
+ * Copy the string pointed to by src (up to and including the /0
  * character) into the array pointed to by dest. If copy between
  * two arrays that overlap, then behavior is undefined.
  */
-
 char * strcpy(char * __restrict__ dest, const char * __restrict__ src)
 {
-  /* Due to the need to support all alignment variances, this
-   * function can not easily be optimized. As a result, it is
-   * serviced using strlen and memcpy.
-   */
-  return ((char *)memcpy((void *)dest, (const void *)src, strlen(src)+1));
+  return _strncpy(dest, src, 0, 0, 0);
 }

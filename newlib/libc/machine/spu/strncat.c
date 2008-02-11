@@ -1,9 +1,6 @@
 /*
-  (C) Copyright 2001,2006,
+  (C) Copyright 2008
   International Business Machines Corporation,
-  Sony Computer Entertainment, Incorporated,
-  Toshiba Corporation,
-
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,68 +27,19 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#include <spu_intrinsics.h>
 #include <stddef.h>
 #include <string.h>
+#include "straddr.h"
+#include "strcpy.h"
 
-/* Appends the string pointed to by src (up to and including the /0
+/*
+ * Appends the string pointed to by src (up to and including the /0
  * character) to the array pointed to by dest (overwriting the
  * /0 character at the end of dest. The strings may not overlap and
  * the dest string must have enough space for the result.
  */
-
-char * strncat(char * __restrict__ dest, const char * __restrict__ src, size_t n)
+char * strncat(char * __restrict__ dest, const char * __restrict__ src,
+               size_t n)
 {
-  unsigned int cmp, skip, mask, len;
-  vec_uchar16 *ptr, data;
-  vec_uint4 cnt, gt, N;
-  char *dst;
-
-  /* Determine the starting location to begin concatenation.
-   */
-  dst = dest + strlen(dest);
-
-  /* Copy the src image until either the src string terminates
-   * or n characters are copied.
-   */
-  N = spu_promote((unsigned int)n, 0);
-
-  /* Determine the string length, not including termination character,
-   * clamped to n characters.
-   */
-  ptr = (vec_uchar16 *)src;
-  skip = (unsigned int)(ptr) & 15;
-  mask = 0xFFFF >> skip;
-
-  data = *ptr++;
-  cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
-  cmp &= mask;
-
-  cnt = spu_cntlz(spu_promote(cmp, 0));
-  len = spu_extract(cnt, 0) - (skip + 16);
-
-  gt = spu_cmpgt(spu_promote(len, 0), N);
-
-  while (spu_extract(spu_andc(spu_cmpeq(cnt, 32), gt), 0)) {
-    data = *ptr++;
-    len -= 16;
-    cnt  = spu_cntlz(spu_gather(spu_cmpeq(data, 0)));
-    len += spu_extract(cnt, 0);
-
-    gt = spu_cmpgt(spu_promote(len, 0), N);
-  }
-
-  /* len = MIN(len, n)
-   */
-  len = spu_extract(spu_sel(spu_promote(len, 0), N, gt), 0);
-
-  /* Perform a memcpy of the resulting length
-   */
-  (void)memcpy((void *)dst, (const void *)src, len);
-
-  /* Terminate the resulting concetenated string.
-   */
-  dst[len] = '\0';
-
-  return (dest);
+  return _strncpy(_straddr(dest), src, n, 1, 1);
 }

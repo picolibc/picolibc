@@ -1,9 +1,6 @@
 /*
-  (C) Copyright 2001,2006,
+  (C) Copyright 2008
   International Business Machines Corporation,
-  Sony Computer Entertainment, Incorporated,
-  Toshiba Corporation,
-
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -30,26 +27,19 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 */
-#include <spu_intrinsics.h>
+
 #include <stddef.h>
 #include <string.h>
+#include "straddr.h"
+#include "strcpy.h"
 
-/* Appends the string pointed to by src (up to and including the /0
- * character) to the array pointed to by dest (overwriting the
+/*
+ * Appends the string pointed to by src (up to and including the /0
+ * character) to the array pointed to by dest overwriting the
  * /0 character at the end of dest. The strings may not overlap and
  * the dest string must have enough space for the result.
  */
-
 char *strcat(char * __restrict__ dest, const char * __restrict__ src)
 {
-  size_t d_len, s_len;
-
-  /* Determine the length of the src and dest input arrays.
-   */
-  d_len = strlen(dest);
-  s_len = strlen(src);
-
-  (void)memcpy((void *)(dest+d_len), (const void *)src, s_len + 1);
-
-  return ((char *)dest);
+  return _strncpy(_straddr(dest), src, 0, 0, 0);
 }

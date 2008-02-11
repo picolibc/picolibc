@@ -1,5 +1,15 @@
 2008-02-11  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libc/machine/spu/straddr.h: New file, supplies _straddr.
+	* libc/machine/spu/strcat.c: Use _straddr and _strcpy.
+	* libc/machine/spu/strcpy.c: Use _strcpy.
+	* libc/machine/spu/strcpy.h: Supply _strcpy for optimized SPU
+	str[n]cpy and str[n]cat.
+	* libc/machine/spu/strncat.c: Use _straddr and _strcpy.
+	* libc/machine/spu/strncpy.c: Use _strcpy.
+							
+2008-02-11  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libc/machine/spu/strlen.c: Remove the len variable and unneeded
 	calculation of its value.
 		  
