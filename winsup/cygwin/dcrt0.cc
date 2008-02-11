@@ -857,7 +857,7 @@ dll_crt0_1 (void *)
   if (!__argc)
     {
       PWCHAR wline = GetCommandLineW ();
-      size_t size = sys_wcstombs (NULL, size, wline);
+      size_t size = sys_wcstombs (NULL, 0, wline);
       char *line = (char *) alloca (size);
       sys_wcstombs (line, size, wline);
 

@@ -236,7 +236,7 @@ is_cp_multibyte (UINT cp)
 const unsigned char *
 next_char (UINT cp, const unsigned char *str, const unsigned char *end)
 {
-  const unsigned char *ret;
+  const unsigned char *ret = NULL;
 
   if (str >= end)
     return end;
