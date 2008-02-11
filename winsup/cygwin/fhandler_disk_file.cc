@@ -949,8 +949,6 @@ cant_access_acl:
 ssize_t
 fhandler_disk_file::fgetxattr (const char *name, void *value, size_t size)
 {
-  OBJECT_ATTRIBUTES attr;
-
   if (pc.is_fs_special ())
     {
       set_errno (ENOTSUP);
@@ -963,8 +961,6 @@ int
 fhandler_disk_file::fsetxattr (const char *name, const void *value, size_t size,
 			       int flags)
 {
-  OBJECT_ATTRIBUTES attr;
-
   if (pc.is_fs_special ())
     {
       set_errno (ENOTSUP);

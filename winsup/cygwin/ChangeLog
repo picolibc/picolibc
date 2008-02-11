@@ -1,5 +1,12 @@
 2008-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fgetxattr): Remove unused
+	attr.
+	(fhandler_disk_file::fsetxattr): Ditto.
+	* include/attr/xattr.h: New file.
+
+2008-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (dll_crt0_1): Fix typo in call to sys_wcstombs.
 	* miscfuncs.cc (next_char): Initialize ret to keep gcc happy.
 
