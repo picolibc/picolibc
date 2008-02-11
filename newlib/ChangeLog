@@ -1,3 +1,8 @@
+2008-02-11  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/machine/spu/strlen.c: Remove the len variable and unneeded
+	calculation of its value.
+		  
 2008-01-25  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/sys/mmixware/isatty.c (_isatty): Renamed from isatty.

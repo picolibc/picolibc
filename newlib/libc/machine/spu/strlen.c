@@ -33,34 +33,36 @@
 #include <spu_intrinsics.h>
 #include <stddef.h>
 
-/* Calculates  the  length  of  the string s, not including the terminating
+/*
+ * Calculates the length of the string s, not including the terminating
  * \0 character.
  */
 size_t strlen(const char *s)
 {
-  size_t len;
   unsigned int cnt, cmp, skip, mask;
   vec_uchar16 *ptr, data;
 
-  /* Compensate for initial mis-aligned string.
+  /*
+   * Compensate for initial mis-aligned string.
    */
-  ptr = (vec_uchar16 *)s;
+  ptr = (vec_uchar16 *)s; /* implicit 16 byte alignment when dereferenced */
   skip = (unsigned int)(ptr) & 15;
   mask = 0xFFFF >> skip;
 
-  data = *ptr++;
+  data = *ptr;
   cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
   cmp &= mask;
 
   cnt = spu_extract(spu_cntlz(spu_promote(cmp, 0)), 0);
-  len = cnt - (skip + 16);
 
   while (cnt == 32) {
-    data = *ptr++;
-    len -= 16;
+    data = *++ptr;
     cnt = spu_extract(spu_cntlz(spu_gather(spu_cmpeq(data, 0))), 0);
-    len += cnt;
   }
 
-  return (len);
+  /*
+   * The length is ptr aligned down to a 16 byte boundary, plus the offset
+   * to the zero byte, minus the starting address s.
+   */
+  return ((((int) ptr & ~0xf) + (cnt - 16)) - (int) s);
 }
