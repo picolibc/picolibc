@@ -6,8 +6,6 @@
 
 /* __in and __out currently conflict with libstdc++, use with caution */
 
-#define IN
-#define OUT
 #define __in
 #define __inout
 #define __in_opt
@@ -19,9 +17,6 @@
 #define __struct_bcount(x)
 #define __field_ecount_opt(x)
 #define __out_bcount_opt(x)
-#ifndef OPTIONAL
-#define OPTIONAL
-#endif
 
 #endif
 

@@ -1,5 +1,10 @@
 2008-02-02  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+  * include/specstrings.h (IN, OUT, OPTIONAL): Remove.
+  * include/windef.h (IN, OUT, OPTIONAL): Define.
+
+2008-02-02  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/specstrings.h: new file, move pseudo modifiers from windef.h.
 	* include/windef.h (__in, __inout, __in_opt, __in_bcound, __in_ecount,
 	__out, __out_ecount_part, __struct_bcount, __field_ecount_opt,
@@ -17,9 +22,9 @@
 
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 	* include/ras.h (RAS_MaxDnsSuffix): corrected typo, was RAX_MaxDnsSuffix.
-	(RASENTRYA, RASENTRYW): Added members (dwfOptions2, dwfOptions3, szDnsSuffix, 
+	(RASENTRYA, RASENTRYW): Added members (dwfOptions2, dwfOptions3, szDnsSuffix,
 	dwTcpWindowSize, szPrerequisitePbk, szPrerequisiteEntry, dwRedialCount,
-	dwRedialPause.	
+	dwRedialPause.
 
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 
@@ -43,7 +48,7 @@
 
 2008-01-29  Brandon Sneed  <nivenh@sourceware.org>
 
-	* include/psapi.h (GetProcessImageFileNameA, GetProcessImageFileNameW): 
+	* include/psapi.h (GetProcessImageFileNameA, GetProcessImageFileNameW):
 	Add prototypes.
 	* lib/psapi.def (GetProcessImageFileNameA@12, GetProcessImageFileNameW@12):
 	Add exports.
@@ -139,7 +144,7 @@
 	* include/rpcndr.h: Missing NdrClientCall2 entry.
 	* lib/rpcrt4.def: Ditto.
 
-2007-10-03  Frank Fesevur  <ffes@users.sourceforge.net> 
+2007-10-03  Frank Fesevur  <ffes@users.sourceforge.net>
 	* lib/scnsave.c: Multi-monitor support.
 
 2007-08-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>
@@ -199,7 +204,7 @@
 	[mingw-Bugs-1751565]
 	* include/basetyps.h (IID); Guard with __IID_DEFINED__.
 
-	[mingw-Bugs-1751595] 
+	[mingw-Bugs-1751595]
 	* include/exdisp.h (DWebBrowserEvents2): Remove undocumented STDDISP
 	methods.
 
@@ -214,7 +219,7 @@
 2007-07-09  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[mingw-Bugs-1749305]
-	* lib/kernel32.def (GetConsoleProcessList@8):  Add export. 
+	* lib/kernel32.def (GetConsoleProcessList@8):  Add export.
 
 2007-07-02  Przemek Czerkas  <pczerkas@gmail.com>
 

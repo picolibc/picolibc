@@ -55,6 +55,18 @@ extern "C" {
 #define TRUE 1
 #endif
 
+/* Pseudo modifiers for parameters
+   We don't use these unnecessary defines in the w32api headers. Define
+   them by default since that is what people expect, but allow users
+   to avoid the pollution.  */
+#ifndef _NO_W32_PSEUDO_MODIFIERS
+#define IN
+#define OUT
+#ifndef OPTIONAL
+#define OPTIONAL
+#endif
+#endif
+
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))
 #ifndef _fastcall
@@ -146,7 +158,7 @@ extern "C" {
 
 #ifndef NONAMELESSUNION
 #ifdef __GNUC__
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
 #define _ANONYMOUS_UNION __extension__
 #define _ANONYMOUS_STRUCT __extension__
 #else
