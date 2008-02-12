@@ -253,7 +253,7 @@ __sbprintf_r(rptr, fp, fmt, ap)
 
 	/* do the work, then copy any error status */
 	ret = _VFPRINTF_R(rptr, &fake, fmt, ap);
-	if (ret >= 0 && fflush(&fake))
+	if (ret >= 0 && _fflush_r(rptr, &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
@@ -368,13 +368,12 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 #ifndef _NO_LONGLONG
 #define	quad_t	  long long
 #define	u_quad_t  unsigned long long
+#else
+#define quad_t    long
+#define u_quad_t  u_long
 #endif
 
-#ifndef _NO_LONGLONG
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
-#else
-	u_long _uquad;
-#endif
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
 	int realsz;		/* field size expanded by dprec */
@@ -541,9 +540,10 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	/*
 	 * Scan the format for conversions (`%' character).
 	 */
+
 	for (;;) {
 	        cp = fmt;
-	        while ((n = _mbtowc_r(_REENT, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
+	        while ((n = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
 			fmt += n;
 			if (wc == '%') {
 				fmt--;
@@ -754,14 +754,9 @@ reswitch:	switch (ch) {
 			  }
 #endif /* __ALTIVEC__ */
 			_uquad = SARG();
-#ifndef _NO_LONGLONG
 			if ((quad_t)_uquad < 0)
-#else
-			if ((long) _uquad < 0)
-#endif
 			{
-
-				_uquad = -_uquad;
+				_uquad = -(quad_t)_uquad;
 				old_sign = sign;
 				sign = '-';
 			}
@@ -907,11 +902,11 @@ reswitch:	switch (ch) {
 			    _uquad = -(quad_t)_uquad;
 			  }
 			if (flags & SHORTINT)
-			  _uquad <<= 49;
+			  _uquad <<= (sizeof(quad_t) - sizeof(short)) * 8 + 1;
 			else if (flags & LONGINT)
 			  _uquad <<= 1;
 			else
-			  _uquad <<= 33;
+			  _uquad <<= (sizeof(quad_t) - sizeof(long)) * 8 + 1;
 
 			if (_uquad == 0 && sign)
 			  {
@@ -927,15 +922,19 @@ reswitch:	switch (ch) {
 		        flags |= FIXEDPOINT;
 		        _uquad = UFPARG();
 			if (flags & SHORTINT)
-			  _uquad <<= 48;
+			  _uquad <<= (sizeof(quad_t) - sizeof(short)) * 8;
 			else if (!(flags & LONGINT))
-			  _uquad <<= 32;
+			  _uquad <<= (sizeof(quad_t) - sizeof(long)) * 8;
 	
 fixed_nosign:
 			if (prec == -1)
 			  prec = DEFPREC;
 
+#ifndef _NO_LONGLONG
 			cp = cvt_ufix64 (data, _uquad, prec, &expt, &ndig);
+#else
+			cp = cvs_ufix32 (data, _uquad, prec, &expt, &ndig);
+#endif
 
 			/* act like %f of format "0.X" */
 			size = prec + 2;

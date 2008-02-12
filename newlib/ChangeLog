@@ -1,3 +1,10 @@
+2008-02-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/powerpc/vfprintf.c (_VFPRINTF_R): Prepare
+	for user specifying --disable-newlib-io-long-long on configure.
+	Call _fflush_r instead of fflush.  For _mbtowc_r, pass the
+	reentrant pointer passed in rather than _REENT.
+
 2008-02-12  Peter Rosin  <peda@lysator.liu.se>
 
 	* libc/stdlib/getopt.c (getopt_internal): Handle optional
