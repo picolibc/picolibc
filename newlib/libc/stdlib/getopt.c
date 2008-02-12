@@ -308,13 +308,8 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
     case OPTIONAL_ARG:
       if (*possible_arg == '=')
         possible_arg++;
-      if (*possible_arg != '\0')
-        {
-          optarg = possible_arg;
-          optwhere = 1;
-        }
-      else
-        optarg = NULL;
+      optarg = (*possible_arg != '\0') ? possible_arg : NULL;
+      optwhere = 1;
       break;
     case REQUIRED_ARG:
       if (*possible_arg == '=')

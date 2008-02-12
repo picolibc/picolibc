@@ -1,3 +1,9 @@
+2008-02-12  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/stdlib/getopt.c (getopt_internal): Handle optional
+	arguments better for long options and short options not
+	appearing as the first option in a sequence.
+
 2008-02-11  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/straddr.h: New file, supplies _straddr.
