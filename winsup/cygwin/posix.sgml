@@ -347,6 +347,9 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     listen
     llabs
     lldiv
+    llrint
+    llrintf
+    llrintl
     localeconv
     localtime
     localtime_r
@@ -362,6 +365,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     lrand48
     lrint
     lrintf
+    lrintl
     lround
     lroundf
     lsearch
@@ -561,6 +565,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     rindex
     rint
     rintf
+    rintl
     rmdir
     round
     roundf
@@ -795,8 +800,13 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     wcsrtombs
     wcsspn
     wcsstr
+    wcstol
+    wcstoll
     wcstombs
+    wcstoul
+    wcstoull
     wcswidth
+    wcsxfrm
     wctob
     wctomb
     wctrans
@@ -924,7 +934,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
 
 </sect1>
 
-<sect1 id="std-gnu"><title>System interfaces compatible with GNU extensions:</title>
+<sect1 id="std-gnu"><title>System interfaces compatible with GNU or Linux extensions:</title>
 
 <screen>
     argz_add
@@ -954,14 +964,26 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     exp10f
     fcloseall
     fcloseall_r
+    fgetxattr
+    flistxattr
     fopencookie
+    fremovexattr
+    fsetxattr
     getline
     getopt_long
     getopt_long_only
+    getxattr
+    lgetxattr
+    listxattr
+    llistxattr
+    lremovexattr
+    lsetxattr
     memmem
     mempcpy
     pow10
     pow10f
+    removexattr
+    setxattr
     stpcpy
     stpncpy
     strndup
@@ -975,6 +997,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     vasprintf
     vasprintf_r
     vdprintf
+    wcpcpy
+    wcpncpy
 </screen>
 
 </sect1>
@@ -1168,9 +1192,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ldexpl
     lgammal
     lio_listio
-    llrint
-    llrintf
-    llrintl
     llround
     llroundf
     llroundl
@@ -1180,7 +1201,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     log2l
     logbl
     logl
-    lrintl
     lroundl
     makecontext
     mlockall
@@ -1213,7 +1233,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     putmsg
     reminderl
     remquol
-    rintl
     roundl
     scalblnl
     scalbnl
@@ -1249,14 +1268,9 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     wcstof
     wcstoimax
     wcstok
-    wcstol
     wcstold
-    wcstoll
-    wcstoul
-    wcstoull
     wcstoumax
     wcswcs
-    wcsxfrm
     wordexp
     wordfree
     wscanf

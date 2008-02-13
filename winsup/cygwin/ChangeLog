@@ -1,5 +1,15 @@
 2008-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml: Move llrint, llrintf, llrintl, lrintl, rintl, wcstol,
+	wcstoll, wcstoul, wcstoull, wcsxfrm from unimplemented to implemented
+	POSIX interfaces.
+	Change headline of "GNU extensions" to "GNU and Linux extensions".
+	Add fgetxattr, flistxattr, fremovexattr, fsetxattr, getxattr, lgetxattr,
+	listxattr, llistxattr, lremovexattr, lsetxattr, removexattr, setxattr,
+	wcpcpy and wcpncpy to list of implemented GNU functions.
+
+2008-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.cc (_cygtls::init_exception_handler): Revert patch
 	from 2005-12-02.
 	* exceptions.cc (stack_info::walk): Add workaround for NT 5.2
