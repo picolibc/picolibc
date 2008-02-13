@@ -70,6 +70,7 @@ struct wincaps
   unsigned has_exclusiveaddruse				: 1;
   unsigned has_buggy_restart_scan			: 1;
   unsigned needs_count_in_si_lpres2			: 1;
+  unsigned has_restricted_stack_args			: 1;
 };
 
 class wincapc
@@ -146,6 +147,7 @@ public:
   bool	IMPLEMENT (has_exclusiveaddruse)
   bool	IMPLEMENT (has_buggy_restart_scan)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
+  bool	IMPLEMENT (has_restricted_stack_args)
 
 #undef IMPLEMENT
 };

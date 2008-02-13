@@ -69,6 +69,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -129,6 +130,7 @@ static NO_COPY wincaps wincap_95 = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -189,6 +191,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -249,6 +252,7 @@ static NO_COPY wincaps wincap_98 = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -309,6 +313,7 @@ static NO_COPY wincaps wincap_98se = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -369,6 +374,7 @@ static NO_COPY wincaps wincap_me = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -429,6 +435,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -489,6 +496,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_exclusiveaddruse:false,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -549,6 +557,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -609,6 +618,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:true,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -669,6 +679,7 @@ static NO_COPY wincaps wincap_xp = {
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -729,6 +740,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:false,
+  has_restricted_stack_args:true,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -789,6 +801,7 @@ static NO_COPY wincaps wincap_vista = {
   has_exclusiveaddruse:true,
   has_buggy_restart_scan:false,
   needs_count_in_si_lpres2:true,
+  has_restricted_stack_args:false,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -902,7 +915,10 @@ wincapc::init ()
   if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))
     wow64 = is_wow64_proc;
   else
-    ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
+    {
+      ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
+      ((wincaps *)this->caps)->has_restricted_stack_args = false;
+    }
 
   __small_sprintf (osnam, "%s-%d.%d", os, version.dwMajorVersion,
 		   version.dwMinorVersion);
