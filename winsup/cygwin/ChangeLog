@@ -1,3 +1,11 @@
+2008-02-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* syscalls.cc (_isatty): Define as an alias to isatty to override
+	newlib version.
+
+	* thread.cc (pthread_kill): Deal with signal 0 as per POSIX and also
+	avoid manipulating an invalid thread.
+
 2008-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml: Move llrint, llrintf, llrintl, lrintl, rintl, wcstol,

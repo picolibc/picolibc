@@ -2640,8 +2640,24 @@ pthread_kill (pthread_t thread, int sig)
   si.si_code = SI_USER;
   si.si_pid = myself->pid;
   si.si_uid = myself->uid;
-  thread->cygtls->set_threadkill ();
-  int rval = sig ? sig_send (NULL, si, thread->cygtls) : 0;
+  int rval;
+  if (!thread->valid)
+    rval = ESRCH;
+  else if (sig)
+    {
+      thread->cygtls->set_threadkill ();
+      rval = sig_send (NULL, si, thread->cygtls);
+    }
+  else
+    switch (WaitForSingleObject (thread->win32_obj_id, 0))
+      {
+      case WAIT_TIMEOUT:
+	rval = 0;
+	break;
+      default:
+	rval = ESRCH;
+	break;
+      }
 
   // unlock myself
   return rval;

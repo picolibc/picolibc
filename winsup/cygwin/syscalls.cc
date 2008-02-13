@@ -999,6 +999,7 @@ isatty (int fd)
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
 }
+EXPORT_ALIAS (isatty, _isatty)
 
 /* Under NT, try to make a hard link using backup API.  If that
    fails or we are Win 95, just copy the file.
