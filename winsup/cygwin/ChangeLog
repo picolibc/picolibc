@@ -1,3 +1,14 @@
+2008-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::init_exception_handler): Revert patch
+	from 2005-12-02.
+	* exceptions.cc (stack_info::walk): Add workaround for NT 5.2
+	64 bit OSes.
+	* wincap.h (wincaps::has_restricted_stack_args): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincapc::init): Reset has_restricted_stack_args if not running
+	under WOW64.
+
 2008-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fgetxattr): Remove unused

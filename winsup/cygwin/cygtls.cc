@@ -260,7 +260,23 @@ void
 _cygtls::init_exception_handler (exception_handler *eh)
 {
   el.handler = eh;
-  el.prev = &el;
+  /* Apparently Windows stores some information about an exception and tries
+     to figure out if the SEH which returned 0 last time actually solved the
+     problem, or if the problem still persists (e.g. same exception at same
+     address).  In this case Windows seems to decide that it can't trust
+     that SEH and calls the next handler in the chain instead.
+
+     At one point this was a loop (el.prev = &el;).  This outsmarted the
+     above behaviour.  Unfortunately this trick doesn't work anymore with
+     Windows 2008, which irremediably gets into an endless loop, taking 100%
+     CPU.  That's why we reverted to a normal SEH chain.
+
+     On the bright side, Windows' behaviour is covered by POSIX:
+
+     "If and when the function returns, if the value of sig was SIGFPE,
+     SIGILL, or SIGSEGV or any other implementation-defined value
+     corresponding to a computational exception, the behavior is undefined." */
+  el.prev = _except_list;
   _except_list = &el;
 }
 

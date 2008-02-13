@@ -40,6 +40,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -69,6 +70,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -98,6 +100,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -127,6 +130,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_2000sp4 = {
@@ -156,6 +160,7 @@ static NO_COPY wincaps wincap_2000sp4 = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -185,6 +190,7 @@ static NO_COPY wincaps wincap_xp = {
   has_gaa_prefixes:false,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_xpsp1 = {
@@ -214,6 +220,7 @@ static NO_COPY wincaps wincap_xpsp1 = {
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_xpsp2 = {
@@ -243,6 +250,7 @@ static NO_COPY wincaps wincap_xpsp2 = {
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:false,
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -272,6 +280,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:false,
   supports_all_posix_ai_flags:false,
+  has_restricted_stack_args:true,
 };
 
 static NO_COPY wincaps wincap_vista = {
@@ -301,6 +310,7 @@ static NO_COPY wincaps wincap_vista = {
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:true,
   supports_all_posix_ai_flags:true,
+  has_restricted_stack_args:false,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -388,7 +398,10 @@ wincapc::init ()
   if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))
     wow64 = is_wow64_proc;
   else
-    ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
+    {
+      ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
+      ((wincaps *)this->caps)->has_restricted_stack_args = false;
+    }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
