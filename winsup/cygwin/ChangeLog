@@ -1,3 +1,8 @@
+2008-02-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* thread.cc (pthread_kill): Deal with signal 0 as per POSIX and also
+	avoid manipulating an invalid thread.
+
 2008-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::init_exception_handler): Revert patch
