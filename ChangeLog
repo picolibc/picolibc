@@ -1,3 +1,10 @@
+2008-02-14  Nick Clifton  <nickc@redhat.com>
+
+	Import this patch from gcc:
+	2008-01-24  David Edelsohn  <edelsohn@gnu.org>
+
+	* libtool.m4: Backport AIX 6 support from ToT Libtool.
+
 2008-02-02  Hans-Peter Nilsson  <hp@axis.com>
 
 	* configure.ac: Enable fortran for cris-*-elf and crisv32-*-elf.
