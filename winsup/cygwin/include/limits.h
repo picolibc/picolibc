@@ -321,10 +321,11 @@ details. */
 #undef NAME_MAX
 #define NAME_MAX 255
 
-/* Maximum length of a path including trailing NUL.
-   (32767 - max. native NT path prefix) */
+/* Maximum length of a path given to API functions including trailing NUL.
+   Deliberately set to the same default value as on Linux.  Internal paths
+   may be longer. */
 #undef PATH_MAX
-#define PATH_MAX 32760
+#define PATH_MAX 4096
 
 /* # of bytes in a pipe buf. This is the max # of bytes which can be
    written to a pipe in one atomic operation. */

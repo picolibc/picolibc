@@ -544,7 +544,7 @@ break_here ()
 static void
 initial_env ()
 {
-  char buf[PATH_MAX];
+  char buf[NT_MAX_PATH];
   if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
     _cygwin_testing = 1;
 
@@ -561,8 +561,8 @@ initial_env ()
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
-      char buf1[PATH_MAX];
-      len = GetModuleFileName (NULL, buf1, PATH_MAX);
+      char buf1[NT_MAX_PATH];
+      len = GetModuleFileName (NULL, buf1, NT_MAX_PATH);
       strlwr (buf1);
       strlwr (buf);
       char *p = strpbrk (buf, ":=");
@@ -870,7 +870,7 @@ dll_crt0_1 (void *)
 	 win32 style. */
       if ((strchr (__argv[0], ':')) || (strchr (__argv[0], '\\')))
 	{
-	  char *new_argv0 = (char *) malloc (PATH_MAX);
+	  char *new_argv0 = (char *) malloc (NT_MAX_PATH);
 	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
 	  __argv[0] = (char *) realloc (new_argv0, strlen (new_argv0) + 1);
 	}

@@ -1,3 +1,26 @@
+2008-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cwcsdup): New function.
+	(cwcsdup1): New function.
+	* cygheap.h (cygheap_user::get_windows_id): New method returning PWCHAR.
+	(cwcsdup): Declare.
+	(cwcsdup1): Declare.
+	* registry.cc (get_registry_hive_path): Use WCHAR instead of char
+	throughout.
+	(load_registry_hive): Ditto.
+	* registry.h (get_registry_hive_path): Change declaration accordingly.
+	(load_registry_hive): Ditto.
+	* sec_helper.cc (cygpsid::string): New method returning PWCHAR.
+	* security.h (cygpsid::string): Declare.
+	* syscalls.cc (seteuid32): Convert local name var to WCHAR.
+	* uinfo.cc (cygheap_user::env_userprofile): Convert local name buffers
+	to WCHAR.  Call sys_wcstombs_alloc to generate puserprof buffer.
+
+	* winsup.h: Fix comment.
+	(NT_MAX_PATH): New definition for maximum internal path length.
+	Use throughout where appropriate.
+	* include/limits.h (PATH_MAX): Set to 4096 as on Linux.
+
 2008-02-13  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* configure.in: Remove non-working options.

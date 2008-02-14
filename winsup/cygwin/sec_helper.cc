@@ -101,6 +101,17 @@ cygpsid::get_id (BOOL search_grp, int *type)
   return id;
 }
 
+PWCHAR
+cygpsid::string (PWCHAR nsidstr) const
+{
+  UNICODE_STRING sid;
+
+  if (!psid || !nsidstr) 
+    return NULL;
+  RtlInitEmptyUnicodeString (&sid, nsidstr, 256);
+  RtlConvertSidToUnicodeString (&sid, psid, FALSE);
+  return nsidstr;
+}
 
 char *
 cygpsid::string (char *nsidstr) const

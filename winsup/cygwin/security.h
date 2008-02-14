@@ -100,6 +100,7 @@ public:
   int get_uid () { return get_id (FALSE); }
   int get_gid () { return get_id (TRUE); }
 
+  PWCHAR string (PWCHAR nsidstr) const;
   char *string (char *nsidstr) const;
 
   bool operator== (const PSID nsid) const

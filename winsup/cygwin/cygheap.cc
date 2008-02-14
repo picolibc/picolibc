@@ -24,6 +24,7 @@
 #include "sigproc.h"
 #include "pinfo.h"
 #include <unistd.h>
+#include <wchar.h>
 
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
@@ -352,6 +353,30 @@ extern "C" void *__stdcall
 ccalloc_abort (cygheap_types x, DWORD n, DWORD size)
 {
   return ccalloc (x, n, size, "ccalloc");
+}
+
+extern "C" PWCHAR __stdcall
+cwcsdup (const PWCHAR s)
+{
+  MALLOC_CHECK;
+  PWCHAR p = (PWCHAR) cmalloc (HEAP_STR, wcslen (s) + 1);
+  if (!p)
+    return NULL;
+  wcpcpy (p, s);
+  MALLOC_CHECK;
+  return p;
+}
+
+extern "C" PWCHAR __stdcall
+cwcsdup1 (const PWCHAR s)
+{
+  MALLOC_CHECK;
+  PWCHAR p = (PWCHAR) cmalloc (HEAP_1_STR, wcslen (s) + 1);
+  if (!p)
+    return NULL;
+  wcpcpy (p, s);
+  MALLOC_CHECK;
+  return p;
 }
 
 extern "C" char *__stdcall

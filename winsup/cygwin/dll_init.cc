@@ -106,7 +106,7 @@ dll_list::operator[] (const char *name)
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
-  char name[PATH_MAX];
+  char name[NT_MAX_PATH];
   DWORD namelen = GetModuleFileName (h, name, sizeof (name));
 
   /* Already loaded? */

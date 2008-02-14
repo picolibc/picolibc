@@ -154,7 +154,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 	pn = NULL;
 
       char *p;
-      char progname[PATH_MAX];
+      char progname[NT_MAX_PATH];
       if (!pn)
 	GetModuleFileName (NULL, pn = progname, sizeof (progname));
       if (!pn)

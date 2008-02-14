@@ -206,7 +206,11 @@ public:
     if (internal_token != NO_IMPERSONATION)
       CloseHandle (internal_token);
   }
-  char * get_windows_id (char * buf)
+  PWCHAR get_windows_id (PWCHAR buf)
+  {
+    return effec_cygsid.string (buf);
+  }
+  char *get_windows_id (char *buf)
   {
     return effec_cygsid.string (buf);
   }
@@ -231,7 +235,7 @@ struct cwdstuff
   DWORD get_drive (char * dst)
   {
     cwd_lock.acquire ();
-    DWORD ret = sys_wcstombs (dst, PATH_MAX, win32.Buffer, drive_length);
+    DWORD ret = sys_wcstombs (dst, NT_MAX_PATH, win32.Buffer, drive_length);
     cwd_lock.release ();
     return ret;
   }
@@ -423,6 +427,8 @@ void *__stdcall ccalloc (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)
 void *__stdcall cmalloc_abort (cygheap_types, DWORD) __attribute__ ((regparm(2)));
 void *__stdcall crealloc_abort (void *, DWORD) __attribute__ ((regparm(2)));
 void *__stdcall ccalloc_abort (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));
+PWCHAR __stdcall cwcsdup (const PWCHAR) __attribute__ ((regparm(1)));
+PWCHAR __stdcall cwcsdup1 (const PWCHAR) __attribute__ ((regparm(1)));
 char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
 char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
 void __stdcall cfree_and_set (char *&, char * = NULL) __attribute__ ((regparm(2)));

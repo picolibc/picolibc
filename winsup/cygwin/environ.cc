@@ -116,7 +116,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
     }
   else
     {
-      char buf[PATH_MAX];
+      char buf[NT_MAX_PATH];
       strcpy (buf, name + namelen);
       towin32 (in_posix, buf);
       native = (char *) realloc (native, namelen + 1 + strlen (buf));
@@ -185,7 +185,7 @@ posify (char **here, const char *value)
   /* Turn all the items from c:<foo>;<bar> into their
      mounted equivalents - if there is one.  */
 
-  char outenv[1 + len + PATH_MAX];
+  char outenv[1 + len + NT_MAX_PATH];
   memcpy (outenv, src, len);
   char *newvalue = outenv + len;
   if (!conv->toposix (value, newvalue) || _impure_ptr->_errno != EIDRM)

@@ -61,7 +61,7 @@ extern unsigned long cygwin_inet_addr (const char *cp);
 
 /* Note that MAX_PATH is defined in the windows headers */
 /* There is also PATH_MAX and MAXPATHLEN.
-   PATH_MAX is from Posix and does *not* include the trailing NUL.
+   PATH_MAX is from Posix and does include the trailing NUL.
    MAXPATHLEN is from Unix.
 
    Thou shalt use CYG_MAX_PATH throughout.  It avoids the NUL vs no-NUL
@@ -75,6 +75,15 @@ extern unsigned long cygwin_inet_addr (const char *cp);
    */
 
 #define CYG_MAX_PATH (MAX_PATH)
+
+/* There's no define for the maximum path length the NT kernel can handle.
+   That's why we define our own to use in path length test and for path
+   buffer sizes.  As MAX_PATH and PATH_MAX, this is defined including the
+   trailing 0.  Internal buffers and internal path routines should use
+   NT_MAX_PATH.  PATH_MAX as defined in limits.h is the maximum length of
+   application provided path strings we handle.  */
+/* FIXME: The name is preliminary and TBD. */
+#define NT_MAX_PATH 32768
 
 #ifdef __cplusplus
 

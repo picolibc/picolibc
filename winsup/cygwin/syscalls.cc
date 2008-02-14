@@ -2483,7 +2483,7 @@ seteuid32 (__uid32_t uid)
   if (new_token != hProcToken)
     {
       /* Avoid having HKCU use default user */
-      char name[128];
+      WCHAR name[128];
       load_registry_hive (usersid.string (name));
 
       /* Try setting owner to same value as user. */

@@ -408,12 +408,12 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  char userprofile_env_buf[PATH_MAX];
-  char win_id[UNLEN + 1]; /* Large enough for SID */
+  WCHAR userprofile_env_buf[NT_MAX_PATH];
+  WCHAR win_id[UNLEN + 1]; /* Large enough for SID */
 
   cfree_and_set (puserprof, almost_null);
   if (get_registry_hive_path (get_windows_id (win_id), userprofile_env_buf))
-    puserprof = cstrdup (userprofile_env_buf);
+    sys_wcstombs_alloc (&puserprof, HEAP_STR, userprofile_env_buf);
 
   return puserprof;
 }

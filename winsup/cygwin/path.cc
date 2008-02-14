@@ -2002,8 +2002,8 @@ mount_info::conv_to_posix_path (PWCHAR src_path, char *posix_path,
 	  changed = true;
 	}
     }
-  char buf[PATH_MAX];
-  sys_wcstombs (buf, PATH_MAX, src_path);
+  char buf[NT_MAX_PATH];
+  sys_wcstombs (buf, NT_MAX_PATH, src_path);
   int ret = conv_to_posix_path (buf, posix_path, keep_rel_p);
   if (changed)
     src_path[0] = L'C';
@@ -4565,7 +4565,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 
       if (!posix_cwd)
 	{
-	  posix_cwd = (const char *) alloca (PATH_MAX);
+	  posix_cwd = (const char *) alloca (NT_MAX_PATH);
 	  mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
 	}
       posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
@@ -4598,8 +4598,8 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
   char *tocopy;
   if (!need_posix)
     {
-      tocopy = (char *) alloca (PATH_MAX);
-      sys_wcstombs (tocopy, PATH_MAX, win32.Buffer, win32.Length);
+      tocopy = (char *) alloca (NT_MAX_PATH);
+      sys_wcstombs (tocopy, NT_MAX_PATH, win32.Buffer, win32.Length);
     }
   else
     tocopy = posix;

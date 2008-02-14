@@ -35,7 +35,7 @@ details. */
 
 #define CALL_HANDLER_RETRY 20
 
-char debugger_command[2 * PATH_MAX + 20];
+char debugger_command[2 * NT_MAX_PATH + 20];
 
 extern "C" {
 extern void sigdelayed ();
@@ -118,8 +118,8 @@ error_start_init (const char *buf)
       return;
     }
 
-  char pgm[PATH_MAX];
-  if (!GetModuleFileName (NULL, pgm, PATH_MAX))
+  char pgm[NT_MAX_PATH];
+  if (!GetModuleFileName (NULL, pgm, NT_MAX_PATH))
     strcpy (pgm, "cygwin1.dll");
   for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
     *p = '/';

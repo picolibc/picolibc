@@ -442,7 +442,7 @@ fhandler_process::fill_filebuf ()
     case PROCESS_EXENAME:
     case PROCESS_EXE:
       {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = PATH_MAX);
+	filebuf = (char *) crealloc_abort (filebuf, bufalloc = NT_MAX_PATH);
 	if (p->process_state & PID_EXITED)
 	  strcpy (filebuf, "<defunct>");
 	else
@@ -524,8 +524,8 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
   DWORD_PTR wset_size;
   DWORD_PTR *workingset = NULL;
   MODULEINFO info;
-  WCHAR modname[PATH_MAX];
-  char posix_modname[PATH_MAX];
+  WCHAR modname[NT_MAX_PATH];
+  char posix_modname[NT_MAX_PATH];
 
   if (!EnumProcessModules (proc, NULL, 0, &needed))
     {
@@ -557,7 +557,7 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 	strcpy (access, "r--p");
 	struct __stat64 st;
 	if (mount_table->conv_to_posix_path (modname, posix_modname, 0))
-	  sys_wcstombs (posix_modname, PATH_MAX, modname);
+	  sys_wcstombs (posix_modname, NT_MAX_PATH, modname);
 	if (stat64 (posix_modname, &st))
 	  {
 	    st.st_dev = 0;

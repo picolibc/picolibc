@@ -19,6 +19,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include <wchar.h>
 static const char cygnus_class[] = "cygnus";
 
 reg_key::reg_key (HKEY top, REGSAM access, ...): _disposition (0)
@@ -207,54 +208,55 @@ reg_key::~reg_key ()
   key_is_invalid = 1;
 }
 
-char *
-get_registry_hive_path (const char *name, char *path)
+PWCHAR
+get_registry_hive_path (const PWCHAR name, PWCHAR path)
 {
-  char key[256];
+  WCHAR key[256], *kend;
   HKEY hkey;
 
   if (!name || !path)
     return NULL;
-  __small_sprintf (key, "SOFTWARE\\Microsoft\\WindowsNT\\CurrentVersion\\"
-  			"ProfileList\\%s", name);
-  if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
+  kend = wcpcpy (key, L"SOFTWARE\\Microsoft\\WindowsNT\\CurrentVersion\\ProfileList\\");
+  wcpcpy (kend, name);
+  if (!RegOpenKeyExW (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
-      char buf[PATH_MAX];
+      WCHAR buf[NT_MAX_PATH];
+      WCHAR tmp[NT_MAX_PATH];
       DWORD type, siz;
 
-      path[0] = '\0';
-      if (!RegQueryValueExA (hkey, "ProfileImagePath", 0, &type,
+      path[0] = L'\0';
+      if (!RegQueryValueExW (hkey, L"ProfileImagePath", 0, &type,
 			     (BYTE *)buf, (siz = sizeof (buf), &siz)))
-	ExpandEnvironmentStringsA (buf, path, PATH_MAX);
+	ExpandEnvironmentStringsW (buf, path, NT_MAX_PATH);
       RegCloseKey (hkey);
       if (path[0])
 	return path;
     }
-  debug_printf ("HKLM\\%s not found", key);
+  debug_printf ("HKLM\\%W not found", key);
   return NULL;
 }
 
 void
-load_registry_hive (const char * name)
+load_registry_hive (const PWCHAR name)
 {
-  char path[PATH_MAX];
+  WCHAR path[NT_MAX_PATH];
   HKEY hkey;
   LONG ret;
 
   if (!name)
     return;
   /* Check if user hive is already loaded. */
-  if (!RegOpenKeyExA (HKEY_USERS, name, 0, KEY_READ, &hkey))
+  if (!RegOpenKeyExW (HKEY_USERS, name, 0, KEY_READ, &hkey))
     {
-      debug_printf ("User registry hive for %s already exists", name);
+      debug_printf ("User registry hive for %W already exists", name);
       RegCloseKey (hkey);
       return;
     }
   if (get_registry_hive_path (name, path))
     {
-      strcat (path, "\\NTUSER.DAT");
-      if ((ret = RegLoadKeyA (HKEY_USERS, name, path)) != ERROR_SUCCESS)
-	debug_printf ("Loading user registry hive for %s failed: %d", name, ret);
+      wcscat (path, L"\\NTUSER.DAT");
+      if ((ret = RegLoadKeyW (HKEY_USERS, name, path)) != ERROR_SUCCESS)
+	debug_printf ("Loading user registry hive for %W failed: %d", name, ret);
     }
 }
 

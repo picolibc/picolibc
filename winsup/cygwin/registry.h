@@ -40,5 +40,5 @@ public:
 };
 
 /* Evaluates path to the directory of the local user registry hive */
-char *__stdcall get_registry_hive_path (const char *name, char *path);
-void __stdcall load_registry_hive (const char *name);
+PWCHAR __stdcall get_registry_hive_path (const PWCHAR name, PWCHAR path);
+void __stdcall load_registry_hive (const PWCHAR name);

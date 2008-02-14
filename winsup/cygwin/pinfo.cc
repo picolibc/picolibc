@@ -392,7 +392,7 @@ DWORD WINAPI
 commune_process (void *arg)
 {
   siginfo_t& si = *((siginfo_t *) arg);
-  char path[PATH_MAX];
+  char path[NT_MAX_PATH];
   DWORD nr;
   HANDLE& tothem = si._si_commune._si_write_handle;
   HANDLE process_sync =
@@ -439,7 +439,7 @@ commune_process (void *arg)
     case PICOM_CWD:
       {
 	sigproc_printf ("processing PICOM_CWD");
-	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1, PATH_MAX)) + 1;
+	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1, NT_MAX_PATH)) + 1;
 	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
 	  sigproc_printf ("WriteFile sizeof cwd failed, %E");
 	else if (!WriteFile (tothem, path, n, &nr, NULL))
@@ -665,7 +665,7 @@ _pinfo::fd (int fd, size_t &n)
       if (cfd < 0)
 	s = cstrdup ("");
       else
-	s = cfd->get_proc_fd_name ((char *) cmalloc_abort (HEAP_COMMUNE, PATH_MAX));
+	s = cfd->get_proc_fd_name ((char *) cmalloc_abort (HEAP_COMMUNE, NT_MAX_PATH));
       n = strlen (s) + 1;
     }
   return s;
@@ -736,8 +736,8 @@ _pinfo::cwd (size_t& n)
     }
   else
     {
-      s = (char *) cmalloc_abort (HEAP_COMMUNE, PATH_MAX);
-      cygheap->cwd.get (s, 1, 1, PATH_MAX);
+      s = (char *) cmalloc_abort (HEAP_COMMUNE, NT_MAX_PATH);
+      cygheap->cwd.get (s, 1, 1, NT_MAX_PATH);
       n = strlen (s) + 1;
     }
   return s;
