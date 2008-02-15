@@ -1,3 +1,8 @@
+2008-02-15  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_hash_table): Delete creator field.
+	(struct bfd_link_info): Add output_bfd.
+
 2008-02-11  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h (XCHAL_HAVE_THREADPTR): Redefine to zero.
