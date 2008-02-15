@@ -237,6 +237,8 @@ typedef unsigned long __uid32_t;
 typedef unsigned long __gid32_t;
 #endif
 
+#define __INT_MAX_PATH 32768
+
 struct external_pinfo
   {
   pid_t pid;
@@ -266,7 +268,7 @@ struct external_pinfo
   __gid32_t gid32;
 
   /* Only available if version >= EXTERNAL_PINFO_VERSION_32_LP */
-  char progname_long[PATH_MAX];
+  char progname_long[__INT_MAX_PATH];
 };
 #endif /*__CYGWIN__*/
 #endif /*WINVER*/
