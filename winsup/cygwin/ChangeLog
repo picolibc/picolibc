@@ -1,5 +1,10 @@
 2008-02-15  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* include/sys/cygwin.h (external_pinfo): Define program_long size using
+	external buffer size rather than cygwin-internal buffer size.
+
+2008-02-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	Perform whitespace cleanup throughout.
 
 	* dcrt0.cc (signal_shift_subtract): Eliminate ancient backwards

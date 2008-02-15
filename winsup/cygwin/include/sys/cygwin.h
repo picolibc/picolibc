@@ -266,7 +266,7 @@ struct external_pinfo
   __gid32_t gid32;
 
   /* Only available if version >= EXTERNAL_PINFO_VERSION_32_LP */
-  char progname_long[NT_MAX_PATH];
+  char progname_long[PATH_MAX];
 };
 #endif /*__CYGWIN__*/
 #endif /*WINVER*/
