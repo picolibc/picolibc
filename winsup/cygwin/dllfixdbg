@@ -45,7 +45,7 @@ for my $k (sort {$section{$a}{-idx} <=> $section{$b}{-idx}} keys %section) {
 	$vma = $section{$k}{-vma};
     }
     if ($vma != $section{$k}{-vma}) {
-        my $newvma = align($vma, $section{$k}{-algn});
+	my $newvma = align($vma, $section{$k}{-algn});
 	if ($newvma != $vma) {
 	    printf STDERR "$0: ERROR $k VMA 0x%08x != 0x%08x\n", $vma, $newvma;
 	    exit 1;

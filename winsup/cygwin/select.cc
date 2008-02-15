@@ -160,7 +160,7 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	const struct timespec *ts, const sigset_t *set)
 {
   struct timeval tv;
-  sigset_t oldset = myself->getsigmask ();
+  sigset_t oldset = _my_tls.sigmask;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -171,11 +171,11 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       tv.tv_usec = ts->tv_nsec / 1000;
     }
   if (set)
-    set_signal_mask (*set, myself->getsigmask ());
+    set_signal_mask (*set, _my_tls.sigmask);
   int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
 			   ts ? &tv : NULL);
   if (set)
-    set_signal_mask (oldset, myself->getsigmask ());
+    set_signal_mask (oldset, _my_tls.sigmask);
   return ret;
 }
 

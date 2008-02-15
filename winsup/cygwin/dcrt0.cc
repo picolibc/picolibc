@@ -74,14 +74,6 @@ _cygtls NO_COPY *_main_tls;
 
 bool NO_COPY cygwin_finished_initializing;
 
-/* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
-   This is subtracted from the signal number prior to shifting the bit.
-   In older versions of cygwin, the signal was used as-is to shift the
-   bit for masking.  So, we'll temporarily detect this and set it to zero
-   for programs that are linked using older cygwins.  This is just a stopgap
-   measure to allow an orderly transfer to the new, correct sigmask method. */
-unsigned NO_COPY int signal_shift_subtract = 1;
-
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
@@ -443,10 +435,6 @@ check_sanity_and_sync (per_process *p)
   if (p->api_major > cygwin_version.api_major)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d > %d",
 	       p->api_major, cygwin_version.api_major);
-
-  if (CYGWIN_VERSION_DLL_MAKE_COMBINED (p->dll_major, p->dll_minor) <=
-      CYGWIN_VERSION_DLL_BAD_SIGNAL_MASK)
-    signal_shift_subtract = 0;
 }
 
 child_info NO_COPY *child_proc_info = NULL;

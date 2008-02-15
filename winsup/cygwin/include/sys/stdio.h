@@ -20,15 +20,15 @@ details. */
 #if !defined(__SINGLE_THREAD__)
 #  if !defined(_flockfile)
 #    define _flockfile(fp) ({ if (!((fp)->_flags & __SSTR)) \
-                  __cygwin_lock_lock ((_LOCK_T *)&(fp)->_lock); })
+		  __cygwin_lock_lock ((_LOCK_T *)&(fp)->_lock); })
 #  endif
 #  if !defined(_ftrylockfile)
 #    define _ftrylockfile(fp) (((fp)->_flags & __SSTR) ? 0 : \
-                  __cygwin_lock_trylock ((_LOCK_T *)&(fp)->_lock))
+		  __cygwin_lock_trylock ((_LOCK_T *)&(fp)->_lock))
 #  endif
 #  if !defined(_funlockfile)
 #    define _funlockfile(fp) ({ if (!((fp)->_flags & __SSTR)) \
-                  __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock); })
+		  __cygwin_lock_unlock ((_LOCK_T *)&(fp)->_lock); })
 #  endif
 #endif
 

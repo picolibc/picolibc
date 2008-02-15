@@ -75,7 +75,7 @@ public:
   ~__DIR_mounts ()
     {
       for (int i = 0; i < count; ++i)
-        RtlFreeUnicodeString (&mounts[i]);
+	RtlFreeUnicodeString (&mounts[i]);
       RtlFreeUnicodeString (&cygdrive);
     }
   __ino64_t check_mount (PUNICODE_STRING fname, __ino64_t ino,
@@ -306,7 +306,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       pfai->BasicInformation.FileAttributes);
     }
   debug_printf ("%p = NtQueryInformationFile(%S)",
-  		status, pc.get_nt_native_path ());
+		status, pc.get_nt_native_path ());
   return -1;
 }
 
@@ -354,7 +354,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 						 TRUE, &basename, TRUE)))
     FileId = pfdi->FileId;
   else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
-  						 pfdi, fdi_size,
+						 pfdi, fdi_size,
 						 FileBothDirectoryInformation,
 						 TRUE, &basename, TRUE)))
     FileId.QuadPart = 0; /* get_namehash is called in fstat_helper. */
@@ -421,7 +421,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   if (get_handle ())
     {
       if (!nohandle () && !is_fs_special ())
-        res = fstat_by_handle (buf);
+	res = fstat_by_handle (buf);
       if (res)
 	res = fstat_by_name (buf);
       return res;
@@ -581,7 +581,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	      InitializeObjectAttributes (&attr, &same, 0, get_handle (), NULL);
 	      if (NT_SUCCESS (NtOpenFile (&h, FILE_READ_DATA, &attr, &io,
 					  FILE_SHARE_VALID_FLAGS, 0)))
-	        {
+		{
 		  LARGE_INTEGER off = { QuadPart:0LL };
 		  char magic[3];
 
@@ -1132,7 +1132,7 @@ fhandler_disk_file::link (const char *newpath)
   if (!NT_SUCCESS (status))
     {
       if (status == STATUS_INVALID_DEVICE_REQUEST)
-        {
+	{
 	  /* FS doesn't support hard links.  Try to copy file. */
 	  WCHAR pcw[pc.get_nt_native_path ()->Length + 1];
 	  WCHAR newpcw[newpc.get_nt_native_path ()->Length + 1];
@@ -1148,7 +1148,7 @@ fhandler_disk_file::link (const char *newpath)
 					| FILE_ATTRIBUTE_READONLY);
 	}
       else
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
@@ -1523,7 +1523,7 @@ fhandler_disk_file::rmdir ()
 			    (pc.get_object_attr (attr, sec_none_nih), &fbi)))
 	status = STATUS_DIRECTORY_NOT_EMPTY;
       else
-        status = STATUS_SUCCESS;
+	status = STATUS_SUCCESS;
     }
   if (!NT_SUCCESS (status))
     {
@@ -1691,7 +1691,7 @@ readdir_get_ino (const char *path, bool dot_dot)
       fname = (char *) alloca (strlen (path) + 4);
       char *c = stpcpy (fname, path);
       if (c[-1] != '/')
-        *c++ = '/';
+	*c++ = '/';
       strcpy (c, "..");
       path = fname;
     }
@@ -1786,7 +1786,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
     }
 
   char tmp[NAME_MAX + 1];
-  sys_wcstombs (tmp, NAME_MAX, fname->Buffer, fname->Length / sizeof (WCHAR)); 
+  sys_wcstombs (tmp, NAME_MAX, fname->Buffer, fname->Length / sizeof (WCHAR));
   if (pc.isencoded ())
     fnunmunge (de->d_name, tmp);
   else

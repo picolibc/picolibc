@@ -30,9 +30,7 @@ details. */
 #include <sys/cygwin.h>
 
 /***********************************************************************
- *
- write_record: Translates a Windows DNS record into a compressed record
-
+ * write_record: Translates a Windows DNS record into a compressed record
  ***********************************************************************/
 
 #define PUTDOMAIN(d,p)\
@@ -63,7 +61,7 @@ static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char 
   ptr += 2; /* Placeholder for RDLENGTH */
 
   /* The default case uses an undocumented feature of the Windows
-     resolver for types greater than 16. 
+     resolver for types greater than 16.
      The DNS_RECORD Data contains the record in wire format. */
 
   switch(rr->wType) {
@@ -181,7 +179,7 @@ static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char 
  cygwin_query: implements res_nquery by calling DnsQuery
 
  ***********************************************************************/
-static int cygwin_query(res_state statp, const char * DomName, int Class, int Type, 
+static int cygwin_query(res_state statp, const char * DomName, int Class, int Type,
 			unsigned char * AnsPtr, int AnsLength)
 {
   DNS_STATUS res;
@@ -191,7 +189,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 
   dnptrs[0] = AnsPtr;
   dnptrs[1] = NULL;
-  
+
   if (Class != ns_c_in) {
     errno = ENOSYS;
     statp->res_h_errno = NETDB_INTERNAL;
@@ -205,7 +203,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 #define HOST_NOT_FOUND  1 /* Authoritative Answer Host not found */
 #define TRY_AGAIN       2 /* Non-Authoritive Host not found, or SERVERFAIL */
 #define NO_RECOVERY     3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
-#define NO_DATA         4 /* Valid name, no data record of requested type */
+#define NO_DATA		4 /* Valid name, no data record of requested type */
 #endif
 
   DPRINTF(debug, "DnsQuery: %lu (Windows)\n", res);
@@ -259,8 +257,8 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
       PUTSHORT(ns_c_in, ptr);
       counts[0] = 1;
     }
-    
-    DPRINTF(debug, "%s Section %d Type %u Windows Record Length %u\n", 
+
+    DPRINTF(debug, "%s Section %d Type %u Windows Record Length %u\n",
 	    rr->pName, rr->Flags.DW & 0x3, rr->wType, rr->wDataLength);
 
     /* Check the records are in correct section order */
@@ -270,7 +268,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
     }
     section =  rr->Flags.DW & 0x3;
 
-    ptr = write_record(ptr, rr, AnsPtr + AnsLength, dnptrs, 
+    ptr = write_record(ptr, rr, AnsPtr + AnsLength, dnptrs,
 		       &dnptrs[DIM(dnptrs) - 1], debug);
 
     counts[section]++;
@@ -293,24 +291,24 @@ done:
 /***********************************************************************
  *
  get_registry_items: returns dns items from the registry
- 
+
  kHey: Handle to registry key
  KeyValue: key value to read
  what: 0 addresses ; 1 search list
 
 ***********************************************************************/
-static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue, 
+static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
 				   res_state statp, int what)
 {
   DWORD size = 0;
   LONG res;
   LPBYTE list;
   int debug = statp->options & RES_DEBUG;
-  
+
   res = RegQueryValueEx( hKey, KeyValue, NULL, NULL, NULL, &size);
-  DPRINTF(debug, "value %s, error %lu (Windows), size %lu\n", 
+  DPRINTF(debug, "value %s, error %lu (Windows), size %lu\n",
 	  KeyValue, res, size);
-  if ((res == ERROR_SUCCESS) && (size > 1)) { 
+  if ((res == ERROR_SUCCESS) && (size > 1)) {
     if (!(list = (LPBYTE) alloca(size))) {
       DPRINTF(debug, "alloca: %s\n", strerror(errno));
     }
@@ -322,7 +320,7 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
       BYTE *ap, *srch;
       int numAddresses = 0;
       for (ap = list; ap < list + size && *ap; ap = srch) {
-        /* The separation character can be 0, ' ', or ','. */
+	/* The separation character can be 0, ' ', or ','. */
 	for (srch = ap; *srch && (isdigit(*srch) || *srch == '.' ); srch++);
 	*srch++ = 0;
 	if (numAddresses < DIM(statp->nsaddr_list)) {
@@ -331,35 +329,35 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
 	  if ( statp->nsaddr_list[numAddresses].sin_addr.s_addr != 0 )
 	    numAddresses++;
 	}
-	else 
+	else
 	  DPRINTF(debug, "no space for server \"%s\"\n", ap);
       }
       statp->nscount = numAddresses;
     }
     else /* Parse the search line */
-      minires_get_search(list, statp); 
+      minires_get_search(list, statp);
   }
   return;
 }
 
 /***********************************************************************
  *
- get_registry_dns: 
+ get_registry_dns:
 
  Read the registry to get dns server addresses in Network Byte Order,
     and set statp->nscount (for NT <= 4.0)
  Read the registry SearchList
- 
+
 ***********************************************************************/
 
 static void get_registry_dns(res_state statp)
 {
-  HKEY hKey;     
+  HKEY hKey;
   DWORD  res;
   const char *keyName = "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters";
-  
+
   DPRINTF(statp->options & RES_DEBUG, "key %s\n", keyName);
-  if ((res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, keyName, 0, 
+  if ((res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, keyName, 0,
 			   KEY_QUERY_VALUE | KEY_READ, &hKey)) != ERROR_SUCCESS) {
     DPRINTF(statp->options & RES_DEBUG, "RegOpenKeyEx: error %lu (Windows)\n", res);
     return;
@@ -367,7 +365,7 @@ static void get_registry_dns(res_state statp)
 
   if (statp->nscount == 0)
     get_registry_dns_items(hKey, "NameServer", statp, 0);
-  if (statp->nscount == 0) 
+  if (statp->nscount == 0)
     get_registry_dns_items(hKey, "DhcpNameServer", statp, 0);
   if (statp->dnsrch[0] == NULL)
     get_registry_dns_items(hKey, "SearchList", statp, 1);
@@ -380,9 +378,9 @@ static void get_registry_dns(res_state statp)
 /***********************************************************************
  *
  get_dns_info: Get the search list or the domain name
-               and the dns server addresses in Network Byte Order
+	       and the dns server addresses in Network Byte Order
 	       Set statp->os_query if DnsQuery is available.
- 
+
 ***********************************************************************/
 void get_dns_info(res_state statp)
 {
@@ -443,7 +441,7 @@ void get_dns_info(res_state statp)
 	statp->nscount++;
       }
     }
-    else 
+    else
       DPRINTF(debug, "no space for server \"%s\"\n", pIPAddr->IpAddress.String);
   }
 

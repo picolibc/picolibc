@@ -221,7 +221,6 @@ get_registry_hive_path (const PWCHAR name, PWCHAR path)
   if (!RegOpenKeyExW (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
       WCHAR buf[NT_MAX_PATH];
-      WCHAR tmp[NT_MAX_PATH];
       DWORD type, siz;
 
       path[0] = L'\0';

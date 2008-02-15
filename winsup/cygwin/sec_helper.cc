@@ -106,7 +106,7 @@ cygpsid::string (PWCHAR nsidstr) const
 {
   UNICODE_STRING sid;
 
-  if (!psid || !nsidstr) 
+  if (!psid || !nsidstr)
     return NULL;
   RtlInitEmptyUnicodeString (&sid, nsidstr, 256);
   RtlConvertSidToUnicodeString (&sid, psid, FALSE);

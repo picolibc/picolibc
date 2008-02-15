@@ -233,7 +233,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 	      PWCHAR buf;
 	      buf = (PWCHAR) GlobalLock (hglb);
 	      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
-	      
+
 	      /* This loop is necessary because the number of bytes returned
 		 by WideCharToMultiByte does not indicate the number of wide
 		 chars used for it, so we could potentially drop wide chars. */

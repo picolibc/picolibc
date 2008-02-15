@@ -1308,7 +1308,7 @@ NTFS supports hardlinks.  </para>
 files.</para>
 
 <para><function>setuid</function> is only safe against reverting the user
-switch after a call to one of the exec(2) functions took place.  Windows 
+switch after a call to one of the exec(2) functions took place.  Windows
 doesn't support a non-revertable user switch within the context of Win32
 processes.</para>
 

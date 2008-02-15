@@ -179,8 +179,7 @@ extern HANDLE tty_mutex;
     })
 
 /* Convert a signal to a signal mask */
-#define SIGTOMASK(sig)	(1 << ((sig) - signal_shift_subtract))
-extern unsigned int signal_shift_subtract;
+#define SIGTOMASK(sig)	(1 << ((sig) - 1))
 
 extern int __api_fatal_exit_val;
 #define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)

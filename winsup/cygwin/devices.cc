@@ -43452,39 +43452,39 @@ device::parsedisk (int drive, int part)
   int base;
   if (drive < ('q' - 'a'))      /* /dev/sda -to- /dev/sdp */
     base = DEV_SD_MAJOR;
-  else if (drive < 32)          /* /dev/sdq -to- /dev/sdaf */
+  else if (drive < 32)		/* /dev/sdq -to- /dev/sdaf */
     {
       base = DEV_SD1_MAJOR;
       drive -= 'q' - 'a';
     }
-  else if (drive < 48)          /* /dev/sdag -to- /dev/sdav */
+  else if (drive < 48)		/* /dev/sdag -to- /dev/sdav */
     {
       base = DEV_SD2_MAJOR;
       drive -= 32;
     }
-  else if (drive < 64)          /* /dev/sdaw -to- /dev/sdbl */
+  else if (drive < 64)		/* /dev/sdaw -to- /dev/sdbl */
     {
       base = DEV_SD3_MAJOR;
       drive -= 48;
     }
-  else if (drive < 80)          /* /dev/sdbm -to- /dev/sdcb */
+  else if (drive < 80)		/* /dev/sdbm -to- /dev/sdcb */
     {
       base = DEV_SD4_MAJOR;
       drive -= 64;
     }
-  else if (drive < 96)          /* /dev/sdcc -to- /dev/sdcr */
+  else if (drive < 96)		/* /dev/sdcc -to- /dev/sdcr */
     {
       base = DEV_SD5_MAJOR;
       drive -= 80;
     }
-  else if (drive < 112)          /* /dev/sdcs -to- /dev/sddh */
+  else if (drive < 112)		/* /dev/sdcs -to- /dev/sddh */
     {
       base = DEV_SD6_MAJOR;
       drive -= 96;
     }
   /* NOTE: This will cause multiple /dev/sddx entries in
-           /proc/partitions if there are more than 128 devices */
-  else                           /* /dev/sddi -to- /dev/sddx */
+	   /proc/partitions if there are more than 128 devices */
+  else				/* /dev/sddi -to- /dev/sddx */
     {
       base = DEV_SD7_MAJOR;
       drive -= 112;

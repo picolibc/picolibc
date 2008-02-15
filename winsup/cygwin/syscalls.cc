@@ -183,9 +183,9 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
     RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
   else if (win32_path.fs_is_ntfs ())	/* NTFS up to 2K3 */
-    RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");	
+    RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
   else if (win32_path.fs_is_fat ())	/* FAT up to 2K3 */
-    RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");	
+    RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
   else
     goto out;
   /* Is the file a subdir of the recycler? */
@@ -287,9 +287,9 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	  goto out;
 	}
       /* Next, if necessary, check if the recycler/SID dir exists and
-         create it if not. */
+	 create it if not. */
       if (win32_path.fs_is_ntfs ())
-        {
+	{
 	  NtClose (recyclerdir);
 	  recycler.Length = recycler_user_len;
 	  status = NtCreateFile (&recyclerdir, READ_CONTROL | FILE_ADD_FILE,
@@ -306,10 +306,10 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	    }
 	}
       /* The desktop.ini and INFO2 (pre-Vista) files are expected by
-         Windows Explorer.  Otherwise, the created bin is treated as
+	 Windows Explorer.  Otherwise, the created bin is treated as
 	 corrupted */
       if (io.Information == FILE_CREATED)
-        {
+	{
 	  HANDLE fh;
 	  RtlInitUnicodeString (&fname, L"desktop.ini");
 	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
@@ -326,7 +326,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	      status = NtWriteFile (fh, NULL, NULL, NULL, &io, desktop_ini,
 				    sizeof desktop_ini - 1, NULL, NULL);
 	      if (!NT_SUCCESS (status))
-	        debug_printf ("NtWriteFile (%S) failed, %08x", &fname, status);
+		debug_printf ("NtWriteFile (%S) failed, %08x", &fname, status);
 	      NtClose (fh);
 	    }
 	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */
@@ -455,7 +455,7 @@ unlink_nt (path_conv &pc)
 	    {
 	      status = check_dir_not_empty (fh);
 	      if (!NT_SUCCESS (status))
-	        {
+		{
 		  NtClose (fh);
 		  return status;
 		}
@@ -1504,7 +1504,7 @@ rename (const char *oldpath, const char *newpath)
     {
       stpcpy (oldbuf = (char *) alloca (olen + 1), oldpath);
       while (olen > 0 && isdirsep (oldbuf[olen - 1]))
-        oldbuf[--olen] = '\0';
+	oldbuf[--olen] = '\0';
       oldpath = oldbuf;
       old_dir_requested = true;
     }
@@ -1539,7 +1539,7 @@ rename (const char *oldpath, const char *newpath)
     {
       stpcpy (newbuf = (char *) alloca (nlen + 1), newpath);
       while (nlen > 0 && isdirsep (newbuf[nlen - 1]))
-        newbuf[--nlen] = '\0';
+	newbuf[--nlen] = '\0';
       newpath = newbuf;
       new_dir_requested = true;
     }
@@ -1593,7 +1593,7 @@ rename (const char *oldpath, const char *newpath)
 	  && newpc.get_nt_native_path ()->Length >
 	     oldpc.get_nt_native_path ()->Length
 	  && *(PWCHAR) ((PBYTE) newpc.get_nt_native_path ()->Buffer
-	  		+ oldpc.get_nt_native_path ()->Length) == L'\\')
+			+ oldpc.get_nt_native_path ()->Length) == L'\\')
 	{
 	  set_errno (EINVAL);
 	  goto out;
@@ -1615,12 +1615,12 @@ rename (const char *oldpath, const char *newpath)
       else if (oldpc.is_lnk_symlink ()
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					      L".lnk", TRUE))
-      	rename_append_suffix (newpc, newpath, nlen, ".lnk");
+	rename_append_suffix (newpc, newpath, nlen, ".lnk");
       else if (oldpc.is_binary ()
 	   && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					  L".exe", TRUE))
 	/* NOTE: No way to rename an executable foo.exe to foo. */
-      	rename_append_suffix (newpc, newpath, nlen, ".exe");
+	rename_append_suffix (newpc, newpath, nlen, ".exe");
     }
   else if (newpc.isdir ())
     {
@@ -1641,7 +1641,7 @@ rename (const char *oldpath, const char *newpath)
 	    }
 	}
       else if (oldpc.is_lnk_symlink ())
-        {
+	{
 	  if (!newpc.is_lnk_symlink ()
 	      && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					     L".lnk", TRUE))
@@ -1658,9 +1658,9 @@ rename (const char *oldpath, const char *newpath)
 	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
 	      removepc = &newpc;
 	    }
-      	}
+	}
       else
-        {
+	{
 	  if ((RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					  L".lnk", TRUE)
 	       || RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
@@ -1712,7 +1712,7 @@ rename (const char *oldpath, const char *newpath)
 			   | (dstpc->is_rep_symlink ()
 			      ? FILE_OPEN_REPARSE_POINT : 0));
       if (!NT_SUCCESS (status))
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  goto out;
 	}
@@ -1726,7 +1726,7 @@ rename (const char *oldpath, const char *newpath)
 				     FileBasicInformation);
       NtClose (nfh);
       if (!NT_SUCCESS (status))
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  goto out;
 	}
@@ -1749,7 +1749,7 @@ rename (const char *oldpath, const char *newpath)
 		     &io, FILE_SHARE_VALID_FLAGS,
 		     FILE_OPEN_FOR_BACKUP_INTENT
 		     | ((removepc ?: dstpc)->is_rep_symlink ()
-		     	? FILE_OPEN_REPARSE_POINT : 0))))
+			? FILE_OPEN_REPARSE_POINT : 0))))
     {
       static const size_t vsiz = sizeof (FILE_FS_VOLUME_INFORMATION)
 				 + 32 * sizeof (WCHAR);

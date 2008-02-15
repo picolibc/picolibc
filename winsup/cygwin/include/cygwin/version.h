@@ -62,8 +62,6 @@ details. */
      /* Every version of cygwin <= this uses an old, incorrect method
 	to determine signal masks. */
 
-#define CYGWIN_VERSION_DLL_BAD_SIGNAL_MASK	19005
-
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
   CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor)
 
@@ -311,7 +309,7 @@ details. */
       169: Export confstr.
       170: Export insque, remque.
       171: Export exp10, exp10f, pow10, pow10f, strcasestr, funopen,
-           fopencookie.
+	   fopencookie.
       172: Export getifaddrs, freeifaddrs.
       173: Export __assert_func.
       174: Export stpcpy, stpncpy.

@@ -25,7 +25,7 @@ int   _EXFUN(bcmp,(const void *, const void *, size_t));
 void  _EXFUN(bcopy,(const void *, void *, size_t));
 void  _EXFUN(bzero,(void *, size_t));
 int   _EXFUN(ffs,(int));
-char *_EXFUN(index,(const char *, int)); 
+char *_EXFUN(index,(const char *, int));
 char *_EXFUN(rindex,(const char *, int));
 int   _EXFUN(strcasecmp,(const char *, const char *));
 int   _EXFUN(strncasecmp,(const char *, const char *, size_t));

@@ -940,7 +940,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
       status = NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
 				       FilePositionInformation);
       if (!NT_SUCCESS (status))
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
@@ -950,7 +950,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
       status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
 				       FileStandardInformation);
       if (!NT_SUCCESS (status))
-        {
+	{
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}

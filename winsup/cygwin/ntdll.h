@@ -790,7 +790,7 @@ extern "C"
 				      PIO_STATUS_BLOCK, ULONG, ULONG, ULONG,
 				      PLARGE_INTEGER);
   NTSTATUS NTAPI NtCreateSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
-  				  PLARGE_INTEGER, ULONG, ULONG, HANDLE);
+				  PLARGE_INTEGER, ULONG, ULONG, HANDLE);
   NTSTATUS NTAPI NtCreateToken (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
 				TOKEN_TYPE, PLUID, PLARGE_INTEGER, PTOKEN_USER,
 				PTOKEN_GROUPS, PTOKEN_PRIVILEGES, PTOKEN_OWNER,
@@ -804,11 +804,11 @@ extern "C"
 				     PLARGE_INTEGER, PULONG, SECTION_INHERIT,
 				     ULONG, ULONG);
   NTSTATUS NTAPI NtNotifyChangeDirectoryFile (HANDLE, HANDLE, PIO_APC_ROUTINE,
-                                              PVOID, PIO_STATUS_BLOCK,
+					      PVOID, PIO_STATUS_BLOCK,
 					      PFILE_NOTIFY_INFORMATION, ULONG,
 					      ULONG, BOOLEAN);
   NTSTATUS NTAPI NtOpenDirectoryObject (PHANDLE, ACCESS_MASK,
-  					POBJECT_ATTRIBUTES);
+					POBJECT_ATTRIBUTES);
   NTSTATUS NTAPI NtOpenFile (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
 			     PIO_STATUS_BLOCK, ULONG, ULONG);
   NTSTATUS NTAPI NtOpenSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
@@ -821,7 +821,7 @@ extern "C"
 				      FILE_INFORMATION_CLASS, BOOLEAN,
 				      PUNICODE_STRING, BOOLEAN);
   NTSTATUS NTAPI NtQueryDirectoryObject (HANDLE, PVOID, ULONG, BOOLEAN,
-  					 BOOLEAN, PULONG, PULONG);
+					 BOOLEAN, PULONG, PULONG);
   NTSTATUS NTAPI NtQueryEaFile (HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG,
 				BOOLEAN, PVOID, ULONG, PULONG, BOOLEAN);
   NTSTATUS NTAPI NtQueryFullAttributesFile (POBJECT_ATTRIBUTES,
@@ -835,7 +835,7 @@ extern "C"
   NTSTATUS NTAPI NtQuerySystemInformation (SYSTEM_INFORMATION_CLASS,
 					   PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQuerySecurityObject (HANDLE, SECURITY_INFORMATION,
-  					PSECURITY_DESCRIPTOR, ULONG, PULONG);
+					PSECURITY_DESCRIPTOR, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryVirtualMemory (HANDLE, PVOID, MEMORY_INFORMATION_CLASS,
 				       PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryVolumeInformationFile (HANDLE, IO_STATUS_BLOCK *,
@@ -912,7 +912,7 @@ extern "C"
      If you know it's 0-terminated, just use RtlInitUnicodeString(). */
   inline
   VOID NTAPI RtlInitCountedUnicodeString (PUNICODE_STRING dest, PCWSTR buf,
-  					  USHORT len)
+					  USHORT len)
   {
     dest->Length = dest->MaximumLength = len;
     dest->Buffer = (PWSTR) buf;
@@ -920,7 +920,7 @@ extern "C"
   /* Split path into dirname and basename part.  This function does not
      copy anything!  It just initializes the dirname and basename
      UNICODE_STRINGs so that their Buffer members point to the right spot
-     into path's Buffer, and the Length (and MaximumLength) members are set 
+     into path's Buffer, and the Length (and MaximumLength) members are set
      to match the dirname part and the basename part.
      Note that dirname's Length is set so that it also includes the trailing
      backslash.  If you don't need it, just subtract sizeof(WCHAR) from

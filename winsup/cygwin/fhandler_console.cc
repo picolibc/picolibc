@@ -1428,7 +1428,7 @@ beep ()
 }
 
 /* This gets called when we found an invalid UTF-8 character.  We try with
-   the default ANSI codepage.  If that fails we just print a question mark. 
+   the default ANSI codepage.  If that fails we just print a question mark.
    Looks ugly but is a neat and alomst sane fallback for many languages. */
 void
 fhandler_console::write_replacement_char (const unsigned char *char_p)
@@ -1456,7 +1456,7 @@ fhandler_console::write_normal (const unsigned char *src,
   const unsigned char *nfound;
   UINT cp = dev_state->get_console_cp ();
 
-  /* First check if we have cached lead bytes of a former try to write 
+  /* First check if we have cached lead bytes of a former try to write
      a truncated multibyte sequence.  If so, process it. */
   if (trunc_buf.len)
     {
@@ -1465,7 +1465,7 @@ fhandler_console::write_normal (const unsigned char *src,
       nfound = next_char (cp, trunc_buf.buf,
 			  trunc_buf.buf + trunc_buf.len + cp_len);
       if (!nfound)		/* Invalid multibyte sequence. */
-        {			/* Give up and print replacement chars. */
+	{			/* Give up and print replacement chars. */
 	  for (int i = 0; i < trunc_buf.len; ++i)
 	    write_replacement_char (trunc_buf.buf + i);
 	}
@@ -1495,7 +1495,7 @@ fhandler_console::write_normal (const unsigned char *src,
       if (!nfound)		/* Invalid multibyte sequence. */
 	break;
       if (nfound == found)	/* Truncated multibyte sequence. */
-        {			/* Stick to it until the next write. */
+	{			/* Stick to it until the next write. */
 	  trunc_buf.len = end - found;
 	  memcpy (trunc_buf.buf, found, trunc_buf.len);
 	  return end;

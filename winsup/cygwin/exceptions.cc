@@ -682,9 +682,9 @@ handle_sigsuspend (sigset_t tempmask)
       return -1;
     }
 
-  sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
+  sigset_t oldmask = _my_tls.sigmask;	// Remember for restoration
 
-  set_signal_mask (tempmask, myself->getsigmask ());
+  set_signal_mask (tempmask, _my_tls.sigmask);
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
@@ -995,8 +995,7 @@ ctrl_c_handler (DWORD type)
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
-  set_signal_mask (newmask, myself->getsigmask ());
-sigproc_printf ("mask now %p\n", myself->getsigmask ());
+  set_signal_mask (newmask, _my_tls.sigmask);
 }
 
 extern "C" int
@@ -1010,9 +1009,9 @@ sighold (int sig)
       return -1;
     }
   mask_sync.acquire (INFINITE);
-  sigset_t mask = myself->getsigmask ();
+  sigset_t mask = _my_tls.sigmask;
   sigaddset (&mask, sig);
-  set_signal_mask (mask, myself->getsigmask ());
+  set_signal_mask (mask, _my_tls.sigmask);
   mask_sync.release ();
   return 0;
 }
@@ -1028,9 +1027,9 @@ sigrelse (int sig)
       return -1;
     }
   mask_sync.acquire (INFINITE);
-  sigset_t mask = myself->getsigmask ();
+  sigset_t mask = _my_tls.sigmask;
   sigdelset (&mask, sig);
-  set_signal_mask (mask, myself->getsigmask ());
+  set_signal_mask (mask, _my_tls.sigmask);
   mask_sync.release ();
   return 0;
 }
@@ -1050,7 +1049,7 @@ sigset (int sig, _sig_func_ptr func)
     }
 
   mask_sync.acquire (INFINITE);
-  sigset_t mask = myself->getsigmask ();
+  sigset_t mask = _my_tls.sigmask;
   /* If sig was in the signal mask return SIG_HOLD, otherwise return the
      previous disposition. */
   if (sigismember (&mask, sig))
@@ -1068,7 +1067,7 @@ sigset (int sig, _sig_func_ptr func)
       signal (sig, func);
       sigdelset (&mask, sig);
     }
-  set_signal_mask (mask, myself->getsigmask ());
+  set_signal_mask (mask, _my_tls.sigmask);
   mask_sync.release ();
   return prev;
 }
@@ -1090,11 +1089,11 @@ set_process_mask_delta ()
   if (_my_tls.deltamask & SIG_NONMASKABLE)
     oldmask = _my_tls.oldmask; /* from handle_sigsuspend */
   else
-    oldmask = myself->getsigmask ();
+    oldmask = _my_tls.sigmask;
   newmask = (oldmask | _my_tls.deltamask) & ~SIG_NONMASKABLE;
   sigproc_printf ("oldmask %p, newmask %p, deltamask %p", oldmask, newmask,
 		  _my_tls.deltamask);
-  myself->setsigmask (newmask);
+  _my_tls.sigmask = newmask;
   mask_sync.release ();
   return oldmask;
 }
@@ -1362,7 +1361,7 @@ _cygtls::call_signal_handler ()
 	  sigact (thissig, &thissi, NULL);
 	}
       incyg = 1;
-      set_signal_mask (this_oldmask, myself->getsigmask ());
+      set_signal_mask (this_oldmask, _my_tls.sigmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }

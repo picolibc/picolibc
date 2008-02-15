@@ -25,11 +25,11 @@ extern "C" {
    which will be used throughout the library whereever there is a _r
    version of a function that takes _REENT.  This saves the overhead
    of a function call for what amounts to a simple computation.
-   
+
    The definition below is essentially equivalent to the one in cygtls.h
    (&_my_tls.local_clib) however it uses a fixed precomputed
    offset rather than dereferencing a field of a structure.
-   
+
    Including tlsoffets.h here in order to get this constant offset
    tls_local_clib is a bit of a hack, but the alternative would require
    dragging the entire definition of struct _cygtls (a large and complex

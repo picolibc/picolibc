@@ -24,7 +24,7 @@ dprintf
 void minires_dprintf(const char * format, ...)
 {
   va_list args;
-  
+
   va_start(args, format);
   fprintf(stderr, "Minires: ");
   vfprintf(stderr, format, args);
@@ -36,7 +36,7 @@ void minires_dprintf(const char * format, ...)
 scanline
 Put pointers in list[] to the beginning of each space or comma delimited
 word in "in", and put the lengths in sizes[] (counting the final 0).
-Return the number of words found  
+Return the number of words found
 ***********************************************************************/
 static int scanline(char * in, char **list, int * sizes, int maxnum)
 {
@@ -44,12 +44,12 @@ static int scanline(char * in, char **list, int * sizes, int maxnum)
   char * startp;
   for (i = 0; i < maxnum; i++) {
     while((*in) && (isspace(*in) || *in == ',')) in++;
-    if (*in == 0) 
+    if (*in == 0)
       break;
     startp = in++;
     while((*in) && !isspace(*in) && *in != ',') in++;
     list[i] = startp;
-    sizes[i] = in - startp + 1; 
+    sizes[i] = in - startp + 1;
     if (*in)
       *in++ = 0;
   }
@@ -70,7 +70,7 @@ void minires_get_search(char * string, res_state statp)
   i = scanline(string, words, sizes, MAXDNSRCH+1);
   ptr = statp->defdname;
   for (j = 0; j < i; j++) {
-    if (j < MAXDNSRCH 
+    if (j < MAXDNSRCH
 	&& ptr + sizes[j] < &statp->defdname[DIM(statp->defdname)]) {
       statp->dnsrch[j] = strcpy(ptr, words[j]);
       statp->dnsrch[j+1] = NULL;
@@ -108,7 +108,7 @@ static void get_options(res_state statp, int i, char **words)
     if ((ptr = strchr(words[i], ':'))) {
       *ptr++ = 0;
       value = atoi(ptr);
-      /* Not supported 
+      /* Not supported
 	 if (!strcasecmp("ndots", words[i])) {
 	 statp->ndots = value;
 	 continue;
@@ -141,7 +141,7 @@ We only look for nameserver, domain, search and options
 ***********************************************************************/
 #if MAXNS > MAXDNSRCH + 1
 #define MAXSIZE MAXNS
-#else 
+#else
 #define MAXSIZE MAXDNSRCH + 1 /* Make unused one visible */
 #endif
 static void get_resolv(res_state statp)
@@ -163,7 +163,7 @@ static void get_resolv(res_state statp)
   while ( fgets(line, sizeof(line), fd) != 0) {
     DPRINTF(debug, "resolv.conf %s", line);
     if ((i = scanline(line, words, sizes, DIM(words))) > 0) {
-      if (!have_address 
+      if (!have_address
 	  && !strncasecmp("nameserver", words[0], sizes[0])) {
 	for ( j = 1; j < i ; j++) {
 	  unsigned int address;
@@ -181,7 +181,7 @@ static void get_resolv(res_state statp)
 	  }
 	}
       }
-      else if (!have_search 
+      else if (!have_search
 	       && (!strncasecmp("search", words[0], sizes[0])
 		   || !strncasecmp("domain", words[0], sizes[0]))) {
 	ptr = statp->defdname;
@@ -208,7 +208,7 @@ static void get_resolv(res_state statp)
 }
 
 /****************************************************************************/
-/* 
+/*
    open_sock()
    Create a datagram socket and call bind.
 
@@ -217,7 +217,7 @@ static void get_resolv(res_state statp)
 static int open_sock(struct sockaddr_in *CliAddr, int debug)
 {
   int fd;
-  
+
   DPRINTF(debug, "opening UDP socket\n");
 
   /* Create a datagram socket */
@@ -257,7 +257,7 @@ struct __res_state *__res_state(void)
 int res_ninit(res_state statp)
 {
   int i;
-  
+
   statp->res_h_errno = NETDB_SUCCESS;
   statp->nscount = 0;
   statp->os_query = NULL;
@@ -273,11 +273,11 @@ int res_ninit(res_state statp)
   get_resolv(statp);
   /* Get dns servers and search list from an os-specific routine, set os_query */
   get_dns_info(statp);
-      
+
   if (statp->nscount == 0 && !statp->os_query) {
     errno = ENONET;
     statp->res_h_errno = NETDB_INTERNAL;
-    DPRINTF(statp->options & RES_DEBUG, "no dns server found\n"); 
+    DPRINTF(statp->options & RES_DEBUG, "no dns server found\n");
     return -1;
   }
   for (i = 0; i < statp->nscount; i++) {
@@ -308,7 +308,7 @@ void res_nclose(res_state statp)
   int res;
   if (statp->sockfd != -1) {
     res = close(statp->sockfd);
-    DPRINTF(statp->options & RES_DEBUG, "close sockfd %d: %s\n", 
+    DPRINTF(statp->options & RES_DEBUG, "close sockfd %d: %s\n",
 	    statp->sockfd, (res == 0)?"OK":strerror(errno));
     statp->sockfd = -1;
   }
@@ -317,7 +317,7 @@ void res_nclose(res_state statp)
 void res_close()
 {
   res_nclose(& res);
-}  
+}
 
 /*****************************************************************
  *
@@ -344,7 +344,7 @@ static int get_tcp_buf(int fd, unsigned char *buf, int size, int debug)
  get_tcp()
 
  *****************************************************************/
-static int get_tcp(struct sockaddr_in *CliAddr, 
+static int get_tcp(struct sockaddr_in *CliAddr,
 		   const unsigned char * MsgPtr, int MsgLength,
 		   unsigned char * AnsPtr, int AnsLength, int debug)
 {
@@ -379,7 +379,7 @@ static int get_tcp(struct sockaddr_in *CliAddr,
   ans_length = ntohs(len_buf.len);
 
   /* Read the answer */
-  if (get_tcp_buf(fd, AnsPtr, MIN(ans_length, AnsLength), debug)) 
+  if (get_tcp_buf(fd, AnsPtr, MIN(ans_length, AnsLength), debug))
     goto done;
   res = ans_length;
 
@@ -393,9 +393,9 @@ static int get_tcp(struct sockaddr_in *CliAddr,
  res_send
  Assumes that the message is a query starting with a short id.
  Handles retransmissions until that id is received.
- 
+
 *****************************************************************/
-int res_nsend( res_state statp, const unsigned char * MsgPtr, 
+int res_nsend( res_state statp, const unsigned char * MsgPtr,
 	       int MsgLength, unsigned char * AnsPtr, int AnsLength)
 {
   /* Current server, shared by all tasks */
@@ -403,13 +403,13 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
   int tcp;
   const int debug = statp->options & RES_DEBUG;
 
-  fd_set fdset_read; 
+  fd_set fdset_read;
   int rslt, addrLen, transNum, wServ;
   struct sockaddr_in mySockAddr, dnsSockAddr;
   struct timeval timeOut;
-  
+
   statp->res_h_errno = NETDB_SUCCESS;
-  if (((statp->options & RES_INIT) == 0) && (res_ninit(statp) != 0)) 
+  if (((statp->options & RES_INIT) == 0) && (res_ninit(statp) != 0))
     return -1;
 
   /* Close the socket if it had been opened before a fork.
@@ -428,7 +428,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
     }
     /* Set close on exec flag */
     if (fcntl(statp->sockfd, F_SETFD, 1) == -1) {
-      DPRINTF(debug, "fcntl: %s\n", 
+      DPRINTF(debug, "fcntl: %s\n",
 	      strerror(errno));
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
@@ -438,17 +438,17 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
       SServ =  statp->mypid % statp->nscount;
   }
 
-  transNum = 0;  
+  transNum = 0;
   while ( transNum++ < statp->retry) {
-    if ((wServ = SServ + 1) >= statp->nscount) 
+    if ((wServ = SServ + 1) >= statp->nscount)
       wServ = 0;
     SServ = wServ;
     /* Send the message */
-    rslt = cygwin_sendto(statp->sockfd, MsgPtr, MsgLength, 0, 
+    rslt = cygwin_sendto(statp->sockfd, MsgPtr, MsgLength, 0,
 			 (struct sockaddr *) &statp->nsaddr_list[wServ],
 			 sizeof(struct sockaddr_in));
     DPRINTF(debug, "sendto: server %08x sockfd %d %s\n",
-	    statp->nsaddr_list[wServ].sin_addr.s_addr, 
+	    statp->nsaddr_list[wServ].sin_addr.s_addr,
 	    statp->sockfd, (rslt == MsgLength)?"OK":strerror(errno));
     if (rslt != MsgLength) {
       statp->res_h_errno = NETDB_INTERNAL;
@@ -474,15 +474,15 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
     }
 
     addrLen = sizeof(dnsSockAddr);
-    rslt = cygwin_recvfrom(statp->sockfd, AnsPtr, AnsLength, 0, 
+    rslt = cygwin_recvfrom(statp->sockfd, AnsPtr, AnsLength, 0,
 			   (struct sockaddr *) & dnsSockAddr, & addrLen);
     if (rslt <= 0) {
       DPRINTF(debug, "recvfrom: %s\n", strerror(errno));
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
     }
-    /* 
-       Prepare to retry with tcp 
+    /*
+       Prepare to retry with tcp
     */
     for (tcp = 0; tcp < 2; tcp++) {
       /* Check if this is the message we expected */
@@ -497,14 +497,14 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 	  && ((AnsPtr[2] & QR) != 0)) {
 
 	DPRINTF(debug, "answer %u from %08x. Error %d. Count %d.\n",
-		rslt, dnsSockAddr.sin_addr.s_addr, 
+		rslt, dnsSockAddr.sin_addr.s_addr,
 		AnsPtr[3] & ERR_MASK, AnsPtr[6]*256 + AnsPtr[7]);
 #if 0
  NETDB_INTERNAL -1 /* see errno */
  NETDB_SUCCESS   0 /* no problem */
  HOST_NOT_FOUND  1 /* Authoritative Answer Host not found */
  TRY_AGAIN       2 /* Non-Authoritive Host not found, or SERVERFAIL */
-                         Also seen returned by some servers when the name is too long
+			 Also seen returned by some servers when the name is too long
  NO_RECOVERY     3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
  NO_DATA         4 /* Valid name, no data record of requested type */
 #endif
@@ -512,27 +512,27 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 	  if ((AnsPtr[2] & TC) && !(statp->options & RES_IGNTC)) { /* Truncated. Try TCP */
 	    rslt = get_tcp(&statp->nsaddr_list[wServ], MsgPtr, MsgLength,
 			   AnsPtr, AnsLength, statp->options & RES_DEBUG);
-	    continue; 
+	    continue;
 	  }
-	  else if ((AnsPtr[6] | AnsPtr[7])!= 0) 
+	  else if ((AnsPtr[6] | AnsPtr[7])!= 0)
 	    return rslt;
-	  else 
+	  else
 	    statp->res_h_errno = NO_DATA;
 	}
 	else {
 	  /* return HOST_NOT_FOUND even for non-authoritative answers */
-	  if ((AnsPtr[3] & ERR_MASK) == NXDOMAIN) 
+	  if ((AnsPtr[3] & ERR_MASK) == NXDOMAIN)
 	    statp->res_h_errno = HOST_NOT_FOUND;
-	  else if ((AnsPtr[3] & ERR_MASK) == SERVFAIL) 
+	  else if ((AnsPtr[3] & ERR_MASK) == SERVFAIL)
 	    statp->res_h_errno = TRY_AGAIN;
-	  else 
+	  else
 	    statp->res_h_errno = NO_RECOVERY;
 	}
 	return -1;
       }
       else {
 	DPRINTF(debug, "unexpected answer %u from %x to query to %x\n",
-		rslt, dnsSockAddr.sin_addr.s_addr, 
+		rslt, dnsSockAddr.sin_addr.s_addr,
 		statp->nsaddr_list[wServ].sin_addr.s_addr);
 	break;
       }
@@ -543,7 +543,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
   return -1;
 }
 
-int res_send( const unsigned char * MsgPtr, int MsgLength, 
+int res_send( const unsigned char * MsgPtr, int MsgLength,
 	      unsigned char * AnsPtr, int AnsLength)
 {
   int r = res_nsend(& res, MsgPtr, MsgLength, AnsPtr, AnsLength);
@@ -556,10 +556,10 @@ int res_send( const unsigned char * MsgPtr, int MsgLength,
  res_mkquery
 
  Return: packet size
-        -1 name format is incorrect 
+	-1 name format is incorrect
 *****************************************************************/
 int res_nmkquery (res_state statp,
-		  int op, const char * dnameptr, int qclass, int qtype, 
+		  int op, const char * dnameptr, int qclass, int qtype,
 		  const unsigned char * dataptr, int datalen,
 		  const unsigned char * newrr, unsigned char * buf, int buflen)
 {
@@ -570,7 +570,7 @@ int res_nmkquery (res_state statp,
     /* Write the name and verify buffer length */
     len = dn_comp(dnameptr, buf + HFIXEDSZ, buflen - HFIXEDSZ - QFIXEDSZ, NULL, NULL);
     if (len < 0) {
-      DPRINTF(statp->options & RES_DEBUG, 
+      DPRINTF(statp->options & RES_DEBUG,
 	      "\"%s\" invalid or buffer too short\n", dnameptr);
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
@@ -578,7 +578,7 @@ int res_nmkquery (res_state statp,
     /* Fill the header */
     id = statp->id;
     PUTSHORT(id, buf);
-    PUTSHORT(RD, buf); 
+    PUTSHORT(RD, buf);
     PUTSHORT(1, buf); /* Number of questions */
     for (i = 0; i < 3; i++)
       PUTSHORT(0, buf); /* Number of answers */
@@ -596,11 +596,11 @@ int res_nmkquery (res_state statp,
   }
 }
 
-int res_mkquery (int op, const char * dnameptr, int qclass, int qtype, 
+int res_mkquery (int op, const char * dnameptr, int qclass, int qtype,
 		 const unsigned char * dataptr, int datalen,
 		 const unsigned char * newrr, unsigned char * buf, int buflen)
 {
-  int r = res_nmkquery (& res, op, dnameptr, qclass, qtype, 
+  int r = res_nmkquery (& res, op, dnameptr, qclass, qtype,
 			dataptr, datalen, newrr, buf, buflen);
   h_errno = res.res_h_errno;
   return r;
@@ -608,17 +608,15 @@ int res_mkquery (int op, const char * dnameptr, int qclass, int qtype,
 }
 
 /*****************************************************************
- *
- res_query()
-                                                                  
+ * res_query()
  *****************************************************************/
 
-int res_nquery( res_state statp, const char * DomName, int Class, int Type, 
+int res_nquery( res_state statp, const char * DomName, int Class, int Type,
 		unsigned char * AnsPtr, int AnsLength)
 {
   u_char packet[PACKETSZ];
   int len;
-  
+
   DPRINTF(statp->options & RES_DEBUG, "query \"%s\" type %d\n", DomName, Type);
   statp->res_h_errno = NETDB_SUCCESS;
 
@@ -626,7 +624,7 @@ int res_nquery( res_state statp, const char * DomName, int Class, int Type,
   if (statp->os_query)
     return ((os_query_t *) statp->os_query)(statp, DomName, Class, Type, AnsPtr, AnsLength);
 
-  if ((len = res_nmkquery (statp, QUERY, DomName, Class, Type, 
+  if ((len = res_nmkquery (statp, QUERY, DomName, Class, Type,
 			   0, 0, 0, packet, PACKETSZ)) < 0)
     return -1;
   return res_nsend( statp, packet, len, AnsPtr, AnsLength);
@@ -640,9 +638,7 @@ int res_query( const char * DomName, int Class, int Type, unsigned char * AnsPtr
 }
 
 /*****************************************************************
- *
- res_querydomain()
-                                                                  
+ * res_querydomain()
  *****************************************************************/
 int res_nquerydomain( res_state statp, const char * Name, const char * DomName,
 		      int Class, int Type, unsigned char * AnsPtr, int AnsLength)
@@ -657,7 +653,7 @@ int res_nquerydomain( res_state statp, const char * Name, const char * DomName,
   else {
     strcpy(fqdn, Name);
     ptr = &fqdn[nlen];
-    if (nlen && *(ptr - 1) != '.') 
+    if (nlen && *(ptr - 1) != '.')
       *(ptr++ - 1) = '.';
     fqdn[sizeof(fqdn) - 1] = 0;
     strncpy(ptr, DomName, sizeof(fqdn) - (ptr - fqdn));
@@ -689,7 +685,7 @@ int res_querydomain( const char * Name, const char * DomName, int Class,
 
  *****************************************************************/
 
-int res_nsearch( res_state statp, const char * DomName, int Class, int Type, 
+int res_nsearch( res_state statp, const char * DomName, int Class, int Type,
 		 unsigned char * AnsPtr, int AnsLength)
 {
   int len, stat, i;
@@ -697,31 +693,31 @@ int res_nsearch( res_state statp, const char * DomName, int Class, int Type,
 
   DPRINTF(statp->options & RES_DEBUG, "search \"%s\" type %d\n", DomName, Type);
 
-  if (((statp->options & RES_INIT) == 0) && (res_ninit(statp) != 0)) 
+  if (((statp->options & RES_INIT) == 0) && (res_ninit(statp) != 0))
     return -1;
 
   stat = res_nquery( statp, DomName, Class, Type, AnsPtr, AnsLength);
 
   /* Check if will skip search */
   if (statp->res_h_errno != HOST_NOT_FOUND               /* Success or hard failure */
-      || ((ptr = strrchr(DomName, '.')) && (!*(ptr+1)))  /* Final dot */ 
+      || ((ptr = strrchr(DomName, '.')) && (!*(ptr+1)))  /* Final dot */
       || (((statp->options & RES_DNSRCH) == 0)           /* Or no search */
 	  && ((ptr != NULL)                              /*  And some dot */
 	      || ((statp->options & RES_DEFNAMES) == 0)))/*    or no def domain */
-      || (!(sptr = statp->dnsrch[0])))                 
+      || (!(sptr = statp->dnsrch[0])))
     return stat;
 
   len = strlen(DomName);
   if (len >= MAXDNAME - 1) /* Space for next dot */
     goto error;
-  strcpy(fullDomName, DomName); 
+  strcpy(fullDomName, DomName);
   fullDomName[len++] = '.';
   fullDomName[MAXDNAME - 1] = 0; /* Overflow indicator */
   i = 0;
   do {
     strncpy(fullDomName + len, sptr, MAXDNAME - len);
     if (fullDomName[MAXDNAME - 1])
-      goto error;      
+      goto error;
     stat = res_nquery(statp, fullDomName, Class, Type, AnsPtr, AnsLength);
   } while ((sptr = statp->dnsrch[++i]) != NULL
 	   && statp->res_h_errno == HOST_NOT_FOUND
@@ -737,7 +733,7 @@ int res_nsearch( res_state statp, const char * DomName, int Class, int Type,
   return -1;
 }
 
-int res_search( const char * DomName, int Class, int Type, 
+int res_search( const char * DomName, int Class, int Type,
 		unsigned char * AnsPtr, int AnsLength)
 {
   int r = res_nsearch(& res, DomName, Class, Type, AnsPtr, AnsLength);
@@ -746,13 +742,11 @@ int res_search( const char * DomName, int Class, int Type,
 }
 
 /*****************************************************************
- *
- dn_expand
-                                                                  
+ * dn_expand
  *****************************************************************/
 
 int dn_expand(const unsigned char *msg, const unsigned char *eomorig,
-              const unsigned char *comp_dn, char *exp_dn, int length)
+	      const unsigned char *comp_dn, char *exp_dn, int length)
 {
   unsigned int len, complen = 0;
   const unsigned char *comp_dn_orig = comp_dn;
@@ -767,31 +761,31 @@ int dn_expand(const unsigned char *msg, const unsigned char *eomorig,
     if (len <= MAXLABEL) {
       if ((length -= (len + 1)) > 0 /* Need space for final . */
 	  && comp_dn + len <= eomorig) {
-        do { *exp_dn++ = *comp_dn++; } while (--len != 0);
-        *exp_dn++ = '.';
+	do { *exp_dn++ = *comp_dn++; } while (--len != 0);
+	*exp_dn++ = '.';
       }
-      else 
+      else
 	goto expand_fail;
     }
     else if (len >= (128+64)) {
       if (!complen)   /* Still in the original field? */
-	complen = (comp_dn - comp_dn_orig) + 1; 
+	complen = (comp_dn - comp_dn_orig) + 1;
       comp_dn = msg + (((len & ~(128+64)) << 8) + *comp_dn);
-      if (comp_dn >= eomorig) 
+      if (comp_dn >= eomorig)
 	goto expand_fail;
     }
-    else 
+    else
       goto expand_fail;
   } while ((len = *comp_dn++) != 0);
   /* Replace last . with a 0 */
   *(--exp_dn) = 0;
-  if (!complen) 
+  if (!complen)
     complen = comp_dn - comp_dn_orig;
 /*  fprintf(stderr, "dn_expand %s\n", exp_start); */
   return complen;
-  
+
 expand_fail:
-/*  fprintf(stderr, "dn_expand fails\n"); */ 
+/*  fprintf(stderr, "dn_expand fails\n"); */
   return -1;
 }
 
@@ -806,13 +800,13 @@ expand_fail:
  preserve the letter cases.
 
  *****************************************************************/
-int dn_comp(const char * exp_dn, u_char * comp_dn, int length, 
+int dn_comp(const char * exp_dn, u_char * comp_dn, int length,
 	    u_char ** dnptrs, u_char ** lastdnptr)
 {
   u_char *cptr = comp_dn, *dptr, *lptr, *rptr;
   unsigned int i, len;
   u_char * const eptr = comp_dn + length - 1; /* Last valid */
-  
+
   errno = EINVAL;
 
   if (*exp_dn == '.' && !*(exp_dn + 1))
@@ -837,7 +831,7 @@ int dn_comp(const char * exp_dn, u_char * comp_dn, int length,
 	    if (*dptr++ != *rptr++)
 	      goto next_dn;
 	  } while (--len);
-	  len = *dptr++; 
+	  len = *dptr++;
 	  if (len == 0) { /* last label */
 	    if (!*rptr || (*rptr == '.' && !*(rptr + 1))) { /* Full match */
 	      len = (dnptrs[i] - dnptrs[0]) | 0xC000;
@@ -903,7 +897,7 @@ int dn_skipname(const unsigned char *comp_dn, const unsigned char *eom)
     }
     if (len > MAXLABEL ||
 	(comp_dn += len) > eom)
-      return -1;	
+      return -1;
   } while (len != 0);
 
   return comp_dn - comp_dn_orig;

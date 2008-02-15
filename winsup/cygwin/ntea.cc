@@ -57,10 +57,10 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
   pc.get_object_attr (attr, sec_none_nih);
 
   debug_printf ("read_ea (%S, %s, %p, %lu)",
-  		attr.ObjectName, name, value, size);
+		attr.ObjectName, name, value, size);
 
   fea = (PFILE_FULL_EA_INFORMATION) alloca (EA_BUFSIZ);
-  
+
   if (name)
     {
       size_t nlen;
@@ -78,7 +78,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 	  }
 
       if ((nlen = strlen (name)) >= MAX_EA_NAME_LEN)
-        {
+	{
 	  set_errno (EINVAL);
 	  return -1;
 	}
@@ -112,7 +112,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       else if (status == STATUS_NONEXISTENT_EA_ENTRY)
 	/* Actually this error code is either never generated, or it was only
 	   generated in some old and long forgotton NT version.  See below. */
-        set_errno (ENOATTR);
+	set_errno (ENOATTR);
       else
 	__seterrno_from_nt_status (status);
       goto out;
@@ -146,7 +146,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
     {
       ret = 0;
       do
-        {
+	{
 	  if (pc.fs_is_samba ())	/* See below. */
 	    fea->EaNameLength += 5;
 	  if (size > 0)
@@ -186,7 +186,7 @@ out:
   if (!hdl)
     CloseHandle (h);
   debug_printf ("%d = read_ea (%S, %s, %p, %lu)",
-  		ret, attr.ObjectName, name, value, size);
+		ret, attr.ObjectName, name, value, size);
   return ret;
 }
 
@@ -210,7 +210,7 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
   pc.get_object_attr (attr, sec_none_nih);
 
   debug_printf ("write_ea (%S, %s, %p, %lu, %d)",
-  		attr.ObjectName, name, value, size, flags);
+		attr.ObjectName, name, value, size, flags);
 
   /* Samba hides the user namespace from Windows clients.  If we get a
      user namespace item, we remove the leading namespace from the name.
@@ -238,7 +238,7 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
 	}
       ssize_t rret = read_ea (hdl, pc, name, NULL, 0);
       if (flags == XATTR_CREATE && rret > 0)
-        {
+	{
 	  set_errno (EEXIST);
 	  goto out;
 	}
@@ -297,7 +297,7 @@ out:
   if (!hdl)
     CloseHandle (h);
   debug_printf ("%d = write_ea (%S, %s, %p, %lu, %d)",
-  		ret, attr.ObjectName, name, value, size, flags);
+		ret, attr.ObjectName, name, value, size, flags);
   return ret;
 }
 
@@ -316,7 +316,7 @@ getxattr_worker (path_conv &pc, const char *name, void *value, size_t size)
       fhandler_base *fh;
 
       if (!(fh = build_fh_pc (pc)))
-        return -1;
+	return -1;
 
       res = fh->fgetxattr (name, value, size);
       delete fh;
@@ -411,7 +411,7 @@ setxattr_worker (path_conv &pc, const char *name, const void *value,
       fhandler_base *fh;
 
       if (!(fh = build_fh_pc (pc)))
-        return -1;
+	return -1;
 
       res = fh->fsetxattr (name, value, size, flags);
       delete fh;

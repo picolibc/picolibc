@@ -434,6 +434,7 @@ private:
   DWORD thread_id;
   __pthread_cleanup_handler *cleanup_stack;
   pthread_mutex mutex;
+  _cygtls *parent_tls;
 
   void suspend_except_self ();
   void resume ();

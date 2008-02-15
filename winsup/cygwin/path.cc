@@ -419,7 +419,7 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
       RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
       attr.ObjectName = &dir;
       if (status == STATUS_NO_MEDIA_IN_DEVICE)
-        {
+	{
 	  no_media = true;
 	  dir.Length = 6 * sizeof (WCHAR);
 	}
@@ -437,7 +437,7 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
       return false;
     }
   status = NtQueryVolumeInformationFile (vol, &io, &ffdi, sizeof ffdi,
-  					 FileFsDeviceInformation);
+					 FileFsDeviceInformation);
   if (!NT_SUCCESS (status))
     ffdi.DeviceType = ffdi.Characteristics = 0;
 
@@ -1996,7 +1996,7 @@ mount_info::conv_to_posix_path (PWCHAR src_path, char *posix_path,
     {
       src_path += 4;
       if (!wcsncmp (src_path, L"UNC\\", 4))
-        {
+	{
 	  src_path += 2;
 	  src_path[0] = L'\\';
 	  changed = true;
@@ -2990,7 +2990,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     }
 
   syscall_printf ("symlink (%s, %S)", oldpath,
-  		  win32_newpath.get_nt_native_path ());
+		  win32_newpath.get_nt_native_path ());
 
   if ((!isdevice && win32_newpath.exists ())
       || win32_newpath.is_auto_device ())
@@ -3007,11 +3007,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       char desc[MAX_PATH + 1], *relpath;
 
       if (!isdevice)
-        {
+	{
 	  /* First create an IDLIST to learn how big our shortcut is
 	     going to be. */
 	  IShellFolder *psl;
-	  
+
 	  /* The symlink target is relative to the directory in which
 	     the symlink gets created, not relative to the cwd.  Therefore
 	     we have to mangle the path quite a bit before calling path_conv. */
@@ -3131,7 +3131,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       /* Note that the terminating nul is written.  */
       cp = stpcpy (stpcpy (buf, SYMLINK_COOKIE), oldpath) + 1;
     }
-  
+
   if (isdevice && win32_newpath.exists ())
     {
       status = NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
@@ -3181,7 +3181,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
 				     FileBasicInformation);
       if (!NT_SUCCESS (status))
-        debug_printf ("Setting attributes failed, status = %p", status);
+	debug_printf ("Setting attributes failed, status = %p", status);
       res = 0;
     }
   else
@@ -3191,7 +3191,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
 				     FileDispositionInformation);
       if (!NT_SUCCESS (status))
-        debug_printf ("Setting delete dispostion failed, status = %p", status);
+	debug_printf ("Setting delete dispostion failed, status = %p", status);
     }
   NtClose (fh);
 
@@ -3313,10 +3313,7 @@ symlink_info::check_sysfile (HANDLE h)
 	    set_error (EIO);
 	}
       else if (io.Information > SYMLINK_MAX + 1)
-        {
-	  debug_printf ("symlink string too long");
-	  
-	}
+	debug_printf ("symlink string too long");
       else
 	res = posixify (srcbuf);
     }
@@ -3650,7 +3647,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       get_nt_native_path (suffix.path, upath);
       status = NtQueryAttributesFile (&attr, &fbi);
       if (NT_SUCCESS (status))
-        fileattr = fbi.FileAttributes;
+	fileattr = fbi.FileAttributes;
       else
 	{
 	  debug_printf ("%p = NtQueryAttributesFile (%S)", status, &upath);
@@ -3693,12 +3690,12 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 				   | FILE_OPEN_FOR_BACKUP_INTENT
 				   | FILE_DIRECTORY_FILE);
 	      if (!NT_SUCCESS (status))
-	        {
+		{
 		  debug_printf ("%p = NtOpenFile(%S)", status, &dirname);
 		  fileattr = 0;
 		}
 	      else
-	        {
+		{
 		  status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
 						 &fdi, sizeof fdi,
 						 FileDirectoryInformation,
@@ -3726,7 +3723,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      goto file_not_symlink;
 	    }
 	  if (set_error (geterrno_from_win_error
-	  			(RtlNtStatusToDosError (status), EACCES)))
+				(RtlNtStatusToDosError (status), EACCES)))
 	    continue;
 	}
 
@@ -4487,7 +4484,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	     For now, we just don't store the path in the PEB and proceed as
 	     usual. */
 	  && len <= MAX_PATH - (nat_cwd->Buffer[len - 1] == L'\\' ? 1 : 2))
-        {
+	{
 	  /* Convert to a Win32 path. */
 	  upath.Buffer += upath.Length / sizeof (WCHAR) - len;
 	  if (upath.Buffer[1] == L'\\') /* UNC path */
@@ -4792,7 +4789,7 @@ basename (char *path)
       if (c && (c > bs || c[1]))
 	return c + 1;
     }
-  else if (!bs[0]) 
+  else if (!bs[0])
     {
       stpncpy (buf, path, bs - path);
       stpcpy (buf + (bs - path), ".");

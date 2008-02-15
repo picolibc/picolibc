@@ -27,7 +27,7 @@ details. */
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/unistd.h>
-#include <netdb.h> 
+#include <netdb.h>
 #include <arpa/nameser.h>
 #include <resolv.h>
 

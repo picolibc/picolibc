@@ -340,7 +340,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       	access = GENERIC_READ | GENERIC_WRITE;
       else if (fd == 0)
 	access = GENERIC_READ;
-      else 
+      else
 	access = GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
 				    possible for some versions of handles */
       fh->init (handle, access, bin);

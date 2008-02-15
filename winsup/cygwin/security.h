@@ -206,11 +206,11 @@ public:
      cygsid above. */
   BOOL operator+= (cygsid &si) { return add ((PSID) si, false); }
   BOOL operator+= (const char *sidstr) { cygsid nsi (sidstr);
-  					 return add ((PSID) nsi, false); }
+					 return add ((PSID) nsi, false); }
   BOOL operator+= (const PSID psid) { return add (psid, false); }
   BOOL operator*= (cygsid &si) { return add ((PSID) si, true); }
   BOOL operator*= (const char *sidstr) { cygsid nsi (sidstr);
-  					 return add ((PSID) nsi, true); }
+					 return add ((PSID) nsi, true); }
   BOOL operator*= (const PSID psid) { return add (psid, true); }
 
   void count (int ncnt)
@@ -220,7 +220,7 @@ public:
     {
       int wcnt = 0;
       for (int i = 0; i < cnt; ++i)
-        if (!sids[i].is_well_known_sid ())
+	if (!sids[i].is_well_known_sid ())
 	  ++wcnt;
       return wcnt;
     }
@@ -236,7 +236,7 @@ public:
   int next_non_well_known_sid (int idx)
     {
       while (++idx < cnt)
-        if (!sids[idx].is_well_known_sid ())
+	if (!sids[idx].is_well_known_sid ())
 	  return idx;
       return -1;
     }

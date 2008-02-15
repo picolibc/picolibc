@@ -1088,7 +1088,7 @@ munmap (void *addr, size_t len)
       DWORD u_len;
 
       LIST_FOREACH_SAFE (rec, &map_list->recs, mr_next, next_rec)
-        {
+	{
 	  if (!rec->match ((caddr_t) addr, len, u_addr, u_len))
 	    continue;
 	  if (rec->unmap_pages (u_addr, u_len))
@@ -1207,7 +1207,7 @@ mprotect (void *addr, size_t len, int prot)
       DWORD u_len;
 
       LIST_FOREACH (rec, &map_list->recs, mr_next)
-        {
+	{
 	  if (!rec->match ((caddr_t) addr, len, u_addr, u_len))
 	    continue;
 	  in_mapped = true;
@@ -1649,7 +1649,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
     }
 
   void *base = MapView (h, *addr, len, get_access (), prot,
-  			flags | MAP_ANONYMOUS, off);
+			flags | MAP_ANONYMOUS, off);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)

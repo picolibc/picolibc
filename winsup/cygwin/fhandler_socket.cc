@@ -426,7 +426,7 @@ search_wsa_event_slot (LONG new_serial_number)
   if (!wsa_slot_mtx)
     {
       wsa_slot_mtx = CreateMutex (&sec_all, FALSE,
-      				  shared_name (name, "sock", 0));
+				  shared_name (name, "sock", 0));
       if (!wsa_slot_mtx)
 	api_fatal ("Couldn't create/open shared socket mutex, %E");
     }
@@ -1218,13 +1218,13 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   if (waitall)
     {
       if (get_socket_type () != SOCK_STREAM)
-        {
+	{
 	  WSASetLastError (WSAEOPNOTSUPP);
 	  set_winsock_errno ();
 	  return SOCKET_ERROR;
 	}
       if (is_nonblocking () || (flags & (MSG_OOB | MSG_PEEK)))
-        waitall = false;
+	waitall = false;
     }
 
   /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
@@ -1249,7 +1249,7 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
 		  wret = 0;
 		}
 	      else
-	        {
+		{
 		  wret -= wsabuf->len;
 		  ++wsabuf;
 		  --wsacnt;

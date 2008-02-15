@@ -55,7 +55,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 		{
 		  set_errno (ENOMEM);
 		  break;
-	        }
+		}
 	      status = NtQuerySecurityObject (fh, ALL_SECURITY_INFORMATION,
 					      sd, len, &len);
 	    }
@@ -66,7 +66,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	    }
 	}
       if (!retry)
-        {
+	{
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
 
@@ -98,7 +98,7 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
   for (; retry < 2; ++retry)
     {
       if (fh)
-        {
+	{
 	  status = NtSetSecurityObject (fh, ALL_SECURITY_INFORMATION, sd);
 	  if (NT_SUCCESS (status))
 	    {
@@ -107,7 +107,7 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	    }
 	}
       if (!retry)
-        {
+	{
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
 
@@ -338,7 +338,7 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 	  return 0;
 	}
       else
-        {
+	{
 	  if (uidret)
 	    *uidret = ILLEGAL_UID;
 	  if (gidret)

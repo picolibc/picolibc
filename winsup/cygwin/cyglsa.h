@@ -49,9 +49,9 @@ typedef struct _LSA_SECPKG_FUNCS
   NTSTATUS (NTAPI *AllocateClientBuffer)(PLSA_CLIENT_REQUEST, ULONG, PVOID *);
   NTSTATUS (NTAPI *FreeClientBuffer)(PLSA_CLIENT_REQUEST, PVOID);
   NTSTATUS (NTAPI *CopyToClientBuffer)(PLSA_CLIENT_REQUEST, ULONG,
-                                       PVOID, PVOID);
+				       PVOID, PVOID);
   NTSTATUS (NTAPI *CopyFromClientBuffer)(PLSA_CLIENT_REQUEST, ULONG,
-                                         PVOID, PVOID);
+					 PVOID, PVOID);
   NTSTATUS (NTAPI *ImpersonateClient)(VOID);
   NTSTATUS (NTAPI *UnloadPackage)(VOID);
   NTSTATUS (NTAPI *DuplicateHandle)(HANDLE,PHANDLE);

@@ -1,3 +1,40 @@
+2008-02-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Perform whitespace cleanup throughout.
+
+	* dcrt0.cc (signal_shift_subtract): Eliminate ancient backwards
+	compatibility.
+	(check_sanity_and_sync): Ditto.
+	* winsup.h (SIGTOMASK): Ditto.  Just use constant in signal
+	calculation.
+	* include/cygwin/version: Remove backwards signal mask compatibility
+	define.
+
+	* path.cc (symlink_info::check_sysfile): Cosmetic change.
+
+	* registry.cc (get_registry_hive_path): Remove unneeded variable.
+
+	* exceptions.cc (handle_sigsuspend): Eliminate thread signal mask and
+	use either main sigmask or current thread sigmask.
+	(set_process_mask): Ditto.
+	(sighold): Ditto.
+	(sigrelse): Ditto.
+	(sigset): Ditto.
+	(set_process_mask_delta): Ditto.
+	(_cygtls::call_signal_handler): Ditto.
+	* fhandler_process.cc (format_process_status): Ditto.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Ditto.
+	* pinfo.h (class pinfo): Ditto.
+	* select.cc (pselect): Ditto.
+	* signal.cc (sigprocmask): Ditto.
+	(abort): Ditto.
+	(sigpause): Ditto.
+	(sigsend): Ditto.
+	(wait_sig): Ditto.
+	* thread.h (pthread::parent_tls): New member.
+	* thread.cc (pthread::pthread): Record parent_tls here.
+	(pthread::thread_init_wrapper): Initialize sigmask from parent thread.
+
 2008-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cwcsdup): New function.
@@ -243,7 +280,7 @@
 	(cwdstuff::get_handle): New method.
 	* path.cc (cwdstuff::set): When doit is true, always try to get
 	directory handle.  Fail if duplicating handle fails.  Store handle
-	in dir.  Fix potential SEGV when setting drive_length. 
+	in dir.  Fix potential SEGV when setting drive_length.
 
 2008-01-28  Corinna Vinschen  <corinna@vinschen.de>
 

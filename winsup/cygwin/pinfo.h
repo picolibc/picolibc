@@ -96,16 +96,6 @@ public:
 
   inline void set_has_pgid_children (bool val) {has_pgid_children = val;}
 
-  inline sigset_t& getsigmask ()
-  {
-    return sig_mask;
-  }
-
-  inline void setsigmask (sigset_t mask)
-  {
-    sig_mask = mask;
-  }
-
   commune_result commune_request (__uint32_t, ...);
   bool alive ();
   fhandler_pipe *pipe_fhandler (HANDLE, size_t &);
@@ -128,8 +118,6 @@ public:
   HANDLE sendsig;
   HANDLE exec_sendsig;
   DWORD exec_dwProcessId;
-private:
-  sigset_t sig_mask;
 public:
   HANDLE wr_proc_pipe;
   DWORD wr_proc_pipe_owner;

@@ -217,14 +217,14 @@ is_cp_multibyte (UINT cp)
 
 /* OMYGOD!  CharNextExA is not UTF-8 aware!  It only works fine with
    double byte charsets.  So we have to do it ourselves for UTF-8.
-   
+
    While being at it, we do more.  If a double-byte or multibyte
    sequence is truncated due to an early end, we need a way to recognize
    it.  The reason is that multiple buffered write statements might
    accidentally stop and start in the middle of a single character byte
    sequence.  If we have to interpret the byte sequences (as in
    fhandler_console), we would print wrong output in these cases.
-   
+
    So we have four possible return values here:
 
    ret = end      if str >= end
@@ -249,7 +249,7 @@ next_char (UINT cp, const unsigned char *str, const unsigned char *end)
     case 950:
     case 1361:
       if (*str <= 0x7f)
-        ret = str + 1;
+	ret = str + 1;
       else if (str == end - 1 && IsDBCSLeadByteEx (cp, *str))
 	ret = str;
       else

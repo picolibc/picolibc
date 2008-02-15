@@ -5,4 +5,4 @@ sed -e '1,4d' -e '/KR_reset.*;/d' -e '/KR_output_statistics.*;/d' \
     -e '/KR_reset.*)/,/}/d' -e '/KR_output_statistics.*)/,/}/d' \
     -e '/# *line/d' "$c" > $2 &&
 rm -f "$c"
-#    -e "s%$c"'"%'"$2"'"%g' 
+#    -e "s%$c"'"%'"$2"'"%g'

@@ -114,7 +114,6 @@ pipe_handler (LPVOID in_ps)
   SetLastError (err);
   return 0;
 }
-      
 
 pipesync::pipesync (HANDLE f, DWORD is_reader):
   reader (false), ret_handle (NULL)

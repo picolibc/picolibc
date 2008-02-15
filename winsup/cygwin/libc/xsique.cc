@@ -23,7 +23,7 @@ insque (void *velement, void *vpred)
   if (pred)
     {
       if ((succ = element->q_forw = pred->q_forw))
-        succ->q_back = element;
+	succ->q_back = element;
       pred->q_forw = element;
     }
   else
