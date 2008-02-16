@@ -1,7 +1,13 @@
 2008-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/cygwin.h (__INT_MAX_PATH): Remove.
+	(external_pinfo): Convert program_long to pointer.
+	* external.cc (fillout_pinfo): Add buffer for program_long value.
+
+2008-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/cygwin.h (__INT_MAX_PATH): Define to 32K.
-	(external_pinfo): Set size to __INT_MAX_PATH.
+	(external_pinfo): Set size of program_long to __INT_MAX_PATH.
 
 2008-02-15  Christopher Faylor  <me+cygwin@cgf.cx>
 

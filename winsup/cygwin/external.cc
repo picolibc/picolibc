@@ -42,6 +42,7 @@ fillout_pinfo (pid_t pid, int winpid)
 {
   BOOL nextpid;
   static external_pinfo ep;
+  static char ep_progname_long_buf[NT_MAX_PATH];
 
   if ((nextpid = !!(pid & CW_NEXTPID)))
     pid ^= CW_NEXTPID;
@@ -98,6 +99,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.uid32 = p->uid;
 	  ep.gid32 = p->gid;
 
+	  ep.progname_long = ep_progname_long_buf;
 	  strcpy (ep.progname_long, p->progname);
 	  break;
 	}
