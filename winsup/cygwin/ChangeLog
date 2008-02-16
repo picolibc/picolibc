@@ -1,3 +1,8 @@
+2008-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fpathconf): Fix _PC_NAME_MAX and
+	_PC_PATH_MAX cases.
+
 2008-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h (__INT_MAX_PATH): Remove.

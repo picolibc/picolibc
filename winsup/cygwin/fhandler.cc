@@ -1541,6 +1541,8 @@ fhandler_base::fsync ()
 int
 fhandler_base::fpathconf (int v)
 {
+  int ret;
+
   switch (v)
     {
     case _PC_LINK_MAX:
@@ -1558,10 +1560,16 @@ fhandler_base::fpathconf (int v)
       break;
     case _PC_NAME_MAX:
       /* NAME_MAX is without trailing \0 */
-      return pc.isdir () ? PATH_MAX - strlen (get_name ()) - 2 : NAME_MAX;
+      if (!pc.isdir ())
+        return NAME_MAX;
+      ret = NT_MAX_PATH - strlen (get_name ()) - 2;
+      return ret < 0 ? 0 : ret > NAME_MAX ? NAME_MAX : ret;
     case _PC_PATH_MAX:
       /* PATH_MAX is with trailing \0 */
-      return pc.isdir () ? PATH_MAX - strlen (get_name ()) - 1 : PATH_MAX;
+      if (!pc.isdir ())
+	return PATH_MAX;
+      ret = NT_MAX_PATH - strlen (get_name ()) - 1;
+      return ret < 0 ? 0 : ret > PATH_MAX ? PATH_MAX : ret;
     case _PC_PIPE_BUF:
       if (pc.isdir ()
 	  || get_device () == FH_FIFO || get_device () == FH_PIPE
