@@ -1,5 +1,5 @@
 /* cr16.h -- Header file for CR16 opcode and register tables.
-   Copyright 2007 Free Software Foundation, Inc.
+   Copyright 2007, 2008 Free Software Foundation, Inc.
    Contributed by M R Swami Reddy
 
    This file is part of GAS, GDB and the GNU binutils.
@@ -368,6 +368,7 @@ extern const unsigned int cr16_num_opcodes;
 
 /* CR16 operands table.  */
 extern const operand_entry cr16_optab[];
+extern const unsigned int cr16_num_optab;
 
 /* CR16 registers table.  */
 extern const reg_entry cr16_regtab[];

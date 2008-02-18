@@ -1,3 +1,7 @@
+2008-02-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
+
+	* cr16.h (cr16_num_optab): Declared.
+
 2008-02-14  Hakan Ardo  <hakan@debian.org>
 
 	PR gas/2626
