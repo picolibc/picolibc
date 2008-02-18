@@ -20,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "dtable.h"
+#include "cygtls.h"
 #include "cygheap.h"
 #include "ntdll.h"
 #include <sys/param.h>
@@ -824,7 +825,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 			  p->uid, p->uid, p->uid, p->uid,
 			  p->gid, p->gid, p->gid, p->gid,
 			  vmsize >> 10, 0, vmrss >> 10, vmdata >> 10, 0, vmtext >> 10, vmlib >> 10,
-			  0, 0, p->getsigmask ()
+			  0, 0, _my_tls.sigmask
 			  );
 }
 

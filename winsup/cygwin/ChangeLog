@@ -1,3 +1,29 @@
+2008-02-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (handle_sigsuspend): Eliminate thread signal mask and
+	use either main sigmask or current thread sigmask.
+	(set_process_mask): Ditto.
+	(sighold): Ditto.
+	(sigrelse): Ditto.
+	(sigset): Ditto.
+	(set_process_mask_delta): Ditto.
+	(_cygtls::call_signal_handler): Ditto.
+	* fhandler_process.cc (format_process_status): Ditto.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Ditto.
+	* pinfo.h (class pinfo): Ditto.
+	* select.cc (pselect): Ditto.
+	* signal.cc (sigprocmask): Ditto.
+	(abort): Ditto.
+	(sigpause): Ditto.
+	(sigsend): Ditto.
+	(wait_sig): Ditto.
+	* sigproc.cc (sig_send): Ditto.
+	(pending_signals::add): Ditto.
+	(wait_sig): Ditto.
+	* thread.h (pthread::parent_tls): New member.
+	* thread.cc (pthread::pthread): Record parent_tls here.
+	(pthread::thread_init_wrapper): Initialize sigmask from parent thread.
+
 2008-02-13  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* thread.cc (pthread_kill): Deal with signal 0 as per POSIX and also

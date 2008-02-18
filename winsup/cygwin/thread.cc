@@ -374,6 +374,7 @@ pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
 {
   if (this != pthread_null::get_null_pthread ())
     threads.insert (this);
+  parent_tls = &_my_tls;
 }
 
 pthread::~pthread ()
@@ -1909,6 +1910,7 @@ pthread::thread_init_wrapper (void *arg)
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = thread;
+  _my_tls.sigmask = thread->parent_tls->sigmask;
   thread->mutex.unlock ();
 
   thread_printf ("started thread %p %p %p %p %p %p", arg, &_my_tls.local_clib,

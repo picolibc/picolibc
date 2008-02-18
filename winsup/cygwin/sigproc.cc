@@ -663,7 +663,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   else if (si.si_signo == __SIGPENDING)
     pack.mask = &pending;
   else if (si.si_signo == __SIGFLUSH || si.si_signo > 0)
-    pack.mask = &myself->getsigmask ();
+    pack.mask = &_my_tls.sigmask;
   else
     pack.mask = NULL;
 
@@ -1118,7 +1118,7 @@ pending_signals::add (sigpacket& pack)
     return;
   se = sigs + pack.si.si_signo;
   *se = pack;
-  se->mask = &myself->getsigmask ();
+  se->mask = &pack.tls->sigmask;
   se->next = NULL;
   if (end)
     end->next = se;
@@ -1199,7 +1199,7 @@ wait_sig (VOID *)
       sigset_t dummy_mask;
       if (!pack.mask)
 	{
-	  dummy_mask = myself->getsigmask ();
+	  dummy_mask = _main_tls->sigmask;
 	  pack.mask = &dummy_mask;
 	}
 
@@ -1218,7 +1218,7 @@ wait_sig (VOID *)
 	  unsigned bit;
 	  sigq.reset ();
 	  while ((q = sigq.next ()))
-	    if (myself->getsigmask () & (bit = SIGTOMASK (q->si.si_signo)))
+	    if (pack.tls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
 	      *pack.mask |= bit;
 	  break;
 	case __SIGHOLD:

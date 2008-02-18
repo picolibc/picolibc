@@ -147,7 +147,7 @@ usleep (useconds_t useconds)
 extern "C" int
 sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 {
-  return handle_sigprocmask (how, set, oldset, myself->getsigmask ());
+  return handle_sigprocmask (how, set, oldset, _my_tls.sigmask);
 }
 
 int __stdcall
@@ -342,7 +342,7 @@ abort (void)
   sigset_t sig_mask;
   sigfillset (&sig_mask);
   sigdelset (&sig_mask, SIGABRT);
-  set_signal_mask (sig_mask, myself->getsigmask ());
+  set_signal_mask (sig_mask, _my_tls.sigmask);
 
   raise (SIGABRT);
   _my_tls.call_signal_handler (); /* Call any signal handler */
@@ -485,7 +485,7 @@ sigpause (int signal_mask)
 extern "C" int
 pause (void)
 {
-  return handle_sigsuspend (myself->getsigmask ());
+  return handle_sigsuspend (_my_tls.sigmask);
 }
 
 extern "C" int
