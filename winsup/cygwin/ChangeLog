@@ -1,3 +1,8 @@
+2008-02-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.cc (sig_send): Use sigmask of target thread if it is
+	specified otherwise default to main sigmask.
+
 2008-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fpathconf): Fix _PC_NAME_MAX and

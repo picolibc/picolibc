@@ -663,7 +663,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   else if (si.si_signo == __SIGPENDING)
     pack.mask = &pending;
   else if (si.si_signo == __SIGFLUSH || si.si_signo > 0)
-    pack.mask = &_my_tls.sigmask;
+    pack.mask = tls ? &tls->sigmask : &_main_tls->sigmask;
   else
     pack.mask = NULL;
 
@@ -673,7 +673,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   if (!pack.si.si_uid)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
-  pack.tls = (_cygtls *) tls;
+  pack.tls = tls;
   if (wait_for_completion)
     {
       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
