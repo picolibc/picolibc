@@ -1,3 +1,0 @@
-LIBRARY d3dxof.dll
-EXPORTS
-DirectXFileCreate@4
