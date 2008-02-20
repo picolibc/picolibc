@@ -1,3 +1,8 @@
+2008-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (cwdstuff::set): Revert error handling change in case
+	DuplicateHandle fails, because it breaks Vista/Longhorn workaround.
+
 2008-02-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (sig_send): Use sigmask of target thread if it is

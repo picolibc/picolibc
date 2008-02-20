@@ -4429,7 +4429,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	 - Unlinking a cwd fails because SetCurrentDirectory seems to
 	   open directories so that deleting the directory is disallowed.
 	   The below code opens with *all* sharing flags set. */
-      HANDLE h, h_copy;
+      HANDLE h;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       OBJECT_ATTRIBUTES attr;
@@ -4454,25 +4454,21 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  res = -1;
 	  goto out;
 	}
-      /* Workaround a problem in Vista which fails in subsequent calls to
-	 CreateFile with ERROR_INVALID_HANDLE if the handle in
+      /* Workaround a problem in Vista/Longhorn which fails in subsequent
+	 calls to CreateFile with ERROR_INVALID_HANDLE if the handle in
 	 CurrentDirectoryHandle changes without calling SetCurrentDirectory,
 	 and the filename given to CreateFile is a relative path.  It looks
 	 like Vista stores a copy of the CWD handle in some other undocumented
 	 place.  The NtClose/DuplicateHandle reuses the original handle for
 	 the copy of the new handle and the next CreateFile works.
 	 Note that this is not thread-safe (yet?) */
-      if (!DuplicateHandle (GetCurrentProcess (), h, GetCurrentProcess (),
-			    &h_copy, 0, TRUE, DUPLICATE_SAME_ACCESS))
-	{
-	  RtlReleasePebLock ();
-	  __seterrno ();
-	  NtClose (h);
-	  res = -1;
-	  goto out;
-	}
       NtClose (*phdl);
-      dir = *phdl = h;
+      if (DuplicateHandle (GetCurrentProcess (), h, GetCurrentProcess (), phdl,
+			   0, TRUE, DUPLICATE_SAME_ACCESS))
+	NtClose (h);
+      else
+	*phdl = h;
+      dir = *phdl;
 
       /* No need to set path on init. */
       if (nat_cwd
