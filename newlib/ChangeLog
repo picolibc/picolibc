@@ -1,3 +1,9 @@
+2008-02-21  Eric Blake  <ebb9@byu.net>
+
+	Fix strtod("-0x", NULL).
+	* libc/stdlib/strtod.c (_strtod_r): Fall back to 0 if hex parse
+	fails.
+
 2008-02-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/powerpc/vfprintf.c (_VFPRINTF_R): Prepare
@@ -20,12 +26,12 @@
 	str[n]cpy and str[n]cat.
 	* libc/machine/spu/strncat.c: Use _straddr and _strcpy.
 	* libc/machine/spu/strncpy.c: Use _strcpy.
-							
+
 2008-02-11  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/strlen.c: Remove the len variable and unneeded
 	calculation of its value.
-		  
+
 2008-01-25  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* libc/sys/mmixware/isatty.c (_isatty): Renamed from isatty.
@@ -138,20 +144,20 @@
 
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * NEWS: Update with 1.16.0 info.
-        * README: Ditto.
-        * acinclude.m4: Change version number to 1.16.0.
-        * aclocal.m4: Regenerated.
-        * configure: Ditto.
-        * doc/aclocal.m4: Ditto.
-        * doc/configure: Ditto.
-        * libc/*/aclocal.m4: Ditto.
-        * libc/*/configure: Ditto.
-        * libc/libc.texinfo: Ditto.
-        * libm/*/aclocal.m4: Ditto.
-        * libm/*/configure: Ditto.
-        * libm/libm.texinfo: Ditto.
-        * libc/sys/linux/shared.ld: Add VERS_1.16.
+	* NEWS: Update with 1.16.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.16.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.16.
 
 2007-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 

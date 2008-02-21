@@ -14,7 +14,7 @@ ANSI_SYNOPSIS
         double strtod(const char *<[str]>, char **<[tail]>);
         float strtof(const char *<[str]>, char **<[tail]>);
 
-        double _strtod_r(void *<[reent]>, 
+        double _strtod_r(void *<[reent]>,
                          const char *<[str]>, char **<[tail]>);
 
 TRAD_SYNOPSIS
@@ -37,12 +37,19 @@ DESCRIPTION
 	producing a substring which can be converted to a double
 	value.  The substring converted is the longest initial
 	subsequence of <[str]>, beginning with the first
-	non-whitespace character, that has the format:
-	.[+|-]<[digits]>[.][<[digits]>][(e|E)[+|-]<[digits]>] 
+	non-whitespace character, that has one of these formats:
+	.[+|-]<[digits]>[.[<[digits]>]][(e|E)[+|-]<[digits]>]
+	.[+|-].<[digits]>[(e|E)[+|-]<[digits]>]
+	.[+|-](i|I)(n|N)(f|F)[(i|I)(n|N)(i|I)(t|T)(y|Y)]
+	.[+|-](n|N)(a|A)(n|N)[<(>[<[hexdigits]>]<)>]
+	.[+|-]0(x|X)<[hexdigits]>[.[<[hexdigits]>]][(p|P)[+|-]<[digits]>]
+	.[+|-]0(x|X).<[hexdigits]>[(p|P)[+|-]<[digits]>]
 	The substring contains no characters if <[str]> is empty, consists
 	entirely of whitespace, or if the first non-whitespace
 	character is something other than <<+>>, <<->>, <<.>>, or a
-	digit. If the substring is empty, no conversion is done, and
+	digit, and cannot be parsed as infinity or NaN. If the platform
+	does not support NaN, then NaN is treated as an empty substring.
+	If the substring is empty, no conversion is done, and
 	the value of <[str]> is stored in <<*<[tail]>>>.  Otherwise,
 	the substring is converted, and a pointer to the final string
 	(which will contain at least the terminating null character of
@@ -52,7 +59,8 @@ DESCRIPTION
 
 	This implementation returns the nearest machine number to the
 	input decimal string.  Ties are broken by using the IEEE
-	round-even rule.
+	round-even rule.  However, <<strtof>> is currently subject to
+	double rounding errors.
 
 	The alternate function <<_strtod_r>> is a reentrant version.
 	The extra argument <[reent]> is a pointer to a reentrancy structure.
@@ -176,7 +184,7 @@ _DEFUN (ULtod, (L, bits, exp, k),
 		L[_0] |= 0x80000000L;
 }
 #endif /* !NO_HEX_FP */
- 
+
 #ifdef INFNAN_CHECK
 static int
 _DEFUN (match, (sp, t),
@@ -254,6 +262,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		switch(s[1]) {
 		  case 'x':
 		  case 'X':
+			/* If the number is not hex, then the parse of
+                           0 is still valid.  */
+			s00 = s + 1;
 			{
 #if defined(FE_DOWNWARD) && defined(FE_TONEAREST) && defined(FE_TOWARDZERO) && defined(FE_UPWARD)
 			FPI fpi1 = fpi;
@@ -268,7 +279,6 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			switch((i = gethex(ptr, &s, &fpi1, &exp, &bb, sign)) & STRTOG_Retmask) {
 			  case STRTOG_NoNumber:
 				s = s00;
-				sign = 0;
 			  case STRTOG_Zero:
 				break;
 			  default:
