@@ -1,3 +1,13 @@
+2008-02-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Try harder to make a
+	pipe into a full-cygwin device.
+	(handle_to_fn): Change \ to / when necessary.
+	* fhandler.cc (fhandler_base::init): Change bin to mode.
+	* fhandler.h (fhandler_pipe::init): Declare.
+	* pipe.cc (fhandler_pipe::init): Define.
+	(handler_pipe::open): Move initialization code into init.
+
 2008-02-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (sig_send): Use sigmask of target thread if it is

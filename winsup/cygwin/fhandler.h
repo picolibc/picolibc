@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Red Hat, Inc.
+   2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -518,6 +518,7 @@ public:
   char *get_proc_fd_name (char *buf);
   void set_close_on_exec (bool val);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  void init (HANDLE, DWORD, mode_t);
   int open (int flags, mode_t mode = 0);
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa)

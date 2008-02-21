@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Red Hat, Inc.
+   2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -40,6 +40,17 @@ static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
 static const char *handle_to_fn (HANDLE, char *);
+
+#define DEVICE_PREFIX "\\device\\"
+#define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1
+#define REMOTE "\\Device\\LanmanRedirector\\"
+#define REMOTE_LEN sizeof (REMOTE) - 1
+#define REMOTE1 "\\Device\\WinDfs\\Root\\"
+#define REMOTE1_LEN sizeof (REMOTE1) - 1
+#define NAMED_PIPE "\\Device\\NamedPipe\\"
+#define NAMED_PIPE_LEN sizeof (NAMED_PIPE) - 1
+#define POSIX_NAMED_PIPE "/Device/NamedPipe/"
+#define POSIX_NAMED_PIPE_LEN sizeof (POSIX_NAMED_PIPE) - 1
 
 /* Set aside space for the table of fds */
 void
@@ -283,13 +294,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	  else
 	    dev = *console_dev;
 	}
-      else if (ft == FILE_TYPE_PIPE)
-	{
-	  if (fd == 0)
-	    dev = *piper_dev;
-	  else
-	    dev = *pipew_dev;
-	}
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
 	dev = *tcp_dev;
       else if (GetCommState (handle, &dcb))
@@ -297,7 +301,12 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	{
 	  name = handle_to_fn (handle, (char *) alloca (CYG_MAX_PATH + 100));
-	  bin = 0;
+	  if (!strncasematch (name, POSIX_NAMED_PIPE, POSIX_NAMED_PIPE_LEN))
+	    /* nothing */;
+	  else if (fd == 0)
+	    dev = *piper_dev;
+	  else
+	    dev = *pipew_dev;
 	}
     }
 
@@ -308,25 +317,31 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       fhandler_base *fh;
 
       if (dev)
-	fh = build_fh_dev (dev);
+	fh = build_fh_dev (dev, name);
       else
 	fh = build_fh_name (name);
 
       if (fh)
 	cygheap->fdtab[fd] = fh;
 
-      if (!bin)
+      if (name)
 	{
-	  bin = fh->get_default_fmode (O_RDWR);
-	  if (bin)
-	    /* nothing */;
-	  else if (dev)
-	    bin = O_BINARY;
-	  else if (name != unknown_file)
-	    bin = fh->pc_binmode ();
+	  bin = fh->pc_binmode ();
+	  if (!bin)
+	    {
+	      bin = fh->get_default_fmode (O_RDWR);
+	      if (!bin && dev)
+		bin = O_BINARY;
+	    }
 	}
 
-      fh->init (handle, GENERIC_READ | GENERIC_WRITE, bin);
+      DWORD access;
+      if (fd == 0)
+	access = GENERIC_READ;
+      else 
+	access = GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
+				    possible for some versions of handles */
+      fh->init (handle, access, bin);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
@@ -833,11 +848,6 @@ dtable::vfork_child_fixup ()
 }
 #endif /*NEWVFORK*/
 
-#define DEVICE_PREFIX "\\device\\"
-#define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1
-#define REMOTE "\\Device\\LanmanRedirector\\"
-#define REMOTE_LEN sizeof (REMOTE) - 1
-
 static const char *
 handle_to_fn (HANDLE h, char *posix_fn)
 {
@@ -852,7 +862,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
   NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf),
   				NULL);
 
-  if (NT_SUCCESS (res))
+  if (!NT_SUCCESS (res))
     {
       strcpy (posix_fn, unknown_file);
       debug_printf ("NtQueryObject failed");
@@ -909,6 +919,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
     }
 
   char *w32 = win32_fn;
+  bool justslash = false;
   if (maxmatchlen)
     {
       n = strlen (maxmatchdos);
@@ -918,15 +929,38 @@ handle_to_fn (HANDLE h, char *posix_fn)
       memcpy (w32, maxmatchdos, n);
       w32[n] = '\\';
     }
+  else if (strncasematch (w32, NAMED_PIPE, NAMED_PIPE_LEN))
+    {
+      debug_printf ("pipe");
+      justslash = true;
+    }
   else if (strncasematch (w32, REMOTE, REMOTE_LEN))
     {
       w32 += REMOTE_LEN - 2;
       *w32 = '\\';
       debug_printf ("remote drive");
+      justslash = true;
+    }
+  else if (strncasematch (w32, REMOTE1, REMOTE1_LEN))
+    {
+      w32 += REMOTE1_LEN - 2;
+      *w32 = '\\';
+      debug_printf ("remote drive");
+      justslash = true;
     }
 
+  if (!justslash)
+    cygwin_conv_to_full_posix_path (w32, posix_fn);
+  else
+    {
+      char *s, *d;
+      for (s = w32, d = posix_fn; *s; s++, d++)
+	if (*s == '\\')
+	  *d = '/';
+	else
+	  *d = *s;
+    }
 
-  debug_printf ("derived path '%s'", w32);
-  cygwin_conv_to_full_posix_path (w32, posix_fn);
+  debug_printf ("derived path '%s', posix '%s'", w32, posix_fn);
   return posix_fn;
 }

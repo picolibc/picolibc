@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Red Hat, Inc.
+   2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1279,7 +1279,7 @@ fhandler_base::fstat (struct __stat64 *buf)
 }
 
 void
-fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
+fhandler_base::init (HANDLE f, DWORD a, mode_t mode)
 {
   set_io_handle (f);
   access = a;
@@ -1291,7 +1291,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
     flags = O_WRONLY;
   else if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
-  set_flags (flags | bin);
+  set_flags (flags | mode);
   set_open_status ();
   debug_printf ("created new fhandler_base for handle %p, bin %d", f, rbinary ());
 }

@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -38,6 +38,39 @@ fhandler_pipe::fhandler_pipe ()
 }
 
 extern "C" int sscanf (const char *, const char *, ...);
+
+void
+fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
+{
+  bool isread = !!(a & GENERIC_READ);
+  SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
+  if (mode & O_NOINHERIT)
+     close_on_exec (true);
+
+  if (isread)
+    {
+      create_read_state (2);
+      create_guard (sa);
+    }
+
+  if (!wincap.has_unreliable_pipes ())
+    /* nothing to do */;
+  else if (isread)
+    {
+      orig_pid = myself->pid;
+      id = ++pipecount;
+    }
+  else /* NOTE: This assumes that pipecount has been incremented by a previous
+	  init of the read end of the pipe.  That isn't really true of native
+	  pipes but, ask me if I care.  */
+    {
+      char buf[80];
+      __small_sprintf (buf, pipeid_fmt, myself->pid, pipecount);
+     writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
+    }
+
+  fhandler_base::init (f, a, mode);
+}
 
 int
 fhandler_pipe::open (int flags, mode_t mode)
@@ -446,28 +479,10 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
       fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev);
       fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
 
-      int binmode = mode & O_TEXT ?: O_BINARY;
+      mode |= mode & O_TEXT ?: O_BINARY;
       fhs[0]->init (r, GENERIC_READ, binmode);
       fhs[1]->init (w, GENERIC_WRITE, binmode);
-      if (mode & O_NOINHERIT)
-       {
-	 fhs[0]->close_on_exec (true);
-	 fhs[1]->close_on_exec (true);
-       }
-
-      fhs[0]->create_read_state (2);
-
       res = 0;
-      fhs[0]->create_guard (sa);
-      if (wincap.has_unreliable_pipes ())
-	{
-	  char buf[80];
-	  int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
-	  __small_sprintf (buf, pipeid_fmt, myself->pid, count);
-	  fhs[1]->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
-	  fhs[0]->orig_pid = myself->pid;
-	  fhs[0]->id = count;
-	}
     }
 
   syscall_printf ("%d = pipe ([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
