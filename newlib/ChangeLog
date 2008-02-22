@@ -1,3 +1,9 @@
+2008-02-20  Eric Blake  <ebb9@byu.net>
+
+	Fix strtod("-0x", NULL).
+	* libc/stdlib/strtod.c (_strtod_r): Fall back to 0 if hex parse
+	fails.
+
 2007-10-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/wcstombs_r.c: Add SUSV2 support for calculating
