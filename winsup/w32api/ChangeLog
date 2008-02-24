@@ -1,3 +1,9 @@
+2008-02-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winnt.h: Update guard around KEY_WOW64_64KEY and KEY_WOW64_32KEY
+	definitions.
+	* include/winreg.h (KEY_WOW64_64KEY, KEY_WOW64_32KEY): Remove.
+
 2008-02-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winnt.h (KEY_WOW64_64KEY, KEY_WOW64_32KEY): Define.

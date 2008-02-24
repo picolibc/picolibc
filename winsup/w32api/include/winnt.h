@@ -975,7 +975,7 @@ typedef DWORD FLONG;
 #define KEY_WRITE 0x20006
 #define KEY_EXECUTE 0x20019
 #define KEY_READ 0x20019
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0502)
 #define KEY_WOW64_64KEY 0x0100
 #define KEY_WOW64_32KEY 0x0200
 #endif
