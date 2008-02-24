@@ -1,7 +1,11 @@
+2008-02-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winnt.h (KEY_WOW64_64KEY, KEY_WOW64_32KEY): Define.
+
 2008-02-02  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-  * include/specstrings.h (IN, OUT, OPTIONAL): Remove.
-  * include/windef.h (IN, OUT, OPTIONAL): Define.
+	* include/specstrings.h (IN, OUT, OPTIONAL): Remove.
+	* include/windef.h (IN, OUT, OPTIONAL): Define.
 
 2008-02-02  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
