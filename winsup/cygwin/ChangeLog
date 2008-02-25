@@ -1,3 +1,30 @@
+2008-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (initial_env): Only use local buffer "buf" if DEBUGGING is
+	enabled.  Replace calls to GetEnvironmentVariable by calls to
+	GetEnvironmentVariableA for clarity.  Call GetEnvironmentVariableA
+	with NULL buffer.
+	(cygbench): Ditto, drop local buffer.
+	* environ.cc (getearly): Call GetEnvironmentVariableA.
+	(environ_init): Retrieve unicode environment and convert to current
+	codepage locally.
+	(getwinenveq): Ditto.
+	* exceptions.cc (try_to_debug): Accommodate new sys_mbstowcs calling
+	convention.
+	* fhandler_clipboard.cc (set_clipboard): Call sys_mbstowcs to retrieve
+	required buffer length.
+	* fork.cc (frok::child): Call GetEnvironmentVariableA.
+	* miscfuncs.cc: Accommodate changed arguments in calls to sys_mbstowcs.
+	* sec_auth.cc: Ditto.
+	* strfuncs.cc (sys_wcstombs_alloc): Fix formatting.
+	(sys_mbstowcs): Change arguments to allow specifying a source string
+	length.
+	(sys_mbstowcs_alloc): Ditto.
+	* uinfo.cc (cygheap_user::ontherange): Accommodate changed arguments in
+	calls to sys_mbstowcs.
+	* winsup.h (sys_mbstowcs): Adjust declaration.
+	(sys_mbstowcs_alloc): Ditto.
+
 2008-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cwdstuff::set): Revert error handling change in case

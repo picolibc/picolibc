@@ -12,6 +12,7 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <wchar.h>
 #include <ctype.h>
 #include <assert.h>
 #include <sys/cygwin.h>
@@ -252,9 +253,9 @@ getearly (const char * name, int *)
 	if (strncasematch (name, *ptr, len) && (*ptr)[len] == '=')
 	  return *ptr + len + 1;
     }
-  else if ((len = GetEnvironmentVariable (name, NULL, 0))
+  else if ((len = GetEnvironmentVariableA (name, NULL, 0))
 	   && (ret = (char *) cmalloc_abort (HEAP_2_STR, len))
-	   && GetEnvironmentVariable (name, ret, len))
+	   && GetEnvironmentVariableA (name, ret, len))
     return ret;
 
   return NULL;
@@ -730,7 +731,7 @@ regopt (const char *name)
 void
 environ_init (char **envp, int envc)
 {
-  char *rawenv;
+  PWCHAR rawenv, w;
   int i;
   char *p;
   char *newp;
@@ -781,21 +782,31 @@ environ_init (char **envp, int envc)
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
 
-  rawenv = GetEnvironmentStrings ();
+  /* We need the CYGWIN variable content before we can loop through
+     the whole environment, so that the wide-char to multibyte conversion
+     can be done according to the "codepage" setting. */
+  if ((i = GetEnvironmentVariableA ("CYGWIN", NULL, 0)))
+    {
+      char *buf = (char *) alloca (i);
+      GetEnvironmentVariableA ("CYGWIN", buf, i);
+      parse_options (buf);
+    }
+
+  rawenv = GetEnvironmentStringsW ();
   if (!rawenv)
     {
       system_printf ("GetEnvironmentStrings returned NULL, %E");
       return;
     }
-  debug_printf ("GetEnvironmentStrings returned %p - \"%s\"", rawenv, rawenv);
+  debug_printf ("GetEnvironmentStrings returned %p", rawenv);
 
   /* Current directory information is recorded as variables of the
      form "=X:=X:\foo\bar; these must be changed into something legal
      (we could just ignore them but maybe an application will
      eventually want to use them).  */
-  for (i = 0, p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1, i++)
+  for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
     {
-      newp = strdup (p);
+      sys_wcstombs_alloc (&newp, HEAP_NOTHEAP, w);
       if (i >= envc)
 	envp = (char **) realloc (envp, (4 + (envc += 100)) * sizeof (char *));
       envp[i] = newp;
@@ -816,7 +827,7 @@ environ_init (char **envp, int envc)
   if (!sawTERM)
     envp[i++] = strdup (cygterm);
   envp[i] = NULL;
-  FreeEnvironmentStrings (rawenv);
+  FreeEnvironmentStringsW (rawenv);
 
 out:
   findenv_func = (char * (*)(const char*, int*)) my_findenv;
@@ -848,14 +859,14 @@ env_sort (const void *a, const void *b)
 char * __stdcall
 getwinenveq (const char *name, size_t namelen, int x)
 {
-  char dum[1];
-  char name0[namelen - 1];
-  memcpy (name0, name, namelen - 1);
-  name0[namelen - 1] = '\0';
-  int totlen = GetEnvironmentVariable (name0, dum, 0);
+  WCHAR name0[namelen - 1];
+  WCHAR valbuf[32768]; /* Max size of an env.var including trailing '\0'. */
+
+  name0[sys_mbstowcs (name0, sizeof name0, name, namelen - 1)] = L'\0';
+  int totlen = GetEnvironmentVariableW (name0, valbuf, 32768);
   if (totlen > 0)
     {
-      totlen++;
+      totlen = sys_wcstombs (NULL, 0, valbuf);
       if (x == HEAP_1_STR)
 	totlen += namelen;
       else
@@ -863,14 +874,9 @@ getwinenveq (const char *name, size_t namelen, int x)
       char *p = (char *) cmalloc_abort ((cygheap_types) x, totlen);
       if (namelen)
 	strcpy (p, name);
-      if (GetEnvironmentVariable (name0, p + namelen, totlen))
-	{
-	  debug_printf ("using value from GetEnvironmentVariable for '%s'",
-			name0);
-	  return p;
-	}
-      else
-	cfree (p);
+      sys_wcstombs (p + namelen, totlen, valbuf);
+      debug_printf ("using value from GetEnvironmentVariable for '%W'", name0);
+      return p;
     }
 
   debug_printf ("warning: %s not present in environment", name);

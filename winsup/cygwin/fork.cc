@@ -197,13 +197,12 @@ frok::child (volatile char * volatile here)
   cygheap->user.reimpersonate ();
 
 #ifdef DEBUGGING
-  char c;
-  if (GetEnvironmentVariable ("FORKDEBUG", &c, 1))
+  if (GetEnvironmentVariableA ("FORKDEBUG", NULL, 0))
     try_to_debug ();
   char buf[80];
   /* This is useful for debugging fork problems.  Use gdb to attach to
      the pid reported here. */
-  if (GetEnvironmentVariable ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
+  if (GetEnvironmentVariableA ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
     {
       small_printf ("Sleeping %d after fork, pid %u\n", atoi (buf), GetCurrentProcessId ());
       Sleep (atoi (buf));

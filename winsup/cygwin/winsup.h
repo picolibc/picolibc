@@ -139,9 +139,9 @@ int __stdcall sys_wcstombs (char *, int, const PWCHAR, int = -1)
 int __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR, int = -1)
   __attribute__ ((regparm(3)));
 
-int __stdcall sys_mbstowcs (PWCHAR, const char *, int)
+int __stdcall sys_mbstowcs (PWCHAR, int, const char *, int = -1)
   __attribute__ ((regparm(3)));
-int __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *)
+int __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *, int = -1)
   __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */

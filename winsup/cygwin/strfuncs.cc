@@ -64,7 +64,7 @@ sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
 {
   int ret;
 
-  ret = WideCharToMultiByte (get_cp (), 0, src, slen, NULL, 0,NULL, NULL);
+  ret = WideCharToMultiByte (get_cp (), 0, src, slen, NULL, 0 ,NULL, NULL);
   if (ret)
     {
       size_t tlen = (slen == -1 ? ret : ret + 1);
@@ -81,28 +81,35 @@ sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
 }
 
 int __stdcall
-sys_mbstowcs (PWCHAR tgt, const char *src, int len)
+sys_mbstowcs (PWCHAR tgt, int tlen, const char *src, int slen)
 {
-  int res = MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
-  return res;
+  int ret = MultiByteToWideChar (get_cp (), 0, src, slen, tgt, tlen);
+  if (ret && tgt)
+    {
+      ret = (ret < tlen) ? ret : tlen - 1;
+      tgt[ret] = L'\0';
+    }
+  return ret;
 }
 
 /* Same as sys_wcstombs_alloc, just backwards. */
 int __stdcall
-sys_mbstowcs_alloc (PWCHAR *tgt_p, int type, const char *src)
+sys_mbstowcs_alloc (PWCHAR *tgt_p, int type, const char *src, int slen)
 {
   int ret;
 
-  ret = MultiByteToWideChar (get_cp (), 0, src, -1, NULL, 0);
+  ret = MultiByteToWideChar (get_cp (), 0, src, slen, NULL, 0);
   if (ret)
     {
+      size_t tlen = (slen == -1 ? ret : ret + 1);
+
       if (type == HEAP_NOTHEAP)
-	*tgt_p = (PWCHAR) calloc (ret, sizeof (WCHAR));
+	*tgt_p = (PWCHAR) calloc (tlen, sizeof (WCHAR));
       else
-	*tgt_p = (PWCHAR) ccalloc ((cygheap_types) type, ret, sizeof (WCHAR));
+	*tgt_p = (PWCHAR) ccalloc ((cygheap_types) type, tlen, sizeof (WCHAR));
       if (!*tgt_p)
 	return 0;
-      ret = sys_mbstowcs (*tgt_p, src, ret);
+      ret = sys_mbstowcs (*tgt_p, tlen, src, slen);
     }
   return ret;
 }

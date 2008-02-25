@@ -296,9 +296,9 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	  if (logsrv ())
 	    {
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-	      sys_mbstowcs (wlogsrv, logsrv (),
-			    sizeof (wlogsrv) / sizeof (*wlogsrv));
-	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
+	      sys_mbstowcs (wlogsrv, sizeof (wlogsrv) / sizeof (*wlogsrv),
+			    logsrv ());
+	     sys_mbstowcs (wuser, sizeof (wuser) / sizeof (*wuser), winname ());
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
 		  sys_wcstombs (homepath_env_buf, CYG_MAX_PATH,

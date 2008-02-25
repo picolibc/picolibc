@@ -532,14 +532,14 @@ break_here ()
 static void
 initial_env ()
 {
-  char buf[NT_MAX_PATH];
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+  if (GetEnvironmentVariableA ("CYGWIN_TESTING", NULL, 0))
     _cygwin_testing = 1;
 
 #ifdef DEBUGGING
+  char buf[NT_MAX_PATH];
   DWORD len;
 
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
+  if (GetEnvironmentVariableA ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
       console_printf ("Sleeping %d, pid %u %P\n", ms, GetCurrentProcessId ());
@@ -547,7 +547,7 @@ initial_env ()
       if (!strace.active () && !dynamically_loaded)
 	strace.hello ();
     }
-  if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
+  if (GetEnvironmentVariableA ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
       char buf1[NT_MAX_PATH];
       len = GetModuleFileName (NULL, buf1, NT_MAX_PATH);
@@ -1141,8 +1141,7 @@ multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned vers
       return;
     }
 
-  char buf[1024];
-  if (GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
+  if (GetEnvironmentVariableA ("CYGWIN_MISMATCH_OK", NULL, 0))
     return;
 
   if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
@@ -1162,8 +1161,7 @@ are unable to find another cygwin DLL.",
 void __stdcall
 cygbench (const char *s)
 {
-  char buf[1024];
-  if (GetEnvironmentVariable ("CYGWIN_BENCH", buf, sizeof (buf)))
+  if (GetEnvironmentVariableA ("CYGWIN_BENCH", NULL, 0))
     small_printf ("%05d ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
 }
 #endif

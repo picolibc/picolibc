@@ -121,7 +121,7 @@ set_clipboard (const void *buf, size_t len)
 
   OpenClipboard (0);
 
-  len = MultiByteToWideChar (get_cp (), 0, (const char *) buf, len, NULL, 0);
+  len = sys_mbstowcs (NULL, 0, (const char *) buf, len);
   if (!len)
     {
       system_printf ("Invalid string");
@@ -134,7 +134,7 @@ set_clipboard (const void *buf, size_t len)
       return -1;
     }
   clipbuf = GlobalLock (hmem);
-  sys_mbstowcs ((PWCHAR) clipbuf, (const char *) buf, len);
+  sys_mbstowcs ((PWCHAR) clipbuf, len, (const char *) buf);
   *((PWCHAR) clipbuf + len) = L'\0';
   GlobalUnlock (hmem);
   if (!SetClipboardData (CF_UNICODETEXT, hmem))

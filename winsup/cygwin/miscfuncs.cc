@@ -116,10 +116,10 @@ cygwin_strcasecmp (const char *cs, const char *ct)
 
   len = (strlen (cs) + 1) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
-  us.Length = sys_mbstowcs (us.Buffer, cs, us.MaximumLength) * sizeof (WCHAR);
+  us.Length = sys_mbstowcs (us.Buffer, us.MaximumLength, cs) * sizeof (WCHAR);
   len = (strlen (ct) + 1) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
-  ut.Length = sys_mbstowcs (ut.Buffer, ct, ut.MaximumLength) * sizeof (WCHAR);
+  ut.Length = sys_mbstowcs (ut.Buffer, ut.MaximumLength, ct) * sizeof (WCHAR);
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
@@ -134,14 +134,14 @@ cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
     ++ls;
   len = ls * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
-  us.Length = MultiByteToWideChar (get_cp (), 0, cs, ls, us.Buffer,
-				   us.MaximumLength)  * sizeof (WCHAR);
+  us.Length = sys_mbstowcs (us.Buffer, us.MaximumLength / sizeof (WCHAR),
+			    cs, ls) * sizeof (WCHAR);
   while (ct[lt] && lt < n)
     ++lt;
   len = lt * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
-  ut.Length = MultiByteToWideChar (get_cp (), 0, ct, lt, ut.Buffer,
-				   ut.MaximumLength)  * sizeof (WCHAR);
+  ut.Length = sys_mbstowcs (ut.Buffer, ut.MaximumLength / sizeof (WCHAR),
+			    ct, lt)  * sizeof (WCHAR);
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
@@ -172,7 +172,7 @@ cygwin_strlwr (char *string)
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);
 
   us.MaximumLength = len; us.Buffer = (PWCHAR) alloca (len);
-  us.Length = sys_mbstowcs (us.Buffer, string, len) * sizeof (WCHAR)
+  us.Length = sys_mbstowcs (us.Buffer, len, string) * sizeof (WCHAR)
 	      - sizeof (WCHAR);
   RtlDowncaseUnicodeString (&us, &us, FALSE);
   sys_wcstombs (string, len / sizeof (WCHAR), us.Buffer);
@@ -186,7 +186,7 @@ cygwin_strupr (char *string)
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);
 
   us.MaximumLength = len; us.Buffer = (PWCHAR) alloca (len);
-  us.Length = sys_mbstowcs (us.Buffer, string, len) * sizeof (WCHAR)
+  us.Length = sys_mbstowcs (us.Buffer, len, string) * sizeof (WCHAR)
 	      - sizeof (WCHAR);
   RtlUpcaseUnicodeString (&us, &us, FALSE);
   sys_wcstombs (string, len / sizeof (WCHAR), us.Buffer);

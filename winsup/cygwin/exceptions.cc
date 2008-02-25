@@ -395,7 +395,7 @@ try_to_debug (bool waitloop)
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
-  sys_mbstowcs (dbg_cmd, debugger_command, sizeof debugger_command);
+  sys_mbstowcs (dbg_cmd, sizeof debugger_command, debugger_command);
   dbg = CreateProcessW (NULL,
 			dbg_cmd,
 			NULL,

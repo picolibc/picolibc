@@ -128,7 +128,7 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
   tgt.Buffer = (PWCHAR) buf;
   tgt.MaximumLength = (strlen (srcstr) + 1) * sizeof (WCHAR);
-  tgt.Length = sys_mbstowcs (buf, srcstr, tgt.MaximumLength / sizeof (WCHAR))
+  tgt.Length = sys_mbstowcs (buf, tgt.MaximumLength / sizeof (WCHAR), srcstr)
 	       * sizeof (WCHAR);
   if (tgt.Length)
     tgt.Length -= sizeof (WCHAR);
@@ -137,8 +137,9 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 void
 str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
 {
-  int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR), srcstr,
-			  (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR));
+  int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR),
+			  (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR),
+			  srcstr);
   if (len)
     tgt.Length += (len - 1) * sizeof (WCHAR);
   else
@@ -186,7 +187,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
     {
       server[0] = server[1] = '\\';
       if (wserver)
-	sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	sys_mbstowcs (wserver, INTERNET_MAX_HOST_NAME_LENGTH + 1, server);
       return true;
     }
 
@@ -196,7 +197,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
   if (dret == ERROR_SUCCESS)
     {
       strcpy (server, pci->DomainControllerName);
-      sys_mbstowcs (wserver, server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_mbstowcs (wserver, INTERNET_MAX_HOST_NAME_LENGTH + 1, server);
       NetApiBufferFree (pci);
       debug_printf ("DC: rediscovery: %d, server: %s", rediscovery, server);
       return true;
@@ -204,7 +205,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver,
   else if (dret == ERROR_PROC_NOT_FOUND)
     {
       /* NT4 w/o DSClient */
-      sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_mbstowcs (wdomain, INTERNET_MAX_HOST_NAME_LENGTH + 1, domain);
       if (rediscovery)
 	dret = NetGetAnyDCName (NULL, wdomain, (LPBYTE *) &buf);
       else
@@ -230,7 +231,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
 {
   char dgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   WCHAR wuser[UNLEN + 1];
-  sys_mbstowcs (wuser, user, UNLEN + 1);
+  sys_mbstowcs (wuser, UNLEN + 1, user);
   LPGROUP_USERS_INFO_0 buf;
   DWORD cnt, tot, len;
   NET_API_STATUS ret;
