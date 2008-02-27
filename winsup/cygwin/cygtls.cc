@@ -221,7 +221,7 @@ _cygtls::set_siginfo (sigpacket *pack)
   infodata = pack->si;
 }
 
-extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
+extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD) __attribute__ ((noreturn));
 int
 _cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *c, void *)
 {
@@ -248,7 +248,7 @@ _cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame
   cygheap->threadlist[threadlist_ix]->remove (INFINITE);
   threadlist_ix = 0;
   RtlUnwind (frame, threadlist_exception_return, e, 0);
-  return 0;
+  /* Never returns */
 }
 
 /* Set up the exception handler for the current thread.  The x86 uses segment
