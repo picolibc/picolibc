@@ -1,3 +1,15 @@
+2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::init_exception_handler): Fix comment.
+
+2008-02-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.cc (_cygtls::handle_threadlist_exception): Make it clear that
+	the function never actually returns.
+	* exceptions.cc (_cygtls::handle_exceptions): Jump out of function
+	rather than returning to avoid meddling by previously installed
+	exception handlers.
+
 2008-02-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Try harder to make a

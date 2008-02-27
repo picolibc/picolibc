@@ -664,7 +664,21 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   sig_send (NULL, si, &me);	// Signal myself
   me.incyg--;
   e->ExceptionFlags = 0;
-  return 0;
+  /* The OS adds an exception list frame to the stack.  It expects to be
+     able to remove this entry after the exception handler returned.
+     However, when unwinding to our frame, our frame becomes the uppermost
+     frame on the stack (%fs:0 points to frame).  This way, our frame
+     is removed from the exception stack and just disappears.  So, we can't
+     just return here or things will be screwed up by the helpful function
+     in (presumably) ntdll.dll.
+
+     So, instead, we will do the equivalent of a longjmp here and return
+     to the caller without visiting any of the helpful code installed prior
+     to this function.  This should work ok, since a longjmp() out of here has
+     to work if linux signal semantics are to be maintained. */
+
+  SetThreadContext (GetCurrentThread (), in);
+  return 0; /* Never actually returns.  This is just to keep gcc happy. */
 }
 
 /* Utilities to call a user supplied exception handler.  */
