@@ -1,6 +1,6 @@
 /* Opcode table for the H8/300
    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2001, 2002,
-   2003, 2004
+   2003, 2004, 2008
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
@@ -1519,6 +1519,7 @@ struct h8_opcode h8_opcodes[] =
   {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP16DST, E}}, {{PREFIX_0100,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 6, "mov.l", {{RS32, DISP32DST, E}}, {{0x7, 0x8, B31 | DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
   {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, B31 | DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
+  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXB16D, E}}, {{PREFIX_0101,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXW16D, E}}, {{PREFIX_0102,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXL16D, E}}, {{PREFIX_0103,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 

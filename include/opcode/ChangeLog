@@ -1,3 +1,11 @@
+2008-02-27  Markus Gyger  <markus+sw@gyger.org>
+	    Nick Clifton  <nickc@redhat.com>
+
+	PR 3134
+	* h8300.h (h8_opcodes): Add an encoding for a mov.l instruction
+	with a 32-bit displacement but without the top bit of the 4th byte
+	set.	
+
 2008-02-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
 
 	* cr16.h (cr16_num_optab): Declared.
