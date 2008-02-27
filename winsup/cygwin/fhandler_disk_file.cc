@@ -1546,8 +1546,8 @@ fhandler_disk_file::rmdir ()
 
 struct __DIR_cache
 {
+  char  __cache[DIR_BUF_SIZE];	/* W2K needs this buffer 8 byte aligned. */
   ULONG __pos;
-  char  __cache[DIR_BUF_SIZE];
 };
 
 #define d_cachepos(d)	(((__DIR_cache *) (d)->__d_dirname)->__pos)
