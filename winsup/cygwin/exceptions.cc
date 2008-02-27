@@ -256,7 +256,7 @@ stack_info::walk ()
 	 a SEGV.  This is fixed in Vista/2K8 WOW64. */
       if (wincap.has_restricted_stack_args () && sf.Params[0] == 0x401000)
 	nparams = 2;
-      for (unsigned i = 0; i < nparams; i++)
+      for (unsigned i = 1; i < nparams; i++)
 	sf.Params[i] = (DWORD) *++ebp;
     }
 

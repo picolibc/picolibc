@@ -1,5 +1,9 @@
 2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (stack_info::walk): Fix typo.
+
+2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.cc (_cygtls::init_exception_handler): Fix comment.
 
 2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
