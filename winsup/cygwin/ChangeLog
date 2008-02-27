@@ -1,5 +1,9 @@
 2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.cc (_cygtls::init_exception_handler): Fix comment.
+
+2008-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* (struct __DIR_cache): Switch order of members so that the buffer
 	given to NtQueryDirectoryFile is 8 byte aligned.
 

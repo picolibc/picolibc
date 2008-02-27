@@ -269,13 +269,8 @@ _cygtls::init_exception_handler (exception_handler *eh)
      At one point this was a loop (el.prev = &el;).  This outsmarted the
      above behaviour.  Unfortunately this trick doesn't work anymore with
      Windows 2008, which irremediably gets into an endless loop, taking 100%
-     CPU.  That's why we reverted to a normal SEH chain.
-
-     On the bright side, Windows' behaviour is covered by POSIX:
-
-     "If and when the function returns, if the value of sig was SIGFPE,
-     SIGILL, or SIGSEGV or any other implementation-defined value
-     corresponding to a computational exception, the behavior is undefined." */
+     CPU.  That's why we reverted to a normal SEH chain and changed the way
+     the exception handler returns to the application. */
   el.prev = _except_list;
   _except_list = &el;
 }
