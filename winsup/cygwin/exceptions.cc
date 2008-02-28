@@ -32,6 +32,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
+#include "ntdll.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -140,11 +141,28 @@ open_stackdumpfile ()
 	p++;
       else
 	p = myself->progname;
-      char corefile[strlen (p) + sizeof (".stackdump")];
-      __small_sprintf (corefile, "%s.stackdump", p);
-      HANDLE h = CreateFile (corefile, GENERIC_WRITE, 0, &sec_none_nih,
-			     CREATE_ALWAYS, 0, 0);
-      if (h != INVALID_HANDLE_VALUE)
+
+      WCHAR corefile[strlen (p) + sizeof (".stackdump")];
+      UNICODE_STRING ucore;
+      OBJECT_ATTRIBUTES attr;
+      RtlInitEmptyUnicodeString (&ucore, corefile,
+				 sizeof corefile - sizeof (WCHAR));
+      ucore.Length = sys_mbstowcs (ucore.Buffer,
+				   ucore.MaximumLength / sizeof (WCHAR),
+				   p, strlen (p)) * sizeof (WCHAR);
+      RtlAppendUnicodeToString (&ucore, L".stackdump");
+      InitializeObjectAttributes (&attr, &ucore, OBJ_CASE_INSENSITIVE,
+				  cygheap->cwd.get_handle (), NULL);
+      HANDLE h;
+      IO_STATUS_BLOCK io;
+      NTSTATUS status;
+
+      status = NtCreateFile (&h, GENERIC_WRITE | SYNCHRONIZE, &attr, &io,
+			     NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_OVERWRITE_IF,
+			     FILE_SYNCHRONOUS_IO_NONALERT
+			     | FILE_OPEN_FOR_BACKUP_INTENT
+			     | FILE_OPEN_FOR_RECOVERY, NULL, 0);
+      if (NT_SUCCESS (status))
 	{
 	  if (!myself->cygstarted)
 	    system_printf ("Dumping stack trace to %s", corefile);
