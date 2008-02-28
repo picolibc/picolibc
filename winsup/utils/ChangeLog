@@ -1,3 +1,8 @@
+2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkpasswd.c (main): Simplify generating SYSTEM entry.  Add entries
+	for LocalService and NetworkService accounts.  Change comments.
+
 2007-12-23  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in (cygcheck.exe): Don't link to ntdll.
