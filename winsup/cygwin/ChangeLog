@@ -1,5 +1,9 @@
 2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (open_stackdumpfile): Add comments.
+
+2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (open_stackdumpfile): Use NtCreateFile to create
 	stackdump file.
 

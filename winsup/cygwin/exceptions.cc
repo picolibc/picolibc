@@ -145,18 +145,21 @@ open_stackdumpfile ()
       WCHAR corefile[strlen (p) + sizeof (".stackdump")];
       UNICODE_STRING ucore;
       OBJECT_ATTRIBUTES attr;
+      /* Create the UNICODE variation of <progname>.stackdump. */
       RtlInitEmptyUnicodeString (&ucore, corefile,
 				 sizeof corefile - sizeof (WCHAR));
       ucore.Length = sys_mbstowcs (ucore.Buffer,
 				   ucore.MaximumLength / sizeof (WCHAR),
 				   p, strlen (p)) * sizeof (WCHAR);
       RtlAppendUnicodeToString (&ucore, L".stackdump");
+      /* Create an object attribute which refers to <progname>.stackdump
+         in Cygwin's cwd. */
       InitializeObjectAttributes (&attr, &ucore, OBJ_CASE_INSENSITIVE,
 				  cygheap->cwd.get_handle (), NULL);
       HANDLE h;
       IO_STATUS_BLOCK io;
       NTSTATUS status;
-
+      /* Try to open it to dump the stack in it. */
       status = NtCreateFile (&h, GENERIC_WRITE | SYNCHRONIZE, &attr, &io,
 			     NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_OVERWRITE_IF,
 			     FILE_SYNCHRONOUS_IO_NONALERT
