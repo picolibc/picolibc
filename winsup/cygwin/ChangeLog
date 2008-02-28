@@ -1,5 +1,11 @@
 2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (_cygtls::handle_exceptions): When being debugged,
+	leave through SetThreadContext, too, to keep exception handler stack
+	intact.
+
+2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (open_stackdumpfile): Add comments.
 
 2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
