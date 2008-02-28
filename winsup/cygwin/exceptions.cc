@@ -631,7 +631,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  if (try_to_debug (0))
 	    {
 	      debugging = true;
-	      return 0;
+	      goto out;
 	    }
 
 	  open_stackdumpfile ();
@@ -676,7 +676,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
      to the caller without visiting any of the helpful code installed prior
      to this function.  This should work ok, since a longjmp() out of here has
      to work if linux signal semantics are to be maintained. */
-
+out:
   SetThreadContext (GetCurrentThread (), in);
   return 0; /* Never actually returns.  This is just to keep gcc happy. */
 }
