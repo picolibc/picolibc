@@ -702,21 +702,11 @@ main (int argc, char **argv)
     {
       if (print_local)
         {
-#if 0
-	  /*
-	   * Get 'Everyone' group
-	   */
-	  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
-			 0, 0, 0, 0, 0, 0, 0);
-#endif
-	  /*
-	   * Get 'system' group
-	   */
-	  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-			 0, 0, 0, 0, 0, 0, 0);
-	  /*
-	   * Get 'administrators' group
-	   */
+	  /* Generate service starter account entries. */
+	  printf ("SYSTEM:*:18:544:,S-1-5-18::\n");
+	  printf ("LocalService:*:19:544:U-NT AUTHORITY\\LocalService,S-1-5-19::\n");
+	  printf ("NetworkService:*:20:544:U-NT AUTHORITY\\NetworkService,S-1-5-20::\n");
+	  /* Get 'administrators' group (has localized name). */
 	  if (!print_local_groups)
 	    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
 			   DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
