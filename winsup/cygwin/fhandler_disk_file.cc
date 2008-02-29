@@ -784,7 +784,7 @@ fhandler_disk_file::fchmod (mode_t mode)
     res = 0;
 
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
@@ -826,7 +826,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
     }
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
@@ -941,7 +941,7 @@ cant_access_acl:
     }
 
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
