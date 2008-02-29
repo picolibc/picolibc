@@ -620,7 +620,7 @@ fhandler_disk_file::fchmod (mode_t mode)
     has_changed (true);
 
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
@@ -663,7 +663,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 				uid, gid, attrib);
     }
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
@@ -756,7 +756,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
     }
 
   if (oret)
-    close ();
+    close_fs ();
 
   return res;
 }
@@ -1040,7 +1040,7 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
     }
 
   if (closeit)
-    close ();
+    close_fs ();
   return 0;
 }
 
