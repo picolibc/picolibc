@@ -1,3 +1,14 @@
+2008-02-29  Gregory Pietsch  <gpietsch@comcast.net>
+
+	* libc/stdlib/getopt.c (getopt_internal): Rewrite to accept
+	data area so as to support reentrant calls.  Change all callers
+	to fill in data area with global values and restore any changes
+	to the global values after call.
+	(__getopt_r, __getopt_long_r, __getopt_long_only_r): New routines
+	to support reentrancy that add a data area argument.
+	* libc/include/getopt.h: Add new _r routines and provide macros
+	so they can be called with using double-underscores.
+
 2008-02-21  Eric Blake  <ebb9@byu.net>
 
 	Fix strtod("-0x", NULL).
