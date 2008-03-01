@@ -332,12 +332,14 @@ _setjmp:
 	movw	%ax,40(%edi)
 	movw	%ss,%ax
 	movw	%ax,42(%edi)
+	movl	%fs:0,%eax
+	movl	%eax,44(%edi)
 	pushl	%ebx
 	call	stabilize_sig_stack
 	movl	$tls::stackptr(%ebx),%eax		# save stack pointer contents
 	decl	$tls::stacklock(%ebx)
 	popl	%ebx
-	movl	%eax,44(%edi)
+	movl	%eax,48(%edi)
 	popl	%edi
 	movl	\$0,%eax
 	leave
@@ -371,6 +373,8 @@ ___sjfault:
 	movw	%ax,40(%edi)
 	movw	%ss,%ax
 	movw	%ax,42(%edi)
+	movl	%fs:0,%eax
+	movl	%eax,44(%edi)
 	popl	%edi
 	movl	\$0,%eax
 	leave
@@ -391,6 +395,8 @@ ___ljfault:
 	movl	24(%edi),%ebp
 	pushfl
 	popl	%ebx
+	movl	44(%edi),%eax
+	movl	%eax,%fs:0
 	movw	42(%edi),%ax
 	movw	%ax,%ss
 	movl	28(%edi),%esp
@@ -415,7 +421,7 @@ _longjmp:
 	movl	%esp,%ebp
 	movl	8(%ebp),%edi				# address of buffer
 	call	stabilize_sig_stack
-	movl	44(%edi),%eax				# get old signal stack
+	movl	48(%edi),%eax				# get old signal stack
 	movl	%eax,$tls::stackptr(%ebx)		# restore
 	decl	$tls::stacklock(%ebx)			# relinquish lock
 	xorl	%eax,%eax
@@ -430,6 +436,8 @@ _longjmp:
 	movl	24(%edi),%ebp
 	pushfl
 	popl	%ebx
+	movl	44(%edi),%eax
+	movl	%eax,%fs:0
 	movw	42(%edi),%ax
 	movw	%ax,%ss
 	movl	28(%edi),%esp

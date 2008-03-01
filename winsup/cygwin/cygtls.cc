@@ -247,8 +247,7 @@ _cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame
   extern void *threadlist_exception_return;
   cygheap->threadlist[threadlist_ix]->remove (INFINITE);
   threadlist_ix = 0;
-  RtlUnwind (frame, threadlist_exception_return, e, 0);
-  /* Never returns */
+  return 0;
 }
 
 /* Set up the exception handler for the current thread.  The x86 uses segment
