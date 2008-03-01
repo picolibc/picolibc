@@ -6,6 +6,7 @@
 	(_cygtls::init_threadlist_exceptions): Ditto.
 	(_cygtls::find_tls): Use myfault handling to deal with errors caused by
 	nonexistent threads.
+	* sigproc.cc (wait_sig): Eliminate call to init_threadlist_exceptions.
 
 2008-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
