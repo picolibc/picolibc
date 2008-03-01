@@ -190,10 +190,8 @@ struct _cygtls
 
   /* exception handling */
   static int handle_exceptions (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
-  static int handle_threadlist_exception (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
   bool inside_kernel (CONTEXT *);
   void init_exception_handler (int (*) (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void*));
-  void init_threadlist_exceptions ();
   void signal_exit (int) __attribute__ ((noreturn, regparm(2)));
   void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
   void signal_debugger (int) __attribute__ ((regparm(2)));

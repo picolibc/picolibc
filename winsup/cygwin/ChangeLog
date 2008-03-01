@@ -1,5 +1,14 @@
 2008-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygtls.h (_cygtls::handle_threadlist_exception): Eliminate.
+	(_cygtls::init_threadlist_exceptions): Ditto.
+	* cygtls.cc (_cygtls::handle_threadlist_exception): Eliminate.
+	(_cygtls::init_threadlist_exceptions): Ditto.
+	(_cygtls::find_tls): Use myfault handling to deal with errors caused by
+	nonexistent threads.
+
+2008-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygtls.cc (_cygtls::init_exception_handler): Just return.
 
 2008-03-01  Corinna Vinschen  <corinna@vinschen.de>
