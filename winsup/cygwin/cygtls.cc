@@ -196,23 +196,28 @@ _cygtls::push (__stack_t addr)
   *stackptr++ = (__stack_t) addr;
 }
 
-#define BAD_IX ((size_t) -1)
-static size_t NO_COPY threadlist_ix = BAD_IX;
 
 _cygtls *
 _cygtls::find_tls (int sig)
 {
+  static int NO_COPY threadlist_ix;
+
   debug_printf ("sig %d\n", sig);
   sentry here (INFINITE);
-  __asm__ volatile (".equ _threadlist_exception_return,.");
+
   _cygtls *res = NULL;
-  for (threadlist_ix = 0; threadlist_ix < nthreads; threadlist_ix++)
+  threadlist_ix = -1;
+
+  myfault efault;
+  if (efault.faulted ())
+    cygheap->threadlist[threadlist_ix]->remove (INFINITE);
+
+  while (++threadlist_ix < (int) nthreads)
     if (sigismember (&(cygheap->threadlist[threadlist_ix]->sigwait_mask), sig))
       {
 	res = cygheap->threadlist[threadlist_ix];
 	break;
       }
-  threadlist_ix = BAD_IX;
   return res;
 }
 
@@ -220,36 +225,6 @@ void
 _cygtls::set_siginfo (sigpacket *pack)
 {
   infodata = pack->si;
-}
-
-extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD) __attribute__ ((noreturn));
-int
-_cygtls::handle_threadlist_exception (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *c, void *)
-{
-  if (e->ExceptionCode != STATUS_ACCESS_VIOLATION)
-    {
-      system_printf ("unhandled exception %p at %p", e->ExceptionCode, c->Eip);
-      return 1;
-    }
-
-  sentry here;
-  if (threadlist_ix == BAD_IX)
-    {
-      api_fatal ("called with threadlist_ix %d", BAD_IX);
-      return 1;
-    }
-
-  if (!here.acquired ())
-    {
-      system_printf ("couldn't aquire muto");
-      return 1;
-    }
-
-  extern void *threadlist_exception_return;
-  cygheap->threadlist[threadlist_ix]->remove (INFINITE);
-  threadlist_ix = 0;
-  RtlUnwind (frame, threadlist_exception_return, e, 0);
-  /* Never returns */
 }
 
 /* Set up the exception handler for the current thread.  The x86 uses segment
@@ -274,10 +249,4 @@ _cygtls::init_exception_handler (exception_handler *eh)
      the exception handler returns to the application. */
   el.prev = _except_list;
   _except_list = &el;
-}
-
-void
-_cygtls::init_threadlist_exceptions ()
-{
-  init_exception_handler (handle_threadlist_exception);
 }

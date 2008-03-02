@@ -1166,7 +1166,6 @@ wait_sig (VOID *)
   SetEvent (wait_sig_inited);
 
   _sig_tls = &_my_tls;
-  _sig_tls->init_threadlist_exceptions ();
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
 
