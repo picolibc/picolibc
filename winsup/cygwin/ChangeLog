@@ -1,3 +1,8 @@
+2008-03-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* smallprint.cc (__small_vsprintf): Free allocated buffer rather than
+	pointer into the buffer.
+
 2008-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::handle_threadlist_exception): Eliminate.

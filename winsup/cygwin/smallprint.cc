@@ -1,6 +1,7 @@
 /* smallprint.cc: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -195,17 +196,18 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  us = va_arg (ap, PUNICODE_STRING);
 		wfillin:
 		  {
-		    char *tmp;
+		    char *tmpbuf;
 
-		    if (!sys_wcstombs_alloc (&tmp, HEAP_NOTHEAP, us->Buffer,
+		    if (!sys_wcstombs_alloc (&tmpbuf, HEAP_NOTHEAP, us->Buffer,
 					     us->Length / sizeof (WCHAR)))
 		      {
 			s = "invalid UNICODE_STRING";
 			goto fillin;
 		      }
+		    char *tmp = tmpbuf;
 		    for (i = 0; *tmp && i < n; i++)
 		      *dst++ = *tmp++;
-		    free (tmp);
+		    free (tmpbuf);
 		  }
 		  break;
 		default:
