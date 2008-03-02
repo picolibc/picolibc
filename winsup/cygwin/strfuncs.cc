@@ -67,7 +67,7 @@ sys_wcstombs_alloc (char **tgt_p, int type, const PWCHAR src, int slen)
   ret = WideCharToMultiByte (get_cp (), 0, src, slen, NULL, 0 ,NULL, NULL);
   if (ret)
     {
-      size_t tlen = (slen == -1 ? ret : ret + 1);
+      size_t tlen = (slen == -1) ? ret : ret + 1;
 
       if (type == HEAP_NOTHEAP)
 	*tgt_p = (char *) calloc (tlen, sizeof (char));

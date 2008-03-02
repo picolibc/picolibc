@@ -149,7 +149,7 @@ extern int dynamically_loaded;
 
 extern int cygserver_running;
 
-#define _MT_SAFE	// DELTEME someday
+#define _MT_SAFE	// DELETEME someday
 
 #define TITLESIZE 1024
 

@@ -1,5 +1,21 @@
 2008-03-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygtls.cc (_cygtls::init_exception_handler): Semi-revert to making
+	only ourselves the exception handler and nothing else.
+	* exceptions.cc (open_stackdumpfile): Use correct format specifiers for
+	unicode when printing nameof stackdump file.
+	(stack_info::walk): Stop walking if ebp points into cygwin itself.
+	(_cygtls::handle_exceptions): Detect when signal is masked and treat as
+	if it was not caught.  Reinitialize exception handler to known state to
+	avoid subsequent attempts to call Windows exception handlers if an
+	exception occurs in a signal handler.  Revert to a 'return 0' rather
+	than using a goto.
+
+	* strfuncs.cc (sys_wcstombs_alloc): Minor formatting tweak.
+	* winsup.h: Fix comment typo.
+
+2008-03-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* smallprint.cc (__small_vsprintf): Free allocated buffer rather than
 	pointer into the buffer.
 

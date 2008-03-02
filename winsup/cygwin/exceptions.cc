@@ -1,7 +1,7 @@
 /* exceptions.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Red Hat, Inc.
+   2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -168,9 +168,9 @@ open_stackdumpfile ()
       if (NT_SUCCESS (status))
 	{
 	  if (!myself->cygstarted)
-	    system_printf ("Dumping stack trace to %s", corefile);
+	    system_printf ("Dumping stack trace to %S", &ucore);
 	  else
-	    debug_printf ("Dumping stack trace to %s", corefile);
+	    debug_printf ("Dumping stack trace to %S", &ucore);
 	  SetStdHandle (STD_ERROR_HANDLE, h);
 	}
     }
@@ -253,7 +253,7 @@ int
 stack_info::walk ()
 {
   char **ebp;
-  if ((ebp = (char **) next_offset ()) == NULL)
+  if (((ebp = (char **) next_offset ()) == NULL) || (ebp >= (char **) cygwin_hmodule))
     return 0;
 
   sf.AddrFrame.Offset = (DWORD) ebp;
@@ -602,7 +602,8 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in->Eip);
 
-  if (global_sigs[si.si_signo].sa_mask & SIGTOMASK (si.si_signo))
+  bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
+  if (masked)
     syscall_printf ("signal %d, masked %p", si.si_signo,
 		    global_sigs[si.si_signo].sa_mask);
 
@@ -621,12 +622,19 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
     me.return_from_fault ();
 
   me.copy_context (in);
-  if (!cygwin_finished_initializing
+
+  /* Reinitialize exception handler list to include just ourselves so that any
+     exceptions that occur in a signal handler will be properly caught. */
+  me.init_exception_handler (handle_exceptions);
+
+  if (masked
       || &me == _sig_tls
+      || !cygwin_finished_initializing
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
+      rtl_unwind (frame, e);
       /* Print the exception to the console */
       if (!myself->cygstarted)
 	for (int i = 0; status_info[i].name; i++)
@@ -645,10 +653,9 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  if (try_to_debug (0))
 	    {
 	      debugging = true;
-	      goto out;
+	      return 0;
 	    }
 
-	  rtl_unwind (frame, e);
 	  open_stackdumpfile ();
 	  exception (e, in);
 	  stackdump ((DWORD) ebp, 0, 1);
@@ -679,7 +686,6 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   sig_send (NULL, si, &me);	// Signal myself
   me.incyg--;
   e->ExceptionFlags = 0;
-out:
   return 0;
 }
 

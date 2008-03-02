@@ -246,6 +246,18 @@ _cygtls::init_exception_handler (exception_handler *eh)
      Windows 2008, which irremediably gets into an endless loop, taking 100%
      CPU.  That's why we reverted to a normal SEH chain and changed the way
      the exception handler returns to the application. */
-  el.prev = _except_list;
+  /* 2008-03-28 - The fun continues.  Revert to doing something sorta like
+     before.  Just make sure *only* the cygwin exception handler is installed
+     rather than honoring other exception handlers.  The theory here is that
+     cygwin should be in control and there should be no Windows voodoo going
+     on behind the scenes.
+
+     This change was made so that this function could be called from
+     handle_exceptions to essentially "clean up" the exception handling
+     linked list.
+
+     The open question is whether making this NULL will have an adverse effect
+     on Windows functions. */
   _except_list = &el;
+  el.prev = NULL;
 }
