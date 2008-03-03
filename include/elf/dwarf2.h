@@ -1,7 +1,7 @@
 /* Declarations and definitions of codes relating to the DWARF2 and
    DWARF3 symbolic debugging information formats.
    Copyright (C) 1992, 1993, 1995, 1996, 1997, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   2003, 2004, 2005, 2006, 2008 Free Software Foundation, Inc.
 
    Written by Gary Funck (gary@intrepid.com) The Ada Joint Program
    Office (AJPO), Florida State University and Silicon Graphics Inc.
@@ -551,7 +551,9 @@ enum dwarf_location_atom
     DW_OP_HP_fltconst8   = 0xe3,
     DW_OP_HP_mod_range   = 0xe4,
     DW_OP_HP_unmod_range = 0xe5,
-    DW_OP_HP_tls         = 0xe6
+    DW_OP_HP_tls         = 0xe6,
+    /* PGI (STMicroelectronics) extensions.  */
+    DW_OP_PGI_omp_thread_num = 0xf8
   };
 
 #define DW_OP_lo_user	0xe0	/* Implementation-defined range start.  */

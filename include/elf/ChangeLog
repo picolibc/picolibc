@@ -1,3 +1,8 @@
+2008-03-03  Pallavi Tambay  <pallavi.tambay@amd.com>
+
+	* dwarf2.h: (enum dwarf_location_atom): Add new DW_OP:
+	DW_OP_PGI_omp_thread_num.
+
 2008-02-04  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips.h: Update copyright.
