@@ -94,6 +94,12 @@ gpietsch@comcast.net
 #define NO_ARG          	0
 #define REQUIRED_ARG    	1
 #define OPTIONAL_ARG    	2
+
+/* For glibc compatibility.  */
+#define no_argument		NO_ARG
+#define required_argument	REQUIRED_ARG
+#define optional_argument	OPTIONAL_ARG
+
   /* The GETOPT_DATA_INITIALIZER macro is used to initialize a statically-
      allocated variable of type struct getopt_data.  */
 #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0}

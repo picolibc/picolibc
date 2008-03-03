@@ -1,3 +1,8 @@
+2008-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/getopt.h (no_argument): Added for glibc compatibility.
+	(required_argument, optional_argument): Ditto.
+
 2008-02-29  Gregory Pietsch  <gpietsch@comcast.net>
 
 	* libc/stdlib/getopt.c (getopt_internal): Rewrite to accept
