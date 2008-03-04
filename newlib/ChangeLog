@@ -1,3 +1,12 @@
+2008-03-03  Eric Blake  <ebb9@byu.net>
+
+	Fix ftell bug after ungetc.
+	* libc/stdio/ftell.c (_ftell_r): Don't flush ungetc buffer on
+	ftell.
+	* libc/stdio64/ftello64.c (_ftello64_r): Likewise.
+	* libc/stdio/fflush.c (_fflush_r): Clear unget buffer when
+	repositioning underlying fd offset.
+
 2008-03-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/getopt.h (no_argument): Added for glibc compatibility.
