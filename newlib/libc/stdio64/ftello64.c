@@ -108,9 +108,12 @@ _DEFUN (_ftello64_r, (ptr, fp),
       return -1L;
     }
 
-  /* Find offset of underlying I/O object, then
-     adjust for buffered bytes.  */
-  _fflush_r (ptr, fp);           /* may adjust seek offset on append stream */
+  /* Find offset of underlying I/O object, then adjust for buffered
+     bytes.  Flush a write stream, since the offset may be altered if
+     the stream is appending.  Do not flush a read stream, since we
+     must not lose the ungetc buffer.  */
+  if (fp->_flags & __SWR)
+    _fflush_r (ptr, fp);
   if (fp->_flags & __SOFF)
     pos = fp->_offset;
   else
