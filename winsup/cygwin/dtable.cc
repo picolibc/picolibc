@@ -336,7 +336,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	}
 
       DWORD access;
-      if (fd == 0)
+      if (dev == FH_TTY || dev == FH_CONSOLE) 
+	access = GENERIC_READ | GENERIC_WRITE;
+      else if (fd == 0)
 	access = GENERIC_READ;
       else 
 	access = GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's

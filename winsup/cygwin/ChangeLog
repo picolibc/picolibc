@@ -1,3 +1,12 @@
+2008-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Set access to
+	read/write if handle is connected to a tty or console.
+	* fhandler_dsp.cc (fhandler_dev_dsp::dup): Set open flags correctly
+	after duplicating from archetype.
+	* fhandler_tty.cc (fhandler_tty_slave::dup): Ditto.
+	(fhandler_pty_master::dup): Ditto.
+
 2008-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::handle_threadlist_exception): Eliminate.

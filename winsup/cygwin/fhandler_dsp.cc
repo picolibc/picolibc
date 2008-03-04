@@ -1131,6 +1131,7 @@ fhandler_dev_dsp::dup (fhandler_base * child)
 {
   debug_printf ("");
   child->archetype = archetype;
+  child->set_flags (get_flags ());
   archetype->usecount++;
   return 0;
 }
