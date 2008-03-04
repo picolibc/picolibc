@@ -1,3 +1,8 @@
+2008-02-28  Joseph Myers  <joseph@codesourcery.com>
+
+	* include/complex.h: Don't condition contents on C99 or not
+	__STRICT_ANSI__.
+
 2008-02-01  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in: Add rules to generate multiple versions of libmoldname.a for

@@ -24,9 +24,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-     || !defined __STRICT_ANSI__ 
-
 /* These macros are specified by C99 standard */
 
 #ifndef __cplusplus
@@ -198,8 +195,6 @@ __CRT_INLINE  long double __MINGW_ATTRIB_CONST cargl (long double _Complex _Z)
 #ifdef __cplusplus
 }
 #endif 
-
-#endif /* __STDC_VERSION__ >= 199901L */
 
 
 #endif /* _COMPLEX_H */
