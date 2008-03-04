@@ -1,3 +1,9 @@
+2008-03-04  Eric Blake  <ebb9@byu.net>
+
+	Fix strtod("nan()", ptr).
+	* libc/stdlib/gdtoa-hexnan.c (hexnan): When the optional
+	n-char-sequence is omitted, still parse the ().
+
 2008-03-03  Eric Blake  <ebb9@byu.net>
 
 	Fix ftell bug after ungetc.

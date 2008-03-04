@@ -98,7 +98,7 @@ _DEFUN (hexnan, (sp, fpi, x0),
 					}
 				continue;
 				}
-			if (/*(*/ c == ')' && havedig) {
+			if (/*(*/ c == ')') {
 				*sp = s + 1;
 				break;
 				}
