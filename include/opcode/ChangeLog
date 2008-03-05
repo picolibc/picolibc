@@ -1,3 +1,9 @@
+2008-03-04  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (ARM_EXT_V6M, ARM_EXT_BARRIER, ARM_EXT_THUMB_MSR): Define.
+	(ARM_AEXT_V6T2, ARM_AEXT_V7_ARM, ARM_AEXT_V7M): Use new flags.
+	(ARM_AEXT_V6M, ARM_ARCH_V6M): Define.
+
 2008-02-27  Denis Vlasenko  <vda.linux@googlemail.com>
 	    Nick Clifton  <nickc@redhat.com>
 
