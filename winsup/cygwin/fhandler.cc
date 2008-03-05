@@ -538,6 +538,10 @@ fhandler_base::open_9x (int flags, mode_t mode)
 	}
       else if (GetLastError () == ERROR_INVALID_HANDLE)
 	set_errno (ENOENT);
+      else if (GetLastError () == ERROR_PATH_NOT_FOUND
+	       && (flags & O_CREAT)
+	       && get_win32_name ()[strlen (get_win32_name ()) - 1] == '\\')
+	set_errno (EISDIR);
       else
 	__seterrno ();
       if (!nohandle ())
@@ -688,7 +692,12 @@ fhandler_base::open (int flags, mode_t mode)
 			 create_disposition, create_options, NULL, 0);
   if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (status);
+      /* Trying to create a directory should return EISDIR, not ENOENT. */
+      if (status == STATUS_OBJECT_NAME_INVALID && (flags & O_CREAT)
+	  && upath.Buffer[upath.Length / sizeof (WCHAR) - 1] == '\\')
+	set_errno (EISDIR);
+      else
+	__seterrno_from_nt_status (status);
       if (!nohandle ())
 	goto done;
    }

@@ -567,8 +567,6 @@ loop:
 	  myself->exec_sendsig = NULL;
 	}
       res = -1;
-      if (moreinfo->myself_pinfo)
-	CloseHandle (moreinfo->myself_pinfo);
       goto out;
     }
 

@@ -125,7 +125,8 @@ public:
 	      cfree (*e);
 	    cfree (moreinfo->envp);
 	  }
-	CloseHandle (moreinfo->myself_pinfo);
+	if (moreinfo->myself_pinfo)
+	  CloseHandle (moreinfo->myself_pinfo);
 	cfree (moreinfo);
       }
   }

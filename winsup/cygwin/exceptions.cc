@@ -455,6 +455,8 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 
 /* Main exception handler. */
 
+extern exception_list *_except_list asm ("%fs:0");
+
 extern "C" char *__progname;
 int
 _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
@@ -586,7 +588,8 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in->Eip);
 
-  if (global_sigs[si.si_signo].sa_mask & SIGTOMASK (si.si_signo))
+  bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
+  if (masked)
     syscall_printf ("signal %d, masked %p", si.si_signo,
 		    global_sigs[si.si_signo].sa_mask);
 
@@ -605,8 +608,15 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
     me.return_from_fault ();
 
   me.copy_context (in);
-  if (!cygwin_finished_initializing
+
+  /* Temporarily replace windows top level SEH with our own handler.
+     We don't want any Windows magic kicking in.  This top level frame
+     will be removed automatically after our exception handler returns. */
+  _except_list->handler = _cygtls::handle_exceptions;
+
+  if (masked
       || &me == _sig_tls
+      || !cygwin_finished_initializing
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
@@ -629,7 +639,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	  if (try_to_debug (0))
 	    {
 	      debugging = true;
-	      goto out;
+	      return 0;
 	    }
 
 	  rtl_unwind (frame, e);
@@ -663,7 +673,6 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   sig_send (NULL, si, &me);	// Signal myself
   me.incyg--;
   e->ExceptionFlags = 0;
-out:
   return 0;
 }
 

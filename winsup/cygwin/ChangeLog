@@ -1,3 +1,26 @@
+2008-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (~child_info_spawn): Check moreinfo->myself_pinfo for
+	NULL before closing.
+	* spawn.cc (spawn_guts): Don't close moreinfo->myself_pinfo explicitely
+	in case of failing CloseProcess.
+
+	* exceptions.cc (_cygtls::handle_exceptions): Replace top level SEH
+	installed by Windows with our own handler.
+
+	* fhandler.cc (fhandler_base::open_): Return EISDIR when trying to
+	create a directory.
+	(fhandler_base::open_9x): Ditto.
+	* ntdll.h (STATUS_OBJECT_NAME_INVALID): Define.
+	* path.cc (path_conv::check): If input path had a trailing dir
+	separator, tack it on to the native path if directory doesn't exist.
+
+2008-03-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (_cygtls::handle_exceptions): Detect when signal is
+	masked and treat as if it was not caught.  Revert to a 'return 0'
+	rather than using a goto.
+
 2008-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Set access to
