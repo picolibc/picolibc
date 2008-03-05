@@ -1,4 +1,4 @@
-/* path.cc: path support.
+  /* path.cc: path support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
    2006, 2007 Red Hat, Inc.
@@ -1101,6 +1101,8 @@ out:
     }
   else if (!need_directory || error)
     /* nothing to do */;
+  else if (fileattr == INVALID_FILE_ATTRIBUTES)
+    strcat (path, "\\"); /* Reattach trailing dirsep in native path. */
   else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
     path_flags &= ~PATH_SYMLINK;
   else

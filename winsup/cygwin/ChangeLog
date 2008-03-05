@@ -1,3 +1,15 @@
+2008-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (~child_info_spawn): Check moreinfo->myself_pinfo for
+	NULL before closing.
+	* spawn.cc (spawn_guts): Don't close moreinfo->myself_pinfo explicitely
+	in case of failing CloseProcess.
+
+	* fhandler.cc (fhandler_base::open_): Return EISDIR when trying to
+	create a directory.
+	* path.cc (path_conv::check): If input path had a trailing dir
+	separator, tack it on to the native path if directory doesn't exist.
+
 2008-03-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.cc (_cygtls::init_exception_handler): Semi-revert to making

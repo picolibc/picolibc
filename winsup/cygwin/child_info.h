@@ -125,7 +125,7 @@ public:
 	      cfree (*e);
 	    cfree (moreinfo->envp);
 	  }
-	if (type != _PROC_SPAWN)
+	if (type != _PROC_SPAWN && moreinfo->myself_pinfo)
 	  CloseHandle (moreinfo->myself_pinfo);
 	cfree (moreinfo);
       }
