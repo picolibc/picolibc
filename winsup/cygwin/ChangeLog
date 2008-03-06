@@ -1,3 +1,7 @@
+2008-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+
 2008-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* child_info.h (~child_info_spawn): Check moreinfo->myself_pinfo for
