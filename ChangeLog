@@ -1,3 +1,11 @@
+2008-03-06  Florian Krohm  <fkrohm@us.ibm.com>
+
+	* s390-opc.c (INSTR_RSL_R0RD): Fix operands.
+	* s390-opc.txt (cmpsc): Duplicate entry removed.
+	(dxr, sqdr, sqer, cxfbr, cdfbr, cefbr, lzer, lzdr, lzxr,
+	cegbr, cdgbr, cxgbr, cegr, cdgr, cxgr, cxfr, cdfr, cefr, fixr, fidr,
+	fier, cu42, cu41): Fix operand format.
+
 2008-02-20  Paolo Bonzini  <bonzini@gnu.org>
 
         PR bootstrap/32009
