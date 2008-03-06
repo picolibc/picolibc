@@ -592,7 +592,7 @@ fhandler_base::open (int flags, mode_t mode)
     {
       /* Trying to create a directory should return EISDIR, not ENOENT. */
       PUNICODE_STRING upath = pc.get_nt_native_path ();
-      if (status == STATUS_OBJECT_NAME_INVALID
+      if (status == STATUS_OBJECT_NAME_INVALID && (flags & O_CREAT)
 	  && upath->Buffer[upath->Length / sizeof (WCHAR) - 1] == '\\')
 	set_errno (EISDIR);
       else
