@@ -1,5 +1,9 @@
 2008-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+
+2008-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open_): Add missing test for O_CREAT.
 	Fix comment.
 
