@@ -414,6 +414,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETOPT"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------

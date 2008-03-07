@@ -83,11 +83,13 @@ Gregory Pietsch's current e-mail address:
 gpietsch@comcast.net
 ****************************************************************************/
 
+#ifndef HAVE_GETOPT
 
 /* include files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define __need_getopt_newlib
 #include <getopt.h>
 
 /* macros */
@@ -471,5 +473,7 @@ __getopt_long_only_r (int argc, char *const argv[], const char *shortopts,
 {
   return getopt_internal (argc, argv, shortopts, longopts, longind, 1, data);
 }
+
+#endif /* !HAVE_GETOPT */
 
 /* end of file GETOPT.C */

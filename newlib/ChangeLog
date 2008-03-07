@@ -1,5 +1,14 @@
 2008-03-07  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/getopt.h: Hide newlib extensions under
+	the __need_getopt_newlib flag.
+	* libc/stdlib/getopt.c: #define __need_getopt_newlib before including
+	getopt.h.  Put entire code under !HAVE_GETOPT to support platforms
+	with their own getopt implementation.
+	* configure.host: Specify HAVE_GETOPT for x86-linux.
+
+2008-03-07  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/sys/reent.h(_REENT_SMALL_CHECK_INIT): Specify
 	this macro completely instead of referring to CHECK_STD_INIT which
 	is only found in libc/stdio/local.h.

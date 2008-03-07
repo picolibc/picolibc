@@ -82,6 +82,7 @@ Gregory Pietsch's current e-mail address:
 gpietsch@comcast.net
 ****************************************************************************/
 
+/* This is a glibc-extension header file. */
 
 #ifndef GETOPT_H
 #define GETOPT_H
@@ -90,23 +91,9 @@ gpietsch@comcast.net
 
 /* include files needed by this include file */
 
-/* macros defined by this include file */
-#define NO_ARG          	0
-#define REQUIRED_ARG    	1
-#define OPTIONAL_ARG    	2
-
-/* For glibc compatibility.  */
-#define no_argument		NO_ARG
-#define required_argument	REQUIRED_ARG
-#define optional_argument	OPTIONAL_ARG
-
-  /* The GETOPT_DATA_INITIALIZER macro is used to initialize a statically-
-     allocated variable of type struct getopt_data.  */
-#define GETOPT_DATA_INITIALIZER	{0,0,0,0,0}
-  /* These #defines are to keep the namespace clear... */
-#define getopt_r		__getopt_r
-#define getopt_long_r		__getopt_long_r
-#define getopt_long_only_r	__getopt_long_only_r
+#define no_argument		0
+#define required_argument	1
+#define optional_argument	2
 
 #ifdef __cplusplus
 extern "C"
@@ -130,6 +117,25 @@ extern "C"
 
   };
 
+/* While getopt.h is a glibc extension, the following are newlib extensions.
+ * They are optionally included via the __need_getopt_newlib flag.  */
+
+#ifdef __need_getopt_newlib
+
+  /* macros defined by this include file */
+  #define NO_ARG          	no_argument
+  #define REQUIRED_ARG    	required_argument
+  #define OPTIONAL_ARG    	optional_argument
+
+  /* The GETOPT_DATA_INITIALIZER macro is used to initialize a statically-
+     allocated variable of type struct getopt_data.  */
+  #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0}
+
+  /* These #defines are to make accessing the reentrant functions easier.  */
+  #define getopt_r		__getopt_r
+  #define getopt_long_r		__getopt_long_r
+  #define getopt_long_only_r	__getopt_long_only_r
+
   /* The getopt_data structure is for reentrancy. Its members are similar to
      the externally-defined variables.  */
   typedef struct getopt_data
@@ -137,6 +143,8 @@ extern "C"
     char *optarg;
     int optind, opterr, optopt, optwhere;
   } getopt_data;
+
+#endif /* __need_getopt_newlib */
 
   /* externally-defined variables */
   extern char *optarg;
