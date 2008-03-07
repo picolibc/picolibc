@@ -1,5 +1,11 @@
 2008-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::sendto): Never send more than
+	64K.  Add comment to explain why.
+	(fhandler_socket::sendmsg): Ditto.
+
+2008-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add tls_pbuf.o.
 	* autoload.cc (CreateDesktopW): Replace CreateDesktopA.
 	(CreateWindowStationW): Replace CreateWindowStationA.

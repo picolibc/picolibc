@@ -1393,7 +1393,13 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (to && !get_inet_addr (to, tolen, &sst, &tolen))
     return SOCKET_ERROR;
 
-  WSABUF wsabuf = { len, (char *) ptr };
+  /* Never write more than 64K at once to workaround a problem with
+     Winsock, which creates a temporary buffer with the total incoming
+     buffer size and copies the whole content over, regardless of
+     the size of the internal send buffer.  A buffer full condition
+     is only recognized in subsequent calls and, if len is big enough,
+     the call even might fail with an out-of-memory condition. */
+  WSABUF wsabuf = { len > 65536 ? 65536 : len, (char *) ptr };
   return send_internal (&wsabuf, 1, flags,
 			(to ? (const struct sockaddr *) &sst : NULL), tolen);
 }
@@ -1411,12 +1417,17 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
     }
 
   WSABUF wsabuf[msg->msg_iovlen];
-  WSABUF *wsaptr = wsabuf + msg->msg_iovlen;
-  const struct iovec *iovptr = msg->msg_iov + msg->msg_iovlen;
-  while (--wsaptr >= wsabuf)
+  WSABUF *wsaptr = wsabuf;
+  const struct iovec *iovptr = msg->msg_iov;
+  size_t total = 0;
+  for (int i = 0; i < msg->msg_iovlen && total < 65536; ++i)
     {
-      wsaptr->len = (--iovptr)->iov_len;
-      wsaptr->buf = (char *) iovptr->iov_base;
+      if (total + iovptr->iov_len > 65536) /* See above. */
+	wsaptr->len = 65536 - total;
+      else
+	wsaptr->len = iovptr->iov_len;
+      total += wsaptr->len;
+      (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
 
   return send_internal (wsabuf, msg->msg_iovlen, flags,
