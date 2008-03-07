@@ -149,8 +149,19 @@ struct __sFILE_fake {
 
   struct _reent *_data;
 };
-/* CHECK_STD_INIT() comes from stdio/local.h; be sure to include that.  */
-# define _REENT_SMALL_CHECK_INIT(ptr) CHECK_STD_INIT(ptr)
+
+/* Following is needed both in libc/stdio and libc/stdlib so we put it
+ * here instead of libc/stdio/local.h where it was previously. */
+
+extern _VOID   _EXFUN(__sinit,(struct _reent *));
+
+# define _REENT_SMALL_CHECK_INIT(ptr)		\
+  do						\
+    {						\
+      if ((ptr) && !(ptr)->__sdidinit)		\
+	__sinit (ptr);				\
+    }						\
+  while (0)
 #else
 # define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 #endif

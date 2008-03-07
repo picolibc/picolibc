@@ -45,6 +45,7 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include "local.h"
 
 int
 _DEFUN(_dprintf_r, (ptr, fd, format),

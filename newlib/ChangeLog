@@ -1,3 +1,12 @@
+2008-03-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h(_REENT_SMALL_CHECK_INIT): Specify
+	this macro completely instead of referring to CHECK_STD_INIT which
+	is only found in libc/stdio/local.h.
+	* libc/stdio/dprintf.c: Add include of local.h.
+	* libc/stdio/vdprintf.c: Ditto.
+	* libc/stdio/vdiprintf.c: Ditto.
+
 2008-03-04  Eric Blake  <ebb9@byu.net>
 
 	Fix strtod("nan()", ptr).
