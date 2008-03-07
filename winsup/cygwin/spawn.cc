@@ -18,6 +18,7 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <wchar.h>
 #include <ctype.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
@@ -33,6 +34,7 @@ details. */
 #include "registry.h"
 #include "environ.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include "winf.h"
 #include "ntdll.h"
 
@@ -301,18 +303,19 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   av newargv;
   linebuf one_line;
   child_info_spawn ch;
-  char *envblock = NULL;
+  PWCHAR envblock = NULL;
   path_conv real_path;
   bool reset_sendsig = false;
 
-  const char *runpath;
+  tmp_pathbuf tp;
+  PWCHAR runpath = tp.w_get ();
   int c_flags;
   bool wascygexec;
   cygheap_exec_info *moreinfo;
 
   bool null_app_name = false;
-  STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-		    NULL, NULL, NULL};
+  STARTUPINFOW si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+		     NULL, NULL, NULL};
   int looped = 0;
   HANDLE orig_wr_proc_pipe = NULL;
 
@@ -333,7 +336,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  moreinfo = (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
+  moreinfo = (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
+						  sizeof (cygheap_exec_info));
   moreinfo->old_title = NULL;
 
   /* CreateProcess takes one long string that is the command line (sigh).
@@ -382,7 +386,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       if (wascygexec)
 	newargv.dup_all ();
-      else if (!one_line.fromargv (newargv, real_path.get_win32 (), real_path.iscygexec ()))
+      else if (!one_line.fromargv (newargv, real_path.get_win32 (),
+				   real_path.iscygexec ()))
 	{
 	  res = -1;
 	  goto out;
@@ -395,12 +400,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       if (mode != _P_OVERLAY ||
 	  !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
-			    &moreinfo->myself_pinfo, 0,
-			    TRUE, DUPLICATE_SAME_ACCESS))
+			    &moreinfo->myself_pinfo, 0, TRUE,
+			    DUPLICATE_SAME_ACCESS))
 	moreinfo->myself_pinfo = NULL;
       else
 	VerifyHandle (moreinfo->myself_pinfo);
     }
+  WCHAR wone_line[one_line.ix + 1];
+  sys_mbstowcs (wone_line, one_line.ix + 1, one_line.buf);
 
   PROCESS_INFORMATION pi;
   pi.hProcess = pi.hThread = NULL;
@@ -418,7 +425,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   c_flags = GetPriorityClass (hMainProc);
   sigproc_printf ("priority class %d", c_flags);
-  c_flags |= CREATE_SEPARATE_WOW_VDM;
+  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
 
   if (mode == _P_DETACH)
     c_flags |= DETACHED_PROCESS;
@@ -444,8 +451,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 generating its own pids again? */
       if (cygheap->pid_handle)
 	/* already done previously */;
-      else if (DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
-				PROCESS_QUERY_INFORMATION, TRUE, 0))
+      else if (DuplicateHandle (hMainProc, hMainProc, hMainProc,
+      				&cygheap->pid_handle, PROCESS_QUERY_INFORMATION,
+				TRUE, 0))
 	ProtectHandleINH (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
@@ -456,19 +464,22 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
   if (!newargv.win16_exe
-      && (!ch.iscygwin () || mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ()))
+      && (!ch.iscygwin () || mode != _P_OVERLAY
+	  || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
-  runpath = null_app_name ? NULL : real_path.get_win32 ();
+  runpath = null_app_name ? NULL : real_path.get_wide_win32_path (runpath);
 
-  syscall_printf ("null_app_name %d (%s, %.9500s)", null_app_name, runpath, one_line.buf);
+  syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
+		  runpath, wone_line);
 
   cygbench ("spawn-guts");
 
   if (!real_path.iscygexec())
     cygheap->fdtab.set_file_pointers_for_exec ();
 
-  moreinfo->envp = build_env (envp, envblock, moreinfo->envc, real_path.iscygexec ());
+  moreinfo->envp = build_env (envp, envblock, moreinfo->envc,
+			      real_path.iscygexec ());
   if (!moreinfo->envp || !envblock)
     {
       set_errno (E2BIG);
@@ -496,16 +507,16 @@ loop:
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
 	  && !cygheap->user.groups.issetgroups ()))
     {
-      rc = CreateProcess (runpath,	/* image name - with full path */
-			  one_line.buf,	/* what was passed to exec */
-			  &sec_none_nih,/* process security attrs */
-			  &sec_none_nih,/* thread security attrs */
-			  TRUE,		/* inherit handles from parent */
-			  c_flags,
-			  envblock,	/* environment */
-			  NULL,
-			  &si,
-			  &pi);
+      rc = CreateProcessW (runpath,	  /* image name - with full path */
+			   wone_line,	  /* what was passed to exec */
+			   &sec_none_nih, /* process security attrs */
+			   &sec_none_nih, /* thread security attrs */
+			   TRUE,	  /* inherit handles from parent */
+			   c_flags,
+			   envblock,	  /* environment */
+			   NULL,
+			   &si,
+			   &pi);
     }
   else
     {
@@ -513,7 +524,7 @@ loop:
       if (mode == _P_OVERLAY)
 	myself.set_acl();
 
-      char wstname[1024] = { '\0' };
+      WCHAR wstname[1024] = { L'\0' };
       HWINSTA hwst_orig = NULL, hwst = NULL;
       HDESK hdsk_orig = NULL, hdsk = NULL;
       PSECURITY_ATTRIBUTES sa;
@@ -521,16 +532,16 @@ loop:
 
       hwst_orig = GetProcessWindowStation ();
       hdsk_orig = GetThreadDesktop (GetCurrentThreadId ());
-      GetUserObjectInformation (hwst_orig, UOI_NAME, wstname, 1024, &n);
+      GetUserObjectInformationW (hwst_orig, UOI_NAME, wstname, 1024, &n);
       /* Prior to Vista it was possible to start a service with the
 	 "Interact with desktop" flag.  This started the service in the
 	 interactive window station of the console.  A big security
 	 risk, but we don't want to disable this behaviour for older
 	 OSes because it's still heavily used by some users.  They have
 	 been warned. */
-      if (!ascii_strcasematch (wstname, "WinSta0"))
+      if (wcscasecmp (wstname, L"WinSta0") != 0)
 	{
-	  char sid[128];
+	  WCHAR sid[128];
 
 	  sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
 			 cygheap->user.sid ());
@@ -540,34 +551,34 @@ loop:
 	     make sense in terms of security to create a new window
 	     station for every logon of the same user.  It just fills up
 	     the system with window stations for no good reason. */
-	  hwst = CreateWindowStationA (cygheap->user.get_windows_id (sid), 0,
+	  hwst = CreateWindowStationW (cygheap->user.get_windows_id (sid), 0,
 				       GENERIC_READ | GENERIC_WRITE, sa);
 	  if (!hwst)
 	    system_printf ("CreateWindowStation failed, %E");
 	  else if (!SetProcessWindowStation (hwst))
 	    system_printf ("SetProcessWindowStation failed, %E");
-	  else if (!(hdsk = CreateDesktopA ("Default", NULL, NULL, 0,
+	  else if (!(hdsk = CreateDesktopW (L"Default", NULL, NULL, 0,
 					    GENERIC_ALL, sa)))
 	    system_printf ("CreateDesktop failed, %E");
 	  else
 	    {
-	      stpcpy (stpcpy (wstname, sid), "\\Default");
+	      wcpcpy (wcpcpy (wstname, sid), L"\\Default");
 	      si.lpDesktop = wstname;
-	      debug_printf ("Desktop: %s", si.lpDesktop);
+	      debug_printf ("Desktop: %W", si.lpDesktop);
 	    }
 	}
 
-      rc = CreateProcessAsUser (cygheap->user.primary_token (),
-		       runpath,		/* image name - with full path */
-		       one_line.buf,	/* what was passed to exec */
-		       &sec_none_nih,   /* process security attrs */
-		       &sec_none_nih,   /* thread security attrs */
-		       TRUE,		/* inherit handles from parent */
-		       c_flags,
-		       envblock,	/* environment */
-		       NULL,
-		       &si,
-		       &pi);
+      rc = CreateProcessAsUserW (cygheap->user.primary_token (),
+			   runpath,	  /* image name - with full path */
+			   wone_line,	  /* what was passed to exec */
+			   &sec_none_nih, /* process security attrs */
+			   &sec_none_nih, /* thread security attrs */
+			   TRUE,	  /* inherit handles from parent */
+			   c_flags,
+			   envblock,	  /* environment */
+			   NULL,
+			   &si,
+			   &pi);
       if (hwst)
 	{
 	  SetProcessWindowStation (hwst_orig);
@@ -952,16 +963,22 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
       char *pgm = NULL;
       char *arg1 = NULL;
       char *ptr, *buf;
+      OBJECT_ATTRIBUTES attr;
+      IO_STATUS_BLOCK io;
+      HANDLE h;
+      NTSTATUS status;
 
-      HANDLE h = CreateFile (real_path.get_win32 (), GENERIC_READ,
-			       FILE_SHARE_READ | FILE_SHARE_WRITE,
-			       &sec_none_nih, OPEN_EXISTING,
-			       FILE_ATTRIBUTE_NORMAL, 0);
-      if (h == INVALID_HANDLE_VALUE)
+      status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
+			   real_path.get_object_attr (attr, sec_none_nih),
+			   &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT
+			   | FILE_NON_DIRECTORY_FILE);
+      if (!NT_SUCCESS (status))
 	goto err;
 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
-      CloseHandle (h);
+      NtClose (h);
       if (!hm)
 	{
 	  /* ERROR_FILE_INVALID indicates very likely an empty file. */

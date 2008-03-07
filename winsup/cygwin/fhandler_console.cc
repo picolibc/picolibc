@@ -1919,7 +1919,7 @@ fhandler_console::need_invisible ()
       USEROBJECTFLAGS oi;
       DWORD len;
       if (!horig
-	  || !GetUserObjectInformation (horig, UOI_FLAGS, &oi, sizeof (oi), &len)
+	  || !GetUserObjectInformationW (horig, UOI_FLAGS, &oi, sizeof (oi), &len)
 	  || !(oi.dwFlags & WSF_VISIBLE))
 	{
 	  b = true;
@@ -1930,7 +1930,7 @@ fhandler_console::need_invisible ()
 	{
 	  if (myself->ctty != TTY_CONSOLE)
 	    {
-	      h = CreateWindowStation (NULL, 0, WINSTA_ACCESS, NULL);
+	      h = CreateWindowStationW (NULL, 0, WINSTA_ACCESS, NULL);
 	      termios_printf ("%p = CreateWindowStation(NULL), %E", h);
 	      if (h)
 		{

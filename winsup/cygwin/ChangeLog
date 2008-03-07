@@ -1,3 +1,52 @@
+2008-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add tls_pbuf.o.
+	* autoload.cc (CreateDesktopW): Replace CreateDesktopA.
+	(CreateWindowStationW): Replace CreateWindowStationA.
+	(GetUserObjectInformationW): Replace GetUserObjectInformationA.
+	* cygheap.h (cwdstuff::get): Assume default buffer size NT_MAX_PATH.
+	* cygtls.cc (_cygtls::remove): Free temporary TLS path buffers.
+	* cygtls.h (TP_NUM_C_BUFS): Define.
+	(TP_NUM_W_BUFS): Define.
+	(class tls_pathbuf): New class to store pointers to thread local 
+	temporary path buffers.
+	(_local_storage::pathbufs): New member.
+	* environ.cc (win_env::add_cache): Use temporary TLS path buffer instead
+	of stack based buffer.
+	(posify): Get temporary outenv buffer from calling function.
+	(environ_init): Create temporary TLS path buffer for posify.
+	(build_env): Create Windows environment block as WCHAR buffer.
+	* environ.h (build_env): Change declaration accordingly.
+	* external.cc (sync_winenv): Accommodate build_env change.
+	* fhandler_console.cc (fhandler_console::need_invisible): Use
+	GetUserObjectInformationW and CreateWindowStationW.
+	* fhandler_process.cc (format_process_maps): Use temporary TLS path
+	buffer instead of stack based buffer.
+	* fork.cc (frok::parent): Convert to use CreateProcessW.
+	* path.cc: Throughout use temporary TLS path buffers instead of stack
+	based buffer.  Replace checks for CYG_MAX_PATH by checks for
+	NT_MAX_PATH.
+	(getfileattr): New function to replace GetFileAttributesA.
+	(normalize_win32_path): Remove Win32 and NT long path prefixes.
+	(getwd): Assume PATH_MAX + 1 buffer per SUSv3.
+	* path.h (class path_conv): Set path buffer to size NT_MAX_PATH.
+	(iswdrive): Define.
+	* pinfo.cc (commune_process): Use temporary TLS path buffer instead of
+	stack based buffer.
+	* registry.cc (get_registry_hive_path): Ditto.
+	(load_registry_hive): Ditto.
+	* spawn.cc (spawn_guts): Convert to use CreateProcessW and
+	CreateProcessAsUserW.
+	(av::fixup): Open/close file using NtOpenFile/NtClose.
+	* syscalls.cc (mknod_worker): Allow PATH_MAX file name.
+	(mknod32): Ditto.
+	(getusershell): Ditto.
+	* tls_pbuf.cc: New file implementing tls_pathbuf and tmp_pathbuf
+	methods.
+	* tls_pbuf.h: New header for files using tmp_pathbuf.
+	* tlsoffsets.h: Regenerate.
+	* winsup.h (NT_MAX_PATH): Define as 32767 to avoid USHORT overflow.
+
 2008-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.

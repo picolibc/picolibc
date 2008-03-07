@@ -23,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include <sys/param.h>
 #include <assert.h>
 #include <sys/sysmacros.h>
@@ -525,8 +526,10 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
   DWORD_PTR wset_size;
   DWORD_PTR *workingset = NULL;
   MODULEINFO info;
-  WCHAR modname[NT_MAX_PATH];
-  char posix_modname[NT_MAX_PATH];
+
+  tmp_pathbuf tp;
+  PWCHAR modname = tp.w_get ();
+  char *posix_modname = tp.c_get ();
 
   if (!EnumProcessModules (proc, NULL, 0, &needed))
     {
@@ -552,7 +555,7 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
     }
   for (i = 0; i < needed / sizeof (HMODULE); i++)
     if (GetModuleInformation (proc, modules[i], &info, sizeof info)
-	&& GetModuleFileNameExW (proc, modules[i], modname, sizeof modname))
+	&& GetModuleFileNameExW (proc, modules[i], modname, NT_MAX_PATH))
       {
 	char access[5];
 	strcpy (access, "r--p");

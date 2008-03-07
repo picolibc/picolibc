@@ -283,7 +283,7 @@ class path_conv
   DWORD get_symlink_length () { return symlink_length; };
  private:
   DWORD symlink_length;
-  char path[CYG_MAX_PATH];
+  char path[NT_MAX_PATH];
 };
 
 /* Symlink marker */
@@ -310,6 +310,7 @@ const char * __stdcall find_exec (const char *name, path_conv& buf,
 
 /* Common macros for checking for invalid path names */
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
+#define iswdrive(s) (iswalpha (*(s)) && (s)[1] == L':')
 
 static inline bool
 has_exec_chars (const char *buf, int len)

@@ -230,7 +230,7 @@ struct cwdstuff
   HANDLE dir;
   DWORD drive_length;
   static muto cwd_lock;
-  char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
+  char *get (char *, int = 1, int = 0, unsigned = NT_MAX_PATH);
   HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
   {

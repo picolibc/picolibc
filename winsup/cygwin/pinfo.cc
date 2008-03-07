@@ -33,6 +33,7 @@ details. */
 #include "fhandler.h"
 #include "cygmalloc.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include "child_info.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
@@ -392,7 +393,8 @@ DWORD WINAPI
 commune_process (void *arg)
 {
   siginfo_t& si = *((siginfo_t *) arg);
-  char path[NT_MAX_PATH];
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
   DWORD nr;
   HANDLE& tothem = si._si_commune._si_write_handle;
   HANDLE process_sync =

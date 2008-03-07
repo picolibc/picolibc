@@ -2336,7 +2336,7 @@ static int __stdcall
 mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
 	      _minor_t minor)
 {
-  char buf[sizeof (":\\00000000:00000000:00000000") + CYG_MAX_PATH];
+  char buf[sizeof (":\\00000000:00000000:00000000") + PATH_MAX];
   sprintf (buf, ":\\%x:%x:%x", major, minor,
 	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
   return symlink_worker (buf, path, true, true);
@@ -2354,7 +2354,7 @@ mknod32 (const char *path, mode_t mode, __dev32_t dev)
       return -1;
     }
 
-  if (strlen (path) >= CYG_MAX_PATH)
+  if (strlen (path) >= PATH_MAX)
     return -1;
 
   path_conv w32path (path, PC_SYM_NOFOLLOW);
@@ -3327,7 +3327,7 @@ getusershell ()
     "/usr/bin/csh",
     NULL
   };
-  static char buf[CYG_MAX_PATH];
+  static char buf[PATH_MAX];
   int ch, buf_idx;
 
   if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
@@ -3342,11 +3342,11 @@ getusershell ()
   /* Get each non-whitespace character as part of the shell path as long as
      it fits in buf. */
   for (buf_idx = 0;
-       ch != EOF && !isspace (ch) && buf_idx < CYG_MAX_PATH;
+       ch != EOF && !isspace (ch) && buf_idx < PATH_MAX;
        buf_idx++, ch = getc (shell_fp))
     buf[buf_idx] = ch;
   /* Skip any trailing non-whitespace character not fitting in buf.  If the
-     path is longer than CYG_MAX_PATH, it's invalid anyway. */
+     path is longer than PATH_MAX, it's invalid anyway. */
   while (ch != EOF && !isspace (ch))
     ch = getc (shell_fp);
   if (buf_idx)

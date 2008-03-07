@@ -171,6 +171,9 @@ _cygtls::remove (DWORD wait)
       free_local (hostent_buf);
     }
 
+  /* Free temporary TLS path buffers. */
+  locals.pathbufs.destroy ();
+
   do
     {
       sentry here (wait);

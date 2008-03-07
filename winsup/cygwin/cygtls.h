@@ -33,7 +33,23 @@ details. */
 
 #include "cygthread.h"
 
+#define TP_NUM_C_BUFS 10
+#define TP_NUM_W_BUFS 10
+
 #pragma pack(push,4)
+/* Defined here to support auto rebuild of tlsoffsets.h. */
+class tls_pathbuf
+{
+  int c_cnt;
+  int w_cnt;
+  char  *c_buf[TP_NUM_C_BUFS];
+  WCHAR *w_buf[TP_NUM_W_BUFS];
+
+public:
+  void destroy ();
+  friend class tmp_pathbuf;
+};
+
 struct _local_storage
 {
   /*
@@ -96,6 +112,9 @@ struct _local_storage
   /* syscalls.cc */
   int setmode_file;
   int setmode_mode;
+
+  /* All functions requiring temporary path buffers. */
+  tls_pathbuf pathbufs;
 };
 
 typedef struct struct_waitq

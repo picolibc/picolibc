@@ -13,6 +13,7 @@ details. */
 #include <stddef.h>
 #include <string.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <ctype.h>
 #include <assert.h>
 #include <sys/cygwin.h>
@@ -27,6 +28,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include "registry.h"
 #include "environ.h"
 #include "child_info.h"
@@ -117,7 +119,8 @@ win_env::add_cache (const char *in_posix, const char *in_native)
     }
   else
     {
-      char buf[NT_MAX_PATH];
+      tmp_pathbuf tp;
+      char *buf = tp.c_get ();
       strcpy (buf, name + namelen);
       towin32 (in_posix, buf);
       native = (char *) realloc (native, namelen + 1 + strlen (buf));
@@ -173,7 +176,7 @@ getwinenv (const char *env, const char *in_posix, win_env *temp)
 /* Convert windows path specs to POSIX, if appropriate.
  */
 static void __stdcall
-posify (char **here, const char *value)
+posify (char **here, const char *value, char *outenv)
 {
   char *src = *here;
   win_env *conv;
@@ -186,7 +189,6 @@ posify (char **here, const char *value)
   /* Turn all the items from c:<foo>;<bar> into their
      mounted equivalents - if there is one.  */
 
-  char outenv[1 + len + NT_MAX_PATH];
   memcpy (outenv, src, len);
   char *newvalue = outenv + len;
   if (!conv->toposix (value, newvalue) || _impure_ptr->_errno != EIDRM)
@@ -740,6 +742,7 @@ environ_init (char **envp, int envc)
   bool got_something_from_registry;
   static char NO_COPY cygterm[] = "TERM=cygwin";
   myfault efault;
+  tmp_pathbuf tp;
 
   if (efault.faulted ())
     api_fatal ("internal error reading the windows environment - too many environment variables?");
@@ -804,6 +807,7 @@ environ_init (char **envp, int envc)
      form "=X:=X:\foo\bar; these must be changed into something legal
      (we could just ignore them but maybe an application will
      eventually want to use them).  */
+  char *tmpbuf = tp.t_get ();
   for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
     {
       sys_wcstombs_alloc (&newp, HEAP_NOTHEAP, w);
@@ -820,7 +824,7 @@ environ_init (char **envp, int envc)
       if (*newp == 'C' && strncmp (newp, "CYGWIN=", sizeof ("CYGWIN=") - 1) == 0)
 	parse_options (newp + sizeof ("CYGWIN=") - 1);
       if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
-	posify (envp + i, *++eq ? eq : --eq);
+	posify (envp + i, *++eq ? eq : --eq, tmpbuf);
       debug_printf ("%p: %s", envp[i], envp[i]);
     }
 
@@ -957,7 +961,7 @@ spenv::retrieve (bool no_envblock, const char *const env)
    Converts environment variables noted in conv_envvars into win32 form
    prior to placing them in the string.  */
 char ** __stdcall
-build_env (const char * const *envp, char *&envblock, int &envc,
+build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	   bool no_envblock)
 {
   int len, n;
@@ -1041,8 +1045,8 @@ build_env (const char * const *envp, char *&envblock, int &envc,
       qsort (pass_env, pass_envc, sizeof (char *), env_sort);
 
       /* Create an environment block suitable for passing to CreateProcess.  */
-      char *s;
-      envblock = (char *) malloc (2 + tl);
+      PWCHAR s;
+      envblock = (PWCHAR) malloc ((2 + tl) * sizeof (WCHAR));
       int new_tl = 0;
       for (srcp = pass_env, s = envblock; *srcp; srcp++)
 	{
@@ -1067,20 +1071,14 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	    p = *srcp;		/* Don't worry about it */
 
 	  len = strlen (p) + 1;
-	  if (len >= 32 * 1024)
-	    {
-	      free (envblock);
-	      envblock = NULL;
-	      goto out;
-	    }
 	  new_tl += len;	/* Keep running total of block length so far */
 
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
 	    {
 	      tl = new_tl + 100;
-	      char *new_envblock =
-			(char *) realloc (envblock, 2 + tl);
+	      PWCHAR new_envblock =
+			(PWCHAR) realloc (envblock, (2 + tl) * sizeof (WCHAR));
 	      /* If realloc moves the block, move `s' with it. */
 	      if (new_envblock != envblock)
 		{
@@ -1089,23 +1087,22 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 		}
 	    }
 
-	  memcpy (s, p, len);
+	  int slen = sys_mbstowcs (s, len, p, len);
 
 	  /* See if environment variable is "special" in a Windows sense.
 	     Under NT, the current directories for visited drives are stored
 	     as =C:=\bar.  Cygwin converts the '=' to '!' for hopefully obvious
 	     reasons.  We need to convert it back when building the envblock */
-	  if (s[0] == '!' && (isdrive (s + 1) || (s[1] == ':' && s[2] == ':'))
-	      && s[3] == '=')
-	    *s = '=';
-	  s += len;
+	  if (s[0] == L'!' && (iswdrive (s + 1) || (s[1] == L':' && s[2] == L':'))
+	      && s[3] == L'=')
+	    *s = L'=';
+	  s += slen + 1;
 	}
-      *s = '\0';			/* Two null bytes at the end */
+      *s = L'\0';			/* Two null bytes at the end */
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end
 					   of buffer */
     }
 
-out:
   debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;
 }

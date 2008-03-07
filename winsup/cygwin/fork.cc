@@ -24,6 +24,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include "perprocess.h"
 #include "dll_init.h"
 #include "sync.h"
@@ -348,16 +349,21 @@ frok::parent (volatile char * volatile stack_here)
 		ch.stackbottom, ch.stacktop, ch.stacksize);
 
   PROCESS_INFORMATION pi;
-  STARTUPINFO si;
+  STARTUPINFOW si;
 
   memset (&si, 0, sizeof (si));
-  si.cb = sizeof (STARTUPINFO);
+  si.cb = sizeof si;
 
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %p, 0, 0, %p, %p)",
-		  myself->progname, myself->progname, c_flags, &si, &pi);
+  /* FIXME: myself->progname should be converted to WCHAR. */
+  tmp_pathbuf tp;
+  PWCHAR progname = tp.w_get ();
+  sys_mbstowcs (progname, NT_MAX_PATH, myself->progname);
+
+  syscall_printf ("CreateProcess (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
+		  progname, progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
 
@@ -367,21 +373,21 @@ frok::parent (volatile char * volatile stack_here)
 
   while (1)
     {
-      rc = CreateProcess (myself->progname, /* image to run */
-			  myself->progname, /* what we send in arg0 */
-			  &sec_none_nih,
-			  &sec_none_nih,
-			  TRUE,	  /* inherit handles from parent */
-			  c_flags,
-			  NULL,	  /* environment filled in later */
-			  0,	  /* use current drive/directory */
-			  &si,
-			  &pi);
+      rc = CreateProcessW (progname, /* image to run */
+			   progname, /* what we send in arg0 */
+			   &sec_none_nih,
+			   &sec_none_nih,
+			   TRUE,	  /* inherit handles from parent */
+			   c_flags,
+			   NULL,	  /* environment filled in later */
+			   0,	  /* use current drive/directory */
+			   &si,
+			   &pi);
 
       if (!rc)
 	{
 	  this_errno = geterrno_from_win_error ();
-	  error = "CreateProcessA failed";
+	  error = "CreateProcessW failed";
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;
 	}

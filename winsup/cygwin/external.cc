@@ -32,6 +32,7 @@ details. */
 #include "environ.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 child_info *get_cygwin_startup_info ();
 
@@ -137,9 +138,9 @@ static void
 sync_winenv ()
 {
   int unused_envc;
-  char *envblock = NULL;
+  PWCHAR envblock = NULL;
   char **envp = build_env (cur_environ (), envblock, unused_envc, false);
-  char *p = envblock;
+  PWCHAR p = envblock;
 
   if (envp)
     {
@@ -151,14 +152,14 @@ sync_winenv ()
     return;
   while (*p)
     {
-      char *eq = strchr (p, '=');
+      PWCHAR eq = wcschr (p, L'=');
       if (eq)
 	{
-	  *eq = '\0';
-	  SetEnvironmentVariable (p, ++eq);
+	  *eq = L'\0';
+	  SetEnvironmentVariableW (p, ++eq);
 	  p = eq;
 	}
-      p = strchr (p, '\0') + 1;
+      p = wcschr (p, L'\0') + 1;
     }
   free (envblock);
 }

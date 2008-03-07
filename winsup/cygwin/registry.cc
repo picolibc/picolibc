@@ -19,6 +19,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "tls_pbuf.h"
 #include <wchar.h>
 static const char cygnus_class[] = "cygnus";
 
@@ -220,12 +221,13 @@ get_registry_hive_path (const PWCHAR name, PWCHAR path)
   wcpcpy (kend, name);
   if (!RegOpenKeyExW (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
-      WCHAR buf[NT_MAX_PATH];
+      tmp_pathbuf tp;
+      PWCHAR buf = tp.w_get ();
       DWORD type, siz;
 
       path[0] = L'\0';
       if (!RegQueryValueExW (hkey, L"ProfileImagePath", 0, &type,
-			     (BYTE *)buf, (siz = sizeof (buf), &siz)))
+			     (BYTE *)buf, (siz = NT_MAX_PATH, &siz)))
 	ExpandEnvironmentStringsW (buf, path, NT_MAX_PATH);
       RegCloseKey (hkey);
       if (path[0])
@@ -238,7 +240,8 @@ get_registry_hive_path (const PWCHAR name, PWCHAR path)
 void
 load_registry_hive (const PWCHAR name)
 {
-  WCHAR path[NT_MAX_PATH];
+  tmp_pathbuf tp;
+  PWCHAR path = tp.w_get ();
   HKEY hkey;
   LONG ret;
 
