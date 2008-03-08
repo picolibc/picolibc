@@ -1,3 +1,8 @@
+2008-03-08  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in: Reorganize considerably, using GNU make's
+	static pattern rules and target-specific variables.
+
 2008-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkpasswd.c (main): Simplify generating SYSTEM entry.  Add entries
