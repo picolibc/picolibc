@@ -612,7 +612,7 @@ done:
 		status, x, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, create_options);
 
-  syscall_printf ("%d = fhandler_base::open (%s, %p)",
+  syscall_printf ("%d = fhandler_base::open (%S, %p)",
 		  res, pc.get_nt_native_path (), flags);
   return res;
 }

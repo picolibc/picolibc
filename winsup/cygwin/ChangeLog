@@ -1,3 +1,8 @@
+2008-03-07  Brian Dessent  <brian@dessent.net>
+
+	* fhandler.cc (fhandler_base::open): Use %S for PUNICODE_STRING.
+	* syscalls.cc (setmode): Ditto.
+
 2008-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::sendto): Never send more than

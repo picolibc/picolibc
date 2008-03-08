@@ -2053,7 +2053,7 @@ setmode (int fd, int mode)
   else
     cfd->set_flags ((cfd->get_flags () & ~(O_TEXT | O_BINARY)) | mode);
 
-  syscall_printf ("(%d<%s>, %p) returning %s", fd,
+  syscall_printf ("(%d<%S>, %p) returning %s", fd,
 		  cfd->pc.get_nt_native_path (), mode,
 		  res & O_TEXT ? "text" : "binary");
   return res;
