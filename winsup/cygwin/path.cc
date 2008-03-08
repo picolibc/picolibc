@@ -2765,10 +2765,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      reasonable guesses for popular types. */
 
   fs_info mntinfo;
+  tmp_pathbuf tp;
   UNICODE_STRING unat;
-  /* Size must allow prepending the native NT path prefixes. */
-  size_t size = (strlen (native_path) + 10) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&unat, (PWSTR) alloca (size), size);
+  RtlInitEmptyUnicodeString (&unat, tp.w_get (), NT_MAX_PATH * sizeof (WCHAR));
   get_nt_native_path (native_path, unat);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
@@ -3027,6 +3026,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   NTSTATUS status;
   HANDLE fh;
   FILE_BASIC_INFORMATION fbi;
+  tmp_pathbuf tp;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -3057,7 +3057,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   win32_newpath.check (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
   if (use_winsym && !win32_newpath.exists ())
     {
-      char *newplnk = (char *) alloca (len + 5);
+      char *newplnk = tp.c_get ();
       stpcpy (stpcpy (newplnk, newpath), ".lnk");
       win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX);
     }
@@ -3098,7 +3098,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	    {
 	      len = strrchr (win32_newpath.normalized_path, '/')
 		    - win32_newpath.normalized_path + 1;
-	      char *absoldpath = (char *) alloca (len + strlen (oldpath) + 1);
+	      char *absoldpath = tp.t_get ();
 	      stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path, len),
 		      oldpath);
 	      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -3156,13 +3156,12 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       if (isdevice)
 	{
 	  relpath_len = oldpath_len;
-	  stpcpy (relpath = (char *) alloca (relpath_len + 1), oldpath);
+	  stpcpy (relpath = tp.c_get (), oldpath);
 	}
       else
 	{
 	  relpath_len = strlen (win32_oldpath.get_win32 ());
-	  stpcpy (relpath = (char *) alloca (relpath_len + 1),
-		  win32_oldpath.get_win32 ());
+	  stpcpy (relpath = tp.c_get (), win32_oldpath.get_win32 ());
 	}
       full_len += sizeof (unsigned short) + relpath_len;
       full_len += sizeof (unsigned short) + oldpath_len;
@@ -3511,6 +3510,7 @@ enum
   SCAN_LNK,
   SCAN_HASLNK,
   SCAN_JUSTCHECK,
+  SCAN_JUSTCHECKTHIS, /* Never try to append a suffix. */
   SCAN_APPENDLNK,
   SCAN_EXTRALNK,
   SCAN_DONE,
@@ -3534,7 +3534,9 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
   nextstate = SCAN_BEG;
   suffixes = suffixes_start = in_suffixes;
 
-  char *ext_here = strrchr (in_path, '.');
+  const char *fname = strrchr (in_path, '\\');
+  fname = fname ? fname + 1 : in_path;
+  char *ext_here = strrchr (fname, '.');
   path = in_path;
   eopath = strchr (path, '\0');
 
@@ -3564,6 +3566,12 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
   ext_here = eopath;
 
  done:
+  /* Avoid attaching suffixes if the resulting filename would be invalid. */
+  if (eopath - fname > NAME_MAX - 4)
+    {
+      nextstate = SCAN_JUSTCHECKTHIS;
+      suffixes = NULL;
+    }
   return ext_here;
 }
 
@@ -3594,6 +3602,9 @@ suffix_scan::next ()
 	    return 0;
 	  case SCAN_JUSTCHECK:
 	    nextstate = SCAN_LNK;
+	    return 1;
+	  case SCAN_JUSTCHECKTHIS:
+	    nextstate = SCAN_DONE;
 	    return 1;
 	  case SCAN_LNK:
 	  case SCAN_APPENDLNK:
@@ -3710,10 +3721,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
   /* TODO: Temporarily do all char->UNICODE conversion here.  This should
      already be slightly faster than using Ascii functions. */
+  tmp_pathbuf tp;
   UNICODE_STRING upath;
   OBJECT_ATTRIBUTES attr;
-  size_t len = (strlen (path) + 8 + 8 + 1) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&upath, (PCWSTR) alloca (len), len);
+  RtlInitEmptyUnicodeString (&upath, tp.w_get (), NT_MAX_PATH * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
   while (suffix.next ())
@@ -3746,7 +3757,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      || status == STATUS_OBJECT_NAME_INVALID)
 	    {
 	      set_error (ENOENT);
-	      break;
+	      goto file_not_symlink;
 	    }
 	  if (status != STATUS_OBJECT_NAME_NOT_FOUND
 	      && status != STATUS_NO_SUCH_FILE) /* File not found on 9x share */
@@ -4223,12 +4234,11 @@ realpath (const char *path, char *resolved)
   if (efault.faulted (EFAULT))
     return NULL;
 
+  tmp_pathbuf tp;
   char *tpath;
   if (isdrive (path))
     {
-      tpath = (char *) alloca (strlen (path)
-			       + strlen (mount_table->cygdrive)
-			       + 1);
+      tpath = tp.c_get ();
       mount_table->cygdrive_posix_path (path, tpath, 0);
     }
   else

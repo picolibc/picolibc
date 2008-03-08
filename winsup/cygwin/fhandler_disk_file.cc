@@ -1542,7 +1542,7 @@ fhandler_disk_file::rmdir ()
 
 #define DIR_BUF_SIZE	(DIR_NUM_ENTRIES \
 			 * (sizeof (FILE_ID_BOTH_DIR_INFORMATION) \
-			    + 2 * (NAME_MAX + 1)))
+			    + (NAME_MAX + 1) * sizeof (WCHAR)))
 
 struct __DIR_cache
 {
@@ -1786,7 +1786,8 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
     }
 
   char tmp[NAME_MAX + 1];
-  sys_wcstombs (tmp, NAME_MAX, fname->Buffer, fname->Length / sizeof (WCHAR));
+  sys_wcstombs (tmp, NAME_MAX + 1, fname->Buffer,
+  		fname->Length / sizeof (WCHAR));
   if (pc.isencoded ())
     fnunmunge (de->d_name, tmp);
   else

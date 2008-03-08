@@ -1,3 +1,19 @@
+2008-03-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (DIR_BUF_SIZE): Define required space for file
+	name in terms of sizeof(WCHAR).
+	(fhandler_disk_file::readdir_helper): Convert *all* of fname.
+	* path.cc (fillout_mntent): Use tmp_pathbuf for path buffer.
+	(symlink_worker): Ditto.
+	(SCAN_JUSTCHECKTHIS): New state for suffix_scan to define
+	that only the actual name gets cheked and a suffix is never attached.
+	(suffix_scan::has): If filename + suffix would be > NAME_MAX, start
+	in SCAN_JUSTCHECKTHIS state.
+	(suffix_scan::next): Add case for SCAN_JUSTCHECKTHIS.
+	(symlink_info::check): Use tmp_pathbuf for path buffer.  Goto
+	file_not_symlink in case of invalid file name.
+	(realpath): Use tmp_pathbuf for path buffer.
+
 2008-03-07  Brian Dessent  <brian@dessent.net>
 
 	* dtable.cc (handle_to_fn): Null-terminate posix_fn in the case
