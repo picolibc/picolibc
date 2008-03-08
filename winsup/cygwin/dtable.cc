@@ -952,6 +952,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 	  *d = '/';
 	else
 	  *d = *s;
+      *d = 0;
     }
 
   debug_printf ("derived path '%s', posix '%s'", w32, posix_fn);

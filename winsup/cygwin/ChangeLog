@@ -1,5 +1,10 @@
 2008-03-07  Brian Dessent  <brian@dessent.net>
 
+	* dtable.cc (handle_to_fn): Null-terminate posix_fn in the case
+	of justslash = true.
+
+2008-03-07  Brian Dessent  <brian@dessent.net>
+
 	* fhandler.cc (fhandler_base::open): Use %S for PUNICODE_STRING.
 	* syscalls.cc (setmode): Ditto.
 
