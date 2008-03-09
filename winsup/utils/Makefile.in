@@ -99,9 +99,22 @@ else
 all: warn_cygcheck_zlib
 endif
 
-# the rest of this file contains generic rules
-
 all: Makefile $(CYGWIN_BINS) $(MINGW_BINS)
+
+# test harness support (note: the "MINGW_BINS +=" should come after the
+# "all:" above so that the testsuite is not run for "make" but only
+# "make check".)
+MINGW_BINS += testsuite.exe
+MINGW_OBJS += path-testsuite.o testsuite.o
+testsuite.exe: path-testsuite.o
+path-testsuite.cc: path.cc ; @test -L $@ || ln -sf ${filter %.cc,$^} $@
+path-testsuite.o: MINGW_CXXFLAGS += -DTESTSUITE
+# this is necessary because this .c lives in the build dir instead of src
+path-testsuite.o: MINGW_CXX := ${patsubst -I.,-I$(utils_source),$(MINGW_CXX)}
+path-testsuite.cc path.cc testsuite.cc: testsuite.h
+check: testsuite.exe ; $(<D)/$(<F)
+
+# the rest of this file contains generic rules
 
 # how to compile a MinGW object
 $(MINGW_OBJS): %.o: %.cc
@@ -137,7 +150,7 @@ $(MINGW_BINS): $(MINGW_DEP_LDLIBS)
 $(CYGWIN_BINS): $(ALL_DEP_LDLIBS)
 
 clean:
-	rm -f *.o $(CYGWIN_BINS) $(MINGW_BINS)
+	rm -f *.o $(CYGWIN_BINS) $(MINGW_BINS) path-testsuite.cc testsuite.exe
 
 realclean: clean
 	rm -f Makefile config.cache

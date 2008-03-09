@@ -1,5 +1,27 @@
 2008-03-08  Brian Dessent  <brian@dessent.net>
 
+	* Makefile.in: Add a 'check' target that builds and runs
+	testsuite.exe from path-testsuite.o and testsuite.o.
+	* path.cc: Include testsuite.h.
+	(struct mnt): Change to a mnt_t typedef and don't define
+	mount_table when TESTSUITE is defined.
+	(find2): Don't include when TESTSUITE is defined to avoid warning.
+	(get_cygdrive0): Ditto.
+	(get_cygdrive): Ditto.
+	(read_mounts): Provide empty implementation when TESTSUITE is
+	defined.
+	(vconcat): Use the isslash macro.
+	(unconvert_slashes): New helper to convert to backslashses.
+	(rel_vconcat): Handle relative paths more gracefully.
+	(cygpath): Skip a leading "./" sequence.  Avoid double-slashes.
+	Normalize final output to backslashes and remove redundant path
+	sequences.
+	* testsuite.cc: New file implementing testsuite driver.
+	* testsuite.h: New header implementing harness mount table and
+	series of tests.
+
+2008-03-08  Brian Dessent  <brian@dessent.net>
+
 	* Makefile.in: Reorganize considerably, using GNU make's
 	static pattern rules and target-specific variables.
 

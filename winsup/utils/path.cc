@@ -1,6 +1,6 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,6 +22,7 @@ details. */
 #include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/mount.h"
 #include "cygwin/include/mntent.h"
+#include "testsuite.h"
 
 /* Used when treating / and \ as equivalent. */
 #define isslash(ch) \
@@ -227,16 +228,27 @@ readlink (HANDLE fh, char *path, int maxlen)
   return true;
 }
 
-static struct mnt
+typedef struct mnt
   {
     const char *native;
     char *posix;
     unsigned flags;
     int issys;
-  } mount_table[255];
+  } mnt_t;
+
+#ifndef TESTSUITE
+static mnt_t mount_table[255];
+#else
+#  define TESTSUITE_MOUNT_TABLE
+#  include "testsuite.h"
+#  undef TESTSUITE_MOUNT_TABLE
+#endif
 
 struct mnt *root_here = NULL;
 
+/* These functions aren't called when defined(TESTSUITE) which results
+   in a compiler warning.  */
+#ifndef TESTSUITE
 static char *
 find2 (HKEY rkey, unsigned *flags, char *what)
 {
@@ -288,10 +300,14 @@ get_cygdrive (HKEY key, mnt *m, int issystem)
   m->issys = issystem;
   return m + 1;
 }
+#endif
 
 static void
 read_mounts ()
 {
+/* If TESTSUITE is defined, bypass this whole function as a harness
+   mount table will be provided.  */
+#ifndef TESTSUITE
   DWORD posix_path_size;
   int res;
   struct mnt *m = mount_table;
@@ -358,6 +374,7 @@ read_mounts ()
 	}
       RegCloseKey (key);
     }
+#endif /* !defined(TESTSUITE) */
 }
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
@@ -439,7 +456,7 @@ vconcat (const char *s, va_list v)
 	  *d++ = *++p;
 	  *d++ = *++p;
 	}
-      else if (*p == '/' || *p == '\\')
+      else if (isslash (*p))
 	{
 	  if (p == rv && unc)
 	    *d++ = *p++;
@@ -460,6 +477,13 @@ concat (const char *s, ...)
   va_start (v, s);
 
   return vconcat (s, v);
+}
+
+static void
+unconvert_slashes (char* name)
+{
+  while ((name = strchr (name, '/')) != NULL)
+    *name++ = '\\';
 }
 
 static char *
@@ -487,13 +511,22 @@ rel_vconcat (const char *s, va_list v)
       match = m;
     }
 
-  if (match)
-    strcpy (path, match->posix);
+  char *temppath;
+  if (!match)
+    // No prefix matched - best effort to return meaningful value.
+    temppath = concat (path, "/", s, NULL);
+  else if (strcmp (match->posix, "/") != 0)
+    // Matched on non-root.  Copy matching prefix + remaining 'path'.
+    temppath = concat (match->posix, path + max_len, "/", s, NULL);
+  else if (path[max_len] == '\0')
+    // Matched on root and there's no remaining 'path'.
+    temppath = concat ("/", s, NULL);
+  else if (isslash (path[max_len]))
+    // Matched on root but remaining 'path' starts with a slash anyway.
+    temppath = concat (path + max_len, "/", s, NULL);
+  else
+    temppath = concat ("/", path + max_len, "/", s, NULL);
 
-  if (!isslash (strchr (path, '\0')[-1]))
-    strcat (path, "/");
-
-  char *temppath = concat (path, s, NULL);
   char *res = vconcat (temppath, v);
   free (temppath);
   return res;
@@ -510,6 +543,9 @@ cygpath (const char *s, ...)
     read_mounts ();
   va_start (v, s);
   char *path;
+  if (s[0] == '.' && isslash (s[1]))
+    s += 2;
+
   if (s[0] == '/' || s[1] == ':')	/* FIXME: too crude? */
     path = vconcat (s, v);
   else
@@ -538,10 +574,15 @@ cygpath (const char *s, ...)
     native = strdup (path);
   else if (max_len == (int) strlen (path))
     native = strdup (match->native);
+  else if (isslash (path[max_len]))
+    native = concat (match->native, path + max_len, NULL);
   else
     native = concat (match->native, "\\", path + max_len, NULL);
   free (path);
 
+  unconvert_slashes (native);
+  for (char *s = strstr (native + 1, "\\.\\"); s && *s; s = strstr (s, "\\.\\"))
+    memmove (s + 1, s + 3, strlen (s + 3) + 1);
   return native;
 }
 
