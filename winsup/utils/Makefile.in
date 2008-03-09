@@ -157,7 +157,7 @@ realclean: clean
 
 install: all
 	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
-	for i in $(CYGWIN_BINS) $(MINGW_BINS) ; do \
+	for i in $(CYGWIN_BINS) ${filter-out testsuite.exe,$(MINGW_BINS)} ; do \
 	  n=`echo $$i | sed '$(program_transform_name)'`; \
 	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
 	done
