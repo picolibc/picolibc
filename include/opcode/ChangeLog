@@ -1,3 +1,7 @@
+2008-03-09  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (FPU_VFP_EXT_D32, FPU_VFP_V3D16, FPU_ARCH_VFP_V3D16): Define.
+
 2008-03-04  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (ARM_EXT_V6M, ARM_EXT_BARRIER, ARM_EXT_THUMB_MSR): Define.
