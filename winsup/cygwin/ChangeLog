@@ -1,5 +1,10 @@
 2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::write_normal): Don't print
+	chars marked as ERR chars.
+
+2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (dev_console::con_to_str): Declare returning DWORD.
 	* fhandler_console.cc (dev_console::con_to_str): Return number of
 	multibyte char bytes.

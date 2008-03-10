@@ -1579,7 +1579,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  cursor_set (false, 0, y);
 	  break;
 	case ERR:
-	  WriteFile (get_output_handle (), found, 1, &done, 0);
+	  /* Don't print chars marked as ERR chars. */
 	  break;
 	case TAB:
 	  cursor_get (&x, &y);
