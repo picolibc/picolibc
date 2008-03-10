@@ -884,7 +884,7 @@ class dev_console
   bool raw_win32_keyboard_mode;
 
   inline UINT get_console_cp ();
-  bool con_to_str (char *d, int dlen, WCHAR w);
+  DWORD con_to_str (char *d, int dlen, WCHAR w);
   DWORD str_to_con (PWCHAR d, const char *s, DWORD sz);
   void set_color (HANDLE);
   bool fillin_info (HANDLE);
@@ -906,6 +906,7 @@ class fhandler_console: public fhandler_termios
     int len;
     unsigned char buf[4]; /* Max len of valid UTF-8 sequence. */
   } trunc_buf;
+  PWCHAR write_buf;
 
 /* Output calls */
   void set_default_attr ();

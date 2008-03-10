@@ -1,5 +1,14 @@
 2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_console): Add write_buf as pointer to
+	temporary buffer space.
+	* fhandler_console.cc (CONVERT_LIMIT): Define as NT_MAX_PATH.  Add
+	comment.
+	(fhandler_console::write_normal): Use write_buf throughout.
+	(fhandler_console::write): Use tmp_pathbuf to allocate write_buf.
+
+2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::write_normal): Don't print
 	chars marked as ERR chars.
 

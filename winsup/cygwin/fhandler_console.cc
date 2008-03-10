@@ -31,9 +31,12 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 #include "registry.h"
 
-#define CONVERT_LIMIT 65536
+/* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
+   is allocated using tmp_pathbuf!!! */
+#define CONVERT_LIMIT NT_MAX_PATH
 
 /*
  * Scroll the screen context.
@@ -1473,10 +1476,10 @@ fhandler_console::write_normal (const unsigned char *src,
       /* Valid multibyte sequence?  Process. */
       if (nfound)
 	{
-	  WCHAR buf[2];
-	  buf_len = dev_state->str_to_con (buf, (const char *) trunc_buf.buf,
+	  buf_len = dev_state->str_to_con (write_buf,
+					   (const char *) trunc_buf.buf,
 					   nfound - trunc_buf.buf);
-	  WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0);
+	  WriteConsoleW (get_output_handle (), write_buf, buf_len, &done, 0);
 	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
 	  trunc_buf.len = 0;
 	  return found;
@@ -1509,9 +1512,7 @@ fhandler_console::write_normal (const unsigned char *src,
   if (found != src)
     {
       DWORD len = found - src;
-      PWCHAR buf = (PWCHAR) alloca (CONVERT_LIMIT * sizeof (WCHAR));
-
-      buf_len = dev_state->str_to_con (buf, (const char *) src, len);
+      buf_len = dev_state->str_to_con (write_buf, (const char *) src, len);
       if (!buf_len)
 	{
 	  debug_printf ("conversion error, handle %p",
@@ -1527,6 +1528,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  scroll_screen (x, y, -1, y, x + buf_len, y);
 	}
 
+      register PWCHAR buf = write_buf;
       do
 	{
 	  if (!WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0))
@@ -1600,6 +1602,11 @@ fhandler_console::write (const void *vsrc, size_t len)
   /* Run and check for ansi sequences */
   unsigned const char *src = (unsigned char *) vsrc;
   unsigned const char *end = src + len;
+  /* This might look a bit far fetched, but using the TLS path buffer allows
+     to allocate a big buffer without using the stack too much.  Doing it here
+     in write instead of in write_normal should be faster, too. */
+  tmp_pathbuf tp;
+  write_buf = tp.w_get ();
 
   debug_printf ("%x, %d", vsrc, len);
 
