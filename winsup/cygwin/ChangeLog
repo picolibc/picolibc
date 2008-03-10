@@ -1,3 +1,14 @@
+2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (dev_console::con_to_str): Declare returning DWORD.
+	* fhandler_console.cc (dev_console::con_to_str): Return number of
+	multibyte char bytes.
+	(fhandler_console::read): Set nread to number of multibyte char bytes
+	returned from con_to_str.
+	(fhandler_console::write_normal): Reorder trunc buffer preocessing.
+	Return after writing valid multibyte sequence out of trunc buffer.
+	Change comments slightly.
+
 2008-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (DIR_BUF_SIZE): Define required space for file

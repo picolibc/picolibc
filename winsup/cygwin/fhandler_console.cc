@@ -152,10 +152,10 @@ set_console_state_for_spawn (bool iscyg)
 /* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
    cached, because a program or the user can change these values at
    any time. */
-inline bool
+inline DWORD
 dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return !!sys_wcstombs (d, dlen, &w, 1);
+  return sys_wcstombs (d, dlen, &w, 1);
 }
 
 inline UINT
@@ -354,7 +354,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 	  else
 	    {
-	      dev_state->con_to_str (tmp + 1, 59, wch);
+	      nread = dev_state->con_to_str (tmp + 1, 59, wch);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
@@ -1464,27 +1464,29 @@ fhandler_console::write_normal (const unsigned char *src,
       memcpy (trunc_buf.buf + trunc_buf.len, src, cp_len);
       nfound = next_char (cp, trunc_buf.buf,
 			  trunc_buf.buf + trunc_buf.len + cp_len);
-      if (!nfound)		/* Invalid multibyte sequence. */
-	{			/* Give up and print replacement chars. */
-	  for (int i = 0; i < trunc_buf.len; ++i)
-	    write_replacement_char (trunc_buf.buf + i);
-	}
-      else if (nfound == trunc_buf.buf)
-	{			/* Still truncated multibyte sequence. */
+      /* Still truncated multibyte sequence?  Keep in trunc_buf. */
+      if (nfound == trunc_buf.buf)
+	{
 	  trunc_buf.len += cp_len;
 	  return end;
 	}
-      else
+      /* Valid multibyte sequence?  Process. */
+      if (nfound)
 	{
-	  /* Valid multibyte sequence.  Process. */
 	  WCHAR buf[2];
 	  buf_len = dev_state->str_to_con (buf, (const char *) trunc_buf.buf,
 					   nfound - trunc_buf.buf);
 	  WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0);
 	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
+	  trunc_buf.len = 0;
+	  return found;
 	}
-      /* Mark trunc_buf as unused. */
+      /* Give up, print replacement chars for trunc_buf... */
+      for (int i = 0; i < trunc_buf.len; ++i)
+	write_replacement_char (trunc_buf.buf + i);
+      /* ... mark trunc_buf as unused... */
       trunc_buf.len = 0;
+      /* ... and proceed. */
     }
 
   while (found < end
