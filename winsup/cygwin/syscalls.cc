@@ -1272,19 +1272,20 @@ sync_worker (const char *vol)
 extern "C" void
 sync ()
 {
-  char vol[CYG_MAX_PATH];
+  /* Per MSDN, 50 bytes should be enough here. */
+  char vol[MAX_PATH];
 
   if (wincap.has_guid_volumes ()) /* Win2k and newer */
     {
-      char a_drive[CYG_MAX_PATH] = {0};
-      char b_drive[CYG_MAX_PATH] = {0};
+      char a_drive[MAX_PATH] = {0};
+      char b_drive[MAX_PATH] = {0};
 
       if (is_floppy ("A:"))
-	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, MAX_PATH);
       if (is_floppy ("B:"))
-	GetVolumeNameForVolumeMountPointA ("B:\\", b_drive, CYG_MAX_PATH);
+	GetVolumeNameForVolumeMountPointA ("B:\\", b_drive, MAX_PATH);
 
-      HANDLE sh = FindFirstVolumeA (vol, CYG_MAX_PATH);
+      HANDLE sh = FindFirstVolumeA (vol, MAX_PATH);
       if (sh != INVALID_HANDLE_VALUE)
 	{
 	  do
@@ -1302,7 +1303,7 @@ sync ()
 	      vol[strlen (vol) - 1] = '\0';
 	      sync_worker (vol);
 	    }
-	  while (FindNextVolumeA (sh, vol, CYG_MAX_PATH));
+	  while (FindNextVolumeA (sh, vol, MAX_PATH));
 	  FindVolumeClose (sh);
 	}
     }

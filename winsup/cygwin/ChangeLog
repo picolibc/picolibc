@@ -1,3 +1,7 @@
+2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (sync): Use MAX_PATH rather than CYG_MAX_PATH.
+
 2008-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_console): Add write_buf as pointer to
