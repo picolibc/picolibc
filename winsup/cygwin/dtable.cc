@@ -31,6 +31,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "tls_pbuf.h"
 #include "ntdll.h"
 #include "shared_info.h"
 
@@ -268,6 +269,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   DCB dcb;
   unsigned bin = O_BINARY;
   device dev;
+  tmp_pathbuf tp;
 
   dev.devn = 0;		/* FIXME: device */
   first_fd_for_open = 0;
@@ -300,7 +302,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev.parse (DEV_TTYS_MAJOR, 0);
       else
 	{
-	  name = handle_to_fn (handle, (char *) alloca (CYG_MAX_PATH + 100));
+	  name = handle_to_fn (handle, tp.c_get ());
 	  if (!strncasematch (name, POSIX_NAMED_PIPE, POSIX_NAMED_PIPE_LEN))
 	    /* nothing */;
 	  else if (fd == 0)
@@ -844,16 +846,18 @@ dtable::vfork_child_fixup ()
 static const char *
 handle_to_fn (HANDLE h, char *posix_fn)
 {
+  tmp_pathbuf tp;
   OBJECT_NAME_INFORMATION *ntfn;
-  char fnbuf[32768];
+  const size_t len = sizeof (OBJECT_NAME_INFORMATION)
+		     + NT_MAX_PATH * sizeof (WCHAR);
+  char *fnbuf = (char *) alloca (len);
 
-  memset (fnbuf, 0, sizeof (fnbuf));
+  memset (fnbuf, 0, len);
   ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
-  ntfn->Name.MaximumLength = sizeof (fnbuf) - sizeof (*ntfn);
+  ntfn->Name.MaximumLength = NT_MAX_PATH * sizeof (WCHAR);
   ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
 
-  NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf),
-  				NULL);
+  NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, len, NULL);
 
   if (!NT_SUCCESS (res))
     {
@@ -871,11 +875,11 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
 
-  char win32_fn[CYG_MAX_PATH + 100];
-  sys_wcstombs (win32_fn, CYG_MAX_PATH + 100, ntfn->Name.Buffer);
+  char *win32_fn = tp.c_get ();
+  sys_wcstombs (win32_fn, NT_MAX_PATH, ntfn->Name.Buffer);
   debug_printf ("nt name '%s'", win32_fn);
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
-      || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
+      || !QueryDosDevice (NULL, fnbuf, len))
     return strcpy (posix_fn, win32_fn);
 
   char *p = strechr (win32_fn + DEVICE_PREFIX_LEN, '\\');
@@ -883,13 +887,13 @@ handle_to_fn (HANDLE h, char *posix_fn)
   int n = p - win32_fn;
   int maxmatchlen = 0;
   char *maxmatchdos = NULL;
+  char *device = tp.c_get ();
   for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
     {
-      char device[CYG_MAX_PATH + 10];
-      device[CYG_MAX_PATH + 9] = '\0';
+      device[NT_MAX_PATH - 1] = '\0';
       if (strchr (s, ':') == NULL)
 	continue;
-      if (!QueryDosDevice (s, device, sizeof (device) - 1))
+      if (!QueryDosDevice (s, device, NT_MAX_PATH - 1))
 	continue;
       char *q = strrchr (device, ';');
       if (q)
