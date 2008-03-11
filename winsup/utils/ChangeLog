@@ -1,5 +1,10 @@
 2008-03-11  Brian Dessent  <brian@dessent.net>
 
+	* cygcheck.cc (find_app_on_path): Make buffer SYMLINK_MAX + 1
+	chars.
+
+2008-03-11  Brian Dessent  <brian@dessent.net>
+
 	* cygcheck.cc (dirname): New static function.
 	(find_app_on_path): Use SYMLINK_MAX.  Resolve symlink relative
 	to link's location.  Adjust to the fact that cygpath already

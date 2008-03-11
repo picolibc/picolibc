@@ -843,7 +843,7 @@ find_app_on_path (const char *app, bool showall = false)
 
   if (is_symlink (fh))
     {
-      static char tmp[SYMLINK_MAX];
+      static char tmp[SYMLINK_MAX + 1];
       if (!readlink (fh, tmp, SYMLINK_MAX))
 	display_error("readlink failed");
       
@@ -853,9 +853,9 @@ find_app_on_path (const char *app, bool showall = false)
       if (!strchr (ptr, '\\'))
 	{
 	  char *lastsep;
-	  strncpy (tmp, cygpath (papp, NULL), SYMLINK_MAX - 1);
+	  strncpy (tmp, cygpath (papp, NULL), SYMLINK_MAX);
 	  lastsep = strrchr (tmp, '\\');
-	  strncpy (lastsep+1, ptr, SYMLINK_MAX - 1 - (lastsep-tmp));
+	  strncpy (lastsep+1, ptr, SYMLINK_MAX - (lastsep-tmp));
 	  ptr = tmp;
 	}
       if (!CloseHandle (fh))
