@@ -15,6 +15,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "tls_pbuf.h"
 #include "winf.h"
 #include "sys/cygwin.h"
 
@@ -136,7 +137,8 @@ av::unshift (const char *what, int conv)
 
   argv = av;
   memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
-  char buf[CYG_MAX_PATH];
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
   if (conv)
     {
       cygwin_conv_to_posix_path (what, buf);

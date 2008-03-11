@@ -1,5 +1,15 @@
 2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (parse_options): Use tmp_pathbuf to allocate buffer.
+	(regopt): Take tmp buffer as additional argument.
+	(environ_init): Alllcate tmpbuf earlier.  Use as temporary buffer in
+	call to regopt.
+	* tls_pbuf.cc (tmp_pathbuf::c_get): Allocate one additional char.
+	(tmp_pathbuf::w_get): Allocate one additional WCHAR.
+	* winf.cc (av::unshift): Use tmp_pathbuf to allocate buffer.
+
+2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (sync): Use MAX_PATH rather than CYG_MAX_PATH.
 
 2008-03-10  Corinna Vinschen  <corinna@vinschen.de>

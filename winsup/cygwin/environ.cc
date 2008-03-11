@@ -626,7 +626,8 @@ parse_options (char *buf)
 
   if (buf == NULL)
     {
-      char newbuf[CYG_MAX_PATH + 7];
+      tmp_pathbuf tp;
+      char *newbuf = tp.c_get ();
       newbuf[0] = '\0';
       for (k = known; k->name != NULL; k++)
 	if (k->remember)
@@ -705,10 +706,9 @@ parse_options (char *buf)
 
 /* Set options from the registry. */
 static bool __stdcall
-regopt (const char *name)
+regopt (const char *name, char *buf)
 {
   bool parsed_something = false;
-  char buf[CYG_MAX_PATH];
   char lname[strlen (name) + 1];
   strlwr (strcpy (lname, name));
 
@@ -716,7 +716,7 @@ regopt (const char *name)
     {
       reg_key r (i, KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
 
-      if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
+      if (r.get_string (lname, buf, NT_MAX_PATH, "") == ERROR_SUCCESS)
 	{
 	  parse_options (buf);
 	  parsed_something = true;
@@ -754,9 +754,11 @@ environ_init (char **envp, int envc)
 	conv_start_chars[(int) cyg_toupper (conv_envvars[i].name[0])] = 1;
       }
 
-  got_something_from_registry = regopt ("default");
+  char *tmpbuf = tp.t_get ();
+  got_something_from_registry = regopt ("default", tmpbuf);
   if (myself->progname[0])
-    got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
+    got_something_from_registry = regopt (myself->progname, tmpbuf)
+				  || got_something_from_registry;
 
   if (!envp)
     envp_passed_in = 0;
@@ -807,7 +809,6 @@ environ_init (char **envp, int envc)
      form "=X:=X:\foo\bar; these must be changed into something legal
      (we could just ignore them but maybe an application will
      eventually want to use them).  */
-  char *tmpbuf = tp.t_get ();
   for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
     {
       sys_wcstombs_alloc (&newp, HEAP_NOTHEAP, w);
