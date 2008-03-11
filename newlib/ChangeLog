@@ -1,6 +1,6 @@
 2008-03-11  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/stdio/rgetc.c (__srget): Invoke CHECK_INIT to ensure
+	* libc/stdio/rgetc.c (__srget_r): Invoke CHECK_INIT to ensure
 	stdin gets resolved properly before refilling.
 
 2008-03-07  Jeff Johnston  <jjohnstn@redhat.com>
