@@ -1,5 +1,5 @@
 /* CR16C ELF support for BFD.
-   Copyright 2004 Free Software Foundation, Inc.
+   Copyright 2004, 2008 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -246,8 +246,8 @@ END_RELOC_NUMBERS (RINDEX_16C_MAX)
    values have a special meaning.  */
 
 /* Far common symbol.  */
-#define SHN_CR16C_FCOMMON	0xff00
-#define SHN_CR16C_NCOMMON	0xff01
+#define SHN_CR16C_FCOMMON	SHN_LORESERVE
+#define SHN_CR16C_NCOMMON	(SHN_LORESERVE + 1)
 
 typedef struct reloc_map
 {

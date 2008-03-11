@@ -1,5 +1,5 @@
 /* x86_64 ELF support for BFD.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2008
    Free Software Foundation, Inc.
    Contributed by Jan Hubicka <jh@suse.cz>
 
@@ -81,7 +81,7 @@ END_RELOC_NUMBERS (R_X86_64_max)
 
 /* Like SHN_COMMON but the symbol will be allocated in the .lbss
    section.  */
-#define SHN_X86_64_LCOMMON 	0xff02
+#define SHN_X86_64_LCOMMON 	(SHN_LORESERVE + 2)
 
 #define SHF_X86_64_LARGE	0x10000000
 #endif

@@ -1,5 +1,5 @@
 /* Score ELF support for BFD.
-   Copyright 2006 Free Software Foundation, Inc.
+   Copyright 2006, 2008 Free Software Foundation, Inc.
    Contributed by 
    Mei Ligang (ligang@sunnorth.com.cn)
    Pei-Lin Tsai (pltsai@sunplus.com)
@@ -44,10 +44,10 @@
 
 /* Defined and allocated common symbol.  Value is virtual address.  If
    relocated, alignment must be preserved.  */
-#define SHN_SCORE_TEXT		0xff01
-#define SHN_SCORE_DATA		0xff02
+#define SHN_SCORE_TEXT		(SHN_LORESERVE + 1)
+#define SHN_SCORE_DATA		(SHN_LORESERVE + 2)
 /* Small common symbol.  */
-#define SHN_SCORE_SCOMMON	0xff03
+#define SHN_SCORE_SCOMMON	(SHN_LORESERVE + 3)
 
 /* Processor specific section flags.  */
 

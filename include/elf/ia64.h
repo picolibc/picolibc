@@ -158,11 +158,11 @@
 /* This section only used by HP-UX, The HP linker gives weak symbols
    precedence over regular common symbols.  We want common to override
    weak.  Using this common instead of SHN_COMMON does that.  */
-#define SHN_IA_64_ANSI_COMMON 0xFF00
+#define SHN_IA_64_ANSI_COMMON SHN_LORESERVE
 
 /* This section is only used by OpenVMS.  Symbol is defined in the symbol
    vector (only possible for image files).  */
-#define SHN_IA_64_VMS_SYMVEC 0xff20
+#define SHN_IA_64_VMS_SYMVEC SHN_LOOS
 
 /* IA64-specific relocation types: */
 

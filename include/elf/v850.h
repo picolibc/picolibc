@@ -1,5 +1,5 @@
 /* V850 ELF support for BFD.
-   Copyright 1997, 1998, 2000, 2002, 2003, 2004, 2007
+   Copyright 1997, 1998, 2000, 2002, 2003, 2004, 2007, 2008
    Free Software Foundation, Inc.
    Created by Michael Meissner, Cygnus Support <meissner@cygnus.com>
 
@@ -88,13 +88,13 @@ END_RELOC_NUMBERS (R_V850_max)
    values have a special meaning.  */
 
 /* Small data area common symbol.  */
-#define SHN_V850_SCOMMON	0xff00
+#define SHN_V850_SCOMMON	SHN_LORESERVE
 
 /* Tiny data area common symbol.  */
-#define SHN_V850_TCOMMON	0xff01
+#define SHN_V850_TCOMMON	(SHN_LORESERVE + 1)
 
 /* Zero data area common symbol.  */
-#define SHN_V850_ZCOMMON	0xff02
+#define SHN_V850_ZCOMMON	(SHN_LORESERVE + 2)
 
 
 /* Processor specific section types.  */

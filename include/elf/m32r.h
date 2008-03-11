@@ -1,5 +1,6 @@
 /* M32R ELF support for BFD.
-   Copyright 1996, 1997, 1998, 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2003, 2004, 2008
+   Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -80,7 +81,7 @@ END_RELOC_NUMBERS (R_M32R_max)
    values have a special meaning.  */
 
 /* Small common symbol.  */
-#define SHN_M32R_SCOMMON	0xff00
+#define SHN_M32R_SCOMMON	SHN_LORESERVE
 
 /* Processor specific section flags.  */
 

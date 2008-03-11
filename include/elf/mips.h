@@ -226,21 +226,21 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 
 /* Defined and allocated common symbol.  Value is virtual address.  If
    relocated, alignment must be preserved.  */
-#define SHN_MIPS_ACOMMON	0xff00
+#define SHN_MIPS_ACOMMON	SHN_LORESERVE
 
 /* Defined and allocated text symbol.  Value is virtual address.
    Occur in the dynamic symbol table of Alpha OSF/1 and Irix 5 executables.  */
-#define SHN_MIPS_TEXT		0xff01
+#define SHN_MIPS_TEXT		(SHN_LORESERVE + 1)
 
 /* Defined and allocated data symbol.  Value is virtual address.
    Occur in the dynamic symbol table of Alpha OSF/1 and Irix 5 executables.  */
-#define SHN_MIPS_DATA		0xff02
+#define SHN_MIPS_DATA		(SHN_LORESERVE + 2)
 
 /* Small common symbol.  */
-#define SHN_MIPS_SCOMMON	0xff03
+#define SHN_MIPS_SCOMMON	(SHN_LORESERVE + 3)
 
 /* Small undefined symbol.  */
-#define SHN_MIPS_SUNDEFINED	0xff04
+#define SHN_MIPS_SUNDEFINED	(SHN_LORESERVE + 4)
 
 /* Processor specific section types.  */
 

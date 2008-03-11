@@ -1,5 +1,5 @@
 /* HPPA ELF support for BFD.
-   Copyright 1993, 1994, 1995, 1998, 1999, 2000, 2005, 2006
+   Copyright 1993, 1994, 1995, 1998, 1999, 2000, 2005, 2006, 2008
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -54,11 +54,11 @@
 /* Special section indices.  */
 /* A symbol that has been declared as a tentative definition in an ANSI C
    compilation.  */
-#define SHN_PARISC_ANSI_COMMON 	0xff00
+#define SHN_PARISC_ANSI_COMMON 	SHN_LORESERVE
 
 /* A symbol that has been declared as a common block using the
    huge memory model.  */
-#define SHN_PARISC_HUGE_COMMON	0xff01
+#define SHN_PARISC_HUGE_COMMON	(SHN_LORESERVE + 1)
 
 /* Processor specific section types.  */
 
