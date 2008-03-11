@@ -486,26 +486,35 @@ unconvert_slashes (char* name)
     *name++ = '\\';
 }
 
+/* This is a helper function for when vcygpath is passed what appears
+   to be a relative POSIX path.  We take a Win32 CWD (either as specified
+   in 'cwd' or as retrieved with GetCurrentDirectory() if 'cwd' is NULL)
+   and find the mount table entry with the longest match.  We replace the
+   matching portion with the corresponding POSIX prefix, and to that append
+   's' and anything in 'v'.  The returned result is a mostly-POSIX
+   absolute path -- 'mostly' because the portions of CWD that didn't
+   match the mount prefix will still have '\\' separators.  */
 static char *
-rel_vconcat (const char *s, va_list v)
+rel_vconcat (const char *cwd, const char *s, va_list v)
 {
-  char path[MAX_PATH + 1];
-  if (!GetCurrentDirectory (MAX_PATH, path))
-    return NULL;
+  char pathbuf[MAX_PATH];
+  if (!cwd || *cwd == '\0')
+    {
+      if (!GetCurrentDirectory (MAX_PATH, pathbuf))
+        return NULL;
+      cwd = pathbuf;
+    }
 
   int max_len = -1;
   struct mnt *m, *match = NULL;
 
-  if (s[0] == '.' && isslash (s[1]))
-    s += 2;
-
-  for (m = mount_table; m->posix ; m++)
+  for (m = mount_table; m->posix; m++)
     {
       if (m->flags & MOUNT_CYGDRIVE)
 	continue;
 
       int n = strlen (m->native);
-      if (n < max_len || !path_prefix_p (m->native, path, n))
+      if (n < max_len || !path_prefix_p (m->native, cwd, n))
 	continue;
       max_len = n;
       match = m;
@@ -514,34 +523,36 @@ rel_vconcat (const char *s, va_list v)
   char *temppath;
   if (!match)
     // No prefix matched - best effort to return meaningful value.
-    temppath = concat (path, "/", s, NULL);
+    temppath = concat (cwd, "/", s, NULL);
   else if (strcmp (match->posix, "/") != 0)
     // Matched on non-root.  Copy matching prefix + remaining 'path'.
-    temppath = concat (match->posix, path + max_len, "/", s, NULL);
-  else if (path[max_len] == '\0')
+    temppath = concat (match->posix, cwd + max_len, "/", s, NULL);
+  else if (cwd[max_len] == '\0')
     // Matched on root and there's no remaining 'path'.
     temppath = concat ("/", s, NULL);
-  else if (isslash (path[max_len]))
+  else if (isslash (cwd[max_len]))
     // Matched on root but remaining 'path' starts with a slash anyway.
-    temppath = concat (path + max_len, "/", s, NULL);
+    temppath = concat (cwd + max_len, "/", s, NULL);
   else
-    temppath = concat ("/", path + max_len, "/", s, NULL);
+    temppath = concat ("/", cwd + max_len, "/", s, NULL);
 
   char *res = vconcat (temppath, v);
   free (temppath);
   return res;
 }
 
-char *
-cygpath (const char *s, ...)
+/* Convert a POSIX path in 's' to an absolute Win32 path, and append
+   anything in 'v' to the end, returning the result.  If 's' is a
+   relative path then 'cwd' is used as the working directory to make
+   it absolute.  Pass NULL in 'cwd' to use GetCurrentDirectory.  */
+static char *
+vcygpath (const char *cwd, const char *s, va_list v)
 {
-  va_list v;
   int max_len = -1;
   struct mnt *m, *match = NULL;
 
   if (!mount_table[0].posix)
     read_mounts ();
-  va_start (v, s);
   char *path;
   if (s[0] == '.' && isslash (s[1]))
     s += 2;
@@ -549,7 +560,7 @@ cygpath (const char *s, ...)
   if (s[0] == '/' || s[1] == ':')	/* FIXME: too crude? */
     path = vconcat (s, v);
   else
-    path = rel_vconcat (s, v);
+    path = rel_vconcat (cwd, s, v);
 
   if (!path)
     return NULL;
@@ -557,7 +568,7 @@ cygpath (const char *s, ...)
   if (strncmp (path, "/./", 3) == 0)
     memmove (path + 1, path + 3, strlen (path + 3) + 1);
 
-  for (m = mount_table; m->posix ; m++)
+  for (m = mount_table; m->posix; m++)
     {
       if (m->flags & MOUNT_CYGDRIVE)
 	continue;
@@ -584,6 +595,26 @@ cygpath (const char *s, ...)
   for (char *s = strstr (native + 1, "\\.\\"); s && *s; s = strstr (s, "\\.\\"))
     memmove (s + 1, s + 3, strlen (s + 3) + 1);
   return native;
+}
+
+char *
+cygpath_rel (const char *cwd, const char *s, ...)
+{
+  va_list v;
+
+  va_start (v, s);
+
+  return vcygpath (cwd, s, v);
+}
+
+char *
+cygpath (const char *s, ...)
+{
+  va_list v;
+  
+  va_start (v, s);
+  
+  return vcygpath (NULL, s, v);
 }
 
 static mnt *m = NULL;

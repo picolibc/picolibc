@@ -807,6 +807,28 @@ ls (char *f)
     display_error ("ls: CloseHandle()");
 }
 
+/* Remove filename from 's' and return directory name without trailing
+   backslash, or NULL if 's' doesn't seem to have a dirname.  */
+static char *
+dirname (const char *s)
+{
+  static char buf[MAX_PATH];
+
+  if (!s)
+    return NULL;
+
+  strncpy (buf, s, MAX_PATH);
+  buf[MAX_PATH - 1] = '\0';   // in case strlen(s) > MAX_PATH
+  char *lastsep = strrchr (buf, '\\');
+  if (!lastsep)
+    return NULL;          // no backslash -> no dirname
+  else if (lastsep - buf <= 2 && buf[1] == ':')
+    lastsep[1] = '\0';    // can't remove backslash of "x:\"
+  else
+    *lastsep = '\0';
+  return buf;
+}
+
 // Find a real application on the path (possibly following symlinks)
 static const char *
 find_app_on_path (const char *app, bool showall = false)
@@ -821,26 +843,25 @@ find_app_on_path (const char *app, bool showall = false)
 
   if (is_symlink (fh))
     {
-      static char tmp[4000] = "";
-      char *ptr;
-      if (!readlink (fh, tmp, 3999))
+      static char tmp[SYMLINK_MAX];
+      if (!readlink (fh, tmp, SYMLINK_MAX))
 	display_error("readlink failed");
-      ptr = cygpath (tmp, NULL);
-      for (char *p = ptr; (p = strchr (p, '/')); p++)
-	*p = '\\';
+      
+      /* Resolve the linkname relative to the directory of the link.  */
+      char *ptr = cygpath_rel (dirname (papp), tmp, NULL);
       printf (" -> %s\n", ptr);
       if (!strchr (ptr, '\\'))
 	{
 	  char *lastsep;
-	  strncpy (tmp, cygpath (papp, NULL), 3999);
-	  for (char *p = tmp; (p = strchr (p, '/')); p++)
-	    *p = '\\';
+	  strncpy (tmp, cygpath (papp, NULL), SYMLINK_MAX - 1);
 	  lastsep = strrchr (tmp, '\\');
-	  strncpy (lastsep+1, ptr, 3999-(lastsep-tmp));
+	  strncpy (lastsep+1, ptr, SYMLINK_MAX - 1 - (lastsep-tmp));
 	  ptr = tmp;
 	}
       if (!CloseHandle (fh))
 	display_error ("find_app_on_path: CloseHandle()");
+      /* FIXME: We leak the ptr returned by cygpath() here which is a
+         malloc()d string.  */
       return find_app_on_path (ptr, showall);
     }
 

@@ -1,3 +1,18 @@
+2008-03-11  Brian Dessent  <brian@dessent.net>
+
+	* cygcheck.cc (dirname): New static function.
+	(find_app_on_path): Use SYMLINK_MAX.  Resolve symlink relative
+	to link's location.  Adjust to the fact that cygpath already
+	normalizes its return value.
+	* path.cc (rel_vconcat): Add cwd parameter, and use it instead
+	of calling GetCurrentDirectory() if possible.  Rename throughout.
+	(vcygpath): Rename from cygpath and accept cwd and va_list.  Pass
+	cwd on to rel_vconcat().
+	(cygpath_rel): New front end for vcygpath.
+	(cygpath): Ditto.
+	* path.h (cygpath_rel): Declare.
+	(SYMLINK_MAX): Define to 4095.
+
 2008-03-09  Brian Dessent  <brian@dessent.net>
 
 	* Makefile.in (install): Don't install the testsuite.
