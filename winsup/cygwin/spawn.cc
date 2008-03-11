@@ -107,7 +107,8 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
   const char *retval = buf.get_win32 ();
-  char tmp[CYG_MAX_PATH];
+  tmp_pathbuf tp;
+  char *tmp = tp.c_get ();
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = strchr (name, '/');
   int err;
