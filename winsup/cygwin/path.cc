@@ -4630,9 +4630,11 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	}
       /* Make sure it's NUL-termniated. */
       win32.Buffer[win32.Length / sizeof (WCHAR)] = L'\0';
-      if (win32.Buffer[1] == L':')
+      if (!doit)			 /* Virtual path */
+	drive_length = 0;
+      else if (win32.Buffer[1] == L':')	 /* X: */
 	drive_length = 2;
-      else if (win32.Buffer[1] == L'\\')
+      else if (win32.Buffer[1] == L'\\') /* UNC path */
 	{
 	  PWCHAR ptr = wcschr (win32.Buffer + 2, L'\\');
 	  if (ptr)
@@ -4642,7 +4644,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  else
 	    drive_length = win32.Length / sizeof (WCHAR);
 	}
-      else
+      else				 /* Shouldn't happen */
 	drive_length = 0;
 
       tmp_pathbuf tp;

@@ -1,5 +1,12 @@
 2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (cwdstuff::set): Make sure drive_length is 0 for virtual
+	paths.  Add comments.
+	* spawn.cc (spawn_guts): Don't allow to start a native Win32 application
+	from a long path or a virtual path.  Print an error message to stderr.
+
+2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (parse_options): Use tmp_pathbuf to allocate buffer.
 	(regopt): Take tmp buffer as additional argument.
 	(environ_init): Alllcate tmpbuf earlier.  Use as temporary buffer in

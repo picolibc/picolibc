@@ -361,6 +361,21 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
+  
+  if (!real_path.iscygexec ()
+      && (cygheap->cwd.drive_length == 0
+	  || cygheap->cwd.win32.Length >= MAX_PATH * sizeof (WCHAR)))
+    {
+      small_printf ("Error: Current working directory is a %s.\n"
+		    "Can't start native Windows application from here.\n\n",
+		    cygheap->cwd.drive_length == 0
+		    ? "virtual Cygwin directory"
+		    : "path longer than allowed for a\n"
+		      "Win32 working directory");
+      set_errno (ENAMETOOLONG);
+      res = -1;
+      goto out;
+    }
 
   if (res)
     goto out;
