@@ -23,6 +23,7 @@ details. */
 #include "dlfcn.h"
 #include "dll_init.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 
 static void __stdcall
 set_dl_error (const char *str)
@@ -48,7 +49,7 @@ get_full_path_of_dll (const char* str, char *name)
   int len = strlen (str);
 
   /* empty string or too long to be legal win32 pathname? */
-  if (len == 0 || len >= CYG_MAX_PATH)
+  if (len == 0 || len >= PATH_MAX)
     return str;		/* Yes.  Let caller deal with it. */
 
   const char *ret;
@@ -91,7 +92,8 @@ dlopen (const char *name, int)
     ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
   else
     {
-      char buf[CYG_MAX_PATH];
+      tmp_pathbuf tp;
+      char *buf = tp.c_get ();
       /* handle for the named library */
       const char *fullpath = get_full_path_of_dll (name, buf);
       if (!fullpath)

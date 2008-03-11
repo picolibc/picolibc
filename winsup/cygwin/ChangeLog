@@ -1,5 +1,11 @@
 2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (get_full_path_of_dll): Allow paths up to PATH_MAX.
+	(dlopen): Call get_full_path_of_dll with path buffer allocate by
+	tmp_pathbuf.
+
+2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (find_exec): Use tmp_pathbuf to allocate path buffer.
 
 2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
