@@ -36,6 +36,10 @@ _DEFUN(__srget_r, (ptr, fp),
        struct _reent *ptr _AND
        register FILE *fp)
 {
+  /* Ensure that any fake std stream is resolved before
+     we call __srefill_r so we may access the true read buffer. */
+  CHECK_INIT(fp);
+
   if (__srefill_r (ptr, fp) == 0)
     {
       fp->_r--;
