@@ -66,7 +66,7 @@ HANDLE NO_COPY tty_list::mutex = NULL;
 void __stdcall
 tty_list::init_session ()
 {
-  char mutex_name[CYG_MAX_PATH];
+  char mutex_name[MAX_PATH];
   /* tty_list::mutex is used while searching for a tty slot. It's necessary
      while finding console window handle */
 
@@ -300,7 +300,7 @@ bool
 tty::alive (const char *fmt)
 {
   HANDLE ev;
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
 
   shared_name (buf, fmt, ntty);
   if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
@@ -323,7 +323,7 @@ tty::open_input_mutex ()
 HANDLE
 tty::open_mutex (const char *mutex)
 {
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
   shared_name (buf, mutex, ntty);
   return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
 }
@@ -332,7 +332,7 @@ HANDLE
 tty::create_inuse (const char *fmt)
 {
   HANDLE h;
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
 
   shared_name (buf, fmt, ntty);
   h = CreateEvent (&sec_all, TRUE, FALSE, buf);
@@ -357,7 +357,7 @@ HANDLE
 tty::get_event (const char *fmt, BOOL manual_reset)
 {
   HANDLE hev;
-  char buf[CYG_MAX_PATH];
+  char buf[MAX_PATH];
 
   shared_name (buf, fmt, ntty);
   if (!(hev = CreateEvent (&sec_all, manual_reset, FALSE, buf)))

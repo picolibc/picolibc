@@ -1,5 +1,15 @@
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pipe.cc (fhandler_pipe::create_selectable): Use MAX_PATH instead of
+	CYG_MAX_PATH.
+	* tty.cc (tty_list::init_session): Ditto.
+	(tty::alive): Ditto.
+	(tty::open_mutex): Ditto.
+	(tty::create_inuse): Ditto.
+	(tty::get_event): Ditto.
+
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Disable
 	munging.  Convert all chars in the 0xf0xx area to it's ascii equivalent.
 	* path.cc (normalize_posix_path): Don't treat "X:foo" as windows path,

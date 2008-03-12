@@ -342,7 +342,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   if (psize < PIPE_BUF)
     psize = PIPE_BUF;
 
-  char pipename[CYG_MAX_PATH];
+  char pipename[MAX_PATH];
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
