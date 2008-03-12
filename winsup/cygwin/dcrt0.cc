@@ -859,7 +859,8 @@ dll_crt0_1 (void *)
       if ((strchr (__argv[0], ':')) || (strchr (__argv[0], '\\')))
 	{
 	  char *new_argv0 = (char *) malloc (NT_MAX_PATH);
-	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
+	  cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, __argv[0],
+			    new_argv0, NT_MAX_PATH);
 	  __argv[0] = (char *) realloc (new_argv0, strlen (new_argv0) + 1);
 	}
     }

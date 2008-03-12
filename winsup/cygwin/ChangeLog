@@ -1,3 +1,61 @@
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (NT_MAX_PATH): Revert ill-advised change to 32767.
+	Accommodate change throughout.
+
+	* cygwin.din (cygwin_conv_path): Export.
+	(cygwin_conv_path_list): Export.
+	(cygwin_create_path): Export.
+	* dcrt0.cc (dll_crt0_1): Use cygwin_conv_path.
+	* dtable.cc (handle_to_fn): Ditto.  Don't expect UNICODE_STRING being
+	0-terminated.
+	* environ.cc (env_plist_to_posix): New helper function.
+	(env_plist_to_win32): Ditto.
+	(env_path_to_posix): Ditto.
+	(env_path_to_win32): Ditto.
+	(return_MAX_PATH): Remove.
+	(conv_envvars): Use new helper functions.  Drop removed members.
+	(win_env::operator =): Accommodate removal of path length functions.
+	(win_env::add_cache): Accommodate new env helper function API.
+	(posify): Ditto.
+	* environ.h (struct win_env): Ditto. Remove path length function
+	pointers since they are unused.
+	* path.cc (warn_msdos): Use cygwin_conv_path.
+	(getfileattr): Use new tmp_pathbuf::u_get method.
+	(fillout_mntent): Ditto.
+	(symlink_info::check): Ditto.
+	(path_conv::check): Use sizeof (WCHAR) instead of constant 2.
+	(symlink_info::check_reparse_point): Ditto.
+	(conv_path_list): Get max size of target string as argument.  Call
+	cygwin_conv_path as helper function.
+	(cygwin_conv_path): New function.
+	(cygwin_create_path): New function.
+	(cygwin_conv_to_win32_path): Just call cygwin_conv_path with size set
+	to MAX_PATH.
+	(cygwin_conv_to_full_win32_path): Ditto.
+	(cygwin_conv_to_posix_path): Ditto.
+	(cygwin_conv_to_full_posix_path): Ditto.
+	(conv_path_list_buf_size): Add FIXME comment.
+	(env_PATH_to_posix): Rename from env_win32_to_posix_path_list.
+	Add size argument as required for env helper functions.
+	(cygwin_win32_to_posix_path_list): Call conv_path_list with size set to
+	MAX_PATH.
+	(cygwin_posix_to_win32_path_list): Ditto.
+	(cygwin_conv_path_list): New function.
+	(cwdstuff::get): Fix length argument in call to sys_wcstombs.
+	* spawn.cc (find_exec): Use cygwin_conv_path_list.
+	* tls_pbuf.h (tmp_pathbuf::u_get: New method.
+	* uinfo.cc (cygheap_user::ontherange): Allocate temporary path buffers
+	using tmp_pathbuf.  Use cygwin_conv_path.
+	* winf.cc (av::unshift): Use cygwin_conv_path.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h: Comment out old cygwin32_XXX API.
+	Mark old path handling API as deprecated.
+	(cygwin_conv_path_t): Typedef.  Define values.
+	(cygwin_conv_path): Declare.
+	(cygwin_create_path): Declare.
+	(cygwin_conv_path_list): Declare.
+
 2008-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dlfcn.cc (get_full_path_of_dll): Allow paths up to PATH_MAX.

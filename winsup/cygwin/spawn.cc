@@ -138,9 +138,9 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   if (strchr (mywinenv, '/'))
     {
       /* it's not really an environment variable at all */
-      int n = cygwin_posix_to_win32_path_list_buf_size (mywinenv);
-      char *s = (char *) alloca (n + 1);
-      if (cygwin_posix_to_win32_path_list (mywinenv, s))
+      int n = cygwin_conv_path_list (CCP_POSIX_TO_WIN_A, mywinenv, NULL, 0);
+      char *s = (char *) alloca (n);
+      if (cygwin_conv_path_list (CCP_POSIX_TO_WIN_A, mywinenv, s, n))
 	goto errout;
       path = s;
       posix_path = mywinenv - 1;

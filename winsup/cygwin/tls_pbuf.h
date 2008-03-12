@@ -17,4 +17,11 @@ public:
   char *c_get ();  /* Create temporary TLS path buf of size NT_MAX_PATH. */
   PWCHAR w_get (); /* Create temporary TLS path buf of size 2 * NT_MAX_PATH. */
   inline char *t_get () { return (char *) w_get (); }
+  inline PUNICODE_STRING u_get (PUNICODE_STRING up)
+    {
+      up->Length = 0;
+      up->MaximumLength = (NT_MAX_PATH - 1) * sizeof (WCHAR);
+      up->Buffer = w_get ();
+      return up;
+    }
 };

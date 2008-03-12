@@ -323,12 +323,13 @@ details. */
       180: Export getxattr, lgetxattr, fgetxattr, listxattr, llistxattr,
 	   flistxattr, setxattr, lsetxattr, fsetxattr, removexattr,
 	   lremovexattr, fremovexattr.
+      181: Export cygwin_conv_path, cygwin_create_path, cygwin_conv_path_list.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 180
+#define CYGWIN_VERSION_API_MINOR 181
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

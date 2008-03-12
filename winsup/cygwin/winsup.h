@@ -81,13 +81,8 @@ extern unsigned long cygwin_inet_addr (const char *cp);
    buffer sizes.  As MAX_PATH and PATH_MAX, this is defined including the
    trailing 0.  Internal buffers and internal path routines should use
    NT_MAX_PATH.  PATH_MAX as defined in limits.h is the maximum length of
-   application provided path strings we handle.
-   
-   Note that it's defined one less than 32K.  This is not only big enough,
-   it also allows to use the value in UNICODE_STRING fields Length and
-   MaximumLength when multiplied with sizeof (WCHAR).  Both fields are
-   USHORT... */
-#define NT_MAX_PATH 32767
+   application provided path strings we handle. */
+#define NT_MAX_PATH 32768
 
 #ifdef __cplusplus
 

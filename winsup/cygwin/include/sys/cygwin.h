@@ -20,6 +20,7 @@ extern "C" {
 
 #define _CYGWIN_SIGNAL_STRING "cYgSiGw00f"
 
+#if 0 /* ENTIRELY DEPRECATED INTERFACES. */
 extern pid_t cygwin32_winpid_to_pid (int);
 extern void cygwin32_win32_to_posix_path_list (const char *, char *);
 extern int cygwin32_win32_to_posix_path_list_buf_size (const char *);
@@ -31,16 +32,64 @@ extern void cygwin32_conv_to_posix_path (const char *, char *);
 extern void cygwin32_conv_to_full_posix_path (const char *, char *);
 extern int cygwin32_posix_path_list_p (const char *);
 extern void cygwin32_split_path (const char *, char *, char *);
+#endif
+
+/* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
+   Don't use in modern applications. */
+extern int cygwin_win32_to_posix_path_list (const char *, char *)
+  __attribute__ ((deprecated));
+extern int cygwin_win32_to_posix_path_list_buf_size (const char *)
+  __attribute__ ((deprecated));
+extern int cygwin_posix_to_win32_path_list (const char *, char *)
+  __attribute__ ((deprecated));
+extern int cygwin_posix_to_win32_path_list_buf_size (const char *)
+  __attribute__ ((deprecated));
+extern int cygwin_conv_to_win32_path (const char *, char *)
+  __attribute__ ((deprecated));
+extern int cygwin_conv_to_full_win32_path (const char *, char *)
+  __attribute__ ((deprecated));
+extern int cygwin_conv_to_posix_path (const char *, char *)
+  __attribute__ ((deprecated));
+extern int cygwin_conv_to_full_posix_path (const char *, char *)
+  __attribute__ ((deprecated));
+
+/* Use these interfaces in favor of the above. */
+
+/* Possible 'what' values in calls to cygwin_conv_path/cygwin_create_path. */
+enum
+{
+  CCP_POSIX_TO_WIN_A = 0, /* from is char*, to is char*       */
+  CCP_POSIX_TO_WIN_W,	  /* from is char*, to is wchar_t*    */
+  CCP_WIN_A_TO_POSIX,	  /* from is char*, to is char*       */
+  CCP_WIN_W_TO_POSIX,	  /* from is wchar_t*, to is char*    */
+
+  /* Or these values to the above as needed. */
+  CCP_ABSOLUTE = 0,	  /* Request absolute path (default). */
+  CCP_RELATIVE = 0x100    /* Request to keep path relative.   */
+};
+typedef unsigned int cygwin_conv_path_t;
+
+/* If size is 0, cygwin_conv_path returns the required buffer size in bytes.
+   Otherwise, it returns 0 on success, or -1 on error and errno is set to
+   one of the below values:
+
+    EINVAL        what has an invalid value.
+    EFAULT        from or to point into nirvana.
+    ENAMETOOLONG  the resulting path is longer than 32K, or, in case
+		  of what == CCP_POSIX_TO_WIN_A, longer than MAX_PATH.
+    ENOSPC        size is less than required for the conversion.
+*/
+extern ssize_t cygwin_conv_path (cygwin_conv_path_t what, const void *from,
+				 void *to, size_t size);
+/* Same, but handles path lists separated by colon or semicolon. */
+extern ssize_t cygwin_conv_path_list (cygwin_conv_path_t what, const void *from,
+				 void *to, size_t size);
+/* Allocate a buffer for the conversion result using malloc(3), and return
+   a pointer to it.  Returns NULL if something goes wrong with errno set
+   to one of the above values, or to ENOMEM if malloc fails. */
+extern void *cygwin_create_path (cygwin_conv_path_t what, const void *from);
 
 extern pid_t cygwin_winpid_to_pid (int);
-extern int cygwin_win32_to_posix_path_list (const char *, char *);
-extern int cygwin_win32_to_posix_path_list_buf_size (const char *);
-extern int cygwin_posix_to_win32_path_list (const char *, char *);
-extern int cygwin_posix_to_win32_path_list_buf_size (const char *);
-extern int cygwin_conv_to_win32_path (const char *, char *);
-extern int cygwin_conv_to_full_win32_path (const char *, char *);
-extern int cygwin_conv_to_posix_path (const char *, char *);
-extern int cygwin_conv_to_full_posix_path (const char *, char *);
 extern int cygwin_posix_path_list_p (const char *);
 extern void cygwin_split_path (const char *, char *, char *);
 

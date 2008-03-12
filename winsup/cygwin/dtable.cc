@@ -854,7 +854,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   memset (fnbuf, 0, len);
   ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
-  ntfn->Name.MaximumLength = NT_MAX_PATH * sizeof (WCHAR);
+  ntfn->Name.MaximumLength = (NT_MAX_PATH - 1) * sizeof (WCHAR);
   ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
 
   NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, len, NULL);
@@ -876,7 +876,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
   ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
 
   char *win32_fn = tp.c_get ();
-  sys_wcstombs (win32_fn, NT_MAX_PATH, ntfn->Name.Buffer);
+  sys_wcstombs (win32_fn, NT_MAX_PATH, ntfn->Name.Buffer,
+  		ntfn->Name.Length / sizeof (WCHAR));
   debug_printf ("nt name '%s'", win32_fn);
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
       || !QueryDosDevice (NULL, fnbuf, len))
@@ -947,7 +948,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
     }
 
   if (!justslash)
-    cygwin_conv_to_full_posix_path (w32, posix_fn);
+    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, w32, posix_fn,
+		      NT_MAX_PATH);
   else
     {
       char *s, *d;

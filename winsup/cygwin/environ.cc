@@ -47,7 +47,37 @@ extern bool allow_server;
 
 static char **lastenviron;
 
-extern "C" int env_win32_to_posix_path_list (const char *, char *posix);
+/* Helper functions for the below environment variables which have to
+   be converted Win32<->POSIX. */
+extern "C" ssize_t env_PATH_to_posix (const void *, void *, size_t);
+
+ssize_t
+env_plist_to_posix (const void *win32, void *posix, size_t size)
+{
+  return cygwin_conv_path_list (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, win32,
+				posix, size);
+}
+
+ssize_t
+env_plist_to_win32 (const void *posix, void *win32, size_t size)
+{
+  return cygwin_conv_path_list (CCP_POSIX_TO_WIN_A | CCP_RELATIVE, posix,
+				win32, size);
+}
+
+ssize_t
+env_path_to_posix (const void *win32, void *posix, size_t size)
+{
+  return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, win32,
+			   posix, size);
+}
+
+ssize_t
+env_path_to_win32 (const void *posix, void *win32, size_t size)
+{
+  return cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE, posix,
+			   win32, size);
+}
 
 #define ENVMALLOC \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
@@ -60,26 +90,16 @@ extern "C" int env_win32_to_posix_path_list (const char *, char *posix);
    PATH needs to be here because CreateProcess uses it and gdb uses
    CreateProcess.  HOME is here because most shells use it and would be
    confused by Windows style path names.  */
-static int return_MAX_PATH (const char *) {return CYG_MAX_PATH;}
 static win_env conv_envvars[] =
   {
-    {NL ("PATH="), NULL, NULL, env_win32_to_posix_path_list,
-     cygwin_posix_to_win32_path_list,
-     cygwin_win32_to_posix_path_list_buf_size,
-     cygwin_posix_to_win32_path_list_buf_size, true},
-    {NL ("HOME="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
-    {NL ("LD_LIBRARY_PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
-     cygwin_posix_to_win32_path_list,
-     cygwin_win32_to_posix_path_list_buf_size,
-     cygwin_posix_to_win32_path_list_buf_size, true},
-    {NL ("TMPDIR="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
-    {NL ("TMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
-    {NL ("TEMP="), NULL, NULL, cygwin_conv_to_full_posix_path,
-     cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH, false},
-    {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
+    {NL ("PATH="), NULL, NULL, env_PATH_to_posix, env_plist_to_win32, true},
+    {NL ("HOME="), NULL, NULL, env_path_to_posix, env_path_to_win32, false},
+    {NL ("LD_LIBRARY_PATH="), NULL, NULL,
+			       env_plist_to_posix, env_plist_to_win32, true},
+    {NL ("TMPDIR="), NULL, NULL, env_path_to_posix, env_path_to_win32, false},
+    {NL ("TMP="), NULL, NULL, env_path_to_posix, env_path_to_win32, false},
+    {NL ("TEMP="), NULL, NULL, env_path_to_posix, env_path_to_win32, false},
+    {NULL, 0, NULL, NULL, 0, 0}
   };
 
 static unsigned char conv_start_chars[256] = {0};
@@ -91,8 +111,6 @@ win_env::operator = (struct win_env& x)
   namelen = x.namelen;
   toposix = x.toposix;
   towin32 = x.towin32;
-  posix_len = x.posix_len;
-  win32_len = x.win32_len;
   immediate = false;
   return *this;
 }
@@ -122,7 +140,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
       tmp_pathbuf tp;
       char *buf = tp.c_get ();
       strcpy (buf, name + namelen);
-      towin32 (in_posix, buf);
+      towin32 (in_posix, buf, NT_MAX_PATH);
       native = (char *) realloc (native, namelen + 1 + strlen (buf));
       strcpy (native, name);
       strcpy (native + namelen, buf);
@@ -191,14 +209,15 @@ posify (char **here, const char *value, char *outenv)
 
   memcpy (outenv, src, len);
   char *newvalue = outenv + len;
-  if (!conv->toposix (value, newvalue) || _impure_ptr->_errno != EIDRM)
+  if (!conv->toposix (value, newvalue, NT_MAX_PATH - len)
+      || _impure_ptr->_errno != EIDRM)
     conv->add_cache (newvalue, *value != '/' ? value : NULL);
   else
     {
       /* The conversion routine removed elements from a path list so we have
 	 to recalculate the windows path to remove elements there, too. */
       char cleanvalue[strlen (value) + 1];
-      conv->towin32 (newvalue, cleanvalue);
+      conv->towin32 (newvalue, cleanvalue, sizeof cleanvalue);
       conv->add_cache (newvalue, cleanvalue);
     }
 

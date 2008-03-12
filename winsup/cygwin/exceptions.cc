@@ -470,6 +470,8 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 
 /* Main exception handler. */
 
+extern exception_list *_except_list asm ("%fs:0");
+
 extern "C" char *__progname;
 int
 _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
@@ -623,9 +625,10 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 
   me.copy_context (in);
 
-  /* Reinitialize exception handler list to include just ourselves so that any
-     exceptions that occur in a signal handler will be properly caught. */
-  me.init_exception_handler (handle_exceptions);
+  /* Temporarily replace windows top level SEH with our own handler.
+     We don't want any Windows magic kicking in.  This top level frame
+     will be removed automatically after our exception handler returns. */
+  _except_list->handler = _cygtls::handle_exceptions;
 
   if (masked
       || &me == _sig_tls
@@ -634,7 +637,6 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
       || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
-      rtl_unwind (frame, e);
       /* Print the exception to the console */
       if (!myself->cygstarted)
 	for (int i = 0; status_info[i].name; i++)
@@ -656,6 +658,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	      return 0;
 	    }
 
+	  rtl_unwind (frame, e);
 	  open_stackdumpfile ();
 	  exception (e, in);
 	  stackdump ((DWORD) ebp, 0, 1);

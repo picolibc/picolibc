@@ -652,7 +652,8 @@ warn_msdos (const char *src)
   tmp_pathbuf tp;
   char *posix_path = tp.c_get ();
   small_printf ("cygwin warning:\n");
-  if (cygwin_conv_to_full_posix_path (src, posix_path))
+  if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, src,
+			posix_path, NT_MAX_PATH))
     small_printf ("  MS-DOS style path detected: %s\n  POSIX equivalent preferred.\n",
 		  src);
   else
@@ -661,7 +662,6 @@ warn_msdos (const char *src)
   small_printf ("  CYGWIN environment variable option \"nodosfilewarning\" turns off this warning.\n"
 		"  Consult the user's guide for more details about POSIX paths:\n"
 		"    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames\n");
-
   user_shared->warned_msdos = true;
 }
 
@@ -675,7 +675,7 @@ getfileattr (const char *path) /* path has to be always absolute. */
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
-  RtlInitEmptyUnicodeString (&upath, tp.w_get (), NT_MAX_PATH * sizeof (WCHAR));
+  tp.u_get (&upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
   get_nt_native_path (path, upath);
 
@@ -742,7 +742,7 @@ path_conv::check (PUNICODE_STRING src, unsigned opt,
   char *path = tp.c_get ();
 
   user_shared->warned_msdos = true;
-  sys_wcstombs (path, NT_MAX_PATH, src->Buffer, src->Length / 2);
+  sys_wcstombs (path, NT_MAX_PATH, src->Buffer, src->Length / sizeof (WCHAR));
   path_conv::check (path, opt, suffixes);
 }
 
@@ -1504,22 +1504,22 @@ nofinalslash (const char *src, char *dst)
 /* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
 
 static int
-conv_path_list (const char *src, char *dst, int to_posix)
+conv_path_list (const char *src, char *dst, size_t size, int to_posix)
 {
   char src_delim, dst_delim;
-  int (*conv_fn) (const char *, char *);
+  cygwin_conv_path_t conv_fn;
 
   if (to_posix)
     {
       src_delim = ';';
       dst_delim = ':';
-      conv_fn = cygwin_conv_to_posix_path;
+      conv_fn = CCP_WIN_A_TO_POSIX | CCP_RELATIVE;
     }
   else
     {
       src_delim = ':';
       dst_delim = ';';
-      conv_fn = cygwin_conv_to_win32_path;
+      conv_fn = CCP_POSIX_TO_WIN_A | CCP_RELATIVE;
     }
 
   char *srcbuf = (char *) alloca (strlen (src) + 1);
@@ -1530,16 +1530,22 @@ conv_path_list (const char *src, char *dst, int to_posix)
   do
     {
       char *s = strccpy (srcbuf, &src, src_delim);
-      int len = s - srcbuf;
+      size_t len = s - srcbuf;
       if (len >= NT_MAX_PATH)
 	{
 	  err = ENAMETOOLONG;
 	  break;
 	}
       if (len)
-	err = conv_fn (srcbuf, ++d);
+	{
+	  ++d;
+	  err = cygwin_conv_path (conv_fn, srcbuf, d, size - (d - dst));
+        }
       else if (!to_posix)
-	err = conv_fn (".", ++d);
+	{
+	  ++d;
+	  err = cygwin_conv_path (conv_fn, ".", d, size - (d - dst));
+	}
       else
 	{
 	  if (to_posix == ENV_CVT)
@@ -2767,7 +2773,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   fs_info mntinfo;
   tmp_pathbuf tp;
   UNICODE_STRING unat;
-  RtlInitEmptyUnicodeString (&unat, tp.w_get (), NT_MAX_PATH * sizeof (WCHAR));
+  tp.u_get (&unat);
   get_nt_native_path (native_path, unat);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
@@ -3431,7 +3437,7 @@ symlink_info::check_reparse_point (HANDLE h)
       sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
 		    (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
 			  + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
-		    rp->SymbolicLinkReparseBuffer.SubstituteNameLength / 2);
+		    rp->SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof (WCHAR));
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
@@ -3445,7 +3451,7 @@ symlink_info::check_reparse_point (HANDLE h)
       sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
 		    (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
-		    rp->MountPointReparseBuffer.SubstituteNameLength / 2);
+		    rp->MountPointReparseBuffer.SubstituteNameLength / sizeof (WCHAR));
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
@@ -3724,7 +3730,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   tmp_pathbuf tp;
   UNICODE_STRING upath;
   OBJECT_ATTRIBUTES attr;
-  RtlInitEmptyUnicodeString (&upath, tp.w_get (), NT_MAX_PATH * sizeof (WCHAR));
+  tp.u_get (&upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
   while (suffix.next ())
@@ -4154,36 +4160,114 @@ fchdir (int fd)
     return -1;\
   } while (0)
 
+extern "C" ssize_t
+cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
+		  size_t size)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  path_conv p;
+  tmp_pathbuf tp;
+  size_t lsiz = 0;
+  char *buf = NULL;
+  int error = 0;
+  bool relative = !!(what & CCP_RELATIVE);
+  what &= ~CCP_RELATIVE;
+
+  switch (what)
+    {
+    case CCP_POSIX_TO_WIN_A:
+      p.check ((const char *) from,
+	       PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
+	       | (relative ? PC_NOFULL : 0));
+      if (p.error)
+	return_with_errno (p.error);
+      PUNICODE_STRING up = p.get_nt_native_path ();
+      buf = tp.c_get ();
+      sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
+      buf += 4; /* Skip \??\ */
+      if (ascii_strncasematch (buf, "UNC\\", 4))
+	*(buf += 2) = '\\';
+      lsiz = strlen (buf) + 1;
+      break;
+    case CCP_POSIX_TO_WIN_W:
+      p.check ((const char *) from,
+	       PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
+	       | (relative ? PC_NOFULL : 0));
+      if (p.error)
+	return_with_errno (p.error);
+      lsiz = (p.get_wide_win32_path_len () + 1) * sizeof (WCHAR);
+      break;
+    case CCP_WIN_A_TO_POSIX:
+      buf = tp.c_get ();
+      error = mount_table->conv_to_posix_path ((const char *) from, buf,
+					       relative);
+      if (error)
+	return_with_errno (error);
+      lsiz = strlen (buf) + 1;
+      break;
+    case CCP_WIN_W_TO_POSIX:
+      buf = tp.c_get ();
+      error = mount_table->conv_to_posix_path ((const PWCHAR) from, buf,
+					       relative);
+      if (error)
+	return_with_errno (error);
+      lsiz = strlen (buf) + 1;
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (!size)
+    return lsiz;
+  if (size < lsiz)
+    {
+      set_errno (ENOSPC);
+      return -1;
+    }
+  switch (what)
+    {
+    case CCP_POSIX_TO_WIN_A:
+    case CCP_WIN_A_TO_POSIX:
+    case CCP_WIN_W_TO_POSIX:
+      strcpy ((char *) to, buf);
+      break;
+    case CCP_POSIX_TO_WIN_W:
+      p.get_wide_win32_path ((PWCHAR) to);
+      break;
+    }
+  return 0;
+}
+
+extern "C" void *
+cygwin_create_path (cygwin_conv_path_t what, const void *from)
+{
+  void *to;
+  ssize_t size = cygwin_conv_path (what, from, NULL, 0);
+  if (size <= 0)
+    return NULL;
+  if (!(to = malloc (size)))
+    return NULL;
+  if (cygwin_conv_path (what, from, to, size) == -1)
+    return NULL;
+  return to;
+}
+
+
 extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOFULL | PC_NOWARN);
-  if (p.error)
-    {
-      win32_path[0] = '\0';
-      set_errno (p.error);
-      return -1;
-    }
-
-
-  strcpy (win32_path,
-	  strcmp (p.get_win32 (), ".\\") == 0 ? "." : p.get_win32 ());
-  return 0;
+  return cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE, path, win32_path,
+			   MAX_PATH);
 }
 
 extern "C" int
 cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN);
-  if (p.error)
-    {
-      win32_path[0] = '\0';
-      set_errno (p.error);
-      return -1;
-    }
-
-  strcpy (win32_path, p.get_win32 ());
-  return 0;
+  return cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE, path, win32_path,
+			   MAX_PATH);
 }
 
 /* This is exported to the world as cygwin_foo by cygwin.din.  */
@@ -4191,29 +4275,15 @@ cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 extern "C" int
 cygwin_conv_to_posix_path (const char *path, char *posix_path)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (!*path)
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-  return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 1));
+  return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, posix_path,
+			   MAX_PATH);
 }
 
 extern "C" int
 cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (!*path)
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-  return_with_errno (mount_table->conv_to_posix_path (path, posix_path, 0));
+  return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, path, posix_path,
+			   MAX_PATH);
 }
 
 /* The realpath function is supported on some UNIX systems.  */
@@ -4322,6 +4392,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   path_conv pc(".", PC_POSIX);
   /* The theory is that an upper bound is
      current_size + (num_elms * max_mount_path_len)  */
+  /* FIXME: This method is questionable in the long run. */
 
   unsigned nrel;
   char delim = to_posix ? ';' : ':';
@@ -4365,22 +4436,51 @@ cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
   return conv_path_list_buf_size (path_list, false);
 }
 
-extern "C" int
-env_win32_to_posix_path_list (const char *win32, char *posix)
+extern "C" ssize_t
+env_PATH_to_posix (const void *win32, void *posix, size_t size)
 {
-  return_with_errno (conv_path_list (win32, posix, ENV_CVT));
+  return_with_errno (conv_path_list ((const char *) win32, (char *) posix,
+				     size, ENV_CVT));
 }
 
 extern "C" int
 cygwin_win32_to_posix_path_list (const char *win32, char *posix)
 {
-  return_with_errno (conv_path_list (win32, posix, 1));
+  return_with_errno (conv_path_list (win32, posix, MAX_PATH, 1));
 }
 
 extern "C" int
 cygwin_posix_to_win32_path_list (const char *posix, char *win32)
 {
-  return_with_errno (conv_path_list (posix, win32, 0));
+  return_with_errno (conv_path_list (posix, win32, MAX_PATH, 0));
+}
+
+extern "C" ssize_t
+cygwin_conv_path_list (cygwin_conv_path_t what, const void *from, void *to,
+		       size_t size)
+{
+  /* FIXME: Path lists are (so far) always retaining relative paths. */
+  what &= ~CCP_RELATIVE;
+  switch (what)
+    {
+    case CCP_WIN_W_TO_POSIX:
+    case CCP_POSIX_TO_WIN_W:
+      /*FIXME*/
+      api_fatal ("wide char path lists not yet supported");
+      break;
+    case CCP_WIN_A_TO_POSIX:
+    case CCP_POSIX_TO_WIN_A:
+      if (size == 0)
+	return conv_path_list_buf_size ((const char *) from,
+					what == CCP_WIN_A_TO_POSIX);
+      return_with_errno (conv_path_list ((const char *) from, (char *) to,
+					 size, what == CCP_WIN_A_TO_POSIX));
+      break;
+    default:
+      break;
+    }
+  set_errno (EINVAL);
+  return -1;
 }
 
 /* cygwin_split_path: Split a path into directory and file name parts.
@@ -4685,7 +4785,8 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
   if (!need_posix)
     {
       tocopy = tp.c_get ();
-      sys_wcstombs (tocopy, NT_MAX_PATH, win32.Buffer, win32.Length);
+      sys_wcstombs (tocopy, NT_MAX_PATH, win32.Buffer,
+		    win32.Length / sizeof (WCHAR));
     }
   else
     tocopy = posix;

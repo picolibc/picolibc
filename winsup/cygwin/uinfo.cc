@@ -30,6 +30,7 @@ details. */
 #include "child_info.h"
 #include "environ.h"
 #include "pwdgrp.h"
+#include "tls_pbuf.h"
 #include "ntdll.h"
 
 /* Initialize the part of cygheap_user that does not depend on files.
@@ -240,11 +241,10 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
-  char homepath_env_buf[CYG_MAX_PATH];
   char homedrive_env_buf[3];
   char *newhomedrive = NULL;
   char *newhomepath = NULL;
-
+  tmp_pathbuf tp;
 
   debug_printf ("what %d, pw %p", what, pw);
   if (what == CH_HOME)
@@ -273,11 +273,12 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    setenv ("HOME", "/", 1);
 	  else
 	    {
-	      char home[CYG_MAX_PATH];
-	      char buf[CYG_MAX_PATH];
+	      char *home = tp.c_get ();
+	      char *buf = tp.c_get ();
 	      strcpy (buf, newhomedrive);
 	      strcat (buf, newhomepath);
-	      cygwin_conv_to_full_posix_path (buf, home);
+	      cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, buf, home,
+				NT_MAX_PATH);
 	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
 	      setenv ("HOME", home, 1);
 	    }
@@ -286,10 +287,12 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 
   if (what != CH_HOME && homepath == NULL && newhomepath == NULL)
     {
+      char *homepath_env_buf = tp.c_get ();
       if (!pw)
 	pw = internal_getpwnam (name ());
       if (pw && pw->pw_dir && *pw->pw_dir)
-	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
+	cygwin_conv_path (CCP_POSIX_TO_WIN_A, pw->pw_dir, homepath_env_buf,
+			  NT_MAX_PATH);
       else
 	{
 	  homepath_env_buf[0] = homepath_env_buf[1] = '\0';
@@ -301,16 +304,17 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	     sys_mbstowcs (wuser, sizeof (wuser) / sizeof (*wuser), winname ());
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
-		  sys_wcstombs (homepath_env_buf, CYG_MAX_PATH,
+		  sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
 		  		ui->usri3_home_dir);
 		  if (!homepath_env_buf[0])
 		    {
-		      sys_wcstombs (homepath_env_buf, CYG_MAX_PATH,
+		      sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
 				    ui->usri3_home_dir_drive);
 		      if (homepath_env_buf[0])
 			strcat (homepath_env_buf, "\\");
 		      else
-			cygwin_conv_to_full_win32_path ("/", homepath_env_buf);
+			cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE,
+					  "/", homepath_env_buf, NT_MAX_PATH);
 		    }
 		}
 	    }

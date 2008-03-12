@@ -23,10 +23,8 @@ struct win_env
     size_t namelen;
     char *posix;
     char *native;
-    int (*toposix) (const char *, char *);
-    int (*towin32) (const char *, char *);
-    int (*posix_len) (const char *);
-    int (*win32_len) (const char *);
+    ssize_t (*toposix) (const void *, void *, size_t);
+    ssize_t (*towin32) (const void *, void *, size_t);
     bool immediate;
     void add_cache (const char *in_posix, const char *in_native = NULL)
       __attribute__ ((regparm (3)));

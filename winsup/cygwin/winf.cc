@@ -141,7 +141,8 @@ av::unshift (const char *what, int conv)
   char *buf = tp.c_get ();
   if (conv)
     {
-      cygwin_conv_to_posix_path (what, buf);
+      cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, what, buf,
+			NT_MAX_PATH);
       char *p = strchr (buf, '\0') - 4;
       if (p > buf && ascii_strcasematch (p, ".exe"))
 	*p = '\0';
