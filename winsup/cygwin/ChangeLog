@@ -1,5 +1,10 @@
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.h: Fix comment.
+	* winsup.h: Ditto.  Reflect the fact that CYG_MAX_PATH is deprecated.
+
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pipe.cc (fhandler_pipe::create_selectable): Use MAX_PATH instead of
 	CYG_MAX_PATH.
 	* tty.cc (tty_list::init_session): Ditto.

@@ -15,8 +15,7 @@ void environ_init (char **, int)
 /* The structure below is used to control conversion to/from posix-style
    file specs.  Currently, only PATH and HOME are converted, but PATH
    needs to use a "convert path list" function while HOME needs a simple
-   "convert to posix/win32".  For the simple case, where a calculated length
-   is required, just return CYG_MAX_PATH.  *FIXME* */
+   "convert to posix/win32".  */
 struct win_env
   {
     const char *name;

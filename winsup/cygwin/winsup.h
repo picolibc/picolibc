@@ -64,16 +64,10 @@ extern unsigned long cygwin_inet_addr (const char *cp);
    PATH_MAX is from Posix and does include the trailing NUL.
    MAXPATHLEN is from Unix.
 
-   Thou shalt use CYG_MAX_PATH throughout.  It avoids the NUL vs no-NUL
-   issue and is neither of the Unixy ones [so we can punt on which
-   one is the right one to use].
-
-   Windows ANSI calls are limited to MAX_PATH in length. Cygwin calls that
-   thunk through to Windows Wide calls are limited to 32K. We define
-   CYG_MAX_PATH as a convenient, not to short, not too long 'happy medium'.
-
-   */
-
+   Thou shalt *not* use CYG_MAX_PATH anymore.  Use NT_MAX_PATH or
+   dynamic allocation instead when accessing real files.  Use
+   MAX_PATH in case you need a convenient small buffer when creating
+   names for synchronization objects or named pipes. */
 #define CYG_MAX_PATH (MAX_PATH)
 
 /* There's no define for the maximum path length the NT kernel can handle.
