@@ -1785,16 +1785,20 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	}
     }
 
-  char tmp[NAME_MAX + 1];
-  sys_wcstombs (tmp, NAME_MAX + 1, fname->Buffer,
-  		fname->Length / sizeof (WCHAR));
   if (pc.isencoded ())
-    fnunmunge (de->d_name, tmp);
+    {
+      char tmp[NAME_MAX + 1];
+      sys_wcstombs (tmp, NAME_MAX + 1, fname->Buffer,
+		    fname->Length / sizeof (WCHAR));
+      fnunmunge (de->d_name, tmp);
+    }
   else
-    strcpy (de->d_name, tmp);
-  if (dir->__d_position == 0 && !strcmp (tmp, "."))
+    sys_wcstombs (de->d_name, NAME_MAX + 1, fname->Buffer,
+		  fname->Length / sizeof (WCHAR));
+
+  if (dir->__d_position == 0 && !strcmp (de->d_name, "."))
     dir->__flags |= dirent_saw_dot;
-  else if (dir->__d_position == 1 && !strcmp (tmp, ".."))
+  else if (dir->__d_position == 1 && !strcmp (de->d_name, ".."))
     dir->__flags |= dirent_saw_dot_dot;
   return 0;
 }

@@ -1,5 +1,10 @@
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Don't
+	copy filename twice in the non-managed case.
+
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winsup.h (NT_MAX_PATH): Revert ill-advised change to 32767.
 	Accommodate change throughout.
 
