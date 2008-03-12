@@ -1785,6 +1785,11 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	}
     }
 
+  /* Transform special DOS chars back to normal. */
+  for (USHORT i = 0; i < fname->Length / sizeof (WCHAR); ++i)
+    if ((fname->Buffer[i] & 0xff00) == 0xf000)
+      fname->Buffer[i] &= 0xff;
+#if 0
   if (pc.isencoded ())
     {
       char tmp[NAME_MAX + 1];
@@ -1793,6 +1798,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       fnunmunge (de->d_name, tmp);
     }
   else
+#endif
     sys_wcstombs (de->d_name, NAME_MAX + 1, fname->Buffer,
 		  fname->Length / sizeof (WCHAR));
 

@@ -253,7 +253,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
   char *dst_start = dst;
   syscall_printf ("src %s", src);
 
-  if (isdrive (src) || *src == '\\')
+  if ((isdrive (src) && src[2] == '\\') || *src == '\\')
     goto win32_path;
 
   tail = dst;
@@ -580,8 +580,61 @@ path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
   memcpy (normalized_path, path_copy, n);
 }
 
-PUNICODE_STRING
-get_nt_native_path (const char *path, UNICODE_STRING& upath)
+WCHAR tfx_chars[] NO_COPY = {
+   0,   1,   2,   3,   4,   5,   6,   7,
+   8,   9,  10,  11,  12,  13,  14,  15,
+  16,  17,  18,  19,  20,  21,  22,  23,
+  24,  25,  26,  27,  28,  29,  30,  31,
+  32, '!', 0xf000 | '"', '#', '$', '%', '&',  39,
+  '(', ')', 0xf000 | '*', '+', ',', '-', '.', '/',
+ '0', '1', '2', '3', '4', '5', '6', '7',
+ '8', '9', 0xf000 | ':', ';', 0xf000 | '<', '=', 0xf000 | '>', 0xf000 | '?',
+ '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
+ 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+ 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+ 'X', 'Y', 'Z', '[',  '\\', ']', '^', '_',
+ '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+ 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+ 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+ 'x', 'y', 'z', '{', 0xf000 | '|', '}', '~', 127
+};
+
+WCHAR tfx_chars_managed[] NO_COPY = {
+   0,   1,   2,   3,   4,   5,   6,   7,
+   8,   9,  10,  11,  12,  13,  14,  15,
+  16,  17,  18,  19,  20,  21,  22,  23,
+  24,  25,  26,  27,  28,  29,  30,  31,
+  32, '!', 0xf000 | '"', '#', '$', '%', '&',  39,
+  '(', ')', 0xf000 | '*', '+', ',', '-', '.', '/',
+ '0', '1', '2', '3', '4', '5', '6', '7',
+ '8', '9', 0xf000 | ':', ';', 0xf000 | '<', '=', 0xf000 | '>', 0xf000 | '?',
+ '@', 0xf000 | 'A', 0xf000 | 'B', 0xf000 | 'C', 0xf000 | 'D', 0xf000 | 'E', 0xf000 | 'F', 0xf000 | 'G',
+ 0xf000 | 'H', 0xf000 | 'I', 0xf000 | 'J', 0xf000 | 'K', 0xf000 | 'L', 0xf000 | 'M', 0xf000 | 'N', 0xf000 | 'O',
+ 0xf000 | 'P', 0xf000 | 'Q', 0xf000 | 'R', 0xf000 | 'S', 0xf000 | 'T', 0xf000 | 'U', 0xf000 | 'V', 0xf000 | 'W',
+ 0xf000 | 'X', 0xf000 | 'Y', 0xf000 | 'Z', '[',  '\\', ']', '^', '_',
+ '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+ 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+ 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+ 'x', 'y', 'z', '{', 0xf000 | '|', '}', '~', 127
+};
+
+static void
+transform_chars (PUNICODE_STRING upath, USHORT start_idx, bool managed)
+{
+  register PWCHAR buf = upath->Buffer;
+  register PWCHAR end = buf + upath->Length / sizeof (WCHAR) - 1;
+  register PWCHAR tfx = managed ? tfx_chars_managed : tfx_chars;
+  for (buf += start_idx; buf <= end; ++buf)
+    if (*buf < 128)
+      *buf = tfx[*buf];
+  /* Win32 can't handle trailing dots and spaces.  Transform the last of them
+     to the private use area, too, to create a valid Win32 filename. */
+  if (*end == L'.' || *end == L' ')
+    *end |= 0xf000;
+}
+
+static PUNICODE_STRING
+get_nt_native_path (const char *path, UNICODE_STRING& upath, bool managed)
 {
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
@@ -590,6 +643,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
     {
       str2uni_cat (upath, "\\??\\");
       str2uni_cat (upath, path);
+      transform_chars (&upath, 7, managed);
     }
   else if (path[1] != '\\')	/* \Device\... */
     str2uni_cat (upath, path);
@@ -598,6 +652,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
     {
       str2uni_cat (upath, "\\??\\UNC\\");
       str2uni_cat (upath, path + 2);
+      transform_chars (&upath, 8, managed);
     }
   else				/* \\.\device or \\?\foo */
     {
@@ -616,7 +671,7 @@ path_conv::get_nt_native_path ()
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
-      ::get_nt_native_path (path, uni_path);
+      ::get_nt_native_path (path, uni_path, isencoded ());
     }
   return &uni_path;
 }
@@ -666,7 +721,7 @@ warn_msdos (const char *src)
 }
 
 static DWORD
-getfileattr (const char *path) /* path has to be always absolute. */
+getfileattr (const char *path, bool managed) /* path has to be always absolute. */
 {
   tmp_pathbuf tp;
   UNICODE_STRING upath;
@@ -677,7 +732,7 @@ getfileattr (const char *path) /* path has to be always absolute. */
 
   tp.u_get (&upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  get_nt_native_path (path, upath);
+  get_nt_native_path (path, upath, managed);
 
   status = NtQueryAttributesFile (&attr, &fbi);
   if (NT_SUCCESS (status))
@@ -872,7 +927,7 @@ path_conv::check (const char *src, unsigned opt,
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 	      else
 		{
-		  fileattr = getfileattr (this->path);
+		  fileattr = getfileattr (this->path, sym.pflags & MOUNT_ENC);
 		  dev.devn = FH_FS;
 		}
 	      goto out;
@@ -881,7 +936,7 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      dev.devn = FH_FS;
 #if 0
-	      fileattr = getfileattr (this->path);
+	      fileattr = getfileattr (this->path, sym.pflags & MOUNT_ENC);
 	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
 		{
 		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
@@ -1170,6 +1225,7 @@ out:
     {
       if (strncmp (path, "\\\\.\\", 4))
 	{
+#if 0
 	  /* Windows ignores trailing dots and spaces in the last path
 	     component, and ignores exactly one trailing dot in inner
 	     path components. */
@@ -1190,7 +1246,7 @@ out:
 		  tail = NULL;
 		}
 	    }
-
+#endif
 	  if (!tail || tail == path)
 	    /* nothing */;
 	  else if (tail[-1] != '\\')
@@ -1776,12 +1832,13 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
     /* nothing */;
   else if ((!(flags & MOUNT_ENC) && isdrive (dst) && !dst[2]) || *p)
     dst[n++] = '\\';
-  if (!*p || !(flags & MOUNT_ENC))
-    {
+  //if (!*p || !(flags & MOUNT_ENC))
+    //{
       if ((n + strlen (p)) >= NT_MAX_PATH)
 	err = ENAMETOOLONG;
       else
 	backslashify (p, dst + n, 0);
+#if 0
     }
   else
     {
@@ -1803,6 +1860,7 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
 	  p = s;
 	}
     }
+#endif
   return err;
 }
 
@@ -2135,7 +2193,6 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     }
 
   int pathbuflen = tail - pathbuf;
-  char *tmpbuf = tp.c_get ();
   for (int i = 0; i < nmounts; ++i)
     {
       mount_item &mi = mount[native_sorted[i]];
@@ -2172,11 +2229,14 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	  const char *p = cygheap->root.unchroot (posix_path);
 	  memmove (posix_path, p, strlen (p) + 1);
 	}
+#if 0
       if (mi.flags & MOUNT_ENC)
 	{
+	  char *tmpbuf = tp.c_get ();
 	  if (fnunmunge (tmpbuf, posix_path))
 	    strcpy (posix_path, tmpbuf);
 	}
+#endif
       goto out;
     }
 
@@ -2774,7 +2834,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   tmp_pathbuf tp;
   UNICODE_STRING unat;
   tp.u_get (&unat);
-  get_nt_native_path (native_path, unat);
+  get_nt_native_path (native_path, unat, flags & MOUNT_ENC);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, true);  /* this pulls from a cache, usually. */
@@ -3740,7 +3800,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       IO_STATUS_BLOCK io;
 
       error = 0;
-      get_nt_native_path (suffix.path, upath);
+      get_nt_native_path (suffix.path, upath, pflags & MOUNT_ENC);
       status = NtQueryAttributesFile (&attr, &fbi);
       if (NT_SUCCESS (status))
 	fileattr = fbi.FileAttributes;

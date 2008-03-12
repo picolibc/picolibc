@@ -21,8 +21,6 @@ details. */
 #define isvirtual_dev(devn) \
   (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
 
-extern PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING &);
-
 inline bool
 has_attribute (DWORD attributes, DWORD attribs_to_test)
 {
