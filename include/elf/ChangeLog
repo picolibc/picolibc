@@ -1,20 +1,30 @@
 2008-03-12  Alan Modra  <amodra@bigpond.net.au>
 
-	* elf/cr16c.h (SHN_CR16C_FCOMMON): Define using SHN_LORESERVE.
+	PR 5900
+	* common.h (SHN_BAD): Delete.
+	(SHN_LORESERVE .. SHN_HIRESERVE): Move to..
+	* external.h: ..here.
+	* internal.h (SHN_LORESERVE, SHN_HIRESERVE): Define.
+	(SHN_LOPROC, SHN_HIPROC, SHN_LOOS, SHN_HIOS): Define.
+	(SHN_ABS, SHN_COMMON, SHN_XINDEX, SHN_BAD): Define.
+
+2008-03-12  Alan Modra  <amodra@bigpond.net.au>
+
+	* cr16c.h (SHN_CR16C_FCOMMON): Define using SHN_LORESERVE.
 	(SHN_CR16C_NCOMMON): Likewise.
-	* elf/hppa.h (SHN_PARISC_ANSI_COMMON): Likewise.
+	* hppa.h (SHN_PARISC_ANSI_COMMON): Likewise.
 	(SHN_PARISC_HUGE_COMMON): Likewise.
-	* elf/ia64.h (SHN_IA_64_ANSI_COMMON): Likewise.
+	* ia64.h (SHN_IA_64_ANSI_COMMON): Likewise.
 	(SHN_IA_64_VMS_SYMVEC): Define using SHN_LOOS.
-	* elf/m32r.h (SHN_M32R_SCOMMON): Define using SHN_LORESERVE.
-	* elf/mips.h (SHN_MIPS_ACOMMON, SHN_MIPS_TEXT): Likewise.
+	* m32r.h (SHN_M32R_SCOMMON): Define using SHN_LORESERVE.
+	* mips.h (SHN_MIPS_ACOMMON, SHN_MIPS_TEXT): Likewise.
 	(SHN_MIPS_DATA, SHN_MIPS_SCOMMON, SHN_MIPS_SUNDEFINED): Likewise.
-	* elf/score.h (SHN_SCORE_TEXT, SHN_SCORE_DATA): Likewise.
+	* score.h (SHN_SCORE_TEXT, SHN_SCORE_DATA): Likewise.
 	(SHN_SCORE_SCOMMON): Likewise.
-	* elf/sparc.h (SHN_BEFORE, SHN_AFTER): Likewise.
-	* elf/v850.h (SHN_V850_SCOMMON, SHN_V850_TCOMMON): Likewise.
+	* sparc.h (SHN_BEFORE, SHN_AFTER): Likewise.
+	* v850.h (SHN_V850_SCOMMON, SHN_V850_TCOMMON): Likewise.
 	(SHN_V850_ZCOMMON): Likewise.
-	* elf/x86-64.h (SHN_X86_64_LCOMMON): Likewise.
+	* x86-64.h (SHN_X86_64_LCOMMON): Likewise.
 
 2008-03-03  Pallavi Tambay  <pallavi.tambay@amd.com>
 

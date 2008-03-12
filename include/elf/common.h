@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007
+   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -495,21 +495,6 @@
 #define STT_HIOS	12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */
 #define STT_HIPROC	15		/* Application-specific semantics */
-
-/* Special section indices, which may show up in st_shndx fields, among
-   other places.  */
-
-#define SHN_UNDEF	0		/* Undefined section reference */
-#define SHN_LORESERVE	0xFF00		/* Begin range of reserved indices */
-#define SHN_LOPROC	0xFF00		/* Begin range of appl-specific */
-#define SHN_HIPROC	0xFF1F		/* End range of appl-specific */
-#define SHN_LOOS	0xFF20		/* OS specific semantics, lo */
-#define SHN_HIOS	0xFF3F		/* OS specific semantics, hi */
-#define SHN_ABS		0xFFF1		/* Associated symbol is absolute */
-#define SHN_COMMON	0xFFF2		/* Associated symbol is in common */
-#define SHN_XINDEX	0xFFFF		/* Section index is held elsewhere */
-#define SHN_HIRESERVE	0xFFFF		/* End range of reserved indices */
-#define SHN_BAD		((unsigned) -1) /* Used internally by bfd */
 
 /* The following constants control how a symbol may be accessed once it has
    become part of an executable or shared library.  */

@@ -1,6 +1,6 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001, 2003, 2005
-   Free Software Foundation, Inc.
+   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001, 2003, 2005,
+   2008 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -34,6 +34,19 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 
 #ifndef _ELF_EXTERNAL_H
 #define _ELF_EXTERNAL_H
+
+/* Special section indices, which may show up in st_shndx fields, among
+   other places.  */
+
+#define SHN_LORESERVE	0xFF00		/* Begin range of reserved indices */
+#define SHN_LOPROC	0xFF00		/* Begin range of appl-specific */
+#define SHN_HIPROC	0xFF1F		/* End range of appl-specific */
+#define SHN_LOOS	0xFF20		/* OS specific semantics, lo */
+#define SHN_HIOS	0xFF3F		/* OS specific semantics, hi */
+#define SHN_ABS		0xFFF1		/* Associated symbol is absolute */
+#define SHN_COMMON	0xFFF2		/* Associated symbol is in common */
+#define SHN_XINDEX	0xFFFF		/* Section index is held elsewhere */
+#define SHN_HIRESERVE	0xFFFF		/* End range of reserved indices */
 
 /* ELF Header (32-bit implementations) */
 

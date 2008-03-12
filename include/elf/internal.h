@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1998, 2000, 2001, 2002,
-   2003, 2006, 2007 Free Software Foundation, Inc.
+   2003, 2006, 2007, 2008 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -36,6 +36,31 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 
 #ifndef _ELF_INTERNAL_H
 #define _ELF_INTERNAL_H
+
+/* Special section indices, which may show up in st_shndx fields, among
+   other places.  */
+
+#undef SHN_UNDEF
+#undef SHN_LORESERVE
+#undef SHN_LOPROC
+#undef SHN_HIPROC
+#undef SHN_LOOS
+#undef SHN_HIOS
+#undef SHN_ABS
+#undef SHN_COMMON
+#undef SHN_XINDEX
+#undef SHN_HIRESERVE
+#define SHN_UNDEF	0		/* Undefined section reference */
+#define SHN_LORESERVE	(-0x100u)	/* Begin range of reserved indices */
+#define SHN_LOPROC	(-0x100u)	/* Begin range of appl-specific */
+#define SHN_HIPROC	(-0xE1u)	/* End range of appl-specific */
+#define SHN_LOOS	(-0xE0u)	/* OS specific semantics, lo */
+#define SHN_HIOS	(-0xC1u)	/* OS specific semantics, hi */
+#define SHN_ABS		(-0xFu)		/* Associated symbol is absolute */
+#define SHN_COMMON	(-0xEu)		/* Associated symbol is in common */
+#define SHN_XINDEX	(-0x1u)		/* Section index is held elsewhere */
+#define SHN_HIRESERVE	(-0x1u)		/* End range of reserved indices */
+#define SHN_BAD		(-0x101u)	/* Used internally by bfd */
 
 /* ELF Header */
 
