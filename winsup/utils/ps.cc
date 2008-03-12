@@ -20,6 +20,10 @@ details. */
 #include <tlhelp32.h>
 #include <psapi.h>
 
+/* Maximum possible path length under NT.  There's no official define
+   for that value.  Note that PATH_MAX is only 4K. */
+#define NT_MAX_PATH 32768
+
 static const char version[] = "$Revision$";
 static char *prog_name;
 
@@ -355,7 +359,9 @@ main (int argc, char *argv[])
       else if (p->process_state & PID_TTYOU)
 	status = 'O';
 
-      char pname[PATH_MAX];
+      /* Maximum possible path length under NT.  There's no official define
+         for that value. */
+      char pname[NT_MAX_PATH];
       if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
 	strcpy (pname, "<defunct>");
       else if (p->ppid)
@@ -363,9 +369,11 @@ main (int argc, char *argv[])
 	  char *s;
 	  pname[0] = '\0';
 	  if (p->version >= EXTERNAL_PINFO_VERSION_32_LP)
-	    cygwin_conv_to_posix_path (p->progname_long, pname);
+	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+			      p->progname_long, pname, NT_MAX_PATH);
 	  else
-	    cygwin_conv_to_posix_path (p->progname, pname);
+	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+			      p->progname, pname, NT_MAX_PATH);
 	  s = strchr (pname, '\0') - 4;
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
 	    *s = '\0';

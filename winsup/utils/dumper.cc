@@ -888,7 +888,6 @@ main (int argc, char **argv)
   int opt;
   const char *p = "";
   DWORD pid;
-  char win32_name [MAX_PATH];
 
   while ((opt = getopt_long (argc, argv, "dqhv", longopts, NULL) ) != EOF)
     switch (opt)
@@ -911,8 +910,11 @@ main (int argc, char **argv)
 
   if (argv && *(argv + optind) && *(argv + optind +1))
     {
-      *win32_name = '\0';
-      cygwin_conv_to_win32_path (*(argv + optind), win32_name);
+      ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE,
+				      *(argv + optind), NULL, 0);
+      char *win32_name = (char *) alloca (len);
+      cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE,  *(argv + optind),
+			win32_name, len);
       if ((p = strrchr (win32_name, '\\')))
 	p++;
       else

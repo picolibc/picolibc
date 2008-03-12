@@ -197,7 +197,8 @@ current_user (int print_sids, int print_cygpath,
 	    strlcat (homedir_w32, "\\", sizeof (homedir_w32));
 	  strlcat (homedir_w32, envhomepath, sizeof (homedir_w32));
 	  if (print_cygpath)
-	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
+	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, homedir_w32,
+			      homedir_psx, MAX_PATH);
 	  else
 	    psx_dir (homedir_w32, homedir_psx);
 	}
@@ -298,7 +299,8 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	      if (homedir_w32[0] != '\0')
 		{
 		  if (print_cygpath)
-		    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
+		    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
+				      homedir_w32, homedir_psx, MAX_PATH);
 		  else
 		    psx_dir (homedir_w32, homedir_psx);
 		}

@@ -607,7 +607,8 @@ do_sysfolders (char option)
     }
   else if (!windows_flag)
     {
-      if (cygwin_conv_to_posix_path (buf, buf2))
+      if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, buf, buf2,
+	  MAX_PATH))
 	fprintf (stderr, "%s: error converting \"%s\" - %s\n",
 		 prog_name, buf, strerror (errno));
       else
@@ -646,8 +647,10 @@ do_pathconv (char *filename)
 {
   char *buf;
   DWORD len;
-  int err;
-  int (*conv_func) (const char *, char *);
+  ssize_t err;
+  cygwin_conv_path_t conv_func =
+		      (unix_flag ? CCP_WIN_A_TO_POSIX : CCP_POSIX_TO_WIN_A)
+		    | (absolute_flag ? CCP_ABSOLUTE : CCP_RELATIVE);
 
   if (!path_flag)
     {
@@ -662,10 +665,8 @@ do_pathconv (char *filename)
 	  exit (1);
 	}
     }
-  else if (unix_flag)
-    len = cygwin_win32_to_posix_path_list_buf_size (filename);
   else
-    len = cygwin_posix_to_win32_path_list_buf_size (filename);
+    len = cygwin_conv_path_list (conv_func, filename, NULL, 0);
 
   buf = (char *) malloc (len);
   if (buf == NULL)
@@ -676,11 +677,9 @@ do_pathconv (char *filename)
 
   if (path_flag)
     {
-      if (unix_flag)
-	err = cygwin_win32_to_posix_path_list (filename, buf);
-      else
+      err = cygwin_conv_path_list (conv_func, filename, buf, len);
+      if (!unix_flag)
 	{
-	  err = cygwin_posix_to_win32_path_list (filename, buf);
 	  if (err)
 	    /* oops */;
 	  buf = get_device_paths (buf);
@@ -700,13 +699,7 @@ do_pathconv (char *filename)
     }
   else
     {
-      if (unix_flag)
-	conv_func = (absolute_flag ? cygwin_conv_to_full_posix_path :
-		     cygwin_conv_to_posix_path);
-      else
-	conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
-		     cygwin_conv_to_win32_path);
-      err = conv_func (filename, buf);
+      err = cygwin_conv_path (conv_func, filename, buf, len);
       if (err)
 	{
 	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",

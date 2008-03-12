@@ -414,8 +414,11 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
 	}
       else if (argv[1])
 	{ 
-	  char win32_path[MAX_PATH];
-	  cygwin_conv_to_win32_path (argv[1], win32_path);
+	  ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE,
+					  argv[1], NULL, 0);
+	  char win32_path[len];
+	  cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE, argv[1],
+			    win32_path, len);
 	  rv = RegLoadKey (base, n, win32_path);
 	  if (rv != ERROR_SUCCESS)
 	    Fail (rv);
@@ -849,8 +852,11 @@ cmd_save ()
   set_privilege (SE_BACKUP_NAME);
   /* REG_OPTION_BACKUP_RESTORE is necessary to save /HKLM/SECURITY */
   find_key (1, KEY_QUERY_VALUE, REG_OPTION_BACKUP_RESTORE);
-  char win32_path[MAX_PATH];
-  cygwin_conv_to_win32_path (argv[1], win32_path);
+  ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE,
+				  argv[1], NULL, 0);
+  char win32_path[len];
+  cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_RELATIVE, argv[1],
+		    win32_path, len);
   DWORD rv = RegSaveKey (key, win32_path, NULL);
   if (rv != ERROR_SUCCESS)
     Fail (rv);

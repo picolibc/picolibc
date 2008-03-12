@@ -1,3 +1,16 @@
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (do_sysfolders): Use cygwin_conv_path.
+	(do_pathconv): Use cygwin_conv_path and cygwin_conv_path_list.
+	* dumper.cc (main): Use cygwin_conv_path.  Allocate target path
+	dynamically.
+	* mkpasswd.c (current_user): Use cygwin_conv_path.
+	(enum_users): Ditto.
+	* ps.cc (NT_MAX_PATH): Define.
+	(main): Use cygwin_conv_path.
+	* regtool.cc (find_key): Ditto. Allocate target path dynamically.
+	(cmd_save): Ditto.
+
 2008-03-11  Brian Dessent  <brian@dessent.net>
 
 	* cygcheck.cc (find_app_on_path): Make buffer SYMLINK_MAX + 1
