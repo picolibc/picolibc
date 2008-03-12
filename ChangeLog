@@ -1,3 +1,7 @@
+2008-03-13  Ben Elliston  <bje@au.ibm.com>
+
+	* config.sub, config.guess: Update from upstream sources.
+
 2008-03-06  Florian Krohm  <fkrohm@us.ibm.com>
 
 	* s390-opc.c (INSTR_RSL_R0RD): Fix operands.
