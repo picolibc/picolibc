@@ -3,7 +3,7 @@
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Disable
 	munging.  Convert all chars in the 0xf0xx area to it's ascii equivalent.
 	* path.cc (normalize_posix_path): Don't treat "X:foo" as windows path,
-	only "a:\foo".
+	only "X:\foo".
 	(tfx_chars): New transformation table for special DOS chars.
 	(tfx_chars_managed): Ditto, plus transformation of uppercase ASCII
 	chars.
