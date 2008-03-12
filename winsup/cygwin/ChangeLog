@@ -1,5 +1,10 @@
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Just return with 0 if filenames are identical,
+	per POSIX.  Drop comment added in previous patch.
+
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Handle a special case of trying to rename a
 	mount point.
 
