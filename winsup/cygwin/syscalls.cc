@@ -1573,13 +1573,21 @@ rename (const char *oldpath, const char *newpath)
   /* First check if oldpath and newpath only differ by case.  If so, it's
      just a request to change the case of the filename.  By simply setting
      the file attributes to INVALID_FILE_ATTRIBUTES (which translates to
-     "file doesn't exist"), all later tests are skipped. */
-  if (newpc.exists ()
-      && equal_path
-      && !RtlEqualUnicodeString (oldpc.get_nt_native_path (),
+     "file doesn't exist"), all later tests are skipped.
+     If not, it's a request to change the case of the name of a mount
+     point.  If we don't catch this here, the underlying directory would
+     be deleted, if it happens to be empty. */
+  if (newpc.exists () && equal_path)
+    {
+      if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				 newpc.get_nt_native_path (),
 				 FALSE))
-    newpc.file_attributes (INVALID_FILE_ATTRIBUTES);
+	{
+	  set_errno (EACCES);
+	  goto out;
+	}
+      newpc.file_attributes (INVALID_FILE_ATTRIBUTES);
+    }
   else if (oldpc.isdir ())
     {
       if (newpc.exists () && !newpc.isdir ())

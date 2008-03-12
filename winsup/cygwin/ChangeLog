@@ -1,5 +1,10 @@
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Handle a special case of trying to rename a
+	mount point.
+
+2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.h: Fix comment.
 	* winsup.h: Ditto.  Reflect the fact that CYG_MAX_PATH is deprecated.
 
