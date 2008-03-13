@@ -1,3 +1,9 @@
+2008-03-13  Alan Modra  <amodra@bigpond.net.au>
+
+	* internal.h (Elf_Internal_Shdr): Change sh_link and sh_info from
+	unsigned long to unsigned int.  Change sh_addralign to bfd_vma.
+	Order struct as for external version.
+
 2008-03-12  Alan Modra  <amodra@bigpond.net.au>
 
 	PR 5900

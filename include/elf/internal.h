@@ -105,12 +105,12 @@ typedef struct elf_internal_shdr {
   unsigned int	sh_type;		/* Type of section */
   bfd_vma	sh_flags;		/* Miscellaneous section attributes */
   bfd_vma	sh_addr;		/* Section virtual addr at execution */
-  bfd_size_type	sh_size;		/* Size of section in bytes */
-  bfd_size_type	sh_entsize;		/* Entry size if section holds table */
-  unsigned long	sh_link;		/* Index of another section */
-  unsigned long	sh_info;		/* Additional section information */
   file_ptr	sh_offset;		/* Section file offset */
-  unsigned int	sh_addralign;		/* Section alignment */
+  bfd_size_type	sh_size;		/* Size of section in bytes */
+  unsigned int	sh_link;		/* Index of another section */
+  unsigned int	sh_info;		/* Additional section information */
+  bfd_vma	sh_addralign;		/* Section alignment */
+  bfd_size_type	sh_entsize;		/* Entry size if section holds table */
 
   /* The internal rep also has some cached info associated with it. */
   asection *	bfd_section;		/* Associated BFD section.  */
