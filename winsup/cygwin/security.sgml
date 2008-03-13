@@ -1,0 +1,45 @@
+<sect1 id="func-cygwin-logon_user">
+<title>cygwin_logon_user</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" HANDLE
+<function>cygwin_logon_user</function></funcdef>
+<paramdef>const struct passwd *<parameter>passwd_entry</parameter></paramdef>
+<paramdef>const char *<parameter>password</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>Given a pointer ot a passwd entry of a user and a cleartext password,
+returns a HANDLE to an impersonation token for this user which can be used
+in a subsequent call to <function>cygwin_set_impersonation_token</function>
+to impersonate that user.  This function can only be called from a process
+which has the required NT user rights to perform a logon.</para>
+
+<para>See also the chapter "New setuid concept" in the Cygwin user's guide.
+</para>
+
+<para>See also <link linkend="func-cygwin-set-impersonation-token">cygwin_set_impersonation_token</link></para>
+
+</sect1>
+
+<sect1 id="func-cygwin-set-impersonation-token">
+<title>cygwin_set_impersonation_token</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" void
+<function>cygwin_set_impersonation_token</function></funcdef>
+<paramdef>const HANDLE <parameter>token</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>Use this function to enable the token given as parameter as
+impersonation token for the next call to <function>setuid</function> or
+<function>seteuid</function>.  Use
+<function>cygwin_set_impersonation_token</function> together with
+<function>cygwin_logon_user</function> to impersonate users using
+password authentication.</para>
+
+<para>See also the chapter "New setuid concept" in the Cygwin user's guide.
+</para>
+
+<para>See also <link linkend="func-cygwin-logon_user">cygwin_logon_user</link></para>
+
+</sect1>

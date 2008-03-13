@@ -1,163 +1,131 @@
-<sect1 id="func-cygwin-posix-to-win32-path-list">
-<title>cygwin_posix_to_win32_path_list</title>
+<sect1 id="func-cygwin-conv-path">
+<title>cygwin_conv_path</title>
 
 <funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_posix_to_win32_path_list</function></funcdef>
-<paramdef>const char *<parameter>posix</parameter></paramdef>
-<paramdef>char *<parameter>win32</parameter></paramdef>
+<funcdef>extern "C" ssize_t
+<function>cygwin_conv_path</function></funcdef>
+<paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
+<paramdef>const void * <parameter>from</parameter></paramdef>
+<paramdef>void * <parameter>to</parameter></paramdef>
+<paramdef>size_t <parameter>size</parameter></paramdef>
 </funcprototype></funcsynopsis>
 
-<para>Given a POSIX path-style string (i.e. /foo:/bar) convert it to
-the equivalent Win32 path-style string (i.e. d:\;e:\bar).
-<parameter>win32</parameter> must point to a sufficiently large
-buffer.</para>
+<para>Use this function to convert POSIX paths in
+<parameter>from</parameter> to Win32 paths in <parameter>to</parameter>
+or, vice versa, Win32 paths in <parameter>from</parameter> to POSIX paths
+in <parameter>to</parameter>.  <parameter>what</parameter>
+defines the direction of this conversion and can be any of the below
+values.</para>
+
+<programlisting>
+  CCP_POSIX_TO_WIN_A      /* from is char *posix, to is char *win32       */
+  CCP_POSIX_TO_WIN_W,     /* from is char *posix, to is wchar_t *win32    */
+  CCP_WIN_A_TO_POSIX,     /* from is char *win32, to is char *posix       */
+  CCP_WIN_W_TO_POSIX,     /* from is wchar_t *win32, to is char *posix    */
+</programlisting>
+
+<para>You can additionally or the following values to
+<parameter>what</parameter>, to define whether you want the resulting
+path in <parameter>to</parameter> to be absolute or if you want to keep
+relative paths in relative notation.  Creating absolute paths is the
+default.</para>
+
+<programlisting>
+  CCP_ABSOLUTE = 0,       /* Request absolute path (default).             */
+  CCP_RELATIVE = 0x100    /* Request to keep path relative.               */
+</programlisting>
+
+<para>If <parameter>size</parameter> is 0,
+<function>cygwin_conv_path</function> just returns the required buffer
+size in bytes.  Otherwise, it returns 0 on success, or -1 on error and
+errno is set to one of the below values.</para>
+
+<programlisting>
+    EINVAL        what has an invalid value.
+    EFAULT        from or to point into nirvana.
+    ENAMETOOLONG  the resulting path is longer than 32K, or, in case
+                  of what == CCP_POSIX_TO_WIN_A, longer than MAX_PATH.
+    ENOSPC        size is less than required for the conversion.
+</programlisting>
 
 <example>
-<title>Example use of cygwin_posix_to_win32_path_list</title>
+<title>Example use of cygwin_conv_path</title>
 <programlisting>
 <![CDATA[
-char *_epath;
-char *_win32epath;
-_epath = _win32epath = getenv (NAME);
-/* If we have a POSIX path list, convert to win32 path list */
-if (_epath != NULL && *_epath != 0
-    && cygwin_posix_path_list_p (_epath))
+#include <sys/cygwin.h>
+
+/* Conversion from incoming Win32 path given as wchar_t *win32 to POSIX path.
+   If incoming path is a relative path, stick to it.  First ask how big
+   the output buffer has to be and allocate space dynamically. */
+ssize_t size;
+char *posix;
+size = cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_RELATIVE, win32, NULL, 0);
+if (size < 0)
+  perror ("cygwin_conv_path");
+else
   {
-    _win32epath = (char *) xmalloc
-      (cygwin_posix_to_win32_path_list_buf_size (_epath));
-    cygwin_posix_to_win32_path_list (_epath, _win32epath);
-    }
+    posix = (char *) malloc (size);
+    if (cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_RELATIVE, win32,
+                          posix, size))
+      perror ("cygwin_conv_path");
+  }
 ]]>
 </programlisting>
 </example>
 
-<para>See also <link linkend="func-cygwin-posix-to-win32-path-list-buf-size">
-cygwin_posix_to_win32_path_list_buf_size</link></para>
+</sect1>
+
+<sect1 id="func-cygwin-conv-path-list">
+<title>cygwin_conv_path_list</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" ssize_t
+<function>cygwin_conv_path</function></funcdef>
+<paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
+<paramdef>const void * <parameter>from</parameter></paramdef>
+<paramdef>void * <parameter>to</parameter></paramdef>
+<paramdef>size_t <parameter>size</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>This is the same as <function>cygwin_conv_path</function>, but the
+input is treated as a path list in $PATH or %PATH% notation.</para>
+<para>If <parameter>what</parameter> is CCP_POSIX_TO_WIN_A or
+CCP_POSIX_TO_WIN_W, given a POSIX $PATH-style string (i.e. /foo:/bar)
+convert it to the equivalent Win32 %PATH%-style string (i.e. d:\;e:\bar).</para>
+<para>If <parameter>what</parameter> is CCP_WIN_A_TO_POSIX or
+CCP_WIN_W_TO_POSIX, given a Win32 %PATH%-style string (i.e. d:\;e:\bar)
+convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
+
+<para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
 
 </sect1>
 
-<sect1 id="func-cygwin-win32-to-posix-path-list">
-<title>cygwin_win32_to_posix_path_list</title>
+<sect1 id="func-cygwin-create-path">
+<title>cygwin_create_path</title>
 
 <funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_win32_to_posix_path_list</function></funcdef>
-<paramdef>const char *<parameter>win32</parameter></paramdef>
-<paramdef>char *<parameter>posix</parameter></paramdef>
+<funcdef>extern "C" void *
+<function>cygwin_create_path</function></funcdef>
+<paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
+<paramdef>const void * <parameter>from</parameter></paramdef>
 </funcprototype></funcsynopsis>
 
-<para>Given a Win32 path-style string (i.e. d:\;e:\bar) convert it to
-the equivalent POSIX path-style string (i.e. /foo:/bar).
-<parameter>posix</parameter> must point to a sufficiently large
-buffer.  See also <link
-linkend="func-cygwin-win32-to-posix-path-list-buf-size">
-cygwin_win32_to_posix_path_list_buf_size</link></para>
+<para>This is equivalent to the <function>cygwin_conv_path</function>, except
+that <function>cygwin_create_path</function> does not take a buffer pointer
+for the result of the conversion as input.  Rather it allocates the buffer
+itself using <function>malloc</function>(3) and returns a pointer to this
+buffer.  In case of error it returns NULL and sets errno to one of the
+values defined for <function>cygwin_conv_path</function>.  Additionally
+errno can be set to the below value.</para>
 
-</sect1>
+<programlisting>
+    ENOMEM        Insufficient memory was available.
+</programlisting>
 
-<sect1 id="func-cygwin-posix-to-win32-path-list-buf-size">
-<title>cygwin_posix_to_win32_path_list_buf_size</title>
+<para>When you don't need the returned buffer anymore, use
+<function>free</function>(3) to deallocate it.</para>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" int
-<function>cygwin_posix_to_win32_path_list_buf_size</function></funcdef>
-<paramdef>const char *<parameter>path_list</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Returns the number of bytes needed to hold the result of calling
-<link linkend="func-cygwin-posix-to-win32-path-list">
-cygwin_posix_to_win32_path_list</link>.</para>
-
-</sect1>
-
-<sect1 id="func-cygwin-win32-to-posix-path-list-buf-size">
-<title>cygwin_win32_to_posix_path_list_buf_size</title>
-
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" int
-<function>cygwin_win32_to_posix_path_list_buf_size</function></funcdef>
-<paramdef>const char *<parameter>path_list</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Tells you how many bytes are needed for the results of <link
-linkend="func-cygwin-win32-to-posix-path-list">
-cygwin_win32_to_posix_path_list</link>.</para>
-
-</sect1>
-
-<sect1 id="func-cygwin-conv-to-posix-path">
-<title>cygwin_conv_to_posix_path</title>
-
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_conv_to_posix_path</function></funcdef>
-<paramdef>const char *<parameter>path</parameter></paramdef>
-<paramdef>char *<parameter>posix_path</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Converts a Win32 path to a POSIX path.  If
-<parameter>path</parameter> is already a POSIX path, leaves it alone.
-If <parameter>path</parameter> is relative, then
-<parameter>posix_path</parameter> will also be relative.  Note that
-<parameter>posix_path</parameter> must point to a buffer of sufficient
-size; use MAX_PATH if needed.</para>
-
-</sect1>
-
-<sect1 id="func-cygwin-conv-to-win32-path">
-<title>cygwin_conv_to_win32_path</title>
-
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_conv_to_win32_path</function></funcdef>
-<paramdef>const char *<parameter>path</parameter></paramdef>
-<paramdef>char *<parameter>win32_path</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Converts a POSIX path to a Win32 path.  If
-<parameter>path</parameter> is already a Win32 path, leaves it alone.
-If <parameter>path</parameter> is relative, then
-<parameter>win32_path</parameter> will also be relative.  Note that
-<parameter>win32_path</parameter> must point to a buffer of sufficient
-size; use MAX_PATH if needed.</para>
-
-</sect1>
-<sect1 id="func-cygwin-conv-to-full-posix-path">
-<title>cygwin_conv_to_full_posix_path</title>
-
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_conv_to_full_posix_path</function></funcdef>
-<paramdef>const char *<parameter>path</parameter></paramdef>
-<paramdef>char *<parameter>posix_path</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Converts a Win32 path to a POSIX path.  If
-<parameter>path</parameter> is already a POSIX path, leaves it alone.
-If <parameter>path</parameter> is relative, then
-<parameter>posix_path</parameter> will be converted to an absolute
-path.  Note that <parameter>posix_path</parameter> must point to a
-buffer of sufficient size; use MAX_PATH if needed.</para>
-
-</sect1>
-
-<sect1 id="func-cygwin-conv-to-full-win32-path">
-<title>cygwin_conv_to_full_win32_path</title>
-
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
-<function>cygwin_conv_to_full_win32_path</function></funcdef>
-<paramdef>const char *<parameter>path</parameter></paramdef>
-<paramdef>char *<parameter>win32_path</parameter></paramdef>
-</funcprototype></funcsynopsis>
-
-<para>Converts a POSIX path to a Win32 path.  If
-<parameter>path</parameter> is already a Win32 path, leaves it alone.
-If <parameter>path</parameter> is relative, then
-<parameter>win32_path</parameter> will be converted to an absolute
-path.  Note that <parameter>win32_path</parameter> must point to a
-buffer of sufficient size; use MAX_PATH if needed.</para>
+<para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
 
 </sect1>
 

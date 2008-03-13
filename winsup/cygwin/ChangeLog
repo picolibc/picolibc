@@ -1,3 +1,15 @@
+2008-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.sgml: Remove documentation for old path API.  Add documentation
+	for new path API.
+	* security.sgml: New file to document cygwin_set_impersonation_token
+	and cygwin_logon_user with only eight years of delay.
+	* shared.sgml: Remove file.
+	* include/sys/cygwin.h (cygwin32_attach_handle_to_fd): Move declaration
+	into fully deprecated function block.
+	(cygwin_logon_user): Move declaration down to declaration of
+	cygwin_set_impersonation_token.
+
 2008-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Just return with 0 if filenames are identical,
