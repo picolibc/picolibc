@@ -253,7 +253,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
   char *dst_start = dst;
   syscall_printf ("src %s", src);
 
-  if ((isdrive (src) && src[2] == '\\') || *src == '\\')
+  if ((isdrive (src) && isdirsep (src[2])) || *src == '\\')
     goto win32_path;
 
   tail = dst;

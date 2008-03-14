@@ -1,3 +1,15 @@
+2008-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fcntl.cc (fcntl_worker): Protect with a 'myfault'.
+
+	* path.cc (normalize_posix_path): Treat X:/ as Win32 path, too.
+
+	* smallprint.cc (__wrn): New static function.
+	(__small_vswprintf): New function to generate WCHAR strings.
+	(__small_swprintf): Ditto.
+	* winsup.h (__small_swprintf): Declare.
+	(__small_vswprintf): Declare.
+
 2008-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.sgml: Remove documentation for old path API.  Add documentation

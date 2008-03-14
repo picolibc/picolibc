@@ -14,6 +14,8 @@ details. */
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <wctype.h>
+#include <wchar.h>
 #include <limits.h>
 
 #define LLMASK	(0xffffffffffffffffULL)
@@ -286,3 +288,194 @@ console_printf (const char *fmt, ...)
   FlushFileBuffers (console_handle);
 }
 #endif
+
+#define wrnarg(dst, base, dosign, len, pad) __wrn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
+#define wrnargLL(dst, base, dosign, len, pad) __wrn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
+
+static PWCHAR __fastcall
+__wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
+{
+  /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
+  unsigned long long uval = 0;
+  WCHAR res[20];
+  static const WCHAR str[] = L"0123456789ABCDEF";
+  int l = 0;
+
+  if (dosign && val < 0)
+    {
+      *dst++ = L'-';
+      uval = -val;
+    }
+  else if (dosign > 0 && val > 0)
+    {
+      *dst++ = L'+';
+      uval = val;
+    }
+  else
+    uval = val;
+
+  uval &= mask;
+
+  do
+    {
+      res[l++] = str[uval % base];
+      uval /= base;
+    }
+  while (uval);
+
+  while (len-- > l)
+    *dst++ = pad;
+
+  while (l > 0)
+    *dst++ = res[--l];
+
+  return dst;
+}
+
+extern "C" int
+__small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
+{
+  WCHAR tmp[NT_MAX_PATH];
+  PWCHAR orig = dst;
+  const char *s;
+  PWCHAR w;
+  UNICODE_STRING uw, *us;
+
+  DWORD err = GetLastError ();
+
+  while (*fmt)
+    {
+      unsigned int n = 0x7fff;
+      if (*fmt != L'%')
+	*dst++ = *fmt++;
+      else
+	{
+	  int len = 0;
+	  WCHAR pad = L' ';
+	  int addsign = -1;
+
+	  switch (*++fmt)
+	  {
+	    case L'+':
+	      addsign = 1;
+	      fmt++;
+	      break;
+	    case L'%':
+	      *dst++ = *fmt++;
+	      continue;
+	  }
+
+	  for (;;)
+	    {
+	      char c = *fmt++;
+	      switch (c)
+		{
+		case L'0':
+		  if (len == 0)
+		    {
+		      pad = L'0';
+		      continue;
+		    }
+		case L'1' ... L'9':
+		  len = len * 10 + (c - L'0');
+		  continue;
+		case L'l':
+		  continue;
+		case L'c':
+		case L'C':
+		  {
+		    unsigned int c = va_arg (ap, unsigned int);
+		    if (c > L' ' && c <= 127)
+		      *dst++ = c;
+		    else
+		      {
+			*dst++ = L'0';
+			*dst++ = L'x';
+			dst = __wrn (dst, 16, 0, c, len, pad, LMASK);
+		      }
+		  }
+		  break;
+		case L'E':
+		  wcscpy (dst, L"Win32 error ");
+		  dst = __wrn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
+		  break;
+		case L'd':
+		  dst = wrnarg (dst, 10, addsign, len, pad);
+		  break;
+		case L'D':
+		  dst = wrnargLL (dst, 10, addsign, len, pad);
+		  break;
+		case L'u':
+		  dst = wrnarg (dst, 10, 0, len, pad);
+		  break;
+		case L'U':
+		  dst = wrnargLL (dst, 10, 0, len, pad);
+		  break;
+		case L'o':
+		  dst = wrnarg (dst, 8, 0, len, pad);
+		  break;
+		case L'p':
+		  *dst++ = L'0';
+		  *dst++ = L'x';
+		  /* fall through */
+		case L'x':
+		  dst = wrnarg (dst, 16, 0, len, pad);
+		  break;
+		case L'X':
+		  dst = wrnargLL (dst, 16, 0, len, pad);
+		  break;
+		case L'P':
+		  if (!GetModuleFileNameW (NULL, tmp, NT_MAX_PATH))
+		    RtlInitUnicodeString (us = &uw, L"cygwin program");
+		  else
+		    RtlInitUnicodeString (us = &uw, tmp);
+		  goto fillin;
+		case L'.':
+		  n = wcstoul (fmt, (wchar_t **) &fmt, 10);
+		  if (*fmt++ != L's')
+		    goto endfor;
+		case L's':
+		  s = va_arg (ap, char *);
+		  if (s == NULL)
+		    s = "(null)";
+		  sys_mbstowcs (tmp, NT_MAX_PATH, s, n);
+		  RtlInitUnicodeString (us = &uw, tmp);
+		  goto fillin;
+		  break;
+		case L'W':
+		  w = va_arg (ap, PWCHAR);
+		  RtlInitUnicodeString (us = &uw, w);
+		  goto fillin;
+		case L'S':
+		  us = va_arg (ap, PUNICODE_STRING);
+		fillin:
+		  if (us->Length / sizeof (WCHAR) < n)
+		    n = us->Length / sizeof (WCHAR);
+		    
+		  for (unsigned int i = 0; i < n; i++)
+		    *dst++ = *w++;
+		  break;
+		default:
+		  *dst++ = L'?';
+		  *dst++ = fmt[-1];
+		}
+	    endfor:
+	      break;
+	    }
+	}
+    }
+  *dst = L'\0';
+  SetLastError (err);
+  return dst - orig;
+}
+
+extern "C" int
+__small_swprintf (PWCHAR dst, const WCHAR *fmt, ...)
+{
+  int r;
+  va_list ap;
+  va_start (ap, fmt);
+  r = __small_vswprintf (dst, fmt, ap);
+  va_end (ap);
+  return r;
+}

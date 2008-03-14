@@ -18,11 +18,16 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
+#include "cygtls.h"
 
 int
 fcntl_worker (int fd, int cmd, void *arg)
 {
   int res;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
 
   cygheap_fdget cfd (fd, true);
   if (cfd < 0)
