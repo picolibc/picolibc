@@ -18,6 +18,7 @@ details. */
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
 #include "path.h"
 #include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/mount.h"
@@ -172,60 +173,57 @@ is_symlink (HANDLE fh)
 bool
 readlink (HANDLE fh, char *path, int maxlen)
 {
-  int got;
-  int magic = get_word (fh, 0x0);
+  DWORD rv;
+  char *buf, *cp;
+  unsigned short len;
+  win_shortcut_hdr *file_header;
+  BY_HANDLE_FILE_INFORMATION fi;
 
-  if (magic == SHORTCUT_MAGIC)
+  if (!GetFileInformationByHandle (fh, &fi)
+      || fi.nFileSizeHigh != 0
+      || fi.nFileSizeLow > 8192)
+    return false;
+
+  buf = (char *) alloca (fi.nFileSizeLow + 1);
+  file_header = (win_shortcut_hdr *) buf;
+
+  if (SetFilePointer (fh, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER
+      || !ReadFile (fh, buf, fi.nFileSizeLow, &rv, NULL)
+      || rv != fi.nFileSizeLow)
+    return false;
+  
+  if (fi.nFileSizeLow > sizeof (file_header)
+      && cmp_shortcut_header (file_header))
     {
-      int offset = get_word (fh, 0x4c);
-      int slen = get_word (fh, 0x4c + offset + 2);
-      if (slen >= maxlen)
-	{
-	  SetLastError (ERROR_FILENAME_EXCED_RANGE);
-	  return false;
-	}
-      if (SetFilePointer (fh, 0x4c + offset + 4, 0, FILE_BEGIN) ==
-	  INVALID_SET_FILE_POINTER && GetLastError () != NO_ERROR)
-	return false;
-
-      if (!ReadFile (fh, path, slen, (DWORD *) &got, 0))
-	return false;
-      else if (got < slen)
-	{
-	  SetLastError (ERROR_READ_FAULT);
-	  return false;
-	}
-      else
-	path[got] = '\0';
+      cp = buf + sizeof (win_shortcut_hdr);
+      if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
+        cp += *(unsigned short *) cp + 2;
+      if (!(len = *(unsigned short *) cp))
+        return false;
+      cp += 2;
+      /* Has appended full path?  If so, use it instead of description. */
+      unsigned short relpath_len = *(unsigned short *) (cp + len);
+      if (cp + len + 2 + relpath_len < buf + fi.nFileSizeLow)
+        {
+          cp += len + 2 + relpath_len;
+          len = *(unsigned short *) cp;
+          cp += 2;
+        }
+      if (len + 1 > maxlen)
+        return false;
+      memcpy (path, cp, len);
+      path[len] = '\0';
+      return true;
     }
-  else if (magic == SYMLINK_MAGIC)
+  else if (strncmp (buf, SYMLINK_COOKIE, strlen (SYMLINK_COOKIE)) == 0
+           && fi.nFileSizeLow - strlen (SYMLINK_COOKIE) <= (unsigned) maxlen
+           && buf[fi.nFileSizeLow - 1] == '\0')
     {
-      char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
-
-      if (SetFilePointer (fh, 0, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-	  && GetLastError () != NO_ERROR)
-	return false;
-
-      if (!ReadFile (fh, cookie_buf, sizeof (cookie_buf), (DWORD *) &got, 0))
-	return false;
-      else if (got == sizeof (cookie_buf)
-	       && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
-	{
-	  if (!ReadFile (fh, path, maxlen, (DWORD *) &got, 0))
-	    return false;
-	  else if (got >= maxlen)
-	    {
-	      SetLastError (ERROR_FILENAME_EXCED_RANGE);
-	      path[0] = '\0';
-	      return false;
-	    }
-	  else
-	    path[got] = '\0';
-	}
-    }
+      strcpy (path, &buf[strlen (SYMLINK_COOKIE)]);
+      return true;
+    }      
   else
     return false;
-  return true;
 }
 
 typedef struct mnt
