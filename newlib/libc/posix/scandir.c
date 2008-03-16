@@ -42,8 +42,6 @@ __FBSDID("$FreeBSD$");
  * struct dirent (through namelist). Returns -1 if there were any errors.
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stddef.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -71,41 +69,22 @@ scandir(const char *dirname, struct dirent ***namelist,
     int (*select)(const struct dirent *), int (*dcomp)(const struct dirent **,
 	const struct dirent **))
 {
-	register struct dirent *d, *p, **names;
-	register size_t nitems;
-	struct stat stb;
-	long arraysz;
+	register struct dirent *d, *p, **names = NULL;
+	register size_t arraysz, numitems;
 	DIR *dirp;
-	int successful = 0;
-	int rc = 0;
-
-	dirp = NULL;
-	names = NULL;
 
 	if ((dirp = opendir(dirname)) == NULL)
 		return(-1);
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	if (fstat(dirp->dd_fd, &stb) < 0)
-		goto cleanup;
 
-	/*
- 	 * If there were no directory entries, then bail.
- 	 */
-	if (stb.st_size == 0)
-		goto cleanup;
-
-	/*
-	 * estimate the array size by taking the size of the directory file
-	 * and dividing it by a multiple of the minimum size entry. 
-	 */
-	arraysz = (stb.st_size / 24);
+	numitems = 0;
+	arraysz = 32;	/* initial estimate of the array size */
 	names = (struct dirent **)malloc(arraysz * sizeof(struct dirent *));
 	if (names == NULL)
-		goto cleanup;
+		goto fail;
 
-	nitems = 0;
 	while ((d = readdir(dirp)) != NULL) {
 		if (select != NULL && !(*select)(d))
 			continue;	/* just selected names */
@@ -114,7 +93,7 @@ scandir(const char *dirname, struct dirent ***namelist,
 		 */
 		p = (struct dirent *)malloc(DIRSIZ(d));
 		if (p == NULL)
-			goto cleanup;
+			goto fail;
 		p->d_ino = d->d_ino;
 		p->d_reclen = d->d_reclen;
 #ifdef _DIRENT_HAVE_D_NAMLEN
@@ -127,39 +106,38 @@ scandir(const char *dirname, struct dirent ***namelist,
 		 * Check to make sure the array has space left and
 		 * realloc the maximum size.
 		 */
-		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0)
-				goto cleanup;
-			arraysz = stb.st_size / 12;
-			names = (struct dirent **)reallocf((char *)names,
-				arraysz * sizeof(struct dirent *));
-			if (names == NULL)
-				goto cleanup;
-		}
-		names[nitems-1] = p;
-	}
-	successful = 1;
-cleanup:
-	closedir(dirp);
-	if (successful) {
-		if (nitems && dcomp != NULL)
-			qsort(names, nitems, sizeof(struct dirent *), (void *)dcomp);
-		*namelist = names;
-		rc = nitems;
-	} else {  /* We were unsuccessful, clean up storage and return -1.  */
-		if ( names ) {
-			int i;
-			for (i=0; i < nitems; i++ )
-				free( names[i] );
-			free( names );
-		}
-		rc = -1;
-	}
+		if (numitems >= arraysz) {
+			struct dirent **names2;
 
+			names2 = reallocarray(names, arraysz,
+			    2 * sizeof(struct dirent *));
+			if (names2 == NULL) {
+				free(p);
+				goto fail;
+			}
+			names = names2;
+			arraysz *= 2;
+		}
+		names[numitems++] = p;
+	}
+	closedir(dirp);
+	if (numitems && dcomp != NULL)
+		qsort(names, numitems, sizeof(struct dirent *), (void *)dcomp);
+	*namelist = names;
 #ifdef HAVE_DD_LOCK
 	__lock_release_recursive(dirp->dd_lock);
 #endif
-	return(rc);
+	return (numitems);
+
+fail:
+	while (numitems > 0)
+		free(names[--numitems]);
+	free(names);
+	closedir(dirp);
+#ifdef HAVE_DD_LOCK
+	__lock_release_recursive(dirp->dd_lock);
+#endif
+	return (-1);
 }
 
 /*
