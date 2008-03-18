@@ -1,4 +1,4 @@
-2008-03-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+2008-03-16  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* proginstall.m4: New file, with fixed AC_PROG_INSTALL.
 
