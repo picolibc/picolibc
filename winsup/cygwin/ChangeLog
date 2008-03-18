@@ -1,3 +1,8 @@
+2008-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h: Revert erroneous move of `#ifdef WINVER' to
+	another location.
+
 2008-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fcntl.cc (fcntl_worker): Protect with a 'myfault'.

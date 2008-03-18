@@ -169,6 +169,8 @@ enum
   PID_EXITED	       = 0x80000000 /* Free entry. */
 };
 
+#ifdef WINVER
+
 /* This lives in the app and is initialized before jumping into the DLL.
    It should only contain stuff which the user's process needs to see, or
    which is needed before the user pointer is initialized, or is needed to
@@ -259,7 +261,6 @@ extern void cygwin_premain1 (int argc, char **argv, struct per_process *);
 extern void cygwin_premain2 (int argc, char **argv, struct per_process *);
 extern void cygwin_premain3 (int argc, char **argv, struct per_process *);
 
-#ifdef WINVER
 #ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
 #endif
