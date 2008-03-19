@@ -1,3 +1,32 @@
+2008-03-19  Andreas Krebbel  <krebbel1@de.ibm.com>
+
+	* opcodes/s390-mkopc.c (s390_opcode_cpu_val): S390_OPCODE_Z10 added.
+	(s390_cond_extensions): Reduced extensions to the compare related.
+	(main): z10 cpu type option added.
+	(expandConditionalJump): Renamed to ...
+	(insertExpandedMnemonic): ... this.
+
+	* opcodes/s390-opc.c: Re-group the operand format makros.
+	(INSTR_RIE_RRPU, INSTR_RIE_RRP0, INSTR_RIE_RUPI,
+	INSTR_RIE_R0PI, INSTR_RIE_RUPU, INSTR_RIE_R0PU, INSTR_RIE_R0IU,
+	INSTR_RIE_R0I0, INSTR_RIE_R0UU, INSTR_RIE_R0U0,
+	INSTR_RIE_RRUUU, INSTR_RIS_RURDI, INSTR_RIS_R0RDI, INSTR_RIS_RURDU,
+	INSTR_RIS_R0RDU, INSTR_RRF_U0RR, INSTR_RRF_00RR, INSTR_RRS_RRRDU,
+	INSTR_RRS_RRRD0, INSTR_RXY_URRD, INSTR_SIY_IRD, INSTR_SIL_RDI,
+	INSTR_SIL_RDU): New instruction formats added.
+	(MASK_RIE_RRPU, MASK_RIE_RRP0, MASK_RIE_RUPI, MASK_RIE_R0PI,
+	MASK_RIE_RUPU, MASK_RIE_R0PU, MASK_RIE_R0IU, MASK_RIE_R0I0,
+	MASK_RIE_R0UU, MASK_RIE_R0U0, MASK_RIE_RRUUU, MASK_RIS_RURDI,
+	MASK_RIS_R0RDI, MASK_RIS_RURDU, MASK_RIS_R0RDU, MASK_RRF_U0RR,
+	MASK_RRF_00RR, MASK_RRS_RRRDU, MASK_RRS_RRRD0, MASK_RXY_URRD,
+	MASK_SIY_IRD, MASK_SIL_RDI, MASK_SIL_RDU): New instruction format
+	masks added.
+	(s390_opformats): New formats added "ris", "rrs", "sil".
+	* opcodes/s390-opc.txt: Add the conditional jumps with the
+	extensions removed from automatic expansion in s390-mkopc.c manually.
+	(asi - trtre): Add new System z10 EC instructions.
+	* include/opcode/s390.h (s390_opcode_cpu_val): S390_OPCODE_Z10 added.
+
 2008-03-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure.ac: m4_include config/proginstall.m4.
