@@ -2,7 +2,7 @@
 
 The author of this software is David M. Gay.
 
-Copyright (C) 1998-2000 by Lucent Technologies
+Copyright (C) 1998-2008 by Lucent Technologies
 All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and
@@ -172,6 +172,7 @@ THIS SOFTWARE.
 
 #define INFNAN_CHECK 1
 #define MULTIPLE_THREADS 1
+#define USE_LOCALE 1
 
 #ifdef DEBUG
 #include <stdio.h>

@@ -91,8 +91,10 @@ THIS SOFTWARE.
 
 #include <math.h>
 #include <stdint.h>
-#include "gdtoa.h"
-
+#include "gdtoaimp.h"
+#ifdef USE_LOCALE
+#include "locale.h"
+#endif
 
 /*
  * For a MinGW build, we provide the implementation dependent entries
@@ -380,6 +382,12 @@ x_sprintf
 	unsigned long ui;
 	static char hex[] = "0123456789abcdef";
 	static char Hex[] = "0123456789ABCDEF";
+
+#ifdef USE_LOCALE
+	char decimalpoint = *localeconv()->decimal_point;
+#else
+	static const char decimalpoint = '.';
+#endif
 
 	ob0 = outbuf = f->ob0;
 	rv = 0;
@@ -751,7 +759,7 @@ x_sprintf
 				if (decpt <= 0) {
 					put('0')
 					if (prec > 0 || alt)
-						put('.')
+						put(decimalpoint)
 					while(decpt < 0) {
 						put('0')
 						prec--;
@@ -768,7 +776,7 @@ x_sprintf
 						}
 						while(--decpt > 0);
 					if (prec > 0 || alt)
-						put('.')
+						put(decimalpoint)
 					}
 				while(--prec >= 0) {
 					if ((c = *s))
@@ -868,7 +876,7 @@ x_sprintf
 					put(sign)
 				put(*s++)
 				if (prec || alt)
-					put('.')
+					put(decimalpoint)
 				while(--prec >= 0) {
 					if ((c = *s))
 						s++;
