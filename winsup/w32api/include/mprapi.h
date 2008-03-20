@@ -379,6 +379,7 @@ typedef struct _MPR_INTERFACE_2 {
 #define MPR_VS_PptpFirst VS_PptpFirst
 #define MPR_VS_L2tpOnly VS_L2tpOnly
 #define MPR_VS_L2tpFirst VS_L2tpFirst
+#if (_WIN32_WINNT>=0x0600)
 typedef struct _MPR_INTERFACE_3 {
 	WCHAR wszInterfaceName[MAX_INTERFACE_NAME_LEN+1];
 	HANDLE hInterface;
@@ -422,6 +423,7 @@ typedef struct _MPR_INTERFACE_3 {
 	IN6_ADDR ipv6addrDnsAlt;
 	IN6_ADDR* ipv6addr;
 } MPR_INTERFACE_3,*PMPR_INTERFACE_3;
+#endif
 typedef struct _MPR_SERVER_0 {
 	BOOL fLanOnlyMode;
 	DWORD dwUpTime;
@@ -459,7 +461,9 @@ DWORD WINAPI MprAdminPortReset(RAS_SERVER_HANDLE,HANDLE);
 BOOL WINAPI MprAdminAcceptNewConnection(RAS_CONNECTION_0*,RAS_CONNECTION_1*);
 BOOL WINAPI MprAdminAcceptNewConnection2(RAS_CONNECTION_0*,RAS_CONNECTION_1*,RAS_CONNECTION_2*);
 BOOL WINAPI MprAdminAcceptNewLink(RAS_PORT_0*,RAS_PORT_1*);
+#if (_WIN32_WINNT >= 0x0600)
 BOOL WINAPI MprAdminAcceptReauthentication(RAS_CONNECTION_0*,RAS_CONNECTION_1*,RAS_CONNECTION_2*,RAS_CONNECTION_3*);
+#endif
 void WINAPI MprAdminConnectionHangupNotification(RAS_CONNECTION_0*,RAS_CONNECTION_1*);
 void WINAPI MprAdminConnectionHangupNotification2(RAS_CONNECTION_0*,RAS_CONNECTION_1*,RAS_CONNECTION_2*);
 DWORD WINAPI MprAdminGetIpAddressForUser(WCHAR*,WCHAR*,DWORD*,BOOL*);

@@ -1,3 +1,11 @@
+2008-03-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/mprapi.h: Add guard for MprAdminAcceptReauthentication function
+	and MPR_INTERFACE_3 structure since they are available only in Windows
+	Server 2008
+
+	Thanks to crackedmind  <crackedmind at sf dot net>.
+
 2008-02-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winnt.h: Update guard around KEY_WOW64_64KEY and KEY_WOW64_32KEY
