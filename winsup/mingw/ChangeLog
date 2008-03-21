@@ -1,4 +1,5 @@
 2008-02-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/gdtoa/gdtoaimp.h (USE_LOCALE): Define.
 	* mingwex/gdtoa/mingw_snprintf.c: [USE_LOCALE] Include locale.h.
 	(x_sprintf): [USE_LOCALE] Use  *localeconv()->decimal_point.
@@ -12,6 +13,11 @@
 
 	* Makefile.in: Add rules to generate multiple versions of libmoldname.a for
 	the different runtime versions.
+
+2008-01-19 Danny Smith <dannysmithusers.sourceforge.net
+
+	* inclue/wchar.h (fwide): Add prototype and guard inline definition.
+	(mbsinit): Likewise.
 
 2007-12-27 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 

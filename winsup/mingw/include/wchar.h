@@ -287,11 +287,15 @@ size_t __cdecl __MINGW_NOTHROW wcsrtombs(char * __restrict__, const wchar_t ** _
 int __cdecl __MINGW_NOTHROW wctob(wint_t);
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
+int __cdecl __MINGW_NOTHROW fwide(FILE*, int);
+int __cdecl __MINGW_NOTHROW mbsinit(const mbstate_t*);
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW fwide(FILE* __UNUSED_PARAM(stream),
 			       int __UNUSED_PARAM(mode))
   {return -1;} /* limited to byte orientation */
 __CRT_INLINE int __cdecl __MINGW_NOTHROW mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
   {return 1;}
+#endif
 wchar_t* __cdecl __MINGW_NOTHROW wmemset(wchar_t *, wchar_t, size_t);
 wchar_t* __cdecl __MINGW_NOTHROW wmemchr(const wchar_t*, wchar_t, size_t);
 int wmemcmp(const wchar_t*, const wchar_t *, size_t);
