@@ -304,6 +304,24 @@ extern const double __QNAN;
 #define NAN __QNAN
 #endif /* __MINGW_GNUC_PREREQ(3, 3) */
 
+/* Use the compiler's builtin define for FLT_EVAL_METHOD to
+   set float_t and double_t.  */
+#if defined(__FLT_EVAL_METHOD__)  
+# if ( __FLT_EVAL_METHOD__== 0)
+typedef float float_t;
+typedef double double_t;
+# elif (__FLT_EVAL_METHOD__ == 1)
+typedef double float_t;
+typedef double double_t;
+# elif (__FLT_EVAL_METHOD__ == 2)
+typedef long double float_t;
+typedef long double double_t;
+#endif
+#else /* ix87 FPU default */
+typedef long double float_t;
+typedef long double double_t;
+#endif
+
 /* 7.12.3.1 */
 /*
    Return values for fpclassify.

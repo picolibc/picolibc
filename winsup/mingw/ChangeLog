@@ -1,3 +1,7 @@
+2008-03-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (float_t, double_t): Define.
+
 2008-02-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/gdtoa/gdtoaimp.h (USE_LOCALE): Define.
