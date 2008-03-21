@@ -1,3 +1,9 @@
+2008-03-20  Ian Lance Taylor  <iant@google.com>
+
+	* configure.ac: Add support for --enable-gold.
+	* Makefile.def: Add gold as a directory like ld.
+	* configure, Makefile.in: Regenerate.
+
 2008-03-19  Andreas Krebbel  <krebbel1@de.ibm.com>
 
 	* opcodes/s390-mkopc.c (s390_opcode_cpu_val): S390_OPCODE_Z10 added.
