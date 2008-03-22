@@ -38,7 +38,7 @@ details. */
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
-static void handle_to_fn (HANDLE, char *);
+static bool handle_to_fn (HANDLE, char *);
 
 #define WCLEN(x) ((sizeof (x) / sizeof (WCHAR)) - 1)
 char unknown_file[] = "some disk file";
@@ -284,18 +284,19 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   DWORD ft = GetFileType (handle);
   char name[NT_MAX_PATH];
   name[0] = '\0';
-  if (ft == FILE_TYPE_PIPE)
+  if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
+    /* can't figure out what this is */;
+  else if (ft == FILE_TYPE_PIPE)
     {
-      handle_to_fn (handle, name);
-      if (name[0])
+      if (handle_to_fn (handle, name))
 	/* ok */;
       else if (fd == 0)
 	dev = *piper_dev;
       else
 	dev = *pipew_dev;
+      if (name[0])
+	access = FILE_CREATE_PIPE_INSTANCE;
     }
-  else if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
-    /* can't figure out what this is */;
   else if (GetConsoleScreenBufferInfo (handle, &buf))
     {
       /* Console output */
@@ -348,11 +349,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	}
 
       if (dev == FH_TTY || dev == FH_CONSOLE)
-      	access = GENERIC_READ | GENERIC_WRITE;
+      	access |= GENERIC_READ | GENERIC_WRITE;
       else if (fd == 0)
-	access = GENERIC_READ;
+	access |= GENERIC_READ;
       else
-	access = GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
+	access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
 				    possible for some versions of handles */
       fh->init (handle, access, bin);
       set_std_handle (fd);
@@ -386,6 +387,7 @@ build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
   return build_fh_name_worker (pc, h, opt, si);
 }
 
+#if 0 /* Not needed yet */
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 build_fh_name (const UNICODE_STRING *name, HANDLE h, unsigned opt, suffix_info *si)
@@ -393,6 +395,7 @@ build_fh_name (const UNICODE_STRING *name, HANDLE h, unsigned opt, suffix_info *
   path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
   return build_fh_name_worker (pc, h, opt, si);
 }
+#endif
 
 fhandler_base *
 build_fh_dev (const device& dev, const char *unix_name)
@@ -866,13 +869,16 @@ dtable::vfork_child_fixup ()
 }
 #endif /*NEWVFORK*/
 
-void decode_tty (WCHAR *w32, char *buf)
+static void
+decode_tty (char *buf, WCHAR *w32)
 {
   int ttyn = wcstol (w32, NULL, 10);
   __small_sprintf (buf, "/dev/tty%d", ttyn);
 }
 
-static void
+/* Try to derive posix filename from given handle.  Return true if
+   the handle is associated with a cygwin tty. */
+static bool
 handle_to_fn (HANDLE h, char *posix_fn)
 {
   tmp_pathbuf tp;
@@ -911,15 +917,21 @@ handle_to_fn (HANDLE h, char *posix_fn)
   if (wcscasecmp (w32, DEV_NULL) == 0)
     {
       strcpy (posix_fn, "/dev/null");
-      return;
+      return false;
     }
 
   if (wcsncasecmp (w32, DEV_NAMED_PIPE, DEV_NAMED_PIPE_LEN) == 0)
     {
       w32 += DEV_NAMED_PIPE_LEN;
-      if (wcsncmp (w32, L"cygwin-tty", WCLEN (L"cygwin-tty")) == 0)
-	decode_tty (w32 + WCLEN (L"cygwin-tty"), posix_fn);
-      return;
+      if (wcsncmp (w32, L"cygwin-", WCLEN (L"cygwin-")) != 0)
+	return false;
+      w32 += WCLEN (L"cygwin-");
+      bool istty = wcsncmp (w32, L"tty", WCLEN (L"tty")) == 0;
+      if (istty)
+	decode_tty (posix_fn, w32 + WCLEN (L"tty"));
+      else if (wcsncmp (w32, L"pipe", WCLEN (L"pipe")) == 0)
+	strcpy (posix_fn, "/dev/pipe");
+      return istty;
     }
 
 
@@ -928,7 +940,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
       || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf)))
     {
       sys_wcstombs (posix_fn, NT_MAX_PATH, w32, w32len);
-      return;
+      return false;
     }
 
   for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
@@ -992,8 +1004,9 @@ handle_to_fn (HANDLE h, char *posix_fn)
 		    NT_MAX_PATH);
 
   debug_printf ("derived path '%W', posix '%s'", w32, posix_fn);
-  return;
+  return false;
 
 unknown:
   strcpy (posix_fn,  unknown_file);
+  return false;
 }

@@ -1,5 +1,13 @@
 2008-03-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* dtable.cc (handle_to_fn): Modify to return true if handle represents
+	a cygwin tty.
+	(dtable::init_std_file_from_handle): Detect when we've seen a cygwin
+	pipe and use it in overlapped mode by default.
+	(decode_tty): Make static.
+
+2008-03-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* dtable.cc: Define various device-related string constants as wide
 	character constants.
 	(dtable::init_std_file_from_handle): Reorganize pipe handling to try to
