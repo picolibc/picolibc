@@ -199,7 +199,7 @@ class path_conv
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
 
-  void check (PUNICODE_STRING upath, unsigned opt = PC_SYM_FOLLOW,
+  void check (const UNICODE_STRING *upath, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
@@ -217,7 +217,7 @@ class path_conv
     check (src, opt, suffixes);
   }
 
-  path_conv (PUNICODE_STRING src, unsigned opt = PC_SYM_FOLLOW,
+  path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
@@ -300,10 +300,10 @@ enum fe_types
   FE_CWD = 4,		/* Search CWD for program */
   FE_DLL = 8		/* Search for DLLs, not executables. */
 };
-const char * __stdcall find_exec (const char *name, path_conv& buf,
-				  const char *winenv = "PATH=",
-				  unsigned opt = FE_NADA,
-				  const char **known_suffix = NULL)
+const char *__stdcall find_exec (const char *name, path_conv& buf,
+				 const char *winenv = "PATH=",
+				 unsigned opt = FE_NADA,
+				 const char **known_suffix = NULL)
   __attribute__ ((regparm(3)));
 
 /* Common macros for checking for invalid path names */

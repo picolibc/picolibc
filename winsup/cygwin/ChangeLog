@@ -1,3 +1,27 @@
+2008-03-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc: Define various device-related string constants as wide
+	character constants.
+	(dtable::init_std_file_from_handle): Reorganize pipe handling to try to
+	catch special tty case.
+	(build_fh_name_worker): Declare for common use.
+	(build_fh_name): Define char version.
+	(build_fh_name): Define (currently unused) UNICODE_STRING version.
+	(decode_tty): Detect if pipe is actually a cygwin tty, returning the
+	tty name in the buffer.
+	(handle_to_fn): Reorganize to use wide characters.
+	* dtable.h (build_fh_name): Declare (currently unused) UNICODE_STRING
+	version.
+	* fhandler_tty.cc (fhandler_pty_master::setup): Use
+	fhandler_pipe::create_selectable to create a pipe with a given name.
+	* pipe.cc (pipe_handler): Make returned handle inheritable.
+	(fhandler_pipe::create_selectable): Take an optional name.  Use a
+	standard cygwin introducer for the name.
+
+	* path.cc (path_conv::check): Make first argument const.
+	* path.h (path_conv::check): Ditto for declaration.
+	(path_conv::path_conv): Ditto for UNICODE_STRING version.
+
 2008-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h: Revert erroneous move of `#ifdef WINVER' to
@@ -241,7 +265,7 @@
 	* cygtls.cc (_cygtls::remove): Free temporary TLS path buffers.
 	* cygtls.h (TP_NUM_C_BUFS): Define.
 	(TP_NUM_W_BUFS): Define.
-	(class tls_pathbuf): New class to store pointers to thread local 
+	(class tls_pathbuf): New class to store pointers to thread local
 	temporary path buffers.
 	(_local_storage::pathbufs): New member.
 	* environ.cc (win_env::add_cache): Use temporary TLS path buffer instead

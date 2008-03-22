@@ -1,7 +1,7 @@
-  /* path.cc: path support.
+/* path.cc: path support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -790,7 +790,7 @@ getfileattr (const char *path, bool managed) /* path has to be always absolute. 
    realy nothing but converting to char *, until path_conv handles
    wide-char paths directly. */
 void
-path_conv::check (PUNICODE_STRING src, unsigned opt,
+path_conv::check (const UNICODE_STRING *src, unsigned opt,
 		  const suffix_info *suffixes)
 {
   tmp_pathbuf tp;

@@ -551,7 +551,7 @@ public:
   int ready_for_read (int fd, DWORD howlong);
   void init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
-  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD);
+  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, const char * = NULL);
 };
 
 enum fifo_state

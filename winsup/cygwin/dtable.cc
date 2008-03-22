@@ -18,8 +18,8 @@ details. */
 #include <unistd.h>
 #include <sys/cygwin.h>
 #include <assert.h>
-#include <ntdef.h>
 #include <winnls.h>
+#include <wchar.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
@@ -35,23 +35,26 @@ details. */
 #include "ntdll.h"
 #include "shared_info.h"
 
-static const char NO_COPY unknown_file[] = "some disk file";
-
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
 
-static const char *handle_to_fn (HANDLE, char *);
+static void handle_to_fn (HANDLE, char *);
 
-#define DEVICE_PREFIX "\\device\\"
-#define DEVICE_PREFIX_LEN sizeof (DEVICE_PREFIX) - 1
-#define REMOTE "\\Device\\LanmanRedirector\\"
-#define REMOTE_LEN sizeof (REMOTE) - 1
-#define REMOTE1 "\\Device\\WinDfs\\Root\\"
-#define REMOTE1_LEN sizeof (REMOTE1) - 1
-#define NAMED_PIPE "\\Device\\NamedPipe\\"
-#define NAMED_PIPE_LEN sizeof (NAMED_PIPE) - 1
-#define POSIX_NAMED_PIPE "/Device/NamedPipe/"
-#define POSIX_NAMED_PIPE_LEN sizeof (POSIX_NAMED_PIPE) - 1
+#define WCLEN(x) ((sizeof (x) / sizeof (WCHAR)) - 1)
+char unknown_file[] = "some disk file";
+const WCHAR DEV_NULL[] = L"\\Device\\Null";
+
+const WCHAR DEVICE_PREFIX[] = L"\\device\\";
+const size_t DEVICE_PREFIX_LEN WCLEN (DEVICE_PREFIX);
+
+static const WCHAR DEV_NAMED_PIPE[] = L"\\Device\\NamedPipe\\";
+static const size_t DEV_NAMED_PIPE_LEN = WCLEN (DEV_NAMED_PIPE);
+
+static const WCHAR DEV_REMOTE[] = L"\\Device\\LanmanRedirector\\";
+static const size_t DEV_REMOTE_LEN = WCLEN (DEV_REMOTE);
+
+static const WCHAR DEV_REMOTE1[] = L"\\Device\\WinDfs\\Root\\";
+static const size_t DEV_REMOTE1_LEN = WCLEN (DEV_REMOTE1);
 
 /* Set aside space for the table of fds */
 void
@@ -262,7 +265,6 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
-  const char *name = NULL;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
   int sal = sizeof (sa);
@@ -278,55 +280,63 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     return;
 
   SetLastError (0);
+  DWORD access = 0;
   DWORD ft = GetFileType (handle);
-  if (ft != FILE_TYPE_UNKNOWN || GetLastError () != ERROR_INVALID_HANDLE)
+  char name[NT_MAX_PATH];
+  name[0] = '\0';
+  if (ft == FILE_TYPE_PIPE)
     {
-      /* See if we can consoleify it */
-      if (GetConsoleScreenBufferInfo (handle, &buf))
-	{
-	  if (ISSTATE (myself, PID_USETTY))
-	    dev.parse (FH_TTY);
-	  else
-	    dev = *console_dev;
-	}
-      else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
-	{
-	  if (ISSTATE (myself, PID_USETTY))
-	    dev.parse (FH_TTY);
-	  else
-	    dev = *console_dev;
-	}
-      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	dev = *tcp_dev;
-      else if (GetCommState (handle, &dcb))
-	dev.parse (DEV_TTYS_MAJOR, 0);
+      handle_to_fn (handle, name);
+      if (name[0])
+	/* ok */;
+      else if (fd == 0)
+	dev = *piper_dev;
       else
-	{
-	  name = handle_to_fn (handle, tp.c_get ());
-	  if (!strncasematch (name, POSIX_NAMED_PIPE, POSIX_NAMED_PIPE_LEN))
-	    /* nothing */;
-	  else if (fd == 0)
-	    dev = *piper_dev;
-	  else
-	    dev = *pipew_dev;
-	}
+	dev = *pipew_dev;
     }
+  else if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
+    /* can't figure out what this is */;
+  else if (GetConsoleScreenBufferInfo (handle, &buf))
+    {
+      /* Console output */
+      if (ISSTATE (myself, PID_USETTY))
+	dev.parse (FH_TTY);
+      else
+	dev = *console_dev;
+    }
+  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
+    {
+      /* Console input */
+      if (ISSTATE (myself, PID_USETTY))
+	dev.parse (FH_TTY);
+      else
+	dev = *console_dev;
+    }
+  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+    /* socket */
+    dev = *tcp_dev;
+  else if (GetCommState (handle, &dcb))
+    /* serial */
+    dev.parse (DEV_TTYS_MAJOR, 0);
+  else
+    /* Try to figure it out from context - probably a disk file */
+    handle_to_fn (handle, name);
 
-  if (!name && !dev)
+  if (!name[0] && !dev)
     fds[fd] = NULL;
   else
     {
       fhandler_base *fh;
 
       if (dev)
-	fh = build_fh_dev (dev, name);
+	fh = build_fh_dev (dev);
       else
 	fh = build_fh_name (name);
 
       if (fh)
 	cygheap->fdtab[fd] = fh;
 
-      if (name)
+      if (name[0])
 	{
 	  bin = fh->pc_binmode ();
 	  if (!bin)
@@ -337,7 +347,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	    }
 	}
 
-      DWORD access;
       if (dev == FH_TTY || dev == FH_CONSOLE)
       	access = GENERIC_READ | GENERIC_WRITE;
       else if (fd == 0)
@@ -352,10 +361,10 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
-fhandler_base *
-build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
+
+static fhandler_base *
+build_fh_name_worker (path_conv& pc, HANDLE h, unsigned opt, suffix_info *si)
 {
-  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
   if (pc.error)
     {
       fhandler_base *fh = cnew (fhandler_nodevice) ();
@@ -369,6 +378,20 @@ build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
     pc.fillin (h);
 
   return build_fh_pc (pc);
+}
+fhandler_base *
+build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
+{
+  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
+  return build_fh_name_worker (pc, h, opt, si);
+}
+
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
+fhandler_base *
+build_fh_name (const UNICODE_STRING *name, HANDLE h, unsigned opt, suffix_info *si)
+{
+  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
+  return build_fh_name_worker (pc, h, opt, si);
 }
 
 fhandler_base *
@@ -843,124 +866,134 @@ dtable::vfork_child_fixup ()
 }
 #endif /*NEWVFORK*/
 
-static const char *
+void decode_tty (WCHAR *w32, char *buf)
+{
+  int ttyn = wcstol (w32, NULL, 10);
+  __small_sprintf (buf, "/dev/tty%d", ttyn);
+}
+
+static void
 handle_to_fn (HANDLE h, char *posix_fn)
 {
   tmp_pathbuf tp;
-  OBJECT_NAME_INFORMATION *ntfn;
-  const size_t len = sizeof (OBJECT_NAME_INFORMATION)
-		     + NT_MAX_PATH * sizeof (WCHAR);
-  char *fnbuf = (char *) alloca (len);
+  ULONG len = 0;
+  OBJECT_NAME_INFORMATION dummy_oni;
+  WCHAR *maxmatchdos = NULL;
+  int maxmatchlen = 0;
 
-  memset (fnbuf, 0, len);
-  ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
-  ntfn->Name.MaximumLength = (NT_MAX_PATH - 1) * sizeof (WCHAR);
-  ntfn->Name.Buffer = (WCHAR *) (ntfn + 1);
+  NtQueryObject (h, ObjectNameInformation, &dummy_oni, sizeof (dummy_oni), &len);
+  if (!len)
+    {
+      debug_printf ("NtQueryObject failed 1");
+      goto unknown;
+    }
 
+  OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) alloca (len + sizeof (WCHAR));
   NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, len, NULL);
 
   if (!NT_SUCCESS (res))
     {
-      strcpy (posix_fn, unknown_file);
-      debug_printf ("NtQueryObject failed");
-      return unknown_file;
+      debug_printf ("NtQueryObject failed 2");
+      goto unknown;
     }
 
   // NT seems to do this on an unopened file
   if (!ntfn->Name.Buffer)
     {
       debug_printf ("nt->Name.Buffer == NULL");
-      return NULL;
+      goto unknown;
     }
 
-  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
+  WCHAR *w32 = ntfn->Name.Buffer;
+  size_t w32len = ntfn->Name.Length / sizeof (WCHAR);
+  w32[w32len] = L'\0';
 
-  char *win32_fn = tp.c_get ();
-  sys_wcstombs (win32_fn, NT_MAX_PATH, ntfn->Name.Buffer,
-  		ntfn->Name.Length / sizeof (WCHAR));
-  debug_printf ("nt name '%s'", win32_fn);
-  if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
-      || !QueryDosDevice (NULL, fnbuf, len))
-    return strcpy (posix_fn, win32_fn);
-
-  char *p = strechr (win32_fn + DEVICE_PREFIX_LEN, '\\');
-
-  int n = p - win32_fn;
-  int maxmatchlen = 0;
-  char *maxmatchdos = NULL;
-  char *device = tp.c_get ();
-  for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
+  if (wcscasecmp (w32, DEV_NULL) == 0)
     {
-      device[NT_MAX_PATH - 1] = '\0';
-      if (strchr (s, ':') == NULL)
+      strcpy (posix_fn, "/dev/null");
+      return;
+    }
+
+  if (wcsncasecmp (w32, DEV_NAMED_PIPE, DEV_NAMED_PIPE_LEN) == 0)
+    {
+      w32 += DEV_NAMED_PIPE_LEN;
+      if (wcsncmp (w32, L"cygwin-tty", WCLEN (L"cygwin-tty")) == 0)
+	decode_tty (w32 + WCLEN (L"cygwin-tty"), posix_fn);
+      return;
+    }
+
+
+  WCHAR fnbuf[64 * 1024];
+  if (wcsncasecmp (w32, DEVICE_PREFIX, DEVICE_PREFIX_LEN) != 0
+      || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf)))
+    {
+      sys_wcstombs (posix_fn, NT_MAX_PATH, w32, w32len);
+      return;
+    }
+
+  for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
+    {
+      WCHAR device[NT_MAX_PATH];
+      if (!QueryDosDeviceW (s, device, sizeof (device)))
 	continue;
-      if (!QueryDosDevice (s, device, NT_MAX_PATH - 1))
+      if (wcschr (s, ':') == NULL)
 	continue;
-      char *q = strrchr (device, ';');
+      WCHAR *q = wcsrchr (device, ';');
       if (q)
 	{
-	  char *r = strchr (q, '\\');
+	  WCHAR *r = wcschr (q, '\\');
 	  if (r)
-	    strcpy (q, r + 1);
+	    wcscpy (q, r + 1);
 	}
-      int devlen = strlen (device);
-      if (device[devlen - 1] == '\\')
-	device[--devlen] = '\0';
+      int devlen = wcslen (device);
+      if (device[devlen - 1] == L'\\')
+	device[--devlen] = L'\0';
       if (devlen < maxmatchlen)
 	continue;
-      if (!strncasematch (device, win32_fn, devlen) ||
-	  (win32_fn[devlen] != '\0' && win32_fn[devlen] != '\\'))
+      if (wcsncmp (device, w32, devlen) != 0||
+	  (w32[devlen] != L'\0' && w32[devlen] != L'\\'))
 	continue;
       maxmatchlen = devlen;
       maxmatchdos = s;
-      debug_printf ("current match '%s'", device);
+      debug_printf ("current match '%W' = '%W'\n", s, device);
     }
 
-  char *w32 = win32_fn;
-  bool justslash = false;
   if (maxmatchlen)
     {
-      n = strlen (maxmatchdos);
-      if (maxmatchdos[n - 1] == '\\')
-	n--;
-      w32 += maxmatchlen - n;
-      memcpy (w32, maxmatchdos, n);
-      w32[n] = '\\';
+      WCHAR *p = wcschr (w32 + DEVICE_PREFIX_LEN, L'\\');
+      size_t n = wcslen (maxmatchdos);
+      WCHAR ch;
+      if (!p)
+	ch = L'\0';
+      else
+	{
+	  if (maxmatchdos[n - 1] == L'\\')
+	    n--;
+	  w32 += maxmatchlen - n;
+	  ch = L'\\';
+	}
+      memcpy (w32, maxmatchdos, n * sizeof (WCHAR));
+      w32[n] = ch;
     }
-  else if (strncasematch (w32, NAMED_PIPE, NAMED_PIPE_LEN))
+  else if (wcsncmp (w32, DEV_REMOTE, DEV_REMOTE_LEN) == 0)
     {
-      debug_printf ("pipe");
-      justslash = true;
-    }
-  else if (strncasematch (w32, REMOTE, REMOTE_LEN))
-    {
-      w32 += REMOTE_LEN - 2;
-      *w32 = '\\';
+      w32 += DEV_REMOTE_LEN - 2;
+      *w32 = L'\\';
       debug_printf ("remote drive");
-      justslash = true;
     }
-  else if (strncasematch (w32, REMOTE1, REMOTE1_LEN))
+  else if (wcsncmp (w32, DEV_REMOTE1, DEV_REMOTE1_LEN) == 0)
     {
-      w32 += REMOTE1_LEN - 2;
-      *w32 = '\\';
+      w32 += DEV_REMOTE1_LEN - 2;
+      *w32 = L'\\';
       debug_printf ("remote drive");
-      justslash = true;
     }
 
-  if (!justslash)
-    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, w32, posix_fn,
-		      NT_MAX_PATH);
-  else
-    {
-      char *s, *d;
-      for (s = w32, d = posix_fn; *s; s++, d++)
-	if (*s == '\\')
-	  *d = '/';
-	else
-	  *d = *s;
-      *d = 0;
-    }
+  cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_ABSOLUTE, w32, posix_fn,
+		    NT_MAX_PATH);
 
-  debug_printf ("derived path '%s', posix '%s'", w32, posix_fn);
-  return posix_fn;
+  debug_printf ("derived path '%W', posix '%s'", w32, posix_fn);
+  return;
+
+unknown:
+  strcpy (posix_fn,  unknown_file);
 }

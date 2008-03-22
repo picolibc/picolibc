@@ -1352,6 +1352,7 @@ fhandler_tty_master::init_console ()
 bool
 fhandler_pty_master::setup (bool ispty)
 {
+  int res;
   tty& t = *cygwin_shared->tty[get_unit ()];
 
   tcinit (&t, true);		/* Set termios information.  Force initialization. */
@@ -1362,13 +1363,24 @@ fhandler_pty_master::setup (bool ispty)
   /* Create communication pipes */
 
   /* FIXME: should this be sec_none_nih? */
-  if (!CreatePipe (&from_master, &get_output_handle (), &sec_all, 128 * 1024))
+
+  /* Create communication pipes */
+
+  char pipename[sizeof("ttyNNNN-from-master")];
+  __small_sprintf (pipename, "tty%d-from-master", get_unit ());
+  res = fhandler_pipe::create_selectable (&sec_all_nih, from_master,
+					  get_output_handle (), 128 * 1024,
+					  pipename);
+  if (res)
     {
       errstr = "input pipe";
       goto err;
     }
 
-  if (!CreatePipe (&get_io_handle (), &to_master, &sec_all, 128 * 1024))
+  __small_sprintf (pipename, "tty%d-to-master", get_unit ());
+  res = fhandler_pipe::create_selectable (&sec_all_nih, get_io_handle (),
+					  to_master, 128 * 1024, pipename);
+  if (res)
     {
       errstr = "output pipe";
       goto err;
@@ -1380,7 +1392,7 @@ fhandler_pty_master::setup (bool ispty)
 
   need_nl = 0;
 
-  /* We do not open allow the others to open us (for handle duplication)
+  /* We do not allow others to open us (for handle duplication)
      but rely on cygheap->inherited_ctty for descendant processes.
      In the future the cygserver may allow access by others. */
 

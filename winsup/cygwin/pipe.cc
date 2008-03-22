@@ -59,7 +59,7 @@ static DWORD WINAPI
 pipe_handler (LPVOID in_ps)
 {
   pipesync ps = *(pipesync *) in_ps;
-  HANDLE in, out;
+  HANDLE h, in, out;
   DWORD err = fhandler_pipe::create_selectable (&sec_none_nih, in, out, 0);
   if (err)
     {
@@ -67,7 +67,8 @@ pipe_handler (LPVOID in_ps)
       system_printf ("couldn't create a shadow pipe for non-cygwin pipe I/O, %E");
       return 0;
     }
-  ((pipesync *) in_ps)->ret_handle = ps.reader ? in : out;
+  h = ((pipesync *) in_ps)->ret_handle = ps.reader ? in : out;
+  SetHandleInformation (h, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
   SetEvent (ps.ev);
 
   char buf[4096];
@@ -124,6 +125,7 @@ pipesync::pipesync (HANDLE f, DWORD is_reader):
       system_printf ("couldn't create synchronization event for non-cygwin pipe, %E");
       goto out;
     }
+  debug_printf ("created thread synchronization event %p", ev);
   non_cygwin_h = f;
   reader = !!is_reader;
   ret_handle = NULL;
@@ -153,7 +155,6 @@ out:
   return;
 }
 
-#define WINPIPE "\\\\.\\pipe\\"
 void
 fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
 {
@@ -324,6 +325,8 @@ fhandler_pipe::dup (fhandler_base *child)
   return res;
 }
 
+#define PIPE_INTRO "\\\\.\\pipe\\cygwin-"
+
 /* Create a pipe, and return handles to the read and write ends,
    just like CreatePipe, but ensure that the write end permits
    FILE_READ_ATTRIBUTES access, on later versions of win32 where
@@ -333,7 +336,7 @@ fhandler_pipe::dup (fhandler_base *child)
    unlike CreatePipe, which returns a bool for success or failure.  */
 int
 fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
-				  HANDLE& w, DWORD psize)
+				  HANDLE& w, DWORD psize, const char *name)
 {
   /* Default to error. */
   r = w = INVALID_HANDLE_VALUE;
@@ -342,20 +345,26 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   if (psize < PIPE_BUF)
     psize = PIPE_BUF;
 
-  char pipename[MAX_PATH];
+  char pipename[MAX_PATH] = PIPE_INTRO;
+  /* FIXME: Eventually make ttys work with overlapped I/O. */
+  DWORD overlapped = name ? 0 : FILE_FLAG_OVERLAPPED;
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
      to be as robust as possible.  */
-  while (1)
+  DWORD err;
+  do
     {
       static volatile ULONG pipe_unique_id;
-
-      __small_sprintf (pipename, "\\\\.\\pipe\\cygwin-%p-%p", myself->pid,
-		       InterlockedIncrement ((LONG *) &pipe_unique_id));
+      if (!name)
+	__small_sprintf (pipename + strlen(PIPE_INTRO), "%p-%p", myself->pid,
+			InterlockedIncrement ((LONG *) &pipe_unique_id));
+      else
+	strcpy (pipename + strlen(PIPE_INTRO), name);
 
       debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
 
+      err = 0;
       /* Use CreateNamedPipe instead of CreatePipe, because the latter
 	 returns a write handle that does not permit FILE_READ_ATTRIBUTES
 	 access, on versions of win32 earlier than WinXP SP2.
@@ -365,7 +374,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	 the pipe was not created earlier by some other process, even if
 	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
 	 because that is only available for Win2k SP2 and WinXP.  */
-      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND | overlapped,
 			   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
@@ -376,7 +385,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	  break;
 	}
 
-      DWORD err = GetLastError ();
+      err = GetLastError ();
       switch (err)
 	{
 	case ERROR_PIPE_BUSY:
@@ -397,13 +406,17 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	  }
 	}
     }
+  while (!name);
+
+  if (err)
+    return err;
 
   debug_printf ("CreateFile: name %s", pipename);
 
   /* Open the named pipe for writing.
      Be sure to permit FILE_READ_ATTRIBUTES access.  */
   w = CreateFile (pipename, GENERIC_WRITE | FILE_READ_ATTRIBUTES, 0, sa_ptr,
-		  OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
+		  OPEN_EXISTING, overlapped, 0);
 
   if (!w || w == INVALID_HANDLE_VALUE)
     {
