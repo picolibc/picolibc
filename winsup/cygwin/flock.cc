@@ -138,7 +138,7 @@
 	 descriptors, or when all such descriptors have been closed.
 
 	 If a process uses open(2) (or similar) to obtain more than one
-	 descrip- tor for the same file, these descriptors are treated
+	 descriptor for the same file, these descriptors are treated
 	 independently by flock().  An attempt to lock the file using
 	 one of these file descriptors may be denied by a lock that the
 	 calling process has already placed via another descriptor.  */

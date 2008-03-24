@@ -1,5 +1,9 @@
 2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc: Fix typo in comment.
+
+2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::dup): Drop setting flags in the parent.
 
 	Implement advisory file locking.
