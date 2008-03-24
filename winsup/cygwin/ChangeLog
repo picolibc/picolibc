@@ -1,5 +1,11 @@
 2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc: Clarify a couple of comments.
+	(lf_setlock): Treat not being able to sync on a process as a potential
+	deadlock situation.  Close process handle using CloseHandle.
+
+2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc: Fix typo in comment.
 
 2008-03-24  Corinna Vinschen  <corinna@vinschen.de>

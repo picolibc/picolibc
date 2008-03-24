@@ -159,9 +159,9 @@ static NO_COPY muto lockf_guard;
 #define LOCK_OBJ_NAME_LEN	56
 
 /* This function takes the own process security descriptor DACL and adds
-   SYNCHRONIZE permissions for everyone.  This allows to wait any process
-   to wait for this process to set the event object to signalled in case
-   the lock gets removed or replaced. */
+   SYNCHRONIZE permissions for everyone.  This allows all processes
+   to wait for this process to die when blocking in a F_SETLKW on a lock
+   which is hold by this process. */
 static void
 allow_others_to_sync ()
 {
@@ -751,7 +751,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
       need_fork_fixup (true);
     }
   /* Unlock the fd table which has been locked in fcntl_worker, otherwise
-     a F_SETLKW waits forever... */
+     a blocking F_SETLKW never wakes up on a signal. */
   cygheap->fdtab.unlock ();
 
   lockf_t **head = &node->i_lockf;
@@ -886,19 +886,26 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
        * Add our lock to the blocked list and sleep until we're free.
        * Remember who blocked us (for deadlock detection).
        */
-      /* TODO */
+      /* FIXME?  See deadlock recognition above. */
 
       /* Wait for the blocking object and its holding process. */
       HANDLE obj = block->open_lock_obj ();
       HANDLE proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
       if (!proc)
-        api_fatal ("OpenProcess: %E");
+	{
+	  /* If we can't synchronize on the process holding the lock,
+	     we will never recognize when the lock has been abandoned.
+	     Treat this as a deadlock-like situation for now. */
+	  debug_printf ("OpenProcess: %E");
+	  NtClose (obj);
+	  return EDEADLK;
+	}
       HANDLE w4[3] = { obj, proc, signal_arrived };
       node->del_all_locks_list ();
       //SetThreadPriority (GetCurrentThread (), priority);
       node->UNLOCK ();
       DWORD ret = WaitForMultipleObjects (3, w4, FALSE, INFINITE);
-      NtClose (proc);
+      CloseHandle (proc);
       NtClose (obj);
       node->LOCK ();
       //SetThreadPriority (GetCurrentThread (), old_prio);
