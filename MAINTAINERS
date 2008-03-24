@@ -13,7 +13,9 @@ Makefile.*; configure; configure.in; src-release
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
-bfd/; binutils/; gas/; gprof/; ld/; opcodes/; cpu/; BFD's part of include/
+bfd/; binutils/; elfcpp/; gas/; gold/; gprof/; ld/; opcodes/; cpu/;
+BFD's part of include/
+
 	binutils: http://sources.redhat.com/binutils/
 	Patches to binutils@sources.redhat.com.
 	Please notify the following of any interface changes:
