@@ -1,5 +1,14 @@
 2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (inode_t::get_all_locks_list): Don't allow F_WAIT flag
+	in lock event object name.
+	(lockf_t::create_lock_obj): Ditto.
+	(lockf_t::open_lock_obj): Ditto.
+	(lf_setlock): Only check POSIX locks for deadlock condition.
+	(lf_findoverlap): Don't let POSIX and flock locks interact.
+
+2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc: Clarify a couple of comments.
 	(lf_setlock): Treat not being able to sync on a process as a potential
 	deadlock situation.  Close process handle using CloseHandle.

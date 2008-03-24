@@ -509,7 +509,7 @@ inode_t::get_all_locks_list ()
 	 lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid */
       wc[LOCK_OBJ_NAME_LEN] = L'\0';
       short flags = wcstol (wc, &endptr, 16);
-      if ((flags & ~(F_WAIT | F_FLOCK | F_POSIX)) != 0
+      if ((flags & ~(F_FLOCK | F_POSIX)) != 0
 	  || (flags & (F_FLOCK | F_POSIX) == (F_FLOCK | F_POSIX)))
 	continue;
       short type = wcstol (endptr + 1, &endptr, 16);
@@ -548,7 +548,8 @@ lockf_t::create_lock_obj ()
   NTSTATUS status;
 
   __small_swprintf (name, L"%02x-%01x-%016X-%016X-%08x-%08x",
-			  lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid);
+			  lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start,
+			  lf_end, lf_id, lf_wid);
   RtlInitCountedUnicodeString (&uname, name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
@@ -570,7 +571,8 @@ lockf_t::open_lock_obj () const
   HANDLE obj;
 
   __small_swprintf (name, L"%02x-%01x-%016X-%016X-%08x-%08x",
-			  lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid);
+			  lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start,
+			  lf_end, lf_id, lf_wid);
   RtlInitCountedUnicodeString (&uname, name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
@@ -867,7 +869,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
 		intelligent.  If it turns out to be too dumb, we might
 		have to remove it or to find another method. */
       for (lockf_t *lk = node->i_lockf; lk; lk = lk->lf_next)
-	if (lk->get_lock_obj_handle_count () > 1)
+	if ((lk->lf_flags & F_POSIX) && lk->get_lock_obj_handle_count () > 1)
 	  return EDEADLK;
 
       /*
@@ -1204,7 +1206,10 @@ lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
   end = lock->lf_end;
   while (lf != NOLOCKF)
     {
-      if ((type & OTHERS) && lf->lf_id == lock->lf_id)
+      if (((type & OTHERS) && lf->lf_id == lock->lf_id)
+	  /* As on Linux: POSIX locks and flock locks don't interact. */
+	  || (lf->lf_flags & (F_POSIX | F_FLOCK))
+	     != (lock->lf_flags & (F_POSIX | F_FLOCK)))
 	{
 	  *prev = &lf->lf_next;
 	  *overlap = lf = lf->lf_next;
