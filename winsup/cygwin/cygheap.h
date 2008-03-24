@@ -295,6 +295,9 @@ struct init_cygheap
   size_t sthreads;
   pid_t pid;			/* my pid */
   HANDLE pid_handle;		/* handle for my pid */
+  struct {			/* Equivalent to using LIST_HEAD. */
+    struct inode_t *lh_first;
+  } inode_list;			/* Global inode pointer for adv. locking. */
   hook_chain hooks;
   void close_ctty ();
   int manage_console_count (const char *, int, bool = false) __attribute__ ((regparm (3)));

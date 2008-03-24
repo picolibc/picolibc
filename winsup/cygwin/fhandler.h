@@ -38,6 +38,7 @@ extern const int proc_len;
 
 class select_record;
 class fhandler_disk_file;
+class inode_t;
 typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
@@ -135,6 +136,8 @@ class fhandler_base
   size_t raixget;
   size_t raixput;
   size_t rabuflen;
+
+  inode_t *node;	/* Used for advisory file locking.  See flock.cc.  */
 
   DWORD fs_flags;
   HANDLE read_state;

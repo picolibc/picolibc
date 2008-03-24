@@ -657,6 +657,7 @@ child_info_fork::handle_fork ()
 void
 child_info_spawn::handle_spawn ()
 {
+  extern void fixup_lockf_after_exec ();
   HANDLE h;
   cygheap_fixup_in_child (true);
   memory_init ();
@@ -689,6 +690,7 @@ child_info_spawn::handle_spawn ()
       old_title = strcpy (title_buf, moreinfo->old_title);
       cfree (moreinfo->old_title);
     }
+  fixup_lockf_after_exec ();
 }
 
 void __stdcall

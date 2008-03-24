@@ -874,6 +874,7 @@ localtime SIGFE
 _localtime = localtime SIGFE
 localtime_r SIGFE
 _localtime_r = localtime_r SIGFE
+lockf SIGFE
 log NOSIGFE
 _log = log NOSIGFE
 log10 NOSIGFE

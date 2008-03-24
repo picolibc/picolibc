@@ -82,6 +82,7 @@ public:
   void delete_archetype (fhandler_base *);
   friend void dtable_init ();
   friend void __stdcall close_all_files (bool);
+  friend class fhandler_disk_file;
   friend class cygheap_fdmanip;
   friend class cygheap_fdget;
   friend class cygheap_fdnew;

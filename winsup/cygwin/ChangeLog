@@ -1,3 +1,33 @@
+2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::dup): Drop setting flags in the parent.
+
+	Implement advisory file locking.
+	* cygheap.h (struct init_cygheap): Add inode_list member.
+	* cygwin.din (lockf): Export.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Call
+	fixup_lockf_after_exec.
+	* dtable.h (class dtable): Add fhandler_disk_file as friend class.
+	* fhandler.cc (fhandler_base::close): Call del_my_locks if node is set.
+	(fhandler_base::fhandler_base): Initialize node to NULL.
+	(fhandler_base::fixup_after_fork): Ditto.
+	* fhandler.h (class fhandler_base): Add member node.
+	* fhandler_disk_file.cc (fhandler_disk_file::lock): Delete.
+	* flock.cc: Implement all advisory file locking here.
+	(fhandler_disk_file::lock): Implement here.
+	(flock): Call fcntl with F_FLOCK bit set.  Remove test main function.
+	(lockf): New function.
+	* fork.cc (frok::child): Call fixup_lockf_after_fork.
+	* ntdll.h (DIRECTORY_ALL_ACCESS): Define.
+	(struct _OBJECT_BASIC_INFORMATION): Define.
+	(enum _EVENT_TYPE): Define.
+	(NtCreateDirectoryObject): Declare.
+	(NtCreateEvent): Declare.
+	(NtCreateMutant): Declare.
+	(NtOpenEvent): Declare.
+	(NtOpenMutant): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+
 2008-03-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (handle_to_fn): Modify to return true if handle represents

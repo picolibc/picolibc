@@ -1004,9 +1004,13 @@ fhandler_base::pwrite (void *, size_t, _off64_t)
 int
 fhandler_base::close ()
 {
+  extern void del_my_locks (inode_t *);
   int res = -1;
 
   syscall_printf ("closing '%s' handle %p", get_name (), get_handle ());
+  /* Delete all POSIX locks on the file. */
+  if (node)
+    del_my_locks (node);
   if (nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else
@@ -1135,7 +1139,6 @@ fhandler_base::dup (fhandler_base *child)
     }
   if (get_overlapped ())
     child->setup_overlapped ();
-  set_flags (child->get_flags ());
   return 0;
 }
 
@@ -1265,6 +1268,7 @@ fhandler_base::fhandler_base () :
   raixget (0),
   raixput (0),
   rabuflen (0),
+  node (NULL),
   fs_flags (0),
   archetype (NULL),
   usecount (0)
@@ -1336,6 +1340,10 @@ fhandler_base::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, io_handle, "io_handle");
   if (get_overlapped ())
     setup_overlapped ();
+  /* POSIX locks are not inherited across fork.  The lock structures
+     are deleted globally in fixup_lockf_after_fork.  Here we just
+     have to reset the pointer. */
+  node = NULL;
 }
 
 void

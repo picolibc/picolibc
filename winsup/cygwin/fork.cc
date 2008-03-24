@@ -173,6 +173,7 @@ int __stdcall
 frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
+  extern void fixup_lockf_after_fork ();
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
@@ -253,6 +254,7 @@ frok::child (volatile char * volatile here)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
+  fixup_lockf_after_fork ();
   wait_for_sigthread (true);
   cygwin_finished_initializing = true;
   return 0;
