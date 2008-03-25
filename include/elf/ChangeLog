@@ -1,3 +1,7 @@
+2008-03-24  Ian Lance Taylor  <iant@google.com>
+
+	* common.h (NT_GNU_GOLD_VERSION): Define.
+
 2008-03-13  Alan Modra  <amodra@bigpond.net.au>
 
 	* internal.h (Elf_Internal_Shdr): Change sh_link and sh_info from
