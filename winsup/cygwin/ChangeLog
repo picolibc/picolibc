@@ -11,6 +11,8 @@
 
 2008-03-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	Implement method of detecting a missing dll as suggested by Brian
+	Dessent.
 	* hookapi.cc (find_first_notloaded_dll): New function.
 	* pinfo.cc (status_exit): New function.  Issue message when dll not
 	found.  Use find_first_notloaded_dll to find a nonexistent dll.
