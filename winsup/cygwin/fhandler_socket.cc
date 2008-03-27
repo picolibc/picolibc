@@ -405,7 +405,7 @@ fhandler_socket::af_local_set_secret (char *buf)
 }
 
 /* Maximum number of concurrently opened sockets from all Cygwin processes
-   on a machine.  Note that shared sockets (through dup/fork/exec) are
+   per session.  Note that shared sockets (through dup/fork/exec) are
    counted as one socket. */
 #define NUM_SOCKS	(65536 / sizeof (wsa_event))
 
@@ -426,7 +426,7 @@ search_wsa_event_slot (LONG new_serial_number)
   if (!wsa_slot_mtx)
     {
       wsa_slot_mtx = CreateMutex (&sec_all, FALSE,
-				  shared_name (name, "sock", 0));
+				  shared_name (name, "sock", 0, true));
       if (!wsa_slot_mtx)
 	api_fatal ("Couldn't create/open shared socket mutex, %E");
     }
@@ -443,7 +443,8 @@ search_wsa_event_slot (LONG new_serial_number)
   while (wsa_events[slot].serial_number)
     {
       HANDLE searchmtx = OpenMutex (STANDARD_RIGHTS_READ, FALSE,
-	    shared_name (searchname, "sock", wsa_events[slot].serial_number));
+	    shared_name (searchname, "sock", wsa_events[slot].serial_number,
+			 true));
       if (!searchmtx)
 	break;
       /* Mutex still exists, attached socket is active, try next slot. */
@@ -476,7 +477,8 @@ fhandler_socket::init_events ()
       if (!new_serial_number)	/* 0 is reserved for global mutex */
 	InterlockedIncrement (&socket_serial_number);
       wsock_mtx = CreateMutex (&sec_all, FALSE,
-			       shared_name (name, "sock", new_serial_number));
+			       shared_name (name, "sock", new_serial_number,
+					    true));
       if (!wsock_mtx)
 	{
 	  debug_printf ("CreateMutex, %E");

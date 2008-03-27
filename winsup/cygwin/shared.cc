@@ -35,11 +35,12 @@ user_info NO_COPY *user_shared;
 HANDLE NO_COPY cygwin_user_h;
 
 char * __stdcall
-shared_name (char *ret_buf, const char *str, int num)
+shared_name (char *ret_buf, const char *str, int num, bool session_local)
 {
   extern bool _cygwin_testing;
 
-  __small_sprintf (ret_buf, "%s%s.%s.%d", cygheap->shared_prefix,
+  __small_sprintf (ret_buf, "%s%s.%s.%d",
+		   session_local ? "" : cygheap->shared_prefix,
 		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
     strcat (ret_buf, cygwin_version.dll_build_date);

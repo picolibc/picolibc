@@ -1,3 +1,10 @@
+2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Create shared objects session local throughout.
+	* shared.cc (shared_name): Add argument to allow opening session
+	local shared memory.
+	* shared_info.h (shared_name): Change declaration accordingly.
+
 2008-03-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* hookapi.cc (find_first_notloaded_dll): New function.
