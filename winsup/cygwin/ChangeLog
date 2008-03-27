@@ -1,5 +1,33 @@
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (FLOCK_PARENT_DIR_ACCESS): Define.
+	(FLOCK_INODE_DIR_ACCESS): Define.
+	(FLOCK_MUTANT_ACCESS): Define.
+	(FLOCK_EVENT_ACCESS): Define.
+	(SD_MIN_SIZE): Define.
+	(everyone_sd): Define to simplify calling _everyone_sd.
+	(_everyone_sd): Replace everyone_sync_sd.  Take SECURITY_DESCRIPTOR as
+	argument and allow to specify access mask.
+	(get_lock_parent_dir): Open/Create parent dir with
+	FLOCK_PARENT_DIR_ACCESS.  Add text to api_fatal message.
+	(inode_t::inode_t): Open/Create dir with FLOCK_INODE_DIR_ACCESS.
+	Open/Create mutant with FLOCK_MUTANT_ACCESS.  Add text to api_fatal
+	message.
+	(lockf_t::create_lock_obj): Create event with FLOCK_EVENT_ACCESS.
+	Add text to api_fatal message.
+	(lockf_t::open_lock_obj): Open event with FLOCK_EVENT_ACCESS.
+	On failure, just return NULL pointer instead of calling api_fatal.
+	(lockf_t::get_lock_obj_handle_count): Replace call to small_printf
+	with call to debug_printf.
+	(lf_setlock): Handle a failure to open the lock event object as
+	EDEADLK.  Call system_printf if opening sync objects fail.
+	* ntdll.h (DIRECTORY_TRAVERSE): Define.
+	(DIRECTORY_CREATE_OBJECT): Define.
+	(DIRECTORY_CREATE_SUBDIRECTORY): Define.
+	(EVENT_QUERY_STATE): Define.
+
+2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Fix setting errno in case of trailing "/."
 
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>

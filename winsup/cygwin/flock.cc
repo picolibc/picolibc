@@ -216,23 +216,42 @@ allow_others_to_sync ()
 }
 
 /* Helper function to create an event security descriptor which only allows
-   SYNCHRONIZE access to everyone.  Only the creating process has all access
+   specific access to everyone.  Only the creating process has all access
    rights. */
-static PSECURITY_DESCRIPTOR
-everyone_sync_sd ()
-{
-  static PSECURITY_DESCRIPTOR psd;
 
-  if (!psd)
+#define FLOCK_PARENT_DIR_ACCESS	(DIRECTORY_QUERY \
+				 | DIRECTORY_TRAVERSE \
+				 | DIRECTORY_CREATE_SUBDIRECTORY \
+				 | READ_CONTROL)
+
+#define FLOCK_INODE_DIR_ACCESS	(DIRECTORY_QUERY \
+				 | DIRECTORY_TRAVERSE \
+				 | DIRECTORY_CREATE_OBJECT \
+				 | READ_CONTROL)
+
+#define FLOCK_MUTANT_ACCESS	(MUTANT_QUERY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
+
+#define FLOCK_EVENT_ACCESS	(EVENT_QUERY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
+
+#define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
+
+#define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
+
+PSECURITY_DESCRIPTOR
+_everyone_sd (void *buf, ACCESS_MASK access)
+{
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) buf;
+
+  if (psd)
     {
-      const size_t acl_len = sizeof (ACL) +
-			     sizeof (ACCESS_ALLOWED_ACE) + MAX_SID_LEN;
-      psd = (PSECURITY_DESCRIPTOR)
-	    malloc (sizeof (SECURITY_DESCRIPTOR) + acl_len);
       InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
       PACL dacl = (PACL) (psd + 1);
-      InitializeAcl (dacl, acl_len, ACL_REVISION);
-      if (!AddAccessAllowedAce (dacl, ACL_REVISION, SYNCHRONIZE, 
+      InitializeAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
+      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access, 
 				well_known_world_sid))
 	{
 	  debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());
@@ -265,13 +284,14 @@ get_lock_parent_dir ()
     {
       RtlInitUnicodeString (&uname, L"\\BaseNamedObjects\\cygwin-fcntl-lk");
       InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, NULL,
-				  sec_all.lpSecurityDescriptor);
-      status = NtOpenDirectoryObject (&dir, DIRECTORY_ALL_ACCESS, &attr);
+				  everyone_sd (FLOCK_PARENT_DIR_ACCESS));
+      status = NtOpenDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
 	{
-	  status = NtCreateDirectoryObject (&dir, DIRECTORY_ALL_ACCESS, &attr);
+	  status = NtCreateDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS,
+					    &attr);
 	  if (!NT_SUCCESS (status))
-	    api_fatal ("NtCreateDirectoryObject: %p", status);
+	    api_fatal ("NtCreateDirectoryObject(parent): %p", status);
 	}
     }
   INODE_LIST_UNLOCK ();
@@ -446,25 +466,25 @@ inode_t::inode_t (dev_t dev, ino_t ino)
   int len = __small_swprintf (name, L"%08x-%016X", dev, ino);
   RtlInitCountedUnicodeString (&uname, name, len * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, parent_dir,
-			      sec_all.lpSecurityDescriptor);
-  status = NtOpenDirectoryObject (&i_dir, DIRECTORY_ALL_ACCESS, &attr);
+			      everyone_sd (FLOCK_INODE_DIR_ACCESS));
+  status = NtOpenDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
   if (!NT_SUCCESS (status))
     {
-      status = NtCreateDirectoryObject (&i_dir, DIRECTORY_ALL_ACCESS, &attr);
+      status = NtCreateDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateDirectoryObject: %p", status);
+	api_fatal ("NtCreateDirectoryObject(inode): %p", status);
     }
   /* Create a mutex object in the file specific dir, which is used for
      access synchronization on the dir and its objects. */
   RtlInitUnicodeString (&uname, L"mtx");
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, i_dir,
-			      sec_all.lpSecurityDescriptor);
-  status = NtOpenMutant (&i_mtx, MUTANT_ALL_ACCESS, &attr);
+			      everyone_sd (FLOCK_MUTANT_ACCESS));
+  status = NtOpenMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr);
   if (!NT_SUCCESS (status))
     {
-      status = NtCreateMutant (&i_mtx, MUTANT_ALL_ACCESS, &attr, FALSE);
+      status = NtCreateMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr, FALSE);
       if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateMutant: %p", status);
+	api_fatal ("NtCreateMutant(inode): %p", status);
     }
 }
 
@@ -553,11 +573,11 @@ lockf_t::create_lock_obj ()
   RtlInitCountedUnicodeString (&uname, name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
-			      everyone_sync_sd ());
+			      everyone_sd (FLOCK_EVENT_ACCESS));
   status = NtCreateEvent (&lf_obj, EVENT_ALL_ACCESS, &attr,
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
-    api_fatal ("NtCreateEvent: %p", status);
+    api_fatal ("NtCreateEvent(lock): %p", status);
 }
 
 /* Open a lock event object for SYNCHRONIZE access (to wait for it). */
@@ -577,9 +597,12 @@ lockf_t::open_lock_obj () const
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
 			      NULL);
-  status = NtOpenEvent (&obj, SYNCHRONIZE, &attr);
+  status = NtOpenEvent (&obj, FLOCK_EVENT_ACCESS, &attr);
   if (!NT_SUCCESS (status))
-    api_fatal ("NtOpenEvent: %p", status);
+    {
+      SetLastError (RtlNtStatusToDosError (status));
+      return NULL;
+    }
   return obj;
 }
 
@@ -596,7 +619,7 @@ lockf_t::get_lock_obj_handle_count () const
       status = NtQueryObject (lf_obj, ObjectBasicInformation,
 			      &obi, sizeof obi, NULL);
       if (!NT_SUCCESS (status))
-	small_printf ("NtQueryObject: %p\n", status);
+	debug_printf ("NtQueryObject: %p\n", status);
       else
       	hdl_cnt = obi.HandleCount;
     }
@@ -892,13 +915,23 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
 
       /* Wait for the blocking object and its holding process. */
       HANDLE obj = block->open_lock_obj ();
+      if (!obj)
+	{
+	  /* We can't synchronize on the lock event object.
+	     Treat this as a deadlock-like situation for now. */
+	  system_printf ("Can't sync with lock object hold by "
+			 "Win32 pid %lu: %E", block->lf_wid);
+	  NtClose (obj);
+	  return EDEADLK;
+	}
       HANDLE proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
       if (!proc)
 	{
 	  /* If we can't synchronize on the process holding the lock,
 	     we will never recognize when the lock has been abandoned.
 	     Treat this as a deadlock-like situation for now. */
-	  debug_printf ("OpenProcess: %E");
+	  system_printf ("Can't sync with process holding a lock "
+			 "(Win32 pid %lu): %E", block->lf_wid);
 	  NtClose (obj);
 	  return EDEADLK;
 	}

@@ -1,6 +1,6 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -189,7 +189,12 @@ typedef struct _FILE_ID_BOTH_DIR_INFORMATION
 #define LOCK_VM_IN_RAM 2
 
 #define DIRECTORY_QUERY 1
+#define DIRECTORY_TRAVERSE 2
+#define DIRECTORY_CREATE_OBJECT 4
+#define DIRECTORY_CREATE_SUBDIRECTORY 8
 #define DIRECTORY_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED|0x0f)
+
+#define EVENT_QUERY_STATE 1
 
 typedef ULONG KAFFINITY;
 
