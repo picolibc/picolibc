@@ -1,5 +1,9 @@
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Fix setting errno in case of trailing "/."
+
+2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc: Create shared objects session local throughout.
 	* shared.cc (shared_name): Add argument to allow opening session
 	local shared memory.

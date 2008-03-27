@@ -1497,10 +1497,16 @@ rename (const char *oldpath, const char *newpath)
   if (efault.faulted (EFAULT))
     return -1;
 
-  if (has_dot_last_component (oldpath, true)
-      || has_dot_last_component (newpath, true))
+  if (has_dot_last_component (oldpath, true))
     {
-      set_errno (EINVAL);
+      oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      set_errno (oldpc.isdir () ? EBUSY : ENOTDIR);
+      goto out;
+    }
+  if (has_dot_last_component (newpath, true))
+    {
+      newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      set_errno (!newpc.exists () ? ENOENT : newpc.isdir () ? EBUSY : ENOTDIR);
       goto out;
     }
 
