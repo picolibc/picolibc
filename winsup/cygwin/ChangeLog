@@ -1,3 +1,21 @@
+2008-03-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* hookapi.cc (find_first_notloaded_dll): New function.
+	* pinfo.cc (status_exit): New function.  Issue message when dll not
+	found.  Use find_first_notloaded_dll to find a nonexistent dll.
+	(pinfo::maybe_set_exit_code_from_windows): Call status_exit when exit
+	code >= 0xc0000000UL.
+	* sigproc.cc (child_info::proc_retry): Return exit code when
+	STATUS_DLL_NOT_FOUND.
+	* spawn.cc (spawn_guts): Minor cleanup.
+	* syscalls.cc (close_all_files): Don't actually close stderr
+	filehandle.  Just make it noninheritable.
+	* winsup.h (find_first_notloaded_dll): Declare new function.
+
+2008-03-26  Brian Dessent  <brian@dessent.net>
+
+	* ntdll.h: Add several missing NTSTATUS defines.
+
 2008-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (inode_t::get_all_locks_list): Don't allow F_WAIT flag

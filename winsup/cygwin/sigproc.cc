@@ -32,6 +32,7 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "exceptions.h"
+#include "ntdll.h"
 
 /*
  * Convenience defines
@@ -935,6 +936,8 @@ child_info::proc_retry (HANDLE h)
     case STILL_ACTIVE:	/* shouldn't happen */
       sigproc_printf ("STILL_ACTIVE?  How'd we get here?");
       break;
+    case STATUS_DLL_NOT_FOUND:
+      return exit_code;
     case STATUS_CONTROL_C_EXIT:
       if (saw_ctrl_c ())
 	return EXITCODE_OK;

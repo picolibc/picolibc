@@ -109,12 +109,17 @@ close_all_files (bool norelease)
   semaphore::terminate ();
 
   fhandler_base *fh;
+  HANDLE h = NULL;
+
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)
       {
 #ifdef DEBUGGING
 	debug_printf ("closing fd %d", i);
 #endif
+	if (i == 2)
+	  DuplicateHandle (GetCurrentProcess (), fh->get_output_handle (), GetCurrentProcess (), &h, 0, false,
+			   DUPLICATE_SAME_ACCESS);
 	fh->close ();
 	if (!norelease)
 	  cygheap->fdtab.release (i);
@@ -123,6 +128,8 @@ close_all_files (bool norelease)
   if (!hExeced && cygheap->ctty)
     cygheap->close_ctty ();
 
+  if (h)
+    SetStdHandle (STD_ERROR_HANDLE, h);
   cygheap->fdtab.unlock ();
 }
 

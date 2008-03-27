@@ -261,7 +261,8 @@ void __stdcall close_all_files (bool = false);
 extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug (bool waitloop = 1);
 
-extern void ld_preload ();
+void ld_preload ();
+const char *find_first_notloaded_dll (class path_conv &);
 
 void set_file_api_mode (codepage_type);
 

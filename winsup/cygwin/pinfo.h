@@ -45,7 +45,7 @@ public:
   pid_t pid;
 
   /* Various flags indicating the state of the process.  See PID_
-     constants below. */
+     constants in <sys/cygwin.h>. */
   DWORD process_state;
 
   DWORD exitcode;	/* set when process exits */

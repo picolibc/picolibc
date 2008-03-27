@@ -1,6 +1,6 @@
 /* hookapi.cc
 
-   Copyright 2005, 2006 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,15 +9,17 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <imagehlp.h>
+#include <stdlib.h>
+#include <alloca.h>
+#include "ntdll.h"
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <stdlib.h>
-#include <imagehlp.h>
-#include <alloca.h>
+#include "pinfo.h"
 
 #define rva(coerce, base, addr) (coerce) ((char *) (base) + (addr))
 #define rvacyg(coerce, addr) rva (coerce, cygwin_hmodule, addr)
@@ -158,7 +160,74 @@ makename (const char *name, char *&buf, int& i, int inc)
   return name;
 }
 
-// Top level routine to find the EXE's imports, and redirect them
+/* Find first missing dll in a given executable.
+   FIXME: This is not foolproof since it doesn't look for dlls in the
+   same directory as the given executable, like Windows.  Instead it
+   searches for dlls in the context of the current executable.  */
+const char *
+find_first_notloaded_dll (path_conv& pc)
+{
+  const char *res = "?";
+  HANDLE hc = NULL;
+  HMODULE hm = NULL;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  HANDLE h;
+  NTSTATUS status;
+
+  status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
+		       pc.get_object_attr (attr, sec_none_nih),
+		       &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		       FILE_SYNCHRONOUS_IO_NONALERT
+		       | FILE_OPEN_FOR_BACKUP_INTENT
+		       | FILE_NON_DIRECTORY_FILE);
+  if (!NT_SUCCESS (status))
+    goto out;
+
+  hc = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
+  NtClose (h);
+  if (!hc)
+    goto out;
+  hm = (HMODULE) MapViewOfFile(hc, FILE_MAP_READ, 0, 0, 0);
+  CloseHandle (hc);
+
+  PIMAGE_NT_HEADERS pExeNTHdr;
+  pExeNTHdr = PEHeaderFromHModule (hm);
+
+  if (!pExeNTHdr)
+    goto out;
+
+  DWORD importRVA;
+  importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  if (!importRVA)
+    goto out;
+
+  long delta = rvadelta (pExeNTHdr, importRVA);
+
+  // Convert imports RVA to a usable pointer
+  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
+  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
+
+  // Iterate through each import descriptor, and redirect if appropriate
+  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+    {
+      const char *lib = rva (PSTR, hm, pd->Name - delta);
+      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
+			             | LOAD_LIBRARY_AS_DATAFILE))
+	{
+	  static char buf[NT_MAX_PATH];
+	  res = strcpy (buf, lib);
+	}
+    }
+
+out:
+  if (hm)
+    UnmapViewOfFile (hm);
+
+  return res;
+}
+
+// Top level routine to find the EXE's imports and redirect them
 void *
 hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
 {

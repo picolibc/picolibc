@@ -104,6 +104,28 @@ pinfo_init (char **envp, int envc)
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
+static DWORD
+status_exit (DWORD x)
+{
+  const char *find_first_notloaded_dll (path_conv &);
+  switch (x)
+    {
+    case STATUS_DLL_NOT_FOUND:
+      {
+	char posix_prog[NT_MAX_PATH];
+	path_conv pc (myself->progname, PC_NOWARN);
+	mount_table->conv_to_posix_path (pc.get_win32 (), posix_prog, 1);
+	small_printf ("%s: error while loading shared libraries: %s: cannot open shared object file: No such file or directory\n",
+		      posix_prog, find_first_notloaded_dll (pc));
+	x = 127;
+      }
+      break;
+    default:
+      x = 127;
+    }
+  return x;
+}
+
 # define self (*this)
 void
 pinfo::maybe_set_exit_code_from_windows ()
@@ -114,10 +136,12 @@ pinfo::maybe_set_exit_code_from_windows ()
 
   if (hProcess && !(self->exitcode & EXITCODE_SET))
     {
-      WaitForSingleObject (hProcess, INFINITE);	// just to be safe, in case
-						// process hasn't quite exited
-						// after closing pipe
+      WaitForSingleObject (hProcess, INFINITE);	/* just to be safe, in case
+						   process hasn't quite exited
+						   after closing pipe */
       GetExitCodeProcess (hProcess, &x);
+      if (x >= 0xc0000000UL)
+	x = status_exit (x);
       self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
     }
   sigproc_printf ("pid %d, exit value - old %p, windows %p, cygwin %p",

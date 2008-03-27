@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Red Hat, Inc.
+   2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -265,7 +265,7 @@ do_cleanup (void *args)
 
 
 int __stdcall
-spawn_guts (const char * prog_arg, const char *const *argv,
+spawn_guts (const char *prog_arg, const char *const *argv,
 	    const char *const envp[], int mode, int __stdin, int __stdout)
 {
   bool rc;
@@ -745,8 +745,7 @@ loop:
 	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
 	      myself->wr_proc_pipe = orig_wr_proc_pipe;
 	    }
-	  DWORD res = ch.proc_retry (pi.hProcess);
-	  if (!res)
+	  if (!ch.proc_retry (pi.hProcess))
 	    {
 	      looped++;
 	      goto loop;
