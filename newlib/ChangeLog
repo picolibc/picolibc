@@ -1,3 +1,9 @@
+2008-03-27 Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/include/reent.h: Define _func_r functions in this file to
+	func if REENTRANT_SYSCALLS_PROVIDED and MISSING_SYSCALL_NAMES are
+	defined.
+			  
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Declare lockf(2) and define lockf
