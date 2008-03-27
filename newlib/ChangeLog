@@ -1,3 +1,8 @@
+2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Declare lockf(2) and define lockf
+	constants when building for Cygwin.
+
 2008-03-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/rgetc.c (__srget_r): Invoke CHECK_INIT to ensure
