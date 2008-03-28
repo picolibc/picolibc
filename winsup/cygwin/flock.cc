@@ -326,8 +326,13 @@ class lockf_t
     {}
     ~lockf_t ();
 
+    /* Used to create all locks list in a given TLS buffer. */
+    void *operator new (size_t size, void *p)
+    { return p; }
+    /* Used to store own lock list in the cygheap. */
     void *operator new (size_t size)
-    { return ccalloc (HEAP_FHANDLER, 1, sizeof (lockf_t)); }
+    { return cmalloc (HEAP_FHANDLER, sizeof (lockf_t)); }
+    /* Never call on node->i_all_lf! */
     void operator delete (void *p)
     { cfree (p); }
 
@@ -360,7 +365,7 @@ class inode_t
     ~inode_t ();
 
     void *operator new (size_t size)
-    { return ccalloc (HEAP_FHANDLER, 1, sizeof (inode_t)); }
+    { return cmalloc (HEAP_FHANDLER, sizeof (inode_t)); }
     void operator delete (void *p)
     { cfree (p); }
 
@@ -369,8 +374,7 @@ class inode_t
     void LOCK () { WaitForSingleObject (i_mtx, INFINITE); }
     void UNLOCK () { ReleaseMutex (i_mtx); }
 
-    void get_all_locks_list ();
-    void del_all_locks_list () { del_locks (&i_all_lf); }
+    lockf_t *get_all_locks_list ();
 
     void del_my_locks () { LOCK (); del_locks (&i_lockf); UNLOCK ();
 }
@@ -445,7 +449,8 @@ inode_t::get (dev_t dev, ino_t ino)
   if (!node)
     {
       node = new inode_t (dev, ino);
-      LIST_INSERT_HEAD (&cygheap->inode_list, node, i_next);
+      if (node)
+	LIST_INSERT_HEAD (&cygheap->inode_list, node, i_next);
     }
   INODE_LIST_UNLOCK ();
   return node;
@@ -505,7 +510,12 @@ inode_t::del_locks (lockf_t **head)
 /* Enumerate all lock event objects for this file and create a lockf_t
    list in the i_all_lf member.  This list is searched in lf_getblock
    for locks which potentially block our lock request. */
-void
+
+/* Number of lockf_t structs which fit in the temporary buffer. */
+#define MAX_LOCKF_CNT	((intptr_t)((NT_MAX_PATH * sizeof (WCHAR)) \
+				    / sizeof (lockf_t)))
+
+lockf_t *
 inode_t::get_all_locks_list ()
 {
   struct fdbi
@@ -515,8 +525,8 @@ inode_t::get_all_locks_list ()
   } f;
   ULONG context;
   NTSTATUS status;
+  lockf_t *lock = i_all_lf;
 
-  del_all_locks_list ();
   for (BOOLEAN restart = TRUE;
        NT_SUCCESS (status = NtQueryDirectoryObject (i_dir, &f, sizeof f, TRUE,
 						    restart, &context, NULL));
@@ -547,12 +557,20 @@ inode_t::get_all_locks_list ()
       DWORD wid = wcstoul (endptr + 1, &endptr, 16);
       if (endptr && *endptr != L'\0')
       	continue;
-      lockf_t *lock = new lockf_t (this, &i_all_lf, flags, type, start, end,
-				   id, wid);
-      if (i_all_lf)
-	lock->lf_next = i_all_lf;
-      i_all_lf = lock;
+      if (lock - i_all_lf >= MAX_LOCKF_CNT)
+        {
+	  system_printf ("Warning, can't handle more than %d locks per file.",
+			 MAX_LOCKF_CNT);
+	  break;
+	}
+      if (lock > i_all_lf)
+        lock[-1].lf_next = lock;
+      new (lock++) lockf_t (this, &i_all_lf, flags, type, start, end, id, wid);
     }
+  /* If no lock has been found, return NULL. */
+  if (lock == i_all_lf)
+    return NULL;
+  return i_all_lf;
 }
 
 /* Create the lock event object in the file's subdir in the NT global
@@ -595,8 +613,7 @@ lockf_t::open_lock_obj () const
 			  lf_end, lf_id, lf_wid);
   RtlInitCountedUnicodeString (&uname, name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
-  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
-			      NULL);
+  InitializeObjectAttributes (&attr, &uname, 0, lf_inode->i_dir, NULL);
   status = NtOpenEvent (&obj, FLOCK_EVENT_ACCESS, &attr);
   if (!NT_SUCCESS (status))
     {
@@ -659,7 +676,7 @@ static int maxlockdepth = MAXDEPTH;
 #define OTHERS  0x2
 static int      lf_clearlock (lockf_t *, lockf_t **);
 static int      lf_findoverlap (lockf_t *, lockf_t *, int, lockf_t ***, lockf_t **);
-static lockf_t   *lf_getblock (lockf_t *, inode_t *node);
+static lockf_t *lf_getblock (lockf_t *, inode_t *node);
 static int      lf_getlock (lockf_t *, inode_t *, struct __flock64 *);
 static int      lf_setlock (lockf_t *, inode_t *, lockf_t **);
 static void     lf_split (lockf_t *, lockf_t *, lockf_t **);
@@ -773,6 +790,11 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
   if (!node)
     {
       node = inode_t::get (stat.st_dev, stat.st_ino);
+      if (!node)
+        {
+	  set_errno (ENOLCK);
+	  return -1;
+	}
       need_fork_fixup (true);
     }
   /* Unlock the fd table which has been locked in fcntl_worker, otherwise
@@ -797,12 +819,24 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
    */
   lockf_t *clean = NULL;
   if (a_op == F_SETLK || a_op == F_UNLCK)
-    clean = new lockf_t ();
+    {
+      clean = new lockf_t ();
+      if (!clean)
+        {
+	  set_errno (ENOLCK);
+	  return -1;
+	}
+    }
   /*
    * Create the lockf_t structure
    */
   lockf_t *lock = new lockf_t (node, head, a_flags, type, start, end,
 			       getpid (), myself->dwProcessId);
+  if (!lock)
+    {
+      set_errno (ENOLCK);
+      return -1;
+    }
 
   node->LOCK ();
   switch (a_op)
@@ -854,6 +888,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
   lockf_t **head = lock->lf_head;
   lockf_t **prev, *overlap;
   int ovcase, priority, old_prio, needtolink;
+  tmp_pathbuf tp;
 
   /*
    * Set the priority
@@ -864,6 +899,8 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
   /*
    * Scan lock list for this file looking for locks that would block us.
    */
+  /* Create temporary space for the all locks list. */
+  node->i_all_lf = (lockf_t *) tp.w_get ();
   while ((block = lf_getblock(lock, node)))
     {
       /*
@@ -871,7 +908,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
        */
       if ((lock->lf_flags & F_WAIT) == 0)
 	{
-	  node->del_all_locks_list ();
 	  lock->lf_next = *clean;
 	  *clean = lock;
 	  return EAGAIN;
@@ -921,7 +957,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
 	     Treat this as a deadlock-like situation for now. */
 	  system_printf ("Can't sync with lock object hold by "
 			 "Win32 pid %lu: %E", block->lf_wid);
-	  NtClose (obj);
 	  return EDEADLK;
 	}
       HANDLE proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
@@ -936,7 +971,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
 	  return EDEADLK;
 	}
       HANDLE w4[3] = { obj, proc, signal_arrived };
-      node->del_all_locks_list ();
       //SetThreadPriority (GetCurrentThread (), priority);
       node->UNLOCK ();
       DWORD ret = WaitForMultipleObjects (3, w4, FALSE, INFINITE);
@@ -959,7 +993,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean)
 	  return geterrno_from_win_error ();
 	}
     }
-  node->del_all_locks_list ();
   allow_others_to_sync ();
   /*
    * No blocks!!  Add the lock.  Note that we will
@@ -1169,7 +1202,10 @@ static int
 lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
 {
   lockf_t *block;
+  tmp_pathbuf tp;
 
+  /* Create temporary space for the all locks list. */
+  node->i_all_lf = (lockf_t *) tp.w_get ();
   if ((block = lf_getblock (lock, node)))
     {
       fl->l_type = block->lf_type;
@@ -1186,7 +1222,6 @@ lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
     }
   else
     fl->l_type = F_UNLCK;
-  node->del_all_locks_list ();
   return 0;
 }
 
@@ -1197,8 +1232,8 @@ lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
 static lockf_t *
 lf_getblock (lockf_t *lock, inode_t *node)
 {   
-  node->get_all_locks_list ();
-  lockf_t **prev, *overlap, *lf = node->i_all_lf;
+  lockf_t **prev, *overlap;
+  lockf_t *lf = node->get_all_locks_list ();
   int ovcase;
 
   prev = lock->lf_head;

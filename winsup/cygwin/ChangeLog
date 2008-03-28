@@ -1,3 +1,22 @@
+2008-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (lockf_t::operator new): Add operator taking a pointer.  Call
+	cmalloc instead of ccalloc in the default operator.  Add comments.
+	(inode_t::operator new): Call cmalloc instead of ccalloc.
+	(inode_t::get_all_locks_list): Return lockf_t pointer.
+	(inode_t::del_all_locks_list): Delete.  Remove calls throughout.
+	(inode_t::get): Handle failing new gracefully.
+	(MAX_LOCKF_CNT): Define.
+	(inode_t::get_all_locks_list): Use pre-allocated buffer in i_all_lf
+	instead of allocating every lock.  Return pointer to start of linked
+	list of locks.
+	(lockf_t::open_lock_obj): Create event object non-inheritable.
+	(fhandler_disk_file::lock): Handle failing new gracefully.
+	(lf_setlock): Allocate temporary buffer for node->i_all_lf from TLS.
+	Remove erroneous NtClose call.
+	(lf_getlock): Allocate temporary buffer for node->i_all_lf from TLS.
+	(lf_getblock): Set lf to return value of get_all_locks_list.
+
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (FLOCK_PARENT_DIR_ACCESS): Define.
