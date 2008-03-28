@@ -1,6 +1,6 @@
 /* archive file definition for GNU software
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2008 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,8 +26,9 @@
    characters, as allowed by ANSI.  '\012' has a fixed value, and remains
    compatible with existing BSDish archives. */
 
-#define ARMAG  "!<arch>\012"	/* For COFF and a.out archives */
-#define ARMAGB "!<bout>\012"	/* For b.out archives */
+#define ARMAG  "!<arch>\012"	/* For COFF and a.out archives.  */
+#define ARMAGB "!<bout>\012"	/* For b.out archives.  */
+#define ARMAGT "!<thin>\012"	/* For thin archives.  */
 #define SARMAG 8
 #define ARFMAG "`\012"
 
@@ -39,14 +40,15 @@
 
 #define ARMAP_TIME_OFFSET       60
 
-struct ar_hdr {
-  char ar_name[16];		/* name of this member */
-  char ar_date[12];		/* file mtime */
-  char ar_uid[6];		/* owner uid; printed as decimal */
-  char ar_gid[6];		/* owner gid; printed as decimal */
-  char ar_mode[8];		/* file mode, printed as octal   */
-  char ar_size[10];		/* file size, printed as decimal */
-  char ar_fmag[2];		/* should contain ARFMAG */
+struct ar_hdr
+{
+  char ar_name[16];		/* Name of this member.  */
+  char ar_date[12];		/* File mtime.  */
+  char ar_uid[6];		/* Owner uid; printed as decimal.  */
+  char ar_gid[6];		/* Owner gid; printed as decimal.  */
+  char ar_mode[8];		/* File mode, printed as octal.   */
+  char ar_size[10];		/* File size, printed as decimal.  */
+  char ar_fmag[2];		/* Should contain ARFMAG.  */
 };
 
 #endif /* __GNU_AR_H__ */
