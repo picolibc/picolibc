@@ -1,3 +1,7 @@
+2008-03-28  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* opcode/avr.h (AVR_ISA_TINY3): Define new opcode set for attiny167.
+
 2008-03-24  Ian Lance Taylor  <iant@google.com>
 
 	* sha1.h: New file, from gnulib.

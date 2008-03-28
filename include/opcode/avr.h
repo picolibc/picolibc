@@ -39,6 +39,7 @@
 #define AVR_ISA_RF401 (AVR_ISA_2xxx | AVR_ISA_MOVW | AVR_ISA_LPMX)
 #define AVR_ISA_TINY2 (AVR_ISA_2xxx | AVR_ISA_MOVW | AVR_ISA_LPMX | \
                        AVR_ISA_SPM  | AVR_ISA_BRK)
+#define AVR_ISA_TINY3 (AVR_ISA_TINY2 | AVR_ISA_MEGA)                       
 #define AVR_ISA_M8    (AVR_ISA_2xxx | AVR_ISA_MUL | AVR_ISA_MOVW | \
                        AVR_ISA_LPMX | AVR_ISA_SPM)
 #define AVR_ISA_M603  (AVR_ISA_2xxx | AVR_ISA_MEGA)
