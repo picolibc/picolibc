@@ -786,7 +786,6 @@ typedef struct _FILE_GET_EA_INFORMATION
   CHAR    EaName[1];
 } FILE_GET_EA_INFORMATION, *PFILE_GET_EA_INFORMATION;
 
-
 typedef struct _FILE_FULL_EA_INFORMATION
 {
   ULONG NextEntryOffset;
@@ -808,6 +807,17 @@ typedef enum _EVENT_TYPE
   NotificationEvent = 0,
   SynchronizationEvent
 } EVENT_TYPE, *PEVENT_TYPE;
+
+typedef struct _EVENT_BASIC_INFORMATION
+{
+  EVENT_TYPE EventType;
+  LONG SignalState;
+} EVENT_BASIC_INFORMATION, *PEVENT_BASIC_INFORMATION;
+
+typedef enum _EVENT_INFORMATION_CLASS
+{
+  EventBasicInformation = 0
+} EVENT_INFORMATION_CLASS, *PEVENT_INFORMATION_CLASS;
 
 /* Function declarations for ntdll.dll.  These don't appear in any
    standard Win32 header.  */
@@ -865,6 +875,8 @@ extern "C"
 					 BOOLEAN, PULONG, PULONG);
   NTSTATUS NTAPI NtQueryEaFile (HANDLE, PIO_STATUS_BLOCK, PVOID, ULONG,
 				BOOLEAN, PVOID, ULONG, PULONG, BOOLEAN);
+  NTSTATUS NTAPI NtQueryEvent (HANDLE, EVENT_INFORMATION_CLASS, PVOID, ULONG,
+			       PULONG);
   NTSTATUS NTAPI NtQueryFullAttributesFile (POBJECT_ATTRIBUTES,
 					    PFILE_NETWORK_OPEN_INFORMATION);
   NTSTATUS NTAPI NtQueryInformationFile (HANDLE, PIO_STATUS_BLOCK, PVOID,

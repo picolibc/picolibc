@@ -1204,7 +1204,7 @@ fstat64 (int fd, struct __stat64 *buf)
       if (!res)
 	{
 	  if (!buf->st_ino)
-	    buf->st_ino = cfd->get_namehash ();
+	    buf->st_ino = cfd->get_ino ();
 	  if (!buf->st_dev)
 	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
@@ -1367,7 +1367,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
       if (!res)
 	{
 	  if (!buf->st_ino)
-	    buf->st_ino = fh->get_namehash ();
+	    buf->st_ino = fh->get_ino ();
 	  if (!buf->st_dev)
 	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)

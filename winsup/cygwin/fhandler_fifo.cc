@@ -68,9 +68,9 @@ fhandler_fifo::open (int flags, mode_t)
   char npname[MAX_PATH];
   DWORD mode = 0;
 
-  /* Generate a semi-unique name to associate with this fifo.
-     FIXME: Probably should use "inode" and "dev" from stat for this. */
-  __small_sprintf (npname, "\\\\.\\pipe\\__cygfifo__%lx", get_namehash ());
+  /* Generate a semi-unique name to associate with this fifo. */
+  __small_sprintf (npname, "\\\\.\\pipe\\__cygfifo__%08x_%016X",
+		   get_dev (), get_ino ());
 
   unsigned low_flags = flags & O_ACCMODE;
   if (low_flags == O_RDONLY)

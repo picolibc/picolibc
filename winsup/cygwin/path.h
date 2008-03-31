@@ -108,8 +108,9 @@ struct fs_info
     unsigned is_netapp       : 1;
     unsigned is_cdrom	     : 1;
   } status;
+  ULONG sernum;
  public:
-  void clear () { memset (&status, 0 , sizeof status); }
+  void clear () { memset (&status, 0 , sizeof status); sernum = 0UL; }
   fs_info () { clear (); }
 
   IMPLEMENT_STATUS_FLAG (DWORD, flags)
@@ -124,6 +125,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_nfs)
   IMPLEMENT_STATUS_FLAG (bool, is_netapp)
   IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
+  ULONG serial_number () const { return sernum; }
 
   bool update (PUNICODE_STRING, bool) __attribute__ ((regparm (3)));
 };
@@ -266,6 +268,7 @@ class path_conv
   bool fs_is_nfs () const {return fs.is_nfs ();}
   bool fs_is_netapp () const {return fs.is_netapp ();}
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
+  ULONG fs_serial_number () const {return fs.serial_number ();}
   void set_path (const char *p) {strcpy (path, p);}
   void fillin (HANDLE h);
   inline size_t size ()

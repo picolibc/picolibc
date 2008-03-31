@@ -137,7 +137,7 @@ readdir_worker (DIR *dir, dirent *de)
       else
 	{
 	  /* Compute d_ino by combining filename hash with directory hash. */
-	  de->d_ino = ((fhandler_base *) dir->__fh)->get_namehash ();
+	  de->d_ino = ((fhandler_base *) dir->__fh)->get_ino ();
 	  if (!is_dot && !is_dot_dot)
 	    {
 	      PUNICODE_STRING w32name =

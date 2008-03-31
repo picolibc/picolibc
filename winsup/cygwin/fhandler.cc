@@ -736,7 +736,7 @@ fhandler_base::write (const void *ptr, size_t len)
 						 FilePositionInformation))
 	  && fpi.CurrentByteOffset.QuadPart
 	     >= fsi.EndOfFile.QuadPart + (128 * 1024)
-	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
+	  && (pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES))
 	{
 	  /* If the file system supports sparse files and the application
 	     is writing after a long seek beyond EOF, convert the file to
@@ -1004,13 +1004,13 @@ fhandler_base::pwrite (void *, size_t, _off64_t)
 int
 fhandler_base::close ()
 {
-  extern void del_my_locks (inode_t *);
   int res = -1;
 
   syscall_printf ("closing '%s' handle %p", get_name (), get_handle ());
-  /* Delete all POSIX locks on the file. */
-  if (node)
-    del_my_locks (node);
+  /* Delete all POSIX locks on the file.  Delete all flock locks on the
+     file if this is the last reference to this file. */
+  if (unique_id)
+    del_my_locks (false);
   if (nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else
@@ -1261,15 +1261,14 @@ fhandler_base::fhandler_base () :
   open_status (),
   access (0),
   io_handle (NULL),
-  namehash (0),
+  ino (0),
   openflags (0),
   rabuf (NULL),
   ralen (0),
   raixget (0),
   raixput (0),
   rabuflen (0),
-  node (NULL),
-  fs_flags (0),
+  unique_id (0),
   archetype (NULL),
   usecount (0)
 {
@@ -1340,10 +1339,9 @@ fhandler_base::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, io_handle, "io_handle");
   if (get_overlapped ())
     setup_overlapped ();
-  /* POSIX locks are not inherited across fork.  The lock structures
-     are deleted globally in fixup_lockf_after_fork.  Here we just
-     have to reset the pointer. */
-  node = NULL;
+  /* POSIX locks are not inherited across fork. */
+  if (unique_id)
+    del_my_locks (true);
 }
 
 void
@@ -1352,6 +1350,8 @@ fhandler_base::fixup_after_exec ()
   debug_printf ("here for '%s'", get_name ());
   if (get_overlapped ())
     setup_overlapped ();
+  if (unique_id && close_on_exec ())
+    del_my_locks (false);
 }
 
 bool

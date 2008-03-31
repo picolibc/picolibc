@@ -451,7 +451,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		fillin:
 		  if (us->Length / sizeof (WCHAR) < n)
 		    n = us->Length / sizeof (WCHAR);
-		    
+		  w = us->Buffer;
 		  for (unsigned int i = 0; i < n; i++)
 		    *dst++ = *w++;
 		  break;

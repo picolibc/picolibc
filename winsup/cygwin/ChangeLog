@@ -1,3 +1,91 @@
+2008-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.cc (__small_vswprintf): Fix uninitialized usage of `w'.
+
+	Revamp advisory file locking to avoid cross reference pointers as well
+	as to allow BSD flock semantics.  More agressively delete unused nodes
+	and sync objects.
+	* fhandler.h (fhandler_base::ino): Rename from namehash.  Fix comment.
+	(fhandler_base::node): Remove.
+	(fhandler_base::unique_id): Add.
+	(fhandler_base::del_my_locks): New method.
+	(get_ino): Rename from get_namehash.  Change usage throughout Cygwin.
+	(get_unique_id): New method.
+	* fhandler.cc (fhandler_base::close): Call own del_my_locks method.
+	Fix comment.
+	(fhandler_base::fhandler_base): Accommodate new and changed members.
+	(fhandler_base::fixup_after_fork): Call del_my_locks.
+	(fhandler_base::fixup_after_exec): Ditto for files with close-on-exec
+	flag set.
+	* fhandler_disk_file.cc (get_ino_by_handle): Rename from
+	readdir_get_ino_by_handle.  Accommodate throughout.
+	(fhandler_base::open_fs): Fill ino with inode number if FS has good
+	inodes.  Allocate a LUID and store in unique_id to recognize file
+	descriptors referencing the same file object.
+	* flock.cc: Drop flock TODO comments.  Use explicit types __dev32_t
+	and __ino64_t instead of dev_t and ino_t.
+	(LOCK_OBJ_NAME_LEN): Change to reflect longer lf_id length.
+	(get_obj_handle_count): New method.
+	(lockf_t::lf_id): Change type to long long.
+	(inode_t::get_lock_obj_handle_count): Drop in favor of static function
+	get_obj_handle_count.
+	(inode_t::del_locks): Remove.
+	(inode_t::get): Add create_if_missing flag argument.
+	(inode_t::del_my_locks): Reimplement to handle POSIX and BSD flock
+	locks.  Return if node can be deleted or not.
+	(inode_t::~inode_t): Ditto.  Close handles to i_dir and i_mtx.
+	(fixup_lockf_after_fork): Remove.
+	(fhandler_base::del_my_locks): New method.
+	(fixup_lockf_after_exec): Check if node can be deleted.
+	(inode_t::get): Only create node if create_if_missing is set.  Lock
+	the returned node here before unlocking the node list.
+	(inode_t::get_all_locks_list): Accommodate new lf_id length.
+	(inode_t::create_lock_obj): Ditto.
+	(lockf_t::open_lock_obj): Ditto.  Change return type to bool.  De-const.
+	Set lf_obj instead of returning a handle.
+	(lockf_t::del_lock_obj): Call SetEvent only if new incoming parameters
+	allow it.  Explain how it's supposed to work.
+	(fhandler_disk_file::lock): Only fetch file length in SEEK_END case.
+	Use NtQueryInformationFile(FileStandardInformation) instead of
+	calling fstat_by_handle.  Always unlock node before returning.
+	Use fhandler's unique id to create lf_id for BSD flock locks.
+	Rely on node lock from inode_t::get.  Call del_lock_obj on removed
+	locks here to allow explicit unlocking.  Delete node if no lock exists
+	on the file anymore.
+	(lf_setlock): Get file handle as additional parameter.  Handle the fact
+	that lf_getblock now always opens the attached event object.  Reactivate
+	erroneously applied patch which deactivates setting thread priority.
+	Additionally handle blocking on BSD flock locks.
+	(lf_clearlock): Get file handle as additional parameter.
+	(lf_getlock): Close event handle opened by lf_getblock.
+	(lf_getblock): Open potentially blocking event object here and check
+	its signal state if it's a BSD flock lock.
+	(lf_wakelock): Get file handle as additional parameter.
+	* fork.cc (frok::child): Drop call to fixup_lockf_after_fork.
+	* ntdll.h (struct _EVENT_BASIC_INFORMATION): Define.
+	(enum _EVENT_INFORMATION_CLASS): Define.
+	(NtQueryEvent): Declare.
+
+	* fhandler.h (fhandler_base::fs_flags): Remove.
+	(fhandler_base::set_fs_flags): Remove.
+	(fhandler_base::get_fs_flags): Remove.
+	* fhandler.cc (fhandler_base::write): Check for sparse file using
+	pc.fs_flags().
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Ditto.
+
+	The return of the volume serial number in fs_info.
+	* fhandler.h (get_dev): New method.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop call to
+	NtQueryVolumeInformationFile(FileFsVolumeInformation).  Just use
+	get_dev() method.
+	* fhandler_fifo.cc (fhandler_fifo::open) Use device ID and inode number
+	to generate fifo name.
+	* path.h (fs_info::sernum): New member.
+	(fs_info::serial_number): New method.
+	(path_conv::fs_serial_number): New method.
+	* path.cc (fs_info::update): Fetch volume serial number and store in
+	sernum.
+
 2008-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (lockf_t::operator new): Add operator taking a pointer.  Call

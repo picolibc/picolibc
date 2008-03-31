@@ -407,6 +407,10 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
   FILE_FS_DEVICE_INFORMATION ffdi;
   FILE_FS_OBJECTID_INFORMATION ffoi;
   PFILE_FS_ATTRIBUTE_INFORMATION pffai;
+  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
+			   + sizeof (FILE_FS_VOLUME_INFORMATION);
+  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
+				     alloca (fvi_size);
   UNICODE_STRING fsname, testname;
 
   InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
@@ -438,6 +442,9 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
       NtClose (vol);
       return false;
     }
+  status = NtQueryVolumeInformationFile (vol, &io, pfvi, fvi_size,
+					 FileFsVolumeInformation);
+  sernum = NT_SUCCESS (status) ? pfvi->VolumeSerialNumber : 0;
   status = NtQueryVolumeInformationFile (vol, &io, &ffdi, sizeof ffdi,
 					 FileFsDeviceInformation);
   if (!NT_SUCCESS (status))

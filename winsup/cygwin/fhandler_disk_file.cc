@@ -169,6 +169,18 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
   return ret;
 }
 
+static inline __ino64_t
+get_ino_by_handle (HANDLE hdl)
+{
+  IO_STATUS_BLOCK io;
+  FILE_INTERNAL_INFORMATION pfai;
+
+  if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &pfai, sizeof pfai,
+					  FileInternalInformation)))
+    return pfai.FileId.QuadPart;
+  return 0;
+}
+
 unsigned __stdcall
 path_conv::ndisk_links (DWORD nNumberOfLinks)
 {
@@ -264,23 +276,10 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   /* The entries potentially contain a name of MAX_PATH wide characters. */
-  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
-			 + sizeof (FILE_FS_VOLUME_INFORMATION);
   const DWORD fai_size = (NAME_MAX + 1) * sizeof (WCHAR)
 			 + sizeof (FILE_ALL_INFORMATION);
-
-  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-				     alloca (fvi_size);
   PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
 
-  status = NtQueryVolumeInformationFile (get_handle (), &io, pfvi, fvi_size,
-					 FileFsVolumeInformation);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("%p = NtQueryVolumeInformationFile(%S)", status,
-		    pc.get_nt_native_path ());
-      pfvi->VolumeSerialNumber = 0;
-    }
   status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
 				   FileAllInformation);
   if (NT_SUCCESS (status))
@@ -298,7 +297,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
 		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
 		       *(FILETIME *) &pfai->BasicInformation.CreationTime,
-		       pfvi->VolumeSerialNumber,
+		       get_dev (),
 		       pfai->StandardInformation.EndOfFile.QuadPart,
 		       pfai->StandardInformation.AllocationSize.QuadPart,
 		       pfai->InternalInformation.FileId.QuadPart,
@@ -357,7 +356,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 						 pfdi, fdi_size,
 						 FileBothDirectoryInformation,
 						 TRUE, &basename, TRUE)))
-    FileId.QuadPart = 0; /* get_namehash is called in fstat_helper. */
+    FileId.QuadPart = 0; /* get_ino is called in fstat_helper. */
   if (!NT_SUCCESS (status))
     {
       debug_printf ("%p = NtQueryDirectoryFile(%S)", status,
@@ -491,7 +490,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   if (pc.isgood_inode (nFileIndex))
     buf->st_ino = (__ino64_t) nFileIndex;
   else
-    buf->st_ino = get_namehash ();
+    buf->st_ino = get_ino ();
 
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
@@ -1047,7 +1046,7 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
       /* Create sparse files only when called through ftruncate, not when
 	 called through posix_fallocate. */
       if (allow_truncate
-	  && get_fs_flags (FILE_SUPPORTS_SPARSE_FILES)
+	  && (pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
 	  && length >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
@@ -1272,7 +1271,11 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-  set_fs_flags (pc.fs_flags ());
+    if (pc.hasgood_inode ())
+      ino = get_ino_by_handle (get_handle ());
+    /* A unique ID is necessary to recognize fhandler entries which are
+       duplicated by dup(2) or fork(2). */
+    AllocateLocallyUniqueId ((PLUID) &unique_id);
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open (%S, %p)", res,
@@ -1523,18 +1526,6 @@ free_dir:
   return res;
 }
 
-static inline __ino64_t
-readdir_get_ino_by_handle (HANDLE hdl)
-{
-  IO_STATUS_BLOCK io;
-  FILE_INTERNAL_INFORMATION pfai;
-
-  if (!NtQueryInformationFile (hdl, &io, &pfai, sizeof pfai,
-			       FileInternalInformation))
-    return pfai.FileId.QuadPart;
-  return 0;
-}
-
 __ino64_t __stdcall
 readdir_get_ino (const char *path, bool dot_dot)
 {
@@ -1569,7 +1560,7 @@ readdir_get_ino (const char *path, bool dot_dot)
 				   | (pc.is_rep_symlink ()
 				      ? FILE_OPEN_REPARSE_POINT : 0))))
     {
-      ino = readdir_get_ino_by_handle (hdl);
+      ino = get_ino_by_handle (hdl);
       NtClose (hdl);
     }
   return ino;
@@ -1607,7 +1598,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 				      FILE_SHARE_VALID_FLAGS,
 				      FILE_OPEN_FOR_BACKUP_INTENT))))
 	{
-	  de->d_ino = readdir_get_ino_by_handle (reph);
+	  de->d_ino = get_ino_by_handle (reph);
 	  NtClose (reph);
 	}
     }
@@ -1779,13 +1770,13 @@ go_ahead:
 
 	  if (dir->__d_position == 0 && buf->FileNameLength == 2
 	      && FileName[0] == '.')
-	    de->d_ino = readdir_get_ino_by_handle (get_handle ());
+	    de->d_ino = get_ino_by_handle (get_handle ());
 	  else if (dir->__d_position == 1 && buf->FileNameLength == 4
 		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    if (!(dir->__flags & dirent_isroot))
 	      de->d_ino = readdir_get_ino (get_name (), true);
 	    else
-	      de->d_ino = readdir_get_ino_by_handle (get_handle ());
+	      de->d_ino = get_ino_by_handle (get_handle ());
 	  else
 	    {
 	      HANDLE hdl;
@@ -1796,7 +1787,7 @@ go_ahead:
 					  FILE_SHARE_VALID_FLAGS,
 					  FILE_OPEN_FOR_BACKUP_INTENT)))
 		{
-		  de->d_ino = readdir_get_ino_by_handle (hdl);
+		  de->d_ino = get_ino_by_handle (hdl);
 		  NtClose (hdl);
 		}
 	    }
@@ -1815,7 +1806,7 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
-      de->d_ino = readdir_get_ino_by_handle (get_handle ());
+      de->d_ino = get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;
@@ -1826,7 +1817,7 @@ go_ahead:
       if (!(dir->__flags & dirent_isroot))
 	de->d_ino = readdir_get_ino (get_name (), true);
       else
-	de->d_ino = readdir_get_ino_by_handle (get_handle ());
+	de->d_ino = get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;

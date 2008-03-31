@@ -125,7 +125,7 @@ class fhandler_base
   int access;
   HANDLE io_handle;
 
-  __ino64_t namehash;	/* hashed filename, used as inode num */
+  __ino64_t ino;	/* file ID or hashed filename, depends on FS. */
 
  protected:
   /* File open flags from open () and fcntl () calls */
@@ -137,9 +137,10 @@ class fhandler_base
   size_t raixput;
   size_t rabuflen;
 
-  inode_t *node;	/* Used for advisory file locking.  See flock.cc.  */
+  /* Used for advisory file locking.  See flock.cc.  */
+  long long unique_id;
+  void del_my_locks (bool);
 
-  DWORD fs_flags;
   HANDLE read_state;
   int wait_overlapped (bool&, bool, DWORD *) __attribute__ ((regparm (3)));
   bool setup_overlapped () __attribute__ ((regparm (1)));
@@ -231,10 +232,6 @@ class fhandler_base
     ReleaseSemaphore (read_state, n, NULL);
   }
 
-  void set_fs_flags (DWORD flags) { fs_flags = flags; }
-  bool get_fs_flags (DWORD flagval = UINT32_MAX)
-    { return (fs_flags & (flagval)); }
-
   bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
   int put_readahead (char value);
@@ -255,7 +252,9 @@ class fhandler_base
   bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
-  __ino64_t get_namehash () { return namehash ?: namehash = hash_path_name (0, pc.get_nt_native_path ()); }
+  __dev32_t get_dev () { return pc.fs_serial_number (); }
+  __ino64_t get_ino () { return ino ?: ino = hash_path_name (0, pc.get_nt_native_path ()); }
+  long long get_unique_id () const { return unique_id; }
   /* Returns name used for /proc/<pid>/fd in buf. */
   virtual char *get_proc_fd_name (char *buf);
 
