@@ -1,5 +1,10 @@
 2008-04-01 Patrick Mansfield <patmans@us.ibm.com>
 
+	* configure.host: Build SPU with -DREENTRANT_SYSCALLS_PROVIDED and
+	  -DMISSING_SYSCALL_NAMES.
+
+2008-04-01 Patrick Mansfield <patmans@us.ibm.com>
+
 	* libc/machine/spu/Makefile.am: Add assert.c.
 	* libc/machine/spu/Makefile.in: Regenerate.
 	* libc/machine/spu/assert.c: New file.

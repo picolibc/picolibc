@@ -268,7 +268,10 @@ case "${host_cpu}" in
 	stdio_dir=
 	libm_machine_dir=spu
 	machine_dir=spu
-	newlib_cflags="${newlib_cflags} -D_POSIX_MODE -ffunction-sections -fdata-sections "
+	newlib_cflags="${newlib_cflags} -D_POSIX_MODE"
+	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	;;
   *)
 	echo '***' "Newlib does not support CPU ${host_cpu}" 1>&2
