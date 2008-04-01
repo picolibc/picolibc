@@ -1,6 +1,6 @@
 /* Fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat, Inc
+   Copyright 2001, 2002, 2003, 2004, 2008 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
    Extended by Gerd Spalink (Gerd.Spalink@t-online.de)

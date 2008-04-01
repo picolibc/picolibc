@@ -1,6 +1,6 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for

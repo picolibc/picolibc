@@ -1,6 +1,6 @@
 /* registry.h: shared info for cygwin
 
-   Copyright 2000, 2001, 2004, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2004, 2006, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 

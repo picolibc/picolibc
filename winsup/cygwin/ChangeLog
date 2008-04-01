@@ -1,5 +1,9 @@
 2008-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Fix copyright dates.
+
+2008-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout, call fcntl64 instead of fcntl or fcntl_worker.
 	* fcntl.cc (fcntl_worker): Remove.
 	(fcntl64): Add fault handler.  Move fcntl_worker stuff here.  Add case
