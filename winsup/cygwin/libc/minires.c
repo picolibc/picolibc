@@ -427,7 +427,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
       return -1;
     }
     /* Set close on exec flag */
-    if (fcntl(statp->sockfd, F_SETFD, 1) == -1) {
+    if (fcntl64(statp->sockfd, F_SETFD, 1) == -1) {
       DPRINTF(debug, "fcntl: %s\n",
 	      strerror(errno));
       statp->res_h_errno = NETDB_INTERNAL;

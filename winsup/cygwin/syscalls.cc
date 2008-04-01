@@ -2940,12 +2940,12 @@ locked_append (int fd, const void * buf, size_t size)
 
   do
     if ((lock_buffer.l_start = lseek64 (fd, 0, SEEK_END)) != (_off64_t) -1
-	&& fcntl_worker (fd, F_SETLKW, &lock_buffer) != -1)
+	&& fcntl64 (fd, F_SETLKW, &lock_buffer) != -1)
       {
 	if (lseek64 (fd, 0, SEEK_END) != (_off64_t) -1)
 	  write (fd, buf, size);
 	lock_buffer.l_type = F_UNLCK;
-	fcntl_worker (fd, F_SETLK, &lock_buffer);
+	fcntl64 (fd, F_SETLK, &lock_buffer);
 	break;
       }
   while (count++ < 1000
@@ -3452,7 +3452,7 @@ popen (const char *command, const char *in_type)
     }
 
   FILE *fp = fdopen (fd, in_type);
-  fcntl (fd, F_SETFD, fcntl (fd, F_GETFD, 0) | FD_CLOEXEC);
+  fcntl64 (fd, F_SETFD, fcntl64 (fd, F_GETFD, 0) | FD_CLOEXEC);
 
   if (!fp)
     goto err;
@@ -3467,11 +3467,11 @@ popen (const char *command, const char *in_type)
 
   {
     lock_process now;
-    int state = fcntl (stdwhat, F_GETFD, 0);
-    fcntl (stdwhat, F_SETFD, state | FD_CLOEXEC);
+    int state = fcntl64 (stdwhat, F_GETFD, 0);
+    fcntl64 (stdwhat, F_SETFD, state | FD_CLOEXEC);
     pid = spawn_guts ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
 		      __stdin, __stdout);
-    fcntl (stdwhat, F_SETFD, state);
+    fcntl64 (stdwhat, F_SETFD, state);
   }
 
   if (pid < 0)

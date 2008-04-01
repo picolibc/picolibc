@@ -58,7 +58,7 @@
  * $RH: flock.c,v 1.2 2000/08/23 17:07:00 nalin Exp $
  */
 
-/* The lockf function has been taken from FreeBSD with the following
+/* The lockf function is based upon FreeBSD sources with the following
  * copyright.
  *
  * Copyright (c) 1997 The NetBSD Foundation, Inc.
@@ -835,8 +835,8 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
     }
   need_fork_fixup (true);
 
-  /* Unlock the fd table which has been locked in fcntl_worker, otherwise
-     a blocking F_SETLKW never wakes up on a signal. */
+  /* Unlock the fd table which has been locked in fcntl_worker/lock_worker,
+     otherwise a blocking F_SETLKW never wakes up on a signal. */
   cygheap->fdtab.unlock ();
 
   lockf_t **head = &node->i_lockf;
@@ -1495,68 +1495,59 @@ lf_wakelock (lockf_t *listhead, HANDLE fhdl)
   listhead->del_lock_obj (fhdl, true);
 }
 
-int
+extern "C" int
 flock (int fd, int operation)
 {
-  int i, cmd;
-  struct __flock64 l = { 0, 0, 0, 0, 0 };
-  if (operation & LOCK_NB)
-    {
-      cmd = F_SETLK;
-    }
-  else
-    {
-      cmd = F_SETLKW;
-    }
-  l.l_whence = SEEK_SET;
+  int res = -1;
+  int cmd;
+  struct __flock64 fl = { 0, SEEK_SET, 0, 0, 0 };
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  cygheap_fdget cfd (fd, true);
+  if (cfd < 0)
+    goto done;
+
+  cmd = (operation & LOCK_NB) ? F_SETLK : F_SETLKW;
   switch (operation & (~LOCK_NB))
     {
     case LOCK_EX:
-      l.l_type = F_WRLCK | F_FLOCK;
-      i = fcntl_worker (fd, cmd, &l);
-      if (i == -1)
-	{
-	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
-	    {
-	      set_errno (EWOULDBLOCK);
-	    }
-	}
+      fl.l_type = F_WRLCK | F_FLOCK;
       break;
     case LOCK_SH:
-      l.l_type = F_RDLCK | F_FLOCK;
-      i = fcntl_worker (fd, cmd, &l);
-      if (i == -1)
-	{
-	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
-	    {
-	      set_errno (EWOULDBLOCK);
-	    }
-	}
+      fl.l_type = F_RDLCK | F_FLOCK;
       break;
     case LOCK_UN:
-      l.l_type = F_UNLCK | F_FLOCK;
-      i = fcntl_worker (fd, cmd, &l);
-      if (i == -1)
-	{
-	  if ((get_errno () == EAGAIN) || (get_errno () == EACCES))
-	    {
-	      set_errno (EWOULDBLOCK);
-	    }
-	}
+      fl.l_type = F_UNLCK | F_FLOCK;
       break;
     default:
-      i = -1;
       set_errno (EINVAL);
-      break;
+      goto done;
     }
-  return i;
+  res = cfd->lock (cmd, &fl);
+  if (res == -1 && (get_errno () == EAGAIN) || (get_errno () == EACCES))
+    set_errno (EWOULDBLOCK);
+done:
+  syscall_printf ("%d = flock (%d, %d)", res, fd, operation);
+  return res;
 }
 
 extern "C" int
 lockf (int filedes, int function, _off64_t size)
 {
-  struct flock fl;
+  int res = -1;
   int cmd;
+  struct __flock64 fl;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  cygheap_fdget cfd (filedes, true);
+  if (cfd < 0)
+    goto done;
 
   fl.l_start = 0;
   fl.l_len = size;
@@ -1578,18 +1569,21 @@ lockf (int filedes, int function, _off64_t size)
       break;
     case F_TEST:
       fl.l_type = F_WRLCK;
-      if (fcntl_worker (filedes, F_GETLK, &fl) == -1)
-	return -1;
+      if (cfd->lock (F_GETLK, &fl) == -1)
+	goto done;
       if (fl.l_type == F_UNLCK || fl.l_pid == getpid ())
-	return 0;
-      errno = EAGAIN;
-      return -1;
+	res = 0;
+      else
+	errno = EAGAIN;
+      goto done;
       /* NOTREACHED */
     default:
       errno = EINVAL;
-      return -1;
+      goto done;
       /* NOTREACHED */
     }
-
-  return fcntl_worker (filedes, cmd, &fl);
+  res = cfd->lock (cmd, &fl);
+done:
+  syscall_printf ("%d = lockf (%d, %d, %D)", res, filedes, function, size);
+  return res;
 }

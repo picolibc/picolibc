@@ -209,14 +209,14 @@ public:
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = size;
-    return fcntl (fd, F_SETLKW, &fl);
+    return fcntl64 (fd, F_SETLKW, &fl);
   }
   int unlock (int fd)
   {
     if (!fl.l_len)
       return 0;
     fl.l_type = F_UNLCK;
-    return fcntl (fd, F_SETLKW, &fl);
+    return fcntl64 (fd, F_SETLKW, &fl);
   }
 };
 

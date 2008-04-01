@@ -1178,11 +1178,6 @@ int fhandler_base::fcntl (int cmd, void *arg)
       }
       res = 0;
       break;
-    case F_GETLK:
-    case F_SETLK:
-    case F_SETLKW:
-      res = lock (cmd, (struct __flock64 *) arg);
-      break;
     default:
       set_errno (EINVAL);
       res = -1;

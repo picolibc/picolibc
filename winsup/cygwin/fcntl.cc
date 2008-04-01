@@ -20,10 +20,12 @@ details. */
 #include "thread.h"
 #include "cygtls.h"
 
-int
-fcntl_worker (int fd, int cmd, void *arg)
+extern "C" int
+fcntl64 (int fd, int cmd, ...)
 {
-  int res;
+  int res = -1;
+  void *arg = NULL;
+  va_list args;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -31,29 +33,33 @@ fcntl_worker (int fd, int cmd, void *arg)
 
   cygheap_fdget cfd (fd, true);
   if (cfd < 0)
-    {
-      res = -1;
-      goto done;
-    }
-  if (cmd != F_DUPFD)
-    res = cfd->fcntl (cmd, arg);
-  else
-    res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
-done:
-  syscall_printf ("%d = fcntl (%d, %d, %p)", res, fd, cmd, arg);
-  return res;
-}
-
-extern "C" int
-fcntl64 (int fd, int cmd, ...)
-{
-  void *arg = NULL;
-  va_list args;
+    goto done;
 
   va_start (args, cmd);
   arg = va_arg (args, void *);
   va_end (args);
-  return fcntl_worker (fd, cmd, arg);
+
+  switch (cmd)
+    {
+    case F_DUPFD:
+      res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
+      break;
+    case F_GETLK:
+    case F_SETLK:
+    case F_SETLKW:
+      {
+        struct __flock64 *fl = (struct __flock64 *) arg;
+        fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
+        res = cfd->lock (cmd, fl);
+      }
+      break;
+    default:
+      res = cfd->fcntl (cmd, arg);
+      break;
+    }
+done:
+  syscall_printf ("%d = fcntl (%d, %d, %p)", res, fd, cmd, arg);
+  return res;
 }
 
 extern "C" int
@@ -63,6 +69,10 @@ _fcntl (int fd, int cmd, ...)
   va_list args;
   struct __flock32 *src = NULL;
   struct __flock64 dst;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
 
   va_start (args, cmd);
   arg = va_arg (args, void *);
@@ -77,7 +87,7 @@ _fcntl (int fd, int cmd, ...)
       dst.l_pid = src->l_pid;
       arg = &dst;
     }
-  int res = fcntl_worker (fd, cmd, arg);
+  int res = fcntl64 (fd, cmd, arg);
   if (cmd == F_GETLK)
     {
       src->l_type = dst.l_type;

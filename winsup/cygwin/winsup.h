@@ -54,7 +54,7 @@ extern struct passwd *getpwnam (const char *);
 extern struct __sFILE64 *fopen64 (const char *, const char *);
 extern struct hostent *cygwin_gethostbyname (const char *name);
 extern unsigned long cygwin_inet_addr (const char *cp);
-
+extern int fcntl64 (int fd, int cmd, ...);
 #ifdef __cplusplus
 }
 #endif
@@ -324,7 +324,6 @@ int symlink_worker (const char *, const char *, bool, bool)
 
 class path_conv;
 
-int fcntl_worker (int fd, int cmd, void *arg);
 int __stdcall stat_worker (path_conv &pc, struct __stat64 *buf) __attribute__ ((regparm (2)));
 
 __ino64_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));

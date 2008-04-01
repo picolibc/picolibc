@@ -217,7 +217,7 @@ connect_syslogd ()
   else
     syslogd_inited = inited_dgram;
   syslogd_sock = fd;
-  fcntl (syslogd_sock, F_SETFD, FD_CLOEXEC);
+  fcntl64 (syslogd_sock, F_SETFD, FD_CLOEXEC);
   return;
 }
 

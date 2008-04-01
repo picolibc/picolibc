@@ -203,7 +203,7 @@ cygwin_rcmd_af(char **ahost, in_port_t rport, const char *locuser,
 			    NULL);
 			return (-1);
 		}
-		fcntl(s, F_SETOWN, pid);
+		fcntl64(s, F_SETOWN, pid);
 		if (cygwin_connect(s, ai->ai_addr, ai->ai_addrlen) >= 0)
 			break;
 		(void)close(s);
