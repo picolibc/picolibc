@@ -1,3 +1,9 @@
+2008-04-01 Patrick Mansfield <patmans@us.ibm.com>
+
+	* libc/machine/spu/Makefile.am: Add assert.c.
+	* libc/machine/spu/Makefile.in: Regenerate.
+	* libc/machine/spu/assert.c: New file.
+
 2008-03-27 Patrick Mansfield <patmans@us.ibm.com>
 
 	* libc/include/reent.h: Define _func_r functions in this file to
