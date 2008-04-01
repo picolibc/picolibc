@@ -73,7 +73,8 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -103,33 +104,34 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-fwrite.$(OBJEXT) lib_a-getc.$(OBJEXT) \
 	lib_a-getchar.$(OBJEXT) lib_a-gets.$(OBJEXT) \
 	lib_a-iprintf.$(OBJEXT) lib_a-iscanf.$(OBJEXT) \
-	lib_a-memcpy.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT) lib_a-perror.$(OBJEXT) \
-	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
-	lib_a-putchar.$(OBJEXT) lib_a-puts.$(OBJEXT) \
-	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
-	lib_a-rewind.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
-	lib_a-setbuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
-	lib_a-siprintf.$(OBJEXT) lib_a-siscanf.$(OBJEXT) \
-	lib_a-sleep.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
-	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
-	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
-	lib_a-strcat.$(OBJEXT) lib_a-strchr.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-strcspn.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
-	lib_a-strncat.$(OBJEXT) lib_a-strncmp.$(OBJEXT) \
-	lib_a-strncpy.$(OBJEXT) lib_a-strpbrk.$(OBJEXT) \
-	lib_a-strrchr.$(OBJEXT) lib_a-strspn.$(OBJEXT) \
-	lib_a-strxfrm.$(OBJEXT) lib_a-tmpfile.$(OBJEXT) \
-	lib_a-tmpnam.$(OBJEXT) lib_a-ungetc.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-vfiprintf.$(OBJEXT) \
-	lib_a-vfiscanf.$(OBJEXT) lib_a-vfprintf.$(OBJEXT) \
-	lib_a-vfscanf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
-	lib_a-viscanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
-	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
-	lib_a-vsiscanf.$(OBJEXT) lib_a-vsniprintf.$(OBJEXT) \
-	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
-	lib_a-vsscanf.$(OBJEXT) lib_a-stack_reg_va.$(OBJEXT)
+	lib_a-memcmp.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
+	lib_a-memmove.$(OBJEXT) lib_a-memset.$(OBJEXT) \
+	lib_a-perror.$(OBJEXT) lib_a-printf.$(OBJEXT) \
+	lib_a-putc.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
+	lib_a-puts.$(OBJEXT) lib_a-remove.$(OBJEXT) \
+	lib_a-rename.$(OBJEXT) lib_a-rewind.$(OBJEXT) \
+	lib_a-scanf.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
+	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
+	lib_a-siscanf.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
+	lib_a-sniprintf.$(OBJEXT) lib_a-snprintf.$(OBJEXT) \
+	lib_a-sprintf.$(OBJEXT) lib_a-sscanf.$(OBJEXT) \
+	lib_a-stdio.$(OBJEXT) lib_a-strcat.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strcpy.$(OBJEXT) lib_a-strcspn.$(OBJEXT) \
+	lib_a-strlen.$(OBJEXT) lib_a-strncat.$(OBJEXT) \
+	lib_a-strncmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+	lib_a-strpbrk.$(OBJEXT) lib_a-strrchr.$(OBJEXT) \
+	lib_a-strspn.$(OBJEXT) lib_a-strxfrm.$(OBJEXT) \
+	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
+	lib_a-ungetc.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
+	lib_a-vfiprintf.$(OBJEXT) lib_a-vfiscanf.$(OBJEXT) \
+	lib_a-vfprintf.$(OBJEXT) lib_a-vfscanf.$(OBJEXT) \
+	lib_a-viprintf.$(OBJEXT) lib_a-viscanf.$(OBJEXT) \
+	lib_a-vprintf.$(OBJEXT) lib_a-vscanf.$(OBJEXT) \
+	lib_a-vsiprintf.$(OBJEXT) lib_a-vsiscanf.$(OBJEXT) \
+	lib_a-vsniprintf.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
+	lib_a-vsprintf.$(OBJEXT) lib_a-vsscanf.$(OBJEXT) \
+	lib_a-stack_reg_va.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -260,9 +262,9 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	ferror.c fflush.c fgetc.c fgetpos.c fgets.c fileno.c fiprintf.S \
 	fiscanf.S fopen.c fprintf.S fputc.c fputs.c fread.c freopen.c \
 	fscanf.S fseek.c fsetpos.c ftell.c fwrite.c getc.c getchar.c \
-	gets.c iprintf.S iscanf.S memcpy.c memmove.c memset.c perror.c \
-	printf.S putc.c putchar.c puts.c remove.c rename.c rewind.c \
-	scanf.S setbuf.c setvbuf.c siprintf.S siscanf.S sleep.c \
+	gets.c iprintf.S iscanf.S memcmp.c memcpy.c memmove.c memset.c \
+	perror.c printf.S putc.c putchar.c puts.c remove.c rename.c \
+	rewind.c scanf.S setbuf.c setvbuf.c siprintf.S siscanf.S sleep.c \
 	sniprintf.S snprintf.S sprintf.S sscanf.S stdio.c strcat.c \
 	strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c \
 	strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c tmpfile.c \
@@ -273,7 +275,7 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. 
+ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
@@ -571,6 +573,12 @@ lib_a-gets.o: gets.c
 
 lib_a-gets.obj: gets.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets.obj `if test -f 'gets.c'; then $(CYGPATH_W) 'gets.c'; else $(CYGPATH_W) '$(srcdir)/gets.c'; fi`
+
+lib_a-memcmp.o: memcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp.o `test -f 'memcmp.c' || echo '$(srcdir)/'`memcmp.c
+
+lib_a-memcmp.obj: memcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp.obj `if test -f 'memcmp.c'; then $(CYGPATH_W) 'memcmp.c'; else $(CYGPATH_W) '$(srcdir)/memcmp.c'; fi`
 
 lib_a-memcpy.o: memcpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.c' || echo '$(srcdir)/'`memcpy.c

@@ -1,5 +1,13 @@
 2008-04-01 Patrick Mansfield <patmans@us.ibm.com>
 
+	* libc/machine/spu/memcmp.c: New file for SPU optimized memcmp.
+	* libc/machine/spu/strncmp.h: New file supply _strncmp_internal.
+	* libc/machine/spu/Makefile.am: Add memcmp.c.
+	* libc/machine/spu/Makefile.in: Rebuild.
+	* libc/machine/spu/strncmp.c: Use _strncmp_internal.
+
+2008-04-01 Patrick Mansfield <patmans@us.ibm.com>
+
 	* configure.host: Build SPU with -DREENTRANT_SYSCALLS_PROVIDED and
 	  -DMISSING_SYSCALL_NAMES.
 
