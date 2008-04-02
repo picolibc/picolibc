@@ -1,5 +1,20 @@
 2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (mount_info::init): First try to fetch mount points from
+	fstab files.  Fallback to registry if none exists.
+	(skip_ws): New inline function.
+	(find_ws): Ditto.
+	(struct opt): New structure for mount options.
+	(read_flags): New static function to convert a mount flags string into
+	a flag value.
+	(mount_info::from_fstab_line): New method to create a mount table
+	entry from a fstab line.
+	(mount_info::from_fstab): New method to read fstab file.
+	* shared_info.h (mount_info::from_fstab_line): Declare.
+	(mount_info::from_fstab): Declare.
+
+2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (enum symlink_t): Rename from shortcut_t.
 
 2008-04-02  Corinna Vinschen  <corinna@vinschen.de>

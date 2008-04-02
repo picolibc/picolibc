@@ -1638,8 +1638,11 @@ mount_info::init ()
 {
   nmounts = 0;
 
+  if (from_fstab (false) | from_fstab (true))	/* The single | is correct! */
+    return;
   /* Fetch the mount table and cygdrive-related information from
      the registry.  */
+  system_printf ("Fallback to fetching mounts from registry");
   from_registry ();
 }
 
@@ -2296,6 +2299,201 @@ mount_info::set_flags_from_win32_path (const char *p)
 	return mi.flags;
     }
   return PATH_BINARY;
+}
+
+inline char *
+skip_ws (char *in)
+{
+  while (*in == ' ' || *in == '\t')
+    ++in;
+  return in;
+}
+
+inline char *
+find_ws (char *in)
+{
+  while (*in && *in != ' ' && *in != '\t')
+    ++in;
+  return in;
+}
+
+struct opt
+{   
+  const char *name;
+  unsigned val;
+  bool clear;
+} oopts[] =
+{
+  {"binary", MOUNT_BINARY, 0},
+  {"text", MOUNT_BINARY, 1},
+  {"exec", MOUNT_EXEC, 0},
+  {"notexec", MOUNT_NOTEXEC, 0},
+  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"nosuid", 0, 0},
+  {"managed", MOUNT_ENC, 0}
+};
+
+static bool
+read_flags (char *options, unsigned &flags)
+{
+  while (*options)
+    {
+      char *p = strchr (options, ',');
+      if (p)
+        *p++ = '\0';
+      else
+        p = strchr (options, '\0');
+
+      for (opt *o = oopts;
+	   o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
+	   o++)
+        if (strcmp (options, o->name) == 0)
+          {
+            if (o->clear)
+              flags &= ~o->val;
+            else
+              flags |= o->val;
+            goto gotit;
+          }
+      system_printf ("invalid fstab option - '%s'", options);
+      return false;
+
+    gotit:
+      options = p;
+    }
+  return true;
+}
+
+bool
+mount_info::from_fstab_line (char *line, bool user)
+{
+  tmp_pathbuf tp;
+  char *native_path = tp.c_get ();
+  /* FIXME */
+  char posix_path[CYG_MAX_PATH];
+
+  /* First field: Native path. */
+  char *c = skip_ws (line);
+  if (!*c || *c == '#')
+    return true;
+  char *cend = find_ws (c);
+  *cend = '\0';
+  *native_path = '\0';
+  strncat (native_path, c, NT_MAX_PATH - 1);
+  /* Second field: POSIX path. */
+  c = skip_ws (cend + 1);
+  if (!*c || *c == '#')
+    return true;
+  cend = find_ws (c);
+  *cend = '\0';
+  *posix_path = '\0';
+  strncat (posix_path, c, CYG_MAX_PATH - 1);
+  /* Third field: FS type.  Ignored. */
+  c = skip_ws (cend + 1);
+  if (!*c || *c == '#')
+    return true;
+  cend = find_ws (c);
+  *cend = '\0';
+  /* Forth field: Flags. */
+  c = skip_ws (cend + 1);
+  if (!*c || *c == '#')
+    return true;
+  cend = find_ws (c);
+  *cend = '\0';
+  unsigned mount_flags = 0;
+  if (!read_flags (c, mount_flags))
+    return true;
+  if (user)
+    mount_flags &= ~MOUNT_SYSTEM;
+  else
+    mount_flags |= MOUNT_SYSTEM;
+  if (!strcmp (native_path, "cygdrive"))
+    {
+      cygdrive_flags = mount_flags;
+      slashify (posix_path, cygdrive, 1);
+      cygdrive_len = strlen (cygdrive);
+    }
+  else
+    {
+      int res = mount_table->add_item (native_path, posix_path, mount_flags,
+				       false);
+      if (res && get_errno () == EMFILE)
+	return false;
+    }
+  return true;
+}
+
+bool
+mount_info::from_fstab (bool user)
+{
+  tmp_pathbuf tp;
+  PWCHAR path = tp.w_get ();
+  PWCHAR w;
+  
+  if (!GetModuleFileNameW (NULL, path, NT_MAX_PATH))
+    {
+      debug_printf ("GetModuleFileNameW, %E");
+      return false;
+    }
+  w = wcsrchr (path, L'\\');
+  if (w)
+    {
+      *w = L'\0';
+      w = wcsrchr (path, L'\\');
+    }
+  if (!w)
+    {
+      debug_printf ("Invalid DLL path");
+      return false;
+    }
+  w = wcpcpy (w, L"\\etc\\fstab");
+  if (user)
+    cygheap->user.get_windows_id (wcpcpy (w, L"."));
+  debug_printf ("Try to read mounts from %W", path);
+  HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
+			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (h == INVALID_HANDLE_VALUE)
+    {
+      debug_printf ("CreateFileW, %E");
+      return false;
+    }
+  char *const buf = reinterpret_cast<char *const> (path);
+  char *got = buf;
+  DWORD len = 0;
+  /* Using NT_MAX_PATH-1 leaves space to append two \0. */
+  while (ReadFile (h, got, (NT_MAX_PATH - 1) * sizeof (WCHAR) - (got - buf),
+		   &len, NULL))
+    {
+      char *end;
+
+      /* Set end marker. */
+      got[len] = got[len + 1] = '\0';
+      /* Set len to the absolute len of bytes in buf. */
+      len += got - buf;
+      /* Reset got to start reading at the start of the buffer again. */
+      got = buf;
+      while (got < buf + len && (end = strchr (got, '\n')))
+        {
+	  end[end[-1] == '\r' ? -1 : 0] = '\0';
+	  if (!from_fstab_line (got, user))
+	    goto done;
+	  got = end + 1;
+	}
+      if (len < (NT_MAX_PATH - 1) * sizeof (WCHAR))
+        break;
+      /* We have to read once more.  Move remaining bytes to the start of
+         the buffer and reposition got so that it points to the end of
+	 the remaining bytes. */
+      len = buf + len - got;
+      memmove (buf, got, len);
+      got = buf + len;
+      buf[len] = buf[len + 1] = '\0';
+    }
+  if (got > buf)
+    from_fstab_line (got, user);
+done:
+  CloseHandle (h);
+  return true;
 }
 
 /* read_mounts: Given a specific regkey, read mounts from under its

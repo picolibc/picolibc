@@ -74,6 +74,8 @@ class mount_info
   int add_item (const char *dev, const char *path, unsigned flags, int reg_p);
   int del_item (const char *path, unsigned flags, int reg_p);
 
+  bool from_fstab_line (char *line, bool user);
+  bool from_fstab (bool user);
   void from_registry ();
   int add_reg_mount (const char * native_path, const char * posix_path,
 		      unsigned mountflags);
