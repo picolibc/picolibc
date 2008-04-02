@@ -353,6 +353,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     localeconv
     localtime
     localtime_r
+    lockf
     log
     log10
     log10f
@@ -1195,7 +1196,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     llround
     llroundf
     llroundl
-    lockf
     log10l
     log1pl
     log2l
