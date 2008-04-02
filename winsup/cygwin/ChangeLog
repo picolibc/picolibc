@@ -1,5 +1,9 @@
 2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (enum symlink_t): Rename from shortcut_t.
+
+2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check_reparse_point): Use NtFsControlFile
 	to read reparse points.
 	(enum shortcut_t): New type.

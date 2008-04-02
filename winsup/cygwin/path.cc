@@ -3778,7 +3778,7 @@ symlink_info::parse_device (const char *contents)
    Return -1 on error, 0 if PATH is not a symlink, or the length
    stored into BUF if PATH is a symlink.  */
 
-enum shortcut_t {
+enum symlink_t {
   is_no_symlink,
   is_shortcut_symlink,
   is_reparse_symlink,
@@ -3907,7 +3907,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  || (opt & PC_SYM_IGNORE))
 	goto file_not_symlink;
 
-      shortcut_t sym_check;
+      symlink_t sym_check;
 
       sym_check = is_no_symlink;
 
