@@ -3487,15 +3487,19 @@ symlink_info::check_sysfile (HANDLE h)
 int
 symlink_info::check_reparse_point (HANDLE h)
 {
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
   PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
 			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-  DWORD size;
   char srcbuf[SYMLINK_MAX + 7];
 
-  if (!DeviceIoControl (h, FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
-			MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &size, NULL))
+  status = NtFsControlFile (h, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
+			    NULL, 0, (LPVOID) rp,
+			    MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("DeviceIoControl(FSCTL_GET_REPARSE_POINT) failed, %E");
+      debug_printf ("NtFsControlFile(FSCTL_GET_REPARSE_POINT) failed, %p",
+		    status);
       set_error (EIO);
       return 0;
     }
@@ -3774,6 +3778,13 @@ symlink_info::parse_device (const char *contents)
    Return -1 on error, 0 if PATH is not a symlink, or the length
    stored into BUF if PATH is a symlink.  */
 
+enum shortcut_t {
+  is_no_symlink,
+  is_shortcut_symlink,
+  is_reparse_symlink,
+  is_sysfile_symlink
+};
+
 int
 symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 {
@@ -3896,9 +3907,9 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  || (opt & PC_SYM_IGNORE))
 	goto file_not_symlink;
 
-      int sym_check;
+      shortcut_t sym_check;
 
-      sym_check = 0;
+      sym_check = is_no_symlink;
 
       if ((fileattr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
 	  == FILE_ATTRIBUTE_DIRECTORY)
@@ -3907,35 +3918,45 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       /* Windows shortcuts are potentially treated as symlinks. */
       /* Valid Cygwin & U/WIN shortcuts are R/O. */
       if ((fileattr & FILE_ATTRIBUTE_READONLY) && suffix.lnk_match ())
-	sym_check = 1;
+	sym_check = is_shortcut_symlink;
+
+      /* Reparse points are potentially symlinks.  This check must be
+         performed before checking the SYSTEM attribute for sysfile
+	 symlinks, since reparse points can have this flag set, too.
+	 For instance, Vista starts to create a couple of reparse points
+	 with SYSTEM and HIDDEN flags set. */
+      else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
+	sym_check = is_reparse_symlink;
 
       /* This is the old Cygwin method creating symlinks: */
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
       else if (fileattr & FILE_ATTRIBUTE_SYSTEM)
-	sym_check = 2;
+	sym_check = is_sysfile_symlink;
 
-      /* Reparse points are potentially symlinks. */
-      else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
-	sym_check = 3;
-
-      if (!sym_check)
+      if (sym_check == is_no_symlink)
 	goto file_not_symlink;
 
       res = -1;
 
-      /* Open the file.  */
-      status = NtOpenFile (&h, FILE_GENERIC_READ, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS,
-			   FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_FOR_BACKUP_INTENT
-			   | (sym_check == 3 ? FILE_OPEN_REPARSE_POINT : 0));
+      /* Open the file.  Opening reparse points must not use GENERIC_READ.
+	 The reason is that Vista starts to create a couple of reparse
+	 points for backward compatibility, hidden system files, explicitely
+	 denying everyone FILE_READ_DATA access. */
+      status = NtOpenFile (&h,
+			   sym_check == is_reparse_symlink
+			   ? READ_CONTROL : FILE_GENERIC_READ,
+			   &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   FILE_OPEN_FOR_BACKUP_INTENT
+			   | (sym_check == is_reparse_symlink
+			      ? FILE_OPEN_REPARSE_POINT
+			      : FILE_SYNCHRONOUS_IO_NONALERT));
       if (!NT_SUCCESS (status))
 	goto file_not_symlink;
 
       switch (sym_check)
 	{
-	case 1:
+	case is_shortcut_symlink:
 	  res = check_shortcut (h);
 	  NtClose (h);
 	  if (!res)
@@ -3951,18 +3972,20 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
-	case 2:
-	  res = check_sysfile (h);
-	  NtClose (h);
-	  if (!res)
-	    goto file_not_symlink;
-	  break;
-	case 3:
+	case is_reparse_symlink:
 	  res = check_reparse_point (h);
 	  NtClose (h);
 	  if (!res)
 	    goto file_not_symlink;
 	  break;
+	case is_sysfile_symlink:
+	  res = check_sysfile (h);
+	  NtClose (h);
+	  if (!res)
+	    goto file_not_symlink;
+	  break;
+	default: /* Make gcc happy.  Won't happen. */
+	  goto file_not_symlink;
 	}
       break;
 
