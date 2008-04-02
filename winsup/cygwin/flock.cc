@@ -262,16 +262,11 @@ get_lock_parent_dir ()
   if (!dir)
     {
       RtlInitUnicodeString (&uname, L"\\BaseNamedObjects\\cygwin-fcntl-lk");
-      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, NULL,
-				  everyone_sd (FLOCK_PARENT_DIR_ACCESS));
-      status = NtOpenDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS, &attr);
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				  NULL, everyone_sd (FLOCK_PARENT_DIR_ACCESS));
+      status = NtCreateDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-	{
-	  status = NtCreateDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS,
-					    &attr);
-	  if (!NT_SUCCESS (status))
-	    api_fatal ("NtCreateDirectoryObject(parent): %p", status);
-	}
+	api_fatal ("NtCreateDirectoryObject(parent): %p", status);
     }
   INODE_LIST_UNLOCK ();
   return dir;
@@ -526,27 +521,19 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
      of the given file, in hex notation. */
   int len = __small_swprintf (name, L"%08x-%016X", dev, ino);
   RtlInitCountedUnicodeString (&uname, name, len * sizeof (WCHAR));
-  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, parent_dir,
-			      everyone_sd (FLOCK_INODE_DIR_ACCESS));
-  status = NtOpenDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
+  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+			      parent_dir, everyone_sd (FLOCK_INODE_DIR_ACCESS));
+  status = NtCreateDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
   if (!NT_SUCCESS (status))
-    {
-      status = NtCreateDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
-      if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateDirectoryObject(inode): %p", status);
-    }
+    api_fatal ("NtCreateDirectoryObject(inode): %p", status);
   /* Create a mutex object in the file specific dir, which is used for
      access synchronization on the dir and its objects. */
   RtlInitUnicodeString (&uname, L"mtx");
-  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, i_dir,
+  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF, i_dir,
 			      everyone_sd (FLOCK_MUTANT_ACCESS));
-  status = NtOpenMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr);
+  status = NtCreateMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))
-    {
-      status = NtCreateMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr, FALSE);
-      if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateMutant(inode): %p", status);
-    }
+    api_fatal ("NtCreateMutant(inode): %p", status);
 }
 
 /* Enumerate all lock event objects for this file and create a lockf_t

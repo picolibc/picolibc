@@ -1,5 +1,11 @@
 2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (get_lock_parent_dir): Drop call to NtOpenDirectoryObject
+	and utilize OBJ_OPENIF flag in call to NtCreateDirectoryObject.
+	(inode_t::inode_t): Ditto.  Same for NtOpenMutant/NtCreateMutant.
+
+2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml: Change lockf to being implemented.
 
 2008-04-02  Corinna Vinschen  <corinna@vinschen.de>
