@@ -39,6 +39,7 @@ details. */
 #include "sync.h"
 #include "heap.h"
 #include "environ.h"
+#include "tls_pbuf.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -161,14 +162,17 @@ insert_file (char *name, char *&cmd)
 {
   HANDLE f;
   DWORD size;
+  tmp_pathbuf tp;
 
-  f = CreateFile (name + 1,
-		  GENERIC_READ,		 /* open for reading	*/
-		  FILE_SHARE_READ,       /* share for reading	*/
-		  &sec_none_nih,	 /* no security		*/
-		  OPEN_EXISTING,	 /* existing file only	*/
-		  FILE_ATTRIBUTE_NORMAL, /* normal file		*/
-		  NULL);		 /* no attr. template	*/
+  PWCHAR wname = tp.w_get ();
+  sys_mbstowcs (wname, NT_MAX_PATH + 1, name + 1);
+  f = CreateFileW (wname,
+		   GENERIC_READ,	 /* open for reading	*/
+		   FILE_SHARE_READ,      /* share for reading	*/
+		   &sec_none_nih,	 /* default security	*/
+		   OPEN_EXISTING,	 /* existing file only	*/
+		   FILE_ATTRIBUTE_NORMAL,/* normal file		*/
+		   NULL);		 /* no attr. template	*/
 
   if (f == INVALID_HANDLE_VALUE)
     {
