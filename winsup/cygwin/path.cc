@@ -2367,10 +2367,7 @@ read_flags (char *options, unsigned &flags)
 bool
 mount_info::from_fstab_line (char *line, bool user)
 {
-  tmp_pathbuf tp;
-  char *native_path = tp.c_get ();
-  /* FIXME */
-  char posix_path[CYG_MAX_PATH];
+  char *native_path, *posix_path, *fs_type;
 
   /* First field: Native path. */
   char *c = skip_ws (line);
@@ -2378,22 +2375,21 @@ mount_info::from_fstab_line (char *line, bool user)
     return true;
   char *cend = find_ws (c);
   *cend = '\0';
-  *native_path = '\0';
-  strncat (native_path, c, NT_MAX_PATH - 1);
+  native_path = c;
   /* Second field: POSIX path. */
   c = skip_ws (cend + 1);
   if (!*c || *c == '#')
     return true;
   cend = find_ws (c);
   *cend = '\0';
-  *posix_path = '\0';
-  strncat (posix_path, c, CYG_MAX_PATH - 1);
-  /* Third field: FS type.  Ignored. */
+  posix_path = c;
+  /* Third field: FS type. */
   c = skip_ws (cend + 1);
   if (!*c || *c == '#')
     return true;
   cend = find_ws (c);
   *cend = '\0';
+  fs_type = c;
   /* Forth field: Flags. */
   c = skip_ws (cend + 1);
   if (!*c || *c == '#')
@@ -2407,7 +2403,7 @@ mount_info::from_fstab_line (char *line, bool user)
     mount_flags &= ~MOUNT_SYSTEM;
   else
     mount_flags |= MOUNT_SYSTEM;
-  if (!strcmp (native_path, "cygdrive"))
+  if (!strcmp (fs_type, "cygdrive"))
     {
       cygdrive_flags = mount_flags;
       slashify (posix_path, cygdrive, 1);
@@ -2416,7 +2412,7 @@ mount_info::from_fstab_line (char *line, bool user)
   else
     {
       int res = mount_table->add_item (native_path, posix_path, mount_flags,
-				       false);
+				     false);
       if (res && get_errno () == EMFILE)
 	return false;
     }
@@ -2447,9 +2443,20 @@ mount_info::from_fstab (bool user)
       debug_printf ("Invalid DLL path");
       return false;
     }
-  w = wcpcpy (w, L"\\etc\\fstab");
+
+  /* Create a default root dir from the path the Cygwin DLL is in. */
+  if (!user)
+    {
+      *w = L'\0';
+      char *native_root = tp.c_get ();
+      sys_wcstombs (native_root, NT_MAX_PATH, path);
+      mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY,
+			     false);
+    }
+
+  PWCHAR u = wcpcpy (w, L"\\etc\\fstab");
   if (user)
-    cygheap->user.get_windows_id (wcpcpy (w, L"."));
+    cygheap->user.get_windows_id (wcpcpy (u, L"."));
   debug_printf ("Try to read mounts from %W", path);
   HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);

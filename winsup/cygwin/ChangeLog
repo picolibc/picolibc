@@ -1,5 +1,10 @@
 2008-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (mount_info::from_fstab_line): Simplify.
+	(mount_info::from_fstab): Create a default root dir.
+
+2008-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (insert_file): Fix potential buffer overflow.
 
 2008-04-03  Corinna Vinschen  <corinna@vinschen.de>
