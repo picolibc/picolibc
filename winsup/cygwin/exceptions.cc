@@ -17,6 +17,7 @@ details. */
 #include <setjmp.h>
 #include <assert.h>
 #include <syslog.h>
+#include <wchar.h>
 
 #include "exceptions.h"
 #include "sync.h"
@@ -46,7 +47,7 @@ extern child_info_spawn *chExeced;
 int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-char windows_system_directory[1024];
+static WCHAR windows_system_directory[1024];
 static size_t windows_system_directory_length;
 
 /* This is set to indicate that we have already exited.  */
@@ -327,8 +328,9 @@ _cygtls::inside_kernel (CONTEXT *cx)
   if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
     sigproc_printf ("couldn't get memory info, pc %p, %E", cx->Eip);
 
-  char *checkdir = (char *) alloca (windows_system_directory_length + 4);
-  memset (checkdir, 0, sizeof (checkdir));
+  size_t size = (windows_system_directory_length + 6) * sizeof (WCHAR);
+  PWCHAR checkdir = (PWCHAR) alloca (size);
+  memset (checkdir, 0, size);
 
 # define h ((HMODULE) m.AllocationBase)
   /* Apparently Windows 95 can sometimes return bogus addresses from
@@ -338,11 +340,16 @@ _cygtls::inside_kernel (CONTEXT *cx)
     res = true;
   else if (h == user_data->hmodule)
     res = false;
-  else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
+  else if (!GetModuleFileNameW (h, checkdir, windows_system_directory_length + 6))
     res = false;
   else
-    res = strncasematch (windows_system_directory, checkdir,
-			 windows_system_directory_length);
+    {
+      /* Skip potential long path prefix. */
+      if (!wcsncmp (checkdir, L"\\\\?\\", 4))
+	checkdir += 4;
+      res = !wcsncasecmp (windows_system_directory, checkdir,
+			  windows_system_directory_length);
+    }
   sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->Eip, h, res);
 # undef h
   return res;
@@ -397,17 +404,17 @@ try_to_debug (bool waitloop)
   lock_ttys::release ();
 
   /* prevent recursive exception handling */
-  char* rawenv = GetEnvironmentStrings () ;
-  for (char* p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1)
+  PWCHAR rawenv = GetEnvironmentStringsW () ;
+  for (PWCHAR p = rawenv; *p != L'\0'; p = wcschr (p, L'\0') + 1)
     {
-      if (strncmp (p, "CYGWIN=", strlen ("CYGWIN=")) == 0)
+      if (wcsncmp (p, L"CYGWIN=", wcslen (L"CYGWIN=")) == 0)
 	{
-	  char* q = strstr (p, "error_start") ;
+	  PWCHAR q = wcsstr (p, L"error_start") ;
 	  /* replace 'error_start=...' with '_rror_start=...' */
 	  if (q)
 	    {
-	      *q = '_' ;
-	      SetEnvironmentVariable ("CYGWIN", p + strlen ("CYGWIN=")) ;
+	      *q = L'_' ;
+	      SetEnvironmentVariableW (L"CYGWIN", p + wcslen (L"CYGWIN=")) ;
 	    }
 	  break ;
 	}
@@ -917,7 +924,7 @@ has_visible_window_station ()
      with the desktop (using the "Allow service to interact with desktop"
      property) are running in an invisible window station. */
   if ((station_hdl = GetProcessWindowStation ())
-      && GetUserObjectInformationA (station_hdl, UOI_FLAGS, &uof,
+      && GetUserObjectInformationW (station_hdl, UOI_FLAGS, &uof,
 				    sizeof uof, &len)
       && (uof.dwFlags & WSF_VISIBLE))
     return true;
@@ -1339,18 +1346,18 @@ void
 events_init ()
 {
   mask_sync.init ("mask_sync");
-  windows_system_directory[0] = '\0';
-  GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
-  char *end = strchr (windows_system_directory, '\0');
+  windows_system_directory[0] = L'\0';
+  GetSystemDirectoryW (windows_system_directory, sizeof (windows_system_directory) / sizeof (WCHAR) - 2);
+  PWCHAR end = wcschr (windows_system_directory, L'\0');
   if (end == windows_system_directory)
     api_fatal ("can't find windows system directory");
-  if (end[-1] != '\\')
+  if (end[-1] != L'\\')
     {
-      *end++ = '\\';
-      *end = '\0';
+      *end++ = L'\\';
+      *end = L'\0';
     }
   windows_system_directory_length = end - windows_system_directory;
-  debug_printf ("windows_system_directory '%s', windows_system_directory_length %d",
+  debug_printf ("windows_system_directory '%W', windows_system_directory_length %d",
 		windows_system_directory, windows_system_directory_length);
 }
 

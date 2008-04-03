@@ -15,6 +15,7 @@ details. */
 
 #include "winsup.h"
 #include <ctype.h>
+#include <wchar.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <syslog.h>
@@ -42,6 +43,7 @@ details. */
 #include "cygtls.h"
 #include "cygwin/in6.h"
 #include "ifaddrs.h"
+#include "tls_pbuf.h"
 
 extern "C"
 {
@@ -385,19 +387,10 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
   /* Do servent/hostent specific processing */
   int protolen = 0;
   int addr_list_len = 0;
-  char *s_proto = NULL;
   if (type == t_servent)
     {
       if (src->s_proto)
-	{
-	  /* Windows 95 idiocy.  Structure is misaligned on Windows 95.
-	     Kludge around this by trying a different pointer alignment.  */
-	  if (!IsBadStringPtr (src->s_proto, INT32_MAX))
-	    s_proto = src->s_proto;
-	  else if (!IsBadStringPtr (((pservent *) src)->s_proto, INT32_MAX))
-	    s_proto = ((pservent *) src)->s_proto;
-	  sz += (protolen = strlen_round (s_proto));
-	}
+	sz += (protolen = strlen_round (src->s_proto));
     }
   else if (type == t_hostent)
     {
@@ -456,9 +449,9 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
 	debug_printf ("protoent %s %x %x", dst->name, dst->list, dst->port_proto_addrtype);
       else if (type == t_servent)
 	{
-	  if (s_proto)
+	  if (src->s_proto)
 	    {
-	      strcpy (dst->s_proto = dp, s_proto);
+	      strcpy (dst->s_proto = dp, src->s_proto);
 	      dp += protolen;
 	    }
 	}
@@ -3832,8 +3825,8 @@ static bool ipv6_inited = false;
 static void
 load_ipv6_funcs ()
 {
-
-  char lib_name[MAX_PATH];
+  tmp_pathbuf tp;
+  PWCHAR lib_name = tp.w_get ();
   size_t len;
   HMODULE lib;
 
@@ -3841,18 +3834,18 @@ load_ipv6_funcs ()
   if (ipv6_inited)
     goto out;
   WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
-  if (GetSystemDirectory (lib_name, MAX_PATH))
+  if (GetSystemDirectoryW (lib_name, NT_MAX_PATH))
     {
-      len = strlen (lib_name);
-      strcpy (lib_name + len, "\\ws2_32.dll");
-      if ((lib = LoadLibrary (lib_name)))
+      len = wcslen (lib_name);
+      wcpcpy (lib_name + len, L"\\ws2_32.dll");
+      if ((lib = LoadLibraryW (lib_name)))
 	{
 	  if (get_ipv6_funcs (lib))
 	    goto out;
 	  FreeLibrary (lib);
 	}
-      strcpy (lib_name + len, "\\wship6.dll");
-      if ((lib = LoadLibrary (lib_name)))
+      wcpcpy (lib_name + len, L"\\wship6.dll");
+      if ((lib = LoadLibraryW (lib_name)))
 	{
 	  if (get_ipv6_funcs (lib))
 	    goto out;

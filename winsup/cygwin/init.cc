@@ -97,11 +97,11 @@ respawn_wow64_process ()
   if (!is_wow64_proc)
     {
       PROCESS_INFORMATION pi;
-      STARTUPINFO si;
+      STARTUPINFOW si;
       DWORD ret = 0;
 
-      GetStartupInfo (&si);
-      if (!CreateProcessA (NULL, GetCommandLineA (), NULL, NULL, TRUE,
+      GetStartupInfoW (&si);
+      if (!CreateProcessW (NULL, GetCommandLineW (), NULL, NULL, TRUE,
 			   CREATE_DEFAULT_ERROR_MODE
 			   | GetPriorityClass (GetCurrentProcess ()),
 			   NULL, NULL, &si, &pi))

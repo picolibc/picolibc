@@ -3299,8 +3299,6 @@ long gethostid (void)
      or a STATUS_ACCESS_VIOLATION is generated */
   ULARGE_INTEGER availb;
   GetDiskFreeSpaceEx ("C:\\", &availb, (PULARGE_INTEGER) &data[11], NULL);
-  if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    GetDiskFreeSpace ("C:\\", NULL, NULL, NULL, (DWORD *)&data[11]);
 
   debug_printf ("hostid entropy: %08x %08x %08x %08x "
 				"%08x %08x %08x %08x "
