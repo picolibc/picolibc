@@ -165,7 +165,7 @@ insert_file (char *name, char *&cmd)
   tmp_pathbuf tp;
 
   PWCHAR wname = tp.w_get ();
-  sys_mbstowcs (wname, NT_MAX_PATH + 1, name + 1);
+  sys_mbstowcs (wname, NT_MAX_PATH, name + 1);
   f = CreateFileW (wname,
 		   GENERIC_READ,	 /* open for reading	*/
 		   FILE_SHARE_READ,      /* share for reading	*/
