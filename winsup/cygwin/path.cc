@@ -2430,7 +2430,8 @@ mount_info::from_fstab (bool user)
   PWCHAR path = tp.w_get ();
   PWCHAR w;
   
-  if (!GetModuleFileNameW (NULL, path, NT_MAX_PATH))
+  if (!GetModuleFileNameW (GetModuleHandleW (L"cygwin1.dll"),
+			   path, NT_MAX_PATH))
     {
       debug_printf ("GetModuleFileNameW, %E");
       return false;
