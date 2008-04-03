@@ -100,7 +100,7 @@
 #define REX_B	1
 
 /* max operands per insn */
-#define MAX_OPERANDS 4
+#define MAX_OPERANDS 5
 
 /* max immediates per insn (lcall, ljmp, insertq, extrq) */
 #define MAX_IMMEDIATE_OPERANDS 2
@@ -109,7 +109,7 @@
 #define MAX_MEMORY_OPERANDS 2
 
 /* max size of insn mnemonics.  */
-#define MAX_MNEM_SIZE 16
+#define MAX_MNEM_SIZE 20
 
 /* max size of register name in insn mnemonics.  */
 #define MAX_REG_NAME_SIZE 8

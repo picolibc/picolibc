@@ -1,3 +1,8 @@
+2008-04-03  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (MAX_OPERANDS): Set to 5.
+	(MAX_MNEM_SIZE): Changed to 20.
+
 2008-03-09  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (FPU_VFP_EXT_D32, FPU_VFP_V3D16, FPU_ARCH_VFP_V3D16): Define.
