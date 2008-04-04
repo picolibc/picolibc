@@ -1,3 +1,37 @@
+2008-04-04  DJ Delorie  <dj@redhat.com>
+
+	* hp74x/configure: Regenerate with autoconf 2.61.
+	* fr30/configure: Regenerate with autoconf 2.61.
+	* mips/configure: Regenerate with autoconf 2.61.
+	* xstormy16/configure: Regenerate with autoconf 2.61.
+	* rs6000/configure: Regenerate with autoconf 2.61.
+	* d30v/configure: Regenerate with autoconf 2.61.
+	* i386/configure: Regenerate with autoconf 2.61.
+	* configure: Regenerate with autoconf 2.61.
+	* wince/configure: Regenerate with autoconf 2.61.
+	* pa/configure: Regenerate with autoconf 2.61.
+	* m32r/configure: Regenerate with autoconf 2.61.
+	* mn10200/configure: Regenerate with autoconf 2.61.
+	* iq2000/configure: Regenerate with autoconf 2.61.
+	* cris/configure: Regenerate with autoconf 2.61.
+	* m68k/configure: Regenerate with autoconf 2.61.
+	* spu/configure: Regenerate with autoconf 2.61.
+	* m32c/configure: Regenerate with autoconf 2.61.
+	* mn10300/configure: Regenerate with autoconf 2.61.
+	* i960/configure: Regenerate with autoconf 2.61.
+	* arm/configure: Regenerate with autoconf 2.61.
+	* libnosys/configure: Regenerate with autoconf 2.61.
+	* m68hc11/configure: Regenerate with autoconf 2.61.
+	* bfin/configure: Regenerate with autoconf 2.61.
+	* crx/configure: Regenerate with autoconf 2.61.
+	* mt/configure: Regenerate with autoconf 2.61.
+	* sparc/configure: Regenerate with autoconf 2.61.
+	* sparc/libsys/configure: Regenerate with autoconf 2.61.
+	* mcore/configure: Regenerate with autoconf 2.61.
+	* mep/configure: Regenerate with autoconf 2.61.
+	* frv/configure: Regenerate with autoconf 2.61.
+	* doc/configure: Regenerate with autoconf 2.61.
+
 2008-01-10  DJ Delorie  <dj@redhat.com>
 
 	* m32c/exit.S (__exit): preserve both argument registers.
