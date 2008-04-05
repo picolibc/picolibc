@@ -1,0 +1,211 @@
+#!/bin/bash
+#
+# Copyright 2008 Red Hat, Inc.
+#
+# This file is part of Cygwin.
+#
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+#
+export PATH="/bin:$PATH"
+
+DEVDIR=/dev
+
+# Create fstab file if it doesn't exist.
+if [ -e "/etc/fstab" -a ! -f "/etc/fstab" ]
+then
+  # Try to move
+  mv -f "/etc/fstab" "/etc/fstab.orig"
+  if [ -e "/etc/fstab" -a ! -f "/etc/fstab" ]
+  then
+    echo
+    echo "/etc/fstab is existant but not a file."
+    echo "Since this file is specifying the mount points, this might"
+    echo "result in unexpected trouble.  Please fix that manually."
+    echo
+  fi
+fi
+
+if [ ! -e "/etc/fstab" ]
+then
+  mount |
+  (
+    while read -r line
+    do
+      [[ "$line" =~ ([^ ]*)\ on\ ([^ ]*)\ type\ ([^ ]*)\ .* ]]
+      if [ "${BASH_REMATCH[2]}" = "/" ]
+      then
+	CYGROOT="${BASH_REMATCH[1]}"
+	FS_TYPE="${BASH_REMATCH[3]}"
+	break
+      fi
+    done
+    cat > /etc/fstab << EOF
+# The  file fstab contains descriptive information about the various file
+# systems.  fstab is only read by programs, and not written;  it  is  the
+# duty  of  the system administrator to properly create and maintain this
+# file.  Each filesystem is described on a separate line; fields on  each
+# line are separated by tabs or spaces.  Lines starting with '#' are com-
+# ments.
+#
+# The first field, (fs_spec),  describes  the  block  special  device  or
+# remote filesystem to be mounted.  On Cygwin, this is the native Windows
+# path which  the mount point links in.  As path separator you MUST use a
+# slash.  Usage of  a backslash might  lead to  unexpected  results.  UNC
+# paths  (using  slashes,  not  backslashes)  are  allowed.  If  the path
+# contains spaces these can be escaped as '\040'.
+#
+# The second field, (fs_file), describes the mount point for the filesys-
+# tem.  If the  name  of  the  mount point contains  spaces these can be
+# escaped as '\040'.
+#
+# The third field, (fs_vfstype), describes the type  of  the  filesystem.
+# Cygwin supports any string here, since  the file system type is usually
+# not  evaluated.  The  noticable  exception  is  the  file  system  type
+# cygdrive.  This  type is  used to  set the  cygdrive  prefix.  See  the
+# user's guide for more information about the cygdrive prefix.
+#
+# The  fourth  field, (fs_mntops), describes the mount options associated
+# with  the filesystem.  It is  formatted as a  comma separated  list  of
+# options.  It contains at least  the type of mount (binary or text) plus
+# any additional options appropriate to  the filesystem type.  Recognized
+# options are binary, text, system, user, exec, notexec, cygexec, nosuid,
+# managed.  For a description of the options see  the user's guide.  Note
+# that  system mount  points  are  not overridable  by  a  later  call to
+# mount(2).  This is only  possible for user mount  points.  Mount points
+# are by default system mount points, unless you specify the option user.
+#
+# The fifth (fs_freq) and sixth (fs_passno) field  are ignored.  They are
+# so far only specified to keep a Linux-like fstab file layout.
+#
+# Note that  you don't have  to specify an fstab  entry for the root dir,
+# unless you want  to have the  root dir pointing  to somewhere  entirely
+# different (hopefully  you know what  you're doing), or  if you want  to
+# mount the root dir with special options (for instance, as text mount).
+#
+# Example entries:
+#
+#   Just a normal mount point:
+#
+#       c:/foo /bar fat32 binary 0 0
+#
+#   A mount point for a managed, textmode mount:
+#
+#       C:/foo /bar/baz ntfs text,managed 0 0
+#
+#   A mount point for a Windows directory with spaces in it:
+#
+#       C:/Documents\040and\040Settings /docs ext3 binary 0 0
+#
+#   A mount point for a remote directory:
+#
+#       //server/share/subdir /srv/subdir smbfs binary 0 0
+#
+#   This is just a comment:
+#
+#       # This is just a comment
+#
+#   Set the cygdrive prefix to /mnt:
+#
+#       none /mnt cygdrive binary 0 0
+#
+
+${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary,system 0 0
+${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary,system 0 0
+# This is default anyway:
+# none /cygdrive cygdrive binary,user 0 0
+EOF
+  )
+fi
+
+# Check for ${DEVDIR} directory
+
+if [ -e "${DEVDIR}" -a ! -d "${DEVDIR}" ]
+then 
+  # No mercy.  Try to remove.
+  rm -f "${DEVDIR}"
+  if [ -e "${DEVDIR}" -a ! -d "${DEVDIR}" ]
+  then 
+    echo
+    echo "${DEVDIR} is existant but not a directory."
+    echo "Please fix that manually, otherwise you WILL get problems."
+    echo
+    exit 1
+  fi
+fi
+
+# Create it if necessary
+
+if [ ! -e "${DEVDIR}" ]
+then
+  mkdir -m 755 "${DEVDIR}"
+  if [ ! -e "${DEVDIR}" ]
+  then
+    echo
+    echo "Creating ${DEVDIR} directory failed."
+    echo "Please fix that manually, otherwise you WILL get problems."
+    echo
+    exit 1
+  fi
+fi
+
+setfacl -m u:system:rwx "${DEVDIR}"
+
+# Check for ${DEVDIR}/shm directory (for POSIX semaphores and POSIX shared mem)
+
+if [ -e "${DEVDIR}/shm" -a ! -d "${DEVDIR}/shm" ]
+then
+  # No mercy.  Try to remove.
+  rm -f "${DEVDIR}/shm"
+  if [ -e "${DEVDIR}/shm" -a ! -d "${DEVDIR}/shm" ]
+  then 
+    echo
+    echo "${DEVDIR}/shm is existant but not a directory."
+    echo "POSIX semaphores and POSIX shared memory will not work"
+    echo
+  fi
+fi
+
+# Create it if necessary
+
+if [ ! -e "${DEVDIR}/shm" ]
+then
+  mkdir -m 1777 "${DEVDIR}/shm"
+  if [ ! -e "${DEVDIR}/shm" ]
+  then
+    echo
+    echo "Creating ${DEVDIR}/shm directory failed."
+    echo "POSIX semaphores and POSIX shared memory will not work"
+    echo
+  fi
+fi
+
+# Check for ${DEVDIR}/mqueue directory (for POSIX message queues)
+
+if [ -e "${DEVDIR}/mqueue" -a ! -d "${DEVDIR}/mqueue" ]
+then
+  # No mercy.  Try to remove.
+  rm -f "${DEVDIR}/shm"
+  if [ -e "${DEVDIR}/shm" -a ! -d "${DEVDIR}/shm" ]
+  then 
+    echo
+    echo "${DEVDIR}/mqueue is existant but not a directory."
+    echo "POSIX message queues will not work"
+    echo
+  fi
+fi
+
+# Create it if necessary
+
+if [ ! -e "${DEVDIR}/mqueue" ]
+then
+  mkdir -m 1777 "${DEVDIR}/mqueue"
+  if [ ! -e "${DEVDIR}/mqueue" ]
+  then
+    echo
+    echo "Creating ${DEVDIR}/mqueue directory failed."
+    echo "POSIX message queues will not work"
+    echo
+  fi
+fi

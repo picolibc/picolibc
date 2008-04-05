@@ -1640,6 +1640,9 @@ mount_info::init ()
 
   if (from_fstab (false) | from_fstab (true))	/* The single | is correct! */
     return;
+
+  /* FIXME: Remove fetching from registry before releasing 1.7.0. */
+
   /* Fetch the mount table and cygdrive-related information from
      the registry.  */
   system_printf ("Fallback to fetching mounts from registry");
@@ -2317,6 +2320,18 @@ find_ws (char *in)
   return in;
 }
 
+inline char *
+conv_fstab_spaces (char *field)
+{
+  register char *sp = field;
+  while (sp = strstr (sp, "\\040"))
+    {
+      *sp++ = ' ';
+      memmove (sp, sp + 3, strlen (sp + 3) + 1);
+    }
+  return field;
+}
+
 struct opt
 {   
   const char *name;
@@ -2324,6 +2339,8 @@ struct opt
   bool clear;
 } oopts[] =
 {
+  {"user", MOUNT_SYSTEM, 1},
+  {"system", MOUNT_SYSTEM, 0},
   {"binary", MOUNT_BINARY, 0},
   {"text", MOUNT_BINARY, 1},
   {"exec", MOUNT_EXEC, 0},
@@ -2375,44 +2392,41 @@ mount_info::from_fstab_line (char *line, bool user)
     return true;
   char *cend = find_ws (c);
   *cend = '\0';
-  native_path = c;
+  native_path = conv_fstab_spaces (c);
   /* Second field: POSIX path. */
   c = skip_ws (cend + 1);
-  if (!*c || *c == '#')
+  if (!*c)
     return true;
   cend = find_ws (c);
   *cend = '\0';
-  posix_path = c;
+  posix_path = conv_fstab_spaces (c);
   /* Third field: FS type. */
   c = skip_ws (cend + 1);
-  if (!*c || *c == '#')
+  if (!*c)
     return true;
   cend = find_ws (c);
   *cend = '\0';
   fs_type = c;
   /* Forth field: Flags. */
   c = skip_ws (cend + 1);
-  if (!*c || *c == '#')
+  if (!*c)
     return true;
   cend = find_ws (c);
   *cend = '\0';
-  unsigned mount_flags = 0;
+  unsigned mount_flags = MOUNT_SYSTEM;
   if (!read_flags (c, mount_flags))
     return true;
   if (user)
     mount_flags &= ~MOUNT_SYSTEM;
-  else
-    mount_flags |= MOUNT_SYSTEM;
   if (!strcmp (fs_type, "cygdrive"))
     {
-      cygdrive_flags = mount_flags;
+      cygdrive_flags = mount_flags | MOUNT_CYGDRIVE;
       slashify (posix_path, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }
   else
     {
-      int res = mount_table->add_item (native_path, posix_path, mount_flags,
-				     false);
+      int res = mount_table->add_item (native_path, posix_path, mount_flags);
       if (res && get_errno () == EMFILE)
 	return false;
     }
@@ -2444,19 +2458,25 @@ mount_info::from_fstab (bool user)
       return false;
     }
 
-  /* Create a default root dir from the path the Cygwin DLL is in. */
   if (!user)
     {
+      /* Create a default root dir from the path the Cygwin DLL is in. */
       *w = L'\0';
       char *native_root = tp.c_get ();
       sys_wcstombs (native_root, NT_MAX_PATH, path);
-      mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY,
-			     false);
+      mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY);
+      /* Create a default cygdrive entry.  Note that this is a user entry.
+         This allows to override it with mount, unless the sysadmin created
+	 a cygdrive entry in /etc/fstab. */
+      cygdrive_flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
+      strcpy (cygdrive, "/cygdrive/");
+      cygdrive_len = strlen (cygdrive);
     }
 
   PWCHAR u = wcpcpy (w, L"\\etc\\fstab");
   if (user)
-    cygheap->user.get_windows_id (wcpcpy (u, L"."));
+    sys_mbstowcs (wcpcpy (u, L"."), NT_MAX_PATH - (u - path),
+		  cygheap->user.name ());
   debug_printf ("Try to read mounts from %W", path);
   HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -2506,6 +2526,7 @@ done:
 
 /* read_mounts: Given a specific regkey, read mounts from under its
    key. */
+/* FIXME: Remove before releasing 1.7.0. */
 
 void
 mount_info::read_mounts (reg_key& r)
@@ -2550,7 +2571,7 @@ mount_info::read_mounts (reg_key& r)
       mount_flags = subkey.get_int ("flags", 0);
 
       /* Add mount_item corresponding to registry mount point. */
-      res = mount_table->add_item (native_path, posix_path, mount_flags, false);
+      res = mount_table->add_item (native_path, posix_path, mount_flags);
       if (res && get_errno () == EMFILE)
 	break; /* The number of entries exceeds MAX_MOUNTS */
     }
@@ -2558,6 +2579,7 @@ mount_info::read_mounts (reg_key& r)
 
 /* from_registry: Build the entire mount table from the registry.  Also,
    read in cygdrive-related information from its registry location. */
+/* FIXME: Remove before releasing 1.7.0. */
 
 void
 mount_info::from_registry ()
@@ -2581,77 +2603,10 @@ mount_info::from_registry ()
     }
 }
 
-/* add_reg_mount: Add mount item to registry.  Return zero on success,
-   non-zero on failure. */
-/* FIXME: Need a mutex to avoid collisions with other tasks. */
-
-int
-mount_info::add_reg_mount (const char *native_path, const char *posix_path, unsigned mountflags)
-{
-  int res;
-
-  /* Add the mount to the right registry location, depending on
-     whether MOUNT_SYSTEM is set in the mount flags. */
-
-  reg_key reg (mountflags & MOUNT_SYSTEM,  KEY_ALL_ACCESS,
-	       CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-
-  /* Start by deleting existing mount if one exists. */
-  res = reg.kill (posix_path);
-  if (res != ERROR_SUCCESS && res != ERROR_FILE_NOT_FOUND)
-    {
- err:
-      __seterrno_from_win_error (res);
-      return -1;
-    }
-
-  /* Create the new mount. */
-  reg_key subkey (reg.get_key (), KEY_ALL_ACCESS, posix_path, NULL);
-
-  res = subkey.set_string ("native", native_path);
-  if (res != ERROR_SUCCESS)
-    goto err;
-  res = subkey.set_int ("flags", mountflags);
-
-  if (mountflags & MOUNT_SYSTEM)
-    {
-      sys_mount_table_counter++;
-      cygwin_shared->sys_mount_table_counter++;
-    }
-  return 0; /* Success */
-}
-
-/* del_reg_mount: delete mount item from registry indicated in flags.
-   Return zero on success, non-zero on failure.*/
-/* FIXME: Need a mutex to avoid collisions with other tasks. */
-
-int
-mount_info::del_reg_mount (const char * posix_path, unsigned flags)
-{
-  int res;
-
-  reg_key reg (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS,
-	       CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-  res = reg.kill (posix_path);
-
-  if (res != ERROR_SUCCESS)
-    {
-      __seterrno_from_win_error (res);
-      return -1;
-    }
-
-  if (flags & MOUNT_SYSTEM)
-    {
-      sys_mount_table_counter++;
-      cygwin_shared->sys_mount_table_counter++;
-    }
-
-  return 0; /* Success */
-}
-
 /* read_cygdrive_info_from_registry: Read the default prefix and flags
    to use when creating cygdrives from the special user registry
    location used to store cygdrive information. */
+/* FIXME: Remove before releasing 1.7.0. */
 
 void
 mount_info::read_cygdrive_info_from_registry ()
@@ -2685,109 +2640,54 @@ mount_info::read_cygdrive_info_from_registry ()
     }
 }
 
-/* write_cygdrive_info_to_registry: Write the default prefix and flags
-   to use when creating cygdrives to the special user registry
+/* write_cygdrive_info: Store default prefix and flags
+   to use when creating cygdrives to the special user shared mem
    location used to store cygdrive information. */
 
 int
-mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsigned flags)
+mount_info::write_cygdrive_info (const char *cygdrive_prefix, unsigned flags)
 {
   /* Verify cygdrive prefix starts with a forward slash and if there's
      another character, it's not a slash. */
   if ((cygdrive_prefix == NULL) || (*cygdrive_prefix == 0) ||
       (!isslash (cygdrive_prefix[0])) ||
       ((cygdrive_prefix[1] != '\0') && (isslash (cygdrive_prefix[1]))))
-      {
-	set_errno (EINVAL);
-	return -1;
-      }
-
-  char hold_cygdrive_prefix[strlen (cygdrive_prefix) + 1];
-  /* Ensure that there is never a final slash */
-  nofinalslash (cygdrive_prefix, hold_cygdrive_prefix);
-
-  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS,
-	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-  int res;
-  res = r.set_string (CYGWIN_INFO_CYGDRIVE_PREFIX, hold_cygdrive_prefix);
-  if (res != ERROR_SUCCESS)
     {
-      __seterrno_from_win_error (res);
+      set_errno (EINVAL);
       return -1;
     }
-  r.set_int (CYGWIN_INFO_CYGDRIVE_FLAGS, flags);
-
-  if (flags & MOUNT_SYSTEM)
-    sys_mount_table_counter = ++cygwin_shared->sys_mount_table_counter;
-
-  /* This also needs to go in the in-memory copy of "cygdrive", but only if
-     appropriate:
-       1. setting user path prefix, or
-       2. overwriting (a previous) system path prefix */
-  if (!(flags & MOUNT_SYSTEM) || (mount_table->cygdrive_flags & MOUNT_SYSTEM))
+  /* Don't allow to override a system cygdrive prefix. */
+  if (cygdrive_flags & MOUNT_SYSTEM)
     {
-      slashify (cygdrive_prefix, cygdrive, 1);
-      cygdrive_flags = flags;
-      cygdrive_len = strlen (cygdrive);
+      set_errno (EPERM);
+      return -1;
     }
 
+  slashify (cygdrive_prefix, cygdrive, 1);
+  cygdrive_flags = flags & ~MOUNT_SYSTEM;
+  cygdrive_len = strlen (cygdrive);
+
   return 0;
-}
-
-int
-mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags)
-{
-  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS,
-	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
-	     NULL);
-
-  /* Delete cygdrive prefix and flags. */
-  int res = r.killvalue (CYGWIN_INFO_CYGDRIVE_PREFIX);
-  int res2 = r.killvalue (CYGWIN_INFO_CYGDRIVE_FLAGS);
-
-  if (flags & MOUNT_SYSTEM)
-    sys_mount_table_counter = ++cygwin_shared->sys_mount_table_counter;
-
-  /* Reinitialize the cygdrive path prefix to reflect to removal from the
-     registry. */
-  read_cygdrive_info_from_registry ();
-
-  if (res == ERROR_SUCCESS)
-    res = res2;
-  if (res == ERROR_SUCCESS)
-    return 0;
-
-  __seterrno_from_win_error (res);
-  return -1;
 }
 
 int
 mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
 			       char* system_flags)
 {
-  /* Get the user path prefix from HKEY_CURRENT_USER. */
-  reg_key r (false,  KEY_READ, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-  int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, CYG_MAX_PATH, "");
-
+  if (user)
+    *user = '\0';
   /* Get the user flags, if appropriate */
-  if (user_flags && res == ERROR_SUCCESS)
-    {
-      int flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
-      strcpy (user_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
-    }
+  if (user_flags)
+    *user_flags = '\0';
 
-  /* Get the system path prefix from HKEY_LOCAL_MACHINE. */
-  reg_key r2 (true,  KEY_READ, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-  int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, CYG_MAX_PATH, "");
+  if (system)
+    strcpy (system, cygdrive);
 
-  /* Get the system flags, if appropriate */
-  if (system_flags && res2 == ERROR_SUCCESS)
-    {
-      int flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE | MOUNT_BINARY);
-      strcpy (system_flags, (flags & MOUNT_BINARY) ? "binmode" : "textmode");
-    }
+  if (system_flags)
+    strcpy (system_flags,
+	    (cygdrive_flags & MOUNT_BINARY) ? "binmode" : "textmode");
 
-  return (res != ERROR_SUCCESS) ? res : res2;
+  return 0;
 }
 
 static mount_item *mounts_for_sort;
@@ -2883,7 +2783,8 @@ mount_info::sort ()
    do this when called internally, but it's cleaner to keep it all here.  */
 
 int
-mount_info::add_item (const char *native, const char *posix, unsigned mountflags, int reg_p)
+mount_info::add_item (const char *native, const char *posix,
+		      unsigned mountflags)
 {
   tmp_pathbuf tp;
   char *nativetmp = tp.c_get ();
@@ -2929,9 +2830,17 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
   int i;
   for (i = 0; i < nmounts; i++)
     {
-      if (strcasematch (mount[i].posix_path, posixtmp) &&
-	  (mount[i].flags & MOUNT_SYSTEM) == (mountflags & MOUNT_SYSTEM))
-	break;
+      if (strcasematch (mount[i].posix_path, posixtmp))
+        {
+	  /* Don't allow to override a system mount with a user mount. */
+	  if ((mount[i].flags & MOUNT_SYSTEM) && !(mountflags & MOUNT_SYSTEM))
+	    {
+	      set_errno (EPERM);
+	      return -1;
+	    }
+	  if ((mount[i].flags & MOUNT_SYSTEM) == (mountflags & MOUNT_SYSTEM))
+	    break;
+	}
     }
 
   if (i == nmounts && nmounts == MAX_MOUNTS)
@@ -2939,9 +2848,6 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
       set_errno (EMFILE);
       return -1;
     }
-
-  if (reg_p && add_reg_mount (nativetmp, posixtmp, mountflags))
-    return -1;
 
   if (i == nmounts)
     nmounts++;
@@ -2960,7 +2866,7 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
 */
 
 int
-mount_info::del_item (const char *path, unsigned flags, int reg_p)
+mount_info::del_item (const char *path, unsigned flags)
 {
   tmp_pathbuf tp;
   char *pathtmp = tp.c_get ();
@@ -2982,23 +2888,19 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
     }
   nofinalslash (pathtmp, pathtmp);
 
-  if (reg_p && posix_path_p &&
-      del_reg_mount (pathtmp, flags) &&
-      del_reg_mount (path, flags)) /* for old irregular entries */
-    return -1;
-
   for (int i = 0; i < nmounts; i++)
     {
       int ent = native_sorted[i]; /* in the same order as getmntent() */
       if (((posix_path_p)
 	   ? strcasematch (mount[ent].posix_path, pathtmp)
-	   : strcasematch (mount[ent].native_path, pathtmp)) &&
-	  (mount[ent].flags & MOUNT_SYSTEM) == (flags & MOUNT_SYSTEM))
+	   : strcasematch (mount[ent].native_path, pathtmp)))
 	{
-	  if (!posix_path_p &&
-	      reg_p && del_reg_mount (mount[ent].posix_path, flags))
-	    return -1;
-
+	  /* Don't allow to remove a system mount. */
+	  if ((mount[ent].flags & MOUNT_SYSTEM))
+	    {
+	      set_errno (EPERM);
+	      return -1;
+	    }
 	  nmounts--; /* One less mount table entry */
 	  /* Fill in the hole if not at the end of the table */
 	  if (ent < nmounts)
@@ -3173,6 +3075,7 @@ extern "C" int
 mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
+  flags &= ~MOUNT_SYSTEM;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -3186,13 +3089,13 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       /* When flags include MOUNT_CYGDRIVE, take this to mean that
 	we actually want to change the cygdrive prefix and flags
 	without actually mounting anything. */
-      res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
+      res = mount_table->write_cygdrive_info (posix_path, flags);
       win32_path = NULL;
     }
   else if (!*win32_path)
     set_errno (EINVAL);
   else
-    res = mount_table->add_item (win32_path, posix_path, flags, true);
+    res = mount_table->add_item (win32_path, posix_path, flags);
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
   return res;
@@ -3226,17 +3129,8 @@ cygwin_umount (const char *path, unsigned flags)
 {
   int res = -1;
 
-  if (flags & MOUNT_CYGDRIVE)
-    {
-      /* When flags include MOUNT_CYGDRIVE, take this to mean that we actually want
-	 to remove the cygdrive prefix and flags without actually unmounting
-	 anything. */
-      res = mount_table->remove_cygdrive_info_from_registry (path, flags);
-    }
-  else
-    {
-      res = mount_table->del_item (path, flags, true);
-    }
+  if (!(flags & MOUNT_CYGDRIVE))
+    res = mount_table->del_item (path, flags & ~MOUNT_SYSTEM);
 
   syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
   return res;

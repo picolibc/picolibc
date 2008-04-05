@@ -1,3 +1,43 @@
+2008-04-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* postinstall: New script.
+	* Makefile.in (sysconfdir): Define.
+	(install): Create $(sysconfdir)/postinstall dir.  Install postinstall
+	script into it.
+
+	* path.cc: Add temorary comments to note later function removal.
+	(conv_fstab_spaces): New inline function to handle \040 to space
+	conversion.
+	(struct opt): Add "system" and "user" mount options.
+	(mount_info::from_fstab_line): Only allow # to start a comment at
+	the beginning of the line.  Call conv_fstab_spaces on native_path and
+	posix_path fields.  Don't enforce system mounts in /etc/fstab.
+	Drop last argument in call to add_item.
+	(mount_info::from_fstab): Create a default cygdrive entry.  Load
+	user mount points from fstab.<username> instead of fstab.<sid>.
+	(mount_info::read_mounts): Drop last argument in call to add_item.
+	(mount_info::add_reg_mount): Remove.
+	(mount_info::del_reg_mount): Remove.
+	(mount_info::write_cygdrive_info): Rename from
+	mount_info::write_cygdrive_info_to_registry.  Don't write to registry.
+	Disallow to overwrite a system cygdrive prefix.
+	(mount_info::remove_cygdrive_info_from_registry): Remove.
+	(mount_info::get_cygdrive_info): Just fetch current cygdrive prefix and
+	flags.
+	(mount_info::add_item): Drop last argument.  Don't write to registry.
+	Disallow to overwrite a system mount point.
+	(mount_info::del_item): Drop last argument.  Don't write to registry.
+	Disallow to remove a system mount point.
+	(mount): Enforce user mount.
+	(cygwin_umount): Ditto.
+	* shared_info.h (mount_info::add_item): Drop last argument.
+	(mount_info::del_item): Ditto.
+	(mount_info::add_reg_mount): Remove.
+	(mount_info::del_reg_mount): Remove.
+	(mount_info::write_cygdrive_info): Rename from
+	mount_info::write_cygdrive_info_to_registry.
+	(mount_info::remove_cygdrive_info_from_registry): Remove.
+
 2008-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (mount_info::from_fstab_line): Simplify.  Recognize special

@@ -71,15 +71,12 @@ class mount_info
 
  public:
   void init ();
-  int add_item (const char *dev, const char *path, unsigned flags, int reg_p);
-  int del_item (const char *path, unsigned flags, int reg_p);
+  int add_item (const char *dev, const char *path, unsigned flags);
+  int del_item (const char *path, unsigned flags);
 
   bool from_fstab_line (char *line, bool user);
   bool from_fstab (bool user);
   void from_registry ();
-  int add_reg_mount (const char * native_path, const char * posix_path,
-		      unsigned mountflags);
-  int del_reg_mount (const char * posix_path, unsigned mountflags);
 
   unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
@@ -90,8 +87,7 @@ class mount_info
 			  int keep_rel_p);
   struct mntent *getmntent (int x);
 
-  int write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsigned flags);
-  int remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags);
+  int write_cygdrive_info (const char *cygdrive_prefix, unsigned flags);
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);

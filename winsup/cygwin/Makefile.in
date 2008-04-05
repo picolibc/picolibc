@@ -27,6 +27,7 @@ exec_prefix:=@exec_prefix@
 bindir:=@bindir@
 libdir:=@libdir@
 mandir:=@mandir@
+sysconfdir:=@sysconfdir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -297,6 +298,8 @@ force:
 
 install: install-libs install-headers install-man install_target \
 	$(install_host) $(install_target)
+	@$(MKDIRP) $(sysconfdir)/postinstall
+	$(INSTALL_PROGRAM) $(srcdir)/postinstall $(sysconfdir)/postinstall/000-cygwin-post-install.sh
 
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
