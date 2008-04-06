@@ -70,11 +70,11 @@ then
 # with  the filesystem.  It is  formatted as a  comma separated  list  of
 # options.  It contains at least  the type of mount (binary or text) plus
 # any additional options appropriate to  the filesystem type.  Recognized
-# options are binary, text, system, user, exec, notexec, cygexec, nosuid,
+# options are binary, text, nouser, user, exec, notexec, cygexec, nosuid,
 # managed.  For a description of the options see  the user's guide.  Note
-# that  system mount  points  are  not overridable  by  a  later  call to
+# that  nouser mount  points  are  not overridable  by  a  later  call to
 # mount(2).  This is only  possible for user mount  points.  Mount points
-# are by default system mount points, unless you specify the option user.
+# are by default nouser mount points, unless you specify the option user.
 #
 # The fifth (fs_freq) and sixth (fs_passno) field  are ignored.  They are
 # so far only specified to keep a Linux-like fstab file layout.
@@ -111,8 +111,8 @@ then
 #       none /mnt cygdrive binary 0 0
 #
 
-${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary,system 0 0
-${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary,system 0 0
+${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary 0 0
+${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary 0 0
 # This is default anyway:
 # none /cygdrive cygdrive binary,user 0 0
 EOF

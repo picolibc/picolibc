@@ -2340,7 +2340,7 @@ struct opt
 } oopts[] =
 {
   {"user", MOUNT_SYSTEM, 1},
-  {"system", MOUNT_SYSTEM, 0},
+  {"nouser", MOUNT_SYSTEM, 0},
   {"binary", MOUNT_BINARY, 0},
   {"text", MOUNT_BINARY, 1},
   {"exec", MOUNT_EXEC, 0},
