@@ -11,14 +11,12 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include <sys/termios.h>
 #include <ddk/ntddser.h>
 
 /**********************************************************************/

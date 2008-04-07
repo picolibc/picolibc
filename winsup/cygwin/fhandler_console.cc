@@ -11,13 +11,10 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include <wincon.h>
 #include <winnls.h>
 #include <ctype.h>
 #include <sys/cygwin.h>

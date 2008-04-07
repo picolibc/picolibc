@@ -10,18 +10,14 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
 #include <wchar.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <assert.h>
-#include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include <winnls.h>
 #include "pinfo.h"
 #include "perprocess.h"
-#include "security.h"
 #include "path.h"
 #include "cygerrno.h"
 #include "fhandler.h"

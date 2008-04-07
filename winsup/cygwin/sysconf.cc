@@ -11,15 +11,11 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <time.h>
-#include <limits.h>
-#include <ntdef.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "ntdll.h"
 
 static long

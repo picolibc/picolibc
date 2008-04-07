@@ -10,17 +10,11 @@ details. */
 
 #include "winsup.h"
 #include "cygerrno.h"
-#include "sigproc.h"
-#include "pinfo.h"
-#include "heap.h"
 #include "shared_info.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "registry.h"
-#include "cygwin_version.h"
 #include "child_info.h"
 
 #define assert(x)

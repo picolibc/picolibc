@@ -13,7 +13,6 @@ details. */
 #include "miscfuncs.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <sys/mman.h>
 #include <sys/param.h>
 #include "cygerrno.h"
@@ -22,8 +21,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "pinfo.h"
-#include "sys/cygwin.h"
 #include "ntdll.h"
 #include <sys/queue.h>
 

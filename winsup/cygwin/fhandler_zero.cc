@@ -11,7 +11,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
 #include "security.h"
 #include "cygerrno.h"
 #include "path.h"

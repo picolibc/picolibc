@@ -9,10 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <windows.h>
-#include <sys/cygwin.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <netdb.h>
 

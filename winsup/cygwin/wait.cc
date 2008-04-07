@@ -10,8 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/wait.h>
-#include <stdlib.h>
-#include "cygerrno.h"
 #include "sigproc.h"
 #include "thread.h"
 #include "cygtls.h"

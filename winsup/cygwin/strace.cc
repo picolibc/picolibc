@@ -10,8 +10,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
-#include <time.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
@@ -19,8 +17,6 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "cygwin_version.h"
-#include "hires.h"
-#include "security.h"
 #include "cygthread.h"
 #include "path.h"
 #include "fhandler.h"

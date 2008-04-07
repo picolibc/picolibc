@@ -13,7 +13,6 @@ details. */
 
 #include "winsup.h"
 #include "cygwin/version.h"
-#include <signal.h>
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -22,9 +21,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "perprocess.h"
-#include "sigproc.h"
 #include "cygtls.h"
-#include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */
 extern "C" int

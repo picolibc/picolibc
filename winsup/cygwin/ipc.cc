@@ -12,7 +12,6 @@
    details. */
 
 #include "winsup.h"
-#include <cygwin/ipc.h>
 #include <sys/stat.h>
 
 /* Notes: we return a valid key even if id's low order 8 bits are 0. */

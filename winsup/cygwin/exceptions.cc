@@ -15,20 +15,14 @@ details. */
 #include <winuser.h>
 #include <imagehlp.h>
 #include <stdlib.h>
-#include <setjmp.h>
-#include <assert.h>
 #include <syslog.h>
 #include <wchar.h>
 
-#include "exceptions.h"
-#include "sync.h"
 #include "pinfo.h"
 #include "cygtls.h"
 #include "sigproc.h"
-#include "cygerrno.h"
 #include "shared_info.h"
 #include "perprocess.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

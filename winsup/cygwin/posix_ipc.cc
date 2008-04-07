@@ -11,22 +11,15 @@ details. */
 #include "winsup.h"
 #include "thread.h"
 #include "path.h"
-#include "cygerrno.h"
 #include "cygtls.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "security.h"
 #include "sigproc.h"
-#include <sys/stat.h>
 #include <sys/mman.h>
 #include <sys/param.h>
-#include <fcntl.h>
-#include <pwd.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <unistd.h>
-#include <stdarg.h>
 #include <mqueue.h>
 #include <semaphore.h>
 

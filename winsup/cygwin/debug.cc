@@ -8,11 +8,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <malloc.h>
-#include "sync.h"
-#include "sigproc.h"
-#include "pinfo.h"
-#include "perprocess.h"
 #include "security.h"
 #include "cygerrno.h"
 #ifdef DEBUGGING
@@ -27,7 +22,6 @@ details. */
 #ifdef DEBUGGING
 /* Here lies extra debugging routines which help track down internal
    Cygwin problems when compiled with -DDEBUGGING . */
-#include <stdlib.h>
 #define NFREEH (sizeof (cygheap->debug.freeh) / sizeof (cygheap->debug.freeh[0]))
 
 class lock_debug

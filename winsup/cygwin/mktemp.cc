@@ -6,14 +6,7 @@ See the copyright at the bottom of this file. */
 
 #include "winsup.h"
 #include "cygerrno.h"
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <unistd.h>
 
 #define link_warning(symbol, msg) \

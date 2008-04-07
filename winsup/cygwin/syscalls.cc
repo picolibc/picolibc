@@ -28,27 +28,16 @@ details. */
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
 #include <sys/statvfs.h> /* needed for statvfs */
-#include <pwd.h>
-#include <grp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <process.h>
 #include <utmp.h>
 #include <utmpx.h>
 #include <sys/uio.h>
-#include <errno.h>
 #include <ctype.h>
-#include <limits.h>
 #include <unistd.h>
-#include <setjmp.h>
 #include <sys/wait.h>
-#include <winnls.h>
-#include <wininet.h>
-#include <winioctl.h>
-#include <lmcons.h> /* for UNLEN */
 #include <rpc.h>
-#include <shellapi.h>
-#include <ntdef.h>
 #include "ntdll.h"
 
 #undef fstat
@@ -58,7 +47,6 @@ details. */
 #undef pwrite
 
 #include <cygwin/version.h>
-#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"

@@ -7,7 +7,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "dll_init.h"

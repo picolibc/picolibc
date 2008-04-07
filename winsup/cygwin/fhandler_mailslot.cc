@@ -9,17 +9,11 @@
    details. */
 
 #include "winsup.h"
-#include <unistd.h>
-#include <sys/termios.h>
 
-#include <ntdef.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
 #include "ntdll.h"
 
 /**********************************************************************/

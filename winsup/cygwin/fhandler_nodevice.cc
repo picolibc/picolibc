@@ -9,24 +9,10 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/cygwin.h>
-#include <sys/uio.h>
-#include <signal.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
-#include "cygwin/version.h"
 #include "path.h"
 #include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "shared_info.h"
-#include "pinfo.h"
-#include <assert.h>
-#include <limits.h>
 
 int
 fhandler_nodevice::open (int, mode_t)

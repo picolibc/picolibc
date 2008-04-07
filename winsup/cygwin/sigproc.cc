@@ -14,16 +14,9 @@ details. */
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <stdlib.h>
-#include <time.h>
-#include <sys/wait.h>
-#include <stdlib.h>
 #include <sys/cygwin.h>
-#include <assert.h>
-#include <sys/signal.h>
 #include "cygerrno.h"
-#include "sync.h"
 #include "pinfo.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -32,7 +25,6 @@ details. */
 #include "shared_info.h"
 #include "cygtls.h"
 #include "sigproc.h"
-#include "exceptions.h"
 #include "ntdll.h"
 
 /*

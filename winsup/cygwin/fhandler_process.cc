@@ -9,10 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
-#include <ntdef.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -25,8 +23,6 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include <sys/param.h>
-#include <assert.h>
-#include <sys/sysmacros.h>
 #include <ctype.h>
 #include <psapi.h>
 

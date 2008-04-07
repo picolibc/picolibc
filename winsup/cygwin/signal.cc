@@ -14,18 +14,14 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include "cygerrno.h"
 #include <sys/cygwin.h>
 #include "pinfo.h"
 #include "sigproc.h"
-#include "hires.h"
-#include "security.h"
 #include "cygtls.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "cygtls.h"
 
 int sigcatchers;	/* FIXME: Not thread safe. */
 

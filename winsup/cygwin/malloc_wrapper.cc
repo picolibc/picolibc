@@ -13,16 +13,11 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
-#include <assert.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygheap.h"
-#include "heap.h"
-#include "sync.h"
 #include "perprocess.h"
 #include "cygmalloc.h"
 #ifndef MALLOC_DEBUG

@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <pwd.h>
 #include <stdio.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -19,7 +18,6 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include <sys/termios.h>
 #include "pwdgrp.h"
 
 /* Read /etc/passwd only once for better performance.  This is done

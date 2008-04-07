@@ -10,10 +10,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/termios.h>
 #include <unistd.h>
 #include <winioctl.h>
-#include <asm/socket.h>
 #include <cygwin/rdevio.h>
 #include <cygwin/hdreg.h>
 #include <cygwin/fs.h>
@@ -21,7 +19,6 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
-#include <ntdef.h>
 #include "ntdll.h"
 
 #define IS_EOM(err)	((err) == ERROR_INVALID_PARAMETER \

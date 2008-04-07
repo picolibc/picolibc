@@ -12,7 +12,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdio.h>
 #include <sys/utsname.h>
 #include "cygwin_version.h"
 #include "cygtls.h"

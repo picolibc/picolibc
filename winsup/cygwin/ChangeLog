@@ -1,3 +1,7 @@
+2008-04-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Remove unneeded header files from source files throughout.
+
 2008-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* postinstall: Add function print_flags and call where appropriate.

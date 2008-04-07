@@ -10,15 +10,9 @@ details. */
 
 #define _execve __FOO_execve_
 #include "winsup.h"
-#include <unistd.h>
-#include <stdlib.h>
 #include <process.h>
 #include "cygerrno.h"
-#include "perprocess.h"
-#include "security.h"
 #include "path.h"
-#include "fhandler.h"
-#include "pinfo.h"
 #include "environ.h"
 #undef _execve
 

@@ -9,7 +9,6 @@
    details. */
 
 #include "winsup.h"
-#include <string.h>
 #include <assert.h>
 #include <stdlib.h>
 #include "cygerrno.h"
@@ -20,7 +19,6 @@
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <unistd.h>

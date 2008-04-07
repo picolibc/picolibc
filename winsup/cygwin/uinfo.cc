@@ -10,18 +10,13 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <pwd.h>
 #include <unistd.h>
-#include <winnls.h>
 #include <wininet.h>
-#include <utmp.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <lm.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "pinfo.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

@@ -13,19 +13,15 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <grp.h>
-#include <wininet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "pinfo.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
-#include "cygtls.h"
 
 static __group32 *group_buf;
 static pwdgrp gr (group_buf);

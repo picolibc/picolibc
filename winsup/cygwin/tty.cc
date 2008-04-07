@@ -13,8 +13,6 @@ details. */
 #include "miscfuncs.h"
 #include <unistd.h>
 #include <utmp.h>
-#include <wingdi.h>
-#include <winuser.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -23,9 +21,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
-#include "cygserver.h"
 #include "shared_info.h"
-#include "cygthread.h"
 
 extern fhandler_tty_master *tty_master;
 

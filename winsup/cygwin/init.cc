@@ -10,12 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
-#include "thread.h"
-#include "perprocess.h"
 #include "cygtls.h"
-#include "pinfo.h"
-#include <ntdef.h>
 #include "ntdll.h"
 
 static DWORD _my_oldfunc;

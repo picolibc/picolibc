@@ -12,14 +12,6 @@
 
 #include "winsup.h"
 #include "thread.h"
-#include "cygerrno.h"
-#include "path.h"
-#include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include <stdarg.h>
-#include <sys/fcntl.h>
-#include "cygtls.h"
 
 extern "C"
 {

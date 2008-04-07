@@ -12,20 +12,15 @@ details. */
 /* FIXME: Should this really be fhandler_pipe.cc? */
 
 #include "winsup.h"
-#include <unistd.h>
 #include <stdlib.h>
 #include <sys/socket.h>
-#include <limits.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "thread.h"
 #include "pinfo.h"
-#include "cygthread.h"
-#include "ntdll.h"
 
 fhandler_pipe::fhandler_pipe ()
   : fhandler_base (), popen_pid (0)

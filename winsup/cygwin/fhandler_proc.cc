@@ -12,8 +12,6 @@ details. */
 #include "miscfuncs.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/cygwin.h>
-#include <ntdef.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -21,7 +19,6 @@ details. */
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <assert.h>
 #include <sys/utsname.h>
 #include <sys/param.h>
 #include "ntdll.h"

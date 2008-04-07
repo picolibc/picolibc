@@ -24,30 +24,19 @@ details. */
    R.Collins, April 2001.  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
 #endif
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <limits.h>
 #include "path.h"
-#include "cygerrno.h"
-#include <assert.h>
 #include <stdlib.h>
 #include "pinfo.h"
 #include "sigproc.h"
 #include "perprocess.h"
-#include "security.h"
 #include "cygtls.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <semaphore.h>
-#include <stdio.h>
-#include <sys/timeb.h>
-#include <exceptions.h>
-#include <sys/fcntl.h>
-#include <sys/lock.h>
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();

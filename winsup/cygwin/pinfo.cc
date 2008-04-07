@@ -12,9 +12,6 @@ details. */
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <stdlib.h>
-#include <time.h>
-#include <limits.h>
-#include <stdarg.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -22,16 +19,12 @@ details. */
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "cygwin_version.h"
 #include "perprocess.h"
 #include "environ.h"
 #include <assert.h>
-#include <sys/wait.h>
-#include <ntdef.h>
 #include "ntdll.h"
 #include "shared_info.h"
 #include "cygheap.h"
-#include "fhandler.h"
 #include "cygmalloc.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
@@ -1056,7 +1049,6 @@ cygwin_winpid_to_pid (int winpid)
   return (pid_t) -1;
 }
 
-#include <tlhelp32.h>
 
 #define slop_pidlist 200
 #define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))

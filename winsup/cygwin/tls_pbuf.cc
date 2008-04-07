@@ -8,7 +8,6 @@ details. */
 
 #include <winsup.h>
 #include <malloc.h>
-#include "thread.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
 

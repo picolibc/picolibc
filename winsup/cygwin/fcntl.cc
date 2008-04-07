@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdarg.h>
 #include <unistd.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -17,7 +16,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "thread.h"
 #include "cygtls.h"
 
 extern "C" int

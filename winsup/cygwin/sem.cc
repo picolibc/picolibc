@@ -9,17 +9,11 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "cygerrno.h"
-#include <signal.h>
 #ifdef USE_SERVER
-#include <sys/types.h>
-#include <stdio.h>
 #include <unistd.h>
-#include <stdarg.h>
 
 #include "sigproc.h"
 
-#include "cygserver_ipc.h"
 #include "cygserver_sem.h"
 #include "cygtls.h"
 

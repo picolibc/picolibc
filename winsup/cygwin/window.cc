@@ -12,18 +12,11 @@ details. */
 
 #include "winsup.h"
 #include <sys/time.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
-#include <unistd.h>
-#include "cygerrno.h"
 #include "perprocess.h"
-#include "security.h"
-#include "thread.h"
 #include "cygtls.h"
 #include "sync.h"
 #include "wininfo.h"

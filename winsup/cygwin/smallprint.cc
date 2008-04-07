@@ -11,12 +11,9 @@ details. */
 
 #include "winsup.h"
 #include "ntdll.h"
-#include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <wctype.h>
 #include <wchar.h>
-#include <limits.h>
 
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)

@@ -33,7 +33,6 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
 #ifdef __CYGWIN
 __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/glob.c,v 1.25 2006/06/05 18:22:13 delphij Exp $");
 #endif
@@ -75,19 +74,12 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/glob.c,v 1.25 2006/06/05 18
 
 #include "winsup.h"
 
-#include <sys/param.h>
-#include <sys/stat.h>
 
 #include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
 #include <glob.h>
-#include <limits.h>
 #include <pwd.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <wchar.h>
 

@@ -9,9 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <unistd.h>
 #include <stdlib.h>
-#include <sys/cygwin.h>
 #include <sys/acl.h>
 #include <sys/statvfs.h>
 #include "cygerrno.h"
@@ -19,9 +17,7 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "shared_info.h"
 #include "cygheap.h"
-#include <assert.h>
 
 #include <dirent.h>
 

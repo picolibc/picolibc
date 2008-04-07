@@ -13,7 +13,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -27,10 +26,7 @@ details. */
 #include "tls_pbuf.h"
 #include "perprocess.h"
 #include "dll_init.h"
-#include "sync.h"
-#include "shared_info.h"
 #include "cygmalloc.h"
-#include "cygthread.h"
 
 #define NPIDS_HELD 4
 

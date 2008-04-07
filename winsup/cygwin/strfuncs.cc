@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <winbase.h>
 #include <winnls.h>
 #include <ntdll.h>
 #include "cygerrno.h"

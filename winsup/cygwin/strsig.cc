@@ -9,11 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "thread.h"
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
 #include <cygtls.h>
 
 struct sigdesc

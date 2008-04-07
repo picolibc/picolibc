@@ -11,16 +11,12 @@ details. */
 /* FIXME: Access permissions are ignored at the moment.  */
 
 #include "winsup.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <assert.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>

@@ -5,11 +5,7 @@
    As long as the above copyright statement and this notice remain
    unchanged, you can do what ever you want with this file.  */
 
-#include <sys/types.h>
-#include <sys/cdefs.h>
-#include <search.h>
 #include <stdint.h>	/* for uint8_t */
-#include <stdlib.h>	/* for NULL */
 #include <string.h>	/* for memcpy () prototype */
 
 static void *lwork (const void *, const void *, size_t *, size_t,

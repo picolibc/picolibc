@@ -12,13 +12,8 @@ details. */
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <grp.h>
-#include <pwd.h>
 #include "cygerrno.h"
 #include "pinfo.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -27,7 +22,6 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
-#include "child_info.h"
 #include "mtinfo.h"
 
 static shared_info cygwin_shared_area __attribute__((section (".cygwin_dll_common"), shared));

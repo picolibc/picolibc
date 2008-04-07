@@ -15,15 +15,11 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
-#include <sys/socket.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include <wingdi.h>
 #include <winuser.h>
 #include <netdb.h>
-#include <unistd.h>
-#include <limits.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
 #include "cygerrno.h"
@@ -34,10 +30,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "sigproc.h"
-#include "tty.h"
-#include "ntdll.h"
 #include "cygtls.h"
-#include <asm/byteorder.h>
 
 /*
  * All these defines below should be in sys/types.h

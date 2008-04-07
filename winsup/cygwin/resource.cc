@@ -14,8 +14,6 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <limits.h>
-#include "cygerrno.h"
 #include "pinfo.h"
 #include "psapi.h"
 #include "cygtls.h"

@@ -11,11 +11,9 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <stdarg.h>
 #include <unistd.h>
 #include <process.h>
 #include <sys/wait.h>
-#include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <wchar.h>
@@ -29,9 +27,7 @@ details. */
 #include "sigproc.h"
 #include "cygheap.h"
 #include "child_info.h"
-#include "shared_info.h"
 #include "pinfo.h"
-#include "registry.h"
 #include "environ.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"

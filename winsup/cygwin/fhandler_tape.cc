@@ -11,14 +11,10 @@ details. */
 
 #include "winsup.h"
 #include "cygtls.h"
-#include <sys/termios.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <sys/mtio.h>
 #include <sys/param.h>
 #include <ddk/ntddstor.h>
-#include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"

@@ -10,7 +10,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "shared_info.h"
 #include "registry.h"
 #include "security.h"
 #include <cygwin/version.h>

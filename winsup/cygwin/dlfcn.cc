@@ -10,18 +10,11 @@ details. */
 
 #include "winsup.h"
 #include <psapi.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
-#include "cygerrno.h"
-#include "security.h"
 #include "path.h"
-#include "fhandler.h"
 #include "perprocess.h"
-#include "thread.h"
 #include "dlfcn.h"
-#include "dll_init.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
 

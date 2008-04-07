@@ -10,14 +10,11 @@ details. */
 
 #include "winsup.h"
 #include "cygtls.h"
-#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "pinfo.h"
 #include "cygheap.h"
-#include <ntdef.h>
 #include "ntdll.h"
 #include <stdlib.h>
 #include <attr/xattr.h>

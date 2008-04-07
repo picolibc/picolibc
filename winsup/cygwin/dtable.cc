@@ -16,9 +16,6 @@ details. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/cygwin.h>
-#include <assert.h>
-#include <winnls.h>
 #include <wchar.h>
 
 #define USE_SYS_TYPES_FD_SET
@@ -26,7 +23,6 @@ details. */
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "perprocess.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

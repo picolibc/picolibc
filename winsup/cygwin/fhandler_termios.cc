@@ -9,9 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/termios.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 #include "cygerrno.h"
 #include "security.h"

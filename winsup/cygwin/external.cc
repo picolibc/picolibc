@@ -12,21 +12,16 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "security.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include <exceptions.h>
 #include "shared_info.h"
 #include "cygwin_version.h"
-#include "perprocess.h"
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "wincap.h"
 #include "heap.h"
-#include "pwdgrp.h"
 #include "cygtls.h"
 #include "child_info.h"
 #include "environ.h"

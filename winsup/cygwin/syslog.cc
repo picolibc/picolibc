@@ -15,17 +15,14 @@ details. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <syslog.h>
-#include <stdarg.h>
 #include <unistd.h>
 #include <sys/un.h>
-#include <sys/uio.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "thread.h"
 #include "cygtls.h"
 
 #define CYGWIN_LOG_NAME "Cygwin"

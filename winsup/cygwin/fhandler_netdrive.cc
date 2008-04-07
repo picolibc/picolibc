@@ -9,18 +9,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <unistd.h>
 #include <stdlib.h>
-#include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "sigproc.h"
 #include "cygthread.h"
-#include <assert.h>
 #include <winnetwk.h>
 
 #include <dirent.h>

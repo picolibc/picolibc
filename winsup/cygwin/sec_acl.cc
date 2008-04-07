@@ -19,7 +19,6 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "pinfo.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
 

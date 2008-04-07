@@ -11,17 +11,11 @@
    details. */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
 #endif
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <limits.h>
 #include "cygerrno.h"
-#include <assert.h>
-#include <stdlib.h>
-#include <syslog.h>
-#include <sched.h>
 #include "pinfo.h"
 /* for getpid */
 #include <unistd.h>

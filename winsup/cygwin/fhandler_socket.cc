@@ -13,9 +13,7 @@
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
-#include <sys/socket.h>
 #include <sys/un.h>
-#include <sys/uio.h>
 #include <asm/byteorder.h>
 
 #include <stdlib.h>
@@ -32,11 +30,9 @@
 #include "cygheap.h"
 #include "shared_info.h"
 #include "sigproc.h"
-#include "cygthread.h"
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/acl.h>
-#include <sys/statvfs.h>
 #include "cygtls.h"
 #include "cygwin/in6.h"
 #include "ntdll.h"

@@ -10,7 +10,6 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "sync.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

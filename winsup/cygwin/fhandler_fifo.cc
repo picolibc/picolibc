@@ -10,19 +10,13 @@
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <errno.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/statvfs.h>
 
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
 

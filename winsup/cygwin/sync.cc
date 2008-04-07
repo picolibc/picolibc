@@ -16,13 +16,7 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <stdlib.h>
-#include <time.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include <stdlib.h>
 #include "sync.h"
-#include "security.h"
 #include "thread.h"
 #include "cygtls.h"
 

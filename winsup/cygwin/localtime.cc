@@ -7,7 +7,6 @@
 #include "winsup.h"
 #include "cygerrno.h"
 #include "sync.h"
-#include <windows.h>
 #define STD_INSPIRED
 #define lint
 
@@ -95,14 +94,11 @@ static char	privatehid[] = "@(#)private.h	7.48";
 ** Nested includes
 */
 
-#include "sys/types.h"	/* for time_t */
 #include "stdio.h"
 #include "limits.h"	/* for CHAR_BIT */
-#include "time.h"
 #include "stdlib.h"
 
 #if HAVE_GETTEXT - 0
-#include "libintl.h"
 #endif /* HAVE_GETTEXT - 0 */
 
 #if HAVE_UNISTD_H - 0
@@ -172,7 +168,6 @@ static char	privatehid[] = "@(#)private.h	7.48";
 
 #ifndef MAXPATHLEN
 #ifdef unix
-#include "sys/param.h"
 #endif /* defined unix */
 #endif /* !defined MAXPATHLEN */
 

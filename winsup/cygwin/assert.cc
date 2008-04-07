@@ -15,7 +15,6 @@ details. */
 
 #include <assert.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 /* This function is called when the assert macro fails.  This will
    override the function of the same name in newlib.  */

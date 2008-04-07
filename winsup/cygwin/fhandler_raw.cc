@@ -9,20 +9,13 @@
    details. */
 
 #include "winsup.h"
-#include <sys/termios.h>
-#include <unistd.h>
 
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
-#include <ntdef.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "ntdll.h"
 
 /**********************************************************************/
 /* fhandler_dev_raw */

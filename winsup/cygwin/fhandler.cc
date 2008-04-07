@@ -12,11 +12,8 @@ details. */
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/cygwin.h>
 #include <sys/uio.h>
 #include <sys/acl.h>
-#include <sys/statvfs.h>
-#include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
@@ -25,12 +22,9 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "shared_info.h"
 #include "pinfo.h"
 #include <assert.h>
-#include <limits.h>
 #include <winioctl.h>
-#include <ntdef.h>
 #include "ntdll.h"
 #include "cygtls.h"
 #include "sigproc.h"

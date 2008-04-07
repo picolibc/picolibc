@@ -12,15 +12,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/ioctl.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sigproc.h"
-#include <sys/termios.h>
 
 extern "C" int
 ioctl (int fd, int cmd, ...)

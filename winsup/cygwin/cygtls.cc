@@ -7,23 +7,15 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/time.h>
 #define USE_SYS_TYPES_FD_SET
-#include <winsock.h>
 #include "thread.h"
 #include "cygtls.h"
-#include "assert.h"
 #include <syslog.h>
-#include <signal.h>
 #include <malloc.h>
-#include "exceptions.h"
-#include "sync.h"
-#include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "pinfo.h"
 #include "sigproc.h"
 
 class sentry

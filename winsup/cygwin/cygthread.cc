@@ -8,12 +8,7 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <windows.h>
 #include <stdlib.h>
-#include "exceptions.h"
-#include "security.h"
-#include "sync.h"
-#include "cygerrno.h"
 #include "sigproc.h"
 #include "thread.h"
 #include "cygtls.h"

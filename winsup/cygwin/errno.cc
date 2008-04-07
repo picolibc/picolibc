@@ -13,9 +13,6 @@ details. */
 #define sys_nerr FOOsys_nerr
 #define _sys_errlist FOO_sys_errlist
 #include "winsup.h"
-#include <stdio.h>
-#include "cygerrno.h"
-#include "thread.h"
 #include "cygtls.h"
 #undef _sys_nerr
 #undef sys_nerr

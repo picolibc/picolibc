@@ -17,9 +17,6 @@ details. */
 #include "miscfuncs.h"
 #include <ctype.h>
 #include <wchar.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <syslog.h>
 
 #include <stdlib.h>
 #define gethostname cygwin_gethostname
@@ -39,7 +36,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "pinfo.h"
 #include "registry.h"
 #include "cygtls.h"
 #include "cygwin/in6.h"

@@ -10,8 +10,6 @@
 
 #include "winsup.h"
 #include <unistd.h>
-#include <sys/mman.h>
-#include <ntdef.h>
 
 #include "cygerrno.h"
 #include "security.h"

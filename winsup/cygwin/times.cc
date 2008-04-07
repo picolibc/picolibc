@@ -11,13 +11,10 @@ details. */
 
 #include "winsup.h"
 #define __timezonefunc__
-#include <time.h>
 #include <sys/times.h>
 #include <sys/timeb.h>
 #include <utime.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -25,10 +22,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
-#include "hires.h"
 #include "cygtls.h"
-#include "sigproc.h"
-#include "sync.h"
 #include "ntdll.h"
 
 #define FACTOR (0x19db1ded53e8000LL)

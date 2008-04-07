@@ -9,9 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <imagehlp.h>
 #include <stdlib.h>
-#include <alloca.h>
 #include "ntdll.h"
 #include "cygerrno.h"
 #include "security.h"
@@ -19,7 +17,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "pinfo.h"
 
 #define rva(coerce, base, addr) (coerce) ((char *) (base) + (addr))
 #define rvacyg(coerce, addr) rva (coerce, cygwin_hmodule, addr)

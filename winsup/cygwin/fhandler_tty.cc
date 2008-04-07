@@ -10,13 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <wingdi.h>
-#include <winuser.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <limits.h>
 #include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
