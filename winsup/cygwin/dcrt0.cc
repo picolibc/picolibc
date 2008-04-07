@@ -10,23 +10,16 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "glob.h"
-#include "exceptions.h"
 #include <ctype.h>
-#include <limits.h>
-#include <winnls.h>
-#include <wingdi.h>
-#include <winuser.h>
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perprocess.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -36,9 +29,7 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
-#include "sync.h"
 #include "heap.h"
-#include "environ.h"
 #include "tls_pbuf.h"
 
 #define MAX_AT_FILE_LEVEL 10
@@ -116,9 +107,9 @@ extern "C"
 #ifdef DEBUGGING
   int pinger;
 #endif
-  int NO_COPY __api_fatal_exit_val = 1;
 };
 
+int NO_COPY __api_fatal_exit_val = 1;
 char *old_title;
 char title_buf[TITLESIZE + 1];
 

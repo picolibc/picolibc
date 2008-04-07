@@ -1,7 +1,7 @@
 /* cygwin/config.h header file for Cygwin.
 
    This wraps Cygwin configuration setting which were in newlib's
-   sys/config.h before.  THis way we can manaage our configuration
+   sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
    Copyright 2003 Red Hat, Inc.

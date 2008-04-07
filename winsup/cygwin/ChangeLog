@@ -1,3 +1,17 @@
+2008-04-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Add miscfuncs.h to files as needed throughout.
+	* mount.cc: New file.
+	* path.cc: Move mount-specific stuff into mount.cc.  Move common stuff
+	into miscfuncs.cc.  Remove unneeded includes.
+	* miscfuncs.cc: Move some common path functions here.
+	* miscfuncs.h: New file.
+	* winsup.h: Move miscelleneous functions to miscfuncs.h.
+	* dcrt0.cc: Remove unneeded includes.
+	* Makefile.in (DLL_OFILES): Add mount.o.
+
+	* include/cygwin/config.h: Fix a minor typo.
+
 2008-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* postinstall: Set IFS to LF only.  Change while loop in subshell to 

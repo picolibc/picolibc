@@ -9,6 +9,7 @@
    details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>

@@ -7,6 +7,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <windows.h>
 #include <stdlib.h>
 #include "exceptions.h"

@@ -15,6 +15,7 @@
 #endif
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <limits.h>
 #include "cygerrno.h"
 #include <assert.h>

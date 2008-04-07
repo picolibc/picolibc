@@ -45,8 +45,8 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern __uid32_t getuid32 (void);
-extern __uid32_t geteuid32 (void);
+extern __uid32_t getuid32 ();
+extern __uid32_t geteuid32 ();
 extern int seteuid32 (__uid32_t);
 extern __gid32_t getegid32 (void);
 extern struct passwd *getpwuid32 (__uid32_t);
@@ -119,9 +119,6 @@ extern UINT active_codepage;
 
 void codepage_init (const char *buf);
 UINT get_cp ();
-bool is_cp_multibyte (UINT cp);
-const unsigned char *next_char (UINT cp, const unsigned char *str,
-				const unsigned char *end);
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */
@@ -296,14 +293,8 @@ void init_console_handler (bool);
 
 void init_global_security ();
 
-int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
-
-ssize_t check_iovec (const struct iovec *, int, bool) __attribute__ ((regparm(3)));
-#define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
-#define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
-
-#define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
+#define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 
 extern bool wsock_started;
 
@@ -328,9 +319,6 @@ int __stdcall stat_worker (path_conv &pc, struct __stat64 *buf) __attribute__ ((
 
 __ino64_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));
 
-extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
-#define SLEEP_0_STAY_LOW INFINITE
-
 /* Returns the real page size, not the allocation size. */
 size_t getsystempagesize ();
 
@@ -342,13 +330,6 @@ enum mmap_region_status
     MMAP_NORESERVE_COMMITED
   };
 mmap_region_status mmap_is_attached_or_noreserve (void *addr, size_t len);
-
-int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
-DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
-
-bool __stdcall create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
-  __attribute__ ((regparm (3)));
-#define CreatePipe create_pipe
 
 inline bool flush_file_buffers (HANDLE h)
 {

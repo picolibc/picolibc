@@ -28,6 +28,7 @@ details. */
 #endif
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <limits.h>
 #include "path.h"
 #include "cygerrno.h"

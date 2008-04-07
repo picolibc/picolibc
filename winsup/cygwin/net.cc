@@ -14,6 +14,7 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <ctype.h>
 #include <wchar.h>
 #include <sys/socket.h>

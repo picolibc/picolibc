@@ -15,6 +15,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <stdlib.h>
 #include <time.h>
 #include <sys/wait.h>

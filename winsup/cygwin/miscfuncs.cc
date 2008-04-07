@@ -10,8 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "cygerrno.h"
-#include <sys/errno.h>
+#include "miscfuncs.h"
 #include <sys/uio.h>
 #include <assert.h>
 #include <alloca.h>
@@ -20,7 +19,6 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <winnls.h>
-#include "cygthread.h"
 #include "cygtls.h"
 #include "ntdll.h"
 
@@ -499,4 +497,52 @@ create_pipe (PHANDLE hr,PHANDLE hw, LPSECURITY_ATTRIBUTES sa, DWORD n)
     else
       break;
   return false;
+}
+
+/* backslashify: Convert all forward slashes in src path to back slashes
+   in dst path.  Add a trailing slash to dst when trailing_slash_p arg
+   is set to 1. */
+
+void
+backslashify (const char *src, char *dst, bool trailing_slash_p)
+{
+  const char *start = src;
+
+  while (*src)
+    {
+      if (*src == '/')
+	*dst++ = '\\';
+      else
+	*dst++ = *src;
+      ++src;
+    }
+  if (trailing_slash_p
+      && src > start
+      && !isdirsep (src[-1]))
+    *dst++ = '\\';
+  *dst++ = 0;
+}
+
+/* slashify: Convert all back slashes in src path to forward slashes
+   in dst path.  Add a trailing slash to dst when trailing_slash_p arg
+   is set to 1. */
+
+void
+slashify (const char *src, char *dst, bool trailing_slash_p)
+{
+  const char *start = src;
+
+  while (*src)
+    {
+      if (*src == '\\')
+	*dst++ = '/';
+      else
+	*dst++ = *src;
+      ++src;
+    }
+  if (trailing_slash_p
+      && src > start
+      && !isdirsep (src[-1]))
+    *dst++ = '/';
+  *dst++ = 0;
 }

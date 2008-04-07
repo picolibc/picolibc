@@ -9,8 +9,11 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+
+bool NO_COPY wsock_started;
 
 /* Macro for defining "auto-load" functions.
  * Note that this is self-modifying code *gasp*.
@@ -243,7 +246,6 @@ std_dll_init ()
 }
 
 /* Initialization function for winsock stuff. */
-bool NO_COPY wsock_started = 0;
 WSADATA NO_COPY wsadata;
 __attribute__ ((used, noinline, regparm(1))) static long long
 wsock_init ()

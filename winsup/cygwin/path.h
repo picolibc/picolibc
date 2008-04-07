@@ -331,6 +331,9 @@ bool fnunmunge (char *, const char *) __attribute__ ((regparm (2)));
 int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
 
 bool is_floppy (const char *);
+int normalize_win32_path (const char *, char *, char *&);
+int normalize_posix_path (const char *, char *, char *&);
+PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING&, bool);
 
 /* FIXME: Move to own include file eventually */
 

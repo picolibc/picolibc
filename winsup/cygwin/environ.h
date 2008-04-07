@@ -40,7 +40,7 @@ char * __stdcall getwinenveq (const char *name, size_t len, int)
   __attribute__ ((regparm (3)));
 
 void __stdcall update_envptrs ();
-extern char **__cygwin_environ, ***main_environ;
+extern "C" char **__cygwin_environ, ***main_environ;
 extern "C" char __stdcall **cur_environ ();
 char ** __stdcall build_env (const char * const *envp, PWCHAR &envblock,
 			     int &envc, bool need_envblock)

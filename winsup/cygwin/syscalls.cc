@@ -24,6 +24,7 @@ details. */
 #define pwrite __FOO_pwrite
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
 #include <sys/statvfs.h> /* needed for statvfs */
