@@ -1,3 +1,8 @@
+2008-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* postinstall: Add function print_flags and call where appropriate.
+	Omit system and cygdrive flag when testing cygdrive flags.
+
 2008-04-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Add miscfuncs.h to files as needed throughout.

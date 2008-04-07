@@ -12,6 +12,15 @@ export PATH="/bin:$PATH"
 
 DEVDIR=/dev
 
+print_flags ()
+{
+  (( $1 & 0x0002 )) && echo -n "binary" || echo -n "text"
+  (( $1 & 0x0010 )) && echo -n ",exec"
+  (( $1 & 0x0040 )) && echo -n ",cygexec"
+  (( $1 & 0x0100 )) && echo -n ",notexec"
+  (( $1 & 0x0800 )) && echo -n ",managed"
+}
+
 # Create fstab file if it doesn't exist.
 if [ -e "/etc/fstab" -a ! -f "/etc/fstab" ]
 then
@@ -130,11 +139,7 @@ EOF
       psx="${subkey// /\\040}"
       flags=$(regtool -q get "$key\\$subkey\flags")
       echo -n "${nat} ${psx} some_fs "
-      (( $flags & 0x0002 )) && echo -n "binary" || echo -n "text"
-      (( $flags & 0x0010 )) && echo -n ",exec"
-      (( $flags & 0x0040 )) && echo -n ",cygexec"
-      (( $flags & 0x0100 )) && echo -n ",notexec"
-      (( $flags & 0x0800 )) && echo -n ",managed"
+      print_flags $flags
       echo " 0 0"
     fi >> /etc/fstab
   done
@@ -145,17 +150,14 @@ EOF
 
   cygd=""
   prefix=$(regtool -q get "$key\cygdrive prefix")
-  flags=$(regtool -q get "$key\cygdrive flags")
-  if [ -n "$prefix" -a \( "$prefix" != "/cygdrive" -o "$flags" -ne 42 \) ]
+  # Don't take system and cygdrive flags into account when testing
+  if [ -n "$prefix" \
+       -a \( "$prefix" != "/cygdrive" \ -o "$(( $flags & ~0x28 ))" -ne 2 \) ]
   then
     cygd="1"
     psx="${prefix// /\\040}"
     echo -n "none ${psx} cygdrive "
-    (( $flags & 0x0002 )) && echo -n "binary" || echo -n "text"
-    (( $flags & 0x0010 )) && echo -n ",exec"
-    (( $flags & 0x0040 )) && echo -n ",cygexec"
-    (( $flags & 0x0100 )) && echo -n ",notexec"
-    (( $flags & 0x0800 )) && echo -n ",managed"
+    print_flags $flags
     echo ",user 0 0"
   fi >> /etc/fstab
 
