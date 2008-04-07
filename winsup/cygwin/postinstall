@@ -29,19 +29,21 @@ fi
 
 if [ ! -e "/etc/fstab" ]
 then
-  mount |
-  (
-    while read -r line
-    do
-      [[ "$line" =~ ([^ ]*)\ on\ ([^ ]*)\ type\ ([^ ]*)\ .* ]]
-      if [ "${BASH_REMATCH[2]}" = "/" ]
-      then
-	CYGROOT="${BASH_REMATCH[1]}"
-	FS_TYPE="${BASH_REMATCH[3]}"
-	break
-      fi
-    done
-    cat > /etc/fstab << EOF
+  # Set IFS to just a LF
+  _OLD_IFS="$IFS"
+  IFS="
+"
+  for line in $(mount)
+  do
+    [[ "$line" =~ ([^ ]*)\ on\ ([^ ]*)\ type\ ([^ ]*)\ .* ]]
+    if [ "${BASH_REMATCH[2]}" = "/" ]
+    then
+      CYGROOT="${BASH_REMATCH[1]}"
+      FS_TYPE="${BASH_REMATCH[3]}"
+      break
+    fi
+  done
+  cat > /etc/fstab << EOF
 # The  file fstab contains descriptive information about the various file
 # systems.  fstab is only read by programs, and not written;  it  is  the
 # duty  of  the system administrator to properly create and maintain this
@@ -111,12 +113,58 @@ then
 #       none /mnt cygdrive binary 0 0
 #
 
-${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary 0 0
-${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary 0 0
-# This is default anyway:
-# none /cygdrive cygdrive binary,user 0 0
 EOF
-  )
+
+  usr_bin=""
+  usr_lib=""
+  key='\HKLM\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2'
+  for subkey in $(regtool -q list "$key")
+  do
+    if [[ "$subkey" =~ /.* ]]
+    then
+      [ "$subkey" = "/usr/bin" ] && usr_bin="1"
+      [ "$subkey" = "/usr/lib" ] && usr_lib="1"
+      nat=$(regtool -q get "$key\\$subkey\native")
+      nat="${nat//\\//}"
+      nat="${nat// /\\040}"
+      psx="${subkey// /\\040}"
+      flags=$(regtool -q get "$key\\$subkey\flags")
+      echo -n "${nat} ${psx} some_fs "
+      (( $flags & 0x0002 )) && echo -n "binary" || echo -n "text"
+      (( $flags & 0x0010 )) && echo -n ",exec"
+      (( $flags & 0x0040 )) && echo -n ",cygexec"
+      (( $flags & 0x0100 )) && echo -n ",notexec"
+      (( $flags & 0x0800 )) && echo -n ",managed"
+      echo " 0 0"
+    fi >> /etc/fstab
+  done
+  [ -z "$usr_bin" ] &&
+    echo "${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary 0 0" >> /etc/fstab
+  [ -z "$usr_lib" ] &&
+    echo "${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary 0 0" >> /etc/fstab
+
+  cygd=""
+  prefix=$(regtool -q get "$key\cygdrive prefix")
+  flags=$(regtool -q get "$key\cygdrive flags")
+  if [ -n "$prefix" -a \( "$prefix" != "/cygdrive" -o "$flags" -ne 42 \) ]
+  then
+    cygd="1"
+    psx="${prefix// /\\040}"
+    echo -n "none ${psx} cygdrive "
+    (( $flags & 0x0002 )) && echo -n "binary" || echo -n "text"
+    (( $flags & 0x0010 )) && echo -n ",exec"
+    (( $flags & 0x0040 )) && echo -n ",cygexec"
+    (( $flags & 0x0100 )) && echo -n ",notexec"
+    (( $flags & 0x0800 )) && echo -n ",managed"
+    echo ",user 0 0"
+  fi >> /etc/fstab
+
+  if [ -z "$cygd" ]
+  then
+    echo "# This is default anyway:" >> /etc/fstab
+    echo "# none /cygdrive cygdrive binary,user 0 0" >> /etc/fstab
+  fi
+  IFS="$_OLD_IFS"
 fi
 
 # Check for ${DEVDIR} directory

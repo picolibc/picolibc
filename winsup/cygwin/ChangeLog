@@ -1,3 +1,9 @@
+2008-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* postinstall: Set IFS to LF only.  Change while loop in subshell to 
+	for loop in parent shell.  Add code to read system mount points and
+	system cygdrive prefix from registry and append them to /etc/fstab.
+
 2008-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (struct opt): Rename "system" to "nouser".
