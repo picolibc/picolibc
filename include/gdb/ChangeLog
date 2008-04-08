@@ -1,3 +1,7 @@
+2008-02-12  M Ranga Swami Reddy <MR.Swami.Reddy@nsc.com>
+
+	* sim-cr16.h: New file.
+
 2008-01-01  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Updated copyright notices for most files.
