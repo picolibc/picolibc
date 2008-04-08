@@ -1,3 +1,7 @@
+2008-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* postinstall: Disable adding registry mounts to /etc/fstab for now.
+
 2008-04-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Remove unneeded header files from source files throughout.
