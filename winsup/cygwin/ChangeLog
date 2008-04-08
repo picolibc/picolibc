@@ -1,5 +1,12 @@
 2008-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::from_fstab): Read user fstab files from
+	/etc/fstab.d/$USER to avoid user write access to /etc.
+	* postinstall: Use variables for filenames.  Create /etc/fstab.d dir
+	with 01777 permissions.
+
+2008-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* postinstall: Disable adding registry mounts to /etc/fstab for now.
 
 2008-04-07  Christopher Faylor  <me+cygwin@cgf.cx>

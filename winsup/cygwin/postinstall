@@ -10,6 +10,10 @@
 #
 export PATH="/bin:$PATH"
 
+SYSCONFDIR=/etc
+FSTAB="${SYSCONFDIR}/fstab"
+FSTABDIR="${SYSCONFDIR}/fstab.d"
+
 DEVDIR=/dev
 
 print_flags ()
@@ -22,21 +26,21 @@ print_flags ()
 }
 
 # Create fstab file if it doesn't exist.
-if [ -e "/etc/fstab" -a ! -f "/etc/fstab" ]
+if [ -e "${FSTAB}" -a ! -f "${FSTAB}" ]
 then
   # Try to move
-  mv -f "/etc/fstab" "/etc/fstab.orig"
-  if [ -e "/etc/fstab" -a ! -f "/etc/fstab" ]
+  mv -f "${FSTAB}" "${FSTAB}.orig"
+  if [ -e "${FSTAB}" -a ! -f "${FSTAB}" ]
   then
     echo
-    echo "/etc/fstab is existant but not a file."
+    echo "${FSTAB} is existant but not a file."
     echo "Since this file is specifying the mount points, this might"
     echo "result in unexpected trouble.  Please fix that manually."
     echo
   fi
 fi
 
-if [ ! -e "/etc/fstab" ]
+if [ ! -e "${FSTAB}" ]
 then
   # Set IFS to just a LF
   _OLD_IFS="$IFS"
@@ -52,7 +56,7 @@ then
       break
     fi
   done
-  cat > /etc/fstab << EOF
+  cat > ${FSTAB} << EOF
 # The  file fstab contains descriptive information about the various file
 # systems.  fstab is only read by programs, and not written;  it  is  the
 # duty  of  the system administrator to properly create and maintain this
@@ -144,12 +148,12 @@ EOF
   #    echo -n "${nat} ${psx} some_fs "
   #    print_flags $flags
   #    echo " 0 0"
-  #  fi >> /etc/fstab
+  #  fi >> ${FSTAB}
   #done
   #[ -z "$usr_bin" ] &&
-    echo "${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary 0 0" >> /etc/fstab
+    echo "${CYGROOT//\\//}/bin /usr/bin ${FS_TYPE} binary 0 0" >> ${FSTAB}
   #[ -z "$usr_lib" ] &&
-    echo "${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary 0 0" >> /etc/fstab
+    echo "${CYGROOT//\\//}/lib /usr/lib ${FS_TYPE} binary 0 0" >> ${FSTAB}
 
   #cygd=""
   #prefix=$(regtool -q get "$key\cygdrive prefix")
@@ -162,14 +166,45 @@ EOF
   #  echo -n "none ${psx} cygdrive "
   #  print_flags $flags
   #  echo ",user 0 0"
-  #fi >> /etc/fstab
+  #fi >> ${FSTAB}
 
   #if [ -z "$cygd" ]
   #then
-    echo "# This is default anyway:" >> /etc/fstab
-    echo "# none /cygdrive cygdrive binary,user 0 0" >> /etc/fstab
+    echo "# This is default anyway:" >> ${FSTAB}
+    echo "# none /cygdrive cygdrive binary,user 0 0" >> ${FSTAB}
   #fi
   IFS="$_OLD_IFS"
+fi
+
+# Check for ${FSTABDIR} directory
+
+if [ -e "${FSTABDIR}" -a ! -d "${FSTABDIR}" ]
+then 
+  # No mercy.  Try to remove.
+  rm -f "${FSTABDIR}"
+  if [ -e "${FSTABDIR}" -a ! -d "${FSTABDIR}" ]
+  then 
+    echo
+    echo "${FSTABDIR} is existant but not a directory."
+    echo "Please fix that manually."
+    echo
+    exit 1
+  fi
+fi
+
+# Create it if necessary
+
+if [ ! -e "${FSTABDIR}" ]
+then
+  mkdir -m 1777 "${FSTABDIR}"
+  if [ ! -e "${FSTABDIR}" ]
+  then
+    echo
+    echo "Creating ${FSTABDIR} directory failed."
+    echo "Please fix that manually."
+    echo
+    exit 1
+  fi
 fi
 
 # Check for ${DEVDIR} directory

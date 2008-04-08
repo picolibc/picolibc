@@ -914,7 +914,7 @@ mount_info::from_fstab (bool user)
 
   PWCHAR u = wcpcpy (w, L"\\etc\\fstab");
   if (user)
-    sys_mbstowcs (wcpcpy (u, L"."), NT_MAX_PATH - (u - path),
+    sys_mbstowcs (wcpcpy (u, L".d\\"), NT_MAX_PATH - (u - path),
 		  cygheap->user.name ());
   debug_printf ("Try to read mounts from %W", path);
   HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
