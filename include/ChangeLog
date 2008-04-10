@@ -1,3 +1,8 @@
+2008-04-10  Andreas Krebbel  <krebbel1@de.ibm.com>
+
+	* dis-asm.h (print_s390_disassembler_options):
+	Prototype added.
+
 2008-03-28  Eric B. Weddington  <eric.weddington@atmel.com>
 
 	* opcode/avr.h (AVR_ISA_TINY3): Define new opcode set for attiny167.
