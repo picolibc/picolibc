@@ -1,3 +1,10 @@
+2008-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (wprintf): Remove.
+	(_wprintf): Ditto.
+	* syscalls.cc (wprintf): Ditto.
+	* include/cygwin/version.h: Add FIXME comment.
+
 2008-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::from_fstab): Read user fstab files from

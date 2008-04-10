@@ -2729,21 +2729,6 @@ __assertfail ()
   exit (99);
 }
 
-/* FIXME: to do this right, maybe work out the usoft va_list machine
-   and use wsvprintfW instead?
-*/
-extern "C" int
-wprintf (const char *fmt, ...)
-{
-  va_list ap;
-  int ret;
-
-  va_start (ap, fmt);
-  ret = vprintf (fmt, ap);
-  va_end (ap);
-  return ret;
-}
-
 extern "C" int
 vhangup ()
 {

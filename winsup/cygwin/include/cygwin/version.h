@@ -325,6 +325,8 @@ details. */
 	   lremovexattr, fremovexattr.
       181: Export cygwin_conv_path, cygwin_create_path, cygwin_conv_path_list.
       182: Export lockf.
+      FIXME: Removed 12 year old and entirely wrong wprintf function at
+           this point.  We need a working implementation soon.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
