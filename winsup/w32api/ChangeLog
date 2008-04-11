@@ -1,7 +1,7 @@
 2008-04-11  Corinna Vinschen  <corinna@vinschen.de>
 
-	* include/sddl.h (ConvertStringSidToSidA): Define.
-	(ConvertStringSidToSidW): Define.
+	* include/sddl.h (ConvertStringSidToSidA): Declare.
+	(ConvertStringSidToSidW): Declare.
 	(ConvertStringSidToSid): Define.
 
 2008-03-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
