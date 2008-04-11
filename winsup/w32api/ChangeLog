@@ -1,3 +1,9 @@
+2008-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sddl.h (ConvertStringSidToSidA): Define.
+	(ConvertStringSidToSidW): Define.
+	(ConvertStringSidToSid): Define.
+
 2008-03-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/mprapi.h: Add guard for MprAdminAcceptReauthentication function
