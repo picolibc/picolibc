@@ -626,7 +626,6 @@ static struct parse_thing
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
-  {"transparent_exe", {&transparent_exe}, justset, NULL, {{false}, {true}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 

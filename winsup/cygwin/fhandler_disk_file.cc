@@ -22,6 +22,7 @@ details. */
 #include "shared_info.h"
 #include "pinfo.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
 #include <winioctl.h>
 
 #define _COMPILING_NEWLIB
@@ -1063,8 +1064,7 @@ fhandler_disk_file::link (const char *newpath)
 {
   extern bool allow_winsymlinks;
 
-  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX,
-		   transparent_exe ? stat_suffixes : NULL);
+  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
   if (newpc.error)
     {
       set_errno (newpc.case_clash ? ECASECLASH : newpc.error);
@@ -1607,21 +1607,23 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 				   fname->Buffer
 				   + fname->Length / sizeof (WCHAR) - 4,
 				   4 * sizeof (WCHAR));
-      RtlInitCountedUnicodeString (&lname, (PWCHAR) L".lnk",
-				   4 * sizeof (WCHAR));
-
+      RtlInitUnicodeString (&lname, (PWCHAR) L".lnk");
       if (RtlEqualUnicodeString (&uname, &lname, TRUE))
 	{
-	  UNICODE_STRING dirname = *pc.get_nt_native_path ();
-	  dirname.Buffer += 4; /* Skip leading \??\ */
-	  dirname.Length -= 4 * sizeof (WCHAR);
+	  tmp_pathbuf tp;
 	  UNICODE_STRING fbuf;
-	  ULONG len = dirname.Length + fname->Length + 2 * sizeof (WCHAR);
-
-	  RtlInitEmptyUnicodeString (&fbuf, (PCWSTR) alloca (len), len);
-	  RtlCopyUnicodeString (&fbuf, &dirname);
+	  
+	  tp.u_get (&fbuf);
+	  RtlCopyUnicodeString (&fbuf, pc.get_nt_native_path ());
 	  RtlAppendUnicodeToString (&fbuf, L"\\");
 	  RtlAppendUnicodeStringToString (&fbuf, fname);
+	  fbuf.Buffer += 4; /* Skip leading \??\ */
+	  fbuf.Length -= 4 * sizeof (WCHAR);
+	  if (*fbuf.Buffer == L'U') /* UNC path */
+	    {
+	      *(fbuf.Buffer += 2) = L'\\';
+	      fbuf.Length -= 2 * sizeof (WCHAR);
+	    }
 	  path_conv fpath (&fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink () || fpath.is_fs_special ())
 	    fname->Length -= 4 * sizeof (WCHAR);

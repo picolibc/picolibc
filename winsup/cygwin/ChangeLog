@@ -1,3 +1,19 @@
+2008-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Simplify
+	code which checks for symlinks.  Fix problem with UNC paths.
+
+	* environ.cc (struct parse_thing): Remove transparent_exe option.
+	* syscalls.cc (transparent_exe): Remove.
+	(unlink): Always add stat_suffixes, drop transparent_exe check.
+	(open): Ditto.
+	(link): Ditto.
+	(pathconf): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Ditto.
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Always remove
+	.exe suffix.
+	* path.cc (realpath): Never attach known_suffix.
+
 2008-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (wprintf): Remove.

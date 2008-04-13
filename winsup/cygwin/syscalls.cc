@@ -78,8 +78,6 @@ suffix_info stat_suffixes[] =
   suffix_info (NULL)
 };
 
-bool transparent_exe = false;
-
 SYSTEM_INFO system_info;
 
 static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
@@ -517,8 +515,7 @@ unlink (const char *ourname)
   DWORD devn;
   NTSTATUS status;
 
-  path_conv win32_name (ourname, PC_SYM_NOFOLLOW,
-			transparent_exe ? stat_suffixes : NULL);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW, stat_suffixes);
 
   if (win32_name.error)
     {
@@ -885,7 +882,7 @@ open (const char *unix_path, int flags, ...)
 	  if (!(fh = build_fh_name (unix_path, NULL,
 				    (flags & (O_NOFOLLOW | O_EXCL))
 				    ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
-				    transparent_exe ? stat_suffixes : NULL)))
+				    stat_suffixes)))
 	    res = -1;		// errno already set
 	  else if ((flags & O_NOFOLLOW) && fh->issymlink ())
 	    {
@@ -1010,8 +1007,7 @@ link (const char *oldpath, const char *newpath)
   int res = -1;
   fhandler_base *fh;
 
-  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW,
-			    transparent_exe ? stat_suffixes : NULL)))
+  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW, stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -1903,8 +1899,7 @@ pathconf (const char *file, int v)
       set_errno (ENOENT);
       return -1;
     }
-  if (!(fh = build_fh_name (file, NULL, PC_SYM_FOLLOW,
-			    transparent_exe ? stat_suffixes : NULL)))
+  if (!(fh = build_fh_name (file, NULL, PC_SYM_FOLLOW, stat_suffixes)))
     return -1;
   if (!fh->exists ())
     {

@@ -446,17 +446,12 @@ fhandler_process::fill_filebuf ()
 	else
 	  {
 	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
-	    /* If transparent_exe isn't set, the link keeps its suffix so that
-	       an open(2) call will succeed on /proc/$PID/exe. */
-	    if (transparent_exe)
+	    int len = strlen (filebuf);
+	    if (len > 4)
 	      {
-		int len = strlen (filebuf);
-		if (len > 4)
-		  {
-		    char *s = filebuf + len - 4;
-		    if (ascii_strcasematch (s, ".exe"))
-		      *s = 0;
-		  }
+		char *s = filebuf + len - 4;
+		if (ascii_strcasematch (s, ".exe"))
+		  *s = 0;
 	      }
 	  }
 	filesize = strlen (filebuf);
