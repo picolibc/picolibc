@@ -1,3 +1,7 @@
+2008-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Drop description of "transparent_exe" option.
+
 2007-29-12  Dave Korn  <dave.korn@artimi.com>
 
 	* faq-using.xml (faq.using.bloda):  New entry.

@@ -179,19 +179,6 @@ order not to strip, specify <literal>title</literal> or <literal>title
 nostrip_title</literal>.</para>
 </listitem>
 <listitem>
-<para><envar>(no)transparent_exe</envar> - EXPERIMENTAL.  Only use this
-option if you're confident to be able to live with the consequences.  If
-set, several additional functions in Cygwin will handle files with .exe
-suffix transparently.  These functions are <function>link(2)</function>,
-<function>open(2)</function>, <function>rename(2)</function>,
-<function>symlink(2)</function>, <function>unlink(2)</function>,
-<function>pathconf(3)</function>.  So far, these functions have been
-treated as too dangerous to act on files with .exe suffix if the .exe
-suffix wasn't given explicitely in the file name argument, and this is
-still the case if the transparent_exe option is not set.  Default is not
-set.</para>
-</listitem>
-<listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
 (i.e., termios) for UNIX-like ttys in the Windows console. 
 It is not compatible with some Windows programs.
