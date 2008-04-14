@@ -34,7 +34,15 @@
 
 
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
+extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
+extern int    _EXFUN(__ssvfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
+int	      _EXFUN(_svfprintf_r,(struct _reent *, FILE *, const char *, 
+				  va_list)
+               			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
+int	      _EXFUN(_svfiprintf_r,(struct _reent *, FILE *, const char *, 
+				  va_list)
+               			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));

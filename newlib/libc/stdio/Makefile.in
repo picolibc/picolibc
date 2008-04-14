@@ -54,8 +54,11 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 = $(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
-	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
+am__DEPENDENCIES_1 = $(lpfx)svfiprintf.$(oext) \
+	$(lpfx)svfprintf.$(oext) $(lpfx)svfiscanf.$(oext) \
+	$(lpfx)svfscanf.$(oext) $(lpfx)vfiprintf.$(oext) \
+	$(lpfx)vfprintf.$(oext) $(lpfx)vfscanf.$(oext) \
+	$(lpfx)vfiscanf.$(oext)
 am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 	lib_a-fdopen.$(OBJEXT) lib_a-feof.$(OBJEXT) \
 	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
@@ -438,6 +441,8 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
 @ELIX_LEVEL_1_TRUE@ELIX_4_SOURCES = 
 LIBADD_OBJS = \
+	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
+	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
 	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
 
@@ -1345,11 +1350,23 @@ $(lpfx)vfprintf.$(oext): vfprintf.c
 $(lpfx)vfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
+$(lpfx)svfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
+
+$(lpfx)svfiprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
+
 $(lpfx)vfscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
 $(lpfx)vfiscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfscanf.c -o $@
+
+$(lpfx)svfscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
+
+$(lpfx)svfiscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref
@@ -1388,6 +1405,10 @@ $(lpfx)sprintf.$(oext): local.h
 $(lpfx)siscanf.$(oext): local.h
 $(lpfx)sscanf.$(oext): local.h
 $(lpfx)stdio.$(oext): local.h
+$(lpfx)svfiprintf.$(oext): local.h
+$(lpfx)svfiscanf.$(oext): local.h floatio.h
+$(lpfx)svfprintf.$(oext): local.h
+$(lpfx)svfscanf.$(oext): local.h floatio.h
 $(lpfx)ungetc.$(oext): local.h
 $(lpfx)vfiprintf.$(oext): local.h
 $(lpfx)vfprintf.$(oext): local.h

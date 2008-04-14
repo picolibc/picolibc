@@ -119,7 +119,7 @@ _siprintf_r(ptr, str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);
@@ -152,7 +152,7 @@ siprintf(str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
+  ret = _svfiprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);

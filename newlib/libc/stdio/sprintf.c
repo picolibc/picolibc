@@ -583,7 +583,7 @@ _sprintf_r(ptr, str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfprintf_r (ptr, &f, fmt, ap);
+  ret = _svfprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);
@@ -616,7 +616,7 @@ sprintf(str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfprintf_r (_REENT, &f, fmt, ap);
+  ret = _svfprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   *f._p = 0;
   return (ret);

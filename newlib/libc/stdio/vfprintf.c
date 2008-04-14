@@ -116,10 +116,18 @@ static char *rcsid = "$Id$";
 
 #ifdef INTEGER_ONLY
 # define VFPRINTF vfiprintf
-# define _VFPRINTF_R _vfiprintf_r
+# ifdef STRING_ONLY
+#   define _VFPRINTF_R _svfiprintf_r
+# else
+#   define _VFPRINTF_R _vfiprintf_r
+# endif
 #else
 # define VFPRINTF vfprintf
-# define _VFPRINTF_R _vfprintf_r
+# ifdef STRING_ONLY
+#   define _VFPRINTF_R _svfprintf_r
+# else
+#   define _VFPRINTF_R _vfprintf_r
+# endif
 # ifndef NO_FLOATING_POINT
 #  define FLOATING_POINT
 # endif
@@ -158,6 +166,100 @@ static char *rcsid = "$Id$";
 # undef _NO_LONGLONG
 #endif
 
+#ifdef STRING_ONLY
+static int
+_DEFUN(__sprint_r, (ptr, fp, uio),
+       struct _reent *ptr _AND
+       FILE *fp _AND
+       register struct __suio *uio)
+{
+	register size_t len;
+	register int w;
+	register struct __siov *iov;
+	register _CONST char *p = NULL;
+
+	iov = uio->uio_iov;
+	len = 0;
+
+	if (uio->uio_resid == 0) {
+		uio->uio_iovcnt = 0;
+		return (0);
+	}
+
+        do {
+		while (len == 0) {
+			p = iov->iov_base;
+			len = iov->iov_len;
+			iov++;
+		}
+		w = fp->_w;
+		if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
+			/* must be asprintf family */
+			unsigned char *str;
+			int curpos = (fp->_p - fp->_bf._base);
+			/* Choose a geometric growth factor to avoid
+		 	 * quadratic realloc behavior, but use a rate less
+			 * than (1+sqrt(5))/2 to accomodate malloc
+		 	 * overhead. asprintf EXPECTS us to overallocate, so
+		 	 * that it can add a trailing \0 without
+		 	 * reallocating.  The new allocation should thus be
+		 	 * max(prev_size*1.5, curpos+len+1). */
+			int newsize = fp->_bf._size * 3 / 2;
+			if (newsize < curpos + len + 1)
+				newsize = curpos + len + 1;
+			if (fp->_flags & __SOPT)
+			{
+				/* asnprintf leaves original buffer alone.  */
+				str = (unsigned char *)_malloc_r (ptr, newsize);
+				if (!str)
+				{
+					ptr->_errno = ENOMEM;
+					goto err;
+				}
+				memcpy (str, fp->_bf._base, curpos);
+				fp->_flags = (fp->_flags & ~__SOPT) | __SMBF;
+			}
+			else
+			{
+				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+						newsize);
+				if (!str) {
+					/* Free unneeded buffer.  */
+					_free_r (ptr, fp->_bf._base);
+					/* Ensure correct errno, even if free 
+					 * changed it.  */
+					ptr->_errno = ENOMEM;
+					goto err;
+				}
+			}		
+			fp->_bf._base = str;
+			fp->_p = str + curpos;
+			fp->_bf._size = newsize;
+			w = len;
+			fp->_w = newsize - curpos;
+		}
+		if (len < w)
+			w = len;
+		(void)memmove ((_PTR) fp->_p, (_PTR) p, (size_t) (w));
+		fp->_w -= w;
+		fp->_p += w;
+		w = len;          /* pretend we copied all */
+		p += w;
+		len -= w;
+        } while ((uio->uio_resid -= w) != 0);
+
+	uio->uio_resid = 0;
+	uio->uio_iovcnt = 0;
+	return 0;
+
+err:
+  fp->_flags |= __SERR;
+  uio->uio_resid = 0;
+  uio->uio_iovcnt = 0;
+  return EOF;
+}
+
+#else /* !STRING_ONLY */ 
 /*
  * Flush out all the vectors defined by the given uio,
  * then reset it so that it can be reused.
@@ -222,6 +324,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 #endif
 	return (ret);
 }
+#endif /* !STRING_ONLY */
 
 
 #ifdef FLOATING_POINT
@@ -360,6 +463,7 @@ _EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
 
 int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 
+#ifndef STRING_ONLY
 int 
 _DEFUN(VFPRINTF, (fp, fmt0, ap),
        FILE * fp         _AND
@@ -370,6 +474,7 @@ _DEFUN(VFPRINTF, (fp, fmt0, ap),
   result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
   return result;
 }
+#endif /* STRING_ONLY */
 
 int 
 _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
@@ -517,6 +622,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	    (u_long)GET_ARG (N, ap, u_int))
 #endif
 
+#ifndef STRING_ONLY
+	/* Initialize std streams if not dealing with sprintf family.  */
 	CHECK_INIT (data, fp);
 	_flockfile (fp);
 
@@ -532,6 +639,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		_funlockfile (fp);
 		return (__sbprintf (data, fp, fmt0, ap));
 	}
+#endif /* STRING_ONLY */
 
 	fmt = (char *)fmt0;
 	uio.uio_iov = iovp = iov;
@@ -1330,7 +1438,9 @@ done:
 error:
 	if (malloc_buf != NULL)
 		_free_r (data, malloc_buf);
+#ifndef STRING_ONLY
 	_funlockfile (fp);
+#endif
 	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */
 }

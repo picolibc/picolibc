@@ -53,7 +53,7 @@ _DEFUN(_vsiprintf_r, (ptr, str, fmt, ap),
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   *f._p = 0;
   return ret;
 }

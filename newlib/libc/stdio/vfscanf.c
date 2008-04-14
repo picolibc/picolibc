@@ -121,15 +121,33 @@ Supporting OS subroutines required:
 #define VFSCANF vfiscanf
 #define _VFSCANF_R _vfiscanf_r
 #define __SVFSCANF __svfiscanf
-#define __SVFSCANF_R __svfiscanf_r
+#ifdef STRING_ONLY
+#  define __SVFSCANF_R __ssvfiscanf_r
+#else
+#  define __SVFSCANF_R __svfiscanf_r
+#endif
 #else
 #define VFSCANF vfscanf
 #define _VFSCANF_R _vfscanf_r
 #define __SVFSCANF __svfscanf
-#define __SVFSCANF_R __svfscanf_r
+#ifdef STRING_ONLY
+#  define __SVFSCANF_R __ssvfscanf_r
+#else
+#  define __SVFSCANF_R __svfscanf_r
+#endif
 #ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
 #endif
+#endif
+
+#ifdef STRING_ONLY
+#undef _flockfile
+#undef _funlockfile
+#define _flockfile(x) {}
+#define _funlockfile(x) {}
+#define _ungetc_r _sungetc_r
+#define __srefill_r __ssrefill_r
+#define _fread_r _sfread_r
 #endif
 
 #ifdef FLOATING_POINT
@@ -234,6 +252,8 @@ typedef unsigned long long u_long_long;
 
 #define BufferEmpty (fp->_r <= 0 && __srefill_r(rptr, fp))
 
+#ifndef STRING_ONLY
+
 #ifndef _REENT_ONLY
 
 int
@@ -267,7 +287,135 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
   CHECK_INIT(data, fp);
   return __SVFSCANF_R (data, fp, fmt, ap);
 }
+#endif /* !STRING_ONLY */
 
+#ifdef STRING_ONLY
+/* When dealing with the sscanf family, we don't want to use the
+ * regular ungetc which will drag in file I/O items we don't need.
+ * So, we create our own trimmed-down version.  */
+static int
+_DEFUN(_sungetc_r, (data, fp, ch),
+	struct _reent *data _AND
+	int c               _AND
+	register FILE *fp)
+{
+  if (c == EOF)
+    return (EOF);
+
+  /* After ungetc, we won't be at eof anymore */
+  fp->_flags &= ~__SEOF;
+  c = (unsigned char) c;
+
+  /*
+   * If we are in the middle of ungetc'ing, just continue.
+   * This may require expanding the current ungetc buffer.
+   */
+
+  if (HASUB (fp))
+    {
+      if (fp->_r >= fp->_ub._size && __submore (data, fp))
+        {
+          return EOF;
+        }
+      *--fp->_p = c;
+      fp->_r++;
+      return c;
+    }
+
+  /*
+   * If we can handle this by simply backing up, do so,
+   * but never replace the original character.
+   * (This makes sscanf() work when scanning `const' data.)
+   */
+
+  if (fp->_bf._base != NULL && fp->_p > fp->_bf._base && fp->_p[-1] == c)
+    {
+      fp->_p--;
+      fp->_r++;
+      return c;
+    }
+
+  /*
+   * Create an ungetc buffer.
+   * Initially, we will use the `reserve' buffer.
+   */
+
+  fp->_ur = fp->_r;
+  fp->_up = fp->_p;
+  fp->_ub._base = fp->_ubuf;
+  fp->_ub._size = sizeof (fp->_ubuf);
+  fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
+  fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
+  fp->_r = 1;
+  return c;
+}
+
+/* String only version of __srefill_r for sscanf family.  */
+static int
+_DEFUN(__ssrefill_r, (ptr, fp),
+       struct _reent * ptr _AND
+       register FILE * fp)
+{
+  /*
+   * Our only hope of further input is the ungetc buffer.
+   * If there is anything in that buffer to read, return.
+   */
+  if (HASUB (fp))
+    {
+      FREEUB (ptr, fp);
+      if ((fp->_r = fp->_ur) != 0)
+        {
+          fp->_p = fp->_up;
+	  return 0;
+        }
+    }
+
+  /* Otherwise we are out of character input.  */
+  fp->_p = fp->_bf._base;
+  fp->_r = 0;
+  fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
+  fp->_flags |= __SEOF;
+  return EOF;
+} 
+ 
+static size_t
+_DEFUN(_sfread_r, (ptr, buf, size, count, fp),
+       struct _reent * ptr _AND
+       _PTR buf _AND
+       size_t size _AND
+       size_t count _AND
+       FILE * fp)
+{
+  register size_t resid;
+  register char *p;
+  register int r;
+  size_t total;
+
+  if ((resid = count * size) == 0)
+    return 0;
+
+  total = resid;
+  p = buf;
+
+  while (resid > (r = fp->_r))
+    {
+      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
+      fp->_p += r;
+      fp->_r = 0;
+      p += r;
+      resid -= r;
+      if (__ssrefill_r (ptr, fp))
+        {
+          /* no more input: return partial result */
+          return (total - resid) / size;
+        }
+    }
+  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
+  fp->_r -= resid;
+  fp->_p += resid;
+  return count;
+}
+#endif /* STRING_ONLY */
 
 int
 _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
@@ -741,7 +889,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      size_t r = fread ((_PTR) GET_ARG (N, ap, char *), 1, width, fp);
+	      size_t r = _fread_r (rptr, (_PTR) GET_ARG (N, ap, char *), 1, width, fp);
 
 	      if (r == 0)
 		goto input_failure;

@@ -53,7 +53,7 @@ _DEFUN(_vasiprintf_r, (ptr, strp, fmt, ap),
   f._bf._base = f._p = NULL;
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   if (ret >= 0)
     {
       *f._p = 0;

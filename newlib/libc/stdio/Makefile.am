@@ -128,6 +128,8 @@ endif !ELIX_LEVEL_2
 endif !ELIX_LEVEL_1
 
 LIBADD_OBJS = \
+	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
+	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
 	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
 
@@ -161,11 +163,23 @@ $(lpfx)vfprintf.$(oext): vfprintf.c
 $(lpfx)vfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
+$(lpfx)svfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
+
+$(lpfx)svfiprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
+
 $(lpfx)vfscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
 $(lpfx)vfiscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfscanf.c -o $@
+
+$(lpfx)svfscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
+
+$(lpfx)svfiscanf.$(oext): vfscanf.c
+	$(LIB_COMPILE) -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfscanf.c -o $@
 
 CHEWOUT_FILES = \
 	clearerr.def		\
@@ -274,6 +288,10 @@ $(lpfx)sprintf.$(oext): local.h
 $(lpfx)siscanf.$(oext): local.h
 $(lpfx)sscanf.$(oext): local.h
 $(lpfx)stdio.$(oext): local.h
+$(lpfx)svfiprintf.$(oext): local.h
+$(lpfx)svfiscanf.$(oext): local.h floatio.h
+$(lpfx)svfprintf.$(oext): local.h
+$(lpfx)svfscanf.$(oext): local.h floatio.h
 $(lpfx)ungetc.$(oext): local.h
 $(lpfx)vfiprintf.$(oext): local.h
 $(lpfx)vfprintf.$(oext): local.h

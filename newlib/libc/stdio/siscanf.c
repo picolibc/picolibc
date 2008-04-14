@@ -152,7 +152,7 @@ siscanf(str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfiscanf_r (_REENT, &f, fmt, ap);
+  ret = __ssvfiscanf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   return ret;
 }
@@ -190,7 +190,7 @@ _siscanf_r(ptr, str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfiscanf_r (ptr, &f, fmt, ap);
+  ret = __ssvfiscanf_r (ptr, &f, fmt, ap);
   va_end (ap);
   return ret;
 }

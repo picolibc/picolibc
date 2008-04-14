@@ -1,3 +1,41 @@
+2008-04-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/Makefile.am: Build vfprintf.c and vfscanf.c with
+	-DSTRING_ONLY defined with and without -DINTEGER_ONLY defined
+	to build special versions for sprintf/sscanf family functions.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/vfprintf.c[STRING_ONLY][INTEGER_ONLY](_VFPRINTF_R): 
+	Redefine to be _svfiprintf_r which is optimized to work with siprintf 
+	family of functions (i.e. no I/O) and does not support floating-point.
+	[STRING_ONLY][!INTEGER_ONLY](_VFPRINTF_R): Redefine to be
+	_svfprintf_r which is optimized to work with sprintf family of
+	functions and not use I/O.
+	[STRING_ONLY](__sprint_r): New string only version of static function. 
+	designed to work with sprintf family of functions.
+	* libc/stdio/vfscanf.c[STRING_ONLY][INTEGER_ONLY](_SVFSCANF_R):
+	Redefine to be _ssvfiscanf_r which is optimized to work with siscanf
+	family of functions (i.e. no I/O) and no float-point support.
+	[STRING_ONLY][!INTEGER_ONLY](_SVFSCANF_R): Redefine to be
+	__ssvfscanf_r which is optimized to work with sscanf family of
+	functions and does not require I/O functions.
+	* libc/stdio/asprintf.c: Call _svfprintf_r instead of _vfprintf_r.
+	* libc/stdio/snprintf.c: Ditto.
+	* libc/stdio/sprintf.c: Ditto.
+	* libc/stdio/vasnprintf.c: Ditto.
+	* libc/stdio/vasprintf.c: Ditto.
+	* libc/stdio/siprintf.c: Call _svfiprintf_r instead of _vfiprintf_r.
+	* libc/stdio/sniprintf.c: Ditto.
+	* libc/stdio/vasiprintf.c: Ditto.
+	* libc/stdio/vsiprintf.c: Ditto.
+	* libc/stdio/vsniprintf.c: Ditto.
+	* libc/stdio/vsprintf.c: Ditto.
+	* libc/stdio/local.h: Add prototypes for _svfprintf_r, _svfiprintf_r,
+	_ssvfscanf_r, and _ssvfiscanf_r.
+	* libc/stdio/sscanf.c: Call _ssvfscanf_r instead of _svfscanf_r.
+	* libc/stdio/vsscanf.c: Ditto.
+	* libc/stdio/siscanf.c: Call _ssvfiscanf_r instead of _svfiscanf_r.
+	* libc/stdio/vsiscanf.c: Ditto.
+
 2008-04-04  DJ Delorie  <dj@redhat.com>
 
 	* libm/machine/spu/configure: Regenerate with autoconf 2.61.

@@ -40,7 +40,7 @@ _DEFUN(_asprintf_r, (ptr, strp, fmt),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfprintf_r (ptr, &f, fmt, ap);
+  ret = _svfprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -67,7 +67,7 @@ _DEFUN(asprintf, (strp, fmt),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfprintf_r (_REENT, &f, fmt, ap);
+  ret = _svfprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {

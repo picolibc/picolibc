@@ -47,7 +47,7 @@ _DEFUN(_vasnprintf_r, (ptr, buf, lenp, fmt, ap),
     }
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
-  ret = _vfprintf_r (ptr, &f, fmt, ap);
+  ret = _svfprintf_r (ptr, &f, fmt, ap);
   if (ret < 0)
     return NULL;
   *lenp = ret;

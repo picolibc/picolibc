@@ -71,5 +71,5 @@ _DEFUN(_vsiscanf_r, (ptr, str, fmt, ap),
   f._ub._base = NULL;
   f._lb._base = NULL;
   f._file = -1;  /* No file. */
-  return __svfiscanf_r (ptr, &f, fmt, ap);
+  return __ssvfiscanf_r (ptr, &f, fmt, ap);
 }

@@ -61,7 +61,7 @@ _DEFUN(_vsniprintf_r, (ptr, str, size, fmt, ap),
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = (size > 0 ? size - 1 : 0);
   f._file = -1;  /* No file. */
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   if (ret < EOF)
     ptr->_errno = EOVERFLOW;
   if (size > 0)

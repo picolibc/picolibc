@@ -64,7 +64,7 @@ _sniprintf_r (ptr, str, size, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret < EOF)
     ptr->_errno = EOVERFLOW;
@@ -108,7 +108,7 @@ sniprintf (str, size, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret < EOF)
     ptr->_errno = EOVERFLOW;

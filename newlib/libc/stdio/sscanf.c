@@ -433,7 +433,7 @@ sscanf(str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfscanf_r (_REENT, &f, fmt, ap);
+  ret = __ssvfscanf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   return ret;
 }
@@ -471,7 +471,7 @@ _sscanf_r(ptr, str, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfscanf_r (ptr, &f, fmt, ap);
+  ret = __ssvfscanf_r (ptr, &f, fmt, ap);
   va_end (ap);
   return ret;
 }
