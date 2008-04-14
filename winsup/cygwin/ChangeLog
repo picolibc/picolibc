@@ -1,3 +1,9 @@
+2008-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Fix
+	thinko in UNC path handling.
+	* path.cc (symlink_worker): Fix typo in comment.  Fix UNC path handling.
+
 2008-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Simplify

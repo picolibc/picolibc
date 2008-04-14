@@ -1642,11 +1642,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	      /* Amazing but true:  Even though the ParseDisplayName method
 		 takes a wide char path name, it does not understand the
 		 Win32 prefix for long pathnames!  So we have to tack off
-		 the prefix and convert tyhe path to the "normal" syntax
+		 the prefix and convert the path to the "normal" syntax
 		 for ParseDisplayName.  I have no idea if it's able to take
 		 long path names at all since I can't test it right now. */
 	      WCHAR *wc = wc_path + 4;
-	      if (!wcscmp (wc, L"UNC\\"))
+	      if (!wcsncmp (wc, L"UNC\\", 4))
 		*(wc += 2) = L'\\';
 	      HRESULT res;
 	      if (SUCCEEDED (res = psl->ParseDisplayName (NULL, NULL, wc, NULL,

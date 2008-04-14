@@ -1619,7 +1619,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	  RtlAppendUnicodeStringToString (&fbuf, fname);
 	  fbuf.Buffer += 4; /* Skip leading \??\ */
 	  fbuf.Length -= 4 * sizeof (WCHAR);
-	  if (*fbuf.Buffer == L'U') /* UNC path */
+	  if (fbuf.Buffer[1] != L':') /* UNC path */
 	    {
 	      *(fbuf.Buffer += 2) = L'\\';
 	      fbuf.Length -= 2 * sizeof (WCHAR);
