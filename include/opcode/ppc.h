@@ -149,6 +149,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by CPUs with paired singles support.  */
 #define PPC_OPCODE_PPCPS	 0x10000000
 
+/* Opcode is supported by Power E500MC */
+#define PPC_OPCODE_E500MC        0x20000000
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
