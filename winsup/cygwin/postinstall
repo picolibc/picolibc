@@ -157,9 +157,11 @@ EOF
 
   #cygd=""
   #prefix=$(regtool -q get "$key\cygdrive prefix")
+  #flags=$(regtool -q get "$key\cygdrive flags")
+  #[ -z "$flags" ] && flags=2
   ## Don't take system and cygdrive flags into account when testing
   #if [ -n "$prefix" \
-  #     -a \( "$prefix" != "/cygdrive" \ -o "$(( $flags & ~0x28 ))" -ne 2 \) ]
+  #     -a \( "$prefix" != "/cygdrive" -o "$(( $flags & ~0x28 ))" -ne 2 \) ]
   #then
   #  cygd="1"
   #  psx="${prefix// /\\040}"
