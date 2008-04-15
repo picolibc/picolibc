@@ -1,3 +1,8 @@
+2008-04-14  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* spu/sbrk.c: Remove "extern int errno", use whatever is supplied
+	by sys/errno.h.
+		  
 2008-04-04  DJ Delorie  <dj@redhat.com>
 
 	* hp74x/configure: Regenerate with autoconf 2.61.

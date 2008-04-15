@@ -34,8 +34,6 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #include <errno.h>
 #include <spu_intrinsics.h>
 
-extern int errno;
-
 extern caddr_t  _end;
 #define STACKSIZE 4096
 
