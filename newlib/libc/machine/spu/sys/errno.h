@@ -19,10 +19,6 @@
    on which it is based, except values used or returned by syscalls must
    be those of the Linux ppc.  */
 
-/* errno is not a global variable, because that would make using it
-   non-reentrant.  Instead, its address is returned by the function
-   __errno.  */
-
 #ifndef _SYS_ERRNO_H_
 #ifdef __cplusplus
 extern "C" {
@@ -31,10 +27,8 @@ extern "C" {
 
 #include <sys/reent.h>
 
-#ifndef _REENT_ONLY
-#define errno (*__errno())
-extern int *__errno _PARAMS ((void));
-#endif
+extern struct _reent _reent_data;
+#define errno (_reent_data._errno)
 
 /* Please don't use these variables directly.
    Use strerror instead. */

@@ -1,3 +1,10 @@
+2008-04-14  Patrick Mansfield  <patmans@us.ibm.com>
+
+	* libc/machine/spu/impure.c: New file, supply a non-static _impure_data.
+  	* libc/machine/spu/Makefile.am: Add new file impure.c.
+	* libc/machine/spu/Makefile.in: Regenerate.
+	* libc/machine/spu/sys/errno.h: Define errno to be _reent_data._errno.
+		
 2008-04-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/Makefile.am: Build vfprintf.c and vfscanf.c with

@@ -12,10 +12,10 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	ferror.c fflush.c fgetc.c fgetpos.c fgets.c fileno.c fiprintf.S \
 	fiscanf.S fopen.c fprintf.S fputc.c fputs.c fread.c freopen.c \
 	fscanf.S fseek.c fsetpos.c ftell.c fwrite.c getc.c getchar.c \
-	gets.c iprintf.S iscanf.S memcmp.c memcpy.c memmove.c memset.c \
-	perror.c printf.S putc.c putchar.c puts.c remove.c rename.c \
-	rewind.c scanf.S setbuf.c setvbuf.c siprintf.S siscanf.S sleep.c \
-	sniprintf.S snprintf.S sprintf.S sscanf.S stdio.c strcat.c \
+	gets.c impure.c iprintf.S iscanf.S memcmp.c memcpy.c memmove.c \
+	memset.c perror.c printf.S putc.c putchar.c puts.c remove.c \
+	rename.c rewind.c scanf.S setbuf.c setvbuf.c siprintf.S siscanf.S \
+	sleep.c sniprintf.S snprintf.S sprintf.S sscanf.S stdio.c strcat.c \
 	strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c \
 	strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c tmpfile.c \
 	tmpnam.c ungetc.c usleep.c vfiprintf.c vfiscanf.c vfprintf.c \
