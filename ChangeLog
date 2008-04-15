@@ -1,3 +1,8 @@
+2008-04-14  David S. Miller  <davem@davemloft.net>
+
+	* configure.ac: Add sparc*-*-* to gold supported targets.
+	* configure: Regenerate.
+
 2008-04-14  Ben Elliston  <bje@au.ibm.com>
 
 	* config.sub, config.guess: Update from upstream sources.
