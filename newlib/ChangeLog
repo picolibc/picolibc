@@ -1,5 +1,9 @@
 2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
 
+	* libc/machine/spu/sys/errno.h: Use _impure_data, not _reent_data.
+	
+2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
+
 	* libc/machine/spu/impure.c: Add missing underscore to impure_data.
 	
 2008-04-14  Patrick Mansfield  <patmans@us.ibm.com>
