@@ -1,3 +1,10 @@
+2008-04-16  David S. Miller  <davem@davemloft.net>
+
+	* elf/sparc.h (R_SPARC_GOTDATA_HIX22,
+	R_SPARC_GOTDATA_LOX10, R_SPARC_GOTDATA_OP_HIX22,
+	R_SPARC_GOTDATA_OP_LOX10, R_SPARC_GOTDATA_OP,
+	R_SPARC_H34, R_SPARC_SIZE32, R_SPARC_SIZE64): New relocs.
+
 2008-03-24  Ian Lance Taylor  <iant@google.com>
 
 	* common.h (NT_GNU_GOLD_VERSION): Define.
