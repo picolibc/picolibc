@@ -1460,7 +1460,11 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
-
+  /* TODO: CV - 2008-04-16.  Lingering disabled.  The original problem
+     could be no longer reproduced on NT4, XP, 2K8.  Any return of a
+     spurious "Connection reset by peer" *could* be caused by disabling
+     the linger code here... */
+#if 0
   /* HACK to allow a graceful shutdown even if shutdown() hasn't been
      called by the application. Note that this isn't the ultimate
      solution but it helps in many cases. */
@@ -1469,7 +1473,7 @@ fhandler_socket::close ()
   linger.l_linger = 240; /* secs. default 2MSL value according to MSDN. */
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
-
+#endif
   release_events ();
   while ((res = closesocket (get_socket ())) != 0)
     {

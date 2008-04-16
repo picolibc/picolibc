@@ -1,5 +1,10 @@
 2008-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::close): Disable enforced
+	lingering since the original problem can no longer be reproduced.
+
+2008-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (internal_getgroups): Drop local buf.  Allocate groups
 	directly using alloca.
 
