@@ -1,3 +1,7 @@
+2007-11-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* pe.h (COFF_ENCODE_ALIGNMENT) Define.
+
 2007-08-02  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* pe.h (IMAGE_SCN_ALIGN_POWER_BIT_POS): New.

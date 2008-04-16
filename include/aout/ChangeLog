@@ -2,6 +2,10 @@
 
 	* ar.h (ARMAGT): New magic string for thin archives.
 
+2005-08-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* encap.h: Remove a29k support.
+
 2005-05-10  Nick Clifton  <nickc@redhat.com>
 
 	* Update the address and phone number of the FSF organization in

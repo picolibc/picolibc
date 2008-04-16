@@ -7,6 +7,10 @@
 	* i386.h (MAX_OPERANDS): Set to 5.
 	(MAX_MNEM_SIZE): Changed to 20.
 
+2008-03-28  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* avr.h (AVR_ISA_TINY3): Define new opcode set for attiny167.
+
 2008-03-09  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (FPU_VFP_EXT_D32, FPU_VFP_V3D16, FPU_ARCH_VFP_V3D16): Define.
@@ -41,6 +45,15 @@
 	(INSN_OCTEON): New macro.
 	(CPU_OCTEON): New macro.
 	(OPCODE_IS_MEMBER): Handle Octeon instructions.
+
+2008-01-23  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* avr.h (AVR_ISA_RF401): Add new opcode set for at86rf401.
+
+2008-01-03  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* avr.h (AVR_ISA_USB162): Add new opcode set.
+	(AVR_ISA_AVR3): Likewise.
 
 2007-11-29  Mark Shinwell  <shinwell@codesourcery.com>
 
@@ -364,6 +377,10 @@
 	(pa_opcode): Revise ordering rules.  Add/move strict pa10 variants
 	before corresponding pa11 opcodes.  Add strict pa10 register-immediate
 	entries for "fdc".
+
+2005-09-30  Catherine Moore  <clm@cm00re.com>
+
+	* bfin.h: New file.
 
 2005-09-24  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 

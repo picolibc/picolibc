@@ -3,10 +3,6 @@
 	* dis-asm.h (print_s390_disassembler_options):
 	Prototype added.
 
-2008-03-28  Eric B. Weddington  <eric.weddington@atmel.com>
-
-	* opcode/avr.h (AVR_ISA_TINY3): Define new opcode set for attiny167.
-
 2008-03-24  Ian Lance Taylor  <iant@google.com>
 
 	* sha1.h: New file, from gnulib.
@@ -39,29 +35,11 @@
 	DEMANGLE_COMPONENT_CHARACTER as new enum values.
 	(demangle_component): Add struct s_character to union u.
 
-2008-01-23  Eric B. Weddington  <eric.weddington@atmel.com>
-
-	* opcode/avr.h (AVR_ISA_RF401): Add new opcode set for at86rf401.
-
-2008-01-03  Eric B. Weddington  <eric.weddington@atmel.com>
-
-	* opcode/avr.h (AVR_ISA_USB162): Add new opcode set.
-	(AVR_ISA_AVR3): Likewise.
-
-2007-11-17  Thiemo Seufer  <ths@mips.com>
-
-	* elf/mips.h (Tag_GNU_MIPS_ABI_FP): Mention -mips32r2 -mfp64 variant
-	in comment.
-
 2007-11-07  Joseph Myers  <joseph@codesourcery.com>
 	    Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* floatformat.h (struct floatformat): Add split_half field.
 	(floatformat_ibm_long_double): New.
-
-2007-11-05  Danny Smith  <dannysmith@users.sourceforge.net>
-
-	* coff/pe.h (COFF_ENCODE_ALIGNMENT) Define.
 
 2007-09-06  Tom Tromey  <tromey@redhat.com>
 
@@ -220,10 +198,6 @@
 
 	* dis-asm.h (print_insn_spu): Declare.
 
-2006-10-17  Mark Shinwell  <shinwell@codesourcery.com>
-
-	* elf/arm.h: Define TAG_CPU_ARCH_* constants.
-
 2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* dis-asm.h: Add prototypes for Score disassembler routines.
@@ -251,30 +225,11 @@
 	* bfdlink.h (bfd_link_info): Replace need_relax_finalize with
 	relax_pass.
 
-2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
-
-	* elf/bfin.h (R_BFIN_GOT17M4, R_BFIN_GOTHI, R_BFIN_GOTLO,
-	R_BFIN_FUNCDESC, R_BFIN_FUNCDESC_GOT17M4,  R_BFIN_FUNCDESC_GOTHI,
-	R_BFIN_FUNCDESC_GOTLO, R_BFIN_FUNCDESC_VALUE,
-	R_BFIN_FUNCDESC_GOTOFF17M4, R_BFIN_FUNCDESC_GOTOFFHI,
-	R_BFIN_FUNCDESC_GOTOFFLO, R_BFIN_GOTOFF17M4, R_BFIN_GOTOFFHI,
-	R_BFIN_GOTOFFLO): New relocs.
-	(EF_BFIN_PIC, EF_BFIN_FDPIC, EF_BFIN_PIC_FLAGS): New macros.
-
-2006-03-23  Michael Matz  <matz@suse.de>
-
-	* elf/x86-64.h: Add the new relocations with their official
-	numbers.
-
 2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
             Anil Paranjape   <anilp1@kpitcummins.com>
             Shilin Shakti    <shilins@kpitcummins.com>
 
 	* dis-asm.h (print_insn_xc16c): New prototype.
-
-2006-02-06  Steve Ellcey  <sje@cup.hp.com>
-
-	* elf/ia64.h (SHF_IA_64_HP_TLS): New.
 
 2006-01-18  DJ Delorie  <dj@redhat.com>
 
@@ -299,24 +254,11 @@
 	Second part of ms1 to mt renaming.
 	* dis-asm.h (print_insn_mt): Renamed.
 
-2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
-
-	* elf/mt.h: Renamed from ms1.h
-
 2005-12-10  Terry Laurenzo  <tlaurenzo@gmail.com>
 
 	PR java/9861
 	* demangle.h : Add DMGL_RET_POSTFIX define to enable alternative
 	output format for return types
-
-2005-11-07  Nathan Sidwell  <nathan@codesourcery.com>
-
-	Add ms2.
-	* elf/ms1.h (EF_MS1_CPU_MS2): New.
-
-2005-11-06  John David Anglin  <dave.anglin@nrc-crnc.gc.ca>
-
-	* elf/hppa.h (R_PARISC_DIR64WR, R_PARISC_DIR64DR): Remove relocs.
 
 2005-11-03  Alan Modra  <amodra@bigpond.net.au>
 
@@ -343,7 +285,6 @@
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
 	* dis-asm.h (print_insn_bfin): Declare.
-	* opcode/bfin.h: New file.
 
 2005-09-26  Mark Mitchell  <mark@codesourcery.com>
 
@@ -353,7 +294,6 @@
 
 	* bfdlink.h: Remove mention of a29k.
 	* dis-asm.h: Remove a29k support.
-	* aout/encap.h: Likewise.
 
 2005-08-17  Mark Kettenis  <kettenis@gnu.org>
 

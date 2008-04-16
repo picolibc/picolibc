@@ -94,6 +94,11 @@
 	* internal.h (ELF_IS_SECTION_IN_SEGMENT): Adjust to cope with
 	segments at the end of memory.
 
+2007-11-17  Thiemo Seufer  <ths@mips.com>
+
+	* mips.h (Tag_GNU_MIPS_ABI_FP): Mention -mips32r2 -mfp64 variant
+	in comment.
+
 2007-11-16  Nick Clifton  <nickc@redhat.com>
 
 	* dwarf2.h: Mention the location of the DWARF3 spec on the web.
@@ -285,6 +290,10 @@
 	(EF_SCORE_FIXDEP): Redefine EF_SCORE_FIXDEP as 0x40000000.
 	(EF_SCORE_HASENTRY): Delete.
 
+2006-10-17  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* arm.h: Define TAG_CPU_ARCH_* constants.
+
 2006-09-17  Mei Ligang  <ligang@sunnorth.com.cn>
 
 	* score.h: New file.
@@ -319,6 +328,21 @@
 2006-05-24  Bjoern Haase  <bjoern.m.haase@web.de>
 
 	* avr.h: Add E_AVR_MACH_AVR6, R_AVR_LO8_LDI_GS and R_AVR_HI8_LDI_GS.
+
+2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin.h (R_BFIN_GOT17M4, R_BFIN_GOTHI, R_BFIN_GOTLO,
+	R_BFIN_FUNCDESC, R_BFIN_FUNCDESC_GOT17M4,  R_BFIN_FUNCDESC_GOTHI,
+	R_BFIN_FUNCDESC_GOTLO, R_BFIN_FUNCDESC_VALUE,
+	R_BFIN_FUNCDESC_GOTOFF17M4, R_BFIN_FUNCDESC_GOTOFFHI,
+	R_BFIN_FUNCDESC_GOTOFFLO, R_BFIN_GOTOFF17M4, R_BFIN_GOTOFFHI,
+	R_BFIN_GOTOFFLO): New relocs.
+	(EF_BFIN_PIC, EF_BFIN_FDPIC, EF_BFIN_PIC_FLAGS): New macros.
+
+2006-03-23  Michael Matz  <matz@suse.de>
+
+	* x86-64.h: Add the new relocations with their official
+	numbers.
 
 2006-03-22  Richard Sandiford  <richard@codesourcery.com>
 	    Daniel Jacobowitz  <dan@codesourcery.com>
@@ -379,6 +403,10 @@
 	(DW_LANG_PLI, DW_LANG_ObjC, DW_LANG_ObjC_plus_plus, DW_LANG_UPC,
 	DW_LANG_D): New.
 
+2006-02-06  Steve Ellcey  <sje@cup.hp.com>
+
+	* ia64.h (SHF_IA_64_HP_TLS): New.
+
 2006-02-24  DJ Delorie  <dj@redhat.com>
 
 	* m32c.h: Add relax relocs.
@@ -428,6 +456,10 @@
 	* common.h (EM_MT): Renamed.
 	* mt.h: Rename relocs, cpu & other defines.
 
+2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* mt.h: Renamed from ms1.h
+
 2005-12-12  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (elf32_arm_get_eabi_attr_int): Add prototype.
@@ -437,6 +469,15 @@
 	PR 1150
 	* mips.h (STO_OPTIONAL): Define.
 	(ELF_MIPS_IS_OPTIONAL): Define.
+
+2005-11-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Add ms2.
+	* ms1.h (EF_MS1_CPU_MS2): New.
+
+2005-11-06  John David Anglin  <dave.anglin@nrc-crnc.gc.ca>
+
+	* hppa.h (R_PARISC_DIR64WR, R_PARISC_DIR64DR): Remove relocs.
 
 2005-09-30  Catherine Moore  <clm@cm00re.com>
 
@@ -493,6 +534,10 @@
 	Add support for Renesas M32C and M16C.
 	* common.h (EM_M32C): New machine number.
 	* m32c.h: New file.
+
+2005-06-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* external.h (GRP_ENTRY_SIZE): Define.
 
 2005-06-17  Jan Beulich  <jbeulich@novell.com>
 
