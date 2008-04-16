@@ -365,10 +365,9 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
       if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
 	  || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
 	{
-	  char buf[size];
-	  TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
+	  PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
 
-	  if (GetTokenInformation (hToken, TokenGroups, buf, size, &size))
+	  if (GetTokenInformation (hToken, TokenGroups, groups, size, &size))
 	    {
 	      cygsid sid;
 

@@ -1,3 +1,8 @@
+2008-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (internal_getgroups): Drop local buf.  Allocate groups
+	directly using alloca.
+
 2008-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* postinstall: Fix copy/paste bug.
