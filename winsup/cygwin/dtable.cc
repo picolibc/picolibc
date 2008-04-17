@@ -301,7 +301,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	{
 	  name = handle_to_fn (handle, (char *) alloca (CYG_MAX_PATH + 100));
-	  if (!strncasematch (name, POSIX_NAMED_PIPE, POSIX_NAMED_PIPE_LEN))
+	  if (ft != FILE_TYPE_PIPE)
 	    /* nothing */;
 	  else if (fd == 0)
 	    dev = *piper_dev;
