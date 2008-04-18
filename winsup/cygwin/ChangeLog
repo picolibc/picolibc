@@ -1,3 +1,8 @@
+2008-04-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (noload): Make sure this and succeeding functions are
+	located in the text segment.
+
 2008-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::close): Disable enforced

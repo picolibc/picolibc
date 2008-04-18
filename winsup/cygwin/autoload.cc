@@ -120,6 +120,7 @@ extern "C" void dll_chain () __asm__ ("dll_chain");
 extern "C" {
 
 __asm__ ("								\n\
+	 .text								\n\
 msg1:									\n\
 	.ascii	\"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"\n\
 									\n\
