@@ -4,7 +4,7 @@ Please do not make ChangeLog entries.
 COPYING, COPYING.LIB, README
 	http://gnu.org.
 
-Makefile.*; configure; configure.in; src-release
+Makefile.*; configure; configure.ac; src-release
 	Any global maintainer can approve changes to these
 	files, but they should be aware	that they need to
 	be kept in sync with their counterparts in the GCC
