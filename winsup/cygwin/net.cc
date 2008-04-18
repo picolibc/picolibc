@@ -30,6 +30,7 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "cygwin/version.h"
+#include "shared_info.h"
 #include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
@@ -2140,8 +2141,6 @@ if_freenameindex (struct if_nameindex *ptr)
 #define PORT_HIGH	(IPPORT_RESERVED - 1)
 #define NUM_PORTS	(PORT_HIGH - PORT_LOW + 1)
 
-LONG last_used_bindresvport __attribute__((section (".cygwin_dll_common"), shared)) = IPPORT_RESERVED;
-
 extern "C" int
 cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 {
@@ -2199,11 +2198,11 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 
   for (int i = 0; i < NUM_PORTS; i++)
     {
-      while ((myport = InterlockedExchange (&last_used_bindresvport, 0)) == 0)
+      while ((myport = InterlockedExchange (&cygwin_shared->last_used_bindresvport, 0)) == 0)
 	low_priority_sleep (0);
       if (--myport < PORT_LOW)
 	myport = PORT_HIGH;
-      InterlockedExchange (&last_used_bindresvport, myport);
+      InterlockedExchange (&cygwin_shared->last_used_bindresvport, myport);
 
       if (sa->sa_family == AF_INET6)
 	sin6->sin6_port = htons (myport);

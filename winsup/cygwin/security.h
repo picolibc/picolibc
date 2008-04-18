@@ -20,6 +20,7 @@ details. */
 #define MAX_SID_LEN 40
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
 		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
+#define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
 #define ACL_DEFAULT_SIZE 3072
 #define NO_SID ((PSID)NULL)
 
@@ -421,6 +422,9 @@ extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
 extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2,
 						  DWORD access2, BOOL inherit)
   __attribute__ ((regparm (3)));
+extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
+#define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
+
 extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 

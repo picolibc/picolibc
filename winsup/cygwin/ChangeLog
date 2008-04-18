@@ -1,3 +1,48 @@
+2008-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (-struct wsa_event): Move to wsa_event.h.  Include
+	wsa_event.h instead.
+	* fhandler_socket.cc (NUM_SOCKS): Move to wsa_event.h.
+	(wsa_events): Move from DLL shared area to cygwin_shared shared
+	memory.  Accommodate throughout.
+	(socket_serial_number): Ditto.
+	* fhandler_tape.cc (mt): Ditto.
+	(mtinfo_init): Remove.
+	(mt): Define as cygwin_shared->mt.
+	* flock.cc (FLOCK_PARENT_DIR_ACCESS): Remove.
+	(FLOCK_INODE_DIR_ACCESS): Move up in file.
+	(FLOCK_MUTANT_ACCESS): Ditto.
+	(FLOCK_EVENT_ACCESS): Ditto.
+	(get_lock_parent_dir): Remove.
+	(inode_t::inode_t): Call get_shared_parent_dir to get parent dir handle.
+	Add a "flock-" prefix to file's lock directory name for clarity.
+	* mtinfo.h (mtinfo_init): Drop declaration.
+	* net.cc (last_used_bindresvport): Move from DLL shared area to
+	cygwin_shared shared memory.
+	(cygwin_bindresvport_sa): Accommodate above change.
+	* sec_helper.cc (_everyone_sd): Move here from flock.cc.
+	* security.h (SD_MIN_SIZE): Ditto.
+	(everyone_sd): Ditto.
+	* shared.cc (cygwin_shared_area): Remove.
+	(cygwin_shared_h): New handle.
+	(get_shared_parent_dir): New static function.
+	(shared_name): Drop session_local argument.  Call get_shared_parent_dir
+	here.  Add cygwin-shared subdir to object name.
+	(offsets): Reinstantiate SH_CYGWIN_SHARED member.
+	(open_shared): Revert change from 2007-03-29 for systems supporting
+	SeCreateGlobalPrivilege.
+	(shared_info::initialize): Call mtinfo's initialize here.
+	(memory_init): Drop call to mtinfo_init.
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add members for global socket and tape info
+	sharing.
+	(enum shared_locations): Reinstantiate SH_CYGWIN_SHARED.
+	(get_shared_parent_dir): Declare.
+	(shared_name): Drop session_local argument from declaration.
+	* wsa_event.h: New file.  Move definitions of NUM_SOCKS and
+	struct wsa_event here.
+
 2008-04-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (noload): Make sure this and succeeding functions are

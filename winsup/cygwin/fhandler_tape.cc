@@ -22,7 +22,6 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "sigproc.h"
-#include "mtinfo.h"
 
 /* Media changes and bus resets are sometimes reported and the function
    hasn't been executed.  We repeat all functions which return with one
@@ -1155,16 +1154,10 @@ mtinfo::initialize ()
     }
 }
 
-static mtinfo mt __attribute__((section (".cygwin_dll_common"), shared));
-
-void __stdcall
-mtinfo_init ()
-{
-  mt.initialize ();
-}
-
 /**********************************************************************/
 /* fhandler_dev_tape */
+
+#define mt	(cygwin_shared->mt)
 
 #define lock(err_ret_val) if (!_lock ()) return err_ret_val;
 

@@ -518,3 +518,36 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   psa->bInheritHandle = inherit;
   return psa;
 }
+
+/* Helper function to create an event security descriptor which only allows
+   specific access to everyone.  Only the creating process has all access
+   rights. */
+
+PSECURITY_DESCRIPTOR
+_everyone_sd (void *buf, ACCESS_MASK access)
+{
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) buf;
+
+  if (psd)
+    {
+      InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
+      PACL dacl = (PACL) (psd + 1);
+      InitializeAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
+      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access, 
+				well_known_world_sid))
+	{
+	  debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());
+	  return NULL;
+	}
+      LPVOID ace;
+      if (!FindFirstFreeAce (dacl, &ace))
+	{
+	  debug_printf ("FindFirstFreeAce: %lu", GetLastError ());
+	  return NULL;
+	}
+      dacl->AclSize = (char *) ace - (char *) dacl;
+      SetSecurityDescriptorDacl (psd, TRUE, dacl, FALSE);
+    }
+  return psd;
+}
+

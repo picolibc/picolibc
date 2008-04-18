@@ -106,6 +106,7 @@
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "shared_info.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -132,6 +133,19 @@ static NO_COPY muto lockf_guard;
 #define INODE_LIST_UNLOCK()	(lockf_guard.release ())
 
 #define LOCK_OBJ_NAME_LEN	64
+
+#define FLOCK_INODE_DIR_ACCESS	(DIRECTORY_QUERY \
+				 | DIRECTORY_TRAVERSE \
+				 | DIRECTORY_CREATE_OBJECT \
+				 | READ_CONTROL)
+
+#define FLOCK_MUTANT_ACCESS	(MUTANT_QUERY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
+
+#define FLOCK_EVENT_ACCESS	(EVENT_QUERY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
 
 /* This function takes the own process security descriptor DACL and adds
    SYNCHRONIZE permissions for everyone.  This allows all processes
@@ -188,84 +202,6 @@ allow_others_to_sync ()
       return;
     }
   done = true;
-}
-
-/* Helper function to create an event security descriptor which only allows
-   specific access to everyone.  Only the creating process has all access
-   rights. */
-
-#define FLOCK_PARENT_DIR_ACCESS	(DIRECTORY_QUERY \
-				 | DIRECTORY_TRAVERSE \
-				 | DIRECTORY_CREATE_SUBDIRECTORY \
-				 | READ_CONTROL)
-
-#define FLOCK_INODE_DIR_ACCESS	(DIRECTORY_QUERY \
-				 | DIRECTORY_TRAVERSE \
-				 | DIRECTORY_CREATE_OBJECT \
-				 | READ_CONTROL)
-
-#define FLOCK_MUTANT_ACCESS	(MUTANT_QUERY_STATE \
-				 | SYNCHRONIZE \
-				 | READ_CONTROL)
-
-#define FLOCK_EVENT_ACCESS	(EVENT_QUERY_STATE \
-				 | SYNCHRONIZE \
-				 | READ_CONTROL)
-
-#define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
-
-#define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
-
-PSECURITY_DESCRIPTOR
-_everyone_sd (void *buf, ACCESS_MASK access)
-{
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) buf;
-
-  if (psd)
-    {
-      InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
-      PACL dacl = (PACL) (psd + 1);
-      InitializeAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
-      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access, 
-				well_known_world_sid))
-	{
-	  debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());
-	  return NULL;
-	}
-      LPVOID ace;
-      if (!FindFirstFreeAce (dacl, &ace))
-	{
-	  debug_printf ("FindFirstFreeAce: %lu", GetLastError ());
-	  return NULL;
-	}
-      dacl->AclSize = (char *) ace - (char *) dacl;
-      SetSecurityDescriptorDacl (psd, TRUE, dacl, FALSE);
-    }
-  return psd;
-}
-
-/* This function returns a handle to the top-level directory in the global
-   NT namespace used to implement advisory locking. */
-static HANDLE
-get_lock_parent_dir ()
-{
-  static HANDLE dir;
-  UNICODE_STRING uname;
-  OBJECT_ATTRIBUTES attr;
-  NTSTATUS status;
-
-  INODE_LIST_LOCK();
-  if (!dir)
-    {
-      RtlInitUnicodeString (&uname, L"\\BaseNamedObjects\\cygwin-fcntl-lk");
-      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
-				  NULL, everyone_sd (FLOCK_PARENT_DIR_ACCESS));
-      status = NtCreateDirectoryObject (&dir, FLOCK_PARENT_DIR_ACCESS, &attr);
-      if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateDirectoryObject(parent): %p", status);
-    }
-  INODE_LIST_UNLOCK ();
-  return dir;
 }
 
 /* Get the handle count of an object. */
@@ -507,15 +443,15 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
 : i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino)
 {
   HANDLE parent_dir;
-  WCHAR name[32];
+  WCHAR name[48];
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  parent_dir = get_lock_parent_dir ();
+  parent_dir = get_shared_parent_dir ();
   /* Create a subdir which is named after the device and inode_t numbers
      of the given file, in hex notation. */
-  int len = __small_swprintf (name, L"%08x-%016X", dev, ino);
+  int len = __small_swprintf (name, L"flock-%08x-%016X", dev, ino);
   RtlInitCountedUnicodeString (&uname, name, len * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
 			      parent_dir, everyone_sd (FLOCK_INODE_DIR_ACCESS));

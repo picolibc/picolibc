@@ -140,5 +140,3 @@ public:
   void initialize ();
   mtinfo_drive *drive (int num) { return &_drive[num]; }
 };
-
-extern void __stdcall mtinfo_init ();

@@ -22,20 +22,52 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
-#include "mtinfo.h"
+#include "ntdll.h"
+#include <alloca.h>
 
-static shared_info cygwin_shared_area __attribute__((section (".cygwin_dll_common"), shared));
 shared_info NO_COPY *cygwin_shared;
 user_info NO_COPY *user_shared;
+HANDLE NO_COPY cygwin_shared_h;
 HANDLE NO_COPY cygwin_user_h;
 
+/* This function returns a handle to the top-level directory in the global
+   NT namespace used to implement global objects including shared memory. */
+
+#define CYG_SHARED_DIR_ACCESS	(DIRECTORY_QUERY \
+                                 | DIRECTORY_TRAVERSE \
+                                 | DIRECTORY_CREATE_SUBDIRECTORY \
+                                 | DIRECTORY_CREATE_OBJECT \
+                                 | READ_CONTROL)
+
+
+HANDLE
+get_shared_parent_dir ()
+{
+  static HANDLE dir;
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  
+  if (!dir)
+    {
+      RtlInitUnicodeString (&uname, L"\\BaseNamedObjects\\cygwin-shared");
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+                                  NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
+      status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
+      if (!NT_SUCCESS (status))
+        api_fatal ("NtCreateDirectoryObject(parent): %p", status);
+    }
+  return dir;
+} 
+
 char * __stdcall
-shared_name (char *ret_buf, const char *str, int num, bool session_local)
+shared_name (char *ret_buf, const char *str, int num)
 {
   extern bool _cygwin_testing;
 
-  __small_sprintf (ret_buf, "%s%s.%s.%d",
-		   session_local ? "" : cygheap->shared_prefix,
+  get_shared_parent_dir ();
+  __small_sprintf (ret_buf, "%scygwin-shared\\%s.%s.%d",
+		   cygheap->shared_prefix,
 		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
     strcat (ret_buf, cygwin_version.dll_build_date);
@@ -47,6 +79,10 @@ shared_name (char *ret_buf, const char *str, int num, bool session_local)
 
 static ptrdiff_t offsets[] =
 {
+  - pround (sizeof (shared_info))
+  - pround (sizeof (user_info))
+  - pround (sizeof (console_state))
+  - pround (sizeof (_pinfo)),
   - pround (sizeof (user_info))
   - pround (sizeof (console_state))
   - pround (sizeof (_pinfo)),
@@ -80,43 +116,16 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
     m = SH_JUSTOPEN;
   else
     {
-      /* Beginning with Windows 2003 Server, a process doesn't necessarily
-	 have the right to create globally accessible shared memory.  If so,
-	 creating the shared memory will fail with ERROR_ACCESS_DENIED if the
-	 user doesn't have the SeCreateGlobalPrivilege privilege.  If that
-	 happened, we retry to create a shared memory object locally.  This
-	 only allows to see the processes in the current user session, but
-	 that's better than nothing. */
-
       if (name)
 	mapname = shared_name (map_buf, name, n);
       if (m == SH_JUSTOPEN)
-	{
-	  shared_h = OpenFileMapping (access, FALSE, mapname);
-	  if (!shared_h && wincap.has_create_global_privilege ()
-	      && GetLastError () == ERROR_FILE_NOT_FOUND)
-	    shared_h = OpenFileMapping (access, FALSE, mapname + 7);
-	}
+	shared_h = OpenFileMapping (access, FALSE, mapname);
       else
 	{
 	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
 	  				PAGE_READWRITE, 0, size, mapname);
-	  switch (GetLastError ())
-	    {
-	    case ERROR_ALREADY_EXISTS:
-	      m = SH_JUSTOPEN;
-	      break;
-	    case ERROR_ACCESS_DENIED:
-	      if (wincap.has_create_global_privilege ())
-	        {
-		  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
-						PAGE_READWRITE, 0, size,
-						mapname + 7);
-		  if (GetLastError () == ERROR_ALREADY_EXISTS)
-		    m = SH_JUSTOPEN;
-		}
-	      break;
-	    }
+	  if (GetLastError () == ERROR_ALREADY_EXISTS)
+	    m = SH_JUSTOPEN;
 	}
       if (shared_h)
 	/* ok! */;
@@ -230,6 +239,8 @@ shared_info::initialize ()
       cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
 
+  mt.initialize ();
+
   if (cb != SHARED_INFO_CB)
     system_printf ("size of shared memory region changed from %u to %u",
 		   SHARED_INFO_CB, cb);
@@ -247,11 +258,17 @@ memory_init ()
       cygheap->user.init ();
     }
 
-  cygwin_shared = &cygwin_shared_area;
+  /* Initialize general shared memory */
+  shared_locations sh_cygwin_shared = SH_CYGWIN_SHARED;
+  cygwin_shared = (shared_info *) open_shared ("shared",
+					       CYGWIN_VERSION_SHARED_DATA,
+					       cygwin_shared_h,
+					       sizeof (*cygwin_shared),
+					       sh_cygwin_shared);
+
   cygwin_shared->initialize ();
 
   user_shared_initialize (false);
-  mtinfo_init ();
 }
 
 unsigned

@@ -10,6 +10,8 @@ details. */
 
 #include "tty.h"
 #include "security.h"
+#include "wsa_event.h"
+#include "mtinfo.h"
 
 /* Mount table entry */
 
@@ -121,9 +123,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 19992
+#define SHARED_INFO_CB 63912
 
-#define CURR_SHARED_MAGIC 0xb7048a88U
+#define CURR_SHARED_MAGIC 0x419c874U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -137,8 +139,12 @@ class shared_info
   bool heap_slop_inited;
   unsigned heap_slop;
   DWORD sys_mount_table_counter;
-
   tty_list tty;
+  wsa_event wsa_events[NUM_SOCKS];
+  LONG socket_serial_number;
+  LONG last_used_bindresvport;
+  mtinfo mt;
+
   void initialize ();
   unsigned heap_chunk_size ();
   unsigned heap_slop_size ();
@@ -151,6 +157,7 @@ extern HANDLE cygwin_user_h;
 
 enum shared_locations
 {
+  SH_CYGWIN_SHARED,
   SH_USER_SHARED,
   SH_SHARED_CONSOLE,
   SH_MYSELF,
@@ -174,7 +181,8 @@ struct console_state
 };
 #endif
 
-char *__stdcall shared_name (char *, const char *, int, bool = false);
+HANDLE get_shared_parent_dir ();
+char *__stdcall shared_name (char *, const char *, int);
 void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
 			     shared_locations&, PSECURITY_ATTRIBUTES psa = &sec_all,
 			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
