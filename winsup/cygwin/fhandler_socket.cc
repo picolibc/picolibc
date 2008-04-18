@@ -403,8 +403,14 @@ fhandler_socket::af_local_set_secret (char *buf)
 /* Maximum number of concurrently opened sockets from all Cygwin processes
    per session.  Note that shared sockets (through dup/fork/exec) are
    counted as one socket. */
+#define NUM_SOCKS       (32768 / sizeof (wsa_event))
+
 #define LOCK_EVENTS	WaitForSingleObject (wsock_mtx, INFINITE)
 #define UNLOCK_EVENTS	ReleaseMutex (wsock_mtx)
+
+static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared)) = { 0 };
+
+static LONG socket_serial_number __attribute__((section (".cygwin_dll_common"), shared)) = 0;
 
 static HANDLE wsa_slot_mtx;
 
@@ -430,11 +436,10 @@ search_wsa_event_slot (LONG new_serial_number)
       break;
     }
   unsigned int slot = new_serial_number % NUM_SOCKS;
-  while (cygwin_shared->wsa_events[slot].serial_number)
+  while (wsa_events[slot].serial_number)
     {
       HANDLE searchmtx = OpenMutex (STANDARD_RIGHTS_READ, FALSE,
-	    shared_name (searchname, "sock",
-			 cygwin_shared->wsa_events[slot].serial_number));
+	    shared_name (searchname, "sock", wsa_events[slot].serial_number));
       if (!searchmtx)
 	break;
       /* Mutex still exists, attached socket is active, try next slot. */
@@ -448,10 +453,10 @@ search_wsa_event_slot (LONG new_serial_number)
 	  return NULL;
 	}
     }
-  memset (&cygwin_shared->wsa_events[slot], 0, sizeof (wsa_event));
-  cygwin_shared->wsa_events[slot].serial_number = new_serial_number;
+  memset (&wsa_events[slot], 0, sizeof (wsa_event));
+  wsa_events[slot].serial_number = new_serial_number;
   ReleaseMutex (wsa_slot_mtx);
-  return cygwin_shared->wsa_events + slot;
+  return wsa_events + slot;
 }
 
 bool
@@ -464,9 +469,9 @@ fhandler_socket::init_events ()
   do
     {
       new_serial_number =
-	InterlockedIncrement (&cygwin_shared->socket_serial_number);
+	InterlockedIncrement (&socket_serial_number);
       if (!new_serial_number)	/* 0 is reserved for global mutex */
-	InterlockedIncrement (&cygwin_shared->socket_serial_number);
+	InterlockedIncrement (&socket_serial_number);
       wsock_mtx = CreateMutex (&sec_all, FALSE,
 			       shared_name (name, "sock", new_serial_number));
       if (!wsock_mtx)

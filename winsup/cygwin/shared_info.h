@@ -10,7 +10,6 @@ details. */
 
 #include "tty.h"
 #include "security.h"
-#include "wsa_event.h"
 #include "mtinfo.h"
 
 /* Mount table entry */
@@ -123,9 +122,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 63912
+#define SHARED_INFO_CB 31144
 
-#define CURR_SHARED_MAGIC 0x419c874U
+#define CURR_SHARED_MAGIC 0xbc77afb0U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -140,8 +139,6 @@ class shared_info
   unsigned heap_slop;
   DWORD sys_mount_table_counter;
   tty_list tty;
-  wsa_event wsa_events[NUM_SOCKS];
-  LONG socket_serial_number;
   LONG last_used_bindresvport;
   mtinfo mt;
 

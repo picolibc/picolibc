@@ -1,6 +1,17 @@
 2008-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler.h (-struct wsa_event): Move to wsa_event.h.  Include
+	Revert thinko in previous patch.
+	* fhandler.h (struct wsa_event): Move back from wsa_event.h to here.
+	* fhandler_socket.cc (NUM_SOCKS): Ditto.
+	(wsa_events): Move back from cygwin_shared to here.  Accommodate
+	throughout.
+	(socket_serial_number): Ditto.
+	* shared_info.h: Accommodate above changes.
+	* wsa_event.h: Remove.
+
+2008-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (struct wsa_event): Move to wsa_event.h.  Include
 	wsa_event.h instead.
 	* fhandler_socket.cc (NUM_SOCKS): Move to wsa_event.h.
 	(wsa_events): Move from DLL shared area to cygwin_shared shared
