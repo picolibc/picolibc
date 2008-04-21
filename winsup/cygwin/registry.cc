@@ -55,7 +55,6 @@ reg_key::reg_key (bool isHKLM, REGSAM access, ...): _disposition (0)
     }
 OK:
   new (this) reg_key (top, access, "SOFTWARE",
-		      CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		      CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
   if (top != HKEY_LOCAL_MACHINE)
     RegCloseKey (top);

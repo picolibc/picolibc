@@ -25,7 +25,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "registry.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include <ntdll.h>
@@ -77,15 +76,11 @@ mount_info::init ()
 {
   nmounts = 0;
 
-  if (from_fstab (false) | from_fstab (true))	/* The single | is correct! */
-    return;
+  if (from_fstab (false) | from_fstab (true))   /* The single | is correct! */
+      return;
 
-  /* FIXME: Remove fetching from registry before releasing 1.7.0. */
-
-  /* Fetch the mount table and cygdrive-related information from
-     the registry.  */
-  system_printf ("Fallback to fetching mounts from registry");
-  from_registry ();
+  /* FIXME: Remove warning message before releasing 1.7.0. */
+  small_printf ("Huh?  No /etc/fstab file?  Using default root and cygdrive prefix...\n");
 }
 
 static void
@@ -908,7 +903,7 @@ mount_info::from_fstab (bool user)
          This allows to override it with mount, unless the sysadmin created
 	 a cygdrive entry in /etc/fstab. */
       cygdrive_flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
-      strcpy (cygdrive, "/cygdrive/");
+      strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/");
       cygdrive_len = strlen (cygdrive);
     }
 
@@ -961,122 +956,6 @@ mount_info::from_fstab (bool user)
 done:
   CloseHandle (h);
   return true;
-}
-
-/* read_mounts: Given a specific regkey, read mounts from under its
-   key. */
-/* FIXME: Remove before releasing 1.7.0. */
-
-void
-mount_info::read_mounts (reg_key& r)
-{
-  tmp_pathbuf tp;
-  char *native_path = tp.c_get ();
-  /* FIXME: The POSIX path is stored as value name right now, which is
-     restricted to 256 bytes. */
-  char posix_path[CYG_MAX_PATH];
-  HKEY key = r.get_key ();
-  DWORD i, posix_path_size;
-  int res;
-
-  /* Loop through subkeys */
-  /* FIXME: we would like to not check MAX_MOUNTS but the heap in the
-     shared area is currently statically allocated so we can't have an
-     arbitrarily large number of mounts. */
-  for (i = 0; ; i++)
-    {
-      int mount_flags;
-
-      posix_path_size = sizeof (posix_path);
-      /* FIXME: if maximum posix_path_size is 256, we're going to
-	 run into problems if we ever try to store a mount point that's
-	 over 256 but is under CYG_MAX_PATH. */
-      res = RegEnumKeyEx (key, i, posix_path, &posix_path_size, NULL,
-			  NULL, NULL, NULL);
-
-      if (res == ERROR_NO_MORE_ITEMS)
-	break;
-      else if (res != ERROR_SUCCESS)
-	{
-	  debug_printf ("RegEnumKeyEx failed, error %d!", res);
-	  break;
-	}
-
-      /* Get a reg_key based on i. */
-      reg_key subkey = reg_key (key, KEY_READ, posix_path, NULL);
-
-      /* Fetch info from the subkey. */
-      subkey.get_string ("native", native_path, NT_MAX_PATH, "");
-      mount_flags = subkey.get_int ("flags", 0);
-
-      /* Add mount_item corresponding to registry mount point. */
-      res = mount_table->add_item (native_path, posix_path, mount_flags);
-      if (res && get_errno () == EMFILE)
-	break; /* The number of entries exceeds MAX_MOUNTS */
-    }
-}
-
-/* from_registry: Build the entire mount table from the registry.  Also,
-   read in cygdrive-related information from its registry location. */
-/* FIXME: Remove before releasing 1.7.0. */
-
-void
-mount_info::from_registry ()
-{
-
-  /* Retrieve cygdrive-related information. */
-  read_cygdrive_info_from_registry ();
-
-  nmounts = 0;
-
-  /* First read mounts from user's table.
-     Then read mounts from system-wide mount table while deimpersonated . */
-  for (int i = 0; i < 2; i++)
-    {
-      if (i)
-	cygheap->user.deimpersonate ();
-      reg_key r (i, KEY_READ, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-      read_mounts (r);
-      if (i)
-	cygheap->user.reimpersonate ();
-    }
-}
-
-/* read_cygdrive_info_from_registry: Read the default prefix and flags
-   to use when creating cygdrives from the special user registry
-   location used to store cygdrive information. */
-/* FIXME: Remove before releasing 1.7.0. */
-
-void
-mount_info::read_cygdrive_info_from_registry ()
-{
-  /* First read cygdrive from user's registry.
-     If failed, then read cygdrive from system-wide registry
-     while deimpersonated. */
-  for (int i = 0; i < 2; i++)
-    {
-      if (i)
-	cygheap->user.deimpersonate ();
-      reg_key r (i, KEY_READ, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
-      if (i)
-	cygheap->user.reimpersonate ();
-
-      if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
-			CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX) != ERROR_SUCCESS && i == 0)
-	continue;
-
-      /* Fetch user cygdrive_flags from registry; returns MOUNT_CYGDRIVE on error. */
-      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS,
-				  MOUNT_CYGDRIVE | MOUNT_BINARY);
-      /* Sanitize */
-      if (i == 0)
-	cygdrive_flags &= ~MOUNT_SYSTEM;
-      else
-	cygdrive_flags |= MOUNT_SYSTEM;
-      slashify (cygdrive, cygdrive, 1);
-      cygdrive_len = strlen (cygdrive);
-      break;
-    }
 }
 
 /* write_cygdrive_info: Store default prefix and flags

@@ -6,9 +6,6 @@
 
 #define CYGWIN_DLL_NAME CYGWIN_VERSION_DLL_IDENTIFIER STRINGIFY(.dll)
 
-#define CYGWIN_REGISTRY_KEY CYGWIN_INFO_CYGNUS_REGISTRY_NAME "\\" \
-			    CYGWIN_INFO_CYGWIN_REGISTRY_NAME
-
 #define CYGWIN_API_VERSION STRINGIFY(CYGWIN_VERSION_API_MAJOR) "." \
 			  STRINGIFY(CYGWIN_VERSION_API_MINOR)
 
@@ -36,13 +33,13 @@ BEGIN
       VALUE "FileDescription", "Cygwin\256 POSIX Emulation DLL"
       VALUE "FileVersion", STRINGIFY(CYGWIN_VERSION)
       VALUE "InternalName", CYGWIN_DLL_NAME
-      VALUE "LegalCopyright", "Copyright \251 Red Hat, Inc. 1996-2003"
+      VALUE "LegalCopyright", "Copyright \251 Red Hat, Inc. 1996-2008"
       VALUE "OriginalFilename", CYGWIN_DLL_NAME
       VALUE "ProductName", "Cygwin"
       VALUE "ProductVersion", STRINGIFY(CYGWIN_VERSION)
       VALUE "APIVersion", CYGWIN_API_VERSION
       VALUE "SharedMemoryVersion", STRINGIFY(CYGWIN_VERSION_SHARED_DATA)
-      VALUE "RegistryKey", CYGWIN_REGISTRY_KEY
+      VALUE "RegistryKey", CYGWIN_INFO_CYGWIN_REGISTRY_NAME
       VALUE "BuildDate", CYGWIN_BUILD_DATE_TIME
     END
   END

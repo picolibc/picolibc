@@ -77,7 +77,6 @@ class mount_info
 
   bool from_fstab_line (char *line, bool user);
   bool from_fstab (bool user);
-  void from_registry ();
 
   unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
@@ -99,12 +98,9 @@ class mount_info
  private:
 
   void sort ();
-  void read_mounts (reg_key& r);
   void mount_slash ();
-  void to_registry ();
 
   int cygdrive_win32_path (const char *src, char *dst, int& unit);
-  void read_cygdrive_info_from_registry ();
 };
 
 class user_info

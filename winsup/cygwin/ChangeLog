@@ -1,5 +1,27 @@
 2008-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::init): Remove call to from_registry.  Print
+	message that fstab is missing.
+	(mount_info::from_fstab): Use CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX
+	instead of constant string.
+	(mount_info::read_mounts): Remove.
+	(mount_info::from_registry): Remove.
+	(mount_info::read_cygdrive_info_from_registry): Remove.
+	* postinstall: Enable code to create fstab entries from old registry
+	entries.
+	* registry.cc (reg_key::reg_key): Drop CYGWIN_INFO_CYGNUS_REGISTRY_NAME
+	from registry key.
+	* shared_info.h (mount_info::read_mounts): Remove declaration.
+	(mount_info::from_registry): Ditto.
+	(mount_info::to_registry): Ditto.
+	(mount_info::read_cygdrive_info_from_registry): Ditto.
+	* winver.rc (CYGWIN_REGISTRY_KEY): Remove.
+	(LegalCopyright): Fix to include 2008.
+	(RegistryKey): Set to CYGWIN_INFO_CYGWIN_REGISTRY_NAME.
+	* include/cygwin/version.h (CYGWIN_INFO_CYGNUS_REGISTRY_NAME): Remove.
+
+2008-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* kernel32.cc (CreateFileMappingW): Fix bug in reserve/commit handling.
 
 2008-04-21  Corinna Vinschen  <corinna@vinschen.de>

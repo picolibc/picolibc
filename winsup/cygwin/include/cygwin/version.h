@@ -364,7 +364,6 @@ details. */
 
      /* Identifiers used in the Win32 registry. */
 
-#define CYGWIN_INFO_CYGNUS_REGISTRY_NAME "Cygnus Solutions"
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
 #define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
 #define CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME "mounts v2"
