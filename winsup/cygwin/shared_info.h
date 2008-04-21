@@ -179,6 +179,7 @@ struct console_state
 #endif
 
 HANDLE get_shared_parent_dir ();
+HANDLE get_session_parent_dir ();
 char *__stdcall shared_name (char *, const char *, int);
 void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
 			     shared_locations&, PSECURITY_ATTRIBUTES psa = &sec_all,

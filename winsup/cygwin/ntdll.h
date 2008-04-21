@@ -8,6 +8,9 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define STATUS_OBJECT_NAME_EXISTS     ((NTSTATUS) 0x40000000)
+#define STATUS_BUFFER_OVERFLOW        ((NTSTATUS) 0x80000005)
+#define STATUS_NO_MORE_FILES          ((NTSTATUS) 0x80000006)
 #ifndef STATUS_INVALID_INFO_CLASS
 /* Some w32api header file defines this so we need to conditionalize this
    define to avoid warnings. */
@@ -35,13 +38,10 @@
 #define STATUS_DIRECTORY_NOT_EMPTY    ((NTSTATUS) 0xc0000101)
 #define STATUS_NOT_ALL_ASSIGNED       ((NTSTATUS) 0x00000106)
 #define STATUS_INVALID_LEVEL          ((NTSTATUS) 0xc0000148)
-#define STATUS_BUFFER_OVERFLOW        ((NTSTATUS) 0x80000005)
-#define STATUS_NO_MORE_FILES          ((NTSTATUS) 0x80000006)
-#define STATUS_DLL_NOT_FOUND          ((NTSTATUS) 0xC0000135)
-#define STATUS_ENTRYPOINT_NOT_FOUND   ((NTSTATUS) 0xC0000139)
-#define STATUS_BAD_DLL_ENTRYPOINT     ((NTSTATUS) 0xC0000251)
-#define STATUS_ILLEGAL_DLL_RELOCATION ((NTSTATUS) 0xC0000269)
-
+#define STATUS_DLL_NOT_FOUND          ((NTSTATUS) 0xc0000135)
+#define STATUS_ENTRYPOINT_NOT_FOUND   ((NTSTATUS) 0xc0000139)
+#define STATUS_BAD_DLL_ENTRYPOINT     ((NTSTATUS) 0xc0000251)
+#define STATUS_ILLEGAL_DLL_RELOCATION ((NTSTATUS) 0xc0000269)
 
 #define PDI_MODULES 0x01
 #define PDI_HEAPS 0x04
@@ -195,6 +195,28 @@ typedef struct _FILE_ID_BOTH_DIR_INFORMATION
 #define DIRECTORY_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED|0x0f)
 
 #define EVENT_QUERY_STATE 1
+#define SEMAPHORE_QUERY_STATE 1
+
+/* Specific ACCESS_MASKSs for objects created in Cygwin. */
+#define CYG_SHARED_DIR_ACCESS	(DIRECTORY_QUERY \
+                                 | DIRECTORY_TRAVERSE \
+                                 | DIRECTORY_CREATE_SUBDIRECTORY \
+                                 | DIRECTORY_CREATE_OBJECT \
+                                 | READ_CONTROL)
+
+#define CYG_MUTANT_ACCESS	(MUTANT_QUERY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
+
+#define CYG_EVENT_ACCESS	(EVENT_QUERY_STATE \
+				 | EVENT_MODIFY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
+
+#define CYG_SEMAPHORE_ACCESS	(SEMAPHORE_QUERY_STATE \
+				 | SEMAPHORE_MODIFY_STATE \
+				 | SYNCHRONIZE \
+				 | READ_CONTROL)
 
 typedef ULONG KAFFINITY;
 
@@ -440,7 +462,8 @@ typedef enum _PROCESSINFOCLASS
   ProcessBasicInformation = 0,
   ProcessQuotaLimits = 1,
   ProcessVmCounters = 3,
-  ProcessTimes =4,
+  ProcessTimes = 4,
+  ProcessSessionInformation = 24,
 } PROCESSINFOCLASS;
 
 typedef struct _DEBUG_BUFFER
@@ -559,6 +582,11 @@ typedef struct _PROCESS_BASIC_INFORMATION
   ULONG UniqueProcessId;
   ULONG InheritedFromUniqueProcessId;
 } PROCESS_BASIC_INFORMATION, *PPROCESS_BASIC_INFORMATION;
+
+typedef struct _PROCESS_SESSION_INFORMATION
+{
+  ULONG  SessionId;
+} PROCESS_SESSION_INFORMATION, *PPROCESS_SESSION_INFORMATION;
 
 typedef enum _MEMORY_INFORMATION_CLASS
 {
@@ -840,6 +868,8 @@ extern "C"
 				 BOOLEAN);
   NTSTATUS NTAPI NtCreateSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
 				  PLARGE_INTEGER, ULONG, ULONG, HANDLE);
+  NTSTATUS NTAPI NtCreateSemaphore (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
+				    LONG, LONG);
   NTSTATUS NTAPI NtCreateToken (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
 				TOKEN_TYPE, PLUID, PLARGE_INTEGER, PTOKEN_USER,
 				PTOKEN_GROUPS, PTOKEN_PRIVILEGES, PTOKEN_OWNER,
@@ -863,6 +893,7 @@ extern "C"
 			     PIO_STATUS_BLOCK, ULONG, ULONG);
   NTSTATUS NTAPI NtOpenMutant (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
   NTSTATUS NTAPI NtOpenSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
+  NTSTATUS NTAPI NtOpenSemaphore (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
   /* WARNING!  Don't rely on the timestamp information returned by
      NtQueryAttributesFile.  Only the DOS file attribute info is reliable. */
   NTSTATUS NTAPI NtQueryAttributesFile (POBJECT_ATTRIBUTES,

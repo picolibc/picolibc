@@ -2938,7 +2938,7 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
 {
   char name[MAX_PATH];
 
-  __small_sprintf (name, "%scyg_psem/cyg%016X%08x%08x", cygheap->shared_prefix,
+  __small_sprintf (name, "semaphore/%016X%08x%08x", 
 		   hash, luid.HighPart, luid.LowPart);
   this->win32_obj_id = ::CreateSemaphore (&sec_all, value, LONG_MAX, name);
   if (!this->win32_obj_id)

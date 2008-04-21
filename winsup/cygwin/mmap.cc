@@ -189,7 +189,7 @@ CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
   return h;
 }
 
-void *
+static void *
 MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
 	 int prot, int flags, _off64_t off)
 {

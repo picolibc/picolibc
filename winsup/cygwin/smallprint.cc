@@ -435,7 +435,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  s = va_arg (ap, char *);
 		  if (s == NULL)
 		    s = "(null)";
-		  sys_mbstowcs (tmp, NT_MAX_PATH, s, n);
+		  sys_mbstowcs (tmp, NT_MAX_PATH, s, n < 0x7fff ? (int) n : -1);
 		  RtlInitUnicodeString (us = &uw, tmp);
 		  goto fillin;
 		  break;

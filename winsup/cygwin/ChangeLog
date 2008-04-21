@@ -1,3 +1,53 @@
+2008-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add kernel32.o.
+	* autoload.cc (WSACloseEvent): Remove.
+	(WSACreateEvent): Remove.
+	* cygheap.cc (cygheap_init): Drop initializing shared_prefix.
+	* cygheap.h (struct init_cygheap): Drop shared_prefix and
+	shared_prefix_buf members.
+	* fhandler_socket.cc (sock_shared_name): New static function.
+	(search_wsa_event_slot): Convert name buffers to WCHAR.  Call
+	NtCreateMutant/NtOpenMutant to create mutexes in session local
+	namespace.
+	(fhandler_socket::init_events): Ditto.  Fix debug output.
+	(fhandler_socket::release_events): Close mutexes using NtClose.
+	(fhandler_socket::dup): Ditto.
+	* kernel32.cc: New file, implementing Win32 calls in a Cygwin-specific
+	way.
+	* mmap.cc (MapView): Make static.
+	* ntdll.h: Fix status code sorting.
+	(STATUS_OBJECT_NAME_EXISTS): Define.
+	(SEMAPHORE_QUERY_STATE): Define.
+	(CYG_SHARED_DIR_ACCESS): Define.
+	(CYG_MUTANT_ACCESS): Define.
+	(CYG_EVENT_ACCESS): Define.
+	(CYG_SEMAPHORE_ACCESS): Define.
+	(enum _PROCESSINFOCLASS): Define ProcessSessionInformation.
+	(struct _PROCESS_SESSION_INFORMATION): Define.
+	(NtCreateSemaphore): Declare.
+	(NtOpenSemaphore): Declare.
+	* flock.cc: Use CYG_xxx_ACCESS access masks where appropriate.
+	* posix_ipc.cc (ipc_mutex_init): Use native functions to create mutex.
+	Create in cygwin-shared subdir.
+	(ipc_cond_init): Ditto for event.
+	(ipc_mutex_close): Use NtClose.
+	(ipc_cond_close): Ditto.
+	(mq_open): Drop "cyg" prefix from mqh_uname.
+	* shared.cc (CYG_SHARED_DIR_ACCESS): Drop definition here.
+	(_cygwin_testing): Declare extern on file level.
+	(get_shared_parent_dir): Change name of shared directory.  Add name
+	to api_fatal output.
+	(get_session_parent_dir): New function.
+	(shared_name): Simplify.
+	(shared_info::initialize): Call get_session_parent_dir.
+	* shared_info.h (get_session_parent_dir): Declare.
+	* smallprint.cc (__small_vswprintf): Fix bug in multibyte string
+	conversion.
+	* thread.cc (semaphore::semaphore): Align semaphore name to object
+	names in posix IPC functions.
+	* include/cygwin/version.h (CYGWIN_VERSION_SHARED_DATA): Bump.
+
 2008-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	Revert thinko in previous patch.

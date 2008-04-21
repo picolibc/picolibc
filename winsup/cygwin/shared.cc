@@ -32,13 +32,7 @@ HANDLE NO_COPY cygwin_user_h;
 
 /* This function returns a handle to the top-level directory in the global
    NT namespace used to implement global objects including shared memory. */
-
-#define CYG_SHARED_DIR_ACCESS	(DIRECTORY_QUERY \
-                                 | DIRECTORY_TRAVERSE \
-                                 | DIRECTORY_CREATE_SUBDIRECTORY \
-                                 | DIRECTORY_CREATE_OBJECT \
-                                 | READ_CONTROL)
-
+extern bool _cygwin_testing;
 
 HANDLE
 get_shared_parent_dir ()
@@ -47,15 +41,53 @@ get_shared_parent_dir ()
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
-  
+
   if (!dir)
     {
-      RtlInitUnicodeString (&uname, L"\\BaseNamedObjects\\cygwin-shared");
+      WCHAR bnoname[MAX_PATH];
+      __small_swprintf (bnoname, L"\\BaseNamedObjects\\%s%s",
+			cygwin_version.shared_id,
+			_cygwin_testing ? cygwin_version.dll_build_date : "");
+      RtlInitUnicodeString (&uname, bnoname);
       InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
                                   NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
       status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-        api_fatal ("NtCreateDirectoryObject(parent): %p", status);
+        api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+    }
+  return dir;
+} 
+
+HANDLE
+get_session_parent_dir ()
+{
+  static HANDLE dir;
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+
+  if (!dir)
+    {
+      PROCESS_SESSION_INFORMATION psi;
+      status = NtQueryInformationProcess (GetCurrentProcess (),
+					  ProcessSessionInformation,
+					  &psi, sizeof psi, NULL);
+      if (!NT_SUCCESS (status) || psi.SessionId == 0)
+	dir = get_shared_parent_dir ();
+      else
+        {
+	  WCHAR bnoname[MAX_PATH];
+	  __small_swprintf (bnoname,
+			    L"\\Sessions\\BNOLINKS\\%d\\%s%s",
+			    psi.SessionId, cygwin_version.shared_id,
+			    _cygwin_testing ? cygwin_version.dll_build_date : "");
+	  RtlInitUnicodeString (&uname, bnoname);
+	  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				      NULL, everyone_sd(CYG_SHARED_DIR_ACCESS));
+	  status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
+	  if (!NT_SUCCESS (status))
+	    api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	}
     }
   return dir;
 } 
@@ -63,14 +95,7 @@ get_shared_parent_dir ()
 char * __stdcall
 shared_name (char *ret_buf, const char *str, int num)
 {
-  extern bool _cygwin_testing;
-
-  get_shared_parent_dir ();
-  __small_sprintf (ret_buf, "%scygwin-shared\\%s.%s.%d",
-		   cygheap->shared_prefix,
-		   cygwin_version.shared_id, str, num);
-  if (_cygwin_testing)
-    strcat (ret_buf, cygwin_version.dll_build_date);
+  __small_sprintf (ret_buf, "%s.%d", str, num);
   return ret_buf;
 }
 
@@ -239,7 +264,9 @@ shared_info::initialize ()
       cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
 
-  mt.initialize ();
+  mt.initialize ();		/* Initialize shared tape information. */
+
+  get_session_parent_dir ();	/* Create session dir if first process. */
 
   if (cb != SHARED_INFO_CB)
     system_printf ("size of shared memory region changed from %u to %u",

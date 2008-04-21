@@ -16,6 +16,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
+#include "ntdll.h"
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <stdlib.h>
@@ -87,10 +88,13 @@ static int
 ipc_mutex_init (HANDLE *pmtx, const char *name)
 {
   char buf[MAX_PATH];
-  __small_sprintf (buf, "%scyg_pmtx/%s", cygheap->shared_prefix, name);
-  *pmtx = CreateMutex (&sec_all, FALSE, buf);
+  SECURITY_ATTRIBUTES sa = sec_none;
+
+  __small_sprintf (buf, "mqueue/mtx_%W", name);
+  sa.lpSecurityDescriptor = everyone_sd (CYG_MUTANT_ACCESS);
+  *pmtx = CreateMutex (&sa, FALSE, buf);
   if (!*pmtx)
-    debug_printf ("failed: %E\n");
+    debug_printf ("CreateMutex: %E");
   return *pmtx ? 0 : geterrno_from_win_error ();
 }
 
@@ -129,10 +133,13 @@ static int
 ipc_cond_init (HANDLE *pevt, const char *name)
 {
   char buf[MAX_PATH];
-  __small_sprintf (buf, "%scyg_pevt/%s", cygheap->shared_prefix, name);
-  *pevt = CreateEvent (&sec_all, TRUE, FALSE, buf);
+  SECURITY_ATTRIBUTES sa = sec_none;
+
+  __small_sprintf (buf, "mqueue/evt_%W", name);
+  sa.lpSecurityDescriptor = everyone_sd (CYG_EVENT_ACCESS);
+  *pevt = CreateEvent (&sa, TRUE, FALSE, buf);
   if (!*pevt)
-    debug_printf ("failed: %E\n");
+    debug_printf ("CreateEvent: %E");
   return *pevt ? 0 : geterrno_from_win_error ();
 }
 
@@ -387,7 +394,7 @@ again:
 	  __seterrno ();
 	  goto err;
 	}
-      __small_sprintf (mqhdr->mqh_uname, "cyg%016X%08x%08x",
+      __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
 		       hash_path_name (0,mqname),
 		       luid.HighPart, luid.LowPart);
       mqhdr->mqh_head = 0;

@@ -342,7 +342,7 @@ details. */
 	Bump to 4 since this hasn't been rigorously updated in a
 	while.  */
 
-#define CYGWIN_VERSION_SHARED_DATA 4
+#define CYGWIN_VERSION_SHARED_DATA 5
 
      /* An identifier used in the names used to create shared objects.
 	The full names include the CYGWIN_VERSION_SHARED_DATA version

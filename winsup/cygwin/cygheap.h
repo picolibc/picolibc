@@ -280,8 +280,6 @@ struct init_cygheap
   HANDLE console_h;
   cwdstuff cwd;
   dtable fdtab;
-  char *shared_prefix;
-  char shared_prefix_buf[8];
 #ifdef DEBUGGING
   cygheap_debug debug;
 #endif

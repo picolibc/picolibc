@@ -414,17 +414,31 @@ static LONG socket_serial_number __attribute__((section (".cygwin_dll_common"), 
 
 static HANDLE wsa_slot_mtx;
 
+static PWCHAR
+sock_shared_name (PWCHAR buf, LONG num)
+{
+  __small_swprintf (buf, L"socket.%d", num);
+  return buf;
+}
+
 static wsa_event *
 search_wsa_event_slot (LONG new_serial_number)
 {
-  char name[MAX_PATH], searchname[MAX_PATH];
+  WCHAR name[32], searchname[32];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
 
   if (!wsa_slot_mtx)
     {
-      wsa_slot_mtx = CreateMutex (&sec_all, FALSE,
-				  shared_name (name, "sock", 0));
-      if (!wsa_slot_mtx)
-	api_fatal ("Couldn't create/open shared socket mutex, %E");
+      RtlInitUnicodeString (&uname, sock_shared_name (name, 0));
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				  get_session_parent_dir (),
+				  everyone_sd (CYG_MUTANT_ACCESS));
+      status = NtCreateMutant (&wsa_slot_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
+      if (!NT_SUCCESS (status))
+	api_fatal ("Couldn't create/open shared socket mutex %S, %p",
+		   &uname, status);
     }
   switch (WaitForSingleObject (wsa_slot_mtx, INFINITE))
     {
@@ -438,12 +452,16 @@ search_wsa_event_slot (LONG new_serial_number)
   unsigned int slot = new_serial_number % NUM_SOCKS;
   while (wsa_events[slot].serial_number)
     {
-      HANDLE searchmtx = OpenMutex (STANDARD_RIGHTS_READ, FALSE,
-	    shared_name (searchname, "sock", wsa_events[slot].serial_number));
-      if (!searchmtx)
+      HANDLE searchmtx;
+      RtlInitUnicodeString (&uname, sock_shared_name (searchname,
+      					wsa_events[slot].serial_number));
+      InitializeObjectAttributes (&attr, &uname, 0, get_session_parent_dir (),
+				  NULL);
+      status = NtOpenMutant (&searchmtx, READ_CONTROL, &attr);
+      if (!NT_SUCCESS (status))
 	break;
       /* Mutex still exists, attached socket is active, try next slot. */
-      CloseHandle (searchmtx);
+      NtClose (searchmtx);
       slot = (slot + 1) % NUM_SOCKS;
       if (slot == (new_serial_number % NUM_SOCKS))
 	{
@@ -463,8 +481,10 @@ bool
 fhandler_socket::init_events ()
 {
   LONG new_serial_number;
-  char name[MAX_PATH];
-  DWORD err = 0;
+  WCHAR name[32];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
 
   do
     {
@@ -472,33 +492,35 @@ fhandler_socket::init_events ()
 	InterlockedIncrement (&socket_serial_number);
       if (!new_serial_number)	/* 0 is reserved for global mutex */
 	InterlockedIncrement (&socket_serial_number);
-      wsock_mtx = CreateMutex (&sec_all, FALSE,
-			       shared_name (name, "sock", new_serial_number));
-      if (!wsock_mtx)
+      RtlInitUnicodeString (&uname, sock_shared_name (name, new_serial_number));
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				  get_session_parent_dir (),
+				  everyone_sd (CYG_MUTANT_ACCESS));
+      status = NtCreateMutant (&wsock_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
+      if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("CreateMutex, %E");
+	  debug_printf ("NtCreateMutant(%S), %p", &uname, status);
 	  set_errno (ENOBUFS);
 	  return false;
 	}
-      err = GetLastError ();
-      if (err == ERROR_ALREADY_EXISTS)
-	CloseHandle (wsock_mtx);
+      if (status == STATUS_OBJECT_NAME_EXISTS)
+	NtClose (wsock_mtx);
     }
-  while (err == ERROR_ALREADY_EXISTS);
+  while (status == STATUS_OBJECT_NAME_EXISTS);
   if ((wsock_evt = CreateEvent (&sec_all, TRUE, FALSE, NULL))
       == WSA_INVALID_EVENT)
     {
-      debug_printf ("WSACreateEvent, %E");
+      debug_printf ("CreateEvent, %E");
       set_errno (ENOBUFS);
-      CloseHandle (wsock_mtx);
+      NtClose (wsock_mtx);
       return false;
     }
   if (WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK) == SOCKET_ERROR)
     {
       debug_printf ("WSAEventSelect, %E");
       set_winsock_errno ();
-      CloseHandle (wsock_evt);
-      CloseHandle (wsock_mtx);
+      NtClose (wsock_evt);
+      NtClose (wsock_mtx);
       return false;
     }
   wsock_events = search_wsa_event_slot (new_serial_number);
@@ -601,8 +623,8 @@ fhandler_socket::wait_for_events (const long event_mask)
 void
 fhandler_socket::release_events ()
 {
-  CloseHandle (wsock_evt);
-  CloseHandle (wsock_mtx);
+  NtClose (wsock_evt);
+  NtClose (wsock_mtx);
 }
 
 void
@@ -629,7 +651,7 @@ fhandler_socket::dup (fhandler_base *child)
 			TRUE, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
-      CloseHandle (fhs->wsock_mtx);
+      NtClose (fhs->wsock_mtx);
       return -1;
     }
   fhs->wsock_events = wsock_events;
@@ -653,8 +675,8 @@ fhandler_socket::dup (fhandler_base *child)
   int ret = fhandler_base::dup (child);
   if (ret)
     {
-      CloseHandle (fhs->wsock_evt);
-      CloseHandle (fhs->wsock_mtx);
+      NtClose (fhs->wsock_evt);
+      NtClose (fhs->wsock_mtx);
     }
   return ret;
 }

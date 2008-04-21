@@ -139,10 +139,6 @@ static NO_COPY muto lockf_guard;
 				 | DIRECTORY_CREATE_OBJECT \
 				 | READ_CONTROL)
 
-#define FLOCK_MUTANT_ACCESS	(MUTANT_QUERY_STATE \
-				 | SYNCHRONIZE \
-				 | READ_CONTROL)
-
 #define FLOCK_EVENT_ACCESS	(EVENT_QUERY_STATE \
 				 | SYNCHRONIZE \
 				 | READ_CONTROL)
@@ -462,8 +458,8 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
      access synchronization on the dir and its objects. */
   RtlInitUnicodeString (&uname, L"mtx");
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF, i_dir,
-			      everyone_sd (FLOCK_MUTANT_ACCESS));
-  status = NtCreateMutant (&i_mtx, FLOCK_MUTANT_ACCESS, &attr, FALSE);
+			      everyone_sd (CYG_MUTANT_ACCESS));
+  status = NtCreateMutant (&i_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))
     api_fatal ("NtCreateMutant(inode): %p", status);
 }
@@ -554,7 +550,7 @@ lockf_t::create_lock_obj ()
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
 			      everyone_sd (FLOCK_EVENT_ACCESS));
-  status = NtCreateEvent (&lf_obj, EVENT_ALL_ACCESS, &attr,
+  status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS, &attr,
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
     api_fatal ("NtCreateEvent(lock): %p", status);
