@@ -1,4 +1,8 @@
-2008-04-20  Corinna Vinschen  <corinna@vinschen.de>
+2008-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* kernel32.cc (CreateFileMappingW): Fix bug in reserve/commit handling.
+
+2008-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add kernel32.o.
 	* autoload.cc (WSACloseEvent): Remove.

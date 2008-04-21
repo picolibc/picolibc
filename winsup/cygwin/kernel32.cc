@@ -331,8 +331,8 @@ CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 			      lpAttributes
 			      ? lpAttributes->lpSecurityDescriptor
 			      : NULL);
-  if (!attribs)
-    attribs = SEC_COMMIT;
+  if (!(attribs & (SEC_RESERVE | SEC_COMMIT)))
+    attribs |= SEC_COMMIT;
   if (hFile == INVALID_HANDLE_VALUE)
     hFile = NULL;
   status = NtCreateSection (&sect, access, &attr, psize, prot, attribs, hFile);
