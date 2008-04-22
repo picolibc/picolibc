@@ -751,8 +751,6 @@ dll_crt0_0 ()
   events_init ();
   tty_list::init_session ();
 
-  cygheap->cwd.init ();
-
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
@@ -774,6 +772,8 @@ dll_crt0_1 (void *)
 
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
+
+  cygheap->cwd.init ();
 
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
