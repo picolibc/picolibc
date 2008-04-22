@@ -1,5 +1,11 @@
 2008-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (fmemopen): Export.
+	(open_memstream): Export.
+	* include/cygwin/version.h: Bump API minor number.
+
+2008-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (create_token): Add integrity level SID to token on
 	systems supporting that.  Remove useless check for dynamically loading
 	NtCreateToken function.

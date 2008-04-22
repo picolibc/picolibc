@@ -476,6 +476,7 @@ fma NOSIGFE
 fmaf NOSIGFE
 fmax NOSIGFE
 fmaxf NOSIGFE
+fmemopen SIGFE
 fmin NOSIGFE
 fminf NOSIGFE
 fmod NOSIGFE
@@ -1017,6 +1018,7 @@ _ntohs = ntohs NOSIGFE
 on_exit SIGFE
 open SIGFE
 _open = open SIGFE
+open_memstream SIGFE
 _open64
 opendir SIGFE
 __opendir_with_d_ino SIGFE

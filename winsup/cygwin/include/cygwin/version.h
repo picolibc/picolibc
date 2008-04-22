@@ -327,12 +327,13 @@ details. */
       182: Export lockf.
       FIXME: Removed 12 year old and entirely wrong wprintf function at
            this point.  We need a working implementation soon.
+      183: Export open_memstream, fmemopen.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 182
+#define CYGWIN_VERSION_API_MINOR 183
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
