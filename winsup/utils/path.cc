@@ -16,9 +16,11 @@ details. */
 #define str(a) #a
 #define scat(a,b) str(a##b)
 #include <windows.h>
+#include <lmcons.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <wchar.h>
 #include "path.h"
 #include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/mount.h"
@@ -226,79 +228,293 @@ readlink (HANDLE fh, char *path, int maxlen)
     return false;
 }
 
-typedef struct mnt
-  {
-    const char *native;
-    char *posix;
-    unsigned flags;
-    int issys;
-  } mnt_t;
+struct mnt_t
+{
+  char *native;
+  char *posix;
+  unsigned flags;
+};
 
 #ifndef TESTSUITE
 static mnt_t mount_table[255];
+static int max_mount_entry;
 #else
 #  define TESTSUITE_MOUNT_TABLE
 #  include "testsuite.h"
 #  undef TESTSUITE_MOUNT_TABLE
 #endif
 
-struct mnt *root_here = NULL;
+mnt_t *root_here = NULL;
+
+inline void
+unconvert_slashes (char* name)
+{
+  while ((name = strchr (name, '/')) != NULL)
+    *name++ = '\\';
+}
 
 /* These functions aren't called when defined(TESTSUITE) which results
    in a compiler warning.  */
 #ifndef TESTSUITE
-static char *
-find2 (HKEY rkey, unsigned *flags, char *what)
+inline char *
+skip_ws (char *in)
 {
-  char *retval = 0;
-  DWORD retvallen = 0;
-  DWORD type;
-  HKEY key;
+  while (*in == ' ' || *in == '\t')
+    ++in;
+  return in;
+}
 
-  if (RegOpenKeyEx (rkey, what, 0, KEY_READ, &key) != ERROR_SUCCESS)
-    return 0;
+inline char *
+find_ws (char *in)
+{
+  while (*in && *in != ' ' && *in != '\t')
+    ++in;
+  return in;
+}
 
-  if (RegQueryValueEx (key, "native", 0, &type, 0, &retvallen)
-      == ERROR_SUCCESS)
+inline char *
+conv_fstab_spaces (char *field)
+{
+  register char *sp = field;
+  while (sp = strstr (sp, "\\040"))
     {
-      retval = (char *) malloc (MAX_PATH + 1);
-      if (RegQueryValueEx (key, "native", 0, &type, (BYTE *) retval, &retvallen)
-	  != ERROR_SUCCESS)
-	{
-	  free (retval);
-	  retval = 0;
-	}
+      *sp++ = ' ';
+      memmove (sp, sp + 3, strlen (sp + 3) + 1);
+    }
+  return field;
+}
+
+struct opt
+{
+  const char *name;
+  unsigned val;
+  bool clear;
+} oopts[] =
+{
+  {"user", MOUNT_SYSTEM, 1},
+  {"nouser", MOUNT_SYSTEM, 0},
+  {"binary", MOUNT_BINARY, 0},
+  {"text", MOUNT_BINARY, 1},
+  {"exec", MOUNT_EXEC, 0},
+  {"notexec", MOUNT_NOTEXEC, 0},
+  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"nosuid", 0, 0},
+  {"managed", MOUNT_ENC, 0}
+};
+
+static bool
+read_flags (char *options, unsigned &flags)
+{
+  while (*options)
+    {
+      char *p = strchr (options, ',');
+      if (p)
+        *p++ = '\0';
+      else
+        p = strchr (options, '\0');
+
+      for (opt *o = oopts;
+           o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
+           o++)
+        if (strcmp (options, o->name) == 0)
+          {
+            if (o->clear)
+              flags &= ~o->val;
+            else
+              flags |= o->val;
+            goto gotit;
+          }
+      return false;
+
+    gotit:
+      options = p;
+    }
+  return true;
+}
+
+static bool
+from_fstab_line (mnt_t *m, char *line, bool user)
+{
+  char *native_path, *posix_path, *fs_type;
+
+  /* First field: Native path. */
+  char *c = skip_ws (line);
+  if (!*c || *c == '#')
+    return false;
+  char *cend = find_ws (c);
+  *cend = '\0';
+  native_path = conv_fstab_spaces (c);
+  /* Second field: POSIX path. */
+  c = skip_ws (cend + 1);
+  if (!*c)
+    return false;
+  cend = find_ws (c);
+  *cend = '\0';
+  posix_path = conv_fstab_spaces (c);
+  /* Third field: FS type. */
+  c = skip_ws (cend + 1);
+  if (!*c)
+    return false;
+  cend = find_ws (c);
+  *cend = '\0';
+  fs_type = c;
+  /* Forth field: Flags. */
+  c = skip_ws (cend + 1);
+  if (!*c)
+    return false;
+  cend = find_ws (c);
+  *cend = '\0';
+  unsigned mount_flags = MOUNT_SYSTEM;
+  if (!read_flags (c, mount_flags))
+    return false;
+  if (user)
+    mount_flags &= ~MOUNT_SYSTEM;
+  if (!strcmp (fs_type, "cygdrive"))
+    {
+      for (mnt_t *sm = mount_table; sm < m; ++sm)
+	if (sm->flags & MOUNT_CYGDRIVE)
+	  {
+	    if ((mount_flags & MOUNT_SYSTEM) || !(sm->flags & MOUNT_SYSTEM))
+	      {
+	      	if (sm->posix)
+		  free (sm->posix);
+		sm->posix = strdup (posix_path);
+		sm->flags = mount_flags | MOUNT_CYGDRIVE;
+	      }
+	    return false;
+	  }
+      m->posix = strdup (posix_path);
+      m->native = strdup (".");
+      m->flags = mount_flags | MOUNT_CYGDRIVE;
+    }
+  else
+    {
+      for (mnt_t *sm = mount_table; sm < m; ++sm)
+	if (!strcasecmp (sm->posix, posix_path))
+	  {
+	    if ((mount_flags & MOUNT_SYSTEM) || !(sm->flags & MOUNT_SYSTEM))
+	      {
+	      	if (sm->native)
+		  free (sm->native);
+		sm->native = strdup (native_path);
+		sm->flags = mount_flags;
+	      }
+	    return false;
+	  }
+      m->posix = strdup (posix_path);
+      unconvert_slashes (native_path);
+      m->native = strdup (native_path);
+      m->flags = mount_flags;
+    }
+  return true;
+}
+
+#define BUFSIZE 65536
+
+static char *
+get_user ()
+{
+  static char user[UNLEN + 1];
+  char *userenv;
+
+  user[0] = '\0';
+  if ((userenv = getenv ("USER")) || (userenv = getenv ("USERNAME")))
+    strncat (user, userenv, UNLEN);
+  return user;
+}
+
+void
+from_fstab (bool user, PWCHAR path, PWCHAR path_end)
+{
+  mnt_t *m = mount_table + max_mount_entry;
+  char buf[BUFSIZE];
+
+  if (!user)
+    {
+      /* Create a default root dir from path. */
+      WideCharToMultiByte (GetACP (), 0, path, -1, buf, BUFSIZE,
+			   NULL, NULL);
+      unconvert_slashes (buf);
+      char *native_path = buf;
+      if (!strncmp (native_path, "\\\\?\\", 4))
+        native_path += 4;
+      if (!strncmp (native_path, "UNC\\", 4))
+        *(native_path += 2) = '\\';
+      m->posix = strdup ("/");
+      m->native = strdup (native_path);
+      m->flags = MOUNT_SYSTEM | MOUNT_BINARY;
+      ++m;
+      /* Create a default cygdrive entry.  Note that this is a user entry.
+         This allows to override it with mount, unless the sysadmin created
+         a cygdrive entry in /etc/fstab. */
+      m->posix = strdup (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
+      m->native = strdup (".");
+      m->flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
+      ++m;
+      max_mount_entry = m - mount_table;
     }
 
-  retvallen = sizeof (flags);
-  RegQueryValueEx (key, "flags", 0, &type, (BYTE *)flags, &retvallen);
+  PWCHAR u = wcscpy (path_end, L"\\etc\\fstab") + 10;
+  if (user)
+    MultiByteToWideChar (GetACP (), 0, get_user (), -1,
+    			 wcscpy (u, L".d\\") + 3, BUFSIZE - (u - path));
+  HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, NULL,
+                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (h == INVALID_HANDLE_VALUE)
+    return;
+  char *got = buf;
+  DWORD len = 0;
+  /* Using BUFSIZE-1 leaves space to append two \0. */
+  while (ReadFile (h, got, BUFSIZE - 1 - (got - buf),
+                   &len, NULL))
+    {
+      char *end;
 
-  RegCloseKey (key);
-
-  return retval;
-}
-
-static LONG
-get_cygdrive0 (HKEY key, const char *what, void *val, DWORD len)
-{
-  LONG status = RegQueryValueEx (key, what, 0, 0, (BYTE *)val, &len);
-  return status;
-}
-
-static mnt *
-get_cygdrive (HKEY key, mnt *m, int issystem)
-{
-  if (get_cygdrive0 (key, CYGWIN_INFO_CYGDRIVE_FLAGS, &m->flags,
-		     sizeof (m->flags)) != ERROR_SUCCESS) {
-    free (m->posix);
-    return m;
-  }
-  get_cygdrive0 (key, CYGWIN_INFO_CYGDRIVE_PREFIX, m->posix, MAX_PATH);
-  m->native = strdup (".");
-  m->issys = issystem;
-  return m + 1;
+      /* Set end marker. */
+      got[len] = got[len + 1] = '\0';
+      /* Set len to the absolute len of bytes in buf. */
+      len += got - buf;
+      /* Reset got to start reading at the start of the buffer again. */
+      got = buf;
+      while (got < buf + len && (end = strchr (got, '\n')))
+        {
+          end[end[-1] == '\r' ? -1 : 0] = '\0';
+          if (from_fstab_line (m, got, user))
+            ++m;
+          got = end + 1;
+        }
+      if (len < BUFSIZE - 1)
+        break;
+      /* We have to read once more.  Move remaining bytes to the start of
+         the buffer and reposition got so that it points to the end of
+         the remaining bytes. */
+      len = buf + len - got;
+      memmove (buf, got, len);
+      got = buf + len;
+      buf[len] = buf[len + 1] = '\0';
+    }
+  if (got > buf && from_fstab_line (m, got, user))
+    ++m;
+  max_mount_entry = m - mount_table;
+  CloseHandle (h);
 }
 #endif
+
+int
+mnt_sort (const void *a, const void *b)
+{
+  const mnt_t *ma = (const mnt_t *) a;
+  const mnt_t *mb = (const mnt_t *) b;
+  int ret;
+  
+  ret = (ma->flags & MOUNT_CYGDRIVE) - (mb->flags & MOUNT_CYGDRIVE);
+  if (ret)
+    return ret;
+  ret = (ma->flags & MOUNT_SYSTEM) - (mb->flags & MOUNT_SYSTEM);
+  if (ret)
+    return ret;
+  return strcmp (ma->posix, mb->posix);
+}
 
 static void
 read_mounts ()
@@ -306,72 +522,53 @@ read_mounts ()
 /* If TESTSUITE is defined, bypass this whole function as a harness
    mount table will be provided.  */
 #ifndef TESTSUITE
-  DWORD posix_path_size;
-  int res;
-  struct mnt *m = mount_table;
-  DWORD disposition;
-  char buf[10000];
+  HKEY setup_key;
+  LONG ret;
+  DWORD len;
+  WCHAR path[32768];
+  PWCHAR path_end;
 
-  root_here = NULL;
-  for (mnt *m1 = mount_table; m1->posix; m1++)
+  for (mnt_t *m1 = mount_table; m1->posix; m1++)
     {
       free (m1->posix);
       if (m1->native)
 	free ((char *) m1->native);
       m1->posix = NULL;
     }
+  max_mount_entry = 0;
 
-  /* Loop through subkeys */
-  /* FIXME: we would like to not check MAX_MOUNTS but the heap in the
-     shared area is currently statically allocated so we can't have an
-     arbitrarily large number of mounts. */
-  for (int issystem = 0; issystem <= 1; issystem++)
+  for (int i = 0; i < 2; ++i)
+    if ((ret = RegOpenKeyExW (i ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER,
+			      L"Software\\Cygwin\\setup", 0,
+			      KEY_READ, &setup_key)) == ERROR_SUCCESS)
+      {
+	len = 32768 * sizeof (WCHAR);
+	ret = RegQueryValueExW (setup_key, L"rootdir", NULL, NULL,
+				(PBYTE) path, &len);
+	RegCloseKey (setup_key);
+	if (ret == ERROR_SUCCESS)
+	  break;
+      }
+  if (ret == ERROR_SUCCESS)
+    path_end = wcschr (path, L'\0');
+  else
     {
-      sprintf (buf, "Software\\%s\\%s\\%s",
-	       CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
-	       CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
-	       CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME);
-
-      HKEY key = issystem ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-      if (RegCreateKeyEx (key, buf, 0, (LPTSTR) "Cygwin", 0, KEY_READ,
-			  0, &key, &disposition) != ERROR_SUCCESS)
-	break;
-      for (int i = 0; ;i++, m++)
+      if (!GetModuleFileNameW (NULL, path, 32768))
+	return;
+      path_end = wcsrchr (path, L'\\');
+      if (path_end)
 	{
-	  m->posix = (char *) malloc (MAX_PATH + 1);
-	  posix_path_size = MAX_PATH;
-	  /* FIXME: if maximum posix_path_size is 256, we're going to
-	     run into problems if we ever try to store a mount point that's
-	     over 256 but is under MAX_PATH. */
-	  res = RegEnumKeyEx (key, i, m->posix, &posix_path_size, NULL,
-			      NULL, NULL, NULL);
-
-	  if (res == ERROR_NO_MORE_ITEMS)
-	    {
-	      m = get_cygdrive (key, m, issystem);
-	      m->posix = NULL;
-	      break;
-	    }
-
-	  if (!*m->posix)
-	    goto no_go;
-	  else if (res != ERROR_SUCCESS)
-	    break;
-	  else
-	    {
-	      m->native = find2 (key, &m->flags, m->posix);
-	      m->issys = issystem;
-	      if (!m->native)
-		goto no_go;
-	    }
-	  continue;
-	no_go:
-	  free (m->posix);
-	  m->posix = NULL;
-	  m--;
+	  *path_end = L'\0';
+	  path_end = wcsrchr (path, L'\\');
 	}
-      RegCloseKey (key);
     }
+  if (!path_end)
+    return;
+  *path_end = L'\0';
+
+  from_fstab (false, path, path_end);
+  from_fstab (true, path, path_end);
+  qsort (mount_table, max_mount_entry, sizeof (mnt_t), mnt_sort);
 #endif /* !defined(TESTSUITE) */
 }
 
@@ -477,13 +674,6 @@ concat (const char *s, ...)
   return vconcat (s, v);
 }
 
-static void
-unconvert_slashes (char* name)
-{
-  while ((name = strchr (name, '/')) != NULL)
-    *name++ = '\\';
-}
-
 /* This is a helper function for when vcygpath is passed what appears
    to be a relative POSIX path.  We take a Win32 CWD (either as specified
    in 'cwd' or as retrieved with GetCurrentDirectory() if 'cwd' is NULL)
@@ -504,7 +694,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
     }
 
   int max_len = -1;
-  struct mnt *m, *match = NULL;
+  mnt_t *m, *match = NULL;
 
   for (m = mount_table; m->posix; m++)
     {
@@ -547,9 +737,9 @@ static char *
 vcygpath (const char *cwd, const char *s, va_list v)
 {
   int max_len = -1;
-  struct mnt *m, *match = NULL;
+  mnt_t *m, *match = NULL;
 
-  if (!mount_table[0].posix)
+  if (!max_mount_entry)
     read_mounts ();
   char *path;
   if (s[0] == '.' && isslash (s[1]))
@@ -615,13 +805,13 @@ cygpath (const char *s, ...)
   return vcygpath (NULL, s, v);
 }
 
-static mnt *m = NULL;
+static mnt_t *m = NULL;
 
 extern "C" FILE *
 setmntent (const char *, const char *)
 {
   m = mount_table;
-  if (!m->posix)
+  if (!max_mount_entry)
     read_mounts ();
   return NULL;
 }
@@ -639,10 +829,10 @@ getmntent (FILE *)
     mnt.mnt_type = (char *) malloc (1024);
   if (!mnt.mnt_opts)
     mnt.mnt_opts = (char *) malloc (1024);
-  if (!m->issys)
-    strcpy (mnt.mnt_type, (char *) "user");
-  else
+  if (m->flags & MOUNT_SYSTEM)
     strcpy (mnt.mnt_type, (char *) "system");
+  else
+    strcpy (mnt.mnt_type, (char *) "user");
   if (!(m->flags & MOUNT_BINARY))
     strcpy (mnt.mnt_opts, (char *) "textmode");
   else

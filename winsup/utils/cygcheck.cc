@@ -1669,6 +1669,7 @@ dump_sysinfo ()
   if (givehelp)
     printf ("Looking for various Cygwin DLLs...  (-v gives version info)\n");
   int cygwin_dll_count = 0;
+  char cygdll_path[32768];
   for (pathlike *pth = paths; pth->dir; pth++)
     {
       WIN32_FIND_DATA ffinfo;
@@ -1686,7 +1687,11 @@ dump_sysinfo ()
 		  sprintf (tmp, "%s%s", pth->dir, f);
 		  if (strcasecmp (f, "cygwin1.dll") == 0)
 		    {
-		      cygwin_dll_count++;
+		      if (!cygwin_dll_count)
+		        strcpy (cygdll_path, pth->dir);
+		      if (!cygwin_dll_count
+			  || strcasecmp (cygdll_path, pth->dir) != 0)
+			cygwin_dll_count++;
 		      found_cygwin_dll = strdup (tmp);
 		    }
 		  else

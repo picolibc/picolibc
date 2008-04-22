@@ -1,3 +1,31 @@
+2008-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Fix multiple Cygwin DLL test.
+	* path.cc: Fetch mount points from fstab files instead of from
+	registry.  Use adapted functions copied from Cygwin DLL.
+	(mnt_t): Drop issys member.  Define as "mnt_t" instead of "struct mnt_t"
+	subsequently.
+	(max_mount_entry): New variable.
+	(unconvert_slashes): Move to earlier location in file.  Make inline.
+	(find2): Remove.
+	(get_cygdrive0): Remove.
+	(get_cygdrive): Remove.
+	(skip_ws): New function.
+	(find_ws): Ditto.
+	(conv_fstab_spaces): Ditto.
+	(read_flags): Ditto.
+	(from_fstab_line): Ditto.
+	(get_user): Ditto.
+	(from_fstab): Ditto.
+	(mnt_sort): Ditto.
+	(read_mounts): Drop old registry code.  Fetch
+	"Software\Cygwin\Setup\rootdir" value from HKCU or HKLM key.  Use
+	rootdir extracted from module path as fallback.  Call from_fstab for
+	nouser and user mount points.
+	(setmntent): Check max_mount_entry to test if read_mounts must be
+	called.
+	(getmntent): Use MOUNT_SYSTEM flag instead of mnt_t's issys member.
+
 2008-03-16  Brian Dessent  <brian@dessent.net>
 
 	* path.cc: Include malloc.h for alloca.
