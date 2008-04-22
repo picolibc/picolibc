@@ -323,6 +323,9 @@ extern cygpsid well_known_this_org_sid;
 extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
 extern cygpsid fake_logon_sid;
+extern cygpsid mandatory_medium_integrity_sid;
+extern cygpsid mandatory_high_integrity_sid;
+extern cygpsid mandatory_system_integrity_sid;
 
 bool privilege_luid (const char *pname, LUID *luid);
 

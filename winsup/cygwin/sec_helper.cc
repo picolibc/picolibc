@@ -60,6 +60,12 @@ MKSID (well_known_admins_sid, "S-1-5-32-544",
 				 DOMAIN_ALIAS_RID_ADMINS);
 MKSID (fake_logon_sid, "S-1-5-5-0-0",
        SECURITY_NT_AUTHORITY, 3, SECURITY_LOGON_IDS_RID, 0, 0);
+MKSID (mandatory_medium_integrity_sid, "S-1-16-8192",
+       SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_MEDIUM_RID);
+MKSID (mandatory_high_integrity_sid, "S-1-16-12288",
+       SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_HIGH_RID);
+MKSID (mandatory_system_integrity_sid, "S-1-16-16384",
+       SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_SYSTEM_RID);
 
 bool
 cygpsid::operator== (const char *nsidstr) const

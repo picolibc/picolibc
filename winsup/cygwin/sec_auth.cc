@@ -825,7 +825,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   /* Create a TOKEN_GROUPS list from the above retrieved list of sids. */
   new_tok_gsids = (PTOKEN_GROUPS)
-		  alloca (sizeof (DWORD) + tmp_gsids.count ()
+		  alloca (sizeof (DWORD) + (tmp_gsids.count () + 1)
 					   * sizeof (SID_AND_ATTRIBUTES));
   new_tok_gsids->GroupCount = tmp_gsids.count ();
   for (DWORD i = 0; i < new_tok_gsids->GroupCount; ++i)
@@ -837,6 +837,23 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
   if (auth_pos >= 0)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
+
+  /* On systems supporting Mandatory Integrity Control, add a MIC SID. */
+  if (wincap.has_mandatory_integrity_control ())
+    {
+      new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes =
+	SE_GROUP_INTEGRITY | SE_GROUP_INTEGRITY_ENABLED;
+      if (usersid == well_known_system_sid)
+	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	  = mandatory_system_integrity_sid;
+      else if (tmp_gsids.contains (well_known_admins_sid))
+	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	  = mandatory_high_integrity_sid;
+      else
+	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	  = mandatory_medium_integrity_sid;
+    }
+
   /* Retrieve list of privileges of that user. */
   if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
     goto out;
@@ -847,11 +864,6 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 		       &pgrp, &dacl, &source);
   if (ret)
     __seterrno_from_nt_status (ret);
-  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      __seterrno ();
-      debug_printf ("Loading NtCreateToken failed.");
-    }
   else
     {
       /* Convert to primary token. */

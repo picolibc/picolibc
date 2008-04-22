@@ -1,3 +1,15 @@
+2008-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (create_token): Add integrity level SID to token on
+	systems supporting that.  Remove useless check for dynamically loading
+	NtCreateToken function.
+	* sec_helper.cc (mandatory_medium_integrity_sid): Define.
+	(mandatory_high_integrity_sid): Define.
+	(mandatory_system_integrity_sid): Define.
+	* sec_helper.h (mandatory_medium_integrity_sid): Declare.
+	(mandatory_high_integrity_sid): Declare.
+	(mandatory_system_integrity_sid): Declare.
+
 2008-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::init): Remove call to from_registry.  Print
