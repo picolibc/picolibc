@@ -1,3 +1,26 @@
+2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (renameat): Declare for Cygwin.
+	(symlinkat): Ditto.
+	* libc/include/sys/unistd.h (readlink): Align declaration to POSIX.
+	(faccessat): Declare for Cygwin.
+	(fchownat): Ditto.
+	(linkat): Ditto.
+	(readlinkat): Ditto.
+	* libc/include/sys/_default_fcntl.h (AT_FDCWD): Define for Cygwin.
+	(AT_EACCESS): Ditto.
+	(AT_SYMLINK_NOFOLLOW): Ditto.
+	(AT_SYMLINK_FOLLOW): Ditto.
+	(AT_REMOVEDIR): Ditto.
+	(futimesat): Declare for Cygwin.
+	(openat): Ditto.
+	(unlinkat): Ditto.
+	* libc/include/sys/stat.h (fchmodat): Ditto.
+	(fstatat): Ditto.
+	(mkdirat): Ditto.
+	(mkfifoat): Ditto.
+	(mknodat): Ditto.
+
 2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/sys/errno.h: Use _impure_data, not _reent_data.

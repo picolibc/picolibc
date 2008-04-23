@@ -131,6 +131,17 @@ extern "C" {
 #define	F_UNLKSYS	4	/* remove remote locks for a given system */
 #endif	/* !_POSIX_SOURCE */
 
+#ifdef __CYGWIN__
+/* Special descriptor value to denote the cwd in calls to openat(2) etc. */
+#define AT_FDCWD -2
+
+/* Flag values for faccessat2) et al. */
+#define AT_EACCESS              1
+#define AT_SYMLINK_NOFOLLOW     2
+#define AT_SYMLINK_FOLLOW       4
+#define AT_REMOVEDIR            8
+#endif
+
 /*#include <sys/stdtypes.h>*/
 
 #ifndef __CYGWIN__
@@ -166,6 +177,11 @@ struct eflock {
 extern int open _PARAMS ((const char *, int, ...));
 extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
+#ifdef __CYGWIN__
+extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
+extern int openat _PARAMS ((int, const char *, int, ...));
+extern int unlinkat _PARAMS ((int, const char *, int));
+#endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
    of newlib.  */

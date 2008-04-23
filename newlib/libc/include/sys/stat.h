@@ -129,6 +129,14 @@ int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 #endif
 
+#if defined (__CYGWIN__)
+int	_EXFUN(fchmodat, (int, const char *, mode_t, int));
+int	_EXFUN(fstatat, (int, const char *, struct __stat64 *, int));
+int	_EXFUN(mkdirat, (int, const char *, mode_t));
+int	_EXFUN(mkfifoat, (int, const char *, mode_t));
+int	_EXFUN(mknodat, (int, const char *, mode_t, dev_t));
+#endif
+
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
 #ifdef _COMPILING_NEWLIB
