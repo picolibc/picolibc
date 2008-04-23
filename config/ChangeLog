@@ -1,15 +1,16 @@
+2008-04-23  Paolo Bonzini  <bonzini@gnu.org>
+
+	* override.m4: Apply _AC_ARG_VALIDATE fix to all versions
+	but 2.62.
+
 2008-04-18  Paolo Bonzini  <bonzini@gnu.org>
 
 	PR bootstrap/35457
 
-	* override.m4: Add this.  Make sure aclocal always picks it.
+	* confsubdir.m4: Rename to...
+	* override.m4: ... this.  Make sure aclocal always picks it.
 	Add more lenient precious variable check, backported from
 	autoconf trunk.
-
-	(note: I left confsubdir.m4 for the moment until all the
-	configure scripts are regenerated.  When confsubdir.m4 is
-	removed, this note should be removed too and config/ChangeLog
-	should be synced with gcc's).
 
 2008-04-04  Nick Clifton  <nickc@redhat.com>
 
