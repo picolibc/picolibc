@@ -967,6 +967,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fcloseall_r
     fgetxattr
     flistxattr
+    fmemopen
     fopencookie
     fremovexattr
     fsetxattr
@@ -981,6 +982,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     lsetxattr
     memmem
     mempcpy
+    open_memstream
     pow10
     pow10f
     removexattr
@@ -1017,11 +1019,25 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     acltopbits
     acltotext
     endmntent
+    faccessat
     facl
+    fchmodat
+    fchownat
     fdopendir
+    fstatat
+    futimesat
     getmntent
+    linkat
     memalign
+    mkdirat
+    mkfifoat
+    mknodat
+    openat
+    readlinkat
+    renameat
     setmntent
+    symlinkat
+    unlinkat
 </screen>
 
 </sect1>

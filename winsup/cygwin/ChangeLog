@@ -1,5 +1,11 @@
 2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml: Add openat, faccessat, fchmodat, fchownat, fstatat,
+	futimesat, linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat,
+	symlinkat, unlinkat to list of implemented Solaris functions.
+
+2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Sort.
 	(faccessat): Export.
 	(fchmodat): Export.
