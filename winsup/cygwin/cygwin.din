@@ -409,6 +409,7 @@ fabs NOSIGFE
 _fabs = fabs NOSIGFE
 fabsf NOSIGFE
 _fabsf = fabsf NOSIGFE
+faccessat SIGFE
 facl SIGFE
 _facl = facl SIGFE
 _facl32 = facl32 SIGFE
@@ -416,9 +417,11 @@ fchdir SIGFE
 _fchdir = fchdir SIGFE
 fchmod SIGFE
 _fchmod = fchmod SIGFE
+fchmodat SIGFE
 fchown SIGFE
 _fchown = fchown SIGFE
 _fchown32 = fchown32 SIGFE
+fchownat SIGFE
 fclose SIGFE
 _fclose = fclose SIGFE
 fcloseall SIGFE
@@ -531,6 +534,7 @@ fsetxattr SIGFE
 fstat SIGFE
 _fstat = fstat SIGFE
 _fstat64 = fstat64 SIGFE
+fstatat SIGFE
 fstatfs SIGFE
 _fstatfs = fstatfs SIGFE
 fstatvfs SIGFE
@@ -561,6 +565,7 @@ ftw SIGFE
 funlockfile SIGFE
 funopen SIGFE
 futimes SIGFE
+futimesat SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
 gai_strerror = cygwin_gai_strerror NOSIGFE
@@ -861,6 +866,7 @@ _lgammaf_r = lgammaf_r NOSIGFE
 lgetxattr SIGFE
 link SIGFE
 _link = link SIGFE
+linkat SIGFE
 listen = cygwin_listen SIGFE
 listxattr SIGFE
 llabs NOSIGFE
@@ -953,11 +959,14 @@ memset NOSIGFE
 _memset = memset NOSIGFE
 mkdir SIGFE
 _mkdir = mkdir SIGFE
+mkdirat SIGFE
 mkdtemp SIGFE
 mkfifo SIGFE
+mkfifoat SIGFE
 mknod SIGFE
 _mknod = mknod SIGFE
 _mknod32 = mknod32 SIGFE
+mknodat SIGFE
 mkstemp SIGFE
 _mkstemp = mkstemp SIGFE
 mktemp SIGFE
@@ -1018,8 +1027,9 @@ _ntohs = ntohs NOSIGFE
 on_exit SIGFE
 open SIGFE
 _open = open SIGFE
-open_memstream SIGFE
 _open64
+open_memstream SIGFE
+openat SIGFE
 opendir SIGFE
 __opendir_with_d_ino SIGFE
 openlog SIGFE
@@ -1172,6 +1182,7 @@ _readdir = readdir SIGFE
 readdir_r SIGFE
 readlink SIGFE
 _readlink = readlink SIGFE
+readlinkat SIGFE
 readv SIGFE
 _readv = readv SIGFE
 realloc SIGFE
@@ -1192,6 +1203,7 @@ remquo NOSIGFE
 remquof NOSIGFE
 rename SIGFE
 _rename = rename SIGFE
+renameat SIGFE
 res_close = __res_close SIGFE
 __res_close SIGFE
 res_init = __res_init SIGFE
@@ -1542,6 +1554,7 @@ __swbuf SIGFE
 __swbuf_r SIGFE
 symlink SIGFE
 _symlink = symlink SIGFE
+symlinkat SIGFE
 sync SIGFE
 sysconf SIGFE
 _sysconf = sysconf SIGFE
@@ -1633,6 +1646,7 @@ ungetc SIGFE
 _ungetc = ungetc SIGFE
 unlink SIGFE
 _unlink = unlink SIGFE
+unlinkat SIGFE
 unlockpt NOSIGFE
 unsetenv SIGFE
 _unsetenv = unsetenv SIGFE

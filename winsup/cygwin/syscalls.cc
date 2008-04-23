@@ -61,6 +61,7 @@ details. */
 #include "cpuid.h"
 #include "registry.h"
 #include "environ.h"
+#include "tls_pbuf.h"
 
 #undef _close
 #undef _lseek
@@ -3489,4 +3490,279 @@ pclose (FILE *fp)
       return -1;
 
   return status;
+}
+
+/* Preliminary(?) implementation of the openat family of functions. */
+
+static int
+gen_full_path_at (char *path_ret, int dirfd, const char *pathname)
+{
+  if (!*pathname)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+  if (strlen (pathname) >= PATH_MAX)
+    {
+      set_errno (ENAMETOOLONG);
+      return -1;
+    }
+  if (isdirsep (*pathname))
+    stpcpy (path_ret, pathname);
+  else
+    {
+      char *p;
+
+      if (dirfd == AT_FDCWD)
+	p = stpcpy (path_ret, cygheap->cwd.posix);
+      else
+        {
+	  cygheap_fdget cfd (dirfd);
+	  if (cfd < 0)
+	    return -1;
+	  if (!cfd->pc.isdir ())
+	    {
+	      set_errno (ENOTDIR);
+	      return -1;
+	    }
+	  p = stpcpy (path_ret, cfd->get_name ());
+	}
+      if (!p)
+        {
+	  set_errno (ENOTDIR);
+	  return -1;
+	}
+      if (p[-1] != '/')
+        *p++ = '/';
+      stpcpy (p, pathname);
+    }
+  return 0;
+}
+
+extern "C" int
+openat (int dirfd, const char *pathname, int flags, ...)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  
+  va_list ap;
+  mode_t mode;
+
+  va_start (ap, flags);
+  mode = va_arg (ap, mode_t);
+  va_end (ap);
+  return open (path, flags, mode);
+}
+
+extern "C" int
+faccessat (int dirfd, const char *pathname, int mode, int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  int res = -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (!gen_full_path_at (path, dirfd, pathname))
+    {
+      if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+	set_errno (EINVAL);
+      else
+	{ 
+	  fhandler_base *fh = build_fh_name (path, NULL,
+					     (flags & AT_SYMLINK_NOFOLLOW)
+					     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
+					     stat_suffixes); 
+	  if (fh)
+	    {
+	      res =  fh->fhaccess (mode);
+	      delete fh;
+	    }
+	}
+    }
+  debug_printf ("returning %d", res);
+  return res;
+}
+
+extern "C" int
+fchmodat (int dirfd, const char *pathname, mode_t mode, int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return chmod (path, mode);
+}
+
+extern "C" int
+fchownat (int dirfd, const char *pathname, __uid32_t uid, __gid32_t gid,
+	 int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return chown_worker (path, (flags & AT_SYMLINK_NOFOLLOW)
+			     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW, uid, gid);
+}
+
+extern "C" int
+fstatat (int dirfd, const char *pathname, struct __stat64 *st, int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return (flags & AT_SYMLINK_NOFOLLOW) ? lstat64 (path, st) : stat64 (path, st);
+}
+
+extern "C" int
+futimesat (int dirfd, const char *pathname, const struct timeval *times)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return utimes (path, times);
+}
+
+extern "C" int
+linkat (int olddirfd, const char *oldpathname,
+	int newdirfd, const char *newpathname,
+	int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *oldpath = tp.c_get ();
+  if (gen_full_path_at (oldpath, olddirfd, oldpathname))
+    return -1;
+  char *newpath = tp.c_get ();
+  if (gen_full_path_at (newpath, newdirfd, newpathname))
+    return -1;
+  if (flags & AT_SYMLINK_FOLLOW)
+    {
+      path_conv old_name (oldpath, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+      if (old_name.error)
+	{
+	  set_errno (old_name.error);
+	  return -1;
+	}
+      strcpy (oldpath, old_name.normalized_path);
+    }
+  return link (oldpath, newpath);
+}
+
+extern "C" int
+mkdirat (int dirfd, const char *pathname, mode_t mode)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return mkdir (path, mode);
+}
+
+extern "C" int
+mkfifoat (int dirfd, const char *pathname, mode_t mode)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return mkfifo (path, mode);
+}
+
+extern "C" int
+mknodat (int dirfd, const char *pathname, mode_t mode, __dev32_t dev)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return mknod32 (path, mode, dev);
+}
+
+extern "C" ssize_t
+readlinkat (int dirfd, const char *pathname, char *buf, size_t bufsize)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return readlink (path, buf, bufsize);
+}
+
+extern "C" int
+renameat (int olddirfd, const char *oldpathname,
+	  int newdirfd, const char *newpathname)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *oldpath = tp.c_get ();
+  if (gen_full_path_at (oldpath, olddirfd, oldpathname))
+    return -1;
+  char *newpath = tp.c_get ();
+  if (gen_full_path_at (newpath, newdirfd, newpathname))
+    return -1;
+  return rename (oldpath, newpath);
+}
+
+extern "C" int
+symlinkat (const char *oldpath, int newdirfd, const char *newpathname)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *newpath = tp.c_get ();
+  if (gen_full_path_at (newpath, newdirfd, newpathname))
+    return -1;
+  return symlink (oldpath, newpath);
+}
+
+extern "C" int
+unlinkat (int dirfd, const char *pathname, int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return (flags & AT_REMOVEDIR) ? rmdir (path) : unlink (path);
 }

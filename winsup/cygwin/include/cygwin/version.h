@@ -328,12 +328,15 @@ details. */
       FIXME: Removed 12 year old and entirely wrong wprintf function at
            this point.  We need a working implementation soon.
       183: Export open_memstream, fmemopen.
+      184: Export openat, faccessat, fchmodat, fchownat, fstatat, futimesat,
+	   linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat, symlinkat, 
+	   unlinkat.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 183
+#define CYGWIN_VERSION_API_MINOR 184
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

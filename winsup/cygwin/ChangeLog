@@ -1,3 +1,38 @@
+2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Sort.
+	(faccessat): Export.
+	(fchmodat): Export.
+	(fchownat): Export.
+	(fstatat): Export.
+	(futimesat): Export.
+	(linkat): Export.
+	(mkdirat): Export.
+	(mkfifoat): Export.
+	(mknodat): Export.
+	(openat): Export.
+	(readlinkat): Export.
+	(renameat): Export.
+	(symlinkat): Export.
+	(unlinkat): Export.
+	* path.cc (readlink): Align definition to POSIX.
+	* syscalls.cc (gen_full_path_at): New static function.
+	(faccessat): Implement.
+	(fchmodat): Implement.
+	(fchownat): Implement.
+	(fstatat): Implement.
+	(futimesat): Implement.
+	(linkat): Implement.
+	(mkdirat): Implement.
+	(mkfifoat): Implement.
+	(mknodat): Implement.
+	(openat): Implement.
+	(readlinkat): Implement.
+	(renameat): Implement.
+	(symlinkat): Implement.
+	(unlinkat): Implement.
+	* include/cygwin/version.h: Bump API minor number.
+
 2008-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_0): Move CWD initialization from here...

@@ -2519,8 +2519,8 @@ symlink_info::case_check (char *path)
 
 /* readlink system call */
 
-extern "C" int
-readlink (const char *path, char *buf, int buflen)
+extern "C" ssize_t
+readlink (const char *path, char *buf, size_t buflen)
 {
   if (buflen < 0)
     {
@@ -2550,7 +2550,7 @@ readlink (const char *path, char *buf, int buflen)
       return -1;
     }
 
-  int len = min (buflen, (int) strlen (pathbuf.get_win32 ()));
+  ssize_t len = min (buflen, strlen (pathbuf.get_win32 ()));
   memcpy (buf, pathbuf.get_win32 (), len);
 
   /* errno set by symlink.check if error */
