@@ -45,8 +45,8 @@
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
-#ifndef _LONG_LONG
-#define _LONG_LONG long long
+#ifndef _LONG_LONG_TYPE
+#define _LONG_LONG_TYPE long long
 #endif
 #ifndef _PARAMS
 #define _PARAMS(paramlist)		paramlist
@@ -65,7 +65,7 @@
 #define	_DEFUN_VOID(name)		name()
 #define _CAST_VOID
 #define _LONG_DOUBLE double
-#define _LONG_LONG long
+#define _LONG_LONG_TYPE long
 #ifndef _PARAMS
 #define _PARAMS(paramlist)		()
 #endif

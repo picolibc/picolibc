@@ -1,3 +1,8 @@
+2008-04-23  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/include/_ansi.h: _LONG_LONG renamed to _LONG_LONG_TYPE.
+	* libc/include/math.h: Likewise.
+		
 2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h (renameat): Declare for Cygwin.
