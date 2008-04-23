@@ -1,6 +1,7 @@
 /* mount.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005,
+   2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -164,9 +165,9 @@ Display information about mounted filesystems, or mount a filesystem\n\
 				system mount points and cygdrive prefixes\n\
   -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
-  -s, --system     (default)    add system-wide mount point\n\
+  -s, --system                  (ignored)\n\
   -t, --text                    text files get \\r\\n line endings\n\
-  -u, --user                    add user-only mount point\n\
+  -u, --user                    (ignored)\n\
   -v, --version                 output version information and exit\n\
   -x, --executable              treat all files under mount point as executables\n\
   -E, --no-executable           treat all files under mount point as \n\
@@ -213,7 +214,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 Filesystem Utility\n\
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 1996-2008 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", progname, len, v, __DATE__);
 }
@@ -231,7 +232,6 @@ main (int argc, char **argv)
 {
   int i;
   int flags = MOUNT_BINARY;
-  int default_flag = MOUNT_SYSTEM;
   char *options = strdup ("");
   enum do_what
   {
@@ -292,14 +292,11 @@ main (int argc, char **argv)
 	  usage ();
 	break;
       case 's':
-	flags |= MOUNT_SYSTEM;
 	break;
       case 't':
 	flags &= ~MOUNT_BINARY;
 	break;
       case 'u':
-	flags &= ~MOUNT_SYSTEM;
-	default_flag = 0;
 	break;
       case 'v':
 	print_version ();
@@ -356,7 +353,7 @@ main (int argc, char **argv)
     case saw_change_cygdrive_prefix:
       if (optind != argc)
 	usage ();
-      change_cygdrive_prefix (argv[optind], flags | default_flag);
+      change_cygdrive_prefix (argv[optind], flags);
       break;
     case saw_show_cygdrive_prefix:
       if (optind <= argc)
@@ -377,8 +374,8 @@ main (int argc, char **argv)
 	    fprintf (stderr, "%s: too many arguments\n", progname);
 	  usage ();
 	}
-      if (force || !mount_already_exists (argv[optind + 1], flags | default_flag))
-	do_mount (argv[optind], argv[optind + 1], flags | default_flag);
+      if (force || !mount_already_exists (argv[optind + 1], flags))
+	do_mount (argv[optind], argv[optind + 1], flags);
       else
 	{
 	  errno = EBUSY;
@@ -410,10 +407,6 @@ mount_commands (void)
     if (!strstr (p->mnt_opts, ",noumount"))
       {
 	strcpy(opts, " -f");
-	if      (p->mnt_type[0] == 'u')
-	  strcat (opts, " -u");
-	else if (p->mnt_type[0] == 's')
-	  strcat (opts, " -s");
 	if      (p->mnt_opts[0] == 'b')
 	  strcat (opts, " -b");
 	else if (p->mnt_opts[0] == 't')

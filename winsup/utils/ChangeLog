@@ -1,3 +1,10 @@
+2008-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (usage): Mark -s and -u as ignored.
+	(print_version): Simplify printing copyright dates.
+	(main): Remove default_flag.  Dont set flags on -s and -u options.
+	(mount_commands): Drop handling -s and -u options.
+
 2008-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Fix multiple Cygwin DLL test.
