@@ -1,3 +1,7 @@
+2008-04-24  Yaakov (Cygwin Ports)  <yselkowitz@users.sourceforge.net>
+
+	* include/wait.h: New file.
+
 2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml: Add openat, faccessat, fchmodat, fchownat, fstatat,
