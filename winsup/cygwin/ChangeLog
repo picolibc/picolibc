@@ -1,5 +1,10 @@
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::utimens_fs): Fix typo in
+	input range check.
+
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (futimens): Export.
 	(utimensat): Export.
 	* fhandler.cc (fhandler_base::utimens): Replace fhandler_base::utimes.
