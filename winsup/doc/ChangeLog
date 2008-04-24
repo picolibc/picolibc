@@ -1,3 +1,7 @@
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin-api.in.sgml: Add std-susv4 section to Compatibility chapter.
+
 2008-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Drop description of "transparent_exe" option.
