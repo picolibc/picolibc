@@ -1,3 +1,10 @@
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/stat.h (UTIME_NOW): Define for Cygwin.
+	(UTIME_OMIT): Ditto.
+	(utimensat): Declare for Cygwin.
+	(futimens): Ditto.
+
 2008-04-23  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/include/_ansi.h: _LONG_LONG renamed to _LONG_LONG_TYPE.

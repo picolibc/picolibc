@@ -115,6 +115,11 @@ struct	stat
 #define	S_ISLNK(m)	(((m)&_IFMT) == _IFLNK)
 #define	S_ISSOCK(m)	(((m)&_IFMT) == _IFSOCK)
 
+#if defined(__CYGWIN__)
+/* Special tv_nsec values for futimens(2) and utimensat(2). */
+#define UTIME_NOW	-2L
+#define UTIME_OMIT	-1L
+#endif
 
 int	_EXFUN(chmod,( const char *__path, mode_t __mode ));
 int     _EXFUN(fchmod,(int __fd, mode_t __mode));
@@ -135,6 +140,8 @@ int	_EXFUN(fstatat, (int, const char *, struct __stat64 *, int));
 int	_EXFUN(mkdirat, (int, const char *, mode_t));
 int	_EXFUN(mkfifoat, (int, const char *, mode_t));
 int	_EXFUN(mknodat, (int, const char *, mode_t, dev_t));
+int	_EXFUN(utimensat, (int, const char *, const struct timespec *, int));
+int	_EXFUN(futimens, (int, const struct timespec *));
 #endif
 
 /* Provide prototypes for most of the _<systemcall> names that are
