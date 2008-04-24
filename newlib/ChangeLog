@@ -1,3 +1,8 @@
+2008-04-24  Nick Clifton  <nickc@redhat.com>
+
+	* libc/include/machine/ieeefp.h: Fix typo: _DOUBLE_IS_32_BITS
+	should be _DOUBLE_IS_32BITS.
+
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/stat.h (UTIME_NOW): Define for Cygwin.
@@ -32,6 +37,11 @@
 	(mkdirat): Ditto.
 	(mkfifoat): Ditto.
 	(mknodat): Ditto.
+
+2008-04-22  Nick Clifton  <nickc@redhat.com>
+
+	* libc/machine/arm/setjmp.S: Add support for thumb2 multiple
+	register load/store instructions.
 
 2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
 
