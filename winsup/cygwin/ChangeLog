@@ -1,5 +1,10 @@
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Disable calling
+	pc.ndisk_links.  Just use nNumberOfLinks instead.
+
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::utimens_fs): Fix typo in
 	input range check.
 

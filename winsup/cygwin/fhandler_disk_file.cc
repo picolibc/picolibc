@@ -478,7 +478,11 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      This is too slow on remote drives, so we do without it.
      Setting the count to 2 confuses `find (1)' command. So
      let's try it with `1' as link count. */
+#if 0
   buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
+#else
+  buf->st_nlink = nNumberOfLinks;
+#endif
 
   /* Enforce namehash as inode number on untrusted file systems. */
   if (pc.isgood_inode (nFileIndex))
