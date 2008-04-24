@@ -1,3 +1,28 @@
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (futimens): Export.
+	(utimensat): Export.
+	* fhandler.cc (fhandler_base::utimens): Replace fhandler_base::utimes.
+	Call utimens_fs.
+	* fhandler.h (class fhandler_base): Declare utimens_fs instead of
+	utimes_fs, utimens instead of utimes.
+	(class fhandler_disk_file): Declare utimens instead of utimes.
+	* fhandler_disk_file.cc (fhandler_disk_file::utimens): Replace
+	fhandler_disk_file::utimes.
+	(fhandler_base::utimens_fs): Replace fhandler_base::utimes_fs.
+	Implement tv_nsec handling according to SUSv4.
+	* syscalls.cc (utimensat): New function.
+	* times.cc (timespec_to_filetime): New function.
+	(timeval_to_timespec): New function.
+	(utimens_worker): Replace utimes_worker.
+	(utimes): Convert timeval to timespec and call utimens_worker.
+	(lutimes): Ditto.
+	(futimens): Take over implementation from futimes.
+	(futimes): Convert timeval to timespec and call futimens.
+	* winsup.h (timespec_to_filetime): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+	* posix.sgml: Add SUSv4 section.  Add futimens and utimensat to it.
+
 2008-04-24  Yaakov (Cygwin Ports)  <yselkowitz@users.sourceforge.net>
 
 	* include/wait.h: New file.

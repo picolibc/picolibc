@@ -1149,16 +1149,17 @@ fhandler_disk_file::link (const char *newpath)
 }
 
 int
-fhandler_disk_file::utimes (const struct timeval *tvp)
+fhandler_disk_file::utimens (const struct timespec *tvp)
 {
-  return utimes_fs (tvp);
+  return utimens_fs (tvp);
 }
 
 int
-fhandler_base::utimes_fs (const struct timeval *tvp)
+fhandler_base::utimens_fs (const struct timespec *tvp)
 {
   LARGE_INTEGER lastaccess, lastwrite;
-  struct timeval tmp[2];
+  struct timespec timeofday;
+  struct timespec tmp[2];
   bool closeit = false;
 
   if (!get_handle ())
@@ -1180,15 +1181,25 @@ fhandler_base::utimes_fs (const struct timeval *tvp)
       closeit = true;
     }
 
-  gettimeofday (&tmp[0], 0);
+  gettimeofday (reinterpret_cast<struct timeval *> (&timeofday), 0);
+  timeofday.tv_nsec *= 1000;
   if (!tvp)
+    tmp[1] = tmp[0] = timeofday;
+  else
     {
-      tmp[1] = tmp[0];
-      tvp = tmp;
+      if ((tmp[0].tv_nsec < UTIME_NOW || tmp[0].tv_nsec > 999999999L)
+	  || (tmp[1].tv_nsec < UTIME_NOW || tmp[1].tv_nsec > 999999999L))
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+      tmp[0] = (tvp[0].tv_nsec == UTIME_NOW) ? timeofday : tvp[0];
+      tmp[1] = (tvp[1].tv_nsec == UTIME_NOW) ? timeofday : tvp[1];
     }
-  timeval_to_filetime (&tvp[0], (FILETIME *) &lastaccess);
-  timeval_to_filetime (&tvp[1], (FILETIME *) &lastwrite);
-  debug_printf ("incoming lastaccess %08x %08x", tvp[0].tv_sec, tvp[0].tv_usec);
+  /* UTIME_OMIT is handled in timespec_to_filetime by setting FILETIME to 0. */
+  timespec_to_filetime (&tmp[0], (FILETIME *) &lastaccess);
+  timespec_to_filetime (&tmp[1], (FILETIME *) &lastwrite);
+  debug_printf ("incoming lastaccess %08x %08x", tmp[0].tv_sec, tmp[0].tv_nsec);
 
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;

@@ -1042,6 +1042,15 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
 
 </sect1>
 
+<sect1 id="std-susv4"><title>System interfaces compatible with the Draft Single Unix Specification, Version 4:</title>
+
+<screen>
+    futimens
+    utimensat
+</screen>
+
+</sect1>
+
 <sect1 id="std-deprec"><title>Other UNIX system interfaces, deprecated or not in POSIX.1-2001:</title>
 
 <screen>

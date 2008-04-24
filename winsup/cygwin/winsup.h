@@ -285,6 +285,7 @@ void __stdcall totimeval (struct timeval *, FILETIME *, int, int);
 long __stdcall to_time_t (FILETIME *);
 void __stdcall to_timestruc_t (FILETIME *, timestruc_t *);
 void __stdcall time_as_timestruc_t (timestruc_t *);
+void __stdcall timespec_to_filetime (const struct timespec *, FILETIME *);
 void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 
 /* Console related */

@@ -3631,6 +3631,25 @@ fstatat (int dirfd, const char *pathname, struct __stat64 *st, int flags)
   return (flags & AT_SYMLINK_NOFOLLOW) ? lstat64 (path, st) : stat64 (path, st);
 }
 
+extern int utimens_worker (path_conv &, const struct timespec *);
+
+extern "C" int
+utimensat (int dirfd, const char *pathname, const struct timespec *times,
+	   int flags)
+{
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  tmp_pathbuf tp;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  path_conv win32 (path, PC_POSIX | ((flags & AT_SYMLINK_NOFOLLOW)
+				     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW),
+		   stat_suffixes);
+  return utimens_worker (win32, times);
+}
+
 extern "C" int
 futimesat (int dirfd, const char *pathname, const struct timeval *times)
 {

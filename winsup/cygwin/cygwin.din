@@ -564,6 +564,7 @@ fts_set_clientptr NOSIGFE
 ftw SIGFE
 funlockfile SIGFE
 funopen SIGFE
+futimens SIGFE
 futimes SIGFE
 futimesat SIGFE
 fwrite SIGFE
@@ -1656,6 +1657,7 @@ usleep SIGFE
 _usleep = usleep SIGFE
 utime SIGFE
 _utime = utime SIGFE
+utimensat SIGFE
 utimes SIGFE
 _utimes = utimes SIGFE
 utmpname SIGFE

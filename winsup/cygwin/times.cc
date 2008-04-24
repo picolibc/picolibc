@@ -184,6 +184,21 @@ time_t_to_filetime (time_t time_in, FILETIME *out)
 
 /* Cygwin internal */
 void __stdcall
+timespec_to_filetime (const struct timespec *time_in, FILETIME *out)
+{
+  if (time_in->tv_nsec == UTIME_OMIT)
+    out->dwHighDateTime = out->dwLowDateTime = 0;
+  else
+    {
+      long long x = time_in->tv_sec * NSPERSEC +
+			    time_in->tv_nsec / (NSPERSEC/100000) + FACTOR;
+      out->dwHighDateTime = x >> 32;
+      out->dwLowDateTime = x;
+    }
+}
+
+/* Cygwin internal */
+void __stdcall
 timeval_to_filetime (const struct timeval *time_in, FILETIME *out)
 {
   long long x = time_in->tv_sec * NSPERSEC +
@@ -200,6 +215,30 @@ time_t_to_timeval (time_t in)
   res.tv_sec = in;
   res.tv_usec = 0;
   return res;
+}
+
+/* Cygwin internal */
+static const struct timespec *
+timeval_to_timespec (const struct timeval *tvp, struct timespec *tmp)
+{
+  if (!tvp)
+    return NULL;
+
+  tmp[0].tv_sec = tvp[0].tv_sec;
+  tmp[0].tv_nsec = tvp[0].tv_usec * 1000;
+  if (tmp[0].tv_nsec < 0)
+    tmp[0].tv_nsec = 0;
+  else if (tmp[0].tv_nsec > 999999999)
+    tmp[0].tv_nsec = 999999999;
+
+  tmp[1].tv_sec = tvp[1].tv_sec;
+  tmp[1].tv_nsec = tvp[1].tv_usec * 1000;
+  if (tmp[1].tv_nsec < 0)
+    tmp[1].tv_nsec = 0;
+  else if (tmp[1].tv_nsec > 999999999)
+    tmp[1].tv_nsec = 999999999;
+
+  return tmp;
 }
 
 /* Cygwin internal */
@@ -439,8 +478,8 @@ gmtime (const time_t *tim_p)
 
 #endif /* POSIX_LOCALTIME */
 
-static int
-utimes_worker (path_conv &win32, const struct timeval *tvp)
+int
+utimens_worker (path_conv &win32, const struct timespec *tvp)
 {
   int res = -1;
 
@@ -475,7 +514,7 @@ utimes_worker (path_conv &win32, const struct timeval *tvp)
 	    }
 	}
 
-      res = fh->utimes (tvp);
+      res = fh->utimens (tvp);
 
       if (!fromfd)
 	delete fh;
@@ -492,7 +531,8 @@ extern "C" int
 utimes (const char *path, const struct timeval *tvp)
 {
   path_conv win32 (path, PC_POSIX | PC_SYM_FOLLOW, stat_suffixes);
-  return utimes_worker (win32, tvp);
+  struct timespec tmp[2];
+  return utimens_worker (win32, timeval_to_timespec (tvp, tmp));
 }
 
 /* BSD */
@@ -500,12 +540,13 @@ extern "C" int
 lutimes (const char *path, const struct timeval *tvp)
 {
   path_conv win32 (path, PC_POSIX | PC_SYM_NOFOLLOW, stat_suffixes);
-  return utimes_worker (win32, tvp);
+  struct timespec tmp[2];
+  return utimens_worker (win32, timeval_to_timespec (tvp, tmp));
 }
 
-/* BSD */
+/* futimens: POSIX/SUSv4 */
 extern "C" int
-futimes (int fd, const struct timeval *tvp)
+futimens (int fd, const struct timespec *tvp)
 {
   int res;
 
@@ -513,11 +554,19 @@ futimes (int fd, const struct timeval *tvp)
   if (cfd < 0)
     res = -1;
   else if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE))
-    res = cfd->utimes (tvp);
+    res = cfd->utimens (tvp);
   else
-    res = utimes_worker (cfd->pc, tvp);
-  syscall_printf ("%d = futimes (%d, %p)", res, fd, tvp);
+    res = utimens_worker (cfd->pc, tvp);
+  syscall_printf ("%d = futimens (%d, %p)", res, fd, tvp);
   return res;
+}
+
+/* BSD */
+extern "C" int
+futimes (int fd, const struct timeval *tvp)
+{
+  struct timespec tmp[2];
+  return futimens (fd,  timeval_to_timespec (tvp, tmp));
 }
 
 /* utime: POSIX 5.6.6.1 */

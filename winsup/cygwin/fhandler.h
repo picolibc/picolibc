@@ -286,7 +286,7 @@ class fhandler_base
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
   virtual int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
-  int utimes_fs (const struct timeval *) __attribute__ ((regparm (2)));
+  int utimens_fs (const struct timespec *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
@@ -295,7 +295,7 @@ class fhandler_base
   virtual int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   virtual int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
-  virtual int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
+  virtual int __stdcall utimens (const struct timespec *) __attribute__ ((regparm (2)));
   virtual int __stdcall fsync () __attribute__ ((regparm (1)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
@@ -695,7 +695,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
-  int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
+  int __stdcall utimens (const struct timespec *) __attribute__ ((regparm (2)));
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, _off64_t off);
