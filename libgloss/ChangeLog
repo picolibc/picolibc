@@ -1,3 +1,8 @@
+2008-04-25  Nick Clifton  <nickc@redhat.com>
+
+	* arm/crt0.S: Allow assembly under ARMv7 ISA.  Support for
+	initializing stack pointers for interrupt modes is still pending.
+
 2008-04-14  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* spu/sbrk.c: Remove "extern int errno", use whatever is supplied

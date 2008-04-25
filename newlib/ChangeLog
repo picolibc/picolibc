@@ -1,3 +1,7 @@
+2008-04-25  Nick Clifton  <nickc@redhat.com>
+
+	* libc/machine/arm/setjmp.S: Fix thumb2 support.
+
 2008-04-24  Nick Clifton  <nickc@redhat.com>
 
 	* libc/include/machine/ieeefp.h: Fix typo: _DOUBLE_IS_32_BITS

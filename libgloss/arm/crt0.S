@@ -82,12 +82,18 @@
 
 	ldr	r3, .Lstack
 	cmp	r3, #0
+#ifdef __thumb2__
+	it	eq
+#endif	
 	ldreq	r3, .LC0
 	/* Note: This 'mov' is essential when starting in User, and ensures we
 		 always get *some* sp value for the initial mode, even if we 
 		 have somehow missed it below (in which case it gets the same
 		 value as FIQ - not ideal, but better than nothing.) */
 	mov	sp, r3
+#ifdef __thumb2__
+	/* XXX Fill in stack assignments for interrupt modes.  */
+#else
 	mrs	r2, CPSR
 	tst	r2, #0x0F	/* Test mode bits - in User of all are 0 */
 	beq	.LC23		/* "eq" means r2 AND #0x0F is 0 */
@@ -109,6 +115,7 @@
 	sub	r3, r3, #0x2000
 		
 	msr     CPSR_c, #0xD3	/* Supervisory mode, interrupts disabled */
+
 	mov	sp, r3
 	sub	r3, r3, #0x8000	/* Min size 32k */
 	bic	r3, r3, #0x00FF	/* Align with current 64k block */
@@ -116,9 +123,9 @@
 
 	str	r3, [r3, #-4]	/* Move value into user mode sp without */ 
 	ldmdb	r3, {sp}^       /* changing modes, via '^' form of ldm */ 
-	
 	orr	r2, r2, #0xC0	/* Back to original mode, presumably SVC, */
 	msr	CPSR_c, r2	/* with FIQ/IRQ disable bits forced to 1 */
+#endif	
 .LC23:
 	/* Setup a default stack-limit in-case the code has been
 	   compiled with "-mapcs-stack-check".  Hard-wiring this value
