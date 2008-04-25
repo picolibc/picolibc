@@ -299,8 +299,6 @@ force:
 
 install: install-libs install-headers install-man install_target \
 	$(install_host) $(install_target)
-	@$(MKDIRP) $(sysconfdir)/postinstall
-	$(INSTALL_PROGRAM) $(srcdir)/postinstall $(sysconfdir)/postinstall/000-cygwin-post-install.sh
 
 uninstall: uninstall-libs uninstall-headers uninstall-man
 

@@ -1,5 +1,9 @@
 2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (install): Drop install rules for postinstall script.
+
+2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* postinstall: Remove (Moved to base-cygwin package).
 
 2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
