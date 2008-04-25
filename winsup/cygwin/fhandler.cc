@@ -539,7 +539,6 @@ fhandler_base::open (int flags, mode_t mode)
 
   if (get_device () == FH_FS)
     {
-      file_attributes = FILE_ATTRIBUTE_NORMAL;
       /* Add the reparse point flag to native symlinks, otherwise we open the
 	 target, not the symlink.  This would break lstat. */
       if (pc.is_rep_symlink ())
@@ -556,6 +555,8 @@ fhandler_base::open (int flags, mode_t mode)
 
       if (flags & O_CREAT)
 	{
+	  file_attributes |= FILE_ATTRIBUTE_NORMAL;
+
 	  /* If mode has no write bits set, we set the R/O attribute. */
 	  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;

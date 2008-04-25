@@ -1,5 +1,10 @@
 2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Move handling FILE_ATTRIBUTE_NORMAL
+	back to its old place.  Or it to file_attributes instead of setting it.
+
+2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): *Only* handle SYSTEM and HIDDEN
 	attributes in FILE_OVERWRITE case.
 
