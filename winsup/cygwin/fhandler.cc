@@ -539,24 +539,26 @@ fhandler_base::open (int flags, mode_t mode)
 
   if (get_device () == FH_FS)
     {
+      file_attributes = FILE_ATTRIBUTE_NORMAL;
       /* Add the reparse point flag to native symlinks, otherwise we open the
 	 target, not the symlink.  This would break lstat. */
       if (pc.is_rep_symlink ())
 	create_options |= FILE_OPEN_REPARSE_POINT;
 
-      if ((flags & O_CREAT) || create_disposition == FILE_OVERWRITE)
+      /* Starting with Windows 2000, when trying to overwrite an already
+	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
+	 attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
+	 Per MSDN you have to create the file with the same attributes as
+	 already specified for the file. */
+      if (((flags & O_CREAT) || create_disposition == FILE_OVERWRITE)
+	  && has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
+	file_attributes |= pc.file_attributes ();
+
+      if (flags & O_CREAT)
 	{
-	  file_attributes = FILE_ATTRIBUTE_NORMAL;
 	  /* If mode has no write bits set, we set the R/O attribute. */
 	  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
-	  /* Starting with Windows 2000, when trying to overwrite an already
-	     existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
-	     attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
-	     Per MSDN you have to create the file with the same attributes as
-	     already specified for the file. */
-	  if (has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
-	    file_attributes |= pc.file_attributes ();
 
 	  /* If the file should actually be created and ntsec is on,
 	     set files attributes. */

@@ -1,5 +1,10 @@
 2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): *Only* handle SYSTEM and HIDDEN
+	attributes in FILE_OVERWRITE case.
+
+2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Handle SYSTEM and HIDDEN attributes
 	in FILE_OVERWRITE case as well.
 
