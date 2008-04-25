@@ -1,3 +1,8 @@
+2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Handle SYSTEM and HIDDEN attributes
+	in FILE_OVERWRITE case as well.
+
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Disable calling

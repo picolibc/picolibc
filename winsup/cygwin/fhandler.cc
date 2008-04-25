@@ -544,7 +544,7 @@ fhandler_base::open (int flags, mode_t mode)
       if (pc.is_rep_symlink ())
 	create_options |= FILE_OPEN_REPARSE_POINT;
 
-      if (flags & O_CREAT)
+      if ((flags & O_CREAT) || create_disposition == FILE_OVERWRITE)
 	{
 	  file_attributes = FILE_ATTRIBUTE_NORMAL;
 	  /* If mode has no write bits set, we set the R/O attribute. */
