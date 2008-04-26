@@ -1,3 +1,7 @@
+2008-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/specstrings.h: Add more dummy defines.
+
 2008-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (SECURITY_MANDATORY_LABEL_AUTHORITY): Define.
