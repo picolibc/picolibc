@@ -1,3 +1,7 @@
+2008-04-26  Chuck Wilson  <cwilso11@users.sourceforge.net>
+
+	* Makefile.in: correct issues with mingw10.dll having multiple relocs.
+
 2008-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/process.h: Include stdint.h for intptr_t definition.

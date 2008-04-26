@@ -243,32 +243,15 @@ libmingwthrd.a: crtmt.o mingwthrd.def
 	$(AR) $(ARFLAGS) $@ crtmt.o
 	$(RANLIB) $@
 
-# Using dllwrap would be so much easier, but Cygnus top-level configure
-# Makefile.in etc don't pass the right variables yet.
-xx_$(THREAD_DLL_NAME) xx_mingwthrd.def: mthr.o mthr_init.o
-	$(DLLWRAP) $(DLLWRAP_FLAGS) -o $(THREAD_DLL_NAME) \
-		--output-def mingwthrd.def \
-		mthr.o mthr_init.o
-
 DLL_OFILES        = mthr.o mthr_init.o
-DLL_CC_STUFF      = -B./ -mdll $(MNO_CYGWIN) -Wl,--image-base,0x6FBC0000 \
+DLL_CC_STUFF      = -B./ -shared $(MNO_CYGWIN) -Wl,--image-base,0x6FBC0000 \
 		    -Wl,--entry,_DllMainCRTStartup@12 \
-                    $(DLL_OFILES) \
+                    $(DLL_OFILES) mingwthrd.def \
 		    -Lmingwex
-DLL_DLLTOOL_STUFF = --as=$(AS) --dllname $(THREAD_DLL_NAME) \
-                    --def mingwthrd.def \
-                    --base-file mingwthrd.base --output-exp mingwthrd.exp
 
 $(THREAD_DLL_NAME) mingwthrd.def: $(DLL_OFILES) Makefile $(SUBDIRS)
 	$(DLLTOOL) --as $(AS) --output-def mingwthrd.def $(DLL_OFILES)
-	$(CC) -Wl,--base-file=mingwthrd.base $(DLL_CC_STUFF) \
-		-o mingwthrd_dummy.exe
-	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
-	$(CC) -Wl,--base-file=mingwthrd.base mingwthrd.exp $(DLL_CC_STUFF) \
-		-o mingwthrd_dummy.exe
-	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
-	$(CC) mingwthrd.exp -o $(THREAD_DLL_NAME) $(DLL_CC_STUFF)
-	rm -f mingwthrd_dummy.exe
+	$(CC) $(DLL_CC_STUFF) -o $(THREAD_DLL_NAME)
 
 libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
