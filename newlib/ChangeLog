@@ -1,3 +1,8 @@
+2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/stat.h: Guard at-functions with !__INSIDE_CYGWIN__.
+	(fstatat): Fix type of third parameter.
+
 2008-04-25  Nick Clifton  <nickc@redhat.com>
 
 	* libc/machine/arm/setjmp.S: Fix thumb2 support.
