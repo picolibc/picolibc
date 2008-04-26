@@ -1,4 +1,11 @@
-2008-03-21  Danny Smith  <dannysmith@users.sourceforge.net>
+2008-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wchar.h (fwide): Return success code rather than failure in inline
+	definition.
+	* mingwex/fwide.c (fwide): ANSI-fy. Get rid of Q8 comments.  Return success
+	code rather than failure.
+
+2008-03-21  Danny Smith
 
 	* include/math.h (float_t, double_t): Define.
 

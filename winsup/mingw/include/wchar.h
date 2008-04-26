@@ -291,8 +291,8 @@ int __cdecl __MINGW_NOTHROW fwide(FILE*, int);
 int __cdecl __MINGW_NOTHROW mbsinit(const mbstate_t*);
 #ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW fwide(FILE* __UNUSED_PARAM(stream),
-			       int __UNUSED_PARAM(mode))
-  {return -1;} /* limited to byte orientation */
+					       int mode)
+  {return mode;} /* Nothing to do  */
 __CRT_INLINE int __cdecl __MINGW_NOTHROW mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
   {return 1;}
 #endif
