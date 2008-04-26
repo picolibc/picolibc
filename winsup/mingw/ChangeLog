@@ -1,5 +1,21 @@
 2008-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/process.h: Include stdint.h for intptr_t definition.
+	(_execl, _execle, _execlp, _execlpe, _execv, _execve, _execvp, _execvpe,
+	_spawnl, _spawnle, _spawnlp, _spawnlpe, _spawnv, _spawnve, _spawnvp,
+	_spawnvpe): Return intptr_t.
+	(execl, execle, execlp, execlpe, execv, execve, execvp, execvpe, spawnl,
+	spawnle, spawnlp, spawnlpe, spawnv, spawnve, spawnvp, spawnvpe): Return
+	intptr_t.
+	* include/wchar.h: Guard wide process.h functions with !__STRICT_ANSI__.
+
+	[!_WPROCESS_DEFINED]: Include stdint.h for intptr_t definition.
+	(_wexecl, _wexecle, _wexeclp, _wexeclpe, _wexecv, _wexecve, _wexecvp,
+	_wexecvpe, _wspawnl, _wspawnle, _wspawnlp, _wspawnlpe, _wspawnv, _wspawnve,
+	_wspawnvp, _wspawnvpe): Return intptr_t.
+
+2008-04-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wchar.h (fwide): Return success code rather than failure in inline
 	definition.
 	* mingwex/fwide.c (fwide): ANSI-fy. Get rid of Q8 comments.  Return success

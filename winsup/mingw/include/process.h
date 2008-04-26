@@ -14,9 +14,8 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-/* Includes a definition of _pid_t and pid_t */
-#include <sys/types.h>
-
+#include <sys/types.h> /* For _pid_t and pid_t. */
+#include <stdint.h>  /* For intptr_t. */
 /*
  * Constants for cwait actions.
  * Obsolete for Win32.
@@ -62,23 +61,23 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _cwait (int*, _pid_t, int);
 
 _CRTIMP _pid_t __cdecl __MINGW_NOTHROW _getpid(void);
 
-_CRTIMP int __cdecl __MINGW_NOTHROW _execl	(const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execle	(const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execlp	(const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execlpe	(const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execv	(const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execve	(const char*, const char* const*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execvp	(const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _execvpe	(const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execl	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execle	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execlp	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execlpe	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execv	(const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execve	(const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execvp	(const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _execvpe	(const char*, const char* const*, const char* const*);
 
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnl	(int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnle	(int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnlp	(int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnlpe	(int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnv	(int, const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnve	(int, const char*, const char* const*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnvp	(int, const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _spawnvpe	(int, const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnl	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnle	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnlp	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnlpe	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnv	(int, const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnve	(int, const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnvp	(int, const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _spawnvpe	(int, const char*, const char* const*, const char* const*);
 
 
 /*
@@ -111,22 +110,24 @@ _CRTIMP void __cdecl __MINGW_NOTHROW _endthreadex (unsigned);
  */
 _CRTIMP int  __cdecl __MINGW_NOTHROW cwait (int*, pid_t, int);
 _CRTIMP pid_t __cdecl __MINGW_NOTHROW getpid (void);
-_CRTIMP int __cdecl __MINGW_NOTHROW execl (const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW execle (const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW execlp (const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW execlpe (const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW execv (const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW execve (const char*, const char* const*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW execvp (const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW execvpe (const char*, const char* const*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnl (int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnle (int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnlp (int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnlpe (int, const char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnv (int, const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnve (int, const char*, const char* const*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnvp (int, const char*, const char* const*);
-_CRTIMP int __cdecl __MINGW_NOTHROW spawnvpe (int, const char*, const char* const*, const char* const*);
+
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execl	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execle	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execlp	(const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execlpe	(const char*, const char*,...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execv	(const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execve	(const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execvp	(const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW execvpe	(const char*, const char* const*, const char* const*);
+
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnl	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnle	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnlp	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnlpe	(int, const char*, const char*, ...);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnv	(int, const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnve	(int, const char*, const char* const*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnvp	(int, const char*, const char* const*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW spawnvpe	(int, const char*, const char* const*, const char* const*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef	__cplusplus
