@@ -694,7 +694,7 @@ dll_crt0_0 ()
   init_global_security ();
   initial_env ();
 
-  SetErrorMode (SEM_FAILCRITICALERRORS);
+  SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory

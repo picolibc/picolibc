@@ -471,15 +471,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 	system_printf ("duplicate to pid_handle failed, %E");
     }
 
-  /* Some file types (currently only sockets) need extra effort in the parent
-     after CreateProcess and before copying the datastructures to the child.
-     So we have to start the child in suspend state, unfortunately, to avoid
-     a race condition. */
-  if (!newargv.win16_exe
-      && (!ch.iscygwin () || mode != _P_OVERLAY
-	  || cygheap->fdtab.need_fixup_before ()))
-    c_flags |= CREATE_SUSPENDED;
-
   runpath = null_app_name ? NULL : real_path.get_wide_win32_path (runpath);
 
   syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
@@ -505,6 +496,15 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
+
+  /* Depends on ch.set call above!
+     Some file types might need extra effort in the parent after CreateProcess
+     and before copying the datastructures to the child.  So we have to start
+     the child in suspend state, unfortunately, to avoid a race condition. */
+  if (!newargv.win16_exe
+      && (!ch.iscygwin () || mode != _P_OVERLAY
+	  || cygheap->fdtab.need_fixup_before ()))
+    c_flags |= CREATE_SUSPENDED;
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different

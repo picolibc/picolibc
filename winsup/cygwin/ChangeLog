@@ -1,3 +1,10 @@
+2008-04-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_0): Set SEM_NOGPFAULTERRORBOX error mode, too,
+	to accommodate Vista/Longhorn.
+	* spawn.cc (spawn_guts): Move check for CREATE_SUSPENDED condition
+	after the call to ch.set() since it depends on it.
+
 2008-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install): Drop install rules for postinstall script.
