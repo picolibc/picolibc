@@ -46,7 +46,7 @@ class wincapc
 {
   OSVERSIONINFOEX  version;
   char             osnam[40];
-  bool             wow64;
+  BOOL             wow64;
   void             *caps;
 
 public:

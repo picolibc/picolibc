@@ -1,3 +1,9 @@
+2008-04-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.h (wincapc::wow64): Change type to BOOL.
+	* wincap.cc: Remove explicit use of this pointer in wincapc methods.
+	(wincapc::init): Fix bug in IsWow64Process handling.
+
 2008-04-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_0): Set SEM_NOGPFAULTERRORBOX error mode, too,

@@ -392,15 +392,12 @@ wincapc::init ()
     }
 
   if (has_osversioninfoex && version.wProductType != VER_NT_WORKSTATION)
-    ((wincaps *)this->caps)->is_server = true;
+    ((wincaps *)caps)->is_server = true;
 
-  BOOL is_wow64_proc = FALSE;
-  if (IsWow64Process (GetCurrentProcess (), &is_wow64_proc))
-    wow64 = is_wow64_proc;
-  else
+  if (IsWow64Process (GetCurrentProcess (), &wow64) && !wow64)
     {
-      ((wincaps *)this->caps)->needs_count_in_si_lpres2 = false;
-      ((wincaps *)this->caps)->has_restricted_stack_args = false;
+      ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
+      ((wincaps *)caps)->has_restricted_stack_args = false;
     }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
@@ -410,5 +407,5 @@ wincapc::init ()
 void
 wincapc::set_chunksize (DWORD nchunksize)
 {
-  ((wincaps *)this->caps)->chunksize = nchunksize;
+  ((wincaps *)caps)->chunksize = nchunksize;
 }
