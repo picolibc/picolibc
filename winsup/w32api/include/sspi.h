@@ -57,6 +57,8 @@ extern "C" {
 #define UNISP_NAME_W L"Microsoft Unified Security Protocol Provider"
 #define SECBUFFER_VERSION 0
 
+typedef UNICODE_STRING SECURITY_STRING, *PSECURITY_STRING;
+
 typedef struct _SecHandle {
 	ULONG_PTR dwLower;
 	ULONG_PTR dwUpper;
