@@ -1,5 +1,9 @@
 2008-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* kernel32.cc (CreateFileMappingW): Remove stray small_printf.
+
+2008-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (IsWow64Process): Remove.
 	(Wow64DisableWow64FsRedirection): Remove.
 	(Wow64RevertWow64FsRedirection): Remove.

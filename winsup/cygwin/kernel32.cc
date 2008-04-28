@@ -338,7 +338,6 @@ CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
   status = NtCreateSection (&sect, access, &attr, psize, prot, attribs, hFile);
   if (!NT_SUCCESS (status))
     {
-      small_printf ("status %p\n", status);
       SetLastError (RtlNtStatusToDosError (status));
       return NULL;
     }
