@@ -2310,7 +2310,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      UNICODE_STRING dirname, basename;
 	      OBJECT_ATTRIBUTES dattr;
 	      HANDLE dir;
-	      FILE_DIRECTORY_INFORMATION fdi;
+	      struct {
+		FILE_DIRECTORY_INFORMATION fdi;
+		WCHAR dummy_buf[NAME_MAX + 1];
+	      } fdi_buf;
 
 	      RtlSplitUnicodePath (&upath, &dirname, &basename);
 	      InitializeObjectAttributes (&dattr, &dirname,
@@ -2328,27 +2331,18 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      else
 		{
 		  status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
-						 &fdi, sizeof fdi,
+						 &fdi_buf, sizeof fdi_buf,
 						 FileDirectoryInformation,
 						 TRUE, &basename, TRUE);
 		  NtClose (dir);
-		  /* Per MSDN, ZwQueryDirectoryFile allows to specify a buffer
-		     which only fits the static parts of the structure (without
-		     filename that is) in the first call.  The buffer actually
-		     contains valid data, even though ZwQueryDirectoryFile
-		     returned STATUS_BUFFER_OVERFLOW.
-
-		     Please note that this doesn't work for the info class
-		     FileIdBothDirectoryInformation, unfortunately, so we don't
-		     use this technique in fhandler_base::fstat_by_name, */
-		  if (!NT_SUCCESS (status) && status != STATUS_BUFFER_OVERFLOW)
+		  if (!NT_SUCCESS (status))
 		    {
 		      debug_printf ("%p = NtQueryDirectoryFile(%S)",
 				    status, &dirname);
 		      fileattr = 0;
 		    }
 		  else
-		    fileattr = fdi.FileAttributes;
+		    fileattr = fdi_buf.fdi.FileAttributes;
 		}
 	      ext_tacked_on = !!*ext_here;
 	      goto file_not_symlink;

@@ -1,5 +1,11 @@
 2008-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check): Avoid special handling for
+	STATUS_BUFFER_OVERFLOW when calling NtQueryDirectoryFile.
+	* strace.cc (strace::vprntf): Use bigger buffer.
+
+2008-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* kernel32.cc (CreateFileMappingW): Remove stray small_printf.
 
 2008-04-28  Corinna Vinschen  <corinna@vinschen.de>

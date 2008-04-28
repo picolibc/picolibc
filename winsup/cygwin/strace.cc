@@ -234,7 +234,7 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
 {
   DWORD err = GetLastError ();
   int len;
-  char buf[10000];
+  char buf[NT_MAX_PATH];
 
   PROTECT (buf);
   SetLastError (err);
