@@ -1,3 +1,8 @@
+2008-04-28  Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips.h (INSN_MACRO): Move it up to the the pinfo macros.
+	(INSN2_M_FP_S, INSN2_M_FP_D): New pinfo2 macros.
+
 2008-04-14  Edmar Wienskoski  <edmar@freescale.com>
 
 	* ppc.h: (PPC_OPCODE_E500MC): New.

@@ -456,6 +456,9 @@ struct mips_opcode
 #define INSN_MULT                   0x40000000
 /* Instruction synchronize shared memory.  */
 #define INSN_SYNC		    0x80000000
+/* Instruction is actually a macro.  It should be ignored by the
+   disassembler, and requires special treatment by the assembler.  */
+#define INSN_MACRO                  0xffffffff
 
 /* These are the bits which may be set in the pinfo2 field of an
    instruction. */
@@ -466,10 +469,14 @@ struct mips_opcode
 #define INSN2_READ_MDMX_ACC	    0x00000002
 /* Instruction writes MDMX accumulator. */
 #define INSN2_WRITE_MDMX_ACC	    0x00000004
-
-/* Instruction is actually a macro.  It should be ignored by the
-   disassembler, and requires special treatment by the assembler.  */
-#define INSN_MACRO                  0xffffffff
+/* Macro uses single-precision floating-point instructions.  This should
+   only be set for macros.  For instructions, FP_S in pinfo carries the
+   same information.  */
+#define INSN2_M_FP_S		    0x00000008
+/* Macro uses double-precision floating-point instructions.  This should
+   only be set for macros.  For instructions, FP_D in pinfo carries the
+   same information.  */
+#define INSN2_M_FP_D		    0x00000010
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that
