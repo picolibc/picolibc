@@ -402,9 +402,6 @@ LoadDLLfuncEx (FindNextVolumeA, 12, kernel32, 1)
 LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)
 LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
 LoadDLLfuncEx (GetVolumeNameForVolumeMountPointA, 12, kernel32, 1)
-LoadDLLfuncEx (IsWow64Process, 8, kernel32, 1);
-LoadDLLfuncEx (Wow64DisableWow64FsRedirection, 4, kernel32, 1)
-LoadDLLfuncEx (Wow64RevertWow64FsRedirection, 4, kernel32, 1)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 

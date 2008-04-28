@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include "security.h"
+#include "ntdll.h"
 
 /* Minimal set of capabilities which is equivalent to NT4. */
 static NO_COPY wincaps wincap_unknown = {
@@ -394,7 +395,10 @@ wincapc::init ()
   if (has_osversioninfoex && version.wProductType != VER_NT_WORKSTATION)
     ((wincaps *)caps)->is_server = true;
 
-  if (IsWow64Process (GetCurrentProcess (), &wow64) && !wow64)
+  if (NT_SUCCESS (NtQueryInformationProcess (GetCurrentProcess (),
+					     ProcessWow64Information,
+					     &wow64, sizeof wow64, NULL))
+      && !wow64)
     {
       ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
       ((wincaps *)caps)->has_restricted_stack_args = false;

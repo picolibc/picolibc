@@ -1,3 +1,14 @@
+2008-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (IsWow64Process): Remove.
+	(Wow64DisableWow64FsRedirection): Remove.
+	(Wow64RevertWow64FsRedirection): Remove.
+	* ntdll.h (enum _PROCESSINFOCLASS): Define ProcessWow64Information.
+	* init.cc (respawn_wow64_process): Use NtQueryInformationProcess to
+	get WOW64 state.
+	* wincap.cc (wincapc::init): Ditto.
+	* wincap.h (wincapc::wow64): Change type to ULONG.
+
 2008-04-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.h (wincapc::wow64): Change type to BOOL.

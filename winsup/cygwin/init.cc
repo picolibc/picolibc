@@ -71,25 +71,25 @@ respawn_wow64_process ()
   PROCESS_BASIC_INFORMATION pbi;
   HANDLE parent;
 
-  BOOL is_wow64_proc = TRUE;	/* Opt on the safe side. */
+  ULONG wow64 = TRUE;	/* Opt on the safe side. */
 
   /* Unfortunately there's no simpler way to retrieve the
      parent process in NT, as far as I know.  Hints welcome. */
   ret = NtQueryInformationProcess (GetCurrentProcess (),
 				   ProcessBasicInformation,
-				   (PVOID) &pbi,
-				   sizeof pbi, NULL);
-  if (ret == STATUS_SUCCESS
+				   &pbi, sizeof pbi, NULL);
+  if (NT_SUCCESS (ret)
       && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
 				FALSE,
 				pbi.InheritedFromUniqueProcessId)))
     {
-      IsWow64Process (parent, &is_wow64_proc);
+      NtQueryInformationProcess (parent, ProcessWow64Information,
+				 &wow64, sizeof wow64, NULL);
       CloseHandle (parent);
     }
 
   /* The parent is a real 64 bit process?  Respawn! */
-  if (!is_wow64_proc)
+  if (!wow64)
     {
       PROCESS_INFORMATION pi;
       STARTUPINFOW si;
