@@ -1,5 +1,10 @@
 2008-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::from_fstab): Skip native path prefix in
+	module path.
+
+2008-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Use volume serial numbers stored in path_conv
 	rather than fetching them here for the "same file" test.  Change
 	comment to reflect this.

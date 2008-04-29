@@ -871,7 +871,8 @@ bool
 mount_info::from_fstab (bool user)
 {
   tmp_pathbuf tp;
-  PWCHAR path = tp.w_get ();
+  PWCHAR path_buf = tp.w_get ();
+  PWCHAR path = path_buf;
   PWCHAR w;
   
   if (!GetModuleFileNameW (GetModuleHandleW (L"cygwin1.dll"),
@@ -879,6 +880,12 @@ mount_info::from_fstab (bool user)
     {
       debug_printf ("GetModuleFileNameW, %E");
       return false;
+    }
+  if (!wcsncmp (path, L"\\\\?\\", 4))
+    {
+      path += 4;
+      if (path[1] != L':')
+        *(path += 2) = L'\\';
     }
   w = wcsrchr (path, L'\\');
   if (w)
