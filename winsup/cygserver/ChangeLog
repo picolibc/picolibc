@@ -1,3 +1,11 @@
+2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_msg.cc: Add fix from upstream version 1.65.
+	(msgsnd): Call msleep with timeout value.  Handle EWOULDBLOCK.  Make
+	sure it's clear from where msleep has been called in debug output.
+	(msgrcv): Make sure it's clear from where msleep has been called in
+	debug output.
+
 2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc: Replace %E __small_printf format specifier with %lu

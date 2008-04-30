@@ -722,10 +722,14 @@ msgsnd(struct thread *td, struct msgsnd_args *uap)
 			}
 			DPRINTF(("goodnight\n"));
 			error = msleep(msqptr, &msq_mtx, (PZERO - 4) | PCATCH,
-			    "msgwait", 0);
+			    "msgsnd", 50);
 			DPRINTF(("good morning, error=%d\n", error));
 			if (we_own_it)
 				msqptr->msg_perm.mode &= ~MSG_LOCKED;
+			if (error == EWOULDBLOCK) {
+				DPRINTF(("timed out\n"));
+				continue;
+			}
 			if (error != 0) {
 				DPRINTF(("msgsnd:  interrupted system call\n"));
 #ifdef __CYGWIN__
@@ -1079,11 +1083,11 @@ msgrcv(struct thread *td, struct msgrcv_args *uap)
 
 		DPRINTF(("msgrcv:  goodnight\n"));
 		error = msleep(msqptr, &msq_mtx, (PZERO - 4) | PCATCH,
-		    "msgwait", 0);
+		    "msgrcv", 0);
 		DPRINTF(("msgrcv:  good morning (error=%d)\n", error));
 
 		if (error != 0) {
-			DPRINTF(("msgsnd:  interrupted system call\n"));
+			DPRINTF(("msgrcv:  interrupted system call\n"));
 #ifdef __CYGWIN__
 		    if (error != EIDRM)
 #endif /* __CYGWIN__ */
