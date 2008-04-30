@@ -310,13 +310,6 @@ frok::parent (volatile char * volatile stack_here)
   else
     c_flags |= DETACHED_PROCESS;
 
-  /* Some file types (currently only sockets) need extra effort in the
-     parent after CreateProcess and before copying the datastructures
-     to the child. So we have to start the child in suspend state,
-     unfortunately, to avoid a race condition. */
-  if (cygheap->fdtab.need_fixup_before ())
-    c_flags |= CREATE_SUSPENDED;
-
   /* Remember the address of the first loaded dll and decide
      if we need to load dlls.  We do this here so that this
      information will be available in the parent and, when
@@ -387,14 +380,6 @@ frok::parent (volatile char * volatile stack_here)
 	  error = "CreateProcessW failed";
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;
-	}
-
-      /* Fixup the parent datastructure if needed and resume the child's
-	 main thread. */
-      if (c_flags & CREATE_SUSPENDED)
-	{
-	  cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
-	  ResumeThread (pi.hThread);
 	}
 
       CloseHandle (pi.hThread);

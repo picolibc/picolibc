@@ -502,8 +502,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
      and before copying the datastructures to the child.  So we have to start
      the child in suspend state, unfortunately, to avoid a race condition. */
   if (!newargv.win16_exe
-      && (!ch.iscygwin () || mode != _P_OVERLAY
-	  || cygheap->fdtab.need_fixup_before ()))
+      && (!ch.iscygwin () || mode != _P_OVERLAY))
     c_flags |= CREATE_SUSPENDED;
 
   /* When ruid != euid we create the new process under the current original
@@ -627,11 +626,6 @@ loop:
 
   if (!(c_flags & CREATE_SUSPENDED))
     strace.write_childpid (ch, pi.dwProcessId);
-
-  /* Fixup the parent data structures if needed and resume the child's
-     main thread. */
-  if (cygheap->fdtab.need_fixup_before ())
-    cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
 
   if (mode != _P_OVERLAY)
     cygpid = cygwin_pid (pi.dwProcessId);

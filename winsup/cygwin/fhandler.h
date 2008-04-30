@@ -218,7 +218,6 @@ class fhandler_base
       return close_on_exec () ? &sec_none_nih : &sec_none;
   }
 
-  virtual void fixup_before_fork_exec (DWORD) {}
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec ();
   void create_read_state (LONG n)
@@ -263,7 +262,6 @@ class fhandler_base
 
   /* fixup fd possibly non-inherited handles after fork */
   bool fork_fixup (HANDLE, HANDLE &, const char *);
-  virtual bool need_fixup_before () const {return false;}
 
   virtual int open (int, mode_t = 0);
   int open_fs (int, mode_t = 0);

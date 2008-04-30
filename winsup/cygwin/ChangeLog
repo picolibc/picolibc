@@ -1,5 +1,22 @@
 2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::release): Drop fixup_before handling.
+	(dtable::fixup_before_fork): Remove.
+	(dtable::fixup_before_exec): Remove.
+	* dtable.h (class dtable): Remove cnt_need_fixup_before member.
+	(dtable::dtable): Accommodate above change.
+	(dtable::dec_need_fixup_before): Remove.
+	(dtable::inc_need_fixup_before): Remove.
+	(dtable::need_fixup_before): Remove.
+	(dtable::fixup_before_exec): Remove declaration.
+	(dtable::fixup_before_fork): Ditto.
+	* fhandler.h (fhandler_base::fixup_before_fork_exec): Remove.
+	(fhandler_base::need_fixup_before): Remove.
+	* fork.cc (frok::parent): Drop fixup_before handling.
+	* spawn.cc (spawn_guts): Ditto.
+
+2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (is_unc_share): Allow \\?\ prefix as well.  Enhance comment.
 	(mount_info::from_fstab): Remove patch from 2008-04-29.
 

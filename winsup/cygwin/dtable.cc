@@ -236,8 +236,6 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-      if (fds[fd]->need_fixup_before ())
-	dec_need_fixup_before ();
       fhandler_base *arch = fds[fd]->archetype;
       delete fds[fd];
       if (arch && !arch->usecount)
@@ -672,42 +670,12 @@ dtable::select_except (int fd, select_record *s)
   return s;
 }
 
-/* Function to walk the fd table after an exec and perform
-   per-fhandler type fixups. */
-void
-dtable::fixup_before_fork (DWORD target_proc_id)
-{
-  lock ();
-  fhandler_base *fh;
-  for (size_t i = 0; i < size; i++)
-    if ((fh = fds[i]) != NULL)
-      {
-	debug_printf ("fd %d (%s)", i, fh->get_name ());
-	fh->fixup_before_fork_exec (target_proc_id);
-      }
-  unlock ();
-}
-
 void
 dtable::move_fd (int from, int to)
 {
   // close (to); /* It is assumed that this is close-on-exec */
   fds[to] = fds[from];
   fds[from] = NULL;
-}
-
-void
-dtable::fixup_before_exec (DWORD target_proc_id)
-{
-  lock ();
-  fhandler_base *fh;
-  for (size_t i = 0; i < size; i++)
-    if ((fh = fds[i]) != NULL && !fh->close_on_exec ())
-      {
-	debug_printf ("fd %d (%s)", i, fh->get_name ());
-	fh->fixup_before_fork_exec (target_proc_id);
-      }
-  unlock ();
 }
 
 void
