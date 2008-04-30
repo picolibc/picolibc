@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1990, 2007 The Regents of the University of California.
+ * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
@@ -40,7 +40,7 @@ _DEFUN(_asiprintf_r, (ptr, strp, fmt),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {
@@ -67,7 +67,7 @@ _DEFUN(asiprintf, (strp, fmt),
   f._bf._size = f._w = 0;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfiprintf_r (_REENT, &f, fmt, ap);
+  ret = _svfiprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   if (ret >= 0)
     {

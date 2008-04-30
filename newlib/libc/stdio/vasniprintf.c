@@ -1,4 +1,4 @@
-/* Copyright (C) 2007 Eric Blake
+/* Copyright (C) 2007, 2008 Eric Blake
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
  */
@@ -47,7 +47,7 @@ _DEFUN(_vasniprintf_r, (ptr, buf, lenp, fmt, ap),
     }
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   if (ret < 0)
     return NULL;
   *lenp = ret;

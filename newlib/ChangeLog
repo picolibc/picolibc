@@ -1,3 +1,15 @@
+2008-04-29  Eric Blake  <ebb9@byu.net>
+
+	Fix 2008-04-14 regression in asprintf(ptr,"").
+	* libc/stdio/asnprintf.c (asnprintf, _asnprintf_r): Avoid stdio
+	baggage.
+	* libc/stdio/asniprintf.c (asniprintf, _asniprintf_r): Likewise.
+	* libc/stdio/asiprintf.c (asiprintf, _asiprintf_r): Likewise.
+	* libc/stdio/vasniprintf.c (_vasniprintf_r): Likewise.
+	* libc/stdio/vsnprintf.c (_vsnprintf_r): Likewise.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [STRING_ONLY]: Always malloc
+	an initial buffer for asprintf.
+
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/stat.h: Guard at-functions with !__INSIDE_CYGWIN__.
@@ -23,7 +35,7 @@
 
 	* libc/include/_ansi.h: _LONG_LONG renamed to _LONG_LONG_TYPE.
 	* libc/include/math.h: Likewise.
-		
+
 2008-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h (renameat): Declare for Cygwin.
@@ -55,31 +67,31 @@
 2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/sys/errno.h: Use _impure_data, not _reent_data.
-	
+
 2008-04-16  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/impure.c: Add missing underscore to impure_data.
-	
+
 2008-04-14  Patrick Mansfield  <patmans@us.ibm.com>
 
 	* libc/machine/spu/impure.c: New file, supply a non-static _impure_data.
-  	* libc/machine/spu/Makefile.am: Add new file impure.c.
+	* libc/machine/spu/Makefile.am: Add new file impure.c.
 	* libc/machine/spu/Makefile.in: Regenerate.
 	* libc/machine/spu/sys/errno.h: Define errno to be _reent_data._errno.
-		
+
 2008-04-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/Makefile.am: Build vfprintf.c and vfscanf.c with
 	-DSTRING_ONLY defined with and without -DINTEGER_ONLY defined
 	to build special versions for sprintf/sscanf family functions.
 	* libc/stdio/Makefile.in: Regenerated.
-	* libc/stdio/vfprintf.c[STRING_ONLY][INTEGER_ONLY](_VFPRINTF_R): 
-	Redefine to be _svfiprintf_r which is optimized to work with siprintf 
+	* libc/stdio/vfprintf.c[STRING_ONLY][INTEGER_ONLY](_VFPRINTF_R):
+	Redefine to be _svfiprintf_r which is optimized to work with siprintf
 	family of functions (i.e. no I/O) and does not support floating-point.
 	[STRING_ONLY][!INTEGER_ONLY](_VFPRINTF_R): Redefine to be
 	_svfprintf_r which is optimized to work with sprintf family of
 	functions and not use I/O.
-	[STRING_ONLY](__sprint_r): New string only version of static function. 
+	[STRING_ONLY](__sprint_r): New string only version of static function.
 	designed to work with sprintf family of functions.
 	* libc/stdio/vfscanf.c[STRING_ONLY][INTEGER_ONLY](_SVFSCANF_R):
 	Redefine to be _ssvfiscanf_r which is optimized to work with siscanf
@@ -135,7 +147,7 @@
 	* libc/include/reent.h: Define _func_r functions in this file to
 	func if REENTRANT_SYSCALLS_PROVIDED and MISSING_SYSCALL_NAMES are
 	defined.
-			  
+
 2008-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Declare lockf(2) and define lockf

@@ -1,4 +1,4 @@
-/* Copyright (C) 2007 Eric Blake
+/* Copyright (C) 2007, 2008 Eric Blake
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
  */
@@ -48,7 +48,7 @@ _DEFUN(_asniprintf_r, (ptr, buf, lenp, fmt),
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret < 0)
     return NULL;
@@ -95,7 +95,7 @@ _DEFUN(asniprintf, (buf, lenp, fmt),
   f._bf._size = f._w = len;
   f._file = -1;  /* No file. */
   va_start (ap, fmt);
-  ret = _vfiprintf_r (ptr, &f, fmt, ap);
+  ret = _svfiprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   if (ret < 0)
     return NULL;
