@@ -42,7 +42,10 @@ details. */
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len))
 
-/* is_unc_share: Return non-zero if PATH begins with //UNC/SHARE */
+/* is_unc_share: Return non-zero if PATH begins with //server/share 
+                 or with one of the native prefixes //./ or //?/ 
+   This function is only used to test for valid input strings.
+   The later normalization drops the native prefixes. */
 
 static inline bool __stdcall
 is_unc_share (const char *path)
@@ -50,7 +53,7 @@ is_unc_share (const char *path)
   const char *p;
   return (isdirsep (path[0])
 	 && isdirsep (path[1])
-	 && (isalnum (path[2]) || path[2] == '.')
+	 && (isalnum (path[2]) || path[2] == '.' || path[2] == '?')
 	 && ((p = strpbrk (path + 3, "\\/")) != NULL)
 	 && isalnum (p[1]));
 }
@@ -576,10 +579,9 @@ mount_info::conv_to_posix_path (PWCHAR src_path, char *posix_path,
   if (!wcsncmp (src_path, L"\\\\?\\", 4))
     {
       src_path += 4;
-      if (!wcsncmp (src_path, L"UNC\\", 4))
+      if (src_path[1] != L':') /* native UNC path */
 	{
-	  src_path += 2;
-	  src_path[0] = L'\\';
+	  *(src_path += 2) = L'\\';
 	  changed = true;
 	}
     }
@@ -880,12 +882,6 @@ mount_info::from_fstab (bool user)
     {
       debug_printf ("GetModuleFileNameW, %E");
       return false;
-    }
-  if (!wcsncmp (path, L"\\\\?\\", 4))
-    {
-      path += 4;
-      if (path[1] != L':')
-        *(path += 2) = L'\\';
     }
   w = wcsrchr (path, L'\\');
   if (w)

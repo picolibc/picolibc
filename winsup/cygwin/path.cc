@@ -1353,7 +1353,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       && src[2] == '?' && isdirsep (src[3]))
     {
       src += 4;
-      if (ascii_strncasematch (src, "UNC", 3))
+      if (src[1] != ':') /* native UNC path */
         {
 	  src += 2; /* Fortunately the first char is not copied... */
 	  beg_src_slash = true;
@@ -1643,10 +1643,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		 takes a wide char path name, it does not understand the
 		 Win32 prefix for long pathnames!  So we have to tack off
 		 the prefix and convert the path to the "normal" syntax
-		 for ParseDisplayName.  I have no idea if it's able to take
-		 long path names at all since I can't test it right now. */
+		 for ParseDisplayName.  */
 	      WCHAR *wc = wc_path + 4;
-	      if (!wcsncmp (wc, L"UNC\\", 4))
+	      if (wc[1] != L':') /* native UNC path */
 		*(wc += 2) = L'\\';
 	      HRESULT res;
 	      if (SUCCEEDED (res = psl->ParseDisplayName (NULL, NULL, wc, NULL,
@@ -2013,11 +2012,8 @@ symlink_info::posixify (char *srcbuf)
   if (srcbuf[0] == '\\' && !strncmp (srcbuf + 1, "??\\", 3))
     {
       srcbuf += 4;
-      if (!strncmp (srcbuf, "UNC\\", 4))
-	{
-	  srcbuf += 2;
-	  *srcbuf = '\\';
-	}
+      if (srcbuf[1] != ':') /* native UNC path */
+	*(srcbuf += 2) = '\\';
     }
   if (isdrive (srcbuf))
     mount_table->conv_to_posix_path (srcbuf, contents, 0);
@@ -2729,7 +2725,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       buf = tp.c_get ();
       sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
       buf += 4; /* Skip \??\ */
-      if (ascii_strncasematch (buf, "UNC\\", 4))
+      if (buf[1] != ':') /* native UNC path */
 	*(buf += 2) = '\\';
       lsiz = strlen (buf) + 1;
       break;
