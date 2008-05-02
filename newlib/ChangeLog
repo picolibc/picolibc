@@ -1,3 +1,10 @@
+2008-04-26  Mark Mitchell  <mark@codesourcery.com>
+
+	* libc/include/stdint.h (SIZE_MIN): Remove.
+	(SIZE_MAX): Define.
+	* testsuite/newlib.stdlib/stdlib.exp: New.
+	* testsuite/newlib.stdlib/size_max.c: Likewise.
+
 2008-04-29  Eric Blake  <ebb9@byu.net>
 
 	Fix 2008-04-14 regression in asprintf(ptr,"").

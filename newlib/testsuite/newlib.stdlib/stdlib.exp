@@ -1,0 +1,10 @@
+# Copyright (C) 2008 by CodeSourcery, Inc.  All rights reserved.
+#
+# Permission to use, copy, modify, and distribute this software
+# is freely granted, provided that this notice is preserved.
+
+load_lib passfail.exp
+
+set exclude_list [list "atexit.c"]
+
+newlib_pass_fail_all -x $exclude_list
