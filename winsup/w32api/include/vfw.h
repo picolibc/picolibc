@@ -632,6 +632,80 @@ typedef struct _AVICOMPRESSOPTIONS {
 	DWORD cbParms;
 	DWORD dwInterleaveEvery;
 } AVICOMPRESSOPTIONS, *LPAVICOMPRESSOPTIONS,*PAVICOMPRESSOPTIONS;
+typedef struct _CAPDRIVERCAPS {
+	UINT wDeviceIndex;
+	BOOL fHasOverlay;
+	BOOL fHasDlgVideoSource;
+	BOOL fHasDlgVideoFormat;
+	BOOL fHasDlgVideoDisplay;
+	BOOL fCaptureInitialized;
+	BOOL fDriverSuppliesPalettes;
+	HANDLE hVideoIn;
+	HANDLE hVideoOut;
+	HANDLE hVideoExtIn;
+	HANDLE hVideoExtOut;
+} CAPDRIVERCAPS, *LPCAPDRIVERCAPS;
+typedef struct _CAPINFOCHUNK {
+	FOURCC fccInfoID;
+	LPVOID lpData;
+	LONG cbData;
+} CAPINFOCHUNK, *LPCAPINFOCHUNK;
+typedef struct _CAPSTATUS {
+	UINT uiImageWidth;
+	UINT uiImageHeight;
+	BOOL fLiveWindow;
+	BOOL fOverlayWindow;
+	BOOL fScale;
+	POINT ptScroll;
+	BOOL fUsingDefaultPalette;
+	BOOL fAudioHardware;
+	BOOL fCapFileExists;
+	DWORD dwCurrentVideoFrame;
+	DWORD dwCurrentVideoFramesDropped;
+	DWORD dwCurrentWaveSamples;
+	DWORD dwCurrentTimeElapsedMS;
+	HPALETTE hPalCurrent;
+	BOOL fCapturingNow;
+	DWORD dwReturn;
+	UINT wNumVideoAllocated;
+	UINT wNumAudioAllocated;
+} CAPSTATUS, *LPCAPSTATUS;
+typedef struct _CAPTUREPARMS {
+	DWORD dwRequestMicroSecPerFrame;
+	BOOL fMakeUserHitOKToCapture;
+	UINT wPercentDropForError;
+	BOOL fYield;
+	DWORD dwIndexSize;
+	UINT wChunkGranularity;
+	BOOL fUsingDOSMemory;
+	UINT wNumVideoRequested;
+	BOOL fCaptureAudio;
+	UINT wNumAudioRequested;
+	UINT vKeyAbort;
+	BOOL fAbortLeftMouse;
+	BOOL fAbortRightMouse;
+	BOOL fLimitEnabled;
+	UINT wTimeLimit;
+	BOOL fMCIControl;
+	BOOL fStepMCIDevice;
+	DWORD dwMCIStartTime;
+	DWORD dwMCIStopTime;
+	BOOL fStepCaptureAt2x;
+	UINT wStepCaptureAverageFrames;
+	DWORD dwAudioBufferSize;
+	BOOL fDisableWriteCache;
+	UINT AVStreamMaster;
+} CAPTUREPARMS, *LPCAPTUREPARMS;
+
+typedef struct videohdr_tag {
+	LPBYTE lpData;
+	DWORD dwBufferLength;
+	DWORD dwBytesUsed;
+	DWORD dwTimeCaptured;
+	DWORD dwUser;
+	DWORD dwFlags;
+	DWORD_PTR dwReserved[4];
+} VIDEOHDR, *LPVIDEOHDR;
 
 #if !defined (_OBJC_NO_COM)
 #define DEFINE_AVIGUID(name,l,w1,w2) DEFINE_GUID(name,l,w1,w2,0xC0,0,0,0,0,0,0,0x46)
@@ -1056,6 +1130,166 @@ ICDecompressExQuery(HIC hic,DWORD dwFlags,LPBITMAPINFOHEADER lpbiSrc,LPVOID lpSr
 	ic.dyDst = dyDst;
 	return ICSendMessage(hic,ICM_DECOMPRESSEX_QUERY,(DWORD)&ic,sizeof(ic));
 }
+
+#define WM_CAP_FIRSTA                   (WM_USER)
+#define WM_CAP_FIRSTW                   (WM_USER + 100)
+
+#define WM_CAP_SET_CALLBACK_ERRORA      (WM_CAP_FIRSTA + 2)
+#define WM_CAP_SET_CALLBACK_ERRORW      (WM_CAP_FIRSTW + 2)
+#define WM_CAP_SET_CALLBACK_STATUS      (WM_CAP_FIRSTA + 3)
+#define WM_CAP_SET_CALLBACK_YIELD       (WM_CAP_FIRSTA + 4)
+#define WM_CAP_SET_CALLBACK_FRAMEA      (WM_CAP_FIRSTA + 5)
+#define WM_CAP_SET_CALLBACK_FRAMEW      (WM_CAP_FIRSTW + 5)
+#define WM_CAP_SET_CALLBACK_VIDEOSTREAM (WM_CAP_FIRSTA + 6)
+#define WM_CAP_SET_CALLBACK_WAVESTREAM  (WM_CAP_FIRSTA + 7)
+#define WM_CAP_GET_USER_DATA            (WM_CAP_FIRSTA + 8)
+#define WM_CAP_SET_USER_DATA            (WM_CAP_FIRSTA + 9)
+#define WM_CAP_DRIVER_CONNECT           (WM_CAP_FIRSTA + 10)
+#define WM_CAP_DRIVER_DISCONNECT        (WM_CAP_FIRSTA + 11)
+#define WM_CAP_DRIVER_GET_NAMEA         (WM_CAP_FIRSTA + 12)
+#define WM_CAP_DRIVER_GET_NAMEW         (WM_CAP_FIRSTW + 12)
+#define WM_CAP_DRIVER_GET_VERSIONA      (WM_CAP_FIRSTA + 13)
+#define WM_CAP_DRIVER_GET_VERSIONW      (WM_CAP_FIRSTW + 13)
+#define WM_CAP_DRIVER_GET_CAPS          (WM_CAP_FIRSTA + 14)
+#define WM_CAP_FILE_SET_CAPTURE_FILEA   (WM_CAP_FIRSTA + 20)
+#define WM_CAP_FILE_SET_CAPTURE_FILEW   (WM_CAP_FIRSTW + 20)
+#define WM_CAP_FILE_GET_CAPTURE_FILEA   (WM_CAP_FIRSTA + 21)
+#define WM_CAP_FILE_GET_CAPTURE_FILEW   (WM_CAP_FIRSTW + 21)
+#define WM_CAP_FILE_ALLOCATE            (WM_CAP_FIRSTA + 22)
+#define WM_CAP_FILE_SAVEASA             (WM_CAP_FIRSTA + 23)
+#define WM_CAP_FILE_SAVEASW             (WM_CAP_FIRSTW + 23)
+#define WM_CAP_FILE_SET_INFOCHUNK       (WM_CAP_FIRSTA + 24)
+#define WM_CAP_FILE_SAVEDIBA            (WM_CAP_FIRSTA + 25)
+#define WM_CAP_FILE_SAVEDIBW            (WM_CAP_FIRSTW + 25)
+#define WM_CAP_EDIT_COPY                (WM_CAP_FIRSTA + 30)
+#define WM_CAP_SET_AUDIOFORMAT          (WM_CAP_FIRSTA + 35)
+#define WM_CAP_GET_AUDIOFORMAT          (WM_CAP_FIRSTA + 36)
+#define WM_CAP_DLG_VIDEOFORMAT          (WM_CAP_FIRSTA + 41)
+#define WM_CAP_DLG_VIDEOSOURCE          (WM_CAP_FIRSTA + 42)
+#define WM_CAP_DLG_VIDEODISPLAY         (WM_CAP_FIRSTA + 43)
+#define WM_CAP_GET_VIDEOFORMAT          (WM_CAP_FIRSTA + 44)
+#define WM_CAP_SET_VIDEOFORMAT          (WM_CAP_FIRSTA + 45)
+#define WM_CAP_DLG_VIDEOCOMPRESSION     (WM_CAP_FIRSTA + 46)
+#define WM_CAP_SET_PREVIEW              (WM_CAP_FIRSTA + 50)
+#define WM_CAP_SET_OVERLAY              (WM_CAP_FIRSTA + 51)
+#define WM_CAP_SET_PREVIEWRATE          (WM_CAP_FIRSTA + 52)
+#define WM_CAP_SET_SCALE                (WM_CAP_FIRSTA + 53)
+#define WM_CAP_GET_STATUS               (WM_CAP_FIRSTA + 54)
+#define WM_CAP_SET_SCROLL               (WM_CAP_FIRSTA + 55)
+#define WM_CAP_GRAB_FRAME               (WM_CAP_FIRSTA + 60)
+#define WM_CAP_GRAB_FRAME_NOSTOP        (WM_CAP_FIRSTA + 61)
+#define WM_CAP_SEQUENCE                 (WM_CAP_FIRSTA + 62)
+#define WM_CAP_SEQUENCE_NOFILE          (WM_CAP_FIRSTA + 63)
+#define WM_CAP_SET_SEQUENCE_SETUP       (WM_CAP_FIRSTA + 64)
+#define WM_CAP_GET_SEQUENCE_SETUP       (WM_CAP_FIRSTA + 65)
+#define WM_CAP_SET_MCI_DEVICEA          (WM_CAP_FIRSTA + 66)
+#define WM_CAP_SET_MCI_DEVICEW          (WM_CAP_FIRSTW + 66)
+#define WM_CAP_GET_MCI_DEVICEA          (WM_CAP_FIRSTA + 67)
+#define WM_CAP_GET_MCI_DEVICEW          (WM_CAP_FIRSTW + 67)
+#define WM_CAP_STOP                     (WM_CAP_FIRSTA + 68)
+#define WM_CAP_ABORT                    (WM_CAP_FIRSTA + 69)
+#define WM_CAP_SINGLE_FRAME_OPEN        (WM_CAP_FIRSTA + 70)
+#define WM_CAP_SINGLE_FRAME_CLOSE       (WM_CAP_FIRSTA + 71)
+#define WM_CAP_SINGLE_FRAME             (WM_CAP_FIRSTA + 72)
+#define WM_CAP_PAL_OPENA                (WM_CAP_FIRSTA + 80)
+#define WM_CAP_PAL_OPENW                (WM_CAP_FIRSTW + 80)
+#define WM_CAP_PAL_SAVEA                (WM_CAP_FIRSTA + 81)
+#define WM_CAP_PAL_SAVEW                (WM_CAP_FIRSTW + 81)
+#define WM_CAP_PAL_PASTE                (WM_CAP_FIRSTA + 82)
+#define WM_CAP_PAL_AUTOCREATE           (WM_CAP_FIRSTA + 83)
+#define WM_CAP_PAL_MANUALCREATE         (WM_CAP_FIRSTA + 84)
+#define WM_CAP_SET_CALLBACK_CAPCONTROL  (WM_CAP_FIRSTA + 85)
+
+#undef WM_CAP_FIRSTA
+#undef WM_CAP_FIRSTW
+
+#ifdef UNICODE
+#define WM_CAP_SET_CALLBACK_ERROR       WM_CAP_SET_CALLBACK_ERRORW
+#define WM_CAP_SET_CALLBACK_FRAME       WM_CAP_SET_CALLBACK_FRAMEW
+#define WM_CAP_DRIVER_GET_NAME          WM_CAP_DRIVER_GET_NAMEW
+#define WM_CAP_DRIVER_GET_VERSION       WM_CAP_DRIVER_GET_VERSIONW
+#define WM_CAP_FILE_SET_CAPTURE_FILE    WM_CAP_FILE_SET_CAPTURE_FILEW
+#define WM_CAP_FILE_GET_CAPTURE_FILE    WM_CAP_FILE_GET_CAPTURE_FILEW
+#define WM_CAP_FILE_SAVEAS              WM_CAP_FILE_SAVEASW
+#define WM_CAP_FILE_SAVEDIB             WM_CAP_FILE_SAVEDIBW
+#define WM_CAP_SET_MCI_DEVICE           WM_CAP_SET_MCI_DEVICEW
+#define WM_CAP_GET_MCI_DEVICE           WM_CAP_GET_MCI_DEVICEW
+#define WM_CAP_PAL_OPEN                 WM_CAP_PAL_OPENW
+#define WM_CAP_PAL_SAVE                 WM_CAP_PAL_SAVEW
+#else
+#define WM_CAP_SET_CALLBACK_ERROR       WM_CAP_SET_CALLBACK_ERRORA
+#define WM_CAP_SET_CALLBACK_FRAME       WM_CAP_SET_CALLBACK_FRAMEA
+#define WM_CAP_DRIVER_GET_NAME          WM_CAP_DRIVER_GET_NAMEA
+#define WM_CAP_DRIVER_GET_VERSION       WM_CAP_DRIVER_GET_VERSIONA
+#define WM_CAP_FILE_SET_CAPTURE_FILE    WM_CAP_FILE_SET_CAPTURE_FILEA
+#define WM_CAP_FILE_GET_CAPTURE_FILE    WM_CAP_FILE_GET_CAPTURE_FILEA
+#define WM_CAP_FILE_SAVEAS              WM_CAP_FILE_SAVEASA
+#define WM_CAP_FILE_SAVEDIB             WM_CAP_FILE_SAVEDIBA
+#define WM_CAP_SET_MCI_DEVICE           WM_CAP_SET_MCI_DEVICEA
+#define WM_CAP_GET_MCI_DEVICE           WM_CAP_GET_MCI_DEVICEA
+#define WM_CAP_PAL_OPEN                 WM_CAP_PAL_OPENA
+#define WM_CAP_PAL_SAVE                 WM_CAP_PAL_SAVEA
+#endif
+
+#define capSendMessage(hwnd,m,w,l) (IsWindow(hwnd)?SendMessage(hwnd,m,w,l):0)
+
+#define capSetCallbackOnError(hwnd,fpProc)          ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_ERROR,0,(LPARAM)(LPVOID)(fpProc)))
+#define capSetCallbackOnStatus(hwnd,fpProc)         ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_STATUS,0,(LPARAM)(LPVOID)(fpProc)))
+#define capSetCallbackOnYield(hwnd,fpProc)          ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_YIELD,0,(LPARAM)(LPVOID)(fpProc)))
+#define capSetCallbackOnFrame(hwnd,fpProc)          ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_FRAME,0,(LPARAM)(LPVOID)(fpProc)))
+#define capSetCallbackOnVideoStream(hwnd,fpProc)    ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_VIDEOSTREAM,0,(LPARAM)(LPVOID)(fpProc)))
+#define capSetCallbackOnWaveStream(hwnd,fpProc)     ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_WAVESTREAM,0,(LPARAM)(LPVOID)(fpProc)))
+#define capGetUserData(hwnd)                        ((LONG) capSendMessage(hwnd,WM_CAP_GET_USER_DATA,0,0))
+#define capSetUserData(hwnd,lUser)                  ((BOOL) capSendMessage(hwnd,WM_CAP_SET_USER_DATA,0,(LPARAM)lUser))
+#define capDriverConnect(hwnd,i)                    ((BOOL) capSendMessage(hwnd,WM_CAP_DRIVER_CONNECT,(WPARAM)(i),0))
+#define capDriverDisconnect(hwnd)                   ((BOOL) capSendMessage(hwnd,WM_CAP_DRIVER_DISCONNECT,0,0))
+#define capDriverGetName(hwnd,szName,wSize)         ((BOOL) capSendMessage(hwnd,WM_CAP_DRIVER_GET_NAME,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capDriverGetVersion(hwnd,szVer,wSize)       ((BOOL) capSendMessage(hwnd,WM_CAP_DRIVER_GET_VERSION,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPTSTR)(szVer)))
+#define capDriverGetCaps(hwnd,psCaps,wSize)         ((BOOL) capSendMessage(hwnd,WM_CAP_DRIVER_GET_CAPS,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPCAPDRIVERCAPS)(psCaps)))
+#define capFileSetCaptureFile(hwnd,szName)          ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_SET_CAPTURE_FILE,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileGetCaptureFile(hwnd,szName,wSize)    ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_GET_CAPTURE_FILE,(WPARAM)(wSize), (LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileAlloc(hwnd,dwSize)                   ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_ALLOCATE,0,(LPARAM)(DWORD)(dwSize)))
+#define capFileSaveAs(hwnd,szName)                  ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_SAVEAS,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capFileSetInfoChunk(hwnd,lpInfoChunk)       ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_SET_INFOCHUNK,0,(LPARAM)(LPCAPINFOCHUNK)(lpInfoChunk)))
+#define capFileSaveDIB(hwnd, szName)                ((BOOL) capSendMessage(hwnd,WM_CAP_FILE_SAVEDIB,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capEditCopy(hwnd)                           ((BOOL) capSendMessage(hwnd,WM_CAP_EDIT_COPY,0,0))
+#define capSetAudioFormat(hwnd,psAudioFormat,wSize) ((BOOL) capSendMessage(hwnd,WM_CAP_SET_AUDIOFORMAT,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPWAVEFORMATEX)(psAudioFormat)))
+#define capGetAudioFormat(hwnd,psAudioFormat,wSize) ((DWORD)capSendMessage(hwnd,WM_CAP_GET_AUDIOFORMAT,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPWAVEFORMATEX)(psAudioFormat)))
+#define capGetAudioFormatSize(hwnd)                 ((DWORD)capSendMessage(hwnd,WM_CAP_GET_AUDIOFORMAT,0,0))
+#define capDlgVideoFormat(hwnd)                     ((BOOL) capSendMessage(hwnd,WM_CAP_DLG_VIDEOFORMAT,0,0))
+#define capDlgVideoSource(hwnd)                     ((BOOL) capSendMessage(hwnd,WM_CAP_DLG_VIDEOSOURCE,0,0))
+#define capDlgVideoDisplay(hwnd)                    ((BOOL) capSendMessage(hwnd,WM_CAP_DLG_VIDEODISPLAY,0,0))
+#define capGetVideoFormat(hwnd,psVideoFormat,wSize) ((DWORD)capSendMessage(hwnd,WM_CAP_GET_VIDEOFORMAT,(WPARAM)(wSize),(LPARAM)(LPVOID)(psVideoFormat)))
+#define capGetVideoFormatSize(hwnd)                 ((DWORD)capSendMessage(hwnd,WM_CAP_GET_VIDEOFORMAT,0,0))
+#define capSetVideoFormat(hwnd,psVideoFormat,wSize) ((BOOL) capSendMessage(hwnd,WM_CAP_SET_VIDEOFORMAT,(WPARAM)(wSize),(LPARAM)(LPVOID)(psVideoFormat)))
+#define capDlgVideoCompression(hwnd)                ((BOOL) capSendMessage(hwnd,WM_CAP_DLG_VIDEOCOMPRESSION,0,0))
+#define capPreview(hwnd,f)                          ((BOOL) capSendMessage(hwnd,WM_CAP_SET_PREVIEW,(WPARAM)(BOOL)(f),0))
+#define capOverlay(hwnd,f)                          ((BOOL) capSendMessage(hwnd,WM_CAP_SET_OVERLAY,(WPARAM)(BOOL)(f),0))
+#define capPreviewRate(hwnd,wMS)                    ((BOOL) capSendMessage(hwnd,WM_CAP_SET_PREVIEWRATE,(WPARAM)(wMS),0))
+#define capPreviewScale(hwnd,f)                     ((BOOL) capSendMessage(hwnd,WM_CAP_SET_SCALE,(WPARAM)(BOOL)f,0))
+#define capGetStatus(hwnd,s,wSize)                  ((BOOL) capSendMessage(hwnd,WM_CAP_GET_STATUS,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPCAPSTATUS)(s)))
+#define capSetScrollPos(hwnd,lpP)                   ((BOOL) capSendMessage(hwnd,WM_CAP_SET_SCROLL,0,(LPARAM)(LPPOINT)(lpP)))
+#define capGrabFrame(hwnd)                          ((BOOL) capSendMessage(hwnd,WM_CAP_GRAB_FRAME,0,0))
+#define capGrabFrameNoStop(hwnd)                    ((BOOL) capSendMessage(hwnd,WM_CAP_GRAB_FRAME_NOSTOP,0,0))
+#define capCaptureSequence(hwnd)                    ((BOOL) capSendMessage(hwnd,WM_CAP_SEQUENCE,0,0))
+#define capCaptureSequenceNoFile(hwnd)              ((BOOL) capSendMessage(hwnd,WM_CAP_SEQUENCE_NOFILE,0,0))
+#define capCaptureSetSetup(hwnd,s,wSize)            ((BOOL) capSendMessage(hwnd,WM_CAP_SET_SEQUENCE_SETUP,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPCAPTUREPARMS)(s)))
+#define capCaptureGetSetup(hwnd,s,wSize)            ((BOOL) capSendMessage(hwnd,WM_CAP_GET_SEQUENCE_SETUP,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPCAPTUREPARMS)(s)))
+#define capSetMCIDeviceName(hwnd,szName)            ((BOOL) capSendMessage(hwnd,WM_CAP_SET_MCI_DEVICE,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capGetMCIDeviceName(hwnd,szName,wSize)      ((BOOL) capSendMessage(hwnd,WM_CAP_GET_MCI_DEVICE,(WPARAM)(wSize),(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capCaptureStop(hwnd)                        ((BOOL) capSendMessage(hwnd,WM_CAP_STOP,0,0))
+#define capCaptureAbort(hwnd)                       ((BOOL) capSendMessage(hwnd,WM_CAP_ABORT,0,0))
+#define capCaptureSingleFrameOpen(hwnd)             ((BOOL) capSendMessage(hwnd,WM_CAP_SINGLE_FRAME_OPEN,0,0))
+#define capCaptureSingleFrameClose(hwnd)            ((BOOL) capSendMessage(hwnd,WM_CAP_SINGLE_FRAME_CLOSE,0,0))
+#define capCaptureSingleFrame(hwnd)                 ((BOOL) capSendMessage(hwnd,WM_CAP_SINGLE_FRAME,0,0))
+#define capPaletteOpen(hwnd,szName)                 ((BOOL) capSendMessage(hwnd,WM_CAP_PAL_OPEN,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capPaletteSave(hwnd,szName)                 ((BOOL) capSendMessage(hwnd,WM_CAP_PAL_SAVE,0,(LPARAM)(LPVOID)(LPTSTR)(szName)))
+#define capPalettePaste(hwnd)                       ((BOOL) capSendMessage(hwnd,WM_CAP_PAL_PASTE,0,0))
+#define capPaletteAuto(hwnd,iFrames,iColors)        ((BOOL) capSendMessage(hwnd,WM_CAP_PAL_AUTOCREATE,(WPARAM)(iFrames),(LPARAM)(DWORD)(iColors)))
+#define capPaletteManual(hwnd,fGrab,iColors)        ((BOOL) capSendMessage(hwnd,WM_CAP_PAL_MANUALCREATE,(WPARAM)(fGrab),(LPARAM)(DWORD)(iColors)))
+#define capSetCallbackOnCapControl(hwnd,fpProc)     ((BOOL) capSendMessage(hwnd,WM_CAP_SET_CALLBACK_CAPCONTROL,0,(LPARAM)(LPVOID)(fpProc)))
+
+#undef capSendMessage
 
 /* AVICAP32 exports */
 HWND VFWAPI capCreateCaptureWindowA (LPCSTR,DWORD,int,int,int,int,HWND,int);
