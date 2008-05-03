@@ -1,3 +1,8 @@
+2008-05-01  Bart Oldeman  <bartoldeman@users.sf.net>
+
+	* include/winuser.h (DEVICE_NOTIFY_WINDOW_HANDLE,
+	DEVICE_NOTIFY_SERVICE_HANDLE): remove duplicate definition.
+
 2008-04-26  Yuval  <uvman@users.sourceforge.net>
 
 	* include/ntsecpkg.h (SECPKG_STATE_ENCRYPTION_PERMITTED,

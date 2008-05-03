@@ -3376,9 +3376,6 @@ typedef const GUID *LPCGUID;
 #endif
 	
 #if (_WIN32_WINNT >= 0x0600)
-#define DEVICE_NOTIFY_WINDOW_HANDLE		0
-#define DEVICE_NOTIFY_SERVICE_HANDLE	1
-	
 typedef HANDLE HPOWERNOTIFY;
 
 typedef struct {
