@@ -307,8 +307,9 @@ _CRTIMP long __cdecl __MINGW_NOTHROW 	atol	(const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wtoi (const wchar_t *);
 _CRTIMP long __cdecl __MINGW_NOTHROW _wtol (const wchar_t *);
 #endif
-_CRTIMP double __cdecl __MINGW_NOTHROW	strtod	(const char*, char**);
+_CRTIMP double __cdecl __MINGW_NOTHROW	_strtod	(const char*, char**);
 #if !defined __NO_ISOCEXT  /*  in libmingwex.a */
+double __cdecl __MINGW_NOTHROW strtod (const char*, char**);
 float __cdecl __MINGW_NOTHROW strtof (const char * __restrict__, char ** __restrict__);
 long double __cdecl __MINGW_NOTHROW strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */

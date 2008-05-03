@@ -85,3 +85,6 @@ __strtod(CONST char *s, char **sp)
 		u.L[_0] |= 0x80000000L;
 	return u.d;
 	}
+
+double __cdecl strtod(const char *s, char **sp)
+    __attribute__((alias("__strtod")));

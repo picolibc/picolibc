@@ -1,3 +1,12 @@
+2008-04-02 Ramiro Polla  <ramiro@lisha.ufsc.br>
+
+	Make strtod() conform to C99.
+
+	* include/stdlib.h (strtod): Declare this mingwex function, and...
+	(_strtod): rename this MSVCRT counterpart.
+
+	* mingwex/gdtoa/strtodnrp.c (strtod): Alias to __strtod.
+
 2008-04-26  Chuck Wilson  <cwilso11@users.sourceforge.net>
 
 	* Makefile.in: correct issues with mingw10.dll having multiple relocs.
