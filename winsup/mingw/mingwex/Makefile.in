@@ -38,6 +38,7 @@ DISTFILES = Makefile.in configure configure.in aclocal.m4 \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
 	gettimeofday.c isblank.c iswblank.c \
 	basename.c dirname.c \
+	usleep.c \
 	tsearch.c twalk.c tdelete.c tfind.c
 
 MATH_DISTFILES = \
@@ -174,6 +175,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
 	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o \
+	usleep.o \
 	basename.o dirname.o tsearch.o twalk.o tdelete.o tfind.o
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o

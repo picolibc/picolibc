@@ -31,6 +31,11 @@
 extern "C" {
 #endif
 
+#if !defined __NO_ISOCEXT
+#include <sys/types.h> /* For useconds_t. */
+
+int __cdecl __MINGW_NOTHROW usleep(useconds_t useconds);
+#endif  /* Not __NO_ISOCEXT */
 
 /* This is defined as a real library function to allow autoconf
    to verify its existence. */

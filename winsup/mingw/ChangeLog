@@ -1,4 +1,11 @@
-2008-04-02 Ramiro Polla  <ramiro@lisha.ufsc.br>
+2008-05-04 Ramiro Polla <ramiro@lisha.ufsc.br>
+
+	* include/sys/time.h (useconds_t): typedef.
+	* include/unistd.h (usleep): Add prototype.
+	* mingwex/usleep.c: New file.
+	* mingwex/makefile.in: Add usleep source and object.
+
+2008-05-02 Ramiro Polla <ramiro@lisha.ufsc.br>
 
 	Make strtod() conform to C99.
 
