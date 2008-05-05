@@ -44,14 +44,8 @@ typedef struct
   unsigned int pad2[3];
 } syscall_readlink_t;
 
-/*
- * POSIX says readlink returns ssize_t, and has an size_t bufsiz, but
- * newlib has it prototyped as returning int, and int bufsiz. ssize_t,
- * size_t and int are ally currently 4 bytes for SPU, so just leave them
- * as ints for now.
- */
-int
-readlink (const char *path, char *buf, int bufsiz)
+ssize_t
+readlink (const char *path, char *buf, size_t bufsiz)
 {
   syscall_readlink_t sys;
 
