@@ -1,6 +1,6 @@
 2008-05-04 Ramiro Polla <ramiro@lisha.ufsc.br>
 
-	* include/sys/time.h (useconds_t): typedef.
+	* include/sys/types.h (useconds_t): typedef.
 	* include/unistd.h (usleep): Add prototype.
 	* mingwex/usleep.c: New file.
 	* mingwex/makefile.in: Add usleep source and object.
