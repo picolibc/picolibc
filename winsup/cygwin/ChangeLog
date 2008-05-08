@@ -1,5 +1,11 @@
 2008-05-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/localedef.h: Remove.
+	* libc/strptime.cc: Define _TimeLocale and declare _CurrentTimeLocale
+	as well as _DefaultTimeLocale locally for Cygwin.
+
+2008-05-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add _def_time.o.  Remove timelocal.o.
 	* include/sys/localedef.h: New file from NetBSD.
 	* libc/_def_time.c: Ditto.
