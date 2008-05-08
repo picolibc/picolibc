@@ -1,4 +1,4 @@
-/*	$OpenBSD: getopt_long.c,v 1.16 2004/02/04 18:17:25 millert Exp $	*/
+/*	$OpenBSD: getopt_long.c,v 1.23 2007/10/31 12:34:57 chl Exp $	*/
 /*	$NetBSD: getopt_long.c,v 1.15 2002/01/31 22:43:40 tv Exp $	*/
 
 /*
@@ -35,13 +35,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *        This product includes software developed by the NetBSD
- *        Foundation, Inc. and its contributors.
- * 4. Neither the name of The NetBSD Foundation nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -55,10 +48,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#if defined(LIBC_SCCS) && !defined(lint)
-static char *rcsid = "$OpenBSD: getopt_long.c,v 1.16 2004/02/04 18:17:25 millert Exp $";
-#endif /* LIBC_SCCS and not lint */
 
 #include <err.h>
 #include <errno.h>
@@ -465,7 +454,6 @@ start:
 		optarg = NULL;
 		if (*place)			/* no white space */
 			optarg = place;
-		/* XXX: disable test for :: if PC? (GNU doesn't) */
 		else if (oli[1] != ':') {	/* arg not optional */
 			if (++optind >= nargc) {	/* no arg */
 				place = EMSG;
@@ -475,13 +463,6 @@ start:
 				return (BADARG);
 			} else
 				optarg = nargv[optind];
-		} else if (!(flags & FLAG_PERMUTE)) {
-			/*
-			 * If permutation is disabled, we can accept an
-			 * optional arg separated by whitespace.
-			 */
-			if (optind + 1 < nargc)
-				optarg = nargv[++optind];
 		}
 		place = EMSG;
 		++optind;
@@ -502,7 +483,7 @@ getopt(int nargc, char * const *nargv, const char *options)
 {
 
 	/*
-	 * We dont' pass FLAG_PERMUTE to getopt_internal() since
+	 * We don't pass FLAG_PERMUTE to getopt_internal() since
 	 * the BSD getopt(3) (unlike GNU) has never done this.
 	 *
 	 * Furthermore, since many privileged programs call getopt()
@@ -518,12 +499,8 @@ getopt(int nargc, char * const *nargv, const char *options)
  *	Parse argc/argv argument vector.
  */
 int
-getopt_long(nargc, nargv, options, long_options, idx)
-	int nargc;
-	char * const *nargv;
-	const char *options;
-	const struct option *long_options;
-	int *idx;
+getopt_long(int nargc, char * const *nargv, const char *options,
+    const struct option *long_options, int *idx)
 {
 
 	return (getopt_internal(nargc, nargv, options, long_options, idx,
@@ -535,12 +512,8 @@ getopt_long(nargc, nargv, options, long_options, idx)
  *	Parse argc/argv argument vector.
  */
 int
-getopt_long_only(nargc, nargv, options, long_options, idx)
-	int nargc;
-	char * const *nargv;
-	const char *options;
-	const struct option *long_options;
-	int *idx;
+getopt_long_only(int nargc, char * const *nargv, const char *options,
+    const struct option *long_options, int *idx)
 {
 
 	return (getopt_internal(nargc, nargv, options, long_options, idx,

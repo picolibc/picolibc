@@ -1,3 +1,14 @@
+2008-05-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add _def_time.o.  Remove timelocal.o.
+	* include/sys/localedef.h: New file from NetBSD.
+	* libc/_def_time.c: Ditto.
+	* libc/getopt.c: Update to latest OpenBSD version 1.23.
+	* libc/strptime.cc: Replace FreeBSD version 1.35 with latest NetBSD
+	version 1.28.
+	* libc/timelocal.cc: Remove.
+	* libc/timelocal.h: Remove.
+
 2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::release): Drop fixup_before handling.
