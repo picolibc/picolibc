@@ -1,3 +1,10 @@
+2008-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Remove _def_time.o.
+	* libc/_def_time.c: Remove.  Move definitions of _DefaultTimeLocale
+	and _CurrentTimeLocale ...
+	* libc/strptime.cc: ... here.
+
 2008-05-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/localedef.h: Remove.

@@ -63,8 +63,33 @@ typedef struct {
 	const char *t_fmt_ampm;
 } _TimeLocale;
 
-extern _TimeLocale *_CurrentTimeLocale;
-extern _TimeLocale  _DefaultTimeLocale;
+_TimeLocale _DefaultTimeLocale = 
+{
+	{
+		"Sun","Mon","Tue","Wed","Thu","Fri","Sat",
+	},
+	{
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
+		"Friday", "Saturday"
+	},
+	{
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	},
+	{
+		"January", "February", "March", "April", "May", "June", "July",
+		"August", "September", "October", "November", "December"
+	},
+	{
+		"AM", "PM"
+	},
+	"%a %b %e %H:%M:%S %Y",
+	"%m/%d/%y",
+	"%H:%M:%S",
+	"%I:%M:%S %p"
+};
+
+_TimeLocale *_CurrentTimeLocale = &_DefaultTimeLocale;
 #endif
 
 #define	_ctloc(x)		(_CurrentTimeLocale->x)

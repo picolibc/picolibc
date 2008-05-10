@@ -126,7 +126,7 @@ MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 86 col line
 #
 DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
-	cygtls.o dcrt0.o debug.o _def_time.o devices.o dir.o dlfcn.o dll_init.o \
+	cygtls.o dcrt0.o debug.o devices.o dir.o dlfcn.o dll_init.o \
 	dtable.o environ.o errno.o exceptions.o exec.o external.o fcntl.o \
 	fhandler.o fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
