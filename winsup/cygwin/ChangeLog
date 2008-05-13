@@ -1,5 +1,19 @@
 2008-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::set_normalized_path): Drop strip_tail argument.
+	Never strip trailing dots and spaces.
+	* (path_conv::check): Accomodate above change.
+	* path.h (path_conv::operator=): Ditto
+	* dtable.cc (build_fh_dev): Ditto.
+	* fhandler.h (fhandler_base::set_name): Ditto.
+
+	* path.cc (transform_chars): Disable converting trailing dots and
+	spaces.
+
+	* path.cc (path_conv::check): Remove two disabled code snippets.
+
+2008-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* random.cc (initstate): Align to POSIX definition.
 	(setstate): Ditto.
 

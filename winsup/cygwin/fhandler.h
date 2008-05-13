@@ -153,7 +153,7 @@ class fhandler_base
   path_conv pc;
 
   virtual void set_name (path_conv &pc);
-  virtual void set_name (const char *s) {pc.set_normalized_path (s, false);}
+  virtual void set_name (const char *s) {pc.set_normalized_path (s);}
   int error () const {return pc.error;}
   void set_error (int error) {pc.error = error;}
   bool exists () const {return pc.exists ();}

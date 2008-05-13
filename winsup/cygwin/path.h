@@ -253,7 +253,7 @@ class path_conv
   path_conv &operator =(path_conv &pc)
   {
     memcpy (this, &pc, pc.size ());
-    set_normalized_path (pc.normalized_path, false);
+    set_normalized_path (pc.normalized_path);
     wide_path = NULL;
     return *this;
   }
@@ -280,7 +280,7 @@ class path_conv
   unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;
   size_t normalized_path_size;
-  void set_normalized_path (const char *, bool) __attribute__ ((regparm (3)));
+  void set_normalized_path (const char *) __attribute__ ((regparm (2)));
   DWORD get_symlink_length () { return symlink_length; };
  private:
   DWORD symlink_length;

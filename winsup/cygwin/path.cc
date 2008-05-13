@@ -531,17 +531,9 @@ path_conv::fillin (HANDLE h)
 }
 
 void
-path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
+path_conv::set_normalized_path (const char *path_copy)
 {
   char *p = strchr (path_copy, '\0');
-
-  if (strip_tail)
-    {
-      while (*--p == '.' || *p == ' ')
-	continue;
-      *++p = '\0';
-    }
-
   size_t n = 1 + p - path_copy;
 
   normalized_path = path + sizeof (path) - n;
@@ -605,10 +597,14 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx, bool managed)
   for (buf += start_idx; buf <= end; ++buf)
     if (*buf < 128)
       *buf = tfx[*buf];
+#if 0
   /* Win32 can't handle trailing dots and spaces.  Transform the last of them
      to the private use area, too, to create a valid Win32 filename. */
+  if (*end == L'\\')
+    --end;
   if (*end == L'.' || *end == L' ')
     *end |= 0xf000;
+#endif
 }
 
 PUNICODE_STRING
@@ -1171,7 +1167,6 @@ virtual_component_retry:
     add_ext_from_sym (sym);
 
 out:
-  bool strip_tail = false;
   if (dev.devn == FH_NETDRIVE && component)
     {
       /* This case indicates a non-existant resp. a non-retrievable
@@ -1203,35 +1198,10 @@ out:
     {
       if (strncmp (path, "\\\\.\\", 4))
 	{
-#if 0
-	  /* Windows ignores trailing dots and spaces in the last path
-	     component, and ignores exactly one trailing dot in inner
-	     path components. */
-	  char *tail = NULL;
-	  for (char *p = path; *p; p++)
-	    {
-	      if (*p != '.' && *p != ' ')
-		tail = NULL;
-	      else if (!tail)
-		tail = p;
-	      if (tail && p[1] == '\\')
-		{
-		  if (p > tail || *tail != '.')
-		    {
-		      error = ENOENT;
-		      return;
-		    }
-		  tail = NULL;
-		}
-	    }
-#endif
 	  if (!tail || tail == path)
 	    /* nothing */;
 	  else if (tail[-1] != '\\')
-	    {
-	      *tail = '\0';
-	      strip_tail = true;
-	    }
+	    *tail = '\0';
 	  else
 	    {
 	      error = ENOENT;
@@ -1254,11 +1224,6 @@ out:
       else if (issymlink () || issocket ())
 	set_exec (0);
     }
-
-#if 0
-  if (issocket ())
-    devn = FH_SOCKET;
-#endif
 
   if (opt & PC_NOFULL)
     {
@@ -1296,7 +1261,7 @@ out:
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
-      set_normalized_path (path_copy, strip_tail);
+      set_normalized_path (path_copy);
       if (is_msdos && !(opt & PC_NOWARN))
 	warn_msdos (src);
     }
