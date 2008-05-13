@@ -354,9 +354,9 @@ srandomdev()
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-initstate(unsigned long seed,		/* seed for R.N.G. */
+initstate(unsigned seed,		/* seed for R.N.G. */
 	  char *arg_state,		/* pointer to state array */
-	  long n)			/* # bytes of state info */
+	  size_t n)			/* # bytes of state info */
 {
 	char *ostate = (char *)(&state[-1]);
 	uint32_t *int_arg_state = (uint32_t *)arg_state;
@@ -367,7 +367,8 @@ initstate(unsigned long seed,		/* seed for R.N.G. */
 		state[-1] = MAX_TYPES * (rptr - state) + rand_type;
 	if (n < BREAK_0) {
 		(void)fprintf(stderr,
-		    "random: not enough state (%ld bytes); ignored.\n", n);
+		    "random: not enough state (%lu bytes); ignored.\n",
+		    (unsigned long) n);
 		return(0);
 	}
 	if (n < BREAK_1) {
@@ -421,7 +422,7 @@ initstate(unsigned long seed,		/* seed for R.N.G. */
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-setstate(char *arg_state /* pointer to state array */)
+setstate(const char *arg_state /* pointer to state array */)
 {
 	uint32_t *new_state = (uint32_t *)arg_state;
 	uint32_t type = new_state[0] % MAX_TYPES;
