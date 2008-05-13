@@ -1,5 +1,10 @@
 2008-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/stdlib.h (initstate): Declare.
+	(setstate): Declare.
+
+2008-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::set_normalized_path): Drop strip_tail argument.
 	Never strip trailing dots and spaces.
 	* (path_conv::check): Accomodate above change.

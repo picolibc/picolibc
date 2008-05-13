@@ -24,7 +24,9 @@ void	setprogname (const char *);
 #ifndef __STRICT_ANSI__
 char *realpath (const char *, char *);
 int unsetenv (const char *);
+char *initstate (unsigned seed, char *state, size_t size);
 long random (void);
+char *setstate (const char *state);
 void srandom (unsigned);
 char *ptsname (int);
 int grantpt (int);
