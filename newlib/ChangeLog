@@ -1,3 +1,8 @@
+2008-05-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h: Change _REENT_INIT... macros to
+	access macro parameter with parentheses around it.
+
 2008-04-26  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/include/stdint.h (SIZE_MIN): Remove.
