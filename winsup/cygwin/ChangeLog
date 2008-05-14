@@ -1,3 +1,10 @@
+2008-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Drop
+	explicit transformation of special DOS chars.
+	* strfuncs.cc (sys_wcstombs): Always transform UNICODE private use area
+	back to ASCII.
+
 2008-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stdlib.h (initstate): Declare.

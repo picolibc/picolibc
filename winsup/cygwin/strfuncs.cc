@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <wchar.h>
 #include <winnls.h>
 #include <ntdll.h>
 #include "cygerrno.h"
@@ -39,7 +40,18 @@ sys_wcstombs (char *tgt, int tlen, const PWCHAR src, int slen)
 {
   int ret;
 
-  ret = WideCharToMultiByte (get_cp (), 0, src, slen, tgt, tlen, NULL, NULL);
+  /* Convert UNICODE private use area.  Reverse functionality (only for
+     path names) is transform_chars in path.cc. */
+  if (slen < 0)
+    slen = wcslen (src) + 1;
+  WCHAR sbuf[slen];
+  memcpy (sbuf, src, slen * sizeof (WCHAR));
+  const unsigned char *end = (unsigned char *) (sbuf + slen);
+  for (unsigned char *s = ((unsigned char *) sbuf) + 1; s < end;
+       s += sizeof (WCHAR))
+    if (*s == 0xf0)
+      *s = 0;
+  ret = WideCharToMultiByte (get_cp (), 0, sbuf, slen, tgt, tlen, NULL, NULL);
   if (ret && tgt)
     {
       ret = (ret < tlen) ? ret : tlen - 1;
