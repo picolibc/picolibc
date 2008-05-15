@@ -1716,6 +1716,7 @@ rename (const char *oldpath, const char *newpath)
      to call only NtSetInformationFile under the transaction.  Therefore we
      have to start the transaction here, if necessary. */
   if (wincap.has_transactions ()
+      && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
       && (dstpc->isdir () || dstpc->has_attribute (FILE_ATTRIBUTE_READONLY)))
     start_transaction (old_trans, trans);
 
@@ -1829,7 +1830,9 @@ rename (const char *oldpath, const char *newpath)
      destination before renaming. */
   if (status == STATUS_ACCESS_DENIED && dstpc->exists () && !dstpc->isdir ())
     {
-      if (wincap.has_transactions () && !trans)
+      if (wincap.has_transactions ()
+	  && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
+	  && !trans)
 	{
 	  start_transaction (old_trans, trans);
 	  /* As mentioned earlier, opening the file must be part of the

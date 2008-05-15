@@ -1,5 +1,9 @@
 2008-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): ONly start transaction if FS supports them.
+
+2008-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (LoadDLLfuncNt): Re-invent.
 	(NtCreateTransaction): Define.
 	(NtCommitTransaction): Define.
