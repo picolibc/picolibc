@@ -40,6 +40,7 @@ struct wincaps
   unsigned has_gaa_on_link_prefix			: 1;
   unsigned supports_all_posix_ai_flags			: 1;
   unsigned has_restricted_stack_args			: 1;
+  unsigned has_transactions				: 1;
 };
 
 class wincapc
@@ -86,6 +87,7 @@ public:
   bool	IMPLEMENT (has_gaa_on_link_prefix)
   bool	IMPLEMENT (supports_all_posix_ai_flags)
   bool	IMPLEMENT (has_restricted_stack_args)
+  bool	IMPLEMENT (has_transactions)
 
 #undef IMPLEMENT
 };

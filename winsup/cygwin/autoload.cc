@@ -311,6 +311,15 @@ LoadDLLfunc (NetLocalGroupGetMembers, 32, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 
+/* 0xc000007a == STATUS_PROCEDURE_NOT_FOUND */
+#define LoadDLLfuncNt(name, n, dllname) \
+  LoadDLLfuncEx2(name, n, dllname, 1, 0xc000007a)
+LoadDLLfuncNt (NtCommitTransaction, 8, ntdll)
+LoadDLLfuncNt (NtCreateTransaction, 40, ntdll)
+LoadDLLfuncNt (NtRollbackTransaction, 8, ntdll)
+LoadDLLfuncNt (RtlGetCurrentTransaction, 0, ntdll)
+LoadDLLfuncNt (RtlSetCurrentTransaction, 4, ntdll)
+
 LoadDLLfuncEx (EnumProcessModules, 16, psapi, 1)
 LoadDLLfuncEx (GetModuleFileNameExW, 16, psapi, 1)
 LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)

@@ -1461,6 +1461,36 @@ rename_append_suffix (path_conv &pc, const char *path, size_t len,
   pc.check (buf, PC_SYM_NOFOLLOW);
 }
 
+static void
+start_transaction (HANDLE &old_trans, HANDLE &trans)
+{
+  NTSTATUS status = NtCreateTransaction (&trans,
+  				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
+				NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+  if (NT_SUCCESS (status))
+    {
+      old_trans = RtlGetCurrentTransaction ();
+      RtlSetCurrentTransaction (trans);
+    }
+  else
+    {
+      debug_printf ("NtCreateTransaction failed, %p", status);
+      old_trans = trans = NULL;
+    }
+}
+
+static NTSTATUS
+stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
+{
+  RtlSetCurrentTransaction (old_trans);
+  if (NT_SUCCESS (status))
+    status = NtCommitTransaction (trans, TRUE);
+  else
+    status = NtRollbackTransaction (trans, TRUE);
+  NtClose (trans);
+  return status;
+}
+
 extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
@@ -1473,6 +1503,7 @@ rename (const char *oldpath, const char *newpath)
   bool equal_path;
   NTSTATUS status;
   HANDLE fh = NULL, nfh;
+  HANDLE old_trans = NULL, trans = NULL;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG size;
@@ -1681,6 +1712,13 @@ rename (const char *oldpath, const char *newpath)
     }
   dstpc = (removepc == &newpc) ? &new2pc : &newpc;
 
+  /* Opening the file must be part of the transaction.  It's not sufficient
+     to call only NtSetInformationFile under the transaction.  Therefore we
+     have to start the transaction here, if necessary. */
+  if (wincap.has_transactions ()
+      && (dstpc->isdir () || dstpc->has_attribute (FILE_ATTRIBUTE_READONLY)))
+    start_transaction (old_trans, trans);
+
   /* DELETE is required to rename a file. */
   status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
 		     &io, FILE_SHARE_VALID_FLAGS,
@@ -1789,9 +1827,36 @@ rename (const char *oldpath, const char *newpath)
      existing file, if the permissions of the existing file aren't right.
      Like directories, we have to handle this separately by removing the
      destination before renaming. */
-  if (status == STATUS_ACCESS_DENIED && dstpc->exists () && !dstpc->isdir ()
-      && NT_SUCCESS (status = unlink_nt (*dstpc)))
-    status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
+  if (status == STATUS_ACCESS_DENIED && dstpc->exists () && !dstpc->isdir ())
+    {
+      if (wincap.has_transactions () && !trans)
+	{
+	  start_transaction (old_trans, trans);
+	  /* As mentioned earlier, opening the file must be part of the
+	     transaction.  Therefore we have to reopen the file here if the
+	     transaction hasn't been started already.  Unfortunately we can't
+	     use the NT "reopen file from existing handle" feature.  In that
+	     case NtOpenFile returns STATUS_TRANSACTIONAL_CONFLICT.  We *have*
+	     to close the handle to the file first, *then* we can re-open it.
+	     Fortunately nothing has happened yet, so the atomicity of the
+	     rename functionality is not spoiled. */
+	  NtClose (fh);
+	  status = NtOpenFile (&fh, DELETE,
+			       oldpc.get_object_attr (attr, sec_none_nih),
+			       &io, FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT
+			       | (oldpc.is_rep_symlink ()
+				  ? FILE_OPEN_REPARSE_POINT : 0));
+	  if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      goto out;
+	    }
+	}
+      if (NT_SUCCESS (status = unlink_nt (*dstpc)))
+	status = NtSetInformationFile (fh, &io, pfri, size,
+				       FileRenameInformation);
+    }
   if (NT_SUCCESS (status))
     {
       if (removepc)
@@ -1804,6 +1869,8 @@ rename (const char *oldpath, const char *newpath)
 out:
   if (fh)
     NtClose (fh);
+  if (wincap.has_transactions () && trans)
+    stop_transaction (status, old_trans, trans);
   syscall_printf ("%d = rename (%s, %s)", res, oldpath, newpath);
   return res;
 }

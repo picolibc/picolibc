@@ -1,3 +1,25 @@
+2008-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (LoadDLLfuncNt): Re-invent.
+	(NtCreateTransaction): Define.
+	(NtCommitTransaction): Define.
+	(NtRollbackTransaction): Define.
+	(RtlGetCurrentTransaction): Define.
+	(RtlSetCurrentTransaction): Define.
+	* ntdll.h (TRANSACTION_ALL_ACCESS): Define.
+	(NtCreateTransaction): Declare.
+	(NtCommitTransaction): Declare.
+	(NtRollbackTransaction): Declare.
+	(RtlGetCurrentTransaction): Declare.
+	(RtlSetCurrentTransaction): Declare.
+	* syscalls.cc (start_transaction): New static function to start TxF
+	transaction.
+	(stop_transaction): New static function to end TxF transaction.
+	(rename): Call start_transaction and stop_transaction where appropriate
+	on systems supporting transactions.
+	* wincap.h (wincaps::has_transactions): New element.
+	* wincap.cc: Implement above element throughout.
+
 2008-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Drop
