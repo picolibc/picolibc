@@ -1,3 +1,8 @@
+2008-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (FILE_SEQUENTIAL_WRITE_ONCE): Define.
+	(FILE_SUPPORTS_TRANSACTIONS): Define.
+
 2008-05-01  Bart Oldeman  <bartoldeman@users.sf.net>
 
 	* include/winuser.h (DEVICE_NOTIFY_WINDOW_HANDLE,
