@@ -1,3 +1,7 @@
+2008-05-15 Ramiro Polla <ramiro@lisha.ufsc.br>
+
+	* include/stdlib.h: Fix strtod under C++.
+
 2008-05-06 Ramiro Polla <ramiro@lisha.ufsc.br>
 
 	* mingwex/gdtoa/strtodnrp.c: Remove alias from strtod to __strtod.
