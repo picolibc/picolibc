@@ -1,3 +1,9 @@
+2008-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_BINS): Remove ipcrm and ipcs.
+	* ipcrm.c: Remove.
+	* ipcs.c: Remove.
+
 2008-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (usage): Mark -s and -u as ignored.
