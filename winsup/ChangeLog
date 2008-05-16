@@ -1,5 +1,9 @@
 2008-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (install-license): Install COPYING file as well.
+
+2008-05-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* CYGWIN_LICENSE: New text.
 
 2007-08-31  Christopher Faylor  <me+cygwin@cgf.cx>
