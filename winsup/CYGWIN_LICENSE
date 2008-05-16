@@ -1,34 +1,61 @@
---------------------------------------------------------------------------
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License (GPL) version 2, as
-published by the Free Software Foundation.
+Red Hat, Inc. licenses Cygwin to you under the terms of the GNU
+General Public License version 2 (GPLv2), as published by the Free
+Software Foundation, along with the additional permissions given
+below.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+There is NO WARRANTY for this software, express or implied, including
+the implied warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. 
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
---------------------------------------------------------------------------
+You should have received a copy of GPLv2 along with this program; if
+not, see http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt .
 
-			*** NOTE ***
 
-In accordance with section 10 of the GPL, Red Hat permits programs whose
-sources are distributed under a license that complies with the Open
-Source definition to be linked with libcygwin.a without libcygwin.a
-itself causing the resulting program to be covered by the GNU GPL.
+Additional Permissions:
 
-This means that you can port an Open Source(tm) application to cygwin,
-and distribute that executable as if it didn't include a copy of
-libcygwin.a linked into it.  Note that this does not apply to the cygwin
-DLL itself.  If you distribute a (possibly modified) version of the DLL
-you must adhere to the terms of the GPL, i.e. you must provide sources
-for the cygwin DLL.
+
+1. Linking Exception.
+
+As a special exception to GPLv2, Red Hat grants you permission to link
+software whose sources are distributed under a license that satisfies
+the Open Source Definition with libcygwin.a, without libcygwin.a
+itself causing the resulting program to be covered by GPLv2.
+
+This means that you can port an open source application to Cygwin, and
+distribute that executable as if it didn't include a copy of
+libcygwin.a linked into it.  Note that this does not apply to the
+Cygwin DLL itself.  If you distribute a (possibly modified) version of
+the DLL you must adhere to the terms of GPLv2, including the
+requirement to provide sources for the Cygwin DLL.
 
 See http://www.opensource.org/docs/osd/ for the precise Open Source
 Definition referenced above.
+
+
+2.  Files Excluded from GPL Coverage.
+
+Red Hat grants you permission to distribute Cygwin with the following
+files, which are not considered part of Cygwin and are not governed by
+GPLv2, in source or binary form.
+
+winsup\testsuite\winsup.api\msgtest.c
+winsup\testsuite\winsup.api\semtest.c
+winsup\testsuite\winsup.api\shmtest.c
+
+Red Hat grants you permission to link or combine code in Cygwin with
+code in or corresponding to the following files, which are not
+considered part of Cygwin and are not governed by GPLv2, and to
+distribute such combinations under terms of your choice, provided that
+such terms are otherwise consistent with the application of GPLv2 to
+Cygwin itself.  You must comply with GPLv2 with respect to all
+portions of such combinations other than those that correspond to or
+are derived from such non-Cygwin code but which do not correspond to
+or are not derived from Cygwin itself.
+
+winsup\cygserver\sysv_shm.cc
+
+
+3.  Alternative License. 
 
 Red Hat sells a special Cygwin License for customers who are unable to
 provide their application in open source code form.  For more
