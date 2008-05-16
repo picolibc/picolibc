@@ -1,3 +1,10 @@
+2008-05-16  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* src-release (DEVO_SUPPORT): Add ChangeLog, MAINTAINERS,
+	README-maintainer-mode, lt~obsolete.m4, ltgcc.m4, depcomp,
+	mkdep, and compile.  Update comments.
+	(ETC_SUPPORT): Add ChangeLog and update comments.
+
 2008-05-11  Ian Lance Taylor  <iant@google.com>
 
 	* src-release (BINUTILS_SUPPORT_DIRS): Add elfcpp and gold.

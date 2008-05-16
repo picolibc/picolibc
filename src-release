@@ -44,22 +44,20 @@ PWD = $${PWDCMD-pwd}
 # Support for building net releases
 
 # Files in devo used in any net release.
-# ChangeLog omitted because it may refer to files which are not in this
-# distribution (perhaps it would be better to include it anyway).
 DEVO_SUPPORT= README Makefile.in configure configure.ac \
 	config.guess config.sub config move-if-change \
 	COPYING COPYING.LIB install-sh config-ml.in symlink-tree \
 	mkinstalldirs ltmain.sh missing ylwrap \
 	libtool.m4 ltsugar.m4 ltversion.m4 ltoptions.m4 \
 	Makefile.def Makefile.tpl src-release config.rpath \
+	ChangeLog MAINTAINERS README-maintainer-mode \
+	lt~obsolete.m4 ltgcc.m4 depcomp mkdep compile \
 	COPYING3 COPYING3.LIB
 
 # Files in devo/etc used in any net release.
-# ChangeLog omitted because it may refer to files which are not in this
-# distribution (perhaps it would be better to include it anyway).
 ETC_SUPPORT= Makefile.in configure configure.in standards.texi \
 	make-stds.texi standards.info* configure.texi configure.info* \
-	configbuild.* configdev.* fdl.texi texi2pod.pl
+	ChangeLog configbuild.* configdev.* fdl.texi texi2pod.pl
 
 
 # When you use `make setup-dirs' or `make taz' you should always redefine
