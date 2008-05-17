@@ -1,3 +1,7 @@
+2008-05-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/stdint.h: Use int rather than long for {u,}int32_t.
+
 2008-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* CYGWIN_LICENSE: Remove duplicate file here.
