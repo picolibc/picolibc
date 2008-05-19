@@ -1494,6 +1494,7 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
 extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
+  tmp_pathbuf tp;
   int res = -1;
   char *oldbuf, *newbuf;
   path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
@@ -1533,7 +1534,7 @@ rename (const char *oldpath, const char *newpath)
   olen = strlen (oldpath);
   if (isdirsep (oldpath[olen - 1]))
     {
-      stpcpy (oldbuf = (char *) alloca (olen + 1), oldpath);
+      stpcpy (oldbuf = tp.c_get (), oldpath);
       while (olen > 0 && isdirsep (oldbuf[olen - 1]))
 	oldbuf[--olen] = '\0';
       oldpath = oldbuf;
@@ -1568,7 +1569,7 @@ rename (const char *oldpath, const char *newpath)
   nlen = strlen (newpath);
   if (isdirsep (newpath[nlen - 1]))
     {
-      stpcpy (newbuf = (char *) alloca (nlen + 1), newpath);
+      stpcpy (newbuf = tp.c_get (), newpath);
       while (nlen > 0 && isdirsep (newbuf[nlen - 1]))
 	newbuf[--nlen] = '\0';
       newpath = newbuf;
@@ -1746,8 +1747,10 @@ rename (const char *oldpath, const char *newpath)
 	}
     }
   /* You can't copy a file if the destination exists and has the R/O
-     attribute set.  Remove the R/O attribute first. */
-  else if (dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))
+     attribute set.  Remove the R/O attribute first.  But first check
+     if a removepc exists.  If so, dstpc points to a non-existing file
+     due to a mangled suffix. */
+  else if (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))
     {
       status = NtOpenFile (&nfh, FILE_WRITE_ATTRIBUTES,
 			   dstpc->get_object_attr (attr, sec_none_nih),
@@ -1814,7 +1817,10 @@ rename (const char *oldpath, const char *newpath)
     }
   size = sizeof (FILE_RENAME_INFORMATION)
 	 + dstpc->get_nt_native_path ()->Length;
-  pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+  if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
+    pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+  else
+    pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
   pfri->ReplaceIfExists = TRUE;
   pfri->RootDirectory = NULL;
   pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;

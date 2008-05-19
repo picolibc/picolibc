@@ -1,3 +1,9 @@
+2008-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Allocate temporary path buffers using
+	tmp_pathbuf.  Don't try to unset R/O attribute on dstpc if a
+	removepc exists.  dstpc is a non-existant file in that case.
+
 2008-05-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/stdint.h: Use int rather than long for {u,}int32_t.
