@@ -1857,7 +1857,7 @@ symlink_info::check_shortcut (HANDLE in_h)
   FILE_STANDARD_INFORMATION fsi;
 
   InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
-  status = NtOpenFile (&h, FILE_GENERIC_READ,
+  status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
 		       &attr, &io, FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_SYNCHRONOUS_IO_NONALERT);
@@ -1941,14 +1941,15 @@ symlink_info::check_sysfile (HANDLE in_h)
   IO_STATUS_BLOCK io;
 
   InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
-  status = NtOpenFile (&h, FILE_GENERIC_READ,
+  status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
 		       &attr, &io, FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     set_error (EIO);
-  if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
-		   sizeof (cookie_buf), NULL, NULL)))
+  else if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io,
+					     cookie_buf, sizeof (cookie_buf),
+					     NULL, NULL)))
     {
       debug_printf ("ReadFile1 failed");
       if (status != STATUS_END_OF_FILE)
@@ -2367,7 +2368,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     &nfs_aol_ffei, sizeof nfs_aol_ffei);
-      if (!NT_SUCCESS (status))
+      if (status == STATUS_ACCESS_DENIED) /* No right to access EAs? */
 	{
 	  no_ea = true;
 	  status = NtCreateFile (&h,

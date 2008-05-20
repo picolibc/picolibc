@@ -1,5 +1,13 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check_shortcut): Minimize requested file 
+	access flags.
+	(symlink_info::check_sysfile): Ditto.  Add missing `else'.
+	(symlink_info::check): Only retry to open file if first try failed
+	with access denied.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (fs_info::update): Re-add opening the unsplitted path
 	for fillout_mntent's sake.
 
