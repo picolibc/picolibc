@@ -1438,12 +1438,33 @@ fhandler_disk_file::mkdir (mode_t mode)
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG fattr = FILE_ATTRIBUTE_DIRECTORY;
+  PFILE_FULL_EA_INFORMATION p = NULL;
+  ULONG plen = 0;
+
+  if (pc.fs_is_nfs ())
+    {
+      /* When creating a dir on an NFS share, we have to set the
+	 file mode by writing a NFS fattr3 structure with the
+	 correct mode bits set. */
+      plen = sizeof (FILE_FULL_EA_INFORMATION) + sizeof (NFS_V3_ATTR)
+	     + sizeof (fattr3);
+      p = (PFILE_FULL_EA_INFORMATION) alloca (plen);
+      p->NextEntryOffset = 0;
+      p->Flags = 0;
+      p->EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+      p->EaValueLength = sizeof (fattr3);
+      strcpy (p->EaName, NFS_V3_ATTR);
+      fattr3 *nfs_attr = (fattr3 *) (p->EaName + p->EaNameLength + 1);
+      memset (nfs_attr, 0, sizeof (fattr3));
+      nfs_attr->type = NF3DIR;
+      nfs_attr->mode = (mode & 07777) & ~cygheap->umask;
+    }
   status = NtCreateFile (&dir, FILE_LIST_DIRECTORY | SYNCHRONIZE,
 			 pc.get_object_attr (attr, sa), &io, NULL,
 			 fattr, FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 			 FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT
 			 | FILE_OPEN_FOR_BACKUP_INTENT,
-			 NULL, 0);
+			 p, plen);
   if (NT_SUCCESS (status))
     {
       NtClose (dir);

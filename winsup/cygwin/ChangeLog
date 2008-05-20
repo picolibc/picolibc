@@ -1,5 +1,10 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Create directories
+	on NFS shares with correct mode bits.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winsup.h (cygwin_inet_addr): Fix type of declaration.
 
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
