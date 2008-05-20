@@ -812,10 +812,14 @@ path_conv::check (const char *src, unsigned opt,
   path_flags = 0;
   known_suffix = NULL;
   fileattr = INVALID_FILE_ATTRIBUTES;
+  if (wide_path)
+    cfree (wide_path);
   wide_path = NULL;
   case_clash = false;
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
+  if (!normalized_path_size && normalized_path)
+    cfree (normalized_path);
   normalized_path = NULL;
   int component = 0;		// Number of translated components
 

@@ -206,35 +206,42 @@ class path_conv
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
 
-  path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
-     wide_path (NULL), path_flags (0), known_suffix (NULL), error (0),
-     dev (in_dev)
-    {
-      strcpy (path, in_dev.native);
-    }
+  path_conv (const device& in_dev)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
+    known_suffix (NULL), error (0), dev (in_dev), normalized_path (NULL),
+    normalized_path_size (0)
+  {
+    strcpy (path, in_dev.native);
+  }
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
+  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
   {
     check (src, opt, suffixes);
   }
 
   path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
+  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
+  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
-  path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL),
-  		path_flags (0), known_suffix (NULL), error (0),
-		normalized_path (NULL)
-    {path[0] = '\0';}
+  path_conv ()
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
+    known_suffix (NULL), error (0), normalized_path (NULL),
+    normalized_path_size (0)
+  {
+    path[0] = '\0';
+  }
 
   ~path_conv ();
   inline char *get_win32 () { return path; }
