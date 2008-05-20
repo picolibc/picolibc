@@ -1,3 +1,7 @@
+2008-05-20  DJ Delorie  <dj@redhat.com>
+
+	* libc/sys/sysnecv850/isatty.c (_isatty): Renamed from isatty.
+	
 2008-05-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Change _REENT_INIT... macros to
