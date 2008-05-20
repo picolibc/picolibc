@@ -1,5 +1,10 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Fix test for
+	S_IFSOCK in mode bits.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_worker): Fix EA buffer size info given to
 	NtCreateFile.
 	(symlink_info::check_nfs_symlink): Get 64K buffer for EA buffer.
