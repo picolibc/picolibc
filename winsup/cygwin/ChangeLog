@@ -1,5 +1,10 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (fs_info::update): Re-add opening the unsplitted path
+	for fillout_mntent's sake.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Create directories
 	on NFS shares with correct mode bits.
 

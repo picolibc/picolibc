@@ -396,6 +396,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     {
       InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
       				  NULL);
+      status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       while (!NT_SUCCESS (status)
 	     && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
 		 || status == STATUS_NO_MEDIA_IN_DEVICE))
