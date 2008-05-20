@@ -53,7 +53,8 @@ extern struct passwd *getpwuid32 (__uid32_t);
 extern struct passwd *getpwnam (const char *);
 extern struct __sFILE64 *fopen64 (const char *, const char *);
 extern struct hostent *cygwin_gethostbyname (const char *name);
-extern unsigned long cygwin_inet_addr (const char *cp);
+/* Don't enforce definition of in_addr_t. */
+extern uint32_t cygwin_inet_addr (const char *cp);
 extern int fcntl64 (int fd, int cmd, ...);
 #ifdef __cplusplus
 }
