@@ -1615,7 +1615,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 			     FILE_SYNCHRONOUS_IO_NONALERT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
-			     pffei, NT_MAX_PATH);
+			     pffei, NT_MAX_PATH * sizeof (WCHAR));
       if (!NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
@@ -2054,10 +2054,9 @@ symlink_info::check_nfs_symlink (HANDLE h)
   fgei_buf.fgei.NextEntryOffset = 0;
   fgei_buf.fgei.EaNameLength = sizeof (NFS_SYML_TARGET) - 1;
   stpcpy (fgei_buf.fgei.EaName, NFS_SYML_TARGET);
-  pffei = (PFILE_FULL_EA_INFORMATION) tp.c_get ();
-  status = NtQueryEaFile (h, &io, pffei, NT_MAX_PATH, TRUE,
-			  &fgei_buf.fgei, sizeof fgei_buf,
-			  NULL, TRUE);
+  pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
+  status = NtQueryEaFile (h, &io, pffei, NT_MAX_PATH * sizeof (WCHAR), TRUE,
+			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
   if (NT_SUCCESS (status) && pffei->EaValueLength > 0)
     {
       PWCHAR spath = (PWCHAR)
