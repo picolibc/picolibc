@@ -1,5 +1,9 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Fix condition when to start a transaction.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::check): Free wide_path and normalized_path if
 	necessary.
 	* path.h (path_conv::path_conv): Set wide_path, normalized_path and

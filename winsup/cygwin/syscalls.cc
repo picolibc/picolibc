@@ -1718,7 +1718,8 @@ rename (const char *oldpath, const char *newpath)
      have to start the transaction here, if necessary. */
   if (wincap.has_transactions ()
       && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
-      && (dstpc->isdir () || dstpc->has_attribute (FILE_ATTRIBUTE_READONLY)))
+      && (dstpc->isdir ()
+	  || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
     start_transaction (old_trans, trans);
 
   /* DELETE is required to rename a file. */
