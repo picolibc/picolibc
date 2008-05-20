@@ -281,6 +281,7 @@ class fhandler_base
 			      DWORD nNumberOfLinks,
 			      DWORD dwFileAttributes)
     __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_nfs_ea (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
   virtual int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));

@@ -127,7 +127,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
   ULONG serial_number () const { return sernum; }
 
-  bool update (PUNICODE_STRING, bool) __attribute__ ((regparm (3)));
+  bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
 };
 
 class path_conv

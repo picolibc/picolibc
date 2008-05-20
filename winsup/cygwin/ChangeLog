@@ -1,5 +1,47 @@
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add nfs.o.
+	* fhandler.cc (fhandler_base::open): Open files on NFS shares with
+	correct access flags and EAs.
+	* fhandler.h (fhandler_base::fstat_by_nfs_ea): Declare.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): New method.
+	(fhandler_base::fstat_by_handle): Call fstat_by_nfs_ea for files on
+	NFS shares.
+	(fhandler_disk_file::fchmod): Use NFS specific method to set mode for
+	files on NFS shares.  Don't overrule errno from call to
+	set_file_attribute with errno from NtSetInformationFile call.
+	(fhandler_disk_file::fchown): Add comment.
+	* mount.cc (fillout_mntent): Accommodate change in second parameter
+	to fs_info::update.
+	* nfs.cc: New file.
+	* nfs.h: New file.
+	* path.cc (fs_info::update): Take handle instead of bool as second
+	parameter.  Use that handle if it's not NULL.  Only close handle if
+	it has been opened here.  Use static defined buffers instead of
+	alloca'd buffers.
+	(path_conv::check): Call symlink_info::check with reference to fs.
+	Don't call fs.update here if file exists.
+	(conv_path_list): Prefer tmp_pathbuf buffer over using alloca.
+	(symlink_worker): Use NFS specific method to create symlinks on NFS
+	shares.  Prefer tmp_pathbuf buffer over using alloca.
+	(symlink_info::check_shortcut): Reopen file from incoming handle
+	with necessary FILE_GENERIC_READ flag.  Prefer tmp_pathbuf buffer over
+	using alloca.
+	(symlink_info::check_sysfile): Ditto.
+	(symlink_info::check_reparse_point): Use tmp_pathbuf buffer to
+	allocate REPARSE_DATA_BUFFER.
+	(symlink_info::check_nfs_symlink): New method.
+	(enum symlink_t): Remove.
+	(symlink_info::check): Don't use NtQueryAttributesFile.  Rather, open
+	file with necessary access flags and call NtQueryInformationFile.  Fix
+	error handling in case file can't be opened.  For existing files, call
+	fs_info::update here.  Restructure symlink checking to accommodate the
+	fact that the file is already open.  Add case for NFS symlinks.
+	* path.h (fs_info::update): Take handle instead of bool as second
+	parameter.
+
+2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Fix condition when to start a transaction.
 
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>

@@ -23,6 +23,7 @@ details. */
 #include "pinfo.h"
 #include "ntdll.h"
 #include "tls_pbuf.h"
+#include "nfs.h"
 #include <winioctl.h>
 
 #define _COMPILING_NEWLIB
@@ -264,11 +265,70 @@ path_conv::isgood_inode (__ino64_t ino) const
   return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
+/* For files on NFS shares, we request an EA of type NfsV3Attributes.
+   This returns the content of a struct fattr3 as defined in RFC 1813.
+   The content is the NFS equivalent of struct stat. so there's not much
+   to do here except for copying. */
+int __stdcall
+fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  struct {
+    FILE_FULL_EA_INFORMATION ffei;
+    char buf[sizeof (NFS_V3_ATTR) + sizeof (fattr3)];
+  } ffei_buf;
+  struct {
+     FILE_GET_EA_INFORMATION fgei;
+     char buf[sizeof (NFS_V3_ATTR)];
+   } fgei_buf;
+
+  fgei_buf.fgei.NextEntryOffset = 0;
+  fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+  stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
+  status = NtQueryEaFile (get_handle (), &io,
+			  &ffei_buf.ffei, sizeof ffei_buf, TRUE,
+			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
+  if (NT_SUCCESS (status))
+    {
+      fattr3 *nfs_attr = (fattr3 *) (ffei_buf.ffei.EaName
+				     + ffei_buf.ffei.EaNameLength + 1);
+      buf->st_dev = nfs_attr->fsid;
+      buf->st_ino = nfs_attr->fileid;
+      buf->st_mode = (nfs_attr->mode & 0xfff)
+		     | nfs_type_mapping[nfs_attr->type & 7];
+      buf->st_nlink = nfs_attr->nlink;
+      /* FIXME: How to convert UNIX uid/gid to Windows SIDs? */
+#if 0
+      buf->st_uid = nfs_attr->uid;
+      buf->st_gid = nfs_attr->gid;
+#else
+      buf->st_uid = myself->uid;
+      buf->st_gid = myself->gid;
+#endif
+      buf->st_rdev = makedev (nfs_attr->rdev.specdata1,
+			      nfs_attr->rdev.specdata2);
+      buf->st_size = nfs_attr->size;
+      buf->st_blksize = PREFERRED_IO_BLKSIZE;
+      buf->st_blocks = nfs_attr->used / 512;
+      buf->st_atim = nfs_attr->atime;
+      buf->st_mtim = nfs_attr->mtime;
+      buf->st_ctim = nfs_attr->ctime;
+      return 0;
+    }
+  debug_printf ("%p = NtQueryEaFile(%S)", status, pc.get_nt_native_path ());
+  return -1;
+}
+
 int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
+
+  if (pc.fs_is_nfs ())
+    return fstat_by_nfs_ea (buf);
+
   /* The entries potentially contain a name of MAX_PATH wide characters. */
   const DWORD fai_size = (NAME_MAX + 1) * sizeof (WCHAR)
 			 + sizeof (FILE_ALL_INFORMATION);
@@ -730,6 +790,8 @@ fhandler_disk_file::fchmod (mode_t mode)
   extern int chmod_device (path_conv& pc, mode_t mode);
   int res = -1;
   int oret = 0;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
 
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
@@ -747,6 +809,34 @@ fhandler_disk_file::fchmod (mode_t mode)
 	  if (!(oret = open (O_BINARY, 0)))
 	    return -1;
 	}
+    }
+
+  if (pc.fs_is_nfs ())
+    {
+      /* chmod on NFS shares works by writing an EA of type NfsV3Attributes.
+         Only type and mode have to be set.  Apparently type isn't checked
+	 for consistency, so it's sufficent to set it to NF3REG all the time. */
+      struct {
+	FILE_FULL_EA_INFORMATION ffei;
+	char buf[sizeof (NFS_V3_ATTR) + sizeof (fattr3)];
+      } ffei_buf;
+      ffei_buf.ffei.NextEntryOffset = 0;
+      ffei_buf.ffei.Flags = 0;
+      ffei_buf.ffei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+      ffei_buf.ffei.EaValueLength = sizeof (fattr3);
+      strcpy (ffei_buf.ffei.EaName, NFS_V3_ATTR);
+      fattr3 *nfs_attr = (fattr3 *) (ffei_buf.ffei.EaName
+				     + ffei_buf.ffei.EaNameLength + 1);
+      memset (nfs_attr, 0, sizeof (fattr3));
+      nfs_attr->type = NF3REG;
+      nfs_attr->mode = mode;
+      status = NtSetEaFile (get_handle (), &io,
+			    &ffei_buf.ffei, sizeof ffei_buf);
+      if (!NT_SUCCESS (status))
+	__seterrno_from_nt_status (status);
+      else
+ 	res = 0;
+      goto out;
     }
 
   if (allow_ntsec && pc.has_acls ())
@@ -767,19 +857,22 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (mode & S_IFSOCK)
     pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
 
-  IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
   fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
   = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
   fbi.FileAttributes = pc.file_attributes () ?: FILE_ATTRIBUTE_NORMAL;
-  NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
-					  FileBasicInformation);
-  if (!NT_SUCCESS (status))
-    __seterrno_from_nt_status (status);
-  else if (!allow_ntsec || !pc.has_acls ())
-    /* Correct NTFS security attributes have higher priority */
-    res = 0;
+  status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+				 FileBasicInformation);
+  /* Correct NTFS security attributes have higher priority */
+  if (!allow_ntsec || !pc.has_acls ())
+    {
+      if (!NT_SUCCESS (status))
+	__seterrno_from_nt_status (status);
+      else
+	res = 0;
+    }
 
+out:
   if (oret)
     close_fs ();
 
@@ -795,6 +888,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     {
       /* fake - if not supported, pretend we're like win95
 	 where it just works */
+      /* FIXME: Could be supported on NFS when user->uid mapping is in place. */
       return 0;
     }
 

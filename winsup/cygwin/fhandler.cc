@@ -28,6 +28,7 @@ details. */
 #include "ntdll.h"
 #include "cygtls.h"
 #include "sigproc.h"
+#include "nfs.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
@@ -469,6 +470,8 @@ fhandler_base::open (int flags, mode_t mode)
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
+  PFILE_FULL_EA_INFORMATION p = NULL;
+  ULONG plen = 0;
 
   syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
 
@@ -520,6 +523,18 @@ fhandler_base::open (int flags, mode_t mode)
 	    access |= SYNCHRONIZE;
 	  }
 	break;
+    }
+
+  if (query_open () && pc.fs_is_nfs ())
+    {
+      /* Make sure we can read EAs of files on an NFS share.  Also make
+         sure that we're going to act on the file itself, even if it'a
+	 a symlink. */
+      access |= FILE_READ_EA;
+      if (query_open () >= query_write_control)
+        access |=  FILE_WRITE_EA;
+      plen = sizeof nfs_aol_ffei;
+      p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
     }
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
@@ -578,13 +593,33 @@ fhandler_base::open (int flags, mode_t mode)
 	      set_security_attribute (mode, &sa, sd);
 	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
 	    }
+	  else if (pc.fs_is_nfs ())
+	    {
+	      /* When creating a file on an NFS share, we have to set the
+	         file mode by writing a NFS fattr3 structure with the
+		 correct mode bits set. */
+	      access |= FILE_WRITE_EA;
+	      plen = sizeof (FILE_FULL_EA_INFORMATION) + sizeof (NFS_V3_ATTR)
+		     + sizeof (fattr3);
+	      p = (PFILE_FULL_EA_INFORMATION) alloca (plen);
+	      p->NextEntryOffset = 0;
+	      p->Flags = 0;
+	      p->EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+	      p->EaValueLength = sizeof (fattr3);
+	      strcpy (p->EaName, NFS_V3_ATTR);
+	      fattr3 *nfs_attr = (fattr3 *) (p->EaName
+	                                     + p->EaNameLength + 1);
+	      memset (nfs_attr, 0, sizeof (fattr3));
+	      nfs_attr->type = NF3REG;
+	      nfs_attr->mode = mode;
+	    }
 	  /* The file attributes are needed for later use in, e.g. fchmod. */
 	  pc.file_attributes (file_attributes);
 	}
     }
 
   status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,
-			 create_disposition, create_options, NULL, 0);
+			 create_disposition, create_options, p, plen);
   if (!NT_SUCCESS (status))
     {
       /* Trying to create a directory should return EISDIR, not ENOENT. */

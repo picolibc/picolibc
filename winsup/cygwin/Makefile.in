@@ -137,7 +137,7 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	fhandler_zero.o flock.o fnmatch.o fork.o fts.o ftw.o getopt.o glob.o \
 	grp.o heap.o hookapi.o inet_addr.o inet_network.o init.o ioctl.o ipc.o \
 	kernel32.o localtime.o lsearch.o malloc_wrapper.o minires-os-if.o \
-	minires.o miscfuncs.o mktemp.o mmap.o msg.o mount.o net.o netdb.o \
+	minires.o miscfuncs.o mktemp.o mmap.o msg.o mount.o net.o netdb.o nfs.o \
 	nftw.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o posix_ipc.o \
 	pthread.o random.o regcomp.o regerror.o regexec.o regfree.o registry.o \
 	resource.o rexec.o rcmd.o scandir.o sched.o sec_acl.o sec_auth.o \

@@ -67,6 +67,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "environ.h"
+#include "nfs.h"
 #include <assert.h>
 #include <ntdll.h>
 #include <wchar.h>
@@ -88,13 +89,15 @@ struct symlink_info
   _major_t major;
   _minor_t minor;
   _mode_t mode;
-  int check (char *path, const suffix_info *suffixes, unsigned opt);
+  int check (char *path, const suffix_info *suffixes, unsigned opt,
+	     fs_info &fs);
   int set (char *path);
   bool parse_device (const char *);
   bool case_check (char *path);
   int check_sysfile (HANDLE h);
   int check_shortcut (HANDLE h);
   int check_reparse_point (HANDLE h);
+  int check_nfs_symlink (HANDLE h);
   int posixify (char *srcbuf);
   bool set_error (int);
 };
@@ -368,7 +371,7 @@ struct smb_extended_info {
 #pragma pack(pop)
 
 bool
-fs_info::update (PUNICODE_STRING upath, bool exists)
+fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 {
   NTSTATUS status = STATUS_OBJECT_NAME_NOT_FOUND;
   HANDLE vol;
@@ -377,45 +380,54 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
   bool no_media = false;
   FILE_FS_DEVICE_INFORMATION ffdi;
   FILE_FS_OBJECTID_INFORMATION ffoi;
-  PFILE_FS_ATTRIBUTE_INFORMATION pffai;
-  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
-			   + sizeof (FILE_FS_VOLUME_INFORMATION);
-  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-				     alloca (fvi_size);
+  struct {
+    FILE_FS_ATTRIBUTE_INFORMATION ffai;
+    WCHAR buf[NAME_MAX + 1];
+  } ffai_buf;
+  struct {
+    FILE_FS_VOLUME_INFORMATION ffvi;
+    WCHAR buf[NAME_MAX + 1];
+  } ffvi_buf;
   UNICODE_STRING fsname, testname;
 
-  InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  if (exists)
-    status = NtOpenFile (&vol, READ_CONTROL, &attr, &io, FILE_SHARE_VALID_FLAGS,
-			 FILE_OPEN_FOR_BACKUP_INTENT);
-  while (!NT_SUCCESS (status)
-	 && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
-	     || status == STATUS_NO_MEDIA_IN_DEVICE))
+  if (in_vol)
+    vol = in_vol;
+  else
     {
-      UNICODE_STRING dir;
-      RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
-      attr.ObjectName = &dir;
-      if (status == STATUS_NO_MEDIA_IN_DEVICE)
+      InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
+      				  NULL);
+      while (!NT_SUCCESS (status)
+	     && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
+		 || status == STATUS_NO_MEDIA_IN_DEVICE))
 	{
-	  no_media = true;
-	  dir.Length = 6 * sizeof (WCHAR);
+	  UNICODE_STRING dir;
+	  RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
+	  attr.ObjectName = &dir;
+	  if (status == STATUS_NO_MEDIA_IN_DEVICE)
+	    {
+	      no_media = true;
+	      dir.Length = 6 * sizeof (WCHAR);
+	    }
+	  else if (dir.Length > 7 * sizeof (WCHAR))
+	    dir.Length -= sizeof (WCHAR);
+	  status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT);
 	}
-      else if (dir.Length > 7 * sizeof (WCHAR))
-	dir.Length -= sizeof (WCHAR);
-      status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("Cannot access path %S, status %08lx",
+	  		attr.ObjectName, status);
+	  clear ();
+	  NtClose (vol);
+	  return false;
+	}
     }
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("Cannot access path %S, status %08lx", attr.ObjectName,
-							   status);
-      clear ();
-      NtClose (vol);
-      return false;
-    }
-  status = NtQueryVolumeInformationFile (vol, &io, pfvi, fvi_size,
+
+  status = NtQueryVolumeInformationFile (vol, &io, &ffvi_buf.ffvi,
+  					 sizeof ffvi_buf,
 					 FileFsVolumeInformation);
-  sernum = NT_SUCCESS (status) ? pfvi->VolumeSerialNumber : 0;
+  sernum = NT_SUCCESS (status) ? ffvi_buf.ffvi.VolumeSerialNumber : 0;
   status = NtQueryVolumeInformationFile (vol, &io, &ffdi, sizeof ffdi,
 					 FileFsDeviceInformation);
   if (!NT_SUCCESS (status))
@@ -429,23 +441,20 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
     is_remote_drive (false);
 
   if (!no_media)
-    {
-      const ULONG size = sizeof (FILE_FS_ATTRIBUTE_INFORMATION)
-			 + NAME_MAX * sizeof (WCHAR);
-      pffai = (PFILE_FS_ATTRIBUTE_INFORMATION) alloca (size);
-      status = NtQueryVolumeInformationFile (vol, &io, pffai, size,
-					     FileFsAttributeInformation);
-    }
+    status = NtQueryVolumeInformationFile (vol, &io, &ffai_buf.ffai,
+					   sizeof ffai_buf,
+					   FileFsAttributeInformation);
   if (no_media || !NT_SUCCESS (status))
     {
       debug_printf ("Cannot get volume attributes (%S), %08lx",
 		    attr.ObjectName, status);
       has_buggy_open (false);
       flags (0);
-      NtClose (vol);
+      if (!in_vol)
+	NtClose (vol);
       return false;
     }
-   flags (pffai->FileSystemAttributes);
+   flags (ffai_buf.ffai.FileSystemAttributes);
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
@@ -469,8 +478,8 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_PERSISTENT_ACLS \
 			     | FILE_NAMED_STREAMS)
-  RtlInitCountedUnicodeString (&fsname, pffai->FileSystemName,
-			       pffai->FileSystemNameLength);
+  RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
+			       ffai_buf.ffai.FileSystemNameLength);
   is_fat (RtlEqualUnicodePathPrefix (&fsname, L"FAT", TRUE));
   RtlInitUnicodeString (&testname, L"NTFS");
   if (is_remote_drive ())
@@ -513,7 +522,8 @@ fs_info::update (PUNICODE_STRING upath, bool exists)
   RtlInitUnicodeString (&testname, L"SUNWNFS");
   has_buggy_open (RtlEqualUnicodeString (&fsname, &testname, FALSE));
 
-  NtClose (vol);
+  if (!in_vol)
+    NtClose (vol);
   return true;
 }
 
@@ -992,7 +1002,7 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path[3] = '\0';
 	    }
 
-	  symlen = sym.check (full_path, suff, opt);
+	  symlen = sym.check (full_path, suff, opt, fs);
 
 is_virtual_symlink:
 
@@ -1213,7 +1223,8 @@ out:
 	    }
 	}
 
-      if (fs.update (get_nt_native_path (), exists ()))
+      /* FS has been checked already for existing files. */
+      if (exists () || fs.update (get_nt_native_path (), NULL))
 	{
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
 	  if (fs.has_acls () && allow_ntsec)
@@ -1434,8 +1445,10 @@ nofinalslash (const char *src, char *dst)
 static int
 conv_path_list (const char *src, char *dst, size_t size, int to_posix)
 {
+  tmp_pathbuf tp;
   char src_delim, dst_delim;
   cygwin_conv_path_t conv_fn;
+  size_t len;
 
   if (to_posix)
     {
@@ -1450,7 +1463,12 @@ conv_path_list (const char *src, char *dst, size_t size, int to_posix)
       conv_fn = CCP_POSIX_TO_WIN_A | CCP_RELATIVE;
     }
 
-  char *srcbuf = (char *) alloca (strlen (src) + 1);
+  char *srcbuf;
+  len = strlen (src) + 1;
+  if (len <= NT_MAX_PATH * sizeof (WCHAR))
+    srcbuf = (char *) tp.w_get ();
+  else
+    srcbuf = (char *) alloca (len);
 
   int err = 0;
   char *d = dst - 1;
@@ -1554,7 +1572,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     }
   /* We need the normalized full path below. */
   win32_newpath.check (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
-  if (use_winsym && !win32_newpath.exists ())
+  if (use_winsym && !win32_newpath.exists ()
+      && (isdevice || !win32_newpath.fs_is_nfs ()))
     {
       char *newplnk = tp.c_get ();
       stpcpy (stpcpy (newplnk, newpath), ".lnk");
@@ -1574,6 +1593,34 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       || win32_newpath.is_auto_device ())
     {
       set_errno (EEXIST);
+      goto done;
+    }
+
+  if (!isdevice && win32_newpath.fs_is_nfs ())
+    {
+      /* On NFS, create symlinks by calling NtCreateFile with an EA of type
+         NfsSymlinkTargetName containing ... the symlink target name. */
+      PFILE_FULL_EA_INFORMATION pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
+      pffei->NextEntryOffset = 0;
+      pffei->Flags = 0;
+      pffei->EaNameLength = sizeof (NFS_SYML_TARGET) - 1;
+      char *EaValue = stpcpy (pffei->EaName, NFS_SYML_TARGET) + 1;
+      pffei->EaValueLength = sizeof (WCHAR) *
+        (sys_mbstowcs ((PWCHAR) EaValue, NT_MAX_PATH, oldpath) - 1);
+      status = NtCreateFile (&fh, FILE_WRITE_DATA | FILE_WRITE_EA | SYNCHRONIZE,
+			     win32_newpath.get_object_attr (attr, sa),
+			     &io, NULL, FILE_ATTRIBUTE_SYSTEM,
+			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			     FILE_SYNCHRONOUS_IO_NONALERT
+			     | FILE_OPEN_FOR_BACKUP_INTENT,
+			     pffei, NT_MAX_PATH);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto done;
+	}
+      NtClose (fh);
+      res = 0;
       goto done;
     }
 
@@ -1664,7 +1711,10 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       full_len += sizeof (unsigned short) + relpath_len;
       full_len += sizeof (unsigned short) + oldpath_len;
       /* 1 byte more for trailing 0 written by stpcpy. */
-      buf = (char *) alloca (full_len + 1);
+      if (full_len < NT_MAX_PATH * sizeof (WCHAR))
+	buf = (char *) tp.w_get ();
+      else
+	buf = (char *) alloca (full_len + 1);
 
       /* Create shortcut header */
       win_shortcut_hdr *shortcut_header = (win_shortcut_hdr *) buf;
@@ -1702,8 +1752,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   else
     {
       /* This is the old technique creating a symlink. */
-      unsigned short oldpath_len = strlen (oldpath);
-      buf = (char *) alloca (sizeof (SYMLINK_COOKIE) + oldpath_len + 1);
+      buf = tp.c_get ();
       /* Note that the terminating nul is written.  */
       cp = stpcpy (stpcpy (buf, SYMLINK_COOKIE), oldpath) + 1;
     }
@@ -1726,7 +1775,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       NtClose (fh);
       if (!NT_SUCCESS (status))
 	{
-	  __seterrno_from_nt_status  (status);
+	  __seterrno_from_nt_status (status);
 	  goto done;
 	}
     }
@@ -1791,32 +1840,49 @@ cmp_shortcut_header (win_shortcut_hdr *file_header)
 }
 
 int
-symlink_info::check_shortcut (HANDLE h)
+symlink_info::check_shortcut (HANDLE in_h)
 {
+  tmp_pathbuf tp;
   win_shortcut_hdr *file_header;
   char *buf, *cp;
   unsigned short len;
   int res = 0;
+  UNICODE_STRING same = { 0, 0, (PWCHAR) L"" };
+  OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
+  HANDLE h;
   IO_STATUS_BLOCK io;
   FILE_STANDARD_INFORMATION fsi;
 
-  status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
-				   FileStandardInformation);
+  InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
+  status = NtOpenFile (&h, FILE_GENERIC_READ,
+		       &attr, &io, FILE_SHARE_VALID_FLAGS,
+		       FILE_OPEN_FOR_BACKUP_INTENT
+		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
       set_error (EIO);
       return 0;
     }
+  status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    {
+      set_error (EIO);
+      goto out;
+    }
   if (fsi.EndOfFile.QuadPart <= sizeof (win_shortcut_hdr)
       || fsi.EndOfFile.QuadPart > 4 * 65536)
-    return 0;
-  buf = (char *) alloca (fsi.EndOfFile.LowPart + 1);
+    goto out;
+  if (fsi.EndOfFile.LowPart < NT_MAX_PATH * sizeof (WCHAR))
+    buf = (char *) tp.w_get ();
+  else
+    buf = (char *) alloca (fsi.EndOfFile.LowPart + 1);
   if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL,
 			       &io, buf, fsi.EndOfFile.LowPart, NULL, NULL)))
     {
       set_error (EIO);
-      return 0;
+      goto out;
     }
   file_header = (win_shortcut_hdr *) buf;
   if (io.Information != fsi.EndOfFile.LowPart
@@ -1854,21 +1920,33 @@ file_not_symlink:
   /* Not a symlink, see if executable.  */
   if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, io.Information))
     pflags |= PATH_EXEC;
+
+out:
+  NtClose (h);
   return 0;
 }
 
 int
-symlink_info::check_sysfile (HANDLE h)
+symlink_info::check_sysfile (HANDLE in_h)
 {
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
   char srcbuf[SYMLINK_MAX + 2];
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
   int res = 0;
+  UNICODE_STRING same = { 0, 0, (PWCHAR) L"" };
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  HANDLE h;
+  IO_STATUS_BLOCK io;
 
-  status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
-		       sizeof (cookie_buf), NULL, NULL);
+  InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
+  status = NtOpenFile (&h, FILE_GENERIC_READ,
+		       &attr, &io, FILE_SHARE_VALID_FLAGS,
+		       FILE_OPEN_FOR_BACKUP_INTENT
+		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
+    set_error (EIO);
+  if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
+		   sizeof (cookie_buf), NULL, NULL)))
     {
       debug_printf ("ReadFile1 failed");
       if (status != STATUS_END_OF_FILE)
@@ -1906,16 +1984,17 @@ symlink_info::check_sysfile (HANDLE h)
       else
 	pflags |= PATH_NOTEXEC;
       }
+  NtClose (h);
   return res;
 }
 
 int
 symlink_info::check_reparse_point (HANDLE h)
 {
+  tmp_pathbuf tp;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
-  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER)
-			    alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+  PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER) tp.c_get ();
   char srcbuf[SYMLINK_MAX + 7];
 
   status = NtFsControlFile (h, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
@@ -1952,6 +2031,39 @@ symlink_info::check_reparse_point (HANDLE h)
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
   return posixify (srcbuf);
+}
+
+int
+symlink_info::check_nfs_symlink (HANDLE h)
+{
+  tmp_pathbuf tp;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  struct {
+    FILE_GET_EA_INFORMATION fgei;
+    char buf[sizeof (NFS_SYML_TARGET)];
+  } fgei_buf;
+  PFILE_FULL_EA_INFORMATION pffei;
+  int res = 0;
+
+  /* To find out if the file is a symlink and to get the symlink target,
+     try to fetch the NfsSymlinkTargetName EA. */
+  fgei_buf.fgei.NextEntryOffset = 0;
+  fgei_buf.fgei.EaNameLength = sizeof (NFS_SYML_TARGET) - 1;
+  stpcpy (fgei_buf.fgei.EaName, NFS_SYML_TARGET);
+  pffei = (PFILE_FULL_EA_INFORMATION) tp.c_get ();
+  status = NtQueryEaFile (h, &io, pffei, NT_MAX_PATH, TRUE,
+			  &fgei_buf.fgei, sizeof fgei_buf,
+			  NULL, TRUE);
+  if (NT_SUCCESS (status) && pffei->EaValueLength > 0)
+    {
+      PWCHAR spath = (PWCHAR)
+		     (pffei->EaName + pffei->EaNameLength + 1);
+      res = sys_wcstombs (contents, SYMLINK_MAX + 1,
+		      spath, pffei->EaValueLength);
+      pflags = PATH_SYMLINK;
+    }
+  return res;
 }
 
 int
@@ -2200,17 +2312,11 @@ symlink_info::parse_device (const char *contents)
    Return -1 on error, 0 if PATH is not a symlink, or the length
    stored into BUF if PATH is a symlink.  */
 
-enum symlink_t {
-  is_no_symlink,
-  is_shortcut_symlink,
-  is_reparse_symlink,
-  is_sysfile_symlink
-};
-
 int
-symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
+symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
+		     fs_info &fs)
 {
-  HANDLE h;
+  HANDLE h = NULL;
   int res = 0;
   suffix_scan suffix;
   contents[0] = '\0';
@@ -2238,15 +2344,47 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       FILE_BASIC_INFORMATION fbi;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
+      bool no_ea = false;
 
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & MOUNT_ENC);
-      status = NtQueryAttributesFile (&attr, &fbi);
-      if (NT_SUCCESS (status))
+      if (h)
+        {
+	  NtClose (h);
+	  h = NULL;
+	}
+      /* The EA given to NtCreateFile allows to get a handle to a symlink on
+         an NFS share, rather than getting a handle to the target of the
+	 symlink (which would spoil the task of this method quite a bit).
+	 Fortunately it's ignored on other file systems so we don't have
+	 to special case NFS too much. */
+      status = NtCreateFile (&h,
+			     READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_EA,
+			     &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
+			     FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+			     FILE_OPEN_REPARSE_POINT
+			     | FILE_OPEN_FOR_BACKUP_INTENT,
+			     &nfs_aol_ffei, sizeof nfs_aol_ffei);
+      if (!NT_SUCCESS (status))
+	{
+	  no_ea = true;
+	  status = NtCreateFile (&h,
+				 READ_CONTROL | FILE_READ_ATTRIBUTES,
+				 &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
+				 FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+				 FILE_OPEN_REPARSE_POINT
+				 | FILE_OPEN_FOR_BACKUP_INTENT,
+				 &nfs_aol_ffei, sizeof nfs_aol_ffei);
+      	}
+      if (NT_SUCCESS (status)
+	  && NT_SUCCESS (status
+			 = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+						   FileBasicInformation)))
 	fileattr = fbi.FileAttributes;
       else
 	{
-	  debug_printf ("%p = NtQueryAttributesFile (%S)", status, &upath);
+	  debug_printf ("%p = NtQueryInformationFile (%S)", status, &upath);
+	  h = NULL;
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 
 	  /* One of the inner path components is invalid, or the path contains
@@ -2266,7 +2404,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      goto file_not_symlink;
 	    }
 	  if (status != STATUS_OBJECT_NAME_NOT_FOUND
-	      && status != STATUS_NO_SUCH_FILE) /* File not found on 9x share */
+	      && status != STATUS_NO_SUCH_FILE) /* ENOENT on NFS or 9x share */
 	    {
 	      /* The file exists, but the user can't access it for one reason
 		 or the other.  To get the file attributes we try to access the
@@ -2312,10 +2450,13 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	      ext_tacked_on = !!*ext_here;
 	      goto file_not_symlink;
 	    }
-	  if (set_error (geterrno_from_win_error
-				(RtlNtStatusToDosError (status), EACCES)))
-	    continue;
+	  set_error (ENOENT);
+	  continue;
 	}
+
+      /* Check file system while we're having the file open anyway. 
+         This speeds up path_conv noticably (~10%). */
+      fs.update (&upath, h);
 
       ext_tacked_on = !!*ext_here;
 
@@ -2323,18 +2464,29 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  || (opt & PC_SYM_IGNORE))
 	goto file_not_symlink;
 
-      symlink_t sym_check;
+      res = -1;
 
-      sym_check = is_no_symlink;
+      /* Windows shortcuts are potentially treated as symlinks.  Valid Cygwin
+	 & U/WIN shortcuts are R/O, but definitely not directories. */
+      if ((fileattr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY))
+	  == FILE_ATTRIBUTE_READONLY && suffix.lnk_match ())
+	{
+	  res = check_shortcut (h);
+	  if (!res)
+	    {
+	      /* If searching for `foo' and then finding a `foo.lnk' which is
+		 no shortcut, return the same as if file not found. */
+	      if (!suffix.lnk_match () || !ext_tacked_on)
+		goto file_not_symlink;
 
-      if ((fileattr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
-	  == FILE_ATTRIBUTE_DIRECTORY)
-	goto file_not_symlink;
-
-      /* Windows shortcuts are potentially treated as symlinks. */
-      /* Valid Cygwin & U/WIN shortcuts are R/O. */
-      if ((fileattr & FILE_ATTRIBUTE_READONLY) && suffix.lnk_match ())
-	sym_check = is_shortcut_symlink;
+	      /* in case we're going to tack *another* .lnk on this filename. */
+	      fileattr = INVALID_FILE_ATTRIBUTES;
+	      continue;
+	    }
+	  if (contents[0] == ':' && contents[1] == '\\'
+	      && parse_device (contents))
+	    goto file_not_symlink;
+	}
 
       /* Reparse points are potentially symlinks.  This check must be
          performed before checking the SYSTEM attribute for sysfile
@@ -2342,68 +2494,38 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	 For instance, Vista starts to create a couple of reparse points
 	 with SYSTEM and HIDDEN flags set. */
       else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
-	sym_check = is_reparse_symlink;
-
-      /* This is the old Cygwin method creating symlinks: */
-      /* A symlink will have the `system' file attribute. */
-      /* Only files can be symlinks (which can be symlinks to directories). */
-      else if (fileattr & FILE_ATTRIBUTE_SYSTEM)
-	sym_check = is_sysfile_symlink;
-
-      if (sym_check == is_no_symlink)
-	goto file_not_symlink;
-
-      res = -1;
-
-      /* Open the file.  Opening reparse points must not use GENERIC_READ.
-	 The reason is that Vista starts to create a couple of reparse
-	 points for backward compatibility, hidden system files, explicitely
-	 denying everyone FILE_READ_DATA access. */
-      status = NtOpenFile (&h,
-			   sym_check == is_reparse_symlink
-			   ? READ_CONTROL : FILE_GENERIC_READ,
-			   &attr, &io, FILE_SHARE_VALID_FLAGS,
-			   FILE_OPEN_FOR_BACKUP_INTENT
-			   | (sym_check == is_reparse_symlink
-			      ? FILE_OPEN_REPARSE_POINT
-			      : FILE_SYNCHRONOUS_IO_NONALERT));
-      if (!NT_SUCCESS (status))
-	goto file_not_symlink;
-
-      switch (sym_check)
 	{
-	case is_shortcut_symlink:
-	  res = check_shortcut (h);
-	  NtClose (h);
-	  if (!res)
-	    /* check more below */;
-	  else if (contents[0] == ':' && contents[1] == '\\' && parse_device (contents))
-	    goto file_not_symlink;
-	  else
-	    break;
-	  /* If searching for `foo' and then finding a `foo.lnk' which is
-	     no shortcut, return the same as if file not found. */
-	  if (!suffix.lnk_match () || !ext_tacked_on)
-	    goto file_not_symlink;
-
-	  fileattr = INVALID_FILE_ATTRIBUTES;
-	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
-	case is_reparse_symlink:
 	  res = check_reparse_point (h);
-	  NtClose (h);
 	  if (!res)
 	    goto file_not_symlink;
-	  break;
-	case is_sysfile_symlink:
-	  res = check_sysfile (h);
-	  NtClose (h);
-	  if (!res)
-	    goto file_not_symlink;
-	  break;
-	default: /* Make gcc happy.  Won't happen. */
-	  goto file_not_symlink;
 	}
+
+      /* This is the old Cygwin method creating symlinks.  A symlink will
+         have the `system' file attribute.  Only files can be symlinks
+	 (which can be symlinks to directories). */
+      else if ((fileattr & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY))
+	       == FILE_ATTRIBUTE_SYSTEM)
+	{
+	  res = check_sysfile (h);
+	  if (!res)
+	    goto file_not_symlink;
+	}
+
+      /* If the file could be opened with FILE_READ_EA, and if it's on a
+         NFS share, check if it's a symlink. */
+      else if (!no_ea && fs.is_nfs ())
+        {
+	  res = check_nfs_symlink (h);
+	  if (!res)
+	    goto file_not_symlink;
+	}
+
+      /* Normal file. */
+      else
+	goto file_not_symlink;
+
       break;
+
 
     file_not_symlink:
       issymlink = false;
@@ -2411,6 +2533,9 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       res = 0;
       break;
     }
+
+  if (h)
+    NtClose (h);
 
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);

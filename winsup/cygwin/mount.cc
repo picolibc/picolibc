@@ -1273,7 +1273,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   get_nt_native_path (native_path, unat, flags & MOUNT_ENC);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
-  mntinfo.update (&unat, true);  /* this pulls from a cache, usually. */
+  mntinfo.update (&unat, NULL);
 
   if (mntinfo.is_samba())
     strcpy (_my_tls.locals.mnt_type, (char *) "smbfs");
