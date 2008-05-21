@@ -168,11 +168,11 @@ static inline __ino64_t
 get_ino_by_handle (HANDLE hdl)
 {
   IO_STATUS_BLOCK io;
-  FILE_INTERNAL_INFORMATION pfai;
+  FILE_INTERNAL_INFORMATION fai;
 
-  if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &pfai, sizeof pfai,
+  if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
 					  FileInternalInformation)))
-    return pfai.FileId.QuadPart;
+    return fai.FileId.QuadPart;
   return 0;
 }
 
@@ -329,38 +329,38 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   if (pc.fs_is_nfs ())
     return fstat_by_nfs_ea (buf);
 
-  /* The entries potentially contain a name of MAX_PATH wide characters. */
-  const DWORD fai_size = (NAME_MAX + 1) * sizeof (WCHAR)
-			 + sizeof (FILE_ALL_INFORMATION);
-  PFILE_ALL_INFORMATION pfai = (PFILE_ALL_INFORMATION) alloca (fai_size);
+  struct {
+    FILE_ALL_INFORMATION fai;
+    WCHAR buf[NAME_MAX + 1];
+  } fai_buf;
 
-  status = NtQueryInformationFile (get_handle (), &io, pfai, fai_size,
-				   FileAllInformation);
-  if (NT_SUCCESS (status))
+  status = NtQueryInformationFile (get_handle (), &io, &fai_buf.fai,
+				   sizeof fai_buf, FileAllInformation);
+  if (!NT_SUCCESS (status))
     {
-      /* If the change time is 0, it's a file system which doesn't
-	 support a change timestamp.  In that case use the LastWriteTime
-	 entry, as in other calls to fstat_helper. */
-      if (pc.is_rep_symlink ())
-	pfai->BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-      pc.file_attributes (pfai->BasicInformation.FileAttributes);
-      return fstat_helper (buf,
-		       pfai->BasicInformation.ChangeTime.QuadPart
-		       ? *(FILETIME *) &pfai->BasicInformation.ChangeTime
-		       : *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-		       *(FILETIME *) &pfai->BasicInformation.LastAccessTime,
-		       *(FILETIME *) &pfai->BasicInformation.LastWriteTime,
-		       *(FILETIME *) &pfai->BasicInformation.CreationTime,
-		       get_dev (),
-		       pfai->StandardInformation.EndOfFile.QuadPart,
-		       pfai->StandardInformation.AllocationSize.QuadPart,
-		       pfai->InternalInformation.FileId.QuadPart,
-		       pfai->StandardInformation.NumberOfLinks,
-		       pfai->BasicInformation.FileAttributes);
+      debug_printf ("%p = NtQueryInformationFile(%S)",
+		    status, pc.get_nt_native_path ());
+      return -1;
     }
-  debug_printf ("%p = NtQueryInformationFile(%S)",
-		status, pc.get_nt_native_path ());
-  return -1;
+  /* If the change time is 0, it's a file system which doesn't
+     support a change timestamp.  In that case use the LastWriteTime
+     entry, as in other calls to fstat_helper. */
+  if (pc.is_rep_symlink ())
+    fai_buf.fai.BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+  pc.file_attributes (fai_buf.fai.BasicInformation.FileAttributes);
+  return fstat_helper (buf,
+		   fai_buf.fai.BasicInformation.ChangeTime.QuadPart
+		   ? *(FILETIME *) &fai_buf.fai.BasicInformation.ChangeTime
+		   : *(FILETIME *) &fai_buf.fai.BasicInformation.LastWriteTime,
+		   *(FILETIME *) &fai_buf.fai.BasicInformation.LastAccessTime,
+		   *(FILETIME *) &fai_buf.fai.BasicInformation.LastWriteTime,
+		   *(FILETIME *) &fai_buf.fai.BasicInformation.CreationTime,
+		   get_dev (),
+		   fai_buf.fai.StandardInformation.EndOfFile.QuadPart,
+		   fai_buf.fai.StandardInformation.AllocationSize.QuadPart,
+		   fai_buf.fai.InternalInformation.FileId.QuadPart,
+		   fai_buf.fai.StandardInformation.NumberOfLinks,
+		   fai_buf.fai.BasicInformation.FileAttributes);
 }
 
 int __stdcall
@@ -372,22 +372,12 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   UNICODE_STRING dirname;
   UNICODE_STRING basename;
   HANDLE dir;
-  const DWORD fdi_size = (NAME_MAX + 1) * sizeof (WCHAR)
-			 + sizeof (FILE_ID_BOTH_DIR_INFORMATION);
-  const DWORD fvi_size = (NAME_MAX + 1) * sizeof (WCHAR)
-			 + sizeof (FILE_FS_VOLUME_INFORMATION);
-  PFILE_ID_BOTH_DIR_INFORMATION pfdi = (PFILE_ID_BOTH_DIR_INFORMATION)
-				       alloca (fdi_size);
-  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-				     alloca (fvi_size);
+  struct {
+    FILE_ID_BOTH_DIR_INFORMATION fdi;
+    WCHAR buf[NAME_MAX + 1];
+  } fdi_buf;
   LARGE_INTEGER FileId;
 
-  if (!pc.exists ())
-    {
-      debug_printf ("already determined that pc does not exist");
-      set_errno (ENOENT);
-      return -1;
-    }
   RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
   InitializeObjectAttributes (&attr, &dirname, OBJ_CASE_INSENSITIVE,
 			      NULL, NULL);
@@ -402,13 +392,13 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     }
   if (wincap.has_fileid_dirinfo ()
       && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
-						 pfdi, fdi_size,
+						 &fdi_buf.fdi, sizeof fdi_buf,
 						 FileIdBothDirectoryInformation,
 						 TRUE, &basename, TRUE)))
-    FileId = pfdi->FileId;
+    FileId = fdi_buf.fdi.FileId;
   else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
-						 pfdi, fdi_size,
-						 FileBothDirectoryInformation,
+						 &fdi_buf.fdi, sizeof fdi_buf,
+						 FileDirectoryInformation,
 						 TRUE, &basename, TRUE)))
     FileId.QuadPart = 0; /* get_ino is called in fstat_helper. */
   if (!NT_SUCCESS (status))
@@ -418,34 +408,26 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       NtClose (dir);
       goto too_bad;
     }
-  status = NtQueryVolumeInformationFile (dir, &io, pfvi, fvi_size,
-					 FileFsVolumeInformation);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("%p = NtQueryVolumeInformationFile(%S)",
-		    status, pc.get_nt_native_path ());
-      pfvi->VolumeSerialNumber = 0;
-    }
   NtClose (dir);
   /* If the change time is 0, it's a file system which doesn't
      support a change timestamp.  In that case use the LastWriteTime
      entry, as in other calls to fstat_helper. */
   if (pc.is_rep_symlink ())
-    pfdi->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  pc.file_attributes (pfdi->FileAttributes);
+    fdi_buf.fdi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+  pc.file_attributes (fdi_buf.fdi.FileAttributes);
   return fstat_helper (buf,
-		       pfdi->ChangeTime.QuadPart ?
-		       *(FILETIME *) &pfdi->ChangeTime :
-		       *(FILETIME *) &pfdi->LastWriteTime,
-		       *(FILETIME *) &pfdi->LastAccessTime,
-		       *(FILETIME *) &pfdi->LastWriteTime,
-		       *(FILETIME *) &pfdi->CreationTime,
-		       pfvi->VolumeSerialNumber,
-		       pfdi->EndOfFile.QuadPart,
-		       pfdi->AllocationSize.QuadPart,
-		       pfdi->FileId.QuadPart,
+		       fdi_buf.fdi.ChangeTime.QuadPart ?
+		       *(FILETIME *) &fdi_buf.fdi.ChangeTime :
+		       *(FILETIME *) &fdi_buf.fdi.LastWriteTime,
+		       *(FILETIME *) &fdi_buf.fdi.LastAccessTime,
+		       *(FILETIME *) &fdi_buf.fdi.LastWriteTime,
+		       *(FILETIME *) &fdi_buf.fdi.CreationTime,
+		       pc.fs_serial_number (),
+		       fdi_buf.fdi.EndOfFile.QuadPart,
+		       fdi_buf.fdi.AllocationSize.QuadPart,
+		       FileId.QuadPart,
 		       1,
-		       pfdi->FileAttributes);
+		       fdi_buf.fdi.FileAttributes);
 
 too_bad:
   LARGE_INTEGER ft;
@@ -679,14 +661,6 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   int ret = -1, opened = 0;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
-  const size_t fvi_size = sizeof (FILE_FS_VOLUME_INFORMATION)
-			  + (NAME_MAX + 1) * sizeof (WCHAR);
-  PFILE_FS_VOLUME_INFORMATION pfvi = (PFILE_FS_VOLUME_INFORMATION)
-				     alloca (fvi_size);
-  const size_t fai_size = sizeof (FILE_FS_ATTRIBUTE_INFORMATION)
-			  + (NAME_MAX + 1) * sizeof (WCHAR);
-  PFILE_FS_ATTRIBUTE_INFORMATION pfai = (PFILE_FS_ATTRIBUTE_INFORMATION)
-					alloca (fai_size);
   FILE_FS_FULL_SIZE_INFORMATION full_fsi;
   FILE_FS_SIZE_INFORMATION fsi;
   HANDLE fh = get_handle ();
@@ -712,27 +686,12 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	}
     }
 
-  /* Get basic volume information. */
-  status = NtQueryVolumeInformationFile (fh, &io, pfvi, fvi_size,
-					 FileFsVolumeInformation);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      goto out;
-    }
-  status = NtQueryVolumeInformationFile (fh, &io, pfai, fai_size,
-					 FileFsAttributeInformation);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      goto out;
-    }
   sfs->f_files = ULONG_MAX;
   sfs->f_ffree = ULONG_MAX;
   sfs->f_favail = ULONG_MAX;
-  sfs->f_fsid = pfvi->VolumeSerialNumber;
-  sfs->f_flag = pfai->FileSystemAttributes;
-  sfs->f_namemax = pfai->MaximumComponentNameLength;
+  sfs->f_fsid = pc.fs_serial_number ();
+  sfs->f_flag = pc.fs_flags ();
+  sfs->f_namemax = pc.fs_name_len ();
   /* Get allocation related information.  Try to get "full" information
      first, which is only available since W2K.  If that fails, try to
      retrieve normal allocation information. */
@@ -1608,7 +1567,7 @@ fhandler_disk_file::opendir (int fd)
 	     OS/FS combinations (say, Win2K/CDFS or so).  Instead of
 	     testing in readdir for yet another error code, let's use
 	     FileIdBothDirectoryInformation only on filesystems supporting
-	     persistent ACLs, FileBothDirectoryInformation otherwise.
+	     persistent ACLs, FileDirectoryInformation otherwise.
 
 	     On older NFS clients (up to SFU 3.5), dangling symlinks
 	     are hidden from directory queries, unless you use the
@@ -1825,20 +1784,20 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	     nicely, but only up to the 128th entry in the directory.  After
 	     reaching this entry, the next call to NtQueryDirectoryFile
 	     (FileIdBothDirectoryInformation) returns STATUS_INVALID_LEVEL.
-	     Why should we care, we can just switch to
-	     FileBothDirectoryInformation, isn't it?  Nope!  The next call to
-	     NtQueryDirectoryFile(FileBothDirectoryInformation) actually
-	     returns STATUS_NO_MORE_FILES, regardless how many files are left
-	     unread in the directory.  This does not happen when using
-	     FileBothDirectoryInformation right from the start, but since
+	     Why should we care, we can just switch to FileDirectoryInformation,
+	     isn't it?  Nope!  The next call to
+	       NtQueryDirectoryFile(FileDirectoryInformation)
+	     actually returns STATUS_NO_MORE_FILES, regardless how many files
+	     are left unread in the directory.  This does not happen when using
+	     FileDirectoryInformation right from the start, but since
 	     we can't decide whether the server we're talking with has this
 	     bug or not, we end up serving Samba shares always in the slow
-	     mode using FileBothDirectoryInformation.  So, what we do here is
+	     mode using FileDirectoryInformation.  So, what we do here is
 	     to implement the solution suggested by Andrew Tridgell,  we just
 	     reread all entries up to dir->d_position using
-	     FileBothDirectoryInformation.
+	     FileDirectoryInformation.
 	     However, We do *not* mark this server as broken and fall back to
-	     using FileBothDirectoryInformation further on.  This would slow
+	     using FileDirectoryInformation further on.  This would slow
 	     down every access to such a server, even for directories under
 	     128 entries.  Also, bigger dirs only suffer from one additional
 	     call per full directory scan, which shouldn't be too big a hit.
@@ -1852,7 +1811,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		    {
 		      status = NtQueryDirectoryFile (get_handle (), NULL, NULL,
 					   0, &io, d_cache (dir), DIR_BUF_SIZE,
-					   FileBothDirectoryInformation,
+					   FileDirectoryInformation,
 					   FALSE, NULL, cnt == 0);
 		      if (!NT_SUCCESS (status))
 			goto go_ahead;
@@ -1872,7 +1831,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 				       d_cache (dir), DIR_BUF_SIZE,
 				       (dir->__flags & dirent_nfs_d_ino)
 				       ? FileNamesInformation
-				       : FileBothDirectoryInformation,
+				       : FileDirectoryInformation,
 				       FALSE, NULL, dir->__d_position == 0);
     }
 
@@ -1904,9 +1863,9 @@ go_ahead:
       	}
       else
 	{
-	  FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
-	  FileNameLength = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileNameLength;
-	  FileAttributes = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileAttributes;
+	  FileName = ((PFILE_DIRECTORY_INFORMATION) buf)->FileName;
+	  FileNameLength = ((PFILE_DIRECTORY_INFORMATION) buf)->FileNameLength;
+	  FileAttributes = ((PFILE_DIRECTORY_INFORMATION) buf)->FileAttributes;
 	}
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);

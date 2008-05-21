@@ -457,6 +457,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       return false;
     }
    flags (ffai_buf.ffai.FileSystemAttributes);
+   name_len (ffai_buf.ffai.MaximumComponentNameLength);
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this

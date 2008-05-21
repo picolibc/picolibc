@@ -95,8 +95,9 @@ struct fs_info
  private:
   struct status_flags
   {
-    DWORD flags;                  /* Volume flags */
-    DWORD samba_version;          /* Samba version if available */
+    ULONG flags;                  /* Volume flags */
+    ULONG samba_version;          /* Samba version if available */
+    ULONG name_len;		  /* MaximumComponentNameLength */
     unsigned is_remote_drive : 1;
     unsigned has_buggy_open  : 1;
     unsigned has_acls	     : 1;
@@ -113,8 +114,9 @@ struct fs_info
   void clear () { memset (&status, 0 , sizeof status); sernum = 0UL; }
   fs_info () { clear (); }
 
-  IMPLEMENT_STATUS_FLAG (DWORD, flags)
-  IMPLEMENT_STATUS_FLAG (DWORD, samba_version)
+  IMPLEMENT_STATUS_FLAG (ULONG, flags)
+  IMPLEMENT_STATUS_FLAG (ULONG, samba_version)
+  IMPLEMENT_STATUS_FLAG (ULONG, name_len)
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
@@ -269,6 +271,7 @@ class path_conv
   DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
   DWORD fs_flags () {return fs.flags ();}
+  DWORD fs_name_len () {return fs.name_len ();}
   bool fs_is_fat () const {return fs.is_fat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
   bool fs_is_samba () const {return fs.is_samba ();}

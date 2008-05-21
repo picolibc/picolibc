@@ -1,5 +1,28 @@
 2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (get_ino_by_handle): Rename pfai to fai.
+	(fhandler_base::fstat_by_handle): Drop fai_size and pfai in favor of
+	static struct fai_buf.  Restructure.
+	(fhandler_base::fstat_by_name): Drop fvi_size and pfvi.  Drop fdi_size
+	and pfdi in favor of static struct fdi_buf.  Drop redundant test for
+	existance.  Use FileDirectoryInformation class instead of
+	FileBothDirectoryInformation.  Drop call to NtQueryVolumeInformationFile
+	in favor of using pc.fs_serial_number ().  Fix FileId information given
+	to fstat_helper.
+	(fhandler_disk_file::fstatvfs): Drop fvi_size, pfvi, fai_size and pfai.
+	Drop getting FileFsVolumeInformation and FileFsAttributeInformation in
+	favor of using the related path_conv info.
+	(fhandler_disk_file::opendir): Fix comment.
+	(fhandler_disk_file::readdir): Ditto.  Use FileDirectoryInformation
+	class instead of FileBothDirectoryInformation.
+	* path.cc (fs_info::update): Store MaximumComponentNameLength in new
+	member name_len.
+	* path.h (struct fs_info): Use ULONG rather than DWORD.  Add member
+	name_len to store MaximumComponentNameLength.  Add accessor methods.
+	(path_conv::fs_name_len): New method.
+
+2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (dirent_states): Add dirent_nfs_d_ino state and add it to
 	dirent_info_mask.
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set
