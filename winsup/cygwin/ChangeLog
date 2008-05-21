@@ -1,3 +1,9 @@
+2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (FILTERED_MODE): Define valid chmod mode mask.
+	(chmod): Call fh->fchmod with filtered mode.
+	(fchmod): Ditto.
+
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Fix test for

@@ -1119,6 +1119,9 @@ chmod_device (path_conv& pc, mode_t mode)
   return mknod_worker (pc.get_win32 (), pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
 }
 
+#define FILTERED_MODE(m)	((m) & (S_ISUID | S_ISGID | S_ISVTX \
+					| S_IRWXU | S_IRWXG | S_IRWXO))
+
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
 chmod (const char *path, mode_t mode)
@@ -1134,7 +1137,7 @@ chmod (const char *path, mode_t mode)
       set_errno (fh->error ());
     }
   else
-    res = fh->fchmod (mode);
+    res = fh->fchmod (FILTERED_MODE (mode));
 
   delete fh;
  error:
@@ -1154,7 +1157,7 @@ fchmod (int fd, mode_t mode)
       return -1;
     }
 
-  return cfd->fchmod (mode);
+  return cfd->fchmod (FILTERED_MODE (mode));
 }
 
 static void
