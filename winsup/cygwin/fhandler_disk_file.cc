@@ -1608,12 +1608,21 @@ fhandler_disk_file::opendir (int fd)
 	     OS/FS combinations (say, Win2K/CDFS or so).  Instead of
 	     testing in readdir for yet another error code, let's use
 	     FileIdBothDirectoryInformation only on filesystems supporting
-	     persistent ACLs, FileBothDirectoryInformation otherwise. */
+	     persistent ACLs, FileBothDirectoryInformation otherwise.
+
+	     On older NFS clients (up to SFU 3.5), dangling symlinks
+	     are hidden from directory queries, unless you use the
+	     FileNamesInformation info class.  Nevertheless, we try
+	     FileIdBothDirectoryInformation first.  On newer NFS clients
+	     it works fine, on the older ones it returns "invalid info
+	     class".  So we can stick to the above explained mechanism. */
 	  if (pc.hasgood_inode ())
 	    {
 	      dir->__flags |= dirent_set_d_ino;
 	      if (wincap.has_fileid_dirinfo ())
 		dir->__flags |= dirent_get_d_ino;
+	      if (pc.fs_is_nfs ())
+	      	dir->__flags |= dirent_nfs_d_ino;
 	    }
 	}
       if (fd >= 0)
@@ -1787,6 +1796,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   NTSTATUS status = STATUS_SUCCESS;
   PFILE_ID_BOTH_DIR_INFORMATION buf = NULL;
   PWCHAR FileName;
+  ULONG FileNameLength;
+  ULONG FileAttributes;
   IO_STATUS_BLOCK io;
   UNICODE_STRING fname;
 
@@ -1859,7 +1870,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
       if (!(dir->__flags & dirent_get_d_ino))
 	status = NtQueryDirectoryFile (get_handle (), NULL, NULL, 0, &io,
 				       d_cache (dir), DIR_BUF_SIZE,
-				       FileBothDirectoryInformation,
+				       (dir->__flags & dirent_nfs_d_ino)
+				       ? FileNamesInformation
+				       : FileBothDirectoryInformation,
 				       FALSE, NULL, dir->__d_position == 0);
     }
 
@@ -1878,21 +1891,33 @@ go_ahead:
       if ((dir->__flags & dirent_get_d_ino))
 	{
 	  FileName = buf->FileName;
+	  FileNameLength = buf->FileNameLength;
+	  FileAttributes = buf->FileAttributes;
 	  if ((dir->__flags & dirent_set_d_ino))
 	    de->d_ino = buf->FileId.QuadPart;
 	}
+      else if ((dir->__flags & dirent_nfs_d_ino))
+	{
+	  FileName = ((PFILE_NAMES_INFORMATION) buf)->FileName;
+	  FileNameLength = ((PFILE_NAMES_INFORMATION) buf)->FileNameLength;
+	  FileAttributes = 0;
+      	}
       else
-	FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
-      RtlInitCountedUnicodeString (&fname, FileName, buf->FileNameLength);
+	{
+	  FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
+	  FileNameLength = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileNameLength;
+	  FileAttributes = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileAttributes;
+	}
+      RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{
 	  OBJECT_ATTRIBUTES attr;
 
-	  if (dir->__d_position == 0 && buf->FileNameLength == 2
+	  if (dir->__d_position == 0 && FileNameLength == 2
 	      && FileName[0] == '.')
 	    de->d_ino = get_ino_by_handle (get_handle ());
-	  else if (dir->__d_position == 1 && buf->FileNameLength == 4
+	  else if (dir->__d_position == 1 && FileNameLength == 4
 		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    if (!(dir->__flags & dirent_isroot))
 	      de->d_ino = readdir_get_ino (get_name (), true);
@@ -1922,7 +1947,7 @@ go_ahead:
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
-			      buf ? buf->FileAttributes : 0, &fname)))
+			      buf ? FileAttributes : 0, &fname)))
     dir->__d_position++;
   else if (!(dir->__flags & dirent_saw_dot))
     {

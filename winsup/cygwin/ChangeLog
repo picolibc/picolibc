@@ -1,5 +1,18 @@
 2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (dirent_states): Add dirent_nfs_d_ino state and add it to
+	dirent_info_mask.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set
+	dirent_nfs_d_ino flag for NFS shares.  Explain why.
+	(fhandler_disk_file::readdir): Use FileNamesInformation instead of
+	FileBothDirectoryInformation info class on NFS clients not supporting
+	the FileIdBothDirectoryInformation info class.  Use local pointers to
+	accommodate different offsets.
+	* path.cc (symlink_info::check): Don't test directories for symlinks
+	on NFS shares.  Enhance comment.
+
+2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (FILTERED_MODE): Define valid chmod mode mask.
 	(chmod): Call fh->fchmod with filtered mode.
 	(fchmod): Ditto.

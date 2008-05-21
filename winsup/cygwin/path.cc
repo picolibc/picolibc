@@ -2514,8 +2514,9 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	}
 
       /* If the file could be opened with FILE_READ_EA, and if it's on a
-         NFS share, check if it's a symlink. */
-      else if (!no_ea && fs.is_nfs ())
+         NFS share, check if it's a symlink.  Only files can be symlinks
+	 (which can be symlinks to directories). */
+      else if (!no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY) && fs.is_nfs ())
         {
 	  res = check_nfs_symlink (h);
 	  if (!res)

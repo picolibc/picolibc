@@ -53,9 +53,10 @@ enum dirent_states
   dirent_isroot		= 0x0008,
   dirent_set_d_ino	= 0x0010,
   dirent_get_d_ino	= 0x0020,
+  dirent_nfs_d_ino	= 0x0040,
 
   /* Global flags which must not be deleted on rewinddir or seekdir. */
-  dirent_info_mask	= 0x0038
+  dirent_info_mask	= 0x0078
 };
 
 enum conn_state
