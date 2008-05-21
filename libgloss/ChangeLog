@@ -1,3 +1,9 @@
+2008-05-20  Nick Clifton  <nickc@redhat.com>
+
+	* iq2000/crt0.S (__dso_handle): Define (weak).
+	* frv/crt0.S (__dso_handle): Define (weak).
+	* mn10300/crt0.S (___dso_handle): Define (weak).
+
 2008-05-05  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/readlink.c: Align readlink implementation to POSIX.

@@ -60,8 +60,13 @@ _start:
 	jarl    _main,		r31
 	mov     r10,		r6
 	jarl    _exit,		r31
-
 # endif
 
 	.section .stack
 _stack:	.long 	1
+
+	.section .data
+	.global ___dso_handle
+	.weak   ___dso_handle
+___dso_handle:
+	.long	0

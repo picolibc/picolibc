@@ -54,3 +54,9 @@ _start:
 	xor %5,%5,%5
 	jal exit		# all done, no need to return or
 	or %4,%0,%2		# exit with main's return value
+
+	.section .data
+	.global __dso_handle
+	.weak __dso_handle
+__dso_handle:
+	.long	0

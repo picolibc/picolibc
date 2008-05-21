@@ -1,3 +1,7 @@
+2008-05-20  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S (___dso_handle): Define (weak).
+
 2008-05-20  DJ Delorie  <dj@redhat.com>
 
 	* libc/sys/sysnecv850/isatty.c (_isatty): Renamed from isatty.
