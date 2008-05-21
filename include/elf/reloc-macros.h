@@ -43,6 +43,34 @@
    	  R_foo_count
    	};
 
+   Note: The value of the symbol defined in the END_RELOC_NUMBERS
+   macro (R_foo_count in the case of the example above) will be
+   set to the value of the whichever *_RELOC macro preceeds it plus
+   one.  Therefore if you intend to use the symbol as a sentinel for
+   the highest valid macro value you should make sure that the
+   preceeding *_RELOC macro is the highest valid number.  ie a
+   declaration like this:
+
+   	START_RELOC_NUMBERS (foo)
+   	    RELOC_NUMBER (R_foo_NONE,    0)
+   	    RELOC_NUMBER (R_foo_32,      1)
+   	    FAKE_RELOC   (R_foo_illegal, 9)
+   	    FAKE_RELOC   (R_foo_synonym, 0)
+   	END_RELOC_NUMBERS (R_foo_count)
+
+   will result in R_foo_count having a value of 1 (R_foo_synonym + 1)
+   rather than 10 or 2 as might be expected.
+
+   Alternatively you can assign a value to END_RELOC_NUMBERS symbol
+   explicitly, like this:
+
+   	START_RELOC_NUMBERS (foo)
+   	    RELOC_NUMBER (R_foo_NONE,    0)
+   	    RELOC_NUMBER (R_foo_32,      1)
+   	    FAKE_RELOC   (R_foo_illegal, 9)
+   	    FAKE_RELOC   (R_foo_synonym, 0)
+   	END_RELOC_NUMBERS (R_foo_count = 2)
+
    If RELOC_MACROS_GEN_FUNC *is* defined, then instead the
    following function will be generated:
 

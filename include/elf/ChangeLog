@@ -1,3 +1,12 @@
+2008-05-21  Nick Clifton  <nickc@redhat.com>
+
+	* reloc-macros.h: Add a comment about the use of the
+	END_RELOC_NUMBERS symbol as a sentinel value.
+
+2008-05-15  Christophe Lyon  <christophe.lyon@st.com>
+	
+	* arm.h (END_RELOC_NUMBERS): Provide a maximum value.
+
 2008-04-16  David S. Miller  <davem@davemloft.net>
 
 	* elf/sparc.h (R_SPARC_GOTDATA_HIX22,
