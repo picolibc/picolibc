@@ -1,3 +1,9 @@
+2008-05-21  Eric Blake  <ebb9@byu.net>
+
+	Optimize strchr for x86.
+	* libc/machine/i386/strchr.S (strchr): Pre-align data so unaligned
+	searches aren't penalized.  Special-case searching for 0.
+
 2008-05-20  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/sysnecv850/crt0.S (___dso_handle): Define (weak).
@@ -5,7 +11,7 @@
 2008-05-20  DJ Delorie  <dj@redhat.com>
 
 	* libc/sys/sysnecv850/isatty.c (_isatty): Renamed from isatty.
-	
+
 2008-05-14  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Change _REENT_INIT... macros to
