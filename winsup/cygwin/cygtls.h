@@ -48,6 +48,7 @@ class tls_pathbuf
 public:
   void destroy ();
   friend class tmp_pathbuf;
+  friend class _cygtls;
 };
 
 struct _local_storage
@@ -132,6 +133,8 @@ typedef struct
 {
   void *_myfault;
   int _myfault_errno;
+  int _myfault_c_cnt;
+  int _myfault_w_cnt;
 } san;
 
 /* Changes to the below structure may require acompanying changes to the very
@@ -232,14 +235,22 @@ struct _cygtls
   {
     if (andreas._myfault_errno)
       set_errno (andreas._myfault_errno);
+    /* Restore tls_pathbuf counters in case of error. */
+    locals.pathbufs.c_cnt = andreas._myfault_c_cnt;
+    locals.pathbufs.w_cnt = andreas._myfault_w_cnt;
     __ljfault ((int *) andreas._myfault, 1);
   }
   int setup_fault (jmp_buf j, san& old_j, int myerrno) __attribute__ ((always_inline))
   {
     old_j._myfault = andreas._myfault;
     old_j._myfault_errno = andreas._myfault_errno;
+    old_j._myfault_c_cnt = andreas._myfault_c_cnt;
+    old_j._myfault_w_cnt = andreas._myfault_w_cnt;
     andreas._myfault = (void *) j;
     andreas._myfault_errno = myerrno;
+    /* Save tls_pathbuf counters. */
+    andreas._myfault_c_cnt = locals.pathbufs.c_cnt;
+    andreas._myfault_w_cnt = locals.pathbufs.w_cnt;
     return __sjfault (j);
   }
   void reset_fault (san& old_j) __attribute__ ((always_inline))

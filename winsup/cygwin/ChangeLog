@@ -1,5 +1,13 @@
 2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (struct san): Add two int values to store the current
+	tls_pathbuf counters.
+	(return_from_fault): Restore tls_pathbuf counters.
+	(setup_fault): Save tls_pathbuf counters.
+	* tlsoffset.h: Regenerate.
+
+2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (setacl): Set errno to EINVAL if user or group don't exist.
 
 2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
