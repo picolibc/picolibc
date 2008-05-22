@@ -2799,12 +2799,12 @@ extern "C" ssize_t
 cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 		  size_t size)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
   path_conv p;
-  tmp_pathbuf tp;
   size_t lsiz = 0;
   char *buf = NULL;
   int error = 0;
@@ -2935,11 +2935,11 @@ realpath (const char *path, char *resolved)
 
   /* Guard reading from a potentially invalid path and writing to a
      potentially invalid resolved. */
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
 
-  tmp_pathbuf tp;
   char *tpath;
   if (isdrive (path))
     {

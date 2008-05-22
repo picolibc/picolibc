@@ -3567,19 +3567,30 @@ pclose (FILE *fp)
 /* Preliminary(?) implementation of the openat family of functions. */
 
 static int
-gen_full_path_at (char *path_ret, int dirfd, const char *pathname)
+gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
+		  bool null_pathname_allowed = false)
 {
-  if (!*pathname)
+  /* Set null_pathname_allowed to true to allow GLIBC compatible behaviour
+     for NULL pathname.  Only used by futimesat. */
+  if (!pathname && !null_pathname_allowed)
     {
-      set_errno (ENOENT);
+      set_errno (EFAULT);
       return -1;
     }
-  if (strlen (pathname) >= PATH_MAX)
+  if (pathname)
     {
-      set_errno (ENAMETOOLONG);
-      return -1;
+      if (!*pathname)
+	{
+	  set_errno (ENOENT);
+	  return -1;
+	}
+      if (strlen (pathname) >= PATH_MAX)
+	{
+	  set_errno (ENAMETOOLONG);
+	  return -1;
+	}
     }
-  if (isdirsep (*pathname))
+  if (pathname && isdirsep (*pathname))
     stpcpy (path_ret, pathname);
   else
     {
@@ -3604,9 +3615,12 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname)
 	  set_errno (ENOTDIR);
 	  return -1;
 	}
-      if (p[-1] != '/')
-        *p++ = '/';
-      stpcpy (p, pathname);
+      if (pathname)
+	{
+	  if (p[-1] != '/')
+	    *p++ = '/';
+	  stpcpy (p, pathname);
+	}
     }
   return 0;
 }
@@ -3614,10 +3628,10 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname)
 extern "C" int
 openat (int dirfd, const char *pathname, int flags, ...)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3634,12 +3648,12 @@ openat (int dirfd, const char *pathname, int flags, ...)
 extern "C" int
 faccessat (int dirfd, const char *pathname, int mode, int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
   int res = -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (!gen_full_path_at (path, dirfd, pathname))
     {
@@ -3665,10 +3679,10 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
 extern "C" int
 fchmodat (int dirfd, const char *pathname, mode_t mode, int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3679,10 +3693,10 @@ extern "C" int
 fchownat (int dirfd, const char *pathname, __uid32_t uid, __gid32_t gid,
 	 int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3693,10 +3707,10 @@ fchownat (int dirfd, const char *pathname, __uid32_t uid, __gid32_t gid,
 extern "C" int
 fstatat (int dirfd, const char *pathname, struct __stat64 *st, int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3709,10 +3723,10 @@ extern "C" int
 utimensat (int dirfd, const char *pathname, const struct timespec *times,
 	   int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3725,12 +3739,12 @@ utimensat (int dirfd, const char *pathname, const struct timespec *times,
 extern "C" int
 futimesat (int dirfd, const char *pathname, const struct timeval *times)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
-  if (gen_full_path_at (path, dirfd, pathname))
+  if (gen_full_path_at (path, dirfd, pathname, true))
     return -1;
   return utimes (path, times);
 }
@@ -3740,10 +3754,10 @@ linkat (int olddirfd, const char *oldpathname,
 	int newdirfd, const char *newpathname,
 	int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *oldpath = tp.c_get ();
   if (gen_full_path_at (oldpath, olddirfd, oldpathname))
     return -1;
@@ -3766,10 +3780,10 @@ linkat (int olddirfd, const char *oldpathname,
 extern "C" int
 mkdirat (int dirfd, const char *pathname, mode_t mode)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3779,10 +3793,10 @@ mkdirat (int dirfd, const char *pathname, mode_t mode)
 extern "C" int
 mkfifoat (int dirfd, const char *pathname, mode_t mode)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3792,10 +3806,10 @@ mkfifoat (int dirfd, const char *pathname, mode_t mode)
 extern "C" int
 mknodat (int dirfd, const char *pathname, mode_t mode, __dev32_t dev)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3805,10 +3819,10 @@ mknodat (int dirfd, const char *pathname, mode_t mode, __dev32_t dev)
 extern "C" ssize_t
 readlinkat (int dirfd, const char *pathname, char *buf, size_t bufsize)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3819,10 +3833,10 @@ extern "C" int
 renameat (int olddirfd, const char *oldpathname,
 	  int newdirfd, const char *newpathname)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *oldpath = tp.c_get ();
   if (gen_full_path_at (oldpath, olddirfd, oldpathname))
     return -1;
@@ -3835,10 +3849,10 @@ renameat (int olddirfd, const char *oldpathname,
 extern "C" int
 symlinkat (const char *oldpath, int newdirfd, const char *newpathname)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *newpath = tp.c_get ();
   if (gen_full_path_at (newpath, newdirfd, newpathname))
     return -1;
@@ -3848,10 +3862,10 @@ symlinkat (const char *oldpath, int newdirfd, const char *newpathname)
 extern "C" int
 unlinkat (int dirfd, const char *pathname, int flags)
 {
+  tmp_pathbuf tp;
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  tmp_pathbuf tp;
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;

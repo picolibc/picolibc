@@ -1,3 +1,10 @@
+2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (cygwin_conv_path): Define tp before setting up faul handler.
+	* syscalls.cc: Ditto, throughout.
+	(gen_full_path_at): Add bool parameter to allow NULL pathname.
+	(futimesat): Allow NULL pathname as GLIBC.
+
 2008-05-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* string.h (strchr): Eliminate.
