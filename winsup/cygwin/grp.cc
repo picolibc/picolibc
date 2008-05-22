@@ -382,8 +382,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 		  if (sid.getfromgr (gr))
 		    for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		      if (sid == groups->Groups[pg].Sid
-			  && !(groups->Groups[pg].Attributes
-			       & SE_GROUP_USE_FOR_DENY_ONLY)
+			  && (groups->Groups[pg].Attributes & SE_GROUP_ENABLED)
 			  && sid != well_known_world_sid)
 			{
 			  if (cnt < gidsetsize)
