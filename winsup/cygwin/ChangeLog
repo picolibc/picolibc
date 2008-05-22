@@ -1,5 +1,10 @@
 2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (internal_getgroups): Don't add deny-only groups to the group
+	list.
+
+2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (struct san): Add two int values to store the current
 	tls_pathbuf counters.
 	(return_from_fault): Restore tls_pathbuf counters.

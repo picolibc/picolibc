@@ -381,8 +381,10 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 		for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 		  if (sid.getfromgr (gr))
 		    for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		      if (sid == groups->Groups[pg].Sid &&
-			  sid != well_known_world_sid)
+		      if (sid == groups->Groups[pg].Sid
+			  && !(groups->Groups[pg].Attributes
+			       & SE_GROUP_USE_FOR_DENY_ONLY)
+			  && sid != well_known_world_sid)
 			{
 			  if (cnt < gidsetsize)
 			    grouplist[cnt] = gr->gr_gid;
