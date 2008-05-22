@@ -27,6 +27,8 @@
 #include <linuxthreads/internals.h>
 #endif
 
+#define _IO_MTSAFE_IO  /* add this as we always want this in newlib */
+
 /* Mutex type.  */
 #if defined(_LIBC) || defined(_IO_MTSAFE_IO)
 typedef pthread_mutex_t __libc_lock_t;

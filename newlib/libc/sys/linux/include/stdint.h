@@ -15,6 +15,7 @@
 #define _STDINT_H
 
 #include <sys/types.h>
+#include <bits/wordsize.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,6 +86,34 @@ typedef int32_t	   	int_least16_t;
 typedef uint32_t  	uint_least16_t;
 #define __int_least16_t_defined 1
 #endif
+#endif
+
+/* Fast types.  */
+
+/* Signed.  */
+typedef signed char             int_fast8_t;
+#if __WORDSIZE == 64
+typedef long int                int_fast16_t;
+typedef long int                int_fast32_t;
+typedef long int                int_fast64_t;
+#else
+typedef int                     int_fast16_t;
+typedef int                     int_fast32_t;
+__extension__
+typedef long long int           int_fast64_t;
+#endif
+
+/* Unsigned.  */
+typedef unsigned char           uint_fast8_t;
+#if __WORDSIZE == 64
+typedef unsigned long int       uint_fast16_t;
+typedef unsigned long int       uint_fast32_t;
+typedef unsigned long int       uint_fast64_t;
+#else
+typedef unsigned int            uint_fast16_t;
+typedef unsigned int            uint_fast32_t;
+__extension__
+typedef unsigned long long int  uint_fast64_t;
 #endif
 
 #if __STDINT_EXP(LONG_MAX) > 0x7fffffff

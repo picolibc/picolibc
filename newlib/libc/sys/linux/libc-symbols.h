@@ -349,4 +349,31 @@
   strong_alias(real, name)
 #endif
 
+#define libc_hidden_def(x)
+#define libc_hidden_weak(x)
+#define libc_hidden_proto(x)
+#define libc_hidden_data_def(x)
+#define libresolv_hidden_def(x)
+#define libresolv_hidden_weak(x)
+#define libresolv_hidden_data_def(x)
+#define libresolv_hidden_proto(x)
+#define static_link_warning(x)
+#define libc_freeres_ptr(x) x
+#define DL_CALL_FCT(x,y) x y
+#define attribute_hidden
+#define internal_function
+
+/* Move compatibility symbols out of the way by placing them all in a
+   special section.  */
+#ifndef __ASSEMBLER__
+# define attribute_compat_text_section \
+    __attribute__ ((section (".text.compat")))
+# define attribute_compat_data_section \
+    __attribute__ ((section (".data.compat")))
+#else
+# define compat_text_section .section ".text.compat", "ax";
+# define compat_data_section .section ".data.compat", "aw";
+#endif
+
+
 #endif /* libc-symbols.h */

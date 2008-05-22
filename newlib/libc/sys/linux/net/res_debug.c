@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1985
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,14 +10,10 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- * 	This product includes software developed by the University of
- * 	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,14 +29,14 @@
 
 /*
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
- * 
+ *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies, and that
  * the name of Digital Equipment Corporation not be used in advertising or
  * publicity pertaining to distribution of the document or software without
  * specific, written prior permission.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
@@ -77,7 +73,7 @@
  */
 
 /*
- * Portions Copyright (c) 1996 by Internet Software Consortium.
+ * Portions Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -94,10 +90,9 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_debug.c	8.1 (Berkeley) 6/4/93";
+static const char sccsid[] = "@(#)res_debug.c	8.1 (Berkeley) 6/4/93";
+static const char rcsid[] = "$BINDId: res_debug.c,v 8.34 2000/02/29 05:30:55 vixie Exp $";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-#include <sys/types.h>
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -116,23 +111,24 @@ static char sccsid[] = "@(#)res_debug.c	8.1 (Berkeley) 6/4/93";
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "local.h"
 
-#define SPRINTF(x) sprintf x
+#ifdef SPRINTF_CHAR
+# define SPRINTF(x) strlen(sprintf/**/x)
+#else
+# define SPRINTF(x) sprintf x
+#endif
 
-extern const char *_res_opcodes[];
-extern const char *_res_resultcodes[];
-extern const char *_res_sectioncodes[];
+extern const char *_res_sectioncodes[] attribute_hidden;
 
 /*
  * Print the current options.
  */
 void
-fp_resstat(struct __res_state *statp, FILE *file) {
+fp_resstat(const res_state statp, FILE *file) {
 	u_long mask;
 
 	fprintf(file, ";; res options:");
-	if (!statp)
-		statp = &_res;
 	for (mask = 1;  mask != 0;  mask <<= 1)
 		if (statp->options & mask)
 			fprintf(file, " %s", p_option(mask));
@@ -140,20 +136,30 @@ fp_resstat(struct __res_state *statp, FILE *file) {
 }
 
 static void
-do_section(ns_msg *handle, ns_sect section, int pflag, FILE *file) {
+do_section(const res_state statp,
+	   ns_msg *handle, ns_sect section,
+	   int pflag, FILE *file)
+{
 	int n, sflag, rrnum;
-	char buf[2048];	/* XXX need to malloc */
+	static int buflen = 2048;
+	char *buf;
 	ns_opcode opcode;
 	ns_rr rr;
 
 	/*
 	 * Print answer records.
 	 */
-	sflag = (_res.pfcode & pflag);
-	if (_res.pfcode && !sflag)
+	sflag = (statp->pfcode & pflag);
+	if (statp->pfcode && !sflag)
 		return;
 
-	opcode = ns_msg_getflag(*handle, ns_f_opcode);
+	buf = malloc(buflen);
+	if (buf == NULL) {
+		fprintf(file, ";; memory allocation failure\n");
+		return;
+	}
+
+	opcode = (ns_opcode) ns_msg_getflag(*handle, ns_f_opcode);
 	rrnum = 0;
 	for (;;) {
 		if (ns_parserr(handle, section, rrnum, &rr)) {
@@ -161,11 +167,11 @@ do_section(ns_msg *handle, ns_sect section, int pflag, FILE *file) {
 				fprintf(file, ";; ns_parserr: %s\n",
 					strerror(errno));
 			else if (rrnum > 0 && sflag != 0 &&
-				 (_res.pfcode & RES_PRF_HEAD1))
+				 (statp->pfcode & RES_PRF_HEAD1))
 				putc('\n', file);
-			return;
+			goto cleanup;
 		}
-		if (rrnum == 0 && sflag != 0 && (_res.pfcode & RES_PRF_HEAD1))
+		if (rrnum == 0 && sflag != 0 && (statp->pfcode & RES_PRF_HEAD1))
 			fprintf(file, ";; %s SECTION:\n",
 				p_section(section, opcode));
 		if (section == ns_s_qd)
@@ -175,27 +181,32 @@ do_section(ns_msg *handle, ns_sect section, int pflag, FILE *file) {
 				p_class(ns_rr_class(rr)));
 		else {
 			n = ns_sprintrr(handle, &rr, NULL, NULL,
-					buf, sizeof buf);
+					buf, buflen);
 			if (n < 0) {
+				if (errno == ENOSPC) {
+					free(buf);
+					buf = NULL;
+					if (buflen < 131072)
+						buf = malloc(buflen += 1024);
+					if (buf == NULL) {
+						fprintf(file,
+				              ";; memory allocation failure\n");
+					      return;
+					}
+					continue;
+				}
 				fprintf(file, ";; ns_sprintrr: %s\n",
 					strerror(errno));
-				return;
+				goto cleanup;
 			}
 			fputs(buf, file);
 			fputc('\n', file);
 		}
 		rrnum++;
 	}
-}
-
-void
-p_query(const u_char *msg) {
-	fp_query(msg, stdout);
-}
-
-void
-fp_query(const u_char *msg, FILE *file) {
-	fp_nquery(msg, PACKETSZ, file);
+ cleanup:
+	if (buf != NULL)
+		free(buf);
 }
 
 /*
@@ -203,13 +214,10 @@ fp_query(const u_char *msg, FILE *file) {
  * This is intended to be primarily a debugging routine.
  */
 void
-fp_nquery(const u_char *msg, int len, FILE *file) {
+res_pquery(const res_state statp, const u_char *msg, int len, FILE *file) {
 	ns_msg handle;
 	int qdcount, ancount, nscount, arcount;
 	u_int opcode, rcode, id;
-
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
-		return;
 
 	if (ns_initparse(msg, len, &handle) < 0) {
 		fprintf(file, ";; ns_initparse: %s\n", strerror(errno));
@@ -226,13 +234,13 @@ fp_nquery(const u_char *msg, int len, FILE *file) {
 	/*
 	 * Print header fields.
 	 */
-	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX) || rcode)
+	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEADX) || rcode)
 		fprintf(file,
 			";; ->>HEADER<<- opcode: %s, status: %s, id: %d\n",
-			_res_opcodes[opcode], _res_resultcodes[rcode], id);
-	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX))
+			_res_opcodes[opcode], p_rcode(rcode), id);
+	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEADX))
 		putc(';', file);
-	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEAD2)) {
+	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEAD2)) {
 		fprintf(file, "; flags:");
 		if (ns_msg_getflag(handle, ns_f_qr))
 			fprintf(file, " qr");
@@ -251,7 +259,7 @@ fp_nquery(const u_char *msg, int len, FILE *file) {
 		if (ns_msg_getflag(handle, ns_f_cd))
 			fprintf(file, " cd");
 	}
-	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEAD1)) {
+	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEAD1)) {
 		fprintf(file, "; %s: %d",
 			p_section(ns_s_qd, opcode), qdcount);
 		fprintf(file, ", %s: %d",
@@ -261,17 +269,17 @@ fp_nquery(const u_char *msg, int len, FILE *file) {
 		fprintf(file, ", %s: %d",
 			p_section(ns_s_ar, opcode), arcount);
 	}
-	if ((!_res.pfcode) || (_res.pfcode & 
+	if ((!statp->pfcode) || (statp->pfcode &
 		(RES_PRF_HEADX | RES_PRF_HEAD2 | RES_PRF_HEAD1))) {
 		putc('\n',file);
 	}
 	/*
 	 * Print the various sections.
 	 */
-	do_section(&handle, ns_s_qd, RES_PRF_QUES, file);
-	do_section(&handle, ns_s_an, RES_PRF_ANS, file);
-	do_section(&handle, ns_s_ns, RES_PRF_AUTH, file);
-	do_section(&handle, ns_s_ar, RES_PRF_ADD, file);
+	do_section(statp, &handle, ns_s_qd, RES_PRF_QUES, file);
+	do_section(statp, &handle, ns_s_an, RES_PRF_ANS, file);
+	do_section(statp, &handle, ns_s_ns, RES_PRF_AUTH, file);
+	do_section(statp, &handle, ns_s_ar, RES_PRF_ADD, file);
 	if (qdcount == 0 && ancount == 0 &&
 	    nscount == 0 && arcount == 0)
 		putc('\n', file);
@@ -290,6 +298,7 @@ p_cdnname(const u_char *cp, const u_char *msg, int len, FILE *file) {
 		fputs(name, file);
 	return (cp + n);
 }
+libresolv_hidden_def (p_cdnname)
 
 const u_char *
 p_cdname(const u_char *cp, const u_char *msg, FILE *file) {
@@ -319,6 +328,7 @@ p_fqnname(cp, msg, msglen, name, namelen)
 	}
 	return (cp + n);
 }
+libresolv_hidden_def (p_fqnname)
 
 /* XXX:	the rest of these functions need to become length-limited, too. */
 
@@ -339,6 +349,8 @@ p_fqname(const u_char *cp, const u_char *msg, FILE *file) {
  * that C_ANY is a qclass but not a class.  (You can ask for records of class
  * C_ANY, but you can't have any records of that class in the database.)
  */
+extern const struct res_sym __p_class_syms[];
+libresolv_hidden_proto (__p_class_syms)
 const struct res_sym __p_class_syms[] = {
 	{C_IN,		"IN"},
 	{C_CHAOS,	"CHAOS"},
@@ -348,11 +360,12 @@ const struct res_sym __p_class_syms[] = {
 	{C_NONE,	"NONE"},
 	{C_IN, 		(char *)0}
 };
+libresolv_hidden_data_def (__p_class_syms)
 
 /*
  * Names of message sections.
  */
-const struct res_sym __p_default_section_syms[] = {
+const struct res_sym __p_default_section_syms[] attribute_hidden = {
 	{ns_s_qd,	"QUERY"},
 	{ns_s_an,	"ANSWER"},
 	{ns_s_ns,	"AUTHORITY"},
@@ -360,7 +373,7 @@ const struct res_sym __p_default_section_syms[] = {
 	{0,             (char *)0}
 };
 
-const struct res_sym __p_update_section_syms[] = {
+const struct res_sym __p_update_section_syms[] attribute_hidden = {
 	{S_ZONE,	"ZONE"},
 	{S_PREREQ,	"PREREQUISITE"},
 	{S_UPDATE,	"UPDATE"},
@@ -368,53 +381,100 @@ const struct res_sym __p_update_section_syms[] = {
 	{0,             (char *)0}
 };
 
+const struct res_sym __p_key_syms[] attribute_hidden = {
+	{NS_ALG_MD5RSA,		"RSA",		"RSA KEY with MD5 hash"},
+	{NS_ALG_DH,		"DH",		"Diffie Hellman"},
+	{NS_ALG_DSA,		"DSA",		"Digital Signature Algorithm"},
+	{NS_ALG_EXPIRE_ONLY,	"EXPIREONLY",	"No algorithm"},
+	{NS_ALG_PRIVATE_OID,	"PRIVATE",	"Algorithm obtained from OID"},
+	{0,			NULL,		NULL}
+};
+
+const struct res_sym __p_cert_syms[] attribute_hidden = {
+	{cert_t_pkix,	"PKIX",		"PKIX (X.509v3) Certificate"},
+	{cert_t_spki,	"SPKI",		"SPKI certificate"},
+	{cert_t_pgp,	"PGP",		"PGP certificate"},
+	{cert_t_url,	"URL",		"URL Private"},
+	{cert_t_oid,	"OID",		"OID Private"},
+	{0,		NULL,		NULL}
+};
+
 /*
  * Names of RR types and qtypes.  Types and qtypes are the same, except
  * that T_ANY is a qtype but not a type.  (You can ask for records of type
  * T_ANY, but you can't have any records of that type in the database.)
  */
+extern const struct res_sym __p_type_syms[];
+libresolv_hidden_proto (__p_type_syms)
 const struct res_sym __p_type_syms[] = {
-	{T_A,		"A",		"address"},
-	{T_NS,		"NS",		"name server"},
-	{T_MD,		"MD",		"mail destination (deprecated)"},
-	{T_MF,		"MF",		"mail forwarder (deprecated)"},
-	{T_CNAME,	"CNAME",	"canonical name"},
-	{T_SOA,		"SOA",		"start of authority"},
-	{T_MB,		"MB",		"mailbox"},
-	{T_MG,		"MG",		"mail group member"},
-	{T_MR,		"MR",		"mail rename"},
-	{T_NULL,	"NULL",		"null"},
-	{T_WKS,		"WKS",		"well-known service (deprecated)"},
-	{T_PTR,		"PTR",		"domain name pointer"},
-	{T_HINFO,	"HINFO",	"host information"},
-	{T_MINFO,	"MINFO",	"mailbox information"},
-	{T_MX,		"MX",		"mail exchanger"},
-	{T_TXT,		"TXT",		"text"},
-	{T_RP,		"RP",		"responsible person"},
-	{T_AFSDB,	"AFSDB",	"DCE or AFS server"},
-	{T_X25,		"X25",		"X25 address"},
-	{T_ISDN,	"ISDN",		"ISDN address"},
-	{T_RT,		"RT",		"router"},
-	{T_NSAP,	"NSAP",		"nsap address"},
-	{T_NSAP_PTR,	"NSAP_PTR",	"domain name pointer"},
-	{T_SIG,		"SIG",		"signature"},
-	{T_KEY,		"KEY",		"key"},
-	{T_PX,		"PX",		"mapping information"},
-	{T_GPOS,	"GPOS",		"geographical position (withdrawn)"},
-	{T_AAAA,	"AAAA",		"IPv6 address"},
-	{T_LOC,		"LOC",		"location"},
-	{T_NXT,		"NXT",		"next valid name (unimplemented)"},
-	{T_EID,		"EID",		"endpoint identifier (unimplemented)"},
-	{T_NIMLOC,	"NIMLOC",	"NIMROD locator (unimplemented)"},
-	{T_SRV,		"SRV",		"server selection"},
-	{T_ATMA,	"ATMA",		"ATM address (unimplemented)"},
-	{T_IXFR,	"IXFR",		"incremental zone transfer"},
-	{T_AXFR,	"AXFR",		"zone transfer"},
-	{T_MAILB,	"MAILB",	"mailbox-related data (deprecated)"},
-	{T_MAILA,	"MAILA",	"mail agent (deprecated)"},
-	{T_NAPTR,	"NAPTR",	"URN Naming Authority"},
-	{T_ANY,		"ANY",		"\"any\""},
+	{ns_t_a,	"A",		"address"},
+	{ns_t_ns,	"NS",		"name server"},
+	{ns_t_md,	"MD",		"mail destination (deprecated)"},
+	{ns_t_mf,	"MF",		"mail forwarder (deprecated)"},
+	{ns_t_cname,	"CNAME",	"canonical name"},
+	{ns_t_soa,	"SOA",		"start of authority"},
+	{ns_t_mb,	"MB",		"mailbox"},
+	{ns_t_mg,	"MG",		"mail group member"},
+	{ns_t_mr,	"MR",		"mail rename"},
+	{ns_t_null,	"NULL",		"null"},
+	{ns_t_wks,	"WKS",		"well-known service (deprecated)"},
+	{ns_t_ptr,	"PTR",		"domain name pointer"},
+	{ns_t_hinfo,	"HINFO",	"host information"},
+	{ns_t_minfo,	"MINFO",	"mailbox information"},
+	{ns_t_mx,	"MX",		"mail exchanger"},
+	{ns_t_txt,	"TXT",		"text"},
+	{ns_t_rp,	"RP",		"responsible person"},
+	{ns_t_afsdb,	"AFSDB",	"DCE or AFS server"},
+	{ns_t_x25,	"X25",		"X25 address"},
+	{ns_t_isdn,	"ISDN",		"ISDN address"},
+	{ns_t_rt,	"RT",		"router"},
+	{ns_t_nsap,	"NSAP",		"nsap address"},
+	{ns_t_nsap_ptr,	"NSAP_PTR",	"domain name pointer"},
+	{ns_t_sig,	"SIG",		"signature"},
+	{ns_t_key,	"KEY",		"key"},
+	{ns_t_px,	"PX",		"mapping information"},
+	{ns_t_gpos,	"GPOS",		"geographical position (withdrawn)"},
+	{ns_t_aaaa,	"AAAA",		"IPv6 address"},
+	{ns_t_loc,	"LOC",		"location"},
+	{ns_t_nxt,	"NXT",		"next valid name (unimplemented)"},
+	{ns_t_eid,	"EID",		"endpoint identifier (unimplemented)"},
+	{ns_t_nimloc,	"NIMLOC",	"NIMROD locator (unimplemented)"},
+	{ns_t_srv,	"SRV",		"server selection"},
+	{ns_t_atma,	"ATMA",		"ATM address (unimplemented)"},
+	{ns_t_tsig,	"TSIG",		"transaction signature"},
+	{ns_t_ixfr,	"IXFR",		"incremental zone transfer"},
+	{ns_t_axfr,	"AXFR",		"zone transfer"},
+	{ns_t_zxfr,	"ZXFR",		"compressed zone transfer"},
+	{ns_t_mailb,	"MAILB",	"mailbox-related data (deprecated)"},
+	{ns_t_maila,	"MAILA",	"mail agent (deprecated)"},
+	{ns_t_naptr,	"NAPTR",	"URN Naming Authority"},
+	{ns_t_kx,	"KX",		"Key Exchange"},
+	{ns_t_cert,	"CERT",		"Certificate"},
+	{ns_t_any,	"ANY",		"\"any\""},
 	{0, 		NULL,		NULL}
+};
+libresolv_hidden_data_def (__p_type_syms)
+
+/*
+ * Names of DNS rcodes.
+ */
+const struct res_sym __p_rcode_syms[] attribute_hidden = {
+	{ns_r_noerror,	"NOERROR",		"no error"},
+	{ns_r_formerr,	"FORMERR",		"format error"},
+	{ns_r_servfail,	"SERVFAIL",		"server failed"},
+	{ns_r_nxdomain,	"NXDOMAIN",		"no such domain name"},
+	{ns_r_notimpl,	"NOTIMP",		"not implemented"},
+	{ns_r_refused,	"REFUSED",		"refused"},
+	{ns_r_yxdomain,	"YXDOMAIN",		"domain name exists"},
+	{ns_r_yxrrset,	"YXRRSET",		"rrset exists"},
+	{ns_r_nxrrset,	"NXRRSET",		"rrset doesn't exist"},
+	{ns_r_notauth,	"NOTAUTH",		"not authoritative"},
+	{ns_r_notzone,	"NOTZONE",		"Not in zone"},
+	{ns_r_max,	"",			""},
+	{ns_r_badsig,	"BADSIG",		"bad signature"},
+	{ns_r_badkey,	"BADKEY",		"bad key"},
+	{ns_r_badtime,	"BADTIME",		"bad time"},
+	{0, 		NULL,			NULL}
 };
 
 int
@@ -443,11 +503,12 @@ sym_ntos(const struct res_sym *syms, int number, int *success) {
 		}
 	}
 
-	sprintf(unname, "%d", number);
+	sprintf(unname, "%d", number);		/* XXX nonreentrant */
 	if (success)
 		*success = 0;
 	return (unname);
 }
+libresolv_hidden_def (sym_ntos)
 
 const char *
 sym_ntop(const struct res_sym *syms, int number, int *success) {
@@ -460,7 +521,7 @@ sym_ntop(const struct res_sym *syms, int number, int *success) {
 			return (syms->humanname);
 		}
 	}
-	sprintf(unname, "%d", number);
+	sprintf(unname, "%d", number);		/* XXX nonreentrant */
 	if (success)
 		*success = 0;
 	return (unname);
@@ -473,6 +534,7 @@ const char *
 p_type(int type) {
 	return (sym_ntos(__p_type_syms, type, (int *)0));
 }
+libresolv_hidden_def (p_type)
 
 /*
  * Return a string for the type.
@@ -499,6 +561,7 @@ const char *
 p_class(int class) {
 	return (sym_ntos(__p_class_syms, class, (int *)0));
 }
+libresolv_hidden_def (p_class)
 
 /*
  * Return a mnemonic for an option
@@ -520,27 +583,37 @@ p_option(u_long option) {
 	case RES_DNSRCH:	return "dnsrch";
 	case RES_INSECURE1:	return "insecure1";
 	case RES_INSECURE2:	return "insecure2";
-	case RES_NOALIASES:	return "noaliases";
 	case RES_USE_INET6:	return "inet6";
-	case RES_NOTLDQUERY:	return "no-tld-query";
-	case RES_USE_EDNS0:	return "edns0";
+	case RES_ROTATE:	return "rotate";
+	case RES_NOCHECKNAME:	return "no-check-names";
+	case RES_USEBSTRING:	return "ip6-bytstring";
+				/* XXX nonreentrant */
 	default:		sprintf(nbuf, "?0x%lx?", (u_long)option);
 				return (nbuf);
 	}
 }
+libresolv_hidden_def (p_option)
 
 /*
  * Return a mnemonic for a time to live.
  */
 const char *
 p_time(u_int32_t value) {
-	static char nbuf[40];
+	static char nbuf[40];		/* XXX nonreentrant */
 
 	if (ns_format_ttl(value, nbuf, sizeof nbuf) < 0)
 		sprintf(nbuf, "%u", value);
 	return (nbuf);
 }
 
+/*
+ * Return a string for the rcode.
+ */
+const char *
+p_rcode(int rcode) {
+	return (sym_ntos(__p_rcode_syms, rcode, (int *)0));
+}
+libresolv_hidden_def (p_rcode)
 
 /*
  * routines to convert between on-the-wire RR format and zone file format.
@@ -548,15 +621,16 @@ p_time(u_int32_t value) {
  * by 60*60*1000 for that.
  */
 
-static unsigned int poweroften[10] = {1, 10, 100, 1000, 10000, 100000,
-				      1000000,10000000,100000000,1000000000};
+static const unsigned int poweroften[10]=
+  { 1, 10, 100, 1000, 10000, 100000,
+    1000000,10000000,100000000,1000000000};
 
 /* takes an XeY precision/size value, returns a string representation. */
 static const char *
 precsize_ntoa(prec)
 	u_int8_t prec;
 {
-	static char retbuf[sizeof "90000000.00"];
+	static char retbuf[sizeof "90000000.00"];	/* XXX nonreentrant */
 	unsigned long val;
 	int mantissa, exponent;
 
@@ -572,24 +646,24 @@ precsize_ntoa(prec)
 /* converts ascii size/precision X * 10**Y(cm) to 0xXY.  moves pointer. */
 static u_int8_t
 precsize_aton(strptr)
-	char **strptr;
+	const char **strptr;
 {
 	unsigned int mval = 0, cmval = 0;
 	u_int8_t retval = 0;
-	char *cp;
+	const char *cp;
 	int exponent;
 	int mantissa;
 
 	cp = *strptr;
 
-	while (isdigit((unsigned char)*cp))
+	while (isdigit(*cp))
 		mval = mval * 10 + (*cp++ - '0');
 
 	if (*cp == '.') {		/* centimeters */
 		cp++;
-		if (isdigit((unsigned char)*cp)) {
+		if (isdigit(*cp)) {
 			cmval = (*cp++ - '0') * 10;
-			if (isdigit((unsigned char)*cp)) {
+			if (isdigit(*cp)) {
 				cmval += (*cp++ - '0');
 			}
 		}
@@ -614,53 +688,53 @@ precsize_aton(strptr)
 /* converts ascii lat/lon to unsigned encoded 32-bit number.  moves pointer. */
 static u_int32_t
 latlon2ul(latlonstrptr,which)
-	char **latlonstrptr;
+	const char **latlonstrptr;
 	int *which;
 {
-	char *cp;
+	const char *cp;
 	u_int32_t retval;
 	int deg = 0, min = 0, secs = 0, secsfrac = 0;
 
 	cp = *latlonstrptr;
 
-	while (isdigit((unsigned char)*cp))
+	while (isdigit(*cp))
 		deg = deg * 10 + (*cp++ - '0');
 
-	while (isspace((unsigned char)*cp))
+	while (isspace(*cp))
 		cp++;
 
-	if (!(isdigit((unsigned char)*cp)))
+	if (!(isdigit(*cp)))
 		goto fndhemi;
 
-	while (isdigit((unsigned char)*cp))
+	while (isdigit(*cp))
 		min = min * 10 + (*cp++ - '0');
 
-	while (isspace((unsigned char)*cp))
+	while (isspace(*cp))
 		cp++;
 
-	if (!(isdigit((unsigned char)*cp)))
+	if (!(isdigit(*cp)))
 		goto fndhemi;
 
-	while (isdigit((unsigned char)*cp))
+	while (isdigit(*cp))
 		secs = secs * 10 + (*cp++ - '0');
 
 	if (*cp == '.') {		/* decimal seconds */
 		cp++;
-		if (isdigit((unsigned char)*cp)) {
+		if (isdigit(*cp)) {
 			secsfrac = (*cp++ - '0') * 100;
-			if (isdigit((unsigned char)*cp)) {
+			if (isdigit(*cp)) {
 				secsfrac += (*cp++ - '0') * 10;
-				if (isdigit((unsigned char)*cp)) {
+				if (isdigit(*cp)) {
 					secsfrac += (*cp++ - '0');
 				}
 			}
 		}
 	}
 
-	while (!isspace((unsigned char)*cp))   /* if any trailing garbage */
+	while (!isspace(*cp))	/* if any trailing garbage */
 		cp++;
 
-	while (isspace((unsigned char)*cp))
+	while (isspace(*cp))
 		cp++;
 
  fndhemi:
@@ -698,10 +772,10 @@ latlon2ul(latlonstrptr,which)
 
 	cp++;			/* skip the hemisphere */
 
-	while (!isspace((unsigned char)*cp))   /* if any trailing garbage */
+	while (!isspace(*cp))	/* if any trailing garbage */
 		cp++;
 
-	while (isspace((unsigned char)*cp))    /* move to next field */
+	while (isspace(*cp))	/* move to next field */
 		cp++;
 
 	*latlonstrptr = cp;
@@ -755,18 +829,18 @@ loc_aton(ascii, binary)
 		altsign = -1;
 		cp++;
 	}
-    
+
 	if (*cp == '+')
 		cp++;
 
-	while (isdigit((unsigned char)*cp))
+	while (isdigit(*cp))
 		altmeters = altmeters * 10 + (*cp++ - '0');
 
 	if (*cp == '.') {		/* decimal meters */
 		cp++;
-		if (isdigit((unsigned char)*cp)) {
+		if (isdigit(*cp)) {
 			altfrac = (*cp++ - '0') * 10;
-			if (isdigit((unsigned char)*cp)) {
+			if (isdigit(*cp)) {
 				altfrac += (*cp++ - '0');
 			}
 		}
@@ -774,21 +848,21 @@ loc_aton(ascii, binary)
 
 	alt = (10000000 + (altsign * (altmeters * 100 + altfrac)));
 
-	while (!isspace((unsigned char)*cp) && (cp < maxcp)) /* if trailing garbage or m */
+	while (!isspace(*cp) && (cp < maxcp)) /* if trailing garbage or m */
 		cp++;
 
-	while (isspace((unsigned char)*cp) && (cp < maxcp))
+	while (isspace(*cp) && (cp < maxcp))
 		cp++;
 
 	if (cp >= maxcp)
 		goto defaults;
 
 	siz = precsize_aton(&cp);
-	
-	while (!isspace((unsigned char)*cp) && (cp < maxcp))   /* if trailing garbage or m */
+
+	while (!isspace(*cp) && (cp < maxcp))	/* if trailing garbage or m */
 		cp++;
 
-	while (isspace((unsigned char)*cp) && (cp < maxcp))
+	while (isspace(*cp) && (cp < maxcp))
 		cp++;
 
 	if (cp >= maxcp)
@@ -796,10 +870,10 @@ loc_aton(ascii, binary)
 
 	hp = precsize_aton(&cp);
 
-	while (!isspace((unsigned char)*cp) && (cp < maxcp))   /* if trailing garbage or m */
+	while (!isspace(*cp) && (cp < maxcp))	/* if trailing garbage or m */
 		cp++;
 
-	while (isspace((unsigned char)*cp) && (cp < maxcp))
+	while (isspace(*cp) && (cp < maxcp))
 		cp++;
 
 	if (cp >= maxcp)
@@ -817,7 +891,7 @@ loc_aton(ascii, binary)
 	PUTLONG(latit,bcp);
 	PUTLONG(longit,bcp);
 	PUTLONG(alt,bcp);
-    
+
 	return (16);		/* size of RR in octets */
 }
 
@@ -828,6 +902,8 @@ loc_ntoa(binary, ascii)
 	char *ascii;
 {
 	static char *error = "?";
+	static char tmpbuf[sizeof
+"1000 60 60.000 N 1000 60 60.000 W -12345678.00m 90000000.00m 90000000.00m 90000000.00m"];
 	const u_char *cp = binary;
 
 	int latdeg, latmin, latsec, latsecfrac;
@@ -840,12 +916,13 @@ loc_ntoa(binary, ascii)
 	int32_t latval, longval, altval;
 	u_int32_t templ;
 	u_int8_t sizeval, hpval, vpval, versionval;
-    
+
 	char *sizestr, *hpstr, *vpstr;
 
-	size_t len;
-
 	versionval = *cp++;
+
+	if (ascii == NULL)
+		ascii = tmpbuf;
 
 	if (versionval) {
 		(void) sprintf(ascii, "; error: unknown LOC RR version");
@@ -903,21 +980,12 @@ loc_ntoa(binary, ascii)
 	altfrac = altval % 100;
 	altmeters = (altval / 100) * altsign;
 
-	len = strlen (precsize_ntoa(sizeval)) + 1;
-	if ((sizestr = malloc(len)) == NULL)
+	if ((sizestr = strdup(precsize_ntoa(sizeval))) == NULL)
 		sizestr = error;
-	else
-		memcpy (sizestr, precsize_ntoa(sizeval), len);
-	len = strlen (precsize_ntoa(hpval)) + 1;
-	if ((hpstr = malloc (len)) == NULL)
+	if ((hpstr = strdup(precsize_ntoa(hpval))) == NULL)
 		hpstr = error;
-	else
-		memcpy (hpstr, precsize_ntoa(hpval), len);
-	len = strlen (precsize_ntoa(vpval)) + 1;
-	if ((vpstr = malloc (len)) == NULL)
+	if ((vpstr = strdup(precsize_ntoa(vpval))) == NULL)
 		vpstr = error;
-	else
-		memcpy (vpstr, precsize_ntoa(vpval), len);
 
 	sprintf(ascii,
 	      "%d %.2d %.2d.%.3d %c %d %.2d %.2d.%.3d %c %d.%.2dm %sm %sm %sm",
@@ -934,6 +1002,7 @@ loc_ntoa(binary, ascii)
 
 	return (ascii);
 }
+libresolv_hidden_def (loc_ntoa)
 
 
 /* Return the number of DNS hierarchy levels in the name. */
@@ -962,17 +1031,24 @@ dn_count_labels(const char *name) {
 }
 
 
-/* 
- * Make dates expressed in seconds-since-Jan-1-1970 easy to read.  
+/*
+ * Make dates expressed in seconds-since-Jan-1-1970 easy to read.
  * SIG records are required to be printed like this, by the Secure DNS RFC.
  */
 char *
 p_secstodate (u_long secs) {
+	/* XXX nonreentrant */
 	static char output[15];		/* YYYYMMDDHHMMSS and null */
 	time_t clock = secs;
 	struct tm *time;
-	
+
+#ifdef HAVE_TIME_R
+	struct tm timebuf;
+
+	time = gmtime_r(&clock, &timebuf);
+#else
 	time = gmtime(&clock);
+#endif
 	time->tm_year += 1900;
 	time->tm_mon += 1;
 	sprintf(output, "%04d%02d%02d%02d%02d%02d",
@@ -980,24 +1056,3 @@ p_secstodate (u_long secs) {
 		time->tm_hour, time->tm_min, time->tm_sec);
 	return (output);
 }
-
-/*
- * Weak aliases for applications that use certain private entry points,
- * and fail to include <resolv.h>.
- */
-#undef fp_resstat
-__weak_reference(__fp_resstat, fp_resstat);
-#undef p_query
-__weak_reference(__p_query, p_query);
-#undef p_fqnname
-__weak_reference(__p_fqnname, p_fqnname);
-#undef sym_ston
-__weak_reference(__sym_ston, sym_ston);
-#undef sym_ntos
-__weak_reference(__sym_ntos, sym_ntos);
-#undef sym_ntop
-__weak_reference(__sym_ntop, sym_ntop);
-#undef dn_count_labels
-__weak_reference(__dn_count_labels, dn_count_labels);
-#undef p_secstodate
-__weak_reference(__p_secstodate, p_secstodate);

@@ -94,6 +94,27 @@
 #define	RES_TIMEOUT		5	/* min. seconds between retries */
 #define	MAXRESOLVSORT		10	/* number of net to sort on */
 #define	RES_MAXNDOTS		15	/* should reflect bit field size */
+#define RES_MAXRETRANS 		30      /* only for resolv.conf/RES_OPTIONS */
+#define RES_MAXRETRY    	5       /* only for resolv.conf/RES_OPTIONS */
+#define RES_DFLRETRY		2       /* Default #/tries. */
+#define RES_MAXTIME 		65535   /* Infinity, in milliseconds. */
+
+
+typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
+        res_sendhookact;
+typedef res_sendhookact (*res_send_qhook) (struct sockaddr_in * const *ns, const u_char **query,
+                                           int *querylen,
+                                           u_char *ans,
+                                           int anssiz,
+                                           int *resplen);
+
+typedef res_sendhookact (*res_send_rhook) (const struct sockaddr_in *ns,
+                                           const u_char *query,
+                                           int querylen,
+                                           u_char *ans,
+                                           int anssiz,
+                                           int *resplen);
+
 
 struct __res_state {
 	int	retrans;	 	/* retransmition time interval */
@@ -114,8 +135,30 @@ struct __res_state {
 		struct in_addr	addr;
 		u_int32_t	mask;
 	} sort_list[MAXRESOLVSORT];
-	char	pad[72];		/* on an i386 this means 512b total */
+        res_send_qhook qhook;           /* query hook */
+        res_send_rhook rhook;           /* response hook */
+        int     res_h_errno;            /* last one set for this context */
+        int     _vcsock;                /* PRIVATE: for res_send VC i/o */
+        u_int   _flags;                 /* PRIVATE: see below */
+        union {
+                char    pad[52];        /* On an i386 this means 512b total. */
+                struct {
+                        u_int16_t               nscount;
+                        u_int16_t               nsmap[MAXNS];
+                        int                     nssocks[MAXNS];
+                        u_int16_t               nscount6;
+                        u_int16_t               nsinit;
+                        struct sockaddr_in6     *nsaddrs[MAXNS];
+                        unsigned long long int  initstamp
+                          __attribute__((packed));
+#if 0
+                        unsigned int            _initstamp[2];
+#endif
+                } _ext;
+        } _u;
 };
+
+typedef struct __res_state *res_state;
 
 /* for INET6 */
 /*
@@ -131,6 +174,15 @@ struct __res_state_ext {
 		} addr, mask;
 	} sort_list[MAXRESOLVSORT];
 };
+
+/*
+ *  * Resolver flags (used to be discrete per-module statics ints).
+ *   */
+#define RES_F_VC        0x00000001      /* socket is TCP */
+#define RES_F_CONN      0x00000002      /* socket is connected */
+
+/* res_findzonecut() options */
+#define RES_EXHAUSTIVE  0x00000001      /* always do all queries */
 
 /*
  * Resolver options (keep these in synch with res_debug.c, please)
@@ -149,11 +201,16 @@ struct __res_state_ext {
 #define	RES_INSECURE2	0x00000800	/* type 2 security disabled */
 #define	RES_NOALIASES	0x00001000	/* shuts off HOSTALIASES feature */
 #define	RES_USE_INET6	0x00002000	/* use/map IPv6 in gethostbyname() */
-#define	RES_NOTLDQUERY	0x00004000	/* Don't query TLD names */
-/* KAME extensions: use higher bit to avoid conflict with ISC use */
-#define	RES_USE_EDNS0	0x40000000	/* use EDNS0 */
+#define RES_ROTATE      0x00004000      /* rotate ns list after each query */
+#define RES_NOCHECKNAME 0x00008000      /* do not check names for sanity. */
+#define RES_KEEPTSIG    0x00010000      /* do not strip TSIG records */
+#define RES_BLAST       0x00020000      /* blast all recursive servers */
+#define RES_USEBSTRING  0x00040000      /* IPv6 reverse lookup with byte
+                                           strings */
+#define RES_NOIP6DOTINT 0x00080000      /* Do not use .ip6.int in IPv6
+                                           reverse lookup */
 
-#define RES_DEFAULT	(RES_RECURSE | RES_DEFNAMES | RES_DNSRCH)
+#define RES_DEFAULT     (RES_RECURSE|RES_DEFNAMES|RES_DNSRCH|RES_NOIP6DOTINT)
 
 /*
  * Resolver "pfcode" values.  Used by dig.
@@ -175,22 +232,13 @@ struct __res_state_ext {
 #define	RES_PRF_INIT    0x00004000
 /*			0x00008000	*/
 
-typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
-	res_sendhookact;
-
-typedef res_sendhookact (*res_send_qhook)(struct sockaddr_in * const *ns,
-					  const u_char **query,
-					  int *querylen,
-					  u_char *ans,
-					  int anssiz,
-					  int *resplen);
-
-typedef res_sendhookact (*res_send_rhook)(const struct sockaddr_in *ns,
-					  const u_char *query,
-					  int querylen,
-					  u_char *ans,
-					  int anssiz,
-					  int *resplen);
+#define RES_SET_H_ERRNO(r,x)                    \
+  do                                            \
+    {                                           \
+      (r)->res_h_errno = x;                     \
+      h_errno = (x);                            \
+    }                                           \
+  while (0)
 
 struct res_sym {
 	int	number;		/* Identifying number, like T_MX */
@@ -207,6 +255,7 @@ extern const struct res_sym __p_type_syms[];
 
 /* Private routines shared between libc/net, named, nslookup and others. */
 #define	res_hnok	__res_hnok
+#define res_hostalias   __res_hostalias
 #define	res_ownok	__res_ownok
 #define	res_mailok	__res_mailok
 #define	res_dnok	__res_dnok
@@ -227,6 +276,7 @@ extern const struct res_sym __p_type_syms[];
 #define	putlong		__putlong
 #define	putshort	__putshort
 #define	p_class		__p_class
+#define	p_rcode		__p_rcode
 #define	p_time		__p_time
 #define	p_type		__p_type
 #define	p_query		__p_query
@@ -249,6 +299,15 @@ extern const struct res_sym __p_type_syms[];
 #define	res_send	__res_send
 #define	res_isourserver	__res_isourserver
 #define	res_nameinquery	__res_nameinquery
+#define res_nclose              __res_nclose
+#define res_ninit               __res_ninit
+#define res_nmkquery            __res_nmkquery
+#define res_npquery             __res_npquery
+#define res_nquery              __res_nquery
+#define res_nquerydomain        __res_nquerydomain
+#define res_nsearch             __res_nsearch
+#define res_nsend               __res_nsend
+#define res_nisourserver        __res_nisourserver
 #define	res_queriesmatch __res_queriesmatch
 #define	res_close	__res_close
 #define	res_opt		__res_opt
@@ -276,6 +335,7 @@ const char *	hostalias(const char *);
 void		putlong(u_int32_t, u_char *);
 void		putshort(u_int16_t, u_char *);
 const char *	p_class(int);
+const char *    p_rcode (int);
 const char *	p_time(u_int32_t);
 const char *	p_type(int);
 void		p_query(const u_char *);
@@ -302,6 +362,18 @@ int		res_send(const u_char *, int, u_char *, int);
 int		res_isourserver(const struct sockaddr_in *);
 int		res_nameinquery(const char *, int, int,
 				const u_char *, const u_char *);
+void            res_npquery (const res_state, const u_char *, int, FILE *);
+const char *    res_hostalias (const res_state, const char *, char *, size_t);
+int             res_nquery (res_state, const char *, int, int, u_char *, int);
+int             res_nsearch (res_state, const char *, int, int, u_char *, int);
+int             res_nquerydomain (res_state, const char *, const char *, int,
+                                  int, u_char *, int);
+int             res_nmkquery (res_state, int, const char *, int, int,
+                              const u_char *, int, const u_char *, u_char *,
+                              int);
+int             res_nsend (res_state, const u_char *, int, u_char *, int);
+void            res_nclose (res_state);
+
 int		res_queriesmatch(const u_char *, const u_char *,
 				 const u_char *, const u_char *);
 void		res_close(void);
@@ -314,6 +386,7 @@ int		res_mkupdate(ns_updrec *, u_char *, int);
 ns_updrec *	res_mkupdrec(int, const char *, u_int, u_int, u_long);
 void		res_freeupdrec(ns_updrec *);
 #endif
+
 __END_DECLS
 
 #endif /* !_RESOLV_H_ */

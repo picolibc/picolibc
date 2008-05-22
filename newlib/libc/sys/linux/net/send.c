@@ -37,7 +37,6 @@ static char sccsid[] = "@(#)send.c	8.2 (Berkeley) 2/21/94";
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-#include "namespace.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 

@@ -83,8 +83,12 @@ typedef	_BSD_SOCKLEN_T_	socklen_t;
 #define	_PATH_NETWORKS	"/etc/networks"
 #define	_PATH_PROTOCOLS	"/etc/protocols"
 #define	_PATH_SERVICES	"/etc/services"
+#define _PATH_NSSWITCH_CONF  "/etc/nsswitch.conf"
 
-extern int h_errno;
+
+extern int *__h_errno_location(void);
+
+#define h_errno (*(__h_errno_location()))
 
 #define	MAXALIASES	35
   /* For now, only support one return address. */
@@ -158,20 +162,27 @@ struct addrinfo {
 /*
  * Error return codes from getaddrinfo()
  */
-#define	EAI_ADDRFAMILY	 1	/* address family for hostname not supported */
-#define	EAI_AGAIN	 2	/* temporary failure in name resolution */
-#define	EAI_BADFLAGS	 3	/* invalid value for ai_flags */
-#define	EAI_FAIL	 4	/* non-recoverable failure in name resolution */
-#define	EAI_FAMILY	 5	/* ai_family not supported */
-#define	EAI_MEMORY	 6	/* memory allocation failure */
-#define	EAI_NODATA	 7	/* no address associated with hostname */
-#define	EAI_NONAME	 8	/* hostname nor servname provided, or not known */
-#define	EAI_SERVICE	 9	/* servname not supported for ai_socktype */
-#define	EAI_SOCKTYPE	10	/* ai_socktype not supported */
-#define	EAI_SYSTEM	11	/* system error returned in errno */
-#define	EAI_BADHINTS	12
-#define	EAI_PROTOCOL	13
-#define	EAI_MAX		14
+/* Error values for `getaddrinfo' function.  */
+# define EAI_BADFLAGS     -1    /* Invalid value for `ai_flags' field.  */
+# define EAI_NONAME       -2    /* NAME or SERVICE is unknown.  */
+# define EAI_AGAIN        -3    /* Temporary failure in name resolution.  */
+# define EAI_FAIL         -4    /* Non-recoverable failure in name res.  */
+# define EAI_NODATA       -5    /* No address associated with NAME.  */
+# define EAI_FAMILY       -6    /* `ai_family' not supported.  */
+# define EAI_SOCKTYPE     -7    /* `ai_socktype' not supported.  */
+# define EAI_SERVICE      -8    /* SERVICE not supported for `ai_socktype'.  */
+# define EAI_ADDRFAMILY   -9    /* Address family for NAME not supported.  */
+# define EAI_MEMORY       -10   /* Memory allocation failure.  */
+# define EAI_SYSTEM       -11   /* System error returned in `errno'.  */
+# define EAI_OVERFLOW     -12   /* Argument buffer overflow.  */
+# ifdef __USE_GNU
+#  define EAI_INPROGRESS  -100  /* Processing request in progress.  */
+#  define EAI_CANCELED    -101  /* Request canceled.  */
+#  define EAI_NOTCANCELED -102  /* Request not canceled.  */
+#  define EAI_ALLDONE     -103  /* All requests done.  */
+#  define EAI_INTR        -104  /* Interrupted by a signal.  */
+#  define EAI_IDN_ENCODE  -105  /* IDN encoding failed.  */
+# endif
 
 /*
  * Flag values for getaddrinfo()
@@ -179,6 +190,7 @@ struct addrinfo {
 #define	AI_PASSIVE	0x00000001 /* get address to use bind() */
 #define	AI_CANONNAME	0x00000002 /* fill ai_canonname */
 #define	AI_NUMERICHOST	0x00000004 /* prevent name resolution */
+#define AI_NUMERICSERV  0x00000008 /* don't use name resolution. */
 /* valid flags for addrinfo */
 #define AI_MASK \
     (AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_ADDRCONFIG)
@@ -219,14 +231,14 @@ void		endnetgrent(void);
 void		endprotoent(void);
 void		endservent(void);
 void		freehostent(struct hostent *);
-struct hostent	*gethostbyaddr(const char *, int, int);
+struct hostent	*gethostbyaddr(const void *, socklen_t, int);
 struct hostent	*gethostbyname(const char *);
 struct hostent	*gethostbyname2(const char *, int);
 struct hostent	*gethostent(void);
 int             gethostent_r(struct hostent *, char *, int, int *, FILE **);
 struct hostent	*getipnodebyaddr(const void *, size_t, int, int *);
 struct hostent	*getipnodebyname(const char *, int, int, int *);
-struct netent	*getnetbyaddr(unsigned long, int);
+struct netent	*getnetbyaddr(uint32_t, int);
 struct netent	*getnetbyname(const char *);
 struct netent	*getnetent(void);
 int		getnetgrent(char **, char **, char **);
@@ -247,10 +259,10 @@ void		setprotoent(int);
 int		getaddrinfo(const char *, const char *,
 			    const struct addrinfo *, struct addrinfo **);
 int		getnameinfo(const struct sockaddr *, socklen_t, char *,
-			    size_t, char *, size_t, int);
+			    socklen_t, char *, socklen_t, unsigned int);
 void		freeaddrinfo(struct addrinfo *);
 char		*gai_strerror(int);
-void		setnetgrent(const char *);
+int		setnetgrent(const char *);
 void		setservent(int);
 
 /*

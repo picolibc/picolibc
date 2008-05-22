@@ -47,11 +47,22 @@
  * Definitions for byte order, according to byte significance from low
  * address to high.
  */
-#define LITTLE_ENDIAN   1234    /* LSB first: i386, vax */
-#define BIG_ENDIAN      4321    /* MSB first: 68000, ibm, net */
-#define PDP_ENDIAN      3412    /* LSB first in word, MSW first in long */
 
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN   1234    /* LSB first: i386, vax */
+#endif
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN      4321    /* MSB first: 68000, ibm, net */
+#endif
+
+#ifndef PDP_ENDIAN
+#define PDP_ENDIAN      3412    /* LSB first in word, MSW first in long */
+#endif
+
+#ifndef BYTE_ORDER
 #define BYTE_ORDER      LITTLE_ENDIAN
+#endif
 
 #ifndef KERNEL
 #include <sys/cdefs.h>

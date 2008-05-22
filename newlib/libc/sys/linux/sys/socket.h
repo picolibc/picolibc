@@ -120,50 +120,69 @@ struct accept_filter_arg {
  */
 #define	SOL_SOCKET	0xffff		/* options for socket level */
 
-/*
- * Address families.
- */
-#define	AF_UNSPEC	0		/* unspecified */
-#define	AF_LOCAL	1		/* local to host (pipes, portals) */
-#define	AF_UNIX		AF_LOCAL	/* backward compatibility */
-#define	AF_INET		2		/* internetwork: UDP, TCP, etc. */
-#define	AF_IMPLINK	3		/* arpanet imp addresses */
-#define	AF_PUP		4		/* pup protocols: e.g. BSP */
-#define	AF_CHAOS	5		/* mit CHAOS protocols */
-#define	AF_NS		6		/* XEROX NS protocols */
-#define	AF_ISO		7		/* ISO protocols */
-#define	AF_OSI		AF_ISO
-#define	AF_ECMA		8		/* European computer manufacturers */
-#define	AF_DATAKIT	9		/* datakit protocols */
-#define	AF_CCITT	10		/* CCITT protocols, X.25 etc */
-#define	AF_SNA		11		/* IBM SNA */
-#define AF_DECnet	12		/* DECnet */
-#define AF_DLI		13		/* DEC Direct data link interface */
-#define AF_LAT		14		/* LAT */
-#define	AF_HYLINK	15		/* NSC Hyperchannel */
-#define	AF_APPLETALK	16		/* Apple Talk */
-#define	AF_ROUTE	17		/* Internal Routing Protocol */
-#define	AF_LINK		18		/* Link layer interface */
-#define	pseudo_AF_XTP	19		/* eXpress Transfer Protocol (no AF) */
-#define	AF_COIP		20		/* connection-oriented IP, aka ST II */
-#define	AF_CNT		21		/* Computer Network Technology */
-#define pseudo_AF_RTIP	22		/* Help Identify RTIP packets */
-#define	AF_IPX		23		/* Novell Internet Protocol */
-#define	AF_SIP		24		/* Simple Internet Protocol */
-#define	pseudo_AF_PIP	25		/* Help Identify PIP packets */
-#define	AF_ISDN		26		/* Integrated Services Digital Network*/
-#define	AF_E164		AF_ISDN		/* CCITT E.164 recommendation */
-#define	pseudo_AF_KEY	27		/* Internal key-management function */
-#define	AF_INET6	28		/* IPv6 */
-#define	AF_NATM		29		/* native ATM access */
-#define	AF_ATM		30		/* ATM */
-#define pseudo_AF_HDRCMPLT 31		/* Used by BPF to not rewrite headers
-					 * in interface output routine
-					 */
-#define	AF_NETGRAPH	32		/* Netgraph sockets */
-#define	AF_SLOW		33		/* 802.3ad slow protocol */
-#define	AF_SCLUSTER	34		/* Sitara cluster protocol */
-#define	AF_MAX		35
+/* Protocol families.  */
+#define	PF_UNSPEC	0	/* Unspecified.  */
+#define	PF_LOCAL	1	/* Local to host (pipes and file-domain).  */
+#define	PF_UNIX		PF_LOCAL /* Old BSD name for PF_LOCAL.  */
+#define	PF_FILE		PF_LOCAL /* Another non-standard name for PF_LOCAL.  */
+#define	PF_INET		2	/* IP protocol family.  */
+#define	PF_AX25		3	/* Amateur Radio AX.25.  */
+#define	PF_IPX		4	/* Novell Internet Protocol.  */
+#define	PF_APPLETALK	5	/* Appletalk DDP.  */
+#define	PF_NETROM	6	/* Amateur radio NetROM.  */
+#define	PF_BRIDGE	7	/* Multiprotocol bridge.  */
+#define	PF_ATMPVC	8	/* ATM PVCs.  */
+#define	PF_X25		9	/* Reserved for X.25 project.  */
+#define	PF_INET6	10	/* IP version 6.  */
+#define	PF_ROSE		11	/* Amateur Radio X.25 PLP.  */
+#define	PF_DECnet	12	/* Reserved for DECnet project.  */
+#define	PF_NETBEUI	13	/* Reserved for 802.2LLC project.  */
+#define	PF_SECURITY	14	/* Security callback pseudo AF.  */
+#define	PF_KEY		15	/* PF_KEY key management API.  */
+#define	PF_NETLINK	16
+#define	PF_ROUTE	PF_NETLINK /* Alias to emulate 4.4BSD.  */
+#define	PF_PACKET	17	/* Packet family.  */
+#define	PF_ASH		18	/* Ash.  */
+#define	PF_ECONET	19	/* Acorn Econet.  */
+#define	PF_ATMSVC	20	/* ATM SVCs.  */
+#define	PF_SNA		22	/* Linux SNA Project */
+#define	PF_IRDA		23	/* IRDA sockets.  */
+#define	PF_PPPOX	24	/* PPPoX sockets.  */
+#define	PF_WANPIPE	25	/* Wanpipe API sockets.  */
+#define	PF_BLUETOOTH	31	/* Bluetooth sockets.  */
+#define	PF_MAX		32	/* For now..  */
+
+/* Address families.  */
+#define	AF_UNSPEC	PF_UNSPEC
+#define	AF_LOCAL	PF_LOCAL
+#define	AF_UNIX		PF_UNIX
+#define	AF_FILE		PF_FILE
+#define	AF_INET		PF_INET
+#define	AF_AX25		PF_AX25
+#define	AF_IPX		PF_IPX
+#define	AF_APPLETALK	PF_APPLETALK
+#define	AF_NETROM	PF_NETROM
+#define	AF_BRIDGE	PF_BRIDGE
+#define	AF_ATMPVC	PF_ATMPVC
+#define	AF_X25		PF_X25
+#define	AF_INET6	PF_INET6
+#define	AF_ROSE		PF_ROSE
+#define	AF_DECnet	PF_DECnet
+#define	AF_NETBEUI	PF_NETBEUI
+#define	AF_SECURITY	PF_SECURITY
+#define	AF_KEY		PF_KEY
+#define	AF_NETLINK	PF_NETLINK
+#define	AF_ROUTE	PF_ROUTE
+#define	AF_PACKET	PF_PACKET
+#define	AF_ASH		PF_ASH
+#define	AF_ECONET	PF_ECONET
+#define	AF_ATMSVC	PF_ATMSVC
+#define	AF_SNA		PF_SNA
+#define	AF_IRDA		PF_IRDA
+#define	AF_PPPOX	PF_PPPOX
+#define	AF_WANPIPE	PF_WANPIPE
+#define	AF_BLUETOOTH	PF_BLUETOOTH
+#define	AF_MAX		PF_MAX
 
 /*
  * Structure used by kernel to store most
@@ -200,48 +219,6 @@ struct sockaddr_storage {
 	int64_t		__ss_align;	/* force desired structure storage alignment */
 	char		__ss_pad2[_SS_PAD2SIZE];
 };
-
-/*
- * Protocol families, same as address families for now.
- */
-#define	PF_UNSPEC	AF_UNSPEC
-#define	PF_LOCAL	AF_LOCAL
-#define	PF_UNIX		PF_LOCAL	/* backward compatibility */
-#define	PF_INET		AF_INET
-#define	PF_IMPLINK	AF_IMPLINK
-#define	PF_PUP		AF_PUP
-#define	PF_CHAOS	AF_CHAOS
-#define	PF_NS		AF_NS
-#define	PF_ISO		AF_ISO
-#define	PF_OSI		AF_ISO
-#define	PF_ECMA		AF_ECMA
-#define	PF_DATAKIT	AF_DATAKIT
-#define	PF_CCITT	AF_CCITT
-#define	PF_SNA		AF_SNA
-#define PF_DECnet	AF_DECnet
-#define PF_DLI		AF_DLI
-#define PF_LAT		AF_LAT
-#define	PF_HYLINK	AF_HYLINK
-#define	PF_APPLETALK	AF_APPLETALK
-#define	PF_ROUTE	AF_ROUTE
-#define	PF_LINK		AF_LINK
-#define	PF_XTP		pseudo_AF_XTP	/* really just proto family, no AF */
-#define	PF_COIP		AF_COIP
-#define	PF_CNT		AF_CNT
-#define	PF_SIP		AF_SIP
-#define	PF_IPX		AF_IPX		/* same format as AF_NS */
-#define PF_RTIP		pseudo_AF_RTIP	/* same format as AF_INET */
-#define PF_PIP		pseudo_AF_PIP
-#define	PF_ISDN		AF_ISDN
-#define	PF_KEY		pseudo_AF_KEY
-#define	PF_INET6	AF_INET6
-#define	PF_NATM		AF_NATM
-#define	PF_ATM		AF_ATM
-#define	PF_NETGRAPH	AF_NETGRAPH
-#define	PF_SLOW		AF_SLOW
-#define PF_SCLUSTER	AF_SCLUSTER
-
-#define	PF_MAX		AF_MAX
 
 /*
  * Definitions for network related sysctl, CTL_NET.

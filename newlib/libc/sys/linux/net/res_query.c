@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1988, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,14 +10,10 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- * 	This product includes software developed by the University of
- * 	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,14 +29,14 @@
 
 /*
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
- * 
+ *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies, and that
  * the name of Digital Equipment Corporation not be used in advertising or
  * publicity pertaining to distribution of the document or software without
  * specific, written prior permission.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
@@ -52,7 +48,7 @@
  */
 
 /*
- * Portions Copyright (c) 1996 by Internet Software Consortium.
+ * Portions Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -69,11 +65,9 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_query.c	8.1 (Berkeley) 6/4/93";
-static char orig_rcsid = "From: Id: res_query.c,v 8.14 1997/06/09 17:47:05 halley Exp $";
+static const char sccsid[] = "@(#)res_query.c	8.1 (Berkeley) 6/4/93";
+static const char rcsid[] = "$BINDId: res_query.c,v 8.20 2000/02/29 05:39:12 vixie Exp $";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-#include <sys/types.h>
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -87,14 +81,23 @@ static char orig_rcsid = "From: Id: res_query.c,v 8.14 1997/06/09 17:47:05 halle
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "libc-symbols.h"
 
-#include "res_config.h"
+/* Options.  Leave them on. */
+/* #undef DEBUG */
 
-#if PACKETSZ > 1024
+#if PACKETSZ > 65536
 #define MAXPACKET	PACKETSZ
 #else
-#define MAXPACKET	1024
+#define MAXPACKET	65536
 #endif
+
+#define QUERYSIZE	(HFIXEDSZ + QFIXEDSZ + MAXCDNAME + 1)
+
+static int
+__libc_res_nquerydomain(res_state statp, const char *name, const char *domain,
+			int class, int type, u_char *answer, int anslen,
+			u_char **answerp);
 
 /*
  * Formulate a normal query, send, and await answer.
@@ -102,129 +105,166 @@ static char orig_rcsid = "From: Id: res_query.c,v 8.14 1997/06/09 17:47:05 halle
  * Perform preliminary check of answer, returning success only
  * if no error is indicated and the answer count is nonzero.
  * Return the size of the response on success, -1 on error.
- * Error number is left in h_errno.
+ * Error number is left in H_ERRNO.
  *
  * Caller must parse answer and determine whether it answers the question.
  */
 int
-res_query(name, class, type, answer, anslen)
-	const char *name;	/* domain name */
-	int class, type;	/* class and type of query */
-	u_char *answer;		/* buffer to put answer */
-	int anslen;		/* size of answer buffer */
+__libc_res_nquery(res_state statp,
+		  const char *name,	/* domain name */
+		  int class, int type,	/* class and type of query */
+		  u_char *answer,	/* buffer to put answer */
+		  int anslen,		/* size of answer buffer */
+		  u_char **answerp)	/* if buffer needs to be enlarged */
 {
-	u_char buf[MAXPACKET];
+	u_char *buf;
 	HEADER *hp = (HEADER *) answer;
-	int n;
+	int n, use_malloc = 0;
 
 	hp->rcode = NOERROR;	/* default */
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
-		h_errno = NETDB_INTERNAL;
-		return (-1);
-	}
+	buf = alloca (QUERYSIZE);
+
 #ifdef DEBUG
-	if (_res.options & RES_DEBUG)
+	if (statp->options & RES_DEBUG)
 		printf(";; res_query(%s, %d, %d)\n", name, class, type);
 #endif
 
-	n = res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
-			buf, sizeof(buf));
-	if (n > 0 && (_res.options & RES_USE_EDNS0) != 0)
-		n = res_opt(n, buf, sizeof(buf), anslen);
-	if (n <= 0) {
+	n = res_nmkquery(statp, QUERY, name, class, type, NULL, 0, NULL,
+			 buf, QUERYSIZE);
+	if (__builtin_expect (n <= 0, 0)) {
+		/* Retry just in case res_nmkquery failed because of too
+		   short buffer.  Shouldn't happen.  */
+		buf = malloc (MAXPACKET);
+		if (buf != NULL) {
+			use_malloc = 1;
+			n = res_nmkquery(statp, QUERY, name, class, type, NULL,
+					 0, NULL, buf, MAXPACKET);
+		}
+	}
+	if (__builtin_expect (n <= 0, 0)) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (statp->options & RES_DEBUG)
 			printf(";; res_query: mkquery failed\n");
 #endif
-		h_errno = NO_RECOVERY;
+		RES_SET_H_ERRNO(statp, NO_RECOVERY);
+		if (use_malloc)
+			free (buf);
 		return (n);
 	}
-	n = res_send(buf, n, answer, anslen);
+	n = __libc_res_nsend(statp, buf, n, answer, anslen, answerp);
+	if (use_malloc)
+		free (buf);
 	if (n < 0) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (statp->options & RES_DEBUG)
 			printf(";; res_query: send error\n");
 #endif
-		h_errno = TRY_AGAIN;
+		RES_SET_H_ERRNO(statp, TRY_AGAIN);
 		return (n);
 	}
 
 	if (hp->rcode != NOERROR || ntohs(hp->ancount) == 0) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (statp->options & RES_DEBUG)
 			printf(";; rcode = %d, ancount=%d\n", hp->rcode,
 			    ntohs(hp->ancount));
 #endif
 		switch (hp->rcode) {
 		case NXDOMAIN:
-			h_errno = HOST_NOT_FOUND;
+			RES_SET_H_ERRNO(statp, HOST_NOT_FOUND);
 			break;
 		case SERVFAIL:
-			h_errno = TRY_AGAIN;
+			RES_SET_H_ERRNO(statp, TRY_AGAIN);
 			break;
 		case NOERROR:
-			h_errno = NO_DATA;
+			RES_SET_H_ERRNO(statp, NO_DATA);
 			break;
 		case FORMERR:
 		case NOTIMP:
 		case REFUSED:
 		default:
-			h_errno = NO_RECOVERY;
+			RES_SET_H_ERRNO(statp, NO_RECOVERY);
 			break;
 		}
 		return (-1);
 	}
 	return (n);
 }
+libresolv_hidden_def (__libc_res_nquery)
+
+int
+res_nquery(res_state statp,
+	   const char *name,	/* domain name */
+	   int class, int type,	/* class and type of query */
+	   u_char *answer,	/* buffer to put answer */
+	   int anslen)		/* size of answer buffer */
+{
+	return __libc_res_nquery(statp, name, class, type, answer, anslen,
+				 NULL);
+}
+libresolv_hidden_def (res_nquery)
 
 /*
  * Formulate a normal query, send, and retrieve answer in supplied buffer.
  * Return the size of the response on success, -1 on error.
  * If enabled, implement search rules until answer or unrecoverable failure
- * is detected.  Error code, if any, is left in h_errno.
+ * is detected.  Error code, if any, is left in H_ERRNO.
  */
 int
-res_search(name, class, type, answer, anslen)
-	const char *name;	/* domain name */
-	int class, type;	/* class and type of query */
-	u_char *answer;		/* buffer to put answer */
-	int anslen;		/* size of answer */
+__libc_res_nsearch(res_state statp,
+	    const char *name,	/* domain name */
+	    int class, int type,	/* class and type of query */
+	    u_char *answer,	/* buffer to put answer */
+	    int anslen,		/* size of answer */
+	    u_char **answerp)
 {
 	const char *cp, * const *domain;
 	HEADER *hp = (HEADER *) answer;
+	char tmp[NS_MAXDNAME];
 	u_int dots;
 	int trailing_dot, ret, saved_herrno;
-	int got_nodata = 0, got_servfail = 0, tried_as_is = 0;
+	int got_nodata = 0, got_servfail = 0, root_on_list = 0;
+	int tried_as_is = 0;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
-		h_errno = NETDB_INTERNAL;
-		return (-1);
-	}
-	errno = 0;
-	h_errno = HOST_NOT_FOUND;	/* default, if we never query */
+	__set_errno (0);
+	RES_SET_H_ERRNO(statp, HOST_NOT_FOUND);  /* True if we never query. */
+
 	dots = 0;
-	for (cp = name; *cp; cp++)
+	for (cp = name; *cp != '\0'; cp++)
 		dots += (*cp == '.');
 	trailing_dot = 0;
 	if (cp > name && *--cp == '.')
 		trailing_dot++;
 
-	/* If there aren't any dots, it could be a user-level alias */
-	if (!dots && (cp = hostalias(name)) != NULL)
-		return (res_query(cp, class, type, answer, anslen));
+	/* If there aren't any dots, it could be a user-level alias. */
+	if (!dots && (cp = res_hostalias(statp, name, tmp, sizeof tmp))!= NULL)
+		return (__libc_res_nquery(statp, cp, class, type, answer,
+					  anslen, answerp));
+
+#ifdef DEBUG
+	if (statp->options & RES_DEBUG)
+		printf("dots=%d, statp->ndots=%d, trailing_dot=%d, name=%s\n",
+		       (int)dots,(int)statp->ndots,(int)trailing_dot,name);
+#endif
 
 	/*
-	 * If there are dots in the name already, let's just give it a try
-	 * 'as is'.  The threshold can be set with the "ndots" option.
+	 * If there are enough dots in the name, let's just give it a
+	 * try 'as is'. The threshold can be set with the "ndots" option.
+	 * Also, query 'as is', if there is a trailing dot in the name.
 	 */
 	saved_herrno = -1;
-	if (dots >= _res.ndots) {
-		ret = res_querydomain(name, NULL, class, type, answer, anslen);
-		if (ret > 0)
+	if (dots >= statp->ndots || trailing_dot) {
+		ret = __libc_res_nquerydomain(statp, name, NULL, class, type,
+					      answer, anslen, answerp);
+		if (ret > 0 || trailing_dot)
 			return (ret);
 		saved_herrno = h_errno;
 		tried_as_is++;
+		if (answerp && *answerp != answer) {
+			answer = *answerp;
+			anslen = MAXPACKET;
+		}
 	}
 
 	/*
@@ -233,18 +273,28 @@ res_search(name, class, type, answer, anslen)
 	 *	- there is at least one dot, there is no trailing dot,
 	 *	  and RES_DNSRCH is set.
 	 */
-	if ((!dots && (_res.options & RES_DEFNAMES)) ||
-	    (dots && !trailing_dot && (_res.options & RES_DNSRCH))) {
+	if ((!dots && (statp->options & RES_DEFNAMES) != 0) ||
+	    (dots && !trailing_dot && (statp->options & RES_DNSRCH) != 0)) {
 		int done = 0;
 
-		for (domain = (const char * const *)_res.dnsrch;
+		for (domain = (const char * const *)statp->dnsrch;
 		     *domain && !done;
 		     domain++) {
 
-			ret = res_querydomain(name, *domain, class, type,
-					      answer, anslen);
+			if (domain[0][0] == '\0' ||
+			    (domain[0][0] == '.' && domain[0][1] == '\0'))
+				root_on_list++;
+
+			ret = __libc_res_nquerydomain(statp, name, *domain,
+						      class, type,
+						      answer, anslen, answerp);
 			if (ret > 0)
 				return (ret);
+
+			if (answerp && *answerp != answer) {
+				answer = *answerp;
+				anslen = MAXPACKET;
+			}
 
 			/*
 			 * If no server present, give up.
@@ -260,11 +310,11 @@ res_search(name, class, type, answer, anslen)
 			 * fully-qualified.
 			 */
 			if (errno == ECONNREFUSED) {
-				h_errno = TRY_AGAIN;
+				RES_SET_H_ERRNO(statp, TRY_AGAIN);
 				return (-1);
 			}
 
-			switch (h_errno) {
+			switch (statp->res_h_errno) {
 			case NO_DATA:
 				got_nodata++;
 				/* FALLTHROUGH */
@@ -286,60 +336,72 @@ res_search(name, class, type, answer, anslen)
 			/* if we got here for some reason other than DNSRCH,
 			 * we only wanted one iteration of the loop, so stop.
 			 */
-			if (!(_res.options & RES_DNSRCH))
+			if ((statp->options & RES_DNSRCH) == 0)
 				done++;
 		}
 	}
 
 	/*
-	 * If we have not already tried the name "as is", do that now.
-	 * note that we do this regardless of how many dots were in the
-	 * name or whether it ends with a dot unless NOTLDQUERY is set.
+	 * If the name has any dots at all, and no earlier 'as-is' query
+	 * for the name, and "." is not on the search list, then try an as-is
+	 * query now.
 	 */
-	if (!tried_as_is && (dots || !(_res.options & RES_NOTLDQUERY))) {
-		ret = res_querydomain(name, NULL, class, type, answer, anslen);
+	if (dots && !(tried_as_is || root_on_list)) {
+		ret = __libc_res_nquerydomain(statp, name, NULL, class, type,
+					      answer, anslen, answerp);
 		if (ret > 0)
 			return (ret);
 	}
 
 	/* if we got here, we didn't satisfy the search.
-	 * if we did an initial full query, return that query's h_errno
+	 * if we did an initial full query, return that query's H_ERRNO
 	 * (note that we wouldn't be here if that query had succeeded).
 	 * else if we ever got a nodata, send that back as the reason.
-	 * else send back meaningless h_errno, that being the one from
+	 * else send back meaningless H_ERRNO, that being the one from
 	 * the last DNSRCH we did.
 	 */
 	if (saved_herrno != -1)
-		h_errno = saved_herrno;
+		RES_SET_H_ERRNO(statp, saved_herrno);
 	else if (got_nodata)
-		h_errno = NO_DATA;
+		RES_SET_H_ERRNO(statp, NO_DATA);
 	else if (got_servfail)
-		h_errno = TRY_AGAIN;
+		RES_SET_H_ERRNO(statp, TRY_AGAIN);
 	return (-1);
 }
+libresolv_hidden_def (__libc_res_nsearch)
+
+int
+res_nsearch(res_state statp,
+	    const char *name,	/* domain name */
+	    int class, int type,	/* class and type of query */
+	    u_char *answer,	/* buffer to put answer */
+	    int anslen)		/* size of answer */
+{
+	return __libc_res_nsearch(statp, name, class, type, answer,
+				  anslen, NULL);
+}
+libresolv_hidden_def (res_nsearch)
 
 /*
  * Perform a call on res_query on the concatenation of name and domain,
  * removing a trailing dot from name if domain is NULL.
  */
-int
-res_querydomain(name, domain, class, type, answer, anslen)
-	const char *name, *domain;
-	int class, type;	/* class and type of query */
-	u_char *answer;		/* buffer to put answer */
-	int anslen;		/* size of answer */
+static int
+__libc_res_nquerydomain(res_state statp,
+	    const char *name,
+	    const char *domain,
+	    int class, int type,	/* class and type of query */
+	    u_char *answer,		/* buffer to put answer */
+	    int anslen,			/* size of answer */
+	    u_char **answerp)
 {
 	char nbuf[MAXDNAME];
 	const char *longname = nbuf;
 	int n, d;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
-		h_errno = NETDB_INTERNAL;
-		return (-1);
-	}
 #ifdef DEBUG
-	if (_res.options & RES_DEBUG)
-		printf(";; res_querydomain(%s, %s, %d, %d)\n",
+	if (statp->options & RES_DEBUG)
+		printf(";; res_nquerydomain(%s, %s, %d, %d)\n",
 		       name, domain?domain:"<Nil>", class, type);
 #endif
 	if (domain == NULL) {
@@ -349,7 +411,7 @@ res_querydomain(name, domain, class, type, answer, anslen)
 		 */
 		n = strlen(name);
 		if (n >= MAXDNAME) {
-			h_errno = NO_RECOVERY;
+			RES_SET_H_ERRNO(statp, NO_RECOVERY);
 			return (-1);
 		}
 		n--;
@@ -362,27 +424,35 @@ res_querydomain(name, domain, class, type, answer, anslen)
 		n = strlen(name);
 		d = strlen(domain);
 		if (n + d + 1 >= MAXDNAME) {
-			h_errno = NO_RECOVERY;
+			RES_SET_H_ERRNO(statp, NO_RECOVERY);
 			return (-1);
 		}
 		sprintf(nbuf, "%s.%s", name, domain);
 	}
-	return (res_query(longname, class, type, answer, anslen));
+	return (__libc_res_nquery(statp, longname, class, type, answer,
+				  anslen, answerp));
 }
 
-const char *
-hostalias(name)
-	const char *name;
+int
+res_nquerydomain(res_state statp,
+	    const char *name,
+	    const char *domain,
+	    int class, int type,	/* class and type of query */
+	    u_char *answer,		/* buffer to put answer */
+	    int anslen)		/* size of answer */
 {
-	char *cp1, *cp2;
-	FILE *fp;
-	char *file;
-	char buf[BUFSIZ];
-	static char abuf[MAXDNAME];
+	return __libc_res_nquerydomain(statp, name, domain, class, type,
+				       answer, anslen, NULL);
+}
+libresolv_hidden_def (res_nquerydomain)
 
-	if (_res.options & RES_NOALIASES)
-		return (NULL);
-	if (issetugid())
+const char *
+res_hostalias(const res_state statp, const char *name, char *dst, size_t siz) {
+	char *file, *cp1, *cp2;
+	char buf[BUFSIZ];
+	FILE *fp;
+
+	if (statp->options & RES_NOALIASES)
 		return (NULL);
 	file = getenv("HOSTALIASES");
 	if (file == NULL || (fp = fopen(file, "r")) == NULL)
@@ -390,35 +460,26 @@ hostalias(name)
 	setbuf(fp, NULL);
 	buf[sizeof(buf) - 1] = '\0';
 	while (fgets(buf, sizeof(buf), fp)) {
-		for (cp1 = buf; *cp1 && !isspace((unsigned char)*cp1); ++cp1)
+		for (cp1 = buf; *cp1 && !isspace(*cp1); ++cp1)
 			;
 		if (!*cp1)
 			break;
 		*cp1 = '\0';
-		if (!strcasecmp(buf, name)) {
-			while (isspace((unsigned char)*++cp1))
+		if (ns_samename(buf, name) == 1) {
+			while (isspace(*++cp1))
 				;
 			if (!*cp1)
 				break;
-			for (cp2 = cp1 + 1; *cp2 && !isspace((unsigned char)*cp2); ++cp2)
+			for (cp2 = cp1 + 1; *cp2 && !isspace(*cp2); ++cp2)
 				;
-			abuf[sizeof(abuf) - 1] = *cp2 = '\0';
-			strncpy(abuf, cp1, sizeof(abuf) - 1);
+			*cp2 = '\0';
+			strncpy(dst, cp1, siz - 1);
+			dst[siz - 1] = '\0';
 			fclose(fp);
-			return (abuf);
+			return (dst);
 		}
 	}
 	fclose(fp);
 	return (NULL);
 }
-
-/*
- * Weak aliases for applications that use certain private entry points,
- * and fail to include <resolv.h>.
- */
-#undef res_query
-__weak_reference(__res_query, res_query);
-#undef res_search
-__weak_reference(__res_search, res_search);
-#undef res_querydomain
-__weak_reference(__res_querydomain, res_querydomain);
+libresolv_hidden_def (res_hostalias)

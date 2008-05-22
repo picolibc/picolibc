@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1985, 1993
  *    The Regents of the University of California.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,14 +10,10 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- * 	This product includes software developed by the University of
- * 	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,14 +29,14 @@
 
 /*
  * Portions Copyright (c) 1993 by Digital Equipment Corporation.
- * 
+ *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies, and that
  * the name of Digital Equipment Corporation not be used in advertising or
  * publicity pertaining to distribution of the document or software without
  * specific, written prior permission.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
  * WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
@@ -52,7 +48,7 @@
  */
 
 /*
- * Portions Copyright (c) 1996 by Internet Software Consortium.
+ * Portions Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -69,12 +65,9 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
-static char orig_rcsid[] = "From: Id: res_mkquery.c,v 8.9 1997/04/24 22:22:36 vixie Exp $";
+static const char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
+static const char rcsid[] = "$BINDId: res_mkquery.c,v 8.12 1999/10/13 16:39:40 vixie Exp $";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <machine/endian.h>
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -84,37 +77,43 @@ static char orig_rcsid[] = "From: Id: res_mkquery.c,v 8.9 1997/04/24 22:22:36 vi
 #include <resolv.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include "local.h"
 
-#include "res_config.h"
+/* Options.  Leave them on. */
+/* #define DEBUG */
+
+#ifdef _LIBC
+# include <hp-timing.h>
+# if HP_TIMING_AVAIL
+#  define RANDOM_BITS(Var) { uint64_t v64; HP_TIMING_NOW (v64); Var = v64; }
+# endif
+#endif
 
 /*
  * Form all types of queries.
  * Returns the size of the result or -1.
  */
 int
-res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
-	int op;			/* opcode of query */
-	const char *dname;	/* domain name */
-	int class, type;	/* class and type of query */
-	const u_char *data;	/* resource record data */
-	int datalen;		/* length of data */
-	const u_char *newrr_in;	/* new rr for modify or append */
-	u_char *buf;		/* buffer to put query */
-	int buflen;		/* size of buffer */
+res_nmkquery(res_state statp,
+	     int op,			/* opcode of query */
+	     const char *dname,		/* domain name */
+	     int class, int type,	/* class and type of query */
+	     const u_char *data,	/* resource record data */
+	     int datalen,		/* length of data */
+	     const u_char *newrr_in,	/* new rr for modify or append */
+	     u_char *buf,		/* buffer to put query */
+	     int buflen)		/* size of buffer */
 {
-	HEADER *hp;
-	u_char *cp;
-	int n;
+	register HEADER *hp;
+	register u_char *cp;
+	register int n;
 	u_char *dnptrs[20], **dpp, **lastdnptr;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
-		h_errno = NETDB_INTERNAL;
-		return (-1);
-	}
 #ifdef DEBUG
-	if (_res.options & RES_DEBUG)
-		printf(";; res_mkquery(%d, %s, %d, %d)\n",
-		       op, dname, class, type);
+	if (statp->options & RES_DEBUG)
+		printf(";; res_nmkquery(%s, %s, %s, %s)\n",
+		       _res_opcodes[op], dname, p_class(class), p_type(type));
 #endif
 	/*
 	 * Initialize header fields.
@@ -123,9 +122,30 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 		return (-1);
 	memset(buf, 0, HFIXEDSZ);
 	hp = (HEADER *) buf;
-	hp->id = htons(++_res.id);
+	/* We randomize the IDs every time.  The old code just
+	   incremented by one after the initial randomization which
+	   still predictable if the application does multiple
+	   requests.  */
+#if 0
+	hp->id = htons(++statp->id);
+#else
+	hp->id = htons(statp->id);
+	int randombits;
+	do
+	  {
+#ifdef RANDOM_BITS
+	    RANDOM_BITS (randombits);
+#else
+	    struct timeval tv;
+	    gettimeofday (&tv, NULL);
+	    randombits = (tv.tv_sec << 8) ^ tv.tv_usec;
+#endif
+	  }
+	while ((randombits & 0xffff) == 0);
+	statp->id = (statp->id + randombits) & 0xffff;
+#endif
 	hp->opcode = op;
-	hp->rd = (_res.options & RES_RECURSE) != 0;
+	hp->rd = (statp->options & RES_RECURSE) != 0;
 	hp->rcode = NOERROR;
 	cp = buf + HFIXEDSZ;
 	buflen -= HFIXEDSZ;
@@ -199,47 +219,4 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 	}
 	return (cp - buf);
 }
-
-/*
- * Weak aliases for applications that use certain private entry points,
- * and fail to include <resolv.h>.
- */
-#undef res_mkquery
-__weak_reference(__res_mkquery, res_mkquery);
-
-/* attach OPT pseudo-RR, as documented in RFC2671 (EDNS0). */
-int
-res_opt(n0, buf, buflen, anslen)
-	int n0;
-	u_char *buf;		/* buffer to put query */
-	int buflen;		/* size of buffer */
-	int anslen;		/* answer buffer length */
-{
-	HEADER *hp;
-	u_char *cp;
-
-	hp = (HEADER *) buf;
-	cp = buf + n0;
-	buflen -= n0;
-
-	if (buflen < 1 + RRFIXEDSZ)
-		return -1;
-
-	*cp++ = 0;	/* "." */
-	buflen--;
-
-	__putshort(T_OPT, cp);	/* TYPE */
-	cp += INT16SZ;
-	__putshort(anslen & 0xffff, cp);	/* CLASS = UDP payload size */
-	cp += INT16SZ;
-	*cp++ = NOERROR;	/* extended RCODE */
-	*cp++ = 0;		/* EDNS version */
-	__putshort(0, cp);	/* MBZ */
-	cp += INT16SZ;
-	__putshort(0, cp);	/* RDLEN */
-	cp += INT16SZ;
-	hp->arcount = htons(ntohs(hp->arcount) + 1);
-	buflen -= RRFIXEDSZ;
-
-	return cp - buf;
-}
+libresolv_hidden_def (res_nmkquery)

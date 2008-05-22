@@ -2,28 +2,38 @@
 
 AUTOMAKE_OPTIONS = cygnus
 
-INCLUDES = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES = -I$(srcdir)/../include -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = addr2ascii.c ascii2addr.c base64.c bindresvport.c ether_addr.c getaddrinfo.c \
-	gethostbydns.c gethostbyht.c gethostbynis.c gethostnamadr.c \
-	getifaddrs.c getnameinfo.c \
-	getnetbydns.c getnetbyht.c getnetbynis.c getnetnamadr.c \
-	getproto.c getprotoent.c getprotoname.c getservbyname.c \
-	getservbyport.c getservent.c herror.c hesiod.c inet_addr.c \
-	ifname.c inet_lnaof.c \
-	inet_makeaddr.c inet_net_ntop.c inet_net_pton.c inet_neta.c \
-	inet_netof.c inet_network.c inet_ntoa.c inet_ntop.c \
-	inet_pton.c innetgr-stub.c ip6opt.c issetugid-stub.c \
-        linkaddr.c map_v4v6.c namespace.h un-namespace.h \
-	name6.c ns_addr.c \
-	ns_name.c ns_netint.c \
-	ns_ntoa.c ns_parse.c ns_print.c ns_ttl.c \
-	nsdispatch.c nslexer.c nsparser.c nsparser.h \
-	nsap_addr.c res_comp.c res_data.c res_debug.c \
-	res_init.c res_mkquery.c res_mkupdate.c res_query.c \
-	res_send.c res_update.c rthdr.c vars.c
+GENERAL_SOURCES = addr2ascii.c ascii2addr.c alias-lookup.c \
+	base64.c check_pf.c digits_dots.c \
+	ether_aton.c ether_aton_r.c ether_hton.c \
+	ether_line.c ether_ntoa.c ether_ntoa_r.c ether_ntoh.c \
+	ethers-lookup.c getaddrinfo.c getaliasent.c \
+	getaliasent_r.c getaliasname.c getaliasname_r.c gethstbyad.c \
+	gethstbyad_r.c gethstbynm2.c gethstbynm2_r.c gethstbynm.c \
+	gethstbynm_r.c gethstent.c gethstent_r.c getnameinfo.c getnetbyad.c \
+	getnetbyad_r.c getnetbynm.c getnetbynm_r.c getnetent.c getnetent_r.c \
+	getnetgrent.c getnetgrent_r.c getnssent.c getnssent_r.c getproto.c \
+	getproto_r.c getprtent.c \
+	getprtent_r.c getprtname.c getprtname_r.c getrpcbyname.c \
+	getrpcbyname_r.c getrpcbynumber.c getrpcbynumber_r.c getrpcent.c \
+	getrpcent_r.c getservent.c getservent_r.c getsrvbynm.c getsrvbynm_r.c \
+	getsrvbypt.c getsrvbypt_r.c grp-lookup.c \
+	herrno.c hosts-lookup.c ifreq.c \
+	in6_addr.c inet6_option.c inet_addr.c \
+	inet_lnaof.c inet_mkadr.c inet_net.c inet_neta.c inet_netof.c \
+	inet_net_ntop.c inet_net_pton.c inet_ntoa.c inet_ntop.c \
+	inet_pton.c issetugid-stub.c key-lookup.c netgrp-lookup.c \
+	network-lookup.c nsswitch.c \
+	ns_name.c ns_netint.c ns_parse.c ns_print.c ns_samedomain.c \
+	ns_ttl.c nsap_addr.c proto-lookup.c opensock.c pwd-lookup.c recv.c \
+	res_comp.c res_data.c res_debug.c res_hconf.c res_init.c \
+	res_libc.c res_mkquery.c \
+	res_query.c res_send.c \
+	rexec.c rpc-lookup.c ruserpass.c send.c service-lookup.c spwd-lookup.c 
 
 ELIX_4_SOURCES = \
+	ifname.c \
 	rcmd.$(oext) \
 	rcmdsh.$(oext)
 

@@ -40,8 +40,6 @@
 #include "collate.h"
 #include "setlocale.h"
 
-#include "libc_private.h"
-
 extern char *_PathLocale;
 int __collate_load_error = 1;
 int __collate_substitute_nontrivial;

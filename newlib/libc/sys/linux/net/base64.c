@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 1998 by Internet Software Consortium.
+ * Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -40,9 +40,10 @@
  * IF IBM IS APPRISED OF THE POSSIBILITY OF SUCH DAMAGES.
  */
 
-#include <sys/cdefs.h>
+#if !defined(LINT) && !defined(CODECENTER)
+static const char rcsid[] = "$BINDId: base64.c,v 8.7 1999/10/13 16:39:33 vixie Exp $";
+#endif /* not lint */
 
-#include <sys/types.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/socket.h>
@@ -56,6 +57,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "libc-symbols.h"
 
 #define Assert(Cond) if (!(Cond)) abort()
 
@@ -111,9 +114,9 @@ static const char Pad64 = '=';
    end of the data is performed using the '=' character.
 
    Since all base64 input is an integral number of octets, only the
-         -------------------------------------------------                       
+         -------------------------------------------------
    following cases can arise:
-   
+
        (1) the final quantum of encoding input is an integral
            multiple of 24 bits; here, the final unit of encoded
 	   output will be an integral multiple of 4 characters
@@ -155,14 +158,14 @@ b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize) {
 		target[datalength++] = Base64[output[2]];
 		target[datalength++] = Base64[output[3]];
 	}
-    
+
 	/* Now we worry about padding. */
 	if (0 != srclength) {
 		/* Get what's left. */
 		input[0] = input[1] = input[2] = '\0';
 		for (i = 0; i < srclength; i++)
 			input[i] = *src++;
-	
+
 		output[0] = input[0] >> 2;
 		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
 		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
@@ -185,6 +188,7 @@ b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize) {
 	target[datalength] = '\0';	/* Returned value doesn't count \0. */
 	return (datalength);
 }
+libresolv_hidden_def (b64_ntop)
 
 /* skips all whitespace anywhere.
    converts characters, four at a time, starting at (or after)
@@ -205,7 +209,7 @@ b64_pton(src, target, targsize)
 	tarindex = 0;
 
 	while ((ch = *src++) != '\0') {
-		if (isspace((unsigned char)ch))        /* Skip whitespace anywhere. */
+		if (isspace(ch))	/* Skip whitespace anywhere. */
 			continue;
 
 		if (ch == Pad64)
@@ -275,7 +279,7 @@ b64_pton(src, target, targsize)
 		case 2:		/* Valid, means one byte of info */
 			/* Skip any number of spaces. */
 			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace((unsigned char)ch))
+				if (!isspace(ch))
 					break;
 			/* Make sure there is another trailing = sign. */
 			if (ch != Pad64)
@@ -290,7 +294,7 @@ b64_pton(src, target, targsize)
 			 * whitespace after it?
 			 */
 			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace((unsigned char)ch))
+				if (!isspace(ch))
 					return (-1);
 
 			/*

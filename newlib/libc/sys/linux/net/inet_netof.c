@@ -10,10 +10,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -34,13 +30,11 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)inet_netof.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <machine/endian.h>
 
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "libc-symbols.h"
 
 /*
  * Return the network number from an internet
@@ -50,7 +44,7 @@ in_addr_t
 inet_netof(in)
 	struct in_addr in;
 {
-	in_addr_t i = ntohl(in.s_addr);
+	register u_int32_t i = ntohl(in.s_addr);
 
 	if (IN_CLASSA(i))
 		return (((i)&IN_CLASSA_NET) >> IN_CLASSA_NSHIFT);
@@ -59,10 +53,4 @@ inet_netof(in)
 	else
 		return (((i)&IN_CLASSC_NET) >> IN_CLASSC_NSHIFT);
 }
-
-/*
- * Weak aliases for applications that use certain private entry points,
- * and fail to include <arpa/inet.h>.
- */
-#undef inet_netof
-__weak_reference(__inet_netof, inet_netof);
+libc_hidden_def (inet_netof)

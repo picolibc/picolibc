@@ -48,6 +48,7 @@ gid_t   _EXFUN(getegid, (void ));
 uid_t   _EXFUN(geteuid, (void ));
 gid_t   _EXFUN(getgid, (void ));
 int     _EXFUN(getgroups, (int __gidsetsize, gid_t __grouplist[] ));
+int 	_EXFUN(__gethostname, (char *__name, size_t __len));
 char    _EXFUN(*getlogin, (void ));
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
 int _EXFUN(getlogin_r, (char *name, size_t namesize) );

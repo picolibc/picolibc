@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996 by Internet Software Consortium.
+ * Copyright (c) 1996,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,16 +15,17 @@
  * SOFTWARE.
  */
 
-#include <sys/cdefs.h>
-#include <sys/types.h>
+#if !defined(_LIBC) && !defined(lint)
+static const char rcsid[] = "$BINDId: ns_netint.c,v 8.4 1999/10/13 16:39:35 vixie Exp $";
+#endif
 
 /* Import. */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-
-#include <netinet/in.h>
 #include <arpa/nameser.h>
+#include <resolv.h>
+#include "libc-symbols.h"
+
+/* Public. */
 
 u_int
 ns_get16(const u_char *src) {
@@ -33,6 +34,7 @@ ns_get16(const u_char *src) {
 	NS_GET16(dst, src);
 	return (dst);
 }
+libresolv_hidden_def (ns_get16)
 
 u_long
 ns_get32(const u_char *src) {
@@ -41,6 +43,7 @@ ns_get32(const u_char *src) {
 	NS_GET32(dst, src);
 	return (dst);
 }
+libresolv_hidden_def (ns_get32)
 
 void
 ns_put16(u_int src, u_char *dst) {

@@ -23,33 +23,6 @@
 #include <unistd.h>
 #include <libc-internal.h>
 
-static
-void *memmem (const void *a, size_t len1, const void *b, size_t len2)
-{
-  char *end, *start;
-  char *ptr1, *ptr2;
-
-  if (len2 > len1)
-    return NULL;
-
-  start = (char *)a;
-  end = start + len1;
-
-  while (start < end)
-    {
-      size_t len = len2;
-      ptr1 = start;
-      ptr2 = (char *)b;
-      while (len > 0 && *ptr1++ == *ptr2++)
-        --len;
-      if (len == 0)
-        return start;
-      ++start;
-    }
-
-  return NULL;
-} 
-
 hp_timing_t
 __get_clockfreq (void)
 {

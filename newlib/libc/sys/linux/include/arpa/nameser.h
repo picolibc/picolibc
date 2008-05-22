@@ -202,7 +202,11 @@ typedef	enum __ns_rcode {
 	ns_r_nxrrset = 8,	/* RRset does not exist */
 	ns_r_notauth = 9,	/* Not authoritative for zone */
 	ns_r_notzone = 10,	/* Zone of record different from zone section */
-	ns_r_max = 11
+	ns_r_max = 11,
+        /* The following are TSIG extended errors */
+        ns_r_badsig = 16,
+        ns_r_badkey = 17,
+        ns_r_badtime = 18
 } ns_rcode;
 
 /* BIND_UPDATE */
@@ -211,6 +215,104 @@ typedef enum __ns_update_operation {
 	ns_uop_add = 1,
 	ns_uop_max = 2
 } ns_update_operation;
+
+/*
+ *  * This structure is used for TSIG authenticated messages
+ *   */
+struct ns_tsig_key {
+        char name[NS_MAXDNAME], alg[NS_MAXDNAME];
+        unsigned char *data;
+        int len;
+};
+typedef struct ns_tsig_key ns_tsig_key;
+
+/*
+ *  * This structure is used for TSIG authenticated TCP messages
+ *   */
+struct ns_tcp_tsig_state {
+        int counter;
+        struct dst_key *key;
+        void *ctx;
+        unsigned char sig[NS_PACKETSZ];
+        int siglen;
+};
+typedef struct ns_tcp_tsig_state ns_tcp_tsig_state;
+
+#define NS_TSIG_FUDGE 300
+#define NS_TSIG_TCP_COUNT 100
+#define NS_TSIG_ALG_HMAC_MD5 "HMAC-MD5.SIG-ALG.REG.INT"
+
+#define NS_TSIG_ERROR_NO_TSIG -10
+#define NS_TSIG_ERROR_NO_SPACE -11
+#define NS_TSIG_ERROR_FORMERR -12
+
+/*
+ * Currently defined type values for resources and queries.
+ */
+typedef enum __ns_type {
+        ns_t_invalid = 0,       /* Cookie. */
+        ns_t_a = 1,             /* Host address. */
+        ns_t_ns = 2,            /* Authoritative server. */
+        ns_t_md = 3,            /* Mail destination. */
+        ns_t_mf = 4,            /* Mail forwarder. */
+        ns_t_cname = 5,         /* Canonical name. */
+        ns_t_soa = 6,           /* Start of authority zone. */
+        ns_t_mb = 7,            /* Mailbox domain name. */
+        ns_t_mg = 8,            /* Mail group member. */
+        ns_t_mr = 9,            /* Mail rename name. */
+        ns_t_null = 10,         /* Null resource record. */
+        ns_t_wks = 11,          /* Well known service. */
+        ns_t_ptr = 12,          /* Domain name pointer. */
+        ns_t_hinfo = 13,        /* Host information. */
+        ns_t_minfo = 14,        /* Mailbox information. */
+        ns_t_mx = 15,           /* Mail routing information. */
+        ns_t_txt = 16,          /* Text strings. */
+        ns_t_rp = 17,           /* Responsible person. */
+        ns_t_afsdb = 18,        /* AFS cell database. */
+        ns_t_x25 = 19,          /* X_25 calling address. */
+        ns_t_isdn = 20,         /* ISDN calling address. */
+        ns_t_rt = 21,           /* Router. */
+        ns_t_nsap = 22,         /* NSAP address. */
+        ns_t_nsap_ptr = 23,     /* Reverse NSAP lookup (deprecated). */
+        ns_t_sig = 24,          /* Security signature. */
+        ns_t_key = 25,          /* Security key. */
+        ns_t_px = 26,           /* X.400 mail mapping. */
+        ns_t_gpos = 27,         /* Geographical position (withdrawn). */
+        ns_t_aaaa = 28,         /* Ip6 Address. */
+        ns_t_loc = 29,          /* Location Information. */
+        ns_t_nxt = 30,          /* Next domain (security). */
+        ns_t_eid = 31,          /* Endpoint identifier. */
+        ns_t_nimloc = 32,       /* Nimrod Locator. */
+        ns_t_srv = 33,          /* Server Selection. */
+        ns_t_atma = 34,         /* ATM Address */
+        ns_t_naptr = 35,        /* Naming Authority PoinTeR */
+        ns_t_kx = 36,           /* Key Exchange */
+        ns_t_cert = 37,         /* Certification record */
+        ns_t_a6 = 38,           /* IPv6 address (deprecates AAAA) */
+        ns_t_dname = 39,        /* Non-terminal DNAME (for IPv6) */
+        ns_t_sink = 40,         /* Kitchen sink (experimentatl) */
+        ns_t_opt = 41,          /* EDNS0 option (meta-RR) */
+        ns_t_tsig = 250,        /* Transaction signature. */
+        ns_t_ixfr = 251,        /* Incremental zone transfer. */
+        ns_t_axfr = 252,        /* Transfer zone of authority. */
+        ns_t_mailb = 253,       /* Transfer mailbox records. */
+        ns_t_maila = 254,       /* Transfer mail agent records. */
+        ns_t_any = 255,         /* Wildcard match. */
+        ns_t_zxfr = 256,        /* BIND-specific, nonstandard. */
+        ns_t_max = 65536
+} ns_type;
+
+/* Exclusively a QTYPE? (not also an RTYPE) */
+#define ns_t_qt_p(t) (ns_t_xfr_p(t) || (t) == ns_t_any || \
+                      (t) == ns_t_mailb || (t) == ns_t_maila)
+/* Some kind of meta-RR? (not a QTYPE, but also not an RTYPE) */
+#define ns_t_mrr_p(t) ((t) == ns_t_tsig || (t) == ns_t_opt)
+/* Exclusively an RTYPE? (not also a QTYPE or a meta-RR) */
+#define ns_t_rr_p(t) (!ns_t_qt_p(t) && !ns_t_mrr_p(t))
+#define ns_t_udp_p(t) ((t) != ns_t_axfr && (t) != ns_t_zxfr)
+#define ns_t_xfr_p(t) ((t) == ns_t_axfr || (t) == ns_t_ixfr || \
+                       (t) == ns_t_zxfr)
+  
 
 /*
  * This RR-like structure is particular to UPDATE.
@@ -234,54 +336,6 @@ struct ns_updrec {
 };
 typedef struct ns_updrec ns_updrec;
 
-/*
- * Currently defined type values for resources and queries.
- */
-typedef enum __ns_type {
-	ns_t_a = 1,		/* Host address. */
-	ns_t_ns = 2,		/* Authoritative server. */
-	ns_t_md = 3,		/* Mail destination. */
-	ns_t_mf = 4,		/* Mail forwarder. */
-	ns_t_cname = 5,		/* Canonical name. */
-	ns_t_soa = 6,		/* Start of authority zone. */
-	ns_t_mb = 7,		/* Mailbox domain name. */
-	ns_t_mg = 8,		/* Mail group member. */
-	ns_t_mr = 9,		/* Mail rename name. */
-	ns_t_null = 10,		/* Null resource record. */
-	ns_t_wks = 11,		/* Well known service. */
-	ns_t_ptr = 12,		/* Domain name pointer. */
-	ns_t_hinfo = 13,	/* Host information. */
-	ns_t_minfo = 14,	/* Mailbox information. */
-	ns_t_mx = 15,		/* Mail routing information. */
-	ns_t_txt = 16,		/* Text strings. */
-	ns_t_rp = 17,		/* Responsible person. */
-	ns_t_afsdb = 18,	/* AFS cell database. */
-	ns_t_x25 = 19,		/* X_25 calling address. */
-	ns_t_isdn = 20,		/* ISDN calling address. */
-	ns_t_rt = 21,		/* Router. */
-	ns_t_nsap = 22,		/* NSAP address. */
-	ns_t_nsap_ptr = 23,	/* Reverse NSAP lookup (deprecated). */
-	ns_t_sig = 24,		/* Security signature. */
-	ns_t_key = 25,		/* Security key. */
-	ns_t_px = 26,		/* X.400 mail mapping. */
-	ns_t_gpos = 27,		/* Geographical position (withdrawn). */
-	ns_t_aaaa = 28,		/* Ip6 Address. */
-	ns_t_loc = 29,		/* Location Information. */
-	ns_t_nxt = 30,		/* Next domain (security). */
-	ns_t_eid = 31,		/* Endpoint identifier. */
-	ns_t_nimloc = 32,	/* Nimrod Locator. */
-	ns_t_srv = 33,		/* Server Selection. */
-	ns_t_atma = 34,		/* ATM Address */
-	ns_t_naptr = 35,	/* Naming Authority PoinTeR */
-	ns_t_opt = 41,		/* OPT pseudo-RR, RFC2761 */
-	/* Query type values which do not appear in resource records. */
-	ns_t_ixfr = 251,	/* Incremental zone transfer. */
-	ns_t_axfr = 252,	/* Transfer zone of authority. */
-	ns_t_mailb = 253,	/* Transfer mailbox records. */
-	ns_t_maila = 254,	/* Transfer mail agent records. */
-	ns_t_any = 255,		/* Wildcard match. */
-	ns_t_max = 65536
-} ns_type;
 
 /*
  * Values for class field
@@ -296,6 +350,24 @@ typedef enum __ns_class {
 	ns_c_any = 255,		/* Wildcard match. */
 	ns_c_max = 65536
 } ns_class;
+
+/* DNSSEC constants. */
+
+typedef enum __ns_key_types {
+        ns_kt_rsa = 1,          /* key type RSA/MD5 */
+        ns_kt_dh  = 2,          /* Diffie Hellman */
+        ns_kt_dsa = 3,          /* Digital Signature Standard (MANDATORY) */
+        ns_kt_private = 254     /* Private key type starts with OID */
+} ns_key_types;
+
+typedef enum __ns_cert_types {
+        cert_t_pkix = 1,        /* PKIX (X.509v3) */
+        cert_t_spki = 2,        /* SPKI */
+        cert_t_pgp  = 3,        /* PGP */
+        cert_t_url  = 253,      /* URL private type */
+        cert_t_oid  = 254       /* OID private type */
+} ns_cert_types;
+
 
 /*
  * Flags field of the KEY RR rdata
@@ -327,6 +399,10 @@ typedef enum __ns_class {
 
 /* The Algorithm field of the KEY and SIG RR's is an integer, {1..254} */
 #define	NS_ALG_MD5RSA		1	/* MD5 with RSA */
+#define NS_ALG_DH               2       /* Diffie Hellman KEY */
+#define NS_ALG_DSA              3       /* DSA KEY */
+#define NS_ALG_DSS              NS_ALG_DSA
+
 #define	NS_ALG_EXPIRE_ONLY	253	/* No alg, no security */
 #define	NS_ALG_PRIVATE_OID	254	/* Key begins with OID giving alg */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 1998 by Internet Software Consortium.
+ * Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,10 +15,9 @@
  * SOFTWARE.
  */
 
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-
-#include <sys/cdefs.h>
-#include <sys/types.h>
+#if !defined(_LIBC) && !defined(lint)
+static const char rcsid[] = "$BINDId: ns_print.c,v 8.18 2000/02/29 05:48:12 vixie Exp $";
+#endif
 
 /* Import. */
 
@@ -35,7 +34,13 @@
 #include <string.h>
 #include <ctype.h>
 
-#define SPRINTF(x) ((size_t)sprintf x)
+#include "libc-symbols.h"
+
+#ifdef SPRINTF_CHAR
+# define SPRINTF(x) strlen(sprintf/**/x)
+#else
+# define SPRINTF(x) ((size_t)sprintf x)
+#endif
 
 /* Forward. */
 
@@ -50,6 +55,12 @@ static int	addstr(const char *src, size_t len,
 		       char **buf, size_t *buflen);
 static int	addtab(size_t len, size_t target, int spaced,
 		       char **buf, size_t *buflen);
+
+/* Proto. */
+
+#ifndef _LIBC
+u_int16_t       dst_s_dns_key_id(const u_char *, const int);
+#endif
 
 /* Macros. */
 
@@ -108,7 +119,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 	/*
 	 * Owner.
 	 */
-	if (name_ctx != NULL && strcasecmp(name_ctx, name) == 0) {
+	if (name_ctx != NULL && ns_samename(name_ctx, name) == 1) {
 		T(addstr("\t\t\t", 3, &buf, &buflen));
 	} else {
 		len = prune_origin(name, origin);
@@ -116,9 +127,10 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 			T(addstr("@\t\t\t", 4, &buf, &buflen));
 		} else {
 			T(addstr(name, len, &buf, &buflen));
-			/* Origin not used and no trailing dot? */
-			if ((!origin || !origin[0] || name[len] == '\0') &&
-			    name[len - 1] != '.') {
+			/* Origin not used or not root, and no trailing dot? */
+			if (((origin == NULL || origin[0] == '\0') ||
+			    (origin[0] != '.' && origin[1] != '\0' &&
+			    name[len] == '\0')) && name[len - 1] != '.') {
 				T(addstr(".", 1, &buf, &buflen));
 				len++;
 			}
@@ -164,7 +176,11 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		rdata += len;
 		T(addstr(" ", 1, &buf, &buflen));
 
-		/* Second word. */
+		    
+		/* Second word, optional in ISDN records. */
+		if (type == ns_t_isdn && rdata == edata)
+			break;
+		    
 		T(len = charstr(rdata, edata, &buf, &buflen));
 		if (len == 0)
 			goto formerr;
@@ -295,7 +311,9 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		break;
 
 	case ns_t_nsap: {
-		char t[255*3];
+		/* 2*255 for hex digits, 128 for '.' and '\0', 2 for
+		   0x if inet_nsap_ntoa starts using it.  */
+		char t[255*2 + 128 + 2];
 
 		(void) inet_nsap_ntoa(rdlen, rdata, t);
 		T(addstr(t, strlen(t), &buf, &buflen));
@@ -431,8 +449,9 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 	    }
 
 	case ns_t_key: {
+#ifndef _LIBC
 		char base64_key[NS_MD5RSA_MAX_BASE64];
-		u_int keyflags, protocol, algorithm;
+		u_int keyflags, protocol, algorithm, key_id;
 		const char *leader;
 		int n;
 
@@ -440,6 +459,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 			goto formerr;
 
 		/* Key flags, Protocol, Algorithm. */
+		key_id = dst_s_dns_key_id(rdata, edata-rdata);
 		keyflags = ns_get16(rdata);  rdata += NS_INT16SZ;
 		protocol = *rdata++;
 		algorithm = *rdata++;
@@ -465,11 +485,15 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		}
 		if (len > 15)
 			T(addstr(" )", 2, &buf, &buflen));
+		n = SPRINTF((tmp, " ; key_tag= %u", key_id));
+		T(addstr(tmp, n, &buf, &buflen));
+#endif /* !_LIBC */
 
 		break;
 	    }
 
 	case ns_t_sig: {
+#ifndef _LIBC
 		char base64_key[NS_MD5RSA_MAX_BASE64];
 		u_int type, algorithm, labels, footprint;
 		const char *leader;
@@ -484,10 +508,10 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		algorithm = *rdata++;
 		labels = *rdata++;
 		t = ns_get32(rdata);  rdata += NS_INT32SZ;
-		len = SPRINTF((tmp, " %s %d %lu ",
-			       p_type(type), algorithm, t));
+		len = SPRINTF((tmp, "%s %d %d %lu ",
+			       p_type(type), algorithm, labels, t));
 		T(addstr(tmp, len, &buf, &buflen));
-		if (labels != (u_int)dn_count_labels(name))
+		if (labels > (u_int)dn_count_labels(name))
 			goto formerr;
 
 		/* Signature expiry. */
@@ -526,7 +550,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 		}
 		if (len > 15)
 			T(addstr(" )", 2, &buf, &buflen));
-
+#endif /* !_LIBC */
 		break;
 	    }
 
@@ -543,6 +567,63 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 				len = SPRINTF((tmp, " %s", p_type(c)));
 				T(addstr(tmp, len, &buf, &buflen));
 			}
+		break;
+	    }
+
+	case ns_t_cert: {
+		u_int c_type, key_tag, alg;
+		int n, siz;
+		char base64_cert[8192], *leader, tmp[40];
+
+		c_type  = ns_get16(rdata); rdata += NS_INT16SZ;
+		key_tag = ns_get16(rdata); rdata += NS_INT16SZ;
+		alg = (u_int) *rdata++;
+
+		len = SPRINTF((tmp, "%d %d %d ", c_type, key_tag, alg));
+		T(addstr(tmp, len, &buf, &buflen));
+		siz = (edata-rdata)*4/3 + 4; /* "+4" accounts for trailing \0 */
+		if (siz > sizeof(base64_cert) * 3/4) {
+			char *str = "record too long to print";
+			T(addstr(str, strlen(str), &buf, &buflen));
+		}
+		else {
+			len = b64_ntop(rdata, edata-rdata, base64_cert, siz);
+
+			if (len < 0)
+				goto formerr;
+			else if (len > 15) {
+				T(addstr(" (", 2, &buf, &buflen));
+				leader = "\n\t\t";
+				spaced = 0;
+			}
+			else
+				leader = " ";
+	
+			for (n = 0; n < len; n += 48) {
+				T(addstr(leader, strlen(leader),
+					 &buf, &buflen));
+				T(addstr(base64_cert + n, MIN(len - n, 48),
+					 &buf, &buflen));
+			}
+			if (len > 15)
+				T(addstr(" )", 2, &buf, &buflen));
+		}
+		break;
+	    }
+
+	case ns_t_tsig: {
+		/* BEW - need to complete this */
+		int n;
+
+		T(len = addname(msg, msglen, &rdata, origin, &buf, &buflen));
+		T(addstr(" ", 1, &buf, &buflen));
+		rdata += 8; /* time */
+		n = ns_get16(rdata); rdata += INT16SZ;
+		rdata += n; /* sig */
+		n = ns_get16(rdata); rdata += INT16SZ; /* original id */
+		sprintf(buf, "%d", ns_get16(rdata));
+		rdata += INT16SZ;
+		addlen(strlen(buf), &buf, &buflen);
 		break;
 	    }
 
@@ -601,7 +682,7 @@ prune_origin(const char *name, const char *origin) {
 	const char *oname = name;
 
 	while (*name != '\0') {
-		if (origin != NULL && strcasecmp(name, origin) == 0)
+		if (origin != NULL && ns_samename(name, origin) == 1)
 			return (name - oname - (name > oname));
 		while (*name != '\0') {
 			if (*name == '\\') {
@@ -658,7 +739,7 @@ charstr(const u_char *rdata, const u_char *edata, char **buf, size_t *buflen) {
 		goto enospc;
 	return (rdata - odata);
  enospc:
-	errno = ENOSPC;
+	__set_errno (ENOSPC);
 	*buf = save_buf;
 	*buflen = save_buflen;
 	return (-1);
@@ -677,27 +758,29 @@ addname(const u_char *msg, size_t msglen,
 	if (n < 0)
 		goto enospc;	/* Guess. */
 	newlen = prune_origin(*buf, origin);
-	if ((origin == NULL || origin[0] == '\0' || (*buf)[newlen] == '\0') &&
-	    (newlen == 0 || (*buf)[newlen - 1] != '.')) {
-		/* No trailing dot. */
-		if (newlen + 2 > *buflen)
-			goto enospc;	/* No room for ".\0". */
-		(*buf)[newlen++] = '.';
-		(*buf)[newlen] = '\0';
-	}
 	if (newlen == 0) {
 		/* Use "@" instead of name. */
 		if (newlen + 2 > *buflen)
 			goto enospc;        /* No room for "@\0". */
 		(*buf)[newlen++] = '@';
 		(*buf)[newlen] = '\0';
+	} else {
+		if (((origin == NULL || origin[0] == '\0') ||
+		    (origin[0] != '.' && origin[1] != '\0' &&
+		    (*buf)[newlen] == '\0')) && (*buf)[newlen - 1] != '.') {
+			/* No trailing dot. */
+			if (newlen + 2 > *buflen)
+				goto enospc;	/* No room for ".\0". */
+			(*buf)[newlen++] = '.';
+			(*buf)[newlen] = '\0';
+		}
 	}
 	*pp += n;
 	addlen(newlen, buf, buflen);
 	**buf = '\0';
 	return (newlen);
  enospc:
-	errno = ENOSPC;
+	__set_errno (ENOSPC);
 	*buf = save_buf;
 	*buflen = save_buflen;
 	return (-1);
@@ -712,8 +795,8 @@ addlen(size_t len, char **buf, size_t *buflen) {
 
 static int
 addstr(const char *src, size_t len, char **buf, size_t *buflen) {
-	if (len > *buflen) {
-		errno = ENOSPC;
+	if (len >= *buflen) {
+		__set_errno (ENOSPC);
 		return (-1);
 	}
 	memcpy(*buf, src, len);

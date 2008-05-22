@@ -1,73 +1,64 @@
-/*
- * Fundamental constants relating to ethernet.
- *
- * $FreeBSD: src/sys/net/ethernet.h,v 1.20 2002/04/04 05:42:09 luigi Exp $
- *
- */
+/* Copyright (C) 1997, 1999, 2001 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
 
-#ifndef _NET_ETHERNET_H_
-#define _NET_ETHERNET_H_
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
 
-/*
- * The number of bytes in an ethernet (MAC) address.
- */
-#define	ETHER_ADDR_LEN		6
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
 
-/*
- * The number of bytes in the type field.
- */
-#define	ETHER_TYPE_LEN		2
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
 
-/*
- * The number of bytes in the trailing CRC field.
- */
-#define	ETHER_CRC_LEN		4
+/* Based on the FreeBSD version of this file. Curiously, that file
+   lacks a copyright in the header. */
 
-/*
- * The length of the combined header.
- */
-#define	ETHER_HDR_LEN		(ETHER_ADDR_LEN*2+ETHER_TYPE_LEN)
+#ifndef __NET_ETHERNET_H
+#define __NET_ETHERNET_H 1
 
-/*
- * The minimum packet length.
- */
-#define	ETHER_MIN_LEN		64
+#include <sys/cdefs.h>
+#include <sys/types.h>
+#include <linux/if_ether.h>     /* IEEE 802.3 Ethernet constants */
 
-/*
- * The maximum packet length.
- */
-#define	ETHER_MAX_LEN		1518
+__BEGIN_DECLS
 
-/*
- * A macro to validate a length with
- */
+/* This is a name for the 48 bit ethernet address available on many
+   systems.  */
+struct ether_addr
+{
+  u_int8_t ether_addr_octet[ETH_ALEN];
+} __attribute__ ((__packed__));
+
+/* 10Mb/s ethernet header */
+struct ether_header
+{
+  u_int8_t  ether_dhost[ETH_ALEN];	/* destination eth addr	*/
+  u_int8_t  ether_shost[ETH_ALEN];	/* source ether addr	*/
+  u_int16_t ether_type;		        /* packet type ID field	*/
+} __attribute__ ((__packed__));
+
+/* Ethernet protocol ID's */
+#define	ETHERTYPE_PUP		0x0200          /* Xerox PUP */
+#define	ETHERTYPE_IP		0x0800		/* IP */
+#define	ETHERTYPE_ARP		0x0806		/* Address resolution */
+#define	ETHERTYPE_REVARP	0x8035		/* Reverse ARP */
+
+#define	ETHER_ADDR_LEN	ETH_ALEN                 /* size of ethernet addr */
+#define	ETHER_TYPE_LEN	2                        /* bytes in type field */
+#define	ETHER_CRC_LEN	4                        /* bytes in CRC field */
+#define	ETHER_HDR_LEN	ETH_HLEN                 /* total octets in header */
+#define	ETHER_MIN_LEN	(ETH_ZLEN + ETHER_CRC_LEN) /* min packet length */
+#define	ETHER_MAX_LEN	(ETH_FRAME_LEN + ETHER_CRC_LEN) /* max packet length */
+
+/* make sure ethenet length is valid */
 #define	ETHER_IS_VALID_LEN(foo)	\
 	((foo) >= ETHER_MIN_LEN && (foo) <= ETHER_MAX_LEN)
-
-/*
- * Structure of a 10Mb/s Ethernet header.
- */
-struct	ether_header {
-	u_char	ether_dhost[ETHER_ADDR_LEN];
-	u_char	ether_shost[ETHER_ADDR_LEN];
-	u_short	ether_type;
-};
-
-/*
- * Structure of a 48-bit Ethernet address.
- */
-struct	ether_addr {
-	u_char octet[ETHER_ADDR_LEN];
-};
-
-#define	ETHERTYPE_PUP		0x0200	/* PUP protocol */
-#define	ETHERTYPE_IP		0x0800	/* IP protocol */
-#define	ETHERTYPE_ARP		0x0806	/* Addr. resolution protocol */
-#define	ETHERTYPE_REVARP	0x8035	/* reverse Addr. resolution protocol */
-#define	ETHERTYPE_VLAN		0x8100	/* IEEE 802.1Q VLAN tagging */
-#define	ETHERTYPE_IPV6		0x86dd	/* IPv6 */
-#define	ETHERTYPE_LOOPBACK	0x9000	/* used to test interfaces */
-/* XXX - add more useful types here */
 
 /*
  * The ETHERTYPE_NTRAILER packet types starting at ETHERTYPE_TRAIL have
@@ -77,58 +68,9 @@ struct	ether_addr {
 #define	ETHERTYPE_TRAIL		0x1000		/* Trailer packet */
 #define	ETHERTYPE_NTRAILER	16
 
-#define	ETHERMTU	(ETHER_MAX_LEN-ETHER_HDR_LEN-ETHER_CRC_LEN)
-#define	ETHERMIN	(ETHER_MIN_LEN-ETHER_HDR_LEN-ETHER_CRC_LEN)
+#define	ETHERMTU	ETH_DATA_LEN
+#define	ETHERMIN	(ETHER_MIN_LEN - ETHER_HDR_LEN - ETHER_CRC_LEN)
 
-#ifdef _KERNEL
-
-/*
- * For device drivers to specify whether they support BPF or not
- */
-#define ETHER_BPF_UNSUPPORTED	0
-#define ETHER_BPF_SUPPORTED	1
-
-struct ifnet;
-struct mbuf;
-
-extern	void (*ng_ether_input_p)(struct ifnet *ifp,
-		struct mbuf **mp, struct ether_header *eh);
-extern	void (*ng_ether_input_orphan_p)(struct ifnet *ifp,
-		struct mbuf *m, struct ether_header *eh);
-extern	int  (*ng_ether_output_p)(struct ifnet *ifp, struct mbuf **mp);
-extern	void (*ng_ether_attach_p)(struct ifnet *ifp);
-extern	void (*ng_ether_detach_p)(struct ifnet *ifp);
-
-extern	int (*vlan_input_p)(struct ether_header *eh, struct mbuf *m);
-extern	int (*vlan_input_tag_p)(struct ether_header *eh, struct mbuf *m,
-		u_int16_t t);
-
-#define	VLAN_INPUT_TAG(eh, m, t) do {			\
-	/* XXX: lock */					\
-	if (vlan_input_tag_p != NULL) 			\
-		(*vlan_input_tag_p)(eh, m, t);		\
-	else {						\
-		(m)->m_pkthdr.rcvif->if_noproto++;	\
-		m_freem(m);				\
-	}						\
-	/* XXX: unlock */				\
-} while (0)
-
-#else /* _KERNEL */
-
-#include <sys/cdefs.h>
-
-/*
- * Ethernet address conversion/parsing routines.
- */
-__BEGIN_DECLS
-struct	ether_addr *ether_aton(const char *);
-int	ether_hostton(const char *, struct ether_addr *);
-int	ether_line(const char *, struct ether_addr *, char *);
-char 	*ether_ntoa(const struct ether_addr *);
-int	ether_ntohost(char *, const struct ether_addr *);
 __END_DECLS
 
-#endif /* !_KERNEL */
-
-#endif /* !_NET_ETHERNET_H_ */
+#endif	/* net/ethernet.h */

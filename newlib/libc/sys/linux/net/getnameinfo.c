@@ -1,372 +1,456 @@
-/*	$KAME: getnameinfo.c,v 1.45 2000/09/25 22:43:56 itojun Exp $	*/
+/* The Inner Net License, Version 2.00
 
-/*
- * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the project nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+  The author(s) grant permission for redistribution and use in source and
+binary forms, with or without modification, of the software and documentation
+provided that the following conditions are met:
 
-/*
- * Issues to be discussed:
- * - Thread safe-ness must be checked
- * - RFC2553 says that we should raise error on short buffer.  X/Open says
- *   we need to truncate the result.  We obey RFC2553 (and X/Open should be
- *   modified).  ipngwg rough consensus seems to follow RFC2553.
- * - What is "local" in NI_FQDN?
- * - NI_NAMEREQD and NI_NUMERICHOST conflict with each other.
- * - (KAME extension) NI_WITHSCOPEID when called with global address,
- *   and sin6_scope_id filled
- */
+0. If you receive a version of the software that is specifically labelled
+   as not being for redistribution (check the version message and/or README),
+   you are not permitted to redistribute that version of the software in any
+   way or form.
+1. All terms of the all other applicable copyrights and licenses must be
+   followed.
+2. Redistributions of source code must retain the authors' copyright
+   notice(s), this list of conditions, and the following disclaimer.
+3. Redistributions in binary form must reproduce the authors' copyright
+   notice(s), this list of conditions, and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+4. [The copyright holder has authorized the removal of this clause.]
+5. Neither the name(s) of the author(s) nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
 
-#include <sys/cdefs.h>
-#include <sys/types.h>
-#include <machine/endian.h>
+THIS SOFTWARE IS PROVIDED BY ITS AUTHORS AND CONTRIBUTORS ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sys/types.h>
-#include <sys/socket.h>
+  If these license terms cause you a real problem, contact the author.  */
+
+/* This software is Copyright 1996 by Craig Metz, All Rights Reserved.  */
+
+#include <alloca.h>
+#include <errno.h>
+#include <netdb.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <arpa/nameser.h>
-#include <netdb.h>
-#include <resolv.h>
-#include <string.h>
-#include <stddef.h>
-#include <errno.h>
+#include <sys/param.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <sys/utsname.h>
+#define _IO_MTSAFE_IO
+#include <bits/libc-lock.h>
+#include <libc-symbols.h>
+#include "local.h"
 
-#define SUCCESS 0
-#define ANY 0
-#define YES 1
-#define NO  0
-
-static struct afd {
-	int a_af;
-	int a_addrlen;
-	int a_socklen;
-	int a_off;
-} afdl [] = {
-#ifdef INET6
-	{PF_INET6, sizeof(struct in6_addr), sizeof(struct sockaddr_in6),
-		offsetof(struct sockaddr_in6, sin6_addr)},
-#endif
-	{PF_INET, sizeof(struct in_addr), sizeof(struct sockaddr_in),
-		offsetof(struct sockaddr_in, sin_addr)},
-	{0, 0, 0},
-};
-
-struct sockinet {
-	u_char	si_len;
-	u_char	si_family;
-	u_short	si_port;
-};
-
-#ifdef INET6
-static int ip6_parsenumeric(const struct sockaddr *, const char *, char *,
-	    size_t, int);
-static int ip6_sa2str(const struct sockaddr_in6 *, char *, size_t, int);
+#ifdef HAVE_LIBIDN
+# include <libidn/idna.h>
+extern int __idna_to_unicode_lzlz (const char *input, char **output,
+				   int flags);
 #endif
 
-/* 2553bis: use EAI_xx for getnameinfo */
-#define ENI_NOSOCKET 	EAI_FAIL		/*XXX*/
-#define ENI_NOSERVNAME	EAI_NONAME
-#define ENI_NOHOSTNAME	EAI_NONAME
-#define ENI_MEMORY	EAI_MEMORY
-#define ENI_SYSTEM	EAI_SYSTEM
-#define ENI_FAMILY	EAI_FAMILY
-#define ENI_SALEN	EAI_FAMILY
+#ifndef min
+# define min(x,y) (((x) > (y)) ? (y) : (x))
+#endif /* min */
 
-int
-getnameinfo(sa, salen, host, hostlen, serv, servlen, flags)
-	const struct sockaddr *sa;
-	socklen_t salen;
-	char *host;
-	size_t hostlen;
-	char *serv;
-	size_t servlen;
-	int flags;
+libc_freeres_ptr (static char *domain);
+
+
+static char *
+internal_function
+nrl_domainname (void)
 {
-	struct afd *afd;
-	struct servent *sp;
-	struct hostent *hp;
-	u_short port;
-	int family, i;
-	const char *addr;
-	u_int32_t v4a;
-	int h_error;
-	char numserv[512];
-	char numaddr[512];
+  static int not_first;
 
-	if (sa == NULL)
-		return ENI_NOSOCKET;
+  if (! not_first)
+    {
+      __libc_lock_define_initialized (static, lock);
+      __libc_lock_lock (lock);
 
-	family = sa->sa_family;
-	for (i = 0; afdl[i].a_af; i++)
-		if (afdl[i].a_af == family) {
-			afd = &afdl[i];
-			goto found;
-		}
-	return ENI_FAMILY;
-	
- found:
-	if (salen != afd->a_socklen)
-		return ENI_SALEN;
-	
-	/* network byte order */
-	port = ((const struct sockinet *)sa)->si_port;
-	addr = (const char *)sa + afd->a_off;
+      if (! not_first)
+	{
+	  char *c;
+	  struct hostent *h, th;
+	  size_t tmpbuflen = 1024;
+	  char *tmpbuf = alloca (tmpbuflen);
+	  int herror;
 
-	if (serv == NULL || servlen == 0) {
-		/*
-		 * do nothing in this case.
-		 * in case you are wondering if "&&" is more correct than
-		 * "||" here: RFC2553 says that serv == NULL OR servlen == 0
-		 * means that the caller does not want the result.
-		 */
-	} else {
-		if (flags & NI_NUMERICSERV)
-			sp = NULL;
-		else {
-			sp = getservbyport(port,
-				(flags & NI_DGRAM) ? "udp" : "tcp");
-		}
-		if (sp) {
-			if (strlen(sp->s_name) + 1 > servlen)
-				return ENI_MEMORY;
-			strcpy(serv, sp->s_name);
-		} else {
-			snprintf(numserv, sizeof(numserv), "%d", ntohs(port));
-			if (strlen(numserv) + 1 > servlen)
-				return ENI_MEMORY;
-			strcpy(serv, numserv);
-		}
-	}
+	  not_first = 1;
 
-	switch (sa->sa_family) {
-	case AF_INET:
-		v4a = (u_int32_t)
-		    ntohl(((const struct sockaddr_in *)sa)->sin_addr.s_addr);
-		if (IN_MULTICAST(v4a) || IN_EXPERIMENTAL(v4a))
-			flags |= NI_NUMERICHOST;
-		v4a >>= IN_CLASSA_NSHIFT;
-		if (v4a == 0)
-			flags |= NI_NUMERICHOST;			
-		break;
-#ifdef INET6
-	case AF_INET6:
+	  while (__gethostbyname_r ("localhost", &th, tmpbuf, tmpbuflen, &h,
+				    &herror))
 	    {
-		const struct sockaddr_in6 *sin6;
-		sin6 = (const struct sockaddr_in6 *)sa;
-		switch (sin6->sin6_addr.s6_addr[0]) {
-		case 0x00:
-			if (IN6_IS_ADDR_V4MAPPED(&sin6->sin6_addr))
-				;
-			else if (IN6_IS_ADDR_LOOPBACK(&sin6->sin6_addr))
-				;
-			else
-				flags |= NI_NUMERICHOST;
+	      if (herror == NETDB_INTERNAL && errno == ERANGE)
+		tmpbuf = extend_alloca (tmpbuf, tmpbuflen, 2 * tmpbuflen);
+	      else
+		break;
+	    }
+
+	  if (h && (c = strchr (h->h_name, '.')))
+	    domain = strdup (++c);
+	  else
+	    {
+	      /* The name contains no domain information.  Use the name
+		 now to get more information.  */
+	      while (__gethostname (tmpbuf, tmpbuflen))
+		tmpbuf = extend_alloca (tmpbuf, tmpbuflen, 2 * tmpbuflen);
+
+	      if ((c = strchr (tmpbuf, '.')))
+		domain = strdup (++c);
+	      else
+		{
+		  /* We need to preserve the hostname.  */
+		  const char *hstname = alloca (strlen (tmpbuf) + 1);
+		  strcpy (hstname, tmpbuf);
+
+		  while (__gethostbyname_r (hstname, &th, tmpbuf, tmpbuflen,
+					    &h, &herror))
+		    {
+		      if (herror == NETDB_INTERNAL && errno == ERANGE)
+			tmpbuf = extend_alloca (tmpbuf, tmpbuflen,
+						2 * tmpbuflen);
+		      else
 			break;
-		default:
-			if (IN6_IS_ADDR_LINKLOCAL(&sin6->sin6_addr)) {
-				flags |= NI_NUMERICHOST;
+		    }
+
+		  if (h && (c = strchr(h->h_name, '.')))
+		    domain = strdup (++c);
+		  else
+		    {
+		      struct in_addr in_addr;
+
+		      in_addr.s_addr = htonl (INADDR_LOOPBACK);
+
+		      while (__gethostbyaddr_r ((const char *) &in_addr,
+						sizeof (struct in_addr),
+						AF_INET, &th, tmpbuf,
+						tmpbuflen, &h, &herror))
+			{
+			  if (herror == NETDB_INTERNAL && errno == ERANGE)
+			    tmpbuf = extend_alloca (tmpbuf, tmpbuflen,
+						    2 * tmpbuflen);
+			  else
+			    break;
 			}
-			else if (IN6_IS_ADDR_MULTICAST(&sin6->sin6_addr))
-				flags |= NI_NUMERICHOST;
-			break;
+
+		      if (h && (c = strchr (h->h_name, '.')))
+			domain = strdup (++c);
+		    }
 		}
 	    }
+	}
+
+      __libc_lock_unlock (lock);
+    }
+
+  return domain;
+};
+
+
+int
+getnameinfo (const struct sockaddr *sa, socklen_t addrlen, char *host,
+	     socklen_t hostlen, char *serv, socklen_t servlen,
+	     unsigned int flags)
+{
+  int serrno = errno;
+  int tmpbuflen = 1024;
+  int herrno;
+  char *tmpbuf = alloca (tmpbuflen);
+  struct hostent th;
+  int ok = 0;
+
+  if (flags & ~(NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|NI_DGRAM
+#ifdef HAVE_LIBIDN
+		|NI_IDN|NI_IDN_ALLOW_UNASSIGNED|NI_IDN_USE_STD3_ASCII_RULES
+#endif
+		))
+    return EAI_BADFLAGS;
+
+  if (sa == NULL || addrlen < sizeof (sa_family_t))
+    return EAI_FAMILY;
+
+  switch (sa->sa_family)
+    {
+    case AF_LOCAL:
+      if (addrlen < (socklen_t) (((struct sockaddr_un *) NULL)->sun_path))
+	return EAI_FAMILY;
+      break;
+    case AF_INET:
+      if (addrlen < sizeof (struct sockaddr_in))
+	return EAI_FAMILY;
+      break;
+    case AF_INET6:
+      if (addrlen < sizeof (struct sockaddr_in6))
+	return EAI_FAMILY;
+      break;
+    default:
+      return EAI_FAMILY;
+    }
+
+  if (host != NULL && hostlen > 0)
+    switch (sa->sa_family)
+      {
+      case AF_INET:
+      case AF_INET6:
+	if (!(flags & NI_NUMERICHOST))
+	  {
+	    struct hostent *h = NULL;
+	    if (h == NULL)
+	      {
+		if (sa->sa_family == AF_INET6)
+		  {
+		    while (__gethostbyaddr_r ((const void *) &(((const struct sockaddr_in6 *) sa)->sin6_addr),
+					      sizeof(struct in6_addr),
+					      AF_INET6, &th, tmpbuf, tmpbuflen,
+					      &h, &herrno))
+		      {
+			if (herrno == NETDB_INTERNAL)
+			  {
+			    if (errno == ERANGE)
+			      tmpbuf = extend_alloca (tmpbuf, tmpbuflen,
+						      2 * tmpbuflen);
+			    else
+			      {
+				h_errno = (herrno);
+				errno = (serrno);
+				return EAI_SYSTEM;
+			      }
+			  }
+			else
+			  {
+			    break;
+			  }
+		      }
+		  }
+		else
+		  {
+		    while (__gethostbyaddr_r ((const void *) &(((const struct sockaddr_in *)sa)->sin_addr),
+					      sizeof(struct in_addr), AF_INET,
+					      &th, tmpbuf, tmpbuflen,
+					      &h, &herrno))
+		      {
+			if (errno == ERANGE)
+			  tmpbuf = extend_alloca (tmpbuf, tmpbuflen,
+						  2 * tmpbuflen);
+			else
+			  {
+			    break;
+			  }
+		      }
+		  }
+	      }
+
+	    if (h)
+	      {
+		char *c;
+		if ((flags & NI_NOFQDN)
+		    && (c = nrl_domainname ())
+		    && (c = strstr (h->h_name, c))
+		    && (c != h->h_name) && (*(--c) == '.'))
+		  /* Terminate the string after the prefix.  */
+		  *c = '\0';
+
+#ifdef HAVE_LIBIDN
+		/* If requested, convert from the IDN format.  */
+		if (flags & NI_IDN)
+		  {
+		    int idn_flags = 0;
+		    if  (flags & NI_IDN_ALLOW_UNASSIGNED)
+		      idn_flags |= IDNA_ALLOW_UNASSIGNED;
+		    if (flags & NI_IDN_USE_STD3_ASCII_RULES)
+		      idn_flags |= IDNA_USE_STD3_ASCII_RULES;
+
+		    char *out;
+		    int rc = __idna_to_unicode_lzlz (h->h_name, &out,
+						     idn_flags);
+		    if (rc != IDNA_SUCCESS)
+		      {
+			if (rc == IDNA_MALLOC_ERROR)
+			  return EAI_MEMORY;
+			if (rc == IDNA_DLOPEN_ERROR)
+			  return EAI_SYSTEM;
+			return EAI_IDN_ENCODE;
+		      }
+
+		    if (out != h->h_name)
+		      {
+			h->h_name = strdupa (out);
+			free (out);
+		      }
+		  }
+#endif
+
+		size_t len = strlen (h->h_name) + 1;
+		if (len > hostlen)
+		  return EAI_OVERFLOW;
+
+		memcpy (host, h->h_name, len);
+
+		ok = 1;
+	      }
+	  }
+
+	if (!ok)
+	  {
+	    if (flags & NI_NAMEREQD)
+	      {
+		__set_errno (serrno);
+		return EAI_NONAME;
+	      }
+	    else
+	      {
+		const char *c;
+		if (sa->sa_family == AF_INET6)
+		  {
+		    const struct sockaddr_in6 *sin6p;
+		    uint32_t scopeid;
+
+		    sin6p = (const struct sockaddr_in6 *) sa;
+
+		    c = inet_ntop (AF_INET6,
+				   (const void *) &sin6p->sin6_addr, host, hostlen);
+		    scopeid = sin6p->sin6_scope_id;
+		    if (scopeid != 0)
+		      {
+			/* Buffer is >= IFNAMSIZ+1.  */
+			char scopebuf[IFNAMSIZ + 1];
+			char *scopeptr;
+			int ni_numericscope = 0;
+			size_t real_hostlen = strnlen (host, hostlen);
+			size_t scopelen = 0;
+
+			scopebuf[0] = SCOPE_DELIMITER;
+			scopebuf[1] = '\0';
+			scopeptr = &scopebuf[1];
+
+			if (IN6_IS_ADDR_LINKLOCAL (&sin6p->sin6_addr)
+			    || IN6_IS_ADDR_MC_LINKLOCAL (&sin6p->sin6_addr))
+			  {
+			    if (if_indextoname (scopeid, scopeptr) == NULL)
+			      ++ni_numericscope;
+			    else
+			      scopelen = strlen (scopebuf);
+			  }
+			else
+			  ++ni_numericscope;
+
+			if (ni_numericscope)
+			  scopelen = 1 + snprintf (scopeptr,
+						     (scopebuf
+						      + sizeof scopebuf
+						      - scopeptr),
+						     "%u", scopeid);
+
+			if (real_hostlen + scopelen + 1 > hostlen)
+			  /* XXX We should not fail here.  Simply enlarge
+			     the buffer or return with out of memory.  */
+			  return EAI_SYSTEM;
+			memcpy (host + real_hostlen, scopebuf, scopelen + 1);
+		      }
+		  }
+		else
+		  c = inet_ntop (AF_INET,
+				 (const void *) &(((const struct sockaddr_in *) sa)->sin_addr),
+				 host, hostlen);
+		if (c == NULL)
+		  {
+		    __set_errno (serrno);
+		    return EAI_SYSTEM;
+		  }
+	      }
+	    ok = 1;
+	  }
+	break;
+
+      case AF_LOCAL:
+	if (!(flags & NI_NUMERICHOST))
+	  {
+	    struct utsname utsname;
+
+	    if (!uname (&utsname))
+	      {
+		strncpy (host, utsname.nodename, hostlen);
 		break;
-#endif
-	}
-	if (host == NULL || hostlen == 0) {
-		/*
-		 * do nothing in this case.
-		 * in case you are wondering if "&&" is more correct than
-		 * "||" here: RFC2553 says that host == NULL OR hostlen == 0
-		 * means that the caller does not want the result.
-		 */
-	} else if (flags & NI_NUMERICHOST) {
-		int numaddrlen;
+	      };
+	  };
 
-		/* NUMERICHOST and NAMEREQD conflicts with each other */
-		if (flags & NI_NAMEREQD)
-			return ENI_NOHOSTNAME;
+	if (flags & NI_NAMEREQD)
+	   {
+	    __set_errno (serrno);
+	    return EAI_NONAME;
+	  }
 
-		switch(afd->a_af) {
-#ifdef INET6
-		case AF_INET6:
-		{
-			int error;
+	strncpy (host, "localhost", hostlen);
+	break;
 
-			if ((error = ip6_parsenumeric(sa, addr, host,
-						      hostlen, flags)) != 0)
-				return(error);
-			break;
-		}
-#endif
-		default:
-			if (inet_ntop(afd->a_af, addr, numaddr, sizeof(numaddr))
-			    == NULL)
-				return ENI_SYSTEM;
-			numaddrlen = strlen(numaddr);
-			if (numaddrlen + 1 > hostlen) /* don't forget terminator */
-				return ENI_MEMORY;
-			strcpy(host, numaddr);
-			break;
-		}
-	} else {
-		hp = getipnodebyaddr(addr, afd->a_addrlen, afd->a_af, &h_error);
+      default:
+        return EAI_FAMILY;
+    }
 
-		if (hp) {
-#if 0
-			/*
-			 * commented out, since "for local host" is not
-			 * implemented here - see RFC2553 p30
-			 */
-			if (flags & NI_NOFQDN) {
-				char *p;
-				p = strchr(hp->h_name, '.');
-				if (p)
-					*p = '\0';
-			}
-#endif
-			if (strlen(hp->h_name) + 1 > hostlen) {
-				freehostent(hp);
-				return ENI_MEMORY;
-			}
-			strcpy(host, hp->h_name);
-			freehostent(hp);
-		} else {
-			if (flags & NI_NAMEREQD)
-				return ENI_NOHOSTNAME;
-			switch(afd->a_af) {
-#ifdef INET6
-			case AF_INET6:
-			{
-				int error;
+  if (serv && (servlen > 0))
+    switch (sa->sa_family)
+      {
+      case AF_INET:
+      case AF_INET6:
+	if (!(flags & NI_NUMERICSERV))
+	  {
+	    struct servent *s, ts;
+	    while (__getservbyport_r (((const struct sockaddr_in *) sa)->sin_port,
+				      ((flags & NI_DGRAM) ? "udp" : "tcp"),
+				      &ts, tmpbuf, tmpbuflen, &s))
+	      {
+		if (herrno == NETDB_INTERNAL)
+		  {
+		    if (errno == ERANGE)
+		      tmpbuf = extend_alloca (tmpbuf, tmpbuflen,
+					      2 * tmpbuflen);
+		    else
+		      {
+			__set_errno (serrno);
+			return EAI_SYSTEM;
+		      }
+		  }
+		else
+		  {
+		    break;
+		  }
+	      }
+	    if (s)
+	      {
+		strncpy (serv, s->s_name, servlen);
+		break;
+	      }
+	  }
 
-				if ((error = ip6_parsenumeric(sa, addr, host,
-							      hostlen,
-							      flags)) != 0)
-					return(error);
-				break;
-			}
-#endif
-			default:
-				if (inet_ntop(afd->a_af, addr, host,
-				    hostlen) == NULL)
-					return ENI_SYSTEM;
-				break;
-			}
-		}
-	}
-	return SUCCESS;
+	if (snprintf (serv, servlen, "%d",
+			ntohs (((const struct sockaddr_in *) sa)->sin_port))
+	    + 1 > servlen)
+	  return EAI_OVERFLOW;
+
+	break;
+
+      case AF_LOCAL:
+	strncpy (serv, ((const struct sockaddr_un *) sa)->sun_path, servlen);
+	break;
+    }
+
+  if (host && (hostlen > 0))
+    host[hostlen-1] = 0;
+  if (serv && (servlen > 0))
+    serv[servlen-1] = 0;
+  errno = serrno;
+  return 0;
 }
-
-#ifdef INET6
-static int
-ip6_parsenumeric(sa, addr, host, hostlen, flags)
-	const struct sockaddr *sa;
-	const char *addr;
-	char *host;
-	size_t hostlen;
-	int flags;
-{
-	int numaddrlen;
-	char numaddr[512];
-
-	if (inet_ntop(AF_INET6, addr, numaddr, sizeof(numaddr))
-	    == NULL)
-		return ENI_SYSTEM;
-
-	numaddrlen = strlen(numaddr);
-	if (numaddrlen + 1 > hostlen) /* don't forget terminator */
-		return ENI_MEMORY;
-	strcpy(host, numaddr);
-
-#ifdef NI_WITHSCOPEID
-	if (
-#ifdef DONT_OPAQUE_SCOPEID
-	    (IN6_IS_ADDR_LINKLOCAL((struct in6_addr *)addr) ||
-	     IN6_IS_ADDR_MULTICAST((struct in6_addr *)addr)) &&
-#endif
-	    ((const struct sockaddr_in6 *)sa)->sin6_scope_id) {
-#ifndef ALWAYS_WITHSCOPE
-		if (flags & NI_WITHSCOPEID)
-#endif /* !ALWAYS_WITHSCOPE */
-		{
-			char scopebuf[MAXHOSTNAMELEN];
-			int scopelen;
-
-			/* ip6_sa2str never fails */
-			scopelen = ip6_sa2str((const struct sockaddr_in6 *)sa,
-					      scopebuf, sizeof(scopebuf),
-					      flags);
-			if (scopelen + 1 + numaddrlen + 1 > hostlen)
-				return ENI_MEMORY;
-			/*
-			 * construct <numeric-addr><delim><scopeid>
-			 */
-			memcpy(host + numaddrlen + 1, scopebuf,
-			       scopelen);
-			host[numaddrlen] = SCOPE_DELIMITER;
-			host[numaddrlen + 1 + scopelen] = '\0';
-		}
-	}
-#endif /* NI_WITHSCOPEID */
-
-	return 0;
-}
-
-/* ARGSUSED */
-static int
-ip6_sa2str(sa6, buf, bufsiz, flags)
-	const struct sockaddr_in6 *sa6;
-	char *buf;
-	size_t bufsiz;
-	int flags;
-{
-	unsigned int ifindex = (unsigned int)sa6->sin6_scope_id;
-	const struct in6_addr *a6 = &sa6->sin6_addr;
-
-#ifdef NI_NUMERICSCOPE
-	if (flags & NI_NUMERICSCOPE) {
-		return(snprintf(buf, bufsiz, "%d", sa6->sin6_scope_id));
-	}
-#endif
-
-	/* if_indextoname() does not take buffer size.  not a good api... */
-	if ((IN6_IS_ADDR_LINKLOCAL(a6) || IN6_IS_ADDR_MC_LINKLOCAL(a6)) &&
-	    bufsiz >= IF_NAMESIZE) {
-		char *p = if_indextoname(ifindex, buf);
-		if (p) {
-			return(strlen(p));
-		}
-	}
-
-	/* last resort */
-	return(snprintf(buf, bufsiz, "%u", sa6->sin6_scope_id));
-}
-#endif /* INET6 */
+libc_hidden_def (getnameinfo)

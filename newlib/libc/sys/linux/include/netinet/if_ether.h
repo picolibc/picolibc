@@ -37,6 +37,9 @@
 #ifndef _NETINET_IF_ETHER_H_
 #define _NETINET_IF_ETHER_H_
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <libc-symbols.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 
