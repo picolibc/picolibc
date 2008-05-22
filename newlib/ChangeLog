@@ -1,8 +1,14 @@
 2008-05-21  Eric Blake  <ebb9@byu.net>
 
+	Optimize the generic strchr.
+	* libc/string/strchr.c (strchr) [!__OPTIMIZE_SIZE__]: Pre-align
+	data so unaligned searches aren't penalized.  Special-case
+	searching for 0.
+
 	Optimize strchr for x86.
-	* libc/machine/i386/strchr.S (strchr): Pre-align data so unaligned
-	searches aren't penalized.  Special-case searching for 0.
+	* libc/machine/i386/strchr.S (strchr) [!__OPTIMIZE_SIZE__]:
+	Pre-align data so unaligned searches aren't penalized.
+	Special-case searching for 0.
 
 2008-05-20  Nick Clifton  <nickc@redhat.com>
 
