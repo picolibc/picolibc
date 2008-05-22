@@ -154,9 +154,13 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 	case USER:
 	case DEF_USER:
 	  if (!(pw = internal_getpwuid (aclbufp[i].a_id))
-	      || !sid.getfrompw (pw)
-	      || !add_access_allowed_ace (acl, ace_off++, allow,
-					  sid, acl_len, inheritance))
+	      || !sid.getfrompw (pw))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  if (!add_access_allowed_ace (acl, ace_off++, allow,
+				       sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case GROUP_OBJ:
@@ -172,9 +176,13 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 	case GROUP:
 	case DEF_GROUP:
 	  if (!(gr = internal_getgrgid (aclbufp[i].a_id))
-	      || !sid.getfromgr (gr)
-	      || !add_access_allowed_ace (acl, ace_off++, allow,
-					  sid, acl_len, inheritance))
+	      || !sid.getfromgr (gr))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  if (!add_access_allowed_ace (acl, ace_off++, allow,
+				       sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case OTHER_OBJ:
