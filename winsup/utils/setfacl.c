@@ -259,7 +259,7 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
   return tcnt;
 }
 
-void
+int
 setfacl (action_t action, char *path, aclent_t *acls, int cnt)
 {
   aclent_t lacl[MAX_ACL_ENTRIES];
@@ -269,13 +269,19 @@ setfacl (action_t action, char *path, aclent_t *acls, int cnt)
   if (action == Set)
     {
       if (acl (path, SETACL, cnt, acls))
-        perror (prog_name);
-      return;
+	{
+	  perror (prog_name);
+	  return 2;
+	}
     }
-  if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
+  else if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
       || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
       || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-    perror (prog_name);
+    {
+      perror (prog_name);
+      return 2;
+    }
+  return 0;
 }
 
 static void
@@ -428,6 +434,7 @@ main (int argc, char **argv)
   int ropt = 0;
   aclent_t acls[MAX_ACL_ENTRIES];
   int aclidx = 0;
+  int ret = 0;
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -561,6 +568,6 @@ main (int argc, char **argv)
         break;
       }
   for (c = optind; c < argc; ++c)
-    setfacl (action, argv[c], acls, aclidx);
-  return 0;
+    ret |= setfacl (action, argv[c], acls, aclidx);
+  return ret;
 }
