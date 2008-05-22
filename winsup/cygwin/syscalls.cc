@@ -1505,7 +1505,7 @@ rename (const char *oldpath, const char *newpath)
   bool old_explicit_suffix = false, new_explicit_suffix = false;
   size_t olen, nlen;
   bool equal_path;
-  NTSTATUS status;
+  NTSTATUS status = 0;
   HANDLE fh = NULL, nfh;
   HANDLE old_trans = NULL, trans = NULL;
   OBJECT_ATTRIBUTES attr;

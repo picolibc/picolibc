@@ -1,3 +1,9 @@
+2008-05-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* string.h (strchr): Eliminate.
+
+	* syscalls.cc (rename): Work around inexplicable C++ warning.
+
 2008-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (get_ino_by_handle): Rename pfai to fai.
