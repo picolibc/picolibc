@@ -1,3 +1,9 @@
+2008-05-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[ mingw-Bugs-1961893 ]
+	* mingwex/gdtoa/mingw_snprint.c (x_sprintf): Always set __ldtoa
+	mode to 2 for E format.
+
 2008-05-15 Ramiro Polla <ramiro@lisha.ufsc.br>
 
 	* include/stdlib.h: Fix strtod under C++.

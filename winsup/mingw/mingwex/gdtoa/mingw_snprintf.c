@@ -840,7 +840,7 @@ x_sprintf
 				  }
 				if (prec < 0)
 					prec = 0;
-				s = s0 = __ldtoa(xx, prec ? 2 : 0, prec + 1, &decpt,
+				s = s0 = __ldtoa(xx,  2,  prec + 1, &decpt,
 					&sgn, &se);
 				if (decpt == -32768)
 					goto fmt9999;
