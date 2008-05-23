@@ -75,9 +75,6 @@ class mount_info
   int add_item (const char *dev, const char *path, unsigned flags);
   int del_item (const char *path, unsigned flags);
 
-  bool from_fstab_line (char *line, bool user);
-  bool from_fstab (bool user);
-
   unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
 			  unsigned *flags = NULL);
@@ -96,9 +93,12 @@ class mount_info
 		       PUNICODE_STRING cygd);
 
  private:
-
   void sort ();
   void mount_slash ();
+  void mount_info::create_root_entry (const PWCHAR root);
+
+  bool from_fstab_line (char *line, bool user);
+  bool from_fstab (bool user, WCHAR [], PWCHAR);
 
   int cygdrive_win32_path (const char *src, char *dst, int& unit);
 };

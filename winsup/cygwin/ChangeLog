@@ -1,5 +1,19 @@
 2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* mount.cc (find_root_from_cygwin_dll): New function factored from
+	from_fstab.  Avoid use of tls since it isn't necessarily initialized
+	when cygwin1.dll is dynamically loaded.
+	(mount_info::create_root_entry): Ditto.
+	(mount_info::init): Calculate cygwin root once.  Use create_root_entry
+	to record it.  Pass fstab location to from_fstab.
+	(mount_info::from_fstab): Move root calculation stuff elsewhere, as per
+	above.
+
+	* shared_info.h (mount_info::from_fstab_line): Make private.
+	(mount_info::fstab): Ditto.  Accommodate new arguments.
+
+2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* mount.cc (mount_info::from_fstab): Use cygwin_hmodule rather than
 	trying to find handle based on cygwin1.dll.
 

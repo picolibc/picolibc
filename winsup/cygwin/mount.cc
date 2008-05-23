@@ -72,15 +72,62 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
   return true;
 }
 
+/* Use absolute path of cygwin1.dll to derive a "root".
+   Return false if GetModuleFileNameW fails or path is "funny".
+   Otherwise return true.  */
+static inline PWCHAR
+find_root_from_cygwin_dll (WCHAR *path)
+{
+  if (!GetModuleFileNameW (cygwin_hmodule, path, NT_MAX_PATH))
+    {
+      debug_printf ("GetModuleFileNameW(%p, %p, %u), %E", cygwin_hmodule, path, NT_MAX_PATH);
+      return NULL;
+    }
+  PWCHAR w = wcsrchr (path, L'\\');
+  if (w)
+    {
+      *w = L'\0';
+      w = wcsrchr (path, L'\\');
+    }
+  if (!w)
+    {
+      debug_printf ("Invalid DLL path");
+      return NULL;
+    }
+  *w = L'\0';
+  return w;
+}
+
+inline void
+mount_info::create_root_entry (const PWCHAR root)
+{
+  /* Create a default root dir from the path the Cygwin DLL is in. */
+  char native_root[NT_MAX_PATH];
+  sys_wcstombs (native_root, NT_MAX_PATH, root);
+  mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY);
+  /* Create a default cygdrive entry.  Note that this is a user entry.
+     This allows to override it with mount, unless the sysadmin created
+     a cygdrive entry in /etc/fstab. */
+  cygdrive_flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
+  strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/");
+  cygdrive_len = strlen (cygdrive);
+}
+
 /* init: Initialize the mount table.  */
 
 void
 mount_info::init ()
 {
   nmounts = 0;
-
-  if (from_fstab (false) | from_fstab (true))   /* The single | is correct! */
-      return;
+  PWCHAR pathend;
+  WCHAR path[NT_MAX_PATH];
+  if ((pathend = find_root_from_cygwin_dll (path)))
+    {
+      create_root_entry (path);
+      pathend = wcpcpy (pathend, L"\\etc\\fstab");
+      if (from_fstab (false, path, pathend) | from_fstab (true, path, pathend))   /* The single | is correct! */
+	  return;
+    }
 
   /* FIXME: Remove warning message before releasing 1.7.0. */
   small_printf ("Huh?  No /etc/fstab file?  Using default root and cygdrive prefix...\n");
@@ -870,58 +917,21 @@ mount_info::from_fstab_line (char *line, bool user)
 }
 
 bool
-mount_info::from_fstab (bool user)
+mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 {
-  tmp_pathbuf tp;
-  PWCHAR path_buf = tp.w_get ();
-  PWCHAR path = path_buf;
-  PWCHAR w;
-  
-  if (!GetModuleFileNameW (cygwin_hmodule, path, NT_MAX_PATH))
-    {
-      debug_printf ("GetModuleFileNameW(%p, path, %u), %E", cygwin_hmodule, NT_MAX_PATH);
-      return false;
-    }
-  w = wcsrchr (path, L'\\');
-  if (w)
-    {
-      *w = L'\0';
-      w = wcsrchr (path, L'\\');
-    }
-  if (!w)
-    {
-      debug_printf ("Invalid DLL path");
-      return false;
-    }
-
-  if (!user)
-    {
-      /* Create a default root dir from the path the Cygwin DLL is in. */
-      *w = L'\0';
-      char *native_root = tp.c_get ();
-      sys_wcstombs (native_root, NT_MAX_PATH, path);
-      mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY);
-      /* Create a default cygdrive entry.  Note that this is a user entry.
-         This allows to override it with mount, unless the sysadmin created
-	 a cygdrive entry in /etc/fstab. */
-      cygdrive_flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
-      strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/");
-      cygdrive_len = strlen (cygdrive);
-    }
-
-  PWCHAR u = wcpcpy (w, L"\\etc\\fstab");
   if (user)
-    sys_mbstowcs (wcpcpy (u, L".d\\"), NT_MAX_PATH - (u - path),
+    sys_mbstowcs (wcpcpy (fstab_end, L".d\\"),
+		  NT_MAX_PATH - (fstab_end - fstab),
 		  cygheap->user.name ());
-  debug_printf ("Try to read mounts from %W", path);
-  HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
+  debug_printf ("Try to read mounts from %W", fstab);
+  HANDLE h = CreateFileW (fstab, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (h == INVALID_HANDLE_VALUE)
     {
       debug_printf ("CreateFileW, %E");
       return false;
     }
-  char *const buf = reinterpret_cast<char *const> (path);
+  char *const buf = reinterpret_cast<char *const> (fstab);
   char *got = buf;
   DWORD len = 0;
   /* Using NT_MAX_PATH-1 leaves space to append two \0. */
