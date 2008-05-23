@@ -1,3 +1,8 @@
+2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Eliminate
+	compiler warning.
+
 2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (symlink_info::check): Don't pass EaBuffer to NtCreateFile if

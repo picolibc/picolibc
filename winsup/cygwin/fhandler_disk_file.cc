@@ -1756,7 +1756,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   PFILE_ID_BOTH_DIR_INFORMATION buf = NULL;
   PWCHAR FileName;
   ULONG FileNameLength;
-  ULONG FileAttributes;
+  ULONG FileAttributes = 0;
   IO_STATUS_BLOCK io;
   UNICODE_STRING fname;
 
@@ -1859,7 +1859,6 @@ go_ahead:
 	{
 	  FileName = ((PFILE_NAMES_INFORMATION) buf)->FileName;
 	  FileNameLength = ((PFILE_NAMES_INFORMATION) buf)->FileNameLength;
-	  FileAttributes = 0;
       	}
       else
 	{
