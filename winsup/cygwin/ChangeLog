@@ -1,3 +1,11 @@
+2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Don't try to
+	use FileIdBothDirectoryInformation on NFS shares.  Fix comment to
+	explain why.
+	* path.cc (symlink_info::check): Reinstantiate no_ea.  Use in 
+	erroneously changed condition.
+
 2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (find_root_from_cygwin_dll): New function factored from
@@ -19,7 +27,7 @@
 
 	* path.cc (symlink_info::check): Remove unused variable.
 
-2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (open_shared): Fix comments.  Fix a condition which has
 	been overlooked to revert to its old state in change from 2008-04-18.
@@ -30,7 +38,7 @@
 	loop.  Set to NULL on first STATUS_EAS_NOT_SUPPORTED.  Align comments.
 	Fix formatting.
 
-2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
+2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Eliminate
 	compiler warning.

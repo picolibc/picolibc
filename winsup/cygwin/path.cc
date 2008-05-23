@@ -2342,7 +2342,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   tp.u_get (&upath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
-  void *eabuf = &nfs_aol_ffei;
+  PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
 
   while (suffix.next ())
@@ -2350,6 +2350,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       FILE_BASIC_INFORMATION fbi;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
+      bool no_ea = false;
 
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & MOUNT_ENC);
@@ -2373,6 +2374,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       /* No right to access EAs or EAs not supported? */
       if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED)
 	{
+	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     whith suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED)
@@ -2380,8 +2382,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      eabuf = NULL;
 	      easize = 0;
 	    }
-	  status = NtCreateFile (&h,
-				 READ_CONTROL | FILE_READ_ATTRIBUTES,
+	  status = NtCreateFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
 				 &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
 				 FILE_SHARE_VALID_FLAGS, FILE_OPEN,
 				 FILE_OPEN_REPARSE_POINT
@@ -2526,7 +2527,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       /* If the file could be opened with FILE_READ_EA, and if it's on a
 	 NFS share, check if it's a symlink.  Only files can be symlinks
 	 (which can be symlinks to directories). */
-      else if (!eabuf && !(fileattr & FILE_ATTRIBUTE_DIRECTORY) && fs.is_nfs ())
+      else if (!no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY) && fs.is_nfs ())
 	{
 	  res = check_nfs_symlink (h);
 	  if (!res)

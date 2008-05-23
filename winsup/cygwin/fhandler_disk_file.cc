@@ -1569,19 +1569,21 @@ fhandler_disk_file::opendir (int fd)
 	     FileIdBothDirectoryInformation only on filesystems supporting
 	     persistent ACLs, FileDirectoryInformation otherwise.
 
-	     On older NFS clients (up to SFU 3.5), dangling symlinks
-	     are hidden from directory queries, unless you use the
-	     FileNamesInformation info class.  Nevertheless, we try
-	     FileIdBothDirectoryInformation first.  On newer NFS clients
-	     it works fine, on the older ones it returns "invalid info
-	     class".  So we can stick to the above explained mechanism. */
+	     NFS clients hide dangling symlinks from directory queries,
+	     unless you use the FileNamesInformation info class.  
+	     On newer NFS clients (>=Vista) FileIdBothDirectoryInformation
+	     works fine, but only if the NFS share is mounted to a drive
+	     letter.  TODO: We don't test that here for now, but it might
+	     be worth to test if there's a speed gain in using
+	     FileIdBothDirectoryInformation, because it doesn't require to
+	     open the file to read the inode number. */
 	  if (pc.hasgood_inode ())
 	    {
 	      dir->__flags |= dirent_set_d_ino;
-	      if (wincap.has_fileid_dirinfo ())
-		dir->__flags |= dirent_get_d_ino;
 	      if (pc.fs_is_nfs ())
 	      	dir->__flags |= dirent_nfs_d_ino;
+	      else if (wincap.has_fileid_dirinfo ())
+		dir->__flags |= dirent_get_d_ino;
 	    }
 	}
       if (fd >= 0)
