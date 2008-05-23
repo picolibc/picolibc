@@ -178,6 +178,7 @@ extern int open _PARAMS ((const char *, int, ...));
 extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
 #ifdef __CYGWIN__
+#include <sys/time.h>
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
 extern int openat _PARAMS ((int, const char *, int, ...));
 extern int unlinkat _PARAMS ((int, const char *, int));

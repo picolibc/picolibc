@@ -1,3 +1,7 @@
+2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/_default_fcntl.h: Include <sys/time.h> on Cygwin.
+
 2008-05-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Add _h_errno field.
