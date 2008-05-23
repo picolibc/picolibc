@@ -165,12 +165,11 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 
   if (!shared && addr)
     {
-      /* Probably win95, so try without specifying the address.  */
       shared = (shared_info *) MapViewOfFileEx (shared_h,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
 				       0, 0, 0, NULL);
 #ifdef DEBUGGING
-      system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
+      system_printf ("relocating shared object %s(%d) from %p to %p", name, n, addr, shared);
 #endif
       offsets[0] = 0;
     }
@@ -178,7 +177,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   if (!shared)
     api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", mapname, shared_h);
 
-  if (m == SH_USER_SHARED && offsets[0])
+  if (m == SH_CYGWIN_SHARED && offsets[0])
     {
       ptrdiff_t delta = (caddr_t) shared - (caddr_t) off_addr (0);
       offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
