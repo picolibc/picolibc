@@ -21,15 +21,6 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#define strlen __builtin_strlen
-#define strcmp __builtin_strcmp
-#define strcpy __builtin_strcpy
-#define memcpy __builtin_memcpy
-#define memcmp __builtin_memcmp
-#ifdef HAVE_BUILTIN_MEMSET
-# define memset __builtin_memset
-#endif
-
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 #define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
 
