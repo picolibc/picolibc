@@ -877,10 +877,9 @@ mount_info::from_fstab (bool user)
   PWCHAR path = path_buf;
   PWCHAR w;
   
-  if (!GetModuleFileNameW (GetModuleHandleW (L"cygwin1.dll"),
-			   path, NT_MAX_PATH))
+  if (!GetModuleFileNameW (cygwin_hmodule, path, NT_MAX_PATH))
     {
-      debug_printf ("GetModuleFileNameW, %E");
+      debug_printf ("GetModuleFileNameW(%p, path, %u), %E", cygwin_hmodule, NT_MAX_PATH);
       return false;
     }
   w = wcsrchr (path, L'\\');

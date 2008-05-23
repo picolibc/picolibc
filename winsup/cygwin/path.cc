@@ -2350,7 +2350,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       FILE_BASIC_INFORMATION fbi;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
-      bool no_ea = false;
 
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & MOUNT_ENC);
@@ -2374,7 +2373,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       /* No right to access EAs or EAs not supported? */
       if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED)
 	{
-	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     whith suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED)

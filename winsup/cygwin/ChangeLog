@@ -1,3 +1,10 @@
+2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc (mount_info::from_fstab): Use cygwin_hmodule rather than
+	trying to find handle based on cygwin1.dll.
+
+	* path.cc (symlink_info::check): Remove unused variable.
+
 2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (open_shared): Fix comments.  Fix a condition which has
