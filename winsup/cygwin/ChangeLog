@@ -1,3 +1,9 @@
+2008-05-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc (mount_info::init): Revert previous change.
+	(mount_info::from_fstab): Change system_printf to debug_printf.  Just
+	use a local NT_MAX_PATH sized temporary buffer.
+
 2008-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::init): Recreate path when trying to read the
