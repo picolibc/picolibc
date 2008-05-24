@@ -1,3 +1,7 @@
+2008-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Reorder test for nfs symlinks.
+
 2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Don't try to
