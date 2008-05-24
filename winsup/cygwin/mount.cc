@@ -125,7 +125,9 @@ mount_info::init ()
     {
       create_root_entry (path);
       pathend = wcpcpy (pathend, L"\\etc\\fstab");
-      if (from_fstab (false, path, pathend) | from_fstab (true, path, pathend))   /* The single | is correct! */
+      if (from_fstab (false, path, pathend)   /* The single | is correct! */
+	  | from_fstab (true, path, wcpcpy (find_root_from_cygwin_dll (path),
+				    L"\\etc\\fstab")))
 	  return;
     }
 
@@ -923,7 +925,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
     sys_mbstowcs (wcpcpy (fstab_end, L".d\\"),
 		  NT_MAX_PATH - (fstab_end - fstab),
 		  cygheap->user.name ());
-  debug_printf ("Try to read mounts from %W", fstab);
+  system_printf ("Try to read mounts from %W", fstab);
   HANDLE h = CreateFileW (fstab, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (h == INVALID_HANDLE_VALUE)
