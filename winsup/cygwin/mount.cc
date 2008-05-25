@@ -935,9 +935,8 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
   char buf[NT_MAX_PATH];
   char *got = buf;
   DWORD len = 0;
-  /* Using NT_MAX_PATH-1 leaves space to append two \0. */
-  while (ReadFile (h, got, (NT_MAX_PATH - 1) * sizeof (WCHAR) - (got - buf),
-		   &len, NULL))
+  /* Using buffer size - 1 leaves space to append two \0. */
+  while (ReadFile (h, got, (sizeof (buf) - 1) - (got - buf), &len, NULL))
     {
       char *end;
 
@@ -954,7 +953,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 	    goto done;
 	  got = end + 1;
 	}
-      if (len < (NT_MAX_PATH - 1) * sizeof (WCHAR))
+      if (len < (sizeof (buf) - 1))
         break;
       /* We have to read once more.  Move remaining bytes to the start of
          the buffer and reposition got so that it points to the end of

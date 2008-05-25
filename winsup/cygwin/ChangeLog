@@ -1,3 +1,7 @@
+2008-05-25  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc (mount_info::from_fstab): Use proper buffer size.
+
 2008-05-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (mount_info::init): Revert previous change.
