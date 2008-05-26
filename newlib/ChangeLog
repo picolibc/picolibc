@@ -1,5 +1,13 @@
 2008-05-26  Eric Blake  <ebb9@byu.net>
 
+	Optimize the generic and x86 memchr.
+	* libc/string/memchr.c (memchr) [!__OPTIMIZE_SIZE__]:
+	Pre-align pointer so unaligned searches aren't penalized.
+	* libc/machine/i386/memchr.S (memchr) [!__OPTIMIZE_SIZE__]: Word
+	operations are faster than repnz byte searches.
+					
+2008-05-26  Eric Blake  <ebb9@byu.net>
+
 	Optimize the generic and x86 memset.
 	* libc/string/memset.c (memset) [!__OPTIMIZE_SIZE__]:
 	Pre-align pointer so unaligned stores aren't penalized.

@@ -20,7 +20,7 @@ DESCRIPTION
 	This function searches memory starting at <<*<[src]>>> for the
 	character <[c]>.  The search only ends with the first
 	occurrence of <[c]>, or after <[length]> characters; in
-	particular, <<NULL>> does not terminate the search.
+	particular, <<NUL>> does not terminate the search.
 
 RETURNS
 	If the character <[c]> is found within <[length]> characters
@@ -64,6 +64,9 @@ QUICKREF
 #error long int is not a 32bit or 64bit byte
 #endif
 
+/* DETECTCHAR returns nonzero if (long)X contains the byte used
+   to fill (long)MASK. */
+#define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
 
 _PTR
 _DEFUN (memchr, (src_void, c, length),
@@ -71,73 +74,61 @@ _DEFUN (memchr, (src_void, c, length),
 	int c _AND
 	size_t length)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   _CONST unsigned char *src = (_CONST unsigned char *) src_void;
+  unsigned char d = c;
 
-  c &= 0xff;
-  
-  while (length--)
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+  unsigned long *asrc;
+  unsigned long  mask;
+  int i;
+
+  while (UNALIGNED (src))
     {
-      if (*src == c)
-	return (char *) src;
+      if (!length--)
+        return NULL;
+      if (*src == d)
+        return (void *) src;
       src++;
     }
-  return NULL;
-#else
-  _CONST unsigned char *src = (_CONST unsigned char *) src_void;
-  unsigned long *asrc;
-  unsigned long  buffer;
-  unsigned long  mask;
-  int i, j;
 
-  c &= 0xff;
-  
-  /* If the size is small, or src is unaligned, then 
-     use the bytewise loop.  We can hope this is rare.  */
-  if (!TOO_SMALL (length) && !UNALIGNED (src)) 
+  if (!TOO_SMALL (length))
     {
-      /* The fast code reads the ASCII one word at a time and only 
+      /* If we get this far, we know that length is large and src is
+         word-aligned. */
+      /* The fast code reads the source one word at a time and only
          performs the bytewise search on word-sized segments if they
-         contain the search character, which is detected by XORing 
+         contain the search character, which is detected by XORing
          the word-sized segment with a word-sized block of the search
-         character and then detecting for the presence of NULL in the
+         character and then detecting for the presence of NUL in the
          result.  */
-      asrc = (unsigned long*) src;
-      mask = 0;
-      for (i = 0; i < LBLOCKSIZE; i++)
-        mask = (mask << 8) + c;
+      asrc = (unsigned long *) src;
+      mask = d << 8 | d;
+      mask = mask << 16 | mask;
+      for (i = 32; i < LBLOCKSIZE * 8; i <<= 1)
+        mask = (mask << i) | mask;
 
       while (length >= LBLOCKSIZE)
         {
-          buffer = *asrc;
-          buffer ^=  mask;
-          if (DETECTNULL (buffer))
-	    {
-              src = (unsigned char*) asrc;
-  	      for ( j = 0; j < LBLOCKSIZE; j++ )
-	        {
-                  if (*src == c)
-                    return (char*) src;
-                  src++;
-	        }
-   	    }
+          if (DETECTCHAR (*asrc, mask))
+            break;
           length -= LBLOCKSIZE;
           asrc++;
         }
-  
+
       /* If there are fewer than LBLOCKSIZE characters left,
          then we resort to the bytewise loop.  */
 
-      src = (unsigned char*) asrc;
+      src = (unsigned char *) asrc;
     }
 
+#endif /* not PREFER_SIZE_OVER_SPEED */
+
   while (length--)
-    { 
-      if (*src == c)
-        return (char*) src;
+    {
+      if (*src == d)
+        return (void *) src;
       src++;
-    } 
+    }
 
   return NULL;
-#endif /* not PREFER_SIZE_OVER_SPEED */
 }
