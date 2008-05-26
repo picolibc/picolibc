@@ -1,7 +1,7 @@
-/* 
+/*
 FUNCTION
 	<<strlen>>---character string length
-	
+
 INDEX
 	strlen
 
@@ -57,32 +57,32 @@ size_t
 _DEFUN (strlen, (str),
 	_CONST char *str)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   _CONST char *start = str;
 
-  while (*str)
-    str++;
-
-  return str - start;
-#else
-  _CONST char *start = str;
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   unsigned long *aligned_addr;
 
-  if (!UNALIGNED (str))
+  /* Align the pointer, so we can search a word at a time.  */
+  while (UNALIGNED (str))
     {
-      /* If the string is word-aligned, we can check for the presence of 
-         a null in each word-sized block.  */
-      aligned_addr = (unsigned long*)str;
-      while (!DETECTNULL (*aligned_addr))
-        aligned_addr++;
-
-      /* Once a null is detected, we check each byte in that block for a
-         precise position of the null.  */
-      str = (char*)aligned_addr;
+      if (!*str)
+	return str - start;
+      str++;
     }
- 
+
+  /* If the string is word-aligned, we can check for the presence of
+     a null in each word-sized block.  */
+  aligned_addr = (unsigned long *)str;
+  while (!DETECTNULL (*aligned_addr))
+    aligned_addr++;
+
+  /* Once a null is detected, we check each byte in that block for a
+     precise position of the null.  */
+  str = (char *) aligned_addr;
+
+#endif /* not PREFER_SIZE_OVER_SPEED */
+
   while (*str)
     str++;
   return str - start;
-#endif /* not PREFER_SIZE_OVER_SPEED */
 }

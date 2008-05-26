@@ -1,3 +1,11 @@
+2008-05-26  Eric Blake  <ebb9@byu.net>
+
+	Optimize the generic and x86 strlen.
+	* libc/string/strlen.c (strlen) [!__OPTIMIZE_SIZE__]: Pre-align
+	data so unaligned searches aren't penalized.
+	* libc/machine/i386/strlen.S (strlen) [!__OPTIMIZE_SIZE__]:
+	Word operations are faster than repnz byte searches.
+
 2008-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/_default_fcntl.h: Include <sys/time.h> on Cygwin.
