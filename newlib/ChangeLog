@@ -1,5 +1,14 @@
 2008-05-26  Eric Blake  <ebb9@byu.net>
 
+	Optimize the generic and x86 memset.
+	* libc/string/memset.c (memset) [!__OPTIMIZE_SIZE__]:
+	Pre-align pointer so unaligned stores aren't penalized.
+	* libc/machine/i386/memset.S (memset): [!__OPTIMIZE_SIZE__]:
+	Pre-align pointer so unaligned stores aren't penalized.  Prefer
+	8-byte over 4-byte alignment.  Reduce register pressure.
+						
+2008-05-26  Eric Blake  <ebb9@byu.net>
+
 	Optimize the generic and x86 strlen.
 	* libc/string/strlen.c (strlen) [!__OPTIMIZE_SIZE__]: Pre-align
 	data so unaligned searches aren't penalized.

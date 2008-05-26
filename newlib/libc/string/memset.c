@@ -22,7 +22,7 @@ DESCRIPTION
 	pointed to by <[dst]> to the value.
 
 RETURNS
-	<<memset>> returns the value of <[m]>.
+	<<memset>> returns the value of <[dst]>.
 
 PORTABILITY
 <<memset>> is ANSI C.
@@ -39,48 +39,42 @@ QUICKREF
 #define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
-_PTR 
+_PTR
 _DEFUN (memset, (m, c, n),
 	_PTR m _AND
 	int c _AND
 	size_t n)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *s = (char *) m;
 
-  while (n-- != 0)
-    {
-      *s++ = (char) c;
-    }
-
-  return m;
-#else
-  char *s = (char *) m;
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   int i;
   unsigned long buffer;
   unsigned long *aligned_addr;
   unsigned int d = c & 0xff;	/* To avoid sign extension, copy C to an
 				   unsigned variable.  */
 
-  if (!TOO_SMALL (n) && !UNALIGNED (m))
+  while (UNALIGNED (s))
     {
-      /* If we get this far, we know that n is large and m is word-aligned. */
-      aligned_addr = (unsigned long*)m;
+      if (n--)
+        *s++ = (char) c;
+      else
+        return m;
+    }
+
+  if (!TOO_SMALL (n))
+    {
+      /* If we get this far, we know that n is large and s is word-aligned. */
+      aligned_addr = (unsigned long *) s;
 
       /* Store D into each char sized location in BUFFER so that
          we can set large blocks quickly.  */
-      if (LBLOCKSIZE == 4)
-        {
-          buffer = (d << 8) | d;
-          buffer |= (buffer << 16);
-        }
-      else
-        {
-          buffer = 0;
-          for (i = 0; i < LBLOCKSIZE; i++)
-	    buffer = (buffer << 8) | d;
-        }
+      buffer = (d << 8) | d;
+      buffer |= (buffer << 16);
+      for (i = 32; i < LBLOCKSIZE * 8; i <<= 1)
+        buffer = (buffer << i) | buffer;
 
+      /* Unroll the loop.  */
       while (n >= LBLOCKSIZE*4)
         {
           *aligned_addr++ = buffer;
@@ -99,11 +93,10 @@ _DEFUN (memset, (m, c, n),
       s = (char*)aligned_addr;
     }
 
+#endif /* not PREFER_SIZE_OVER_SPEED */
+
   while (n--)
-    {
-      *s++ = (char)d;
-    }
+    *s++ = (char) c;
 
   return m;
-#endif /* not PREFER_SIZE_OVER_SPEED */
 }
