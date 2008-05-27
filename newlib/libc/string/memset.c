@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	void *memset(const void *<[dst]>, int <[c]>, size_t <[length]>);
+	void *memset(void *<[dst]>, int <[c]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>

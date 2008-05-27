@@ -1,3 +1,8 @@
+2008-05-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/memset.c: Fix documented prototype to remove
+	erroneous const attribute on first parameter.
+
 2008-05-26  Eric Blake  <ebb9@byu.net>
 
 	Optimize the generic and x86 memchr.
