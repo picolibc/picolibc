@@ -1,3 +1,8 @@
+2008-05-28  Eric Blake  <ebb9@byu.net>
+
+	Fix bug in previous patch.
+	* libc/machine/i386/memset.S (memset): Mask second arg correctly.
+
 2008-05-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/memset.c: Fix documented prototype to remove
@@ -10,16 +15,16 @@
 	Pre-align pointer so unaligned searches aren't penalized.
 	* libc/machine/i386/memchr.S (memchr) [!__OPTIMIZE_SIZE__]: Word
 	operations are faster than repnz byte searches.
-					
+
 2008-05-26  Eric Blake  <ebb9@byu.net>
 
 	Optimize the generic and x86 memset.
 	* libc/string/memset.c (memset) [!__OPTIMIZE_SIZE__]:
 	Pre-align pointer so unaligned stores aren't penalized.
-	* libc/machine/i386/memset.S (memset): [!__OPTIMIZE_SIZE__]:
+	* libc/machine/i386/memset.S (memset) [!__OPTIMIZE_SIZE__]:
 	Pre-align pointer so unaligned stores aren't penalized.  Prefer
 	8-byte over 4-byte alignment.  Reduce register pressure.
-						
+
 2008-05-26  Eric Blake  <ebb9@byu.net>
 
 	Optimize the generic and x86 strlen.

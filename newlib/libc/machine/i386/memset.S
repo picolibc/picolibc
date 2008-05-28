@@ -19,7 +19,7 @@ SYM (memset):
 	movl esp,ebp
 	pushl edi
 	movl 8(ebp),edi
-	movl 12(ebp),eax
+	movzbl 12(ebp),eax
 	movl 16(ebp),ecx
 	cld
 
@@ -27,7 +27,6 @@ SYM (memset):
 /* Less than 16 bytes won't benefit from the 'rep stosl' loop.  */
 	cmpl $16,ecx
 	jbe .L19
-	cbw
 	testl $7,edi
 	je .L10
 
