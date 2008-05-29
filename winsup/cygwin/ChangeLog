@@ -1,6 +1,7 @@
 2008-05-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* devices.in: Change mapping for /dev/ttyS* and /dev/com*.
+	* devices.cc: Regenerate.
 
 2008-05-25  Christopher Faylor  <me+cygwin@cgf.cx>
 
