@@ -1,5 +1,11 @@
 2008-05-28  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
+	* include/commctrl.h (NMLVODSTATECHANGE): Define.
+
+	Thanks to Tim Kosse <botg at users dot sf dot net>.
+
+2008-05-28  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
 	* include/winnt.h (SUBLANG_TIBETAN_BHUTAN): Fix definition.
 
 	Thanks to Nicola Di Nisio <nicoladinisio at users dot sf dot net>.
