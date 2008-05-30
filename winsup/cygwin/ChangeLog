@@ -1,3 +1,8 @@
+2008-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* select.cc (peek_pipe): Semi-reinstate pipe NT-special write
+	detection.
+
 2008-05-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* devices.in: Change mapping for /dev/ttyS* and /dev/com*.

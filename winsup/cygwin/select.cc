@@ -16,6 +16,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include "ntdll.h"
 
 #include <wingdi.h>
 #include <winuser.h>
@@ -294,7 +295,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       select_printf ("woke up.  wait_ret %d.  verifying", wait_ret);
       s = &start;
       bool gotone = false;
-      /* Some types of object (e.g., consoles) wake up on "inappropriate" events
+      /* Some types of objects (e.g., consoles) wake up on "inappropriate" events
 	 like mouse movements.  The verify function will detect these situations.
 	 If it returns false, then this wakeup was a false alarm and we should go
 	 back to waiting. */
@@ -505,10 +506,6 @@ out:
 		       fh->get_name ());
       else
 	{
-#if 0
-/* FIXME: This code is not quite correct.  There's no better solution
-   so far but to always treat the write side of the pipe as writable. */
-
 	  IO_STATUS_BLOCK iosb = {0};
 	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
@@ -519,19 +516,18 @@ out:
 				      FilePipeLocalInformation))
 	    {
 	      /* If NtQueryInformationFile fails, optimistically assume the
-		 pipe is writable.  This could happen on Win9x, because
-		 NtQueryInformationFile is not available, or if we somehow
+		 pipe is writable.  This could happen if we somehow
 		 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
 		 access on the write end.  */
 	      select_printf ("%s, NtQueryInformationFile failed",
 			     fh->get_name ());
 	      gotone += s->write_ready = true;
 	    }
-	  /* Ensure that enough space is available for atomic writes,
-	     as required by POSIX.  Subsequent writes with size > PIPE_BUF
-	     can still block, but most (all?) UNIX variants seem to work
-	     this way (e.g., BSD, Linux, Solaris).  */
-	  else if (fpli.WriteQuotaAvailable >= PIPE_BUF)
+	  /* If there is anything available in the pipe buffer then signal
+	     that.  This means that a pipe could still block since you could
+	     be trying to write more to the pipe than is available in the
+	     buffer but that is the hazard of select().  */
+	  else if (fpli.WriteQuotaAvailable)
 	    {
 	      select_printf ("%s, ready for write: size %lu, avail %lu",
 			     fh->get_name (),
@@ -539,6 +535,10 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
+#if 0
+/* FIXME: This code is not quite correct.  There's no better solution
+   so far but to make simple assumptions based on WriteQuotaAvailable. */
+
 	  /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
 	     the pipe writable only if it is completely empty, to minimize the
 	     probability that a subsequent write will block.  */
@@ -551,8 +551,6 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
-#else
-	  gotone += s->write_ready = true;
 #endif
 	}
     }
