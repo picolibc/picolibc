@@ -1,3 +1,7 @@
+2008-06-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin.sc: Remove unrequired and erroneous definition.
+
 2008-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.cc (peek_pipe): Semi-reinstate pipe NT-special write

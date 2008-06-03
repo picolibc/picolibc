@@ -111,7 +111,6 @@ SECTIONS
   }
   __cygheap_end = ABSOLUTE(.);
   __cygheap_end1 = __cygheap_mid + SIZEOF(.cygheap);
-  __cygwin_debug_size = SIZEOF(.gnu_debuglink);
   /DISCARD/ :
   {
     *(.debug$S)
