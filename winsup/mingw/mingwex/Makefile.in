@@ -54,17 +54,16 @@ MATH_DISTFILES = \
 	fpclassify.c fpclassifyf.c fpclassifyl.c \
 	frexpf.c frexpl.S fucom.c hypotf.c hypotl.c ilogb.S ilogbf.S \
 	ilogbl.S isnan.c isnanf.c isnanl.c ldexpf.c ldexpl.c \
-	lgamma.c lgammaf.c lgammal.c llrint.c \
-	llrintf.c llrintl.c llround.c llroundf.c llroundl.c \
+	lgamma.c lgammaf.c lgammal.c llrint.c llrintf.c llrintl.c \
 	log10f.S log10l.S log1p.S log1pf.S log1pl.S log2.S log2f.S \
 	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
-	lrintl.c lround.c lroundf.c lroundl.c modff.c modfl.c \
+	lrintl.c lround_generic.c modff.c modfl.c \
 	nearbyint.S nearbyintf.S nearbyintl.S \
 	nextafterf.c nextafterl.c nexttowardf.c nexttoward.c \
 	powf.c powi.c powif.c powil.c powl.c \
 	remainder.S remainderf.S remainderl.S remquo.S \
-	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
-	roundl.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
+	remquof.S remquol.S rint.c rintf.c rintl.c round_internal.h \
+	round_generic.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
 	signbit.c signbitf.c signbitl.c sinf.S sinhf.c sinhl.c sinl.S \
 	sqrtf.c sqrtl.c tanf.S tanhf.c tanhl.c tanl.S tgamma.c \
 	tgammaf.c tgammal.c trunc.c truncf.c truncl.c \
@@ -153,22 +152,24 @@ MATH_OBJS = \
 	fpclassify.o fpclassifyf.o fpclassifyl.o \
 	frexpf.o frexpl.o fucom.o hypotf.o hypotl.o ilogb.o ilogbf.o \
 	ilogbl.o isnan.o isnanf.o isnanl.o ldexpf.o ldexpl.o \
-	lgamma.o lgammaf.o lgammal.o llrint.o \
-	llrintf.o llrintl.o llround.o llroundf.o llroundl.o \
+	lgamma.o lgammaf.o lgammal.o llrint.o llrintf.o llrintl.o \
 	log10f.o log10l.o log1p.o log1pf.o log1pl.o log2.o log2f.o \
-	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
-	lrintl.o lround.o lroundf.o lroundl.o modff.o modfl.o \
+	log2l.o logb.o logbf.o logbl.o logf.o logl.o \
+	lrint.o lrintf.o lrintl.o modff.o modfl.o \
 	nearbyint.o nearbyintf.o nearbyintl.o \
 	nextafterf.o nextafterl.o nexttowardf.o nexttoward.o \
 	powf.o powi.o powif.o powil.o powl.o \
 	remainder.o remainderf.o remainderl.o remquo.o \
-	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
-	roundl.o scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \
+	remquof.o remquol.o rint.o rintf.o rintl.o \
+	scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \
 	signbit.o signbitf.o signbitl.o sinf.o sinhf.o sinhl.o sinl.o \
 	sqrtf.o sqrtl.o tanf.o tanhf.o tanhl.o tanl.o tgamma.o \
 	tgammaf.o tgammal.o trunc.o truncf.o truncl.o \
 	acosh.o acoshf.o acoshl.o asinh.o asinhf.o asinhl.o \
 	atanh.o atanhf.o atanhl.o
+MATH_ROUND_OBJS = round.o roundf.o roundl.o
+MATH_LROUND_OBJS = lround.o lroundf.o lroundl.o
+MATH_LLROUND_OBJS = llround.o llroundf.o llroundl.o
 FENV_OBJS = fesetround.o  fegetround.o \
 	fegetenv.o fesetenv.o feupdateenv.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
@@ -196,7 +197,8 @@ GDTOA_OBJS = \
 	mingw_snprintf.o
 
 LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_STUB_OBJS) \
-	$(STDIO_OBJS) $(MATH_OBJS)  $(FENV_OBJS) \
+	$(STDIO_OBJS) $(MATH_OBJS) $(MATH_ROUND_OBJS) \
+	$(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS) $(FENV_OBJS) \
 	$(POSIX_OBJS) $(REPLACE_OBJS) $(COMPLEX_OBJS) \
 	$(GDTOA_OBJS)
 
@@ -209,6 +211,14 @@ $(LIBMINGWEX_A): $(LIB_OBJS)
 	rm -f $(LIBMINGWEX_A)
 	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
 	$(RANLIB) $@
+
+$(MATH_ROUND_OBJS): round_generic.c
+	$(CC) $(ALL_CFLAGS) -I$(srcdir)/math -c -o $@ \
+	  -D FUNCTION=$* $(srcdir)/math/round_generic.c
+
+$(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS): lround_generic.c
+	$(CC) $(ALL_CFLAGS) -I$(srcdir)/math -c -o $@ \
+	  -D FUNCTION=$* $(srcdir)/math/lround_generic.c
 
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
@@ -254,6 +264,8 @@ atanh.o atanhf.o atanhl.o: fastmath.h
 mbrtowc.o wcrtomb.o wcstof.o wcstold.o: mb_wc_common.h
 
 $(GDTOA_OBJS): gd_arith.h gdtoa.h gdtoaimp.h gd_qnan.h
+
+$(MATH_ROUND_OBJS) $(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS): round_internal.h
 
 dist:
 	mkdir $(distdir)/mingwex

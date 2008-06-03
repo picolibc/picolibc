@@ -1,3 +1,34 @@
+2008-06-02  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Avoid precision errors in round(), lround() and llround() functions.
+
+	* mingwex/math/round_generic.c: New file; it replaces...
+	* mingwex/math/round.c: ...this; delete it.
+	* mingwex/math/roundf.c: ...and this; ditto.
+	* mingwex/math/roundl.c: ...and this; ditto.
+
+	* mingwex/math/lround_generic.c: New file; it replaces...
+	* mingwex/math/lround.c: ...this; delete it.
+	* mingwex/math/lroundf.c: ...and this; ditto.
+	* mingwex/math/lroundl.c: ...and this; ditto.
+	* mingwex/math/llround.c: ...and this; ditto.
+	* mingwex/math/llroundf.c: ...and this; ditto.
+	* mingwex/math/llroundl.c: ...and this; ditto.
+
+	* mingwex/math/round_internal.h: New file; it provides generic common
+	code, which is shared by `round_generic.c' and `lround_generic.c'; the
+	implementation is based on techniques suggested by Danny Smith and
+	Greg Chicares.
+
+	* mingwex/Makefile.in (MATH_DISTFILES): Remove `round.c', `roundf.c',
+	`roundl.c', `lround.c', `lroundf.c', `lroundl.c', `llround.c',
+	`llroundf.c' and `llroundl.c'; replace by `round_internal.h',
+	`round_generic.c' and `lround_generic.c'.
+	(MATH_OBJS): Factor out files listed in...
+	(MATH_ROUND_OBJS, MATH_LROUND_OBJS, MATH_LLROUND_OBJS): ...these new
+	macros; define them; specify dependencies and build rules; add to...
+	(LIB_OBJS): ...this list.
+
 2008-05-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	[ mingw-Bugs-1961893 ]
