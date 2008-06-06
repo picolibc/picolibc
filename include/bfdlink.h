@@ -372,6 +372,9 @@ struct bfd_link_info
      wrap_hash.  Used by PowerPC Linux for 'dot' symbols.  */
   char wrap_char;
 
+  /* Separator between archive and filename in linker script filespecs.  */
+  char path_separator;
+
   /* Function callbacks.  */
   const struct bfd_link_callbacks *callbacks;
 

@@ -1,3 +1,7 @@
+2008-06-06  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Add "path_separator".
+
 2008-04-10  Andreas Krebbel  <krebbel1@de.ibm.com>
 
 	* dis-asm.h (print_s390_disassembler_options):
