@@ -1,3 +1,8 @@
+2008-06-09  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/strcat.c: Return value fixed.
+	* libc/machine/spu/strncat.c: Likewise.
+		
 2008-05-28  Eric Blake  <ebb9@byu.net>
 
 	Fix bug in previous patch.

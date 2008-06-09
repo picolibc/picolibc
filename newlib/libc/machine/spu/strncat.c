@@ -41,5 +41,6 @@
 char * strncat(char * __restrict__ dest, const char * __restrict__ src,
                size_t n)
 {
-  return _strncpy(_straddr(dest), src, n, 1, 1);
+  _strncpy(_straddr(dest), src, n, 1, 1);
+  return dest;
 }
