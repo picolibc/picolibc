@@ -1,3 +1,7 @@
+008-06-09  Eric Blake  <ebb9@byu.net>
+
+	* signal.cc (abort): Only flush streams after signal handler.
+
 2008-06-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin.sc: Remove unrequired and erroneous definition.

@@ -324,16 +324,6 @@ abort (void)
 {
   _my_tls.incyg++;
   sig_dispatch_pending ();
-  /* Flush all streams as per SUSv2.
-     From my reading of this document, this isn't strictly correct.
-     The streams are supposed to be flushed prior to exit.  However,
-     if there is I/O in any signal handler that will not necessarily
-     be flushed.
-     However this is the way FreeBSD does it, and it is much easier to
-     do things this way, so... */
-  if (_GLOBAL_REENT->__cleanup)
-    _GLOBAL_REENT->__cleanup (_GLOBAL_REENT);
-
   /* Ensure that SIGABRT can be caught regardless of blockage. */
   sigset_t sig_mask;
   sigfillset (&sig_mask);
@@ -342,6 +332,10 @@ abort (void)
 
   raise (SIGABRT);
   _my_tls.call_signal_handler (); /* Call any signal handler */
+
+  /* Flush all streams as per SUSv2.  */
+  if (_GLOBAL_REENT->__cleanup)
+    _GLOBAL_REENT->__cleanup (_GLOBAL_REENT);
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
