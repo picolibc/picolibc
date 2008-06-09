@@ -18,8 +18,7 @@
 ##############################################################################
 ### WARNING: this file contains embedded tabs.  Do not run untabify on this file.
 
-m4_include(config/acx.m4)
-m4_include(config/override.m4)
+sinclude(config/acx.m4)
 m4_include(config/proginstall.m4)
 
 AC_INIT(move-if-change)
@@ -317,7 +316,7 @@ if test "${ENABLE_GOLD}" = "yes"; then
   if test "$is_elf" = "yes"; then
     # Check for target supported by gold.
     case "${target}" in
-      i?86-*-* | x86_64-*-* | sparc*-*-*)
+      i?86-*-* | x86_64-*-*)
         configdirs="`echo " ${configdirs} " | sed -e 's/ ld / gold /'`"
         ;;
     esac
@@ -589,7 +588,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ld target-libgloss ${libgcj}"
     ;;
   avr-*-*)
-    noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj} target-libssp"
+    noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
   bfin-*-*)
     noconfigdirs="$noconfigdirs gdb"
@@ -602,9 +601,6 @@ case "${target}" in
     ;;
   c54x*-*-* | tic54x-*-*)
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj} gcc gdb newlib"
-    ;;
-  cr16-*-*)
-    noconfigdirs="$noconfigdirs ${libgcj} gdb"
     ;;
   cris-*-* | crisv32-*-*)
     unsupported_languages="$unsupported_languages java"
@@ -1046,10 +1042,12 @@ case "${host}" in
     host_makefile_frag="config/mh-djgpp"
     ;;
   *-cygwin*)
-    ACX_CHECK_CYGWIN_CAT_WORKS
     host_makefile_frag="config/mh-cygwin"
     ;;
-  *-mingw*)
+  *-mingw32*)
+    host_makefile_frag="config/mh-mingw"
+    ;;
+  *-mingw64*)
     host_makefile_frag="config/mh-mingw"
     ;;
   *-interix*)

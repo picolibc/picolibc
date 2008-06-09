@@ -1,39 +1,3 @@
-2008-06-08  Joseph Myers  <joseph@codesourcery.com>
-
-	PR tree-optimization/36218
-	* config/mh-mingw (LDFLAGS): Define.
-
-2008-06-05  Danny Smith  <dannysmith@users.sourceforge.net>
-
-	PR driver/35916
-	* mh-mingw (CFLAGS): Add -D__USE_MINGW_ACCESS.
-
-2008-05-12  Samuel Tardieu  <sam@rfc1149.net>
-	    Paolo Bonzini  <bonzini@gnu.org>
-
-	PR ada/36001
-	* acx.m4: Add optional parameter to ACX_PROG_GNAT.
-
-2008-04-23  Paolo Bonzini  <bonzini@gnu.org>
-
-	* override.m4: Apply _AC_ARG_VALIDATE fix to all versions
-	but 2.62.
-
-2008-04-18  Paolo Bonzini  <bonzini@gnu.org>
-
-	PR bootstrap/35457
-
-	* confsubdir.m4: Rename to...
-	* override.m4: ... this.  Make sure aclocal always picks it.
-	Add more lenient precious variable check, backported from
-	autoconf trunk.
-
-2008-04-04  Nick Clifton  <nickc@redhat.com>
-
-	PR binutils/4334
-	* acx.m4 (ACX_CHECK_CYGWIN_CAT_WORKS): New macro to check that
-	cygwin builds are not running in textmode.
-
 2008-03-27  Paolo Bonzini  <bonzini@gnu.org>
 
 	* extensions.m4: New.

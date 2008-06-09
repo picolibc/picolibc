@@ -20,14 +20,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-# First, test for a proper version of make, but only where one is required.
-
-@if gcc
-ifeq (,$(.VARIABLES)) # The variable .VARIABLES, new with 3.80, is never empty.
-$(error GNU make version 3.80 or newer is required.)
-endif
-@endif gcc
-
 # -------------------------------
 # Standard Autoconf-set variables
 # -------------------------------
@@ -143,12 +135,6 @@ BUILD_EXPORTS = \
 	RANLIB="$(RANLIB_FOR_BUILD)"; export RANLIB; \
 	WINDRES="$(WINDRES_FOR_BUILD)"; export WINDRES; \
 	WINDMC="$(WINDMC_FOR_BUILD)"; export WINDMC;
-
-# These variables must be set on the make command line for directories
-# built for the build system to override those in BASE_FLAGS_TO_PASSS.
-EXTRA_BUILD_FLAGS = \
-	CFLAGS="$(CFLAGS_FOR_BUILD)" \
-	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
 
 # This is the list of directories to built for the host system.
 SUBDIRS = @configdirs@
@@ -505,7 +491,6 @@ BASE_FLAGS_TO_PASS = \
 	"INSTALL_DATA=$(INSTALL_DATA)" \
 	"INSTALL_PROGRAM=$(INSTALL_PROGRAM)" \
 	"INSTALL_SCRIPT=$(INSTALL_SCRIPT)" \
-	"LDFLAGS_FOR_BUILD=$(LDFLAGS_FOR_BUILD)" \
 	"LEX=$(LEX)" \
 	"M4=$(M4)" \
 	"MAKE=$(MAKE)" \
@@ -2769,7 +2754,7 @@ all-build-libiberty: configure-build-libiberty
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/libiberty && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-libiberty))
 @endif build-libiberty
 
@@ -2825,7 +2810,7 @@ all-build-bison: configure-build-bison
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/bison && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-bison))
 @endif build-bison
 
@@ -2881,7 +2866,7 @@ all-build-byacc: configure-build-byacc
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/byacc && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-byacc))
 @endif build-byacc
 
@@ -2937,7 +2922,7 @@ all-build-flex: configure-build-flex
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/flex && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-flex))
 @endif build-flex
 
@@ -2993,7 +2978,7 @@ all-build-m4: configure-build-m4
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/m4 && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-m4))
 @endif build-m4
 
@@ -3049,7 +3034,7 @@ all-build-texinfo: configure-build-texinfo
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/texinfo && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-texinfo))
 @endif build-texinfo
 
@@ -3105,7 +3090,7 @@ all-build-fixincludes: configure-build-fixincludes
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(BUILD_EXPORTS) \
 	(cd $(BUILD_SUBDIR)/fixincludes && \
-	  $(MAKE) $(BASE_FLAGS_TO_PASS) $(EXTRA_BUILD_FLAGS)  \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS)   \
 		$(TARGET-build-fixincludes))
 @endif build-fixincludes
 
@@ -52697,10 +52682,10 @@ stage_current:
 	@if test -f stage_last; then $(unstage); else $(MAKE) stage1-start; fi
 
 .PHONY: restrap
-restrap::
+restrap:
 	@: $(MAKE); $(stage)
 	rm -rf stage1-$(TARGET_SUBDIR) stage2-* stageb2g0-* stage3-* stageb3g2-* stage4-* stageprofile-* stagefeedback-* 
-restrap:: all
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) all
 @endif gcc-bootstrap
 
 # --------------------------------------
@@ -53366,16 +53351,6 @@ all-stageb3g2-gold: maybe-all-build-byacc
 all-stage4-gold: maybe-all-build-byacc
 all-stageprofile-gold: maybe-all-build-byacc
 all-stagefeedback-gold: maybe-all-build-byacc
-check-gold: maybe-all-binutils
-
-check-stage1-gold: maybe-all-stage1-binutils
-check-stage2-gold: maybe-all-stage2-binutils
-check-stageb2g0-gold: maybe-all-stageb2g0-binutils
-check-stage3-gold: maybe-all-stage3-binutils
-check-stageb3g2-gold: maybe-all-stageb3g2-binutils
-check-stage4-gold: maybe-all-stage4-binutils
-check-stageprofile-gold: maybe-all-stageprofile-binutils
-check-stagefeedback-gold: maybe-all-stagefeedback-binutils
 configure-opcodes: maybe-configure-intl
 
 configure-stage1-opcodes: maybe-configure-stage1-intl

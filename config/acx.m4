@@ -357,8 +357,7 @@ ac_c_preproc_warn_flag=yes])# AC_PROG_CPP_WERROR
 
 # Test for GNAT.
 # We require the gnatbind program, and a compiler driver that
-# understands Ada.  We use the user's CC setting, already found,
-# and possibly add $1 to the command-line parameters.
+# understands Ada.  We use the user's CC setting, already found.
 #
 # Sets the shell variable have_gnat to yes or no as appropriate, and
 # substitutes GNATBIND and GNATMAKE.
@@ -381,7 +380,7 @@ acx_cv_cc_gcc_supports_ada=no
 # Other compilers, like HP Tru64 UNIX cc, exit successfully when
 # given a .adb file, but produce no object file.  So we must check
 # if an object file was really produced to guard against this.
-errors=`(${CC} $1[]m4_ifval([$1], [ ])-c conftest.adb) 2>&1 || echo failure`
+errors=`(${CC} -c conftest.adb) 2>&1 || echo failure`
 if test x"$errors" = x && test -f conftest.$ac_objext; then
   acx_cv_cc_gcc_supports_ada=yes
 fi
@@ -595,27 +594,4 @@ AC_DEFUN([ACX_BUGURL],[
   esac;
   AC_SUBST(REPORT_BUGS_TO)
   AC_SUBST(REPORT_BUGS_TEXI)
-])
-
-dnl ####
-dnl # ACX_CHECK_CYGWIN_CAT_WORKS
-dnl # On Cygwin hosts, check that the cat command ignores 
-dnl # carriage returns as otherwise builds will not work.
-dnl # See binutils PR 4334 for more details.
-AC_DEFUN([ACX_CHECK_CYGWIN_CAT_WORKS],[
-AC_MSG_CHECKING([to see if cat works as expected])
-echo a >cygwin-cat-check
-if test `cat cygwin-cat-check` == a ; then
-  rm cygwin-cat-check
-  AC_MSG_RESULT(yes)
-else
-  rm cygwin-cat-check
-  AC_MSG_RESULT(no)
-  AC_MSG_ERROR([The cat command does not ignore carriage return characters.
-  Please either mount the build directory in binary mode or run the following
-  commands before running any configure script:
-set -o igncr
-export SHELLOPTS 
-  ])
-fi
 ])

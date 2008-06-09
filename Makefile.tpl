@@ -23,14 +23,6 @@ in
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-# First, test for a proper version of make, but only where one is required.
-
-@if gcc
-ifeq (,$(.VARIABLES)) # The variable .VARIABLES, new with 3.80, is never empty.
-$(error GNU make version 3.80 or newer is required.)
-endif
-@endif gcc
-
 # -------------------------------
 # Standard Autoconf-set variables
 # -------------------------------
@@ -146,12 +138,6 @@ BUILD_EXPORTS = \
 	RANLIB="$(RANLIB_FOR_BUILD)"; export RANLIB; \
 	WINDRES="$(WINDRES_FOR_BUILD)"; export WINDRES; \
 	WINDMC="$(WINDMC_FOR_BUILD)"; export WINDMC;
-
-# These variables must be set on the make command line for directories
-# built for the build system to override those in BASE_FLAGS_TO_PASSS.
-EXTRA_BUILD_FLAGS = \
-	CFLAGS="$(CFLAGS_FOR_BUILD)" \
-	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
 
 # This is the list of directories to built for the host system.
 SUBDIRS = @configdirs@
@@ -961,8 +947,7 @@ clean-stage[+id+]-[+prefix+][+module+]:
 	     target_alias=(get "target" "${target_alias}")
 	     args="$(BUILD_CONFIGARGS)" no-config-site=true +]
 
-[+ all prefix="build-" subdir="$(BUILD_SUBDIR)" exports="$(BUILD_EXPORTS)"
-	     args="$(EXTRA_BUILD_FLAGS)" +]
+[+ all prefix="build-" subdir="$(BUILD_SUBDIR)" exports="$(BUILD_EXPORTS)" +]
 [+ ENDFOR build_module +]
 
 # --------------------------------------
@@ -1457,11 +1442,11 @@ stage_current:
 	@if test -f stage_last; then $(unstage); else $(MAKE) stage1-start; fi
 
 .PHONY: restrap
-restrap::
+restrap:
 	@: $(MAKE); $(stage)
 	rm -rf stage1-$(TARGET_SUBDIR) [+ FOR bootstrap-stage +][+ IF prev
 	  +]stage[+id+]-* [+ ENDIF prev +][+ ENDFOR bootstrap-stage +]
-restrap:: all
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) all
 @endif gcc-bootstrap
 
 # --------------------------------------
