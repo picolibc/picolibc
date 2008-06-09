@@ -1,13 +1,3 @@
-2008-06-08  Joseph Myers  <joseph@codesourcery.com>
-
-	PR tree-optimization/36218
-	* config/mh-mingw (LDFLAGS): Define.
-
-2008-06-05  Danny Smith  <dannysmith@users.sourceforge.net>
-
-	PR driver/35916
-	* mh-mingw (CFLAGS): Add -D__USE_MINGW_ACCESS.
-
 2008-05-12  Samuel Tardieu  <sam@rfc1149.net>
 	    Paolo Bonzini  <bonzini@gnu.org>
 
