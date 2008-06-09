@@ -1,11 +1,3 @@
-2008-06-09  Takashi Yoshii  <yoshii.takashi@renesas.com>
-
-	* sh.h (EF_SH_BFD_TABLE): Set bfd_mach_sh for EF_SH_UNKNOWN.
-
-2008-06-09  Joseph Myers  <joseph@codesourcery.com>
-
-	* common.h: Change registry@caldera.com to registry@sco.com.
-
 2008-05-21  Nick Clifton  <nickc@redhat.com>
 
 	* reloc-macros.h: Add a comment about the use of the
