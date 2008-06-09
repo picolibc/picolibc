@@ -95,7 +95,7 @@
 #define ET_HIPROC	0xFFFF	/* Processor-specific */
 
 /* Values for e_machine, which identifies the architecture.  These numbers
-   are officially assigned by registry@caldera.com.  See below for a list of
+   are officially assigned by registry@sco.com.  See below for a list of
    ad-hoc numbers used during initial development.  */
 
 #define EM_NONE		  0	/* No machine */
@@ -198,7 +198,7 @@
    will have a collision.  Instead, pick a random number.
 
    Normally, each entity or maintainer responsible for a machine with an
-   unofficial e_machine number should eventually ask registry@caldera.com for
+   unofficial e_machine number should eventually ask registry@sco.com for
    an officially blessed number to be added to the list above.	*/
 
 /* Old version of Sparc v9, from before the ABI;
