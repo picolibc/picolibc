@@ -54,7 +54,7 @@
    bfd_mach_* are defined in bfd_in2.h (generated from
    archures.c).  */
 #define EF_SH_BFD_TABLE \
-/* EF_SH_UNKNOWN	*/ bfd_mach_sh3		, \
+/* EF_SH_UNKNOWN	*/ bfd_mach_sh		, \
 /* EF_SH1		*/ bfd_mach_sh		, \
 /* EF_SH2		*/ bfd_mach_sh2		, \
 /* EF_SH3		*/ bfd_mach_sh3		, \
