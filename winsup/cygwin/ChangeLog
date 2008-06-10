@@ -1,5 +1,10 @@
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::from_fstab): Read sizeof (buf) - 2 bytes.
+	Add code to handle overly long lines.
+
+2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (lsaauth): Make returned token inheritable.
 
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>

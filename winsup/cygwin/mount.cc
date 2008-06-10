@@ -935,8 +935,9 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
   char buf[NT_MAX_PATH];
   char *got = buf;
   DWORD len = 0;
-  /* Using buffer size - 1 leaves space to append two \0. */
-  while (ReadFile (h, got, (sizeof (buf) - 1) - (got - buf), &len, NULL))
+  unsigned line = 1;
+  /* Using buffer size - 2 leaves space to append two \0. */
+  while (ReadFile (h, got, (sizeof (buf) - 2) - (got - buf), &len, NULL))
     {
       char *end;
 
@@ -946,15 +947,39 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
       len += got - buf;
       /* Reset got to start reading at the start of the buffer again. */
       got = buf;
+retry:
+      bool got_nl = false;
       while (got < buf + len && (end = strchr (got, '\n')))
         {
+	  got_nl = true;
 	  end[end[-1] == '\r' ? -1 : 0] = '\0';
 	  if (!from_fstab_line (got, user))
 	    goto done;
 	  got = end + 1;
+	  ++line;
 	}
-      if (len < (sizeof (buf) - 1))
+      if (len < (sizeof (buf) - 2))
         break;
+      /* Check if the buffer contained at least one \n.  If not, the
+         line length is > 32K.  We don't take such long lines.  Print
+	 a debug message and skip this line entirely. */
+      if (!got_nl)
+        {
+	  system_printf ("%W: Line %d too long, skipping...", fstab, line);
+	  while (ReadFile (h, buf, (sizeof (buf) - 2), &len, NULL))
+	    {
+	      buf[len] = buf[len + 1] = '\0';
+	      got = strchr (buf, '\n');
+	      if (got)
+	        {
+		  ++got;
+		  ++line;
+		  goto retry;
+		}
+	    }
+	  got = buf;
+	  break;
+	}
       /* We have to read once more.  Move remaining bytes to the start of
          the buffer and reposition got so that it points to the end of
 	 the remaining bytes. */
@@ -963,6 +988,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
       got = buf + len;
       buf[len] = buf[len + 1] = '\0';
     }
+  /* Catch a last line without trailing \n. */
   if (got > buf)
     from_fstab_line (got, user);
 done:
