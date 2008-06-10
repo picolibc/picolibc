@@ -21,7 +21,9 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	tmpnam.c ungetc.c usleep.c vfiprintf.c vfiscanf.c vfprintf.c \
 	vfscanf.c viprintf.c viscanf.c vprintf.c vscanf.c vsiprintf.c \
 	vsiscanf.c vsniprintf.c vsnprintf.c vsprintf.c vsscanf.c \
-	stack_reg_va.S
+	stack_reg_va.S spu_clock_svcs.c spu_clock_stop.c spu_timer_flih.S \
+	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
+	spu_timer_stop.c spu_timer_free.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)

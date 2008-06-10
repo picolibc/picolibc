@@ -1,5 +1,21 @@
 2008-06-09  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libc/machine/spu/Makefile.am: Add new files.
+	* libc/machine/spu/Makefile.in: Likewise.
+	* libc/machine/spu/include/spu_timer.h: New file to add timer support
+        using interrupts.
+	* libc/machine/spu/spu_clock_stop.c: Likewise.
+	* libc/machine/spu/spu_clock_svcs.c: Likewise.
+	* libc/machine/spu/spu_timer_flih.S: Likewise.
+	* libc/machine/spu/spu_timer_free.c: Likewise.
+	* libc/machine/spu/spu_timer_internal.h: Likewise.
+	* libc/machine/spu/spu_timer_slih.c: Likewise.
+	* libc/machine/spu/spu_timer_slih_reg.c: Likewise.
+	* libc/machine/spu/spu_timer_stop.c: Likewise.
+	* libc/machine/spu/spu_timer_svcs.c: Likewise.
+
+2008-06-09  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libc/machine/spu/strcat.c: Return value fixed.
 	* libc/machine/spu/strncat.c: Likewise.
 		
