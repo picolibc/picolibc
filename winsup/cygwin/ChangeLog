@@ -1,5 +1,9 @@
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (lsaauth): Make returned token inheritable.
+
+2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.cc: Regenerate.
 
 2008-06-09  Christopher Faylor  <me+cygwin@cgf.cx>

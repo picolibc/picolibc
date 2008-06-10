@@ -1118,6 +1118,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	}
     }
 
+  /* The token returned by LsaLogonUser is not inheritable.  Make it so. */
+  if (!SetHandleInformation (user_token, HANDLE_FLAG_INHERIT,
+			     HANDLE_FLAG_INHERIT))
+    system_printf ("SetHandleInformation %E");
+
 out:
   if (privs)
     free (privs);
