@@ -260,14 +260,14 @@ format_procnet_ifinet6 (char *&filebuf)
 	  filesize += sprintf (filebuf + filesize, "%04x",
 			       ntohs (sin6->sin6_addr.s6_addr16[i]));
 	filebuf[filesize++] = ' ';
-	filesize += __small_sprintf (filebuf + filesize,
-				"%02x %02x %02x %02x %s\n",
-				pap->IfIndex ?: pap->Ipv6IfIndex,
-				ip_addr_prefix (pua, pap->FirstPrefix),
-				((struct sockaddr_in6 *)
-				 pua->Address.lpSockaddr)->sin6_scope_id,
-				pua->DadState,
-				pap->AdapterName);
+	filesize += sprintf (filebuf + filesize,
+			     "%02lx %02x %02x %02x %s\n",
+			     pap->IfIndex ?: pap->Ipv6IfIndex,
+			     ip_addr_prefix (pua, pap->FirstPrefix),
+			     ((struct sockaddr_in6 *)
+			      pua->Address.lpSockaddr)->sin6_scope_id,
+			     pua->DadState,
+			     pap->AdapterName);
       }
 
 out:

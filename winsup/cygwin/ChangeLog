@@ -1,5 +1,14 @@
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procnet.cc (format_procnet_ifinet6): Use sprintf rather than
+	__small_sprintf.
+	* net.cc (if_nametoindex): Prefer IPv6IfIndex over IfIndex for
+	consistency with /proc/net/if_inet6.
+	(if_indextoname): Ditto.
+	(if_nameindex): Ditto.
+
+2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_info::from_fstab): Read sizeof (buf) - 2 bytes.
 	Add code to handle overly long lines.
 

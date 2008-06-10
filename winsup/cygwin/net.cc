@@ -2048,7 +2048,7 @@ if_nametoindex (const char *name)
       for (pap = pa0; pap; pap = pap->Next)
 	if (strcasematch (lname, pap->AdapterName))
 	  {
-	    index = pap->IfIndex;
+	    index = pap->Ipv6IfIndex ?: pap->IfIndex;
 	    break;
 	  }
       free (pa0);
@@ -2070,7 +2070,7 @@ if_indextoname (unsigned ifindex, char *ifname)
       && get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       for (pap = pa0; pap; pap = pap->Next)
-	if (ifindex == pap->IfIndex)
+	if (ifindex == (pap->Ipv6IfIndex ?: pap->IfIndex))
 	  {
 	    name = strcpy (ifname, pap->AdapterName);
 	    break;
@@ -2110,9 +2110,9 @@ if_nameindex (void)
 	  for (pap = pa0, cnt = 0; pap; pap = pap->Next)
 	    {
 	      for (int i = 0; i < cnt; ++i)
-		if (iflist[i].if_index == (pap->IfIndex ?: pap->Ipv6IfIndex))
+		if (iflist[i].if_index == (pap->Ipv6IfIndex ?: pap->IfIndex))
 		  goto outer_loop;
-	      iflist[cnt].if_index = pap->IfIndex ?: pap->Ipv6IfIndex;
+	      iflist[cnt].if_index = pap->Ipv6IfIndex ?: pap->IfIndex;
 	      strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
 	      ++cnt;
 	    outer_loop:
