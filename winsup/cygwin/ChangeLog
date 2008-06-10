@@ -1,5 +1,12 @@
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (if_nametoindex): Fix typo in call to get_adapters_addresses.
+	(if_indextoname): Prefer IPv6 loopback device name over IPv4 loopback
+	device name on pre-Vista systems.
+	(if_nameindex): Ditto.
+
+2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procnet.cc (format_procnet_ifinet6): Use sprintf rather than
 	__small_sprintf.
 	* net.cc (if_nametoindex): Prefer IPv6IfIndex over IfIndex for

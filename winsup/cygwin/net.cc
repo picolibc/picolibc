@@ -2037,7 +2037,7 @@ if_nametoindex (const char *name)
     return 0;
 
   if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pap, AF_UNSPEC))
+      && get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       char lname[IF_NAMESIZE], *c;
 
@@ -2072,6 +2072,19 @@ if_indextoname (unsigned ifindex, char *ifname)
       for (pap = pa0; pap; pap = pap->Next)
 	if (ifindex == (pap->Ipv6IfIndex ?: pap->IfIndex))
 	  {
+	    /* Unfortunately the pre-Vista IPv6 stack has a distinct loopback
+	       device with the same Ipv6IfIndex as the IfIndex of the IPv4
+	       loopback device, but with a different adapter name.
+	       For consistency with /proc/net/if_inet6, try to find the
+	       IPv6 loopback device and use that adapter name instead.
+	       We identify the loopback device by its IfIndex of 1. */
+	    if (pap->IfIndex == 1 && pap->Ipv6IfIndex == 0)
+	      for (PIP_ADAPTER_ADDRESSES pap2 = pa0; pap2; pap2 = pap2->Next)
+	        if (pap2->Ipv6IfIndex == 1)
+		  {
+		    pap = pap2;
+		    break;
+		  }
 	    name = strcpy (ifname, pap->AdapterName);
 	    break;
 	  }
@@ -2114,6 +2127,14 @@ if_nameindex (void)
 		  goto outer_loop;
 	      iflist[cnt].if_index = pap->Ipv6IfIndex ?: pap->IfIndex;
 	      strcpy (iflist[cnt].if_name = ifnamelist[cnt], pap->AdapterName);
+	      /* See comment in if_indextoname. */
+	      if (pap->IfIndex == 1 && pap->Ipv6IfIndex == 0)
+		for (PIP_ADAPTER_ADDRESSES pap2 = pa0; pap2; pap2 = pap2->Next)
+		  if (pap2->Ipv6IfIndex == 1)
+		    {
+		      strcpy (ifnamelist[cnt], pap2->AdapterName);
+		      break;
+		    }
 	      ++cnt;
 	    outer_loop:
 	      ;
