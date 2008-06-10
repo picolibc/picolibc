@@ -229,6 +229,31 @@ fhandler_procnet::fill_filebuf ()
   return true;
 }
 
+/* Return the same scope values as Linux. */
+static unsigned int
+get_scope (struct in6_addr *addr)
+{
+  if (IN6_IS_ADDR_LOOPBACK (addr))
+    return 0x10;
+  if (IN6_IS_ADDR_LINKLOCAL (addr))
+    return 0x20;
+  if (IN6_IS_ADDR_SITELOCAL (addr))
+    return 0x40;
+  if (IN6_IS_ADDR_V4COMPAT (addr))
+    return 0x80;
+  return 0x0;
+}
+
+/* Convert DAD state into Linux compatible values. */
+static unsigned int dad_to_flags[] =
+{
+  0x02,		/* Invalid -> NODAD */
+  0x40,		/* Tentative -> TENTATIVE */
+  0xc0,		/* Duplicate to PERMANENT | TENTATIVE */
+  0x20,		/* Deprecated -> DEPRECATED */
+  0x80		/* Preferred -> PERMANENT */
+};
+
 static _off64_t
 format_procnet_ifinet6 (char *&filebuf)
 {
@@ -262,11 +287,11 @@ format_procnet_ifinet6 (char *&filebuf)
 	filebuf[filesize++] = ' ';
 	filesize += sprintf (filebuf + filesize,
 			     "%02lx %02x %02x %02x %s\n",
-			     pap->IfIndex ?: pap->Ipv6IfIndex,
+			     pap->Ipv6IfIndex,
 			     ip_addr_prefix (pua, pap->FirstPrefix),
-			     ((struct sockaddr_in6 *)
-			      pua->Address.lpSockaddr)->sin6_scope_id,
-			     pua->DadState,
+			     get_scope (&((struct sockaddr_in6 *)
+					pua->Address.lpSockaddr)->sin6_addr),
+			     dad_to_flags [pua->DadState],
 			     pap->AdapterName);
       }
 

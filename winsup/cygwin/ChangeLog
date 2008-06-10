@@ -1,5 +1,15 @@
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procnet.cc (get_scope): New static function to evaluate
+	scope.
+	(dad_to_flags): New static array to convert Windows DAD state to
+	Linux values.
+	(format_procnet_ifinet6): Drop asking for IfIndex, just use Ipv6IfIndex.
+	Use get_scope and dad_to_flags to generate more accurate linux-like
+	output.
+
+2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (if_nametoindex): Fix typo in call to get_adapters_addresses.
 	(if_indextoname): Prefer IPv6 loopback device name over IPv4 loopback
 	device name on pre-Vista systems.
