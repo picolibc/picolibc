@@ -1,5 +1,12 @@
 2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (get_nt_native_path): Drop considerations for DOS devices.
+	Keep relative paths relative.
+	(cygwin_conv_path): Don't try to skip native NT prefixes on relative
+	paths.
+
+2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_MOUNT_REGISTRY): Bump.
 	(CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME): Remove.
 	(CYGWIN_INFO_CYGDRIVE_FLAGS): Remove.

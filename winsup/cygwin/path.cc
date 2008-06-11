@@ -626,9 +626,10 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool managed)
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
     str2uni_cat (upath, path);
-  else if (path[0] != '\\')	/* X:\...  or NUL, etc. */
+  else if (path[0] != '\\')	/* X:\...  or relative path. */
     {
-      str2uni_cat (upath, "\\??\\");
+      if (path[1] == ':')	/* X:\... */
+	str2uni_cat (upath, "\\??\\");
       str2uni_cat (upath, path);
       transform_chars (&upath, 7, managed);
     }
@@ -2832,9 +2833,13 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       PUNICODE_STRING up = p.get_nt_native_path ();
       buf = tp.c_get ();
       sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
-      buf += 4; /* Skip \??\ */
-      if (buf[1] != ':') /* native UNC path */
-	*(buf += 2) = '\\';
+      /* Convert native path to standard DOS path. */
+      if (!strncmp (buf, "\\??\\", 4))
+        {
+	  buf += 4;
+	  if (buf[1] != ':') /* native UNC path */
+	    *(buf += 2) = '\\';
+	}
       lsiz = strlen (buf) + 1;
       break;
     case CCP_POSIX_TO_WIN_W:
