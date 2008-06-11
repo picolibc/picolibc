@@ -1,3 +1,7 @@
+2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procnet.cc (dad_to_flags): Fix comment.
+
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procnet.cc (get_scope): New static function to evaluate

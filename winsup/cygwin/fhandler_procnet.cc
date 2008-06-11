@@ -249,7 +249,7 @@ static unsigned int dad_to_flags[] =
 {
   0x02,		/* Invalid -> NODAD */
   0x40,		/* Tentative -> TENTATIVE */
-  0xc0,		/* Duplicate to PERMANENT | TENTATIVE */
+  0xc0,		/* Duplicate -> PERMANENT | TENTATIVE */
   0x20,		/* Deprecated -> DEPRECATED */
   0x80		/* Preferred -> PERMANENT */
 };
