@@ -1,5 +1,14 @@
 2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_MOUNT_REGISTRY): Bump.
+	(CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME): Remove.
+	(CYGWIN_INFO_CYGDRIVE_FLAGS): Remove.
+	(CYGWIN_INFO_CYGDRIVE_PREFIX): Remove.
+	(CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX): Add comment to differ from the
+	registry related defines.
+
+2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procnet.cc (dad_to_flags): Fix comment.
 
 2008-06-10  Corinna Vinschen  <corinna@vinschen.de>

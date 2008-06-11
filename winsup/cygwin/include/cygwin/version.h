@@ -363,17 +363,18 @@ details. */
 
 	1: Original number version.
 	2: New mount registry layout, system-wide mount accessibility.
+	3: The mount table is not in the registry anymore, but in /etc/fstab.
      */
 
-#define CYGWIN_VERSION_MOUNT_REGISTRY 2
+#define CYGWIN_VERSION_MOUNT_REGISTRY 3
 
      /* Identifiers used in the Win32 registry. */
 
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
 #define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
-#define CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME "mounts v2"
-#define CYGWIN_INFO_CYGDRIVE_FLAGS "cygdrive flags"
-#define CYGWIN_INFO_CYGDRIVE_PREFIX "cygdrive prefix"
+
+     /* The default cygdrive prefix. */
+
 #define CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/cygdrive"
 
      /* In addition to the above version number strings, the build
