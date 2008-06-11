@@ -1,3 +1,8 @@
+2008-06-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/machine/_default_types.h: Fix GNUC check to
+	handle 4.0 and greater.
+
 2008-06-09  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/Makefile.am: Add new files.

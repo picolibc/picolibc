@@ -12,8 +12,8 @@ extern "C" {
 /*
  * Guess on types by examining *_MIN / *_MAX defines.
  */
-#if defined(__GNUC__) && (__GNUC__ >= 3 ) \
-  && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 )
+#if defined(__GNUC__) && ((__GNUC__ >= 4) || (__GNUC__ >= 3 ) \
+  && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2 ))
 /* GCC >= 3.3.0 has __<val>__ implicitly defined. */
 #define __EXP(x) __##x##__
 #else
