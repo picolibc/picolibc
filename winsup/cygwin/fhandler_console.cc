@@ -140,7 +140,6 @@ set_console_state_for_spawn (bool iscyg)
 
   if (shared_console_info != NULL)
     {
-      /* ACK.  Temporarily define for use in TTYSETF macro */
       SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
       shared_console_info->tty_min_state.rstcons (true);
     }
