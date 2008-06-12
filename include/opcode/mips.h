@@ -215,6 +215,14 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_SH_UDI4		6
 #define OP_MASK_UDI4		0xfffff
 
+/* Octeon */
+#define OP_SH_BBITIND		16
+#define OP_MASK_BBITIND		0x1f
+#define OP_SH_CINSPOS		6
+#define OP_MASK_CINSPOS		0x1f
+#define OP_SH_CINSLM1		11
+#define OP_MASK_CINSLM1		0x1f
+
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -370,6 +378,19 @@ struct mips_opcode
    "+3" UDI immediate bits 6-20
    "+4" UDI immediate bits 6-25
 
+   Octeon:
+   "+x" Bit index field of bbit.  Enforces: 0 <= index < 32.
+   "+X" Bit index field of bbit aliasing bbit32.  Matches if 32 <= index < 64,
+	otherwise skips to next candidate.
+   "+p" Position field of cins/cins32/exts/exts32. Enforces 0 <= pos < 32.
+   "+P" Position field of cins/exts aliasing cins32/exts32.  Matches if
+	32 <= pos < 64, otherwise skips to next candidate.
+   "+s" Length-minus-one field of cins/exts.  Enforces: 0 <= lenm1 < 32.
+   "+S" Length-minus-one field of cins32/exts32 or cins/exts aliasing
+	cint32/exts32.  Enforces non-negative value and that
+	pos + lenm1 < 32 or pos + lenm1 < 64 depending whether previous
+	position field is "+p" or "+P".
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -385,8 +406,8 @@ struct mips_opcode
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
    "1234"
-   "ABCDEFGHIT"
-   "t"
+   "ABCDEFGHIPSTX"
+   "pstx"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -962,11 +983,10 @@ extern int bfd_mips_num_opcodes;
 #define MIPS16OP_MASK_IMM6	0x3f
 #define MIPS16OP_SH_IMM6	5
 
-/* These are the characters which may appears in the args field of an
-   instruction.  They appear in the order in which the fields appear
-   when the instruction is used.  Commas and parentheses in the args
-   string are ignored when assembling, and written into the output
-   when disassembling.
+/* These are the characters which may appears in the args field of a MIPS16
+   instruction.  They appear in the order in which the fields appear when the
+   instruction is used.  Commas and parentheses in the args string are ignored
+   when assembling, and written into the output when disassembling.
 
    "y" 3 bit register (MIPS16OP_*_RY)
    "x" 3 bit register (MIPS16OP_*_RX)

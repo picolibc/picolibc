@@ -1,3 +1,12 @@
+2008-06-12  Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips.h: Document new field descriptors +x, +X, +p, +P, +s, +S.
+	Update comment before MIPS16 field descriptors to mention MIPS16.
+	(OP_SH_BBITIND, OP_MASK_BBITIND): New bit mask and shift count for
+	BBIT.
+	(OP_SH_CINSPOS, OP_MASK_CINSPOS, OP_SH_CINSLM1, OP_MASK_CINSLM1):
+	New bit masks and shift counts for cins and exts.
+
 2008-04-28  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips.h (INSN_MACRO): Move it up to the the pinfo macros.
