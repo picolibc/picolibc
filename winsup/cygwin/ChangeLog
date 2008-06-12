@@ -1,3 +1,9 @@
+2008-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::open): Set console state last.
+	Only add ENABLE_PROCESSED_INPUT flag if this is the first time we open
+	the console.
+
 2008-04-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Fix pipe related test.

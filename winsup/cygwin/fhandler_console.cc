@@ -682,16 +682,19 @@ fhandler_console::open (int flags, mode_t)
       dev_state->set_default_attr ();
     }
 
+  tc->rstcons (false);
+  set_open_status ();
+  int cons_cnt = cygheap->manage_console_count ("fhandler_console::open", 1);
+
   DWORD cflags;
   if (GetConsoleMode (get_io_handle (), &cflags))
     {
-      cflags |= ENABLE_PROCESSED_INPUT;
-      SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
+      if (cons_cnt <= 1)
+	cflags |= ENABLE_PROCESSED_INPUT;
+      SetConsoleMode (get_io_handle (),
+		      ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
     }
 
-  tc->rstcons (false);
-  set_open_status ();
-  cygheap->manage_console_count ("fhandler_console::open", 1);
   debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
 		get_output_handle ());
 
