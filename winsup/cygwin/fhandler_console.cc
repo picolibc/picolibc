@@ -121,34 +121,6 @@ tty_list::get_tty (int n)
     return &nada;
 }
 
-/* Determine if a console is associated with this process prior to a spawn.
-   If it is, then just return.  If the console has been initialized, then
-   set it into a more friendly state for non-cygwin apps. */
-void __stdcall
-set_console_state_for_spawn (bool iscyg)
-{
-  if (fhandler_console::need_invisible () || iscyg
-      || (myself->ctty >= 0 && myself->ctty != TTY_CONSOLE))
-    return;
-
-  HANDLE h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_WRITE,
-			 &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-			 NULL);
-
-  if (h == INVALID_HANDLE_VALUE)
-    return;
-
-  if (shared_console_info != NULL)
-    {
-      SetConsoleMode (h, ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT);
-      shared_console_info->tty_min_state.rstcons (true);
-    }
-
-  CloseHandle (h);
-
-  return;
-}
-
 /* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
    cached, because a program or the user can change these values at
    any time. */
@@ -647,16 +619,15 @@ fhandler_console::open (int flags, mode_t)
       dev_state->set_default_attr ();
     }
 
-  DWORD cflags;
-  if (GetConsoleMode (get_io_handle (), &cflags))
-    {
-      cflags |= ENABLE_PROCESSED_INPUT;
-      SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
-    }
-
   tc->rstcons (false);
   set_open_status ();
   cygheap->manage_console_count ("fhandler_console::open", 1);
+
+  DWORD cflags;
+  if (GetConsoleMode (get_io_handle (), &cflags))
+    SetConsoleMode (get_io_handle (),
+		    ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
+
   debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
 		get_output_handle ());
 

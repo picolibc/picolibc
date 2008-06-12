@@ -1423,6 +1423,4 @@ class select_stuff
 		   device_specific_serial (0),
 		   device_specific_mailslot (0) {}
 };
-
-void __stdcall set_console_state_for_spawn (bool);
 #endif /* _FHANDLER_H_ */

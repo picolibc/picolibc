@@ -1,3 +1,11 @@
+2008-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (set_console_state_for_spawn): Drop declaration.
+	* fhandler_console.cc (set_console_state_for_spawn): Remove.
+	(fhandler_console::open): Set console state last.  Don't set
+	ENABLE_PROCESSED_INPUT flag.
+	* spawn.cc (spawn_guts): Drop call to set_console_state_for_spawn.
+
 2008-06-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (get_nt_native_path): Drop considerations for DOS devices.

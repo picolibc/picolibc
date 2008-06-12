@@ -441,8 +441,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   if (mode == _P_DETACH)
     c_flags |= DETACHED_PROCESS;
-  else
-    set_console_state_for_spawn (real_path.iscygexec ());
 
   if (mode != _P_OVERLAY)
     myself->exec_sendsig = NULL;
