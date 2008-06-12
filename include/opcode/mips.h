@@ -222,6 +222,8 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_MASK_CINSPOS		0x1f
 #define OP_SH_CINSLM1		11
 #define OP_MASK_CINSLM1		0x1f
+#define OP_SH_SEQI		6
+#define OP_MASK_SEQI		0x3ff
 
 /* This structure holds information for a particular instruction.  */
 
@@ -385,6 +387,7 @@ struct mips_opcode
    "+p" Position field of cins/cins32/exts/exts32. Enforces 0 <= pos < 32.
    "+P" Position field of cins/exts aliasing cins32/exts32.  Matches if
 	32 <= pos < 64, otherwise skips to next candidate.
+   "+Q" Immediate field of seqi/snei.  Enforces -512 <= imm < 512.
    "+s" Length-minus-one field of cins/exts.  Enforces: 0 <= lenm1 < 32.
    "+S" Length-minus-one field of cins32/exts32 or cins/exts aliasing
 	cint32/exts32.  Enforces non-negative value and that
@@ -406,7 +409,7 @@ struct mips_opcode
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
    "1234"
-   "ABCDEFGHIPSTX"
+   "ABCDEFGHIPQSTX"
    "pstx"
 */
 

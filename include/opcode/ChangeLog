@@ -7,6 +7,9 @@
 	(OP_SH_CINSPOS, OP_MASK_CINSPOS, OP_SH_CINSLM1, OP_MASK_CINSLM1):
 	New bit masks and shift counts for cins and exts.
 
+	* mips.h: Document new field descriptors +Q.
+	(OP_SH_SEQI, OP_MASK_SEQI): New bit mask and shift count for SEQI.
+
 2008-04-28  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips.h (INSN_MACRO): Move it up to the the pinfo macros.
