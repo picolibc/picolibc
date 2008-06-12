@@ -205,7 +205,7 @@
 #define EM_M16C		117	/* Renesas M16C series microprocessors */
 #define EM_DSPIC30F	118	/* Microchip Technology dsPIC30F Digital Signal Controller */
 #define EM_CE		119	/* Freescale Communication Engine RISC core */
-#define EM_M32C_NEW	120	/* Renesas M32C series microprocessors */
+#define EM_M32C		120	/* Renesas M32C series microprocessors */
 
 #define EM_TSK3000	131	/* Altium TSK3000 core */
 #define EM_RS08		132	/* Freescale RS08 embedded processor */
@@ -323,7 +323,7 @@
 #define EM_CYGNUS_MN10200	0xdead
 
 /* Renesas M32C and M16C.  */
-#define EM_M32C			0xFEB0
+#define EM_M32C_OLD		0xFEB0
 
 /* Vitesse IQ2000.  */
 #define EM_IQ2000		0xFEBA
