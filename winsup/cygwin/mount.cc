@@ -1027,22 +1027,30 @@ mount_info::write_cygdrive_info (const char *cygdrive_prefix, unsigned flags)
 }
 
 int
-mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
-			       char* system_flags)
+mount_info::get_cygdrive_info (char *user, char *system, char *user_flags,
+			       char *system_flags)
 {
   if (user)
     *user = '\0';
-  /* Get the user flags, if appropriate */
+  if (system)
+    *system = '\0';
   if (user_flags)
     *user_flags = '\0';
-
-  if (system)
-    strcpy (system, cygdrive);
-
   if (system_flags)
-    strcpy (system_flags,
-	    (cygdrive_flags & MOUNT_BINARY) ? "binmode" : "textmode");
+    *system_flags = '\0';
 
+  char *path = (cygdrive_flags & MOUNT_SYSTEM) ? system : user;
+  char *flags = (cygdrive_flags & MOUNT_SYSTEM) ? system_flags : user_flags;
+
+  if (path)
+    {
+      strcpy (path, cygdrive);
+      /* Strip trailing slash for backward compatibility. */
+      if (cygdrive_len > 2)
+        path[cygdrive_len - 1] = '\0';
+    }
+  if (flags)
+    strcpy (flags, (cygdrive_flags & MOUNT_BINARY) ? "binmode" : "textmode");
   return 0;
 }
 

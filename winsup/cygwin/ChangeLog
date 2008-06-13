@@ -1,5 +1,11 @@
 2008-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::get_cygdrive_info): Fix usage of user and
+	system arguments.  Strip trailing slash from path for backward
+	compatibility.
+
+2008-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (set_console_state_for_spawn): Drop declaration.
 	* fhandler_console.cc (set_console_state_for_spawn): Remove.
 	(fhandler_console::open): Set console state last.  Don't set
