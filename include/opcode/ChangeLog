@@ -1,3 +1,10 @@
+2008-06-13  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* ppc.h (ppc_cpu_t): New typedef.
+	(struct powerpc_opcode <flags>): Use it.
+	(struct powerpc_operand <insert, extract>): Likewise.
+	(struct powerpc_macro <flags>): Likewise.
+
 2008-06-12  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips.h: Document new field descriptors +x, +X, +p, +P, +s, +S.

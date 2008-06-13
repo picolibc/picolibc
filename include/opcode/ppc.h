@@ -22,6 +22,8 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #ifndef PPC_H
 #define PPC_H
 
+typedef unsigned long ppc_cpu_t;
+
 /* The opcode table is an array of struct powerpc_opcode.  */
 
 struct powerpc_opcode
@@ -42,7 +44,7 @@ struct powerpc_opcode
   /* One bit flags for the opcode.  These are used to indicate which
      specific processors support the instructions.  The defined values
      are listed below.  */
-  unsigned long flags;
+  ppc_cpu_t flags;
 
   /* An array of operand codes.  Each code is an index into the
      operand table.  They appear in the order which the operands must
@@ -183,7 +185,7 @@ struct powerpc_operand
      operand value is legal, *ERRMSG will be unchanged (most operands
      can accept any value).  */
   unsigned long (*insert)
-    (unsigned long instruction, long op, int dialect, const char **errmsg);
+    (unsigned long instruction, long op, ppc_cpu_t dialect, const char **errmsg);
 
   /* Extraction function.  This is used by the disassembler.  To
      extract this operand type from an instruction, check this field.
@@ -201,7 +203,7 @@ struct powerpc_operand
      non-zero if this operand type can not actually be extracted from
      this operand (i.e., the instruction does not match).  If the
      operand is valid, *INVALID will not be changed.  */
-  long (*extract) (unsigned long instruction, int dialect, int *invalid);
+  long (*extract) (unsigned long instruction, ppc_cpu_t dialect, int *invalid);
 
   /* One bit syntax flags.  */
   unsigned long flags;
@@ -318,7 +320,7 @@ struct powerpc_macro
   /* One bit flags for the opcode.  These are used to indicate which
      specific processors support the instructions.  The values are the
      same as those for the struct powerpc_opcode flags field.  */
-  unsigned long flags;
+  ppc_cpu_t flags;
 
   /* A format string to turn the macro into a normal instruction.
      Each %N in the string is replaced with operand number N (zero
