@@ -1,3 +1,10 @@
+2008-06-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	[mingw-Bugs-1801641]
+	* include/wchar.h (_wfdopen): Const-ify second arg.
+	* include/stdio.h (_wfdopen): Likewise.
+	Thanks to <tdragon at users dot sourceforge net>
+
 2008-06-02  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Avoid precision errors in round(), lround() and llround() functions.
