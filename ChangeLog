@@ -1,3 +1,8 @@
+2008-06-16  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* Makefile.tpl: Fix comment errors.
+	* Makefile.in: Regenerate.
+
 2008-06-13  Julian Brown  <julian@codesourcery.com>
 
 	* configure.ac (arm*-*-linux-gnueabi): Don't disable building
