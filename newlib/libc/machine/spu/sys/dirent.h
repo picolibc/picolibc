@@ -32,6 +32,9 @@
 */
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAXNAMLEN	255
 
@@ -54,4 +57,7 @@ struct dirent *readdir (DIR *);
 void rewinddir(DIR *);
 void seekdir(DIR *dir, off_t offset);
 off_t telldir(DIR *dir);
+#ifdef __cplusplus
+}
+#endif
 #endif

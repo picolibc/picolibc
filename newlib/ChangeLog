@@ -1,3 +1,10 @@
+
+2008-06-16  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/sys/dirent.h: Add extern "C" specifier if C++.
+	* libc/machine/spu/sys/sched.h: Likewise.
+	* libc/machine/spu/sys/syscall.h: Likewise.
+	
 2008-06-16  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/mk_syscalls: Provide .type and .size directives
