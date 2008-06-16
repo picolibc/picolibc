@@ -1,3 +1,19 @@
+2008-06-16  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/mk_syscalls: Provide .type and .size directives
+	in generated assembler files.
+	* libc/machine/spu/fprintf.S: Regenerate.
+	* libc/machine/spu/fscanf.S: Regenerate.
+	* libc/machine/spu/printf.S: Regenerate.
+	* libc/machine/spu/scanf.S: Regenerate.
+	* libc/machine/spu/snprintf.S: Regenerate.
+	* libc/machine/spu/sprintf.S: Regenerate.
+	* libc/machine/spu/sscanf.S: Regenerate.
+	* libc/machine/spu/stack_reg_va.S (__stack_reg_va): Provide .type
+	and .size directives.
+	* libc/machine/spu/setjmp.S (setjmp): Likewise.
+	(longjmp): Likewise.
+	
 2008-06-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/_default_types.h: Fix GNUC check to

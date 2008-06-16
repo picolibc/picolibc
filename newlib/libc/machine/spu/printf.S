@@ -33,6 +33,7 @@
 	.text
 	.align	4
 	GLOBL	printf
+	.type	printf, @function
 printf:
 	stqd	$0, 16($sp)		/* save caller address */
 	il	$2, 1			/* number of fixed arguments */
@@ -47,3 +48,4 @@ printf:
 	a	$sp, $sp, $2
 	lqd	$0, 16($sp)		/* load caller address */
 	bi      $0			/* return to caller */
+	.size	printf, .-printf

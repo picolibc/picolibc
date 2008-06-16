@@ -85,6 +85,7 @@
 
 	.text
 	.global __stack_reg_va
+	.type	__stack_reg_va, @function
 
 __stack_reg_va:
 
@@ -164,3 +165,6 @@ save_regs_2:
 	ai	ptr, ptr, -16
 	brz	tmp, save_regs_1	/* if (tmp == 0) jump */
 	bi	link			/* finish to make va_list */
+
+	.size	__stack_reg_va, .-__stack_reg_va
+

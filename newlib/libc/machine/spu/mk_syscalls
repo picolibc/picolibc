@@ -69,6 +69,7 @@ while ($line = <DEFS>) {
 	print SOURCE "	.text\n";
 	print SOURCE "	.align	4\n";
 	print SOURCE "	GLOBL	", $name, "\n";
+	print SOURCE "	.type	", $name, ", \@function\n";
 	print SOURCE $name, ":\n";
 
 	print SOURCE "	stqd	\$0, 16(\$sp)		\/\* save caller address \*\/\n";
@@ -92,6 +93,8 @@ while ($line = <DEFS>) {
 	print SOURCE "	a	\$sp, \$sp, \$2\n";
 	print SOURCE "	lqd	\$0, 16(\$sp)		\/\* load caller address \*\/\n";
 	print SOURCE "	bi      \$0			\/\* return to caller \*\/\n";
+
+	print SOURCE "	.size	", $name, ", .-", $name, "\n";
 
 	close(SOURCE);
 }

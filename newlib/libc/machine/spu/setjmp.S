@@ -36,6 +36,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 	.text
 	.align	2
 	.global	setjmp
+	.type	setjmp, @function
 setjmp:
 	stqd	$80, 2*16($3)
 	stqd	$81, 3*16($3)
@@ -97,6 +98,7 @@ setjmp:
 
 setjmp_ret:
 	bi	$0
+	.size	setjmp, .-setjmp
 
 /*
 	int longjmp( jmp_buf env, int val );
@@ -104,6 +106,7 @@ setjmp_ret:
 	.text
 	.align	2
 	.global	longjmp
+	.type	longjmp, @function
 longjmp:
 	lr	$127, $1
 
@@ -176,4 +179,5 @@ longjmp:
 
 longjmp_ret:
 	bi	$0
+	.size	longjmp, .-longjmp
 
