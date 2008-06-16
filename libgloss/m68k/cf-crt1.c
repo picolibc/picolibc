@@ -68,7 +68,7 @@ void __attribute__ ((weak)) hardware_init_hook (void)
   /* Set the VBR. */
   __asm__ __volatile__ ("movec.l %0,%/vbr" :: "r" (__interrupt_vector));
 
-#ifndef __mcf_family_5213
+#if !defined(__mcf_family_5213) && !defined(__mcf_family_51qe)
   /* Flush & enable the caches */
 #define CACR_CINV (1 << 24)
 #define CACR_CENB (1 << 31)

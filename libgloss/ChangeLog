@@ -1,3 +1,7 @@
+2008-06-16  Corrin Meyer  <cjmeyer@gmail.com>
+
+	* m68k/cf-crt1.c[__mcf_family_m1qe]: Don't access CACR.
+
 2008-05-20  Nick Clifton  <nickc@redhat.com>
 
 	* iq2000/crt0.S (__dso_handle): Define (weak).
