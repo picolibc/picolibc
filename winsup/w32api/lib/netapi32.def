@@ -1,5 +1,7 @@
 LIBRARY NETAPI32.DLL
 EXPORTS
+DsGetDcNameA@24
+DsGetDcNameW@24
 I_BrowserDebugCall@12
 I_BrowserDebugTrace@8
 I_BrowserQueryOtherDomains@16
