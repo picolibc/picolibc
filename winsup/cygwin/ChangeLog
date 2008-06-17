@@ -1,3 +1,8 @@
+2008-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/resolv.h (_getshort): Drop declaration.
+	(_getlong): Ditto.
+
 2008-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::get_cygdrive_info): Fix usage of user and

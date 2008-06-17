@@ -391,10 +391,6 @@ const char *	loc_ntoa __P((const u_char *binary, char *ascii));
 int		dn_skipname __P((const u_char *, const u_char *));
 void		putlong __P((u_int32_t, u_char *));
 void		putshort __P((u_int16_t, u_char *));
-#ifndef __ultrix__
-u_int16_t	_getshort __P((const u_char *src));
-u_int32_t	_getlong __P((const u_char *src));
-#endif
 const char *	p_class __P((int));
 const char *	p_time __P((u_int32_t));
 const char *	p_type __P((int));
