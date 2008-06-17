@@ -1,3 +1,8 @@
+2008-06-17  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/Makefile.in: Add new file.
+	* spu/linux_syscalls.c: New file to add Linux syscall support.
+		
 2008-06-16  Corrin Meyer  <cjmeyer@gmail.com>
 
 	* m68k/cf-crt1.c[__mcf_family_m1qe]: Don't access CACR.
