@@ -441,6 +441,8 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   if (mode == _P_DETACH)
     c_flags |= DETACHED_PROCESS;
+  else
+    fhandler_console::need_invisible ();
 
   if (mode != _P_OVERLAY)
     myself->exec_sendsig = NULL;

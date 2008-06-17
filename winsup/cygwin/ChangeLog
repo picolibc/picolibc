@@ -1,3 +1,9 @@
+2008-06-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* spawn.cc (spawn_guts): Reinstate call to
+	fhandler_console::need_invisible since it is required to prevent
+	console flashing.
+
 2008-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/resolv.h (_getshort): Drop declaration.
