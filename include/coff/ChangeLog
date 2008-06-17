@@ -1,3 +1,13 @@
+2008-06-17  Nick Clifton  <nickc@redhat.com>
+
+	* ti.h (GET_SCNHDR_NLNNO): Provide an alternative version of this
+	macro which does not trigger an array bounds warning in gcc.
+	(PUT_SCNHDR_NLNNO): Likewise.
+	(GET_SCNHDR_FLAGS): Likewise.
+	(PUT_SCNHDR_FLAGS): Likewise.
+	(GET_SCNHDR_PAGE): Likewise.
+	(PUT_SCNHDR_PAGE): Likewise.
+
 2007-11-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* pe.h (COFF_ENCODE_ALIGNMENT) Define.
