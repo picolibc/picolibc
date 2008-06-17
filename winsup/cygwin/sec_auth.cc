@@ -165,11 +165,6 @@ close_local_policy (LSA_HANDLE &lsa)
   lsa = INVALID_HANDLE_VALUE;
 }
 
-/* CV, 2006-07-06: Missing in w32api. */
-extern "C" DWORD WINAPI DsGetDcNameA (LPCSTR, LPCSTR, GUID *, LPCSTR, ULONG,
-				      PDOMAIN_CONTROLLER_INFOA *);
-#define DS_FORCE_REDISCOVERY	1
-
 bool
 get_logon_server (const char *domain, char *server, WCHAR *wserver,
 		  bool rediscovery)
