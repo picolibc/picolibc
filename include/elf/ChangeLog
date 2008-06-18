@@ -1,3 +1,8 @@
+2008-06-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
+
+	* common.h (EM_CR16): Correct value.
+	(EM_CR16): Rename to EM_CR16_OLD.
+
 2008-06-12  DJ Delorie  <dj@redhat.com>
 
 	* common.h (EM_M32C_NEW): Rename to EM_M32C.
