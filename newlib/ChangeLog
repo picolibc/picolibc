@@ -1,3 +1,8 @@
+2008-06-18  Eric Blake  <ebb9@byu.net>
+
+	Per Posix, strsignal returns non-const char*.
+	* libc/include/string.h (strsignal): Fix return type.
+
 2008-06-17  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/sys/linux_syscalls.h: New file to add Linux syscall
