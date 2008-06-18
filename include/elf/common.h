@@ -235,6 +235,7 @@
 #define EM_METAG	174	/* Imagination Technologies META processor architecture */
 #define EM_MCST_ELBRUS	175	/* MCST Elbrus general purpose hardware architecture */
 #define EM_ECOG16	176	/* Cyan Technology eCOG16 family */
+#define EM_CR16		177	/* National Semiconductor CompactRISC 16-bit processor */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -258,8 +259,8 @@
 /* picoJava */
 #define EM_PJ_OLD      		99
 
-/* National Semiconductor CompactRISC - CR16 */
-#define EM_CR16			115
+/* Old, unofficial value for National Semiconductor CompactRISC - CR16 */
+#define EM_CR16_OLD		115
 
 /* AVR magic number.  Written in the absense of an ABI.  */
 #define EM_AVR_OLD		0x1057
