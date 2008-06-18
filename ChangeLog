@@ -1,3 +1,7 @@
+2008-06-18  Ian Lance Taylor  <iant@google.com>
+
+	* src-release (BINUTILS_SUPPORT_DIRS): Add depcomp.
+
 2008-06-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure: Regenerate.
