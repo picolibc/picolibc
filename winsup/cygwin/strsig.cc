@@ -73,13 +73,17 @@ static const sigdesc siglist[] =
   {0, NULL, NULL}
 };
 
-extern "C" const char *
+extern "C" char *
 strsignal (int signo)
 {
+  const char *sigstring = "Unknown signal %d";
   for (int i = 0; siglist[i].n; i++)
     if (siglist[i].n == signo)
-      return siglist[i].str;
-  __small_sprintf (_my_tls.locals.signamebuf, "Unknown signal %d", signo);
+      {
+	sigstring = siglist[i].str;
+	break;
+      }
+  __small_sprintf (_my_tls.locals.signamebuf, sigstring, signo);
   return _my_tls.locals.signamebuf;
 }
 
