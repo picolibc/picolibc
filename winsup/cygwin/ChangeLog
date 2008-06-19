@@ -1,3 +1,7 @@
+2008-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_master::setup): Fix pipe inheritance.
+
 2008-06-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strsig.cc (strsignal): Return non-const buffer to allow building with
