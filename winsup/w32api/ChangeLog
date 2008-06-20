@@ -1,3 +1,9 @@
+2008-06-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/ddk/hal.def (HalTranslateBusAddress): Correct suffix.
+	* lib/ddk/ntoskrnl.def (MmAllocateContiguousMemory): Correct suffix.
+	Bug reported by Brian Hawley.
+
 2008-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/dsgetdc.h (DS_FORCE_REDISCOVERY, DS_FORCE_REDISCOVERY,

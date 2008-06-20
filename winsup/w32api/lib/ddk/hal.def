@@ -47,7 +47,7 @@ HalSetBusDataByOffset@24
 ;HalStartProfileInterrupt
 ;HalStopProfileInterrupt
 ;HalSystemVectorDispatchEntry
-HalTranslateBusAddress@20
+HalTranslateBusAddress@24
 ;IoAssignDriveLetters
 IoFlushAdapterBuffers@24
 IoFreeAdapterChannel@4

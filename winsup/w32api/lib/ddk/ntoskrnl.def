@@ -639,7 +639,7 @@ LpcPortObjectType DATA
 ;MmAddVerifierThunks
 ;MmAdjustWorkingSetSize
 MmAdvanceMdl@8
-MmAllocateContiguousMemory@8
+MmAllocateContiguousMemory@12
 MmAllocateContiguousMemorySpecifyCache@20
 MmAllocateMappingAddress@8
 MmAllocateNonCachedMemory@4
