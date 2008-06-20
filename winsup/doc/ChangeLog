@@ -1,3 +1,7 @@
+2008-06-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* faq-using.xml: Add more words about multiple cygwins.
+
 2008-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin-api.in.sgml: Add std-susv4 section to Compatibility chapter.

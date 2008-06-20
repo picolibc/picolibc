@@ -468,7 +468,7 @@ cygwin1.dll without exiting <emphasis>all</emphasis> Cygwin apps (including inet
 beforehand.
 </para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
-you get by running <ulink url="http://cygwin.com/setup.exe">http://cygwin.com/setup.exe</ulink>, installed in the
+you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>, installed in the
 directory controlled by this program.  If you have other versions on
 your system and desire help from the cygwin project, you should delete
 or rename all DLLs that are not installed by <filename>setup.exe</filename>.
@@ -480,6 +480,71 @@ machine, not just components in your PATH (as 'type' would do) or
 cygwin-mounted filesystems (as Cygwin 'find' would do).
 </para>
 </answer></qandaentry>
+
+<qandaentry id="faq.using.third-party.multiple-copies">
+<question><para>
+I read the above but I want to bundle Cygwin with a product, and ship it
+to customer sites.  How can I do this without conflicting with any
+Cygwin installed by the user?
+</para></question>
+<answer><para>
+Third party developers who wish to use Cygwin should check if
+there is a version of cygwin installed and use the installed
+version if it is newer, or conditionally upgrade if it is not.
+(If you write a tool to make this easy, consider contributing
+it for others to use)
+</para></answer></qandaentry>
+
+<qandaentry id="faq.using.bundling-cygwin">
+<question><para>
+Can I bundle Cygwin with my product for free?
+</para></question>
+<answer><para>
+Only if you comply with Cygwin's <ulink
+url="http://cygwin.com/license.html">license</ulink> very carefully.  If you
+choose to distribute cygwin1.dll, you must be willing to distribute the
+exact source code used to build that copy of cygwin1.dll as per the
+terms of the GPL.  If you ship applications that link with cygwin1.dll,
+you must either provide those applications' source code under a
+GPL-compatible license, *or* purchase a cygwin license from Red Hat.
+</para></answer></qandaentry>
+
+<qandaentry id="faq.using.private-cygwin">
+<question><para>
+So I can't install a private version of the Cygwin DLL without
+conflictng with the system cygwin?
+</para></question>
+<answer><para>
+Actually, if you are very careful, you can have two different versions
+of the Cygwin DLL installed on your system at the same time but they
+must be run serially.  This means that you can't be running programs
+using both versions of Cygwin at the same time.  Please be aware that
+currently both versions will use the same mount table entries although
+this wil change in Cygwin version 1.7.x.
+</para><para>
+This usage is not recommeded for novices.  Only limited support will be
+provided in the <ulink url="http://cygwin.com/lists.html">mailing lists</ulink>
+if you run into problems.
+</para></answer></qandaentry>
+
+<qandaentry id="faq.using.older-cygwin-conflict">
+<question><para>
+But doesn't that mean that if some application installs an older Cygwin
+DLL on top of a newer DLL, my application will break?
+</para></question>
+<answer><para>
+It depends on what you mean by "break".  If the application installs a
+version of the Cygwin DLL in another location than Cygwin's /bin
+directory then the rules in 9.3 apply.  If the application installs an
+older version of the DLL in /bin then you should complain loudly to the
+application provider.
+</para><para>
+Remember that the Cygwin DLL strives to be backwards compatible so a
+newer version of the DLL should always work with older executables.  So,
+in general, it is always best to keep one version of the DLL on your
+system and it should always be the latest version which matches your
+installed distribution.
+</para></answer></qandaentry>
 
 <qandaentry id="faq.using.missing-packages">
 <question><para>Why isn't package XYZ available in Cygwin?</para></question>
