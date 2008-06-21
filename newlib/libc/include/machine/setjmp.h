@@ -307,11 +307,16 @@ typedef int sigjmp_buf[_JBLEN+2];
 
 #endif
 
-/* POSIX _setjmp/_longjmp macros, maintained for XSI compatibility.  These
+/* POSIX _setjmp/_longjmp, maintained for XSI compatibility.  These
    are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
    New applications should use sigsetjmp/siglongjmp instead. */
+#ifdef __CYGWIN__
+extern void _longjmp(jmp_buf, int);
+extern int _setjmp(jmp_buf);
+#else
 #define _setjmp(env)		sigsetjmp ((env), 0)
 #define _longjmp(env, val)	siglongjmp ((env), (val))
+#endif
 
 #ifdef __cplusplus
 }
