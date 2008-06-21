@@ -1,3 +1,9 @@
+2008-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/limits.h (PATH_MAX): Add comment.
+	* include/cygwin/config.h (__FILENAME_MAX__): Define as 4096.  Add
+	comment.
+
 2008-06-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_pty_master::setup): Fix pipe inheritance.

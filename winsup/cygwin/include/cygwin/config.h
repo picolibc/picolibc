@@ -43,7 +43,7 @@ extern char *_tlsbase __asm__ ("%fs:4");
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
 #endif  /* _COMPILING_NEWLIB */
 
-#define __FILENAME_MAX__ (260 - 1 /* NUL */)
+#define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __LARGE64_FILES 1
 #define __CYGWIN_USE_BIG_TYPES__ 1

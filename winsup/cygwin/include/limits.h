@@ -324,6 +324,7 @@ details. */
 /* Maximum length of a path given to API functions including trailing NUL.
    Deliberately set to the same default value as on Linux.  Internal paths
    may be longer. */
+/* Keep in sync with __PATHNAME_MAX__ in cygwin/config.h */
 #undef PATH_MAX
 #define PATH_MAX 4096
 
