@@ -1,3 +1,8 @@
+2008-06-23  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (XALLOCA, XDUP, XALLOCAVEC, XDUPVEC, XALLOCAVAR,
+	XDUPVAR, XOBNEWVEC, XOBNEWVAR): New.
+
 2008-06-06  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_info): Add "path_separator".
