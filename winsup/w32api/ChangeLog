@@ -1,3 +1,10 @@
+2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
+
+	* include/winbase.h (InterlockedIncrement, InterlockedDecrement,
+	InterlockedCompareExchange, InterlockedExchange, 
+	InterlockedCompareExchangePointer, InterlockedExchangeAdd,
+	InterlockedExchangePointer): Modified from PLONG to LONG volatile *.
+
 2008-06-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/ddk/hal.def (HalTranslateBusAddress): Correct suffix.

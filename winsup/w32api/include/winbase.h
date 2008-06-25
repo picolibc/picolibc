@@ -1660,20 +1660,20 @@ WINBASEAPI VOID WINAPI InitializeSListHead(PSLIST_HEADER);
 #endif
 #ifndef __INTERLOCKED_DECLARED
 #define __INTERLOCKED_DECLARED
-LONG WINAPI InterlockedCompareExchange(LPLONG,LONG,LONG);
+LONG WINAPI InterlockedCompareExchange(LONG volatile *,LONG,LONG);
 /* PVOID WINAPI InterlockedCompareExchangePointer(PVOID*,PVOID,PVOID); */
 #define InterlockedCompareExchangePointer(d,e,c) \
-    (PVOID)InterlockedCompareExchange((LPLONG)(d),(LONG)(e),(LONG)(c))
-LONG WINAPI InterlockedDecrement(LPLONG);
-LONG WINAPI InterlockedExchange(LPLONG,LONG);
+    (PVOID)InterlockedCompareExchange((LONG volatile *)(d),(LONG)(e),(LONG)(c))
+LONG WINAPI InterlockedDecrement(LONG volatile *);
+LONG WINAPI InterlockedExchange(LONG volatile *,LONG);
 /* PVOID WINAPI InterlockedExchangePointer(PVOID*,PVOID); */
 #define InterlockedExchangePointer(t,v) \
-    (PVOID)InterlockedExchange((LPLONG)(t),(LONG)(v))
-LONG WINAPI InterlockedExchangeAdd(LPLONG,LONG);
+    (PVOID)InterlockedExchange((LONG volatile *)(t),(LONG)(v))
+LONG WINAPI InterlockedExchangeAdd(LONG volatile *,LONG);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedFlushSList(PSLIST_HEADER);
 #endif
-LONG WINAPI InterlockedIncrement(LPLONG);
+LONG WINAPI InterlockedIncrement(LONG volatile *);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedPopEntrySList(PSLIST_HEADER);
 PSLIST_ENTRY WINAPI InterlockedPushEntrySList(PSLIST_HEADER,PSLIST_ENTRY);
