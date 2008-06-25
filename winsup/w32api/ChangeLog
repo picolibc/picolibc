@@ -1,9 +1,17 @@
 2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
 
+	* include/winbase.h (GetProcessHandleCount, GetSystemRegistryQuota,
+	GetThreadIOPendingFlag): Modified to rely on _WIN32_WINNT 0x0501 instead 
+	of 0x0502.
+	Bug reported by Thomas Denk.
+	
+2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
+
 	* include/winbase.h (InterlockedIncrement, InterlockedDecrement,
 	InterlockedCompareExchange, InterlockedExchange, 
 	InterlockedCompareExchangePointer, InterlockedExchangeAdd,
 	InterlockedExchangePointer): Modified from PLONG to LONG volatile *.
+	Bug reported by Erik Blake.
 
 2008-06-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
