@@ -1,3 +1,8 @@
+2008-06-26  Fred Korz  <korz_fred@emc.com>
+
+	* effectively.sgml: Correct subject-verb agreement, missing verb
+	(typo), preposition and (definite vs indefinite) article use.
+
 2008-06-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* faq-using.xml: Add more words about multiple cygwins.
@@ -55,9 +60,9 @@
 
 2006-08-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-        * faq-setup.xml (faq.setup.uninstall): Mention Safe Mode
+	* faq-setup.xml (faq.setup.uninstall): Mention Safe Mode
 	requirement for accessing the Security tab in XP Home.
-        * faq-using.xml (faq.using.chmod): Mention FAT32.
+	* faq-using.xml (faq.using.chmod): Mention FAT32.
 
 2006-08-09  Christopher Faylor  <cgf@timesys.com>
 
@@ -75,9 +80,9 @@
 
 2006-06-01  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-        * faq-setup.xml (faq.setup.automated): New FAQ.
+	* faq-setup.xml (faq.setup.automated): New FAQ.
 
-2006-05-30  Dave Korn  <dave.korn@artimi.com> 
+2006-05-30  Dave Korn  <dave.korn@artimi.com>
 
 	* faq-api.xml (faq.api.winsock):  Replace references to depracated
 	Win32_Winsock macro with __USE_W32_WINSOCK, and enlarge on details.
@@ -116,17 +121,17 @@
 
 2006-02-01  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* faq-setup.xml (faq.setup.what-packages): 
+	* faq-setup.xml (faq.setup.what-packages):
 	Mention new cygcheck -p option.
 
 2006-01-27  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* faq-programming.xml (faq.programming.building-cygwin): 
+	* faq-programming.xml (faq.programming.building-cygwin):
 	Move cocom to the build requirements.
 
 2006-01-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* faq-programming.xml (faq.programming.building-cygwin): 
+	* faq-programming.xml (faq.programming.building-cygwin):
 	Simplify instructions, and remove tar usage basics.
 
 2006-01-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
@@ -199,7 +204,7 @@
 
 	* faq.xml: Remove copyright section, link to license.html
 	* faq-sections.xml: Remove copyright section, link to license.html
-	* faq-programming.xml: Remove confusing reference to Red Hat. 
+	* faq-programming.xml: Remove confusing reference to Red Hat.
 	* faq-what.xml: Reword "supported" FAQ.
 
 2005-09-15  Corinna Vinschen  <corinna@vinschen.de>
@@ -241,7 +246,7 @@
 2005-07-10  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygwinenv.sgml: Update tty section to mention rxvt and xterm.
-	* how-programming.texinfo: Update GPL section of CVS FAQ. 
+	* how-programming.texinfo: Update GPL section of CVS FAQ.
 	* how-using.texinfo: Expand FAQ about out of date packages.
 	* setup-net.sgml: Add troubleshooting setup.exe section.
 
@@ -262,7 +267,7 @@
 
 2005-05-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* how-using.texinfo : Update the mkdir -p section to reflect 
+	* how-using.texinfo : Update the mkdir -p section to reflect
 	changes in handling network drives.
 
 2005-05-18  Brian Dessent  <brian@dessent.net>
@@ -353,7 +358,7 @@
 
 2004-12-27  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* Makefile.in: Update to use xmlto. 
+	* Makefile.in: Update to use xmlto.
 	* cygwin.dsl: Change into DocBook XSL stylesheet for xmlto.
 	* pathnames.sgml: Correct documentation of mount behavior.
 
@@ -380,10 +385,10 @@
 2004-12-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygserver.sgml: Cleanup minor markup problem.
-	* how-resources.texinfo: Add man and info to documentation FAQ. 
+	* how-resources.texinfo: Add man and info to documentation FAQ.
 	* how-using.texinfo: Add more detail to Unicode FAQ.
 	* install.texinfo: Finally apply Pierre's patch from 2003-03-03.
-	* relnotes.texinfo: Add note about hyperthreading reports. 
+	* relnotes.texinfo: Add note about hyperthreading reports.
 
 2004-09-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
@@ -393,8 +398,8 @@
 
 	* how-programming.texinfo: Add gcj note to WinMain@16 FAQ.
 	* how-using.texinfo: Add FAQ about network shares and authentication.
-	* install.texinfo: Add "Where is make" to FAQ subtitle. 
-	
+	* install.texinfo: Add "Where is make" to FAQ subtitle.
+
 2004-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: smbntsec is not on by default.
@@ -410,12 +415,12 @@
 2004-07-16  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-resources.texinfo: Update documentation to /usr/share/doc.
-	* how-using.texinfo: Add paragraph about find -noleaf. 
-	
+	* how-using.texinfo: Add paragraph about find -noleaf.
+
 2004-06-14  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-programming.texinfo: Add section about Visual Studio linking.
-	
+
 2004-06-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* faq.texinfo: Move outdated calls.texinfo to readme.texinfo.
@@ -435,10 +440,10 @@
 
 2004-03-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* ntsec.sgml: Replace chapter numbers with <link>s, 
+	* ntsec.sgml: Replace chapter numbers with <link>s,
 	replace release-numbers in <title>s with descriptions.
 
-2004-03-30  Ronald Landheer-Cieslak <ronald@landheer.com> 
+2004-03-30  Ronald Landheer-Cieslak <ronald@landheer.com>
 
 	* ntsec.sgml: Fix typos, correct chapter numbers.
 
@@ -448,7 +453,7 @@
 
 2004-03-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* how-programming.texinfo: Make list in .lib FAQ enumerative. 
+	* how-programming.texinfo: Make list in .lib FAQ enumerative.
 
 2004-03-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
@@ -472,7 +477,7 @@
 
 2004-02-19  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
-	* cygwinenv.sgml: Remove incorrect ^Z information. Add 
+	* cygwinenv.sgml: Remove incorrect ^Z information. Add
 	some tags to server option description.
 	* textbinary.sgml: Remove incorrect ^Z information.
 
@@ -498,9 +503,9 @@
 
 2004-01-20  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-	* Makefile.in: Remove unused cygwin-ug and cygwin-api-int 
+	* Makefile.in: Remove unused cygwin-ug and cygwin-api-int
 	targets from default build.
-	* how-using.texinfo: Add information about 8-bit character 
+	* how-using.texinfo: Add information about 8-bit character
 	display to FAQ.
 	* setup2.sgml: Add information about 8-bit character display
 	to "Setting up Cygwin".
@@ -551,13 +556,13 @@
 
 2003-05-08  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
-	* cygwin-ug-net.in.sgml: Remove outdated revision information and 
+	* cygwin-ug-net.in.sgml: Remove outdated revision information and
 	author's names.
 
 2003-04-26  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* gcc.sgml: Remove outdated "WinMainCRTStartup" references. Add a
-	hellogui.c example. 
+	hellogui.c example.
 
 2003-03-26  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
@@ -753,7 +758,7 @@ Thu Jul 20 13:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 Tue May  3  0:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * ntsec.sgml: Revisited description of `ntsec' according to
-        the changes in release 1.1.
-        * setup.sgml: Include ntsec.
-        * setup-net.sgml: Ditto.
+	* ntsec.sgml: Revisited description of `ntsec' according to
+	the changes in release 1.1.
+	* setup.sgml: Include ntsec.
+	* setup-net.sgml: Ditto.

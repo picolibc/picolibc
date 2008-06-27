@@ -62,15 +62,15 @@ preferable to use <command>cygpath</command> in shell scripts.
 
 <sect2> <title>Console Programs</title>
 <para>
-Another issue is receiving output from or giving input to the console-based 
+Another issue is receiving output from or giving input to console-based 
 Windows programs.  Unfortunately, interacting with Windows console 
 applications is not a simple matter of using a translation utility. Windows 
-console applications and designed to run under <command>command.com</command> 
+console applications are designed to run under <command>command.com</command> 
 or <command>cmd.exe</command>, and some do not deal gracefully with other
 situations.  Cygwin can receive console input only if it
 is also running in a console (DOS box) since Windows does not provide
 any way to attach to the backend of the console device. Another
-traditional Unix input/output method, ptys (pseudo-terminals), are 
+traditional Unix input/output method, ptys (pseudo-terminals), is
 supported by Cygwin but not entirely by Windows.  The basic problem is 
 that a Cygwin pty is a pipe and some Windows applications do not like 
 having their input or output redirected to pipes.  
@@ -80,8 +80,8 @@ having their input or output redirected to pipes.
 To help deal with these issues, Cygwin supports customizable levels of 
 Windows verses Unix compatibility behavior.  To be most compatible with 
 Windows programs, use a DOS prompt, running only the occasional Cygwin 
-command or script. Next would be to run <command>bash</command> with 
-the default DOS box. To make Cygwin more Unix compatible in this case, 
+command or script. Next would be to run <command>bash</command> within 
+a default DOS box. To make Cygwin more Unix compatible in this case, 
 set <envar>CYGWIN=tty</envar> (see <xref linkend="using-cygwinenv"></xref>).
 Alternatively, the optional <systemitem>rxvt</systemitem> package provides 
 a native-Windows version of the popular X11 terminal emulator (it is not 
