@@ -1,3 +1,7 @@
+2008-07-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Temporarily add ability to generate pdfs.
+
 2008-06-26  Fred Korz  <korz_fred@emc.com>
 
 	* effectively.sgml: Correct subject-verb agreement, missing verb
