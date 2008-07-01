@@ -386,16 +386,21 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_fgetchar (void);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_fputchar (int);
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_fdopen (int, const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_fileno (FILE*);
-_CRTIMP int __cdecl __MINGW_NOTHROW	_fcloseall(void);
-_CRTIMP FILE* __cdecl __MINGW_NOTHROW	_fsopen(const char*, const char*, int);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_fcloseall (void);
+_CRTIMP FILE* __cdecl __MINGW_NOTHROW	_fsopen (const char*, const char*, int);
 #ifdef __MSVCRT__
-_CRTIMP int __cdecl __MINGW_NOTHROW	_getmaxstdio(void);
-_CRTIMP int __cdecl __MINGW_NOTHROW	_setmaxstdio(int);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_getmaxstdio (void);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_setmaxstdio (int);
 #endif
 
 #if __MSVCRT_VERSION__ >= 0x800
-_CRTIMP int __cdecl __MINGW_NOTHROW _set_printf_count_output(int);
-_CRTIMP int __cdecl __MINGW_NOTHROW _get_printf_count_output(void);
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _get_output_format (void);
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _set_output_format (unsigned int);
+
+#define _TWO_DIGIT_EXPONENT  1
+
+_CRTIMP int __cdecl __MINGW_NOTHROW _get_printf_count_output (void);
+_CRTIMP int __cdecl __MINGW_NOTHROW _set_printf_count_output (int);
 #endif
 
 #ifndef _NO_OLDNAMES

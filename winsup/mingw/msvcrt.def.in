@@ -810,6 +810,8 @@ _set_SSE2_enable
 #endif /* 7.1  */
 #if ( __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr80.dll
+_get_output_format
+_set_output_format
 _get_printf_count_output
 _set_printf_count_output
 _set_abort_behavior
