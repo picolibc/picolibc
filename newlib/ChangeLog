@@ -1,5 +1,14 @@
 2008-07-02  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/argz/argz_count.c: Include stddef.h to get size_t.
+	* libc/argz/argz_extract.c: Ditto.
+	* libc/argz/argz_stringify.c: Ditto.
+	* libc/search/hash.h: Ditto.
+	* libc/sys/linux/include/sched.h: Ditto.
+	* libc/sys/linux/sys/types.h: Ditto.
+
+2008-07-02  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/machine/mips/strncpy.c (strncpy): Fix logic so unaligned
 	source data is taken care of before loop unrolling.
 

@@ -38,6 +38,8 @@
  */
 
 #include <sys/param.h>
+#define __need_size_t
+#include <stddef.h>
 
 /* Check that newlib understands the byte order of its target system.  */
 #ifndef BYTE_ORDER
