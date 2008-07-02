@@ -1314,9 +1314,11 @@ path_conv::is_binary ()
   tmp_pathbuf tp;
   PWCHAR bintest = tp.w_get ();
   DWORD bin;
+  /* Do NOT check for .exe suffix, otherwise rename(2) misbehaves
+     when renaming files to existing executables with omitted suffix.
+     strip(1) is a candidate uncovering wrong behaviour here. */
   return exec_state () == is_executable
-	 && RtlEqualUnicodePathSuffix (get_nt_native_path (), L".exe", TRUE)
-	 && GetBinaryTypeW (get_wide_win32_path (bintest), &bin);
+	 || GetBinaryTypeW (get_wide_win32_path (bintest), &bin);
 }
 
 /* Normalize a Win32 path.

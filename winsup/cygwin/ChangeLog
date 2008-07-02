@@ -1,3 +1,7 @@
+2008-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::is_binary): Fix test.  Add comment.
+
 2008-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_bindresvport_sa): Fix usage of last_used_bindresvport.
