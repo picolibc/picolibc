@@ -82,6 +82,26 @@ strncpy (char *dst0, const char *src0, size_t count)
 
   dst = (unsigned char *)dst0;
   src = (unsigned const char *)src0;
+  /* Take care of any odd bytes in the source data because we
+   * want to unroll where we read ahead 2 or 4 bytes at a time and then
+   * check each byte for the null terminator.  This can result in
+   * a segfault for the case where the source pointer is unaligned,
+   * the null terminator is in valid memory, but reading 2 or 4 bytes at a
+   * time blindly eventually goes outside of valid memory. */
+  while ((src & (UNROLL_FACTOR - 1)) != 0 && count > 0)
+    {
+      *dst++ = ch = *src++;
+      --count;
+      if (ch == '\0')
+	{
+          end = dst + count;
+	  while (dst != end)
+	    *dst++ = '\0';
+
+	  return dst0;
+	}
+    }
+
   if (__builtin_expect (count >= 4, 1))
     {
       odd_bytes = (count & (UNROLL_FACTOR - 1));

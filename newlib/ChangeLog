@@ -1,3 +1,8 @@
+2008-07-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/mips/strncpy.c (strncpy): Fix logic so unaligned
+	source data is taken care of before loop unrolling.
+
 2008-06-25  Hans-Peter Nilsson  <hp@axis.com>
 
 	Fix strict-aliasing issues with _strtod_r and Storeinc.
