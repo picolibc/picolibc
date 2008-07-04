@@ -1,3 +1,8 @@
+2008-07-04  Danny Smith  <dannysmith@users,sourceforge.net>
+
+        * include/stdio.h (swprintf, vswprintf): Guard with  #ifndef __STRICT_ANSI__ 
+        * include/wchar.h (swprintf, vswprintf): Likewise.
+
 2008-07-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* msvcrt.def.in [__msvcr80__, __msvcr80d__, __msvcr90__, __msvcr90d__]
@@ -7,7 +12,6 @@
 	(_get_output_format, _set_output_format): Declare prototypes.
 	(_TWO_DIGIT_EXPONENT): Define.
 	Some other minor formatting adjustments.
-
 
 2008-06-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
