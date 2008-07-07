@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #if !defined(__GNUC__) || (__GNUC__ < 3)
 #define __builtin_expect(a,b) a
@@ -88,7 +89,7 @@ strncpy (char *dst0, const char *src0, size_t count)
    * a segfault for the case where the source pointer is unaligned,
    * the null terminator is in valid memory, but reading 2 or 4 bytes at a
    * time blindly eventually goes outside of valid memory. */
-  while ((src & (UNROLL_FACTOR - 1)) != 0 && count > 0)
+  while (((uintptr_t) src & (UNROLL_FACTOR - 1)) != 0 && count > 0)
     {
       *dst++ = ch = *src++;
       --count;

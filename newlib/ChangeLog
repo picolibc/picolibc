@@ -1,3 +1,8 @@
+2008-07-07  Hans-Peter Nilsson  <hp@axis.com>
+
+	* libc/machine/mips/strncpy.c: Include stdint.h to get uintptr_t.
+	(strncpy): Cast src to uintptr_t before checking alignment with "&".
+
 2008-07-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/argz/argz_count.c: Include stddef.h to get size_t.
