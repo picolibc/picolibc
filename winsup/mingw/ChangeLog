@@ -1,3 +1,8 @@
+2008-07-06  Gregory McGarry   <gregorymcgarry@users.sourceforge.net>
+
+        * include/ctype.h (_imp____mb_cur_max): Correct spelling.
+	(_imp____mb_cur_max_dll): Likewise.
+
 2008-07-04  Danny Smith  <dannysmith@users,sourceforge.net>
 
         * include/stdio.h (swprintf, vswprintf): Guard with  #ifndef __STRICT_ANSI__ 

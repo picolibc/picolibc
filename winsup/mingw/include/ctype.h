@@ -33,7 +33,7 @@
 #define	_CONTROL	0x0020
 /* _BLANK is set for SP and non-ASCII horizontal space chars (eg,
    "no-break space", 0xA0, in CP1250) but not for HT.  */
-#define	_BLANK		0x0040 
+#define	_BLANK		0x0040
 #define	_HEX		0x0080
 #define	_LEADBYTE	0x8000
 
@@ -97,10 +97,10 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _toupper(int);
 
 #else		/* ! __DECLSPEC_SUPPORTED */
 # ifdef __MSVCRT__
-   extern int* _imp____mbcur_max;
+   extern int* _imp____mb_cur_max;
 #  define MB_CUR_MAX (*_imp____mb_cur_max)
 # else		/* not __MSVCRT */
-   extern int*  _imp____mbcur_max_dll;
+   extern int*  _imp____mb_cur_max_dll;
 #  define MB_CUR_MAX (*_imp____mb_cur_max_dll)
 # endif 	/* not __MSVCRT */
 #endif  	/*  __DECLSPEC_SUPPORTED */
