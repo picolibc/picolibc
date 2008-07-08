@@ -54,8 +54,8 @@ _memset:
 	inc   a0
 	sub   1, a1
 	lne
-	mov d3,a0
 .Lepilogue:
+	mov d3,a0
 	ret [d2,d3,a2,a3], 16
 .Lend_of_memset:
 	.size	 _memset, .Lend_of_memset - _memset

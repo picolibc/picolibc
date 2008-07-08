@@ -1,3 +1,8 @@
+2008-07-08  Kenji Tanaka  <tanaka.ken2@jp.panasonic.com>
+
+	* libc/machine/mn10300/memset.S: Fix bug where return value is
+	incorrectly set if number of bytes set is a multiple of 4.
+
 2008-07-07  Hans-Peter Nilsson  <hp@axis.com>
 
 	* libc/machine/mips/strncpy.c: Include stdint.h to get uintptr_t.
