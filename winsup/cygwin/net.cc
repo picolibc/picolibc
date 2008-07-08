@@ -3836,7 +3836,7 @@ get_ipv6_funcs (HMODULE lib)
 }
 
 static NO_COPY muto load_ipv6_guard;
-static bool ipv6_inited = false;
+static NO_COPY bool ipv6_inited = false;
 #define load_ipv6()	if (!ipv6_inited) load_ipv6_funcs ();
 
 static void
