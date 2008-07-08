@@ -649,8 +649,16 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
 
-      res = setsockopt (fh->get_socket (), level, optname,
-			(const char *) optval, optlen);
+      /* On systems supporting "enhanced socket security (2K3 and later),
+	 the default behaviour of socket binding is equivalent to the POSIX
+	 behaviour with SO_REUSEADDR.  Setting SO_REUSEADDR would only result
+	 in wrong behaviour.  See also fhandler_socket::bind(). */
+      if (level == SOL_SOCKET && optname == SO_REUSEADDR
+	  && wincap.has_enhanced_socket_security ())
+	res = 0;
+      else
+	res = setsockopt (fh->get_socket (), level, optname,
+			  (const char *) optval, optlen);
 
       if (optlen == 4)
 	syscall_printf ("setsockopt optval=%x", *(long *) optval);

@@ -1,5 +1,16 @@
 2008-07-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::bind): Don't run explicit
+	local socket test in SO_REUSEADDR case on systems supporting
+	enhanced socket security.  Explain why.  Only call address_in_use
+	for AF_INET sockets.
+	* net.cc (cygwin_setsockopt): Don't call setsockopt to set SO_REUSEADDR
+	on systems supporting enhanced socket security.  Add comment.
+	* wincap.h (wincaps::has_enhanced_socket_security): New element.
+	* wincap.cc: Implement above element throughout.
+
+2008-07-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (ipv6_inited): Make NO_COPY.
 
 2008-07-02  Corinna Vinschen  <corinna@vinschen.de>
