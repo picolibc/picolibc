@@ -725,9 +725,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 		  goto done;
 #endif
 	      }
-	  /* user.sgsids groups must be in the token */
+	  /* user.sgsids groups must be in the token, except for builtin groups.
+	     These can be different on domain member machines compared to
+	     domain controllers, so these builtin groups may be validly missing
+	     from a token created through password or lsaauth logon. */
 	  for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
-	    if (!saw[gidx] && !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
+	    if (!saw[gidx]
+	    	&& !groups.sgsids.sids[gidx].is_well_known_sid ()
+		&& !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
 	      goto done;
 	}
       /* The primary group must be in the token */

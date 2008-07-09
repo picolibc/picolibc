@@ -1,5 +1,10 @@
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (verify_token): Allow builtin groups missing in a token
+	and it's still valid.  Explain why.
+
+2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (DsGetDcNameW): Replace DsGetDcNameA.
 	* dcrt0.cc (child_info_spawn::handle_spawn): Drop artificial
 	supplementary group list from calling setgroups in parent.
