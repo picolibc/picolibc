@@ -714,9 +714,20 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 		  saw[pos] = true;
 		else if (groups.pgsid == gsid)
 		  sawpg = true;
+#if 0
+		/* With this `else', verify_token returns false if we find
+		   groups in the token, which are not in the group list set
+		   with setgroups().  That's rather dangerous.  What we're
+		   really interested in is that all groups in the setgroups()
+		   list are in the token.  A token created through ADVAPI 
+		   should be allowed to contain more groups than requested
+		   through setgroups(), esecially since Vista and the
+		   addition of integrity groups. So we disable this statement
+		   for now. */
 		else if (gsid != well_known_world_sid
 			 && gsid != usersid)
 		  goto done;
+#endif
 	      }
 	  /* user.sgsids groups must be in the token */
 	  for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
