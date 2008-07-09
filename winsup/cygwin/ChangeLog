@@ -1,5 +1,24 @@
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (DsGetDcNameW): Replace DsGetDcNameA.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Drop artificial
+	supplementary group list from calling setgroups in parent.
+	* grp.cc (internal_getgroups): Drop 9x-only code.  Reformat.
+	* sec_auth.cc (get_logon_server): Do everything in WCHAR only.
+	(get_user_groups): Ditto.  Use wlogonserver in LookupAccountNameW
+	calls, too.
+	(is_group_member): Get logon server as first argument and use in call
+	to NetLocalGroupGetMembers.
+	(get_user_local_groups): Get logon server as first argument and use in
+	calls to NetLocalGroupEnum and LookupAccountNameW.  Revamp to work
+	more correctly in domain environments.
+	(get_server_groups): Accommodate aforementioned changed function calls.
+	* security.h (get_logon_server): Change prototype accordingly.
+	* uinfo.cc (cygheap_user::env_logsrv): Accommodate changed
+	get_logon_server call.
+
+2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (internal_getgroups): Also add integrity-enabled groups.
 
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>

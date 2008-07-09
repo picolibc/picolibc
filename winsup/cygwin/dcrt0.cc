@@ -671,6 +671,7 @@ child_info_spawn::handle_spawn ()
     cygheap->fdtab.move_fd (__stdin, 0);
   if (__stdout >= 0)
     cygheap->fdtab.move_fd (__stdout, 1);
+  cygheap->user.groups.clear_supp ();
 
   ready (true);
 

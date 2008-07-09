@@ -302,7 +302,7 @@ wsock_init ()
 LoadDLLprime (ws2_32, _wsock_init)
 
 /* 127 == ERROR_PROC_NOT_FOUND */
-LoadDLLfuncEx2 (DsGetDcNameA, 24, netapi32, 1, 127)
+LoadDLLfuncEx2 (DsGetDcNameW, 24, netapi32, 1, 127)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
 LoadDLLfuncEx (NetGetAnyDCName, 12, netapi32, 1)
 LoadDLLfuncEx (NetGetDCName, 12, netapi32, 1)

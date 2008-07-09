@@ -369,10 +369,12 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
   if (!mydomain || ascii_strcasematch (myname, "SYSTEM"))
     return almost_null;
 
-  char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+  sys_mbstowcs (wdomain, INTERNET_MAX_HOST_NAME_LENGTH + 1, mydomain);
   cfree_and_set (plogsrv, almost_null);
-  if (get_logon_server (mydomain, logsrv, NULL, false))
-    plogsrv = cstrdup (logsrv);
+  if (get_logon_server (wdomain, wlogsrv, false))
+    sys_wcstombs_alloc (&plogsrv, HEAP_STR, wlogsrv);
   return plogsrv;
 }
 

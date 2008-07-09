@@ -331,8 +331,6 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
   DWORD size;
   int cnt = 0;
   struct __group32 *gr;
-  __gid32_t gid;
-  const char *username;
 
   if (!srchsid && cygheap->user.groups.issetgroups ())
     {
@@ -340,8 +338,8 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
       for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	if (sid.getfromgr (gr))
 	  for (int pg = 0; pg < cygheap->user.groups.sgsids.count (); ++pg)
-	    if (sid == cygheap->user.groups.sgsids.sids[pg] &&
-		sid != well_known_world_sid)
+	    if (sid == cygheap->user.groups.sgsids.sids[pg]
+		&& sid != well_known_world_sid)
 	      {
 		if (cnt < gidsetsize)
 		  grouplist[cnt] = gr->gr_gid;
@@ -360,67 +358,41 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
   else
     hToken = hProcToken;
 
-  if (hToken)
+  if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
+      || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
     {
-      if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
-	  || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
+
+      if (GetTokenInformation (hToken, TokenGroups, groups, size, &size))
 	{
-	  PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
+	  cygsid sid;
 
-	  if (GetTokenInformation (hToken, TokenGroups, groups, size, &size))
+	  if (srchsid)
 	    {
-	      cygsid sid;
-
-	      if (srchsid)
-		{
-		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if ((cnt = (*srchsid == groups->Groups[pg].Sid)))
-		      break;
-		}
-	      else
-		for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-		  if (sid.getfromgr (gr))
-		    for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		      if (sid == groups->Groups[pg].Sid
-			  && (groups->Groups[pg].Attributes
-			      & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
-			  && sid != well_known_world_sid)
-			{
-			  if (cnt < gidsetsize)
-			    grouplist[cnt] = gr->gr_gid;
-			  ++cnt;
-			  if (gidsetsize && cnt > gidsetsize)
-			    goto error;
-			  break;
-			}
+	      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+		if ((cnt = (*srchsid == groups->Groups[pg].Sid)))
+		  break;
 	    }
+	  else
+	    for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	      if (sid.getfromgr (gr))
+		for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+		  if (sid == groups->Groups[pg].Sid
+		      && (groups->Groups[pg].Attributes
+			  & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
+		      && sid != well_known_world_sid)
+		    {
+		      if (cnt < gidsetsize)
+			grouplist[cnt] = gr->gr_gid;
+		      ++cnt;
+		      if (gidsetsize && cnt > gidsetsize)
+			goto error;
+		      break;
+		    }
 	}
-      else
-	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
-      return cnt;
     }
-
-  gid = myself->gid;
-  username = cygheap->user.name ();
-  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-    if (gid == gr->gr_gid)
-      {
-	if (cnt < gidsetsize)
-	  grouplist[cnt] = gr->gr_gid;
-	++cnt;
-	if (gidsetsize && cnt > gidsetsize)
-	  goto error;
-      }
-    else if (gr->gr_mem)
-      for (int gi = 0; gr->gr_mem[gi]; ++gi)
-	if (strcasematch (username, gr->gr_mem[gi]))
-	  {
-	    if (cnt < gidsetsize)
-	      grouplist[cnt] = gr->gr_gid;
-	    ++cnt;
-	    if (gidsetsize && cnt > gidsetsize)
-	      goto error;
-	  }
+  else
+    debug_printf ("%d = GetTokenInformation(NULL) %E", size);
   return cnt;
 
 error:

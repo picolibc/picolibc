@@ -380,8 +380,7 @@ bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
 /* Get default logonserver for a domain. */
-bool get_logon_server (const char * domain, char * server, WCHAR *wserver,
-		       bool rediscovery);
+bool get_logon_server (PWCHAR domain, PWCHAR wserver, bool rediscovery);
 
 /* sec_helper.cc: Security helper functions. */
 int set_privilege (HANDLE token, DWORD privilege, bool enable);
