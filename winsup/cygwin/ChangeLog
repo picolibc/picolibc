@@ -1,5 +1,9 @@
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (internal_getgroups): Also add integrity-enabled groups.
+
+2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (verify_token): Disable code which returns false if
 	the token contains additional groups not requested by setgroups.
 	Explain why.
