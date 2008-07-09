@@ -1,3 +1,35 @@
+2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c: Use statically linked functions throughout, except for
+	DsGetDcNameW.  Reformat.  Convert to use WCHAR for names throughout.
+	Use defines instead of constants throughout.
+	(MAX_SID_LEN): Define.
+	(load_netapi): Just load DsGetDcNameW pointer.
+	(psx_dir): Remove.
+	(uni2ansi): Remove.
+	(enum_local_users): Take server name and use in Net... call.
+	(DBGSID): Define datastructure.
+	(MAX_BUILTIN_SIDS): Define.
+	(builtin_sid_list): Define global sid list.
+	(builtin_sid_cnt): Define counter for global sid list.
+	(enum_local_groups): Take server name and use in Net... and Lookup...
+	calls.  Take offset argument.  Use MAX_PREFERRED_LENGTH in call to
+	NetLocalGroupEnum.  Check for duplicate builtin groups.
+	(enum_users): Take server name and use in Net... call.
+	(usage): Change text slightly.
+	(print_version): Fix copyright.
+	(main): Call enum_local_groups for domains as well.
+	* mkpasswd.c: Use statically linked functions throughout, except for
+	DsGetDcNameW.  Reformat.  Convert to use WCHAR for names throughout.
+	Use defines instead of constants throughout.
+	(MAX_SID_LEN): Define.
+	(load_netapi): Just load DsGetDcNameW pointer.
+	(uni2ansi): Use wcstombs.
+	(current_user): Replace "unused_by_nt/2000/xp" by
+	just "unused".
+	(enum_users): Ditto.
+	(print_version): Fix copyright.
+
 2008-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (setfacl): Change from void to int.  Return 2 in case of

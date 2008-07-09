@@ -1,6 +1,7 @@
 /* mkgroup.c:
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -17,12 +18,16 @@
 #include <getopt.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
+#include <wininet.h>
+#include <iptypes.h>
 #include <ntsecapi.h>
 #include <ntdef.h>
 
 #define print_win_error(x) _print_win_error(x, __LINE__)
 
 static const char version[] = "$Revision$";
+
+#define MAX_SID_LEN 40
 
 typedef struct {
   LPWSTR DomainControllerName;
@@ -39,66 +44,18 @@ typedef struct {
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 
-NET_API_STATUS WINAPI (*netapibufferallocate)(DWORD,PVOID*);
-NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
-NET_API_STATUS WINAPI (*netgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-NET_API_STATUS WINAPI (*netgroupgetinfo)(LPWSTR,LPWSTR,DWORD,PBYTE*);
-NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-NET_API_STATUS WINAPI (*netlocalgroupgetmembers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
-NET_API_STATUS WINAPI (*netgroupgetusers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-
-NTSTATUS NTAPI (*lsaclose)(LSA_HANDLE);
-NTSTATUS NTAPI (*lsaopenpolicy)(PLSA_UNICODE_STRING,PLSA_OBJECT_ATTRIBUTES,ACCESS_MASK,PLSA_HANDLE);
-NTSTATUS NTAPI (*lsaqueryinformationpolicy)(LSA_HANDLE,POLICY_INFORMATION_CLASS,PVOID*);
-NTSTATUS NTAPI (*lsafreememory)(PVOID);
-
 NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
 
-BOOL
+void
 load_netapi ()
 {
   HANDLE h = LoadLibrary ("netapi32.dll");
-
-  if (!h)
-    return FALSE;
-
-  if (!(netapibufferallocate = (void *) GetProcAddress (h, "NetApiBufferAllocate")))
-    return FALSE;
-  if (!(netapibufferfree = (void *) GetProcAddress (h, "NetApiBufferFree")))
-    return FALSE;
-  if (!(netgroupenum = (void *) GetProcAddress (h, "NetGroupEnum")))
-    return FALSE;
-  if (!(netgroupgetinfo = (void *) GetProcAddress (h, "NetGroupGetInfo")))
-    return FALSE;
-  if (!(netgroupgetusers = (void *) GetProcAddress (h, "NetGroupGetUsers")))
-    return FALSE;
-  if (!(netlocalgroupenum = (void *) GetProcAddress (h, "NetLocalGroupEnum")))
-    return FALSE;
-  if (!(netlocalgroupgetmembers = (void *) GetProcAddress (h, "NetLocalGroupGetMembers")))
-    return FALSE;
-  if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
-    return FALSE;
-
-  dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
-
-  if (!(h = LoadLibrary ("advapi32.dll")))
-    return FALSE;
-
-  if (!(lsaclose = (void *) GetProcAddress (h, "LsaClose")))
-    return FALSE;
-  if (!(lsaopenpolicy = (void *) GetProcAddress (h, "LsaOpenPolicy")))
-    return FALSE;
-  if (!(lsaqueryinformationpolicy = (void *) GetProcAddress (h, "LsaQueryInformationPolicy")))
-    return FALSE;
-  if (!(lsafreememory = (void *) GetProcAddress (h, "LsaFreeMemory")))
-    return FALSE;
-
-  return TRUE;
+  if (h)
+    dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
 }
 
 char *
@@ -120,38 +77,6 @@ put_sid (PSID sid)
 }
 
 void
-psx_dir (char *in, char *out)
-{
-  if (isalpha (in[0]) && in[1] == ':')
-    {
-      sprintf (out, "/cygdrive/%c", in[0]);
-      in += 2;
-      out += strlen (out);
-    }
-
-  while (*in)
-    {
-      if (*in == '\\')
-	*out = '/';
-      else
-	*out = *in;
-      in++;
-      out++;
-    }
-
-  *out = '\0';
-}
-
-void
-uni2ansi (LPWSTR wcs, char *mbs, int size)
-{
-  if (wcs)
-    WideCharToMultiByte (CP_ACP, 0, wcs, -1, mbs, size, NULL, NULL);
-  else
-    *mbs = '\0';
-}
-
-void
 _print_win_error(DWORD code, int line)
 {
   char buf[4096];
@@ -168,15 +93,14 @@ _print_win_error(DWORD code, int line)
 }
 
 void
-enum_local_users (LPWSTR groupname)
+enum_local_users (LPWSTR servername, LPWSTR groupname)
 {
   LOCALGROUP_MEMBERS_INFO_1 *buf1;
   DWORD entries = 0;
   DWORD total = 0;
   DWORD reshdl = 0;
 
-  if (!netlocalgroupgetmembers (NULL, groupname,
-				1, (void *) &buf1,
+  if (!NetLocalGroupGetMembers (servername, groupname, 1, (void *) &buf1,
 				MAX_PREFERRED_LENGTH,
 				&entries, &total, &reshdl))
     {
@@ -185,26 +109,35 @@ enum_local_users (LPWSTR groupname)
       for (i = 0; i < entries; ++i)
 	if (buf1[i].lgrmi1_sidusage == SidTypeUser)
 	  {
-	    char user[256];
-
 	    if (!first)
 	      printf (",");
 	    first = 0;
-	    uni2ansi (buf1[i].lgrmi1_name, user, sizeof (user));
-	    printf ("%s", user);
+	    printf ("%ls", buf1[i].lgrmi1_name);
 	  }
-      netapibufferfree (buf1);
+      NetApiBufferFree (buf1);
     }
 }
 
+typedef struct {
+  BYTE  Revision;
+  BYTE  SubAuthorityCount;
+  SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
+  DWORD SubAuthority[8];
+} DBGSID, *PDBGSID;
+
+#define MAX_BUILTIN_SIDS 100	/* Should be enough for the forseable future. */
+DBGSID builtin_sid_list[MAX_BUILTIN_SIDS];
+DWORD builtin_sid_cnt;
+
 int
-enum_local_groups (int print_sids, int print_users, char *disp_groupname)
+enum_local_groups (LPWSTR servername, int print_sids, int print_users,
+		   int id_offset, char *disp_groupname)
 {
   LOCALGROUP_INFO_0 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
-  WCHAR uni_name[512];
+  WCHAR uni_name[GNLEN + 1];
   DWORD rc;
 
   do
@@ -213,14 +146,16 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
 
       if (disp_groupname != NULL)
 	{
-	  MultiByteToWideChar (CP_ACP, 0, disp_groupname, -1, uni_name, 512 );
-	  rc = netapibufferallocate(sizeof(LOCALGROUP_INFO_0), (void *) &buffer );
-	  buffer[0].lgrpi0_name = (LPWSTR) & uni_name;
-	  entriesread=1;
+	  mbstowcs (uni_name, disp_groupname, GNLEN + 1);
+	  rc = NetApiBufferAllocate (sizeof (LOCALGROUP_INFO_0),
+				     (void *) &buffer);
+	  buffer[0].lgrpi0_name = uni_name;
+	  entriesread = 1;
 	}
       else 
-	rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
-				&entriesread, &totalentries, &resume_handle);
+	rc = NetLocalGroupEnum (servername, 0, (void *) &buffer,
+				MAX_PREFERRED_LENGTH, &entriesread,
+				&totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -238,55 +173,76 @@ enum_local_groups (int print_sids, int print_users, char *disp_groupname)
 
       for (i = 0; i < entriesread; i++)
 	{
-	  char localgroup_name[100];
-	  char domain_name[100];
-	  DWORD domname_len = 100;
-	  char psid_buffer[1024];
+	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
+	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	  char psid_buffer[MAX_SID_LEN];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = 1024;
+	  DWORD sid_length = MAX_SID_LEN;
 	  DWORD gid;
 	  SID_NAME_USE acc_type;
-	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name, sizeof (localgroup_name));
+	  PDBGSID pdsid;
+	  BOOL is_builtin = FALSE;
 
-	  if (!LookupAccountName (NULL, localgroup_name, psid,
-				  &sid_length, domain_name, &domname_len,
-				  &acc_type))
+	  if (!LookupAccountNameW (servername, buffer[i].lgrpi0_name, psid,
+				   &sid_length, domain_name, &domname_len,
+				   &acc_type))
 	    {
 	      print_win_error(rc);
-	      fprintf(stderr, " (%s)\n", localgroup_name);
+	      fprintf (stderr, " (%ls)\n", buffer[i].lgrpi0_name);
 	      continue;
 	    }
           else if (acc_type == SidTypeDomain)
             {
-              char domname[356];
+              WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-              strcpy (domname, domain_name);
-              strcat (domname, "\\");
-              strcat (domname, localgroup_name);
-              sid_length = 1024;
-              domname_len = 100;
-              if (!LookupAccountName (NULL, domname,
-                                      psid, &sid_length,
-                                      domain_name, &domname_len,
-                                      &acc_type))
+              wcscpy (domname, domain_name);
+              wcscat (domname, L"\\");
+              wcscat (domname, buffer[i].lgrpi0_name);
+              sid_length = MAX_SID_LEN;
+              domname_len = MAX_DOMAIN_NAME_LEN + 1;
+              if (!LookupAccountNameW (servername, domname,
+                                       psid, &sid_length,
+                                       domain_name, &domname_len,
+                                       &acc_type))
                 {
                   print_win_error(rc);
-		  fprintf(stderr, " (%s)\n", domname);
+		  fprintf(stderr, " (%ls)\n", domname);
                   continue;
                 }
             }
 
+	  /* Store all local SIDs with prefix "S-1-5-32-" and check if it
+	     has been printed already.  This allows to get all builtin
+	     groups exactly once and not once per domain. */
+	  pdsid = (PDBGSID) psid;
+	  if (pdsid->IdentifierAuthority.Value[5] == sid_nt_auth.Value[5]
+	      && pdsid->SubAuthority[0] == SECURITY_BUILTIN_DOMAIN_RID)
+	    {
+	      int b;
+
+	      is_builtin = TRUE;
+	      if (servername && builtin_sid_cnt)
+		for (b = 0; b < builtin_sid_cnt; b++)
+		  if (EqualSid (&builtin_sid_list[b], psid))
+		    goto skip_group;
+	      if (builtin_sid_cnt < MAX_BUILTIN_SIDS)
+		CopySid (sizeof (DBGSID), &builtin_sid_list[builtin_sid_cnt++],
+			 psid);
+	    }
+
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 
-	  printf ("%s:%s:%ld:", localgroup_name,
+	  printf ("%ls:%s:%ld:", buffer[i].lgrpi0_name,
                                 print_sids ? put_sid (psid) : "",
-                                gid);
+                                gid + (is_builtin ? 0 : id_offset));
 	  if (print_users)
-	    enum_local_users (buffer[i].lgrpi0_name);
+	    enum_local_users (servername, buffer[i].lgrpi0_name);
 	  printf ("\n");
+skip_group:
+	  ;
 	}
 
-      netapibufferfree (buffer);
+      NetApiBufferFree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
@@ -302,24 +258,19 @@ enum_users (LPWSTR servername, LPWSTR groupname)
   DWORD total = 0;
   DWORD reshdl = 0;
 
-  if (!netgroupgetusers (servername, groupname,
-			 0, (void *) &buf1,
-			 MAX_PREFERRED_LENGTH,
-			 &entries, &total, &reshdl))
+  if (!NetGroupGetUsers (servername, groupname, 0, (void *) &buf1,
+			 MAX_PREFERRED_LENGTH, &entries, &total, &reshdl))
     {
       unsigned i, first = 1;
 
       for (i = 0; i < entries; ++i)
 	{
-	  char user[256];
-
 	  if (!first)
 	    printf (",");
 	  first = 0;
-	  uni2ansi (buf1[i].grui0_name, user, sizeof (user));
-	  printf ("%s", user);
+	  printf ("%ls", buf1[i].grui0_name);
 	}
-      netapibufferfree (buf1);
+      NetApiBufferFree (buf1);
     }
 }
 
@@ -331,12 +282,8 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
-  WCHAR uni_name[512];
+  WCHAR uni_name[GNLEN + 1];
   DWORD rc;
-  char ansi_srvname[256];
-
-  if (servername)
-    uni2ansi (servername, ansi_srvname, sizeof (ansi_srvname));
 
   do
     {
@@ -344,14 +291,15 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
 
       if (disp_groupname != NULL)
 	{
-	  MultiByteToWideChar (CP_ACP, 0, disp_groupname, -1, uni_name, 512 );
-	  rc = netgroupgetinfo(servername, (LPWSTR) & uni_name, 2,
-			       (void *) &buffer );
+	  mbstowcs (uni_name, disp_groupname, GNLEN + 1);
+	  rc = NetGroupGetInfo (servername, (LPWSTR) & uni_name, 2,
+				(void *) &buffer);
 	  entriesread=1;
 	}
       else 
-	rc = netgroupenum (servername, 2, (void *) & buffer, MAX_PREFERRED_LENGTH,
-			   &entriesread, &totalentries, &resume_handle);
+	rc = NetGroupEnum (servername, 2, (void *) & buffer,
+			   MAX_PREFERRED_LENGTH, &entriesread, &totalentries,
+			   &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -369,50 +317,46 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
 
       for (i = 0; i < entriesread; i++)
 	{
-	  char groupname[100];
-	  char domain_name[100];
-	  DWORD domname_len = 100;
-	  char psid_buffer[1024];
+	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
+	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	  char psid_buffer[MAX_SID_LEN];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = 1024;
+	  DWORD sid_length = MAX_SID_LEN;
 	  SID_NAME_USE acc_type;
 
 	  int gid = buffer[i].grpi2_group_id;
-	  uni2ansi (buffer[i].grpi2_name, groupname, sizeof (groupname));
           if (print_sids)
             {
-              if (!LookupAccountName (servername ? ansi_srvname : NULL,
-                                      groupname,
-                                      psid, &sid_length,
-                                      domain_name, &domname_len,
-			              &acc_type))
+              if (!LookupAccountNameW (servername, buffer[i].grpi2_name,
+                                       psid, &sid_length,
+                                       domain_name, &domname_len,
+			               &acc_type))
                 {
                   print_win_error(rc);
-		  fprintf(stderr, " (%s)\n", groupname);
+		  fprintf(stderr, " (%ls)\n", buffer[i].grpi2_name);
                   continue;
                 }
               else if (acc_type == SidTypeDomain)
                 {
-                  char domname[356];
+                  WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-                  strcpy (domname, domain_name);
-                  strcat (domname, "\\");
-                  strcat (domname, groupname);
-                  sid_length = 1024;
-                  domname_len = 100;
-                  if (!LookupAccountName (servername ? ansi_srvname : NULL,
-                                          domname,
-                                          psid, &sid_length,
-                                          domain_name, &domname_len,
-			                  &acc_type))
+                  wcscpy (domname, domain_name);
+                  wcscat (domname, L"\\");
+                  wcscat (domname, buffer[i].grpi2_name);
+                  sid_length = MAX_SID_LEN;
+                  domname_len = MAX_DOMAIN_NAME_LEN + 1;
+                  if (!LookupAccountNameW (servername, domname,
+					   psid, &sid_length,
+					   domain_name, &domname_len,
+					   &acc_type))
                     {
                       print_win_error(rc);
-		      fprintf(stderr, " (%s)\n", domname);
+		      fprintf(stderr, " (%ls)\n", domname);
                       continue;
                     }
                 }
             }
-	  printf ("%s:%s:%u:", groupname,
+	  printf ("%ls:%s:%u:", buffer[i].grpi2_name,
                                print_sids ? put_sid (psid) : "",
                                gid + id_offset);
 	  if (print_users)
@@ -420,7 +364,7 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset,
 	  printf ("\n");
 	}
 
-      netapibufferfree (buffer);
+      NetApiBufferFree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
@@ -432,7 +376,7 @@ print_special (int print_sids,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
-  char name[256], dom[256];
+  char name[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD len, len2, rid;
   PSID sid;
   SID_NAME_USE use;
@@ -441,8 +385,8 @@ print_special (int print_sids,
   				sub5, sub6, sub7, sub8, &sid))
     {
       if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
+			    name, (len = UNLEN + 1, &len),
+			    dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
 			    &use))
 	{
 	  if (sub8)
@@ -478,7 +422,7 @@ current_group (int print_sids, int print_users, int id_offset)
   int errpos = 0;
   struct {
     PSID psid;
-    int buffer[10];
+    char buffer[MAX_SID_LEN];
   } tg;
 
 
@@ -520,9 +464,9 @@ usage (FILE * stream, int isNT)
 	           "Print /etc/group file to stdout\n\n"
 	           "Options:\n");
   if (isNT)
-    fprintf (stream, "   -l,--local             print local group information\n"
+    fprintf (stream, "   -l,--local             print machine local group information\n"
 	             "   -c,--current           print current group, if a domain account\n"
-		     "   -d,--domain            print global group information (from current\n"
+		     "   -d,--domain            print domain group information (from current\n"
 	             "                          domain if no domains specified)\n"
 		     "   -o,--id-offset offset  change the default offset (10000) added to gids\n"
 		     "                          in domain accounts.\n"
@@ -571,7 +515,7 @@ print_version ()
   printf ("\
 mkgroup (cygwin) %.*s\n\
 group File Generator\n\
-Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
@@ -581,7 +525,7 @@ main (int argc, char **argv)
 {
   LPWSTR servername;
   DWORD rc = ERROR_SUCCESS;
-  WCHAR domain_name[100];
+  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
   int print_local = 0;
   int print_current = 0;
   int print_domain = 0;
@@ -594,9 +538,8 @@ main (int argc, char **argv)
   int isNT;
   int i;
 
-  char name[256], dom[256];
+  char dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD len, len2;
-  char buf[1024];
   PSID psid = NULL;
   SID_NAME_USE use;
 
@@ -670,23 +613,22 @@ main (int argc, char **argv)
 	}
       domain_specified = 1;
     }
-  if (!load_netapi ())
-    {
-      print_win_error(GetLastError ());
-      return 1;
-    }
+  load_netapi ();
 
   if (print_local)
     {
+      char machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      char sid[MAX_SID_LEN];
+
       if (isRoot)
         {
-      /*
-       * Very special feature for the oncoming future:
-       * Create a "root" group account, being actually the local
-       * Administrators group.  Since user name, sid and gid are
-       * fixed, there's no need to call print_special() for this.
-       */
-      printf ("root:S-1-5-32-544:0:\n");
+	  /*
+	   * Very special feature for the oncoming future:
+	   * Create a "root" group account, being actually the local
+	   * Administrators group.  Since user name, sid and gid are
+	   * fixed, there's no need to call print_special() for this.
+	   */
+	  printf ("root:S-1-5-32-544:0:\n");
 	}
 
       if (disp_groupname == NULL)
@@ -699,35 +641,35 @@ main (int argc, char **argv)
       /*
        * Get 'None' group
       */
-      len = 256;
-      GetComputerName (name, &len);
-      len = 1024;
-      len2 = 256;
-      if (LookupAccountName (NULL, name, (PSID) buf, &len, dom, &len, &use))
-	psid = (PSID) buf;
+      len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+      GetComputerName (machine, &len);
+      len = MAX_SID_LEN;
+      len2 = MAX_DOMAIN_NAME_LEN + 1;
+      if (LookupAccountName (NULL, machine, (PSID) sid, &len, dom, &len2, &use))
+	psid = (PSID) sid;
       else
         {
-	  ret = lsaopenpolicy (NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
+	  ret = LsaOpenPolicy (NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
 	  if (ret == STATUS_SUCCESS && lsa != INVALID_HANDLE_VALUE)
 	    {
-	      ret = lsaqueryinformationpolicy (lsa,
+	      ret = LsaQueryInformationPolicy (lsa,
 					       PolicyPrimaryDomainInformation,
 					       (void *) &pdi);
 	      if (ret == STATUS_SUCCESS)
 	        {
 		  if (pdi->Sid)
 		    {
-		      CopySid (1024, (PSID) buf, pdi->Sid);
-		      psid = (PSID) buf;
+		      CopySid (MAX_SID_LEN, (PSID) sid, pdi->Sid);
+		      psid = (PSID) sid;
 		    }
-		  lsafreememory (pdi);
+		  LsaFreeMemory (pdi);
 		}
-	      lsaclose (lsa);
+	      LsaClose (lsa);
 	    }
 	}
       if (!psid)
         fprintf (stderr,
-	        "WARNING: Group 513 couldn't get retrieved.  Try mkgroup -d\n");
+	        "WARNING: Machine local group 513 couldn't get retrieved.  Try mkgroup -d\n");
       else
 	print_special (print_sids, GetSidIdentifierAuthority (psid), 5,
 				   *GetSidSubAuthority (psid, 0),
@@ -741,11 +683,8 @@ main (int argc, char **argv)
 	}
 
       if (!isRoot)
-	{
-      enum_local_groups (print_sids, print_users, disp_groupname);
-	}
+	enum_local_groups (NULL, print_sids, print_users, 0, disp_groupname);
     }
-
   i = 1;
   if (print_domain) 
     do
@@ -770,13 +709,13 @@ main (int argc, char **argv)
 	  }
 	else
 	  {
-	    rc = netgetdcname (NULL, NULL, (void *) &servername);
+	    rc = NetGetDCName (NULL, NULL, (void *) &servername);
 	    if (rc == ERROR_SUCCESS && domain_specified)
 	      {
 		LPWSTR server = servername;
 		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
-		rc = netgetdcname (NULL, domain_name, (void *) &servername);
-		netapibufferfree (server);
+		rc = NetGetDCName (NULL, domain_name, (void *) &servername);
+		NetApiBufferFree (server);
 	      }
 	    if (rc != ERROR_SUCCESS)
 	      {
@@ -784,9 +723,11 @@ main (int argc, char **argv)
 		return 1;
 	      }
 	  }
-	enum_groups (servername, print_sids, print_users, id_offset * i++,
+	enum_groups (servername, print_sids, print_users, id_offset * i,
 		     disp_groupname);
-	netapibufferfree (pdci ? (PVOID) pdci : (PVOID) servername);
+	enum_local_groups (servername, print_sids, print_users, id_offset * i++,
+			   disp_groupname);
+	NetApiBufferFree (pdci ? (PVOID) pdci : (PVOID) servername);
       }
     while (++optind < argc);
 

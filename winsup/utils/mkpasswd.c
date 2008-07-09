@@ -1,6 +1,7 @@
 /* mkpasswd.c:
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006,
+   2008 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -22,8 +23,11 @@
 #include <sys/fcntl.h>
 #include <lmerr.h>
 #include <lmcons.h>
+#include <iptypes.h>
 
 #define print_win_error(x) _print_win_error(x, __LINE__)
+
+#define MAX_SID_LEN 40
 
 static const char version[] = "$Revision$";
 
@@ -42,39 +46,19 @@ typedef struct {
   LPWSTR ClientSiteName;
 } *PDOMAIN_CONTROLLER_INFOW;
 
-NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
-NET_API_STATUS WINAPI (*netuserenum)(LPWSTR,DWORD,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
-NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
-NET_API_STATUS WINAPI (*netusergetinfo)(LPWSTR,LPWSTR,DWORD,PBYTE*);
 NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
 
-BOOL
+void
 load_netapi ()
 {
   HANDLE h = LoadLibrary ("netapi32.dll");
 
-  if (!h)
-    return FALSE;
-
-  if (!(netapibufferfree = (void *) GetProcAddress (h, "NetApiBufferFree")))
-    return FALSE;
-  if (!(netuserenum = (void *) GetProcAddress (h, "NetUserEnum")))
-    return FALSE;
-  if (!(netlocalgroupenum = (void *) GetProcAddress (h, "NetLocalGroupEnum")))
-    return FALSE;
-  if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
-    return FALSE;
-  if (!(netusergetinfo = (void *) GetProcAddress (h, "NetUserGetInfo")))
-    return FALSE;
-
-  dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
-
-  return TRUE;
+  if (h)
+    dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
 }
 
 char *
@@ -122,7 +106,7 @@ void
 uni2ansi (LPWSTR wcs, char *mbs, int size)
 {
   if (wcs)
-    WideCharToMultiByte (CP_ACP, 0, wcs, -1, mbs, size, NULL, NULL);
+    wcstombs (mbs, wcs, size);
   else
     *mbs = '\0';
 }
@@ -214,7 +198,7 @@ current_user (int print_sids, int print_cygpath,
       strlcat (homedir_psx, envname, sizeof (homedir_psx));
     }
 
-  printf ("%s:unused_by_nt/2000/xp:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
+  printf ("%s:unused:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
 	  envname,
 	  uid + id_offset,
 	  gid + id_offset,
@@ -238,27 +222,23 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
   DWORD rc;
-  char ansi_srvname[256];
-  WCHAR uni_name[512];
-
-  if (servername)
-    uni2ansi (servername, ansi_srvname, sizeof (ansi_srvname));
+  WCHAR uni_name[UNLEN + 1];
 
   do
     {
       DWORD i;
 
-    if (disp_username != NULL)
-      {
-	MultiByteToWideChar (CP_ACP, 0, disp_username, -1, uni_name, 512 );
-	rc = netusergetinfo(servername, (LPWSTR) & uni_name, 3,
-			    (void *) &buffer );
-	entriesread=1;
-      }
-    else 
-      rc = netuserenum (servername, 3, FILTER_NORMAL_ACCOUNT,
-			(void *) &buffer, 1024,
-			&entriesread, &totalentries, &resume_handle);
+      if (disp_username != NULL)
+	{
+	  mbstowcs (uni_name, disp_username, UNLEN + 1);
+	  rc = NetUserGetInfo (servername, (LPWSTR) &uni_name, 3,
+			       (void *) &buffer);
+	  entriesread = 1;
+	}
+      else 
+	rc = NetUserEnum (servername, 3, FILTER_NORMAL_ACCOUNT,
+			  (void *) &buffer, MAX_PREFERRED_LENGTH,
+			  &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -276,21 +256,17 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 
       for (i = 0; i < entriesread; i++)
 	{
-	  char username[100];
-	  char fullname[100];
-	  char homedir_psx[MAX_PATH];
+	  char homedir_psx[PATH_MAX];
 	  char homedir_w32[MAX_PATH];
-	  char domain_name[100];
-	  DWORD domname_len = 100;
-	  char psid_buffer[1024];
+	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
+	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	  char psid_buffer[MAX_SID_LEN];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = 1024;
+	  DWORD sid_length = MAX_SID_LEN;
 	  SID_NAME_USE acc_type;
 
 	  int uid = buffer[i].usri3_user_id;
 	  int gid = buffer[i].usri3_primary_group_id;
-	  uni2ansi (buffer[i].usri3_name, username, sizeof (username));
-	  uni2ansi (buffer[i].usri3_full_name, fullname, sizeof (fullname));
 	  homedir_w32[0] = homedir_psx[0] = '\0';
 	  if (passed_home_path[0] == '\0')
 	    {
@@ -300,71 +276,65 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		{
 		  if (print_cygpath)
 		    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-				      homedir_w32, homedir_psx, MAX_PATH);
+				      homedir_w32, homedir_psx, PATH_MAX);
 		  else
 		    psx_dir (homedir_w32, homedir_psx);
 		}
 	      else
-		{
-		  strcpy (homedir_psx, "/home/");
-		  strcat (homedir_psx, username);
-		}
+		uni2ansi (buffer[i].usri3_name,
+			  stpcpy (homedir_psx, "/home/"), PATH_MAX - 6);
 	    }
 	  else
-	    {
-	      strcpy (homedir_psx, passed_home_path);
-	      strcat (homedir_psx, username);
-	    }
+	    uni2ansi (buffer[i].usri3_name,
+		      stpcpy (homedir_psx, passed_home_path),
+		      PATH_MAX - strlen (passed_home_path));
 
 	  if (print_sids)
 	    {
-	      if (!LookupAccountName (servername ? ansi_srvname : NULL,
-				      username,
-				      psid, &sid_length,
-				      domain_name, &domname_len,
-				      &acc_type))
+	      if (!LookupAccountNameW (servername, buffer[i].usri3_name,
+				       psid, &sid_length, domain_name,
+				       &domname_len, &acc_type))
 		{
 	  	  print_win_error(GetLastError ());
-		  fprintf(stderr, " (%s)\n", username);
+		  fprintf(stderr, " (%ls)\n", buffer[i].usri3_name);
 		  continue;
 		}
 	      else if (acc_type == SidTypeDomain)
 		{
-		  char domname[356];
+		  WCHAR domname[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
 
-		  strcpy (domname, domain_name);
-		  strcat (domname, "\\");
-		  strcat (domname, username);
-		  sid_length = 1024;
-		  domname_len = 100;
-		  if (!LookupAccountName (servername ? ansi_srvname : NULL,
-					  domname,
-					  psid, &sid_length,
-					  domain_name, &domname_len,
-					  &acc_type))
+		  wcscpy (domname, domain_name);
+		  wcscat (domname, L"\\");
+		  wcscat (domname, buffer[i].usri3_name);
+		  sid_length = MAX_SID_LEN;
+		  domname_len = sizeof (domname);
+		  if (!LookupAccountNameW (servername, domname, psid,
+					   &sid_length, domain_name,
+					   &domname_len, &acc_type))
 		    {
 		      print_win_error(GetLastError ());
-		      fprintf(stderr, " (%s)\n", domname);
+		      fprintf(stderr, " (%ls)\n", domname);
 		      continue;
 		    }
 		}
 	    }
-	  printf ("%s:unused_by_nt/2000/xp:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
-	  	  username,
+	  printf ("%ls:unused:%u:%u:%ls%s%s%ls%s%ls%s%s:%s:/bin/bash\n",
+	  	  buffer[i].usri3_name,
 		  uid + id_offset,
 		  gid + id_offset,
-		  fullname,
-		  print_sids && fullname[0] ? "," : "",
+		  buffer[i].usri3_full_name ?: L"",
+		  print_sids && buffer[i].usri3_full_name 
+		  && buffer[i].usri3_full_name[0] ? "," : "",
 		  print_sids ? "U-" : "",
-		  print_sids ? domain_name : "",
+		  print_sids ? domain_name : L"",
 		  print_sids && domain_name[0] ? "\\" : "",
-		  print_sids ? username : "",
+		  print_sids ? buffer[i].usri3_full_name : L"",
 		  print_sids ? "," : "",
 		  print_sids ? put_sid (psid) : "",
 		  homedir_psx);
 	}
 
-      netapibufferfree (buffer);
+      NetApiBufferFree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
@@ -385,7 +355,7 @@ enum_local_groups (int print_sids)
     {
       DWORD i;
 
-      rc = netlocalgroupenum (NULL, 0, (void *) &buffer, 1024,
+      rc = NetLocalGroupEnum (NULL, 0, (void *) &buffer, 1024,
 			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -404,52 +374,48 @@ enum_local_groups (int print_sids)
 
       for (i = 0; i < entriesread; i++)
 	{
-	  char localgroup_name[100];
-	  char domain_name[100];
-	  DWORD domname_len = 100;
-	  char psid_buffer[1024];
+	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
+	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	  char psid_buffer[MAX_SID_LEN];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = 1024;
+	  DWORD sid_length = MAX_SID_LEN;
 	  DWORD gid;
 	  SID_NAME_USE acc_type;
-	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name, sizeof (localgroup_name));
 
-	  if (!LookupAccountName (NULL, localgroup_name, psid,
-				  &sid_length, domain_name, &domname_len,
-				  &acc_type))
+	  if (!LookupAccountNameW (NULL, buffer[i].lgrpi0_name, psid,
+				   &sid_length, domain_name, &domname_len,
+				   &acc_type))
 	    {
 	      print_win_error(GetLastError ());
-	      fprintf(stderr, " (%s)\n", localgroup_name);
+	      fprintf(stderr, " (%ls)\n", buffer[i].lgrpi0_name);
 	      continue;
 	    }
 	  else if (acc_type == SidTypeDomain)
 	    {
-	      char domname[356];
+	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-	      strcpy (domname, domain_name);
-	      strcat (domname, "\\");
-	      strcat (domname, localgroup_name);
-	      sid_length = 1024;
-	      domname_len = 100;
-	      if (!LookupAccountName (NULL, domname,
-				      psid, &sid_length,
-				      domain_name, &domname_len,
-				      &acc_type))
+	      wcscpy (domname, domain_name);
+	      wcscat (domname, L"\\");
+	      wcscat (domname, buffer[i].lgrpi0_name);
+	      sid_length = MAX_SID_LEN;
+	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	      if (!LookupAccountNameW (NULL, domname, psid, &sid_length,
+				       domain_name, &domname_len, &acc_type))
 		{
 		  print_win_error(GetLastError ());
-		  fprintf(stderr, " (%s)\n", domname);
+		  fprintf(stderr, " (%ls)\n", domname);
 		  continue;
 		}
 	    }
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 
-	  printf ("%s:*:%ld:%ld:%s%s::\n", localgroup_name, gid, gid,
+	  printf ("%ls:*:%ld:%ld:%s%s::\n", buffer[i].lgrpi0_name, gid, gid,
 		  print_sids ? "," : "",
 		  print_sids ? put_sid (psid) : "");
 	}
 
-      netapibufferfree (buffer);
+      NetApiBufferFree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
@@ -463,7 +429,7 @@ print_special (int print_sids,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
-  char name[256], dom[256];
+  char name[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD len, len2, rid;
   PSID sid;
   SID_NAME_USE use;
@@ -472,8 +438,8 @@ print_special (int print_sids,
   				sub5, sub6, sub7, sub8, &sid))
     {
       if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
+			    name, (len = UNLEN + 1, &len),
+			    dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
 			    &use))
 	{
 	  if (sub8)
@@ -563,7 +529,7 @@ print_version ()
   printf ("\
 mkpasswd (cygwin) %.*s\n\
 passwd File Generator\n\
-Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
@@ -573,7 +539,7 @@ main (int argc, char **argv)
 {
   LPWSTR servername = NULL;
   DWORD rc = ERROR_SUCCESS;
-  WCHAR domain_name[200];
+  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
   int print_local = 0;
   int print_current = 0;
   int print_domain = 0;
@@ -694,11 +660,7 @@ main (int argc, char **argv)
 	}
       domain_specified = 1;
     }
-  if (!load_netapi ())
-    {
-      print_win_error(GetLastError ());
-      return 1;
-    }
+  load_netapi ();
 
   if (disp_username == NULL)
     {
@@ -745,13 +707,13 @@ main (int argc, char **argv)
 	  }
 	else
 	  {
-	    rc = netgetdcname (NULL, NULL, (void *) &servername);
+	    rc = NetGetDCName (NULL, NULL, (void *) &servername);
 	    if (rc == ERROR_SUCCESS && domain_specified)
 	      {
 		LPWSTR server = servername;
 		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
-		rc = netgetdcname (server, domain_name, (void *) &servername);
-		netapibufferfree (server);
+		rc = NetGetDCName (server, domain_name, (void *) &servername);
+		NetApiBufferFree (server);
 	      }
 	    if (rc != ERROR_SUCCESS)
 	      {
@@ -761,7 +723,7 @@ main (int argc, char **argv)
           }
 	enum_users (servername, print_sids, print_cygpath, passed_home_path,
 		    id_offset * i++, disp_username);
-	netapibufferfree (pdci ? (PVOID) pdci : (PVOID) servername);
+	NetApiBufferFree (pdci ? (PVOID) pdci : (PVOID) servername);
       }
     while (++optind < argc);
 
