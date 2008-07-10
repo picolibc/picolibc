@@ -725,6 +725,8 @@ extern void bfd_mips_elf32_swap_reginfo_out
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0
+#define ELF_ST_IS_MIPS16(OTHER) (((OTHER) & 0xf0) == STO_MIPS16)
+#define ELF_ST_SET_MIPS16(OTHER) (((OTHER) & ~0xf0) | STO_MIPS16)
 
 /* This bit is used on Irix to indicate a symbol whose definition
    is optional - if, at final link time, it cannot be found, no

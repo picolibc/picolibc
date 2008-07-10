@@ -1,3 +1,7 @@
+2008-07-10  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h (ELF_ST_IS_MIPS16, ELF_ST_SET_MIPS16): New macros.
+
 2008-06-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
 
 	* common.h (EM_CR16): Correct value.
