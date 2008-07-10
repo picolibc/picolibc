@@ -1,6 +1,6 @@
 /* cyglsa.c: LSA authentication module for Cygwin
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2008 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -13,10 +13,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #define _CRT_SECURE_NO_DEPRECATE
 #include <ntstatus.h>
 #define WIN32_NO_STATUS
+#include <wchar.h>
 #include <windows.h>
 #include <wininet.h>
 #include <lm.h>
 #include <ntsecapi.h>
+#include <ntddk.h>
 #include "../cygwin/cyglsa.h"
 #include "../cygwin/include/cygwin/version.h"
 
@@ -37,6 +39,17 @@ DllMain (HINSTANCE inst, DWORD reason, LPVOID res)
   return TRUE;
 }
 
+#ifndef RtlInitEmptyUnicodeString
+inline
+VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
+				     USHORT len)
+{
+  dest->Length = 0;
+  dest->MaximumLength = len;
+  dest->Buffer = (PWSTR) buf;
+}
+#endif
+
 static PUNICODE_STRING
 uni_alloc (PWCHAR src, DWORD len)
 {
@@ -55,140 +68,136 @@ uni_alloc (PWCHAR src, DWORD len)
   return tgt;
 }
 
-#ifdef DEBUGGING
-/* No, I don't want to include stdio.h... */
-extern int sprintf (const char *, const char *, ...);
+/* No, I don't want to include stdio.h so I take what ntdll offers. */
+extern int _vsnprintf (char *, size_t, const char *, va_list);
 
-static void
-print (HANDLE fh, const char *text, BOOL nl)
+static HANDLE fh = INVALID_HANDLE_VALUE;
+
+static int
+printf (const char *format, ...)
 {
+  char buf[256];
   DWORD wr;
+  int ret;
 
-  WriteFile (fh, text, strlen (text), &wr, NULL);
-  if (nl)
-    WriteFile (fh, "\n", 1, &wr, NULL);
+  if (fh == INVALID_HANDLE_VALUE)
+    return 0;
+  va_list ap;
+
+  va_start (ap, format);
+  ret = _vsnprintf (buf, 256, format, ap);
+  va_end (ap);
+  if (ret <= 0)
+    return ret;
+  if (ret > 256)
+    ret = 255;
+  buf[255] = '\0';
+  WriteFile (fh, buf, ret, &wr, NULL);
+  return wr;
 }
 
 static void
-print_sid (HANDLE fh, const char *prefix, int idx, PISID sid)
+print_sid (const char *prefix, int idx, PISID sid)
 {
-  char buf[256];
   DWORD i;
 
-  print (fh, prefix, FALSE);
+  printf ("%s", prefix);
   if (idx >= 0)
-    {
-      sprintf (buf, "[%d] ", idx);
-      print (fh, buf, FALSE);
-    }
-  sprintf (buf, "(0x%08x) ", (INT_PTR) sid);
-  print (fh, buf, FALSE);
+    printf ("[%d] ", idx);
+  printf ("(0x%08x) ", (INT_PTR) sid);
   if (!sid)
-    print (fh, "NULL", TRUE);
+    printf ("NULL\n");
   else if (IsBadReadPtr (sid, 8))
-    print (fh, "INVALID POINTER", TRUE);
+    printf ("INVALID POINTER\n");
   else if (!IsValidSid ((PSID) sid))
-    print (fh, "INVALID SID", TRUE);
+    printf ("INVALID SID\n");
   else if (IsBadReadPtr (sid, 8 + sizeof (DWORD) * sid->SubAuthorityCount))
-    print (fh, "INVALID POINTER SPACE", TRUE);
+    printf ("INVALID POINTER SPACE\n");
   else
     {
-      sprintf (buf, "S-%d-%d", sid->Revision, sid->IdentifierAuthority.Value[5]);
+      printf ("S-%d-%d", sid->Revision, sid->IdentifierAuthority.Value[5]);
       for (i = 0; i < sid->SubAuthorityCount; ++i)
-        sprintf (buf + strlen (buf), "-%lu", sid->SubAuthority[i]);
-      print (fh, buf, TRUE);
+        printf ("-%lu", sid->SubAuthority[i]);
+      printf ("\n");
     }
 }
 
 static void
-print_groups (HANDLE fh, PTOKEN_GROUPS grps)
+print_groups (PTOKEN_GROUPS grps)
 {
-  char buf[256];
   DWORD i;
 
-  sprintf (buf, "Groups: (0x%08x) ", (INT_PTR) grps);
-  print (fh, buf, FALSE);
+  printf ("Groups: (0x%08x) ", (INT_PTR) grps);
   if (!grps)
-    print (fh, "NULL", TRUE);
+    printf ("NULL\n");
   else if (IsBadReadPtr (grps, sizeof (DWORD)))
-    print (fh, "INVALID POINTER", TRUE);
+    printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (grps, sizeof (DWORD) + sizeof (SID_AND_ATTRIBUTES)
   						* grps->GroupCount))
-    print (fh, "INVALID POINTER SPACE", TRUE);
+    printf ("INVALID POINTER SPACE\n");
   else
     {
-      sprintf (buf, "Count: %lu", grps->GroupCount);
-      print (fh, buf, TRUE);
+      printf ("Count: %lu\n", grps->GroupCount);
       for (i = 0; i < grps->GroupCount; ++i)
         {
-	  sprintf (buf, "(attr: 0x%lx)", grps->Groups[i].Attributes);
-	  print_sid (fh, " ", i, (PISID) grps->Groups[i].Sid);
+	  printf ("(attr: 0x%lx)", grps->Groups[i].Attributes);
+	  print_sid (" ", i, (PISID) grps->Groups[i].Sid);
 	}
     }
 }
 
 static void
-print_privs (HANDLE fh, PTOKEN_PRIVILEGES privs)
+print_privs (PTOKEN_PRIVILEGES privs)
 {
-  char buf[256];
   DWORD i;
 
-  sprintf (buf, "Privileges: (0x%08x) ", (INT_PTR) privs);
-  print (fh, buf, FALSE);
+  printf ("Privileges: (0x%08x) ", (INT_PTR) privs);
   if (!privs)
-    print (fh, "NULL", TRUE);
+    printf ("NULL\n");
   else if (IsBadReadPtr (privs, sizeof (DWORD)))
-    print (fh, "INVALID POINTER", TRUE);
+    printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (privs, sizeof (DWORD) + sizeof (LUID_AND_ATTRIBUTES)
 						 * privs->PrivilegeCount))
-    print (fh, "INVALID POINTER SPACE", TRUE);
+    printf ("INVALID POINTER SPACE\n");
   else
     {
-      sprintf (buf, "Count: %lu", privs->PrivilegeCount);
-      print (fh, buf, TRUE);
+      printf ("Count: %lu\n", privs->PrivilegeCount);
       for (i = 0; i < privs->PrivilegeCount; ++i)
-        {
-	  sprintf (buf, "Luid: {%ld, %lu} Attributes: 0x%lx",
-		   privs->Privileges[i].Luid.HighPart,
-		   privs->Privileges[i].Luid.LowPart,
-		   privs->Privileges[i].Attributes);
-	  print (fh, buf, TRUE);
-	}
+	printf ("Luid: {%ld, %lu} Attributes: 0x%lx\n",
+		privs->Privileges[i].Luid.HighPart,
+		privs->Privileges[i].Luid.LowPart,
+		privs->Privileges[i].Attributes);
     }
 }
 
 static void
-print_dacl (HANDLE fh, PACL dacl)
+print_dacl (PACL dacl)
 {
-  char buf[256];
   DWORD i;
 
-  sprintf (buf, "DefaultDacl: (0x%08x) ", (INT_PTR) dacl);
-  print (fh, buf, FALSE);
+  printf ("DefaultDacl: (0x%08x) ", (INT_PTR) dacl);
   if (!dacl)
-    print (fh, "NULL", TRUE);
+    printf ("NULL\n");
   else if (IsBadReadPtr (dacl, sizeof (ACL)))
-    print (fh, "INVALID POINTER", TRUE);
+    printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (dacl, dacl->AclSize))
-    print (fh, "INVALID POINTER SPACE", TRUE);
+    printf ("INVALID POINTER SPACE\n");
   else
     {
-      sprintf (buf, "Rev: %d, Count: %d", dacl->AclRevision, dacl->AceCount);
-      print (fh, buf, TRUE);
+      printf ("Rev: %d, Count: %d\n", dacl->AclRevision, dacl->AceCount);
       for (i = 0; i < dacl->AceCount; ++i)
         {
+	  PVOID vace;
 	  PACCESS_ALLOWED_ACE ace;
 
-	  if (!GetAce (dacl, i, (PVOID *) &ace))
-	    {
-	      sprintf (buf, "[%lu] GetAce error %lu", i, GetLastError ());
-	      print (fh, buf, TRUE);
-	    }
+	  if (!GetAce (dacl, i, &vace))
+	    printf ("[%lu] GetAce error %lu\n", i, GetLastError ());
 	  else
 	    {
-	      sprintf (buf, "Type: %x, Flags: %x, Access: %lx, ",
-		       ace->Header.AceType, ace->Header.AceFlags, (DWORD) ace->Mask);
-	      print_sid (fh, buf, i, (PISID) &ace->SidStart);
+	      ace = (PACCESS_ALLOWED_ACE) vace;
+	      printf ("Type: %x, Flags: %x, Access: %lx,",
+		      ace->Header.AceType, ace->Header.AceFlags, (DWORD) ace->Mask);
+	      print_sid (" ", i, (PISID) &ace->SidStart);
 	    }
 	}
     }
@@ -196,48 +205,39 @@ print_dacl (HANDLE fh, PACL dacl)
 
 static void
 print_tokinf (PLSA_TOKEN_INFORMATION_V2 ptok, size_t size,
-	      PVOID got_start, PVOID gotinf_start, PVOID gotinf_end)
+	       PVOID got_start, PVOID gotinf_start, PVOID gotinf_end)
 {
-  HANDLE fh;
-  char buf[256];
-
-  fh = CreateFile ("C:\\cyglsa.dbgout", GENERIC_WRITE,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		   NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
     return;
 
-  sprintf (buf, "INCOMING: start: 0x%08x infstart: 0x%08x infend: 0x%08x",
-	   (INT_PTR) got_start, (INT_PTR) gotinf_start,
-	   (INT_PTR) gotinf_end);
-  print (fh, buf, TRUE);
+  printf ("INCOMING: start: 0x%08x infstart: 0x%08x infend: 0x%08x\n",
+	  (INT_PTR) got_start, (INT_PTR) gotinf_start,
+	  (INT_PTR) gotinf_end);
 
-  sprintf (buf, "LSA_TOKEN_INFORMATION_V2: 0x%08x - 0x%08x",
-	   (INT_PTR) ptok, (INT_PTR) ptok + size);
-  print (fh, buf, TRUE);
+  printf ("LSA_TOKEN_INFORMATION_V2: 0x%08x - 0x%08x\n",
+	  (INT_PTR) ptok, (INT_PTR) ptok + size);
 
   /* User SID */
-  sprintf (buf, "User: (attr: 0x%lx)", ptok->User.User.Attributes);
-  print_sid (fh, "User: ", -1, (PISID) ptok->User.User.Sid);
+  printf ("User: (attr: 0x%lx)", ptok->User.User.Attributes);
+  print_sid (" ", -1, (PISID) ptok->User.User.Sid);
 
   /* Groups */
-  print_groups (fh, ptok->Groups);
+  print_groups (ptok->Groups);
 
   /* Primary Group SID */
-  print_sid (fh, "Primary Group: ", -1, (PISID)ptok->PrimaryGroup.PrimaryGroup);
+  print_sid ("Primary Group: ", -1, (PISID)ptok->PrimaryGroup.PrimaryGroup);
 
   /* Privileges */
-  print_privs (fh, ptok->Privileges);
+  print_privs (ptok->Privileges);
 
   /* Owner */
-  print_sid (fh, "Owner: ", -1, (PISID) ptok->Owner.Owner);
+  print_sid ("Owner: ", -1, (PISID) ptok->Owner.Owner);
 
   /* Default DACL */
-  print_dacl (fh, ptok->DefaultDacl.DefaultDacl);
+  print_dacl (ptok->DefaultDacl.DefaultDacl);
 
-  CloseHandle (fh);
+  // CloseHandle (fh);
 }
-#endif /* DEBUGGING */
 
 NTSTATUS NTAPI
 LsaApInitializePackage (ULONG authp_id, PLSA_SECPKG_FUNCS dpt,
@@ -272,16 +272,23 @@ LsaApInitializePackage (ULONG authp_id, PLSA_SECPKG_FUNCS dpt,
   if (major < 5 || (major == 5 && minor == 0))
     must_create_logon_sid = TRUE;
 
+#ifdef DEBUGGING
+  fh = CreateFile ("C:\\cyglsa.dbgout", GENERIC_WRITE,
+		   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		   NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  printf ("Initialized\n");
+#endif /* DEBUGGING */
+
   return STATUS_SUCCESS;
 }
 
 NTSTATUS NTAPI
-LsaApLogonUser (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
-		PVOID auth, PVOID client_auth_base, ULONG auth_len,
-		PVOID *pbuf, PULONG pbuf_len, PLUID logon_id,
-		PNTSTATUS sub_stat, PLSA_TOKEN_INFORMATION_TYPE tok_type,
-		PVOID *tok, PLSA_UNICODE_STRING *account,
-		PLSA_UNICODE_STRING *authority)
+LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
+		  PVOID auth, PVOID client_auth_base, ULONG auth_len,
+		  PVOID *pbuf, PULONG pbuf_len, PLUID logon_id,
+		  PNTSTATUS sub_stat, PLSA_TOKEN_INFORMATION_TYPE tok_type,
+		  PVOID *tok, PUNICODE_STRING *account,
+		  PUNICODE_STRING *authority, PUNICODE_STRING *machine)
 {
   WCHAR user[UNLEN + 1];
   WCHAR domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -296,16 +303,25 @@ LsaApLogonUser (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
   /* Check if the caller has the SeTcbPrivilege, otherwise refuse service. */
   stat = funcs->GetClientInfo (&clinf);
   if (stat != STATUS_SUCCESS)
-    return stat;
+    {
+      printf ("GetClientInfo failed: 0x%08lx\n", stat);
+      return stat;
+    }
   if (!clinf.HasTcbPrivilege)
-    return STATUS_ACCESS_DENIED;
+    {
+      printf ("Client has no TCB privilege.  Access denied.\n");
+      return STATUS_ACCESS_DENIED;
+    }
 
   /* Make a couple of validity checks. */
   if (auth_len < sizeof *authinf
       || authinf->magic != CYG_LSA_MAGIC
       || !authinf->username[0]
       || !authinf->domain[0])
-    return STATUS_INVALID_PARAMETER;
+    {
+      printf ("Invalid authentication parameter.\n");
+      return STATUS_INVALID_PARAMETER;
+    }
   checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
 				   CYGWIN_VERSION_DLL_MINOR);
   csp = (PDWORD) &authinf->username;
@@ -313,26 +329,126 @@ LsaApLogonUser (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
   while (csp < csp_end)
     checksum += *csp++;
   if (authinf->checksum != checksum)
-    return STATUS_INVALID_PARAMETER_3;
+    {
+      printf ("Invalid checksum.\n");
+      return STATUS_INVALID_PARAMETER_3;
+    }
 
   /* Set account to username and authority to domain resp. machine name.
      The name of the logon account name as returned by LookupAccountSid
      is created from here as "authority\account". */
   authinf->username[UNLEN] = '\0';
-  ulen = mbstowcs (user, authinf->username, UNLEN + 1);
+  ulen = mbstowcs (user, authinf->username, sizeof (user));
   authinf->domain[INTERNET_MAX_HOST_NAME_LENGTH] = '\0';
-  dlen = mbstowcs (domain, authinf->domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  dlen = mbstowcs (domain, authinf->domain, sizeof (domain));
   if (account && !(*account = uni_alloc (user, ulen)))
-    return STATUS_NO_MEMORY;
+    {
+      printf ("No memory trying to create account.\n");
+      return STATUS_NO_MEMORY;
+    }
   if (authority && !(*authority = uni_alloc (domain, dlen)))
-    return STATUS_NO_MEMORY;
+    {
+      printf ("No memory trying to create authority.\n");
+      return STATUS_NO_MEMORY;
+    }
+  if (machine)
+    {
+      WCHAR mach[MAX_COMPUTERNAME_LENGTH + 1];
+      DWORD msize = MAX_COMPUTERNAME_LENGTH + 1;
+      if (!GetComputerNameW (mach, &msize))
+        wcscpy (mach, L"UNKNOWN");
+      if (!(*machine = uni_alloc (mach, wcslen (mach))))
+	{
+	  printf ("No memory trying to create machine.\n");
+	  return STATUS_NO_MEMORY;
+	}
+    }
   /* Create a fake buffer in pbuf which is free'd again in the client.
      Windows 2000 tends to crash when setting this pointer to NULL. */
   if (pbuf)
     {
+#ifdef JUST_ANOTHER_NONWORKING_SOLUTION
+      cygprf_t prf;
+      WCHAR sam_username[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+      SECURITY_STRING sam_user, prefix;
+      PUCHAR user_auth;
+      ULONG user_auth_size;
+      WCHAR flatname[UNLEN + 1];
+      UNICODE_STRING flatnm;
+      TOKEN_SOURCE ts;
+      HANDLE token;
+#endif /* JUST_ANOTHER_NONWORKING_SOLUTION */
+
       stat = funcs->AllocateClientBuffer (request, 64UL, pbuf);
       if (!LSA_SUCCESS (stat))
-        return stat;
+	{
+	  printf ("AllocateClientBuffer failed: 0x%08lx\n", stat);
+	  return stat;
+	}
+#ifdef JUST_ANOTHER_NONWORKING_SOLUTION
+      prf.magic_pre = MAGIC_PRE;
+      prf.token = NULL;
+      prf.magic_post = MAGIC_POST;
+
+#if 0
+      /* That's how it was supposed to work according to MSDN... */
+      wcscpy (sam_username, domain);
+      wcscat (sam_username, L"\\");
+      wcscat (sam_username, user);
+#else
+      /* That's the only solution which worked, and then it only worked
+         for machine local accounts.  No domain authentication possible.
+	 STATUS_NO_SUCH_USER galore! */
+      wcscpy (sam_username, user);
+#endif
+      RtlInitUnicodeString (&sam_user, sam_username);
+      RtlInitUnicodeString (&prefix, L"");
+      RtlInitEmptyUnicodeString (&flatnm, flatname,
+				 (UNLEN + 1) * sizeof (WCHAR));
+
+      stat = funcs->GetAuthDataForUser (&sam_user, SecNameSamCompatible,
+					NULL, &user_auth,
+					&user_auth_size, &flatnm);
+      if (!NT_SUCCESS (stat))
+	{
+	  char sam_u[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+	  wcstombs (sam_u, sam_user.Buffer, sizeof (sam_u));
+	  printf ("GetAuthDataForUser (%u,%u,%s) failed: 0x%08lx\n",
+		  sam_user.Length, sam_user.MaximumLength, sam_u, stat);
+	  return stat;
+	}
+
+      memcpy (ts.SourceName, "Cygwin.1", 8);
+      ts.SourceIdentifier.HighPart = 0;
+      ts.SourceIdentifier.LowPart = 0x0104;
+      RtlInitEmptyUnicodeString (&flatnm, flatname,
+				 (UNLEN + 1) * sizeof (WCHAR));
+      stat = funcs->ConvertAuthDataToToken (user_auth, user_auth_size,
+					    SecurityDelegation, &ts,
+					    Interactive, *authority,
+					    &token, logon_id, &flatnm,
+					    sub_stat);
+      if (!NT_SUCCESS (stat))
+	{
+	  printf ("ConvertAuthDataToToken failed: 0x%08lx\n", stat);
+	  return stat;
+	}
+
+      stat = funcs->DuplicateHandle (token, &prf.token);
+      if (!NT_SUCCESS (stat))
+	{
+	  printf ("DuplicateHandle failed: 0x%08lx\n", stat);
+	  return stat;
+	}
+      
+      stat = funcs->CopyToClientBuffer (request, sizeof prf, *pbuf, &prf);
+      if (!NT_SUCCESS (stat))
+	{
+	  printf ("CopyToClientBuffer failed: 0x%08lx\n", stat);
+	  return stat;
+	}
+      funcs->FreeLsaHeap (user_auth);
+#endif /* JUST_ANOTHER_NONWORKING_SOLUTION */
     }
   if (pbuf_len)
     *pbuf_len = 64UL;
@@ -471,16 +587,16 @@ LsaApLogonUser (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
   *tok = (PVOID) tokinf;
   *tok_type = LsaTokenInformationV2;
 
-#ifdef DEBUGGING
   print_tokinf (tokinf, authinf->inf_size, authinf, &authinf->inf,
 		(PVOID)((LONG_PTR) &authinf->inf + authinf->inf_size));
-#endif
 
   /* Create logon session. */
   if (!AllocateLocallyUniqueId (logon_id))
     {
       funcs->FreeLsaHeap (*tok);
       *tok = NULL;
+      printf ("AllocateLocallyUniqueId failed: Win32 error %lu\n",
+	      GetLastError ());
       return STATUS_INSUFFICIENT_RESOURCES;
     }
   stat = funcs->CreateLogonSession (logon_id);
@@ -488,9 +604,11 @@ LsaApLogonUser (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     {
       funcs->FreeLsaHeap (*tok);
       *tok = NULL;
+      printf ("CreateLogonSession failed: 0x%08lx\n", stat);
       return stat;
     }
 
+  printf ("BINGO!!!\n", stat);
   return STATUS_SUCCESS;
 }
 

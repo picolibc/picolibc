@@ -2,7 +2,7 @@ LIBRARY "cyglsa"
 
 EXPORTS
 LsaApInitializePackage = LsaApInitializePackage@20
-LsaApLogonUser = LsaApLogonUser@52
+LsaApLogonUserEx = LsaApLogonUserEx@56
 LsaApLogonTerminated = LsaApLogonTerminated@4
 LsaApCallPackage = LsaApCallPackage@28
 LsaApCallPackagePassthrough = LsaApCallPackage@28
