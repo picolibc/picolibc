@@ -23,6 +23,8 @@ extern "C" {
 /* Datastructures not defined in w32api. */
 typedef PVOID *PLSA_CLIENT_REQUEST;
 
+typedef UNICODE_STRING SECURITY_STRING, *PSECURITY_STRING;
+
 typedef struct _SECPKG_CLIENT_INFO
 {
   LUID LogonId;
@@ -33,6 +35,23 @@ typedef struct _SECPKG_CLIENT_INFO
   BOOLEAN Restricted;
 } SECPKG_CLIENT_INFO, *PSECPKG_CLIENT_INFO;
 
+typedef enum _SECPKG_NAME_TYPE
+{
+  SecNameSamCompatible,
+  SecNameAlternateId,
+  SecNameFlat,
+  SecNameDN,
+  SecNameSPN
+} SECPKG_NAME_TYPE, *PSECPKG_NAME_TYPE;
+
+typedef struct _SECPKG_CALL_INFO
+{
+  ULONG ProcessId;
+  ULONG ThreadId;
+  ULONG Attributes;
+  ULONG CallCount;
+} SECPKG_CALL_INFO, *PSECPKG_CALL_INFO;
+
 /* The table returned by LsaApInitializePackage is actually a
    LSA_SECPKG_FUNCTION_TABLE even though that's not documented.
    We need only a subset of this table, basically the LSA_DISPATCH_TABLE
@@ -41,7 +60,7 @@ typedef struct _LSA_SECPKG_FUNCS
 {
   NTSTATUS (NTAPI *CreateLogonSession)(PLUID);
   NTSTATUS (NTAPI *DeleteLogonSession)(PLUID);
-  NTSTATUS (NTAPI *AddCredentials)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *AddCredentials)(PLUID, ULONG, PLSA_STRING, PLSA_STRING);
   NTSTATUS (NTAPI *GetCredentials)(PVOID); /* wrong prototype, unused */
   NTSTATUS (NTAPI *DeleteCredentials)(PVOID); /* wrong prototype, unused */
   PVOID (NTAPI *AllocateLsaHeap)(ULONG);
@@ -54,10 +73,41 @@ typedef struct _LSA_SECPKG_FUNCS
 					 PVOID, PVOID);
   NTSTATUS (NTAPI *ImpersonateClient)(VOID);
   NTSTATUS (NTAPI *UnloadPackage)(VOID);
-  NTSTATUS (NTAPI *DuplicateHandle)(HANDLE,PHANDLE);
+  NTSTATUS (NTAPI *DuplicateHandle)(HANDLE, PHANDLE);
   NTSTATUS (NTAPI *SaveSupplementalCredentials)(VOID);
   NTSTATUS (NTAPI *CreateThread)(PVOID); /* wrong prototype, unused */
   NTSTATUS (NTAPI *GetClientInfo)(PSECPKG_CLIENT_INFO);
+  NTSTATUS (NTAPI *RegisterNotification)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *CancelNotification)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *MapBuffer)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *CreateToken)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *AuditLogon)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *CallPackage)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *FreeReturnBuffer)(PVOID); /* wrong prototype, unused */
+  BOOLEAN  (NTAPI *GetCallInfo)(PSECPKG_CALL_INFO);
+  NTSTATUS (NTAPI *CallPackageEx)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *CreateSharedMemory)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *AllocateSharedMemory)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *FreeSharedMemory)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *DeleteSharedMemory)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *OpenSamUser)(PSECURITY_STRING, SECPKG_NAME_TYPE,
+				PSECURITY_STRING, BOOLEAN, ULONG, PVOID *);
+  NTSTATUS (NTAPI *GetUserCredentials)(PVOID, PVOID, PULONG, PVOID *, PULONG);
+  NTSTATUS (NTAPI *GetUserAuthData)(PVOID, PUCHAR *, PULONG);
+  NTSTATUS (NTAPI *CloseSamUser)(PVOID);
+  NTSTATUS (NTAPI *ConvertAuthDataToToken)(PVOID, ULONG,
+					   SECURITY_IMPERSONATION_LEVEL,
+					   PTOKEN_SOURCE, SECURITY_LOGON_TYPE,
+					   PUNICODE_STRING, PHANDLE, PLUID,
+					   PUNICODE_STRING, PNTSTATUS);
+  NTSTATUS (NTAPI *ClientCallback)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *UpdateCredentials)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *GetAuthDataForUser)(PSECURITY_STRING, SECPKG_NAME_TYPE,
+				       PSECURITY_STRING, PUCHAR *, PULONG,
+				       PUNICODE_STRING);
+  NTSTATUS (NTAPI *CrackSingleName)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *AuditAccountLogon)(PVOID); /* wrong prototype, unused */
+  NTSTATUS (NTAPI *CallPackagePassthrough)(PVOID); /* wrong prototype, unused */
 } LSA_SECPKG_FUNCS, *PLSA_SECPKG_FUNCS;
 
 typedef enum _LSA_TOKEN_INFORMATION_TYPE
@@ -141,6 +191,16 @@ typedef struct
   CYG_LSA_TOKEN_INFORMATION inf;
   BYTE data[1];
 } cyglsa_t;
+
+typedef struct
+{
+  DWORD magic_pre;
+  HANDLE token;
+  DWORD magic_post;
+} cygprf_t;
+
+#define MAGIC_PRE  0x12345678UL
+#define MAGIC_POST 0x87654321UL
 
 #ifdef __cplusplus
 }

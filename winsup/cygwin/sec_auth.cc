@@ -1016,10 +1016,13 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   authinf_size += gsize;			    /* Groups + Group SIDs */
   /* When trying to define the admins group as primary group on Vista,
      LsaLogonUser fails with error STATUS_INVALID_OWNER.  As workaround
-     we define "Local" as primary group here.  First, this adds the otherwise
-     missing "Local" group to the group list and second, seteuid32
-     sets the primary group to the group set in /etc/passwd anyway. */
-  pgrpsid = well_known_local_sid;
+     we define "Local" as primary group here.  Seteuid32 sets the primary
+     group to the group set in /etc/passwd anyway. */
+  if (new_groups.pgsid == well_known_admins_sid)
+    pgrpsid = well_known_local_sid;
+  else
+    pgrpsid = new_groups.pgsid;
+
   authinf_size += GetLengthSid (pgrpsid);	    /* Primary Group SID */
 
   authinf_size += psize;			    /* Privileges */
@@ -1104,7 +1107,20 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       goto out;
     }
   if (profile)
-    LsaFreeReturnBuffer (profile);
+    {
+#ifdef JUST_ANOTHER_NONWORKING_SOLUTION
+      /* See ../lsaauth/cyglsa.c. */
+      cygprf_t *prf = (cygprf_t *) profile;
+      if (prf->magic_pre == MAGIC_PRE && prf->magic_post == MAGIC_POST
+	  && prf->token)
+	{
+	  CloseHandle (user_token);
+	  user_token = prf->token;
+	  system_printf ("Got token through profile: %p", user_token);
+	}
+#endif /* JUST_ANOTHER_NONWORKING_SOLUTION */
+      LsaFreeReturnBuffer (profile);
+    }
 
   if (wincap.has_mandatory_integrity_control ())
     {

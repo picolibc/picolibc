@@ -1,3 +1,14 @@
+2008-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.h (SECURITY_STRING): Define.
+	(enum _SECPKG_NAME_TYPE): Define.
+	(struct _SECPKG_CALL_INFO): Define.
+	(struct _LSA_SECPKG_FUNCS): Extend to full size.  Define unused
+	functions lazily.
+	(cygprf_t): Define.
+	* sec_auth.cc (lsaauth): Use actual primary group if no admins group.
+	Add (disabled) code to fetch token from profil data.
+
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (verify_token): Allow builtin groups missing in a token
