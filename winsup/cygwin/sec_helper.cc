@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/acl.h>
+#include <wchar.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -298,11 +299,14 @@ security_descriptor::free ()
   sd_size = 0;
 }
 
+#undef TEXT
+#define TEXT(q) L##q
+
 /* Index must match the correspoding foo_PRIVILEGE value, see security.h. */
-static const char *cygpriv[] =
+static const wchar_t *cygpriv[] =
 {
-  "",
-  "",
+  L"",
+  L"",
   SE_CREATE_TOKEN_NAME,
   SE_ASSIGNPRIMARYTOKEN_NAME,
   SE_LOCK_MEMORY_NAME,
@@ -340,13 +344,13 @@ static const char *cygpriv[] =
 };
 
 bool
-privilege_luid (const char *pname, LUID *luid)
+privilege_luid (const PWCHAR pname, LUID *luid)
 {
   ULONG idx;
   for (idx = SE_CREATE_TOKEN_PRIVILEGE;
        idx <= SE_MAX_WELL_KNOWN_PRIVILEGE;
        ++idx)
-    if (!strcmp (cygpriv[idx], pname))
+    if (!wcscmp (cygpriv[idx], pname))
       {
 	luid->HighPart = 0;
 	luid->LowPart = idx;
@@ -355,12 +359,12 @@ privilege_luid (const char *pname, LUID *luid)
   return false;
 }
 
-static const char *
+static const wchar_t *
 privilege_name (const LUID &priv_luid)
 {
   if (priv_luid.HighPart || priv_luid.LowPart < SE_CREATE_TOKEN_PRIVILEGE
       || priv_luid.LowPart > SE_MAX_WELL_KNOWN_PRIVILEGE)
-    return "<unknown privilege>";
+    return L"<unknown privilege>";
   return cygpriv[priv_luid.LowPart];
 }
 
@@ -393,7 +397,7 @@ set_privilege (HANDLE token, DWORD privilege, bool enable)
 
 out:
   if (ret < 0)
-    debug_printf ("%d = set_privilege ((token %x) %s, %d)\n", ret, token,
+    debug_printf ("%d = set_privilege ((token %x) %W, %d)\n", ret, token,
 		  privilege_name (new_priv.Privileges[0].Luid), enable);
   return ret;
 }

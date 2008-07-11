@@ -327,7 +327,7 @@ extern cygpsid mandatory_medium_integrity_sid;
 extern cygpsid mandatory_high_integrity_sid;
 extern cygpsid mandatory_system_integrity_sid;
 
-bool privilege_luid (const char *pname, LUID *luid);
+bool privilege_luid (const PWCHAR pname, LUID *luid);
 
 inline BOOL
 legal_sid_type (SID_NAME_USE type)

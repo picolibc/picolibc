@@ -14,6 +14,7 @@ details. */
 #include <wininet.h>
 #include <stdlib.h>
 #include <lm.h>
+#include <iptypes.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "pinfo.h"
@@ -369,9 +370,9 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
   if (!mydomain || ascii_strcasematch (myname, "SYSTEM"))
     return almost_null;
 
-  WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  WCHAR wdomain[MAX_DOMAIN_NAME_LEN + 1];
   WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  sys_mbstowcs (wdomain, INTERNET_MAX_HOST_NAME_LENGTH + 1, mydomain);
+  sys_mbstowcs (wdomain, MAX_DOMAIN_NAME_LEN + 1, mydomain);
   cfree_and_set (plogsrv, almost_null);
   if (get_logon_server (wdomain, wlogsrv, false))
     sys_wcstombs_alloc (&plogsrv, HEAP_STR, wlogsrv);

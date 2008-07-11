@@ -18,7 +18,11 @@ extern "C" {
 
 #define CYG_LSA_PKGNAME "CygwinLsa"
 
-#define CYG_LSA_MAGIC 0x0379f014LU
+#define CYG_LSA_MAGIC_OLD1 0x0379f014LU
+/* First change to cyglsa_t.
+   - Username and domain are now of type WCHAR instead of char.
+   - domain is MAX_DOMAIN_NAME_LEN instead of INTERNET_MAX_HOST_NAME_LENGTH. */
+#define CYG_LSA_MAGIC 0x0379f115LU
 
 /* Datastructures not defined in w32api. */
 typedef PVOID *PLSA_CLIENT_REQUEST;
@@ -185,8 +189,8 @@ typedef struct
 {
   DWORD magic;
   DWORD checksum;
-  CHAR username[UNLEN + 1];
-  CHAR domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  WCHAR username[UNLEN + 1];
+  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
   ULONG inf_size;
   CYG_LSA_TOKEN_INFORMATION inf;
   BYTE data[1];

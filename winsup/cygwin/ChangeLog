@@ -1,3 +1,29 @@
+2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	Change length for domain buffers from INTERNET_MAX_HOST_NAME_LENGTH to
+	MAX_DOMAIN_NAME_LEN throughout.
+	* cyglsa.h (CYG_LSA_MAGIC): New value.
+	(cyglsa_t): Define username and domain as WCHAR arrays.
+	* errno.cc (errmap): Add mapping for ERROR_NONE_MAPPED.
+	* sec_auth.cc: Drop 'w' prefix from WCHAR string variable names where
+	appropriate.
+	(extract_nt_dom_user): Prefer resolving by SID before resolving by
+	domain\name pair.
+	(cygwin_logon_user): Don't print cleartext password in debug output.
+	Change comment.
+	(get_user_groups): Revert calls to LookupAccountNameW to use NULL
+	server instead of explicit server name, according to MSDN.
+	(get_user_local_groups): Ditto.
+	(get_server_groups): Fetch domain and user name from usersid per
+	LookupAccountSidW instead of calling extract_nt_dom_user.
+	(lsaauth): Fetch domain and user name from usersid per LookupAccountSidW
+	instead of calling extract_nt_dom_user.
+	* sec_helper.cc (cygpriv): Convert to wchar_t pointer array.
+	(privilege_luid): Convert first parameter to  PWCHAR.
+	(privilege_name): Return wchar_t pointer.
+	(set_privileges): Accommodate debug output.
+	* security.h (privilege_luid): Change prototype accordingly.
+
 2008-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa.h (SECURITY_STRING): Define.
