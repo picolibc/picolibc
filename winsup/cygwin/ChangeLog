@@ -1,5 +1,9 @@
 2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc (peek_pipe): Temporarily revert patch from 2008-05-30.
+
+2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	Change length for domain buffers from INTERNET_MAX_HOST_NAME_LENGTH to
 	MAX_DOMAIN_NAME_LEN throughout.
 	* cyglsa.h (CYG_LSA_MAGIC): New value.

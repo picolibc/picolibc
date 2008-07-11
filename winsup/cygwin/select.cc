@@ -506,6 +506,10 @@ out:
 		       fh->get_name ());
       else
 	{
+#if 0
+/* FIXME: This code is not quite correct.  There's no better solution
+   so far but to make simple assumptions based on WriteQuotaAvailable. */
+
 	  IO_STATUS_BLOCK iosb = {0};
 	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
@@ -535,10 +539,6 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
-#if 0
-/* FIXME: This code is not quite correct.  There's no better solution
-   so far but to make simple assumptions based on WriteQuotaAvailable. */
-
 	  /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
 	     the pipe writable only if it is completely empty, to minimize the
 	     probability that a subsequent write will block.  */
@@ -551,6 +551,8 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
+#else
+	  gotone += s->write_ready = true;
 #endif
 	}
     }
