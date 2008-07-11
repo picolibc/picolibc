@@ -17,6 +17,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include <windows.h>
 #include <wininet.h>
 #include <lm.h>
+#include <iptypes.h>
 #include <ntsecapi.h>
 #include <ntddk.h>
 #include "../cygwin/cyglsa.h"
@@ -290,9 +291,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 		  PVOID *tok, PUNICODE_STRING *account,
 		  PUNICODE_STRING *authority, PUNICODE_STRING *machine)
 {
-  WCHAR user[UNLEN + 1];
-  WCHAR domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  DWORD checksum, ulen, dlen, i;
+  DWORD checksum, i;
   PDWORD csp, csp_end;
   NTSTATUS stat;
   SECPKG_CLIENT_INFO clinf;
@@ -338,15 +337,15 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
      The name of the logon account name as returned by LookupAccountSid
      is created from here as "authority\account". */
   authinf->username[UNLEN] = '\0';
-  ulen = mbstowcs (user, authinf->username, sizeof (user));
-  authinf->domain[INTERNET_MAX_HOST_NAME_LENGTH] = '\0';
-  dlen = mbstowcs (domain, authinf->domain, sizeof (domain));
-  if (account && !(*account = uni_alloc (user, ulen)))
+  authinf->domain[MAX_DOMAIN_NAME_LEN] = '\0';
+  if (account && !(*account = uni_alloc (authinf->username,
+  					 wcslen (authinf->username))))
     {
       printf ("No memory trying to create account.\n");
       return STATUS_NO_MEMORY;
     }
-  if (authority && !(*authority = uni_alloc (domain, dlen)))
+  if (authority && !(*authority = uni_alloc (authinf->domain,
+					     wcslen (authinf->domain))))
     {
       printf ("No memory trying to create authority.\n");
       return STATUS_NO_MEMORY;
@@ -369,7 +368,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     {
 #ifdef JUST_ANOTHER_NONWORKING_SOLUTION
       cygprf_t prf;
-      WCHAR sam_username[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+      WCHAR sam_username[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
       SECURITY_STRING sam_user, prefix;
       PUCHAR user_auth;
       ULONG user_auth_size;
@@ -392,14 +391,14 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 
 #if 0
       /* That's how it was supposed to work according to MSDN... */
-      wcscpy (sam_username, domain);
+      wcscpy (sam_username, authinf->domain);
       wcscat (sam_username, L"\\");
-      wcscat (sam_username, user);
+      wcscat (sam_username, authinf->username);
 #else
       /* That's the only solution which worked, and then it only worked
          for machine local accounts.  No domain authentication possible.
 	 STATUS_NO_SUCH_USER galore! */
-      wcscpy (sam_username, user);
+      wcscpy (sam_username, authinf->username);
 #endif
       RtlInitUnicodeString (&sam_user, sam_username);
       RtlInitUnicodeString (&prefix, L"");
@@ -411,7 +410,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 					&user_auth_size, &flatnm);
       if (!NT_SUCCESS (stat))
 	{
-	  char sam_u[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
+	  char sam_u[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
 	  wcstombs (sam_u, sam_user.Buffer, sizeof (sam_u));
 	  printf ("GetAuthDataForUser (%u,%u,%s) failed: 0x%08lx\n",
 		  sam_user.Length, sam_user.MaximumLength, sam_u, stat);

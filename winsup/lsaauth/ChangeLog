@@ -1,3 +1,10 @@
+2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c (LsaApLogonUserEx): Accommodate the fact that authinf->domain
+	and authinf->username are now of type WCHAR.  Change sam_username and
+	sam_u size to be deifned in terms of MAX_DOMAIN_NAME_LEN instead of
+	INTERNET_MAX_HOST_NAME_LENGTH.
+
 2008-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa.c: Revamp debugging output.
