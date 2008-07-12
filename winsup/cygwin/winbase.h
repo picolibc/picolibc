@@ -1,6 +1,6 @@
 /* winbase.h
 
-   Copyright 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2008 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -12,7 +12,7 @@ details. */
 #define _WINBASE2_H
 
 extern __inline__ long
-ilockincr (long *m)
+ilockincr (volatile long *m)
 {
   register int __res;
   __asm__ __volatile__ ("\n\
@@ -24,7 +24,7 @@ ilockincr (long *m)
 }
 
 extern __inline__ long
-ilockdecr (long *m)
+ilockdecr (volatile long *m)
 {
   register int __res;
   __asm__ __volatile__ ("\n\
@@ -36,7 +36,7 @@ ilockdecr (long *m)
 }
 
 extern __inline__ long
-ilockexch (long *t, long v)
+ilockexch (volatile long *t, long v)
 {
   register int __res;
   __asm__ __volatile__ ("\n\
@@ -47,7 +47,7 @@ ilockexch (long *t, long v)
 }
 
 extern __inline__ long
-ilockcmpexch (long *t, long v, long c)
+ilockcmpexch (volatile long *t, long v, long c)
 {
   register int __res;
   __asm__ __volatile__ ("\n\

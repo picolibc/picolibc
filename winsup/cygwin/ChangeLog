@@ -1,3 +1,9 @@
+2008-07-12  Eric Blake  <ebb9@byu.net>
+
+	Fix usage of recently fixed Interlocked* functions.
+	* winbase.h (ilockincr, ilockdecr, ilockexch, ilockcmpexch): Add
+	volatile qualifier, to match Interlocked* functions.
+
 2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* select.cc (peek_pipe): Temporarily revert patch from 2008-05-30.
@@ -246,7 +252,7 @@
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Don't try to
 	use FileIdBothDirectoryInformation on NFS shares.  Fix comment to
 	explain why.
-	* path.cc (symlink_info::check): Reinstantiate no_ea.  Use in 
+	* path.cc (symlink_info::check): Reinstantiate no_ea.  Use in
 	erroneously changed condition.
 
 2008-05-23  Christopher Faylor  <me+cygwin@cgf.cx>
@@ -385,7 +391,7 @@
 
 2008-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
-	* path.cc (symlink_info::check_shortcut): Minimize requested file 
+	* path.cc (symlink_info::check_shortcut): Minimize requested file
 	access flags.
 	(symlink_info::check_sysfile): Ditto.  Add missing `else'.
 	(symlink_info::check): Only retry to open file if first try failed
@@ -969,7 +975,7 @@
 
 2008-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
-	* postinstall: Set IFS to LF only.  Change while loop in subshell to 
+	* postinstall: Set IFS to LF only.  Change while loop in subshell to
 	for loop in parent shell.  Add code to read system mount points and
 	system cygdrive prefix from registry and append them to /etc/fstab.
 
@@ -1036,7 +1042,7 @@
 2008-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	Cleanup.
-	* exceptions.cc (windows_system_directory): Make static.  Convert to 
+	* exceptions.cc (windows_system_directory): Make static.  Convert to
 	WCHAR.
 	(_cygtls::inside_kernel): Accommodate above change.  Check module
 	path name for leading \\?\ and skip, if so.
@@ -2163,4 +2169,3 @@
 	(fhandler_pipe::create): Simplify based on above change.
 
 	* tty.cc (tty_list::allocate): Remove non-NT code.
-
