@@ -1,5 +1,14 @@
 2008-07-12  Jie Zhang  <jie.zhang@analog.com>
 
+	Revert
+	2008-07-12  Jie Zhang  <jie.zhang@analog.com>
+	* bfdlink.h (struct bfd_link_info): Add sep_code member
+	variable.
+	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.
+	(EF_BFIN_DATA_IN_L1): Define.
+
+2008-07-12  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfdlink.h (struct bfd_link_info): Add sep_code member
 	variable.
 	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.

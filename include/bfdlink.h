@@ -346,9 +346,6 @@ struct bfd_link_info
   /* Non-NULL if .note.gnu.build-id section should be created.  */
   char *emit_note_gnu_build_id;
 
-  /* TRUE if putting code into separate segment.  */
-  unsigned int sep_code: 1;
-
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The
