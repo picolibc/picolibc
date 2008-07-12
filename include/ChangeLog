@@ -1,34 +1,3 @@
-2008-07-12  Jie Zhang  <jie.zhang@analog.com>
-
-	Revert
-	2008-07-12  Jie Zhang  <jie.zhang@analog.com>
-	* bfdlink.h (struct bfd_link_info): Add sep_code member
-	variable.
-	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.
-	(EF_BFIN_DATA_IN_L1): Define.
-
-2008-07-12  Jie Zhang  <jie.zhang@analog.com>
-
-	* bfdlink.h (struct bfd_link_info): Add sep_code member
-	variable.
-	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.
-	(EF_BFIN_DATA_IN_L1): Define.
-
-2008-07-07  Stan Shebs  <stan@codesourcery.com>
-
-	* dis-asm.h (struct disassemble_info): Add endian_code field.
-
-2008-07-07  Joel Brobecker  <brobecker@adacore.com>
-
-	* safe-ctype.h: Add #include of ctype.h before redefining
-	the ctype.h macros.
-
-2008-07-04  Joel Brobecker  <brobecker@adacore.com>
-
-	* safe-ctype.h: Remove #error when detecting that ctype.h has been
-	included. Redefine the various macros provided by ctype.h as
-	undefined variables.
-
 2008-06-23  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (XALLOCA, XDUP, XALLOCAVEC, XDUPVEC, XALLOCAVAR,
