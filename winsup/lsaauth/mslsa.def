@@ -2,7 +2,7 @@ LIBRARY "cyglsa64"
 
 EXPORTS
 LsaApInitializePackage
-LsaApLogonUser
+LsaApLogonUserEx
 LsaApLogonTerminated
 LsaApCallPackage
 LsaApCallPackagePassthrough = LsaApCallPackage

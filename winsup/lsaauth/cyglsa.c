@@ -19,7 +19,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include <lm.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
-#include <ntddk.h>
 #include "../cygwin/cyglsa.h"
 #include "../cygwin/include/cygwin/version.h"
 
@@ -41,9 +40,8 @@ DllMain (HINSTANCE inst, DWORD reason, LPVOID res)
 }
 
 #ifndef RtlInitEmptyUnicodeString
-inline
-VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
-				     USHORT len)
+__inline VOID NTAPI
+RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf, USHORT len)
 {
   dest->Length = 0;
   dest->MaximumLength = len;
@@ -52,7 +50,7 @@ VOID NTAPI RtlInitEmptyUnicodeString(PUNICODE_STRING dest, PCWSTR buf,
 #endif
 
 static PUNICODE_STRING
-uni_alloc (PWCHAR src, DWORD len)
+uni_alloc (PWCHAR src, USHORT len)
 {
   PUNICODE_STRING tgt;
 
@@ -80,10 +78,10 @@ printf (const char *format, ...)
   char buf[256];
   DWORD wr;
   int ret;
+  va_list ap;
 
   if (fh == INVALID_HANDLE_VALUE)
     return 0;
-  va_list ap;
 
   va_start (ap, format);
   ret = _vsnprintf (buf, 256, format, ap);
@@ -471,14 +469,17 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       base = (LONG_PTR) &authinf->inf;
 
       newsize = authinf->inf_size;
-      newsize += sizeof (PSID) - sizeof (OFFSET); /* User SID */
+      newsize += sizeof (TOKEN_USER) - sizeof (CYG_TOKEN_USER); /* User SID */
       newsize += sizeof (PTOKEN_GROUPS) - sizeof (OFFSET); /* Groups */
       src_grps = (PCYG_TOKEN_GROUPS) (base + authinf->inf.Groups);
       newsize += src_grps->GroupCount		  /* Group SIDs */
-      		 * (sizeof (PSID) - sizeof (OFFSET));
+      		 * (sizeof (SID_AND_ATTRIBUTES)
+		    - sizeof (CYG_SID_AND_ATTRIBUTES));
       newsize += sizeof (PSID) - sizeof (OFFSET); /* Primary Group SID */
-      newsize += sizeof (PSID) - sizeof (OFFSET); /* Owner SID */
+      newsize += sizeof (PTOKEN_PRIVILEGES) - sizeof (OFFSET); /* Privileges */
+      newsize += 0; /* Owner SID */
       newsize += sizeof (PACL) - sizeof (OFFSET); /* Default DACL */
+
       if (!(tokinf = funcs->AllocateLsaHeap (newsize)))
 	return STATUS_NO_MEMORY;
       tptr = (PBYTE)(tokinf + 1);

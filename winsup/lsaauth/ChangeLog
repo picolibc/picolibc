@@ -1,3 +1,17 @@
+2008-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Don't include ntddk.h.
+	(RtlInitEmptyUnicodeString): Use Visual-C compatible "__inline" instead
+	of "inline".
+	(uni_alloc): Change second argument to USHORT.
+	(printf): Move definition of ap to make Visual-C++ happy.
+	(LsaApLogonUserEx): Compute size of datastructure returned to
+	LSA on 64 bit systems correctly to avoid heap corruption.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-visual-c.bat: Accommodate newer Microsoft
+	toolchains.  Add more comment.
+	* mslsa.def: Export LsaApLogonUserEx instead of LsaApLogonUser.
+
 2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa.c (LsaApLogonUserEx): Accommodate the fact that authinf->domain
