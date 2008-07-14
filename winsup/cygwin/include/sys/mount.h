@@ -30,7 +30,8 @@ enum
   MOUNT_DEVFS =		0x0200,	/* /device "filesystem" */
   MOUNT_PROC =		0x0400,	/* /proc "filesystem" */
   MOUNT_ENC =		0x0800,	/* encode special characters */
-  MOUNT_RO =		0x1000  /* read-only "filesystem" */
+  MOUNT_RO =		0x1000, /* read-only "filesystem" */
+  MOUNT_NOACL =		0x2000  /* support reading/writing ACLs */
 };
 
 int mount (const char *, const char *, unsigned __flags);

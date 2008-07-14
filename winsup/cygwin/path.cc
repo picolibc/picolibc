@@ -516,8 +516,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   is_nfs (RtlEqualUnicodeString (&fsname, &testname, FALSE));
   is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
 
-  has_acls ((flags () & FS_PERSISTENT_ACLS)
-	    && (allow_smbntsec || !is_remote_drive ()));
+  has_acls (flags () & FS_PERSISTENT_ACLS);
   hasgood_inode (((flags () & FILE_PERSISTENT_ACLS) && !is_netapp ())
 		 || is_nfs ());
   /* Known file systems with buggy open calls. Further explanation
@@ -1231,7 +1230,7 @@ out:
       if (exists () || fs.update (get_nt_native_path (), NULL))
 	{
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
-	  if (fs.has_acls () && allow_ntsec)
+	  if (fs.has_acls ())
 	    set_exec (0);  /* We really don't know if this is executable or not here
 			      but set it to not executable since it will be figured out
 			      later by anything which cares about this. */
@@ -1785,7 +1784,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  goto done;
 	}
     }
-  if (allow_ntsec && win32_newpath.has_acls ())
+  if (win32_newpath.has_acls ())
     set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
 			    &sa, sd);
   status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,

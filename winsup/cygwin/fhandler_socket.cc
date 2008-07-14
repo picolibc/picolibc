@@ -882,7 +882,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	fattr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none_nih;
       security_descriptor sd;
-      if (allow_ntsec && pc.has_acls ())
+      if (pc.has_acls ())
 	set_security_attribute (mode, &sa, sd);
       NTSTATUS status;
       HANDLE fh;

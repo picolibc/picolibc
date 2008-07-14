@@ -336,9 +336,6 @@ legal_sid_type (SID_NAME_USE type)
       || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
-extern bool allow_ntsec;
-extern bool allow_smbntsec;
-
 /* File manipulation */
 int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
 				  __uid32_t *, __gid32_t *);

@@ -571,18 +571,6 @@ set_proc_retry (const char *buf)
   child_info::retry_count = strtoul (buf, NULL, 0);
 }
 
-static void
-set_ntsec (const char *buf)
-{
-  allow_ntsec = (buf && ascii_strcasematch (buf, "yes"));
-}
-
-static void
-set_smbntsec (const char *buf)
-{
-  allow_smbntsec = (buf && ascii_strcasematch (buf, "yes"));
-}
-
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -615,13 +603,11 @@ static struct parse_thing
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"ntsec", {func: set_ntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
 #ifdef USE_SERVER
   {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
 #endif
-  {"smbntsec", {func: set_smbntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},

@@ -80,6 +80,7 @@ enum path_types
   PATH_CYGWIN_EXEC	= MOUNT_CYGWIN_EXEC,
   PATH_ENC		= MOUNT_ENC,
   PATH_RO		= MOUNT_RO,
+  PATH_NOACL		= MOUNT_NOACL,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_LNK		= 0x01000000,
@@ -148,7 +149,7 @@ class path_conv
   bool case_clash;
 
   bool isremote () const {return fs.is_remote_drive ();}
-  bool has_acls () const {return fs.has_acls (); }
+  bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
   bool hasgood_inode () const {return fs.hasgood_inode (); }
   bool isgood_inode (__ino64_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}

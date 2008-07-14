@@ -1,5 +1,22 @@
 2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout drop allow_ntsec and allow_smbntsec handling.
+	* environ.cc (set_ntsec): Remove.
+	(set_smbntsec): Remove.
+	(known): Remove ntsec and smbntsec options.
+	* external.cc (check_ntsec): Return true if no filename is given.
+	* mount.cc (oopts): Add "acl" and "noacl" options.  Set MOUNT_NOACL
+	flag accordingly.
+	(fillout_mntent): Handle MOUNT_NOACL flag.
+	* path.h (enum path_types): Add PATH_NOACL.
+	* security.cc (allow_ntsec): Remove.
+	(allow_smbntsec): Remove.
+	* security.h (allow_ntsec): Drop declaration.
+	(allow_smbntsec): Drop declaration.
+	* include/sys/mount.h (MOUNT_NOACL): Define.
+
+2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (cygwin_strncasecmp): Fix bug which results in
 	prematurely truncated strings.  Simplify target length argument to
 	sys_mbstowcs.

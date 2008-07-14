@@ -761,7 +761,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!(oret = open (O_BINARY, 0)))
 	{
 	  /* Need WRITE_DAC|WRITE_OWNER to write ACLs. */
-	  if (allow_ntsec && pc.has_acls ())
+	  if (pc.has_acls ())
 	    return -1;
 	  /* Otherwise FILE_WRITE_ATTRIBUTES is sufficient. */
 	  query_open (query_write_attributes);
@@ -798,13 +798,12 @@ fhandler_disk_file::fchmod (mode_t mode)
       goto out;
     }
 
-  if (allow_ntsec && pc.has_acls ())
+  if (pc.has_acls ())
     {
       if (pc.isdir ())
 	mode |= S_IFDIR;
       if (!set_file_attribute (get_handle (), pc,
-			       ILLEGAL_UID, ILLEGAL_GID, mode)
-	  && allow_ntsec)
+			       ILLEGAL_UID, ILLEGAL_GID, mode))
 	res = 0;
     }
 
@@ -823,7 +822,7 @@ fhandler_disk_file::fchmod (mode_t mode)
   status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
 				 FileBasicInformation);
   /* Correct NTFS security attributes have higher priority */
-  if (!allow_ntsec || !pc.has_acls ())
+  if (!pc.has_acls ())
     {
       if (!NT_SUCCESS (status))
 	__seterrno_from_nt_status (status);
@@ -843,7 +842,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 {
   int oret = 0;
 
-  if (!pc.has_acls () || !allow_ntsec)
+  if (!pc.has_acls ())
     {
       /* fake - if not supported, pretend we're like win95
 	 where it just works */
@@ -887,7 +886,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
   int res = -1;
   int oret = 0;
 
-  if (!pc.has_acls () || !allow_ntsec)
+  if (!pc.has_acls ())
     {
 cant_access_acl:
       switch (cmd)
@@ -1388,7 +1387,7 @@ fhandler_disk_file::mkdir (mode_t mode)
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
 
-  if (allow_ntsec && has_acls ())
+  if (has_acls ())
     set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
 			    &sa, sd);
 

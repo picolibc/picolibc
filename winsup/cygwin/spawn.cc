@@ -169,7 +169,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       if ((suffix = perhaps_suffix (tmp, buf, err, opt)) != NULL)
 	{
-	  if (buf.has_acls () && allow_ntsec && check_file_access (buf, X_OK))
+	  if (buf.has_acls () && check_file_access (buf, X_OK))
 	    continue;
 
 	  if (posix == tmp)

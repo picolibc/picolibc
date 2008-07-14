@@ -374,13 +374,12 @@ fhandler_base::fhaccess (int flags)
   else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK)
 	   && !pc.isdir ())
     goto eaccess_done;
-  else if (has_acls () && allow_ntsec)
+  else if (has_acls ())
     {
       res = check_file_access (pc, flags);
       goto done;
     }
-  else if (get_device () == FH_REGISTRY && allow_ntsec && open (O_RDONLY, 0)
-	   && get_handle ())
+  else if (get_device () == FH_REGISTRY && open (O_RDONLY, 0) && get_handle ())
     {
       res = check_registry_access (get_handle (), flags);
       close ();
@@ -588,7 +587,7 @@ fhandler_base::open (int flags, mode_t mode)
 	     descriptor matches.  The result is that the file gets created, but
 	     then NtCreateFile doesn't return a handle to the file and fails
 	     with STATUS_ACCESS_DENIED.  Go figure! */
-	  if (allow_ntsec && has_acls ())
+	  if (has_acls ())
 	    {
 	      set_security_attribute (mode, &sa, sd);
 	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;

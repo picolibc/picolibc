@@ -831,7 +831,9 @@ struct opt
   {"notexec", MOUNT_NOTEXEC, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"nosuid", 0, 0},
-  {"managed", MOUNT_ENC, 0}
+  {"managed", MOUNT_ENC, 0},
+  {"acl", MOUNT_NOACL, 1},
+  {"noacl", MOUNT_NOACL, 0}
 };
 
 static bool
@@ -1352,6 +1354,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     strcat (_my_tls.locals.mnt_opts, (char *) ",noexec");
   if (flags & MOUNT_ENC)
     strcat (_my_tls.locals.mnt_opts, ",managed");
+
+  if (flags & MOUNT_NOACL)
+    strcat (_my_tls.locals.mnt_opts, (char *) ",noacl");
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");

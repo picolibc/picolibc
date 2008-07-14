@@ -29,12 +29,6 @@ details. */
 				  | GROUP_SECURITY_INFORMATION \
 				  | OWNER_SECURITY_INFORMATION)
 
-/* Set ntsec explicit as default. */
-bool allow_ntsec = true;
-/* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
-   It's defined here because of it's strong relationship to allow_ntsec. */
-bool allow_smbntsec;
-
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 {
@@ -310,15 +304,12 @@ int
 get_reg_attribute (HKEY hkey, mode_t *attribute, __uid32_t *uidret,
 		   __gid32_t *gidret)
 {
-  if (allow_ntsec)
-    {
-      security_descriptor sd;
+  security_descriptor sd;
 
-      if (!get_reg_sd (hkey, sd))
-	{
-	  get_info_from_sd (sd, attribute, uidret, gidret);
-	  return 0;
-	}
+  if (!get_reg_sd (hkey, sd))
+    {
+      get_info_from_sd (sd, attribute, uidret, gidret);
+      return 0;
     }
   /* The entries are already set to default values */
   return -1;
@@ -328,7 +319,7 @@ int
 get_file_attribute (HANDLE handle, path_conv &pc,
 		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  if (pc.has_acls () && allow_ntsec)
+  if (pc.has_acls ())
     {
       security_descriptor sd;
 
@@ -707,7 +698,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
 {
   int ret = -1;
 
-  if (pc.has_acls () && allow_ntsec)
+  if (pc.has_acls ())
     {
       security_descriptor sd;
 

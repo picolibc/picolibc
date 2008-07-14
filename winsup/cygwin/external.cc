@@ -123,9 +123,9 @@ static DWORD
 check_ntsec (const char *filename)
 {
   if (!filename)
-    return allow_ntsec;
+    return true;
   path_conv pc (filename);
-  return allow_ntsec && pc.has_acls ();
+  return pc.has_acls ();
 }
 
 /* Copy cygwin environment variables to the Windows environment. */
