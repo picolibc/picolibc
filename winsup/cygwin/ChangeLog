@@ -1,5 +1,11 @@
 2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (cygwin_strncasecmp): Fix bug which results in
+	prematurely truncated strings.  Simplify target length argument to
+	sys_mbstowcs.
+
+2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetExtendedTcpTable): Define.
 	* fhandler_socket.cc (address_in_use): Take const struct sockaddr
 	pointer as argument.  Implement additional AF_INET6 table check.

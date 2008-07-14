@@ -130,16 +130,14 @@ cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
 
   while (cs[ls] && ls < n)
     ++ls;
-  len = ls * sizeof (WCHAR);
+  len = (ls + 1) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
-  us.Length = sys_mbstowcs (us.Buffer, us.MaximumLength / sizeof (WCHAR),
-			    cs, ls) * sizeof (WCHAR);
+  us.Length = sys_mbstowcs (us.Buffer, ls + 1, cs, ls) * sizeof (WCHAR);
   while (ct[lt] && lt < n)
     ++lt;
-  len = lt * sizeof (WCHAR);
+  len = (lt + 1) * sizeof (WCHAR);
   RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
-  ut.Length = sys_mbstowcs (ut.Buffer, ut.MaximumLength / sizeof (WCHAR),
-			    ct, lt)  * sizeof (WCHAR);
+  ut.Length = sys_mbstowcs (ut.Buffer, lt + 1, ct, lt)  * sizeof (WCHAR);
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
