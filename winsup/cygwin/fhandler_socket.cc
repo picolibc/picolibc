@@ -769,24 +769,62 @@ fhandler_socket::link (const char *newpath)
 }
 
 static inline bool
-address_in_use (struct sockaddr_in *addr)
+address_in_use (const struct sockaddr *addr)
 {
-  PMIB_TCPTABLE tab;
-  PMIB_TCPROW entry;
-  DWORD size = 0, i;
-
-  if (GetTcpTable (NULL, &size, FALSE) == ERROR_INSUFFICIENT_BUFFER)
+  switch (addr->sa_family)
     {
-      tab = (PMIB_TCPTABLE) alloca (size);
-      if (!GetTcpTable (tab, &size, FALSE))
-	{
-	  for (i = tab->dwNumEntries, entry = tab->table; i > 0; --i, ++entry)
-	    if (entry->dwLocalAddr == addr->sin_addr.s_addr
-		&& entry->dwLocalPort == addr->sin_port
-		&& entry->dwState >= MIB_TCP_STATE_LISTEN
-		&& entry->dwState <= MIB_TCP_STATE_LAST_ACK)
-	      return true;
-	}
+    case AF_INET:
+      {
+	PMIB_TCPTABLE tab;
+	PMIB_TCPROW entry;
+	DWORD size = 0, i;
+	struct sockaddr_in *in = (struct sockaddr_in *) addr;
+
+	if (GetTcpTable (NULL, &size, FALSE) == ERROR_INSUFFICIENT_BUFFER)
+	  {
+	    tab = (PMIB_TCPTABLE) alloca (size += 16 * sizeof (PMIB_TCPROW));
+	    if (!GetTcpTable (tab, &size, FALSE))
+	      for (i = tab->dwNumEntries, entry = tab->table; i > 0;
+		   --i, ++entry)
+		if (entry->dwLocalAddr == in->sin_addr.s_addr
+		    && entry->dwLocalPort == in->sin_port
+		    && entry->dwState >= MIB_TCP_STATE_LISTEN
+		    && entry->dwState <= MIB_TCP_STATE_LAST_ACK)
+		  return true;
+	  }
+      }
+      break;
+    case AF_INET6:
+      {
+	/* This test works on XP SP2 and above which should cover almost
+	   all IPv6 users... */
+	PMIB_TCP6TABLE_OWNER_PID tab;
+	PMIB_TCP6ROW_OWNER_PID entry;
+	DWORD size = 0, i;
+	struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) addr;
+
+	if (GetExtendedTcpTable (NULL, &size, FALSE, AF_INET6,
+				 TCP_TABLE_OWNER_PID_ALL, 0)
+	    == ERROR_INSUFFICIENT_BUFFER)
+	  {
+	    tab = (PMIB_TCP6TABLE_OWNER_PID)
+		  alloca (size += 16 * sizeof (PMIB_TCP6ROW_OWNER_PID));
+	    if (!GetExtendedTcpTable (tab, &size, FALSE, AF_INET6,
+				      TCP_TABLE_OWNER_PID_ALL, 0))
+	      for (i = tab->dwNumEntries, entry = tab->table; i > 0;
+		   --i, ++entry)
+		if (IN6_ARE_ADDR_EQUAL (entry->ucLocalAddr,
+					in6->sin6_addr.s6_addr)
+		    /* FIXME: Is testing for the scope required. too?!? */
+		    && entry->dwLocalPort == in6->sin6_port
+		    && entry->dwState >= MIB_TCP_STATE_LISTEN
+		    && entry->dwState <= MIB_TCP_STATE_LAST_ACK)
+		  return true;
+	  }
+      }
+      break;
+    default:
+      break;
     }
   return false;
 }
@@ -932,10 +970,9 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 		 systems is never to set SO_REUSEADDR but only to note that
 		 it has been set for the above SO_EXCLUSIVEADDRUSE setting.
 		 See setsockopt() in net.cc. */
-	      if (name->sa_family == AF_INET
-		  && get_socket_type () == SOCK_STREAM
+	      if (get_socket_type () == SOCK_STREAM
 		  && wincap.has_ip_helper_lib ()
-		  && address_in_use ((struct sockaddr_in *) name))
+		  && address_in_use (name))
 		{
 		  debug_printf ("Local address in use, don't bind");
 		  set_errno (EADDRINUSE);

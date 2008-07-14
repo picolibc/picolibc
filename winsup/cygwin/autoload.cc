@@ -397,6 +397,7 @@ LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
 
 // 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't supprot iphlpapi funcs
 LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
+LoadDLLfuncEx2 (GetExtendedTcpTable, 24, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIfEntry, 4, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIpAddrTable, 12, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIpForwardTable, 12, iphlpapi, 1, 50)

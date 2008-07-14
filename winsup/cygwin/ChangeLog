@@ -1,3 +1,13 @@
+2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetExtendedTcpTable): Define.
+	* fhandler_socket.cc (address_in_use): Take const struct sockaddr
+	pointer as argument.  Implement additional AF_INET6 table check.
+	(fhandler_socket::bind): Drop AF_INET test before calling
+	address_in_use.
+	* net.cc (ipv4_getnameinfo): Return EAI_FAMILY instead of 1 if
+	called with unsupported af_family.
+
 2008-07-12  Eric Blake  <ebb9@byu.net>
 
 	Fix usage of recently fixed Interlocked* functions.

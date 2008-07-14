@@ -3765,7 +3765,7 @@ ipv4_getnameinfo (const struct sockaddr *sa, socklen_t salen,
 #endif
 
     default:
-      return (1);
+      return (EAI_FAMILY);
     }
 }
 
