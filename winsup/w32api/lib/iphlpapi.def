@@ -15,6 +15,7 @@ GetAdapterIndex@8
 GetAdaptersInfo@8
 GetBestInterface@8
 GetBestRoute@12
+GetExtendedTcpTable@24
 GetFriendlyIfIndex@4
 GetIcmpStatistics@4
 GetIfEntry@4

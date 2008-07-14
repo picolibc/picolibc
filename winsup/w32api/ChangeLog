@@ -1,3 +1,11 @@
+2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/iphlpapi.h (GetExtendedTcpTable): Add prototype.
+	* include/iprtrmib.h (TCP_TABLE_CLASS, MIB_TCPROW_OWNER_PID,
+	MIB_TCPTABLE_OWNER_PID, MIB_TCP6ROW_OWNER_PID,
+	MIB_TCP6TABLE_OWNER_PID): Define.
+	* lib/iphlpapi.def (GetExtendedTcpTable): Export.
+
 2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
 
 	* include/winbase.h (GetProcessHandleCount, GetSystemRegistryQuota,

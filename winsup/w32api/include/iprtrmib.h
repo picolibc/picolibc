@@ -39,6 +39,17 @@ extern "C" {
 #define MIB_USE_CURRENT_TTL ((DWORD)-1)
 #define MIB_USE_CURRENT_FORWARDING ((DWORD)-1)
 #define MIB_TCP_MAXCONN_DYNAMIC ((DWORD)-1)
+typedef enum {
+  TCP_TABLE_BASIC_LISTENER,
+  TCP_TABLE_BASIC_CONNECTIONS,
+  TCP_TABLE_BASIC_ALL,
+  TCP_TABLE_OWNER_PID_LISTENER,
+  TCP_TABLE_OWNER_PID_CONNECTIONS,
+  TCP_TABLE_OWNER_PID_ALL,
+  TCP_TABLE_OWNER_MODULE_LISTENER,
+  TCP_TABLE_OWNER_MODULE_CONNECTIONS,
+  TCP_TABLE_OWNER_MODULE_ALL
+} TCP_TABLE_CLASS, *PTCP_TABLE_CLASS;
 typedef struct {
   DWORD dwAddr;
   DWORD dwIndex;
@@ -189,6 +200,18 @@ typedef struct {
   MIB_TCPROW table[ANY_SIZE];
 } MIB_TCPTABLE, *PMIB_TCPTABLE;
 typedef struct {
+  DWORD dwState;
+  DWORD dwLocalAddr;
+  DWORD dwLocalPort;
+  DWORD dwRemoteAddr;
+  DWORD dwRemotePort;
+  DWORD dwOwningPid;
+} MIB_TCPROW_OWNER_PID, *PMIB_TCPROW_OWNER_PID;
+typedef struct {
+  DWORD dwNumEntries;
+  MIB_TCPROW_OWNER_PID table[ANY_SIZE];
+} MIB_TCPTABLE_OWNER_PID, *PMIB_TCPTABLE_OWNER_PID;
+typedef struct {
   DWORD dwInDatagrams;
   DWORD dwNoPorts;
   DWORD dwInErrors;
@@ -203,6 +226,20 @@ typedef struct {
   DWORD dwNumEntries;
   MIB_UDPROW table[ANY_SIZE];
 } MIB_UDPTABLE, *PMIB_UDPTABLE;
+typedef struct {
+  UCHAR ucLocalAddr[16];
+  DWORD dwLocalScopeId;
+  DWORD dwLocalPort;
+  UCHAR ucRemoteAddr[16];
+  DWORD dwRemoteScopeId;
+  DWORD dwRemotePort;
+  DWORD dwState;
+  DWORD dwOwningPid;
+} MIB_TCP6ROW_OWNER_PID,  *PMIB_TCP6ROW_OWNER_PID;
+typedef struct {
+  DWORD dwNumEntries;
+  MIB_TCP6ROW_OWNER_PID table[ANY_SIZE];
+} MIB_TCP6TABLE_OWNER_PID,  *PMIB_TCP6TABLE_OWNER_PID;
 #ifdef __cplusplus
 }
 #endif
