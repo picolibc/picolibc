@@ -1,5 +1,10 @@
 2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fpathconf): On _PC_POSIX_PERMISSIONS
+	and _PC_POSIX_SECURITY, return true for NFS, too.
+
+2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout drop allow_ntsec and allow_smbntsec handling.
 	* environ.cc (set_ntsec): Remove.
 	(set_smbntsec): Remove.

@@ -1640,7 +1640,7 @@ fhandler_base::fpathconf (int v)
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
       if (get_device () == FH_FS)
-	return pc.has_acls ();
+	return pc.has_acls () || pc.fs_is_nfs ();
       set_errno (EINVAL);
       break;
     default:
