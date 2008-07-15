@@ -118,9 +118,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 31144
+#define SHARED_INFO_CB 31136
 
-#define CURR_SHARED_MAGIC 0xbc77afb0U
+#define CURR_SHARED_MAGIC 0xace17c0fU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -136,6 +136,7 @@ class shared_info
   DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;
+  DWORD obcaseinsensitivity;
   mtinfo mt;
 
   void initialize ();

@@ -1,15 +1,12 @@
 /* mtinfo.h: Defininitions for the Cygwin tape driver class.
 
-   Copyright 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
-
-#define MTINFO_MAGIC		0x179b2af0
-#define MTINFO_VERSION		2
 
 /* Maximum number of supported partitions per drive. */
 #define MAX_PARTITION_NUM	64
@@ -132,8 +129,6 @@ public:
 
 class mtinfo
 {
-  DWORD magic;
-  DWORD version;
   mtinfo_drive _drive[MAX_DRIVE_NUM];
 
 public:

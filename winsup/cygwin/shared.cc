@@ -256,16 +256,14 @@ shared_info::initialize ()
     }
 
   heap_init ();
+  get_session_parent_dir ();	/* Create session dir if first process. */
 
   if (!sversion)
     {
       tty.init ();		/* Initialize tty table.  */
+      mt.initialize ();		/* Initialize shared tape information. */
       cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
-
-  mt.initialize ();		/* Initialize shared tape information. */
-
-  get_session_parent_dir ();	/* Create session dir if first process. */
 
   if (cb != SHARED_INFO_CB)
     system_printf ("size of shared memory region changed from %u to %u",

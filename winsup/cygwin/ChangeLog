@@ -1,3 +1,18 @@
+2008-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (mtinfo::initialize): Remove synchronization stuff.
+	Just initialize drive data.
+	* mtinfo.h (MTINFO_MAGIC): Remove.
+	(MTINFO_VERSION): Remove.
+	(class mtinfo): Remove magic and version members.
+	* shared.cc (shared_info::initialize): Move call to
+	get_session_parent_dir so that the dir creation is only called once.
+	Move call to mt.initialize so that it's called only by the first
+	process creating the shared memory.
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add obcaseinsensitivity member.
+
 2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fpathconf): On _PC_POSIX_PERMISSIONS

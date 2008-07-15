@@ -1,7 +1,8 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1125,33 +1126,8 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 void
 mtinfo::initialize ()
 {
-  char name[MAX_PATH];
-  HANDLE mtx;
-
-  shared_name (name, "mtinfo_mutex", 0);
-  if (!(mtx = CreateMutex (&sec_all_nih, FALSE, name)))
-    api_fatal ("CreateMutex '%s', %E.  Terminating.", name);
-  WaitForSingleObject (mtx, INFINITE);
-  if (!magic)
-    {
-      magic = MTINFO_MAGIC;
-      version = MTINFO_VERSION;
-      for (unsigned i = 0; i < MAX_DRIVE_NUM; ++i)
-	drive (i)->initialize (i, true);
-      ReleaseMutex (mtx);
-      CloseHandle (mtx);
-    }
-  else
-    {
-      ReleaseMutex (mtx);
-      CloseHandle (mtx);
-      if (magic != MTINFO_MAGIC)
-	api_fatal ("MT magic number screwed up: %lu, should be %lu",
-		   magic, MTINFO_MAGIC);
-      if (version != MTINFO_VERSION)
-	system_printf ("MT version number mismatch: %lu, should be %lu",
-		       version, MTINFO_VERSION);
-    }
+  for (unsigned i = 0; i < MAX_DRIVE_NUM; ++i)
+    drive (i)->initialize (i, true);
 }
 
 /**********************************************************************/
