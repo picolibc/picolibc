@@ -19,6 +19,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include <lm.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
+#ifdef __MINGW32__
+#include <ntddk.h>
+#endif
 #include "../cygwin/cyglsa.h"
 #include "../cygwin/include/cygwin/version.h"
 

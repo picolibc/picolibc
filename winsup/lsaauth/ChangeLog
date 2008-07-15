@@ -1,3 +1,9 @@
+2008-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Include ntddk.h again, but only if __MINGW32__ is defined.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-visual-c.bat: Fix comment.
+
 2008-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa.c: Don't include ntddk.h.

@@ -6,8 +6,8 @@ rem Note that you need not only the SDK headers and libs, but also the
 rem 64 bit ntdll.lib file from a DDK supporting 64 bit builds.
 rem
 rem Make sure all necessary include paths are set in %Include% (inc\ddk,
-rem inc\atl, inc\crt) and rem that %Lib% points to the 64 bit libs, not
-rem the 32 bit libs.  In the latter case the link stage will succeed,
+rem inc\atl, inc\crt) and make sure that %Lib% points to the 64 bit libs, not
+rem to the 32 bit libs.  In the latter case the link stage will succeed,
 rem but the resulting DLL is non-functional.
 rem
 rem This can be used as long as no x86_64-pe/coff capable gcc is available.
