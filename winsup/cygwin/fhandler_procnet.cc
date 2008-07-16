@@ -65,7 +65,7 @@ fhandler_procnet::exists ()
     return 1;
 
   for (int i = 0; process_listing[i]; i++)
-    if (pathmatch (path + 1, process_listing[i]))
+    if (!strcmp (path + 1, process_listing[i]))
       {
 	if (i == PROCNET_IFINET6)
 	  {
@@ -167,8 +167,8 @@ fhandler_procnet::open (int flags, mode_t mode)
   process_file_no = -1;
   for (int i = 0; process_listing[i]; i++)
     {
-      if (path_prefix_p
-	  (process_listing[i], path + 1, strlen (process_listing[i])))
+      if (path_prefix_p (process_listing[i], path + 1,
+			 strlen (process_listing[i]), false))
 	process_file_no = i;
     }
   if (process_file_no == -1)

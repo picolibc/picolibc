@@ -32,7 +32,7 @@ details. */
 
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
-  (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len))
+  (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len, false))
 
 #define iscygdrive_device(path) \
   (isalpha (path[mount_table->cygdrive_len]) && \
@@ -40,7 +40,7 @@ details. */
     !path[mount_table->cygdrive_len + 1]))
 
 #define isproc(path) \
-  (path_prefix_p (proc, (path), proc_len))
+  (path_prefix_p (proc, (path), proc_len, false))
 
 /* is_unc_share: Return non-zero if PATH begins with //server/share 
                  or with one of the native prefixes //./ or //?/ 
@@ -150,161 +150,6 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
-static char dot_special_chars[] =
-    "."
-    "\001" "\002" "\003" "\004" "\005" "\006" "\007" "\010"
-    "\011" "\012" "\013" "\014" "\015" "\016" "\017" "\020"
-    "\021" "\022" "\023" "\024" "\025" "\026" "\027" "\030"
-    "\031" "\032" "\033" "\034" "\035" "\036" "\037" ":"
-    "\\"   "*"    "?"    "%"     "\""   "<"    ">"    "|"
-    "A"    "B"    "C"    "D"    "E"    "F"    "G"    "H"
-    "I"    "J"    "K"    "L"    "M"    "N"    "O"    "P"
-    "Q"    "R"    "S"    "T"    "U"    "V"    "W"    "X"
-    "Y"    "Z";
-static char *special_chars = dot_special_chars + 1;
-static char special_introducers[] =
-    "anpcl";
-
-static char
-special_char (const char *s, const char *valid_chars = special_chars)
-{
-  if (*s != '%' || strlen (s) < 3)
-    return 0;
-
-  char *p;
-  char hex[] = {s[1], s[2], '\0'};
-  unsigned char c = strtoul (hex, &p, 16);
-  p = strechr (valid_chars, c);
-  return *p;
-}
-
-/* Determines if name is "special".  Assumes that name is empty or "absolute" */
-static int
-special_name (const char *s, int inc = 1)
-{
-  if (!*s)
-    return false;
-
-  s += inc;
-
-  if (strcmp (s, ".") == 0 || strcmp (s, "..") == 0)
-    return false;
-
-  int n;
-  const char *p = NULL;
-  if (ascii_strncasematch (s, "conin$", n = 5)
-      || ascii_strncasematch (s, "conout$", n = 7)
-      || ascii_strncasematch (s, "nul", n = 3)
-      || ascii_strncasematch (s, "aux", 3)
-      || ascii_strncasematch (s, "prn", 3)
-      || ascii_strncasematch (s, "con", 3))
-    p = s + n;
-  else if (ascii_strncasematch (s, "com", 3)
-	   || ascii_strncasematch (s, "lpt", 3))
-    strtoul (s + 3, (char **) &p, 10);
-  if (p && (*p == '\0' || *p == '.'))
-    return -1;
-
-  return (strchr (s, '\0')[-1] == '.')
-	 || (strpbrk (s, special_chars) && !ascii_strncasematch (s, "%2f", 3));
-}
-
-bool
-fnunmunge (char *dst, const char *src)
-{
-  bool converted = false;
-  char c;
-
-  if ((c = special_char (src, special_introducers)))
-    {
-      __small_sprintf (dst, "%c%s", c, src + 3);
-      if (special_name (dst, 0))
-	{
-	  *dst++ = c;
-	  src += 3;
-	}
-    }
-
-  while (*src)
-    if (!(c = special_char (src, dot_special_chars)))
-      *dst++ = *src++;
-    else
-      {
-	converted = true;
-	*dst++ = c;
-	src += 3;
-      }
-
-  *dst = *src;
-  return converted;
-}
-
-static bool
-copy1 (char *&d, const char *&src, int& left)
-{
-  left--;
-  if (left || !*src)
-    *d++ = *src++;
-  else
-    return true;
-  return false;
-}
-
-static bool
-copyenc (char *&d, const char *&src, int& left)
-{
-  char buf[16];
-  int n = __small_sprintf (buf, "%%%02x", (unsigned char) *src++);
-  left -= n;
-  if (left <= 0)
-    return true;
-  strcpy (d, buf);
-  d += n;
-  return false;
-}
-
-int
-mount_item::fnmunge (char *dst, const char *src, int& left)
-{
-  int name_type;
-  if (!(name_type = special_name (src)))
-    {
-      if ((int) strlen (src) >= left)
-	return ENAMETOOLONG;
-      else
-	strcpy (dst, src);
-    }
-  else
-    {
-      char *d = dst;
-      if (copy1 (d, src, left))
-	  return ENAMETOOLONG;
-      if (name_type < 0 && copyenc (d, src, left))
-	return ENAMETOOLONG;
-
-      while (*src)
-	if (!strchr (special_chars, *src) || (*src == '%' && !special_char (src)))
-	  {
-	    if (copy1 (d, src, left))
-	      return ENAMETOOLONG;
-	  }
-	else if (copyenc (d, src, left))
-	  return ENAMETOOLONG;
-
-      char dot[] = ".";
-      const char *p = dot;
-      if (*--d != '.')
-	d++;
-      else if (copyenc (d, p, left))
-	return ENAMETOOLONG;
-
-      *d = *src;
-    }
-
-  backslashify (dst, dst, 0);
-  return 0;
-}
-
 int
 mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigned chroot_pathlen)
 {
@@ -328,37 +173,12 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
   const char *p = src + real_posix_pathlen;
   if (*p == '/')
     /* nothing */;
-  else if ((!(flags & MOUNT_ENC) && isdrive (dst) && !dst[2]) || *p)
+  else if ((isdrive (dst) && !dst[2]) || *p)
     dst[n++] = '\\';
-  //if (!*p || !(flags & MOUNT_ENC))
-    //{
-      if ((n + strlen (p)) >= NT_MAX_PATH)
-	err = ENAMETOOLONG;
-      else
-	backslashify (p, dst + n, 0);
-#if 0
-    }
+  if ((n + strlen (p)) >= NT_MAX_PATH)
+    err = ENAMETOOLONG;
   else
-    {
-      int left = NT_MAX_PATH - n;
-      while (*p)
-	{
-	  char slash = 0;
-	  char *s = strchr (p + 1, '/');
-	  if (s)
-	    {
-	      slash = *s;
-	      *s = '\0';
-	    }
-	  err = fnmunge (dst += n, p, left);
-	  if (!s || err)
-	    break;
-	  n = strlen (dst);
-	  *s = slash;
-	  p = s;
-	}
-    }
-#endif
+    backslashify (p, dst + n, 0);
   return err;
 }
 
@@ -493,7 +313,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	  continue;
 	}
 
-      if (path_prefix_p (path, src_path, len))
+      if (path_prefix_p (path, src_path, len, mi->flags & MOUNT_NOPOSIX))
 	break;
     }
 
@@ -693,7 +513,8 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
   for (int i = 0; i < nmounts; ++i)
     {
       mount_item &mi = mount[native_sorted[i]];
-      if (!path_prefix_p (mi.native_path, pathbuf, mi.native_pathlen))
+      if (!path_prefix_p (mi.native_path, pathbuf, mi.native_pathlen,
+			  mi.flags & MOUNT_NOPOSIX))
 	continue;
 
       if (cygheap->root.exists () && !cygheap->root.posix_ok (mi.posix_path))
@@ -726,14 +547,6 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	  const char *p = cygheap->root.unchroot (posix_path);
 	  memmove (posix_path, p, strlen (p) + 1);
 	}
-#if 0
-      if (mi.flags & MOUNT_ENC)
-	{
-	  char *tmpbuf = tp.c_get ();
-	  if (fnunmunge (tmpbuf, posix_path))
-	    strcpy (posix_path, tmpbuf);
-	}
-#endif
       goto out;
     }
 
@@ -782,7 +595,8 @@ mount_info::set_flags_from_win32_path (const char *p)
   for (int i = 0; i < nmounts; i++)
     {
       mount_item &mi = mount[native_sorted[i]];
-      if (path_prefix_p (mi.native_path, p, mi.native_pathlen))
+      if (path_prefix_p (mi.native_path, p, mi.native_pathlen,
+			 mi.flags & MOUNT_NOPOSIX))
 	return mi.flags;
     }
   return PATH_BINARY;
@@ -831,9 +645,10 @@ struct opt
   {"notexec", MOUNT_NOTEXEC, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"nosuid", 0, 0},
-  {"managed", MOUNT_ENC, 0},
   {"acl", MOUNT_NOACL, 1},
-  {"noacl", MOUNT_NOACL, 0}
+  {"noacl", MOUNT_NOACL, 0},
+  {"posix=1", MOUNT_NOPOSIX, 1},
+  {"posix=0", MOUNT_NOPOSIX, 0}
 };
 
 static bool
@@ -1196,7 +1011,7 @@ mount_info::add_item (const char *native, const char *posix,
   int i;
   for (i = 0; i < nmounts; i++)
     {
-      if (strcasematch (mount[i].posix_path, posixtmp))
+      if (!strcmp (mount[i].posix_path, posixtmp))
         {
 	  /* Don't allow to override a system mount with a user mount. */
 	  if ((mount[i].flags & MOUNT_SYSTEM) && !(mountflags & MOUNT_SYSTEM))
@@ -1258,7 +1073,7 @@ mount_info::del_item (const char *path, unsigned flags)
     {
       int ent = native_sorted[i]; /* in the same order as getmntent() */
       if (((posix_path_p)
-	   ? strcasematch (mount[ent].posix_path, pathtmp)
+	   ? !strcmp (mount[ent].posix_path, pathtmp)
 	   : strcasematch (mount[ent].native_path, pathtmp)))
 	{
 	  /* Don't allow to remove a system mount. */
@@ -1315,7 +1130,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   tmp_pathbuf tp;
   UNICODE_STRING unat;
   tp.u_get (&unat);
-  get_nt_native_path (native_path, unat, flags & MOUNT_ENC);
+  get_nt_native_path (native_path, unat);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
@@ -1352,11 +1167,12 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     strcat (_my_tls.locals.mnt_opts, (char *) ",exec");
   else if (flags & MOUNT_NOTEXEC)
     strcat (_my_tls.locals.mnt_opts, (char *) ",noexec");
-  if (flags & MOUNT_ENC)
-    strcat (_my_tls.locals.mnt_opts, ",managed");
 
   if (flags & MOUNT_NOACL)
     strcat (_my_tls.locals.mnt_opts, (char *) ",noacl");
+
+  if (flags & MOUNT_NOPOSIX)
+    strcat (_my_tls.locals.mnt_opts, (char *) ",posix=0");
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");

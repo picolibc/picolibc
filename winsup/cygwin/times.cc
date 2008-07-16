@@ -495,7 +495,7 @@ utimens_worker (path_conv &win32, const struct timespec *tvp)
 	if (cfd->get_access () & (FILE_WRITE_ATTRIBUTES | GENERIC_WRITE)
 	    && RtlEqualUnicodeString (cfd->pc.get_nt_native_path (),
 				      win32.get_nt_native_path (),
-				      TRUE))
+				      cfd->pc.objcaseinsensitive ()))
 	  {
 	    fh = cfd;
 	    fromfd = true;

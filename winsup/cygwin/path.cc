@@ -71,6 +71,7 @@
 #include <assert.h>
 #include <ntdll.h>
 #include <wchar.h>
+#include <wctype.h>
 
 bool dos_file_warning = true;
 
@@ -84,7 +85,6 @@ struct symlink_info
   int issymlink;
   bool ext_tacked_on;
   int error;
-  bool case_clash;
   bool isdevice;
   _major_t major;
   _minor_t minor;
@@ -93,7 +93,6 @@ struct symlink_info
 	     fs_info &fs);
   int set (char *path);
   bool parse_device (const char *);
-  bool case_check (char *path);
   int check_sysfile (HANDLE h);
   int check_shortcut (HANDLE h);
   int check_reparse_point (HANDLE h);
@@ -103,8 +102,6 @@ struct symlink_info
 };
 
 muto NO_COPY cwdstuff::cwd_lock;
-
-int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46 };
@@ -154,7 +151,8 @@ struct win_shortcut_hdr
 */
 
 int
-path_prefix_p (const char *path1, const char *path2, int len1)
+path_prefix_p (const char *path1, const char *path2, int len1,
+	       bool caseinsensitive)
 {
   /* Handle case where PATH1 has trailing '/' and when it doesn't.  */
   if (len1 > 0 && isdirsep (path1[len1 - 1]))
@@ -164,7 +162,8 @@ path_prefix_p (const char *path1, const char *path2, int len1)
     return isdirsep (path2[0]) && !isdirsep (path2[1]);
 
   if (isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':')
-    return pathnmatch (path1, path2, len1);
+    return caseinsensitive ? strncasematch (path1, path2, len1)
+			   : !strncmp (path1, path2, len1);
 
   return 0;
 }
@@ -172,19 +171,19 @@ path_prefix_p (const char *path1, const char *path2, int len1)
 /* Return non-zero if paths match in first len chars.
    Check is dependent of the case sensitivity setting. */
 int
-pathnmatch (const char *path1, const char *path2, int len)
+pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive)
 {
-  return pcheck_case == PCHECK_STRICT ? !strncmp (path1, path2, len)
-				      : strncasematch (path1, path2, len);
+  return caseinsensitive
+	 ? strncasematch (path1, path2, len) : !strncmp (path1, path2, len);
 }
 
 /* Return non-zero if paths match. Check is dependent of the case
    sensitivity setting. */
 int
-pathmatch (const char *path1, const char *path2)
+pathmatch (const char *path1, const char *path2, bool caseinsensitive)
 {
-  return pcheck_case == PCHECK_STRICT ? !strcmp (path1, path2)
-				      : strcasematch (path1, path2);
+  return caseinsensitive
+	 ? strcasematch (path1, path2) : !strcmp (path1, path2);
 }
 
 /* TODO: This function is used in mkdir and rmdir to generate correct
@@ -326,9 +325,9 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     }
 }
 
-static void __stdcall mkrelpath (char *dst) __attribute__ ((regparm (2)));
+static void __stdcall mkrelpath (char *dst, bool caseinsensitive) __attribute__ ((regparm (2)));
 static void __stdcall
-mkrelpath (char *path)
+mkrelpath (char *path, bool caseinsensitive)
 {
   tmp_pathbuf tp;
   char *cwd_win32 = tp.c_get ();
@@ -336,7 +335,7 @@ mkrelpath (char *path)
     return;
 
   unsigned cwdlen = strlen (cwd_win32);
-  if (!path_prefix_p (cwd_win32, path, cwdlen))
+  if (!path_prefix_p (cwd_win32, path, cwdlen, caseinsensitive))
     return;
 
   size_t n = strlen (path);
@@ -394,6 +393,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     vol = in_vol;
   else
     {
+      /* Always caseinsensitive.  We really just need access to the drive. */
       InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
 				  NULL);
       status = NtOpenFile (&vol, READ_CONTROL, &attr, &io,
@@ -523,6 +523,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
      in fhandler.cc (fhandler_disk_file::open). */
   RtlInitUnicodeString (&testname, L"SUNWNFS");
   has_buggy_open (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+  /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
+     except on Samba which handles Windows clients case insensitive.
+     NFS doesn't set the FILE_CASE_SENSITIVE_SEARCH flag but is case
+     sensitive. */
+  caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
+		   && !is_nfs ());
 
   if (!in_vol)
     NtClose (vol);
@@ -581,34 +587,14 @@ WCHAR tfx_chars[] NO_COPY = {
  'x', 'y', 'z', '{', 0xf000 | '|', '}', '~', 127
 };
 
-WCHAR tfx_chars_managed[] NO_COPY = {
-   0,   1,   2,   3,   4,   5,   6,   7,
-   8,   9,  10,  11,  12,  13,  14,  15,
-  16,  17,  18,  19,  20,  21,  22,  23,
-  24,  25,  26,  27,  28,  29,  30,  31,
-  32, '!', 0xf000 | '"', '#', '$', '%', '&',  39,
-  '(', ')', 0xf000 | '*', '+', ',', '-', '.', '/',
- '0', '1', '2', '3', '4', '5', '6', '7',
- '8', '9', 0xf000 | ':', ';', 0xf000 | '<', '=', 0xf000 | '>', 0xf000 | '?',
- '@', 0xf000 | 'A', 0xf000 | 'B', 0xf000 | 'C', 0xf000 | 'D', 0xf000 | 'E', 0xf000 | 'F', 0xf000 | 'G',
- 0xf000 | 'H', 0xf000 | 'I', 0xf000 | 'J', 0xf000 | 'K', 0xf000 | 'L', 0xf000 | 'M', 0xf000 | 'N', 0xf000 | 'O',
- 0xf000 | 'P', 0xf000 | 'Q', 0xf000 | 'R', 0xf000 | 'S', 0xf000 | 'T', 0xf000 | 'U', 0xf000 | 'V', 0xf000 | 'W',
- 0xf000 | 'X', 0xf000 | 'Y', 0xf000 | 'Z', '[',  '\\', ']', '^', '_',
- '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
- 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
- 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
- 'x', 'y', 'z', '{', 0xf000 | '|', '}', '~', 127
-};
-
 static void
-transform_chars (PUNICODE_STRING upath, USHORT start_idx, bool managed)
+transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 {
   register PWCHAR buf = upath->Buffer;
   register PWCHAR end = buf + upath->Length / sizeof (WCHAR) - 1;
-  register PWCHAR tfx = managed ? tfx_chars_managed : tfx_chars;
   for (buf += start_idx; buf <= end; ++buf)
     if (*buf < 128)
-      *buf = tfx[*buf];
+      *buf = tfx_chars[*buf];
 #if 0
   /* Win32 can't handle trailing dots and spaces.  Transform the last of them
      to the private use area, too, to create a valid Win32 filename. */
@@ -620,7 +606,7 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx, bool managed)
 }
 
 PUNICODE_STRING
-get_nt_native_path (const char *path, UNICODE_STRING& upath, bool managed)
+get_nt_native_path (const char *path, UNICODE_STRING& upath)
 {
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
@@ -628,9 +614,15 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool managed)
   else if (path[0] != '\\')	/* X:\...  or relative path. */
     {
       if (path[1] == ':')	/* X:\... */
-	str2uni_cat (upath, "\\??\\");
-      str2uni_cat (upath, path);
-      transform_chars (&upath, 7, managed);
+	{
+	  str2uni_cat (upath, "\\??\\");
+	  str2uni_cat (upath, path);
+	  /* The drive letter must be upper case. */
+	  upath.Buffer[4] = towupper (upath.Buffer[4]);
+	}
+      else
+	str2uni_cat (upath, path);
+      transform_chars (&upath, 7);
     }
   else if (path[1] != '\\')	/* \Device\... */
     str2uni_cat (upath, path);
@@ -639,7 +631,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool managed)
     {
       str2uni_cat (upath, "\\??\\UNC\\");
       str2uni_cat (upath, path + 2);
-      transform_chars (&upath, 8, managed);
+      transform_chars (&upath, 8);
     }
   else				/* \\.\device or \\?\foo */
     {
@@ -658,7 +650,7 @@ path_conv::get_nt_native_path ()
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
-      ::get_nt_native_path (path, uni_path, isencoded ());
+      ::get_nt_native_path (path, uni_path);
     }
   return &uni_path;
 }
@@ -669,7 +661,7 @@ path_conv::get_object_attr (OBJECT_ATTRIBUTES &attr, SECURITY_ATTRIBUTES &sa)
   if (!get_nt_native_path ())
     return NULL;
   InitializeObjectAttributes (&attr, &uni_path,
-			      OBJ_CASE_INSENSITIVE
+			      objcaseinsensitive ()
 			      | (sa.bInheritHandle ? OBJ_INHERIT : 0),
 			      NULL, sa.lpSecurityDescriptor);
   return &attr;
@@ -708,7 +700,7 @@ warn_msdos (const char *src)
 }
 
 static DWORD
-getfileattr (const char *path, bool managed) /* path has to be always absolute. */
+getfileattr (const char *path, bool caseinsensitive) /* path has to be always absolute. */
 {
   tmp_pathbuf tp;
   UNICODE_STRING upath;
@@ -718,8 +710,10 @@ getfileattr (const char *path, bool managed) /* path has to be always absolute. 
   IO_STATUS_BLOCK io;
 
   tp.u_get (&upath);
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  get_nt_native_path (path, upath, managed);
+  InitializeObjectAttributes (&attr, &upath,
+			      caseinsensitive ? OBJ_CASE_INSENSITIVE : 0,
+			      NULL, NULL);
+  get_nt_native_path (path, upath);
 
   status = NtQueryAttributesFile (&attr, &fbi);
   if (NT_SUCCESS (status))
@@ -736,7 +730,8 @@ getfileattr (const char *path, bool managed) /* path has to be always absolute. 
 
       RtlSplitUnicodePath (&upath, &dirname, &basename);
       InitializeObjectAttributes (&attr, &dirname,
-				  OBJ_CASE_INSENSITIVE, NULL, NULL);
+				  caseinsensitive ? OBJ_CASE_INSENSITIVE : 0,
+				  NULL, NULL);
       status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
@@ -825,10 +820,10 @@ path_conv::check (const char *src, unsigned opt,
   path_flags = 0;
   known_suffix = NULL;
   fileattr = INVALID_FILE_ATTRIBUTES;
+  caseinsensitive = OBJ_CASE_INSENSITIVE;
   if (wide_path)
     cfree (wide_path);
   wide_path = NULL;
-  case_clash = false;
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
   if (!normalized_path_size && normalized_path)
@@ -918,7 +913,8 @@ path_conv::check (const char *src, unsigned opt,
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 	      else
 		{
-		  fileattr = getfileattr (this->path, sym.pflags & MOUNT_ENC);
+		  fileattr = getfileattr (this->path,
+					  sym.pflags & MOUNT_NOPOSIX);
 		  dev.devn = FH_FS;
 		}
 	      goto out;
@@ -927,7 +923,7 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      dev.devn = FH_FS;
 #if 0
-	      fileattr = getfileattr (this->path, sym.pflags & MOUNT_ENC);
+	      fileattr = getfileattr (this->path, sym.pflags & MOUNT_NOPOSIX);
 	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
 		{
 		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
@@ -1031,81 +1027,59 @@ is_virtual_symlink:
 	      goto out;
 	    }
 
-	  if (sym.case_clash)
+	  if (!component)
 	    {
-	      if (pcheck_case == PCHECK_STRICT)
+	      fileattr = sym.fileattr;
+	      path_flags = sym.pflags;
+	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
+		path_flags |= PATH_NOPOSIX;
+	      caseinsensitive = (path_flags & PATH_NOPOSIX)
+				? OBJ_CASE_INSENSITIVE : 0;
+	    }
+
+	  /* If symlink.check found an existing non-symlink file, then
+	     it sets the appropriate flag.  It also sets any suffix found
+	     into `ext_here'. */
+	  if (!sym.issymlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
+	    {
+	      error = sym.error;
+	      if (component == 0)
+		add_ext_from_sym (sym);
+	      else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
 		{
-		  case_clash = true;
-		  error = ENOENT;
+		  error = ENOTDIR;
 		  goto out;
 		}
-	      /* If pcheck_case==PCHECK_ADJUST the case_clash is remembered
-		 if the last component is concerned. This allows functions
-		 which shall create files to avoid overriding already existing
-		 files with another case. */
-	      if (!component)
-		case_clash = true;
+	      goto out;	// file found
 	    }
-	  if (!(opt & PC_SYM_IGNORE))
+	  /* Found a symlink if symlen > 0.  If component == 0, then the
+	     src path itself was a symlink.  If !follow_mode then
+	     we're done.  Otherwise we have to insert the path found
+	     into the full path that we are building and perform all of
+	     these operations again on the newly derived path. */
+	  else if (symlen > 0)
 	    {
-	      if (!component)
+	      saw_symlinks = 1;
+	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		{
-		  fileattr = sym.fileattr;
-		  path_flags = sym.pflags;
-		}
-
-	      /* If symlink.check found an existing non-symlink file, then
-		 it sets the appropriate flag.  It also sets any suffix found
-		 into `ext_here'. */
-	      if (!sym.issymlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
-		{
-		  error = sym.error;
-		  if (component == 0)
-		    add_ext_from_sym (sym);
-		  else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
+		  set_symlink (symlen); // last component of path is a symlink.
+		  if (opt & PC_SYM_CONTENTS)
 		    {
-		      error = ENOTDIR;
+		      strcpy (path, sym.contents);
 		      goto out;
 		    }
-		  if (pcheck_case == PCHECK_RELAXED)
-		    goto out;	// file found
-		  /* Avoid further symlink evaluation. Only case checks are
-		     done now. */
-		  opt |= PC_SYM_IGNORE;
-		}
-	      /* Found a symlink if symlen > 0.  If component == 0, then the
-		 src path itself was a symlink.  If !follow_mode then
-		 we're done.  Otherwise we have to insert the path found
-		 into the full path that we are building and perform all of
-		 these operations again on the newly derived path. */
-	      else if (symlen > 0)
-		{
-		  saw_symlinks = 1;
-		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
-		    {
-		      set_symlink (symlen); // last component of path is a symlink.
-		      if (opt & PC_SYM_CONTENTS)
-			{
-			  strcpy (path, sym.contents);
-			  goto out;
-			}
-		      add_ext_from_sym (sym);
-		      if (pcheck_case == PCHECK_RELAXED)
-			goto out;
-		      /* Avoid further symlink evaluation. Only case checks are
-			 done now. */
-		      opt |= PC_SYM_IGNORE;
-		    }
-		  else
-		    break;
-		}
-	      else if (sym.error && sym.error != ENOENT && sym.error != ENOSHARE)
-		{
-		  error = sym.error;
+		  add_ext_from_sym (sym);
 		  goto out;
 		}
-	      /* No existing file found. */
+	      else
+		break;
 	    }
+	  else if (sym.error && sym.error != ENOENT && sym.error != ENOSHARE)
+	    {
+	      error = sym.error;
+	      goto out;
+	    }
+	  /* No existing file found. */
 
 virtual_component_retry:
 	  /* Find the new "tail" of the path, e.g. in '/for/bar/baz',
@@ -1246,7 +1220,7 @@ out:
   if (opt & PC_NOFULL)
     {
       if (is_relpath)
-	mkrelpath (this->path);
+	mkrelpath (this->path, !!caseinsensitive);
       if (need_directory)
 	{
 	  size_t n = strlen (this->path);
@@ -1587,7 +1561,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 
   if (win32_newpath.error)
     {
-      set_errno (win32_newpath.case_clash ? ECASECLASH : win32_newpath.error);
+      set_errno (win32_newpath.error);
       goto done;
     }
 
@@ -2334,7 +2308,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   minor = 0;
   mode = 0;
   pflags &= ~(PATH_SYMLINK | PATH_LNK | PATH_REP);
-  case_clash = false;
+  ULONG ci_flag = cygwin_shared->obcaseinsensitive || (pflags & PATH_NOPOSIX)
+		  ? OBJ_CASE_INSENSITIVE : 0;
 
   /* TODO: Temporarily do all char->UNICODE conversion here.  This should
      already be slightly faster than using Ascii functions. */
@@ -2342,7 +2317,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   UNICODE_STRING upath;
   OBJECT_ATTRIBUTES attr;
   tp.u_get (&upath);
-  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  InitializeObjectAttributes (&attr, &upath, ci_flag, NULL, NULL);
 
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
@@ -2355,7 +2330,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       bool no_ea = false;
 
       error = 0;
-      get_nt_native_path (suffix.path, upath, pflags & MOUNT_ENC);
+      get_nt_native_path (suffix.path, upath);
       if (h)
 	{
 	  NtClose (h);
@@ -2434,8 +2409,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      } fdi_buf;
 
 	      RtlSplitUnicodePath (&upath, &dirname, &basename);
-	      InitializeObjectAttributes (&dattr, &dirname,
-					  OBJ_CASE_INSENSITIVE, NULL, NULL);
+	      InitializeObjectAttributes (&dattr, &dirname, ci_flag,
+					  NULL, NULL);
 	      status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 				   &dattr, &io, FILE_SHARE_VALID_FLAGS,
 				   FILE_SYNCHRONOUS_IO_NONALERT
@@ -2474,10 +2449,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       fs.update (&upath, h);
 
       ext_tacked_on = !!*ext_here;
-
-      if (pcheck_case != PCHECK_RELAXED && !case_check (path)
-	  || (opt & PC_SYM_IGNORE))
-	goto file_not_symlink;
 
       res = -1;
 
@@ -2569,52 +2540,10 @@ symlink_info::set (char *path)
   error = 0;
   issymlink = true;
   isdevice = false;
-  ext_tacked_on = case_clash = false;
+  ext_tacked_on = false;
   ext_here = NULL;
   extn = major = minor = mode = 0;
   return strlen (path);
-}
-
-/* Check the correct case of the last path component (given in DOS style).
-   Adjust the case in this->path if pcheck_case == PCHECK_ADJUST or return
-   false if pcheck_case == PCHECK_STRICT.
-   Dont't call if pcheck_case == PCHECK_RELAXED.
-*/
-
-bool
-symlink_info::case_check (char *path)
-{
-  WIN32_FIND_DATA data;
-  HANDLE h;
-  char *c;
-
-  /* Set a pointer to the beginning of the last component. */
-  if (!(c = strrchr (path, '\\')))
-    c = path;
-  else
-    ++c;
-
-  if ((h = FindFirstFile (path, &data))
-      != INVALID_HANDLE_VALUE)
-    {
-      FindClose (h);
-
-      /* If that part of the component exists, check the case. */
-      if (strncmp (c, data.cFileName, strlen (data.cFileName)))
-	{
-	  case_clash = true;
-
-	  /* If check is set to STRICT, a wrong case results
-	     in returning a ENOENT. */
-	  if (pcheck_case == PCHECK_STRICT)
-	    return false;
-
-	  /* PCHECK_ADJUST adjusts the case in the incoming
-	     path which points to the path in *this. */
-	  strcpy (c, data.cFileName);
-	}
-    }
-  return true;
 }
 
 /* readlink system call */
@@ -3267,6 +3196,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
       phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
       if (!nat_cwd) /* On init, just reopen CWD with desired access flags. */
 	RtlInitUnicodeString (&upath, L"");
+      /* This is for Win32 apps only.  No case sensitivity here... */
       InitializeObjectAttributes (&attr, &upath,
 				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 				  nat_cwd ? NULL : *phdl, NULL);
@@ -3461,7 +3391,7 @@ OBJECT_ATTRIBUTES etc::fn[MAX_ETC_FILES + 1];
 LARGE_INTEGER etc::last_modified[MAX_ETC_FILES + 1];
 
 int
-etc::init (int n, PUNICODE_STRING etc_fn)
+etc::init (int n, path_conv &pc)
 {
   if (n > 0)
     /* ok */;
@@ -3470,7 +3400,7 @@ etc::init (int n, PUNICODE_STRING etc_fn)
   else
     api_fatal ("internal error");
 
-  InitializeObjectAttributes (&fn[n], etc_fn, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  pc.get_object_attr (fn[n], sec_none_nih);
   change_possible[n] = false;
   test_file_change (n);
   paranoid_printf ("fn[%d] %S, curr_ix %d", n, fn[n].ObjectName, curr_ix);

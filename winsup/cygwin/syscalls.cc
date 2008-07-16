@@ -197,7 +197,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   RtlSplitUnicodePath (win32_path.get_nt_native_path (), &root, NULL);
   root.Length -= fname.Length - sizeof (WCHAR);
 
-  /* Open root directory. */
+  /* Open root directory.  All recycler bin ops are caseinsensitive. */
   InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenFile (&rootdir, FILE_TRAVERSE, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
@@ -1602,13 +1602,13 @@ rename (const char *oldpath, const char *newpath)
   /* This test is necessary in almost every case, so just do it once here. */
   equal_path = RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				      newpc.get_nt_native_path (),
-				      TRUE);
+				      oldpc.objcaseinsensitive ());
 
   /* First check if oldpath and newpath only differ by case.  If so, it's
      just a request to change the case of the filename.  By simply setting
      the file attributes to INVALID_FILE_ATTRIBUTES (which translates to
      "file doesn't exist"), all later tests are skipped. */
-  if (newpc.exists () && equal_path)
+  if (oldpc.objcaseinsensitive () && newpc.exists () && equal_path)
     {
       if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				 newpc.get_nt_native_path (),
@@ -1646,7 +1646,7 @@ rename (const char *oldpath, const char *newpath)
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				     newpc.get_nt_native_path (),
-				     TRUE))
+				     oldpc.objcaseinsensitive ()))
 	    {
 	      res = 0;
 	      goto out;
@@ -1674,7 +1674,7 @@ rename (const char *oldpath, const char *newpath)
 	  newpc.check (newpath, PC_SYM_NOFOLLOW);
 	  if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				     newpc.get_nt_native_path (),
-				     TRUE))
+				     oldpc.objcaseinsensitive ()))
 	    {
 	      res = 0;
 	      goto out;
@@ -2776,7 +2776,8 @@ chroot (const char *newroot)
   else
     {
       getwinenv("PATH="); /* Save the native PATH */
-      cygheap->root.set (path.normalized_path, path.get_win32 ());
+      cygheap->root.set (path.normalized_path, path.get_win32 (),
+			 !!path.objcaseinsensitive ());
       ret = 0;
     }
 

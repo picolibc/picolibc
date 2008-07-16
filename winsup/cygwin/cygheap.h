@@ -53,6 +53,7 @@ struct cygheap_root_mount_info
   unsigned posix_pathlen;
   char native_path[CYG_MAX_PATH];
   unsigned native_pathlen;
+  bool caseinsensitive;
 };
 
 /* CGF: FIXME This doesn't belong here */
@@ -68,7 +69,8 @@ public:
   {
     if (!m)
       return 1;
-    return path_prefix_p (m->posix_path, path, m->posix_pathlen);
+    return path_prefix_p (m->posix_path, path, m->posix_pathlen,
+			  m->caseinsensitive);
   }
   bool ischroot_native (const char *path)
   {
@@ -87,7 +89,7 @@ public:
     return p;
   }
   bool exists () {return !!m;}
-  void set (const char *, const char *);
+  void set (const char *, const char *, bool);
   size_t posix_length () const { return m->posix_pathlen; }
   const char *posix_path () const { return m->posix_path; }
   size_t native_length () const { return m->native_pathlen; }

@@ -1,3 +1,80 @@
+2008-07-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	Add case-sensitivity.
+	Unconditionally handle mount points case-sensitive.
+	Unconditionally handle virtual paths case-sensitive.
+	Unconditionally handle registry paths case-insensitive.
+	Otherwise, accommodate case-sensitivity of given path throughout.
+	* cygheap.cc (cygheap_root::set): Get additional caseinsensitive
+	parameter and store it.
+	* cygheap.h (struct cygheap_root_mount_info): Add member
+	caseinsensitive.
+	* dlfcn.cc (get_full_path_of_dll): Drop PC_NOFULL parameter from call
+	to path_conv::check.
+	* environ.cc (pcheck_case): Remove.
+	(check_case_init): Remove.
+	(known): Drop "check_case" option.
+	* exceptions.cc (open_stackdumpfile): Add comment.
+	* fhandler.cc (fhandler_base::get_default_fmode): Call pathmatch
+	instead of strcasematch.
+	* fhandler_disk_file.cc: Accommodate case-sensitivity of given path
+	throughout.
+	(__DIR_mounts::check_mount): Unconditionally check virtual paths
+	case-sensitive.
+	(fhandler_disk_file::link): Drop case clash handling.
+	(fhandler_disk_file::open): Ditto.
+	(fhandler_disk_file::readdir_helper): Drop managed mount code.
+	* mount.cc: Remove managed mount code and datastructures.
+	(struct opt): Remove "managed" option.  Add "posix=0" and "posix=1"
+	options.
+	(fillout_mntent): Remove "managed" output.  Add "posix" output.
+	* path.cc (struct symlink_info): Remove case_clash member and
+	case_check method.
+	(pcheck_case): Remove.
+	(path_prefix_p): Take additional bool parameter "caseinsensitive".
+	(pathnmatch): Ditto.
+	(pathmatch): Ditto.
+	(mkrelpath): Ditto.
+	(fs_info::update): Set caseinsensitive flag according to file system
+	name and FILE_CASE_SENSITIVE_SEARCH flag.  Add comment.
+	(tfx_chars_managed): Remove.
+	(transform_chars): Drop "managed" parameter.  Always use tfx_chars.
+	(get_nt_native_path): Drop "managed" parameter.  Make sure drive letters
+	are always upper case.
+	(getfileattr): Change second parameter to denote caseinsensitivity.
+	(path_conv::check): Initialize caseinsensitive to OBJ_CASE_INSENSITIVE.
+	Set caseinsensitive according to global obcaseinsensitive flag, file
+	system case sensitivity and MOUNT_NOPOSIX mount flag.
+	Drop case_clash and all the related code.
+	(symlink_worker): Drop case clash handling.
+	(symlink_info::set): Drop setting case_clash.
+	(symlink_info::case_check): Remove.
+	(cwdstuff::set): Add comment.
+	(etc::init): Take path_conv instead of PUNICODE_STRING as parameter to
+	allow case sensitivity.
+	* path.h (enum pathconv_arg): Drop PC_SYM_IGNORE.
+	(enum case_checking): Remove.
+	(enum path_types): Drop PATH_ENC, add PATH_NOPOSIX flag.
+	(struct fs_info): Add caseinsensitive flag and accessor methods.
+	(class path_conv): Add caseinsensitive member and define
+	objcaseinsensitive method.  Drop case_clash member and isencoded method.
+	(pathmatch): Change prototype according to above change.
+	(pathnmatch): Ditto.
+	(path_prefix_p): Ditto.
+	(get_nt_native_path): Ditto.
+	(class etc): Ditto.
+	(fnunmunge): Remove prototype.
+	* shared.cc (shared_info::init_obcaseinsensitive): Initialize
+	obcaseinsensitive flag from obcaseinsensitive registry value.
+	(shared_info::initialize): Call init_obcaseinsensitive here by the
+	first process creating the shared memory.
+	* shared_info.h (mount_item::fnmunge): Remove.
+	(shared_info::obcaseinsensitive): Rename from obcaseinsensitivity.
+	(shared_info::init_obcaseinsensitive): Declare.
+	* syscalls.cc (try_to_bin): Add comment.
+	* include/sys/mount.h (MOUNT_ENC): Remove flag.
+	(MOUNT_NOPOSIX): Add flag.
+
 2008-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tape.cc (mtinfo::initialize): Remove synchronization stuff.

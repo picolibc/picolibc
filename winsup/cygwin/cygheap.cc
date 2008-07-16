@@ -396,7 +396,7 @@ cstrdup1 (const char *s)
 }
 
 void
-cygheap_root::set (const char *posix, const char *native)
+cygheap_root::set (const char *posix, const char *native, bool caseinsensitive)
 {
   if (*posix == '/' && posix[1] == '\0')
     {
@@ -418,6 +418,7 @@ cygheap_root::set (const char *posix, const char *native)
   m->native_pathlen = strlen (native);
   if (m->native_pathlen >= 1 && m->native_path[m->native_pathlen - 1] == '\\')
     m->native_path[--m->native_pathlen] = '\0';
+  m->caseinsensitive = caseinsensitive;
 }
 
 cygheap_user::~cygheap_user ()

@@ -107,12 +107,12 @@ fhandler_process::exists ()
     return 2;
 
   for (int i = 0; process_listing[i]; i++)
-    if (pathmatch (path + 1, process_listing[i]))
+    if (!strcmp (path + 1, process_listing[i]))
       {
 	fileid = i;
 	return is_symlink (i) ? -2 : (i == PROCESS_FD) ? 1 : -1;
       }
-  if (pathnmatch (strchr (path, '/') + 1, "fd/", 3))
+  if (!strncmp (strchr (path, '/') + 1, "fd/", 3))
     {
       fileid = PROCESS_FD;
       if (fill_filebuf ())
@@ -270,8 +270,8 @@ fhandler_process::open (int flags, mode_t mode)
   process_file_no = -1;
   for (int i = 0; process_listing[i]; i++)
     {
-      if (path_prefix_p
-	  (process_listing[i], path + 1, strlen (process_listing[i])))
+      if (path_prefix_p (process_listing[i], path + 1,
+			 strlen (process_listing[i]), false))
 	process_file_no = i;
     }
   if (process_file_no == -1)

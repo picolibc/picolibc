@@ -117,8 +117,8 @@ fhandler_registry::exists ()
   if (file == path)
     {
       for (int i = 0; registry_listing[i]; i++)
-	if (path_prefix_p
-	    (registry_listing[i], path, strlen (registry_listing[i])))
+	if (path_prefix_p (registry_listing[i], path,
+			   strlen (registry_listing[i]), true))
 	  {
 	    file_type = 1;
 	    goto out;
@@ -140,7 +140,7 @@ fhandler_registry::exists ()
 				     NULL, NULL))
 	     || (error == ERROR_MORE_DATA))
 	{
-	  if (pathmatch (buf, file))
+	  if (strcasematch (buf, file))
 	    {
 	      file_type = 1;
 	      goto out;
@@ -159,8 +159,8 @@ fhandler_registry::exists ()
 				    NULL, NULL))
 	     || (error == ERROR_MORE_DATA))
 	{
-	  if (pathmatch (buf, file) || (buf[0] == '\0' &&
-					pathmatch (file, DEFAULT_VALUE_NAME)))
+	  if (strcasematch (buf, file)
+	      || (buf[0] == '\0' && strcasematch (file, DEFAULT_VALUE_NAME)))
 	    {
 	      file_type = -1;
 	      goto out;
@@ -461,8 +461,8 @@ fhandler_registry::open (int flags, mode_t mode)
   if (file == path)
     {
       for (int i = 0; registry_listing[i]; i++)
-	if (path_prefix_p
-	    (registry_listing[i], path, strlen (registry_listing[i])))
+	if (path_prefix_p (registry_listing[i], path,
+			   strlen (registry_listing[i]), true))
 	  {
 	    if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
 	      {
@@ -520,7 +520,7 @@ fhandler_registry::open (int flags, mode_t mode)
 
   set_io_handle (handle);
 
-  if (pathmatch (file, DEFAULT_VALUE_NAME))
+  if (strcasematch (file, DEFAULT_VALUE_NAME))
     value_name = cstrdup ("");
   else
     value_name = cstrdup (file);
@@ -631,7 +631,7 @@ value_not_found:
 	 (error = RegEnumKeyEx (handle, index++, buf, &buf_size, NULL, NULL,
 				NULL, NULL)) || (error == ERROR_MORE_DATA))
     {
-      if (pathmatch (buf, value_name))
+      if (strcasematch (buf, value_name))
 	{
 	  set_errno (EISDIR);
 	  return false;
@@ -694,7 +694,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
       else
 	{
 	  for (int i = 0; registry_listing[i]; i++)
-	    if (pathmatch (component, registry_listing[i]))
+	    if (strcasematch (component, registry_listing[i]))
 	      hKey = registry_keys[i];
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return hKey;

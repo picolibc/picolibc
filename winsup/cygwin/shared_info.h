@@ -33,7 +33,6 @@ class mount_item
   void init (const char *dev, const char *path, unsigned flags);
 
   struct mntent *getmntent ();
-  int fnmunge (char *, const char *, int&);
   int build_win32 (char *, const char *, unsigned *, unsigned);
 };
 
@@ -120,7 +119,7 @@ public:
 
 #define SHARED_INFO_CB 31136
 
-#define CURR_SHARED_MAGIC 0xace17c0fU
+#define CURR_SHARED_MAGIC 0x18da899eU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -136,10 +135,11 @@ class shared_info
   DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;
-  DWORD obcaseinsensitivity;
+  DWORD obcaseinsensitive;
   mtinfo mt;
 
   void initialize ();
+  void init_obcaseinsensitive ();
   unsigned heap_chunk_size ();
   unsigned heap_slop_size ();
 };

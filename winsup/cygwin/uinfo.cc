@@ -527,7 +527,7 @@ pwdgrp::load (const char *posix_fname)
   curr_lines = 0;
 
   pc.check (posix_fname);
-  etc_ix = etc::init (etc_ix, pc.get_nt_native_path ());
+  etc_ix = etc::init (etc_ix, pc);
 
   paranoid_printf ("%s", posix_fname);
 

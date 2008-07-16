@@ -49,7 +49,6 @@ enum pathconv_arg
 {
   PC_SYM_FOLLOW		= 0x0001,
   PC_SYM_NOFOLLOW	= 0x0002,
-  PC_SYM_IGNORE		= 0x0004,
   PC_SYM_CONTENTS	= 0x0008,
   PC_NOFULL		= 0x0010,
   PC_NULLEMPTY		= 0x0020,
@@ -57,13 +56,6 @@ enum pathconv_arg
   PC_POSIX		= 0x0080,
   PC_NOWARN		= 0x0100,
   PC_NO_ACCESS_CHECK	= 0x00800000
-};
-
-enum case_checking
-{
-  PCHECK_RELAXED	= 0,
-  PCHECK_ADJUST		= 1,
-  PCHECK_STRICT		= 2
 };
 
 #define PC_NONULLEMPTY -1
@@ -78,9 +70,9 @@ enum path_types
   PATH_EXEC		= MOUNT_EXEC,
   PATH_NOTEXEC		= MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC	= MOUNT_CYGWIN_EXEC,
-  PATH_ENC		= MOUNT_ENC,
   PATH_RO		= MOUNT_RO,
   PATH_NOACL		= MOUNT_NOACL,
+  PATH_NOPOSIX		= MOUNT_NOPOSIX,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_LNK		= 0x01000000,
@@ -103,6 +95,7 @@ struct fs_info
     unsigned has_buggy_open  : 1;
     unsigned has_acls	     : 1;
     unsigned hasgood_inode   : 1;
+    unsigned caseinsensitive : 1;
     unsigned is_fat	     : 1;
     unsigned is_ntfs	     : 1;
     unsigned is_samba	     : 1;
@@ -122,6 +115,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
+  IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
   IMPLEMENT_STATUS_FLAG (bool, is_fat)
   IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
   IMPLEMENT_STATUS_FLAG (bool, is_samba)
@@ -136,6 +130,7 @@ struct fs_info
 class path_conv
 {
   DWORD fileattr;
+  ULONG caseinsensitive;
   fs_info fs;
   PWCHAR wide_path;
   UNICODE_STRING uni_path;
@@ -146,15 +141,14 @@ class path_conv
   char *known_suffix;
   int error;
   device dev;
-  bool case_clash;
 
   bool isremote () const {return fs.is_remote_drive ();}
+  ULONG objcaseinsensitive () const {return caseinsensitive;}
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
   bool hasgood_inode () const {return fs.hasgood_inode (); }
   bool isgood_inode (__ino64_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
-  bool isencoded () const {return path_flags & PATH_ENC;}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)
@@ -333,18 +327,17 @@ has_exec_chars (const char *buf, int len)
 	  (buf[0] == 'M' && buf[1] == 'Z'));
 }
 
-int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)));
-int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
+int pathmatch (const char *path1, const char *path2, bool caseinsensitive) __attribute__ ((regparm (3)));
+int pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive) __attribute__ ((regparm (3)));
 bool has_dot_last_component (const char *dir, bool test_dot_dot) __attribute__ ((regparm (2)));
 
-bool fnunmunge (char *, const char *) __attribute__ ((regparm (2)));
-
-int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
+int path_prefix_p (const char *path1, const char *path2, int len1,
+		   bool caseinsensitive) __attribute__ ((regparm (3)));
 
 bool is_floppy (const char *);
 int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
-PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING&, bool);
+PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING&);
 
 /* FIXME: Move to own include file eventually */
 
@@ -358,7 +351,7 @@ class etc
   static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
   static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];
   static bool dir_changed (int);
-  static int init (int, PUNICODE_STRING);
+  static int init (int, path_conv &pc);
   static bool file_changed (int);
   static bool test_file_change (int);
   friend class pwdgrp;

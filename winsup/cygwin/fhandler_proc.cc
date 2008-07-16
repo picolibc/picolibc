@@ -117,7 +117,8 @@ fhandler_proc::get_proc_fhandler (const char *path)
 
   for (int i = 0; proc_listing[i]; i++)
     {
-      if (path_prefix_p (proc_listing[i], path, strlen (proc_listing[i])))
+      if (path_prefix_p (proc_listing[i], path, strlen (proc_listing[i]),
+			 false))
 	return proc_fhandlers[i];
     }
 
@@ -152,7 +153,7 @@ fhandler_proc::exists ()
   if (*path == 0)
     return 2;
   for (int i = 0; proc_listing[i]; i++)
-    if (pathmatch (path + 1, proc_listing[i]))
+    if (!strcmp (path + 1, proc_listing[i]))
       {
 	fileid = i;
 	return (proc_fhandlers[i] == FH_PROC) ? (i == PROC_SELF ? -2 : -1) : 1;
@@ -188,7 +189,7 @@ fhandler_proc::fstat (struct __stat64 *buf)
     {
       path++;
       for (int i = 0; proc_listing[i]; i++)
-	if (pathmatch (path, proc_listing[i]))
+	if (!strcmp (path, proc_listing[i]))
 	  {
 	    if (proc_fhandlers[i] != FH_PROC)
 	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
@@ -273,7 +274,8 @@ fhandler_proc::open (int flags, mode_t mode)
 
   proc_file_no = -1;
   for (int i = 0; proc_listing[i]; i++)
-    if (path_prefix_p (proc_listing[i], path + 1, strlen (proc_listing[i])))
+    if (path_prefix_p (proc_listing[i], path + 1, strlen (proc_listing[i]),
+		       false))
       {
 	proc_file_no = i;
 	if (proc_fhandlers[i] != FH_PROC)

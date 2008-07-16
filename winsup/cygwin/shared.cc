@@ -240,6 +240,25 @@ user_shared_initialize (bool reinit)
     }
 }
 
+/* Initialize obcaseinsensitive.  Default to case insensitive on pre-XP. */
+void
+shared_info::init_obcaseinsensitive ()
+{
+  HKEY key;
+  DWORD size = sizeof (DWORD);
+
+  obcaseinsensitive = 1;
+  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
+		  "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
+		  0, KEY_READ, &key) == ERROR_SUCCESS)
+    {
+      RegQueryValueEx (key, "obcaseinsensitive", NULL, NULL,
+		       (LPBYTE) &obcaseinsensitive, &size);
+      RegCloseKey (key);
+    }
+  debug_printf ("obcaseinsensitive set to %d", obcaseinsensitive);
+}
+
 void
 shared_info::initialize ()
 {
@@ -260,8 +279,10 @@ shared_info::initialize ()
 
   if (!sversion)
     {
+
       tty.init ();		/* Initialize tty table.  */
       mt.initialize ();		/* Initialize shared tape information. */
+      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
       cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
 

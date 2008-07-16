@@ -325,7 +325,7 @@ fhandler_base::get_default_fmode (int flags)
 	    if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
 	      continue;
 	    else if ((pf->flags & O_ACCMODE) == accflags
-		     && strcasematch (stem, pf->name))
+		     && pathmatch (stem, pf->name, !!pc.objcaseinsensitive ()))
 	      {
 		fmode = pf->flags & ~O_ACCMODE;
 		break;

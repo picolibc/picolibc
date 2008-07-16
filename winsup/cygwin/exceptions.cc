@@ -149,7 +149,7 @@ open_stackdumpfile ()
 				   p, strlen (p)) * sizeof (WCHAR);
       RtlAppendUnicodeToString (&ucore, L".stackdump");
       /* Create an object attribute which refers to <progname>.stackdump
-	 in Cygwin's cwd. */
+	 in Cygwin's cwd.  Stick to caseinsensitivity. */
       InitializeObjectAttributes (&attr, &ucore, OBJ_CASE_INSENSITIVE,
 				  cygheap->cwd.get_handle (), NULL);
       HANDLE h;

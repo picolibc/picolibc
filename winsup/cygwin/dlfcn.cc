@@ -63,7 +63,7 @@ get_full_path_of_dll (const char* str, char *name)
   if (isabspath (name) ||
       (ret = check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
 	     ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
-    real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);	/* Convert */
+    real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);	/* Convert */
 
   if (!real_filename.error)
     ret = strcpy (name, real_filename.get_win32 ());

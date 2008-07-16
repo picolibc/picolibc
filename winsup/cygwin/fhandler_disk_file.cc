@@ -81,20 +81,20 @@ public:
 	  UNICODE_STRING proc;
 
 	  RtlInitUnicodeString (&proc, L"proc");
-	  if (RtlEqualUnicodeString (fname, &proc, TRUE))
+	  if (RtlEqualUnicodeString (fname, &proc, FALSE))
 	    {
 	      found[__DIR_PROC] = true;
 	      return 2;
 	    }
 	  if (fname->Length / sizeof (WCHAR) == mount_table->cygdrive_len - 2
-	      && RtlEqualUnicodeString (fname, &cygdrive, TRUE))
+	      && RtlEqualUnicodeString (fname, &cygdrive, FALSE))
 	    {
 	      found[__DIR_CYGDRIVE] = true;
 	      return 2;
 	    }
 	}
       for (int i = 0; i < count; ++i)
-	if (RtlEqualUnicodeString (fname, &mounts[i], TRUE))
+	if (RtlEqualUnicodeString (fname, &mounts[i], FALSE))
 	  {
 	    found[i] = true;
 	    return eval ? eval_ino (i) : 1;
@@ -233,7 +233,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 		RtlInitCountedUnicodeString (&fname, pfdi->FileName,
 					     pfdi->FileNameLength);
 		InitializeObjectAttributes (&attr, &fname,
-					    OBJ_CASE_INSENSITIVE, fh, NULL);
+					    objcaseinsensitive (), fh, NULL);
 		if (is_volume_mountpoint (&attr))
 		  ++count;
 	      }
@@ -379,7 +379,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   LARGE_INTEGER FileId;
 
   RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
-  InitializeObjectAttributes (&attr, &dirname, OBJ_CASE_INSENSITIVE,
+  InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
 			      NULL, NULL);
   if (!NT_SUCCESS (status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 				       &attr, &io, FILE_SHARE_VALID_FLAGS,
@@ -1123,7 +1123,7 @@ fhandler_disk_file::link (const char *newpath)
   path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
   if (newpc.error)
     {
-      set_errno (newpc.case_clash ? ECASECLASH : newpc.error);
+      set_errno (newpc.error);
       return -1;
     }
 
@@ -1135,7 +1135,7 @@ fhandler_disk_file::link (const char *newpath)
     }
 
   char new_buf[strlen (newpath) + 5];
-  if (!newpc.error && !newpc.case_clash)
+  if (!newpc.error)
     {
       if (allow_winsymlinks && pc.is_lnk_special ())
 	{
@@ -1298,13 +1298,6 @@ fhandler_disk_file::open (int flags, mode_t mode)
 int
 fhandler_base::open_fs (int flags, mode_t mode)
 {
-  if (pc.case_clash && flags & O_CREAT)
-    {
-      debug_printf ("case clash detected");
-      set_errno (ECASECLASH);
-      return 0;
-    }
-
   /* Unfortunately NT allows to open directories for writing, but that's
      disallowed according to SUSv3. */
   if (pc.isdir () && (flags & O_ACCMODE) != O_RDONLY)
@@ -1683,7 +1676,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       OBJECT_ATTRIBUTES attr;
       IO_STATUS_BLOCK io;
 
-      InitializeObjectAttributes (&attr, fname, OBJ_CASE_INSENSITIVE,
+      InitializeObjectAttributes (&attr, fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
       if (is_volume_mountpoint (&attr)
 	  && (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
@@ -1729,18 +1722,8 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	}
     }
 
-#if 0
-  if (pc.isencoded ())
-    {
-      char tmp[NAME_MAX + 1];
-      sys_wcstombs (tmp, NAME_MAX + 1, fname->Buffer,
-		    fname->Length / sizeof (WCHAR));
-      fnunmunge (de->d_name, tmp);
-    }
-  else
-#endif
-    sys_wcstombs (de->d_name, NAME_MAX + 1, fname->Buffer,
-		  fname->Length / sizeof (WCHAR));
+  sys_wcstombs (de->d_name, NAME_MAX + 1, fname->Buffer,
+		fname->Length / sizeof (WCHAR));
 
   if (dir->__d_position == 0 && !strcmp (de->d_name, "."))
     dir->__flags |= dirent_saw_dot;
@@ -1886,7 +1869,8 @@ go_ahead:
 	    {
 	      HANDLE hdl;
 
-	      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+	      InitializeObjectAttributes (&attr, &fname,
+					  pc.objcaseinsensitive (),
 					  get_handle (), NULL);
 	      if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
 					  FILE_SHARE_VALID_FLAGS,
@@ -1964,7 +1948,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
       HANDLE new_dir;
 
       RtlInitUnicodeString (&fname, L"");
-      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+      InitializeObjectAttributes (&attr, &fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,

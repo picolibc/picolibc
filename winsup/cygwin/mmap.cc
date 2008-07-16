@@ -841,7 +841,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       IO_STATUS_BLOCK io;
 
       RtlInitUnicodeString (&fname, L"");
-      InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
+      InitializeObjectAttributes (&attr, &fname, fh->pc.objcaseinsensitive (),
 				  fh->get_handle (), NULL);
       status = NtOpenFile (&h,
 			   fh->get_access () | GENERIC_EXECUTE | SYNCHRONIZE,
