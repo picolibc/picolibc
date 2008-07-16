@@ -38,15 +38,7 @@ request()
   fi
 }
 
-# Check if running on NT
-_sys="`uname`"
-_nt=`expr "${_sys}" : "CYGWIN_NT"`
-if [ ${_nt} -eq 0 ]
-then
-  echo "LSA authentication does not work on Windows 95/98/Me.  Exiting."
-  exit 1
-fi
-# If running on NT, check if running under at least Windows 2000
+# Check if running under at least Windows 2000
 _nt_too_old=`uname | awk -F- '{print ( $2 < 5.0 ) ? 1 : 0;}'`
 if [ ${_nt_too_old} -eq 1 ]
 then
@@ -79,23 +71,39 @@ request "Are you sure you want to continue?" || exit 0
 # The registry value which keeps the authentication packages.
 value='/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Lsa/Authentication Packages'
 
-# Get old content, remove evry trace of "cyglsa" from it and write the
+[ -f /bin/cyglsa -a ! -d /bin/cyglsa ] && rm -rf /bin/cyglsa
+if [ ! -d /bin/cyglsa ]
+then
+  if ! mkdir -m 755 /bin/cyglsa
+  then
+    echo "Creating the /bin/cyglsa directory failed.  Exiting."
+    exit 1
+  fi
+fi
+if ! mv -b /bin/${dll} /bin/cyglsa/${dll}
+then
+    echo "Copying the new LSA authentication package /bin/${dll} to"
+    echo "/bin/cyglsa/${dll} failed.  Exiting."
+    exit 1
+fi
+
+# Get old content, remove every trace of "cyglsa" from it and write the
 # content back to the registry with the new, correct path to the cyglsa DLL.
 old=`regtool get "${value}"`
 new=`for i in ${old}
 do
   echo $i | grep -v cyglsa
 done`
-if ! regtool set "${value}" ${new} "${bindir}\\${dll}"
+if ! regtool set "${value}" ${new} "${bindir}\\cyglsa\\${dll}"
 then
-  echo "Setting the new registry value failed."
+  echo "Setting the new registry value failed.  Exiting."
   exit 1
 fi
 
 echo
 echo "Cygwin LSA authentication package registered."
 echo
-echo "Activating the Cygwin's LSA authentication package requires to reboot."
+echo "Activating Cygwin's LSA authentication package requires to reboot."
 if [ -x /bin/shutdown ]
 then
   if request "Do you want to do this immediately?"
