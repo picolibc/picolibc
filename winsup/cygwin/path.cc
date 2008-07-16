@@ -1499,7 +1499,7 @@ conv_path_list (const char *src, char *dst, size_t size, int to_posix)
 
 /* If TRUE create symlinks as Windows shortcuts, if false create symlinks
    as normal files with magic number and system bit set. */
-bool allow_winsymlinks = true;
+bool allow_winsymlinks = false;
 
 extern "C" int
 symlink (const char *oldpath, const char *newpath)
