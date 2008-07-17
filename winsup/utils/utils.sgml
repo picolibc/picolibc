@@ -81,7 +81,7 @@ The <literal>-f</literal> option helps you to track down which package a
 file came from, and <literal>-l</literal> lists all files in a package.
 For example, to find out about <filename>/usr/bin/less</filename> and its
 package:
-<example><title>Example <command>cygcheck</command> usage</title>
+<example id="utils-cygcheck-ex"><title>Example <command>cygcheck</command> usage</title>
 <screen>
 $ cygcheck -f /usr/bin/less
 less-381-1
@@ -128,7 +128,7 @@ package listing</ulink> page.</para>
 
 <para>For example, perhaps you are getting an error because you are missing a
 certain DLL and you want to know which package includes that file:
-<example><title>Searching all packages for a file</title>
+<example id="utils-search-ex"><title>Searching all packages for a file</title>
 <screen>
 $ cygcheck -p 'cygintl-2\.dll'
 Found 1 matches for 'cygintl-2\.dll'.
@@ -270,7 +270,7 @@ contain spaces (C:\Program Files) so should be enclosed in quotes.
 </para>
 
 
-<example><title>Example <command>cygpath</command> usage</title>
+<example id="utils-cygpath-ex"><title>Example <command>cygpath</command> usage</title>
 <screen>
 <![CDATA[
 #!/bin/sh
@@ -452,7 +452,7 @@ given signal, or a list of all signal names if no signal is given.</para>
 option, either with a signal number or a signal name (minus the "SIG"
 part), like these examples:</para>
 
-<example><title>Using the kill command</title>
+<example id="utils-kill-ex"><title>Using the kill command</title>
 <screen>
 <prompt>$</prompt> <userinput>kill 123</userinput>
 <prompt>$</prompt> <userinput>kill -1 123</userinput>
@@ -536,7 +536,7 @@ create a file with the correct format.
 To initially set up your machine if you are a local user, you'd do
 something like this:</para>
   
-<example><title>Setting up the groups file for local accounts</title>
+<example id="utils-mkgroup-ex"><title>Setting up the groups file for local accounts</title>
 <screen>
 <prompt>$</prompt> <userinput>mkdir /etc</userinput>
 <prompt>$</prompt> <userinput>mkgroup -l &gt; /etc/group</userinput>
@@ -610,7 +610,7 @@ if remote access is desired.
 To initially set up your machine if you are a local user, you'd do
 something like this:</para>
   
-<example><title>Setting up the passwd file for local accounts</title>
+<example id="utils-mkpasswd-ex"><title>Setting up the passwd file for local accounts</title>
 <screen>
 <prompt>$</prompt> <userinput>mkdir /etc</userinput>
 <prompt>$</prompt> <userinput>mkpasswd -l &gt; /etc/passwd</userinput>
@@ -642,7 +642,7 @@ SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
 use the specified prefix instead of the account home dir or <literal>/home/
 </literal>. For example, this command:
 
-<example><title>Using an alternate home root</title>
+<example id="utils-althome-ex"><title>Using an alternate home root</title>
 <screen>
 <prompt>$</prompt> <userinput>mkpasswd -l -p "$(cygpath -H)" &gt; /etc/passwd</userinput>
 </screen>
@@ -689,12 +689,12 @@ done by mount commands on typical UNIX systems.  Please see
 behind the Cygwin POSIX file system and strategies for using
 mounts. To remove mounts, use <command>umount</command></para>
 
-<sect3><title>Using mount</title>
+<sect3 id="utils-mount"><title>Using mount</title>
 
 <para>If you just type <command>mount</command> with no parameters, it
 will display the current mount table for you.</para>
 
-<example>
+<example id="utils-mount-ex">
 <title>Displaying the current set of mount points</title>
 <screen>
 <prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
@@ -718,7 +718,7 @@ demonstrates how to mount the directory
 <filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>.
 </para>
 
-<example>
+<example id="utils-mount-add-ex">
 <title>Adding mount points</title>
 <screen>
 <prompt>c:\cygwin\&gt;</prompt> <userinput>ls /data</userinput>
@@ -802,7 +802,7 @@ most of the options are duplicates of other mount flags):</para>
 </screen>
 </sect3>
 
-<sect3><title>Cygdrive mount points</title>
+<sect3 id="utils-cygdrive"><title>Cygdrive mount points</title>
 
 <para>Whenever Cygwin cannot use any of the existing mounts to convert
 from a particular Win32 path to a POSIX one, Cygwin will, instead,
@@ -815,7 +815,7 @@ can be used to change this default automount prefix through the use of the
 "--change-cygdrive-prefix" option.  In the following example, we will
 set the automount prefix to <filename>/</filename>:</para>
 
-<example>
+<example id="utils-cygdrive-ex">
 <title>Changing the default prefix</title>
 <screen>
 <prompt>c:\cygwin\&gt;</prompt> <userinput>mount --change-cygdrive-prefix /</userinput>
@@ -834,7 +834,7 @@ automounted filesystems default to binary mode file accesses.</para>
 
 </sect3>
 
-<sect3><title>Limitations</title>
+<sect3 id="utils-limitations"><title>Limitations</title>
 
 <para>Limitations: there is a hard-coded limit of 30 mount
 points.  Also, although you can mount to pathnames that do not start
