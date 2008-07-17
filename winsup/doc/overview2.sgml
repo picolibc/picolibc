@@ -33,11 +33,11 @@ After installation, you can find Cygwin-specific documentation in
 the <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 <para>
-Developers coming from a Windows background will find a set of tools capable of
-writing console or GUI executables that rely on the Microsoft Win32 API.  The
-<command>dlltool</command> utility may be used to write Windows Dynamically
-Linked Libraries (DLLs).  The resource compiler <command>windres</command> is
-also provided.
+Developers coming from a Windows background will be able to write 
+console or GUI executables that rely on the Microsoft Win32 API instead
+of Cygwin using the -mno-cygwin option to GCC.  The <command>-shared</command>
+option allows to write Windows Dynamically Linked Libraries (DLLs).  The
+resource compiler <command>windres</command> is also provided.
 </para>
 </sect1>
 
@@ -75,7 +75,7 @@ Developers coming from a UNIX background will find a set of utilities
 they are already comfortable using, including a working UNIX shell.  The
 compiler tools are the standard GNU compilers most people will have previously
 used under UNIX, only ported to the Windows host.  Programmers wishing to port
-UNIX software to Windows NT or 9x will find that the Cygwin library provides
+UNIX software to Windows NT will find that the Cygwin library provides
 an easy way to port many UNIX packages, with only minimal source code
 changes.
 </para>
@@ -88,138 +88,148 @@ changes.
 against the library is executed, the Cygwin DLL is loaded into the
 application's text segment.  Because we are trying to emulate a UNIX kernel
 which needs access to all processes running under it, the first Cygwin DLL to
-run creates shared memory areas that other processes using separate instances
-of the DLL can access.  This is used to keep track of open file descriptors and
-assist fork and exec, among other purposes.  In addition to the shared memory
-regions, every process also has a per_process structure that contains
+run creates shared memory areas and global synchronization objects that other
+processes using separate instances of the DLL can access.  This is used to keep track of open file descriptors and to assist fork and exec, among other
+purposes.  Every process also has a per_process structure that contains
 information such as process id, user id, signal masks, and other similar
 process-specific information.</para>
 
-<para>The DLL is implemented using the Win32 API, which allows it to run on all
-Win32 hosts.  Because processes run under the standard Win32 subsystem, they
+<para>The DLL is implemented as a standard DLL in the Win32 subsystem.  Under
+the hood it's using the Win32 API, as well as the native NT API, where
+appropriate.</para>
+
+<para>Because processes run under the standard Win32 subsystem, they
 can access both the UNIX compatibility calls provided by Cygwin as well as
 any of the Win32 API calls.  This gives the programmer complete flexibility in
 designing the structure of their program in terms of the APIs used.  For
 example, they could write a Win32-specific GUI using Win32 API calls on top of
 a UNIX back-end that uses Cygwin.</para>
 
-<para>Early on in the development process, we made the important design
-decision that it would not be necessary to strictly adhere to existing UNIX
-standards like POSIX.1 if it was not possible or if it would significantly
-diminish the usability of the tools on the Win32 platform.  In many cases, an
-environment variable can be set to override the default behavior and force
-standards compliance.</para>
-</sect2>
+<para>The native NT API is used mainly for speed, as well as to access
+NT capabilities which are useful to implement certain POSIX features, but
+are hidden to the Win32 API.
+</para>
 
-<sect2 id="ov-hi-win9xnt"><title>Supporting both Windows NT and 9x</title>
-<para>While Windows 95 and Windows 98 are similar enough to each other that we
-can safely ignore the distinction when implementing Cygwin, Windows NT is an
-extremely different operating system.  For this reason, whenever the DLL is
-loaded, the library checks which operating system is active so that it can act
-accordingly.</para>
-
-<para>In some cases, the Win32 API is only different for
-historical reasons.  In this situation, the same basic functionality is
-available under Windows 9x and NT but the method used to gain this
-functionality differs.  A trivial example: in our implementation of
-uname, the library examines the sysinfo.dwProcessorType structure
-member to figure out the processor type under Windows 9x.  This field
-is not supported in NT, which has its own operating system-specific
-structure member called sysinfo.wProcessorLevel.</para>
-
-<para>Other differences between NT and 9x are much more fundamental in
-nature.  The best example is that only NT provides a security model.</para>
+<para>Due to some restrictions in Windows, it's not always possible
+to strictly adhere to existing UNIX standards like POSIX.1.  Fortunately
+these are mostely border cases.</para>
 </sect2>
 
 <sect2 id="ov-hi-perm"><title>Permissions and Security</title>
 <para>Windows NT includes a sophisticated security model based on Access
-Control Lists (ACLs).  Cygwin maps Win32 file ownership and permissions to the
-more standard, older UNIX model by default.  Cygwin version 1.1 introduces
-support for ACLs according to the system calls used on newer versions of
-Solaris. This ability is used when the `ntsec' feature is switched on which
-is described in <xref linkend="ntsec"></xref>.
-The chmod call maps UNIX-style permissions
-back to the Win32 equivalents.  Because many programs expect to be able to find
-the /etc/passwd and /etc/group files, we provide <ulink 
-url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount">utilities</ulink>
+Control Lists (ACLs).  Cygwin maps Win32 file ownership and permissions to
+ACLs by default, on file systems supporting them (usually NTFS).  Solaris
+style ACLs and accompanying function calls are also supported.
+The chmod call maps UNIX-style permissions back to the Win32 equivalents. 
+Because many programs expect to be able to find the
+<filename>/etc/passwd</filename> and
+<filename>/etc/group</filename> files, we provide <ulink 
+url="http://cygwin.com/cygwin-ug-net/using-utils.html">utilities</ulink>
 that can be used to construct them from the user and group information
 provided by the operating system.</para>
 
-<para>Under Windows NT, users with Administrator rights are permitted to 
-chown files.  With version 1.1.3 Cygwin introduced a mechanism for setting real
-and effective UIDs under Windows NT/W2K. This is described in 
-<xref linkend="ntsec"></xref>.  As of version 1.5.13, the Cygwin developers
-are not aware of any feature in the Cygwin DLL that would allow users to gain
-privileges or to access objects to which they have no rights under Windows.
-However there is no guarantee that Cygwin is as secure as the Windows it runs
-on. Cygwin processes share some variables and are thus easier targets of
-denial of service type of attacks.
+<para>Users with Administrator rights are permitted to chown files.
+With version 1.1.3 Cygwin introduced a mechanism for setting real and
+effective UIDs. This is described in <xref linkend="ntsec"></xref>.  As
+of version 1.5.13, the Cygwin developers are not aware of any feature in
+the Cygwin DLL that would allow users to gain privileges or to access
+objects to which they have no rights under Windows.  However there is no
+guarantee that Cygwin is as secure as the Windows it runs on. Cygwin
+processes share some variables and are thus easier targets of denial of
+service type of attacks.
 </para>
-
-<para>Under Windows 9x, the situation is considerably different.  Since a
-security model is not provided, Cygwin fakes file ownership by making all
-files look like they are owned by a default user and group id.  As under NT,
-file permissions can still be determined by examining their read/write/execute
-status.  Rather than return an unimplemented error, under Windows 9x, the
-chown call succeeds immediately without actually performing any action
-whatsoever.  This is appropriate since essentially all users jointly own the
-files when no concept of file ownership exists.</para>
 
 </sect2>
 
 <sect2 id="ov-hi-files"><title>File Access</title> <para>Cygwin supports
-both Win32- and POSIX-style paths, using either forward or back slashes as the
-directory delimiter.  Paths coming into the DLL are translated from Win32 to
-POSIX as needed.  As a result, the library believes that the file system is a
-POSIX-compliant one, translating paths back to Win32 paths whenever it calls a
-Win32 API function.  UNC pathnames (starting with two slashes) are
-supported.</para>
+both POSIX- and Win32-style paths, using either forward or back slashes as the
+directory delimiter.  Paths coming into the DLL are translated from POSIX to
+native NT as needed.  From the application perspective, the file system is
+a POSIX-compliant one.  The implementation details are safely hidden in the
+Cygwin DLL.  UNC pathnames (starting with two slashes) are supported for
+network paths.</para>
 
-<para>The layout of this POSIX view of the Windows file system space is stored
-in the Windows registry.  While the slash ('/') directory points to the system
-partition by default, this is easy to change with the Cygwin mount utility.
-In addition to selecting the slash partition, it allows mounting arbitrary
-Win32 paths into the POSIX file system space.  Many people use the utility to
-mount each drive letter under the slash partition (e.g. C:\ to /c, D:\ to /d,
-etc...).</para>
+<para>Since version 1.7.0, the layout of this POSIX view of the Windows file
+system space is stored in the <filename>/etc/fstab</filename> file.  Actually,
+there is a system-wide <filename>/etc/fstab</filename> file as well as a
+user-specific fstab file <filename>/etc/fstab.d/${USER}</filename>.</para>
+
+<para>At startup the DLL has to find out where it can find the
+<filename>/etc/fstab</filename> file.  The mechanism used for this is simple.
+First it retrieves it's own path, for instance
+<filename>C:\Cygwin\bin\cygwin1.dll</filename>.  From there it deduces
+that the root path is <filename>C:\Cygwin</filename>.  So it looks for the
+<filename>fstab</filename> file in <filename>C:\Cygwin\etc\fstab</filename>. 
+The layout of this file is very similar to the layout of the
+<filename>fstab</filename> file on Linux.  Just instead of block devices,
+the mount points point to Win32 paths.  An installation with
+<command>setup.exe</command> installs a <filename>fstab</filename> file by
+default, which can easily be changed using the editor of your choice.</para>
+
+<para>In addition to selecting the root partition, the
+<filename>fstab</filename> file allows mounting arbitrary Win32 paths into
+the POSIX file system space.  A special case is the so-called cygdrive prefix.
+It's the path under which every available drive in the system is mounted
+under its drive letter.  The default value is <filename>/cygdrive</filename>,
+so you can access the drives as <filename>/cygdrive/c</filename>,
+<filename>/cygdrive/d</filename>, etc...  The cygdrive prefix can be set to
+some other value (<filename>/mnt</filename> for instance) in the
+<filename>fstab</filename> file(s).</para>
 
 <para>The library exports several Cygwin-specific functions that can be used
 by external programs to convert a path or path list from Win32 to POSIX or vice
 versa.  Shell scripts and Makefiles cannot call these functions directly.
-Instead, they can do the same path translations by executing the cygpath
-utility program that we provide with Cygwin.</para>
+Instead, they can do the same path translations by executing the
+<command>cygpath</command> utility program that we provide with Cygwin.</para>
 
-<para>Win32 file systems are case preserving but case insensitive.  Cygwin
-does not currently support case distinction because, in practice, few UNIX
-programs actually rely on it.  While we could mangle file names to support case
-distinction, this would add unnecessary overhead to the library and make it
-more difficult for non-Cygwin applications to access those files.</para>
+<para>Win32 applications handle filenames case preserving but case
+insensitive.  Cygwin supports case sensitivity on file systems supporting
+that.  Since Windows XP, the OS only supports case sensitivity when a
+specific registry value is changed.  Therefore case sensitivity is not
+the default usually.</para>
 
-<para>Symbolic links are emulated by files containing a magic cookie followed
-by the path to which the link points.  They are marked with the System
-attribute so that only files with that attribute have to be read to determine
-whether or not the file is a symbolic link.  Hard links are fully supported
-under Windows NT on NTFS file systems.  On a FAT file system, the call falls
-back to simply copying the file, a strategy that works in many cases.</para>
+<para>Symbolic links are not present and supported on Windows up to and
+including Windows Server 2003 R2.  Only starting with Windows Vista,
+native symlinks are available.  Unfortunately they are strangly implemented
+and so not very useful for a POSIX emulation layer.  Consequentially
+Cygwin recognizes them as symlinks but does not create them.</para>
 
-<para>The inode number for a file is calculated by hashing its full Win32 path.
-The inode number generated by the stat call always matches the one returned in
-d_ino of the dirent structure.  It is worth noting that the number produced by
-this method is not guaranteed to be unique.  However, we have not found this to
-be a significant problem because of the low probability of generating a
-duplicate inode number.</para>
+<para>Symbolic links are potentially created in two different ways.
+The file style symlinks are files containing a magic cookie followed by
+the path to which the link points.  They are marked with the System DOS
+attribute so that only files with that attribute have to be read to
+determine whether or not the file is a symbolic link.  The shortcut style
+symlinks are Windows shortcut files with a special header and the
+Readonly DOS attribute set.  The advantage of file symlinks is speed,
+the advantage of shortcut symlinks is the fact that they can be utilized
+by non-Cygwin Win32 tools as well.</para>
 
-<para>Chroot is supported since release 1.1.3. Note that chroot isn't
-supported native by Windows. This implies some restrictions. First of all,
-the chroot call isn't a privileged call. Each user may call it. Second, the
-chroot environment isn't safe against native windows processes. If you
-want to support a chroot environment as, for example, by allowing an
-anonymous ftp with restricted access, you'll have to care that only
-native Cygwin applications are accessible inside of the chroot environment.
-Since that applications are only using the Cygwin POSIX API to access the
-file system their access can be restricted as it is intended. This includes
-not only POSIX paths but Win32 paths (containing drive letter and/or
-backslashes) and CIFS paths (//server/share or \\server\share) as well.</para>
+<para>Hard links are fully supported on NTFS and NFS file systems.  On FAT
+and some other file systems, the call falls back to simply copying the file,
+a strategy that works in many cases.</para>
+
+<para>On file systems which don't support unique persistent file IDs (FAT,
+older Samba shares) the inode number for a file is calculated by hashing its
+full Win32 path.  The inode number generated by the stat call always matches
+the one returned in <literal>d_ino</literal> of the <literal>dirent</literal>
+structure.  It is worth noting that the number produced by this method is not
+guaranteed to be unique.  However, we have not found this to be a significant
+problem because of the low probability of generating a duplicate inode number.
+</para>
+
+<para><function>chroot(2)</function> is supported since Cygwin 1.1.3.
+However, chroot is not a concept known by Windows.  This implies some
+restrictions.  First of all, the <function>chroot</function> call isn't a
+privileged call.  Each user may call it.  Second, the chroot environment
+isn't safe against native windows processes.  If you want to support a
+chroot environment as, for example, by allowing an anonymous ftp with
+restricted access, you'll have to care that only native Cygwin applications
+are accessible inside of the chroot environment.  Since those applications
+are only using the Cygwin POSIX API to access the file system their access
+can be restricted as it is intended.  This includes not only POSIX paths but
+Win32 paths containing drive letter and/or backslashes as well as UNC paths
+(<filename>//server/share</filename> or <filename>\\server\share</filename>).
+</para>
 </sect2>
 
 <sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
@@ -246,7 +256,9 @@ set to override this behavior.</para>
 "newlib" as part of the library, rather than write all of the lib C
 and math calls from scratch.  Newlib is a BSD-derived ANSI C library,
 previously only used by cross-compilers for embedded systems
-development.</para>
+development.  Other functions, which are not supported by newlib have
+been added to the Cygwin sources using BSD implementations as much as
+possible.</para>
 
 <para>The reuse of existing free implementations of such things
 as the glob, regexp, and getopt libraries saved us considerable
@@ -258,8 +270,8 @@ malloc if it so desires.</para>
 </sect2>
 
 <sect2 id="ov-hi-process"><title>Process Creation</title>
-<para>The fork call in Cygwin is particularly interesting because it
-does not map well on top of the Win32 API.  This makes it very
+<para>The <function>fork</function> call in Cygwin is particularly interesting
+because it does not map well on top of the Win32 API.  This makes it very
 difficult to implement correctly.  Currently, the Cygwin fork is a
 non-copy-on-write implementation similar to what was present in early
 flavors of UNIX.</para>
@@ -335,26 +347,43 @@ it.</para>
 </sect2>
 
 <sect2 id="ov-hi-sockets"><title>Sockets</title>
-<para>Socket-related calls in Cygwin simply
-call the functions by the same name in Winsock, Microsoft's
-implementation of Berkeley sockets.  Only a few changes were needed to
-match the expected UNIX semantics - one of the most troublesome
-differences was that Winsock must be initialized before the first
-socket function is called.  As a result, Cygwin has to perform this
-initialization when appropriate.  In order to support sockets across
-fork calls, child processes initialize Winsock if any inherited file
-descriptor is a socket.</para>
+<para>Socket-related calls in Cygwin basically call the functions by the
+same name in Winsock, Microsoft's implementation of Berkeley sockets, but
+with lots of tweaks.  All sockets are non-blocking under the hood to allow
+to interrupt blocking calls by POSIX signals.  Additional bookkeeping is
+necessary to implement correct socket sharing POSIX semantics and especially
+for the select call.  Some socket-related functions are not implemented at
+all in Winsock, as, for example, socketpair.  Starting with Windows Vista,
+Microsoft removed the legacy calls <function>rcmd(3)</function>,
+<function>rexec(3)</function> and <function>rresvport(3)</function>.
+Recent versions of Cygwin now implement all these calls internally.</para>
 
-<para>Unfortunately, implicitly loading DLLs
-at process startup is usually a slow affair.  Because many processes
-do not use sockets, Cygwin explicitly loads the Winsock DLL the
-first time it calls the Winsock initialization routine.  This single
-change sped up GNU configure times by thirty
-percent.</para>
+<para>An especially troublesome feature of Winsock is that it must be
+initialized before the first socket function is called.  As a result, Cygwin
+has to perform this initialization on the fly, as soon as the first
+socket-related function is called by the application.  In order to support
+sockets across fork calls, child processes initialize Winsock if any
+inherited file descriptor is a socket.</para>
+
+<para>AF_UNIX (AF_LOCAL) sockets are not available in Winsock.  They are
+implemented in Cygwin by using local AF_INET sockets instead.  This is
+completely transparent to the application.  Cygwin's implementation also
+supports the getpeereid BSD extension.  A yet missing feature is
+descriptor passing, though.</para>
+
+<para>Starting with release 1.7.0, Cygwin gets IPv6 support.  However, this
+depends on the availability of the Windows IPv6 stack.  Up to Windows 2003,
+the IPv6 stack is treated as "experimental" and it's not feature complete.
+Full support is only available starting with Windows Vista and Windows Server
+2008.  The newly implemented <function>getaddrinfo</function> and
+<function>getnameinfo</function> functions are not dependent on the OS,
+though.  Cygwin 1.7.0 adds replacement functions which implement the full
+functionality for IPv4.</para>
+
 </sect2>
 
 <sect2 id="ov-hi-select"><title>Select</title>
-<para>The UNIX select function is another
+<para>The UNIX <function>select</function> function is another
 call that does not map cleanly on top of the Win32 API.  Much to our
 dismay, we discovered that the Win32 select in Winsock only worked on
 socket handles.  Our implementation allows select to function normally

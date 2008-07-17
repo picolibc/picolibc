@@ -1,3 +1,7 @@
+2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Revamp documentation for Cygwin 1.7, part 1.
+
 2008-07-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Temporarily add ability to generate pdfs.

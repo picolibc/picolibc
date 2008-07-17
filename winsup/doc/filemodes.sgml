@@ -1,34 +1,33 @@
 <sect1 id="using-filemodes"><title>File permissions</title>
 
-<para>On Windows 9x systems, files are always readable, and Cygwin uses the
-native read-only mode to determine if they are writable. Files are
+<para>On FAT or FAT32 filesystems, files are always readable, and Cygwin
+uses the DOS read-only attribute to determine if they are writable. Files are
 considered to be executable if the filename ends with .bat, .com or .exe, or
 if its content starts with #!. Consequently <command>chmod</command> can
 only affect the "w" mode, it silently ignores actions involving the other
 modes.  This means that <command>ls -l</command>
 needs to open and read files. It can thus be relatively slow.</para>
 
-<para>Under NT, file permissions default to the same behavior as Windows
-9x but there is optional functionality in Cygwin that can make file
-systems behave more like on UNIX systems.  This is turned on by adding
-the "ntea" option to the <envar>CYGWIN</envar> environment variable.</para>
+<para>On NTFS, file permissions are evaluated using the Access Control
+Lists (ACLs) attached to a file.  This can be switched off by using the
+"noacl" option to the respective mount point in the
+<filename>/etc/fstab</filename> or <filename>/etc/fstab.d/$USER</filename>
+file.  For more information on file permissions, see
 
-<para>When the "ntea" feature is activated, Cygwin will start with basic
-permissions as determined above, but can store POSIX file permissions in NT
-Extended Attributes.  This feature works quite well on NTFS partitions
-because the attributes can be stored sensibly inside the normal NTFS
-filesystem structure.  However, on a FAT partition, NT stores extended
-attributes in a flat file at the root of the partition called <filename>EA
-DATA. SF</filename>.  This file can grow to extremely large sizes if you
-have a large number of files on the partition in question, slowing the
-system to a crawl.  In addition, the <filename>EA DATA. SF</filename> file
-can only be deleted outside of Windows because of its "in use" status.  For
-these reasons, the use of NT Extended Attributes is off by default in
-Cygwin.  Finally, note that specifying "ntea" in <envar>CYGWIN</envar> has no
-effect under Windows 9x. </para>
+<!-- TODO: Put the file permission stuff from ntsec here??? -->
 
-<para>Under NT, the test "[ -w filename]" is only true if filename is
-writable across the board, e.g. <command>chmod +w filename</command>. </para>
+<xref linkend="ntsec"></xref>.
+</para>
+
+<!-- TODO -->
+
+<para>On NFS shares, file permissions are exactly the POSIX permissions
+transmitted from the server using the NFSv3 protocol, if the NFS client
+is the one from Microsoft's "Services For Unix", or the one built into
+Windows Vista or later.
+</para>
+
+<para>Only the user and group ownership is not necessarily correct.</para>
 
 </sect1>
 

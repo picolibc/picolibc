@@ -1,123 +1,146 @@
-<sect1 id="ntsec"><title>NT security and usage of <literal>ntsec</literal></title>
+<sect1 id="ntsec"><title>NT security</title>
 
-<para>The setting of UNIX like object permissions is controlled by the 
-<link linkend="using-cygwinenv"><envar>CYGWIN</envar> environment
-variable</link> setting <literal>(no)ntsec</literal> which is set to
-<literal>ntsec</literal> by default.</para>
+<para>The setting of POSIX like object permissions is controlled by the 
+<link linkend="mount-table">mount option</link> <literal>(no)acl</literal>
+which is set to <literal>acl</literal> by default.  The design goal
+is to utilize the Windows access control API to implement real POSIX
+permissions.</para>
 
-<para>The design goal of <literal>ntsec</literal> is to get a more UNIX-like
-permission structure based upon the security features of Windows NT.
-To describe the changes, I will first give a short overview in
-<xref linkend="ntsec-common"></xref>.
-</para>
-<para><link linkend="ntsec-processes" endterm="ntsec-processes.title"></link>
-discusses the changes in ntsec related to privileges on processes.</para>
-
-<para><link linkend="ntsec-files" endterm="ntsec-files.title"></link> shows
-the basics of UNIX-like setting of file permissions.</para>
-
-<para><link linkend="ntsec-sids" endterm="ntsec-sids.title"></link>
-talks about using SIDs in <filename>/etc/passwd</filename> and
-<filename>/etc/group</filename>.</para>
-
-<para><link linkend="ntsec-mapping" endterm="ntsec-mapping.title"></link>
-illustrates the permission mapping leak of Windows NT.</para>
-
-<para><link linkend="ntsec-aclfuncs" endterm="ntsec-aclfuncs.title"></link>
-describes in short the ACL API since release 1.1.</para>
-
-<para><link linkend="ntsec-setuid" endterm="ntsec-setuid.title"></link>
-describes the new support of a setuid concept introduced with release
-1.1.3.</para>
-
-<para><link linkend="ntsec-switch" endterm="ntsec-switch.title"></link>
-gives the basics of using the SYSTEM user to switch user context.
-</para>
-
-<para><link linkend="ntsec-ids" endterm="ntsec-ids.title"></link>
-explains the way Cygwin shows users and groups that are not in 
-<filename>/etc/passwd</filename> or <filename>/etc/group</filename>.
-</para>
+<para>We start with a short overview.  Note that this overview must
+be necessarily short.  If you want to learn more about the Windows security
+model, see the <ulink url="http://msdn.microsoft.com/en-us/library/aa374860(VS.85).aspx">Access Control</ulink> article in MSDN documentation.</para>
 
 <sect2 id="ntsec-common"><title>NT security</title>
 
-<para>The NT security allows a process to allow or deny access of
-different kind to `objects'. `Objects' are files, processes,
-threads, semaphores, etc.</para>
+<para>In the NT security model, almost any "object" is securable.
+"Objects" are files, processes, threads, semaphores, etc.</para>
 
-<para>The main data structure of NT security is the `security descriptor'
-(SD) structure. It explains the permissions, that are granted (or denied)
-to an object and contains information, that is related to so called
-`security identifiers' (SID).</para>
+<para>Every object has a data structure called "security descriptor" (SD)
+attached.  The SD contains all information necessary to control who can
+how access an object.  The SD of an object consists of five parts:</para>
 
-<para>A SID is a unique identifier for users, groups and domains. 
-SIDs are comparable to UNIX UIDs and GIDs, but are more complicated
-because they are unique across networks. Example:</para>
+<itemizedlist spacing="compact">
+<listitem><para>Flags which control several aspects of this SD. This is
+not discussed here.</para></listitem>
+<listitem><para>The SID of the object owner.</para></listitem>
+<listitem><para>The SID of the object owner group.</para></listitem>
+<listitem><para>A list of "Access Control Entries" (ACE), called the
+"Discretionary Access Control List" (DACL).</para></listitem>
+<listitem><para>Another list of ACEs, called the
+"Security Access Control List" (SACL), which doesn't matter for our
+purpose.</para></listitem>
+</itemizedlist>
 
-<para>SID of a system `foo':</para>
+<para>Every ACE contains a so-called "Security IDentifier" (SID) and
+other stuff which is explained a bit later.  Let's talk about the SID first.
+</para>
+
+<para>A SID is a unique identifier for users, groups, computers and AD
+domains.  SIDs are basically comparable to POSIX UIDs and GIDs, but are
+more complicated because they are unique across multiple machines or
+domains.  A SID is a structure of multiple numerical values.  There's
+a convenient convention to type SIDs.  Here's an example:</para>
+
+<para>SID of a machine "foo":</para>
 
 <screen>
   S-1-5-21-165875785-1005667432-441284377
 </screen>
 
-<para>SID of a user `johndoe' of the system `foo':</para>
+<para>SID of a user "johndoe" of the system "foo":</para>
 
 <screen>
   S-1-5-21-165875785-1005667432-441284377-1023
 </screen>
 
-<para>The above example shows the convention for printing SIDs. The leading
-`S' should show that it is a SID. The next number is a version number which
-is always 1. The next number is the so called `top-level authority' that
-identifies the source that issued the SID.</para>
+<para>The leading "S" has no further meaning except to show that this is
+a SID.  The next number is a version number which is always 1 so far.
+The next two numbers are the authority which shows the initiated what
+kind of SID this is.  There are a couple of builtin accounts and
+accounts with very special meaning. However, computer and domain SIDs
+always start with "S-1-5-21".  The next three numbers, all 32 bit values,
+are the unique 96 bit identifier of the comupter system.  This is
+hopefully unique all over the world, but in practice it's sufficient if
+the comuter SIDs are unique within a single Windows network.</para>
 
-<para>While each system in a NT network has it's own SID, the situation
-is modified in NT domains: The SID of the domain controller is the
-base SID for each domain user. If an NT user has one account as domain
-user and another account on his local machine, these accounts are under
-any circumstances DIFFERENT, regardless of the usage of the same user
-name and password!</para>
+<para>As you can see in the above example, SIDs of users (and groups)
+are identical to the computer SID, except for an additional part, the
+so-called "relative identifier" (RID).  So the SID of a user is always 
+uniquely attached to the system on which the account has been generated.</para>
 
-<para>SID of a domain `bar':</para>
+<para>It's a bit different in domains.  The domain has its own SID, and
+that SID is identical to the SID of the first domain controller, on
+which the domain is created.  Domain user SIDs look exactly like the
+computer user SIDs, the leading part is just the domain SID and the RID
+is created when the user is created.</para>
+
+<para>Ok, consider you created a new domain "bar" on some new domain
+controller and you would like to create a domain account "johndoe":</para>
+
+<para>SID of a domain "bar.local":</para>
 
 <screen>
   S-1-5-21-186985262-1144665072-740312968
 </screen>
 
-<para>SID of a user `johndoe' in the domain `bar':</para>
+<para>SID of a user "johndoe" in the domain "bar.local":</para>
 
 <screen>
   S-1-5-21-186985262-1144665072-740312968-1207
 </screen>
 
-<para>The last part of the SID, the so called `relative identifier' (RID),
-is by default used as UID and/or GID under Cygwin. As the name and the
-above example implies, this id is unique only relative to one system or
-domain.</para>
+<para>Ok, so you now have two accounts called johndoe, one account
+created on the machine "foo", one created in the domain "bar.local".
+Both have different SIDs and not even the RID is the same.  How do
+the systems know it's the same account?  After all, the name is
+the same, right?  The answer is, these accounts are NOT identical.
+For all the machines know there are two different accounts, one is
+"FOO\johndoe", the other one is "BAR\johndoe" or "johndoe@bar.local".
+Different SID, different account.  Full stop.
+</para>
 
-<para>Note, that it's possible that a user has the same RID on two
-different systems. The resulting SIDs are nevertheless different, so
-the SIDs are representing different users in an NT network.</para>
+<para>The last part of the SID, the so called "Relative IDentifier" (RID),
+is by default used as UID and/or GID under Cygwin when you create the
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename>
+files using the <command>mkpasswd</command> and <command>mkgroup</command>
+tools.  Domain account UIDs and GIDs are offset by 10000 by default
+which might be a bit low for very big organizations.  Fortunately there's
+an option in both tools to change the offset...</para>
 
-<para>There is a big difference between UNIX IDs and NT SIDs: the existence of
-the so called `well known groups'. For example UNIX has no GID for the
-group of `all users'. NT has an SID for them, called `Everyone' in the
-English versions. The SIDs of well-known groups are not unique across
-an NT network but their meanings are unmistakable.
-Examples of well-known groups:</para>
+<para>Do you still remember the SIDs with special meaning?  In offical
+notation they are called "well-known SIDs".  For example, POSIX has no GID
+for the group of "all users" or "world" or "others".  The last three rwx
+bits in a permission value just represent the permissions for "everyone
+who is not the owner or is member of the owning group".  Windows has a
+SID for these poor souls, the "Everyone" SID.  Other well-known SIDs
+represent more circumstances instead of actual users or groups.  Here
+are a few examples for well-known SIDs:</para>
 
 <screen>
-everyone                        S-1-1-0
-creator/owner                   S-1-3-0
-batch process (via `at')        S-1-5-3
-authenticated users             S-1-5-11
-system                          S-1-5-18
+Everyone                        S-1-1-0    Simply everyone...
+Batch                           S-1-5-3    Processes started via the task
+					   scheduler are member of this group.
+Interactive			S-1-5-4    Only processes of users which are
+					   logged in via an interactive
+					   session are members here.
+Authenticated Users             S-1-5-11   Users which have gone through
+                                           the authentication process and
+					   survived.  Anonymously accessing
+					   users are not incuded here.
+SYSTEM                          S-1-5-18   A special account which has all
+					   kinds of dangerous rights, sort of
+					   an uber-root account.
 </screen>
 
-<para>The last important group of SIDs are the `predefined groups'. This
-groups are used mainly on systems outside of domains to simplify the 
-administration of user permissions. The corresponding SIDs are not unique
-across the network so they are interpreted only locally:</para>
+<para>For a full list please refer to
+<ulink url="http://msdn.microsoft.com/en-us/library/aa379649.aspx">Well-known SIDs</ulink>.
+Naturally well-known SIDs are the same on each machine, so they are
+not unique to a machine or domain.  They have the same meaning across
+the Windows network.</para>
+
+<para>Additionally there are a couple of well-known builtin groups,
+which have the same SID on every machine and which have certain user
+rights by default:</para>
 
 <screen>
 administrators                  S-1-5-32-544
@@ -126,186 +149,142 @@ guests                          S-1-5-32-546
 ...
 </screen>
 
-<para>Now, how are permissions given to objects? A process may assign an SD
-to the object. The SD of an object consists of three parts:</para>
+<para>For instance, every account is usually member in the "Users"
+group.  All administrator accounts are member of the "Administrators"
+group.  That's all about it as far as single machines are involved.  In
+a domain environment it's a bit more tricky.  Since these SIDs are not
+unique to a machine, every domain user and every domain group can be a
+member of these well known groups.  Consider the domain group "Domain
+Admins".  This group is by default in the "Administrators" group.  Let's
+assume the above computer called "foo" is a member machine of the domain
+"bar.local".  If you stick the user "BAR\johndoe" into the group "Domain
+Admins", this guy will automatically be a mamber of the administrators
+group on "foo", when logging in on "foo".  Neat, isn't it?</para>
+
+<para>Back to ACE and ACL.  POSIX is able to create three different
+permissions, the permissions for the owner, for the group and for the
+world.  In contrast the Windows ACL has a potentially infinite number of
+members... as long as they fit into 64K.  Every member is an ACE.
+ACE consist of three parts:</para>
 
 <itemizedlist spacing="compact">
-<listitem><para>the SID of the owner </para></listitem>
-<listitem><para>the SID of the group </para></listitem>
-<listitem><para>a list of SIDs with their permissions, called
-`access control list' (ACL) </para></listitem>
+<listitem><para>The type of the ACE (allow ACE or deny ACE).</para></listitem>
+<listitem><para>Permission bits, 32 of them.</para></listitem>
+<listitem><para>The SID for which the permissions are allowed or denied.</para></listitem>
 </itemizedlist>
 
-<para>UNIX is able to create three different permissions, the permissions
-for the owner, for the group and for the world. In contrast the ACL
-has a potentially infinite number of members. Every member is a so called
-`access control element' (ACE). An ACE contains three parts:</para>
-
-<itemizedlist spacing="compact">
-<listitem><para>the type of the ACE </para></listitem>
-<listitem><para>permissions, described with a DWORD </para></listitem>
-<listitem><para>the SID, for which the above mentioned permissions are
-set </para></listitem>
-</itemizedlist>
-
-<!-- Is the historical note really important here? we're at version 1.5.9, after all.. -->
-<para>The two important types of ACEs are the `access allowed ACE' and the
-`access denied ACE'. The ntsec functionality only used `access allowed ACEs' up
-to Cygwin version 1.1.0. Later versions also use `access denied ACEs' 
-to reflect the UNIX permissions as well as possible.</para>
+<para>The two (for us) important types of ACEs are the "access allowed
+ACE" and the "access denied ACE".  As the names imply, the allow ACE
+tells the system to allow the given permissions to the SID, the deny ACE
+results in denying the specific permission bits.</para>
 
 <para>The possible permissions on objects are more detailed than in
-UNIX. For example, the permission to delete an object is different
-from the write permission.</para>
-
-<para>With the aforementioned method NT is able to grant or revoke permissions
-to objects in a far more specific way. But what about cygwin? In a POSIX
-environment it would be fine to have the security behavior of a POSIX
-system. The NT security model is MOSTLY able to reproduce the POSIX model.
-The ntsec method tries to do this in cygwin.</para>
-
-<para>You ask "Mostly? Why mostly???" Because there's a leak in the NT model.
-I will describe that in detail in chapter 5.</para>
-
-<para>Creating  explicit object security is not that easy so you will often
-see only two simple variations in use:</para>
-
-<itemizedlist spacing="compact">
-<listitem><para>default permissions, computed by the operating system </para></listitem>
-<listitem><para>each permission to everyone </para></listitem>
-</itemizedlist>
-
-<para>For parameters to functions that create or open securable objects another
-data structure is used, the `security attributes' (SA). This structure
-contains an SD and a flag that specifies whether the returned handle
-to the object is inherited to child processes or not.
-This property is not important for ntsec so in
-this document the difference between SDs and SAs is ignored.</para>
-
-</sect2>
-
-<sect2 id="ntsec-processes"><title id="ntsec-processes.title">Process privileges</title>
-
-<para>Any process started under control of Cygwin has a semaphore attached
-to it, that is used for signaling purposes. The creation of this semaphore
-can be found in sigproc.cc, function `getsem'. The first parameter to the
-function call `CreateSemaphore' is an SA. Without ntsec this SA 
-assigns default security to the semaphore. There is a simple disadvantage:
-Only the owner of the process may send signals to it. Or, in other words,
-if the owner of the process is not a member of the administrators' group,
-no administrator may kill the process! This is especially annoying, if
-processes are started via service manager.</para>
-
-<para>Ntsec now assigns an SA to the process control semaphore, that
-has each permission set for the user of the process, for the
-administrators' group and for `system', which is a synonym for the
-operating system itself. The creation of this SA is done by the function
-`sec_user', that can be found in `shared.cc'. Each member of the
-administrators' group is now allowed to send signals to any process
-created in Cygwin, regardless of the process owner.</para>
-
-<para>Moreover, each process now has the appropriate security settings, when
-it is started via `CreateProcess'. You will find this in function
-`spawn_guts' in module `spawn.cc'. The security settings for starting a
-process in another user context have to add the SID of the new user, too.
-In the case of the `CreateProcessAsUser' call, sec_user creates an SA with
-an additional entry for the sid of the new user.</para>
+POSIX.  For example, the permission to delete an object is different
+from the permission to change object data, and even changing object data
+can be separated into different permission bits for different kind of
+data.</para>
 
 </sect2>
 
 <sect2 id="ntsec-files"><title id="ntsec-files.title">File permissions</title>
 
-<para>If ntsec is turned on, file permissions are set as in UNIX. An SD is
-assigned to the file containing the owner and group and ACEs for the
-owner, the group and `Everyone'.</para>
+<para>On NTFS and if the <literal>noacl</literal> mount option is not
+specified for a mount point, Cygwin sets file permissions as in POSIX.
+Basically this is done by defining a SD with the matching owner and group
+SIDs, and a DACL which contains ACEs for the owner, the group and for
+"Everyone", which represents what POSIX calls "others".</para>
 
-<para>The complete settings of UNIX like permissions can be found in the file
-`security.cc'. The two functions `get_nt_attribute' and `set_nt_attribute'
-are the main code. The reading and writing of the SDs is done by the
-functions `read_sd' and `write_sd'. `write_sd' uses the function `BackupRead'
-instead of the simpler function `SetFileSecurity' because the latter is
-unable to set owners different from the caller.</para>
-
-<para>If you are creating a file `foo' outside of Cygwin, you will see something
-like the following on <command>ls -ln</command>:</para>
-
-<para>If your login is member of the administrators' group:</para>
-<screen>
-  rwxrwxrwx 1  544  513  ... foo
-</screen>
-<para>if not:</para>
-<screen>
-  rwxrwxrwx 1  1000  513  ... foo
-</screen>
-
-<para>Note the user and group IDs. 544 is the UID of the administrators' group.
-This is a `feature' <literal>:-P</literal> of WinNT. If you are a member of
-the administrators' group, every file that you create is owned by the
-administrators' group, instead of by you.</para>
-
-<para>The second example shows the UID of the first user, that has been
-created with NT's the user administration tool. The users and groups are
-sequentially numbered, starting with 1000. Users and groups are using the
-same numbering scheme, so a user and a group don't share the same ID.</para>
-
-<para>In both examples the GID 513 is of special interest. This GID is a
-well known group with different naming in local systems and domains.
-Outside of domains the group is named 'None' (`Kein' in German, `Aucun'
-in French, etc.), in domains it is named 'Domain Users'.  Unfortunately,
-the group `None' is never shown in the user admin tool outside of domains!
-This is very confusing but this seems to have no negative consequences.</para>
-
-<para>To work correctly, ntsec depends on the files
+<para>To use NT security correctly, Cygwin depends on the files
 <filename>/etc/passwd</filename> and <filename>/etc/group</filename>.
-In Cygwin release 1.0 the names and the IDs must correspond to the
-appropriate NT IDs! The IDs used in Cygwin are the RID of the NT SID, as
-mentioned earlier.
-A SID of e.g. the user `corinna' on my NT workstation:</para>
+These files define the traslation between the Cygwin uid/gid and the
+Windows SID.  The SID is stored in the pw_gecos field in
+<filename>/etc/passwd</filename>, and in the gr_passwd field in
+<filename>/etc/group</filename>. Since the pw_gecos field can contain
+more information than just a SID, there are some rules for the layout.
+It's required that the SID is the last entry of the pw_gecos field,
+assuming that the entries in pw_gecos are comma-separated.  The
+commands <command>mkpasswd</command> and <command>mkgroup</command>
+usually do this for you.</para>
 
+<para>Another interesting entry in the pw_gecos field (which is also
+usually created by running <command>mkpasswd</command>) is the Windows user
+name entry.  It takes the form "U-domain\username" and is typically used
+by services to authenticate a user.  Logging in through <command>ssh</command>
+or <command>telnet</command> are two typical scenarios.
+</para>
+
+<para>A typical snippet from <filename>/etc/passwd</filename>:</para>
+
+<example id="ntsec-passwd">
+<title>/etc/passwd:</title>
 <screen>
-  S-1-5-21-165875785-1005667432-441284377-1000
-</screen>
-
-<para>Note the last number: It's the RID 1000, Cygwin's UID.</para>
-
-<para>Unfortunately, workstations and servers outside of domains are not
-able to set primary groups! In these cases, where there is no correlation
-of users to primary groups, NT returns 513 (None) as primary group,
-regardless of the membership to existing local groups.</para>
-
-<para>When using <command>mkpasswd  -l -g</command> on such systems, you
-have to change the primary group by hand if `None' as primary group is
-not what you want (and I'm sure, it's not what you want!)</para>
-
-<para>Look at the following examples, which were parts of my files before
-storing SIDs in /etc/passwd and /etc/group had been introduced (See next
-chapter for details).  With the exception of my personal user entry, all
-entries are well known entries.</para> 
-
-<example>
-<title>/etc/passwd</title>
-<screen>
-everyone:*:0:0:::
-system:*:18:18:::
-administrator::500:544::/home/root:/bin/bash
-guest:*:501:546:::
-administrators:*:544:544::/home/root:
-corinna::1000:547:Corinna Vinschen:/home/corinna:/bin/tcsh
+SYSTEM:*:18:544:,S-1-5-18::
+Administrators:*:544:544:,S-1-5-32-544::
+Administrator:unused:500:513:U-FOO\Administrator,S-1-5-21-790525478-115176313-839522115-500:/home/Administrator:/bin/bash
+corinna:unused:11001:11125:U-BAR\corinna,S-1-5-21-2913048732-1697188782-3448811101-1001:/home/corinna:/bin/tcsh
 </screen>
 </example>
 
-<example>
-<title>/etc/group</title>
+<para>The SYSTEM entry is usually needed by services.  The Administrators
+entry (Huh?  A group in /etc/passwd?) is only here to allow
+<command>ls</command> to print some file ownerships correctly.  Windows
+doesn't care if the owner of a file is a user or a group.  In older
+versions of Windows NT the default ownership for files created by an
+administrator account was set to the group Administrators instead of to
+the creating user account.  This has changed, but for those older
+systems it's convenient to have the Administrators group in
+<filename>/etc/passwd</filename>.</para>
+
+<para>The really interesting entries are the next two.  The Administrator
+entry is for the local administrator, the corinna entry matches the corinna
+account in the domain BAR.  The information given in the pw_gecos field
+are all we need to exactly identify an account, and to have a two way
+translation, from Windows account name/SID to Cygwin account name uid and
+vice versa.  Having this complete information allows us to choose a Cygwin
+name and uid which doesn't have to match the Windows account at all.  As
+long as the pw_gecos information is available, we're on the safe side:</para>
+
+<example id="ntsec-passwd-tweaked">
+<title>/etc/passwd, tweaked:</title>
 <screen>
-everyone::0:
-system::18:
-none::513:
-administrators::544:
-users::545:
-guests::546:
-powerusers::547:
+root:unused:0:513:U-FOO\Administrator,S-1-5-21-790525478-115176313-839522115-500:/home/Administrator:/bin/bash
+thursday_next:unused:11001:11125:U-BAR\corinna,S-1-5-21-2913048732-1697188782-3448811101-1001:/home/corinna:/bin/tcsh
 </screen>
 </example>
+
+<para>  The above <filename>/etc/passwd</filename> will still work fine.
+You can now login via <command>ssh</command> as the user "root", and
+Cygwin dutyfully translates "root" into the Windows user
+"FOO\Administrators" and files owned by FOO\Administrators are shown to
+have the uid 0 when calling <command>ls -ln</command>.  All you do you're
+actually doing as Administrator.  Files created as root will be owned by
+FOO\Administrator.  And the domain user BAR\corinna can now happily
+pretend to be Thursday Next, but will wake up sooner or later finding
+out she's still actually the domain user BAR\corinna...</para>
+
+<para>Do I have to mention that you can also rename groups in
+<filename>/etc/group</filename>?  As long as the SID is present and correct,
+all is well.  This allows for instance to rename the "Administrators" group
+to "root" as well:</para>
+
+<example id="ntsec-group-tweaked">
+<title>/etc/group, tweaked:</title>
+<screen>
+root:S-1-5-32-544:544:
+</screen>
+</example>
+
+<para>Last but not least you can also change the primary group of a user
+in <filename>/etc/passwd</filename>.  The only requirement is that the user
+is actually a member of the new primary group in Windows.  For instance,
+normal users in a domain environment are members in the group "Domain Users",
+which in turn is member of the well-known group "Users".  Additionally let's
+assume the user is also a member of the newly created group .  The default
+primary group for users is 
+
+<!-- TODO: The rest of the file... -->
+
+</para>
 
 <para>As you can see, I changed my primary group membership from 513 (None)
 to 547 (powerusers).  So all files I created inside of Cygwin were now owned
@@ -329,14 +308,6 @@ processes, which are started through service manager.</para>
 </sect2>
 
 <sect2 id="ntsec-sids"><title id="ntsec-sids.title">NT SIDs in Cygwin</title>
-
-<para>In Cygwin release 1.1 a new technique of using the 
-<filename>/etc/passwd</filename> and <filename>/etc/group</filename>
- was introduced.</para>
-
-<para>Both files may now contain SIDs of users and groups. They
-are saved in the last field of pw_gecos in <filename>/etc/passwd</filename>
-and in the gr_passwd field in <filename>/etc/group</filename>.</para>
 
 <para>This has the following advantages:</para>
 <itemizedlist spacing="compact">
@@ -378,14 +349,14 @@ root::500:513::/home/root:/bin/sh
 <listitem><para>As in U*X systems UIDs and GIDs numbering scheme now
 don't influence each other. So it's possible to have same Id's for a
 user and a group:</para>
-<example>
+<example id="ntsec-passwd-root">
 <title>/etc/passwd:</title>
 <screen>
 root::0:0:S-1-5-21-54355234-56236534-345635656-500:/home/root:/bin/sh
 </screen>
 </example>
 
-<example>
+<example id="ntsec-group-root">
 <title>/etc/group:</title>
 <screen>
 root:S-1-5-32-544:0:
@@ -401,14 +372,6 @@ not to do this since ntsec works better when having the SIDs available.</para>
 
 <para>Please note that the pw_gecos field in <filename>/etc/passwd</filename>
 is defined as a comma separated list. The SID has to be the last field!</para>
-
-<para>As aforementioned you are able to use Cygwin account names different
-from the NT account names. If you want to login through `telnet' or something
-else you have to use the special <command>login</command>. You may then
-add another field to pw_gecos which contains the NT user name including
-it's domain. So you are able to login as each domain user. The syntax
-is easy: Just add an entry of the form U-ntdomain\ntusername to the pw_gecos
-field. Note that the SID must still remain the last field in pw_gecos!</para>
 
 <screen>
 the_king::1:1:Elvis Presley,U-STILLHERE\elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
@@ -429,7 +392,7 @@ examples.  Please note that I've changed these files heavily!  There's no
 need to change them that way, it's just for testing purposes and...
 for fun.</para>
 
-<example>
+<example id="ntsec-passwd-ex-2">
 <title>/etc/passwd</title>
 <screen>
 root:*:0:0:Administrators group,S-1-5-32-544::
@@ -440,7 +403,7 @@ Guest:*:501:546:,S-1-5-21-1844237615-436374069-1060284298-501:/home/Guest:/bin/b
 </screen>
 </example>
 
-<example>
+<example id="ntsec-group-ex-2">
 <title>/etc/group</title>
 <screen>
 root:S-1-5-32-544:0:
@@ -593,7 +556,7 @@ found on <ulink url="http://docs.sun.com">http://docs.sun.com</ulink> </para>
 
 <sect2 id="ntsec-setuid"><title id="ntsec-setuid.title">New setuid concept</title>
 
-<para>UNIX applications which have to switch the user context are using
+<para>POSIX applications which have to switch the user context are using
 the <command>setuid</command> and <command>seteuid</command> calls which
 are not part of the Windows API.
 Nevertheless these calls are supported under Windows NT/W2K since Cygwin

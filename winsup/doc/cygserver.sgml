@@ -41,6 +41,7 @@
 </para>
 
 <itemizedlist spacing="compact">
+<listitem>
   <screen>-f, --config-file &lt;file&gt;</screen>
   <para>  
     Use &lt;file&gt; as configuration file instead of the default configuration
@@ -52,6 +53,7 @@
     This option has no counterpart in the configuration file, for obvious
    reasons.
   </para>
+</listitem>
 <listitem>
   <screen>-c, --cleanup-threads &lt;num&gt;</screen>
   <para>  
@@ -96,8 +98,7 @@
   <screen>-y, --syslog</screen>
   <para>  
     Force logging to the system log.  This is the default, if stderr is not
-    connected to a tty, e. g. redirected to a file.  Note, that on 9x/Me
-    systems the syslog is faked by a file C:\CYGWIN_SYSLOG.TXT.
+    connected to a tty, e. g. redirected to a file.
     Configuration file option:  kern.log.syslog
   </para>
 </listitem>
@@ -143,8 +144,8 @@
   <screen>-S, --shutdown</screen>
   <para>  
     Shutdown a running daemon and exit.  Other methods are sending a SIGHUP
-    to the Cygserver PID or, if running as service under NT, calling
-    `net stop cygserver' or `cygrunsrv -E cygserver'.
+    to the Cygserver PID or, if running as service, calling `net stop
+    cygserver' or `cygrunsrv -E cygserver'.
   </para>
 </listitem>
 <listitem>
@@ -168,22 +169,16 @@
 <para>
   Before you run Cygserver for the first time, you should run the
   /usr/bin/cygserver-config script once.  It creates the default
-  configuration file and, upon request, installs Cygserver as service
-  when running under NT.  The script only performs a default install,
-  with no further options given to Cygserver when running as service.
-  Due to the wide configurability by changing the configuration file,
-  that's typically not necessary.
+  configuration file and, upon request, installs Cygserver as service.
+  The script only performs a default install, with no further options
+  given to Cygserver when running as service.  Due to the wide
+  configurability by changing the configuration file, that's typically
+  not necessary.
 </para>
 <para>
-  On Windows 9x/Me, just start Cygserver in any console window.  It's
-  advisable to redirect stderr to a file of choice (e. g.
-  /var/log/cygserver.log) and to use the -e and -Y options or the
-  set the appropriate settings in the configuration file (see below).
-</para>
-<para>
-  On Windows NT/2000/XP or 2003, you should always run Cygserver as a
-  service under LocalSystem account.  This is the way it is installed
-  for you by the /usr/bin/cygserver-config script.
+  You should always run Cygserver as a service under LocalSystem account. 
+  This is the way it is installed for you by the /usr/bin/cygserver-config
+  script.
 </para>
 
 </sect2>

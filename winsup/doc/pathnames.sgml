@@ -1,6 +1,6 @@
 <sect1 id="using-pathnames"><title>Mapping path names</title>
 
-<sect2><title>Introduction</title>
+<sect2 id="pathnames-intro"><title>Introduction</title>
 
 <para>Cygwin supports both Win32- and POSIX-style paths, where
 directory delimiters may be either forward or back slashes.  UNC
@@ -24,41 +24,112 @@ necessary.</para>
 
 <sect2 id="mount-table"><title>The Cygwin Mount Table</title>
 
-<para>The <command>mount</command> utility program is used to
-to map Win32 drives and network shares into Cygwin's internal POSIX
-directory tree.  This is a similar concept to the typical UNIX mount
-program.  For those people coming from a Windows background, the
-<command>mount</command> utility is very similar to the old DOS
-<command>join</command>, in that it makes your drive letters appear as
-subdirectories somewhere else.</para>
+<para>The <filename>/etc/fstab</filename> file is used to map Win32
+drives and network shares into Cygwin's internal POSIX directory tree.
+This is a similar concept to the typical UNIX fstab file.  The mount
+points stored in <filename>/etc/fstab</filename> are globally set for
+all users.  Sometimes there's a requirement to have user specific
+mount points.  The Cygwin DLL supports user specific fstab files.
+These are stored in the directory <filename>/etc/fstab.d</filename>
+and the name of the file is the Cygwin username of the user, as it's
+stored in the <filename>/etc/passwd</filename> file.  The content of the
+user specifc file is identical to the system-wide
+<filename>fstab</filename> file.</para>
 
-<para>The mapping is stored in the current user's Cygwin
-<firstterm>mount table</firstterm> in the Windows registry so that the
-information will be retrieved next time the user logs in.  Because it
-is sometimes desirable to have system-wide as well as user-specific
-mounts, there is also a system-wide mount table that all Cygwin users
-inherit.  The system-wide table may only be modified by a user with
-the appropriate privileges (Administrator privileges in Windows
-NT).</para>
+<para>The file fstab contains descriptive information about the various file
+systems.  fstab is only read by programs, and not written; it is the
+duty of the system administrator to properly create and maintain this
+file.  Each filesystem is described on a separate line; fields on each
+line are separated by tabs or spaces.  Lines starting with '#' are
+comments.</para>
 
-<para>The current user's table is located under
-"HKEY_CURRENT_USER/Software/Cygnus Solutions/Cygwin/mounts
-v&lt;version&gt;"
-where &lt;version&gt; is the latest registry version associated with
-the Cygwin library (this version is not the same as the release
-number).  The system-wide table is located under the same subkeys
-under HKEY_LOCAL_SYSTEM.  The user mount table takes precedence over 
-the system-wide table if a path is mounted in both.  This includes the
-setting of the cygdrive prefix.</para>
+<para>The first field describes the block special device or
+remote filesystem to be mounted.  On Cygwin, this is the native Windows
+path which the mount point links in.  As path separator you MUST use a
+slash.  Usage of a backslash might lead to unexpected results.  UNC
+paths (using slashes, not backslashes) are allowed.  If the path
+contains spaces these can be escaped as <literal>'\040'</literal>.</para>
 
-<para>The <command>mount</command> command can set the POSIX root
-<filename>/</filename> to any directory in the Windows file system.
-In absence of such a mount, Cygwin maps <filename>/</filename> to the
-root of the current Windows working directory (for example, 
-<filename>H:\</filename> or <filename>\\computer\share</filename>). 
-Normally Cygwin's <command>setup.exe</command> creates the initial
-mount point for the POSIX root. 
-</para>
+<para>The second field describes the mount point for the filesystem. 
+If the name of the mount point contains spaces these can be
+escaped as '\040'.</para>
+
+<para>The third field describes the type of the filesystem.
+Cygwin supports any string here, since the file system type is usually
+not evaluated.  The noticable exception is the file system type
+cygdrive.  This type is used to set the cygdrive prefix.</para>
+
+<para>The fourth field describes the mount options associated
+with the filesystem.  It is formatted as a comma separated list of
+options.  It contains at least the type of mount (binary or text) plus
+any additional options appropriate to the filesystem type.  Recognized
+options are binary, text, nouser, user, exec, notexec, cygexec, nosuid,
+posix=[0|1].  The meaning of the options is as follows.</para>
+
+<screen>
+  acl      - Cygwin uses the filesystem's access control lists (ACLs) to
+             implement real POSIX permissions (default).  This flag only
+	     affects filesystems supporting ACLs (NTFS) and is ignored
+	     otherwise.
+  noacl    - Cygwin ignores filesystem ACLs and only fakes a subset of
+	     permission bits based on the DOS readonly attribute.  This
+	     behaviour is the default on FAT and FAT32.  The flag is
+	     ignored on NFS filesystems.
+  binary   - Files default to binary mode (default).
+  text     - Files default to CRLF text mode line endings.
+  nouser   - Mount is a system-wide mount.
+  user     - Mount is a user mount.
+  exec     - Treat all files below mount point as executable.
+  notexec  - Treat all files below mount point as not executable.
+  cygexec  - Treat all files below mount point as cygwin executables.
+  nosuid   - No suid files are allowed (currently unimplemented).
+  posix=0  - Switch off case sensitivity for paths under this mount point.
+  posix=1  - Switch on case sensitivity for paths under this mount point
+	     (default).
+</screen>
+
+<para>Note that nouser mount points are not overridable by a later call
+to mount(2).  This is only possible for user mount points.  Mount points
+are by default nouser mount points, unless you specify the option user. 
+In contrast, all mount points in the user specific fstab file are user
+mount points.</para>
+
+<para>The fifth and sixth field are ignored.  They are
+so far only specified to keep a Linux-like fstab file layout.</para>
+
+<para>Note that you don't have to specify an fstab entry for the root dir,
+unless you want to have the root dir pointing to somewhere entirely
+different (hopefully you know what you're doing), or if you want to
+mount the root dir with special options (for instance, as text mount).</para>
+
+<para>Example entries:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+  <para>Just a normal mount point:</para>
+  <screen>c:/foo /bar fat32 binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a managed, textmode mount:</para>
+  <screen>C:/foo /bar/baz ntfs text,managed 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a Windows directory with spaces in it:</para>
+  <screen>C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a remote directory:</para>
+  <screen>//server/share/subdir /srv/subdir smbfs binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>This is just a comment:</para>
+  <screen># This is just a comment</screen>
+</listitem>
+<listitem>
+  <para>Set the cygdrive prefix to /mnt:</para>
+  <screen>none /mnt cygdrive binary 0 0</screen>
+</listitem>
+</itemizedlist>
 
 <para>Whenever Cygwin generates a Win32 path from a POSIX one, it uses
 the longest matching prefix in the mount table.  Thus, if
@@ -70,19 +141,14 @@ POSIX equivalent current directory.  Otherwise, the handling of MS-DOS
 filenames bypasses the mount table.
 </para>
 
-<para>Invoking <command>mount</command> without any arguments displays
-Cygwin's current set of mount points.
-In the following example, the C
-drive is the POSIX root and D drive is mapped to
-<filename>/d</filename>.  Note that in this case, the root mount is a
-system-wide mount point that is visible to all users running Cygwin
-programs, whereas the <filename>/d</filename> mount is only visible
-to the current user.</para>
+<para>If you want to see the current set of mount points valid in your
+session, you can invoking the Cygwin tool <command>mount</command> without
+arguments:</para>
 
-<example>
+<example id="pathnames-mount-ex">
 <title>Displaying the current set of mount points</title>
 <screen>
-<prompt>c:\&gt;</prompt> <userinput>mount</userinput>
+<prompt>bash-3.2$</prompt> <userinput>mount</userinput>
 f:\cygwin\bin on /usr/bin type system (binmode)
 f:\cygwin\lib on /usr/lib type system (binmode)
 f:\cygwin on / type system (binmode)
@@ -94,9 +160,10 @@ e: on /cygdrive/e type user (binmode,noumount)
 
 <para>You can also use the <command>mount</command> command to add
 new mount points, and the <command>umount</command> to delete
-them.  See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
-information on how to use these utilities to set up your Cygwin POSIX
-file system.</para>
+them.  However, since they are only noted in memory, these mount
+points will disappear as soon as your last Cygwin process ends.
+See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
+information.</para>
 
 <para>Whenever Cygwin cannot use any of the existing mounts to convert
 from a particular Win32 path to a POSIX one, Cygwin will
@@ -105,19 +172,12 @@ path <filename>/cygdrive</filename>.  For example, if Cygwin accesses
 <filename>Z:\foo</filename> and the Z drive is not currently in the
 mount table, then <filename>Z:\</filename> would be automatically
 converted to <filename>/cygdrive/Z</filename>.  The default
-prefix of <filename>/cygdrive</filename> may be changed (see the
-<xref linkend="mount"></xref> for more information).</para>
-
-<para>It is possible to assign some special attributes to each mount
-point.  Automatically mounted partitions are displayed as "auto"
-mounts.  Mounts can also be marked as either "textmode" or "binmode"
--- whether text files are read in the same manner as binary files by
-default or not (see <xref linkend="using-textbinary"></xref> for more
-information on text and binary modes.</para>
+prefix of <filename>/cygdrive</filename> may be changed in the fstab file
+as outlined above.</para>
 
 </sect2>
 
-<sect2><title>Additional Path-related Information</title>
+<sect2 id="pathnames-additional"><title>Additional Path-related Information</title>
 
 <para>The <command>cygpath</command> program provides the ability to
 translate between Win32 and POSIX pathnames in shell scripts. See
@@ -150,23 +210,113 @@ not by default, for example).</para>
 
 <sect1 id="using-specialnames"><title>Special filenames</title>
 
-<sect2> <title>DOS devices</title>
+<sect2 id="pathnames-dosdevices">
+<title>DOS devices</title>
 
-<para>Windows filenames invalid under Windows are also invalid under
-Cygwin.  This means that base filenames such as 
+<para>Filenames invalid under Win32 are not necessarily invalid
+under Cygwin since release 1.7.0.  There are a couple of rules which
+apply to Windows filenames.  First of all, DOS device names like
 <filename>AUX</filename>, <filename>COM1</filename>,
 <filename>LPT1</filename> or <filename>PRN</filename> (to name a few)
-cannot be used in a regular Cygwin Windows or POSIX path, even with an
-extension (<filename>prn.txt</filename>). However the special names can be
-used as filename extensions (<filename>file.aux</filename>). You can use
-the special names as you would under DOS, for example you can print on your
-default printer with the command <command>cat filename > PRN</command>
-(make sure to end with a Form Feed).
-</para>
+cannot be used in a native Win32 application, even with an
+extension (<filename>prn.txt</filename>).  Cygwin can handle files with
+these names just fine.</para>
 
 </sect2>
 
-<sect2> <title>POSIX devices</title>
+<sect2 id="pathnames-specialchars">
+<title>Special characters in filenames</title>
+
+<para>Win32 filenames can't contain trailing dots and spaces for backward
+compatibility.  When trying to create files with trailing dots or spaces,
+all of them are removed before the file is created.  This restriction does
+only affect native Win32 applications.  Cygwin applications can create and
+access files with trailing dots and spaces without problems.</para>
+
+<para>Some characters are disallowed in filenames on Windows filesystems:</para>
+
+<screen>
+  "   *   :   &lt;   &gt;   ?   |   \
+</screen>
+
+<para>Cygwin can't fix this, but it has a method to workaround this
+restriction.  All of the above characters, except for the backslash,
+are converted to special UNICODE characters in the range 0xf000 to 0xf0ff
+(the "Private use area") when creating or accessing files.</para>
+
+</sect2>
+
+<sect2 id="pathnames-casesensitive">
+<title>Case sensitive filenames</title>
+
+<para>In the Win32 subsystem filenames are only case-preserved, but not
+case-sensitive.  You can't access two files in the same directory which
+only differ by case, like <filename>Abc</filename> and
+<filename>aBc</filename>.  While NTFS (and some remote filesystems)
+support case-sensitivity, the NT kernel starting with Windows XP does
+not support it by default.  Rather, you have to tweak a registry setting
+and reboot.  For that reason, case-sensitivity is not supported by Cygwin,
+unless you change that registry value.</para>
+
+<para>If you really want case-sensitivity in Cygwin, you can switch it
+on by setting the registry value</para>
+
+<screen>
+HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel\obcaseinsensitive
+</screen>
+
+<para>to 0 and reboot the machine.  For least surprise, Cygwin expects
+this registry value also on Windows NT4 and Windows 2000, which usually
+both don't know this registry key.  If you want case-sensitivity on these
+systems, create that registry value and set it to 0.  On these systems
+(and *only* on these systems) you don't have to reboot to bring it
+into effect.</para>
+
+<note>
+<para>
+Note that when installing Microsoft's Services For Unix (SFU), you're asked if
+you want to use case-sensitive filenames.  If you answer "yes" at this point,
+the installer will change the aforementioned registry value to 0, too.  So, if
+you have SFU installed, there's some chance that the registry value is already
+set to case sensitivity.
+</para>
+</note>
+
+<para>After you set this registry value to 0, Cygwin will be case-sensitive
+by default on NTFS and NFS filesystems.  Be aware that using two filenames
+which only differ by case might result in some weird interoperability
+issues with native Win32 applications.  You're using case-sensitivity 
+at your own risk.  You have been warned!</para>
+
+<para>Even if you use case-sensitivity, it might be feasible to switch to
+case-insensitivity for certain paths for better interoperability with
+native Win32 applications (even if it's just Windows Explorer).  You can do
+this on a per-mount point base, by using the "posix=0" mount option in
+/etc/fstab, or your /etc/fstab.d/$USER file.</para>
+
+<para>For a start, it might be best to switch the cygdrive path to
+case-insensitivity, because the default Windows $PATH variable is not
+always using the correct case by default.  As a result, your shell will
+claim that it can't find Windows commands like <command>attrib</command>
+or <command>net</command>.  Here's an example how you can switch the
+cygdrive prefix to case-insensitivity:</para>
+
+<example id="mount-caseinsensitive">
+<title>Example mount point to enforce case-insensitivity on cygdrive paths</title>
+<screen>
+none /cygdrive cygdrive binary,posix=0 0 0
+</screen>
+</example>
+
+<para>Note that mount points as well as device names and virtual
+paths like /proc are always case-sensitive!  The only exception are
+the subdirs and filenames under /proc/registry, /proc/registry32
+and /proc/registry64.  Registry access is always case-insensitive.
+Read on for more information.</para>
+
+</sect2>
+
+<sect2 id="pathnames-posixdevices"> <title>POSIX devices</title>
 <para>There is no need to create a POSIX <filename>/dev</filename> 
 directory as Cygwin automatically simulates it internally. 
 These devices cannot be seen with the command <command>ls /dev/</command>
@@ -177,67 +327,97 @@ If you want to be able to see all devices in
 url="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt">create_devices.sh</ulink>
 script.
 </para>
+
 <para>
-Cygwin supports the following devices commonly found on POSIX systems:
-<filename>/dev/dsp</filename>, <filename>/dev/null</filename>, 
-<filename>/dev/zero</filename>, <filename>/dev/console</filename>,
-<filename>/dev/tty</filename>, <filename>/dev/ttym</filename>, 
-<filename>/dev/ttyX</filename>, <filename>/dev/ttySX</filename>, 
-<filename>/dev/pipe</filename>, <filename>/dev/port</filename>, 
-<filename>/dev/ptmx</filename>, <filename>/dev/mem</filename>,
-<filename>/dev/random</filename>, and <filename>/dev/urandom</filename>.
-Some other POSIX devices, such as 
-<filename>/dev/kmem</filename>, are planned for development.
+Cygwin supports the following character devices commonly found on POSIX systems:
+</para>
+
+<screen>
+/dev/null
+/dev/zero
+/dev/full
+
+/dev/console	Pseudo device name for the standard console window created
+		by Windows.  Same as the one used for cmd.exe.  Every one
+		of them has this name.  It's not quite comparable with the
+		console device on UNIX machines.
+
+/dev/tty	The current tty of a session running in a pseudo tty.
+/dev/ptmx	Pseudo tty master device.
+/dev/ttym
+
+/dev/tty0	Pseudo ttys are numbered from /dev/tty0 upwards as they are
+/dev/tty1	requested.
+...
+
+/dev/ttyS0	Serial communication devices.  ttyS0 == Win32 COM1,
+/dev/ttyS1	ttyS1 == COM2, etc.
+...
+
+/dev/pipe
+/dev/fifo
+
+/dev/mem	The physical memory of the machine.  Note that access to the
+/dev/port	physical memory has been restricted with Windows Server 2003.
+/dev/kmem	Since this OS, you can't access physical memory from user space.
+
+/dev/kmsg	Kernel message pipe, for usage with sys logger services.
+
+/dev/random	Random number generator.
+/dev/urandom
+
+/dev/dsp	Default sound device of the system.
+</screen>
+
+<para>
 Cygwin also has several Windows-specific devices:
-<filename>/dev/comX</filename> (the serial ports, starting with 
-<filename>COM1</filename> which is the same as <filename>ttyS0</filename>),
-<filename>/dev/conin</filename> (Windows <filename>CONIN$</filename>),
-<filename>/dev/conout</filename> (Windows <filename>CONOUT$</filename>),
-<filename>/dev/clipboard</filename> (the Windows clipboard, currently
-text only), and <filename>/dev/windows</filename> (the Windows message
-queue).
 </para>
 
-<para>Windows NT/W2K/XP additionally support raw devices like floppies,
-disks, partitions and tapes.  These are accessed from Cygwin applications
-using POSIX device names which are supported in two different ways.
-</para>
+<screen>
+/dev/com1	The serial ports, starting with COM1 which is the same as ttyS0.
+/dev/com2	Please use /dev/ttySx instead.
+...
 
-<para>Up to Cygwin 1.3.3 the only way to access those devices was
-to mount the Win32 device names to a POSIX device name but this usage
-is discouraged since Cygwin 1.3.4 and only kept for backward compatibility.
-</para>
+/dev/conin	Same as Windows CONIN$.
+/dev/conout	Same as Windows CONOUT$.
+/dev/clipboard	The Windows clipboard, text only
+/dev/windows	The Windows message queue.
+</screen>
 
 <para>
-Beginning with Cygwin 1.3.4, raw devices are accessible by Cygwin processes
-using fixed POSIX device names.  These fixed POSIX device names are generated
-using a direct conversion from the POSIX namespace to the internal NT namespace.
+Block devices are accessible by Cygwin processes using fixed POSIX device
+names.  These POSIX device names are generated using a direct conversion
+from the POSIX namespace to the internal NT namespace.
 E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
 or the first partition on the third harddisk is \device\harddisk2\partition1.
 The first floppy in the system is \device\floppy0, the first CD-ROM is
-\device\cdrom0 and the first tape drive is \device\tape0.
+\device\cdrom0 and the first tape drive is \device\tape0.  The mapping
+to the POSIX /dev namespace is as follows:
 </para>
-
-<para>The new fixed POSIX names are mapped to NT internal devices as
-follows:</para>
 
 <screen>
 /dev/st0	\device\tape0, rewind
 /dev/nst0	\device\tape0, no-rewind
 /dev/st1	\device\tape1
+/dev/nst1	\device\tape1
 ...
+/dev/st15
+/dev/nst15
 
 /dev/fd0	\device\floppy0
 /dev/fd1	\device\floppy1
 ...
-
-/dev/scd0	\device\cdrom0
-/dev/scd1	\device\cdrom1
-...
+/dev/fd15
 
 /dev/sr0	\device\cdrom0
 /dev/sr1	\device\cdrom1
 ...
+/dev/sr15
+
+/dev/scd0	\device\cdrom0
+/dev/scd1	\device\cdrom1
+...
+/dev/scd15
 
 /dev/sda	\device\harddisk0\partition0	(whole disk)
 /dev/sda1	\device\harddisk0\partition1	(first partition)
@@ -249,10 +429,10 @@ follows:</para>
 
 [up to]
 
-/dev/sdl	\device\harddisk11\partition0
-/dev/sdl1	\device\harddisk11\partition1
+/dev/sddx	\device\harddisk127\partition0
+/dev/sddx1	\device\harddisk127\partition1
 ...
-/dev/sdl15	\device\harddisk11\partition15
+/dev/sddx15	\device\harddisk127\partition15
 </screen>
 
 <para>
@@ -261,32 +441,16 @@ links as they are created on Linux systems for convenience:
 </para>
 
 <screen>
-ln -s /dev/scd0 /dev/cdrom
-ln -s /dev/nst0  /dev/tape
+ln -s /dev/sr0 /dev/cdrom
+ln -s /dev/nst0 /dev/tape
 ...
 </screen>
 
-<warning>
-<para>
-Note that you can't use the mount table to map from a fixed device name
-to your own device name or to map from internal NT device name to
-your own device name.  Also using symbolic links to map from the internal
-NT device name to your own device name will not do what you want.
-The following three examples will not work as expected:
-</para>
-
-<screen>
-mount -f -b /dev/nst0 /dev/tape     # DOES NOT WORK
-mount -f -b /device/tape0 /dev/tape # DOES NOT WORK
-ln -s /device/tape0 /dev/tape       # DOES NOT WORK
-</screen>
-</warning>
-
 </sect2>
 
-<sect2><title>The .exe extension</title>
+<sect2 id="pathnames-exe"><title>The .exe extension</title>
 
-<para> Executable program filenames end with <filename>.exe</filename>
+<para>Win32 executable filenames end with <filename>.exe</filename>
 but the <filename>.exe</filename> need not be included in the command,
 so that traditional UNIX names can be used.  However, for programs that
 end in <filename>.bat</filename> and <filename>.com</filename>, you
@@ -319,18 +483,9 @@ Cygwin 1.5.19.  It has been changed for consistency with the rest of Cygwin.
 <filename>filename</filename>. This allows many makefiles written
 for UNIX systems to work well under Cygwin.</para>
 
-<para>Unfortunately, the <command>install</command> and
-<command>strip</command> commands do distinguish between
-<filename>filename</filename> and <filename>filename.exe</filename>. They
-fail when working on a non-existing <filename>filename</filename> even if
-<filename>filename.exe</filename> exists, thus breaking some makefiles.
-This problem can be solved by writing <command>install</command> and
-<command>strip</command> shell scripts to provide the extension ".exe"
-when needed.
-</para>
 </sect2>
 
-<sect2><title>The /proc filesystem</title> 
+<sect2 id="pathnames-proc"><title>The /proc filesystem</title> 
 <para>
 Cygwin, like Linux and other similar operating systems, supports the
 <filename>/proc</filename> virtual filesystem. The files in this
@@ -344,7 +499,12 @@ is <filename>/proc/registry</filename>, which displays the Windows
 registry with each <literal>KEY</literal> as a directory and each
 <literal>VALUE</literal> as a file. As anytime you deal with the
 Windows registry, use caution since changes may result in an unstable
-or broken system.
+or broken system.  There are additionally subdirectories called
+<filename>/proc/registry32</filename> and <filename>/proc/registry64</filename>.
+They are identical to <filename>/proc/registry</filename> on 32 bit
+host OSes.  On 64 bit host OSes, <filename>/proc/registry32</filename>
+opens the 32 bit processes view on the registry, while
+<filename>/proc/registry64</filename> opens the 64 bit processes view.
 </para>
 <para>
 The Cygwin <filename>/proc</filename> is not as complete as the
@@ -354,7 +514,7 @@ that use it.
 </para>
 </sect2>
 
-<sect2><title>The @pathnames</title> 
+<sect2 id="pathnames-at"><title>The @pathnames</title> 
 <para>To circumvent the limitations on shell line length in the native
 Windows command shells, Cygwin programs expand their arguments
 starting with "@" in a special way.  If a file
@@ -366,7 +526,7 @@ Embedded double quotes must be repeated.
 In the following example compare the behaviors of the bash built-in
 <command>echo</command> and of the program <command>/bin/echo</command>.</para>
 
-<example><title> Using @pathname</title>
+<example id="pathnames-at-ex"><title> Using @pathname</title>
 <screen>
 <prompt>bash$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
 <prompt>bash$</prompt> <userinput>echo @mylist</userinput>

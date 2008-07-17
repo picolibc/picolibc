@@ -18,23 +18,27 @@ support the <literal>/?</literal> switch to display usage information.
 <para>
 Unfortunately, no standard set of tools included with all versions of 
 Windows exists.  If you are unfamiliar with the tools available 
-on your system, here is a general guide.  Windows 95, 98, and ME have 
-very limited command-line configuration tools.  Windows NT 4.0 has much 
-better coverage, which Windows 2000 and XP expanded. 
+on your system, here is a general guide.  Windows NT 4.0 has only a basic 
+set of tools, which later versions of Windows expanded. 
 Microsoft also provides free downloads for Windows NT 4.0 (the Resource Kit 
 Support Tools), Windows 2000 (the Resource Kit Tools), and XP (the 
-Windows Support Tools). Additionally, many independent sites such as 
-<ulink url="http://download.com.com">download.com</ulink>, 
+Windows Support Tools).  Generally, the younger the Windows version, the
+more complete are the on-board tools.  Additionally, many independent sites
+such as 
+<ulink url="http://download.com">download.com</ulink>, 
 <ulink url="http://simtel.net">simtel.net</ulink>, 
-and <ulink url="http://sysinternals.com">sysinternals.com</ulink>
-provide command-line utilities.  A few Windows tools, such as 
-<command>find.exe</command> and <command>sort.exe</command>,
-may conflict with the Cygwin versions; make sure that you use the full 
-path (<command>/usr/bin/find</command>) or that your Cygwin 
-<literal>bin</literal> directory comes first in your <envar>PATH</envar>.
+and Microsoft's own
+<ulink url="http://technet.microsoft.com/en-us/sysinternals/default.aspx">Sysinternals</ulink>
+provide quite useful command-line utilities, as far as they are not
+already provided by Cygwin.  A few Windows tools, such as 
+<command>find.exe</command>, <command>link.exe</command> and
+<command>sort.exe</command>, may conflict with the Cygwin versions
+make sure that you use the full path (<command>/usr/bin/find</command>)
+or that your Cygwin <literal>bin</literal> directory comes first in your
+<envar>PATH</envar>.
 </para>
 
-<sect2> <title>Pathnames</title>
+<sect2 id="using-pathnames-effectively"> <title>Pathnames</title>
 
 <para>
 Windows programs do not understand POSIX pathnames, so any arguments 
@@ -60,15 +64,15 @@ preferable to use <command>cygpath</command> in shell scripts.
 
 </sect2>
 
-<sect2> <title>Console Programs</title>
+<sect2 id="using-console"> <title>Console Programs</title>
 <para>
 Another issue is receiving output from or giving input to console-based 
 Windows programs.  Unfortunately, interacting with Windows console 
 applications is not a simple matter of using a translation utility. Windows 
-console applications are designed to run under <command>command.com</command> 
-or <command>cmd.exe</command>, and some do not deal gracefully with other
+console applications are designed to run under 
+<command>cmd.exe</command>, and some do not deal gracefully with other
 situations.  Cygwin can receive console input only if it
-is also running in a console (DOS box) since Windows does not provide
+is also running in a console window since Windows does not provide
 any way to attach to the backend of the console device. Another
 traditional Unix input/output method, ptys (pseudo-terminals), is
 supported by Cygwin but not entirely by Windows.  The basic problem is 
@@ -78,7 +82,7 @@ having their input or output redirected to pipes.
 
 <para>
 To help deal with these issues, Cygwin supports customizable levels of 
-Windows verses Unix compatibility behavior.  To be most compatible with 
+Windows versus Unix compatibility behavior.  To be most compatible with 
 Windows programs, use a DOS prompt, running only the occasional Cygwin 
 command or script. Next would be to run <command>bash</command> within 
 a default DOS box. To make Cygwin more Unix compatible in this case, 
@@ -92,7 +96,7 @@ but expect some compatibility problems with Windows programs.
 
 </sect2>
 
-<sect2> <title>Cygwin and Windows Networking</title>
+<sect2 id="using-net"> <title>Cygwin and Windows Networking</title>
 <para>
 Many popular Cygwin packages, such as <systemitem>ncftp</systemitem>, 
 <systemitem>lynx</systemitem>, and <systemitem>wget</systemitem>, require a 
@@ -111,11 +115,11 @@ of these programs, see if the alternate one works as expected.
 <para>
 There are a variety of other programs available for specific situations.
 If your system does not have an always-on network connection, you 
-may be interested in <command>rasdial.exe</command> (or alternatives for
-Windows 95, 98, and ME) for automating dialup connections.  
+may be interested in <command>rasdial.exe</command> for automating dialup
+connections.  
 Users who frequently change their network 
 configuration can script these changes with <command>netsh.exe</command> 
-(Windows 2000 and XP). For proxy users, the open source 
+(Windows 2000 and later). For proxy users, the open source 
 <ulink url="http://apserver.sourceforge.net">
 NTLM Authorization Proxy Server</ulink> or the no-charge
 <ulink url="http://www.hummingbird.com/products/nc/socks/index.html">
@@ -125,15 +129,15 @@ programs in your environment.
 
 </sect2>
 
-<sect2><title>The cygutils package</title>
+<sect2 id="using-cygutils"><title>The cygutils package</title>
 
 <para>
-The optional <systemitem>cygutils</systemitem> package contains miscellaneous tools that are
-small enough to not require their own package. It is not included in a
-default Cygwin install; select it from the Utils category in 
-<command>setup.exe</command>. Several of the <systemitem>cygutils</systemitem> tools are useful
-for interacting with Windows. 
-</para>
+The optional <systemitem>cygutils</systemitem> package contains
+miscellaneous tools that are small enough to not require their own package.
+It is not included in a default Cygwin install; select it from the Utils
+category in <command>setup.exe</command>. Several of the
+<systemitem>cygutils</systemitem> tools are useful for interacting with
+Windows.</para>
 
 <para>
 One of the hassles of Unix-Windows interoperability is the different line 
@@ -146,7 +150,7 @@ endings, but <systemitem>cygutils</systemitem> provides several dedicated progra
 </para>
 </sect2>
 
-<sect2><title>Creating shortcuts with cygutils</title>
+<sect2 id="using-shortcuts"><title>Creating shortcuts with cygutils</title>
 <para>
 Another problem area is between Unix-style links, which link one file
 to another, and Microsoft .lnk files, which provide a shortcut to a
@@ -172,7 +176,7 @@ Windows shortcuts.
 </para>
 </sect2>
   
-<sect2><title>Printing with cygutils</title>
+<sect2 id="using-printing"><title>Printing with cygutils</title>
 <para>
 There are several options for printing from Cygwin, including the 
 <command>lpr</command> found in <systemitem>cygutils</systemitem> (not to be confused with the 

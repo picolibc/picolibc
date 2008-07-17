@@ -18,7 +18,7 @@ program for debugging.  What you need to do is add
 <literal>-g</literal> to all the other flags you use when compiling
 your sources to objects.</para>
 
-<example><title>Compiling with -g</title>
+<example id="gdb-g"><title>Compiling with -g</title>
 <screen>
 <prompt>$</prompt> gcc -g -O2 -c myapp.c
 <prompt>$</prompt> gcc -g myapp.c -o myapp
@@ -57,7 +57,7 @@ at individual variables or what pointers point to.</para>
 <command>break</command> command to tell gdb to stop your program when it
 gets to a specific function or line number:</para>
 
-<example><title>"break" in gdb</title>
+<example id="gdb-break"><title>"break" in gdb</title>
 <screen>
 <prompt>(gdb)</prompt> break my_function
 <prompt>(gdb)</prompt> break 47
@@ -75,7 +75,7 @@ time.</para>
 your program.  These two cases are the same as far as your program is
 concerned:</para>
 
-<example><title>Debugging with command line arguments</title>
+<example id="gdb-cliargs"><title>Debugging with command line arguments</title>
 <screen>
 <prompt>$</prompt> myprog -t foo --queue 47
 

@@ -35,7 +35,7 @@ to make use of <ulink url="http://www.google.com/search?q=new+to+unix">
 other resources</ulink>.
 </para>
 
-<sect2><title>Download Source</title>
+<sect2 id="setup-download"><title>Download Source</title>
 <para>
 Cygwin uses packages to manage installing various software. When
 the default <literal>Install from Internet</literal> option is chosen,
@@ -69,7 +69,7 @@ this; search the list for <command>mkcygwget</command> for ideas.
 </para>
 </sect2>
 
-<sect2><title>Selecting an Install Directory</title>
+<sect2 id="setup-dir"><title>Selecting an Install Directory</title>
 <para>
 The <literal>Root Directory</literal> for Cygwin (default
 <literal>C:\cygwin</literal>) will become <literal>/</literal> 
@@ -97,7 +97,7 @@ have a very good reason to switch it to
 </para>
 </sect2>
 
-<sect2><title>Local Package Directory</title>
+<sect2 id="setup-localdir"><title>Local Package Directory</title>
 <para>
 The <literal>Local Package Directory</literal> is the cache where 
 <command>setup.exe</command> stores the packages before they are
@@ -111,7 +111,7 @@ or in case you need to reinstall a package.
 </para>
 </sect2>
 
-<sect2><title>Connection Method</title>
+<sect2 id="setup-connection"><title>Connection Method</title>
 <para>
 The <literal>Direct Connection</literal> method of downloading will 
 directly download the packages, while the IE5 method will leverage your 
@@ -124,7 +124,7 @@ authorization for proxy servers.
 </para>
 </sect2>
 
-<sect2><title>Choosing Mirrors</title>
+<sect2 id="setup-mirror"><title>Choosing Mirrors</title>
 <para>
 Since there is no way of knowing from where you will be downloading
 Cygwin, you need to choose at least one mirror site.  Cygwin mirrors 
@@ -137,7 +137,7 @@ mirror) you can add it.
 </para>
 </sect2>
 
-<sect2><title>Choosing Packages</title>
+<sect2 id="setup-packages"><title>Choosing Packages</title>
 <para>
 For each selected mirror site, <command>setup.exe</command> downloads a 
 small text file called <literal>setup.bz2</literal> that contains a list
@@ -201,7 +201,7 @@ stable version.
 </para>
 </sect2>
 
-<sect2><title>Download and Installation Progress</title>
+<sect2 id="setup-progress"><title>Download and Installation Progress</title>
 <para>
 First, <command>setup.exe</command> will download all selected packages
 to the local directory chosen earlier. Before installing, 
@@ -212,7 +212,7 @@ show progress bars for the current task and total remaining disk space.
 </para>
 </sect2>
 
-<sect2><title>Icons</title>
+<sect2 id="setup-icons"><title>Icons</title>
 <para>
 You may choose to install shortcuts on the Desktop and/or Start Menu
 to start a <literal>bash</literal> shell. If you prefer to use a different
@@ -221,7 +221,7 @@ use these shortcuts as a guide to creating your own.
 </para>
 </sect2>
 
-<sect2><title>Post-Install Scripts</title>
+<sect2 id="setup-postinstall"><title>Post-Install Scripts</title>
 <para>
 Last of all, <command>setup.exe</command> will run any post-install
 scripts to finish correctly setting up installed packages. Since each
@@ -236,7 +236,7 @@ Relevant documentation can be found in the <literal>/usr/doc/Cygwin/</literal>
 or <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 </sect2>
-<sect2><title>Troubleshooting</title>
+<sect2 id="setup-troubleshooting"><title>Troubleshooting</title>
 <para>
 Unfortunately, the complex setup process means that odd problems can
 occur. If you're having trouble downloading packages, it may be network

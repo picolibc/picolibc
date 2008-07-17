@@ -1,6 +1,6 @@
 <sect1 id="using-textbinary"><title>Text and Binary modes</title>
 
-<sect2> <title>The Issue</title>
+<sect2 id="textbin-issue"> <title>The Issue</title>
 
 <para>On a UNIX system, when an application reads from a file it gets
 exactly what's in the file on disk and the converse is true for writing.
@@ -28,7 +28,7 @@ other programs (such as <command>cat</command>, <command>cmp</command>,
 
 </sect2>
 
-<sect2><title>The default Cygwin behavior</title>
+<sect2 id="textbin-default"><title>The default Cygwin behavior</title>
 
 <para>The Cygwin system gives us some flexibility in deciding how files 
 are to be opened when the mode is not specified explicitly. 
@@ -49,22 +49,8 @@ backslash or a colon), the default is binary.
 <listitem>
 <para>Pipes and non-file devices are opened in binary mode,
 except if the <envar>CYGWIN</envar> environment variable contains
-<literal>nobinmode</literal>.</para>
-<warning><title>Warning!</title><para>In b20.1 of 12/98, a file will be opened
-in binary mode if any of the following conditions hold:</para> 
-<orderedlist numeration="arabic" spacing="compact">
-<listitem><para>binary mode is specified in the open call</para>
-</listitem>
-<listitem><para>the filename is a MS-DOS filename</para>
-</listitem>
-<listitem><para>the file resides on a binary mounted partition</para>
-</listitem>
-<listitem><para><envar>CYGWIN</envar> contains <literal>binmode</literal></para>
-</listitem>
-<listitem><para>the file is not a disk file</para>
-</listitem>
-</orderedlist>
-</warning>
+<literal>nobinmode</literal>.  Sockets are always opened in binary
+mode.</para>
 </listitem>
 
 <listitem>
@@ -79,7 +65,7 @@ and <command> program &lt; filename </command> are not equivalent when
 </orderedlist>
 </sect2>
 
-<sect2><title>Example</title>
+<sect2 id="textbin-example"><title>Example</title>
 <para>To illustrate the various rules, we provide scripts to delete CRs
 from files by using the <command>tr</command> program, which can only write
 to standard output. 
@@ -115,7 +101,7 @@ In the second case we rely on the DOS shell to redirect in binary mode.
 </para>
 </sect2>
 
-<sect2><title>Binary or text?</title>
+<sect2 id="textbin-question"><title>Binary or text?</title>
 
 <para>UNIX programs that have been written for maximum portability
 will know the difference between text and binary files and act
@@ -150,7 +136,7 @@ in binary mode.</para>
 
 </sect2>
 
-<sect2><title>Programming</title>
+<sect2 id="textbin-devel"><title>Programming</title>
 
 <para>In the <function>open()</function> function call, binary mode can be
 specified with the flag <literal>O_BINARY</literal> and text mode with

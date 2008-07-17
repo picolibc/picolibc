@@ -23,20 +23,21 @@ DOS shell, before launching bash.  </para>
 The <envar>PATH</envar> environment variable is used by Cygwin
 applications as a list of directories to search for executable files
 to run.  This environment variable is converted from Windows format
-(e.g. <filename>C:\WinNT\system32;C:\WinNT</filename>) to UNIX format
-(e.g., <filename>/WinNT/system32:/WinNT</filename>) when a Cygwin
-process first starts.
+(e.g. <filename>C:\Windows\system32;C:\Windows</filename>) to UNIX format
+(e.g., <filename>/cygdrive/c/Windows/system32:/cygdrive/c/Windows</filename>)
+when a Cygwin process first starts.
 Set it so that it contains at least the <filename>x:\cygwin\bin</filename>
 directory where "<filename>x:\cygwin</filename> is the "root" of your
 cygwin installation if you wish to use cygwin tools outside of bash.
+This is usually done by the batch file you're starting your shell with.
 </para>
 
 <para> 
 The <envar>HOME</envar> environment variable is used by many programs to
 determine the location of your home directory and we recommend that it be
 defined.  This environment variable is also converted from Windows format
-when a Cygwin process first starts.  Set it to point to your home directory
-before launching bash. 
+when a Cygwin process first starts.  It's usually set in the shell
+profile scripts in the /etc directory.
 </para>
 
 <para>
@@ -79,8 +80,8 @@ when using <command>regtool</command> since damaging your system registry can
 result in an unusable system.  This example sets memory limit to 1024 MB:
 
 <screen>
-regtool -i set /HKLM/Software/Cygnus\ Solutions/Cygwin/heap_chunk_in_mb 1024
-regtool -v list /HKLM/Software/Cygnus\ Solutions/Cygwin
+regtool -i set /HKLM/Software/Cygwin/heap_chunk_in_mb 1024
+regtool -v list /HKLM/Software/Cygwin
 </screen>
 </para>
 
@@ -121,6 +122,7 @@ gcc max_memory.c -o max_memory.exe
 
 Run the program and it will output the maximum amount of allocatable memory.
 </para>
+
 </sect1>
 
 <sect1 id="setup-files"><title>Customizing bash</title>
@@ -128,19 +130,19 @@ Run the program and it will output the maximum amount of allocatable memory.
 <para>
 To set bash up so that cut and paste work properly, click on the
 "Properties" button of the window, then on the "Misc" tab.  Make sure
-that "Quick Edit" is checked and "Fast Pasting" isn't.  These settings
-will be remembered next time you run bash from that
-shortcut. Similarly you can set the working directory inside the
-"Program" tab. The entry "%HOME%" is valid.
+that "QuickEdit mode" and "Insert mode" are checked.  These settings
+will be remembered next time you run bash from that shortcut. Similarly
+you can set the working directory inside the "Program" tab. The entry
+"%HOME%" is valid, but requires that you set <envar>HOME</envar> in
+the Windows environment.
 </para>
 
 <para>
 Your home directory should contain three initialization files
 that control the behavior of bash.  They are
 <filename>.profile</filename>, <filename>.bashrc</filename> and
-<filename>.inputrc</filename>.  These initialization files will only
-be read if <envar>HOME</envar> is defined before starting bash.
-</para>
+<filename>.inputrc</filename>.  The Cygwin base installation creates
+stub files when you start bash for the first time.</para>
 
 <para>
 <filename>.profile</filename> (other names are also valid, see the bash man

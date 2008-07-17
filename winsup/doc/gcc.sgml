@@ -6,7 +6,7 @@
 Refer to the GCC User's Guide for information on standard usage and
 options.  Here's a simple example:</para>
 
-<example>
+<example id="gcc-hello-world">
 <title>Building Hello World with GCC</title>
 <screen>
 <prompt>C:\&gt;</prompt> <userinput>gcc hello.c -o hello.exe</userinput>

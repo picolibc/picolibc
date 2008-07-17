@@ -5,17 +5,15 @@
 <para>
 Cygwin is a Linux-like environment for Windows. It consists of a DLL
 (<filename>cygwin1.dll</filename>), which acts as an emulation layer
-providing substantial <ulink
-url="http://www.pasc.org/#POSIX">POSIX</ulink> (Portable Operating
-System Interface) system call functionality, and a collection of tools,
-which provide a Linux look and feel. The Cygwin DLL works with all x86
-versions of Windows since Windows 95. The API follows the <ulink
-url="http://www.opengroup.org/onlinepubs/009695399/nfindex.html">Single
+providing substantial <ulink url="http://www.pasc.org/#POSIX">POSIX</ulink>
+(Portable Operating System Interface) system call functionality, and a
+collection of tools, which provide a Linux look and feel. The Cygwin DLL
+works with all x86 and AMD64 versions of Windows NT since Windows NT 4.
+The API follows the
+<ulink url="http://www.opengroup.org/onlinepubs/009695399/nfindex.html">Single
 Unix Specification</ulink> as much as possible, and then Linux practice.
-Two other major differences between Cygwin and Linux are the C library
-(<literal>newlib</literal> instead of <literal>glibc</literal>) and
-default <command>/bin/sh</command>, which is <command>ash</command> on
-Cygwin but <command>bash</command> on most Linux distributions.
+The major differences between Cygwin and Linux is the C library
+(<literal>newlib</literal> instead of <literal>glibc</literal>).
 </para>
 <para>
 With Cygwin installed, users have access to many standard UNIX
@@ -48,8 +46,8 @@ information on how the GNU GPL may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.
 For more information about the proprietary-use license, please go to
-<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/
-</ulink>.  Customers of the native Win32 GNUPro should feel free to submit bug
+<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/</ulink>. 
+Customers of the native Win32 GNUPro should feel free to submit bug
 reports and ask questions through the normal channels.  All other
 questions should be sent to the project mailing list
 <email>cygwin@cygwin.com</email>.</para>
@@ -60,9 +58,9 @@ questions should be sent to the project mailing list
 
 <note>
 <para>
-A more complete historical look Cygwin is Geoffrey J. Noer's 1998 paper,
-"Cygwin32: A Free Win32 Porting Layer for UNIX&reg; Applications" which can be
-found at the <ulink
+A historical look into the first years of Cygwin development is
+Geoffrey J. Noer's 1998 paper, "Cygwin32: A Free Win32 Porting Layer for
+UNIX&reg; Applications" which can be found at the <ulink
 url="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technical.html">
 2nd USENIX Windows NT Symposium Online Proceedings</ulink>.
 </para>
@@ -108,6 +106,14 @@ New Cygwin Net Release</ulink> which provided the native Win32 program
 separately. Since then, the Cygwin DLL and <command>setup.exe</command> 
 have seen continuous development.
 </para>
+
+<para>
+The latest major improvement in this development is the 1.7 release in
+2008, which dropped Windows 95/98/Me support in favor of using Windows
+NT features more extensively.  It adds a lot of new features like
+case-sensitive filenames, NFS interoperability, IPv6 support and much
+more.</para>
+
 </sect1>
 
 DOCTOOL-INSERT-highlights

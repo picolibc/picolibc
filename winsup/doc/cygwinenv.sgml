@@ -1,10 +1,13 @@
 <sect1 id="using-cygwinenv"><title>The <envar>CYGWIN</envar> environment
 variable</title>
 
+<sect2 id="cygwinenv-implemented-options">
+<title>Implemented options</title>
+
 <para>The <envar>CYGWIN</envar> environment variable is used to configure
 many global settings for the Cygwin runtime system. It contains the options
 listed below, separated by blank characters. Many options can be turned off
-by prefixing with <literal>no </literal>.</para>
+by prefixing with <literal>no</literal>.</para>
 
 <itemizedlist mark="bullet">
 <listitem>
@@ -12,7 +15,8 @@ by prefixing with <literal>no </literal>.</para>
 (e.g. pipe and COM ports) file opens default to binary mode 
 (no CRLF translation) instead of text mode.  Defaults to set (binary
 mode).  By default, devices are opened in binary mode, so this option
-has little effect on normal cygwin operations.
+has little effect on normal cygwin operations.  Sockets are always
+in binary mode.
 
 It does affect two things, however.  For non-NTFS filesystems, this
 option will control the line endings for standard output/input/error
@@ -21,52 +25,28 @@ the default translation mode of a pipe, although most shells set the
 pipe to binary by default.
 </para>
 </listitem>
-<listitem>
-<para><envar>check_case:level</envar> - THIS OPTION IS DEPRECATED.
-Don't use it unless you know what you're doing and don't see any way
-around it.  And even then, this option is error prone, slows down Cygwin
-and not well maintained.  This option controls the behavior of
-Cygwin when a user tries to open or create a file using a case different from
-the case of the path as saved on the disk.
-<literal>level</literal> is one of <literal>relaxed</literal>,
-<literal>adjust</literal> and <literal>strict</literal>.</para>
-<itemizedlist mark="bullet">
-<listitem>
-<para><envar>relaxed</envar> which is the default behaviour simply
-ignores case. That's the default for native Windows applications as well.</para>
-</listitem>
-<listitem>
-<para><envar>adjust</envar> behaves mostly invisible. The POSIX input
-path is internally adjusted in case, so that the resulting DOS path uses the
-correct case throughout. You can see the result when changing the directory
-using a wrong case and calling <command>/bin/pwd</command> afterwards.</para>
-</listitem>
-<listitem>
-<para><envar>strict</envar> results in a error message if the case
-isn't correct. Trying to open a file <filename>Foo</filename> while a file
-<filename>fOo</filename> exists results in a "no such file or directory"
-error. Trying to create a file <filename>BAR</filename> while a file
-<filename>Bar</filename> exists results in a "Filename exists with different
-case" error.</para>
-</listitem>
-</itemizedlist>
-</listitem>
 
 <listitem>
-<para><envar>codepage:[ansi|oem]</envar> - Windows console 
-applications can use different character sets (codepages) for drawing
-characters.  The first setting, called "ansi", is the default.
-This character set contains various forms of latin characters used
-in European languages.  The name originates from the ANSI Latin1
-(ISO 8859-1) standard, used in Windows 1.0, though the character
-sets have since diverged from any standard.  The second setting
-selects an older, DOS-based character set, containing various line
-drawing and special characters.  It is called "oem" since it was
-originally encoded in the firmware of IBM PCs by original
-equipment manufacturers (OEMs).  If you find that some characters 
-(especially non-US or 'graphical' ones) do not display correctly in 
-Cygwin, you can use this option to select an appropriate codepage.
-</para>
+<para><envar>codepage:[ansi|oem|utf8]</envar> - This option controls
+which single- or multibyte character set is used for file and console
+operations.  Windows is using UTF-16 characters internally and this
+option specifies how 8-byte character sets are converted to UTF-16 and
+vice versa.  The default setting is <envar>ansi</envar> which means,
+conversion is based on the current ANSI codepage, typically 1252 in
+many Western language versions of Windows.  The name originates from the
+ANSI Latin1 (ISO 8859-1) standard, used in Windows 1.0, though the
+character sets have since diverged from any standard.  The second
+setting selects an older, DOS-based character set, containing various
+line drawing and special characters.  It is called <envar>oem</envar>
+since it was originally encoded in the firmware of IBM PCs by original
+equipment manufacturers (OEMs).</para>
+<para>If you find that some characters (especially non-US or 'graphical' ones)
+do not display correctly in Cygwin, you can use this option to select an
+appropriate codepage.  Finally, <envar>utf8</envar> treats all file names
+and console characters as UTF-8 chars.  Please note that, for correct
+operation, you have to set the environment variable LC_CTYPE to "C-UTF-8"
+for the time being.  The reason is that newlib's multibyte conversion
+functions require this setting.</para>
 </listitem>
 
 <listitem>
@@ -77,16 +57,18 @@ path name.  Defaults to set.</para>
 
 <listitem>
 <para><envar>(no)envcache</envar> - If set, environment variable
-conversions (between Win32 and POSIX) are cached.  Note that this is may
+conversions (between Win32 and POSIX) are cached.  Note that this may
 cause problems if the mount table changes, as the cache is not invalidated
 and may contain values that depend on the previous mount table
 contents. Defaults to set.</para>
 </listitem>
+
 <listitem>
 <para><envar>(no)export</envar> - If set, the final values of these
 settings are re-exported to the environment as <envar>CYGWIN</envar> again.
 Defaults to off.</para>
 </listitem>
+
 <listitem>
 <para>
 <envar>error_start:Win32filepath</envar> - if set, runs 
@@ -98,6 +80,7 @@ usually set to the path to <command>gdb</command> or
 There is no default set.
 </para>
 </listitem>
+
 <listitem>
 <para><envar>forkchunk:32768</envar> - causes the <function>fork()</function>
 to copy memory some number of bytes at a time, in the above example 
@@ -106,12 +89,14 @@ possible, which is preferable in most cases but may slow some older systems
 down.
 </para>
 </listitem>
+
 <listitem>
 <para><envar>proc_retry:n</envar> - causes the <function>fork()</function> and <function>exec*()</function>
 to retry n times when a child process fails due to certain windows-specific errors.  These errors usually
 occur when processes are being started while a user is logging off.
 </para>
 </listitem>
+
 <listitem>
 <para><envar>(no)glob[:ignorecase]</envar> - if set, command line arguments
 containing UNIX-style file wildcard characters (brackets, question mark,
@@ -122,40 +107,13 @@ Default is set.</para>
 <para>This option also accepts an optional <literal>[no]ignorecase</literal> modifer.
 If supplied, wildcard matching is case insensitive.  The default is <literal>noignorecase</literal></para>
 </listitem>
-<listitem>
-<para><envar>(no)ntea</envar> - if set, use NT Extended Attributes to
-store UNIX-like inode information.
-This option only operates under Windows NT. Defaults to not set.
-Only FAT and NTFS support Extended Attributes, not FAT32, so it's
-of no use there.  Furthermore, on NTFS partitions ntsec, which provides
-real permissions, overrides ntea, which only provides faked permissions.
-So setting ntea only makes sense if you either have FAT partitions,
-or if you switch off ntsec explicitely. </para>
-<warning><title>Warning!</title> <para>This may create additional
-<emphasis>large</emphasis> files on FAT partitions.</para></warning>
-</listitem>
-<listitem>
-<para><envar>(no)ntsec</envar> - if set, use the NT security
-model to set UNIX-like permissions on files and processes. The
-file permissions can only be set on NTFS partitions. FAT/FAT32 don't
-support the NT file security. Defaults to set. For more information, read
-the documentation in <xref linkend="ntsec"></xref>.</para>
-</listitem>
-<listitem>
-<para><envar>(no)smbntsec</envar> - if set, use <envar>ntsec</envar> on remote
-drives as well (default is "nosmbntesc"). When setting "smbntsec" there's
-a chance that you get problems with Samba shares so you should use this
-option with care.  One reason for a non working <envar>ntsec</envar> on
-remote drives could be insufficient permissions of the users. The requires
-user rights are somewhat dangerous (SeRestorePrivilege), so it's not always
-an option to grant that rights to users.  However, this shouldn't be a
-problem in NT domain environments.</para>
-</listitem>
+
 <listitem>
 <para><envar>(no)reset_com</envar> - if set, serial ports are reset
 to 9600-8-N-1 with no flow control when used. This is done at open
 time and when handles are inherited.  Defaults to set.</para>
 </listitem>
+
 <listitem>
 <para><envar>(no)server</envar> - if set, allows client applications
 to use the Cygserver facilities.  This option must be enabled explicitely
@@ -166,18 +124,18 @@ successfully.  These function calls will return with
 <literal>ENOSYS</literal>, "Bad system call".
 </para>
 </listitem>
+
 <listitem>
 <para><envar>(no)strip_title</envar> - if set, strips the directory
 part off the window title, if any.  Default is not set.</para>
 </listitem>
+
 <listitem>
 <para><envar>(no)title</envar> - if set, the title bar
 reflects the name of the program currently running.  Default is not
-set.  Note that under Win9x the title bar is always enabled and it is
-stripped by default, but this is because of the way Win9x works.  In
-order not to strip, specify <literal>title</literal> or <literal>title
-nostrip_title</literal>.</para>
+set.</para>
 </listitem>
+
 <listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
 (i.e., termios) for UNIX-like ttys in the Windows console. 
@@ -190,11 +148,65 @@ and it cannot be changed in the shell.  It should not be set when using
 other terminals (i.e., rxvt or xterm). 
 </para>
 </listitem>
+
 <listitem>
 <para><envar>(no)winsymlinks</envar> - if set, Cygwin creates
 symlinks as Windows shortcuts with a special header and the R/O attribute
 set. If not set, Cygwin creates symlinks as plain files with a magic number,
-a path and the system attribute set. Defaults to set.</para>
+a path and the system attribute set. Defaults to not set since plain
+file symlinks are faster to write and faster to read.</para>
 </listitem>
 </itemizedlist>
+
+</sect2>
+
+<sect2 id="cygwinenv-removed-options">
+<title>Removed options</title>
+
+<para>
+Some CYGWIN options have been removed in Cygwin 1.7 for one reason or another.
+These removed options are listed below.</para>
+
+<itemizedlist mark="bullet">
+<listitem>
+<para><envar>check_case</envar> - This option has been removed in favor of
+real case sensitivity and the per-mount option "posix=[0|1]".  For more
+information, read the documentation in <xref linkend="mount-table"></xref> and
+<xref linkend="pathnames-casesensitive"></xref>.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)ntea</envar> -  This option has been removed since it
+only fakes security which is considered dangerous and useless.  It also
+created an uncontrollably large file on FAT and was entirely useless
+on FAT32.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)ntsec</envar> - This option has been removed in favor of
+the per-mount option "acl"/"noacl".  For more information, read the
+documentation in <xref linkend="mount-table"></xref>.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)smbntsec</envar> - This option has been removed in favor of
+the per-mount option "acl"/"noacl".  For more information, read the
+documentation in <xref linkend="mount-table"></xref>.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)transparent_exe</envar> - This option has been removed
+because the behaviour it switched on is now the standard behaviour in
+Cygwin.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)traverse</envar> - This option has been removed because
+traverse checking is not quite correctly implemented by Microsoft and
+it's behaviour is getting worse with each new OS version.</para>
+</listitem>
+</itemizedlist>
+
+</sect2>
+
 </sect1>
