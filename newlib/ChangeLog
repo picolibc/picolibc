@@ -1,3 +1,8 @@
+2008-07-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/assert.h (__ASSERT_FUNC): Define to __FUNCTION__ when
+	__STDC_VERSION__ < 199901L and __GNUC__ >= 2.
+
 2008-07-17  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/strcpy.h: Pad null bytes if necessary.
