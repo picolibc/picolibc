@@ -1,3 +1,7 @@
+2008-07-17  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/strcpy.h: Pad null bytes if necessary.
+
 2008-07-08  Kenji Tanaka  <tanaka.ken2@jp.panasonic.com>
 
 	* libc/machine/mn10300/memset.S: Fix bug where return value is

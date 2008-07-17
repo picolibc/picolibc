@@ -176,5 +176,9 @@ static inline void * _strncpy(char * __restrict__ dest, const char *
      */
     dest[maxlen - spu_extract(curlen, 0)] = '\0';
   }
+
+  /* Pad null bytes if the length of the "src" is less than "n" (strncpy).  */
+  if (checklen && !lastzero && (maxlen != spu_extract(curlen,0)))
+    memset(dest + spu_extract(curlen, 0), 0, maxlen - spu_extract(curlen, 0));
   return (dest);
 }
