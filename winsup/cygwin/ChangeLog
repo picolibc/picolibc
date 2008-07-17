@@ -1,3 +1,7 @@
+2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (mount_info::from_fstab_line): Default to binary mount.
+
 2008-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (allow_winsymlinks): Revert default to create system bit
