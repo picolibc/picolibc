@@ -1,5 +1,13 @@
 2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (do_mount): Remove MOUNT_ENC code.
+	(oopts): Remove "managed" option.
+	(mount_commands): Drop "managed" handling.
+	* path.cc (oopts): Remove "managed" option.
+	(getmntent): Remove MOUNT_ENC code.
+
+2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* utils.sgml: Add id's to all examples.
 
 2008-07-09  Corinna Vinschen  <corinna@vinschen.de>

@@ -103,25 +103,6 @@ do_mount (const char *dev, const char *where, int flags)
 	}
     }
 
-  if (!force && flags & MOUNT_ENC)
-    {
-      DIR *dd = opendir (dev);
-      if (dd)
-	{
-	  struct dirent *d;
-	  while ((d = readdir (dd)))
-	    {
-	      if (d->d_name[0] != '.')
-		/* fall through */;
-	      else if (d->d_name[1] == '\0'
-		       || (d->d_name[1] == '.' && d->d_name[2] == '\0'))
-		continue;
-	      fprintf (stderr, "%s: error: don't use \"-o managed\" on non-empty directories\n", progname);
-	      exit (1);
-	    }
-	}
-    }
-
   if (mount (dev, where, flags))
     error (where);
 
@@ -192,8 +173,7 @@ struct opt
   {"exec", MOUNT_EXEC, 0},
   {"notexec", MOUNT_NOTEXEC, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
-  {"nosuid", 0, 0},
-  {"managed", MOUNT_ENC, 0}
+  {"nosuid", 0, 0}
 };
 
 static void
@@ -417,8 +397,6 @@ mount_commands (void)
 	  strcat (opts, " -E");
 	if (strstr (p->mnt_opts, ",cygexec"))
 	  strcat (opts, " -X");
-	if (strstr (p->mnt_opts, ",managed"))
-	  strcat (opts, " -o managed");
 	while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
 	  *c = '/';
 	printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
