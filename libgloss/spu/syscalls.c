@@ -29,6 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
+#include <spu_intrinsics.h>
 #include <errno.h>
 #include "jsre.h"
 
@@ -36,6 +37,7 @@ int
 __send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
 {
 
+        int newerrno;
 	unsigned int	combined = ( ( opcode<<24 )&0xff000000 ) | ( ( unsigned int )data & 0x00ffffff );
 
         __vector unsigned int stopfunc = {
@@ -48,7 +50,13 @@ __send_to_ppe (unsigned int signalcode, unsigned int opcode, void *data)
         void (*f) (void) = (void *) &stopfunc;
         asm ("sync");
         f ();
-        errno = ((unsigned int *) data)[3];
+        newerrno = ((unsigned int *) data)[3];
+        /*
+         * Note: branchless code to conditionally set errno using
+         * spu_cmpeq and spu_sel used more space than the following.
+         */
+        if (newerrno)
+                errno = newerrno;
 
         /*
          * Return the rc code stored in slot 0.

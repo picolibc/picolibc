@@ -1,3 +1,7 @@
+2008-07-17  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/syscalls.c: Check and set the errno value.
+
 2008-06-17  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/Makefile.in: Add new file.
