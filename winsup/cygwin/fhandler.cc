@@ -456,7 +456,7 @@ int
 fhandler_base::open (int flags, mode_t mode)
 {
   int res = 0;
-  HANDLE x;
+  HANDLE fh;
   ULONG file_attributes = 0;
   ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : FILE_SHARE_VALID_FLAGS);
   ULONG create_disposition;
@@ -572,19 +572,9 @@ fhandler_base::open (int flags, mode_t mode)
 	  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
 
-	  /* If the file should actually be created and ntsec is on,
-	     set files attributes. */
-	  /* TODO: Don't remove the call to has_acls() unless there's a
-	     solution for the security descriptor problem on remote samba
-	     drives.  The local user SID is used in set_security_attribute,
-	     but the actual owner on the Samba share is the SID of the Unix
-	     account.  There's no transparent mapping between these accounts.
-	     And Samba has a strange behaviour when creating a file.  Apparently
-	     it *first* creates the file, *then* it looks if the security
-	     descriptor matches.  The result is that the file gets created, but
-	     then NtCreateFile doesn't return a handle to the file and fails
-	     with STATUS_ACCESS_DENIED.  Go figure! */
-	  if (has_acls ())
+	  /* If the file should actually be created and has ACLs,
+	     set files attributes, except on Samba.  See below. */
+	  if (has_acls () && !pc.fs_is_samba ())
 	    {
 	      set_security_attribute (mode, &sa, sd);
 	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
@@ -614,7 +604,7 @@ fhandler_base::open (int flags, mode_t mode)
 	}
     }
 
-  status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,
+  status = NtCreateFile (&fh, access, &attr, &io, NULL, file_attributes, shared,
 			 create_disposition, create_options, p, plen);
   if (!NT_SUCCESS (status))
     {
@@ -629,7 +619,24 @@ fhandler_base::open (int flags, mode_t mode)
 	goto done;
    }
 
-  set_io_handle (x);
+  /* Samba weirdness:
+     The local user SID is used in set_security_attribute, but the
+     actual owner on the Samba share is the SID of the Unix account.
+     There's no transparent mapping between these accounts.
+
+     FIXME: Really?
+
+     And Samba has a strange behaviour when creating a file.  Apparently
+     it *first* creates the file, *then* it looks if the security
+     descriptor matches.  The result is that the file gets created, but
+     then NtCreateFile doesn't return a handle to the file and fails
+     with STATUS_ACCESS_DENIED.  That's why we first create the file
+     with default SD and afterwards set the permissions while ignoring
+     the owner and group. */
+  if ((flags & O_CREAT) && has_acls () && pc.fs_is_samba ())
+    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, mode);
+
+  set_io_handle (fh);
   set_flags (flags, pc.binmode ());
 
   res = 1;
@@ -637,7 +644,7 @@ fhandler_base::open (int flags, mode_t mode)
 done:
   debug_printf ("%x = NtCreateFile "
 		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
-		status, x, access, pc.get_nt_native_path (), file_attributes,
+		status, fh, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, create_options);
 
   syscall_printf ("%d = fhandler_base::open (%S, %p)",

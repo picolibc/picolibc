@@ -1,5 +1,11 @@
 2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Rename x to fh.  On Samba, always
+	create file with NULL security descriptor and set the permissions
+	afterwards.  Explain why.
+
+2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (known): Remove "binmode" option.
 	* fhandler.cc (binmode): Remove.
 	(fhandler_base::set_flags): Accommodate binmode removal.
