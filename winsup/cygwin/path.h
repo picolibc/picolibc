@@ -193,7 +193,6 @@ class path_conv
     return dont_know_if_executable;
   }
 
-  void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}

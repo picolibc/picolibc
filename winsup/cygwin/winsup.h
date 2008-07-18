@@ -337,7 +337,6 @@ int cygwin_select (int , fd_set *, fd_set *, fd_set *,
 		   struct timeval *to);
 int cygwin_gethostname (char *__name, size_t __len);
 
-extern DWORD binmode;
 extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern void (*__CTOR_LIST__) (void);
 extern void (*__DTOR_LIST__) (void);

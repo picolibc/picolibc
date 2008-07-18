@@ -495,11 +495,8 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
 extern "C" int
 pipe (int filedes[2])
 {
-  extern DWORD binmode;
   fhandler_pipe *fhs[2];
-  int res = fhandler_pipe::create (fhs, DEFAULT_PIPEBUFSIZE,
-				   (!binmode || binmode == O_BINARY)
-				   ? O_BINARY : O_TEXT);
+  int res = fhandler_pipe::create (fhs, DEFAULT_PIPEBUFSIZE, O_BINARY);
   if (res == 0)
     {
       cygheap_fdnew fdin;

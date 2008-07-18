@@ -34,8 +34,6 @@ static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
 
-DWORD binmode;
-
 inline fhandler_base&
 fhandler_base::operator =(fhandler_base& x)
 {
@@ -197,8 +195,7 @@ fhandler_base::set_flags (int flags, int supplied_bin)
   else if (supplied_bin)
     bin = supplied_bin;
   else
-    bin = wbinary () || rbinary () || (binmode != O_TEXT)
-	  ? O_BINARY : O_TEXT;
+    bin = wbinary () || rbinary () ? O_BINARY : O_TEXT;
 
   openflags = flags | bin;
 

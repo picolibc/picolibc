@@ -1,3 +1,12 @@
+2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (known): Remove "binmode" option.
+	* fhandler.cc (binmode): Remove.
+	(fhandler_base::set_flags): Accommodate binmode removal.
+	* path.h (path_conv::set_binary): Remove.
+	* pipe.cc (pipe): Create pipes always as binary pipes.
+	* winsup.h (binmode): Remove declaration.
+
 2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::from_fstab_line): Default to binary mount.

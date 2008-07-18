@@ -566,7 +566,6 @@ static struct parse_thing
       } values[2];
   } known[] NO_COPY =
 {
-  {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
   {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
