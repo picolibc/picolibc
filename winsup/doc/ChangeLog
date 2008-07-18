@@ -1,3 +1,7 @@
+2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Move binmode option to list of removed options.
+
 2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Revamp documentation for Cygwin 1.7, part 1.

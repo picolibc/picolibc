@@ -10,21 +10,6 @@ listed below, separated by blank characters. Many options can be turned off
 by prefixing with <literal>no</literal>.</para>
 
 <itemizedlist mark="bullet">
-<listitem>
-<para><envar>(no)binmode</envar> - if set, non-disk 
-(e.g. pipe and COM ports) file opens default to binary mode 
-(no CRLF translation) instead of text mode.  Defaults to set (binary
-mode).  By default, devices are opened in binary mode, so this option
-has little effect on normal cygwin operations.  Sockets are always
-in binary mode.
-
-It does affect two things, however.  For non-NTFS filesystems, this
-option will control the line endings for standard output/input/error
-for redirection from the Windows command shell.  It will also affect
-the default translation mode of a pipe, although most shells set the
-pipe to binary by default.
-</para>
-</listitem>
 
 <listitem>
 <para><envar>codepage:[ansi|oem|utf8]</envar> - This option controls
@@ -156,6 +141,7 @@ set. If not set, Cygwin creates symlinks as plain files with a magic number,
 a path and the system attribute set. Defaults to not set since plain
 file symlinks are faster to write and faster to read.</para>
 </listitem>
+
 </itemizedlist>
 
 </sect2>
@@ -168,6 +154,14 @@ Some CYGWIN options have been removed in Cygwin 1.7 for one reason or another.
 These removed options are listed below.</para>
 
 <itemizedlist mark="bullet">
+
+<listitem>
+<para><envar>(no)binmode</envar> - This option has been removed because
+all file opens default to binary mode, unless the open mode has been specified
+explicitely in the open(2) call.
+</para>
+</listitem>
+
 <listitem>
 <para><envar>check_case</envar> - This option has been removed in favor of
 real case sensitivity and the per-mount option "posix=[0|1]".  For more
@@ -205,6 +199,7 @@ Cygwin.</para>
 traverse checking is not quite correctly implemented by Microsoft and
 it's behaviour is getting worse with each new OS version.</para>
 </listitem>
+
 </itemizedlist>
 
 </sect2>
