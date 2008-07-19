@@ -14,6 +14,8 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "cygthread.h"
 #include <winnetwk.h>
 
@@ -37,14 +39,20 @@ struct netdriveinf
     HANDLE sem;
   };
 
+struct net_hdls
+  {
+    HANDLE net;
+    HANDLE dom;
+  };
+
 static DWORD WINAPI
 thread_netdrive (void *arg)
 {
   netdriveinf *ndi = (netdriveinf *) arg;
-  LPTSTR dummy = NULL;
-  LPNETRESOURCE nro, nro2;
-  DWORD size;
-  HANDLE enumhdl;
+  char provider[256], *dummy = NULL;
+  LPNETRESOURCE nro;
+  DWORD cnt, size;
+  struct net_hdls *nh;
 
   ReleaseSemaphore (ndi->sem, 1, NULL);
   switch (ndi->what)
@@ -54,29 +62,74 @@ thread_netdrive (void *arg)
       ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
 					     nro, &size, &dummy);
       break;
-    case GET_RESOURCE_OPENENUM:
     case GET_RESOURCE_OPENENUMTOP:
       nro = (LPNETRESOURCE) alloca (size = 4096);
+      nh = (struct net_hdls *) ndi->out;
+      ndi->ret = WNetGetProviderName (WNNC_NET_LANMAN, provider,
+				      (size = 256, &size));
+      if (ndi->ret != NO_ERROR)
+	break;
+      memset (nro, 0, sizeof *nro);
+      nro->dwScope = RESOURCE_GLOBALNET;
+      nro->dwType = RESOURCETYPE_ANY;
+      nro->dwDisplayType = RESOURCEDISPLAYTYPE_GROUP;
+      nro->dwUsage = RESOURCEUSAGE_RESERVED | RESOURCEUSAGE_CONTAINER;
+      nro->lpRemoteName = provider;
+      nro->lpProvider = provider;
+      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+			       RESOURCEUSAGE_ALL, nro, &nh->net);
+      if (ndi->ret != NO_ERROR)
+	break;
+      while ((ndi->ret = WNetEnumResource (nh->net, (cnt = 1, &cnt), nro,
+				(size = 4096, &size))) == NO_ERROR)
+	{
+	  ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+				   RESOURCEUSAGE_ALL, nro, &nh->dom);
+	  if (ndi->ret == NO_ERROR)
+	    break;
+	}
+      break;
+    case GET_RESOURCE_OPENENUM:
+      nro = (LPNETRESOURCE) alloca (size = 4096);
+      nh = (struct net_hdls *) ndi->out;
+      ndi->ret = WNetGetProviderName (WNNC_NET_LANMAN, provider,
+				      (size = 256, &size));
+      if (ndi->ret != NO_ERROR)
+	break;
+      ((LPNETRESOURCE) ndi->in)->lpProvider = provider;
       ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
 					     nro, &size, &dummy);
       if (ndi->ret != NO_ERROR)
 	break;
-      if (ndi->what == GET_RESOURCE_OPENENUMTOP)
+      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+			       RESOURCEUSAGE_ALL, nro, &nh->dom);
+      break;
+    case GET_RESOURCE_ENUM:
+      nh = (struct net_hdls *) ndi->in;
+      if (!nh->dom)
+        {
+	  ndi->ret = ERROR_NO_MORE_ITEMS;
+	  break;
+	}
+      while ((ndi->ret = WNetEnumResource (nh->dom, (cnt = 1, &cnt),
+					   (LPNETRESOURCE) ndi->out,
+					   &ndi->outsize)) != NO_ERROR
+	     && nh->net)
 	{
-	  nro2 = nro;
+	  WNetCloseEnum (nh->dom);
+	  nh->dom = NULL;
 	  nro = (LPNETRESOURCE) alloca (size = 4096);
-	  ndi->ret = WNetGetResourceParent (nro2, nro, &size);
+	  while ((ndi->ret = WNetEnumResource (nh->net, (cnt = 1, &cnt), nro,
+					     (size = 4096, &size))) == NO_ERROR)
+	    {
+	      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+				       RESOURCEUSAGE_ALL, nro, &nh->dom);
+	      if (ndi->ret == NO_ERROR)
+		break;
+	    }
 	  if (ndi->ret != NO_ERROR)
 	    break;
 	}
-      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK, 0, nro,
-			       &enumhdl);
-      if (ndi->ret == NO_ERROR)
-	*(HANDLE *) ndi->out = enumhdl;
-      break;
-    case GET_RESOURCE_ENUM:
-      ndi->ret = WNetEnumResource ((HANDLE) ndi->in, (size = 1, &size),
-				   (LPNETRESOURCE) ndi->out, &ndi->outsize);
       break;
     }
   ReleaseSemaphore (ndi->sem, 1, NULL);
@@ -145,7 +198,6 @@ fhandler_netdrive::fstat (struct __stat64 *buf)
 int
 fhandler_netdrive::readdir (DIR *dir, dirent *de)
 {
-  DWORD size;
   NETRESOURCE *nro;
   DWORD ret;
   int res;
@@ -153,21 +205,11 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
   if (!dir->__d_position)
     {
       size_t len = strlen (get_name ());
-      char *namebuf;
+      char *namebuf = NULL;
       NETRESOURCE nr = { 0 };
+      struct net_hdls *nh;
 
-      if (len == 2)	/* // */
-	{
-	  namebuf = (char *) alloca (MAX_COMPUTERNAME_LENGTH + 3);
-	  strcpy (namebuf, "\\\\");
-	  size = MAX_COMPUTERNAME_LENGTH + 1;
-	  if (!GetComputerName (namebuf + 2, &size))
-	    {
-	      res = geterrno_from_win_error ();
-	      goto out;
-	    }
-	}
-      else
+      if (len != 2)	/* // */
 	{
 	  const char *from;
 	  char *to;
@@ -180,15 +222,17 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       nr.lpRemoteName = namebuf;
       nr.dwType = RESOURCETYPE_DISK;
       nro = (NETRESOURCE *) alloca (4096);
+      nh = (struct net_hdls *) ccalloc (HEAP_FHANDLER, 1, sizeof *nh);
       ret = create_thread_and_wait (len == 2 ? GET_RESOURCE_OPENENUMTOP
 					     : GET_RESOURCE_OPENENUM,
-				    &nr, &dir->__handle, 0, "WNetOpenEnum");
+				    &nr, nh, 0, "WNetOpenEnum");
       if (ret != NO_ERROR)
 	{
 	  dir->__handle = INVALID_HANDLE_VALUE;
 	  res = geterrno_from_win_error (ret);
 	  goto out;
 	}
+      dir->__handle = (HANDLE) nh;
     }
   ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle,
 				nro = (LPNETRESOURCE) alloca (16384),
@@ -201,7 +245,10 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       char *bs = strrchr (nro->lpRemoteName, '\\');
       strcpy (de->d_name, bs ? bs + 1 : nro->lpRemoteName);
       if (strlen (get_name ()) == 2)
-	de->d_ino = hash_path_name (get_ino (), de->d_name);
+	{
+	  strlwr (de->d_name);
+	  de->d_ino = hash_path_name (get_ino (), de->d_name);
+	}
       else
 	{
 	  de->d_ino = readdir_get_ino (nro->lpRemoteName, false);
@@ -234,7 +281,14 @@ void
 fhandler_netdrive::rewinddir (DIR *dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
-    WNetCloseEnum (dir->__handle);
+    {
+      struct net_hdls *nh = (struct net_hdls *) dir->__handle;
+      if (nh->dom)
+	WNetCloseEnum (nh->dom);
+      if (nh->net)
+	WNetCloseEnum (nh->net);
+      cfree (nh);
+    }
   dir->__handle = INVALID_HANDLE_VALUE;
   return fhandler_virtual::rewinddir (dir);
 }

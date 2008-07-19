@@ -1,3 +1,16 @@
+2008-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (WNetGetProviderNameA): Define.
+	(WNetGetResourceParentA): Remove.
+	* fhandler_netdrive.cc (struct net_hdls): New structure to keep
+	WNet handles.  Stored in dir->__handle throughout.
+	(thread_netdrive): Rewrite to enumerate all servers in all accessible
+	domains and workgroups.
+	(fhandler_netdrive::readdir): Simplify toplevel code.  Lowercase all
+	server names in toplevel.
+	(fhandler_netdrive::rewinddir): Close all WNet handles and free
+	net_hdls structure.
+
 2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Rename x to fh.  On Samba, always
