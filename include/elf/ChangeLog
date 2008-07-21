@@ -1,3 +1,7 @@
+2008-07-21  Luis Machado  <luisgpm@br.ibm.com>
+
+	* common.h: Define NT_PPC_VSX.
+
 2008-07-10  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h (ELF_ST_IS_MIPS16, ELF_ST_SET_MIPS16): New macros.

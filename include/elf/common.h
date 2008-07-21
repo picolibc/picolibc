@@ -443,6 +443,8 @@
 					/*   note name must be "LINUX".  */
 #define NT_PPC_VMX	0x100		/* PowerPC Altivec/VMX registers */
 					/*   note name must be "LINUX".  */
+#define NT_PPC_VSX	0x102		/* PowerPC VSX registers */
+					/*   note name must be "LINUX".  */
 
 /* Note segments for core files on dir-style procfs systems.  */
 
