@@ -39,6 +39,6 @@ No supporting OS subroutines are required.
 int
 _DEFUN(isspace,(c),int c)
 {
-	return((_ctype_ + 1)[c] & _S);
+	return(__ctype_ptr__[c+1] & _S);
 }
 

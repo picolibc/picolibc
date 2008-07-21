@@ -38,6 +38,6 @@ No supporting OS subroutines are required.
 int
 _DEFUN(islower,(c),int c)
 {
-	return((_ctype_ + 1)[c] & _L);
+	return(__ctype_ptr__[c+1] & _L);
 }
 

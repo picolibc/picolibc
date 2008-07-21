@@ -39,6 +39,6 @@ No supporting OS subroutines are required.
 int
 _DEFUN(isalpha,(c),int c)
 {
-	return((_ctype_ + 1)[c] & (_U|_L));
+	return(__ctype_ptr__[c+1] & (_U|_L));
 }
 

@@ -42,7 +42,7 @@ No supporting OS subroutines are required.
 int
 _DEFUN(iscntrl,(c),int c)
 {
-	return((_ctype_ + 1)[c] & _C);
+	return(__ctype_ptr__[c+1] & _C);
 }
 
 

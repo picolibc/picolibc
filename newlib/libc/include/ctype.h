@@ -36,21 +36,20 @@ int _EXFUN(_toupper, (int __c));
 #define _X	0100
 #define	_B	0200
 
-extern	__IMPORT _CONST char	*__ctype_ptr;
-extern	__IMPORT _CONST char	_ctype_[];  /* For backward compatibility.  */
+extern	__IMPORT _CONST char	*__ctype_ptr__;
 
 #ifndef __cplusplus
-#define	isalpha(c)	((__ctype_ptr)[(unsigned)(c)]&(_U|_L))
-#define	isupper(c)	((__ctype_ptr)[(unsigned)(c)]&_U)
-#define	islower(c)	((__ctype_ptr)[(unsigned)(c)]&_L)
-#define	isdigit(c)	((__ctype_ptr)[(unsigned)(c)]&_N)
-#define	isxdigit(c)	((__ctype_ptr)[(unsigned)(c)]&(_X|_N))
-#define	isspace(c)	((__ctype_ptr)[(unsigned)(c)]&_S)
-#define ispunct(c)	((__ctype_ptr)[(unsigned)(c)]&_P)
-#define isalnum(c)	((__ctype_ptr)[(unsigned)(c)]&(_U|_L|_N))
-#define isprint(c)	((__ctype_ptr)[(unsigned)(c)]&(_P|_U|_L|_N|_B))
-#define	isgraph(c)	((__ctype_ptr)[(unsigned)(c)]&(_P|_U|_L|_N))
-#define iscntrl(c)	((__ctype_ptr)[(unsigned)(c)]&_C)
+#define	isalpha(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))
+#define	isupper(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_U)
+#define	islower(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_L)
+#define	isdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_N)
+#define	isxdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_X|_N))
+#define	isspace(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_S)
+#define ispunct(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_P)
+#define isalnum(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L|_N))
+#define isprint(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N|_B))
+#define	isgraph(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N))
+#define iscntrl(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_C)
 
 
 /* Non-gcc versions will get the library versions, and will be

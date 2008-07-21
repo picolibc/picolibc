@@ -1,3 +1,21 @@
+2008-07-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/ctype/ctype_.c: Add new pointer __ctype_ptr__ which is one
+	less than the old __ctype_ptr.
+	* libc/ctype/isalnum.c: Use __ctype_ptr__.
+	* libc/ctype/isalpha.c: Ditto.
+	* libc/ctype/iscntrl.c: Ditto.
+	* libc/ctype/isdigit.c: Ditto.
+	* libc/ctype/islower.c: Ditto.
+	* libc/ctype/isprint.c: Ditto.
+	* libc/ctype/ispunct.c: Ditto.
+	* libc/ctype/isspace.c: Ditto.
+	* libc/ctype/isupper.c: Ditto.
+	* libc/ctype/isxdigit.c: Ditto.
+	* libc/include/ctype.h: Change ctype macros to use new __ctype_ptr__
+	and add declaration of __ctype_ptr__.  Remove older ctype table pointers
+	from here even though they can still work.
+
 2008-07-18  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/strcpy.h: Fix error in previous patch.

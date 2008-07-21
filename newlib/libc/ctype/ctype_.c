@@ -86,8 +86,10 @@ static _CONST char _ctype_b[128 + 256] = {
 
 #  if defined(__CYGWIN__)
 _CONST char __declspec(dllexport) *__ctype_ptr = _ctype_b + 128;
+_CONST char __declspec(dllexport) *__ctype_ptr__ = _ctype_b + 127;
 #  else
 _CONST char *__ctype_ptr = _ctype_b + 128;
+_CONST char *__ctype_ptr__ = _ctype_b + 127;
 #  endif
 
 #  if defined(_HAVE_ARRAY_ALIASING)
@@ -124,4 +126,5 @@ _CONST char _ctype_[1 + 256] = {
 };
 
 _CONST char *__ctype_ptr = _ctype_ + 1;
+_CONST char *__ctype_ptr__ = _ctype_;
 #endif
