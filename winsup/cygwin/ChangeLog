@@ -1,3 +1,14 @@
+2008-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygcheck.exe): Link against ntdll.
+	* bloda.cc: link against ntdll functions statically.
+	* cygpath.cc (get_user_folder): Drop 9x code.
+	(print_version): Fix copyright.
+	* mkgroup.c: Remove 9x code.
+	* mkpasswd.c: Ditto.
+	* path.cc (oopts): Add new mount options.
+	* ps.cc: Fix copyright.
+
 2008-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (WNetGetProviderNameA): Define.
