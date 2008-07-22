@@ -298,7 +298,11 @@ struct opt
   {"exec", MOUNT_EXEC, 0},
   {"notexec", MOUNT_NOTEXEC, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
-  {"nosuid", 0, 0}
+  {"nosuid", 0, 0},
+  {"acl", MOUNT_NOACL, 1},
+  {"noacl", MOUNT_NOACL, 0},
+  {"posix=1", MOUNT_NOPOSIX, 1},
+  {"posix=0", MOUNT_NOPOSIX, 0}
 };
 
 static bool
@@ -844,6 +848,10 @@ getmntent (FILE *)
     strcat (mnt.mnt_opts, (char *) ",noexec");
   if ((m->flags & MOUNT_CYGDRIVE))	/* cygdrive */
     strcat (mnt.mnt_opts, (char *) ",cygdrive");
+  if ((m->flags & MOUNT_NOACL))
+    strcat (mnt.mnt_opts, (char *) ",noacl");
+  if ((m->flags & MOUNT_NOPOSIX))
+    strcat (mnt.mnt_opts, (char *) ",posix=0");
   mnt.mnt_freq = 1;
   mnt.mnt_passno = 1;
   m++;

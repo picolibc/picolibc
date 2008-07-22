@@ -1,6 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -529,8 +529,7 @@ get_special_folder (char* path, int id)
 static void
 get_user_folder (char* path, int id, int allid)
 {
-  if (!get_special_folder (path, allusers_flag ? allid : id) && allusers_flag)
-    get_special_folder (path, id); // Fix for Win9x without any "All Users"
+  get_special_folder (path, allusers_flag ? allid : id);
 }
 
 static void
@@ -740,7 +739,7 @@ print_version ()
 cygpath (cygwin) %.*s\n\
 Path Conversion Utility\n\
 Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, \n\
-          2007 Red Hat, Inc.\n\
+          2007, 2008 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }

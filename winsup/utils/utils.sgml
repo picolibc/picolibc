@@ -505,69 +505,75 @@ SIGUSR2     31    user defined signal 2
 <sect2 id="mkgroup"><title>mkgroup</title>
 
 <screen>
-Usage: mkgroup [OPTION]... [domain]...
-Prints /etc/group file to stdout
+Usage: mkgroup [OPTION]...
+Print /etc/group file to stdout
 
 Options:
-   -l,--local             print local group information
-   -c,--current           print current group, if a domain account
-   -d,--domain            print global group information (from current
-                          domain if no domains specified).
-   -o,--id-offset offset  change the default offset (10000) added to gids
-                          in domain accounts.
-   -s,--no-sids           don't print SIDs in pwd field
-                          (this affects ntsec)
-   -u,--users             print user list in gr_mem field
-   -g,--group groupname   only return information for the specified group\n");
-   -h,--help              print this message
+   -l,--local [machine]    print local groups (from local machine if no
+                           machine specified)
+   -L,--Local [machine]    ditto, but generate groupname with machine prefix
+   -d,--domain [domain]    print domain groups (from current domain if no
+                           domain specified)
+   -D,--Domain [domain]    ditto, but generate groupname with machine prefix
+   -c,--current            print current group
+   -C,--Current            ditto, but generate groupname with machine or
+                           domain prefix
+   -S,--separator char     for -L, -D, -C use character char as domain\group
+                           separator in groupname instead of the default '\'
+   -o,--id-offset offset   change the default offset (10000) added to gids
+                           in domain or foreign server accounts.
+   -g,--group groupname    only return information for the specified group
+                           one of -l, -L, -d, -D must be specified, too
+   -s,--no-sids            (ignored)
+   -u,--users              (ignored)
+   -h,--help               print this message
+   -v,--version            print version information and exit
 
-   -v,--version           print version information and exit
-
-One of `-l' or `-d' must be given on NT/W2K.
+Default is to print local groups on stand-alone machines, plus domain
+groups on domain controllers and domain member machines.
 </screen>
 
 <para>The <command>mkgroup</command> program can be used to help
-configure your Windows system to be more UNIX-like by creating an
-initial <filename>/etc/group</filename>.
-Its use is essential on the NT series (Windows NT, 2000, and XP) to
-include Windows security information.
-It can also be used on the Win9x series (Windows 95, 98, and Me) to
-create a file with the correct format.
-To initially set up your machine if you are a local user, you'd do
-something like this:</para>
-  
-<example id="utils-mkgroup-ex"><title>Setting up the groups file for local accounts</title>
-<screen>
-<prompt>$</prompt> <userinput>mkdir /etc</userinput>
-<prompt>$</prompt> <userinput>mkgroup -l &gt; /etc/group</userinput>
-</screen>
-</example>
+configure Cygwin by creating a <filename>/etc/group</filename>
+file.  Its use is essential to include Windows security information.</para>
 
+<para>The command is initially called by <command>setup.exe</command> to
+create a default <filename>/etc/group</filename>.  This should be
+sufficient in most circumstances.  However, especially when working
+in a multi-domain environment, you can use <command>mkgroup</command>
+manually to create a more complete <filename>/etc/group</filename> file for
+all domains.  Especially when you have the same group name used on
+multiple machines or in multiple domains, you can use the <literal>-D</literal>,
+<literal>-L</literal> and <literal>-C</literal> options to create unique
+domain\group style groupnames.</para>
+  
 <para>Note that this information is static.  If you change the group
 information in your system, you'll need to regenerate the group file
 for it to have the new information.</para>
 
-<para>The <literal>-d</literal> and <literal>-l</literal> options
+<para>The <literal>-d/-D</literal> and <literal>-l/-L</literal> options
 allow you to specify where the information comes from, the
-local machine or the domain (default or given), or both.
-With the  <literal>-d</literal> option the program contacts the Domain
+local SAM of a machine or from the domain, or both.
+With the <literal>-d/-D</literal> options the program contacts a Domain
 Controller, which my be unreachable or have restricted access.
-An entry for the current domain user can then be created by using the
-option <literal>-c</literal> together with <literal>-l</literal>,
-but <literal>-c</literal> has no effect when used with <literal>-d</literal>.
-The <literal>-o</literal> option allows for special cases
+For very simple needs, an entry for the current user's group can be
+created by using the option <literal>-c</literal> or <literal>-C</literal>.
+If you want to use one of the <literal>-D</literal>, <literal>-L</literal>
+or <literal>-C</literal> options, but you don't like the backslash as
+domain/group separator, you can specify another separator using the
+<literal>-S</literal> option, for instance</para>
+
+<example id="utils-mkgroup-ex"><title>Setting up group entry for current user with different domain/group separator</title>
+<screen>
+<prompt>$</prompt> <userinput>mkgroup -C -S+ &gt; /etc/group</userinput>
+<prompt>$</prompt> <userinput>cat /etc/group</userinput>
+DOMAIN+my_group:S-1-5-21-2913048732-1697188782-3448811101-1144:11144:
+</screen>
+</example>
+
+<para>The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the GIDs might match otherwise.
-The <literal>-s</literal>
-option omits the NT Security Identifier (SID).  For more information on 
-SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
-<literal>-u</literal> option causes <command>mkgroup</command> to 
-enumerate the users for each group, placing the group members in the 
-gr_mem (last) field.  Note that this can greatly increase
-the time for <command>mkgroup</command> to run in a large domain.
-Having gr_mem fields is helpful when a domain user logs in remotely
-while the local machine is disconnected from the Domain Controller.
-The <literal>-g</literal> option only prints the information for
-one group.
+The <literal>-g</literal> option only prints the information for one group.
 </para>
 
 </sect2>
@@ -575,68 +581,74 @@ one group.
 <sect2 id="mkpasswd"><title>mkpasswd</title>
 
 <screen>
-Usage: mkpasswd [OPTION]... [domain]...
-Prints /etc/passwd file to stdout
+Usage: mkpasswd [OPTIONS]...
+Print /etc/passwd file to stdout
 
 Options:
-   -l,--local              print local user accounts
-   -c,--current            print current account, if a domain account
-   -d,--domain             print domain accounts (from current domain
-                           if no domains specified)
+   -l,--local [machine]    print local user accounts (from local machine
+                           if no machine specified)
+   -L,--Local [machine]    ditto, but generate username with machine prefix
+   -d,--domain [domain]    print domain accounts (from current domain
+                           if no domain specified)
+   -D,--Domain [domain]    ditto, but generate username with domain prefix
+   -c,--current            print current user
+   -C,--Current            ditto, but generate username with machine or
+                           domain prefix
+   -S,--separator char     for -L, -D, -C use character char as domain\user
+                           separator in username instead of the default '\'
    -o,--id-offset offset   change the default offset (10000) added to uids
-                           in domain accounts.
-   -g,--local-groups       print local group information too
-                           if no domains specified
-   -m,--no-mount           don't use mount points for home dir
-   -s,--no-sids            don't print SIDs in GCOS field
-                           (this affects ntsec)
-   -p,--path-to-home path  use specified path and not user account home dir or /home
+                           in domain or foreign server accounts.
    -u,--username username  only return information for the specified user
+                           one of -l, -L, -d, -D must be specified, too
+   -p,--path-to-home path  use specified path instead of user account home dir
+                           or /home prefix
+   -m,--no-mount           don't use mount points for home dir
+   -s,--no-sids            (ignored)
+   -g,--local-groups       (ignored)
    -h,--help               displays this message
    -v,--version            version information and exit
 
-One of `-l', `-d' or `-g' must be given on NT/W2K.
+Default is to print local accounts on stand-alone machines, domain accounts
+on domain controllers and domain member machines.
 </screen>
 
 <para>The <command>mkpasswd</command> program can be used to help
-configure your Windows system to be more UNIX-like by creating an
-initial <filename>/etc/passwd</filename> from your system information.
-Its use is essential on the NT series (Windows NT, 2000, and XP) to
-include Windows security information, but the actual passwords are
-determined by Windows, not by the content of <filename>/etc/passwd</filename>.
-On the Win9x series (Windows 95, 98, and Me) the password field must be
-replaced by the output of <userinput>crypt your_password</userinput>
-if remote access is desired.
-To initially set up your machine if you are a local user, you'd do
-something like this:</para>
-  
-<example id="utils-mkpasswd-ex"><title>Setting up the passwd file for local accounts</title>
-<screen>
-<prompt>$</prompt> <userinput>mkdir /etc</userinput>
-<prompt>$</prompt> <userinput>mkpasswd -l &gt; /etc/passwd</userinput>
-</screen>
-</example>
+configure Cygwin by creating a <filename>/etc/passwd</filename> from
+your system information.
+Its use is essential to include Windows security information.  However,
+the actual passwords are determined by Windows, not by the content of
+<filename>/etc/passwd</filename>.</para>
 
+<para>The command is initially called by <command>setup.exe</command> to
+create a default <filename>/etc/passwd</filename>.  This should be
+sufficient in most circumstances.  However, especially when working
+in a multi-domain environment, you can use <command>mkpasswd</command>
+manually to create a more complete <filename>/etc/passwd</filename> file for
+all domains.  Especially when you have the same user name used on
+multiple machines or in multiple domains, you can use the <literal>-D</literal>,
+<literal>-L</literal> and <literal>-C</literal> options to create unique
+domain\user style usernames.</para>
+  
 <para>Note that this information is static.  If you change the user
 information in your system, you'll need to regenerate the passwd file
 for it to have the new information.</para>
 
-<para>The <literal>-d</literal> and <literal>-l</literal> options
+<para>The <literal>-d/-D</literal> and <literal>-l/-L</literal> options
 allow you to specify where the information comes from, the
 local machine or the domain (default or given), or both.
-With the  <literal>-d</literal> option the program contacts the Domain
-Controller, which my be unreachable or have restricted access.
-An entry for the current domain user can then be created by using the
-option <literal>-c</literal> together with <literal>-l</literal>,
-but <literal>-c</literal> has no effect when used with <literal>-d</literal>.
+With the  <literal>-d/-D</literal> options the program contacts the Domain
+Controller, which may be unreachable or have restricted access.
+An entry for the current user can be created by using the
+option <literal>-c</literal> or  <literal>-C</literal>.
+If you want to use one of the <literal>-D</literal>, <literal>-L</literal>
+or <literal>-C</literal> options, but you don't like the backslash as
+domain/group separator, you can specify another separator using the
+<literal>-S</literal> option, simialar to the <command>mkgroup</command>.
 The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the UIDs might match otherwise.
-The <literal>-g</literal> option creates a local
-user that corresponds to each local group. This is because NT assigns groups
-file ownership.  The <literal>-m</literal> option bypasses the current
+The <literal>-m</literal> option bypasses the current
 mount table so that, for example, two users who have a Windows home 
-directory of H: could mount them differently.  The <literal>-s</literal>
-option omits the NT Security Identifier (SID).  For more information on
+directory of H: could mount them differently.  For more information on
 SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
 <literal>-p</literal> option causes <command>mkpasswd</command> to
 use the specified prefix instead of the account home dir or <literal>/home/
@@ -649,9 +661,8 @@ use the specified prefix instead of the account home dir or <literal>/home/
 </example>
 
 would put local users' home directories in the Windows 'Profiles' directory. 
-On Win9x machines the <literal>-u</literal> option creates an entry for
-the specified user. On the NT series it restricts the output to that user,
-greatly reducing the amount of time it takes in a large domain.</para>
+The <literal>-u</literal> option creates just an entry for
+the specified user.</para>
 
 </sect2>
 

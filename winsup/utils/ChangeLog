@@ -1,3 +1,24 @@
+2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygcheck.exe): Link against ntdll.
+	* bloda.cc: Use statically linked functions throughout.
+	* cygpath.cc: Drop 9x considerations.
+	* mkgroup.c: Revamp.  Redefine -l and -d options to take optional
+	machine and domain parameters.  Redefine -c to work always, using
+	token information.  Add -L, -D, -C to create unique groupnames in
+	domain\group syntax.  Add -S option to define domain\group separator
+	char.  Ignore -u and -s options.
+	* mkpasswd.c: Revamp.  Redefine -l and -d options to take optional
+	machine and domain parameters.  Redefine -c to work always, using
+	token information.  Add -L, -D, -C to create unique usernames in
+	domain\user syntax.  Add -S option to define domain\user separator
+	char.  Ignore -g and -s options.  Prefer to take homedir from $HOME
+	over $HOMEDRIVE/$HOMEPATH.
+	* path.cc (oopts): Add "acl", "noacl", "posix=0" and "posix=1" options.
+	(getmntent): Accomodate throughout.
+	* ps.cc: Fix copyright dates.
+	* utils.sgml: Fix text for mkgroup and mkpasswd.
+
 2008-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (do_mount): Remove MOUNT_ENC code.

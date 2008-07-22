@@ -94,7 +94,7 @@ ifdef libz
 zlib_h  := -include ${patsubst %/lib/mingw/libz.a,%/include/zlib.h,${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}}
 zconf_h := ${patsubst %/zlib.h,%/zconf.h,$(zlib_h)}
 dump_setup.o: MINGW_CXXFLAGS += $(zconf_h) $(zlib_h)
-cygcheck.exe: MINGW_LDFLAGS += $(libz)
+cygcheck.exe: MINGW_LDFLAGS += $(libz) -lntdll
 else
 all: warn_cygcheck_zlib
 endif

@@ -9,21 +9,23 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define _WIN32_WINNT 0x0600
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <stdio.h>
-#include <windows.h>
-#include <io.h>
 #include <unistd.h>
-#include <sys/cygwin.h>
 #include <getopt.h>
-#include <lmaccess.h>
-#include <lmapibuf.h>
+#include <io.h>
 #include <sys/fcntl.h>
-#include <lmerr.h>
-#include <lmcons.h>
+#include <sys/cygwin.h>
+#include <windows.h>
+#include <lm.h>
 #include <iptypes.h>
+#include <wininet.h>
+#include <ntsecapi.h>
+#include <dsgetdc.h>
+#include <ntdef.h>
 
 #define print_win_error(x) _print_win_error(x, __LINE__)
 
@@ -31,20 +33,10 @@
 
 static const char version[] = "$Revision$";
 
+extern char *__progname;
+
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
-
-typedef struct {
-  LPWSTR DomainControllerName;
-  LPWSTR DomainControllerAddress;
-  ULONG  DomainControllerAddressType;
-  GUID   DomainGuid;
-  LPWSTR DomainName;
-  LPWSTR DnsForestName;
-  ULONG  Flags;
-  LPWSTR DcSiteName;
-  LPWSTR ClientSiteName;
-} *PDOMAIN_CONTROLLER_INFOW;
 
 NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
 
@@ -52,13 +44,82 @@ NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CO
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
 
+typedef struct 
+{
+  char *str;
+  BOOL with_dom;
+} domlist_t;
+
 void
-load_netapi ()
+_print_win_error(DWORD code, int line)
+{
+  char buf[4096];
+
+  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
+      | FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      code,
+      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) buf, sizeof (buf), NULL))
+    fprintf (stderr, "mkpasswd (%d): [%lu] %s", line, code, buf);
+  else
+    fprintf (stderr, "mkpasswd (%d): error %lu", line, code);
+}
+
+void
+load_dsgetdcname ()
 {
   HANDLE h = LoadLibrary ("netapi32.dll");
 
   if (h)
     dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
+}
+
+static PWCHAR
+get_dcname (char *domain)
+{
+  static WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  DWORD rc;
+  PWCHAR servername;
+  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
+  PDOMAIN_CONTROLLER_INFOW pdci = NULL;
+
+  if (dsgetdcname)
+    {
+      if (domain)
+	{
+	  mbstowcs (domain_name, domain, strlen (domain) + 1);
+	  rc = dsgetdcname (NULL, domain_name, NULL, NULL, 0, &pdci);
+	}
+      else
+	rc = dsgetdcname (NULL, NULL, NULL, NULL, 0, &pdci);
+      if (rc != ERROR_SUCCESS)
+	{
+	  print_win_error(rc);
+	  return (PWCHAR) -1;
+	}
+      wcscpy (server, pdci->DomainControllerName);
+      NetApiBufferFree (pdci);
+    }
+  else
+    {
+      rc = NetGetDCName (NULL, NULL, (void *) &servername);
+      if (rc == ERROR_SUCCESS && domain)
+	{
+	  LPWSTR server = servername;
+	  mbstowcs (domain_name, domain, strlen (domain) + 1);
+	  rc = NetGetDCName (server, domain_name, (void *) &servername);
+	  NetApiBufferFree (server);
+	}
+      if (rc != ERROR_SUCCESS)
+	{
+	  print_win_error(rc);
+	  return (PWCHAR) -1;
+	}
+      wcscpy (server, servername);
+      NetApiBufferFree ((PVOID) servername);
+    }
+  return server;
 }
 
 char *
@@ -112,68 +173,50 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 }
 
 void
-_print_win_error(DWORD code, int line)
+current_user (int print_cygpath, const char *sep, const char *passed_home_path,
+	      int id_offset, const char *disp_username)
 {
-  char buf[4096];
-
-  if (FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM
-      | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      code,
-      MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-      (LPTSTR) buf, sizeof (buf), NULL))
-    fprintf (stderr, "mkpasswd (%d): [%lu] %s", line, code, buf);
-  else
-    fprintf (stderr, "mkpasswd (%d): error %lu", line, code);
-}
-
-void
-current_user (int print_sids, int print_cygpath,
-	      const char * passed_home_path, int id_offset, const char * disp_username)
-{
-  char name[UNLEN + 1], *envname, *envdomain;
   DWORD len;
   HANDLE ptok;
-  int errpos = 0;
   struct {
     PSID psid;
     int buffer[10];
   } tu, tg;
+  char user[UNLEN + 1];
+  char dom[MAX_DOMAIN_NAME_LEN + 1];
+  DWORD ulen = UNLEN + 1;
+  DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
+  SID_NAME_USE acc_type;
+  int uid, gid;
+  char homedir_psx[PATH_MAX] = {0}, homedir_w32[MAX_PATH] = {0};
 
-
-  if ((!GetUserName (name, (len = sizeof (name), &len)) && (errpos = __LINE__))
-      || !name[0]
-      || !(envname = getenv("USERNAME"))
-      || strcasecmp (envname, name)
-      || (disp_username && strcasecmp(envname, disp_username))
-      || (!GetComputerName (name, (len = sizeof (name), &len))
-	  && (errpos = __LINE__))
-      || !(envdomain = getenv("USERDOMAIN"))
-      || !envdomain[0]
-      || !strcasecmp (envdomain, name)
-      || (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
-	  && (errpos = __LINE__))
-      || (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &len)
-	  && (errpos = __LINE__))
-      || (!GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
-	  && (errpos = __LINE__))
-      || (!CloseHandle (ptok) && (errpos = __LINE__)))
+  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
+      || !GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &len)
+      || !GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
+      || !CloseHandle (ptok)
+      || !LookupAccountSidA (NULL, tu.psid, user, &ulen, dom, &dlen, &acc_type))
     {
-      if (errpos)
-	_print_win_error (GetLastError (), errpos);
+      print_win_error (GetLastError ());
       return;
     }
 
-  int uid = *GetSidSubAuthority (tu.psid, *GetSidSubAuthorityCount(tu.psid) - 1);
-  int gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
-  char homedir_psx[MAX_PATH] = {0}, homedir_w32[MAX_PATH] = {0};
-
-  char *envhomedrive = getenv ("HOMEDRIVE");
-  char *envhomepath = getenv ("HOMEPATH");
-
+  uid = *GetSidSubAuthority (tu.psid, *GetSidSubAuthorityCount(tu.psid) - 1);
+  gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
   if (passed_home_path[0] == '\0')
     {
-      if (envhomepath && envhomepath[0])
+      char *envhome = getenv ("HOME");
+      char *envhomedrive = getenv ("HOMEDRIVE");
+      char *envhomepath = getenv ("HOMEPATH");
+
+      if (envhome && envhome[0])
+        {
+	  if (print_cygpath)
+	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, envhome,
+			      homedir_psx, PATH_MAX);
+	  else
+	    psx_dir (envhome, homedir_psx);
+	}
+      else if (envhomepath && envhomepath[0])
         {
 	  if (envhomedrive)
 	    strlcpy (homedir_w32, envhomedrive, sizeof (homedir_w32));
@@ -182,47 +225,67 @@ current_user (int print_sids, int print_cygpath,
 	  strlcat (homedir_w32, envhomepath, sizeof (homedir_w32));
 	  if (print_cygpath)
 	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, homedir_w32,
-			      homedir_psx, MAX_PATH);
+			      homedir_psx, PATH_MAX);
 	  else
 	    psx_dir (homedir_w32, homedir_psx);
 	}
       else
         {
 	  strlcpy (homedir_psx, "/home/", sizeof (homedir_psx));
-	  strlcat (homedir_psx, envname, sizeof (homedir_psx));
+	  strlcat (homedir_psx, user, sizeof (homedir_psx));
 	}
     }
   else
     {
       strlcpy (homedir_psx, passed_home_path, sizeof (homedir_psx));
-      strlcat (homedir_psx, envname, sizeof (homedir_psx));
+      strlcat (homedir_psx, user, sizeof (homedir_psx));
     }
 
-  printf ("%s:unused:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
-	  envname,
+  printf ("%s%s%s:unused:%u:%u:U-%s\\%s,%s:%s:/bin/bash\n",
+	  sep ? dom : "",
+	  sep ?: "",
+	  user,
 	  uid + id_offset,
 	  gid + id_offset,
-	  envname,
-	  print_sids ? "," : "",
-	  print_sids ? "U-" : "",
-	  print_sids ? envdomain : "",
-	  print_sids ? "\\" : "",
-	  print_sids ? envname : "",
-	  print_sids ? "," : "",
-	  print_sids ? put_sid (tu.psid) : "",
+	  dom,
+	  user,
+	  put_sid (tu.psid),
 	  homedir_psx);
 }
 
 int
-enum_users (LPWSTR servername, int print_sids, int print_cygpath,
-	    const char * passed_home_path, int id_offset, char *disp_username)
+enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
+	    int print_cygpath, const char *passed_home_path, int id_offset,
+	    char *disp_username)
 {
+  WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  PWCHAR servername = NULL;
+  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
+  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
   USER_INFO_3 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
   DWORD resume_handle = 0;
   DWORD rc;
   WCHAR uni_name[UNLEN + 1];
+  
+  if (domain)
+    {
+      servername = get_dcname (d_or_m);
+      if (servername == (PWCHAR) -1)
+      	return 1;
+    }
+  else if (d_or_m)
+    {
+      int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
+	{
+	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
+		   __progname, d_or_m);
+	  return 1;
+	}
+      servername = machine;
+    }
 
   do
     {
@@ -243,7 +306,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 	{
 	case ERROR_ACCESS_DENIED:
 	  print_win_error(rc);
-	  exit (1);
+	  return 1;
 
 	case ERROR_MORE_DATA:
 	case ERROR_SUCCESS:
@@ -251,7 +314,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 
 	default:
 	  print_win_error(rc);
-	  exit (1);
+	  return 1;
 	}
 
       for (i = 0; i < entriesread; i++)
@@ -289,48 +352,45 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		      stpcpy (homedir_psx, passed_home_path),
 		      PATH_MAX - strlen (passed_home_path));
 
-	  if (print_sids)
+	  if (!LookupAccountNameW (servername, buffer[i].usri3_name,
+				   psid, &sid_length, domain_name,
+				   &domname_len, &acc_type))
 	    {
-	      if (!LookupAccountNameW (servername, buffer[i].usri3_name,
-				       psid, &sid_length, domain_name,
+	      print_win_error(GetLastError ());
+	      fprintf(stderr, " (%ls)\n", buffer[i].usri3_name);
+	      continue;
+	    }
+	  else if (acc_type == SidTypeDomain)
+	    {
+	      WCHAR domname[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
+
+	      wcscpy (domname, domain_name);
+	      wcscat (domname, L"\\");
+	      wcscat (domname, buffer[i].usri3_name);
+	      sid_length = MAX_SID_LEN;
+	      domname_len = sizeof (domname);
+	      if (!LookupAccountNameW (servername, domname, psid,
+				       &sid_length, domain_name,
 				       &domname_len, &acc_type))
 		{
-	  	  print_win_error(GetLastError ());
-		  fprintf(stderr, " (%ls)\n", buffer[i].usri3_name);
+		  print_win_error(GetLastError ());
+		  fprintf(stderr, " (%ls)\n", domname);
 		  continue;
 		}
-	      else if (acc_type == SidTypeDomain)
-		{
-		  WCHAR domname[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
-
-		  wcscpy (domname, domain_name);
-		  wcscat (domname, L"\\");
-		  wcscat (domname, buffer[i].usri3_name);
-		  sid_length = MAX_SID_LEN;
-		  domname_len = sizeof (domname);
-		  if (!LookupAccountNameW (servername, domname, psid,
-					   &sid_length, domain_name,
-					   &domname_len, &acc_type))
-		    {
-		      print_win_error(GetLastError ());
-		      fprintf(stderr, " (%ls)\n", domname);
-		      continue;
-		    }
-		}
 	    }
-	  printf ("%ls:unused:%u:%u:%ls%s%s%ls%s%ls%s%s:%s:/bin/bash\n",
+
+	  printf ("%ls%s%ls:unused:%u:%u:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
+		  with_dom ? domain_name : L"",
+		  with_dom ? sep : "",
 	  	  buffer[i].usri3_name,
 		  uid + id_offset,
 		  gid + id_offset,
 		  buffer[i].usri3_full_name ?: L"",
-		  print_sids && buffer[i].usri3_full_name 
+		  buffer[i].usri3_full_name 
 		  && buffer[i].usri3_full_name[0] ? "," : "",
-		  print_sids ? "U-" : "",
-		  print_sids ? domain_name : L"",
-		  print_sids && domain_name[0] ? "\\" : "",
-		  print_sids ? buffer[i].usri3_full_name : L"",
-		  print_sids ? "," : "",
-		  print_sids ? put_sid (psid) : "",
+		  domain_name,
+		  buffer[i].usri3_name,
+		  put_sid (psid),
 		  homedir_psx);
 	}
 
@@ -342,90 +402,8 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
   return 0;
 }
 
-int
-enum_local_groups (int print_sids)
-{
-  LOCALGROUP_INFO_0 *buffer;
-  DWORD entriesread = 0;
-  DWORD totalentries = 0;
-  DWORD resume_handle = 0;
-  DWORD rc ;
-
-  do
-    {
-      DWORD i;
-
-      rc = NetLocalGroupEnum (NULL, 0, (void *) &buffer, 1024,
-			      &entriesread, &totalentries, &resume_handle);
-      switch (rc)
-	{
-	case ERROR_ACCESS_DENIED:
-	  print_win_error(rc);
-	  exit (1);
-
-	case ERROR_MORE_DATA:
-	case ERROR_SUCCESS:
-	  break;
-
-	default:
-	  print_win_error(rc);
-	  exit (1);
-	}
-
-      for (i = 0; i < entriesread; i++)
-	{
-	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
-	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	  char psid_buffer[MAX_SID_LEN];
-	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = MAX_SID_LEN;
-	  DWORD gid;
-	  SID_NAME_USE acc_type;
-
-	  if (!LookupAccountNameW (NULL, buffer[i].lgrpi0_name, psid,
-				   &sid_length, domain_name, &domname_len,
-				   &acc_type))
-	    {
-	      print_win_error(GetLastError ());
-	      fprintf(stderr, " (%ls)\n", buffer[i].lgrpi0_name);
-	      continue;
-	    }
-	  else if (acc_type == SidTypeDomain)
-	    {
-	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
-
-	      wcscpy (domname, domain_name);
-	      wcscat (domname, L"\\");
-	      wcscat (domname, buffer[i].lgrpi0_name);
-	      sid_length = MAX_SID_LEN;
-	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	      if (!LookupAccountNameW (NULL, domname, psid, &sid_length,
-				       domain_name, &domname_len, &acc_type))
-		{
-		  print_win_error(GetLastError ());
-		  fprintf(stderr, " (%ls)\n", domname);
-		  continue;
-		}
-	    }
-
-	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
-
-	  printf ("%ls:*:%ld:%ld:%s%s::\n", buffer[i].lgrpi0_name, gid, gid,
-		  print_sids ? "," : "",
-		  print_sids ? put_sid (psid) : "");
-	}
-
-      NetApiBufferFree (buffer);
-
-    }
-  while (rc == ERROR_MORE_DATA);
-
-  return 0;
-}
-
 void
-print_special (int print_sids,
-	       PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
+print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
@@ -458,58 +436,70 @@ print_special (int print_sids,
 	    rid = sub2;
 	  else
 	    rid = sub1;
-	  printf ("%s:*:%lu:%lu:%s%s::\n",
+	  printf ("%s:*:%lu:%lu:,%s::\n",
 		  name, rid, rid == 18 ? 544 : rid, /* SYSTEM hack */
-		  print_sids ? "," : "",
-		  print_sids ? put_sid (sid) : "");
+		  put_sid (sid));
         }
       FreeSid (sid);
     }
 }
 
 int
-usage (FILE * stream, int isNT)
+usage (FILE * stream)
 {
-  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]...\n"
-	           "Print /etc/passwd file to stdout\n\n"
-	           "Options:\n");
-  if (isNT)
-    fprintf (stream, "   -l,--local              print local user accounts\n"
-	             "   -c,--current            print current account, if a domain account\n"
-                     "   -d,--domain             print domain accounts (from current domain\n"
-                     "                           if no domains specified)\n"
-                     "   -o,--id-offset offset   change the default offset (10000) added to uids\n"
-                     "                           in domain accounts.\n"
-                     "   -g,--local-groups       print local group information too\n"
-                     "                           if no domain specified\n"
-                     "   -m,--no-mount           don't use mount points for home dir\n"
-                     "   -s,--no-sids            don't print SIDs in GCOS field\n"
-	             "                           (this affects ntsec)\n");
-  fprintf (stream, "   -p,--path-to-home path  use specified path and not user account home dir or /home\n"
-                   "   -u,--username username  only return information for the specified user\n"
-                   "   -h,--help               displays this message\n"
-	           "   -v,--version            version information and exit\n\n");
-  if (isNT)
-    fprintf (stream, "One of '-l', '-d' or '-g' must be given.\n");
+  fprintf (stream,
+"Usage: mkpasswd [OPTIONS]...\n"
+"Print /etc/passwd file to stdout\n"
+"\n"
+"Options:\n"
+"   -l,--local [machine]    print local user accounts (from local machine\n"
+"                           if no machine specified)\n"
+"   -L,--Local [machine]    ditto, but generate username with machine prefix\n"
+"   -d,--domain [domain]    print domain accounts (from current domain\n"
+"                           if no domain specified)\n"
+"   -D,--Domain [domain]    ditto, but generate username with domain prefix\n"
+"   -c,--current            print current user\n"
+"   -C,--Current            ditto, but generate username with machine or\n"
+"                           domain prefix\n"
+"   -S,--separator char     for -L, -D, -C use character char as domain\\user\n"
+"                           separator in username instead of the default '\\'\n"
+"   -o,--id-offset offset   change the default offset (10000) added to uids\n"
+"                           in domain or foreign server accounts.\n"
+"   -u,--username username  only return information for the specified user\n"
+"                           one of -l, -L, -d, -D must be specified, too\n"
+"   -p,--path-to-home path  use specified path instead of user account home dir\n"
+"                           or /home prefix\n"
+"   -m,--no-mount           don't use mount points for home dir\n"
+"   -s,--no-sids            (ignored)\n"
+"   -g,--local-groups       (ignored)\n"
+"   -h,--help               displays this message\n"
+"   -v,--version            version information and exit\n"
+"\n"
+"Default is to print local accounts on stand-alone machines, domain accounts\n"
+"on domain controllers and domain member machines.\n");
   return 1;
 }
 
 struct option longopts[] = {
-  {"local", no_argument, NULL, 'l'},
   {"current", no_argument, NULL, 'c'},
-  {"domain", no_argument, NULL, 'd'},
-  {"id-offset", required_argument, NULL, 'o'},
+  {"Current", no_argument, NULL, 'C'},
+  {"domain", optional_argument, NULL, 'd'},
+  {"Domain", optional_argument, NULL, 'D'},
   {"local-groups", no_argument, NULL, 'g'},
-  {"no-mount", no_argument, NULL, 'm'},
-  {"no-sids", no_argument, NULL, 's'},
-  {"path-to-home", required_argument, NULL, 'p'},
-  {"username", required_argument, NULL, 'u'},
   {"help", no_argument, NULL, 'h'},
+  {"local", optional_argument, NULL, 'l'},
+  {"Local", optional_argument, NULL, 'L'},
+  {"no-mount", no_argument, NULL, 'm'},
+  {"id-offset", required_argument, NULL, 'o'},
+  {"path-to-home", required_argument, NULL, 'p'},
+  {"no-sids", no_argument, NULL, 's'},
+  {"separator", required_argument, NULL, 'S'},
+  {"username", required_argument, NULL, 'u'},
   {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "lcdo:gsmhp:u:v";
+char opts[] = "cCd::D::ghl::L::mo:sS:p:u:v";
 
 static void
 print_version ()
@@ -534,202 +524,194 @@ Compiled on %s\n\
 ", len, v, __DATE__);
 }
 
+static void
+enum_std_accounts ()
+{
+  /* Generate service starter account entries. */
+  printf ("SYSTEM:*:18:544:,S-1-5-18::\n");
+  printf ("LocalService:*:19:544:U-NT AUTHORITY\\LocalService,S-1-5-19::\n");
+  printf ("NetworkService:*:20:544:U-NT AUTHORITY\\NetworkService,S-1-5-20::\n");
+  /* Get 'administrators' group (has localized name). */
+  print_special (&sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
+		 DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
+}
+
+static PPOLICY_PRIMARY_DOMAIN_INFO p_dom;
+
+static BOOL
+fetch_primary_domain ()
+{
+  NTSTATUS status;
+  LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
+  LSA_HANDLE lsa;
+
+  if (!p_dom)
+    {
+      status = LsaOpenPolicy (NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
+      if (!NT_SUCCESS (status))
+	return FALSE;
+      status = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
+					  (PVOID *) &p_dom);
+      LsaClose (lsa);
+      if (!NT_SUCCESS (status))
+	return FALSE;
+    }
+  return !!p_dom->Sid;
+}
+
 int
 main (int argc, char **argv)
 {
-  LPWSTR servername = NULL;
-  DWORD rc = ERROR_SUCCESS;
-  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
   int print_local = 0;
-  int print_current = 0;
+  domlist_t locals[16];
   int print_domain = 0;
-  int print_local_groups = 0;
-  int domain_specified = 0;
-  int print_sids = 1;
+  domlist_t domains[16];
+  char *opt;
   int print_cygpath = 1;
+  int print_current = 0;
+  const char *sep_char = "\\";
   int id_offset = 10000;
-  int i;
-  int isNT;
+  int c, i, off;
   char *disp_username = NULL;
-  char name[256], passed_home_path[MAX_PATH];
-  DWORD len;
+  char passed_home_path[PATH_MAX];
+  BOOL in_domain;
 
-  isNT = (GetVersion () < 0x80000000);
   passed_home_path[0] = '\0';
   if (!isatty (1))
     setmode (1, O_BINARY);
 
-  if (isNT && argc == 1)
-    return usage (stderr, isNT);
-  else
+  load_dsgetdcname ();
+  in_domain = fetch_primary_domain ();
+  if (argc == 1)
     {
-      while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-	switch (i)
-	  {
-	  case 'l':
-	    print_local = 1;
-	    break;
-	  case 'c':
-	    print_current = 1;
-	    break;
-	  case 'd':
-	    print_domain = 1;
-	    break;
-	  case 'o':
-	    id_offset = strtol (optarg, NULL, 10);
-	    break;
-	  case 'g':
-	    print_local_groups = 1;
-	    break;
-	  case 's':
-	    print_sids = 0;
-	    break;
-	  case 'm':
-	    print_cygpath = 0;
-	    break;
-	  case 'p':
-	    if (optarg[0] != '/')
-	    {
-	      fprintf (stderr, "%s: '%s' is not a fully qualified path.\n",
-		       argv[0], optarg);
-	      return 1;
-	    }
-	    strcpy (passed_home_path, optarg);
-	    if (optarg[strlen (optarg)-1] != '/')
-	      strcat (passed_home_path, "/");
-	    break;
-	  case 'u':
-	    disp_username = optarg;
-	    break;
-	  case 'h':
-	    usage (stdout, isNT);
-	    return 0;
-	  case 'v':
-	    print_version ();
-	    return 0;
-	  default:
-	    fprintf (stderr, "Try '%s --help' for more information.\n", argv[0]);
-	    return 1;
-	  }
-    }
-  if (!isNT)
-    {
-      /* This takes Windows 9x/ME into account. */
-      if (passed_home_path[0] == '\0')
-	strcpy (passed_home_path, "/home/");
-      if (!disp_username)
-        {
-	  printf ("admin:use_crypt:%lu:%lu:Administrator:%sadmin:/bin/bash\n", 
-		  DOMAIN_USER_RID_ADMIN,
-		  DOMAIN_ALIAS_RID_ADMINS,
-		  passed_home_path);
-	  if (GetUserName (name, (len = 256, &len)))
-	    disp_username = name;
-	}
-      if (disp_username && disp_username[0])
-        {
-	  /* Create a pseudo random uid */
-	  unsigned long uid = 0, i;
-	  for (i = 0; disp_username[i]; i++)
-	    uid += toupper (disp_username[i]) << ((6 * i) % 25);
-	  uid = (uid % (1000 - DOMAIN_USER_RID_ADMIN - 1)) 
-	    + DOMAIN_USER_RID_ADMIN + 1;
-    	  
-	  printf ("%s:use_crypt:%lu:%lu:%s:%s%s:/bin/bash\n", 
-		  disp_username,
-		  uid,
-		  DOMAIN_ALIAS_RID_ADMINS,
-		  disp_username,
-		  passed_home_path,
-		  disp_username);
-	}
+      enum_std_accounts ();
+      if (in_domain)
+	enum_users (TRUE, NULL, sep_char, print_cygpath, passed_home_path,
+		    10000, disp_username);
+      else
+	enum_users (FALSE, NULL, sep_char, print_cygpath, passed_home_path, 0,
+		    disp_username);
       return 0;
     }
-  if (!print_local && !print_domain && !print_local_groups)
-    {
-      fprintf (stderr, "%s: Specify one of '-l', '-d' or '-g'\n", argv[0]);
-      return 1;
-    }
-  if (optind < argc)
-    {
-      if (!print_domain)
-        {
-	  fprintf (stderr, "%s: A domain name is only accepted "
-		   "when '-d' is given.\n", argv[0]);
+
+  while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+    switch (c)
+      {
+      case 'l':
+      case 'L':
+	if (print_local >= 16)
+	  {
+	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
+			     "servers.\n", __progname);
+	    return 1;
+	  }
+	opt = optarg ?:
+	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
+	for (i = 0; i < print_local; ++i)
+	  if ((!locals[i].str && !opt)
+	      || (locals[i].str && opt && !strcmp (locals[i].str, opt)))
+	    goto skip_local;
+	locals[print_local].str = opt;
+	locals[print_local++].with_dom = c == 'L';
+skip_local:
+	break;
+      case 'd':
+      case 'D':
+	if (print_domain >= 16)
+	  {
+	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
+			     "domains.\n", __progname);
+	    return 1;
+	  }
+	opt = optarg ?:
+	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
+	for (i = 0; i < print_domain; ++i)
+	  if ((!domains[i].str && !opt)
+	      || (domains[i].str && opt && !strcmp (domains[i].str, opt)))
+	    goto skip_domain;
+	domains[print_domain].str = opt;
+	domains[print_domain++].with_dom = c == 'D';
+skip_domain:
+	break;
+      case 'S':
+	sep_char = optarg;
+	if (strlen (sep_char) > 1)
+	  {
+	    fprintf (stderr, "%s: Only one character allowed as domain\\user "
+			     "separator character.\n", __progname);
+	    return 1;
+	  }
+	if (*sep_char == ':')
+	  {
+	    fprintf (stderr, "%s: Colon not allowed as domain\\user separator "
+			     "character.\n", __progname);
+	    return 1;
+	  }
+        break;
+      case 'c':
+	sep_char = NULL;
+	/*FALLTHRU*/
+      case 'C':
+	print_current = 1;
+	break;
+      case 'o':
+	id_offset = strtol (optarg, NULL, 10);
+	break;
+      case 'g':
+	break;
+      case 's':
+	break;
+      case 'm':
+	print_cygpath = 0;
+	break;
+      case 'p':
+	if (optarg[0] != '/')
+	{
+	  fprintf (stderr, "%s: '%s' is not a fully qualified path.\n",
+		   __progname, optarg);
 	  return 1;
 	}
-      domain_specified = 1;
-    }
-  load_netapi ();
-
-  if (disp_username == NULL)
-    {
-      if (print_local)
-        {
-	  /* Generate service starter account entries. */
-	  printf ("SYSTEM:*:18:544:,S-1-5-18::\n");
-	  printf ("LocalService:*:19:544:U-NT AUTHORITY\\LocalService,S-1-5-19::\n");
-	  printf ("NetworkService:*:20:544:U-NT AUTHORITY\\NetworkService,S-1-5-20::\n");
-	  /* Get 'administrators' group (has localized name). */
-	  if (!print_local_groups)
-	    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
-			   DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
-	}
-      if (print_local_groups)
-	enum_local_groups (print_sids);
-    }
-
-  if (print_local)
-    enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0,
-    		disp_username);
-
-  i = 1;
-  if (print_domain) 
-    do 
-      {
-	PDOMAIN_CONTROLLER_INFOW pdci = NULL;
-
-	if (dsgetdcname)
-	  {
-	    if (domain_specified)
-	      {
-		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
-		rc = dsgetdcname (NULL, domain_name, NULL, NULL, 0, &pdci);
-	      }
-	    else
-	      rc = dsgetdcname (NULL, NULL, NULL, NULL, 0, &pdci);
-	    if (rc != ERROR_SUCCESS)
-	      {
-		print_win_error(rc);
-		return 1;
-	      }
-	    servername = pdci->DomainControllerName;
-	  }
-	else
-	  {
-	    rc = NetGetDCName (NULL, NULL, (void *) &servername);
-	    if (rc == ERROR_SUCCESS && domain_specified)
-	      {
-		LPWSTR server = servername;
-		mbstowcs (domain_name, argv[optind], strlen (argv[optind]) + 1);
-		rc = NetGetDCName (server, domain_name, (void *) &servername);
-		NetApiBufferFree (server);
-	      }
-	    if (rc != ERROR_SUCCESS)
-	      {
-		print_win_error(rc);
-		return 1;
-	      }
-          }
-	enum_users (servername, print_sids, print_cygpath, passed_home_path,
-		    id_offset * i++, disp_username);
-	NetApiBufferFree (pdci ? (PVOID) pdci : (PVOID) servername);
+	strcpy (passed_home_path, optarg);
+	if (optarg[strlen (optarg)-1] != '/')
+	  strcat (passed_home_path, "/");
+	break;
+      case 'u':
+	disp_username = optarg;
+	break;
+      case 'h':
+	usage (stdout);
+	return 0;
+      case 'v':
+	print_version ();
+	return 0;
+      default:
+	fprintf (stderr, "Try '%s --help' for more information.\n", __progname);
+	return 1;
       }
-    while (++optind < argc);
 
-  if (print_current && !print_domain)
-    current_user(print_sids, print_cygpath, passed_home_path,
-		 id_offset, disp_username);
+  if (optind < argc - 1)
+    usage (stdout);
+
+  off = 1;
+  for (i = 0; i < print_local; ++i)
+    {
+      if (locals[i].str)
+	enum_users (FALSE, locals + i, sep_char, print_cygpath,
+		    passed_home_path, id_offset * off++, disp_username);
+      else
+	{
+	  enum_std_accounts ();
+	  enum_users (FALSE, locals + i, sep_char, print_cygpath,
+		      passed_home_path, 0, disp_username);
+	}
+    }
+
+  for (i = 0; i < print_domain; ++i)
+    enum_users (TRUE, domains + i, sep_char, print_cygpath, passed_home_path,
+		id_offset * off++, disp_username);
+
+  if (print_current)
+    current_user (print_cygpath, sep_char, passed_home_path, id_offset, disp_username);
 
   return 0;
 }
