@@ -379,7 +379,8 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    {
 	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-	      wcscpy (domname, domain_name);
+	      wcscpy (domname, domain || !servername
+			       ? domain_name : servername);
 	      wcscat (domname, L"\\");
 	      wcscat (domname, buffer[i].grpi2_name);
 	      sid_length = MAX_SID_LEN;
