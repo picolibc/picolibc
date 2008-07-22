@@ -1,5 +1,10 @@
 2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (spawn_guts): Remove long path prefix from win32 path
+	before calling CreateProcess if path length is < MAX_PATH.
+
+2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/ctype.h: Declare __ctype_ptr__ to keep newlib build happy.
 
 2008-07-21  Corinna Vinschen  <corinna@vinschen.de>
