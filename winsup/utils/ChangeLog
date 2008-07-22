@@ -1,5 +1,10 @@
 2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mkgroup.c (main): Remove special root group code.  Only print
+	SYSTEM group in case of printing local machine or local domain groups.
+
+2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (cygcheck.exe): Link against ntdll.
 	* bloda.cc: Use statically linked functions throughout.
 	* cygpath.cc: Drop 9x considerations.

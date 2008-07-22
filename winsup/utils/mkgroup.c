@@ -588,11 +588,11 @@ main (int argc, char **argv)
   domlist_t domains[16];
   char *opt;
   int print_current = 0;
+  int print_system = 0;
   const char *sep_char = "\\";
   int id_offset = 10000;
   int c, i, off;
   char *disp_groupname = NULL;
-  int isRoot = 0;
   BOOL in_domain;
 
   if (!isatty (1))
@@ -632,7 +632,8 @@ main (int argc, char **argv)
 	  if ((!locals[i].str && !opt)
 	      || (locals[i].str && opt && !strcmp (locals[i].str, opt)))
 	    goto skip_local;
-	locals[print_local].str = opt;
+	if (!(locals[print_local].str = opt))
+	  print_system = 1;
 	locals[print_local++].with_dom = c == 'L';
   skip_local:
 	break;
@@ -650,7 +651,8 @@ main (int argc, char **argv)
 	  if ((!domains[i].str && !opt)
 	      || (domains[i].str && opt && !strcmp (domains[i].str, opt)))
 	    goto skip_domain;
-	domains[print_domain].str = opt;
+	if (!(domains[print_domain].str = opt))
+	  print_system = 1;
 	domains[print_domain++].with_dom = c == 'D';
   skip_domain:
 	break;
@@ -684,7 +686,6 @@ main (int argc, char **argv)
 	break;
       case 'g':
 	disp_groupname = optarg;
-	isRoot = !strcmp(disp_groupname, "root");
 	break;
       case 'h':
 	usage (stdout);
@@ -701,32 +702,24 @@ main (int argc, char **argv)
     usage (stdout);
 
   /* Get 'system' group */
-  if (!disp_groupname && (print_local > 0 || print_domain > 0))
+  if (!disp_groupname && print_system)
     print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		   0, 0, 0, 0, 0, 0, 0);
 
   off = 1;
-  if (isRoot)
+  for (i = 0; i < print_local; ++i)
     {
-      /* Very special feature for the oncoming future:
-	 Create a "root" group being actually the local Administrators group.
-         Printing root disables printing any other "real" local group. */
-      printf ("root:S-1-5-32-544:0:\n");
+      if (locals[i].str)
+	{
+	  if (!enum_local_groups (FALSE, locals + i, sep_char,
+				  id_offset * off, disp_groupname))
+	    enum_groups (FALSE, locals + i, sep_char, id_offset * off++,
+			 disp_groupname);
+	}
+      else if (!enum_local_groups (FALSE, locals + i, sep_char, 0,
+				   disp_groupname))
+	enum_groups (FALSE, locals + i, sep_char, 0, disp_groupname);
     }
-  else
-    for (i = 0; i < print_local; ++i)
-      {
-	if (locals[i].str)
-	  {
-	    if (!enum_local_groups (FALSE, locals + i, sep_char,
-				    id_offset * off, disp_groupname))
-	      enum_groups (FALSE, locals + i, sep_char, id_offset * off++,
-			   disp_groupname);
-	  }
-	else if (!enum_local_groups (FALSE, locals + i, sep_char, 0,
-				     disp_groupname))
-	  enum_groups (FALSE, locals + i, sep_char, 0, disp_groupname);
-      }
 
   for (i = 0; i < print_domain; ++i)
     {
