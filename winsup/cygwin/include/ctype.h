@@ -40,6 +40,9 @@ int __cdecl _toupper(int);
 
 #if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
 extern const char _ctype_[];
+#ifdef _COMPILING_NEWLIB
+extern const char *__ctype_ptr__;
+#endif
 #else
 extern const __declspec(dllimport) char _ctype_[];
 #endif
