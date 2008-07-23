@@ -482,7 +482,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       {
         PWCHAR r = runpath + 4;
 	if (r[1] != L':') /* UNC path */
-	  r += 2;
+	  *(r += 2) = L'\\';
 	runpath = r;
       }
   }
