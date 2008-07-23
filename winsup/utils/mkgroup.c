@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -122,18 +123,18 @@ get_dcname (char *domain)
 }
 
 char *
-put_sid (PSID sid)
+put_sid (PSID psid)
 {
   static char s[512];
   char t[32];
   DWORD i;
 
   strcpy (s, "S-1-");
-  sprintf(t, "%u", GetSidIdentifierAuthority (sid)->Value[5]);
+  sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
   strcat (s, t);
-  for (i = 0; i < *GetSidSubAuthorityCount (sid); ++i)
+  for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
-      sprintf(t, "-%lu", *GetSidSubAuthority (sid, i));
+      sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
       strcat (s, t);
     }
   return s;
@@ -149,6 +150,109 @@ typedef struct {
 #define MAX_BUILTIN_SIDS 100	/* Should be enough for the forseable future. */
 DBGSID builtin_sid_list[MAX_BUILTIN_SIDS];
 DWORD builtin_sid_cnt;
+
+void
+enum_unix_groups (domlist_t *dom_or_machine, const char *sep, int id_offset,
+		  char *unix_grp_list)
+{
+  WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  PWCHAR servername = NULL;
+  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
+  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
+  SID_IDENTIFIER_AUTHORITY auth = { { 0, 0, 0, 0, 0, 22 } };
+  char *gstr, *grp_list;
+  WCHAR grp[GNLEN + sizeof ("Unix Group\\") + 1];
+  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
+  DWORD glen, dlen, sidlen;
+  PSID psid;
+  char psid_buffer[MAX_SID_LEN];
+  SID_NAME_USE acc_type;
+
+  if (!d_or_m)
+    return;
+
+  int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
+    {
+      fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
+	       __progname, d_or_m);
+      return;
+    }
+  servername = machine;
+
+  if (!AllocateAndInitializeSid (&auth, 2, 2, 0, 0, 0, 0, 0, 0, 0, &psid))
+    return;
+
+  if (!(grp_list = strdup (unix_grp_list)))
+    {
+      FreeSid (psid);
+      return;
+    }
+
+  for (gstr = strtok (grp_list, ","); gstr; gstr = strtok (NULL, ","))
+    {
+      if (!isdigit (gstr[0]) && gstr[0] != '-')
+	{
+	  PWCHAR p = wcpcpy (grp, L"Unix Group\\");
+	  ret = mbstowcs (p, gstr, GNLEN + 1);
+	  if (ret < 1 || ret >= GNLEN + 1)
+	    fprintf (stderr, "%s: Invalid group name '%s'.  Skipping...\n",
+		     __progname, gstr);
+	  else if (LookupAccountNameW (servername, grp,
+				       psid = (PSID) psid_buffer,
+				       (sidlen = MAX_SID_LEN, &sidlen),
+				       dom,
+				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
+				       &acc_type))
+	    printf ("%s%s%ls:%s:%lu:\n",
+		    with_dom ? "Unix Group" : "",
+		    with_dom ? sep : "",
+		    p,
+		    put_sid (psid),
+		    id_offset +
+		    *GetSidSubAuthority (psid,
+					 *GetSidSubAuthorityCount(psid) - 1));
+	}
+      else
+	{
+	  DWORD start, stop;
+	  char *p = gstr;
+	  if (*p == '-')
+	    start = 0;
+	  else
+	    start = strtol (p, &p, 10);
+	  if (!*p)
+	    stop = start;
+	  else if (*p++ != '-' || !isdigit (*p)
+		   || (stop = strtol (p, &p, 10)) < start || *p)
+	    {
+	      fprintf (stderr, "%s: Malformed unix group list entry '%s'.  "
+			       "Skipping...\n", __progname, gstr);
+	      continue;
+	    }
+	  for (; start <= stop; ++ start)
+	    {
+	      *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1)
+	      = start;
+	      if (LookupAccountSidW (servername, psid,
+				     grp, (glen = GNLEN + 1, &glen),
+				     dom,
+				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
+				     &acc_type)
+		  && !iswdigit (grp[0]))
+		printf ("%s%s%ls:%s:%lu:\n",
+			with_dom ? "Unix Group" : "",
+			with_dom ? sep : "",
+			grp,
+			put_sid (psid),
+			id_offset + start);
+	    }
+	}
+    }
+
+  free (grp_list);
+  FreeSid (psid);
+}
 
 int
 enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
@@ -414,18 +518,18 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
-  char name[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
-  DWORD len, len2, rid;
-  PSID sid;
-  SID_NAME_USE use;
+  WCHAR grp[GNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
+  DWORD glen, dlen, rid;
+  PSID psid;
+  SID_NAME_USE acc_type;
 
   if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
-  				sub5, sub6, sub7, sub8, &sid))
+  				sub5, sub6, sub7, sub8, &psid))
     {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = UNLEN + 1, &len),
-			    dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
-			    &use))
+      if (LookupAccountSidW (NULL, psid,
+			    grp, (glen = GNLEN + 1, &glen),
+			    dom, (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
+			    &acc_type))
 	{
 	  if (sub8)
 	    rid = sub8;
@@ -443,9 +547,9 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	    rid = sub2;
 	  else
 	    rid = sub1;
-	  printf ("%s:%s:%lu:\n", name, put_sid (sid), rid);
+	  printf ("%ls:%s:%lu:\n", grp, put_sid (psid), rid);
         }
-      FreeSid (sid);
+      FreeSid (psid);
     }
 }
 
@@ -458,8 +562,8 @@ current_group (const char *sep, int id_offset)
     PSID psid;
     char buffer[MAX_SID_LEN];
   } tg;
-  char grp[GNLEN + 1];
-  char dom[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR grp[GNLEN + 1];
+  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD glen = GNLEN + 1;
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   int gid;
@@ -468,14 +572,14 @@ current_group (const char *sep, int id_offset)
   if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
       || !GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
       || !CloseHandle (ptok)
-      || !LookupAccountSidA (NULL, tg.psid, grp, &glen, dom, &dlen, &acc_type))
+      || !LookupAccountSidW (NULL, tg.psid, grp, &glen, dom, &dlen, &acc_type))
     {
       print_win_error (GetLastError ());
       return;
     }
   gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
-  printf ("%s%s%s:%s:%u:\n",
-	  sep ? dom : "",
+  printf ("%ls%s%ls:%s:%u:\n",
+	  sep ? dom : L"",
 	  sep ?: "",
 	  grp,
 	  put_sid (tg.psid),
@@ -505,6 +609,11 @@ usage (FILE * stream)
 "                           in domain or foreign server accounts.\n"
 "   -g,--group groupname    only return information for the specified group\n"
 "                           one of -l, -L, -d, -D must be specified, too\n"
+"   -U,--unix grouplist     additionally print UNIX groups when using -l or -L\n"
+"                           on a UNIX Samba server\n"
+"                           grouplist is a comma-separated list of groupnames\n"
+"                           or gid ranges (root,-25,50-100).\n"
+"                           (enumerating large ranges can take a long time!)\n"
 "   -s,--no-sids            (ignored)\n"
 "   -u,--users              (ignored)\n"
 "   -h,--help               print this message\n"
@@ -528,11 +637,12 @@ struct option longopts[] = {
   {"no-sids", no_argument, NULL, 's'},
   {"separator", required_argument, NULL, 'S'},
   {"users", no_argument, NULL, 'u'},
+  {"unix", required_argument, NULL, 'U'},
   {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "cCd::D::g:hl::L::o:sS:uv";
+char opts[] = "cCd::D::g:hl::L::o:sS:uU:v";
 
 void
 print_version ()
@@ -590,6 +700,7 @@ main (int argc, char **argv)
   char *opt;
   int print_current = 0;
   int print_system = 0;
+  char *print_unix = NULL;
   const char *sep_char = "\\";
   int id_offset = 10000;
   int c, i, off;
@@ -672,6 +783,9 @@ main (int argc, char **argv)
 	    return 1;
 	  }
         break;
+      case 'U':
+      	print_unix = optarg;
+	break;
       case 'c':
       	sep_char = NULL;
 	/*FALLTHRU*/
@@ -714,8 +828,13 @@ main (int argc, char **argv)
 	{
 	  if (!enum_local_groups (FALSE, locals + i, sep_char,
 				  id_offset * off, disp_groupname))
-	    enum_groups (FALSE, locals + i, sep_char, id_offset * off++,
-			 disp_groupname);
+	    {
+	      if (print_unix)
+	      	enum_unix_groups (locals + i, sep_char, id_offset * off,
+				  print_unix);
+	      enum_groups (FALSE, locals + i, sep_char, id_offset * off++,
+			   disp_groupname);
+	    }
 	}
       else if (!enum_local_groups (FALSE, locals + i, sep_char, 0,
 				   disp_groupname))

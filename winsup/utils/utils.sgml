@@ -524,6 +524,11 @@ Options:
                            in domain or foreign server accounts.
    -g,--group groupname    only return information for the specified group
                            one of -l, -L, -d, -D must be specified, too
+   -U,--unix grouplist     additionally print UNIX groups when using -l or -L
+                           on a UNIX Samba server
+                           grouplist is a comma-separated list of groupnames
+                           or gid ranges (root,-25,50-100).
+			   (enumerating large ranges can take a long time!)
    -s,--no-sids            (ignored)
    -u,--users              (ignored)
    -h,--help               print this message
@@ -574,6 +579,11 @@ DOMAIN+my_group:S-1-5-21-2913048732-1697188782-3448811101-1144:11144:
 <para>The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the GIDs might match otherwise.
 The <literal>-g</literal> option only prints the information for one group.
+The <literal>-U</literal> option allows to enumerate the standard UNIX
+groups on a Samba machine.  It's used together with
+<literal>-l samba-server</literal> or <literal>-L samba-server</literal>.
+The normal UNIX groups are usually not enumerated, but they can show
+up as group in <command>ls -l</command> output.
 </para>
 
 </sect2>
@@ -603,6 +613,11 @@ Options:
    -p,--path-to-home path  use specified path instead of user account home dir
                            or /home prefix
    -m,--no-mount           don't use mount points for home dir
+   -U,--unix userlist      additionally print UNIX users when using -l or -L\
+                           on a UNIX Samba server
+                           userlist is a comma-separated list of usernames
+                           or uid ranges (root,-25,50-100).
+                           (enumerating large ranges can take a long time!)
    -s,--no-sids            (ignored)
    -g,--local-groups       (ignored)
    -h,--help               displays this message
@@ -662,7 +677,13 @@ use the specified prefix instead of the account home dir or <literal>/home/
 
 would put local users' home directories in the Windows 'Profiles' directory. 
 The <literal>-u</literal> option creates just an entry for
-the specified user.</para>
+the specified user.
+The <literal>-U</literal> option allows to enumerate the standard UNIX
+users on a Samba machine.  It's used together with
+<literal>-l samba-server</literal> or <literal>-L samba-server</literal>.
+The normal UNIX users are usually not enumerated, but they can show
+up as file owners in <command>ls -l</command> output.
+</para>
 
 </sect2>
 

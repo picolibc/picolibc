@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <wctype.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -182,8 +183,8 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
     PSID psid;
     int buffer[10];
   } tu, tg;
-  char user[UNLEN + 1];
-  char dom[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR user[UNLEN + 1];
+  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD ulen = UNLEN + 1;
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   SID_NAME_USE acc_type;
@@ -194,7 +195,7 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
       || !GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &len)
       || !GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
       || !CloseHandle (ptok)
-      || !LookupAccountSidA (NULL, tu.psid, user, &ulen, dom, &dlen, &acc_type))
+      || !LookupAccountSidW (NULL, tu.psid, user, &ulen, dom, &dlen, &acc_type))
     {
       print_win_error (GetLastError ());
       return;
@@ -231,18 +232,20 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 	}
       else
         {
-	  strlcpy (homedir_psx, "/home/", sizeof (homedir_psx));
-	  strlcat (homedir_psx, user, sizeof (homedir_psx));
+	  wcstombs (stpncpy (homedir_psx, "/home/", sizeof (homedir_psx)),
+		    user, sizeof (homedir_psx) - 6);
+	  homedir_psx[PATH_MAX - 1] = '\0';
 	}
     }
   else
     {
-      strlcpy (homedir_psx, passed_home_path, sizeof (homedir_psx));
-      strlcat (homedir_psx, user, sizeof (homedir_psx));
+      char *p = stpncpy (homedir_psx, passed_home_path, sizeof (homedir_psx));
+      wcstombs (p, user, sizeof (homedir_psx) - (p - homedir_psx));
+      homedir_psx[PATH_MAX - 1] = '\0';
     }
 
-  printf ("%s%s%s:unused:%u:%u:U-%s\\%s,%s:%s:/bin/bash\n",
-	  sep ? dom : "",
+  printf ("%ls%s%ls:unused:%u:%u:U-%ls\\%ls,%s:%s:/bin/bash\n",
+	  sep ? dom : L"",
 	  sep ?: "",
 	  user,
 	  uid + id_offset,
@@ -251,6 +254,109 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 	  user,
 	  put_sid (tu.psid),
 	  homedir_psx);
+}
+
+void
+enum_unix_users (domlist_t *dom_or_machine, const char *sep, int id_offset,
+		 char *unix_user_list)
+{
+  WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  PWCHAR servername = NULL;
+  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
+  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
+  SID_IDENTIFIER_AUTHORITY auth = { { 0, 0, 0, 0, 0, 22 } };
+  char *ustr, *user_list;
+  WCHAR user[UNLEN + sizeof ("Unix User\\") + 1];
+  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
+  DWORD ulen, dlen, sidlen;
+  PSID psid;
+  char psid_buffer[MAX_SID_LEN];
+  SID_NAME_USE acc_type;
+
+  if (!d_or_m)
+    return;
+
+  int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
+    {
+      fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
+               __progname, d_or_m);
+      return;
+    }
+  servername = machine;
+
+  if (!AllocateAndInitializeSid (&auth, 2, 1, 0, 0, 0, 0, 0, 0, 0, &psid))
+    return;
+
+  if (!(user_list = strdup (unix_user_list)))
+    {
+      FreeSid (psid);
+      return;
+    }
+
+  for (ustr = strtok (user_list, ","); ustr; ustr = strtok (NULL, ","))
+    {
+      if (!isdigit (ustr[0]) && ustr[0] != '-')
+      	{
+	  PWCHAR p = wcpcpy (user, L"Unix User\\");
+	  ret = mbstowcs (p, ustr, UNLEN + 1);
+	  if (ret < 1 || ret >= UNLEN + 1)
+	    fprintf (stderr, "%s: Invalid user name '%s'.  Skipping...\n",
+		     __progname, ustr);
+	  else if (LookupAccountNameW (servername, user,
+				       psid = (PSID) psid_buffer,
+				       (sidlen = MAX_SID_LEN, &sidlen),
+				       dom,
+				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
+				       &acc_type))
+            printf ("%s%s%ls:unused:%lu:99999:,%s::\n",
+                    with_dom ? "Unix User" : "",
+                    with_dom ? sep : "",
+                    user + 10,
+		    id_offset +
+		    *GetSidSubAuthority (psid,
+					 *GetSidSubAuthorityCount(psid) - 1),
+                    put_sid (psid));
+	}
+      else
+	{
+	  DWORD start, stop;
+	  char *p = ustr;
+	  if (*p == '-')
+	    start = 0;
+	  else
+	    start = strtol (p, &p, 10);
+	  if (!*p)
+	    stop = start;
+	  else if (*p++ != '-' || !isdigit (*p)
+		   || (stop = strtol (p, &p, 10)) < start || *p)
+	    {
+	      fprintf (stderr, "%s: Malformed unix user list entry '%s'.  "
+			       "Skipping...\n", __progname, ustr);
+	      continue;
+	    }
+	  for (; start <= stop; ++ start)
+	    {
+	      *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1)
+	      = start;
+	      if (LookupAccountSidW (servername, psid,
+				     user, (ulen = GNLEN + 1, &ulen),
+				     dom,
+				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
+				     &acc_type)
+		  && !iswdigit (user[0]))
+		printf ("%s%s%ls:unused:%lu:99999:,%s::\n",
+			with_dom ? "Unix User" : "",
+			with_dom ? sep : "",
+			user,
+			id_offset + start,
+			put_sid (psid));
+	    }
+	}
+    }
+
+  free (user_list);
+  FreeSid (psid);
 }
 
 int
@@ -408,18 +514,18 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
-  char name[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR user[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD len, len2, rid;
   PSID sid;
-  SID_NAME_USE use;
+  SID_NAME_USE acc_type;
 
   if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
   				sub5, sub6, sub7, sub8, &sid))
     {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = UNLEN + 1, &len),
-			    dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
-			    &use))
+      if (LookupAccountSidW (NULL, sid,
+			     user, (len = UNLEN + 1, &len),
+			     dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
+			     &acc_type))
 	{
 	  if (sub8)
 	    rid = sub8;
@@ -437,8 +543,8 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	    rid = sub2;
 	  else
 	    rid = sub1;
-	  printf ("%s:*:%lu:%lu:,%s::\n",
-		  name, rid, rid == 18 ? 544 : rid, /* SYSTEM hack */
+	  printf ("%ls:*:%lu:%lu:,%s::\n",
+		  user, rid, rid == 18 ? 544 : rid, /* SYSTEM hack */
 		  put_sid (sid));
         }
       FreeSid (sid);
@@ -471,6 +577,11 @@ usage (FILE * stream)
 "   -p,--path-to-home path  use specified path instead of user account home dir\n"
 "                           or /home prefix\n"
 "   -m,--no-mount           don't use mount points for home dir\n"
+"   -U,--unix userlist      additionally print UNIX users when using -l or -L\n" 
+"                           on a UNIX Samba server\n"
+"                           userlist is a comma-separated list of usernames\n"
+"                           or uid ranges (root,-25,50-100).\n"
+"                           (enumerating large ranges can take a long time!)\n"
 "   -s,--no-sids            (ignored)\n"
 "   -g,--local-groups       (ignored)\n"
 "   -h,--help               displays this message\n"
@@ -496,11 +607,12 @@ struct option longopts[] = {
   {"no-sids", no_argument, NULL, 's'},
   {"separator", required_argument, NULL, 'S'},
   {"username", required_argument, NULL, 'u'},
+  {"unix", required_argument, NULL, 'U'},
   {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "cCd::D::ghl::L::mo:sS:p:u:v";
+char opts[] = "cCd::D::ghl::L::mo:sS:p:u:U:v";
 
 static void
 print_version ()
@@ -570,6 +682,7 @@ main (int argc, char **argv)
   char *opt;
   int print_cygpath = 1;
   int print_current = 0;
+  char *print_unix = NULL;
   const char *sep_char = "\\";
   int id_offset = 10000;
   int c, i, off;
@@ -649,6 +762,9 @@ skip_domain:
 	    return 1;
 	  }
         break;
+      case 'U':
+        print_unix = optarg;
+	break;
       case 'c':
 	sep_char = NULL;
 	/*FALLTHRU*/
@@ -697,8 +813,12 @@ skip_domain:
   for (i = 0; i < print_local; ++i)
     {
       if (locals[i].str)
-	enum_users (FALSE, locals + i, sep_char, print_cygpath,
-		    passed_home_path, id_offset * off++, disp_username);
+	{
+	  if (print_unix)
+	    enum_unix_users (locals + i, sep_char, id_offset * off, print_unix);
+	  enum_users (FALSE, locals + i, sep_char, print_cygpath,
+		      passed_home_path, id_offset * off++, disp_username);
+      	}
       else
 	{
 	  enum_std_accounts ();

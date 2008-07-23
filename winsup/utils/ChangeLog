@@ -1,3 +1,22 @@
+2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c: Consolidate variable names.
+	(enum_unix_groups): New function.
+	(print_special): Use LookupAccountSidW instead of LookupAccountSidA.
+	(current_group): Ditto.
+	(usage): Add -U option.
+	(longopts): Add --unix option.
+	(opts): Add -U option.
+	(main): Handle -U option.  Call enum_unix_groups if set.
+	* mkpasswd.c: Consolidate variable names.
+	(current_user): Use LookupAccountSidW instead of LookupAccountSidA.
+	(enum_unix_users): New function.
+	(usage): Add -U option.
+	(longopts): Add --unix option.
+	(opts): Add -U option.
+	(main): Handle -U option.  Call enum_unix_groups if set.
+	* utils.sgml: Add -U option text to mkgroup and mkpasswd description.
+
 2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (enum_groups): Create full qualified groupname using
