@@ -725,12 +725,22 @@ main (int argc, char **argv)
 			     "domains and machines.\n", __progname);
 	    return 1;
 	  }
+	domlist[print_domlist].domain = (c == 'd' || c == 'D');
 	opt = optarg ?:
 	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
 	for (i = 0; i < print_domlist; ++i)
-	  if ((!domlist[i].str && !opt)
-	      || (domlist[i].str && opt && !strcmp (domlist[i].str, opt)))
-	    goto skip;
+	  if (domlist[i].domain == domlist[print_domlist].domain
+	      && ((!domlist[i].str && !opt)
+		  || (domlist[i].str && opt
+		      && (off = strlen (domlist[i].str))
+		      && !strncmp (domlist[i].str, opt, off)
+		      && (!opt[off] || opt[off] == ','))))
+	    {
+	      fprintf (stderr, "%s: Duplicate %s '%s'.  Skipping...\n",
+		       __progname, domlist[i].domain ? "domain" : "machine",
+		       domlist[i].str);
+	      goto skip;
+	    }
 	domlist[print_domlist].str = opt;
 	domlist[print_domlist].id_offset = ULONG_MAX;
 	if (opt && (p = strchr (opt, ',')))
@@ -746,7 +756,6 @@ main (int argc, char **argv)
 	      }
 	    *p = '\0';
 	  }
-	domlist[print_domlist].domain = (c == 'd' || c == 'D');
 	domlist[print_domlist++].with_dom = (c == 'D' || c == 'L');
 skip:
 	break;

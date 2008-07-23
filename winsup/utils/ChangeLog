@@ -1,5 +1,10 @@
 2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mkgroup.c (main): Fix test for duplicate domain/machine request.
+	* mkpasswd.c (main): Ditto.
+
+2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mkgroup.c: Rework to allow per-domain/per-machine id_offset.
 	Add -b option to skip builtin groups.
 	(main): Simplify code.
