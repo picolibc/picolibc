@@ -509,12 +509,16 @@ Usage: mkgroup [OPTION]...
 Print /etc/group file to stdout
 
 Options:
-   -l,--local [machine]    print local groups (from local machine if no
-                           machine specified)
-   -L,--Local [machine]    ditto, but generate groupname with machine prefix
-   -d,--domain [domain]    print domain groups (from current domain if no
-                           domain specified)
-   -D,--Domain [domain]    ditto, but generate groupname with machine prefix
+   -l,--local [machine[,offset]]
+                           print local groups with gid offset offset
+                           (from local machine if no machine specified)
+   -L,--Local [machine[,offset]]
+                           ditto, but generate groupname with machine prefix
+   -d,--domain [domain[,offset]]
+                           print domain groups with gid offset offset
+                           (from current domain if no domain specified)
+   -D,--Domain [domain[,offset]]
+                           ditto, but generate groupname with machine prefix
    -c,--current            print current group
    -C,--Current            ditto, but generate groupname with machine or
                            domain prefix
@@ -524,6 +528,7 @@ Options:
                            in domain or foreign server accounts.
    -g,--group groupname    only return information for the specified group
                            one of -l, -L, -d, -D must be specified, too
+   -b,--no-builtin         don't print BUILTIN groups
    -U,--unix grouplist     additionally print UNIX groups when using -l or -L
                            on a UNIX Samba server
                            grouplist is a comma-separated list of groupnames
@@ -561,6 +566,10 @@ allow you to specify where the information comes from, the
 local SAM of a machine or from the domain, or both.
 With the <literal>-d/-D</literal> options the program contacts a Domain
 Controller, which my be unreachable or have restricted access.
+Comma-separated from the machine or domain, you can specify an offset
+which is used as base added to the group's RID to compute the gid
+(offset + RID = gid).  This allows to create the same gids every time you
+re-run <command>mkgroup</command>.
 For very simple needs, an entry for the current user's group can be
 created by using the option <literal>-c</literal> or <literal>-C</literal>.
 If you want to use one of the <literal>-D</literal>, <literal>-L</literal>
@@ -595,12 +604,16 @@ Usage: mkpasswd [OPTIONS]...
 Print /etc/passwd file to stdout
 
 Options:
-   -l,--local [machine]    print local user accounts (from local machine
-                           if no machine specified)
-   -L,--Local [machine]    ditto, but generate username with machine prefix
-   -d,--domain [domain]    print domain accounts (from current domain
-                           if no domain specified)
-   -D,--Domain [domain]    ditto, but generate username with domain prefix
+   -l,--local [machine[,offset]]
+                           print local user accounts with uid offset offset
+                           (from local machine if no machine specified)
+   -L,--Local [machine[,offset]]
+                           ditto, but generate username with machine prefix
+   -d,--domain [domain[,offset]]
+                           print domain accounts with uid offset offset
+                           (from current domain if no domain specified)
+   -D,--Domain [domain[,offset]]
+                           ditto, but generate username with domain prefix
    -c,--current            print current user
    -C,--Current            ditto, but generate username with machine or
                            domain prefix
@@ -653,6 +666,10 @@ allow you to specify where the information comes from, the
 local machine or the domain (default or given), or both.
 With the  <literal>-d/-D</literal> options the program contacts the Domain
 Controller, which may be unreachable or have restricted access.
+Comma-separated from the machine or domain, you can specify an offset
+which is used as base added to the user's RID to compute the uid
+(offset + RID = uid).  This allows to create the same uids every time you
+re-run <command>mkpasswd</command>.
 An entry for the current user can be created by using the
 option <literal>-c</literal> or  <literal>-C</literal>.
 If you want to use one of the <literal>-D</literal>, <literal>-L</literal>

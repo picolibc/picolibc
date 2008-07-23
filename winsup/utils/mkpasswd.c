@@ -48,6 +48,8 @@ NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CO
 typedef struct 
 {
   char *str;
+  DWORD id_offset;
+  BOOL domain;
   BOOL with_dom;
 } domlist_t;
 
@@ -175,7 +177,7 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 
 void
 current_user (int print_cygpath, const char *sep, const char *passed_home_path,
-	      int id_offset, const char *disp_username)
+	      DWORD id_offset, const char *disp_username)
 {
   DWORD len;
   HANDLE ptok;
@@ -244,12 +246,12 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
       homedir_psx[PATH_MAX - 1] = '\0';
     }
 
-  printf ("%ls%s%ls:unused:%u:%u:U-%ls\\%ls,%s:%s:/bin/bash\n",
+  printf ("%ls%s%ls:unused:%lu:%lu:U-%ls\\%ls,%s:%s:/bin/bash\n",
 	  sep ? dom : L"",
 	  sep ?: "",
 	  user,
-	  uid + id_offset,
-	  gid + id_offset,
+	  id_offset + uid,
+	  id_offset + gid,
 	  dom,
 	  user,
 	  put_sid (tu.psid),
@@ -257,7 +259,7 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 }
 
 void
-enum_unix_users (domlist_t *dom_or_machine, const char *sep, int id_offset,
+enum_unix_users (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 		 char *unix_user_list)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -361,7 +363,7 @@ enum_unix_users (domlist_t *dom_or_machine, const char *sep, int id_offset,
 
 int
 enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-	    int print_cygpath, const char *passed_home_path, int id_offset,
+	    int print_cygpath, const char *passed_home_path, DWORD id_offset,
 	    char *disp_username)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -486,12 +488,12 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		}
 	    }
 
-	  printf ("%ls%s%ls:unused:%u:%u:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
+	  printf ("%ls%s%ls:unused:%lu:%lu:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
 	  	  buffer[i].usri3_name,
-		  uid + id_offset,
-		  gid + id_offset,
+		  id_offset + uid,
+		  id_offset + gid,
 		  buffer[i].usri3_full_name ?: L"",
 		  buffer[i].usri3_full_name 
 		  && buffer[i].usri3_full_name[0] ? "," : "",
@@ -559,12 +561,16 @@ usage (FILE * stream)
 "Print /etc/passwd file to stdout\n"
 "\n"
 "Options:\n"
-"   -l,--local [machine]    print local user accounts (from local machine\n"
-"                           if no machine specified)\n"
-"   -L,--Local [machine]    ditto, but generate username with machine prefix\n"
-"   -d,--domain [domain]    print domain accounts (from current domain\n"
-"                           if no domain specified)\n"
-"   -D,--Domain [domain]    ditto, but generate username with domain prefix\n"
+"   -l,--local [machine[,offset]]\n"
+"                           print local user accounts with uid offset offset\n"
+"                           (from local machine if no machine specified)\n"
+"   -L,--Local [machine[,offset]]\n"
+"                           ditto, but generate username with machine prefix\n"
+"   -d,--domain [domain[,offset]]\n"
+"                           print domain accounts with uid offset offset\n"
+"                           (from current domain if no domain specified)\n"
+"   -D,--Domain [domain[,offset]]\n"
+"                           ditto, but generate username with domain prefix\n"
 "   -c,--current            print current user\n"
 "   -C,--Current            ditto, but generate username with machine or\n"
 "                           domain prefix\n"
@@ -675,17 +681,15 @@ fetch_primary_domain ()
 int
 main (int argc, char **argv)
 {
-  int print_local = 0;
-  domlist_t locals[16];
-  int print_domain = 0;
-  domlist_t domains[16];
-  char *opt;
+  int print_domlist = 0;
+  domlist_t domlist[32];
+  char *opt, *p, *ep;
   int print_cygpath = 1;
   int print_current = 0;
   char *print_unix = NULL;
   const char *sep_char = "\\";
-  int id_offset = 10000;
-  int c, i, off;
+  DWORD id_offset = 10000, off;
+  int c, i;
   char *disp_username = NULL;
   char passed_home_path[PATH_MAX];
   BOOL in_domain;
@@ -711,41 +715,40 @@ main (int argc, char **argv)
   while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
-      case 'l':
-      case 'L':
-	if (print_local >= 16)
-	  {
-	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
-			     "servers.\n", __progname);
-	    return 1;
-	  }
-	opt = optarg ?:
-	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
-	for (i = 0; i < print_local; ++i)
-	  if ((!locals[i].str && !opt)
-	      || (locals[i].str && opt && !strcmp (locals[i].str, opt)))
-	    goto skip_local;
-	locals[print_local].str = opt;
-	locals[print_local++].with_dom = c == 'L';
-skip_local:
-	break;
       case 'd':
       case 'D':
-	if (print_domain >= 16)
+      case 'l':
+      case 'L':
+	if (print_domlist >= 32)
 	  {
-	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
-			     "domains.\n", __progname);
+	    fprintf (stderr, "%s: Can not enumerate from more than 32 "
+			     "domains and machines.\n", __progname);
 	    return 1;
 	  }
 	opt = optarg ?:
 	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
-	for (i = 0; i < print_domain; ++i)
-	  if ((!domains[i].str && !opt)
-	      || (domains[i].str && opt && !strcmp (domains[i].str, opt)))
-	    goto skip_domain;
-	domains[print_domain].str = opt;
-	domains[print_domain++].with_dom = c == 'D';
-skip_domain:
+	for (i = 0; i < print_domlist; ++i)
+	  if ((!domlist[i].str && !opt)
+	      || (domlist[i].str && opt && !strcmp (domlist[i].str, opt)))
+	    goto skip;
+	domlist[print_domlist].str = opt;
+	domlist[print_domlist].id_offset = ULONG_MAX;
+	if (opt && (p = strchr (opt, ',')))
+	  {
+	    if (p == opt
+	    	|| !isdigit (p[1])
+	    	|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
+		    , *ep))
+	      {
+		fprintf (stderr, "%s: Malformed domain,offset string '%s'.  "
+			 "Skipping...\n", __progname, opt);
+	      	break;
+	      }
+	    *p = '\0';
+	  }
+	domlist[print_domlist].domain = (c == 'd' || c == 'D');
+	domlist[print_domlist++].with_dom = (c == 'D' || c == 'L');
+skip:
 	break;
       case 'S':
 	sep_char = optarg;
@@ -772,7 +775,13 @@ skip_domain:
 	print_current = 1;
 	break;
       case 'o':
-	id_offset = strtol (optarg, NULL, 10);
+	id_offset = strtoul (optarg, &ep, 10);
+	if (*ep)
+	  {
+	    fprintf (stderr, "%s: Malformed offset '%s'.  "
+		     "Skipping...\n", __progname, optarg);
+	    return 1;
+	  }
 	break;
       case 'g':
 	break;
@@ -806,33 +815,25 @@ skip_domain:
 	return 1;
       }
 
-  if (optind < argc - 1)
-    usage (stdout);
-
-  off = 1;
-  for (i = 0; i < print_local; ++i)
+  off = id_offset;
+  for (i = 0; i < print_domlist; ++i)
     {
-      if (locals[i].str)
-	{
-	  if (print_unix)
-	    enum_unix_users (locals + i, sep_char, id_offset * off, print_unix);
-	  enum_users (FALSE, locals + i, sep_char, print_cygpath,
-		      passed_home_path, id_offset * off++, disp_username);
-      	}
-      else
-	{
-	  enum_std_accounts ();
-	  enum_users (FALSE, locals + i, sep_char, print_cygpath,
-		      passed_home_path, 0, disp_username);
-	}
+      DWORD my_off = (domlist[i].domain || domlist[i].str)
+		     ? domlist[i].id_offset != ULONG_MAX
+		       ? domlist[i].id_offset : off : 0;
+      if (!domlist[i].domain && domlist[i].str && print_unix)
+	enum_unix_users (domlist + i, sep_char, my_off, print_unix);
+      if (!my_off)
+      	enum_std_accounts ();
+      enum_users (domlist[i].domain, domlist + i, sep_char, print_cygpath,
+		  passed_home_path, my_off, disp_username);
+      if (my_off)
+      	off += id_offset;
     }
 
-  for (i = 0; i < print_domain; ++i)
-    enum_users (TRUE, domains + i, sep_char, print_cygpath, passed_home_path,
-		id_offset * off++, disp_username);
-
   if (print_current)
-    current_user (print_cygpath, sep_char, passed_home_path, id_offset, disp_username);
+    current_user (print_cygpath, sep_char, passed_home_path, off,
+		  disp_username);
 
   return 0;
 }

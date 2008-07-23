@@ -1,5 +1,15 @@
 2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mkgroup.c: Rework to allow per-domain/per-machine id_offset.
+	Add -b option to skip builtin groups.
+	(main): Simplify code.
+	* mkpasswd.c: Rework to allow per-domain/per-machine id_offset.
+	(main): Simplify code.
+	* utils.sgml: Explain changed mkgroup/mkpasswd -d/-D/-l/-L options.
+	Add mkgroup -b option.
+
+2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mkgroup.c: Consolidate variable names.
 	(enum_unix_groups): New function.
 	(print_special): Use LookupAccountSidW instead of LookupAccountSidA.

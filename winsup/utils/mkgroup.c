@@ -48,6 +48,8 @@ NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CO
 typedef struct
 {
   char *str;
+  DWORD id_offset;
+  BOOL domain;
   BOOL with_dom;
 } domlist_t;
 
@@ -152,7 +154,7 @@ DBGSID builtin_sid_list[MAX_BUILTIN_SIDS];
 DWORD builtin_sid_cnt;
 
 void
-enum_unix_groups (domlist_t *dom_or_machine, const char *sep, int id_offset,
+enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 		  char *unix_grp_list)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -256,7 +258,7 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, int id_offset,
 
 int
 enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-		   int id_offset, char *disp_groupname)
+		   DWORD id_offset, char *disp_groupname, int print_builtin)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   PWCHAR servername = NULL;
@@ -367,8 +369,10 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    {
 	      int b;
 
+	      if (!print_builtin)
+	        goto skip_group;
 	      is_builtin = TRUE;
-	      if (servername && builtin_sid_cnt)
+	      if (builtin_sid_cnt)
 		for (b = 0; b < builtin_sid_cnt; b++)
 		  if (EqualSid (&builtin_sid_list[b], psid))
 		    goto skip_group;
@@ -380,8 +384,8 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 
 	  printf ("%ls%s%ls:%s:%ld:\n",
-		  with_dom ? domain_name : L"",
-		  with_dom ? sep : "",
+		  with_dom && !is_builtin ? domain_name : L"",
+		  with_dom && !is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
 		  gid + (is_builtin ? 0 : id_offset));
@@ -399,7 +403,7 @@ skip_group:
 
 void
 enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-	     int id_offset, char *disp_groupname)
+	     DWORD id_offset, char *disp_groupname)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   PWCHAR servername = NULL;
@@ -499,12 +503,12 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		  continue;
 		}
 	    }
-	  printf ("%ls%s%ls:%s:%u:\n",
+	  printf ("%ls%s%ls:%s:%lu:\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
 		  buffer[i].grpi2_name,
 		  put_sid (psid),
-		  gid + id_offset);
+		  id_offset + gid);
 	}
 
       NetApiBufferFree (buffer);
@@ -554,7 +558,7 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 }
 
 void
-current_group (const char *sep, int id_offset)
+current_group (const char *sep, DWORD id_offset)
 {
   DWORD len;
   HANDLE ptok;
@@ -578,12 +582,12 @@ current_group (const char *sep, int id_offset)
       return;
     }
   gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
-  printf ("%ls%s%ls:%s:%u:\n",
+  printf ("%ls%s%ls:%s:%lu:\n",
 	  sep ? dom : L"",
 	  sep ?: "",
 	  grp,
 	  put_sid (tg.psid),
-	  gid + id_offset);
+	  id_offset + gid);
 }
 
 int
@@ -594,12 +598,16 @@ usage (FILE * stream)
 "Print /etc/group file to stdout\n"
 "\n"
 "Options:\n"
-"   -l,--local [machine]    print local groups (from local machine if no\n"
-"                           machine specified)\n"
-"   -L,--Local [machine]    ditto, but generate groupname with machine prefix\n"
-"   -d,--domain [domain]    print domain groups (from current domain if no\n"
-"                           domain specified)\n"
-"   -D,--Domain [domain]    ditto, but generate groupname with machine prefix\n"
+"   -l,--local [machine[,offset]]\n"
+"                           print local groups with gid offset offset\n"
+"                           (from local machine if no machine specified)\n"
+"   -L,--Local [machine[,offset]]\n"
+"                           ditto, but generate groupname with machine prefix\n"
+"   -d,--domain [domain[,offset]]\n"
+"                           print domain groups with gid offset offset\n"
+"                           (from current domain if no domain specified)\n"
+"   -D,--Domain [domain[,offset]]\n"
+"                           ditto, but generate groupname with machine prefix\n"
 "   -c,--current            print current group\n"
 "   -C,--Current            ditto, but generate groupname with machine or\n"
 "                           domain prefix\n"
@@ -609,6 +617,7 @@ usage (FILE * stream)
 "                           in domain or foreign server accounts.\n"
 "   -g,--group groupname    only return information for the specified group\n"
 "                           one of -l, -L, -d, -D must be specified, too\n"
+"   -b,--no-builtin         don't print BUILTIN groups\n"
 "   -U,--unix grouplist     additionally print UNIX groups when using -l or -L\n"
 "                           on a UNIX Samba server\n"
 "                           grouplist is a comma-separated list of groupnames\n"
@@ -625,6 +634,7 @@ usage (FILE * stream)
 }
 
 struct option longopts[] = {
+  {"no-builtin", no_argument, NULL, 'b'},
   {"current", no_argument, NULL, 'c'},
   {"Current", no_argument, NULL, 'C'},
   {"domain", optional_argument, NULL, 'd'},
@@ -642,7 +652,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "cCd::D::g:hl::L::o:sS:uU:v";
+char opts[] = "bcCd::D::g:hl::L::o:sS:uU:v";
 
 void
 print_version ()
@@ -693,17 +703,16 @@ fetch_primary_domain ()
 int
 main (int argc, char **argv)
 {
-  int print_local = 0;
-  domlist_t locals[16];
-  int print_domain = 0;
-  domlist_t domains[16];
-  char *opt;
+  int print_domlist = 0;
+  domlist_t domlist[32];
+  char *opt, *p, *ep;
   int print_current = 0;
   int print_system = 0;
+  int print_builtin = 1;
   char *print_unix = NULL;
   const char *sep_char = "\\";
-  int id_offset = 10000;
-  int c, i, off;
+  DWORD id_offset = 10000, off;
+  int c, i;
   char *disp_groupname = NULL;
   BOOL in_domain;
 
@@ -719,10 +728,11 @@ main (int argc, char **argv)
       if (in_domain)
 	{
 	  if (!enum_local_groups (TRUE, NULL, sep_char, id_offset,
-				  disp_groupname))
+				  disp_groupname, print_builtin))
 	    enum_groups (TRUE, NULL, sep_char, id_offset, disp_groupname);
 	}
-      else if (!enum_local_groups (FALSE, NULL, sep_char, 0, disp_groupname))
+      else if (!enum_local_groups (FALSE, NULL, sep_char, 0, disp_groupname,
+				   print_builtin))
 	enum_groups (FALSE, NULL, sep_char, 0, disp_groupname);
       return 0;
     }
@@ -730,43 +740,41 @@ main (int argc, char **argv)
   while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
-      case 'l':
-      case 'L':
-	if (print_local >= 16)
-	  {
-	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
-			     "servers.\n", __progname);
-	    return 1;
-	  }
-	opt = optarg ?:
-	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
-	for (i = 0; i < print_local; ++i)
-	  if ((!locals[i].str && !opt)
-	      || (locals[i].str && opt && !strcmp (locals[i].str, opt)))
-	    goto skip_local;
-	if (!(locals[print_local].str = opt))
-	  print_system = 1;
-	locals[print_local++].with_dom = c == 'L';
-  skip_local:
-	break;
       case 'd':
       case 'D':
-	if (print_domain >= 16)
+      case 'l':
+      case 'L':
+	if (print_domlist >= 32)
 	  {
-	    fprintf (stderr, "%s: Can not enumerate from more than 16 "
-			     "domains.\n", __progname);
+	    fprintf (stderr, "%s: Can not enumerate from more than 32 "
+			     "domains and machines.\n", __progname);
 	    return 1;
 	  }
 	opt = optarg ?:
 	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
-	for (i = 0; i < print_domain; ++i)
-	  if ((!domains[i].str && !opt)
-	      || (domains[i].str && opt && !strcmp (domains[i].str, opt)))
-	    goto skip_domain;
-	if (!(domains[print_domain].str = opt))
+	for (i = 0; i < print_domlist; ++i)
+	  if ((!domlist[i].str && !opt)
+	      || (domlist[i].str && opt && !strcmp (domlist[i].str, opt)))
+	    goto skip;
+	if (!(domlist[print_domlist].str = opt))
 	  print_system = 1;
-	domains[print_domain++].with_dom = c == 'D';
-  skip_domain:
+	domlist[print_domlist].id_offset = ULONG_MAX;
+	if (opt && (p = strchr (opt, ',')))
+	  {
+	    if (p == opt
+	    	|| !isdigit (p[1])
+	    	|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
+		    , *ep))
+	      {
+		fprintf (stderr, "%s: Malformed machine,offset string '%s'.  "
+			 "Skipping...\n", __progname, opt);
+	      	break;
+	      }
+	    *p = '\0';
+	  }
+	domlist[print_domlist].domain = (c == 'd' || c == 'D');
+	domlist[print_domlist++].with_dom = (c == 'D' || c == 'L');
+  skip:
 	break;
       case 'S':
 	sep_char = optarg;
@@ -795,6 +803,9 @@ main (int argc, char **argv)
       case 'o':
 	id_offset = strtol (optarg, NULL, 10);
 	break;
+      case 'b':
+      	print_builtin = 0;
+	break;
       case 's':
 	break;
       case 'u':
@@ -813,44 +824,31 @@ main (int argc, char **argv)
 	return 1;
       }
 
-  if (optind < argc - 1)
-    usage (stdout);
-
   /* Get 'system' group */
-  if (!disp_groupname && print_system)
+  if (!disp_groupname && print_system && print_builtin)
     print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		   0, 0, 0, 0, 0, 0, 0);
 
-  off = 1;
-  for (i = 0; i < print_local; ++i)
+  off = id_offset;
+  for (i = 0; i < print_domlist; ++i)
     {
-      if (locals[i].str)
+      DWORD my_off = (domlist[i].domain || domlist[i].str)
+		     ? domlist[i].id_offset != ULONG_MAX
+		       ? domlist[i].id_offset : off : 0;
+      if (!enum_local_groups (domlist[i].domain, domlist + i, sep_char,
+			      my_off, disp_groupname, print_builtin))
 	{
-	  if (!enum_local_groups (FALSE, locals + i, sep_char,
-				  id_offset * off, disp_groupname))
-	    {
-	      if (print_unix)
-	      	enum_unix_groups (locals + i, sep_char, id_offset * off,
-				  print_unix);
-	      enum_groups (FALSE, locals + i, sep_char, id_offset * off++,
-			   disp_groupname);
-	    }
+	  if (!domlist[i].domain && domlist[i].str && print_unix)
+	    enum_unix_groups (domlist + i, sep_char, my_off, print_unix);
+	  enum_groups (domlist[i].domain, domlist + i, sep_char, my_off,
+		       disp_groupname);
+	  if (my_off)
+	    off += id_offset;
 	}
-      else if (!enum_local_groups (FALSE, locals + i, sep_char, 0,
-				   disp_groupname))
-	enum_groups (FALSE, locals + i, sep_char, 0, disp_groupname);
-    }
-
-  for (i = 0; i < print_domain; ++i)
-    {
-      if (!enum_local_groups (TRUE, domains + i, sep_char, id_offset * off,
-			      disp_groupname))
-	enum_groups (TRUE, domains + i, sep_char, id_offset * off++,
-		     disp_groupname);
     }
 
   if (print_current)
-    current_group (sep_char, id_offset);
+    current_group (sep_char, off);
 
   return 0;
 }
