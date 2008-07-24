@@ -1,3 +1,9 @@
+2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/lmaccess.h (struct _USER_INFO_4): Define.
+	(struct _USER_INFO_23): Define.
+	(struct _GROUP_INFO_3): Define.
+
 2008-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/iphlpapi.h (GetExtendedTcpTable): Add prototype.
