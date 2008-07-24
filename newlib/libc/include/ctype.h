@@ -67,6 +67,9 @@ extern	__IMPORT _CONST char	*__ctype_ptr__;
 #define toascii(c)	((c)&0177)
 #endif
 
+/* For C++ backward-compatibility only.  */
+extern	__IMPORT _CONST char	_ctype_[];
+
 _END_STD_C
 
 #endif /* _CTYPE_H_ */

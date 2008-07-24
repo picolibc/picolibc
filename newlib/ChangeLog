@@ -1,3 +1,8 @@
+2008-07-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/ctype.h (_ctype_): Restore for C++ backward
+	compatability only.
+
 2008-07-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/ctype/ctype_.c: Add new pointer __ctype_ptr__ which is one
