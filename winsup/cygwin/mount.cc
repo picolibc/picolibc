@@ -734,7 +734,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 		       FILE_SHARE_VALID_FLAGS, FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
-      system_printf ("NtOpenFile(%S) failed, %p", &upath, status);
+      debug_printf ("NtOpenFile(%S) failed, %p", &upath, status);
       return false;
     }
 

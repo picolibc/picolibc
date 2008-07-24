@@ -1,5 +1,10 @@
 2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::from_fstab): Change system_printf to
+	debug_printf on NtOpenFile failure.
+
+2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shared.cc (user_shared_initialize): Fetch potentially changed Cygwin
 	username from /etc/passwd before loading mount table.
 	(shared_info::init_installation_root): New function fetching Cygwin's
