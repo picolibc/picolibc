@@ -72,32 +72,6 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
   return true;
 }
 
-/* Use absolute path of cygwin1.dll to derive a "root".
-   Return false if GetModuleFileNameW fails or path is "funny".
-   Otherwise return true.  */
-static inline PWCHAR
-find_root_from_cygwin_dll (WCHAR *path)
-{
-  if (!GetModuleFileNameW (cygwin_hmodule, path, NT_MAX_PATH))
-    {
-      debug_printf ("GetModuleFileNameW(%p, %p, %u), %E", cygwin_hmodule, path, NT_MAX_PATH);
-      return NULL;
-    }
-  PWCHAR w = wcsrchr (path, L'\\');
-  if (w)
-    {
-      *w = L'\0';
-      w = wcsrchr (path, L'\\');
-    }
-  if (!w)
-    {
-      debug_printf ("Invalid DLL path");
-      return NULL;
-    }
-  *w = L'\0';
-  return w;
-}
-
 inline void
 mount_info::create_root_entry (const PWCHAR root)
 {
@@ -121,14 +95,13 @@ mount_info::init ()
   nmounts = 0;
   PWCHAR pathend;
   WCHAR path[NT_MAX_PATH];
-  if ((pathend = find_root_from_cygwin_dll (path)))
-    {
-      create_root_entry (path);
-      pathend = wcpcpy (pathend, L"\\etc\\fstab");
-      if (from_fstab (false, path, pathend)   /* The single | is correct! */
-	  | from_fstab (true, path, pathend))
-	  return;
-    }
+  
+  pathend = wcpcpy (path, cygwin_shared->installation_root);
+  create_root_entry (path);
+  pathend = wcpcpy (pathend, L"\\etc\\fstab");
+  if (from_fstab (false, path, pathend)   /* The single | is correct! */
+      | from_fstab (true, path, pathend))
+      return;
 
   /* FIXME: Remove warning message before releasing 1.7.0. */
   small_printf ("Huh?  No /etc/fstab file?  Using default root and cygdrive prefix...\n");
@@ -737,27 +710,45 @@ mount_info::from_fstab_line (char *line, bool user)
 bool
 mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 {
+  UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  HANDLE fh;
+
   if (user)
-    sys_mbstowcs (wcpcpy (fstab_end, L".d\\"),
-		  NT_MAX_PATH - (fstab_end - fstab),
-		  cygheap->user.name ());
-  debug_printf ("Try to read mounts from %W", fstab);
-  HANDLE h = CreateFileW (fstab, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
-			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (h == INVALID_HANDLE_VALUE)
     {
-      debug_printf ("CreateFileW, %E");
+      extern void transform_chars (PWCHAR, PWCHAR);
+      PWCHAR username;
+      sys_mbstowcs (username = wcpcpy (fstab_end, L".d\\"),
+		    NT_MAX_PATH - (fstab_end - fstab),
+		    cygheap->user.name ());
+      /* Make sure special chars in the username are converted according to
+         the rules. */
+      transform_chars (username, username + wcslen (username) - 1);
+    }
+  RtlInitUnicodeString (&upath, fstab);
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  debug_printf ("Try to read mounts from %W", fstab);
+  status = NtOpenFile (&fh, SYNCHRONIZE | FILE_READ_DATA, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, FILE_SYNCHRONOUS_IO_NONALERT);
+  if (!NT_SUCCESS (status))
+    {
+      system_printf ("NtOpenFile(%S) failed, %p", &upath, status);
       return false;
     }
+
   char buf[NT_MAX_PATH];
   char *got = buf;
   DWORD len = 0;
   unsigned line = 1;
   /* Using buffer size - 2 leaves space to append two \0. */
-  while (ReadFile (h, got, (sizeof (buf) - 2) - (got - buf), &len, NULL))
+  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, got,
+				 (sizeof (buf) - 2) - (got - buf), NULL, NULL)))
     {
       char *end;
 
+      len = io.Information;
       /* Set end marker. */
       got[len] = got[len + 1] = '\0';
       /* Set len to the absolute len of bytes in buf. */
@@ -783,8 +774,10 @@ retry:
       if (!got_nl)
         {
 	  system_printf ("%W: Line %d too long, skipping...", fstab, line);
-	  while (ReadFile (h, buf, (sizeof (buf) - 2), &len, NULL))
+	  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, buf,
+	  				 (sizeof (buf) - 2), NULL, NULL)))
 	    {
+	      len = io.Information;
 	      buf[len] = buf[len + 1] = '\0';
 	      got = strchr (buf, '\n');
 	      if (got)
@@ -809,7 +802,7 @@ retry:
   if (got > buf)
     from_fstab_line (got, user);
 done:
-  CloseHandle (h);
+  NtClose (fh);
   return true;
 }
 

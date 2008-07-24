@@ -72,7 +72,7 @@ pwdgrp::read_group ()
     if ((*group_buf)[i].gr_mem != &null_ptr)
       free ((*group_buf)[i].gr_mem);
 
-  load ("/etc/group");
+  load (L"\\etc\\group");
 
   /* Complete /etc/group in memory if needed */
   if (!internal_getgrgid (myself->gid))

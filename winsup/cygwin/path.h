@@ -350,7 +350,7 @@ class etc
   static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
   static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];
   static bool dir_changed (int);
-  static int init (int, path_conv &pc);
+  static int init (int, POBJECT_ATTRIBUTES);
   static bool file_changed (int);
   static bool test_file_change (int);
   friend class pwdgrp;

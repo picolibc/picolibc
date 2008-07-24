@@ -11,6 +11,7 @@ details. */
 #include "tty.h"
 #include "security.h"
 #include "mtinfo.h"
+#include "limits.h"
 
 /* Mount table entry */
 
@@ -117,9 +118,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 31136
+#define SHARED_INFO_CB 39328
 
-#define CURR_SHARED_MAGIC 0x18da899eU
+#define CURR_SHARED_MAGIC 0x22f9ff0bU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -135,10 +136,12 @@ class shared_info
   DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;
+  WCHAR installation_root[PATH_MAX];
   DWORD obcaseinsensitive;
   mtinfo mt;
 
   void initialize ();
+  void init_installation_root ();
   void init_obcaseinsensitive ();
   unsigned heap_chunk_size ();
   unsigned heap_slop_size ();

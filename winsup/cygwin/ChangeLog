@@ -1,3 +1,38 @@
+2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (user_shared_initialize): Fetch potentially changed Cygwin
+	username from /etc/passwd before loading mount table.
+	(shared_info::init_installation_root): New function fetching Cygwin's
+	installation root dir and storing as native NT path in global shared
+	memory.
+	(shared_info::initialize): Call init_installation_root exactly once at
+	first startup.
+	* shared_info.h (SHARED_INFO_CB): Accommodate change to shared_info.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Add installation_root member.
+	(shared_info::init_installation_root): Declare.
+
+	* grp.cc (pwdgrp::read_group): Call pwdgrp::load with native WCHAR path.
+	* passwd.cc (pwdgrp::read_passwd): Ditto.  Avoid recursion.
+	(etc::init): Take POBJECT_ATTRIBUTES instead of path_conv.
+	* path.h (etc::init): Change prototype accordingly.
+	* pwdgrp.h (class pwdgrp): Store path as UNICODE_STRING/PWCHAR instead
+	of as path_conv.
+	(pwdgrp::load): Accommodate prototype.
+	* uinfo.cc (pwdgrp::load): Change argument type from char to wchar_t.
+	Create native NT path here instead of calling path_conv.
+
+	* mount.cc (find_root_from_cygwin_dll): Drop in favor of global
+	initializaion in shared_info.
+	(mount_info::init): Fetch native NT root dir from cygwin_shared.
+	(mount_info::from_fstab): Expect native NT path and use native NT
+	functions to access file.  Convert username part in user fstab path
+	according to special char transformation rules.
+	* path.cc (tfx_chars): Convert slash to backslash.
+	(transform_chars): Implement for path given as PWCHAR.
+	(transform_chars): PUNICODE_STRING version calls PWCHAR version.
+	Remove useless commented code.
+
 2008-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Fix previous patch for UNC paths.

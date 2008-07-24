@@ -13,6 +13,7 @@ details. */
 #include <unistd.h>
 #include <wininet.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <lm.h>
 #include <iptypes.h>
 #include <sys/cygwin.h>
@@ -22,6 +23,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "shared_info.h"
 #include "registry.h"
 #include "child_info.h"
 #include "environ.h"
@@ -508,7 +510,7 @@ pwdgrp::add_line (char *eptr)
 }
 
 void
-pwdgrp::load (const char *posix_fname)
+pwdgrp::load (const wchar_t *rel_path)
 {
   static const char failed[] = "failed";
   static const char succeeded[] = "succeeded";
@@ -526,23 +528,26 @@ pwdgrp::load (const char *posix_fname)
   buf = NULL;
   curr_lines = 0;
 
-  pc.check (posix_fname);
-  etc_ix = etc::init (etc_ix, pc);
-
-  paranoid_printf ("%s", posix_fname);
-
-  if (pc.error || !pc.exists () || pc.isdir ())
+  if (!path &&
+      !(path = (PWCHAR) malloc ((wcslen (cygwin_shared->installation_root)
+				 + wcslen (rel_path) + 1) * sizeof (WCHAR))))
     {
-      paranoid_printf ("strange path_conv problem");
+      paranoid_printf ("malloc (%W) failed", rel_path);
       goto out;
     }
-  status = NtOpenFile (&fh, FILE_READ_DATA,
-		       pc.get_object_attr (attr, sec_none_nih), &io,
+  wcpcpy (wcpcpy (path, cygwin_shared->installation_root), rel_path);
+  RtlInitUnicodeString (&upath, path);
+
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  etc_ix = etc::init (etc_ix, &attr);
+
+  paranoid_printf ("%S", &upath);
+
+  status = NtOpenFile (&fh, FILE_READ_DATA, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, 0);
   if (!NT_SUCCESS (status))
     {
-      paranoid_printf ("NtOpenFile(%S) failed, status %p",
-			pc.get_nt_native_path (), status);
+      paranoid_printf ("NtOpenFile(%S) failed, status %p", &upath, status);
       goto out;
     }
   status = NtQueryInformationFile (fh, &io, &fsi, sizeof fsi,
@@ -550,7 +555,7 @@ pwdgrp::load (const char *posix_fname)
   if (!NT_SUCCESS (status))
     {
       paranoid_printf ("NtQueryInformationFile(%S) failed, status %p",
-		       pc.get_nt_native_path (), status);
+		       &upath, status);
       goto out;
     }
   /* FIXME: Should we test for HighPart set?  If so, the
@@ -567,8 +572,7 @@ pwdgrp::load (const char *posix_fname)
 		       fsi.EndOfFile.LowPart, &off, NULL);
   if (!NT_SUCCESS (status))
     {
-      paranoid_printf ("NtReadFile(%S) failed, status %p",
-		       pc.get_nt_native_path (), status);
+      paranoid_printf ("NtReadFile(%S) failed, status %p", &upath, status);
       free (buf);
       goto out;
     }
@@ -576,12 +580,12 @@ pwdgrp::load (const char *posix_fname)
   char *eptr = buf;
   while ((eptr = add_line (eptr)))
     continue;
-  debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
+  debug_printf ("%W curr_lines %d", rel_path, curr_lines);
   res = succeeded;
 
 out:
   if (fh)
     NtClose (fh);
-  debug_printf ("%s load %s", posix_fname, res);
+  debug_printf ("%W load %s", rel_path, res);
   initialized = true;
 }

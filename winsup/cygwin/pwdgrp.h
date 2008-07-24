@@ -35,7 +35,8 @@ class pwdgrp
   void (pwdgrp::*read) ();
   bool (pwdgrp::*parse) ();
   int etc_ix;
-  path_conv pc;
+  UNICODE_STRING upath;
+  PWCHAR path;
   char *buf, *lptr;
   int max_lines;
   bool initialized;
@@ -67,7 +68,7 @@ class pwdgrp
 public:
   int curr_lines;
 
-  void load (const char *);
+  void load (const wchar_t *);
   inline void refresh (bool check)
   {
     if (!check && initialized)

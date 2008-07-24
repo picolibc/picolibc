@@ -574,7 +574,7 @@ WCHAR tfx_chars[] NO_COPY = {
   16,  17,  18,  19,  20,  21,  22,  23,
   24,  25,  26,  27,  28,  29,  30,  31,
   32, '!', 0xf000 | '"', '#', '$', '%', '&',  39,
-  '(', ')', 0xf000 | '*', '+', ',', '-', '.', '/',
+  '(', ')', 0xf000 | '*', '+', ',', '-', '.', '\\',
  '0', '1', '2', '3', '4', '5', '6', '7',
  '8', '9', 0xf000 | ':', ';', 0xf000 | '<', '=', 0xf000 | '>', 0xf000 | '?',
  '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
@@ -587,22 +587,20 @@ WCHAR tfx_chars[] NO_COPY = {
  'x', 'y', 'z', '{', 0xf000 | '|', '}', '~', 127
 };
 
-static void
+void
+transform_chars (PWCHAR path, PWCHAR path_end)
+{
+  for (; path <= path_end; ++path)
+    if (*path < 128)
+      *path = tfx_chars[*path];
+}
+
+static inline
+void
 transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 {
-  register PWCHAR buf = upath->Buffer;
-  register PWCHAR end = buf + upath->Length / sizeof (WCHAR) - 1;
-  for (buf += start_idx; buf <= end; ++buf)
-    if (*buf < 128)
-      *buf = tfx_chars[*buf];
-#if 0
-  /* Win32 can't handle trailing dots and spaces.  Transform the last of them
-     to the private use area, too, to create a valid Win32 filename. */
-  if (*end == L'\\')
-    --end;
-  if (*end == L'.' || *end == L' ')
-    *end |= 0xf000;
-#endif
+  transform_chars (upath->Buffer + start_idx,
+		   upath->Buffer + upath->Length / sizeof (WCHAR) - 1);
 }
 
 PUNICODE_STRING
@@ -3391,7 +3389,7 @@ OBJECT_ATTRIBUTES etc::fn[MAX_ETC_FILES + 1];
 LARGE_INTEGER etc::last_modified[MAX_ETC_FILES + 1];
 
 int
-etc::init (int n, path_conv &pc)
+etc::init (int n, POBJECT_ATTRIBUTES attr)
 {
   if (n > 0)
     /* ok */;
@@ -3400,7 +3398,7 @@ etc::init (int n, path_conv &pc)
   else
     api_fatal ("internal error");
 
-  pc.get_object_attr (fn[n], sec_none_nih);
+  fn[n] = *attr;
   change_possible[n] = false;
   test_file_change (n);
   paranoid_printf ("fn[%d] %S, curr_ix %d", n, fn[n].ObjectName, curr_ix);

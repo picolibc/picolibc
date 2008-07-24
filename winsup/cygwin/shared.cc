@@ -22,8 +22,10 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "pwdgrp.h"
 #include "ntdll.h"
 #include <alloca.h>
+#include <wchar.h>
 
 shared_info NO_COPY *cygwin_shared;
 user_info NO_COPY *user_shared;
@@ -225,7 +227,12 @@ user_shared_initialize (bool reinit)
   /* Initialize the Cygwin per-user shared, if necessary */
   if (!sversion)
     {
-      debug_printf ("initializing user shared");
+      cygpsid sid (cygheap->user.sid ());
+      struct passwd *pw = internal_getpwsid (sid);
+      /* Correct the user name with what's defined in /etc/passwd before
+	 loading the user fstab file. */
+      if (pw)
+      	cygheap->user.set_name (pw->pw_name);
       user_shared->mountinfo.init ();	/* Initialize the mount table.  */
       user_shared->cb =  sizeof (*user_shared);
     }
@@ -238,6 +245,46 @@ user_shared_initialize (bool reinit)
       else if (user_shared->cb != sizeof (*user_shared))
 	multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
     }
+}
+
+/* Use absolute path of cygwin1.dll to derive the Win32 dir which
+   is our installation root.  Note that we can't handle Cygwin installation
+   root dirs of more than 4K path length.  I assume that's ok... */
+void
+shared_info::init_installation_root ()
+{
+  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "GetModuleFileNameW(%p, %p, %u), %E",
+	       cygwin_hmodule, installation_root, PATH_MAX);
+  PWCHAR p = installation_root;
+  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+    {
+      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+	{
+	  p = wcpcpy (p, L"\\??\\UN");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	  *p = L'C';
+	}
+      else
+	{
+	  p = wcpcpy (p, L"\\??\\");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	}
+    }
+  installation_root[1] = L'?';
+
+  PWCHAR w = wcsrchr (installation_root, L'\\');
+  if (w)
+    {
+      *w = L'\0';
+      w = wcsrchr (installation_root, L'\\');
+    }
+  if (!w)
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "Invalid DLL path");
+
+  *w = L'\0';
 }
 
 /* Initialize obcaseinsensitive.  Default to case insensitive on pre-XP. */
@@ -279,10 +326,10 @@ shared_info::initialize ()
 
   if (!sversion)
     {
-
+      init_installation_root ();/* Initialize installation root dir. */
+      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
       tty.init ();		/* Initialize tty table.  */
       mt.initialize ();		/* Initialize shared tape information. */
-      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
       cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
 
