@@ -34,3 +34,14 @@ CertDeleteCertificateFromStore@4
 PFXIsPFXBlob@4
 PFXVerifyPassword@12
 PFXImportCertStore@12
+CertGetCertificateContextProperty@16
+CryptEnumKeyIdentifierProperties@28
+CryptAcquireCertificatePrivateKey@24
+CertCreateCertificateContext@12
+CryptGetKeyIdentifierProperty@28
+CertSetCertificateContextProperty@16
+CertCompareCertificateName@12
+CryptSetKeyIdentifierProperty@24
+CryptEncodeObject@20
+CryptGetDefaultProviderA@20
+CryptGetDefaultProviderW@20

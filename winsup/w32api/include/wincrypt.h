@@ -994,7 +994,164 @@ typedef struct _CERT_POLICY_MAPPINGS_INFO {
   PCERT_POLICY_MAPPING rgPolicyMapping;
 } CERT_POLICY_MAPPINGS_INFO, 
  *PCERT_POLICY_MAPPINGS_INFO;
+
 #endif /* (WINVER >= 0x0501) */ /* Windows Server 2003, Windows XP */
+
+//http://msdn.microsoft.com/en-us/library/aa922935.aspx
+//Some Crypto Key Provider Information structures.
+typedef struct _CRYPT_KEY_PROV_PARAM {
+    DWORD           dwParam;
+    BYTE            *pbData;
+    DWORD           cbData;
+    DWORD           dwFlags;
+} CRYPT_KEY_PROV_PARAM, *PCRYPT_KEY_PROV_PARAM;
+
+//http://msdn.microsoft.com/en-us/library/aa381420(VS.85).aspx
+typedef struct _CRYPT_KEY_PROV_INFO {
+    LPWSTR                  pwszContainerName;
+    LPWSTR                  pwszProvName;
+    DWORD                   dwProvType;
+    DWORD                   dwFlags;
+    DWORD                   cProvParam;
+    PCRYPT_KEY_PROV_PARAM   rgProvParam;
+    DWORD                   dwKeySpec;
+} CRYPT_KEY_PROV_INFO, *PCRYPT_KEY_PROV_INFO;
+
+#define CERT_SET_KEY_PROV_HANDLE_PROP_ID    0x00000001
+#define CERT_SET_KEY_CONTEXT_PROP_ID        0x00000001
+
+#define CRYPT_KEYID_DELETE_FLAG         0x00000010
+#define CRYPT_KEYID_SET_NEW_FLAG        0x00002000
+
+//certificate crl ctl IDs
+#define CERT_KEY_PROV_HANDLE_PROP_ID        1
+#define CERT_KEY_PROV_INFO_PROP_ID          2
+#define CERT_SHA1_HASH_PROP_ID              3
+#define CERT_MD5_HASH_PROP_ID               4
+#define CERT_HASH_PROP_ID                   CERT_SHA1_HASH_PROP_ID
+#define CERT_KEY_CONTEXT_PROP_ID            5
+#define CERT_KEY_SPEC_PROP_ID               6
+#define CERT_IE30_RESERVED_PROP_ID          7
+#define CERT_PUBKEY_HASH_RESERVED_PROP_ID   8
+#define CERT_ENHKEY_USAGE_PROP_ID           9
+#define CERT_CTL_USAGE_PROP_ID              CERT_ENHKEY_USAGE_PROP_ID
+#define CERT_NEXT_UPDATE_LOCATION_PROP_ID   10
+#define CERT_FRIENDLY_NAME_PROP_ID          11
+#define CERT_PVK_FILE_PROP_ID               12
+#define CERT_DESCRIPTION_PROP_ID            13
+#define CERT_ACCESS_STATE_PROP_ID           14
+#define CERT_SIGNATURE_HASH_PROP_ID         15
+#define CERT_SMART_CARD_DATA_PROP_ID        16
+#define CERT_EFS_PROP_ID                    17
+#define CERT_FORTEZZA_DATA_PROP_ID          18
+#define CERT_ARCHIVED_PROP_ID               19
+#define CERT_KEY_IDENTIFIER_PROP_ID         20
+#define CERT_AUTO_ENROLL_PROP_ID            21
+#define CERT_PUBKEY_ALG_PARA_PROP_ID        22
+#define CERT_CROSS_CERT_DIST_POINTS_PROP_ID 23
+#define CERT_ISSUER_PUBLIC_KEY_MD5_HASH_PROP_ID     24
+#define CERT_SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID    25
+#define CERT_ENROLLMENT_PROP_ID             26
+#define CERT_DATE_STAMP_PROP_ID             27
+#define CERT_ISSUER_SERIAL_NUMBER_MD5_HASH_PROP_ID  28
+#define CERT_SUBJECT_NAME_MD5_HASH_PROP_ID  29
+#define CERT_EXTENDED_ERROR_INFO_PROP_ID    30
+
+//Certificate name type
+#define CERT_NAME_EMAIL_TYPE            1
+#define CERT_NAME_RDN_TYPE              2
+#define CERT_NAME_ATTR_TYPE             3
+#define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
+#define CERT_NAME_FRIENDLY_DISPLAY_TYPE 5
+#define CERT_NAME_DNS_TYPE              6
+#define CERT_NAME_URL_TYPE              7
+#define CERT_NAME_UPN_TYPE              8
+
+//certificate/CRL, encoded, context or element disposition values.
+#define CERT_STORE_ADD_NEW                                  1
+#define CERT_STORE_ADD_USE_EXISTING                         2
+#define CERT_STORE_ADD_REPLACE_EXISTING                     3
+#define CERT_STORE_ADD_ALWAYS                               4
+#define CERT_STORE_ADD_REPLACE_EXISTING_INHERIT_PROPERTIES  5
+#define CERT_STORE_ADD_NEWER                                6
+#define CERT_STORE_ADD_NEWER_INHERIT_PROPERTIES             7
+
+#define CRYPT_ACQUIRE_CACHE_FLAG                0x00000001
+#define CRYPT_ACQUIRE_USE_PROV_INFO_FLAG        0x00000002
+#define CRYPT_ACQUIRE_COMPARE_KEY_FLAG          0x00000004
+#define CRYPT_ACQUIRE_SILENT_FLAG               0x00000040
+
+// dwFlags definitions for CryptAcquireContext
+#define CRYPT_VERIFYCONTEXT     0xF0000000
+#define CRYPT_NEWKEYSET         0x00000008
+#define CRYPT_DELETEKEYSET      0x00000010
+#define CRYPT_MACHINE_KEYSET    0x00000020
+#define CRYPT_SILENT            0x00000040
+
+// dwFlag definitions for CryptGenKey
+#define CRYPT_EXPORTABLE        0x00000001
+#define CRYPT_USER_PROTECTED    0x00000002
+#define CRYPT_CREATE_SALT       0x00000004
+#define CRYPT_UPDATE_KEY        0x00000008
+#define CRYPT_NO_SALT           0x00000010
+#define CRYPT_PREGEN            0x00000040
+#define CRYPT_RECIPIENT         0x00000010
+#define CRYPT_INITIATOR         0x00000040
+#define CRYPT_ONLINE            0x00000080
+#define CRYPT_SF                0x00000100
+#define CRYPT_CREATE_IV         0x00000200
+#define CRYPT_KEK               0x00000400
+#define CRYPT_DATA_KEY          0x00000800
+#define CRYPT_VOLATILE          0x00001000
+#define CRYPT_SGCKEY            0x00002000
+#define CRYPT_ARCHIVABLE        0x00004000
+
+#define RSA1024BIT_KEY          0x04000000
+
+// dwFlags definitions for CryptDeriveKey
+#define CRYPT_SERVER            0x00000400
+
+#define KEY_LENGTH_MASK         0xFFFF0000
+
+// dwFlag definitions for CryptExportKey
+#define CRYPT_Y_ONLY            0x00000001
+#define CRYPT_SSL2_FALLBACK     0x00000002
+#define CRYPT_DESTROYKEY        0x00000004
+#define CRYPT_OAEP              0x00000040  // used with RSA encryptions/decryptions
+                                            // CryptExportKey, CryptImportKey,
+                                            // CryptEncrypt and CryptDecrypt
+
+#define CRYPT_BLOB_VER3         0x00000080  // export version 3 of a blob type
+#define CRYPT_IPSEC_HMAC_KEY    0x00000100  // CryptImportKey only
+
+// dwFlags definitions for CryptDecrypt
+//  See also CRYPT_OAEP, above.
+//  Note, the following flag is not supported for CryptEncrypt
+#define CRYPT_DECRYPT_RSA_NO_PADDING_CHECK      0x00000020
+
+// dwFlags definitions for CryptCreateHash
+#define CRYPT_SECRETDIGEST      0x00000001
+
+// dwFlags definitions for CryptHashData
+#define CRYPT_OWF_REPL_LM_HASH  0x00000001  // this is only for the OWF replacement CSP
+
+// dwFlags definitions for CryptHashSessionKey
+#define CRYPT_LITTLE_ENDIAN     0x00000001
+
+// dwFlags definitions for CryptSignHash and CryptVerifySignature
+#define CRYPT_NOHASHOID         0x00000001
+#define CRYPT_TYPE2_FORMAT      0x00000002
+#define CRYPT_X931_FORMAT       0x00000004
+
+// dwFlag definitions for CryptSetProviderEx and CryptGetDefaultProvider
+#define CRYPT_MACHINE_DEFAULT   0x00000001
+#define CRYPT_USER_DEFAULT      0x00000002
+#define CRYPT_DELETE_DEFAULT    0x00000004
+
+//algorithm
+#define CALG_SSL3_SHAMD5        (ALG_CLASS_HASH | ALG_TYPE_ANY | ALG_SID_SSL3SHAMD5)
+
+//End of crypto key provider information structures
 
 BOOL WINAPI CertCloseStore(HCERTSTORE,DWORD);
 BOOL WINAPI CertGetCertificateChain(HCERTCHAINENGINE,PCCERT_CONTEXT,LPFILETIME,HCERTSTORE,PCERT_CHAIN_PARA,DWORD,LPVOID,PCCERT_CHAIN_CONTEXT*);
@@ -1132,6 +1289,29 @@ BOOL WINAPI CryptUnprotectData (DATA_BLOB*, LPWSTR*, DATA_BLOB*, PVOID, CRYPTPRO
 /* from http://msdn2.microsoft.com/en-us/library/aa302402.aspx: */
 #define CRYPTPROTECT_UI_FORBIDDEN 0x1
 #define CRYPTPROTECT_LOCAL_MACHINE 0x4
+
+//For Mozilla trunk
+typedef BOOL (WINAPI *PFN_CRYPT_ENUM_KEYID_PROP)(const CRYPT_HASH_BLOB *, DWORD, void *, void *, DWORD,DWORD,void **,DWORD);
+
+BOOL WINAPI CertGetCertificateContextProperty (PCCERT_CONTEXT, DWORD, void *, DWORD *);
+BOOL WINAPI CryptEnumKeyIdentifierProperties (const CRYPT_HASH_BLOB *, DWORD, DWORD, LPCWSTR, void *, void *, PFN_CRYPT_ENUM_KEYID_PROP);
+BOOL WINAPI CryptAcquireCertificatePrivateKey(PCCERT_CONTEXT, DWORD, void *, HCRYPTPROV *, DWORD *, BOOL *);
+PCCERT_CONTEXT WINAPI CertCreateCertificateContext (DWORD, const BYTE *, DWORD);
+BOOL WINAPI CryptGetKeyIdentifierProperty( const CRYPT_HASH_BLOB *, DWORD, DWORD, LPCWSTR, void *, void *, DWORD *);
+BOOL WINAPI CertSetCertificateContextProperty( PCCERT_CONTEXT, DWORD, DWORD, void *);
+BOOL WINAPI CertCompareCertificateName( DWORD, PCERT_NAME_BLOB, PCERT_NAME_BLOB);
+BOOL WINAPI CryptSetKeyIdentifierProperty (const CRYPT_HASH_BLOB *, DWORD, DWORD, LPCWSTR, void *, void *);
+DWORD WINAPI CertOIDToAlgId( LPCSTR );
+BOOL WINAPI CryptGetDefaultProviderA(DWORD,DWORD,DWORD,LPSTR,DWORD);
+BOOL WINAPI CryptGetDefaultProviderW(DWORD,DWORD,DWORD,LPSTR,DWORD);
+
+#ifdef UNICODE
+#define CryptGetDefaultProvider  CryptGetDefaultProviderW
+#else
+#define CryptGetDefaultProvider  CryptGetDefaultProviderA
+#endif // !UNICODE
+
+ 
 #ifdef __cplusplus
 }
 #endif

@@ -1,3 +1,17 @@
+2008-07-25 Bo Yang <techrazy@users.sourceforge.net>
+
+	* include/wincrypt.h  (struct _CRYPT_KEY_PROV_PARAM, 
+	struct _CRYPT_KEY_PROV_INFO, CertGetCertificateContextProperty,
+	CryptEnumKeyIdentifierProperties, CryptAcquireCertificatePrivateKey,
+	CertCreateCertificateContext, CryptGetKeyIdentifierProperty,
+	CertSetCertificateContextProperty, CertCompareCertificateName, 
+	CryptSetKeyIdentifierProperty, CertOIDToAlgId, CryptGetDefaultProviderA,
+	CryptGetDefaultProviderW and many corresponding macroes): Define.
+	* lib/crypt32.def  (Export the above 11 functions): Export.
+	* include/winerror.h  (CRYPT_E_NOT_FOUND and other crypt related
+	macroes): Define.
+	
+
 2008-07-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winuser.h (MENUGETOBJECTINFO, MNGO_NOINTERFACE, MNGO_NOERROR,
