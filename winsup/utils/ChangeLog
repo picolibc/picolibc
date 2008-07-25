@@ -1,3 +1,11 @@
+2008-07-25  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc: Remove non-unix-like options (-x,-t,b) throughout.
+	(oopts): Use boolean constants for slightly increased clarity.
+
+	* configure.in: Remove apparently unneeded program_transfer_name code.
+	* configure: Regenerate.
+
 2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.sgml: Remove useless text.

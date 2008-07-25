@@ -111,19 +111,12 @@ do_mount (const char *dev, const char *where, int flags)
 
 static struct option longopts[] =
 {
-  {"binary", no_argument, NULL, 'b'},
   {"change-cygdrive-prefix", no_argument, NULL, 'c'},
-  {"cygwin-executable", no_argument, NULL, 'X'},
-  {"executable", no_argument, NULL, 'x'},
   {"force", no_argument, NULL, 'f'},
   {"help", no_argument, NULL, 'h' },
   {"mount-commands", no_argument, NULL, 'm'},
-  {"no-executable", no_argument, NULL, 'E'},
   {"options", required_argument, NULL, 'o'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
-  {"system", no_argument, NULL, 's'},
-  {"text", no_argument, NULL, 't'},
-  {"user", no_argument, NULL, 'u'},
   {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
@@ -136,8 +129,6 @@ usage (FILE *where = stderr)
   fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
 Display information about mounted filesystems, or mount a filesystem\n\
 \n\
-  -b, --binary     (default)    text files are equivalent to binary files\n\
-				(newline = \\n)\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
@@ -146,13 +137,7 @@ Display information about mounted filesystems, or mount a filesystem\n\
 				system mount points and cygdrive prefixes\n\
   -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
-  -s, --system                  (ignored)\n\
-  -t, --text                    text files get \\r\\n line endings\n\
-  -u, --user                    (ignored)\n\
   -v, --version                 output version information and exit\n\
-  -x, --executable              treat all files under mount point as executables\n\
-  -E, --no-executable           treat all files under mount point as \n\
-				non-executables\n\
   -X, --cygwin-executable       treat all files under mount point as cygwin\n\
 				executables\n\
 ", progname);
@@ -166,13 +151,13 @@ struct opt
   bool clear;
 } oopts[] =
 {
-  {"user", MOUNT_SYSTEM, 1},
-  {"system", MOUNT_SYSTEM, 0},
-  {"binary", MOUNT_BINARY, 0},
-  {"text", MOUNT_BINARY, 1},
-  {"exec", MOUNT_EXEC, 0},
-  {"notexec", MOUNT_NOTEXEC, 0},
-  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"user", MOUNT_SYSTEM, true},
+  {"system", MOUNT_SYSTEM, false},
+  {"binary", MOUNT_BINARY, false},
+  {"text", MOUNT_BINARY, true},
+  {"exec", MOUNT_EXEC, false},
+  {"notexec", MOUNT_NOTEXEC, false},
+  {"cygexec", MOUNT_CYGWIN_EXEC, false},
   {"nosuid", 0, 0}
 };
 
@@ -271,25 +256,9 @@ main (int argc, char **argv)
 	else
 	  usage ();
 	break;
-      case 's':
-	break;
-      case 't':
-	flags &= ~MOUNT_BINARY;
-	break;
-      case 'u':
-	break;
       case 'v':
 	print_version ();
 	return 0;
-	break;
-      case 'x':
-	flags |= MOUNT_EXEC;
-	break;
-      case 'E':
-	flags |= MOUNT_NOTEXEC;
-	break;
-      case 'X':
-	flags |= MOUNT_CYGWIN_EXEC;
 	break;
       default:
 	usage ();

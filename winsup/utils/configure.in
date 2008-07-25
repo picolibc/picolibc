@@ -23,17 +23,6 @@ AC_ARG_PROGRAM
 AC_CHECK_LIB(iconv, libiconv, libiconv=-liconv)
 AC_SUBST(libiconv)
 
-if test "x$cross_compiling" = "xyes"; then
-  if test "x$program_transform_name" = "xs,x,x,"; then
-    program_transform_name=""
-  fi
-  if test "x$program_transform_name" = "x"; then
-    program_transform_name="s,^,$host-,"
-  else
-    program_transform_name="$program_transform_name -e s,^,$host-,"
-  fi
-fi
-
 INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 AC_PROG_INSTALL
