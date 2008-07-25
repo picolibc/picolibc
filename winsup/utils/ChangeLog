@@ -1,3 +1,7 @@
+2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.sgml: Remove useless text.
+
 2008-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (main): Fix test for duplicate domain/machine request.

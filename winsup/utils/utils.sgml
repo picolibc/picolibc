@@ -249,12 +249,6 @@ the <literal>-l</literal> and <literal>-s</literal> options to use normal
 identical to <literal>-w</literal> and <literal>-s</literal> together.
 </para>
 
-<para>Caveat: The <literal>-l</literal> option does not work if the
-<emphasis>check_case</emphasis> parameter of <emphasis>CYGWIN</emphasis> 
-is set to <emphasis>strict</emphasis>, since Cygwin is not able to match 
-any Windows short path in this mode.
-</para>
-
 <para>The <literal>-p</literal> option means that you want to convert
 a path-style string rather than a single filename.  For example, the
 PATH environment variable is semicolon-delimited in Windows, but
@@ -289,7 +283,7 @@ explorer $XPATH &
 <literal>-D</literal>, <literal>-H</literal>, <literal>-P</literal>, 
 <literal>-S</literal>, and <literal>-W</literal> output directories used 
 by Windows that are not the same on all systems, for example 
-<literal>-S</literal> might output C:\WINNT\SYSTEM32 or C:\WINDOWS\SYSTEM. 
+<literal>-S</literal> might output C:\WINNT\system32 or C:\Windows\System32. 
 The <literal>-H</literal> shows the Windows profiles directory that can 
 be used as root of home.  The <literal>-A</literal> option forces use of 
 the "All Users" directories instead of the current user for the 
@@ -300,9 +294,7 @@ their internal numeric code (decimal or 0xhex). For valid codes and
 symbolic names, see the CSIDL_* definitions in the include file
 /usr/include/w32api/shlobj.h from package w32api. The current valid
 range of codes for folders is 0 (Desktop) to 59 (CDBurn area).
-On Win9x systems with only a single user, <literal>-A</literal> has no
-effect; <literal>-D</literal> and <literal>-AD</literal> would have the
-same output.  By default the output is in UNIX (POSIX) format; 
+By default the output is in UNIX (POSIX) format; 
 use the <literal>-w</literal> or <literal>-d</literal> options to get
 other formats.</para>
 
