@@ -48,12 +48,22 @@ details. */
    The later normalization drops the native prefixes. */
 
 static inline bool __stdcall
+is_native_path (const char *path)
+{
+  return isdirsep (path[0])
+	 && (isdirsep (path[1]) || path[1] == '?')
+	 && (path[2] == '?' || path[2] == '.')
+	 && isdirsep (path[3])
+	 && isalpha (path[4]);
+}
+
+static inline bool __stdcall
 is_unc_share (const char *path)
 {
   const char *p;
   return (isdirsep (path[0])
 	 && isdirsep (path[1])
-	 && (isalnum (path[2]) || path[2] == '.' || path[2] == '?')
+	 && isalnum (path[2])
 	 && ((p = strpbrk (path + 3, "\\/")) != NULL)
 	 && isalnum (p[1]));
 }
@@ -76,8 +86,8 @@ inline void
 mount_info::create_root_entry (const PWCHAR root)
 {
   /* Create a default root dir from the path the Cygwin DLL is in. */
-  char native_root[NT_MAX_PATH];
-  sys_wcstombs (native_root, NT_MAX_PATH, root);
+  char native_root[PATH_MAX];
+  sys_wcstombs (native_root, PATH_MAX, root);
   mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
@@ -94,7 +104,7 @@ mount_info::init ()
 {
   nmounts = 0;
   PWCHAR pathend;
-  WCHAR path[NT_MAX_PATH];
+  WCHAR path[PATH_MAX];
   
   pathend = wcpcpy (path, cygwin_shared->installation_root);
   create_root_entry (path);
@@ -972,7 +982,7 @@ mount_info::add_item (const char *native, const char *posix,
      not a UNC or absolute path. */
 
   if (native == NULL || !isabspath (native) ||
-      !(is_unc_share (native) || isdrive (native)))
+      !(is_native_path (native) || is_unc_share (native) || isdrive (native)))
     nativeerr = EINVAL;
   else
     nativeerr = normalize_win32_path (native, nativetmp, nativetail);

@@ -2612,7 +2612,10 @@ seteuid32 (__uid32_t uid)
   myself->uid = uid;
   groups.ischanged = FALSE;
   if (!issamesid)
-    user_shared_initialize (true);
+    {
+      user_shared_initialize (true);
+      user_shared_initialize_1 ();
+    }
   return 0;
 }
 

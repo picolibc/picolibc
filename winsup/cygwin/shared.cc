@@ -198,6 +198,24 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   return shared;
 }
 
+/* User shared initialization which requires malloc and cygtls stuff has to
+   go here. */
+void
+user_shared_initialize_1 ()
+{
+  if (!user_shared->cb)
+    {
+      cygpsid sid (cygheap->user.sid ());
+      struct passwd *pw = internal_getpwsid (sid);
+      /* Correct the user name with what's defined in /etc/passwd before
+	 loading the user fstab file. */
+      if (pw)
+      	cygheap->user.set_name (pw->pw_name);
+      user_shared->mountinfo.init ();	/* Initialize the mount table.  */
+      user_shared->cb =  sizeof (*user_shared);
+    }
+}
+
 void
 user_shared_initialize (bool reinit)
 {
@@ -224,19 +242,8 @@ user_shared_initialize (bool reinit)
   debug_printf ("user shared version %x", user_shared->version);
 
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &user_shared->version, USER_VERSION_MAGIC);
-  /* Initialize the Cygwin per-user shared, if necessary */
-  if (!sversion)
-    {
-      cygpsid sid (cygheap->user.sid ());
-      struct passwd *pw = internal_getpwsid (sid);
-      /* Correct the user name with what's defined in /etc/passwd before
-	 loading the user fstab file. */
-      if (pw)
-      	cygheap->user.set_name (pw->pw_name);
-      user_shared->mountinfo.init ();	/* Initialize the mount table.  */
-      user_shared->cb =  sizeof (*user_shared);
-    }
-  else
+  /* Wait for initialization of the Cygwin per-user shared, if necessary */
+  if (sversion)
     {
       while (!user_shared->cb)
 	low_priority_sleep (0);	// Should be hit only very very rarely

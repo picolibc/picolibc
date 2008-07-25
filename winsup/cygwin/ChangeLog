@@ -1,3 +1,23 @@
+2008-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_0): Call malloc_init and user_shared_initialize_1
+	here in case we're dynamically loaded.  Explain why.
+	(dll_crt0_1): Call user_shared_initialize_1 from here.
+	* mount.cc (is_native_path): New inline function testing for native
+	and long Win32 path prefix.
+	(is_unc_share): Remove long WIn32 path prefix test.
+	(mount_info::create_root_entry): Use PATH_MAX buffer.
+	(mount_info::init): Ditto.
+	(mount_info::add_item): Test for is_native_path as well.
+	* path.cc (normalize_win32_path): Simplify native path prefix code.
+	* shared.cc (user_shared_initialize_1): New function taking user
+	shared initialization code relying on malloc and cygtls.
+	(user_shared_initialize): Move mountinfo initialization to
+	user_shared_initialize_1.
+	* shared_info.h (user_shared_initialize_1): Declare.
+	* syscalls.cc (seteuid32): Call user_shared_initialize_1 after user
+	changed.
+
 2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::from_fstab): Change system_printf to

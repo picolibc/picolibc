@@ -185,3 +185,5 @@ void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD si
 			     shared_locations&, PSECURITY_ATTRIBUTES psa = &sec_all,
 			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_initialize (bool reinit);
+extern void user_shared_initialize_1 ();
+

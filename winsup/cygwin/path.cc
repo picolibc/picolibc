@@ -1311,12 +1311,9 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
     {
       src += 4;
       if (src[1] != ':') /* native UNC path */
-	{
-	  src += 2; /* Fortunately the first char is not copied... */
-	  beg_src_slash = true;
-	}
+	src += 2; /* Fortunately the first char is not copied... */
       else
-	beg_src_slash = isdirsep (src[0]);
+	beg_src_slash = false;
     }
   if (beg_src_slash && isdirsep (src[1]))
     {
