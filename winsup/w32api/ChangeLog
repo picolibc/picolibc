@@ -1,3 +1,7 @@
+2008-07-24  techrazy  <techrazy@users.sourceforge.net>
+
+	* include/wingdi.h (OUT_PS_ONLY_PRECIS): Define.
+
 2008-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/lmaccess.h (struct _USER_INFO_4): Define.

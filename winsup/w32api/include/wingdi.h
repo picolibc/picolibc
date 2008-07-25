@@ -358,6 +358,8 @@ extern "C" {
 #define OUT_RASTER_PRECIS	6
 #define OUT_TT_ONLY_PRECIS	7
 #define OUT_OUTLINE_PRECIS	8
+//http://www.pinvoke.net/default.aspx/Structures/LOGFONT.html
+#define OUT_PS_ONLY_PRECIS      10
 #define CLIP_DEFAULT_PRECIS	0
 #define CLIP_CHARACTER_PRECIS	1
 #define CLIP_STROKE_PRECIS	2
