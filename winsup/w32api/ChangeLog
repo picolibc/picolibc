@@ -1,5 +1,9 @@
 2008-07-25 Bo Yang <techrazy@users.sourceforge.net>
 
+	* lib/gdi32.def (SetLayout): Export.
+
+2008-07-25 Bo Yang <techrazy@users.sourceforge.net>
+
 	* include/wincrypt.h  (struct _CRYPT_KEY_PROV_PARAM, 
 	struct _CRYPT_KEY_PROV_INFO, CertGetCertificateContextProperty,
 	CryptEnumKeyIdentifierProperties, CryptAcquireCertificatePrivateKey,

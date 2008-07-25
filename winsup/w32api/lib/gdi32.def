@@ -345,3 +345,4 @@ UpdateICMRegKeyA@16
 UpdateICMRegKeyW@16
 WidenPath@4
 gdiPlaySpoolStream@24
+SetLayout@8
