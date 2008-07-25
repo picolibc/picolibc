@@ -16,6 +16,11 @@ extern "C" {
 #endif
 #endif
 
+#define MNGO_NOINTERFACE  0x00
+#define MNGO_NOERROR      0x01
+#define MNGOF_TOPGAP      0x01
+#define MNGOF_BOTTOMGAP   0x02
+
 #define WC_DIALOG MAKEINTATOM(0x8002)
 #define FALT	16
 #define FCONTROL	8
@@ -2486,6 +2491,13 @@ typedef void(CALLBACK *SENDASYNCPROC)(HWND,UINT,DWORD,LRESULT);
 DECLARE_HANDLE(HHOOK);
 DECLARE_HANDLE(HDWP);
 DECLARE_HANDLE(HDEVNOTIFY);
+typedef struct tagMENUGETOBJECTINFO {
+  DWORD  dwFlags;
+  UINT  uPos;
+  HMENU  hmenu;
+  PVOID  riid;
+  PVOID  pvObj;
+} MENUGETOBJECTINFO, *PMENUGETOBJECTINFO;
 typedef struct tagACCEL {
 	BYTE fVirt;
 	WORD key;

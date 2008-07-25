@@ -1,3 +1,8 @@
+2008-07-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winuser.h (MENUGETOBJECTINFO, MNGO_NOINTERFACE, MNGO_NOERROR,
+	MNGOF_TOPGAP, MNGOF_BOTTOMGAP): Define.
+
 2008-07-24  techrazy  <techrazy@users.sourceforge.net>
 
 	* include/wingdi.h (OUT_PS_ONLY_PRECIS): Define.
