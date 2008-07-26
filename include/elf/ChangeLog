@@ -1,3 +1,7 @@
+2008-07-26  Michael Eager <eager@eagercon.com>
+
+	* ppc.h: Add description of single-precision.
+
 2008-07-21  Luis Machado  <luisgpm@br.ibm.com>
 
 	* common.h: Define NT_PPC_VSX.
