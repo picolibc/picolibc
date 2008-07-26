@@ -1362,7 +1362,7 @@ fhandler_pty_master::setup (bool ispty)
 
   char pipename[sizeof("ttyNNNN-from-master")];
   __small_sprintf (pipename, "tty%d-from-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_all, from_master,
+  res = fhandler_pipe::create_selectable (&sec_none_nih, from_master,
 					  get_output_handle (), 128 * 1024,
 					  pipename);
   if (res)
@@ -1370,19 +1370,29 @@ fhandler_pty_master::setup (bool ispty)
       errstr = "input pipe";
       goto err;
     }
-
-  __small_sprintf (pipename, "tty%d-to-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_all, get_io_handle (),
-					  to_master, 128 * 1024, pipename);
-  if (res)
+  if (!SetHandleInformation (get_output_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
     {
-      errstr = "output pipe";
+      errstr = "inheritable get_output_handle ()";
       goto err;
     }
 
   if (!SetNamedPipeHandleState (get_output_handle (), &pipe_mode, NULL, NULL))
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
+
+  __small_sprintf (pipename, "tty%d-to-master", get_unit ());
+  res = fhandler_pipe::create_selectable (&sec_none_nih, get_io_handle (),
+					  to_master, 128 * 1024, pipename);
+  if (res)
+    {
+      errstr = "output pipe";
+      goto err;
+    }
+  if (!SetHandleInformation (get_io_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
+    {
+      errstr = "inheritable get_io_handle ()";
+      goto err;
+    }
 
   need_nl = 0;
 
@@ -1418,20 +1428,6 @@ fhandler_pty_master::setup (bool ispty)
   errstr = shared_name (buf, INPUT_MUTEX, t.ntty);
   if (!(input_mutex = CreateMutex (&sec_all, FALSE, buf)))
     goto err;
-
-  if (!DuplicateHandle (hMainProc, from_master, hMainProc, &from_master, 0, false,
-			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    {
-      errstr = "non-inheritable from_master";
-      goto err;
-    }
-
-  if (!DuplicateHandle (hMainProc, to_master, hMainProc, &to_master, 0, false,
-			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    {
-      errstr = "non-inheritable to_master";
-      goto err;
-    }
 
   t.from_master = from_master;
   t.to_master = to_master;

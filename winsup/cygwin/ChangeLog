@@ -1,3 +1,8 @@
+2008-07-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_master::setup): Reorganize so that all
+	operations for each end of the pipe are grouped together.
+
 2008-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_1): Call malloc_init and user_shared_initialize_1
