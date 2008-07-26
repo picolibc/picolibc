@@ -777,7 +777,13 @@ void
 dll_crt0_1 (void *)
 {
   check_sanity_and_sync (user_data);
-  malloc_init ();
+
+  if (!dynamically_loaded)
+    {
+      malloc_init ();
+      user_shared_initialize_1 ();
+    }
+
 #ifdef CGF
   int i = 0;
   const int n = 2 * 1024 * 1024;
@@ -787,8 +793,6 @@ dll_crt0_1 (void *)
 
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
-
-  user_shared_initialize_1 ();
 
   cygheap->cwd.init ();
 
