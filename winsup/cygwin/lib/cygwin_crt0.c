@@ -9,27 +9,16 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #undef __INSIDE_CYGWIN__
-#include <windows.h>
-#include <time.h>	/* Needed since call to sys/time.h via sys/cygwin.h
-			   complains otherwise */
 #include <sys/cygwin.h>
-#include <stdlib.h>
 #include "crt0.h"
 
-extern void dll_crt0__FP11per_process (struct per_process *)  __declspec (dllimport) __attribute ((noreturn));
+extern void __stdcall _dll_crt0 ()
+  __declspec (dllimport) __attribute ((noreturn));
 
 /* for main module */
 void
 cygwin_crt0 (MainFunc f)
 {
-  struct per_process *u;
-  if (_cygwin_crt0_common (f, NULL))
-    u = NULL;		/* Newer DLL.  Use DLL internal per_process. */
-  else			/* Older DLL.  Provide a per_process */
-    {
-      u = (struct per_process *) alloca (sizeof (*u));
-      memset (u, 0, sizeof (u));
-      (void) _cygwin_crt0_common (f, u);
-    }
-  dll_crt0__FP11per_process (u);	/* Jump into the dll, never to return */
+  _cygwin_crt0_common (f, NULL);
+  _dll_crt0 ();	/* Jump into the dll, never to return */
 }

@@ -1,5 +1,14 @@
 2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* mount.cc (mount_info::init): Add location where we're looking for
+	fstab to temporary message.
+
+	* lib/cygwin_crt0.c (cygwin_crt0): Simplify by eliminating
+	accommodations for ancient cygwin DLLs.
+	* lib/crt0.h: Include <windows.h> directly since it is needed.
+
+2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* shared_info.h (shared_destroy): Declare.
 	* shared.cc (shared_destroy): Define new function to destroy shared
 	memory regions.

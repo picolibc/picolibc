@@ -114,7 +114,7 @@ mount_info::init ()
       return;
 
   /* FIXME: Remove warning message before releasing 1.7.0. */
-  small_printf ("Huh?  No /etc/fstab file?  Using default root and cygdrive prefix...\n");
+  small_printf ("Huh?  No /etc/fstab file in %W?  Using default root and cygdrive prefix...\n", path);
 }
 
 static void
