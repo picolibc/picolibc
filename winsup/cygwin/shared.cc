@@ -254,6 +254,15 @@ user_shared_initialize (bool reinit)
     }
 }
 
+void __stdcall
+shared_destroy ()
+{
+  ForceCloseHandle (cygwin_shared_h);
+  UnmapViewOfFile (cygwin_shared);
+  ForceCloseHandle (cygwin_user_h);
+  UnmapViewOfFile (user_shared);
+}
+
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation root.  Note that we can't handle Cygwin installation
    root dirs of more than 4K path length.  I assume that's ok... */

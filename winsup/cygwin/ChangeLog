@@ -1,3 +1,11 @@
+2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* shared_info.h (shared_destroy): Declare.
+	* shared.cc (shared_destroy): Define new function to destroy shared
+	memory regions.
+	* init.cc (dll_entry): Call shared_destroy when dll detaches from the
+	process.
+
 2008-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::send_internal): Send never more

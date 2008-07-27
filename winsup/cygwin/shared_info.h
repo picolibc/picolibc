@@ -120,7 +120,7 @@ public:
 
 #define SHARED_INFO_CB 39328
 
-#define CURR_SHARED_MAGIC 0x22f9ff0bU
+#define CURR_SHARED_MAGIC 0x398d8baU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -164,6 +164,7 @@ enum shared_locations
 
 };
 void __stdcall memory_init ();
+void __stdcall shared_destroy ();
 
 #define shared_align_past(p) \
   ((char *) (system_info.dwAllocationGranularity * \

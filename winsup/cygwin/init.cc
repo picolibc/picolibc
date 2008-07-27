@@ -12,6 +12,7 @@ details. */
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
+#include "shared_info.h"
 
 static DWORD _my_oldfunc;
 
@@ -142,6 +143,8 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       _my_oldfunc = TlsAlloc ();
       break;
     case DLL_PROCESS_DETACH:
+      if (dynamically_loaded)
+	shared_destroy ();
       break;
     case DLL_THREAD_ATTACH:
       if (hwait_sig)
