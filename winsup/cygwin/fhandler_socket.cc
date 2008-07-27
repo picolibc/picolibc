@@ -1415,38 +1415,57 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
 				const struct sockaddr *to, int tolen)
 {
   int res = 0;
-  DWORD ret = 0, err = 0;
+  DWORD ret = 0, err = 0, sum = 0, off = 0;
+  WSABUF buf;
 
-  do
+  for (DWORD i = 0; i < wsacnt; off >= wsabuf[i].len && (++i, off = 0))
     {
-      if ((res = WSASendTo (get_socket (), wsabuf, wsacnt, &ret,
-			    flags & (MSG_OOB | MSG_DONTROUTE), to, tolen, NULL, NULL))
-	  && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
+      buf.buf = wsabuf[i].buf + off;
+      buf.len = wsabuf[i].len - off;
+      if (buf.len > 65536)	/* See KB 823764 */
+	buf.len = 65536;
+
+      do
 	{
-	  LOCK_EVENTS;
-	  wsock_events->events &= ~FD_WRITE;
-	  UNLOCK_EVENTS;
+	  if ((res = WSASendTo (get_socket (), &buf, 1, &ret,
+				flags & (MSG_OOB | MSG_DONTROUTE), to, tolen,
+				NULL, NULL))
+	      && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
+	    {
+	      LOCK_EVENTS;
+	      wsock_events->events &= ~FD_WRITE;
+	      UNLOCK_EVENTS;
+	    }
 	}
+      while (res && err == WSAEWOULDBLOCK
+	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
+
+      if (!res)
+	{
+	  off += ret;
+	  sum += ret;
+	}
+      else if (is_nonblocking () || err != WSAEWOULDBLOCK)
+	break;
     }
-  while (res && err == WSAEWOULDBLOCK
-	 && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
-
-  if (res == SOCKET_ERROR)
-    set_winsock_errno ();
-  else
-    res = ret;
-
-  /* Special handling for EPIPE and SIGPIPE.
-
-     EPIPE is generated if the local end has been shut down on a connection
-     oriented socket.  In this case the process will also receive a SIGPIPE
-     unless MSG_NOSIGNAL is set.  */
-  if (res == SOCKET_ERROR && get_errno () == ESHUTDOWN
-      && get_socket_type () == SOCK_STREAM)
+  
+  if (sum)
+    res = sum;
+  else if (res == SOCKET_ERROR)
     {
-      set_errno (EPIPE);
-      if (! (flags & MSG_NOSIGNAL))
-	raise (SIGPIPE);
+      set_winsock_errno ();
+
+      /* Special handling for EPIPE and SIGPIPE.
+
+	 EPIPE is generated if the local end has been shut down on a connection
+	 oriented socket.  In this case the process will also receive a SIGPIPE
+	 unless MSG_NOSIGNAL is set.  */
+      if (get_errno () == ESHUTDOWN && get_socket_type () == SOCK_STREAM)
+	{
+	  set_errno (EPIPE);
+	  if (! (flags & MSG_NOSIGNAL))
+	    raise (SIGPIPE);
+	}
     }
 
   return res;
@@ -1467,7 +1486,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
      the size of the internal send buffer.  A buffer full condition
      is only recognized in subsequent calls and, if len is big enough,
      the call even might fail with an out-of-memory condition. */
-  WSABUF wsabuf = { len > 65536 ? 65536 : len, (char *) ptr };
+  WSABUF wsabuf = { len, (char *) ptr };
   return send_internal (&wsabuf, 1, flags,
 			(to ? (const struct sockaddr *) &sst : NULL), tolen);
 }
@@ -1487,14 +1506,9 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
   WSABUF wsabuf[msg->msg_iovlen];
   WSABUF *wsaptr = wsabuf;
   const struct iovec *iovptr = msg->msg_iov;
-  size_t total = 0;
-  for (int i = 0; i < msg->msg_iovlen && total < 65536; ++i)
+  for (int i = 0; i < msg->msg_iovlen; ++i)
     {
-      if (total + iovptr->iov_len > 65536) /* See above. */
-	wsaptr->len = 65536 - total;
-      else
-	wsaptr->len = iovptr->iov_len;
-      total += wsaptr->len;
+      wsaptr->len = iovptr->iov_len;
       (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
 

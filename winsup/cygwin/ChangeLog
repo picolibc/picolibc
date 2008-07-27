@@ -1,3 +1,11 @@
+2008-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Send never more
+	then 64K bytes at once.  For blocking sockets, loop until entire data
+	has been sent or an error occurs.
+	(fhandler_socket::sendto): Drop code which sends on 64K bytes.
+	(fhandler_socket::sendmsg): Ditto.
+
 2008-07-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_tty.cc (fhandler_pty_master::setup): Reorganize so that all
