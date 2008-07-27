@@ -2612,10 +2612,8 @@ seteuid32 (__uid32_t uid)
   myself->uid = uid;
   groups.ischanged = FALSE;
   if (!issamesid)
-    {
-      user_shared_initialize (true);
-      user_shared_initialize_1 ();
-    }
+    /* Recreate and fill out the user shared region for a new user. */
+    user_shared_create (true);
   return 0;
 }
 

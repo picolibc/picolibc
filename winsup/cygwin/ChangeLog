@@ -1,3 +1,17 @@
+2008-07-27  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_0): Remove calling malloc_init and
+	user_shared_initialize_1 from here.
+	(dll_crt0_1): Remove dynamically_loaded check.  Just call malloc_init
+	and user_shared_initialize unconditionally.
+	* shared.cc (user_shared_create): Rename from user_shared_initialize.
+	(user_shared_initialize): Rename from user_shared_initialize_1.  Move
+	complete user_shared content initialization code here from
+	user_shared_create.
+	* syscalls.cc (seteuid32): Remove call to user_shared_initialize_1.
+	That is implied by the "true" argument to user_shared_create().
+
 2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (mount_info::init): Add location where we're looking for

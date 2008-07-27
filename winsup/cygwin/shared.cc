@@ -198,12 +198,13 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
   return shared;
 }
 
-/* User shared initialization which requires malloc and cygtls stuff has to
-   go here. */
+/* Second half of user shared initialization: Initialize content. */
 void
-user_shared_initialize_1 ()
+user_shared_initialize ()
 {
-  if (!user_shared->cb)
+  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &user_shared->version, USER_VERSION_MAGIC);
+  /* Wait for initialization of the Cygwin per-user shared, if necessary */
+  if (!sversion)
     {
       cygpsid sid (cygheap->user.sid ());
       struct passwd *pw = internal_getpwsid (sid);
@@ -214,10 +215,20 @@ user_shared_initialize_1 ()
       user_shared->mountinfo.init ();	/* Initialize the mount table.  */
       user_shared->cb =  sizeof (*user_shared);
     }
+  else
+    {
+      while (!user_shared->cb)
+	low_priority_sleep (0);	// Should be hit only very very rarely
+      if (user_shared->version != sversion)
+	multiple_cygwin_problem ("user shared memory version", user_shared->version, sversion);
+      else if (user_shared->cb != sizeof (*user_shared))
+	multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
+    }
 }
 
+/* First half of user shared initialization: Create shared mem region. */
 void
-user_shared_initialize (bool reinit)
+user_shared_create (bool reinit)
 {
   char name[UNLEN + 1] = ""; /* Large enough for SID */
 
@@ -240,18 +251,8 @@ user_shared_initialize (bool reinit)
   debug_printf ("opening user shared for '%s' at %p", name, user_shared);
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
-
-  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &user_shared->version, USER_VERSION_MAGIC);
-  /* Wait for initialization of the Cygwin per-user shared, if necessary */
-  if (sversion)
-    {
-      while (!user_shared->cb)
-	low_priority_sleep (0);	// Should be hit only very very rarely
-      if (user_shared->version != sversion)
-	multiple_cygwin_problem ("user shared memory version", user_shared->version, sversion);
-      else if (user_shared->cb != sizeof (*user_shared))
-	multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
-    }
+  if (reinit)
+    user_shared_initialize ();
 }
 
 void __stdcall
@@ -367,16 +368,14 @@ memory_init ()
     }
 
   /* Initialize general shared memory */
-  shared_locations sh_cygwin_shared = SH_CYGWIN_SHARED;
+  shared_locations sh_cygwin_shared;
   cygwin_shared = (shared_info *) open_shared ("shared",
 					       CYGWIN_VERSION_SHARED_DATA,
 					       cygwin_shared_h,
 					       sizeof (*cygwin_shared),
-					       sh_cygwin_shared);
-
+					       sh_cygwin_shared = SH_CYGWIN_SHARED);
   cygwin_shared->initialize ();
-
-  user_shared_initialize (false);
+  user_shared_create (false);
 }
 
 unsigned

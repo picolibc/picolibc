@@ -752,20 +752,6 @@ dll_crt0_0 ()
   events_init ();
   tty_list::init_session ();
 
-  if (dynamically_loaded)
-    {
-      /* When dynamically loaded. we must initialize the user shared memory
-	 entirely here since dll_crt0_1 will not be called.  Stuff in
-	 user_shared_initialize_1 relies on malloc and cygtls being available
-	 and the initialization isn't finished without calling it.  In the
-	 non-dynamical case this is called in dll_crt0_1, because malloc_init
-	 has to test for overloaded malloc functionality in the application.
-	 That's not an issue when cygwin is loaded dynamically.  It will just
-	 use its own malloc area. */
-      malloc_init ();
-      user_shared_initialize_1 ();
-    }
-
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
@@ -778,11 +764,12 @@ dll_crt0_1 (void *)
 {
   check_sanity_and_sync (user_data);
 
-  if (!dynamically_loaded)
-    {
-      malloc_init ();
-      user_shared_initialize_1 ();
-    }
+  /* Initialize malloc and then call user_shared_initialize since it relies
+     on a functioning malloc and it's possible that the user's program may
+     have overridden malloc.  We only know about that at this stage,
+     unfortunately. */
+  malloc_init ();
+  user_shared_initialize ();
 
 #ifdef CGF
   int i = 0;
