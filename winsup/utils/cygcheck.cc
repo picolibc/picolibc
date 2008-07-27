@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2008 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -2020,35 +2020,36 @@ load_cygwin (int& argc, char **&argv)
 
   if (!(h = LoadLibrary ("cygwin1.dll")))
     return;
-  if (!(cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
-    return;
-
-  char **av = (char **) cygwin_internal (CW_ARGV);
-  if (av && ((DWORD) av != (DWORD) -1))
-    for (argc = 0, argv = av; *av; av++)
-      argc++;
-
-  char **envp = (char **) cygwin_internal (CW_ENVP);
-  if (envp && ((DWORD) envp != (DWORD) -1))
+  if ((cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
     {
-      /* Store path and revert to this value, otherwise path gets overwritten
-	 by the POSIXy Cygwin variation, which breaks cygcheck.
-	 Another approach would be to use the Cygwin PATH and convert it to
-	 Win32 again. */
-      char *path = NULL;
-      char **env;
-      while (*(env = _environ))
+      char **av = (char **) cygwin_internal (CW_ARGV);
+      if (av && ((DWORD) av != (DWORD) -1))
+	for (argc = 0, argv = av; *av; av++)
+	  argc++;
+
+      char **envp = (char **) cygwin_internal (CW_ENVP);
+      if (envp && ((DWORD) envp != (DWORD) -1))
 	{
-	  if (strncmp (*env, "PATH=", 5) == 0)
-	    path = strdup (*env);
-	  nuke (*env);
+	  /* Store path and revert to this value, otherwise path gets overwritten
+	     by the POSIXy Cygwin variation, which breaks cygcheck.
+	     Another approach would be to use the Cygwin PATH and convert it to
+	     Win32 again. */
+	  char *path = NULL;
+	  char **env;
+	  while (*(env = _environ))
+	    {
+	      if (strncmp (*env, "PATH=", 5) == 0)
+		path = strdup (*env);
+	      nuke (*env);
+	    }
+	  for (char **ev = envp; *ev; ev++)
+	    if (strncmp (*ev, "PATH=", 5) != 0)
+	     putenv (*ev);
+	  if (path)
+	    putenv (path);
 	}
-      for (char **ev = envp; *ev; ev++)
-	if (strncmp (*ev, "PATH=", 5) != 0)
-	 putenv (*ev);
-      if (path)
-	putenv (path);
     }
+  FreeLibrary (h);
 }
 
 int

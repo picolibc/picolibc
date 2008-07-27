@@ -1,3 +1,8 @@
+2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (load_cygwin): Free the cygwin dll after we're done with
+	it.
+
 2008-07-25  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc: Remove non-unix-like options (-x,-t,b) throughout.
