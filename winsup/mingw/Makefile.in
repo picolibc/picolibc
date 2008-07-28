@@ -136,6 +136,8 @@ DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
 DLLWRAP = @DLLWRAP@
 DLLWRAP_FOR_TARGET = $(DLLWRAP)
 DLLWRAP_FLAGS = --dlltool $(DLLTOOL) --as $(AS) --driver-name $(CC)
+OBJCOPY = @OBJCOPY@
+NM = @NM@
 
 TAR = tar
 TARFLAGS = z
@@ -205,7 +207,7 @@ SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
 aclocal.m4 crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs \
-moldname.def.in msvcrt.def.in \
+moldname.def.in msvcrt.def.in ofmt_stub.s \
 mthr.c mthr_init.c mthr_stub.c readme.txt \
 isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
@@ -334,7 +336,7 @@ test_headers:
 clean:
 	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
 	-rm -f $(THREAD_DLL_NAME) mingwthrd_dummy.exe
-	-rm -f moldname-*.def
+	-rm -f msvcr*.def moldname-*.def
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 distclean: clean
@@ -469,7 +471,7 @@ subdirs: $(SUBDIRS)
 force:
 
 #
-# Dependancies
+# Dependencies
 #
 libcrtdll.a: crtdll.def
 libmsvcrt.a: msvcrt.def
@@ -501,8 +503,35 @@ config.status: configure
 
 .SUFFIXES: .y $(SUFFIXES) .cc .def .a
 
-lib%.a:%.def
-	$(DLLTOOL) --as=$(AS) -k --dllname $*.dll --output-lib lib$*.a --def $<
+sym_prefix = __msvcrt
+
+NM_LOOKUP = $(NM) $@ | sed -n \
+  -e '/:$$/h;/^[0-7][0-7]*  *T  */{s///;H;g;s/\n//p' \
+  -e '}' | sed -n 's/:_'"$$key"'$$//p'
+
+MINGW_REPL_FUNCS = printf fprintf sprintf vprintf vfprintf vsprintf
+
+lib%.a: %.def
+	$(DLLTOOL) --as=$(AS) -k --dllname $*.dll --output-lib $@ --def $<
+	for key in $(MINGW_REPL_FUNCS); do \
+	  src=`$(NM_LOOKUP)`; \
+	  if test -n "$$src"; then \
+	    dst=`echo "$$src" | sed 's/0/4/'`; repl="$$repl $$dst"; \
+	    tmpfiles="$$tmpfiles $$src $$dst"; \
+	    $(AR) x $@ $$src; \
+	    $(OBJCOPY) --redefine-sym _$$key=_$(sym_prefix)_$$key \
+	      --redefine-sym __imp__$$key=__imp__$(sym_prefix)_$$key \
+	      $$src $$dst; \
+	  fi; done; \
+	test `key=_get_output_format; $(NM_LOOKUP)` || \
+	  repl="$$repl ofmt_stub.o"; \
+	test -n "$$repl" && $(AR) rcs $@ $$repl; \
+	$(RM) $$tmpfiles
+
+libmsvcrt.a  libmsvcrtd.a:  ofmt_stub.o
+libmsvcr70.a libmsvcr70d.a: ofmt_stub.o
+libmsvcr71.a libmsvcr71d.a: ofmt_stub.o
+libcrtdll.a  libcrtdlld.a:  ofmt_stub.o
 
 .c.o:
 	$(CC) -c $(ALL_CFLAGS) $< -o $@

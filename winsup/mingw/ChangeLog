@@ -1,12 +1,36 @@
+2008-07-28  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Lay foundations for new printf() function family implementation.
+
+	* ofmt_stub.s: New file; implement forward compatibility stub for...
+	(_get_output_format): ...this MSVCR80.DLL and later function.
+
+	* Makefile.in (SRCDIST_FILES): Add ofmt_stub.s.
+	(NM, OBJCOPY): New macros; define them with AC_SUBSTed values.
+	(sym_prefix, NM_LOOKUP, MINGW_REPL_FUNCS): New macros; define them.
+	(lib%.a): Include ofmt_stub.o when import library does not already
+	advertise availability of the _get_output_format() function;
+	Add alias stubs for MINGW_REPL_FUNCS, such that...
+	(__msvcrt_printf): ...is an alias for Microsoft's printf().
+	(__msvcrt_fprintf): ...is an alias for Microsoft's fprintf().
+	(__msvcrt_sprintf): ...is an alias for Microsoft's sprintf().
+	(__msvcrt_vprintf): ...is an alias for Microsoft's vprintf().
+	(__msvcrt_vfprintf): ...is an alias for Microsoft's vfprintf().
+	(__msvcrt_vsprintf): ...is an alias for Microsoft's vsprintf().
+	(clean): Add msvcr*.def.
+
+	* configure.in (NM, OBJCOPY): Use AC_CHECK_TOOL to specify them.
+	* configure: Regenerated.
+
 2008-07-06  Gregory McGarry   <gregorymcgarry@users.sourceforge.net>
 
-        * include/ctype.h (_imp____mb_cur_max): Correct spelling.
+	* include/ctype.h (_imp____mb_cur_max): Correct spelling.
 	(_imp____mb_cur_max_dll): Likewise.
 
 2008-07-04  Danny Smith  <dannysmith@users,sourceforge.net>
 
-        * include/stdio.h (swprintf, vswprintf): Guard with  #ifndef __STRICT_ANSI__ 
-        * include/wchar.h (swprintf, vswprintf): Likewise.
+	* include/stdio.h (swprintf, vswprintf): Guard with  #ifndef __STRICT_ANSI__ 
+	* include/wchar.h (swprintf, vswprintf): Likewise.
 
 2008-07-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
