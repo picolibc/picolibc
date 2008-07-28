@@ -25,7 +25,9 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
-DISTFILES = Makefile.in configure configure.in aclocal.m4 \
+
+DISTFILES = \
+	Makefile.in configure configure.in aclocal.m4 \
 	_Exit.c atoll.c dirent.c feclearexcept.c fegetenv.c \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
@@ -37,8 +39,7 @@ DISTFILES = Makefile.in configure configure.in aclocal.m4 \
 	wdirent.c wmemchr.c wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c \
 	wcrtomb.c wctob.c mbrtowc.c btowc.c mb_wc_common.h \
 	gettimeofday.c isblank.c iswblank.c \
-	basename.c dirname.c \
-	usleep.c \
+	basename.c dirname.c usleep.c \
 	tsearch.c twalk.c tdelete.c tfind.c
 
 MATH_DISTFILES = \
@@ -67,12 +68,13 @@ MATH_DISTFILES = \
 	signbit.c signbitf.c signbitl.c sinf.S sinhf.c sinhl.c sinl.S \
 	sqrtf.c sqrtl.c tanf.S tanhf.c tanhl.c tanl.S tgamma.c \
 	tgammaf.c tgammal.c trunc.c truncf.c truncl.c \
-	acosh.c acoshf.c acoshl.c  asinh.c asinhf.c asinhl.c \
+	acosh.c acoshf.c acoshl.c asinh.c asinhf.c asinhl.c \
 	atanh.c atanhf.c atanhl.c fastmath.h
 
 STDIO_DISTFILES = \
 	fopen64.c fseeko64.c ftello64.c lseek64.c \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c \
+	pformat.c pformat.h snprintf.c vsnprintf.c \
 	snwprintf.c vsnwprintf.c
 
 COMPLEX_DISTFILES = \
@@ -90,7 +92,8 @@ GDTOA_DISTFILES = \
 	arithchk.c dmisc.c dtoa.c  g__fmt.c g_dfmt.c g_ffmt.c g_xfmt.c \
 	gd_arith.h  gd_qnan.h gdtoa.c gdtoa.h gdtoaimp.h gethex.c gmisc.c \
 	hd_init.c hexnan.c  misc.c qnan.c README smisc.c strtodg.c strtodnrp.c \
-	strtof.c strtopx.c sum.c ulp.c mingw_snprintf.c
+	strtof.c strtopx.c sum.c ulp.c
+
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
@@ -139,7 +142,7 @@ STDLIB_STUB_OBJS = \
 STDIO_OBJS = \
 	fopen64.o fseeko64.o ftello64.o lseek64.o \
 	vfscanf.o vfwscanf.o vscanf.o vsscanf.o vswscanf.o vwscanf.o \
-	snwprintf.o vsnwprintf.o
+	pformat.o snprintf.o vsnprintf.o snwprintf.o vsnwprintf.o
 MATH_OBJS = \
 	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
@@ -175,8 +178,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
-	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o \
-	usleep.o \
+	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o usleep.o \
 	basename.o dirname.o tsearch.o twalk.o tdelete.o tfind.o
 REPLACE_OBJS = \
 	mingw-aligned-malloc.o mingw-fseek.o
@@ -193,8 +195,7 @@ COMPLEX_OBJS = \
 GDTOA_OBJS = \
 	dmisc.o dtoa.o g__fmt.o g_dfmt.o g_ffmt.o g_xfmt.o gdtoa.o \
 	gethex.o gmisc.o hd_init.o hexnan.o misc.o smisc.o \
-	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o \
-	mingw_snprintf.o
+	strtodg.o strtodnrp.o strtof.o strtopx.o sum.o ulp.o
 
 LIB_OBJS = $(Q8_OBJS)  $(CTYPE_OBJS) $(STDLIB_STUB_OBJS) \
 	$(STDIO_OBJS) $(MATH_OBJS) $(MATH_ROUND_OBJS) \
@@ -252,6 +253,14 @@ distclean:
 .s.o:
 	$(CC) -c  $< -o $@
 
+# pformat.o needs an explicit build rule; we always build it
+# assuming __MSVCRT_VERSION__ >= 0x0800, relying on ofmt_stub.s
+# (in the parent directory) to maintain forward compatibility
+# for earlier versions of MSVCRT.DLL
+#
+PFORMAT_CFLAGS = $(ALL_CFLAGS) -I $(srcdir)/gdtoa -D__MSVCRT_VERSION__=0x0800
+pformat.o: pformat.c pformat.h
+	$(CC) -c $(PFORMAT_CFLAGS) $(srcdir)/stdio/$*.c -o $@
 
 #
 # Dependencies
@@ -266,6 +275,9 @@ mbrtowc.o wcrtomb.o wcstof.o wcstold.o: mb_wc_common.h
 $(GDTOA_OBJS): gd_arith.h gdtoa.h gdtoaimp.h gd_qnan.h
 
 $(MATH_ROUND_OBJS) $(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS): round_internal.h
+
+snprintf.o:  snprintf.c  pformat.h
+vsnprintf.o: vsnprintf.c pformat.h
 
 dist:
 	mkdir $(distdir)/mingwex

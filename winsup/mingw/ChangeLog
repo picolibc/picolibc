@@ -1,3 +1,20 @@
+2008-07-29  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Replace __mingw_snprintf() with new generic family implementation;
+	likewise, replace __mingw_vsnprintf().
+
+	* mingwex/stdio/pformat.c mingwex/stdio/pformat.h: New files.
+	* mingwex/stdio/snprintf.c mingwex/stdio/vsnprintf.c: New files.
+	* mingwex/Makefile.in (STDIO_DISTFILES): Add them.
+	(GDTOA_DISTFILES): Remove mingw_snprintf.c
+	(STDIO_OBJS): Add pformat.o, snprintf.o and vsnprintf.o
+	(GDTOA_OBJS): Remove mingw_snprintf.o
+	(PFORMAT_CFLAGS): New macro; define it, as required by...
+	(pformat.o): ...this new explicit build target.
+	(snprintf.o, vsnprintf.o): Declare prerequisites.
+
+	* mingwex/gdtoa/mingw_snprintf.c: Redundant file; delete it.
+
 2008-07-28  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Lay foundations for new printf() function family implementation.
