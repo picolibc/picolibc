@@ -332,7 +332,8 @@ details. */
 	   linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat, symlinkat, 
 	   unlinkat.
       185: Export futimens, utimensat.
-      186: Remove ancient V8 regexp functions.
+      186: Remove ancient V8 regexp functions.  Also eliminate old crt0 interface
+           which provided its own user_data structure.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
