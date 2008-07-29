@@ -1054,10 +1054,10 @@ posix_fallocate SIGFE
 posix_madvise SIGFE
 posix_memalign SIGFE
 posix_openpt SIGFE
-posix_regcomp SIGFE
-posix_regerror SIGFE
-posix_regexec SIGFE
-posix_regfree SIGFE
+posix_regcomp = regcomp SIGFE
+posix_regerror = regerror SIGFE
+posix_regexec = regexec SIGFE
+posix_regfree = regfree SIGFE
 pow NOSIGFE
 _pow = pow NOSIGFE
 pow10 NOSIGFE
@@ -1192,6 +1192,10 @@ realpath SIGFE
 recv = cygwin_recv SIGFE
 recvfrom = cygwin_recvfrom SIGFE
 recvmsg = cygwin_recvmsg SIGFE
+regcomp SIGFE
+regerror SIGFE
+regexec SIGFE
+regfree SIGFE
 remainder NOSIGFE
 _remainder = remainder NOSIGFE
 remainderf NOSIGFE

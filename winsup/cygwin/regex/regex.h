@@ -6,13 +6,6 @@
 extern "C" {
 #endif
 
-#ifdef __INSIDE_CYGWIN__
-#define regcomp posix_regcomp
-#define regerror posix_regerror
-#define regexec posix_regexec
-#define regfree posix_regfree
-#endif
-
 /* === regex2.h === */
 typedef _off_t regoff_t;
 typedef struct {

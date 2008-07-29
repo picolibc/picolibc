@@ -1,3 +1,15 @@
+2008-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Remove v8 regexp files.
+	(OBSOLETE_FUNCTIONS): Remove v8 regexp functions.
+	(NEW_FUNCTIONS): Remove POSIX regex functions.
+	* cygwin.din: Export POSIX regex functions with their correct symbol
+	name.  Export with posix_ prefix for backward compatibility.
+	* syscalls.cc (regfree): Remove ancient fake function.
+	* regex/regex.h: Remove renaming regex functions within Cygwin.
+	* regexp/*: Remove.
+	* include /cygwin/version,.h: Bump API minor number.
+
 2008-07-27  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me+cygwin@cgf.cx>
 

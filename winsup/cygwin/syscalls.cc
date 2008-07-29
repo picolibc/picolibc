@@ -2401,13 +2401,6 @@ ptsname (int fd)
   return (char *) (cfd->ptsname ());
 }
 
-/* FIXME: what is this? */
-extern "C" int __declspec(dllexport)
-regfree ()
-{
-  return 0;
-}
-
 static int __stdcall
 mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
 	      _minor_t minor)

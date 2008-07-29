@@ -332,12 +332,13 @@ details. */
 	   linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat, symlinkat, 
 	   unlinkat.
       185: Export futimens, utimensat.
+      186: Remove ancient V8 regexp functions.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 185
+#define CYGWIN_VERSION_API_MINOR 186
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

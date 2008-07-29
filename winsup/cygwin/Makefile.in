@@ -144,14 +144,13 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	sec_helper.o security.o select.o sem.o shared.o shm.o sigfe.o signal.o \
 	sigproc.o smallprint.o spawn.o strace.o strfuncs.o strptime.o strsep.o \
 	strsig.o sync.o syscalls.o sysconf.o syslog.o termios.o thread.o \
-	timer.o times.o tls_pbuf.o tty.o uinfo.o uname.o v8_regexp.o \
-	v8_regerror.o v8_regsub.o wait.o wincap.o window.o winf.o xsique.o \
+	timer.o times.o tls_pbuf.o tty.o uinfo.o uname.o wait.o wincap.o \
+	window.o winf.o xsique.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o
 
-OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
-		    open acl aclcheck aclfrommode aclfrompbits \
+OBSOLETE_FUNCTIONS:=open acl aclcheck aclfrommode aclfrompbits \
 		    aclfromtext aclsort acltomode acltopbits \
 		    acltotext chown facl fchown fcntl fdopen fgetpos fopen \
 		    freopen fseeko fsetpos fstat ftello ftruncate \
@@ -161,11 +160,7 @@ OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub \
 		    setgid setgroups setregid setreuid setuid stat \
 		    telldir tmpfile truncate timezone
 
-NEW_FUNCTIONS:=regcomp posix_regcomp \
-	       regerror posix_regerror \
-	       regexec posix_regexec \
-	       regfree posix_regfree \
-	       open _open64 \
+NEW_FUNCTIONS:=open _open64 \
 	       acl _acl32 \
 	       aclcheck _aclcheck32 \
 	       aclfrommode _aclfrommode32 \
