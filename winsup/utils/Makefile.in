@@ -71,6 +71,7 @@ strace.exe: path.o
 cygcheck.exe: bloda.o path.o dump_setup.o
 
 # Provide any necessary per-target variable overrides.
+cygcheck.exe: MINGW_LDFLAGS += -lntdll
 cygpath.exe: ALL_LDFLAGS += -lntdll
 
 # Check for dumper's requirements and enable it if found.
@@ -94,7 +95,7 @@ ifdef libz
 zlib_h  := -include ${patsubst %/lib/mingw/libz.a,%/include/zlib.h,${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}}
 zconf_h := ${patsubst %/zlib.h,%/zconf.h,$(zlib_h)}
 dump_setup.o: MINGW_CXXFLAGS += $(zconf_h) $(zlib_h)
-cygcheck.exe: MINGW_LDFLAGS += $(libz) -lntdll
+cygcheck.exe: MINGW_LDFLAGS += $(libz)
 else
 all: warn_cygcheck_zlib
 endif
@@ -172,7 +173,7 @@ warn_dumper:
 	@echo '*** Not building dumper.exe since some required libraries are'
 	@echo '*** missing: libbfd.a and libintl.a.'
 	@echo '*** If you need this program, check out the naked-bfd and naked-intl'
-	@echo '*** sources from sources.redhat.com.  Then, configure and build these'
+	@echo '*** sources from sourceware.org.  Then, configure and build these'
 	@echo '*** libraries.  Otherwise, you can safely ignore this warning.'
 
 warn_cygcheck_zlib:

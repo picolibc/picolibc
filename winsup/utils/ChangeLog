@@ -1,3 +1,7 @@
+2008-07-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in: Link cygcheck with -lntdll even without mingw-zlib.
+
 2008-07-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygcheck.cc (load_cygwin): Free the cygwin dll after we're done with
