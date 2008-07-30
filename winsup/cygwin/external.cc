@@ -28,6 +28,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <iptypes.h>
 
 child_info *get_cygwin_startup_info ();
 
@@ -254,10 +255,17 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
       case CW_EXTRACT_DOMAIN_AND_USER:
 	{
+	  WCHAR nt_domain[MAX_DOMAIN_NAME_LEN + 1];
+	  WCHAR nt_user[UNLEN + 1];
+
 	  struct passwd *pw = va_arg (arg, struct passwd *);
 	  char *domain = va_arg (arg, char *);
 	  char *user = va_arg (arg, char *);
-	  extract_nt_dom_user (pw, domain, user);
+	  extract_nt_dom_user (pw, nt_domain, nt_user);
+	  if (domain)
+	    sys_wcstombs (domain, MAX_DOMAIN_NAME_LEN + 1, nt_domain);
+	  if (user)
+	    sys_wcstombs (user, UNLEN + 1, nt_user);
 	  return 0;
 	}
       case CW_CMDLINE:

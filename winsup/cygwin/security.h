@@ -375,7 +375,7 @@ bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pin
 bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 
 /* Extract U-domain\user field from passwd entry. */
-void extract_nt_dom_user (const struct passwd *pw, char *domain, char *user);
+void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
 bool get_logon_server (PWCHAR domain, PWCHAR wserver, bool rediscovery);
 

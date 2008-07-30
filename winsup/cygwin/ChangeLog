@@ -1,3 +1,12 @@
+2008-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (extract_nt_dom_user): Return domain and user name as
+	WCHAR.
+	(cygwin_logon_user): Accommodate above change.  Convert password to
+	WCHAR and call LogonUserW.
+	* external.cc (cygwin_internal): Accommodate above change.
+	* security.h (extract_nt_dom_user): Change prototype accordingly.
+
 2008-07-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin.din (_getutline): Remove.

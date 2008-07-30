@@ -22,6 +22,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
 #include <lm.h>
 #include <iptypes.h>
 #include "pwdgrp.h"
@@ -36,7 +37,7 @@ cygwin_set_impersonation_token (const HANDLE hToken)
 }
 
 void
-extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
+extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user)
 {
 
   cygsid psid;
@@ -47,12 +48,12 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
   debug_printf ("pw_gecos %x (%s)", pw->pw_gecos, pw->pw_gecos);
 
   if (psid.getfrompw (pw)
-      && LookupAccountSid (NULL, psid, user, &ulen, domain, &dlen, &use))
+      && LookupAccountSidW (NULL, psid, user, &ulen, domain, &dlen, &use))
     return;
 
   char *d, *u, *c;
-  domain[0] = '\0';
-  strlcpy (user, pw->pw_name, UNLEN + 1);
+  domain[0] = L'\0';
+  sys_mbstowcs (user, UNLEN + 1, pw->pw_name);
   if ((d = strstr (pw->pw_gecos, "U-")) != NULL &&
       (d == pw->pw_gecos || d[-1] == ','))
     {
@@ -60,33 +61,35 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
       if ((u = strechr (d + 2, '\\')) >= c)
        u = d + 1;
       else if (u - d <= MAX_DOMAIN_NAME_LEN + 2)
-       strlcpy (domain, d + 2, u - d - 1);
+       sys_mbstowcs (domain, MAX_DOMAIN_NAME_LEN + 1, d + 2, u - d - 1);
       if (c - u <= UNLEN + 1)
-       strlcpy (user, u + 1, c - u);
+       sys_mbstowcs (user, UNLEN + 1, u + 1, c - u);
     }
 }
 
 extern "C" HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
 {
-  if (!pw)
+  if (!pw || !password)
     {
       set_errno (EINVAL);
       return INVALID_HANDLE_VALUE;
     }
 
-  char nt_domain[MAX_DOMAIN_NAME_LEN + 1];
-  char nt_user[UNLEN + 1];
+  WCHAR nt_domain[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR nt_user[UNLEN + 1];
+  PWCHAR passwd;
   HANDLE hToken;
+  tmp_pathbuf tp;
 
   extract_nt_dom_user (pw, nt_domain, nt_user);
-  debug_printf ("LogonUserA (%s, %s, ...)", nt_user, nt_domain);
+  debug_printf ("LogonUserW (%W, %W, ...)", nt_user, nt_domain);
+  sys_mbstowcs (passwd = tp.w_get (), NT_MAX_PATH, password);
   /* CV 2005-06-08: LogonUser should run under the primary process token,
      otherwise it returns with ERROR_ACCESS_DENIED. */
   cygheap->user.deimpersonate ();
-  if (!LogonUserA (nt_user, *nt_domain ? nt_domain : NULL, (char *) password,
-		   LOGON32_LOGON_INTERACTIVE,
-		   LOGON32_PROVIDER_DEFAULT,
+  if (!LogonUserW (nt_user, *nt_domain ? nt_domain : NULL, passwd,
+		   LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT,
 		   &hToken))
     {
       __seterrno ();
