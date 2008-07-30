@@ -1,3 +1,20 @@
+2008-07-30 Paolo Bonzini  <bonzini@gnu.org>
+
+	Sync with gcc:
+	2008-07-30 Paolo Bonzini  <bonzini@gnu.org>
+
+        * configure.ac: Add makefile fragments for hpux.
+        * Makefile.def (flags_to_pass): Add ADA_CFLAGS.
+        * Makefile.tpl (HOST_EXPORTS): Pass ADA_CFLAGS.
+        * configure: Regenerate.
+        * Makefile.in: Regenerate.
+
+	2008-06-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+        * Makefile.tpl ($(srcdir)/configure): Update dependencies.
+        * Makefile.in: Regenerate.
+        * configure: Regenerate.
+
 2008-06-18  Ian Lance Taylor  <iant@google.com>
 
 	* src-release (BINUTILS_SUPPORT_DIRS): Remove mkdep and depcomp.
