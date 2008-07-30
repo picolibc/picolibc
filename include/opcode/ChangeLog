@@ -1,3 +1,8 @@
+2008-07-30  Michael J. Eager  <eager@eagercon.com>
+
+	* ppc.h (PPC_OPCODE_405): Define.
+	(PPC_OPERAND_FSL, PPC_OPERAND_FCR, PPC_OPERAND_UDI): Define.
+
 2008-06-13  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (ppc_cpu_t): New typedef.
