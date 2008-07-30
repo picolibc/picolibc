@@ -1,5 +1,5 @@
 /* PPC ELF support for BFD.
-   Copyright 1995, 1996, 1998, 2000, 2001, 2002, 2003, 2005
+   Copyright 1995, 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2007, 2008
    Free Software Foundation, Inc.
 
    By Michael Meissner, Cygnus Support, <meissner@cygnus.com>, from information
@@ -177,7 +177,8 @@ enum
 {
   /* 0-3 are generic.  */
   Tag_GNU_Power_ABI_FP = 4, /* Value 1 for hard-float, 2 for
-			       soft-float; 0 for not tagged or not
+			       soft-float, 3 for single=precision 
+			       hard-float; 0 for not tagged or not
 			       using any ABIs affected by the
 			       differences.  */
 

@@ -154,6 +154,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by Power E500MC */
 #define PPC_OPCODE_E500MC        0x20000000
 
+/* Opcode is supported by PowerPC 405 processor.  */
+#define PPC_OPCODE_405		 0x40000000
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
@@ -304,6 +307,11 @@ extern const unsigned int num_powerpc_operands;
 
 /* Valid range of operand is 0..n rather than 0..n-1.  */
 #define PPC_OPERAND_PLUS1 (0x10000)
+
+/* Xilinx APU and FSL related operands */
+#define PPC_OPERAND_FSL (0x20000)
+#define PPC_OPERAND_FCR (0x40000)
+#define PPC_OPERAND_UDI (0x80000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
    with the operands table for simplicity.  The macro table is an
