@@ -3098,7 +3098,7 @@ getutent ()
 }
 
 extern "C" struct utmp *
-getutid (struct utmp *id)
+getutid (const struct utmp *id)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -3137,7 +3137,7 @@ getutid (struct utmp *id)
 }
 
 extern "C" struct utmp *
-getutline (struct utmp *line)
+getutline (const struct utmp *line)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -3160,7 +3160,7 @@ getutline (struct utmp *line)
 }
 
 extern "C" struct utmp *
-pututline (struct utmp *ut)
+pututline (const struct utmp *ut)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -3184,7 +3184,10 @@ pututline (struct utmp *ut)
     }
   else
     locked_append (utmp_fd, ut, sizeof *ut);
-  return ut;
+  /* The documentation says to return a pointer to this which implies that
+     this has to be cast from a const.  That doesn't seem right but the
+     documentation seems pretty clear on this.  */
+  return (struct utmp *) ut;
 }
 
 extern "C" void
@@ -3202,6 +3205,7 @@ endutxent ()
 extern "C" struct utmpx *
 getutxent ()
 {
+  /* UGH.  Not thread safe. */
   static struct utmpx utx;
   return copy_ut_to_utx (getutent (), &utx);
 }
@@ -3209,6 +3213,7 @@ getutxent ()
 extern "C" struct utmpx *
 getutxid (const struct utmpx *id)
 {
+  /* UGH.  Not thread safe. */
   static struct utmpx utx;
 
   myfault efault;
@@ -3221,6 +3226,7 @@ getutxid (const struct utmpx *id)
 extern "C" struct utmpx *
 getutxline (const struct utmpx *line)
 {
+  /* UGH.  Not thread safe. */
   static struct utmpx utx;
 
   myfault efault;
@@ -3233,6 +3239,7 @@ getutxline (const struct utmpx *line)
 extern "C" struct utmpx *
 pututxline (const struct utmpx *utmpx)
 {
+  /* UGH.  Not thread safe. */
   static struct utmpx utx;
 
   myfault efault;

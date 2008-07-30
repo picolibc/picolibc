@@ -1,6 +1,6 @@
 /* sys/utmp.h
 
-   Copyright 2001, 2004 Red Hat, Inc.
+   Copyright 2001, 2003, 2004, 2005, 2008 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -34,17 +34,16 @@ struct utmp
  long	ut_addr;
 };
 
-extern struct utmp *_getutline (struct utmp *);
 extern struct utmp *getutent (void);
-extern struct utmp *getutid (struct utmp *);
-extern struct utmp *getutline (struct utmp *);
-extern struct utmp *pututline (struct utmp *);
+extern struct utmp *getutid (const struct utmp *);
+extern struct utmp *getutline (const struct utmp *);
+extern struct utmp *pututline (const struct utmp *);
 extern void endutent (void);
 extern void setutent (void);
 extern void utmpname (const char *);
 
-void login (struct utmp *);
-int logout (char *);
+void login (const struct utmp *);
+int logout (const char *);
 int login_tty (int);
 void updwtmp (const char *, const struct utmp *);
 void logwtmp (const char *, const char *, const char *);

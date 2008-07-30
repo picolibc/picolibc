@@ -701,7 +701,6 @@ _getutent = getutent SIGFE
 getutid SIGFE
 _getutid = getutid SIGFE
 getutline SIGFE
-_getutline = getutline SIGFE
 getutxent SIGFE
 getutxid SIGFE
 getutxline SIGFE

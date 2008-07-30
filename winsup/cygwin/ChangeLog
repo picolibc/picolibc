@@ -1,3 +1,18 @@
+2008-07-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin.din (_getutline): Remove.
+	* lib/bsdlib.cc (login): Make argument const as per linux.
+	(logout): Ditto.
+	* syscalls.cc (getutid): Ditto.
+	(getutline): Ditto.
+	(pututline): Ditto.
+	(getutxent): Add comment mentioning non-thread-safety.
+	(getutxid): Ditto.
+	(getutxline): Ditto.
+	(pututxline): Ditto.
+	* sys/utmp.h: Declare arguments to various functions as const as per
+	linux.  Remove bogus _getutline definition.
+
 2008-07-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/cygwin/version.h: Add comment indicating that current API number

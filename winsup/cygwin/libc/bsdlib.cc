@@ -271,7 +271,7 @@ logwtmp (const char *line, const char *user, const char *host)
 }
 
 extern "C" void
-login (struct utmp *ut)
+login (const struct utmp *ut)
 {
   pututline (ut);
   endutent ();
@@ -279,7 +279,7 @@ login (struct utmp *ut)
 }
 
 extern "C" int
-logout (char *line)
+logout (const char *line)
 {
   struct utmp ut_buf, *ut;
 
