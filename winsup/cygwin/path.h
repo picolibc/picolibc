@@ -91,17 +91,18 @@ struct fs_info
     ULONG flags;                  /* Volume flags */
     ULONG samba_version;          /* Samba version if available */
     ULONG name_len;		  /* MaximumComponentNameLength */
-    unsigned is_remote_drive : 1;
-    unsigned has_buggy_open  : 1;
-    unsigned has_acls	     : 1;
-    unsigned hasgood_inode   : 1;
-    unsigned caseinsensitive : 1;
-    unsigned is_fat	     : 1;
-    unsigned is_ntfs	     : 1;
-    unsigned is_samba	     : 1;
-    unsigned is_nfs	     : 1;
-    unsigned is_netapp       : 1;
-    unsigned is_cdrom	     : 1;
+    unsigned is_remote_drive		: 1;
+    unsigned has_buggy_open		: 1;
+    unsigned has_buggy_fileid_dirinfo	: 1;
+    unsigned has_acls			: 1;
+    unsigned hasgood_inode		: 1;
+    unsigned caseinsensitive		: 1;
+    unsigned is_fat			: 1;
+    unsigned is_ntfs			: 1;
+    unsigned is_samba			: 1;
+    unsigned is_nfs			: 1;
+    unsigned is_netapp 			: 1;
+    unsigned is_cdrom			: 1;
   } status;
   ULONG sernum;
  public:
@@ -113,6 +114,7 @@ struct fs_info
   IMPLEMENT_STATUS_FLAG (ULONG, name_len)
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
   IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
@@ -149,6 +151,7 @@ class path_conv
   bool isgood_inode (__ino64_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
+  int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)

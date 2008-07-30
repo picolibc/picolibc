@@ -390,7 +390,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       debug_printf ("%p = NtOpenFile(%S)", status, pc.get_nt_native_path ());
       goto too_bad;
     }
-  if (wincap.has_fileid_dirinfo ()
+  if (wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ()
       && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
 						 &fdi_buf.fdi, sizeof fdi_buf,
 						 FileIdBothDirectoryInformation,
@@ -1574,7 +1574,8 @@ fhandler_disk_file::opendir (int fd)
 	      dir->__flags |= dirent_set_d_ino;
 	      if (pc.fs_is_nfs ())
 	      	dir->__flags |= dirent_nfs_d_ino;
-	      else if (wincap.has_fileid_dirinfo ())
+	      else if (wincap.has_fileid_dirinfo ()
+		       && !pc.has_buggy_fileid_dirinfo ())
 		dir->__flags |= dirent_get_d_ino;
 	    }
 	}

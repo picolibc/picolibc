@@ -389,6 +389,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   } ffvi_buf;
   UNICODE_STRING fsname, testname;
 
+  clear ();
   if (in_vol)
     vol = in_vol;
   else
@@ -420,7 +421,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	{
 	  debug_printf ("Cannot access path %S, status %08lx",
 			attr.ObjectName, status);
-	  clear ();
 	  NtClose (vol);
 	  return false;
 	}
@@ -450,8 +450,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     {
       debug_printf ("Cannot get volume attributes (%S), %08lx",
 		    attr.ObjectName, status);
-      has_buggy_open (false);
-      flags (0);
       if (!in_vol)
 	NtClose (vol);
       return false;
@@ -506,23 +504,38 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
 		  && FS_IS_SAMBA);
 
-      is_netapp (!is_samba ()
-		 && RtlEqualUnicodeString (&fsname, &testname, FALSE)
-		 && FS_IS_NETAPP_DATAONTAP);
+      if (!is_samba ())
+        {
+	  is_netapp (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+		     && FS_IS_NETAPP_DATAONTAP);
+
+	  RtlInitUnicodeString (&testname, L"NFS");
+	  is_nfs (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+
+	  if (!is_nfs ())
+	    {
+	      /* Known remote file systems which can't handle calls to
+	         NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
+	      RtlInitUnicodeString (&testname, L"UNIXFS");
+	      has_buggy_fileid_dirinfo (RtlEqualUnicodeString (&fsname,
+							       &testname,
+							       FALSE));
+
+	      /* Known remote file systems with buggy open calls.  Further
+		 explanation in fhandler.cc (fhandler_disk_file::open). */
+	      RtlInitUnicodeString (&testname, L"SUNWNFS");
+	      has_buggy_open (RtlEqualUnicodeString (&fsname, &testname,
+						     FALSE));
+	    }
+	}
     }
   is_ntfs (RtlEqualUnicodeString (&fsname, &testname, FALSE)
 	   && !is_samba () && !is_netapp ());
-  RtlInitUnicodeString (&testname, L"NFS");
-  is_nfs (RtlEqualUnicodeString (&fsname, &testname, FALSE));
   is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
 
   has_acls (flags () & FS_PERSISTENT_ACLS);
   hasgood_inode (((flags () & FILE_PERSISTENT_ACLS) && !is_netapp ())
 		 || is_nfs ());
-  /* Known file systems with buggy open calls. Further explanation
-     in fhandler.cc (fhandler_disk_file::open). */
-  RtlInitUnicodeString (&testname, L"SUNWNFS");
-  has_buggy_open (RtlEqualUnicodeString (&fsname, &testname, FALSE));
   /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
      except on Samba which handles Windows clients case insensitive.
      NFS doesn't set the FILE_CASE_SENSITIVE_SEARCH flag but is case

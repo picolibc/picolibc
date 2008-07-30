@@ -1,5 +1,21 @@
 2008-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_name): Check for
+	file systems incapable of handling FileIdBothDirectoryInformation
+	correctly.
+	(fhandler_disk_file::opendir): Ditto.
+	* path.cc (fs_info::update): Always clear at the start.
+	Rearrange to make certain tests only on non-Samba, non-NFS remote
+	drives.
+	Add test for file systems known to be incapable of handling
+	FileIdBothDirectoryInformation correctly.  Right now that's just
+	"UNIXFS".
+	* path.h (struct fs_info): Add has_buggy_fileid_dirinfo flag and
+	accessor methods.
+	(class path_conv): Add has_buggy_fileid_dirinfo method.
+
+2008-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (extract_nt_dom_user): Return domain and user name as
 	WCHAR.
 	(cygwin_logon_user): Accommodate above change.  Convert password to
