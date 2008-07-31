@@ -483,7 +483,10 @@ spawn_guts (const char *prog_arg, const char *const *argv,
         PWCHAR r = runpath + 4;
 	if (r[1] != L':') /* UNC path */
 	  *(r += 2) = L'\\';
-	runpath = r;
+	if (!RtlIsDosDeviceName_U (r))
+	  runpath = r;
+	else if (*r == L'\\')
+	  *r = L'C';
       }
   }
 

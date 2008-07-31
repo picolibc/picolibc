@@ -1,3 +1,8 @@
+2008-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Check constructed short pathname for being
+	a DOS device name and fall back to long path name, if so.
+
 2008-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_name): Check for
