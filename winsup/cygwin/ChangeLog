@@ -1,5 +1,10 @@
 2008-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check): Handle (and explain) a special case
+	when accessing files matching DOS device names on SMB shares.
+
+2008-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (spawn_guts): Check constructed short pathname for being
 	a DOS device name and fall back to long path name, if so.
 

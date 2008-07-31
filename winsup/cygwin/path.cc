@@ -2440,6 +2440,18 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 		    {
 		      debug_printf ("%p = NtQueryDirectoryFile(%S)",
 				    status, &dirname);
+		      if (status == STATUS_NO_SUCH_FILE)
+			{
+			  /* This can happen when trying to access files
+			     which match DOS device names on SMB shares.
+			     NtOpenFile failed with STATUS_ACCESS_DENIED,
+			     but the NtQueryDirectoryFile tells us the
+			     file doesn't exist.  We're suspicious in this
+			     case and retry with the next suffix instead of
+			     just giving up. */
+			  set_error (ENOENT);
+			  continue;
+			}
 		      fileattr = 0;
 		    }
 		  else
