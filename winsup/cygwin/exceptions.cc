@@ -243,20 +243,23 @@ stack_info::init (DWORD ebp, bool wantargs, bool goodframe)
 # undef debp
 }
 
+extern "C" void _cygwin_exit_return ();
+
 /* Walk the stack by looking at successive stored 'bp' frames.
    This is not foolproof. */
 int
 stack_info::walk ()
 {
   char **ebp;
+
+  if ((void (*) ()) sf.AddrPC.Offset == _cygwin_exit_return)
+    return 0;		/* stack frames are exhausted */
+
   if (((ebp = (char **) next_offset ()) == NULL) || (ebp >= (char **) cygwin_hmodule))
     return 0;
 
   sf.AddrFrame.Offset = (DWORD) ebp;
   sf.AddrPC.Offset = sf.AddrReturn.Offset;
-
-  if (!sf.AddrPC.Offset)
-    return 0;		/* stack frames are exhausted */
 
   /* The return address always follows the stack pointer */
   sf.AddrReturn.Offset = (DWORD) *++ebp;

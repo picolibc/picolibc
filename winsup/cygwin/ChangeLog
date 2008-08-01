@@ -1,3 +1,11 @@
+2008-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Add a symbol denoting return from call to
+	main().
+	* exceptions.cc (stack_info::walk): Stop walking the stack when we
+	hit _cygwin_exit_return rather than just blindly stopping when PC
+	becomes zero.
+
 2008-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Handle (and explain) a special case

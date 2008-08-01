@@ -933,6 +933,10 @@ dll_crt0_1 (void *)
   ld_preload ();
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
+  __asm__ ("				\n\
+	.global __cygwin_exit_return	\n\
+__cygwin_exit_return:			\n\
+");
 }
 
 extern "C" void __stdcall
