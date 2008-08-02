@@ -157,6 +157,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by PowerPC 405 processor.  */
 #define PPC_OPCODE_405		 0x40000000
 
+/* Opcode is supported by Vector-Scalar (VSX) Unit */
+#define PPC_OPCODE_VSX		 0x80000000
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
@@ -312,6 +315,10 @@ extern const unsigned int num_powerpc_operands;
 #define PPC_OPERAND_FSL (0x20000)
 #define PPC_OPERAND_FCR (0x40000)
 #define PPC_OPERAND_UDI (0x80000)
+
+/* This operand names a vector-scalar unit register.  The disassembler
+   prints these with a leading 'vs'.  */
+#define PPC_OPERAND_VSR (0x100000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
    with the operands table for simplicity.  The macro table is an
