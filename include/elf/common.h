@@ -73,7 +73,7 @@
 #define ELFOSABI_OPENBSD     12	/* OpenBSD */
 #define ELFOSABI_OPENVMS     13	/* OpenVMS */
 #define ELFOSABI_NSK	     14	/* Hewlett-Packard Non-Stop Kernel */
-#define ELFOSABI_AROS	     15	/* Amiga Research OS */
+#define ELFOSABI_AROS	     15	/* AROS */
 #define ELFOSABI_ARM	     97	/* ARM */
 #define ELFOSABI_STANDALONE 255	/* Standalone (embedded) application */
 
@@ -211,7 +211,7 @@
 #define EM_RS08		132	/* Freescale RS08 embedded processor */
 
 #define EM_ECOG2	134	/* Cyan Technology eCOG2 microprocessor */
-#define EM_SCORE        135     /* Sunplus Score */
+#define EM_SCORE	135	/* Sunplus Score */
 #define EM_DSP24	136	/* New Japan Radio (NJR) 24-bit DSP Processor */
 #define EM_VIDEOCORE3	137	/* Broadcom VideoCore III processor */
 #define EM_LATTICEMICO32 138	/* RISC processor for Lattice FPGA architecture */
@@ -257,7 +257,7 @@
 #define EM_PPC_OLD		17
 
 /* picoJava */
-#define EM_PJ_OLD      		99
+#define EM_PJ_OLD		99
 
 /* Old, unofficial value for National Semiconductor CompactRISC - CR16 */
 #define EM_CR16_OLD		115
@@ -269,7 +269,7 @@
 #define EM_MSP430_OLD		0x1059
 
 /* Morpho MT.   Written in the absense of an ABI.  */
-#define EM_MT                   0x2530
+#define EM_MT			0x2530
 
 /* FR30 magic number - no EABI available.  */
 #define EM_CYGNUS_FR30		0x3330
@@ -284,7 +284,7 @@
 #define EM_CYGNUS_FRV		0x5441
 
 /* Infineon Technologies 16-bit microcontroller with C166-V2 core.  */
-#define EM_XC16X   		0x4688
+#define EM_XC16X		0x4688
 
 /* D10V backend magic number.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_D10V		0x7650
@@ -299,7 +299,7 @@
 #define EM_OR32			0x8472
 
 /* Cygnus PowerPC ELF backend.  Written in the absence of an ABI.  */
-#define EM_CYGNUS_POWERPC 	0x9025
+#define EM_CYGNUS_POWERPC	0x9025
 
 /* Alpha backend magic number.  Written in the absence of an ABI.  */
 #define EM_ALPHA		0x9026
@@ -543,8 +543,8 @@
 #define STT_FILE	4		/* Symbol gives a file name */
 #define STT_COMMON	5		/* An uninitialised common block */
 #define STT_TLS		6		/* Thread local data object */
-#define STT_RELC        8               /* Complex relocation expression */
-#define STT_SRELC       9               /* Signed Complex relocation expression */
+#define STT_RELC	8		/* Complex relocation expression */
+#define STT_SRELC	9		/* Signed Complex relocation expression */
 #define STT_LOOS	10		/* OS-specific semantics */
 #define STT_HIOS	12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */

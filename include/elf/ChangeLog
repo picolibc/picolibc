@@ -1,3 +1,7 @@
+2008-08-04  Markus Weiss  <weissms@aros.org>
+
+	* common.h (ELFOSABI_AROS): Update comment.
+
 2008-07-26  Michael Eager <eager@eagercon.com>
 
 	* ppc.h: Add description of single-precision.
