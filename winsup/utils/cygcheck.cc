@@ -2024,8 +2024,15 @@ load_cygwin (int& argc, char **&argv)
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
       if (av && ((DWORD) av != (DWORD) -1))
-	for (argc = 0, argv = av; *av; av++)
-	  argc++;
+	{
+	  /* Copy cygwin's idea of the argument list into this Window application. */
+	  for (argc = 0; av[argc]; argc++)
+	    continue;
+	  argv = (char **) calloc (argc + 1, sizeof (char *));
+	  for (char **argvp = argv; *av; av++)
+	    *argvp++ = strdup (*av);
+	}
+
 
       char **envp = (char **) cygwin_internal (CW_ENVP);
       if (envp && ((DWORD) envp != (DWORD) -1))

@@ -1,3 +1,8 @@
+2008-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (load_cygwin): Duplicate argv list since it disappears
+	when cygwin1.dll is unloaded.
+
 2008-07-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in: Link cygcheck with -lntdll even without mingw-zlib.
