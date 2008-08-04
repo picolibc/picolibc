@@ -1,3 +1,12 @@
+2008-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Changes suggested by Dave Korn.
+	* dcrt0.cc (cygwin_exit): Remove (hopefully) extraneous call to
+	dll_global_dtors.
+	* dll_init.cc (dll_global_dtors): Run destructors in reverse
+	dependency/load order.
+	* dll_init.h (dll_list): Add dll_global_dtors as a friend.
+
 2008-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_1): Add a symbol denoting return from call to

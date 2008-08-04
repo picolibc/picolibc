@@ -32,7 +32,7 @@ dll_global_dtors ()
   int recorded = dll_global_dtors_recorded;
   dll_global_dtors_recorded = false;
   if (recorded)
-    for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
+    for (dll *d = dlls.end; d != &dlls.start; d = d->prev)
       d->p.run_dtors ();
 }
 

@@ -86,6 +86,7 @@ public:
     hold = &start;
     return inext ();
   }
+  friend void dll_global_dtors ();
 };
 
 extern dll_list dlls;

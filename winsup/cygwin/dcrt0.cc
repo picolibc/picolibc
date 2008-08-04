@@ -1112,7 +1112,6 @@ cygwin_atexit (void (*function)(void))
 extern "C" void
 cygwin_exit (int n)
 {
-  dll_global_dtors ();
   if (atexit_lock)
     atexit_lock.acquire ();
   exit (n);
