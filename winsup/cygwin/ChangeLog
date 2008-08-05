@@ -1,3 +1,7 @@
+2008-08-05  Brian Dessent  <brian@dessent.net>
+
+	* config/i386/profile.h (mcount): Mark asms volatile.
+
 2008-08-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll_init.cc (dll_global_dtors): Add an additional test to avoid
