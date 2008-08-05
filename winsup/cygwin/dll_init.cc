@@ -31,7 +31,7 @@ dll_global_dtors ()
 {
   int recorded = dll_global_dtors_recorded;
   dll_global_dtors_recorded = false;
-  if (recorded)
+  if (recorded && dlls.start.next)
     for (dll *d = dlls.end; d != &dlls.start; d = d->prev)
       d->p.run_dtors ();
 }
@@ -217,10 +217,9 @@ dll_list::detach (void *retaddr)
 void
 dll_list::init ()
 {
-  dll_global_dtors_recorded = true;
-
   /* Walk the dll chain, initializing each dll */
   dll *d = &start;
+  dll_global_dtors_recorded = d->next != NULL;
   while ((d = d->next))
     d->init ();
 }

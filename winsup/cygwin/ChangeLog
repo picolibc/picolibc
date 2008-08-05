@@ -1,3 +1,10 @@
+2008-08-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dll_init.cc (dll_global_dtors): Add an additional test to avoid
+	walking the linked list if it is empty.
+	(dll_list::detach): Don't set dll_global_dtors_recorded if we aren't
+	actually going to record any dlls.
+
 2008-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Changes suggested by Dave Korn.
