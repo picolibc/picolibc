@@ -1,3 +1,9 @@
+2008-08-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Use Samba workaround generally
+	for all remote filesystems supporting ACLs.  Change comment and
+	explain why.  Refer to the discussion which led to this.
+
 2008-08-05  Brian Dessent  <brian@dessent.net>
 
 	* config/i386/profile.h (mcount): Mark asms volatile.

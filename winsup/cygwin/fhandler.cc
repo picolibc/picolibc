@@ -573,8 +573,9 @@ fhandler_base::open (int flags, mode_t mode)
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
 
 	  /* If the file should actually be created and has ACLs,
-	     set files attributes, except on Samba.  See below. */
-	  if (has_acls () && !pc.fs_is_samba ())
+	     set files attributes, except on remote file systems.
+	     See below. */
+	  if (has_acls () && !pc.isremote ())
 	    {
 	      set_security_attribute (mode, &sa, sd);
 	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
@@ -619,21 +620,24 @@ fhandler_base::open (int flags, mode_t mode)
 	goto done;
    }
 
-  /* Samba weirdness:
-     The local user SID is used in set_security_attribute, but the
-     actual owner on the Samba share is the SID of the Unix account.
-     There's no transparent mapping between these accounts.
+  /* After some discussion on the samba-technical list, starting here:
+     http://lists.samba.org/archive/samba-technical/2008-July/060247.html
 
-     FIXME: Really?
+     Always create files on a remote share using a NULL SD.  Create
+     correct permission bits afterwards, maintaing the owner and group
+     information just like chmod.
 
-     And Samba has a strange behaviour when creating a file.  Apparently
-     it *first* creates the file, *then* it looks if the security
-     descriptor matches.  The result is that the file gets created, but
-     then NtCreateFile doesn't return a handle to the file and fails
-     with STATUS_ACCESS_DENIED.  That's why we first create the file
-     with default SD and afterwards set the permissions while ignoring
-     the owner and group. */
-  if ((flags & O_CREAT) && has_acls () && pc.fs_is_samba ())
+     The reason to do this is to maintain the Windows behaviour when
+     creating files on a remote share.  Files on a remote share are
+     created as the user used for authentication.  In a domain that's
+     usually the user you're logged in as.  Outside of a domain you're
+     authenticating using a local user account on the sharing machine.
+     If the SIDs of the client machine are used, that's entirely
+     unexpected behaviour.
+     
+     Doing it like we do here creates the expected SD in a domain as
+     well as on standalone servers. */
+  if ((flags & O_CREAT) && has_acls () && pc.isremote ())
     set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, mode);
 
   set_io_handle (fh);
