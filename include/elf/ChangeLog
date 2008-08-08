@@ -1,3 +1,11 @@
+2008-08-08  Richard Sandiford  <rdsandiford@googlemail.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+	    Catherine Moore  <clm@codesourcery.com>
+	    Mark Shinwell  <shinwell@codesourcery.com>
+
+	* mips.h (STO_MIPS_PLT, ELF_ST_IS_MIPS_PLT, ELF_ST_SET_MIPS_PLT)
+	(STO_MIPS_PIC, DT_MIPS_PLTGOT, DT_MIPS_RWPLT): New macros.
+
 2008-08-04  Markus Weiss  <weissms@aros.org>
 
 	* common.h (ELFOSABI_AROS): Update comment.

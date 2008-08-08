@@ -662,6 +662,12 @@ extern void bfd_mips_elf32_swap_reginfo_out
 
 /* Address of auxiliary .dynamic.  */
 #define DT_MIPS_AUX_DYNAMIC	0x70000031
+
+/* Address of the base of the PLTGOT.  */
+#define DT_MIPS_PLTGOT         0x70000032
+
+/* Points to the base of a writable PLT.  */
+#define DT_MIPS_RWPLT          0x70000034
 
 /* Flags which may appear in a DT_MIPS_FLAGS entry.  */
 
@@ -722,6 +728,20 @@ extern void bfd_mips_elf32_swap_reginfo_out
 #define STO_INTERNAL		STV_INTERNAL
 #define STO_HIDDEN		STV_HIDDEN
 #define STO_PROTECTED		STV_PROTECTED
+
+/* The MIPS psABI was updated in 2008 with support for PLTs and copy
+   relocs.  There are therefore two types of nonzero SHN_UNDEF functions:
+   PLT entries and traditional MIPS lazy binding stubs.  We mark the former
+   with STO_MIPS_PLT to distinguish them from the latter.  */
+#define STO_MIPS_PLT		0x8
+
+/* This value is used to mark PIC functions in an object that mixes
+   PIC and non-PIC.  */
+#define STO_MIPS_PIC		0x20
+#define ELF_ST_IS_MIPS_PIC(OTHER) \
+  (((OTHER) & ~ELF_ST_VISIBILITY (-1)) == STO_MIPS_PIC)
+#define ELF_ST_SET_MIPS_PIC(OTHER) \
+  (STO_MIPS_PIC | ELF_ST_VISIBILITY (OTHER))
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0
