@@ -296,10 +296,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	      if (current_position + bytes_to_read >= drive_size)
 		bytes_to_read = drive_size - current_position;
 	      if (!bytes_to_read)
-		{
-		  eom_detected (true);
-		  break;
-		}
+		break;
 
 	      debug_printf ("read %d bytes %s", bytes_to_read,
 			    len < devbufsiz ? "into buffer" : "directly");

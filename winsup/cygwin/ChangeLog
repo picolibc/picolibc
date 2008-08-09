@@ -1,3 +1,9 @@
+2008-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Don't set
+	eom_detected when EOF is detected, thus returning 0 instead of
+	setting errno to ENOSPC.
+
 2008-08-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Use Samba workaround generally
