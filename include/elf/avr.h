@@ -24,7 +24,7 @@
 #include "elf/reloc-macros.h"
 
 /* Processor specific flags for the ELF header e_flags field.  */
-#define EF_AVR_MACH 0xf
+#define EF_AVR_MACH 0x7F
 
 /* If bit #7 is set, it is assumed that the elf file uses local symbols
    as reference for the relocations so that linker relaxation is possible.  */
@@ -32,9 +32,13 @@
 
 #define E_AVR_MACH_AVR1 1
 #define E_AVR_MACH_AVR2 2
+#define E_AVR_MACH_AVR25 25
 #define E_AVR_MACH_AVR3 3
+#define E_AVR_MACH_AVR31 31
+#define E_AVR_MACH_AVR35 35
 #define E_AVR_MACH_AVR4 4
 #define E_AVR_MACH_AVR5 5
+#define E_AVR_MACH_AVR51 51
 #define E_AVR_MACH_AVR6 6 
 
 /* Relocations.  */

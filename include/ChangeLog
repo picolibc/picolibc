@@ -1,3 +1,14 @@
+2008-08-08  Anatoly Sokolov  <aesok@post.ru>
+
+	* elf/avr.h (E_AVR_MACH_AVR25, E_AVR_MACH_AVR31,
+	E_AVR_MACH_AVR35, E_AVR_MACH_AVR51): Define.
+	(EF_AVR_MACH): Redefine to 0x7F.
+	* opcode/avr.h (AVR_ISA_TINY3, AVR_ISA_ALL, AVR_ISA_USB162): Remove.
+	(AVR_ISA_AVR3): Redefine.
+	(AVR_ISA_AVR1, AVR_ISA_AVR2, AVR_ISA_AVR31, AVR_ISA_AVR35,
+	AVR_ISA_AVR3_ALL, AVR_ISA_AVR4, AVR_ISA_AVR5, AVR_ISA_AVR51,
+	AVR_ISA_AVR6): Define.
+
 2008-07-12  Jie Zhang  <jie.zhang@analog.com>
 
 	Revert
