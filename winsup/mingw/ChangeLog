@@ -1,3 +1,17 @@
+2008-08-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Add replacements for remaining members of printf() family.
+	
+	* mingwex/stdio/printf.c: New file.
+	* mingwex/stdio/fprintf.c: New file.
+	* mingwex/stdio/sprintf.c: New file.
+	* mingwex/stdio/vprintf.c: New file.
+	* mingwex/stdio/vfprintf.c: New file.
+	* mingwex/stdio/vsprintf.c: New file.
+
+	* mingwex/Makefile.in (STDIO_DISTFILES): Add them.
+	(STDIO_OBJS): Add their corresponding object files.
+
 2008-07-29  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Replace __mingw_snprintf() with new generic family implementation;

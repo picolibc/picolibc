@@ -74,7 +74,8 @@ MATH_DISTFILES = \
 STDIO_DISTFILES = \
 	fopen64.c fseeko64.c ftello64.c lseek64.c \
 	vfscanf.c vfwscanf.c vscanf.c vsscanf.c vswscanf.c vwscanf.c \
-	pformat.c pformat.h snprintf.c vsnprintf.c \
+	pformat.c pformat.h printf.c fprintf.c sprintf.c snprintf.c \
+	vprintf.c vfprintf.c vsprintf.c vsnprintf.c \
 	snwprintf.c vsnwprintf.c
 
 COMPLEX_DISTFILES = \
@@ -142,7 +143,8 @@ STDLIB_STUB_OBJS = \
 STDIO_OBJS = \
 	fopen64.o fseeko64.o ftello64.o lseek64.o \
 	vfscanf.o vfwscanf.o vscanf.o vsscanf.o vswscanf.o vwscanf.o \
-	pformat.o snprintf.o vsnprintf.o snwprintf.o vsnwprintf.o
+	pformat.o snprintf.o vsnprintf.o snwprintf.o vsnwprintf.o \
+	printf.o fprintf.o sprintf.o vprintf.o vfprintf.o vsprintf.o
 MATH_OBJS = \
 	acosf.o acosl.o asinf.o asinl.o atan2f.o atan2l.o \
 	atanf.o atanl.o cbrt.o cbrtf.o cbrtl.o ceilf.o ceill.o \
