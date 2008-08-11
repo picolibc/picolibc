@@ -1656,10 +1656,11 @@ rename (const char *oldpath, const char *newpath)
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					      L".lnk", TRUE))
 	rename_append_suffix (newpc, newpath, nlen, ".lnk");
-      else if (oldpc.is_binary ()
+      else if (oldpc.is_binary () && !old_explicit_suffix
 	   && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					  L".exe", TRUE))
-	/* NOTE: No way to rename an executable foo.exe to foo. */
+	/* To rename an executable foo.exe to bar-without-exe-suffix, the
+	   .exe suffix must be given explicitly in oldpath. */
 	rename_append_suffix (newpc, newpath, nlen, ".exe");
     }
   else if (newpc.isdir ())

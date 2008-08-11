@@ -1,3 +1,8 @@
+2008-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): If newpath doesn't exist, check if .exe suffix
+	in oldpath has been omitted before appending .exe to newpath.
+
 2008-08-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Don't set
