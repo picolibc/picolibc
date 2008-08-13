@@ -80,7 +80,7 @@ then
     exit 1
   fi
 fi
-if ! mv -b /bin/${dll} /bin/cyglsa/${dll}
+if ! cp -b "/bin/${dll}" "/bin/cyglsa/${dll}"
 then
     echo "Copying the new LSA authentication package /bin/${dll} to"
     echo "/bin/cyglsa/${dll} failed.  Exiting."

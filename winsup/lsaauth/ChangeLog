@@ -1,3 +1,7 @@
+2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa-config: Copy the DLL instead of moving.
+
 2008-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa-config: Always create a /bin/cyglsa directory and copy the
