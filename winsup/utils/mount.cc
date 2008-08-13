@@ -24,9 +24,11 @@ details. */
 #endif
 #include <errno.h>
 
+#define NT_MAX_PATH 32768
+
 #define EXEC_FLAGS (MOUNT_EXEC | MOUNT_NOTEXEC | MOUNT_CYGWIN_EXEC)
 
-static void mount_commands (void);
+static void mount_entries (void);
 static void show_mounts (void);
 static void show_cygdrive_info (void);
 static void change_cygdrive_prefix (const char *new_prefix, int flags);
@@ -114,14 +116,33 @@ static struct option longopts[] =
   {"change-cygdrive-prefix", no_argument, NULL, 'c'},
   {"force", no_argument, NULL, 'f'},
   {"help", no_argument, NULL, 'h' },
-  {"mount-commands", no_argument, NULL, 'm'},
+  {"mount-entries", no_argument, NULL, 'm'},
   {"options", required_argument, NULL, 'o'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
   {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "bcfhmpstuvxEXo:";
+static char opts[] = "cfhmpvo:";
+
+struct opt
+{
+  const char *name;
+  unsigned val;
+  bool clear;
+} oopts[] =
+{
+  {"binary", MOUNT_BINARY, false},
+  {"text", MOUNT_BINARY, true},
+  {"exec", MOUNT_EXEC, false},
+  {"notexec", MOUNT_NOTEXEC, false},
+  {"cygexec", MOUNT_CYGWIN_EXEC, false},
+  {"nosuid", 0, 0},
+  {"acl", MOUNT_NOACL, true},
+  {"noacl", MOUNT_NOACL, false},
+  {"posix=1", MOUNT_NOPOSIX, true},
+  {"posix=0", MOUNT_NOPOSIX, false},
+};
 
 static void
 usage (FILE *where = stderr)
@@ -133,33 +154,18 @@ Display information about mounted filesystems, or mount a filesystem\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
   -h, --help                    output usage information and exit\n\
-  -m, --mount-commands          write mount commands to replicate user and\n\
-				system mount points and cygdrive prefixes\n\
+  -m, --mount-entries           write fstab entries to replicate mount points\n\
+				and cygdrive prefixes\n\
   -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -v, --version                 output version information and exit\n\
-  -X, --cygwin-executable       treat all files under mount point as cygwin\n\
-				executables\n\
-", progname);
+\n\
+Valid options are:\n\n  ", progname);
+  for (opt *o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
+    fprintf (where, "%s%s", o == oopts ? "" : ",", o->name);
+  fputs ("\n\n", where);
   exit (where == stderr ? 1 : 0);
 }
-
-struct opt
-{
-  const char *name;
-  unsigned val;
-  bool clear;
-} oopts[] =
-{
-  {"user", MOUNT_SYSTEM, true},
-  {"system", MOUNT_SYSTEM, false},
-  {"binary", MOUNT_BINARY, false},
-  {"text", MOUNT_BINARY, true},
-  {"exec", MOUNT_EXEC, false},
-  {"notexec", MOUNT_NOTEXEC, false},
-  {"cygexec", MOUNT_CYGWIN_EXEC, false},
-  {"nosuid", 0, 0}
-};
 
 static void
 print_version ()
@@ -223,9 +229,6 @@ main (int argc, char **argv)
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
-      case 'b':
-	flags |= MOUNT_BINARY;
-	break;
       case 'c':
 	if (do_what == nada)
 	  do_what = saw_change_cygdrive_prefix;
@@ -312,7 +315,7 @@ main (int argc, char **argv)
     case saw_mount_commands:
       if (optind <= argc)
 	usage ();
-      mount_commands ();
+      mount_entries ();
       break;
     default:
       if (optind != (argc - 1))
@@ -336,66 +339,63 @@ main (int argc, char **argv)
   return 0;
 }
 
+static char *
+convert_spaces (char *tgt, const char *src)
+{
+  char *tp, *spacep;
+  const char *sp;
+
+  tp = tgt;
+  for (sp = src; (spacep = strchr (sp, ' ')); sp = spacep + 1)
+    {
+      tp = stpncpy (tp, sp, spacep - sp);
+      tp = stpcpy (tp, "\\040");
+    }
+  stpcpy (tp, sp);
+  return tgt;
+}
+
 static void
-mount_commands (void)
+mount_entries (void)
 {
   FILE *m = setmntent ("/-not-used-", "r");
   struct mntent *p;
-  char *c;
-  const char *format_mnt = "mount%s \"%s\" \"%s\"\n";
-  const char *format_cyg = "mount%s --change-cygdrive-prefix \"%s\"\n";
-  char opts[MAX_PATH];
-  char user[MAX_PATH];
-  char system[MAX_PATH];
-  char user_flags[MAX_PATH];
-  char system_flags[MAX_PATH];
+  const char *format_mnt = "%s %s %s %s 0 0\n";
+  const char *format_cyg = "none %s cygdrive %s 0 0\n";
 
-  // write mount commands for user and system mount points
+  // write fstab entries for normal mount points
   while ((p = getmntent (m)) != NULL)
     // Only list non-cygdrives
     if (!strstr (p->mnt_opts, ",noumount"))
       {
-	strcpy(opts, " -f");
-	if      (p->mnt_opts[0] == 'b')
-	  strcat (opts, " -b");
-	else if (p->mnt_opts[0] == 't')
-	  strcat (opts, " -t");
-	if (strstr (p->mnt_opts, ",exec"))
-	  strcat (opts, " -x");
-	if (strstr (p->mnt_opts, ",noexec"))
-	  strcat (opts, " -E");
-	if (strstr (p->mnt_opts, ",cygexec"))
-	  strcat (opts, " -X");
-	while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
-	  *c = '/';
-	printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
+	char fsname[NT_MAX_PATH], dirname[NT_MAX_PATH];
+	printf (format_mnt, convert_spaces (fsname, p->mnt_fsname),
+			    convert_spaces (dirname, p->mnt_dir),
+			    p->mnt_type, p->mnt_opts);
       }
   endmntent (m);
 
-  // write mount commands for cygdrive prefixes
-  cygwin_internal (CW_GET_CYGDRIVE_INFO, user, system, user_flags,
-		   system_flags);
-
-  if (strlen (user) > 0)
+  // write fstab entry for cygdrive prefix
+  m = setmntent ("/-not-used-", "r");
+  while ((p = getmntent (m)) != NULL)
     {
-      strcpy (opts, " -u");
-      if (user_flags[0] == 'b')
-	strcat (opts, " -b");
-      else if (user_flags[0] == 't')
-	strcat (opts, " -t");
-      printf (format_cyg, opts, user);
-    }
+      char *noumount;
+      if ((noumount = strstr (p->mnt_opts, ",noumount")))
+      	{
+	  char dirname[NT_MAX_PATH];
+	  char opts[strlen (p->mnt_opts) + 1];
 
-  if (strlen (system) > 0)
-    {
-      strcpy (opts, " -s");
-      if (system_flags[0] == 'b')
-	strcat (opts, " -b");
-      else if (system_flags[0] == 't')
-	strcat (opts, " -t");
-      printf (format_cyg, opts, system);
+	  convert_spaces (dirname, p->mnt_dir);
+	  char *ls = strrchr (dirname, '/');
+	  if (ls && ls > dirname)
+	    *ls = '\0';
+	  *stpncpy (opts, p->mnt_opts, noumount - p->mnt_opts) = '\0';
+	  printf (format_cyg, dirname, opts);
+	  break;
+	}
     }
-
+  endmntent (m);
+      
   exit(0);
 }
 
@@ -493,7 +493,7 @@ show_cygdrive_info ()
   if (strlen (user) > 0)
     printf (format, user, "user", user_flags);
   if (strlen (system) > 0)
-    printf (format, system, "system", system_flags);
+    printf (format, system, "nouser", system_flags);
 
   exit (0);
 }

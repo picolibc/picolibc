@@ -1,3 +1,28 @@
+2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (NT_MAX_PATH): Define.
+	(longopts): Rename mount-commands option to mount-entries.
+	(opts): Remove removed options.
+	(struct opt): Move up in file to allow using it in usage.
+	(usage): Change text for --mount-entries option.  Remove
+	-X option.  Add valid options output.
+	(main): Remove handling -b option.
+	(convert_spaces): New static function to convert spaces to "\040"
+	string.
+	(mount_entries): Renamed from mount_commands.  Rewrite to emit
+	/etc/fstab compatible output.
+	(show_cygdrive_info): Print "nouser" rather than "system".
+	* umount.cc (longopts): Remove remove-all-mounts,
+	remove-cygdrive-prefix, remove-system-mounts, system and user options.
+	(opts): Remove A, c, s, S, u options.
+	(usage): Remove text for all removed options.
+	(main): Remove handling for all removed options.
+	(remove_all_mounts): Remove.
+	(remove_all_system_mounts): Remove.
+	(remove_cygdrive_prefix): Remove.
+	* utils.sgml: Fix mount and umount documentation.  Move description
+	of (cyg,not)exec options to mount table section.
+
 2008-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygcheck.cc (load_cygwin): Duplicate argv list since it disappears
