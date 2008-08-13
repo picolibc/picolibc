@@ -51,7 +51,7 @@ struct dll
   int count;
   dll_type type;
   int namelen;
-  char name[NT_MAX_PATH];
+  WCHAR name[NT_MAX_PATH];
   void detach ();
   int init ();
 };
@@ -68,7 +68,7 @@ public:
   int tot;
   int loaded_dlls;
   int reload_on_fork;
-  dll *operator [] (const char *name);
+  dll *operator [] (const PWCHAR name);
   dll *alloc (HINSTANCE, per_process *, dll_type);
   void detach (void *);
   void init ();

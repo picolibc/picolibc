@@ -18,6 +18,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "cygtls.h"
+#include <wchar.h>
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -89,11 +90,11 @@ dll::init ()
 
 /* Look for a dll based on name */
 dll *
-dll_list::operator[] (const char *name)
+dll_list::operator[] (const PWCHAR name)
 {
   dll *d = &start;
   while ((d = d->next) != NULL)
-    if (strcasematch (name, d->name))
+    if (!wcscasecmp (name, d->name))
       return d;
 
   return NULL;
@@ -105,8 +106,8 @@ dll_list::operator[] (const char *name)
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
-  char name[NT_MAX_PATH];
-  DWORD namelen = GetModuleFileName (h, name, sizeof (name));
+  WCHAR name[NT_MAX_PATH];
+  DWORD namelen = GetModuleFileNameW (h, name, sizeof (name));
 
   /* Already loaded? */
   dll *d = dlls[name];
@@ -165,7 +166,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
      info about this DLL. */
   d->count = 1;
   d->namelen = namelen;
-  strcpy (d->name, name);
+  wcscpy (d->name, name);
   d->handle = h;
   d->p = p;
   d->type = type;
@@ -229,7 +230,7 @@ dll_list::init ()
 /* Mark every memory address up to "here" as reserved.  This may force
    Windows NT to load a DLL in the next available, lowest slot. */
 static void
-reserve_upto (const char *name, DWORD here)
+reserve_upto (const PWCHAR name, DWORD here)
 {
   DWORD size;
   MEMORY_BASIC_INFORMATION mb;
@@ -245,7 +246,7 @@ reserve_upto (const char *name, DWORD here)
 	  size = here - start;
 	if (mb.State == MEM_FREE &&
 	    !VirtualAlloc ((void *) start, size, MEM_RESERVE, PAGE_NOACCESS))
-	  api_fatal ("couldn't allocate memory %p(%d) for '%s' alignment, %E\n",
+	  api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
 		     start, size, name);
       }
 }
@@ -254,7 +255,7 @@ reserve_upto (const char *name, DWORD here)
    Note that this may also free otherwise reserved memory.  If that becomes
    a problem, we'll have to keep track of the memory that we reserve above. */
 static void
-release_upto (const char *name, DWORD here)
+release_upto (const PWCHAR name, DWORD here)
 {
   DWORD size;
   MEMORY_BASIC_INFORMATION mb;
@@ -271,7 +272,7 @@ release_upto (const char *name, DWORD here)
 	      | (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
-	  api_fatal ("couldn't release memory %p(%d) for '%s' alignment, %E\n",
+	  api_fatal ("couldn't release memory %p(%d) for '%W' alignment, %E\n",
 		     start, size, name);
       }
 }
@@ -299,10 +300,10 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
       if (d.type == DLL_LOAD)
 	{
 	  bool unload = true;
-	  HMODULE h = LoadLibraryEx (d.name, NULL, DONT_RESOLVE_DLL_REFERENCES);
+	  HMODULE h = LoadLibraryExW (d.name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 
 	  if (!h)
-	    system_printf ("can't reload %s", d.name);
+	    system_printf ("can't reload %W", d.name);
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.
 	     It sort of stinks that we can't invert the order of the FreeLibrary
@@ -315,11 +316,11 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	      if (unload)
 		{
 		  FreeLibrary (h);
-		  LoadLibrary (d.name);
+		  LoadLibraryW (d.name);
 		}
 	    }
 	  else if (try2)
-	    api_fatal ("unable to remap %s to same address as parent(%p) != %p",
+	    api_fatal ("unable to remap %W to same address as parent(%p) != %p",
 		       d.name, d.handle, h);
 	  else
 	    {
