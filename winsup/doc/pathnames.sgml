@@ -88,11 +88,26 @@ posix=[0|1].  The meaning of the options is as follows.</para>
 	     (default).
 </screen>
 
+<para>Normally, files ending in certain extensions (.exe, .com, .bat, .btm,
+.cmd) are assumed to be executable.  Files whose first two characters begin
+with '#!' are also considered to be executable.
+The <literal>exec</literal> option is used to instruct Cygwin that the
+mounted file is "executable".  If the <literal>exec</literal> option is used
+with a directory then all files in the directory are executable.
+This option allows other files to be marked as executable and avoids the
+overhead of opening each file to check for a '#!'.  The
+<literal>cygexec</literal> option is very similar to <literal>exec</literal>,
+but also prevents Cygwin from setting up commands and environment variables
+for a normal Windows program, adding another small performance gain.  The
+opposite of these options is the <literal>notexec</literal> option, which
+means that no files should be marked as executable under that mount point.
+</para>
+
 <para>Note that nouser mount points are not overridable by a later call
-to mount(2).  This is only possible for user mount points.  Mount points
-are by default nouser mount points, unless you specify the option user. 
-In contrast, all mount points in the user specific fstab file are user
-mount points.</para>
+to <command>mount</command>.  This is only possible for user mount points. 
+Mount points given in <filename>/etc/fstab</filename> are by default nouser
+mount points, unless you specify the option user.  In contrast, all mount
+points in the user specific fstab file are user mount points.</para>
 
 <para>The fifth and sixth field are ignored.  They are
 so far only specified to keep a Linux-like fstab file layout.</para>

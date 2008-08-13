@@ -1,3 +1,8 @@
+2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Move description for (cyg,not)exec mount options
+	from utils.sgml here.  Clarify nouser mount points.
+
 2008-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Move binmode option to list of removed options.
