@@ -1160,9 +1160,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      `silent' here; it's a magic internal thing. */
 
   if (!(flags & MOUNT_BINARY))
-    strcpy (_my_tls.locals.mnt_opts, (char *) "textmode");
+    strcpy (_my_tls.locals.mnt_opts, (char *) "text");
   else
-    strcpy (_my_tls.locals.mnt_opts, (char *) "binmode");
+    strcpy (_my_tls.locals.mnt_opts, (char *) "binary");
 
   if (flags & MOUNT_CYGWIN_EXEC)
     strcat (_my_tls.locals.mnt_opts, (char *) ",cygexec");
@@ -1182,8 +1182,6 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
     strcat (_my_tls.locals.mnt_opts, (char *) ",user");
-  else					/* system mount */
-    strcat (_my_tls.locals.mnt_opts, (char *) ",system");
 
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 
