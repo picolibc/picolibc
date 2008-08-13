@@ -1,5 +1,9 @@
 2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (fillout_mntent): Always print noumount option last.
+
+2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fillout_mntent): Print options as taken in fstab and mount.
 
 2008-08-13  Corinna Vinschen  <corinna@vinschen.de>

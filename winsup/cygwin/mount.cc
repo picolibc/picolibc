@@ -1177,11 +1177,11 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   if (flags & MOUNT_NOPOSIX)
     strcat (_my_tls.locals.mnt_opts, (char *) ",posix=0");
 
-  if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
-    strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");
-
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
     strcat (_my_tls.locals.mnt_opts, (char *) ",user");
+
+  if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
+    strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");
 
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 
