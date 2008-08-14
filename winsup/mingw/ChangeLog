@@ -1,3 +1,11 @@
+2008-08-14  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Add missing dependencies for building libmingwex.a.
+
+	* mingwex/Makefile.in (printf.o, fprintf.o, sprintf.o): Make them...
+	(vprintf.o, vfprintf.o, vsprintf.o): ...and also these, depend on...
+	(pformat.h): ...this.
+
 2008-08-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Add replacements for remaining members of printf() family.

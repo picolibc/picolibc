@@ -278,8 +278,14 @@ $(GDTOA_OBJS): gd_arith.h gdtoa.h gdtoaimp.h gd_qnan.h
 
 $(MATH_ROUND_OBJS) $(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS): round_internal.h
 
-snprintf.o:  snprintf.c  pformat.h
-vsnprintf.o: vsnprintf.c pformat.h
+printf.o:     printf.c     pformat.h
+fprintf.o:    fprintf.c    pformat.h
+sprintf.o:    sprintf.c    pformat.h
+snprintf.o:   snprintf.c   pformat.h
+vprintf.o:    vprintf.c    pformat.h
+vfprintf.o:   vfprintf.c   pformat.h
+vsprintf.o:   vsprintf.c   pformat.h
+vsnprintf.o:  vsnprintf.c  pformat.h
 
 dist:
 	mkdir $(distdir)/mingwex
