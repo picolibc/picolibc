@@ -1,5 +1,10 @@
 2008-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Fix linking
+	against symlinks.
+
+2008-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Call set_security_attribute with
 	additional path_conv argument.
 	* fhandler.cc (fhandler_base::open): Ditto.

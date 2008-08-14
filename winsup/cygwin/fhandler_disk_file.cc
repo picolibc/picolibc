@@ -1118,8 +1118,6 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 int
 fhandler_disk_file::link (const char *newpath)
 {
-  extern bool allow_winsymlinks;
-
   path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
   if (newpc.error)
     {
@@ -1137,7 +1135,7 @@ fhandler_disk_file::link (const char *newpath)
   char new_buf[strlen (newpath) + 5];
   if (!newpc.error)
     {
-      if (allow_winsymlinks && pc.is_lnk_special ())
+      if (pc.is_lnk_special ())
 	{
 	  /* Shortcut hack. */
 	  stpcpy (stpcpy (new_buf, newpath), ".lnk");
@@ -1182,18 +1180,16 @@ fhandler_disk_file::link (const char *newpath)
       if (status == STATUS_INVALID_DEVICE_REQUEST)
 	{
 	  /* FS doesn't support hard links.  Try to copy file. */
-	  WCHAR pcw[pc.get_nt_native_path ()->Length + 1];
-	  WCHAR newpcw[newpc.get_nt_native_path ()->Length + 1];
+	  WCHAR pcw[(pc.get_nt_native_path ()->Length / sizeof (WCHAR)) + 1];
+	  WCHAR newpcw[(newpc.get_nt_native_path ()->Length / sizeof (WCHAR))
+		       + 1];
 	  if (!CopyFileW (pc.get_wide_win32_path (pcw),
 			  newpc.get_wide_win32_path (newpcw), TRUE))
 	    {
 	      __seterrno ();
 	      return -1;
 	    }
-	  if (!allow_winsymlinks && pc.is_lnk_special ())
-	    SetFileAttributesW (newpcw, pc.file_attributes ()
-					| FILE_ATTRIBUTE_SYSTEM
-					| FILE_ATTRIBUTE_READONLY);
+	  SetFileAttributesW (newpcw, pc.file_attributes ());
 	}
       else
 	{
