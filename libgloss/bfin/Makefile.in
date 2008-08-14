@@ -7,6 +7,7 @@ srcdir = @srcdir@
 objdir = .
 srcroot = $(srcdir)/../..
 objroot = $(objdir)/../..
+top_srcdir = @top_srcdir@
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -28,6 +29,8 @@ MULTIDIRS =
 MULTISUBDIR =
 
 SHELL =	/bin/sh
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 
 CC = @CC@
 
@@ -56,14 +59,32 @@ SIM_OBJS	= syscalls.o
 SIM_TEST	= sim-test
 SIM_INSTALL	= install-sim
 
+# Here is all of the development board stuff
+# BF531, BF532, BF533, BF537
+BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
+	bf522.ld bf523.ld bf524.ld bf525.ld bf526.ld bf527.ld \
+	bf531.ld bf532.ld bf533.ld \
+	bf534.ld bf536.ld bf537.ld \
+	bf538.ld bf539.ld \
+	bf542.ld bf544.ld bf547.ld bf548.ld bf549.ld \
+	bf561.ld bf561a.ld bf561b.ld bf561m.ld
+BOARD_LDFLAGS	=
+BOARD_BSP	= # We actually use libnosys.a
+BOARD_CRT0S	= basiccrt.o basiccrts.o
+BOARD_CRT0S	+= basiccrt561.o basiccrt561s.o basiccrt561b.o
+BOARD_OBJS	=
+BOARD_TEST	=
+BOARD_INSTALL	= install-board
+
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
+INCLUDES += -I$(srcdir)/include
 #
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${SIM_CRT0} ${SIM_BSP}
+all: ${SIM_CRT0} ${SIM_BSP} ${BOARD_CRT0S} ${BOARD_BSP}
 
 #
 # here's where we build the board support packages for each target
@@ -75,20 +96,75 @@ ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 #
 #
 #
-.c.S:
-	${CC} ${CFLAGS_FOR_TARGET} -c $<
+crt0.o: crt0.S
+
+basiccrt.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
+else
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+endif
+
+basiccrts.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
+else
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+endif
+
+basiccrt561.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
+else
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
+endif
+
+basiccrt561s.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
+else
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
+endif
+
+
+basiccrt561b.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
+else
+	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
+endif
 
 clean mostlyclean:
-	rm -f a.out core *.i *.o $(SIM_BSP)
+	rm -f a.out core *.i *.o ${SIM_BSP} ${BOARD_BSP}
 
 distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${SIM_INSTALL}
+install: ${SIM_INSTALL} ${BOARD_INSTALL}
 
 install-sim:
-	set -e; for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
+	for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do \
+	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+	done
+
+install-board:
+	for x in ${BOARD_CRT0S} ${BOARD_BSP}; do \
+	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+	done
+	-if [ -z "${MULTISUBDIR}" ]; then \
+	  for x in ${BOARD_SCRIPTS}; do \
+	   ${INSTALL_DATA} ${srcdir}/$$x $(DESTDIR)${tooldir}/lib/$$x; \
+	  done; \
+	  ${mkinstalldirs} ${DESTDIR}${tooldir}/include; \
+	  for i in ${srcdir}/include/*.h; do \
+	   ${INSTALL_DATA} $$i ${DESTDIR}${tooldir}/include/`basename $$i`; \
+	  done; \
+	  ${mkinstalldirs} ${DESTDIR}${tooldir}/include/sys; \
+	  for i in ${srcdir}/include/sys/*.h; do \
+	   ${INSTALL_DATA} $$i ${DESTDIR}${tooldir}/include/sys/`basename $$i`; \
+	  done; \
+	else true; fi
 
 doc:
 info:

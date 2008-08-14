@@ -1,3 +1,55 @@
+2008-08-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in: (top_srcdir): Define.
+	(mkinstalldirs): Define.
+	(BOARD_SCRIPTS): Define.
+	(BOARD_LDFLAGS): Define.
+	(BOARD_BSP): Define.
+	(BOARD_CRT0S): Define.
+	(BOARD_OBJS): Define.
+	(BOARD_TEST): Define.
+	(BOARD_INSTALL): Define.
+	(INCLUDES): Add -I$(srcdir)/include.
+	(all): Add ${BOARD_CRT0S} and ${BOARD_BSP}.
+	(.c.S): Remove target.
+	(crt0.o): New target.
+	(basiccrt.o): Likewise.
+	(basiccrtb.o): Likewise.
+	(basiccrts.o): Likewise.
+	(basiccrt561.o, basiccrt561s.o, basiccrt561b.o): Likewise
+	(clean mostlyclean): Remove ${BOARD_BSP}.
+	(install): Depend on ${BOARD_INSTALL}.
+	(install-sim): Reformat.
+	(install-board): New target.
+	* bfin/basiccrt.S: Remove useless __ADSPBF561_COREB__ in
+	workaround code for 05000229.
+	* bfin/syscalls.c (do_syscall): Use `EXCPT 0' instead of
+	`RAISE 0' for syscall.
+	* bfin/basiccrt.S: New file.
+	* bfin/bf5*ld: New file.
+	* bfin/bfin-common-mc.ld: New file.
+	* bfin/bfin-common-sc.ld: New file.
+	* bfin/include/blackfin.h: New file.
+	* bfin/include/cdefBF5*.h: New file.
+	* bfin/include/cdef_LPBlackfin.h: New file.
+	* bfin/include/cdefblackfin.h: New file.
+	* bfin/include/cplb.h: New file.
+	* bfin/include/cplbtab.h: New file.
+	* bfin/include/defBF5*.h: New files.
+	* bfin/include/def_LPBlackfin.h: New files.
+	* bfin/include/defblackfin.h: New file.
+	* bfin/include/sys/_adi_platform.h: New file.
+	* bfin/include/sys/anomaly_macros_rtl.h: New file.
+	* bfin/include/sys/excause.h: New file.
+	* bfin/include/sys/exception.h: New file.
+	* bfin/include/sys/mc_typedef.h: New file.
+	* bfin/include/sys/platform.h: New file.
+	* bfin/include/sys/pll.h: New file.
+	* bfin/include/sysreg.h: New file.
+	* libnosys/configure.in (MISSING_SYSCALL_NAMES): Don't define
+	for bfin.
+	* libnosys/configure: Regenerate.
+
 2008-07-17  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/syscalls.c: Check and set the errno value.
