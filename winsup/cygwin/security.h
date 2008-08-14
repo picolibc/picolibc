@@ -349,7 +349,8 @@ bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PS
 int __stdcall check_file_access (path_conv &, int);
 int __stdcall check_registry_access (HANDLE, int);
 
-void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
+void set_security_attribute (path_conv &pc, int attribute,
+			     PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);
 
 bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);

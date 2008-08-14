@@ -807,10 +807,10 @@ fhandler_disk_file::fchmod (mode_t mode)
 	res = 0;
     }
 
-  /* if the mode we want has any write bits set, we can't be read only. */
+  /* If the mode has any write bits set, the DOS R/O flag is in the way. */
   if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
     pc &= (DWORD) ~FILE_ATTRIBUTE_READONLY;
-  else
+  else if (!pc.has_acls ())	/* Never set DOS R/O if security is used. */
     pc |= (DWORD) FILE_ATTRIBUTE_READONLY;
   if (S_ISSOCK (mode))
     pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
@@ -1380,8 +1380,10 @@ fhandler_disk_file::mkdir (mode_t mode)
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
 
-  if (has_acls ())
-    set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
+  /* See comments in fhander_base::open () for an explanation why we defer
+     setting security attributes on remote files. */
+  if (has_acls () && !pc.isremote ())
+    set_security_attribute (pc, S_IFDIR | ((mode & 07777) & ~cygheap->umask),
 			    &sa, sd);
 
   NTSTATUS status;
@@ -1418,6 +1420,9 @@ fhandler_disk_file::mkdir (mode_t mode)
 			 p, plen);
   if (NT_SUCCESS (status))
     {
+      if (has_acls () && pc.isremote ())
+	set_file_attribute (dir, pc, ILLEGAL_UID, ILLEGAL_GID,
+			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
       NtClose (dir);
       res = 0;
     }

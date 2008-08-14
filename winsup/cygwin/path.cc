@@ -1766,8 +1766,10 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  goto done;
 	}
     }
-  if (win32_newpath.has_acls ())
-    set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
+  /* See comments in fhander_base::open () for an explanation why we defer
+     setting security attributes on remote files. */
+  if (win32_newpath.has_acls () && !win32_newpath.isremote ())
+    set_security_attribute (win32_newpath, S_IFLNK | STD_RBITS | STD_WBITS,
 			    &sa, sd);
   status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
 			 win32_newpath.get_object_attr (attr, sa),
@@ -1783,6 +1785,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       __seterrno_from_nt_status (status);
       goto done;
     }
+  if (win32_newpath.has_acls () && win32_newpath.isremote ())
+    set_file_attribute (fh, win32_newpath, ILLEGAL_UID, ILLEGAL_GID,
+    			S_IFLNK | STD_RBITS | STD_WBITS);
   status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
   if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
     {

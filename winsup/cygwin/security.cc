@@ -380,7 +380,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 static PSECURITY_DESCRIPTOR
-alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
+alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  security_descriptor &sd_ret)
 {
   BOOL dummy;
@@ -462,28 +462,31 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
-  /* Construct allow attribute for owner. */
+  /* Construct allow attribute for owner.
+     Don't set FILE_READ/WRITE_ATTRIBUTES unconditionally on Samba, otherwise
+     it enforces read permissions.  Same for other's below. */
   DWORD owner_allow = STANDARD_RIGHTS_ALL
-		      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+		      | pc.fs_is_samba ()
+			? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)
     owner_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXUSR)
-    owner_allow |= FILE_GENERIC_EXECUTE;
+    owner_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
   if (S_ISDIR (attribute)
       && (attribute & (S_IWUSR | S_IXUSR)) == (S_IWUSR | S_IXUSR))
     owner_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for group. */
-  DWORD group_allow = STANDARD_RIGHTS_READ
-		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+  DWORD group_allow = STANDARD_RIGHTS_READ |
+		      (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWGRP)
-    group_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+    group_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXGRP)
-    group_allow |= FILE_GENERIC_EXECUTE;
+    group_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
   if (S_ISDIR (attribute)
       && (attribute & (S_IWGRP | S_IXGRP)) == (S_IWGRP | S_IXGRP)
       && !(attribute & S_ISVTX))
@@ -491,13 +494,13 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 
   /* Construct allow attribute for everyone. */
   DWORD other_allow = STANDARD_RIGHTS_READ
-		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
   if (attribute & S_IROTH)
     other_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWOTH)
-    other_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+    other_allow |= FILE_GENERIC_WRITE;
   if (attribute & S_IXOTH)
-    other_allow |= FILE_GENERIC_EXECUTE;
+    other_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
   if (S_ISDIR (attribute)
       && (attribute & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
       && !(attribute & S_ISVTX))
@@ -682,13 +685,13 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 }
 
 void
-set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
+set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
 			security_descriptor &sd)
 {
   psa->lpSecurityDescriptor = sd.malloc (SECURITY_DESCRIPTOR_MIN_LENGTH);
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
+  psa->lpSecurityDescriptor = alloc_sd (pc, geteuid32 (), getegid32 (),
 					attribute, sd);
 }
 
@@ -702,7 +705,8 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     {
       security_descriptor sd;
 
-      if (!get_file_sd (handle, pc, sd) && alloc_sd (uid, gid, attribute, sd))
+      if (!get_file_sd (handle, pc, sd)
+	  && alloc_sd (pc, uid, gid, attribute, sd))
 	ret = set_file_sd (handle, pc, sd);
     }
   else

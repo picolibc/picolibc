@@ -1,3 +1,27 @@
+2008-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Call set_security_attribute with
+	additional path_conv argument.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Never set DOS
+	R/O attribute when using ACLs.
+	(fhandler_disk_file::mkdir): Ditto.  Set
+	security descriptor on remote dirs after creating the dir, same as in
+	fhandler_base::open.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto for remote AF_LOCAL
+	socket files.
+	* path.cc (symlink_worker): Ditto. for remote symlinks.
+	* security.cc (alloc_sd): Take additional path_conv argument.
+	Accommodate throughout.  Drop setting FILE_WRITE_EA/FILE_READ_EA
+	flags unconditionally (was only necessary for "ntea"). Don't set
+	FILE_READ_ATTRIBUTES and FILE_WRITE_ATTRIBUTES unconditionally on
+	Samba.  Add comment to explain.  Drop useless setting of
+	STANDARD_RIGHTS_WRITE, it's in FILE_GENERIC_WRITE anyway.
+	Remove FILE_READ_ATTRIBUTES bit from FILE_GENERIC_EXECUTE so as not
+	to enforce read permissions on Samba.
+	(set_security_attribute): Take additional path_conv argument.
+	* security.h (set_security_attribute): Change prototype accordingly.
+
 2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fillout_mntent): Always print noumount option last.

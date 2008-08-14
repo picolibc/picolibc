@@ -577,7 +577,7 @@ fhandler_base::open (int flags, mode_t mode)
 	     See below. */
 	  if (has_acls () && !pc.isremote ())
 	    {
-	      set_security_attribute (mode, &sa, sd);
+	      set_security_attribute (pc, mode, &sa, sd);
 	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
 	    }
 	  else if (pc.fs_is_nfs ())
