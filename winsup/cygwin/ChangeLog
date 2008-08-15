@@ -1,3 +1,9 @@
+2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Don't use eabuf when trying to open
+	file a second time.  Call NtOpenFile instead of NtCreateFile in this
+	case.
+
 2008-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Fix linking

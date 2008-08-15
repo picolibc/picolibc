@@ -2356,8 +2356,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	 to special case NFS too much. */
       status = NtCreateFile (&h,
 			     READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_EA,
-			     &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
-			     FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+			     &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
+			     FILE_OPEN,
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
@@ -2372,12 +2372,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      eabuf = NULL;
 	      easize = 0;
 	    }
-	  status = NtCreateFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
-				 &attr, &io, NULL, FILE_ATTRIBUTE_NORMAL,
-				 FILE_SHARE_VALID_FLAGS, FILE_OPEN,
-				 FILE_OPEN_REPARSE_POINT
-				 | FILE_OPEN_FOR_BACKUP_INTENT,
-				 eabuf, easize);
+	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS, 
+			       FILE_OPEN_REPARSE_POINT
+			       | FILE_OPEN_FOR_BACKUP_INTENT);
 	}
       if (NT_SUCCESS (status)
 	  && NT_SUCCESS (status
