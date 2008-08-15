@@ -1,5 +1,10 @@
 2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::create_root_entry): Create default cygdrive
+	prefix with MOUNT_NOPOSIX flag.
+
+2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Don't use eabuf when trying to open
 	file a second time.  Call NtOpenFile instead of NtCreateFile in this
 	case.

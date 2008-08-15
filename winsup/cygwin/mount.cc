@@ -92,7 +92,7 @@ mount_info::create_root_entry (const PWCHAR root)
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
-  cygdrive_flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
+  cygdrive_flags = MOUNT_BINARY | MOUNT_NOPOSIX | MOUNT_CYGDRIVE;
   strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/");
   cygdrive_len = strlen (cygdrive);
 }
