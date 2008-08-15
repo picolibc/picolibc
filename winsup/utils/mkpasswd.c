@@ -175,16 +175,37 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
     *mbs = '\0';
 }
 
+typedef struct {
+  PSID psid;
+  int buffer[10];
+} sidbuf;
+
+sidbuf curr_user;
+sidbuf curr_pgrp;
+BOOL got_curr_user = FALSE;
+
+void
+fetch_current_user_sid ()
+{
+  DWORD len;
+  HANDLE ptok;
+
+  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
+      || !GetTokenInformation (ptok, TokenUser, &curr_user, sizeof curr_user,
+			       &len)
+      || !GetTokenInformation (ptok, TokenPrimaryGroup, &curr_pgrp,
+			       sizeof curr_pgrp, &len)
+      || !CloseHandle (ptok))
+    {
+      print_win_error (GetLastError ());
+      return;
+    }
+}
+
 void
 current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 	      DWORD id_offset, const char *disp_username)
 {
-  DWORD len;
-  HANDLE ptok;
-  struct {
-    PSID psid;
-    int buffer[10];
-  } tu, tg;
   WCHAR user[UNLEN + 1];
   WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD ulen = UNLEN + 1;
@@ -193,18 +214,18 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
   int uid, gid;
   char homedir_psx[PATH_MAX] = {0}, homedir_w32[MAX_PATH] = {0};
 
-  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
-      || !GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &len)
-      || !GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
-      || !CloseHandle (ptok)
-      || !LookupAccountSidW (NULL, tu.psid, user, &ulen, dom, &dlen, &acc_type))
+  if (!curr_user.psid || !curr_pgrp.psid
+      || !LookupAccountSidW (NULL, curr_user.psid, user, &ulen, dom, &dlen,
+			     &acc_type))
     {
       print_win_error (GetLastError ());
       return;
     }
 
-  uid = *GetSidSubAuthority (tu.psid, *GetSidSubAuthorityCount(tu.psid) - 1);
-  gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
+  uid = *GetSidSubAuthority (curr_user.psid,
+			     *GetSidSubAuthorityCount(curr_user.psid) - 1);
+  gid = *GetSidSubAuthority (curr_pgrp.psid,
+			     *GetSidSubAuthorityCount(curr_pgrp.psid) - 1);
   if (passed_home_path[0] == '\0')
     {
       char *envhome = getenv ("HOME");
@@ -254,7 +275,7 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 	  id_offset + gid,
 	  dom,
 	  user,
-	  put_sid (tu.psid),
+	  put_sid (curr_user.psid),
 	  homedir_psx);
 }
 
@@ -487,7 +508,8 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		  continue;
 		}
 	    }
-
+	  if (EqualSid (curr_user.psid, psid))
+	    got_curr_user = TRUE;
 	  printf ("%ls%s%ls:unused:%lu:%lu:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
@@ -824,6 +846,8 @@ skip:
 	return 1;
       }
 
+  fetch_current_user_sid ();
+
   off = id_offset;
   for (i = 0; i < print_domlist; ++i)
     {
@@ -840,7 +864,7 @@ skip:
       	off += id_offset;
     }
 
-  if (print_current)
+  if (print_current && !got_curr_user)
     current_user (print_cygpath, sep_char, passed_home_path, off,
 		  disp_username);
 

@@ -1,3 +1,22 @@
+2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (fetch_current_pgrp_sid): New function to fetch primary
+	group SID from user token.
+	(current_group): Move up in file.  Move fetching primary group SID to
+	fetch_current_pgrp_sid.
+	(enum_local_groups): Check if current SID is the same as current user's
+	primary group SID.
+	(enum_groups): Ditto.
+	(main): Call fetch_current_pgrp_sid before enumerating groups.  Call
+	current_group only if current group hasn't been enumerated already.
+	* mkpasswd.c (fetch_current_user_sid): New function to fetch current
+	user SID from user token.
+	(current_user): Move fetching current user SID to
+	fetch_current_user_sid.
+	(enum_users): Check if current SID is the same as current user's SID.
+	(main): Call fetch_current_user_sid before enumerating users.  Call
+	current_user only if current user hasn't been enumerated already.
+
 2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (NT_MAX_PATH): Define.

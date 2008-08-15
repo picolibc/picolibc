@@ -153,6 +153,57 @@ typedef struct {
 DBGSID builtin_sid_list[MAX_BUILTIN_SIDS];
 DWORD builtin_sid_cnt;
 
+typedef struct {
+  PSID psid;
+  int buffer[10];
+} sidbuf;
+
+sidbuf curr_pgrp;
+BOOL got_curr_pgrp = FALSE;
+
+void
+fetch_current_pgrp_sid ()
+{
+  DWORD len;
+  HANDLE ptok;
+
+  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
+      || !GetTokenInformation (ptok, TokenPrimaryGroup, &curr_pgrp,
+			       sizeof curr_pgrp, &len)
+      || !CloseHandle (ptok))
+    {
+      print_win_error (GetLastError ());
+      return;
+    }
+}
+
+void
+current_group (const char *sep, DWORD id_offset)
+{
+  WCHAR grp[GNLEN + 1];
+  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
+  DWORD glen = GNLEN + 1;
+  DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
+  int gid;
+  SID_NAME_USE acc_type;
+
+  if (!curr_pgrp.psid
+      || !LookupAccountSidW (NULL, curr_pgrp.psid, grp, &glen, dom, &dlen,
+			     &acc_type))
+    {
+      print_win_error (GetLastError ());
+      return;
+    }
+  gid = *GetSidSubAuthority (curr_pgrp.psid,
+			     *GetSidSubAuthorityCount(curr_pgrp.psid) - 1);
+  printf ("%ls%s%ls:%s:%lu:\n",
+	  sep ? dom : L"",
+	  sep ?: "",
+	  grp,
+	  put_sid (curr_pgrp.psid),
+	  id_offset + gid);
+}
+
 void
 enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 		  char *unix_grp_list)
@@ -380,9 +431,9 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		CopySid (sizeof (DBGSID), &builtin_sid_list[builtin_sid_cnt++],
 			 psid);
 	    }
-
+	  if (EqualSid (curr_pgrp.psid, psid))
+	    got_curr_pgrp = TRUE;
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
-
 	  printf ("%ls%s%ls:%s:%ld:\n",
 		  with_dom && !is_builtin ? domain_name : L"",
 		  with_dom && !is_builtin ? sep : "",
@@ -503,6 +554,8 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		  continue;
 		}
 	    }
+	  if (EqualSid (curr_pgrp.psid, psid))
+	    got_curr_pgrp = TRUE;
 	  printf ("%ls%s%ls:%s:%lu:\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
@@ -555,39 +608,6 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
         }
       FreeSid (psid);
     }
-}
-
-void
-current_group (const char *sep, DWORD id_offset)
-{
-  DWORD len;
-  HANDLE ptok;
-  struct {
-    PSID psid;
-    char buffer[MAX_SID_LEN];
-  } tg;
-  WCHAR grp[GNLEN + 1];
-  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
-  DWORD glen = GNLEN + 1;
-  DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
-  int gid;
-  SID_NAME_USE acc_type;
-
-  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok)
-      || !GetTokenInformation (ptok, TokenPrimaryGroup, &tg, sizeof tg, &len)
-      || !CloseHandle (ptok)
-      || !LookupAccountSidW (NULL, tg.psid, grp, &glen, dom, &dlen, &acc_type))
-    {
-      print_win_error (GetLastError ());
-      return;
-    }
-  gid = *GetSidSubAuthority (tg.psid, *GetSidSubAuthorityCount(tg.psid) - 1);
-  printf ("%ls%s%ls:%s:%lu:\n",
-	  sep ? dom : L"",
-	  sep ?: "",
-	  grp,
-	  put_sid (tg.psid),
-	  id_offset + gid);
 }
 
 int
@@ -838,6 +858,8 @@ skip:
     print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		   0, 0, 0, 0, 0, 0, 0);
 
+  fetch_current_pgrp_sid ();
+
   off = id_offset;
   for (i = 0; i < print_domlist; ++i)
     {
@@ -856,7 +878,7 @@ skip:
 	}
     }
 
-  if (print_current)
+  if (print_current && !got_curr_pgrp)
     current_group (sep_char, off);
 
   return 0;
