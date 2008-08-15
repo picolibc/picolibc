@@ -355,7 +355,8 @@ mount_info::get_mounts_here (const char *parent_dir, int parent_dir_len,
 					  last_slash + 1);
     }
   RtlCreateUnicodeStringFromAsciiz (cygd, cygdrive + 1);
-  cygd->Length -= 2;	// Strip trailing slash
+  if (cygd->Length)
+    cygd->Length -= 2;	// Strip trailing slash
   return n_mounts;
 }
 

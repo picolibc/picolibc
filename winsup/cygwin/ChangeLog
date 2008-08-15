@@ -1,5 +1,10 @@
 2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::get_mounts_here): Don't subtract 2 from
+	Length if it's 0 anyway.
+
+2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_info::create_root_entry): Create default cygdrive
 	prefix with MOUNT_NOPOSIX flag.
 
