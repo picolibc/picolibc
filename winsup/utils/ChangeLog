@@ -1,5 +1,10 @@
 2008-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* mkpasswd.c (main): Avoid printing system accounts when a single user
+	name has been requested.
+
+2008-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* Makefile.in (ALL_LDFLAGS): Add --enable-auto-import option to quiet
 	ld warnings.
 	* mkgroup.c: Change all global variables and most functions to static.

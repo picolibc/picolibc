@@ -868,7 +868,7 @@ skip:
 		       ? domlist[i].id_offset : off : 0;
       if (!domlist[i].domain && domlist[i].str && print_unix)
 	enum_unix_users (domlist + i, sep_char, my_off, print_unix);
-      if (!my_off && !print_current)
+      if (!my_off && !print_current && !disp_username)
 	enum_std_accounts ();
       enum_users (domlist[i].domain, domlist + i, sep_char, print_cygpath,
 		  passed_home_path, my_off, disp_username, print_current);
