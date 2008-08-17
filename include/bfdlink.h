@@ -198,6 +198,9 @@ extern void bfd_link_add_undef
 extern void bfd_link_repair_undef_list
   (struct bfd_link_hash_table *table);
 
+/* Read symbols and cache symbol pointer array in outsymbols.  */
+extern bfd_boolean bfd_generic_link_read_symbols (bfd *);
+
 struct bfd_sym_chain
 {
   struct bfd_sym_chain *next;

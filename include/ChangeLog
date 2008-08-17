@@ -1,3 +1,7 @@
+2008-08-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (bfd_generic_link_read_symbols): Declare.
+
 2008-08-08  Anatoly Sokolov  <aesok@post.ru>
 
 	* elf/avr.h (E_AVR_MACH_AVR25, E_AVR_MACH_AVR31,
