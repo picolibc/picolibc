@@ -1994,7 +1994,7 @@ print_version ()
   printf ("\
 cygcheck version %.*s\n\
 System Checker for Cygwin\n\
-Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.\n\
+Copyright (C) 1998 - 2008 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
