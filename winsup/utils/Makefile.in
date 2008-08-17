@@ -41,7 +41,7 @@ include $(srcdir)/../Makefile.common
 .PHONY: all install clean realclean warn_dumper warn_cygcheck_zlib
 
 ALL_LDLIBS     := -lnetapi32 -ladvapi32
-ALL_LDFLAGS    := -B$(newlib_build)/libc -B$(w32api_lib) $(LDFLAGS) $(ALL_LDLIBS)
+ALL_LDFLAGS    := -Wl,--enable-auto-import -B$(newlib_build)/libc -B$(w32api_lib) $(LDFLAGS) $(ALL_LDLIBS)
 ALL_DEP_LDLIBS := $(cygwin_build)/libcygwin.a ${patsubst -l%,\
                     $(w32api_lib)/lib%.a,$(ALL_LDLIBS) -lkernel32 -luser32}
 

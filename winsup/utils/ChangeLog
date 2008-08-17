@@ -1,3 +1,25 @@
+2008-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in (ALL_LDFLAGS): Add --enable-auto-import option to quiet
+	ld warnings.
+	* mkgroup.c: Change all global variables and most functions to static.
+	(enum_local_groups): Add a print_current parameter to control whether
+	entries for everything should be printed or just the current user.
+	(enum_groups): Ditto.
+	(main): Move call fetch_current_pgrp_sid earlier to avoid a NULL
+	deference when no command line arguments are specified.  Accommodate
+	argument changes to above functions.  Avoid printing SYSTEM account
+	when print_current is specified.  Issue error when extra stuff is found
+	on the command line.
+	* mkpasswd.c: Change all global variables and most functions to static.
+	(enum_users): Add a print_current parameter to control whether entries
+	for everything should be printed or just the current user.
+	(main): Move call fetch_current_user_sid earlier to avoid a NULL
+	deference when no command line arguments are specified.  Accommodate
+	argument change to above function.  Avoid printing standard accounts
+	when print_current is specified.  Issue error when extra stuff is found
+	on the command line.
+
 2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (fetch_current_pgrp_sid): New function to fetch primary

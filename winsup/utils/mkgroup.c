@@ -53,7 +53,7 @@ typedef struct
   BOOL with_dom;
 } domlist_t;
 
-void
+static void
 _print_win_error (DWORD code, int line)
 {
   char buf[4096];
@@ -69,7 +69,7 @@ _print_win_error (DWORD code, int line)
     fprintf (stderr, "mkgroup (%d): error %lu", line, code);
 }
 
-void
+static void
 load_dsgetdcname ()
 {
   HANDLE h = LoadLibrary ("netapi32.dll");
@@ -124,7 +124,7 @@ get_dcname (char *domain)
   return server;
 }
 
-char *
+static char *
 put_sid (PSID psid)
 {
   static char s[512];
@@ -158,10 +158,10 @@ typedef struct {
   int buffer[10];
 } sidbuf;
 
-sidbuf curr_pgrp;
-BOOL got_curr_pgrp = FALSE;
+static sidbuf curr_pgrp;
+static BOOL got_curr_pgrp = FALSE;
 
-void
+static void
 fetch_current_pgrp_sid ()
 {
   DWORD len;
@@ -177,7 +177,7 @@ fetch_current_pgrp_sid ()
     }
 }
 
-void
+static void
 current_group (const char *sep, DWORD id_offset)
 {
   WCHAR grp[GNLEN + 1];
@@ -204,7 +204,7 @@ current_group (const char *sep, DWORD id_offset)
 	  id_offset + gid);
 }
 
-void
+static void
 enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 		  char *unix_grp_list)
 {
@@ -307,9 +307,10 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
   FreeSid (psid);
 }
 
-int
+static int
 enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-		   DWORD id_offset, char *disp_groupname, int print_builtin)
+		   DWORD id_offset, char *disp_groupname, int print_builtin,
+		   int print_current)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   PWCHAR servername = NULL;
@@ -332,7 +333,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
     {
       int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
-      	{
+	{
 	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
 		   __progname, d_or_m);
 	  return 1;
@@ -352,7 +353,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  buffer[0].lgrpi0_name = gname;
 	  entriesread = 1;
 	}
-      else 
+      else
 	rc = NetLocalGroupEnum (servername, 0, (void *) &buffer,
 				MAX_PREFERRED_LENGTH, &entriesread,
 				&totalentries, &resume_handle);
@@ -391,25 +392,25 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	      fprintf (stderr, " (%ls)\n", buffer[i].lgrpi0_name);
 	      continue;
 	    }
-          else if (acc_type == SidTypeDomain)
-            {
-              WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
+	  else if (acc_type == SidTypeDomain)
+	    {
+	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-              wcscpy (domname, domain_name);
-              wcscat (domname, L"\\");
-              wcscat (domname, buffer[i].lgrpi0_name);
-              sid_length = MAX_SID_LEN;
-              domname_len = MAX_DOMAIN_NAME_LEN + 1;
-              if (!LookupAccountNameW (servername, domname,
-                                       psid, &sid_length,
-                                       domain_name, &domname_len,
-                                       &acc_type))
-                {
-                  print_win_error (rc);
+	      wcscpy (domname, domain_name);
+	      wcscat (domname, L"\\");
+	      wcscat (domname, buffer[i].lgrpi0_name);
+	      sid_length = MAX_SID_LEN;
+	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
+	      if (!LookupAccountNameW (servername, domname,
+				       psid, &sid_length,
+				       domain_name, &domname_len,
+				       &acc_type))
+		{
+		  print_win_error (rc);
 		  fprintf(stderr, " (%ls)\n", domname);
-                  continue;
-                }
-            }
+		  continue;
+		}
+	    }
 
 	  /* Store all local SIDs with prefix "S-1-5-32-" and check if it
 	     has been printed already.  This allows to get all builtin
@@ -421,7 +422,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	      int b;
 
 	      if (!print_builtin)
-	        goto skip_group;
+		goto skip_group;
 	      is_builtin = TRUE;
 	      if (builtin_sid_cnt)
 		for (b = 0; b < builtin_sid_cnt; b++)
@@ -431,8 +432,12 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		CopySid (sizeof (DBGSID), &builtin_sid_list[builtin_sid_cnt++],
 			 psid);
 	    }
-	  if (EqualSid (curr_pgrp.psid, psid))
+	  if (!print_current)
+	    /* fall through */;
+	  else if (EqualSid (curr_pgrp.psid, psid))
 	    got_curr_pgrp = TRUE;
+	  else
+	    continue;
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%ld:\n",
 		  with_dom && !is_builtin ? domain_name : L"",
@@ -452,9 +457,9 @@ skip_group:
   return 0;
 }
 
-void
+static void
 enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-	     DWORD id_offset, char *disp_groupname)
+	     DWORD id_offset, char *disp_groupname, int print_current)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   PWCHAR servername = NULL;
@@ -477,7 +482,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
     {
       int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
-      	{
+	{
 	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
 		   __progname, d_or_m);
 	  return;
@@ -496,7 +501,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 				(void *) &buffer);
 	  entriesread=1;
 	}
-      else 
+      else
 	rc = NetGroupEnum (servername, 2, (void *) & buffer,
 			   MAX_PREFERRED_LENGTH, &entriesread, &totalentries,
 			   &resume_handle);
@@ -554,8 +559,12 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 		  continue;
 		}
 	    }
-	  if (EqualSid (curr_pgrp.psid, psid))
+	  if (!print_current)
+	    /* fall through */;
+	  else if (EqualSid (curr_pgrp.psid, psid))
 	    got_curr_pgrp = TRUE;
+	  else
+	    continue;
 	  printf ("%ls%s%ls:%s:%lu:\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
@@ -570,7 +579,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   while (rc == ERROR_MORE_DATA);
 }
 
-void
+static void
 print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
 	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
@@ -581,7 +590,7 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
   SID_NAME_USE acc_type;
 
   if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
-  				sub5, sub6, sub7, sub8, &psid))
+				sub5, sub6, sub7, sub8, &psid))
     {
       if (LookupAccountSidW (NULL, psid,
 			    grp, (glen = GNLEN + 1, &glen),
@@ -605,12 +614,12 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	  else
 	    rid = sub1;
 	  printf ("%ls:%s:%lu:\n", grp, put_sid (psid), rid);
-        }
+	}
       FreeSid (psid);
     }
 }
 
-int
+static int
 usage (FILE * stream)
 {
   fprintf (stream,
@@ -672,9 +681,9 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "bcCd::D::g:hl::L::o:sS:uU:v";
+static char opts[] = "bcCd::D::g:hl::L::o:sS:uU:v";
 
-void
+static void
 print_version ()
 {
   const char *v = strchr (version, ':');
@@ -712,7 +721,7 @@ fetch_primary_domain ()
       if (!NT_SUCCESS (status))
 	return FALSE;
       status = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
-					  (PVOID *) &p_dom);
+					  (PVOID *) ((void *) &p_dom));
       LsaClose (lsa);
       if (!NT_SUCCESS (status))
 	return FALSE;
@@ -741,6 +750,8 @@ main (int argc, char **argv)
 
   load_dsgetdcname ();
   in_domain = fetch_primary_domain ();
+  fetch_current_pgrp_sid ();
+
   if (argc == 1)
     {
       print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
@@ -748,12 +759,12 @@ main (int argc, char **argv)
       if (in_domain)
 	{
 	  if (!enum_local_groups (TRUE, NULL, sep_char, id_offset,
-				  disp_groupname, print_builtin))
-	    enum_groups (TRUE, NULL, sep_char, id_offset, disp_groupname);
+				  disp_groupname, print_builtin, 0))
+	    enum_groups (TRUE, NULL, sep_char, id_offset, disp_groupname, 0);
 	}
       else if (!enum_local_groups (FALSE, NULL, sep_char, 0, disp_groupname,
-				   print_builtin))
-	enum_groups (FALSE, NULL, sep_char, 0, disp_groupname);
+				   print_builtin, 0))
+	enum_groups (FALSE, NULL, sep_char, 0, disp_groupname, 0);
       return 0;
     }
 
@@ -792,13 +803,13 @@ main (int argc, char **argv)
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt
-	    	|| !isdigit (p[1])
-	    	|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
+		|| !isdigit (p[1])
+		|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
 		    , *ep))
 	      {
 		fprintf (stderr, "%s: Malformed machine,offset string '%s'.  "
 			 "Skipping...\n", __progname, opt);
-	      	break;
+		break;
 	      }
 	    *p = '\0';
 	  }
@@ -819,12 +830,12 @@ skip:
 			     "character.\n", __progname);
 	    return 1;
 	  }
-        break;
+	break;
       case 'U':
-      	print_unix = optarg;
+	print_unix = optarg;
 	break;
       case 'c':
-      	sep_char = NULL;
+	sep_char = NULL;
 	/*FALLTHRU*/
       case 'C':
 	print_current = 1;
@@ -833,7 +844,7 @@ skip:
 	id_offset = strtol (optarg, NULL, 10);
 	break;
       case 'b':
-      	print_builtin = 0;
+	print_builtin = 0;
 	break;
       case 's':
 	break;
@@ -853,12 +864,18 @@ skip:
 	return 1;
       }
 
+  if (argv[optind])
+    {
+      fprintf (stderr,
+	       "mkgroup: non-option command line argument `%s' is not allowed.\n"
+	       "Try `mkgroup --help' for more information.\n", argv[optind]);
+      exit (1);
+    }
+
   /* Get 'system' group */
-  if (!disp_groupname && print_system && print_builtin)
+  if (!disp_groupname && print_system && print_builtin && !print_current)
     print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		   0, 0, 0, 0, 0, 0, 0);
-
-  fetch_current_pgrp_sid ();
 
   off = id_offset;
   for (i = 0; i < print_domlist; ++i)
@@ -867,12 +884,12 @@ skip:
 		     ? domlist[i].id_offset != ULONG_MAX
 		       ? domlist[i].id_offset : off : 0;
       if (!enum_local_groups (domlist[i].domain, domlist + i, sep_char,
-			      my_off, disp_groupname, print_builtin))
+			      my_off, disp_groupname, print_builtin, print_current))
 	{
 	  if (!domlist[i].domain && domlist[i].str && print_unix)
 	    enum_unix_groups (domlist + i, sep_char, my_off, print_unix);
 	  enum_groups (domlist[i].domain, domlist + i, sep_char, my_off,
-		       disp_groupname);
+		       disp_groupname, print_current);
 	  if (my_off)
 	    off += id_offset;
 	}
