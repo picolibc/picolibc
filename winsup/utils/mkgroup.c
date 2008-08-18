@@ -454,7 +454,10 @@ skip_group:
     }
   while (rc == ERROR_MORE_DATA);
 
-  return 0;
+  /* Return -1 if the single group we're looking for has been found here to
+     avoid calling enum_groups for the same group, thus avoiding a spurious
+     error message "group name could not be found" in enum_groups. */
+  return disp_groupname && entriesread ? -1 : 0;
 }
 
 static void
