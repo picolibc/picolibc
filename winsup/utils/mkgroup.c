@@ -348,10 +348,9 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
       if (disp_groupname != NULL)
 	{
 	  mbstowcs (gname, disp_groupname, GNLEN + 1);
-	  rc = NetApiBufferAllocate (sizeof (LOCALGROUP_INFO_0),
-				     (void *) &buffer);
-	  buffer[0].lgrpi0_name = gname;
-	  entriesread = 1;
+	  rc = NetLocalGroupGetInfo (servername, gname, 0, (void *) &buffer);
+	  if (rc == ERROR_SUCCESS)
+	    entriesread = 1;
 	}
       else
 	rc = NetLocalGroupEnum (servername, 0, (void *) &buffer,
