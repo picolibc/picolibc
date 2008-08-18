@@ -744,6 +744,7 @@ main (int argc, char **argv)
   int c, i;
   char *disp_groupname = NULL;
   BOOL in_domain;
+  int optional_args = 0;
 
   if (!isatty (1))
     setmode (1, O_BINARY);
@@ -768,6 +769,7 @@ main (int argc, char **argv)
       return 0;
     }
 
+  unsetenv ("POSIXLY_CORRECT"); /* To get optional arg processing right. */
   while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
@@ -784,6 +786,8 @@ main (int argc, char **argv)
 	domlist[print_domlist].domain = (c == 'd' || c == 'D');
 	opt = optarg ?:
 	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
+	if (opt == argv[optind])
+	  ++optional_args;
 	for (i = 0; i < print_domlist; ++i)
 	  if (domlist[i].domain == domlist[print_domlist].domain
 	      && ((!domlist[i].str && !opt)
@@ -864,6 +868,7 @@ skip:
 	return 1;
       }
 
+  optind += optional_args;
   if (argv[optind])
     {
       fprintf (stderr,
