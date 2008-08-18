@@ -388,7 +388,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 				   &sid_length, domain_name, &domname_len,
 				   &acc_type))
 	    {
-	      print_win_error (rc);
+	      print_win_error (GetLastError ());
 	      fprintf (stderr, " (%ls)\n", buffer[i].lgrpi0_name);
 	      continue;
 	    }
@@ -406,7 +406,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 				       domain_name, &domname_len,
 				       &acc_type))
 		{
-		  print_win_error (rc);
+		  print_win_error (GetLastError ());
 		  fprintf(stderr, " (%ls)\n", domname);
 		  continue;
 		}
@@ -538,7 +538,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 				   domain_name, &domname_len,
 				   &acc_type))
 	    {
-	      print_win_error (rc);
+	      print_win_error (GetLastError ());
 	      fprintf(stderr, " (%ls)\n", buffer[i].grpi2_name);
 	      continue;
 	    }
@@ -557,7 +557,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 				       domain_name, &domname_len,
 				       &acc_type))
 		{
-		  print_win_error (rc);
+		  print_win_error (GetLastError ());
 		  fprintf(stderr, " (%ls)\n", domname);
 		  continue;
 		}
