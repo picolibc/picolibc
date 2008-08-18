@@ -786,7 +786,7 @@ main (int argc, char **argv)
 	domlist[print_domlist].domain = (c == 'd' || c == 'D');
 	opt = optarg ?:
 	      argv[optind] && argv[optind][0] != '-' ? argv[optind] : NULL;
-	if (opt == argv[optind])
+	if (argv[optind] && opt == argv[optind])
 	  ++optional_args;
 	for (i = 0; i < print_domlist; ++i)
 	  if (domlist[i].domain == domlist[print_domlist].domain
