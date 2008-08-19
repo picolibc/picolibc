@@ -1,3 +1,9 @@
+2008-08-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Don't treat
+	ERROR_BROKEN_PIPE as a non-error.  Do raise SIGPIPE when it is
+	detected.
+
 2008-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::get_mounts_here): Don't subtract 2 from

@@ -1687,7 +1687,7 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
   DWORD err = GetLastError ();
   if (!res && err != ERROR_IO_PENDING)
     {
-      if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
+      if (err != ERROR_HANDLE_EOF)
 	goto err;
       res = 1;
       if (*bytes)
@@ -1738,7 +1738,7 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 err:
   __seterrno_from_win_error (err);
   res = -1;
-  if (err == ERROR_NO_DATA)
+  if (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE)
     raise (SIGPIPE);
 out:
   ResetEvent (get_overlapped ()->hEvent);
