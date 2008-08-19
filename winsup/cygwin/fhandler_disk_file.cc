@@ -1386,7 +1386,6 @@ fhandler_disk_file::mkdir (mode_t mode)
   HANDLE dir;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  ULONG fattr = FILE_ATTRIBUTE_DIRECTORY;
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
 
@@ -1410,7 +1409,8 @@ fhandler_disk_file::mkdir (mode_t mode)
     }
   status = NtCreateFile (&dir, FILE_LIST_DIRECTORY | SYNCHRONIZE,
 			 pc.get_object_attr (attr, sa), &io, NULL,
-			 fattr, FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			 FILE_ATTRIBUTE_DIRECTORY, FILE_SHARE_VALID_FLAGS,
+			 FILE_CREATE,
 			 FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT
 			 | FILE_OPEN_FOR_BACKUP_INTENT,
 			 p, plen);

@@ -466,8 +466,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
      Don't set FILE_READ/WRITE_ATTRIBUTES unconditionally on Samba, otherwise
      it enforces read permissions.  Same for other's below. */
   DWORD owner_allow = STANDARD_RIGHTS_ALL
-		      | pc.fs_is_samba ()
-			? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
+		      | (pc.fs_is_samba ()
+			 ? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES));
   if (attribute & S_IRUSR)
     owner_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWUSR)

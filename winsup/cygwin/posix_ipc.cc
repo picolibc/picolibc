@@ -90,7 +90,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
   char buf[MAX_PATH];
   SECURITY_ATTRIBUTES sa = sec_none;
 
-  __small_sprintf (buf, "mqueue/mtx_%W", name);
+  __small_sprintf (buf, "mqueue/mtx_%s", name);
   sa.lpSecurityDescriptor = everyone_sd (CYG_MUTANT_ACCESS);
   *pmtx = CreateMutex (&sa, FALSE, buf);
   if (!*pmtx)
@@ -135,7 +135,7 @@ ipc_cond_init (HANDLE *pevt, const char *name)
   char buf[MAX_PATH];
   SECURITY_ATTRIBUTES sa = sec_none;
 
-  __small_sprintf (buf, "mqueue/evt_%W", name);
+  __small_sprintf (buf, "mqueue/evt_%s", name);
   sa.lpSecurityDescriptor = everyone_sd (CYG_EVENT_ACCESS);
   *pevt = CreateEvent (&sa, TRUE, FALSE, buf);
   if (!*pevt)
