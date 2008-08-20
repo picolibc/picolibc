@@ -1,3 +1,8 @@
+2008-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/wtsapi32.h (_WTS_INFO_CLASS, _WTS_CONNECTSTATE_CLASS,
+	WTSQuerySessionInformation, WTSFreeMemory): Define.
+
 2008-07-25 Bo Yang <techrazy@users.sourceforge.net>
 
 	* lib/gdi32.def (SetLayout): Export.
