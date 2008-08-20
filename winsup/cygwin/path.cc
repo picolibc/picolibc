@@ -1852,10 +1852,7 @@ symlink_info::check_shortcut (HANDLE in_h)
 		       FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
-    {
-      set_error (EIO);
-      return 0;
-    }
+    return 0;
   status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
 				   FileStandardInformation);
   if (!NT_SUCCESS (status))
@@ -1936,7 +1933,7 @@ symlink_info::check_sysfile (HANDLE in_h)
 		       FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
-    set_error (EIO);
+    ;
   else if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io,
 					     cookie_buf, sizeof (cookie_buf),
 					     NULL, NULL)))

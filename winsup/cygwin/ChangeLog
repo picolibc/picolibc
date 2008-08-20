@@ -1,3 +1,9 @@
+2008-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check_shortcut): If file can't be opened,
+	treat it as non-symlink rather than generating an EIO error.
+	(symlink_info::check_sysfile): Ditto.
+
 2008-08-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::wait_overlapped): Always assume that
