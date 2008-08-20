@@ -132,9 +132,10 @@ fhandler_fifo::wait (bool iswrite)
     {
     case fifo_wait_for_client:
       bool res = ConnectNamedPipe (get_handle (), get_overlapped ());
+      DWORD dummy_bytes;
       if (res || GetLastError () == ERROR_PIPE_CONNECTED)
 	return true;
-      return wait_overlapped (res, iswrite, NULL);
+      return wait_overlapped (res, iswrite, &dummy_bytes);
     default:
       break;
     }

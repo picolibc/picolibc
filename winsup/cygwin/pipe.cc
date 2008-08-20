@@ -490,7 +490,7 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
   return -1;
 }
 
-#define DEFAULT_PIPEBUFSIZE (16 * PIPE_BUF)
+#define DEFAULT_PIPEBUFSIZE 65536
 
 extern "C" int
 pipe (int filedes[2])

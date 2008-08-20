@@ -1,3 +1,15 @@
+2008-08-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Always assume that
+	bytes will be non-NULL.  Distinguish input result from result derived
+	from WFMO and GetOverlappedResult or res can never be -1.  Only raise
+	SIGPIPE when writing.
+	* fhandler.h (fhandler_base::wait_overlapped): Pass first argument by
+	value.
+	* fhandler_fifo.cc (fhandler_fifo::wait): Pass in dummy byte count to
+	wait_overlapped.
+	* pipe.cc (DEFAULT_PIPEBUFSIZE): Define to 65536 explicitly.
+
 2008-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Drop fattr variable

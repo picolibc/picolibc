@@ -1680,18 +1680,17 @@ fhandler_base::destroy_overlapped ()
 }
 
 int
-fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
+fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 {
-  if (bytes)
-    *bytes = (DWORD) -1;
+  int res;
+  *bytes = (DWORD) -1;
   DWORD err = GetLastError ();
-  if (!res && err != ERROR_IO_PENDING)
+  if (!inres && err != ERROR_IO_PENDING)
     {
-      if (err != ERROR_HANDLE_EOF)
+      if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
 	goto err;
       res = 1;
-      if (*bytes)
-	*bytes = 0;
+      *bytes = 0;
     }
   else
     {
@@ -1707,12 +1706,13 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
       if (&_my_tls == _main_tls)
 	w4[n++] = signal_arrived;
       HANDLE h = writing ? get_output_handle () : get_handle ();
-      switch (WaitForMultipleObjects (n, w4, false, INFINITE))
+      DWORD res = WaitForMultipleObjects (n, w4, false, INFINITE);
+      ResetEvent (get_overlapped ()->hEvent);
+      switch (res)
 	{
 	case WAIT_OBJECT_0:
 	  debug_printf ("normal read");
-	  if (!bytes ||
-	      GetOverlappedResult (h, get_overlapped (), bytes, false))
+	  if (GetOverlappedResult (h, get_overlapped (), bytes, false))
 	    res = 1;
 	  else
 	    {
@@ -1738,10 +1738,9 @@ fhandler_base::wait_overlapped (bool& res, bool writing, DWORD *bytes)
 err:
   __seterrno_from_win_error (err);
   res = -1;
-  if (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE)
+  if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
     raise (SIGPIPE);
 out:
-  ResetEvent (get_overlapped ()->hEvent);
   return res;
 }
 
