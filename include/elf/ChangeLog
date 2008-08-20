@@ -1,3 +1,9 @@
+2008-08-20  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa.h (R_XTENSA_TLSDESC_FN, R_XTENSA_TLSDESC_ARG)
+	(R_XTENSA_TLS_DTPOFF, R_XTENSA_TLS_TPOFF, R_XTENSA_TLS_FUNC)
+	(R_XTENSA_TLS_ARG, R_XTENSA_TLS_CALL): New.
+
 2008-08-08  Richard Sandiford  <rdsandiford@googlemail.com>
 	    Daniel Jacobowitz  <dan@codesourcery.com>
 	    Catherine Moore  <clm@codesourcery.com>
