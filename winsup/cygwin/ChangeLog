@@ -1,3 +1,9 @@
+2008-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Reorganize again to
+	accommodate what appears to be an MSDN hint about not resetting the
+	overlapped event prior to calling GetOverlappedResult.
+
 2008-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check_shortcut): If file can't be opened,
