@@ -511,8 +511,6 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    /* fall through */;
 	  else if (EqualSid (curr_user.psid, psid))
 	    got_curr_user = TRUE;
-	  else
-	    continue;
 
 	  printf ("%ls%s%ls:unused:%lu:%lu:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
 		  with_dom ? domain_name : L"",
@@ -873,7 +871,7 @@ skip:
 		       ? domlist[i].id_offset : off : 0;
       if (!domlist[i].domain && domlist[i].str && print_unix)
 	enum_unix_users (domlist + i, sep_char, my_off, print_unix);
-      if (!my_off && !print_current && !disp_username)
+      if (!my_off && !disp_username)
 	enum_std_accounts ();
       enum_users (domlist[i].domain, domlist + i, sep_char, print_cygpath,
 		  passed_home_path, my_off, disp_username, print_current);

@@ -1,3 +1,13 @@
+2008-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (enum_local_groups): Don't skip printing groups when
+	print_current is set and group SID is not curr_pgrp.
+	(enum_groups): Ditto.
+	(main): Fix condition when SYSTEM group gets printed.
+	* mkpasswd.c (enum_users): Don't skip printing users when print_current
+	is set and user SID is not curr_user.
+	(main): Allow printing standard accounts even when print_current is set.
+
 2008-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (enum_local_groups): Use NetLocalGroupGetInfo to find out

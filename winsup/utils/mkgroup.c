@@ -435,8 +435,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    /* fall through */;
 	  else if (EqualSid (curr_pgrp.psid, psid))
 	    got_curr_pgrp = TRUE;
-	  else
-	    continue;
+
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%ld:\n",
 		  with_dom && !is_builtin ? domain_name : L"",
@@ -565,8 +564,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    /* fall through */;
 	  else if (EqualSid (curr_pgrp.psid, psid))
 	    got_curr_pgrp = TRUE;
-	  else
-	    continue;
+
 	  printf ("%ls%s%ls:%s:%lu:\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
@@ -880,7 +878,7 @@ skip:
     }
 
   /* Get 'system' group */
-  if (!disp_groupname && print_system && print_builtin && !print_current)
+  if (!disp_groupname && print_system && print_builtin && print_domlist)
     print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
 		   0, 0, 0, 0, 0, 0, 0);
 
