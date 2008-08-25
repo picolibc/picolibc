@@ -1,3 +1,8 @@
+2008-08-25  Alan Modra  <amodra@bigpond.net.au>
+
+	* binary-io.h: New file, imported from gnulib, but don't
+	#include <fcntl.h> or <stdio.h>.
+
 2008-08-17  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (bfd_generic_link_read_symbols): Declare.
