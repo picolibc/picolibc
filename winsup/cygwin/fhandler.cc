@@ -1740,6 +1740,10 @@ err:
   __seterrno_from_win_error (err);
   res = -1;
 out:
+  /* Make sure the event is unsignalled (this is a potential race in a multi-threaded
+     app.  Sigh.).  Must do this after WFMO and GetOverlappedResult or suffer
+     occasional sporadic problems:
+	http://cygwin.com/ml/cygwin/2008-08/msg00511.html */
   ResetEvent (get_overlapped ()->hEvent);
   if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
     raise (SIGPIPE);
