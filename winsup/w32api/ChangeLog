@@ -1,5 +1,13 @@
 2008-08-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/shlwapi.h (ASSOCF_INIT_NOREMAPCLSID, ASSOCF_INIT_BYEXENAME,
+	ASSOCF_OPEN_BYEXENAME, ASSOCF_INIT_DEFAULTTOSTAR,
+	ASSOCF_INIT_DEFAULTTOFOLDER, ASSOCF_NOUSERSETTINGS, ASSOCF_NOTRUNCATE,
+	ASSOCF_VERIFY, ASSOCF_REMAPRUNDLL, ASSOCF_NOFIXUPS, ASSOCF_IGNOREBASECLASS,
+	ASSOCF_INIT_IGNOREUNKNOWN): Define.
+
+2008-08-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/commctrl.h (LVN_MARQUEEBEGIN): Define.
 
 	Thanks to Tim Kosse <botg at users dot sf dot net>.
