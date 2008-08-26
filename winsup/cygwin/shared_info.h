@@ -95,7 +95,7 @@ class mount_info
  private:
   void sort ();
   void mount_slash ();
-  void mount_info::create_root_entry (const PWCHAR root);
+  void create_root_entry (const PWCHAR root);
 
   bool from_fstab_line (char *line, bool user);
   bool from_fstab (bool user, WCHAR [], PWCHAR);
