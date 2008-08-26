@@ -1,3 +1,10 @@
+2008-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_pipe): Rename read and write
+	declarations to raw_read and raw_write.
+	* pipe.cc (fhandler_pipe::raw_read): Rename from read.
+	(fhandler_pipe::raw_write): Rename from write.
+
 2008-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::wait_overlapped): Reorganize again to

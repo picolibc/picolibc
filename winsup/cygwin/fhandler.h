@@ -542,8 +542,8 @@ public:
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   char *get_proc_fd_name (char *buf);
-  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  int write (const void *, size_t);
+  void __stdcall raw_read (void *ptr, size_t& len);
+  int raw_write (const void *, size_t);
   int open (int flags, mode_t mode = 0);
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
