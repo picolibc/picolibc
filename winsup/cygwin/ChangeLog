@@ -1,3 +1,10 @@
+2008-08-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_tty.cc (close_maybe): Check for both types of invalid handle
+	before attempting CloseHandle.
+	(fhandler_pty_master::setup): Only set inheritance on pty handles, not
+	tty handles.
+
 2008-08-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* shared_info.h (shared_info::create_root_entry): Remove extraneous

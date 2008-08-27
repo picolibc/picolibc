@@ -1339,7 +1339,7 @@ fhandler_tty_master::init_console ()
 
 #define close_maybe(h) \
   do { \
-    if (h) \
+    if (h && h != INVALID_HANDLE_VALUE) \
       CloseHandle (h); \
   } while (0)
 
@@ -1356,10 +1356,6 @@ fhandler_pty_master::setup (bool ispty)
 
   /* Create communication pipes */
 
-  /* FIXME: should this be sec_none_nih? */
-
-  /* Create communication pipes */
-
   char pipename[sizeof("ttyNNNN-from-master")];
   __small_sprintf (pipename, "tty%d-from-master", get_unit ());
   res = fhandler_pipe::create_selectable (&sec_none_nih, from_master,
@@ -1370,7 +1366,9 @@ fhandler_pty_master::setup (bool ispty)
       errstr = "input pipe";
       goto err;
     }
-  if (!SetHandleInformation (get_output_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
+  /* Only ptys should create inheritable handles by default.  ttys are
+     parcelled out on an as-needed basis and handle inheritance differently. */
+  if (ispty && !SetHandleInformation (get_output_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
     {
       errstr = "inheritable get_output_handle ()";
       goto err;
@@ -1388,7 +1386,9 @@ fhandler_pty_master::setup (bool ispty)
       errstr = "output pipe";
       goto err;
     }
-  if (!SetHandleInformation (get_io_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
+  /* Only ptys should create inheritable handles by default.  ttys are
+     parcelled out on an as-needed basis and handle inheritance differently. */
+  if (ispty && !SetHandleInformation (get_io_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
     {
       errstr = "inheritable get_io_handle ()";
       goto err;
