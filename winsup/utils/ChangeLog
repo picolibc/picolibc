@@ -1,3 +1,11 @@
+2008-08-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (nuke): Use malloc rather than alloca for environment
+	variables.
+	(load_cygwin): Ditto.
+	* dump_setup.cc (parse_filename): Cosmetic changes.
+	(get_packages): Ditto.
+
 2008-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (enum_local_groups): Don't skip printing groups when

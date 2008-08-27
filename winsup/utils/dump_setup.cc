@@ -94,14 +94,14 @@ parse_filename (const char *in_fn, fileparse& f)
     if (*ver == '-')
       if (isdigit (ver[1]))
 	{
-	  *ver++ = 0;
+	  *ver++ = '\0';
 	  strcpy (f.pkg, p);
 	  break;
 	}
       else if (strcasecmp (ver, "-src") == 0 ||
 	       strcasecmp (ver, "-patch") == 0)
 	{
-	  *ver++ = 0;
+	  *ver++ = '\0';
 	  strcpy (f.pkg, p);
 	  strcpy (f.what, strlwr (ver));
 	  strcpy (f.pkgtar, p);
@@ -311,7 +311,8 @@ check_package_files (int verbose, char *package)
  * The last entry in the list is {NULL,NULL}.
  */
 static pkgver *
-get_packages (char **argv) {
+get_packages (char **argv)
+{
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");
 
@@ -352,7 +353,7 @@ get_packages (char **argv) {
 	  if (len > package_len)
 	    package_len = len;
 	  packages[n].name = (char *) malloc (len + 1);
-	  strcpy (packages[n].name , package);
+	  strcpy (packages[n].name, package);
 	  if (f.what[0])
 	    strcat (strcat (packages[n].name, "-"), f.what);
 	  packages[n].ver = strdup (f.ver);
