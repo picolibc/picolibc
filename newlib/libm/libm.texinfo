@@ -1,20 +1,5 @@
 \input texinfo.tex
 @setfilename libm.info
-@tex
-% NOTE LOCAL KLUGE TO AVOID TOO MUCH WHITESPACE FROM "makedoc"
-\global\long\def\example{%
-\begingroup
-\let\aboveenvbreak=\par
-\let\afterenvbreak=\par
-\parskip=0pt
-\lisp}
-\global\long\def\Eexample{%
-\Elisp
-\endgroup
-\vskip -\parskip% to cancel out effect of following \par
-}
-% END LOCAL WHITESPACE KLUGE
-@end tex
 @syncodeindex fn cp
 
 @ifinfo

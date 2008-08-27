@@ -1,3 +1,9 @@
+2008-08-27  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* libc/libc.texinfo: Remove "LOCAL KLUGE" that prevents it
+	from building pdfs.
+	* libm/libm.texinfo: Likewise.
+				
 2008-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Fix condition for
