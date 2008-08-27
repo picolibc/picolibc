@@ -1,3 +1,8 @@
+2008-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Fix condition for
+	accepting a converted character and continuing the loop.
+		
 2008-07-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/ctype.h (_ctype_): Restore for C++ backward
