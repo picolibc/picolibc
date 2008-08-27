@@ -1,3 +1,12 @@
+2008-08-27  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Avoid access violations, passing NULL to printf( "...%s..." );
+	(inconsistencency with MSVCRT and glibc, reported by Colin Harrison).
+
+	* mingwex/stdio/pformat.c (__pformat_puts): Substitute "(null)"
+	for argument value, if caller passes a NULL pointer.
+	(__pformat_wcputs): Likewise, substitute L"(null)".
+
 2008-08-14  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Add missing dependencies for building libmingwex.a.

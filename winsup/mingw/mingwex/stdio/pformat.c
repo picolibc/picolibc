@@ -356,8 +356,10 @@ void __pformat_puts( const char *s, __pformat_t *stream )
    * to the `__pformat()' output stream.
    *
    * This is implemented as a trivial call to `__pformat_putchars()',
-   * passing the length of the input string as the character count.
+   * passing the length of the input string as the character count,
+   * (after first verifying that the input pointer is not NULL).
    */
+  if( s == NULL ) s = "(null)";
   __pformat_putchars( s, strlen( s ), stream );
 }
 
@@ -434,8 +436,10 @@ void __pformat_wcputs( const wchar_t *s, __pformat_t *stream )
    * the input string, to the `__pformat()' output stream.
    *
    * This is implemented as a trivial call to `__pformat_wputchars()',
-   * passing the length of the input string as the character count.
+   * passing the length of the input string as the character count,
+   * (after first verifying that the input pointer is not NULL).
    */
+  if( s == NULL ) s = L"(null)";
   __pformat_wputchars( s, wcslen( s ), stream );
 }
 
