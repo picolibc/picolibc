@@ -1,3 +1,7 @@
+2008-08-28  Tristan Gingold  <gingold@adacore.com>
+
+	* stab.def: Add BNSYM, ENSYM, OSO for darwin.
+
 2008-03-27  Cary Coutant <ccoutant@google.com>
 
 	* ar.h (ARMAGT): New magic string for thin archives.

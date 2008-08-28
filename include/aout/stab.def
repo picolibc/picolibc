@@ -53,6 +53,10 @@ __define_stab (N_MAIN, 0x2a, "MAIN")
 /* Solaris2:  Read-only data symbols.  */
 __define_stab (N_ROSYM, 0x2c, "ROSYM")
 
+/* MacOS X:
+   The beginning of a relocatable function block - including stabs.  */
+__define_stab (N_BNSYM, 0x2e, "BNSYM")
+
 /* Global symbol in Pascal.
    Supposedly the value is its line number; I'm skeptical.  */
 __define_stab (N_PC, 0x30, "PC")
@@ -106,6 +110,9 @@ __define_stab(N_DEFD, 0x4a, "DEFD")
 /* New in Solaris2.  Function start/body/end line numbers.  */
 __define_stab(N_FLINE, 0x4C, "FLINE")
 
+/* MacOS X: This tells the end of a relocatable function + debugging info.  */
+__define_stab(N_ENSYM, 0x4E, "ENSYM")
+
 /* THE FOLLOWING TWO STAB VALUES CONFLICT.  Happily, one is for Modula-2
    and one is for C++.   Still,... */
 /* GNU C++ exception variable.  Name is variable name.  */
@@ -135,6 +142,10 @@ __define_stab (N_ENDM, 0x62, "ENDM")
    On Solaris2, value is undefined, but desc is a source-language code.  */
 
 __define_stab (N_SO, 0x64, "SO")
+
+/* Apple:  This is the stab that associated the .o file with the
+   N_SO stab, in the case where debug info is mostly stored in the .o file.  */
+__define_stab (N_OSO, 0x66, "OSO")
 
 /* SunPro F77:  Name of alias.  */
 __define_stab (N_ALIAS, 0x6c, "ALIAS")
