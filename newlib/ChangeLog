@@ -1,3 +1,8 @@
+2008-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Optimize condition
+	for accepting a converted character.
+
 2008-08-27  Sandra Loosemore  <sandra@codesourcery.com>
 
 	* libc/libc.texinfo: Remove "LOCAL KLUGE" that prevents it

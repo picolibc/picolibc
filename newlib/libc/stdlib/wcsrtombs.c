@@ -45,7 +45,7 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
 	  ps->__count = 0;
 	  return (size_t)-1;
 	}
-      if (n <= len - bytes && bytes <= len)
+      if (n + bytes <= len)
 	{
           n += bytes;
 	  if (dst)
