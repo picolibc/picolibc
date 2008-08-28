@@ -1,3 +1,9 @@
+2008-08-28  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/time/mktime.c (mktime): Fix tm_isdst value usage (allowing
+	any positive value from user (per std) rather than depending
+	upon 1).
+		
 2008-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Optimize condition

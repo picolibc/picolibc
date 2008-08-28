@@ -9,6 +9,8 @@
  * the fields of the structure are set to represent the specified calendar
  * time. Returns the specified calendar time. If the calendar time can not be
  * represented, returns the value (time_t) -1.
+ *
+ * Modifications:	Fixed tm_isdst usage - 27 August 2008 Craig Howland.
  */
 
 /*
@@ -157,7 +159,7 @@ mktime (tim_p)
 {
   time_t tim = 0;
   long days = 0;
-  int year, isdst;
+  int year, isdst, tm_isdst;
   __tzinfo_type *tz = __gettzinfo ();
 
   /* validate structure */
@@ -202,7 +204,9 @@ mktime (tim_p)
   /* compute total seconds */
   tim += (days * _SEC_IN_DAY);
 
-  isdst = tim_p->tm_isdst;
+  /* Convert user positive into 1 */
+  tm_isdst = tim_p->tm_isdst > 0  ?  1 : tim_p->tm_isdst;
+  isdst = tm_isdst;
 
   if (_daylight)
     {
@@ -225,8 +229,10 @@ mktime (tim_p)
 	      isdst = (tz->__tznorth
 		       ? (tim >= startdst_dst && tim < startstd_std)
 		       : (tim >= startdst_dst || tim < startstd_std));
-	      /* if user committed and was wrong, perform correction */
-	      if ((isdst ^ tim_p->tm_isdst) == 1)
+ 	      /* if user committed and was wrong, perform correction, but not
+ 	       * if the user has given a negative value (which
+ 	       * asks mktime() to determine if DST is in effect or not) */
+ 	      if (tm_isdst >= 0  &&  (isdst ^ tm_isdst) == 1)
 		{
 		  /* we either subtract or add the difference between
 		     time zone offsets, depending on which way the user got it
