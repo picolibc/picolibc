@@ -1,3 +1,8 @@
+2008-08-28  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* ia64.h (ia64_resource_specifier): Add IA64_RS_CR_IIB.  Update
+	IA64_RS_CR.
+
 2008-08-01  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (PPC_OPCODE_VSX, PPC_OPERAND_VSR): New.
