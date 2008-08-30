@@ -1,5 +1,10 @@
 2008-08-29  Andy Grover  <andy.grover@oracle.com>
 
+	* include/ddk/winddk.h (KeRaiseIrql): Define.
+	(KfRaiseIrql, KfLowerIrql): remove incorrect definitions.
+
+2008-08-29  Andy Grover  <andy.grover@oracle.com>
+
 	* include/ddk/winddk.h (KeFlushQueuedDpcs, KeMemoryBarrier): Define.
 	(KeGetCurrentProcessorNumber): Fix incorrect member reference.
 	(InterlockedIncrement, InterlockedDecrement): fix warning.

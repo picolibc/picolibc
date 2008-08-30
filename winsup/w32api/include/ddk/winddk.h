@@ -7726,38 +7726,18 @@ KeWaitForSingleObject(
   /*IN*/ BOOLEAN  Alertable,
   /*IN*/ PLARGE_INTEGER  Timeout  /*OPTIONAL*/);
 
-#if defined(_X86_)
-
 NTOSAPI
 VOID
-FASTCALL
-KfLowerIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-NTOSAPI
-KIRQL
-FASTCALL
-KfRaiseIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-#define KeLowerIrql(a) KfLowerIrql(a)
-#define KeRaiseIrql(a,b) *(b) = KfRaiseIrql(a)
-
-#else
+DDKAPI
+KeRaiseIrql(
+  /*IN*/ KIRQL new_irql,
+  /*OUT*/ PKIRQL old_irql);
 
 NTOSAPI
 VOID
 DDKAPI
 KeLowerIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-NTOSAPI
-KIRQL
-DDKAPI
-KeRaiseIrql(
-  /*IN*/ KIRQL  NewIrql);
-
-#endif
+  /*IN*/ KIRQL irql);
 
 NTOSAPI
 KIRQL
