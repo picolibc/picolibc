@@ -1,5 +1,20 @@
 2008-08-29  Andy Grover  <andy.grover@oracle.com>
 
+	* include/ddk/ndis.h (NDIS_MINIPORT_MAJOR_VERSION, NDIS_MINIPORT_MINOR_VERSION,
+	struct NDIS_TASK_OFFLOAD_HEADER, PROTOCOL_RESERVED_SIZE_IN_PACKET,
+	NdisGetFirstBufferFromPacketSafe, NdisMIndicateReceivePacket,
+	NdisSetPacketPoolProtocolId, NdisMInitializeTimer, NdisMSetPeriodicTimer,
+	NdisMCancelTimer): Define.
+	(enum NDIS_ENCAPSULATION, struct NDIS_ENCAPSULATION_FORMAT): move in file.
+	(struct _NDIS_PACKET): Define using _ANONYMOUS_UNION and ANONYMOUS_STRUCT to
+	eliminate warnings.
+	(NdisReinitializePacket): Rename from NdisReinitializePacketCounts.
+	* lib/ddk/ndis.def (NdisInitAnsiString, NdisInitUnicodeString, NdisMCancelTimer,
+	NdisMInitializeTimer, NdisMSetPeriodicTimer, NdisSetPacketPoolProtocolId):
+	Export.
+
+2008-08-29  Andy Grover  <andy.grover@oracle.com>
+
 	* include/ddk/winddk.h (RtlStringCbCopyA, RtlStringCbPrintfA,
 	RtlStringCbVPrintfA): define in terms of POSIX string functions.
 

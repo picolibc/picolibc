@@ -130,8 +130,8 @@ NdisImmediateReadSharedMemory@16
 ;NdisImmediateWritePortUlong
 ;NdisImmediateWritePortUshort
 NdisImmediateWriteSharedMemory@16
-;NdisInitAnsiString DATA
-;NdisInitUnicodeString DATA
+NdisInitAnsiString@8
+NdisInitUnicodeString@8
 ;NdisInitializeEvent
 NdisInitializeReadWriteLock@4
 ;NdisInitializeString
@@ -149,7 +149,7 @@ NdisInitializeWrapper@16
 NdisMAllocateMapRegisters@20
 NdisMAllocateSharedMemory@20
 NdisMAllocateSharedMemoryAsync@16
-;NdisMCancelTimer
+NdisMCancelTimer@8
 NdisMCloseLog@4
 NdisMCmActivateVc@8
 NdisMCmCreateVc@16
@@ -179,7 +179,7 @@ NdisMGetDeviceProperty@24
 ;NdisMIndicateStatus
 ;NdisMIndicateStatusComplete
 NdisMInitializeScatterGatherDma@12
-;NdisMInitializeTimer
+NdisMInitializeTimer@16
 NdisMMapIoSpace@20
 ;NdisMPciAssignResources
 NdisMPromoteMiniport@4
@@ -202,7 +202,7 @@ NdisMRemoveMiniport@4
 NdisMSetAttributesEx@20
 ;NdisMSetInformationComplete
 NdisMSetMiniportSecondary@8
-;NdisMSetPeriodicTimer
+NdisMSetPeriodicTimer@8
 ;NdisMSetTimer
 NdisMSleep@4
 ;NdisMStartBufferPhysicalMapping
@@ -252,7 +252,7 @@ NdisSend@12
 NdisSendPackets@12
 ;NdisSetEvent
 ;NdisSetPacketCancelId
-;NdisSetPacketPoolProtocolId
+NdisSetPacketPoolProtocolId@8
 ;NdisSetPacketStatus
 ;NdisSetProtocolFilter
 ;NdisSetTimer
