@@ -4896,6 +4896,10 @@ RtlStringFromGUID(
   /*IN*/ REFGUID  Guid, 
   /*OUT*/ PUNICODE_STRING  GuidString);
 
+#define RtlStringCbCopyA(dst, dst_len, src) strncpy(dst, src, dst_len)
+#define RtlStringCbPrintfA(args...) snprintf(args)
+#define RtlStringCbVPrintfA(args...) vsnprintf(args)
+
 NTOSAPI
 BOOLEAN
 DDKAPI
