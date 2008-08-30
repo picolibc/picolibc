@@ -1,3 +1,35 @@
+2008-08-30  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Implement conditional replacement for printf() family functions.
+
+	* include/_mingw.h (__USE_MINGW_ANSI_STDIO): New macro; define it.
+	(__MINGW_ANSI_STDIO__): New manifest constant; define as bitmapped
+	flag for use in user specified __MINGW_FEATURES__ attribute.
+	(__MINGW_LC_MESSAGES__, __MINGW_LC_ENVVARS__): New manifest constants;
+	currently unused: reserved as components of...
+	(__MINGW_LC_EXTENSIONS__): ...this new manifest constant; earmarked as
+	a __MINGW_FEATURES__ enhancement to setlocale().
+
+	* include/stdio.h (__mingw_printf, __mingw_vprintf): Prototype them.
+	(__mingw_fprintf, __mingw_vfprintf): Likewise.
+	(__mingw_sprintf, __mingw_vsprintf): Likewise.
+	(__msvcrt_printf, __msvcrt_vprintf): Likewise.
+	(__msvcrt_fprintf, __msvcrt_vfprintf): Likewise.
+	(__msvcrt_sprintf, __msvcrt_vsprintf): Likewise.
+	(printf, vprintf) [!__USE_MINGW_ANSI_STDIO]: Prototype for default
+	usage; link to DLL import stub, importing from MSVCRT.
+	(fprintf, vfprintf) [!__USE_MINGW_ANSI_STDIO]: Likewise.
+	(sprintf, vsprintf) [!__USE_MINGW_ANSI_STDIO]: Likewise.
+	(printf) [__USE_MINGW_ANSI_STDIO]: Redirect to __mingw_printf; use
+	locally defined static stub implementation.
+	(fprintf, sprintf) [__USE_MINGW_ANSI_STDIO]: Likewise; redirect to
+	__mingw_fprintf and __mingw_sprintf respectively.
+	(vprintf) [__USE_MINGW_ANSI_STDIO]: Redirect to __mingw_vprintf; use
+	static inline implementation for C++ and GNU C, or locally defined
+	static stub otherwise. 
+	(vfprintf, vsprintf) [__USE_MINGW_ANSI_STDIO]: Likewise; redirect to
+	__mingw_vfprintf and __mingw_vsprintf respectively.
+
 2008-08-27  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Avoid access violations, passing NULL to printf( "...%s..." );

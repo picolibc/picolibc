@@ -194,16 +194,130 @@ _CRTIMP void __cdecl __MINGW_NOTHROW	setbuf (FILE*, char*);
 
 /*
  * Formatted Output
+ *
+ * MSVCRT implementations are not ANSI C99 conformant...
+ * we offer these conforming alternatives from libmingwex.a
  */
+#undef  __mingw_stdio_redirect__
+#define __mingw_stdio_redirect__(F) __cdecl __MINGW_NOTHROW __mingw_##F
 
-_CRTIMP int __cdecl __MINGW_NOTHROW	fprintf (FILE*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW	printf (const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW	sprintf (char*, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW	_snprintf (char*, size_t, const char*, ...);
-_CRTIMP int __cdecl __MINGW_NOTHROW	vfprintf (FILE*, const char*, __VALIST);
-_CRTIMP int __cdecl __MINGW_NOTHROW	vprintf (const char*, __VALIST);
-_CRTIMP int __cdecl __MINGW_NOTHROW	vsprintf (char*, const char*, __VALIST);
-_CRTIMP int __cdecl __MINGW_NOTHROW	_vsnprintf (char*, size_t, const char*, __VALIST);
+extern int __mingw_stdio_redirect__(fprintf)(FILE*, const char*, ...);
+extern int __mingw_stdio_redirect__(printf)(const char*, ...);
+extern int __mingw_stdio_redirect__(sprintf)(char*, const char*, ...);
+extern int __mingw_stdio_redirect__(snprintf)(char*, size_t, const char*, ...);
+extern int __mingw_stdio_redirect__(vfprintf)(FILE*, const char*, __VALIST);
+extern int __mingw_stdio_redirect__(vprintf)(const char*, __VALIST);
+extern int __mingw_stdio_redirect__(vsprintf)(char*, const char*, __VALIST);
+extern int __mingw_stdio_redirect__(vsnprintf)(char*, size_t, const char*, __VALIST);
+
+#if __USE_MINGW_ANSI_STDIO
+/*
+ * User has expressed a preference for C99 conformance...
+ */
+# undef __mingw_stdio_redirect__
+# ifdef __cplusplus
+/*
+ * For C++ we use inline implementations, to avoid interference
+ * with namespace qualification, which may result from using #defines.
+ */
+#  define __mingw_stdio_redirect__  static inline __cdecl __MINGW_NOTHROW
+
+# elif defined __GNUC__
+/*
+ * FIXME: Is there any GCC version prerequisite here?
+ *
+ * We also prefer inline implementations for C, when we can be confident
+ * that the GNU specific __inline__ mechanism is supported.
+ */
+#  define __mingw_stdio_redirect__  static __inline__ __cdecl __MINGW_NOTHROW
+
+# else
+/*
+ * Can't use inlines; fall back on module local static stubs.
+ */
+#  define __mingw_stdio_redirect__  static __cdecl __MINGW_NOTHROW
+# endif
+
+__mingw_stdio_redirect__
+int fprintf (FILE *__stream, const char *__format, ...)
+{
+  register int __retval;
+  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
+  __retval = __mingw_vfprintf( __stream, __format, __argv );
+  __builtin_va_end( __argv );
+  return __retval;
+}
+
+__mingw_stdio_redirect__
+int printf (const char *__format, ...)
+{
+  register int __retval;
+  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
+  __retval = __mingw_vprintf( __format, __argv );
+  __builtin_va_end( __argv );
+  return __retval;
+}
+
+__mingw_stdio_redirect__
+int sprintf (char *__stream, const char *__format, ...)
+{
+  register int __retval;
+  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
+  __retval = __mingw_vsprintf( __stream, __format, __argv );
+  __builtin_va_end( __argv );
+  return __retval;
+}
+
+__mingw_stdio_redirect__
+int vfprintf (FILE *__stream, const char *__format, __VALIST __argv)
+{
+  return __mingw_vfprintf( __stream, __format, __argv );
+}
+
+__mingw_stdio_redirect__
+int vprintf (const char *__format, __VALIST __argv)
+{
+  return __mingw_vprintf( __format, __argv );
+}
+
+__mingw_stdio_redirect__
+int vsprintf (char *__stream, const char *__format, __VALIST __argv)
+{
+  return __mingw_vsprintf( __stream, __format, __argv );
+}
+
+#else
+/*
+ * Default configuration: simply direct all calls to MSVCRT...
+ */
+_CRTIMP int __cdecl __MINGW_NOTHROW fprintf (FILE*, const char*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW printf (const char*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW sprintf (char*, const char*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW vfprintf (FILE*, const char*, __VALIST);
+_CRTIMP int __cdecl __MINGW_NOTHROW vprintf (const char*, __VALIST);
+_CRTIMP int __cdecl __MINGW_NOTHROW vsprintf (char*, const char*, __VALIST);
+
+#endif
+/*
+ * Regardless of user preference, always offer these alternative
+ * entry points, for direct access to the MSVCRT implementations.
+ */
+#undef  __mingw_stdio_redirect__
+#define __mingw_stdio_redirect__(F) __cdecl __MINGW_NOTHROW __msvcrt_##F
+
+_CRTIMP int __mingw_stdio_redirect__(fprintf)(FILE*, const char*, ...);
+_CRTIMP int __mingw_stdio_redirect__(printf)(const char*, ...);
+_CRTIMP int __mingw_stdio_redirect__(sprintf)(char*, const char*, ...);
+_CRTIMP int __mingw_stdio_redirect__(vfprintf)(FILE*, const char*, __VALIST);
+_CRTIMP int __mingw_stdio_redirect__(vprintf)(const char*, __VALIST);
+_CRTIMP int __mingw_stdio_redirect__(vsprintf)(char*, const char*, __VALIST);
+
+#undef  __mingw_stdio_redirect__
+
+/* The following pair ALWAYS refer to the MSVCRT implementations...
+ */
+_CRTIMP int __cdecl __MINGW_NOTHROW _snprintf (char*, size_t, const char*, ...);
+_CRTIMP int __cdecl __MINGW_NOTHROW _vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 /*
@@ -213,7 +327,7 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_vsnprintf (char*, size_t, const char*, __VA
  * compatible with C99, but the following are; if you want the MSVCRT
  * behaviour, you *must* use the Microsoft uglified names.
  */
-int __cdecl __MINGW_NOTHROW snprintf(char *, size_t, const char *, ...);
+int __cdecl __MINGW_NOTHROW snprintf (char *, size_t, const char *, ...);
 int __cdecl __MINGW_NOTHROW vsnprintf (char *, size_t, const char *, __VALIST);
 
 int __cdecl __MINGW_NOTHROW vscanf (const char * __restrict__, __VALIST);
