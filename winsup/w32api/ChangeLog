@@ -1,3 +1,7 @@
+2008-08-30 Bo Yang <techrazy@users.sourceforge.net>
+
+	* include/sspi.h: Fix PSecurityFunctionTableW structure.
+
 2008-08-29  Andy Grover  <andy.grover@oracle.com>
 
 	* include/ddk/scsi.h: Define READ_TOC formats.
