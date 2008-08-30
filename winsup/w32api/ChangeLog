@@ -1,5 +1,10 @@
 2008-08-29  Andy Grover  <andy.grover@oracle.com>
 
+	* include/ddk/scsi.h: Define READ_TOC formats.
+	* lib/ddk/scsiport.def (ScsiPortGetDeviceBase): Fix export.
+
+2008-08-29  Andy Grover  <andy.grover@oracle.com>
+
 	* include/ddk/ndis.h (NDIS_MINIPORT_MAJOR_VERSION, NDIS_MINIPORT_MINOR_VERSION,
 	struct NDIS_TASK_OFFLOAD_HEADER, PROTOCOL_RESERVED_SIZE_IN_PACKET,
 	NdisGetFirstBufferFromPacketSafe, NdisMIndicateReceivePacket,
