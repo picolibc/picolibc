@@ -3828,7 +3828,7 @@ KeGetCurrentIrql(
  *   VOID)
  */
 #define KeGetCurrentProcessorNumber() \
-  ((ULONG)KeGetCurrentKPCR()->ProcessorNumber)
+  ((ULONG)KeGetCurrentKPCR()->Number)
 
 
 #if  __USE_NTOSKRNL__
@@ -3842,13 +3842,13 @@ NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedIncrement(
-  /*IN*/ PLONG  VOLATILE  Addend);
+  /*IN*/ LONG VOLATILE *Addend);
 
 NTOSAPI
 LONG
 DDKFASTAPI
 InterlockedDecrement(
-  /*IN*/ PLONG  VOLATILE  Addend);
+  /*IN*/ LONG VOLATILE *Addend);
 
 NTOSAPI
 LONG
@@ -7350,6 +7350,11 @@ KeEnterCriticalRegion(
 #define KeFlushIoBuffers(_Mdl, _ReadOperation, _DmaOperation)
 
 NTOSAPI
+VOID
+DDKAPI
+KeFlushQueuedDpcs(VOID);
+
+NTOSAPI
 PRKTHREAD
 DDKAPI
 KeGetCurrentThread(
@@ -7448,6 +7453,8 @@ VOID
 DDKAPI
 KeLeaveCriticalRegion(
   VOID);
+
+#define KeMemoryBarrier() asm("mfence;")
 
 NTOSAPI
 NTSTATUS

@@ -1,3 +1,11 @@
+2008-08-29  Andy Grover  <andy.grover@oracle.com>
+
+	* include/ddk/winddk.h (KeFlushQueuedDpcs, KeMemoryBarrier): Define.
+	(KeGetCurrentProcessorNumber): Fix incorrect member reference.
+	(InterlockedIncrement, InterlockedDecrement): fix warning.
+	* lib/ddk/ntoskrnl.def (KeFlushQueuedDpcs, KeMemoryBarrier): Export.
+	(KeNumberProcessors): Export.
+
 2008-08-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shlwapi.h (ASSOCF_INIT_NOREMAPCLSID, ASSOCF_INIT_BYEXENAME,

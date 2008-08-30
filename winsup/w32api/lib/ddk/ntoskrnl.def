@@ -506,6 +506,7 @@ KeEnterCriticalRegion@0
 ;KeFindConfigurationEntry
 ;KeFindConfigurationNextEntry
 ;KeFlushEntireTb
+KeFlushQueuedDpcs@0
 KeGetCurrentThread@0
 KeGetPreviousMode@0
 KeGetRecommendedSharedDataAlignment@0
@@ -542,7 +543,7 @@ KeInsertQueueDpc@12
 ;KeIsExecutingDpc
 KeLeaveCriticalRegion@0
 ;KeLoaderBlock DATA
-;KeNumberProcessors DATA
+KeNumberProcessors DATA
 ;KeProfileInterrupt
 ;KeProfileInterruptWithSource
 KePulseEvent@12
