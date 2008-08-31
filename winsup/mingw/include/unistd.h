@@ -1,18 +1,17 @@
+#ifndef _UNISTD_H
 /*
  * This file is part of the Mingw32 package.
  *
  * unistd.h maps (roughly) to io.h
+ * Other headers included by unistd.h may be selectively processed;
+ * __UNISTD_H_SOURCED__ enables such selective processing.
  */
-
-#ifndef _UNISTD_H
 #define _UNISTD_H
+#define __UNISTD_H_SOURCED__ 1
 
 #include <io.h>
 #include <process.h>
-
-#define __UNISTD_GETOPT__
 #include <getopt.h>
-#undef __UNISTD_GETOPT__
 
 /* These are also defined in stdio.h. */
 #ifndef	SEEK_SET
@@ -49,4 +48,5 @@ __CRT_INLINE int ftruncate(int __fd, off_t __length)
 }
 #endif
 
+#undef __UNISTD_H_SOURCED__
 #endif /* _UNISTD_H */

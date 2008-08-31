@@ -1,3 +1,17 @@
+2008-08-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Reimplement getopt.c to add getopt_long_only() function.
+
+	(N.B. this reimplementation removes support for BSD/Mac-OS-X
+	`optreset' nonsense; user code should set `optind = 0' instead,
+	to reinitialise option scanning).
+
+	* mingwex/getopt.c: Delete all content; reimplement it.
+	* include/getopt.h: Likewise.
+
+	* include/unistd.h (__UNISTD_H_SOURCED__): New macro; define it.
+	(__UNISTD_GETOPT__): This macro is no longer required; remove it.
+
 2008-08-30  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Implement conditional replacement for printf() family functions.
