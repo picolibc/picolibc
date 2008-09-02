@@ -47,6 +47,7 @@ extern int spu_timer_alloc (int interval, void (*func) (int));
 extern int spu_timer_free (int id);
 extern int spu_timer_start (int id);
 extern int spu_timer_stop (int id);
+extern unsigned spu_timebase (void);
 
 /* Interrupt services.  */
 extern void spu_slih_register (unsigned event_mask,

@@ -78,7 +78,7 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -140,7 +140,7 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-spu_timer_flih.$(OBJEXT) lib_a-spu_timer_slih.$(OBJEXT) \
 	lib_a-spu_timer_slih_reg.$(OBJEXT) \
 	lib_a-spu_timer_svcs.$(OBJEXT) lib_a-spu_timer_stop.$(OBJEXT) \
-	lib_a-spu_timer_free.$(OBJEXT)
+	lib_a-spu_timer_free.$(OBJEXT) lib_a-spu_timebase.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -214,11 +214,6 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -234,18 +229,23 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 machine_dir = @machine_dir@
@@ -254,8 +254,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sys_dir = @sys_dir@
@@ -280,7 +282,7 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	vsiscanf.c vsniprintf.c vsnprintf.c vsprintf.c vsscanf.c \
 	stack_reg_va.S spu_clock_svcs.c spu_clock_stop.c spu_timer_flih.S \
 	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
-	spu_timer_stop.c spu_timer_free.c
+	spu_timer_stop.c spu_timer_free.c spu_timebase.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -912,6 +914,12 @@ lib_a-spu_timer_free.o: spu_timer_free.c
 
 lib_a-spu_timer_free.obj: spu_timer_free.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu_timer_free.obj `if test -f 'spu_timer_free.c'; then $(CYGPATH_W) 'spu_timer_free.c'; else $(CYGPATH_W) '$(srcdir)/spu_timer_free.c'; fi`
+
+lib_a-spu_timebase.o: spu_timebase.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu_timebase.o `test -f 'spu_timebase.c' || echo '$(srcdir)/'`spu_timebase.c
+
+lib_a-spu_timebase.obj: spu_timebase.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu_timebase.obj `if test -f 'spu_timebase.c'; then $(CYGPATH_W) 'spu_timebase.c'; else $(CYGPATH_W) '$(srcdir)/spu_timebase.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

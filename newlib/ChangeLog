@@ -1,3 +1,10 @@
+2008-09-01  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/include/spu_timer.h: spu_timebase function added.
+	* libc/machine/spu/spu_timebase.c: New file.
+	* libc/machine/spu/Makefile.am: Add new file.
+	* libc/machine/spu/Makefile.in: Regenerated.
+			
 2008-08-28  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/time/mktime.c (mktime): Fix tm_isdst value usage (allowing
