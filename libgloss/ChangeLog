@@ -1,3 +1,8 @@
+2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/Makefile.in: Fix missing linux_syscalls.o.
+	* spu/linux_syscalls.c: Remove extraneous "3D" sequences.
+
 2008-08-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/Makefile.in: (top_srcdir): Define.

@@ -37,26 +37,26 @@ int
 __linux_syscall (struct spu_syscall_block *s)
 {
   int ret;
-  __vector unsigned int stopfunc =3D {
+  __vector unsigned int stopfunc = {
     0x00002104,			/* stop 0x2104  */
     (unsigned int) s,
     0x4020007f,			/* nop  */
     0x35000000			/* bi $0  */
   };
 
-  void (*f) (void) =3D (void *) &stopfunc;
+  void (*f) (void) = (void *) &stopfunc;
   asm ("sync");
 
   f ();
 
   if (s->nr_ret > -4096ull)
     {
-      errno =3D -s->nr_ret;
-      ret =3D -1;
+      errno = -s->nr_ret;
+      ret = -1;
     }
   else
     {
-      ret =3D s->nr_ret;
+      ret = s->nr_ret;
     }
   return ret;
 }

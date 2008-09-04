@@ -58,7 +58,8 @@ OBJS = \
 	access.o chdir.o chmod.o chown.o close.o conv_stat.o dirfuncs.o dup.o \
 	dup2.o exit.o fchdir.o fchmod.o fchown.o fdatasync.o fstat.o \
 	fsync.o ftruncate.o getcwd.o getpagesize.o getpid.o \
-	gettimeofday.o isatty.o kill.o lchown.o link.o lockf.o lseek.o \
+	gettimeofday.o isatty.o kill.o lchown.o \
+	link.o linux_syscalls.o lockf.o lseek.o \
 	lstat.o mkdir.o mknod.o mkstemp.o mktemp.o nanosleep.o open.o \
 	pread.o pwrite.o read.o readlink.o readv.o rmdir.o sbrk.o \
 	sched_yield.o shm_open.o shm_unlink.o stat.o symlink.o sync.o \
