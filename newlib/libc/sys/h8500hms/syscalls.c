@@ -93,7 +93,7 @@ _sbrk (incr)
 
 
 int 
-_isatty (file)
+isatty (file)
      int file;
 {
   return 1;

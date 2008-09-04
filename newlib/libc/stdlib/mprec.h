@@ -78,18 +78,31 @@ union double_union
 #define word1(x) (x.i[1])
 #endif
 
-/* The following is taken from gdtoaimp.h for use with new strtod, but
-   adjusted to avoid invalid type-punning.  */
+
+/* The following is taken from gdtoaimp.h for use with new strtod.  */
 typedef __int32_t Long;
+typedef union { double d; __ULong L[2]; } U;
 
-/* Unfortunately, because __ULong might be a different type than
-   __uint32_t, we can't re-use union double_union as-is without
-   further edits in strtod.c.  */
-typedef union { double d; __ULong i[2]; } U;
+#ifdef YES_ALIAS
+#define dval(x) x
+#ifdef IEEE_8087
+#define dword0(x) ((__ULong *)&x)[1]
+#define dword1(x) ((__ULong *)&x)[0]
+#else
+#define dword0(x) ((__ULong *)&x)[0]
+#define dword1(x) ((__ULong *)&x)[1]
+#endif
+#else /* !YES_ALIAS */
+#ifdef IEEE_8087
+#define dword0(x) ((U*)&x)->L[1]
+#define dword1(x) ((U*)&x)->L[0]
+#else
+#define dword0(x) ((U*)&x)->L[0]
+#define dword1(x) ((U*)&x)->L[1]
+#endif
+#define dval(x) ((U*)&x)->d
+#endif /* YES_ALIAS */
 
-#define dword0(x) word0(x)
-#define dword1(x) word1(x)
-#define dval(x) (x.d)
 
 #undef SI
 #ifdef Sudden_Underflow
@@ -98,7 +111,17 @@ typedef union { double d; __ULong i[2]; } U;
 #define SI 0
 #endif
 
-#define Storeinc(a,b,c) (*(a)++ = (b) << 16 | (c) & 0xffff)
+/* The following definition of Storeinc is appropriate for MIPS processors.
+ * An alternative that might be better on some machines is
+ * #define Storeinc(a,b,c) (*a++ = b << 16 | c & 0xffff)
+ */
+#if defined (__IEEE_BYTES_LITTLE_ENDIAN) + defined (IEEE_8087) + defined (VAX)
+#define Storeinc(a,b,c) (((unsigned short *)a)[1] = (unsigned short)b, \
+((unsigned short *)a)[0] = (unsigned short)c, a++)
+#else
+#define Storeinc(a,b,c) (((unsigned short *)a)[0] = (unsigned short)b, \
+((unsigned short *)a)[1] = (unsigned short)c, a++)
+#endif
 
 /* #define P DBL_MANT_DIG */
 /* Ten_pmax = floor(P*log(2)/log(5)) */
@@ -144,7 +167,11 @@ typedef union { double d; __ULong i[2]; } U;
 
 #define word0(x) (x.i[0])
 #define word1(x) 0
-#define dword0(x) word0(x)
+#ifdef YES_ALIAS
+#define dword0(x) ((__ULong *)&x)[0]
+#else
+#define dword0(x) ((U*)&x)->L[0]
+#endif
 #define dword1(x) 0
 #else
 

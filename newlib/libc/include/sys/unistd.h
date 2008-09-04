@@ -46,18 +46,12 @@ int     _EXFUN(execlp, (const char *__file, const char *, ... ));
 int     _EXFUN(execv, (const char *__path, char * const __argv[] ));
 int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
-#if defined(__CYGWIN__)
-int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
-#endif
 #if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
 int     _EXFUN(fchdir, (int __fildes));
 #endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
-#endif
-#if defined(__CYGWIN__)
-int	_EXFUN(fchownat, (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags));
 #endif
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
@@ -105,14 +99,11 @@ int     _EXFUN(isatty, (int __fildes ));
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
 #endif
 int     _EXFUN(link, (const char *__path1, const char *__path2 ));
-#if defined(__CYGWIN__)
-int     _EXFUN(linkat, (int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags ));
-#endif
 int	_EXFUN(nice, (int __nice_value ));
 #if !defined(__INSIDE_CYGWIN__)
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 #endif
-#if defined(__SPU__) || defined(__CYGWIN__)
+#if defined(__SPU__)
 #define F_ULOCK	0
 #define F_LOCK	1
 #define F_TLOCK	2
@@ -198,7 +189,6 @@ int	 getsubopt(char **, char * const *, char **);
 int     _EXFUN(_close, (int __fildes ));
 pid_t   _EXFUN(_fork, (void ));
 pid_t   _EXFUN(_getpid, (void ));
-int	_EXFUN(_isatty, (int __fildes ));
 int     _EXFUN(_link, (const char *__path1, const char *__path2 ));
 _off_t   _EXFUN(_lseek, (int __fildes, _off_t __offset, int __whence ));
 #ifdef __LARGE64_FILES
@@ -235,10 +225,7 @@ void    _EXFUN(sync, (void));
 int     _EXFUN(sync, (void));
 #endif
 
-ssize_t _EXFUN(readlink, (const char *__path, char *__buf, size_t __buflen));
-#if defined(__CYGWIN__)
-ssize_t	_EXFUN(readlinkat, (int __dirfd1, const char *__path, char *__buf, size_t __buflen));
-#endif
+int     _EXFUN(readlink, (const char *__path, char *__buf, int __buflen));
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 
 #define	F_OK	0

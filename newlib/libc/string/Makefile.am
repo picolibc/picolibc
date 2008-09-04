@@ -72,9 +72,9 @@ GENERAL_SOURCES = \
 	wmemset.c
 
 if ELIX_LEVEL_1
-ELIX_2_SOURCES =
+ELIX_SOURCES =
 else
-ELIX_2_SOURCES = \
+ELIX_SOURCES = \
 	bcmp.c \
 	memccpy.c \
 	mempcpy.c \
@@ -84,33 +84,18 @@ ELIX_2_SOURCES = \
 	strcasestr.c \
 	strndup_r.c \
 	wcpcpy.c \
-	wcpncpy.c
-endif !ELIX_LEVEL_1
-
-if ELIX_LEVEL_1
-ELIX_4_SOURCES =
-else
-if ELIX_LEVEL_2
-ELIX_4_SOURCES =
-else
-if ELIX_LEVEL_3
-ELIX_4_SOURCES =
-else
-ELIX_4_SOURCES = \
-	memmem.c
-endif !ELIX_LEVEL_3
-endif !ELIX_LEVEL_2
-endif !ELIX_LEVEL_1
+	wcpncpy.c \
+endif
 
 libstring_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libstring.la
-libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
+libstring_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
+lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
@@ -132,8 +117,7 @@ wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
-wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
-memmem.def
+wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
 
 SUFFIXES = .def
 

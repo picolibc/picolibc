@@ -3,7 +3,7 @@
 #include <_ansi.h>
 #include <errno.h>
 
-int _isatty(file)
+int isatty(file)
      int file;
 {
   return 1;

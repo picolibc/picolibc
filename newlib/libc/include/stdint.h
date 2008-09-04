@@ -348,7 +348,8 @@ typedef unsigned long uintptr_t;
 #endif
 
 /* This must match size_t in stddef.h, currently long unsigned int */
-#define SIZE_MAX (__STDINT_EXP(LONG_MAX) * 2UL + 1)
+#define SIZE_MIN (-__STDINT_EXP(LONG_MAX) - 1L)
+#define SIZE_MAX __STDINT_EXP(LONG_MAX)
 
 /* This must match sig_atomic_t in <signal.h> (currently int) */
 #define SIG_ATOMIC_MIN (-__STDINT_EXP(INT_MAX) - 1)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996,1999 by Internet Software Consortium.
+ * Copyright (c) 1996 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,9 +15,8 @@
  * SOFTWARE.
  */
 
-#if !defined(_LIBC) && !defined(lint)
-static const char rcsid[] = "$BINDId: ns_ttl.c,v 8.8 1999/10/13 16:39:36 vixie Exp $";
-#endif
+#include <sys/cdefs.h>
+#include <sys/types.h>
 
 /* Import. */
 
@@ -28,13 +27,7 @@ static const char rcsid[] = "$BINDId: ns_ttl.c,v 8.8 1999/10/13 16:39:36 vixie E
 #include <stdio.h>
 #include <string.h>
 
-#include "libc-symbols.h"
-
-#ifdef SPRINTF_CHAR
-# define SPRINTF(x) strlen(sprintf/**/x)
-#else
-# define SPRINTF(x) ((size_t)sprintf x)
-#endif
+#define SPRINTF(x) ((size_t)sprintf x)
 
 /* Forward. */
 
@@ -91,9 +84,6 @@ ns_format_ttl(u_long src, char *dst, size_t dstlen) {
 	return (dst - odst);
 }
 
-#ifndef SHARED
-// Seems not to be needed.  It's not exported from the DSO.  Some libresolv.a
-// might depend on it so we let it in.
 int
 ns_parse_ttl(const char *src, u_long *dst) {
 	u_long ttl, tmp;
@@ -139,10 +129,9 @@ ns_parse_ttl(const char *src, u_long *dst) {
 	return (0);
 
  einval:
-	__set_errno (EINVAL);
+	errno = EINVAL;
 	return (-1);
 }
-#endif
 
 /* Private. */
 

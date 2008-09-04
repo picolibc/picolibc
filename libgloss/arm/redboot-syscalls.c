@@ -103,7 +103,7 @@ _gettimeofday (void * tp, void * tzp)
 
 
 int
-_isatty(int fd)
+isatty(int fd)
 {
     int err;
     err = __syscall(SYS_isatty, fd);

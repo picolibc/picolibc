@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------  */
-/* (C)Copyright 2001,2008,                                         */
+/* (C)Copyright 2006,2007,                                         */
 /* International Business Machines Corporation,                    */
 /* Sony Computer Entertainment, Incorporated,                      */
 /* Toshiba Corporation,                                            */
@@ -22,6 +22,18 @@
 /*   contributors may be used to endorse or promote products       */
 /*   derived from this software without specific prior written     */
 /*   permission.                                                   */
+/* Redistributions of source code must retain the above copyright  */
+/* notice, this list of conditions and the following disclaimer.   */
+/*                                                                 */
+/* Redistributions in binary form must reproduce the above         */
+/* copyright notice, this list of conditions and the following     */
+/* disclaimer in the documentation and/or other materials          */
+/* provided with the distribution.                                 */
+/*                                                                 */
+/* Neither the name of IBM Corporation nor the names of its        */
+/* contributors may be used to endorse or promote products         */
+/* derived from this software without specific prior written       */
+/* permission.                                                     */
 /*                                                                 */
 /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND          */
 /* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,     */
@@ -68,7 +80,9 @@
  */ 
 static __inline vector double _recipd2(vector double value_d)
 {
+  vector unsigned long long zero     = (vector unsigned long long) { 0x0000000000000000ULL, 0x0000000000000000ULL };
   vector unsigned long long expmask  = (vector unsigned long long) { 0x7FF0000000000000ULL, 0x7FF0000000000000ULL };
+  vector unsigned long long signmask = (vector unsigned long long) { 0x8000000000000000ULL, 0x8000000000000000ULL };
   vector float  x0;
   vector float  value;
   vector float  two   = spu_splats(2.0f);
@@ -80,7 +94,6 @@ static __inline vector double _recipd2(vector double value_d)
    * point exponents that are out of single precision range.
    */
   bias = spu_xor(spu_and(value_d, (vector double)expmask), (vector double)expmask);
-
   value = spu_roundtf(spu_mul(value_d, bias));
   x0 = spu_re(value);
   x1 = spu_extend(spu_mul(x0, spu_nmsub(value, x0, two)));
@@ -89,22 +102,10 @@ static __inline vector double _recipd2(vector double value_d)
   x3 = spu_mul(x2, spu_nmsub(value_d, x2, two_d));
 
   /* Handle input = +/- infinity or +/-0. */
-
-#ifdef __SPU_EDP__
-  vec_ullong2 is0inf = spu_testsv(value_d, SPU_SV_NEG_ZERO     | SPU_SV_POS_ZERO |
-                                           SPU_SV_NEG_INFINITY | SPU_SV_POS_INFINITY);
-#else
-  vec_double2 nzero = spu_splats(-0.0);
-  vec_double2 xabs = spu_andc(value_d, nzero);
-  vector unsigned char swap  = (vector unsigned char) {4,5,6,7, 0,1,2,3, 12,13,14,15, 8,9,10,11};
-  vec_uint4 isinf  = spu_cmpeq((vec_uint4)xabs, (vec_uint4)expmask);
-  vec_uint4 iszero = spu_cmpeq((vec_uint4)xabs, 0);
-  isinf  = spu_and(isinf,  spu_shuffle(isinf, isinf, swap));
-  iszero = spu_and(iszero, spu_shuffle(iszero, iszero, swap));
-  vec_ullong2 is0inf = (vec_ullong2)spu_or(isinf, iszero);
-#endif /* __SPU_EDP__ */
-
-  x3 = spu_sel(x3, spu_xor(value_d, (vector double)expmask), is0inf);
+  vec_double2 xabs = spu_andc(value_d, (vec_double2)signmask);
+  vec_ullong2 zeroinf = spu_or(spu_cmpeq(xabs, (vec_double2)expmask),
+                               spu_cmpeq(xabs, (vec_double2)zero));
+  x3 = spu_sel(x3, spu_xor(value_d, (vector double)expmask), zeroinf);
 
   return (x3);
 }

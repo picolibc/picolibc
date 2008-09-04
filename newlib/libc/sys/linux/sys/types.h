@@ -50,8 +50,6 @@
  * libc/include/sys/types.h.  Repeat those here and
  * skip the kernel's definitions. */
 
-#define __need_size_t
-#include <stddef.h>
 #include <sys/config.h>
 #include <features.h>
 #include <machine/types.h>

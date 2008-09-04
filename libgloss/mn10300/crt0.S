@@ -56,9 +56,3 @@ _start:
 
 	.section .stack
 _stack:	.long 	1
-
-	.section .data
-	.global ___dso_handle
-	.weak ___dso_handle
-___dso_handle:
-	.long	0

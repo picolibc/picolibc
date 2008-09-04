@@ -114,8 +114,9 @@ struct termios {
 /* From asm-etrax100/ioctls.h: beware of updates.  */
 #define TCGETS          0x5401
 
+/* Note that this name does not have a prepended underscore.  */
 int
-_isatty (int fd)
+isatty (int fd)
 {
   struct termios dummy;
   int save_errno = errno;

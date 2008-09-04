@@ -33,7 +33,6 @@
 	.text
 	.align	4
 	GLOBL	fscanf
-	.type	fscanf, @function
 fscanf:
 	stqd	$0, 16($sp)		/* save caller address */
 	il	$2, 2			/* number of fixed arguments */
@@ -54,4 +53,3 @@ fscanf:
 	a	$sp, $sp, $2
 	lqd	$0, 16($sp)		/* load caller address */
 	bi      $0			/* return to caller */
-	.size	fscanf, .-fscanf

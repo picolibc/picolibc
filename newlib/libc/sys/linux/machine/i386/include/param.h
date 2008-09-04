@@ -60,9 +60,7 @@
 #define LITTLE_ENDIAN	1234
 #endif
 
-#ifndef BYTE_ORDER
 #define BYTE_ORDER	LITTLE_ENDIAN
-#endif
 
 /*
  * OBJFORMAT_NAMES is a comma-separated list of the object formats

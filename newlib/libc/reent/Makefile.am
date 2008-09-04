@@ -37,7 +37,6 @@ GENERAL_SOURCES = \
 	fstatr.c \
 	getreent.c \
 	gettimeofdayr.c \
-	isattyr.c \
 	linkr.c \
 	lseekr.c \
 	openr.c \

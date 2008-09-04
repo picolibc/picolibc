@@ -129,7 +129,7 @@ _unlink ()
 }
 
 int
-_isatty (fd)
+isatty (fd)
      int fd;
 {
   return 0;

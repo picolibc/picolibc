@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	.global	__exit
 __exit:
-	pushm	r0,r1
+	push.w	r1
 	jsr.a	__m32c_fini
-	popm	r0,r1
+	pop.w	r1
 	SYSCALL(SYS_exit)

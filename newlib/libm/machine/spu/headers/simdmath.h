@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------  */
-/* (C)Copyright 2006,2008,                                         */
+/* (C)Copyright 2006,2007,                                         */
 /* International Business Machines Corporation                     */
 /* All Rights Reserved.                                            */
 /*                                                                 */
@@ -19,6 +19,18 @@
 /*   contributors may be used to endorse or promote products       */
 /*   derived from this software without specific prior written     */
 /*   permission.                                                   */
+/* Redistributions of source code must retain the above copyright  */
+/* notice, this list of conditions and the following disclaimer.   */
+/*                                                                 */
+/* Redistributions in binary form must reproduce the above         */
+/* copyright notice, this list of conditions and the following     */
+/* disclaimer in the documentation and/or other materials          */
+/* provided with the distribution.                                 */
+/*                                                                 */
+/* Neither the name of IBM Corporation nor the names of its        */
+/* contributors may be used to endorse or promote products         */
+/* derived from this software without specific prior written       */
+/* permission.                                                     */
 /*                                                                 */
 /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND          */
 /* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,     */
@@ -200,9 +212,9 @@ vector double fmind2(vector double x, vector double y);
 vector double fmodd2(vector double x, vector double y);
 vector float  fmodf4_fast(vector float x, vector float y);
 vector signed long long fpclassifyd2(vector double x);
-vector double frexpd2(vector double x, vector signed long long *pexp);
+vector double frexpd2(vector double x, vector signed int *pexp);
 vector double hypotd2(vector double x, vector double y);
-vector signed long long ilogbd2(vector double x);
+vector signed int ilogbd2(vector double x);
 vector unsigned long long is0denormd2(vector double x);
 vector unsigned long long isequald2(vector double x, vector double y);
 vector unsigned long long isfinited2(vector double x);
@@ -215,7 +227,7 @@ vector unsigned long long islessgreaterd2(vector double x, vector double y);
 vector unsigned long long isnand2(vector double x);
 vector unsigned long long isnormald2(vector double x);
 vector unsigned long long isunorderedd2(vector double x, vector double y);
-vector double ldexpd2(vector double x, vector signed long long exp);
+vector double ldexpd2(vector double x, vector signed int exp);
 vector signed long long llabsi2(vector signed long long x);
 lldivi2_t lldivi2(vector signed long long x, vector signed long long y);
 lldivu2_t lldivu2(vector unsigned long long x, vector unsigned long long y);
@@ -225,7 +237,6 @@ vector signed long long llroundd2(vector double x);
 vector double log10d2(vector double x);
 vector double log1pd2(vector double x);
 vector double log2d2(vector double x);
-vector double logbd2(vector double x);
 vector double logd2(vector double x);
 vector double modfd2(vector double x, vector double* pint);
 vector double nearbyintd2(vector double x);
@@ -236,7 +247,7 @@ vector double powd2(vector double x, vector double y);
 vector double recipd2(vector double value_d);
 vector float  recipf4_fast(vector float a);
 vector double remainderd2(vector double x, vector double y);
-vector double remquod2(vector double x, vector double y, vector signed long long *quo);
+vector double remquod2(vector double x, vector double y, vector signed int *quo);
 vector double rintd2(vector double x);
 vector double roundd2(vector double x);
 vector double rsqrtd2(vector double x);

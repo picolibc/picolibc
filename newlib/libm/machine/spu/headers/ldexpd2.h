@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------  */
-/* (C)Copyright 2001,2008,                                         */
+/* (C)Copyright 2006,2007,                                         */
 /* International Business Machines Corporation,                    */
 /* Sony Computer Entertainment, Incorporated,                      */
 /* Toshiba Corporation,                                            */
@@ -22,6 +22,18 @@
 /*   contributors may be used to endorse or promote products       */
 /*   derived from this software without specific prior written     */
 /*   permission.                                                   */
+/* Redistributions of source code must retain the above copyright  */
+/* notice, this list of conditions and the following disclaimer.   */
+/*                                                                 */
+/* Redistributions in binary form must reproduce the above         */
+/* copyright notice, this list of conditions and the following     */
+/* disclaimer in the documentation and/or other materials          */
+/* provided with the distribution.                                 */
+/*                                                                 */
+/* Neither the name of IBM Corporation nor the names of its        */
+/* contributors may be used to endorse or promote products         */
+/* derived from this software without specific prior written       */
+/* permission.                                                     */
 /*                                                                 */
 /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND          */
 /* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,     */
@@ -58,7 +70,10 @@ static __inline vector double _ldexpd2(vector double x, vector signed long long 
 {
   vec_uchar16 odd_to_even = ((vec_uchar16) { 4,5,6,7,     0x80,0x80,0x80,0x80, 
                                              12,13,14,15, 0x80,0x80,0x80,0x80 });
+  vec_uchar16 dup_even = ((vec_uchar16) { 0,1,2,3,    0,1,2,3,
+                                          8,9,10,11,  8,9,10,11});
   vec_int4 exp;
+  vec_uint4 exphi;
   vec_int4 e1, e2;
   vec_int4 min = spu_splats(-2044);
   vec_int4 max = spu_splats(2046);
@@ -68,6 +83,8 @@ static __inline vector double _ldexpd2(vector double x, vector signed long long 
   vec_double2 out;
 
   exp = (vec_int4)spu_shuffle(llexp, llexp, odd_to_even);
+
+  exphi = (vec_uint4)spu_shuffle(llexp, llexp, dup_even);
 
   /* Clamp the specified exponent to the range -2044 to 2046.
    */

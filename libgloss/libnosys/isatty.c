@@ -11,11 +11,11 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_isatty, (file),
+_DEFUN (isatty, (file),
         int file)
 {
   errno = ENOSYS;
   return 0;
 }
 
-stub_warning(_isatty)
+stub_warning(isatty)

@@ -4,7 +4,7 @@
 #include "trap.h"
 
 
-_isatty (fd)
+isatty (fd)
      int fd;
 {
   return 1;

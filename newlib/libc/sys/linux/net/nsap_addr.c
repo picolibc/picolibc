@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996-1999 by Internet Software Consortium.
+ * Copyright (c) 1996, 1998 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,30 +15,31 @@
  * SOFTWARE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$BINDId: nsap_addr.c,v 8.10 1999/10/13 16:39:28 vixie Exp $";
-#endif /* LIBC_SCCS and not lint */
+#include <sys/cdefs.h>
+#include <sys/types.h>
 
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/socket.h>
-
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
-
 #include <ctype.h>
 #include <resolv.h>
 
-#include "libc-symbols.h"
-
 static char
-xtob(int c) {
+xtob(c)
+	int c;
+{
 	return (c - (((c >= '0') && (c <= '9')) ? '0' : '7'));
 }
 
 u_int
-inet_nsap_addr(const char *ascii, u_char *binary, int maxlen) {
+inet_nsap_addr(ascii, binary, maxlen)
+	const char *ascii;
+	u_char *binary;
+	int maxlen;
+{
 	u_char c, nib;
 	u_int len = 0;
 
@@ -47,7 +48,8 @@ inet_nsap_addr(const char *ascii, u_char *binary, int maxlen) {
 			continue;
 		if (!isascii(c))
 			return (0);
-		c = toupper(c);
+		if (islower(c))
+			c = toupper(c);
 		if (isxdigit(c)) {
 			nib = xtob(c);
 			c = *ascii++;
@@ -69,10 +71,14 @@ inet_nsap_addr(const char *ascii, u_char *binary, int maxlen) {
 }
 
 char *
-inet_nsap_ntoa(int binlen, const u_char *binary, char *ascii) {
+inet_nsap_ntoa(binlen, binary, ascii)
+	int binlen;
+	const u_char *binary;
+	char *ascii;
+{
 	int nib;
 	int i;
-	static char tmpbuf[255*2 + 128];
+	static char tmpbuf[255*3];
 	char *start;
 
 	if (ascii)
@@ -96,3 +102,12 @@ inet_nsap_ntoa(int binlen, const u_char *binary, char *ascii) {
 	*ascii = '\0';
 	return (start);
 }
+
+/*
+ * Weak aliases for applications that use certain private entry points,
+ * and fail to include <arpa/inet.h>.
+ */
+#undef inet_nsap_addr
+__weak_reference(__inet_nsap_addr, inet_nsap_addr);
+#undef inet_nsap_ntoa
+__weak_reference(__inet_nsap_ntoa, inet_nsap_ntoa);

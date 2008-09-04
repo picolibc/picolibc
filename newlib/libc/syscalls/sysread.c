@@ -9,5 +9,9 @@ _DEFUN (read, (fd, buf, cnt),
      void *buf _AND
      size_t cnt)
 {
+#ifdef REENTRANT_SYSCALLS_PROVIDED
   return _read_r (_REENT, fd, buf, cnt);
+#else
+  return _read (fd, buf, cnt);
+#endif
 }

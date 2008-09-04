@@ -268,9 +268,3 @@ EXT(__frv_fix_usrptrs):
 .Lret3:	ret
 .Lend3:
 	.size	EXT(__frv_fix_usrptrs),.Lend2-EXT(__frv_fix_usrptrs)
-
-	.section .data
-	.global __dso_handle
-	.weak __dso_handle
-__dso_handle:
-	.long	0

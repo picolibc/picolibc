@@ -164,8 +164,6 @@ _DEFUN(_fflush_r, (ptr, fp),
 	      fp->_p = fp->_bf._base;
 	      if (fp->_flags & __SOFF)
 		fp->_offset = curoff;
-	      if (HASUB (fp))
-		FREEUB (ptr, fp);
 	    }
 	  else
 	    {

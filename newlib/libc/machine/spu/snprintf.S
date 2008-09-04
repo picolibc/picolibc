@@ -33,7 +33,6 @@
 	.text
 	.align	4
 	GLOBL	snprintf
-	.type	snprintf, @function
 snprintf:
 	stqd	$0, 16($sp)		/* save caller address */
 	il	$2, 3			/* number of fixed arguments */
@@ -48,4 +47,3 @@ snprintf:
 	a	$sp, $sp, $2
 	lqd	$0, 16($sp)		/* load caller address */
 	bi      $0			/* return to caller */
-	.size	snprintf, .-snprintf

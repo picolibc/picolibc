@@ -14,7 +14,7 @@ ANSI_SYNOPSIS
         double strtod(const char *<[str]>, char **<[tail]>);
         float strtof(const char *<[str]>, char **<[tail]>);
 
-        double _strtod_r(void *<[reent]>,
+        double _strtod_r(void *<[reent]>, 
                          const char *<[str]>, char **<[tail]>);
 
 TRAD_SYNOPSIS
@@ -37,19 +37,12 @@ DESCRIPTION
 	producing a substring which can be converted to a double
 	value.  The substring converted is the longest initial
 	subsequence of <[str]>, beginning with the first
-	non-whitespace character, that has one of these formats:
-	.[+|-]<[digits]>[.[<[digits]>]][(e|E)[+|-]<[digits]>]
-	.[+|-].<[digits]>[(e|E)[+|-]<[digits]>]
-	.[+|-](i|I)(n|N)(f|F)[(i|I)(n|N)(i|I)(t|T)(y|Y)]
-	.[+|-](n|N)(a|A)(n|N)[<(>[<[hexdigits]>]<)>]
-	.[+|-]0(x|X)<[hexdigits]>[.[<[hexdigits]>]][(p|P)[+|-]<[digits]>]
-	.[+|-]0(x|X).<[hexdigits]>[(p|P)[+|-]<[digits]>]
+	non-whitespace character, that has the format:
+	.[+|-]<[digits]>[.][<[digits]>][(e|E)[+|-]<[digits]>] 
 	The substring contains no characters if <[str]> is empty, consists
 	entirely of whitespace, or if the first non-whitespace
 	character is something other than <<+>>, <<->>, <<.>>, or a
-	digit, and cannot be parsed as infinity or NaN. If the platform
-	does not support NaN, then NaN is treated as an empty substring.
-	If the substring is empty, no conversion is done, and
+	digit. If the substring is empty, no conversion is done, and
 	the value of <[str]> is stored in <<*<[tail]>>>.  Otherwise,
 	the substring is converted, and a pointer to the final string
 	(which will contain at least the terminating null character of
@@ -59,8 +52,7 @@ DESCRIPTION
 
 	This implementation returns the nearest machine number to the
 	input decimal string.  Ties are broken by using the IEEE
-	round-even rule.  However, <<strtof>> is currently subject to
-	double rounding errors.
+	round-even rule.
 
 	The alternate function <<_strtod_r>> is a reentrant version.
 	The extra argument <[reent]> is a pointer to a reentrancy structure.
@@ -184,7 +176,7 @@ _DEFUN (ULtod, (L, bits, exp, k),
 		L[_0] |= 0x80000000L;
 }
 #endif /* !NO_HEX_FP */
-
+ 
 #ifdef INFNAN_CHECK
 static int
 _DEFUN (match, (sp, t),
@@ -218,8 +210,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	int bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, decpt, dsign,
 		 e, e1, esign, i, j, k, nd, nd0, nf, nz, nz0, sign;
 	_CONST char *s, *s0, *s1;
-	double aadj, adj;
-	U aadj1, rv, rv0;
+	double aadj, aadj1, adj, rv, rv0;
 	Long L;
 	__ULong y, z;
 	_Bigint *bb, *bb1, *bd, *bd0, *bs, *delta;
@@ -263,9 +254,6 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		switch(s[1]) {
 		  case 'x':
 		  case 'X':
-			/* If the number is not hex, then the parse of
-                           0 is still valid.  */
-			s00 = s + 1;
 			{
 #if defined(FE_DOWNWARD) && defined(FE_TONEAREST) && defined(FE_TOWARDZERO) && defined(FE_UPWARD)
 			FPI fpi1 = fpi;
@@ -280,6 +268,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			switch((i = gethex(ptr, &s, &fpi1, &exp, &bb, sign)) & STRTOG_Retmask) {
 			  case STRTOG_NoNumber:
 				s = s00;
+				sign = 0;
 			  case STRTOG_Zero:
 				break;
 			  default:
@@ -287,7 +276,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					copybits(bits, fpi.nbits, bb);
 					Bfree(ptr,bb);
 					}
-				ULtod(rv.i, bits, exp, i);
+				ULtod(((U*)&rv)->L, bits, exp, i);
 			  }}
 			goto ret;
 		  }
@@ -470,7 +459,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef Honor_FLT_ROUNDS
 				/* round correctly FLT_ROUNDS = 2 or 3 */
 				if (sign) {
-					dval(rv) = -dval(rv);
+					rv = -rv;
 					sign = 0;
 					}
 #endif
@@ -486,7 +475,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef Honor_FLT_ROUNDS
 				/* round correctly FLT_ROUNDS = 2 or 3 */
 				if (sign) {
-					dval(rv) = -dval(rv);
+					rv = -rv;
 					sign = 0;
 					}
 #endif
@@ -514,7 +503,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef Honor_FLT_ROUNDS
 			/* round correctly FLT_ROUNDS = 2 or 3 */
 			if (sign) {
-				dval(rv) = -dval(rv);
+				rv = -rv;
 				sign = 0;
 				}
 #endif
@@ -977,14 +966,14 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			}
 		if ((aadj = ratio(delta, bs)) <= 2.) {
 			if (dsign)
-				aadj = dval(aadj1) = 1.;
+				aadj = aadj1 = 1.;
 			else if (dword1(rv) || dword0(rv) & Bndry_mask) {
 #ifndef Sudden_Underflow
 				if (dword1(rv) == Tiny1 && !dword0(rv))
 					goto undfl;
 #endif
 				aadj = 1.;
-				dval(aadj1) = -1.;
+				aadj1 = -1.;
 				}
 			else {
 				/* special case -- power of FLT_RADIX to be */
@@ -994,24 +983,24 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					aadj = 1./FLT_RADIX;
 				else
 					aadj *= 0.5;
-				dval(aadj1) = -aadj;
+				aadj1 = -aadj;
 				}
 			}
 		else {
 			aadj *= 0.5;
-			dval(aadj1) = dsign ? aadj : -aadj;
+			aadj1 = dsign ? aadj : -aadj;
 #ifdef Check_FLT_ROUNDS
 			switch(Rounding) {
 				case 2: /* towards +infinity */
-					dval(aadj1) -= 0.5;
+					aadj1 -= 0.5;
 					break;
 				case 0: /* towards 0 */
 				case 3: /* towards -infinity */
-					dval(aadj1) += 0.5;
+					aadj1 += 0.5;
 				}
 #else
 			if (Flt_Rounds == 0)
-				dval(aadj1) += 0.5;
+				aadj1 += 0.5;
 #endif /*Check_FLT_ROUNDS*/
 			}
 		y = dword0(rv) & Exp_mask;
@@ -1021,7 +1010,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		if (y == Exp_msk1*(DBL_MAX_EXP+Bias-1)) {
 			dval(rv0) = dval(rv);
 			dword0(rv) -= P*Exp_msk1;
-			adj = dval(aadj1) * ulp(dval(rv));
+			adj = aadj1 * ulp(dval(rv));
 			dval(rv) += adj;
 			if ((dword0(rv) & Exp_mask) >=
 					Exp_msk1*(DBL_MAX_EXP+Bias-P)) {
@@ -1043,18 +1032,18 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					if ((z = aadj) <= 0)
 						z = 1;
 					aadj = z;
-					dval(aadj1) = dsign ? aadj : -aadj;
+					aadj1 = dsign ? aadj : -aadj;
 					}
 				dword0(aadj1) += (2*P+1)*Exp_msk1 - y;
 				}
-			adj = dval(aadj1) * ulp(dval(rv));
+			adj = aadj1 * ulp(dval(rv));
 			dval(rv) += adj;
 #else
 #ifdef Sudden_Underflow
 			if ((dword0(rv) & Exp_mask) <= P*Exp_msk1) {
 				dval(rv0) = dval(rv);
 				dword0(rv) += P*Exp_msk1;
-				adj = dval(aadj1) * ulp(dval(rv));
+				adj = aadj1 * ulp(dval(rv));
 				dval(rv) += adj;
 #ifdef IBM
 				if ((dword0(rv) & Exp_mask) <  P*Exp_msk1)
@@ -1077,7 +1066,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 					dword0(rv) -= P*Exp_msk1;
 				}
 			else {
-				adj = dval(aadj1) * ulp(dval(rv));
+				adj = aadj1 * ulp(dval(rv));
 				dval(rv) += adj;
 				}
 #else /*Sudden_Underflow*/
@@ -1089,11 +1078,11 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			 * example: 1.2e-307 .
 			 */
 			if (y <= (P-1)*Exp_msk1 && aadj > 1.) {
-				dval(aadj1) = (double)(int)(aadj + 0.5);
+				aadj1 = (double)(int)(aadj + 0.5);
 				if (!dsign)
-					dval(aadj1) = -dval(aadj1);
+					aadj1 = -aadj1;
 				}
-			adj = dval(aadj1) * ulp(dval(rv));
+			adj = aadj1 * ulp(dval(rv));
 			dval(rv) += adj;
 #endif /*Sudden_Underflow*/
 #endif /*Avoid_Underflow*/

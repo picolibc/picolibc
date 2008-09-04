@@ -5,7 +5,6 @@
  */
 
 #include <_ansi.h>
-#include <stddef.h>
 #include <sys/types.h>
 
 size_t

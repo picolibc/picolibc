@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------  */
-/* (C)Copyright 2007,2008,                                         */
+/* (C)Copyright 2006,2007,                                         */
 /* International Business Machines Corporation                     */
 /* All Rights Reserved.                                            */
 /*                                                                 */
@@ -19,6 +19,18 @@
 /*   contributors may be used to endorse or promote products       */
 /*   derived from this software without specific prior written     */
 /*   permission.                                                   */
+/* Redistributions of source code must retain the above copyright  */
+/* notice, this list of conditions and the following disclaimer.   */
+/*                                                                 */
+/* Redistributions in binary form must reproduce the above         */
+/* copyright notice, this list of conditions and the following     */
+/* disclaimer in the documentation and/or other materials          */
+/* provided with the distribution.                                 */
+/*                                                                 */
+/* Neither the name of IBM Corporation nor the names of its        */
+/* contributors may be used to endorse or promote products         */
+/* derived from this software without specific prior written       */
+/* permission.                                                     */
 /*                                                                 */
 /* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND          */
 /* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,     */
@@ -85,10 +97,10 @@ static __inline vector float _nextafterf4(vector float x, vector float y)
 
     /* Determine value to add to x */
     delta = (vec_int4)spu_xor(xgty, xlt0);
-    deltap1 = spu_add(delta,one);
+    deltap1 = delta + one;
     delta = spu_sel(deltap1, delta, (vec_uint4)delta);
 
-    xint = spu_add(xint, delta);
+    xint = xint + delta;
 
     /* Fix the case of x = 0, and answer should be -1 ulp */
     result = spu_sel((vec_float4)xint, n1ulp, spu_and((vec_uint4)delta, xeq0));

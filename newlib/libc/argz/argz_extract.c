@@ -4,7 +4,6 @@
  * is freely granted, provided that this notice is preserved.
  */
 
-#include <stddef.h>
 #include <argz.h>
 #include <sys/types.h>
 

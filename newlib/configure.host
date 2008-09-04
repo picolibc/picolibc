@@ -268,10 +268,7 @@ case "${host_cpu}" in
 	stdio_dir=
 	libm_machine_dir=spu
 	machine_dir=spu
-	newlib_cflags="${newlib_cflags} -D_POSIX_MODE"
-	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
-	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
+	newlib_cflags="${newlib_cflags} -D_POSIX_MODE -ffunction-sections -fdata-sections "
 	;;
   *)
 	echo '***' "Newlib does not support CPU ${host_cpu}" 1>&2
@@ -417,7 +414,6 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
-	newlib_cflags="${newlib_cflags} -DHAVE_GETOPT"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------

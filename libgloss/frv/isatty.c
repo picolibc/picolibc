@@ -20,7 +20,7 @@
  *           serial port, we'll say yes _AND return a 1.
  */
 int
-_DEFUN (_isatty, (fd),
+_DEFUN (isatty, (fd),
        int fd)
 {
   return (1);

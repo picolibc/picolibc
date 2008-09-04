@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include "local.h"
 
 int
 _DEFUN(_vdprintf_r, (ptr, fd, format, ap),

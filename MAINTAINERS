@@ -4,7 +4,7 @@ Please do not make ChangeLog entries.
 COPYING, COPYING.LIB, README
 	http://gnu.org.
 
-Makefile.*; configure; configure.ac; src-release
+Makefile.*; configure; configure.in; src-release
 	Any global maintainer can approve changes to these
 	files, but they should be aware	that they need to
 	be kept in sync with their counterparts in the GCC
@@ -13,9 +13,7 @@ Makefile.*; configure; configure.ac; src-release
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com
 
-bfd/; binutils/; elfcpp/; gas/; gold/; gprof/; ld/; opcodes/; cpu/;
-BFD's part of include/
-
+bfd/; binutils/; gas/; gprof/; ld/; opcodes/; cpu/; BFD's part of include/
 	binutils: http://sources.redhat.com/binutils/
 	Patches to binutils@sources.redhat.com.
 	Please notify the following of any interface changes:
