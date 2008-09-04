@@ -56,7 +56,6 @@
 
 #include <spu_intrinsics.h>
 #include "floord2.h"
-#include "ldexpd2.h"
 
 #define LOG2E 1.4426950408889634073599     // 1/log(2) 
 
@@ -101,15 +100,12 @@
 
 static __inline vector double _expd2(vector double x)
 {
-  vec_uchar16 even2odd = ((vec_uchar16){0x80, 0x80, 0x80, 0x80, 0, 1, 2, 3,
-                                        0x80, 0x80, 0x80, 0x80, 8, 9, 10, 11});
-
   //  log(2) in extended machine representable precision
   vec_double2 ln2_hi = spu_splats(6.9314575195312500E-1);  // 3FE62E4000000000
   vec_double2 ln2_lo = spu_splats(1.4286068203094172E-6);  // 3EB7F7D1CF79ABCA
 
-
   //  coefficients for the power series
+  // vec_double2 f01 = spu_splats(1.00000000000000000000E0);  // 1/(1!)
   vec_double2 f02 = spu_splats(5.00000000000000000000E-1); // 1/(2!)
   vec_double2 f03 = spu_splats(1.66666666666666666667E-1); // 1/(3!)
   vec_double2 f04 = spu_splats(4.16666666666666666667E-2); // 1/(4!)
@@ -126,19 +122,42 @@ static __inline vector double _expd2(vector double x)
   vec_double2 rx = _floord2(spu_madd(x,spu_splats(LOG2E),spu_splats(0.5)));
 
   // extract the exponent of reduction
-  vec_int4 nint = spu_convts(spu_roundtf(rx),0);
-  vec_llong2 n  = spu_extend(spu_shuffle(nint, nint, even2odd));
+  vec_int4 exp = spu_convts(spu_roundtf(rx),0);
 
   // reduce the input to within [ -ln(2)/2 ... ln(2)/2 ]
   vec_double2 r;
   r = spu_nmsub(rx,ln2_hi,x);
   r = spu_nmsub(rx,ln2_lo,r);
 
-
   vec_double2 result;
   vec_double2 r2 = spu_mul(r,r);
 
   //  Use Horner's method on the power series
+  /*  result = ((((c12*x + c11)*x + c10)*x + c9)*x + c8)*x + c7)*x + c6)*x^6 +
+              ((((((c5*x + c4)*x + c3)*x + c2)*x + c1)*x + c0
+  */
+
+#ifdef __SPU_EDP__
+  vec_double2 p1, p2, r4, r6;
+
+  p1 = spu_madd(f12, r, f11);
+  p2 = spu_madd(f05, r, f04);
+  r4 = spu_mul(r2, r2);
+  p1 = spu_madd(p1, r, f10);
+  p2 = spu_madd(p2, r, f03);
+  p1 = spu_madd(p1, r, f09);
+  p2 = spu_madd(p2, r, f02);
+  p1 = spu_madd(p1, r, f08);
+  r6 = spu_mul(r2, r4);
+  p1 = spu_madd(p1, r, f07);
+  p2 = spu_madd(p2, r2, r);
+  p1 = spu_madd(p1, r, f06);
+
+  result = spu_madd(r6, p1, p2);
+  result = spu_add(result, spu_splats(1.0));
+
+#else
+
   result = spu_madd(r,f12,f11);
   result = spu_madd(result,r,f10);
   result = spu_madd(result,r,f09);
@@ -152,14 +171,38 @@ static __inline vector double _expd2(vector double x)
   result = spu_madd(result,r2,r);
   result = spu_add(result,spu_splats(1.0));
 
-  //  Scale the result
-  result = _ldexpd2(result, n);
+#endif  /* __SPU_EDP__ */
+
+
+  //  Scale the result - basically a call to ldexpd2()
+  vec_int4 e1, e2;
+  vec_int4 min = spu_splats(-2044);
+  vec_int4 max = spu_splats(2046);
+  vec_uint4 cmp_min, cmp_max;
+  vec_uint4 shift = (vec_uint4) { 20, 32, 20, 32 };
+  vec_double2 f1, f2;
+
+  /* Clamp the specified exponent to the range -2044 to 2046.
+   */
+  cmp_min = spu_cmpgt(exp, min);
+  cmp_max = spu_cmpgt(exp, max);
+  exp = spu_sel(min, exp, cmp_min);
+  exp = spu_sel(exp, max, cmp_max);
+
+  /* Generate the factors f1 = 2^e1 and f2 = 2^e2
+   */
+  e1 = spu_rlmaska(exp, -1);
+  e2 = spu_sub(exp, e1);
+
+  f1 = (vec_double2)spu_sl(spu_add(e1, 1023), shift);
+  f2 = (vec_double2)spu_sl(spu_add(e2, 1023), shift);
+
+  /* Compute the product x * 2^e1 * 2^e2
+   */
+  result = spu_mul(spu_mul(result, f1), f2);
 
   return result;
-
-
 }
-
 
 #endif /* _EXPD2_H_ */
 #endif /* __SPU__ */

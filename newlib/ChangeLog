@@ -1,5 +1,22 @@
 2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libm/machine/spu/headers/acoshf4.h: Rebase against current simdmath.
+	* libm/machine/spu/headers/asinhd2.h: Likewise.
+	* libm/machine/spu/headers/atanhd2.h: Likewise.
+	* libm/machine/spu/headers/atanhf4.h: Likewise.
+	* libm/machine/spu/headers/erff4.h: Likewise.
+	* libm/machine/spu/headers/expd2.h: Likewise.
+	* libm/machine/spu/headers/ldexpd2.h: Likewise.
+	* libm/machine/spu/headers/lgammaf4.h: Likewise.
+	* libm/machine/spu/headers/logbf4.h: Likewise.
+	* libm/machine/spu/headers/nextafterd2.h: Likewise.
+	* libm/machine/spu/headers/nextafterf4.h: Likewise.
+	* libm/machine/spu/headers/recipd2.h: Likewise.
+	* libm/machine/spu/headers/simdmath.h: Likewise.
+	* libm/machine/spu/headers/acoshd2.: Likewise.
+
+2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libm/machine/spu/headers/cbrt.h: cbrt_factors[] declared.
 	* libm/machine/spu/headers/cbrtf.h: Likewise.
 		

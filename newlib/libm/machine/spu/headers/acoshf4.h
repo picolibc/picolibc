@@ -89,26 +89,26 @@
  * Taylor Series Coefficients 
  * for x around 1.
  */
-#define ACOSH_TAY01  1.0000000000000000000000000000000000000000000000000000000000000000000000E0  /* 1 / 1                            */
-#define ACOSH_TAY02 -8.3333333333333333333333333333333333333333333333333333333333333333333333E-2 /* 1 / 12                           */
-#define ACOSH_TAY03  1.8750000000000000000000000000000000000000000000000000000000000000000000E-2 /* 3 / 160                          */
-#define ACOSH_TAY04 -5.5803571428571428571428571428571428571428571428571428571428571428571429E-3 /* 5 / 896                          */
-#define ACOSH_TAY05  1.8988715277777777777777777777777777777777777777777777777777777777777778E-3 /* 35 / 18432                       */
-#define ACOSH_TAY06 -6.9912997159090909090909090909090909090909090909090909090909090909090909E-4 /* 63 / 90112                       */
-#define ACOSH_TAY07  2.7113694411057692307692307692307692307692307692307692307692307692307692E-4 /* 231 / 851968                     */
-#define ACOSH_TAY08 -1.0910034179687500000000000000000000000000000000000000000000000000000000E-4 /* 143 / 1310720                    */
-#define ACOSH_TAY09  4.5124222250545726102941176470588235294117647058823529411764705882352941E-5 /* 6435 / 142606336                 */
-#define ACOSH_TAY10 -1.9065643611707185444078947368421052631578947368421052631578947368421053E-5 /* 12155 / 637534208                */
-#define ACOSH_TAY11  8.1936873140789213634672619047619047619047619047619047619047619047619048E-6 /* 46189 / 5637144576               */
-#define ACOSH_TAY12 -3.5705692742181860882302989130434782608695652173913043478260869565217391E-6 /* 88179 / 24696061952              */
-#define ACOSH_TAY13  1.5740259550511837005615234375000000000000000000000000000000000000000000E-6 /* 676039 / 429496729600            */
-#define ACOSH_TAY14 -7.0068819224144573564882631655092592592592592592592592592592592592592593E-7 /* 1300075 / 1855425871872          */
-#define ACOSH_TAY15  3.1453306166503321507881427633351293103448275862068965517241379310344828E-7 /* 5014575 / 15942918602752         */
+#define SDM_ACOSHF4_TAY01  1.00000000000000000000000000000000000E0f  /* 1 / 1                            */
+#define SDM_ACOSHF4_TAY02 -8.33333333333333333333333333333333333E-2f /* 1 / 12                           */
+#define SDM_ACOSHF4_TAY03  1.87500000000000000000000000000000000E-2f /* 3 / 160                          */
+#define SDM_ACOSHF4_TAY04 -5.58035714285714285714285714285714286E-3f /* 5 / 896                          */
+#define SDM_ACOSHF4_TAY05  1.89887152777777777777777777777777778E-3f /* 35 / 18432                       */
+#define SDM_ACOSHF4_TAY06 -6.99129971590909090909090909090909091E-4f /* 63 / 90112                       */
+#define SDM_ACOSHF4_TAY07  2.71136944110576923076923076923076923E-4f /* 231 / 851968                     */
+#define SDM_ACOSHF4_TAY08 -1.09100341796875000000000000000000000E-4f /* 143 / 1310720                    */
+#define SDM_ACOSHF4_TAY09  4.51242222505457261029411764705882353E-5f /* 6435 / 142606336                 */
+#define SDM_ACOSHF4_TAY10 -1.90656436117071854440789473684210526E-5f /* 12155 / 637534208                */
+#define SDM_ACOSHF4_TAY11  8.19368731407892136346726190476190476E-6f /* 46189 / 5637144576               */
+#define SDM_ACOSHF4_TAY12 -3.57056927421818608823029891304347826E-6f /* 88179 / 24696061952              */
+#define SDM_ACOSHF4_TAY13  1.57402595505118370056152343750000000E-6f /* 676039 / 429496729600            */
+#define SDM_ACOSHF4_TAY14 -7.00688192241445735648826316550925926E-7f /* 1300075 / 1855425871872          */
+#define SDM_ACOSHF4_TAY15  3.14533061665033215078814276333512931E-7f /* 5014575 / 15942918602752         */
 #if 0
-#define ACOSH_TAY16 -1.4221629293564136230176494967552923387096774193548387096774193548387097E-7 /* 9694845 / 68169720922112         */
-#define ACOSH_TAY17  6.4711106776113328206437555226412686434659090909090909090909090909090909E-8 /* 100180065 / 1548112371908608     */
-#define ACOSH_TAY18 -2.9609409781171182528071637664522443498883928571428571428571428571428571E-8 /* 116680311 / 3940649673949184     */
-#define ACOSH_TAY19  1.3615438056281793767600509061201198680980785472972972972972972972972973E-8 /* 2268783825 / 166633186212708352  */
+#define SDM_ACOSHF4_TAY16 -1.42216292935641362301764949675529234E-7f /* 9694845 / 68169720922112         */
+#define SDM_ACOSHF4_TAY17  6.47111067761133282064375552264126864E-8f /* 100180065 / 1548112371908608     */
+#define SDM_ACOSHF4_TAY18 -2.96094097811711825280716376645224435E-8f /* 116680311 / 3940649673949184     */
+#define SDM_ACOSHF4_TAY19  1.36154380562817937676005090612011987E-8f /* 2268783825 / 166633186212708352  */
 #endif
 
 
@@ -117,6 +117,7 @@ static __inline vector float _acoshf4(vector float x)
 {
     vec_float4 minus_onef = spu_splats(-1.0f);
     vec_float4 twof       = spu_splats(2.0f);
+    vec_float4 largef     = spu_splats(2.5e19f);
     vec_float4 xminus1;
     /* Where we switch from taylor to formula */
     vec_float4  switch_approx = spu_splats(2.0f);
@@ -129,36 +130,40 @@ static __inline vector float _acoshf4(vector float x)
      *   acosh = ln(x + sqrt(x^2 - 1))
      */
     fresult = _sqrtf4(spu_madd(x, x, minus_onef));
-    fresult = spu_add(x, fresult);
+    fresult = spu_add(x, spu_sel(fresult, x, spu_cmpgt(x, largef)));
     fresult = _logf4(fresult);
+    fresult = (vec_float4)spu_add((vec_uint4)fresult, spu_splats(2u));
 
     /*
      * Taylor Series
      */
     xminus1 = spu_add(x, minus_onef);
 
-    mresult = spu_madd(xminus1, spu_splats((float)ACOSH_TAY15), spu_splats((float)ACOSH_TAY14));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY13));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY12));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY11));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY10));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY09));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY08));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY07));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY06));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY05));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY04));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY03));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY02));
-    mresult = spu_madd(xminus1, mresult, spu_splats((float)ACOSH_TAY01));
+    mresult = spu_splats(SDM_ACOSHF4_TAY15);
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY14));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY13));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY12));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY11));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY10));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY09));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY08));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY07));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY06));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY05));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY04));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY03));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY02));
+    mresult = spu_madd(xminus1, mresult, spu_splats(SDM_ACOSHF4_TAY01));
     
     mresult = spu_mul(mresult, _sqrtf4(spu_mul(xminus1, twof)));
+    mresult = (vec_float4)spu_add((vec_uint4)mresult, spu_splats(1u));
 
     /*
      * Select series or formula
      */
     use_form = spu_cmpgt(x, switch_approx);
     result = spu_sel(mresult, fresult, use_form);
+
 
     return result;
 }

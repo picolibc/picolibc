@@ -52,6 +52,7 @@
 #define _ATANHF4_H_	1
 
 #include <spu_intrinsics.h>
+#include <math.h>
 #include "logf4.h"
 
 /*
@@ -72,8 +73,7 @@
  *  Special Cases:
  *  - atanh(1)  =  HUGE_VALF
  *  - atanh(-1) = -HUGE_VALF
- *	- The result is undefined for x outside of the domain [-1,1],
- *	  since single-precision NaN is not supported on the SPU.
+ *	- The result is undefined for x outside of the domain [-1,1].
  *
  */
 
@@ -81,34 +81,28 @@
  * Maclaurin Series Coefficients 
  * for x near 0.
  */
-#define ATANH_MAC01 1.0000000000000000000000000000000000000000000000000000000000000000000000E0
-#define ATANH_MAC03 3.3333333333333333333333333333333333333333333333333333333333333333333333E-1
-#define ATANH_MAC05 2.0000000000000000000000000000000000000000000000000000000000000000000000E-1
-#define ATANH_MAC07 1.4285714285714285714285714285714285714285714285714285714285714285714286E-1
+#define SDM_SP_ATANH_MAC01 1.000000000000000000000000000000E0
+#define SDM_SP_ATANH_MAC03 3.333333333333333333333333333333E-1
+#define SDM_SP_ATANH_MAC05 2.000000000000000000000000000000E-1
+#define SDM_SP_ATANH_MAC07 1.428571428571428571428571428571E-1
 #if 0
-#define ATANH_MAC09 1.1111111111111111111111111111111111111111111111111111111111111111111111E-1
-#define ATANH_MAC11 9.0909090909090909090909090909090909090909090909090909090909090909090909E-2
-#define ATANH_MAC13 7.6923076923076923076923076923076923076923076923076923076923076923076923E-2
-#define ATANH_MAC15 6.6666666666666666666666666666666666666666666666666666666666666666666667E-2
-#define ATANH_MAC17 5.8823529411764705882352941176470588235294117647058823529411764705882353E-2
-#define ATANH_MAC19 5.2631578947368421052631578947368421052631578947368421052631578947368421E-2
-#define ATANH_MAC21 4.7619047619047619047619047619047619047619047619047619047619047619047619E-2
-#define ATANH_MAC23 4.3478260869565217391304347826086956521739130434782608695652173913043478E-2
-#define ATANH_MAC25 4.0000000000000000000000000000000000000000000000000000000000000000000000E-2
-#define ATANH_MAC27 3.7037037037037037037037037037037037037037037037037037037037037037037037E-2
-#define ATANH_MAC29 3.4482758620689655172413793103448275862068965517241379310344827586206897E-2
+#define SDM_SP_ATANH_MAC09 1.111111111111111111111111111111E-1
+#define SDM_SP_ATANH_MAC11 9.090909090909090909090909090909E-2
+#define SDM_SP_ATANH_MAC13 7.692307692307692307692307692308E-2
+#define SDM_SP_ATANH_MAC15 6.666666666666666666666666666667E-2
 #endif
 
 
 static __inline vector float _atanhf4(vector float x)
 {
+    vec_uint4  one = spu_splats(1u);
     vec_float4 sign_mask = spu_splats(-0.0f);
     vec_float4 onef      = spu_splats(1.0f);
     vec_float4 onehalff  = spu_splats(0.5f);
+    vec_float4 huge      = spu_splats(HUGE_VALF);
     vec_float4 result, fresult, mresult;;
     vec_float4 xabs, xsqu;
     /* Where we switch from maclaurin to formula */
-    //vec_float4  switch_approx = spu_splats(0.4661f);
     vec_float4  switch_approx = spu_splats(0.165f);
     vec_uint4   use_form;
 
@@ -126,11 +120,10 @@ static __inline vector float _atanhf4(vector float x)
     /*
      * Taylor Series
      */
-    mresult = spu_madd(xsqu, spu_splats((float)ATANH_MAC07), spu_splats((float)ATANH_MAC05));
-    mresult = spu_madd(xsqu, mresult, spu_splats((float)ATANH_MAC03));
-    mresult = spu_madd(xsqu, mresult, spu_splats((float)ATANH_MAC01));
+    mresult = spu_madd(xsqu, spu_splats((float)SDM_SP_ATANH_MAC07), spu_splats((float)SDM_SP_ATANH_MAC05));
+    mresult = spu_madd(xsqu, mresult, spu_splats((float)SDM_SP_ATANH_MAC03));
+    mresult = spu_madd(xsqu, mresult, spu_splats((float)SDM_SP_ATANH_MAC01));
     mresult = spu_mul(xabs, mresult);
-
 
     /*
      * Choose between series and formula
@@ -138,6 +131,22 @@ static __inline vector float _atanhf4(vector float x)
     use_form = spu_cmpgt(xabs, switch_approx);
     result = spu_sel(mresult, fresult, use_form);
 
+    /*
+     * Correct for accumulated truncation error. Currently reduces rms of
+     * absolute error by about 50%
+     */
+    result = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.0f))));
+    result = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.25f))));
+
+    /*
+     * Check Boundary Conditions
+     */
+    result = spu_sel(result, huge, spu_cmpeq(xabs, onef));
+
+    /*
+     * Spec says |x| > 1, result is undefined, so no additional
+     * boundary checks needed.
+     */
 
     /* Preserve sign - atanh is anti-symmetric */
     result = spu_sel(result, x, (vec_uint4)sign_mask);

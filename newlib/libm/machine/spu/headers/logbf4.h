@@ -57,19 +57,18 @@
 
 /*
  * FUNCTION
- *	vector float _scalbnf4(vector float x, vector signed int exp)
+ *	vector float _logbf4(vector float x)
  *
  * DESCRIPTION
- *      The _scalbnf4 function returns a vector containing each element of x 
- *      multiplied by 2^n computed efficiently.  This function is computed 
- *      without the assistance of any floating point operations and as such 
- *      does not set any floating point exceptions.
+ *  The _logbf4 function returns a vector float that contains the exponent
+ *  of the corresponding elements of the input vector x. The exponent is
+ *  defined by:
+ *    x = frac * FLT_RADIX^exp, with frac in [1, FLT_RADIX).
  *
- *      Special Cases:
- *	  - if the exponent is 0, then x is either 0 or a subnormal, and the 
- *          result will be returned as 0.
- *        - if the result if underflows, it will be returned as 0.
- *        - if the result overflows, it will be returned as FLT_MAX.
+ *  Special Cases:
+ *    x = 0,  result is undefined.
+ *    x = NaN, result is NaN.
+ *    x = infinity, +infinity is returned.
  *
  */
 static __inline vector float _logbf4(vector float x)
