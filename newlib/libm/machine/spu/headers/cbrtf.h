@@ -36,7 +36,13 @@
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
-extern double cbrt_factors[5];
+static double cbrt_factors[5] = {
+  0.629960524947436484311,      /* 2^(-2/3)  */
+  0.793700525984099680699,      /* 2^(-1/3)  */
+  1.0,                          /* 2^(0)     */
+  1.259921049894873164666,      /* 2^(1/3)   */
+  1.587401051968199583441       /* 2^(2/3)   */
+};
 
 /* Compute the cube root of the floating point input x.
  */

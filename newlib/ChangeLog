@@ -1,3 +1,8 @@
+2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libm/machine/spu/headers/cbrt.h: cbrt_factors[] declared.
+	* libm/machine/spu/headers/cbrtf.h: Likewise.
+		
 2008-09-01  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/include/spu_timer.h: spu_timebase function added.
