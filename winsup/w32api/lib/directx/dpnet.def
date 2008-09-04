@@ -1,3 +1,0 @@
-LIBRARY dpnet.dll
-EXPORTS
-DirectPlay8Create@12
