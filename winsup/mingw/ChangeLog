@@ -1,3 +1,7 @@
+2008-09-07 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.15.
+
 2008-09-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Adjust to new naming standard for MinGW while maintaining old

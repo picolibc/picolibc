@@ -22,9 +22,9 @@
  */
 #define __MINGW_H
 
-#define __MINGW32_VERSION           3.14
+#define __MINGW32_VERSION           3.15
 #define __MINGW32_MAJOR_VERSION     3
-#define __MINGW32_MINOR_VERSION     14
+#define __MINGW32_MINOR_VERSION     15
 
 #if __GNUC__ >= 3
 #pragma GCC system_header
