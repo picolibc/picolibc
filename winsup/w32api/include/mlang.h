@@ -239,9 +239,9 @@ DECLARE_INTERFACE_(IMLangFontLink,IMLangCodePages)
         STDMETHOD(CodePageToCodePages)(THIS_ UINT,DWORD*) PURE;
         STDMETHOD(CodePagesToCodePage)(THIS_ DWORD,UINT,UINT*) PURE;
         STDMETHOD(GetFontCodePages)(THIS_ HDC,HFONT,DWORD*) PURE;
+        STDMETHOD(MapFont)(THIS_ HDC,DWORD,HFONT,HFONT*) PURE;
         STDMETHOD(ReleaseFont)(THIS_ HFONT) PURE;
         STDMETHOD(ResetFontMapping)(THIS) PURE;
-        STDMETHOD(MapFont)(THIS_ HDC,DWORD,WCHAR,HFONT*) PURE;
 };
 #undef INTERFACE
 

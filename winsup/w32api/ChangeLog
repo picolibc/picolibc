@@ -1,3 +1,7 @@
+2008-09-07  alsemm  <alsemm@users.sourceforge.net>
+
+	* include/mlang.h (IMLangFontLink2::MapFont): Fix definition.
+
 2008-09-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ws2tcpip.h (IPV6_MREQ): Fix typo.
