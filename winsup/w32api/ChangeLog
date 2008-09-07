@@ -1,3 +1,8 @@
+2008-09-07  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.12.
+	* Makefile.in: Ditto.
+
 2008-09-07  Michael Hentschel  <mikeh42@users.sourceforge.net>
 
 	* include/shlwapi.h (STIF_DEFAULT, STIF_SUPPORT_HEX): Define.
