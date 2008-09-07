@@ -19,6 +19,8 @@ host_alias = @host@
 target_alias = @target@
 prefix = @prefix@
 conf_prefix = @prefix@
+# FIXME: this needs an appropriate AC_SUBST
+host_os = mingw32
 
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
@@ -91,12 +93,12 @@ install uninstall:
 	done
 
 ifdef SNAPDATE
-    distdir = $(PACKAGE)-$(VERSION)-$(SNAPDATE)
+    distdir = $(PACKAGE)-$(VERSION)-$(SNAPDATE)-$(host_os)
 else
    ifneq (,$(findstring cygwin, $(target_alias)))
       distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)
    else
-      distdir=$(PACKAGE)-$(VERSION)
+      distdir=$(PACKAGE)-$(VERSION)-$(host_os)
    endif
 endif
 
@@ -126,6 +128,7 @@ srcdist:
 	rm -f $(distdir)-src$(TARFILEEXT)
 	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)
 
+ifneq (,$(findstring cygwin, $(target_alias)))
 bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
@@ -133,6 +136,15 @@ bindist:
 	$(MAKE) install prefix=`pwd`/$(distdir)$(dist_prefix) exec_prefix=`pwd`/$(distdir)$(dist_prefix)
 	rm -f $(distdir)$(TARFILEEXT)
 	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
+else
+bindist:
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	$(MAKE) install prefix=`pwd`/$(distdir)$(dist_prefix) exec_prefix=`pwd`/$(distdir)$(dist_prefix)
+	rm -f $(distdir)$(TARFILEEXT)
+	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)-dev$(TARFILEEXT) *
+endif
 
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')

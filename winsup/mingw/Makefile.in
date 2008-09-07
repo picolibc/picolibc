@@ -17,7 +17,6 @@
 
 # This makefile requires GNU make.
 
-PACKAGE = mingw-runtime
 VERSION = @PACKAGE_VERSION@
 CYGRELEASE = 1
 
@@ -31,6 +30,14 @@ target_alias = @target_alias@
 with_cross_host = @with_cross_host@
 prefix = @prefix@
 conf_prefix = @prefix@
+# FIXME: this needs an appropriate AC_SUBST
+host_os = mingw32
+
+ifneq (,$(findstring cygwin, $(target_alias)))
+PACKAGE = mingw-runtime
+else
+PACKAGE = mingwrt
+endif
 
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
@@ -71,7 +78,7 @@ else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
-inst_docdir:=$(prefix)/doc/mingw-runtime
+inst_docdir:=$(prefix)/doc/runtime
 endif
 endif
 
@@ -345,12 +352,12 @@ distclean: clean
 	-rm -f Makefile
 
 ifdef SNAPDATE
-      distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
+      distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)-$(host_os)
 else
    ifneq (,$(findstring cygwin, $(target_alias)))
       distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)
    else
-      distdir=$(PACKAGE)-$(VERSION)
+      distdir=$(PACKAGE)-$(VERSION)-$(host_os)
    endif
 endif
 
@@ -395,6 +402,7 @@ srcdist:
 	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)
 
 
+ifneq (,$(findstring cygwin, $(target_alias)))
 bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
@@ -403,6 +411,17 @@ bindist:
 	rm -f $(distdir).tar.gz
 	cd $(distdir); \
 	$(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
+else
+bindist:
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	$(MAKE) install prefix=$(shell pwd)/$(distdir)$(dist_prefix)
+	rm -f $(distdir).tar.gz
+	cd $(distdir); \
+	$(TAR) $(TARFLAGS)cf ../$(distdir)-dev$(TARFILEEXT) * --exclude=bin; \
+	$(TAR) $(TARFLAGS)cf ../$(distdir)-dll$(TARFILEEXT) bin/*.dll
+endif
 
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')

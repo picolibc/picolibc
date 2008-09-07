@@ -1,3 +1,8 @@
+2008-09-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Adjust to new naming standard for MinGW while maintaining old
+	naming standard for Cygwin.
+
 2008-08-30 Bo Yang <techrazy@users.sourceforge.net>
 
 	* include/sspi.h: Fix PSecurityFunctionTableW structure.

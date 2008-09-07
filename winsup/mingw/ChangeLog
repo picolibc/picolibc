@@ -1,3 +1,8 @@
+2008-09-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Adjust to new naming standard for MinGW while maintaining old
+	naming standard for Cygwin.
+
 2008-08-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Reimplement getopt.c to add getopt_long_only() function.
