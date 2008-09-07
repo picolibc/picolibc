@@ -1,3 +1,8 @@
+2008-09-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ws2tcpip.h (IPV6_MREQ): Fix typo.
+	Thanks to Richard Hughes for report.
+
 2008-09-06  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* Makefile.in: Adjust to new naming standard for MinGW while maintaining old

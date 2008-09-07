@@ -275,7 +275,7 @@ struct ipv6_mreq {
 	struct in6_addr ipv6mr_multiaddr;
 	unsigned int    ipv6mr_interface;
 };
-typedef struct ipv6_mreq IPV6_MREG;
+typedef struct ipv6_mreq IPV6_MREQ;
 
 struct in6_pktinfo {
 	IN6_ADDR ipi6_addr;
