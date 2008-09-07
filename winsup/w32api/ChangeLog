@@ -1,3 +1,7 @@
+2008-09-07  Michael Hentschel  <mikeh42@users.sourceforge.net>
+
+	* include/shlwapi.h (STIF_DEFAULT, STIF_SUPPORT_HEX): Define.
+
 2008-09-07  alsemm  <alsemm@users.sourceforge.net>
 
 	* include/mlang.h (IMLangFontLink2::MapFont): Fix definition.
