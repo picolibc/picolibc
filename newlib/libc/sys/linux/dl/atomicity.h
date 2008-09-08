@@ -28,7 +28,7 @@ exchange_and_add (volatile uint32_t *mem, uint32_t val)
 {
   register uint32_t result;
   __asm__ __volatile__ ("lock; xaddl %0,%1"
-			: "=r" (result), "=m" (*mem) : "0" (val), "1" (*mem));
+			: "=r" (result), "=m" (*mem) : "m" (val), "1" (*mem));
   return result;
 }
 
@@ -37,7 +37,7 @@ __attribute__ ((unused))
 atomic_add (volatile uint32_t *mem, int val)
 {
   __asm__ __volatile__ ("lock; addl %1,%0"
-			: "=m" (*mem) : "ir" (val), "0" (*mem));
+			: "=m" (*mem) : "ir" (val), "m" (*mem));
 }
 
 static inline char

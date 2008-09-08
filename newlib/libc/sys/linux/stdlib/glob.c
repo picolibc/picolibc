@@ -77,6 +77,7 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <linux/limits.h>
 
 #include "collate.h"
 

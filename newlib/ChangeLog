@@ -1,3 +1,19 @@
+2008-09-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/dl/atomicity.h (exchange_and_add): Fix asm statement to use "m" instead of "0".
+	(atomic_add): Ditto.
+	* libc/sys/linux/linuxthreads/spinlock.c (__pthread_release): Ditto. 
+	* libc/sys/linux/net/getaddrinfo.c: Add limit.h include.
+	* libc/sys/linux/stdlib/glob.c: Ditto.
+
+2008-09-08  jjohnstn  <jjohnstn@vermillion>
+
+	* libc/sys/linux/dl/atomicity.h (exchange_and_add): 
+	(atomic_add): 
+	* libc/sys/linux/linuxthreads/spinlock.c (__pthread_release): 
+	* libc/sys/linux/net/getaddrinfo.c: 
+	* libc/sys/linux/stdlib/glob.c: 
+
 2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libm/machine/spu/headers/acosd2.h: Duplicated preamble text removed.

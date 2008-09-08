@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <not-cancel.h>
 #include <nscd/nscd-client.h>
 #include <nscd/nscd_proto.h>
+#include <limits.h>
 #include "local.h"
 
 #ifdef HAVE_LIBIDN
