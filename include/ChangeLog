@@ -1,3 +1,8 @@
+2008-09-09  Jason Merrill  <jason@redhat.com>
+
+	* demangle.h (enum demangle_component_type): Add
+	DEMANGLE_COMPONENT_DECLTYPE.
+
 2008-08-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* binary-io.h: New file, imported from gnulib, but don't
