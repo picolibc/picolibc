@@ -1,5 +1,16 @@
 2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygwin.din (sys_sigabbrev): Add this here.
+	* dcrt0.cc (__argc,__argv,_check_for_executable): Remove dllexport
+	decoration since it is already handled in cygwin.din.
+	* errno.cc (_sys_errlist): Ditto.
+	* strsig.cc (sys_sigabbrev): Ditto.
+	* include/cygwin/signal.h: Protect use of dllimport when
+	__INSIDE_CYGWIN__.
+	* libc/getopt.c: Revert previous changes.  Define __INSIDE_CYGWIN__.
+
+2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* localtime.cc (increment_overflow): Mark as non-inline to prevent
 	compiler from complaining about the very thing we're trying to test.
 	* ntea.cc (read_ea): Reorganize to avoid a new compiler warning/error.

@@ -25,6 +25,7 @@ reent_data DATA
 sys_errlist = _sys_errlist DATA
 _sys_errlist DATA
 sys_nerr = _sys_nerr DATA
+sys_sigabbrev DATA
 _sys_nerr DATA
 _timezone DATA
 _tzname DATA

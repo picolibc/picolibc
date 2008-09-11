@@ -57,7 +57,7 @@ struct sigdesc
 
 #define _s(n, s) #n
 #define _s2(n, s, n1, s1) #n
-const char __declspec(dllexport) * sys_sigabbrev[] NO_COPY_INIT =
+const char *sys_sigabbrev[] NO_COPY_INIT =
 {
   NULL,
   __signals

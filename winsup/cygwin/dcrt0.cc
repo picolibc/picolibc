@@ -51,8 +51,8 @@ bool allow_glob = true;
 bool NO_COPY in_forkee;
 
 int __argc_safe;
-int _declspec(dllexport) __argc;
-char _declspec(dllexport) **__argv;
+int __argc;
+char **__argv;
 #ifdef NEWVFORK
 vfork_save NO_COPY *main_vfork;
 #endif
@@ -103,7 +103,7 @@ extern "C"
    /* impure_ptr */ _GLOBAL_REENT,
   };
   bool ignore_case_with_glob;
-  int __declspec (dllexport) _check_for_executable = true;
+  int _check_for_executable = true;
 };
 
 int NO_COPY __api_fatal_exit_val = 1;

@@ -143,7 +143,7 @@ static NO_COPY struct
 };
 
 extern "C" {
-const char __declspec(dllexport) * _sys_errlist[] NO_COPY_INIT =
+const char *_sys_errlist[] NO_COPY_INIT =
 {
 /* NOERROR 0 */		  "No error",
 /* EPERM 1 */		  "Operation not permitted",

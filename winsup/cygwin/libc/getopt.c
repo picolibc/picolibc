@@ -51,18 +51,19 @@
 
 #include <err.h>
 #include <errno.h>
-#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+#define __INSIDE_CYGWIN__
+#include <getopt.h>
 
 #define	REPLACE_GETOPT		/* use this getopt as the system getopt(3) */
 
 #ifdef REPLACE_GETOPT
-int __declspec(dllexport)   opterr = 1;	/* if error message should be printed */
-int __declspec(dllexport)   optind = 1; /* index into parent argv vector */
-int __declspec(dllexport)   optopt = '?';/* index into parent argv vector *//* character checked for validity */
-int __declspec(dllexport)   optreset;	/* reset getopt */
-char  __declspec(dllexport) *optarg;	/* argument associated with option */
+int	opterr = 1;		/* if error message should be printed */
+int	optind = 1;		/* index into parent argv vector */
+int	optopt = '?';		/* character checked for validity */
+int	optreset;		/* reset getopt */
+char    *optarg;		/* argument associated with option */
 #endif
 
 #define PRINT_ERROR	((opterr) && (*options != ':'))
