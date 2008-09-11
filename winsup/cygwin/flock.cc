@@ -497,10 +497,10 @@ inode_t::get_all_locks_list ()
       wc[LOCK_OBJ_NAME_LEN] = L'\0';
       short flags = wcstol (wc, &endptr, 16);
       if ((flags & ~(F_FLOCK | F_POSIX)) != 0
-	  || (flags & (F_FLOCK | F_POSIX) == (F_FLOCK | F_POSIX)))
+	  || ((flags & (F_FLOCK | F_POSIX)) == (F_FLOCK | F_POSIX)))
 	continue;
       short type = wcstol (endptr + 1, &endptr, 16);
-      if (type != F_RDLCK && type != F_WRLCK || !endptr || *endptr != L'-')
+      if (type != (F_RDLCK && type != F_WRLCK) || !endptr || *endptr != L'-')
         continue;
       _off64_t start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
       if (start < 0 || !endptr || *endptr != L'-')
@@ -1442,7 +1442,7 @@ flock (int fd, int operation)
       goto done;
     }
   res = cfd->lock (cmd, &fl);
-  if (res == -1 && (get_errno () == EAGAIN) || (get_errno () == EACCES))
+  if ((res == -1) && ((get_errno () == EAGAIN) || (get_errno () == EACCES)))
     set_errno (EWOULDBLOCK);
 done:
   syscall_printf ("%d = flock (%d, %d)", res, fd, operation);

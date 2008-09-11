@@ -1,3 +1,50 @@
+2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.cc (creturn): Reorganize to avoid a new compiler
+	warning/error.
+	* dtable.cc (handle_to_fn): Ditto.
+	* fhandler_console.cc (fhandler_console::read): Ditto.
+	(fhandler_console::scroll_screen): Ditto.
+	(dev_console::set_color): Ditto.
+	* fhandler_dsp.cc (fhandler_dev_dsp::write): Ditto.
+	(fhandler_dev_dsp::read): Ditto.
+	* fhandler_tape.cc (mtinfo_drive::get_status): Ditto.
+	* hookapi.cc (find_first_notloaded_dll): Ditto.
+	* mmap.cc (msync): Ditto.
+	* pipe.cc (pipesync::pipesync): Ditto.
+	* sec_acl.cc (getace): Ditto.
+	* sec_auth.cc (create_token): Ditto.
+	(lsaauth): Ditto.
+	* select.cc (peek_pipe): Ditto.
+	* spawn.cc (av::fixup): Ditto.
+	* syscalls.cc (popen): Ditto.
+	* tty.cc (tty::init_session): Ditto.
+	* uinfo.cc (pwdgrp::load): Ditto.
+	* fhandler.cc (fhandler_base::setup_overlapped): Ditto.
+	(fhandler_base::wait_overlapped): Rename second use of res variable to
+	wres or errors are not returned correctly.
+	* dcrt0.cc: Remove obsolete variable.
+	* dll_init.cc (release_upto): Fix typo involving incorrect use of '|'.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Avoid a
+	compiler warning regarding coercing type-punned variables.
+	(fhandler_base::fstat_by_name): Ditto.  fhandler_fifo.cc
+	(fhandler_fifo::open_nonserver): Fix = vs.  == typo.
+	(fhandler_fifo::wait): Add all conditions to switch statement to avoid
+	a compiler warning.
+	* fhandler_process.cc: Avoid unneeded initialization of variables to
+	zero.
+	(fhandler_socket::listen): Add braces around initializer.
+	* flock.cc (inode_t::get_all_locks_list): Reorganize to avoid a
+	compiler warning.  Fix problem with EWOULDBLOCK error return.
+	* path.cc (GUID_shortcut): Use braces around struct initializer.
+	(cygwin_conv_path): Reorganize to avoid a compiler warning.
+	* random.cc (dummy): Mark variable as volatile to avoid a "used
+	uninitialized" warning.
+	* libc/getopt.c: Mark some variables as dllexport although gcc doesn't
+	seem to do the right thing with them.
+	* libc/minires-os-if.c (get_registry_dns_items): Coerce some function
+	arguments to avoid a compiler warning.
+
 2008-08-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_tty.cc (close_maybe): Check for both types of invalid handle

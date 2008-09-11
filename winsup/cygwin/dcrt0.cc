@@ -104,9 +104,6 @@ extern "C"
   };
   bool ignore_case_with_glob;
   int __declspec (dllexport) _check_for_executable = true;
-#ifdef DEBUGGING
-  int pinger;
-#endif
 };
 
 int NO_COPY __api_fatal_exit_val = 1;

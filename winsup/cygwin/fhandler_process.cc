@@ -931,7 +931,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       ++*vmrss;
       unsigned flags = mwsl->WorkingSetList[i] & 0x0FFF;
-      if (flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE) == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
+      if ((flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE)) == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
 	++*vmlib;
       else if (flags & WSLE_PAGE_SHAREABLE)
 	++*vmshare;

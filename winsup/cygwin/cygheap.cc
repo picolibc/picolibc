@@ -244,14 +244,15 @@ _crealloc (void *ptr, unsigned size)
 inline static void *
 creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL)
 {
-  if (!c)
-    if (fn)
-      api_fatal ("%s would have returned NULL", fn);
-    else
-      {
-	set_errno (ENOMEM);
-	return NULL;
-      }
+  if (c)
+    /* nothing to do */;
+  else if (fn)
+    api_fatal ("%s would have returned NULL", fn);
+  else
+    {
+      set_errno (ENOMEM);
+      return NULL;
+    }
   c->type = x;
   char *cend = ((char *) c + sizeof (*c) + len);
   if (cygheap_max < cend)

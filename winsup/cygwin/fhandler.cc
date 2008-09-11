@@ -1665,7 +1665,7 @@ fhandler_base::setup_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped ();
   memset (ov, 0, sizeof (*ov));
-  return ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL);
+  return (ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
 }
 
 void
@@ -1707,9 +1707,9 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
       if (&_my_tls == _main_tls)
 	w4[n++] = signal_arrived;
       HANDLE h = writing ? get_output_handle () : get_handle ();
-      DWORD res = WaitForMultipleObjects (n, w4, false, INFINITE);
+      DWORD wres = WaitForMultipleObjects (n, w4, false, INFINITE);
       err = 0;
-      switch (res)
+      switch (wres)
 	{
 	case WAIT_OBJECT_0:
 	  debug_printf ("normal read");

@@ -506,7 +506,7 @@ out:
 		       fh->get_name ());
       else
 	{
-#if 1
+#if 0
 /* FIXME: This code is not quite correct.  There's no better solution
    so far but to make simple assumptions based on WriteQuotaAvailable. */
 
@@ -531,7 +531,7 @@ out:
 	     that.  This means that a pipe could still block since you could
 	     be trying to write more to the pipe than is available in the
 	     buffer but that is the hazard of select().  */
-	  else if (fpli.WriteQuotaAvailable = (fpli.OutboundQuota - fpli.ReadDataAvailable))
+	  else if ((fpli.WriteQuotaAvailable = (fpli.OutboundQuota - fpli.ReadDataAvailable)))
 	    {
 	      select_printf ("%s, ready for write: size %lu, avail %lu",
 			     fh->get_name (),

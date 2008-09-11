@@ -1007,24 +1007,25 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   int len_s = len;
   const char *ptr_s = static_cast <const char *> (ptr);
 
-  if (!audio_out_)
-    if (IS_WRITE ())
-      {
-	debug_printf ("Allocating");
-	if (!(audio_out_ = new Audio_out))
-	  return -1;
-
-	/* check for wave file & get parameters & skip header if possible. */
-
-	if (audio_out_->parsewav (ptr_s, len_s,
-				  audiofreq_, audiobits_, audiochannels_))
-	  debug_printf ("=> ptr_s=%08x len_s=%d", ptr_s, len_s);
-      }
-    else
-      {
-	set_errno (EBADF); // device was opened for read?
+  if (audio_out_)
+    /* nothing to do */;
+  else if (IS_WRITE ())
+    {
+      debug_printf ("Allocating");
+      if (!(audio_out_ = new Audio_out))
 	return -1;
-      }
+
+      /* check for wave file & get parameters & skip header if possible. */
+
+      if (audio_out_->parsewav (ptr_s, len_s,
+				audiofreq_, audiobits_, audiochannels_))
+	debug_printf ("=> ptr_s=%08x len_s=%d", ptr_s, len_s);
+    }
+  else
+    {
+      set_errno (EBADF); // device was opened for read?
+      return -1;
+    }
 
   /* Open audio device properly with callbacks.
      Private parameters were set in call to parsewav.
@@ -1046,23 +1047,24 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
   if ((fhandler_dev_dsp *) archetype != this)
     return ((fhandler_dev_dsp *)archetype)->read(ptr, len);
 
-  if (!audio_in_)
-    if (IS_READ ())
-      {
-	debug_printf ("Allocating");
-	if (!(audio_in_ = new Audio_in))
-	  {
-	    len = (size_t)-1;
-	    return;
-	  }
-	audio_in_->setconvert (audioformat_);
-      }
-    else
-      {
-	len = (size_t)-1;
-	set_errno (EBADF); // device was opened for write?
-	return;
-      }
+  if (audio_in_)
+    /* nothing to do */;
+  else if (IS_READ ())
+    {
+      debug_printf ("Allocating");
+      if (!(audio_in_ = new Audio_in))
+	{
+	  len = (size_t)-1;
+	  return;
+	}
+      audio_in_->setconvert (audioformat_);
+    }
+  else
+    {
+      len = (size_t)-1;
+      set_errno (EBADF); // device was opened for write?
+      return;
+    }
 
   /* Open audio device properly with callbacks.
      This is a noop when there are successive reads in the same process */

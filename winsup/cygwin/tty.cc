@@ -81,11 +81,12 @@ tty::init_session ()
 
   if (NOTSTATE (myself, PID_USETTY))
     return;
-  if (myself->ctty == -1)
-    if (NOTSTATE (myself, PID_CYGPARENT))
-      myself->ctty = cygwin_shared->tty.attach (myself->ctty);
-    else
-      return;
+  if (myself->ctty != -1)
+    /* nothing to do */;
+  else if (NOTSTATE (myself, PID_CYGPARENT))
+    myself->ctty = cygwin_shared->tty.attach (myself->ctty);
+  else
+    return;
   if (myself->ctty == -1)
     termios_printf ("Can't attach to tty");
 }

@@ -104,7 +104,7 @@ struct symlink_info
 muto NO_COPY cwdstuff::cwd_lock;
 
 static const GUID GUID_shortcut
-			= { 0x00021401L, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46 };
+			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
 enum {
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
@@ -2775,22 +2775,24 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   switch (what)
     {
     case CCP_POSIX_TO_WIN_A:
-      p.check ((const char *) from,
-	       PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
-	       | (relative ? PC_NOFULL : 0));
-      if (p.error)
-	return_with_errno (p.error);
-      PUNICODE_STRING up = p.get_nt_native_path ();
-      buf = tp.c_get ();
-      sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
-      /* Convert native path to standard DOS path. */
-      if (!strncmp (buf, "\\??\\", 4))
-        {
-	  buf += 4;
-	  if (buf[1] != ':') /* native UNC path */
-	    *(buf += 2) = '\\';
-	}
-      lsiz = strlen (buf) + 1;
+      {
+	p.check ((const char *) from,
+		 PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
+		 | (relative ? PC_NOFULL : 0));
+	if (p.error)
+	  return_with_errno (p.error);
+	PUNICODE_STRING up = p.get_nt_native_path ();
+	buf = tp.c_get ();
+	sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
+	/* Convert native path to standard DOS path. */
+	if (!strncmp (buf, "\\??\\", 4))
+	  {
+	    buf += 4;
+	    if (buf[1] != ':') /* native UNC path */
+	      *(buf += 2) = '\\';
+	  }
+	lsiz = strlen (buf) + 1;
+      }
       break;
     case CCP_POSIX_TO_WIN_W:
       p.check ((const char *) from,

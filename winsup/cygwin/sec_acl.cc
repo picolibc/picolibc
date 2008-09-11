@@ -238,22 +238,28 @@ getace (__aclent32_t &acl, int type, int id, DWORD win_ace_mask,
   acl.a_id = id;
 
   if ((win_ace_mask & FILE_READ_BITS) && !(acl.a_perm & (S_IROTH | DENY_R)))
-    if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= S_IROTH;
-    else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm |= DENY_R;
+    {
+      if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
+	acl.a_perm |= S_IROTH;
+      else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
+	acl.a_perm |= DENY_R;
+    }
 
   if ((win_ace_mask & FILE_WRITE_BITS) && !(acl.a_perm & (S_IWOTH | DENY_W)))
-    if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= S_IWOTH;
-    else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm |= DENY_W;
+    {
+      if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
+	acl.a_perm |= S_IWOTH;
+      else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
+	acl.a_perm |= DENY_W;
+    }
 
   if ((win_ace_mask & FILE_EXEC_BITS) && !(acl.a_perm & (S_IXOTH | DENY_X)))
-    if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= S_IXOTH;
-    else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm |= DENY_X;
+    {
+      if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
+	acl.a_perm |= S_IXOTH;
+      else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
+	acl.a_perm |= DENY_X;
+    }
 }
 
 int

@@ -79,7 +79,6 @@ void __stdcall modify_handle (const char *, int, HANDLE, const char *, bool)
   __attribute__ ((regparm (3)));
 void setclexec (HANDLE, HANDLE, bool);
 void debug_fixup_after_fork_exec ();
-extern int pinger;
 
 struct handle_list
   {

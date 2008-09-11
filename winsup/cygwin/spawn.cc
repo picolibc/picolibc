@@ -974,7 +974,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 {
   const char *p;
   bool exeext = ascii_strcasematch (ext, ".exe");
-  if (exeext && real_path.iscygexec () || ascii_strcasematch (ext, ".bat"))
+  if ((exeext && real_path.iscygexec ()) || ascii_strcasematch (ext, ".bat"))
     return 0;
   if (!*ext && ((p = ext - 4) > real_path.get_win32 ())
       && (ascii_strcasematch (p, ".bat") || ascii_strcasematch (p, ".cmd")

@@ -116,29 +116,29 @@ pipesync::pipesync (HANDLE f, DWORD is_reader):
 {
   ev = CreateEvent (&sec_none_nih, true, false, NULL);
   if (!ev)
+    system_printf ("couldn't create synchronization event for non-cygwin pipe, %E");
+  else
     {
-      system_printf ("couldn't create synchronization event for non-cygwin pipe, %E");
-      goto out;
-    }
-  debug_printf ("created thread synchronization event %p", ev);
-  non_cygwin_h = f;
-  reader = !!is_reader;
-  ret_handle = NULL;
+      debug_printf ("created thread synchronization event %p", ev);
+      non_cygwin_h = f;
+      reader = !!is_reader;
+      ret_handle = NULL;
 
-  DWORD tid;
-  HANDLE ht = CreateThread (&sec_none_nih, 0, pipe_handler, this, 0, &tid);
+      DWORD tid;
+      HANDLE ht = CreateThread (&sec_none_nih, 0, pipe_handler, this, 0, &tid);
 
-  if (!ht)
-    goto out;
-  CloseHandle (ht);
+      if (!ht)
+	goto out;
+      CloseHandle (ht);
 
-  switch (WaitForSingleObject (ev, INFINITE))
-    {
-    case WAIT_OBJECT_0:
-      break;
-    default:
-      system_printf ("WFSO failed waiting for synchronization event for non-cygwin pipe, %E");
-      break;
+      switch (WaitForSingleObject (ev, INFINITE))
+	{
+	case WAIT_OBJECT_0:
+	  break;
+	default:
+	  system_printf ("WFSO failed waiting for synchronization event for non-cygwin pipe, %E");
+	  break;
+	}
     }
 
 out:

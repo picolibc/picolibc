@@ -408,9 +408,9 @@ fhandler_socket::af_local_set_secret (char *buf)
 #define LOCK_EVENTS	WaitForSingleObject (wsock_mtx, INFINITE)
 #define UNLOCK_EVENTS	ReleaseMutex (wsock_mtx)
 
-static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared)) = { 0 };
+static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared));
 
-static LONG socket_serial_number __attribute__((section (".cygwin_dll_common"), shared)) = 0;
+static LONG socket_serial_number __attribute__((section (".cygwin_dll_common"), shared));
 
 static HANDLE wsa_slot_mtx;
 
@@ -1091,7 +1091,7 @@ fhandler_socket::listen (int backlog)
 	      sin6_family: AF_INET6,
 	      sin6_port: 0,
 	      sin6_flowinfo: 0,
-	      sin6_addr: IN6ADDR_ANY_INIT,
+	      sin6_addr: {{IN6ADDR_ANY_INIT}},
 	      sin6_scope_id: 0
 	    };
 	  if (!::bind (get_socket (), (struct sockaddr *) &sin6, sizeof sin6))

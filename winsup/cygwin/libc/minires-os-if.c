@@ -325,7 +325,7 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
 	*srch++ = 0;
 	if (numAddresses < DIM(statp->nsaddr_list)) {
 	  DPRINTF(debug, "server \"%s\"\n", ap);
-	  statp->nsaddr_list[numAddresses].sin_addr.s_addr = cygwin_inet_addr(ap);
+	  statp->nsaddr_list[numAddresses].sin_addr.s_addr = cygwin_inet_addr((char *) ap);
 	  if ( statp->nsaddr_list[numAddresses].sin_addr.s_addr != 0 )
 	    numAddresses++;
 	}
@@ -335,7 +335,7 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
       statp->nscount = numAddresses;
     }
     else /* Parse the search line */
-      minires_get_search(list, statp);
+      minires_get_search((char *) list, statp);
   }
   return;
 }

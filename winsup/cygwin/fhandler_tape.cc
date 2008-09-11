@@ -801,11 +801,12 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
       get->mt_fileno = part (partition)->file;
       get->mt_blkno = part (partition)->fblock;
 
-      if (get->mt_blkno == 0)
-	if (get->mt_fileno == 0)
-	  get->mt_gstat |= GMT_BOT (-1);
-	else
-	  get->mt_gstat |= GMT_EOF (-1);
+      if (get->mt_blkno != 0)
+	/* nothing to do */;
+      else if (get->mt_fileno == 0)
+	get->mt_gstat |= GMT_BOT (-1);
+      else
+	get->mt_gstat |= GMT_EOF (-1);
       if (part (partition)->emark >= eod_hit)
 	get->mt_gstat |= GMT_EOD (-1);
       if (part (partition)->emark >= eom_hit)

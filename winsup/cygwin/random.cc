@@ -280,7 +280,7 @@ srandom(unsigned x)
 /* Avoid a compiler warning when we really want to get at the junk in
    an uninitialized variable. */
 static unsigned long
-dummy (unsigned long *x)
+dummy (unsigned volatile long *x)
 {
   return *x;
 }

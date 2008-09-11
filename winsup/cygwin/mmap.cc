@@ -1130,7 +1130,7 @@ msync (void *addr, size_t len, int flags)
 
   if (((uintptr_t) addr % getpagesize ())
       || (flags & ~(MS_ASYNC | MS_SYNC | MS_INVALIDATE))
-      || (flags & (MS_ASYNC | MS_SYNC) == (MS_ASYNC | MS_SYNC)))
+      || ((flags & (MS_ASYNC | MS_SYNC)) == (MS_ASYNC | MS_SYNC)))
     {
       set_errno (EINVAL);
       goto out;

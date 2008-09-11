@@ -798,13 +798,14 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
 	 id of the user account running current process. */
-      if (usersid != well_known_system_sid)
-	if (!GetTokenInformation (hProcToken, TokenStatistics,
-				  &stats, sizeof stats, &size))
-	  debug_printf
-	    ("GetTokenInformation(hProcToken, TokenStatistics), %E");
-	else
-	  auth_luid = stats.AuthenticationId;
+      if (usersid == well_known_system_sid)
+	/* nothing to do */;
+      else if (!GetTokenInformation (hProcToken, TokenStatistics,
+				     &stats, sizeof stats, &size))
+	debug_printf
+	  ("GetTokenInformation(hProcToken, TokenStatistics), %E");
+      else
+	auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
@@ -1103,8 +1104,10 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   authinf->checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
 					    CYGWIN_VERSION_DLL_MINOR);
-  PDWORD csp = (PDWORD) &authinf->username;
-  PDWORD csp_end = (PDWORD) ((PBYTE) authinf + authinf_size);
+  PDWORD csp;
+  PDWORD csp_end;
+  csp = (PDWORD) &authinf->username;
+  csp_end = (PDWORD) ((PBYTE) authinf + authinf_size);
   while (csp < csp_end)
     authinf->checksum += *csp++;
 

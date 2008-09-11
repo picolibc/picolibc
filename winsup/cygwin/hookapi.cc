@@ -191,29 +191,29 @@ find_first_notloaded_dll (path_conv& pc)
   PIMAGE_NT_HEADERS pExeNTHdr;
   pExeNTHdr = PEHeaderFromHModule (hm);
 
-  if (!pExeNTHdr)
-    goto out;
-
-  DWORD importRVA;
-  importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-  if (!importRVA)
-    goto out;
-
-  long delta = rvadelta (pExeNTHdr, importRVA);
-
-  // Convert imports RVA to a usable pointer
-  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
-  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
-
-  // Iterate through each import descriptor, and redirect if appropriate
-  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+  if (pExeNTHdr)
     {
-      const char *lib = rva (PSTR, hm, pd->Name - delta);
-      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
-			             | LOAD_LIBRARY_AS_DATAFILE))
+      DWORD importRVA;
+      importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      if (importRVA)
 	{
-	  static char buf[NT_MAX_PATH];
-	  res = strcpy (buf, lib);
+	  long delta = rvadelta (pExeNTHdr, importRVA);
+
+	  // Convert imports RVA to a usable pointer
+	  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
+	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
+
+	  // Iterate through each import descriptor, and redirect if appropriate
+	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+	    {
+	      const char *lib = rva (PSTR, hm, pd->Name - delta);
+	      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
+					     | LOAD_LIBRARY_AS_DATAFILE))
+		{
+		  static char buf[NT_MAX_PATH];
+		  res = strcpy (buf, lib);
+		}
+	    }
 	}
     }
 

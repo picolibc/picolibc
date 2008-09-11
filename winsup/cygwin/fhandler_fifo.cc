@@ -34,7 +34,7 @@ fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
   DWORD mode = 0;
   if (low_flags == O_RDONLY)
     mode = GENERIC_READ;
-  else if (low_flags = O_WRONLY)
+  else if (low_flags == O_WRONLY)
     mode = GENERIC_WRITE;
   else
     mode = GENERIC_READ | GENERIC_WRITE;
@@ -131,11 +131,16 @@ fhandler_fifo::wait (bool iswrite)
   switch (wait_state)
     {
     case fifo_wait_for_client:
-      bool res = ConnectNamedPipe (get_handle (), get_overlapped ());
-      DWORD dummy_bytes;
-      if (res || GetLastError () == ERROR_PIPE_CONNECTED)
-	return true;
-      return wait_overlapped (res, iswrite, &dummy_bytes);
+      {
+	bool res = ConnectNamedPipe (get_handle (), get_overlapped ());
+	DWORD dummy_bytes;
+	if (res || GetLastError () == ERROR_PIPE_CONNECTED)
+	  return true;
+	return wait_overlapped (res, iswrite, &dummy_bytes);
+      }
+    case fifo_unknown:
+    case fifo_wait_for_server:
+      /* CGF FIXME SOON: test if these really need to be handled. */
     default:
       break;
     }

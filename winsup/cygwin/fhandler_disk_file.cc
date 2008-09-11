@@ -350,11 +350,11 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   pc.file_attributes (fai_buf.fai.BasicInformation.FileAttributes);
   return fstat_helper (buf,
 		   fai_buf.fai.BasicInformation.ChangeTime.QuadPart
-		   ? *(FILETIME *) &fai_buf.fai.BasicInformation.ChangeTime
-		   : *(FILETIME *) &fai_buf.fai.BasicInformation.LastWriteTime,
-		   *(FILETIME *) &fai_buf.fai.BasicInformation.LastAccessTime,
-		   *(FILETIME *) &fai_buf.fai.BasicInformation.LastWriteTime,
-		   *(FILETIME *) &fai_buf.fai.BasicInformation.CreationTime,
+		   ? *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.ChangeTime
+		   : *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastWriteTime,
+		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastAccessTime,
+		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastWriteTime,
+		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.CreationTime,
 		   get_dev (),
 		   fai_buf.fai.StandardInformation.EndOfFile.QuadPart,
 		   fai_buf.fai.StandardInformation.AllocationSize.QuadPart,
@@ -417,11 +417,11 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   pc.file_attributes (fdi_buf.fdi.FileAttributes);
   return fstat_helper (buf,
 		       fdi_buf.fdi.ChangeTime.QuadPart ?
-		       *(FILETIME *) &fdi_buf.fdi.ChangeTime :
-		       *(FILETIME *) &fdi_buf.fdi.LastWriteTime,
-		       *(FILETIME *) &fdi_buf.fdi.LastAccessTime,
-		       *(FILETIME *) &fdi_buf.fdi.LastWriteTime,
-		       *(FILETIME *) &fdi_buf.fdi.CreationTime,
+		       *(FILETIME *) (void *) &fdi_buf.fdi.ChangeTime :
+		       *(FILETIME *) (void *) &fdi_buf.fdi.LastWriteTime,
+		       *(FILETIME *) (void *) &fdi_buf.fdi.LastAccessTime,
+		       *(FILETIME *) (void *) &fdi_buf.fdi.LastWriteTime,
+		       *(FILETIME *) (void *) &fdi_buf.fdi.CreationTime,
 		       pc.fs_serial_number (),
 		       fdi_buf.fdi.EndOfFile.QuadPart,
 		       fdi_buf.fdi.AllocationSize.QuadPart,
@@ -434,10 +434,10 @@ too_bad:
   /* Arbitrary value: 2006-12-01 */
   RtlSecondsSince1970ToTime (1164931200L, &ft);
   return fstat_helper (buf,
-		       *(FILETIME *) &ft,
-		       *(FILETIME *) &ft,
-		       *(FILETIME *) &ft,
-		       *(FILETIME *) &ft,
+		       *(FILETIME *) (void *) &ft,
+		       *(FILETIME *) (void *) &ft,
+		       *(FILETIME *) (void *) &ft,
+		       *(FILETIME *) (void *) &ft,
 		       0,
 		       0ULL,
 		       -1LL,

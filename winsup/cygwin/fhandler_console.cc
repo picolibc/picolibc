@@ -261,7 +261,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
 	  if (input_rec.Event.KeyEvent.bKeyDown &&
 	      virtual_key_code == VK_SCROLL &&
-	      control_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED) == LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED
+	      ((control_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED)) == (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
 	    )
 	    {
 	      set_raw_win32_keyboard_mode (!dev_state->raw_win32_keyboard_mode);
@@ -568,11 +568,12 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance
    * is more than half of screen, filling doesn't work as expected */
 
-  if (sr1.Top != sr1.Bottom)
-    if (dest.Y <= sr1.Top)	/* forward scroll */
-      clear_screen (0, 1 + dest.Y + sr1.Bottom - sr1.Top, sr2.Right, sr2.Bottom);
-    else			/* reverse scroll */
-      clear_screen (0, sr1.Top, sr2.Right, dest.Y - 1);
+  if (sr1.Top == sr1.Bottom)
+    /* nothing to do */;
+  else if (dest.Y <= sr1.Top)	/* forward scroll */
+    clear_screen (0, 1 + dest.Y + sr1.Bottom - sr1.Top, sr2.Right, sr2.Bottom);
+  else			/* reverse scroll */
+    clear_screen (0, sr1.Top, sr2.Right, dest.Y - 1);
 }
 
 int
@@ -895,12 +896,13 @@ dev_console::set_color (HANDLE h)
     win_bg |= BACKGROUND_INTENSITY;
   if (intensity == INTENSITY_INVISIBLE)
     win_fg = win_bg;
-  else if (intensity == INTENSITY_BOLD)
+  else if (intensity != INTENSITY_BOLD)
+    /* nothing to do */;
     /* apply foreground intensity only in non-reverse mode! */
-    if (reverse)
-      win_bg |= BACKGROUND_INTENSITY;
-    else
-      win_fg |= FOREGROUND_INTENSITY;
+  else if (reverse)
+    win_bg |= BACKGROUND_INTENSITY;
+  else
+    win_fg |= FOREGROUND_INTENSITY;
 
   current_win32_attr = win_fg | win_bg;
   if (h)

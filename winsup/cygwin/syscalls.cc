@@ -3517,14 +3517,13 @@ popen (const char *command, const char *in_type)
     fcntl64 (stdwhat, F_SETFD, state);
   }
 
-  if (pid < 0)
-    goto err;
-  close (other_fd);
-
-  fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[fd];
-  fh->set_popen_pid (pid);
-
-  return fp;
+  if (pid >= 0)
+    {
+      close (other_fd);
+      fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[fd];
+      fh->set_popen_pid (pid);
+      return fp;
+    }
 
 err:
   int save_errno = get_errno ();

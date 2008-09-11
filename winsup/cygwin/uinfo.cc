@@ -577,8 +577,7 @@ pwdgrp::load (const wchar_t *rel_path)
       goto out;
     }
   buf[fsi.EndOfFile.LowPart] = '\0';
-  char *eptr = buf;
-  while ((eptr = add_line (eptr)))
+  for (char *eptr = buf; (eptr = add_line (eptr)); )
     continue;
   debug_printf ("%W curr_lines %d", rel_path, curr_lines);
   res = succeeded;
