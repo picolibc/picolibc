@@ -426,7 +426,7 @@ static __inline vector float _lgammaf4(vector float x)
   vec_float4 xappr = spu_sub(xabs, xoffset);
 
   /* If in Stirling partition, do some setup before the madds */
-  xappr = spu_sel(xappr, inv_xsqu, gt_r7start);
+  xappr = spu_sel(xappr, inv_xsqu, (vector unsigned int)gt_r7start);
 
 
 
@@ -463,13 +463,13 @@ static __inline vector float _lgammaf4(vector float x)
    */
 
   /* Finish the Near 0 formula */
-  result = spu_sel(spu_sub(result, ln_x), result, gt_r1start);
+  result = spu_sel(spu_sub(result, ln_x), result, (vector unsigned int)gt_r1start);
 
   /* Finish Stirling's Approximation */
   vec_float4 resultstirling = spu_madd(spu_sub(xabs, spu_splats(0.5f)), ln_x, halflog2pi);
   resultstirling = spu_sub(resultstirling, xabs);
   resultstirling = spu_add(spu_mul(result,inv_x), resultstirling);
-  result = spu_sel(result, resultstirling, gt_r7start);
+  result = spu_sel(result, resultstirling, (vector unsigned int)gt_r7start);
 
 
   /* Adjust due to systematic truncation */

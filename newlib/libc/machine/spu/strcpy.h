@@ -30,6 +30,7 @@
 
 #include <spu_intrinsics.h>
 #include "vec_literal.h"
+#include <string.h>
 
 /*
  * Supply an inline _strncpy for strcpy/cat and strncpy/cat. Relies on

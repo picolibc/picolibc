@@ -1,3 +1,9 @@
+2008-09-10  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/strcpy.h: Add missing header.
+	* libc/machine/spu/spu_timer_slih.c: Remove unused Variable.
+	* libm/machine/spu/headers/lgammaf4.h: Add type cast.
+
 2008-09-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/dl/atomicity.h (exchange_and_add): Fix asm

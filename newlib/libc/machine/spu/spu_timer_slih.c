@@ -55,7 +55,7 @@ __reset_spu_decr (int val)
      value is the current timeout value minus the current decrementer value.
      Occasionally the read returns 0 - a second read will clear this
      condition.  */
-  int decval0 = spu_readch (SPU_RdDec);
+  spu_readch (SPU_RdDec);
   int decval = spu_readch (SPU_RdDec);
   /* Restart decrementer with next timeout val.  */
   __enable_spu_decr (enable_val, mask);
