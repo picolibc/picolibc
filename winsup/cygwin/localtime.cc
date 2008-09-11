@@ -1788,7 +1788,8 @@ ctime_r(const time_t *timep, char *buf)
 ** Simplified normalize logic courtesy Paul Eggert (eggert@twinsun.com).
 */
 
-static int
+/* Mark as noinline to prevent a compiler warning. */
+static int __attribute__((noinline))
 increment_overflow(int *number, int delta)
 {
 	int	number0;

@@ -921,7 +921,7 @@ peek_serial (select_record *s, bool)
   set_handle_or_return_if_not_open (h, s);
   int ready = 0;
 
-  if (s->read_selected && s->read_ready || (s->write_selected && s->write_ready))
+  if ((s->read_selected && s->read_ready) || (s->write_selected && s->write_ready))
     {
       select_printf ("already ready");
       ready = 1;

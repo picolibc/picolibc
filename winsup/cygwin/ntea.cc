@@ -65,14 +65,15 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       /* Samba hides the user namespace from Windows clients.  If we try to
 	 retrieve a user namespace item, we remove the leading namespace from
 	 the name, otherwise the search fails. */
-      if (pc.fs_is_samba ())
-	if (ascii_strncasematch (name, "user.", 5))
-	  name += 5;
-	else
-	  {
-	    set_errno (ENOATTR);
-	    goto out;
-	  }
+      if (!pc.fs_is_samba ())
+	/* nothing to do */;
+      else if (ascii_strncasematch (name, "user.", 5))
+	name += 5;
+      else
+	{
+	  set_errno (ENOATTR);
+	  goto out;
+	}
 
       if ((nlen = strlen (name)) >= MAX_EA_NAME_LEN)
 	{

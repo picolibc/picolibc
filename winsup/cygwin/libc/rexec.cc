@@ -206,7 +206,7 @@ next:
 		while ((t = token()) && t != MACH && t != DEFAULT) switch(t) {
 
 		case LOGIN:
-			if (token())
+			if (token()) {
 				if (*aname == 0) {
 					*aname = (char *) malloc((unsigned) strlen(tokval) + 1);
 					(void) strcpy(*aname, tokval);
@@ -214,6 +214,7 @@ next:
 					if (strcmp(*aname, tokval))
 						goto next;
 				}
+			}
 			break;
 		case PASSWD:
 			if ((*aname == 0 || strcmp(*aname, "anonymous")) &&

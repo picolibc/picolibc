@@ -1,5 +1,16 @@
 2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* localtime.cc (increment_overflow): Mark as non-inline to prevent
+	compiler from complaining about the very thing we're trying to test.
+	* ntea.cc (read_ea): Reorganize to avoid a new compiler warning/error.
+	* sched.cc (sched_rr_get_interval): Ditto.
+	* select.cc (peek_serial): Ditto.
+	* libc/rexec.cc (ruserpass): Ditto.
+	* posix_ipc.cc (ipc_names): Make static to avoid a compiler warning
+	(and it's the right thing to do anyway).
+
+2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* net.cc (in6addr_any, in6addr_loopback): Add appropriate number of
 	braces around initializer.
 	(dup_ent): Try harder to coerce the first argument to deal with more

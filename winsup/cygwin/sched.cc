@@ -295,7 +295,7 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
     qindex = 0;
   vfindex = ((prisep >> 2) & 3) % 3;
   if (vfindex == 0)
-    vfindex = wincap.is_server () || prisep & 3 == 0 ? 1 : 0;
+    vfindex = wincap.is_server () || (prisep & 3) == 0 ? 1 : 0;
   else
     vfindex -= 1;
   slindex = ((prisep >> 4) & 3) % 3;

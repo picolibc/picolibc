@@ -26,7 +26,7 @@ details. */
 
 /* The prefix_len is the length of the path prefix ncluding trailing "/"
    (or "/sem." for semaphores) as well as the trailing NUL. */
-struct
+static struct
 {
   const char *prefix;
   const size_t prefix_len;

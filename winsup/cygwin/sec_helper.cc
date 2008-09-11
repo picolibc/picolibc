@@ -140,7 +140,7 @@ PSID
 cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
 {
   DWORD i;
-  SID_IDENTIFIER_AUTHORITY sid_auth = {0,0,0,0,0,0};
+  SID_IDENTIFIER_AUTHORITY sid_auth = {{0,0,0,0,0,0}};
 
   if (s > 255 || cnt < 1 || cnt > 8)
     {
