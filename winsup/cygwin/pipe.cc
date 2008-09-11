@@ -292,7 +292,7 @@ fhandler_pipe::get_proc_fd_name (char *buf)
   return buf;
 }
 
-void __stdcall
+void
 fhandler_pipe::raw_read (void *in_ptr, size_t& in_len)
 {
   return read_overlapped (in_ptr, in_len);
