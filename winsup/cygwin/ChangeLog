@@ -1,5 +1,16 @@
 2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* net.cc (in6addr_any, in6addr_loopback): Add appropriate number of
+	braces around initializer.
+	(dup_ent): Try harder to coerce the first argument to deal with more
+	stringent compiler.
+	(get_2k_ifs): Remove extraneous typedef.
+	(get_2k_ifs): Reorganize expression to avoid a compiler warning.
+	(get_xp_ifs): Ditto.
+	(get_nt_ifs): Ditto.
+
+2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_pipe::raw_read): Remove __stdcall decoration.
 	* pipe.cc (fhandler_pipe::raw_read): Ditto.
 

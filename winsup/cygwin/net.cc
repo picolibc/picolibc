@@ -54,8 +54,8 @@ extern "C"
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
 }				/* End of "C" section */
 
-const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
-const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+const struct in6_addr in6addr_loopback = {{IN6ADDR_LOOPBACK_INIT}};
 
 static fhandler_socket *
 get (const int fd)
@@ -322,7 +322,8 @@ static const char *entnames[] = {"host", "proto", "serv"};
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
-#define dup_ent(old, src, type) __dup_ent ((unionent *&) (_my_tls.locals.old), (unionent *) (src), type)
+/* FIXME: Use an overloaded function or template here. */
+#define dup_ent(old, src, type) __dup_ent ((unionent *&) *((unionent *) _my_tls.locals.old), (unionent *) (src), type)
 #ifdef DEBUGGING
 static void *
 #else
@@ -1426,7 +1427,7 @@ get_xp_ifs (ULONG family)
 		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
 		  uint32_t mask =
 		  ((struct sockaddr_in *) &ifp->ifa_netmask)->sin_addr.s_addr;
-		  if_sin->sin_addr.s_addr = sin->sin_addr.s_addr & mask | ~mask;
+		  if_sin->sin_addr.s_addr = (sin->sin_addr.s_addr & mask) | ~mask;
 		  if_sin->sin_family = AF_INET;
 		  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
 					       &ifp->ifa_brddstaddr;
@@ -1489,7 +1490,7 @@ get_2k_ifs ()
   struct ifall *ifret = NULL, *ifp = NULL;
   struct sockaddr_in *if_sin;
 
-  typedef struct ifcount_t
+  struct ifcount_t
   {
     DWORD ifIndex;
     size_t count;
@@ -1636,8 +1637,7 @@ get_2k_ifs ()
 	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
 #else
 	      uint32_t mask = ipt->table[ip_cnt].dwMask;
-	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr
-					& mask | ~mask;
+	      if_sin->sin_addr.s_addr = (ipt->table[ip_cnt].dwAddr & mask) | ~mask;
 #endif
 	      ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
 					   &ifp->ifa_brddstaddr;
@@ -1889,7 +1889,7 @@ get_nt_ifs ()
 		  lip = cygwin_inet_addr (dhcp ? dhcpaddress : ip);
 		  lnp = cygwin_inet_addr (dhcp ? dhcpnetmask : np);
 		  sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-		  sin->sin_addr.s_addr = lip & lnp | ~lnp;
+		  sin->sin_addr.s_addr = (lip & lnp) | ~lnp;
 		  sin->sin_family = AF_INET;
 		  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
 					       &ifp->ifa_brddstaddr;

@@ -606,7 +606,7 @@ inline char *
 conv_fstab_spaces (char *field)
 {
   register char *sp = field;
-  while (sp = strstr (sp, "\\040"))
+  while ((sp = strstr (sp, "\\040")) != NULL)
     {
       *sp++ = ' ';
       memmove (sp, sp + 3, strlen (sp + 3) + 1);
