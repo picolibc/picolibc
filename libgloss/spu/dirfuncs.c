@@ -56,22 +56,30 @@ typedef struct {
   unsigned int pad0[3];
 } syscall_opendir_t;
 
+typedef struct {
+  uint64_t dir;
+  unsigned int pad0[2];
+} syscall_opendir_ret_t;
+
 DIR *
 opendir (const char *name)
 {
   DIR *dir;
-  int ppc_dir, i;
-  syscall_opendir_t sys;
+  int i;
+  union {
+    syscall_opendir_t sys;
+    syscall_opendir_ret_t ret;
+  } u;
 
-  sys.name = (unsigned int) name;
+  u.sys.name = (unsigned int) name;
   for (i = 0; i < SPE_OPENDIR_MAX; i++) {
     if (!spe_dir[i].ppc_dir) {
       dir = &spe_dir[i];
-      __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPENDIR, &sys);
+      __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_OPENDIR, &u);
       /*
        * Pull 64 bits out of the result.
        */
-      dir->ppc_dir = ((uint64_t*)&sys)[0];
+      dir->ppc_dir = u.ret.dir;
       if (!dir->ppc_dir) {
         dir = NULL;
       }
@@ -163,5 +171,5 @@ telldir (DIR *dir)
 {
   uint64_t ppc_dir = dir->ppc_dir;
 
-  __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_TELLDIR, &ppc_dir);
+  return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_TELLDIR, &ppc_dir);
 }

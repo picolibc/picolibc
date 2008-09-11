@@ -1,3 +1,8 @@
+2008-09-10  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/dirfuncs.c: Avoid warnings.
+	* spu/kill.c: Likewise.
+
 2008-09-04  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/Makefile.in: Fix missing linux_syscalls.o.

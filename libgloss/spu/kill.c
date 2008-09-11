@@ -31,6 +31,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
 #include <unistd.h>
+#include <errno.h>
 
 int
 kill (int pid, int sig)
@@ -39,5 +40,7 @@ kill (int pid, int sig)
 	  {
 		  _exit (sig);
 	  }
+	errno = ESRCH;
+	return -1;
 }
 
