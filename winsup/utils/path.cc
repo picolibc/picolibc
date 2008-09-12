@@ -35,8 +35,8 @@ details. */
    })
 
 
-static const GUID GUID_shortcut
-			= { 0x00021401L, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46 };
+static const GUID GUID_shortcut =
+  {0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
 enum {
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
@@ -276,7 +276,7 @@ inline char *
 conv_fstab_spaces (char *field)
 {
   register char *sp = field;
-  while (sp = strstr (sp, "\\040"))
+  while ((sp = strstr (sp, "\\040")) != NULL)
     {
       *sp++ = ' ';
       memmove (sp, sp + 3, strlen (sp + 3) + 1);
@@ -284,7 +284,7 @@ conv_fstab_spaces (char *field)
   return field;
 }
 
-struct opt
+static struct opt
 {
   const char *name;
   unsigned val;
@@ -503,7 +503,7 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
 }
 #endif
 
-int
+static int
 mnt_sort (const void *a, const void *b)
 {
   const mnt_t *ma = (const mnt_t *) a;

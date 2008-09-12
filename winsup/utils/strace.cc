@@ -131,7 +131,7 @@ add_child (DWORD id, HANDLE hproc)
       lasth = children.next->hproc = hproc;
       processes++;
       if (!quiet)
-	fprintf (stderr, "Windows process %d attached\n", id);
+	fprintf (stderr, "Windows process %lu attached\n", id);
     }
 }
 
@@ -148,7 +148,7 @@ remove_child (DWORD id)
 	c->next = c1->next;
 	free (c1);
 	if (!quiet)
-	  fprintf (stderr, "Windows process %d detached\n", id);
+	  fprintf (stderr, "Windows process %lu detached\n", id);
 	processes--;
 	return;
       }
@@ -650,7 +650,7 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	    {
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
-		fprintf (ofile, "--- Process %u, exception %p at %p\n", ev.dwProcessId,
+		fprintf (ofile, "--- Process %lu, exception %p at %p\n", ev.dwProcessId,
 			 ev.u.Exception.ExceptionRecord.ExceptionCode,
 			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
 	    }

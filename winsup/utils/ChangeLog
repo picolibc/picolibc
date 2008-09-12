@@ -1,3 +1,28 @@
+2008-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (pathlike::check_existence): Remove class name from
+	declaration.
+	(display_internet_error): Use proper format specifier for DWORD.
+	(environ): Remove unneeded declaration.
+	(main): Use brace around nested if to avoid an overly-helpful compiler
+	warning.
+	* dump_setup.cc (parse_filename): Reorganize nested if to avoid an
+	overly-helpful compiler warning.
+	* path.cc (GUID_shortcut): Use braces around part of initializer which
+	needs them.
+	(conv_fstab_spaces): Parenthesize assignment in while loop to avoid a
+	compiler warning.
+	(struct opt): Make static.
+	* ps.cc (main): Reorganize nested if to avoid an overly-helpful
+	compiler warning.
+	* regtool.cc: Make some anonymous structs static to avoid a compiler
+	warning.
+	* ssp.c (lookup_thread_id): Initialize *tix to zero to avoid potential
+	uninitialized use.
+	* strace.cc (add_child): Use proper format specifier for DWORD.
+	(remove_child): Ditto.
+	(proc_child): Ditto.
+
 2008-08-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygcheck.cc (nuke): Use malloc rather than alloca for environment

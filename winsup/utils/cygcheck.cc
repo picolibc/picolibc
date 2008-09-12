@@ -124,9 +124,9 @@ struct pathlike
 {
   char *dir;
   bool issys;
-  void pathlike::check_existence (const char *fn, int showall, int verbose,
-				  char* first, const char *ext1 = "",
-				  const char *ext2 = "");
+  void check_existence (const char *fn, int showall, int verbose,
+			char* first, const char *ext1 = "",
+			const char *ext2 = "");
 };
 
 pathlike *paths;
@@ -201,7 +201,7 @@ display_internet_error (const char *message, ...)
 	  sizeof (err_buf), NULL) == 0)
 	strcpy (err_buf, "(Unknown error)");
 
-      fprintf (stderr, "cygcheck: %s: %s (win32 error %d)\n", message,
+      fprintf (stderr, "cygcheck: %s: %s (win32 error %lu)\n", message,
 	       err_buf, err);
     }
   else
@@ -900,9 +900,6 @@ cygcheck (const char *app)
   did = NULL;
   return track_down (papp, ".exe", 0);
 }
-
-
-extern char **environ;
 
 struct RegInfo
 {
@@ -2115,11 +2112,13 @@ main (int argc, char **argv)
   if (posixly == NULL)
     putenv ("POSIXLY_CORRECT=");
 
-  if (argc == 0 && !sysinfo && !keycheck && !check_setup && !list_package)
-    if (givehelp)
-      usage (stdout, 0);
-    else
-      usage (stderr, 1);
+  if ((argc == 0) && !sysinfo && !keycheck && !check_setup && !list_package)
+    {
+      if (givehelp)
+	usage (stdout, 0);
+      else
+	usage (stderr, 1);
+    }
 
   if ((check_setup || sysinfo || find_package || list_package || grep_packages)
       && keycheck)

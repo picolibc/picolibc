@@ -91,24 +91,25 @@ parse_filename (const char *in_fn, fileparse& f)
   f.pkg[0] = f.what[0] = '\0';
   p = base (fn);
   for (ver = p; *ver; ver++)
-    if (*ver == '-')
-      if (isdigit (ver[1]))
-	{
-	  *ver++ = '\0';
-	  strcpy (f.pkg, p);
-	  break;
-	}
-      else if (strcasecmp (ver, "-src") == 0 ||
-	       strcasecmp (ver, "-patch") == 0)
-	{
-	  *ver++ = '\0';
-	  strcpy (f.pkg, p);
-	  strcpy (f.what, strlwr (ver));
-	  strcpy (f.pkgtar, p);
-	  strcat (f.pkgtar, f.tail);
-	  ver = strchr (ver, '\0');
-	  break;
-	}
+    if (*ver != '-')
+      continue;
+    else if (isdigit (ver[1]))
+      {
+	*ver++ = '\0';
+	strcpy (f.pkg, p);
+	break;
+      }
+    else if (strcasecmp (ver, "-src") == 0 ||
+	     strcasecmp (ver, "-patch") == 0)
+      {
+	*ver++ = '\0';
+	strcpy (f.pkg, p);
+	strcpy (f.what, strlwr (ver));
+	strcpy (f.pkgtar, p);
+	strcat (f.pkgtar, f.tail);
+	ver = strchr (ver, '\0');
+	break;
+      }
 
   if (!f.pkg[0])
     strcpy (f.pkg, p);

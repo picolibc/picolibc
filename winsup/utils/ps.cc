@@ -344,14 +344,15 @@ main (int argc, char *argv[])
       if ((proc_id > 0) && (p->pid != proc_id))
 	continue;
 
-      if (!aflag)
-	if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
-	  {
-	    if (p->uid32 != (__uid32_t) uid)
-	      continue;
-	  }
-	else if (p->uid != uid)
-	  continue;
+      if (aflag)
+	/* nothing to do */;
+      else if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
+	{
+	  if (p->uid32 != (__uid32_t) uid)
+	    continue;
+	}
+      else if (p->uid != uid)
+	continue;
       char status = ' ';
       if (p->process_state & PID_STOPPED)
 	status = 'S';

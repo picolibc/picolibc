@@ -202,7 +202,7 @@ Fail (DWORD rv)
   exit (1);
 }
 
-struct
+static struct
 {
   const char *string;
   HKEY key;
@@ -865,8 +865,7 @@ cmd_save ()
   return 0;
 }
 
-
-struct
+static struct
 {
   const char *name;
   int (*func) ();
