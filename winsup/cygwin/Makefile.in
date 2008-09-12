@@ -451,7 +451,7 @@ lib%.a: %.o
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\
 	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
-	$(COMPILE_CXX) -o version.o version.cc && \
+	$(COMPILE_CXX) -c -o version.o version.cc && \
 	touch $@
 
 Makefile: cygwin.din
@@ -460,7 +460,7 @@ $(DEF_FILE): gendef cygwin.din $(srcdir)/tlsoffsets.h
 	$^ $@ sigfe.s
 
 $(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
-	$^ $@ $(COMPILE_CXX)
+	$^ $@ $(COMPILE_CXX) -c
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \

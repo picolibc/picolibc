@@ -174,6 +174,7 @@ ceilf NOSIGFE
 _ceilf = ceilf NOSIGFE
 cfgetispeed NOSIGFE
 cfgetospeed NOSIGFE
+cfmakeraw NOSIGFE
 cfsetispeed SIGFE
 cfsetospeed SIGFE
 chdir SIGFE

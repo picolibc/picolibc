@@ -330,6 +330,7 @@ int tcsendbreak (int, int);
 int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
+void cfmakeraw (struct termios *);
 int cfsetispeed (struct termios *, speed_t);
 int cfsetospeed (struct termios *, speed_t);
 

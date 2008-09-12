@@ -1,3 +1,11 @@
+2008-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Add -c option which is now removed from COMPILE_C*.
+	* cygwin.din (cfmakeraw): Export.
+	* termios.cc (cfmakeraw): Implement.
+	* include/sys/termios.h (cfmakeraw): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2008-09-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin.din (sys_sigabbrev): Add this here.
