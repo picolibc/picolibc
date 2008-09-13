@@ -1,3 +1,10 @@
+2008-09-13  mega-squall  <mega-squall@users.sf.net>
+
+	* include/winnt.h (SUBLANG_BENGALI_INDIA, SUBLANG_PUNJABI_INDIA,
+	SUBLANG_ROMANIAN_ROMANIA): Correct definition.
+	(SUBLANG_BENGALI_BANGLADESH, SUBLANG_PUNJABI_PAKISTAN,
+	SUBLANG_ROMANIAN_MOLDOVA): Define.
+
 2008-09-11  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/shlwapi.h (ASSOCSTR): Update enum.
