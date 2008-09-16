@@ -1,3 +1,22 @@
+2008-09-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.h (unionent): Move from net.cc.
+	(unionent::struct_type): Move enum here.
+	(_local_storage::hostent_buf): Define as unionent.
+	(_local_storage::protoent_buf): Ditto.
+	(_local_storage::servent_buf): Ditto.
+	* net.cc (unionent): Move to cygtls.h.
+	(struct_type): Ditto.
+	(dup_ent): Define one function per {host,proto,serv}ent type.
+	(cygwin_getprotobyname): Simplify dup_ent call.  Removed now-unneeded
+	return type coercion.
+	(cygwin_getprotobynumber): Ditto.
+	(cygwin_getservbyname): Ditto.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto.
+	(cygwin_gethostbyaddr): Ditto.
+	tlsoffsets.h: Regenerate.
+
 2008-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Add -c option which is now removed from COMPILE_C*.
@@ -73,13 +92,14 @@
 	* dll_init.cc (release_upto): Fix typo involving incorrect use of '|'.
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Avoid a
 	compiler warning regarding coercing type-punned variables.
-	(fhandler_base::fstat_by_name): Ditto.  fhandler_fifo.cc
-	(fhandler_fifo::open_nonserver): Fix = vs.  == typo.
+	(fhandler_base::fstat_by_name): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::open_nonserver): Fix = vs.  == typo.
 	(fhandler_fifo::wait): Add all conditions to switch statement to avoid
 	a compiler warning.
 	* fhandler_process.cc: Avoid unneeded initialization of variables to
 	zero.
-	(fhandler_socket::listen): Add braces around initializer.
+	* fhandler_socket.cc (fhandler_socket::listen): Add braces around
+	initializer.
 	* flock.cc (inode_t::get_all_locks_list): Reorganize to avoid a
 	compiler warning.  Fix problem with EWOULDBLOCK error return.
 	* path.cc (GUID_shortcut): Use braces around struct initializer.

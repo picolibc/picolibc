@@ -293,24 +293,6 @@ struct pservent
 };
 #pragma pack(pop)
 
-struct unionent
-{
-  char *name;
-  char **list;
-  short port_proto_addrtype;
-  short h_len;
-  union
-  {
-    char *s_proto;
-    char **h_addr_list;
-  };
-};
-
-enum struct_type
-{
-  t_hostent, t_protoent, t_servent
-};
-
 static const char *entnames[] = {"host", "proto", "serv"};
 
 /* Generic "dup a {host,proto,serv}ent structure" function.
@@ -322,18 +304,16 @@ static const char *entnames[] = {"host", "proto", "serv"};
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
-/* FIXME: Use an overloaded function or template here. */
-#define dup_ent(old, src, type) __dup_ent ((unionent *&) *((unionent *) _my_tls.locals.old), (unionent *) (src), type)
 #ifdef DEBUGGING
 static void *
 #else
 static inline void *
 #endif
-__dup_ent (unionent *&dst, unionent *src, struct_type type)
+dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 {
   if (dst)
     debug_printf ("old %sent structure \"%s\" %p\n", entnames[type],
-		  ((unionent *) dst)->name, dst);
+		  dst->name, dst);
 
   if (!src)
     {
@@ -347,13 +327,13 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
   int sz, struct_sz;
   switch (type)
     {
-    case t_protoent:
+    case unionent::t_protoent:
       struct_sz = sizeof (protoent);
       break;
-    case t_servent:
+    case unionent::t_servent:
       struct_sz = sizeof (servent);
       break;
-    case t_hostent:
+    case unionent::t_hostent:
       struct_sz = sizeof (hostent);
       break;
     default:
@@ -386,12 +366,12 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
   /* Do servent/hostent specific processing */
   int protolen = 0;
   int addr_list_len = 0;
-  if (type == t_servent)
+  if (type == unionent::t_servent)
     {
       if (src->s_proto)
 	sz += (protolen = strlen_round (src->s_proto));
     }
-  else if (type == t_hostent)
+  else if (type == unionent::t_hostent)
     {
       /* Calculate the length and storage used for h_addr_list */
       for (av = src->h_addr_list; av && *av; av++)
@@ -412,7 +392,6 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
   unsigned rsz = 256 * ((sz + 255) / 256);
   dst = (unionent *) realloc (dst, rsz);
 
-  /* Hopefully, this worked. */
   if (dst)
     {
       memset (dst, 0, sz);
@@ -444,9 +423,9 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
 	}
 
       /* Do servent/protoent/hostent specific processing. */
-      if (type == t_protoent)
+      if (type == unionent::t_protoent)
 	debug_printf ("protoent %s %x %x", dst->name, dst->list, dst->port_proto_addrtype);
-      else if (type == t_servent)
+      else if (type == unionent::t_servent)
 	{
 	  if (src->s_proto)
 	    {
@@ -454,7 +433,7 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
 	      dp += protolen;
 	    }
 	}
-      else if (type == t_hostent)
+      else if (type == unionent::t_hostent)
 	{
 	  /* Transfer h_len and duplicate contents of h_addr_list, using
 	     memory after 'list' allocation. */
@@ -474,6 +453,24 @@ __dup_ent (unionent *&dst, unionent *src, struct_type type)
   return dst;
 }
 
+static inline hostent *
+dup_ent (hostent *src)
+{
+  return (hostent *) dup_ent (_my_tls.locals.hostent_buf, (unionent *) src, unionent::t_hostent);
+}
+
+static inline protoent *
+dup_ent (protoent *src)
+{
+  return (protoent *) dup_ent (_my_tls.locals.protoent_buf, (unionent *) src, unionent::t_protoent);
+}
+
+static inline servent *
+dup_ent (servent *src)
+{
+  return (servent *) dup_ent (_my_tls.locals.servent_buf, (unionent *) src, unionent::t_servent);
+}
+
 /* exported as getprotobyname: standards? */
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
@@ -481,14 +478,14 @@ cygwin_getprotobyname (const char *p)
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
-  return (protoent *) dup_ent (protoent_buf, getprotobyname (p), t_protoent);
+  return dup_ent (getprotobyname (p));
 }
 
 /* exported as getprotobynumber: standards? */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  return (protoent *) dup_ent (protoent_buf, getprotobynumber (number), t_protoent);
+  return dup_ent (getprotobynumber (number));
 }
 
 bool
@@ -786,7 +783,7 @@ cygwin_getservbyname (const char *name, const char *proto)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  servent *res = (servent *) dup_ent (servent_buf, getservbyname (name, proto), t_servent);
+  servent *res = dup_ent (getservbyname (name, proto));
   syscall_printf ("%p = getservbyname (%s, %s)", res, name, proto);
   return res;
 }
@@ -800,8 +797,8 @@ cygwin_getservbyport (int port, const char *proto)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  servent *res = (servent *) dup_ent (servent_buf, getservbyport (port, proto), t_servent);
-  syscall_printf ("%p = getservbyport (%d, %s)", _my_tls.locals.servent_buf, port, proto);
+  servent *res = dup_ent (getservbyport (port, proto));
+  syscall_printf ("%p = getservbyport (%d, %s)", res, port, proto);
   return res;
 }
 
@@ -863,7 +860,7 @@ cygwin_gethostbyname (const char *name)
       h = &tmp;
     }
 
-  hostent *res = (hostent *) dup_ent (hostent_buf, h, t_hostent);
+  hostent *res = dup_ent (h);
   if (res)
     debug_printf ("h_name %s", res->h_name);
   else
@@ -883,9 +880,9 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  hostent *res = (hostent *) dup_ent (hostent_buf, gethostbyaddr (addr, len, type), t_hostent);
+  hostent *res = dup_ent (gethostbyaddr (addr, len, type));
   if (res)
-    debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
+    debug_printf ("h_name %s", res->h_name);
   else
     set_host_errno ();
   return res;

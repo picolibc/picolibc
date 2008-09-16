@@ -51,6 +51,24 @@ public:
   friend class _cygtls;
 };
 
+class unionent
+{
+public:
+  char *name;
+  char **list;
+  short port_proto_addrtype;
+  short h_len;
+  union
+  {
+    char *s_proto;
+    char **h_addr_list;
+  };
+  enum struct_type
+  {
+    t_hostent, t_protoent, t_servent
+  };
+};
+
 struct _local_storage
 {
   /*
@@ -102,10 +120,11 @@ struct _local_storage
 
   /* net.cc */
   char *ntoa_buf;			// note: malloced
-  struct protoent *protoent_buf;	// note: malloced
-  struct servent *servent_buf;		// note: malloced
-  struct hostent *hostent_buf;		// note: malloced
   char signamebuf[sizeof ("Unknown signal 4294967295   ")];
+
+  unionent *hostent_buf;		// note: malloced
+  unionent *protoent_buf;		// note: malloced
+  unionent *servent_buf;		// note: malloced
 
   /* cygthread.cc */
   char unknown_thread_name[30];
