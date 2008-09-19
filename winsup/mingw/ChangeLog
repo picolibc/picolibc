@@ -1,3 +1,13 @@
+2008-09-19  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Fix MinGW-Bug [2117379].
+	(Reported by Peiyuan Song).
+
+	* include/stdio.h (__argv): Replace all references in function
+	prototype argument lists and inline function local variables, with ...
+	(__local_argv): ...this, to avoid potential conflict with ...
+	* include/stdlib (__argv): ...this #defined macro.
+
 2008-09-07 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.15.

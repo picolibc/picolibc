@@ -242,9 +242,9 @@ __mingw_stdio_redirect__
 int fprintf (FILE *__stream, const char *__format, ...)
 {
   register int __retval;
-  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
-  __retval = __mingw_vfprintf( __stream, __format, __argv );
-  __builtin_va_end( __argv );
+  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
+  __retval = __mingw_vfprintf( __stream, __format, __local_argv );
+  __builtin_va_end( __local_argv );
   return __retval;
 }
 
@@ -252,9 +252,9 @@ __mingw_stdio_redirect__
 int printf (const char *__format, ...)
 {
   register int __retval;
-  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
-  __retval = __mingw_vprintf( __format, __argv );
-  __builtin_va_end( __argv );
+  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
+  __retval = __mingw_vprintf( __format, __local_argv );
+  __builtin_va_end( __local_argv );
   return __retval;
 }
 
@@ -262,28 +262,28 @@ __mingw_stdio_redirect__
 int sprintf (char *__stream, const char *__format, ...)
 {
   register int __retval;
-  __builtin_va_list __argv; __builtin_va_start( __argv, __format );
-  __retval = __mingw_vsprintf( __stream, __format, __argv );
-  __builtin_va_end( __argv );
+  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
+  __retval = __mingw_vsprintf( __stream, __format, __local_argv );
+  __builtin_va_end( __local_argv );
   return __retval;
 }
 
 __mingw_stdio_redirect__
-int vfprintf (FILE *__stream, const char *__format, __VALIST __argv)
+int vfprintf (FILE *__stream, const char *__format, __VALIST __local_argv)
 {
-  return __mingw_vfprintf( __stream, __format, __argv );
+  return __mingw_vfprintf( __stream, __format, __local_argv );
 }
 
 __mingw_stdio_redirect__
-int vprintf (const char *__format, __VALIST __argv)
+int vprintf (const char *__format, __VALIST __local_argv)
 {
-  return __mingw_vprintf( __format, __argv );
+  return __mingw_vprintf( __format, __local_argv );
 }
 
 __mingw_stdio_redirect__
-int vsprintf (char *__stream, const char *__format, __VALIST __argv)
+int vsprintf (char *__stream, const char *__format, __VALIST __local_argv)
 {
-  return __mingw_vsprintf( __stream, __format, __argv );
+  return __mingw_vsprintf( __stream, __format, __local_argv );
 }
 
 #else
