@@ -148,7 +148,10 @@ extern __IMPORT int sys_nerr;
 #define ECASECLASH 137  /* Filename exists with different case */
 #define EILSEQ 138
 #define EOVERFLOW 139	/* Value too large for defined data type */
-#define ECANCELED 140	/* Operation canceled. */
+#define ECANCELED 140	/* Operation canceled */
+#define ENOTRECOVERABLE 141	/* State not recoverable */
+#define EOWNERDEAD 142	/* Previous owner died */
+
 
 /* From cygwin32.  */
 #define EWOULDBLOCK EAGAIN	/* Operation would block */

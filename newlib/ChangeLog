@@ -1,3 +1,9 @@
+2008-09-19  Eric Blake  <ebb9@byu.net>
+
+	Supply missing POSIX errno values.
+	* libc/include/sys/errno.h (ENOTRECOVERABLE, EOWNERDEAD): Define.
+	* libc/string/strerror.c (strerror): Decode them, and ECANCELED.
+
 2008-09-10  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/strcpy.h: Add missing header.
