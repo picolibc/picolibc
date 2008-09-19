@@ -1,5 +1,15 @@
 2008-09-19  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
+	Fix MinGW-Bug [2119504].
+	(Reported by Peiyuan Song).
+
+	* mingwex/getopt.c (getopt_resolved): Do not overwrite...
+	(*retindex): ...this already correctly assigned return variable...
+	(opt[index].val): ...with this; this should have been assigned to...
+	(*opt[index].flag) [opt[index].flag != NULL]: ...this instead.
+
+2008-09-19  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
 	Fix MinGW-Bug [2117379].
 	(Reported by Peiyuan Song).
 

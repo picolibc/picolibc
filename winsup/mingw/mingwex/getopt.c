@@ -283,12 +283,12 @@ struct option *opt, int index, int *retindex, const CHAR *optstring )
 
   /* when the caller has provided a return buffer ...
    */
-  if( retindex != NULL )
+  if( opt[index].flag != NULL )
   {
     /* ... then we place the proper return value there,
      * and return a status code of zero ...
      */
-    *retindex = opt[index].val;
+    *(opt[index].flag) = opt[index].val;
     return 0;
   }
   /* ... otherwise, the return value becomes the status code.
