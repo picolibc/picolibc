@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#include <subauth.h>
+
 #define SECPKG_CRED_INBOUND 1
 #define SECPKG_CRED_OUTBOUND 2
 #define SECPKG_CRED_BOTH (SECPKG_CRED_OUTBOUND|SECPKG_CRED_INBOUND)

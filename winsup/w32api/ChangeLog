@@ -1,3 +1,8 @@
+2008-09-21  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* incude/sspi.h: include subauth.h to fix issue of UNICODE_STRING being
+	undefined.
+
 2008-09-13  mega-squall  <mega-squall@users.sf.net>
 
 	* include/winnt.h (SUBLANG_BENGALI_INDIA, SUBLANG_PUNJABI_INDIA,
