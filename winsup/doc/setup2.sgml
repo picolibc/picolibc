@@ -59,14 +59,13 @@ first starts.  Most Cygwin applications do not make use of the
 <sect1 id="setup-maxmem"><title>Changing Cygwin's Maximum Memory</title>
 
 <para>
-By default no Cygwin program can allocate more than 384 MB of memory 
-(program+data).  You should not need to change this default in most 
-circumstances.  However, if you need to use more real or virtual memory in 
-your machine you may add an entry in the either the 
-<literal>HKEY_LOCAL_MACHINE</literal> (to change the limit for all users) or 
-<literal>HKEY_CURRENT_USER</literal> (for just the current user) section of 
-the registry. 
-</para>
+Cygwin's heap is extensible.  However, it does start out at a fixed size
+and attempts to extend it may run into memory which has been previously
+allocated by Windows.  In some cases, this problem can be solved by
+adding an entry in the either the <literal>HKEY_LOCAL_MACHINE</literal>
+(to change the limit for all users) or
+<literal>HKEY_CURRENT_USER</literal> (for just the current user) section
+of the registry.  </para>
 
 <para>
 Add the <literal>DWORD</literal> value <literal>heap_chunk_in_mb</literal> 
