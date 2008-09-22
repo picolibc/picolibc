@@ -1,3 +1,12 @@
+2008-09-22 Rafael Espindola  <espindola@google.com>
+
+	* plugin-api.h (ld_plugin_status): Remove comma from the last item.
+	Use C style comment.
+	(ld_plugin_api_version, ld_plugin_output_file_type,
+	ld_plugin_symbol_kind, ld_plugin_symbol_visibility,
+	ld_plugin_symbol_resolution, ld_plugin_level, ld_plugin_tag): Remove
+	comma from the last item.
+
 2008-09-18  Cary Coutant  <ccoutant@google.com>
 
 	Add plugin functionality for link-time optimization (LTO).
