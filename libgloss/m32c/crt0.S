@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005 Red Hat Incorporated.
+Copyright (c) 2005,2008 Red Hat Incorporated.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
@@ -42,12 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ALIGN 2
 #endif
 
+	.section ".resetvec","ax",@progbits
+	.long	_start
+
 	.text
 
 	.global _start
 _start:
 .LFB2:
-	fset	U	/* User stack */
+	fclr	U	/* One stack for user and interrupts */
 	ldc	#__stack,sp
 
 #ifdef A16
@@ -72,6 +75,14 @@ _start:
 	mov.w	#0,r0
 	sstr.w
 
+#ifdef A16
+	ldc	#%lo16(__var_vects),intbl
+	ldc	#%hi16(__var_vects),intbh
+#else
+	ldc	#__var_vects,intb
+#endif
+
+	fset	I
 	jsr.a	__m32c_init
 
 	jsr.a	_main

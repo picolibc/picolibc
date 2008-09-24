@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005 Red Hat Incorporated.
+Copyright (c) 2005,2008 Red Hat Incorporated.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
@@ -35,6 +35,7 @@ OUTPUT_FORMAT("elf32-m32c", "elf32-m32c",
 	      "elf32-m32c")
 OUTPUT_ARCH(m32c)
 ENTRY(_start)
+INPUT(-lm32cgloss)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 MEMORY {
@@ -132,6 +133,8 @@ SECTIONS
     SORT(CONSTRUCTORS)
     *(.data1)
     *(.got.plt) *(.got)
+    PROVIDE (__var_vect_start = .);
+    *(.var_vects)
 
     . = ALIGN(2);
     _edata = .;

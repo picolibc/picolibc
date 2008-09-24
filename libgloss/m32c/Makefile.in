@@ -1,4 +1,4 @@
-# Copyright (c) 2005 Red Hat Inc
+# Copyright (c) 2005,2008 Red Hat Inc
 #
 # The authors hereby grant permission to use, copy, modify, distribute,
 # and license this software and its documentation for any purpose, provided
@@ -56,9 +56,11 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
+HEADERS = varvects.h
 SCRIPTS = r8c.ld m16c.ld m32cm.ld m32c.ld m16cmon.ld m32cmon.ld sim8.ld sim16.ld sim24.ld
 CRT = crt0.o crtn.o
 SIM_BSP = libsim.a
+M32C_BSP = libm32cgloss.a
 LIBNOSYS = ../libnosys/libnosys.a
 SIM_OBJS = \
 	sbrk.o \
@@ -85,7 +87,8 @@ SIM_OBJS = \
 	link.o \
 	isatty.o \
 	abort.o
-
+M32C_OBJS = \
+	varvects.o
 
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
@@ -95,9 +98,13 @@ SIM_OBJS = \
 .S.o:
 	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
 
-all: $(CRT) $(SIM_BSP) $(SCRIPTS)
+all: $(CRT) $(SIM_BSP) $(M32C_BSP) $(SCRIPTS)
 
 $(SIM_BSP): $(SIM_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+$(M32C_BSP): $(M32C_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
@@ -167,12 +174,16 @@ unlink.o : $(SDEPS)
 utime.o : $(SDEPS)
 write.o : $(SDEPS)
 
-install: $(CRT) $(SIM_BSP) $(SCRIPTS)
-	for c in $(CRT) $(SIM_BSP); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+install: $(CRT) $(SIM_BSP) $(M32C_BSP) $(SCRIPTS)
+	for c in $(CRT) $(SIM_BSP) $(M32C_BSP); do \
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	for c in $(SCRIPTS); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	done
+	for c in $(HEADERS); do \
+	  $(INSTALL_DATA) ${srcdir}/$$c \
+		$(DESTDIR)$(tooldir)/include/$$c ;\
 	done
 
 clean mostlyclean:

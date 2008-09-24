@@ -1,3 +1,12 @@
+2008-09-24  DJ Delorie  <dj@redhat.com>
+
+	* m32c/varvects.S: New.
+	* m32c/varvects.h: New.
+	* m32c/sample.c: New.
+	* m32c/Makefile.in: Add m32cgloss library support.
+	* m32c/crt0.S: Tweaks to support interrupts by default.
+	* m32c/m32c.tmpl: Likewise.
+
 2008-09-10  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/dirfuncs.c: Avoid warnings.
