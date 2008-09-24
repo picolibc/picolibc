@@ -352,7 +352,7 @@ distclean: clean
 	-rm -f Makefile
 
 ifdef SNAPDATE
-      distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)-$(host_os)
+      distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
 else
    ifneq (,$(findstring cygwin, $(target_alias)))
       distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)

@@ -1,3 +1,7 @@
+2008-09-23  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* Makefile.in: Don't include host_os as part of snapshot filename.
+
 2008-09-19  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2119504].
