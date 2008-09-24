@@ -1,3 +1,7 @@
+2008-09-24  Richard Henderson  <rth@redhat.com>
+
+	* elf/dwarf2.h (DW_OP_GNU_encoded_addr): New.
+
 2008-09-22 Rafael Espindola  <espindola@google.com>
 
 	* plugin-api.h (ld_plugin_status): Remove comma from the last item.
