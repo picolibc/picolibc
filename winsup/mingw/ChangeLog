@@ -1,3 +1,13 @@
+2008-09-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Fix MinGW-Bug [2125708].
+	(Reported by Alexandr Zamaraev).
+
+	* include/stdlib.h (intptr_t) [!_INTPTR_T_DEFINED]: Unused typedef;
+	not wanted here; remove it; replace it by...
+	(uintptr_t) [!_UINTPTR_T_DEFINED]: ...this typedef; needed by...
+	(_invalid_parameter_handler): ...this function typedef.
+
 2008-09-23  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* Makefile.in: Don't include host_os as part of snapshot filename.

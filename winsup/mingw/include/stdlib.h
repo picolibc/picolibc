@@ -413,7 +413,6 @@ _onexit_t __cdecl __MINGW_NOTHROW _onexit( _onexit_t );
 _CRTIMP int __cdecl __MINGW_NOTHROW	_putenv	(const char*);
 _CRTIMP void __cdecl __MINGW_NOTHROW	_searchenv (const char*, const char*, char*);
 
-
 _CRTIMP char* __cdecl __MINGW_NOTHROW	_ecvt (double, int, int*, int*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	_fcvt (double, int, int*, int*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	_gcvt (double, int, char*);
@@ -437,39 +436,44 @@ _CRTIMP __int64 __cdecl __MINGW_NOTHROW	_wtoi64(const wchar_t *);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _i64tow(__int64, wchar_t *, int);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _ui64tow(unsigned __int64, wchar_t *, int);
 
-
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotl(unsigned long, int) __MINGW_ATTRIB_CONST;
 _CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotr(unsigned long, int) __MINGW_ATTRIB_CONST;
 
 _CRTIMP int __cdecl __MINGW_NOTHROW _set_error_mode (int);
-#define _OUT_TO_DEFAULT	0
-#define _OUT_TO_STDERR	1
-#define _OUT_TO_MSGBOX	2
-#define _REPORT_ERRMODE	3
 
-#if __MSVCRT_VERSION__ >= 0x800
-#ifndef _INTPTR_T_DEFINED
-#define _INTPTR_T_DEFINED
-#ifdef _WIN64
-  typedef __int64 intptr_t;
-#else
-  typedef int intptr_t;
-#endif
-#endif
+# define _OUT_TO_DEFAULT	0
+# define _OUT_TO_STDERR 	1
+# define _OUT_TO_MSGBOX 	2
+# define _REPORT_ERRMODE	3
+
+# if __MSVCRT_VERSION__ >= 0x800
+#  ifndef _UINTPTR_T_DEFINED
+#   define _UINTPTR_T_DEFINED
+#   ifdef _WIN64
+      typedef unsigned __int64 uintptr_t;
+#   else
+      typedef unsigned int uintptr_t;
+#   endif
+#  endif
+
 _CRTIMP unsigned int __cdecl __MINGW_NOTHROW _set_abort_behavior (unsigned int, unsigned int);
-/* These masks work with msvcr80.dll version 8.0.50215.44 (a beta release).  */
-#define _WRITE_ABORT_MSG 1
-#define _CALL_REPORTFAULT 2
 
-typedef void (* _invalid_parameter_handler) (const wchar_t *,
-					     const wchar_t *,
-					     const wchar_t *,
-					     unsigned int,
-					     uintptr_t);
+/* These masks work with msvcr80.dll version 8.0.50215.44 (a beta release).  */
+#  define _WRITE_ABORT_MSG	1
+#  define _CALL_REPORTFAULT	2
+
+typedef void
+(* _invalid_parameter_handler) (
+    const wchar_t *,
+    const wchar_t *,
+    const wchar_t *,
+    unsigned int,
+    uintptr_t);
 _invalid_parameter_handler _set_invalid_parameter_handler (_invalid_parameter_handler);
-#endif /* __MSVCRT_VERSION__ >= 0x800 */
+
+# endif /* __MSVCRT_VERSION__ >= 0x800 */
 #endif /* __MSVCRT__ */
 
 #ifndef	_NO_OLDNAMES
