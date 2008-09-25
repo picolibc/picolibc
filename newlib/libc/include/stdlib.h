@@ -174,8 +174,8 @@ unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__n, char **
 
 #ifndef __CYGWIN__
 _VOID	_EXFUN(cfree,(_PTR));
-void	_EXFUN(unsetenv,(const char *__string));
-void	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));
+int	_EXFUN(unsetenv,(const char *__string));
+int	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));
 #endif
 
 #endif /* ! __STRICT_ANSI__ */

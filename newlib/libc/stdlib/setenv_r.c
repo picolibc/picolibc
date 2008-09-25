@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include "envlock.h"
 
 extern char **environ;
@@ -43,6 +44,8 @@ extern char *_findenv_r _PARAMS ((struct _reent *, const char *, int *));
  * _setenv_r --
  *	Set the value of the environmental variable "name" to be
  *	"value".  If rewrite is set, replace any current value.
+ *	If "name" contains equal sign, -1 is returned, and errno is
+ *	set to EINVAL;
  */
 
 int
@@ -56,10 +59,14 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
   register char *C;
   int l_value, offset;
 
+  if (strchr(name, '='))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
   ENV_LOCK;
 
-  if (*value == '=')		/* no `=' in value */
-    ++value;
   l_value = strlen (value);
   if ((C = _findenv_r (reent_ptr, name, &offset)))
     {				/* find if already exists */
@@ -132,20 +139,33 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
  * _unsetenv_r(name) --
  *	Delete environmental variable "name".
  */
-void
+int
 _DEFUN (_unsetenv_r, (reent_ptr, name),
         struct _reent *reent_ptr _AND
         _CONST char *name)
 {
   register char **P;
   int offset;
+  int rc;
+  
+  if (strchr(name, '='))
+    {
+      errno = EINVAL;
+      return -1;
+    }
 
   ENV_LOCK;
 
+  rc = -1;
+
   while (_findenv_r (reent_ptr, name, &offset))	/* if set multiple times */
-    for (P = &(*p_environ)[offset];; ++P)
-      if (!(*P = *(P + 1)))
-	break;
+    { 
+      rc = 0;
+      for (P = &(*p_environ)[offset];; ++P)
+        if (!(*P = *(P + 1)))
+	  break;
+    }
 
   ENV_UNLOCK;
+  return (rc);
 }

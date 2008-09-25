@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern void _unsetenv_r _PARAMS ((struct _reent *, const char *));
+extern int _unsetenv_r _PARAMS ((struct _reent *, const char *));
 
 /*
  * setenv --
@@ -44,11 +44,11 @@ _DEFUN (setenv, (name, value, rewrite),
  * unsetenv(name) --
  *	Delete environmental variable "name".
  */
-void
+int
 _DEFUN (unsetenv, (name),
         _CONST char *name)
 {
-  _unsetenv_r (_REENT, name);
+  return _unsetenv_r (_REENT, name);
 }
 
 #endif /* !_REENT_ONLY */

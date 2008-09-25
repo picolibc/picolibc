@@ -1,3 +1,18 @@
+2008-09-24  Pawel Veselov  <pawel.veselov@gmail.com>
+
+	Fix setenv/getenv/unsetenv to be OpenGroup compliant:
+	* libc/include/stdlib.h (unsetenv, _unsetenv_r): Redefine with integer
+	return types.
+	* libc/stdlib/getenv_r.c (_findenv_r): Do no special processing with
+	names that contain equal chars.
+	* libc/stdlib/setenv.c: Redefine _unsetenv_r as returning int.
+	* libc/stdlib/setenv_r.c (_setenv_r): Return -1 and set errno to
+	EINVAL if name contains an equal sign.  Do not remove any equal signs
+	from the value.
+	(_unsetenv_r): Modified to return int.  Return -1 and set EINVAL
+	if name contains equal sign.  Return -1 if no variable(s) were found
+	and return 0 otherwise.
+
 2008-09-19  Eric Blake  <ebb9@byu.net>
 
 	Supply missing POSIX errno values.
