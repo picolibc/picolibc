@@ -146,9 +146,9 @@ _DEFUN (_unsetenv_r, (reent_ptr, name),
 {
   register char **P;
   int offset;
-  int rc;
-  
-  if (strchr(name, '='))
+ 
+  /* Name cannot be NULL, empty, or contain an equal sign.  */ 
+  if (name == NULL || name[0] == '\0' || strchr(name, '='))
     {
       errno = EINVAL;
       return -1;
@@ -156,16 +156,13 @@ _DEFUN (_unsetenv_r, (reent_ptr, name),
 
   ENV_LOCK;
 
-  rc = -1;
-
   while (_findenv_r (reent_ptr, name, &offset))	/* if set multiple times */
     { 
-      rc = 0;
       for (P = &(*p_environ)[offset];; ++P)
         if (!(*P = *(P + 1)))
 	  break;
     }
 
   ENV_UNLOCK;
-  return (rc);
+  return 0;
 }

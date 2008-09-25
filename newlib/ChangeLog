@@ -1,3 +1,8 @@
+2008-09-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/setenv_r.c (_unsetenv_r): Modify to return -1 only if
+	name is NULL, empty, or contains equal sign.
+
 2008-09-24  Pawel Veselov  <pawel.veselov@gmail.com>
 
 	Fix setenv/getenv/unsetenv to be OpenGroup compliant:
