@@ -1,3 +1,7 @@
+2008-08-25  Richard Henderson  <rth@redhat.com>
+
+	* elf/dwarf2.h (DW_OP_GNU_encoded_addr): New.
+
 2008-08-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* binary-io.h: New file, imported from gnulib, but don't
@@ -181,9 +185,9 @@
 	override_segment_assignment field.
 
 2007-02-17  Mark Mitchell  <mark@codesourcery.com>
-            Nathan Sidwell  <nathan@codesourcery.com>
-            Vladimir Prus  <vladimir@codesourcery.com
-            Joseph Myers  <joseph@codesourcery.com>
+	    Nathan Sidwell  <nathan@codesourcery.com>
+	    Vladimir Prus  <vladimir@codesourcery.com
+	    Joseph Myers  <joseph@codesourcery.com>
 
 	* bin-bugs.h: Remove.
 
@@ -286,8 +290,8 @@
 	relax_pass.
 
 2006-02-17  Shrirang Khisti  <shrirangk@kpitcummins.com>
-            Anil Paranjape   <anilp1@kpitcummins.com>
-            Shilin Shakti    <shilins@kpitcummins.com>
+	    Anil Paranjape   <anilp1@kpitcummins.com>
+	    Shilin Shakti    <shilins@kpitcummins.com>
 
 	* dis-asm.h (print_insn_xc16c): New prototype.
 
