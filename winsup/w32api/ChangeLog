@@ -1,3 +1,7 @@
+2008-09-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/vfw.h (capSendMessage): Rename to __capSendMessage.
+
 2008-09-24  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/vfw.h (WM_CAP_SET_CALLBACK_ERRORA, WM_CAP_SET_CALLBACK_ERRORW,
