@@ -1,3 +1,8 @@
+2008-09-26  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/stdlib/getenv_r.c (_getenv_r): Modify to not match if name
+	contains an equal sign.
+
 2008-09-25  Raphael Derossa Pereira  <raphaelpereira@gmail.com>
 
 	* libc/include/pthread.h[_UNIX98_THREAD_MUTEX_ATTRIBUTES]: Add
