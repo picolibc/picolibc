@@ -57,6 +57,17 @@ int	_EXFUN(pthread_mutexattr_getpshared,
 int	_EXFUN(pthread_mutexattr_setpshared,
 		(pthread_mutexattr_t *__attr, int __pshared));
 
+#if defined(_UNIX98_THREAD_MUTEX_ATTRIBUTES)
+
+/* Single UNIX Specification 2 Mutex Attributes types */
+
+int _EXFUN(pthread_mutexattr_gettype,
+		(_CONST pthread_mutexattr_t *__attr, int *__kind));
+int _EXFUN(pthread_mutexattr_settype,
+		(pthread_mutexattr_t *__attr, int __kind));
+
+#endif
+
 /* Initializing and Destroying a Mutex, P1003.1c/Draft 10, p. 87 */
 
 int	_EXFUN(pthread_mutex_init,

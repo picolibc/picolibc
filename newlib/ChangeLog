@@ -1,3 +1,13 @@
+2008-09-25  Raphael Derossa Pereira  <raphaelpereira@gmail.com>
+
+	* libc/include/pthread.h[_UNIX98_THREAD_MUTEX_ATTRIBUTES]: Add
+	new pthread_mutexattr_gettype and pthread_mutexattr_settype
+	prototypes.
+	* libc/include/sys/types.h[_UNIX98_THREAD_MUTEX_ATTRIBUTES]: Add
+	new mutex type values.
+	(pthread_mutexattr_t)[_UNIX98_THREAD_MUTEX_ATTRIBUTES]: Add type
+	field.
+
 2008-09-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/setenv_r.c (_unsetenv_r): Modify to return -1 only if

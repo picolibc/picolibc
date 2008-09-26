@@ -323,6 +323,17 @@ typedef struct {
 #define PTHREAD_PRIO_PROTECT 2
 #endif
 
+#if defined(_UNIX98_THREAD_MUTEX_ATTRIBUTES)
+
+/* Values for mutex type */
+
+#define PTHREAD_MUTEX_NORMAL     0
+#define PTHREAD_MUTEX_RECURSIVE  1
+#define PTHREAD_MUTEX_ERRORCHECK 2
+#define PTHREAD_MUTEX_DEFAULT    3
+
+#endif
+
 typedef __uint32_t pthread_mutex_t;      /* identify a mutex */
 
 typedef struct {
@@ -333,6 +344,9 @@ typedef struct {
 #if defined(_POSIX_THREAD_PRIO_PROTECT)
   int   prio_ceiling;
   int   protocol;
+#endif
+#if defined(_UNIX98_THREAD_MUTEX_ATTRIBUTES)
+  int type;
 #endif
   int   recursive;
 } pthread_mutexattr_t;
