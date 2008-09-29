@@ -1,3 +1,8 @@
+2008-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (inode_t::get_all_locks_list): Fix typo.
+	* posix.sgml: Add cfmakeraw to list of implemented BSD functions.
+
 2008-09-19  Eric Blake  <ebb9@byu.net>
 
 	* errno.cc (_sys_errlist): Add ECANCELED, ENOTRECOVERABLE,

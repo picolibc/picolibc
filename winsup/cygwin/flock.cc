@@ -500,7 +500,7 @@ inode_t::get_all_locks_list ()
 	  || ((flags & (F_FLOCK | F_POSIX)) == (F_FLOCK | F_POSIX)))
 	continue;
       short type = wcstol (endptr + 1, &endptr, 16);
-      if (type != (F_RDLCK && type != F_WRLCK) || !endptr || *endptr != L'-')
+      if ((type != F_RDLCK && type != F_WRLCK) || !endptr || *endptr != L'-')
         continue;
       _off64_t start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
       if (start < 0 || !endptr || *endptr != L'-')
