@@ -1,3 +1,13 @@
+2008-09-29  Peter O'Gorman  <pogma@thewrittenword.com>
+
+	* libtool.m4: Update to libtool 2.2.6.
+	* lt~obsolete.m4: Update to libtool 2.2.6.
+	* ltmain.sh: Update to libtool 2.2.6.
+	* ltsugar.m4: Update to libtool 2.2.6.
+	* ltversion.m4: Update to libtool 2.2.6.
+	* ltoptions.m4: Update to libtool 2.2.6.
+	* ltgcc.m4: Update to match changes from libtool 2.2.6.
+
 2008-08-31  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
 
 	* configure.ac (RPATH_ENVVAR): Use PATH on Windows.
