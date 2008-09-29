@@ -1,3 +1,26 @@
+2008-09-24  Richard Henderson  <rth@redhat.com>
+
+	* elf/dwarf2.h (DW_OP_GNU_encoded_addr): New.
+
+2008-09-22 Rafael Espindola  <espindola@google.com>
+
+	* plugin-api.h (ld_plugin_status): Remove comma from the last item.
+	Use C style comment.
+	(ld_plugin_api_version, ld_plugin_output_file_type,
+	ld_plugin_symbol_kind, ld_plugin_symbol_visibility,
+	ld_plugin_symbol_resolution, ld_plugin_level, ld_plugin_tag): Remove
+	comma from the last item.
+
+2008-09-18  Cary Coutant  <ccoutant@google.com>
+
+	Add plugin functionality for link-time optimization (LTO).
+	* plugin-api.h: New file.
+
+2008-09-09  Jason Merrill  <jason@redhat.com>
+
+	* demangle.h (enum demangle_component_type): Add
+	DEMANGLE_COMPONENT_DECLTYPE.
+
 2008-08-25  Alan Modra  <amodra@bigpond.net.au>
 
 	* binary-io.h: New file, imported from gnulib, but don't
