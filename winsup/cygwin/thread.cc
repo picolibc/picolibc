@@ -1673,30 +1673,14 @@ pthread_mutex::_fixup_after_fork ()
 {
   debug_printf ("mutex %x in _fixup_after_fork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal ("pthread_mutex::_fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
+    api_fatal ("pthread_mutex::_fixup_after_fork () doesn't understand PROCESS_SHARED mutex's");
 
-  if (owner == NULL)
-    {
-      /* mutex has no owner, reset to initial */
-      lock_counter = 0;
-#ifdef DEBUGGING
-      tid = 0;
-#endif
-    }
-  else if (lock_counter != 0)
-    {
-      /* All waiting threads are gone after a fork */
-      lock_counter = 1;
-#ifdef DEBUGGING
-      tid = 0xffffffff;	/* Don't know the tid after a fork */
-#endif
-    }
-
-  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
-  if (!win32_obj_id)
-    api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
-
+  /* All waiting threads are gone after a fork */
+  lock_counter = 0;
+  owner = NULL;
+  win32_obj_id = NULL;
   condwaits = 0;
+  tid = 0;	/* Don't know the tid after a fork */
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),

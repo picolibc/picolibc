@@ -1,3 +1,9 @@
+2008-09-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* thread.cc (pthread_mutex::_fixup_after_fork): Just reset lock to
+	pristine state after fork.  Don't recreate a mutex since it may not
+	actually be needed.
+
 2008-09-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (inode_t::get_all_locks_list): Fix typo.
