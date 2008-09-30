@@ -1680,7 +1680,10 @@ pthread_mutex::_fixup_after_fork ()
   owner = NULL;
   win32_obj_id = NULL;
   condwaits = 0;
-  tid = 0;	/* Don't know the tid after a fork */
+#ifdef DEBUGGING
+  tid = 0xffffffff;        /* Don't know the tid after a fork */
+#endif
+
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),

@@ -1,5 +1,10 @@
 2008-09-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* thread.cc (pthread_mutex::_fixup_after_fork): Reinstate DEBUGGING
+	conditional.
+
+2008-09-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* thread.cc (pthread_mutex::_fixup_after_fork): Just reset lock to
 	pristine state after fork.  Don't recreate a mutex since it may not
 	actually be needed.
