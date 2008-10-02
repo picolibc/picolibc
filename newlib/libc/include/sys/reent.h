@@ -41,7 +41,7 @@ struct _reent;
  * by having nearly everything possible allocated at first use.
  */
 
-struct _Bigint 
+struct _Bigint
 {
   struct _Bigint *_next;
   int _k, _maxwds, _sign, _wds;
@@ -271,7 +271,7 @@ typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
-struct _glue 
+struct _glue
 {
   struct _glue *_next;
   int _niobs;
@@ -365,7 +365,7 @@ struct _reent
   int  _inc;			/* used by tmpnam */
 
   char *_emergency;
- 
+
   int __sdidinit;		/* 1 means stdio has been init'd */
 
   int _current_category;	/* used by setlocale */
@@ -462,7 +462,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   }
 
 /* Only built the assert() calls if we are built with debugging.  */
-#if DEBUG 
+#if DEBUG
 #include <assert.h>
 #define __reent_assert(x) assert(x)
 #else
@@ -501,6 +501,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   _r->_r48->_mult[1] = _RAND48_MULT_1; \
   _r->_r48->_mult[2] = _RAND48_MULT_2; \
   _r->_r48->_add = _RAND48_ADD; \
+  _r->_r48->_rand_next = 1; \
 } while (0)
 #define _REENT_CHECK_RAND48(var) \
   _REENT_CHECK(var, _r48, struct _rand48 *, sizeof *((var)->_r48), _REENT_INIT_RAND48((var)))
@@ -583,7 +584,7 @@ struct _reent
 
   int  _inc;			/* used by tmpnam */
   char _emergency[_REENT_EMERGENCY_SIZE];
- 
+
   int _current_category;	/* used by setlocale */
   _CONST char *_current_locale;
 
@@ -617,7 +618,7 @@ struct _reent
           _mbstate_t _wctomb_state;
           char _l64a_buf[8];
           char _signal_buf[_REENT_SIGNAL_SIZE];
-          int _getdate_err;  
+          int _getdate_err;
           _mbstate_t _mbrlen_state;
           _mbstate_t _mbrtowc_state;
           _mbstate_t _mbsrtowcs_state;
@@ -627,7 +628,7 @@ struct _reent
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
-     allow addition of new reent fields and keep binary compatibility.   */ 
+     allow addition of new reent fields and keep binary compatibility.   */
       struct
         {
 #define _N_LISTS 30

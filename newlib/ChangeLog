@@ -1,3 +1,8 @@
+2008-10-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h[_REENT_SMALL](_REENT_INIT_RAND48): Add 
+	initialization of _rand_next to 1.
+
 2008-09-29  Peter O'Gorman  <pogma@thewrittenword.com>
 	    Steve Ellcey  <sje@cup.hp.com>
 
