@@ -1,5 +1,10 @@
 2008-10-02  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/string/str-two-way.h (critical_factorization): Cast the index
+	operation to ensure unsigned rollover occurs when adding to SIZE_MAX.
+
+2008-10-02  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/sys/linux/include/stdint.h (SIZE_MAX): Fix value which should
 	be size of size_t, not int.
 	(SIZE_MIN): Remove.

@@ -114,7 +114,7 @@ critical_factorization (const unsigned char *needle, size_t needle_len,
   while (j + k < needle_len)
     {
       a = CANON_ELEMENT (needle[j + k]);
-      b = CANON_ELEMENT (needle[max_suffix + k]);
+      b = CANON_ELEMENT (needle[(size_t)(max_suffix + k)]);
       if (a < b)
 	{
 	  /* Suffix is smaller, period is entire prefix so far.  */
