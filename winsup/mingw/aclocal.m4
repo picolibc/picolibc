@@ -8,13 +8,12 @@
 # Wrapper for AC_CONFIG_SRCDIR; in addition to checking for a
 # unique file reference within the source tree, it resolves the
 # definition for PACKAGE_VERSION, based on a tagged definition
-# within that file, and adjusts PACKAGE_TARNAME to match.
+# within that file.
 #
 AC_DEFUN([MINGW_AC_CONFIG_SRCDIR],
 [AC_CONFIG_SRCDIR([$2])
  AC_MSG_CHECKING([package version])
  PACKAGE_VERSION=`awk '$[2] == "'"$1"'" { print $[3] }' ${srcdir}/$2`
- PACKAGE_TARNAME=${PACKAGE_NAME}-${PACKAGE_VERSION}
  AC_MSG_RESULT([$PACKAGE_VERSION])dnl
 ]) #MINGW_AC_CONFIG_SRCDIR
 
@@ -33,7 +32,7 @@ AC_DEFUN([MINGW_AC_CONFIG_SRCDIR],
 # PARTICULAR PURPOSE.
 
 # GCC_NO_EXECUTABLES
-# -----------------
+# ------------------
 # FIXME: The GCC team has specific needs which the current Autoconf
 # framework cannot solve elegantly.  This macro implements a dirty
 # hack until Autoconf is able to provide the services its users

@@ -1,3 +1,20 @@
+2008-10-03  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Improve package identification in configure script.
+
+	* configure.ac (AC_INIT): Redefine parameters...
+	(PACKAGE_NAME): Set to `MinGW Runtime'.
+	(PACKAGE_BUGREPORT): Set to `http://mingw.org/reporting_bugs'
+	(PACKAGE_TARNAME): Set to `mingwrt'.
+	(PACKAGE_VERSION): Set generically to `v3.x'; reassigned by...
+	(MINGW_AC_CONFIG_SRCDIR): ...this macro, which extracts...
+	(__MINGW32_VERSION): ...this, from file `include/_mingw.h'.
+
+	* aclocal.m4 (MINGW_AC_CONFIG_SRCDIR): Do not redefine...
+	(PACKAGE_TARNAME): ...this.
+
+	* configure: Regenerated.
+
 2008-09-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2125708].
