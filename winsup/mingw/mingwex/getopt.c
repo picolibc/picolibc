@@ -254,6 +254,12 @@ struct option *opt, int index, int *retindex, const CHAR *optstring )
   if( retindex != NULL )
     *retindex = index;
 
+  /* On return, `optind' should normally refer to the argument, if any,
+   * which follows the current one; it is convenient to set this, before
+   * checking for the presence of any `optarg'.
+   */
+  optind = *argind + 1;
+
   if( optarg && (opt[index].has_arg == no_argument) )
     /*
      * it is an error for the user to specify an option specific argument
@@ -267,12 +273,12 @@ struct option *opt, int index, int *retindex, const CHAR *optstring )
     /* similarly, it is an error if no argument is specified
      * with an option which requires one ...
      */
-    if( (*argind + 1) < argc )
+    if( optind < argc )
       /*
        * ... except that the requirement may be satisfied from
-       * the following comand line argument, if any ...
+       * the following command line argument, if any ...
        */
-      optarg = argv[++*argind];
+      optarg = argv[*argind = optind++];
 
     else
       /* so fail this case, only if no such argument exists!
@@ -303,19 +309,23 @@ int getopt_parse( int mode, getopt_std_args, ... )
   /* Common core implementation for ALL `getopt' functions.
    */
   static int argind = 0;
+  static int optbase = 0;
   static const CHAR *nextchar = NULL;
   static int optmark = 0;
 
-  if( (argind == 0) || (optind == 0) )
+  if( optind < optbase )
   {
-    /* POSIX wants `optind' to have an initial value of one, but we want
-     * it to be initialised to zero, when we are called for the first time,
-     * (as indicated by `argind' having a value of zero).  We also want to
-     * allow the caller to reset the `getopt' parser, causing it to scan
-     * the arguments again, (or to scan a new set of arguments); this
-     * may be achieved by the caller resetting `optind' to zero.
+    /* POSIX does not prescribe any definitive mechanism for restarting
+     * a `getopt' scan, but some applications may require such capability.
+     * We will support it, by allowing the caller to adjust the value of
+     * `optind' downwards, (nominally setting it to zero).  Since POSIX
+     * wants `optind' to have an initial value of one, but we want all
+     * of our internal placeholders to be initialised to zero, when we
+     * are called for the first time, we will handle such a reset by
+     * adjusting all of the internal placeholders to one less than the
+     * adjusted `optind' value, (but never to less than zero).
      */
-    optmark = optind = argind = 0;
+    optmark = optbase = argind = (optind > 0) ? optind - 1 : 0;
     nextchar = NULL;
   }
 
@@ -363,10 +373,12 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	    return getopt_missing_arg( optstring );
 	  }
 	}
+	optind = argind + 1;
 	nextchar = NULL;
       }
       else
 	optarg = NULL;
+      optind = (nextchar && *nextchar) ? argind : argind + 1;
       return optopt;
     }
     /* if we didn't find a valid match for the specified option character,
@@ -378,11 +390,13 @@ int getopt_parse( int mode, getopt_std_args, ... )
       nextchar = NULL;
       optopt = 0;
     }
-    else complain( "invalid option -- %c", optopt );
+    else
+      complain( "invalid option -- %c", optopt );
+    optind = (nextchar && *nextchar) ? argind : argind + 1;
     return getopt_unknown;
   }
 
-  if( optmark > optind )
+  if( optmark > optbase )
   {
     /* This can happen, in GNU parsing mode ONLY, when we have
      * skipped over non-option arguments, and found a subsequent
@@ -416,25 +430,25 @@ int getopt_parse( int mode, getopt_std_args, ... )
      * overwriting these saved arguments, while making space
      * to replace them in their permuted location.
      */
-    for( --optmark; optmark >= optind; --optmark )
+    for( --optmark; optmark >= optbase; --optmark )
       arglist[optmark + optspan] = arglist[optmark];
 
     /* restore the temporarily saved option arguments to
      * their permuted location.
      */
     for( index = 0; index < optspan; ++index )
-      arglist[optind + index] = this_arg[index];
+      arglist[optbase + index] = this_arg[index];
 
-    /* adjust `optind', to account for the relocated option.
+    /* adjust `optbase', to account for the relocated option.
      */
-    optind += optspan;
+    optbase += optspan;
   }
 
   else
     /* no permutation occurred ...
-     * simply adjust `optind' for all options parsed so far.
+     * simply adjust `optbase' for all options parsed so far.
      */
-    optind = argind + 1;
+    optbase = argind + 1;
 
   /* enter main parsing loop ...
    */
@@ -468,7 +482,7 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	{
 	  /* this is an explicit `--' end of options marker, so wrap up now!
 	   */
-	  if( optmark > optind )
+	  if( optmark > optbase )
 	  {
 	    /* permuting the argument list as necessary ...
 	     * (note use of `this_arg' and `arglist', as above).
@@ -479,16 +493,16 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	    /* move all preceding non-option arguments to the right ...
 	     */
 	    do arglist[optmark] = arglist[optmark - 1];
-	       while( optmark-- > optind );
+	       while( optmark-- > optbase );
 
 	    /* reinstate the `--' marker, in its permuted location.
 	     */
-	    arglist[optind] = this_arg;
+	    arglist[optbase] = this_arg;
 	  }
-	  /* ... before finally bumping `optind' past the `--' marker,
+	  /* ... before finally bumping `optbase' past the `--' marker,
 	   * and returning the `all done' completion indicator.
 	   */
-	  ++optind;
+	  optind = ++optbase;
 	  return getopt_all_done;
 	}
       }
@@ -549,9 +563,10 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	      {
 		/* if this is not the first, then we have an ambiguity ...
 		 */
-		complain( "option `%s' is ambiguous", argv[argind] );
-		nextchar = NULL;
 		optopt = 0;
+		nextchar = NULL;
+		optind = argind + 1;
+		complain( "option `%s' is ambiguous", argv[argind] );
 		return getopt_unknown;
 	      }
 	      /* otherwise just note that we've found a possible match ...
@@ -576,6 +591,7 @@ int getopt_parse( int mode, getopt_std_args, ... )
 	   */
 	  optopt = 0;
 	  nextchar = NULL;
+	  optind = argind + 1;
 	  complain( "unrecognised option `%s'", argv[argind] );
 	  return getopt_unknown;
 	}
@@ -601,6 +617,7 @@ int getopt_parse( int mode, getopt_std_args, ... )
        * option, with return value defined as `getopt_ordered'.
        */
       nextchar = NULL;
+      optind = argind + 1;
       optarg = argv[argind];
       return getopt_ordered;
     }
@@ -615,6 +632,7 @@ int getopt_parse( int mode, getopt_std_args, ... )
   }
   /* fall through when all arguments have been evaluated,
    */
+  optind = optbase;
   return getopt_all_done;
 }
 

@@ -1,5 +1,16 @@
 2008-10-03  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
+	Fix MinGW-Bug [2144266]: getopt() sets `optind' incorrectly.
+	(Reported by Christian Franke)
+
+	* mingwex/getopt.c (optind): Make global variable value conform to
+	behaviour specified by POSIX; do not use it for internal state in...
+	(getopt_parse): ...this static function; use...
+	(optbase): ...this new static local variable instead.
+	(getopt_resolved): Update `optind' as required.
+
+2008-10-03  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
 	Improve package identification in configure script.
 
 	* configure.ac (AC_INIT): Redefine parameters...
