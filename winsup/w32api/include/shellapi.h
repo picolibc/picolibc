@@ -52,7 +52,7 @@ extern "C" {
 #define NIM_DELETE	2
 #if (_WIN32_IE >= 0x0500)
 #define NOTIFYICON_VERSION 3
-#ifdef (_WIN32_WINNT >= 0x600)
+#if (_WIN32_WINNT >= 0x600)
 #define NOTIFYICON_VERSION_4  4
 #endif
 #define NIM_SETFOCUS	3
