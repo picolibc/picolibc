@@ -1,3 +1,7 @@
+2008-10-04  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/shellapi.h (NOTIFYICON_VERSION_4): Define.
+
 2008-09-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/vfw.h (capSendMessage): Rename to __capSendMessage.
