@@ -1,3 +1,8 @@
+2008-10-04 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.15.1 and introduce
+	__MINGW32_PATCHLEVEL variable.
+
 2008-10-03  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2144266]: getopt() sets `optind' incorrectly.
