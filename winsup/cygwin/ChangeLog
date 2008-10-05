@@ -1,3 +1,10 @@
+2008-10-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_0): Don't initialize signals early when
+	dynamically loaded.
+	(dll_crt0_1): Wait until this phase to initialize signals when
+	dynamically loaded.
+
 2008-09-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* thread.cc (pthread_mutex::_fixup_after_fork): Reinstate DEBUGGING

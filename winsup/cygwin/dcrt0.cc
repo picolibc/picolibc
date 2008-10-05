@@ -697,7 +697,8 @@ dll_crt0_0 ()
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
-  sigproc_init ();
+  if (!dynamically_loaded)
+    sigproc_init ();
 
   lock_process::init ();
   _impure_ptr = _GLOBAL_REENT;
@@ -759,6 +760,8 @@ dll_crt0_0 ()
 void
 dll_crt0_1 (void *)
 {
+  if (dynamically_loaded)
+    sigproc_init ();
   check_sanity_and_sync (user_data);
 
   /* Initialize malloc and then call user_shared_initialize since it relies
