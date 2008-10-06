@@ -1,3 +1,8 @@
+2008-10-06  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/time/tzset_r.c (_tzset_r):  Change US default start/end dates to
+	2007 law revision of start in 2nd Sunday in March, end 1st Sun in Nov.
+
 2008-10-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/str-two-way.h (critical_factorization): Cast the index

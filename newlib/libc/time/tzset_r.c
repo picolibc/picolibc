@@ -147,20 +147,22 @@ _DEFUN (_tzset_r, (reent_ptr),
 	  d = strtoul (tzenv, &end, 10);
 	  
 	  /* if unspecified, default to US settings */
+	  /* From 1987-2006, US was M4.1.0,M10.5.0, but starting in 2007 is
+	   * M3.2.0,M11.1.0 (2nd Sunday March through 1st Sunday November)  */
 	  if (end == tzenv)
 	    {
 	      if (i == 0)
 		{
 		  tz->__tzrule[0].ch = 'M';
-		  tz->__tzrule[0].m = 4;
-		  tz->__tzrule[0].n = 1;
+		  tz->__tzrule[0].m = 3;
+		  tz->__tzrule[0].n = 2;
 		  tz->__tzrule[0].d = 0;
 		}
 	      else
 		{
 		  tz->__tzrule[1].ch = 'M';
-		  tz->__tzrule[1].m = 10;
-		  tz->__tzrule[1].n = 5;
+		  tz->__tzrule[1].m = 11;
+		  tz->__tzrule[1].n = 1;
 		  tz->__tzrule[1].d = 0;
 		}
 	    }
@@ -193,8 +195,3 @@ _DEFUN (_tzset_r, (reent_ptr),
 
   TZ_UNLOCK;
 }
-
-
-
-
-
