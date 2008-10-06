@@ -1,3 +1,8 @@
+2008-10-06  Eric Blake  <ebb9@byu.net>
+
+	* libc/stdlib/ldtoa.c (etoasc): Fix rounding to even when fraction
+	is 0.5 or 0.75.
+
 2008-10-06  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/time/tzset_r.c (_tzset_r):  Change US default start/end dates to
