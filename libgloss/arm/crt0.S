@@ -167,14 +167,23 @@ __change_mode:
 	ldr	r3, .Lhwinit
 	cmp	r3, #0
 	beq	.LC24
+#if defined(__thumb__) || defined(__thumb2__)
+	blx   r3
+#else
 	mov	lr, pc
 	mov	pc, r3
+#endif
 .LC24:	
 	ldr	r3, .Lswinit
 	cmp	r3, #0
 	beq	.LC25
+#if defined(__thumb__) || defined(__thumb2__)
+	blx   r3
+#else
 	mov	lr, pc
 	mov	pc, r3
+#endif
+
 .LC25:	
 	mov	r0, #0		/*  no arguments  */
 	mov	r1, #0		/*  no argv either */

@@ -1,3 +1,8 @@
+2008-10-06  Bill Tompkins  <bill+newlib@key-square.com>
+
+	* arm/crt0.S: Fix calling hardware_init_hook() or software_init_hook()
+	under thumb and thumb2.
+
 2008-09-24  DJ Delorie  <dj@redhat.com>
 
 	* m32c/varvects.S: New.
