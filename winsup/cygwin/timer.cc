@@ -170,7 +170,17 @@ timer_thread (VOID *x)
 	  {
 	    pthread_t notify_thread;
 	    debug_printf ("%p starting thread", x);
-	    int rc = pthread_create (&notify_thread, tt->evp.sigev_notify_attributes,
+	    pthread_attr_t *attr;
+	    pthread_attr_t default_attr;
+	    if (tt->evp.sigev_notify_attributes)
+	      attr = tt->evp.sigev_notify_attributes;
+	    else
+	      {
+		pthread_attr_init(attr = &default_attr);
+		pthread_attr_setdetachstate (attr, PTHREAD_CREATE_DETACHED);
+	      }
+
+	    int rc = pthread_create (&notify_thread, attr,
 				     (void * (*) (void *)) tt->evp.sigev_notify_function,
 				     tt->evp.sigev_value.sival_ptr);
 	    if (rc)

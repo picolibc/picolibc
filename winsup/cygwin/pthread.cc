@@ -17,7 +17,7 @@ extern "C"
 {
 /*  ThreadCreation */
 int
-pthread_create (pthread_t * thread, const pthread_attr_t * attr,
+pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 		void *(*start_routine) (void *), void *arg)
 {
   return pthread::create (thread, attr, start_routine, arg);

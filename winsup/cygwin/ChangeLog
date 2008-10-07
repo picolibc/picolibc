@@ -1,3 +1,9 @@
+2008-10-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pthread.cc (pthread_create): Very minor formatting change.
+	* timer.cc (timer_thread): Ensure that any created thread defaults to
+	detached state.
+
 2008-10-06  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::initialized): Remove bogus stack check which would
