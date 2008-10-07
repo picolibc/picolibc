@@ -1,3 +1,9 @@
+2008-10-06  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.h (_cygtls::initialized): Remove bogus stack check which would
+	when checking the current thread from the current thread.
+	* tlsoffsets.h: Regenerate.
+
 2008-10-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Don't initialize signals early when

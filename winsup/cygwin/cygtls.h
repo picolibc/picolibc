@@ -220,8 +220,7 @@ struct _cygtls
   __stack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
-    volatile char here;
-    return ((char *) this > &here) && initialized == CYGTLS_INITIALIZED;
+    return initialized == CYGTLS_INITIALIZED;
   }
   bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)
     __attribute__((regparm(3)));
