@@ -1248,7 +1248,8 @@ out:
   if (saw_symlinks)
     set_has_symlinks ();
 
-  if (!error && !isdir () && !(path_flags & PATH_ALL_EXEC))
+  if (!error && !isdir () && !(path_flags & PATH_ALL_EXEC)
+      && !fs.has_acls () && !fs.is_nfs ())
     {
       const char *p = strchr (path, '\0') - 4;
       if (p >= path &&
