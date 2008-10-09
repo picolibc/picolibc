@@ -609,6 +609,18 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       else
 	{
 	  buf->st_mode |= S_IFREG;
+	  /* Check suffix for executable file. */
+	  if (pc.exec_state () == dont_know_if_executable)
+	    {
+	      PUNICODE_STRING path = pc.get_nt_native_path ();
+
+	      if (RtlEqualUnicodePathSuffix (path, L".exe", TRUE)
+		  || RtlEqualUnicodePathSuffix (path, L".bat", TRUE)
+		  || RtlEqualUnicodePathSuffix (path, L".com", TRUE))
+		pc.set_exec ();
+	    }
+	  /* No known sufix, check file header.  This catches binaries and
+	     shebang scripts. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      UNICODE_STRING same;
