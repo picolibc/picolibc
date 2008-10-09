@@ -1,3 +1,9 @@
+2008-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check_shortcut): Don't check for executability
+	here.
+	(symlink_info::check_sysfile): Ditto.
+
 2008-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::path_conv): Only assume executability by suffix

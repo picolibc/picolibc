@@ -1877,12 +1877,12 @@ symlink_info::check_shortcut (HANDLE in_h)
   file_header = (win_shortcut_hdr *) buf;
   if (io.Information != fsi.EndOfFile.LowPart
       || !cmp_shortcut_header (file_header))
-    goto file_not_symlink;
+    goto out;
   cp = buf + sizeof (win_shortcut_hdr);
   if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
     cp += *(unsigned short *) cp + 2;
   if (!(len = *(unsigned short *) cp))
-    goto file_not_symlink;
+    goto out;
   cp += 2;
   /* Check if this is a device file - these start with the sequence :\\ */
   if (strncmp (cp, ":\\", 2) == 0)
@@ -1898,18 +1898,13 @@ symlink_info::check_shortcut (HANDLE in_h)
 	  cp += 2;
 	}
       if (len > SYMLINK_MAX)
-	goto file_not_symlink;
+	goto out;
       cp[len] = '\0';
       res = posixify (cp);
     }
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
   return res;
-
-file_not_symlink:
-  /* Not a symlink, see if executable.  */
-  if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, io.Information))
-    pflags |= PATH_EXEC;
 
 out:
   NtClose (h);
@@ -1965,16 +1960,6 @@ symlink_info::check_sysfile (HANDLE in_h)
   else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
     pflags |= PATH_SOCKET;
-  else
-    {
-      /* Not a symlink, see if executable.  */
-      if (pflags & PATH_ALL_EXEC)
-	/* Nothing to do */;
-      else if (has_exec_chars (cookie_buf, io.Information))
-	pflags |= PATH_EXEC;
-      else
-	pflags |= PATH_NOTEXEC;
-      }
   NtClose (h);
   return res;
 }
