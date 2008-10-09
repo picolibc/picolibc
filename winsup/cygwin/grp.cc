@@ -84,7 +84,8 @@ pwdgrp::read_group ()
 
       cygheap->user.groups.pgsid.string (strbuf);
       if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
-	strlcpy (group_name, gr->gr_name, sizeof (group_name));
+	snprintf (group_name, sizeof (group_name),
+		  "passwd/group_GID_clash(%lu/%lu)", myself->gid, gr->gr_gid);
       if (myself->uid == UNKNOWN_UID)
 	strcpy (group_name, "mkpasswd"); /* Feedback... */
       snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
