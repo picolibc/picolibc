@@ -1,5 +1,11 @@
 2008-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::is_binary): Always check for GetBinaryType.
+	* syscalls.cc (rename): Fix test for just changing case of name on
+	case insensitive filesystems.
+
+2008-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check_shortcut): Don't check for executability
 	here.
 	(symlink_info::check_sysfile): Ditto.

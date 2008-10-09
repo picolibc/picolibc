@@ -1608,7 +1608,8 @@ rename (const char *oldpath, const char *newpath)
      just a request to change the case of the filename.  By simply setting
      the file attributes to INVALID_FILE_ATTRIBUTES (which translates to
      "file doesn't exist"), all later tests are skipped. */
-  if (oldpc.objcaseinsensitive () && newpc.exists () && equal_path)
+  if (oldpc.objcaseinsensitive () && newpc.exists () && equal_path
+      && old_explicit_suffix == new_explicit_suffix)
     {
       if (RtlEqualUnicodeString (oldpc.get_nt_native_path (),
 				 newpc.get_nt_native_path (),
