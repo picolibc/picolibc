@@ -12,7 +12,7 @@
 
 2008-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
-	* path.cc (path_conv::path_conv): Only assume executability by suffix
+	* path.cc (path_conv::check): Only assume executability by suffix
 	on file systems not supporting permissions.
 
 2008-10-07  Christopher Faylor  <me+cygwin@cgf.cx>
