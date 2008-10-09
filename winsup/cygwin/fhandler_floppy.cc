@@ -338,20 +338,26 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	    }
 	}
     }
-  else if (!read_file (p, len, &bytes_read, &ret))
+  else
     {
-      if (!IS_EOM (ret))
+      _off64_t current_position = get_current_position ();
+      if (current_position + bytes_to_read >= drive_size)
+	bytes_to_read = drive_size - current_position;
+      if (bytes_to_read && !read_file (p, len, &bytes_read, &ret))
 	{
-	  __seterrno ();
-	  goto err;
-	}
-      if (bytes_read)
-	eom_detected (true);
-      else
-	{
-	  debug_printf ("return -1, set errno to ENOSPC");
-	  set_errno (ENOSPC);
-	  goto err;
+	  if (!IS_EOM (ret))
+	    {
+	      __seterrno ();
+	      goto err;
+	    }
+	  if (bytes_read)
+	    eom_detected (true);
+	  else
+	    {
+	      debug_printf ("return -1, set errno to ENOSPC");
+	      set_errno (ENOSPC);
+	      goto err;
+	    }
 	}
     }
 

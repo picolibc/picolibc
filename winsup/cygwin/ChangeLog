@@ -1,5 +1,10 @@
 2008-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Keep track of
+	current position in non-buffered case, too.
+
+2008-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (pwdgrp::read_group): Generate more speaking group name
 	if passwd gid exists under different gid in /etc/group.
 
