@@ -1,3 +1,7 @@
+2008-10-10  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* ppc.h: Add Tag_GNU_Power_ABI_Struct_Return.
+
 2008-10-04  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (R_CRIS_32_GOT_GD, R_CRIS_16_GOT_GD, R_CRIS_32_GD)
