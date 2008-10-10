@@ -1,3 +1,7 @@
+2008-10-09  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/mmsystem.h (sndAlias): Correct GCC4 warning.
+
 2008-10-04  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/shellapi.h (NOTIFYICON_VERSION_4): Define.
