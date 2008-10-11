@@ -314,8 +314,11 @@ double __cdecl __MINGW_NOTHROW __strtod (const char*, char**);
 #else
 static
 #endif /* Not __cplusplus */
-inline double __cdecl __MINGW_NOTHROW strtod (const char* __restrict__ __nptr, char** __restrict__ __endptr)
-{ return __strtod(__nptr, __endptr); }
+__inline__ double __cdecl __MINGW_NOTHROW
+strtod (const char* __restrict__ __nptr, char** __restrict__ __endptr)
+{
+  return __strtod(__nptr, __endptr);
+}
 float __cdecl __MINGW_NOTHROW strtof (const char * __restrict__, char ** __restrict__);
 long double __cdecl __MINGW_NOTHROW strtold (const char * __restrict__, char ** __restrict__);
 #else

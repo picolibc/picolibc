@@ -1,3 +1,12 @@
+2008-10-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Make strtod() inline definition C89 compliant.
+	(Issue reported by Ilya Shestopalov and Ian Puleston)
+	(Correction identified by Danny Smith)
+
+	* include/stdlib.h (strtod): Declare as `__inline__', not `inline';
+	reformat inline function definition.
+
 2008-10-04 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.15.1 and introduce
