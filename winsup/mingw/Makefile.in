@@ -189,14 +189,14 @@ MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
 
 LIBS = libcrtdll.a \
-       libmsvcrt.a libmsvcrtd.a \
+       libmsvcrt.a  libmsvcrtd.a \
        libmsvcr70.a libmsvcr70d.a \
        libmsvcr71.a libmsvcr71d.a \
        libmsvcr80.a libmsvcr80d.a \
        libmsvcr90.a libmsvcr90d.a \
        libmingw32.a \
        libcoldname.a \
-       libmoldname.a libmoldnamed.a \
+       libmoldname.a   libmoldnamed.a \
        libmoldname70.a libmoldname70d.a \
        libmoldname71.a libmoldname71d.a \
        libmoldname80.a libmoldname80d.a \
@@ -305,7 +305,10 @@ libmoldname.a libmoldnamed.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-libmoldname70.a libmoldname70d.a libmoldname71.a libmoldname71d.a libmoldname80.a libmoldname80d.a libmoldname90.a libmoldname90d.a: moldname-msvcrt.def $(MOLD_OBJS)
+libmoldname70.a libmoldname70d.a \
+libmoldname71.a libmoldname71d.a \
+libmoldname80.a libmoldname80d.a \
+libmoldname90.a libmoldname90d.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
 		--dllname msvcr$(@:libmoldname%a=%)dll  \
 		--def moldname-msvcrt.def	\
@@ -320,11 +323,13 @@ crt1.o dllcrt1.o:
 crt2.o dllcrt2.o:
 	$(CC) -c -D__MSVCRT__ -U__CRTDLL__ $(ALL_CFLAGS) $< -o $@
 
+check: check-headers
+
 TEST_H_OPTIONS = $(ALL_CFLAGS) -Wall -W -Wsystem-headers -c \
 	$(srcdir)/test_headers.c -o test_headers.o
 
-.PHONY: test_headers
-test_headers:
+.PHONY: check-headers
+check-headers: force
 	@echo "Testing runtime headers..."
 	@for lang in c c++ objective-c ; do \
 		echo "$$lang ..."; \

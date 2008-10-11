@@ -1,5 +1,14 @@
 2008-10-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
+	Use de-facto standard Makefile goals to invoke test suite.
+
+	* Makefile.in: Some minor formatting adjustments.
+	(test_headers): Unconventionally named goal renamed to...
+	(check-headers): ...this; make it a prerequisite of...
+	(check): ...this new conventionally named goal.
+
+2008-10-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
 	Make strtod() inline definition C89 compliant.
 	(Issue reported by Ilya Shestopalov and Ian Puleston)
 	(Correction identified by Danny Smith)
