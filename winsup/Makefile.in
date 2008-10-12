@@ -1,5 +1,5 @@
 # Makefile.in for windows stuff
-# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006
+# Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007
 # Red Hat, Inc.
 #
 # This file is part of Cygwin.
@@ -15,15 +15,19 @@ VPATH:=@srcdir@
 srcdir:=@srcdir@
 objdir:=.
 
+DESTDIR=
 target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
-prefix:=@prefix@
-
+prefix:=${DESTDIR}@prefix@
+exec_prefix:=${DESTDIR}@exec_prefix@
+bindir:=${DESTDIR}@bindir@
+libdir:=${DESTDIR}@libdir@
+datadir:=${DESTDIR}@datadir@
+infodir:=${DESTDIR}@infodir@
+includedir:=${DESTDIR}@includedir@
 program_transform_name:=@program_transform_name@
-exec_prefix:=@exec_prefix@
-bindir:=@bindir@
-libdir:=@libdir@
+
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -33,9 +37,6 @@ endif
 else
 tooldir:=$(exec_prefix)/$(target_alias)
 endif
-datadir:=@datadir@
-infodir:=@infodir@
-includedir:=@includedir@
 
 INSTALL:=@INSTALL@
 INSTALL_PROGRAM:=@INSTALL_PROGRAM@

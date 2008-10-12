@@ -1,3 +1,7 @@
+2008-10-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Tweak to work better with new utils/mingw front-end.
+
 2008-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install-license): Install COPYING file as well.

@@ -48,8 +48,7 @@ ALL_DEP_LDLIBS := $(cygwin_build)/libcygwin.a ${patsubst -l%,\
 MINGW_LIB        := $(mingw_build)/libmingw32.a
 MINGW_LDLIBS     := $(ALL_LDLIBS) $(MINGW_LIB)
 MINGW_DEP_LDLIBS := $(ALL_DEP_LDLIBS) $(MINGW_LIB)
-MINGW_CXX        := ${patsubst %/cygwin/include,%/mingw/include,\
-                      ${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)}} -I$(updir)
+MINGW_CXX        := ${srcdir}/mingw ${CXX} -I${updir}
 
 # List all binaries to be linked in Cygwin mode.  Each binary on this list
 # must have a corresponding .o of the same name.
@@ -90,7 +89,7 @@ all: warn_dumper
 endif
 
 # Check for availability of a MinGW libz and enable for cygcheck.
-libz:=${shell x=$$($(CC) -mno-cygwin --print-file-name=libz.a); cd $$(dirname $$x); dir=$$(pwd); case "$$dir" in *mingw*) echo $$dir/libz.a ;; esac}
+libz:=${shell x=$$(${MINGW_CXX} --print-file-name=libz.a); cd $$(dirname $$x); dir=$$(pwd); case "$$dir" in *mingw*) echo $$dir/libz.a ;; esac}
 ifdef libz
 zlib_h  := -include ${patsubst %/lib/mingw/libz.a,%/include/zlib.h,${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}}
 zconf_h := ${patsubst %/zlib.h,%/zconf.h,$(zlib_h)}
@@ -129,10 +128,10 @@ endif
 # how to link a MinGW binary
 $(MINGW_BINS): %.exe: %.o
 ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
-	@echo $(CXX) -o $@ ${filter %.o,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	@echo $(MINGW_CXX) -o $@ ${filter %.o,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
+	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
 # how to link a Cygwin binary
