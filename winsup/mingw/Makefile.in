@@ -104,11 +104,9 @@ CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 
 # compiling with Cygwin?
-MNO_CYGWIN = @MNO_CYGWIN@
-ifdef MNO_CYGWIN
-   subdirforlib=/mingw
-else
-   libdir=
+NO_CYGWIN := @NO_CYGWIN@
+ifdef NO_CYGWIN
+override CC := ${NO_CYGWIN} $(firstword ${CC})
 endif
 
 # Either crtdll (CRT_ID 1) or msvcrt (CRT_ID 2).
@@ -128,8 +126,8 @@ INCLUDES = -I$(srcdir)/include \
   -I$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(W32API_INCLUDE) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(W32API_INCLUDE)
+ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE)
 
 AS = @AS@
 AR = @AR@

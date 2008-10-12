@@ -36,7 +36,10 @@ CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 
 # compiling with Cygwin?
-MNO_CYGWIN = @MNO_CYGWIN@
+NO_CYGWIN := @NO_CYGWIN@
+ifdef NO_CYGWIN
+override CC := ${NO_CYGWIN} $(firstword $(filter-out ${NO_CYGWIN},${CC}))
+endif
 
 # Either crtdll (CRT_ID 1) or msvcrt (CRT_ID 2).
 RUNTIME = @RUNTIME@
@@ -51,8 +54,8 @@ W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(W32API_INCLUDE) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(W32API_INCLUDE)
+ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE)
 
 AS = @AS@
 AR = @AR@

@@ -51,14 +51,14 @@ W32API_INCLUDE='-I $(srcdir)/../w32api/include'
 
 case "$target_os" in
 *cygwin*)
-  MNO_CYGWIN=-mno-cygwin
+  NO_CYGWIN="$(cd ${srcdir}/../utils; pwd)/mingw"
   LIBM_A=libm.a
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
   ;;
 *)
   # Build it for MSVCRT by default.
-  MNO_CYGWIN=
+  NO_CYGWIN=
   LIBM_A=libm.a
   ;;
 esac
@@ -71,7 +71,7 @@ esac
 AC_SUBST([THREAD_DLL], [mingwm])
 
 AC_SUBST([MKINSTALLDIRS], [$ac_aux_dir/mkinstalldirs])
-AC_SUBST([MNO_CYGWIN])
+AC_SUBST([NO_CYGWIN])
 AC_SUBST([LIBM_A])
 AC_SUBST([LIBGMON_A])
 AC_SUBST([HEADER_SUBDIR])

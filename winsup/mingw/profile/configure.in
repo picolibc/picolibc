@@ -40,13 +40,13 @@ LIBGMON_A=libgmon.a
 case "$target_os" in
 *mingw32crt*)
   CRT_ID=1
-  MNO_CYGWIN=
+  NO_CYGWIN=
   RUNTIME=crtdll
   CRT0S="gcrt1.o gcrt2.o"
   ;;
 *cygwin*)
   CRT_ID=2
-  MNO_CYGWIN=-mno-cygwin
+  NO_CYGWIN="$(cd ${srcdir}/../../utils; pwd)/mingw"
   RUNTIME=msvcrt
   CRT0S=gcrt0.o
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
@@ -55,7 +55,7 @@ case "$target_os" in
 *)
   # Build it for MSVCRT by default.
   CRT_ID=2
-  MNO_CYGWIN=
+  NO_CYGWIN=
   RUNTIME=msvcrt
   CRT0S="gcrt1.o gcrt2.o"
   ;;
@@ -65,7 +65,7 @@ W32API_INCLUDE='-I $(srcdir)/../../w32api/include'
 
 AC_SUBST(CRT_ID)
 AC_SUBST(RUNTIME)
-AC_SUBST(MNO_CYGWIN)
+AC_SUBST(NO_CYGWIN)
 AC_SUBST(LIBGMON_A)
 AC_SUBST(CRT0S)
 AC_SUBST(W32API_INCLUDE)

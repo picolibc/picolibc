@@ -37,15 +37,15 @@ AC_CANONICAL_SYSTEM
 
 case "$target_os" in
 *cygwin*)
-  MNO_CYGWIN=-mno-cygwin
+  NO_CYGWIN="$(cd ${srcdir}/../../utils; pwd)/mingw"
   ;;
 *)
   # Build it for MSVCRT by default.
-  MNO_CYGWIN=
+  NO_CYGWIN=
   ;;
 esac
 
-AC_SUBST(MNO_CYGWIN)
+AC_SUBST(NO_CYGWIN)
 
 W32API_INCLUDE='-I $(srcdir)/../../w32api/include'
 AC_SUBST(W32API_INCLUDE)

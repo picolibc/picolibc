@@ -1,3 +1,16 @@
+2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Use a different method to invoke gcc in a cygwin-hosted
+	environment.
+	* mingwex/Makefile.in: Ditto.
+	* profile/Makefile.in: Ditto.
+	* configure.in: Record mingw front-end for building under Cygwin.
+	* mingwex/configure.in: Ditto.
+	* profile/configure.in: Ditto.
+	* configure: Regenerate.
+	* mingwex/configure: Ditto.
+	* profile/configure: Ditto.
+
 2008-10-11  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Use de-facto standard Makefile goals to invoke test suite.

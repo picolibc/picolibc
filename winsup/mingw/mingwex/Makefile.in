@@ -106,14 +106,17 @@ WARNFLAGS = -Wall
 
 
 # compiling with Cygwin?
-MNO_CYGWIN = @MNO_CYGWIN@
+NO_CYGWIN := @NO_CYGWIN@
+ifdef NO_CYGWIN
+override CC := ${NO_CYGWIN} $(firstword $(filter-out ${NO_CYGWIN},${CC}))
+endif
 
 W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(INCLUDES) $(W32API_INCLUDE) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(INCLUDES) $(W32API_INCLUDE)
+ALL_CXXFLAGS = $(CXXFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(INCLUDES) -nostdinc++ $(W32API_INCLUDE)
 
 AS = @AS@
 AR = @AR@
