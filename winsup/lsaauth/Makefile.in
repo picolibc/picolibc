@@ -29,14 +29,19 @@ INSTALL_DATA    := @INSTALL_DATA@
 CC              := @CC@
 CC_FOR_TARGET   := $(CC)
 
+override CC	:= @NO_CYGWIN@ $(firstword ${CC})
+
 CFLAGS          := @CFLAGS@
 
 include $(srcdir)/../Makefile.common
 
-WIN32_COMMON	:= -mno-cygwin
 WIN32_INCLUDES  := -I. -I$(srcdir) $(w32api_include) $(w32api_include)/ddk
 WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
 WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -nostdlib -Wl,-shared
+
+ifdef MINGW_CC
+override CC:=${MINGW_CC}
+endif
 
 LIBS		:= -ladvapi32 -lkernel32 -lntdll
 
@@ -54,12 +59,7 @@ $(DEF_FILE): cyglsa.din config.status
 	$(SHELL) config.status
 
 $(DLL): $(OBJ) $(DEF_FILE)
-ifdef VERBOSE
-	$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(OBJ) $(LIBS)
-else
-	@echo $(CC) .. -o $@ $(OBJ)
-	@$(CC) -s $(WIN32_LDFLAGS) -o $@ $(DEF_FILE) $(OBJ) $(LIBS)
-endif
+	$(CC) -s $(WIN32_LDFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: all install clean realclean
 
@@ -76,10 +76,4 @@ install: all
 	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(bindir)/cyglsa-config
 
 %.o: %.c
-ifdef VERBOSE
 	$(CC) $(WIN32_CFLAGS) -c -o $@ $<
-else
-	@echo $(CC) -c $(CFLAGS) ... $(<F)
-	@$(CC) $(WIN32_CFLAGS) -c -o $@ $<
-endif
-

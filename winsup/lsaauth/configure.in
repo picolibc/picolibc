@@ -24,6 +24,9 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
+NO_CYGWIN="$(cd ${srcdir}/../utils; pwd)/mingw"
+
+AC_SUBST(NO_CYGWIN)
 AC_ARG_PROGRAM
 
 if test "x$cross_compiling" = "xyes"; then

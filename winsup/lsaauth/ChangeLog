@@ -1,3 +1,14 @@
+2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Rearrange to avoid -mno-cygwin.
+	* configure.in: Use mingw front-end from utils directory as compiler
+	front-end.
+	* configure: Regenerate.
+	* cyglsa.c (cyglsa_printf): Rename from 'printf' to avoid a compiler
+	error.
+	(print_sid, print_groups, print_privs, print_dacl, print_tokinf,
+	LsaApLogonUserEx): Ditto.
+
 2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cyglsa-config: Copy the DLL instead of moving.

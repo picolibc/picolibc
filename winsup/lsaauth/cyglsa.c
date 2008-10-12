@@ -76,7 +76,7 @@ extern int _vsnprintf (char *, size_t, const char *, va_list);
 static HANDLE fh = INVALID_HANDLE_VALUE;
 
 static int
-printf (const char *format, ...)
+cyglsa_printf (const char *format, ...)
 {
   char buf[256];
   DWORD wr;
@@ -103,24 +103,24 @@ print_sid (const char *prefix, int idx, PISID sid)
 {
   DWORD i;
 
-  printf ("%s", prefix);
+  cyglsa_printf ("%s", prefix);
   if (idx >= 0)
-    printf ("[%d] ", idx);
-  printf ("(0x%08x) ", (INT_PTR) sid);
+    cyglsa_printf ("[%d] ", idx);
+  cyglsa_printf ("(0x%08x) ", (INT_PTR) sid);
   if (!sid)
-    printf ("NULL\n");
+    cyglsa_printf ("NULL\n");
   else if (IsBadReadPtr (sid, 8))
-    printf ("INVALID POINTER\n");
+    cyglsa_printf ("INVALID POINTER\n");
   else if (!IsValidSid ((PSID) sid))
-    printf ("INVALID SID\n");
+    cyglsa_printf ("INVALID SID\n");
   else if (IsBadReadPtr (sid, 8 + sizeof (DWORD) * sid->SubAuthorityCount))
-    printf ("INVALID POINTER SPACE\n");
+    cyglsa_printf ("INVALID POINTER SPACE\n");
   else
     {
-      printf ("S-%d-%d", sid->Revision, sid->IdentifierAuthority.Value[5]);
+      cyglsa_printf ("S-%d-%d", sid->Revision, sid->IdentifierAuthority.Value[5]);
       for (i = 0; i < sid->SubAuthorityCount; ++i)
-        printf ("-%lu", sid->SubAuthority[i]);
-      printf ("\n");
+        cyglsa_printf ("-%lu", sid->SubAuthority[i]);
+      cyglsa_printf ("\n");
     }
 }
 
@@ -129,20 +129,20 @@ print_groups (PTOKEN_GROUPS grps)
 {
   DWORD i;
 
-  printf ("Groups: (0x%08x) ", (INT_PTR) grps);
+  cyglsa_printf ("Groups: (0x%08x) ", (INT_PTR) grps);
   if (!grps)
-    printf ("NULL\n");
+    cyglsa_printf ("NULL\n");
   else if (IsBadReadPtr (grps, sizeof (DWORD)))
-    printf ("INVALID POINTER\n");
+    cyglsa_printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (grps, sizeof (DWORD) + sizeof (SID_AND_ATTRIBUTES)
   						* grps->GroupCount))
-    printf ("INVALID POINTER SPACE\n");
+    cyglsa_printf ("INVALID POINTER SPACE\n");
   else
     {
-      printf ("Count: %lu\n", grps->GroupCount);
+      cyglsa_printf ("Count: %lu\n", grps->GroupCount);
       for (i = 0; i < grps->GroupCount; ++i)
         {
-	  printf ("(attr: 0x%lx)", grps->Groups[i].Attributes);
+	  cyglsa_printf ("(attr: 0x%lx)", grps->Groups[i].Attributes);
 	  print_sid (" ", i, (PISID) grps->Groups[i].Sid);
 	}
     }
@@ -153,19 +153,19 @@ print_privs (PTOKEN_PRIVILEGES privs)
 {
   DWORD i;
 
-  printf ("Privileges: (0x%08x) ", (INT_PTR) privs);
+  cyglsa_printf ("Privileges: (0x%08x) ", (INT_PTR) privs);
   if (!privs)
-    printf ("NULL\n");
+    cyglsa_printf ("NULL\n");
   else if (IsBadReadPtr (privs, sizeof (DWORD)))
-    printf ("INVALID POINTER\n");
+    cyglsa_printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (privs, sizeof (DWORD) + sizeof (LUID_AND_ATTRIBUTES)
 						 * privs->PrivilegeCount))
-    printf ("INVALID POINTER SPACE\n");
+    cyglsa_printf ("INVALID POINTER SPACE\n");
   else
     {
-      printf ("Count: %lu\n", privs->PrivilegeCount);
+      cyglsa_printf ("Count: %lu\n", privs->PrivilegeCount);
       for (i = 0; i < privs->PrivilegeCount; ++i)
-	printf ("Luid: {%ld, %lu} Attributes: 0x%lx\n",
+	cyglsa_printf ("Luid: {%ld, %lu} Attributes: 0x%lx\n",
 		privs->Privileges[i].Luid.HighPart,
 		privs->Privileges[i].Luid.LowPart,
 		privs->Privileges[i].Attributes);
@@ -177,27 +177,27 @@ print_dacl (PACL dacl)
 {
   DWORD i;
 
-  printf ("DefaultDacl: (0x%08x) ", (INT_PTR) dacl);
+  cyglsa_printf ("DefaultDacl: (0x%08x) ", (INT_PTR) dacl);
   if (!dacl)
-    printf ("NULL\n");
+    cyglsa_printf ("NULL\n");
   else if (IsBadReadPtr (dacl, sizeof (ACL)))
-    printf ("INVALID POINTER\n");
+    cyglsa_printf ("INVALID POINTER\n");
   else if (IsBadReadPtr (dacl, dacl->AclSize))
-    printf ("INVALID POINTER SPACE\n");
+    cyglsa_printf ("INVALID POINTER SPACE\n");
   else
     {
-      printf ("Rev: %d, Count: %d\n", dacl->AclRevision, dacl->AceCount);
+      cyglsa_printf ("Rev: %d, Count: %d\n", dacl->AclRevision, dacl->AceCount);
       for (i = 0; i < dacl->AceCount; ++i)
         {
 	  PVOID vace;
 	  PACCESS_ALLOWED_ACE ace;
 
 	  if (!GetAce (dacl, i, &vace))
-	    printf ("[%lu] GetAce error %lu\n", i, GetLastError ());
+	    cyglsa_printf ("[%lu] GetAce error %lu\n", i, GetLastError ());
 	  else
 	    {
 	      ace = (PACCESS_ALLOWED_ACE) vace;
-	      printf ("Type: %x, Flags: %x, Access: %lx,",
+	      cyglsa_printf ("Type: %x, Flags: %x, Access: %lx,",
 		      ace->Header.AceType, ace->Header.AceFlags, (DWORD) ace->Mask);
 	      print_sid (" ", i, (PISID) &ace->SidStart);
 	    }
@@ -212,15 +212,15 @@ print_tokinf (PLSA_TOKEN_INFORMATION_V2 ptok, size_t size,
   if (fh == INVALID_HANDLE_VALUE)
     return;
 
-  printf ("INCOMING: start: 0x%08x infstart: 0x%08x infend: 0x%08x\n",
+  cyglsa_printf ("INCOMING: start: 0x%08x infstart: 0x%08x infend: 0x%08x\n",
 	  (INT_PTR) got_start, (INT_PTR) gotinf_start,
 	  (INT_PTR) gotinf_end);
 
-  printf ("LSA_TOKEN_INFORMATION_V2: 0x%08x - 0x%08x\n",
+  cyglsa_printf ("LSA_TOKEN_INFORMATION_V2: 0x%08x - 0x%08x\n",
 	  (INT_PTR) ptok, (INT_PTR) ptok + size);
 
   /* User SID */
-  printf ("User: (attr: 0x%lx)", ptok->User.User.Attributes);
+  cyglsa_printf ("User: (attr: 0x%lx)", ptok->User.User.Attributes);
   print_sid (" ", -1, (PISID) ptok->User.User.Sid);
 
   /* Groups */
@@ -278,7 +278,7 @@ LsaApInitializePackage (ULONG authp_id, PLSA_SECPKG_FUNCS dpt,
   fh = CreateFile ("C:\\cyglsa.dbgout", GENERIC_WRITE,
 		   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 		   NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  printf ("Initialized\n");
+  cyglsa_printf ("Initialized\n");
 #endif /* DEBUGGING */
 
   return STATUS_SUCCESS;
@@ -304,12 +304,12 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
   stat = funcs->GetClientInfo (&clinf);
   if (stat != STATUS_SUCCESS)
     {
-      printf ("GetClientInfo failed: 0x%08lx\n", stat);
+      cyglsa_printf ("GetClientInfo failed: 0x%08lx\n", stat);
       return stat;
     }
   if (!clinf.HasTcbPrivilege)
     {
-      printf ("Client has no TCB privilege.  Access denied.\n");
+      cyglsa_printf ("Client has no TCB privilege.  Access denied.\n");
       return STATUS_ACCESS_DENIED;
     }
 
@@ -319,7 +319,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       || !authinf->username[0]
       || !authinf->domain[0])
     {
-      printf ("Invalid authentication parameter.\n");
+      cyglsa_printf ("Invalid authentication parameter.\n");
       return STATUS_INVALID_PARAMETER;
     }
   checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
@@ -330,7 +330,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     checksum += *csp++;
   if (authinf->checksum != checksum)
     {
-      printf ("Invalid checksum.\n");
+      cyglsa_printf ("Invalid checksum.\n");
       return STATUS_INVALID_PARAMETER_3;
     }
 
@@ -342,13 +342,13 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
   if (account && !(*account = uni_alloc (authinf->username,
   					 wcslen (authinf->username))))
     {
-      printf ("No memory trying to create account.\n");
+      cyglsa_printf ("No memory trying to create account.\n");
       return STATUS_NO_MEMORY;
     }
   if (authority && !(*authority = uni_alloc (authinf->domain,
 					     wcslen (authinf->domain))))
     {
-      printf ("No memory trying to create authority.\n");
+      cyglsa_printf ("No memory trying to create authority.\n");
       return STATUS_NO_MEMORY;
     }
   if (machine)
@@ -359,7 +359,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
         wcscpy (mach, L"UNKNOWN");
       if (!(*machine = uni_alloc (mach, wcslen (mach))))
 	{
-	  printf ("No memory trying to create machine.\n");
+	  cyglsa_printf ("No memory trying to create machine.\n");
 	  return STATUS_NO_MEMORY;
 	}
     }
@@ -382,7 +382,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       stat = funcs->AllocateClientBuffer (request, 64UL, pbuf);
       if (!LSA_SUCCESS (stat))
 	{
-	  printf ("AllocateClientBuffer failed: 0x%08lx\n", stat);
+	  cyglsa_printf ("AllocateClientBuffer failed: 0x%08lx\n", stat);
 	  return stat;
 	}
 #ifdef JUST_ANOTHER_NONWORKING_SOLUTION
@@ -413,7 +413,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 	{
 	  char sam_u[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
 	  wcstombs (sam_u, sam_user.Buffer, sizeof (sam_u));
-	  printf ("GetAuthDataForUser (%u,%u,%s) failed: 0x%08lx\n",
+	  cyglsa_printf ("GetAuthDataForUser (%u,%u,%s) failed: 0x%08lx\n",
 		  sam_user.Length, sam_user.MaximumLength, sam_u, stat);
 	  return stat;
 	}
@@ -430,21 +430,21 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 					    sub_stat);
       if (!NT_SUCCESS (stat))
 	{
-	  printf ("ConvertAuthDataToToken failed: 0x%08lx\n", stat);
+	  cyglsa_printf ("ConvertAuthDataToToken failed: 0x%08lx\n", stat);
 	  return stat;
 	}
 
       stat = funcs->DuplicateHandle (token, &prf.token);
       if (!NT_SUCCESS (stat))
 	{
-	  printf ("DuplicateHandle failed: 0x%08lx\n", stat);
+	  cyglsa_printf ("DuplicateHandle failed: 0x%08lx\n", stat);
 	  return stat;
 	}
       
       stat = funcs->CopyToClientBuffer (request, sizeof prf, *pbuf, &prf);
       if (!NT_SUCCESS (stat))
 	{
-	  printf ("CopyToClientBuffer failed: 0x%08lx\n", stat);
+	  cyglsa_printf ("CopyToClientBuffer failed: 0x%08lx\n", stat);
 	  return stat;
 	}
       funcs->FreeLsaHeap (user_auth);
@@ -598,7 +598,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     {
       funcs->FreeLsaHeap (*tok);
       *tok = NULL;
-      printf ("AllocateLocallyUniqueId failed: Win32 error %lu\n",
+      cyglsa_printf ("AllocateLocallyUniqueId failed: Win32 error %lu\n",
 	      GetLastError ());
       return STATUS_INSUFFICIENT_RESOURCES;
     }
@@ -607,11 +607,11 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     {
       funcs->FreeLsaHeap (*tok);
       *tok = NULL;
-      printf ("CreateLogonSession failed: 0x%08lx\n", stat);
+      cyglsa_printf ("CreateLogonSession failed: 0x%08lx\n", stat);
       return stat;
     }
 
-  printf ("BINGO!!!\n", stat);
+  cyglsa_printf ("BINGO!!!\n", stat);
   return STATUS_SUCCESS;
 }
 
