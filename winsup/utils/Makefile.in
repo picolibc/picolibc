@@ -135,7 +135,7 @@ else
 endif
 
 # how to link a Cygwin binary
-$(CYGWIN_BINS): %.exe: %.o 
+$(CYGWIN_BINS): %.exe: %.o
 ifdef VERBOSE
 	$(CXX) -o $@ ${filter %.o,$^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
 else

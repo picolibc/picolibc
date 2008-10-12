@@ -3,7 +3,7 @@
 # an installed version of the MinGW components.
 
 #
-# Find the path to the compiler
+# Find the path to the compiler.
 #
 compiler=$1; shift
 case "$compiler" in
