@@ -6,18 +6,12 @@
 # Find the path to the compiler.
 #
 compiler=$1; shift
-case "$compiler" in
-	*/*)	;;
-	*)	compiler=($(type "$compiler"))
-		compiler=${compiler[2]} ;;
-esac
+dir=$(cd $(dirname $("$compiler" -print-prog-name=ld))/../..; pwd)
 
 #
 # The mingw32 directory should live somewhere close by to the
 # compiler.  Search for it.
 #
-updir=$(dirname "$compiler")
-dir=$(cd "$updir"/..; pwd)
 [ "$dir" = '/' ] && dir=''
 mingw_dir=''
 for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-mingw*; do
