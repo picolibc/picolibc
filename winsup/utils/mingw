@@ -34,6 +34,9 @@ newargs=()
 sawcomp() { return 1; }
 sawcfile() { return 1; }
 sawofile() { return 1; }
+sawshared() { return 1; }
+sawnostdinc() { return 1; }
+sawnostdlib() { return 1; }
 eatnext() { return 1; }
 pushnext() { return 1; }
 for f do
@@ -45,13 +48,16 @@ for f do
 	pushnext() { return 1; }
     else
 	case "$f" in
-	    *cygwin/include*|*newlib*) continue ;;
+	    *cygwin/include*|*newlib|-mno-cygwin) continue ;;
 	    -c|-E)		sawcomp() { return 0; } ;;
 	    -isystem)	eatnext() { return 0; }; continue ;;
-	    -o)		pushnext() { return 0; } ; /bin/true ;;
+	    -o)		pushnext() { return 0; } ;;
+	    -nostdinc*)	sawnostdinc() { return 0; } ;;
+	    -nostdlib)	sawnostdlib() { return 0; } ;;
+	    -shared|-Wl,-shared)	sawshared() { return 0; } ;;
 	    -*)		;;
 	    *.cc|*.c)	sawcfile() { return 0; } ;;
-	    *.o)		sawofile() { return 0; }; /bin/true  ;;
+	    *.o)		sawofile() { return 0; };;
 	esac
     fi
     newargs[${#newargs[*]}]="$f"
@@ -65,18 +71,22 @@ set -- -B"$mingw_dir"/lib/ "${newargs[@]}"
 # an attempt to link, compile, or both.
 if sawcomp || sawcfile; then
     ccdir=$(dirname $($compiler -print-libgcc-file-name))
-    set -- -isystem "$ccdir"/include -D__MINGW32__ -D__MSVCRT__ -DWIN32 -D_WIN32 -D__WIN32 -D__WIN32__ -U__CYGWIN__ -Uunix -U__unix__ -U__unix -U __CYGWIN32__ -I"${mingw_dir}"/include "$@"
-    case "$compiler" in
-	*++*) set -- -nostdinc++ "$@" ;;
-	*) set -- -nostdinc "$@" ;;
-    esac
+    sawnostdinc || set -- -isystem "$ccdir"/include -I"${mingw_dir}"/include  "$@"
+    set -- -D__MINGW32__ -D__MSVCRT__ -DWIN32 -D_WIN32 -D__WIN32 -D__WIN32__ -U__CYGWIN__ -Uunix -U__unix__ -U__unix -U __CYGWIN32__ "$@"
+    if ! sawnostdinc; then
+	case "$compiler" in
+	    *++*) set -- -nostdinc++ "$@" ;;
+	    *) set -- -nostdinc "$@" ;;
+	esac
+    fi
 fi
 
 if sawofile || ! sawcfile || ! sawcomp; then
     w32api=$($compiler -print-file-name=libc.a)
     w32api=$(cd $(dirname "$w32api")/w32api; pwd)
-    set -- "$@" -nostdlib -Wl,-nostdlib -L"$w32api" -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -lmingw32 -luser32 -lkernel32 -ladvapi32 -lshell32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt
-    { sawofile || sawcfile; } && set -- "$mingw_dir"/lib/crt2.o "$@"
+    set -- -Wl,-nostdlib -L"${w32api}" "$@"
+    ! sawnostdlib && set -- -nostdlib "$@" -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt -lmingw32 -luser32 -lkernel32 -ladvapi32 -lshell32 -lmingw32 -lgcc -lmoldname -lmingwex -lmsvcrt
+    ! sawnostdlib && ! sawshared && { sawofile || sawcfile; } && set -- "$mingw_dir"/lib/crt2.o "$@"
 fi
 
 # Execute the compiler with new mingw-specific options.
