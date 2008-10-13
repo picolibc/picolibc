@@ -1,7 +1,7 @@
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mingw: Set sawcfile when -xc* is detected.  Extend list of detected
-	source filew.
+	source files.
 
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
