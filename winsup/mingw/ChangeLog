@@ -1,3 +1,12 @@
+2008-10-13  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Fix MinGW-Bug [2160227]
+	Eliminate conflicting declarations and implementations of scalb().
+
+	* moldname.def.in (scalb): Comment out of EXPORTS list.
+	* include/math.h (scalb): Comment out OLDNAMES prototype; it conflicts
+	with GCC's built-in declaration.
+
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Use a different method to invoke gcc in a cygwin-hosted

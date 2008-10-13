@@ -259,7 +259,14 @@ _CRTIMP double __cdecl y1 (double);
 _CRTIMP double __cdecl yn (int, double);
 
 _CRTIMP double __cdecl chgsign (double);
+/*
+ * scalb() is a GCC built-in.
+ * Exclude this _scalb() stub; the semantics are incompatible
+ * with the built-in implementation.
+ *
 _CRTIMP double __cdecl scalb (double, long);
+ *
+ */
 _CRTIMP int __cdecl finite (double);
 _CRTIMP int __cdecl fpclass (double);
 

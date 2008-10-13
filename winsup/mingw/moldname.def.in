@@ -141,7 +141,10 @@ y0
 y1
 yn
 chgsign
-scalb
+; omit scalb...
+; it would conflict with the GCC built-in, which exhibits
+; semantics differing from the MSVCRT implementation.
+;scalb
 finite
 fpclass
 ; C99 functions
