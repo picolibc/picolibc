@@ -104,18 +104,21 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
       DWORD allow;
       /* Owner has more standard rights set. */
       if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
-	allow = STANDARD_RIGHTS_ALL | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+	allow = STANDARD_RIGHTS_ALL
+		| (pc.fs_is_samba ()
+		   ? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES));
       else
-	allow = STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA;
+	allow = STANDARD_RIGHTS_READ
+		| (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
 	{
-	  allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
+	  allow |= FILE_GENERIC_WRITE;
 	  writable = true;
 	}
       if (aclbufp[i].a_perm & S_IXOTH)
-	allow |= FILE_GENERIC_EXECUTE;
+	allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
       if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))
 	allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */

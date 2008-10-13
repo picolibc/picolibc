@@ -479,8 +479,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
     owner_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for group. */
-  DWORD group_allow = STANDARD_RIGHTS_READ |
-		      (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
+  DWORD group_allow = STANDARD_RIGHTS_READ
+		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWGRP)
@@ -526,12 +526,10 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 
   DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
   owner_deny &= ~(STANDARD_RIGHTS_READ
-		  | FILE_READ_ATTRIBUTES | FILE_READ_EA
-		  | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA);
+		  | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
 
   DWORD group_deny = ~group_allow & other_allow;
-  group_deny &= ~(STANDARD_RIGHTS_READ
-		  | FILE_READ_ATTRIBUTES | FILE_READ_EA);
+  group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES);
 
   /* Set deny ACE for owner. */
   if (owner_deny
