@@ -50,13 +50,14 @@ for f do
 	case "$f" in
 	    *cygwin/include*|*newlib|-mno-cygwin) continue ;;
 	    -c|-E)		sawcomp() { return 0; } ;;
+	    -xc*)		sawcfile() { return 0; } ;;
 	    -isystem)	eatnext() { return 0; }; continue ;;
 	    -o)		pushnext() { return 0; } ;;
 	    -nostdinc*)	sawnostdinc() { return 0; } ;;
 	    -nostdlib)	sawnostdlib() { return 0; } ;;
 	    -shared|-Wl,-shared)	sawshared() { return 0; } ;;
 	    -*)		;;
-	    *.cc|*.c)	sawcfile() { return 0; } ;;
+	    *.cc|*.c|*.s|*.S|*.i|*.ii)	sawcfile() { return 0; } ;;
 	    *.o)		sawofile() { return 0; };;
 	esac
     fi
