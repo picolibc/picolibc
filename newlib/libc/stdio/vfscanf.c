@@ -33,9 +33,9 @@ ANSI_SYNOPSIS
 	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>, 
+	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>,
                        va_list <[list]>);
-	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
                        va_list <[list]>);
 	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
                        const char *<[fmt]>, va_list <[list]>);
@@ -51,7 +51,7 @@ TRAD_SYNOPSIS
 	FILE *<[fp]>;
 	char *<[fmt]>;
 	va_list <[list]>;
-	
+
 	int vsscanf( <[str]>, <[fmt]>, <[list]>)
 	char *<[str]>;
 	char *<[fmt]>;
@@ -67,7 +67,7 @@ TRAD_SYNOPSIS
 	FILE *<[fp]>;
 	char *<[fmt]>;
 	va_list <[list]>;
-	
+
 	int _vsscanf_r( <[reent]>, <[str]>, <[fmt]>, <[list]>)
 	struct _reent *<[reent]>;
 	char *<[str]>;
@@ -76,18 +76,18 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<vscanf>>, <<vfscanf>>, and <<vsscanf>> are (respectively) variants
-of <<scanf>>, <<fscanf>>, and <<sscanf>>.  They differ only in 
-allowing their caller to pass the variable argument list as a 
-<<va_list>> object (initialized by <<va_start>>) rather than 
+of <<scanf>>, <<fscanf>>, and <<sscanf>>.  They differ only in
+allowing their caller to pass the variable argument list as a
+<<va_list>> object (initialized by <<va_start>>) rather than
 directly accepting a variable number of arguments.
 
 RETURNS
 The return values are consistent with the corresponding functions:
 <<vscanf>> returns the number of input fields successfully scanned,
 converted, and stored; the return value does not include scanned
-fields which were not stored.  
+fields which were not stored.
 
-If <<vscanf>> attempts to read at end-of-file, the return value 
+If <<vscanf>> attempts to read at end-of-file, the return value
 is <<EOF>>.
 
 If no fields were stored, the return value is <<0>>.
@@ -257,9 +257,9 @@ typedef unsigned long long u_long_long;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(VFSCANF, (fp, fmt, ap), 
-       register FILE *fp _AND 
-       _CONST char *fmt _AND 
+_DEFUN(VFSCANF, (fp, fmt, ap),
+       register FILE *fp _AND
+       _CONST char *fmt _AND
        va_list ap)
 {
   CHECK_INIT(_REENT, fp);
@@ -279,9 +279,9 @@ _DEFUN(__SVFSCANF, (fp, fmt0, ap),
 
 int
 _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data _AND 
-       register FILE *fp   _AND 
-       _CONST char *fmt    _AND 
+       struct _reent *data _AND
+       register FILE *fp   _AND
+       _CONST char *fmt    _AND
        va_list ap)
 {
   CHECK_INIT(data, fp);
@@ -376,8 +376,8 @@ _DEFUN(__ssrefill_r, (ptr, fp),
   fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
   fp->_flags |= __SEOF;
   return EOF;
-} 
- 
+}
+
 static size_t
 _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
        struct _reent * ptr _AND
@@ -486,7 +486,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 
   _flockfile (fp);
- 
+
   nassigned = 0;
   nread = 0;
   for (;;)
@@ -822,14 +822,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /* scan arbitrary characters (sets NOSKIP) */
 	  if (width == 0)
 	    width = 1;
-          if (flags & LONG) 
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+          if (flags & LONG)
             {
               if ((flags & SUPPRESS) == 0)
                 wcp = GET_ARG (N, ap, wchar_t *);
               else
                 wcp = NULL;
               n = 0;
-              while (width != 0) 
+              while (width != 0)
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
@@ -837,7 +838,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   fp->_r -= 1;
                   fp->_p += 1;
                   memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
+                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
@@ -850,17 +851,19 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                         wcp += 1;
                       n = 0;
                     }
-                  if (BufferEmpty) 
+                  if (BufferEmpty)
 	            {
-                      if (n != 0) 
+                      if (n != 0)
                         goto input_failure;
                       break;
                     }
                 }
               if (!(flags & SUPPRESS))
                 nassigned++;
-            } 
-          else if (flags & SUPPRESS) 
+            }
+          else
+#endif
+        	  if (flags & SUPPRESS)
 	    {
 	      size_t sum = 0;
 	      for (;;)
@@ -950,7 +953,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /* like CCL, but zero-length string OK, & no NOSKIP */
 	  if (width == 0)
             width = (size_t)~0;
-          if (flags & LONG) 
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+          if (flags & LONG)
             {
               /* Process %S and %ls placeholders */
               if ((flags & SUPPRESS) == 0)
@@ -958,7 +962,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
               else
                 wcp = &wc;
               n = 0;
-              while (!isspace (*fp->_p) && width != 0) 
+              while (!isspace (*fp->_p) && width != 0)
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
@@ -966,7 +970,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   fp->_r -= 1;
                   fp->_p += 1;
                   memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
+                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -985,20 +989,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                         wcp += 1;
                       n = 0;
                     }
-                  if (BufferEmpty) 
+                  if (BufferEmpty)
                     {
                       if (n != 0)
                         goto input_failure;
                       break;
                     }
                 }
-              if (!(flags & SUPPRESS)) 
+              if (!(flags & SUPPRESS))
                 {
                   *wcp = L'\0';
                   nassigned++;
                 }
             }
-          else if (flags & SUPPRESS) 
+          else
+#endif
+        	  if (flags & SUPPRESS)
 	    {
 	      n = 0;
 	      while (!isspace (*fp->_p))
@@ -1524,7 +1530,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                  sprintf (exp_start, "e%ld", new_exp);
 		}
 
-	      /* Current _strtold routine is markedly slower than 
+	      /* Current _strtold routine is markedly slower than
 	         _strtod_r.  Only use it if we have a long double
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */

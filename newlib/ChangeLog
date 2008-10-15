@@ -1,3 +1,8 @@
+2008-10-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__ssvfiscanf_r): Do not support %lc, %C, %ls or
+	%S conversions when the EL/IX level is 1.
+
 2008-10-06  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdlib/ldtoa.c (etoasc): Fix rounding to even when fraction
