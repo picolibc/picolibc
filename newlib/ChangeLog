@@ -1,3 +1,9 @@
+2008-10-15  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/include/ctype.h (isblank):  isblank is C99.
+	* libc/ctype/isblank.c (isblank comments):  ditto.  isblank does not
+	have a macro version (as was claimed in the description).
+
 2008-10-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__ssvfiscanf_r): Do not support %lc, %C, %ls or

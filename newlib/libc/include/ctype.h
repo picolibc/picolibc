@@ -19,8 +19,12 @@ int _EXFUN(isxdigit,(int __c));
 int _EXFUN(tolower, (int __c));
 int _EXFUN(toupper, (int __c));
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 1999901L)
 int _EXFUN(isblank, (int __c));
+#endif
+
+#ifndef __STRICT_ANSI__
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
 int _EXFUN(_tolower, (int __c));
