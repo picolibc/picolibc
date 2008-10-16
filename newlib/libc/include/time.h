@@ -226,6 +226,16 @@ extern "C" {
 
 #endif
 
+#if defined(_POSIX_MONOTONIC_CLOCK)
+
+/*  The identifier for the system-wide monotonic clock, which is defined
+ *      as a clock whose value cannot be set via clock_settime() and which 
+ *          cannot have backward clock jumps. */
+
+#define CLOCK_MONOTONIC (clockid_t)4
+
+#endif
+
 #if defined(_POSIX_CPUTIME)
 
 /* Accessing a Process CPU-time CLock, P1003.4b/D8, p. 55 */
