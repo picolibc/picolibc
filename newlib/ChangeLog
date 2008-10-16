@@ -1,9 +1,13 @@
 2008-10-16  Joel Sherrill <joel.sherrill@oarcorp.com>
 
-   * libc/include/time.h: Add CLOCK_MONOTONIC.
-   * libc/include/sys/features.h: Define
-   _POSIX_MONOTONIC_CLOCK for RTEMS. 
-   
+	* libc/include/sys/unistd.h: RTEMS follows standard for sync(). 
+
+2008-10-16  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/time.h: Add CLOCK_MONOTONIC.
+	* libc/include/sys/features.h: Define
+	_POSIX_MONOTONIC_CLOCK for RTEMS. 
+
 2008-10-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* newlib.hin: Restore to previous 1.14 version which has no

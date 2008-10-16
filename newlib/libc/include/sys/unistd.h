@@ -229,10 +229,8 @@ useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 char *	_EXFUN(mktemp, (char *));
 #endif
 
-#if defined(__CYGWIN__) || defined(__SPU__)
+#if defined(__CYGWIN__) || defined(__SPU__) || defined(__rtems__)
 void    _EXFUN(sync, (void));
-#elif defined(__rtems__)
-int     _EXFUN(sync, (void));
 #endif
 
 ssize_t _EXFUN(readlink, (const char *__path, char *__buf, size_t __buflen));
