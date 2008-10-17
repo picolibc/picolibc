@@ -1,3 +1,10 @@
+2008-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::get_debugger_info): Call SetStdHandle
+	for the newly opened handle.  Explain why.
+	(dtable::stdio_init): Don't duplicate standard error handle
+	when stderr has already been created under debugger control.
+
 2008-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (setacl): Align standard owner and group permissions

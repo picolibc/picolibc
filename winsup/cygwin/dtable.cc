@@ -128,6 +128,11 @@ dtable::get_debugger_info ()
 	      release (i);
 	    else
 	      CloseHandle (h);
+	      /* Copy to Windows' idea of a standard handle, otherwise
+		 we have invalid standard handles when calling Windows
+		 functions (small_printf and strace might suffer, too). */
+	      SetStdHandle (std_consts[i], i ? fh->get_output_handle ()
+					     : fh->get_handle ());
 	  }
     }
 }
@@ -161,7 +166,11 @@ dtable::stdio_init ()
   /* STD_ERROR_HANDLE has been observed to be the same as
      STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
      to pass data from child to parent).  */
-  if (out == err)
+  /* CV 2008-10-17: Under debugger control, std fd's have been potentially
+     initialized in dtable::get_debugger_info ().  In this case
+     init_std_file_from_handle is a no-op, so, even if out == err we don't
+     want to duplicate the handle since it will be unused. */
+  if (out == err && (!being_debugged () || !not_open (2)))
     {
       /* Since this code is not invoked for forked tasks, we don't have
 	 to worry about the close-on-exec flag here.  */
