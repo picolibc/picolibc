@@ -528,7 +528,7 @@ void __pformat_int( __pformat_intarg_t value, __pformat_t *stream )
     &&  ((stream->flags & PFORMAT_JUSTIFY) == PFORMAT_ZEROFILL)  )
       /*
        * and the `0' flag is in effect, so we pad the remaining spaces,
-       * to the left of the displayed value, with zeroes.
+       * to the left of the displayed value, with zeros.
        */
       while( stream->width-- > 0 )
 	*p++ = '0';
@@ -665,7 +665,7 @@ void __pformat_xint( int fmt, __pformat_intarg_t value, __pformat_t *stream )
   &&  ((stream->flags & PFORMAT_JUSTIFY) == PFORMAT_ZEROFILL)  )
     /*
      * When the `0' flag is set, and not overridden by the `-' flag,
-     * or by a specified precision, add sufficient leading zeroes to
+     * or by a specified precision, add sufficient leading zeros to
      * consume the remaining field width.
      */
     while( width-- > 0 )
@@ -1034,7 +1034,7 @@ void __pformat_emit_float( int sign, char *value, int len, __pformat_t *stream )
      * adjusting appropriately, when sufficient width remains...
      * (note that we must check both of these conditions, because
      * precision may be more negative than width, as a result of
-     * adjustment to provide extra padding when trailing zeroes
+     * adjustment to provide extra padding when trailing zeros
      * are to be discarded from "%g" format conversion with a
      * specified field width, but if width itself is negative,
      * then there is explicitly to be no padding anyway).
@@ -1098,42 +1098,43 @@ void __pformat_emit_float( int sign, char *value, int len, __pformat_t *stream )
   /* Emit the digits of the encoded numeric value...
    */
   if( len > 0 )
-  {
-    /* beginning with those which precede the radix point,
-     * and appending any necessary significant trailing zeroes.
+    /*
+     * ...beginning with those which precede the radix point,
+     * and appending any necessary significant trailing zeros.
      */
-    while( len-- > 0 )
-      __pformat_putc( *value ? *value++ : '0', stream );
-
-    /* Unless the encoded value is integral, AND the radix point
-     * is not expressly demanded by the `#' flag, we must insert
-     * the appropriately localised radix point mark here...
-     */
-    if( (stream->precision > 0) || (stream->flags & PFORMAT_HASHED) )
-      __pformat_emit_radix_point( stream );
-  }
+    do __pformat_putc( *value ? *value++ : '0', stream );
+       while( --len > 0 );
 
   else
-  {
     /* The magnitude of the encoded value is less than 1.0, so no
      * digits precede the radix point; we emit a mandatory initial
      * zero, followed immediately by the radix point.
      */
     __pformat_putc( '0', stream );
+
+  /* Unless the encoded value is integral, AND the radix point
+   * is not expressly demanded by the `#' flag, we must insert
+   * the appropriately localised radix point mark here...
+   */
+  if( (stream->precision > 0) || (stream->flags & PFORMAT_HASHED) )
     __pformat_emit_radix_point( stream );
 
-    /* The radix point offset, `len', may be negative; this implies
-     * that additional zeroes must appear, following the radix point,
-     * and preceding the first significant digit.  We reduce the
-     * precision, (adding a negative value), to allow for these
-     * additional zeroes, then emit the zeroes as required.
+  /* When the radix point offset, `len', is negative, this implies
+   * that additional zeros must appear, following the radix point,
+   * and preceding the first significant digit...
+   */
+  if( len < 0 )
+  {
+    /* To accommodate these, we adjust the precision, (reducing it
+     * by adding a negative value), and then we emit as many zeros
+     * as are required.
      */
     stream->precision += len;
-    while( len++ < 0 )
-      __pformat_putc( '0', stream );
+    do __pformat_putc( '0', stream );
+       while( ++len < 0 );
   }
 
-  /* Now we emit any remaining significant digits, or trailing zeroes,
+  /* Now we emit any remaining significant digits, or trailing zeros,
    * until the required precision has been achieved.
    */
   while( stream->precision-- > 0 )
@@ -1340,12 +1341,12 @@ void __pformat_gfloat( long double x, __pformat_t *stream )
       /* The `#' flag is not in effect...
        * Here we adjust the precision to accommodate all digits which
        * precede the radix point, but we truncate any balance following
-       * it, to suppress output of non-significant trailing zeroes...
+       * it, to suppress output of non-significant trailing zeros...
        */
       if( ((stream->precision = strlen( value ) - intlen) < 0)
         /*
 	 * This may require a compensating adjustment to the field
-	 * width, to accommodate significant trailing zeroes, which
+	 * width, to accommodate significant trailing zeros, which
 	 * precede the radix point...
 	 */
       && (stream->width > 0)  )
@@ -1375,7 +1376,7 @@ void __pformat_gfloat( long double x, __pformat_t *stream )
        * The `#' flag is in effect...
        * Adjust precision to emit the specified number of significant
        * digits, with one preceding the radix point, and the balance
-       * following it, retaining any non-significant trailing zeroes
+       * following it, retaining any non-significant trailing zeros
        * which are required to exactly match the requested precision...
        */
       stream->precision--;
@@ -1384,7 +1385,7 @@ void __pformat_gfloat( long double x, __pformat_t *stream )
       /* The `#' flag is not in effect...
        * Adjust precision to emit only significant digits, with one
        * preceding the radix point, and any others following it, but
-       * suppressing non-significant trailing zeroes...
+       * suppressing non-significant trailing zeros...
        */
       stream->precision = strlen( value ) - 1;
 
@@ -1516,7 +1517,7 @@ void __pformat_emit_xfloat( __pformat_fpreg_t value, __pformat_t *stream )
 
     if( (c > 0) || (p > buf) || (stream->precision >= 0) )
       /*
-       * Ignoring insignificant trailing zeroes, (unless required to
+       * Ignoring insignificant trailing zeros, (unless required to
        * satisfy specified precision), store the current encoded digit
        * into the pending output buffer, in LIFO order, and using the
        * appropriate case for digits in the `A'..`F' range.
@@ -1637,7 +1638,7 @@ void __pformat_emit_xfloat( __pformat_fpreg_t value, __pformat_t *stream )
   while( p > buf )
     __pformat_emit_numeric_value( *--p, stream );
 
-  /* followed by any additional zeroes needed to satisfy the
+  /* followed by any additional zeros needed to satisfy the
    * precision specification...
    */
   while( stream->precision-- > 0 )
@@ -2433,7 +2434,7 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 
 	  case '0':
 	    /*
-	     * May represent a flag, to activate the `pad with zeroes'
+	     * May represent a flag, to activate the `pad with zeros'
 	     * option, or it may simply be a digit in a width or in a
 	     * precision specification...
 	     */

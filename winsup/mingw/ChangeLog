@@ -1,3 +1,11 @@
+2008-10-18  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Fix MinGW-Bug [2136252]: (Reported by Roumen Petrov).
+	Remove extraneous radix point in printf( "%.0f", v ) for v < 0.5
+
+	* mingwex/stdio/pformat.c (__pformat_emit_float): Always make output
+	of radix point conditional on precision != 0 or `#' flag specified.
+
 2008-10-13  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2160227]
