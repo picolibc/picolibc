@@ -827,12 +827,8 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (S_ISSOCK (mode))
     pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
 
-  FILE_BASIC_INFORMATION fbi;
-  fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
-  = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-  fbi.FileAttributes = pc.file_attributes () ?: FILE_ATTRIBUTE_NORMAL;
-  status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
-				 FileBasicInformation);
+  status = NtSetAttributesFile (get_handle (), pc.file_attributes ()
+					       ?: FILE_ATTRIBUTE_NORMAL);
   /* Correct NTFS security attributes have higher priority */
   if (!pc.has_acls ())
     {

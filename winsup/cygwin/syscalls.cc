@@ -399,7 +399,6 @@ unlink_nt (path_conv &pc)
   HANDLE fh;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  FILE_BASIC_INFORMATION fbi;
 
   ACCESS_MASK access = DELETE;
   /* If the R/O attribute is set, we have to open the file with
@@ -473,13 +472,7 @@ unlink_nt (path_conv &pc)
 
   /* Get rid of read-only attribute. */
   if (access & FILE_WRITE_ATTRIBUTES)
-    {
-      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
-      fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-      fbi.FileAttributes = (pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY)
-			   ?: FILE_ATTRIBUTE_NORMAL;
-      NtSetInformationFile (fh, &io,  &fbi, sizeof fbi, FileBasicInformation);
-    }
+    NtSetAttributesFile (fh, pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
 
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
@@ -487,22 +480,16 @@ unlink_nt (path_conv &pc)
   if (!NT_SUCCESS (status))
     {
       syscall_printf ("Setting delete disposition failed, status = %p", status);
+      /* Restore R/O attributes. */
       if (access & FILE_WRITE_ATTRIBUTES)
-	{
-	  /* Restore R/O attributes. */
-	  fbi.FileAttributes = pc.file_attributes ();
-	  NtSetInformationFile (fh, &io,  &fbi, sizeof fbi,
-				FileBasicInformation);
-	}
+	NtSetAttributesFile (fh, pc.file_attributes ());
     }
   else if ((access & FILE_WRITE_ATTRIBUTES) && !pc.isdir ())
     {
       /* Restore R/O attribute to accommodate hardlinks.  Don't try this
 	 with directories!  For some reason the below NtSetInformationFile
 	 changes the disposition for delete back to FALSE, at least on XP. */
-      fbi.FileAttributes = pc.file_attributes ();
-      NtSetInformationFile (fh, &io,  &fbi, sizeof fbi,
-			    FileBasicInformation);
+      NtSetAttributesFile (fh, pc.file_attributes ());
     }
 
   NtClose (fh);
@@ -1727,9 +1714,13 @@ rename (const char *oldpath, const char *newpath)
 	  || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
     start_transaction (old_trans, trans);
 
-  /* DELETE is required to rename a file. */
+  /* DELETE is required to rename a file.  Samba (only some versions?) doesn't
+     like the FILE_SHARE_DELETE mode if the file has the R/O attribute set
+     and returns STATUS_ACCESS_DENIED in that case. */
   status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
-		     &io, FILE_SHARE_VALID_FLAGS,
+		     &io,
+		     oldpc.fs_is_samba () ? FILE_SHARE_READ | FILE_SHARE_WRITE
+					  : FILE_SHARE_VALID_FLAGS,
 		     FILE_OPEN_FOR_BACKUP_INTENT
 		     | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0));
   if (!NT_SUCCESS (status))
@@ -1769,14 +1760,8 @@ rename (const char *oldpath, const char *newpath)
 	  __seterrno_from_nt_status (status);
 	  goto out;
 	}
-      FILE_BASIC_INFORMATION fbi;
-      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
-      fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-      fbi.FileAttributes = (dstpc->file_attributes ()
-			    & ~FILE_ATTRIBUTE_READONLY)
-			   ?: FILE_ATTRIBUTE_NORMAL;
-      status = NtSetInformationFile (nfh, &io,  &fbi, sizeof fbi,
-				     FileBasicInformation);
+      status = NtSetAttributesFile (nfh, dstpc->file_attributes ()
+					 & ~FILE_ATTRIBUTE_READONLY);
       NtClose (nfh);
       if (!NT_SUCCESS (status))
 	{

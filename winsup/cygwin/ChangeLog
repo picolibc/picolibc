@@ -1,3 +1,13 @@
+2008-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (NtSetAttributesFile): New inline function.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Use
+	NtSetAttributesFile.
+	* path.cc (symlink_worker): Ditto.
+	* syscalls.cc (unlink_nt): Ditto.
+	(rename): Omit FILE_SHARE_DELETE when opening files on Samba.  Add
+	comment to explain why.
+
 2008-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::get_debugger_info): Call SetStdHandle

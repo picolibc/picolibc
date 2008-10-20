@@ -1516,7 +1516,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   IO_STATUS_BLOCK io;
   NTSTATUS status;
   HANDLE fh;
-  FILE_BASIC_INFORMATION fbi;
   tmp_pathbuf tp;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
@@ -1741,11 +1740,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  __seterrno_from_nt_status (status);
 	  goto done;
 	}
-      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
-      = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-      fbi.FileAttributes = FILE_ATTRIBUTE_NORMAL;
-      status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
-				     FileBasicInformation);
+      status = NtSetAttributesFile (fh, FILE_ATTRIBUTE_NORMAL);
       NtClose (fh);
       if (!NT_SUCCESS (status))
 	{
@@ -1778,12 +1773,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
   if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
     {
-      fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
-      = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-      fbi.FileAttributes = use_winsym ? FILE_ATTRIBUTE_READONLY
-				      : FILE_ATTRIBUTE_SYSTEM;
-      status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
-				     FileBasicInformation);
+      status = NtSetAttributesFile (fh, use_winsym ? FILE_ATTRIBUTE_READONLY
+						   : FILE_ATTRIBUTE_SYSTEM);
       if (!NT_SUCCESS (status))
 	debug_printf ("Setting attributes failed, status = %p", status);
       res = 0;

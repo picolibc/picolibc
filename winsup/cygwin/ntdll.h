@@ -1072,4 +1072,15 @@ extern "C"
   NTSTATUS NTAPI RtlInt64ToHexUnicodeString (ULONGLONG value,
 					     PUNICODE_STRING dest,
 					     BOOLEAN append);
+  /* Set file attributes.  Don't change file times. */
+  inline
+  NTSTATUS NTAPI NtSetAttributesFile (HANDLE h, ULONG attr)
+  {
+    IO_STATUS_BLOCK io;
+    FILE_BASIC_INFORMATION fbi;
+    fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart =
+    fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+    fbi.FileAttributes = attr ?: FILE_ATTRIBUTE_NORMAL;
+    return NtSetInformationFile(h, &io, &fbi, sizeof fbi, FileBasicInformation);
+  }
 }
