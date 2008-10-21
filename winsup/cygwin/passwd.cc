@@ -19,6 +19,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
+#include "shared_info.h"
 
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
@@ -62,20 +63,22 @@ pwdgrp::read_passwd ()
   add_line (pretty_ls);
   cygsid tu = cygheap->user.sid ();
   tu.string (strbuf);
-  if (myself->uid == ILLEGAL_UID)
+  if (!user_shared->cb || myself->uid == ILLEGAL_UID)
     searchentry = !internal_getpwsid (tu);
-  if (searchentry &&
-      (!(pw = internal_getpwnam (cygheap->user.name ())) ||
-       (myself->uid != ILLEGAL_UID &&
-	myself->uid != (__uid32_t) pw->pw_uid  &&
-	!internal_getpwuid (myself->uid))))
+  if (searchentry
+      && (!(pw = internal_getpwnam (cygheap->user.name ()))
+	  || !user_shared->cb
+	  || (myself->uid != ILLEGAL_UID
+	      && myself->uid != (__uid32_t) pw->pw_uid
+	      && !internal_getpwuid (myself->uid))))
     {
       static char linebuf[1024];	// must be static and
 					// should not be NO_COPY
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),
-		myself->uid == ILLEGAL_UID ? UNKNOWN_UID : myself->uid,
-		myself->gid,
+		(!user_shared->cb || myself->uid == ILLEGAL_UID)
+		? UNKNOWN_UID : myself->uid,
+		!user_shared->cb ? UNKNOWN_GID : myself->gid,
 		strbuf, getenv ("HOME") ?: "");
       debug_printf ("Completing /etc/passwd: %s", linebuf);
       add_line (linebuf);

@@ -1,3 +1,9 @@
+2008-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (pwdgrp::read_passwd): Check if we're called within
+	user_shared initialization and ignore myself, if so.  Reformat
+	conditional expression.
+
 2008-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (NtSetAttributesFile): New inline function.
