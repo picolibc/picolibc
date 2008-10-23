@@ -13,8 +13,14 @@ details. */
 #include "security.h"
 #include "ntdll.h"
 
+/* CV, 2008-10-23: All wincapc's have to be in the .cygwin_dll_common section,
+   same as wincap itself.  Otherwise the capability changes made in
+   wincapc::init() are not propagated to any subsequently started process
+   in the same session.  I'm only writing this longish comment because I'm
+   puzzled that this has never been noticed before... */
+
 /* Minimal set of capabilities which is equivalent to NT4. */
-static NO_COPY wincaps wincap_unknown = {
+wincaps wincap_unknown __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
@@ -46,7 +52,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_nt4 = {
+wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
@@ -78,7 +84,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_nt4sp4 = {
+wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
@@ -110,7 +116,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_2000 = {
+wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
@@ -142,7 +148,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_2000sp4 = {
+wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
@@ -174,7 +180,7 @@ static NO_COPY wincaps wincap_2000sp4 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_xp = {
+wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
@@ -206,7 +212,7 @@ static NO_COPY wincaps wincap_xp = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_xpsp1 = {
+wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
@@ -238,7 +244,7 @@ static NO_COPY wincaps wincap_xpsp1 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_xpsp2 = {
+wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
@@ -270,7 +276,7 @@ static NO_COPY wincaps wincap_xpsp2 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_2003 = {
+wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x4,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
@@ -302,7 +308,7 @@ static NO_COPY wincaps wincap_2003 = {
   has_transactions:false,
 };
 
-static NO_COPY wincaps wincap_vista = {
+wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
