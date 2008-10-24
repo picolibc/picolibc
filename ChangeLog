@@ -1,3 +1,8 @@
+2008-10-24  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.tpl (HOST_EXPORTS): Correct CPPFLAGS typo.
+	* Makefile.in: Regenerated.
+
 2008-10-22  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	PR gdb/921
