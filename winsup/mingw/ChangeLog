@@ -1,3 +1,13 @@
+2008-10-28  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Correct some binary distribution packaging defects.
+
+	* Makefile.in (bindist): Remove `make' conditionals; segregate into...
+	(bindist-common, bindist-mingwrt, bindist-mingw-runtime): ...these new
+	intermediate goals; they make packages of files, as specified by...
+	(BINDIST_FILES, DEVDIST_FILES, DLLDIST_FILES): ...these new macros.
+	(dist_prefix) [target_alias !~ cygwin]: Leave it undefined.
+
 2008-10-18  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2136252]: (Reported by Roumen Petrov).

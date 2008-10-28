@@ -367,12 +367,7 @@ endif
 ifneq (,$(findstring cygwin, $(target_alias)))
   TARFLAGS = j
   TARFILEEXT = .tar.bz2
-endif
-
-ifneq (,$(findstring mingw, $(target_alias)))
-    dist_prefix =
-else
-    dist_prefix = $(conf_prefix)
+  dist_prefix = $(conf_prefix)
 endif
 
 dist: srcdist bindist
@@ -404,27 +399,41 @@ srcdist:
 	rm -f $(distdir)-src.tar.gz
 	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)
 
+# Binary package structure is determined according to the
+# preferred package name assigned at configure time...
+#
+bindist: bindist-$(PACKAGE)
 
-ifneq (,$(findstring cygwin, $(target_alias)))
-bindist:
+# The directory structure is common to both package styles...
+#
+bindist-common:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
 	$(MAKE) install prefix=$(shell pwd)/$(distdir)$(dist_prefix)
 	rm -f $(distdir).tar.gz
+
+# Current MinGW distributions prefer separate `dev' and `dll' bundles,
+# and use the abbreviated `mingwrt' form for the package name...
+#
+DEVDIST_FILES = * --exclude=bin
+DLLDIST_FILES = bin/*.dll doc/*
+#
+bindist-mingwrt: bindist-common
 	cd $(distdir); \
-	$(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
-else
-bindist:
+	$(TAR) $(TARFLAGS)cf ../$(distdir)-dev$(TARFILEEXT) $(DEVDIST_FILES); \
+	$(TAR) $(TARFLAGS)cf ../$(distdir)-dll$(TARFILEEXT) $(DLLDIST_FILES)
 	rm -rf $(distdir)
-	mkdir $(distdir)
-	chmod 755 $(distdir)
-	$(MAKE) install prefix=$(shell pwd)/$(distdir)$(dist_prefix)
-	rm -f $(distdir).tar.gz
+
+# However, Cygwin maintainers continue to prefer a composite package,
+# retaining the older `mingw-runtime' naming convention...
+#
+BINDIST_FILES = *
+#
+bindist-mingw-runtime: bindist-common
 	cd $(distdir); \
-	$(TAR) $(TARFLAGS)cf ../$(distdir)-dev$(TARFILEEXT) * --exclude=bin; \
-	$(TAR) $(TARFLAGS)cf ../$(distdir)-dll$(TARFILEEXT) bin/*.dll
-endif
+	$(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) $(BINDIST_FILES)
+	rm -rf $(distdir)
 
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')
