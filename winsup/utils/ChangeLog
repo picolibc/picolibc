@@ -1,3 +1,8 @@
+2008-10-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in (ALL_LDFLAGS): Link libgcc statically for everything
+	here.
+
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mingw: Set sawcfile when -xc* is detected.  Extend list of detected
