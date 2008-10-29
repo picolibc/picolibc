@@ -1,3 +1,14 @@
+2008-10-10  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* ppc.h: Add Tag_GNU_Power_ABI_Struct_Return.
+
+2008-10-04  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h (R_CRIS_32_GOT_GD, R_CRIS_16_GOT_GD, R_CRIS_32_GD)
+	(R_CRIS_DTP, R_CRIS_32_DTPREL, R_CRIS_16_DTPREL, R_CRIS_DTPMOD)
+	(R_CRIS_32_GOT_TPREL, R_CRIS_16_GOT_TPREL, R_CRIS_32_TPREL)
+	(R_CRIS_16_TPREL): New relocations.
+
 2008-08-20  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa.h (R_XTENSA_TLSDESC_FN, R_XTENSA_TLSDESC_ARG)

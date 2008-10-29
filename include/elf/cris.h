@@ -91,6 +91,82 @@ START_RELOC_NUMBERS (elf_cris_reloc_type)
      The BFD equivalent is BFD_RELOC_CRIS_32_PLT_PCREL.  */
   RELOC_NUMBER (R_CRIS_32_PLT_PCREL, 19)
 
+  /* An assembler-generated-only relocation, instructing the linker to
+     reserve two GOT slots, carrying the R_CRIS_DTP relocation for the
+     symbol (pointing to the first slot, the relocation fills in
+     both).  The value is a 32-bit-value, relative to the start of the
+     GOT.  Assembly syntax: "sym:GDGOTREL".  */
+  RELOC_NUMBER (R_CRIS_32_GOT_GD, 20)
+
+  /* Similar to R_CRIS_32_GOT_GD, but the value is a 16-bit unsigned
+     number, limiting access to 65536/4 global symbols per module (or
+     65536/8 thread variables; loosely speaking G*4+T*8 < 65536, where
+     T is the number of thread variables and G is the number of other
+     external global variables and functions).  Assembly syntax:
+     "sym:GDGOTREL16".  */
+  RELOC_NUMBER (R_CRIS_16_GOT_GD, 21)
+
+  /* Similar to R_CRIS_32_GOT_GD, but the value is the absolute
+     address of the GOT entry.  Disallowed in DSOs created with
+     -shared.  Assembly syntax: "sym:GD".  */
+  RELOC_NUMBER (R_CRIS_32_GD, 22)
+
+  /* A linker-generated-only relocation, instructing the dynamic
+     linker to fill in the module ID and module-relative-TLS-block
+     offset of the symbol in question, used for GOT entries.  Note
+     that this relocation instructs to fill in two 32-bit values.  */
+  RELOC_NUMBER (R_CRIS_DTP, 23)
+
+  /* An assembler-generated-only relocation, instructing the linker to
+     reserve the first two GOT slots, and attach the R_CRIS_DTPMOD
+     relocation(*) for the module to the first slot, the second
+     containing zero.  The value is 32 bits, the offset from the start
+     of the TLS block of the module to the thread-local symbol
+     mentioned in the relocation.  This relocation must only be applied
+     to module-local symbols.  Assembly syntax: "expr:DTPREL".  */
+  RELOC_NUMBER (R_CRIS_32_DTPREL, 24)
+
+  /* Similar to R_CRIS_32_DTPREL, but the value is a 16-bit signed
+     number, limiting the size of thread-variables of the DSO to 32768
+     bytes.  (Note: matches both model 1 and 2 and allows use of addo.w
+     as the instruction where this relocation is used.)  Assembly
+     syntax: "expr:DTPREL16".  */
+  RELOC_NUMBER (R_CRIS_16_DTPREL, 25)
+
+  /* An assembler-generated-only relocation, instructing the linker to
+     reserve a GOT slot and attach the R_CRIS_32_TPREL relocation for
+     the symbol in question.  The value is 32 bits, which is the
+     GOT-relative offset of the slot.  Assembly syntax:
+     "sym:TPOFFGOT".  */
+  RELOC_NUMBER (R_CRIS_32_GOT_TPREL, 26)
+
+  /* Similar to R_CRIS_32_TPREL, but the value is a 16-bit positive
+     number, limiting the number of thread- and global variables of
+     the DSO to 32768/4.  Assembly syntax: "sym:TPOFFGOT16".  */
+  RELOC_NUMBER (R_CRIS_16_GOT_TPREL, 27)
+
+  /* An assembler- and linker-generated relocation, instructing to
+     resolve the symbol in question yielding the TLS offset of the
+     thread variable; relative to the module's TLS data if in a DSO,
+     but relative to the executable's thread data if in an
+     executable. Not allowed as input when generating a DSO.  Assembly
+     syntax: "expr:TPOFF".  */
+  RELOC_NUMBER (R_CRIS_32_TPREL, 28)
+
+  /* Similar to R_CRIS_32_TPREL, but only applicable to executables
+     compiled with -msmall-tls. Not allowed in a DSO. The value is a
+     16-bit signed number, limiting the size of thread-variables of
+     the executable to 32768 bytes. (Note: being signed makes it match
+     both model 1 and 2 and allows use of addo.w as the instruction
+     where this relocation is applied.)  Assembly syntax:
+     "expr:TPOFF16".  */
+  RELOC_NUMBER (R_CRIS_16_TPREL, 29)
+
+  /* A linker-generated-only relocation, instructing the dynamic
+     linker to fill in the current module ID, used for GOT entries
+     (always the fourth one).  */
+  RELOC_NUMBER (R_CRIS_DTPMOD, 30)
+
   /* No other relocs must be visible outside the assembler.  */
 
 END_RELOC_NUMBERS (R_CRIS_max)
