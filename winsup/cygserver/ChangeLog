@@ -1,3 +1,7 @@
+2008-10-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Use -static-libgcc when creating cygserver.exe.
+
 2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_msg.cc: Add fix from upstream version 1.65.
