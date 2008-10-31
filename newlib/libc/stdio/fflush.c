@@ -21,6 +21,8 @@ FUNCTION
 
 INDEX
 	fflush
+INDEX
+	_fflush_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>

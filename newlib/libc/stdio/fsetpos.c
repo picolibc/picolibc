@@ -27,7 +27,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fsetpos(FILE *<[fp]>, const fpos_t *<[pos]>);
-	int _fsetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>, l
+	int _fsetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	               const fpos_t *<[pos]>);
 
 TRAD_SYNOPSIS

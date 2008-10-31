@@ -24,7 +24,7 @@ INDEX
 INDEX
 	_putc_unlocked_r
 
-POSIX_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int putc_unlocked(int <[ch]>, FILE *<[fp]>);
 

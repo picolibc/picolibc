@@ -24,7 +24,7 @@ INDEX
 INDEX
 	_getchar_unlocked_r
 
-POSIX_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int getchar_unlocked();
 

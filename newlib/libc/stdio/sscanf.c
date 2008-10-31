@@ -22,24 +22,28 @@ FUNCTION
 INDEX
 	scanf
 INDEX
+	_scanf_r
+INDEX
 	fscanf
 INDEX
+	_fscanf_r
+INDEX
 	sscanf
+INDEX
+	_sscanf_r
 
 ANSI_SYNOPSIS
         #include <stdio.h>
 
-        int scanf(const char *<[format]> [, <[arg]>, ...]);
-        int fscanf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
-        int sscanf(const char *<[str]>, const char *<[format]> 
-                   [, <[arg]>, ...]);
+        int scanf(const char *<[format]>, ...);
+        int fscanf(FILE *<[fd]>, const char *<[format]>, ...);
+        int sscanf(const char *<[str]>, const char *<[format]>, ...);
 
-        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]>
-                     [, <[arg]>, ...]);
-        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]>
-                      [, <[arg]>, ...]);
+        int _scanf_r(struct _reent *<[ptr]>, const char *<[format]>, ...);
+        int _fscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, 
+                      const char *<[format]>, ...);
         int _sscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
-                      const char *<[format]> [, <[arg]>, ...]);
+                      const char *<[format]>, ...);
 
 
 TRAD_SYNOPSIS

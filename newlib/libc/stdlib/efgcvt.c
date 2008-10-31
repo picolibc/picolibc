@@ -5,7 +5,11 @@ FUNCTION
 INDEX
 	ecvt
 INDEX
+	ecvtf
+INDEX
 	fcvt
+INDEX
+	fcvtf
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>

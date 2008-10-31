@@ -22,15 +22,27 @@ FUNCTION
 INDEX
 	viprintf
 INDEX
+	_viprintf_r
+INDEX
 	vfiprintf
+INDEX
+	_vfiprintf_r
 INDEX
 	vsiprintf
 INDEX
+	_vsiprintf_r
+INDEX
 	vsniprintf
+INDEX
+	_vsniprintf_r
 INDEX
 	vasiprintf
 INDEX
+	_vasiprintf_r
+INDEX
 	vasniprintf
+INDEX
+	_vasniprintf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
@@ -51,13 +63,11 @@ ANSI_SYNOPSIS
 	int _vsiprintf_r(struct _reent *<[reent]>, char *<[str]>,
                         const char *<[fmt]>, va_list <[list]>);
 	int _vsniprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                          size_t <[size]>, const char *<[fmt]>,
-                          va_list <[list]>);
+                          size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
 	int _vasiprintf_r(struct _reent *<[reent]>, char **<[str]>,
                           const char *<[fmt]>, va_list <[list]>);
 	char *_vasniprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                             size_t *<[size]>, const char *<[fmt]>,
-                             va_list <[list]>);
+                             size_t *<[size]>, const char *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
 <<viprintf>>, <<vfiprintf>>, <<vasiprintf>>, <<vsiprintf>>,

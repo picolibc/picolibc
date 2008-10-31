@@ -21,6 +21,8 @@ FUNCTION
 
 INDEX
 	remove
+INDEX
+	_remove_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>

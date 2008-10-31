@@ -22,41 +22,51 @@ FUNCTION
 INDEX
 	fprintf
 INDEX
+	_fprintf_r
+INDEX
 	printf
+INDEX
+	_printf_r
 INDEX
 	asprintf
 INDEX
+	_asprintf_r
+INDEX
 	sprintf
+INDEX
+	_sprintf_r
 INDEX
 	snprintf
 INDEX
+	_snprintf_r
+INDEX
 	asnprintf
+INDEX
+	_asnprintf_r
 
 ANSI_SYNOPSIS
         #include <stdio.h>
 
-        int printf(const char *<[format]> [, <[arg]>, ...]);
-        int fprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
-        int sprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
-        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>
-                     [, <[arg]>, ...]);
-        int asprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
-        char *asnprintf(char *<[str]>, size_t *<[size]>, const char *<[format]>
-                        [, <[arg]>, ...]);
+        int printf(const char *<[format]>, ...);
+        int fprintf(FILE *<[fd]>, const char *<[format]>, ...);
+        int sprintf(char *<[str]>, const char *<[format]>, ...);
+        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>,
+                     ...);
+        int asprintf(char **<[strp]>, const char *<[format]>, ...);
+        char *asnprintf(char *<[str]>, size_t *<[size]>, const char *<[format]>,
+                        ...);
 
-        int _printf_r(struct _reent *<[ptr]>, const char *<[format]>
-                      [, <[arg]>, ...]);
+        int _printf_r(struct _reent *<[ptr]>, const char *<[format]>, ...);
         int _fprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
-                       const char *<[format]> [, <[arg]>, ...]);
+                       const char *<[format]>, ...);
         int _sprintf_r(struct _reent *<[ptr]>, char *<[str]>,
-                       const char *<[format]> [, <[arg]>, ...]);
+                       const char *<[format]>, ...);
         int _snprintf_r(struct _reent *<[ptr]>, char *<[str]>, size_t <[size]>,
-                        const char *<[format]> [, <[arg]>, ...]);
+                        const char *<[format]>, ...);
         int _asprintf_r(struct _reent *<[ptr]>, char **<[strp]>,
-                        const char *<[format]> [, <[arg]>, ...]);
+                        const char *<[format]>, ...);
         char *_asnprintf_r(struct _reent *<[ptr]>, char *<[str]>,
-                           size_t *<[size]>, const char *<[format]>
-                           [, <[arg]>, ...]);
+                           size_t *<[size]>, const char *<[format]>, ...);
 
 DESCRIPTION
         <<printf>> accepts a series of arguments, applies to each a

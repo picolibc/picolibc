@@ -9,6 +9,8 @@ FUNCTION
 
 INDEX
 	ctime
+INDEX
+	ctime_r
 
 ANSI_SYNOPSIS
 	#include <time.h>

@@ -22,24 +22,28 @@ FUNCTION
 INDEX
 	iscanf
 INDEX
+	_iscanf_r
+INDEX
 	fiscanf
 INDEX
+	_fiscanf_r
+INDEX
 	siscanf
+INDEX
+	_siscanf_r
 
 ANSI_SYNOPSIS
         #include <stdio.h>
 
-        int iscanf(const char *<[format]> [, <[arg]>, ...]);
-        int fiscanf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
-        int siscanf(const char *<[str]>, const char *<[format]> 
-                   [, <[arg]>, ...]);
+        int iscanf(const char *<[format]>, ...);
+        int fiscanf(FILE *<[fd]>, const char *<[format]>, ...);
+        int siscanf(const char *<[str]>, const char *<[format]>, ...);
 
-        int _iscanf_r(struct _reent *<[ptr]>, const char *<[format]>
-                   [, <[arg]>, ...]);
-        int _fiscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, const char *<[format]>
-                   [, <[arg]>, ...]);
+        int _iscanf_r(struct _reent *<[ptr]>, const char *<[format]>, ...);
+        int _fiscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, 
+                       const char *<[format]>, ...);
         int _siscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
-                   const char *<[format]> [, <[arg]>, ...]);
+                   const char *<[format]>, ...);
 
 
 TRAD_SYNOPSIS

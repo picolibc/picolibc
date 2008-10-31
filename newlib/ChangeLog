@@ -1,5 +1,37 @@
 2008-10-31  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/diprintf.c: Modify documentation so eclipse newlib
+	libhover docs generate properly.
+	* libc/stdio/dprintf.c: Ditto.
+	* libc/stdio/fflush.c: Ditto.
+	* libc/stdio/fopencookie.c: Ditto.
+	* libc/stdio/fread.c: Ditto.
+	* libc/stdio/fsetpos.c: Ditto.
+	* libc/stdio/getc_u.c: Ditto.
+	* libc/stdio/getchar_u.c: Ditto.
+	* libc/stdio/putc_u.c: Ditto.
+	* libc/stdio/putchar_u.c: Ditto.
+	* libc/stdio/remove.c: Ditto.
+	* libc/stdio/siprintf.c: Ditto.
+	* libc/stdio/siscanf.c: Ditto.
+	* libc/stdio/sprintf.c: Ditto.
+	* libc/stdio/sscanf.c: Ditto.
+	* libc/stdio/vfprintf.c: Ditto.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/viprintf.c: Ditto.
+	* libc/stdio/viscanf.c: Ditto.
+	* libc/stdlib/calloc.c: Ditto.
+	* libc/stdlib/efgcvt.c: Ditto.
+	* libc/stdlib/envlock.c: Ditto.
+	* libc/time/asctime.c: Ditto.
+	* libc/time/ctime.c: Ditto.
+	* libc/time/gmtime.c: Ditto.
+	* libc/time/lcltime.c: Ditto.
+	* libc/time/tzset.c: Ditto.
+	* libc/stdlib/envlock.h: Moved to libc/include.
+
+2008-10-31  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/limits.h: Add ARG_MAX, PATH_MAX, and _POSIX2_RE_DUP_MAX.
 	* libc/include/envlock.h: New file.
 	* libc/include/fnmatch.h: Ditto.

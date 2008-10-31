@@ -31,8 +31,7 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	size_t _fread_r(struct _reent *<[ptr]>, void *<[buf]>,
-	                size_t <[size]>, size_t <[count]>,
-		        FILE *<[fp]>);
+	                size_t <[size]>, size_t <[count]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

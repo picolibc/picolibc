@@ -8,7 +8,7 @@ INDEX
 	__env_unlock
 
 ANSI_SYNOPSIS
-	#include "envlock.h"
+	#include <envlock.h>
 	void __env_lock (struct _reent *<[reent]>);
 	void __env_unlock (struct _reent *<[reent]>);
 

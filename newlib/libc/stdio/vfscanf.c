@@ -22,9 +22,15 @@ FUNCTION
 INDEX
 	vfscanf
 INDEX
+	_vfscanf_r
+INDEX
 	vscanf
 INDEX
+	_vscanf_r
+INDEX
 	vsscanf
+INDEX
+	_vsscanf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>

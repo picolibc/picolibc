@@ -22,7 +22,7 @@ FUNCTION
 INDEX
 	putchar_unlocked
 
-POSIX_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int putchar_unlocked(int <[ch]>);
 

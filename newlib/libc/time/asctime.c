@@ -22,7 +22,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <time.h>
 	char *asctime(const struct tm *<[clock]>);
-	char *asctime_r(const struct tm *<[clock]>, char *<[buf]>);
+	char *_asctime_r(const struct tm *<[clock]>, char *<[buf]>);
 
 TRAD_SYNOPSIS
 	#include <time.h>

@@ -4,6 +4,8 @@ FUNCTION
 
 INDEX
 	tzset
+INDEX
+	_tzset_r
 
 ANSI_SYNOPSIS
 	#include <time.h>

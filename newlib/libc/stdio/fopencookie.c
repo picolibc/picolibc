@@ -12,6 +12,13 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
+	FILE *fopencookie(const void *<[cookie]>, const char *<[mode]>,
+			  cookie_io_functions_t <[functions]>);
+
+DESCRIPTION
+<<fopencookie>> creates a <<FILE>> stream where I/O is performed using
+custom callbacks.  The callbacks are registered via the structure:
+
 	typedef ssize_t (*cookie_read_function_t)(void *_cookie, char *_buf,
 						  size_t _n);
 	typedef ssize_t (*cookie_write_function_t)(void *_cookie,
@@ -19,12 +26,6 @@ ANSI_SYNOPSIS
 	typedef int (*cookie_seek_function_t)(void *_cookie, off_t *_off,
 					      int _whence);
 	typedef int (*cookie_close_function_t)(void *_cookie);
-	FILE *fopencookie(const void *<[cookie]>, const char *<[mode]>,
-			  cookie_io_functions_t <[functions]>);
-
-DESCRIPTION
-<<fopencookie>> creates a <<FILE>> stream where I/O is performed using
-custom callbacks.  The callbacks are registered via the structure:
 
 .	typedef struct
 .	{

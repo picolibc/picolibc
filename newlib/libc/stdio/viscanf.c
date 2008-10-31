@@ -24,9 +24,15 @@ FUNCTION
 INDEX
 	viscanf
 INDEX
+	_viscanf_r
+INDEX
 	vfiscanf
 INDEX
+	_vfiscanf_r
+INDEX
 	vsiscanf
+INDEX
+	_vsiscanf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>

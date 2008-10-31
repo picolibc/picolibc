@@ -24,7 +24,7 @@ INDEX
 INDEX
 	_getc_unlocked_r
 
-POSIX_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int getc_unlocked(FILE *<[fp]>);
 

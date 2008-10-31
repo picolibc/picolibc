@@ -10,7 +10,11 @@ FUNCTION
 INDEX
 	dprintf
 INDEX
+	_dprintf_r
+INDEX
 	vdprintf
+INDEX
+	_vdprintf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>

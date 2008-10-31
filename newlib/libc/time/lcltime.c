@@ -8,6 +8,8 @@ FUNCTION
 
 INDEX
 	localtime
+INDEX
+	localtime_r
 
 ANSI_SYNOPSIS
 	#include <time.h>

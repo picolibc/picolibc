@@ -10,7 +10,11 @@ FUNCTION
 INDEX
 	diprintf
 INDEX
+	_diprintf_r
+INDEX
 	vdiprintf
+INDEX
+	_vdiprintf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
@@ -19,7 +23,7 @@ ANSI_SYNOPSIS
 	int vdiprintf(int <[fd]>, const char *<[format]>, va_list <[ap]>);
 	int _diprintf_r(struct _reent *<[ptr]>, int <[fd]>,
 			const char *<[format]>, ...);
-	int _vidprintf_r(struct _reent *<[ptr]>, int <[fd]>,
+	int _vdiprintf_r(struct _reent *<[ptr]>, int <[fd]>,
 			const char *<[format]>, va_list <[ap]>);
 
 DESCRIPTION
