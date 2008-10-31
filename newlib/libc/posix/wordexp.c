@@ -3,6 +3,7 @@
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
  */
+#ifndef _NO_WORDEXP
 
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -184,3 +185,4 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
     }
   return WRDE_SUCCESS;
 }
+#endif /* !_NO_WORDEXP  */

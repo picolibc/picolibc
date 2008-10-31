@@ -4,6 +4,8 @@
  * is freely granted, provided that this notice is preserved.
  */
 
+#ifndef _NO_WORDEXP
+
 #include <sys/param.h>
 #include <sys/stat.h>
 
@@ -36,3 +38,5 @@ wordfree(wordexp_t *pwordexp)
   free(pwordexp->we_wordv);
   pwordexp->we_wordv = NULL;
 }
+
+#endif /* !_NO_WORDEXP  */

@@ -5,9 +5,11 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
-	closedir.c creat.c _isatty.c isatty.c \
-	opendir.c readdir.c \
-	readdir_r.c rewinddir.c sleep.c usleep.c \
+	closedir.c collate.c collcmp.c creat.c \
+	fnmatch.c glob.c _isatty.c isatty.c \
+	opendir.c readdir.c readdir.c reallocf.c \
+	regcomp.c regerror.c regexec.c regfree.c \
+	rewinddir.c sleep.c usleep.c \
 	telldir.c
 
 ELIX_2_SOURCES = \
@@ -15,7 +17,7 @@ ELIX_2_SOURCES = \
 
 ELIX_3_SOURCES = \
 	execl.c execle.c execlp.c execv.c \
-	execve.c execvp.c
+	execve.c execvp.c wordexp.c wordfree.c
 
 ELIX_4_SOURCES = \
 	popen.c 
@@ -63,5 +65,7 @@ TARGETDOC = ../tmp.texi
 
 # No doc for posix.
 doc:
+
+AM_CFLAGS = -D_GNU_SOURCE
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref

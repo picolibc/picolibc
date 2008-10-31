@@ -1,3 +1,76 @@
+2008-10-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/limits.h: Add ARG_MAX, PATH_MAX, and _POSIX2_RE_DUP_MAX.
+	* libc/include/envlock.h: New file.
+	* libc/include/fnmatch.h: Ditto.
+	* libc/include/glob.h: Ditto.
+	* libc/include/regex.h: Ditto.
+	* libc/include/wordexp.h: Ditto.
+	* libc/posix/Makefile.am: Add new files moved from 
+	libc/sys/linux/stdlib.
+	* libc/posix/Makefile.in: Regenerated.
+	* libc/posix/COPYRIGHT: New file moved from libc/sys/linux/stdlib.
+	* libc/posix/cclass.h: Ditto.
+	* libc/posix/cname.h: Ditto.
+	* libc/posix/collate.c: Ditto.
+	* libc/posix/collate.h: Ditto.
+	* libc/posix/collcmp.c: Ditto.
+	* libc/posix/engine.c: Ditto.
+	* libc/posix/fnmatch.3: Ditto.
+	* libc/posix/glob.3: Ditto.
+	* libc/posix/fnmatch.c: Ditto.
+	* libc/posix/glob.c: Ditto.
+	* libc/posix/namespace.h: Ditto.
+	* libc/posix/reallocf.c: Ditto.
+	* libc/posix/regcomp.c: Ditto.
+	* libc/posix/regerror.c: Ditto.
+	* libc/posix/regex.3: Ditto.
+	* libc/posix/regex2.h: Ditto.
+	* libc/posix/regexec.c: Ditto.
+	* libc/posix/regfree.c: Ditto.
+	* libc/posix/rune.h: Ditto.
+	* libc/posix/runetype.h: Ditto.
+	* libc/posix/scandir.c: Remove advertising clause which is not in
+	effect.
+	* libc/posix/sysexits.h: Ditto.
+	* libc/posix/un-namespace.h: Ditto.
+	* libc/posix/utils.h: Ditto.
+	* libc/posix/wordexp.c: Ditto.
+	* libc/posix/wordfree.c: Ditto.
+	* libc/posix/execl.c: Add !_NO_EXECVE flag check.
+	* libc/posix/execle.c: Ditto.
+	* libc/posix/execlp.c: Ditto.
+	* libc/posix/execv.c: Ditto.
+	* libc/posix/execve.c: Ditto.
+	* libc/posix/execvp.c: Ditto.
+	* libc/posix/popen.c: Add !_NO_POPEN flag check.
+	* libc/sys/linux/configure: Regenerated.
+	* libc/sys/linux/configure.in: Remove stdlib.
+	* libc/sys/linux/include/limits.h: Add include of linux/limits.h.
+	* libc/sys/linux/stdlib/Makefile.am: Removed.
+	* libc/sys/linux/stdlib/Makefile.in: Ditto.
+	* libc/sys/linux/stdlib/COPYRIGHT: Moved to libc/posix.
+	* libc/sys/linux/stdlib/cclass.h: Ditto.
+	* libc/sys/linux/stdlib/cname.h: Ditto.
+	* libc/sys/linux/stdlib/collate.c: Ditto.
+	* libc/sys/linux/stdlib/collate.h: Ditto.
+	* libc/sys/linux/stdlib/collcmp.c: Ditto.
+	* libc/sys/linux/stdlib/engine.c: Ditto.
+	* libc/sys/linux/stdlib/fnmatch.3: Ditto.
+	* libc/sys/linux/stdlib/fnmatch.c: Ditto.
+	* libc/sys/linux/stdlib/glob.3: Ditto.
+	* libc/sys/linux/stdlib/glob.c: Ditto.
+	* libc/sys/linux/stdlib/reallocf.c: Ditto.
+	* libc/sys/linux/stdlib/regcomp.c: Ditto.
+	* libc/sys/linux/stdlib/regerror.c: Ditto.
+	* libc/sys/linux/stdlib/regex.3: Ditto.
+	* libc/sys/linux/stdlib/regex2.h: Ditto.
+	* libc/sys/linux/stdlib/regexec.c: Ditto.
+	* libc/sys/linux/stdlib/regfree.c: Ditto.
+	* libc/sys/linux/stdlib/utils.h: Ditto.
+	* libc/sys/linux/stdlib/wordexp.c: Ditto.
+	* libc/sys/linux/stdlib/wordfree.c: Ditto.
+
 2008-10-16  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/unistd.h: RTEMS follows standard for sync(). 

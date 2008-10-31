@@ -1,27 +1,5 @@
-Copyright 1992, 1993, 1994 Henry Spencer.  All rights reserved.
-This software is not subject to any license of the American Telephone
-and Telegraph Company or of the Regents of the University of California.
-
-Permission is granted to anyone to use this software for any purpose on
-any computer system, and to alter it and redistribute it, subject
-to the following restrictions:
-
-1. The author is not responsible for the consequences of use of this
-   software, no matter how awful, even if they arise from flaws in it.
-
-2. The origin of this software must not be misrepresented, either by
-   explicit claim or by omission.  Since few users ever read sources,
-   credits must appear in the documentation.
-
-3. Altered versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.  Since few users
-   ever read sources, credits must appear in the documentation.
-
-4. This notice may not be removed or altered.
-
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 /*-
- * Copyright (c) 1994
+ * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +10,6 @@ to the following restrictions:
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -52,5 +26,30 @@ to the following restrictions:
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	@(#)COPYRIGHT	8.1 (Berkeley) 3/16/94
+ * $FreeBSD: src/include/fnmatch.h,v 1.10 2002/03/23 17:24:53 imp Exp $
+ *	@(#)fnmatch.h	8.1 (Berkeley) 6/2/93
  */
+
+#ifndef	_FNMATCH_H_
+#define	_FNMATCH_H_
+
+#define	FNM_NOMATCH	1	/* Match failed. */
+
+#define	FNM_NOESCAPE	0x01	/* Disable backslash escaping. */
+#define	FNM_PATHNAME	0x02	/* Slash must be matched by slash. */
+#define	FNM_PERIOD	0x04	/* Period must be matched by period. */
+
+#if defined(_GNU_SOURCE) || !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
+#define	FNM_LEADING_DIR	0x08	/* Ignore /<tail> after Imatch. */
+#define	FNM_CASEFOLD	0x10	/* Case insensitive search. */
+#define	FNM_IGNORECASE	FNM_CASEFOLD
+#define	FNM_FILE_NAME	FNM_PATHNAME
+#endif
+
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+int	 fnmatch(const char *, const char *, int);
+__END_DECLS
+
+#endif /* !_FNMATCH_H_ */

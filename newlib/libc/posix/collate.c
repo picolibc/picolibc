@@ -38,7 +38,6 @@
 #include "un-namespace.h"
 
 #include "collate.h"
-#include "setlocale.h"
 
 extern char *_PathLocale;
 int __collate_load_error = 1;

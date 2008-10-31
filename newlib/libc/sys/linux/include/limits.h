@@ -139,6 +139,8 @@
 # endif
 #endif
 
+#include <linux/limits.h>
+
 #ifdef	__USE_POSIX
 /* POSIX adds things to <limits.h>.  */
 # include <bits/posix1_lim.h>
@@ -151,3 +153,4 @@
 #ifdef	__USE_XOPEN
 # include <bits/xopen_lim.h>
 #endif
+

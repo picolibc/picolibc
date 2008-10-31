@@ -20,6 +20,12 @@ AC_LIBTOOL_WIN32_DLL
 AM_PROG_LIBTOOL
 fi
 
+AC_CONFIG_SUBDIRS(machine)
+
+if test "${newlib_multithread}" = "yes"; then
+AC_CONFIG_SUBDIRS(linuxthreads)
+fi
+
 LINUX_MACH_LIB=
 if test -n "${machine_dir}"; then
   if test "${use_libtool}" = "yes"; then
@@ -33,20 +39,15 @@ AC_SUBST(LINUX_MACH_LIB)
 EXTRA_SUBDIRS=
 EXTRA_SUBLIBS=
 
-AC_CONFIG_SUBDIRS(machine)
-
-if test "${newlib_multithread}" = "yes"; then
-AC_CONFIG_SUBDIRS(linuxthreads)
-fi
 if test "x${newlib_elix_level}" = "x1"; then
 EXTRA_SUBDIRS=linuxthreads net
 else 
-EXTRA_SUBDIRS="linuxthreads net intl stdlib iconv dl"
-EXTRA_SUBLIBS="net/libnet.la intl/libintl.la stdlib/libstdlib.la iconv/libiconv.la dl/libdl.la"
+EXTRA_SUBDIRS="linuxthreads net intl iconv dl"
+EXTRA_SUBLIBS="net/libnet.la intl/libintl.la iconv/libiconv.la dl/libdl.la"
 fi
 
 AC_SUBST(EXTRA_SUBDIRS)
 AC_SUBST(EXTRA_SUBLIBS)
 
-AC_CONFIG_FILES([Makefile intl/Makefile net/Makefile stdlib/Makefile iconv/Makefile dl/Makefile cmath/Makefile argp/Makefile])
+AC_CONFIG_FILES([Makefile intl/Makefile net/Makefile iconv/Makefile dl/Makefile cmath/Makefile argp/Makefile])
 AC_OUTPUT

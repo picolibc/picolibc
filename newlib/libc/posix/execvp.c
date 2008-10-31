@@ -1,3 +1,5 @@
+#ifndef _NO_EXECVE
+
 /* execvp.c */
 
 /* This and the other exec*.c files in this directory require 
@@ -67,3 +69,5 @@ _DEFUN (execvp, (file, argv),
 
   return -1;
 }
+
+#endif /* !_NO_EXECVE  */

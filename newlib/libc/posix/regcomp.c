@@ -14,10 +14,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -36,6 +32,8 @@
  *
  *	@(#)regcomp.c	8.5 (Berkeley) 3/20/94
  */
+
+#ifndef _NO_REGEX
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)regcomp.c	8.5 (Berkeley) 3/20/94";
@@ -2086,3 +2084,5 @@ struct re_guts *g;
 		g->iflags |= BAD;
 	return(maxnest);
 }
+
+#endif /* !_NO_REGEX  */

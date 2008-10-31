@@ -1,3 +1,5 @@
+#ifndef _NO_EXECVE
+
 /* execl.c */
 
 /* This and the other exec*.c files in this directory require 
@@ -47,3 +49,4 @@ _DEFUN(execl, (path, arg0, va_alist),
 
   return _execve (path, (char * _CONST  *) argv, *p_environ);
 }
+#endif /* !_NO_EXECVE  */
