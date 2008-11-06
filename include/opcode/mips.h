@@ -262,6 +262,7 @@ struct mips_opcode
 
    Each of these characters corresponds to a mask field defined above.
 
+   "1" 5 bit sync type (OP_*_SHAMT)
    "<" 5 bit shift amount (OP_*_SHAMT)
    ">" shift amount between 32 and 63, stored after subtracting 32 (OP_*_SHAMT)
    "a" 26 bit target address (OP_*_TARGET)
@@ -401,7 +402,7 @@ struct mips_opcode
    "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
-   "234567890"
+   "1234567890"
    "%[]<>(),+:'@!$*&"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefghijklopqrstuvwxz"

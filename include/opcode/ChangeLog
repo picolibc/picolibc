@@ -1,3 +1,7 @@
+2008-11-06  Chao-ying Fu  <fu@mips.com>
+
+	* mips.h: Doucument '1' for 5-bit sync type.
+
 2008-08-28  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* ia64.h (ia64_resource_specifier): Add IA64_RS_CR_IIB.  Update
