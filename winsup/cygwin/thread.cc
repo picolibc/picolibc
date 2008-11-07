@@ -1637,13 +1637,15 @@ pthread_mutex::_unlock (pthread_t self)
   if (!pthread::equal (owner, self))
     return EPERM;
 
-  if (--recursion_counter == 0)
+  /* Don't try to unlock anything if recursion_counter == 0 initially.
+     That means that we've forked. */
+  if (recursion_counter > 0 && --recursion_counter == 0)
     {
       owner = NULL;
 #ifdef DEBUGGING
       tid = 0;
 #endif
-      if (InterlockedDecrement ((long *)&lock_counter))
+      if (InterlockedDecrement ((long *) &lock_counter))
 	// Another thread is waiting
 	::ReleaseSemaphore (win32_obj_id, 1, NULL);
     }
@@ -1657,10 +1659,10 @@ pthread_mutex::_destroy (pthread_t self)
   if (condwaits || _trylock (self))
     // Do not destroy a condwaited or locked mutex
     return EBUSY;
-  else if (recursion_counter != 1)
+  else if (recursion_counter > 1)
     {
       // Do not destroy a recursive locked mutex
-      --recursion_counter;
+      recursion_counter--;
       return EBUSY;
     }
 
@@ -1671,19 +1673,20 @@ pthread_mutex::_destroy (pthread_t self)
 void
 pthread_mutex::_fixup_after_fork ()
 {
-  debug_printf ("mutex %x in _fixup_after_fork", this);
+  debug_printf ("mutex %p in _fixup_after_fork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("pthread_mutex::_fixup_after_fork () doesn't understand PROCESS_SHARED mutex's");
 
   /* All waiting threads are gone after a fork */
+  recursion_counter = 0;
   lock_counter = 0;
-  owner = NULL;
-  win32_obj_id = NULL;
   condwaits = 0;
 #ifdef DEBUGGING
-  tid = 0xffffffff;        /* Don't know the tid after a fork */
+  tid = 0xffffffff;	/* Don't know the tid after a fork */
 #endif
-
+  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  if (!win32_obj_id)
+    api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
@@ -2925,7 +2928,7 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
 {
   char name[MAX_PATH];
 
-  __small_sprintf (name, "semaphore/%016X%08x%08x", 
+  __small_sprintf (name, "semaphore/%016X%08x%08x",
 		   hash, luid.HighPart, luid.LowPart);
   this->win32_obj_id = ::CreateSemaphore (&sec_all, value, LONG_MAX, name);
   if (!this->win32_obj_id)

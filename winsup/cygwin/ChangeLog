@@ -1,3 +1,17 @@
+2008-11-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pthread.cc (pthread_mutex::_unlock): Avoid unlocking a mutex if the
+	recursion_counter is already 0.
+	(pthread_mutex::_destroy): Don't consider a mutex busy if its
+	recursion_counter == 0.
+	(pthread_mutex::_fixup_after_fork): Set recursion_counter to 0 to flag
+	that we've just forked.  Don't reset the owner of this mutex since the
+	forkee may think it still owns the mutex.  Reinstate initialization of
+	win32_obj_id.
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Initialize a
+	variable to bypass a C++ warning.
+
 2008-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (environ_init): Avoid evaluating $CYGWIN twice.

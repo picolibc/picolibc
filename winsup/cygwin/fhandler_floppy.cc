@@ -245,7 +245,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 {
   DWORD bytes_read = 0;
   DWORD read2;
-  DWORD bytes_to_read;
+  DWORD bytes_to_read = 0;
   int ret;
   size_t len = ulen;
   char *tgt;
