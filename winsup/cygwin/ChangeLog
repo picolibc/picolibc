@@ -1,3 +1,8 @@
+2008-11-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (normalize_win32_path): Don't add a trailing '\' if the cwd
+	returns a path with a trailing '\'.
+
 2008-11-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pthread.cc (pthread_mutex::_unlock): Avoid unlocking a mutex if the

@@ -1346,7 +1346,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       else
 	{
 	  tail = strchr (tail, '\0');
-	  *tail++ = '\\';
+	  if (tail[-1] != '\\')
+	    *tail++ = '\\';
 	}
     }
 
