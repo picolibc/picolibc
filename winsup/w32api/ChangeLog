@@ -1,3 +1,10 @@
+2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (PROCESS_DEP_ENABLE,
+	PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION): Define for >= Vista SP1.
+	(enum _DEP_SYSTEM_POLICY_TYPE): Ditto.
+	(GetProcessDEPPolicy, GetSystemDEPPolicy, SetProcessDEPPolicy): Ditto.
+
 2008-10-09  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/mmsystem.h (sndAlias): Correct GCC4 warning.
