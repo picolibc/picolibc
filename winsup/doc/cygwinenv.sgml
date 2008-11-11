@@ -135,6 +135,42 @@ other terminals (i.e., rxvt or xterm).
 </listitem>
 
 <listitem>
+<para><envar>(no)upcaseenv</envar> - if set, Cygwin converts all
+environment variables to all-uppercase, when a Cygwin process is started
+from a non-Cygwin native Windows process.  This is how it has been done
+until Cygwin 1.5.  If not set, Cygwin does not change the case of environment
+variables, except for a restricted set to maintain minimal backward
+compatibility and for correct handling of certain essential variables.
+The current list of always uppercased variables is:</para>
+<screen>
+  ALLUSERSPROFILE
+  COMMONPROGRAMFILES
+  COMPUTERNAME
+  COMSPEC
+  HOME
+  HOMEDRIVE
+  HOMEPATH
+  NUMBER_OF_PROCESSORS
+  OS
+  PATH
+  PATHEXT
+  PROCESSOR_ARCHITECTURE
+  PROCESSOR_IDENTIFIER
+  PROCESSOR_LEVEL
+  PROCESSOR_REVISION
+  PROGRAMFILES
+  SYSTEMDRIVE
+  SYSTEMROOT
+  TEMP
+  TERM
+  TMP
+  TMPDIR
+  WINDIR
+</screen>
+<para>Defaults to not set.</para>
+</listitem>
+
+<listitem>
 <para><envar>(no)winsymlinks</envar> - if set, Cygwin creates
 symlinks as Windows shortcuts with a special header and the R/O attribute
 set. If not set, Cygwin creates symlinks as plain files with a magic number,

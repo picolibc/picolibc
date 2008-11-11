@@ -1,3 +1,7 @@
+2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add description for upcaseenv option.
+
 2008-09-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* setup2.sgml: Clarify heap allocation.
