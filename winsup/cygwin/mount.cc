@@ -403,7 +403,8 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
     }
   else
     {
-      dst[0] = cyg_tolower (*p);
+      /* drive letter must always be uppercase for casesensitive native NT. */
+      dst[0] = cyg_toupper (*p);
       dst[1] = ':';
       strcpy (dst + 2, p + 1);
       backslashify (dst, dst, !dst[2]);
@@ -1211,7 +1212,7 @@ cygdrive_getmntent ()
 	if (_my_tls.locals.available_drives & mask)
 	  break;
 
-      __small_sprintf (native_path, "%c:\\", drive);
+      __small_sprintf (native_path, "%c:\\", cyg_toupper (drive));
       if (GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
 	{
 	  _my_tls.locals.available_drives &= ~mask;

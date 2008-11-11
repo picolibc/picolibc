@@ -1,5 +1,13 @@
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::cygdrive_win32_path): Always upper case
+	DOS drive letter to accommodate case sensitivity.
+	(cygdrive_getmntent): Ditto.
+	* path.cc (path_conv::check): Invalidate wide_path after making path
+	relative.
+
+2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (create_upcaseenv): New static variable.
 	(renv_arr): New static array to keep track of environment variables
 	which have to be always uppercased.

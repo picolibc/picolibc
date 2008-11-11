@@ -1231,7 +1231,14 @@ out:
   if (opt & PC_NOFULL)
     {
       if (is_relpath)
-	mkrelpath (this->path, !!caseinsensitive);
+	{
+	  mkrelpath (this->path, !!caseinsensitive);
+	  /* Invalidate wide_path so that wide relpath can be created
+	     in later calls to get_nt_native_path or get_wide_win32_path. */
+	  if (wide_path)
+	    cfree (wide_path);
+	  wide_path = NULL;
+	}
       if (need_directory)
 	{
 	  size_t n = strlen (this->path);
