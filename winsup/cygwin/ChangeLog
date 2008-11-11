@@ -1,3 +1,16 @@
+2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (create_upcaseenv): New static variable.
+	(renv_arr): New static array to keep track of environment variables
+	which have to be always uppercased.
+	(idx_arr): Ditto.
+	(start_at): Ditto.
+	(ucreqenv): New function to uppercase only the environment variables
+	from renv_arr.
+	(parse_thing): Add "upcaseenv" setting.
+	(environ_init): Parse $CYGWIN before doing anything else.  Call
+	ucreqenv instead of ucenv if CYGWIN=noupcaseenv is set.
+
 2008-11-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (normalize_win32_path): Don't add a trailing '\' if the cwd

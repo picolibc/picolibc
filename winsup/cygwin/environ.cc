@@ -36,6 +36,7 @@ extern bool allow_winsymlinks;
 extern bool strip_title_path;
 bool reset_com = false;
 static bool envcache = true;
+static bool create_upcaseenv = false;
 #ifdef USE_SERVER
 extern bool allow_server;
 #endif
@@ -453,6 +454,62 @@ ucenv (char *p, char *eq)
       *p = cyg_toupper (*p);
 }
 
+/* Minimal list of Windows vars which must be converted to uppercase.
+   Either for POSIX compatibility of for backward compatibility with
+   existing applications. */
+static struct renv {
+        const char *name;
+        const size_t namelen;
+} renv_arr[] = {
+        { NL("ALLUSERSPROFILE=") },		// 0
+        { NL("COMMONPROGRAMFILES=") },		// 1
+        { NL("COMPUTERNAME=") },
+        { NL("COMSPEC=") },
+        { NL("HOME=") },			// 4
+        { NL("HOMEDRIVE=") },
+        { NL("HOMEPATH=") },
+        { NL("NUMBER_OF_PROCESSORS=") },	// 7
+        { NL("OS=") },				// 8
+        { NL("PATH=") },			// 9
+        { NL("PATHEXT=") },
+        { NL("PROCESSOR_ARCHITECTURE=") },
+        { NL("PROCESSOR_IDENTIFIER=") },
+        { NL("PROCESSOR_LEVEL=") },
+        { NL("PROCESSOR_REVISION=") },
+        { NL("PROGRAMFILES=") },
+        { NL("SYSTEMDRIVE=") },			// 16
+        { NL("SYSTEMROOT=") },
+        { NL("TEMP=") },			// 18
+        { NL("TERM=") },
+        { NL("TMP=") },
+        { NL("TMPDIR=") },
+        { NL("WINDIR=") }			// 22
+};
+#define RENV_SIZE (sizeof (renv_arr) / sizeof (renv_arr[0]))
+/* Set of first characters of the above list of variables. */
+static const char idx_arr[] = "ACHNOPSTW";
+/* Index into renv_arr at which the variables with this specific character
+   starts. */
+static const int start_at[] = { 0, 1, 4, 7, 8, 9, 16, 18, 22 };
+
+/* Hopefully as quick as possible.  Only upcase specific set of important
+   Windows variables. */
+static __inline__ void
+ucreqenv (char *p)
+{
+  char first = cyg_toupper (*p);
+  const char *idx = strchr (idx_arr, first);
+  if (idx)
+    for (size_t i = start_at[idx - idx_arr];
+	 i < RENV_SIZE && renv_arr[i].name[0] == first;
+	 ++i)
+      if (strncasematch (p, renv_arr[i].name, renv_arr[i].namelen))
+	{
+	  strncpy (p, renv_arr[i].name, renv_arr[i].namelen);
+	  break;
+	}
+}
+
 /* Parse CYGWIN options */
 
 static NO_COPY bool export_settings = false;
@@ -581,6 +638,7 @@ static struct parse_thing
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
+  {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
@@ -759,7 +817,8 @@ environ_init (char **envp, int envc)
 
   /* We need the CYGWIN variable content before we can loop through
      the whole environment, so that the wide-char to multibyte conversion
-     can be done according to the "codepage" setting. */
+     can be done according to the "codepage" setting, as well as the
+     uppercasing according to the "upcaseenv" setting. */
   if ((i = GetEnvironmentVariableA ("CYGWIN", NULL, 0)))
     {
       char *buf = (char *) alloca (i);
@@ -789,7 +848,10 @@ environ_init (char **envp, int envc)
 	*newp = '!';
       char *eq = strechr (newp, '=');
       if (!child_proc_info)
-	ucenv (newp, eq);
+	if (create_upcaseenv)
+	  ucenv (newp, eq);	/* Uppercase all env vars. */
+	else
+	  ucreqenv (newp);	/* Uppercase only selected vars. */
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
       if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
