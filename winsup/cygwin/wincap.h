@@ -42,6 +42,7 @@ struct wincaps
   unsigned supports_all_posix_ai_flags			: 1;
   unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
+  unsigned ts_has_dep_problem				: 1;
 };
 
 class wincapc
@@ -90,6 +91,7 @@ public:
   bool	IMPLEMENT (supports_all_posix_ai_flags)
   bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)
+  bool	IMPLEMENT (ts_has_dep_problem)
 
 #undef IMPLEMENT
 };

@@ -413,6 +413,9 @@ LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)
 LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
 LoadDLLfuncEx (GetSystemWindowsDirectoryW, 8, kernel32, 1)
 LoadDLLfuncEx (GetVolumeNameForVolumeMountPointA, 12, kernel32, 1)
+LoadDLLfuncEx (GetSystemDEPPolicy, 0, kernel32, 1)
+LoadDLLfuncEx (GetProcessDEPPolicy, 12, kernel32, 1)
+LoadDLLfuncEx (SetProcessDEPPolicy, 4, kernel32, 1)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 

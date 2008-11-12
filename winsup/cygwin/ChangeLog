@@ -1,5 +1,19 @@
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetSystemDEPPolicy): Define.
+	(GetProcessDEPPolicy): Ditto.
+	(SetProcessDEPPolicy): Ditto.
+	* dcrt0.cc (disable_dep): New static function.
+	(dll_crt0_0): Call disable_dep on platforms requiring it.  Add longish
+	comment to explain the circumstances.
+	* wincap.h (wincaps::ts_has_dep_problem): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincapc::init): Set ts_has_dep_problem to true on 2008 Terminal
+	Servers.
+	* winsup.h (WINVER): Set to 0x0601.
+
+2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_info::cygdrive_win32_path): Always upper case
 	DOS drive letter to accommodate case sensitivity.
 	(cygdrive_getmntent): Ditto.

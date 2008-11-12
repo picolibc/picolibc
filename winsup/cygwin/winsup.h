@@ -26,7 +26,7 @@ details. */
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
-#define WINVER 0x0600
+#define WINVER 0x0601
 #define _NO_W32_PSEUDO_MODIFIERS
 
 #include <sys/types.h>

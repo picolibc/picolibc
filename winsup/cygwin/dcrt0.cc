@@ -686,6 +686,31 @@ child_info_spawn::handle_spawn ()
   fixup_lockf_after_exec ();
 }
 
+static DEP_SYSTEM_POLICY_TYPE dep_system_policy = (DEP_SYSTEM_POLICY_TYPE) -1;
+
+static void
+disable_dep ()
+{
+  DWORD ppolicy;
+  BOOL perm;
+
+  if (dep_system_policy < 0)
+    {
+      dep_system_policy = GetSystemDEPPolicy ();
+      debug_printf ("DEP System Policy: %d", (int) dep_system_policy);
+    }
+  if (dep_system_policy < OptIn)
+    return;
+  if (!GetProcessDEPPolicy (hMainProc, &ppolicy, &perm))
+    {
+      debug_printf ("GetProcessDEPPolicy: %E");
+      return;
+    }
+  debug_printf ("DEP Process Policy: %d (permanent = %d)", ppolicy, perm);
+  if (ppolicy > 0 && !perm && !SetProcessDEPPolicy (0))
+    debug_printf ("SetProcessDEPPolicy: %E");
+}
+
 void __stdcall
 dll_crt0_0 ()
 {
@@ -749,6 +774,27 @@ dll_crt0_0 ()
   /* Initialize events */
   events_init ();
   tty_list::init_session ();
+
+  /* FIXME: This is hopefully a temporary hack, at least until the support
+     case at Microsoft has been closed one way or the other.
+
+     The disable_dep function disables DEP for all Cygwin processes if
+     the process runs on a Windows Server 2008 with Terminal Services
+     installed.  This combination (TS+DEP) breaks *some* Cygwin
+     applications.  The Terminal Service specific DLL tsappcmp.dll
+     changes the page protection of some pages in the application's text
+     segment from PAGE_EXECUTE_WRITECOPY to PAGE_WRITECOPY for no
+     apparent reason.  This occurs before any Cygwin or applicaton code
+     had a chance to run.  MS has no explanation for this so far, but is
+     rather busy trying to avoid giving support for this problem (as of
+     2008-11-11).
+
+     Unfortunately disabling DEP seems to have a not negligible
+     performance hit.  In the long run, either MS has to fix their
+     problem, or we have to find a better workaround, if any exists.
+     Idle idea: Adding EXECUTE protection to all text segment pages? */
+  if (wincap.ts_has_dep_problem ())
+    disable_dep ();
 
   debug_printf ("finished dll_crt0_0 initialization");
 }
