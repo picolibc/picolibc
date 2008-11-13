@@ -798,6 +798,9 @@
 #define AT_UCACHEBSIZE	21		/* Unified cache block size.  */
 #define AT_IGNOREPPC	22		/* Entry should be ignored */
 #define	AT_SECURE	23		/* Boolean, was exec setuid-like?  */
+#define AT_BASE_PLATFORM 24		/* String identifying real platform,
+					   may differ from AT_PLATFORM.  */
+#define AT_EXECFN	31		/* Filename of executable.  */
 /* Pointer to the global system page used for system calls and other
    nice things.  */
 #define AT_SYSINFO	32

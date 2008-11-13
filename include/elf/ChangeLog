@@ -1,3 +1,7 @@
+2008-10-13  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* common.h (AT_BASE_PLATFORM, AT_EXECFN): Define.
+
 2008-10-10  Nathan Froyd  <froydnj@codesourcery.com>
 
 	* ppc.h: Add Tag_GNU_Power_ABI_Struct_Return.
