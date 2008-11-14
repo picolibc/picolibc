@@ -1,3 +1,13 @@
+2008-11-14  Tristan Gingold  <gingold@adacore.com>
+
+	* fopen-vms.h (FOPEN_RB): Use a single string to match the
+	standard prototype.
+	(FOPEN_WB): Ditto.
+	(FOPEN_AB): Ditto.
+	(FOPEN_RUB): Ditto.
+	(FOPEN_WUB): Ditto.
+	(FOPEN_AUB): Ditto.
+
 2008-10-21  Alan Modra  <amodra@bigpond.net.au>
 
 	* obstack.h (obstack_finish <!__GNUC__>): Cast result to void *.
