@@ -1,3 +1,7 @@
+2008-11-14  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* internal.h (struct elf_segment_map): Add header_size field.
+ 
 2008-10-13  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (AT_BASE_PLATFORM, AT_EXECFN): Define.
