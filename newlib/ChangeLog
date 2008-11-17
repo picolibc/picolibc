@@ -1,5 +1,9 @@
 2008-11-17  Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* configure.host: RTEMS now uses posix subdirectory. 
+
+2008-11-17  Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* sys/rtems/include/limits.h: Add _POSIX2_RE_DUP_MAX.
 	* sys/rtems/sys/param.h: sys/rtprio.h not needed.
 
