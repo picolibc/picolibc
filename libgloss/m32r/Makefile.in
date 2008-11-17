@@ -85,9 +85,6 @@ MONSPECS = mon.specs
 
 all: $(CRT0) $(LIBGLOSS) $(MONLIBGLOSS) $(GDBLIB) $(GDBSTUB)
 
-m32r-stub.o: $(srcdir)/$(MULTISRCTOP)../../gdb/m32r-stub.c
-	$(CC) -c $(CFLAGS) -o $@ $(srcdir)/$(MULTISRCTOP)../../gdb/m32r-stub.c
-
 libgloss.a: $(LIBOBJS)
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
@@ -126,6 +123,7 @@ config.status: configure
 # to support SunOS VPATH
 crt0.o: crt0.S
 m32r-lib.o: m32r-lib.c
+m32r-stub.o: m32r-stub.c
 chmod.o: chmod.c
 close.o: close.c
 exit.o: exit.c
