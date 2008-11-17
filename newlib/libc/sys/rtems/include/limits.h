@@ -42,6 +42,9 @@
 #define _POSIX_OPEN_MAX         16
 #define _POSIX_PATH_MAX         255
 #define _POSIX_PIPE_BUF         512
+/* The maximum number of repeated occurrences of a regular expression
+ *  *    permitted when using the interval notation `\{M,N\}'.  */
+#define _POSIX2_RE_DUP_MAX              255
 #define _POSIX_RTSIG_MAX        8
 #define _POSIX_SEM_NSEMS_MAX    256
 #define _POSIX_SEM_VALUE_MAX    32767

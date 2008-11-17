@@ -93,7 +93,6 @@
 #include <sys/resource.h>
 #include <sys/ucred.h>
 #include <sys/uio.h>
-#include <sys/rtprio.h>
 
 #ifndef FALSE
 #define	FALSE	0
