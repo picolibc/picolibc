@@ -1,3 +1,4 @@
+#ifndef _NO_BASENAME
 /* Copyright 2005 Shaun Jackman
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
@@ -23,3 +24,5 @@ _DEFUN (basename, (path),
 		p--;
 	return p + 1;
 }
+
+#endif /* !_NO_BASENAME  */

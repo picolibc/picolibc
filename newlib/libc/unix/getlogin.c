@@ -1,3 +1,5 @@
+#ifndef _NO_GETLOGIN
+
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -40,3 +42,4 @@ getlogin ()
   close (utmp_fd);
   return 0;
 }
+#endif /* !_NO_GETLOGIN  */

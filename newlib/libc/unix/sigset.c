@@ -1,3 +1,5 @@
+#ifndef _NO_SIGSET
+
 #include <signal.h>
 #include <errno.h>
 
@@ -62,3 +64,4 @@ sigismember (const sigset_t * set, int signo)
 }
 
 #endif /* SIG_SETMASK */
+#endif /* _NO_SIGSET  */

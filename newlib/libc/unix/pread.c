@@ -1,3 +1,4 @@
+#ifndef _NO_PREAD
 /*
 FUNCTION
 <<pread>>---read a file from specified position
@@ -88,4 +89,5 @@ _DEFUN (pread, (fd, buf, n, off),
   return _pread_r (_REENT, fd, buf, n, off);
 }
 
-#endif
+#endif /* !_REENT_ONLY  */
+#endif /* !_NO_PREAD  */

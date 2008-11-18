@@ -1,3 +1,5 @@
+#ifndef _NO_GETUT
+
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
@@ -84,3 +86,5 @@ getutline (struct utmp *line)
 
   return 0;
 }
+
+#endif /* !_NO_GETUT  */

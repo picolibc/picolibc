@@ -1,3 +1,5 @@
+#ifndef _NO_DIRNAME
+
 /* Copyright 2005 Shaun Jackman
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
@@ -26,3 +28,5 @@ _DEFUN (dirname, (path),
 		p == path ? "/" :
 		(*p = '\0', path);
 }
+
+#endif /* !_NO_DIRNAME  */

@@ -1,3 +1,4 @@
+#ifndef _NO_PWRITE
 /*
 FUNCTION
 <<pwrite>>---write a file from specified position
@@ -89,4 +90,5 @@ _DEFUN (pwrite, (fd, buf, n, off),
   return _pwrite_r (_REENT, fd, buf, n, off);
 }
 
-#endif
+#endif /* !_REENT_ONLY  */
+#endif /* !_NO_PWRITE  */

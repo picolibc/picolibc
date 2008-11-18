@@ -1,3 +1,5 @@
+#ifndef _NO_GETPWENT
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -125,3 +127,5 @@ endpwent ()
   if (passwd_fp != NULL)
     fclose (passwd_fp);
 }
+
+#endif /* !_NO_GETPWENT  */
