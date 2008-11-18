@@ -1,3 +1,4 @@
+#ifndef _NO_GETPASS
 /*
  * Copyright (c) 1988 The Regents of the University of California.
  * All rights reserved.
@@ -97,3 +98,4 @@ getpass (prompt)
     (void) fclose (fp);
   return buf;
 }
+#endif /* !_NO_GETPASS  */
