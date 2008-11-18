@@ -1,3 +1,7 @@
+2008-11-18  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/unix/ttyname.c: Use isatty() instead of tcgetattr().
+
 2008-11-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/unix/basename.c: Add !_NO_BASENAME flag check so code can be

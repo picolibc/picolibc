@@ -32,7 +32,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <paths.h>
@@ -51,15 +50,14 @@ _DEFUN( ttyname_r,(fd, name, namesize),
 	size_t  namesize)
 {
   struct stat sb;
-  struct termios tty;
   struct dirent *dirp;
   DIR *dp;
   struct stat dsb;
   char buf[sizeof(ttyname_buf)];
 
   /* Must be a terminal. */
-  if (tcgetattr (fd, &tty) < 0)
-    return errno;	/* Can be EBADF or ENOTTY */
+  if (!isatty(fd))
+    return ENOTTY;
 
   /* Must be a character device. */
   if (fstat (fd, &sb) || !S_ISCHR (sb.st_mode))
