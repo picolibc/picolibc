@@ -1,3 +1,4 @@
+#ifndef _NO_TTYNAME
 /*
  * Copyright (c) 1988 The Regents of the University of California.
  * All rights reserved.
@@ -10,10 +11,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -31,10 +28,6 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)ttyname.c	5.10 (Berkeley) 5/6/91";
-#endif /* LIBC_SCCS and not lint */
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -44,30 +37,38 @@ static char sccsid[] = "@(#)ttyname.c	5.10 (Berkeley) 5/6/91";
 #include <string.h>
 #include <paths.h>
 #include <_syslist.h>
+#include <errno.h>
 
-static char buf[sizeof (_PATH_DEV) + MAXNAMLEN] = _PATH_DEV;
+static char ttyname_buf[sizeof (_PATH_DEV) + MAXNAMLEN] = _PATH_DEV;
 
-char *
-ttyname (fd)
-     int fd;
+/*
+ *  ttyname_r() - POSIX 1003.1b 4.7.2 - Determine Terminal Device Name
+ */
+int
+_DEFUN( ttyname_r,(fd, name, namesize),
+	int fd _AND
+	char   *name _AND
+	size_t  namesize)
 {
   struct stat sb;
   struct termios tty;
   struct dirent *dirp;
   DIR *dp;
   struct stat dsb;
+  char buf[sizeof(ttyname_buf)];
 
   /* Must be a terminal. */
   if (tcgetattr (fd, &tty) < 0)
-    return NULL;
+    return errno;	/* Can be EBADF or ENOTTY */
 
   /* Must be a character device. */
   if (fstat (fd, &sb) || !S_ISCHR (sb.st_mode))
-    return NULL;
+    return ENOTTY;
 
   if ((dp = opendir (_PATH_DEV)) == NULL)
-    return NULL;
+    return EBADF;
 
+  strcpy(buf, _PATH_DEV);
   while ((dirp = readdir (dp)) != NULL)
     {
       if (dirp->d_ino != sb.st_ino)
@@ -77,8 +78,32 @@ ttyname (fd)
 	  sb.st_ino != dsb.st_ino)
 	continue;
       (void) closedir (dp);
-      return buf;
+      if(strlen(buf) < namesize)  /* < to account for terminating null */
+	{
+	strcpy(name, buf);
+	return 0;
+	}
+      else
+	{
+	return ERANGE;
+	}
     }
   (void) closedir (dp);
-  return NULL;
+  return EBADF;
 }
+
+/*
+ *  ttyname() - POSIX 1003.1b 4.7.2 - Determine Terminal Device Name
+ */
+char *
+_DEFUN( ttyname,(fd),
+	int fd)
+{
+  register int  fail;
+  register char *ret=NULL;
+  fail = ttyname_r( fd, ttyname_buf, sizeof(ttyname_buf) );
+  if ( fail )  errno = fail;
+   else  ret = ttyname_buf;
+  return ret;
+}
+#endif /* !_NO_TTYNAME  */

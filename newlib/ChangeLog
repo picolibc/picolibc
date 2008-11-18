@@ -1,3 +1,8 @@
+2008-11-18  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/unix/ttyname.c: Add ttyname_r and change ttyname to use
+	ttyname_r.
+
 2008-11-17  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* configure.host: RTEMS now uses posix subdirectory. 
