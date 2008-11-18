@@ -65,6 +65,7 @@
 #define FPU_VFP_EXT_V3	 0x01000000	/* VFPv3 insns.	              */
 #define FPU_NEON_EXT_V1	 0x00800000	/* Neon (SIMD) insns.	      */
 #define FPU_VFP_EXT_D32  0x00400000	/* Registers D16-D31.	      */
+#define FPU_NEON_FP16	 0x00200000	/* Half-precision extensions. */
 
 /* Architectures are the sum of the base and extensions.  The ARM ARM (rev E)
    defines the following: ARMv3, ARMv3M, ARMv4xM, ARMv4, ARMv4TxM, ARMv4T,
@@ -139,6 +140,8 @@
 #define FPU_ARCH_NEON_V1  ARM_FEATURE (0, FPU_NEON_EXT_V1)
 #define FPU_ARCH_VFP_V3_PLUS_NEON_V1 \
   ARM_FEATURE (0, FPU_VFP_V3 | FPU_NEON_EXT_V1)
+#define FPU_ARCH_NEON_FP16 \
+  ARM_FEATURE (0, FPU_VFP_V3 | FPU_NEON_EXT_V1 | FPU_NEON_FP16)
 #define FPU_ARCH_VFP_HARD ARM_FEATURE (0, FPU_VFP_HARD)
 
 #define FPU_ARCH_ENDIAN_PURE ARM_FEATURE (0, FPU_ENDIAN_PURE)

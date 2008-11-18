@@ -1,3 +1,7 @@
+2008-11-18  Catherine Moore  <clm@codesourcery.com>
+
+	* arm.h (Tag_ABI_FP_16bit_format): Define.
+
 2008-11-14  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* internal.h (struct elf_segment_map): Add header_size field.

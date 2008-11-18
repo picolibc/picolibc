@@ -272,6 +272,12 @@ enum
   Tag_ABI_optimization_goals,
   Tag_ABI_FP_optimization_goals,
   /* 32 is generic.  */
+  Tag_undefined33 = 33,
+  Tag_CPU_unaligned_access,
+  Tag_undefined35, 
+  Tag_VFP_HP_extension,
+  Tag_undefined37,
+  Tag_ABI_FP_16bit_format = 38,
 };
 
 #endif
