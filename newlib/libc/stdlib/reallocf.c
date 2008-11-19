@@ -24,17 +24,32 @@
  * SUCH DAMAGE.
  */
 
+/* Documented in malloc.c.  */
+
 #include <sys/cdefs.h>
 
 #include <stdlib.h>
 
-void *
-reallocf(void *ptr, size_t size)
+_PTR
+_DEFUN (_reallocf_r, (reentptr, ptr, size),
+	struct _reent *reentptr _AND
+	_PTR ptr _AND
+	size_t size)
 {
 	void *nptr;
 
-	nptr = realloc(ptr, size);
+	nptr = _realloc_r(reentptr, ptr, size);
 	if (!nptr && ptr)
-		free(ptr);
+		_free_r(reentptr, ptr);
 	return (nptr);
 }
+
+#ifndef _REENT_ONLY
+_PTR
+_DEFUN (reallocf, (ptr, size),
+	_PTR ptr _AND
+	size_t size)
+{
+  return _reallocf_r(_REENT, ptr, size);
+}
+#endif

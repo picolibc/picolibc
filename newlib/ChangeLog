@@ -1,3 +1,18 @@
+2008-11-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/bits/dirent.h: New header file.
+	* libc/sys/linux/sys/dirent.h: Include <bits/dirent.h> instead of
+	<linux/dirent.h>.
+	* libc/posix/Makefile.am: Remove reallocf.
+	* libc/posix/Makefile.in: Regenerated.
+	* libc/posix/reallocf.c: Moved to...
+	* libc/stdlib/reallocf.c: Here
+	* libc/stdlib/malloc.c: Add reallocf documentation.
+	* libc/include/stdlib.h: Add reallocf and _reallocf_r prototypes.
+	* libc/stdlib/Makefile.am: Add reallocf.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/posix/_isatty.c: Set errno.
+
 2008-11-19  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/unix/collate.c (__collate_err): simplify to remove unnecessary

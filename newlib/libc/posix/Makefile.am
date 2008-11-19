@@ -7,7 +7,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
 	closedir.c collate.c collcmp.c creat.c \
 	fnmatch.c glob.c _isatty.c isatty.c \
-	opendir.c readdir.c readdir.c reallocf.c \
+	opendir.c readdir.c readdir.c \
 	regcomp.c regerror.c regexec.c regfree.c \
 	rewinddir.c sleep.c usleep.c \
 	telldir.c

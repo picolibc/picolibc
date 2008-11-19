@@ -47,6 +47,7 @@ GENERAL_SOURCES = \
 	rand.c		\
 	rand_r.c	\
 	realloc.c	\
+	reallocf.c	\
 	strtod.c	\
 	strtol.c	\
 	strtoul.c	\

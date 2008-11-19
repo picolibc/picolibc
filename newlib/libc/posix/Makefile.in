@@ -62,11 +62,11 @@ am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-collate.$(OBJEXT) \
 	lib_a-fnmatch.$(OBJEXT) lib_a-glob.$(OBJEXT) \
 	lib_a-_isatty.$(OBJEXT) lib_a-isatty.$(OBJEXT) \
 	lib_a-opendir.$(OBJEXT) lib_a-readdir.$(OBJEXT) \
-	lib_a-readdir.$(OBJEXT) lib_a-reallocf.$(OBJEXT) \
-	lib_a-regcomp.$(OBJEXT) lib_a-regerror.$(OBJEXT) \
-	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT) \
-	lib_a-rewinddir.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT)
+	lib_a-readdir.$(OBJEXT) lib_a-regcomp.$(OBJEXT) \
+	lib_a-regerror.$(OBJEXT) lib_a-regexec.$(OBJEXT) \
+	lib_a-regfree.$(OBJEXT) lib_a-rewinddir.$(OBJEXT) \
+	lib_a-sleep.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
+	lib_a-telldir.$(OBJEXT)
 am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
 am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
 	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
@@ -87,8 +87,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libposix_la_LIBADD =
 am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo fnmatch.lo \
 	glob.lo _isatty.lo isatty.lo opendir.lo readdir.lo readdir.lo \
-	reallocf.lo regcomp.lo regerror.lo regexec.lo regfree.lo \
-	rewinddir.lo sleep.lo usleep.lo telldir.lo
+	regcomp.lo regerror.lo regexec.lo regfree.lo rewinddir.lo \
+	sleep.lo usleep.lo telldir.lo
 am__objects_7 = scandir.lo seekdir.lo
 am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
 	execvp.lo wordexp.lo wordfree.lo
@@ -292,7 +292,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
 	closedir.c collate.c collcmp.c creat.c \
 	fnmatch.c glob.c _isatty.c isatty.c \
-	opendir.c readdir.c readdir.c reallocf.c \
+	opendir.c readdir.c readdir.c \
 	regcomp.c regerror.c regexec.c regfree.c \
 	rewinddir.c sleep.c usleep.c \
 	telldir.c
@@ -451,12 +451,6 @@ lib_a-readdir.o: readdir.c
 
 lib_a-readdir.obj: readdir.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readdir.obj `if test -f 'readdir.c'; then $(CYGPATH_W) 'readdir.c'; else $(CYGPATH_W) '$(srcdir)/readdir.c'; fi`
-
-lib_a-reallocf.o: reallocf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocf.o `test -f 'reallocf.c' || echo '$(srcdir)/'`reallocf.c
-
-lib_a-reallocf.obj: reallocf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-reallocf.obj `if test -f 'reallocf.c'; then $(CYGPATH_W) 'reallocf.c'; else $(CYGPATH_W) '$(srcdir)/reallocf.c'; fi`
 
 lib_a-regcomp.o: regcomp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-regcomp.o `test -f 'regcomp.c' || echo '$(srcdir)/'`regcomp.c

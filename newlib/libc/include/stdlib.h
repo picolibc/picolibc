@@ -104,6 +104,9 @@ char *  _EXFUN(mktemp,(char *));
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
+#ifndef __STRICT_ANSI__
+_PTR	_EXFUN(reallocf,(_PTR __r, size_t __size));
+#endif
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
@@ -129,6 +132,7 @@ int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
 _VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((noreturn)));
 int	_EXFUN(putenv,(char *__string));
 int	_EXFUN(_putenv_r,(struct _reent *, char *__string));
+_PTR	_EXFUN(_reallocf_r,(struct _reent *, _PTR, size_t));
 int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
 int	_EXFUN(_setenv_r,(struct _reent *, const char *__string, const char *__value, int __overwrite));
 
