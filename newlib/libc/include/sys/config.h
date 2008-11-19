@@ -94,7 +94,7 @@
 #endif
 #endif
 
-#ifdef __mips__
+#if defined(__mips__) && !defined(__rtems__)
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
 
@@ -183,10 +183,6 @@
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
-#if defined(__mips__)
-#undef __ATTRIBUTE_IMPURE_PTR__
-#define __ATTRIBUTE_IMPURE_PTR__
-#endif
 #endif
 
 #ifndef __IMPORT

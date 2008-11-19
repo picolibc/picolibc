@@ -1,3 +1,10 @@
+2008-11-19  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/sys/config.h[__mips__]: Don't bother
+	setting __ATTRIBUTE_IMPURE_PTR__ here.
+	[__rtems__][__mips__]: No need to undef the __ATTRIBUTE_IMPURE_PTR__
+	macro anymore.
+
 2008-11-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/bits/dirent.h: New header file.
