@@ -1,5 +1,10 @@
 2008-11-19  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/posix/runetype.h: Add include of stddef.h and remove
+	defining standard types: size_t and wchar_t.
+
+2008-11-19  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/include/pthread.h: Remove prototypes for
 	pthread_attr_getcputime and pthread_attr_setcputime which
 	were proposed but never approved by the POSIX standard.

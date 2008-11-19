@@ -36,26 +36,15 @@
 #ifndef	_RUNETYPE_H_
 #define	_RUNETYPE_H_
 
+#include <stddef.h>
 #include <sys/cdefs.h>
 #include <machine/ansi.h>
 
 #ifdef	_BSD_RUNE_T_
 typedef	_BSD_RUNE_T_	rune_t;
 #undef	_BSD_RUNE_T_
-#endif
-
+#else
 typedef int rune_t;
-
-#ifdef	_BSD_SIZE_T_
-typedef	_BSD_SIZE_T_	size_t;
-#undef	_BSD_SIZE_T_
-#endif
-
-typedef unsigned int size_t;
-
-#ifdef	_BSD_WCHAR_T_
-typedef	_BSD_WCHAR_T_	wchar_t;
-#undef	_BSD_WCHAR_T_
 #endif
 
 #define	_CACHED_RUNES	(1 <<8 )	/* Must be a power of 2 */
