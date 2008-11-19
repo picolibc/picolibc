@@ -175,14 +175,12 @@ __collate_strdup(s)
 void
 __collate_err(int ex, const char *f)
 {
-	const char *s = strdup("collate_error");
+	const char *s;
 	int serrno = errno;
 
-	write(STDERR_FILENO, s, strlen(s));
-	write(STDERR_FILENO, ": ", 2);
-	free(s);
-	s = f;
-	write(STDERR_FILENO, s, strlen(s));
+	/* Be careful to change write counts if you change the strings */
+	write(STDERR_FILENO, "collate_error: ", 15);
+	write(STDERR_FILENO, f, strlen(f));
 	write(STDERR_FILENO, ": ", 2);
 	s = strerror(serrno);
 	write(STDERR_FILENO, s, strlen(s));

@@ -1,3 +1,8 @@
+2008-11-19  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/unix/collate.c (__collate_err): simplify to remove unnecessary
+	strdup() and strlen() calls, also getting rid of a compiler warning.
+
 2008-11-19  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* libc/include/sys/config.h: Don't put 
