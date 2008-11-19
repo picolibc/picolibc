@@ -1,3 +1,8 @@
+2008-11-19  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/sys/config.h: Don't put 
+	__ATTRIBUTE_IMPURE_PTR__ into .sdata section for mips-rtems.
+		  
 2008-11-19  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/posix/runetype.h: Add include of stddef.h and remove
