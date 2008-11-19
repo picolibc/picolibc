@@ -1,3 +1,9 @@
+2008-11-19  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
+	* libc/include/pthread.h: Remove prototypes for
+	pthread_attr_getcputime and pthread_attr_setcputime which
+	were proposed but never approved by the POSIX standard.
+
 2008-11-18  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/unix/ttyname.c: Use isatty() instead of tcgetattr().

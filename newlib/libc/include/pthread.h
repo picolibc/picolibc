@@ -294,14 +294,6 @@ void 	_EXFUN(pthread_cleanup_pop, (int __execute));
 int	_EXFUN(pthread_getcpuclockid,
 	(pthread_t __pthread_id, clockid_t *__clock_id));
  
-/* CPU-time Clock Thread Creation Attribute, P1003.4b/D8, p. 59 */
-
-int	_EXFUN(pthread_attr_setcputime,
-	(pthread_attr_t *__attr, int __clock_allowed));
-
-int	_EXFUN(pthread_attr_getcputime,
-	(pthread_attr_t *__attr, int *__clock_allowed));
-
 #endif /* defined(_POSIX_THREAD_CPUTIME) */
 
 
