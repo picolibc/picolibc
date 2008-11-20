@@ -6,12 +6,12 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright notice, 
+* Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright 
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the 
 documentation and/or other materials provided with the distribution.
-    * Neither the name of IBM nor the names of its contributors may be 
+* Neither the name of IBM nor the names of its contributors may be
 used to endorse or promote products derived from this software without 
 specific prior written permission.
 
@@ -46,6 +46,10 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 #define JSRE_GETTIMEOFDAY 7
 #define JSRE_LSEEK 9
 #define JSRE_LSTAT 10
+#define JSRE_MMAP 11
+#define JSRE_MREMAP 12
+#define JSRE_MSYNC 13
+#define JSRE_MUNMAP 14
 #define JSRE_OPEN 15
 #define JSRE_READ 16
 #define JSRE_SHM_OPEN 21

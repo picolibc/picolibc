@@ -1,3 +1,15 @@
+2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
+            Patrick Mansfield  <patmans@us.ibm.com>
+            Joel Schopp   <jschopp@austin.ibm.com>
+
+	* spu/Makefile.in: Add new files.
+	* spu/jsre.h: Add JSRE_MMAP, JSRE_MREMAP, JSRE_MSYNC and
+	JSRE_MUNMAP opcodes.
+	* spu/mmap_eaddr.c: New File.
+	* spu/mremap_eaddr.c: Likewise.
+	* spu/msync_eaddr.c: Likewise.
+	* spu/munmap_eaddr.c: Likewise.
+
 2008-11-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* m32r/Makefile.in: Add building m32r-stub.o from local copy instead
