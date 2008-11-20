@@ -25,6 +25,15 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
 	spu_timer_stop.c spu_timer_free.c spu_timebase.c
 
+if HAVE_SPU_EA
+lib_a_SOURCES += calloc_ea.c free_ea.c malloc_ea.c memchr_ea.c memcmp_ea.c \
+	memcpy_ea.c memmove_ea.c memset_ea.c mmap_ea.c mremap_ea.c msync_ea.c \
+	munmap_ea.c posix_memalign_ea.c realloc_ea.c strcat_ea.c strchr_ea.c \
+	strcmp_ea.c strcpy_ea.c strcspn_ea.c strlen_ea.c strncat_ea.c strncmp_ea.c \
+	strncpy_ea.c strpbrk_ea.c strrchr_ea.c strspn_ea.c strstr_ea.c read_ea.c \
+	pread_ea.c readv_ea.c write_ea.c pwrite_ea.c writev_ea.c
+endif
+
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 

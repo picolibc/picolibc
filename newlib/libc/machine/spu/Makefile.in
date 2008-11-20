@@ -36,6 +36,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_SPU_EA_TRUE@am__append_1 = calloc_ea.c free_ea.c malloc_ea.c memchr_ea.c memcmp_ea.c \
+@HAVE_SPU_EA_TRUE@	memcpy_ea.c memmove_ea.c memset_ea.c mmap_ea.c mremap_ea.c msync_ea.c \
+@HAVE_SPU_EA_TRUE@	munmap_ea.c posix_memalign_ea.c realloc_ea.c strcat_ea.c strchr_ea.c \
+@HAVE_SPU_EA_TRUE@	strcmp_ea.c strcpy_ea.c strcspn_ea.c strlen_ea.c strncat_ea.c strncmp_ea.c \
+@HAVE_SPU_EA_TRUE@	strncpy_ea.c strpbrk_ea.c strrchr_ea.c strspn_ea.c strstr_ea.c read_ea.c \
+@HAVE_SPU_EA_TRUE@	pread_ea.c readv_ea.c write_ea.c pwrite_ea.c writev_ea.c
+
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -78,7 +85,24 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -93,6 +117,39 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
+@HAVE_SPU_EA_TRUE@am__objects_1 = lib_a-calloc_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-free_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-malloc_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-memchr_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-memcmp_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-memcpy_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-memmove_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-memset_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-mmap_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-mremap_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-msync_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-munmap_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-posix_memalign_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-realloc_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strcat_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strchr_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strcmp_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strcpy_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strcspn_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strlen_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strncat_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strncmp_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strncpy_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strpbrk_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strrchr_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strspn_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-strstr_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-read_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-pread_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-readv_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-write_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-pwrite_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-writev_ea.$(OBJEXT)
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-clearerr.$(OBJEXT) lib_a-creat.$(OBJEXT) \
 	lib_a-fclose.$(OBJEXT) lib_a-feof.$(OBJEXT) \
@@ -140,7 +197,8 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-spu_timer_flih.$(OBJEXT) lib_a-spu_timer_slih.$(OBJEXT) \
 	lib_a-spu_timer_slih_reg.$(OBJEXT) \
 	lib_a-spu_timer_svcs.$(OBJEXT) lib_a-spu_timer_stop.$(OBJEXT) \
-	lib_a-spu_timer_free.$(OBJEXT) lib_a-spu_timebase.$(OBJEXT)
+	lib_a-spu_timer_free.$(OBJEXT) lib_a-spu_timebase.$(OBJEXT) \
+	$(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -183,6 +241,8 @@ ELIX_LEVEL_3_FALSE = @ELIX_LEVEL_3_FALSE@
 ELIX_LEVEL_3_TRUE = @ELIX_LEVEL_3_TRUE@
 ELIX_LEVEL_4_FALSE = @ELIX_LEVEL_4_FALSE@
 ELIX_LEVEL_4_TRUE = @ELIX_LEVEL_4_TRUE@
+HAVE_SPU_EA_FALSE = @HAVE_SPU_EA_FALSE@
+HAVE_SPU_EA_TRUE = @HAVE_SPU_EA_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -266,22 +326,23 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
 AM_CCASFLAGS = $(INCLUDES)
 lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
-	ferror.c fflush.c fgetc.c fgetpos.c fgets.c fileno.c fiprintf.S \
-	fiscanf.S fopen.c fprintf.S fputc.c fputs.c fread.c freopen.c \
-	fscanf.S fseek.c fsetpos.c ftell.c fwrite.c getc.c getchar.c \
-	gets.c impure.c iprintf.S iscanf.S memcmp.c memcpy.c memmove.c \
-	memset.c perror.c printf.S putc.c putchar.c puts.c remove.c \
-	rename.c rewind.c scanf.S setbuf.c setvbuf.c siprintf.S siscanf.S \
-	sleep.c sniprintf.S snprintf.S sprintf.S sscanf.S stdio.c strcat.c \
-	strchr.c strcmp.c strcpy.c strcspn.c strlen.c strncat.c strncmp.c \
-	strncpy.c strpbrk.c strrchr.c strspn.c strxfrm.c tmpfile.c \
-	tmpnam.c ungetc.c usleep.c vfiprintf.c vfiscanf.c vfprintf.c \
-	vfscanf.c viprintf.c viscanf.c vprintf.c vscanf.c vsiprintf.c \
-	vsiscanf.c vsniprintf.c vsnprintf.c vsprintf.c vsscanf.c \
-	stack_reg_va.S spu_clock_svcs.c spu_clock_stop.c spu_timer_flih.S \
+	ferror.c fflush.c fgetc.c fgetpos.c fgets.c fileno.c \
+	fiprintf.S fiscanf.S fopen.c fprintf.S fputc.c fputs.c fread.c \
+	freopen.c fscanf.S fseek.c fsetpos.c ftell.c fwrite.c getc.c \
+	getchar.c gets.c impure.c iprintf.S iscanf.S memcmp.c memcpy.c \
+	memmove.c memset.c perror.c printf.S putc.c putchar.c puts.c \
+	remove.c rename.c rewind.c scanf.S setbuf.c setvbuf.c \
+	siprintf.S siscanf.S sleep.c sniprintf.S snprintf.S sprintf.S \
+	sscanf.S stdio.c strcat.c strchr.c strcmp.c strcpy.c strcspn.c \
+	strlen.c strncat.c strncmp.c strncpy.c strpbrk.c strrchr.c \
+	strspn.c strxfrm.c tmpfile.c tmpnam.c ungetc.c usleep.c \
+	vfiprintf.c vfiscanf.c vfprintf.c vfscanf.c viprintf.c \
+	viscanf.c vprintf.c vscanf.c vsiprintf.c vsiscanf.c \
+	vsniprintf.c vsnprintf.c vsprintf.c vsscanf.c stack_reg_va.S \
+	spu_clock_svcs.c spu_clock_stop.c spu_timer_flih.S \
 	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
-	spu_timer_stop.c spu_timer_free.c spu_timebase.c
-
+	spu_timer_stop.c spu_timer_free.c spu_timebase.c \
+	$(am__append_1)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -918,6 +979,204 @@ lib_a-spu_timebase.o: spu_timebase.c
 
 lib_a-spu_timebase.obj: spu_timebase.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu_timebase.obj `if test -f 'spu_timebase.c'; then $(CYGPATH_W) 'spu_timebase.c'; else $(CYGPATH_W) '$(srcdir)/spu_timebase.c'; fi`
+
+lib_a-calloc_ea.o: calloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-calloc_ea.o `test -f 'calloc_ea.c' || echo '$(srcdir)/'`calloc_ea.c
+
+lib_a-calloc_ea.obj: calloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-calloc_ea.obj `if test -f 'calloc_ea.c'; then $(CYGPATH_W) 'calloc_ea.c'; else $(CYGPATH_W) '$(srcdir)/calloc_ea.c'; fi`
+
+lib_a-free_ea.o: free_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-free_ea.o `test -f 'free_ea.c' || echo '$(srcdir)/'`free_ea.c
+
+lib_a-free_ea.obj: free_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-free_ea.obj `if test -f 'free_ea.c'; then $(CYGPATH_W) 'free_ea.c'; else $(CYGPATH_W) '$(srcdir)/free_ea.c'; fi`
+
+lib_a-malloc_ea.o: malloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloc_ea.o `test -f 'malloc_ea.c' || echo '$(srcdir)/'`malloc_ea.c
+
+lib_a-malloc_ea.obj: malloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-malloc_ea.obj `if test -f 'malloc_ea.c'; then $(CYGPATH_W) 'malloc_ea.c'; else $(CYGPATH_W) '$(srcdir)/malloc_ea.c'; fi`
+
+lib_a-memchr_ea.o: memchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr_ea.o `test -f 'memchr_ea.c' || echo '$(srcdir)/'`memchr_ea.c
+
+lib_a-memchr_ea.obj: memchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr_ea.obj `if test -f 'memchr_ea.c'; then $(CYGPATH_W) 'memchr_ea.c'; else $(CYGPATH_W) '$(srcdir)/memchr_ea.c'; fi`
+
+lib_a-memcmp_ea.o: memcmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp_ea.o `test -f 'memcmp_ea.c' || echo '$(srcdir)/'`memcmp_ea.c
+
+lib_a-memcmp_ea.obj: memcmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp_ea.obj `if test -f 'memcmp_ea.c'; then $(CYGPATH_W) 'memcmp_ea.c'; else $(CYGPATH_W) '$(srcdir)/memcmp_ea.c'; fi`
+
+lib_a-memcpy_ea.o: memcpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_ea.o `test -f 'memcpy_ea.c' || echo '$(srcdir)/'`memcpy_ea.c
+
+lib_a-memcpy_ea.obj: memcpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy_ea.obj `if test -f 'memcpy_ea.c'; then $(CYGPATH_W) 'memcpy_ea.c'; else $(CYGPATH_W) '$(srcdir)/memcpy_ea.c'; fi`
+
+lib_a-memmove_ea.o: memmove_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_ea.o `test -f 'memmove_ea.c' || echo '$(srcdir)/'`memmove_ea.c
+
+lib_a-memmove_ea.obj: memmove_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmove_ea.obj `if test -f 'memmove_ea.c'; then $(CYGPATH_W) 'memmove_ea.c'; else $(CYGPATH_W) '$(srcdir)/memmove_ea.c'; fi`
+
+lib_a-memset_ea.o: memset_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_ea.o `test -f 'memset_ea.c' || echo '$(srcdir)/'`memset_ea.c
+
+lib_a-memset_ea.obj: memset_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset_ea.obj `if test -f 'memset_ea.c'; then $(CYGPATH_W) 'memset_ea.c'; else $(CYGPATH_W) '$(srcdir)/memset_ea.c'; fi`
+
+lib_a-mmap_ea.o: mmap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mmap_ea.o `test -f 'mmap_ea.c' || echo '$(srcdir)/'`mmap_ea.c
+
+lib_a-mmap_ea.obj: mmap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mmap_ea.obj `if test -f 'mmap_ea.c'; then $(CYGPATH_W) 'mmap_ea.c'; else $(CYGPATH_W) '$(srcdir)/mmap_ea.c'; fi`
+
+lib_a-mremap_ea.o: mremap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mremap_ea.o `test -f 'mremap_ea.c' || echo '$(srcdir)/'`mremap_ea.c
+
+lib_a-mremap_ea.obj: mremap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mremap_ea.obj `if test -f 'mremap_ea.c'; then $(CYGPATH_W) 'mremap_ea.c'; else $(CYGPATH_W) '$(srcdir)/mremap_ea.c'; fi`
+
+lib_a-msync_ea.o: msync_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-msync_ea.o `test -f 'msync_ea.c' || echo '$(srcdir)/'`msync_ea.c
+
+lib_a-msync_ea.obj: msync_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-msync_ea.obj `if test -f 'msync_ea.c'; then $(CYGPATH_W) 'msync_ea.c'; else $(CYGPATH_W) '$(srcdir)/msync_ea.c'; fi`
+
+lib_a-munmap_ea.o: munmap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-munmap_ea.o `test -f 'munmap_ea.c' || echo '$(srcdir)/'`munmap_ea.c
+
+lib_a-munmap_ea.obj: munmap_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-munmap_ea.obj `if test -f 'munmap_ea.c'; then $(CYGPATH_W) 'munmap_ea.c'; else $(CYGPATH_W) '$(srcdir)/munmap_ea.c'; fi`
+
+lib_a-posix_memalign_ea.o: posix_memalign_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_memalign_ea.o `test -f 'posix_memalign_ea.c' || echo '$(srcdir)/'`posix_memalign_ea.c
+
+lib_a-posix_memalign_ea.obj: posix_memalign_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_memalign_ea.obj `if test -f 'posix_memalign_ea.c'; then $(CYGPATH_W) 'posix_memalign_ea.c'; else $(CYGPATH_W) '$(srcdir)/posix_memalign_ea.c'; fi`
+
+lib_a-realloc_ea.o: realloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-realloc_ea.o `test -f 'realloc_ea.c' || echo '$(srcdir)/'`realloc_ea.c
+
+lib_a-realloc_ea.obj: realloc_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-realloc_ea.obj `if test -f 'realloc_ea.c'; then $(CYGPATH_W) 'realloc_ea.c'; else $(CYGPATH_W) '$(srcdir)/realloc_ea.c'; fi`
+
+lib_a-strcat_ea.o: strcat_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_ea.o `test -f 'strcat_ea.c' || echo '$(srcdir)/'`strcat_ea.c
+
+lib_a-strcat_ea.obj: strcat_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcat_ea.obj `if test -f 'strcat_ea.c'; then $(CYGPATH_W) 'strcat_ea.c'; else $(CYGPATH_W) '$(srcdir)/strcat_ea.c'; fi`
+
+lib_a-strchr_ea.o: strchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchr_ea.o `test -f 'strchr_ea.c' || echo '$(srcdir)/'`strchr_ea.c
+
+lib_a-strchr_ea.obj: strchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchr_ea.obj `if test -f 'strchr_ea.c'; then $(CYGPATH_W) 'strchr_ea.c'; else $(CYGPATH_W) '$(srcdir)/strchr_ea.c'; fi`
+
+lib_a-strcmp_ea.o: strcmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcmp_ea.o `test -f 'strcmp_ea.c' || echo '$(srcdir)/'`strcmp_ea.c
+
+lib_a-strcmp_ea.obj: strcmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcmp_ea.obj `if test -f 'strcmp_ea.c'; then $(CYGPATH_W) 'strcmp_ea.c'; else $(CYGPATH_W) '$(srcdir)/strcmp_ea.c'; fi`
+
+lib_a-strcpy_ea.o: strcpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_ea.o `test -f 'strcpy_ea.c' || echo '$(srcdir)/'`strcpy_ea.c
+
+lib_a-strcpy_ea.obj: strcpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy_ea.obj `if test -f 'strcpy_ea.c'; then $(CYGPATH_W) 'strcpy_ea.c'; else $(CYGPATH_W) '$(srcdir)/strcpy_ea.c'; fi`
+
+lib_a-strcspn_ea.o: strcspn_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcspn_ea.o `test -f 'strcspn_ea.c' || echo '$(srcdir)/'`strcspn_ea.c
+
+lib_a-strcspn_ea.obj: strcspn_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcspn_ea.obj `if test -f 'strcspn_ea.c'; then $(CYGPATH_W) 'strcspn_ea.c'; else $(CYGPATH_W) '$(srcdir)/strcspn_ea.c'; fi`
+
+lib_a-strlen_ea.o: strlen_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strlen_ea.o `test -f 'strlen_ea.c' || echo '$(srcdir)/'`strlen_ea.c
+
+lib_a-strlen_ea.obj: strlen_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strlen_ea.obj `if test -f 'strlen_ea.c'; then $(CYGPATH_W) 'strlen_ea.c'; else $(CYGPATH_W) '$(srcdir)/strlen_ea.c'; fi`
+
+lib_a-strncat_ea.o: strncat_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_ea.o `test -f 'strncat_ea.c' || echo '$(srcdir)/'`strncat_ea.c
+
+lib_a-strncat_ea.obj: strncat_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncat_ea.obj `if test -f 'strncat_ea.c'; then $(CYGPATH_W) 'strncat_ea.c'; else $(CYGPATH_W) '$(srcdir)/strncat_ea.c'; fi`
+
+lib_a-strncmp_ea.o: strncmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncmp_ea.o `test -f 'strncmp_ea.c' || echo '$(srcdir)/'`strncmp_ea.c
+
+lib_a-strncmp_ea.obj: strncmp_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncmp_ea.obj `if test -f 'strncmp_ea.c'; then $(CYGPATH_W) 'strncmp_ea.c'; else $(CYGPATH_W) '$(srcdir)/strncmp_ea.c'; fi`
+
+lib_a-strncpy_ea.o: strncpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_ea.o `test -f 'strncpy_ea.c' || echo '$(srcdir)/'`strncpy_ea.c
+
+lib_a-strncpy_ea.obj: strncpy_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncpy_ea.obj `if test -f 'strncpy_ea.c'; then $(CYGPATH_W) 'strncpy_ea.c'; else $(CYGPATH_W) '$(srcdir)/strncpy_ea.c'; fi`
+
+lib_a-strpbrk_ea.o: strpbrk_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strpbrk_ea.o `test -f 'strpbrk_ea.c' || echo '$(srcdir)/'`strpbrk_ea.c
+
+lib_a-strpbrk_ea.obj: strpbrk_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strpbrk_ea.obj `if test -f 'strpbrk_ea.c'; then $(CYGPATH_W) 'strpbrk_ea.c'; else $(CYGPATH_W) '$(srcdir)/strpbrk_ea.c'; fi`
+
+lib_a-strrchr_ea.o: strrchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strrchr_ea.o `test -f 'strrchr_ea.c' || echo '$(srcdir)/'`strrchr_ea.c
+
+lib_a-strrchr_ea.obj: strrchr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strrchr_ea.obj `if test -f 'strrchr_ea.c'; then $(CYGPATH_W) 'strrchr_ea.c'; else $(CYGPATH_W) '$(srcdir)/strrchr_ea.c'; fi`
+
+lib_a-strspn_ea.o: strspn_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strspn_ea.o `test -f 'strspn_ea.c' || echo '$(srcdir)/'`strspn_ea.c
+
+lib_a-strspn_ea.obj: strspn_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strspn_ea.obj `if test -f 'strspn_ea.c'; then $(CYGPATH_W) 'strspn_ea.c'; else $(CYGPATH_W) '$(srcdir)/strspn_ea.c'; fi`
+
+lib_a-strstr_ea.o: strstr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strstr_ea.o `test -f 'strstr_ea.c' || echo '$(srcdir)/'`strstr_ea.c
+
+lib_a-strstr_ea.obj: strstr_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strstr_ea.obj `if test -f 'strstr_ea.c'; then $(CYGPATH_W) 'strstr_ea.c'; else $(CYGPATH_W) '$(srcdir)/strstr_ea.c'; fi`
+
+lib_a-read_ea.o: read_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-read_ea.o `test -f 'read_ea.c' || echo '$(srcdir)/'`read_ea.c
+
+lib_a-read_ea.obj: read_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-read_ea.obj `if test -f 'read_ea.c'; then $(CYGPATH_W) 'read_ea.c'; else $(CYGPATH_W) '$(srcdir)/read_ea.c'; fi`
+
+lib_a-pread_ea.o: pread_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pread_ea.o `test -f 'pread_ea.c' || echo '$(srcdir)/'`pread_ea.c
+
+lib_a-pread_ea.obj: pread_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pread_ea.obj `if test -f 'pread_ea.c'; then $(CYGPATH_W) 'pread_ea.c'; else $(CYGPATH_W) '$(srcdir)/pread_ea.c'; fi`
+
+lib_a-readv_ea.o: readv_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readv_ea.o `test -f 'readv_ea.c' || echo '$(srcdir)/'`readv_ea.c
+
+lib_a-readv_ea.obj: readv_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readv_ea.obj `if test -f 'readv_ea.c'; then $(CYGPATH_W) 'readv_ea.c'; else $(CYGPATH_W) '$(srcdir)/readv_ea.c'; fi`
+
+lib_a-write_ea.o: write_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-write_ea.o `test -f 'write_ea.c' || echo '$(srcdir)/'`write_ea.c
+
+lib_a-write_ea.obj: write_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-write_ea.obj `if test -f 'write_ea.c'; then $(CYGPATH_W) 'write_ea.c'; else $(CYGPATH_W) '$(srcdir)/write_ea.c'; fi`
+
+lib_a-pwrite_ea.o: pwrite_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pwrite_ea.o `test -f 'pwrite_ea.c' || echo '$(srcdir)/'`pwrite_ea.c
+
+lib_a-pwrite_ea.obj: pwrite_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pwrite_ea.obj `if test -f 'pwrite_ea.c'; then $(CYGPATH_W) 'pwrite_ea.c'; else $(CYGPATH_W) '$(srcdir)/pwrite_ea.c'; fi`
+
+lib_a-writev_ea.o: writev_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writev_ea.o `test -f 'writev_ea.c' || echo '$(srcdir)/'`writev_ea.c
+
+lib_a-writev_ea.obj: writev_ea.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writev_ea.obj `if test -f 'writev_ea.c'; then $(CYGPATH_W) 'writev_ea.c'; else $(CYGPATH_W) '$(srcdir)/writev_ea.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

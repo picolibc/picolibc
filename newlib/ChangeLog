@@ -1,3 +1,46 @@
+2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
+            Patrick Mansfield  <patmans@us.ibm.com>
+            Joel Schopp   <jschopp@austin.ibm.com>
+
+	* libc/machine/spu/configure.in: Add __ea detection.
+	* libc/machine/spu/Makefile.am: Add new files.
+	* libc/machine/spu/include/ea.h: New file.
+	* libc/machine/spu/ea_internal.h: Likewise.
+	* libc/machine/spu/sys/mman.h: Likewise.
+	* libc/machine/spu/mmap_ea.c: Likewise.
+	* libc/machine/spu/munmap_ea.c: Likewise.
+	* libc/machine/spu/mremap_ea.c: Likewise.
+	* libc/machine/spu/msync_ea.c: Likewise.
+	* libc/machine/spu/memchr_ea.c: Likewise.
+	* libc/machine/spu/memcmp_ea.c: Likewise.
+	* libc/machine/spu/memcpy_ea.c: Likewise.
+	* libc/machine/spu/memmove_ea.c: Likewise.
+	* libc/machine/spu/memset_ea.c: Likewise.
+	* libc/machine/spu/malloc_ea.c: Likewise.
+	* libc/machine/spu/realloc_ea.c: Likewise.
+	* libc/machine/spu/calloc_ea.c: Likewise.
+	* libc/machine/spu/free_ea.c: Likewise.
+	* libc/machine/spu/posix_memalign_ea.c: Likewise.
+	* libc/machine/spu/strcat_ea.c: Likewise.
+	* libc/machine/spu/strchr_ea.c: Likewise.
+	* libc/machine/spu/strcmp_ea.c: Likewise.
+	* libc/machine/spu/strcpy_ea.c: Likewise.
+	* libc/machine/spu/strcspn_ea.c: Likewise.
+	* libc/machine/spu/strlen_ea.c: Likewise.
+	* libc/machine/spu/strncat_ea.c: Likewise.
+	* libc/machine/spu/strncmp_ea.c: Likewise.
+	* libc/machine/spu/strncpy_ea.c: Likewise.
+	* libc/machine/spu/strpbrk_ea.c: Likewise.
+	* libc/machine/spu/strrchr_ea.c: Likewise.
+	* libc/machine/spu/strspn_ea.c: Likewise.
+	* libc/machine/spu/strstr_ea.c: Likewise.
+	* libc/machine/spu/read_ea.c: Likewise.
+	* libc/machine/spu/pread_ea.c: Likewise.
+	* libc/machine/spu/readv_ea.c: Likewise.
+	* libc/machine/spu/write_ea.c: Likewise.
+	* libc/machine/spu/pwrite_ea.c: Likewise.
+	* libc/machine/spu/writev_ea.c: Likewise.
+
 2008-11-19  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/config.h[__mips__]: Don't bother
