@@ -1,4 +1,9 @@
 2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/sys/linux_syscalls.h: Additional syscall defines to
+	be in sync with current kernels.
+
+2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
             Patrick Mansfield  <patmans@us.ibm.com>
             Joel Schopp   <jschopp@austin.ibm.com>
 

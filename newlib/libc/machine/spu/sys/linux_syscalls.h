@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* The system call numbers. See kernel source file
-   include/asm-powerpc/unistd.h.  */
+   arch/powerpc/include/asm/unistd.h.  */
 #define __NR_read                   3
 #define __NR_write                  4
 #define __NR_open                   5
@@ -275,10 +275,19 @@ extern "C" {
 #define __NR_timerfd                306
 #define __NR_eventfd                307
 #define __NR_sync_file_range2       308
-
+#define __NR_fallocate              309
+#define __NR_subpage_prot           310
+#define __NR_timerfd_settime        311
+#define __NR_timerfd_gettime        312
+#define __NR_signalfd4              313
+#define __NR_eventfd2               314
+#define __NR_epoll_create1          315
+#define __NR_dup3                   316
+#define __NR_pipe2                  317
+#define __NR_inotify_init1          318
 
 /* System callbacks from the SPU. See kernel source file
-   include/asm-powerpc/spu.h.  */
+   arch/powerpc/include/asm/spu.h.  */
 struct spu_syscall_block
 {
   unsigned long long nr_ret;	/* System call nr and return value.  */
