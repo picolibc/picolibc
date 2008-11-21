@@ -1,3 +1,8 @@
+2008-11-21  Sterling Augustine  <sterling@tensilica.com>
+
+	* xtensa-isa-internal.h (XTENSA_STATE_IS_SHARED_OR): New flag.
+	* xtensa-isa.h (xtensa_state_is_shared_or): New prototype.
+
 2008-11-19  Bob Wilson  <bob.wilson@acm.org>
 	
 	* xtensa-config.h (XCHAL_HAVE_MUL16, XCHAL_HAVE_MUL32, XCHAL_HAVE_DIV32)
