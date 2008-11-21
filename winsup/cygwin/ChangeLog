@@ -1,3 +1,7 @@
+2008-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (MapView): Add NT status to debug output.
+
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetSystemDEPPolicy): Define.
