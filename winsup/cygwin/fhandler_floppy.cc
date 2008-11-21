@@ -245,7 +245,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 {
   DWORD bytes_read = 0;
   DWORD read2;
-  DWORD bytes_to_read = 0;
+  DWORD bytes_to_read;
   int ret;
   size_t len = ulen;
   char *tgt;
@@ -341,9 +341,10 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
   else
     {
       _off64_t current_position = get_current_position ();
+      bytes_to_read = len;
       if (current_position + bytes_to_read >= drive_size)
 	bytes_to_read = drive_size - current_position;
-      if (bytes_to_read && !read_file (p, len, &bytes_read, &ret))
+      if (bytes_to_read && !read_file (p, bytes_to_read, &bytes_read, &ret))
 	{
 	  if (!IS_EOM (ret))
 	    {

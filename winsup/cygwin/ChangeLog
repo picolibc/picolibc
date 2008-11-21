@@ -1,5 +1,12 @@
 2008-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Drop
+	initialization of bytes_to_read.  Set bytes_to_read to len in
+	non-buffered case.  Call read_bytes correctly with bytes_to_read
+	instead of len.
+
+2008-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (MapView): Add NT status to debug output.
 
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
