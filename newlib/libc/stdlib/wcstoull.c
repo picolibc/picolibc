@@ -16,7 +16,7 @@ ANSI_SYNOPSIS
                               wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
-	#include <stdlib.h>
+	#include <wchar.h>
         unsigned long long wcstoull(<[s]>, <[ptr]>, <[base]>)
         wchar_t *<[s]>;
         wchar_t **<[ptr]>;
@@ -40,8 +40,9 @@ to convert the subject string into an unsigned long long integer, and returns th
 result.
 
 If the value of <[base]> is zero, the subject string is expected to look
-like a normal C integer constant (save that no optional sign is permitted):
-a possible <<0x>> indicating hexadecimal radix, and a number.
+like a normal C integer constant:  an optional sign (<<+>> or <<->>),
+a possible <<0x>> indicating hexadecimal radix or a possible <0> indicating
+octal radix, and a number.
 If <[base]> is between 2 and 36, the expected form of the subject is a
 sequence of digits (which may include letters, depending on the
 base) representing an integer in the radix specified by <[base]>.
@@ -73,10 +74,13 @@ extra argument <[reent]> is a pointer to a reentrancy structure.
 
 
 RETURNS
+<<wcstoull>> returns <<0>> and sets <<errno>> to <<EINVAL>> if the value of
+<[base]> is not supported.
+
 <<wcstoull>> returns the converted value, if any. If no conversion was
 made, <<0>> is returned.
 
-<<wcstoull>> returns <<ULONG_LONG_MAX>> if the magnitude of the converted
+<<wcstoull>> returns <<ULLONG_MAX>> if the magnitude of the converted
 value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
@@ -119,10 +123,7 @@ PORTABILITY
  */
 
 #include <_ansi.h>
-#include <limits.h>
-#include <wctype.h>
-#include <errno.h>
-#include <stdlib.h>
+#include <wchar.h>
 #include <reent.h>
 
 #ifndef _REENT_ONLY

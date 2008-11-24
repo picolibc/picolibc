@@ -59,6 +59,7 @@ extern _VOID   _EXFUN(__smakebuf_r,(struct _reent *, FILE *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
 extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
+extern int _EXFUN(__submore, (struct _reent *, FILE *));
 
 #ifdef __LARGE64_FILES
 extern _fpos64_t _EXFUN(__sseek64,(struct _reent *, void *, _fpos64_t, int));

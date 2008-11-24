@@ -45,10 +45,16 @@
 #define _GNU_SOURCE
 #include <_ansi.h>
 #include <limits.h>
+#include <wchar.h>
 #include <wctype.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <reent.h>
+
+/* Make up for older non-compliant limits.h.  (This is a C99/POSIX function,
+ * and both require ULLONG_MAX in limits.h.)  */
+#if !defined(ULLONG_MAX)
+# define ULLONG_MAX	ULONG_LONG_MAX
+#endif
 
 /*
  * Convert a wide string to an unsigned long long integer.
@@ -69,6 +75,10 @@ _DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
 	register unsigned long long cutoff;
 	register int neg = 0, any, cutlim;
 
+	if(base < 0  ||  base == 1  ||  base > 36)  {
+		rptr->_errno = EINVAL;
+		return(0ULL);
+	}
 	/*
 	 * See strtol for comments as to the logic used.
 	 */
@@ -88,8 +98,8 @@ _DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
 	}
 	if (base == 0)
 		base = c == L'0' ? 8 : 10;
-	cutoff = (unsigned long long)ULONG_LONG_MAX / (unsigned long long)base;
-	cutlim = (unsigned long long)ULONG_LONG_MAX % (unsigned long long)base;
+	cutoff = (unsigned long long)ULLONG_MAX / (unsigned long long)base;
+	cutlim = (unsigned long long)ULLONG_MAX % (unsigned long long)base;
 	for (acc = 0, any = 0;; c = *s++) {
 		if (iswdigit(c))
 			c -= L'0';
@@ -108,7 +118,7 @@ _DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
 		}
 	}
 	if (any < 0) {
-		acc = ULONG_LONG_MAX;
+		acc = ULLONG_MAX;
 		rptr->_errno = ERANGE;
 	} else if (neg)
 		acc = -acc;

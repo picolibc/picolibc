@@ -112,7 +112,7 @@
 #define		socket				_socket
 #define		socketpair			_socketpair
 #define		wait4				_wait4
-#define		write				_write
+/*#define		write				_write*/
 #define		writev				_writev
 
 

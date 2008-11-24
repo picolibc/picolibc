@@ -382,7 +382,9 @@ size_t	_EXFUN(_fread_r, (struct _reent *, _PTR, size_t _size, size_t _n, FILE *)
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
+int	_EXFUN(_fseeko_r,(struct _reent *, FILE *, _off_t, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
+_off_t	_EXFUN(_ftello_r,(struct _reent *, FILE *));
 size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR , size_t _size, size_t _n, FILE *));
 int	_EXFUN(_getc_r, (struct _reent *, FILE *));
 int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));

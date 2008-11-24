@@ -1,3 +1,23 @@
+2008-11-24  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/stdlib/wcstoull_r.c:  Add EINVAL return for bad base value,
+	include wchar.h for prototype, remove extraneous includes, use
+	C99/POSIX ULLONG_MAX (but allow for poor limits.h).
+	* libc/stdlib/wcstoull.c:  Fix usage comments (mistakes and to add
+	base value check noted above), remove extraneous includes.
+	* libc/stdio/asnprintf.c:  Add #include "local.h" to get function
+	prototype for _svfprintf_r().
+	* libc/stdio/vasnprintf.c:  Ditto.
+	* libc/stdio/local.h:  Add function prototype for __submore().
+	* libc/include/stdio.h:  Add function prototypes for _fseeko_r and
+	_ftello_r.
+	* libc/posix/namespace.h:  Commented out define for write to
+	eliminate write() prototype being missing for collate.c (which is
+	the only file that presently includes namespace.h).
+	* libc/include/reent.h:  Added _rename_r.
+	* libc/reent/renamer.c:  Corrected function prototypes in synopses.
+	* libc/locale/ldpart.c:  Use struct stat64 when calling fstat64.
+
 2008-11-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/search/hash_func.c: Comment out unused static hash functions.

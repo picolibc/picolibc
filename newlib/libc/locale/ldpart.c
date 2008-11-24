@@ -57,7 +57,11 @@ __part_load_locale(const char *name,
 	char			*p;
 	const char 		*plim;
 	char                     filename[PATH_MAX];
+#ifdef __USE_INTERNAL_STAT64
+	struct stat64		 st;
+#else
 	struct stat		 st;
+#endif
 	size_t			 namesize;
 	size_t			 bufsize;
 	int                      save_using_locale;

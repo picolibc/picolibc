@@ -30,15 +30,14 @@ INDEX
 ANSI_SYNOPSIS
 	#include <reent.h>
 	int _rename_r(struct _reent *<[ptr]>,
-		     int <[fd]>, int <[cmd]>, <[arg]>);
+		const char *<[old]>, const char *<[new]>);
 
 TRAD_SYNOPSIS
 	#include <reent.h>
-	int _rename_r(<[ptr]>, <[fd]>, <[cmd]>, <[arg]>)
+	int _rename_r(<[ptr]>, <[old]>, <[new]>)
 	struct _reent *<[ptr]>;
-	int <[fd]>;
-	int <[cmd]>;
-	int <[arg]>;
+	char *<[old]>;
+	char *<[new]>;
 
 DESCRIPTION
 	This is a reentrant version of <<rename>>.  It
