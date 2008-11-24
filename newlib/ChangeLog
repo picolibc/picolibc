@@ -4,10 +4,10 @@
 
 2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
 
-	* libc/posix/Makefile.am: Compile readdir_r.c
+	* libc/posix/Makefile.am: Compile readdir_r.c not readdir.c twice.
 	* libc/posix/Makefile.in: Regenerated.
 
-   not readdir.c twice.2008-11-24  Corinna Vinschen  <corinna@vinschen.de>
+2008-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h (__SMOD): Remove definition of unused flag.
 	* libc/include/sys/reent.h (struct __sFILE): Add _flags2 member.
