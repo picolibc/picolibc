@@ -1,5 +1,9 @@
 2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* libc/posix/scandir.c: Fix memory leaks. 
+
+2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* libc/posix/Makefile.am: Compile readdir_r.c
 	* libc/posix/Makefile.in: Regenerated.
 

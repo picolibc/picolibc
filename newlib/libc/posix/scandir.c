@@ -78,18 +78,25 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 	struct stat stb;
 	long arraysz;
 	DIR *dirp;
+	int successful = 0;
+	int rc = 0;
+
+	dirp = NULL;
+	names = NULL;
 
 	if ((dirp = opendir(dirname)) == NULL)
 		return(-1);
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	if (fstat(dirp->dd_fd, &stb) < 0) {
-#ifdef HAVE_DD_LOCK
-		__lock_release_recursive(dirp->dd_lock);
-#endif
-		return(-1);
-	}
+	if (fstat(dirp->dd_fd, &stb) < 0)
+		goto cleanup;
+
+	/*
+ 	 * If there were no directory entries, then bail.
+ 	 */
+	if (stb.st_size == 0)
+		goto cleanup;
 
 	/*
 	 * estimate the array size by taking the size of the directory file
@@ -97,12 +104,8 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 	 */
 	arraysz = (stb.st_size / 24);
 	names = (struct dirent **)malloc(arraysz * sizeof(struct dirent *));
-	if (names == NULL) {
-#ifdef HAVE_DD_LOCK
-		__lock_release_recursive(dirp->dd_lock);
-#endif
-		return(-1);
-	}
+	if (names == NULL)
+		goto cleanup;
 
 	nitems = 0;
 	while ((d = readdir(dirp)) != NULL) {
@@ -112,12 +115,8 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * Make a minimum size copy of the data
 		 */
 		p = (struct dirent *)malloc(DIRSIZ(d));
-		if (p == NULL) {
-#ifdef HAVE_DD_LOCK
-			__lock_release_recursive(dirp->dd_lock);
-#endif
-			return(-1);
-		}
+		if (p == NULL)
+			goto cleanup;
 		p->d_ino = d->d_ino;
 		p->d_reclen = d->d_reclen;
 #ifdef _DIRENT_HAVE_D_NAMLEN
@@ -131,32 +130,38 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * realloc the maximum size.
 		 */
 		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0) {
-#ifdef HAVE_DD_LOCK
-				__lock_release_recursive(dirp->dd_lock);
-#endif
-				return(-1);	/* just might have grown */
-			}
+			if (fstat(dirp->dd_fd, &stb) < 0)
+				goto cleanup;
 			arraysz = stb.st_size / 12;
-			names = (struct dirent **)realloc((char *)names,
+			names = (struct dirent **)reallocf((char *)names,
 				arraysz * sizeof(struct dirent *));
-			if (names == NULL) {
-#ifdef HAVE_DD_LOCK
-				__lock_release_recursive(dirp->dd_lock);
-#endif
-				return(-1);
-			}
+			if (names == NULL)
+				goto cleanup;
 		}
 		names[nitems-1] = p;
 	}
+	successful = 1;
+cleanup:
 	closedir(dirp);
-	if (nitems && dcomp != NULL)
-		qsort(names, nitems, sizeof(struct dirent *), (void *)dcomp);
-	*namelist = names;
+	if (successful) {
+		if (nitems && dcomp != NULL)
+			qsort(names, nitems, sizeof(struct dirent *), (void *)dcomp);
+		*namelist = names;
+		rc = nitems;
+	} else {  /* We were unsuccessful, clean up storage and return -1.  */
+		if ( names ) {
+			int i;
+			for (i=0; i < nitems; i++ )
+				free( names[i] );
+			free( names );
+		}
+		rc = -1;
+	}
+
 #ifdef HAVE_DD_LOCK
 	__lock_release_recursive(dirp->dd_lock);
 #endif
-	return(nitems);
+	return(rc);
 }
 
 /*
