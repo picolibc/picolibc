@@ -46,6 +46,7 @@ _DEFUN(std, (ptr, flags, file, data),
   ptr->_r = 0;
   ptr->_w = 0;
   ptr->_flags = flags;
+  ptr->_flags2 = 0;
   ptr->_file = file;
   ptr->_bf._base = 0;
   ptr->_bf._size = 0;
@@ -126,6 +127,7 @@ _DEFUN(__sfp, (d),
 found:
   fp->_file = -1;		/* no file */
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
+  fp->_flags2 = 0;
 #ifndef __SINGLE_THREAD__
   __lock_init_recursive (fp->_lock);
 #endif

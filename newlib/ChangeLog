@@ -1,3 +1,14 @@
+2008-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (__SMOD): Remove definition of unused flag.
+	* libc/include/sys/reent.h (struct __sFILE): Add _flags2 member.
+	* libc/stdio/findfp.c (std): Initialize _flags2.
+	(__sfp): Ditto.
+	* libc/stdio/refill.c (__srefill_r): Drop resetting __SMOD flag.
+	* libc/stdio/vfscanf.c (__ssrefill_r): Ditto.
+	* libc/stdio/fseek.c (_fseek_r): Drop checking __SMOD flag.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Ditto.
+
 2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/sys/linux_syscalls.h: Additional syscall defines to

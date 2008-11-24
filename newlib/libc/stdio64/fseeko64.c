@@ -282,12 +282,10 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   /*
    * If the target offset is within the current buffer,
    * simply adjust the pointers, clear EOF, undo ungetc(),
-   * and return.  (If the buffer was modified, we have to
-   * skip this; see fgetline.c.)
+   * and return.
    */
 
-  if ((fp->_flags & __SMOD) == 0 &&
-      target >= curoff && target < curoff + n)
+  if (target >= curoff && target < curoff + n)
     {
       register int o = target - curoff;
 

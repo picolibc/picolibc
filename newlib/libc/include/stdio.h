@@ -78,7 +78,6 @@ typedef _fpos64_t fpos64_t;
 #define	__SOPT	0x0400		/* do fseek() optimisation */
 #define	__SNPT	0x0800		/* do not do fseek() optimisation */
 #define	__SOFF	0x1000		/* set iff _offset is in fact correct */
-#define	__SMOD	0x2000		/* true => fgetline modified _p text */
 #if defined(__CYGWIN__)
 #  define __SCLE  0x4000        /* convert line endings CR/LF <-> NL */
 #endif

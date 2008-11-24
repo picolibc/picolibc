@@ -212,6 +212,7 @@ struct __sFILE {
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */
 #endif
+  int   _flags2;        /* for future use */
 };
 
 #ifdef __CUSTOM_FILE_IO__

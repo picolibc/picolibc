@@ -105,7 +105,6 @@ _DEFUN(__srefill_r, (ptr, fp),
     _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
   fp->_p = fp->_bf._base;
   fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
-  fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
 #ifndef __CYGWIN__
   if (fp->_r <= 0)
 #else

@@ -379,7 +379,6 @@ _DEFUN(__ssrefill_r, (ptr, fp),
   /* Otherwise we are out of character input.  */
   fp->_p = fp->_bf._base;
   fp->_r = 0;
-  fp->_flags &= ~__SMOD;	/* buffer contents are again pristine */
   fp->_flags |= __SEOF;
   return EOF;
 }
