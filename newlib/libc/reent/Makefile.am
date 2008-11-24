@@ -8,11 +8,13 @@ if HAVE_STDIO64_DIR
 STDIO64_SOURCES = \
 	fstat64r.c \
 	lseek64r.c \
+	stat64r.c \
 	open64r.c
 
 STDIO64_DEFS = \
 	fstat64r.def \
 	lseek64r.def \
+	stat64r.def \
 	open64r.def
 endif
 

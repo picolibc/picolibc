@@ -1,3 +1,10 @@
+2008-11-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/search/hash_func.c: Comment out unused static hash functions.
+	* libc/reent/stat64r.c: New file.
+	* libc/reent/Makefile.am: Add stat64r.c support.
+	* libc/reent/Makefile.in: Regenerated.
+
 2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/posix/scandir.c: Fix memory leaks. 

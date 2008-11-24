@@ -69,6 +69,7 @@ am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-unlinkr.$(OBJEXT) lib_a-writer.$(OBJEXT)
 @HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
+@HAVE_STDIO64_DIR_TRUE@	lib_a-stat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-open64r.$(OBJEXT)
 am__objects_3 = $(am__objects_2)
 am__objects_4 = lib_a-execr.$(OBJEXT)
@@ -87,7 +88,7 @@ am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
 	openr.lo readr.lo renamer.lo signalr.lo signgam.lo sbrkr.lo \
 	statr.lo timesr.lo unlinkr.lo writer.lo
 @HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
-@HAVE_STDIO64_DIR_TRUE@	open64r.lo
+@HAVE_STDIO64_DIR_TRUE@	stat64r.lo open64r.lo
 am__objects_8 = $(am__objects_7)
 am__objects_9 = execr.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@am__objects_10 =  \
@@ -287,11 +288,13 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 @HAVE_STDIO64_DIR_TRUE@STDIO64_SOURCES = \
 @HAVE_STDIO64_DIR_TRUE@	fstat64r.c \
 @HAVE_STDIO64_DIR_TRUE@	lseek64r.c \
+@HAVE_STDIO64_DIR_TRUE@	stat64r.c \
 @HAVE_STDIO64_DIR_TRUE@	open64r.c
 
 @HAVE_STDIO64_DIR_TRUE@STDIO64_DEFS = \
 @HAVE_STDIO64_DIR_TRUE@	fstat64r.def \
 @HAVE_STDIO64_DIR_TRUE@	lseek64r.def \
+@HAVE_STDIO64_DIR_TRUE@	stat64r.def \
 @HAVE_STDIO64_DIR_TRUE@	open64r.def
 
 ELIX_2_SOURCES = $(STDIO64_SOURCES)
@@ -551,6 +554,12 @@ lib_a-lseek64r.o: lseek64r.c
 
 lib_a-lseek64r.obj: lseek64r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseek64r.obj `if test -f 'lseek64r.c'; then $(CYGPATH_W) 'lseek64r.c'; else $(CYGPATH_W) '$(srcdir)/lseek64r.c'; fi`
+
+lib_a-stat64r.o: stat64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.o `test -f 'stat64r.c' || echo '$(srcdir)/'`stat64r.c
+
+lib_a-stat64r.obj: stat64r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat64r.obj `if test -f 'stat64r.c'; then $(CYGPATH_W) 'stat64r.c'; else $(CYGPATH_W) '$(srcdir)/stat64r.c'; fi`
 
 lib_a-open64r.o: open64r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open64r.o `test -f 'open64r.c' || echo '$(srcdir)/'`open64r.c

@@ -45,9 +45,11 @@ static char sccsid[] = "@(#)hash_func.c	8.2 (Berkeley) 2/21/94";
 #include "page.h"
 #include "extern.h"
 
+#if 0
 static __uint32_t hash1(const void *, size_t);
 static __uint32_t hash2(const void *, size_t);
 static __uint32_t hash3(const void *, size_t);
+#endif
 static __uint32_t hash4(const void *, size_t);
 
 /* Global default hash function */
@@ -65,6 +67,7 @@ __uint32_t (*__default_hash)(const void *, size_t) = hash4;
 #define PRIME1		37
 #define PRIME2		1048583
 
+#if 0
 static __uint32_t
 hash1(keyarg, len)
 	const void *keyarg;
@@ -79,12 +82,14 @@ hash1(keyarg, len)
 	h %= PRIME2;
 	return (h);
 }
+#endif
 
 /*
  * Phong's linear congruential hash
  */
 #define dcharhash(h, c)	((h) = 0x63c63cd9*(h) + 0x9c39c33d + (c))
 
+#if 0
 static __uint32_t
 hash2(keyarg, len)
 	const void *keyarg;
@@ -104,6 +109,7 @@ hash2(keyarg, len)
 	}
 	return (h);
 }
+#endif
 
 /*
  * This is INCREDIBLY ugly, but fast.  We break the string up into 8 byte
@@ -114,6 +120,7 @@ hash2(keyarg, len)
  *
  * OZ's original sdbm hash
  */
+#if 0
 static __uint32_t
 hash3(keyarg, len)
 	const void *keyarg;
@@ -160,6 +167,7 @@ hash3(keyarg, len)
 	}
 	return (h);
 }
+#endif
 
 /* Hash function from Chris Torek. */
 static __uint32_t
