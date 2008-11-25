@@ -51,17 +51,24 @@ systems; these are described in more detail in
 <xref linkend="using-effectively"></xref>.
 </para>
 <para>
-Any time you want to update or install a Cygwin package, use the
-graphical <command>setup.exe</command> program. Note that, differently from
-what happens under most Unix and Linux systems, presence of updated
-packages isn't checked automatically in the default installation, but you
-have to run manually<command>setup.exe</command> to check for updates.
-By default, <command>setup.exe</command> only installs a minimal set of
-packages, so look around and choose your favorite utilities on the package
-selection screen. You may also search for specfic tools on the Cygwin
-website's <ulink url="http://cygwin.com/packages/">Setup Package
-Search</ulink> For more information about what each option in
-<command>setup.exe</command> means, see <xref linkend="internet-setup"></xref>. 
+Use the graphical command <command>setup.exe</command> any time you want
+to update or install a Cygwin package.  This program must be run
+manually every time you want to check for updated packages since Cygwin
+does not currently include a mechanism for automatically detecting
+package updates.
+</para>
+<para>
+By default, <command>setup.exe</command> only installs a minimal subset of
+packages.  Add any other packages by clicking on the <literal>+</literal>
+next to the Category name and then select the package from the displayed
+list.  You may search for specfic tools by using the
+<ulink url="http://cygwin.com/packages/">Setup Package Search</ulink>
+at the Cygwin web site.
+</para>
+<para>
+For more information about what each option in
+<command>setup.exe</command> means, see <xref
+linkend="internet-setup"></xref>.
 </para>
 <para>
 Another option is to install everything by clicking on the
