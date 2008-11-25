@@ -52,9 +52,12 @@ systems; these are described in more detail in
 </para>
 <para>
 Any time you want to update or install a Cygwin package, use the
-graphical <command>setup.exe</command> program. By default,
-<command>setup.exe</command> only installs a minimal set of packages, 
-so look around and choose your favorite utilities on the package
+graphical <command>setup.exe</command> program. Note that, differently from
+what happens under most Unix and Linux systems, presence of updated
+packages isn't checked automatically in the default installation, but you
+have to run manually<command>setup.exe</command> to check for updates.
+By default, <command>setup.exe</command> only installs a minimal set of
+packages, so look around and choose your favorite utilities on the package
 selection screen. You may also search for specfic tools on the Cygwin
 website's <ulink url="http://cygwin.com/packages/">Setup Package
 Search</ulink> For more information about what each option in

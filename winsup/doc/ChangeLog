@@ -1,3 +1,8 @@
+2008-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	Suggested by Valerio Bigiani <vbigiani@yahoo.it>:
+	* overview2.sgml: Add text that no automatic updates are provided.
+
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add description for upcaseenv option.
