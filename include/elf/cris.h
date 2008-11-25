@@ -147,10 +147,9 @@ START_RELOC_NUMBERS (elf_cris_reloc_type)
 
   /* An assembler- and linker-generated relocation, instructing to
      resolve the symbol in question yielding the TLS offset of the
-     thread variable; relative to the module's TLS data if in a DSO,
-     but relative to the executable's thread data if in an
-     executable. Not allowed as input when generating a DSO.  Assembly
-     syntax: "expr:TPOFF".  */
+     thread variable, relative to the global TLS block.  Not allowed
+     as input when generating a DSO.  Assembly syntax:
+     "expr:TPOFF".  */
   RELOC_NUMBER (R_CRIS_32_TPREL, 28)
 
   /* Similar to R_CRIS_32_TPREL, but only applicable to executables
@@ -164,7 +163,7 @@ START_RELOC_NUMBERS (elf_cris_reloc_type)
 
   /* A linker-generated-only relocation, instructing the dynamic
      linker to fill in the current module ID, used for GOT entries
-     (always the fourth one).  */
+     (usually the fourth one).  */
   RELOC_NUMBER (R_CRIS_DTPMOD, 30)
 
   /* No other relocs must be visible outside the assembler.  */

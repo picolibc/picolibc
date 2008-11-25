@@ -1,3 +1,8 @@
+2008-11-25  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris.h (R_CRIS_32_TPREL): Correct comment.
+	(R_CRIS_DTPMOD): Open up for use elsewhere than the fourth GOT entry.
+
 2008-11-18  Catherine Moore  <clm@codesourcery.com>
 
 	* arm.h (Tag_ABI_FP_16bit_format): Define.
