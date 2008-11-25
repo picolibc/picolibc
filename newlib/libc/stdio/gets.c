@@ -79,15 +79,20 @@ _DEFUN(_gets_r, (ptr, buf),
   register int c;
   register char *s = buf;
 
-  while ((c = _getchar_r (ptr)) != '\n')
+  _flockfile (stdin);
+  while ((c = __sgetc_r (ptr, stdin)) != '\n')
     if (c == EOF)
       if (s == buf)
-	return NULL;
+	{
+	  _funlockfile (stdin);
+	  return NULL;
+	}
       else
 	break;
     else
       *s++ = c;
   *s = 0;
+  _funlockfile (stdin);
   return buf;
 }
 

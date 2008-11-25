@@ -1,3 +1,8 @@
+2008-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/gets.c (_gets_r): Lock stdin here and call
+	__sgetc_r instead of _getchar_r.
+
 2008-11-24  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/stdlib/wcstoull_r.c:  Add EINVAL return for bad base value,
