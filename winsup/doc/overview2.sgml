@@ -45,7 +45,17 @@ resource compiler <command>windres</command> is also provided.
 <title>Quick Start Guide for those more experienced with UNIX</title>
 <para>
 If you are an experienced UNIX user who misses a powerful command-line
-environment, you will enjoy Cygwin. Note that there are some workarounds
+environment, you will enjoy Cygwin.
+Developers coming from a UNIX background will find a set of utilities
+they are already comfortable using, including a working UNIX shell.  The
+compiler tools are the standard GNU compilers most people will have previously
+used under UNIX, only ported to the Windows host.  Programmers wishing to port
+UNIX software to Windows NT will find that the Cygwin library provides
+an easy way to port many UNIX packages, with only minimal source code
+changes.
+</para>
+<para>
+Note that there are some workarounds
 that cause Cygwin to behave differently than most UNIX-like operating
 systems; these are described in more detail in 
 <xref linkend="using-effectively"></xref>.
@@ -60,15 +70,10 @@ package updates.
 <para>
 By default, <command>setup.exe</command> only installs a minimal subset of
 packages.  Add any other packages by clicking on the <literal>+</literal>
-next to the Category name and then select the package from the displayed
+next to the Category name and selecting the package from the displayed
 list.  You may search for specfic tools by using the
 <ulink url="http://cygwin.com/packages/">Setup Package Search</ulink>
 at the Cygwin web site.
-</para>
-<para>
-For more information about what each option in
-<command>setup.exe</command> means, see <xref
-linkend="internet-setup"></xref>.
 </para>
 <para>
 Another option is to install everything by clicking on the
@@ -81,13 +86,9 @@ After installation, you can find Cygwin-specific documentation in
 the <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 <para>
-Developers coming from a UNIX background will find a set of utilities
-they are already comfortable using, including a working UNIX shell.  The
-compiler tools are the standard GNU compilers most people will have previously
-used under UNIX, only ported to the Windows host.  Programmers wishing to port
-UNIX software to Windows NT will find that the Cygwin library provides
-an easy way to port many UNIX packages, with only minimal source code
-changes.
+For more information about what each option in
+<command>setup.exe</command> means, see <xref
+linkend="internet-setup"></xref>.
 </para>
 
 </sect1>
