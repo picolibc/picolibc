@@ -68,7 +68,6 @@ static __inline vector double _erfd2(vector double x)
 {
   vec_uchar16 dup_even  = ((vec_uchar16) { 0,1,2,3, 0,1,2,3,  8, 9,10,11,  8, 9,10,11 });
   vec_double2 onehalfd  = spu_splats(0.5);
-  vec_double2 zerod     = spu_splats(0.0);
   vec_double2 oned      = spu_splats(1.0);
   vec_double2 sign_mask = spu_splats(-0.0);
 
@@ -76,15 +75,9 @@ static __inline vector double _erfd2(vector double x)
   vec_float4 approx_point = spu_splats(1.77f);
 
   vec_double2 xabs, xsqu, xsign;
-  vec_uint4 xabshigh;
-  vec_uint4 isinf, isnan;
   vec_double2 tresult, presult, result;
 
   xsign = spu_and(x, sign_mask);
-
-  /* Force Denorms to 0 */
-  x = spu_add(x, zerod);
-
   xabs = spu_andc(x, sign_mask);
   xsqu = spu_mul(x, x);
 
@@ -112,15 +105,11 @@ static __inline vector double _erfd2(vector double x)
   /*
    * Special cases/errors.
    */
-  xabshigh = (vec_uint4)spu_shuffle(xabs, xabs, dup_even);
 
   /* x = +/- infinite, return +/-1 */
-  isinf = spu_cmpeq(xabshigh, 0x7FF00000);
-  result = spu_sel(result, oned, (vec_ullong2)isinf);
-
   /* x = nan, return x */
-  isnan = spu_cmpgt(xabshigh, 0x7FF00000);
-  result = spu_sel(result, x, (vec_ullong2)isnan);
+  result = spu_sel(result, oned, spu_testsv(x, SPU_SV_NEG_INFINITY | SPU_SV_POS_INFINITY));
+  result = spu_sel(result,    x, spu_testsv(x, SPU_SV_NEG_DENORM   | SPU_SV_POS_DENORM));
 
   /*
    * Preserve sign in result, since erf(-x) = -erf(x)

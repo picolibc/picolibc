@@ -1,3 +1,15 @@
+2008-11-26 Ken Werner <ken.werner@de.ibm.com>
+
+	* libm/machine/spu/headers/acosd2.h: Rebase against current simdmath.
+	* libm/machine/spu/headers/asind2.h: Likewise.
+	* libm/machine/spu/headers/asinhf4.h: Likewise.
+	* libm/machine/spu/headers/divd2.h: Likewise.
+	* libm/machine/spu/headers/erf_utils.h: Likewise.
+	* libm/machine/spu/headers/erfcd2.h: Likewise.
+	* libm/machine/spu/headers/erfcf4.h: Likewise.
+	* libm/machine/spu/headers/erfd2.h: Likewise.
+	* libm/machine/spu/headers/recipd2.h: Likewise.
+
 2008-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/gets.c (_gets_r): Lock stdin here and call

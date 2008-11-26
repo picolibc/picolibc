@@ -166,57 +166,6 @@
   _tresult = spu_mul(_tresult, spu_splats(TWO_OVER_SQRT_PI));                          \
 }
 
-#define TAYLOR_ERFF4(_xabs, _xsqu, _tresult)  {                                          \
-  _tresult = spu_madd(_xsqu, spu_splats((float)TAYLOR_ERF_45), spu_splats((float)TAYLOR_ERF_44));    \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_43));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_42));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_41));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_40));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_39));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_38));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_37));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_36));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_35));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_34));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_33));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_32));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_31));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_30));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_29));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_28));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_27));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_26));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_25));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_24));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_23));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_22));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_21));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_20));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_19));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_18));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_17));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_16));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_15));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_14));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_13));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_12));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_11));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_10));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_09));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_08));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_07));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_06));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_05));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_04));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_03));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_02));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_01));                     \
-  _tresult = spu_madd(_tresult, _xsqu, spu_splats((float)TAYLOR_ERF_00));                     \
-  _tresult = spu_mul(_tresult, _xabs);                                                 \
-  _tresult = spu_mul(_tresult, spu_splats((float)TWO_OVER_SQRT_PI));                          \
-}
-
-
 
   /*
    * Continued Fractions Approximation of Erfc()
@@ -266,43 +215,7 @@
   vec_float4 inv_xsqu;                  \
   inv_xsqu = _recipf4(_xsqu);            \
   v = spu_mul(inv_xsqu, onehalff);       \
-  p = spu_splats(3.025f); q = onef; plast = p; qlast = q;                                        \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(40.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(39.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(38.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(37.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(36.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(35.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(34.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(33.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(32.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(31.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(30.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(29.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(28.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(27.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(26.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(25.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(24.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(23.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(22.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(21.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(20.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(19.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(18.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(17.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(16.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(15.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(14.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(13.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(12.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(11.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats(10.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats( 9.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats( 8.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats( 7.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats( 6.0f)), plast); q = plast; plast = p; qlast = q;    \
-  p = spu_madd(qlast, spu_mul(v, spu_splats( 5.0f)), plast); q = plast; plast = p; qlast = q;    \
+  p = spu_splats(1.945f); q = onef; plast = p; qlast = q;                                        \
   p = spu_madd(qlast, spu_mul(v, spu_splats( 4.0f)), plast); q = plast; plast = p; qlast = q;    \
   p = spu_madd(qlast, spu_mul(v, spu_splats( 3.0f)), plast); q = plast; plast = p; qlast = q;    \
   p = spu_madd(qlast, spu_mul(v, spu_splats( 2.0f)), plast); q = plast; plast = p; qlast = q;    \

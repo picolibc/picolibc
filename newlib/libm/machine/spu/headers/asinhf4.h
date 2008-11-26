@@ -96,8 +96,8 @@
 #define ASINH_MAC25     6.4472103118896484375000000000000000000000000000000000000000000000000000E-3
 #define ASINH_MAC27     -5.7400376708419234664351851851851851851851851851851851851851851851851852E-3
 #define ASINH_MAC29     5.1533096823199041958512931034482758620689655172413793103448275862068966E-3
-#if 0
 #define ASINH_MAC31     -4.6601434869150961599042338709677419354838709677419354838709677419354839E-3
+#if 0
 #define ASINH_MAC33     4.2409070936793630773370916193181818181818181818181818181818181818181818E-3
 #define ASINH_MAC35     -3.8809645588376692363194056919642857142857142857142857142857142857142857E-3
 #define ASINH_MAC37     3.5692053938259345454138678473395270270270270270270270270270270270270270E-3
@@ -107,34 +107,43 @@
 #endif
 
 
-
 static __inline vector float _asinhf4(vector float x)
 {
     vec_float4 sign_mask = spu_splats(-0.0f);
     vec_float4 onef      = spu_splats(1.0f);
-    vec_float4 result, fresult, mresult;;
+    vec_uint4  oneu      = spu_splats(1u);
+    vec_uint4  twou      = spu_splats(2u);
+    vec_uint4  threeu    = spu_splats(3u);
+    vec_float4 ln2       = spu_splats(6.931471805599453094172321E-1f);
+    vec_float4 largef    = spu_splats(9.21e18f);
+    vec_float4 result, fresult, mresult;
     vec_float4 xabs, xsqu;
     /* Where we switch from maclaurin to formula */
-    vec_float4  switch_approx = spu_splats(0.685f);
+    vec_float4  switch_approx = spu_splats(0.74f);
+    vec_float4  trunc_part2   = spu_splats(20.0f);
+    vec_uint4   truncadd;
+    vec_uint4   islarge;
     vec_uint4   use_form;
 
-   
     xabs = spu_andc(x, sign_mask);
     xsqu = spu_mul(x, x);
+    islarge = spu_cmpgt(xabs, largef);
 
     /*
      * Formula:
      *   asinh = ln(|x| + sqrt(x^2 + 1))
      */
-    fresult = _sqrtf4(spu_madd(x, x, onef));
-    fresult = spu_add(xabs, fresult);
-    fresult = _logf4(fresult);
 
+    vec_float4 logarg = spu_add(xabs, _sqrtf4(spu_madd(xabs, xabs, onef)));
+    logarg = spu_sel(logarg, xabs, islarge);
+    fresult = _logf4(logarg);
+    fresult = spu_sel(fresult, spu_add(fresult, ln2), islarge);
 
     /*
      * Maclaurin Series
      */
-    mresult = spu_madd(xsqu, spu_splats((float)ASINH_MAC29), spu_splats((float)ASINH_MAC27));
+    mresult = spu_madd(xsqu, spu_splats((float)ASINH_MAC31), spu_splats((float)ASINH_MAC29));
+    mresult = spu_madd(xsqu, mresult, spu_splats((float)ASINH_MAC27));
     mresult = spu_madd(xsqu, mresult, spu_splats((float)ASINH_MAC25));
     mresult = spu_madd(xsqu, mresult, spu_splats((float)ASINH_MAC23));
     mresult = spu_madd(xsqu, mresult, spu_splats((float)ASINH_MAC21));
@@ -150,13 +159,18 @@ static __inline vector float _asinhf4(vector float x)
     mresult = spu_madd(xsqu, mresult, spu_splats((float)ASINH_MAC01));
     mresult = spu_mul(xabs, mresult);
 
-
     /*
      * Choose between series and formula
      */
-    use_form = spu_cmpgt(xabs, switch_approx);
+    use_form  = spu_cmpgt(xabs, switch_approx);
     result = spu_sel(mresult, fresult, use_form);
 
+    /*
+     * Truncation correction on spu
+     */
+    truncadd = spu_sel(oneu, threeu, use_form);
+    truncadd = spu_sel(truncadd, twou, spu_cmpgt(xabs, trunc_part2));
+    result = (vec_float4)spu_add((vec_uint4)result, truncadd);
 
     /* Preserve sign - asinh is anti-symmetric */
     result = spu_sel(result, x, (vec_uint4)sign_mask);

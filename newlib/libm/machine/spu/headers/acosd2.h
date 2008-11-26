@@ -40,9 +40,8 @@
 #ifndef _ACOSD2_H_
 #define _ACOSD2_H_	1
 
-#include <spu_intrinsics.h>
-
 #include "simdmath.h"
+#include <spu_intrinsics.h>
 #include "sqrtd2.h"
 #include "divd2.h"
 
