@@ -1,6 +1,6 @@
 2008-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
-	Remove unneeded whitespace.
+	Remove unneeded whitespace throughout.
 
 	* fhandler_fifo.cc (fhandler_fifo::open): Rework to cause errno to be
 	set to ENXIO when opening a fifo write/nonblocking.
