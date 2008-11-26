@@ -42,8 +42,8 @@ details. */
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len, false))
 
-/* is_unc_share: Return non-zero if PATH begins with //server/share 
-                 or with one of the native prefixes //./ or //?/ 
+/* is_unc_share: Return non-zero if PATH begins with //server/share
+		 or with one of the native prefixes //./ or //?/
    This function is only used to test for valid input strings.
    The later normalization drops the native prefixes. */
 
@@ -105,7 +105,7 @@ mount_info::init ()
   nmounts = 0;
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
-  
+
   pathend = wcpcpy (path, cygwin_shared->installation_root);
   create_root_entry (path);
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
@@ -616,7 +616,7 @@ conv_fstab_spaces (char *field)
 }
 
 struct opt
-{   
+{
   const char *name;
   unsigned val;
   bool clear;
@@ -643,21 +643,21 @@ read_flags (char *options, unsigned &flags)
     {
       char *p = strchr (options, ',');
       if (p)
-        *p++ = '\0';
+	*p++ = '\0';
       else
-        p = strchr (options, '\0');
+	p = strchr (options, '\0');
 
       for (opt *o = oopts;
 	   o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
 	   o++)
-        if (strcmp (options, o->name) == 0)
-          {
-            if (o->clear)
-              flags &= ~o->val;
-            else
-              flags |= o->val;
-            goto gotit;
-          }
+	if (strcmp (options, o->name) == 0)
+	  {
+	    if (o->clear)
+	      flags &= ~o->val;
+	    else
+	      flags |= o->val;
+	    goto gotit;
+	  }
       system_printf ("invalid fstab option - '%s'", options);
       return false;
 
@@ -736,7 +736,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 		    NT_MAX_PATH - (fstab_end - fstab),
 		    cygheap->user.name ());
       /* Make sure special chars in the username are converted according to
-         the rules. */
+	 the rules. */
       transform_chars (username, username + wcslen (username) - 1);
     }
   RtlInitUnicodeString (&upath, fstab);
@@ -770,7 +770,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 retry:
       bool got_nl = false;
       while (got < buf + len && (end = strchr (got, '\n')))
-        {
+	{
 	  got_nl = true;
 	  end[end[-1] == '\r' ? -1 : 0] = '\0';
 	  if (!from_fstab_line (got, user))
@@ -779,21 +779,21 @@ retry:
 	  ++line;
 	}
       if (len < (sizeof (buf) - 2))
-        break;
+	break;
       /* Check if the buffer contained at least one \n.  If not, the
-         line length is > 32K.  We don't take such long lines.  Print
+	 line length is > 32K.  We don't take such long lines.  Print
 	 a debug message and skip this line entirely. */
       if (!got_nl)
-        {
+	{
 	  system_printf ("%W: Line %d too long, skipping...", fstab, line);
 	  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, buf,
-	  				 (sizeof (buf) - 2), NULL, NULL)))
+					 (sizeof (buf) - 2), NULL, NULL)))
 	    {
 	      len = io.Information;
 	      buf[len] = buf[len + 1] = '\0';
 	      got = strchr (buf, '\n');
 	      if (got)
-	        {
+		{
 		  ++got;
 		  ++line;
 		  goto retry;
@@ -803,7 +803,7 @@ retry:
 	  break;
 	}
       /* We have to read once more.  Move remaining bytes to the start of
-         the buffer and reposition got so that it points to the end of
+	 the buffer and reposition got so that it points to the end of
 	 the remaining bytes. */
       len = buf + len - got;
       memmove (buf, got, len);
@@ -869,7 +869,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char *user_flags,
       strcpy (path, cygdrive);
       /* Strip trailing slash for backward compatibility. */
       if (cygdrive_len > 2)
-        path[cygdrive_len - 1] = '\0';
+	path[cygdrive_len - 1] = '\0';
     }
   if (flags)
     strcpy (flags, (cygdrive_flags & MOUNT_BINARY) ? "binmode" : "textmode");
@@ -1017,7 +1017,7 @@ mount_info::add_item (const char *native, const char *posix,
   for (i = 0; i < nmounts; i++)
     {
       if (!strcmp (mount[i].posix_path, posixtmp))
-        {
+	{
 	  /* Don't allow to override a system mount with a user mount. */
 	  if ((mount[i].flags & MOUNT_SYSTEM) && !(mountflags & MOUNT_SYSTEM))
 	    {

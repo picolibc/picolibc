@@ -13,8 +13,8 @@
    The essential code of the lf_XXX functions has been taken from the
    module src/sys/kern/kern_lockf.c.  It has been adapted to use NT
    global namespace subdirs and event objects for synchronization
-   purposes. 
-   
+   purposes.
+
    So, the following copyright applies to most of the code in the lf_XXX
    functions.
 
@@ -49,7 +49,7 @@
  * SUCH DAMAGE.
  *
  *      @(#)ufs_lockf.c 8.3 (Berkeley) 1/6/94
-*/   
+*/
 
 /*
  * The flock() function is based upon source taken from the Red Hat
@@ -354,7 +354,7 @@ fhandler_base::del_my_locks (bool after_fork)
   if (node)
     {
       bool no_locks_left =
-      	node->del_my_locks (after_fork ? 0 : get_unique_id (), get_handle ());
+	node->del_my_locks (after_fork ? 0 : get_unique_id (), get_handle ());
       if (no_locks_left)
 	{
 	  LIST_REMOVE (node, i_next);
@@ -501,28 +501,28 @@ inode_t::get_all_locks_list ()
 	continue;
       short type = wcstol (endptr + 1, &endptr, 16);
       if ((type != F_RDLCK && type != F_WRLCK) || !endptr || *endptr != L'-')
-        continue;
+	continue;
       _off64_t start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
       if (start < 0 || !endptr || *endptr != L'-')
-        continue;
+	continue;
       _off64_t end = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
       if (end < -1LL || (end > 0 && end < start) || !endptr || *endptr != L'-')
-      	continue;
+	continue;
       long long id = wcstoll (endptr + 1, &endptr, 16);
       if (!endptr || *endptr != L'-'
 	  || ((flags & F_POSIX) && (id < 1 || id > ULONG_MAX)))
-      	continue;
+	continue;
       DWORD wid = wcstoul (endptr + 1, &endptr, 16);
       if (endptr && *endptr != L'\0')
-      	continue;
+	continue;
       if (lock - i_all_lf >= MAX_LOCKF_CNT)
-        {
+	{
 	  system_printf ("Warning, can't handle more than %d locks per file.",
 			 MAX_LOCKF_CNT);
 	  break;
 	}
       if (lock > i_all_lf)
-        lock[-1].lf_next = lock;
+	lock[-1].lf_next = lock;
       new (lock++) lockf_t (this, &i_all_lf, flags, type, start, end, id, wid);
     }
   /* If no lock has been found, return NULL. */
@@ -637,7 +637,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 
   short a_flags = fl->l_type & (F_POSIX | F_FLOCK);
   short type = fl->l_type & (F_RDLCK | F_WRLCK | F_UNLCK);
-  
+
   if (!a_flags)
     a_flags = F_POSIX; /* default */
   if (a_op == F_SETLKW)
@@ -652,21 +652,21 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 	a_op = F_UNLCK;
 	break;
       case F_RDLCK:
-        if (!(get_access () & GENERIC_READ))
+	if (!(get_access () & GENERIC_READ))
 	  {
 	    set_errno (EBADF);
 	    return -1;
 	  }
 	break;
       case F_WRLCK:
-        if (!(get_access () & GENERIC_WRITE))
+	if (!(get_access () & GENERIC_WRITE))
 	  {
 	    set_errno (EBADF);
 	    return -1;
 	  }
 	break;
       default:
-      	set_errno (EINVAL);
+	set_errno (EINVAL);
 	return -1;
       }
 
@@ -776,7 +776,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
     {
       clean = new lockf_t ();
       if (!clean)
-        {
+	{
 	  node->UNLOCK ();
 	  set_errno (ENOLCK);
 	  return -1;
@@ -805,9 +805,9 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
     case F_UNLCK:
       error = lf_clearlock (lock, &clean, get_handle ());
       lock->lf_next = clean;
-      clean = lock; 
+      clean = lock;
       break;
-    
+
     case F_GETLK:
       error = lf_getlock (lock, node, fl);
       lock->lf_next = clean;
@@ -850,7 +850,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
  */
 static int
 lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
-{ 
+{
   lockf_t *block;
   lockf_t **head = lock->lf_head;
   lockf_t **prev, *overlap;
@@ -896,7 +896,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
        * do not go off into neverland.
        */
       /* FIXME: We check the handle count of all the lock event objects
-                this process holds.  If it's > 1, another process is
+		this process holds.  If it's > 1, another process is
 		waiting for one of our locks.  This method isn't overly
 		intelligent.  If it turns out to be too dumb, we might
 		have to remove it or to find another method. */
@@ -937,7 +937,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	}
       SetThreadPriority (GetCurrentThread (), priority);
       if (lock->lf_flags & F_POSIX)
-        {
+	{
 	  HANDLE proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
 	  if (!proc)
 	    {
@@ -955,7 +955,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  CloseHandle (proc);
 	}
       else
-        {
+	{
 	  HANDLE w4[2] = { obj, signal_arrived };
 	  node->UNLOCK ();
 	  /* Unfortunately, since BSD flock locks are not attached to a
@@ -977,7 +977,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  /* The lock object has been set to signalled. */
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  /* For POSIX locks, the process holding the lock has exited. */ 
+	  /* For POSIX locks, the process holding the lock has exited. */
 	  if (lock->lf_flags & F_POSIX)
 	    break;
 	  /*FALLTHRU*/
@@ -1016,16 +1016,16 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
        */
       switch (ovcase)
 	{
-        case 0: /* no overlap */
+	case 0: /* no overlap */
 	  if (needtolink)
 	    {
 	      *prev = lock;
 	      lock->lf_next = overlap;
 	      lock->create_lock_obj ();
-            }
-            break;
+	    }
+	    break;
 
-        case 1: /* overlap == lock */
+	case 1: /* overlap == lock */
 	  /*
 	   * If downgrading lock, others may be
 	   * able to acquire it.
@@ -1038,7 +1038,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  *clean = lock;
 	  break;
 
-        case 2: /* overlap contains lock */
+	case 2: /* overlap contains lock */
 	  /*
 	   * Check for common starting point and different types.
 	   */
@@ -1063,7 +1063,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	    lock->lf_next->create_lock_obj ();
 	  break;
 
-        case 3: /* lock contains overlap */
+	case 3: /* lock contains overlap */
 	  /*
 	   * If downgrading lock, others may be able to
 	   * acquire it, otherwise take the list.
@@ -1087,7 +1087,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  *clean = overlap;
 	  continue;
 
-        case 4: /* overlap starts before lock */
+	case 4: /* overlap starts before lock */
 	  /*
 	   * Add lock after overlap on the list.
 	   */
@@ -1101,7 +1101,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  needtolink = 0;
 	  continue;
 
-        case 5: /* overlap ends after lock */
+	case 5: /* overlap ends after lock */
 	  /*
 	   * Add the new lock before overlap.
 	   */
@@ -1146,13 +1146,13 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
 
       switch (ovcase)
 	{
-        case 1: /* overlap == lock */
+	case 1: /* overlap == lock */
 	  *prev = overlap->lf_next;
 	  overlap->lf_next = *clean;
 	  *clean = overlap;
 	  break;
 
-        case 2: /* overlap contains lock: split it */
+	case 2: /* overlap contains lock: split it */
 	  if (overlap->lf_start == unlock->lf_start)
 	    {
 	      overlap->lf_start = unlock->lf_end + 1;
@@ -1166,24 +1166,24 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
 	    overlap->lf_next->create_lock_obj ();
 	  break;
 
-        case 3: /* lock contains overlap */
+	case 3: /* lock contains overlap */
 	  *prev = overlap->lf_next;
 	  lf = overlap->lf_next;
 	  overlap->lf_next = *clean;
 	  *clean = overlap;
 	  continue;
 
-        case 4: /* overlap starts before lock */
-            overlap->lf_end = unlock->lf_start - 1;
-            prev = &overlap->lf_next;
-            lf = overlap->lf_next;
+	case 4: /* overlap starts before lock */
+	    overlap->lf_end = unlock->lf_start - 1;
+	    prev = &overlap->lf_next;
+	    lf = overlap->lf_next;
 	    overlap->create_lock_obj ();
-            continue;
+	    continue;
 
-        case 5: /* overlap ends after lock */
-            overlap->lf_start = unlock->lf_end + 1;
+	case 5: /* overlap ends after lock */
+	    overlap->lf_start = unlock->lf_end + 1;
 	    overlap->create_lock_obj ();
-            break;
+	    break;
 	}
       break;
     }
@@ -1229,7 +1229,7 @@ lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
  */
 static lockf_t *
 lf_getblock (lockf_t *lock, inode_t *node)
-{   
+{
   lockf_t **prev, *overlap;
   lockf_t *lf = node->get_all_locks_list ();
   int ovcase;
@@ -1272,7 +1272,7 @@ lf_getblock (lockf_t *lock, inode_t *node)
  *
  * NOTE: this returns only the FIRST overlapping lock.  There
  *   may be more than one.
- */ 
+ */
 static int
 lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
 		lockf_t **overlap)
@@ -1295,7 +1295,7 @@ lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
 	  *prev = &lf->lf_next;
 	  *overlap = lf = lf->lf_next;
 	  continue;
-        }
+	}
       /*
        * OK, check for overlap
        *
@@ -1316,7 +1316,7 @@ lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
 	  *prev = &lf->lf_next;
 	  *overlap = lf = lf->lf_next;
 	  continue;
-        }
+	}
       if ((lf->lf_start == start) && (lf->lf_end == end))
 	{
 	  /* Case 1 */
@@ -1360,7 +1360,7 @@ lf_split (lockf_t *lock1, lockf_t *lock2, lockf_t **split)
 {
   lockf_t *splitlock;
 
-  /* 
+  /*
    * Check to see if spliting into only two pieces.
    */
   if (lock1->lf_start == lock2->lf_start)

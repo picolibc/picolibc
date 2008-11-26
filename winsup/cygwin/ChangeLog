@@ -1,3 +1,27 @@
+2008-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Remove unneeded whitespace.
+
+	* fhandler_fifo.cc (fhandler_fifo::open): Rework to cause errno to be
+	set to ENXIO when opening a fifo write/nonblocking.
+
+	* environ.cc (ucreqenv): Rename to ucenv.  Move code from old ucenv
+	here and conditionalize it on create_upcaseenv.
+	(ucenv): Delete.
+	(environ_init): Fix compiler warning by moving create_upcaseenv test to
+	ucenv.  Don't bother checking for child_proc_info when calling ucenv
+	since it is assumed to be NULL at the point where the function is
+	called.
+
+	* path.cc (symlink_worker): Turn off MS-DOS path warnings when dealing
+	with devices since the device handler passes in a translated MS-DOS
+	path.
+
+	* sec_auth.cc (lsaprivkeyauth): Avoid variable initialization which
+	causes a compiler error.
+
+	* fhandler_netdrive.cc: Update copyright.
+
 2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add setlsapwd.o.

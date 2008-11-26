@@ -46,9 +46,9 @@ fcntl64 (int fd, int cmd, ...)
     case F_SETLK:
     case F_SETLKW:
       {
-        struct __flock64 *fl = (struct __flock64 *) arg;
-        fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
-        res = cfd->lock (cmd, fl);
+	struct __flock64 *fl = (struct __flock64 *) arg;
+	fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
+	res = cfd->lock (cmd, fl);
       }
       break;
     default:

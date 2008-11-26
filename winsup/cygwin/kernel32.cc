@@ -74,7 +74,7 @@ OpenEventW (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCWSTR lpName)
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
   ULONG flags = 0;
-  
+
   if (bInheritHandle)
     flags |= OBJ_INHERIT;
   if (lpName)

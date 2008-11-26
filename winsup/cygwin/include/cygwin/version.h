@@ -326,14 +326,14 @@ details. */
       181: Export cygwin_conv_path, cygwin_create_path, cygwin_conv_path_list.
       182: Export lockf.
       FIXME: Removed 12 year old and entirely wrong wprintf function at
-           this point.  We need a working implementation soon.
+	   this point.  We need a working implementation soon.
       183: Export open_memstream, fmemopen.
       184: Export openat, faccessat, fchmodat, fchownat, fstatat, futimesat,
-	   linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat, symlinkat, 
+	   linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat, symlinkat,
 	   unlinkat.
       185: Export futimens, utimensat.
       186: Remove ancient V8 regexp functions.  Also eliminate old crt0 interface
-           which provided its own user_data structure.
+	   which provided its own user_data structure.
       187: Export cfmakeraw.
       188: Export CW_SET_PRIV_KEY.
      */

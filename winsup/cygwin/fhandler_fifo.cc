@@ -86,19 +86,37 @@ fhandler_fifo::open (int flags, mode_t)
       LPSECURITY_ATTRIBUTES sa_buf =
 	sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
       mode |= FILE_FLAG_OVERLAPPED;
-      HANDLE h = CreateNamedPipe(npname, mode, FIFO_PIPE_MODE,
-				 PIPE_UNLIMITED_INSTANCES, 0, 0,
-				 NMPWAIT_WAIT_FOREVER, sa_buf);
+
+      HANDLE h;
+      DWORD err;
+      bool nonblocking_write = !!((flags & (O_WRONLY | O_NONBLOCK)) == (O_WRONLY | O_NONBLOCK));
+      if (nonblocking_write)
+	{
+	  h = INVALID_HANDLE_VALUE;
+	  err = ERROR_ACCESS_DENIED;
+	}
+      else
+	{
+	  h = CreateNamedPipe(npname, mode, FIFO_PIPE_MODE,
+			      PIPE_UNLIMITED_INSTANCES, 0, 0,
+			      NMPWAIT_WAIT_FOREVER, sa_buf);
+	  err = GetLastError ();
+	}
       if (h != INVALID_HANDLE_VALUE)
 	wait_state = fifo_wait_for_client;
       else
-	  switch (GetLastError ())
+	  switch (err)
 	    {
 	    case ERROR_ACCESS_DENIED:
 	      h = open_nonserver (npname, low_flags, sa_buf);
 	      if (h != INVALID_HANDLE_VALUE)
 		{
 		  wait_state = fifo_wait_for_server;
+		  break;
+		}
+	      if (nonblocking_write && GetLastError () == ERROR_FILE_NOT_FOUND)
+		{
+		  set_errno (ENXIO);
 		  break;
 		}
 	      /* fall through intentionally */

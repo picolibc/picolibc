@@ -785,7 +785,7 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.fs_is_nfs ())
     {
       /* chmod on NFS shares works by writing an EA of type NfsV3Attributes.
-         Only type and mode have to be set.  Apparently type isn't checked
+	 Only type and mode have to be set.  Apparently type isn't checked
 	 for consistency, so it's sufficent to set it to NF3REG all the time. */
       struct {
 	FILE_FULL_EA_INFORMATION ffei;
@@ -806,7 +806,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!NT_SUCCESS (status))
 	__seterrno_from_nt_status (status);
       else
- 	res = 0;
+	res = 0;
       goto out;
     }
 
@@ -1571,7 +1571,7 @@ fhandler_disk_file::opendir (int fd)
 	     persistent ACLs, FileDirectoryInformation otherwise.
 
 	     NFS clients hide dangling symlinks from directory queries,
-	     unless you use the FileNamesInformation info class.  
+	     unless you use the FileNamesInformation info class.
 	     On newer NFS clients (>=Vista) FileIdBothDirectoryInformation
 	     works fine, but only if the NFS share is mounted to a drive
 	     letter.  TODO: We don't test that here for now, but it might
@@ -1582,7 +1582,7 @@ fhandler_disk_file::opendir (int fd)
 	    {
 	      dir->__flags |= dirent_set_d_ino;
 	      if (pc.fs_is_nfs ())
-	      	dir->__flags |= dirent_nfs_d_ino;
+		dir->__flags |= dirent_nfs_d_ino;
 	      else if (wincap.has_fileid_dirinfo ()
 		       && !pc.has_buggy_fileid_dirinfo ())
 		dir->__flags |= dirent_get_d_ino;
@@ -1714,7 +1714,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	{
 	  tmp_pathbuf tp;
 	  UNICODE_STRING fbuf;
-	  
+
 	  tp.u_get (&fbuf);
 	  RtlCopyUnicodeString (&fbuf, pc.get_nt_native_path ());
 	  RtlAppendUnicodeToString (&fbuf, L"\\");
@@ -1853,7 +1853,7 @@ go_ahead:
 	{
 	  FileName = ((PFILE_NAMES_INFORMATION) buf)->FileName;
 	  FileNameLength = ((PFILE_NAMES_INFORMATION) buf)->FileNameLength;
-      	}
+	}
       else
 	{
 	  FileName = ((PFILE_DIRECTORY_INFORMATION) buf)->FileName;

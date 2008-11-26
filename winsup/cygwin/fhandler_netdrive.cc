@@ -1,6 +1,6 @@
 /* fhandler_netdrive.cc: fhandler for // and //MACHINE handling
 
-   Copyright 2005 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -107,7 +107,7 @@ thread_netdrive (void *arg)
     case GET_RESOURCE_ENUM:
       nh = (struct net_hdls *) ndi->in;
       if (!nh->dom)
-        {
+	{
 	  ndi->ret = ERROR_NO_MORE_ITEMS;
 	  break;
 	}

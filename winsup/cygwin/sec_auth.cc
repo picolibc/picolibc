@@ -720,7 +720,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 		   groups in the token, which are not in the group list set
 		   with setgroups().  That's rather dangerous.  What we're
 		   really interested in is that all groups in the setgroups()
-		   list are in the token.  A token created through ADVAPI 
+		   list are in the token.  A token created through ADVAPI
 		   should be allowed to contain more groups than requested
 		   through setgroups(), esecially since Vista and the
 		   addition of integrity groups. So we disable this statement
@@ -1221,7 +1221,8 @@ lsaprivkeyauth (struct passwd *pw)
     }
 
   /* The key is not 0-terminated. */
-  PWCHAR passwd = (PWCHAR) alloca (data->Length + sizeof (WCHAR));
+  PWCHAR passwd;
+  passwd = (PWCHAR) alloca (data->Length + sizeof (WCHAR));
   *wcpncpy (passwd, data->Buffer, data->Length / sizeof (WCHAR)) = L'\0';
   LsaFreeMemory (data);
   debug_printf ("Try logon for %W\\%W", domain, user);

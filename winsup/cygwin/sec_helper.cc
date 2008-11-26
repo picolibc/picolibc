@@ -543,7 +543,7 @@ _everyone_sd (void *buf, ACCESS_MASK access)
       InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
       PACL dacl = (PACL) (psd + 1);
       InitializeAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
-      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access, 
+      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access,
 				well_known_world_sid))
 	{
 	  debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());

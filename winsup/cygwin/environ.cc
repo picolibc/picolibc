@@ -437,53 +437,36 @@ unsetenv (const char *name)
   return 0;
 }
 
-/* Turn environment variable part of a=b string into uppercase. */
-static __inline__ void
-ucenv (char *p, char *eq)
-{
-  /* Amazingly, NT has a case sensitive environment name list,
-     but only sometimes.
-     It's normal to have NT set your "Path" to something.
-     Later, you set "PATH" to something else.  This alters "Path".
-     But if you try and do a naive getenv on "PATH" you'll get nothing.
-
-     So we upper case the labels here to prevent confusion later but
-     we only do it for the first process in a session group. */
-  for (; p < eq; p++)
-    if (islower (*p))
-      *p = cyg_toupper (*p);
-}
-
 /* Minimal list of Windows vars which must be converted to uppercase.
    Either for POSIX compatibility of for backward compatibility with
    existing applications. */
 static struct renv {
-        const char *name;
-        const size_t namelen;
+	const char *name;
+	const size_t namelen;
 } renv_arr[] = {
-        { NL("ALLUSERSPROFILE=") },		// 0
-        { NL("COMMONPROGRAMFILES=") },		// 1
-        { NL("COMPUTERNAME=") },
-        { NL("COMSPEC=") },
-        { NL("HOME=") },			// 4
-        { NL("HOMEDRIVE=") },
-        { NL("HOMEPATH=") },
-        { NL("NUMBER_OF_PROCESSORS=") },	// 7
-        { NL("OS=") },				// 8
-        { NL("PATH=") },			// 9
-        { NL("PATHEXT=") },
-        { NL("PROCESSOR_ARCHITECTURE=") },
-        { NL("PROCESSOR_IDENTIFIER=") },
-        { NL("PROCESSOR_LEVEL=") },
-        { NL("PROCESSOR_REVISION=") },
-        { NL("PROGRAMFILES=") },
-        { NL("SYSTEMDRIVE=") },			// 16
-        { NL("SYSTEMROOT=") },
-        { NL("TEMP=") },			// 18
-        { NL("TERM=") },
-        { NL("TMP=") },
-        { NL("TMPDIR=") },
-        { NL("WINDIR=") }			// 22
+	{ NL("ALLUSERSPROFILE=") },		// 0
+	{ NL("COMMONPROGRAMFILES=") },		// 1
+	{ NL("COMPUTERNAME=") },
+	{ NL("COMSPEC=") },
+	{ NL("HOME=") },			// 4
+	{ NL("HOMEDRIVE=") },
+	{ NL("HOMEPATH=") },
+	{ NL("NUMBER_OF_PROCESSORS=") },	// 7
+	{ NL("OS=") },				// 8
+	{ NL("PATH=") },			// 9
+	{ NL("PATHEXT=") },
+	{ NL("PROCESSOR_ARCHITECTURE=") },
+	{ NL("PROCESSOR_IDENTIFIER=") },
+	{ NL("PROCESSOR_LEVEL=") },
+	{ NL("PROCESSOR_REVISION=") },
+	{ NL("PROGRAMFILES=") },
+	{ NL("SYSTEMDRIVE=") },			// 16
+	{ NL("SYSTEMROOT=") },
+	{ NL("TEMP=") },			// 18
+	{ NL("TERM=") },
+	{ NL("TMP=") },
+	{ NL("TMPDIR=") },
+	{ NL("WINDIR=") }			// 22
 };
 #define RENV_SIZE (sizeof (renv_arr) / sizeof (renv_arr[0]))
 /* Set of first characters of the above list of variables. */
@@ -492,22 +475,41 @@ static const char idx_arr[] = "ACHNOPSTW";
    starts. */
 static const int start_at[] = { 0, 1, 4, 7, 8, 9, 16, 18, 22 };
 
-/* Hopefully as quick as possible.  Only upcase specific set of important
-   Windows variables. */
+/* Turn environment variable part of a=b string into uppercase.
+   Conditionally controlled by upcaseenv CYGWIN setting.  */
 static __inline__ void
-ucreqenv (char *p)
+ucenv (char *p, const char *eq)
 {
-  char first = cyg_toupper (*p);
-  const char *idx = strchr (idx_arr, first);
-  if (idx)
-    for (size_t i = start_at[idx - idx_arr];
-	 i < RENV_SIZE && renv_arr[i].name[0] == first;
-	 ++i)
-      if (strncasematch (p, renv_arr[i].name, renv_arr[i].namelen))
-	{
-	  strncpy (p, renv_arr[i].name, renv_arr[i].namelen);
-	  break;
-	}
+  if (create_upcaseenv)
+    {
+      /* Amazingly, NT has a case sensitive environment name list,
+	 but only sometimes.
+	 It's normal to have NT set your "Path" to something.
+	 Later, you set "PATH" to something else.  This alters "Path".
+	 But if you try and do a naive getenv on "PATH" you'll get nothing.
+
+	 So we upper case the labels here to prevent confusion later but
+	 we only do it for processes that are started by non-Cygwin programs. */
+      for (; p < eq; p++)
+	if (islower (*p))
+	  *p = cyg_toupper (*p);
+    }
+  else
+    {
+      /* Hopefully as quickly as possible - only upcase specific set of important
+	 Windows variables. */
+      char first = cyg_toupper (*p);
+      const char *idx = strchr (idx_arr, first);
+      if (idx)
+	for (size_t i = start_at[idx - idx_arr];
+	     i < RENV_SIZE && renv_arr[i].name[0] == first;
+	     ++i)
+	  if (strncasematch (p, renv_arr[i].name, renv_arr[i].namelen))
+	    {
+	      strncpy (p, renv_arr[i].name, renv_arr[i].namelen);
+	      break;
+	    }
+    }
 }
 
 /* Parse CYGWIN options */
@@ -847,14 +849,10 @@ environ_init (char **envp, int envc)
       if (*newp == '=')
 	*newp = '!';
       char *eq = strechr (newp, '=');
-      if (!child_proc_info)
-	if (create_upcaseenv)
-	  ucenv (newp, eq);	/* Uppercase all env vars. */
-	else
-	  ucreqenv (newp);	/* Uppercase only selected vars. */
+      ucenv (newp, eq);	/* (possibly conditionally) uppercase env vars. */
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
-      if (*eq && conv_start_chars[(unsigned char)envp[i][0]])
+      if (*eq && conv_start_chars[(unsigned char) envp[i][0]])
 	posify (envp + i, *++eq ? eq : --eq, tmpbuf);
       debug_printf ("%p: %s", envp[i], envp[i]);
     }

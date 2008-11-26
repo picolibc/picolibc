@@ -1452,7 +1452,7 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
       else if (is_nonblocking () || err != WSAEWOULDBLOCK)
 	break;
     }
-  
+
   if (sum)
     res = sum;
   else if (res == SOCKET_ERROR)

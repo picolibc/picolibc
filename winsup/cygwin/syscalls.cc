@@ -2504,7 +2504,7 @@ seteuid32 (__uid32_t uid)
      the privileged user instead of using the orignal token.  This can have
      unfortunate side effects.  The created token has different group
      memberships, different user rights, and misses possible network
-     credentials. 
+     credentials.
      Therefore we try this shortcut now.  When switching back to the
      privileged user, we probably always want a correct (aka original)
      user token for this privileged user, not only in sshd. */
@@ -2537,7 +2537,7 @@ seteuid32 (__uid32_t uid)
     {
       new_token = lsaprivkeyauth (pw_new);
       if (new_token)
-        {
+	{
 	  /* We have to verify this token since settings in /etc/group
 	     might render it unusable im terms of group membership. */
 	  if (!verify_token (new_token, usersid, groups))
@@ -2547,7 +2547,7 @@ seteuid32 (__uid32_t uid)
 	    }
 	}
       if (!new_token)
-        {
+	{
 	  debug_printf ("lsaprivkeyauth failed, try lsaauth.");
 	  if (!(new_token = lsaauth (usersid, groups, pw_new)))
 	    {
@@ -3619,7 +3619,7 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
       if (dirfd == AT_FDCWD)
 	p = stpcpy (path_ret, cygheap->cwd.posix);
       else
-        {
+	{
 	  cygheap_fdget cfd (dirfd);
 	  if (cfd < 0)
 	    return -1;
@@ -3631,7 +3631,7 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 	  p = stpcpy (path_ret, cfd->get_name ());
 	}
       if (!p)
-        {
+	{
 	  set_errno (ENOTDIR);
 	  return -1;
 	}
@@ -3655,7 +3655,7 @@ openat (int dirfd, const char *pathname, int flags, ...)
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
-  
+
   va_list ap;
   mode_t mode;
 
@@ -3680,11 +3680,11 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
       if (flags & ~(F_OK|R_OK|W_OK|X_OK))
 	set_errno (EINVAL);
       else
-	{ 
+	{
 	  fhandler_base *fh = build_fh_name (path, NULL,
 					     (flags & AT_SYMLINK_NOFOLLOW)
 					     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
-					     stat_suffixes); 
+					     stat_suffixes);
 	  if (fh)
 	    {
 	      res =  fh->fhaccess (mode);

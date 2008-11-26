@@ -394,13 +394,13 @@ class fhandler_mailslot : public fhandler_base
   select_record *select_read (select_record *s);
 };
 
-struct wsa_event 
+struct wsa_event
 {
   LONG serial_number;
   long events;
   int  connect_errorcode;
   pid_t owner;
-};  
+};
 
 class fhandler_socket: public fhandler_base
 {

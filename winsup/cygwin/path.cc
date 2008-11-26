@@ -1,4 +1,4 @@
-  /* path.cc: path support.
+/* path.cc: path support.
 
      Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
      2006, 2007, 2008 Red Hat, Inc.
@@ -505,7 +505,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 		  && FS_IS_SAMBA);
 
       if (!is_samba ())
-        {
+	{
 	  is_netapp (RtlEqualUnicodeString (&fsname, &testname, FALSE)
 		     && FS_IS_NETAPP_DATAONTAP);
 
@@ -515,7 +515,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  if (!is_nfs ())
 	    {
 	      /* Known remote file systems which can't handle calls to
-	         NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
+		 NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
 	      RtlInitUnicodeString (&testname, L"UNIXFS");
 	      has_buggy_fileid_dirinfo (RtlEqualUnicodeString (&fsname,
 							       &testname,
@@ -1525,6 +1525,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   NTSTATUS status;
   HANDLE fh;
   tmp_pathbuf tp;
+  unsigned check_opt;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -1551,14 +1552,16 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       set_errno (ENOENT);
       goto done;
     }
+
+  check_opt = PC_SYM_NOFOLLOW | PC_POSIX | (isdevice ? PC_NOWARN : 0);
   /* We need the normalized full path below. */
-  win32_newpath.check (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
+  win32_newpath.check (newpath, check_opt, stat_suffixes);
   if (use_winsym && !win32_newpath.exists ()
       && (isdevice || !win32_newpath.fs_is_nfs ()))
     {
       char *newplnk = tp.c_get ();
       stpcpy (stpcpy (newplnk, newpath), ".lnk");
-      win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX);
+      win32_newpath.check (newplnk, check_opt);
     }
 
   if (win32_newpath.error)
@@ -1621,7 +1624,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  /* The symlink target is relative to the directory in which
 	     the symlink gets created, not relative to the cwd.  Therefore
 	     we have to mangle the path quite a bit before calling path_conv. */
-	  if (!isabspath (oldpath))
+	if (isabspath (oldpath))
+	  win32_oldpath.check (oldpath,
+			       PC_SYM_NOFOLLOW,
+			       stat_suffixes);
+	else
 	    {
 	      len = strrchr (win32_newpath.normalized_path, '/')
 		    - win32_newpath.normalized_path + 1;
@@ -1630,8 +1637,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 		      oldpath);
 	      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
 	    }
-	  else
-	    win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
 	  if (SUCCEEDED (SHGetDesktopFolder (&psl)))
 	    {
 	      WCHAR wc_path[win32_oldpath.get_wide_win32_path_len () + 1];
@@ -1777,7 +1782,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
     }
   if (win32_newpath.has_acls () && win32_newpath.isremote ())
     set_file_attribute (fh, win32_newpath, ILLEGAL_UID, ILLEGAL_GID,
-    			S_IFLNK | STD_RBITS | STD_WBITS);
+			S_IFLNK | STD_RBITS | STD_WBITS);
   status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
   if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
     {

@@ -358,7 +358,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
-  
+
   if (!real_path.iscygexec ()
       && (cygheap->cwd.drive_length == 0
 	  || cygheap->cwd.win32.Length >= MAX_PATH * sizeof (WCHAR)))
@@ -480,7 +480,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
     	|| (runpath[5] != L':'				/* UNC path */
 	    && len < (MAX_PATH + 6) * sizeof (WCHAR)))
       {
-        PWCHAR r = runpath + 4;
+	PWCHAR r = runpath + 4;
 	if (r[1] != L':') /* UNC path */
 	  *(r += 2) = L'\\';
 	if (!RtlIsDosDeviceName_U (r))

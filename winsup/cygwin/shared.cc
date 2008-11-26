@@ -52,13 +52,13 @@ get_shared_parent_dir ()
 			_cygwin_testing ? cygwin_version.dll_build_date : "");
       RtlInitUnicodeString (&uname, bnoname);
       InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
-                                  NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
+				  NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
       status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-        api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
     }
   return dir;
-} 
+}
 
 HANDLE
 get_session_parent_dir ()
@@ -77,7 +77,7 @@ get_session_parent_dir ()
       if (!NT_SUCCESS (status) || psi.SessionId == 0)
 	dir = get_shared_parent_dir ();
       else
-        {
+	{
 	  WCHAR bnoname[MAX_PATH];
 	  __small_swprintf (bnoname,
 			    L"\\Sessions\\BNOLINKS\\%d\\%s%s",
@@ -92,7 +92,7 @@ get_session_parent_dir ()
 	}
     }
   return dir;
-} 
+}
 
 char * __stdcall
 shared_name (char *ret_buf, const char *str, int num)
@@ -150,7 +150,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       else
 	{
 	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
-	  				PAGE_READWRITE, 0, size, mapname);
+					PAGE_READWRITE, 0, size, mapname);
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
 	    m = SH_JUSTOPEN;
 	}
@@ -211,7 +211,7 @@ user_shared_initialize ()
       /* Correct the user name with what's defined in /etc/passwd before
 	 loading the user fstab file. */
       if (pw)
-      	cygheap->user.set_name (pw->pw_name);
+	cygheap->user.set_name (pw->pw_name);
       user_shared->mountinfo.init ();	/* Initialize the mount table.  */
       user_shared->cb =  sizeof (*user_shared);
     }

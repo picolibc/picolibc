@@ -524,11 +524,11 @@ fhandler_base::open (int flags, mode_t mode)
   if (query_open () && pc.fs_is_nfs ())
     {
       /* Make sure we can read EAs of files on an NFS share.  Also make
-         sure that we're going to act on the file itself, even if it'a
+	 sure that we're going to act on the file itself, even if it'a
 	 a symlink. */
       access |= FILE_READ_EA;
       if (query_open () >= query_write_control)
-        access |=  FILE_WRITE_EA;
+	access |=  FILE_WRITE_EA;
       plen = sizeof nfs_aol_ffei;
       p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
     }
@@ -583,7 +583,7 @@ fhandler_base::open (int flags, mode_t mode)
 	  else if (pc.fs_is_nfs ())
 	    {
 	      /* When creating a file on an NFS share, we have to set the
-	         file mode by writing a NFS fattr3 structure with the
+		 file mode by writing a NFS fattr3 structure with the
 		 correct mode bits set. */
 	      access |= FILE_WRITE_EA;
 	      plen = sizeof (FILE_FULL_EA_INFORMATION) + sizeof (NFS_V3_ATTR)
@@ -595,7 +595,7 @@ fhandler_base::open (int flags, mode_t mode)
 	      p->EaValueLength = sizeof (fattr3);
 	      strcpy (p->EaName, NFS_V3_ATTR);
 	      fattr3 *nfs_attr = (fattr3 *) (p->EaName
-	                                     + p->EaNameLength + 1);
+					     + p->EaNameLength + 1);
 	      memset (nfs_attr, 0, sizeof (fattr3));
 	      nfs_attr->type = NF3REG;
 	      nfs_attr->mode = mode;
@@ -634,7 +634,7 @@ fhandler_base::open (int flags, mode_t mode)
      authenticating using a local user account on the sharing machine.
      If the SIDs of the client machine are used, that's entirely
      unexpected behaviour.
-     
+
      Doing it like we do here creates the expected SD in a domain as
      well as on standalone servers. */
   if ((flags & O_CREAT) && has_acls () && pc.isremote ())
@@ -1609,7 +1609,7 @@ fhandler_base::fpathconf (int v)
     case _PC_NAME_MAX:
       /* NAME_MAX is without trailing \0 */
       if (!pc.isdir ())
-        return NAME_MAX;
+	return NAME_MAX;
       ret = NT_MAX_PATH - strlen (get_name ()) - 2;
       return ret < 0 ? 0 : ret > NAME_MAX ? NAME_MAX : ret;
     case _PC_PATH_MAX:
