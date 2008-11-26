@@ -1,6 +1,6 @@
 /* cygserver_shm.h: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -78,7 +78,7 @@ public:
   client_request_shm (proc *);				// shmfork
 #endif
 
-  int retval () const { return _parameters.out.ret; }
+  int retval () const { return msglen () ? _parameters.out.ret : -1; }
   void *ptrval () const { return (void *)_parameters.out.ptr; }
   vm_object_t objval () const { return _parameters.out.obj; }
 };

@@ -25,6 +25,7 @@ details. */
 #include "cygtls.h"
 #include "child_info.h"
 #include "environ.h"
+#include "cygserver_setpwd.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -357,6 +358,11 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  dos_file_warning = va_arg (arg, int);
 	}
 	break;
+      case CW_SET_PRIV_KEY:
+	{
+	  const char *passwd = va_arg (arg, const char *);
+	  return setlsapwd (passwd);
+	}
 
       default:
 	break;

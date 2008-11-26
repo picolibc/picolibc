@@ -335,12 +335,13 @@ details. */
       186: Remove ancient V8 regexp functions.  Also eliminate old crt0 interface
            which provided its own user_data structure.
       187: Export cfmakeraw.
+      188: Export CW_SET_PRIV_KEY.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 187
+#define CYGWIN_VERSION_API_MINOR 188
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

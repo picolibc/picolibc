@@ -1,6 +1,6 @@
 /* cygserver.h
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -20,7 +20,7 @@ details. */
 #endif
 
 #define CYGWIN_SERVER_VERSION_MAJOR	1
-#define CYGWIN_SERVER_VERSION_API	3
+#define CYGWIN_SERVER_VERSION_API	4
 #define CYGWIN_SERVER_VERSION_MINOR	0
 #define CYGWIN_SERVER_VERSION_PATCH	0
 
@@ -51,6 +51,7 @@ protected:
     CYGSERVER_REQUEST_MSG,
     CYGSERVER_REQUEST_SEM,
     CYGSERVER_REQUEST_SHM,
+    CYGSERVER_REQUEST_SETPWD,
     CYGSERVER_REQUEST_LAST
   } request_code_t;
 

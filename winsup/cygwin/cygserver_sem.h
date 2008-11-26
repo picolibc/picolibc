@@ -1,6 +1,6 @@
 /* cygserver_sem.h: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -71,7 +71,7 @@ public:
   client_request_sem (int, struct sembuf *, size_t);	// semop
 #endif
 
-  int retval () const { return _parameters.out.ret; }
+  int retval () const { return msglen () ? _parameters.out.ret : -1; }
 };
 
 #ifndef __INSIDE_CYGWIN__

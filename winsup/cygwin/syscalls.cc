@@ -2493,7 +2493,23 @@ seteuid32 (__uid32_t uid)
   cygheap->user.deimpersonate ();
 
   /* Verify if the process token is suitable. */
-  if (verify_token (hProcToken, usersid, groups))
+  /* TODO, CV 2008-11-25: The check against saved_sid is a kludge and a
+     shortcut.  We must check if it's really feasible in the long run.
+     The reason to add this shortcut is this:  sshd switches back to the
+     privileged user running sshd at least twice in the process of
+     authentication.  It calls seteuid first, then setegid.  Due to this
+     order, the setgroups group list is still active when calling seteuid
+     and verify_token treats the original token of the privileged user as
+     insufficient.  This in turn results in creating a new user token for
+     the privileged user instead of using the orignal token.  This can have
+     unfortunate side effects.  The created token has different group
+     memberships, different user rights, and misses possible network
+     credentials. 
+     Therefore we try this shortcut now.  When switching back to the
+     privileged user, we probably always want a correct (aka original)
+     user token for this privileged user, not only in sshd. */
+  if ((uid == cygheap->user.saved_uid && usersid == cygheap->user.saved_sid ())
+      || verify_token (hProcToken, usersid, groups))
     new_token = hProcToken;
   /* Verify if the external token is suitable */
   else if (cygheap->user.external_token != NO_IMPERSONATION
@@ -2514,19 +2530,35 @@ seteuid32 (__uid32_t uid)
 
   debug_printf ("Found token %d", new_token);
 
-  /* If no impersonation token is available, try to
-     authenticate using NtCreateToken () or LSA authentication. */
+  /* If no impersonation token is available, try to authenticate using
+     LSA private data stored password, LSA authentication using our own
+     LSA module, or, as last chance, NtCreateToken. */
   if (new_token == INVALID_HANDLE_VALUE)
     {
-      if (!(new_token = lsaauth (usersid, groups, pw_new)))
-	{
-	  debug_printf ("lsaauth failed, try create_token.");
-	  new_token = create_token (usersid, groups, pw_new);
-	  if (new_token == INVALID_HANDLE_VALUE)
+      new_token = lsaprivkeyauth (pw_new);
+      if (new_token)
+        {
+	  /* We have to verify this token since settings in /etc/group
+	     might render it unusable im terms of group membership. */
+	  if (!verify_token (new_token, usersid, groups))
 	    {
-	      debug_printf ("create_token failed, bail out of here");
-	      cygheap->user.reimpersonate ();
-	      return -1;
+	      CloseHandle (new_token);
+	      new_token = NULL;
+	    }
+	}
+      if (!new_token)
+        {
+	  debug_printf ("lsaprivkeyauth failed, try lsaauth.");
+	  if (!(new_token = lsaauth (usersid, groups, pw_new)))
+	    {
+	      debug_printf ("lsaauth failed, try create_token.");
+	      new_token = create_token (usersid, groups, pw_new);
+	      if (new_token == INVALID_HANDLE_VALUE)
+		{
+		  debug_printf ("create_token failed, bail out of here");
+		  cygheap->user.reimpersonate ();
+		  return -1;
+		}
 	    }
 	}
 

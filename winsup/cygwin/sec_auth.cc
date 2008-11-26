@@ -27,6 +27,7 @@ details. */
 #include <iptypes.h>
 #include "pwdgrp.h"
 #include "cyglsa.h"
+#include "cygserver_setpwd.h"
 #include <cygwin/version.h>
 
 extern "C" void
@@ -150,13 +151,13 @@ str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
     tgt.Length = tgt.MaximumLength = 0;
 }
 
-static LSA_HANDLE
-open_local_policy ()
+HANDLE
+open_local_policy (ACCESS_MASK access)
 {
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
+  HANDLE lsa = INVALID_HANDLE_VALUE;
 
-  NTSTATUS ret = LsaOpenPolicy (NULL, &oa, POLICY_EXECUTE, &lsa);
+  NTSTATUS ret = LsaOpenPolicy (NULL, &oa, access, &lsa);
   if (ret != STATUS_SUCCESS)
     __seterrno_from_win_error (LsaNtStatusToWinError (ret));
   return lsa;
@@ -785,7 +786,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   push_self_privilege (SE_CREATE_TOKEN_PRIVILEGE, true);
 
   /* Open policy object. */
-  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
+  if ((lsa = open_local_policy (POLICY_EXECUTE)) == INVALID_HANDLE_VALUE)
     goto out;
 
   /* User, owner, primary group. */
@@ -963,7 +964,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
 
   /* Open policy object. */
-  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
+  if ((lsa = open_local_policy (POLICY_EXECUTE)) == INVALID_HANDLE_VALUE)
     goto out;
 
   /* Create origin. */
@@ -1171,4 +1172,76 @@ out:
 
   debug_printf ("%p = lsaauth ()", user_token);
   return user_token;
+}
+
+#define SFU_LSA_KEY_SUFFIX	L"_microsoft_sfu_utility"
+
+HANDLE
+lsaprivkeyauth (struct passwd *pw)
+{
+  NTSTATUS status;
+  HANDLE lsa = INVALID_HANDLE_VALUE;
+  HANDLE token = NULL;
+  WCHAR sid[256];
+  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR user[UNLEN + 1];
+  WCHAR key_name[MAX_DOMAIN_NAME_LEN + UNLEN + wcslen (SFU_LSA_KEY_SUFFIX) + 2];
+  UNICODE_STRING key;
+  PUNICODE_STRING data;
+  cygsid psid;
+
+  push_self_privilege (SE_TCB_PRIVILEGE, true);
+
+  /* Open policy object. */
+  if ((lsa = open_local_policy (POLICY_GET_PRIVATE_INFORMATION))
+      == INVALID_HANDLE_VALUE)
+    goto out;
+
+  /* Needed for Interix key and LogonUser. */
+  extract_nt_dom_user (pw, domain, user);
+
+  /* First test for a Cygwin entry. */
+  if (psid.getfrompw (pw) && psid.string (sid))
+    {
+      wcpcpy (wcpcpy (key_name, CYGWIN_LSA_KEY_PREFIX), sid);
+      RtlInitUnicodeString (&key, key_name);
+      status = LsaRetrievePrivateData (lsa, &key, &data);
+      if (!NT_SUCCESS (status))
+	{
+	  /* No Cygwin key, try Interix key. */
+	  if (!*domain)
+	    goto out;
+	  __small_swprintf (key_name, L"%W_%W%W",
+			    domain, user, SFU_LSA_KEY_SUFFIX);
+	  RtlInitUnicodeString (&key, key_name);
+	  status = LsaRetrievePrivateData (lsa, &key, &data);
+	  if (!NT_SUCCESS (status))
+	    goto out;
+	}
+    }
+
+  /* The key is not 0-terminated. */
+  PWCHAR passwd = (PWCHAR) alloca (data->Length + sizeof (WCHAR));
+  *wcpncpy (passwd, data->Buffer, data->Length / sizeof (WCHAR)) = L'\0';
+  LsaFreeMemory (data);
+  debug_printf ("Try logon for %W\\%W", domain, user);
+  if (!LogonUserW (user, domain, passwd, LOGON32_LOGON_INTERACTIVE,
+		   LOGON32_PROVIDER_DEFAULT, &token))
+    {
+      __seterrno ();
+      token = NULL;
+    }
+  else if (!SetHandleInformation (token,
+				  HANDLE_FLAG_INHERIT,
+				  HANDLE_FLAG_INHERIT))
+    {
+      __seterrno ();
+      CloseHandle (token);
+      token = NULL;
+    }
+
+out:
+  close_local_policy (lsa);
+  pop_self_privilege ();
+  return token;
 }

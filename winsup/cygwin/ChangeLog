@@ -1,3 +1,33 @@
+2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add setlsapwd.o.
+	* cygserver.h (CYGWIN_SERVER_VERSION_API): Bump.
+	(request_code_t): Define CYGSERVER_REQUEST_SETPWD request type.
+	* cygserver_msg.h (client_request_msg::retval): Use default value of -1
+	for retval if msglen is 0.
+	* cygserver_sem.h (client_request_sem::retval): Ditto.
+	* cygserver_shm.h (client_request_shm::retval): Ditto.
+	* cygserver_setpwd.h: New file.
+	* external.cc (cygwin_internal): Implement new CW_SET_PRIV_KEY type.
+	* sec_auth.cc (open_local_policy): Make externally available.
+	Get ACCESS_MASK as argument.
+	(create_token): Accommodate change to open_local_policy.
+	(lsaauth): Ditto.
+	(lsaprivkeyauth): New function fetching token by retrieving
+	password stored in Cygwin or Interix LSA private data area and
+	calling LogonUser with it.
+	* security.h (lsaprivkeyauth): Declare.
+	(open_local_policy): Declare.
+	* setlsapwd.cc: New file implementing setting LSA private data password
+	using LsaStorePrivateData or by calling cygserver if available.
+	* syscalls.cc (seteuid32): Add workaround to get the original token
+	when switching back to the original privileged user, even if
+	setgroups group list is still active.  Add long comment to explain why.
+	Call lsaprivkeyauth first, only if that fails call lsaauth or
+	create_token.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SET_PRIV_KEY.
+
 2008-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::raw_read): Drop

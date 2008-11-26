@@ -370,6 +370,8 @@ void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((reg
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* LSA authentication function. */
 HANDLE lsaauth (cygsid &, user_groups &, struct passwd *);
+/* LSA private key storage authentication, same as when using service logons. */
+HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */
@@ -379,6 +381,8 @@ bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
 bool get_logon_server (PWCHAR domain, PWCHAR wserver, bool rediscovery);
+
+HANDLE open_local_policy (ACCESS_MASK access);
 
 /* sec_helper.cc: Security helper functions. */
 int set_privilege (HANDLE token, DWORD privilege, bool enable);
