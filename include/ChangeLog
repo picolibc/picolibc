@@ -1,3 +1,9 @@
+2008-11-26  Alan Modra  <amodra@bigpond.net.au>
+
+	PR 7047
+	* bfdlink.h (struct bfd_elf_version_expr): Delete "symbol".
+	Add "literal".
+
 2008-11-21  Sterling Augustine  <sterling@tensilica.com>
 
 	* xtensa-isa-internal.h (XTENSA_STATE_IS_SHARED_OR): New flag.

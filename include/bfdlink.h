@@ -707,8 +707,8 @@ struct bfd_elf_version_expr
   struct bfd_elf_version_expr *next;
   /* Glob pattern.  */
   const char *pattern;
-  /* NULL for a glob pattern, otherwise a straight symbol.  */
-  const char *symbol;
+  /* Set if pattern is not a glob.  */
+  unsigned int literal : 1;
   /* Defined by ".symver".  */
   unsigned int symver : 1;
   /* Defined by version script.  */
