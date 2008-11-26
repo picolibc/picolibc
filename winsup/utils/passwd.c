@@ -1,6 +1,6 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2008 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -26,6 +26,7 @@ details. */
 #include <sys/cygwin.h>
 #include <sys/types.h>
 #include <time.h>
+#include <errno.h>
 
 #define USER_PRIV_ADMIN		 2
 
@@ -50,10 +51,11 @@ static struct option longopts[] =
   {"maxage", required_argument, NULL, 'x'},
   {"length", required_argument, NULL, 'L'},
   {"status", no_argument, NULL, 'S'},
+  { "reg-store-pwd", no_argument, NULL, 'R'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cCd:eEhi:ln:pPuvx:L:S";
+static char opts[] = "cCd:eEhi:ln:pPuvx:L:SR";
 
 int
 eprint (int with_name, const char *fmt, ...)
@@ -263,6 +265,9 @@ usage (FILE * stream, int status)
   "                           password aging rule.\n"
   "  -p, --pwd-not-required   no password required for USER.\n"
   "  -P, --pwd-required       password is required for USER.\n"
+  "  -R, --reg-store-pwd      enter password to store it in the registry for\n"
+  "                           later usage by services to be able to switch\n"
+  "                           to this user context with network credentials.\n"
   "\n"
   "System operations:\n"
   "  -i, --inactive NUM       set NUM of days before inactive accounts are disabled\n"
@@ -281,7 +286,16 @@ usage (FILE * stream, int status)
   "\n"
   "If no option is given, change USER's password.  If no user name is given,\n"
   "operate on current user.  System operations must not be mixed with user\n"
-  "operations.  Don't specify a USER when triggering a system operation. \n"
+  "operations.  Don't specify a USER when triggering a system operation.\n"
+  "\n"
+  "Don't specify a user or any other option together with the -R option.\n"
+  "Non-Admin users can only store their password if cygserver is running and\n"
+  "the CYGWIN environment variable is set to contain the word 'server'.\n"
+  "Note that storing even obfuscated passwords in the registry is not overly\n"
+  "secure.  Use this feature only if the machine is adequately locked down.\n"
+  "Don't use this feature if you don't need network access within a remote\n"
+  "session.  You can delete your stored password by using `passwd -R' and\n"
+  "specifying an empty password.\n"
   "\n"
   "Report bugs to <cygwin@cygwin.com>\n", prog_name);
   exit (status);
@@ -314,7 +328,7 @@ int
 main (int argc, char **argv)
 {
   char *c;
-  char user[64], oldpwd[64], newpwd[64];
+  char user[UNLEN + 1], oldpwd[_PASSWORD_LEN + 1], newpwd[_PASSWORD_LEN + 1];
   int ret = 0;
   int cnt = 0;
   int opt, len;
@@ -331,6 +345,7 @@ main (int argc, char **argv)
   int popt = 0;
   int Popt = 0;
   int Sopt = 0;
+  int Ropt = 0;
   PUSER_INFO_3 ui, li;
   LPWSTR server = NULL;
 
@@ -353,20 +368,20 @@ main (int argc, char **argv)
         break;
 
       case 'i':
-	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((iarg = atoi (optarg)) < 0 || iarg > 999)
 	  return eprint (1, "Force logout time must be between 0 and 999.");
         break;
 
       case 'l':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || uopt || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || uopt || Sopt || Ropt)
 	  usage (stderr, 1);
 	lopt = 1;
         break;
 
       case 'n':
-	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((narg = atoi (optarg)) < 0 || narg > 999)
 	  return eprint (1, "Minimum password age must be between 0 and 999.");
@@ -376,25 +391,27 @@ main (int argc, char **argv)
         break;
 
       case 'u':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || Sopt || Ropt)
 	  usage (stderr, 1);
 	uopt = 1;
         break;
 
       case 'c':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	copt = 1;
         break;
 
       case 'C':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Copt = 1;
         break;
 
       case 'd':
         {
+	  if (Ropt)
+	    usage (stderr, 1);
 	  char *tmpbuf = alloca (strlen (optarg) + 3);
 	  tmpbuf[0] = '\0';
 	  if (*optarg != '\\')
@@ -408,25 +425,25 @@ main (int argc, char **argv)
 	break;
 
       case 'e':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	eopt = 1;
         break;
 
       case 'E':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Eopt = 1;
         break;
 
       case 'p':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	popt = 1;
         break;
 
       case 'P':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Popt = 1;
         break;
@@ -437,7 +454,7 @@ main (int argc, char **argv)
         break;
 
       case 'x':
-	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((xarg = atoi (optarg)) < 0 || xarg > 999)
 	  return eprint (1, "Maximum password age must be between 0 and 999.");
@@ -447,7 +464,7 @@ main (int argc, char **argv)
         break;
 
       case 'L':
-	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((Larg = atoi (optarg)) < 0 || Larg > LM20_PWLEN)
 	  return eprint (1, "Minimum password length must be between "
@@ -456,14 +473,44 @@ main (int argc, char **argv)
 
       case 'S':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt
-	    || copt || Copt || eopt || Eopt || popt || Popt)
+	    || copt || Copt || eopt || Eopt || popt || Popt || Ropt)
 	  usage (stderr, 1);
 	Sopt = 1;
         break;
 
+      case 'R':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt
+	    || copt || Copt || eopt || Eopt || popt || Popt || Sopt
+	    || server)
+	  usage (stderr, 1);
+	Ropt = 1;
+      	break;
+
       default:
         usage (stderr, 1);
       }
+
+  if (Ropt)
+    {
+      if (optind < argc)
+        usage (stderr, 1);
+      printf (
+"This functionality stores a password in the registry for usage by services\n"
+"which need to change the user context and require network access.  Typical\n"
+"applications are interactive remote logons using sshd, cron task, etc.\n"
+"This password will always tried first when any privileged application is\n"
+"about to switch the user context.\n\n"
+"Note that storing even obfuscated passwords in the registry is not overly\n"
+"secure.  Use this feature only if the machine is adequately locked down.\n"
+"Don't use this feature if you don't need network access within a remote\n"
+"session.  You can delete your stored password by specifying an empty password.\n\n");
+      strcpy (newpwd, getpass ("Enter your current password: "));
+      if (strcmp (newpwd, getpass ("Re-enter your current password: ")))
+        eprint (0, "Password is not identical.");
+      else if (cygwin_internal (CW_SET_PRIV_KEY, newpwd))
+	return eprint (0, "Storing password failed: %s", strerror (errno));
+      return 0;
+    }
 
   if (!server)
     {

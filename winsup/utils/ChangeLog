@@ -1,3 +1,12 @@
+2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (longopts): Add --reg-store-pwd option.
+	(opts): Add -R option.
+	(usage): Add text for -R/--reg-store-pwd option.
+	(main): Fix size of local user and password string arrays.
+	Handle -R option.
+	* utils.sgml: Add text for passwd -R/--reg-store-pwd option.
+
 2008-10-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in (ALL_LDFLAGS): Link libgcc statically for everything
