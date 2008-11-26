@@ -19,12 +19,14 @@ VPATH:=$(srcdir):$(libltp_srcdir)/lib
 target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
-prefix:=@prefix@
+
+DESTDIR=
+prefix:=${DESTDIR}@prefix@
 
 program_transform_name:=@program_transform_name@
-exec_prefix:=@exec_prefix@
-bindir:=@bindir@
-libdir:=@libdir@
+exec_prefix:=${DESTDIR}@exec_prefix@
+bindir:=${DESTDIR}@bindir@
+libdir:=${DESTDIR}@libdir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -34,9 +36,9 @@ endif
 else
 tooldir:=$(exec_prefix)/$(target_alias)
 endif
-datadir:=@datadir@
-infodir:=@infodir@
-includedir:=@includedir@
+datadir:=${DESTDIR}@datadir@
+infodir:=${DESTDIR}@infodir@
+includedir:=${DESTDIR}@includedir@
 
 TESTSUP_INCLUDES:=-I$(libltp_srcdir)/include
 

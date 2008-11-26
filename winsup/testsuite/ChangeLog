@@ -1,3 +1,7 @@
+2008-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Revert erroneous checkin.
+
 2006-07-23  Christopher Faylor  <cgf@timesys.com>
 
 	* Makefile.in: Update copyright.  Remove unused stuff.
