@@ -308,7 +308,7 @@ is_grp_member (gid_t grp, gid_t *grplist, int listsize)
  * This function mallocs the necessary buffer spcae by itself.  It
  * must be free'd by the calling function.
  */
-static void *
+void *
 get_token_info (HANDLE tok, TOKEN_INFORMATION_CLASS tic)
 {
   void *buf;

@@ -12,6 +12,12 @@ What is Cygserver?
   - XSI IPC Message Queues.
   - XSI IPC Semaphores.
   - XSI IPC Shared Memory.
+  - Allows non-privileged users to store obfuscated passwords in the
+    registry to be used for setuid(2) to create user tokens with network
+    credentials.  This service is used by `passwd -R'.  Using the stored
+    passwords in setuid(2) does not require running cygserver.  The
+    registry storage is the same as Windows uses to store passwords for
+    accounts running Windows services.
 
 
 Cygserver command line options:

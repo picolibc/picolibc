@@ -27,6 +27,7 @@ details. */
 #include "cygserver_msg.h"
 #include "cygserver_sem.h"
 #include "cygserver_shm.h"
+#include "cygserver_setpwd.h"
 
 #include "cygserver.h"
 #include "transport.h"
@@ -292,6 +293,9 @@ client_request::handle_request (transport_layer_base *const conn,
       break;
     case CYGSERVER_REQUEST_SHM:
       req = new client_request_shm;
+      break;
+    case CYGSERVER_REQUEST_SETPWD:
+      req = new client_request_setpwd;
       break;
     default:
       syscall_printf ("unknown request code %d received: request ignored",

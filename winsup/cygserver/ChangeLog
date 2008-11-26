@@ -1,3 +1,15 @@
+2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (OBJS): Add setpwd.o.
+	* README: Explain new service to store passwords in the LSA registry
+	area.
+	* bsd_helper.cc (get_token_info): Make externally available.
+	* bsd_helper.h (get_token_info): Declare.
+	* client.cc (client_request::handle_request): Add case for
+	CYGSERVER_REQUEST_SETPWD request.
+	* setpwd.cc: New file implementing the CYGSERVER_REQUEST_SETPWD
+	request.
+
 2008-10-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Use -static-libgcc when creating cygserver.exe.

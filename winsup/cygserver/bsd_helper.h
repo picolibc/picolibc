@@ -44,6 +44,7 @@ int win_copyout (struct thread *, const void *, void *, size_t);
 #define copyin(a,b,c) win_copyin((td),(a),(b),(c))
 #define copyout(a,b,c) win_copyout((td),(a),(b),(c))
 
+void *get_token_info (HANDLE, TOKEN_INFORMATION_CLASS);
 int ipcperm (struct thread *, struct ipc_perm *, unsigned int);
 int suser (struct thread *);
 bool adjust_identity_info (struct proc *p);
