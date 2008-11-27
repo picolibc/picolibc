@@ -1,3 +1,7 @@
+2008-11-27  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* configure.host (*-rtems*): Turn on using portion of unix subdirectory.
+
 2008-11-27  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/argz/argz_add.c:  Added #include <argz.h> to get function
