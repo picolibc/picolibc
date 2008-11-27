@@ -1,3 +1,8 @@
+2008-11-27  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
+
+	* cr16.h (R_CR16_GOT_REGREL20, R_CR16_GOTC_REGREL20 and
+	R_CR16_GLOB_DAT): New relocations.
+
 2008-11-25  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (R_CRIS_32_TPREL): Correct comment.
