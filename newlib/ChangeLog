@@ -1,3 +1,8 @@
+2008-11-27  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/posix/telldir.c: Use #if !defined() instead of #ifndef 
+	to fix GCC warning.
+
 2008-11-27  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/Makefile.am: Add spu-mcount.S spu-gmon.c.

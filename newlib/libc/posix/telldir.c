@@ -75,7 +75,7 @@ __LOCK_INIT(static, dd_hash_lock);
  * return a pointer into a directory
  */
 
-#ifndef _ELIX_LEVEL || _ELIX_LEVEL >= 2
+#if !defined(_ELIX_LEVEL) || (_ELIX_LEVEL >= 2)
 
 long
 _DEFUN(telldir, (dirp),
