@@ -158,7 +158,7 @@ build_tools="build-texinfo build-byacc build-flex build-bison build-m4 build-fix
 
 # these libraries are used by various programs built for the host environment
 #
-host_libs="intl mmalloc libiberty opcodes bfd readline tcl tk itcl libgui zlib libcpp libdecnumber gmp mpfr"
+host_libs="intl mmalloc libiberty opcodes bfd readline tcl tk itcl libgui zlib libcpp libdecnumber gmp mpfr ppl cloog"
 
 # these tools are built for the host environment
 # Note, the powerpc-eabi build depends on sim occurring before gdb in order to
@@ -895,8 +895,6 @@ case "${target}" in
     ;;
   sparc-*-solaris* | sparc64-*-solaris* | sparcv9-*-solaris*)
     ;;
-  spu-*-*)
-    ;;
   v810-*-*)
     noconfigdirs="$noconfigdirs bfd binutils gas gcc gdb ld target-libstdc++-v3 opcodes target-libgloss ${libgcj}"
     ;;
@@ -1270,11 +1268,11 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
   if test x"$have_gmp" = xyes; then
     saved_LIBS="$LIBS"
     LIBS="$LIBS $gmplibs"
-    dnl MPFR 2.2.1 is acceptable, but MPFR 2.3.0 is better.
+    dnl MPFR 2.3.0 is acceptable, but MPFR 2.3.2 is better.
     AC_MSG_CHECKING([for correct version of mpfr.h])
     AC_TRY_LINK([#include <gmp.h>
     #include <mpfr.h>],[
-    #if MPFR_VERSION < MPFR_VERSION_NUM(2,2,1)
+    #if MPFR_VERSION < MPFR_VERSION_NUM(2,3,0)
     choke me
     #endif
     mpfr_t n;
@@ -1287,7 +1285,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
     mpfr_subnormalize (x, t, GMP_RNDN);
     ], [AC_TRY_LINK([#include <gmp.h>
     #include <mpfr.h>],[
-    #if MPFR_VERSION < MPFR_VERSION_NUM(2,3,0)
+    #if MPFR_VERSION < MPFR_VERSION_NUM(2,3,2)
     choke me
     #endif
     mpfr_t n; mpfr_init(n);
@@ -1298,7 +1296,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
   CFLAGS="$saved_CFLAGS"
 
   if test x$have_gmp != xyes; then
-    AC_MSG_ERROR([Building GCC requires GMP 4.1+ and MPFR 2.3.0+.
+    AC_MSG_ERROR([Building GCC requires GMP 4.1+ and MPFR 2.3.2+.
 Try the --with-gmp and/or --with-mpfr options to specify their locations.
 Copies of these libraries' source code can be found at their respective
 hosting sites as well as at ftp://gcc.gnu.org/pub/gcc/infrastructure/.
@@ -1312,6 +1310,115 @@ fi
 # Flags needed for both GMP and/or MPFR
 AC_SUBST(gmplibs)
 AC_SUBST(gmpinc)
+
+
+# Check for PPL
+ppl_major_version=0
+ppl_minor_version=10
+ppllibs=
+pplinc=
+
+AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the installed PPL package
+                          Equivalent to --with-ppl-include=PATH/include
+                          plus --with-ppl-lib=PATH/lib])
+AC_ARG_WITH(ppl_include, [  --with-ppl-include=PATH Specify directory for installed PPL include files])
+AC_ARG_WITH(ppl_lib, [  --with-ppl-lib=PATH     Specify the directory for the installed PPL library])
+
+if test "x$with_ppl" != x; then
+  ppllibs="-L$with_ppl/lib -lppl_c -lppl -lgmpxx"
+  pplinc="-I$with_ppl/include $pplinc"
+  LIBS="$ppllibs $LIBS"
+fi
+if test "x$with_ppl_include" != x; then
+  pplinc="-I$with_ppl_include $pplinc"
+fi
+if test "x$with_ppl_lib" != x; then
+  ppllibs="-L$with_ppl_lib -lppl_c -lppl -lgmpxx"
+  LIBS="$ppllibs $LIBS"
+fi
+if test "x$with_ppl$with_ppl_include$with_ppl_lib" = x && test -d ${srcdir}/ppl; then
+  ppllibs='-L$$r/$(HOST_SUBDIR)/ppl/.libs -L$$r/$(HOST_SUBDIR)/ppl/_libs -lppl_c -lppl -lgmpxx '
+  pplinc='-I$$r/$(HOST_SUBDIR)/ppl/include -I$$s/ppl/include '
+  LIBS="$ppllibs $LIBS"
+fi
+
+AC_ARG_ENABLE(ppl-version-check,
+[  --disable-ppl-version-check    disable check for PPL version],
+ENABLE_PPL_CHECK=$enableval,
+ENABLE_PPL_CHECK=yes)
+
+if test "${ENABLE_PPL_CHECK}" = "yes"; then
+  saved_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS $pplinc $gmpinc"
+  AC_MSG_CHECKING([for version $ppl_major_version.$ppl_minor_version of PPL])
+  AC_TRY_COMPILE([#include "ppl_c.h"],[
+  #if PPL_VERSION_MAJOR != $ppl_major_version || PPL_VERSION_MINOR != $ppl_minor_version
+  choke me
+  #endif
+  ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); ppllibs= ; pplinc= ])
+  CFLAGS="$saved_CFLAGS"
+fi
+
+# Flags needed for PPL
+AC_SUBST(ppllibs)
+AC_SUBST(pplinc)
+
+
+# Check for CLOOG
+clooglibs=" -lcloog "
+clooginc=" -DCLOOG_PPL_BACKEND "
+
+AC_ARG_WITH(cloog, [  --with-cloog=PATH       Specify prefix directory for the installed CLooG-PPL package
+                          Equivalent to --with-cloog-include=PATH/include
+                          plus --with-cloog-lib=PATH/lib])
+AC_ARG_WITH(cloog_include, [  --with-cloog-include=PATH Specify directory for installed CLooG include files])
+AC_ARG_WITH(cloog_lib, [  --with-cloog-lib=PATH   Specify the directory for the installed CLooG library])
+AC_ARG_WITH(cloog-polylib, [  --with-cloog-polylib=PATH Specify prefix directory for the installed CLooG-PolyLib package])
+
+if test "x$with_cloog" != x; then
+  clooglibs="-L$with_cloog/lib -lcloog"
+  clooginc="-I$with_cloog/include -DCLOOG_PPL_BACKEND "
+  LIBS="$clooglibs $LIBS"
+fi
+if test "x$with_cloog_polylib" != x; then
+  clooglibs="-L$with_cloog/lib -lcloog"
+  clooginc="-I$with_cloog/include "
+  LIBS="$clooglibs $LIBS"
+fi
+if test "x$with_cloog_include" != x; then
+  clooginc="-I$with_cloog_include -DCLOOG_PPL_BACKEND "
+fi
+if test "x$with_cloog_lib" != x; then
+  clooglibs="-L$with_cloog_lib -lcloog"
+  LIBS="$clooglibs $LIBS"
+fi
+if test "x$with_cloog$with_cloog_include$with_cloog_lib" = x && test -d ${srcdir}/cloog; then
+  clooglibs='-L$$r/$(HOST_SUBDIR)/cloog/.libs -L$$r/$(HOST_SUBDIR)/cloog/_libs -lcloog '
+  clooginc='-I$$r/$(HOST_SUBDIR)/cloog/include -I$$s/cloog/include -DCLOOG_PPL_BACKEND '
+  LIBS="$clooglibs $LIBS"
+fi
+
+AC_ARG_ENABLE(cloog-version-check,
+[  --disable-cloog-version-check  disable check for CLooG version],
+ENABLE_CLOOG_CHECK=$enableval,
+ENABLE_CLOOG_CHECK=yes)
+
+if test "${ENABLE_CLOOG_CHECK}" = "yes"; then
+  saved_CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS $clooginc $gmpinc $pplinc"
+  AC_MSG_CHECKING([for correct version of CLooG])
+  AC_TRY_COMPILE([#include "cloog/cloog.h"],[
+  #if CLOOG_VERSION_MAJOR != 0 || CLOOG_VERSION_MINOR != 15
+  choke me
+  #endif
+  ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); clooglibs= ; clooginc= ])
+  CFLAGS="$saved_CFLAGS"
+fi
+
+# Flags needed for CLOOG
+AC_SUBST(clooglibs)
+AC_SUBST(clooginc)
+
 
 # By default, C is the only stage 1 language.
 stage1_languages=,c,
@@ -2062,6 +2169,8 @@ case "${host}" in
 esac
 
 # On systems where the dynamic library environment variable is PATH,
+# gcc/ will put dynamic libraries into a subdirectory to avoid adding
+# built executables to PATH.
 if test "$RPATH_ENVVAR" = PATH; then
   GCC_SHLIB_SUBDIR=/shlib
 else

@@ -1,3 +1,72 @@
+2008-11-27  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from GCC:
+
+	2007-12-02  Matthias Klose  <doko@ubuntu.com>
+
+	* config-ml.in: Remove 64bit configure tests.
+
+	2008-05-14  Rafael Espindola  <espindola@google.com>
+
+	* config-ml.in: don't handle --enable-shared and --enable-static.
+
+	2008-09-02  Sebastian Pop  <sebastian.pop@amd.com>
+	    Tobias Grosser  <grosser@fim.uni-passau.de>
+	    Jan Sjodin  <jan.sjodin@amd.com>
+	    Harsha Jagasia  <harsha.jagasia@amd.com>
+	    Dwarakanath Rajagopal  <dwarak.rajagopal@amd.com>
+	    Konrad Trifunovic  <konrad.trifunovic@inria.fr>
+	    Adrien Eliche  <aeliche@isty.uvsq.fr>
+
+	Merge from graphite branch.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+	* configure.ac (host_libs): Add ppl and cloog.
+	Add checks for PPL and CLooG.
+	* Makefile.def (ppl, cloog): Added modules and dependences.
+	* Makefile.tpl (PPLLIBS, PPLINC, CLOOGLIBS, CLOOGINC): New.
+	(HOST_PPLLIBS, HOST_PPLINC, HOST_CLOOGLIBS, HOST_CLOOGINC): New.
+
+	2008-09-03  Richard Guenther  <rguenther@suse.de>
+
+	* configure.ac: Always pass -DCLOOG_PPL_BACKEND to the
+	cloog test.
+	* configure: Re-generate.
+
+	2008-09-03  Sebastian Pop  <sebastian.pop@amd.com>
+
+	* configure.ac (--with-cloog-polylib): New.
+	(--disable-cloog-version-check): New.
+	(--disable-ppl-version-check): New.
+	* configure: Re-generate.
+
+	2008-09-05  Richard Guenther  <rguenther@suse.de>
+
+	* configure.ac: Initialize clooglibs to -lcloog.
+	* configure: Re-generate.
+
+	2008-10-13  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* configure.ac (MPFR check): Bump minimum version to 2.3.0 and
+	recommended version to 2.3.2.
+
+	* configure: Regenerate.
+
+	2008-10-31  Ben Elliston  <bje@au.ibm.com>
+
+	* configure.ac (spu-*-*): Remove special case.
+	* configure: Regenerate.
+
+	Complete comment text from GCC version of:
+
+	2008-08-31  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
+
+	* configure.ac (RPATH_ENVVAR): Use PATH on Windows.
+	(GCC_SHLIB_SUBDIR): New.
+	* Makefile.tpl (HOST_LIB_PATH_gcc): Use GCC_SHLIB_SUBDIR.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+
 2008-11-27  Tristan Gingold  <gingold@adacore.com>
 
 	* configure.ac: Build gdb for i?86-*-darwin*
