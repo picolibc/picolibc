@@ -1,3 +1,10 @@
+2008-11-27  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/Makefile.am: Add spu-mcount.S spu-gmon.c.
+	* libc/machine/spu/Makefile.in: Regenerated.
+	* libc/machine/spu/spu-gmon.c: New file.
+	* libc/machine/spu/spu-mcount.S: New file.
+
 2008-11-27  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* configure.host (*-rtems*): Turn on using portion of unix subdirectory.

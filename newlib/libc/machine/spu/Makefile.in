@@ -41,7 +41,8 @@ host_triplet = @host@
 @HAVE_SPU_EA_TRUE@	munmap_ea.c posix_memalign_ea.c realloc_ea.c strcat_ea.c strchr_ea.c \
 @HAVE_SPU_EA_TRUE@	strcmp_ea.c strcpy_ea.c strcspn_ea.c strlen_ea.c strncat_ea.c strncmp_ea.c \
 @HAVE_SPU_EA_TRUE@	strncpy_ea.c strpbrk_ea.c strrchr_ea.c strspn_ea.c strstr_ea.c read_ea.c \
-@HAVE_SPU_EA_TRUE@	pread_ea.c readv_ea.c write_ea.c pwrite_ea.c writev_ea.c
+@HAVE_SPU_EA_TRUE@	pread_ea.c readv_ea.c write_ea.c pwrite_ea.c writev_ea.c spu-mcount.S \
+@HAVE_SPU_EA_TRUE@	spu-gmon.c
 
 DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../config.sub $(srcdir)/Makefile.in \
@@ -102,7 +103,7 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -149,7 +150,9 @@ lib_a_LIBADD =
 @HAVE_SPU_EA_TRUE@	lib_a-readv_ea.$(OBJEXT) \
 @HAVE_SPU_EA_TRUE@	lib_a-write_ea.$(OBJEXT) \
 @HAVE_SPU_EA_TRUE@	lib_a-pwrite_ea.$(OBJEXT) \
-@HAVE_SPU_EA_TRUE@	lib_a-writev_ea.$(OBJEXT)
+@HAVE_SPU_EA_TRUE@	lib_a-writev_ea.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-spu-mcount.$(OBJEXT) \
+@HAVE_SPU_EA_TRUE@	lib_a-spu-gmon.$(OBJEXT)
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-clearerr.$(OBJEXT) lib_a-creat.$(OBJEXT) \
 	lib_a-fclose.$(OBJEXT) lib_a-feof.$(OBJEXT) \
@@ -505,6 +508,12 @@ lib_a-spu_timer_flih.o: spu_timer_flih.S
 
 lib_a-spu_timer_flih.obj: spu_timer_flih.S
 	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu_timer_flih.obj `if test -f 'spu_timer_flih.S'; then $(CYGPATH_W) 'spu_timer_flih.S'; else $(CYGPATH_W) '$(srcdir)/spu_timer_flih.S'; fi`
+
+lib_a-spu-mcount.o: spu-mcount.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu-mcount.o `test -f 'spu-mcount.S' || echo '$(srcdir)/'`spu-mcount.S
+
+lib_a-spu-mcount.obj: spu-mcount.S
+	$(CCAS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-spu-mcount.obj `if test -f 'spu-mcount.S'; then $(CYGPATH_W) 'spu-mcount.S'; else $(CYGPATH_W) '$(srcdir)/spu-mcount.S'; fi`
 
 .c.o:
 	$(COMPILE) -c $<
@@ -1177,6 +1186,12 @@ lib_a-writev_ea.o: writev_ea.c
 
 lib_a-writev_ea.obj: writev_ea.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-writev_ea.obj `if test -f 'writev_ea.c'; then $(CYGPATH_W) 'writev_ea.c'; else $(CYGPATH_W) '$(srcdir)/writev_ea.c'; fi`
+
+lib_a-spu-gmon.o: spu-gmon.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu-gmon.o `test -f 'spu-gmon.c' || echo '$(srcdir)/'`spu-gmon.c
+
+lib_a-spu-gmon.obj: spu-gmon.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu-gmon.obj `if test -f 'spu-gmon.c'; then $(CYGPATH_W) 'spu-gmon.c'; else $(CYGPATH_W) '$(srcdir)/spu-gmon.c'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
