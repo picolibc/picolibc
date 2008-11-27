@@ -1,3 +1,20 @@
+2008-11-27  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/argz/argz_add.c:  Added #include <argz.h> to get function
+	prototypes.
+	* libc/argz/argz_append.c: Ditto.
+	* libc/argz/argz_count.c: Ditto.
+	* libc/argz/argz_create.c: Ditto.
+	* libc/argz/argz_create_sep.c: Ditto.
+	* libc/argz/argz_delete.c: Ditto.
+	* libc/argz/argz_next.c: Ditto.
+	* libc/argz/argz_stringify.c: Ditto
+	* libc/stdlib/strtod.c: Added #include <stdlib.h> to get function
+	prototypes.
+	* libc/stdlib/wcstoul.c: Added #include <wchar.h> to get function
+	prototypes, corrected traditional usage comment.
+	* libc/include/wchar.h: Added _mbsrtowcs_r() prototype.
+
 2008-11-26 Ken Werner <ken.werner@de.ibm.com>
 
 	* libm/machine/spu/headers/acosd2.h: Rebase against current simdmath.

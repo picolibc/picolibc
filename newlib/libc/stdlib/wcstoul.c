@@ -16,7 +16,7 @@ ANSI_SYNOPSIS
                               wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
-	#include <stdlib.h>
+	#include <wchar.h>
         unsigned long wcstoul(<[s]>, <[ptr]>, <[base]>)
         wchar_t *<[s]>;
         wchar_t **<[ptr]>;
@@ -121,6 +121,7 @@ PORTABILITY
 #include <_ansi.h>
 #include <limits.h>
 #include <wctype.h>
+#include <wchar.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>

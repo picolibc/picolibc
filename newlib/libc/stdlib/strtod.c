@@ -112,6 +112,7 @@ THIS SOFTWARE.
 
 #include <_ansi.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
