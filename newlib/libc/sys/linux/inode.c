@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/utime.h>
-#include <linux/dirent.h>
+#include <dirent.h>
 #include <machine/syscall.h>
 
 #define _LIBC 1

@@ -64,5 +64,6 @@ weak_alias(__libc_open64,open64);
 weak_alias(__libc_open64,_open64);
 weak_alias(__libc_open64,__open64);
 weak_alias(__libc_fstat64,_fstat64);
+weak_alias(__libc_stat64,_stat64);
 
 
