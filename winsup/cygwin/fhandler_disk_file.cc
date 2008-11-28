@@ -1677,6 +1677,20 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       dir->__flags &= ~dirent_set_d_ino;
     }
 
+  /* Set d_type if type can be determined from file attributes.
+     FILE_ATTRIBUTE_SYSTEM ommitted to leave DT_UNKNOWN for old symlinks.
+     For new symlinks, d_type will be reset to DT_UNKNOWN below.  */
+  if (attr &&
+      !(attr & (  ~FILE_ATTRIBUTE_VALID_FLAGS
+		| FILE_ATTRIBUTE_SYSTEM
+		| FILE_ATTRIBUTE_REPARSE_POINT)))
+    {
+      if (attr & FILE_ATTRIBUTE_DIRECTORY)
+	de->d_type = DT_DIR;
+      else
+	de->d_type = DT_REG;
+    }
+
   /* Check for directory reparse point.  These are potential volume mount
      points which have another inode than the underlying directory. */
   if ((attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
@@ -1728,7 +1742,10 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	    }
 	  path_conv fpath (&fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink () || fpath.is_fs_special ())
-	    fname->Length -= 4 * sizeof (WCHAR);
+	    {
+	      fname->Length -= 4 * sizeof (WCHAR);
+	      de->d_type = DT_UNKNOWN;
+	    }
 	}
     }
 

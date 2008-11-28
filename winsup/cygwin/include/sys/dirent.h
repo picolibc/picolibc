@@ -18,11 +18,13 @@
 
 #pragma pack(push,4)
 #if defined(__INSIDE_CYGWIN__) || defined (__CYGWIN_USE_BIG_TYPES__)
+#define _DIRENT_HAVE_D_TYPE
 struct dirent
 {
   long __d_version;			/* Used internally */
   __ino64_t d_ino;
-  __uint32_t __d_unused1;
+  unsigned char d_type;
+  unsigned char __d_unused1[3];
   __uint32_t __d_internal1;
   char d_name[NAME_MAX + 1];
 };
@@ -77,7 +79,7 @@ int scandir (const char *__dir,
 	     int (*compar) (const struct dirent **, const struct dirent **));
 
 int alphasort (const struct dirent **__a, const struct dirent **__b);
-#if 0  /* these make no sense in the absence of d_type */
+#ifdef _DIRENT_HAVE_D_TYPE
 /* File types for `d_type'.  */
 enum
 {
@@ -104,6 +106,6 @@ enum
 /* Convert between stat structure types and directory types.  */
 # define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
-#endif /* #if 0 */
+#endif /* _DIRENT_HAVE_D_TYPE */
 #endif /* _POSIX_SOURCE */
 #endif /*_SYS_DIRENT_H*/

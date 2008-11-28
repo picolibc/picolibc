@@ -93,6 +93,9 @@ readdir_worker (DIR *dir, dirent *de)
     }
 
   de->d_ino = 0;
+  de->d_type = DT_UNKNOWN;
+  memset (&de->__d_unused1, 0, sizeof (de->__d_unused1));
+
   int res = ((fhandler_base *) dir->__fh)->readdir (dir, de);
 
   if (res == ENMFILE)

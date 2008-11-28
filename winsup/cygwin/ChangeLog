@@ -1,3 +1,12 @@
+2008-11-28  Christian Franke  <franke@computer.org>
+
+	* dir.cc (readdir_worker): Initialize dirent.d_type and __d_unused1.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper):
+	Set dirent.d_type based on FILE_ATTRIBUTE_*.
+	* include/sys/dirent.h: Define _DIRENT_HAVE_D_TYPE (enables DT_*
+	declarations).
+	(struct dirent): Add d_type. Adjust __d_unused1 size to preserve layout.
+
 2008-11-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* exceptions.cc (sigpacket::process): Make sure that 'tls' is never
