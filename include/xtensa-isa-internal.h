@@ -1,5 +1,5 @@
 /* Internal definitions for configurable Xtensa ISA support.
-   Copyright 2003, 2004, 2005 Free Software Foundation, Inc.
+   Copyright 2003, 2004, 2005, 2008 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -15,7 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301,
+   USA.  */
 
 #ifndef XTENSA_ISA_INTERNAL_H
 #define XTENSA_ISA_INTERNAL_H
@@ -33,6 +34,7 @@
 #define XTENSA_OPCODE_IS_CALL		0x00000008
 
 #define XTENSA_STATE_IS_EXPORTED	0x00000001
+#define XTENSA_STATE_IS_SHARED_OR	0x00000002
 
 #define XTENSA_INTERFACE_HAS_SIDE_EFFECT 0x00000001
 
