@@ -1191,20 +1191,22 @@ sigpacket::process ()
   else
     handler = NULL;
 
+  bool tls_was_null = !tls;
+  if (tls_was_null)
+    tls = _main_tls;
+
   if (si.si_signo == SIGKILL)
     goto exit_sig;
   if (si.si_signo == SIGSTOP)
     {
       sig_clear (SIGCONT);
-      if (!tls)
-	tls = _main_tls;
       goto stop;
     }
 
   bool insigwait_mask;
   if ((masked = ISSTATE (myself, PID_STOPPED)))
     insigwait_mask = false;
-  else if (!tls)
+  else if (tls_was_null)
     insigwait_mask = !handler && (tls = _cygtls::find_tls (si.si_signo));
   else
     insigwait_mask = sigismember (&tls->sigwait_mask, si.si_signo);
@@ -1216,11 +1218,8 @@ sigpacket::process ()
     /* nothing to do */;
   else if (sigismember (mask, si.si_signo))
     masked = true;
-  else if (tls)
+  else
     masked  = sigismember (&tls->sigmask, si.si_signo);
-
-  if (!tls)
-    tls = _main_tls;
 
   if (masked)
     {

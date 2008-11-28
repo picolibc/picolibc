@@ -1,3 +1,8 @@
+2008-11-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Make sure that 'tls' is never
+	NULL when used.
+
 2008-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Remove unneeded whitespace throughout.
@@ -207,7 +212,7 @@
 2008-10-06  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::initialized): Remove bogus stack check which would
-	when checking the current thread from the current thread.
+	crash when checking the current thread from the current thread.
 	* tlsoffsets.h: Regenerate.
 
 2008-10-05  Christopher Faylor  <me+cygwin@cgf.cx>
