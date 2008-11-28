@@ -1191,9 +1191,7 @@ sigpacket::process ()
   else
     handler = NULL;
 
-  bool tls_was_null = !tls;
-  if (tls_was_null)
-    tls = _main_tls;
+  _cygtls *use_tls = tls ?: _main_tls;
 
   if (si.si_signo == SIGKILL)
     goto exit_sig;
@@ -1206,10 +1204,14 @@ sigpacket::process ()
   bool insigwait_mask;
   if ((masked = ISSTATE (myself, PID_STOPPED)))
     insigwait_mask = false;
-  else if (tls_was_null)
-    insigwait_mask = !handler && (tls = _cygtls::find_tls (si.si_signo));
-  else
+  else if (tls)
     insigwait_mask = sigismember (&tls->sigwait_mask, si.si_signo);
+  else
+    {
+      insigwait_mask = !handler && (tls = _cygtls::find_tls (si.si_signo));
+      if (tls)
+	use_tls = tls;
+    }
 
   if (insigwait_mask)
     goto thread_specific;
@@ -1218,7 +1220,7 @@ sigpacket::process ()
     /* nothing to do */;
   else if (sigismember (mask, si.si_signo))
     masked = true;
-  else
+  else if (tls)
     masked  = sigismember (&tls->sigmask, si.si_signo);
 
   if (masked)
@@ -1269,7 +1271,7 @@ sigpacket::process ()
   if (handler == (void *) SIG_ERR)
     goto exit_sig;
 
-  tls->set_siginfo (this);
+  use_tls->set_siginfo (this);
   goto dosig;
 
 stop:
@@ -1282,7 +1284,7 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", si.si_signo, handler);
-  rc = setup_handler (si.si_signo, handler, thissig, tls);
+  rc = setup_handler (si.si_signo, handler, thissig, use_tls);
 
 done:
   if (continue_now)
@@ -1291,10 +1293,10 @@ done:
   return rc;
 
 thread_specific:
-  tls->sig = si.si_signo;
-  tls->set_siginfo (this);
+  use_tls->sig = si.si_signo;
+  use_tls->set_siginfo (this);
   sigproc_printf ("releasing sigwait for thread");
-  SetEvent (tls->event);
+  SetEvent (use_tls->event);
   goto done;
 
 exit_sig:
@@ -1303,11 +1305,11 @@ exit_sig:
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
-      tls->copy_context (&c);
+      use_tls->copy_context (&c);
       si.si_signo |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
-  tls->signal_exit (si.si_signo);	/* never returns */
+  use_tls->signal_exit (si.si_signo);	/* never returns */
 }
 
 /* Cover function to `do_exit' to handle exiting even in presence of more

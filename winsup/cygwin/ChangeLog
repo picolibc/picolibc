@@ -1,3 +1,8 @@
+2008-11-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Rework previous change.  tls
+	could still become NULL.
+
 2008-11-28  Christian Franke  <franke@computer.org>
 
 	* dir.cc (readdir_worker): Initialize dirent.d_type and __d_unused1.
