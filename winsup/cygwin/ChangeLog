@@ -1,5 +1,10 @@
 2008-11-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* exceptions.c (sigpacket::process): Set tls on return since it is
+	assumed to be set to a valid value by the caller.
+
+2008-11-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* include/cygwin/version.h: Bump api minor number to 189 to flag the
 	implementation of dirent.d_type.
 

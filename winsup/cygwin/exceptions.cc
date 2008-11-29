@@ -1287,6 +1287,7 @@ dosig:
   rc = setup_handler (si.si_signo, handler, thissig, use_tls);
 
 done:
+  tls = use_tls;
   if (continue_now)
     SetEvent (sigCONT);
   sigproc_printf ("returning %d", rc);
