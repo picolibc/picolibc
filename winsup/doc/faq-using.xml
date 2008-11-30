@@ -357,7 +357,7 @@ to determine whether they are executable.
 <question><para>How do I print under Cygwin?</para></question>
 <answer>
 
-<para>There is no working lp or lpr system as you would find on UNIX.
+<para>lpr is available in the <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink> cygutils package.  Some <ulink url="http://cygwin.com/ml/cygwin/2008-05/msg00123.html">usage hints</ulink> are available courtesy of Rodrigo Medina.
 </para>
 <para>Jason Tishler has written a couple of messages that explain how to use
 a2ps (for nicely formatted text in PostScript) and ghostscript (to print

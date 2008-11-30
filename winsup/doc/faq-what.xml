@@ -113,46 +113,13 @@ in the Cygwin User's Guide.
 
 <para><emphasis role='bold'>(Please note that if you have cygwin-specific questions, all of these people will appreciate it if you use the cygwin mailing lists rather than sending personal email.)</emphasis>
 </para>
-<para>Chris Faylor is behind many of the recent changes in Cygwin.  Prior to
-joining Cygnus, he contributed significant fixes to the process control
-and environ code, reworked the strace mechanism, and rewrote the
-signal-related code from scratch as a Net contributor.  In addition to
-continuing to make technical contributions, Chris is also currently the
-group's manager.
-</para>
+<para>Chris Faylor provided the Cygwin signal handler code.  He also maintains
+the <ulink url='http://sourceware.org'>sourceware site</ulink> where the
+cygwin project lives.</para>
 <para>Corinna Vinschen has contributed several useful fixes to the path
 handling code, console support, improved security handling, and raw
 device support.  Corinna is currently employed by Red Hat as a
 GDB/Cygwin engineer.
-</para>
-<para>DJ Delorie has done important work in profiling Cygwin,
-worked on the Dejagnu automated testing framework, merged the dlltool
-functionality into ld, wrote a good deal of the Cygwin Users' Guide,
-authored the cygcheck utility, and made automated snapshots available
-from our project WWW page.  DJ is currently employed by Red Hat as
-a GCC engineer.
-</para>
-<para>Egor Duda has contributed many useful fixes.  He is responsible for
-Cygwin's ability to start a debugger on detection of a fatal error
-as well as produce core dumps.
-</para>
-<para>Robert Collins has contributed many improvements to thread handling
-as well as generic fixes to cygwin itself.
-</para>
-<para>Kazuhiro Fujieda has contributed many bug fixes and bug reports.
-</para>
-<para>Earnie Boyd has contributed many bug fixes and is the mingw and w32api
-maintainer.
-</para>
-<para>David Starks-Browning is our dedicated FAQ maintainer.
-</para>
-<para>Geoffrey Noer took over the Cygwin project from its initial author Steve
-Chamberlain in mid-1996.  As maintainer, he produced Net releases beta
-16 through 20; made the development snapshots; worked with Net
-contributors to fix bugs; made many various code improvements himself;
-wrote a paper on Cygwin for the 1998 Usenix NT Symposium; authored the
-project WWW pages, FAQ, README; etc.  Geoffrey is not currently employed
-by Red Hat.
 </para>
 <para>Steve Chamberlain designed and implemented
 Cygwin in 1995-1996 while working for Cygnus.  He worked with the Net
@@ -160,19 +127,11 @@ to improve the technology, ported/integrated many of the user tools
 for the first time to Cygwin, and produced all of the releases up to
 beta 14.  Steve is not currently employed by Red Hat.
 </para>
-<para>Marco Fuykschot and Peter Boncz of Data Distilleries contributed nearly
-all of the changes required to make Cygwin thread-safe.  They also
-provided the pthreads interface.
-</para>
 <para>Sergey Okhapkin has been an invaluable Net contributor.  He implemented
 the tty/pty support, has played a significant role in revamping signal
 and exception handling, and has made countless contributions throughout
 the library.  He also provided binaries of the development snapshots to
 the Net after the beta 19 release.
-</para>
-<para>Mumit Khan has been most helpful on the EGCS end of things, providing
-quite a large number of stabilizing patches to the compiler tools for
-the B20 release.
 </para>
 <para>Philippe Giacinti contributed the implementation of dlopen, dlclose,
 dlsym, dlfork, and dlerror in Cygwin.

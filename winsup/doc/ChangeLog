@@ -1,3 +1,8 @@
+2008-11-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* faq-using.xml: Remove assertion that lpr doesn't exit.
+	* faq-what.xml: Remove ancient who's who data.
+
 2008-11-25  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* overview2.sgml: Reorganize and make minor wording changes.
