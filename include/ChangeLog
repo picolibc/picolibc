@@ -1,3 +1,7 @@
+2008-12-01  Cary Coutant  <ccoutant@google.com>
+
+	* plugin-api.h: Fix syntax error when compiling with C++.
+
 2008-11-26  Alan Modra  <amodra@bigpond.net.au>
 
 	PR 7047
