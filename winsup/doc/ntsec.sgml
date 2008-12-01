@@ -1,23 +1,32 @@
-<sect1 id="ntsec"><title>NT security</title>
+<sect1 id="ntsec"><title>Using Windows security in Cygwin</title>
 
-<para>The setting of POSIX like object permissions is controlled by the 
-<link linkend="mount-table">mount option</link> <literal>(no)acl</literal>
-which is set to <literal>acl</literal> by default.  The design goal
-is to utilize the Windows access control API to implement real POSIX
-permissions.</para>
+<para>This paragraph discusses how the Windows security model is
+utilized in Cygwin to implement POSIX-like permissions, as well as how
+the authentication model is used to allow to switch the user context in
+a POSIX-like fashion.</para>
+
+<para>The setting of POSIX like file and directory permissions is
+controlled by the <link linkend="mount-table">mount option</link>
+<literal>(no)acl</literal> which is set to <literal>acl</literal> by
+default.</para>
 
 <para>We start with a short overview.  Note that this overview must
 be necessarily short.  If you want to learn more about the Windows security
 model, see the <ulink url="http://msdn.microsoft.com/en-us/library/aa374860(VS.85).aspx">Access Control</ulink> article in MSDN documentation.</para>
 
-<sect2 id="ntsec-common"><title>NT security</title>
+<para>The POSIX security model is not discussed here, but assumed to be
+understood by the reader.  If you don't know the POSIX security model,
+search the web for beginner documentation.</para>
 
-<para>In the NT security model, almost any "object" is securable.
+<sect2 id="ntsec-common"><title>Overview</title>
+
+<para>In the Windows security model, almost any "object" is securable.
 "Objects" are files, processes, threads, semaphores, etc.</para>
 
-<para>Every object has a data structure called "security descriptor" (SD)
-attached.  The SD contains all information necessary to control who can
-how access an object.  The SD of an object consists of five parts:</para>
+<para>Every object has a data structure attached, called a "security
+descriptor" (SD).  The SD contains all information necessary to control
+who can how access an object.  The SD of an object consists of five
+parts:</para>
 
 <itemizedlist spacing="compact">
 <listitem><para>Flags which control several aspects of this SD. This is
@@ -26,9 +35,8 @@ not discussed here.</para></listitem>
 <listitem><para>The SID of the object owner group.</para></listitem>
 <listitem><para>A list of "Access Control Entries" (ACE), called the
 "Discretionary Access Control List" (DACL).</para></listitem>
-<listitem><para>Another list of ACEs, called the
-"Security Access Control List" (SACL), which doesn't matter for our
-purpose.</para></listitem>
+<listitem><para>Another list of ACEs, called the "Security Access Control List"
+(SACL), which doesn't matter for our purpose.  We ignore it here.</para></listitem>
 </itemizedlist>
 
 <para>Every ACE contains a so-called "Security IDentifier" (SID) and
@@ -182,7 +190,9 @@ results in denying the specific permission bits.</para>
 POSIX.  For example, the permission to delete an object is different
 from the permission to change object data, and even changing object data
 can be separated into different permission bits for different kind of
-data.</para>
+data.  But there's a problem with the definition of a "correct" ACL
+which disallows to map certain POSIX permissions cleanly.  See
+<xref linkend="ntsec-mapping"></xref>.</para>
 
 </sect2>
 
@@ -194,7 +204,7 @@ Basically this is done by defining a SD with the matching owner and group
 SIDs, and a DACL which contains ACEs for the owner, the group and for
 "Everyone", which represents what POSIX calls "others".</para>
 
-<para>To use NT security correctly, Cygwin depends on the files
+<para>To use Windows security correctly, Cygwin depends on the files
 <filename>/etc/passwd</filename> and <filename>/etc/group</filename>.
 These files define the traslation between the Cygwin uid/gid and the
 Windows SID.  The SID is stored in the pw_gecos field in
@@ -278,192 +288,72 @@ root:S-1-5-32-544:544:
 in <filename>/etc/passwd</filename>.  The only requirement is that the user
 is actually a member of the new primary group in Windows.  For instance,
 normal users in a domain environment are members in the group "Domain Users",
-which in turn is member of the well-known group "Users".  Additionally let's
-assume the user is also a member of the newly created group .  The default
-primary group for users is 
+which in turn is member of the well-known group "Users".  So, if it's
+more feasible in your environment that the user's primary group is
+"Users", just set the user's primary group in <filename>/etc/passwd</filename>
+to the Cygwin uid of "Users" (see in <filename>/etc/group</filename>,
+default 545).</para>
 
-<!-- TODO: The rest of the file... -->
-
-</para>
-
-<para>As you can see, I changed my primary group membership from 513 (None)
-to 547 (powerusers).  So all files I created inside of Cygwin were now owned
-by the powerusers group instead of None.  This is the way I liked it.</para>
-
-<para>Groups may be mentioned in the passwd file, too. This has two
-advantages:</para>
-
-<itemizedlist spacing="compact">
-<listitem><para>Because NT assigns them to files as owners, a
-<command>ls -l</command> is often more readable.</para></listitem>
-<listitem><para>Moreover it's possible to assigned them to files as
-owners with Cygwin's <command>chown</command>.</para></listitem>
-</itemizedlist>
-
-<para>The group `system' is the aforementioned synonym for the operating system
-itself and is normally the owner of processes that are started through
-service manager. The same is true for files that are created by
-processes, which are started through service manager.</para>
+<para>However, here's a WARNING: If you want to do similar changes to
+your files, please do that only if you're feeling comfortably with the
+concepts.  Otherwise don't be surprised if some stuff doesn't work
+anymore.  If you screwed up things, revert to <filename>/etc/passwd</filename>
+and <filename>/etc/group</filename> files created by mkpasswd
+and mkgroup.  Especially don't change the UID or the name of user
+SYSTEM.  Even if that works mostly, some Cygwin applications running as
+local service under that account could suddenly start behaving
+strangely.</para>
 
 </sect2>
 
-<sect2 id="ntsec-sids"><title id="ntsec-sids.title">NT SIDs in Cygwin</title>
+<sect2 id="ntsec-mapping"><title id="ntsec-mapping.title">The POSIX permission mapping leak</title>
 
-<para>This has the following advantages:</para>
+<para>As promised earlier, here's the problem when trying to map the
+POSIX permission model on the Windows permission model.</para>
+
+<para>There's a leak in the definition of a "correct" ACL which
+disallows a certain POSIX permission setting.  The official
+documentation explains in short the following:</para>
+
 <itemizedlist spacing="compact">
-<listitem><para>ntsec works better in domain environments.</para></listitem>
-<listitem><para>Accounts (users and groups) may get another name in
-Cygwin than their NT account name. The name in <filename>/etc/passwd</filename>
-or <filename>/etc/group</filename> is transparently used by Cygwin
-applications (e.g. <command>chown</command>, <command>chmod</command>,
-<command>ls</command>):</para>
+<listitem><para>The requested permissions are checked against all
+ACEs of the user as well as all groups the user is member of.  The
+permissions given in these user and groups access allowed ACEs are
+accumulated and the resulting set is the set of permissions of that
+user.</para></listitem>
 
-<screen>
-root::500:513::/home/root:/bin/sh
-</screen>
+<listitem><para>The order of ACEs is important. The system reads them in
+sequence until either any single requested permission is denied or all
+requested permissions are granted.  Reading stops when this condition is
+met.  Later ACEs are not taken into account.</para></listitem>
 
-<para>instead of</para>
+<listitem><para>All access denied ACEs _should_ precede any access
+allowed ACE.  ACLs following this rule are called "canonical"</para></listitem>
 
-<screen>
-adminstrator::500:513::/home/root:/bin/sh
-</screen>
-
-<para>Caution: If you like to use the account as login account via
-<command>telnet</command> etc. you have to remain the name unchanged or
-you have to use the special version of <command>login</command> which is
-part of the standard Cygwin distribution since 1.1.</para></listitem>
-<listitem><para>Cygwin UIDs and GIDs are now not necessarily the RID
-part of the NT SID:</para>
-
-<screen>
-root::0:513:S-1-5-21-54355234-56236534-345635656-500:/home/root:/bin/sh
-</screen>
-
-<para>instead of</para>
-
-<screen>
-root::500:513::/home/root:/bin/sh
-</screen>
-
-</listitem>
-<listitem><para>As in U*X systems UIDs and GIDs numbering scheme now
-don't influence each other. So it's possible to have same Id's for a
-user and a group:</para>
-<example id="ntsec-passwd-root">
-<title>/etc/passwd:</title>
-<screen>
-root::0:0:S-1-5-21-54355234-56236534-345635656-500:/home/root:/bin/sh
-</screen>
-</example>
-
-<example id="ntsec-group-root">
-<title>/etc/group:</title>
-<screen>
-root:S-1-5-32-544:0:
-</screen>
-</example>
-</listitem>
 </itemizedlist>
 
-<para>The tools <command>mkpasswd</command> and <command>mkgroup</command>
-create the needed entries by default. If you don't want that you can use
-the options <literal>-s</literal> or <literal>--no-sids</literal>. I suggest
-not to do this since ntsec works better when having the SIDs available.</para>
+<para>Note that the last rule is a preference or a definition of
+correctness.  It's not an absolute requirement.  All Windows kernels
+will correctly deal with the ACL regardless of the order of allow and
+deny ACEs.  The second rule is not modified to get the ACEs in the
+preferred order.</para>
 
-<para>Please note that the pw_gecos field in <filename>/etc/passwd</filename>
-is defined as a comma separated list. The SID has to be the last field!</para>
+<para>Unfortunately the security tab in the file properties dialog of
+the Windows NT4 explorer is completely unable to deal with access denied ACEs
+while the Windows 2000 and later properties dialog rearranges the order of the
+ACEs to canonical order before you can read them. Thank God, the sort
+order remains unchanged if one presses the Cancel button.  But don't
+even _think_ of pressing OK...</para>
 
-<screen>
-the_king::1:1:Elvis Presley,U-STILLHERE\elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
-</screen>
-
-<para>For a local user just drop the domain:</para>
-
-<screen>
-the_king::1:1:Elvis Presley,U-elvis,S-1-5-21-1234-5678-9012-1000:/bin/sh
-</screen>
-
-<para>In either case the password of the user is taken from the NT user
-database, NOT from the passwd file!</para>
-
-<para>As in the previous chapter I give my personal
-<filename>/etc/passwd</filename> and <filename>/etc/group</filename> as
-examples.  Please note that I've changed these files heavily!  There's no
-need to change them that way, it's just for testing purposes and...
-for fun.</para>
-
-<example id="ntsec-passwd-ex-2">
-<title>/etc/passwd</title>
-<screen>
-root:*:0:0:Administrators group,S-1-5-32-544::
-SYSTEM:*:18:18:,S-1-5-18:/home/system:/bin/bash
-admin:*:500:513:,S-1-5-21-1844237615-436374069-1060284298-500:/home/Administrator:/bin/bash
-corinna:*:100:0:Corinna Vinschen,S-1-5-21-1844237615-436374069-1060284298-1003:/home/corinna:/bin/tcsh
-Guest:*:501:546:,S-1-5-21-1844237615-436374069-1060284298-501:/home/Guest:/bin/bash
-</screen>
-</example>
-
-<example id="ntsec-group-ex-2">
-<title>/etc/group</title>
-<screen>
-root:S-1-5-32-544:0:
-local:S-1-2-0:2:
-network:S-1-5-2:3:
-interactive:S-1-5-4:4:
-authenticatedusers:S-1-5-11:5:
-SYSTEM:S-1-5-18:18:
-local_svc:S-1-5-19:19:
-netwrk_svc:S-1-5-20:20:
-none:S-1-5-21-1844237615-436374069-1060284298-513:513:
-bckup_op:S-1-5-32-551:551:
-guests:S-1-5-32-546:546:
-pwrusers:S-1-5-32-547:547:
-replicator:S-1-5-32-552:552:
-users:S-1-5-32-545:545:
-</screen>
-</example>
-
-<para>If you want to do similar changes to your files, please do that only
-if you're feeling comfortably with the concepts.  Otherwise don't be surprised
-if some stuff doesn't work anymore.  If you screwed up things, revert to files
-created by mkpasswd and mkgroup.  Especially don't change the UID or the name
-of user SYSTEM.  Even if that works mostly, some Cygwin applications running
-as local service under that account could suddenly start behaving strangely.
-</para>
-
-</sect2>
-
-<sect2 id="ntsec-mapping"><title id="ntsec-mapping.title">The mapping leak</title>
-
-<para>Now its time to point out the leak in the NT permissions.
-The official documentation explains in short the following:</para>
-<itemizedlist spacing="compact">
-<listitem><para>access allow ACEs are accumulated regarding to the
-group membership of the caller.</para></listitem>
-<listitem><para>The order of ACEs is important. The system reads them
-in sequence until either any needed right is denied or all needed rights
-are granted. Later ACEs are then not taken into account.</para></listitem>
-<listitem><para>All access denied ACEs _should_ precede any
-access allowed ACE.</para></listitem>
-</itemizedlist>
-
-<para>Note that the last rule is a preference, not a law. NT will correctly
-deal with the ACL regardless of the sequence order. The second rule is
-not modified to get the ACEs in the preferred order.</para>
-
-<para>Unfortunately the security tab of the NT4 explorer is completely
-unable to deal with access denied ACEs while the explorer of W2K rearranges
-the order of the ACEs before you can read them. Thank God, the sort order
-remains unchanged if one presses the Cancel button.</para>
-
-<para>You still ask "Where is the leak?" NT ACLs are unable to reflect each
-possible combination of POSIX permissions. Example:</para>
+<para>Canonical ACLs are unable to reflect each possible combination
+of POSIX permissions. Example:</para>
 
 <screen>
 rw-r-xrw-
 </screen>
 
-<para>1st try:</para>
+<para>Ok, so here's the first try to create a matching ACL, assuming
+the Windows permissions only have three bits, as their POSIX pendants:</para>
 
 <screen>
 UserAllow:   110
@@ -474,7 +364,7 @@ OthersAllow: 110
 <para>Hmm, because of the accumulation of allow rights the user may
 execute because the group may execute.</para>
 
-<para>2st try:</para>
+<para>Second try:</para>
 
 <screen>
 UserDeny:    001
@@ -485,7 +375,7 @@ OthersAllow: 110
 <para>Now the user may read and write but not execute. Better? No!
 Unfortunately the group may write now because others may write.</para>
 
-<para>3rd try:</para>
+<para>Third try:</para>
 
 <screen>
 UserDeny:    001
@@ -496,7 +386,7 @@ OthersAllow: 110
 
 <para>Now the group may not write as intended but unfortunately the user may
 not write anymore, either. How should this problem be solved? According to
-the official rules a UserAllow has to follow the GroupDeny but it's
+the canonical order a UserAllow has to follow the GroupDeny but it's
 easy to see that this can never be solved that way.</para>
 
 <para>The only chance:</para>
@@ -509,63 +399,26 @@ GroupAllow:  001
 OthersAllow: 110
 </screen>
 
-<para>Again: This works for both, NT4 and W2K. Only the GUIs aren't
-able to deal with that order.</para>
+<para>Again: This works on all existing versions of Windows NT, at the
+time of writing from at least NT4 up to Server 2008.  Only the GUIs
+aren't able (or willing) to deal with that order.</para>
 
 </sect2>
 
-<sect2 id="ntsec-aclfuncs"><title id="ntsec-aclfuncs.title">The ACL API</title>
-
-<para>For dealing with ACLs Cygwin now has the ACL API as it's
-implemented in newer versions of Solaris. The new data structure
-for a single ACL entry (ACE in NT terminology) is defined in
-<filename>sys/acl.h</filename> as:</para>
-
-<screen>
-typedef struct acl {
-  int     a_type;  /* entry type */
-  uid_t   a_id;    /* UID | GID */
-  mode_t  a_perm;  /* permissions */
-} aclent_t;
-</screen>
-
-<para>The a_perm member of the aclent_t type contains only the bits
-for read, write and execute as in the file mode. If e.g. read permission
-is granted, all read bits (S_IRUSR, S_IRGRP, S_IROTH) are set.
-CLASS_OBJ or MASK ACL entries are not fully implemented yet.</para>
-
-<para>The new API calls are</para>
-
-<screen>
-acl(2), facl(2)
-aclcheck(3),
-aclsort(3),
-acltomode(3), aclfrommode(3),
-acltopbits(3), aclfrompbits(3),
-acltotext(3), aclfromtext(3)
-</screen>
-
-<para>Like in Solaris, Cygwin has two new commands for working with
-ACLs on the command line: <command>getfacl</command> and
-<command>setfacl</command>.</para>
-
-<para>Online man pages for the aforementioned commands and API calls can be
-found on <ulink url="http://docs.sun.com">http://docs.sun.com</ulink> </para>
-
-</sect2>
-
-<sect2 id="ntsec-setuid"><title id="ntsec-setuid.title">New setuid concept</title>
+<sect2 id="ntsec-setuid"><title id="ntsec-setuid.title">Switching the user context</title>
 
 <para>POSIX applications which have to switch the user context are using
-the <command>setuid</command> and <command>seteuid</command> calls which
-are not part of the Windows API.
-Nevertheless these calls are supported under Windows NT/W2K since Cygwin
-release 1.1.3.  Because of the nature of NT security an application which
-needs the ability has to be patched, though.</para>
+the <command>setuid</command> and <command>seteuid</command> calls.</para>
 
-<para>NT uses so-called `access tokens' to identify a user and it's
+<para>Windows doesn't support the concept of these calls in a simple
+fashion and switching the user context in Windows is generally a tricky
+process with lots of "behind the scenes" magic involved.</para>
+
+<!-- TODO: The rest of the file... -->
+
+<para>Windows uses so-called `access tokens' to identify a user and it's
 permissions. To switch the user context the application has to request
-such an `access token'. This is typically done by calling the NT API
+such an `access token'. This is typically done by calling the Win32 API
 function <command>LogonUser</command>. The access token is returned and
 either used in <command>ImpersonateLoggedOnUser</command> to change user
 context of the current process or in <command>CreateProcessAsUser</command>
@@ -709,9 +562,9 @@ context without giving a password by just calling the usual
 <command>setgid</command> and <command>setegid</command> functions.  
 </para>
 <para>
-On NT and Windows 2000 the <systemitem
+Up to Windows XP the <systemitem
 class="username">SYSTEM</systemitem> user has these privileges and can
-run services such as <command>sshd</command>. However, on Windows 2003
+run services such as <command>sshd</command>. However, startung with Windows 2003
 <systemitem class="username">SYSTEM</systemitem> lacks the
 <command>Create a token object</command> right, so it is necessary to
 create a special user with all the necessary rights, as
