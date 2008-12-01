@@ -182,7 +182,7 @@ enum ld_plugin_status
 
 typedef
 enum ld_plugin_status
-(*ld_plugin_message) (int level, char *format, ...);
+(*ld_plugin_message) (int level, const char *format, ...);
 
 enum ld_plugin_level
 {
