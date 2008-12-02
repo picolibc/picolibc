@@ -1,3 +1,9 @@
+2008-12-02  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.def: configure-target-boehm-gc depends on
+	all-target-libstdc++-v3.
+	* Makefile.in: Regenerate.
+
 2008-12-02  Ben Elliston  <bje@au.ibm.com>
 
 	* config.sub, config.guess: Update from upstream sources.
@@ -173,17 +179,17 @@
 	Sync with gcc:
 	2008-07-30 Paolo Bonzini  <bonzini@gnu.org>
 
-        * configure.ac: Add makefile fragments for hpux.
-        * Makefile.def (flags_to_pass): Add ADA_CFLAGS.
-        * Makefile.tpl (HOST_EXPORTS): Pass ADA_CFLAGS.
-        * configure: Regenerate.
-        * Makefile.in: Regenerate.
+	* configure.ac: Add makefile fragments for hpux.
+	* Makefile.def (flags_to_pass): Add ADA_CFLAGS.
+	* Makefile.tpl (HOST_EXPORTS): Pass ADA_CFLAGS.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
 
 	2008-06-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
-        * Makefile.tpl ($(srcdir)/configure): Update dependencies.
-        * Makefile.in: Regenerate.
-        * configure: Regenerate.
+	* Makefile.tpl ($(srcdir)/configure): Update dependencies.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
 
 2008-06-18  Ian Lance Taylor  <iant@google.com>
 
@@ -248,13 +254,13 @@
 
 	2008-04-18  Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.tpl (restrap): Call `make all' using double-colon rules.
-        * Makefile.in: Regenerate.
+	* Makefile.tpl (restrap): Call `make all' using double-colon rules.
+	* Makefile.in: Regenerate.
 
 	2008-04-11  Eric B. Weddington  <eweddington@cso.atmel.com>
 
-        * configure.ac: Do not build libssp for the AVR.
-        * configure: Regenerate.
+	* configure.ac: Do not build libssp for the AVR.
+	* configure: Regenerate.
 
 2008-04-18  Nick Clifton  <nickc@redhat.com>
 
@@ -263,9 +269,9 @@
 
 2008-04-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
 
-        * configure.ac (cr16-*-*): Add case for cr16 target and include gdb
+	* configure.ac (cr16-*-*): Add case for cr16 target and include gdb
 	as nonconfigurable directories list.
-        * configure: Regenerate.
+	* configure: Regenerate.
 
 2008-04-14  David S. Miller  <davem@davemloft.net>
 
@@ -296,8 +302,8 @@
 2008-04-04  NightStrike  <NightStrike@gmail.com>
 
 	PR other/35151
-        * configure.ac: Combine rules for mingw32 and mingw64.
-        * configure: Regenerate.
+	* configure.ac: Combine rules for mingw32 and mingw64.
+	* configure: Regenerate.
 
 2008-03-27  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -347,9 +353,9 @@
 2008-03-16  Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
 
 	Backport from upstream Libtool:
-	
+
 	2007-10-12  Eric Blake  <ebb9@byu.net>
-	
+
 	Deal with Autoconf 2.62's semantic change in m4_append.
 	* ltsugar.m4 (lt_append): Replace broken versions of
 	m4_append.
@@ -382,27 +388,27 @@
 
 2008-02-20  Paolo Bonzini  <bonzini@gnu.org>
 
-        PR bootstrap/32009
-        PR bootstrap/32161
+	PR bootstrap/32009
+	PR bootstrap/32161
 
-        * configure.ac (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Compute here.
-        * configure: Regenerate.
+	* configure.ac (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Compute here.
+	* configure: Regenerate.
 
-        * Makefile.def: Define stage_libcflags for all bootstrap stages.
-        * Makefile.tpl (BOOT_LIBCFLAGS, STAGE2_LIBCFLAGS, STAGE3_LIBCFLAGS,
-        STAGE4_LIBCFLAGS): New.
-        (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Subst from autoconf, without
-        $(SYSROOT_CFLAGS_FOR_TARGET) and $(DEBUG_PREFIX_CFLAGS_FOR_TARGET).
-        (BASE_TARGET_EXPORTS): Append them here to C{,XX}FLAGS.
-        (EXTRA_TARGET_FLAGS): Append them here to {LIB,}C{,XX}FLAGS.
-        (configure-stage[+id+]-[+prefix+][+module+]): Pass stage_libcflags
-        for target modules.  Don't export LIBCFLAGS.
-        (all-stage[+id+]-[+prefix+][+module+]): Pass stage_libcflags; pass
-        $(BASE_FLAGS_TO_PASS) where [+args+] was passed, and [+args+] after
-        the overridden CFLAGS_FOR_TARGET and CXXFLAGS_FOR_TARGET.
-        (invocations of `all'): Replace $(TARGET_FLAGS_TO_PASS) with
-        $(EXTRA_TARGET_FLAGS), $(FLAGS_TO_PASS) with $(EXTRA_HOST_FLAGS).
-        * Makefile.in: Regenerate.
+	* Makefile.def: Define stage_libcflags for all bootstrap stages.
+	* Makefile.tpl (BOOT_LIBCFLAGS, STAGE2_LIBCFLAGS, STAGE3_LIBCFLAGS,
+	STAGE4_LIBCFLAGS): New.
+	(CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Subst from autoconf, without
+	$(SYSROOT_CFLAGS_FOR_TARGET) and $(DEBUG_PREFIX_CFLAGS_FOR_TARGET).
+	(BASE_TARGET_EXPORTS): Append them here to C{,XX}FLAGS.
+	(EXTRA_TARGET_FLAGS): Append them here to {LIB,}C{,XX}FLAGS.
+	(configure-stage[+id+]-[+prefix+][+module+]): Pass stage_libcflags
+	for target modules.  Don't export LIBCFLAGS.
+	(all-stage[+id+]-[+prefix+][+module+]): Pass stage_libcflags; pass
+	$(BASE_FLAGS_TO_PASS) where [+args+] was passed, and [+args+] after
+	the overridden CFLAGS_FOR_TARGET and CXXFLAGS_FOR_TARGET.
+	(invocations of `all'): Replace $(TARGET_FLAGS_TO_PASS) with
+	$(EXTRA_TARGET_FLAGS), $(FLAGS_TO_PASS) with $(EXTRA_HOST_FLAGS).
+	* Makefile.in: Regenerate.
 
 2008-02-16  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
@@ -429,11 +435,11 @@
 
 2008-01-30  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
-        PR bootstrap/34922
-        * configure.ac (PARSE_ARGS): Push suitable setting of
-        ac_subdirs_all, for `./configure --help=recursive'.
-        Handle `+' in generic toplevel directory disabling.
-        * configure: Regenerate.
+	PR bootstrap/34922
+	* configure.ac (PARSE_ARGS): Push suitable setting of
+	ac_subdirs_all, for `./configure --help=recursive'.
+	Handle `+' in generic toplevel directory disabling.
+	* configure: Regenerate.
 
 2008-01-23  Ben Elliston  <bje@au.ibm.com>
 
@@ -474,11 +480,11 @@
 
 2007-11-28  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
-        * config-ml.in: Robustify against white space in absolute file
-        names.
+	* config-ml.in: Robustify against white space in absolute file
+	names.
 
-        * config-ml.in (multi-clean): Substitute ${Makefile}.
-        Remove superfluous ${Makefile} in list.
+	* config-ml.in (multi-clean): Substitute ${Makefile}.
+	Remove superfluous ${Makefile} in list.
 
 2007-10-23  Daniel Jacobowitz  <dan@codesourcery.com>
 
@@ -535,7 +541,7 @@
 	* Makefile.def: Add libgomp config as a maybe dependency for libstdc++.
 	* configure: Regenerate.
 	* Makefile.in: Regenerate.
-	
+
 2007-09-17  Andreas Schwab  <schwab@suse.de>
 
 	* configure.ac: Raise minimum makeinfo version to 4.6.
@@ -594,7 +600,7 @@
 	* configure: Regenerate.
 
 2007-08-18  Paul Brook  <paul@codesourcery.com>
-            Joseph Myers  <joseph@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
 
 	* Makefile.tpl (DEBUG_PREFIX_CFLAGS_FOR_TARGET): New.
 	(CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Include it.
@@ -662,11 +668,11 @@
 
 2007-07-09  Kai Tietz   <kai.tietz@onevision.com>
 
-        * Makefile.def: Add windmc tool to build.
-        * Makefile.tpl: Likewise.
-        * configure.ac: Likewise.
-        * Makefile.in: Regenerate.
-        * configure: Regenerate.
+	* Makefile.def: Add windmc tool to build.
+	* Makefile.tpl: Likewise.
+	* configure.ac: Likewise.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
 
 2007-07-05  H.J. Lu  <hongjiu.lu@intel.com>
 
@@ -683,7 +689,7 @@
 	* configure.ac (arm*-*-linux-gnueabi): Don't build libgloss if we're
 	not building newlib.
 	* configure: Regenerated.
-	
+
 2007-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* src-release (DEVO_SUPPORT): Correct typos.
@@ -695,9 +701,9 @@
 
 2007-06-14  Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.tpl (cleanstrap): Don't delete the toplevel Makefile.
-        (distclean-stage[+id+]): Possibly delete stage_last.
-        * Makefile.in: Regenerate.
+	* Makefile.tpl (cleanstrap): Don't delete the toplevel Makefile.
+	(distclean-stage[+id+]): Possibly delete stage_last.
+	* Makefile.in: Regenerate.
 
 2007-06-07  Ben Elliston  <bje@au.ibm.com>
 
@@ -713,9 +719,9 @@
 	Sync with gcc:
 	2007-05-30  Jakub Jelinek  <jakub@redhat.com>
 
-        PR bootstrap/29382
-        * configure.ac: Don't use -fkeep-inline-functions for GCC < 3.3.1.
-        * configure: Rebuilt.
+	PR bootstrap/29382
+	* configure.ac: Don't use -fkeep-inline-functions for GCC < 3.3.1.
+	* configure: Rebuilt.
 
 2007-06-01  Steve Ellcey  <sje@cup.hp.com>
 
@@ -821,9 +827,9 @@
 	* configure: Rebuilt.
 
 2007-02-17  Mark Mitchell  <mark@codesourcery.com>
-            Nathan Sidwell  <nathan@codesourcery.com>
-            Vladimir Prus  <vladimir@codesourcery.com
-            Joseph Myers  <joseph@codesourcery.com>
+	    Nathan Sidwell  <nathan@codesourcery.com>
+	    Vladimir Prus  <vladimir@codesourcery.com
+	    Joseph Myers  <joseph@codesourcery.com>
 
 	* configure.ac (TOPLEVEL_CONFIGURE_ARGUMENTS): Fix quoting.
 	* configure: Regenerate.
@@ -929,28 +935,28 @@
 2007-01-11  Paolo Bonzini  <bonzini@gnu.org>
 
 	* configure.in: Change == to = in test command.
-        * configure: Regenerate.
+	* configure: Regenerate.
 
 2007-01-11  Paolo Bonzini  <bonzini@gnu.org>
-            Nick Clifton  <nickc@redhat.com>
-            Kaveh R. Ghazi  <ghazi@caip.rutgets.edu>
+	    Nick Clifton  <nickc@redhat.com>
+	    Kaveh R. Ghazi  <ghazi@caip.rutgets.edu>
 
-        * configure.in (build_configargs, host_configargs, target_configargs):
-        Remove build/host/target parameters.
-        (host_libs): Add gmp and mpfr.
-        (GMP tests): Reorganize to allow in-tree GMP/MPFR.
-        * Makefile.def (gmp, mpfr): New.
-        (gcc): Remove target.
-        * Makefile.tpl (build_os, build_vendor, host_os, host_vendor,
-        target_os, target_vendor): New.
-        (configure): Add host_alias/target_alias arguments.  Adjust invocations.
-        * configure: Regenerate.
-        * Makefile.in: Regenerate.
+	* configure.in (build_configargs, host_configargs, target_configargs):
+	Remove build/host/target parameters.
+	(host_libs): Add gmp and mpfr.
+	(GMP tests): Reorganize to allow in-tree GMP/MPFR.
+	* Makefile.def (gmp, mpfr): New.
+	(gcc): Remove target.
+	* Makefile.tpl (build_os, build_vendor, host_os, host_vendor,
+	target_os, target_vendor): New.
+	(configure): Add host_alias/target_alias arguments.  Adjust invocations.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
 
 2007-01-11  Matt Fago  <fago@earthlink.net>
 
 	* configure.in: Try to link to functions only in mpfr 2.2.x
-        to improve robustness of configure tests.
+	to improve robustness of configure tests.
 	* configure: Regenerate.
 
 2007-01-08  Kai Tietz	<kai.tietz@onevision.com>
@@ -986,20 +992,20 @@
 	Sync with gcc:
 	2006-12-29  Paolo Bonzini  <bonzini@gnu.org>
 
-        * configure.in: Reorganize recognition of languages.  Add
-        --enable-stage1-languages.  Show supported languages for the chosen
-        target rather than all recognized languages.
-        * configure: Regenerate.
+	* configure.in: Reorganize recognition of languages.  Add
+	--enable-stage1-languages.  Show supported languages for the chosen
+	target rather than all recognized languages.
+	* configure: Regenerate.
 
 	2006-12-29  Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.tpl (GCC_STRAP_TARGETS, all-prebootstrap): Remove.
-        * Makefile.in: Regenerate.
+	* Makefile.tpl (GCC_STRAP_TARGETS, all-prebootstrap): Remove.
+	* Makefile.in: Regenerate.
 
 	2006-12-29  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
-        * configure.in: Warn that MPFR 2.2.0 is buggy.
-        * configure: Regenerate.
+	* configure.in: Warn that MPFR 2.2.0 is buggy.
+	* configure: Regenerate.
 
 2006-12-27  Ian Lance Taylor  <iant@google.com>
 
@@ -1150,8 +1156,8 @@
 	* configure: Regenerate.
 
 2006-08-15  Thiemo Seufer  <ths@mips.com>
-            Nigel Stephens  <nigel@mips.com>
-            David Ung  <davidu@mips.com>
+	    Nigel Stephens  <nigel@mips.com>
+	    David Ung  <davidu@mips.com>
 
 	* config.sub: Add support for sde as alias of mipsisa32-sde-elf.
 
@@ -1160,10 +1166,10 @@
 	Sync from GCC:
 	2006-07-04  Eric Botcazou  <ebotcazou@libertysurf.fr>
 
-        PR bootstrap/18058
-        * configure.in: Add -fkeep-inline-functions to CFLAGS for stage 1
-        if the bootstrap compiler is a GCC version that supports it.
-        * configure: Regenerate.
+	PR bootstrap/18058
+	* configure.in: Add -fkeep-inline-functions to CFLAGS for stage 1
+	if the bootstrap compiler is a GCC version that supports it.
+	* configure: Regenerate.
 
 2006-07-22  Daniel Jacobowitz  <dan@codesourcery.com>
 
@@ -1172,8 +1178,8 @@
 
 2006-07-18  Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.tpl (configure-stageN-MODULE): Pass --with-build-libsubdir
-        for stages after the first.
+	* Makefile.tpl (configure-stageN-MODULE): Pass --with-build-libsubdir
+	for stages after the first.
 
 2006-07-17  Jakub Jelinek  <jakub@redhat.com>
 
@@ -1251,7 +1257,7 @@
 	Sync from gcc:
 
 	2005-01-12  David Edelsohn  <edelsohn@gnu.org>
-	            Andreas Schwab  <schwab@suse.de>
+		    Andreas Schwab  <schwab@suse.de>
 
 	PR bootstrap/18033
 	* config-ml.in: Eval option if surrounded by single quotes.
@@ -1388,15 +1394,15 @@
 	Sync with gcc:
 	2006-03-10  Aldy Hernandez  <aldyh@redhat.com>
 
-        * configure.in: Handle --disable-<component> generically.
-        * configure: Regenerate.
+	* configure.in: Handle --disable-<component> generically.
+	* configure: Regenerate.
 
 	2006-02-21 Rafael Avila de Espindola <rafael.espindola@gmail.com>
 
-        * Makefile.tpl  (BUILD_CONFIGDIRS): Remove.
-        (TARGET_CONFIGDIRS): Remove.
-        * configure.in: Remove AC_SUBST(target_configdirs).
-        * Makefile.in, configure: Regenerated.
+	* Makefile.tpl  (BUILD_CONFIGDIRS): Remove.
+	(TARGET_CONFIGDIRS): Remove.
+	* configure.in: Remove AC_SUBST(target_configdirs).
+	* Makefile.in, configure: Regenerated.
 
 
 2006-03-01  H.J. Lu  <hongjiu.lu@intel.com>
@@ -1443,22 +1449,22 @@
 	2006-01-31  Richard Guenther  <rguenther@suse.de>
 		    Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.def (target_modules): Add libgcc-math target module.
-        * configure.in (target_libraries): Add libgcc-math target library.
-        (--enable-libgcc-math): New configure switch.
-        * Makefile.in: Re-generate.
-        * configure: Re-generate.
-        * libgcc-math: New toplevel directory.
+	* Makefile.def (target_modules): Add libgcc-math target module.
+	* configure.in (target_libraries): Add libgcc-math target library.
+	(--enable-libgcc-math): New configure switch.
+	* Makefile.in: Re-generate.
+	* configure: Re-generate.
+	* libgcc-math: New toplevel directory.
 
 	2006-01-18  Richard Henderson  <rth@redhat.com>
-	            Jakub Jelinek  <jakub@redhat.com>
-	            Diego Novillo  <dnovillo@redhat.com>
+		    Jakub Jelinek  <jakub@redhat.com>
+		    Diego Novillo  <dnovillo@redhat.com>
 
-        * libgomp: New directory.
-        * Makefile.def: Add target_module libgomp.
-        * Makefile.in: Regenerate.
-        * configure.in (target_libraries): Add target-libgomp.
-        * configure: Regenerate.
+	* libgomp: New directory.
+	* Makefile.def: Add target_module libgomp.
+	* Makefile.in: Regenerate.
+	* configure.in (target_libraries): Add target-libgomp.
+	* configure: Regenerate.
 
 2006-02-14  Paolo Bonzini  <bonzini@gnu.org>
 	    Andreas Schwab  <schwab@suse.de>
@@ -1488,37 +1494,37 @@
 
 	2006-01-04  Paolo Bonzini  <bonzini@gnu.org>
 
-        PR bootstrap/24252
+	PR bootstrap/24252
 
-        * Makefile.def (flags_to_pass): Add STAGE1_CFLAGS and STAGE1_LANGUAGES.
-        * Makefile.tpl (OBJDUMP): New.
-        (EXTRA_HOST_FLAGS): Add it.
-        (EXTRA_GCC_FLAGS): Remove flags already specified in flags_to_pass.
+	* Makefile.def (flags_to_pass): Add STAGE1_CFLAGS and STAGE1_LANGUAGES.
+	* Makefile.tpl (OBJDUMP): New.
+	(EXTRA_HOST_FLAGS): Add it.
+	(EXTRA_GCC_FLAGS): Remove flags already specified in flags_to_pass.
 
-        * Makefile.tpl (stage[+id+]-start, stage[+id+]-end): Do not try
-        to use symbolic links between directories.  Avoid race conditions
-        or make them harmless.
-        * configure.in: Do not try to use symbolic links between directories.
+	* Makefile.tpl (stage[+id+]-start, stage[+id+]-end): Do not try
+	to use symbolic links between directories.  Avoid race conditions
+	or make them harmless.
+	* configure.in: Do not try to use symbolic links between directories.
 
-        * Makefile.def (LEAN): Pass.
-        * Makefile.tpl (LEAN): Define.
-        (stage[+id+]-start): Accept that the previous directory does not
-        exist, if the bootstrap is lean.
-        (stage[+id+]-bubble): Invoke lean bootstrap commands after
-        stage[+id+]-start.  Use a makefile variable and an `if' instead of a
-        configure substitution.
-        ([+compare-target+]): Likewise.
-        ([+bootstrap-target+]-lean): New.
-        * configure.in: Remove lean bootstrap support from here.
+	* Makefile.def (LEAN): Pass.
+	* Makefile.tpl (LEAN): Define.
+	(stage[+id+]-start): Accept that the previous directory does not
+	exist, if the bootstrap is lean.
+	(stage[+id+]-bubble): Invoke lean bootstrap commands after
+	stage[+id+]-start.  Use a makefile variable and an `if' instead of a
+	configure substitution.
+	([+compare-target+]): Likewise.
+	([+bootstrap-target+]-lean): New.
+	* configure.in: Remove lean bootstrap support from here.
 
-        * Makefile.in: Regenerate.
-        * configure: Regenerate.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
 
 	2006-01-02  Andreas Schwab  <schwab@suse.de>
 
-        * configure.in: When reconfiguring remove Makefile in
-        all stage directories.
-        * configure: Regenerate.
+	* configure.in: When reconfiguring remove Makefile in
+	all stage directories.
+	* configure: Regenerate.
 
 2005-12-27  Leif Ekblad  <leif@rdos.net>
 
@@ -1532,14 +1538,14 @@
 
 2005-12-20  Paolo Bonzini  <bonzini@gnu.org>
 
-        Revert Ada-related part of the previous change.
+	Revert Ada-related part of the previous change.
 
-        * Makefile.def (ADAFLAGS, BOOT_ADAFLAGS, ADAFLAGS_FOR_TARGET):
-        Do not pass.
-        * Makefile.tpl (BOOT_ADAFLAGS): Do not define.
-        * Makefile.in: Regenerate.
-        * configure.in: Do not include mt-ppc-aix target fragment.
-        * configure: Regenerate.
+	* Makefile.def (ADAFLAGS, BOOT_ADAFLAGS, ADAFLAGS_FOR_TARGET):
+	Do not pass.
+	* Makefile.tpl (BOOT_ADAFLAGS): Do not define.
+	* Makefile.in: Regenerate.
+	* configure.in: Do not include mt-ppc-aix target fragment.
+	* configure: Regenerate.
 
 2005-12-19  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -1575,21 +1581,21 @@
 
 	2005-12-14  Daniel Jacobowitz  <dan@codesourcery.com>
 
-        * Makefile.tpl: Throughout the file, use : $(MAKE) along with
-        $(stage) and $(unstage).
-        (EXTRA_TARGET_FLAGS): Correct double-quoting.
-        (all): Remove stray semicolon.
-        (local-distclean): Don't handle multilib.tmp and multilib.out.
-        (install.all): Set $s for consistency.
-        (configure-[+prefix+][+module+]): Instead of [+deps+], handle
-        check_multilibs setting.  Always make the install directory.
-        (configure-stage[+id+]-[+prefix+][+module+]): Likewise.
-        Correct @if/@endif.
-        (all-stage[+id+]-[+prefix+][+module+]): Correct @if/@endif.
-        ($(TARGET_SUBDIR)/[+module+]/multilib.out): Remove.
-        (stage[+id+]-start, stage[+id+]-end): Stage $(TARGET_SUBDIR).
-        (multilib.out): Remove.
-        * Makefile.in: Regenerated.
+	* Makefile.tpl: Throughout the file, use : $(MAKE) along with
+	$(stage) and $(unstage).
+	(EXTRA_TARGET_FLAGS): Correct double-quoting.
+	(all): Remove stray semicolon.
+	(local-distclean): Don't handle multilib.tmp and multilib.out.
+	(install.all): Set $s for consistency.
+	(configure-[+prefix+][+module+]): Instead of [+deps+], handle
+	check_multilibs setting.  Always make the install directory.
+	(configure-stage[+id+]-[+prefix+][+module+]): Likewise.
+	Correct @if/@endif.
+	(all-stage[+id+]-[+prefix+][+module+]): Correct @if/@endif.
+	($(TARGET_SUBDIR)/[+module+]/multilib.out): Remove.
+	(stage[+id+]-start, stage[+id+]-end): Stage $(TARGET_SUBDIR).
+	(multilib.out): Remove.
+	* Makefile.in: Regenerated.
 
 2005-12-12  Nathan Sidwell  <nathan@codesourcery.com>
 
@@ -1613,46 +1619,46 @@
 
 	2005-12-05  Paolo Bonzini  <bonzini@gnu.org>
 
-        * configure.in (CONFIGURED_BISON, CONFIGURED_YACC, CONFIGURED_M4,
-        CONFIGURED_FLEX, CONFIGURED_LEX, CONFIGURED_MAKEINFO): Remove
-        "CONFIGURED_" from the AC_CHECK_PROGS invocation.  Move below.
-        Find in-tree tools if available.
-        (EXPECT, RUNTEST, LIPO, STRIP): Find them and substitute them.
-        (CONFIGURED_*_FOR_TARGET): Don't set nor substitute.
-        (*_FOR_TARGET): Set them with GCC_TARGET_TOOL.
-        (COMPILER_*_FOR_TARGET): New.
-        * Makefile.tpl (HOST_EXPORTS): Add *_FOR_TARGET symbols that gcc needs.
-        (BASE_TARGET_EXPORTS): Use COMPILER_*_FOR_TARGET symbols.
-        (CONFIGURED_*, USUAL_*): Remove.
-        (BISON, YACC, FLEX, LEX, M4, MAKEINFO, EXPECT, RUNTEST, LIPO,
-        STRIP): Use autoconf substitutions.
-        (COMPILER_AS_FOR_TARGET, COMPILER_LD_FOR_TARGET,
-        COMPILER_NM_FOR_TARGET): New.
-        (EXTRA_HOST_FLAGS): Pass LIPO and STRIP.
+	* configure.in (CONFIGURED_BISON, CONFIGURED_YACC, CONFIGURED_M4,
+	CONFIGURED_FLEX, CONFIGURED_LEX, CONFIGURED_MAKEINFO): Remove
+	"CONFIGURED_" from the AC_CHECK_PROGS invocation.  Move below.
+	Find in-tree tools if available.
+	(EXPECT, RUNTEST, LIPO, STRIP): Find them and substitute them.
+	(CONFIGURED_*_FOR_TARGET): Don't set nor substitute.
+	(*_FOR_TARGET): Set them with GCC_TARGET_TOOL.
+	(COMPILER_*_FOR_TARGET): New.
+	* Makefile.tpl (HOST_EXPORTS): Add *_FOR_TARGET symbols that gcc needs.
+	(BASE_TARGET_EXPORTS): Use COMPILER_*_FOR_TARGET symbols.
+	(CONFIGURED_*, USUAL_*): Remove.
+	(BISON, YACC, FLEX, LEX, M4, MAKEINFO, EXPECT, RUNTEST, LIPO,
+	STRIP): Use autoconf substitutions.
+	(COMPILER_AS_FOR_TARGET, COMPILER_LD_FOR_TARGET,
+	COMPILER_NM_FOR_TARGET): New.
+	(EXTRA_HOST_FLAGS): Pass LIPO and STRIP.
 
-        (all): Make all-host and all-target in parallel.
-        (do-[+make_target+], do-check, install, [+compare-target+]): Ensure
-        that $$r and $$s are set before invoking a recursive make.
-        (stage[+id+]-bubble): Likewise, and invoke the comparison at the end.
-        ([+bootstrap-target+]): Inline most of the `all' target.
-
-	2005-11-29  Ben Elliston  <bje@au.ibm.com>
-
-        * Makefile.tpl (clean-target-libgcc): Invoke clean-target-libgcc
-        from the gcc build directory.
-        * Makefile.in: Regenerate.
+	(all): Make all-host and all-target in parallel.
+	(do-[+make_target+], do-check, install, [+compare-target+]): Ensure
+	that $$r and $$s are set before invoking a recursive make.
+	(stage[+id+]-bubble): Likewise, and invoke the comparison at the end.
+	([+bootstrap-target+]): Inline most of the `all' target.
 
 	2005-11-29  Ben Elliston  <bje@au.ibm.com>
 
-        * Makefile.def: Add new libdecnumber host_module.  Make all-gcc
-        depend on all-libdecnumber.
-        * configure.in (host_libs): Include libdecnumber.
-        * Makefile.in: Regenerate.
-        * configure: Likewise.
+	* Makefile.tpl (clean-target-libgcc): Invoke clean-target-libgcc
+	from the gcc build directory.
+	* Makefile.in: Regenerate.
+
+	2005-11-29  Ben Elliston  <bje@au.ibm.com>
+
+	* Makefile.def: Add new libdecnumber host_module.  Make all-gcc
+	depend on all-libdecnumber.
+	* configure.in (host_libs): Include libdecnumber.
+	* Makefile.in: Regenerate.
+	* configure: Likewise.
 
 	2005-11-21  Kean Johnston  <jkj@sco.com>
 
-        * config.sub, config.guess: Sync from upstream sources.
+	* config.sub, config.guess: Sync from upstream sources.
 
 2005-11-11  Daniel Jacobowitz  <dan@codesourcery.com>
 
@@ -1782,8 +1788,8 @@
 
 2005-08-20  Richard Earnshaw  <richard.earnshaw@arm.com>
 
-        * Makefile.def (libssp): Add to lang_env_dependencies.
-        * Makefile.in: Regenerate.
+	* Makefile.def (libssp): Add to lang_env_dependencies.
+	* Makefile.in: Regenerate.
 
 2005-08-17  Christian Groessler  <chris@groessler.org>
 
@@ -1939,12 +1945,12 @@
 	accepted into the master sources.)
 
 2005-06-02  Aldy Hernandez  <aldyh@redhat.com>
-            Michael Snyder  <msnyder@redhat.com>
-            Stan Cox  <scox@redhat.com>
+	    Michael Snyder  <msnyder@redhat.com>
+	    Stan Cox  <scox@redhat.com>
 
-        * configure.in: Set noconfigdirs for ms1.
+	* configure.in: Set noconfigdirs for ms1.
 
-        * configure: Regenerate.
+	* configure: Regenerate.
 
 2005-05-25  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -1990,19 +1996,19 @@
 
 	2005-04-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
-        * config.sub: Update from master copy.
+	* config.sub: Update from master copy.
 
 	2005-04-19  Hans-Peter Nilsson  <hp@axis.com>
 
-        * configure.in <crisv32-*-*, cris-*-*>: New local variable
-        libgcj_ex_libffi.  Have specific match for *-*-linux*.  Separate
-        matches for "*-*-aout" and "*-*-elf".  Don't disable libffi for
-        "*-*-elf" and "*-*-linux*".
-        * configure: Regenerate.
+	* configure.in <crisv32-*-*, cris-*-*>: New local variable
+	libgcj_ex_libffi.  Have specific match for *-*-linux*.  Separate
+	matches for "*-*-aout" and "*-*-elf".  Don't disable libffi for
+	"*-*-elf" and "*-*-linux*".
+	* configure: Regenerate.
 
 2005-04-06  Paolo Bonzini  <bonzini@gnu.org>
 
-        * Makefile.tpl (BUILD_CONFIGARGS): Include --with-build-subdir.
+	* Makefile.tpl (BUILD_CONFIGARGS): Include --with-build-subdir.
 	(TARGET_CONFIGARGS): Include --with-target-subdir.
 	(configure, all): New macros.  Use them throughout.
 
@@ -12714,4 +12720,3 @@ left-margin: 8
 fill-column: 76
 version-control: never
 End:
-
