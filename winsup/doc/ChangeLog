@@ -1,5 +1,9 @@
 2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntsec.sgml: Fix a few typos.
+
+2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygserver.sgml: Fix cross reference to the ntsec documentation.
 
 2008-12-02  Corinna Vinschen  <corinna@vinschen.de>

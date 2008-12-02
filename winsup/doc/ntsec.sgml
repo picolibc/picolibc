@@ -275,8 +275,8 @@ thursday_next:unused:11001:11125:U-BAR\corinna,S-1-5-21-2913048732-1697188782-34
 
 <para>  The above <filename>/etc/passwd</filename> will still work fine.
 You can now login via <command>ssh</command> as the user "root", and
-Cygwin dutyfully translates "root" into the Windows user
-"FOO\Administrators" and files owned by FOO\Administrators are shown to
+Cygwin dutifully translates "root" into the Windows user
+"FOO\Administrator" and files owned by FOO\Administrator are shown to
 have the uid 0 when calling <command>ls -ln</command>.  All you do you're
 actually doing as Administrator.  Files created as root will be owned by
 FOO\Administrator.  And the domain user BAR\corinna can now happily
