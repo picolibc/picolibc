@@ -85,7 +85,7 @@ static HKEY open_key (const char *name, REGSAM access, DWORD wow64, bool isValue
 static inline bool
 must_encode (char c)
 {
-  return (isdirsep (c) || c == '%');
+  return (isdirsep (c) || c == ':' || c == '%');
 }
 
 /* Encode special chars in registry key or value name.

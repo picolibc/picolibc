@@ -1,3 +1,7 @@
+2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_registry.cc (must_encode): Fix condition changed for testing.
+
 2008-12-01  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (must_encode): New function.
