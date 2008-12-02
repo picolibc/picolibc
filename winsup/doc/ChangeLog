@@ -1,5 +1,9 @@
 2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.sgml: Fix cross reference to the ntsec documentation.
+
+2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygserver.sgml: Document new feature to store hidden passwords
 	for seteuid.
 

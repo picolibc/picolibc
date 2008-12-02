@@ -23,7 +23,7 @@
   credentials.  This service is used by <command><link
   linkend="passwd">passwd</link> -R</command>.  Using the stored
   passwords in <command>set(e)uid</command> does not require running
-  Cygserver.  For details, see <xref linkend="ntsec-nopasswd3"></xref>.
+  Cygserver.  For details, see <xref linkend="ntsec-setuid-overview"></xref>.
   </para></listitem>
 </itemizedlist>
 
