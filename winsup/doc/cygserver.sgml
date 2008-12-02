@@ -17,6 +17,14 @@
   <listitem><para>XSI IPC Message Queues.</para></listitem>
   <listitem><para>XSI IPC Semaphores.</para></listitem>
   <listitem><para>XSI IPC Shared Memory.</para></listitem>
+  <listitem><para>Allows non-privileged users to store obfuscated
+  passwords in the registry to be used by <command>setuid</command> and
+  <command>seteuid</command> calls to create user tokens with network
+  credentials.  This service is used by <command><link
+  linkend="passwd">passwd</link> -R</command>.  Using the stored
+  passwords in <command>set(e)uid</command> does not require running
+  Cygserver.  For details, see <xref linkend="ntsec-nopasswd3"></xref>.
+  </para></listitem>
 </itemizedlist>
 
 </sect2>

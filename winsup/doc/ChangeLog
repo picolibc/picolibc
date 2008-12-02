@@ -1,5 +1,10 @@
 2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.sgml: Document new feature to store hidden passwords
+	for seteuid.
+
+2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntsec.sgml: Finishing up changes for 1.7.
 
 2008-12-01  Corinna Vinschen  <corinna@vinschen.de>
