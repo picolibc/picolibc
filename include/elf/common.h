@@ -546,6 +546,7 @@
 #define STT_RELC	8		/* Complex relocation expression */
 #define STT_SRELC	9		/* Signed Complex relocation expression */
 #define STT_LOOS	10		/* OS-specific semantics */
+#define STT_IFUNC	10		/* Symbol is an indirect code object */
 #define STT_HIOS	12		/* OS-specific semantics */
 #define STT_LOPROC	13		/* Application-specific semantics */
 #define STT_HIPROC	15		/* Application-specific semantics */
