@@ -1,6 +1,6 @@
 /* minires.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2008 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
@@ -225,6 +225,17 @@ static int open_sock(struct sockaddr_in *CliAddr, int debug)
     DPRINTF(debug, "socket(UDP): %s\n", strerror(errno));
     return -1;
   }
+  /* Set non-blocking */
+  if (fcntl64(fd, F_SETFL, O_NONBLOCK) < 0)  {
+    DPRINTF(debug, "fcntl: %s\n", strerror(errno));
+    return -1;
+  }
+  /* Set close on exec flag */
+  if (fcntl64(fd, F_SETFD, 1) == -1) {
+    DPRINTF(debug, "fcntl: %s\n", strerror(errno));
+    return -1;
+  }
+
   CliAddr->sin_family = AF_INET;
   CliAddr->sin_addr.s_addr = htonl(INADDR_ANY);
   CliAddr->sin_port = htons(0);
@@ -266,7 +277,10 @@ int res_ninit(res_state statp)
   statp->use_os = 1;            /* use os_query if available and allowed by get_resolv */
   statp->mypid = -1;
   statp->sockfd = -1;
-
+  /* Use the pid and the ppid for random seed, from the point of view of an outsider.
+     Mix the upper and lower bits as they are not used equally */
+  i = getpid();
+  statp->id = (ushort) (getppid() ^ (i << 8) ^ (i >> 8));
   for (i = 0; i < DIM(statp->dnsrch); i++)  statp->dnsrch[i] = 0;
 
   /* resolv.conf (dns servers & search list)*/
@@ -420,22 +434,15 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 
   /* Open a socket for this process */
   if (statp->sockfd == -1) {
-    /* Create a socket and bind it (to any port) */
+    /* Create a non-blocking, close on exec socket and bind it (to any port) */
     statp->sockfd = open_sock(& mySockAddr, debug);
     if (statp->sockfd  < 0 ) {
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
     }
-    /* Set close on exec flag */
-    if (fcntl64(statp->sockfd, F_SETFD, 1) == -1) {
-      DPRINTF(debug, "fcntl: %s\n",
-	      strerror(errno));
-      statp->res_h_errno = NETDB_INTERNAL;
-      return -1;
-    }
     statp->mypid = getpid();
     if (SServ == 0XFFFFFFFF) /* Pseudo random */
-      SServ =  statp->mypid % statp->nscount;
+      SServ =  statp->id % statp->nscount;
   }
 
   transNum = 0;
@@ -443,6 +450,26 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
     if ((wServ = SServ + 1) >= statp->nscount)
       wServ = 0;
     SServ = wServ;
+
+    /* There exists attacks on DNS where many wrong answers with guessed id's and
+       spoofed source address and port are generated at about the time when the
+       program is tricked into resolving a name.
+       This routine runs through the retry loop for each incorrect answer.
+       It is thus extremely likely that such attacks will cause a TRY_AGAIN return,
+       probably causing the calling program to retry after a delay.
+       
+       Note that valid late or duplicate answers to a previous questions also cause
+       a retry, although this is minimized by flushing the socket before sending the
+       new question.
+    */
+
+    /* Flush duplicate or late answers */
+    while ((rslt = cygwin_recvfrom( statp->sockfd, AnsPtr, AnsLength, 0, NULL, NULL)) >= 0) {
+      DPRINTF(debug, "Flushed %d bytes\n", rslt);
+    }
+    DPRINTF(debug && (errno != EWOULDBLOCK), 
+	    "Unexpected errno for flushing recvfrom: %s", strerror(errno)); 
+
     /* Send the message */
     rslt = cygwin_sendto(statp->sockfd, MsgPtr, MsgLength, 0,
 			 (struct sockaddr *) &statp->nsaddr_list[wServ],
@@ -481,24 +508,39 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
     }
-    /*
-       Prepare to retry with tcp
+    DPRINTF(debug, "recvfrom: %d bytes from %08x\n", rslt, dnsSockAddr.sin_addr.s_addr);
+    /* 
+       Prepare to retry with tcp 
     */
     for (tcp = 0; tcp < 2; tcp++) {
-      /* Check if this is the message we expected */
-      if ((*MsgPtr == *AnsPtr)     /* Ids match */
-	  && (*(MsgPtr + 1) == *(AnsPtr + 1))
-/* We have stopped checking this because the question may not be present on error,
-   in particular when the name in the question is not a valid name.
-   Simply check that the header is present. */
+      /* Check if this is the expected message from the expected server */
+      if ((memcmp(& dnsSockAddr, & statp->nsaddr_list[wServ],
+		  (char *) & dnsSockAddr.sin_zero[0] - (char *) & dnsSockAddr) == 0)
 	  && (rslt >= HFIXEDSZ)
-/*        && (rslt >= MsgLength )
-	  && (memcmp(MsgPtr + HFIXEDSZ, AnsPtr + HFIXEDSZ, MsgLength - HFIXEDSZ) == 0) */
-	  && ((AnsPtr[2] & QR) != 0)) {
-
-	DPRINTF(debug, "answer %u from %08x. Error %d. Count %d.\n",
-		rslt, dnsSockAddr.sin_addr.s_addr,
-		AnsPtr[3] & ERR_MASK, AnsPtr[6]*256 + AnsPtr[7]);
+	  && (*MsgPtr == *AnsPtr)     /* Ids match */
+	  && (*(MsgPtr + 1) == *(AnsPtr + 1))
+	  && ((AnsPtr[2] & QR) != 0)
+	  && (AnsPtr[4] == 0)
+	  /* We check the question if present.
+	     Some servers don't return it on error, in particular
+	     when the name in the question is not valid. */
+	  && (((AnsPtr[5] == 0)
+	       && ((AnsPtr[3] & ERR_MASK) != NOERROR))
+	      || ((AnsPtr[5] == 1)
+		  && (rslt >= MsgLength)
+		  && (memcmp(MsgPtr + HFIXEDSZ, AnsPtr + HFIXEDSZ, MsgLength - HFIXEDSZ) == 0)))) {
+	if ((AnsPtr[3] & ERR_MASK) == NOERROR) {
+	  if ((AnsPtr[2] & TC) && (tcp == 0) && !(statp->options & RES_IGNTC)) { 
+	    /* Truncated. Try TCP */
+	    rslt = get_tcp(&statp->nsaddr_list[wServ], MsgPtr, MsgLength,
+			   AnsPtr, AnsLength, statp->options & RES_DEBUG);
+	    continue /* Tcp loop */; 
+	  }
+	  else if ((AnsPtr[6] | AnsPtr[7])!= 0)
+	    return rslt;
+	  else
+	    statp->res_h_errno = NO_DATA;
+	}
 #if 0
  NETDB_INTERNAL -1 /* see errno */
  NETDB_SUCCESS   0 /* no problem */
@@ -508,32 +550,24 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
  NO_RECOVERY     3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP */
  NO_DATA         4 /* Valid name, no data record of requested type */
 #endif
-	if ((AnsPtr[3] & ERR_MASK) == NOERROR) {
-	  if ((AnsPtr[2] & TC) && !(statp->options & RES_IGNTC)) { /* Truncated. Try TCP */
-	    rslt = get_tcp(&statp->nsaddr_list[wServ], MsgPtr, MsgLength,
-			   AnsPtr, AnsLength, statp->options & RES_DEBUG);
-	    continue;
-	  }
-	  else if ((AnsPtr[6] | AnsPtr[7])!= 0)
-	    return rslt;
-	  else
-	    statp->res_h_errno = NO_DATA;
-	}
 	else {
+	  switch (AnsPtr[3] & ERR_MASK) {
 	  /* return HOST_NOT_FOUND even for non-authoritative answers */
-	  if ((AnsPtr[3] & ERR_MASK) == NXDOMAIN)
+	  case NXDOMAIN:
+	  case FORMERR:
 	    statp->res_h_errno = HOST_NOT_FOUND;
-	  else if ((AnsPtr[3] & ERR_MASK) == SERVFAIL)
+	    break;
+	  case SERVFAIL: 
 	    statp->res_h_errno = TRY_AGAIN;
-	  else
+	    break;
+	  default:
 	    statp->res_h_errno = NO_RECOVERY;
+	  }
 	}
 	return -1;
       }
       else {
-	DPRINTF(debug, "unexpected answer %u from %x to query to %x\n",
-		rslt, dnsSockAddr.sin_addr.s_addr,
-		statp->nsaddr_list[wServ].sin_addr.s_addr);
+	DPRINTF(debug, "unexpected answer\n");
 	break;
       }
     } /* TCP */
@@ -564,7 +598,8 @@ int res_nmkquery (res_state statp,
 		  const unsigned char * newrr, unsigned char * buf, int buflen)
 {
   int i, len;
-  short id;
+  const char * ptr;
+  unsigned int id4;
 
   if (op == QUERY) {
     /* Write the name and verify buffer length */
@@ -575,10 +610,10 @@ int res_nmkquery (res_state statp,
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
     }
+
     /* Fill the header */
-    id = statp->id;
-    PUTSHORT(id, buf);
-    PUTSHORT(RD, buf);
+    PUTSHORT(statp->id, buf);
+    PUTSHORT(RD, buf); 
     PUTSHORT(1, buf); /* Number of questions */
     for (i = 0; i < 3; i++)
       PUTSHORT(0, buf); /* Number of answers */
@@ -587,7 +622,19 @@ int res_nmkquery (res_state statp,
     buf += len;
     PUTSHORT(qtype, buf);
     PUTSHORT(qclass, buf);
-    return len + 16; /* packet size */
+
+    /* Update id. The current query adds entropy to the next query id */
+    for (id4 = qtype, i = 0, ptr = dnameptr; *ptr; ptr++, i += 3) 
+      id4 ^= *ptr << (i & 0xF);
+    i = 1 + statp->id % 15; /* Between 1 and 16 */
+    /* id dependent rotation, also brings MSW to LSW */
+    id4 = (id4 << i) ^ (id4 >> (16 - i)) ^ (id4 >> (32 - i));
+    if ((short) id4)
+      statp->id ^= (short) id4;
+    else 
+      statp->id++; /* Force change */
+
+    return len + (HFIXEDSZ + QFIXEDSZ); /* packet size */
   }
   else { /* Not implemented */
     errno = ENOSYS;
