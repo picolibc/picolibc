@@ -1,3 +1,7 @@
+2008-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntsec.sgml: Revamp parts of the doc for clearness.
+
 2008-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.sgml: Fix a few typos.

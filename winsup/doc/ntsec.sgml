@@ -1,11 +1,11 @@
 <sect1 id="ntsec"><title>Using Windows security in Cygwin</title>
 
-<para>This paragraph discusses how the Windows security model is
+<para>This section discusses how the Windows security model is
 utilized in Cygwin to implement POSIX-like permissions, as well as how
-the authentication model is used to allow to switch the user context in
-a POSIX-like fashion.</para>
+the Windows authentication model is used to allow cygwin applications
+to switch users in a POSIX-like fashion.</para>
 
-<para>The setting of POSIX like file and directory permissions is
+<para>The setting of POSIX-like file and directory permissions is
 controlled by the <link linkend="mount-table">mount</link> option
 <literal>(no)acl</literal> which is set to <literal>acl</literal> by
 default.</para>
@@ -14,9 +14,10 @@ default.</para>
 be necessarily short.  If you want to learn more about the Windows security
 model, see the <ulink url="http://msdn.microsoft.com/en-us/library/aa374860(VS.85).aspx">Access Control</ulink> article in MSDN documentation.</para>
 
-<para>The POSIX security model is not discussed here, but assumed to be
-understood by the reader.  If you don't know the POSIX security model,
-search the web for beginner documentation.</para>
+<para>POSIX concepts and specificially the POSIX security model are not
+discussed here, but assumed to be understood by the reader.  If you
+don't know the POSIX security model, search the web for beginner
+documentation.</para>
 
 <sect2 id="ntsec-common"><title>Overview</title>
 
@@ -25,8 +26,8 @@ search the web for beginner documentation.</para>
 
 <para>Every object has a data structure attached, called a "security
 descriptor" (SD).  The SD contains all information necessary to control
-who can how access an object.  The SD of an object consists of five
-parts:</para>
+who can access an object, and to determine what they are allowed to do
+to or with it.  The SD of an object consists of five parts:</para>
 
 <itemizedlist spacing="compact">
 <listitem><para>Flags which control several aspects of this SD. This is
@@ -43,11 +44,13 @@ not discussed here.</para></listitem>
 other stuff which is explained a bit later.  Let's talk about the SID first.
 </para>
 
-<para>A SID is a unique identifier for users, groups, computers and AD
-domains.  SIDs are basically comparable to POSIX UIDs and GIDs, but are
-more complicated because they are unique across multiple machines or
-domains.  A SID is a structure of multiple numerical values.  There's
-a convenient convention to type SIDs.  Here's an example:</para>
+<para>A SID is a unique identifier for users, groups, computers and
+Active Directory (AD) domains.  SIDs are basically comparable to POSIX
+user ids (UIDs) and group ids (GIDs), but are more complicated because
+they are unique across multiple machines or domains.  A SID is a
+structure of multiple numerical values.  There's a convenient convention
+to type SIDs, as a string of numerical fields separated by hyphen
+characters.  Here's an example:</para>
 
 <para>SID of a machine "foo":</para>
 
@@ -61,15 +64,18 @@ a convenient convention to type SIDs.  Here's an example:</para>
   S-1-5-21-165875785-1005667432-441284377-1023
 </screen>
 
-<para>The leading "S" has no further meaning except to show that this is
-a SID.  The next number is a version number which is always 1 so far.
-The next two numbers are the authority which shows the initiated what
-kind of SID this is.  There are a couple of builtin accounts and
-accounts with very special meaning. However, computer and domain SIDs
-always start with "S-1-5-21".  The next three numbers, all 32 bit values,
-are the unique 96 bit identifier of the computer system.  This is
-hopefully unique all over the world, but in practice it's sufficient if
-the computer SIDs are unique within a single Windows network.</para>
+<para>The first field is always "S", which is just a notational convention
+to show that this is a SID.  The second field is the version number of
+the SID structure, So far there exists only one version of SIDs, so this
+field is always 1.  The third and fourth fields represent the "authority"
+which can be thought of as a type or category of SIDs.  There are a
+couple of builtin accounts and accounts with very special meaning which
+have certain well known values in these third and fourth fields.
+However, computer and domain SIDs always start with "S-1-5-21".  The
+next three fields, all 32 bit values, represent the unique 96 bit
+identifier of the computer system.  This is a hopefully unique value all
+over the world, but in practice it's sufficient if the computer SIDs are
+unique within a single Windows network.</para>
 
 <para>As you can see in the above example, SIDs of users (and groups)
 are identical to the computer SID, except for an additional part, the
@@ -101,11 +107,11 @@ controller and you would like to create a domain account "johndoe":</para>
 created on the machine "foo", one created in the domain "bar.local".
 Both have different SIDs and not even the RID is the same.  How do
 the systems know it's the same account?  After all, the name is
-the same, right?  The answer is, these accounts are NOT identical.
-For all the machines know there are two different accounts, one is
+the same, right?  The answer is, these accounts are <emphasis
+role='bold'>not</emphasis> identical.  All machines on the network will
+treat these SIDs as identifying two separate accounts.  One is
 "FOO\johndoe", the other one is "BAR\johndoe" or "johndoe@bar.local".
-Different SID, different account.  Full stop.
-</para>
+Different SID, different account.  Full stop.  </para>
 
 <para>The last part of the SID, the so called "Relative IDentifier" (RID),
 is by default used as UID and/or GID under Cygwin when you create the
@@ -118,12 +124,12 @@ an option in both tools to change the offset...</para>
 <para>Do you still remember the SIDs with special meaning?  In offical
 notation they are called "well-known SIDs".  For example, POSIX has no GID
 for the group of "all users" or "world" or "others".  The last three rwx
-bits in a permission value just represent the permissions for "everyone
-who is not the owner or is member of the owning group".  Windows has a
-SID for these poor souls, the "Everyone" SID.  Other well-known SIDs
-represent circumstances under which a process is running, rather than
-actual users or groups.  Here are a few examples for well-known
-SIDs:</para>
+bits in a unix-style permission value just represent the permissions for
+"everyone who is not the owner or is member of the owning group".
+Windows has a SID for these poor souls, the "Everyone" SID.  Other
+well-known SIDs represent circumstances under which a process is
+running, rather than actual users or groups.  Here are a few examples
+for well-known SIDs:</para>
 
 <screen>
 Everyone                        S-1-1-0    Simply everyone...
@@ -141,9 +147,13 @@ SYSTEM                          S-1-5-18   A special account which has all
 					   an uber-root account.
 </screen>
 
-<para>For a full list please refer to the MSDN document
-<ulink url="http://msdn.microsoft.com/en-us/library/aa379649.aspx">Well-known SIDs</ulink>.
-Naturally well-known SIDs are the same on each machine, so they are
+<para>For a full list please refer to the MSDN document <ulink
+url="http://msdn.microsoft.com/en-us/library/aa379649.aspx">Well-known
+SIDs</ulink>.  The Cygwin package called "csih" provides a tool,
+/usr/lib/csih/getAccountName.exe, which can be used to print the
+(possibly localized) name for the various well-known SIDS.</para>
+
+<para>Naturally well-known SIDs are the same on each machine, so they are
 not unique to a machine or domain.  They have the same meaning across
 the Windows network.</para>
 
@@ -489,22 +499,33 @@ aren't able (or willing) to deal with that order.</para>
 
 </sect2>
 
-
 <sect2 id="ntsec-setuid-overview"><title id="ntsec-setuid-overview.title">Switching the user context</title>
 
-<para>POSIX applications which have to switch the user context are using
-the <command>setuid</command> and <command>seteuid</command> calls.
-Windows doesn't support the concept of these calls in a simple
-fashion and switching the user context in Windows is generally a tricky
-process with lots of "behind the scenes" magic involved.</para>
+<para>Since Windows XP, Windows users have been accustomed to the
+"Switch User" feature, which switches the entire desktop to another user
+while leaving the original user's desktop "suspended".  Another Windows
+feature (since Windows 2000) is the "Run as..." context menu entry,
+which allows to start an application using another user account when
+right-clicking on applications and shortcuts.</para>
+
+<para>On POSIX systems, this operation can be performed by processes
+running under the privileged user accounts (usually the "root" user
+account) on a per-process basis.  This is called "switching the user
+context" for that process, and is performed using the POSIX
+<command>setuid</command> and <command>seteuid</command> system
+calls.</para>
+
+<para>While this sort of feature is available on Windows as well,
+Windows does not support the concept of these calls in a simple fashion.
+Switching the user context in Windows is generally a tricky process with
+lots of "behind the scenes" magic involved.</para>
 
 <para>Windows uses so-called `access tokens' to identify a user and its
 permissions.  Usually the access token is created at logon time and then
 it's attached to the starting process.  Every new process within a session
 inherits the access token from its parent process.  Every thread can
-get its own access token, which allows to define threads with restricted
-permissions.  To switch the user context the process has to request such
-an access token for the new user.</para>
+get its own access token, which allows, for instance, to define threads
+with restricted permissions.</para>
 
 </sect2>
 
@@ -512,17 +533,20 @@ an access token for the new user.</para>
 
 <para>To switch the user context the process has to request such an access
 token for the new user.  This is typically done by calling the Win32 API
-function <command>LogonUser</command>. The access token is returned and
-either used in <command>ImpersonateLoggedOnUser</command> to change the
-user context of the current thread, or in
-<command>CreateProcessAsUser</command> to change the user context of a
-spawned child process.  Later versions of Windows define new functions
-in this context and there are also functions to manipulate existing
-access tokens (usually only to restrict them).  Windows Vista also adds
-subtokens which are attached to other access tokens which plays an
-important role in the UAC (User Access Control) facility of Vista and
-later.  However, none of these extensions are really important for
-this documentation.</para>
+function <command>LogonUser</command> with the user name and the user's
+cleartext password as arguments.  If the user exists and the password was
+specified correctly, the access token is returned and either used in
+<command>ImpersonateLoggedOnUser</command> to change the user context of
+the current thread, or in <command>CreateProcessAsUser</command> to
+change the user context of a spawned child process.</para>
+
+<para>Later versions of Windows define new functions in this context and
+there are also functions to manipulate existing access tokens (usually
+only to restrict them).  Windows Vista also adds subtokens which are
+attached to other access tokens which plays an important role in the UAC
+(User Access Control) facility of Vista and later.  However, none of
+these extensions to the original concept are important for this
+documentation.</para>
 
 <para>Back to this logon with password, how can this be used to
 implement <command>set(e)uid</command>?  Well, it requires to patch the
@@ -539,8 +563,6 @@ application is illustrated by a short example:</para>
 #ifdef __CYGWIN__
 #include <windows.h>
 #include <sys/cygwin.h>
-/* Use the following define to determine the Windows version */
-#define is_winnt        (GetVersion() < 0x80000000)
 #endif
 
 [...]
@@ -559,10 +581,9 @@ application is illustrated by a short example:</para>
     token = cygwin_logon_user (user_pwd_entry, cleartext_password);
     if (token == INVALID_HANDLE_VALUE)
        error_exit;
-    /* Inform Cygwin about the new impersonation token.
-       Cygwin is able now, to switch to that user context by
-       setuid or seteuid calls. */
+    /* Inform Cygwin about the new impersonation token. */
     cygwin_set_impersonation_token (token);
+    /* Cygwin is now able, to switch to that user context by setuid or seteuid calls. */
   }
 #else
     /* Use standard method on non-Cygwin systems. */
