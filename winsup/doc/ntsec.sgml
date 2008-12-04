@@ -826,11 +826,11 @@ can access the password of all keys stored this way in the registry.</para>
 
 <para>Conclusion: If your system is used exclusively by you, and if
 you're also the only administrator of your system, and if your system is
-adequately locked down to prevent malicious access, you can savely use
+adequately locked down to prevent malicious access, you can safely use
 this method.  If your machine is part of a network which has
 dedicated administrators, and you're not one of these administrators,
 but you (think you) can trust your administrators, you can probably
-savely use this method.</para>
+safely use this method.</para>
 
 <para>In all other cases, don't use this method.  You have been warned.</para>
 
