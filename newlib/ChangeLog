@@ -1,3 +1,9 @@
+2008-12-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/features.h (_POSIX_V6_ILP32_OFF32): Always define.
+	(_POSIX_V6_LP64_OFF64): Ditto.
+	(_POSIX_V6_LPBIG_OFFBIG): Ditto.
+
 2008-11-28  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/inode.c: Include <dirent.h> instead of
