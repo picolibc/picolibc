@@ -1,3 +1,8 @@
+2008-12-05  Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips/idt64.ld: Set arch to mips:isa64r2 from mips:isa64.  Update
+	comment.
+
 2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
             Patrick Mansfield  <patmans@us.ibm.com>
             Joel Schopp   <jschopp@austin.ibm.com>
