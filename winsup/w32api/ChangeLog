@@ -1,3 +1,8 @@
+2008-12-05  Chris Sutcliffe <ir0nh34d@users.sf.net>
+
+	* lib/glut.def: remove.
+	* lib/glut32.def: ditto.
+
 2008-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winbase.h (PROCESS_DEP_ENABLE,
