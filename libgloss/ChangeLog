@@ -1,3 +1,8 @@
+2008-12-06  Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips/idt32.ld: Set arch to mips:isa32r2 from mips:isa32.  Update
+	comment.
+
 2008-12-05  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips/idt64.ld: Set arch to mips:isa64r2 from mips:isa64.  Update

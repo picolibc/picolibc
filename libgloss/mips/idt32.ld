@@ -1,9 +1,9 @@
 /* The following TEXT start address leaves space for the monitor
-   workspace.  This linker script links isa32 programs for use with the
-   simulator.  */
+   workspace.  This linker script links ISA32r2 programs for use with
+   the simulator.  */
 
 ENTRY(_start)
-OUTPUT_ARCH("mips:isa32")
+OUTPUT_ARCH("mips:isa32r2")
 OUTPUT_FORMAT("elf32-littlemips", "elf32-bigmips", "elf32-littlemips")
 GROUP(-lc -lidt -lgcc)
 SEARCH_DIR(.)
