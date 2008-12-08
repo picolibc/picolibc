@@ -91,7 +91,7 @@ must_encode (char c)
 /* Encode special chars in registry key or value name.
  */
 static int
-encode_regname (char * dst, const char * src)
+encode_regname (char * dst, const char * src, bool add_val)
 {
   int di = 0;
   for (int si = 0; src[si]; si++)
@@ -108,31 +108,47 @@ encode_regname (char * dst, const char * src)
       else
 	dst[di++] = c;
     }
+
+  if (add_val)
+    {
+      if (di + 4 >= NAME_MAX + 1)
+	return ENAMETOOLONG;
+      memcpy (dst + di, "%val", 4);
+      di += 4;
+    }
+
   dst[di] = 0;
   return 0;
 }
 
 /* Decode special chars in registry key or value name.
+ * Returns 0: success, 1: "%val" detected, -1: error.
  */
 static int
 decode_regname (char * dst, const char * src, int len = -1)
 {
   if (len < 0)
     len = strlen (src);
+  int res = 0;
   int di = 0;
   for (int si = 0; si < len; si++)
     {
       char c = src[si];
       if (c == '%')
 	{
+	  if (si + 4 == len && !memcmp (src + si, "%val", 4))
+	    {
+	      res = 1;
+	      break;
+	    }
 	  if (si + 2 >= len)
-	    return EINVAL;
+	    return -1;
 	  char s[] = {src[si+1], src[si+2], '\0'};
 	  char *p;
 	  c = strtoul (s, &p, 16);
 	  if (!(must_encode (c) ||
 	        (c == '.' && si == 0 && (len == 3 || (src[3] == '.' && len == 4)))))
-	    return EINVAL;
+	    return -1;
 	  dst[di++] = c;
 	  si += 2;
 	}
@@ -140,7 +156,49 @@ decode_regname (char * dst, const char * src, int len = -1)
 	dst[di++] = c;
     }
   dst[di] = 0;
-  return 0;
+  return res;
+}
+
+
+/* Hash table to limit calls to key_exists ().
+ */
+class __DIR_hash
+{
+public:
+  __DIR_hash ()
+    {
+      memset (table, 0, sizeof(table));
+    }
+
+  void set (unsigned h)
+    {
+      table [(h >> 3) & (HASH_SIZE - 1)] |= (1 << (h & 0x3));
+    }
+
+  bool is_set (unsigned h) const
+    {
+      return (table [(h >> 3) & (HASH_SIZE - 1)] & (1 << (h & 0x3))) != 0;
+    }
+
+private:
+  enum { HASH_SIZE = 1024 };
+  unsigned char table[HASH_SIZE];
+};
+
+#define d_hash(d)	((__DIR_hash *) (d)->__d_internal)
+
+
+/* Return true if subkey NAME exists in key PARENT.
+ */
+static bool
+key_exists (HKEY parent, const char * name, DWORD wow64)
+{
+  HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
+  LONG error = RegOpenKeyEx (parent, name, 0, KEY_READ | wow64, &hKey);
+  if (error == ERROR_SUCCESS)
+    RegCloseKey (hKey);
+
+  return (error == ERROR_SUCCESS || error == ERROR_ACCESS_DENIED);
 }
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
@@ -190,7 +248,13 @@ fhandler_registry::exists ()
       goto out;
     }
 
-  hKey = open_key (path, KEY_READ, wow64, false);
+  char dec_file[NAME_MAX + 1];
+  int val_only = decode_regname (dec_file, file);
+  if (val_only < 0)
+    goto out;
+
+  if (!val_only)
+    hKey = open_key (path, KEY_READ, wow64, false);
   if (hKey != (HKEY) INVALID_HANDLE_VALUE)
     file_type = 1;
   else
@@ -199,33 +263,36 @@ fhandler_registry::exists ()
       if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	return 0;
 
-      while (ERROR_SUCCESS ==
-	     (error = RegEnumKeyEx (hKey, index++, buf, &buf_size, NULL, NULL,
-				     NULL, NULL))
-	     || (error == ERROR_MORE_DATA))
+      if (!val_only)
 	{
-	  if (strcasematch (buf, file))
+	  while (ERROR_SUCCESS ==
+		 (error = RegEnumKeyEx (hKey, index++, buf, &buf_size,
+					NULL, NULL, NULL, NULL))
+		 || (error == ERROR_MORE_DATA))
 	    {
-	      file_type = 1;
+	      if (strcasematch (buf, dec_file))
+		{
+		  file_type = 1;
+		  goto out;
+		}
+		buf_size = NAME_MAX + 1;
+	    }
+	  if (error != ERROR_NO_MORE_ITEMS)
+	    {
+	      seterrno_from_win_error (__FILE__, __LINE__, error);
 	      goto out;
 	    }
+	  index = 0;
 	  buf_size = NAME_MAX + 1;
 	}
-      if (error != ERROR_NO_MORE_ITEMS)
-	{
-	  seterrno_from_win_error (__FILE__, __LINE__, error);
-	  goto out;
-	}
-      index = 0;
-      buf_size = NAME_MAX + 1;
+
       while (ERROR_SUCCESS ==
 	     (error = RegEnumValue (hKey, index++, buf, &buf_size, NULL, NULL,
 				    NULL, NULL))
 	     || (error == ERROR_MORE_DATA))
 	{
-	  char enc_buf[NAME_MAX + 1];
 	  if (   (buf[0] == '\0' && strcasematch (file, DEFAULT_VALUE_NAME))
-	      || (!encode_regname (enc_buf, buf) && strcasematch (enc_buf, file)))
+	      || strcasematch (buf, dec_file))
 	    {
 	      file_type = -1;
 	      goto out;
@@ -324,7 +391,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		  value_name++;
 		  char dec_value_name[NAME_MAX + 1];
 		  DWORD dwSize;
-		  if (!decode_regname (dec_value_name, value_name) &&
+		  if (decode_regname (dec_value_name, value_name) >= 0 &&
 		      ERROR_SUCCESS ==
 		      RegQueryValueEx (hKey, dec_value_name, NULL, NULL, NULL,
 				       &dwSize))
@@ -381,13 +448,16 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
       res = 0;
       goto out;
     }
-  if (dir->__handle == INVALID_HANDLE_VALUE && dir->__d_position == 0)
+  if (dir->__handle == INVALID_HANDLE_VALUE)
     {
+      if (dir->__d_position != 0)
+	goto out;
       handle = open_key (path + 1, KEY_READ, wow64, false);
       dir->__handle = handle;
+      if (dir->__handle == INVALID_HANDLE_VALUE)
+	goto out;
+      dir->__d_internal = (unsigned) new __DIR_hash ();
     }
-  if (dir->__handle == INVALID_HANDLE_VALUE)
-    goto out;
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {
       strcpy (de->d_name, special_dot_files[dir->__d_position++]);
@@ -425,14 +495,35 @@ retry:
     }
 
   /* We get here if `buf' contains valid data.  */
-  if (*buf == 0)
-    strcpy (de->d_name, DEFAULT_VALUE_NAME);
-  else if (encode_regname (de->d_name, buf))
-    goto retry;
-
   dir->__d_position++;
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     dir->__d_position += 0x10000;
+
+  if (*buf == 0)
+    strcpy (de->d_name, DEFAULT_VALUE_NAME);
+  else
+    {
+      /* Append "%val" if value name is identical to a previous key name.  */
+      unsigned h = hash_path_name (1, buf);
+      bool add_val = false;
+      if (! (dir->__d_position & REG_ENUM_VALUES_MASK))
+	d_hash (dir)->set (h);
+      else if (d_hash (dir)->is_set (h)
+	       && key_exists ((HKEY) dir->__handle, buf, wow64))
+	add_val = true;
+
+      if (encode_regname (de->d_name, buf, add_val))
+	{
+	  buf_size = NAME_MAX + 1;
+	  goto retry;
+	}
+    }
+
+  if (dir->__d_position & REG_ENUM_VALUES_MASK)
+    de->d_type = DT_REG;
+  else
+    de->d_type = DT_DIR;
+
   res = 0;
 out:
   syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
@@ -473,11 +564,14 @@ int
 fhandler_registry::closedir (DIR * dir)
 {
   int res = 0;
-  if (dir->__handle != INVALID_HANDLE_VALUE &&
-      RegCloseKey ((HKEY) dir->__handle) != ERROR_SUCCESS)
+  if (dir->__handle != INVALID_HANDLE_VALUE)
     {
-      __seterrno ();
-      res = -1;
+      delete d_hash (dir);
+      if (RegCloseKey ((HKEY) dir->__handle) != ERROR_SUCCESS)
+	{
+	  __seterrno ();
+	  res = -1;
+	}
     }
   syscall_printf ("%d = closedir (%p)", res, dir);
   return 0;
@@ -488,7 +582,7 @@ fhandler_registry::open (int flags, mode_t mode)
 {
   int pathlen;
   const char *file;
-  HKEY handle;
+  HKEY handle = (HKEY) INVALID_HANDLE_VALUE;
 
   int res = fhandler_virtual::open (flags, mode);
   if (!res)
@@ -573,14 +667,16 @@ fhandler_registry::open (int flags, mode_t mode)
     }
 
   char dec_file[NAME_MAX + 1];
-  if (decode_regname (dec_file, file))
+  int val_only = decode_regname (dec_file, file);
+  if (val_only < 0)
     {
       set_errno (EINVAL);
       res = 0;
       goto out;
     }
 
-  handle = open_key (path, KEY_READ, wow64, false);
+  if (!val_only)
+    handle = open_key (path, KEY_READ, wow64, false);
   if (handle == (HKEY) INVALID_HANDLE_VALUE)
     {
       handle = open_key (path, KEY_READ, wow64, true);
@@ -736,7 +832,8 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
       const char *anchor = name;
       while (*name && !isdirsep (*name))
 	name++;
-      if (decode_regname (component, anchor, name - anchor))
+      int val_only = decode_regname (component, anchor, name - anchor);
+      if (val_only < 0)
         {
 	  set_errno (EINVAL);
 	  if (parentOpened)
@@ -748,6 +845,15 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 	name++;
       if (*name == 0 && isValue == true)
 	goto out;
+
+      if (val_only)
+	{
+	  set_errno (ENOENT);
+	  if (parentOpened)
+	    RegCloseKey (hParentKey);
+	  hKey = (HKEY) INVALID_HANDLE_VALUE;
+	  break;
+	}
 
       if (hParentKey != (HKEY) INVALID_HANDLE_VALUE)
 	{

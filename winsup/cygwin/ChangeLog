@@ -1,3 +1,24 @@
+2008-12-07  Christian Franke  <franke@computer.org>
+
+	* fhandler_registry.cc (encode_regname): Add Parameter add_val.
+	Append "%val" if add_val is set.
+	(decode_regname): Remove trailing "%val". Change returncode accordingly.
+	(__DIR_hash): New class.
+	(d_hash): New macro.
+	(key_exists): New function.
+	(fhandler_registry::exists): Remove encode of registry name before path
+	compare, decode file part of path instead.  Skip checks for keys if
+	trailing "%val" detected.
+	(fhandler_registry::fstat): Change check of return value of
+	decode_regname ().
+	(fhandler_registry::readdir): Allocate __DIR_hash.  Record key names in
+	hash table. Append "%val" if key with same name exists. Fix error
+	handling of encode_regname ().  Set dirent.d_type.
+	(fhandler_registry::closedir): Delete __DIR_hash.
+	(fhandler_registry::open): Don't open key if trailing "%val" detected
+	by decode_regname ().
+	(open_key): Ditto.
+
 2008-12-03  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
 
 	* libc/minires.c (open_sock): Set non blocking and close on exec.
