@@ -1,3 +1,7 @@
+2008-12-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* resolv.h: #include <netinet/in.h> for sockaddr_in typedef.
+
 2008-12-07  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (encode_regname): Add Parameter add_val.
