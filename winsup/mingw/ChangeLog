@@ -1,3 +1,7 @@
+2008-12-08  Dmitry G. Gorbachev  <d.g.gorbachev@gmail.com>
+
+	* cpu_features.c (__cpu_features_init): Remove erroneous ';'.
+
 2008-10-28  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Correct some binary distribution packaging defects.
