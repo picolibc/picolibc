@@ -1,3 +1,8 @@
+2008-12-10  Jason Merrill  <jason@redhat.com>
+
+	* demangle.h (enum demangle_component_type): Add
+	DEMANGLE_COMPONENT_FIXED_TYPE.
+
 2008-12-01  Cary Coutant  <ccoutant@google.com>
 
 	* plugin-api.h (ld_plugin_message): Change format parameter to const.
