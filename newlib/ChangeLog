@@ -1,3 +1,20 @@
+2008-12-10  Joseph Myers  <joseph@codesourcery.com>
+
+	* libc/include/stdint.h (INT32_MIN, INT32_MAX, UINT32_MAX,
+	INT_LEAST32_MIN, INT_LEAST32_MAX, UINT_LEAST32_MAX): Define to
+	constants with "long" types where appropriate.
+	(INT_FAST8_MIN, INT_FAST8_MAX, UINT_FAST8_MAX, INT_FAST16_MIN,
+	INT_FAST16_MAX, UINT_FAST16_MAX, INT_FAST32_MIN, INT_FAST32_MAX,
+	UINT_FAST32_MAX, INT_FAST64_MIN, INT_FAST64_MAX, UINT_FAST64_MAX):
+	Correct to match logic for defining corresponding types.
+	(INTMAX_MAX, INTMAX_MIN, UINTMAX_MAX): Define.
+	(SIZE_MAX): Define using __SIZE_MAX__ if available.
+	(PTRDIFF_MAX): Define using __PTRDIFF_MAX__ if available.
+	(PTRDIFF_MIN): Define in terms of PTRDIFF_MAX.
+	(WCHAR_MAX, WCHAR_MIN, WINT_MAX, WINT_MIN): Define.
+	(UINT8_C, UINT16_C): Define to give signed values if corresponding
+	types would promote to int.
+
 2008-12-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/features.h (_POSIX_V6_ILP32_OFF32): Always define.
