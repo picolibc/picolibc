@@ -51,6 +51,7 @@ _DEFUN(std, (ptr, flags, file, data),
   ptr->_bf._base = 0;
   ptr->_bf._size = 0;
   ptr->_lbfsize = 0;
+  memset (&ptr->_mbstate, 0, sizeof (_mbstate_t));
   ptr->_cookie = ptr;
   ptr->_read = __sread;
 #ifndef __LARGE64_FILES
@@ -139,6 +140,7 @@ found:
   fp->_bf._base = NULL;		/* no buffer */
   fp->_bf._size = 0;
   fp->_lbfsize = 0;		/* not line buffered */
+  memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   /* fp->_cookie = <any>; */	/* caller sets cookie, _read/_write etc */
   fp->_ub._base = NULL;		/* no ungetc buffer */
   fp->_ub._size = 0;

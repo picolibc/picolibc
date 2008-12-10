@@ -117,10 +117,20 @@ ELIX_4_SOURCES = \
 	asnprintf.c		\
 	diprintf.c		\
 	dprintf.c		\
+	fgetwc.c		\
+	fgetws.c		\
 	fmemopen.c		\
 	fopencookie.c		\
+	fputwc.c		\
+	fputws.c		\
 	funopen.c		\
+	fwide.c			\
+	getwc.c			\
+	getwchar.c		\
 	open_memstream.c	\
+	putwc.c			\
+	putwchar.c		\
+	ungetwc.c		\
 	vasniprintf.c		\
 	vasnprintf.c
 endif !ELIX_LEVEL_3
@@ -194,18 +204,23 @@ CHEWOUT_FILES = \
 	fgetc.def		\
 	fgetpos.def		\
 	fgets.def		\
+	fgetwc.def		\
+	fgetws.def		\
 	fileno.def		\
 	fmemopen.def		\
 	fopen.def		\
 	fopencookie.def		\
 	fputc.def		\
 	fputs.def		\
+	fputwc.def		\
+	fputws.def		\
 	fread.def		\
 	freopen.def		\
 	fseek.def		\
 	fsetpos.def		\
 	ftell.def		\
 	funopen.def		\
+	fwide.def		\
 	fwrite.def		\
 	getc.def		\
 	getc_u.def		\
@@ -215,6 +230,8 @@ CHEWOUT_FILES = \
 	getline.def		\
 	gets.def		\
 	getw.def		\
+	getwc.def		\
+	getwchar.def		\
 	mktemp.def		\
 	open_memstream.def	\
 	perror.def		\
@@ -224,6 +241,8 @@ CHEWOUT_FILES = \
 	putchar_u.def		\
 	puts.def		\
 	putw.def		\
+	putwc.def		\
+	putwchar.def		\
 	remove.def		\
 	rename.def		\
 	rewind.def		\
@@ -238,6 +257,7 @@ CHEWOUT_FILES = \
 	tmpfile.def		\
 	tmpnam.def		\
 	ungetc.def		\
+	ungetwc.def		\
 	vfprintf.def		\
 	vfscanf.def		\
 	viprintf.def		\
@@ -261,11 +281,15 @@ CLEANFILES = $(CHEWOUT_FILES) *.ref
 $(lpfx)fclose.$(oext): local.h
 $(lpfx)fdopen.$(oext): local.h
 $(lpfx)fflush.$(oext): local.h
+$(lpfx)fgetwc.$(oext): local.h
+$(lpfx)fgetws.$(oext): local.h
 $(lpfx)findfp.$(oext): local.h
 $(lpfx)fmemopen.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
 $(lpfx)fopencookie.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
+$(lpfx)fputwc.$(oext): local.h
+$(lpfx)fputws.$(oext): local.h fvwrite.h
 $(lpfx)fread.$(oext): local.h
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
@@ -273,11 +297,16 @@ $(lpfx)ftell.$(oext): local.h
 $(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
 $(lpfx)fwalk.$(oext): local.h
+$(lpfx)fwide.$(oext): local.h
+$(lpfx)getwc.$(oext): local.h
+$(lpfx)getwchar.$(oext): local.h
 $(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)iscanf.$(oext): local.h
 $(lpfx)makebuf.$(oext): local.h
 $(lpfx)open_memstream.$(oext): local.h
 $(lpfx)puts.$(oext): fvwrite.h
+$(lpfx)putwc.$(oext): local.h
+$(lpfx)putwchar.$(oext): local.h
 $(lpfx)refill.$(oext): local.h
 $(lpfx)scanf.$(oext): local.h
 $(lpfx)setbuf.$(oext): local.h
@@ -293,6 +322,7 @@ $(lpfx)svfiscanf.$(oext): local.h floatio.h
 $(lpfx)svfprintf.$(oext): local.h
 $(lpfx)svfscanf.$(oext): local.h floatio.h
 $(lpfx)ungetc.$(oext): local.h
+$(lpfx)ungetwc.$(oext): local.h
 $(lpfx)vfiprintf.$(oext): local.h
 $(lpfx)vfprintf.$(oext): local.h
 $(lpfx)vfiscanf.$(oext): local.h floatio.h

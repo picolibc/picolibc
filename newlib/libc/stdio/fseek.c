@@ -316,6 +316,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       if (HASUB (fp))
 	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
+      memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
       _funlockfile (fp);
       return 0;
     }
@@ -345,6 +346,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       fp->_p += n;
       fp->_r -= n;
     }
+  memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   _funlockfile (fp);
   return 0;
 
@@ -374,6 +376,7 @@ dumb:
      optimization is then allowed if no subsequent flush
      is performed.  */
   fp->_flags &= ~__SNPT;
+  memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   _funlockfile (fp);
   return 0;
 }

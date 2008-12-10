@@ -91,6 +91,38 @@ long long _EXFUN(_wcstoll_r, (struct _reent *, const wchar_t *, wchar_t **, int)
 unsigned long _EXFUN(_wcstoul_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 
+wint_t _EXFUN(fgetwc, (__FILE *));
+wchar_t *_EXFUN(fgetws, (wchar_t *, int, __FILE *));
+wint_t _EXFUN(fputwc, (wchar_t, __FILE *));
+int _EXFUN(fputws, (const wchar_t *, __FILE *));
+int _EXFUN (fwide, (__FILE *, int));
+wint_t _EXFUN (getwc, (__FILE *));
+wint_t _EXFUN (getwchar, (void));
+wint_t _EXFUN(putwc, (wchar_t, __FILE *));
+wint_t _EXFUN(putwchar, (wchar_t));
+wint_t _EXFUN (ungetwc, (wint_t wc, __FILE *));
+
+wint_t _EXFUN(_fgetwc_r, (struct _reent *, __FILE *));
+wchar_t *_EXFUN(_fgetws_r, (struct _reent *, wchar_t *, int, __FILE *));
+wint_t _EXFUN(_fputwc_r, (struct _reent *, wchar_t, __FILE *));
+int _EXFUN(_fputws_r, (struct _reent *, const wchar_t *, __FILE *));
+int _EXFUN (_fwide_r, (struct _reent *, __FILE *, int));
+wint_t _EXFUN (_getwc_r, (struct _reent *, __FILE *));
+wint_t _EXFUN (_getwchar_r, (struct _reent *ptr));
+wint_t _EXFUN(_putwc_r, (struct _reent *, wchar_t, __FILE *));
+wint_t _EXFUN(_putwchar_r, (struct _reent *, wchar_t));
+wint_t _EXFUN (_ungetwc_r, (struct _reent *, wint_t wc, __FILE *));
+
+#define getwc(fp)	fgetwc(fp)
+#define putwc(wc,fp)	fputwc((wc), (fp))
+#ifndef _REENT_ONLY
+#define getwchar()	fgetwc(_REENT->_stdin)
+#define putwchar(wc)	fputwc((wc), _REENT->_stdout)
+#else
+#define getwchar()	fgetwc(_impure_ptr->_stdin)
+#define putwchar(wc)	fputwc((wc), _impure_ptr->_stdout)
+#endif
+
 _END_STD_C
 
 #endif /* _WCHAR_H_ */

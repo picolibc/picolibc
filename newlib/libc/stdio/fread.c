@@ -147,6 +147,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
   CHECK_INIT(ptr, fp);
 
   _flockfile (fp);
+  ORIENT (fp, -1);
   if (fp->_r < 0)
     fp->_r = 0;
   total = resid;

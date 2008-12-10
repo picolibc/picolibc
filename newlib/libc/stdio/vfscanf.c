@@ -492,6 +492,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 
   _flockfile (fp);
 
+  ORIENT (fp, -1);
+
   nassigned = 0;
   nread = 0;
   for (;;)

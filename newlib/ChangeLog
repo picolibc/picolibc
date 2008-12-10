@@ -1,3 +1,51 @@
+2008-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	Implement basic wide char stdio functionality, based on FreeBSD.
+	* libc/include/stdio.h (__SORD): Define.
+	(__SWID): Define.
+	* libc/include/wchar.h: Add declarations for new wide char functions.
+	(getwc): Define as macro.
+	(getwchar): Ditto.
+	(putwc): Ditto.
+	(putwchar): Ditto.
+	* libc/include/sys/reent.h (struct __sFILE): Add _mbstate member.
+	(struct __sFILE64): Ditto.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES): Add fgetwc.c, fgetws.c,
+	fputwc.c, fputws.c, fwide.c, getwc.c, getwchar.c, putwc.c, putwchar.c
+	and ungetwc.c.
+	(CHEWOUT_FILES): Add fgetwc.def, fgetws.def, fputwc.def, fputws.def,
+	fwide.def, getwc.def, getwchar.def, putwc.def, putwchar.def and
+	ungetwc.def.
+	Add header dependency rules for the new files.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/fgetwc.c: New file, implementing fgetwc and _fgetwc_r.
+	* libc/stdio/fgetws.c: New file, implementing fgetws and _fgetws_r.
+	* libc/stdio/findfp.c (std): Initialize FILE's _mbstate member.
+	(__sfmoreglue): Ditto.
+	* libc/stdio/fputs.c (_fputs_r): Set stream orientation.
+	* libc/stdio/fputwc.c: New file, implementing fputwc and _fputwc_r.
+	* libc/stdio/fputws.c: New file, implementing fputws and _fputws_r.
+	* libc/stdio/fread.c (_fread_r): Set stream orientation.
+	* libc/stdio/freopen.c (_freopen_r): Reset stream orientation.  Reset
+	_mbstate.
+	* libc/stdio/fseek.c (_fseek_r): Reset _mbstate.
+	* libc/stdio/fwide.c: New file, implementing fwide and _fwide_r.
+	* libc/stdio/fwrite.c (_fwrite_r): Set stream orientation.
+	* libc/stdio/getwc.c: New file, implementing getwc and _getwc_r.
+	* libc/stdio/getwchar.c: New file, implementing getwchar and
+	_getwchar_r.
+	* libc/stdio/local.h (ORIENT): New macro.
+	* libc/stdio/puts.c (_puts_r): Set stream orientation.
+	* libc/stdio/putwc.c: New file, implementing putwc and _putwc_r.
+	* libc/stdio/putwchar.c: New file, implementing putwchar and
+	_putwchar_r.
+	* libc/stdio/refill.c (__srefill_r): Set stream orientation.
+	* libc/stdio/stdio.tex: Add documentation for new functions.
+	* libc/stdio/ungetc.c (_ungetc_r): Set stream orientation.
+	* libc/stdio/ungetwc.c: New file, implementing ungetwc and _ungetwc_r.
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Set stream orientation.
+	* libc/stdio/wbuf.c (__swbuf_r): Ditto.
+
 2008-12-10  Joseph Myers  <joseph@codesourcery.com>
 
 	* libc/include/stdint.h (INT32_MIN, INT32_MAX, UINT32_MAX,

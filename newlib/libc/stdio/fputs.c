@@ -89,6 +89,7 @@ _DEFUN(_fputs_r, (ptr, s, fp),
   CHECK_INIT(ptr, fp);
 
   _flockfile (fp);
+  ORIENT (fp, -1);
   result = __sfvwrite_r (ptr, fp, &uio);
   _funlockfile (fp);
   return result;

@@ -212,6 +212,7 @@ struct __sFILE {
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */
 #endif
+  _mbstate_t _mbstate;	/* for wide char stdio functions. */
   int   _flags2;        /* for future use */
 };
 
@@ -265,6 +266,7 @@ struct __sFILE64 {
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */
 #endif
+  _mbstate_t _mbstate;	/* for wide char stdio functions. */
 };
 typedef struct __sFILE64 __FILE;
 #else

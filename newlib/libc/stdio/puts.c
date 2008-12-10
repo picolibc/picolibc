@@ -89,8 +89,8 @@ _DEFUN(_puts_r, (ptr, s),
   uio.uio_resid = c + 1;
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
-
   _REENT_SMALL_CHECK_INIT (ptr);
+  ORIENT (stdout, -1);
   return (__sfvwrite_r (ptr, _stdout_r (ptr), &uio) ? EOF : '\n');
 }
 

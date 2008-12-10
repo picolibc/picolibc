@@ -120,6 +120,7 @@ _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
   CHECK_INIT(ptr, fp);
 
   _flockfile (fp);
+  ORIENT (fp, -1);
   if (__sfvwrite_r (ptr, fp, &uio) == 0)
     {
       _funlockfile (fp);

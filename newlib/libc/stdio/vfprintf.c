@@ -637,6 +637,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	CHECK_INIT (data, fp);
 	_flockfile (fp);
 
+	ORIENT(fp, -1);
+
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
 		_funlockfile (fp);

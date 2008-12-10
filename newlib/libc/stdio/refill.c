@@ -45,6 +45,8 @@ _DEFUN(__srefill_r, (ptr, fp),
 
   CHECK_INIT (ptr, fp);
 
+  ORIENT (fp, -1);
+
   fp->_r = 0;			/* largely a convenience for callers */
 
 #ifndef __CYGWIN__

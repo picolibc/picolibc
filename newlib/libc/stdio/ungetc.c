@@ -127,6 +127,8 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
 
   _flockfile (fp);
 
+  ORIENT (fp, -1);
+
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
 
