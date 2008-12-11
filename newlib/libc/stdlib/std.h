@@ -25,7 +25,7 @@
 #ifdef _HAVE_STDC
 int    		__ten_mul(double *acc, int digit);
 double		__adjust(struct _reent *ptr, double *acc, int dexp, int sign);
-const double	__exp10(unsigned x);
+double		__exp10(unsigned x);
 #else
 int    		__ten_mul();
 double		__adjust();

@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <errno.h>
+#include "local.h"
 
 char *
 _DEFUN(_vasniprintf_r, (ptr, buf, lenp, fmt, ap),

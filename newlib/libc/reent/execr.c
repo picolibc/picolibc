@@ -35,16 +35,16 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <reent.h>
-	int _execve_r(struct _reent *<[ptr]>, char *<[name]>,
-                      char **<[argv]>, char **<[env]>);
+	int _execve_r(struct _reent *<[ptr]>, const char *<[name]>,
+                      char *const <[argv]>[], char *const <[env]>[]);
 
 TRAD_SYNOPSIS
 	#include <reent.h>
 	int _execve_r(<[ptr]>, <[name]>, <[argv]>, <[env]>)
 	struct _reent *<[ptr]>;
         char *<[name]>;
-        char **<[argv]>;
-        char **<[env]>;
+        char *<[argv]>[];
+        char *<[env]>[];
 
 DESCRIPTION
 	This is a reentrant version of <<execve>>.  It
@@ -55,9 +55,9 @@ DESCRIPTION
 int
 _DEFUN (_execve_r, (ptr, name, argv, env),
      struct _reent *ptr _AND
-     char *name _AND
-     char **argv _AND
-     char **env)
+     _CONST char *name _AND
+     char *_CONST argv[] _AND
+     char *_CONST env[])
 {
   int ret;
 

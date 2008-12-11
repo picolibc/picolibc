@@ -719,8 +719,7 @@ return(0);
 
 /* Return nonzero if internal format number is infinite. */
 static int 
-eiisinf (x)
-     unsigned short x[];
+eiisinf (unsigned short x[])
 {
 
 #ifdef NANS

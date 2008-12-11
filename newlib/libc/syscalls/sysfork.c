@@ -5,6 +5,7 @@
 #ifndef NO_FORK
 
 #include <reent.h>
+#include <unistd.h>
 
 int
 _DEFUN_VOID (fork)

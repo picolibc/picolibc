@@ -1,6 +1,7 @@
 /* connector for kill */
 
 #include <reent.h>
+#include <signal.h>
 
 int
 _DEFUN (kill, (pid, sig),

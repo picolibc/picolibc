@@ -1,6 +1,7 @@
 /* connector for fstat */
 
 #include <reent.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 int

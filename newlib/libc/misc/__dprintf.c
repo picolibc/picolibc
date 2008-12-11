@@ -4,6 +4,7 @@
    We do assume _write_r is working.
 */
 
+#include <_ansi.h>
 #include "ctype.h"
 #include "reent.h"
 #include "string.h"
@@ -19,10 +20,10 @@
 static char *parse_number ();
 #endif
 
-static long get_number ();
-static void print_number ();
-static void write_char ();
-static void write_string ();
+static long _EXFUN(get_number, (char *, long, int));
+static void _EXFUN(print_number, (int, int, long));
+static void _EXFUN(write_char, (char c));
+static void _EXFUN(write_string, (_CONST char *s));
 
 /* Non-zero for big-endian systems.  */
 static int big_endian_p;
@@ -39,7 +40,7 @@ static int big_endian_p;
    20 words at a certain address).  A modifier of `N' says the next argument
    is a count, and the one after that is a pointer.
 
-   Example: __dprintf (stderr, "%Nx\n", 20, p); /-* print 20 ints at `p' *-/
+   Example: __dprintf ("%Nx\n", 20, p); /-* print 20 ints at `p' *-/
 
    Supported formats are: c d u x s p.
 
@@ -54,7 +55,7 @@ static int big_endian_p;
 
 void
 #ifdef __STDC__
-__dprintf (char *fmt, ...)
+__dprintf (const char *fmt, ...)
 #else
 __dprintf (fmt, va_alist)
      char *fmt;
@@ -176,10 +177,10 @@ parse_number (s, p)
 /* Fetch the number at S of SIZE bytes.  */
 
 static long
-get_number (s, size, unsigned_p)
-     char *s;
-     long size;
-     int unsigned_p;
+_DEFUN(get_number, (s, size, unsigned_p),
+     char *s _AND
+     long size _AND
+     int unsigned_p)
 {
   long x;
   unsigned char *p = (unsigned char *) s;
@@ -219,10 +220,10 @@ get_number (s, size, unsigned_p)
 /* Print X in base BASE.  */
 
 static void
-print_number (base, unsigned_p, n)
-     int base;
-     int unsigned_p;
-     long n;
+_DEFUN(print_number, (base, unsigned_p, n),
+     int base _AND
+     int unsigned_p _AND
+     long n)
 {
   static char chars[16] = "0123456789abcdef";
   char *p, buf[32];
@@ -253,8 +254,8 @@ print_number (base, unsigned_p, n)
    stdio is working.  */
 
 static void
-write_char (c)
-     char c;
+_DEFUN(write_char, (c),
+     char c)
 {
   _write_r (_REENT, CONSOLE_FD, &c, 1);
 }
@@ -264,8 +265,8 @@ write_char (c)
    stdio is working.  */
 
 static void
-write_string (s)
-     char *s;
+_DEFUN(write_string, (s),
+     _CONST char *s)
 {
   _write_r (_REENT, CONSOLE_FD, s, strlen (s));
 }

@@ -250,8 +250,6 @@ static void * get_arg (int, va_list *, int *, void **);
 typedef unsigned long long u_long_long;
 #endif
 
-/*static*/ u_char *__sccl ();
-
 /*
  * vfscanf
  */
@@ -452,7 +450,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   size_t mbslen;                /* length of converted multibyte sequence */
   mbstate_t state;              /* value to keep track of multibyte state */
 
-  u_long (*ccfn) () = 0;	/* conversion function (strtol/strtoul) */
+  #define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
+  u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
@@ -658,13 +657,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /* FALLTHROUGH */
 	case 'd':
 	  c = CT_INT;
-	  ccfn = (u_long (*)())_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
 	  base = 10;
 	  break;
 
 	case 'i':
 	  c = CT_INT;
-	  ccfn = (u_long (*)())_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
 	  base = 0;
 	  break;
 
@@ -786,7 +785,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  if (isupper (c))
 	    flags |= LONG;
 	  c = CT_INT;
-	  ccfn = (u_long (*)())_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
 	  base = 10;
 	  break;
 	}

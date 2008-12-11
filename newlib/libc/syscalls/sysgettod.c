@@ -2,10 +2,7 @@
 
 #include <reent.h>
 #include <sys/types.h>
-#include <sys/times.h>
-
-struct timeval;
-struct timezone;
+#include <sys/time.h>
 
 int
 _DEFUN (gettimeofday, (ptimeval, ptimezone),

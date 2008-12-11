@@ -1,3 +1,46 @@
+2008-12-11  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/include/sys/lock.h:  Add void cast to avoid "statement has no
+	effect" warnings from gcc.
+	* libc/include/sys/stdio.h:  Ditto.
+	* libc/include/sys/time.h:  Correct gettimeofday() prototype.
+	* libc/stdlib/__exp10.c:  Add #include "std.h" for function prototype.
+	* libc/stdlib/__ten_mu.c:  Ditto.
+	* libc/stdlib/std.h:  Correct __exp10's ANSI prototype.
+	* libc/stdlib/ldtoa.c:  Change eiisinf definition to ANSI form.  (Are
+	already others in file without _ansi method, so did not bother.)
+	* libc/stdlib/system.c:  Use _ansi forms for function prototypes and
+	definitions.
+	* libc/time/mktime.c:  Ditto.
+	* libc/misc/__dprintf.c:  Ditto.
+	* libc/include/stdio.h:  Add function prototypes for _fgetc_r,
+	_fgetpos_r, _fsetpos_r, _freopen_r, _rewind_r, freopen64, _freopen64_r,
+	_funopen_r, and _fopencookie_r.
+	* libc/include/reent.h:  Add function prototype for _stat64_r, align
+	_execve_r prototype with POSIX definition for execve.
+	* libc/reent/execr.c:  Align function prototype with POSIX definition.
+	* libc/stdio/asniprintf.c:  Add #include "local.h".
+	* libc/stdio/vasniprintf.c:  Ditto.
+	* libc/stdio/fread.c:  Remove unused variable newcount.
+	* libc/stdio/local.h:  Add function prototype for __sccl.
+	* libc/stdio/open_memstream.c:  Remove unused variable flags.
+	* libc/stdio/vfscanf.c:  Proper prototyping for ccfn, remove prototype
+	for __sccl since now in local.h.
+	* libc/string/memcpy.c:  Add #include <string.h> (for real and for
+	traditional synopsis), remove extraneous stddef.h and limits.h.
+	* libc/syscalls/sysclose.c:  Add #include <unistd.h>.
+	* libc/syscalls/sysfork.c:  Ditto.
+	* libc/syscalls/sysgetpid.c:  Ditto.
+	* libc/syscalls/sysexecve.c:  Add #include <unistd.h>, align function
+	prototype with POSIX definition.
+	* libc/syscalls/sysfstat.c:  Add #include <sys/stat.h>.
+	* libc/syscalls/sysgettod.c:  Correct sys/times.h to sys/time.h.
+	* libc/syscalls/syskill.c:  Add #include <signal.h>.
+	* libc/syscalls/syslink.c:  Add #include <unistd.h>, fix prototype.
+	* libc/syscalls/sysunlink.c:  Ditto.
+	* libc/syscalls/sysstat.c:  Add #include <sys/stat.h>, fix prototype.
+	* libc/syscalls/syswait.c:  Add #include <sys/wait.h>, fix prototype.
+
 2008-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	Implement basic wide char stdio functionality, based on FreeBSD.

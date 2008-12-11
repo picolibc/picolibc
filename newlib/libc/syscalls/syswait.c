@@ -1,8 +1,9 @@
 /* connector for wait */
 
 #include <reent.h>
+#include <sys/wait.h>
 
-int
+pid_t
 _DEFUN (wait, (status),
         int *status)
 {

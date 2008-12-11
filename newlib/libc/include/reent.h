@@ -137,7 +137,7 @@ struct timezone;
 /* Reentrant versions of system calls.  */
 
 extern int _close_r _PARAMS ((struct _reent *, int));
-extern int _execve_r _PARAMS ((struct _reent *, char *, char **, char **));
+extern int _execve_r _PARAMS ((struct _reent *, const char *, char *const *, char *const *));
 extern int _fcntl_r _PARAMS ((struct _reent *, int, int, int));
 extern int _fork_r _PARAMS ((struct _reent *));
 extern int _fstat_r _PARAMS ((struct _reent *, int, struct stat *));
@@ -170,6 +170,7 @@ struct stat64;
 extern _off64_t _lseek64_r _PARAMS ((struct _reent *, int, _off64_t, int));
 extern int _fstat64_r _PARAMS ((struct _reent *, int, struct stat64 *));
 extern int _open64_r _PARAMS ((struct _reent *, const char *, int, int));
+extern int _stat64_r _PARAMS ((struct _reent *, const char *, struct stat64 *));
 #endif
 
 #endif

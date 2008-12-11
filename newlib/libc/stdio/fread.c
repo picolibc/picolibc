@@ -87,7 +87,7 @@ _DEFUN(crlf_r, (ptr, fp, buf, count, eof),
        size_t count _AND
        int eof)
 {
-  int newcount = 0, r;
+  int r;
   char *s, *d, *e;
 
   if (count == 0)

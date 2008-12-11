@@ -371,13 +371,22 @@ int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
 int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 int	_EXFUN(_fflush_r, (struct _reent *, FILE *));
+int	_EXFUN(_fgetc_r, (struct _reent *, FILE *));
 char *  _EXFUN(_fgets_r, (struct _reent *, char *, int, FILE *));
+#ifdef _COMPILING_NEWLIB
+int	_EXFUN(_fgetpos_r, (struct _reent *, FILE *, _fpos_t *));
+int	_EXFUN(_fsetpos_r, (struct _reent *, FILE *, const _fpos_t *));
+#else
+int	_EXFUN(_fgetpos_r, (struct _reent *, FILE *, fpos_t *));
+int	_EXFUN(_fsetpos_r, (struct _reent *, FILE *, const fpos_t *));
+#endif
 int	_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 FILE *	_EXFUN(_fmemopen_r, (struct _reent *, void *, size_t, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
+FILE *	_EXFUN(_freopen_r, (struct _reent *, const char *, const char *, FILE *));
 int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
@@ -389,6 +398,7 @@ int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
 int	_EXFUN(_fseeko_r,(struct _reent *, FILE *, _off_t, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
 _off_t	_EXFUN(_ftello_r,(struct _reent *, FILE *));
+void	_EXFUN(_rewind_r, (struct _reent *, FILE *));
 size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR , size_t _size, size_t _n, FILE *));
 int	_EXFUN(_getc_r, (struct _reent *, FILE *));
 int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));
@@ -479,6 +489,7 @@ ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 #if !defined(__CYGWIN__) || defined(_COMPILING_NEWLIB)
 FILE *	_EXFUN(fdopen64, (int, const char *));
 FILE *  _EXFUN(fopen64, (const char *, const char *));
+FILE *  _EXFUN(freopen64, (_CONST char *, _CONST char *, FILE *));
 _off64_t _EXFUN(ftello64, (FILE *));
 _off64_t _EXFUN(fseeko64, (FILE *, _off64_t, int));
 int     _EXFUN(fgetpos64, (FILE *, _fpos64_t *));
@@ -487,6 +498,7 @@ FILE *  _EXFUN(tmpfile64, (void));
 
 FILE *	_EXFUN(_fdopen64_r, (struct _reent *, int, const char *));
 FILE *  _EXFUN(_fopen64_r, (struct _reent *,const char *, const char *));
+FILE *  _EXFUN(_freopen64_r, (struct _reent *, _CONST char *, _CONST char *, FILE *));
 _off64_t _EXFUN(_ftello64_r, (struct _reent *, FILE *));
 _off64_t _EXFUN(_fseeko64_r, (struct _reent *, FILE *, _off64_t, int));
 int     _EXFUN(_fgetpos64_r, (struct _reent *, FILE *, _fpos64_t *));
@@ -513,8 +525,18 @@ FILE	*_EXFUN(funopen,(const _PTR __cookie,
 		int (*__writefn)(_PTR __c, const char *__buf, int __n),
 		_fpos64_t (*__seekfn)(_PTR __c, _fpos64_t __off, int __whence),
 		int (*__closefn)(_PTR __c)));
+FILE	*_EXFUN(_funopen_r,(struct _reent *, const _PTR __cookie,
+		int (*__readfn)(_PTR __c, char *__buf, int __n),
+		int (*__writefn)(_PTR __c, const char *__buf, int __n),
+		_fpos64_t (*__seekfn)(_PTR __c, _fpos64_t __off, int __whence),
+		int (*__closefn)(_PTR __c)));
 # else
 FILE	*_EXFUN(funopen,(const _PTR __cookie,
+		int (*__readfn)(_PTR __cookie, char *__buf, int __n),
+		int (*__writefn)(_PTR __cookie, const char *__buf, int __n),
+		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
+		int (*__closefn)(_PTR __cookie)));
+FILE	*_EXFUN(_funopen_r,(struct _reent *, const _PTR __cookie,
 		int (*__readfn)(_PTR __cookie, char *__buf, int __n),
 		int (*__writefn)(_PTR __cookie, const char *__buf, int __n),
 		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
@@ -545,8 +567,10 @@ typedef struct
   cookie_seek_function_t  *seek;
   cookie_close_function_t *close;
 } cookie_io_functions_t;
-FILE *_EXFUN(fopencookie,(void *__cookie, const char *__mode,
-			  cookie_io_functions_t __functions));
+FILE *_EXFUN(fopencookie,(void *__cookie,
+		const char *__mode, cookie_io_functions_t __functions));
+FILE *_EXFUN(_fopencookie_r,(struct _reent *, void *__cookie,
+		const char *__mode, cookie_io_functions_t __functions));
 #endif /* ! __STRICT_ANSI__ */
 
 #ifndef __CUSTOM_FILE_IO__

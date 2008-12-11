@@ -254,7 +254,6 @@ _DEFUN(_open_memstream_r, (ptr, buf, size),
 {
   FILE *fp;
   memstream *c;
-  int flags;
 
   if (!buf || !size)
     {

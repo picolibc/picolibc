@@ -7,6 +7,7 @@ ANSI_SYNOPSIS
         void* memcpy(void *<[out]>, const void *<[in]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
+        #include <string.h>
         void *memcpy(<[out]>, <[in]>, <[n]>
         void *<[out]>;
         void *<[in]>;
@@ -33,8 +34,7 @@ QUICKREF
 	*/
 
 #include <_ansi.h>
-#include <stddef.h>
-#include <limits.h>
+#include <string.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
