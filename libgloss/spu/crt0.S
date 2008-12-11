@@ -158,6 +158,12 @@ _start:
 	ila	$3, _fini
 	brsl	$LR, atexit
 
+#ifdef _PROFILE
+	/* Call monstartup if profiling is enabled
+	 */
+	brsl	$LR, __monstartup
+#endif
+
 	ori     $3,$80,0
 	ori     $4,$81,0	
 #ifndef _STD_MAIN

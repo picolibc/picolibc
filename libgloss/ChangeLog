@@ -1,3 +1,8 @@
+2008-12-11  Ken Werner  <ken.werner@de.ibm.com
+
+	* spu/crt0.S: Call __monstartup if profiling is enabled.
+	* spu/Makefile.in: Add gcrt1.o gcrt2.o.
+
 2008-12-06  Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips/idt32.ld: Set arch to mips:isa32r2 from mips:isa32.  Update
