@@ -1,8 +1,8 @@
 2008-12-11 Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/include/sys/time.h(gettimeofday): Change prototype so
+	* libc/include/sys/time.h (gettimeofday): Change prototype so
 	2nd parameter is void *, matching SUSV2.
-	* libc/syscalls/sysgettod.c(gettimeofday): Ditto.
+	* libc/syscalls/sysgettod.c (gettimeofday): Ditto.
 
 2008-12-11 Jukka Pietarinen <jukka.pietarinen@mrf.fi>
 
