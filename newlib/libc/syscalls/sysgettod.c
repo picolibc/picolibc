@@ -7,7 +7,7 @@
 int
 _DEFUN (gettimeofday, (ptimeval, ptimezone),
      struct timeval *ptimeval _AND
-     struct timezone *ptimezone)
+     void *ptimezone)
 {
   return _gettimeofday_r (_REENT, ptimeval, ptimezone);
 }
