@@ -1,3 +1,17 @@
+2008-12-11 Jukka Pietarinen <jukka.pietarinen@mrf.fi>
+
+	* configure.host: Add lm32
+	* libc/include/machine/ieeefp.h: Add __lm32__
+	* libc/include/machine/setjmp.h: Add __lm32__
+	* libc/machine/configure.in: Add lm32
+	* libc/machine/configure: Regenerated.
+	* libc/machine/lm32/aclocal.m4: New file.
+	* libc/machine/lm32/configure.in: Ditto.
+	* libc/machine/lm32/configure: Ditto.
+	* libc/machine/lm32/Makefile.am: Ditto.
+	* libc/machine/lm32/Makefile.in: Ditto.
+	* libc/machine/lm32/setjmp.s: Ditto.
+
 2008-12-11  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/include/sys/lock.h:  Add void cast to avoid "statement has no

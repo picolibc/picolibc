@@ -149,6 +149,10 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __lm32__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __M32R__
 #define __IEEE_BIG_ENDIAN
 #endif

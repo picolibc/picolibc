@@ -161,6 +161,9 @@ case "${host_cpu}" in
   iq2000)
 	machine_dir=iq2000
 	;;
+  lm32)
+	machine_dir=lm32
+	;;
   m32c)
 	machine_dir=m32c
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DABORT_PROVIDED -DSMALL_MEMORY"
