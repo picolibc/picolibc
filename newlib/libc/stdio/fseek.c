@@ -101,6 +101,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <fcntl.h>
 #include <stdlib.h>

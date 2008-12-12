@@ -1,3 +1,9 @@
+2008-12-12  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/stdio/freopen.c:  Add <string.h> for memset prototype.
+	* libc/stdio/fseek.c:  Ditto.
+	* libc/stdio/fwide.c:  Add <wchar.h> for fwide prototype.
+
 2008-12-11 Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/time.h (gettimeofday): Change prototype so

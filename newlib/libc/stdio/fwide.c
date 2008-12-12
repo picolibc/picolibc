@@ -55,6 +55,7 @@ C99, POSIX.1-2001.
 */
 
 #include <_ansi.h>
+#include <wchar.h>
 #include "local.h"
 
 int
