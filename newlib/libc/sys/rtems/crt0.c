@@ -77,6 +77,13 @@ _calloc_r() {}
 _malloc_r() {}
 _free_r() {}
 
+/* stubs for functions required by libc/posix */
+int getdents(int fd, void *dp, int count) { return -1; }
+struct timespec;
+int nanosleep(const struct timespec *req, struct timespec *rem) { return -1; }
+int _execve(const char *path, char * const *argv, char * const *envp) { return -1; }
+int _exit(int status) { return -1; }
+
 /* gcc can implicitly generate references to these */
 /* strcmp() {} */
 /* strcpy() {} */

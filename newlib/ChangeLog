@@ -1,5 +1,10 @@
 2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/sys/rtems/crt0.c: Add stubs for getdents(), nanosleep(), 
+	_execve(), _exit().
+
+2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* configure.host: Let *rtems* default to c99-formats.
 
 2008-12-12  Craig Howland  <howland@LGSInnovations.com>
