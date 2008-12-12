@@ -1,5 +1,11 @@
 2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/include/sys/features.h: Set RTEMS's _POSIX_MONOTONIC_CLOCK to
+	200112L (SUSv3 compliance).
+	Comment out RTEMS's _POSIX_SHARED_MEMORY_OBJECTS (Unsupported).
+
+2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/sys/rtems/crt0.c: Add stubs for getdents(), nanosleep(), 
 	_execve(), _exit().
 
