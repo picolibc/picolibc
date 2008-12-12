@@ -510,11 +510,23 @@ displays information such as what model and speed processor you have.
 </para>
 <para>
 One unique aspect of the Cygwin <filename>/proc</filename> filesystem
-is <filename>/proc/registry</filename>, which displays the Windows
-registry with each <literal>KEY</literal> as a directory and each
-<literal>VALUE</literal> as a file. As anytime you deal with the
-Windows registry, use caution since changes may result in an unstable
-or broken system.  There are additionally subdirectories called
+is <filename>/proc/registry</filename>, see next section.
+</para>
+<para>
+The Cygwin <filename>/proc</filename> is not as complete as the
+one in Linux, but it provides significant capabilities. The
+<systemitem>procps</systemitem> package contains several utilities
+that use it.
+</para>
+</sect2>
+
+<sect2 id="pathnames-proc-registry"><title>The /proc/registry filesystem</title>
+<para>
+The <filename>/proc/registry</filename> filesystem provides read-only
+access to the Windows registry.  It displays each <literal>KEY</literal>
+as a directory and each <literal>VALUE</literal> as a file.  As anytime
+you deal with the Windows registry, use caution since changes may result
+in an unstable or broken system.  There are additionally subdirectories called
 <filename>/proc/registry32</filename> and <filename>/proc/registry64</filename>.
 They are identical to <filename>/proc/registry</filename> on 32 bit
 host OSes.  On 64 bit host OSes, <filename>/proc/registry32</filename>
@@ -522,10 +534,29 @@ opens the 32 bit processes view on the registry, while
 <filename>/proc/registry64</filename> opens the 64 bit processes view.
 </para>
 <para>
-The Cygwin <filename>/proc</filename> is not as complete as the
-one in Linux, but it provides significant capabilities. The
-<systemitem>procps</systemitem> package contains several utilities
-that use it.
+Reserved characters ('/', '\', ':', and '%') or reserved names
+(<filename>.</filename> and <filename>..</filename>) are converted by
+percent-encoding:
+<screen>
+<prompt>bash$</prompt> <userinput>regtool list -v '\HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices'</userinput>
+...
+\DosDevices\C: (REG_BINARY) = cf a8 97 e8 00 08 fe f7
+...
+<prompt>bash$</prompt> <userinput>cd /proc/registry/HKEY_LOCAL_MACHINE/SYSTEM</userinput>
+<prompt>bash$</prompt> <userinput>ls -l MountedDevices</userinput>
+...
+-r--r----- 1 Admin SYSTEM  12 Dec 10 11:20 %5CDosDevices%5CC%3A
+...
+<prompt>bash$</prompt> <userinput>od -t x1 MountedDevices/%5CDosDevices%5CC%3A</userinput>
+0000000 cf a8 97 e8 00 08 fe f7 01 00 00 00
+</screen>
+The unnamed (default) value of a key can be accessed using the filename
+<filename>@</filename>.
+</para>
+<para>
+If a registry key contains a subkey and a value with the same name
+<filename>foo</filename>, Cygwin displays the subkey as
+<filename>foo</filename> and the value as <filename>foo%val</filename>.
 </para>
 </sect2>
 
