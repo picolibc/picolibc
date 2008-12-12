@@ -85,11 +85,11 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-wcsncmp.$(OBJEXT) lib_a-wcsncpy.$(OBJEXT) \
 	lib_a-wcsnlen.$(OBJEXT) lib_a-wcspbrk.$(OBJEXT) \
 	lib_a-wcsrchr.$(OBJEXT) lib_a-wcsspn.$(OBJEXT) \
-	lib_a-wcsstr.$(OBJEXT) lib_a-wcswidth.$(OBJEXT) \
-	lib_a-wcsxfrm.$(OBJEXT) lib_a-wcwidth.$(OBJEXT) \
-	lib_a-wmemchr.$(OBJEXT) lib_a-wmemcmp.$(OBJEXT) \
-	lib_a-wmemcpy.$(OBJEXT) lib_a-wmemmove.$(OBJEXT) \
-	lib_a-wmemset.$(OBJEXT)
+	lib_a-wcsstr.$(OBJEXT) lib_a-wcstok.$(OBJEXT) \
+	lib_a-wcswidth.$(OBJEXT) lib_a-wcsxfrm.$(OBJEXT) \
+	lib_a-wcwidth.$(OBJEXT) lib_a-wmemchr.$(OBJEXT) \
+	lib_a-wmemcmp.$(OBJEXT) lib_a-wmemcpy.$(OBJEXT) \
+	lib_a-wmemmove.$(OBJEXT) lib_a-wmemset.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
@@ -116,9 +116,9 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	strstr.lo swab.lo u_strerr.lo wcscat.lo wcschr.lo wcscmp.lo \
 	wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo wcslcpy.lo \
 	wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo wcsnlen.lo \
-	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo \
-	wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo wmemcpy.lo \
-	wmemmove.lo wmemset.lo
+	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
+	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
+	wmemcpy.lo wmemmove.lo wmemset.lo
 @ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo wcpcpy.lo \
@@ -371,6 +371,7 @@ GENERAL_SOURCES = \
 	wcsrchr.c \
 	wcsspn.c \
 	wcsstr.c \
+	wcstok.c \
 	wcswidth.c \
 	wcsxfrm.c \
 	wcwidth.c \
@@ -420,7 +421,7 @@ wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
 wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
-wcsrchr.def	wcsspn.def	wcsstr.def \
+wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def
@@ -837,6 +838,12 @@ lib_a-wcsstr.o: wcsstr.c
 
 lib_a-wcsstr.obj: wcsstr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsstr.obj `if test -f 'wcsstr.c'; then $(CYGPATH_W) 'wcsstr.c'; else $(CYGPATH_W) '$(srcdir)/wcsstr.c'; fi`
+
+lib_a-wcstok.o: wcstok.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstok.o `test -f 'wcstok.c' || echo '$(srcdir)/'`wcstok.c
+
+lib_a-wcstok.obj: wcstok.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstok.obj `if test -f 'wcstok.c'; then $(CYGPATH_W) 'wcstok.c'; else $(CYGPATH_W) '$(srcdir)/wcstok.c'; fi`
 
 lib_a-wcswidth.o: wcswidth.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcswidth.o `test -f 'wcswidth.c' || echo '$(srcdir)/'`wcswidth.c

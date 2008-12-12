@@ -1,3 +1,11 @@
+2008-12-12  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/include/wchar.h:  Added wcstok() declaration.
+	* libc/string/wcstok.c: New file, implementing wcstok.
+	* libc/string/Makefile.am: Add wcstok support.
+	* libc/string/wcstrings.tex: Ditto.
+	* libc/string/Makefile.in: Regenerated.
+
 2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/stdio/fputws.c: Fix documentation.

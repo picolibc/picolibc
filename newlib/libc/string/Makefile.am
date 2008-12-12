@@ -62,6 +62,7 @@ GENERAL_SOURCES = \
 	wcsrchr.c \
 	wcsspn.c \
 	wcsstr.c \
+	wcstok.c \
 	wcswidth.c \
 	wcsxfrm.c \
 	wcwidth.c \
@@ -130,7 +131,7 @@ wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
 wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
-wcsrchr.def	wcsspn.def	wcsstr.def \
+wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def
