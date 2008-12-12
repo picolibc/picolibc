@@ -26,7 +26,7 @@
 
 /*
 FUNCTION        
-<<fputs>>---write a wide character string in a file or stream
+<<fputws>>---write a wide character string in a file or stream
 
 INDEX
 	fputws   

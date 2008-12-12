@@ -49,7 +49,7 @@ TRAD_SYNOPSIS
 	wchar_t <[wc]>;
 
 DESCRIPTION
-The <<putwchar(>> function or macro is the wide-character equivalent of
+The <<putwchar>> function or macro is the wide-character equivalent of
 the <<putchar>> function. It writes the wide character wc to stdout.
 
 The alternate function <<_putwchar_r>> is a reentrant version.  The

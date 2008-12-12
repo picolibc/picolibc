@@ -56,11 +56,11 @@ The alternate function <<_getwchar_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
-The next wide character cast to <<wint_t>>), unless there is no more
+The next wide character cast to <<wint_t>>, unless there is no more
 data, or the host system reports a read error; in either of these
-situations, <<getwchar>> returns <<EOF>>.
+situations, <<getwchar>> returns <<WEOF>>.
 
-You can distinguish the two situations that cause an <<EOF>> result by
+You can distinguish the two situations that cause an <<WEOF>> result by
 using `<<ferror(stdin)>>' and `<<feof(stdin)>>'.
 
 PORTABILITY
