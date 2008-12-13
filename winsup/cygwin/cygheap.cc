@@ -424,16 +424,6 @@ cygheap_root::set (const char *posix, const char *native, bool caseinsensitive)
 
 cygheap_user::~cygheap_user ()
 {
-#if 0
-  if (pname)
-    cfree (pname);
-  if (plogsrv)
-    cfree (plogsrv - 2);
-  if (pdomain)
-    cfree (pdomain);
-  if (psid)
-    cfree (psid);
-#endif
 }
 
 void

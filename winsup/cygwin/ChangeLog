@@ -1,3 +1,18 @@
+2008-12-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.cc (cygheap_user::~cygheap_user): Remove unneeded if 0'ed
+	code.
+
+	* fhandler_registry.cc (fhandler_registry::exists): Recode goto as
+	if/else to avoid a gcc4 compiler warning.
+	(fhandler_registry::open): Ditto.  Use one goto rather than two.
+
+	* gentls_offsets: Fix compiler warning in generated output.
+	* tlsoffsets.h: Regenerate.
+
+	* mount.cc (fillout_mntent): slashify native paths returned via
+	getmntent.
+
 2008-12-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* resolv.h: #include <netinet/in.h> for sockaddr_in typedef.

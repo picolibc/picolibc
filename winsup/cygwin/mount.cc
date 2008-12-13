@@ -1122,7 +1122,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      table because the mount table might change, causing weird effects
      from the getmntent user's point of view. */
 
-  strcpy (_my_tls.locals.mnt_fsname, native_path);
+  slashify (native_path, _my_tls.locals.mnt_fsname, false);
   ret.mnt_fsname = _my_tls.locals.mnt_fsname;
   strcpy (_my_tls.locals.mnt_dir, posix_path);
   ret.mnt_dir = _my_tls.locals.mnt_dir;
@@ -1135,7 +1135,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   tmp_pathbuf tp;
   UNICODE_STRING unat;
   tp.u_get (&unat);
-  get_nt_native_path (native_path, unat);
+  get_nt_native_path (_my_tls.locals.mnt_fsname, unat);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
