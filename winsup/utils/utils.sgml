@@ -749,7 +749,7 @@ to the current user.</para>
 <para>The <command>mount</command> utility is also the mechanism for
 adding new mounts to the mount table.  The following example
 demonstrates how to mount the directory
-<filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>
+<filename>//pollux/home/joe/data</filename> to <filename>/data</filename>
 for the duration of the current session.
 </para>
 
@@ -761,10 +761,10 @@ ls: /data: No such file or directory
 <prompt>c:\cygwin\&gt;</prompt> <userinput>mount //pollux/home/joe/data /data</userinput>
 mount: warning - /data does not exist!
 <prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
-\\pollux\home\joe\data on /data type smbfs (binary)
-c:\cygwin\bin on /usr/bin type ntfs (binary)
-c:\cygwin\lib on /usr/lib type ntfs (binary)
-c:\cygwin on / type ntfs (binary)
+//pollux/home/joe/data on /data type smbfs (binary)
+c:/cygwin/bin on /usr/bin type ntfs (binary)
+c:/cygwin/lib on /usr/lib type ntfs (binary)
+c:/cygwin on / type ntfs (binary)
 c: on /c type ntfs (binary,user,noumount)
 d: on /d type fat (binary,user,noumount)
 </screen>

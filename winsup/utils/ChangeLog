@@ -1,3 +1,7 @@
+2008-12-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* utils.sgml: Convert some backslashes to slashes.
+
 2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.c (longopts): Add --reg-store-pwd option.
