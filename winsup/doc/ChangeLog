@@ -1,3 +1,7 @@
+2008-12-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pathnames.sgml: Convert some backslashes to slashes.
+
 2008-12-11  Christian Franke  <franke@computer.org>
 
 	* pathnames.sgml: New section for /proc/registry. Document registry

@@ -164,10 +164,10 @@ arguments:</para>
 <title>Displaying the current set of mount points</title>
 <screen>
 <prompt>bash-3.2$</prompt> <userinput>mount</userinput>
-f:\cygwin\bin on /usr/bin type system (binmode)
-f:\cygwin\lib on /usr/lib type system (binmode)
-f:\cygwin on / type system (binmode)
-e:\src on /usr/src type system (binmode)
+f:/cygwin/bin on /usr/bin type system (binmode)
+f:/cygwin/lib on /usr/lib type system (binmode)
+f:/cygwin on / type system (binmode)
+e:/src on /usr/src type system (binmode)
 c: on /cygdrive/c type user (binmode,noumount)
 e: on /cygdrive/e type user (binmode,noumount)
 </screen>
@@ -184,8 +184,8 @@ information.</para>
 from a particular Win32 path to a POSIX one, Cygwin will
 automatically default to an imaginary mount point under the default POSIX
 path <filename>/cygdrive</filename>.  For example, if Cygwin accesses
-<filename>Z:\foo</filename> and the Z drive is not currently in the
-mount table, then <filename>Z:\</filename> would be automatically
+<filename>Z:/foo</filename> and the Z drive is not currently in the
+mount table, then <filename>Z:/</filename> would be automatically
 converted to <filename>/cygdrive/Z</filename>.  The default
 prefix of <filename>/cygdrive</filename> may be changed in the fstab file
 as outlined above.</para>
@@ -201,7 +201,7 @@ translate between Win32 and POSIX pathnames in shell scripts. See
 <para>The <envar>HOME</envar>, <envar>PATH</envar>, and
 <envar>LD_LIBRARY_PATH</envar> environment variables are automatically
 converted from Win32 format to POSIX format (e.g.  from
-<filename>c:\cygwin\bin</filename> to <filename>/bin</filename>, if
+<filename>c:/cygwin\bin</filename> to <filename>/bin</filename>, if
 there was a mount from that Win32 path to that POSIX path) when a Cygwin
 process first starts.</para>
 
@@ -479,11 +479,11 @@ does not.  In the same situation the function call
 <filename>filename.exe</filename>.  The two files can be distinguished
 by examining their inodes, as demonstrated below.
 <screen>
-<prompt>C:\&gt;</prompt> <userinput>ls * </userinput>
+<prompt>C:/&gt;</prompt> <userinput>ls * </userinput>
 a      a.exe     b.exe
-<prompt>C:\&gt;</prompt> <userinput>ls -i a a.exe</userinput>
+<prompt>C:/&gt;</prompt> <userinput>ls -i a a.exe</userinput>
 445885548 a       435996602 a.exe
-<prompt>C:\&gt;</prompt> <userinput>ls -i b b.exe</userinput>
+<prompt>C:/&gt;</prompt> <userinput>ls -i b b.exe</userinput>
 432961010 b       432961010 b.exe
 </screen>
 If a shell script <filename>myprog</filename> and a program
