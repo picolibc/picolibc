@@ -2346,7 +2346,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      easize = 0;
 	    }
 	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
-			       &attr, &io, FILE_SHARE_VALID_FLAGS, 
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
 	}

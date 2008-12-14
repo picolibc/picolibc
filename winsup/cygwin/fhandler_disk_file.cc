@@ -1640,7 +1640,7 @@ readdir_get_ino (const char *path, bool dot_dot)
       strcpy (c, "..");
       path = fname;
     }
-  path_conv pc (path, PC_SYM_NOFOLLOW | PC_POSIX);
+  path_conv pc (path, PC_SYM_NOFOLLOW | PC_POSIX | PC_NOWARN);
   if (pc.isspecial ())
     {
       if (!stat_worker (pc, &st))
