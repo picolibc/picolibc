@@ -1,5 +1,13 @@
 2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export fgetwc, fgetws, fputwc, fputws, fwide, getwc,
+	getwchar, putwc, putwchar, ungetwc.
+	* posix.sgml: Move above functions (add missing) into "implemented
+	SUSv3" section.
+	* include/cygwin/version.h: Bump api minor number.
+
+2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_registry): Declare dup method.
 	* fhandler_registry.cc (fhandler_registry::exists): Fix missing
 	parenthesis.

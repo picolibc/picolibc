@@ -155,6 +155,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fgetc
     fgetpos
     fgets
+    fgetwc
+    fgetws
     fileno
     flockfile
     floor
@@ -175,6 +177,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fprintf
     fputc
     fputs
+    fputwc
+    fputws
     fread
     free
     freeaddrinfo
@@ -197,6 +201,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ftw
     funlockfile
     futimes
+    fwide
     fwrite
     gai_strerror
     gcvt
@@ -256,6 +261,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     getutxent
     getutxid
     getutxline
+    getwc
+    getwchar
     getwd
     glob
     globfree
@@ -534,6 +541,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     putenv
     puts
     pututxline
+    putwc
+    putwchar
     pwrite
     qsort
     raise
@@ -765,6 +774,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     umask
     uname
     ungetc
+    ungetwc
     unlink
     unlockpt
     unsetenv
@@ -1187,18 +1197,13 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fesetround
     fetestexcept
     feupdateenv
-    fgetwc
-    fgetws
     floorl
     fmal
     fmaxl
     fminl
     fmodl
     fmtmsg
-    fputwc
-    fputws
     frexpl
-    fwide
     fwprintf
     fwscanf
     getcontext
@@ -1210,8 +1215,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     getnetbyname
     getnetent
     getpmsg
-    getwc
-    getwchar
     hypotl
     ilogbl
     initstate

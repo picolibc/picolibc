@@ -461,6 +461,8 @@ _fgetpos = fgetpos SIGFE
 _fgetpos64 = fgetpos64 SIGFE
 fgets SIGFE
 _fgets = fgets SIGFE
+fgetwc SIGFE
+fgetws SIGFE
 fgetxattr SIGFE
 fileno SIGFE
 _fileno = fileno SIGFE
@@ -506,6 +508,8 @@ fputc SIGFE
 _fputc = fputc SIGFE
 fputs SIGFE
 _fputs = fputs SIGFE
+fputwc SIGFE
+fputws SIGFE
 fread SIGFE
 _fread = fread SIGFE
 free SIGFE
@@ -569,6 +573,7 @@ funopen SIGFE
 futimens SIGFE
 futimes SIGFE
 futimesat SIGFE
+fwide SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
 gai_strerror = cygwin_gai_strerror NOSIGFE
@@ -708,6 +713,8 @@ getutxid SIGFE
 getutxline SIGFE
 getw SIGFE
 _getw = getw SIGFE
+getwc SIGFE
+getwchar SIGFE
 getwd SIGFE
 _getwd = getwd SIGFE
 getxattr SIGFE
@@ -1166,6 +1173,8 @@ _pututline = pututline SIGFE
 pututxline SIGFE
 putw SIGFE
 _putw = putw SIGFE
+putwc SIGFE
+putwchar SIGFE
 pwrite SIGFE
 qsort NOSIGFE
 _qsort = qsort NOSIGFE
@@ -1650,6 +1659,7 @@ uname SIGFE
 _uname = uname SIGFE
 ungetc SIGFE
 _ungetc = ungetc SIGFE
+ungetwc SIGFE
 unlink SIGFE
 _unlink = unlink SIGFE
 unlinkat SIGFE
