@@ -237,13 +237,15 @@ fhandler_registry::exists ()
   file++;
 
   if (file == path)
-    for (int i = 0; registry_listing[i]; i++)
-      if (path_prefix_p (registry_listing[i], path,
-			 strlen (registry_listing[i]), true))
-	{
-	  file_type = 1;
-	  break;
-	}
+    {
+      for (int i = 0; registry_listing[i]; i++)
+	if (path_prefix_p (registry_listing[i], path,
+			   strlen (registry_listing[i]), true))
+	  {
+	    file_type = 1;
+	    break;
+	  }
+    }
   else
     {
       char dec_file[NAME_MAX + 1];
@@ -640,6 +642,9 @@ fhandler_registry::open (int flags, mode_t mode)
 	    else
 	      {
 		set_io_handle (registry_keys[i]);
+		/* Marking as nohandle allows to call dup on pseudo registry
+		   handles. */
+		nohandle (true);
 		flags |= O_DIROPEN;
 		goto success;
 	      }
@@ -724,7 +729,7 @@ fhandler_registry::close ()
   if (res != 0)
     return res;
   HKEY handle = (HKEY) get_handle ();
-  if (handle != (HKEY) INVALID_HANDLE_VALUE)
+  if (handle != (HKEY) INVALID_HANDLE_VALUE && handle < HKEY_CLASSES_ROOT)
     {
       if (RegCloseKey (handle) != ERROR_SUCCESS)
 	{
@@ -890,4 +895,17 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
     }
 out:
   return hKey;
+}
+
+int
+fhandler_registry::dup (fhandler_base *child)
+{
+  int ret = fhandler_virtual::dup (child);
+  /* Pseudo registry handles can't be duplicated using DuplicateHandle.
+     Therefore those fhandlers are marked with the nohandle flag.  This
+     allows fhandler_base::dup to succeed as usual for nohandle fhandlers.
+     Here we just have to fix up by copying the pseudo handle value. */
+  if ((HKEY) get_handle () >= HKEY_CLASSES_ROOT)
+    child->set_io_handle (get_handle ());
+  return ret;
 }

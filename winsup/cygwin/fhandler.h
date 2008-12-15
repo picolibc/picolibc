@@ -1299,6 +1299,7 @@ class fhandler_registry: public fhandler_proc
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
   int close ();
+  int dup (fhandler_base *child);
 };
 
 class pinfo;
