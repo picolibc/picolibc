@@ -84,7 +84,10 @@ setlsapwd (const char *passwd)
       __seterrno_from_nt_status (status);
 #endif
       if (data_buf)
-	free (data_buf);
+	{
+	  memset (data.Buffer, 0, data.Length);
+	  free (data_buf);
+	}
     }
   return ret;
 }
