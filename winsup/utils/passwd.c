@@ -503,7 +503,8 @@ main (int argc, char **argv)
 "Note that storing even obfuscated passwords in the registry is not overly\n"
 "secure.  Use this feature only if the machine is adequately locked down.\n"
 "Don't use this feature if you don't need network access within a remote\n"
-"session.  You can delete your stored password by specifying an empty password.\n\n");
+"session.\n\n"
+"You can delete your stored password by specifying an empty password.\n\n");
       strcpy (newpwd, getpass ("Enter your current password: "));
       if (strcmp (newpwd, getpass ("Re-enter your current password: ")))
         eprint (0, "Password is not identical.");

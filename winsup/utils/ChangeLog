@@ -1,3 +1,8 @@
+2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (main): Put how to delete the registry password on its own
+	line in passwd -R output.
+
 2008-12-13  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* utils.sgml: Convert some backslashes to slashes.
