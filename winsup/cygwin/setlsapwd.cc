@@ -56,8 +56,6 @@ setlsapwd (const char *passwd)
   if (!passwd || ! *passwd
       || sys_mbstowcs_alloc (&data_buf, HEAP_NOTHEAP, passwd))
     {
-      NTSTATUS status = STATUS_ACCESS_DENIED;
-
       memset (&data, 0, sizeof data);
       if (data_buf)
 	RtlInitUnicodeString (&data, data_buf);
@@ -65,13 +63,19 @@ setlsapwd (const char *passwd)
       if ((lsa = open_local_policy (POLICY_CREATE_SECRET))
 	  != INVALID_HANDLE_VALUE)
 	{
-	  status = LsaStorePrivateData (lsa, &key, data.Length ? &data : NULL);
-	  if (NT_SUCCESS (status))
+	  NTSTATUS status = LsaStorePrivateData (lsa, &key,
+						 data.Length ? &data : NULL);
+	  /* Success or we're trying to remove a password entry which doesn't
+	     exist. */
+	  if (NT_SUCCESS (status)
+	      || (data.Length == 0 && status == STATUS_OBJECT_NAME_NOT_FOUND))
 	    ret = 0;
+	  else
+	    __seterrno_from_nt_status (status);
 	  LsaClose (lsa);
 	}
-      if (ret)
 #ifdef USE_SERVER
+      else if (ret)
 	{
 	  /* If that fails, ask cygserver. */
 	  client_request_setpwd request (&data);
@@ -80,8 +84,6 @@ setlsapwd (const char *passwd)
 	  else
 	    ret = 0;
 	}
-#else
-      __seterrno_from_nt_status (status);
 #endif
       if (data_buf)
 	{
