@@ -3610,7 +3610,7 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
 	  return -1;
 	}
     }
-  if (pathname && isdirsep (*pathname))
+  if (pathname && isabspath (pathname))
     stpcpy (path_ret, pathname);
   else
     {
