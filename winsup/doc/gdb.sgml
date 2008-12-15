@@ -20,8 +20,8 @@ your sources to objects.</para>
 
 <example id="gdb-g"><title>Compiling with -g</title>
 <screen>
-<prompt>$</prompt> gcc -g -O2 -c myapp.c
-<prompt>$</prompt> gcc -g myapp.c -o myapp
+<prompt>bash$</prompt> gcc -g -O2 -c myapp.c
+<prompt>bash$</prompt> gcc -g myapp.c -o myapp
 </screen>
 </example>
 
@@ -77,9 +77,9 @@ concerned:</para>
 
 <example id="gdb-cliargs"><title>Debugging with command line arguments</title>
 <screen>
-<prompt>$</prompt> myprog -t foo --queue 47
+<prompt>bash$</prompt> myprog -t foo --queue 47
 
-<prompt>$</prompt> gdb myprog
+<prompt>bash$</prompt> gdb myprog
 <prompt>(gdb)</prompt> run -t foo --queue 47
 </screen>
 </example>

@@ -1,3 +1,9 @@
+2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gcc.sgml: Use 'bash$' as Cygwin prompt throughout.
+	* gdb.sgml: Ditto.
+	* pathnames.sgml: Ditto.  Fix the @ expansion example.
+
 2008-12-13  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pathnames.sgml: Convert some backslashes to slashes.

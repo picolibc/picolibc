@@ -9,11 +9,11 @@ options.  Here's a simple example:</para>
 <example id="gcc-hello-world">
 <title>Building Hello World with GCC</title>
 <screen>
-<prompt>C:\&gt;</prompt> <userinput>gcc hello.c -o hello.exe</userinput>
-<prompt>C:\&gt;</prompt> <userinput>hello.exe</userinput>
+<prompt>bash$</prompt> <userinput>gcc hello.c -o hello.exe</userinput>
+<prompt>bash$</prompt> <userinput>hello.exe</userinput>
 Hello, World
 
-<prompt>C:\&gt;</prompt>
+<prompt>bash$</prompt>
 </screen>
 </example>
 

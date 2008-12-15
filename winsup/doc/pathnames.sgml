@@ -163,7 +163,7 @@ arguments:</para>
 <example id="pathnames-mount-ex">
 <title>Displaying the current set of mount points</title>
 <screen>
-<prompt>bash-3.2$</prompt> <userinput>mount</userinput>
+<prompt>bash$</prompt> <userinput>mount</userinput>
 f:/cygwin/bin on /usr/bin type system (binmode)
 f:/cygwin/lib on /usr/lib type system (binmode)
 f:/cygwin on / type system (binmode)
@@ -479,11 +479,11 @@ does not.  In the same situation the function call
 <filename>filename.exe</filename>.  The two files can be distinguished
 by examining their inodes, as demonstrated below.
 <screen>
-<prompt>C:/&gt;</prompt> <userinput>ls * </userinput>
+<prompt>bash$</prompt> <userinput>ls * </userinput>
 a      a.exe     b.exe
-<prompt>C:/&gt;</prompt> <userinput>ls -i a a.exe</userinput>
+<prompt>bash$</prompt> <userinput>ls -i a a.exe</userinput>
 445885548 a       435996602 a.exe
-<prompt>C:/&gt;</prompt> <userinput>ls -i b b.exe</userinput>
+<prompt>bash$</prompt> <userinput>ls -i b b.exe</userinput>
 432961010 b       432961010 b.exe
 </screen>
 If a shell script <filename>myprog</filename> and a program
@@ -577,6 +577,7 @@ In the following example compare the behaviors of the bash built-in
 <prompt>bash$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
 <prompt>bash$</prompt> <userinput>echo @mylist</userinput>
 @mylist
+<prompt>bash$</prompt> <userinput>cmd</userinput>
 <prompt>c:\&gt;</prompt> <userinput>c:\cygwin\bin\echo @mylist</userinput>
 This is a     long line
 </screen>
