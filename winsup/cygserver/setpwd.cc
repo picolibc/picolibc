@@ -90,6 +90,8 @@ client_request_setpwd::serve (transport_layer_base *const conn,
   RtlAppendUnicodeStringToString (&key, &sid);
   RtlInitUnicodeString (&data, _parameters.in.passwd);
   status = LsaStorePrivateData (lsa, &key, data.Length ? &data : NULL);
+  if (data.Length)
+    memset (data.Buffer, 0, data.Length);
   if (NT_SUCCESS (status))
     error_code (0);
   else
