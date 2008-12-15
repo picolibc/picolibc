@@ -256,7 +256,7 @@ fhandler_registry::exists ()
 
       if (!val_only)
 	hKey = open_key (path, KEY_READ, wow64, false);
-      if (hKey != (HKEY) INVALID_HANDLE_VALUE)
+      if (hKey != (HKEY) INVALID_HANDLE_VALUE || get_errno () == EACCES)
 	file_type = 1;
       else
 	{
@@ -683,7 +683,8 @@ fhandler_registry::open (int flags, mode_t mode)
 	handle = open_key (path, KEY_READ, wow64, false);
       if (handle == (HKEY) INVALID_HANDLE_VALUE)
 	{
-	  handle = open_key (path, KEY_READ, wow64, true);
+	  if (get_errno () != EACCES)
+	    handle = open_key (path, KEY_READ, wow64, true);
 	  if (handle == (HKEY) INVALID_HANDLE_VALUE)
 	    {
 	      res = 0;
