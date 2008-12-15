@@ -159,7 +159,12 @@ open_local_policy (ACCESS_MASK access)
 
   NTSTATUS ret = LsaOpenPolicy (NULL, &oa, access, &lsa);
   if (ret != STATUS_SUCCESS)
-    __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+    {
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      /* Some versions of Windows set the lsa handle to NULL when
+         LsaOpenPolicy fails. */
+      lsa = INVALID_HANDLE_VALUE;
+    }
   return lsa;
 }
 
