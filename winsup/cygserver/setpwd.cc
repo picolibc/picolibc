@@ -92,7 +92,9 @@ client_request_setpwd::serve (transport_layer_base *const conn,
   status = LsaStorePrivateData (lsa, &key, data.Length ? &data : NULL);
   if (data.Length)
     memset (data.Buffer, 0, data.Length);
-  if (NT_SUCCESS (status))
+  /* Success or we're trying to remove a password entry which doesn't exist. */
+  if (NT_SUCCESS (status)
+      || (data.Length == 0 && status == STATUS_OBJECT_NAME_NOT_FOUND))
     error_code (0);
   else
     error_code (LsaNtStatusToWinError (status));
