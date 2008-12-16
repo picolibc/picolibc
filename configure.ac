@@ -446,7 +446,7 @@ case "${target}" in
   *-*-chorusos)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
-  powerpc-*-darwin* | x86_64-*-darwin9*)
+  powerpc-*-darwin* | x86_64-*-darwin[[912]]*)
     noconfigdirs="$noconfigdirs ld gas gdb gprof"
     noconfigdirs="$noconfigdirs sim target-rda"
     ;;
@@ -1315,7 +1315,7 @@ AC_SUBST(gmpinc)
 # Check for PPL
 ppl_major_version=0
 ppl_minor_version=10
-ppllibs=
+ppllibs=" -lppl_c -lppl -lgmpxx "
 pplinc=
 
 AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the installed PPL package

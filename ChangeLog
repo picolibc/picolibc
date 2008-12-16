@@ -1,3 +1,22 @@
+2008-12-16  Paolo Bonzini  <bonzini@gnu.org>
+
+	Sync with GCC:
+
+	2008-12-12  Sebastian Pop  <sebastian.pop@amd.com>
+
+	* configure.ac (ppllibs): Add by default the lib flags.
+	* configure: Regenerate.
+
+	2008-12-04  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+        * configure.ac: Add double brackets on darwin[912].
+        * configure: Regenerate.
+
+	2008-12-02  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+        * configure.ac: Expand to darwin10 and later.
+        * configure: Regenerate.
+
 2008-12-02  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.def: configure-target-boehm-gc depends on
