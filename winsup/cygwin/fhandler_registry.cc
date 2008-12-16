@@ -75,9 +75,6 @@ static const char *special_dot_files[] =
 static const int SPECIAL_DOT_FILE_COUNT =
   (sizeof (special_dot_files) / sizeof (const char *)) - 1;
 
-/* Name given to default values */
-static const char *DEFAULT_VALUE_NAME = "@";
-
 static HKEY open_key (const char *name, REGSAM access, DWORD wow64, bool isValue);
 
 /* Return true if char must be encoded.
@@ -89,30 +86,35 @@ must_encode (char c)
 }
 
 /* Encode special chars in registry key or value name.
+ * Returns 0: success, -1: error.
  */
 static int
 encode_regname (char * dst, const char * src, bool add_val)
 {
   int di = 0;
-  for (int si = 0; src[si]; si++)
-    {
-      char c = src[si];
-      if (must_encode (c) ||
-	  (c == '.' && si == 0 && (!src[1] || (src[1] == '.' && !src[2]))))
-	{
-	  if (di + 3 >= NAME_MAX + 1)
-	    return ENAMETOOLONG;
-	  __small_sprintf (dst + di, "%%%02x", c);
-	  di += 3;
-	}
-      else
-	dst[di++] = c;
-    }
+  if (!src[0])
+    dst[di++] = '@'; // Default value.
+  else
+    for (int si = 0; src[si]; si++)
+      {
+	char c = src[si];
+	if (must_encode (c) ||
+	    (si == 0 && ((c == '.' && (!src[1] || (src[1] == '.' && !src[2]))) ||
+			(c == '@' && !src[1]))))
+	  {
+	    if (di + 3 >= NAME_MAX + 1)
+	      return -1;
+	    __small_sprintf (dst + di, "%%%02x", c);
+	    di += 3;
+	  }
+	else
+	  dst[di++] = c;
+      }
 
   if (add_val)
     {
       if (di + 4 >= NAME_MAX + 1)
-	return ENAMETOOLONG;
+	return -1;
       memcpy (dst + di, "%val", 4);
       di += 4;
     }
@@ -129,32 +131,39 @@ decode_regname (char * dst, const char * src, int len = -1)
 {
   if (len < 0)
     len = strlen (src);
+
   int res = 0;
-  int di = 0;
-  for (int si = 0; si < len; si++)
+  if (len > 4 && !memcmp (src + len - 4, "%val", 4))
     {
-      char c = src[si];
-      if (c == '%')
-	{
-	  if (si + 4 == len && !memcmp (src + si, "%val", 4))
-	    {
-	      res = 1;
-	      break;
-	    }
-	  if (si + 2 >= len)
-	    return -1;
-	  char s[] = {src[si+1], src[si+2], '\0'};
-	  char *p;
-	  c = strtoul (s, &p, 16);
-	  if (!(must_encode (c) ||
-		(c == '.' && si == 0 && (len == 3 || (src[3] == '.' && len == 4)))))
-	    return -1;
-	  dst[di++] = c;
-	  si += 2;
-	}
-      else
-	dst[di++] = c;
+      len -= 4;
+      res = 1;
     }
+
+  int di = 0;
+  if (len == 1 && src[0] == '@')
+    ; // Default value.
+  else
+    for (int si = 0; si < len; si++)
+      {
+	char c = src[si];
+	if (c == '%')
+	  {
+	    if (si + 2 >= len)
+	      return -1;
+	    char s[] = {src[si+1], src[si+2], '\0'};
+	    char *p;
+	    c = strtoul (s, &p, 16);
+	    if (!(must_encode (c) ||
+		  (si == 0 && ((c == '.' && (len == 3 || (src[3] == '.' && len == 4))) ||
+			       (c == '@' && len == 3)))))
+	      return -1;
+	    dst[di++] = c;
+	    si += 2;
+	  }
+	else
+	  dst[di++] = c;
+      }
+
   dst[di] = 0;
   return res;
 }
@@ -264,7 +273,7 @@ fhandler_registry::exists ()
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return 0;
 
-	  if (!val_only)
+	  if (!val_only && dec_file[0])
 	    {
 	      while (ERROR_SUCCESS ==
 		     (error = RegEnumKeyEx (hKey, index++, buf, &buf_size,
@@ -292,8 +301,7 @@ fhandler_registry::exists ()
 					NULL, NULL))
 		 || (error == ERROR_MORE_DATA))
 	    {
-	      if (   (buf[0] == '\0' && strcasematch (file, DEFAULT_VALUE_NAME))
-		  || strcasematch (buf, dec_file))
+	      if (strcasematch (buf, dec_file))
 		{
 		  file_type = -1;
 		  goto out;
@@ -501,25 +509,22 @@ retry:
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     dir->__d_position += 0x10000;
 
-  if (*buf == 0)
-    strcpy (de->d_name, DEFAULT_VALUE_NAME);
-  else
-    {
-      /* Append "%val" if value name is identical to a previous key name.  */
-      unsigned h = hash_path_name (1, buf);
-      bool add_val = false;
-      if (! (dir->__d_position & REG_ENUM_VALUES_MASK))
-	d_hash (dir)->set (h);
-      else if (d_hash (dir)->is_set (h)
-	       && key_exists ((HKEY) dir->__handle, buf, wow64))
-	add_val = true;
+  {
+    /* Append "%val" if value name is identical to a previous key name.  */
+    unsigned h = hash_path_name (1, buf);
+    bool add_val = false;
+    if (! (dir->__d_position & REG_ENUM_VALUES_MASK))
+      d_hash (dir)->set (h);
+    else if (d_hash (dir)->is_set (h)
+	     && key_exists ((HKEY) dir->__handle, buf, wow64))
+      add_val = true;
 
-      if (encode_regname (de->d_name, buf, add_val))
-	{
-	  buf_size = NAME_MAX + 1;
-	  goto retry;
-	}
-    }
+    if (encode_regname (de->d_name, buf, add_val))
+      {
+	buf_size = NAME_MAX + 1;
+	goto retry;
+      }
+  }
 
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     de->d_type = DT_REG;
@@ -695,11 +700,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	flags |= O_DIROPEN;
 
       set_io_handle (handle);
-
-      if (strcasematch (dec_file, DEFAULT_VALUE_NAME))
-	value_name = cstrdup ("");
-      else
-	value_name = cstrdup (dec_file);
+      value_name = cstrdup (dec_file);
 
       if (!(flags & O_DIROPEN) && !fill_filebuf ())
 	{
@@ -852,7 +853,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
       if (*name == 0 && isValue == true)
 	goto out;
 
-      if (val_only)
+      if (val_only || !component[0])
 	{
 	  set_errno (ENOENT);
 	  if (parentOpened)

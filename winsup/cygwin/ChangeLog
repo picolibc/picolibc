@@ -1,3 +1,16 @@
+2008-12-16  Christian Franke  <franke@computer.org>
+
+	* fhandler_registry.cc (DEFAULT_VALUE_NAME): Remove constant.
+	(encode_regname): Encode empty (default) name to "@".
+	Encode "@" to "%40".  Change error return to -1.
+	(decode_regname): Decode "@" to empty name.  Decode "%40" to "@".
+	(fhandler_registry::exists): Skip check for keys if name is empty.
+	Remove check for DEFAULT_VALUE_NAME, now handled by decode_regname ().
+	(fhandler_registry::readdir): Remove check for empty name, now
+	handled by encode_regname ().
+	(fhandler_registry::open): Remove check for DEFAULT_VALUE_NAME.
+	(fhandler_registry::open_key): Fail with ENOENT if key name is empty.
+
 2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (gen_full_path_at): Use isabspath instead of isdirsep
