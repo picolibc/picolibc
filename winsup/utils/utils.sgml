@@ -901,7 +901,7 @@ User operations:
   -P, --pwd-required       password is required for USER.
   -R, --reg-store-pwd      enter password to store it in the registry for
                            later usage by services to be able to switch
-                           to this user context with network credentials."
+                           to this user context with network credentials.
 
 System operations:
   -i, --inactive NUM       set NUM of days before inactive accounts are disabled
