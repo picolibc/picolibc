@@ -100,6 +100,10 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(frv)
 	config_testsuite=true
 	;;
+  lm32*-*-*)
+	AC_CONFIG_SUBDIRS(lm32)
+	config_testsuite=true
+	;;
   mcore-*-*)
 	AC_CONFIG_SUBDIRS(mcore)
 	config_testsuite=true

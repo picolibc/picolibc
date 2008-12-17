@@ -1,3 +1,20 @@
+2008-12-17  Jon Beniston <jon@beniston.com>
+
+	* README: Add description of lm32 directory.
+	* configure.in: Add lm32 target.        
+	* configure: Regenerated.
+	* libnosys/configure.in: Add lm32 target.
+	* libnosys/configure: Regenerated.
+	* lm32: New directory.
+	* lm32/aclocal.m4: New file.
+	* lm32/Makefile.in: New file.
+	* lm32/configure.in: New file.
+	* lm32/configure: New file.
+	* lm32/crt0.S: New file.
+	* lm32/isatty.c: New file.
+	* lm32/scall.S: New file.
+	* lm32/sim.ld: New file.
+
 2008-12-11  Ken Werner  <ken.werner@de.ibm.com
 
 	* spu/crt0.S: Call __monstartup if profiling is enabled.
