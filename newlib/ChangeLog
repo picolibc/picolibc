@@ -1,3 +1,7 @@
+2008-12-17  Jon Beniston <jon@beniston.com>
+
+	* configure.host: Set syscall_dir for lm32 target.
+
 2008-12-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/stdio.tex: Remove putwc and getwc references as they
