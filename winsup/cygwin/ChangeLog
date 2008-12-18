@@ -1,3 +1,12 @@
+2008-12-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlin_info::check): Set 4th parameter of
+	NtQueryDirectoryFile to NULL instead of 0 since it's a pointer.
+	Simplify label and break from loop handling in symlink evaluation
+	conditional expression.  Drop a now useless break statement.  Fix
+	behaviour when searching for `foo' and then finding a `foo.lnk'
+	which is no shortcut.
+
 2008-12-16  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (DEFAULT_VALUE_NAME): Remove constant.

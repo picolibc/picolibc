@@ -2407,7 +2407,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 		}
 	      else
 		{
-		  status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
+		  status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
 						 &fdi_buf, sizeof fdi_buf,
 						 FileDirectoryInformation,
 						 TRUE, &basename, TRUE);
@@ -2458,16 +2458,25 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	    {
 	      /* If searching for `foo' and then finding a `foo.lnk' which is
 		 no shortcut, return the same as if file not found. */
-	      if (!suffix.lnk_match () || !ext_tacked_on)
-		goto file_not_symlink;
-
-	      /* in case we're going to tack *another* .lnk on this filename. */
-	      fileattr = INVALID_FILE_ATTRIBUTES;
-	      continue;
+	      if (ext_tacked_on)
+		{
+		  fileattr = INVALID_FILE_ATTRIBUTES;
+		  set_error (ENOENT);
+		  continue;
+		}
 	    }
-	  if (contents[0] == ':' && contents[1] == '\\'
-	      && parse_device (contents))
-	    goto file_not_symlink;
+	  else if (contents[0] != ':' || contents[1] != '\\'
+		   || !parse_device (contents))
+	    break;
+	}
+
+      /* If searching for `foo' and then finding a `foo.lnk' which is
+	 no shortcut, return the same as if file not found. */
+      else if (suffix.lnk_match () && ext_tacked_on)
+        {
+	  fileattr = INVALID_FILE_ATTRIBUTES;
+	  set_error (ENOENT);
+	  continue;
 	}
 
       /* Reparse points are potentially symlinks.  This check must be
@@ -2478,8 +2487,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
 	{
 	  res = check_reparse_point (h);
-	  if (!res)
-	    goto file_not_symlink;
+	  if (res)
+	    break;
 	}
 
       /* This is the old Cygwin method creating symlinks.  A symlink will
@@ -2489,8 +2498,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	       == FILE_ATTRIBUTE_SYSTEM)
 	{
 	  res = check_sysfile (h);
-	  if (!res)
-	    goto file_not_symlink;
+	  if (res)
+	    break;
 	}
 
       /* If the file could be opened with FILE_READ_EA, and if it's on a
@@ -2499,17 +2508,11 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       else if (fs.is_nfs () && !no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY))
 	{
 	  res = check_nfs_symlink (h);
-	  if (!res)
-	    goto file_not_symlink;
+	  if (res)
+	    break;
 	}
 
-      /* Normal file. */
-      else
-	goto file_not_symlink;
-
-      break;
-
-
+    /* Normal file. */
     file_not_symlink:
       issymlink = false;
       syscall_printf ("%s", isdevice ? "is a device" : "not a symlink");
