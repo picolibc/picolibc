@@ -1,5 +1,14 @@
 2008-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc: Set 4th parameter of NtQueryDirectoryFile to
+	NULL throughout.  
+	(fhandler_disk_file::facl): Fix a condition so that fstat_by_handle
+	is actually used.
+	(fhandler_disk_file::readdir): Don't print debug message on a simple
+	STATUS_NO_MORE_FILES status code.
+
+2008-12-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlin_info::check): Set 4th parameter of
 	NtQueryDirectoryFile to NULL instead of 0 since it's a pointer.
 	Simplify label and break from loop handling in symlink evaluation

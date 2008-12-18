@@ -199,7 +199,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   PFILE_DIRECTORY_INFORMATION fdibuf = (PFILE_DIRECTORY_INFORMATION)
 				       alloca (65536);
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
-  while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, 0, &io, fdibuf,
+  while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, NULL, &io, fdibuf,
 					   65536, FileDirectoryInformation,
 					   FALSE, NULL, first)))
     {
@@ -391,13 +391,14 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
       goto too_bad;
     }
   if (wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ()
-      && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
+      && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
 						 &fdi_buf.fdi, sizeof fdi_buf,
 						 FileIdBothDirectoryInformation,
 						 TRUE, &basename, TRUE)))
     FileId = fdi_buf.fdi.FileId;
-  else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
-						 &fdi_buf.fdi, sizeof fdi_buf,
+  else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, NULL,
+						 &io, &fdi_buf.fdi,
+						 sizeof fdi_buf,
 						 FileDirectoryInformation,
 						 TRUE, &basename, TRUE)))
     FileId.QuadPart = 0; /* get_ino is called in fstat_helper. */
@@ -920,7 +921,7 @@ cant_access_acl:
 		    query_open (query_read_attributes);
 		    oret = open (O_BINARY, 0);
 		  }
-		if ((!oret && !fstat_by_handle (&st))
+		if ((oret && !fstat_by_handle (&st))
 		    || !fstat_by_name (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
@@ -1777,7 +1778,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
     {
       if ((dir->__flags & dirent_get_d_ino))
 	{
-	  status = NtQueryDirectoryFile (get_handle (), NULL, NULL, 0, &io,
+	  status = NtQueryDirectoryFile (get_handle (), NULL, NULL, NULL, &io,
 					 d_cache (dir), DIR_BUF_SIZE,
 					 FileIdBothDirectoryInformation,
 					 FALSE, NULL, dir->__d_position == 0);
@@ -1821,7 +1822,8 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		  if (d_cachepos (dir) == 0)
 		    {
 		      status = NtQueryDirectoryFile (get_handle (), NULL, NULL,
-					   0, &io, d_cache (dir), DIR_BUF_SIZE,
+					   NULL, &io, d_cache (dir),
+					   DIR_BUF_SIZE,
 					   FileDirectoryInformation,
 					   FALSE, NULL, cnt == 0);
 		      if (!NT_SUCCESS (status))
@@ -1838,7 +1840,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	    }
 	}
       if (!(dir->__flags & dirent_get_d_ino))
-	status = NtQueryDirectoryFile (get_handle (), NULL, NULL, 0, &io,
+	status = NtQueryDirectoryFile (get_handle (), NULL, NULL, NULL, &io,
 				       d_cache (dir), DIR_BUF_SIZE,
 				       (dir->__flags & dirent_nfs_d_ino)
 				       ? FileNamesInformation
@@ -1848,7 +1850,9 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 
 go_ahead:
 
-  if (!NT_SUCCESS (status))
+  if (status == STATUS_NO_MORE_FILES)
+    /*nothing*/;
+  else if (!NT_SUCCESS (status))
     debug_printf ("NtQueryDirectoryFile failed, status %p, win32 error %lu",
 		  status, RtlNtStatusToDosError (status));
   else
