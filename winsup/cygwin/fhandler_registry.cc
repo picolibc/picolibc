@@ -75,6 +75,22 @@ static const char *special_dot_files[] =
 static const int SPECIAL_DOT_FILE_COUNT =
   (sizeof (special_dot_files) / sizeof (const char *)) - 1;
 
+/* Value names for HKEY_PERFORMANCE_DATA.
+ *
+ * CAUTION: Never call RegQueryValueEx (HKEY_PERFORMANCE_DATA, "Add", ...).
+ * It WRITES data and may destroy the perfc009.dat file.  Same applies to
+ * name prefixes "Ad" and "A".
+ */
+static const char * const perf_data_files[] =
+{
+  "@",
+  "Costly",
+  "Global"
+};
+
+static const int PERF_DATA_FILE_COUNT =
+  sizeof (perf_data_files) / sizeof (perf_data_files[0]);
+
 static HKEY open_key (const char *name, REGSAM access, DWORD wow64, bool isValue);
 
 /* Return true if char must be encoded.
@@ -273,6 +289,24 @@ fhandler_registry::exists ()
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return 0;
 
+	  if (hKey == HKEY_PERFORMANCE_DATA)
+	    {
+	      /* RegEnumValue () returns garbage for this key.
+	         RegQueryValueEx () returns a PERF_DATA_BLOCK even
+	         if a value does not contain any counter objects.
+	         So allow access to the generic names and to
+	         (blank separated) lists of counter numbers.
+	         Never allow access to "Add", see above comment.  */
+	      for (int i = 0; i < PERF_DATA_FILE_COUNT && file_type == 0; i++)
+		{
+		  if (strcasematch (perf_data_files[i], file))
+		    file_type = -1;
+		}
+	      if (file_type == 0 && !file[strspn (file, " 0123456789")])
+		file_type = -1;
+	      goto out;
+	    }
+
 	  if (!val_only && dec_file[0])
 	    {
 	      while (ERROR_SUCCESS ==
@@ -376,7 +410,11 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	open_key (path, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE, wow64,
 		  (file_type < 0) ? true : false);
 
-      if (hKey != (HKEY) INVALID_HANDLE_VALUE)
+      if (hKey == HKEY_PERFORMANCE_DATA)
+	/* RegQueryInfoKey () always returns write time 0,
+	   RegQueryValueEx () does not return required buffer size.  */
+	;
+      else if (hKey != (HKEY) INVALID_HANDLE_VALUE)
 	{
 	  FILETIME ftLastWriteTime;
 	  DWORD subkey_count;
@@ -474,6 +512,18 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
       res = 0;
       goto out;
     }
+  if ((HKEY) dir->__handle == HKEY_PERFORMANCE_DATA)
+    {
+      /* RegEnumValue () returns garbage for this key,
+         simulate only a minimal listing of the generic names.  */
+      if (dir->__d_position >= SPECIAL_DOT_FILE_COUNT + PERF_DATA_FILE_COUNT)
+	goto out;
+      strcpy (de->d_name, perf_data_files[dir->__d_position - SPECIAL_DOT_FILE_COUNT]);
+      dir->__d_position++;
+      res = 0;
+      goto out;
+    }
+
 retry:
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     /* For the moment, the type of key is ignored here. when write access is added,
@@ -782,23 +832,21 @@ fhandler_registry::fill_filebuf ()
       bufalloc = 0;
       do
 	{
-	  bufalloc += 1000;
+	  bufalloc += 16 * 1024;
 	  filebuf = (char *) crealloc_abort (filebuf, bufalloc);
 	  size = bufalloc;
 	  error = RegQueryValueEx (handle, value_name, NULL, &type,
 				   (BYTE *) filebuf, &size);
 	  if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
 	    {
-	      if (error != ERROR_FILE_NOT_FOUND)
-		{
-		  seterrno_from_win_error (__FILE__, __LINE__, error);
-		  return true;
-		}
-	      goto value_not_found;
+	      seterrno_from_win_error (__FILE__, __LINE__, error);
+	      return false;
 	    }
 	}
       while (error == ERROR_MORE_DATA);
       filesize = size;
+      /* RegQueryValueEx () opens HKEY_PERFORMANCE_DATA.  */
+      RegCloseKey (handle);
     }
   return true;
 value_not_found:
@@ -851,9 +899,9 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
       if (*name)
 	name++;
       if (*name == 0 && isValue == true)
-	goto out;
+	break;
 
-      if (val_only || !component[0])
+      if (val_only || !component[0] || hKey == HKEY_PERFORMANCE_DATA)
 	{
 	  set_errno (ENOENT);
 	  if (parentOpened)
@@ -874,14 +922,14 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 				    REG_OPTION_BACKUP_RESTORE,
 				    effective_access | wow64, NULL,
 				    &hKey, NULL);
+	  if (parentOpened)
+	    RegCloseKey (hParentKey);
 	  if (error != ERROR_SUCCESS)
 	    {
 	      hKey = (HKEY) INVALID_HANDLE_VALUE;
 	      seterrno_from_win_error (__FILE__, __LINE__, error);
 	      return hKey;
 	    }
-	  if (parentOpened)
-	    RegCloseKey (hParentKey);
 	  hParentKey = hKey;
 	  parentOpened = true;
 	}
@@ -895,7 +943,6 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 	  hParentKey = hKey;
 	}
     }
-out:
   return hKey;
 }
 

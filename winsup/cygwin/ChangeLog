@@ -1,3 +1,20 @@
+2008-12-19  Christian Franke  <franke@computer.org>
+
+	* fhandler_registry.cc (perf_data_files): New table.
+	(PERF_DATA_FILE_COUNT): New constant.
+	(fhandler_registry::exists): Add check for HKEY_PERFORMANCE_DATA
+	value names.
+	(fhandler_registry::fstat): For HKEY_PERFORMANCE_DATA, return
+	default values only.
+	(fhandler_registry::readdir): For HKEY_PERFORMANCE_DATA, list
+	names from perf_data_files only.
+	(fhandler_registry::fill_filebuf): Use larger buffer to speed up
+	access to HKEY_PERFORMANCE_DATA values.  Remove check for possible
+	subkey.  Add RegCloseKey ().
+	(open_key): Replace goto by break, remove label.  Do not try to
+	open subkey of HKEY_PERFORMANCE_DATA.  Add missing RegCloseKey ()
+	after open subkey error.
+
 2008-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Handle incoming DOS paths non-POSIXy,
