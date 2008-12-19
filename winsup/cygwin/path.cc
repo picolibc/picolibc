@@ -1042,7 +1042,11 @@ is_virtual_symlink:
 	    {
 	      fileattr = sym.fileattr;
 	      path_flags = sym.pflags;
-	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
+	      /* If the OS is caseinsensitive or the FS is caseinsensitive or
+	         the incoming path was given in DOS notation, don't handle
+		 path casesensitive. */
+	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ()
+		  || is_msdos)
 		path_flags |= PATH_NOPOSIX;
 	      caseinsensitive = (path_flags & PATH_NOPOSIX)
 				? OBJ_CASE_INSENSITIVE : 0;
@@ -1214,6 +1218,10 @@ out:
       /* FS has been checked already for existing files. */
       if (exists () || fs.update (get_nt_native_path (), NULL))
 	{
+	  /* Incoming DOS paths are treated like DOS paths in native
+	     Windows applications.  No ACLs, just default settings. */
+	  if (is_msdos)
+	    fs.has_acls (false);
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
 	  if (fs.has_acls ())
 	    set_exec (0);  /* We really don't know if this is executable or not here

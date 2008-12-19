@@ -1,3 +1,8 @@
+2008-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Handle incoming DOS paths non-POSIXy,
+	always case-insensitive, always ignoring ACLs.
+
 2008-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc: Set 4th parameter of NtQueryDirectoryFile to
