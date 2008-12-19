@@ -30,9 +30,21 @@ details. */
 #include "tls_pbuf.h"
 #include "child_info.h"
 
-static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
+class pinfo_basic: public _pinfo
+{
+public:
+  pinfo_basic();
+};
 
-pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
+pinfo_basic::pinfo_basic()
+{
+  pid = dwProcessId = GetCurrentProcessId ();
+  GetModuleFileName (NULL, progname, sizeof (progname));
+}
+
+pinfo_basic myself_initial NO_COPY;
+
+pinfo NO_COPY myself (static_cast<_pinfo *> (&myself_initial));	// Avoid myself != NULL checks
 
 bool is_toplevel_proc;
 
@@ -43,12 +55,12 @@ void __stdcall
 set_myself (HANDLE h)
 {
   if (!h)
-    cygheap->pid = cygwin_pid (GetCurrentProcessId ());
+    cygheap->pid = cygwin_pid (myself_initial.pid);
+
   myself.init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
   myself->process_state |= PID_IN_USE;
-  myself->dwProcessId = GetCurrentProcessId ();
-
-  GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
+  myself->dwProcessId = myself_initial.pid;
+  strcpy (myself->progname, myself_initial.progname);
   strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
   if (h)

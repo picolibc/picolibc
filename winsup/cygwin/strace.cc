@@ -31,16 +31,19 @@ class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 
+strace::strace ()
+{
+  if (!dynamically_loaded && !_active && being_debugged ())
+    {
+      char buf[30];
+      __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active);
+      OutputDebugString (buf);
+    }
+}
+
 void
 strace::hello ()
 {
-  if (_active || !being_debugged ())
-    return;
-
-  char buf[30];
-  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active);
-  OutputDebugString (buf);
-
   if (active ())
     {
       char pidbuf[40];

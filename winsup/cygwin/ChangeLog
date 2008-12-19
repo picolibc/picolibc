@@ -1,3 +1,15 @@
+2008-12-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pinfo.cc (pinfo_basic): New class.
+	(pinfo_basic::pinfo_basic): Define constructor for new class.
+	(myself): Initialize from myself_initial.
+	(set_myself): Set pid and progname from already myself_initial.
+	* strace.cc (strace::strace): Split apart strace::hello.  Send
+	notification to strace as early as possible.
+	(strace::hello): Just send clause which describes the current process.
+	This can now be preceded by early initialization strace output.
+	* include/sys/strace.h (strace::strace): Declare new constructor.
+
 2008-12-19  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (perf_data_files): New table.
