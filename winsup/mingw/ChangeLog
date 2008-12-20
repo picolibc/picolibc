@@ -1,3 +1,20 @@
+2008-12-16 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* msvcrt.def.in (___lc_codepage_func, ___lc_collate_cp_func,
+	___lc_handle_func, ___mb_cur_max_func, ___setlc_active_func,
+	___unguarded_readlc_active_add_func, __crtCompareStringW,
+	__crtGetStringTypeW, __crtLCMapStringW, __pctype_func,
+	__pwctype_func, __iob_func, __uncaught_exception, __wcserror,
+	__CxxDetectRethrow, __CxxExceptionFilter, __CxxQueryExceptionSize,
+	__CxxRegisterExceptionObject, __CxxUnregisterExceptionObject,
+	__CxxCallUnwindDtor, __DestructExceptionObject, _aligned_free,
+	_aligned_malloc, _aligned_offset_malloc, _aligned_offset_realloc,
+	_aligned_realloc, _cgetws, _cputws, _cwprintf, _cwscanf, _getwch,
+	_getwche, _putwch, _resetstkoflw, _scprintf, _scwprintf,
+	_set_SSE2_enable, _snscanf, _snwscanf, _strtoi64, _strtoui64,
+	_ungetwch, _vscprintf, _vscwprintf, _wcserror, _wcstoi64,
+	_wcstoui64, _wctype, _wtof, _get_heap_handle): Always export.
+
 2008-12-08  Dmitry G. Gorbachev  <d.g.gorbachev@gmail.com>
 
 	* cpu_features.c (__cpu_features_init): Remove erroneous ';'.
@@ -60,6 +77,7 @@
 	* include/stdlib.h (strtod): Declare as `__inline__', not `inline';
 	reformat inline function definition.
 
+>>>>>>> 1.423
 2008-10-04 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.15.1 and introduce

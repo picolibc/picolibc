@@ -743,20 +743,28 @@ _wfindfirst64
 _wfindnext64
 _wstat64
 _wutime64
-#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
-; msvcr70.dll amd later
-__buffer_overrun
+; msvcrt.dll (file version 7.0.xxxx, as shipped with XP)
+___lc_codepage_func
+___lc_collate_cp_func
+___lc_handle_func
+___mb_cur_max_func
+___setlc_active_func
+___unguarded_readlc_active_add_func
+__crtCompareStringW
+__crtGetStringTypeW
+__crtLCMapStringW
+__pctype_func
+__pwctype_func
+__iob_func
+__uncaught_exception
+__wcserror
 __CxxDetectRethrow
 __CxxExceptionFilter
 __CxxQueryExceptionSize
 __CxxRegisterExceptionObject
 __CxxUnregisterExceptionObject
+__CxxCallUnwindDtor
 __DestructExceptionObject
-__lc_clike
-__security_error_handler
-__set_buffer_overrun_handler
-__uncaught_exception
-__wcserror
 _aligned_free
 _aligned_malloc
 _aligned_offset_malloc
@@ -764,7 +772,6 @@ _aligned_offset_realloc
 _aligned_realloc
 _cgetws
 _cputws
-_CRT_RTC_INIT
 _cwprintf
 _cwscanf
 _getwch
@@ -773,7 +780,7 @@ _putwch
 _resetstkoflw
 _scprintf
 _scwprintf
-_set_security_error_handler
+_set_SSE2_enable
 _snscanf
 _snwscanf
 _strtoi64
@@ -786,27 +793,21 @@ _wcstoi64
 _wcstoui64
 _wctype
 _wtof
+_get_heap_handle
+#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
+; msvcr70.dll and later
+__buffer_overrun
+__lc_clike
+__security_error_handler
+__set_buffer_overrun_handler
+_CRT_RTC_INIT
+_set_security_error_handler
 #endif  /* 7.0 */
 #if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr71.dll
-___lc_codepage_func
-___lc_collate_cp_func
-___lc_handle_func
-___mb_cur_max_func
-___setlc_active_func
-___unguarded_readlc_active_add_func
 __CppXcptFilter
-__crtCompareStringW
-__crtGetStringTypeW
-__crtLCMapStringW
-__CxxCallUnwindDtor
 __CxxCallUnwindVecDtor
-__iob_func
-__pctype_func
-__pwctype_func
-_get_heap_handle
 _set_purecall_handler
-_set_SSE2_enable
 #endif /* 7.1  */
 #if ( __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
 ; msvcr80.dll
