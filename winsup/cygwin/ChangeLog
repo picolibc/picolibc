@@ -1,5 +1,11 @@
 2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.cc (fhandler_base::wait_overlapped): Reorganize to eliminate
+	gotos and to hopefully eliminate one race when a signal is detected or
+	there is a WFMO error.
+
+2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* pinfo.h (pinfo::thisproc): Declare.  Rename from set_myself.
 	* pinfo.cc (pinfo::thisproc): Define.  Rename from set_myself.  Set
 	procinfo to NULL to avoid confusing subsequent init.

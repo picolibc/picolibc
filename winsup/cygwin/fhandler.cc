@@ -1682,19 +1682,11 @@ fhandler_base::destroy_overlapped ()
 int
 fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 {
-  int res;
+  int res = 0;
   *bytes = (DWORD) -1;
-  DWORD err = GetLastError ();
-  if (!inres && err != ERROR_IO_PENDING)
-    {
-      if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
-	goto err;
-      res = 1;
-      *bytes = 0;
-      err = 0;
-    }
-  else
-    {
+  DWORD err;
+  if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
+   {
 #ifdef DEBUGGING
       if (!get_overlapped ())
 	system_printf ("get_overlapped is zero?");
@@ -1707,39 +1699,47 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
       if (&_my_tls == _main_tls)
 	w4[n++] = signal_arrived;
       HANDLE h = writing ? get_output_handle () : get_handle ();
-      DWORD wres = WaitForMultipleObjects (n, w4, false, INFINITE);
-      err = 0;
-      switch (wres)
+      DWORD wfres = WaitForMultipleObjects (n, w4, false, INFINITE);
+      if (wfres != WAIT_OBJECT_0)
+	CancelIo (h);
+      BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
+      bool signalled = !wores && (wfres == WAIT_OBJECT_0 + 1);
+      if (signalled)
 	{
-	case WAIT_OBJECT_0:
-	  debug_printf ("normal read");
-	  if (GetOverlappedResult (h, get_overlapped (), bytes, false))
-	    res = 1;
-	  else
-	    {
-	      err = GetLastError ();
-	      goto err;
-	    }
-	  break;
-	case WAIT_OBJECT_0 + 1:
 	  debug_printf ("got a signal");
-	  CancelIo (h);
 	  set_errno (EINTR);
 	  res = 0;
-	  break;
-	default:
+	  err = 0;
+	}
+      else if (!wores)
+	{
 	  err = GetLastError ();
-	  debug_printf ("WFMO error, %E");
-	  goto err;
-	  break;
+	  debug_printf ("general error");
+	}
+      else
+	{
+	  debug_printf ("normal read");
+	  res = 1;
+	  err = 0;
 	}
     }
-  goto out;
 
-err:
-  __seterrno_from_win_error (err);
-  res = -1;
-out:
+  if (!err)
+    /* nothing to do */;
+  else if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
+    {
+      debug_printf ("err %u", err);
+      __seterrno_from_win_error (err);
+      res = -1;
+    }
+  else
+    {
+      res = 1;
+      *bytes = 0;
+      err = 0;
+      debug_printf ("EOF");
+    }
+
   /* Make sure the event is unsignalled (this is a potential race in a multi-threaded
      app.  Sigh.).  Must do this after WFMO and GetOverlappedResult or suffer
      occasional sporadic problems:
