@@ -516,7 +516,6 @@ pwdgrp::load (const wchar_t *rel_path)
   static const char succeeded[] = "succeeded";
   const char *res = failed;
   HANDLE fh = NULL;
-  LARGE_INTEGER off = { QuadPart:0LL };
 
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
@@ -543,8 +542,8 @@ pwdgrp::load (const wchar_t *rel_path)
 
   paranoid_printf ("%S", &upath);
 
-  status = NtOpenFile (&fh, FILE_READ_DATA, &attr, &io,
-		       FILE_SHARE_VALID_FLAGS, 0);
+  status = NtOpenFile (&fh, SYNCHRONIZE | FILE_READ_DATA, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
       paranoid_printf ("NtOpenFile(%S) failed, status %p", &upath, status);
@@ -568,8 +567,8 @@ pwdgrp::load (const wchar_t *rel_path)
       paranoid_printf ("malloc (%d) failed", fsi.EndOfFile.LowPart);
       goto out;
     }
-  status = NtReadFile (fh, NULL, NULL, NULL, &io, buf,
-		       fsi.EndOfFile.LowPart, &off, NULL);
+  status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, fsi.EndOfFile.LowPart,
+		       NULL, NULL);
   if (!NT_SUCCESS (status))
     {
       paranoid_printf ("NtReadFile(%S) failed, status %p", &upath, status);

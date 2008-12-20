@@ -75,7 +75,7 @@ public:
       return;
     if (pglock.acquire () == 1 &&
 	(!initialized || (check && etc::file_changed (etc_ix))))
-	(this->*read) ();
+      (this->*read) ();
     pglock.release ();
   }
 

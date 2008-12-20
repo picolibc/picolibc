@@ -1,3 +1,9 @@
+2008-12-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp::refresh): Fix indentation.
+	* uinfo.cc (pwdgrp::load): Open file synchronized to avoid truncated
+	read.  Drop local variable off.
+
 2008-12-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pinfo.cc (pinfo_basic): New class.
