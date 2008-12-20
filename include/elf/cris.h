@@ -166,6 +166,11 @@ START_RELOC_NUMBERS (elf_cris_reloc_type)
      (usually the fourth one).  */
   RELOC_NUMBER (R_CRIS_DTPMOD, 30)
 
+  /* Similar to R_CRIS_32_GOT_TPREL, but the value is the absolute
+     address of the GOT entry.  Disallowed in DSOs created with
+     -shared.  Assembly syntax: "sym:IE".  */
+  RELOC_NUMBER (R_CRIS_32_IE, 31)
+
   /* No other relocs must be visible outside the assembler.  */
 
 END_RELOC_NUMBERS (R_CRIS_max)
