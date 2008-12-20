@@ -112,8 +112,6 @@ public:
   bool __stdcall exists () __attribute__ ((regparm (1)));
   const char *_ctty (char *);
 
-  friend void __stdcall set_myself (HANDLE);
-
   /* signals */
   HANDLE sendsig;
   HANDLE exec_sendsig;
@@ -147,6 +145,7 @@ public:
   pinfo (_pinfo *x): procinfo (x), hProcess (NULL) {}
   pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0, NULL);}
   pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), waiter_ready (0), wait_thread (NULL) {init (n, flag, NULL);}
+  void thisproc (HANDLE) __attribute__ ((regparm (2)));
   void release ();
   int wait () __attribute__ ((regparm (1)));
   ~pinfo ()
@@ -222,7 +221,6 @@ cygwin_pid (pid_t pid)
 }
 
 void __stdcall pinfo_init (char **, int);
-void __stdcall set_myself (HANDLE h);
 extern pinfo myself;
 
 #define _P_VFORK 0

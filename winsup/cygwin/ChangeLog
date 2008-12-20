@@ -1,3 +1,12 @@
+2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pinfo.h (pinfo::thisproc): Declare.  Rename from set_myself.
+	* pinfo.cc (pinfo::thisproc): Define.  Rename from set_myself.  Set
+	procinfo to NULL to avoid confusing subsequent init.
+	(pinfo_init): Accommodate set_myself -> pinfo::thisproc rename.
+	* dcrt0.cc (child_info_fork::handle_fork): Ditto.
+	(child_info_spawn::handle_spawn): Ditto.
+
 2008-12-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp::refresh): Fix indentation.

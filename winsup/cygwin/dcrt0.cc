@@ -626,7 +626,7 @@ child_info_fork::handle_fork ()
 {
   cygheap_fixup_in_child (false);
   memory_init ();
-  set_myself (NULL);
+  myself.thisproc (NULL);
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
 
@@ -657,7 +657,7 @@ child_info_spawn::handle_spawn ()
       !DuplicateHandle (hMainProc, moreinfo->myself_pinfo, hMainProc, &h, 0,
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
-  set_myself (h);
+  myself.thisproc (h);
   __argc = moreinfo->argc;
   __argv = moreinfo->argv;
   envp = moreinfo->envp;

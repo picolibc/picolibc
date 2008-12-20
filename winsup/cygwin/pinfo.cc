@@ -52,28 +52,30 @@ bool is_toplevel_proc;
    _pinfo for this "pid" if h != NULL. */
 
 void __stdcall
-set_myself (HANDLE h)
+pinfo::thisproc (HANDLE h)
 {
+  procinfo = NULL;
+
   if (!h)
     cygheap->pid = cygwin_pid (myself_initial.pid);
 
-  myself.init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
-  myself->process_state |= PID_IN_USE;
-  myself->dwProcessId = myself_initial.pid;
-  strcpy (myself->progname, myself_initial.progname);
+  init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
+  procinfo->process_state |= PID_IN_USE;
+  procinfo->dwProcessId = myself_initial.pid;
+  strcpy (procinfo->progname, myself_initial.progname);
   strace.hello ();
-  debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
+  debug_printf ("myself->dwProcessId %u", procinfo->dwProcessId);
   if (h)
     {
       /* here if execed */
       static pinfo NO_COPY myself_identity;
-      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED, NULL);
-      myself->exec_sendsig = NULL;
-      myself->exec_dwProcessId = 0;
+      myself_identity.init (cygwin_pid (procinfo->dwProcessId), PID_EXECED, NULL);
+      procinfo->exec_sendsig = NULL;
+      procinfo->exec_dwProcessId = 0;
     }
   else if (!child_proc_info)	/* child_proc_info is only set when this process
 				   was started by another cygwin process */
-    myself->start_time = time (NULL); /* Register our starting time. */
+    procinfo->start_time = time (NULL); /* Register our starting time. */
   else if (cygheap->pid_handle)
     {
       ForceCloseHandle (cygheap->pid_handle);
@@ -96,7 +98,7 @@ pinfo_init (char **envp, int envc)
     {
       /* Invent our own pid.  */
 
-      set_myself (NULL);
+      myself.thisproc (NULL);
       myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
