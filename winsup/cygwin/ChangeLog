@@ -1,5 +1,11 @@
 2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* pipe.cc (getov_result): Add parameters to facilitate better EOF
+	checking.
+	(pipe_handler): Pass extra arguments to getov_result.
+
+2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.cc (fhandler_base::wait_overlapped): Reorganize to eliminate
 	gotos and to hopefully eliminate one race when a signal is detected or
 	there is a WFMO error.

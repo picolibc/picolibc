@@ -39,10 +39,14 @@ struct pipesync
 };
 
 inline bool
-getov_result (HANDLE h, DWORD& nbytes, LPOVERLAPPED ov)
+getov_result (BOOL res, bool reading, HANDLE h, DWORD& nbytes, LPOVERLAPPED ov)
 {
-  if (ov && (GetLastError () != ERROR_IO_PENDING
-	     || !GetOverlappedResult (h, ov, &nbytes, true)))
+  DWORD err = GetLastError ();
+  if (res || (reading && ov && !res && err == ERROR_HANDLE_EOF))
+    /* not an error */;
+  else if (!ov || (err != ERROR_IO_PENDING)
+	   || (!GetOverlappedResult (h, ov, &nbytes, true)
+	       && (!reading || (GetLastError () != ERROR_HANDLE_EOF))))
     {
       __seterrno ();
       return false;
@@ -91,13 +95,13 @@ pipe_handler (LPVOID in_ps)
     {
       ResetEvent (ov.hEvent);
       BOOL res = ReadFile (hread, buf, 4096, &read_bytes, rov);
-      if (!res && !getov_result (hread, read_bytes, rov))
+      if (!getov_result (res, true, hread, read_bytes, rov))
 	break;
       if (!read_bytes)
 	break;
 
       res = WriteFile (hwrite, buf, read_bytes, &write_bytes, wov);
-      if (!res && !getov_result (hwrite, write_bytes, wov))
+      if (!getov_result (res, false, hwrite, write_bytes, wov))
 	break;
       if (write_bytes != read_bytes)
 	break;
