@@ -42,7 +42,7 @@ inline bool
 getov_result (BOOL res, bool reading, HANDLE h, DWORD& nbytes, LPOVERLAPPED ov)
 {
   DWORD err = GetLastError ();
-  if (res || (reading && ov && !res && err == ERROR_HANDLE_EOF))
+  if (res || (reading && ov && err == ERROR_HANDLE_EOF))
     /* not an error */;
   else if (!ov || (err != ERROR_IO_PENDING)
 	   || (!GetOverlappedResult (h, ov, &nbytes, true)
@@ -70,7 +70,6 @@ pipe_handler (LPVOID in_ps)
   SetHandleInformation (h, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
   SetEvent (ps.ev);
 
-  char buf[4096];
   DWORD read_bytes, write_bytes;
   HANDLE hread, hwrite, hclose;
   OVERLAPPED ov, *rov, *wov;
@@ -91,6 +90,7 @@ pipe_handler (LPVOID in_ps)
       wov = NULL;
     }
 
+  char buf[4096];
   while (1)
     {
       ResetEvent (ov.hEvent);
@@ -151,7 +151,6 @@ out:
       CloseHandle (ev);
       ev = NULL;
     }
-  return;
 }
 
 void

@@ -1,3 +1,7 @@
+2008-12-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pipe.cc (getov_result): Minor cleanup.
+
 2008-12-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pipe.cc (getov_result): Add parameters to facilitate better EOF
