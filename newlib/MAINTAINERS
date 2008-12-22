@@ -23,7 +23,7 @@ free to devolve that responsibility among the other maintainers.
 
 Makefile.in, configure*:	jjohnstn@redhat.com
 
-Cygwin:				cgf@redhat.com
+Cygwin:				corinna@vinschen.de
 
 Web pages:			jjohnstn@redhat.com
 
@@ -41,5 +41,4 @@ m32c port		DJ Delorie		dj@redhat.com
 These are users with general write privileges after getting approval:
 
 DJ Delorie			dj@redhat.com
-Christopher G. Faylor		cgf@redhat.com
 Jim Wilson			wilson@specifixinc.com

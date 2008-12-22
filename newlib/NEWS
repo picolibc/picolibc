@@ -1,3 +1,17 @@
+*** Major changes in newlib version 1.17.0:
+
+* new C99 wide-char function additions
+* lm32 platform support contributed
+* movement of regex functions from sys/linux directory into
+  shared libc/posix directory
+* string function optimizations
+* redesign of formatted I/O to reduce dependencies when using
+  sprintf/sscanf family of functions
+* numerous warning cleanups
+* documentation fixes to support pdf, info, ps formats and
+  eclipse libhover hover docs
+* various bug fixes
+
 *** Major changes in newlib version 1.16.0:
 
 * mep-elf support contributed
