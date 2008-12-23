@@ -1,3 +1,7 @@
+2008-12-23  Nick Clifton  <nickc@redhat.com>
+
+	* commmon.h (STT_IFUNC): Delete.
+
 2008-12-20  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (R_CRIS_32_IE): New relocation.
