@@ -321,6 +321,15 @@ struct external_scnhdr {
     }									\
    while (0)
 
+/* The entire scnhdr may not be assigned.
+   Ensure that everything is initialized.  */
+#define COFF_ADJUST_SCNHDR_OUT_PRE(ABFD, INT, EXT)	\
+  do							\
+    {							\
+      memset((EXT), 0, sizeof (SCNHDR));		\
+    }							\
+  while (0)
+
 /* The line number and reloc overflow checking in coff_swap_scnhdr_out in
    coffswap.h doesn't use PUT_X for s_nlnno and s_nreloc.
    Due to different sized v0/v1/v2 section headers, we have to re-write these

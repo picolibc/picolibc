@@ -1,3 +1,7 @@
+2008-12-23  Johan Olmutz Nielsen  <jnielsen@ddci.com>
+
+	* ti.h (COFF_ADJUST_SCNHDR_OUT_PRE): Define.
+
 2008-06-17  Nick Clifton  <nickc@redhat.com>
 
 	* ti.h (GET_SCNHDR_NLNNO): Provide an alternative version of this
