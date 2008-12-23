@@ -23,134 +23,9 @@ details. */
 #include "pinfo.h"
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), popen_pid (0)
+  : fhandler_base (), popen_pid (0), overlapped (NULL)
 {
-  get_overlapped ()->hEvent = NULL;
   need_fork_fixup (true);
-}
-
-struct pipesync
-{
-  bool reader;
-  HANDLE ev, non_cygwin_h, ret_handle;
-  pipesync(HANDLE, DWORD);
-  int operator == (int x) const {return !!ev;}
-  static DWORD WINAPI handler (LPVOID *);
-};
-
-inline bool
-getov_result (BOOL res, bool reading, HANDLE h, DWORD& nbytes, LPOVERLAPPED ov)
-{
-  DWORD err = GetLastError ();
-  if (res || (reading && ov && err == ERROR_HANDLE_EOF))
-    /* not an error */;
-  else if (!ov || (err != ERROR_IO_PENDING)
-	   || (!GetOverlappedResult (h, ov, &nbytes, true)
-	       && (!reading || (GetLastError () != ERROR_HANDLE_EOF))))
-    {
-      __seterrno ();
-      return false;
-    }
-  return true;
-}
-
-static DWORD WINAPI
-pipe_handler (LPVOID in_ps)
-{
-  pipesync ps = *(pipesync *) in_ps;
-  HANDLE h, in, out;
-  DWORD err = fhandler_pipe::create_selectable (&sec_none_nih, in, out, 0);
-  if (err)
-    {
-      SetLastError (err);
-      system_printf ("couldn't create a shadow pipe for non-cygwin pipe I/O, %E");
-      return 0;
-    }
-  h = ((pipesync *) in_ps)->ret_handle = ps.reader ? in : out;
-  SetHandleInformation (h, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
-  SetEvent (ps.ev);
-
-  DWORD read_bytes, write_bytes;
-  HANDLE hread, hwrite, hclose;
-  OVERLAPPED ov, *rov, *wov;
-  memset (&ov, 0, sizeof (ov));
-  ov.hEvent = CreateEvent (&sec_none_nih, true, false, NULL);
-  if (ps.reader)
-    {
-      hread = ps.non_cygwin_h;
-      hclose = hwrite = out;
-      wov = &ov;
-      rov = NULL;
-    }
-  else
-    {
-      hclose = hread = in;
-      hwrite = ps.non_cygwin_h;
-      rov = &ov;
-      wov = NULL;
-    }
-
-  char buf[4096];
-  while (1)
-    {
-      ResetEvent (ov.hEvent);
-      BOOL res = ReadFile (hread, buf, 4096, &read_bytes, rov);
-      if (!getov_result (res, true, hread, read_bytes, rov))
-	break;
-      if (!read_bytes)
-	break;
-
-      res = WriteFile (hwrite, buf, read_bytes, &write_bytes, wov);
-      if (!getov_result (res, false, hwrite, write_bytes, wov))
-	break;
-      if (write_bytes != read_bytes)
-	break;
-    }
-
-  err = GetLastError ();
-  CloseHandle (ov.hEvent);
-  CloseHandle (hclose);
-  CloseHandle (ps.non_cygwin_h);
-  SetLastError (err);
-  return 0;
-}
-
-pipesync::pipesync (HANDLE f, DWORD is_reader):
-  reader (false), ret_handle (NULL)
-{
-  ev = CreateEvent (&sec_none_nih, true, false, NULL);
-  if (!ev)
-    system_printf ("couldn't create synchronization event for non-cygwin pipe, %E");
-  else
-    {
-      debug_printf ("created thread synchronization event %p", ev);
-      non_cygwin_h = f;
-      reader = !!is_reader;
-      ret_handle = NULL;
-
-      DWORD tid;
-      HANDLE ht = CreateThread (&sec_none_nih, 0, pipe_handler, this, 0, &tid);
-
-      if (!ht)
-	goto out;
-      CloseHandle (ht);
-
-      switch (WaitForSingleObject (ev, INFINITE))
-	{
-	case WAIT_OBJECT_0:
-	  break;
-	default:
-	  system_printf ("WFSO failed waiting for synchronization event for non-cygwin pipe, %E");
-	  break;
-	}
-    }
-
-out:
-  if (ev)
-    {
-      CloseHandle (ev);
-      ev = NULL;
-    }
 }
 
 void
@@ -173,16 +48,10 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
 
   bool opened_properly = a & FILE_CREATE_PIPE_INSTANCE;
   a &= ~FILE_CREATE_PIPE_INSTANCE;
-  if (!opened_properly)
-    {
-      pipesync ps (f, a & GENERIC_READ);
-      f = ps.ret_handle;
-    }
-
   fhandler_base::init (f, a, mode);
   if (mode & O_NOINHERIT)
     close_on_exec (true);
-  setup_overlapped ();
+  setup_overlapped (opened_properly);
 }
 
 extern "C" int sscanf (const char *, const char *, ...);

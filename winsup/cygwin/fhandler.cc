@@ -1661,11 +1661,22 @@ fhandler_base::fpathconf (int v)
 /* Overlapped I/O */
 
 bool
-fhandler_base::setup_overlapped ()
+fhandler_base::setup_overlapped (bool doit)
 {
-  OVERLAPPED *ov = get_overlapped ();
+  OVERLAPPED *ov = get_overlapped_buffer ();
   memset (ov, 0, sizeof (*ov));
-  return (ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
+  bool res;
+  if (doit)
+    {
+      set_overlapped (ov);
+      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
+    }
+  else
+    {
+      set_overlapped (NULL);
+      res = false;
+    }
+  return res;
 }
 
 void
@@ -1682,6 +1693,9 @@ fhandler_base::destroy_overlapped ()
 int
 fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 {
+  if (!get_overlapped ())
+    return inres;
+
   int res = 0;
   *bytes = (DWORD) -1;
   DWORD err;
@@ -1753,10 +1767,6 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 void
 fhandler_base::read_overlapped (void *ptr, size_t& len)
 {
-#ifdef DEBUGGING
-  assert (get_overlapped ());
-  assert (get_overlapped ()->hEvent);
-#endif
   while (1)
     {
       bool res = ReadFile (get_handle (), ptr, len, (DWORD *) &len,

@@ -1,3 +1,28 @@
+2008-12-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_base_setup_overlapped): Add new argument.
+	(fhandler_base::get_overlapped_buffer): Declare new function.
+	(fhandler_base::set_overlapped): Ditto.
+	(fhandler_pipe::overlapped): New variable.
+	(fhandler_pipe::get_overlapped): Rework to return contents of
+	overlapped variable.
+	(fhandler_pipe::set_overlapped): Set overlapped variable based on
+	argument.
+	(fhandler_fifo::get_overlapped_buffer): Return pointer to io_status.
+	* fhandler.cc (handler_base::setup_overlapped): Set to overlapped
+	pointer to NULL if new doit parameter is false.  Otherwise set up
+	overlapped event as usual.
+	(fhandler_base::wait_overlapped): Return inres if this isn't an
+	overlapped operation.
+	(fhandler_base::read_overlapped): Remove inappropriate asserts.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Zero overlapped element.
+	(struct pipesync): Delete.
+	(getov_result): Ditto.
+	(pipe_handler): Ditto.
+	(pipesync::pipesync): Ditto.
+	(fhandler_pipe::init): Don't set up pipesync thread.  Just pass
+	opened_properly flag along to overlapped setup.
+
 2008-12-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pipe.cc (getov_result): Minor cleanup.
@@ -66,7 +91,7 @@
 2008-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc: Set 4th parameter of NtQueryDirectoryFile to
-	NULL throughout.  
+	NULL throughout.
 	(fhandler_disk_file::facl): Fix a condition so that fstat_by_handle
 	is actually used.
 	(fhandler_disk_file::readdir): Don't print debug message on a simple

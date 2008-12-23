@@ -144,7 +144,7 @@ class fhandler_base
 
   HANDLE read_state;
   int wait_overlapped (bool, bool, DWORD *) __attribute__ ((regparm (3)));
-  bool setup_overlapped () __attribute__ ((regparm (1)));
+  bool setup_overlapped (bool doit = true) __attribute__ ((regparm (2)));
   void destroy_overlapped () __attribute__ ((regparm (1)));
 
  public:
@@ -344,6 +344,8 @@ class fhandler_base
   virtual void raw_read (void *ptr, size_t& ulen);
   virtual int raw_write (const void *ptr, size_t ulen);
   virtual OVERLAPPED *get_overlapped () {return NULL;}
+  virtual OVERLAPPED *get_overlapped_buffer () {return NULL;}
+  virtual void set_overlapped (OVERLAPPED *) {}
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
@@ -532,9 +534,14 @@ class fhandler_pipe: public fhandler_base
 private:
   pid_t popen_pid;
   OVERLAPPED io_status;
+  OVERLAPPED *overlapped;
 public:
   fhandler_pipe ();
-  OVERLAPPED *get_overlapped () {return &io_status;}
+
+  OVERLAPPED *get_overlapped () {return overlapped;}
+  OVERLAPPED *get_overlapped_buffer () {return &io_status;}
+  void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
+
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}
   _off64_t lseek (_off64_t offset, int whence);
@@ -577,6 +584,7 @@ public:
   bool isfifo () { return true; }
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   OVERLAPPED *get_overlapped () {return &io_status;}
+  OVERLAPPED *get_overlapped_buffer () {return &io_status;}
 };
 
 class fhandler_dev_raw: public fhandler_base
