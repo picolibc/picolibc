@@ -1,3 +1,7 @@
+2008-12-23  Jon Beniston <jon@beniston.com>
+
+	* lm32.h: New file.
+
 2008-12-23  Nick Clifton  <nickc@redhat.com>
 
 	* commmon.h (STT_IFUNC): Delete.

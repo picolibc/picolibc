@@ -1,3 +1,7 @@
+2008-12-23  Jon Beniston <jon@beniston.com>
+
+	* dis-asm.h: Add LM32 disassembler function prototype.
+
 2008-12-10  Jason Merrill  <jason@redhat.com>
 
 	* demangle.h (enum demangle_component_type): Add
