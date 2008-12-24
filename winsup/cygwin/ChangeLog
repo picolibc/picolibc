@@ -1,3 +1,8 @@
+2008-12-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (symlink_info::check_shortcut): Ensure that symlink handle is
+	closed on successful return.
+
 2008-12-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.h (fhandler_base_setup_overlapped): Add new argument.

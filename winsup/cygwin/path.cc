@@ -1902,11 +1902,10 @@ symlink_info::check_shortcut (HANDLE in_h)
     }
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
-  return res;
 
 out:
   NtClose (h);
-  return 0;
+  return res;
 }
 
 int
