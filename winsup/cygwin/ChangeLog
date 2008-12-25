@@ -1,3 +1,16 @@
+2008-12-25  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc: Change comment.
+	(smb_extended_info): Move here from path.cc.
+	(fs_info::update): Ditto.
+	(mount_info::create_root_entry): Delay conversion to slashes and use
+	passed in buffer to figure out fs type.
+	* path.cc (smb_extended_info): Move.
+	(fs_info::update): Ditto.
+	* mount.h: New file.  Move mount information here.
+	* path.h: (fs_info::update): Move.
+	* shared_info.h (mount_item): Ditto.
+
 2008-12-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (symlink_info::check_shortcut): Ensure that symlink handle is

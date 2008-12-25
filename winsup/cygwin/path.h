@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "devices.h"
+#include "mount.h"
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -83,51 +84,6 @@ enum path_types
 };
 
 class symlink_info;
-struct fs_info
-{
- private:
-  struct status_flags
-  {
-    ULONG flags;                  /* Volume flags */
-    ULONG samba_version;          /* Samba version if available */
-    ULONG name_len;		  /* MaximumComponentNameLength */
-    unsigned is_remote_drive		: 1;
-    unsigned has_buggy_open		: 1;
-    unsigned has_buggy_fileid_dirinfo	: 1;
-    unsigned has_acls			: 1;
-    unsigned hasgood_inode		: 1;
-    unsigned caseinsensitive		: 1;
-    unsigned is_fat			: 1;
-    unsigned is_ntfs			: 1;
-    unsigned is_samba			: 1;
-    unsigned is_nfs			: 1;
-    unsigned is_netapp 			: 1;
-    unsigned is_cdrom			: 1;
-  } status;
-  ULONG sernum;
- public:
-  void clear () { memset (&status, 0 , sizeof status); sernum = 0UL; }
-  fs_info () { clear (); }
-
-  IMPLEMENT_STATUS_FLAG (ULONG, flags)
-  IMPLEMENT_STATUS_FLAG (ULONG, samba_version)
-  IMPLEMENT_STATUS_FLAG (ULONG, name_len)
-  IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
-  IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
-  IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
-  IMPLEMENT_STATUS_FLAG (bool, has_acls)
-  IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
-  IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
-  IMPLEMENT_STATUS_FLAG (bool, is_fat)
-  IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_samba)
-  IMPLEMENT_STATUS_FLAG (bool, is_nfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_netapp)
-  IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
-  ULONG serial_number () const { return sernum; }
-
-  bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
-};
 
 class path_conv
 {
