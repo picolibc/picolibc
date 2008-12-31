@@ -1032,9 +1032,10 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
       return;
     }
 
-  FILE *f = popen (id, "rt");
-
   char buf[16384];
+  snprintf (buf, sizeof (buf), "\"%s\"", id);
+  FILE *f = popen (buf, "rt");
+
   buf[0] = '\0';
   fgets (buf, sizeof (buf), f);
   pclose (f);
@@ -1118,7 +1119,7 @@ dump_sysinfo_services ()
     }
 
   /* check for a recent cygrunsrv */
-  snprintf (buf, sizeof (buf), "%s --version", cygrunsrv);
+  snprintf (buf, sizeof (buf), "\"%s\" --version", cygrunsrv);
   if ((f = popen (buf, "rt")) == NULL)
     {
       printf ("Failed to execute '%s', skipping services check.\n", buf);
@@ -1136,7 +1137,7 @@ dump_sysinfo_services ()
   /* For verbose mode, just run cygrunsrv --list --verbose and copy output
      verbatim; otherwise run cygrunsrv --list and then cygrunsrv --query for
      each service.  */
-  snprintf (buf, sizeof (buf), (verbose ? "%s --list --verbose" : "%s --list"),
+  snprintf (buf, sizeof (buf), (verbose ? "\"%s\" --list --verbose" : "%s --list"),
 	    cygrunsrv);
   if ((f = popen (buf, "rt")) == NULL)
     {
@@ -1167,7 +1168,7 @@ dump_sysinfo_services ()
       if (nchars > 0)
 	for (char *srv = strtok (buf, "\n"); srv; srv = strtok (NULL, "\n"))
 	  {
-	    snprintf (buf2, sizeof (buf2), "%s --query %s", cygrunsrv, srv);
+	    snprintf (buf2, sizeof (buf2), "\"%s\" --query %s", cygrunsrv, srv);
 	    if ((f = popen (buf2, "rt")) == NULL)
 	      {
 		printf ("Failed to execute '%s', skipping services check.\n", buf2);
