@@ -1,5 +1,9 @@
 2008-12-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* include/bits/wordsize.h: New linux-compatibility header.
+
+2008-12-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* exceptions.cc (try_to_debug): Avoid creating a huge buffer on the
 	stack.
 
