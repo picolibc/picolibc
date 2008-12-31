@@ -719,9 +719,8 @@ getwd SIGFE
 _getwd = getwd SIGFE
 getxattr SIGFE
 glob SIGFE
-_glob = glob SIGFE
 globfree SIGFE
-_globfree = globfree SIGFE
+glob_pattern_p
 gmtime SIGFE
 _gmtime = gmtime SIGFE
 gmtime_r SIGFE

@@ -109,8 +109,9 @@ __BEGIN_DECLS
 # define DLLEXPORT __declspec(dllimport)
 #endif
 
-int	DLLEXPORT glob(const char *, int, int (*)(const char *, int), glob_t *);
-void	DLLEXPORT globfree(glob_t *);
+int	DLLEXPORT glob (const char *, int, int (*)(const char *, int), glob_t *);
+void	DLLEXPORT globfree (glob_t *);
+int	DLLEXPORT glob_pattern_p (const char *, int);
 __END_DECLS
 
 #endif /* !_GLOB_H_ */

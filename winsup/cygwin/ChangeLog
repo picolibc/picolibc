@@ -1,3 +1,11 @@
+2008-12-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* glob_pattern_p.cc: New file.
+	* Makefile.in (DLL_OFILES): Add glob_pattern_p.o.
+	* glob.h: Add declaration for glob_pattern_p.
+
+	* pinfo.cc (pinfo::thisproc): Remove __stdcall attribute.
+
 2008-12-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/bits/wordsize.h: New linux-compatibility header.

@@ -51,7 +51,7 @@ bool is_toplevel_proc;
 /* Setup the pinfo structure for this process.  There may already be a
    _pinfo for this "pid" if h != NULL. */
 
-void __stdcall
+void
 pinfo::thisproc (HANDLE h)
 {
   procinfo = NULL;
