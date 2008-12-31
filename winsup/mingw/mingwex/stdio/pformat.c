@@ -1813,6 +1813,11 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
       __pformat_state_t  state = PFORMAT_INIT;
       __pformat_length_t length = PFORMAT_LENGTH_INT;
 
+      /* Save the current format scan position, so that we can backtrack
+       * in the event of encountering an invalid format specification...
+       */
+      char *backtrack = fmt;
+
       /* Restart capture for dynamic field width and precision specs...
        */
       int *width_spec = &stream.width;
@@ -2490,12 +2495,15 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 	    }
 
 	    else
+	    {
 	      /* We found a digit out of context, or some other character
-	       * with no designated meaning; silently reject it, and any
-	       * further characters other than argument length modifiers,
-	       * until this format specification is completely resolved.
+	       * with no designated meaning; reject this format specification,
+	       * backtrack, and emit it as literal text...
 	       */
-	      state = PFORMAT_END;
+	      fmt = backtrack;
+	      __pformat_putc( '%', &stream );
+	      goto format_scan;
+	    }
 	}
       }
     }

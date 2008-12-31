@@ -1,3 +1,13 @@
+2008-12-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Partial fix for MinGW-Bug [2457778]: (Reported by Sisyphus).
+	Correct mishandling of invalid characters in printf() format specs.
+
+	* mingwex/stdio/pformat.c (__pformat): Save `fmt' scan position in...
+	(backtrack): ...this new automatic variable, at start of each format
+	conversion specification substring; use it to backtrack, and print the
+	substring literally, if any invalid character is encountered.
+
 2008-12-16 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* msvcrt.def.in (___lc_codepage_func, ___lc_collate_cp_func,
