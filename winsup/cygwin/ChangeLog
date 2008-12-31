@@ -1,5 +1,9 @@
 2008-12-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 191.
+
+2008-12-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* glob_pattern_p.cc: New file.
 	* Makefile.in (DLL_OFILES): Add glob_pattern_p.o.
 	* glob.h: Add declaration for glob_pattern_p.
