@@ -1,3 +1,7 @@
+2009-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* speclib: Rewrite completely in perl.  Avoid multiple nm calls.
+
 2008-12-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 191.

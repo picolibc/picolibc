@@ -1,52 +1,91 @@
-#!/bin/sh -x
-# speclib - Make a special version of the cygwin import library.
-#
-#   Copyright 2001, 2002 Red Hat, Inc.
-#
-# This file is part of Cygwin.
-#
-# This software is a copyrighted work licensed under the terms of the
-# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-# details.
+#!/usr/bin/perl
+use Getopt::Long;
+use File::Temp qw'tempdir';
+use File::Basename;
+use strict;
 
-case "$1" in
-    -v) shift; v() { :; } ;;
-    *) v() { /bin/false; } ;;
-esac
-lib=$1; shift
-nm=$1; shift
-ar=$1; shift
-libdll=$1; shift
-cp /dev/null /tmp/$$.objs
-trap "cd /tmp; /bin/rm -rf $lib.bak /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
-$nm --extern-only --defined-only $* | sed -n -e 's%^.* [TD] \(.*\)$%/ \1\$/p%p' > /tmp/$$.syms
-v || $nm -Ap --extern-only --defined-only $libdll | egrep ' I __head| I _.*_iname' |  awk -F: '{print $2}' > /tmp/$$.objs
-$nm -Ap --extern-only --defined-only $libdll | sed -n -f /tmp/$$.syms | awk -F: '{print $2}' >> /tmp/$$.objs
-sort -o /tmp/$$.objs -u /tmp/$$.objs
+sub dllname($;$);
 
-[ -s /tmp/$$.objs ] || { echo "speclib: couldn't find symbols for $lib" 1>&2; exit 1; }
+my $verbose;
+my $static;
+my $exclude;
 
-/bin/rm -rf /tmp/$$.dir
-mkdir /tmp/$$.dir
-cd /tmp/$$.dir
-if v; then
-    $ar x $libdll
-    /bin/rm -f `cat /tmp/$$.objs`
-else
-    $ar x $libdll `cat /tmp/$$.objs`
-fi
-/bin/rm -f $lib
-$ar crus $lib *.o
-export lib;
-perl -pi.bak -- - $lib << 'EOF'
-BEGIN {
-    binmode STDIN;
-    binmode STDOUT;
-    $lib = ($ENV{lib} =~ m!/([^/]+)$!o)[0] || $ENV{lib};
-    $lib =~ s/\.a//o;
-    my $pad = length('cygwin1_dll') - length($lib);
-    die "speclib: library name too long (" . length($lib) . ")\n" if $pad < 0;
-    $lib = "__head_$lib" . "\0" x $pad;
+GetOptions('static!'=>\$static, 'v|exclude!'=>\$exclude);
+
+my $lib = shift;
+my $nm = shift;
+my $ar = shift;
+my $libdll = shift;
+
+open my $nm_fd, '-|', $nm, '-Ap', '--defined-only', @ARGV, $libdll or
+  die "$0: execution of $nm for object files failed - $!\n";
+
+my %match_syms = ();
+my $symfiles = ();
+my $lastfn;
+my @headtail = ();
+my %extract = ();
+my $libdllname;
+while (<$nm_fd>) {
+    study;
+    m%^\Q$libdll\E:([^:]*):\d+ i \.idata\$([56])% and do {
+	if ($2 eq 5) {
+	    push @headtail, $1;
+	} else {
+	    pop @headtail;
+	}
+	next;
+    };
+    m%^\Q$libdll\E:[^:]*:\d+ I (__head_.*)$% and do {
+	$libdllname = $1;
+	next;
+    };
+    next unless m%^([^:]*):([^:]*(?=:))?.* [DTI] (.*)%o;
+    if ($1 ne $libdll) {
+	 $match_syms{$3} = 1;
+     } elsif ($match_syms{$3} ? !$exclude : $exclude) {
+	 $extract{$2} = 1;
+     }
 }
-    s/__head_cygwin1_dll/$lib/g;
-EOF
+close $nm_fd;
+
+%extract or die "$0: couldn't find symbols for $lib\n";
+defined($libdllname) or die "$0: couldn't determine __head_<NAME> - malformed import archive?\n";
+for (@headtail) {
+    $extract{$_} = 1;
+}
+
+my $dir = tempdir();
+
+chdir $dir;
+# print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
+my $res = system $ar, 'x', $libdll, sort keys %extract;
+die "$0: $ar extraction exited with non-zero status\n" if $res;
+unlink $lib;
+$res = system $ar, 'crus', $lib, sort keys %extract;
+die "$0: $ar creation exited with non-zero status\n" if $res;
+
+open my $lib_fd, '<', $lib or die "$0: couldn't open $lib for input - $!\n";
+binmode $lib_fd;
+
+my $libname = dllname($lib, 'lib');
+my $pad = length($libdllname) - length($libname);
+die "$0: library name too long (" . length($libname) . ")\n" if $pad < 0;
+$libname .= "\0" x $pad;
+
+$res = sysread($lib_fd, $_, -s $lib);
+close $lib_fd;
+
+die "$0: couldn't read $lib - $!\n" if $res != -s _;
+0 while s/$libdllname/$libname/sog;
+
+open $lib_fd, '>', $lib or die "$0: couldn't open $lib for output - $!\n";
+syswrite($lib_fd, $_) == length($_) or die "$0: write to $lib failed - $!\n";
+close $lib_fd;
+exit 0;
+
+sub dllname($;$) {
+    my $x = basename($_[0], '.a');
+    $x =~ s/^lib//o;
+    return '__head_' . $_[1] . $x;
+}
