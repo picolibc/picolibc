@@ -1,5 +1,5 @@
 # Makefile for Cygwin server
-# Copyright 2003, 2006, 2007 Red Hat, Inc.
+# Copyright 2003, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -80,7 +80,7 @@ $(cygwin_build)/%.o: $(cygwin_source)/%.c
 Makefile: Makefile.in configure
 
 lib%.o: %.cc
-	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE_CXX)} -c -I$(updir)/cygwin -o $(@D)/${basename $(@F)}$o $<
+	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE_CXX)} -c -I$(updir)/cygwin -I$(bupdir)/cygwin -o $(@D)/${basename $(@F)}$o $<
 
 libcygserver.a: $(LIBOBJS)
 	$(AR) crus $@ $?
