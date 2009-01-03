@@ -4,8 +4,8 @@
 	Update copyrights where appropriate.
 
 	* globals.cc: New file for generic global variables.
-	* mkglobals_h: New file to generate globals.h.
-	* mkstatic: New Script used to build a (currently non-working) static
+	* mkglobals_h: New script to generate globals.h.
+	* mkstatic: New script used to build a (currently non-working) static
 	libcygwin_s.a.
 	* Makefile.in: Add unused rule to build a non-working libcygwin_s.a.
 	(DLL_OFILES): Add globals.o.  Make all objects rely on globals.h.
