@@ -1,6 +1,6 @@
 /* cxx.cc
 
-   Copyright 2002, 2003 Red Hat, Inc.
+   Copyright 2002, 2003, 2005, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,7 +11,6 @@ details. */
 #if (__GNUC__ >= 3)
 
 #include "winsup.h"
-#include <stdlib.h>
 
 void *
 operator new (size_t s)

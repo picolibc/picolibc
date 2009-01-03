@@ -1,6 +1,7 @@
 /* fhandler_mailslot.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2005, 2007 Red Hat, Inc.
+   Copyright 2005, 2007, 2008, 2009
+   Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -11,7 +12,6 @@
 #include "winsup.h"
 
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "ntdll.h"

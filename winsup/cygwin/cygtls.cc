@@ -1,6 +1,6 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -8,10 +8,8 @@ details. */
 
 #include "winsup.h"
 #define USE_SYS_TYPES_FD_SET
-#include "thread.h"
 #include "cygtls.h"
 #include <syslog.h>
-#include <malloc.h>
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

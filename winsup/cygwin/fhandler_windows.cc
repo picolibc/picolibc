@@ -1,6 +1,7 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009
+   Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
@@ -15,7 +16,6 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 

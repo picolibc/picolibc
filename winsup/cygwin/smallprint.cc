@@ -1,6 +1,6 @@
 /* smallprint.cc: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008
+   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -61,7 +61,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
   return dst;
 }
 
-extern "C" int
+int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
   char tmp[NT_MAX_PATH];
@@ -223,7 +223,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   return dst - orig;
 }
 
-extern "C" int
+int
 __small_sprintf (char *dst, const char *fmt, ...)
 {
   int r;
@@ -234,7 +234,7 @@ __small_sprintf (char *dst, const char *fmt, ...)
   return r;
 }
 
-extern "C" void
+void
 small_printf (const char *fmt, ...)
 {
   char buf[16384];
@@ -261,7 +261,7 @@ small_printf (const char *fmt, ...)
 
 #ifdef DEBUGGING
 static HANDLE NO_COPY console_handle = NULL;
-extern "C" void
+void
 console_printf (const char *fmt, ...)
 {
   char buf[16384];
@@ -329,7 +329,7 @@ __wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsign
   return dst;
 }
 
-extern "C" int
+int
 __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 {
   WCHAR tmp[NT_MAX_PATH];
@@ -466,7 +466,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
   return dst - orig;
 }
 
-extern "C" int
+int
 __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...)
 {
   int r;

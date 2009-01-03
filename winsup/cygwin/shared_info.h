@@ -1,6 +1,6 @@
 /* shared_info.h: shared info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,6 +32,10 @@ public:
 #define SHARED_INFO_CB 39328
 
 #define CURR_SHARED_MAGIC 0x398d8baU
+
+#define USER_VERSION	1	// increment when mount table changes and
+#define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
+#define CURR_USER_MAGIC 0xb2232e71U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between

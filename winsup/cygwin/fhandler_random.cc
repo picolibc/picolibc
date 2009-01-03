@@ -1,6 +1,7 @@
 /* fhandler_random.cc: code to access /dev/random and /dev/urandom
 
-   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009
+   Red Hat, Inc.
 
    Written by Corinna Vinschen (vinschen@cygnus.com)
 
@@ -11,10 +12,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <limits.h>
 #include <unistd.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 

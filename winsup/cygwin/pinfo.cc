@@ -1,7 +1,7 @@
 /* pinfo.cc: process table support
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -419,8 +419,6 @@ _pinfo::alive ()
   return !!h;
 }
 
-extern char **__argv;
-
 DWORD WINAPI
 commune_process (void *arg)
 {
@@ -444,7 +442,6 @@ commune_process (void *arg)
       {
 	sigproc_printf ("processing PICOM_CMDLINE");
 	unsigned n = 0;
-	extern int __argc_safe;
 	const char *argv[__argc_safe + 1];
 
 	for (int i = 0; i < __argc_safe; i++)

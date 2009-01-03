@@ -1,6 +1,7 @@
 /* fhandler_termios.cc
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,13 +13,11 @@ details. */
 #include <stdlib.h>
 #include <ctype.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"
-#include "sys/cygwin.h"
 #include "cygtls.h"
 
 /* Common functions shared by tty/console */

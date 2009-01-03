@@ -1,6 +1,6 @@
 /* fhandler_virtual.cc: base fhandler class for virtual filesystems
 
-   Copyright 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,11 +9,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
 #include <sys/acl.h>
 #include <sys/statvfs.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

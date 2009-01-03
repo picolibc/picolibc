@@ -1,10 +1,6 @@
 
 
 #include "winsup.h"
-#include <sys/types.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include "devices.h"
 #include "sys/cygwin.h"
 #include "tty.h"

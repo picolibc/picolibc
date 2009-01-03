@@ -1,6 +1,7 @@
 /* security.h: security declarations
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -336,6 +337,7 @@ legal_sid_type (SID_NAME_USE type)
       || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
+class path_conv;
 /* File manipulation */
 int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
 				  __uid32_t *, __gid32_t *);

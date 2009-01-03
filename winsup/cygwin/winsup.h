@@ -1,7 +1,7 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -36,17 +36,17 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern __uid32_t getuid32 ();
-extern __uid32_t geteuid32 ();
-extern int seteuid32 (__uid32_t);
-extern __gid32_t getegid32 (void);
-extern struct passwd *getpwuid32 (__uid32_t);
-extern struct passwd *getpwnam (const char *);
-extern struct __sFILE64 *fopen64 (const char *, const char *);
-extern struct hostent *cygwin_gethostbyname (const char *name);
+__uid32_t getuid32 ();
+__uid32_t geteuid32 ();
+int seteuid32 (__uid32_t);
+__gid32_t getegid32 (void);
+struct passwd *getpwuid32 (__uid32_t);
+struct passwd *getpwnam (const char *);
+struct __sFILE64 *fopen64 (const char *, const char *);
+struct hostent *cygwin_gethostbyname (const char *name);
 /* Don't enforce definition of in_addr_t. */
-extern uint32_t cygwin_inet_addr (const char *cp);
-extern int fcntl64 (int fd, int cmd, ...);
+uint32_t cygwin_inet_addr (const char *cp);
+int fcntl64 (int fd, int cmd, ...);
 #ifdef __cplusplus
 }
 #endif
@@ -104,11 +104,6 @@ extern const char case_folded_upper[];
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
-/* Codepage and multibyte string specific stuff. */
-enum codepage_type {ansi_cp, oem_cp, utf8_cp};
-extern codepage_type current_codepage;
-extern UINT active_codepage;
-
 void codepage_init (const char *buf);
 UINT get_cp ();
 
@@ -127,7 +122,6 @@ int __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *, int = -1)
   __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */
-extern int dynamically_loaded;
 
 extern int cygserver_running;
 
@@ -136,9 +130,6 @@ extern int cygserver_running;
 #define TITLESIZE 1024
 
 #include "debug.h"
-
-/* Events/mutexes */
-extern HANDLE tty_mutex;
 
 /**************************** Convenience ******************************/
 
@@ -163,7 +154,6 @@ extern HANDLE tty_mutex;
 /* Convert a signal to a signal mask */
 #define SIGTOMASK(sig)	(1 << ((sig) - 1))
 
-extern int __api_fatal_exit_val;
 #define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)
 #define api_fatal(fmt, args...) __api_fatal (fmt,## args)
 
@@ -191,38 +181,17 @@ class per_process;
 /* cygwin .dll initialization */
 void dll_crt0 (per_process *) __asm__ ("_dll_crt0__FP11per_process");
 extern "C" void __stdcall _dll_crt0 ();
-extern void dll_crt0_1 (void *);
-extern void dll_dllcrt0_1 (void *);
-extern int __stdcall spawn_guts (const char * prog_arg, const char *const *argv,
-				 const char *const envp[], int mode,
-				 int __stdin = -1, int __stdout = -1);
+void dll_crt0_1 (void *);
+void dll_dllcrt0_1 (void *);
+int spawn_guts (const char * prog_arg, const char *const *argv,
+		const char *const envp[], int mode, int __stdin = -1,
+		int __stdout = -1) __attribute__ ((regparm(3)));
 
 /* dynamically loaded dll initialization */
 extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
-
-/* exit the program */
-
-enum exit_states
-  {
-    ES_NOT_EXITING = 0,
-    ES_PROCESS_LOCKED,
-    ES_GLOBAL_DTORS,
-    ES_EVENTS_TERMINATE,
-    ES_THREADTERM,
-    ES_SIGNAL,
-    ES_CLOSEALL,
-    ES_HUP_PGRP,
-    ES_HUP_SID,
-    ES_EXEC_EXIT,
-    ES_TITLE,
-    ES_TTY_TERMINATE,
-    ES_FINAL
-  };
-
-extern exit_states exit_state;
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
 
 /* UID/GID */
@@ -252,8 +221,6 @@ extern "C" int try_to_debug (bool waitloop = 1);
 
 void ld_preload ();
 const char *find_first_notloaded_dll (class path_conv &);
-
-void set_file_api_mode (codepage_type);
 
 extern bool cygwin_finished_initializing;
 
@@ -293,11 +260,11 @@ extern bool wsock_started;
 
 /* Printf type functions */
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
-extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
-extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
-extern "C" int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...) /*__attribute__ ((regparm (2)))*/;
-extern "C" int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
-extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
+int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
+int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
+int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...) /*__attribute__ ((regparm (2)))*/;
+int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
+void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
 extern "C" void vklog (int priority, const char *message, va_list ap);
 extern "C" void klog (int priority, const char *message, ...);
@@ -336,11 +303,6 @@ extern "C" {
 int cygwin_select (int , fd_set *, fd_set *, fd_set *,
 		   struct timeval *to);
 int cygwin_gethostname (char *__name, size_t __len);
-
-extern char _data_start__, _data_end__, _bss_start__, _bss_end__;
-extern void (*__CTOR_LIST__) (void);
-extern void (*__DTOR_LIST__) (void);
-extern SYSTEM_INFO system_info;
 };
 
 /*************************** Unsorted ******************************/
@@ -355,18 +317,13 @@ extern SYSTEM_INFO system_info;
 #define NO_R ~(S_IRUSR | S_IRGRP | S_IROTH)
 #define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
-/* The title on program start. */
-extern char *old_title;
-extern bool display_title;
-extern bool transparent_exe;
 
-extern bool in_forkee;
+extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
+extern "C" void (*__CTOR_LIST__) (void);
+extern "C" void (*__DTOR_LIST__) (void);
 
-extern HANDLE hMainThread;
-extern HANDLE hMainProc;
-extern HANDLE hProcToken;
-extern HANDLE hProcImpToken;
-
+#if !defined(_GLOBALS_H)
+#include "globals.h"
 inline void clear_procimptoken ()
 {
   if (hProcImpToken)
@@ -377,11 +334,7 @@ inline void clear_procimptoken ()
     }
 }
 
-extern HANDLE hExeced;
-extern HMODULE cygwin_hmodule;
-
-extern bool cygwin_testing;
-
-extern char almost_null[];
+void set_file_api_mode (codepage_type);
+#endif
 
 #endif /* defined __cplusplus */

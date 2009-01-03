@@ -1,6 +1,6 @@
 /* assert.cc: Handle the assert macro for WIN32.
 
-   Copyright 1997, 1998, 2000, 2001, 2007 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "security.h"
 #include <wingdi.h>
 #include <winuser.h>
 

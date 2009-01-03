@@ -1,7 +1,8 @@
 /* dcrt0.cc -- essentially the main() for the Cygwin dll
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,6 +16,7 @@ details. */
 #include <stdlib.h>
 #include "glob.h"
 #include <ctype.h>
+#include "environ.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
@@ -36,79 +38,14 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
+
 extern "C" void cygwin_exit (int) __attribute__ ((noreturn));
-
-HANDLE NO_COPY hMainProc = (HANDLE) -1;
-HANDLE NO_COPY hMainThread;
-HANDLE NO_COPY hProcToken;
-HANDLE NO_COPY hProcImpToken;
-
-muto NO_COPY lock_process::locker;
-
-bool display_title;
-bool strip_title_path;
-bool allow_glob = true;
-bool NO_COPY in_forkee;
-
-int __argc_safe;
-int __argc;
-char **__argv;
-#ifdef NEWVFORK
-vfork_save NO_COPY *main_vfork;
-#endif
-
-static int NO_COPY envc;
-char NO_COPY **envp;
-
 extern "C" void __sinit (_reent *);
 
-_cygtls NO_COPY *_main_tls;
+static int NO_COPY envc;
+static char NO_COPY **envp;
 
-bool NO_COPY cygwin_finished_initializing;
-
-MTinterface _mtinterf;
-
-bool NO_COPY _cygwin_testing;
-
-char NO_COPY almost_null[1];
-
-extern "C"
-{
-  /* This is an exported copy of environ which can be used by DLLs
-     which use cygwin.dll.  */
-  char **__cygwin_environ;
-  char ***main_environ = &__cygwin_environ;
-  /* __progname used in getopt error message */
-  char *__progname;
-  struct per_process __cygwin_user_data =
-  {/* initial_sp */ 0, /* magic_biscuit */ 0,
-   /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
-   /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
-   /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
-   /* malloc */ malloc, /* free */ free,
-   /* realloc */ realloc,
-   /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,
-   /* dtors */ NULL, /* data_start */ NULL, /* data_end */ NULL,
-   /* bss_start */ NULL, /* bss_end */ NULL,
-   /* calloc */ calloc,
-   /* premain */ {NULL, NULL, NULL, NULL},
-   /* run_ctors_p */ 0,
-   /* unused */ {0, 0, 0, 0, 0, 0, 0},
-   /* UNUSED forkee */ 0,
-   /* hmodule */ NULL,
-   /* api_major */ CYGWIN_VERSION_API_MAJOR,
-   /* api_minor */ CYGWIN_VERSION_API_MINOR,
-   /* unused2 */ {0, 0, 0, 0, 0, 0},
-   /* threadinterface */ &_mtinterf,
-   /* impure_ptr */ _GLOBAL_REENT,
-  };
-  bool ignore_case_with_glob;
-  int _check_for_executable = true;
-};
-
-int NO_COPY __api_fatal_exit_val = 1;
-char *old_title;
-char title_buf[TITLESIZE + 1];
+static char title_buf[TITLESIZE + 1];
 
 static void
 do_global_dtors ()
@@ -1038,8 +975,6 @@ __main (void)
   do_global_ctors (user_data->ctors, false);
   atexit (do_global_dtors);
 }
-
-exit_states NO_COPY exit_state;
 
 void __stdcall
 do_exit (int status)

@@ -55,7 +55,7 @@ for (@headtail) {
     $extract{$_} = 1;
 }
 
-my $dir = tempdir();
+my $dir = tempdir(CLEANUP => 1);
 
 chdir $dir;
 # print join(' ', '+', $ar, 'x', sort keys %extract), "\n";

@@ -2,7 +2,7 @@
    process's environment.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -30,10 +30,8 @@ details. */
 #include "child_info.h"
 
 extern bool dos_file_warning;
-extern bool allow_glob;
 extern bool ignore_case_with_glob;
 extern bool allow_winsymlinks;
-extern bool strip_title_path;
 bool reset_com = false;
 static bool envcache = true;
 static bool create_upcaseenv = false;

@@ -1,6 +1,7 @@
 /* fhandler_mem.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009
+   Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -12,7 +13,6 @@
 #include <unistd.h>
 
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "ntdll.h"

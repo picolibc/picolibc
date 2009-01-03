@@ -36,11 +36,8 @@ static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $
 #endif
 
 #include <fcntl.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/param.h>
-#include <sys/types.h>
 #include <gmon.h>
 
 #include <profil.h>

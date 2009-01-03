@@ -1,6 +1,7 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008 Red Hat, Inc
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009
+   Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -11,12 +12,10 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
 #include <wchar.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 

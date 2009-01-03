@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -50,7 +50,6 @@ static suffix_info dll_suffixes[] =
   suffix_info (NULL)
 };
 
-HANDLE hExeced;
 child_info_spawn *chExeced;
 
 /* Add .exe to PROG if not already present and see if that exists.
@@ -260,7 +259,7 @@ do_cleanup (void *args)
 }
 
 
-int __stdcall
+int
 spawn_guts (const char *prog_arg, const char *const *argv,
 	    const char *const envp[], int mode, int __stdin, int __stdout)
 {

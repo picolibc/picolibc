@@ -4,9 +4,7 @@
    which is intended to operate similarly to a mutex but attempts to
    avoid making expensive calls to the kernel.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
-
-   Written by Christopher Faylor <cgf@cygnus.com>
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,6 +21,7 @@ details. */
 #undef WaitForSingleObject
 
 DWORD NO_COPY muto::exiting_thread;
+muto NO_COPY lock_process::locker;
 
 void
 muto::grab ()

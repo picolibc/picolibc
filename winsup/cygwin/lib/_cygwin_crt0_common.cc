@@ -1,6 +1,6 @@
-/* common.cc: common crt0 function for cygwin crt0's.
+/* _cygwin_crt0_common.cc: common crt0 function for cygwin crt0's.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,11 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "perprocess.h"
-#include "cygwin/version.h"
 #include "crt0.h"
-#include <reent.h>
-#include <stdlib.h>
 
 /* Avoid an info message from linker when linking applications. */
 extern __declspec(dllimport) struct _reent *_impure_ptr;

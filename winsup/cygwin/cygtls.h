@@ -1,6 +1,6 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2008 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -12,7 +12,7 @@ details. */
 #include <signal.h>
 #include <pwd.h>
 #include <grp.h>
-#include <sys/time.h>
+#include <time.h>
 #define _NOMNTENT_FUNCS
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
@@ -35,6 +35,10 @@ details. */
 
 #define TP_NUM_C_BUFS 10
 #define TP_NUM_W_BUFS 10
+
+#ifdef CYGTLS_HANDLE
+#include "thread.h"
+#endif
 
 #pragma pack(push,4)
 /* Defined here to support auto rebuild of tlsoffsets.h. */
@@ -236,7 +240,7 @@ struct _cygtls
   void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
   void signal_debugger (int) __attribute__ ((regparm(2)));
 
-#ifdef _THREAD_H
+#ifdef CYGTLS_HANDLE
   operator HANDLE () const {return tid->win32_obj_id;}
 #endif
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));

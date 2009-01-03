@@ -1,7 +1,7 @@
 /* thread.h: Locking and threading module definitions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
-   2008 Red Hat, Inc.
+   2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,7 +19,7 @@ details. */
 
 #include <pthread.h>
 #include <limits.h>
-#include <security.h>
+#include "security.h"
 #include <errno.h>
 
 enum cw_sig_wait

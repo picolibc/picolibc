@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -86,10 +86,6 @@ class mount_item
    What we need is to have a more dynamic allocation scheme, but the current
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
-
-#define USER_VERSION	1	// increment when mount table changes and
-#define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
-#define CURR_USER_MAGIC 0xb2232e71U
 
 class reg_key;
 struct device;

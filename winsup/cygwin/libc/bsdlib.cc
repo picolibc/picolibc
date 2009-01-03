@@ -33,14 +33,10 @@
 #include "winsup.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <utmp.h>
 #include <unistd.h>
-#include <sys/termios.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include "cygerrno.h"
-#include "thread.h"
 #include "cygtls.h"
 
 extern "C" int

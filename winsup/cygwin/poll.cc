@@ -1,6 +1,7 @@
 /* poll.cc. Implements poll(2) via usage of select(2) call.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+   Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -13,11 +14,9 @@
 #define FD_SETSIZE 16384		// lots of fds
 #include "winsup.h"
 #include <sys/poll.h>
-#include <sys/socket.h>
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"

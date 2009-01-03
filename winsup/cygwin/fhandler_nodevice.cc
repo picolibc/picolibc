@@ -1,6 +1,7 @@
-/* fhandler.cc.  See console.cc for fhandler_console functions.
+/* fhandler_nodevice.cc.  "No such device" handler.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2008, 2009
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 

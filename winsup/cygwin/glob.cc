@@ -102,8 +102,6 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/glob.c,v 1.25 2006/06/05 18
 #undef MAXPATHLEN
 #define MAXPATHLEN 16384
 
-extern BOOL ignore_case_with_glob;
-
 #define	DOLLAR		'$'
 #define	DOT		'.'
 #define	EOS		'\0'

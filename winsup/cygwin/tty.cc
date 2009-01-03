@@ -1,6 +1,6 @@
 /* tty.cc
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -100,7 +100,7 @@ tty::create_master (int ttynum)
   ttym.setunit (ttynum); /* CGF FIXME device */
   tty_master = (fhandler_tty_master *) build_fh_dev (ttym);
   if (tty_master->init ())
-    api_fatal ("Can't create master tty");
+    api_fatal ("can't create master tty");
   else
     {
       /* Log utmp entry */

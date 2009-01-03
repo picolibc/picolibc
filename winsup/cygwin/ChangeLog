@@ -1,3 +1,52 @@
 2009-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	Remove unneeded header files from source files throughout.
+	Update copyrights where appropriate.
+
+	* globals.cc: New file for generic global variables.
+	* mkglobals_h: New file to generate globals.h.
+	* mkstatic: New Script used to build a (currently non-working) static
+	libcygwin_s.a.
+	* Makefile.in: Add unused rule to build a non-working libcygwin_s.a.
+	(DLL_OFILES): Add globals.o.  Make all objects rely on globals.h.
+	(globals.h): New target.  Generate globals.h.
+	* cygtls.h: Honor new CYGTLS_HANDLE define to control when the HANDLE
+	operator is allowed in _cygtls.
+	* dcrt0.cc: Move most globals to globals.cc.
+	* init.cc: Ditto.
+	* environ.cc (strip_title_path): Remove now-unneeded extern.
+	* fhandler_serial.cc (fhandler_serial::open): Ditto.
+	* pinfo.cc: Ditto.
+	(commune_process): Ditto.
+	* shared.cc: Ditto.
+	* glob.cc: Ditto.
+	* strace.cc: Ditto.
+	* exceptions.cc: Define CYGTLS_HANDLE before including winsup.h.
+	* path.cc (stat_suffixes): Move here.
+	* security.h: Add forward class path_conv declaration.
+	* smallprint.cc (__small_vsprintf): Make a true c++ function.
+	(__small_sprintf): Ditto.
+	(small_printf): Ditto.
+	(console_printf): Ditto.
+	(__small_vswprintf): Ditto.
+	(__small_swprintf): Ditto.
+	* spawn.cc (spawn_guts): Remove _stdcall decoration in favor of
+	regparm.
+	(hExeced): Move to globals.cc
+	* strfuncs.cc (current_codepage): Ditto.
+	(active_codepage): Ditto.
+	* sync.cc (lock_process::locker): Move here from dcrt0.cc.
+	* syscalls.cc (stat_suffixes): Move to path.cc.
+	* tty.cc (tty::create_master): Uncapitalize fatal warning for
+	consistency.
+	* winsup.h: Include globals.h to declare most of the grab bag list of
+	globals which were previously defined here.
+
+	* mount.h: Move USER_* defines back to shared_info.h.
+
+	* speclib: Force temporary directory cleanup.
+	
+
+2009-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* speclib: Rewrite completely in perl.  Avoid multiple nm calls.
