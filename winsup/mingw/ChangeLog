@@ -1,3 +1,15 @@
+2009-01-04  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Fix MinGW-Bug [2445962]; (reported by Keishi Suenaga).
+	Also add tentative support for BSD specific `optreset' feature.
+
+	* include/getopt.h (optreset) [_BSD_SOURCE]: Define; map it to...
+	(__mingw_optreset): ...this new global variable.
+
+	* mingwex/getopt.c (__mingw_optreset): Instantiate it...
+	(getopt_parse) [optind < 1]: ...make it true; use it to reset argument
+	parsing context.
+
 2008-12-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Partial fix for MinGW-Bug [2457778]: (Reported by Sisyphus).

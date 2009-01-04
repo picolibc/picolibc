@@ -45,6 +45,17 @@ extern char *optarg;		/* pointer to argument of current option  */
 
 extern int getopt( int, char * const [], const char * );
 
+#ifdef _BSD_SOURCE
+/*
+ * BSD adds the non-standard `optreset' feature, for reinitialisation
+ * of `getopt' parsing.  We support this feature, for applications which
+ * proclaim their BSD heritage, before including this header; however,
+ * to maintain portability, developers are advised to avoid it.
+ */
+# define optreset  __mingw_optreset
+
+extern int optreset;
+#endif
 #ifdef __cplusplus
 }
 #endif
