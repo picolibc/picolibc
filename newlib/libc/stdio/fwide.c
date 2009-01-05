@@ -19,7 +19,7 @@ TRAD_SYNOPSIS
 	FILE *<[fp]>;
 	int <[mode]>;
 
-	int fwide(<[ptr]>, <[fp]>, <[mode]>)
+	int _fwide_r(<[ptr]>, <[fp]>, <[mode]>)
 	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	int <[mode]>;
