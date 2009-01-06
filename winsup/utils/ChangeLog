@@ -1,3 +1,7 @@
+2009-01-05  Pierre Humblet  <Pierre.Humblet@ieee.org>
+
+	* cygcheck.cc (dump_sysinfo_services): Quote the path for popen.
+
 2008-12-30  Pierre Humblet  <Pierre.Humblet@ieee.org>
 
 	* cygcheck.cc (pretty_id): Quote the path for popen.

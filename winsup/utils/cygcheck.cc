@@ -1137,7 +1137,7 @@ dump_sysinfo_services ()
   /* For verbose mode, just run cygrunsrv --list --verbose and copy output
      verbatim; otherwise run cygrunsrv --list and then cygrunsrv --query for
      each service.  */
-  snprintf (buf, sizeof (buf), (verbose ? "\"%s\" --list --verbose" : "%s --list"),
+  snprintf (buf, sizeof (buf), (verbose ? "\"%s\" --list --verbose" : "\"%s\" --list"),
 	    cygrunsrv);
   if ((f = popen (buf, "rt")) == NULL)
     {
