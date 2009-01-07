@@ -1,5 +1,16 @@
 2009-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h: Reorder NT status flags.  Fix a case difference. Add
+	STATUS_CANNOT_DELETE flag.
+	* syscalls.cc (unlink_nt): Change initial NtOpenFile to request
+	FILE_SHARE_DELETE sharing mode.  Change comment accordingly.
+	If setting delete disposition failed with STATUS_CANNOT_DELETE, try
+	to delete using delete-on-close.  Explain why.
+	Rearrange setting R/O DOS attribute after trying to delete.  Simplify
+	comment.
+
+2009-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Only add .exe if
 	original file has .exe as well.
 	* path.cc (path_conv::is_binary): Only recognize Windows 32 and 64 bit

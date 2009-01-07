@@ -405,14 +405,14 @@ unlink_nt (path_conv &pc)
     flags |= FILE_OPEN_REPARSE_POINT;
 
   pc.get_object_attr (attr, sec_none_nih);
-  /* First try to open the file with sharing not allowed.  If the file
-     has an open handle on it, this will fail.  That indicates that the
-     file has to be moved to the recycle bin so that it actually disappears
-     from its directory even though its in use.  Otherwise, if opening
-     doesn't fail, the file is not in use and by simply closing the handle
-     the file will disappear. */
+  /* First try to open the file with only allowing sharing for delete.  If
+     the file has an open handle on it, other than just for deletion, this
+     will fail.  That indicates that the file has to be moved to the recycle
+     bin so that it actually disappears from its directory even though its
+     in use.  Otherwise, if opening doesn't fail, the file is not in use and
+     we can go straight to setting the delete disposition flag. */
   bool move_to_bin = false;
-  status = NtOpenFile (&fh, access, &attr, &io, 0, flags);
+  status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
   if (status == STATUS_SHARING_VIOLATION)
     {
       move_to_bin = true;
@@ -470,16 +470,46 @@ unlink_nt (path_conv &pc)
 				 FileDispositionInformation);
   if (!NT_SUCCESS (status))
     {
-      syscall_printf ("Setting delete disposition failed, status = %p", status);
-      /* Restore R/O attributes. */
-      if (access & FILE_WRITE_ATTRIBUTES)
-	NtSetAttributesFile (fh, pc.file_attributes ());
+      syscall_printf ("Setting delete disposition failed, status = %p",
+		      status);
+      /* Trying to delete a hardlink to a file in use by the system in some
+	 way (for instance, font files) by setting the delete disposition fails
+	 with STATUS_CANNOT_DELETE.  Strange enough, deleting these hardlinks
+	 using delete-on-close semantic works.
+      
+	 Don't use delete-on-close on remote shares.  If two processes
+	 have open handles on a file and one of them calls unlink, the
+	 file is removed from the remote share even though the other
+	 process still has an open handle.  That process than gets Win32
+	 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.
+	 Microsoft KB 837665 describes this problem as a bug in 2K3, but
+	 I have reproduced it on other systems. */
+      if (status == STATUS_CANNOT_DELETE && !pc.isremote ())
+        {
+	  HANDLE fh2;
+	  UNICODE_STRING fname;
+
+	  /* Re-open from handle so we open the correct file no matter if it
+	     has been moved to the bin or not. */
+	  RtlInitUnicodeString (&fname, L"");
+	  InitializeObjectAttributes (&attr, &fname, 0, fh, NULL);
+	  status = NtOpenFile (&fh2, DELETE, &attr, &io,
+			       move_to_bin ? FILE_SHARE_VALID_FLAGS
+					   : FILE_SHARE_DELETE,
+			       flags | FILE_DELETE_ON_CLOSE);
+	  if (!NT_SUCCESS (status))
+	    syscall_printf ("Setting delete-on-close failed, status = %p",
+			    status);
+	  else
+	    NtClose (fh2);
+	}
     }
-  else if ((access & FILE_WRITE_ATTRIBUTES) && !pc.isdir ())
+  if ((access & FILE_WRITE_ATTRIBUTES)
+      && (!NT_SUCCESS (status) || !pc.isdir ()))
     {
       /* Restore R/O attribute to accommodate hardlinks.  Don't try this
 	 with directories!  For some reason the below NtSetInformationFile
-	 changes the disposition for delete back to FALSE, at least on XP. */
+	 changes the delete disposition back to FALSE, at least on XP. */
       NtSetAttributesFile (fh, pc.file_attributes ());
     }
 
