@@ -94,7 +94,7 @@ FLAGS_TO_PASS = \
 	"DESTDIR=$(DESTDIR)"
 
 all: stmp-bsp force
-	@rootpre=`pwd`/; export rootpre; \
+	+@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	$(MULTIDO) $(FLAGS_TO_PASS) multi-do DO=all
 
