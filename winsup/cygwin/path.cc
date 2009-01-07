@@ -1116,7 +1116,8 @@ path_conv::is_binary ()
   PWCHAR bintest = tp.w_get ();
   DWORD bin;
 
-  return GetBinaryTypeW (get_wide_win32_path (bintest), &bin);
+  return GetBinaryTypeW (get_wide_win32_path (bintest), &bin)
+	 && (bin == SCS_32BIT_BINARY || bin == SCS_64BIT_BINARY);
 }
 
 /* Normalize a Win32 path.

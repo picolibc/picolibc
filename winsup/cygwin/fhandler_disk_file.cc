@@ -1153,6 +1153,8 @@ fhandler_disk_file::link (const char *newpath)
 	}
       else if (!pc.isdir ()
 	       && pc.is_binary ()
+	       && RtlEqualUnicodePathSuffix (pc.get_nt_native_path (),
+					     L".exe", TRUE)
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					      L".exe", TRUE))
 	{
