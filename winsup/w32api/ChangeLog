@@ -1,3 +1,7 @@
+2009-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (SCS_64BIT_BINARY): Define.
+
 2008-12-05  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.13.
