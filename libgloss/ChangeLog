@@ -21,7 +21,7 @@
 	* lm32/scall.S: New file.
 	* lm32/sim.ld: New file.
 
-2008-12-11  Ken Werner  <ken.werner@de.ibm.com
+2008-12-11  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/crt0.S: Call __monstartup if profiling is enabled.
 	* spu/Makefile.in: Add gcrt1.o gcrt2.o.
@@ -1988,12 +1988,12 @@
 	* mips/cfe_prestart.S (hardware_hazard_hook): To here,
 	and translate into assembly.
 
-2003-01-08  Richard Sandiford  <rsandifo@redhat.com
+2003-01-08  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips/crt0.S (_start): Allocate 64 bytes of stack instead of 32.
 	Pass an empty argv and envp to main().
 
-2003-01-08  Richard Sandiford  <rsandifo@redhat.com
+2003-01-08  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips/configure.in (mips64vr-elf, mips64vrel-elf): New config.
 	* mips/configure: Regenerate.
