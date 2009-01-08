@@ -823,7 +823,7 @@ mem1:				saved_errno = errno;
 				p->fts_info = FTS_NSOK;
 			p->fts_accpath = cur->fts_accpath;
 		} else if (nlinks == 0
-#if defined(DT_DIR) && !defined(__CYGWIN__)
+#if defined(DT_DIR)
 		    || (nostat &&
 		    dp->d_type != DT_DIR && dp->d_type != DT_UNKNOWN)
 #endif
@@ -1232,9 +1232,10 @@ fts_ufslinks(FTS *sp, const FTSENT *ent)
 #ifdef __CYGWIN__
 			/* The link count is reliable in Cygwin's directory
 			   stat structures, unless the link count is 1.
-			   This indicates a remote filesystem on which Cygwin
+			   This indicates a filesystem on which Cygwin
 			   refuses to count the directory links for speed. */
-			priv->ftsp_linksreliable = (ent->fts_dev == 1) ? 0 : 1;
+			priv->ftsp_linksreliable = (ent->fts_nlink == 1)
+						   ? 0 : 1;
 #else
 			priv->ftsp_linksreliable = 0;
 			for (cpp = ufslike_filesystems; *cpp; cpp++) {

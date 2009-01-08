@@ -1,3 +1,9 @@
+2009-01-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/fts.c (fts_build): Use DT_DIR case on Cygwin.
+	(fts_ufslinks): Fix using wrong structure member in Cygwin-specific
+	code.
+
 2009-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h: Reorder NT status flags.  Fix a case difference. Add
