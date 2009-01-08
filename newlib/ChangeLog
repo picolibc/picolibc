@@ -1,3 +1,7 @@
+2009-01-07  Kazu Hirata  <kazu@codesourcery.com>
+
+	* libc/include/sys/stdio.h (_flockfile, _funlockfile): Fix typos.
+
 2009-01-05  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/stdio/fwide.c:  Correct typo in TRAD_SYNOPSIS for _fwide_r.
