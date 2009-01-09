@@ -1,3 +1,10 @@
+2009-01-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc: New file.  First stab at implementing ldd-like functionality
+	for Cygwin.
+	* Makefile.in (CYGWIN_BINS): Add ldd.
+	(ldd.exe): Use -lpsapi.
+
 2009-01-05  Pierre Humblet  <Pierre.Humblet@ieee.org>
 
 	* cygcheck.cc (dump_sysinfo_services): Quote the path for popen.
