@@ -1,3 +1,13 @@
+2009-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (mount_info::from_fstab_line): Always convert drive
+	letter in native path to uppercase.
+	* path.cc (normalize_win32_path): Ditto.
+	(path_prefix_p): Revert previous patch.
+
+	* path.cc (symlink_info::check): Check for STATUS_INVALID_PARAMETER
+	return code to circumvent weird behaviour of Samba 3.2.x shares.
+
 2009-01-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/sys/cygwin.h (CW_SETERRNO): Define.

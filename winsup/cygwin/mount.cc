@@ -876,6 +876,9 @@ mount_info::from_fstab_line (char *line, bool user)
   char *cend = find_ws (c);
   *cend = '\0';
   native_path = conv_fstab_spaces (c);
+  /* Always convert drive letter to uppercase for case sensitivity. */
+  if (isdrive (native_path))
+    native_path[0] = cyg_toupper (native_path[0]);
   /* Second field: POSIX path. */
   c = skip_ws (cend + 1);
   if (!*c)

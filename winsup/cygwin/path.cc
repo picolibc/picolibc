@@ -169,20 +169,8 @@ path_prefix_p (const char *path1, const char *path2, int len1,
     return isdirsep (path2[0]) && !isdirsep (path2[1]);
 
   if (isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':')
-    {
-      if (len1 < 2 || (path1[1] != ':') || (path2[1] != ':'))
-	/* nothing */;
-      else if (tolower (*path1) != tolower(*path2))
-	return 0;
-      else
-	{
-	  path1 += 2;
-	  path2 += 2;
-	  len1 -= 2;
-	}
-      return caseinsensitive ? strncasematch (path1, path2, len1)
-			     : !strncmp (path1, path2, len1);
-    }
+    return caseinsensitive ? strncasematch (path1, path2, len1)
+			   : !strncmp (path1, path2, len1);
 
   return 0;
 }
@@ -1177,17 +1165,23 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	    }
 	}
     }
-  if (tail == dst && !isdrive (src) && *src != '/')
+  if (tail == dst)
     {
-      if (beg_src_slash)
-	tail += cygheap->cwd.get_drive (dst);
-      else if (!cygheap->cwd.get (dst, 0))
-	return get_errno ();
-      else
+      if (isdrive (src))
+	/* Always convert drive letter to uppercase for case sensitivity. */
+	*tail++ = cyg_toupper (*src++);
+      else if (*src != '/')
 	{
-	  tail = strchr (tail, '\0');
-	  if (tail[-1] != '\\')
-	    *tail++ = '\\';
+	  if (beg_src_slash)
+	    tail += cygheap->cwd.get_drive (dst);
+	  else if (!cygheap->cwd.get (dst, 0))
+	    return get_errno ();
+	  else
+	    {
+	      tail = strchr (tail, '\0');
+	      if (tail[-1] != '\\')
+		*tail++ = '\\';
+	    }
 	}
     }
 
@@ -2167,7 +2161,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
       /* No right to access EAs or EAs not supported? */
-      if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED)
+      if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED
+	  /* Or a bug in Samba 3.2.x when accessing a share's root dir which
+	     has EAs enabled? */
+	  || status == STATUS_INVALID_PARAMETER)
 	{
 	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
