@@ -1,3 +1,16 @@
+2009-01-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/sys/cygwin.h (CW_SETERRNO): Define.
+	* external.cc (CW_SETERRNO): Implement.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 192 to
+	reflect the above change.
+
+	* path.cc (path_prefix_p): Treat X: as equivalent to x:.
+
+	* mkglobals_h: Remove unneeded #define.
+
+	* spawn.cc (spawn_guts): Avoid overly wordy initialization to zero.
+
 2009-01-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/fts.c (fts_build): Use DT_DIR case on Cygwin.

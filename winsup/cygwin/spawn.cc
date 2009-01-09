@@ -310,8 +310,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   cygheap_exec_info *moreinfo;
 
   bool null_app_name = false;
-  STARTUPINFOW si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-		     NULL, NULL, NULL};
+  STARTUPINFOW si = {};
   int looped = 0;
   HANDLE orig_wr_proc_pipe = NULL;
 

@@ -363,6 +363,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  const char *passwd = va_arg (arg, const char *);
 	  return setlsapwd (passwd);
 	}
+      case CW_SETERRNO:
+	{
+	  const char *file = va_arg (arg, const char *);
+	  int line = va_arg (arg, int);
+	  seterrno(file, line);
+	}
+	break;
 
       default:
 	break;

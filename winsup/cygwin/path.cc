@@ -169,8 +169,20 @@ path_prefix_p (const char *path1, const char *path2, int len1,
     return isdirsep (path2[0]) && !isdirsep (path2[1]);
 
   if (isdirsep (path2[len1]) || path2[len1] == 0 || path1[len1 - 1] == ':')
-    return caseinsensitive ? strncasematch (path1, path2, len1)
-			   : !strncmp (path1, path2, len1);
+    {
+      if (len1 < 2 || (path1[1] != ':') || (path2[1] != ':'))
+	/* nothing */;
+      else if (tolower (*path1) != tolower(*path2))
+	return 0;
+      else
+	{
+	  path1 += 2;
+	  path2 += 2;
+	  len1 -= 2;
+	}
+      return caseinsensitive ? strncasematch (path1, path2, len1)
+			     : !strncmp (path1, path2, len1);
+    }
 
   return 0;
 }
