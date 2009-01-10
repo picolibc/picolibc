@@ -1,3 +1,7 @@
+2009-01-10 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.15.2.
+
 2009-01-04  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Fix MinGW-Bug [2445962]; (reported by Keishi Suenaga).
@@ -99,7 +103,6 @@
 	* include/stdlib.h (strtod): Declare as `__inline__', not `inline';
 	reformat inline function definition.
 
->>>>>>> 1.423
 2008-10-04 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.15.1 and introduce
