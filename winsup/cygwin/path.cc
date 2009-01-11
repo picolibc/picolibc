@@ -901,7 +901,7 @@ is_virtual_symlink:
 	      else
 		break;
 	    }
-	  else if (sym.error && sym.error != ENOENT && sym.error != ENOSHARE)
+	  else if (sym.error && sym.error != ENOENT)
 	    {
 	      error = sym.error;
 	      goto out;
@@ -996,7 +996,7 @@ out:
     }
   else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
     {
-      error = dev.devn == FH_NETDRIVE ? ENOSHARE : ENOENT;
+      error = ENOENT;
       return;
     }
   else if (!need_directory || error)
@@ -2162,8 +2162,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			     eabuf, easize);
       /* No right to access EAs or EAs not supported? */
       if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED
-	  /* Or a bug in Samba 3.2.x when accessing a share's root dir which
-	     has EAs enabled? */
+	  /* Or a bug in Samba 3.2.x (x <= 7) when accessing a share's root dir
+	     which has EAs enabled? */
 	  || status == STATUS_INVALID_PARAMETER)
 	{
 	  no_ea = true;

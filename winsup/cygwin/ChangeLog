@@ -1,3 +1,11 @@
+2009-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Set errno to ENOENT instead of ENOSHARE throughout.
+	* path.cc (path_conv::check): Set to and check for ENOENT instead of
+	ENOSHARE.
+
+	* path.cc (symlink_info::check): Fix Samba 3.2.x comment.
+
 2009-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::from_fstab_line): Always convert drive
