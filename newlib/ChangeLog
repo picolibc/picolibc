@@ -1,3 +1,7 @@
+2009-01-12  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* libc/machine/powerpc/vfscanf.c (__sccl): Remove declaration.
+
 2009-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fwalk.c (__fwalk, __fwalk_reent): Remove locking of
