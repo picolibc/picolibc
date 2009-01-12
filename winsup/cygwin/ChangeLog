@@ -1,3 +1,15 @@
+2009-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (enum bin_status): New type.
+	(try_to_bin): Return bin_status.  Rename win32_path to pc.  Rename h
+	to fh.  Rename fh to tmp_fh.  Add code to set delete dispostion and
+	more code to replace file moved to bin by another, temporary file.
+	Add comments to explain why.
+	(unlink_nt): Replace move_to_bin with bin_stat.  Only set bin_stat
+	to move_to_bin for non-remote files.  As a last resort, call try_to_bin
+	if setting delete-on-close failed.  Only re-set R/O DOS attribute
+	and only close handle if it's still valid.
+
 2009-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Set errno to ENOENT instead of ENOSHARE throughout.

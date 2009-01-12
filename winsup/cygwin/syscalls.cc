@@ -132,13 +132,21 @@ static BYTE info2[] =
   0x00, 0x00, 0x20, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void
-try_to_bin (path_conv &win32_path, HANDLE h)
+enum bin_status
 {
+  dont_move,
+  move_to_bin,
+  has_been_moved
+};
+
+static bin_status
+try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
+{
+  bin_status bin_stat = move_to_bin;
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  HANDLE rootdir = NULL, recyclerdir = NULL;
+  HANDLE rootdir = NULL, recyclerdir = NULL, tmp_fh = NULL;
   USHORT recycler_base_len = 0, recycler_user_len = 0;
   UNICODE_STRING root, recycler, fname;
   WCHAR recyclerbuf[NAME_MAX + 1]; /* Enough for recycler + SID + filename */
@@ -146,9 +154,10 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   PFILE_INTERNAL_INFORMATION pfii;
   PFILE_RENAME_INFORMATION pfri;
   BYTE infobuf[sizeof (FILE_NAME_INFORMATION ) + 32767 * sizeof (WCHAR)];
+  FILE_DISPOSITION_INFORMATION disp = { TRUE };
 
   pfni = (PFILE_NAME_INFORMATION) infobuf;
-  status = NtQueryInformationFile (h, &io, pfni, sizeof infobuf,
+  status = NtQueryInformationFile (fh, &io, pfni, sizeof infobuf,
 				   FileNameInformation);
   if (!NT_SUCCESS (status))
     {
@@ -168,9 +177,9 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
     RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
-  else if (win32_path.fs_is_ntfs ())	/* NTFS up to 2K3 */
+  else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
     RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
-  else if (win32_path.fs_is_fat ())	/* FAT up to 2K3 */
+  else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
     RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
   else
     goto out;
@@ -185,7 +194,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 
   /* Create root dir path from file name information. */
   RtlSplitUnicodePath (&fname, &fname, NULL);
-  RtlSplitUnicodePath (win32_path.get_nt_native_path (), &root, NULL);
+  RtlSplitUnicodePath (pc.get_nt_native_path (), &root, NULL);
   root.Length -= fname.Length - sizeof (WCHAR);
 
   /* Open root directory.  All recycler bin ops are caseinsensitive. */
@@ -206,7 +215,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   /* On NTFS the recycler dir contains user specific subdirs, which are the
      actual recycle bins per user.  The name if this dir is the string
      representation of the user SID. */
-  if (win32_path.fs_is_ntfs ())
+  if (pc.fs_is_ntfs ())
     {
       UNICODE_STRING sid;
       WCHAR sidbuf[128];
@@ -222,7 +231,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   /* Create hopefully unique filename. */
   RtlAppendUnicodeToString (&recycler, L"\\cyg");
   pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
-  status = NtQueryInformationFile (h, &io, pfii, sizeof infobuf,
+  status = NtQueryInformationFile (fh, &io, pfii, sizeof infobuf,
 				   FileInternalInformation);
   if (!NT_SUCCESS (status))
     {
@@ -237,7 +246,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
   pfri->RootDirectory = rootdir;
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
-  status = NtSetInformationFile (h, &io, pfri, sizeof infobuf,
+  status = NtSetInformationFile (fh, &io, pfri, sizeof infobuf,
 				 FileRenameInformation);
   if (status == STATUS_OBJECT_PATH_NOT_FOUND)
     {
@@ -260,7 +269,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
       recycler.Length = recycler_base_len;
       status = NtCreateFile (&recyclerdir,
 			     READ_CONTROL
-			     | (win32_path.fs_is_ntfs () ? 0 : FILE_ADD_FILE),
+			     | (pc.fs_is_ntfs () ? 0 : FILE_ADD_FILE),
 			     &attr, &io, NULL,
 			     FILE_ATTRIBUTE_DIRECTORY
 			     | FILE_ATTRIBUTE_SYSTEM
@@ -274,7 +283,7 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	}
       /* Next, if necessary, check if the recycler/SID dir exists and
 	 create it if not. */
-      if (win32_path.fs_is_ntfs ())
+      if (pc.fs_is_ntfs ())
 	{
 	  NtClose (recyclerdir);
 	  recycler.Length = recycler_user_len;
@@ -296,11 +305,10 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	 corrupted */
       if (io.Information == FILE_CREATED)
 	{
-	  HANDLE fh;
 	  RtlInitUnicodeString (&fname, L"desktop.ini");
 	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
 				      recyclerdir, NULL);
-	  status = NtCreateFile (&fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
+	  status = NtCreateFile (&tmp_fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
 				 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN,
 				 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 				 FILE_SYNCHRONOUS_IO_NONALERT
@@ -309,18 +317,18 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 	    debug_printf ("NtCreateFile (%S) failed, %08x", &recycler, status);
 	  else
 	    {
-	      status = NtWriteFile (fh, NULL, NULL, NULL, &io, desktop_ini,
+	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, desktop_ini,
 				    sizeof desktop_ini - 1, NULL, NULL);
 	      if (!NT_SUCCESS (status))
 		debug_printf ("NtWriteFile (%S) failed, %08x", &fname, status);
-	      NtClose (fh);
+	      NtClose (tmp_fh);
 	    }
 	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */
 	    {
 	      RtlInitUnicodeString (&fname, L"INFO2");
-	      status = NtCreateFile (&fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
-				     FILE_ATTRIBUTE_ARCHIVE
-				     | FILE_ATTRIBUTE_HIDDEN,
+	      status = NtCreateFile (&tmp_fh, FILE_GENERIC_WRITE, &attr, &io,
+				     NULL, FILE_ATTRIBUTE_ARCHIVE
+					   | FILE_ATTRIBUTE_HIDDEN,
 				     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
 				     FILE_SYNCHRONOUS_IO_NONALERT
 				     | FILE_NON_DIRECTORY_FILE, NULL, 0);
@@ -329,26 +337,75 @@ try_to_bin (path_conv &win32_path, HANDLE h)
 				&recycler, status);
 		else
 		{
-		  status = NtWriteFile (fh, NULL, NULL, NULL, &io, info2,
+		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, info2,
 					sizeof info2, NULL, NULL);
 		  if (!NT_SUCCESS (status))
 		    debug_printf ("NtWriteFile (%S) failed, %08x",
 				  &fname, status);
-		  NtClose (fh);
+		  NtClose (tmp_fh);
 		}
 	    }
 	}
       NtClose (recyclerdir);
       /* Shoot again. */
-      status = NtSetInformationFile (h, &io, pfri, sizeof infobuf,
+      status = NtSetInformationFile (fh, &io, pfri, sizeof infobuf,
 				     FileRenameInformation);
     }
   if (!NT_SUCCESS (status))
-    debug_printf ("Move %S to %S failed, status = %p",
-		  win32_path.get_nt_native_path (), &recycler, status);
+    {
+      debug_printf ("Move %S to %S failed, status = %p",
+		    pc.get_nt_native_path (), &recycler, status);
+      goto out;
+    }
+  /* Moving to the bin worked. */
+  bin_stat = has_been_moved;
+  /* Now we try to set the delete disposition.  If that worked, we're done.
+     We try this here first, as long as we still have the open handle.
+     Otherwise the below code closes the handle to allow replacing the file. */
+  status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
+				 FileDispositionInformation);
+  /* In case of success, restore R/O attribute to accommodate hardlinks.
+     That leaves potentially hardlinks around with the R/O bit suddenly
+     off if setting the delete disposition failed, but please, keep in
+     mind this is really a border case only. */
+  if ((access & FILE_WRITE_ATTRIBUTES) && NT_SUCCESS (status) && !pc.isdir ())
+    NtSetAttributesFile (fh, pc.file_attributes ());
+  NtClose (fh);
+  fh = NULL; /* So unlink_nt doesn't close the handle twice. */
+  /* On success or when trying to unlink a directory we just return here.
+     The below code only works for files. */
+  if (NT_SUCCESS (status) || pc.isdir ())
+    goto out;
+  /* The final trick.  We create a temporary file with delete-on-close
+     semantic and rename that file to the file just moved to the bin.
+     This typically overwrites the original file and we get rid of it,
+     even if neither setting the delete dispostion, nor setting
+     delete-on-close on the original file succeeds.  There are still
+     cases in which this fails, for instance, when trying to delete a
+     hardlink to a DLL used by the unlinking application itself. */
+  RtlAppendUnicodeToString (&recycler, L"X");
+  InitializeObjectAttributes (&attr, &recycler, 0, rootdir, NULL);
+  status = NtCreateFile (&tmp_fh, DELETE, &attr, &io, NULL,
+			 FILE_ATTRIBUTE_NORMAL, 0, FILE_SUPERSEDE,
+			 FILE_NON_DIRECTORY_FILE | FILE_DELETE_ON_CLOSE,
+			 NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("Creating file for overwriting failed, status = %p",
+		    status);
+      goto out;
+    }
+  status = NtSetInformationFile (tmp_fh, &io, pfri, sizeof infobuf,
+				 FileRenameInformation);
+  NtClose (tmp_fh);
+  if (!NT_SUCCESS (status))
+    debug_printf ("Overwriting with another file failed, status = %p",
+		  status);
+
 out:
   if (rootdir)
     NtClose (rootdir);
+  return bin_stat;
 }
 
 static NTSTATUS
@@ -411,11 +468,13 @@ unlink_nt (path_conv &pc)
      bin so that it actually disappears from its directory even though its
      in use.  Otherwise, if opening doesn't fail, the file is not in use and
      we can go straight to setting the delete disposition flag. */
-  bool move_to_bin = false;
+  bin_status bin_stat = dont_move;
   status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
   if (status == STATUS_SHARING_VIOLATION)
     {
-      move_to_bin = true;
+      /* Bin is only accessible locally. */
+      if (!pc.isremote ())
+	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())
 	status = NtOpenFile (&fh, access, &attr, &io,
 			     FILE_SHARE_VALID_FLAGS, flags);
@@ -457,14 +516,15 @@ unlink_nt (path_conv &pc)
       syscall_printf ("Opening file for delete failed, status = %p", status);
       return status;
     }
-
-  if (move_to_bin && !pc.isremote ())
-    try_to_bin (pc, fh);
-
   /* Get rid of read-only attribute. */
   if (access & FILE_WRITE_ATTRIBUTES)
     NtSetAttributesFile (fh, pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
-
+  /* Try to move to bin if a sharing violation occured.  If that worked,
+     we're done. */
+  if (bin_stat == move_to_bin
+      && (bin_stat = try_to_bin (pc, fh, access)) == has_been_moved)
+    return 0;
+  /* Try to set delete disposition. */
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
 				 FileDispositionInformation);
@@ -475,7 +535,7 @@ unlink_nt (path_conv &pc)
       /* Trying to delete a hardlink to a file in use by the system in some
 	 way (for instance, font files) by setting the delete disposition fails
 	 with STATUS_CANNOT_DELETE.  Strange enough, deleting these hardlinks
-	 using delete-on-close semantic works.
+	 using delete-on-close semantic works... most of the time.
       
 	 Don't use delete-on-close on remote shares.  If two processes
 	 have open handles on a file and one of them calls unlink, the
@@ -494,26 +554,36 @@ unlink_nt (path_conv &pc)
 	  RtlInitUnicodeString (&fname, L"");
 	  InitializeObjectAttributes (&attr, &fname, 0, fh, NULL);
 	  status = NtOpenFile (&fh2, DELETE, &attr, &io,
-			       move_to_bin ? FILE_SHARE_VALID_FLAGS
-					   : FILE_SHARE_DELETE,
+			       bin_stat == move_to_bin ? FILE_SHARE_VALID_FLAGS
+						       : FILE_SHARE_DELETE,
 			       flags | FILE_DELETE_ON_CLOSE);
 	  if (!NT_SUCCESS (status))
-	    syscall_printf ("Setting delete-on-close failed, status = %p",
-			    status);
+	    {
+	      syscall_printf ("Setting delete-on-close failed, status = %p",
+			      status);
+	      /* This is really the last chance.  If it hasn't been moved
+	         to the bin already, try it now.  If moving to the bin
+		 succeeds, we got rid of the file in some way, even if
+		 unlinking didn't work. */
+	      if (bin_stat == dont_move)
+	      	bin_stat = try_to_bin (pc, fh, access);
+	      if (bin_stat == has_been_moved)
+		status = STATUS_SUCCESS;
+	    }
 	  else
 	    NtClose (fh2);
 	}
     }
-  if ((access & FILE_WRITE_ATTRIBUTES)
-      && (!NT_SUCCESS (status) || !pc.isdir ()))
+  if (fh)
     {
       /* Restore R/O attribute to accommodate hardlinks.  Don't try this
 	 with directories!  For some reason the below NtSetInformationFile
 	 changes the delete disposition back to FALSE, at least on XP. */
-      NtSetAttributesFile (fh, pc.file_attributes ());
+      if ((access & FILE_WRITE_ATTRIBUTES)
+	  && (!NT_SUCCESS (status) || !pc.isdir ()))
+	NtSetAttributesFile (fh, pc.file_attributes ());
+      NtClose (fh);
     }
-
-  NtClose (fh);
   return status;
 }
 
