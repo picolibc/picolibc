@@ -40,10 +40,8 @@ _DEFUN(__fwalk, (ptr, function),
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
         {
-          _flockfile (fp);
           if (fp->_flags != 0 && fp->_file != -1)
             ret |= (*function) (fp);
-          _funlockfile (fp);
         }
 
   return ret;
@@ -64,10 +62,8 @@ _DEFUN(__fwalk_reent, (ptr, reent_function),
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
         {
-          _flockfile (fp);
           if (fp->_flags != 0 && fp->_file != -1)
             ret |= (*reent_function) (ptr, fp);
-          _funlockfile (fp);
         }
 
   return ret;

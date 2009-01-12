@@ -1,3 +1,8 @@
+2009-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fwalk.c (__fwalk, __fwalk_reent): Remove locking of
+	each fp.  Let the function being called lock the fp, if necessary.
+
 2009-01-07  Kazu Hirata  <kazu@codesourcery.com>
 
 	* libc/include/sys/stdio.h (_flockfile, _funlockfile): Fix typos.
