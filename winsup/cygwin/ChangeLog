@@ -1,3 +1,8 @@
+2009-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/getopt.c (parse_long_options): Use fix from NetBSD's getopt
+	to avoid false ambiguities.
+
 2009-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (enum bin_status): New type.

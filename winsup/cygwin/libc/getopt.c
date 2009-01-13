@@ -170,10 +170,16 @@ parse_long_options(char * const *nargv, const char *options,
 {
 	char *current_argv, *has_equal;
 	size_t current_argv_len;
-	int i, match;
+	int i, ambiguous, match;
+
+#define IDENTICAL_INTERPRETATION(_x, _y)                                \
+	(long_options[(_x)].has_arg == long_options[(_y)].has_arg &&    \
+	 long_options[(_x)].flag == long_options[(_y)].flag &&          \
+	 long_options[(_x)].val == long_options[(_y)].val)
 
 	current_argv = place;
 	match = -1;
+	ambiguous = 0;
 
 	optind++;
 
@@ -193,6 +199,7 @@ parse_long_options(char * const *nargv, const char *options,
 		if (strlen(long_options[i].name) == current_argv_len) {
 			/* exact match */
 			match = i;
+			ambiguous = 0;
 			break;
 		}
 		/*
@@ -204,14 +211,16 @@ parse_long_options(char * const *nargv, const char *options,
 
 		if (match == -1)	/* partial match */
 			match = i;
-		else {
-			/* ambiguous abbreviation */
-			if (PRINT_ERROR)
-				warnx(ambig, (int)current_argv_len,
-				     current_argv);
-			optopt = 0;
-			return (BADCH);
-		}
+		else if (!IDENTICAL_INTERPRETATION(i, match))
+			ambiguous = 1;
+	}
+	if (ambiguous) {
+		/* ambiguous abbreviation */
+		if (PRINT_ERROR)
+			warnx(ambig, (int)current_argv_len,
+			     current_argv);
+		optopt = 0;
+		return (BADCH);
 	}
 	if (match != -1) {		/* option found */
 		if (long_options[match].has_arg == no_argument
@@ -276,6 +285,7 @@ parse_long_options(char * const *nargv, const char *options,
 		return (0);
 	} else
 		return (long_options[match].val);
+#undef IDENTICAL_INTERPRETATION
 }
 
 /*
