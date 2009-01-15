@@ -40,6 +40,7 @@ enum ld_plugin_status
 {
   LDPS_OK = 0,
   LDPS_NO_SYMS,         /* Attempt to get symbols that haven't been added. */
+  LDPS_BAD_HANDLE,      /* No claimed object associated with given handle. */
   LDPS_ERR
   /* Additional Error codes TBD.  */
 };
@@ -165,6 +166,20 @@ enum ld_plugin_status
 (*ld_plugin_add_symbols) (void *handle, int nsyms,
                           const struct ld_plugin_symbol *syms);
 
+/* The linker's interface for getting the input file information with
+   an open (possibly re-opened) file descriptor.  */
+
+typedef
+enum ld_plugin_status
+(*ld_plugin_get_input_file) (const void *handle,
+                             struct ld_plugin_input_file *file);
+
+/* The linker's interface for releasing the input file.  */
+
+typedef
+enum ld_plugin_status
+(*ld_plugin_release_input_file) (const void *handle);
+
 /* The linker's interface for retrieving symbol resolution information.  */
 
 typedef
@@ -207,7 +222,9 @@ enum ld_plugin_tag
   LDPT_ADD_SYMBOLS,
   LDPT_GET_SYMBOLS,
   LDPT_ADD_INPUT_FILE,
-  LDPT_MESSAGE
+  LDPT_MESSAGE,
+  LDPT_GET_INPUT_FILE,
+  LDPT_RELEASE_INPUT_FILE
 };
 
 /* The plugin transfer vector.  */
@@ -226,6 +243,8 @@ struct ld_plugin_tv
     ld_plugin_get_symbols tv_get_symbols;
     ld_plugin_add_input_file tv_add_input_file;
     ld_plugin_message tv_message;
+    ld_plugin_get_input_file tv_get_input_file;
+    ld_plugin_release_input_file tv_release_input_file;
   } tv_u;
 };
 

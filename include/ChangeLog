@@ -1,3 +1,11 @@
+2008-12-01  Cary Coutant  <ccoutant@google.com>
+
+	* plugin-api.h (LDPS_BAD_HANDLE): New constant.
+	(ld_plugin_get_input_file): New typedef.
+	(ld_plugin_release_input_file): New typedef.
+	(LDPT_GET_INPUT_FILE, LDPT_RELEASE_INPUT_FILE): New constants.
+	(struct ld_plugin_tv): Add two new fields.
+
 2008-12-23  Jon Beniston <jon@beniston.com>
 
 	* dis-asm.h: Add LM32 disassembler function prototype.
