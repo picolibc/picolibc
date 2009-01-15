@@ -1,3 +1,8 @@
+2009-01-15  Douglas B Rupp  <rupp@gnat.com>
+
+	* ia64.h (SHT_IA_64_VMS_DISPLAY_NAME_INFO, EF_IA_64_ARCHVER_1):
+	New macros. Minor reformatting.
+
 2008-12-23  Jon Beniston <jon@beniston.com>
 
 	* lm32.h: New file.

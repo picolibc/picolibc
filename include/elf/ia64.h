@@ -1,5 +1,5 @@
 /* IA-64 ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2008
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2008, 2009
    Free Software Foundation, Inc.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>
 
@@ -24,8 +24,9 @@
 
 /* Bits in the e_flags field of the Elf64_Ehdr:  */
 
-#define EF_IA_64_MASKOS	 0x0000000f	/* OS-specific flags.  */
-#define EF_IA_64_ARCH	 0xff000000	/* Arch. version mask.  */
+#define EF_IA_64_MASKOS	   0x0000000f	/* OS-specific flags.  */
+#define EF_IA_64_ARCH	   0xff000000	/* Arch. version mask.  */
+#define EF_IA_64_ARCHVER_1 (1 << 24)    /* Arch. version level 1 compat.  */
 
 /* ??? These four definitions are not part of the SVR4 ABI.
    They were present in David's initial code drop, so it is probable
@@ -84,22 +85,24 @@
 /* OpenVMS section types.  */
 /* The section contains PC-to-source correlation information for use by the
    VMS RTL's traceback facility.  */
-#define SHT_IA_64_VMS_TRACE          0x60000000
+#define SHT_IA_64_VMS_TRACE             0x60000000
 /* The section contains routine signature information for use by the
    translated image executive.  */
-#define SHT_IA_64_VMS_TIE_SIGNATURES 0x60000001
+#define SHT_IA_64_VMS_TIE_SIGNATURES    0x60000001
 /* The section contains dwarf-3 information.  */
-#define SHT_IA_64_VMS_DEBUG          0x60000002
+#define SHT_IA_64_VMS_DEBUG             0x60000002
 /* The section contains the dwarf-3 string table.  */
-#define SHT_IA_64_VMS_DEBUG_STR      0x60000003
+#define SHT_IA_64_VMS_DEBUG_STR         0x60000003
 /* The section contains linkage information to perform consistency checking
    accross object modules.  */
-#define SHT_IA_64_VMS_LINKAGES       0x60000004
+#define SHT_IA_64_VMS_LINKAGES          0x60000004
 /* The section allows the symbol vector in an image to be location through
    the section table.  */
-#define SHT_IA_64_VMS_SYMBOL_VECTOR  0x60000005
+#define SHT_IA_64_VMS_SYMBOL_VECTOR     0x60000005
 /* The section contains inter-image fixups.  */
-#define SHT_IA_64_VMS_FIXUP          0x60000006
+#define SHT_IA_64_VMS_FIXUP             0x60000006
+/* The section contains unmangled name info.  */
+#define SHT_IA_64_VMS_DISPLAY_NAME_INFO 0x60000007
 
 /* Bits in the p_flags field of Elf64_Phdr:  */
 
