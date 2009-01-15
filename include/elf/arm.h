@@ -85,17 +85,23 @@
 #define PF_ARM_ABS         0x40000000   /* Segment must be loaded at its base address.  */
 
 /* Values for the Tag_CPU_arch EABI attribute.  */
-#define TAG_CPU_ARCH_PRE_V4    0
-#define TAG_CPU_ARCH_V4                1
-#define TAG_CPU_ARCH_V4T       2
-#define TAG_CPU_ARCH_V5T       3
-#define TAG_CPU_ARCH_V5TE      4
-#define TAG_CPU_ARCH_V5TEJ     5
-#define TAG_CPU_ARCH_V6                6
-#define TAG_CPU_ARCH_V6KZ      7
-#define TAG_CPU_ARCH_V6T2      8
-#define TAG_CPU_ARCH_V6K       9
-#define TAG_CPU_ARCH_V7                10
+#define TAG_CPU_ARCH_PRE_V4	0
+#define TAG_CPU_ARCH_V4		1
+#define TAG_CPU_ARCH_V4T	2
+#define TAG_CPU_ARCH_V5T	3
+#define TAG_CPU_ARCH_V5TE	4
+#define TAG_CPU_ARCH_V5TEJ	5
+#define TAG_CPU_ARCH_V6		6
+#define TAG_CPU_ARCH_V6KZ	7
+#define TAG_CPU_ARCH_V6T2	8
+#define TAG_CPU_ARCH_V6K	9
+#define TAG_CPU_ARCH_V7		10
+#define TAG_CPU_ARCH_V6_M	11
+#define TAG_CPU_ARCH_V6S_M	12
+#define MAX_TAG_CPU_ARCH	12
+/* Pseudo-architecture to allow objects to be compatible with the subset of
+   armv4t and armv6-m.  This value should never be stored in object files.  */
+#define TAG_CPU_ARCH_V4T_PLUS_V6_M (MAX_TAG_CPU_ARCH + 1)
 
 /* Relocation types.  */
 
@@ -251,7 +257,7 @@ enum
   Tag_THUMB_ISA_use,
   Tag_VFP_arch,
   Tag_WMMX_arch,
-  Tag_NEON_arch,
+  Tag_Advanced_SIMD_arch,
   Tag_PCS_config,
   Tag_ABI_PCS_R9_use,
   Tag_ABI_PCS_RW_data,
@@ -271,13 +277,21 @@ enum
   Tag_ABI_WMMX_args,
   Tag_ABI_optimization_goals,
   Tag_ABI_FP_optimization_goals,
-  /* 32 is generic.  */
+  /* 32 is generic (Tag_compatibility).  */
   Tag_undefined33 = 33,
   Tag_CPU_unaligned_access,
-  Tag_undefined35, 
+  Tag_undefined35,
   Tag_VFP_HP_extension,
   Tag_undefined37,
-  Tag_ABI_FP_16bit_format = 38,
+  Tag_ABI_FP_16bit_format,
+  Tag_undefined39,
+  Tag_nodefaults = 64,
+  Tag_also_compatible_with,
+  Tag_T2EE_use,
+  Tag_conformance,
+  Tag_Virtualization_use,
+  Tag_undefined69,
+  Tag_MPextension_use
 };
 
 #endif

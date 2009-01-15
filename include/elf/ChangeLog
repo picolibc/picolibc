@@ -1,3 +1,15 @@
+2009-01-15  Andrew Stubbs  <ams@codesourcery.com>
+	    Julian Brown   <julian@codesourcery.com>
+
+	* arm.h (TAG_CPU_ARCH_V6_M, TAG_CPU_ARCH_V6S_M): New defines.
+	(MAX_TAG_CPU_ARCH, TAG_CPU_ARCH_V4T_PLUS_V6_M): New defines.
+	(Tag_NEON_arch): Rename to Tag_Advanced_SIMD_arch to match ARM ABI
+	version 2.07.
+	(Tag_undefined39, Tag_nodefaults): New enum values.
+	(Tag_also_compatible_with, Tag_T2EE_use): Likewise.
+	(Tag_conformance, Tag_Virtualization_use): Likewise.
+	(Tag_undefined69, Tag_MPextension_use): Likewise.
+
 2009-01-15  Douglas B Rupp  <rupp@gnat.com>
 
 	* ia64.h (SHT_IA_64_VMS_DISPLAY_NAME_INFO, EF_IA_64_ARCHVER_1):
