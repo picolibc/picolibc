@@ -1,3 +1,7 @@
+2009-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Fix copyright dates.
+
 2009-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/getopt.c (parse_long_options): Use fix from NetBSD's getopt
