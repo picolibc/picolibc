@@ -1,7 +1,7 @@
 2009-01-16  Alan Modra  <amodra@bigpond.net.au>
 
 	* Makefile.def (configure-opcodes): Depend on configure-libiberty.
-	* Makefile.def (all-opcodes): Depend on all-libiberty.
+	(all-opcodes): Depend on all-libiberty.
 	* Makefile.in: Regenerate.
 
 2009-01-15  Douglas B Rupp  <rupp@gnat.com>
