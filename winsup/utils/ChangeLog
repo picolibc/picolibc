@@ -1,3 +1,9 @@
+2009-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Raise size of osname.  Add Windows 7
+	and Windows 2008 R2 as recognized OSes.  Update products array to
+	the latest documented list.
+
 2009-01-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldd.cc: New file.  First stab at implementing ldd-like functionality

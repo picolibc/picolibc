@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1199,7 +1199,7 @@ dump_sysinfo ()
   char *found_cygwin_dll;
   bool is_nt = false;
   bool more_info = true;
-  char osname[80];
+  char osname[128];
 
   printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
@@ -1232,10 +1232,15 @@ dump_sysinfo ()
 	  BOOL (WINAPI *GetProductInfo) (DWORD, DWORD, DWORD, DWORD, PDWORD) =
 		  (BOOL (WINAPI *)(DWORD, DWORD, DWORD, DWORD, PDWORD))
 		  GetProcAddress (k32, "GetProductInfo");
-	  if (osversion.wProductType == VER_NT_WORKSTATION)
-	    strcpy (osname, "Vista");
-	  else
-	    strcpy (osname, "2008");
+	  if (osversion.dwMinorVersion == 0)
+	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			    ? "Vista" : "2008");
+	  else if (osversion.dwMinorVersion == 1)
+	    {
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "7" : "2008 R2");
+	      strcat (osname, " (Not yet supported!)");
+	    }
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
 			      osversion.dwMinorVersion,
@@ -1244,39 +1249,56 @@ dump_sysinfo ()
 			      &prod))
 	    {
 #define       PRODUCT_UNLICENSED 0xabcdabcd
-#define       PRODUCT_SMALLBUSINESS_SERVER_PREMIUM 0x19
+#define       PRODUCT_HYPERV 0x2a
 	      const char *products[] =
 	        {
 		  "",
-		  " Ultimate Edition",
-		  " Home Basic Edition",
-		  " Home Premium Edition",
-		  " Enterprise Edition",
-		  " Home Basic N Edition",
-		  " Business Edition",
-		  " Server Standard Edition",
-		  " Server Datacenter Edition",
+		  " Ultimate",
+		  " Home Basic",
+		  " Home Premium",
+		  " Enterprise",
+		  " Home Basic N",
+		  " Business",
+		  " Server Standard",
+		  " Server Datacenter",
 		  " Small Business Server",
-		  " Server Enterprise Edition",
-		  " Starter Edition",
-		  " Server Datacenter Edition Core",
-		  " Server Standard Edition Core",
-		  " Server Enterprise Edition Core",
-		  " Server Enterprise Edition for Itanium-based Systems",
-		  " Business N Edition",
-		  " Web Server Edition",
-		  " Cluster Server Edition",
-		  " Home Server Edition",
-		  " Storage Server Express Edition",
-		  " Storage Server Standard Edition",
-		  " Storage Server Workgroup Edition",
-		  " Storage Server Enterprise Edition",
-		  " Server for Small Business Edition",
-		  " Small Business Server Premium Edition"
+		  " Server Enterprise",
+		  " Starter",
+		  " Server Datacenter Core",
+		  " Server Standard Core",
+		  " Server Enterprise Core",
+		  " Server Enterprise for Itanium-based Systems",
+		  " Business N",
+		  " Web Server",
+		  " HPC Edition",
+		  " Home Server",
+		  " Storage Server Express",
+		  " Storage Server Standard",
+		  " Storage Server Workgroup",
+		  " Storage Server Enterprise",
+		  " for Windows Essential Server Solutions",
+		  " Small Business Server Premium",
+		  " Home Premium N",
+		  " Enterprise N",
+		  " Ultimate N",
+		  " Web Server Core",
+		  " Essential Business Server Management Server",
+		  " Essential Business Server Security Server"
+		  " Essential Business Server Messaging Server",
+		  "",
+		  "",
+		  " without Hyper-V for Windows Essential Server Solutions",
+		  " Server Standard without Hyper-V",
+		  " Server Datacenter without Hyper-V",
+		  " Server Enterprise without Hyper-V",
+		  " Server Datacenter Core without Hyper-V",
+		  " Server Standard Core without Hyper-V",
+		  " Server Enterprise Core without Hyper-V",
+		  " Hyper-V Server"
 		};
 	      if (prod == PRODUCT_UNLICENSED)
 	        strcat (osname, "Unlicensed");
-	      else if (prod > PRODUCT_SMALLBUSINESS_SERVER_PREMIUM)
+	      else if (prod > PRODUCT_HYPERV)
 	        strcat (osname, "");
 	      else
 	        strcat (osname, products[prod]);
