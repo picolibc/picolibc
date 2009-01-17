@@ -749,7 +749,7 @@ NtOpenThread@16
 NtOpenThreadToken@16
 ;NtOpenThreadTokenEx
 ;NtQueryDirectoryFile
-;NtQueryEaFile
+NtQueryEaFile@36
 NtQueryInformationAtom@20
 ;NtQueryInformationFile
 NtQueryInformationProcess@20
@@ -762,7 +762,7 @@ NtQuerySystemInformation@16
 NtReadFile@36
 NtRequestPort@8
 NtRequestWaitReplyPort@12
-;NtSetEaFile
+NtSetEaFile@16
 NtSetEvent@8
 ;NtSetInformationFile
 NtSetInformationProcess@16
@@ -1318,7 +1318,7 @@ ZwQueryDefaultLocale@8
 ZwQueryDefaultUILanguage@4
 ZwQueryDirectoryFile@44
 ZwQueryDirectoryObject@28
-;ZwQueryEaFile
+ZwQueryEaFile@36
 ZwQueryFullAttributesFile@8
 ZwQueryInformationFile@20
 ZwQueryInformationJobObject@20
@@ -1345,7 +1345,7 @@ ZwSaveKey@8
 ;ZwSetBootOptions
 ZwSetDefaultLocale@8
 ZwSetDefaultUILanguage@4
-;ZwSetEaFile
+ZwSetEaFile@16
 ZwSetEvent@8
 ZwSetInformationFile@20
 ZwSetInformationJobObject@16
