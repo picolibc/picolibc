@@ -1,3 +1,12 @@
+2009-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Fix copyright date.
+	* cygcheck.cc (scan_registry): Take additional parameter and add code
+	to avoid recursion in Wow6432Node subkey.  Rename variable cygnus to
+	cygwin.  Scan for "Cygwin" instead of for "cygnus" substring.
+	(dump_sysinfo): Drop unused calls to scan_registry.  Drop scanning
+	HKEY_CURRENT_CONFIG.
+
 2009-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Raise size of osname.  Add Windows 7

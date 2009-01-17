@@ -921,7 +921,7 @@ show_reg (RegInfo * ri, int nest)
 }
 
 static void
-scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
+scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygwin, bool wow64)
 {
   RegInfo ri;
   ri.prev = prev;
@@ -930,8 +930,8 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 
   char *cp;
   for (cp = name; *cp; cp++)
-    if (strncasecmp (cp, "cygnus", 6) == 0)
-      cygnus = 1;
+    if (strncasecmp (cp, "Cygwin", 6) == 0)
+      cygwin = 1;
 
   DWORD num_subkeys, max_subkey_len, num_values;
   DWORD max_value_len, max_valdata_len, i;
@@ -948,7 +948,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
       return;
     }
 
-  if (cygnus)
+  if (cygwin)
     {
       show_reg (&ri, 0);
 
@@ -1001,10 +1001,18 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 	  ERROR_SUCCESS)
 	{
 	  HKEY sKey;
+	  /* Don't recurse more than one level into the WOW64 subkey since
+	     that would lead to an endless recursion. */
+	  if (!strcasecmp (subkey_name, "Wow6432Node"))
+	    {
+	      if (wow64)
+		continue;
+	      wow64 = true;
+	    }
 	  if (RegOpenKeyEx (hKey, subkey_name, 0, KEY_READ, &sKey)
 	      == ERROR_SUCCESS)
 	    {
-	      scan_registry (&ri, sKey, subkey_name, cygnus);
+	      scan_registry (&ri, sKey, subkey_name, cygwin, wow64);
 	      if (RegCloseKey (sKey) != ERROR_SUCCESS)
 		display_error ("scan_registry: RegCloseKey()");
 	    }
@@ -1505,19 +1513,11 @@ dump_sysinfo ()
   if (registry)
     {
       if (givehelp)
-	printf ("Scanning registry for keys with 'Cygnus' in them...\n");
-#if 0
-      /* big and not generally useful */
-      scan_registry (0, HKEY_CLASSES_ROOT, (char *) "HKEY_CLASSES_ROOT", 0);
-#endif
-      scan_registry (0, HKEY_CURRENT_CONFIG,
-		     (char *) "HKEY_CURRENT_CONFIG", 0);
-      scan_registry (0, HKEY_CURRENT_USER, (char *) "HKEY_CURRENT_USER", 0);
-      scan_registry (0, HKEY_LOCAL_MACHINE, (char *) "HKEY_LOCAL_MACHINE", 0);
-#if 0
-      /* the parts we need are duplicated in HKEY_CURRENT_USER anyway */
-      scan_registry (0, HKEY_USERS, (char *) "HKEY_USERS", 0);
-#endif
+	printf ("Scanning registry for keys with 'Cygwin' in them...\n");
+      scan_registry (0, HKEY_CURRENT_USER,
+		     (char *) "HKEY_CURRENT_USER", 0, false);
+      scan_registry (0, HKEY_LOCAL_MACHINE,
+		     (char *) "HKEY_LOCAL_MACHINE", 0, false);
       printf ("\n");
     }
   else
