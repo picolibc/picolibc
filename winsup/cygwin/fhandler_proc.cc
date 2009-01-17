@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -30,72 +30,57 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-/* offsets in proc_listing */
-static const int PROC_LOADAVG    =  2;   // /proc/loadavg
-static const int PROC_MEMINFO    =  3;   // /proc/meminfo
-static const int PROC_REGISTRY   =  4;   // /proc/registry
-static const int PROC_STAT       =  5;   // /proc/stat
-static const int PROC_VERSION    =  6;   // /proc/version
-static const int PROC_UPTIME     =  7;   // /proc/uptime
-static const int PROC_CPUINFO    =  8;   // /proc/cpuinfo
-static const int PROC_PARTITIONS =  9;   // /proc/partitions
-static const int PROC_SELF       = 10;   // /proc/self
-static const int PROC_REGISTRY32 = 11;   // /proc/registry32
-static const int PROC_REGISTRY64 = 12;   // /proc/registry64
-static const int PROC_NET        = 13;   // /proc/net
+enum proc_type_t {
+  proc_symlink = -2,
+  proc_file = -1,
+  proc_none = 0,
+  proc_directory = 1,
+  proc_rootdir = 2
+};
+
+struct proc_tab_t {
+  const char *name;
+  __dev32_t fhandler;
+  proc_type_t type;
+  size_t bufsize;
+  _off64_t (*format_func)(char *, size_t);
+};
+
+static _off64_t format_proc_loadavg (char *, size_t);
+static _off64_t format_proc_meminfo (char *, size_t);
+static _off64_t format_proc_stat (char *, size_t);
+static _off64_t format_proc_version (char *, size_t);
+static _off64_t format_proc_uptime (char *, size_t);
+static _off64_t format_proc_cpuinfo (char *, size_t);
+static _off64_t format_proc_partitions (char *, size_t);
+static _off64_t format_proc_self (char *, size_t);
 
 /* names of objects in /proc */
-static const char *proc_listing[] = {
-  ".",
-  "..",
-  "loadavg",
-  "meminfo",
-  "registry",
-  "stat",
-  "version",
-  "uptime",
-  "cpuinfo",
-  "partitions",
-  "self",
-  "registry32",
-  "registry64",
-  "net",
-  NULL
+static const proc_tab_t proc_tab[] = {
+  { ".",	  FH_PROC,	proc_directory,	    0, NULL },
+  { "..",	  FH_PROC,	proc_directory,	    0, NULL },
+  { "loadavg",	  FH_PROC,	proc_file,	   16, format_proc_loadavg },
+  { "meminfo",	  FH_PROC,	proc_file,	 2048, format_proc_meminfo },
+  { "registry",	  FH_REGISTRY,	proc_directory,	    0, NULL  },
+  { "stat",	  FH_PROC,	proc_file,	16384, format_proc_stat },
+  { "version",	  FH_PROC,	proc_file,	  100, format_proc_version },
+  { "uptime",	  FH_PROC,	proc_file,	   80, format_proc_uptime },
+  { "cpuinfo",	  FH_PROC,	proc_file,	16384, format_proc_cpuinfo },
+  { "partitions", FH_PROC,	proc_file,	 4096, format_proc_partitions },
+  { "self",	  FH_PROC,	proc_symlink,	   16, format_proc_self },
+  { "registry32", FH_REGISTRY,	proc_directory,	    0, NULL },
+  { "registry64", FH_REGISTRY,	proc_directory,	    0, NULL },
+  { "net",	  FH_PROCNET,	proc_directory,	    0, NULL },
+  { NULL,	  0,		proc_none,	    0, NULL },
 };
 
 #define PROC_DIR_COUNT 4
 
-static const int PROC_LINK_COUNT = (sizeof (proc_listing) / sizeof (const char *)) - 1;
-
-/* FH_PROC in the table below means the file/directory is handles by
- * fhandler_proc.
- */
-static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_REGISTRY,
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_PROC,
-  FH_REGISTRY,
-  FH_REGISTRY,
-  FH_PROCNET,
-};
+static const int PROC_LINK_COUNT = (sizeof (proc_tab) / sizeof (proc_tab_t)) - 1;
 
 /* name of the /proc filesystem */
 const char proc[] = "/proc";
 const int proc_len = sizeof (proc) - 1;
-
-static _off64_t format_proc_meminfo (char *destbuf, size_t maxsize);
-static _off64_t format_proc_stat (char *destbuf, size_t maxsize);
-static _off64_t format_proc_uptime (char *destbuf, size_t maxsize);
-static _off64_t format_proc_cpuinfo (char *destbuf, size_t maxsize);
-static _off64_t format_proc_partitions (char *destbuf, size_t maxsize);
 
 /* Auxillary function that returns the fhandler associated with the given path
    this is where it would be nice to have pattern matching in C - polymorphism
@@ -115,11 +100,11 @@ fhandler_proc::get_proc_fhandler (const char *path)
   if (*path == 0)
     return FH_PROC;
 
-  for (int i = 0; proc_listing[i]; i++)
+  for (int i = 0; proc_tab[i].name; i++)
     {
-      if (path_prefix_p (proc_listing[i], path, strlen (proc_listing[i]),
+      if (path_prefix_p (proc_tab[i].name, path, strlen (proc_tab[i].name),
 			 false))
-	return proc_fhandlers[i];
+	return proc_tab[i].fhandler;
     }
 
   if (pinfo (atoi (path)))
@@ -151,12 +136,12 @@ fhandler_proc::exists ()
   debug_printf ("exists (%s)", path);
   path += proc_len;
   if (*path == 0)
-    return 2;
-  for (int i = 0; proc_listing[i]; i++)
-    if (!strcmp (path + 1, proc_listing[i]))
+    return proc_rootdir;
+  for (int i = 0; proc_tab[i].name; i++)
+    if (!strcmp (path + 1, proc_tab[i].name))
       {
 	fileid = i;
-	return (proc_fhandlers[i] == FH_PROC) ? (i == PROC_SELF ? -2 : -1) : 1;
+	return proc_tab[i].type;
       }
   return 0;
 }
@@ -188,12 +173,12 @@ fhandler_proc::fstat (struct __stat64 *buf)
   else
     {
       path++;
-      for (int i = 0; proc_listing[i]; i++)
-	if (!strcmp (path, proc_listing[i]))
+      for (int i = 0; proc_tab[i].name; i++)
+	if (!strcmp (path, proc_tab[i].name))
 	  {
-	    if (proc_fhandlers[i] != FH_PROC)
+	    if (proc_tab[i].type == proc_directory)
 	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-	    else if (i == PROC_SELF)
+	    else if (proc_tab[i].type == proc_symlink)
 	      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
 	    else
 	      {
@@ -213,7 +198,7 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
   int res;
   if (dir->__d_position < PROC_LINK_COUNT)
     {
-      strcpy (de->d_name, proc_listing[dir->__d_position++]);
+      strcpy (de->d_name, proc_tab[dir->__d_position++].name);
       dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
       res = 0;
     }
@@ -273,12 +258,12 @@ fhandler_proc::open (int flags, mode_t mode)
     }
 
   proc_file_no = -1;
-  for (int i = 0; proc_listing[i]; i++)
-    if (path_prefix_p (proc_listing[i], path + 1, strlen (proc_listing[i]),
+  for (int i = 0; proc_tab[i].name; i++)
+    if (path_prefix_p (proc_tab[i].name, path + 1, strlen (proc_tab[i].name),
 		       false))
       {
 	proc_file_no = i;
-	if (proc_fhandlers[i] != FH_PROC)
+	if (proc_tab[i].fhandler != FH_PROC)
 	  {
 	    if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
 	      {
@@ -327,7 +312,7 @@ fhandler_proc::open (int flags, mode_t mode)
     {
       res = 0;
       goto out;
-	}
+    }
 
   if (flags & O_APPEND)
     position = filesize;
@@ -346,73 +331,31 @@ out:
 bool
 fhandler_proc::fill_filebuf ()
 {
-  switch (fileid)
+  if (fileid < PROC_LINK_COUNT && proc_tab[fileid].format_func)
     {
-    case PROC_VERSION:
-      {
-	if (!filebuf)
-	  {
-	    struct utsname uts_name;
-	    uname (&uts_name);
-	    bufalloc = strlen (uts_name.sysname) + 1
-		       + strlen (uts_name.release) + 1
-		       + strlen (uts_name.version) + 2;
-	    filebuf = (char *) crealloc_abort (filebuf, bufalloc);
-	    filesize = __small_sprintf (filebuf, "%s %s %s\n",
-					uts_name.sysname, uts_name.release,
-					uts_name.version);
-	  }
-	break;
-      }
-    case PROC_UPTIME:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 80);
-	filesize = format_proc_uptime (filebuf, bufalloc);
-	break;
-      }
-    case PROC_STAT:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16384);
-	filesize = format_proc_stat (filebuf, bufalloc);
-	break;
-      }
-    case PROC_LOADAVG:
-      {
-	/*
-	 * not really supported - Windows doesn't keep track of these values
-	 * Windows 95/98/me does have the KERNEL/CPUUsage performance counter
-	 * which is similar.
-	 */
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16);
-	filesize = __small_sprintf (filebuf, "%u.%02u %u.%02u %u.%02u\n",
-				    0, 0, 0, 0, 0, 0);
-	break;
-      }
-    case PROC_MEMINFO:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
-	filesize = format_proc_meminfo (filebuf, bufalloc);
-	break;
-      }
-    case PROC_CPUINFO:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 16384);
-	filesize = format_proc_cpuinfo (filebuf, bufalloc);
-	break;
-      }
-    case PROC_PARTITIONS:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 4096);
-	filesize = format_proc_partitions (filebuf, bufalloc);
-	break;
-      }
-    case PROC_SELF:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 32);
-	filesize = __small_sprintf (filebuf, "%d", getpid ());
-      }
+      filebuf = (char *) crealloc_abort (filebuf,
+					 bufalloc = proc_tab[fileid].bufsize);
+      filesize = proc_tab[fileid].format_func (filebuf, bufalloc);
+      return true;
     }
-    return true;
+  return false;
+}
+
+static _off64_t
+format_proc_version (char *destbuf, size_t maxsize)
+{
+  struct utsname uts_name;
+
+  uname (&uts_name);
+  return __small_sprintf (destbuf, "%s %s %s\n",
+			  uts_name.sysname, uts_name.release, uts_name.version);
+}
+
+static _off64_t
+format_proc_loadavg (char *destbuf, size_t maxsize)
+{
+  return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u\n",
+				    0, 0, 0, 0, 0, 0);
 }
 
 static _off64_t
@@ -1171,6 +1114,12 @@ format_proc_partitions (char *destbuf, size_t maxsize)
   NtClose (dirhdl);
 
   return bufptr - destbuf;
+}
+
+static _off64_t
+format_proc_self (char *destbuf, size_t maxsize)
+{
+  return __small_sprintf (destbuf, "%d", getpid ());
 }
 
 #undef print

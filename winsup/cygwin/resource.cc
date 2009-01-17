@@ -1,6 +1,6 @@
 /* resource.cc: getrusage () and friends.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -17,6 +17,10 @@ details. */
 #include "pinfo.h"
 #include "psapi.h"
 #include "cygtls.h"
+#include "path.h"
+#include "fhandler.h"
+#include "pinfo.h"
+#include "dtable.h"
 
 /* add timeval values */
 static void
@@ -139,6 +143,7 @@ getrlimit (int resource, struct rlimit *rlp)
       rlp->rlim_cur = getdtablesize ();
       if (rlp->rlim_cur < OPEN_MAX)
 	rlp->rlim_cur = OPEN_MAX;
+      rlp->rlim_max = 100 * NOFILE_INCR;
       break;
     case RLIMIT_CORE:
       rlp->rlim_cur = rlim_core;
