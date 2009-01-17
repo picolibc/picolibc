@@ -897,7 +897,9 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
 	 to get this right.  Too bad. */
       if (!wincap.is_wow64 ()
-	  && ((len > fsiz && !autogrow (flags)) || len < pagesize))
+	  && ((len > fsiz && !autogrow (flags))
+	      || roundup2 (len, getsystempagesize ())
+		 < roundup2 (len, pagesize)))
 	orig_len = len;
       if (len > fsiz)
 	{
