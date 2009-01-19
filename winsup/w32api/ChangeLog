@@ -7,7 +7,6 @@
 
 	* include/winbase.h (SCS_64BIT_BINARY): Define.
 
->>>>>>> 1.981
 2008-12-05  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.13.
@@ -181,17 +180,17 @@
 
 2008-07-25 Bo Yang <techrazy@users.sourceforge.net>
 
-	* include/wincrypt.h  (struct _CRYPT_KEY_PROV_PARAM, 
+	* include/wincrypt.h (struct _CRYPT_KEY_PROV_PARAM,
 	struct _CRYPT_KEY_PROV_INFO, CertGetCertificateContextProperty,
 	CryptEnumKeyIdentifierProperties, CryptAcquireCertificatePrivateKey,
 	CertCreateCertificateContext, CryptGetKeyIdentifierProperty,
-	CertSetCertificateContextProperty, CertCompareCertificateName, 
+	CertSetCertificateContextProperty, CertCompareCertificateName,
 	CryptSetKeyIdentifierProperty, CertOIDToAlgId, CryptGetDefaultProviderA,
 	CryptGetDefaultProviderW and many corresponding macroes): Define.
-	* lib/crypt32.def  (Export the above 11 functions): Export.
-	* include/winerror.h  (CRYPT_E_NOT_FOUND and other crypt related
+	* lib/crypt32.def (Export the above 11 functions): Export.
+	* include/winerror.h (CRYPT_E_NOT_FOUND and other crypt related
 	macroes): Define.
-	
+
 
 2008-07-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
@@ -219,14 +218,14 @@
 2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
 
 	* include/winbase.h (GetProcessHandleCount, GetSystemRegistryQuota,
-	GetThreadIOPendingFlag): Modified to rely on _WIN32_WINNT 0x0501 instead 
+	GetThreadIOPendingFlag): Modified to rely on _WIN32_WINNT 0x0501 instead
 	of 0x0502.
 	Bug reported by Thomas Denk.
-	
+
 2008-06-25  Brandon Sneed  <nivenh@sourceware.org>
 
 	* include/winbase.h (InterlockedIncrement, InterlockedDecrement,
-	InterlockedCompareExchange, InterlockedExchange, 
+	InterlockedCompareExchange, InterlockedExchange,
 	InterlockedCompareExchangePointer, InterlockedExchangeAdd,
 	InterlockedExchangePointer): Modified from PLONG to LONG volatile *.
 	Bug reported by Erik Blake.
@@ -990,10 +989,10 @@
 
 	* include/aclui.h: Replace __OBJC__ guard with _OBJC_NO_COM.
 	* include/basetyps.h:  Likewise.
- 	(_COM_interface): New define.
+	(_COM_interface): New define.
 	(interface): Define to _COM_interface, conditional on !__OBJC__.
 	Replace 'interface' with '_COM_interface', throughout.
-  	* include/comcat.h: Replace 'interface' with '_COM_interface', throughout.
+	* include/comcat.h: Replace 'interface' with '_COM_interface', throughout.
 	* include/commdlg.h: Replace __OBJC__ guard with _OBJC_NO_COM.
 	* include/docobj.h: Replace 'interface' with '_COM_interface', throughout.
 	* include/mshtml.h: Likewise.
@@ -1851,7 +1850,7 @@
 	(PPP_LCP_CHAP_MS): Add define.
 	(PPP_LCP_CHAP_MSV2): Add define.
 	(PPP_LCP_MULTILINK_FRAMING): Add define.
- 	(enum _RAS_HARDWARE_CONDITION): Add.
+	(enum _RAS_HARDWARE_CONDITION): Add.
 	(enum _RAS_PORT_CONDITION): Add.
 	(struct _PPP_ATCP_INFO): Add.
 	(struct _PPP_ATCP_INFO): Add.
@@ -2013,7 +2012,7 @@
 	fields not present on PocketPC.
 	(GetCurrentThreadId): Conditionally declare as extern function
 	without dllimport attribute on PocketPC.
- 	(ResetEvent): Likwise.
+	(ResetEvent): Likwise.
 	(SetEvent): Likewise.
 
 	* include/wingdi.h [_WIN32_WCE]  (GetTextExtentPoint32{A|W}):
@@ -2323,18 +2322,18 @@
 
 2006-03-26  Hansres Engel  <engel@node.ch>
 
-         Add Uniscribe API for typography and for complex scripts.
+	 Add Uniscribe API for typography and for complex scripts.
 	* include/usp10.h: New file.
 	* lib/usp10.def: New file.
 
 	* include/winver.h:  Change first argument of GetFileVersionInfo[...] to const.
 
-        * include/imm.h (IMECHARPOSITION): Add structure.
+	* include/imm.h (IMECHARPOSITION): Add structure.
 	(RECONVERTSTRING): Likwise.
 
 	* include/commdlg.h (OPENFILENAME_SIZE_VERSION_400): Define.
 
-        * lib/uuid.c (CMultiLanguage): Add UUID definition.
+	* lib/uuid.c (CMultiLanguage): Add UUID definition.
 	(IMLangFontLink2): Likewise.
 	(IMultiLanguage): Likewise.
 
@@ -2349,7 +2348,7 @@
 
 2006-03-18  Peter Åstrand  <astrand@cendio.se>
 
-         * lib/wtsapi32.def: New file.
+	 * lib/wtsapi32.def: New file.
 
 2006-03-15  Christopher Faylor  <cgf@timesys.com>
 
@@ -2477,14 +2476,14 @@
 
 2006-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
-        * include/commctrl.h: Correct spelling of 'compatibility' in
+	* include/commctrl.h: Correct spelling of 'compatibility' in
 	comments.
 	* include/setupapi.h: Likewise.
 	* include/ws2tcpip.h: Likewise.
 
 2006-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
-        * include/ddk/winddk.h (KeGetCurrentKPCR): Support -masm=intel.
+	* include/ddk/winddk.h (KeGetCurrentKPCR): Support -masm=intel.
 
 2006-01-24  Jiri Malak  <Jiri.Malak@iol.cz>
 
@@ -2848,7 +2847,7 @@
 	* include/basetyps.h (__int16): Correct define.
 
 2005-02-10  Jiri Malak  <Jiri.Malak@iol.cz>
-            Danny Smith  <dannysmith@users.sourceforge.net>
+	    Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/directx/dinput_private.h (ATTRIBUTE_TEXT_SECTION): New
 	define for Open Watcom portability.
@@ -3086,10 +3085,10 @@
 2004-10-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wsahelp.h (WINSOCK_MAPPING, WSHGetWinsockMapping,
-        PWSH_GET_WINSOCK_MAPPING): Don't define if __OBJC__.
+	PWSH_GET_WINSOCK_MAPPING): Don't define if __OBJC__.
 
 2004-10-15  Robert Wruck  <wruck@tweerlei.de>
-            Danny Smith  <dannysmith@users.sourceforge.net>
+	    Danny Smith  <dannysmith@users.sourceforge.net>
 
 	= include/winbase.h (InitializeSListHead, Interlocked*):
 	Guard with !__USE_NTOSKRNL__.
@@ -3116,9 +3115,9 @@
 
 2004-10-11  Robert Wruck  <wruck@tweerlei.de>
 
-        * include/ddk/winddk.h (IoReleaseRemoveLockAndWait): Fix
-        definition
-        (IoReleaseRemoveLock): Add definition.
+	* include/ddk/winddk.h (IoReleaseRemoveLockAndWait): Fix
+	definition
+	(IoReleaseRemoveLock): Add definition.
 
 2004-10-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -3289,7 +3288,7 @@
 2004-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (CMYK): Correct macro. Group CMYK/RGB
-        macros together.
+	macros together.
 
 2004-07-24  Brodie Thiesfield  <brofield@users.sourceforge.net>
 
@@ -3708,7 +3707,7 @@
 	* include/winerror.h (DISP_E_DIVBYZERO): Define constant.
 	* include/winuser.h (COLOR_*): Define missing constants.
 	* include/wtypes.h (enum VARENUM): Add VT_INT_PTR, VT_UINT_PTR.
- 	(VT_INT_PTR, VT_UINT_PTR): Remove macro definitions.
+	(VT_INT_PTR, VT_UINT_PTR): Remove macro definitions.
 
 2004-02-23  Filip Navara  <xnavara@volny.cz>
 
@@ -3844,7 +3843,7 @@
 	ICommDlgBrowser, IShellFolder2, IPersistFolder2, IPersistFolder3):
 	Add COBJMACROS.
 	(SHCreateDirectoryEx[AW], SHBindToParent): Add prototypes.
-        * lib/shell32.c	(IID_IPersistFolder2, IID_IPersistFolder3,
+	* lib/shell32.c (IID_IPersistFolder2, IID_IPersistFolder3,
 	IID_IShellFolder2, IID_IFileSystemBindData): Add definitions.
 
 2004-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
@@ -3960,7 +3959,7 @@
 	(IColumnProvider): Add COM interface.
 	(IQueryInfo): Likewise.
 	(IShellIconOverlayIdentifier): Likewise.
-  	* include/shlguid.h (IID_IColumnProvider) Declare.
+	* include/shlguid.h (IID_IColumnProvider) Declare.
 	(IID_IQueryInfo): Likweise.
 	(IID_IShellIconOverlayIdentifier): Likwise.
 	* lib/shell32.c (IID_IColumnProvider) Define.
@@ -4952,7 +4951,7 @@
 
 2003-08-22   Danny Smith <dannysmith@users.sourceforge.net>
 
-        * include/winnt.h (IMAGE_SUBSYSTEM_XBOX): Add define.
+	* include/winnt.h (IMAGE_SUBSYSTEM_XBOX): Add define.
 
 2003-08-22  Mihai Preda <mihai_preda@users.sourceforge.net>
 
@@ -4962,11 +4961,11 @@
 
 2003-08-22   Danny Smith <dannysmith@users.sourceforge.net>
 
-        * include/winuser.h (DC_BUTTONS): Add define.
+	* include/winuser.h (DC_BUTTONS): Add define.
 
 2003-08-22  Andrew Greenwood  <lists@silverblade.co.uk>
 
-        * include/winuser.h (DC_GRADIENT): Add define.
+	* include/winuser.h (DC_GRADIENT): Add define.
 
 2003-08-22  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
@@ -4984,7 +4983,7 @@
 	Define.
 	* include/shlobj.h (SHDRAGIMAGE): Define structure.
 	(IDragSourceHelper) Define interface.
-  	(IDropTargetHelper): Likewise.
+	(IDropTargetHelper): Likewise.
 	(IExtractIcon): Unicode it.
 	(ICommDlgBrowser): Use IShellView type as param in OnDefaultCommand,
 	OnStateChange and IncludeObject methods.
@@ -5450,7 +5449,7 @@
 
 2003-05-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
- 	* include/commctrl.h (STATUSCLASSNAME, TOOLBARCLASSNAME,
+	* include/commctrl.h (STATUSCLASSNAME, TOOLBARCLASSNAME,
 	TOOLTIPS_CLASS, TRACKBAR_CLASS, UPDOWN_CLASS, PROGRESS_CLASS,
 	HOTKEY_CLASS): Remove dupicate defines for UNICODE case.
 
@@ -5595,7 +5594,7 @@
 	UPDOWN_CLASS,WC_COMBOBOXEX,WC_HEADER,WC_IPADDRESS,WC_LISTVIEW,
 	WC_TABCONTROL,WC_TREEVIEW): Move UNICODE mappings out of
 	RC_INVOKED guard.
- 	(WC_PAGESCROLLER,WC_NATIVEFONTCTL,WC_BUTTON,WC_STATIC,WC_EDIT,
+	(WC_PAGESCROLLER,WC_NATIVEFONTCTL,WC_BUTTON,WC_STATIC,WC_EDIT,
 	WC_LISTBOX,WC_COMBOBOX,WC_SCROLLBAR): Add defines.
 
 2003-03-28  Bang Jun-Young  <junyoung@netbsd.org>
@@ -5630,7 +5629,7 @@
 
 	* include/ddk/ntapi.h (JOBOBJECT_*):
 	Remove structures and enums definitions.
-  	(JOB_OBJECT*): Move defines from here...
+	(JOB_OBJECT*): Move defines from here...
 	* include/winnt.h (JOB_OBJECT* ): To here.
 
 	* include/ddk/ntpoapi.h (LATENCY_TIME, POWER_ACTION_POLICY,
@@ -5665,7 +5664,7 @@
 
 	* include/lmaccess.h (UF_LOCKOUT): Correct name from UF_LOCK.
 	Thanks to: Fabricio D. Rossi  <gurusoda@users.sourceforge.net>
- 	(UF_SETTABLE_BITS): Correct UF_LOCKOUT here too.
+	(UF_SETTABLE_BITS): Correct UF_LOCKOUT here too.
 
 2003-03-17  Bang Jun-Young  <junyoung@netbsd.org>
 
@@ -5708,8 +5707,8 @@
 
 2003-03-12  Ranjit Mathew  <rmathew@hotmail.com>
 
-        * include/winnt.h (_IMAGE_SEPARATE_DEBUG_HEADER): Expose
-        member SectionAlignment.
+	* include/winnt.h (_IMAGE_SEPARATE_DEBUG_HEADER): Expose
+	member SectionAlignment.
 
 2003-03-11  Earnie Boyd  <earnie@users.sf.net>
 
@@ -6126,7 +6125,7 @@
 
 2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
- 	* include/unknwn.h: Include windows.h and ole2.h before header
+	* include/unknwn.h: Include windows.h and ole2.h before header
 	guard to avoid circular inclusion of COM headers.
 
 2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
@@ -6205,7 +6204,7 @@
 
 	* include/windows.h: Guard inclusion of wingdi.h,
 	commdlg.h, winspool.h, ole2.h with NOGDI.
- 	* include/winuser.h (ICONMETRICS, NONCLIENTMETRICS,
+	* include/winuser.h (ICONMETRICS, NONCLIENTMETRICS,
 	ChangeDisplaySettings, CreateDesktop, EnumDisplaySettings):
 	Guard with NOGDI.
 
@@ -6569,7 +6568,7 @@
 	(NS_*): Add defines.
 	(SERVICE_*): Ditto.
 	(SERVICE_ADDRESS): Add structure and typedefs.
- 	(SERVICE_ADDRESSES): Ditto.
+	(SERVICE_ADDRESSES): Ditto.
 	(SERVICE_INFO[AW]): Ditto, and add UNICODE mappings.
 	(LPSERVICE_ASYNC_INFO): Add typedef.
 	(SetService[AW], GetAddressByName[AW]): Add prototypes and UNICODE
@@ -7818,7 +7817,7 @@
 	* include/oleauto.h: Define VARIANT* flags for VariantChangeType.
 	Thanks to: Pat Thoyts.
 	* include/winnt.h: Change C++ style comment to C style.
- 	* include/shlobj.h: Ditto.
+	* include/shlobj.h: Ditto.
 	* include/objbase.h (enum tagCOINIT): Remove comma at end of
 	list.
 	* include/oledlg.h (enum tagOLEUIPASTEFLAG): Ditto.
@@ -7896,7 +7895,7 @@
 
 2001-09-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
- 	* include/winnt.h (_[U]LARGE_INTEGER): Protect nameless struct with
+	* include/winnt.h (_[U]LARGE_INTEGER): Protect nameless struct with
 	!defined(NONAMELESSUNION), rather than defined(_ANONYMOUS_STRUCT).
 	(_REPARSE_DATA_BUFFER): Name union field DUMMYUNIONNAME.
 
@@ -8021,7 +8020,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/oaidl.h (tagVARIANT): Mark anonymous structs and unions
-	 as 	__extension__.
+	as __extension__.
 	(tagTYPEDESC): Ditto.
 	(_wireBRECORD): Add structure definition.
 	(_wireSAFEARR_BRECORD): Ditto.
@@ -8072,7 +8071,7 @@ Thu Aug 30 09:35:51 2001  Christopher Faylor <cgf@cygnus.com>
 2001-08-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	Apply Dmitry Bely  <dbely@mail.ru> patch 437834 (with additions).
- 	* include/oleidl.h (ISupportErrorInfo, ICreateInfo): Move from here
+	* include/oleidl.h (ISupportErrorInfo, ICreateInfo): Move from here
 	* include/oaidl.h: ... to here.
 	* include/oaidl.h ICreateErrorInfo): Add interface definition.
 	(IErrorInfo::GetGUID): Change arg to GUID.
