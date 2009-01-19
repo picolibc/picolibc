@@ -163,12 +163,12 @@
 
 
 /* 64-bit types */
-#if __have_longlong64
-#define __PRI64(x) __STRINGIFY(ll##x)
-#define __SCN64(x) __STRINGIFY(ll##x)
-#elif __have_long64
+#if __have_long64
 #define __PRI64(x) __STRINGIFY(l##x)
 #define __SCN64(x) __STRINGIFY(l##x)
+#elif __have_longlong64
+#define __PRI64(x) __STRINGIFY(ll##x)
+#define __SCN64(x) __STRINGIFY(ll##x)
 #else
 #define __PRI64(x) __STRINGIFY(x)
 #define __SCN64(x) __STRINGIFY(x)
@@ -217,12 +217,12 @@
 #endif
 
 /* max-bit types */
-#if __have_longlong64
-#define __PRIMAX(x) __STRINGIFY(ll##x)
-#define __SCNMAX(x) __STRINGIFY(ll##x)
-#elif __have_long64
+#if __have_long64
 #define __PRIMAX(x) __STRINGIFY(l##x)
 #define __SCNMAX(x) __STRINGIFY(l##x)
+#elif __have_longlong64
+#define __PRIMAX(x) __STRINGIFY(ll##x)
+#define __SCNMAX(x) __STRINGIFY(ll##x)
 #else
 #define __PRIMAX(x) __STRINGIFY(x)
 #define __SCNMAX(x) __STRINGIFY(x)
@@ -242,12 +242,12 @@
 #define SCNxMAX		__SCNMAX(x)
 
 /* ptr types */
-#if __have_longlong64
-#define __PRIPTR(x) __STRINGIFY(ll##x)
-#define __SCNPTR(x) __STRINGIFY(ll##x)
-#elif __have_long64
+#if __have_long64
 #define __PRIPTR(x) __STRINGIFY(l##x)
 #define __SCNPTR(x) __STRINGIFY(l##x)
+#elif __have_longlong64
+#define __PRIPTR(x) __STRINGIFY(ll##x)
+#define __SCNPTR(x) __STRINGIFY(ll##x)
 #else
 #define __PRIPTR(x) __STRINGIFY(x)
 #define __SCNPTR(x) __STRINGIFY(x)

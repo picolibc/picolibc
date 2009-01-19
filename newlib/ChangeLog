@@ -1,3 +1,11 @@
+2009-01-19  Neal H. Walfield  <neal@gnu.org>
+
+	* libc/include/stdint.h (INT64_C, UINT64_C, INTMAX_C, UINTMAX_C)
+	[__have_long64 && __have_longlong64]: Use L and UL, not LL and ULL.
+	* libc/include/inttypes.h (__PRI64, __SCN64, __PRIMAX, __SCNMAX,
+	__PRIPTR, __SCNPTR) [__have_long64 && __have_longlong64]: Use l,
+	not ll.
+
 2009-01-12  Nathan Froyd  <froydnj@codesourcery.com>
 
 	* libc/machine/powerpc/vfscanf.c (__sccl): Remove declaration.

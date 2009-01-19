@@ -457,22 +457,22 @@ typedef unsigned long uintptr_t;
 #endif
 
 #if __int64_t_defined
-#if __have_longlong64
-#define INT64_C(x)	x##LL
-#define UINT64_C(x)	x##ULL
-#else
+#if __have_long64
 #define INT64_C(x)	x##L
 #define UINT64_C(x)	x##UL
+#else
+#define INT64_C(x)	x##LL
+#define UINT64_C(x)	x##ULL
 #endif
 #endif
 
 /** Macros for greatest-width integer constant expression */
-#if __have_longlong64
-#define INTMAX_C(x)	x##LL
-#define UINTMAX_C(x)	x##ULL
-#else
+#if __have_long64
 #define INTMAX_C(x)	x##L
 #define UINTMAX_C(x)	x##UL
+#else
+#define INTMAX_C(x)	x##LL
+#define UINTMAX_C(x)	x##ULL
 #endif
 
 
