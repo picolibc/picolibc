@@ -1,3 +1,7 @@
+2009-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (enum _DEP_SYSTEM_POLICY_TYPE): Fix version guard.
+
 2009-01-11  Henry Nestler  <henry@bigfoot.de>
 
 	* lib/ddk/ntoskrnl.def: Enable ZwQueryEaFile, ZwSetEaFile, NtQueryEaFile,

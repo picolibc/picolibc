@@ -1063,7 +1063,7 @@ typedef enum _COMPUTER_NAME_FORMAT {
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 typedef DWORD EXECUTION_STATE;
 #endif
-#if (_WIN32_WINNT >= 0x0601)
+#if (_WIN32_WINNT >= 0x0600)
 typedef enum _DEP_SYSTEM_POLICY_TYPE {
 	AlwaysOn,
 	AlwaysOff,
