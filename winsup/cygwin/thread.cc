@@ -1227,9 +1227,13 @@ pthread_rwlock::rdlock ()
 
   mtx.lock ();
 
-  if (lookup_reader (self))
+  reader = lookup_reader (self);
+  if (reader)
     {
-      result = EDEADLK;
+      if (reader->n < ULONG_MAX)
+	++reader->n;
+      else
+      	errno = EAGAIN;
       goto DONE;
     }
 
@@ -1252,6 +1256,7 @@ pthread_rwlock::rdlock ()
     }
 
   reader->thread = self;
+  reader->n = 1;
   add_reader (reader);
 
  DONE:
@@ -1272,10 +1277,15 @@ pthread_rwlock::tryrdlock ()
     result = EBUSY;
   else
     {
-      struct RWLOCK_READER *reader = new struct RWLOCK_READER;
-      if (reader)
+      struct RWLOCK_READER *reader;
+
+      reader = lookup_reader (self);
+      if (reader && reader->n < ULONG_MAX)
+	++reader->n;
+      else if ((reader = new struct RWLOCK_READER))
 	{
 	  reader->thread = self;
+	  reader->n = 1;
 	  add_reader (reader);
 	}
       else
@@ -1365,6 +1375,8 @@ pthread_rwlock::unlock ()
 	  result = EPERM;
 	  goto DONE;
 	}
+      if (--reader->n > 0)
+      	goto DONE;
 
       remove_reader (reader);
       delete reader;

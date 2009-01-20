@@ -1,5 +1,14 @@
 2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.h (struct pthread_rwlock::RWLOCK_READER): Add counter n.
+	* thread.cc (pthread_rwlock::rdlock): If a thread already owns a
+	read lock, just count the number of locks for it, per SUSv4.
+	(pthread_rwlock::tryrdlock): Ditto.
+	(pthread_rwlock::unlock): If a thread has more than one concurrent
+	read locks, just count down.
+
+2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (WSAIoctl): Reintroduce.
 	(WSASendMsg): Define.
 	* fhandler.h (class fhandler_socket): Change definition of recv_internal

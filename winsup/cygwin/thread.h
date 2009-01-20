@@ -556,6 +556,7 @@ public:
   {
     struct RWLOCK_READER *next;
     pthread_t thread;
+    unsigned long n;
   } *readers;
   fast_mutex readers_mx;
 
