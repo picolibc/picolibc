@@ -43,6 +43,8 @@ struct wincaps
   unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
   unsigned ts_has_dep_problem				: 1;
+  unsigned has_recvmsg					: 1;
+  unsigned has_sendmsg					: 1;
 };
 
 class wincapc
@@ -92,6 +94,8 @@ public:
   bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)
   bool	IMPLEMENT (ts_has_dep_problem)
+  bool	IMPLEMENT (has_recvmsg)
+  bool	IMPLEMENT (has_sendmsg)
 
 #undef IMPLEMENT
 };

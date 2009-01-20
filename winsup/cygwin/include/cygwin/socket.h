@@ -80,7 +80,8 @@ struct cmsghdr
 };
 
 #define CMSG_ALIGN(len) \
-	(((len) + sizeof (size_t) - 1) & ~(sizeof (size_t) - 1))
+	(((len) + __alignof__ (struct cmsghdr) - 1) \
+	 & ~(__alignof__ (struct cmsghdr) - 1))
 #define CMSG_LEN(len) \
 	(CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
 #define CMSG_SPACE(len) \

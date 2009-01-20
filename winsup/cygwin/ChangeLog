@@ -1,3 +1,33 @@
+2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (WSAIoctl): Reintroduce.
+	(WSASendMsg): Define.
+	* fhandler.h (class fhandler_socket): Change definition of recv_internal
+	and send_internal to take WSAMSG pointer as parameter.
+	* fhandler_socket.cc (WSAID_WSARECVMSG): Define.
+	(LPFN_WSARECVMSG): Define.
+	(WSASendMsg): Declare.
+	(get_ext_funcptr): New function to fetch address of WSARecvMsg.
+	(fhandler_socket::recv_internal): Take just a LPWSAMSG parameter.
+	Change code accordingly.  If control information is requested,
+	fetch address of WSARecvMsg and use that instead of WSARecvFrom.
+	(fhandler_socket::recvfrom): Change return type to ssize_t as
+	declared in fhandler.h.  Accommodate changes to recv_internal.
+	(fhandler_socket::recvmsg): Ditto.  Make sure that control information
+	is only requested if system, address family, and socket type support it.
+	(fhandler_socket::send_internal): Take just a LPWSAMSG parameter
+	and the flags.  Change code accordingly.  If control information is
+	provided, use WSASendMsg instead of WSASendTo.
+	(fhandler_socket::sendto): Drop useless comment.  Accommodate changes
+	to send_internal.
+	(fhandler_socket::sendmsg): Ditto.  Make sure that control information
+	is only provided if system, address family, and socket type support it.
+	* wincap.h (wincaps::has_recvmsg): New element.
+	(wincaps::has_sendmsg): New element
+	* wincap.cc: Implement above elements throughout.
+	* include/cygwin/socket.h (CMSG_ALIGN): Phrase in terms of alignment
+	of type struct cmsghdr.
+
 2009-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Fix condition checking if anonymous mapping beyond

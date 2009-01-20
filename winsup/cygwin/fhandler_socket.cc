@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+#include <mswsock.h>
 #include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -1277,16 +1278,52 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
   return recvmsg (&msg, 0);
 }
 
+extern "C" {
+#define WSAID_WSARECVMSG \
+	  {0xf689d7c8,0x6f1f,0x436b,{0x8a,0x53,0xe5,0x4f,0xe3,0x51,0xc3,0x22}};
+typedef int (WSAAPI *LPFN_WSARECVMSG)(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,
+				      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
+int WSAAPI WSASendMsg(SOCKET,LPWSAMSG,DWORD,LPDWORD, LPWSAOVERLAPPED,
+		      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
+};
+
+/* There's no DLL which exports the symbol WSARecvMsg.  One has to call
+   WSAIoctl as below to fetch the function pointer.  Why on earth did the
+   MS developers decide not to export a normal symbol for these extension
+   functions? */
+inline int
+get_ext_funcptr (SOCKET sock, void *funcptr)
+{
+  DWORD bret;
+  const GUID guid = WSAID_WSARECVMSG;
+  return WSAIoctl (sock, SIO_GET_EXTENSION_FUNCTION_POINTER,
+		   (void *) &guid, sizeof (GUID), funcptr, sizeof (void *),
+		   &bret, NULL, NULL);
+}
+
 inline ssize_t
-fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
-				struct sockaddr *from, int *fromlen)
+fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 {
   ssize_t res = 0;
   DWORD ret = 0, wret;
-  int evt_mask = FD_READ | ((flags & MSG_OOB) ? FD_OOB : 0);
+  int evt_mask = FD_READ | ((wsamsg->dwFlags & MSG_OOB) ? FD_OOB : 0);
+  LPWSABUF wsabuf = wsamsg->lpBuffers;
+  ULONG wsacnt = wsamsg->dwBufferCount;
+  bool use_recvmsg = false;
+  static LPFN_WSARECVMSG WSARecvMsg;
 
-  bool waitall = (flags & MSG_WAITALL);
-  flags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
+  bool waitall = (wsamsg->dwFlags & MSG_WAITALL);
+  wsamsg->dwFlags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
+  if (wsamsg->Control.len > 0)
+    {
+      if (!WSARecvMsg
+	  && get_ext_funcptr (get_socket (), &WSARecvMsg) == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
+	}
+      use_recvmsg = true;
+    }
   if (waitall)
     {
       if (get_socket_type () != SOCK_STREAM)
@@ -1295,7 +1332,7 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
 	  set_winsock_errno ();
 	  return SOCKET_ERROR;
 	}
-      if (is_nonblocking () || (flags & (MSG_OOB | MSG_PEEK)))
+      if (is_nonblocking () || (wsamsg->dwFlags & (MSG_OOB | MSG_PEEK)))
 	waitall = false;
     }
 
@@ -1305,8 +1342,12 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   while (!(res = wait_for_events (evt_mask | FD_CLOSE))
 	 || saw_shutdown_read ())
     {
-      res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &wret,
-			 &flags, from, fromlen, NULL, NULL);
+      if (use_recvmsg)
+	res = WSARecvMsg (get_socket (), wsamsg, &wret, NULL, NULL);
+      else
+	res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &wret,
+			   &wsamsg->dwFlags, wsamsg->name, &wsamsg->namelen,
+			   NULL, NULL);
       if (!res)
 	{
 	  ret += wret;
@@ -1353,32 +1394,34 @@ fhandler_socket::recv_internal (WSABUF *wsabuf, DWORD wsacnt, DWORD flags,
   return ret;
 }
 
-int
+ssize_t
 fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
   WSABUF wsabuf = { len, (char *) ptr };
-  return recv_internal (&wsabuf, 1, flags, from, fromlen);
+  WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
+		    &wsabuf, 1,
+		    { 0, NULL},
+		    flags };
+  ssize_t ret = recv_internal (&wsamsg);
+  if (fromlen)
+    *fromlen = wsamsg.namelen;
+  return ret;
 }
 
-int
+ssize_t
 fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 {
-  if (CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
-    ((struct OLD_msghdr *) msg)->msg_accrightslen = 0;
-  else
+  /* TODO: Descriptor passing on AF_LOCAL sockets. */
+
+  /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
+     supported for datagram and raw sockets. */
+  if (!wincap.has_recvmsg () || get_socket_type () == SOCK_STREAM
+      || get_addr_family () == AF_LOCAL)
     {
       msg->msg_controllen = 0;
-      msg->msg_flags = 0;
-    }
-  if (get_addr_family () == AF_LOCAL)
-    {
-      /* On AF_LOCAL sockets the (fixed-size) name of the shared memory
-	 area used for descriptor passing is transmitted first.
-	 If this string is empty, no descriptors are passed and we can
-	 go ahead recv'ing the normal data blocks.  Otherwise start
-	 special handling for descriptor passing. */
-      /*TODO*/
+      if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+	msg->msg_flags = 0;
     }
 
   WSABUF wsabuf[msg->msg_iovlen];
@@ -1389,11 +1432,19 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
       wsaptr->len = (--iovptr)->iov_len;
       wsaptr->buf = (char *) iovptr->iov_base;
     }
-
-  struct sockaddr *from = (struct sockaddr *) msg->msg_name;
-  int *fromlen = from ? &msg->msg_namelen : NULL;
-
-  return recv_internal (wsabuf, msg->msg_iovlen, flags, from, fromlen);
+  WSAMSG wsamsg = { (struct sockaddr *) msg->msg_name, msg->msg_namelen,
+		    wsabuf, msg->msg_iovlen,
+		    { msg->msg_controllen, (char *) msg->msg_control },
+		    flags };
+  ssize_t ret = recv_internal (&wsamsg);
+  if (ret >= 0)
+    {
+      msg->msg_namelen = wsamsg.namelen;
+      msg->msg_controllen = wsamsg.Control.len;
+      if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+	msg->msg_flags = wsamsg.dwFlags;
+    }
+  return ret;
 }
 
 int
@@ -1415,26 +1466,35 @@ fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
 }
 
 inline ssize_t
-fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
-				const struct sockaddr *to, int tolen)
+fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 {
   int res = 0;
   DWORD ret = 0, err = 0, sum = 0, off = 0;
   WSABUF buf;
+  bool use_sendmsg = false;
 
-  for (DWORD i = 0; i < wsacnt; off >= wsabuf[i].len && (++i, off = 0))
+  if (wsamsg->Control.len > 0)
+    use_sendmsg = true;
+  for (DWORD i = 0; i < wsamsg->dwBufferCount;
+       off >= wsamsg->lpBuffers[i].len && (++i, off = 0))
     {
-      buf.buf = wsabuf[i].buf + off;
-      buf.len = wsabuf[i].len - off;
+      buf.buf = wsamsg->lpBuffers[i].buf + off;
+      buf.len = wsamsg->lpBuffers[i].len - off;
       if (buf.len > 65536)	/* See KB 823764 */
 	buf.len = 65536;
 
       do
 	{
-	  if ((res = WSASendTo (get_socket (), &buf, 1, &ret,
-				flags & (MSG_OOB | MSG_DONTROUTE), to, tolen,
-				NULL, NULL))
-	      && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
+	  if (use_sendmsg)
+	    res = WSASendMsg (get_socket (), wsamsg,
+			      flags & (MSG_OOB | MSG_DONTROUTE), &ret,
+			      NULL, NULL);
+	  else
+	    res = WSASendTo (get_socket (), &buf, 1, &ret,
+			     flags & (MSG_OOB | MSG_DONTROUTE),
+			     wsamsg->name, wsamsg->namelen,
+			     NULL, NULL);
+	  if (res && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
 	    {
 	      LOCK_EVENTS;
 	      wsock_events->events &= ~FD_WRITE;
@@ -1467,7 +1527,7 @@ fhandler_socket::send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
       if (get_errno () == ESHUTDOWN && get_socket_type () == SOCK_STREAM)
 	{
 	  set_errno (EPIPE);
-	  if (! (flags & MSG_NOSIGNAL))
+	  if (!(flags & MSG_NOSIGNAL))
 	    raise (SIGPIPE);
 	}
     }
@@ -1484,28 +1544,18 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   if (to && !get_inet_addr (to, tolen, &sst, &tolen))
     return SOCKET_ERROR;
 
-  /* Never write more than 64K at once to workaround a problem with
-     Winsock, which creates a temporary buffer with the total incoming
-     buffer size and copies the whole content over, regardless of
-     the size of the internal send buffer.  A buffer full condition
-     is only recognized in subsequent calls and, if len is big enough,
-     the call even might fail with an out-of-memory condition. */
   WSABUF wsabuf = { len, (char *) ptr };
-  return send_internal (&wsabuf, 1, flags,
-			(to ? (const struct sockaddr *) &sst : NULL), tolen);
+  WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
+		    &wsabuf, 1,
+		    { 0, NULL},
+		    0 };
+  return send_internal (&wsamsg, flags);
 }
 
 int
 fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 {
-  if (get_addr_family () == AF_LOCAL)
-    {
-      /* For AF_LOCAL/AF_UNIX sockets, if descriptors are given, start
-	 the special handling for descriptor passing.  Otherwise just
-	 transmit an empty string to tell the receiver that no
-	 descriptor passing is done. */
-      /*TODO*/
-    }
+  /* TODO: Descriptor passing on AF_LOCAL sockets. */
 
   WSABUF wsabuf[msg->msg_iovlen];
   WSABUF *wsaptr = wsabuf;
@@ -1515,9 +1565,17 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
       wsaptr->len = iovptr->iov_len;
       (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
-
-  return send_internal (wsabuf, msg->msg_iovlen, flags,
-			(struct sockaddr *) msg->msg_name, msg->msg_namelen);
+  WSAMSG wsamsg = { (struct sockaddr *) msg->msg_name, msg->msg_namelen,
+		    wsabuf, msg->msg_iovlen,
+		    /* Disappointing but true:  Even if WSASendMsg is
+		       supported, it's only supported for datagram and
+		       raw sockets. */
+		    { !wincap.has_sendmsg ()
+		      || get_socket_type () == SOCK_STREAM
+		      || get_addr_family () == AF_LOCAL
+		      ? 0 : msg->msg_controllen, (char *) msg->msg_control },
+		    0 };
+  return send_internal (&wsamsg, flags);
 }
 
 int

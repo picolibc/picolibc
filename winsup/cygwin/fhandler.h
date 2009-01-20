@@ -483,16 +483,13 @@ class fhandler_socket: public fhandler_base
 
   int open (int flags, mode_t mode = 0);
   ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  inline ssize_t recv_internal (struct _WSABUF *wsabuf, DWORD wsacnt,
-  				DWORD flags,
-				struct sockaddr *from, int *fromlen);
+  inline ssize_t recv_internal (struct _WSAMSG *wsamsg);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
 
   ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  inline ssize_t send_internal (struct _WSABUF *wsabuf, DWORD wsacnt, int flags,
-				const struct sockaddr *to, int tolen);
+  inline ssize_t send_internal (struct _WSAMSG *wsamsg, int flags);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
   ssize_t sendmsg (const struct msghdr *msg, int flags);

@@ -51,6 +51,8 @@ wincaps wincap_unknown __attribute__((section (".cygwin_dll_common"), shared)) =
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:false,
+  has_sendmsg:false,
 };
 
 wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -84,6 +86,8 @@ wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:false,
+  has_sendmsg:false,
 };
 
 wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -117,6 +121,8 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:false,
+  has_sendmsg:false,
 };
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -150,6 +156,8 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:false,
+  has_sendmsg:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -183,6 +191,8 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:false,
+  has_sendmsg:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -216,6 +226,8 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -249,6 +261,8 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -282,6 +296,8 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -315,6 +331,8 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:true,
   has_transactions:false,
   ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -348,6 +366,8 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_stack_args:false,
   has_transactions:true,
   ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
