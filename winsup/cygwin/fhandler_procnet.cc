@@ -1,6 +1,6 @@
 /* fhandler_procnet.cc: fhandler for /proc/net virtual filesystem
 
-   Copyright 2007 Red Hat, Inc.
+   Copyright 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,6 +15,7 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "fhandler_virtual.h"
 #include "dtable.h"
 #include "cygheap.h"
 
@@ -34,20 +35,18 @@ extern "C" int ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua,
 			       PIP_ADAPTER_PREFIX pap);
 bool get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa0, ULONG family);
 
-static const int PROCNET_IFINET6 = 2;
+static _off64_t format_procnet_ifinet6 (void *, char *&);
 
-static const char * const process_listing[] =
+static const virt_tab_t procnet_tab[] =
 {
-  ".",
-  "..",
-  "if_inet6",
-  NULL
+  { ".",        FH_PROCNET, virt_directory, NULL },
+  { "..",       FH_PROCNET, virt_directory, NULL },
+  { "if_inet6", FH_PROCNET, virt_file,      format_procnet_ifinet6 },
+  { NULL,       0,          virt_none,      NULL }
 };
 
-static const int PROCESS_LINK_COUNT =
-  (sizeof (process_listing) / sizeof (const char *)) - 1;
-
-static _off64_t format_procnet_ifinet6 (char *&filebuf);
+static const int PROCNET_LINK_COUNT =
+  (sizeof (procnet_tab) / sizeof (virt_tab_t)) - 1;
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
@@ -64,19 +63,19 @@ fhandler_procnet::exists ()
   if (*path == 0)
     return 1;
 
-  for (int i = 0; process_listing[i]; i++)
-    if (!strcmp (path + 1, process_listing[i]))
+  for (int i = 0; procnet_tab[i].name; i++)
+    if (!strcmp (path + 1, procnet_tab[i].name))
       {
-	if (i == PROCNET_IFINET6)
+	if (procnet_tab[i].type == virt_file)
 	  {
 	    if (!wincap.has_gaa_prefixes ()
 	    	|| !get_adapters_addresses (NULL, AF_INET6))
-	      return 0;
+	      return virt_none;
 	  }
 	fileid = i;
-	return -1;
+	return procnet_tab[i].type;
       }
-  return 0;
+  return virt_none;
 }
 
 fhandler_procnet::fhandler_procnet ():
@@ -92,15 +91,15 @@ fhandler_procnet::fstat (struct __stat64 *buf)
   int file_type = exists ();
   switch (file_type)
     {
-    case 0:
+    case virt_none:
       set_errno (ENOENT);
       return -1;
-    case 1:
-    case 2:
+    case virt_directory:
+    case virt_rootdir:
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       buf->st_nlink = 2;
       return 0;
-    case -1:
+    case virt_file:
     default:
       buf->st_mode |= S_IFREG | S_IRUSR | S_IRGRP | S_IROTH;
       return 0;
@@ -111,15 +110,15 @@ int
 fhandler_procnet::readdir (DIR *dir, dirent *de)
 {
   int res = ENMFILE;
-  if (dir->__d_position >= PROCESS_LINK_COUNT)
+  if (dir->__d_position >= PROCNET_LINK_COUNT)
     goto out;
-  if (dir->__d_position == PROCNET_IFINET6)
+  if (procnet_tab[dir->__d_position].type == virt_file)
     {
       if (!wincap.has_gaa_prefixes ()
 	  || !get_adapters_addresses (NULL, AF_INET6))
 	goto out;
     }
-  strcpy (de->d_name, process_listing[dir->__d_position++]);
+  strcpy (de->d_name, procnet_tab[dir->__d_position++].name);
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   res = 0;
 out:
@@ -165,10 +164,10 @@ fhandler_procnet::open (int flags, mode_t mode)
     }
 
   process_file_no = -1;
-  for (int i = 0; process_listing[i]; i++)
+  for (int i = 0; procnet_tab[i].name; i++)
     {
-      if (path_prefix_p (process_listing[i], path + 1,
-			 strlen (process_listing[i]), false))
+      if (path_prefix_p (procnet_tab[i].name, path + 1,
+			 strlen (procnet_tab[i].name), false))
 	process_file_no = i;
     }
   if (process_file_no == -1)
@@ -217,16 +216,12 @@ out:
 bool
 fhandler_procnet::fill_filebuf ()
 {
-  switch (fileid)
+  if (procnet_tab[fileid].format_func)
     {
-    case PROCNET_IFINET6:
-      {
-	filesize = format_procnet_ifinet6 (filebuf);
-	break;
-      }
+      filesize = procnet_tab[fileid].format_func (NULL, filebuf);
+      return true;
     }
-
-  return true;
+  return false;
 }
 
 /* Return the same scope values as Linux. */
@@ -255,7 +250,7 @@ static unsigned int dad_to_flags[] =
 };
 
 static _off64_t
-format_procnet_ifinet6 (char *&filebuf)
+format_procnet_ifinet6 (void *, char *&filebuf)
 {
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   PIP_ADAPTER_UNICAST_ADDRESS pua;

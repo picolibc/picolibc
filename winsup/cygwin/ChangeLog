@@ -1,5 +1,14 @@
 2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procnet.cc: Reorganize global procnet content data into a
+	new struct virt_tab_t.  Accommodate throughout.
+
+	* fhandler.h: Fix copyright dates.
+	* fhandler_process.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+
+2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.h (FH_PROCESSFD): New device type.
 	* dtable.cc (build_fh_pc): Add case for FH_PROCESSFD.
 	* fhandler.h (class fhandler_virtual): Drop bufalloc member.
