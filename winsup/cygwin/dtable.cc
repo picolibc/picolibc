@@ -507,6 +507,7 @@ build_fh_pc (path_conv& pc)
 	  fh = cnew (fhandler_registry) ();
 	  break;
 	case FH_PROCESS:
+	case FH_PROCESSFD:
 	  fh = cnew (fhandler_process) ();
 	  break;
 	case FH_PROCNET:

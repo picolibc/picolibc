@@ -20,8 +20,7 @@ details. */
 #include <dirent.h>
 
 fhandler_virtual::fhandler_virtual ():
-  fhandler_base (), filebuf (NULL), bufalloc ((size_t) -1),
-  fileid (-1)
+  fhandler_base (), filebuf (NULL), fileid (-1)
 {
 }
 
@@ -159,7 +158,7 @@ fhandler_virtual::dup (fhandler_base * child)
     {
       fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
       fhproc_child->filebuf = (char *) cmalloc_abort (HEAP_BUF, filesize);
-      fhproc_child->bufalloc = fhproc_child->filesize = filesize;
+      fhproc_child->filesize = filesize;
       fhproc_child->position = position;
       memcpy (fhproc_child->filebuf, filebuf, filesize);
       fhproc_child->set_flags (get_flags ());
@@ -177,7 +176,6 @@ fhandler_virtual::close ()
 	  cfree (filebuf);
 	  filebuf = NULL;
 	}
-      bufalloc = (size_t) -1;
     }
   return 0;
 }

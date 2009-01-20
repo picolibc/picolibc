@@ -1,5 +1,40 @@
 2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.h (FH_PROCESSFD): New device type.
+	* dtable.cc (build_fh_pc): Add case for FH_PROCESSFD.
+	* fhandler.h (class fhandler_virtual): Drop bufalloc member.
+	* fhandler_virtual.h: New header.
+	* fhandler_proc.cc: Remove types proc_type_t and proc_tab_t in favor
+	of types virt_type_t and virt_tab_t from fhandler_virtual.h.
+	Change prototypes of format_XXX functions accordingly.
+	(proc_tab): Drop size member info.
+	(fhandler_proc::fill_filebuf): Don't allocate filebuf here.  Allocate
+	it in the format_XXX functions.
+	* fhandler_process.cc: Reorganize global process content data into a
+	new struct virt_tab_t.  Accommodate throughout.
+	(format_process_winexename): New function.
+	(format_process_winpid): New function.
+	(format_process_exename): New function.
+	(format_process_root): New function.
+	(format_process_cwd): New function.
+	(format_process_cmdline): New function.
+	(format_process_ppid): New function.
+	(format_process_uid): New function.
+	(format_process_pgid): New function.
+	(format_process_sid): New function.
+	(format_process_gid): New function.
+	(format_process_ctty): New function.
+	(format_process_fd): New function.
+	* fhandler_procnet.cc (fhandler_procnet::fill_filebuf): Don't use
+	bufalloc.
+	* fhandler_registry.cc (fhandler_registry::fill_filebuf): Define
+	bufalloc locally.
+	* fhandler_virtual.cc (fhandler_virtual::fhandler_virtual): Drop
+	initialization of bufalloc.
+	(fhandler_virtual::dup): Drop copying bufalloc.
+
+2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.h (struct pthread_rwlock::RWLOCK_READER): Add counter n.
 	* thread.cc (pthread_rwlock::rdlock): If a thread already owns a
 	read lock, just count the number of locks for it, per SUSv4.

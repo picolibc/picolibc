@@ -1227,7 +1227,6 @@ class fhandler_virtual : public fhandler_base
 {
  protected:
   char *filebuf;
-  size_t bufalloc;
   _off64_t filesize;
   _off64_t position;
   int fileid; // unique within each class

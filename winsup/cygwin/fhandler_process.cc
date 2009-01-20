@@ -15,6 +15,7 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "fhandler_virtual.h"
 #include "pinfo.h"
 #include "shared_info.h"
 #include "dtable.h"
@@ -29,62 +30,52 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static const int PROCESS_PPID = 2;
-static const int PROCESS_WINPID = 3;
-static const int PROCESS_WINEXENAME = 4;
-static const int PROCESS_STATUS = 5;
-static const int PROCESS_UID = 6;
-static const int PROCESS_GID = 7;
-static const int PROCESS_PGID = 8;
-static const int PROCESS_SID = 9;
-static const int PROCESS_CTTY = 10;
-static const int PROCESS_STAT = 11;
-static const int PROCESS_STATM = 12;
-static const int PROCESS_CMDLINE = 13;
-static const int PROCESS_MAPS = 14;
-static const int PROCESS_FD = 15;
-static const int PROCESS_EXENAME = 16;
-/* Keep symlinks always the last entries. */
-static const int PROCESS_ROOT = 17;
-static const int PROCESS_EXE = 18;
-static const int PROCESS_CWD = 19;
+static _off64_t format_process_maps (void *, char *&);
+static _off64_t format_process_stat (void *, char *&);
+static _off64_t format_process_status (void *, char *&);
+static _off64_t format_process_statm (void *, char *&);
+static _off64_t format_process_winexename (void *, char *&);
+static _off64_t format_process_winpid (void *, char *&);
+static _off64_t format_process_exename (void *, char *&);
+static _off64_t format_process_root (void *, char *&);
+static _off64_t format_process_cwd (void *, char *&);
+static _off64_t format_process_cmdline (void *, char *&);
+static _off64_t format_process_ppid (void *, char *&);
+static _off64_t format_process_uid (void *, char *&);
+static _off64_t format_process_pgid (void *, char *&);
+static _off64_t format_process_sid (void *, char *&);
+static _off64_t format_process_gid (void *, char *&);
+static _off64_t format_process_ctty (void *, char *&);
+static _off64_t format_process_fd (void *, char *&);
 
-/* The position of "root" defines the beginning of symlik entries. */
-#define is_symlink(nr) ((nr) >= PROCESS_ROOT)
-
-static const char * const process_listing[] =
+static const virt_tab_t process_tab[] =
 {
-  ".",
-  "..",
-  "ppid",
-  "winpid",
-  "winexename",
-  "status",
-  "uid",
-  "gid",
-  "pgid",
-  "sid",
-  "ctty",
-  "stat",
-  "statm",
-  "cmdline",
-  "maps",
-  "fd",
-  "exename",
-  /* Keep symlinks always the last entries. */
-  "root",
-  "exe",
-  "cwd",
-  NULL
+  { ".",          FH_PROCESS,   virt_directory, NULL },
+  { "..",         FH_PROCESS,   virt_directory, NULL },
+  { "ppid",       FH_PROCESS,   virt_file,      format_process_ppid },
+  { "winpid",     FH_PROCESS,   virt_file,	format_process_winpid },
+  { "winexename", FH_PROCESS,   virt_file,      format_process_winexename },
+  { "status",     FH_PROCESS,   virt_file,      format_process_status },
+  { "uid",        FH_PROCESS,   virt_file,      format_process_uid },
+  { "gid",        FH_PROCESS,   virt_file,      format_process_gid },
+  { "pgid",       FH_PROCESS,   virt_file,      format_process_pgid },
+  { "sid",        FH_PROCESS,   virt_file,      format_process_sid },
+  { "ctty",       FH_PROCESS,   virt_file,      format_process_ctty },
+  { "stat",       FH_PROCESS,   virt_file,      format_process_stat },
+  { "statm",      FH_PROCESS,   virt_file,      format_process_statm },
+  { "cmdline",    FH_PROCESS,   virt_file,      format_process_cmdline },
+  { "maps",       FH_PROCESS,   virt_file,      format_process_maps },
+  { "fd",         FH_PROCESSFD, virt_directory, format_process_fd },
+  { "exename",    FH_PROCESS,   virt_file,      format_process_exename },
+  { "root",       FH_PROCESS,   virt_symlink,   format_process_root },
+  { "exe",        FH_PROCESS,   virt_symlink,   format_process_exename },
+  { "cwd",        FH_PROCESS,   virt_symlink,   format_process_cwd },
+  { NULL,         0,            virt_none,      NULL }
 };
 
 static const int PROCESS_LINK_COUNT =
-  (sizeof (process_listing) / sizeof (const char *)) - 1;
+  (sizeof (process_tab) / sizeof (virt_tab_t)) - 1;
 
-static _off64_t format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize);
-static _off64_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
-static _off64_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
-static _off64_t format_process_statm (_pinfo *p, char *destbuf, size_t maxsize);
 static int get_process_state (DWORD dwProcessId);
 static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
 			    unsigned long *vmrss, unsigned long *vmtext,
@@ -106,28 +97,33 @@ fhandler_process::exists ()
   if (*path == 0)
     return 2;
 
-  for (int i = 0; process_listing[i]; i++)
-    if (!strcmp (path + 1, process_listing[i]))
-      {
-	fileid = i;
-	return is_symlink (i) ? -2 : (i == PROCESS_FD) ? 1 : -1;
-      }
-  if (!strncmp (strchr (path, '/') + 1, "fd/", 3))
+  for (int i = 0; process_tab[i].name; i++)
     {
-      fileid = PROCESS_FD;
-      if (fill_filebuf ())
-	return -2;
-      /* Check for nameless device entries. */
-      path = strrchr (path, '/');
-      if (path && *++path)
+      if (!strcmp (path + 1, process_tab[i].name))
 	{
-	  if (!strncmp (path, "pipe:[", 6))
-	    return -3;
-	  else if (!strncmp (path, "socket:[", 8))
-	    return -4;
+	  fileid = i;
+	  return process_tab[i].type;
+	}
+      if (process_tab[i].type == virt_directory
+	  && !strncmp (path + 1, process_tab[i].name,
+		       strlen (process_tab[i].name))
+	  && path[1 + strlen (process_tab[i].name)] == '/')
+	{
+	  fileid = i;
+	  if (fill_filebuf ())
+	    return virt_symlink;
+	  /* Check for nameless device entries. */
+	  path = strrchr (path, '/');
+	  if (path && *++path)
+	    {
+	      if (!strncmp (path, "pipe:[", 6))
+		return virt_pipe;
+	      else if (!strncmp (path, "socket:[", 8))
+		return virt_socket;
+	    }
 	}
     }
-  return 0;
+  return virt_none;
 }
 
 fhandler_process::fhandler_process ():
@@ -154,11 +150,11 @@ fhandler_process::fstat (struct __stat64 *buf)
 
   switch (file_type)
     {
-    case 0:
+    case virt_none:
       set_errno (ENOENT);
       return -1;
-    case 1:
-    case 2:
+    case virt_directory:
+    case virt_rootdir:
       buf->st_ctime = buf->st_mtime = buf->st_birthtime = p->start_time;
       buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec
 	= buf->st_birthtim.tv_nsec = 0;
@@ -171,22 +167,22 @@ fhandler_process::fstat (struct __stat64 *buf)
       else
 	buf->st_nlink = 3;
       return 0;
-    case -2:
+    case virt_symlink:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
       return 0;
-    case -3:
+    case virt_pipe:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFIFO | S_IRUSR | S_IWUSR;
       return 0;
-    case -4:
+    case virt_socket:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFSOCK | S_IRUSR | S_IWUSR;
       return 0;
-    case -1:
+    case virt_file:
     default:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
@@ -199,7 +195,7 @@ DIR *
 fhandler_process::opendir (int fd)
 {
   DIR *dir = fhandler_virtual::opendir (fd);
-  if (dir && fileid == PROCESS_FD)
+  if (dir && process_tab[fileid].fhandler == FH_PROCESSFD)
     fill_filebuf ();
   return dir;
 }
@@ -208,20 +204,20 @@ int
 fhandler_process::readdir (DIR *dir, dirent *de)
 {
   int res = ENMFILE;
-  if (fileid == PROCESS_FD)
+  if (process_tab[fileid].fhandler == FH_PROCESSFD)
     {
       if (dir->__d_position >= 2 + filesize / sizeof (int))
 	goto out;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
     goto out;
-  if (fileid == PROCESS_FD && dir->__d_position > 1)
+  if (process_tab[fileid].fhandler == FH_PROCESSFD && dir->__d_position > 1)
     {
       int *p = (int *) filebuf;
       __small_sprintf (de->d_name, "%d", p[dir->__d_position++ - 2]);
     }
   else
-    strcpy (de->d_name, process_listing[dir->__d_position++]);
+    strcpy (de->d_name, process_tab[dir->__d_position++].name);
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   res = 0;
 out:
@@ -268,10 +264,10 @@ fhandler_process::open (int flags, mode_t mode)
     }
 
   process_file_no = -1;
-  for (int i = 0; process_listing[i]; i++)
+  for (int i = 0; process_tab[i].name; i++)
     {
-      if (path_prefix_p (process_listing[i], path + 1,
-			 strlen (process_listing[i]), false))
+      if (path_prefix_p (process_tab[i].name, path + 1,
+			 strlen (process_tab[i].name), false))
 	process_file_no = i;
     }
   if (process_file_no == -1)
@@ -289,7 +285,7 @@ fhandler_process::open (int flags, mode_t mode)
 	  goto out;
 	}
     }
-  if (process_file_no == PROCESS_FD)
+  if (process_tab[process_file_no].fhandler == FH_PROCESSFD)
     {
       flags |= O_DIROPEN;
       goto success;
@@ -322,6 +318,11 @@ out:
   return res;
 }
 
+struct process_fd_t {
+  const char *path;
+  _pinfo *p;
+};
+
 bool
 fhandler_process::fill_filebuf ()
 {
@@ -338,173 +339,211 @@ fhandler_process::fill_filebuf ()
       return false;
     }
 
-  switch (fileid)
+  if (process_tab[fileid].format_func)
     {
-    case PROCESS_FD:
-      {
-	size_t fs;
-	char *fdp = strrchr (path, '/');
-	if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
-	  {
-	    if (filebuf)
-	      cfree (filebuf);
-	    filebuf = p->fds (fs);
-	  }
-	else
-	  {
-	    if (filebuf)
-	      cfree (filebuf);
-	    int fd = atoi (fdp);
-	    if (fd < 0 || (fd == 0 && !isdigit (*fdp)))
-	      {
-		set_errno (ENOENT);
-		return false;
-	      }
-	    filebuf = p->fd (fd, fs);
-	    if (!filebuf || !*filebuf)
-	      {
-		set_errno (ENOENT);
-		return false;
-	      }
-	  }
-	filesize = fs;
-	break;
-      }
-    case PROCESS_UID:
-    case PROCESS_GID:
-    case PROCESS_PGID:
-    case PROCESS_SID:
-    case PROCESS_CTTY:
-    case PROCESS_PPID:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 40);
-	int num;
-	switch (fileid)
-	  {
-	  case PROCESS_PPID:
-	    num = p->ppid;
-	    break;
-	  case PROCESS_UID:
-	    num = p->uid;
-	    break;
-	  case PROCESS_PGID:
-	    num = p->pgid;
-	    break;
-	  case PROCESS_SID:
-	    num = p->sid;
-	    break;
-	  case PROCESS_GID:
-	    num = p->gid;
-	    break;
-	  case PROCESS_CTTY:
-	    num = p->ctty;
-	    break;
-	  default: // what's this here for?
-	    num = 0;
-	    break;
-	  }
-	__small_sprintf (filebuf, "%d\n", num);
-	filesize = strlen (filebuf);
-	break;
-      }
-    case PROCESS_ROOT:
-    case PROCESS_CWD:
-    case PROCESS_CMDLINE:
-      {
-	if (filebuf)
-	  {
-	    cfree (filebuf);
-	    filebuf = NULL;
-	  }
-	size_t fs;
-	switch (fileid)
-	  {
-	  case PROCESS_ROOT:
-	    filebuf = p->root (fs);
-	    break;
-	  case PROCESS_CWD:
-	    filebuf = p->cwd (fs);
-	    break;
-	  case PROCESS_CMDLINE:
-	    filebuf = p->cmdline (fs);
-	    break;
-	  }
-	filesize = fs;
-	if (!filebuf || !*filebuf)
-	  {
-	    filebuf = cstrdup ("<defunct>");
-	    filesize = strlen (filebuf) + 1;
-	  }
-	break;
-      }
-    case PROCESS_EXENAME:
-    case PROCESS_EXE:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = NT_MAX_PATH);
-	if (p->process_state & PID_EXITED)
-	  strcpy (filebuf, "<defunct>");
-	else
-	  {
-	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
-	    int len = strlen (filebuf);
-	    if (len > 4)
-	      {
-		char *s = filebuf + len - 4;
-		if (ascii_strcasematch (s, ".exe"))
-		  *s = 0;
-	      }
-	  }
-	filesize = strlen (filebuf);
-	break;
-      }
-    case PROCESS_WINPID:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 40);
-	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
-	filesize = strlen (filebuf);
-	break;
-      }
-    case PROCESS_WINEXENAME:
-      {
-	int len = strlen (p->progname);
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = (len + 2));
-	strcpy (filebuf, p->progname);
-	filebuf[len] = '\n';
-	filesize = len + 1;
-	break;
-      }
-    case PROCESS_STATUS:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
-	filesize = format_process_status (*p, filebuf, bufalloc);
-	break;
-      }
-    case PROCESS_STAT:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
-	filesize = format_process_stat (*p, filebuf, bufalloc);
-	break;
-      }
-    case PROCESS_STATM:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
-	filesize = format_process_statm (*p, filebuf, bufalloc);
-	break;
-      }
-    case PROCESS_MAPS:
-      {
-	filebuf = (char *) crealloc_abort (filebuf, bufalloc = 2048);
-	filesize = format_process_maps (*p, filebuf, bufalloc);
-	break;
-      }
+      if (process_tab[fileid].fhandler == FH_PROCESSFD)
+        {
+	  process_fd_t fd = { path, p };
+	  filesize = process_tab[fileid].format_func (&fd, filebuf);
+	}
+      else
+	filesize = process_tab[fileid].format_func (p, filebuf);
+      return !filesize ? false : true;
     }
-
-  return true;
+  return false;
 }
 
 static _off64_t
-format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
+format_process_fd (void *data, char *&destbuf)
 {
+  _pinfo *p = ((process_fd_t *) data)->p;
+  const char *path = ((process_fd_t *) data)->path;
+  size_t fs = 0;
+  char *fdp = strrchr (path, '/');
+
+  if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
+    {
+      if (destbuf)
+	cfree (destbuf);
+      destbuf = p->fds (fs);
+    }
+  else
+    {
+      if (destbuf)
+	cfree (destbuf);
+      int fd = atoi (fdp);
+      if (fd < 0 || (fd == 0 && !isdigit (*fdp)))
+	{
+	  set_errno (ENOENT);
+	  return 0;
+	}
+      destbuf = p->fd (fd, fs);
+      if (!destbuf || !*destbuf)
+	{
+	  set_errno (ENOENT);
+	  return 0;
+	}
+    }
+  return fs;
+}
+
+static _off64_t
+format_process_ppid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->ppid);
+}
+
+static _off64_t
+format_process_uid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->uid);
+}
+
+static _off64_t
+format_process_pgid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->pgid);
+}
+
+static _off64_t
+format_process_sid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->sid);
+}
+
+static _off64_t
+format_process_gid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->gid);
+}
+
+static _off64_t
+format_process_ctty (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 40);
+  return __small_sprintf (destbuf, "%d\n", p->ctty);
+}
+
+static _off64_t
+format_process_root (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  size_t fs;
+
+  if (destbuf)
+    {
+      cfree (destbuf);
+      destbuf = NULL;
+    }
+  destbuf = p->root (fs);
+  if (!destbuf || !*destbuf)
+    {
+      destbuf = cstrdup ("<defunct>");
+      fs = strlen (destbuf) + 1;
+    }
+  return fs;
+}
+
+static _off64_t
+format_process_cwd (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  size_t fs;
+
+  if (destbuf)
+    {
+      cfree (destbuf);
+      destbuf = NULL;
+    }
+  destbuf = p->cwd (fs);
+  if (!destbuf || !*destbuf)
+    {
+      destbuf = cstrdup ("<defunct>");
+      fs = strlen (destbuf) + 1;
+    }
+  return fs;
+}
+
+static _off64_t
+format_process_cmdline (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  size_t fs;
+
+  if (destbuf)
+    {
+      cfree (destbuf);
+      destbuf = NULL;
+    }
+  destbuf = p->cmdline (fs);
+  if (!destbuf || !*destbuf)
+    {
+      destbuf = cstrdup ("<defunct>");
+      fs = strlen (destbuf) + 1;
+    }
+  return fs;
+}
+
+static _off64_t
+format_process_exename (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  int len;
+  tmp_pathbuf tp;
+
+  char *buf = tp.c_get ();
+  if (p->process_state & PID_EXITED)
+    stpcpy (buf, "<defunct>");
+  else
+    {
+      mount_table->conv_to_posix_path (p->progname, buf, 1);
+      len = strlen (buf);
+      if (len > 4)
+	{
+	  char *s = buf + len - 4;
+	  if (ascii_strcasematch (s, ".exe"))
+	    *s = 0;
+	}
+    }
+  destbuf = (char *) crealloc_abort (destbuf, (len = strlen (buf)) + 1);
+  stpcpy (destbuf, buf);
+  return len;
+}
+
+static _off64_t
+format_process_winpid (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  destbuf = (char *) crealloc_abort (destbuf, 20);
+  return __small_sprintf (destbuf, "%d\n", p->dwProcessId);
+}
+
+static _off64_t
+format_process_winexename (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  int len = strlen (p->progname);
+  destbuf = (char *) crealloc_abort (destbuf, len + 2);
+  strcpy (destbuf, p->progname);
+  destbuf[len] = '\n';
+  return len + 1;
+}
+
+static _off64_t
+format_process_maps (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
   HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
 			     FALSE,
 			     p->dwProcessId);
@@ -521,7 +560,13 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
   tmp_pathbuf tp;
   PWCHAR modname = tp.w_get ();
   char *posix_modname = tp.c_get ();
+  size_t maxsize = 0;
 
+  if (destbuf)
+    {
+      cfree (destbuf);
+      destbuf = NULL;
+    }
   if (!EnumProcessModules (proc, NULL, 0, &needed))
     {
       __seterrno ();
@@ -558,8 +603,10 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
 	    st.st_dev = 0;
 	    st.st_ino = 0;
 	  }
-	if (len + strlen (posix_modname) + 62 > maxsize - 1)
-	  destbuf = (char *) crealloc_abort (destbuf, maxsize += 2048);
+	size_t newlen = strlen (posix_modname) + 62;
+	if (len + newlen >= maxsize)
+	  destbuf = (char *) crealloc_abort (destbuf,
+					   maxsize += roundup2 (newlen, 2048));
 	if (workingset)
 	  for (unsigned i = 1; i <= wset_size; ++i)
 	    {
@@ -594,8 +641,9 @@ out:
 }
 
 static _off64_t
-format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
+format_process_stat (void *data, char *&destbuf)
 {
+  _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
   int state = 'R';
   unsigned long fault_count = 0UL,
@@ -704,6 +752,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
   vmrss = vmc.WorkingSetSize / page_size;
   vmmaxrss = ql.MaximumWorkingSetSize / page_size;
 
+  destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "
 				   "%lu %lu %lu %lu %lu %lu %lu "
@@ -722,8 +771,9 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 }
 
 static _off64_t
-format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
+format_process_status (void *data, char *&destbuf)
 {
+  _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
   int state = 'R';
   const char *state_str = "unknown";
@@ -781,6 +831,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
   // The real uid value for *this* process is stored at cygheap->user.real_uid
   // but we can't get at the real uid value for any other process, so
   // just fake it as p->uid. Similar for p->gid.
+  destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "Name:\t%s\n"
 				   "State:\t%c (%s)\n"
 				   "Tgid:\t%d\n"
@@ -812,13 +863,15 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
 }
 
 static _off64_t
-format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
+format_process_statm (void *data, char *&destbuf)
 {
+  _pinfo *p = (_pinfo *) data;
   unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
 		vmlib = 0UL, vmshare = 0UL;
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
     return 0;
+  destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld %ld",
 			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata, 0);
 }

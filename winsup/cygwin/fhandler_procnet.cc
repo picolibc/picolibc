@@ -221,7 +221,7 @@ fhandler_procnet::fill_filebuf ()
     {
     case PROCNET_IFINET6:
       {
-	bufalloc = filesize = format_procnet_ifinet6 (filebuf);
+	filesize = format_procnet_ifinet6 (filebuf);
 	break;
       }
     }

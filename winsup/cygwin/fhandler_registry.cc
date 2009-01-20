@@ -803,6 +803,8 @@ fhandler_registry::fill_filebuf ()
   DWORD type, size;
   LONG error;
   HKEY handle = (HKEY) get_handle ();
+  size_t bufalloc;
+
   if (handle != HKEY_PERFORMANCE_DATA)
     {
       error = RegQueryValueEx (handle, value_name, NULL, &type, NULL, &size);

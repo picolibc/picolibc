@@ -16,9 +16,11 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "fhandler_virtual.h"
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "tls_pbuf.h"
 #include <sys/utsname.h>
 #include <sys/param.h>
 #include "ntdll.h"
@@ -30,53 +32,37 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-enum proc_type_t {
-  proc_symlink = -2,
-  proc_file = -1,
-  proc_none = 0,
-  proc_directory = 1,
-  proc_rootdir = 2
-};
-
-struct proc_tab_t {
-  const char *name;
-  __dev32_t fhandler;
-  proc_type_t type;
-  size_t bufsize;
-  _off64_t (*format_func)(char *, size_t);
-};
-
-static _off64_t format_proc_loadavg (char *, size_t);
-static _off64_t format_proc_meminfo (char *, size_t);
-static _off64_t format_proc_stat (char *, size_t);
-static _off64_t format_proc_version (char *, size_t);
-static _off64_t format_proc_uptime (char *, size_t);
-static _off64_t format_proc_cpuinfo (char *, size_t);
-static _off64_t format_proc_partitions (char *, size_t);
-static _off64_t format_proc_self (char *, size_t);
+static _off64_t format_proc_loadavg (void *, char *&);
+static _off64_t format_proc_meminfo (void *, char *&);
+static _off64_t format_proc_stat (void *, char *&);
+static _off64_t format_proc_version (void *, char *&);
+static _off64_t format_proc_uptime (void *, char *&);
+static _off64_t format_proc_cpuinfo (void *, char *&);
+static _off64_t format_proc_partitions (void *, char *&);
+static _off64_t format_proc_self (void *, char *&);
 
 /* names of objects in /proc */
-static const proc_tab_t proc_tab[] = {
-  { ".",	  FH_PROC,	proc_directory,	    0, NULL },
-  { "..",	  FH_PROC,	proc_directory,	    0, NULL },
-  { "loadavg",	  FH_PROC,	proc_file,	   16, format_proc_loadavg },
-  { "meminfo",	  FH_PROC,	proc_file,	 2048, format_proc_meminfo },
-  { "registry",	  FH_REGISTRY,	proc_directory,	    0, NULL  },
-  { "stat",	  FH_PROC,	proc_file,	16384, format_proc_stat },
-  { "version",	  FH_PROC,	proc_file,	  100, format_proc_version },
-  { "uptime",	  FH_PROC,	proc_file,	   80, format_proc_uptime },
-  { "cpuinfo",	  FH_PROC,	proc_file,	16384, format_proc_cpuinfo },
-  { "partitions", FH_PROC,	proc_file,	 4096, format_proc_partitions },
-  { "self",	  FH_PROC,	proc_symlink,	   16, format_proc_self },
-  { "registry32", FH_REGISTRY,	proc_directory,	    0, NULL },
-  { "registry64", FH_REGISTRY,	proc_directory,	    0, NULL },
-  { "net",	  FH_PROCNET,	proc_directory,	    0, NULL },
-  { NULL,	  0,		proc_none,	    0, NULL },
+static const virt_tab_t proc_tab[] = {
+  { ".",	  FH_PROC,	virt_directory,	NULL },
+  { "..",	  FH_PROC,	virt_directory,	NULL },
+  { "loadavg",	  FH_PROC,	virt_file,	format_proc_loadavg },
+  { "meminfo",	  FH_PROC,	virt_file,	format_proc_meminfo },
+  { "registry",	  FH_REGISTRY,	virt_directory,	NULL  },
+  { "stat",	  FH_PROC,	virt_file,	format_proc_stat },
+  { "version",	  FH_PROC,	virt_file,	format_proc_version },
+  { "uptime",	  FH_PROC,	virt_file,	format_proc_uptime },
+  { "cpuinfo",	  FH_PROC,	virt_file,	format_proc_cpuinfo },
+  { "partitions", FH_PROC,	virt_file,	format_proc_partitions },
+  { "self",	  FH_PROC,	virt_symlink,	format_proc_self },
+  { "registry32", FH_REGISTRY,	virt_directory,	NULL },
+  { "registry64", FH_REGISTRY,	virt_directory,	NULL },
+  { "net",	  FH_PROCNET,	virt_directory,	NULL },
+  { NULL,	  0,		virt_none,	NULL }
 };
 
 #define PROC_DIR_COUNT 4
 
-static const int PROC_LINK_COUNT = (sizeof (proc_tab) / sizeof (proc_tab_t)) - 1;
+static const int PROC_LINK_COUNT = (sizeof (proc_tab) / sizeof (virt_tab_t)) - 1;
 
 /* name of the /proc filesystem */
 const char proc[] = "/proc";
@@ -136,14 +122,14 @@ fhandler_proc::exists ()
   debug_printf ("exists (%s)", path);
   path += proc_len;
   if (*path == 0)
-    return proc_rootdir;
+    return virt_rootdir;
   for (int i = 0; proc_tab[i].name; i++)
     if (!strcmp (path + 1, proc_tab[i].name))
       {
 	fileid = i;
 	return proc_tab[i].type;
       }
-  return 0;
+  return virt_none;
 }
 
 fhandler_proc::fhandler_proc ():
@@ -176,9 +162,9 @@ fhandler_proc::fstat (struct __stat64 *buf)
       for (int i = 0; proc_tab[i].name; i++)
 	if (!strcmp (path, proc_tab[i].name))
 	  {
-	    if (proc_tab[i].type == proc_directory)
+	    if (proc_tab[i].type == virt_directory)
 	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-	    else if (proc_tab[i].type == proc_symlink)
+	    else if (proc_tab[i].type == virt_symlink)
 	      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
 	    else
 	      {
@@ -333,33 +319,36 @@ fhandler_proc::fill_filebuf ()
 {
   if (fileid < PROC_LINK_COUNT && proc_tab[fileid].format_func)
     {
-      filebuf = (char *) crealloc_abort (filebuf,
-					 bufalloc = proc_tab[fileid].bufsize);
-      filesize = proc_tab[fileid].format_func (filebuf, bufalloc);
+      filesize = proc_tab[fileid].format_func (NULL, filebuf);
       return true;
     }
   return false;
 }
 
 static _off64_t
-format_proc_version (char *destbuf, size_t maxsize)
+format_proc_version (void *, char *&destbuf)
 {
   struct utsname uts_name;
 
   uname (&uts_name);
+  destbuf = (char *) crealloc_abort (destbuf, strlen (uts_name.sysname)
+					      + strlen (uts_name.release)
+					      + strlen (uts_name.version)
+					      + 4);
   return __small_sprintf (destbuf, "%s %s %s\n",
 			  uts_name.sysname, uts_name.release, uts_name.version);
 }
 
 static _off64_t
-format_proc_loadavg (char *destbuf, size_t maxsize)
+format_proc_loadavg (void *, char *&destbuf)
 {
+  destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u\n",
 				    0, 0, 0, 0, 0, 0);
 }
 
 static _off64_t
-format_proc_meminfo (char *destbuf, size_t maxsize)
+format_proc_meminfo (void *, char *&destbuf)
 {
   unsigned long mem_total = 0UL, mem_free = 0UL, swap_total = 0UL,
 		swap_free = 0UL;
@@ -370,6 +359,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG size = 512;
   NTSTATUS ret = STATUS_SUCCESS;
+
   spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
   if (spi)
     {
@@ -404,6 +394,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
     }
   if (spi)
     free (spi);
+  destbuf = (char *) crealloc_abort (destbuf, 512);
   return __small_sprintf (destbuf, "         total:      used:      free:\n"
 				   "Mem:  %10lu %10lu %10lu\n"
 				   "Swap: %10lu %10lu %10lu\n"
@@ -424,7 +415,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
 }
 
 static _off64_t
-format_proc_uptime (char *destbuf, size_t maxsize)
+format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
 
@@ -451,24 +442,27 @@ format_proc_uptime (char *destbuf, size_t maxsize)
   if (NT_SUCCESS (ret))
     idle_time = (spi.IdleTime.QuadPart / sbi.NumberProcessors) / 100000ULL;
 
+  destbuf = (char *) crealloc_abort (destbuf, 80);
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
 			  uptime / 100, long (uptime % 100),
 			  idle_time / 100, long (idle_time % 100));
 }
 
 static _off64_t
-format_proc_stat (char *destbuf, size_t maxsize)
+format_proc_stat (void *, char *&destbuf)
 {
   unsigned long pages_in = 0UL, pages_out = 0UL, interrupt_count = 0UL,
 		context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
   time_t boot_time = 0;
-
-  char *eobuf = destbuf;
   NTSTATUS ret;
   SYSTEM_PERFORMANCE_INFORMATION spi;
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-
   SYSTEM_BASIC_INFORMATION sbi;
+  tmp_pathbuf tp;
+
+  char *buf = tp.c_get ();
+  char *eobuf = buf;
+
   if ((ret = NtQuerySystemInformation (SystemBasicInformation,
 				       (PVOID) &sbi, sizeof sbi, NULL))
       != STATUS_SUCCESS)
@@ -541,7 +535,9 @@ format_proc_stat (char *destbuf, size_t maxsize)
 				   interrupt_count,
 				   context_switches,
 				   boot_time);
-  return eobuf - destbuf;
+  destbuf = (char *) crealloc_abort (destbuf, eobuf - buf);
+  memcpy (destbuf, buf, eobuf - buf);
+  return eobuf - buf;
 }
 
 #define read_value(x,y) \
@@ -567,7 +563,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 	} while (0)
 
 static _off64_t
-format_proc_cpuinfo (char *destbuf, size_t maxsize)
+format_proc_cpuinfo (void *, char *&destbuf)
 {
   SYSTEM_INFO siSystemInfo;
   HKEY hKey;
@@ -576,10 +572,12 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
   int cpu_number;
   const int BUFSIZE = 256;
   CHAR szBuffer[BUFSIZE];
-  char *bufptr = destbuf;
+  tmp_pathbuf tp;
+
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
 
   GetSystemInfo (&siSystemInfo);
-
   for (cpu_number = 0; ; cpu_number++)
     {
       if (cpu_number)
@@ -962,22 +960,25 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
       bufptr += __small_sprintf (bufptr, "\n");
   }
 
-  return bufptr - destbuf;
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
 }
 
 #undef read_value
 
 static _off64_t
-format_proc_partitions (char *destbuf, size_t maxsize)
+format_proc_partitions (void *, char *&destbuf)
 {
-  char *bufptr = destbuf;
-  print ("major minor  #blocks  name\n\n");
-
   char devname[NAME_MAX + 1];
   OBJECT_ATTRIBUTES attr;
   HANDLE dirhdl, devhdl;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
+  tmp_pathbuf tp;
+
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
 
   /* Open \Device object directory. */
   wchar_t wpath[MAX_PATH] = L"\\Device";
@@ -987,9 +988,10 @@ format_proc_partitions (char *destbuf, size_t maxsize)
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtOpenDirectoryObject %x", status);
-      return bufptr - destbuf;
+      return 0;
     }
 
+  print ("major minor  #blocks  name\n\n");
   /* Traverse \Device directory ... */
   PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
 				     alloca (640);
@@ -1113,12 +1115,15 @@ format_proc_partitions (char *destbuf, size_t maxsize)
     }
   NtClose (dirhdl);
 
-  return bufptr - destbuf;
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
 }
 
 static _off64_t
-format_proc_self (char *destbuf, size_t maxsize)
+format_proc_self (void *, char *&destbuf)
 {
+  destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%d", getpid ());
 }
 
