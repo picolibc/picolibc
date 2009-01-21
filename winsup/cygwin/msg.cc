@@ -1,6 +1,6 @@
 /* msg.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#ifdef USE_SERVER
 #include <unistd.h>
 
 #include "sigproc.h"
@@ -84,7 +83,6 @@ client_request_msg::client_request_msg (int msqid,
 
   msglen (sizeof (_parameters.in));
 }
-#endif /* USE_SERVER */
 
 /*
  * XSI message queue API.  These are exported by the DLL.
@@ -93,7 +91,6 @@ client_request_msg::client_request_msg (int msqid,
 extern "C" int
 msgctl (int msqid, int cmd, struct msqid_ds *buf)
 {
-#ifdef USE_SERVER
   syscall_printf ("msgctl (msqid = %d, cmd = 0x%x, buf = %p)",
 		  msqid, cmd, buf);
   myfault efault;
@@ -126,17 +123,11 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 msgget (key_t key, int msgflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("msgget (key = %U, msgflg = 0x%x)", key, msgflg);
   client_request_msg request (key, msgflg);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -148,17 +139,11 @@ msgget (key_t key, int msgflg)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" ssize_t
 msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %d, "
 		  "msgtyp = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
@@ -175,17 +160,11 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
       return -1;
     }
   return request.rcvval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgflg);
   myfault efault;
@@ -201,9 +180,4 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }

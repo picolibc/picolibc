@@ -1,6 +1,6 @@
 /* sem.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2004, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#ifdef USE_SERVER
 #include <unistd.h>
 
 #include "sigproc.h"
@@ -67,7 +66,6 @@ client_request_sem::client_request_sem (int semid,
 
   msglen (sizeof (_parameters.in));
 }
-#endif /* USE_SERVER */
 
 /*
  * XSI semaphore API.  These are exported by the DLL.
@@ -76,7 +74,6 @@ client_request_sem::client_request_sem (int semid,
 extern "C" int
 semctl (int semid, int semnum, int cmd, ...)
 {
-#ifdef USE_SERVER
   union semun arg = {0};
   if (cmd == IPC_STAT || cmd == IPC_SET || cmd == IPC_INFO || cmd == SEM_INFO
       || cmd == GETALL || cmd == SETALL || cmd == SETVAL)
@@ -101,17 +98,11 @@ semctl (int semid, int semnum, int cmd, ...)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 semget (key_t key, int nsems, int semflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("semget (key = %U, nsems = %d, semflg = 0x%x)",
 		  key, nsems, semflg);
   client_request_sem request (key, nsems, semflg);
@@ -124,17 +115,11 @@ semget (key_t key, int nsems, int semflg)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 semop (int semid, struct sembuf *sops, size_t nsops)
 {
-#ifdef USE_SERVER
   syscall_printf ("semop (semid = %d, sops = %p, nsops = %d)",
 		  semid, sops, nsops);
   myfault efault;
@@ -150,9 +135,4 @@ semop (int semid, struct sembuf *sops, size_t nsops)
       return -1;
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }

@@ -1,3 +1,10 @@
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove USE_SERVER define.  Accommodate throughout.
+	* configure.in: Remove --enable-server option.
+	* configure: Regenerate.
+	* environ.cc: Remove CYGWIN=server setting.
+
 2009-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procnet.cc: Reorganize global procnet content data into a

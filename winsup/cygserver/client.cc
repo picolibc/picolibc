@@ -1,6 +1,6 @@
 /* client.cc
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008, 2009 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -33,8 +33,6 @@ details. */
 #include "transport.h"
 
 int cygserver_running = CYGSERVER_UNKNOWN; // Nb: inherited by children.
-
-bool allow_server = false;	// Nb: inherited by children.
 
 client_request_get_version::client_request_get_version ()
   : client_request (CYGSERVER_REQUEST_GET_VERSION, &version, sizeof (version))
@@ -527,13 +525,6 @@ check_cygserver_available ()
 void
 cygserver_init ()
 {
-  if (!allow_server)
-    {
-      syscall_printf ("cygserver use disabled in client");
-      cygserver_running = CYGSERVER_UNAVAIL;
-      return;
-    }
-
   assert (cygserver_running == CYGSERVER_UNKNOWN	\
 	  || cygserver_running == CYGSERVER_OK		\
 	  || cygserver_running == CYGSERVER_UNAVAIL);

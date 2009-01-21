@@ -1,3 +1,9 @@
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Remove --enable-server option.  Allways add the
+	cygserver directory to $SUBDIRS.
+	* configure: Regenerate.
+
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Revert erroneous checkin.

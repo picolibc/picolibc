@@ -1,7 +1,7 @@
 /* fhandler_tty.cc
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -528,10 +528,8 @@ fhandler_tty_slave::open (int flags, mode_t)
   HANDLE to_master_local;
   from_master_local = to_master_local = NULL;
 
-#ifdef USE_SERVER
   if (cygserver_running == CYGSERVER_UNAVAIL
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
-#endif
     {
       if (get_ttyp ()->master_pid < 0)
 	{
@@ -546,9 +544,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  termios_printf ("*** couldn't find tty master");
 	  return 0;
 	}
-#ifdef USE_SERVER
       termios_printf ("cannot dup handles via server. using old method.");
-#endif
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
 				      p->dwProcessId);
       if (tty_owner == NULL)
@@ -642,9 +638,6 @@ int
 fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 					  LPHANDLE to_master_ptr)
 {
-#ifndef USE_SERVER
-  return 0;
-#else
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
@@ -659,7 +652,6 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
   *to_master_ptr = req.to_master ();
 
   return 1;
-#endif
 }
 
 void
@@ -1400,10 +1392,8 @@ fhandler_pty_master::setup (bool ispty)
      but rely on cygheap->inherited_ctty for descendant processes.
      In the future the cygserver may allow access by others. */
 
-#ifdef USE_SERVER
   if (cygserver_running == CYGSERVER_UNKNOWN)
     cygserver_init ();
-#endif
 
   /* Create synchronisation events */
 

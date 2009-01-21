@@ -1,3 +1,9 @@
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc (allow_server): Remove variable.
+	(client_request_get_version::client_request_get_version): Drop checking
+	allow_server.
+
 2009-01-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in (CFLAGS): Look in cygwin's build directory for header

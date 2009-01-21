@@ -9,6 +9,3 @@
 
 /* Define if using new vfork functionality. */
 #undef NEWVFORK
-
-/* Define if using cygserver */
-#undef USE_SERVER

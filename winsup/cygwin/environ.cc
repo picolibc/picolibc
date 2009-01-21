@@ -35,9 +35,6 @@ extern bool allow_winsymlinks;
 bool reset_com = false;
 static bool envcache = true;
 static bool create_upcaseenv = false;
-#ifdef USE_SERVER
-extern bool allow_server;
-#endif
 
 static char **lastenviron;
 
@@ -632,9 +629,6 @@ static struct parse_thing
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
-#ifdef USE_SERVER
-  {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
-#endif
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},

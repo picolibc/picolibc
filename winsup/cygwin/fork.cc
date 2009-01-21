@@ -209,7 +209,6 @@ frok::child (volatile char * volatile here)
 
   MALLOC_CHECK;
 
-#ifdef USE_SERVER
   /* Incredible but true:  If we use sockets and SYSV IPC shared memory,
      there's a good chance that a duplicated socket in the child occupies
      memory which is needed to duplicate shared memory from the parent
@@ -219,7 +218,6 @@ frok::child (volatile char * volatile here)
      fdtab before fixing up shared memory. */
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
-#endif
 
   MALLOC_CHECK;
 

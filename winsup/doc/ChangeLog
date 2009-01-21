@@ -1,3 +1,12 @@
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.sgml: Remove the "How to use the Cygserver services"
+	section.
+	* cygwinenv.sgml: Move "(no)server" to the removed options section.
+	* faq-programming.xml: Remove CYGWIN=server requirement for running
+	the Cygwin testsuite.
+	* ntsec.sgml: Ditto for using `passwd -R'.
+
 2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gcc.sgml: Use 'bash$' as Cygwin prompt throughout.

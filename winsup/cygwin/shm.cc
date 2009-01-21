@@ -1,6 +1,6 @@
 /* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2004, 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#ifdef USE_SERVER
 #include <sys/queue.h>
 #include <unistd.h>
 
@@ -142,7 +141,6 @@ fixup_shms_after_fork ()
     }
   return 0;
 }
-#endif /* USE_SERVER */
 
 /*
  * XSI shmaphore API.  These are exported by the DLL.
@@ -151,7 +149,6 @@ fixup_shms_after_fork ()
 extern "C" void *
 shmat (int shmid, const void *shmaddr, int shmflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0x%x)",
 		  shmid, shmaddr, shmflg);
 
@@ -247,17 +244,11 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   SLIST_INSERT_HEAD (&sph_list, sph_entry, sph_next);
   SLIST_UNLOCK ();
   return ptr;
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return (void *) -1;
-#endif
 }
 
 extern "C" int
 shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
-#ifdef USE_SERVER
   syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = 0x%x)",
 		  shmid, cmd, buf);
   myfault efault;
@@ -295,17 +286,11 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       SLIST_UNLOCK ();
     }
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 shmdt (const void *shmaddr)
 {
-#ifdef USE_SERVER
   syscall_printf ("shmdt (shmaddr = %p)", shmaddr);
   client_request_shm request (shmaddr);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -341,17 +326,11 @@ shmdt (const void *shmaddr)
     }
   SLIST_UNLOCK ();
   return request.retval ();
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }
 
 extern "C" int
 shmget (key_t key, size_t size, int shmflg)
 {
-#ifdef USE_SERVER
   syscall_printf ("shmget (key = %U, size = %d, shmflg = 0x%x)",
 		  key, size, shmflg);
   /* Try allocating memory before calling cygserver. */
@@ -398,9 +377,4 @@ shmget (key_t key, size_t size, int shmflg)
   SLIST_INSERT_HEAD (&ssh_list, ssh_new_entry, ssh_next);
   SLIST_UNLOCK ();
   return shmid;
-#else
-  set_errno (ENOSYS);
-  raise (SIGSYS);
-  return -1;
-#endif
 }

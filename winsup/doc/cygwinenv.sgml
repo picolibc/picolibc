@@ -100,17 +100,6 @@ time and when handles are inherited.  Defaults to set.</para>
 </listitem>
 
 <listitem>
-<para><envar>(no)server</envar> - if set, allows client applications
-to use the Cygserver facilities.  This option must be enabled explicitely
-on the client side, otherwise your applications won't be able to use the
-XSI IPC function calls (<function>msgget</function>,
-<function>semget</function>, <function>shmget</function>, and friends)
-successfully.  These function calls will return with
-<literal>ENOSYS</literal>, "Bad system call".
-</para>
-</listitem>
-
-<listitem>
 <para><envar>(no)strip_title</envar> - if set, strips the directory
 part off the window title, if any.  Default is not set.</para>
 </listitem>
@@ -216,6 +205,15 @@ on FAT32.</para>
 <para><envar>(no)ntsec</envar> - This option has been removed in favor of
 the per-mount option "acl"/"noacl".  For more information, read the
 documentation in <xref linkend="mount-table"></xref>.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)server</envar> - Originally this option had to be
+enabled on the client side to use features only available when running
+<command>cygserver</command>.  This option has been removed because Cygwin now
+always tries to contact cygserver if a function is called which requires
+cygserver being available.  For more information, read the documentation
+in <xref linkend="using-cygserver"></xref>.</para>
 </listitem>
 
 <listitem>

@@ -790,22 +790,11 @@ all network credentials.  Hmm, that's heaven...</para>
 
 <para>First, adding a password to the LSA private registry area
 requires administrative access.  So calling <command>passwd -R</command>
-as a normal user will fail.  Cygwin provides a workaround for
+as a normal user will fail!  Cygwin provides a workaround for
 this.  If <command>cygserver</command> is started as a service running
 under the SYSTEM account (which is the default way to run
 <command>cygserver</command>) you can use <command>passwd -R</command>
-as normal, non-privileged user as well.  Just keep in mind that this
-requires to set the environment variable CYGWIN to contain the word
-"server" before running <command>passwd -R</command>, if it's not
-already set anyway.  See <xref linkend="using-cygwinenv"></xref>.
-Example:</para>
-
-<screen>
-bash$ echo $CYGWIN
-tty
-bash$ export CYGWIN="tty server"
-bash$ passwd -R
-</screen>
+as normal, non-privileged user as well.</para>
 
 <para>Second, as aforementioned, the password is two-way encrypted in a
 hidden, obfuscated registry area.  Only SYSTEM has access to this area

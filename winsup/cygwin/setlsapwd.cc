@@ -1,6 +1,6 @@
 /* setlsapwd.cc: Set LSA private data password for current user.
 
-   Copyright 2008 Red Hat, Inc.
+   Copyright 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,7 +22,6 @@ details. */
 #include <stdlib.h>
 #include <wchar.h>
 
-#ifdef USE_SERVER
 /*
  * client_request_setpwd Constructor
  */
@@ -36,8 +35,6 @@ client_request_setpwd::client_request_setpwd (PUNICODE_STRING passwd)
 
   msglen (sizeof (_parameters.in));
 }
-
-#endif /* USE_SERVER */
 
 unsigned long
 setlsapwd (const char *passwd)
@@ -74,17 +71,14 @@ setlsapwd (const char *passwd)
 	    __seterrno_from_nt_status (status);
 	  LsaClose (lsa);
 	}
-#ifdef USE_SERVER
       else if (ret)
 	{
-	  /* If that fails, ask cygserver. */
 	  client_request_setpwd request (&data);
 	  if (request.make_request () == -1 || request.error_code ())
 	    set_errno (request.error_code ());
 	  else
 	    ret = 0;
 	}
-#endif
       if (data_buf)
 	{
 	  memset (data.Buffer, 0, data.Length);

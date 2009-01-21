@@ -1,3 +1,7 @@
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c: Remove CYGWIN=server requirement from usage text.
+
 2009-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Fix copyright date.

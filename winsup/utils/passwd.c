@@ -1,6 +1,6 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2008 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2008, 2009 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -289,8 +289,8 @@ usage (FILE * stream, int status)
   "operations.  Don't specify a USER when triggering a system operation.\n"
   "\n"
   "Don't specify a user or any other option together with the -R option.\n"
-  "Non-Admin users can only store their password if cygserver is running and\n"
-  "the CYGWIN environment variable is set to contain the word 'server'.\n"
+  "Non-Admin users can only store their password if cygserver is running\n"
+  "as service under the SYSTEM account.\n"
   "Note that storing even obfuscated passwords in the registry is not overly\n"
   "secure.  Use this feature only if the machine is adequately locked down.\n"
   "Don't use this feature if you don't need network access within a remote\n"

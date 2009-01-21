@@ -11,9 +11,6 @@
 /* Define if using new vfork functionality. */
 #undef NEWVFORK
 
-/* Define if using cygserver */
-#undef USE_SERVER
-
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
