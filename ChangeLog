@@ -1,3 +1,7 @@
+2009-01-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Add ARM license.
+
 2009-01-16  Alan Modra  <amodra@bigpond.net.au>
 
 	* Makefile.def (configure-opcodes): Depend on configure-libiberty.
