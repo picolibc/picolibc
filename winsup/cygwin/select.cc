@@ -928,6 +928,10 @@ peek_serial (select_record *s, bool)
       goto out;
     }
 
+  /* This is apparently necessary for the com0com driver.
+     See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
+  SetCommMask (h, 0);
+
   SetCommMask (h, EV_RXCHAR);
 
   if (!fh->overlapped_armed)
