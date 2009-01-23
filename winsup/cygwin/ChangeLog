@@ -1,3 +1,8 @@
+2009-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.cc (__small_vsprintf): Use already available buffer tmp
+	in wfillin case.
+
 2009-01-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.cc (peek_serial): Add hack to allow proper operation with

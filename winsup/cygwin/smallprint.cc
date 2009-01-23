@@ -195,18 +195,15 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  us = va_arg (ap, PUNICODE_STRING);
 		wfillin:
 		  {
-		    char *tmpbuf;
-
-		    if (!sys_wcstombs_alloc (&tmpbuf, HEAP_NOTHEAP, us->Buffer,
-					     us->Length / sizeof (WCHAR)))
+		    if (!sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
+				       us->Length / sizeof (WCHAR)))
 		      {
 			s = "invalid UNICODE_STRING";
 			goto fillin;
 		      }
-		    char *tmp = tmpbuf;
-		    for (i = 0; *tmp && i < n; i++)
-		      *dst++ = *tmp++;
-		    free (tmpbuf);
+		    char *t = tmp;
+		    for (i = 0; *t && i < n; i++)
+		      *dst++ = *t++;
 		  }
 		  break;
 		default:
