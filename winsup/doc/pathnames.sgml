@@ -262,6 +262,12 @@ when accessing the above files so all these files as well as
 <filename>/etc</filename> itself may be NTFS symlinks or reparse
 points.</para>
 
+<para>Last but not least, make sure that these files are world-readable.
+Every process of any user account has to read these files potentially,
+so world-readability is essential.  The only exception are the user
+specific files <filename>/etc/fstab.d/$USER</filename>, which only have
+to be readable by the $USER user account itself.</para>
+
 </sect2>
 
 <sect2 id="pathnames-dosdevices"><title>DOS devices</title>
