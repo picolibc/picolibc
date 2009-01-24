@@ -225,8 +225,46 @@ not by default, for example).</para>
 
 <sect1 id="using-specialnames"><title>Special filenames</title>
 
-<sect2 id="pathnames-dosdevices">
-<title>DOS devices</title>
+<sect2 id="pathnames-etc"><title>Special files in /etc</title>
+
+<para>Certain files in Cygwin's <filename>/etc</filename> directory are
+read by Cygwin before the mount table has been established.  The list
+of files is</para>
+
+<screen>
+  /etc/fstab
+  /etc/fstab.d/$USER
+  /etc/passwd
+  /etc/group
+</screen>
+
+<para>These file are read using native Windows NT functions which have
+no notion of Cygwin symlinks or POSIX paths.  For that reason
+there are a few requirements as far as <filename>/etc</filename> is
+concerned.</para>
+
+<para>To access these files, the Cygwin DLL evaluates it's own full
+Windows path, strips off the innermost directory component and adds
+"\etc".  Let's assume the Cygwin DLL is installed as
+<filename>C:\cygwin\bin\cygwin1.dll</filename>.  First the DLL name as
+well as the innermost directory (<filename>bin</filename>) is stripped
+off: <filename>C:\cygwin\</filename>.  Then "etc" and the filename to
+look for is attached: <filename>C:\cygwin\etc\fstab</filename>.  So the
+/etc directory must be parallel to the directory in which the cygwn1.dll
+exists and <filename>/etc</filename> must not be a Cygwin symlink
+pointing to another directory.  Consequentially none of the files from
+the above list, including the directory
+<filename>/etc/fstab.d</filename>is allowed to be a Cygwin symlink
+either.</para>
+
+<para>However, native NTFS symlinks and reparse points are transparent
+when accessing the above files so all these files as well as
+<filename>/etc</filename> itself may be NTFS symlinks or reparse
+points.</para>
+
+</sect2>
+
+<sect2 id="pathnames-dosdevices"><title>DOS devices</title>
 
 <para>Filenames invalid under Win32 are not necessarily invalid
 under Cygwin since release 1.7.0.  There are a couple of rules which

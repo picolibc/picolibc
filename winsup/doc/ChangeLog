@@ -1,3 +1,7 @@
+2009-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Add section about accessing /etc files.
+
 2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.sgml: Remove the "How to use the Cygserver services"
