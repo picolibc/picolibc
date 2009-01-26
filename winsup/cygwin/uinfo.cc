@@ -543,7 +543,9 @@ pwdgrp::load (const wchar_t *rel_path)
   paranoid_printf ("%S", &upath);
 
   status = NtOpenFile (&fh, SYNCHRONIZE | FILE_READ_DATA, &attr, &io,
-		       FILE_SHARE_VALID_FLAGS, FILE_SYNCHRONOUS_IO_NONALERT);
+		       FILE_SHARE_VALID_FLAGS,
+		       FILE_SYNCHRONOUS_IO_NONALERT
+		       | FILE_OPEN_FOR_BACKUP_INTENT);
   if (!NT_SUCCESS (status))
     {
       paranoid_printf ("NtOpenFile(%S) failed, status %p", &upath, status);
