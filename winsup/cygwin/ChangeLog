@@ -1,5 +1,14 @@
 2009-01-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* shared.cc (shared_name): New function for WCHAR names.
+	(open_shared): Take name parameter as WCHAR.  Accommodate throughout.
+	* shared_info.h ((CURR_SHARED_MAGIC): Redefine.
+	(shared_name): Add declaration for function taking a WCHAR name.
+	(open_shared): Change declaration according to above change.
+	* pinfo.cc (pinfo::init) : Accommodate above change.
+
+2009-01-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (getgrgid_r): Simplify code by using stpcpy.
 	(getgrnam_r): Ditto.
 	* passwd.cc (getpwuid_r32): Simplify code by using stpcpy.

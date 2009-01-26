@@ -100,6 +100,13 @@ shared_name (char *ret_buf, const char *str, int num)
   return ret_buf;
 }
 
+WCHAR * __stdcall
+shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
+{
+  __small_swprintf (ret_buf, L"%W.%d", str, num);
+  return ret_buf;
+}
+
 #define page_const (65535)
 #define pround(n) (((size_t) (n) + page_const) & ~page_const)
 
@@ -121,7 +128,7 @@ static ptrdiff_t offsets[] =
 #define off_addr(x)	((void *)((caddr_t) cygwin_hmodule + offsets[x]))
 
 void * __stdcall
-open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
+open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	     shared_locations& m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
   void *shared;
@@ -135,8 +142,8 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       VirtualFree (addr, 0, MEM_RELEASE);
     }
 
-  char map_buf[MAX_PATH];
-  char *mapname = NULL;
+  WCHAR map_buf[MAX_PATH];
+  WCHAR *mapname = NULL;
 
   if (shared_h)
     m = SH_JUSTOPEN;
@@ -145,10 +152,10 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       if (name)
 	mapname = shared_name (map_buf, name, n);
       if (m == SH_JUSTOPEN)
-	shared_h = OpenFileMapping (access, FALSE, mapname);
+	shared_h = OpenFileMappingW (access, FALSE, mapname);
       else
 	{
-	  shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
+	  shared_h = CreateFileMappingW (INVALID_HANDLE_VALUE, psa,
 					PAGE_READWRITE, 0, size, mapname);
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
 	    m = SH_JUSTOPEN;
@@ -156,7 +163,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       if (shared_h)
 	/* ok! */;
       else if (m != SH_JUSTOPEN)
-	api_fatal ("CreateFileMapping %s, %E.  Terminating.", mapname);
+	api_fatal ("CreateFileMapping %W, %E.  Terminating.", mapname);
       else
 	return NULL;
     }
@@ -170,13 +177,13 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
 				       0, 0, 0, NULL);
 #ifdef DEBUGGING
-      system_printf ("relocating shared object %s(%d) from %p to %p", name, n, addr, shared);
+      system_printf ("relocating shared object %W(%d) from %p to %p", name, n, addr, shared);
 #endif
       offsets[0] = 0;
     }
 
   if (!shared)
-    api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", mapname, shared_h);
+    api_fatal ("MapViewOfFileEx '%W'(%p), %E.  Terminating.", mapname, shared_h);
 
   if (m == SH_CYGWIN_SHARED && offsets[0])
     {
@@ -192,7 +199,7 @@ open_shared (const char *name, int n, HANDLE& shared_h, DWORD size,
       offsets[SH_TOTAL_SIZE] += delta;
     }
 
-  debug_printf ("name %s, n %d, shared %p (wanted %p), h %p", mapname, n, shared, addr, shared_h);
+  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p", mapname, n, shared, addr, shared_h);
 
   return shared;
 }
@@ -229,7 +236,7 @@ user_shared_initialize ()
 void
 user_shared_create (bool reinit)
 {
-  char name[UNLEN + 1] = ""; /* Large enough for SID */
+  WCHAR name[UNLEN + 1] = L""; /* Large enough for SID */
 
   if (reinit)
     {
@@ -247,7 +254,7 @@ user_shared_create (bool reinit)
   user_shared = (user_info *) open_shared (name, USER_VERSION,
 					    cygwin_user_h, sizeof (user_info),
 					    sh_user_shared, &sec_none);
-  debug_printf ("opening user shared for '%s' at %p", name, user_shared);
+  debug_printf ("opening user shared for '%W' at %p", name, user_shared);
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
   if (reinit)
@@ -368,7 +375,7 @@ memory_init ()
 
   /* Initialize general shared memory */
   shared_locations sh_cygwin_shared;
-  cygwin_shared = (shared_info *) open_shared ("shared",
+  cygwin_shared = (shared_info *) open_shared (L"shared",
 					       CYGWIN_VERSION_SHARED_DATA,
 					       cygwin_shared_h,
 					       sizeof (*cygwin_shared),

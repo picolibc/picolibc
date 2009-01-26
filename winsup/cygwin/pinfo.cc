@@ -227,7 +227,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       else
 	mapsize = sizeof (_pinfo);
 
-      procinfo = (_pinfo *) open_shared ("cygpid", n, h0, mapsize, shloc,
+      procinfo = (_pinfo *) open_shared (L"cygpid", n, h0, mapsize, shloc,
 					 sec_attribs, access);
       if (!h0)
 	{
