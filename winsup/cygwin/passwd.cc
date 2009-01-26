@@ -1,6 +1,6 @@
 /* passwd.cc: getpwnam () and friends
 
-   Copyright 1996, 1997, 1998, 2001, 2002, 2003, 2007 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2001, 2002, 2003, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -159,9 +159,9 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
     return 0;
 
   /* check needed buffer size. */
-  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) +
-		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) +
-		    strlen (temppw->pw_passwd) + 5;
+  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_passwd)
+		    + strlen (temppw->pw_gecos) + strlen (temppw->pw_dir)
+		    + strlen (temppw->pw_shell) + 5;
   if (needsize > bufsize)
     return ERANGE;
 
@@ -169,17 +169,12 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   *result = pwd;
   pwd->pw_uid = temppw->pw_uid;
   pwd->pw_gid = temppw->pw_gid;
-  pwd->pw_name = buffer;
-  pwd->pw_dir = pwd->pw_name + strlen (temppw->pw_name) + 1;
-  pwd->pw_shell = pwd->pw_dir + strlen (temppw->pw_dir) + 1;
-  pwd->pw_gecos = pwd->pw_shell + strlen (temppw->pw_shell) + 1;
+  buffer = stpcpy (pwd->pw_name = buffer, temppw->pw_name);
+  buffer = stpcpy (pwd->pw_passwd = buffer + 1, temppw->pw_passwd);
+  buffer = stpcpy (pwd->pw_gecos = buffer + 1, temppw->pw_gecos);
+  buffer = stpcpy (pwd->pw_dir = buffer + 1, temppw->pw_dir);
+  stpcpy (pwd->pw_shell = buffer + 1, temppw->pw_shell);
   pwd->pw_comment = NULL;
-  pwd->pw_passwd = pwd->pw_gecos + strlen (temppw->pw_gecos) + 1;
-  strcpy (pwd->pw_name, temppw->pw_name);
-  strcpy (pwd->pw_dir, temppw->pw_dir);
-  strcpy (pwd->pw_shell, temppw->pw_shell);
-  strcpy (pwd->pw_gecos, temppw->pw_gecos);
-  strcpy (pwd->pw_passwd, temppw->pw_passwd);
   return 0;
 }
 
@@ -217,9 +212,9 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
     return 0;
 
   /* check needed buffer size. */
-  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_dir) +
-		    strlen (temppw->pw_shell) + strlen (temppw->pw_gecos) +
-		    strlen (temppw->pw_passwd) + 5;
+  size_t needsize = strlen (temppw->pw_name) + strlen (temppw->pw_passwd)
+		    + strlen (temppw->pw_gecos) + strlen (temppw->pw_dir)
+		    + strlen (temppw->pw_shell) + 5;
   if (needsize > bufsize)
     return ERANGE;
 
@@ -227,17 +222,12 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   *result = pwd;
   pwd->pw_uid = temppw->pw_uid;
   pwd->pw_gid = temppw->pw_gid;
-  pwd->pw_name = buffer;
-  pwd->pw_dir = pwd->pw_name + strlen (temppw->pw_name) + 1;
-  pwd->pw_shell = pwd->pw_dir + strlen (temppw->pw_dir) + 1;
-  pwd->pw_gecos = pwd->pw_shell + strlen (temppw->pw_shell) + 1;
+  buffer = stpcpy (pwd->pw_name = buffer, temppw->pw_name);
+  buffer = stpcpy (pwd->pw_passwd = buffer + 1, temppw->pw_passwd);
+  buffer = stpcpy (pwd->pw_gecos = buffer + 1, temppw->pw_gecos);
+  buffer = stpcpy (pwd->pw_dir = buffer + 1, temppw->pw_dir);
+  stpcpy (pwd->pw_shell = buffer + 1, temppw->pw_shell);
   pwd->pw_comment = NULL;
-  pwd->pw_passwd = pwd->pw_gecos + strlen (temppw->pw_gecos) + 1;
-  strcpy (pwd->pw_name, temppw->pw_name);
-  strcpy (pwd->pw_dir, temppw->pw_dir);
-  strcpy (pwd->pw_shell, temppw->pw_shell);
-  strcpy (pwd->pw_gecos, temppw->pw_gecos);
-  strcpy (pwd->pw_passwd, temppw->pw_passwd);
   return 0;
 }
 

@@ -1,5 +1,12 @@
 2009-01-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (getgrgid_r): Simplify code by using stpcpy.
+	(getgrnam_r): Ditto.
+	* passwd.cc (getpwuid_r32): Simplify code by using stpcpy.
+	(getpwnam_r): Ditto.
+
+2009-01-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::load): Open file with FILE_OPEN_FOR_BACKUP_INTENT
 	flag.
 

@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007 Red Hat, Inc.
+   2007, 2008, 2009 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -195,20 +195,13 @@ getgrgid_r (__gid32_t gid, struct __group32 *grp, char *buffer, size_t bufsize,
   /* make a copy of tempgr */
   *result = grp;
   grp->gr_gid = tempgr->gr_gid;
-  grp->gr_name = buffer;
-  grp->gr_passwd = grp->gr_name + strlen (tempgr->gr_name) + 1;
-  grp->gr_mem = (char **) (grp->gr_passwd + strlen (tempgr->gr_passwd) + 1);
-  char *mem = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
+  buffer = stpcpy (grp->gr_name = buffer, tempgr->gr_name);
+  buffer = stpcpy (grp->gr_passwd = buffer + 1, tempgr->gr_passwd);
+  grp->gr_mem = (char **) (buffer + 1);
+  buffer = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
   for (i = 0; tempgr->gr_mem[i]; ++i)
-    {
-      grp->gr_mem[i] = mem;
-      mem += strlen (tempgr->gr_mem[i]) + 1;
-    }
+    buffer = stpcpy (grp->gr_mem[i] = buffer, tempgr->gr_mem[i]) + 1;
   grp->gr_mem[i] = NULL;
-  strcpy (grp->gr_name, tempgr->gr_name);
-  strcpy (grp->gr_passwd, tempgr->gr_passwd);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    strcpy (grp->gr_mem[i], tempgr->gr_mem[i]);
   return 0;
 }
 
@@ -252,20 +245,13 @@ getgrnam_r (const char *nam, struct __group32 *grp, char *buffer,
   /* make a copy of tempgr */
   *result = grp;
   grp->gr_gid = tempgr->gr_gid;
-  grp->gr_name = buffer;
-  grp->gr_passwd = grp->gr_name + strlen (tempgr->gr_name) + 1;
-  grp->gr_mem = (char **) (grp->gr_passwd + strlen (tempgr->gr_passwd) + 1);
-  char *mem = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
+  buffer = stpcpy (grp->gr_name = buffer, tempgr->gr_name);
+  buffer = stpcpy (grp->gr_passwd = buffer + 1, tempgr->gr_passwd);
+  grp->gr_mem = (char **) (buffer + 1);
+  buffer = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
   for (i = 0; tempgr->gr_mem[i]; ++i)
-    {
-      grp->gr_mem[i] = mem;
-      mem += strlen (tempgr->gr_mem[i]) + 1;
-    }
+    buffer = stpcpy (grp->gr_mem[i] = buffer, tempgr->gr_mem[i]) + 1;
   grp->gr_mem[i] = NULL;
-  strcpy (grp->gr_name, tempgr->gr_name);
-  strcpy (grp->gr_passwd, tempgr->gr_passwd);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    strcpy (grp->gr_mem[i], tempgr->gr_mem[i]);
   return 0;
 }
 
