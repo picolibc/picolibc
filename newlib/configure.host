@@ -640,6 +640,11 @@ case "${host}" in
   lm32-*-*)
 	syscall_dir=syscalls
 	;;
+  m32c-*-*)
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
+  	;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.
 	# We don't generate sda relocs however for upward compatibility.
