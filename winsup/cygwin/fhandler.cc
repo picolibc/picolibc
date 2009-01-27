@@ -1697,7 +1697,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
     return inres;
 
   int res = 0;
-  *bytes = (DWORD) -1;
+
   DWORD err;
   if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
    {
@@ -1722,6 +1722,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 	{
 	  debug_printf ("got a signal");
 	  set_errno (EINTR);
+	  *bytes = (DWORD) -1;
 	  res = 0;
 	  err = 0;
 	}
@@ -1732,7 +1733,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
 	}
       else
 	{
-	  debug_printf ("normal read");
+	  debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
 	  res = 1;
 	  err = 0;
 	}
@@ -1744,6 +1745,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
     {
       debug_printf ("err %u", err);
       __seterrno_from_win_error (err);
+      *bytes = (DWORD) -1;
       res = -1;
     }
   else
@@ -1787,10 +1789,9 @@ fhandler_base::write_overlapped (const void *ptr, size_t len)
       bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
 			    get_overlapped ());
       int wres = wait_overlapped (res, true, &bytes_written);
-      if (wres < 0)
-	return -1;
       if (wres || !_my_tls.call_signal_handler ())
 	break;
     }
+  debug_printf ("returning %u", bytes_written);
   return bytes_written;
 }

@@ -26,6 +26,7 @@ fhandler_pipe::fhandler_pipe ()
   : fhandler_base (), popen_pid (0), overlapped (NULL)
 {
   need_fork_fixup (true);
+  uninterruptible_io (true);
 }
 
 void
