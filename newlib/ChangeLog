@@ -1,3 +1,9 @@
+2009-01-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Add additional check for
+	inf and nan processing to not proceed if we have already collected
+	zeroes.
+
 2009-01-26  DJ Delorie  <dj@redhat.com>
 
 	* configure.host (m32c-*-*): Add long long I/O support by default.

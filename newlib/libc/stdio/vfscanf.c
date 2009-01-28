@@ -489,6 +489,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
 
+  __sfp_lock_acquire ();
   _flockfile (fp);
 
   ORIENT (fp, -1);
@@ -779,6 +780,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	   */
 	case '\0':		/* compat */
 	  _funlockfile (fp);
+	  __sfp_lock_release ();
 	  return EOF;
 
 	default:		/* compat */
@@ -1329,7 +1331,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  break;
 		case 'n':
 		case 'N':
-		  if (nancount == 0
+		  if (nancount == 0 && zeroes == 0
 		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
 				  (NDIGITS | DPTOK | EXPOK))
 		    {
@@ -1358,7 +1360,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  break;
 		case 'i':
 		case 'I':
-		  if (infcount == 0
+		  if (infcount == 0 && zeroes == 0
 		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
 				  (NDIGITS | DPTOK | EXPOK))
 		    {
@@ -1577,11 +1579,13 @@ input_failure:
      invalid format string), return EOF if no matches yet, else number
      of matches made prior to failure.  */
   _funlockfile (fp);
+  __sfp_lock_release ();
   return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _funlockfile (fp);
+  __sfp_lock_release ();
   return nassigned;
 }
 
