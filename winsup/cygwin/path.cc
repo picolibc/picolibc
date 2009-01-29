@@ -2140,6 +2140,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       bool no_ea = false;
+      bool fs_update_called = false;
 
       error = 0;
       get_nt_native_path (suffix.path, upath);
@@ -2178,6 +2179,30 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	}
+      if (status == STATUS_OBJECT_NAME_NOT_FOUND && ci_flag == 0
+	  && wincap.has_broken_udf ())
+        {
+	  /* On NT 5.x UDF is broken (at least) in terms of case sensitivity.
+	     When trying to open a file case sensitive, the file appears to be
+	     non-existant.  Another bug is described in fs_info::update. */
+	  attr.Attributes = OBJ_CASE_INSENSITIVE;
+	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_REPARSE_POINT
+			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  attr.Attributes = ci_flag;
+	  if (NT_SUCCESS (status))
+	    {
+	      fs.update (&upath, h);
+	      if (fs.is_udf ())
+		fs_update_called = true;
+	      else
+	      	{
+		  NtClose (h);
+		  status = STATUS_OBJECT_NAME_NOT_FOUND;
+		}
+	    }
 	}
       if (NT_SUCCESS (status)
 	  && NT_SUCCESS (status
@@ -2271,7 +2296,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 
       /* Check file system while we're having the file open anyway.
 	 This speeds up path_conv noticably (~10%). */
-      fs.update (&upath, h);
+      if (!fs_update_called)
+	fs.update (&upath, h);
 
       ext_tacked_on = !!*ext_here;
 

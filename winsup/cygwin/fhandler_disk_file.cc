@@ -1928,7 +1928,8 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
-      de->d_ino = get_ino_by_handle (get_handle ());
+      if (pc.isgood_inode (de->d_ino))
+	de->d_ino = get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;

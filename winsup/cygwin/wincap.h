@@ -45,6 +45,7 @@ struct wincaps
   unsigned ts_has_dep_problem				: 1;
   unsigned has_recvmsg					: 1;
   unsigned has_sendmsg					: 1;
+  unsigned has_broken_udf				: 1;
 };
 
 class wincapc
@@ -96,6 +97,7 @@ public:
   bool	IMPLEMENT (ts_has_dep_problem)
   bool	IMPLEMENT (has_recvmsg)
   bool	IMPLEMENT (has_sendmsg)
+  bool	IMPLEMENT (has_broken_udf)
 
 #undef IMPLEMENT
 };

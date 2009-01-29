@@ -262,7 +262,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     }
   is_ntfs (RtlEqualUnicodeString (&fsname, &testname, FALSE)
 	   && !is_samba () && !is_netapp ());
-  is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
 
   has_acls (flags () & FS_PERSISTENT_ACLS);
   hasgood_inode (((flags () & FILE_PERSISTENT_ACLS) && !is_netapp ())
@@ -273,6 +272,21 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
      sensitive. */
   caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
 		   && !is_nfs ());
+
+  is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
+  if (is_cdrom ())
+    {
+      RtlInitUnicodeString (&testname, L"UDF");
+      is_udf (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+      /* UDF on NT 5.x is broken (at least) in terms of case sensitivity.  The
+	 UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability but:
+	 - Opening the root directory for query seems to work at first, but the
+	   filenames in the directory listing are mutilated.
+	 - When trying to open a file or directory case sensitive, the file
+	   appears to be non-existant. */
+      if (is_udf () && wincap.has_broken_udf ())
+	caseinsensitive (true);
+    }
 
   if (!in_vol)
     NtClose (vol);

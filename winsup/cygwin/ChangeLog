@@ -1,3 +1,18 @@
+2009-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Fix inode number
+	evaluation for faked "." entry.
+
+	* mount.cc (fs_info::update): Move setting of is_cdrom after checking
+	for caseinsensitivity.  Recognize UDF in is_cdrom case and set
+	caseinsensitive flag according to UDF brokenness determined by OS.
+	Add comment to explain why.
+	* mount.h (class fs_info): Add is_udf status flag.
+	* path.cc (symlink_info::check): Add workaround for UDF bug in
+	terms of casesensitivity on certain OSes.
+	* wincap.h (wincaps::has_broken_udf): New element.
+	(wincaps::has_broken_udf): New element
+
 2009-01-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::wait_overlapped): Set bytes to -1 on
