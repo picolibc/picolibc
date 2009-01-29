@@ -1,3 +1,12 @@
+2009-01-28  Doug Evans  <dje@google.com>
+
+	* opcode/i386.h: Add multiple inclusion protection.
+	(EAX_REG_NUM,ECX_REG_NUM,EDX_REGNUM,EBX_REG_NUM,ESI_REG_NUM)
+	(EDI_REG_NUM): New macros.
+	(MODRM_MOD_FIELD,MODRM_REG_FIELD,MODRM_RM_FIELD): New macros.
+	(SIB_SCALE_FIELD,SIB_INDEX_FIELD,SIB_BASE_FIELD): New macros.
+	(REG_PREFIX_P): New macro.
+
 2009-01-09  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (struct powerpc_opcode): New field "deprecated".

@@ -35,6 +35,9 @@
 
    The affected opcode map is dceX, dcfX, deeX, defX.  */
 
+#ifndef OPCODE_I386_H
+#define OPCODE_I386_H
+
 #ifndef SYSV386_COMPAT
 /* Set non-zero for broken, compatible instructions.  Set to zero for
    non-broken opcodes at your peril.  gcc generates SystemV/386
@@ -72,8 +75,14 @@
 #define NOP_OPCODE (char) 0x90
 
 /* register numbers */
-#define EBP_REG_NUM 5
+#define EAX_REG_NUM 0
+#define ECX_REG_NUM 1
+#define EDX_REG_NUM 2
+#define EBX_REG_NUM 3
 #define ESP_REG_NUM 4
+#define EBP_REG_NUM 5
+#define ESI_REG_NUM 6
+#define EDI_REG_NUM 7
 
 /* modrm_byte.regmem for twobyte escape */
 #define ESCAPE_TO_TWO_BYTE_ADDRESSING ESP_REG_NUM
@@ -87,8 +96,21 @@
 #define REGMEM_FIELD_HAS_REG 0x3/* always = 0x3 */
 #define REGMEM_FIELD_HAS_MEM (~REGMEM_FIELD_HAS_REG)
 
+/* Extract fields from the mod/rm byte.  */
+#define MODRM_MOD_FIELD(modrm) (((modrm) >> 6) & 3)
+#define MODRM_REG_FIELD(modrm) (((modrm) >> 3) & 7)
+#define MODRM_RM_FIELD(modrm)  (((modrm) >> 0) & 7)
+
+/* Extract fields from the sib byte.  */
+#define SIB_SCALE_FIELD(sib) (((sib) >> 6) & 3)
+#define SIB_INDEX_FIELD(sib) (((sib) >> 3) & 7)
+#define SIB_BASE_FIELD(sib)  (((sib) >> 0) & 7)
+
 /* x86-64 extension prefix.  */
 #define REX_OPCODE	0x40
+
+/* Non-zero if OPCODE is the rex prefix.  */
+#define REX_PREFIX_P(opcode) (((opcode) & 0xf0) == REX_OPCODE)
 
 /* Indicates 64 bit operand size.  */
 #define REX_W	8
@@ -113,3 +135,5 @@
 
 /* max size of register name in insn mnemonics.  */
 #define MAX_REG_NAME_SIZE 8
+
+#endif /* OPCODE_I386_H */
