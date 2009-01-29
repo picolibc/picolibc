@@ -1,9 +1,0 @@
-#
-# A simple example which prints a message on a selected printer. This won't
-# work right unless you make PRINTDLG a packed structure!
-#
-
-Main prntest.exe : prntest.c ;
-
-Gui prntest.exe ;
-
