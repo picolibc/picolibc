@@ -314,7 +314,7 @@ only differ by case, like <filename>Abc</filename> and
 <filename>aBc</filename>.  While NTFS (and some remote filesystems)
 support case-sensitivity, the NT kernel starting with Windows XP does
 not support it by default.  Rather, you have to tweak a registry setting
-and reboot.  For that reason, case-sensitivity is not supported by Cygwin,
+and reboot.  For that reason, case-sensitivity can not be supported by Cygwin,
 unless you change that registry value.</para>
 
 <para>If you really want case-sensitivity in Cygwin, you can switch it
@@ -329,11 +329,12 @@ this registry value also on Windows NT4 and Windows 2000, which usually
 both don't know this registry key.  If you want case-sensitivity on these
 systems, create that registry value and set it to 0.  On these systems
 (and *only* on these systems) you don't have to reboot to bring it
-into effect.</para>
+into effect, rather stopping all Cygwin processes and then restarting them
+is sufficient.</para>
 
 <note>
 <para>
-Note that when installing Microsoft's Services For Unix (SFU), you're asked if
+When installing Microsoft's Services For Unix (SFU), you're asked if
 you want to use case-sensitive filenames.  If you answer "yes" at this point,
 the installer will change the aforementioned registry value to 0, too.  So, if
 you have SFU installed, there's some chance that the registry value is already
@@ -351,21 +352,20 @@ at your own risk.  You have been warned!</para>
 case-insensitivity for certain paths for better interoperability with
 native Win32 applications (even if it's just Windows Explorer).  You can do
 this on a per-mount point base, by using the "posix=0" mount option in
-/etc/fstab, or your /etc/fstab.d/$USER file.</para>
+<filename>/etc/fstab</filename>, or your <filename>/etc/fstab.d/$USER</filename>
+file.</para>
 
-<para>For a start, it might be best to switch the cygdrive path to
-case-insensitivity, because the default Windows $PATH variable is not
-always using the correct case by default.  As a result, your shell will
-claim that it can't find Windows commands like <command>attrib</command>
-or <command>net</command>.  Here's an example how you can switch the
-cygdrive prefix to case-insensitivity:</para>
-
-<example id="mount-caseinsensitive">
-<title>Example mount point to enforce case-insensitivity on cygdrive paths</title>
-<screen>
-none /cygdrive cygdrive binary,posix=0 0 0
-</screen>
-</example>
+<para><filename>/cygdrive</filename> paths are case-insensitive by default.
+The reason is that the native Windows %PATH% environment variable is not
+always using the correct case for all paths in it.  As a result, if you use
+case-sensitivity on the <filename>/cygdrive</filename> prefix, your shell
+might claim that it can't find Windows commands like <command>attrib</command>
+or <command>net</command>.  To ease the pain the <filename>/cygdrive</filename>
+path is case-insensitive by default and you have to use the "posix=1" setting
+explicitely in <filename>/etc/fstab</filename> or
+<filename>/etc/fstab.d/$USER</filename> to switch it to case-sensitivity,
+or you have to make sure that the native Win32 %PATH% environment variable
+is using the correct case for all paths throughout.</para>
 
 <para>Note that mount points as well as device names and virtual
 paths like /proc are always case-sensitive!  The only exception are
