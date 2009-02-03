@@ -1,3 +1,11 @@
+2009-02-03  Sandip Matte  <sandip@rmicorp.com>
+
+	* mips.h (INSN_XLR): Define.
+	(INSN_CHIP_MASK): Update.
+	(CPU_XLR): Define.
+	(OPCODE_IS_MEMBER): Update.
+	(M_MSGSND, M_MSGLD, M_MSGLD_T, M_MSGWAIT, M_MSGWAIT_T): Define.
+
 2009-01-28  Doug Evans  <dje@google.com>
 
 	* opcode/i386.h: Add multiple inclusion protection.

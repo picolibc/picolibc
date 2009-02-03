@@ -1,3 +1,7 @@
+2009-02-03  Sandip Matte  <sandip@rmicorp.com>
+
+	* mips.h (E_MIPS_MACH_XLR): Define.
+
 2009-02-03  Maxim Kuvyrkov  <maxim@codesourcery.com>
 
 	* m68k.h: Map TLS relocations to numbers.
