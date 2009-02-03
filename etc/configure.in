@@ -7,6 +7,6 @@ AC_PROG_INSTALL
 AC_SUBST(datarootdir)
 AC_SUBST(docdir)
 AC_SUBST(htmldir)
-
+AC_SUBST(pdfdir)
 
 AC_OUTPUT(Makefile)
