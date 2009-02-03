@@ -1,3 +1,7 @@
+2009-02-03  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* m68k.h: Map TLS relocations to numbers.
+
 2009-01-15  Andrew Stubbs  <ams@codesourcery.com>
 	    Julian Brown   <julian@codesourcery.com>
 
