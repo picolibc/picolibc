@@ -40,6 +40,7 @@ static _off64_t format_proc_uptime (void *, char *&);
 static _off64_t format_proc_cpuinfo (void *, char *&);
 static _off64_t format_proc_partitions (void *, char *&);
 static _off64_t format_proc_self (void *, char *&);
+static _off64_t format_proc_mounts (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
@@ -54,6 +55,7 @@ static const virt_tab_t proc_tab[] = {
   { "cpuinfo",	  FH_PROC,	virt_file,	format_proc_cpuinfo },
   { "partitions", FH_PROC,	virt_file,	format_proc_partitions },
   { "self",	  FH_PROC,	virt_symlink,	format_proc_self },
+  { "mounts",	  FH_PROC,	virt_symlink,	format_proc_mounts },
   { "registry32", FH_REGISTRY,	virt_directory,	NULL },
   { "registry64", FH_REGISTRY,	virt_directory,	NULL },
   { "net",	  FH_PROCNET,	virt_directory,	NULL },
@@ -1125,6 +1127,13 @@ format_proc_self (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%d", getpid ());
+}
+
+static _off64_t
+format_proc_mounts (void *, char *&destbuf)
+{
+  destbuf = (char *) crealloc_abort (destbuf, sizeof ("self/mounts"));
+  return __small_sprintf (destbuf, "self/mounts");
 }
 
 #undef print

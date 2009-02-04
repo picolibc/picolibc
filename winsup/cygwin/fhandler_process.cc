@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -22,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygtls.h"
+#include "pwdgrp.h"
 #include "tls_pbuf.h"
 #include <sys/param.h>
 #include <ctype.h>
@@ -47,6 +49,7 @@ static _off64_t format_process_sid (void *, char *&);
 static _off64_t format_process_gid (void *, char *&);
 static _off64_t format_process_ctty (void *, char *&);
 static _off64_t format_process_fd (void *, char *&);
+static _off64_t format_process_mounts (void *, char *&);
 
 static const virt_tab_t process_tab[] =
 {
@@ -70,6 +73,7 @@ static const virt_tab_t process_tab[] =
   { "root",       FH_PROCESS,   virt_symlink,   format_process_root },
   { "exe",        FH_PROCESS,   virt_symlink,   format_process_exename },
   { "cwd",        FH_PROCESS,   virt_symlink,   format_process_cwd },
+  { "mounts",     FH_PROCESS,   virt_file,      format_process_mounts },
   { NULL,         0,            virt_none,      NULL }
 };
 
@@ -874,6 +878,68 @@ format_process_statm (void *data, char *&destbuf)
   destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld %ld",
 			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata, 0);
+}
+
+extern "C" {
+  FILE *setmntent (const char *, const char *);
+  struct mntent *getmntent (FILE *);
+};
+
+static _off64_t
+format_process_mounts (void *data, char *&destbuf)
+{
+  _pinfo *p = (_pinfo *) data;
+  user_info *u_shared = NULL;
+  HANDLE u_hdl = NULL;
+  _off64_t len = 0;
+  struct mntent *mnt;
+
+  if (p->pid != myself->pid)
+    {
+      WCHAR sid_string[UNLEN + 1] = L""; /* Large enough for SID */
+      shared_locations sl = SH_JUSTOPEN;
+
+      cygsid p_sid;
+
+      if (!p_sid.getfrompw (internal_getpwuid (p->uid)))
+      	return 0;
+      p_sid.string (sid_string);
+      u_shared = (user_info *) open_shared (sid_string, USER_VERSION, u_hdl,
+					    sizeof (user_info), sl,
+					    &sec_none_nih);
+      if (!u_shared)
+	return 0;
+    }
+  else
+    u_shared = user_shared;
+
+  /* Store old value of _my_tls.locals here. */
+  int iteration = _my_tls.locals.iteration;
+  unsigned available_drives = _my_tls.locals.available_drives;
+  /* This reinitializes the above values in _my_tls. */
+  setmntent (NULL, NULL);
+  while ((mnt = getmntent (NULL)))
+    {
+      destbuf = (char *) crealloc_abort (destbuf, len
+						  + strlen (mnt->mnt_fsname)
+						  + strlen (mnt->mnt_dir)
+						  + strlen (mnt->mnt_type)
+						  + strlen (mnt->mnt_opts)
+						  + 28);
+      len += __small_sprintf (destbuf + len, "%s %s %s %s %d %d\n",
+			      mnt->mnt_fsname, mnt->mnt_dir, mnt->mnt_type,
+			      mnt->mnt_opts, mnt->mnt_freq, mnt->mnt_passno);
+    }
+  /* Restore old value of _my_tls.locals here. */
+  _my_tls.locals.iteration = iteration;
+  _my_tls.locals.available_drives = available_drives;
+
+  if (u_hdl) /* Only not-NULL if open_shared has been called. */
+    {
+      UnmapViewOfFile (u_shared);
+      CloseHandle (u_hdl);
+    }
+  return len;
 }
 
 static int

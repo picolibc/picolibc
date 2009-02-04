@@ -1,5 +1,12 @@
 2009-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (proc_tab): Add entry for mounts symlink.
+	(format_proc_mounts): New function to implement mounts symlink.
+	* fhandler_process.cc (process_tab): Add entry for mounts file.
+	(format_process_mounts): New function to implement mounts file.
+
+2009-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (alloc_sd): Disable generating default permission entries
 	for directories.
 
