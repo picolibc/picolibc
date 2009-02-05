@@ -30,10 +30,10 @@ quadword_aligned:
   cmpq    $256, rdx
   jb      quadword_copy
 
-  movq    rax, -8  (rsp)
-  movq    r12, -16 (rsp)
-  movq    r13, -24 (rsp)
-  movq    r14, -32 (rsp)
+  pushq    rax
+  pushq    r12
+  pushq    r13
+  pushq    r14
 
   movq    rdx, rcx                /* Copy 128 bytes at a time with minimum cache polution */
   shrq    $7, rcx
@@ -89,10 +89,10 @@ loop:
   movq    rdx, rcx
   andq    $127, rcx
   rep     movsb
-  movq    -8  (rsp), rax
-  movq    -16 (rsp), r12
-  movq    -24 (rsp), r13
-  movq    -32 (rsp), r14
+  popq    r14
+  popq    r13
+  popq    r12
+  popq    rax
   ret
 
 
