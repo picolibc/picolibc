@@ -341,12 +341,13 @@ details. */
 	   putwc, putwchar, ungetwc.
       191: Export glob_pattern_p
       192: CW_SETERRNO added
+      193: Export wcstok.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 192
+#define CYGWIN_VERSION_API_MINOR 193
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
