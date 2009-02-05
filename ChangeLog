@@ -1,3 +1,24 @@
+2009-02-05  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.tpl (stage_last): Define $r and $s before using
+	$(RECURSE_FLAGS_TO_PASS).
+	* Makefile.in: Regenerate
+
+2009-01-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Add ARM license.
+
+2009-01-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* Makefile.def (configure-opcodes): Depend on configure-libiberty.
+	(all-opcodes): Depend on all-libiberty.
+	* Makefile.in: Regenerate.
+
+2009-01-15  Douglas B Rupp  <rupp@gnat.com>
+
+	* configure.ac (ia64*-*-*vms*): Add case with no gdb or ld support.
+	* configure: Regenerate.
+
 2008-12-18  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Backport link test fix from upstream Libtool:
@@ -28,13 +49,13 @@
 
 	2008-12-04  Jack Howarth  <howarth@bromo.med.uc.edu>
 
-        * configure.ac: Add double brackets on darwin[912].
-        * configure: Regenerate.
+	* configure.ac: Add double brackets on darwin[912].
+	* configure: Regenerate.
 
 	2008-12-02  Jack Howarth  <howarth@bromo.med.uc.edu>
 
-        * configure.ac: Expand to darwin10 and later.
-        * configure: Regenerate.
+	* configure.ac: Expand to darwin10 and later.
+	* configure: Regenerate.
 
 2008-12-02  Andreas Schwab  <schwab@suse.de>
 

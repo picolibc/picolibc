@@ -1,3 +1,11 @@
+2009-02-02  Doug Evans  <dje@google.com>
+
+	* tcl.m4 (SC_PATH_TCLCONFIG): Don't exit 0 if tclconfig fails.
+	(SC_PATH_TKCONFIG): Don't exit 0 if tkconfig fails.
+	(SC_LOAD_TCLCONFIG): Quote all uses of TCL_BIN_DIR, it may contain
+	"# no Tcl configs found".
+	(SC_LOAD_TKCONFIG): Similarily for TK_BIN_DIR.
+
 2008-11-21  Kai Tietz  <kai.tietz@onevision.com>
 
 	Fix PR/25502
