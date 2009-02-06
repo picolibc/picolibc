@@ -59,6 +59,11 @@
 /* The opcode for the fwait instruction, which disassembler treats as a
    prefix when it can.  */
 #define FWAIT_OPCODE 0x9b
+
+/* Instruction prefixes.
+   NOTE: For certain SSE* instructions, 0x66,0xf2,0xf3 are treated as
+   part of the opcode.  Other prefixes may still appear between them
+   and the 0x0f part of the opcode.  */
 #define ADDR_PREFIX_OPCODE 0x67
 #define DATA_PREFIX_OPCODE 0x66
 #define LOCK_PREFIX_OPCODE 0xf0
