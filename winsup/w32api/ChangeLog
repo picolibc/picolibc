@@ -1,3 +1,7 @@
+2009-02-06  Linton Miller  <Linton.Miller@trivininc.com>
+
+	* include/wtsapi32.h (WTS_CURRENT_SESSION): Fix definition.
+
 2009-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winbase.h (enum _DEP_SYSTEM_POLICY_TYPE): Fix version guard.

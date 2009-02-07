@@ -88,7 +88,7 @@ void WINAPI WTSFreeMemory(PVOID pMemory);
 
   // WTSWaitSystemEvent local server handle
 #define WTS_CURRENT_SERVER_HANDLE 0
-#define WTS_CURRENT_SESSION       0
+#define WTS_CURRENT_SESSION       ((DWORD)-1)
 
   // WTSWaitSystemEvent flags
 #define WTS_EVENT_NONE				0x00000000
