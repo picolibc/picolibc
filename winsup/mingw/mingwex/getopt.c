@@ -328,18 +328,18 @@ int getopt_parse( int mode, getopt_std_args, ... )
      * We will support it, by allowing the caller to adjust the value of
      * `optind' downwards, (nominally setting it to zero).  Since POSIX
      * wants `optind' to have an initial value of one, but we want all
-     * of our internal placeholders to be initialised to zero, when we
+     * of our internal place holders to be initialised to zero, when we
      * are called for the first time, we will handle such a reset by
-     * adjusting all of the internal placeholders to one less than the
-     * adjusted `optind' value, (but never to less than zero).
+     * adjusting all of the internal place holders to one less than
+     * the adjusted `optind' value, (but never to less than zero).
      */
     if( optreset )
     {
       /* User has explicitly requested reinitialisation...
        * We need to reset `optind' to it's normal initial value of 1,
        * to avoid a potential infinitely recursive loop; by doing this
-       * up front, we also ensure that the remaining placeholders will
-       * be correctly reinitialised to no less than zero.
+       * up front, we also ensure that the remaining place holders
+       * will be correctly reinitialised to no less than zero.
        */
       optind = 1;
 
@@ -348,10 +348,35 @@ int getopt_parse( int mode, getopt_std_args, ... )
       optreset = 0;
     }
 
-    /* Now, we may safely reinitialise the internal placeholders, to
+    /* Now, we may safely reinitialise the internal place holders, to
      * one less than `optind', without fear of making them negative.
      */
     optmark = optbase = argind = optind - 1;
+    nextchar = NULL;
+  }
+  
+  /* From a POSIX perspective, the following is `undefined behaviour';
+   * we implement it thus, for compatibility with GNU and BSD getopt.
+   */
+  else if( optind > (argind + 1) )
+  {
+    /* Some applications expect to be able to manipulate `optind',
+     * causing `getopt' to skip over one or more elements of `argv';
+     * POSIX doesn't require us to support this brain-damaged concept;
+     * (indeed, POSIX defines no particular behaviour, in the event of
+     *  such usage, so it must be considered a bug for an application
+     *  to rely on any particular outcome); nonetheless, Mac-OS-X and
+     * BSD actually provide *documented* support for this capability,
+     * so we ensure that our internal place holders keep track of
+     * external `optind' increments; (`argind' must lag by one).
+     */
+    argind = optind - 1;
+
+    /* When `optind' is misused, in this fashion, we also abandon any
+     * residual text in the argument we had been parsing; this is done
+     * without any further processing of such abandoned text, assuming
+     * that the caller is equipped to handle it appropriately.
+     */
     nextchar = NULL;
   }
 

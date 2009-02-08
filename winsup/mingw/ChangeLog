@@ -1,3 +1,11 @@
+2009-02-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	MinGW-Feature-Request [2222263]: Make getopt() GNU / BSD compatibile.
+	(Requested by Robert Riebisch)
+
+	* mingwex/getopt.c (getopt_parse): Track external increments of...
+	(optind): ...this global variable.
+
 2009-01-10 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.15.2.
