@@ -1,3 +1,8 @@
+2009-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winioctl.h (FSCTL_ALLOW_EXTENDED_DASD_IO): Copy definition
+	from ddk/ntifs.h.
+
 2009-02-06  Linton Miller  <Linton.Miller@trivininc.com>
 
 	* include/wtsapi32.h (WTS_CURRENT_SESSION): Fix definition.
