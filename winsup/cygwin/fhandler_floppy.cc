@@ -1,7 +1,8 @@
 /* fhandler_floppy.cc.  See fhandler.h for a description of the
    fhandler classes.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -205,12 +206,26 @@ fhandler_dev_floppy::open (int flags, mode_t)
      the typical tar and cpio buffer sizes, Except O_DIRECT is set, in which
      case we're not buffering at all. */
   devbufsiz = (flags & O_DIRECT) ? 0L : 61440L;
-  int ret =  fhandler_dev_raw::open (flags);
+  int ret = fhandler_dev_raw::open (flags);
 
-  if (ret && get_drive_info (NULL))
+  if (ret)
     {
-      close ();
-      return 0;
+      DWORD bytes_read;
+
+      if (get_drive_info (NULL))
+	{
+	  close ();
+	  return 0;
+	}
+      /* If we're trying to access a CD/DVD drive, or an entire disk,
+         make sure we're actually allowed to read *all* of the device.
+	 This is actually documented in the MSDN CreateFile man page. */
+      if (get_major () != DEV_FLOPPY_MAJOR
+	  && (get_major () == DEV_CDROM_MAJOR || get_minor () == 0)
+	  && !DeviceIoControl (get_handle (), FSCTL_ALLOW_EXTENDED_DASD_IO,
+			       NULL, 0, NULL, 0, &bytes_read, NULL))
+	debug_printf ("DeviceIoControl (FSCTL_ALLOW_EXTENDED_DASD_IO) "
+		      "failed, %E");
     }
 
   return ret;
@@ -298,7 +313,8 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	      if (!bytes_to_read)
 		break;
 
-	      debug_printf ("read %d bytes %s", bytes_to_read,
+	      debug_printf ("read %d bytes from pos %U %s", bytes_to_read,
+			    current_position,
 			    len < devbufsiz ? "into buffer" : "directly");
 	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
 		{
@@ -344,6 +360,8 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
       bytes_to_read = len;
       if (current_position + bytes_to_read >= drive_size)
 	bytes_to_read = drive_size - current_position;
+      debug_printf ("read %d bytes from pos %U directly", bytes_to_read,
+		    current_position);
       if (bytes_to_read && !read_file (p, bytes_to_read, &bytes_read, &ret))
 	{
 	  if (!IS_EOM (ret))

@@ -1,3 +1,13 @@
+2009-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Fix format.  Add
+	code to allow to read disk and CD/DVD devices in full length.  Explain
+	why.
+	(fhandler_dev_floppy::raw_read): Add current position to debug output.
+
+	* include/sys/sched.h: New stub file to override newlib file with
+	clashing definitions.
+
 2009-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export wcstok.
