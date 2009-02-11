@@ -1,5 +1,10 @@
 2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-programming.xml: Revamp (mostely) for Cygwin 1.7.
+	* faq-what.xml: Ditto.
+
+2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (FAQ_SOURCES): Define FAQ sources.
 	(faq/faq.html): Depend on FAQ sources.
 	(faq/faq-nochunks.html): Ditto.

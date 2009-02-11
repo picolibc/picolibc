@@ -5,19 +5,20 @@
 
 <para>The Cygwin tools are ports of the popular GNU development tools for
 Microsoft Windows.  They run thanks to the Cygwin library which
-provides the UNIX system calls and environment these programs expect.
+provides the POSIX system calls and environment these programs expect.
 </para>
-<para>With these tools installed, it is possible to write Win32 console or
-GUI applications that make use of the standard Microsoft Win32 API
-and/or the Cygwin API.  As a result, it is possible to easily
-port many significant Unix programs without the need
+<para>With these tools installed, it is possible to write Windows console
+or GUI applications that make use of significant parts of the POSIX API.
+As a result, it is possible to easily port many Unix programs without the need
 for extensive changes to the source code.  This includes configuring
 and building most of the available GNU software (including the packages
-included with the Cygwin development tools themselves).  Even if
+included with the Cygwin development tools themselves) as well as lots
+of BSD tools and packages (including OpenSSH).  Even if
 the development tools are of little to no use to you, you may have
-interest in the many standard Unix utilities provided with the package.
-They can be used both from the bash shell (provided) or from the
-standard Windows command shell.
+interest in the many standard POSIX utilities provided with the package.
+They can be used from one of the provided Unix shells like bash, tcsh or zsh,
+as well as from the standard Windows command shell if you have to for some
+sad reason.
 </para>
 </answer></qandaentry>
 
@@ -26,8 +27,10 @@ standard Windows command shell.
 <answer>
 
 <para>Cygwin can be expected to run on all modern 32 bit versions of
-Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP/2003
-and the WOW64 32 bit environment on released 64 bit versions of Windows.
+Windows, except Windows CE and Windows 95/98/Me.  This includes, as of the
+time of writing this, Windows NT4, Windows 2000, Windows XP, Windows Server
+2003, Windows Vista, Windows Server 2008, as well as the WOW64 32 bit
+environment on released 64 bit versions of Windows (XP/2003/Vista/2008).
 As far as we know no one is working on a native 64 bit version of Cygwin.
 Since Cygwin is a community-supported free software project, patches to
 provide support for other versions would be thoughtfully considered.
@@ -51,7 +54,9 @@ for download and setup, a current list of mirror sites, a User's
 Guide, an API Reference, mailing lists and archives, and additional
 ported software.
 </para>
-<para>You can find documentation for the individual GNU tools at
+<para>You can find documentation for the individual GNU tools typically
+as man pages or info pages as part of the Cygwin net distribution.
+Additionally you can get the latest docs at
 <ulink url="http://www.gnu.org/manual/" />.  (You should read GNU manuals from a
 local mirror.  Check <ulink url="http://www.gnu.org/server/list-mirrors.html" />
 for a list of them.)
@@ -64,16 +69,17 @@ for a list of them.)
 
 <para>Yes.  Parts are GNU software (gcc, gas, ld, etc...), parts are covered
 by the standard X11 license, some of it is public domain, some of
-it was written by Cygnus and placed under the GPL.  None of it is
-shareware.  You don't have to pay anyone to use it but you should be
-sure to read the copyright section of the FAQ for more information on
-how the GNU General Public License may affect your use of these tools.
+it was written by Red Hat (or the former Cygnus Solutions) and placed under
+the GPL.  None of it is shareware.  You don't have to pay anyone to use it
+but you should be sure to read the copyright section of the FAQ for more
+information on how the GNU General Public License may affect your use of
+these tools.
 </para>
 <para>In particular, if you intend to port a proprietary (non-GPL'd)
 application using Cygwin, you will need the proprietary-use license 
-for the Cygwin library.  This is available for purchase; please visit
-<ulink url="http://cygwin.com/license.html" /> for more information.
-All other questions should be sent to the project
+for the Cygwin library.  This is available for purchase from Red Hat;
+please visit <ulink url="http://cygwin.com/license.html" /> for more
+information.  All other questions should be sent to the public project
 mailing list cygwin@cygwin.com.
 </para>
 <para>Note that when we say "free" we mean freedom, not price.  The goal of
@@ -111,39 +117,30 @@ in the Cygwin User's Guide.
 <question><para>Who's behind the project?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note that if you have cygwin-specific questions, all of these people will appreciate it if you use the cygwin mailing lists rather than sending personal email.)</emphasis>
+<para><emphasis role='bold'>(Please note that if you have cygwin-specific
+questions, all of these people will appreciate it if you use the cygwin
+mailing lists rather than sending personal email.)</emphasis>
 </para>
-<para>Chris Faylor provided the Cygwin signal handler code.  He also maintains
-the <ulink url='http://sourceware.org'>sourceware site</ulink> where the
-cygwin project lives.</para>
-<para>Corinna Vinschen has contributed several useful fixes to the path
-handling code, console support, improved security handling, and raw
-device support.  Corinna is currently employed by Red Hat as a
-GDB/Cygwin engineer.
+<para>
+Christopher Faylor (cgf) is one of the project leads. Chris works for
+Netapp but all of his Cygwin activities occur on his own time. He is
+most notably responsible for the support of signal handling and
+fork/exec in Cygwin. He also administer's the site which hosts the
+cygwin web site and release.
 </para>
-<para>Steve Chamberlain designed and implemented
-Cygwin in 1995-1996 while working for Cygnus.  He worked with the Net
-to improve the technology, ported/integrated many of the user tools
-for the first time to Cygwin, and produced all of the releases up to
-beta 14.  Steve is not currently employed by Red Hat.
+<para>
+Corinna Vinschen (corinna) is the other project lead. Corinna is a
+senior Red Hat engineer. Corinna is responsible for such important
+subsystems as security and networking and has recently added support to
+Cygwin for wide characters, increased path length, IPv6, advisory
+file locking and more.
 </para>
-<para>Sergey Okhapkin has been an invaluable Net contributor.  He implemented
-the tty/pty support, has played a significant role in revamping signal
-and exception handling, and has made countless contributions throughout
-the library.  He also provided binaries of the development snapshots to
-the Net after the beta 19 release.
+<para>
+Yaakov Selkowitz is the Cygwin/X coordinator. Jon Turney serves on the
+Cygwin/X team as a developer.
 </para>
-<para>Philippe Giacinti contributed the implementation of dlopen, dlclose,
-dlsym, dlfork, and dlerror in Cygwin.
-</para>
-<para>Ian Lance Taylor did a much-needed rework of the path handling code for
-beta 18, and has made many assorted fixes throughout the code.  Jeremy
-Allison made significant contributions in the area of file handling and
-process control, and rewrote select from scratch.  Doug Evans rewrote
-the path-handling code in beta 16, among other things.  Kim Knuttila and
-Michael Meissner put in many long hours working on the now-defunct
-PowerPC port.  Jason Molenda and Mark Eichin have also made important
-contributions.
+<para>
+The Cygwin setup project is currently maintained by a group of people, most notably, Brian Dessent (brian) and Dave Korn (dave.korn).
 </para>
 <para>Please note that all of us working on Cygwin try to
 be as responsive as possible and deal with patches and questions as we
