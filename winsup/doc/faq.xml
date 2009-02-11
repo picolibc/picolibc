@@ -12,7 +12,6 @@
       <!ENTITY FAQ-USING SYSTEM "faq-using.xml">
       <!ENTITY FAQ-API SYSTEM "faq-api.xml">
       <!ENTITY FAQ-PROGRAMMING SYSTEM "faq-programming.xml">
-      <!ENTITY FAQ-PROBLEMS SYSTEM "faq-problems.xml">
 ]>
 
 <article id="faq-nochunks" lang="en">
@@ -53,14 +52,8 @@
 &FAQ-PROGRAMMING;
 </qandadiv>
 
-<qandadiv id="faq.known-problems">
-<title>Known Problems in the Latest Net Release</title>
-&FAQ-PROBLEMS;
-</qandadiv>
-
 <qandadiv id="faq.copyright">
 <title>Copyright</title>
-
 
 <qandaentry id="faq.what.copyright">
 <question><para>What are the copyrights?</para></question>

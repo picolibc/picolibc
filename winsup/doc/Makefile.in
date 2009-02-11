@@ -25,6 +25,9 @@ TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool.exe *.junk \
 	 cygwin-api.sgml cygwin-api cygwin-api-int.sgml cygwin-api-int \
 	 faq
 
+FAQ_SOURCES:= faq-api.xml faq-programming.xml faq-resources.xml \
+	      faq-sections.xml faq-setup.xml faq-using.xml faq-what.xml faq.xml
+
 .SUFFIXES:
 
 all : \
@@ -64,11 +67,11 @@ cygwin-api/cygwin-api.pdf : cygwin-api.sgml
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
-faq/faq.html :
+faq/faq.html : $(FAQ_SOURCES)
 	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.*.html
 
-faq/faq-nochunks.html :
+faq/faq-nochunks.html : $(FAQ_SOURCES)
 	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq-nochunks.html
 

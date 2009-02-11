@@ -3,21 +3,19 @@
 <question><para>How does everything work?</para></question>
 <answer>
 
-<para>There's a C library which provides a Unix-style API.  The
+<para>There's a C library which provides a POSIX-style API.  The
 applications are linked with it and voila - they run on Windows.
 </para>
 <para>The aim is to add all the goop necessary to make your apps run on
-Windows into the C library.  Then your apps should run on Unix and
-Windows with no changes at the source level.
+Windows into the C library.  Then your apps should (ideally) run on POSIX
+systems (Unix/Linux) and Windows with no changes at the source level.
 </para>
 <para>The C library is in a DLL, which makes basic applications quite small.
-And it allows relatively easy upgrades to the Win32/Unix translation
+And it allows relatively easy upgrades to the Win32/POSIX translation
 layer, providing that DLL changes stay backward-compatible.
 </para>
-<para>For a good overview of Cygwin, you may want to read the paper on Cygwin
-published by the Usenix Association in conjunction with the 2d Usenix NT
-Symposium in August 1998.  It is available in HTML format on the project
-WWW site.
+<para>For a good overview of Cygwin, you may want to read the Cygwin
+User's Guide.
 </para>
 </answer></qandaentry>
 
@@ -41,50 +39,74 @@ release.  The snapshots are available from
 
 <para>Let's start with some background.
 </para>
-<para>In UNIX, a file is a file and what the file contains is whatever the
-program/programmer/user told it to put into it.  In Windows, a file is
-also a file and what the file contains depends not only on the
+<para>On POSIX systems, a file is a file and what the file contains is
+whatever the program/programmer/user told it to put into it.  In Windows,
+a file is also a file and what the file contains depends not only on the
 program/programmer/user but also the file processing mode.
 </para>
 <para>When processing in text mode, certain values of data are treated
-specially.  A \n (new line) written to the file will prepend a \r
-(carriage return) so that if you `printf("Hello\n") you in fact get
+specially.  A \n (new line, NL) written to the file will prepend a \r
+(carriage return, CR) so that if you `printf("Hello\n") you in fact get
 "Hello\r\n".  Upon reading this combination, the \r is removed and the
 number of bytes returned by the read is 1 less than was actually read.
 This tends to confuse programs dependent on ftell() and fseek().  A
 Ctrl-Z encountered while reading a file sets the End Of File flags even
 though it truly isn't the end of file.
 </para>
-<para>One of Cygwin's goals is to make it possible to easily mix Cygwin-ported
-Unix programs with generic Windows programs.  As a result, Cygwin opens
-files in text mode as is normal under Windows.  In the accompanying
-tools, tools that deal with binaries (e.g. objdump) operate in Unix
-binary mode and tools that deal with text files (e.g. bash) operate in
-text mode.
+<para>One of Cygwin's goals is to make it possible to mix Cygwin-ported
+POSIX programs with generic Windows programs.  As a result, Cygwin allows
+to open files in text mode.  In the accompanying tools, tools that deal
+with binaries (e.g. objdump) operate in POSIX binary mode and many (but
+not all) tools that deal with text files (e.g. bash) operate in text mode.
+There are also some text tools which operate in a mixed mode.  They read
+files always in text mode, but write files in binary mode, or they write
+in the mode (text or binary) which is specified by the underlying mount
+point.  For a description of mount points, see the Cygwin User's Guide.
 </para>
-<para>Some people push the notion of globally setting the default processing
-mode to binary via mount point options or by setting the CYGWIN
-environment variable.  But that creates a different problem.  In
-binary mode, the program receives all of the data in the file, including
-a \r.  Since the programs will no longer deal with these properly for
-you, you would have to remove the \r from the relevant text files,
-especially scripts and startup resource files.  This is a porter "cop
-out", forcing the user to deal with the \r for the porter.
+<para>Actually there's no really good reason to do text mode processing
+since it only slows down reading and writing files.  Additionally many
+Windows applications can deal with POSIX \n line endings just fine
+(unfortunate exception: Notepad).  So we suggest to use binary mode
+as much as possible and only convert files from or to DOS text mode
+using tools specifically created to do that job, for instance, d2u and
+u2d from the util-linux package.
 </para>
-<para>It is rather easy for the porter to fix the source code by supplying the
-appropriate file processing mode switches to the open/fopen functions.
-Treat all text files as text and treat all binary files as binary.  To be
-specific, you can select binary mode by adding <literal>O_BINARY</literal> to
-the second argument of an <literal>open</literal> call, or
-<literal>"b"</literal> to second argument of an <literal>fopen</literal> call.
-You can also call <literal>setmode (fd, O_BINARY)</literal>.
+<para>It is rather easy for the porter of a Unix package to fix the source
+code by supplying the appropriate file processing mode switches to the
+open/fopen functions.  Treat all text files as text and treat all binary
+files as binary.  To be specific, you can select binary mode by adding
+<literal>O_BINARY</literal> to the second argument of an
+<literal>open</literal> call, or <literal>"b"</literal> to second argument
+of an <literal>fopen</literal> call.  You can also call
+<literal>setmode (fd, O_BINARY)</literal>.  To select text mode add
+<literal>O_TEXT</literal> to the second argument of an <literal>open</literal>
+call, or <literal>"t"</literal> to second argument of an
+<literal>fopen</literal> call, or just call
+<literal>setmode (fd, O_TEXT)</literal>.
 </para>
-<para>Note that because the open/fopen switches are defined by ANSI, they
-exist under most flavors of Unix; open/fopen will just ignore the switch
-since they have no meaning to UNIX.
+<para>You can also avoid to change the source code at all by linking
+an additional object file to your executable.  Cygwin provides various
+object files in the <filename>/usr/lib</filename> directory which,
+when linked to an executable, changes the default open modes of any
+file opened within the executed process itself.  The files are
+<screen>
+  binmode.o      - Open all files in binary mode.
+  textmode.o     - Open all files in text mode.
+  textreadmode.o - Open all files opened for reading in text mode.
+  automode.o     - Open all files opened for reading in text mode,
+                   all files opened for writing in binary mode.
+</screen>
 </para>
-<para>Explanation adapted from mailing list email by Earnie Boyd
-&lt;earnie_boyd (at) yahoo.com&gt;.
+<para>
+<note>
+  Linking against these object files does <emphasis>not</emphasis> change
+  the open mode of files propagated to a process by its parent process,
+  for instance, if the process is part of a shell pipe expression.
+</note>
+</para>
+<para>Note that of the above flags only the "b" fopen flags are defined by
+ANSI.  They exist under most flavors of Unix.  However, using O_BINARY,
+O_TEXT, or the "t" flag is non-portable.
 </para>
 </answer></qandaentry>
 
@@ -96,22 +118,6 @@ since they have no meaning to UNIX.
 </para>
 <para>There is also extensive support for 'POSIX threads', see the file
 <literal>cygwin.din</literal> for the list of POSIX thread functions provided.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.api.winnt">
-<question><para>Why is some functionality only supported in Windows NT?</para></question>
-<answer>
-
-<para>Windows 9x: n.
-32 bit extensions and a graphical shell for a 16 bit patch to an
-8 bit operating system originally coded for a 4 bit microprocessor,
-written by a 2 bit company that can't stand 1 bit of competition.
-</para>
-<para>But seriously, Windows 9x lacks most of the security-related calls and
-has several other deficiencies with respect to its version of the Win32
-API.  See the calls.texinfo document for more information as to what
-is not supported in Win 9x.
 </para>
 </answer></qandaentry>
 
@@ -164,19 +170,18 @@ expect.
 
 <para>Cygwin knows of two ways to create symlinks.
 </para>
-<para>The old method is the only valid one up to but not including version 1.3.0.
-If it's enabled (from 1.3.0 on by setting `nowinsymlinks' in the environment
-variable CYGWIN) Cygwin generates link files with a magic header.  When you
+<para>The default method generates link files with a magic header.  When you
 open a file or directory that is a link to somewhere else, it opens the file
 or directory listed in the magic header.  Because we don't want to have to
 open every referenced file to check symlink status, Cygwin marks symlinks
 with the system attribute.  Files without the system attribute are not
 checked.  Because remote samba filesystems do not enable the system
 attribute by default, symlinks do not work on network drives unless you
-explicitly enable this attribute.
+explicitly enable this attribute or use the second method to create
+symlinks.
 </para>
-<para>The new method which is introduced with Cygwin version 1.3.0 is enabled
-by default or if `winsymlinks' is set in the environment variable CYGWIN.
+<para>The second method is enabled if `winsymlinks' is set in the environment
+variable CYGWIN.
 Using this method, Cygwin generates symlinks by creating Windows shortcuts.
 Cygwin created shortcuts have a special header (which is in that way never
 created by Explorer) and the R/O attribute set.  A DOS path is stored in
@@ -189,7 +194,7 @@ and it will only use the DOS path then.  While Cygwin shortcuts are shown
 without the ".lnk" suffix in `ls' output, non-Cygwin shortcuts are shown
 with the suffix.  However, both are treated as symlinks.
 </para>
-<para>Both, the old and the new symlinks can live peacefully together since Cygwin
+<para>Both, types of symlinks can live peacefully together since Cygwin
 treats both as symlinks regardless of the setting of `(no)winsymlinks' in
 the environment variable CYGWIN.
 </para>
@@ -199,11 +204,15 @@ the environment variable CYGWIN.
 <question><para>Why do some files, which are not executables have the 'x' type.</para></question>
 <answer>
 
-<para>When working out the Unix-style attribute bits on a file, the library
-has to fill out some information not provided by the WIN32 API.  
+<para>When working out the POSIX-style attribute bits on a file stored on
+certain filesystems (FAT, FAT32), the library has to fill out some information
+not provided by these filesystems.
 </para>
 <para>It guesses that files ending in .exe and .bat are executable, as are
-ones which have a "#!" as their first characters.
+ones which have a "#!" as their first characters.  This guessing doesn't
+take place on filesystems providing real permission information (NTFS, NFS),
+unless you switch the permission handling off using the mount flag "noacl"
+on these filesystems.
 </para>
 </answer></qandaentry>
 
@@ -224,52 +233,22 @@ service type of attacks.
 <question><para>How do the net-related functions work?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
-</para>
-<para>The network support in Cygwin is supposed to provide the Unix API, not
+<para>The network support in Cygwin is supposed to provide the POSIX API, not
 the Winsock API.
 </para>
 <para>There are differences between the semantics of functions with the same
 name under the API.
 </para>
-<para>E.g., the select system call on Unix can wait on a standard file handles
+<para>E.g., the POSIX select system call can wait on a standard file handles
 and handles to sockets.  The select call in Winsock can only wait on
-sockets.  Because of this, cygwin.dll does a lot of nasty stuff behind
-the scenes, trying to persuade various Winsock/win32 functions to do what
+sockets.  Because of this, the Cygwin dll does a lot of nasty stuff behind
+the scenes, trying to persuade various Winsock/Win32 functions to do what
 a Unix select would do.
 </para>
 <para>If you are porting an application which already uses Winsock, then
-using the net support in Cygwin is wrong.
-</para>
-<para>But you can still use native Winsock, and use Cygwin.  The functions
-which cygwin.dll exports are called 'cygwin_&lt;name&gt;'.  There
-are a load of defines which map the standard Unix names to the names
-exported by the DLL-- check out include/netdb.h:
-</para>
-<screen>
-..etc..
-void		cygwin_setprotoent (int);
-void		cygwin_setservent (int);
-void		cygwin_setrpcent (int);
-..etc..
-#ifndef __INSIDE_CYGWIN_NET__
-#define endprotoent cygwin_endprotoent 
-#define endservent cygwin_endservent 
-#define endrpcent  cygwin_endrpcent  
-..etc..
-</screen>
-
-<para>The idea is that you'll get the Unix-&gt;Cygwin mapping if you include
-the standard Unix header files.  If you use this, you won't need to
-link with libwinsock.a - all the net stuff is inside the DLL.
-</para>
-<para>The mywinsock.h file is a standard winsock.h which has been hacked to
-remove the bits which conflict with the standard Unix API, or are
-defined in other headers.  E.g., in mywinsock.h, the definition of
-struct hostent is removed.  This is because on a Unix box, it lives in
-netdb.  It isn't a good idea to use it in your applications.
-</para>
-<para>As of the b19 release, this information may be slightly out of date.
+porting the application to Cygwin means to port the application to using
+the POSIX net functions.  You should never mix Cygwin net functions with
+direct calls to Winsock functions.  If you use Cygwin, use the POSIX API.
 </para>
 </answer></qandaentry>
 
@@ -277,17 +256,8 @@ netdb.  It isn't a good idea to use it in your applications.
 <question><para>I don't want Unix sockets, how do I use normal Win32 winsock?</para></question>
 <answer>
 
-<para>To use the vanilla Win32 winsock, you just need to #define __USE_W32_WINSOCK
-and #include "windows.h" (or "winsock2.h" at the top of your source file(s).  You may
-find it easier to add "-D__USE_W32_WINSOCK" to the CFLAGS settings in your makefile,
-if you are using one, as this will then apply to all your source files.  It is also
-worth using "#define WIN32_LEAN_AND_MEAN" before you include the windows header file,
-as this will prevent it from pulling in lots of header files for all sorts of unrelated
-windows APIs when all you want is the Winsock definitions; again, this could be set
-for the entire project in your CFLAGS.
-</para><para>
-You'll also need to add -lwsock32 to the compiler's command line (or the makefile's
-list of link libs) so that you link against libwsock32.a.
+<para>You don't.  Look for the MingW project to port applications using
+native Win32/Winsock functions.
 </para>
 </answer></qandaentry>
 
@@ -300,18 +270,18 @@ shared library.  First of all, since October 1998 every Cygwin DLL has
 been named <literal>cygwin1.dll</literal> and has a 1 in the release name.
 Additionally, there are DLL major and minor numbers that correspond to
 the name of the release, and a release number. In other words,
-cygwin-1.5.10-2 is <literal>cygwin1.dll</literal>, major version 5, minor version
-10, release 2.
+cygwin-1.7.1-2 is <literal>cygwin1.dll</literal>, major version 7, minor
+version 1, release 2.
 </para>
-<para>The <literal>cygwin1.dll</literal> major version number gets incremented only when a
-change is made that makes existing software incompatible. For example,
-the first major version 5 release, cygwin-1.5.0-1, added 64-bit file I/O
-operations, which required many libraries to be recompiled and relinked.
-The minor version changes every time we make a new backward compatible
-Cygwin release available.  There is also a <literal>cygwin1.dll</literal> release
-version number.  The release number is only incremented if we update an
-existing release in a way that does not effect the DLL (like a missing
-header file).
+<para>The <literal>cygwin1.dll</literal> major version number gets incremented
+only when a change is made that makes existing software incompatible. For
+example, the first major version 5 release, cygwin-1.5.0-1, added 64-bit
+file I/O operations, which required many libraries to be recompiled and
+relinked.  The minor version changes every time we make a new backward
+compatible Cygwin release available.  There is also a
+<literal>cygwin1.dll</literal> release version number.  The release number
+is only incremented if we update an existing release in a way that does not
+effect the DLL (like a missing header file).
 </para>
 <para>There are also Cygwin API major and minor numbers.  The major number
 tracks important non-backward-compatible interface changes to the API.
@@ -322,22 +292,19 @@ newly compiled ones.
 </para>
 <para>Then there is a shared memory region compatibility version number.  It is
 incremented when incompatible changes are made to the shared memory
-region or to any named shared mutexes, semaphores, etc.  Finally there
-is a mount point registry version number which keeps track
-of non-backwards-compatible changes to the registry mount table layout.
-This has been <literal>mounts v2</literal> for a long time. For more exciting Cygwin
-version number details, check out the <literal>/usr/include/cygwin/version.h</literal>
-file.
+region or to any named shared mutexes, semaphores, etc.  For more exciting
+Cygwin version number details, check out the
+<literal>/usr/include/cygwin/version.h</literal> file.
 </para>
 </answer></qandaentry>
 
 <qandaentry id="faq.api.timezone">
-<question><para>Why isn't _timezone set correctly?</para></question>
+<question><para>Why isn't timezone set correctly?</para></question>
 <answer>
 
 <para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
 </para>
-<para>Did you explicitly call tzset() before checking the value of _timezone?
+<para>Did you explicitly call tzset() before checking the value of timezone?
 If not, you must do so.
 </para>
 </answer></qandaentry>
@@ -346,8 +313,9 @@ If not, you must do so.
 <question><para>Is there a mouse interface?</para></question>
 <answer>
 
-<para>There is no way to capture mouse events from Cygwin.  There are
-currently no plans to add support for this.
+<para>If you're using X then use the X API to handle mouse events.
+In a Windows console window you can enable and capture mouse events
+using the xterm escape sequences for mouse events.
 </para>
 </answer></qandaentry>
 

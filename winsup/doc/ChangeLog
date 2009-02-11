@@ -1,3 +1,13 @@
+2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (FAQ_SOURCES): Define FAQ sources.
+	(faq/faq.html): Depend on FAQ sources.
+	(faq/faq-nochunks.html): Ditto.
+	* faq-api.xml: Revamp for Cygwin 1.7.
+	* faq-problems.xml: Remove.
+	* faq-sections.xml: Accommodate removal of faq-problems.xml.
+	* faq.xml: Ditto.
+
 2009-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml: Rephrase the "Case sensitive filenames" chapter

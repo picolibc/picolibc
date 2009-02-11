@@ -12,7 +12,6 @@
       <!ENTITY FAQ-USING SYSTEM "faq-using.xml">
       <!ENTITY FAQ-API SYSTEM "faq-api.xml">
       <!ENTITY FAQ-PROGRAMMING SYSTEM "faq-programming.xml">
-      <!ENTITY FAQ-PROBLEMS SYSTEM "faq-problems.xml">
 ]>
 
 <article id="faq" lang="en">
@@ -54,12 +53,6 @@
 <title>Programming Questions</title>
 <qandaset><?dbhtml toc="1"?>
 &FAQ-PROGRAMMING;
-</qandaset></sect1>
-
-<sect1  id="faq.known-problems">
-<title>Known Problems in the Latest Net Release</title>
-<qandaset><?dbhtml toc="1"?>
-&FAQ-PROBLEMS;
 </qandaset></sect1>
 
 <sect1  id="faq.copyright">
