@@ -1,3 +1,9 @@
+2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (open): Handle O_DIRECTORY flag.
+	* include/fcntl.h: Add SUSv4 flags O_DIRECTORY, O_EXEC and O_SEARCH.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::open): Fix format.  Add

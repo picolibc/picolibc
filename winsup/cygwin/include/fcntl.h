@@ -1,6 +1,6 @@
 /* fcntl.h
 
-   Copyright 1996, 1998, 2001, 2005, 2006 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2005, 2006, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,11 +17,16 @@ details. */
 /* sys/fcntl defines values up to 0x40000 (O_NOINHERIT). */
 #define _FDIRECT	0x80000
 #define _FNOFOLLOW	0x100000
+#define _FDIRECTORY	0x200000
+#define _FEXECSRCH	0x400000
 
 #define O_DIRECT	_FDIRECT
 #define O_NOFOLLOW	_FNOFOLLOW
 #define O_DSYNC		_FSYNC
 #define O_RSYNC		_FSYNC
+#define O_DIRECTORY	_FDIRECTORY
+#define O_EXEC		_FEXECSRCH
+#define O_SEARCH	_FEXECSRCH
 
 #define POSIX_FADV_NORMAL	0
 #define POSIX_FADV_SEQUENTIAL	1

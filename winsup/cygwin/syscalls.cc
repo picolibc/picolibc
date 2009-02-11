@@ -969,6 +969,12 @@ open (const char *unix_path, int flags, ...)
 	      res = -1;
 	      set_errno (ELOOP);
 	    }
+	  else if ((flags & O_DIRECTORY) && !fh->pc.isdir ())
+	    {
+	      delete fh;
+	      res = -1;
+	      set_errno (ENOTDIR);
+	    }
 	  else if (((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) && fh->exists ())
 	    {
 	      delete fh;
