@@ -51,6 +51,7 @@ GENERAL_SOURCES = \
 	strtod.c	\
 	strtol.c	\
 	strtoul.c	\
+	wcstod.c	\
 	wcstol.c	\
 	wcstoul.c	\
 	wcstombs.c	\
@@ -238,12 +239,12 @@ CHEWOUT_FILES= \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
+	wcstod.def 	\
 	wcstol.def 	\
 	wcstoll.def 	\
 	wcstoul.def 	\
 	wcstoull.def 	\
 	system.def	\
-	wcstol.def 	\
 	wcstombs.def	\
 	wctomb.def	
 

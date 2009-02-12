@@ -1,3 +1,15 @@
+2009-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h (_wcstod_r): Declare.
+	(_wcstof_r): Declare.
+	(wcstod): Declare.
+	(wcstof): Declare.
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add wcstod.c.
+	(CHEWOUT_FILES): Add wcstod.def.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/stdlib.tex: Add wcstod.
+	* libc/stdlib/wcstod.c: New file.
+
 2009-02-05  Neal H. Walfield  <neal@gnu.org>
 
 	* libc/machine/x86_64/memcpy.S (memcpy): Don't use the red zone.
