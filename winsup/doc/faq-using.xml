@@ -800,10 +800,8 @@ interfere with the normal functioning of Cygwin.
 <question><para>Is there a Cygwin port of GNU Emacs?</para></question>
 <answer>
 
-<para>Yes!  It uses the X11 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>) Windows
-interface.  From a remote login shell, this ``emacs -nw'' works fine.
-There is also a non-X11 version which just provides the text-only
-terminal interface.  Use Cygwin Setup to install either one (or both).
+<para>Yes.  It uses the X11 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>) GUI.  Right now the package is old and outdated.
+Consider using XEmacs for now.
 </para>
 </answer></qandaentry>
 
@@ -811,10 +809,10 @@ terminal interface.  Use Cygwin Setup to install either one (or both).
 <question><para>What about NT Emacs?</para></question>
 <answer>
 
-<para>If you want GNU Emacs with a native Microsoft Windows interface, but
-without X, then you must use the native Windows port, commonly known
-as ``NT Emacs''.  You get NT Emacs from any GNU mirror.  It is not
-available from Cygwin Setup.
+<para>If you want GNU Emacs with a native Microsoft GUI interface, then
+you can either use XEmacs (see below), or you can fetch a native NT Emacs
+from <ulink url="http://ftp.gnu.org/pub/gnu/emacs/windows/">http://ftp.gnu.org/pub/gnu/emacs/windows/</ulink>.  See also the README file you get from the
+same place.
 </para>
 <para>NT Emacs uses the Windows command shell by default.  Since it is not a
 Cygwin application, it has no knowledge of Cygwin mounts.  With those
@@ -849,7 +847,7 @@ settings are for Emacs 21.1:
 cygwin-mount.el from <ulink url="http://www.emacswiki.org/elisp/index.html">http://www.emacswiki.org/elisp/index.html</ulink>.
 </para>
 <para>Note that all of this ``just works'' if you use the Cygwin port of
-Emacs from Cygwin Setup.
+Emacs or XEmacs from Cygwin Setup.
 </para>
 </answer></qandaentry>
 
