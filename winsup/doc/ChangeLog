@@ -1,3 +1,8 @@
+2009-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-setup.xml: Revamp for Cygwin 1.7.
+	* faq-using.xml: Ditto.
+
 2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-programming.xml: Revamp (mostely) for Cygwin 1.7.

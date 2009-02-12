@@ -238,7 +238,7 @@ ought to check whether you <emphasis>really</emphasis> want to install everythin
 <answer>
 
 <para>That depends, obviously, on what you've chosen to download and
-install.  A full installation today is probably larger than 800MB
+install.  A full installation today is probably larger than 1 GB
 installed, not including the package archives themselves nor the source
 code.
 </para>
@@ -413,9 +413,8 @@ installed are <literal>sshd</literal>, <literal>cron</literal>,
 </para>
 </listitem>
 <listitem><para>Stop the X11 server if it is running, and terminate any Cygwin programs 
-that might be running in the background.  Remove all mount information by typing 
-<literal>umount -A</literal> and then exit the command prompt and ensure that no Cygwin 
-processes remain.  Note: If you want to save your mount points for a later 
+that might be running in the background.  Exit the command prompt and ensure
+that no Cygwin processes remain.  Note: If you want to save your mount points for a later 
 reinstall, first save the output of <literal>mount -m</literal> as described at 
 <ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount" />.
 </para>
@@ -453,10 +452,10 @@ remove it.
 </para>
 </listitem>
 <listitem><para>Finally, if you want to be thorough you can delete the registry tree 
-<literal>Software\Cygnus Solutions</literal> under <literal>HKEY_LOCAL_MACHINE</literal> and/or 
+<literal>Software\Cygwin</literal> under <literal>HKEY_LOCAL_MACHINE</literal> and/or 
 <literal>HKEY_CURRENT_USER</literal>.  However, if you followed the directions above you 
-will have already removed all the mount information which is typically the only 
-thing stored in the registry.
+will have already removed everything important.  Typically only the installation
+directory has been stored in the registry at all.
 </para>
 </listitem>
 </orderedlist>
@@ -540,10 +539,13 @@ the Cygwin Setup homepage at
 
 <para>While some users have successfully done this, for example Indiana
 University's XLiveCD <ulink url="http://xlivecd.indiana.edu/">http://xlivecd.indiana.edu/</ulink>, there is no
-easy way to do it. Full instructions for constructing a porttable Cygwin
+easy way to do it. Full instructions for constructing a portable Cygwin
 on CD by hand can be found on the mailing list at
-<ulink url="http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html">http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html</ulink>.  (Thanks
-to fergus at bonhard dot uklinux dot net for these instructions.)
+<ulink url="http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html">http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html</ulink>
+(Thanks to fergus at bonhard dot uklinux dot net for these instructions.)
+Please note that these instructions are rather old and are referring to the
+somewhat different setup of a Cygwin 1.5.x release.  As soon as somebody set
+this up for Cygwin 1.7, we might add this information here.
 </para>
 </answer></qandaentry>
 
@@ -551,15 +553,8 @@ to fergus at bonhard dot uklinux dot net for these instructions.)
 <question><para>How do I save, restore, delete, or modify the Cygwin information stored in the registry?</para></question>
 <answer>
 
-<para>Currently Cygwin stores its mount table information in the registry.  It
-is recommended that you use the <literal>mount</literal> and <literal>umount</literal> commands
-to manipulate the mount information instead of directly modifying the
-registry.
-</para>
-<para>To save the mount information to a file for later restoration, use
-<literal>mount -m &gt; mounts.bat</literal> To remove all mount information use
-<literal>umount -A</literal>.  To reincorporate saved mount information just run the
-batch file. For more information on using <literal>mount</literal>, see
-<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount">http://cygwin.com/cygwin-ug-net/using-utils.html#mount</ulink>.
+<para>Since Cygwin 1.7, there's nothing important in the registry anymore,
+except for the installation directory information stored there for the sake
+of setup.exe.  There's nothing left to manipulate anymore.
 </para></answer></qandaentry>
 

@@ -1,29 +1,23 @@
 <!-- faq-problems.xml -->
 <qandaentry id="faq.using.missing-dlls">
-<question><para>Why can't my application locate cygncurses5.dll?  or cygintl.dll?  or cygreadline5.dll?  or ...?</para></question>
+<question><para>Why can't my application locate cygncurses-8.dll?  or cygintl-3.dll?  or cygreadline6.dll?  or ...?</para></question>
 <answer>
 
-<para>If you upgraded recently, and suddenly vim (or some other Cygwin
-application) cannot find <literal>cygncurses5.dll</literal>, it probably means that you did
-not follow these instructions properly:
-<ulink url="http://cygwin.com/ml/cygwin-announce/2001/msg00124.html">http://cygwin.com/ml/cygwin-announce/2001/msg00124.html</ulink>.  To
-repair the damage, you must run Cygwin Setup again, and re-install the
-<literal>libncurses5</literal> package.
+<para>Well, something has gone wrong somehow...
 </para>
-<para>Note that Cygwin Setup won't show this option by default.  In the
+<para>To repair the damage, you must run Cygwin Setup again, and re-install the
+package which provides the missing DLL package.
+</para>
+<para>If you already installed the package at one point, Cygwin Setup won't
+show the option to install the package by default.  In the
 ``Select packages to install'' dialog, click on the <literal>Full/Part</literal>
 button.  This lists all packages, even those that are already
-installed.  Scroll down to locate the <literal>libncurses5</literal> package.
-Click on the ``cycle'' glyph until it says ``Reinstall''.  Continue
-with the installation.
-</para>
-<para>Similarly, if something cannot find <literal>cygintl.dll</literal>, then run
-Cygwin Setup and re-install the <literal>libintl</literal> and <literal>libintl1</literal>
-packages.
+installed.  Scroll down to locate the missing package, for instance
+<literal>libncurses8</literal>.  Click on the ``cycle'' glyph until it says
+``Reinstall''.  Continue with the installation.
 </para>
 <para>For a detailed explanation of the general problem, and how to extend
-it to other missing DLLs (like cygreadline5.dll) and identify their
-containing packages, see
+it to other missing DLLs and identify their containing packages, see
 <ulink url="http://cygwin.com/ml/cygwin/2002-01/msg01619.html">http://cygwin.com/ml/cygwin/2002-01/msg01619.html</ulink>.
 </para>
 </answer></qandaentry>
@@ -32,46 +26,33 @@ containing packages, see
 <question><para>Why is Cygwin suddenly <emphasis>so</emphasis> slow?</para></question>
 <answer>
 
-<para>If you recently upgraded and suddenly <emphasis>every</emphasis> command takes a
+<para>If suddenly <emphasis>every</emphasis> command takes a
 <emphasis>very</emphasis> long time, then something is probably attempting to 
 access a network share.  You may have the obsolete <literal>//c</literal>
-notation in your PATH or startup files.  This now means the
-<emphasis>network share</emphasis> <literal>c</literal>, which will slow things down
-tremendously if it does not exist.  
+notation in your PATH or startup files.  Using <literal>//c</literal> means
+to contact the <emphasis>network server</emphasis> <literal>c</literal>, which
+will slow things down tremendously if it does not exist.  
 </para>
-<para>Using //c (for C:) doesn't work anymore.  (Similarly for any drive
-letter, e.g. <literal>//z</literal> for <literal>Z:</literal>) This ``feature'' has long been
-deprecated, and no longer works at all in the latest release.  As of
-release 1.3.3, <literal>//c</literal> now means the <emphasis>network share</emphasis> <literal>c</literal>.
+<para>Using //c (for C:) doesn't work.  (Similarly for any drive
+letter, e.g. <literal>//z</literal> for <literal>Z:</literal>) This
+``feature'' has long been deprecated.
 For a detailed discussion of why this change was made, and how deal
-with it now, refer to
+with it, refer to
 <ulink url="http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html">http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html</ulink>.
+Just note that, in contrast to what that posting claims, using
+<literal>/</literal> as the cygdrive prefix is not supported anymore for a
+long time (though it still might work).
 </para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.services">
-<question><para>Why don't my services work?</para></question>
-<answer>
-
-<para>Most Windows services run as a special user called <literal>SYSTEM</literal>.  If you
-installed Cygwin for "Just Me", the <literal>SYSTEM</literal> user won't see your
-Cygwin mount table.  You need to re-mount all of your mounts as
-"system" for services to work. You can re-run <literal>setup.exe</literal> and
-select "Install for All Users", or this script will do the trick:
-</para>
-<screen>
-eval "`mount -m | sed -e 's/ -u / -s /g' -e 's/$/;/'`"
-</screen>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.shares">
 <question><para>Why can't my services access network shares?</para></question>
 <answer>
 
-<para>When a service switches to a certain user, it is running as 
-<literal>SYSTEM</literal> impersonating the user account. During
-impersonation, the user's password is not available and so non-public
-network shares are not available.  For more information, see
+<para>If your service is one of those which switch the user context
+(sshd, inetd, etc), then it depends on the method used to switch to
+another user.  This problem as well as its solution is described in
+detail in the Cygwin User's Guide, see
 <ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />.
 </para>
 <para>Workarounds include using public network share that does not require
@@ -103,10 +84,13 @@ follow this rule.  You <emphasis role='bold'>must</emphasis> have <literal>/usr/
 the Windows system directories!)  Otherwise you will likely encounter
 all sorts of problems running Cygwin applications.
 </para>
+<para>If you're using another shell than bash (say, tcsh), the mechanism
+is the same, just the names of the login scripts are different.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.not-found">
-<question><para>Bash says "command not found", but it's right there!</para></question>
+<question><para>Bash (or another shell) says "command not found", but it's right there!</para></question>
 <answer>
 
 <para>If you compile a program, you might find that you can't run it:
@@ -117,7 +101,7 @@ all sorts of problems running Cygwin applications.
         bash: hello: command not found
 </screen>
 
-<para>Unlike Windows, bash does not look for programs in <literal>.</literal> (the current
+<para>Unlike the Windows default behaviour, Unix shells like bash do not look for programs in <literal>.</literal> (the current
 directory) by default.  You can add <literal>.</literal> to your PATH (see above),
 but this is not recommended (at least on UNIX) for security reasons.
 Just tell bash where to find it, when you type it on the command line:
@@ -156,8 +140,7 @@ as such.
 
 <para>Your .bashrc is read from your home directory specified by the HOME
 environment variable.  It uses /.bashrc if HOME is not set.  So you need
-to set HOME correctly, or move your .bashrc to the top of the drive
-mounted as / in Cygwin.
+to set HOME (and the home dir in your /etc/passwd entry) correctly.
 </para>
 </answer></qandaentry>
 
@@ -206,13 +189,13 @@ or
 <question><para>Why can't I cd into a shortcut to a directory?</para></question>
 <answer>
 
-<para>Cygwin versions &lt; 1.3.0 do not follow MS Windows Explorer Shortcuts
+<para>Cygwin does not follow MS Windows Explorer Shortcuts
 (*.lnk files).  It sees a shortcut as a regular file and this you
 cannot "cd" into it.
 </para>
-<para>Since version 1.3.0, Cygwin uses shortcuts as symlinks by default.
-</para>
-<para>Cygwin shortcuts are different from shortcuts created by native Windows
+<para>Cygwin is also capable to create POSIX symlinks as Windows shortcuts 
+(see the CYGWIN environment variable option "winsymlinks"), but these
+shortcuts are different from shortcuts created by native Windows
 applications.  Windows applications can usually make use of Cygwin
 shortcuts but not vice versa.  This is by choice.  The reason is that
 Windows shortcuts may contain a bunch of extra information which would
@@ -254,8 +237,9 @@ See the documentation for the option <literal>-noleaf</literal> in the man page.
 it has not been ported to Cygwin and has never worked.  It is
 currently installed as part of the sh-utils, but again, it does not work.
 </para>
-<para>You may be able to use <literal>login</literal> instead, but you should read
-<ulink url="http://www.cygwin.com/ml/cygwin/2001-03/msg00337.html">http://www.cygwin.com/ml/cygwin/2001-03/msg00337.html</ulink> first.
+<para>You should rather install <literal>sshd</literal> and use
+<literal>ssh username@localhost</literal> as a <literal>su</literal>
+replacement.
 </para>
 <para>For some technical background into why <literal>su</literal> doesn't work, read
 <ulink url="http://www.cygwin.com/ml/cygwin/2003-06/msg00897.html">http://www.cygwin.com/ml/cygwin/2003-06/msg00897.html</ulink> and
@@ -264,7 +248,7 @@ related messages.
 </answer></qandaentry>
 
 <qandaentry id="faq.using.man">
-<question><para>Why doesn't man (or apropos) work?</para></question>
+<question><para>Why doesn't man -k (or apropos) work?</para></question>
 <answer>
 
 <para>Before you can use <literal>man -k</literal> or <literal>apropos</literal>, you
@@ -289,8 +273,10 @@ or <literal>mkgroup</literal>, you need to run one or both of those
 commands.
 </para>
 <para>If you're using FAT32 instead of NTFS, <literal>chmod</literal> 
-will fail since FAT32 does not provide any security. You might consider 
-converting the drive to NTFS with <literal>CONVERT.EXE</literal>.
+will fail since FAT32 does not provide any permission information.
+You should really consider converting the drive to NTFS with
+<literal>CONVERT.EXE</literal>.  FAT and FAT32 are barely good enough
+for memory cards or USB sticks to exchange pictures...
 </para>
 <para>For other cases, understand that Cygwin attempts to show UNIX 
 permissions based on the security features of Windows, so the Windows 
@@ -300,36 +286,25 @@ for more information on how Cygwin maps Windows permissions.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.using.mkdir-network">
-<question><para>Why doesn't <literal>mkdir -p</literal> work on a network share?</para></question>
-<answer>
-
-<para>Starting with <literal>coreutils-5.3.0-6</literal> and <literal>cygwin-1.5.17</literal>, you can
-do something like this:
-</para>
-<screen>
-bash$ mkdir -p //MACHINE/Share/path/to/new/dir
-</screen>
-
-<para>However, coreutils expects Unix path names, so something like
-<literal>mkdir -p \\\\machine\\share\\path</literal> will fail. 
-</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.using.shell-scripts">
 <question><para>Why doesn't my shell script work?</para></question>
 <answer>
 
 <para>There are two basic problems you might run into.  One is the fact that
-<command>/bin/sh</command> is really <command>bash</command> (prior to
-<command>bash-3.0-6</command>, <command>/bin/sh</command> was ash).  and is
-missing some features you might expect in <command>/bin/sh</command>,
-particularly if you are used to <command>/bin/sh</command> actually being
-<command>zsh</command> (MacOS X "Panther") or <command>ksh</command> (Tru64).  
+<command>/bin/sh</command> is really <command>bash</command>.
+It could be missing some features you might expect in
+<command>/bin/sh</command>, if you are used to <command>/bin/sh</command>
+actually being <command>zsh</command> (MacOS X "Panther") or
+<command>ksh</command> (Tru64).  
 </para>
 
-<para>Or, it could be a permission problem, and Cygwin doesn't understand that your script is executable.  Because <literal>chmod</literal> may not work (see FAQ entry above), Cygwin must read the contents of files to determine if
-they are executable.  If your script does not start with
+<para>Or, it could be a permission problem, and Cygwin doesn't understand
+that your script is executable.  On NTFS or NFS just make the script
+executable using <literal>chmod +x</literal>.  However,
+<literal>chmod</literal> may not work due to restrictions of the
+filesystem (see FAQ entry above).  In this case Cygwin must read the
+contents of files to determine if they are executable.  If your script
+does not start with
 </para>
 <screen>
 	#! /bin/sh
@@ -346,7 +321,8 @@ idiom
 
 <para>also works.
 </para>
-<para>Note that you can use <literal>mount -x</literal> to force Cygwin to treat all files
+<para>Note that you can use the filesystem flag <literal>cygexec</literal> in
+<filename>/etc/fstab</filename> to force Cygwin to treat all files
 under the mount point as executable.  This can be used for individual
 files as well as directories.  Then Cygwin will not bother to read files
 to determine whether they are executable.
@@ -365,8 +341,8 @@ PostScript files on non-PostScript Windows printers).  Start at
 <ulink url="http://cygwin.com/ml/cygwin/2001-04/msg00657.html">http://cygwin.com/ml/cygwin/2001-04/msg00657.html</ulink>.  Note that the
 <literal>file</literal> command is now available as part of Cygwin setup.
 </para>
-<para>Alternatively, on NT, you can use the Windows <literal>print</literal> command.  (It
-does not seem to be available on Win9x.)  Type
+<para>Alternatively, on NT, you can use the Windows <literal>print</literal>
+command.  (It does not seem to be available on Win9x.)  Type
 </para>
 <screen>
 	bash$ print /\?
@@ -391,10 +367,15 @@ formfeed character to your file.
 <answer>
 
 <para>Internationalization is a complex issue. The short answer is that
-Cygwin is not Unicode-aware, so things that might work in Linux will
-not necessarily work on Cygwin. However, some things do work. To type
-international characters (&pound;&auml;&ouml;) in <literal>bash</literal>, add the following
-lines to your <literal>~/.inputrc</literal> file and restart <literal>bash</literal>:
+Cygwin relies on the setting of the CYGWIN environment variable as well
+as on the setting of LANG environment variable.  The underlying C library,
+newlib, only supports a small subset of LANG settings.  The default is "C".
+To get UTF-8 support you must set LANG to "C-UTF-8" and CYGWIN so that
+it contains "codepage:utf8".
+</para>
+<para>To type international characters (&pound;&auml;&ouml;) in
+<literal>bash</literal>, add the following lines to your
+<literal>~/.inputrc</literal> file and restart <literal>bash</literal>:
 </para>
 <screen>
 	set meta-flag on 
@@ -404,11 +385,12 @@ lines to your <literal>~/.inputrc</literal> file and restart <literal>bash</lite
 	set kanji-code sjis
 </screen>
 
-<para>These are options to the <literal>readline</literal> library, which you can read
-about in the <literal>bash(1)</literal> and <literal>readline(3)</literal> man pages. Other
-tools that do not use <literal>readline</literal> for display, such as <literal>less</literal>
-and <literal>ls</literal>, require additional settings, which could be put in your
-<literal>~/.bashrc</literal>:
+<para>These are options to the <literal>readline</literal> library, which
+you can read about in the <literal>bash(1)</literal> and
+<literal>readline(3)</literal> man pages. Other tools that do not use
+<literal>readline</literal> for display, such as <literal>less</literal>
+and <literal>ls</literal>, require additional settings, which could be put
+in your <literal>~/.bashrc</literal>:
 <screen>
 alias less='/bin/less -r'
 alias ls='/bin/ls -F --color=tty --show-control-chars'
@@ -417,40 +399,6 @@ export OUTPUT_CHARSET="sjis"
 </screen>
 These examples use the Japanese Shift-JIS character set, obviously
 you will want to change them for your own locale. 
-</para>
-
-</answer></qandaentry>
-
-<qandaentry id="faq.using.cursor">
-<question><para>Why don't cursor keys work under Win95/Win98?</para></question>
-<answer>
-
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
-</para>
-<para>Careful examination shows that they not just non-functional, but
-rather behave strangely, for example, with NumLock off, keys on numeric
-keyboard work, until you press usual cursor keys, when even numeric
-stop working, but they start working again after hitting alphanumeric
-key, etc. This reported to happen on localized versions of Win98 and
-Win95, and not specific to Cygwin; there are known cases of Alt+Enter
-(fullscreen/windowed toggle) not working and shifts sticking with
-other programs. The cause of this problem is Microsoft keyboard
-localizer which by default installed in 'autoexec.bat'. Corresponding
-line looks like:
-</para>
-<screen>
-keyb ru,,C:\WINDOWS\COMMAND\keybrd3.sys
-</screen>
-
-<para>(That's for russian locale.) You should comment that line if you want
-your keys working properly. Of course, this will deprive you of your
-local alphabet keyboard support, so you should think about
-another localizer. ex-USSR users are of course knowledgeable of Keyrus
-localizer, and it might work for other locales too, since it has keyboard
-layout editor. But it has russian messages and documentation ;-(
-Reference URL is http://www.hnet.ru/software/contrib/Utils/KeyRus/
-(note the you may need to turn off Windows logo for Keyrus to operate
-properly).
 </para>
 </answer></qandaentry>
 
@@ -463,15 +411,16 @@ have multiple versions, they will conflict and cause problems.
 </para>
 <para>If you get the error "shared region is corrupted" or "shared region
 version mismatch" it means you have multiple versions of cygwin1.dll
-running at the same time.  This could happen, for example, if you update
-cygwin1.dll without exiting <emphasis>all</emphasis> Cygwin apps (including inetd)
-beforehand.
+running at the same time which conflict with each other.  This could happen,
+for example, if you update cygwin1.dll without exiting
+<emphasis>all</emphasis> Cygwin apps (including inetd) beforehand.
 </para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
-you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>, installed in the
-directory controlled by this program.  If you have other versions on
-your system and desire help from the cygwin project, you should delete
-or rename all DLLs that are not installed by <filename>setup.exe</filename>.
+you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>,
+installed in the directory controlled by this program.  If you have other
+versions on your system and desire help from the cygwin project, you should
+delete or rename all DLLs that are not installed by
+<filename>setup.exe</filename>.
 </para>
 <para>If you're trying to find multiple versions of the DLL that are causing
 this problem, reboot first, in case DLLs still loaded in memory are the
@@ -512,17 +461,20 @@ GPL-compatible license, *or* purchase a cygwin license from Red Hat.
 <qandaentry id="faq.using.private-cygwin">
 <question><para>
 So I can't install a private version of the Cygwin DLL without
-conflictng with the system cygwin?
+conflicting with the system cygwin?
 </para></question>
 <answer><para>
 Actually, if you are very careful, you can have two different versions
 of the Cygwin DLL installed on your system at the same time but they
-must be run serially.  This means that you can't be running programs
-using both versions of Cygwin at the same time.  Please be aware that
-currently both versions will use the same mount table entries although
-this wil change in Cygwin version 1.7.x.
-</para><para>
-This usage is not recommeded for novices.  Only limited support will be
+must be run serially.  The only exception from this rule is, if one of
+the DLLs is a pre-1.7 DLL and the other is a 1.7.0 or later DLL.  These
+DLLs can work concurrently without knowing about each other due to
+massive changes using shared resources in Cygwin 1.7.  However,
+processes using different DLLs will not interact with each other
+correctly, so keep them separate except you really really know what
+you're doing.
+</para>
+<para>This usage is not recommeded for novices.  Only limited support will be
 provided in the <ulink url="http://cygwin.com/lists.html">mailing lists</ulink>
 if you run into problems.
 </para></answer></qandaentry>
@@ -535,9 +487,10 @@ DLL on top of a newer DLL, my application will break?
 <answer><para>
 It depends on what you mean by "break".  If the application installs a
 version of the Cygwin DLL in another location than Cygwin's /bin
-directory then the rules in 9.3 apply.  If the application installs an
-older version of the DLL in /bin then you should complain loudly to the
-application provider.
+directory then the rules in
+<xref linkend="faq.using.third-party.multiple-copies"></xref> apply. 
+If the application installs an older version of the DLL in /bin then you
+should complain loudly to the application provider.
 </para><para>
 Remember that the Cygwin DLL strives to be backwards compatible so a
 newer version of the DLL should always work with older executables.  So,
@@ -581,7 +534,7 @@ mailing list pinging the maintainer is perfectly acceptable.  There are
 no guarantees that the maintainer will have time to update the package
 or that you'll receive a response to your request, however.
 </para>
-<para>Remeber that the operative term here is "volunteer".
+<para>Remember that the operative term here is "volunteer".
 </para>
 </answer></qandaentry>
 
@@ -630,24 +583,15 @@ get there.
 Then <literal>/cygdrive/c/Windows</literal> becomes <literal>/c/Windows</literal> which is a
 little less typing.
 </para>
-<para>Note that you only need to mount drives once.  The mapping is kept
-in the registry so mounts stay valid pretty much indefinitely.
-You can only get rid of them with umount, or the registry editor.
+<para>Note that you have to enter the mount point into the
+<filename>/etc/fstab</filename> file to keep it indefinitely. 
+The mount command will only add the mount point for the lifetime
+of your current Cygwin session.
 </para>
-<para>The '-b' option to mount mounts the mountpoint in binary mode
-("binmode") where text and binary files are treated equivalently.  This
-should only be necessary for badly ported Unix programs where binary
-flags are missing from open calls.  It is also the setting for /,
-/usr/bin and /usr/lib in a default Cygwin installation.  The default for
-new mounts is text mode ("textmode"), which is also the mode for all
-"cygdrive" mounts.
-</para>
-<para>You can change the default <literal>cygdrive</literal> prefix and whether it is
-binmode or textmode using the <literal>mount</literal> command.  For example,
-<screen>
-	bash$ mount -b --change-cygdrive-prefix cygdrive
-</screen>
-will change all <literal>/cygdrive/...</literal> mounts to binmode.
+<para>You can change the default <literal>cygdrive</literal> prefix and whether it is binmode or textmode using the <filename>/etc/fstab</filename> file
+as well.  See the Cygwin User's Guide at
+<ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table">http://cygwin.com/cygwin-ug-net/using.html#mount-table</ulink>
+for more details.
 </para>
 </answer></qandaentry>
 
@@ -655,16 +599,13 @@ will change all <literal>/cygdrive/...</literal> mounts to binmode.
 <question><para>How can I copy and paste into Cygwin console windows?</para></question>
 <answer>
 
-<para>First, consider using rxvt instead of the standard console window.  In
-rxvt, selecting with the left-mouse also copies, and middle-mouse
-pastes.  It couldn't be easier!
+<para>First, consider using rxvt or mintty instead of the standard console
+window.  In rxvt/mintty, selecting with the left-mouse also copies,
+and middle-mouse pastes.  It couldn't be easier!
 </para>
-<para>Under Windows NT, open the properties dialog of the console window.
+<para>In Windows's console window, open the properties dialog.
 The options contain a toggle button, named "Quick edit mode".  It must
 be ON.  Save the properties.
-</para>
-<para>Under Windows 9x, open the properties dialog of the console window.
-Select the Misc tab.  Uncheck Fast Pasting.  Check QuickEdit.
 </para>
 <para>You can also bind the insert key to paste from the clipboard by adding 
 the following line to your .inputrc file: 
@@ -708,40 +649,32 @@ interfere with the normal functioning of Cygwin.
 <question><para>How can I share files between Unix and Windows?</para></question>
 <answer>
 
-<para>During development, we have both Linux boxes running Samba and Windows
-machines.  We often build with cross-compilers under Linux and copy
+<para>During development, we have Linux boxes running Samba and NFS as well
+as Windows machines.  We often build with cross-compilers under Linux and copy
 binaries and source to the Windows system or just toy with them
-directly off the Samba-mounted partition.  On dual-boot NT/Windows 9x
-machines, we usually use the FAT filesystem so we can also access the
-files under Windows 9x.
+directly off the Samba-mounted partition.  Or, we use the Microsoft NFS
+client and just use NFS shares on Linux from Windows.  And then there are
+tools like <literal>scp</literal>, <literal>ftp</literal>,
+<literal>rsync</literal>, ...
 </para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.case-sensitive">
-<question><para>Is Cygwin case-sensitive? What are managed mounts?</para></question>
+<question><para>Is Cygwin case-sensitive??</para></question>
 <answer>
 
 <para>Several Unix programs expect to be able to use to filenames
 spelled the same way, but with different case.  A prime example
-of this is perl's configuration script, which wants <literal>Makefile</literal> and
-<literal>makefile</literal>.  WIN32 can't tell the difference between files with
-just different case, so the configuration fails.
+of this is perl's configuration script, which wants
+<literal>Makefile</literal> and <literal>makefile</literal>.  Windows can't
+tell the difference between files with just different case, so the
+configuration fails.
 </para>
-<para>To help with this problem, starting in <literal>cygwin-1.5.0</literal> it is
-possible to have a case sensitive Cygwin managed mount. This is an
-experimental feature and should be used with caution. You should only
-use it for directories that are initially unpopulated and are due to
-be completely managed by cygwin (hence the name).  So, the best use
-would be to create an empty directory, mount it, and then add files to
-it:  
+<para>To help with this problem, Cygwin supports casesensitivity
+starting with Cygwin 1.7.0.  For a detailed description how to use that
+feature see the Cygwin User's Guilde at
+<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>.
 </para>
-<screen>
-mkdir /managed-dir
-mount -o managed c:/cygwin/managed-dir /managed-dir
-cd /managed-dir/
-touch makefile
-touch Makefile
-</screen>
 
 </answer></qandaentry>
 
@@ -749,13 +682,19 @@ touch Makefile
 <question><para>What about DOS special filenames?</para></question>
 <answer>
 
-<para>Files cannot be named com1, lpt1, or aux (to name a few); either as
-the root filename or as the extension part.  If you do, you'll have
+<para>In Windows, files cannot be named com1, lpt1, or aux (to name a few);
+either as the root filename or as the extension part.  If you do, you'll have
 trouble.  Unix programs don't avoid these names which can make things
 interesting.  E.g., the perl distribution has a file called
 <literal>aux.sh</literal>.  The perl configuration tries to make sure that
 <literal>aux.sh</literal> is there, but an operation on a file with the magic
 letters 'aux' in it will hang.
+</para>
+<para>At least that's what happens when using native Windows tools.  Cygwin
+1.7.0 and later can deal with these filenames just fine.  Again, see the
+User's Guide at
+<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>
+for a detailed description of what's possible with filenames and what is not.
 </para>
 </answer></qandaentry>
 
@@ -772,7 +711,7 @@ bet that the hung process is still running somewhere.  Use the Task
 Manager, pview, or a similar utility to kill the process.
 </para>
 <para>And, if all else fails, there's always the reset button/power switch.
-This should never be necessary under Windows NT.
+In theory this should never be necessary, though.
 </para>
 </answer></qandaentry>
 
@@ -928,57 +867,9 @@ this message from the Cygwin mailing list:
 <question><para>Is there a better alternative to the standard console window?</para></question>
 <answer>
 
-<para>Yes!  Use rxvt instead.  It's an optional package in Cygwin Setup.
-You can use it with or without X11.  You can resize it easily by
-dragging an edge or corner.  Copy and paste is easy with the left and
-middle mouse buttons, respectively.  It will honor settings in your
-~/.Xdefaults file, even without X.  For details see
-<literal>/usr/share/doc/Cygwin/rxvt-&lt;ver&gt;.README</literal>.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.info-error">
-<question><para>info error "dir: No such file or directory"</para></question>
-<answer>
-
-<para>Cygwin packages install their info documentation in the
-<literal>/usr/share/info</literal> directory.  But you need to create a <literal>dir</literal>
-file there before the standalone info program (probably
-<literal>/usr/bin/info</literal>) can be used to read those info files.  This is how
-you do it:
-<screen>
-	bash$ cd /usr/share/info
-	bash$ for f in *.info ; do install-info $f dir ; done
-</screen>
-This may generate warnings:
-<screen>
-	install-info: warning: no info dir entry in `gzip.info'
-	install-info: warning: no info dir entry in `time.info'
-</screen>
-The <literal>install-info</literal> command cannot parse these files, so you will
-have to add their entries to <literal>/usr/share/info/dir</literal> by hand.
-</para>
-<para>Even if the dir file already exists, you may have to update it when
-you install new Cygwin packages.  Some packages update the dir file
-for you, but many don't.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.out-of-queue">
-<question><para>Why do I get a message saying Out of Queue slots?</para></question>
-<answer>
-
-<para>"Out of queue slots!" generally occurs when you're trying to remove
-many files that you do not have permission to remove (either because
-you don't have permission, they are opened exclusively, etc).  What
-happens is Cygwin queues up these files with the supposition that it
-will be possible to delete these files in the future.  Assuming that
-the permission of an affected file does change later on, the file will
-be deleted as requested.  However, if too many requests come in to
-delete inaccessible files, the queue overflows and you get the message
-you're asking about.  Usually you can remedy this with a quick chmod,
-close of a file, or other such thing.  (Thanks to Larry Hall for
-this explanation).
+<para>Yes!  Use rxvt or mintty instead.  Both are optional packages in
+Cygwin Setup.  You can use rxvt with or without X11, while mintty is a 
+Cygwin application providing a native GUI.
 </para>
 </answer></qandaentry>
 
@@ -998,15 +889,9 @@ file:
 
 <para>Note that the 0775 can be anything as long as the 0010 bit is set.
 </para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.df-incorrect">
-<question><para>Why does df report sizes incorrectly.</para></question>
-<answer>
-
-<para>There is a bug in the Win32 API function GetFreeDiskSpace that
-makes it return incorrect values for disks larger than 2 GB in size.
-Perhaps that may be your problem?
+<para>Alternatively, use Windows shortcuts as symlinks.  See the CYGWIN
+environment variable option "winsymlinks" 
+<ulink url="http://cygwin.com/cygwin-ug-net/using-cygwinenv.html">http://cygwin.com/cygwin-ug-net/using-cygwinenv.html</ulink>
 </para>
 </answer></qandaentry>
 
@@ -1016,8 +901,8 @@ Perhaps that may be your problem?
 
 <para>The versions of Tcl/Tk distributed with Cygwin (e.g. cygtclsh80.exe,
 cygwish80.exe) are not actually "Cygwin versions" of those tools.
-They are built with the <literal>-mno-cygwin</literal> option to <literal>gcc</literal>, which
-means they do not understand Cygwin mounts or symbolic links.
+They are built as native libraries, which means they do not understand
+Cygwin mounts or symbolic links.
 </para>
 <para>See the entry "How do I convert between Windows and UNIX paths?"
 elsewhere in this FAQ.
