@@ -1746,6 +1746,8 @@ wcsrtombs NOSIGFE
 wcsspn NOSIGFE
 wcsstr NOSIGFE
 wcstok NOSIGFE
+wcstod NOSIGFE
+wcstof NOSIGFE
 wcstol NOSIGFE
 wcstoll NOSIGFE
 wcstombs NOSIGFE

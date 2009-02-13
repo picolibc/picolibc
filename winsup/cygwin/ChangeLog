@@ -1,3 +1,8 @@
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export wcstod and wcstof.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (open): Handle O_DIRECTORY flag.
