@@ -284,6 +284,15 @@ getenv (const char *name)
   return findenv_func (name, &offset);
 }
 
+/* This function is required so that newlib uses the same environment
+   as Cygwin. */
+extern "C" char *
+_getenv_r (struct _reent *, const char *name)
+{
+  int offset;
+  return findenv_func (name, &offset);
+}
+
 static int __stdcall
 envsize (const char * const *in_envp)
 {

@@ -1,5 +1,9 @@
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (_getenv_r): New function.
+
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml: Move dirfd to SUSv4 section.
 
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
