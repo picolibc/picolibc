@@ -1,5 +1,9 @@
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml: Move dirfd to SUSv4 section.
+
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml: Move interfaces deprecated in SUSv4 to deprecated
 	interfaces section.  Move interfaces added in SUSv4 to SUSv4
 	section or, if unimplemented, add them to the unimplemented interfaces
