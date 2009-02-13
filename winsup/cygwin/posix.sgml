@@ -819,6 +819,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsncat
     wcsncmp
     wcsncpy
+    wcsnlen
     wcspbrk
     wcsrchr
     wcsrtombs
@@ -1336,7 +1337,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsftime
     wcsncasecmp
     wcsncasecmp_l
-    wcsnlen
     wcsnrtombs
     wcstoimax
     wcstold

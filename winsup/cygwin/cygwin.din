@@ -1740,6 +1740,7 @@ _wcslen = wcslen NOSIGFE
 wcsncat NOSIGFE
 wcsncmp NOSIGFE
 wcsncpy NOSIGFE
+wcsnlen NOSIGFE
 wcspbrk NOSIGFE
 wcsrchr NOSIGFE
 wcsrtombs NOSIGFE
