@@ -88,7 +88,12 @@ posix=[0|1].  The meaning of the options is as follows.</para>
 	     (default).
 </screen>
 
-<para>Normally, files ending in certain extensions (.exe, .com, .bat, .btm,
+<para>While normally the execute permission bits are used to evaluate
+executability, this is not possible on filesystems which don't support
+permissions at all (like FAT/FAT32), or if ACLs are ignored on filesystems
+supporting them (see the aforementioned <literal>acl</literal> mount option).
+In these cases, the following heuristic is used to evaluate if a file is
+executable: Files ending in certain extensions (.exe, .com, .bat, .btm,
 .cmd) are assumed to be executable.  Files whose first two characters begin
 with '#!' are also considered to be executable.
 The <literal>exec</literal> option is used to instruct Cygwin that the
@@ -103,11 +108,14 @@ opposite of these options is the <literal>notexec</literal> option, which
 means that no files should be marked as executable under that mount point.
 </para>
 
-<para>Note that nouser mount points are not overridable by a later call
-to <command>mount</command>.  This is only possible for user mount points. 
-Mount points given in <filename>/etc/fstab</filename> are by default nouser
-mount points, unless you specify the option user.  In contrast, all mount
-points in the user specific fstab file are user mount points.</para>
+<para><literal>nouser</literal> mount points are not overridable by a later
+call to <command>mount</command>.
+Mount points given in <filename>/etc/fstab</filename> are by default
+<literal>nouser</literal> mount points, unless you specify the option
+<literal>user</literal>.  This allows the administrator to set certain
+paths so that they are not overridable by users.  In contrast, all mount
+points in the user specific fstab file are <literal>user</literal> mount
+points.</para>
 
 <para>The fifth and sixth field are ignored.  They are
 so far only specified to keep a Linux-like fstab file layout.</para>
@@ -180,15 +188,48 @@ points will disappear as soon as your last Cygwin process ends.
 See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
 information.</para>
 
-<para>Whenever Cygwin cannot use any of the existing mounts to convert
-from a particular Win32 path to a POSIX one, Cygwin will
-automatically default to an imaginary mount point under the default POSIX
-path <filename>/cygdrive</filename>.  For example, if Cygwin accesses
-<filename>Z:/foo</filename> and the Z drive is not currently in the
-mount table, then <filename>Z:/</filename> would be automatically
-converted to <filename>/cygdrive/Z</filename>.  The default
-prefix of <filename>/cygdrive</filename> may be changed in the fstab file
-as outlined above.</para>
+</sect2>
+
+<sect2 id="cygdrive"><title>The cygdrive path prefix</title>
+
+<para>As already outlined in <xref linkend="ov-hi-files"></xref>, you can
+access arbitary drives on your system by using the cygdrive path prefix.
+The default value for this prefix is <literal>/cygdrive</literal>, and
+a path to any drive can be constructed by using the cygdrive prefix and
+appending the drive letter as subdirectory, like this:</para>
+
+<screen>
+  bash$ ls -l /cygdrive/f/somedir
+</screen>
+
+<para>This lists the content of the directory F:\somedir.</para>
+
+<para>The cygdrive prefix is a virtual directory under which all drives
+on a system are subsumed.  The mount options of the cygdrive prefix is
+used for all file access through the cygdrive prefixed drives.  For instance,
+assuming the cygdrive mount options are <literal>binary,posix=0</literal>,
+then any file <literal>/cygdrive/x/file</literal> will be opened in
+binary mode by default (mount option <literal>binary</literal>, and the case
+of the filename doesn't matter (mount option <literal>posix=0</literal>.
+</para>
+
+<para>The cygdrive prefix may be changed in the fstab file as outlined above.
+Please note that you must not use the cygdrive prefix for any other mount
+point.  For instance this:</para>
+
+<screen>
+  none /cygdrive cygdrive binary 0 0
+  D:   /cygdrive/d somefs text 0 0
+</screen>
+
+<para>will not make file access using the /mnt/d path prefix suddenly using
+textmode.  If you want to mount any drive explicitely in another mode than
+the cygdrive prefix, use a distinct path prefix:</para>
+
+<screen>
+  none /cygdrive cygdrive binary 0 0
+  D:   /mnt/d somefs text 0 0
+</screen>
 
 </sect2>
 
