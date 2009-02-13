@@ -914,6 +914,8 @@ mount_info::from_fstab_line (char *line, bool user)
   cend = find_ws (c);
   *cend = '\0';
   unsigned mount_flags = MOUNT_SYSTEM | MOUNT_BINARY;
+  if (!strcmp (fs_type, "cygdrive"))
+    mount_flags |= MOUNT_NOPOSIX;
   if (!read_flags (c, mount_flags))
     return true;
   if (user)
