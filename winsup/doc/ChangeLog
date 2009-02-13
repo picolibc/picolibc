@@ -1,3 +1,7 @@
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Replace "binmode" with new "binary" output of mount.
+
 2009-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml: First cut on Emacs.
