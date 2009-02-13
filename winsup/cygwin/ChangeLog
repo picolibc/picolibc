@@ -1,5 +1,12 @@
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml: Move interfaces deprecated in SUSv4 to deprecated
+	interfaces section.  Move interfaces added in SUSv4 to SUSv4
+	section or, if unimplemented, add them to the unimplemented interfaces
+	section.
+
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml: Merge SUSv3 and SUSv4 section into a single SUSv4 section.
 	Move Solaris calls now in SUSv4 to SUSv4 section.  Rename unimplemented
 	section to refer to SUSv4.  Add note about missing interfaces.

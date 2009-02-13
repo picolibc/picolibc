@@ -24,6 +24,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     acosh
     acoshf
     alarm
+    alphasort
     asctime
     asctime_r
     asin
@@ -43,12 +44,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     atol
     atoll
     basename
-    bcmp
-    bcopy
     bind
     bsearch
     btowc
-    bzero
     cabs
     cabsf
     calloc
@@ -105,10 +103,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     dlerror
     dlopen
     dlsym
+    dprintf
     drand48
     dup
     dup2
-    ecvt
     encrypt			(available in external "crypt" library)
     endgrent
     endhostent
@@ -146,7 +144,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fchownat
     fclose
     fcntl
-    fcvt
     fdatasync
     fdim
     fdimf
@@ -169,6 +166,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fmaf
     fmax
     fmaxf
+    fmemopen
     fmin
     fminf
     fmod
@@ -199,7 +197,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fsync
     ftell
     ftello
-    ftime
     ftok
     ftruncate
     ftrylockfile
@@ -210,7 +207,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fwide
     fwrite
     gai_strerror
-    gcvt
     getaddrinfo
     getc
     getc_unlocked
@@ -229,11 +225,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getgrnam
     getgrnam_r
     getgroups
-    gethostbyaddr
-    gethostbyname
     gethostid
     gethostname
     getitimer			(see chapter "Implementation Notes")
+    getline
     getlogin
     getlogin_r
     getnameinfo
@@ -269,13 +264,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getutxline
     getwc
     getwchar
-    getwd
     glob
     globfree
     gmtime
     gmtime_r
     grantpt
-    h_errno
     hcreate
     hdestroy
     hsearch
@@ -295,7 +288,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ilogbf
     imaxabs
     imaxdiv
-    index
     inet_addr
     inet_ntoa
     inet_ntop
@@ -402,12 +394,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     memset
     mkdir
     mkdirat
+    mkdtemp
     mkfifo
     mkfifoat
     mknod
     mknodat
     mkstemp
-    mktemp
     mktime
     mlock
     mmap
@@ -449,6 +441,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     openat
     opendir
     openlog
+    open_memstream
     optarg
     opterr
     optind
@@ -507,13 +500,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_key_create
     pthread_key_delete
     pthread_kill
-    pthread_mutex_destroy
-    pthread_mutex_getprioceiling
-    pthread_mutex_init
-    pthread_mutex_lock
-    pthread_mutex_setprioceiling
-    pthread_mutex_trylock
-    pthread_mutex_unlock
     pthread_mutexattr_destroy
     pthread_mutexattr_getprioceiling
     pthread_mutexattr_getprotocol
@@ -524,6 +510,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_mutexattr_setprotocol
     pthread_mutexattr_setpshared
     pthread_mutexattr_settype
+    pthread_mutex_destroy
+    pthread_mutex_getprioceiling
+    pthread_mutex_init
+    pthread_mutex_lock
+    pthread_mutex_setprioceiling
+    pthread_mutex_trylock
+    pthread_mutex_unlock
     pthread_once
     pthread_rwlock_destroy
     pthread_rwlock_init
@@ -585,14 +578,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     renameat
     rewind
     rewinddir
-    rindex
     rint
     rintf
     rintl
     rmdir
     round
     roundf
-    scalb
     scalbln
     scalblnf
     scalbn
@@ -703,6 +694,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     stderr
     stdin
     stdout
+    stpcpy
+    stpncpy
     strcasecmp
     strcat
     strchr
@@ -719,9 +712,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strncat
     strncmp
     strncpy
+    strndup
+    strnlen
     strpbrk
     strptime
     strrchr
+    strsignal
     strspn
     strstr
     strtod
@@ -784,7 +780,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     twalk
     tzname
     tzset
-    ualarm
     umask
     uname
     ungetc
@@ -793,7 +788,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     unlinkat
     unlockpt
     unsetenv
-    usleep
     utime
     utimensat
     utimes
@@ -801,7 +795,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     va_copy
     va_end
     va_start
-    vfork			(see chapter "Implementation Notes")
+    vdprintf
     vfprintf
     vfscanf
     vprintf
@@ -811,6 +805,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vsscanf
     wait
     waitpid
+    wcpcpy
+    wcpncpy
     wcrtomb
     wcscat
     wcschr
@@ -860,7 +856,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-bsd"><title>System interfaces compatible with BSD functions:</title>
 
 <screen>
-    alphasort
     bindresvport
     bindresvport_sa
     cfmakeraw
@@ -910,7 +905,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     login_tty
     logout
     logwtmp
-    mkdtemp
     openpty
     rcmd
     rcmd_af
@@ -946,7 +940,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strlcat
     strlcpy
     strsep
-    strsignal
     updwtmp
     valloc
     verr
@@ -983,7 +976,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asnprintf
     asprintf
     asprintf_r
-    dprintf
     dremf
     envz_add
     envz_entry
@@ -997,11 +989,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fcloseall_r
     fgetxattr
     flistxattr
-    fmemopen
     fopencookie
     fremovexattr
     fsetxattr
-    getline
     getopt_long
     getopt_long_only
     getxattr
@@ -1012,15 +1002,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lsetxattr
     memmem
     mempcpy
-    open_memstream
     pow10
     pow10f
     removexattr
     setxattr
-    stpcpy
-    stpncpy
-    strndup
-    strnlen
     tdestroy
     timegm
     timelocal
@@ -1029,9 +1014,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vasnprintf
     vasprintf
     vasprintf_r
-    vdprintf
-    wcpcpy
-    wcpncpy
 </screen>
 
 </sect1>
@@ -1058,37 +1040,52 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 
 </sect1>
 
-<sect1 id="std-deprec"><title>Other UNIX system interfaces, deprecated or not in POSIX.1-2001:</title>
+<sect1 id="std-deprec"><title>Other UNIX system interfaces, deprecated or not in POSIX.1-2008:</title>
 
 <screen>
+    bcmp			(POSIX.1-2001, SUSv3)
+    bcopy			(SUSv3)
+    bzero			(SUSv3)
     cuserid			(POSIX.1-1988, SUSv2)
+    ecvt			(SUSv3)
     endutent			(XPG2)
+    fcvt			(SUSv3)
+    ftime			(SUSv3)
+    gcvt			(SUSv3)
+    gethostbyaddr		(SUSv3)
+    gethostbyname		(SUSv3)
     getpass			(SUSv2)
     getutent			(XPG2)
     getutid			(XPG2)
     getutline			(XPG2)
     getw			(SVID)
+    getwd			(SUSv3)
+    h_errno			(SUSv3)
+    index			(SUSv3)
     mallinfo			(SVID)
     mallopt			(SVID)
+    mktemp			(SUSv3)
     on_exit			(SunOS)
     pthread_continue		(XPG2)
     pthread_getsequence_np	(Tru64)
     pthread_suspend		(XPG2)
     pututline			(XPG2)
     putw			(SVID)
+    rindex			(SUSv3)
+    scalb			(SUSv3)
     setutent			(XPG2)
     sys_errlist			(BSD)
     sys_nerr			(BSD)
     ttyslot			(SUSv2)
+    ualarm			(SUSv3)
+    usleep			(SUSv3)
     utmpname			(XPG2)
+    vfork			(SUSv3) (see chapter "Implementation Notes")
 </screen>
 
 </sect1>
 
 <sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 4:</title>
-
-<note><para>FIXME: This only covers the interfaces of SUSv3.  The missing
-interfaces from SUSv4 have to be added here at one point.</para></note>
 
 <screen>
     acoshl
@@ -1176,6 +1173,8 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     ctanhf
     ctanhl
     ctanl
+    dirfd
+    duplocale
     endnetent
     erfcl
     erfl
@@ -1196,16 +1195,17 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     fesetround
     fetestexcept
     feupdateenv
+    fexecve
     floorl
     fmal
     fmaxl
     fminl
     fmodl
     fmtmsg
+    freelocale
     frexpl
     fwprintf
     fwscanf
-    getcontext
     getdate
     getdate_err
     gethostent
@@ -1217,7 +1217,31 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     hypotl
     ilogbl
     initstate
+    isalnum_l
+    isalpha_l
     isastream
+    isblank_l
+    iscntrl_l
+    isdigit_l
+    isgraph_l
+    islower_l
+    isprint_l
+    ispunct_l
+    isspace_l
+    isupper_l
+    iswalnum_l
+    iswalpha_l
+    iswblank_l
+    iswcntrl_l
+    iswdigit_l
+    iswgraph_l
+    iswlower_l
+    iswprint_l
+    iswpunct_l
+    iswspace_l
+    iswupper_l
+    iswxdigit_l
+    isxdigit_l
     ldexpl
     lgammal
     lio_listio
@@ -1230,19 +1254,23 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     logbl
     logl
     lroundl
-    makecontext
+    mbsnrtowcs
     mlockall
     modfl
     munlockall
     nanl
     nearbyintl
+    newlocale
     nextafterl
     nexttowardl
+    open_wmemstream
     posix_mem_offset
     posix_spawn[...]
     posix_trace[...]
     posix_typed_[...]
     powl
+    psiginfo
+    psignal
     pthread_attr_getguardsize
     pthread_attr_getstack
     pthread_attr_getstackaddr
@@ -1253,6 +1281,9 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     pthread_condattr_getclock
     pthread_condattr_setclock
     pthread_getcpuclockid
+    pthread_mutexattr_getrobust
+    pthread_mutexattr_setrobust
+    pthread_mutex_consistent
     pthread_mutex_timedlock
     pthread_rwlock_timedrdlock
     pthread_rwlock_timedwrlock
@@ -1272,8 +1303,13 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     sinl
     sockatmark
     sqrtl
+    strcasecmp_l
+    strcoll_l
     strfmon
+    strfmon_l
+    strncasecmp_l
     strtold
+    strxfrm_l
     swabcontext
     swprintf
     swscanf
@@ -1282,8 +1318,12 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     tcgetsid
     tgammal
     timer_getoverrun
+    tolower_l
+    toupper_l
+    towctrans_l
     truncl
     ulimit
+    uselocale
     vfwprintf
     vfwscanf
     vswprintf
@@ -1291,11 +1331,19 @@ interfaces from SUSv4 have to be added here at one point.</para></note>
     vwprintf
     vwscanf
     waitid
+    wcscasecmp
+    wcscasecmp_l
     wcsftime
+    wcsncasecmp
+    wcsncasecmp_l
+    wcsnlen
+    wcsnrtombs
     wcstoimax
     wcstold
     wcstoumax
-    wcswcs
+    wcsxfrm_l
+    wctrans_l
+    wctype_l
     wordexp
     wordfree
     wscanf
