@@ -1,5 +1,12 @@
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml: Merge SUSv3 and SUSv4 section into a single SUSv4 section.
+	Move Solaris calls now in SUSv4 to SUSv4 section.  Rename unimplemented
+	section to refer to SUSv4.  Add note about missing interfaces.
+	Move wcstod and wcstof from unimplemented to SUSv4 section.
+
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_info::from_fstab_line): Make cygdrive posix=0 by
 	default as documented.
 

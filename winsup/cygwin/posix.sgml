@@ -1,7 +1,7 @@
-<sect1 id="std-susv3"><title>System interfaces compatible with the Single Unix Specification, Version 3:</title>
+<sect1 id="std-susv4"><title>System interfaces compatible with the Single Unix Specification, Version 4:</title>
 
-<para>Note that the core of the Single Unix Specification, Version 3 is
-also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
+<para>Note that the core of the Single Unix Specification, Version 4 is
+also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 
 <screen>
     FD_CLR
@@ -138,9 +138,12 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     expm1f
     fabs
     fabsf
+    faccessat
     fchdir
     fchmod
+    fchmodat
     fchown
+    fchownat
     fclose
     fcntl
     fcvt
@@ -148,6 +151,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fdim
     fdimf
     fdopen
+    fdopendir
     feof
     ferror
     fflush
@@ -190,6 +194,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     fseeko
     fsetpos
     fstat
+    fstatat
     fstatvfs
     fsync
     ftell
@@ -200,6 +205,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ftrylockfile
     ftw
     funlockfile
+    futimens
     futimes
     fwide
     fwrite
@@ -351,6 +357,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     lgamma
     lgammaf
     link
+    linkat
     listen
     llabs
     lldiv
@@ -394,8 +401,11 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     memmove
     memset
     mkdir
+    mkdirat
     mkfifo
+    mkfifoat
     mknod
+    mknodat
     mkstemp
     mktemp
     mktime
@@ -436,6 +446,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ntohl
     ntohs
     open
+    openat
     opendir
     openlog
     optarg
@@ -553,6 +564,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     readdir
     readdir_r
     readlink
+    readlinkat
     readv
     realloc
     realpath
@@ -570,6 +582,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     remquo
     remquof
     rename
+    renameat
     rewind
     rewinddir
     rindex
@@ -724,6 +737,7 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     strxfrm
     swab
     symlink
+    symlinkat
     sync
     sysconf
     syslog
@@ -776,10 +790,12 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     ungetc
     ungetwc
     unlink
+    unlinkat
     unlockpt
     unsetenv
     usleep
     utime
+    utimensat
     utimes
     va_arg
     va_copy
@@ -811,6 +827,8 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     wcsrtombs
     wcsspn
     wcsstr
+    wcstod
+    wcstof
     wcstok
     wcstol
     wcstoll
@@ -1031,34 +1049,11 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     acltopbits
     acltotext
     endmntent
-    faccessat
     facl
-    fchmodat
-    fchownat
-    fdopendir
-    fstatat
     futimesat
     getmntent
-    linkat
     memalign
-    mkdirat
-    mkfifoat
-    mknodat
-    openat
-    readlinkat
-    renameat
     setmntent
-    symlinkat
-    unlinkat
-</screen>
-
-</sect1>
-
-<sect1 id="std-susv4"><title>System interfaces compatible with the Draft Single Unix Specification, Version 4:</title>
-
-<screen>
-    futimens
-    utimensat
 </screen>
 
 </sect1>
@@ -1090,7 +1085,10 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
 
 </sect1>
 
-<sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 3:</title>
+<sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 4:</title>
+
+<note><para>FIXME: This only covers the interfaces of SUSv3.  The missing
+interfaces from SUSv4 have to be added here at one point.</para></note>
 
 <screen>
     acoshl
@@ -1294,8 +1292,6 @@ also ISO/IEC 9945:2003 and IEEE Std 1003.1-2001 (POSIX.1-2001).</para>
     vwscanf
     waitid
     wcsftime
-    wcstod
-    wcstof
     wcstoimax
     wcstold
     wcstoumax
