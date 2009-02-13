@@ -15,11 +15,10 @@
   <toc></toc>
 
 <chapter id="compatibility"><title>Compatibility</title>
-DOCTOOL-INSERT-std-susv3
+DOCTOOL-INSERT-std-susv4
 DOCTOOL-INSERT-std-bsd
 DOCTOOL-INSERT-std-gnu
 DOCTOOL-INSERT-std-solaris
-DOCTOOL-INSERT-std-susv4
 DOCTOOL-INSERT-std-deprec
 DOCTOOL-INSERT-std-notimpl
 DOCTOOL-INSERT-std-notes

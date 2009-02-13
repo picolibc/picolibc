@@ -1,5 +1,9 @@
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin-api.in.sgml: Fix API section layout.
+
+2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pathnames.sgml: Add a cygdrive section.
 
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
