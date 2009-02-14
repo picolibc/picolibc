@@ -1,3 +1,7 @@
+2009-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml: Fix usage of ampersand in NT emacs script.
+
 2009-02-14  Jari Aalto <jari.aalto@cante.net>
 
 	* faq-using.xml: Expand Emacs entries.

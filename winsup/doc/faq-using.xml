@@ -883,7 +883,7 @@ settings are for Emacs 21.1:
 	;; The M-x shell would continue to run standard Windows shell
 	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	(defun my-bash (&optional buffer)
+	(defun my-bash (&amp;optional buffer)
 	  "Run Cygwin Bash shell in optional BUFFER; default *shell-bash*."
 	  (autoload 'comint-check-proc "comint")
 	  (interactive
