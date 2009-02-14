@@ -805,14 +805,25 @@ Consider using XEmacs for now.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.using.xemacs">
+<question><para>What about XEmacs?</para></question>
+<answer>
+
+<para>For a concise description of the current situation with XEmacs, see
+this message from the Cygwin mailing list:
+<ulink url="http://cygwin.com/ml/cygwin/2002-11/msg00609.html">http://cygwin.com/ml/cygwin/2002-11/msg00609.html</ulink>.
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.using.ntemacs">
 <question><para>What about NT Emacs?</para></question>
 <answer>
 
-<para>If you want GNU Emacs with a native Microsoft GUI interface, then
-you can either use XEmacs (see below), or you can fetch a native NT Emacs
-from <ulink url="http://ftp.gnu.org/pub/gnu/emacs/windows/">http://ftp.gnu.org/pub/gnu/emacs/windows/</ulink>.  See also the README file you get from the
-same place.
+<para>If you want GNU Emacs with a native Microsoft GUI interface,
+then you can either use XEmacs (see above), or native
+NT Emacs: see section
+<ulink url="http://www.gnu.org/software/emacs/windows/Getting-Emacs.html#Getting-Emacs">Where can I get pre-compiled versions?</ulink> in NT Emacs FAQ.
+
 </para>
 <para>NT Emacs uses the Windows command shell by default.  Since it is not a
 Cygwin application, it has no knowledge of Cygwin mounts.  With those
@@ -822,25 +833,86 @@ for the JDEE package (<ulink url="http://jdee.sunsite.dk/">http://jdee.sunsite.d
 settings are for Emacs 21.1:
 </para>
 <screen>
+
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; Initial setup
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	;; This assumes that Cygwin is installed in C:\cygwin (the
 	;; default) and that C:\cygwin\bin is not already in your
 	;; Windows Path (it generally should not be).
-	;;
+
 	(setq exec-path (cons "C:/cygwin/bin" exec-path))
 	(setenv "PATH" (concat "C:\\cygwin\\bin;" (getenv "PATH")))
-	;;
-	;; NT-emacs assumes a Windows command shell, which you change
-	;; here.
-	;;
+
+	;;   LOGNAME and USER are expected in many Emacs packages
+	;;   Check these environment variables.
+
+	(if (and (null (getenv "USER"))
+		 ;; Windows includes variable USERNAME, which is copied to
+		 ;; LOGNAME and USER respectively.
+		 (getenv "USERNAME"))
+	    (setenv "USER" (getenv "USERNAME")))
+
+	(if (and (getenv "LOGNAME")
+		 ;;  Bash shell defines only LOGNAME
+		 (null (getenv "USER")))
+	    (setenv "USER" (getenv "LOGNAME")))
+
+	(if (and (getenv "USER")
+		 (null (getenv "LOGNAME")))
+	    (setenv "LOGNAME" (getenv "USER")))
+
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; (A) M-x shell: This change M-x shell permanently
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	;; Would call Windows command interpreter. Change it.
+
 	(setq shell-file-name "bash")
-	(setenv "SHELL" shell-file-name) 
-	(setq explicit-shell-file-name shell-file-name) 
-	;;
-	;; This removes unsightly ^M characters that would otherwise
-	;; appear in the output of java applications.
-	;;
+	(setenv "SHELL" shell-file-name)
+	(setq explicit-shell-file-name shell-file-name)
+
+	;; Remove C-m (^M) characters that appear in output
+
 	(add-hook 'comint-output-filter-functions
 	          'comint-strip-ctrl-m)
+
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; (B) *OR* call following function with M-x my-bash
+	;; The M-x shell would continue to run standard Windows shell
+	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	(defun my-bash (&optional buffer)
+	  "Run Cygwin Bash shell in optional BUFFER; default *shell-bash*."
+	  (autoload 'comint-check-proc "comint")
+	  (interactive
+	   (let ((name "*shell-bash*"))
+	     (if current-prefix-arg
+		 (setq name (read-string
+			     (format "Cygwin shell buffer (default %s): " name)
+			     (not 'initial-input)
+			     (not 'history)
+			     name)))
+	     (list name)))
+	  (or buffer
+	      (setq buffer "*shell-bash*"))
+	  (if (comint-check-proc buffer)
+	      (pop-to-buffer buffer)
+	    (let* ((shell-file-name            "bash")
+		   (explicit-shell-file-name   shell-file-name)
+		   (explicit-sh-args           '("--login" "-i"))
+		   (explicit-bash-args         explicit-sh-args)
+		   (w32-quote-process-args     ?\"));; Use Cygwin quoting rules.
+	      (shell buffer)
+	      ;;  By default Emacs sends "\r\n", but bash wants plain "\n"
+	      (set-buffer-process-coding-system 'undecided-dos 'undecided-unix)
+	      ;; With TAB completion, add slash path separator, none to filenames
+	      (make-local-variable 'comint-completion-addsuffix)
+	      (setq comint-completion-addsuffix '("/" . ""))
+	      ;;  This variable is local to buffer
+	      (setq comint-prompt-regexp "^[ \n\t]*[$] ?"))))
+
 </screen>
 
 <para>If you want NT Emacs to understand Cygwin paths, get
@@ -848,16 +920,6 @@ cygwin-mount.el from <ulink url="http://www.emacswiki.org/elisp/index.html">http
 </para>
 <para>Note that all of this ``just works'' if you use the Cygwin port of
 Emacs or XEmacs from Cygwin Setup.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.xemacs">
-<question><para>What about XEmacs?</para></question>
-<answer>
-
-<para>For a concise description of the current situation with XEmacs, see
-this message from the Cygwin mailing list:
-<ulink url="http://cygwin.com/ml/cygwin/2002-11/msg00609.html">http://cygwin.com/ml/cygwin/2002-11/msg00609.html</ulink>.
 </para>
 </answer></qandaentry>
 
