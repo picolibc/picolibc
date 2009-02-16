@@ -84,6 +84,17 @@ realloc (void *p, size_t size)
   return res;
 }
 
+/* BSD extension:  Same as realloc, just if it fails to allocate new memory,
+   it frees the incoming pointer. */
+extern "C" void *
+reallocf (void *p, size_t size)
+{
+  void *res = realloc (p, size);
+  if (!res && p)
+    free (p);
+  return res;
+}
+
 extern "C" void *
 calloc (size_t nmemb, size_t size)
 {

@@ -44,7 +44,6 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #define __FBSDID(x)
 #define _open open
 #define _close close
-#define reallocf realloc
 #endif
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/fts.c,v 1.27 2004/06/08 06:23:23 das Exp $");

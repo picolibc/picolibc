@@ -1197,6 +1197,7 @@ readv SIGFE
 _readv = readv SIGFE
 realloc SIGFE
 _realloc = realloc SIGFE
+reallocf SIGFE
 realpath SIGFE
 recv = cygwin_recv SIGFE
 recvfrom = cygwin_recvfrom SIGFE
