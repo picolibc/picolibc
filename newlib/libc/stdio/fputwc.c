@@ -44,7 +44,7 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _fputwc_r(struct _rent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t _fputwc_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
@@ -52,7 +52,7 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
-	wint_t _putwc_r(struct _rent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+	wint_t _putwc_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>

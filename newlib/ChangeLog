@@ -1,3 +1,7 @@
+2009-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/fputwc.c: Fix typo in man page info.
+
 2009-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (_wcstod_r): Declare.
