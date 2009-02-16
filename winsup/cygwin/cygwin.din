@@ -1746,15 +1746,17 @@ wcsrchr NOSIGFE
 wcsrtombs NOSIGFE
 wcsspn NOSIGFE
 wcsstr NOSIGFE
-wcstok NOSIGFE
 wcstod NOSIGFE
 wcstof NOSIGFE
+wcstoimax = wcstoll NOSIGFE
+wcstok NOSIGFE
 wcstol NOSIGFE
 wcstoll NOSIGFE
 wcstombs NOSIGFE
 _wcstombs = wcstombs NOSIGFE
 wcstoul NOSIGFE
 wcstoull NOSIGFE
+wcstoumax = wcstoull NOSIGFE
 wcswidth NOSIGFE
 wcsxfrm NOSIGFE
 wctob NOSIGFE

@@ -345,12 +345,13 @@ details. */
       194: fcntl.h flags O_DIRECTORY, O_EXEC and O_SEARCH added.
       195: Export wcstod, wcstof.
       196: Export wcsnlen.
+      197: Export wcstoimax, wcstoumax.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 196
+#define CYGWIN_VERSION_API_MINOR 197
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

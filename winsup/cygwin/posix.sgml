@@ -827,12 +827,14 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsstr
     wcstod
     wcstof
+    wcstoimax
     wcstok
     wcstol
     wcstoll
     wcstombs
     wcstoul
     wcstoull
+    wcstoumax
     wcswidth
     wcsxfrm
     wctob
@@ -1338,9 +1340,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsncasecmp
     wcsncasecmp_l
     wcsnrtombs
-    wcstoimax
     wcstold
-    wcstoumax
     wcsxfrm_l
     wctrans_l
     wctype_l

@@ -1,3 +1,10 @@
+2009-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export wcstoimax, wcstoumax.
+	* posix.sgml: Move wcstoimax and wcstoumax to SUSv4 section.
+	* include/inttypes.h: Declare wcstoimax and wcstoumax.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export wcsnlen.
