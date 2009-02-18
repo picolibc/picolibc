@@ -117,6 +117,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <errno.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include <wctype.h>
+#include <math.h>
 
 double
 _DEFUN (_wcstod_r, (ptr, nptr, endptr),

@@ -325,6 +325,8 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
      mallocs on small strings) and 64k bytes (to avoid overusing the
      heap if *size was garbage).  */
   c->max = *size;
+  if (wide == 1)
+    c->max *= sizeof(wchar_t);
   if (c->max < 64)
     c->max = 64;
   else if (c->max > 64 * 1024)
@@ -342,7 +344,10 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
       _free_r (ptr, c);
       return NULL;
     }
-  **buf = '\0';
+  if (wide == 1)
+    **((wchar_t **)buf) = L'\0';
+  else
+    **buf = '\0';
 
   c->storage = c;
   c->pbuf = buf;
@@ -374,7 +379,7 @@ _DEFUN(_open_memstream_r, (ptr, buf, size),
        char **buf _AND
        size_t *size)
 {
-  internal_open_memstream_r (ptr, buf, size, -1);
+  return internal_open_memstream_r (ptr, buf, size, -1);
 }
 
 FILE *
@@ -383,7 +388,7 @@ _DEFUN(_open_wmemstream_r, (ptr, buf, size),
        wchar_t **buf _AND
        size_t *size)
 {
-  internal_open_memstream_r (ptr, buf, size, 1);
+  return internal_open_memstream_r (ptr, (char **)buf, size, 1);
 }
 
 #ifndef _REENT_ONLY

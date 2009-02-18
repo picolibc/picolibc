@@ -1,3 +1,15 @@
+2009-02-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/open_memstream.c (internal_open_memstream_r): Fix max
+	buffer size to be in wchar_t units if wide == 1 is passed in.  In
+	this case, also initialize the first character of the buffer to be
+	wide char null.
+	(_open_wmemstream_r): Cast buf to be (char **) to avoid warning.
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Change all occurences of
+	incrementing the size_t value n to first check that n is not already
+	size_t -1.  Fix some compiler warnings.
+	* libc/stdlib/wcstod.c: Add includes for <wctype.h> and <math.h>.
+
 2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/open_memstream.c: Add open_wmemstream to doumentation.

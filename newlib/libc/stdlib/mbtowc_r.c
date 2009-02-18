@@ -65,8 +65,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     return -2;
 
 #ifdef _MB_CAPABLE
-  if (__lc_ctype == NULL ||
-      (strlen (__lc_ctype) <= 1))
+  if (strlen (__lc_ctype) <= 1)
     { /* fall-through */ }
   else if (!strcmp (__lc_ctype, "C-UTF-8"))
     {
@@ -80,7 +79,8 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	ch = t[i++];
       else
 	{
-	  ++n;
+	  if (n < (size_t)-1)
+	    ++n;
 	  ch = state->__value.__wchb[0];
 	}
 
@@ -123,7 +123,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[0] = ch;
 	  if (state->__count == 0)
 	    state->__count = 1;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 2)
 	    return -2;
@@ -158,7 +158,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[0] = ch;
 	  if (state->__count == 0)
 	    state->__count = 1;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 2)
 	    return -2;
@@ -171,7 +171,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[1] = ch;
 	  if (state->__count == 1)
 	    state->__count = 2;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 3)
 	    return -2;
@@ -201,7 +201,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[0] = ch;
 	  if (state->__count == 0)
 	    state->__count = 1;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 2)
 	    return -2;
@@ -214,7 +214,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[1] = ch;
 	  if (state->__count == 1)
 	    state->__count = 2;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 3)
 	    return -2;
@@ -224,7 +224,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[2] = ch;
 	  if (state->__count == 2)
 	    state->__count = 3;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 4)
 	    return -2;
@@ -254,7 +254,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[0] = ch;
 	  if (state->__count == 0)
 	    state->__count = 1;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 2)
 	    return -2;
@@ -267,7 +267,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[1] = ch;
 	  if (state->__count == 1)
 	    state->__count = 2;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 3)
 	    return -2;
@@ -277,7 +277,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[2] = ch;
 	  if (state->__count == 2)
 	    state->__count = 3;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 4)
 	    return -2;
@@ -287,7 +287,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  state->__value.__wchb[3] = ch;
 	  if (state->__count == 3)
 	    state->__count = 4;
-	  else
+	  else if (n < (size_t)-1)
 	    ++n;
 	  if (n < 5)
 	    return -2;
@@ -444,7 +444,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
               *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)(t[i]);
               return (i + 1);
             case MAKE_A:
-              ptr = (char *)(t + i + 1);
+              ptr = (unsigned char *)(t + i + 1);
               break;
             case ERROR:
             default:
