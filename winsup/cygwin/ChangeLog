@@ -1,3 +1,9 @@
+2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export open_wmemstream.
+	* posix.sgml: Move open_wmemstream to SUSv4 section.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export reallocf.

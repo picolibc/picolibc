@@ -443,6 +443,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     opendir
     openlog
     open_memstream
+    open_wmemstream
     optarg
     opterr
     optind
@@ -1267,7 +1268,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     newlocale
     nextafterl
     nexttowardl
-    open_wmemstream
     posix_mem_offset
     posix_spawn[...]
     posix_trace[...]

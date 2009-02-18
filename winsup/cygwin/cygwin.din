@@ -1037,6 +1037,7 @@ open SIGFE
 _open = open SIGFE
 _open64
 open_memstream SIGFE
+open_wmemstream SIGFE
 openat SIGFE
 opendir SIGFE
 __opendir_with_d_ino SIGFE
