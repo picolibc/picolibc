@@ -1,3 +1,21 @@
+2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/open_memstream.c: Add open_wmemstream to doumentation.
+	(struct memstream): Add wide element.
+	Change saved to a union to take char and wchar_t values.
+	(memwriter): Accommodate wide-oriented oeprations.
+	(memseeker): Ditto.
+	(memseeker64): Ditto.
+	(memcloser): Ditto.
+	(internal_open_memstream_r): New static function.  Take functionality
+	from former _open_memstream_r and handle additional "wide" parameter.
+	(_open_memstream_r): Just call internal_open_memstream_r with wide==-1
+	from here.
+	(_open_wmemstream_r): New function.
+	(open_wmemstream): Ditto.
+	* libc/include/wchar.h (open_wmemstream): Declare.
+	(_open_wmemstream_r): Declare.
+
 2009-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/fputwc.c: Fix typo in man page info.

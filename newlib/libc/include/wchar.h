@@ -118,6 +118,9 @@ wint_t _EXFUN(_putwc_r, (struct _reent *, wchar_t, __FILE *));
 wint_t _EXFUN(_putwchar_r, (struct _reent *, wchar_t));
 wint_t _EXFUN (_ungetwc_r, (struct _reent *, wint_t wc, __FILE *));
 
+__FILE *_EXFUN (open_wmemstream, (wchar_t **, size_t *));
+__FILE *_EXFUN (_open_wmemstream_r, (struct _reent *, wchar_t **, size_t *));
+
 #define getwc(fp)	fgetwc(fp)
 #define putwc(wc,fp)	fputwc((wc), (fp))
 #ifndef _REENT_ONLY

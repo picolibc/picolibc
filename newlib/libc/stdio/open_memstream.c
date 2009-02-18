@@ -5,19 +5,25 @@
 
 /*
 FUNCTION
-<<open_memstream>>---open a write stream around an arbitrary-length string
+<<open_memstream>>, <<open_wmemstream>>---open a write stream around an arbitrary-length string
 
 INDEX
 	open_memstream
+INDEX
+	open_wmemstream
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *open_memstream(char **restrict <[buf]>,
 			     size_t *restrict <[size]>);
 
+	#include <wchar.h>
+	FILE *open_wmemstream(wchar_t **restrict <[buf]>,
+			      size_t *restrict <[size]>);
+
 DESCRIPTION
-<<open_memstream>> creates a seekable <<FILE>> stream that wraps an
-arbitrary-length buffer, created as if by <<malloc>>.  The current
+<<open_memstream>> creates a seekable, byte-oriented <<FILE>> stream that
+wraps an arbitrary-length buffer, created as if by <<malloc>>.  The current
 contents of *<[buf]> are ignored; this implementation uses *<[size]>
 as a hint of the maximum size expected, but does not fail if the hint
 was wrong.  The parameters <[buf]> and <[size]> are later stored
@@ -27,6 +33,10 @@ after fflush, the pointer is only valid until another stream operation
 that results in a write.  Behavior is undefined if the user alters
 either *<[buf]> or *<[size]> prior to <<fclose>>.
 
+<<open_wmemstream>> is like <<open_memstream>> just with the associated
+stream being wide-oriented.  The size set in <[size]> in subsequent
+operations is the number of wide characters.
+
 The stream is write-only, since the user can directly read *<[buf]>
 after a flush; see <<fmemopen>> for a way to wrap a string with a
 readable stream.  The user is responsible for calling <<free>> on
@@ -34,10 +44,10 @@ the final *<[buf]> after <<fclose>>.
 
 Any time the stream is flushed, a NUL byte is written at the current
 position (but is not counted in the buffer length), so that the string
-is always NUL-terminated after at most *<[size]> bytes.  However, data
-previously written beyond the current stream offset is not lost, and
-the NUL byte written during a flush is restored to its previous value
-when seeking elsewhere in the string.
+is always NUL-terminated after at most *<[size]> bytes (or wide characters
+in case of <<open_wmemstream>>).  However, data previously written beyond
+the current stream offset is not lost, and the NUL value written during a
+flush is restored to its previous value when seeking elsewhere in the string.
 
 RETURNS
 The return value is an open FILE pointer on success.  On error,
@@ -46,12 +56,13 @@ or <[size]> is NULL, ENOMEM if memory could not be allocated, or
 EMFILE if too many streams are already open.
 
 PORTABILITY
-This function is being added to POSIX 200x, but is not in POSIX 2001.
+POSIX.1-2008
 
 Supporting OS subroutines required: <<sbrk>>.
 */
 
 #include <stdio.h>
+#include <wchar.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/lock.h>
@@ -71,7 +82,11 @@ typedef struct memstream {
   size_t pos; /* current position */
   size_t eof; /* current file size */
   size_t max; /* current malloc buffer size, always > eof */
-  char saved; /* saved character that lived at *psize before NUL */
+  union {
+    char c;
+    wchar_t w;
+  } saved; /* saved character that lived at *psize before NUL */
+  int8_t wide; /* wide-oriented (>0) or byte-oriented (<0) */
 } memstream;
 
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
@@ -119,10 +134,12 @@ _DEFUN(memwriter, (ptr, cookie, buf, n),
      trailing NUL is overwriting.  Otherwise, extend the stream.  */
   if (c->pos > c->eof)
     c->eof = c->pos;
+  else if (c->wide > 0)
+    c->saved.w = *(wchar_t *)(cbuf + c->pos);
   else
-    c->saved = cbuf[c->pos];
+    c->saved.c = cbuf[c->pos];
   cbuf[c->pos] = '\0';
-  *c->psize = c->pos;
+  *c->psize = (c->wide > 0) ? c->pos / sizeof (wchar_t) : c->pos;
   return n;
 }
 
@@ -163,16 +180,30 @@ _DEFUN(memseeker, (ptr, cookie, pos, whence),
     {
       if (c->pos < c->eof)
 	{
-	  (*c->pbuf)[c->pos] = c->saved;
-	  c->saved = '\0';
+	  if (c->wide > 0)
+	    *(wchar_t *)((*c->pbuf) + c->pos) = c->saved.w;
+	  else
+	    (*c->pbuf)[c->pos] = c->saved.c;
+	  c->saved.w = L'\0';
 	}
       c->pos = offset;
       if (c->pos < c->eof)
 	{
-	  c->saved = (*c->pbuf)[c->pos];
-	  (*c->pbuf)[c->pos] = '\0';
-	  *c->psize = c->pos;
+	  if (c->wide > 0)
+	    {
+	      c->saved.w = *(wchar_t *)((*c->pbuf) + c->pos);
+	      *(wchar_t *)((*c->pbuf) + c->pos) = L'\0';
+	      *c->psize = c->pos / sizeof (wchar_t);
+	    }
+	  else
+	    {
+	      c->saved.c = (*c->pbuf)[c->pos];
+	      (*c->pbuf)[c->pos] = '\0';
+	      *c->psize = c->pos;
+	    }
 	}
+      else if (c->wide > 0)
+	*c->psize = c->eof / sizeof (wchar_t);
       else
 	*c->psize = c->eof;
     }
@@ -210,16 +241,30 @@ _DEFUN(memseeker64, (ptr, cookie, pos, whence),
     {
       if (c->pos < c->eof)
 	{
-	  (*c->pbuf)[c->pos] = c->saved;
-	  c->saved = '\0';
+	  if (c->wide > 0)
+	    *(wchar_t *)((*c->pbuf) + c->pos) = c->saved.w;
+	  else
+	    (*c->pbuf)[c->pos] = c->saved.c;
+	  c->saved.w = L'\0';
 	}
       c->pos = offset;
       if (c->pos < c->eof)
 	{
-	  c->saved = (*c->pbuf)[c->pos];
-	  (*c->pbuf)[c->pos] = '\0';
-	  *c->psize = c->pos;
+	  if (c->wide > 0)
+	    {
+	      c->saved.w = *(wchar_t *)((*c->pbuf) + c->pos);
+	      *(wchar_t *)((*c->pbuf) + c->pos) = L'\0';
+	      *c->psize = c->pos / sizeof (wchar_t);
+	    }
+	  else
+	    {
+	      c->saved.c = (*c->pbuf)[c->pos];
+	      (*c->pbuf)[c->pos] = '\0';
+	      *c->psize = c->pos;
+	    }
 	}
+      else if (c->wide > 0)
+	*c->psize = c->eof / sizeof (wchar_t);
       else
 	*c->psize = c->eof;
     }
@@ -237,7 +282,9 @@ _DEFUN(memcloser, (ptr, cookie),
   char *buf;
 
   /* Be nice and try to reduce any unused memory.  */
-  buf = _realloc_r (ptr, *c->pbuf, *c->psize + 1);
+  buf = _realloc_r (ptr, *c->pbuf,
+		    c->wide > 0 ? (*c->psize + 1) * sizeof (wchar_t)
+				: *c->psize + 1);
   if (buf)
     *c->pbuf = buf;
   _free_r (ptr, c->storage);
@@ -246,11 +293,12 @@ _DEFUN(memcloser, (ptr, cookie),
 
 /* Open a memstream that tracks a dynamic buffer in BUF and SIZE.
    Return the new stream, or fail with NULL.  */
-FILE *
-_DEFUN(_open_memstream_r, (ptr, buf, size),
+static FILE *
+_DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
        struct _reent *ptr _AND
        char **buf _AND
-       size_t *size)
+       size_t *size _AND
+       int wide)
 {
   FILE *fp;
   memstream *c;
@@ -300,7 +348,8 @@ _DEFUN(_open_memstream_r, (ptr, buf, size),
   c->pbuf = buf;
   c->psize = size;
   c->eof = 0;
-  c->saved = '\0';
+  c->saved.w = L'\0';
+  c->wide = (int8_t) wide;
 
   _flockfile (fp);
   fp->_file = -1;
@@ -314,8 +363,27 @@ _DEFUN(_open_memstream_r, (ptr, buf, size),
   fp->_flags |= __SL64;
 #endif
   fp->_close = memcloser;
+  ORIENT (fp, wide);
   _funlockfile (fp);
   return fp;
+}
+
+FILE *
+_DEFUN(_open_memstream_r, (ptr, buf, size),
+       struct _reent *ptr _AND
+       char **buf _AND
+       size_t *size)
+{
+  internal_open_memstream_r (ptr, buf, size, -1);
+}
+
+FILE *
+_DEFUN(_open_wmemstream_r, (ptr, buf, size),
+       struct _reent *ptr _AND
+       wchar_t **buf _AND
+       size_t *size)
+{
+  internal_open_memstream_r (ptr, buf, size, 1);
 }
 
 #ifndef _REENT_ONLY
@@ -325,5 +393,13 @@ _DEFUN(open_memstream, (buf, size),
        size_t *size)
 {
   return _open_memstream_r (_REENT, buf, size);
+}
+
+FILE *
+_DEFUN(open_wmemstream, (buf, size),
+       wchar_t **buf _AND
+       size_t *size)
+{
+  return _open_wmemstream_r (_REENT, buf, size);
 }
 #endif /* !_REENT_ONLY */
