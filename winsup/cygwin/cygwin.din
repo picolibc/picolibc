@@ -944,6 +944,7 @@ _mblen = mblen NOSIGFE
 mbrlen NOSIGFE
 mbrtowc NOSIGFE
 mbsinit NOSIGFE
+mbsnrtowcs NOSIGFE
 mbsrtowcs NOSIGFE
 mbstowcs NOSIGFE
 _mbstowcs = mbstowcs NOSIGFE
@@ -1743,6 +1744,7 @@ wcsncat NOSIGFE
 wcsncmp NOSIGFE
 wcsncpy NOSIGFE
 wcsnlen NOSIGFE
+wcsnrtombs NOSIGFE
 wcspbrk NOSIGFE
 wcsrchr NOSIGFE
 wcsrtombs NOSIGFE

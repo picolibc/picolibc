@@ -384,6 +384,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     mbrlen
     mbrtowc
     mbsinit
+    mbsnrtowcs
     mbsrtowcs
     mbstowcs
     mbtowc
@@ -821,6 +822,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsncmp
     wcsncpy
     wcsnlen
+    wcsnrtombs
     wcspbrk
     wcsrchr
     wcsrtombs
@@ -1259,7 +1261,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     logbl
     logl
     lroundl
-    mbsnrtowcs
     mlockall
     modfl
     munlockall
@@ -1340,7 +1341,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsftime
     wcsncasecmp
     wcsncasecmp_l
-    wcsnrtombs
     wcstold
     wcsxfrm_l
     wctrans_l

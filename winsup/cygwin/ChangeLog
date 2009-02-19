@@ -1,3 +1,9 @@
+2009-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export mbsnrtowcs and wcsnrtombs.
+	* posix.sgml: Move mbsnrtowcs and wcsnrtombs to SUSv4 section.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export open_wmemstream.
