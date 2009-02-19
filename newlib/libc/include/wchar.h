@@ -47,10 +47,18 @@ size_t	_EXFUN(mbrtowc, (wchar_t * , const char * , size_t, mbstate_t *));
 size_t	_EXFUN(_mbrtowc_r, (struct _reent *, wchar_t * , const char * , 
 			size_t, mbstate_t *));
 int	_EXFUN(mbsinit, (const mbstate_t *));
+size_t	_EXFUN(mbsnrtowcs, (wchar_t * , const char ** , size_t, size_t,
+			mbstate_t *));
+size_t	_EXFUN(_mbsnrtowcs_r, (struct _reent *, wchar_t * , const char ** ,
+			size_t, size_t, mbstate_t *));
 size_t	_EXFUN(mbsrtowcs, (wchar_t * , const char ** , size_t, mbstate_t *));
 size_t	_EXFUN(_mbsrtowcs_r, (struct _reent *, wchar_t * , const char ** , size_t, mbstate_t *));
 size_t	_EXFUN(wcrtomb, (char * , wchar_t, mbstate_t *));
 size_t	_EXFUN(_wcrtomb_r, (struct _reent *, char * , wchar_t, mbstate_t *));
+size_t	_EXFUN(wcsnrtombs, (char * , const wchar_t ** , size_t, size_t,
+			mbstate_t *));
+size_t	_EXFUN(_wcsnrtombs_r, (struct _reent *, char * , const wchar_t ** , 
+			size_t, size_t, mbstate_t *));
 size_t	_EXFUN(wcsrtombs, (char * , const wchar_t ** , size_t, mbstate_t *));
 size_t	_EXFUN(_wcsrtombs_r, (struct _reent *, char * , const wchar_t ** , 
 			size_t, mbstate_t *));

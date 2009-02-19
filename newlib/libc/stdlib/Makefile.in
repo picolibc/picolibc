@@ -111,9 +111,10 @@ am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
 	lib_a-l64a.$(OBJEXT) lib_a-malign.$(OBJEXT) \
 	lib_a-mbrlen.$(OBJEXT) lib_a-mbrtowc.$(OBJEXT) \
-	lib_a-mbsinit.$(OBJEXT) lib_a-mbsrtowcs.$(OBJEXT) \
-	lib_a-on_exit.$(OBJEXT) lib_a-valloc.$(OBJEXT) \
-	lib_a-wcrtomb.$(OBJEXT) lib_a-wcsrtombs.$(OBJEXT) \
+	lib_a-mbsinit.$(OBJEXT) lib_a-mbsnrtowcs.$(OBJEXT) \
+	lib_a-mbsrtowcs.$(OBJEXT) lib_a-on_exit.$(OBJEXT) \
+	lib_a-valloc.$(OBJEXT) lib_a-wcrtomb.$(OBJEXT) \
+	lib_a-wcsnrtombs.$(OBJEXT) lib_a-wcsrtombs.$(OBJEXT) \
 	lib_a-wctob.$(OBJEXT)
 am__objects_4 = lib_a-putenv.$(OBJEXT) lib_a-putenv_r.$(OBJEXT) \
 	lib_a-setenv.$(OBJEXT) lib_a-setenv_r.$(OBJEXT)
@@ -146,8 +147,9 @@ am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	wcstoll.lo wcstoll_r.lo wcstoull.lo wcstoull_r.lo atoll.lo \
 	llabs.lo lldiv.lo
 am__objects_9 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
-	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsrtowcs.lo \
-	on_exit.lo valloc.lo wcrtomb.lo wcsrtombs.lo wctob.lo
+	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsnrtowcs.lo \
+	mbsrtowcs.lo on_exit.lo valloc.lo wcrtomb.lo wcsnrtombs.lo \
+	wcsrtombs.lo wctob.lo
 am__objects_10 = putenv.lo putenv_r.lo setenv.lo setenv_r.lo
 am__objects_11 = system.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_12 = $(am__objects_9) \
@@ -440,10 +442,12 @@ ELIX_2_SOURCES = \
 	mbrlen.c	\
 	mbrtowc.c	\
 	mbsinit.c	\
+	mbsnrtowcs.c	\
 	mbsrtowcs.c	\
 	on_exit.c	\
 	valloc.c	\
 	wcrtomb.c	\
+	wcsnrtombs.c	\
 	wcsrtombs.c	\
 	wctob.c
 
@@ -1142,6 +1146,12 @@ lib_a-mbsinit.o: mbsinit.c
 lib_a-mbsinit.obj: mbsinit.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsinit.obj `if test -f 'mbsinit.c'; then $(CYGPATH_W) 'mbsinit.c'; else $(CYGPATH_W) '$(srcdir)/mbsinit.c'; fi`
 
+lib_a-mbsnrtowcs.o: mbsnrtowcs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsnrtowcs.o `test -f 'mbsnrtowcs.c' || echo '$(srcdir)/'`mbsnrtowcs.c
+
+lib_a-mbsnrtowcs.obj: mbsnrtowcs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsnrtowcs.obj `if test -f 'mbsnrtowcs.c'; then $(CYGPATH_W) 'mbsnrtowcs.c'; else $(CYGPATH_W) '$(srcdir)/mbsnrtowcs.c'; fi`
+
 lib_a-mbsrtowcs.o: mbsrtowcs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mbsrtowcs.o `test -f 'mbsrtowcs.c' || echo '$(srcdir)/'`mbsrtowcs.c
 
@@ -1165,6 +1175,12 @@ lib_a-wcrtomb.o: wcrtomb.c
 
 lib_a-wcrtomb.obj: wcrtomb.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcrtomb.obj `if test -f 'wcrtomb.c'; then $(CYGPATH_W) 'wcrtomb.c'; else $(CYGPATH_W) '$(srcdir)/wcrtomb.c'; fi`
+
+lib_a-wcsnrtombs.o: wcsnrtombs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsnrtombs.o `test -f 'wcsnrtombs.c' || echo '$(srcdir)/'`wcsnrtombs.c
+
+lib_a-wcsnrtombs.obj: wcsnrtombs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsnrtombs.obj `if test -f 'wcsnrtombs.c'; then $(CYGPATH_W) 'wcsnrtombs.c'; else $(CYGPATH_W) '$(srcdir)/wcsnrtombs.c'; fi`
 
 lib_a-wcsrtombs.o: wcsrtombs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsrtombs.o `test -f 'wcsrtombs.c' || echo '$(srcdir)/'`wcsrtombs.c

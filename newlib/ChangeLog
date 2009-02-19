@@ -1,3 +1,22 @@
+2009-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h (mbsnrtowcs): Declare.
+	(_mbsnrtowcs_r): Declare.
+	(wcsnrtombs): Declare.
+	(_wcsnrtombs_r): Declare.
+	* libc/stdlib/Makefile.am (ELIX_2_SOURCES): Add mbsnrtowcs.c
+	and wcsnrtombs.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/mbsnrtowcs.c: New file, implementing _mbsnrtowcs_r
+	and mbsnrtowcs.  Document mbsnrtowcs and mbsrtowcs.
+	* libc/stdlib/mbsrtowcs.c (_mbsrtowcs_r): Just call _mbsnrtowcs_r.
+	(mbsrtowcs): Ditto.
+	* libc/stdlib/wcsnrtombs.c: New file, implementing _wcsnrtombs_r
+	and wcsnrtombs.  Document wcsrtombs and wcsnrtombs.
+	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Just call _wcsnrtombs_r.
+	(wcsrtombs): Ditto.
+	* libc/stdlib/stdlib.tex: Accommodate new documentation.
+
 2009-02-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/open_memstream.c (internal_open_memstream_r): Fix max

@@ -98,10 +98,12 @@ ELIX_2_SOURCES = \
 	mbrlen.c	\
 	mbrtowc.c	\
 	mbsinit.c	\
+	mbsnrtowcs.c	\
 	mbsrtowcs.c	\
 	on_exit.c	\
 	valloc.c	\
 	wcrtomb.c	\
+	wcsnrtombs.c	\
 	wcsrtombs.c	\
 	wctob.c
 
