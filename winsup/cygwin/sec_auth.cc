@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -266,59 +266,16 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
 }
 
 static bool
-is_group_member (PWCHAR logonserver, PWCHAR group, PSID pusersid,
-		 cygsidlist &grp_list)
-{
-  LPLOCALGROUP_MEMBERS_INFO_1 buf;
-  DWORD cnt, tot;
-  NET_API_STATUS ret;
-
-  /* Members can be users or global groups */
-  ret = NetLocalGroupGetMembers (logonserver, group, 1, (LPBYTE *) &buf,
-				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
-  if (ret)
-    return false;
-
-  bool retval = true;
-  for (DWORD bidx = 0; bidx < cnt; ++bidx)
-    if (EqualSid (pusersid, buf[bidx].lgrmi1_sid))
-      goto done;
-    else
-      {
-	/* The extra test for the group being a global group or a well-known
-	   group is necessary, since apparently also aliases (for instance
-	   Administrators or Users) can be members of local groups, even
-	   though MSDN states otherwise.  The GUI refuses to put aliases into
-	   local groups, but the CLI interface allows it.  However, a normal
-	   logon token does not contain groups, in which the user is only
-	   indirectly a member by being a member of an alias in this group.
-	   So we also should not put them into the token group list.
-	   Note: Allowing those groups in our group list renders external
-	   tokens invalid, so that it becomes impossible to logon with
-	   password and valid logon token. */
-	for (int glidx = 0; glidx < grp_list.count (); ++glidx)
-	  if ((buf[bidx].lgrmi1_sidusage == SidTypeGroup
-	       || buf[bidx].lgrmi1_sidusage == SidTypeWellKnownGroup)
-	      && EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi1_sid))
-	    goto done;
-      }
-
-  retval = false;
- done:
-  NetApiBufferFree (buf);
-  return retval;
-}
-
-static bool
 get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
-		       cygsidlist &grp_list, PSID pusersid)
+		       cygsidlist &grp_list, PWCHAR user)
 {
   LPLOCALGROUP_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetLocalGroupEnum (logonserver, 0, (LPBYTE *) &buf,
-			   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
+  ret = NetUserGetLocalGroups (logonserver, user, 0, LG_INCLUDE_INDIRECT,
+			       (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
+			       &cnt, &tot);
   if (ret)
     {
       __seterrno_from_win_error (ret);
@@ -335,34 +292,33 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
   bg_ptr = wcpcpy (builtin_grp, L"BUILTIN\\");
 
   for (DWORD i = 0; i < cnt; ++i)
-    if (is_group_member (logonserver, buf[i].lgrpi0_name, pusersid, grp_list))
-      {
-	cygsid gsid;
-	DWORD glen = MAX_SID_LEN;
-	WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
-	DWORD domlen = sizeof (dom);
-	bool builtin = false;
+    {
+      cygsid gsid;
+      DWORD glen = MAX_SID_LEN;
+      WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
+      DWORD domlen = sizeof (dom);
+      bool builtin = false;
 
-	use = SidTypeInvalid;
-	wcscpy (dg_ptr, buf[i].lgrpi0_name);
-	if (!LookupAccountNameW (NULL, domlocal_grp, gsid, &glen,
-				 dom, &domlen, &use))
-	  {
-	    if (GetLastError () != ERROR_NONE_MAPPED)
-	      debug_printf ("LookupAccountName(%W), %E", domlocal_grp);
-	    wcscpy (bg_ptr, dg_ptr);
-	    if (!LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
-				     dom, &domlen, &use))
-	      debug_printf ("LookupAccountName(%W), %E", builtin_grp);
-	    builtin = true;
-	  }
-	if (!legal_sid_type (use))
-	  debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
-	else if (builtin)
-	  grp_list *= gsid;
-	else
-	  grp_list += gsid;
-      }
+      use = SidTypeInvalid;
+      wcscpy (dg_ptr, buf[i].lgrpi0_name);
+      if (!LookupAccountNameW (NULL, domlocal_grp, gsid, &glen,
+			       dom, &domlen, &use))
+	{
+	  if (GetLastError () != ERROR_NONE_MAPPED)
+	    debug_printf ("LookupAccountName(%W), %E", domlocal_grp);
+	  wcscpy (bg_ptr, dg_ptr);
+	  if (!LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
+				   dom, &domlen, &use))
+	    debug_printf ("LookupAccountName(%W), %E", builtin_grp);
+	  builtin = true;
+	}
+      if (!legal_sid_type (use))
+	debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+      else if (builtin)
+	grp_list *= gsid;
+      else
+	grp_list += gsid;
+    }
   NetApiBufferFree (buf);
   return true;
 }
@@ -466,7 +422,7 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
       && !get_user_groups (server, grp_list, user, domain)
       && get_logon_server (domain, server, true))
     get_user_groups (server, grp_list, user, domain);
-  if (get_user_local_groups (server, domain, grp_list, usersid))
+  if (get_user_local_groups (server, domain, grp_list, user))
     {
       get_unix_group_sidlist (pw, grp_list);
       return true;

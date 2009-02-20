@@ -1,3 +1,15 @@
+2009-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NetLocalGroupEnum): Remove.
+	(NetLocalGroupGetMembers): Remove.
+	(NetUserGetLocalGroups): Add.
+	* sec_auth.cc (is_group_member): Remove function.
+	(get_user_local_groups): Get user as string instead of as SID.
+	Call NetUserGetLocalGroups instead of NetLocalGroupEnum.  Drop call
+	to is_group_member.
+	(get_server_groups): Call get_user_local_groups with user name instead
+	of user SID.
+
 2009-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winver.rc: Fix Copyright date.
