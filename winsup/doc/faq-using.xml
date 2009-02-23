@@ -806,13 +806,46 @@ Consider using XEmacs for now.
 </answer></qandaentry>
 
 <qandaentry id="faq.using.xemacs">
-<question><para>What about XEmacs?</para></question>
+<question><para>Is there a Cygwin port of XEmacs?</para></question>
 <answer>
 
-<para>For a concise description of the current situation with XEmacs, see
-this message from the Cygwin mailing list:
-<ulink url="http://cygwin.com/ml/cygwin/2002-11/msg00609.html">http://cygwin.com/ml/cygwin/2002-11/msg00609.html</ulink>.
+<para>Yes.  It can be used in three different modes:</para>
+<para><itemizedlist>
+<listitem><para>X11 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>) GUI</para></listitem>
+</itemizedlist></para>
+<para>You have to <emphasis>set</emphasis> the DISPLAY environment variable
+before starting xemacs.</para>
+<screen>
+	bash$ DISPLAY=127.0.0.1:0 xemacs &amp;
+</screen>
+<para><itemizedlist>
+<listitem><para>Windows native GUI</para></listitem>
+</itemizedlist></para>
+<para>You have to <emphasis>unset</emphasis> the DISPLAY environment variable
+before starting xemacs.</para>
+<screen>
+	bash$ DISPLAY= xemacs &amp;
+</screen>
+<para><itemizedlist>
+<listitem><para>Console mode</para></listitem>
+</itemizedlist></para>
+<para>Start xemacs with -nw in a terminal (native or X11) window</para>
+<screen>
+	bash$ xemacs -nw
+</screen>
+<para>The current stable Cygwin version of XEmacs is 21.4.x. But there is also a
+Cygwin test release version (21.5.x) available for download via setup.exe.
 </para>
+<para>To use all the standard packages with XEmacs you should download the following
+two packages:</para>
+<para><itemizedlist>
+<listitem><para>xemacs-sumo - XEmacs standard packages</para></listitem>
+<listitem><para>xemacs-mule-sumo - XEmacs MULE (MUlti Lingual Emacs) packages</para></listitem>
+</itemizedlist></para>
+<para>An alternative <emphasis>native</emphasis> distribution of XEmacs for
+Windows based systems can be downloaded from
+<ulink url="http://xemacs.org/Download/win32/index.html">http://xemacs.org/Download/win32/index.html</ulink>.
+It uses an <emphasis>InnoSetup Kit</emphasis> based installer.</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.ntemacs">

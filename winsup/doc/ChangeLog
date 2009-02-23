@@ -1,3 +1,7 @@
+2009-02-23  Dr. Volker Zell <dr.volker.zell@oracle.com>
+
+	* faq-using.xml: Rework XEmacs FAQ.
+
 2009-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml: Fix usage of ampersand in NT emacs script.
