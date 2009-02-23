@@ -30,25 +30,64 @@
 
 #include "ttyname.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <string.h>
 #include <paths.h>
+#include <_syslist.h>
 #include <errno.h>
 
-static char ttyname_buf[TTYNAME_BUFSIZE] = _PATH_DEV;
-
 /*
- *  ttyname() - POSIX 1003.1b 4.7.2 - Determine Terminal Device Name
+ *  ttyname_r() - POSIX 1003.1b 4.7.2 - Determine Terminal Device Name
  */
-char *
-_DEFUN( ttyname,(fd),
-	int fd)
+int
+_DEFUN( ttyname_r,(fd, name, namesize),
+	int fd _AND
+	char   *name _AND
+	size_t  namesize)
 {
-  register int  fail;
-  register char *ret=NULL;
-  fail = ttyname_r( fd, ttyname_buf, sizeof(ttyname_buf) );
-  if ( fail )  errno = fail;
-   else  ret = ttyname_buf;
-  return ret;
+  struct stat sb;
+  struct dirent *dirp;
+  DIR *dp;
+  struct stat dsb;
+  char buf[TTYNAME_BUFSIZE];
+
+  /* Must be a terminal. */
+  if (!isatty(fd))
+    return ENOTTY;
+
+  /* Must be a character device. */
+  if (fstat (fd, &sb) || !S_ISCHR (sb.st_mode))
+    return ENOTTY;
+
+  if ((dp = opendir (_PATH_DEV)) == NULL)
+    return EBADF;
+
+  strcpy(buf, _PATH_DEV);
+  while ((dirp = readdir (dp)) != NULL)
+    {
+      if (dirp->d_ino != sb.st_ino)
+	continue;
+      strcpy (buf + sizeof (_PATH_DEV) - 1, dirp->d_name);
+      if (stat (buf, &dsb) || sb.st_dev != dsb.st_dev ||
+	  sb.st_ino != dsb.st_ino)
+	continue;
+      (void) closedir (dp);
+      if(strlen(buf) < namesize)  /* < to account for terminating null */
+	{
+	strcpy(name, buf);
+	return 0;
+	}
+      else
+	{
+	return ERANGE;
+	}
+    }
+  (void) closedir (dp);
+  return EBADF;
 }
+
 #endif /* !_NO_TTYNAME  */

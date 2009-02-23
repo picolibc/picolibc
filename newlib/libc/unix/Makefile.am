@@ -12,7 +12,8 @@ GENERAL_SOURCES = \
 
 ## Distinguish different EL/IX level interfaces
 ELIX_2_SOURCES = \
-	ttyname.c
+	ttyname.c \
+	ttyname_r.c
 
 ELIX_4_SOURCES = \
 	basename.c	\

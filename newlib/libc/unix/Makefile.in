@@ -59,7 +59,7 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-getcwd.$(OBJEXT) lib_a-pread.$(OBJEXT) \
 	lib_a-pwrite.$(OBJEXT) lib_a-sigset.$(OBJEXT)
-am__objects_2 = lib_a-ttyname.$(OBJEXT)
+am__objects_2 = lib_a-ttyname.$(OBJEXT) lib_a-ttyname_r.$(OBJEXT)
 am__objects_3 = lib_a-basename.$(OBJEXT) lib_a-dirname.$(OBJEXT) \
 	lib_a-getlogin.$(OBJEXT) lib_a-getpass.$(OBJEXT) \
 	lib_a-getpwent.$(OBJEXT) lib_a-getut.$(OBJEXT)
@@ -74,7 +74,7 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libunix_la_LIBADD =
 am__objects_5 = getcwd.lo pread.lo pwrite.lo sigset.lo
-am__objects_6 = ttyname.lo
+am__objects_6 = ttyname.lo ttyname_r.lo
 am__objects_7 = basename.lo dirname.lo getlogin.lo getpass.lo \
 	getpwent.lo getut.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_8 = $(am__objects_6) \
@@ -278,7 +278,8 @@ GENERAL_SOURCES = \
 	sigset.c
 
 ELIX_2_SOURCES = \
-	ttyname.c
+	ttyname.c \
+	ttyname_r.c
 
 ELIX_4_SOURCES = \
 	basename.c	\
@@ -401,6 +402,12 @@ lib_a-ttyname.o: ttyname.c
 
 lib_a-ttyname.obj: ttyname.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ttyname.obj `if test -f 'ttyname.c'; then $(CYGPATH_W) 'ttyname.c'; else $(CYGPATH_W) '$(srcdir)/ttyname.c'; fi`
+
+lib_a-ttyname_r.o: ttyname_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ttyname_r.o `test -f 'ttyname_r.c' || echo '$(srcdir)/'`ttyname_r.c
+
+lib_a-ttyname_r.obj: ttyname_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ttyname_r.obj `if test -f 'ttyname_r.c'; then $(CYGPATH_W) 'ttyname_r.c'; else $(CYGPATH_W) '$(srcdir)/ttyname_r.c'; fi`
 
 lib_a-basename.o: basename.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-basename.o `test -f 'basename.c' || echo '$(srcdir)/'`basename.c

@@ -1,3 +1,14 @@
+2009-02-23  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/unix/ttyname.c:  Remove ttyname_r() (to a new file to avoid
+	coupling ttyname_r() and ttyname() due to the latter's large buffer).
+	* libc/unix/ttyname_r.c:  New file to hold ttyname_r(), previously in
+	ttyname.c.
+	* libc/unix/ttyname.h:  New file (common size definition for the 2
+	ttyname*c files that are now split).
+	* libc/unix/Makefile.am (ELIX_2_SOURCES):  Add ttyname_r.c.
+	* libc/unix/Makefile.in:  Regenerate.
+
 2009-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (mbsnrtowcs): Declare.
