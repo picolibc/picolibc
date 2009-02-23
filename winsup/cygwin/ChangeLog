@@ -1,3 +1,7 @@
+2009-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_user_local_groups): Simplify LookupAccountName code.
+
 2009-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (NetLocalGroupEnum): Remove.

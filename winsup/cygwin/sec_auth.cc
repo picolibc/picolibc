@@ -297,27 +297,34 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
       DWORD glen = MAX_SID_LEN;
       WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
       DWORD domlen = sizeof (dom);
-      bool builtin = false;
 
       use = SidTypeInvalid;
       wcscpy (dg_ptr, buf[i].lgrpi0_name);
-      if (!LookupAccountNameW (NULL, domlocal_grp, gsid, &glen,
-			       dom, &domlen, &use))
+      if (LookupAccountNameW (NULL, domlocal_grp, gsid, &glen,
+			      dom, &domlen, &use))
 	{
-	  if (GetLastError () != ERROR_NONE_MAPPED)
-	    debug_printf ("LookupAccountName(%W), %E", domlocal_grp);
-	  wcscpy (bg_ptr, dg_ptr);
-	  if (!LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
-				   dom, &domlen, &use))
-	    debug_printf ("LookupAccountName(%W), %E", builtin_grp);
-	  builtin = true;
+	  if (!legal_sid_type (use))
+	    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+	  else
+	    grp_list += gsid;
 	}
-      if (!legal_sid_type (use))
-	debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
-      else if (builtin)
-	grp_list *= gsid;
+      else if (GetLastError () == ERROR_NONE_MAPPED)
+	{
+	  /* Check if it's a builtin group. */
+	  wcscpy (bg_ptr, dg_ptr);
+	  if (LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
+				  dom, &domlen, &use))
+	    {
+	      if (!legal_sid_type (use))
+		debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+	      else
+		grp_list *= gsid;
+	    }
+	  else
+	    debug_printf ("LookupAccountName(%W), %E", builtin_grp);
+	}
       else
-	grp_list += gsid;
+	debug_printf ("LookupAccountName(%W), %E", domlocal_grp);
     }
   NetApiBufferFree (buf);
   return true;
