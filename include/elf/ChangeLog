@@ -1,3 +1,11 @@
+2009-02-23  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (STB_LOPROC): Replace Application-specific with
+	Processor-specific in comments.
+	(STB_HIPROC): Likewise.
+	(STT_LOPROC): Likewise.
+	(STT_HIPROC): Likewise.
+
 2009-02-03  Sandip Matte  <sandip@rmicorp.com>
 
 	* mips.h (E_MIPS_MACH_XLR): Define.
