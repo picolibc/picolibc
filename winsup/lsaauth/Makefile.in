@@ -70,10 +70,10 @@ clean:
 	rm -f *.o *.dll
 
 install: all
-	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
-	$(INSTALL_PROGRAM) $(DLL) $(bindir)/$(DLL)
-	$(INSTALL_PROGRAM) $(srcdir)/cyglsa64.dll $(bindir)/cyglsa64.dll
-	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(bindir)/cyglsa-config
+	$(SHELL) $(updir1)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) $(DLL) $(DESTDIR)$(bindir)/$(DLL)
+	$(INSTALL_PROGRAM) $(srcdir)/cyglsa64.dll $(DESTDIR)$(bindir)/cyglsa64.dll
+	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(DESTDIR)$(bindir)/cyglsa-config
 
 %.o: %.c
 	$(CC) $(WIN32_CFLAGS) -c -o $@ $<

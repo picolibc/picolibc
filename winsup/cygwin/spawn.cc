@@ -512,7 +512,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  /* Depends on ch.set call above!
+  /* Depends on ch.set call above.
      Some file types might need extra effort in the parent after CreateProcess
      and before copying the datastructures to the child.  So we have to start
      the child in suspend state, unfortunately, to avoid a race condition. */

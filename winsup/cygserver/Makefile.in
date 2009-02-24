@@ -51,14 +51,14 @@ CYGWIN_LIB:=$(cygwin_build)/libcygwin.a
 all: cygserver.exe
 
 install: all $(updir1)/mkinstalldirs cygserver.conf cygserver-config README
-	$(updir1)/mkinstalldirs $(sbindir)
-	$(updir1)/mkinstalldirs $(bindir)
-	$(updir1)/mkinstalldirs $(sysconfdir)/defaults/etc
-	$(updir1)/mkinstalldirs $(prefix)/share/doc/Cygwin
-	$(INSTALL_PROGRAM) cygserver.exe $(sbindir)/cygserver.exe
-	$(INSTALL_PROGRAM) $(srcdir)/cygserver-config $(bindir)/cygserver-config
-	$(INSTALL_DATA) $(srcdir)/cygserver.conf $(sysconfdir)/defaults/etc/cygserver.conf
-	$(INSTALL_DATA) $(srcdir)/README $(prefix)/share/doc/Cygwin/cygserver.README
+	$(updir1)/mkinstalldirs $(DESTDIR)$(sbindir)
+	$(updir1)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(updir1)/mkinstalldirs $(DESTDIR)$(sysconfdir)/defaults/etc
+	$(updir1)/mkinstalldirs $(DESTDIR)$(prefix)/share/doc/Cygwin
+	$(INSTALL_PROGRAM) cygserver.exe $(DESTDIR)$(sbindir)/cygserver.exe
+	$(INSTALL_PROGRAM) $(srcdir)/cygserver-config $(DESTDIR)$(bindir)/cygserver-config
+	$(INSTALL_DATA) $(srcdir)/cygserver.conf $(DESTDIR)$(sysconfdir)/defaults/etc/cygserver.conf
+	$(INSTALL_DATA) $(srcdir)/README $(DESTDIR)$(prefix)/share/doc/Cygwin/cygserver.README
 
 clean:
 	rm -f $(OBJS) ${patsubst %.o,%.d,$(OBJS)} cygserver.exe

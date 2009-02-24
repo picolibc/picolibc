@@ -158,10 +158,10 @@ realclean: clean
 	rm -f Makefile config.cache
 
 install: all
-	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
+	$(SHELL) $(updir1)/mkinstalldirs $(DESTDIR)$(bindir)
 	for i in $(CYGWIN_BINS) ${filter-out testsuite.exe,$(MINGW_BINS)} ; do \
 	  n=`echo $$i | sed '$(program_transform_name)'`; \
-	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
+	  $(INSTALL_PROGRAM) $$i $(DESTDIR)$(bindir)/$$n; \
 	done
 
 $(cygwin_build)/libcygwin.a: $(cygwin_build)/Makefile

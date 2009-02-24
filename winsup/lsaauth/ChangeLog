@@ -1,3 +1,7 @@
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
 2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Rearrange to avoid -mno-cygwin.

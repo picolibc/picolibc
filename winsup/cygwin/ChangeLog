@@ -1,3 +1,7 @@
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
 2009-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (get_user_local_groups): Simplify LookupAccountName code.

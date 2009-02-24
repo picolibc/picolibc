@@ -308,37 +308,37 @@ install: install-libs install-headers install-man install_target \
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
 install-libs: $(TARGET_LIBS)
-	@$(MKDIRP) $(bindir)
-	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(bindir)/$(DLL_NAME); \
+	@$(MKDIRP) $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME); \
 	for i in $^; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/lib/`basename $$i` ; \
 	done
-	cd $(tooldir)/lib && ln -sf libcygwin.a libg.a
+	cd $(DESTDIR)$(tooldir)/lib && ln -sf libcygwin.a libg.a
 
 install-headers:
 	cd $(srcdir); \
 	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
-	    $(MKDIRP) $(tooldir)/$$sub; \
+	    $(MKDIRP) $(DESTDIR)$(tooldir)/$$sub; \
 	    for i in $$sub/*.h ; do \
-	      $(INSTALL_DATA) $$i $(tooldir)/$$sub/`basename $$i` ; \
+	      $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
 	done ; \
-	$(INSTALL_DATA) regex/regex.h $(tooldir)/include/regex.h
+	$(INSTALL_DATA) regex/regex.h $(DESTDIR)$(tooldir)/include/regex.h
 
 install-man:
-	@$(MKDIRP) $(mandir)/man2 $(mandir)/man3 $(mandir)/man5 $(mandir)/man7
+	@$(MKDIRP) $(DESTDIR)$(mandir)/man2 $(DESTDIR)$(mandir)/man3 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man7
 	cd $(srcdir); \
 	for i in `find . -type f -name '*.2'`; do \
-	    $(INSTALL_DATA) $$i $(mandir)/man2/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man2/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.3'`; do \
-	    $(INSTALL_DATA) $$i $(mandir)/man3/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man3/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.5'`; do \
-	    $(INSTALL_DATA) $$i $(mandir)/man5/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man5/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.7'`; do \
-	    $(INSTALL_DATA) $$i $(mandir)/man7/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man7/`basename $$i` ; \
 	done
 
 install_target:

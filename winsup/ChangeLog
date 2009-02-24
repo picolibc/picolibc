@@ -1,3 +1,7 @@
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
 2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Remove --enable-server option.  Allways add the

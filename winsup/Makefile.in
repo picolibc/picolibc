@@ -65,9 +65,9 @@ endif
 all: Makefile $(SUBDIRS)
 
 install-license: CYGWIN_LICENSE COPYING
-	${INSTALL} -d $(prefix)/share/doc/Cygwin
+	${INSTALL} -d $(DESTDIR)$(prefix)/share/doc/Cygwin
 	for i in $^; do \
-	  ${INSTALL} $$i $(prefix)/share/doc/Cygwin ; \
+	  ${INSTALL} $$i $(DESTDIR)$(prefix)/share/doc/Cygwin ; \
 	done
 
 install: Makefile $(INSTALL_LICENSE) $(INSTALL_SUBDIRS)

@@ -1,3 +1,7 @@
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
 2009-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Evaluate and print state of
