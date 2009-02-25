@@ -229,6 +229,7 @@ CHEWOUT_FILES= \
 	malloc.def	\
 	mallocr.def	\
 	mblen.def	\
+	mbsnrtowcs.def	\
 	mbstowcs.def	\
 	mbtowc.def	\
 	mlock.def	\
@@ -241,6 +242,7 @@ CHEWOUT_FILES= \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
+	wcsnrtombs.def	\
 	wcstod.def 	\
 	wcstol.def 	\
 	wcstoll.def 	\

@@ -1,11 +1,22 @@
+2009-02-25  Brooks Moses  <brooks@codesourcery.com>
+
+	* libc/stdlib/Makefile.am (CHEWOUT_FILES): Add
+	  mbsnrtowcs.def, wcsnrtombs.def.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/stdlib.tex (@menu): Use correct section
+	  names for mbsrtowcs, wcsrtombs.
+	* libc/stdlib/wcstod.c: Remove stray character in
+	  documentation.
+
 2009-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* mbtowc_r.c (_mbtowc_r): Remove conversion of 5 and 6 byte UTF-8
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Remove conversion of 5 and 6 
+	byte UTF-8
 	sequences since they are invalid in the Unicode standard.
 	Handle surrogate pairs in case of wchar_t == UTF-16.
-	* wctomb_r.c (_wctomb_r): Don't convert invalid Unicode wchar_t
-	values beyond 0x10ffff into UTF-8 chars.  Handle surrogate pairs in
-	case of wchar_t == UTF-16.
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Don't convert invalid Unicode 
+	wchar_t values beyond 0x10ffff into UTF-8 chars.  Handle surrogate 
+	pairs in case of wchar_t == UTF-16.
 
 2009-02-24  Kevin Buettner  <kevinb@redhat.com>
 
