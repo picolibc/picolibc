@@ -75,6 +75,18 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
       if (s == NULL)
         return 0; /* UTF-8 character encodings are not state-dependent */
 
+      if (state->__count == 4)
+	{
+	  /* Create the second half of the surrogate pair.  For a description
+	     see the comment below. */
+	  wint_t tmp = (wchar_t)((state->__value.__wchb[0] & 0x07) << 18)
+	    |   (wchar_t)((state->__value.__wchb[1] & 0x3f) << 12)
+	    |   (wchar_t)((state->__value.__wchb[2] & 0x3f) << 6)
+	    |   (wchar_t)(state->__value.__wchb[3] & 0x3f);
+	  state->__count = 0;
+	  *pwc = 0xdc00 | ((tmp - 0x10000) & 0x3ff);
+	  return 2;
+	}
       if (state->__count == 0)
 	ch = t[i++];
       else
@@ -153,8 +165,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
       else if (ch >= 0xf0 && ch <= 0xf7)
 	{
 	  /* four-byte sequence */
-	  if (sizeof(wchar_t) < 4)
-	    return -1; /* we can't store such a value */
+	  wint_t tmp;
 	  state->__value.__wchb[0] = ch;
 	  if (state->__count == 0)
 	    state->__count = 1;
@@ -185,125 +196,25 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  ch = t[i++];
 	  if (ch < 0x80 || ch > 0xbf)
 	    return -1;
-	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x07) << 18)
-	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 6)
-	    |    (wchar_t)(ch & 0x3f);
-	
-	  state->__count = 0;
-	  return i;
-	}
-      else if (ch >= 0xf8 && ch <= 0xfb)
-	{
-	  /* five-byte sequence */
-	  if (sizeof(wchar_t) < 4)
-	    return -1; /* we can't store such a value */
-	  state->__value.__wchb[0] = ch;
-	  if (state->__count == 0)
-	    state->__count = 1;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 2)
-	    return -2;
-	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
-	  if (state->__value.__wchb[0] == 0xf8 && ch < 0x88)
-	    /* overlong UTF-8 sequence */
-	    return -1;
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[1] = ch;
-	  if (state->__count == 1)
-	    state->__count = 2;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 3)
-	    return -2;
-	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[2] = ch;
-	  if (state->__count == 2)
-	    state->__count = 3;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 4)
-	    return -2;
-	  ch = (state->__count == 3) ? t[i++] : state->__value.__wchb[3];
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[3] = ch;
-	  state->__count = 4;
-	  if (n < 5)
-	    return -2;
-	  ch = t[i++];
-	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x03) << 24)
-	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 18)
-	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 12)
-	    |    (wchar_t)((state->__value.__wchb[3] & 0x3f) << 6)
-	    |    (wchar_t)(ch & 0x3f);
-	
-	  state->__count = 0;
-	  return i;
-	}
-      else if (ch >= 0xfc && ch <= 0xfd)
-        {
-          /* six-byte sequence */
-	  int ch2;
-	  if (sizeof(wchar_t) < 4)
-	    return -1; /* we can't store such a value */
-	  state->__value.__wchb[0] = ch;
-	  if (state->__count == 0)
-	    state->__count = 1;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 2)
-	    return -2;
-	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
-	  if (state->__value.__wchb[0] == 0xfc && ch < 0x84)
-	    /* overlong UTF-8 sequence */
-	    return -1;
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[1] = ch;
-	  if (state->__count == 1)
-	    state->__count = 2;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 3)
-	    return -2;
-	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[2] = ch;
-	  if (state->__count == 2)
-	    state->__count = 3;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 4)
-	    return -2;
-	  ch = (state->__count == 3) ? t[i++] : state->__value.__wchb[3];
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  state->__value.__wchb[3] = ch;
-	  if (state->__count == 3)
-	    state->__count = 4;
-	  else if (n < (size_t)-1)
-	    ++n;
-	  if (n < 5)
-	    return -2;
-	  if (n == 5)
-	    return -1; /* at this point we can't save enough to restart */
-	  ch = t[i++];
-	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
-	  ch2 = t[i++];
-	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x01) << 30)
-	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 24)
-	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 18)
-	    |    (wchar_t)((state->__value.__wchb[3] & 0x3f) << 12)
-	    |    (wchar_t)((ch & 0x3f) << 6)
-	    |    (wchar_t)(ch2 & 0x3f);
-	
+	  tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
+	    |   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
+	    |   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6)
+	    |   (wint_t)(ch & 0x3f);
+	  if (tmp > 0xffff && sizeof(wchar_t) == 2)
+	    {
+	      /* On systems which have wchar_t being UTF-16 values, the value
+		 doesn't fit into a single wchar_t in this case.  So what we
+		 do here is to store the state with a special value of __count
+		 and return the first half of a surrogate pair.  As return
+		 value we choose to return the half of the actual UTF-8 char.
+		 The second half is returned in case we recognize the special
+		 __count value above. */
+	      state->__value.__wchb[3] = ch;
+	      state->__count = 4;
+	      *pwc = 0xd800 | (((tmp - 0x10000) >> 10) & 0x3ff);
+	      return 2;
+	    }
+	  *pwc = tmp;
 	  state->__count = 0;
 	  return i;
 	}

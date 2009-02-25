@@ -28,6 +28,11 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
       if (s == NULL)
         return 0; /* UTF-8 encoding is not state-dependent */
 
+      if (state->__count == -4 && (wchar < 0xdc00 || wchar >= 0xdfff))
+	{
+	  /* At this point only the second half of a surrogate pair is valid. */
+	  return -1;
+	}
       if (wchar <= 0x7f)
         {
           *s = wchar;
@@ -41,41 +46,51 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         }
       else if (wchar >= 0x800 && wchar <= 0xffff)
         {
-          /* UTF-16 surrogates -- must not occur in normal UCS-4 data */
           if (wchar >= 0xd800 && wchar <= 0xdfff)
-            return -1;
-
+	    {
+	      wint_t tmp;
+	      /* UTF-16 surrogates -- must not occur in normal UCS-4 data */
+	      if (sizeof (wchar_t) != 2)
+		return -1;
+	      if (wchar >= 0xdc00)
+		{
+		  /* Second half of a surrogate pair. It's not valid if
+		     we don't have already read a first half of a surrogate
+		     before. */
+		  if (state->__count != -4)
+		    return -1;
+		  /* If it's valid, reconstruct the full Unicode value and
+		     return the trailing three bytes of the UTF-8 char. */
+		  tmp = (state->__value.__wchb[0] << 16)
+			| (state->__value.__wchb[1] << 8)
+			| (wchar & 0x3ff);
+		  state->__count = 0;
+		  *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
+		  *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
+		  *s   = 0x80 |  (tmp &     0x3f);
+		  return 3;
+	      	}
+	      /* First half of a surrogate pair.  Store the state and return
+	         the first byte of the UTF-8 char. */
+	      tmp = ((wchar & 0x3ff) << 10) + 0x10000;
+	      state->__value.__wchb[0] = (tmp >> 16) & 0xff;
+	      state->__value.__wchb[1] = (tmp >> 8) & 0xff;
+	      state->__count = -4;
+	      *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
+	      return 1;
+	    }
           *s++ = 0xe0 | ((wchar & 0xf000) >> 12);
           *s++ = 0x80 | ((wchar &  0xfc0) >> 6);
           *s   = 0x80 |  (wchar &   0x3f);
           return 3;
         }
-      else if (wchar >= 0x10000 && wchar <= 0x1fffff)
+      else if (wchar >= 0x10000 && wchar <= 0x10ffff)
         {
           *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
           *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
           *s++ = 0x80 | ((wchar &    0xfc0) >> 6);
           *s   = 0x80 |  (wchar &     0x3f);
           return 4;
-        }
-      else if (wchar >= 0x200000 && wchar <= 0x3ffffff)
-        {
-          *s++ = 0xf8 | ((wchar & 0x3000000) >> 24);
-          *s++ = 0x80 | ((wchar &  0xfc0000) >> 18);
-          *s++ = 0x80 | ((wchar &   0x3f000) >> 12);
-          *s++ = 0x80 | ((wchar &     0xfc0) >> 6);
-          *s   = 0x80 |  (wchar &      0x3f);
-          return 5;
-        }
-      else if (wchar >= 0x4000000 && wchar <= 0x7fffffff)
-        {
-          *s++ = 0xfc | ((wchar & 0x40000000) >> 30);
-          *s++ = 0x80 | ((wchar & 0x3f000000) >> 24);
-          *s++ = 0x80 | ((wchar &   0xfc0000) >> 18);
-          *s++ = 0x80 | ((wchar &    0x3f000) >> 12);
-          *s++ = 0x80 | ((wchar &      0xfc0) >> 6);
-          *s   = 0x80 |  (wchar &       0x3f);
-          return 6;
         }
       else
         return -1;
