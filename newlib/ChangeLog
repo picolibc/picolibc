@@ -1,3 +1,7 @@
+2009-02-24  Kevin Buettner  <kevinb@redhat.com>
+
+	* libc/stdio/open_memstream.c (stdint.h): Include.
+
 2009-02-23  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/unix/ttyname.c:  Remove ttyname_r() (to a new file to avoid

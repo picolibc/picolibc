@@ -66,6 +66,7 @@ Supporting OS subroutines required: <<sbrk>>.
 #include <errno.h>
 #include <string.h>
 #include <sys/lock.h>
+#include <stdint.h>
 #include "local.h"
 
 #ifndef __LARGE64_FILES
