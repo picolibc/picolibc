@@ -1,3 +1,7 @@
+2009-02-26  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* ppc.h (PPC_OPCODE_POWER7): New.
+
 2009-02-06  Doug Evans  <dje@google.com>
 
 	* i386.h: Add comment regarding sse* insns and prefixes.

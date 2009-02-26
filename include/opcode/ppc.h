@@ -114,6 +114,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is only supported by Power4 architecture.  */
 #define PPC_OPCODE_POWER4	    0x4000
 
+/* Opcode is only supported by Power7 architecture.  */
+#define PPC_OPCODE_POWER7	    0x8000
+
 /* Opcode is only supported by POWERPC Classic architecture.  */
 #define PPC_OPCODE_CLASSIC	   0x10000
 
