@@ -1,3 +1,7 @@
+2009-02-26  Brooks Moses  <brooks@codesourcery.com>
+
+	* libc/machine/arm/strcpy.c: Add missing comma.
+
 2009-02-26  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/machine/lm32/configure.in: Let 

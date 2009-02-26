@@ -92,7 +92,7 @@ strcpy (char* dst, const char* src)
        "mov	r3, r4\n"
   "1:\n\t"
 #ifdef __ARMEB__
-       "rors	r3, r3 #24\n\t"
+       "rors	r3, r3, #24\n\t"
 #endif
        "strb	r3, [ip], #1\n\t"
        "tst	r3, #0xff\n\t"
