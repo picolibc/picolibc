@@ -1,4 +1,4 @@
-2009-02-26  Ralf CorsÃ©pius  <ralf.corsepius@rtems.org>
+2009-02-26  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/machine/lm32/configure.in: Let 
 	AC_CONFIG_SRCDIR point to setjmp.S instead of setjmp.s
