@@ -1,3 +1,9 @@
+2009-02-26  Ralf CorsÃ©pius  <ralf.corsepius@rtems.org>
+
+	* libc/machine/lm32/configure.in: Let 
+	AC_CONFIG_SRCDIR point to setjmp.S instead of setjmp.s
+	* libs/machine/lm32/configure: Regenerate.
+
 2009-02-25  Brooks Moses  <brooks@codesourcery.com>
 
 	* libc/stdlib/Makefile.am (CHEWOUT_FILES): Add
