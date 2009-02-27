@@ -1,3 +1,17 @@
+2009-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (dtable::select_read): Add ability to override fh.
+	* fhandler.h (fhandler_fifo::select_read): Declare new function.
+	(fhandler_fifo::select_write): Ditto.
+	(fhandler_fifo::select_except): Ditto.
+	* select.cc (peek_pipe): Treat certain classes of pipe errors as "no
+	data".
+	(fhandler_fifo::select_read): Define new function.
+	(fhandler_fifo::select_write): Ditto.
+	(fhandler_fifo::select_except): Ditto.
+
+	* shared_info.h (CURR_SHARED_MAGIC): Update.
+
 2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
 
 	* Makefile.in: Add DESTDIR functionality.
@@ -410,7 +424,6 @@
 	* mount.h: Move USER_* defines back to shared_info.h.
 
 	* speclib: Force temporary directory cleanup.
-	
 
 2009-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
 

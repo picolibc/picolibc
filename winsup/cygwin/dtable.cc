@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -640,7 +640,8 @@ dtable::select_read (int fd, select_record *s)
   fhandler_base *fh = fds[fd];
   s = fh->select_read (s);
   s->fd = fd;
-  s->fh = fh;
+  if (!s->fh)
+    s->fh = fh;
   s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
   return s;

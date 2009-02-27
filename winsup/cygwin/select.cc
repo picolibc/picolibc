@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -465,10 +465,19 @@ peek_pipe (select_record *s, bool from_select)
     select_printf ("%s, select for read/except on write end of pipe",
 		   fh->get_name ());
   else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
-    {
-      select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
-      n = -1;
-    }
+    switch (GetLastError ())
+      {
+      case ERROR_BAD_PIPE:
+      case ERROR_PIPE_BUSY:
+      case ERROR_NO_DATA:
+      case ERROR_PIPE_NOT_CONNECTED:
+	n = 0;
+	break;
+      default:
+	select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
+	n = -1;
+	break;
+      }
 
   if (n < 0)
     {
@@ -679,6 +688,48 @@ fhandler_pipe::select_write (select_record *s)
 
 select_record *
 fhandler_pipe::select_except (select_record *s)
+{
+  if (!s)
+    s = new select_record;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->except_selected = true;
+  s->except_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_fifo::select_read (select_record *s)
+{
+  if (!s)
+    s = new select_record;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->read_selected = true;
+  s->read_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_fifo::select_write (select_record *s)
+{
+  if (!s)
+    s = new select_record;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->write_selected = true;
+  s->write_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_fifo::select_except (select_record *s)
 {
   if (!s)
     s = new select_record;

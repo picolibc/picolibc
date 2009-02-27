@@ -558,6 +558,7 @@ public:
   void init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, const char * = NULL);
+  friend class fhandler_fifo;
 };
 
 enum fifo_state
@@ -582,6 +583,9 @@ public:
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   OVERLAPPED *get_overlapped () {return &io_status;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
+  select_record *select_read (select_record *s);
+  select_record *select_write (select_record *s);
+  select_record *select_except (select_record *s);
 };
 
 class fhandler_dev_raw: public fhandler_base
