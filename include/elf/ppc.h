@@ -186,6 +186,11 @@ enum
      registers, 3 for SPE registers; 0 for not tagged or not using any
      ABIs affected by the differences.  */
   Tag_GNU_Power_ABI_Vector = 8,
+
+  /* Value 1 for ABIs using r3/r4 for returning structures <= 8 bytes,
+     2 for ABIs using memory; 0 for not tagged or not using any ABIs
+     affected by the differences.  */
+  Tag_GNU_Power_ABI_Struct_Return = 12
 };
 
 #endif /* _ELF_PPC_H */
