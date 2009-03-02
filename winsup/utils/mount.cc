@@ -386,9 +386,15 @@ mount_entries (void)
 	  char opts[strlen (p->mnt_opts) + 1];
 
 	  convert_spaces (dirname, p->mnt_dir);
+	  // remove trailing slash
 	  char *ls = strrchr (dirname, '/');
-	  if (ls && ls > dirname)
-	    *ls = '\0';
+	  if (ls)
+	    {
+	      // last slash == leading slash?  cygdrive prefix == "/"
+	      if (ls == dirname)
+		++ls;
+	      *ls = '\0';
+	    }
 	  *stpncpy (opts, p->mnt_opts, noumount - p->mnt_opts) = '\0';
 	  printf (format_cyg, dirname, opts);
 	  break;

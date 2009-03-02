@@ -1,3 +1,8 @@
+2009-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (mount_entries): Handle a "/" cygdrive prefix correctly.
+	Add comments.
+
 2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
 
 	* Makefile.in: Add DESTDIR functionality.
