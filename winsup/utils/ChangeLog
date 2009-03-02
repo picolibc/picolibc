@@ -1,5 +1,11 @@
 2009-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.sgml: Set example prompt to "$" throughout.  Don't use "/"
+	as example cygdrive prefix.  Remove reference to -u and -s options.
+	Add an example using the -o flag.
+
+2009-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_entries): Handle a "/" cygdrive prefix correctly.
 	Add comments.
 

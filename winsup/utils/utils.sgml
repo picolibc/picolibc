@@ -181,7 +181,7 @@ When asked to run this command save the output so that you can email it,
 for example:</para>
 
 <screen>
-<prompt>C:\cygwin&gt;</prompt> <userinput>cygcheck -s -v -r -h &gt; cygcheck_output.txt</userinput>
+<prompt>$</prompt> <userinput>cygcheck -s -v -r -h &gt; cygcheck_output.txt</userinput>
 </screen>
 
 </sect2>
@@ -731,7 +731,7 @@ will display the current mount table for you.</para>
 <example id="utils-mount-ex">
 <title>Displaying the current set of mount points</title>
 <screen>
-<prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
+<prompt>$</prompt> <userinput>mount</userinput>
 c:\cygwin\bin on /usr/bin type ntfs (binary)
 c:\cygwin\lib on /usr/lib type ntfs (binary)
 c:\cygwin on / type ntfs (binary)
@@ -756,11 +756,11 @@ for the duration of the current session.
 <example id="utils-mount-add-ex">
 <title>Adding mount points</title>
 <screen>
-<prompt>c:\cygwin\&gt;</prompt> <userinput>ls /data</userinput>
+<prompt>$</prompt> <userinput>ls /data</userinput>
 ls: /data: No such file or directory
-<prompt>c:\cygwin\&gt;</prompt> <userinput>mount //pollux/home/joe/data /data</userinput>
+<prompt>$</prompt> <userinput>mount //pollux/home/joe/data /data</userinput>
 mount: warning - /data does not exist!
-<prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
+<prompt>$</prompt> <userinput>mount</userinput>
 //pollux/home/joe/data on /data type smbfs (binary)
 c:/cygwin/bin on /usr/bin type ntfs (binary)
 c:/cygwin/lib on /usr/lib type ntfs (binary)
@@ -826,24 +826,32 @@ mount table, then <filename>z:\</filename> will be accessible as
 <filename>/cygdrive/z</filename>.  The <command>mount</command> utility 
 can be used to change this default automount prefix through the use of the
 "--change-cygdrive-prefix" option.  In the following example, we will
-set the automount prefix to <filename>/</filename>:</para>
+set the automount prefix to <filename>/mnt</filename>:</para>
 
 <example id="utils-cygdrive-ex">
 <title>Changing the default prefix</title>
 <screen>
-<prompt>c:\cygwin\&gt;</prompt> <userinput>mount --change-cygdrive-prefix /</userinput>
+<prompt>$</prompt> <userinput>mount --change-cygdrive-prefix /mnt</userinput>
 </screen>
 </example>
 
 <para>Note that the cygdrive prefix can be set both per-user and system-wide, 
 and that as with all mounts, a user-specific mount takes precedence over the 
 system-wide setting.  The <command>mount</command> utility creates system-wide 
-mounts by default if you do not specify a type.  Use the <literal>-s</literal> 
-or <literal>-u</literal> flag to indicate a system or user mount, respectively.
+mounts by default if you do not specify a type.
 You can always see the user and system cygdrive prefixes with the 
-<literal>-p</literal> option.  Using the <literal>-b</literal>
+<literal>-p</literal> option.  Using the <literal>--options</literal>
 flag with <literal>--change-cygdrive-prefix</literal> makes all new 
-automounted filesystems default to binary mode file accesses.</para>
+automounted filesystems default to this set of options.  For instance
+(using the short form of the command line flags)</para>
+
+<example id="utils-cygdrive-ex2">
+<title>Changing the default prefix with specific mount options</title>
+<screen>
+<prompt>$</prompt> <userinput>mount -c /mnt -o binary,noacl</userinput>
+</screen>
+</example>
+
 
 </sect3>
 
