@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
@@ -31,6 +32,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
       if (state->__count == -4 && (wchar < 0xdc00 || wchar >= 0xdfff))
 	{
 	  /* At this point only the second half of a surrogate pair is valid. */
+	  r->_errno = EILSEQ;
 	  return -1;
 	}
       if (wchar <= 0x7f)
@@ -51,14 +53,20 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 	      wint_t tmp;
 	      /* UTF-16 surrogates -- must not occur in normal UCS-4 data */
 	      if (sizeof (wchar_t) != 2)
-		return -1;
+		{
+		  r->_errno = EILSEQ;
+		  return -1;
+		}
 	      if (wchar >= 0xdc00)
 		{
 		  /* Second half of a surrogate pair. It's not valid if
 		     we don't have already read a first half of a surrogate
 		     before. */
 		  if (state->__count != -4)
-		    return -1;
+		    {
+		      r->_errno = EILSEQ;
+		      return -1;
+		    }
 		  /* If it's valid, reconstruct the full Unicode value and
 		     return the trailing three bytes of the UTF-8 char. */
 		  tmp = (state->__value.__wchb[0] << 16)
@@ -93,7 +101,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
           return 4;
         }
       else
-        return -1;
+	{
+	  r->_errno = EILSEQ;
+	  return -1;
+	}
     }
   else if (!strcmp (__lc_ctype, "C-SJIS"))
     {
@@ -113,7 +124,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
               return 2;
             }
           else
-            return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
         }
     }
   else if (!strcmp (__lc_ctype, "C-EUCJP"))
@@ -134,7 +148,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
               return 2;
             }
           else
-            return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
         }
     }
   else if (!strcmp (__lc_ctype, "C-JIS"))
@@ -165,7 +182,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
               return cnt + 2;
             }
           else
-            return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
         }
       else
         {
@@ -187,6 +207,12 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
     return 0;
  
   /* otherwise we are dealing with a single byte character */
+  if (wchar >= 0x100)
+    {
+      r->_errno = EILSEQ;
+      return -1;
+    }
+
   *s = (char) wchar;
   return 1;
 }

@@ -1,3 +1,9 @@
+2009-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Return EILSEQ in case of an
+	invalid wchar.  Return -1 if wchar doesn't fit into singlebyte
+	value in case of using a singlebyte charset.
+
 2009-02-26  Brooks Moses  <brooks@codesourcery.com>
 
 	* libc/machine/arm/strcpy.c: Add missing comma.
