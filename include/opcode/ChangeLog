@@ -1,5 +1,8 @@
 2009-03-02  Alan Modra  <amodra@bigpond.net.au>
 
+	2009-02-26  Peter Bergner  <bergner@vnet.ibm.com>
+	* ppc.h (PPC_OPCODE_POWER7): New.
+
 	2009-01-09  Peter Bergner  <bergner@vnet.ibm.com>
 	* ppc.h (struct powerpc_opcode): New field "deprecated".
 	(PPC_OPCODE_NOPOWER4): Delete.
