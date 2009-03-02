@@ -46,6 +46,11 @@ struct powerpc_opcode
      are listed below.  */
   ppc_cpu_t flags;
 
+  /* One bit flags for the opcode.  These are used to indicate which
+     specific processors no longer support the instructions.  The defined
+     values are listed below.  */
+  ppc_cpu_t deprecated;
+
   /* An array of operand codes.  Each code is an index into the
      operand table.  They appear in the order which the operands must
      appear in assembly code, and are terminated by a zero.  */
@@ -108,9 +113,6 @@ extern const int powerpc_num_opcodes;
 
 /* Opcode is only supported by Power4 architecture.  */
 #define PPC_OPCODE_POWER4	    0x4000
-
-/* Opcode isn't supported by Power4 architecture.  */
-#define PPC_OPCODE_NOPOWER4	    0x8000
 
 /* Opcode is only supported by POWERPC Classic architecture.  */
 #define PPC_OPCODE_CLASSIC	   0x10000
