@@ -48,6 +48,7 @@ effects vary with the locale.
 
 #include <newlib.h>
 #include <stdlib.h>
+#include <errno.h>
 
 int
 _DEFUN (wctomb, (s, wchar),
@@ -61,6 +62,12 @@ _DEFUN (wctomb, (s, wchar),
 #else /* not _MB_CAPABLE */
         if (s == NULL)
                 return 0;
+
+	/* Verify that wchar is a valid single-byte character.  */
+	if ((size_t)wchar >= 0x100) {
+		errno = EILSEQ;
+		return -1;
+	}
 
         *s = (char) wchar;
         return 1;

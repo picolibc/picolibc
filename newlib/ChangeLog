@@ -1,3 +1,9 @@
+2009-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/wctomb_r.c (_wctomb_r): When checking single-byte
+	charset, cast wchar to size_t in case wchar_t is signed.
+	* libc/stdlib/wctomb.c (wctomb): Add similar single-byte check.
+
 2009-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wctomb_r.c (_wctomb_r): Return EILSEQ in case of an

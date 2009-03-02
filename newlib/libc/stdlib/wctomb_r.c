@@ -207,7 +207,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
     return 0;
  
   /* otherwise we are dealing with a single byte character */
-  if (wchar >= 0x100)
+  if ((size_t)wchar >= 0x100)
     {
       r->_errno = EILSEQ;
       return -1;
