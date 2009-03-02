@@ -1,5 +1,8 @@
 2009-03-02  Alan Modra  <amodra@bigpond.net.au>
 
+	2008-11-14  Nathan Sidwell  <nathan@codesourcery.com>
+	* internal.h (struct elf_segment_map): Add header_size field.
+ 
 	2008-10-10  Nathan Froyd  <froydnj@codesourcery.com>
 	* ppc.h: Add Tag_GNU_Power_ABI_Struct_Return.
 

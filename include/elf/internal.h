@@ -266,6 +266,8 @@ struct elf_segment_map
   bfd_vma p_align;
   /* Segment size in file and memory */
   bfd_vma p_size;
+  /* Required size of filehdr + phdrs, if non-zero */
+  bfd_vma header_size;
   /* Whether the p_flags field is valid; if not, the flags are based
      on the section flags.  */
   unsigned int p_flags_valid : 1;
