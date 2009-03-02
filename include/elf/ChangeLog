@@ -1,3 +1,8 @@
+2009-03-02  Qinwei  <qinwei@sunnorth.com.cn>
+
+	* score.h (RELOC_NUMBER): Add R_SCORE_IMM32.
+	* common.h (EM_SCORE_OLD): Define.
+
 2009-02-23  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h (STB_LOPROC): Replace Application-specific with

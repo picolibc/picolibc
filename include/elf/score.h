@@ -1,6 +1,7 @@
 /* Score ELF support for BFD.
-   Copyright 2006, 2008 Free Software Foundation, Inc.
+   Copyright 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
    Contributed by 
+   Brain.lin (brain.lin@sunplusct.com)
    Mei Ligang (ligang@sunnorth.com.cn)
    Pei-Lin Tsai (pltsai@sunplus.com)
 
@@ -8,7 +9,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -35,6 +36,10 @@
 #define GP_DISP_LABEL           "_gp_disp"
 
 /* Processor specific flags for the ELF header e_flags field:  */
+#define EF_SCORE_MACH           0xffff0000      
+#define EF_OMIT_PIC_FIXDD       0x0fff0000      
+#define E_SCORE_MACH_SCORE3     0x00030000
+#define E_SCORE_MACH_SCORE7     0x00070000
 
 /* File contains position independent code.  */
 #define EF_SCORE_PIC            0x80000000
@@ -101,7 +106,7 @@ START_RELOC_NUMBERS (elf_score_reloc_type)
   RELOC_NUMBER (R_SCORE_NONE,           0)
   RELOC_NUMBER (R_SCORE_HI16,           1)   
   RELOC_NUMBER (R_SCORE_LO16,           2)   
-  RELOC_NUMBER (R_SCORE_DUMMY1,         3)
+  RELOC_NUMBER (R_SCORE_BCMP,           3)
   RELOC_NUMBER (R_SCORE_24,             4)   
   RELOC_NUMBER (R_SCORE_PC19,           5)  
   RELOC_NUMBER (R_SCORE16_11,           6)   
@@ -118,6 +123,8 @@ START_RELOC_NUMBERS (elf_score_reloc_type)
   RELOC_NUMBER (R_SCORE_GPREL32,        17)
   RELOC_NUMBER (R_SCORE_REL32,          18)
   RELOC_NUMBER (R_SCORE_DUMMY_HI16,     19)
+  RELOC_NUMBER (R_SCORE_IMM30,          20)
+  RELOC_NUMBER (R_SCORE_IMM32,          21)
 END_RELOC_NUMBERS (R_SCORE_max)
 
 #endif /* _ELF_SCORE_H */

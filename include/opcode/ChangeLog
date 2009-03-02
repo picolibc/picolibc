@@ -1,3 +1,9 @@
+2009-03-02  Qinwei  <qinwei@sunnorth.com.cn>
+
+	* score-inst.h (score_insn_type, score_data_type): Add Ra_I9_I5
+	and _IMM11 for mbitclr and mbitset.
+	* score-datadep.h: Update dependency information.
+
 2009-02-26  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (PPC_OPCODE_POWER7): New.

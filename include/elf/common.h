@@ -334,6 +334,9 @@
 
 #define EM_CYGNUS_MEP		0xF00D  /* Toshiba MeP */
 
+/* Old Sunplus S+core7 backend magic number. Written in the absence of an ABI.  */
+#define EM_SCORE_OLD            95
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */

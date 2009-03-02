@@ -1,6 +1,7 @@
 /* score-inst.h -- Score Instructions Table
-   Copyright 2006 Free Software Foundation, Inc.
+   Copyright 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
    Contributed by: 
+   Brain.lin (brain.lin@sunplusct.com)
    Mei Ligang (ligang@sunnorth.com.cn)
    Pei-Lin Tsai (pltsai@sunplus.com)
 
@@ -8,7 +9,7 @@
 
    GAS is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    GAS is distributed in the hope that it will be useful,
@@ -96,6 +97,8 @@ enum score_insn_type
   Rd_Rs_I14,
   I15,
   Rd_I16,
+  Rd_I30, 
+  Rd_I32, 
   Rd_rvalueRs_SI10,
   Rd_lvalueRs_SI10,
   Rd_rvalueRs_preSI12,
@@ -105,6 +108,8 @@ enum score_insn_type
   Rd_Rs_SI14,
   Rd_rvalueRs_SI15,
   Rd_lvalueRs_SI15,
+  Rd_SI5,
+  Rd_SI6,
   Rd_SI16,
   PC_DISP8div2,
   PC_DISP11div2,
@@ -139,6 +144,8 @@ enum score_insn_type
   Insn_GP,
   Insn_PIC,
   Insn_internal,
+  Insn_BCMP,
+  Ra_I9_I5,
 };
 
 enum score_data_type
@@ -178,6 +185,13 @@ enum score_data_type
   _SIMM16_pic = 42,   /* Index in score_df_range.  */
   _IMM16_LO16_pic = 43,
   _IMM16_pic = 44,
+
+  _SIMM5 = 45,
+  _SIMM6 = 46,
+  _IMM32 = 47,
+  _SIMM32 = 48,
+  _IMM11 = 49,
+  _IMM5_MULTI_LOAD = 50,
 };
 
 #define REG_TMP			  1
@@ -206,302 +220,17 @@ enum score_data_type
 #define OP16_SH_DISP8           (OP_IMM_TYPE | 0)
 #define OP16_SH_DISP11          (OP_IMM_TYPE | 1)
 
-struct datafield_range
-{
-  int data_type;
-  int bits;
-  int range[2];
-};
-
-struct datafield_range score_df_range[] =
-{
-  {_IMM4,             4,  {0, (1 << 4) - 1}},	        /* (     0 ~ 15   ) */
-  {_IMM5,             5,  {0, (1 << 5) - 1}},	        /* (     0 ~ 31   ) */
-  {_IMM8,             8,  {0, (1 << 8) - 1}},	        /* (     0 ~ 255  ) */
-  {_IMM14,            14, {0, (1 << 14) - 1}},	        /* (     0 ~ 16383) */
-  {_IMM15,            15, {0, (1 << 15) - 1}},	        /* (     0 ~ 32767) */
-  {_IMM16,            16, {0, (1 << 16) - 1}},	        /* (     0 ~ 65535) */
-  {_SIMM10,           10, {-(1 << 9), (1 << 9) - 1}},	/* (  -512 ~ 511  ) */
-  {_SIMM12,           12, {-(1 << 11), (1 << 11) - 1}},	/* ( -2048 ~ 2047 ) */
-  {_SIMM14,           14, {-(1 << 13), (1 << 13) - 1}},	/* ( -8192 ~ 8191 ) */
-  {_SIMM15,           15, {-(1 << 14), (1 << 14) - 1}},	/* (-16384 ~ 16383) */
-  {_SIMM16,           16, {-(1 << 15), (1 << 15) - 1}},	/* (-32768 ~ 32767) */
-  {_SIMM14_NEG,       14, {-(1 << 13), (1 << 13) - 1}},	/* ( -8191 ~ 8192 ) */
-  {_IMM16_NEG,        16, {0, (1 << 16) - 1}},	        /* (-65535 ~ 0    ) */
-  {_SIMM16_NEG,       16, {-(1 << 15), (1 << 15) - 1}},	/* (-32768 ~ 32767) */
-  {_IMM20,            20, {0, (1 << 20) - 1}},
-  {_IMM25,            25, {0, (1 << 25) - 1}},
-  {_DISP8div2,        8,  {-(1 << 8), (1 << 8) - 1}},	/* (  -256 ~ 255  ) */
-  {_DISP11div2,       11, {0, 0}},
-  {_DISP19div2,       19, {-(1 << 19), (1 << 19) - 1}},	/* (-524288 ~ 524287) */
-  {_DISP24div2,       24, {0, 0}},
-  {_VALUE,            32, {0, ((unsigned int)1 << 31) - 1}},
-  {_VALUE_HI16,       16, {0, (1 << 16) - 1}},
-  {_VALUE_LO16,       16, {0, (1 << 16) - 1}},
-  {_VALUE_LDST_LO16,  16, {0, (1 << 16) - 1}},
-  {_SIMM16_LA,        16, {-(1 << 15), (1 << 15) - 1}},	/* (-32768 ~ 32767) */
-  {_IMM5_RSHIFT_1,    5,  {0, (1 << 6) - 1}},	        /* (     0 ~ 63   ) */
-  {_IMM5_RSHIFT_2,    5,  {0, (1 << 7) - 1}},	        /* (     0 ~ 127  ) */
-  {_SIMM16_LA_POS,    16, {0, (1 << 15) - 1}},	        /* (     0 ~ 32767) */
-  {_IMM5_RANGE_8_31,  5,  {8, 31}},	                /* But for cop0 the valid data : (8 ~ 31). */
-  {_IMM10_RSHIFT_2,   10, {-(1 << 11), (1 << 11) - 1}},	/* For ldc#, stc#. */
-  {_SIMM10,           10, {0, (1 << 10) - 1}},	        /* ( -1024 ~ 1023 ) */
-  {_SIMM12,           12, {0, (1 << 12) - 1}},	        /* ( -2048 ~ 2047 ) */
-  {_SIMM14,           14, {0, (1 << 14) - 1}},          /* ( -8192 ~ 8191 ) */
-  {_SIMM15,           15, {0, (1 << 15) - 1}},	        /* (-16384 ~ 16383) */
-  {_SIMM16,           16, {0, (1 << 16) - 1}},	        /* (-65536 ~ 65536) */
-  {_SIMM14_NEG,       14, {0, (1 << 16) - 1}},          /* ( -8191 ~ 8192 ) */
-  {_IMM16_NEG,        16, {0, (1 << 16) - 1}},	        /* ( 65535 ~ 0    ) */
-  {_SIMM16_NEG,       16, {0, (1 << 16) - 1}},	        /* ( 65535 ~ 0    ) */
-  {_IMM20,            20, {0, (1 << 20) - 1}},	        /* (-32768 ~ 32767) */
-  {_IMM25,            25, {0, (1 << 25) - 1}},	        /* (-32768 ~ 32767) */
-  {_GP_IMM15,         15, {0, (1 << 15) - 1}},	        /* (     0 ~ 65535) */
-  {_GP_IMM14,         14, {0, (1 << 14) - 1}},	        /* (     0 ~ 65535) */
-  {_SIMM16_pic,       16, {-(1 << 15), (1 << 15) - 1}},	/* (-32768 ~ 32767) */
-  {_IMM16_LO16_pic,   16, {0, (1 << 16) - 1}},	        /* ( 65535 ~ 0    ) */
-  {_IMM16_pic,        16, {0, (1 << 16) - 1}},	        /* (     0 ~ 65535) */
-};
-
-struct shift_bitmask
-{
-  int opd_type;
-  int opd_num;
-  struct datafield_range *df_range;
-  int sh[4];
-  long fieldbits[4];
-};
-
-struct shift_bitmask score_sh_bits_map[] =
-{
-  {
-   Rd_I4, 2, &score_df_range[_IMM4],
-   {OP16_SH_REGD, OP16_SH_I45, 0, 0},
-   {0xf, 0xf, 0, 0},
-   },
-  {
-   Rd_I5, 2, &score_df_range[_IMM5],
-   {OP16_SH_REGD, OP16_SH_I45, 0, 0},
-   {0xf, 0x1f, 0, 0},
-   },
-  {
-   Rd_rvalueBP_I5, 2, &score_df_range[_IMM5],
-   {OP16_SH_REGD, OP16_SH_I45, 0, 0},
-   {0xf, 0x1f, 0, 0},
-   },
-  {
-   Rd_lvalueBP_I5, 2, &score_df_range[_IMM5],
-   {OP16_SH_REGD, OP16_SH_I45, 0, 0},
-   {0xf, 0x1f, 0, 0},
-   },
-  {
-   Rd_Rs_I5, 3, &score_df_range[_IMM5],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I5, 0},
-   {0x1f, 0x1f, 0x1f, 0},
-   },
-  {
-   x_Rs_I5, 2, &score_df_range[_IMM5],
-   {OP_SH_REGS1, OP_SH_I5, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-  {
-   x_I5_x, 1, &score_df_range[_IMM5],
-   {OP_SH_TRAPI5, 0, 0, 0},
-   {0x1f, 0, 0, 0},
-   },
-  {
-   Rd_I8, 2, &score_df_range[_IMM8],
-   {OP16_SH_REGD, OP16_SH_I8, 0, 0},
-   {0xf, 0xff, 0, 0},
-   },
-  {
-   Rd_Rs_I14, 3, &score_df_range[_IMM14],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I, 0},
-   {0x1f, 0x1f, 0x3fff, 0},
-   },
-  {
-   I15, 1, &score_df_range[_IMM15],
-   {OP_SH_I15, 0, 0, 0},
-   {0x7fff, 0, 0, 0},
-   },
-  {
-   Rd_I16, 2, &score_df_range[_IMM16],
-   {OP_SH_REGD, OP_SH_I, 0, 0},
-   {0x1f, 0xffff, 0, 0},
-   },
-  {
-   Rd_rvalueRs_SI10, 3, &score_df_range[_SIMM10],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I10, 0},
-   {0x1f, 0x1f, 0x3ff, 0},
-   },
-  {
-   Rd_lvalueRs_SI10, 3, &score_df_range[_SIMM10],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I10, 0},
-   {0x1f, 0x1f, 0x3ff, 0},
-   },
-  {
-   Rd_rvalueRs_preSI12, 3, &score_df_range[_SIMM12],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I12, 0},
-   {0xf, 0xf, 0xfff, 0},
-   },
-  {
-   Rd_rvalueRs_postSI12, 3, &score_df_range[_SIMM12],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I12, 0},
-   {0xf, 0xf, 0xfff, 0},
-   },
-  {
-   Rd_lvalueRs_preSI12, 3, &score_df_range[_SIMM12],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I12, 0},
-   {0xf, 0xf, 0xfff, 0},
-   },
-  {
-   Rd_lvalueRs_postSI12, 3, &score_df_range[_SIMM12],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I12, 0},
-   {0xf, 0xf, 0xfff, 0},
-   },
-  {
-   Rd_Rs_SI14, 3, &score_df_range[_SIMM14],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_I, 0},
-   {0x1f, 0x1f, 0x3fff, 0},
-   },
-  {
-   Rd_rvalueRs_SI15, 3, &score_df_range[_SIMM15],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_RI15, 0},
-   {0x1f, 0x1f, 0x7fff, 0},
-   },
-  {
-   Rd_lvalueRs_SI15, 3, &score_df_range[_SIMM15],
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_RI15, 0},
-   {0x1f, 0x1f, 0x7fff, 0},
-   },
-  {
-   Rd_SI16, 2, &score_df_range[_SIMM16],
-   {OP_SH_REGD, OP_SH_I, 0, 0},
-   {0x1f, 0xffff, 0, 0},
-   },
-  {
-   PC_DISP8div2, 1, &score_df_range[_DISP8div2],
-   {OP16_SH_DISP8, 0, 0, 0},
-   {0xff, 0, 0, 0},
-   },
-  {
-   PC_DISP11div2, 1, &score_df_range[_DISP11div2],
-   {OP16_SH_DISP11, 0, 0, 0},
-   {0x7ff, 0, 0, 0},
-   },
-  {
-   PC_DISP19div2, 2, &score_df_range[_DISP19div2],
-   {OP_SH_DISP19_p1, OP_SH_DISP19_p2, 0, 0},
-   {0x3ff, 0x1ff, 0, 0},
-   },
-  {
-   PC_DISP24div2, 1, &score_df_range[_DISP24div2],
-   {OP_SH_DISP24, 0, 0, 0},
-   {0xffffff, 0, 0, 0},
-   },
-  {
-   Rd_Rs_Rs, 3, NULL,
-   {OP_SH_REGD, OP_SH_REGS1, OP_SH_REGS2, 0},
-   {0x1f, 0x1f, 0x1f, 0}
-   },
-  {
-   Rd_Rs_x, 2, NULL,
-   {OP_SH_REGD, OP_SH_REGS1, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-  {
-   Rd_x_Rs, 2, NULL,
-   {OP_SH_REGD, OP_SH_REGS2, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-  {
-   Rd_x_x, 1, NULL,
-   {OP_SH_REGD, 0, 0, 0},
-   {0x1f, 0, 0, 0},
-   },
-  {
-   x_Rs_Rs, 2, NULL,
-   {OP_SH_REGS1, OP_SH_REGS2, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-  {
-   x_Rs_x, 1, NULL,
-   {OP_SH_REGS1, 0, 0, 0},
-   {0x1f, 0, 0, 0},
-   },
-  {
-   Rd_Rs, 2, NULL,
-   {OP16_SH_REGD, OP16_SH_REGS1, 0, 0},
-   {0xf, 0xf, 0, 0},
-   },
-  {
-   Rd_HighRs, 2, NULL,
-   {OP16_SH_REGD, OP16_SH_REGS1, 0, 0},
-   {0xf, 0xf, 0x1f, 0},
-   },
-  {
-   Rd_rvalueRs, 2, NULL,
-   {OP16_SH_REGD, OP16_SH_REGS1, 0, 0},
-   {0xf, 0xf, 0, 0},
-   },
-  {
-   Rd_lvalueRs, 2, NULL,
-   {OP16_SH_REGD, OP16_SH_REGS1, 0, 0},
-   {0xf, 0xf, 0, 0}
-   },
-   {
-   Rd_lvalue32Rs, 2, NULL,
-   {OP_SH_REGD, OP_SH_REGS1, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-   {
-   Rd_rvalue32Rs, 2, NULL,
-   {OP_SH_REGD, OP_SH_REGS1, 0, 0},
-   {0x1f, 0x1f, 0, 0},
-   },
-  {
-   x_Rs, 1, NULL,
-   {OP16_SH_REGS1, 0, 0, 0},
-   {0xf, 0, 0, 0},
-   },
-  {
-   NO_OPD, 0, NULL,
-   {0, 0, 0, 0},
-   {0, 0, 0, 0},
-   },
-  {
-   NO16_OPD, 0, NULL,
-   {0, 0, 0, 0},
-   {0, 0, 0, 0},
-   },
-};
-
-struct asm_opcode
-{
-  /* Instruction name.  */
-  const char *template;
-
-  /* Instruction Opcode.  */
-  unsigned long value;
-
-  /* Instruction bit mask.  */
-  unsigned long bitmask;
-
-  /* Relax instruction opcode.  0x8000 imply no relaxation.  */
-  unsigned long relax_value;
-
-  /* Instruction type.  */
-  enum score_insn_type type;
-
-  /* Function to call to parse args.  */
-  void (*parms) (char *);
-};
-
 enum insn_class
 {
   INSN_CLASS_16,
   INSN_CLASS_32,
+  INSN_CLASS_48,
   INSN_CLASS_PCE,
   INSN_CLASS_SYN
 };
+
+/* s3_s7: Globals for both tc-score.c and elf32-score.c.  */
+extern int score3;
+extern int score7;
 
 #endif
