@@ -1,5 +1,10 @@
 2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-using.xml: Rework UTF FAQ to accommodate latest setlocale
+	change in newlib.
+
+2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pathnames.sgml: Remove reference to managed mountpoints in mount
 	entry example.
 

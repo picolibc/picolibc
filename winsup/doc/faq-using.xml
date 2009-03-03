@@ -368,11 +368,20 @@ formfeed character to your file.
 
 <para>Internationalization is a complex issue. The short answer is that
 Cygwin relies on the setting of the CYGWIN environment variable as well
-as on the setting of LANG environment variable.  The underlying C library,
-newlib, only supports a small subset of LANG settings.  The default is "C".
-To get UTF-8 support you must set LANG to "C-UTF-8" and CYGWIN so that
-it contains "codepage:utf8".
-</para>
+as on the setting of LANG/LC_xxx environment variables.</para>
+
+<para>To get UTF-8 support you must set the environment variable CYGWIN
+so that it contains the substring "codepage:utf8".  This is required in
+Cygwin so far to get correct translation from Windows wide character
+filenames to their UTF-8 counterpart.  Applications on the other hand
+require the setting of the LANG, LC_ALL, or LC_CTYPE environment variables.
+To get UTF-8 support you can set, for instance, $LANG to "en_US.UTF-8".
+This will give you support for the UTF-8 character set.  Note that the
+language part has to contain a valid language specifier, but is otherwise
+so far ignored by newlib, the underlying C library.  There's no support
+for correct language-specific collation, monetary or date/time-related
+string handling.  This is planned for a later release, though.</para>
+
 <para>To type international characters (&pound;&auml;&ouml;) in
 <literal>bash</literal>, add the following lines to your
 <literal>~/.inputrc</literal> file and restart <literal>bash</literal>:
