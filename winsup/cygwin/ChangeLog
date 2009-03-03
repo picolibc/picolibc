@@ -1,3 +1,8 @@
+2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/asm/byteorder.h: Disable optimization when building
+	Cygwin network code.
+
 2009-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (dtable::select_read): Add ability to override fh.
