@@ -1,5 +1,15 @@
 2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc: Include asm/byteorder.h.
+	(htonl): Move to end of file.  Add comment to explain why.  Align
+	definition to POSIX.  Use related macro from asm/byteorder.h.
+	(ntohl): Ditto.
+	(htons): Ditto.
+	(ntohs): Ditto.
+	* include/asm/byteorder.h: Revert previous patch.
+
+2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/asm/byteorder.h: Disable optimization when building
 	Cygwin network code.
 

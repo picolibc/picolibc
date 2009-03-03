@@ -23,6 +23,7 @@ details. */
 #include <unistd.h>
 #undef gethostname
 #include <netdb.h>
+#include <asm/byteorder.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include <iphlpapi.h>
@@ -71,38 +72,6 @@ get (const int fd)
     set_errno (ENOTSOCK);
 
   return fh;
-}
-
-/* htonl: standards? */
-extern "C" unsigned long int
-htonl (unsigned long int x)
-{
-  return ((((x & 0x000000ffU) << 24) |
-	   ((x & 0x0000ff00U) << 8) |
-	   ((x & 0x00ff0000U) >> 8) |
-	   ((x & 0xff000000U) >> 24)));
-}
-
-/* ntohl: standards? */
-extern "C" unsigned long int
-ntohl (unsigned long int x)
-{
-  return htonl (x);
-}
-
-/* htons: standards? */
-extern "C" unsigned short
-htons (unsigned short x)
-{
-  return ((((x & 0x000000ffU) << 8) |
-	   ((x & 0x0000ff00U) >> 8)));
-}
-
-/* ntohs: standards? */
-extern "C" unsigned short
-ntohs (unsigned short x)
-{
-  return htons (x);
 }
 
 /* exported as inet_ntoa: BSD 4.3 */
@@ -4019,7 +3988,8 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   return ret;
 }
 
-/* The below function has been taken from OpenBSD's src/sys/netinet6/in6.c. */
+/* The below function in6_are_prefix_equal has been taken from OpenBSD's
+   src/sys/netinet6/in6.c. */
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -4102,4 +4072,40 @@ in6_are_prefix_equal (struct in6_addr *p1, struct in6_addr *p2, int len)
     return 0;
 
   return 1;
+}
+
+/* These functions are stick to the end of this file so that the
+   optimization in asm/byteorder.h can be used even here in net.cc. */
+
+#undef htonl
+#undef ntohl
+#undef htons
+#undef ntohs
+
+/* htonl: standards? */
+extern "C" uint32_t
+htonl (uint32_t x)
+{
+  return __htonl (x);
+}
+
+/* ntohl: standards? */
+extern "C" uint32_t
+ntohl (uint32_t x)
+{
+  return __ntohl (x);
+}
+
+/* htons: standards? */
+extern "C" uint16_t
+htons (uint16_t x)
+{
+  return __htons (x);
+}
+
+/* ntohs: standards? */
+extern "C" uint16_t
+ntohs (uint16_t x)
+{
+  return __ntohs (x);
 }
