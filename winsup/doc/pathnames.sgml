@@ -133,16 +133,16 @@ mount the root dir with special options (for instance, as text mount).</para>
   <screen>c:/foo /bar fat32 binary 0 0</screen>
 </listitem>
 <listitem>
-  <para>A mount point for a managed, textmode mount:</para>
-  <screen>C:/foo /bar/baz ntfs text,managed 0 0</screen>
+  <para>A mount point for a textmode mount with case sensitivity switched off:</para>
+  <screen>C:/foo /bar/baz ntfs text,posix=0 0 0</screen>
 </listitem>
 <listitem>
   <para>A mount point for a Windows directory with spaces in it:</para>
   <screen>C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
 </listitem>
 <listitem>
-  <para>A mount point for a remote directory:</para>
-  <screen>//server/share/subdir /srv/subdir smbfs binary 0 0</screen>
+  <para>A mount point for a remote directory without ACL support:</para>
+  <screen>//server/share/subdir /srv/subdir smbfs binary,noacl 0 0</screen>
 </listitem>
 <listitem>
   <para>This is just a comment:</para>

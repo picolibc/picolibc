@@ -1,3 +1,8 @@
+2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Remove reference to managed mountpoints in mount
+	entry example.
+
 2009-02-23  Dr. Volker Zell <dr.volker.zell@oracle.com>
 
 	* faq-using.xml: Rework XEmacs FAQ.
