@@ -8,8 +8,6 @@
 /* for some conversions, we use the __count field as a place to store a state value */
 #define __state __count
 
-extern char __lc_ctype[12];
-
 int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
         struct _reent *r     _AND 
@@ -22,9 +20,9 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
      is 4, as is the case on cygwin.  */
   wint_t wchar = _wchar;
 
-  if (strlen (__lc_ctype) <= 1)
+  if (strlen (__locale_charset ()) <= 1)
     { /* fall-through */ }
-  else if (!strcmp (__lc_ctype, "C-UTF-8"))
+  else if (!strcmp (__locale_charset (), "UTF-8"))
     {
       if (s == NULL)
         return 0; /* UTF-8 encoding is not state-dependent */
@@ -106,7 +104,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 	  return -1;
 	}
     }
-  else if (!strcmp (__lc_ctype, "C-SJIS"))
+  else if (!strcmp (__locale_charset (), "SJIS"))
     {
       unsigned char char2 = (unsigned char)wchar;
       unsigned char char1 = (unsigned char)(wchar >> 8);
@@ -130,7 +128,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 	    }
         }
     }
-  else if (!strcmp (__lc_ctype, "C-EUCJP"))
+  else if (!strcmp (__locale_charset (), "EUCJP"))
     {
       unsigned char char2 = (unsigned char)wchar;
       unsigned char char1 = (unsigned char)(wchar >> 8);
@@ -154,7 +152,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 	    }
         }
     }
-  else if (!strcmp (__lc_ctype, "C-JIS"))
+  else if (!strcmp (__locale_charset (), "JIS"))
     {
       int cnt = 0; 
       unsigned char char2 = (unsigned char)wchar;

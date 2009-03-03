@@ -69,29 +69,25 @@ No supporting OS subroutines are required.
 int
 _DEFUN(iswalpha,(c), wint_t c)
 {
-  int unicode = 0;
-  if (__lc_ctype[0] == 'C' && __lc_ctype[1] == '\0')
-    {
-      unicode = 0;
-      /* fall-through */ 
-    }
 #ifdef _MB_CAPABLE
-  else if (!strcmp (__lc_ctype, "C-JIS"))
+  int unicode = 0;
+
+  if (!strcmp (__locale_charset (), "JIS"))
     {
       c = __jp2uc (c, JP_JIS);
       unicode = 1;
     }
-  else if (!strcmp (__lc_ctype, "C-SJIS"))
+  else if (!strcmp (__locale_charset (), "SJIS"))
     {
       c = __jp2uc (c, JP_SJIS);
       unicode = 1;
     }
-  else if (!strcmp (__lc_ctype, "C-EUCJP"))
+  else if (!strcmp (__locale_charset (), "EUCJP"))
     {
       c = __jp2uc (c, JP_EUCJP);
       unicode = 1;
     }
-  else if (!strcmp (__lc_ctype, "C-UTF-8"))
+  else if (!strcmp (__locale_charset (), "UTF-8"))
     {
       unicode = 1;
     }

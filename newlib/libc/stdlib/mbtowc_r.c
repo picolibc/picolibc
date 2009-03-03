@@ -45,8 +45,6 @@ static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* we override the mbstate_t __count field for more complex encodings and use it store a state value */
 #define __state __count
 
-extern char __lc_ctype[12];
-
 int
 _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
         struct _reent *r   _AND
@@ -65,9 +63,9 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     return -2;
 
 #ifdef _MB_CAPABLE
-  if (strlen (__lc_ctype) <= 1)
+  if (strlen (__locale_charset ()) <= 1)
     { /* fall-through */ }
-  else if (!strcmp (__lc_ctype, "C-UTF-8"))
+  else if (!strcmp (__locale_charset (), "UTF-8"))
     {
       int ch;
       int i = 0;
@@ -221,7 +219,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
       else
 	return -1;
     }      
-  else if (!strcmp (__lc_ctype, "C-SJIS"))
+  else if (!strcmp (__locale_charset (), "SJIS"))
     {
       int ch;
       int i = 0;
@@ -251,7 +249,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -1;
 	}
     }
-  else if (!strcmp (__lc_ctype, "C-EUCJP"))
+  else if (!strcmp (__locale_charset (), "EUCJP"))
     {
       int ch;
       int i = 0;
@@ -281,7 +279,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -1;
 	}
     }
-  else if (!strcmp (__lc_ctype, "C-JIS"))
+  else if (!strcmp (__locale_charset (), "JIS"))
     {
       JIS_STATE curr_state;
       JIS_ACTION action;

@@ -20,7 +20,7 @@
 #define WC_UPPER	11
 #define WC_XDIGIT	12
 
-extern char __lc_ctype[12];
+extern char *__locale_charset ();
 
 /* Japanese encoding types supported */
 #define JP_JIS		1

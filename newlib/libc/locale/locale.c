@@ -42,13 +42,16 @@ execution environment for international collating and formatting
 information; <<localeconv>> reports on the settings of the current
 locale.
 
-This is a minimal implementation, supporting only the required <<"C">>
-value for <[locale]>; strings representing other locales are not
-honored unless _MB_CAPABLE is defined in which case three new
-extensions are allowed for LC_CTYPE or LC_MESSAGES only: <<"C-JIS">>, 
-<<"C-EUCJP">>, <<"C-SJIS">>, or <<"C-ISO-8859-1">>.  (<<"">> is 
-also accepted; it represents the default locale
-for an implementation, here equivalent to <<"C">>.)
+This is a minimal implementation, supporting only the required <<"POSIX">>
+and <<"C">> values for <[locale]>; strings representing other locales are not
+honored unless _MB_CAPABLE is defined in which case POSIX locale strings
+are allowed, plus five extensions supported for backward compatibility with
+older implementations using newlib: <<"C-UTF-8">>, <<"C-JIS">>, <<"C-EUCJP">>,
+<<"C-SJIS">>, or <<"C-ISO-8859-x">> with 1 <= x <= 15.  Even when using
+POSIX locale strings, the only charsets allowed are <<"UTF-8">>, <<"JIS">>,
+<<"EUCJP">>, <<"SJIS">>, or <<"ISO-8859-x">> with 1 <= x <= 15.  (<<"">> is 
+also accepted; if given, the settings are read from the corresponding
+LC_* environment variables and $LANG according to POSIX rules.
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
 a pointer to the string representing the current locale (always
@@ -66,9 +69,13 @@ in effect.
 <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
-<<setlocale>> returns either a pointer to a string naming the locale
-currently in effect (always <<"C">> for this implementation, or, if
-the locale request cannot be honored, <<NULL>>.
+A successful call to <<setlocale>> returns a pointer to a string
+associated with the specified category for the new locale.  The string
+returned by <<setlocale>> is such that a subsequent call using that
+string will restore that category (or all categories in case of LC_ALL),
+to that state.  The application shall not modify the string returned
+which may be overwritten by a subsequent call to <<setlocale>>.
+On error, <<setlocale>> returns <<NULL>>.
 
 <<localeconv>> returns a pointer to a structure of type <<lconv>>,
 which describes the formatting and collating conventions in effect (in
@@ -81,16 +88,50 @@ implementations is the C locale.
 No supporting OS subroutines are required.
 */
 
+/* Parts of this code are originally taken from FreeBSD. */
 /*
- * setlocale, localeconv : internationalize your locale.
- *                         (Only "C" or null supported).
+ * Copyright (c) 1996 - 2002 FreeBSD Project
+ * Copyright (c) 1991, 1993
+ *      The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Paul Borman at Krystal Technologies.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 
 #include <newlib.h>
+#include <errno.h>
 #include <locale.h>
 #include <string.h>
 #include <limits.h>
 #include <reent.h>
+#include <stdlib.h>
+
+#define _LC_LAST      7
+#define ENCODING_LEN 31
 
 #ifdef __CYGWIN__
 int __declspec(dllexport) __mb_cur_max = 1;
@@ -109,11 +150,48 @@ static _CONST struct lconv lconv =
   CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
 };
 
+#ifdef _MB_CAPABLE
+/*
+ * Category names for getenv()
+ */
+static char *categories[_LC_LAST] = {
+  "LC_ALL",
+  "LC_COLLATE",
+  "LC_CTYPE",
+  "LC_MONETARY",
+  "LC_NUMERIC",
+  "LC_TIME",
+  "LC_MESSAGES",
+};
 
-char * _EXFUN(__locale_charset,(_VOID));
+/*
+ * Current locales for each category
+ */
+static char current_categories[_LC_LAST][ENCODING_LEN + 1] = {
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+};
 
-static char *charset = "ISO-8859-1";
-char __lc_ctype[12] = "C";
+/*
+ * The locales we are going to try and load
+ */
+static char new_categories[_LC_LAST][ENCODING_LEN + 1];
+static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
+
+static char current_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
+static char *currentlocale(void);
+static char *loadlocale(struct _reent *, int);
+static const char *__get_locale_env(struct _reent *, int);
+
+#endif
+
+static char lc_ctype_charset[ENCODING_LEN + 1] = "ISO-8859-1";
+static char lc_message_charset[ENCODING_LEN + 1] = "ISO-8859-1";
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
@@ -124,154 +202,303 @@ _DEFUN(_setlocale_r, (p, category, locale),
 #ifndef _MB_CAPABLE
   if (locale)
     { 
-      if (strcmp (locale, "C") && strcmp (locale, ""))
-        return 0;
+      if (strcmp (locale, "POSIX") && strcmp (locale, "C")
+	  && strcmp (locale, ""))
+        return NULL;
       p->_current_category = category;  
       p->_current_locale = locale;
     }
   return "C";
 #else
-  static char last_lc_ctype[12] = "C";
-  static char lc_messages[12] = "C";
-  static char last_lc_messages[12] = "C";
+  int i, j, len, saverr;
+  const char *env, *r;
 
-  if (locale)
+  if (category < LC_ALL || category >= _LC_LAST)
     {
-      char *locale_name = (char *)locale;
-      if (category != LC_CTYPE && category != LC_MESSAGES) 
-        { 
-          if (strcmp (locale, "C") && strcmp (locale, ""))
-            return 0;
-          if (category == LC_ALL)
-            {
-              strcpy (last_lc_ctype, __lc_ctype);
-              strcpy (__lc_ctype, "C");
-              strcpy (last_lc_messages, lc_messages);
-              strcpy (lc_messages, "C");
-              __mb_cur_max = 1;
-            }
-        }
+      p->_errno = EINVAL;
+      return NULL;
+    }
+
+  if (locale == NULL)
+    return category != LC_ALL ? current_categories[category] : currentlocale();
+
+  /*
+   * Default to the current locale for everything.
+   */
+  for (i = 1; i < _LC_LAST; ++i)
+    strcpy (new_categories[i], current_categories[i]);
+
+  /*
+   * Now go fill up new_categories from the locale argument
+   */
+  if (!*locale)
+    {
+      if (category == LC_ALL)
+	{
+	  for (i = 1; i < _LC_LAST; ++i)
+	    {
+	      env = __get_locale_env (p, i);
+	      if (strlen (env) > ENCODING_LEN)
+		{
+		  p->_errno = EINVAL;
+		  return NULL;
+		}
+	      strcpy (new_categories[i], env);
+	    }
+	}
       else
-        {
-          if (locale[0] == 'C' && locale[1] == '-')
-            {
-              switch (locale[2])
-                {
-                case 'U':
-                  if (strcmp (locale, "C-UTF-8"))
-                    return 0;
-                break;
-                case 'J':
-                  if (strcmp (locale, "C-JIS"))
-                    return 0;
-                break;
-                case 'E':
-                  if (strcmp (locale, "C-EUCJP"))
-                    return 0;
-                break;
-                case 'S':
-                  if (strcmp (locale, "C-SJIS"))
-                    return 0;
-                break;
-                case 'I':
-                  if (strcmp (locale, "C-ISO-8859-1"))
-                    return 0;
-                break;
-                default:
-                  return 0;
-                }
-            }
-          else 
-            {
-              if (strcmp (locale, "C") && strcmp (locale, ""))
-                return 0;
-              locale_name = "C"; /* C is always the default locale */
-            }
-
-          if (category == LC_CTYPE)
-            {
-              strcpy (last_lc_ctype, __lc_ctype);
-              strcpy (__lc_ctype, locale_name);
-
-              __mb_cur_max = 1;
-              if (locale[1] == '-')
-                {
-                  switch (locale[2])
-                    {
-                    case 'U':
-                      __mb_cur_max = 6;
-                    break;
-                    case 'J':
-                      __mb_cur_max = 8;
-                    break;
-                    case 'E':
-                      __mb_cur_max = 2;
-                    break;
-                    case 'S':
-                      __mb_cur_max = 2;
-                    break;
-                    case 'I':
-                    default:
-                      __mb_cur_max = 1;
-                    }
-                }
-            }
-          else
-            {
-              strcpy (last_lc_messages, lc_messages);
-              strcpy (lc_messages, locale_name);
-
-              charset = "ISO-8859-1";
-              if (locale[1] == '-')
-                {
-                  switch (locale[2])
-                    {
-                    case 'U':
-                      charset = "UTF-8";
-                    break;
-                    case 'J':
-                      charset = "JIS";
-                    break;
-                    case 'E':
-                      charset = "EUCJP";
-                    break;
-                    case 'S':
-                      charset = "SJIS";
-                    break;
-                    case 'I':
-                      charset = "ISO-8859-1";
-                    break;
-                    default:
-                      return 0;
-                    }
-                }
-            }
-        }
-      p->_current_category = category;  
-      p->_current_locale = locale;
-
-      if (category == LC_CTYPE)
-        return last_lc_ctype;
-      else if (category == LC_MESSAGES)
-        return last_lc_messages;
+	{
+	  env = __get_locale_env (p, category);
+	  if (strlen (env) > ENCODING_LEN)
+	    {
+	      p->_errno = EINVAL;
+	      return NULL;
+	    }
+	  strcpy (new_categories[category], env);
+	}
+    }
+  else if (category != LC_ALL)
+    {
+      if (strlen (locale) > ENCODING_LEN)
+	{
+	  p->_errno = EINVAL;
+	  return NULL;
+	}
+      strcpy (new_categories[category], locale);
     }
   else
     {
-      if (category == LC_CTYPE)
-        return __lc_ctype;
-      else if (category == LC_MESSAGES)
-        return lc_messages;
+      if ((r = strchr (locale, '/')) == NULL)
+	{
+	  if (strlen (locale) > ENCODING_LEN)
+	    {
+	      p->_errno = EINVAL;
+	      return NULL;
+	    }
+	  for (i = 1; i < _LC_LAST; ++i)
+	    strcpy (new_categories[i], locale);
+	}
+      else
+	{
+	  for (i = 1; r[1] == '/'; ++r)
+	    ;
+	  if (!r[1])
+	    {
+	      p->_errno = EINVAL;
+	      return NULL;  /* Hmm, just slashes... */
+	    }
+	  do
+	    {
+	      if (i == _LC_LAST)
+		break;  /* Too many slashes... */
+	      if ((len = r - locale) > ENCODING_LEN)
+		{
+		  p->_errno = EINVAL;
+		  return NULL;
+		}
+	      strlcpy (new_categories[i], locale, len + 1);
+	      i++;
+	      while (*r == '/')
+		r++;
+	      locale = r;
+	      while (*r && *r != '/')
+		r++;
+	    }
+	  while (*locale);
+	  while (i < _LC_LAST)
+	    {
+	      strcpy (new_categories[i], new_categories[i-1]);
+	      i++;
+	    }
+	}
     }
- 
-  return "C";
+
+  if (category != LC_ALL)
+    return loadlocale (p, category);
+
+  for (i = 1; i < _LC_LAST; ++i)
+    {
+      strcpy (saved_categories[i], current_categories[i]);
+      if (loadlocale (p, i) == NULL)
+	{
+	  saverr = p->_errno;
+	  for (j = 1; j < i; j++)
+	    {
+	      strcpy (new_categories[j], saved_categories[j]);
+	      if (loadlocale (p, j) == NULL)
+		{
+		  strcpy (new_categories[j], "C");
+		  loadlocale (p, j);
+		}
+	    }
+	  p->_errno = saverr;
+	  return NULL;
+	}
+    }
+  return currentlocale ();
 #endif
-  
 }
+
+#ifdef _MB_CAPABLE
+static char *
+currentlocale()
+{
+        int i;
+
+        (void)strcpy(current_locale_string, current_categories[1]);
+
+        for (i = 2; i < _LC_LAST; ++i)
+                if (strcmp(current_categories[1], current_categories[i])) {
+                        for (i = 2; i < _LC_LAST; ++i) {
+                                (void)strcat(current_locale_string, "/");
+                                (void)strcat(current_locale_string,
+                                             current_categories[i]);
+                        }
+                        break;
+                }
+        return (current_locale_string);
+}
+#endif
+
+#ifdef _MB_CAPABLE
+static char *
+loadlocale(struct _reent *p, int category)
+{
+  /* At this point a full-featured system would just load the locale
+     specific data from the locale files.
+     What we do here for now is to check the incoming string for correctness.
+     The string must be in one of the allowed locale strings, either
+     one in POSIX-style, or one in the old newlib style to maintain
+     backward compatibility.  If the local string is correct, the charset
+     is extracted and stored in lc_ctype_charset or lc_message_charset
+     dependent on the cateogry. */
+  char *locale = new_categories[category];
+  char charset[ENCODING_LEN + 1];
+  unsigned long val;
+  char *end;
+  int mbc_max;
+  
+  /* "POSIX" is translated to "C", as on Linux. */
+  if (!strcmp (locale, "POSIX"))
+    strcpy (locale, "C");
+  if (!strcmp (locale, "C"))				/* Default "C" locale */
+    strcpy (charset, "ISO-8859-1");
+  else if (locale[0] == 'C' && locale[1] == '-')	/* Old newlib style */
+	strcpy (charset, locale + 2);
+  else							/* POSIX style */
+    {
+      char *c = locale;
+
+      /* Don't use ctype macros here, they might be localized. */
+      /* Language */
+      if (c[0] <= 'a' || c[0] >= 'z'
+	  || c[1] <= 'a' || c[1] >= 'z')
+	return NULL;
+      c += 2;
+      if (c[0] == '_')
+        {
+	  /* Territory */
+	  ++c;
+	  if (c[0] <= 'A' || c[0] >= 'Z'
+	      || c[1] <= 'A' || c[1] >= 'Z')
+	    return NULL;
+	  c += 2;
+	}
+      if (c[0] == '.')
+	{
+	  /* Charset */
+	  strcpy (charset, c + 1);
+	  if ((c = strchr (charset, '@')))
+	    /* Strip off modifier */
+	    *c = '\0';
+	}
+      else if (c[0] == '\0' || c[0] == '@')
+	/* End of string or just a modifier */
+	strcpy (charset, "ISO-8859-1");
+      else
+	/* Invalid string */
+      	return NULL;
+    }
+  /* We only support this subset of charsets. */
+  switch (charset[0])
+    {
+    case 'U':
+      if (strcmp (charset, "UTF-8"))
+	return NULL;
+      mbc_max = 6;
+    break;
+    case 'J':
+      if (strcmp (charset, "JIS"))
+	return NULL;
+      mbc_max = 8;
+    break;
+    case 'E':
+      if (strcmp (charset, "EUCJP"))
+	return NULL;
+      mbc_max = 2;
+    break;
+    case 'S':
+      if (strcmp (charset, "SJIS"))
+	return NULL;
+      mbc_max = 2;
+    break;
+    case 'I':
+    default:
+      /* Must be exactly one of ISO-8859-1, [...] ISO-8859-15. */
+      if (strncmp (charset, "ISO-8859-", 9))
+	return NULL;
+      val = strtol (charset + 9, &end, 10);
+      if (val < 1 || val > 15 || *end)
+	return NULL;
+      mbc_max = 1;
+      break;
+    }
+  if (category == LC_CTYPE)
+    {
+      strcpy (lc_ctype_charset, charset);
+      __mb_cur_max = mbc_max;
+    }
+  else if (category == LC_MESSAGES)
+    strcpy (lc_message_charset, charset);
+  p->_current_category = category;  
+  p->_current_locale = locale;
+  return strcpy(current_categories[category], new_categories[category]);
+}
+
+static const char *
+__get_locale_env(struct _reent *p, int category)
+{
+  const char *env;
+
+  /* 1. check LC_ALL. */
+  env = _getenv_r (p, categories[0]);
+
+  /* 2. check LC_* */
+  if (env == NULL || !*env)
+    env = _getenv_r (p, categories[category]);
+
+  /* 3. check LANG */
+  if (env == NULL || !*env)
+    env = _getenv_r (p, "LANG");
+
+  /* 4. if none is set, fall to "C" */
+  if (env == NULL || !*env)
+    env = "C";
+
+  return env;
+}
+#endif
 
 char *
 _DEFUN_VOID(__locale_charset)
 {
-  return charset;
+  return lc_ctype_charset;
+}
+
+char *
+_DEFUN_VOID(__locale_msgcharset)
+{
+  return lc_message_charset;
 }
 
 struct lconv *
