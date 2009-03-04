@@ -623,6 +623,10 @@ child_info_spawn::handle_spawn ()
   fixup_lockf_after_exec ();
 }
 
+#if 0
+/* Setting the TS-aware flag in the application's PE header is sufficient.
+   Just keep this in as a reminder. */
+
 static DEP_SYSTEM_POLICY_TYPE dep_system_policy = (DEP_SYSTEM_POLICY_TYPE) -1;
 
 static void
@@ -647,6 +651,7 @@ disable_dep ()
   if (ppolicy > 0 && !perm && !SetProcessDEPPolicy (0))
     debug_printf ("SetProcessDEPPolicy: %E");
 }
+#endif
 
 void __stdcall
 dll_crt0_0 ()
@@ -712,10 +717,11 @@ dll_crt0_0 ()
   events_init ();
   tty_list::init_session ();
 
-  /* FIXME: This is hopefully a temporary hack, at least until the support
-     case at Microsoft has been closed one way or the other.
+#if 0
+  /* Setting the TS-aware flag in the application's PE header is sufficient.
+     Just keep this in as a reminder. */
 
-     The disable_dep function disables DEP for all Cygwin processes if
+  /* The disable_dep function disables DEP for all Cygwin processes if
      the process runs on a Windows Server 2008 with Terminal Services
      installed.  This combination (TS+DEP) breaks *some* Cygwin
      applications.  The Terminal Service specific DLL tsappcmp.dll
@@ -732,6 +738,7 @@ dll_crt0_0 ()
      Idle idea: Adding EXECUTE protection to all text segment pages? */
   if (wincap.ts_has_dep_problem ())
     disable_dep ();
+#endif
 
   debug_printf ("finished dll_crt0_0 initialization");
 }
