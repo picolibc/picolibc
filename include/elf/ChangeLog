@@ -1,3 +1,8 @@
+2009-03-04  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_TLSGD, R_PPC_TLSLD): Add new relocs.
+	* ppc64.h (R_PPC64_TLSGD, R_PPC64_TLSLD): Add new relocs.
+
 2009-03-02  Qinwei  <qinwei@sunnorth.com.cn>
 
 	* score.h (RELOC_NUMBER): Add R_SCORE_IMM32.
