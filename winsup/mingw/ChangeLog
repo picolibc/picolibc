@@ -1,3 +1,7 @@
+2009-03-05  Kai Tietz  <kai.tietz@onevision.com>
+
+	* pseudo-reloc.c: Rewrite to enable pseudo_reloc version 2.
+
 2009-02-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	MinGW-Feature-Request [2222263]: Make getopt() GNU / BSD compatibile.
