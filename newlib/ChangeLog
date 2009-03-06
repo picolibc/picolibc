@@ -1,3 +1,11 @@
+2009-03-06  Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>,
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/reent/reent.c (_reclaim_reent): Make a block from MP-related
+	statements in _REENT_SMALL case.  Check if _atexit is not NULL before
+	dereferencing it.
+	(_wrapup_reent): Check if _atexit is not NULL before dereferencing it.
+
 2009-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdio.h (__VALIST): Guard against multiple definition.

@@ -50,6 +50,7 @@ _DEFUN (_reclaim_reent, (ptr),
       /* used by mprec routines. */
 #ifdef _REENT_SMALL
       if (ptr->_mp)	/* don't bother allocating it! */
+      {
 #endif
       if (_REENT_MP_FREELIST(ptr))
 	{
@@ -71,6 +72,9 @@ _DEFUN (_reclaim_reent, (ptr),
 	}
       if (_REENT_MP_RESULT(ptr))
 	_free_r (ptr, _REENT_MP_RESULT(ptr));
+#ifdef _REENT_SMALL
+      }
+#endif
 
 #ifdef _REENT_SMALL
       if (ptr->_emergency)
@@ -83,7 +87,7 @@ _DEFUN (_reclaim_reent, (ptr),
 	_free_r (ptr, ptr->_localtime_buf);
       if (ptr->_asctime_buf)
 	_free_r (ptr, ptr->_asctime_buf);
-      if (ptr->_atexit->_on_exit_args_ptr)
+      if (ptr->_atexit && ptr->_atexit->_on_exit_args_ptr)
 	_free_r (ptr, ptr->_atexit->_on_exit_args_ptr);
 #else
       /* atexit stuff */
@@ -130,11 +134,11 @@ _DEFUN (_wrapup_reent, (ptr), struct _reent *ptr)
   register struct _atexit *p;
   register int n;
 
-  if (ptr == 0)
-      ptr = _REENT;
+  if (ptr == NULL)
+    ptr = _REENT;
 
 #ifdef _REENT_SMALL
-  for (p = &ptr->_atexit, n = p->_ind; --n >= 0;)
+  for (p = ptr->_atexit, n = p ? p->_ind : 0; --n >= 0;)
     (*p->_fns[n]) ();
 #else
   for (p = ptr->_atexit; p; p = p->_next)
