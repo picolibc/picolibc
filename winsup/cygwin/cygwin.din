@@ -25,8 +25,8 @@ reent_data DATA
 sys_errlist = _sys_errlist DATA
 _sys_errlist DATA
 sys_nerr = _sys_nerr DATA
-sys_sigabbrev DATA
 _sys_nerr DATA
+sys_sigabbrev DATA
 _timezone DATA
 _tzname DATA
 _Exit SIGFE
@@ -574,6 +574,7 @@ futimens SIGFE
 futimes SIGFE
 futimesat SIGFE
 fwide SIGFE
+fwprintf SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
 gai_strerror = cygwin_gai_strerror NOSIGFE
@@ -719,8 +720,8 @@ getwd SIGFE
 _getwd = getwd SIGFE
 getxattr SIGFE
 glob SIGFE
-globfree SIGFE
 glob_pattern_p
+globfree SIGFE
 gmtime SIGFE
 _gmtime = gmtime SIGFE
 gmtime_r SIGFE
@@ -1569,6 +1570,7 @@ swab NOSIGFE
 _swab = swab NOSIGFE
 __swbuf SIGFE
 __swbuf_r SIGFE
+swprintf SIGFE
 symlink SIGFE
 _symlink = symlink SIGFE
 symlinkat SIGFE
@@ -1699,6 +1701,7 @@ vfscanf SIGFE
 _vfscanf = vfscanf SIGFE
 vfscanf_r = _vfscanf_r SIGFE
 _vfscanf_r SIGFE
+vfwprintf SIGFE
 vhangup SIGFE
 _vhangup = vhangup SIGFE
 vprintf SIGFE
@@ -1715,9 +1718,11 @@ vsscanf SIGFE
 _vsscanf = vsscanf SIGFE
 vsscanf_r = _vsscanf_r SIGFE
 _vsscanf_r SIGFE
+vswprintf SIGFE
 vsyslog SIGFE
 vwarn SIGFE
 vwarnx SIGFE
+vwprintf SIGFE
 wait SIGFE
 _wait = wait SIGFE
 wait3 SIGFE
@@ -1774,6 +1779,7 @@ wmemcmp NOSIGFE
 wmemcpy NOSIGFE
 wmemmove NOSIGFE
 wmemset NOSIGFE
+wprintf SIGFE
 write SIGFE
 _write = write SIGFE
 writev SIGFE

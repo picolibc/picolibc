@@ -349,12 +349,13 @@ details. */
       198: Export reallocf.
       199: Export open_wmemstream.
       200: Export mbsnrtowcs, wcsnrtombs.
+      201: Export wprintf, fwprintf, swprintf, vwprintf, vfwprintf, vswprintf.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 200
+#define CYGWIN_VERSION_API_MINOR 201
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
