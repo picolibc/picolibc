@@ -1067,6 +1067,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     gcvt			(SUSv3)
     gethostbyaddr		(SUSv3)
     gethostbyname		(SUSv3)
+    gethostbyname2		(first defined in BIND 4.9.4)
     getpass			(SUSv2)
     getutent			(XPG2)
     getutid			(XPG2)

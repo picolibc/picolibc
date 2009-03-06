@@ -636,6 +636,7 @@ _getgroups = getgroups SIGFE
 _getgroups32 = getgroups32 SIGFE
 gethostbyaddr = cygwin_gethostbyaddr SIGFE
 gethostbyname = cygwin_gethostbyname SIGFE
+gethostbyname2 SIGFE
 gethostid SIGFE
 gethostname = cygwin_gethostname SIGFE
 _gethostname = cygwin_gethostname SIGFE

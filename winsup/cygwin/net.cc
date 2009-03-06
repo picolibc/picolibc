@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -43,6 +43,8 @@ details. */
 #include "cygwin/in6.h"
 #include "ifaddrs.h"
 #include "tls_pbuf.h"
+#define _CYGWIN_IN_H 
+#include <resolv.h>
 
 extern "C"
 {
@@ -53,6 +55,9 @@ extern "C"
   int sscanf (const char *, const char *, ...);
   int cygwin_inet_aton(const char *, struct in_addr *);
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
+  int dn_length1(const unsigned char *, const unsigned char *,
+		 const unsigned char *);
+  
 }				/* End of "C" section */
 
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
@@ -264,6 +269,25 @@ struct pservent
 
 static const char *entnames[] = {"host", "proto", "serv"};
 
+static unionent *
+realloc_ent (unionent *&dst, int sz)
+{
+  /* Allocate the storage needed.  Allocate a rounded size to attempt to force
+     reuse of this buffer so that a poorly-written caller will not be using
+     a freed buffer. */
+  unsigned rsz = 256 * ((sz + 255) / 256);
+  unionent * ptr;
+  if ((ptr = (unionent *) realloc (dst, rsz)))
+    dst = ptr;
+  return ptr;
+}
+
+static inline hostent *
+realloc_ent (int sz, hostent *)
+{
+  return (hostent *) realloc_ent (_my_tls.locals.hostent_buf, sz);
+}
+
 /* Generic "dup a {host,proto,serv}ent structure" function.
    This is complicated because we need to be able to free the
    structure at any point and we can't rely on the pointer contents
@@ -310,7 +334,7 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
       break;
     }
 
-  /* Every *ent begins with a name.  Calculate it's length. */
+  /* Every *ent begins with a name.  Calculate its length. */
   int namelen = strlen_round (src->name);
   sz = struct_sz + namelen;
 
@@ -355,13 +379,8 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 	}
     }
 
-  /* Allocate the storage needed.  Allocate a rounded size to attempt to force
-     reuse of this buffer so that a poorly-written caller will not be using
-     a freed buffer. */
-  unsigned rsz = 256 * ((sz + 255) / 256);
-  dst = (unionent *) realloc (dst, rsz);
-
-  if (dst)
+  /* Allocate the storage needed.  */
+  if (realloc_ent (dst, sz))
     {
       memset (dst, 0, sz);
       /* This field is common to all *ent structures but named differently
@@ -855,6 +874,287 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   else
     set_host_errno ();
   return res;
+}
+
+static void 
+memcpy4to6 (char *dst, const u_char *src)
+{
+  const unsigned int h[] = {0, 0, htonl (0xFFFF)};
+  memcpy (dst, h, 12);
+  memcpy (dst + 12, src, NS_INADDRSZ);
+}
+
+static hostent * 
+gethostby_helper (const char *name, const int af, const int type,
+		  const int addrsize_in, const int addrsize_out)
+{
+  /* Get the data from the name server */
+  const int maxcount = 3;
+  int old_errno, ancount = 0, anlen = 1024, msgsize = 0;
+  u_char *ptr, *msg = NULL;
+  int sz;
+  hostent *ret;
+  char *string_ptr;
+
+  while ((anlen > msgsize) && (ancount++ < maxcount))
+    {
+      msgsize = anlen;
+      ptr = (u_char *) realloc (msg, msgsize);
+      if (ptr == NULL )
+	{
+	  old_errno = errno;
+	  free (msg);
+	  set_errno (old_errno);
+	  h_errno = NETDB_INTERNAL;
+	  return NULL;
+	}
+      msg = ptr;
+      anlen = res_search (name, ns_c_in, type, msg, msgsize);
+    } 
+
+  if (ancount >= maxcount)
+    {
+      free (msg);
+      h_errno = NO_RECOVERY;
+      return NULL;
+    }
+  if (anlen < 0) /* errno and h_errno are set */
+    {
+      old_errno = errno;
+      free (msg);
+      set_errno (old_errno);
+      return NULL; 
+    }
+  u_char *eomsg = msg + anlen - 1;
+
+
+  /* We scan the answer records to determine the required memory size. 
+     They can be corrupted and we don't fully trust that the message
+     follows the standard exactly. glibc applies some checks that
+     we emulate.
+     The answers are copied in the hostent structure in a second scan.
+     To simplify the second scan we store information as follows:
+     - "class" is replaced by the compressed name size
+     - the first 16 bits of the "ttl" store the expanded name size + 1 
+     - the last 16 bits of the "ttl" store the offset to the next valid record.
+     Note that "type" is rewritten in host byte order. */
+  
+  class record {
+  public:
+    unsigned type: 16;		// type
+    unsigned complen: 16;       // class or compressed length
+    unsigned namelen1: 16;      // expanded length (with final 0)
+    unsigned next_o: 16;        // offset to next valid
+    unsigned size: 16;          // data size
+    u_char data[];              // data
+    record * next () { return (record *) (((char *) this) + next_o); }
+    void set_next ( record * nxt) { next_o = ((char *) nxt) - ((char *) this); }
+    u_char * name () { return (u_char *) (((char *) this) - complen); }
+  };
+
+  record * anptr = NULL, * prevptr = NULL, * curptr;
+  int i, alias_count = 0, string_size = 0, address_count = 0;
+  int complen, namelen1 = 0, address_len = 0, antype, anclass, ansize;
+
+  /* Get the count of answers */
+  ancount = ntohs (((HEADER *) msg)->ancount);
+
+  /* Skip the question, it was verified by res_send */
+  ptr = msg + sizeof (HEADER);
+  if ((complen = dn_skipname (ptr, eomsg)) < 0)
+    goto corrupted;    
+  /* Point to the beginning of the answer section */
+  ptr += complen + NS_QFIXEDSZ;
+  
+  /* Scan the answer records to determine the sizes */
+  for (i = 0; i < ancount; i++, ptr = curptr->data + ansize)
+    {
+      if ((complen = dn_skipname (ptr, eomsg)) < 0)
+	goto corrupted;
+
+      curptr = (record *) (ptr + complen);
+      antype = ntohs (curptr->type);
+      anclass = ntohs (curptr->complen);
+      ansize = ntohs (curptr->size);
+      /* Class must be internet */
+      if (anclass != ns_c_in)
+	continue;
+
+      curptr->complen = complen;
+      if ((namelen1 = dn_length1 (msg, eomsg, curptr-> name())) <= 0)
+	goto corrupted;
+
+      if (antype == ns_t_cname) 
+	{
+	  alias_count++;
+	  string_size += namelen1;
+	}
+      else if (antype == type)
+	{
+	  ansize = ntohs (curptr->size);
+	  if (ansize != addrsize_in)
+	    continue;
+	  if (address_count == 0)
+	    {
+	      address_len = namelen1;
+	      string_size += namelen1;
+	    }
+	  else if (address_len != namelen1)
+	    continue;
+	  address_count++;
+	}
+      /* Update the records */
+      curptr->type = antype; /* Host byte order */
+      curptr->namelen1 = namelen1;
+      if (! anptr)
+	anptr = prevptr = curptr;
+      else
+	{
+	  prevptr->set_next (curptr);
+	  prevptr = curptr;
+	}
+    }
+
+  /* If there is no address, quit */
+  if (address_count == 0)
+    {
+      free (msg);
+      h_errno = NO_DATA;
+      return NULL;
+    }
+  
+  /* Determine the total size */
+  sz = DWORD_round (sizeof(hostent))
+       + sizeof (char *) * (alias_count + address_count + 2)
+       + string_size
+       + address_count * addrsize_out;
+
+  ret = realloc_ent (sz,  (hostent *) NULL);
+  if (! ret) 
+    {
+      old_errno = errno;
+      free (msg);
+      set_errno (old_errno);
+      h_errno = NETDB_INTERNAL;
+      return NULL;
+    }
+
+  ret->h_addrtype = af;
+  ret->h_length = addrsize_out;
+  ret->h_aliases = (char **) (((char *) ret) + DWORD_round (sizeof(hostent)));
+  ret->h_addr_list = ret->h_aliases + alias_count + 1;
+  string_ptr = (char *) (ret->h_addr_list + address_count + 1);
+ 
+  /* Rescan the answers */
+  ancount = alias_count + address_count; /* Valid records */
+  alias_count = address_count = 0;
+
+  for (i = 0, curptr = anptr; i < ancount; i++, curptr = curptr->next ())
+    {
+      antype = curptr->type;
+      if (antype == ns_t_cname) 
+	{
+	  complen = dn_expand (msg, eomsg, curptr->name (), string_ptr, string_size);
+#ifdef DEBUGGING
+	  if (complen != curptr->complen)  
+	    go to debugging;
+#endif
+	  ret->h_aliases[alias_count++] = string_ptr;
+	  namelen1 = curptr->namelen1;
+	  string_ptr += namelen1;
+	  string_size -= namelen1;	  
+	  continue;
+	}
+      if (antype == type)
+	    {
+	      if (address_count == 0)
+		{
+		  complen = dn_expand (msg, eomsg, curptr->name(), string_ptr, string_size);
+#ifdef DEBUGGING
+		  if (complen != curptr->complen)  
+		    go to debugging;
+#endif
+		  ret->h_name = string_ptr;
+		  namelen1 = curptr->namelen1;
+		  string_ptr += namelen1;
+		  string_size -= namelen1;	  
+		}
+	      ret->h_addr_list[address_count++] = string_ptr;
+	      if (addrsize_in != addrsize_out)
+		memcpy4to6 (string_ptr, curptr->data);
+	      else
+		memcpy (string_ptr, curptr->data, addrsize_in);
+	      string_ptr += addrsize_out;
+	      string_size -= addrsize_out;
+	      continue;
+	    }
+#ifdef DEBUGGING
+      /* Should not get here */
+      go to debugging;
+#endif
+    }
+#ifdef DEBUGGING
+  if (string_size < 0)  
+    go to debugging;
+#endif      
+  
+  free (msg);
+
+  ret->h_aliases[alias_count] = NULL;
+  ret->h_addr_list[address_count] = NULL;
+ 
+  return ret;
+
+ corrupted:
+  free (msg);
+  /* Hopefully message corruption errors are temporary.
+     Should it be NO_RECOVERY ? */
+  h_errno = TRY_AGAIN;
+  return NULL;
+
+
+#ifdef DEBUGGING
+ debugging:
+   system_printf ("Please debug.");
+   free (msg);
+   free (ret);
+   h_errno = NO_RECOVERY;
+   return NULL;
+#endif
+}
+
+/* gethostbyname2: standards? */
+extern "C" struct hostent *
+gethostbyname2 (const char *name, int af)
+{
+  sig_dispatch_pending ();
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return NULL;
+
+  if (!(_res.options & RES_INIT))
+      res_init();
+  bool v4to6 = _res.options & RES_USE_INET6;
+
+  int type, addrsize_in, addrsize_out;
+  switch (af) 
+    {
+    case AF_INET:
+      addrsize_in = NS_INADDRSZ;
+      addrsize_out = (v4to6) ? NS_IN6ADDRSZ : NS_INADDRSZ;
+      type = ns_t_a;
+      break;
+    case AF_INET6:
+      addrsize_in = addrsize_out = NS_IN6ADDRSZ;
+      type = ns_t_aaaa;
+      break;
+    default:
+      set_errno (EAFNOSUPPORT);
+      h_errno = NETDB_INTERNAL;
+      return NULL;
+    }
+  
+  return gethostby_helper (name, af, type, addrsize_in, addrsize_out);
 }
 
 /* exported as accept: standards? */
@@ -2485,10 +2785,6 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
  * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  * SOFTWARE.
  */
-
-#define	IN6ADDRSZ	16
-#define	INADDRSZ	 4
-#define	INT16SZ		 2
 
 /* int
  * inet_pton4(src, dst)

@@ -1,6 +1,6 @@
 /* minires.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2008 Red Hat, Inc.
+   Copyright 2006, 2008, 2009 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
@@ -99,6 +99,11 @@ static void get_options(res_state statp, int i, char **words)
       DPRINTF(statp->options & RES_DEBUG, "%s: 1\n", words[i]);
       continue;
     }
+    if (!strcasecmp("inet6", words[i])) {
+      statp->options |= RES_USE_INET6;
+      DPRINTF(statp->options & RES_DEBUG, "%s: 1\n", words[i]);
+      continue;
+    }
     if (!strcasecmp("osquery", words[i])) {
       statp->use_os = 1;
       DPRINTF(statp->options & RES_DEBUG, "%s: 1\n", words[i]);
@@ -114,16 +119,22 @@ static void get_options(res_state statp, int i, char **words)
 	 continue;
 	 }
       */
-      if (!strcasecmp("retry", words[i])) {
+      if (!strcasecmp("retry", words[i])
+	  || !strcasecmp("attempts", words[i])) {
 	if (value < 1)
 	  value = 1;
+	else if (value > RES_MAXRETRY)
+	  value = RES_MAXRETRY;
 	statp->retry = value;
 	DPRINTF(statp->options & RES_DEBUG, "%s: %d\n", words[i], value);
 	continue;
       }
-      if (!strcasecmp("retrans", words[i])) {
+      if (!strcasecmp("retrans", words[i])
+	  || !strcasecmp("timeout", words[i])) {
 	if (value < 1)
 	  value = 1;
+	else if (value > RES_MAXRETRANS)
+	  value = RES_MAXRETRANS;
 	statp->retrans = value;
 	DPRINTF(statp->options & RES_DEBUG, "%s: %d\n", words[i], value);
 	continue;
@@ -270,6 +281,9 @@ int res_ninit(res_state statp)
   int i;
 
   statp->res_h_errno = NETDB_SUCCESS;
+   /* Only debug may be set before calling init */
+  statp->options &= RES_DEBUG;
+  statp->options |= RES_INIT | RES_DEFAULT;
   statp->nscount = 0;
   statp->os_query = NULL;
   statp->retrans = RES_TIMEOUT; /* timeout in seconds */
@@ -299,9 +313,6 @@ int res_ninit(res_state statp)
     statp->nsaddr_list[i].sin_port = htons(NAMESERVER_PORT);
     bzero(statp->nsaddr_list[i].sin_zero, sizeof(statp->nsaddr_list[i].sin_zero));
   }
-  /* Only debug may be set before calling init */
-  statp->options &= RES_DEBUG;
-  statp->options |= RES_INIT | RES_DEFAULT;
   return 0;
 }
 
@@ -806,7 +817,7 @@ int dn_expand(const unsigned char *msg, const unsigned char *eomorig,
     exp_dn++;
   else do {
     if (len <= MAXLABEL) {
-      if ((length -= (len + 1)) > 0 /* Need space for final . */
+      if ((length -= (len + 1)) >= 0 /* Need space for final . */
 	  && comp_dn + len <= eomorig) {
 	do { *exp_dn++ = *comp_dn++; } while (--len != 0);
 	*exp_dn++ = '.';
@@ -835,7 +846,6 @@ expand_fail:
 /*  fprintf(stderr, "dn_expand fails\n"); */
   return -1;
 }
-
 
 /*****************************************************************
  *
@@ -926,8 +936,7 @@ int dn_comp(const char * exp_dn, u_char * comp_dn, int length,
 }
 
 /*****************************************************************
- *
- dn_skipname
+ * dn_skipname
 
  Measures the compressed domain name length and returns it.
  *****************************************************************/
@@ -948,4 +957,39 @@ int dn_skipname(const unsigned char *comp_dn, const unsigned char *eom)
   } while (len != 0);
 
   return comp_dn - comp_dn_orig;
+}
+
+/*****************************************************************
+ * dn_length1    For internal use
+
+ Return length of uncompressesed name incl final 0.
+ *****************************************************************/
+
+int dn_length1(const unsigned char *msg, const unsigned char *eomorig,
+	       const unsigned char *comp_dn)
+{
+  unsigned int len, length = 0;
+
+  errno = EINVAL;
+  if (comp_dn >= eomorig)
+    goto expand_fail;
+  else while ((len = *comp_dn++) != 0) {
+    if (len <= MAXLABEL) {
+      if ((comp_dn += len) <= eomorig)
+	length += len + 1;
+      else
+	goto expand_fail;
+    }
+    else if (len >= (128+64)) {
+      comp_dn = msg + (((len & ~(128+64)) << 8) + *comp_dn);
+      if (comp_dn >= eomorig)
+	goto expand_fail;
+    }
+    else
+      goto expand_fail;
+  }
+  return length;
+
+expand_fail:
+  return -1;
 }
