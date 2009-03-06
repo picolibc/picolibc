@@ -13,10 +13,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -36,107 +32,76 @@
 
 /*
 FUNCTION
-<<vfprintf>>, <<vprintf>>, <<vsprintf>>, <<vsnprintf>>, <<vasprintf>>, <<vasnprintf>>---format argument list
+<<vfwprintf>>, <<vwprintf>>, <<vswprintf>>---wide character format argument list
 
 INDEX
-	vfprintf
+	vfwprintf
 INDEX
-	_vfprintf_r
+	_vfwprintf_r
 INDEX
-	vprintf
+	vwprintf
 INDEX
-	_vprintf_r
+	_vwprintf_r
 INDEX
-	vsprintf
+	vswprintf
 INDEX
-	_vsprintf_r
-INDEX
-	vsnprintf
-INDEX
-	_vsnprintf_r
-INDEX
-	vasprintf
-INDEX
-	_vasprintf_r
-INDEX
-	vasnprintf
-INDEX
-	_vasnprintf_r
+	_vswprintf_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
-	int vprintf(const char *<[fmt]>, va_list <[list]>);
-	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
-	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>,
-                      va_list <[list]>);
-	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
-	char *vasnprintf(char *<[str]>, size_t *<[size]>, const char *<[fmt]>,
-                         va_list <[list]>);
+	int vwprintf(const wchar_t *<[fmt]>, va_list <[list]>);
+	int vfwprintf(FILE *<[fp]>, const wchar_t *<[fmt]>, va_list <[list]>);
+	int vswprintf(wchar_t *<[str]>, const wchar_t *<[fmt]>,
+		      va_list <[list]>);
 
-	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
+	int _vwprintf_r(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
                         va_list <[list]>);
-	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
-                        const char *<[fmt]>, va_list <[list]>);
-	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                        const char *<[fmt]>, va_list <[list]>);
-	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>,
-                         const char *<[fmt]>, va_list <[list]>);
-	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                         size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
-	char *_vasnprintf_r(struct _reent *<[reent]>, char *<[str]>,
-                            size_t *<[size]>, const char *<[fmt]>, va_list <[list]>);
+	int _vfwprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
+			 const wchar_t *<[fmt]>, va_list <[list]>);
+	int _vswprintf_r(struct _reent *<[reent]>, wchar_t *<[str]>,
+			 const wchar_t *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
-<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>>, <<vsnprintf>>,
-and <<vasnprintf>> are (respectively) variants of <<printf>>,
-<<fprintf>>, <<asprintf>>, <<sprintf>>, <<snprintf>>, and
-<<asnprintf>>.  They differ only in allowing their caller to pass the
-variable argument list as a <<va_list>> object (initialized by
-<<va_start>>) rather than directly accepting a variable number of
-arguments.  The caller is responsible for calling <<va_end>>.
+<<vwprintf>>, <<vfwprintf>> and <<vswprintf>> are (respectively) variants
+of <<wprintf>>, <<fwprintf>> and <<swprintf>>.  They differ only in allowing
+their caller to pass the variable argument list as a <<va_list>> object
+(initialized by <<va_start>>) rather than directly accepting a variable
+number of arguments.  The caller is responsible for calling <<va_end>>.
 
-<<_vprintf_r>>, <<_vfprintf_r>>, <<_vasprintf_r>>, <<_vsprintf_r>>,
-<<_vsnprintf_r>>, and <<_vasnprintf_r>> are reentrant versions of the
-above.
+<<_vwprintf_r>>, <<_vfwprintf_r>> and <<_vswprintf_r>> are reentrant
+versions of the above.
 
 RETURNS
 The return values are consistent with the corresponding functions.
 
 PORTABILITY
-ANSI C requires <<vprintf>>, <<vfprintf>>, <<vsprintf>>, and
-<<vsnprintf>>.  The remaining functions are newlib extensions.
+POSIX-1.2008
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-/*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
-static char *rcsid = "$Id$";
-#endif /* LIBC_SCCS and not lint */
-
 /*
- * Actual printf innards.
+ * Actual wprintf innards.
  *
  * This code is large and complicated...
  */
 #include <newlib.h>
 
 #ifdef INTEGER_ONLY
-# define VFPRINTF vfiprintf
+# define VFWPRINTF vfiwprintf
 # ifdef STRING_ONLY
-#   define _VFPRINTF_R _svfiprintf_r
+#   define _VFWPRINTF_R _svfiwprintf_r
 # else
-#   define _VFPRINTF_R _vfiprintf_r
+#   define _VFWPRINTF_R _vfiwprintf_r
 # endif
 #else
-# define VFPRINTF vfprintf
+# define VFWPRINTF vfwprintf
 # ifdef STRING_ONLY
-#   define _VFPRINTF_R _svfprintf_r
+#   define _VFWPRINTF_R _svfwprintf_r
 # else
-#   define _VFPRINTF_R _vfprintf_r
+#   define _VFWPRINTF_R _vfwprintf_r
 # endif
 # ifndef NO_FLOATING_POINT
 #  define FLOATING_POINT
@@ -176,164 +141,26 @@ static char *rcsid = "$Id$";
 # undef _NO_LONGLONG
 #endif
 
+int _EXFUN(_VFWPRINTF_R, (struct _reent *, FILE *, _CONST wchar_t *, va_list));
+/* Defined in vfprintf.c. */
 #ifdef STRING_ONLY
 #define __SPRINT __ssprint_r
 #else
 #define __SPRINT __sprint_r
 #endif
+int _EXFUN(__SPRINT, (struct _reent *, FILE *, register struct __suio *));
 
-/* The __sprint_r/__ssprint_r functions are shared between all versions of
-   vfprintf and vfwprintf.  They must only be defined once, which we do in
-   the INTEGER_ONLY versions here. */
-#ifdef STRING_ONLY
-#ifdef INTEGER_ONLY
-int
-_DEFUN(__ssprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       register struct __suio *uio)
-{
-	register size_t len;
-	register int w;
-	register struct __siov *iov;
-	register _CONST char *p = NULL;
-
-	iov = uio->uio_iov;
-	len = 0;
-
-	if (uio->uio_resid == 0) {
-		uio->uio_iovcnt = 0;
-		return (0);
-	}
-
-        do {
-		while (len == 0) {
-			p = iov->iov_base;
-			len = iov->iov_len;
-			iov++;
-		}
-		w = fp->_w;
-		if (len >= w && fp->_flags & (__SMBF | __SOPT)) {
-			/* must be asprintf family */
-			unsigned char *str;
-			int curpos = (fp->_p - fp->_bf._base);
-			/* Choose a geometric growth factor to avoid
-		 	 * quadratic realloc behavior, but use a rate less
-			 * than (1+sqrt(5))/2 to accomodate malloc
-		 	 * overhead. asprintf EXPECTS us to overallocate, so
-		 	 * that it can add a trailing \0 without
-		 	 * reallocating.  The new allocation should thus be
-		 	 * max(prev_size*1.5, curpos+len+1). */
-			int newsize = fp->_bf._size * 3 / 2;
-			if (newsize < curpos + len + 1)
-				newsize = curpos + len + 1;
-			if (fp->_flags & __SOPT)
-			{
-				/* asnprintf leaves original buffer alone.  */
-				str = (unsigned char *)_malloc_r (ptr, newsize);
-				if (!str)
-				{
-					ptr->_errno = ENOMEM;
-					goto err;
-				}
-				memcpy (str, fp->_bf._base, curpos);
-				fp->_flags = (fp->_flags & ~__SOPT) | __SMBF;
-			}
-			else
-			{
-				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
-						newsize);
-				if (!str) {
-					/* Free unneeded buffer.  */
-					_free_r (ptr, fp->_bf._base);
-					/* Ensure correct errno, even if free
-					 * changed it.  */
-					ptr->_errno = ENOMEM;
-					goto err;
-				}
-			}
-			fp->_bf._base = str;
-			fp->_p = str + curpos;
-			fp->_bf._size = newsize;
-			w = len;
-			fp->_w = newsize - curpos;
-		}
-		if (len < w)
-			w = len;
-		(void)memmove ((_PTR) fp->_p, (_PTR) p, (size_t) (w));
-		fp->_w -= w;
-		fp->_p += w;
-		w = len;          /* pretend we copied all */
-		p += w;
-		len -= w;
-        } while ((uio->uio_resid -= w) != 0);
-
-	uio->uio_resid = 0;
-	uio->uio_iovcnt = 0;
-	return 0;
-
-err:
-  fp->_flags |= __SERR;
-  uio->uio_resid = 0;
-  uio->uio_iovcnt = 0;
-  return EOF;
-}
-#endif /* INTEGER_ONLY */
-
-#else /* !STRING_ONLY */
-#ifdef INTEGER_ONLY
-/*
- * Flush out all the vectors defined by the given uio,
- * then reset it so that it can be reused.
- */
-int
-_DEFUN(__sprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       register struct __suio *uio)
-{
-	register int err = 0;
-
-	if (uio->uio_resid == 0) {
-		uio->uio_iovcnt = 0;
-		return (0);
-	}
-	if (fp->_flags2 & __SWID) {
-		struct __siov *iov;
-		wchar_t *p;
-		int i, len;
-
-		iov = uio->uio_iov;
-		for (; uio->uio_resid != 0;
-		     uio->uio_resid -= len * sizeof (wchar_t), iov++) {
-			p = (wchar_t *) iov->iov_base;
-			len = iov->iov_len / sizeof (wchar_t);
-			for (i = 0; i < len; i++) {
-				if (_fputwc_r (ptr, p[i], fp) == WEOF) {
-					err = -1;
-					goto out;
-				}
-			}
-		}
-	} else
-		err = __sfvwrite_r(ptr, fp, uio);
-out:
-	uio->uio_resid = 0;
-	uio->uio_iovcnt = 0;
-	return (err);
-}
-#endif /* INTEGER_ONLY */
-
+#ifndef STRING_ONLY
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
  * worries about ungetc buffers and so forth.
  */
 static int
-_DEFUN(__sbprintf, (rptr, fp, fmt, ap),
+_DEFUN(__sbwprintf, (rptr, fp, fmt, ap),
        struct _reent *rptr _AND
        register FILE *fp   _AND
-       _CONST char *fmt  _AND
+       _CONST wchar_t *fmt  _AND
        va_list ap)
 {
 	int ret;
@@ -356,7 +183,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 #endif
 
 	/* do the work, then copy any error status */
-	ret = _VFPRINTF_R (rptr, &fake, fmt, ap);
+	ret = _VFWPRINTF_R (rptr, &fake, fmt, ap);
 	if (ret >= 0 && _fflush_r (rptr, &fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
@@ -403,10 +230,10 @@ extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
 #  define FREXP(f,e) ((_LONG_DOUBLE) frexp ((double)f, e))
 # endif /* !_NO_LONGDBL */
 
-static char *cvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, char *, int *,
-                 int, int *, char *);
+static wchar_t *wcvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, wchar_t *,
+		    int *, int, int *, wchar_t *);
 
-static int exponent(char *, int, int);
+static int wexponent(wchar_t *, int, int);
 
 #endif /* FLOATING_POINT */
 
@@ -436,6 +263,7 @@ static int exponent(char *, int, int);
 typedef quad_t * quad_ptr_t;
 typedef _PTR     void_ptr_t;
 typedef char *   char_ptr_t;
+typedef wchar_t* wchar_ptr_t;
 typedef long *   long_ptr_t;
 typedef int  *   int_ptr_t;
 typedef short *  short_ptr_t;
@@ -460,6 +288,7 @@ union arg_val
   short_ptr_t val_short_ptr_t;
   long_ptr_t val_long_ptr_t;
   char_ptr_t val_char_ptr_t;
+  wchar_ptr_t val_wchar_ptr_t;
   quad_ptr_t val_quad_ptr_t;
   void_ptr_t val_void_ptr_t;
   quad_t val_quad_t;
@@ -468,17 +297,17 @@ union arg_val
 };
 
 static union arg_val *
-_EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
+_EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
                  va_list *ap, int *numargs, union arg_val *args,
-                 int *arg_type, char **last_fmt));
+                 int *arg_type, wchar_t **last_fmt));
 #endif /* !_NO_POS_ARGS */
 
 /*
  * Macros for converting digits to letters and vice versa
  */
-#define	to_digit(c)	((c) - '0')
+#define	to_digit(c)	((c) - L'0')
 #define is_digit(c)	((unsigned)to_digit (c) <= 9)
-#define	to_char(n)	((n) + '0')
+#define	to_char(n)	((n) + L'0')
 
 /*
  * Flags used during conversion.
@@ -504,40 +333,38 @@ _EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
 # define CHARINT	0
 #endif
 
-int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
-
 #ifndef STRING_ONLY
 int
-_DEFUN(VFPRINTF, (fp, fmt0, ap),
+_DEFUN(VFWPRINTF, (fp, fmt0, ap),
        FILE * fp         _AND
-       _CONST char *fmt0 _AND
+       _CONST wchar_t *fmt0 _AND
        va_list ap)
 {
   int result;
-  result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
+  result = _VFWPRINTF_R (_REENT, fp, fmt0, ap);
   return result;
 }
 #endif /* STRING_ONLY */
 
 int
-_DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
+_DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
        struct _reent *data _AND
        FILE * fp           _AND
-       _CONST char *fmt0   _AND
+       _CONST wchar_t *fmt0   _AND
        va_list ap)
 {
-	register char *fmt;	/* format string */
-	register int ch;	/* character from fmt */
+	register wchar_t *fmt;	/* format string */
+	register wint_t ch;	/* character from fmt */
 	register int n, m;	/* handy integers (short term usage) */
-	register char *cp;	/* handy char pointer (short term usage) */
+	register wchar_t *cp;	/* handy char pointer (short term usage) */
 	register struct __siov *iovp;/* for PRINT macro */
 	register int flags;	/* flags as above */
-	char *fmt_anchor;       /* current format spec being processed */
+	wchar_t *fmt_anchor;    /* current format spec being processed */
 #ifndef _NO_POS_ARGS
 	int N;                  /* arg number */
 	int arg_index;          /* index into args processed directly */
 	int numargs;            /* number of varargs read */
-	char *saved_fmt;        /* saved fmt pointer */
+	wchar_t *saved_fmt;     /* saved fmt pointer */
 	union arg_val args[MAX_POS_ARGS];
 	int arg_type[MAX_POS_ARGS];
 	int is_pos_arg;         /* is current format positional? */
@@ -546,33 +373,32 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	int ret;		/* return value accumulator */
 	int width;		/* width from format (%8d), or 0 */
 	int prec;		/* precision from format (%.3d), or -1 */
-	char sign;		/* sign prefix (' ', '+', '-', or \0) */
+	wchar_t sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef FLOATING_POINT
-	char *decimal_point = _localeconv_r (data)->decimal_point;
-	char softsign;		/* temporary negative sign for floats */
+	wchar_t decimal_point;
+#ifdef _MB_CAPABLE
+	mbstate_t state;        /* mbtowc calls from library must not change state */
+#endif
+	wchar_t softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
 # define _fpvalue (_double_.fp)
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
-	int ndig = 0;		/* actual number of digits returned by cvt */
-	char expstr[MAXEXPLEN];	/* buffer for exponent string */
+	int ndig = 0;		/* actual number of digits returned by wcvt */
+	wchar_t expstr[MAXEXPLEN];	/* buffer for exponent string */
 #endif /* FLOATING_POINT */
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
 	int realsz;		/* field size expanded by dprec */
-	int size;		/* size of converted field or string */
-	char *xdigs = NULL;	/* digits for [xX] conversion */
+	int size = 0;		/* size of converted field or string */
+	wchar_t *xdigs = NULL;	/* digits for [xX] conversion */
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
-	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
-	char ox[2];		/* space for 0x hex-prefix */
-#ifdef _MB_CAPABLE
-	wchar_t wc;
-	mbstate_t state;        /* mbtowc calls from library must not change state */
-#endif
-	char *malloc_buf = NULL;/* handy pointer for malloced buffers */
+	wchar_t buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
+	wchar_t ox[2];		/* space for 0x hex-prefix */
+	wchar_t *malloc_buf = NULL;/* handy pointer for malloced buffers */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
@@ -580,21 +406,29 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	 * below longer.
 	 */
 #define	PADSIZE	16		/* pad chunk size */
-	static _CONST char blanks[PADSIZE] =
-	 {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-	static _CONST char zeroes[PADSIZE] =
-	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
+	static _CONST wchar_t blanks[PADSIZE] =
+	 {L' ',L' ',L' ',L' ',L' ',L' ',L' ',L' ',
+	  L' ',L' ',L' ',L' ',L' ',L' ',L' ',L' '};
+	static _CONST wchar_t zeroes[PADSIZE] =
+	 {L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0',
+	  L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0'};
 
+#ifdef FLOATING_POINT
 #ifdef _MB_CAPABLE
 	memset (&state, '\0', sizeof (state));
+	_mbrtowc_r (data, &decimal_point, _localeconv_r (data)->decimal_point,
+		    MB_CUR_MAX, &state);
+#else
+	decimal_point = (wchar_t) *_localeconv_r (data)->decimal_point;
+#endif
 #endif
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
 	 */
 #define	PRINT(ptr, len) { \
-	iovp->iov_base = (ptr); \
-	iovp->iov_len = (len); \
-	uio.uio_resid += (len); \
+	iovp->iov_base = (char *) (ptr); \
+	iovp->iov_len = (len) * sizeof (wchar_t); \
+	uio.uio_resid += (len) * sizeof (wchar_t); \
 	iovp++; \
 	if (++uio.uio_iovcnt >= NIOV) { \
 		if (__SPRINT(data, fp, &uio)) \
@@ -670,19 +504,19 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	CHECK_INIT (data, fp);
 	_flockfile (fp);
 
-	ORIENT(fp, -1);
+	ORIENT(fp, 1);
 
-	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
+	/* sorry, fwprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
 		_funlockfile (fp);
 		return (EOF);
 	}
 
-	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
+	/* optimise fwprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
 		_funlockfile (fp);
-		return (__sbprintf (data, fp, fmt0, ap));
+		return (__sbwprintf (data, fp, fmt0, ap));
 	}
 #else /* STRING_ONLY */
         /* Create initial buffer if we are called by asprintf family.  */
@@ -698,7 +532,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
         }
 #endif /* STRING_ONLY */
 
-	fmt = (char *)fmt0;
+	fmt = (wchar_t *)fmt0;
 	uio.uio_iov = iovp = iov;
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
@@ -716,27 +550,14 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	 */
 	for (;;) {
 	        cp = fmt;
-#ifdef _MB_CAPABLE
-	        while ((n = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
-                    if (wc == '%')
-                        break;
-                    fmt += n;
-		}
-#else
-                while (*fmt != '\0' && *fmt != '%')
-                    fmt += 1;
-#endif
+                while (*fmt != L'\0' && *fmt != L'%')
+                    ++fmt;
 		if ((m = fmt - cp) != 0) {
 			PRINT (cp, m);
 			ret += m;
 		}
-#ifdef _MB_CAPABLE
-		if (n <= 0)
+                if (*fmt == L'\0')
                     goto done;
-#else
-                if (*fmt == '\0')
-                    goto done;
-#endif
 		fmt_anchor = fmt;
 		fmt++;		/* skip over '%' */
 
@@ -744,7 +565,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		dprec = 0;
 		width = 0;
 		prec = -1;
-		sign = '\0';
+		sign = L'\0';
 #ifndef _NO_POS_ARGS
 		N = arg_index;
 		is_pos_arg = 0;
@@ -753,7 +574,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
-		case '\'':
+		case L'\'':
 		  /* The ' flag is required by POSIX, but not C99.
 		     In the C locale, LC_NUMERIC requires
 		     thousands_sep to be the empty string.  And since
@@ -761,26 +582,26 @@ reswitch:	switch (ch) {
 		     is currently a no-op.  */
 		  goto rflag;
 #endif
-		case ' ':
+		case L' ':
 			/*
 			 * ``If the space and + flags both appear, the space
 			 * flag will be ignored.''
 			 *	-- ANSI X3J11
 			 */
 			if (!sign)
-				sign = ' ';
+				sign = L' ';
 			goto rflag;
-		case '#':
+		case L'#':
 			flags |= ALT;
 			goto rflag;
-		case '*':
+		case L'*':
 #ifndef _NO_POS_ARGS
 			/* we must check for positional arg used for dynamic width */
 			n = N;
 			old_is_pos_arg = is_pos_arg;
 			is_pos_arg = 0;
 			if (is_digit (*fmt)) {
-				char *old_fmt = fmt;
+				wchar_t *old_fmt = fmt;
 
 				n = 0;
 				ch = *fmt++;
@@ -789,7 +610,7 @@ reswitch:	switch (ch) {
 					ch = *fmt++;
 				} while (is_digit (ch));
 
-				if (ch == '$') {
+				if (ch == L'$') {
 					if (n <= MAX_POS_ARGS) {
 						n -= 1;
 						is_pos_arg = 1;
@@ -818,21 +639,21 @@ reswitch:	switch (ch) {
 				goto rflag;
 			width = -width;
 			/* FALLTHROUGH */
-		case '-':
+		case L'-':
 			flags |= LADJUST;
 			goto rflag;
-		case '+':
-			sign = '+';
+		case L'+':
+			sign = L'+';
 			goto rflag;
-		case '.':
-			if ((ch = *fmt++) == '*') {
+		case L'.':
+			if ((ch = *fmt++) == L'*') {
 #ifndef _NO_POS_ARGS
 				/* we must check for positional arg used for dynamic width */
 				n = N;
 				old_is_pos_arg = is_pos_arg;
 				is_pos_arg = 0;
 				if (is_digit (*fmt)) {
-					char *old_fmt = fmt;
+					wchar_t *old_fmt = fmt;
 
 					n = 0;
 					ch = *fmt++;
@@ -841,7 +662,7 @@ reswitch:	switch (ch) {
 						ch = *fmt++;
 					} while (is_digit (ch));
 
-					if (ch == '$') {
+					if (ch == L'$') {
 						if (n <= MAX_POS_ARGS) {
 							n -= 1;
 							is_pos_arg = 1;
@@ -870,7 +691,7 @@ reswitch:	switch (ch) {
 			}
 			prec = n < 0 ? -1 : n;
 			goto reswitch;
-		case '0':
+		case L'0':
 			/*
 			 * ``Note that 0 is taken as a flag, not as the
 			 * beginning of a field width.''
@@ -878,15 +699,15 @@ reswitch:	switch (ch) {
 			 */
 			flags |= ZEROPAD;
 			goto rflag;
-		case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
+		case L'1': case L'2': case L'3': case L'4':
+		case L'5': case L'6': case L'7': case L'8': case L'9':
 			n = 0;
 			do {
 				n = 10 * n + to_digit (ch);
 				ch = *fmt++;
 			} while (is_digit (ch));
 #ifndef _NO_POS_ARGS
-			if (ch == '$') {
+			if (ch == L'$') {
 				if (n <= MAX_POS_ARGS) {
 					N = n - 1;
 					is_pos_arg = 1;
@@ -899,39 +720,39 @@ reswitch:	switch (ch) {
 			width = n;
 			goto reswitch;
 #ifdef FLOATING_POINT
-		case 'L':
+		case L'L':
 			flags |= LONGDBL;
 			goto rflag;
 #endif
-		case 'h':
+		case L'h':
 #ifdef _WANT_IO_C99_FORMATS
-			if (*fmt == 'h') {
+			if (*fmt == L'h') {
 				fmt++;
 				flags |= CHARINT;
 			} else
 #endif
 				flags |= SHORTINT;
 			goto rflag;
-		case 'l':
+		case L'l':
 #if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
-			if (*fmt == 'l') {
+			if (*fmt == L'l') {
 				fmt++;
 				flags |= QUADINT;
 			} else
 #endif
 				flags |= LONGINT;
 			goto rflag;
-		case 'q': /* extension */
+		case L'q': /* extension */
 			flags |= QUADINT;
 			goto rflag;
 #ifdef _WANT_IO_C99_FORMATS
-		case 'j':
+		case L'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
 		  else
 		    flags |= QUADINT;
 		  goto rflag;
-		case 'z':
+		case L'z':
 		  if (sizeof (size_t) < sizeof (int))
 		    /* POSIX states size_t is 16 or more bits, as is short.  */
 		    flags |= SHORTINT;
@@ -946,7 +767,7 @@ reswitch:	switch (ch) {
 		       have size_t as wide as long long.  */
 		    flags |= QUADINT;
 		  goto rflag;
-		case 't':
+		case L't':
 		  if (sizeof (ptrdiff_t) < sizeof (int))
 		    /* POSIX states ptrdiff_t is 16 or more bits, as
 		       is short.  */
@@ -962,35 +783,28 @@ reswitch:	switch (ch) {
 		       have ptrdiff_t as wide as long long.  */
 		    flags |= QUADINT;
 		  goto rflag;
-		case 'C':
+		case L'C':
 #endif /* _WANT_IO_C99_FORMATS */
-		case 'c':
+		case L'c':
 			cp = buf;
-#ifdef _MB_CAPABLE
-			if (ch == 'C' || (flags & LONGINT)) {
-				mbstate_t ps;
-
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if ((size = (int)_wcrtomb_r (data, cp,
-					       (wchar_t)GET_ARG (N, ap, wint_t),
-						&ps)) == -1) {
-					fp->_flags |= __SERR;
-					goto error;
+			if (ch == L'c' && !(flags & LONGINT)) {
+				wint_t wc = btowc ((int) GET_ARG (N, ap, int));
+				if (wc == WEOF) {
+				    fp->_flags |= __SERR;
+				    goto error;
 				}
+				cp[0] = (wchar_t) wc;
 			}
 			else
-#endif /* _MB_CAPABLE */
 			{
-				*cp = GET_ARG (N, ap, int);
-				size = 1;
+				cp[0] = GET_ARG (N, ap, int);
 			}
-			sign = '\0';
+			cp[1] = L'\0';
+			size = 1;
+			sign = L'\0';
 			break;
-		case 'D':  /* extension */
-			flags |= LONGINT;
-			/*FALLTHROUGH*/
-		case 'd':
-		case 'i':
+		case L'd':
+		case L'i':
 			_uquad = SARG ();
 #ifndef _NO_LONGLONG
 			if ((quad_t)_uquad < 0)
@@ -1000,21 +814,21 @@ reswitch:	switch (ch) {
 			{
 
 				_uquad = -_uquad;
-				sign = '-';
+				sign = L'-';
 			}
 			base = DEC;
 			goto number;
 #ifdef FLOATING_POINT
 # ifdef _WANT_IO_C99_FORMATS
-		case 'a':
-		case 'A':
-		case 'F':
+		case L'a':
+		case L'A':
+		case L'F':
 # endif
-		case 'e':
-		case 'E':
-		case 'f':
-		case 'g':
-		case 'G':
+		case L'e':
+		case L'E':
+		case L'f':
+		case L'g':
+		case L'G':
 # ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
 				_fpvalue = (double) GET_ARG (N, ap, _LONG_DOUBLE);
@@ -1031,19 +845,19 @@ reswitch:	switch (ch) {
 			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
-				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
-					cp = "INF";
+				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
+					cp = L"INF";
 				else
-					cp = "inf";
+					cp = L"inf";
 				size = 3;
 				flags &= ~ZEROPAD;
 				break;
 			}
 			if (isnan (_fpvalue)) {
-				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
-					cp = "NAN";
+				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
+					cp = L"NAN";
 				else
-					cp = "nan";
+					cp = L"nan";
 				size = 3;
 				flags &= ~ZEROPAD;
 				break;
@@ -1061,35 +875,36 @@ reswitch:	switch (ch) {
 			expt = _ldcheck (&_fpvalue);
 			if (expt == 2) {
 				if (_fpvalue < 0)
-					sign = '-';
-				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
-					cp = "INF";
+					sign = L'-';
+				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
+					cp = L"INF";
 				else
-					cp = "inf";
+					cp = L"inf";
 				size = 3;
 				flags &= ~ZEROPAD;
 				break;
 			}
 			if (expt == 1) {
-				if (ch <= 'G') /* 'A', 'E', 'F', or 'G' */
-					cp = "NAN";
+				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
+					cp = L"NAN";
 				else
-					cp = "nan";
+					cp = L"nan";
 				size = 3;
 				flags &= ~ZEROPAD;
 				break;
 			}
 # endif /* !_NO_LONGDBL */
 
+			cp = buf;
 # ifdef _WANT_IO_C99_FORMATS
-			if (ch == 'a' || ch == 'A') {
-				ox[0] = '0';
-				ox[1] = ch == 'a' ? 'x' : 'X';
+			if (ch == L'a' || ch == L'A') {
+				ox[0] = L'0';
+				ox[1] = ch == L'a' ? L'x' : L'X';
 				flags |= HEXPREFIX;
 				if (prec >= BUF)
 				  {
 				    if ((malloc_buf =
-					 (char *)_malloc_r (data, prec + 1))
+					 (wchar_t *)_malloc_r (data, (prec + 1) * sizeof (wchar_t)))
 					== NULL)
 				      {
 					fp->_flags |= __SERR;
@@ -1097,38 +912,36 @@ reswitch:	switch (ch) {
 				      }
 				    cp = malloc_buf;
 				  }
-				else
-				  cp = buf;
 			} else
 # endif /* _WANT_IO_C99_FORMATS */
 			if (prec == -1) {
 				prec = DEFPREC;
-			} else if ((ch == 'g' || ch == 'G') && prec == 0) {
+			} else if ((ch == L'g' || ch == L'G') && prec == 0) {
 				prec = 1;
 			}
 
 			flags |= FPT;
 
-			cp = cvt (data, _fpvalue, prec, flags, &softsign,
-				  &expt, ch, &ndig, cp);
+			cp = wcvt (data, _fpvalue, prec, flags, &softsign,
+				   &expt, ch, &ndig, cp);
 
-			if (ch == 'g' || ch == 'G') {
+			if (ch == L'g' || ch == L'G') {
 				if (expt <= -4 || expt > prec)
 					ch -= 2; /* 'e' or 'E' */
 				else
-					ch = 'g';
+					ch = L'g';
 			}
 # ifdef _WANT_IO_C99_FORMATS
-			else if (ch == 'F')
-				ch = 'f';
+			else if (ch == L'F')
+				ch = L'f';
 # endif
-			if (ch <= 'e') {	/* 'a', 'A', 'e', or 'E' fmt */
+			if (ch <= L'e') {	/* 'a', 'A', 'e', or 'E' fmt */
 				--expt;
-				expsize = exponent (expstr, expt, ch);
+				expsize = wexponent (expstr, expt, ch);
 				size = expsize + ndig;
 				if (ndig > 1 || flags & ALT)
 					++size;
-			} else if (ch == 'f') {		/* f fmt */
+			} else if (ch == L'f') {		/* f fmt */
 				if (expt > 0) {
 					size = expt;
 					if (prec || flags & ALT)
@@ -1146,10 +959,10 @@ reswitch:	switch (ch) {
 					1 : 2 - expt);
 
 			if (softsign)
-				sign = '-';
+				sign = L'-';
 			break;
 #endif /* FLOATING_POINT */
-		case 'n':
+		case L'n':
 #ifndef _NO_LONGLONG
 			if (flags & QUADINT)
 				*GET_ARG (N, ap, quad_ptr_t) = ret;
@@ -1166,14 +979,11 @@ reswitch:	switch (ch) {
 			else
 				*GET_ARG (N, ap, int_ptr_t) = ret;
 			continue;	/* no output */
-		case 'O': /* extension */
-			flags |= LONGINT;
-			/*FALLTHROUGH*/
-		case 'o':
+		case L'o':
 			_uquad = UARG ();
 			base = OCT;
 			goto nosign;
-		case 'p':
+		case L'p':
 			/*
 			 * ``The argument shall be a pointer to void.  The
 			 * value of the pointer is converted to a sequence
@@ -1184,98 +994,88 @@ reswitch:	switch (ch) {
 			/* NOSTRICT */
 			_uquad = (uintptr_t) GET_ARG (N, ap, void_ptr_t);
 			base = HEX;
-			xdigs = "0123456789abcdef";
+			xdigs = L"0123456789abcdef";
 			flags |= HEXPREFIX;
-			ox[0] = '0';
-			ox[1] = ch = 'x';
+			ox[0] = L'0';
+			ox[1] = ch = L'x';
 			goto nosign;
-		case 's':
+		case L's':
 #ifdef _WANT_IO_C99_FORMATS
-		case 'S':
+		case L'S':
 #endif
 			sign = '\0';
-			cp = GET_ARG (N, ap, char_ptr_t);
+			cp = GET_ARG (N, ap, wchar_ptr_t);
 #ifndef __OPTIMIZE_SIZE__
 			/* Behavior is undefined if the user passed a
 			   NULL string when precision is not 0.
 			   However, if we are not optimizing for size,
 			   we might as well mirror glibc behavior.  */
 			if (cp == NULL) {
-				cp = "(null)";
+				cp = L"(null)";
 				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
 			else
 #endif /* __OPTIMIZE_SIZE__ */
 #ifdef _MB_CAPABLE
-			if (ch == 'S' || (flags & LONGINT)) {
+			if (ch == L's' && !(flags & LONGINT)) {
+				char *arg = (char *) cp;
+				size_t insize = 0, nchars = 0, nconv = 0;
 				mbstate_t ps;
-				_CONST wchar_t *wcp;
+				wchar_t *p;
 
-				wcp = (_CONST wchar_t *)cp;
-				size = m = 0;
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-
-				/* Count number of bytes needed for multibyte
-				   string that will be produced from widechar
-				   string.  */
 				if (prec >= 0) {
-					while (1) {
-						if (wcp[m] == L'\0')
+					char *p = arg;
+					memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+					while (nchars < (size_t)prec) {
+						nconv = mbrlen (p, MB_CUR_MAX, &ps);
+						if (nconv == 0 || nconv == (size_t)-1 ||
+						    nconv == (size_t)-2)
 							break;
-						if ((n = (int)_wcrtomb_r (data,
-						     buf, wcp[m], &ps)) == -1) {
+						p += nconv;
+						++nchars;
+						insize += nconv;
+					}
+					if (nconv == (size_t) -1 || nconv == (size_t) -2) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
+				} else
+					insize = strlen(arg);
+				if (insize >= BUF) {
+				    if ((malloc_buf = (wchar_t *) _malloc_r (data, (insize + 1) * sizeof (wchar_t)))
+								== NULL) {
 							fp->_flags |= __SERR;
 							goto error;
 						}
-						if (n + size > prec)
-							break;
-						m += 1;
-						size += n;
-						if (size == prec)
-							break;
-					}
-				}
-				else {
-					if ((size = (int)_wcsrtombs_r (data,
-						   NULL, &wcp, 0, &ps)) == -1) {
-						fp->_flags |= __SERR;
-						goto error;
-					}
-					wcp = (_CONST wchar_t *)cp;
-				}
-
-				if (size == 0)
-					break;
-
-				if (size >= BUF) {
-					if ((malloc_buf =
-					     (char *)_malloc_r (data, size + 1))
-					    == NULL) {
-						fp->_flags |= __SERR;
-						goto error;
-					}
-					cp = malloc_buf;
+						cp = malloc_buf;
 				} else
 					cp = buf;
-
-				/* Convert widechar string to multibyte string. */
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, cp, &wcp, size, &ps)
-				    != size) {
+				p = cp;
+				while (insize != 0) {
+					nconv = _mbrtowc_r (data, p, arg, insize, &ps);
+					if (nconv == 0 || nconv == (size_t)-1 || nconv == (size_t)-2)
+						break;
+					++p;
+					arg += nconv;
+					insize -= nconv;
+				}
+				if (nconv == (size_t) -1 || nconv == (size_t) -2) {
 					fp->_flags |= __SERR;
 					goto error;
 				}
-				cp[size] = '\0';
+				*p = L'\0';
+				size = p - cp;
 			}
 			else
 #endif /* _MB_CAPABLE */
 			if (prec >= 0) {
 				/*
-				 * can't use strlen; can only look for the
+				 * can't use wcslen; can only look for the
 				 * NUL in the first `prec' characters, and
 				 * strlen () will go further.
 				 */
-				char *p = memchr (cp, 0, prec);
+				wchar_t *p = wmemchr (cp, L'\0', prec);
 
 				if (p != NULL) {
 					size = p - cp;
@@ -1284,32 +1084,29 @@ reswitch:	switch (ch) {
 				} else
 					size = prec;
 			} else
-				size = strlen (cp);
+				size = wcslen (cp);
 
 			break;
-		case 'U': /* extension */
-			flags |= LONGINT;
-			/*FALLTHROUGH*/
-		case 'u':
+		case L'u':
 			_uquad = UARG ();
 			base = DEC;
 			goto nosign;
-		case 'X':
-			xdigs = "0123456789ABCDEF";
+		case L'X':
+			xdigs = L"0123456789ABCDEF";
 			goto hex;
 		case 'x':
-			xdigs = "0123456789abcdef";
+			xdigs = L"0123456789abcdef";
 hex:			_uquad = UARG ();
 			base = HEX;
 			/* leading 0x/X only if non-zero */
 			if (flags & ALT && _uquad != 0) {
-				ox[0] = '0';
+				ox[0] = L'0';
 				ox[1] = ch;
 				flags |= HEXPREFIX;
 			}
 
 			/* unsigned conversions */
-nosign:			sign = '\0';
+nosign:			sign = L'\0';
 			/*
 			 * ``... diouXx conversions ... if a precision is
 			 * specified, the 0 flag will be ignored.''
@@ -1337,8 +1134,8 @@ number:			if ((dprec = prec) >= 0)
 						_uquad >>= 3;
 					} while (_uquad);
 					/* handle octal leading 0 */
-					if (flags & ALT && *cp != '0')
-						*--cp = '0';
+					if (flags & ALT && *cp != L'0')
+						*--cp = L'0';
 					break;
 
 				case DEC:
@@ -1358,8 +1155,8 @@ number:			if ((dprec = prec) >= 0)
 					break;
 
 				default:
-					cp = "bug in vfprintf: bad base";
-					size = strlen (cp);
+					cp = L"bug in vfprintf: bad base";
+					size = wcslen (cp);
 					goto skipsize;
 				}
 			}
@@ -1373,19 +1170,19 @@ number:			if ((dprec = prec) >= 0)
                         *    printf ("%#.0o",0);
 			*/
                        else if (base == OCT && (flags & ALT))
-                         *--cp = '0';
+                         *--cp = L'0';
 
 			size = buf + BUF - cp;
 		skipsize:
 			break;
 		default:	/* "%?" prints ?, unless ? is NUL */
-			if (ch == '\0')
+			if (ch == L'\0')
 				goto done;
 			/* pretend it was %c with argument ch */
 			cp = buf;
 			*cp = ch;
 			size = 1;
-			sign = '\0';
+			sign = L'\0';
 			break;
 		}
 
@@ -1432,18 +1229,18 @@ number:			if ((dprec = prec) >= 0)
 		if ((flags & FPT) == 0) {
 			PRINT (cp, size);
 		} else {	/* glue together f_p fragments */
-			if (ch >= 'f') {	/* 'f' or 'g' */
+			if (ch >= L'f') {	/* 'f' or 'g' */
 				if (_fpvalue == 0) {
 					/* kludge for __dtoa irregularity */
-					PRINT ("0", 1);
+					PRINT (L"0", 1);
 					if (expt < ndig || flags & ALT) {
-						PRINT (decimal_point, 1);
+						PRINT (&decimal_point, 1);
 						PAD (ndig - 1, zeroes);
 					}
 				} else if (expt <= 0) {
-					PRINT ("0", 1);
+					PRINT (L"0", 1);
 					if (expt || ndig || flags & ALT) {
-						PRINT (decimal_point, 1);
+						PRINT (&decimal_point, 1);
 						PAD (-expt, zeroes);
 						PRINT (cp, ndig);
 					}
@@ -1451,18 +1248,18 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (cp, ndig);
 					PAD (expt - ndig, zeroes);
 					if (flags & ALT)
-						PRINT (decimal_point, 1);
+						PRINT (&decimal_point, 1);
 				} else {
 					PRINT (cp, expt);
 					cp += expt;
-					PRINT (decimal_point, 1);
+					PRINT (&decimal_point, 1);
 					PRINT (cp, ndig - expt);
 				}
 			} else {	/* 'a', 'A', 'e', or 'E' */
 				if (ndig > 1 || flags & ALT) {
 					PRINT (cp, 1);
 					cp++;
-					PRINT (decimal_point, 1);
+					PRINT (&decimal_point, 1);
 					if (_fpvalue) {
 						PRINT (cp, ndig - 1);
 					} else	/* 0.[0..] */
@@ -1511,21 +1308,20 @@ error:
    *LENGTH to the length of the returned string.  CH must be one of
    [aAeEfFgG]; if it is [aA], then the return string lives in BUF,
    otherwise the return value shares the mprec reentrant storage.  */
-static char *
-cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
-    char *sign, int *decpt, int ch, int *length, char *buf)
+static wchar_t *
+wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
+     wchar_t *sign, int *decpt, int ch, int *length, wchar_t *buf)
 {
 	int mode, dsgn;
-	char *digits, *bp, *rve;
 # ifdef _NO_LONGDBL
 	union double_union tmp;
 
 	tmp.d = value;
 	if (word0 (tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
 		value = -value;
-		*sign = '-';
+		*sign = L'-';
 	} else
-		*sign = '\000';
+		*sign = L'\0';
 # else /* !_NO_LONGDBL */
 	union
 	{
@@ -1536,13 +1332,14 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	ld.val = value;
 	if (ld.ieee.sign) { /* this will check for < 0 and -0.0 */
 		value = -value;
-		*sign = '-';
+		*sign = L'-';
 	} else
-		*sign = '\000';
+		*sign = L'\0';
 # endif /* !_NO_LONGDBL */
 
 # ifdef _WANT_IO_C99_FORMATS
-	if (ch == 'a' || ch == 'A') {
+	if (ch == L'a' || ch == L'A') {
+		wchar_t *digits, *bp, *rve;
 		/* This code assumes FLT_RADIX is a power of 2.  The initial
 		   division ensures the digit before the decimal will be less
 		   than FLT_RADIX (unless it is rounded later).	 There is no
@@ -1550,7 +1347,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		value = FREXP (value, decpt) / 8;
 		if (!value)
 			*decpt = 1;
-		digits = ch == 'a' ? "0123456789abcdef" : "0123456789ABCDEF";
+		digits = ch == L'a' ? L"0123456789abcdef" : L"0123456789ABCDEF";
 		bp = buf;
 		do {
 			value *= 16;
@@ -1562,37 +1359,43 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 			/* round to even */
 			rve = bp;
 			while (*--rve == digits[0xf]) {
-				*rve = '0';
+				*rve = L'0';
 			}
-			*rve = *rve == '9' ? digits[0xa] : *rve + 1;
+			*rve = *rve == L'9' ? digits[0xa] : *rve + 1;
 		} else {
 			while (ndigits-- >= 0) {
-				*bp++ = '0';
+				*bp++ = L'0';
 			}
 		}
 		*length = bp - buf;
 		return buf;
 	}
 # endif /* _WANT_IO_C99_FORMATS */
-	if (ch == 'f' || ch == 'F') {
+	if (ch == L'f' || ch == L'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
 		/* To obtain ndigits after the decimal point for the 'e'
 		 * and 'E' formats, round to ndigits + 1 significant
 		 * figures.
 		 */
-		if (ch == 'e' || ch == 'E') {
+		if (ch == L'e' || ch == L'E') {
 			ndigits++;
 		}
 		mode = 2;		/* ndigits significant digits */
 	}
 
-	digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+	{
+	  char *digits, *bp, *rve;
+#ifndef _MB_CAPABLE
+	  int i;
+#endif
 
-	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
+	  digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+
+	  if ((ch != L'g' && ch != L'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
-		if (ch == 'f' || ch == 'F') {
-			if (*digits == '0' && value)
+		if (ch == L'f' || ch == L'F') {
+			if (*digits == L'0' && value)
 				*decpt = -ndigits + 1;
 			bp += *decpt;
 		}
@@ -1600,30 +1403,38 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 			rve = bp;
 		while (rve < bp)
 			*rve++ = '0';
+	  }
+#ifdef _MB_CAPABLE
+	  *length = _mbsnrtowcs_r (data, buf, (const char **) &digits,
+				   rve - digits, BUF, NULL);
+#else
+	  *length = rve - digits;
+	  for (i = 0; i < *length && i < BUF; ++i)
+	    buf[i] = (wchar_t) digits[i];
+#endif
+	  return buf;
 	}
-	*length = rve - digits;
-	return (digits);
 }
 
 static int
-exponent(char *p0, int exp, int fmtch)
+wexponent(wchar_t *p0, int exp, int fmtch)
 {
-	register char *p, *t;
-	char expbuf[MAXEXPLEN];
+	register wchar_t *p, *t;
+	wchar_t expbuf[MAXEXPLEN];
 # ifdef _WANT_IO_C99_FORMATS
-	int isa = fmtch == 'a' || fmtch == 'A';
+	int isa = fmtch == L'a' || fmtch == L'A';
 # else
 #  define isa 0
 # endif
 
 	p = p0;
-	*p++ = isa ? 'p' - 'a' + fmtch : fmtch;
+	*p++ = isa ? L'p' - L'a' + fmtch : fmtch;
 	if (exp < 0) {
 		exp = -exp;
-		*p++ = '-';
+		*p++ = L'-';
 	}
 	else
-		*p++ = '+';
+		*p++ = L'+';
 	t = expbuf + MAXEXPLEN;
 	if (exp > 9) {
 		do {
@@ -1634,7 +1445,7 @@ exponent(char *p0, int exp, int fmtch)
 	}
 	else {
 		if (!isa)
-			*p++ = '0';
+			*p++ = L'0';
 		*p++ = to_char (exp);
 	}
 	return (p - p0);
@@ -1675,91 +1486,19 @@ exponent(char *p0, int exp, int fmtch)
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-/* The below constant state tables are shared between all versions of
-   vfprintf and vfwprintf.  They must only be defined once, which we do in
-   the STRING_ONLY/INTEGER_ONLY versions here. */
-#if defined (STRING_ONLY) && defined(INTEGER_ONLY)
-
-_CONST __CH_CLASS __chclass[256] = {
-  /* 00-07 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 08-0f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 10-17 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 18-1f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 20-27 */  FLAG,    OTHER,   OTHER,   FLAG,    DOLLAR,  OTHER,   OTHER,   FLAG,
-  /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
-  /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
-  /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 40-47 */  OTHER,   SPEC,    OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
-  /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC,
-  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
-  /* 58-5f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 60-67 */  OTHER,   SPEC,    OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC,
-  /* 68-6f */  MODFR,   SPEC,    MODFR,   OTHER,   MODFR,   OTHER,   SPEC,    SPEC,
-  /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    MODFR,   SPEC,    OTHER,   OTHER,
-  /* 78-7f */  SPEC,    OTHER,   MODFR,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 80-87 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 88-8f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 90-97 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 98-9f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* a0-a7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* a8-af */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* b0-b7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* b8-bf */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* c0-c7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* c8-cf */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* d0-d7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* d8-df */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* e0-e7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* e8-ef */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* f0-f7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* f8-ff */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-};
-
-_CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS] = {
-  /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */
-  /* START */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
-  /* SFLAG */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
-  /* WDIG  */  { DONE,    DONE,    WIDTH,  SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
-  /* WIDTH */  { DONE,    DONE,    DONE,   SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
-  /* SMOD  */  { DONE,    DONE,    DONE,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
-  /* SDOT  */  { SDOT,    PREC,    DONE,   SMOD,    DONE,   DONE,  VARP,   DONE,   DONE },
-  /* VARW  */  { DONE,    VWDIG,   DONE,   SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
-  /* VARP  */  { DONE,    VPDIG,   DONE,   SMOD,    DONE,   DONE,  DONE,   DONE,   DONE },
-  /* PREC  */  { DONE,    DONE,    DONE,   SMOD,    DONE,   DONE,  DONE,   DONE,   DONE },
-  /* VWDIG */  { DONE,    DONE,    WIDTH,  DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
-  /* VPDIG */  { DONE,    DONE,    PREC,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
-};
-
-_CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS] = {
-  /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */
-  /* START */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* SFLAG */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* WDIG  */  { NOOP,    NOOP,    GETPOS, GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* WIDTH */  { NOOP,    NOOP,    NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* SMOD  */  { NOOP,    NOOP,    NOOP,   NOOP,    GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* SDOT  */  { NOOP,    SKIPNUM, NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* VARW  */  { NOOP,    NUMBER,  NOOP,   GETPW,   GETPWB, GETPW, NOOP,   NOOP,   NOOP },
-  /* VARP  */  { NOOP,    NUMBER,  NOOP,   GETPW,   GETPWB, NOOP,  NOOP,   NOOP,   NOOP },
-  /* PREC  */  { NOOP,    NOOP,    NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
-  /* VWDIG */  { NOOP,    NOOP,    PWPOS,  NOOP,    NOOP,   NOOP,  NOOP,   NOOP,   NOOP },
-  /* VPDIG */  { NOOP,    NOOP,    PWPOS,  NOOP,    NOOP,   NOOP,  NOOP,   NOOP,   NOOP },
-};
-
-#endif /* STRING_ONLY && INTEGER_ONLY */
-
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
 _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
        struct _reent *data _AND
        int n               _AND
-       char *fmt           _AND
+       wchar_t *fmt        _AND
        va_list *ap         _AND
        int *numargs_p      _AND
        union arg_val *args _AND
        int *arg_type       _AND
-       char **last_fmt)
+       wchar_t **last_fmt)
 {
-  int ch;
+  wchar_t ch;
   int number, flags;
   int spec_type;
   int numargs = *numargs_p;
@@ -1770,41 +1509,20 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   int max_pos_arg = n;
   /* Only need types that can be reached via vararg promotions.  */
   enum types { INT, LONG_INT, QUAD_INT, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
-# ifdef _MB_CAPABLE
-  wchar_t wc;
-  mbstate_t wc_state;
-  int nbytes;
-# endif
 
   /* if this isn't the first call, pick up where we left off last time */
   if (*last_fmt != NULL)
     fmt = *last_fmt;
 
-# ifdef _MB_CAPABLE
-  memset (&wc_state, '\0', sizeof (wc_state));
-# endif
-
   /* we need to process either to end of fmt string or until we have actually
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
-# ifdef _MB_CAPABLE
-      while ((nbytes = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0)
-	{
-	  fmt += nbytes;
-	  if (wc == '%')
-	    break;
-	}
+      while (*fmt != L'\0' && *fmt != L'%')
+				fmt += 1;
 
-      if (nbytes <= 0)
-	break;
-# else
-      while (*fmt != '\0' && *fmt != '%')
-	fmt += 1;
-
-      if (*fmt == '\0')
-	break;
-# endif /* ! _MB_CAPABLE */
+      if (*fmt == L'\0')
+				break;
       state = START;
       flags = 0;
       pos = -1;
@@ -1817,7 +1535,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
       while (state != DONE)
 	{
 	  ch = *fmt++;
-	  chtype = __chclass[ch];
+	  chtype = ch < (wchar_t) 256 ? __chclass[ch] : OTHER;
 	  next_state = __state_table[state][chtype];
 	  action = __action_table[state][chtype];
 	  state = next_state;
@@ -1827,23 +1545,23 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	    case GETMOD:  /* we have format modifier */
 	      switch (ch)
 		{
-		case 'h':
+		case L'h':
 		  /* No flag needed, since short and char promote to int.  */
 		  break;
-		case 'L':
+		case L'L':
 		  flags |= LONGDBL;
 		  break;
-		case 'q':
+		case L'q':
 		  flags |= QUADINT;
 		  break;
 # ifdef _WANT_IO_C99_FORMATS
-		case 'j':
+		case L'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
 		  else
 		    flags |= QUADINT;
 		  break;
-		case 'z':
+		case L'z':
 		  if (sizeof (size_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (size_t) <= sizeof (long))
@@ -1855,7 +1573,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		       have size_t as wide as long long.  */
 		    flags |= QUADINT;
 		  break;
-		case 't':
+		case L't':
 		  if (sizeof (ptrdiff_t) <= sizeof (int))
 		    /* no flag needed */;
 		  else if (sizeof (ptrdiff_t) <= sizeof (long))
@@ -1868,10 +1586,10 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    flags |= QUADINT;
 		  break;
 # endif /* _WANT_IO_C99_FORMATS */
-		case 'l':
+		case L'l':
 		default:
 # if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
-		  if (*fmt == 'l')
+		  if (*fmt == L'l')
 		    {
 		      flags |= QUADINT;
 		      ++fmt;
@@ -1888,12 +1606,12 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		/* process the specifier and translate it to a type to fetch from varargs */
 		switch (ch)
 		  {
-		  case 'd':
-		  case 'i':
-		  case 'o':
-		  case 'x':
-		  case 'X':
-		  case 'u':
+		  case L'd':
+		  case L'i':
+		  case L'o':
+		  case L'x':
+		  case L'X':
+		  case L'u':
 		    if (flags & LONGINT)
 		      spec_type = LONG_INT;
 # ifndef _NO_LONGLONG
@@ -1903,21 +1621,16 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    else
 		      spec_type = INT;
 		    break;
-		  case 'D':
-		  case 'U':
-		  case 'O':
-		    spec_type = LONG_INT;
-		    break;
 # ifdef _WANT_IO_C99_FORMATS
-		  case 'a':
-		  case 'A':
-		  case 'F':
+		  case L'a':
+		  case L'A':
+		  case L'F':
 # endif
-		  case 'f':
-		  case 'g':
-		  case 'G':
-		  case 'E':
-		  case 'e':
+		  case L'f':
+		  case L'g':
+		  case L'G':
+		  case L'E':
+		  case L'e':
 # ifndef _NO_LONGDBL
 		    if (flags & LONGDBL)
 		      spec_type = LONG_DOUBLE;
@@ -1925,15 +1638,15 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 # endif
 		      spec_type = DOUBLE;
 		    break;
-		  case 's':
+		  case L's':
 # ifdef _WANT_IO_C99_FORMATS
-		  case 'S':
+		  case L'S':
 # endif
-		  case 'p':
-		  case 'n':
+		  case L'p':
+		  case L'n':
 		    spec_type = CHAR_PTR;
 		    break;
-		  case 'c':
+		  case L'c':
 # ifdef _WANT_IO_C99_FORMATS
 		    if (flags & LONGINT)
 		      spec_type = WIDE_CHAR;
@@ -1942,7 +1655,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		      spec_type = INT;
 		    break;
 # ifdef _WANT_IO_C99_FORMATS
-		  case 'C':
+		  case L'C':
 		    spec_type = WIDE_CHAR;
 		    break;
 # endif
@@ -1969,7 +1682,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 			args[numargs++].val_int = va_arg (*ap, int);
 			break;
 		      case CHAR_PTR:
-			args[numargs++].val_char_ptr_t = va_arg (*ap, char *);
+			args[numargs++].val_wchar_ptr_t = va_arg (*ap, wchar_t *);
 			break;
 		      case DOUBLE:
 			args[numargs++].val_double = va_arg (*ap, double);
@@ -2037,7 +1750,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 	  args[numargs++].val_quad_t = va_arg (*ap, quad_t);
 	  break;
 	case CHAR_PTR:
-	  args[numargs++].val_char_ptr_t = va_arg (*ap, char *);
+	  args[numargs++].val_wchar_ptr_t = va_arg (*ap, wchar_t *);
 	  break;
 	case DOUBLE:
 	  args[numargs++].val_double = va_arg (*ap, double);

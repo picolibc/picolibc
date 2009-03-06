@@ -125,14 +125,20 @@ ELIX_4_SOURCES = \
 	fputws.c		\
 	funopen.c		\
 	fwide.c			\
+	fwprintf.c		\
 	getwc.c			\
 	getwchar.c		\
 	open_memstream.c	\
 	putwc.c			\
 	putwchar.c		\
+	swprintf.c		\
 	ungetwc.c		\
 	vasniprintf.c		\
-	vasnprintf.c
+	vasnprintf.c		\
+	vswprintf.c		\
+	vwprintf.c		\
+	wprintf.c
+
 endif !ELIX_LEVEL_3
 endif !ELIX_LEVEL_2
 endif !ELIX_LEVEL_1
@@ -141,7 +147,9 @@ LIBADD_OBJS = \
 	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
 	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
-	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
+	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext) \
+	$(lpfx)svfiwprintf.$(oext) $(lpfx)svfwprintf.$(oext) \
+	$(lpfx)vfiwprintf.$(oext) $(lpfx)vfwprintf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -178,6 +186,18 @@ $(lpfx)svfprintf.$(oext): vfprintf.c
 
 $(lpfx)svfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
+
+$(lpfx)vfwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)vfiwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)svfwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)svfiwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
 
 $(lpfx)vfscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
@@ -254,12 +274,14 @@ CHEWOUT_FILES = \
 	siscanf.def		\
 	sprintf.def		\
 	sscanf.def		\
+	swprintf.def		\
 	tmpfile.def		\
 	tmpnam.def		\
 	ungetc.def		\
 	ungetwc.def		\
 	vfprintf.def		\
 	vfscanf.def		\
+	vfwprintf.def		\
 	viprintf.def		\
 	viscanf.def
 
@@ -298,9 +320,10 @@ $(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
 $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwide.$(oext): local.h
+$(lpfx)fwprintf.$(oext): local.h
+$(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)getwc.$(oext): local.h
 $(lpfx)getwchar.$(oext): local.h
-$(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)iscanf.$(oext): local.h
 $(lpfx)makebuf.$(oext): local.h
 $(lpfx)open_memstream.$(oext): local.h
@@ -312,25 +335,30 @@ $(lpfx)scanf.$(oext): local.h
 $(lpfx)setbuf.$(oext): local.h
 $(lpfx)setvbuf.$(oext): local.h
 $(lpfx)siprintf.$(oext): local.h
+$(lpfx)siscanf.$(oext): local.h
 $(lpfx)sniprintf.$(oext): local.h
 $(lpfx)sprintf.$(oext): local.h
-$(lpfx)siscanf.$(oext): local.h
 $(lpfx)sscanf.$(oext): local.h
 $(lpfx)stdio.$(oext): local.h
 $(lpfx)svfiprintf.$(oext): local.h
 $(lpfx)svfiscanf.$(oext): local.h floatio.h
 $(lpfx)svfprintf.$(oext): local.h
 $(lpfx)svfscanf.$(oext): local.h floatio.h
+$(lpfx)swprintf.$(oext): local.h
 $(lpfx)ungetc.$(oext): local.h
 $(lpfx)ungetwc.$(oext): local.h
 $(lpfx)vfiprintf.$(oext): local.h
-$(lpfx)vfprintf.$(oext): local.h
 $(lpfx)vfiscanf.$(oext): local.h floatio.h
+$(lpfx)vfprintf.$(oext): local.h
 $(lpfx)vfscanf.$(oext): local.h floatio.h
+$(lpfx)vfwprintf.$(oext): local.h
 $(lpfx)viscanf.$(oext): local.h
 $(lpfx)vscanf.$(oext): local.h
-$(lpfx)vsniprintf.$(oext): local.h
 $(lpfx)vsiscanf.$(oext): local.h
+$(lpfx)vsniprintf.$(oext): local.h
 $(lpfx)vsscanf.$(oext): local.h
+$(lpfx)vswprintf.$(oext): local.h
+$(lpfx)vwprintf.$(oext): local.h
 $(lpfx)wbuf.$(oext): local.h fvwrite.h
+$(lpfx)wprintf.$(oext): local.h
 $(lpfx)wsetup.$(oext): local.h

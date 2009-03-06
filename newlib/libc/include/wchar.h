@@ -10,6 +10,9 @@
 #define __need_wint_t
 #include <stddef.h>
 
+#define __need___va_list
+#include <stdarg.h>
+
 /* For _mbstate_t definition. */
 #include <sys/_types.h>
 
@@ -128,6 +131,28 @@ wint_t _EXFUN (_ungetwc_r, (struct _reent *, wint_t wc, __FILE *));
 
 __FILE *_EXFUN (open_wmemstream, (wchar_t **, size_t *));
 __FILE *_EXFUN (_open_wmemstream_r, (struct _reent *, wchar_t **, size_t *));
+
+#ifndef __VALIST
+#ifdef __GNUC__
+#define __VALIST __gnuc_va_list
+#else
+#define __VALIST char*
+#endif
+#endif
+
+int	_EXFUN(fwprintf, (__FILE *, const wchar_t *, ...));
+int	_EXFUN(swprintf, (wchar_t *, size_t, const wchar_t *, ...));
+int	_EXFUN(vfwprintf, (__FILE *, const wchar_t *, __VALIST));
+int	_EXFUN(vswprintf, (wchar_t *, size_t, const wchar_t *, __VALIST));
+int	_EXFUN(vwprintf, (const wchar_t *, __VALIST));
+int	_EXFUN(wprintf, (const wchar_t *, ...));
+
+int	_EXFUN(_fwprintf_r, (struct _reent *, __FILE *, const wchar_t *, ...));
+int	_EXFUN(_swprintf_r, (struct _reent *, wchar_t *, size_t, const wchar_t *, ...));
+int	_EXFUN(_vfwprintf_r, (struct _reent *, __FILE *, const wchar_t *, __VALIST));
+int	_EXFUN(_vswprintf_r, (struct _reent *, wchar_t *, size_t, const wchar_t *, __VALIST));
+int	_EXFUN(_vwprintf_r, (struct _reent *, const wchar_t *, __VALIST));
+int	_EXFUN(_wprintf_r, (struct _reent *, const wchar_t *, ...));
 
 #define getwc(fp)	fgetwc(fp)
 #define putwc(wc,fp)	fputwc((wc), (fp))

@@ -1,3 +1,34 @@
+2009-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (__VALIST): Guard against multiple definition.
+	* libc/include/wchar.h: Include stdarg.h.
+	(__VALIST): Define conditionally.
+	(fwprintf, swprintf, vfwprintf, vswprintf, vwprintf, wprintf: Declare.
+	(_fwprintf_r, _swprintf_r, _vfwprintf_r, _vswprintf_r, _vwprintf_r,
+	 _wprintf_r): Declare.
+	* libc/stdio/Makefile.am: Add new files.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/fwprintf.c: New file.
+	* libc/stdio/local.h (_svfwprintf_r, _svfiwprintf_r): Declare.
+	(__CH_CLASS, __STATE, __ACTION): Move definition from vfprintf.c here
+	and move to the __ namespace.
+	(__chclass, __state_table, __action_table): Declare.
+	* libc/stdio/stdio.tex: Add new documentation references.
+	* libc/stdio/swprintf.c: New file.
+	* libc/stdio/vfprintf.c (__SPRINT): New macro to call the right
+	__sprint_r function according to compilation unit.  Use throughout.
+	(__ssprint_r): Rename STRING_ONLY variant from __sprint_r.
+	Make externaly available.  Only define if INTEGER_ONLY is defined.
+	(__sprint_r): Make externaly available.  Only define if INTEGER_ONLY
+	is defined.  Handle stream orientation.
+	(__sbprintf): Copy FILE's _flags2 member as well.
+	(__chclass, __state_table, __action_table): Prepend __ to name and
+	make externally available.
+	* libc/stdio/vfwprintf.c: New file.
+	* libc/stdio/vswprintf.c: New file.
+	* libc/stdio/vwprintf.c: New file.
+	* libc/stdio/wprintf.c: New file.
+
 2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (_setlocale_r): New implementation based on

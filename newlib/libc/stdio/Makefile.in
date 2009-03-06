@@ -60,7 +60,9 @@ am__DEPENDENCIES_1 = $(lpfx)svfiprintf.$(oext) \
 	$(lpfx)svfprintf.$(oext) $(lpfx)svfiscanf.$(oext) \
 	$(lpfx)svfscanf.$(oext) $(lpfx)vfiprintf.$(oext) \
 	$(lpfx)vfprintf.$(oext) $(lpfx)vfscanf.$(oext) \
-	$(lpfx)vfiscanf.$(oext)
+	$(lpfx)vfiscanf.$(oext) $(lpfx)svfiwprintf.$(oext) \
+	$(lpfx)svfwprintf.$(oext) $(lpfx)vfiwprintf.$(oext) \
+	$(lpfx)vfwprintf.$(oext)
 am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 	lib_a-fdopen.$(OBJEXT) lib_a-feof.$(OBJEXT) \
 	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
@@ -123,14 +125,19 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fputws.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-funopen.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fwide.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fwprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-getwc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-getwchar.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-open_memstream.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-putwc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-putwchar.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-swprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-ungetwc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasniprintf.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasnprintf.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasnprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vswprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vwprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wprintf.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -166,14 +173,19 @@ am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputws.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwide.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwprintf.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	getwc.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	getwchar.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	open_memstream.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	putwc.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	putwchar.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swprintf.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	ungetwc.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.lo \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vswprintf.c \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vwprintf.c \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wprintf.c
 @USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libstdio_la_OBJECTS = $(am_libstdio_la_OBJECTS)
@@ -470,14 +482,19 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputws.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwide.c			\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	getwc.c			\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	getwchar.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	open_memstream.c	\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	putwc.c			\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	putwchar.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	ungetwc.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.c		\
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.c
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vswprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vwprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wprintf.c
 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_4_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
@@ -486,7 +503,9 @@ LIBADD_OBJS = \
 	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
 	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
 	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
-	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext)
+	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext) \
+	$(lpfx)svfiwprintf.$(oext) $(lpfx)svfwprintf.$(oext) \
+	$(lpfx)vfiwprintf.$(oext) $(lpfx)vfwprintf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio.la
@@ -565,12 +584,14 @@ CHEWOUT_FILES = \
 	siscanf.def		\
 	sprintf.def		\
 	sscanf.def		\
+	swprintf.def		\
 	tmpfile.def		\
 	tmpnam.def		\
 	ungetc.def		\
 	ungetwc.def		\
 	vfprintf.def		\
 	vfscanf.def		\
+	vfwprintf.def		\
 	viprintf.def		\
 	viscanf.def
 
@@ -1299,6 +1320,36 @@ lib_a-vasnprintf.o: vasnprintf.c
 lib_a-vasnprintf.obj: vasnprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasnprintf.obj `if test -f 'vasnprintf.c'; then $(CYGPATH_W) 'vasnprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasnprintf.c'; fi`
 
+lib_a-vwprintf.o: vwprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vwprintf.o `test -f 'vwprintf.c' || echo '$(srcdir)/'`vwprintf.c
+
+lib_a-vwprintf.obj: vwprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vwprintf.obj `if test -f 'vwprintf.c'; then $(CYGPATH_W) 'vwprintf.c'; else $(CYGPATH_W) '$(srcdir)/vwprintf.c'; fi`
+
+lib_a-swprintf.o: swprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-swprintf.o `test -f 'swprintf.c' || echo '$(srcdir)/'`swprintf.c
+
+lib_a-swprintf.obj: swprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-swprintf.obj `if test -f 'swprintf.c'; then $(CYGPATH_W) 'swprintf.c'; else $(CYGPATH_W) '$(srcdir)/swprintf.c'; fi`
+
+lib_a-vswprintf.o: vswprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vswprintf.o `test -f 'vswprintf.c' || echo '$(srcdir)/'`vswprintf.c
+
+lib_a-vswprintf.obj: vswprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vswprintf.obj `if test -f 'vswprintf.c'; then $(CYGPATH_W) 'vswprintf.c'; else $(CYGPATH_W) '$(srcdir)/vswprintf.c'; fi`
+
+lib_a-wprintf.o: wprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wprintf.o `test -f 'wprintf.c' || echo '$(srcdir)/'`wprintf.c
+
+lib_a-wprintf.obj: wprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wprintf.obj `if test -f 'wprintf.c'; then $(CYGPATH_W) 'wprintf.c'; else $(CYGPATH_W) '$(srcdir)/wprintf.c'; fi`
+
+lib_a-fwprintf.o: fwprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fwprintf.o `test -f 'fwprintf.c' || echo '$(srcdir)/'`fwprintf.c
+
+lib_a-fwprintf.obj: fwprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fwprintf.obj `if test -f 'fwprintf.c'; then $(CYGPATH_W) 'fwprintf.c'; else $(CYGPATH_W) '$(srcdir)/fwprintf.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1468,6 +1519,18 @@ $(lpfx)svfprintf.$(oext): vfprintf.c
 $(lpfx)svfiprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfprintf.c -o $@
 
+$(lpfx)vfwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)vfiwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)svfwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
+$(lpfx)svfiwprintf.$(oext): vfwprintf.c
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
 $(lpfx)vfscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
 
@@ -1507,9 +1570,10 @@ $(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
 $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwide.$(oext): local.h
+$(lpfx)fwprintf.$(oext): local.h
+$(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)getwc.$(oext): local.h
 $(lpfx)getwchar.$(oext): local.h
-$(lpfx)fwrite.$(oext): local.h fvwrite.h
 $(lpfx)iscanf.$(oext): local.h
 $(lpfx)makebuf.$(oext): local.h
 $(lpfx)open_memstream.$(oext): local.h
@@ -1521,27 +1585,32 @@ $(lpfx)scanf.$(oext): local.h
 $(lpfx)setbuf.$(oext): local.h
 $(lpfx)setvbuf.$(oext): local.h
 $(lpfx)siprintf.$(oext): local.h
+$(lpfx)siscanf.$(oext): local.h
 $(lpfx)sniprintf.$(oext): local.h
 $(lpfx)sprintf.$(oext): local.h
-$(lpfx)siscanf.$(oext): local.h
 $(lpfx)sscanf.$(oext): local.h
 $(lpfx)stdio.$(oext): local.h
 $(lpfx)svfiprintf.$(oext): local.h
 $(lpfx)svfiscanf.$(oext): local.h floatio.h
 $(lpfx)svfprintf.$(oext): local.h
 $(lpfx)svfscanf.$(oext): local.h floatio.h
+$(lpfx)swprintf.$(oext): local.h
 $(lpfx)ungetc.$(oext): local.h
 $(lpfx)ungetwc.$(oext): local.h
 $(lpfx)vfiprintf.$(oext): local.h
-$(lpfx)vfprintf.$(oext): local.h
 $(lpfx)vfiscanf.$(oext): local.h floatio.h
+$(lpfx)vfprintf.$(oext): local.h
 $(lpfx)vfscanf.$(oext): local.h floatio.h
+$(lpfx)vfwprintf.$(oext): local.h
 $(lpfx)viscanf.$(oext): local.h
 $(lpfx)vscanf.$(oext): local.h
-$(lpfx)vsniprintf.$(oext): local.h
 $(lpfx)vsiscanf.$(oext): local.h
+$(lpfx)vsniprintf.$(oext): local.h
 $(lpfx)vsscanf.$(oext): local.h
+$(lpfx)vswprintf.$(oext): local.h
+$(lpfx)vwprintf.$(oext): local.h
 $(lpfx)wbuf.$(oext): local.h fvwrite.h
+$(lpfx)wprintf.$(oext): local.h
 $(lpfx)wsetup.$(oext): local.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
