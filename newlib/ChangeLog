@@ -1,3 +1,17 @@
+2009-03-09  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/time/strftime.c:  Adapt for dual-purpose use so not only
+	defines strftime(), but can also define wcsftime(); add optional
+	test package; speed up %Y handling.
+	* libc/time/wcsftime.c:  New file, defining wcsftime() (albeit
+	indirectly by including strftime.c) and its documentation.
+	* libc/time/time.tex:  Enhance tm_isdst explanation, change strftime
+	description to match modified description in strftime.c
+	* libc/time/Makefile.am:  Add wcsftime.c and wcsftime.def.  Add a rule
+	so that wcsftime.o gets rebuilt when strftime changes.
+	* libc/time/Makefile.in:  Regenerate.
+	* libc/include/wchar.h (wcsftime): Declare.
+
 2009-03-06  Hans-Erik Floryd <hans-erik.floryd@rt-labs.com>,
 	    Corinna Vinschen  <corinna@vinschen.de>
 

@@ -44,6 +44,8 @@ Number of days elapsed since last January 1, between 0 and 365 inclusive.
 @item tm_isdst
 Daylight Savings Time flag: positive means DST in effect, zero means DST
 not in effect, negative means no information about DST is available.
+Although for mktime(), negative means that it should decide if DST is in
+effect or not.
 @end table
 
 @menu
@@ -54,7 +56,7 @@ not in effect, negative means no information about DST is available.
 * gmtime::      Convert time to UTC (GMT) traditional representation
 * localtime::   Convert time to local representation
 * mktime::      Convert time to arithmetic representation
-* strftime::    Flexible calendar time formatter
+* strftime::    Convert date and time to a user-formatted string
 * time::        Get current calendar time (as single number)
 * __tz_lock::   Lock time zone global variables
 * tzset::       Set timezone info

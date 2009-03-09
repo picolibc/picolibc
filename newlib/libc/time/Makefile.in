@@ -66,7 +66,8 @@ am__objects_1 = lib_a-asctime.$(OBJEXT) lib_a-asctime_r.$(OBJEXT) \
 	lib_a-mktm_r.$(OBJEXT) lib_a-strftime.$(OBJEXT) \
 	lib_a-strptime.$(OBJEXT) lib_a-time.$(OBJEXT) \
 	lib_a-tzlock.$(OBJEXT) lib_a-tzset.$(OBJEXT) \
-	lib_a-tzset_r.$(OBJEXT) lib_a-tzvars.$(OBJEXT)
+	lib_a-tzset_r.$(OBJEXT) lib_a-tzvars.$(OBJEXT) \
+	lib_a-wcsftime.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
@@ -74,7 +75,7 @@ libtime_la_LIBADD =
 am__objects_2 = asctime.lo asctime_r.lo clock.lo ctime.lo ctime_r.lo \
 	difftime.lo gettzinfo.lo gmtime.lo gmtime_r.lo lcltime.lo \
 	lcltime_r.lo mktime.lo mktm_r.lo strftime.lo strptime.lo \
-	time.lo tzlock.lo tzset.lo tzset_r.lo tzvars.lo
+	time.lo tzlock.lo tzset.lo tzset_r.lo tzvars.lo wcsftime.lo
 @USE_LIBTOOL_TRUE@am_libtime_la_OBJECTS = $(am__objects_2)
 libtime_la_OBJECTS = $(am_libtime_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libtime_la_rpath =
@@ -283,7 +284,8 @@ LIB_SOURCES = \
 	tzlock.c	\
 	tzset.c		\
 	tzset_r.c	\
-	tzvars.c
+	tzvars.c	\
+	wcsftime.c
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libtime.la
@@ -304,7 +306,8 @@ CHEWOUT_FILES = \
 	strftime.def	\
 	time.def	\
 	tzlock.def	\
-	tzset.def
+	tzset.def	\
+	wcsftime.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -497,6 +500,12 @@ lib_a-tzvars.o: tzvars.c
 lib_a-tzvars.obj: tzvars.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.obj `if test -f 'tzvars.c'; then $(CYGPATH_W) 'tzvars.c'; else $(CYGPATH_W) '$(srcdir)/tzvars.c'; fi`
 
+lib_a-wcsftime.o: wcsftime.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.o `test -f 'wcsftime.c' || echo '$(srcdir)/'`wcsftime.c
+
+lib_a-wcsftime.obj: wcsftime.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.obj `if test -f 'wcsftime.c'; then $(CYGPATH_W) 'wcsftime.c'; else $(CYGPATH_W) '$(srcdir)/wcsftime.c'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -650,6 +659,9 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
 	done
+
+# This rule is needed so that wcsftime.o is rebuilt when strftime.c changes.
+$(lpfx)wcsftime.$(oext): strftime.c
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

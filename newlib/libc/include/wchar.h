@@ -72,6 +72,7 @@ int	_EXFUN(wcscoll, (const wchar_t *, const wchar_t *));
 wchar_t	*_EXFUN(wcscpy, (wchar_t * , const wchar_t *));
 wchar_t	*_EXFUN(wcpcpy, (wchar_t * , const wchar_t *));
 size_t	_EXFUN(wcscspn, (const wchar_t *, const wchar_t *));
+size_t  _EXFUN(wcsftime, (wchar_t *, size_t, const wchar_t *, const struct tm *));
 size_t	_EXFUN(wcslcat, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslcpy, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslen, (const wchar_t *));
