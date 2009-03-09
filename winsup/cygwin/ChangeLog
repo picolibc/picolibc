@@ -1,3 +1,9 @@
+2009-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export wcsftime.
+	* posix.sgml: Move wcsftime to SUSv4 list.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-03-06  Pierre A. Humblet <pierre@phumblet.no-ip.org>
 
 	* cygwin.din: Export gethostbyname2.

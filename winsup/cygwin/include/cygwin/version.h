@@ -351,12 +351,13 @@ details. */
       200: Export mbsnrtowcs, wcsnrtombs.
       201: Export wprintf, fwprintf, swprintf, vwprintf, vfwprintf, vswprintf.
       202: Export gethostbyname2.
+      203: Export wcsftime.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 202
+#define CYGWIN_VERSION_API_MINOR 203
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

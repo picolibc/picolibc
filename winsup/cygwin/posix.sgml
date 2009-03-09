@@ -822,6 +822,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcscoll
     wcscpy
     wcscspn
+    wcsftime
     wcslen
     wcsncat
     wcsncmp
@@ -1339,7 +1340,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     waitid
     wcscasecmp
     wcscasecmp_l
-    wcsftime
     wcsncasecmp
     wcsncasecmp_l
     wcstold
