@@ -1,0 +1,8 @@
+2005-05-15  Ramana Radhakrishnan  <ramana@codito.com>
+
+	* arc.h: Merge new ELF relocs.
+
+2005-05-12  Ramana Radhakrishnan  <ramana@codito.com>
+
+	* dwarf2.h: Add Metaware specific CFA info. 
+
