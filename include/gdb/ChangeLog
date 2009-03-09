@@ -1,3 +1,8 @@
+2009-03-09  J"orn Rennecke  <joern.rennecke@arc.com>
+
+	* callback.h (get_path): Declare.
+	* target-io/arc.h: New file.
+
 2008-01-01  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	Updated copyright notices for most files.

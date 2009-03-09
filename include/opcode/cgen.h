@@ -1,6 +1,6 @@
 /* Header file for targets using CGEN: Cpu tools GENerator.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007
 Free Software Foundation, Inc.
 
 This file is part of GDB, the GNU debugger, and the GNU Binutils.
@@ -1339,7 +1339,7 @@ typedef struct cgen_cpu_desc
   int (* dis_hash_p) (const CGEN_INSN *);
 
   /* Disassembler hash function.  */
-  unsigned int (* dis_hash) (const char *, CGEN_INSN_INT);
+  unsigned int (* dis_hash) (const char *, CGEN_INSN_INT, int);
 
   /* Number of entries in disassembler hash table.  */
   unsigned int dis_hash_size;

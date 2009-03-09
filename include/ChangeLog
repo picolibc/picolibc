@@ -1,3 +1,12 @@
+2009-03-09  J"orn Rennecke  <joern.rennecke@arc.com>
+
+	* opcode/cgen.h (struct cgen_cpu_desc):
+	New int argument for member dis_hash.
+
+	* dis-asm.h (print_insn_arc): Declare.
+
+	* dis-asm.h (arc_get_disassembler): Argument is (bfd *).
+
 2008-02-15  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_hash_table): Delete creator field.
