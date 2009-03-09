@@ -162,7 +162,7 @@ host_libs="intl mmalloc libiberty opcodes bfd readline tcl tk itcl libgui zlib l
 # know that we are building the simulator.
 # binutils, gas and ld appear in that order because it makes sense to run
 # "make check" in that particular order.
-host_tools="byacc flex bison binutils gas ld fixincludes gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils gettext zip fastjar gnattools"
+host_tools="texinfo byacc flex bison binutils gas ld fixincludes gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils gettext zip fastjar gnattools"
 
 # libgcj represents the runtime libraries only used by gcj.
 libgcj="target-libffi \
@@ -206,10 +206,6 @@ target_tools="target-examples target-groff target-gperf target-rda"
 configdirs=`echo ${host_libs} ${host_tools}`
 target_configdirs=`echo ${target_libraries} ${target_tools}`
 build_configdirs=`echo ${build_libs} ${build_tools}`
-
-m4_divert_text([PARSE_ARGS],
-[ac_subdirs_all=`cd $srcdir && echo */configure | sed 's,/configure,,g'`
-])
 
 ################################################################################
 
@@ -575,6 +571,7 @@ case "${target}" in
 	unsupported_languages="$unsupported_languages fortran"
 	noconfigdirs="$noconfigdirs target-libffi target-boehm-gc";;
       *-*-elf)
+	unsupported_languages="$unsupported_languages fortran"
 	noconfigdirs="$noconfigdirs target-boehm-gc";;
       *-*-linux*)
 	noconfigdirs="$noconfigdirs target-newlib target-libgloss";;
@@ -874,7 +871,7 @@ case "${target}" in
   vax-*-*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
     ;;
-  xtensa*-*-*)
+  xtensa-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   ip2k-*-*)
@@ -1483,8 +1480,7 @@ fi
 # Handle --disable-<component> generically.
 for dir in $configdirs $build_configdirs $target_configdirs ; do
   dirname=`echo $dir | sed -e s/target-//g -e s/build-//g -e s/-/_/g`
-  varname=`echo $dirname | sed -e s/+/_/g`
-  if eval test x\${enable_${varname}} "=" xno ; then
+  if eval test x\${enable_${dirname}} "=" xno ; then
     noconfigdirs="$noconfigdirs $dir"
   fi
 done
@@ -1667,38 +1663,6 @@ AC_ARG_WITH([debug-prefix-map],
   [DEBUG_PREFIX_CFLAGS_FOR_TARGET=])
 AC_SUBST(DEBUG_PREFIX_CFLAGS_FOR_TARGET)
 
-# During gcc bootstrap, if we use some random cc for stage1 then CFLAGS
-# might be empty or "-g".  We don't require a C++ compiler, so CXXFLAGS
-# might also be empty (or "-g", if a non-GCC C++ compiler is in the path).
-# We want to ensure that TARGET libraries (which we know are built with
-# gcc) are built with "-O2 -g", so include those options when setting
-# CFLAGS_FOR_TARGET and CXXFLAGS_FOR_TARGET.
-if test "x$CFLAGS_FOR_TARGET" = x; then
-  CFLAGS_FOR_TARGET=$CFLAGS
-  case " $CFLAGS " in
-    *" -O2 "*) ;;
-    *) CFLAGS_FOR_TARGET="-O2 $CFLAGS" ;;
-  esac
-  case " $CFLAGS " in
-    *" -g "* | *" -g3 "*) ;;
-    *) CFLAGS_FOR_TARGET="-g $CFLAGS" ;;
-  esac
-fi
-AC_SUBST(CFLAGS_FOR_TARGET)
-
-if test "x$CXXFLAGS_FOR_TARGET" = x; then
-  CXXFLAGS_FOR_TARGET=$CXXFLAGS
-  case " $CXXFLAGS " in
-    *" -O2 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-O2 $CXXFLAGS" ;;
-  esac
-  case " $CXXFLAGS " in
-    *" -g "* | *" -g3 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS" ;;
-  esac
-fi
-AC_SUBST(CXXFLAGS_FOR_TARGET)
-
 # Handle --with-headers=XXX.  If the value is not "yes", the contents of
 # the named directory are copied to $(tooldir)/sys-include.
 if test x"${with_headers}" != x && test x"${with_headers}" != xno ; then
@@ -1826,7 +1790,7 @@ case "${target}" in
   v850*-*-*)
     md_exec_prefix=/usr/ccs/bin
     ;;
-  xtensa*-*-elf*)
+  xtensa-*-elf*)
     ;;
 
   *-*-beos* | \

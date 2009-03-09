@@ -1,16 +1,3 @@
-2008-02-20  Uros Bizjak  <ubizjak@gmail.com>
-
-	* mh-ppc-darwin (BOOT_CFLAGS): Use +=, not =.
-
-2008-02-20  Paolo Bonzini  <bonzini@gnu.org>
-
-	PR bootstrap/32009
-	* mh-ppc-darwin (BOOT_CFLAGS): Reenable.
-		
-2008-01-08  Jakub Jelinek  <jakub@redhat.com>
-
-	* futex.m4: New file.
-
 2007-12-06  Richard Sandiford  <rsandifo@nildram.co.uk>
 
 	* mt-sde (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Use +=, not =.
