@@ -35,7 +35,7 @@ At least one command option or a PROGRAM is required, as shown above.
   -f, --find-package   find the package that FILE belongs to
   -l, --list-package   list contents of PACKAGE (or all packages if none given)
   -p, --package-query  search for REGEXP in the entire cygwin.com package
-                       repository (requies internet connectivity)
+                       repository (requires internet connectivity)
   -v, --verbose        produce more verbose output
   -h, --help           annotate output with explanatory comments when given
                        with another command, otherwise print this help
