@@ -1,5 +1,17 @@
 2009-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_socket::wait_for_events): Take additional
+	parameter "dontwait".
+	* fhandler_socket.cc (fhandler_socket::wait_for_events): Act as if the
+	socket is non-blocking if dontwait is true.
+	(fhandler_socket::recv_internal): Use incoming MSG_DONTWAIT flag to
+	set the wait_for_events dontwait parameter.
+	(fhandler_socket::send_internal): Ditto.  Optimize code slightly.
+	* include/cygwin/socket.h (MSG_DONTWAIT): Define.
+	* include/cygwin/version.h: Bump API minor number.
+
+2009-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export wcsftime.
 	* posix.sgml: Move wcsftime to SUSv4 list.
 	* include/cygwin/version.h: Bump API minor number.

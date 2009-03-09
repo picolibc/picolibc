@@ -580,7 +580,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 }
 
 int
-fhandler_socket::wait_for_events (const long event_mask)
+fhandler_socket::wait_for_events (const long event_mask, bool dontwait)
 {
   if (async_io ())
     return 0;
@@ -590,7 +590,7 @@ fhandler_socket::wait_for_events (const long event_mask)
 
   while (!(ret = evaluate_events (event_mask, events, true)) && !events)
     {
-      if (is_nonblocking ())
+      if (is_nonblocking () || dontwait)
 	{
 	  WSASetLastError (WSAEWOULDBLOCK);
 	  return SOCKET_ERROR;
@@ -1312,7 +1312,8 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   bool use_recvmsg = false;
   static LPFN_WSARECVMSG WSARecvMsg;
 
-  bool waitall = (wsamsg->dwFlags & MSG_WAITALL);
+  bool waitall = !!(wsamsg->dwFlags & MSG_WAITALL);
+  bool dontwait = !!(wsamsg->dwFlags & MSG_DONTWAIT);
   wsamsg->dwFlags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
     {
@@ -1339,7 +1340,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
      waiting in the buffers, otherwise the event handling gets messed up
      for some reason. */
-  while (!(res = wait_for_events (evt_mask | FD_CLOSE))
+  while (!(res = wait_for_events (evt_mask | FD_CLOSE, dontwait))
 	 || saw_shutdown_read ())
     {
       if (use_recvmsg)
@@ -1472,7 +1473,10 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   DWORD ret = 0, err = 0, sum = 0, off = 0;
   WSABUF buf;
   bool use_sendmsg = false;
+  bool dontwait = !!(flags & MSG_DONTWAIT);
+  bool nosignal = !(flags & MSG_NOSIGNAL);
 
+  flags &= (MSG_OOB | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
     use_sendmsg = true;
   for (DWORD i = 0; i < wsamsg->dwBufferCount;
@@ -1486,14 +1490,10 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
       do
 	{
 	  if (use_sendmsg)
-	    res = WSASendMsg (get_socket (), wsamsg,
-			      flags & (MSG_OOB | MSG_DONTROUTE), &ret,
-			      NULL, NULL);
+	    res = WSASendMsg (get_socket (), wsamsg, flags, &ret, NULL, NULL);
 	  else
-	    res = WSASendTo (get_socket (), &buf, 1, &ret,
-			     flags & (MSG_OOB | MSG_DONTROUTE),
-			     wsamsg->name, wsamsg->namelen,
-			     NULL, NULL);
+	    res = WSASendTo (get_socket (), &buf, 1, &ret, flags,
+			     wsamsg->name, wsamsg->namelen, NULL, NULL);
 	  if (res && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
 	    {
 	      LOCK_EVENTS;
@@ -1502,7 +1502,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	    }
 	}
       while (res && err == WSAEWOULDBLOCK
-	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE)));
+	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE), dontwait));
 
       if (!res)
 	{
@@ -1527,7 +1527,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
       if (get_errno () == ESHUTDOWN && get_socket_type () == SOCK_STREAM)
 	{
 	  set_errno (EPIPE);
-	  if (!(flags & MSG_NOSIGNAL))
+	  if (!nosignal)
 	    raise (SIGPIPE);
 	}
     }

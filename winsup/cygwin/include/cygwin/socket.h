@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005, 2006, 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -191,6 +191,7 @@ struct OLD_msghdr
 #define MSG_PEEK        0x2             /* peek at incoming message */
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
 #define MSG_WAITALL     0x8             /* wait for all requested bytes */
+#define MSG_DONTWAIT	0x10		/* selective non-blocking operation */
 #define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 #define MSG_TRUNC       0x0100          /* Normal data truncated */
 #define MSG_CTRUNC      0x0200          /* Control data truncated */
