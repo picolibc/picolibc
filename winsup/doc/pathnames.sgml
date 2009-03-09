@@ -421,11 +421,13 @@ Read on for more information.</para>
 directory as Cygwin automatically simulates it internally. 
 These devices cannot be seen with the command <command>ls /dev/</command>
 although commands such as <command>ls /dev/tty</command> work fine.
-If you want to be able to see all devices in
+If you want to be able to see all well-known devices in
 <filename>/dev/</filename>, you can use Igor Pechtchanski's
 <ulink
 url="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt">create_devices.sh</ulink>
-script.
+script.  This script does not add the raw disk devices, though.  Again,
+it's not necessary to see an existing device in /dev to access it.  The script
+is just for the fun of it.
 </para>
 
 <para>
@@ -491,48 +493,81 @@ from the POSIX namespace to the internal NT namespace.
 E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
 or the first partition on the third harddisk is \device\harddisk2\partition1.
 The first floppy in the system is \device\floppy0, the first CD-ROM is
-\device\cdrom0 and the first tape drive is \device\tape0.  The mapping
-to the POSIX /dev namespace is as follows:
+\device\cdrom0 and the first tape drive is \device\tape0.</para>
+
+<para>The mapping from physical device to the name of the device in the
+internal NT namespace can be found in various places.  For hard disks and
+CD/DVD drives the Windows "Disk management" (part of the "Computer Management"
+console) shoes the mapping "Disk 0" is \device\harddisk0, "CD-ROM 2" is
+\device\cdrom2.  Another place to find this mapping is the "Device Management"
+console.  Disks have a "Location" number, tapes have a "Tape Symbolic Name",
+etc.  Unfortunately the places where to find this information is not very
+well-defined.</para>
+
+<para>
+For external disks (USB-drives, CF-cards in a cardreader, etc) you can use
+Cygwin to find out the mapping.  <filename>/proc/partitions</filename>
+contains a list of raw drives known to Cygwin.  The <command>df</command>
+command shows a list of drives and their respective sizes.  If you match
+the information between <filename>/proc/partitions</filename> and the
+<command>df</command> output, you should be able to figure out which
+external drive corresponds to which raw disk device name.</para>
+
+<note><para>Apart from tape devices which are not block devices and are
+by default accessed directly, accessing mass storage devices raw
+is something you should only do if you know what you're doing and know how to
+handle the information.  <emphasis role='bold'>Writing</emphasis> to a raw
+mass storage device you should only do if you
+<emphasis role='bold'>really</emphasis> know what you're doing and are aware
+of the fact that any mistake can destroy important information, for the
+device, and for you.  So, please, handle this ability with care.
+<emphasis role='bold'>You have been warned.</emphasis></para></note>
+
+<para>
+Last but not least, the mapping from POSIX /dev namespace to internal
+NT namespace is as follows:
 </para>
 
 <screen>
-/dev/st0	\device\tape0, rewind
-/dev/nst0	\device\tape0, no-rewind
-/dev/st1	\device\tape1
-/dev/nst1	\device\tape1
+POSIX device name     Internal NT device name
+
+/dev/st0	      \device\tape0, rewind
+/dev/nst0	      \device\tape0, no-rewind
+/dev/st1	      \device\tape1
+/dev/nst1	      \device\tape1
 ...
 /dev/st15
 /dev/nst15
 
-/dev/fd0	\device\floppy0
-/dev/fd1	\device\floppy1
+/dev/fd0	      \device\floppy0
+/dev/fd1	      \device\floppy1
 ...
 /dev/fd15
 
-/dev/sr0	\device\cdrom0
-/dev/sr1	\device\cdrom1
+/dev/sr0	      \device\cdrom0
+/dev/sr1	      \device\cdrom1
 ...
 /dev/sr15
 
-/dev/scd0	\device\cdrom0
-/dev/scd1	\device\cdrom1
+/dev/scd0	      \device\cdrom0
+/dev/scd1	      \device\cdrom1
 ...
 /dev/scd15
 
-/dev/sda	\device\harddisk0\partition0	(whole disk)
-/dev/sda1	\device\harddisk0\partition1	(first partition)
+/dev/sda	      \device\harddisk0\partition0	(whole disk)
+/dev/sda1	      \device\harddisk0\partition1	(first partition)
 ...
-/dev/sda15	\device\harddisk0\partition15	(fifteenth partition)
+/dev/sda15	      \device\harddisk0\partition15	(fifteenth partition)
 
-/dev/sdb	\device\harddisk1\partition0
-/dev/sdb1	\device\harddisk1\partition1
+/dev/sdb	      \device\harddisk1\partition0
+/dev/sdb1	      \device\harddisk1\partition1
 
 [up to]
 
-/dev/sddx	\device\harddisk127\partition0
-/dev/sddx1	\device\harddisk127\partition1
+/dev/sddx	      \device\harddisk127\partition0
+/dev/sddx1	      \device\harddisk127\partition1
 ...
-/dev/sddx15	\device\harddisk127\partition15
+/dev/sddx15	      \device\harddisk127\partition15
 </screen>
 
 <para>

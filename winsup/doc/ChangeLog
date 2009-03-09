@@ -1,3 +1,7 @@
+2009-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Try to be more clear explain raw devices.
+
 2009-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml: Rework UTF FAQ to accommodate latest setlocale
