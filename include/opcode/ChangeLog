@@ -1,3 +1,7 @@
+2009-03-10  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (ppc_parse_cpu): Declare.
+
 2009-03-02  Qinwei  <qinwei@sunnorth.com.cn>
 
 	* score-inst.h (score_insn_type, score_data_type): Add Ra_I9_I5

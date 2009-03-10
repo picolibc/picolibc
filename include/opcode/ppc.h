@@ -1,6 +1,6 @@
 /* ppc.h -- Header file for PowerPC opcode table
    Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007 Free Software Foundation, Inc.
+   2007, 2008, 2009 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
 This file is part of GDB, GAS, and the GNU binutils.
@@ -350,5 +350,7 @@ struct powerpc_macro
 
 extern const struct powerpc_macro powerpc_macros[];
 extern const int powerpc_num_macros;
+
+extern ppc_cpu_t ppc_parse_cpu (ppc_cpu_t, const char *);
 
 #endif /* PPC_H */
