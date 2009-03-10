@@ -1,3 +1,7 @@
+2009-03-09  Brooks Moses  <brooks@codesourcery.com>
+
+	* libc/machine/arm/arm_asm.h: Fix typo.
+
 2009-03-09  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/time/strftime.c:  Adapt for dual-purpose use so not only

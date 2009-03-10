@@ -27,7 +27,7 @@
  */
 
 #ifndef ARM_ASM__H
-#define AMR_ASM__H
+#define ARM_ASM__H
 
 /* First define some macros that keep everything else sane.  */
 #if defined (__ARM_ARCH_7A__) || defined (__ARM_ARCH_7R__)
