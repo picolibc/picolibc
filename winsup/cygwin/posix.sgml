@@ -821,6 +821,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcpcpy
     wcpncpy
     wcrtomb
+    wcscasecmp
     wcscat
     wcschr
     wcscmp
@@ -829,6 +830,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcscspn
     wcsftime
     wcslen
+    wcsncasecmp
     wcsncat
     wcsncmp
     wcsncpy
@@ -1339,9 +1341,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ulimit
     uselocale
     waitid
-    wcscasecmp
     wcscasecmp_l
-    wcsncasecmp
     wcsncasecmp_l
     wcstold
     wcsxfrm_l

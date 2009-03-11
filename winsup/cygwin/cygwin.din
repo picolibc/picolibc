@@ -1740,6 +1740,7 @@ warnx SIGFE
 wcpcpy NOSIGFE
 wcpncpy NOSIGFE
 wcrtomb NOSIGFE
+wcscasecmp NOSIGFE
 wcscat NOSIGFE
 wcschr NOSIGFE
 wcscmp NOSIGFE
@@ -1752,6 +1753,7 @@ wcslcat NOSIGFE
 wcslcpy NOSIGFE
 wcslen NOSIGFE
 _wcslen = wcslen NOSIGFE
+wcsncasecmp NOSIGFE
 wcsncat NOSIGFE
 wcsncmp NOSIGFE
 wcsncpy NOSIGFE

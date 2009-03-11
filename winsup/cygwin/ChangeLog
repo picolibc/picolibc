@@ -1,5 +1,11 @@
 2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export wcscasecmp, wcsncasecmp.
+	* posix.sgml: Move wcscasecmp, wcsncasecmp to SUSv4 list.
+	* include/cygwin/version.h: Bump API minor number.
+
+2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export wscanf, fwscanf, swscanf, vwscanf, vfwscanf,
 	vswscanf.
 	* posix.sgml: Move fwscanf, swscanf, vwscanf, vfwscanf, vswscanf
