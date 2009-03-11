@@ -577,6 +577,7 @@ fwide SIGFE
 fwprintf SIGFE
 fwrite SIGFE
 _fwrite = fwrite SIGFE
+fwscanf SIGFE
 gai_strerror = cygwin_gai_strerror NOSIGFE
 gamma NOSIGFE
 _gamma = gamma NOSIGFE
@@ -1572,6 +1573,7 @@ _swab = swab NOSIGFE
 __swbuf SIGFE
 __swbuf_r SIGFE
 swprintf SIGFE
+swscanf SIGFE
 symlink SIGFE
 _symlink = symlink SIGFE
 symlinkat SIGFE
@@ -1703,6 +1705,7 @@ _vfscanf = vfscanf SIGFE
 vfscanf_r = _vfscanf_r SIGFE
 _vfscanf_r SIGFE
 vfwprintf SIGFE
+vfwscanf SIGFE
 vhangup SIGFE
 _vhangup = vhangup SIGFE
 vprintf SIGFE
@@ -1720,10 +1723,12 @@ _vsscanf = vsscanf SIGFE
 vsscanf_r = _vsscanf_r SIGFE
 _vsscanf_r SIGFE
 vswprintf SIGFE
+vswscanf SIGFE
 vsyslog SIGFE
 vwarn SIGFE
 vwarnx SIGFE
 vwprintf SIGFE
+vwscanf SIGFE
 wait SIGFE
 _wait = wait SIGFE
 wait3 SIGFE
@@ -1786,6 +1791,7 @@ write SIGFE
 _write = write SIGFE
 writev SIGFE
 _writev = writev SIGFE
+wscanf SIGFE
 y0 NOSIGFE
 y0f NOSIGFE
 y1 NOSIGFE

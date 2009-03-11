@@ -208,6 +208,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fwide
     fwprintf
     fwrite
+    fwscanf
     gai_strerror
     getaddrinfo
     getc
@@ -737,6 +738,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strxfrm
     swab
     swprintf
+    swscanf
     symlink
     symlinkat
     sync
@@ -804,13 +806,16 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vfprintf
     vfscanf
     vfwprintf
+    vfwscanf
     vprintf
     vscanf
     vsnprintf
     vsprintf
     vsscanf
     vswprintf
+    vswscanf
     vwprintf
+    vwscanf
     wait
     waitpid
     wcpcpy
@@ -859,6 +864,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wprintf
     write
     writev
+    wscanf
     y0
     y1
     yn
@@ -1218,7 +1224,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fmtmsg
     freelocale
     frexpl
-    fwscanf
     getdate
     getdate_err
     gethostent
@@ -1322,7 +1327,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strtold
     strxfrm_l
     swabcontext
-    swscanf
     tanhl
     tanl
     tcgetsid
@@ -1334,9 +1338,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     truncl
     ulimit
     uselocale
-    vfwscanf
-    vswscanf
-    vwscanf
     waitid
     wcscasecmp
     wcscasecmp_l
@@ -1348,7 +1349,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wctype_l
     wordexp
     wordfree
-    wscanf
 </screen>
 
 </sect1>
