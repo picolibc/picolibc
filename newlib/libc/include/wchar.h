@@ -65,6 +65,7 @@ size_t	_EXFUN(_wcsnrtombs_r, (struct _reent *, char * , const wchar_t ** ,
 size_t	_EXFUN(wcsrtombs, (char * , const wchar_t ** , size_t, mbstate_t *));
 size_t	_EXFUN(_wcsrtombs_r, (struct _reent *, char * , const wchar_t ** , 
 			size_t, mbstate_t *));
+int	_EXFUN(wcscasecmp, (const wchar_t *, const wchar_t *));
 wchar_t	*_EXFUN(wcscat, (wchar_t * , const wchar_t *));
 wchar_t	*_EXFUN(wcschr, (const wchar_t *, wchar_t));
 int	_EXFUN(wcscmp, (const wchar_t *, const wchar_t *));
@@ -76,6 +77,7 @@ size_t  _EXFUN(wcsftime, (wchar_t *, size_t, const wchar_t *, const struct tm *)
 size_t	_EXFUN(wcslcat, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslcpy, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslen, (const wchar_t *));
+int	_EXFUN(wcsncasecmp, (const wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wcsncat, (wchar_t * , const wchar_t * , size_t));
 int	_EXFUN(wcsncmp, (const wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wcsncpy, (wchar_t *  , const wchar_t * , size_t));

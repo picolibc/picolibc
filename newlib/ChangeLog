@@ -1,4 +1,13 @@
-2009-03-06  Corinna Vinschen  <corinna@vinschen.de>
+2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h (wcscasecmp, wcsncasecmp): Declare.
+	* libc/string/Makefile.am: Add wcscasecmp.c, wcsncasecmp.c
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/string/strings.tex: Add new documentation references.
+	* libc/string/wcscasecmp.c: New file.
+	* libc/string/wcsncasecmp.c: New file.
+
+2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (fwscanf, swscanf, vfwscanf, vswscanf, vwscanf,
 	wscanf): Declare.
