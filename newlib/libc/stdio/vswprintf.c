@@ -27,6 +27,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <limits.h>
 #include <stdarg.h>
 #include <errno.h>
+#include "local.h"
 
 int
 _DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),

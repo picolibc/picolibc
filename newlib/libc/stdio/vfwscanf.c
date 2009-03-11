@@ -17,95 +17,93 @@
 
 /*
 FUNCTION
-<<vfscanf>>, <<vscanf>>, <<vsscanf>>---format argument list
+<<vfwscanf>>, <<vwscanf>>, <<vswscanf>>---scan and format argument list from wide character input
 
 INDEX
-	vfscanf
+	vfwscanf
 INDEX
-	_vfscanf_r
+	_vfwscanf
 INDEX
-	vscanf
+	vwscanf
 INDEX
-	_vscanf_r
+	_vwscanf
 INDEX
-	vsscanf
+	vswscanf
 INDEX
-	_vsscanf_r
+	_vswscanf
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
-	int vscanf(const char *<[fmt]>, va_list <[list]>);
-	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
+	int vwscanf(const wchar_t *<[fmt]>, va_list <[list]>);
+	int vfwscanf(FILE *<[fp]>, const wchar_t *<[fmt]>, va_list <[list]>);
+	int vswscanf(const wchar_t *<[str]>, const wchar_t *<[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>,
+	int _vwscanf(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
                        va_list <[list]>);
-	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
+	int _vfwscanf(struct _reent *<[reent]>, FILE *<[fp]>, const wchar_t *<[fmt]>,
                        va_list <[list]>);
-	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>,
-                       const char *<[fmt]>, va_list <[list]>);
+	int _vswscanf(struct _reent *<[reent]>, const wchar_t *<[str]>,
+                       const wchar_t *<[fmt]>, va_list <[list]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	#include <varargs.h>
-	int vscanf( <[fmt]>, <[ist]>)
-	char *<[fmt]>;
+	int vwscanf( <[fmt]>, <[ist]>)
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
-	int vfscanf( <[fp]>, <[fmt]>, <[list]>)
+	int vfwscanf( <[fp]>, <[fmt]>, <[list]>)
 	FILE *<[fp]>;
-	char *<[fmt]>;
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
-	int vsscanf( <[str]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-	char *<[fmt]>;
+	int vswscanf( <[str]>, <[fmt]>, <[list]>)
+	wchar_t *<[str]>;
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
-	int _vscanf_r( <[reent]>, <[fmt]>, <[ist]>)
+	int _vwscanf( <[reent]>, <[fmt]>, <[ist]>)
 	struct _reent *<[reent]>;
-	char *<[fmt]>;
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
-	int _vfscanf_r( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
+	int _vfwscanf( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
 	struct _reent *<[reent]>;
 	FILE *<[fp]>;
-	char *<[fmt]>;
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
-	int _vsscanf_r( <[reent]>, <[str]>, <[fmt]>, <[list]>)
+	int _vswscanf( <[reent]>, <[str]>, <[fmt]>, <[list]>)
 	struct _reent *<[reent]>;
-	char *<[str]>;
-	char *<[fmt]>;
+	wchar_t *<[str]>;
+	wchar_t *<[fmt]>;
 	va_list <[list]>;
 
 DESCRIPTION
-<<vscanf>>, <<vfscanf>>, and <<vsscanf>> are (respectively) variants
-of <<scanf>>, <<fscanf>>, and <<sscanf>>.  They differ only in
+<<vwscanf>>, <<vfwscanf>>, and <<vswscanf>> are (respectively) variants
+of <<wscanf>>, <<fwscanf>>, and <<swscanf>>.  They differ only in
 allowing their caller to pass the variable argument list as a
 <<va_list>> object (initialized by <<va_start>>) rather than
 directly accepting a variable number of arguments.
 
 RETURNS
 The return values are consistent with the corresponding functions:
-<<vscanf>> returns the number of input fields successfully scanned,
+<<vwscanf>> returns the number of input fields successfully scanned,
 converted, and stored; the return value does not include scanned
 fields which were not stored.
 
-If <<vscanf>> attempts to read at end-of-file, the return value
+If <<vwscanf>> attempts to read at end-of-file, the return value
 is <<EOF>>.
 
 If no fields were stored, the return value is <<0>>.
 
-The routines <<_vscanf_r>>, <<_vfscanf_f>>, and <<_vsscanf_r>> are
-reentrant versions which take an additional first parameter which points to the
-reentrancy structure.
+The routines <<_vwscanf>>, <<_vfwscanf>>, and <<_vswscanf>> are
+reentrant versions which take an additional first parameter which points
+to the reentrancy structure.
 
 PORTABILITY
-These are GNU extensions.
-
-Supporting OS subroutines required:
+C99, POSIX-1.2008
 */
 
 #include <_ansi.h>
@@ -124,22 +122,22 @@ Supporting OS subroutines required:
 #include "local.h"
 
 #ifdef INTEGER_ONLY
-#define VFSCANF vfiscanf
-#define _VFSCANF_R _vfiscanf_r
-#define __SVFSCANF __svfiscanf
+#define VFWSCANF vfiwscanf
+#define _VFWSCANF_R _vfiwscanf_r
+#define __SVFWSCANF __svfiwscanf
 #ifdef STRING_ONLY
-#  define __SVFSCANF_R __ssvfiscanf_r
+#  define __SVFWSCANF_R __ssvfiwscanf_r
 #else
-#  define __SVFSCANF_R __svfiscanf_r
+#  define __SVFWSCANF_R __svfiwscanf_r
 #endif
 #else
-#define VFSCANF vfscanf
-#define _VFSCANF_R _vfscanf_r
-#define __SVFSCANF __svfscanf
+#define VFWSCANF vfwscanf
+#define _VFWSCANF_R _vfwscanf_r
+#define __SVFWSCANF __svfwscanf
 #ifdef STRING_ONLY
-#  define __SVFSCANF_R __ssvfscanf_r
+#  define __SVFWSCANF_R __ssvfwscanf_r
 #else
-#  define __SVFSCANF_R __svfscanf_r
+#  define __SVFWSCANF_R __svfwscanf_r
 #endif
 #ifndef NO_FLOATING_POINT
 #define FLOATING_POINT
@@ -151,9 +149,9 @@ Supporting OS subroutines required:
 #undef _funlockfile
 #define _flockfile(x) {}
 #define _funlockfile(x) {}
-#define _ungetc_r _sungetc_r
+#define _ungetwc_r _sungetwc_r
 #define __srefill_r __ssrefill_r
-#define _fread_r _sfread_r
+#define _fgetwc_r _sfgetwc_r
 #endif
 
 #ifdef FLOATING_POINT
@@ -166,7 +164,7 @@ Supporting OS subroutines required:
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
-extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
+extern _LONG_DOUBLE _wcstold_r _PARAMS((wchar_t *s, wchar_t **sptr));
 #endif
 
 #include "floatio.h"
@@ -228,7 +226,7 @@ static void * get_arg (int, va_list *, int *, void **);
 
 #define	PFXOK		0x200	/* 0x prefix is (still) legal */
 #define	NZDIGITS	0x400	/* no zero digits detected */
-#define	NNZDIGITS	0x800	/* no non-zero digits detected */
+#define HAVESIGN        0x10000 /* sign detected */
 
 /*
  * Conversion types.
@@ -237,81 +235,72 @@ static void * get_arg (int, va_list *, int *, void **);
 #define	CT_CHAR		0	/* %c conversion */
 #define	CT_CCL		1	/* %[...] conversion */
 #define	CT_STRING	2	/* %s conversion */
-#define	CT_INT		3	/* integer, i.e., strtol or strtoul */
-#define	CT_FLOAT	4	/* floating, i.e., strtod */
+#define	CT_INT		3	/* integer, i.e., wcstol or wcstoul */
+#define	CT_FLOAT	4	/* floating, i.e., wcstod */
 
-#if 0
-#define u_char unsigned char
-#endif
-#define u_char char
-#define u_long unsigned long
-
-#ifndef _NO_LONGLONG
-typedef unsigned long long u_long_long;
-#endif
+#define INCCL(_c)       \
+	(cclcompl ? (wmemchr(ccls, (_c), ccle - ccls) == NULL) : \
+	(wmemchr(ccls, (_c), ccle - ccls) != NULL))
 
 /*
- * vfscanf
+ * vfwscanf
  */
-
-#define BufferEmpty (fp->_r <= 0 && __srefill_r(rptr, fp))
 
 #ifndef STRING_ONLY
 
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(VFSCANF, (fp, fmt, ap),
+_DEFUN(VFWSCANF, (fp, fmt, ap),
        register FILE *fp _AND
-       _CONST char *fmt _AND
+       _CONST wchar_t *fmt _AND
        va_list ap)
 {
   CHECK_INIT(_REENT, fp);
-  return __SVFSCANF_R (_REENT, fp, fmt, ap);
+  return __SVFWSCANF_R (_REENT, fp, fmt, ap);
 }
 
 int
-_DEFUN(__SVFSCANF, (fp, fmt0, ap),
+_DEFUN(__SVFWSCANF, (fp, fmt0, ap),
        register FILE *fp _AND
-       char _CONST *fmt0 _AND
+       wchar_t _CONST *fmt0 _AND
        va_list ap)
 {
-  return __SVFSCANF_R (_REENT, fp, fmt0, ap);
+  return __SVFWSCANF_R (_REENT, fp, fmt0, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
+_DEFUN(_VFWSCANF_R, (data, fp, fmt, ap),
        struct _reent *data _AND
        register FILE *fp   _AND
-       _CONST char *fmt    _AND
+       _CONST wchar_t *fmt    _AND
        va_list ap)
 {
   CHECK_INIT(data, fp);
-  return __SVFSCANF_R (data, fp, fmt, ap);
+  return __SVFWSCANF_R (data, fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */
 
-#if defined (STRING_ONLY) && defined (INTEGER_ONLY)
-/* When dealing with the sscanf family, we don't want to use the
- * regular ungetc which will drag in file I/O items we don't need.
+#ifdef STRING_ONLY
+/* When dealing with the swscanf family, we don't want to use the
+ * regular ungetwc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
-int
-_DEFUN(_sungetc_r, (data, fp, ch),
+static wint_t
+_DEFUN(_sungetwc_r, (data, fp, ch),
 	struct _reent *data _AND
-	int c               _AND
+	wint_t wc           _AND
 	register FILE *fp)
 {
-  if (c == EOF)
-    return (EOF);
+  if (wc == WEOF)
+    return (WEOF);
 
   /* After ungetc, we won't be at eof anymore */
   fp->_flags &= ~__SEOF;
-  c = (unsigned char) c;
 
   /*
-   * If we are in the middle of ungetc'ing, just continue.
+   * If we are in the middle of ungetwc'ing, just continue.
    * This may require expanding the current ungetc buffer.
    */
 
@@ -321,22 +310,24 @@ _DEFUN(_sungetc_r, (data, fp, ch),
         {
           return EOF;
         }
-      *--fp->_p = c;
-      fp->_r++;
-      return c;
+      fp->_p -= sizeof (wchar_t);
+      *fp->_p = (wchar_t) wc;
+      fp->_r += sizeof (wchar_t);
+      return wc;
     }
 
   /*
    * If we can handle this by simply backing up, do so,
    * but never replace the original character.
-   * (This makes sscanf() work when scanning `const' data.)
+   * (This makes swscanf() work when scanning `const' data.)
    */
 
-  if (fp->_bf._base != NULL && fp->_p > fp->_bf._base && fp->_p[-1] == c)
+  if (fp->_bf._base != NULL && fp->_p > fp->_bf._base
+      && ((wchar_t *)fp->_p)[-1] == wc)
     {
-      fp->_p--;
-      fp->_r++;
-      return c;
+      fp->_p -= sizeof (wchar_t);
+      fp->_r += sizeof (wchar_t);
+      return wc;
     }
 
   /*
@@ -348,96 +339,44 @@ _DEFUN(_sungetc_r, (data, fp, ch),
   fp->_up = fp->_p;
   fp->_ub._base = fp->_ubuf;
   fp->_ub._size = sizeof (fp->_ubuf);
-  fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
-  fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
-  fp->_r = 1;
-  return c;
+  fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - sizeof (wchar_t)];
+  *(wchar_t *) fp->_p = wc;
+  fp->_r = 2;
+  return wc;
 }
 
-/* String only version of __srefill_r for sscanf family.  */
-int
-_DEFUN(__ssrefill_r, (ptr, fp),
-       struct _reent * ptr _AND
-       register FILE * fp)
-{
-  /*
-   * Our only hope of further input is the ungetc buffer.
-   * If there is anything in that buffer to read, return.
-   */
-  if (HASUB (fp))
-    {
-      FREEUB (ptr, fp);
-      if ((fp->_r = fp->_ur) != 0)
-        {
-          fp->_p = fp->_up;
-	  return 0;
-        }
-    }
+extern int __ssrefill_r _PARAMS ((struct _reent *ptr, register FILE * fp));
 
-  /* Otherwise we are out of character input.  */
-  fp->_p = fp->_bf._base;
-  fp->_r = 0;
-  fp->_flags |= __SEOF;
-  return EOF;
-}
-
-size_t
-_DEFUN(_sfread_r, (ptr, buf, size, count, fp),
+static size_t
+_DEFUN(_sfgetwc_r, (ptr, fp),
        struct _reent * ptr _AND
-       _PTR buf _AND
-       size_t size _AND
-       size_t count _AND
        FILE * fp)
 {
-  register size_t resid;
-  register char *p;
-  register int r;
-  size_t total;
+  wchar_t wc;
 
-  if ((resid = count * size) == 0)
-    return 0;
-
-  total = resid;
-  p = buf;
-
-  while (resid > (r = fp->_r))
-    {
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
-      fp->_p += r;
-      fp->_r = 0;
-      p += r;
-      resid -= r;
-      if (__ssrefill_r (ptr, fp))
-        {
-          /* no more input: return partial result */
-          return (total - resid) / size;
-        }
-    }
-  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
-  fp->_r -= resid;
-  fp->_p += resid;
-  return count;
+  if (fp->_r <= 0 && __ssrefill_r (ptr, fp))
+    return (WEOF);
+  wc = *(wchar_t *) fp->_p;
+  fp->_p += sizeof (wchar_t);
+  fp->_r -= sizeof (wchar_t);
+  return (wc);
 }
-#else /* !STRING_ONLY || !INTEGER_ONLY */
-int _EXFUN (_sungetc_r, (struct _reent *, int, register FILE *));
-int _EXFUN (__ssrefill_r, (struct _reent *, register FILE *));
-size_t _EXFUN (_sfread_r, (struct _reent *, _PTR buf, size_t, size_t, FILE *));
-#endif /* !STRING_ONLY || !INTEGER_ONLY */
+#endif /* STRING_ONLY */
 
 int
-_DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
+_DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
        struct _reent *rptr _AND
        register FILE *fp   _AND
-       char _CONST *fmt0   _AND
+       wchar_t _CONST *fmt0   _AND
        va_list ap)
 {
-  register u_char *fmt = (u_char *) fmt0;
-  register int c;		/* character from format, or conversion */
+  register wchar_t *fmt = (wchar_t *) fmt0;
+  register wint_t c;            /* character from format, or conversion */
   register size_t width;	/* field width, or 0 */
-  register char *p;		/* points into all kinds of strings */
+  register wchar_t *p = NULL;	/* points into all kinds of strings */
   register int n;		/* handy integer */
   register int flags;		/* flags as defined above */
-  register char *p0;		/* saves original value of p when necessary */
+  register wchar_t *p0;		/* saves original value of p when necessary */
   int nassigned;		/* number of fields assigned */
   int nread;			/* number of characters consumed from fp */
 #ifndef _NO_POS_ARGS
@@ -447,18 +386,20 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   void *args[MAX_POS_ARGS];	/* positional args read */
   int is_pos_arg;		/* is current format positional? */
 #endif
-  int base = 0;			/* base argument to strtol/strtoul */
-  int nbytes = 1;               /* number of bytes read from fmt string */
-  wchar_t wc;                   /* wchar to use to read format string */
-  wchar_t *wcp;                 /* handy wide character pointer */
-  size_t mbslen;                /* length of converted multibyte sequence */
-  mbstate_t state;              /* value to keep track of multibyte state */
+  int base = 0;			/* base argument to wcstol/wcstoul */
 
-  #define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
-  u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
-  char ccltab[256];		/* character class table for %[...] */
-  char buf[BUF];		/* buffer for numeric conversions */
-  char *lptr;                   /* literal pointer */
+  mbstate_t mbs;                /* value to keep track of multibyte state */
+
+  #define CCFN_PARAMS	_PARAMS((struct _reent *, const wchar_t *, wchar_t **, int))
+  unsigned long (*ccfn)CCFN_PARAMS=0;	/* conversion function (wcstol/wcstoul) */
+  wchar_t buf[BUF];		/* buffer for numeric conversions */
+  const wchar_t *ccls;          /* character class start */
+  const wchar_t *ccle;          /* character class end */
+  int cclcompl = 0;             /* ccl is complemented? */
+  wint_t wi;                    /* handy wint_t */
+  char *mbp = NULL;             /* multibyte string pointer for %c %s %[ */
+  size_t nconv;                 /* number of bytes in mb. conversion */
+  char mbbuf[MB_LEN_MAX];       /* temporary mb. character buffer */
 
   char *cp;
   short *sp;
@@ -496,32 +437,25 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   __sfp_lock_acquire ();
   _flockfile (fp);
 
-  ORIENT (fp, -1);
+  ORIENT (fp, 1);
 
   nassigned = 0;
   nread = 0;
+  ccls = ccle = NULL;
   for (;;)
     {
-#ifndef _MB_CAPABLE
-      wc = *fmt;
-#else
-      memset (&state, '\0', sizeof (state));
-      nbytes = _mbtowc_r (rptr, &wc, fmt, MB_CUR_MAX, &state);
-#endif
-      fmt += nbytes;
-      if (wc == 0)
+      c = *fmt++;
+      if (c == L'\0')
 	goto all_done;
-      if (nbytes == 1 && isspace (wc))
+      if (iswspace (c))
 	{
-	  for (;;)
-	    {
-	      if (BufferEmpty || !isspace (*fp->_p))
-		break;
-	      nread++, fp->_r--, fp->_p++;
-	    }
+	  while ((c = _fgetwc_r (rptr, fp)) != WEOF && iswspace(c))
+	    ;
+	  if (c != WEOF)
+	    _ungetwc_r (rptr, c, fp);
 	  continue;
 	}
-      if (wc != '%')
+      if (c != L'%')
 	goto literal;
       width = 0;
       flags = 0;
@@ -540,27 +474,24 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 
       switch (c)
 	{
-	case '%':
+	case L'%':
 	literal:
-          lptr = fmt - nbytes;
-          for (n = 0; n < nbytes; ++n)
-            {
-	      if (BufferEmpty)
-	        goto input_failure;
-	      if (*fp->_p != *lptr)
-	        goto match_failure;
-	      fp->_r--, fp->_p++;
-	      nread++;
-              ++lptr;
-            }
+	  if ((wi = _fgetwc_r (rptr, fp)) == WEOF)
+	    goto input_failure;
+	  if (wi != c)
+	    {
+	      _ungetwc_r (rptr, wi, fp);
+	      goto input_failure;
+	    }
+	  nread++;
 	  continue;
 
-	case '*':
+	case L'*':
 	  flags |= SUPPRESS;
 	  goto again;
-	case 'l':
+	case L'l':
 #if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
-	  if (*fmt == 'l')	/* Check for 'll' = long long (SUSv3) */
+	  if (*fmt == L'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
 	      ++fmt;
 	      flags |= LONGDBL;
@@ -569,10 +500,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 	    flags |= LONG;
 	  goto again;
-	case 'L':
+	case L'L':
 	  flags |= LONGDBL;
 	  goto again;
-	case 'h':
+	case L'h':
 #ifdef _WANT_IO_C99_FORMATS
 	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
 	    {
@@ -584,13 +515,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    flags |= SHORT;
 	  goto again;
 #ifdef _WANT_IO_C99_FORMATS
-	case 'j': /* intmax_t */
+	case L'j': /* intmax_t */
 	  if (sizeof (intmax_t) == sizeof (long))
 	    flags |= LONG;
 	  else
 	    flags |= LONGDBL;
 	  goto again;
-	case 't': /* ptrdiff_t */
+	case L't': /* ptrdiff_t */
 	  if (sizeof (ptrdiff_t) < sizeof (int))
 	    /* POSIX states ptrdiff_t is 16 or more bits, as
 	       is short.  */
@@ -606,7 +537,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       have ptrdiff_t as wide as long long.  */
 	    flags |= LONGDBL;
 	  goto again;
-	case 'z': /* size_t */
+	case L'z': /* size_t */
 	  if (sizeof (size_t) < sizeof (int))
 	    /* POSIX states size_t is 16 or more bits, as is short.  */
 	    flags |= SHORT;
@@ -623,21 +554,21 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  goto again;
 #endif /* _WANT_IO_C99_FORMATS */
 
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-	  width = width * 10 + c - '0';
+	case L'0':
+	case L'1':
+	case L'2':
+	case L'3':
+	case L'4':
+	case L'5':
+	case L'6':
+	case L'7':
+	case L'8':
+	case L'9':
+	  width = width * 10 + c - L'0';
 	  goto again;
 
 #ifndef _NO_POS_ARGS
-	case '$':
+	case L'$':
 	  if (width <= MAX_POS_ARGS)
 	    {
 	      N = width - 1;
@@ -649,79 +580,78 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  goto input_failure;
 #endif /* !_NO_POS_ARGS */
 
-	  /*
-	   * Conversions. Those marked `compat' are for
-	   * 4.[123]BSD compatibility.
-	   *
-	   * (According to ANSI, E and X formats are supposed to
-	   * the same as e and x.  Sorry about that.)
-	   */
-
-	case 'D':		/* compat */
-	  flags |= LONG;
-	  /* FALLTHROUGH */
-	case 'd':
+	case L'd':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (unsigned long (*)CCFN_PARAMS)_wcstol_r;
 	  base = 10;
 	  break;
 
-	case 'i':
+	case L'i':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (unsigned long (*)CCFN_PARAMS)_wcstol_r;
 	  base = 0;
 	  break;
 
-	case 'O':		/* compat */
-	  flags |= LONG;
-	  /* FALLTHROUGH */
-	case 'o':
+	case L'o':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = _wcstoul_r;
 	  base = 8;
 	  break;
 
-	case 'u':
+	case L'u':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = _wcstoul_r;
 	  base = 10;
 	  break;
 
-	case 'X':
-	case 'x':
+	case L'X':
+	case L'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = _wcstoul_r;
 	  base = 16;
 	  break;
 
 #ifdef FLOATING_POINT
 # ifdef _WANT_IO_C99_FORMATS
-	case 'a':
-	case 'A':
-	case 'F':
+	case L'A':
+	case L'a':
+	case L'F':
 # endif
-	case 'E':
-	case 'G':
-	case 'e':
-	case 'f':
-	case 'g':
+	case L'E':
+	case L'G':
+	case L'e':
+	case L'f':
+	case L'g':
 	  c = CT_FLOAT;
 	  break;
 #endif
 
 #ifdef _WANT_IO_C99_FORMATS
-	case 'S':
+	case L'S':
 	  flags |= LONG;
 	  /* FALLTHROUGH */
 #endif
 
-	case 's':
+	case L's':
 	  c = CT_STRING;
 	  break;
 
-	case '[':
-	  fmt = (u_char *) __sccl (ccltab, (unsigned char *) fmt);
+	case L'[':
+	  ccls = fmt;
+	  if (*fmt == '^')
+	    {
+	      cclcompl = 1;
+	      ++fmt;
+	    }
+	  else
+	    cclcompl = 0;
+	  if (*fmt == ']')
+	    fmt++;
+	  while (*fmt != '\0' && *fmt != ']')
+	    fmt++;
+	  ccle = fmt;
+	  fmt++;
 	  flags |= NOSKIP;
 	  c = CT_CCL;
 	  break;
@@ -740,7 +670,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = _wcstoul_r;
 	  base = 16;
 	  break;
 
@@ -782,25 +712,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /*
 	   * Disgusting backwards compatibility hacks.	XXX
 	   */
-	case '\0':		/* compat */
+	case L'\0':		/* compat */
 	  _funlockfile (fp);
 	  __sfp_lock_release ();
 	  return EOF;
 
 	default:		/* compat */
-	  if (isupper (c))
-	    flags |= LONG;
-	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
-	  base = 10;
-	  break;
+	  goto match_failure;
 	}
-
-      /*
-       * We have a conversion that requires input.
-       */
-      if (BufferEmpty)
-	goto input_failure;
 
       /*
        * Consume leading white space, except for formats that
@@ -808,20 +727,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
        */
       if ((flags & NOSKIP) == 0)
 	{
-	  while (isspace (*fp->_p))
-	    {
-	      nread++;
-	      if (--fp->_r > 0)
-		fp->_p++;
-	      else
-	      if (__srefill_r (rptr, fp))
-		goto input_failure;
-	    }
-	  /*
-	   * Note that there is at least one character in the
-	   * buffer, so conversions that do not set NOSKIP ca
-	   * no longer result in an input failure.
-	   */
+	  while ((wi = _fgetwc_r (rptr, fp)) != WEOF && iswspace (wi))
+	    nread++;
+	  if (wi == WEOF)
+	    goto input_failure;
+	  _ungetwc_r (rptr, wi, fp);
 	}
 
       /*
@@ -834,129 +744,128 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /* scan arbitrary characters (sets NOSKIP) */
 	  if (width == 0)
 	    width = 1;
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
-            {
-              if ((flags & SUPPRESS) == 0)
-                wcp = GET_ARG (N, ap, wchar_t *);
-              else
-                wcp = NULL;
-              n = 0;
-              while (width != 0)
-                {
-                  if (n == MB_CUR_MAX)
-                    goto input_failure;
-                  buf[n++] = *fp->_p;
-                  fp->_r -= 1;
-                  fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
-                                                         == (size_t)-1)
-                    goto input_failure; /* Invalid sequence */
-                  if (mbslen == 0 && !(flags & SUPPRESS))
-                    *wcp = L'\0';
-                  if (mbslen != (size_t)-2) /* Incomplete sequence */
-                    {
-                      nread += n;
-                      width -= 1;
-                      if (!(flags & SUPPRESS))
-                        wcp += 1;
-                      n = 0;
-                    }
-                  if (BufferEmpty)
-	            {
-                      if (n != 0)
-                        goto input_failure;
-                      break;
-                    }
-                }
-              if (!(flags & SUPPRESS))
-                nassigned++;
-            }
-          else
-#endif
-        	  if (flags & SUPPRESS)
 	    {
-	      size_t sum = 0;
-	      for (;;)
+	      if (!(flags & SUPPRESS))
+		p = va_arg(ap, wchar_t *);
+	      n = 0;
+	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
-		  if ((n = fp->_r) < (int)width)
-		    {
-		      sum += n;
-		      width -= n;
-		      fp->_p += n;
-		      if (__srefill_r (rptr, fp))
-			{
-			  if (sum == 0)
-			    goto input_failure;
-			  break;
-			}
-		    }
-		  else
-		    {
-		      sum += width;
-		      fp->_r -= width;
-		      fp->_p += width;
-		      break;
-		    }
+		  if (!(flags & SUPPRESS))
+		    *p++ = (wchar_t) wi;
+		  n++;
 		}
-	      nread += sum;
+	      if (n == 0)
+		goto input_failure;
+	      nread += n;
+	      if (!(flags & SUPPRESS))
+		nassigned++;
 	    }
 	  else
 	    {
-	      size_t r = _fread_r (rptr, (_PTR) GET_ARG (N, ap, char *), 1, width, fp);
-
-	      if (r == 0)
+	      if (!(flags & SUPPRESS))
+		mbp = va_arg(ap, char *);
+	      n = 0;
+	      memset ((_PTR)&mbs, '\0', sizeof (mbstate_t));
+	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
+		{
+		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
+		    {
+		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		      if (nconv == (size_t) -1)
+			goto input_failure;
+		    }
+		  else
+		    {
+		      nconv = _wcrtomb_r (rptr, mbbuf, wi, &mbs);
+		      if (nconv == (size_t) -1)
+			goto input_failure;
+		      if (nconv > width)
+			{
+			  _ungetwc_r (rptr, wi, fp);
+			  break;
+			}
+		      if (!(flags & SUPPRESS))
+			memcpy(mbp, mbbuf, nconv);
+		    }
+		  if (!(flags & SUPPRESS))
+		    mbp += nconv;
+		  width -= nconv;
+		  n++;
+		}
+	      if (n == 0)
 		goto input_failure;
-	      nread += r;
-	      nassigned++;
+	      nread += n;
+	      if (!(flags & SUPPRESS))
+		nassigned++;
 	    }
 	  break;
 
 	case CT_CCL:
 	  /* scan a (nonempty) character class (sets NOSKIP) */
 	  if (width == 0)
-	    width = ~0;		/* `infinity' */
+	    width = (size_t) ~0;		/* `infinity' */
 	  /* take only those things in the class */
-	  if (flags & SUPPRESS)
+	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
 	      n = 0;
-	      while (ccltab[*fp->_p])
-		{
-		  n++, fp->_r--, fp->_p++;
-		  if (--width == 0)
-		    break;
-		  if (BufferEmpty)
-		    {
-		      if (n == 0)
-			goto input_failure;
-		      break;
-		    }
-		}
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width-- != 0 && INCCL (wi))
+		n++;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	      if (n == 0)
+		goto match_failure;
+	    }
+	  else if (flags & LONG)
+	    {
+	      p0 = p = va_arg(ap, wchar_t *);
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width-- != 0 && INCCL (wi))
+		*p++ = (wchar_t) wi;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	      n = p - p0;
 	      if (n == 0)
 		goto match_failure;
 	    }
 	  else
 	    {
-	      p0 = p = GET_ARG (N, ap, char *);
-	      while (ccltab[*fp->_p])
+	      if (!(flags & SUPPRESS))
+		mbp = va_arg(ap, char *);
+	      n = 0;
+	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width-- != 0 && INCCL (wi))
 		{
-		  fp->_r--;
-		  *p++ = *fp->_p++;
-		  if (--width == 0)
-		    break;
-		  if (BufferEmpty)
+		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
 		    {
-		      if (p == p0)
+		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		      if (nconv == (size_t) -1)
 			goto input_failure;
-		      break;
 		    }
+		  else
+		    {
+		      nconv = wcrtomb(mbbuf, wi, &mbs);
+		      if (nconv == (size_t) -1)
+			goto input_failure;
+		      if (nconv > width)
+			break;
+		      if (!(flags & SUPPRESS))
+			memcpy(mbp, mbbuf, nconv);
+		    }
+		  if (!(flags & SUPPRESS))
+		    mbp += nconv;
+		  width -= nconv;
+		  n++;
 		}
-	      n = p - p0;
-	      if (n == 0)
-		goto match_failure;
-	      *p = 0;
-	      nassigned++;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	      if (!(flags & SUPPRESS))
+		{
+		  *mbp = 0;
+		  nassigned++;
+		}
 	    }
 	  nread += n;
 	  break;
@@ -965,107 +874,76 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  /* like CCL, but zero-length string OK, & no NOSKIP */
 	  if (width == 0)
             width = (size_t)~0;
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
-          if (flags & LONG)
-            {
-              /* Process %S and %ls placeholders */
-              if ((flags & SUPPRESS) == 0)
-                wcp = GET_ARG (N, ap, wchar_t *);
-              else
-                wcp = &wc;
-              n = 0;
-              while (!isspace (*fp->_p) && width != 0)
-                {
-                  if (n == MB_CUR_MAX)
-                    goto input_failure;
-                  buf[n++] = *fp->_p;
-                  fp->_r -= 1;
-                  fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
-                                                        == (size_t)-1)
-                    goto input_failure;
-                  if (mbslen == 0)
-                    *wcp = L'\0';
-                  if (mbslen != (size_t)-2) /* Incomplete sequence */
-                    {
-                      if (iswspace(*wcp))
-                        {
-                          while (n != 0)
-                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
-                          break;
-                        }
-                      nread += n;
-                      width -= 1;
-                      if ((flags & SUPPRESS) == 0)
-                        wcp += 1;
-                      n = 0;
-                    }
-                  if (BufferEmpty)
-                    {
-                      if (n != 0)
-                        goto input_failure;
-                      break;
-                    }
-                }
-              if (!(flags & SUPPRESS))
-                {
-                  *wcp = L'\0';
-                  nassigned++;
-                }
-            }
-          else
-#endif
-        	  if (flags & SUPPRESS)
+	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
-	      n = 0;
-	      while (!isspace (*fp->_p))
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width-- != 0 && !iswspace (wi))
+		nread++;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	    }
+	  else if (flags & LONG)
+	    {
+	      p0 = p = va_arg(ap, wchar_t *);
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width-- != 0 && !iswspace (wi))
 		{
-		  n++, fp->_r--, fp->_p++;
-		  if (--width == 0)
-		    break;
-		  if (BufferEmpty)
-		    break;
+		  *p++ = (wchar_t) wi;
+		  nread++;
 		}
-	      nread += n;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	      *p = '\0';
+	      nassigned++;
 	    }
 	  else
 	    {
-	      p0 = p = GET_ARG (N, ap, char *);
-	      while (!isspace (*fp->_p))
+	      if (!(flags & SUPPRESS))
+		mbp = va_arg(ap, char *);
+	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
+	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
+		     && width != 0 && !iswspace (wi))
 		{
-		  fp->_r--;
-		  *p++ = *fp->_p++;
-		  if (--width == 0)
-		    break;
-		  if (BufferEmpty)
-		    break;
+		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
+		    {
+		      nconv = wcrtomb(mbp, wi, &mbs);
+		      if (nconv == (size_t)-1)
+			goto input_failure;
+		    }
+		  else
+		    {
+		      nconv = wcrtomb(mbbuf, wi, &mbs);
+		      if (nconv == (size_t)-1)
+			goto input_failure;
+		      if (nconv > width)
+			break;
+		      if (!(flags & SUPPRESS))
+			memcpy(mbp, mbbuf, nconv);
+		    }
+		  if (!(flags & SUPPRESS))
+		    mbp += nconv;
+		  width -= nconv;
+		  nread++;
 		}
-	      *p = 0;
-	      nread += p - p0;
-	      nassigned++;
+	      if (wi != WEOF)
+		_ungetwc_r (rptr, wi, fp);
+	      if (!(flags & SUPPRESS))
+		{
+		  *mbp = 0;
+		  nassigned++;
+		}
 	    }
 	  continue;
 
 	case CT_INT:
 	{
-	  /* scan an integer as if by strtol/strtoul */
-	  unsigned width_left = 0;
-	  int skips = 0;
-#ifdef hardway
-	  if (width == 0 || width > sizeof (buf) - 1)
-#else
-	  /* size_t is unsigned, hence this optimisation */
-	  if (width - 1 > sizeof (buf) - 2)
-#endif
-	    {
-	      width_left = width - (sizeof (buf) - 1);
-	      width = sizeof (buf) - 1;
-	    }
-	  flags |= SIGNOK | NDIGITS | NZDIGITS | NNZDIGITS;
+	  /* scan an integer as if by wcstol/wcstoul */
+	  if (width == 0 || width > sizeof (buf) / sizeof (*buf) - 1)
+	    width = sizeof(buf) / sizeof (*buf) - 1;
+	  flags |= SIGNOK | NDIGITS | NZDIGITS;
 	  for (p = buf; width; width--)
 	    {
-	      c = *fp->_p;
+	      c = _fgetwc_r (rptr, fp);
 	      /*
 	       * Switch on the character; `goto ok' if we
 	       * accept it as a part of number.
@@ -1081,89 +959,76 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		   * before this, do not turn off prefixing (someone else
 		   * will turn it off if we have scanned any nonzero digits).
 		   */
-		case '0':
-		  if (! (flags & NNZDIGITS))
-		    goto ok;
+		case L'0':
 		  if (base == 0)
 		    {
 		      base = 8;
 		      flags |= PFXOK;
 		    }
 		  if (flags & NZDIGITS)
-		    {
-		      flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
-		      goto ok;
-		    }
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
-		  if (width_left)
-		    {
-		      width_left--;
-		      width++;
-		    }
-		  ++skips;
-		  goto skip;
+		    flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
+		  else
+		    flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  goto ok;
 
 		  /* 1 through 7 always legal */
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
+		case L'1':
+		case L'2':
+		case L'3':
+		case L'4':
+		case L'5':
+		case L'6':
+		case L'7':
 		  base = basefix[base];
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* digits 8 and 9 ok iff decimal or hex */
-		case '8':
-		case '9':
+		case L'8':
+		case L'9':
 		  base = basefix[base];
 		  if (base <= 8)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* letters ok iff hex */
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
+		case L'A':
+		case L'B':
+		case L'C':
+		case L'D':
+		case L'E':
+		case L'F':
+		case L'a':
+		case L'b':
+		case L'c':
+		case L'd':
+		case L'e':
+		case L'f':
 		  /* no need to fix base here */
 		  if (base <= 10)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
 		  goto ok;
 
 		  /* sign ok only as first character */
-		case '+':
-		case '-':
+		case L'+':
+		case L'-':
 		  if (flags & SIGNOK)
 		    {
 		      flags &= ~SIGNOK;
+		      flags |= HAVESIGN;
 		      goto ok;
 		    }
 		  break;
 
 		  /* x ok iff flag still set & single 0 seen */
-		case 'x':
-		case 'X':
-		  if ((flags & (PFXOK | NZDIGITS)) == PFXOK)
+		case L'x':
+		case L'X':
+		  if ((flags & PFXOK) && p == buf + 1 + !!(flags & HAVESIGN))
 		    {
 		      base = 16;/* if %i */
 		      flags &= ~PFXOK;
-		      /* We must reset the NZDIGITS and NDIGITS
-			 flags that would have been unset by seeing
-			 the zero that preceded the X or x.  */
-		      flags |= NZDIGITS | NDIGITS;
 		      goto ok;
 		    }
 		  break;
@@ -1173,18 +1038,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	       * If we got here, c is not a legal character
 	       * for a number.  Stop accumulating digits.
 	       */
+	      if (c != WEOF)
+		_ungetwc_r (rptr, c, fp);
 	      break;
 	    ok:
 	      /*
 	       * c is legal: store it and look at the next.
 	       */
-	      *p++ = c;
-	    skip:
-	      if (--fp->_r > 0)
-		fp->_p++;
-	      else
-	      if (__srefill_r (rptr, fp))
-		break;		/* EOF */
+	      *p++ = (wchar_t) c;
 	    }
 	  /*
 	   * If we had only a sign, it is no good; push back the sign.
@@ -1197,24 +1058,29 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_ungetc_r (rptr, *--p, fp); /* [-+xX] */
-	      if (p == buf)
-		goto match_failure;
+		_ungetwc_r (rptr, *--p, fp); /* [-+xX] */
+	      goto match_failure;
+	    }
+	  c = p[-1];
+	  if (c == L'x' || c == L'X')
+	    {
+	      --p;
+	      _ungetwc_r (rptr, c, fp);
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
-	      u_long res;
+	      unsigned long res;
 
 	      *p = 0;
-	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
+	      res = (*ccfn) (rptr, buf, (wchar_t **) NULL, base);
 	      if (flags & POINTER)
 		{
 		  void **vp = GET_ARG (N, ap, void **);
 #ifndef _NO_LONGLONG
-		  if (sizeof (uintptr_t) > sizeof (u_long))
+		  if (sizeof (uintptr_t) > sizeof (unsigned long))
 		    {
-		      u_long_long resll;
-		      resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		      unsigned long long resll;
+		      resll = _wcstoull_r (rptr, buf, (wchar_t **) NULL, base);
 		      *vp = (void *) (uintptr_t) resll;
 		    }
 		  else
@@ -1241,11 +1107,11 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifndef _NO_LONGLONG
 	      else if (flags & LONGDBL)
 		{
-		  u_long_long resll;
-		  if (ccfn == _strtoul_r)
-		    resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		  unsigned long long resll;
+		  if (ccfn == _wcstoul_r)
+		    resll = _wcstoull_r (rptr, buf, (wchar_t **) NULL, base);
 		  else
-		    resll = _strtoll_r (rptr, buf, (char **) NULL, base);
+		    resll = _wcstoll_r (rptr, buf, (wchar_t **) NULL, base);
 		  llp = GET_ARG (N, ap, long long*);
 		  *llp = resll;
 		}
@@ -1257,20 +1123,20 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		}
 	      nassigned++;
 	    }
-	  nread += p - buf + skips;
+	  nread += p - buf;
 	  break;
 	}
 #ifdef FLOATING_POINT
 	case CT_FLOAT:
 	{
-	  /* scan a floating point number as if by strtod */
+	  /* scan a floating point number as if by wcstod */
 	  /* This code used to assume that the number of digits is reasonable.
 	     However, ANSI / ISO C makes no such stipulation; we have to get
 	     exact results even when there is an unreasonable amount of
 	     leading zeroes.  */
 	  long leading_zeroes = 0;
 	  long zeroes, exp_adjust;
-	  char *exp_start = NULL;
+	  wchar_t *exp_start = NULL;
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
@@ -1289,14 +1155,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  exp_adjust = 0;
 	  for (p = buf; width; )
 	    {
-	      c = *fp->_p;
+	      c = _fgetwc_r (rptr, fp);
 	      /*
 	       * This code mimicks the integer conversion
 	       * code, but is much simpler.
 	       */
 	      switch (c)
 		{
-		case '0':
+		case L'0':
 		  if (flags & NDIGITS)
 		    {
 		      flags &= ~SIGNOK;
@@ -1309,15 +1175,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fskip;
 		    }
 		  /* Fall through.  */
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+		case L'1':
+		case L'2':
+		case L'3':
+		case L'4':
+		case L'5':
+		case L'6':
+		case L'7':
+		case L'8':
+		case L'9':
 		  if (nancount + infcount == 0)
 		    {
 		      flags &= ~(SIGNOK | NDIGITS);
@@ -1325,16 +1191,16 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    }
 		  break;
 
-		case '+':
-		case '-':
+		case L'+':
+		case L'-':
 		  if (flags & SIGNOK)
 		    {
 		      flags &= ~SIGNOK;
 		      goto fok;
 		    }
 		  break;
-		case 'n':
-		case 'N':
+		case L'n':
+		case L'N':
 		  if (nancount == 0 && zeroes == 0
 		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
 				  (NDIGITS | DPTOK | EXPOK))
@@ -1354,16 +1220,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
-		case 'a':
-		case 'A':
+		case L'a':
+		case L'A':
 		  if (nancount == 1)
 		    {
 		      nancount = 2;
 		      goto fok;
 		    }
 		  break;
-		case 'i':
-		case 'I':
+		case L'i':
 		  if (infcount == 0 && zeroes == 0
 		      && (flags & (NDIGITS | DPTOK | EXPOK)) ==
 				  (NDIGITS | DPTOK | EXPOK))
@@ -1378,31 +1243,31 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
-		case 'f':
-		case 'F':
+		case L'f':
+		case L'F':
 		  if (infcount == 2)
 		    {
 		      infcount = 3;
 		      goto fok;
 		    }
 		  break;
-		case 't':
-		case 'T':
+		case L't':
+		case L'T':
 		  if (infcount == 6)
 		    {
 		      infcount = 7;
 		      goto fok;
 		    }
 		  break;
-		case 'y':
-		case 'Y':
+		case L'y':
+		case L'Y':
 		  if (infcount == 7)
 		    {
 		      infcount = 8;
 		      goto fok;
 		    }
 		  break;
-		case '.':
+		case L'.':
 		  if (flags & DPTOK)
 		    {
 		      flags &= ~(SIGNOK | DPTOK);
@@ -1410,8 +1275,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
-		case 'e':
-		case 'E':
+		case L'e':
+		case L'E':
 		  /* no exponent without some digits */
 		  if ((flags & (NDIGITS | EXPOK)) == EXPOK
 		      || ((flags & EXPOK) && zeroes))
@@ -1429,17 +1294,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		    }
 		  break;
 		}
+	      if (c != WEOF)
+		_ungetwc_r (rptr, c, fp);
 	      break;
 	    fok:
 	      *p++ = c;
 	    fskip:
 	      width--;
 	      ++nread;
-	      if (--fp->_r > 0)
-		fp->_p++;
-	      else
-	      if (__srefill_r (rptr, fp))
-		break;		/* EOF */
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
@@ -1458,7 +1320,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		 guarantee that in all implementations of ungetc.  */
 	      while (p > buf)
 		{
-		  _ungetc_r (rptr, *--p, fp); /* [-+nNaA] */
+		  _ungetwc_r (rptr, *--p, fp); /* [-+nNaA] */
 		  --nread;
 		}
 	      goto match_failure;
@@ -1471,14 +1333,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      if (infcount >= 3) /* valid 'inf', but short of 'infinity' */
 		while (infcount-- > 3)
 		  {
-		    _ungetc_r (rptr, *--p, fp); /* [iInNtT] */
+		    _ungetwc_r (rptr, *--p, fp); /* [iInNtT] */
 		    --nread;
 		  }
 	      else
 		{
 		  while (p > buf)
 		    {
-		      _ungetc_r (rptr, *--p, fp); /* [-+iInN] */
+		      _ungetwc_r (rptr, *--p, fp); /* [-+iInN] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1496,7 +1358,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  /* no digits at all */
 		  while (p > buf)
 		    {
-		      _ungetc_r (rptr, *--p, fp); /* [-+.] */
+		      _ungetwc_r (rptr, *--p, fp); /* [-+.] */
 		      --nread;
 		    }
 		  goto match_failure;
@@ -1504,13 +1366,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      /* just a bad exponent (e and maybe sign) */
 	      c = *--p;
 	      --nread;
-	      if (c != 'e' && c != 'E')
+	      if (c != L'e' && c != L'E')
 		{
-		  _ungetc_r (rptr, c, fp); /* [-+] */
+		  _ungetwc_r (rptr, c, fp); /* [-+] */
 		  c = *--p;
 		  --nread;
 		}
-	      _ungetc_r (rptr, c, fp); /* [eE] */
+	      _ungetwc_r (rptr, c, fp); /* [eE] */
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
@@ -1531,7 +1393,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  exp_start = p;
 		}
 	      else if (exp_adjust)
-                new_exp = _strtol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
+                new_exp = _wcstol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
 	      if (exp_adjust)
 		{
 
@@ -1539,18 +1401,16 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		     truncate some trailing digits to make room.  */
 		  if (exp_start >= buf + sizeof (buf) - MAX_LONG_LEN)
 		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
-                 sprintf (exp_start, "e%ld", new_exp);
+                 swprintf (exp_start, MAX_LONG_LEN, L"e%ld", new_exp);
 		}
 
-	      /* Current _strtold routine is markedly slower than
-	         _strtod_r.  Only use it if we have a long double
-	         result.  */
-#ifndef _NO_LONGDBL /* !_NO_LONGDBL */
+	      /* FIXME: We don't have wcstold yet. */
+#if 0//ndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _strtold (buf, NULL);
+		qres = _wcstold_r (rptr, buf, NULL);
 	      else
 #endif
-	        res = _strtod_r (rptr, buf, NULL);
+	        res = _wcstod_r (rptr, buf, NULL);
 
 	      if (flags & LONG)
 		{
@@ -1594,7 +1454,7 @@ all_done:
 }
 
 #ifndef _NO_POS_ARGS
-/* Process all intermediate arguments.  Fortunately, with scanf, all
+/* Process all intermediate arguments.  Fortunately, with wscanf, all
    intermediate arguments are sizeof(void*), so we don't need to scan
    ahead in the format string.  */
 static void *

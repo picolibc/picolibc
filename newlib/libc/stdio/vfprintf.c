@@ -278,7 +278,9 @@ err:
   uio->uio_iovcnt = 0;
   return EOF;
 }
-#endif /* INTEGER_ONLY */
+#else /* !INTEGER_ONLY */
+int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
+#endif /* !INTEGER_ONLY */
 
 #else /* !STRING_ONLY */
 #ifdef INTEGER_ONLY
@@ -322,7 +324,9 @@ out:
 	uio->uio_iovcnt = 0;
 	return (err);
 }
-#endif /* INTEGER_ONLY */
+#else /* !INTEGER_ONLY */
+int __sprint_r (struct _reent *, FILE *, register struct __suio *);
+#endif /* !INTEGER_ONLY */
 
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a

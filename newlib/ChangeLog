@@ -1,3 +1,37 @@
+2009-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h (fwscanf, swscanf, vfwscanf, vswscanf, vwscanf,
+	wscanf): Declare.
+	(_fwscanf_r, _swscanf_r, _vfwscanf_r, _vswscanf_r, _vwscanf_r,
+	_wscanf_r): Declare.
+	* libc/stdio/Makefile.am: Add new wscanf files.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/fwscanf.c: New file.
+	* libc/stdio/local.h (__svfwscanf_r, __ssvfwscanf_r, __svfiwscanf_r,
+	__ssvfiwscanf_r): Declare.
+	* libc/stdio/stdio.tex: Add new documentation references.
+	* libc/stdio/swscanf.c: New file.
+	* libc/stdio/vfwscanf.c: New file.
+	* libc/stdio/vswscanf.c: New file.
+	* libc/stdio/vwscanf.c: New file.
+	* libc/stdio/wscanf.c: New file.
+
+	* libc/stdio/vfscanf.c (_sungetc_r): Make externaly available.  Only
+	define if INTEGER_ONLY is defined.  Declare otherwise.
+	(__ssrefill_r): Ditto.
+	(_sfread_r): Ditto.
+
+	Remove static eofread/eofread1 functions and use __seofread
+	function instead, throughout.
+	* libc/stdio/local.h (__seofread): Declare.
+	* libc/stdio/stdio.c (__seofread): Define.
+
+	* libc/stdio/fgetwc.c (__fgetwc): Fix compiler warning.
+	* libc/stdio/fgetws.c (_fgetws_r): Ditto.
+	* libc/stdio/fread.c (_fread_r): Ditto.
+	* libc/stdio/vfprintf.c: Ditto.
+	* libc/stdio/vswprintf.c: Ditto.
+
 2009-03-09  Brooks Moses  <brooks@codesourcery.com>
 
 	* libc/machine/arm/arm_asm.h: Fix typo.
@@ -29,7 +63,7 @@
 	* libc/include/stdio.h (__VALIST): Guard against multiple definition.
 	* libc/include/wchar.h: Include stdarg.h.
 	(__VALIST): Define conditionally.
-	(fwprintf, swprintf, vfwprintf, vswprintf, vwprintf, wprintf: Declare.
+	(fwprintf, swprintf, vfwprintf, vswprintf, vwprintf, wprintf): Declare.
 	(_fwprintf_r, _swprintf_r, _vfwprintf_r, _vswprintf_r, _vwprintf_r,
 	 _wprintf_r): Declare.
 	* libc/stdio/Makefile.am: Add new files.

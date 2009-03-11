@@ -155,6 +155,20 @@ int	_EXFUN(_vswprintf_r, (struct _reent *, wchar_t *, size_t, const wchar_t *, _
 int	_EXFUN(_vwprintf_r, (struct _reent *, const wchar_t *, __VALIST));
 int	_EXFUN(_wprintf_r, (struct _reent *, const wchar_t *, ...));
 
+int	_EXFUN(fwscanf, (__FILE *, const wchar_t *, ...));
+int	_EXFUN(swscanf, (const wchar_t *, const wchar_t *, ...));
+int	_EXFUN(vfwscanf, (__FILE *, const wchar_t *, __VALIST));
+int	_EXFUN(vswscanf, (const wchar_t *, const wchar_t *, __VALIST));
+int	_EXFUN(vwscanf, (const wchar_t *, __VALIST));
+int	_EXFUN(wscanf, (const wchar_t *, ...));
+
+int	_EXFUN(_fwscanf_r, (struct _reent *, __FILE *, const wchar_t *, ...));
+int	_EXFUN(_swscanf_r, (struct _reent *, const wchar_t *, const wchar_t *, ...));
+int	_EXFUN(_vfwscanf_r, (struct _reent *, __FILE *, const wchar_t *, __VALIST));
+int	_EXFUN(_vswscanf_r, (struct _reent *, const wchar_t *, const wchar_t *, __VALIST));
+int	_EXFUN(_vwscanf_r, (struct _reent *, const wchar_t *, __VALIST));
+int	_EXFUN(_wscanf_r, (struct _reent *, const wchar_t *, ...));
+
 #define getwc(fp)	fgetwc(fp)
 #define putwc(wc,fp)	fputwc((wc), (fp))
 #ifndef _REENT_ONLY

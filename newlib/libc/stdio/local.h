@@ -38,6 +38,10 @@ extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list
 extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern int    _EXFUN(__ssvfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
+extern int    _EXFUN(__svfwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
+extern int    _EXFUN(__ssvfwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
+extern int    _EXFUN(__svfiwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
+extern int    _EXFUN(__ssvfiwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
 int	      _EXFUN(_svfprintf_r,(struct _reent *, FILE *, const char *, 
 				  va_list)
                			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
@@ -53,6 +57,8 @@ extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
 					       int));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__seofread,(struct _reent *, void *,
+						  char *, int));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(struct _reent *, void *,
 						const char *, int));
 extern _fpos_t _EXFUN(__sseek,(struct _reent *, void *, _fpos_t, int));

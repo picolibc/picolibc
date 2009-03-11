@@ -1,5 +1,5 @@
-/*
- * Code created by modifying iscanf.c which has following copyright.
+/*-
+ * Code created by modifying scanf.c which has following copyright.
  *
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -20,7 +20,7 @@
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
-#include <string.h>
+#include <wchar.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
@@ -28,38 +28,21 @@
 #endif
 #include "local.h"
 
-/*
- * vsiscanf
- */
-
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vsiscanf, (str, fmt, ap), 
-       _CONST char *str _AND 
-       _CONST char *fmt _AND 
-       va_list ap)
+vwscanf (_CONST wchar_t *fmt, va_list ap)
 {
-  return _vsiscanf_r (_REENT, str, fmt, ap);
+  _REENT_SMALL_CHECK_INIT (_REENT);
+  return __svfwscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vsiscanf_r, (ptr, str, fmt, ap),
-       struct _reent *ptr _AND 
-       _CONST char *str   _AND 
-       _CONST char *fmt   _AND 
-       va_list ap)
+_vwscanf_r (struct _reent *ptr, _CONST wchar_t *fmt, va_list ap)
 {
-  FILE f;
-
-  f._flags = __SRD | __SSTR;
-  f._bf._base = f._p = (unsigned char *) str;
-  f._bf._size = f._r = strlen (str);
-  f._read = __seofread;
-  f._ub._base = NULL;
-  f._lb._base = NULL;
-  f._file = -1;  /* No file. */
-  return __ssvfiscanf_r (ptr, &f, fmt, ap);
+  _REENT_SMALL_CHECK_INIT (ptr);
+  return __svfwscanf_r (ptr, _stdin_r (ptr), fmt, ap);
 }
+

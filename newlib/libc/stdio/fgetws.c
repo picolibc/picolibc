@@ -108,7 +108,7 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
   wsp = ws;
   do
     {
-      src = fp->_p;
+      src = (char *) fp->_p;
       nl = memchr (fp->_p, '\n', fp->_r);
       nconv = _mbsrtowcs_r (ptr, wsp, &src,
 			    nl != NULL ? (nl - fp->_p + 1) : fp->_r,

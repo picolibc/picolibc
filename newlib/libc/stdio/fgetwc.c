@@ -129,7 +129,7 @@ _DEFUN(__fgetwc, (ptr, fp),
     }
   do
     {
-      nconv = _mbrtowc_r (ptr, &wc, fp->_p, fp->_r, &fp->_mbstate);
+      nconv = _mbrtowc_r (ptr, &wc, (char *) fp->_p, fp->_r, &fp->_mbstate);
       if (nconv == (size_t)-1)
 	break;
       else if (nconv == (size_t)-2)

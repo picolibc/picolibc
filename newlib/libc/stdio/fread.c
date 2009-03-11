@@ -179,9 +179,9 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 	  void * old_p = fp->_p;
 	  int old_size = fp->_bf._size;
 	  /* allow __refill to use user's buffer */
-	  fp->_bf._base = p;
+	  fp->_bf._base = (unsigned char *) p;
 	  fp->_bf._size = resid;
-	  fp->_p = p;
+	  fp->_p = (unsigned char *) p;
 	  rc = __srefill_r (ptr, fp);
 	  /* restore fp buffering back to original state */
 	  fp->_bf._base = old_base;

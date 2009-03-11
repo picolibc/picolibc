@@ -61,6 +61,17 @@ _DEFUN(__sread, (ptr, cookie, buf, n),
   return ret;
 }
 
+/* Dummy function used in sscanf/swscanf. */
+_READ_WRITE_RETURN_TYPE
+_DEFUN(__seofread, (ptr, cookie, buf, len),
+       struct _reent *_ptr _AND
+       _PTR cookie _AND
+       char *buf   _AND
+       int len)
+{
+  return 0;
+}
+
 _READ_WRITE_RETURN_TYPE
 _DEFUN(__swrite, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
