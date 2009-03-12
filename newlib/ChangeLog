@@ -1,4 +1,8 @@
-2009-03-09  Craig Howland <howland@LGSInnovations.com>
+2009-03-12  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/stdio/swscanf.c:  Some documentation corrections.
+
+2009-03-12  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/stdio/swprintf.c (_swprintf_r, swprintf):
 	correct how terminating L'\0' is added;

@@ -229,7 +229,9 @@ DESCRIPTION
 		enough to accept the sequence and a
 		terminating null character which will be added
 		automatically.  (<[pattern]> is discussed in the paragraph following
-		this table). Corresponding <[arg]>: <<(char *arg)>>.
+		this table).  Corresponding <[arg]>: <<(char *arg)>>.
+		If an <<l>> specifier is present, the corresponding <[arg]> is
+		a <<(wchar_t *arg)>>.
 
 		o d
 		Reads a decimal integer into the corresponding <[arg]>: <<(int *arg)>>.
@@ -280,7 +282,7 @@ DESCRIPTION
 	Here are some <[pattern]> examples:
 		o+
 		o %[abcd]
-		matches wide wide character strings containing only
+		matches wide character strings containing only
 		<<a>>, <<b>>, <<c>>, and <<d>>.
 
 		o %[^abcd]
@@ -290,6 +292,7 @@ DESCRIPTION
 		o %[A-DW-Z]
 		Note: No wide character ranges, so this expression matches wide
 		character strings containing <<A>>, <<->>, <<D>>, <<W>>, <<Z>>.
+		o-
 
 	Floating point numbers (for field types <<e>>, <<f>>, <<g>>, <<E>>,
 	<<F>>, <<G>>) must correspond to the following general form:
