@@ -139,6 +139,17 @@ public:
     void rewind () { memset (found, 0, sizeof found); }
 };
 
+inline bool
+path_conv::isgood_inode (__ino64_t ino) const
+{
+  /* We can't trust remote inode numbers of only 32 bit.  That means,
+     all remote inode numbers when running under NT4, as well as remote NT4
+     NTFS, as well as shares of Samba version < 3.0.
+     The known exception are SFU NFS shares, which return the valid 32 bit
+     inode number from the remote file system unchanged. */
+  return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
+}
+
 static inline bool
 is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
 {
@@ -165,13 +176,14 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
 }
 
 static inline __ino64_t
-get_ino_by_handle (HANDLE hdl)
+get_ino_by_handle (path_conv &pc, HANDLE hdl)
 {
   IO_STATUS_BLOCK io;
   FILE_INTERNAL_INFORMATION fai;
 
   if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
-					  FileInternalInformation)))
+					  FileInternalInformation))
+      && pc.isgood_inode (fai.FileId.QuadPart))
     return fai.FileId.QuadPart;
   return 0;
 }
@@ -252,17 +264,6 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   NtClose (fh);
   delete dir;
   return count;
-}
-
-inline bool
-path_conv::isgood_inode (__ino64_t ino) const
-{
-  /* We can't trust remote inode numbers of only 32 bit.  That means,
-     all remote inode numbers when running under NT4, as well as remote NT4
-     NTFS, as well as shares of Samba version < 3.0.
-     The known exception are SFU NFS shares, which return the valid 32 bit
-     inode number from the remote file system unchanged. */
-  return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
 /* For files on NFS shares, we request an EA of type NfsV3Attributes.
@@ -1331,8 +1332,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-    if (pc.hasgood_inode ())
-      ino = get_ino_by_handle (get_handle ());
+    ino = get_ino_by_handle (pc, get_handle ());
     /* A unique ID is necessary to recognize fhandler entries which are
        duplicated by dup(2) or fork(2). */
     AllocateLocallyUniqueId ((PLUID) &unique_id);
@@ -1658,7 +1658,9 @@ readdir_get_ino (const char *path, bool dot_dot)
 				   | (pc.is_rep_symlink ()
 				      ? FILE_OPEN_REPARSE_POINT : 0))))
     {
-      ino = get_ino_by_handle (hdl);
+      ino = get_ino_by_handle (pc, hdl);
+      if (!ino)
+	ino = hash_path_name (0, pc.get_nt_native_path ());
       NtClose (hdl);
     }
   return ino;
@@ -1710,7 +1712,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 				      FILE_SHARE_VALID_FLAGS,
 				      FILE_OPEN_FOR_BACKUP_INTENT))))
 	{
-	  de->d_ino = get_ino_by_handle (reph);
+	  de->d_ino = get_ino_by_handle (pc, reph);
 	  NtClose (reph);
 	}
     }
@@ -1891,13 +1893,13 @@ go_ahead:
 
 	  if (dir->__d_position == 0 && FileNameLength == 2
 	      && FileName[0] == '.')
-	    de->d_ino = get_ino_by_handle (get_handle ());
+	    de->d_ino = get_ino_by_handle (pc, get_handle ());
 	  else if (dir->__d_position == 1 && FileNameLength == 4
 		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    if (!(dir->__flags & dirent_isroot))
 	      de->d_ino = readdir_get_ino (get_name (), true);
 	    else
-	      de->d_ino = get_ino_by_handle (get_handle ());
+	      de->d_ino = get_ino_by_handle (pc, get_handle ());
 	  else
 	    {
 	      HANDLE hdl;
@@ -1907,18 +1909,16 @@ go_ahead:
 					  get_handle (), NULL);
 	      if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
 					  FILE_SHARE_VALID_FLAGS,
-					  FILE_OPEN_FOR_BACKUP_INTENT)))
+					  FILE_OPEN_FOR_BACKUP_INTENT
+					  | FILE_OPEN_REPARSE_POINT)))
 		{
-		  de->d_ino = get_ino_by_handle (hdl);
+		  de->d_ino = get_ino_by_handle (pc, hdl);
 		  NtClose (hdl);
 		}
 	    }
-	  /* Enforce namehash as inode number on untrusted file systems. */
-	  if (!pc.isgood_inode (de->d_ino))
-	    {
-	      dir->__flags &= ~dirent_set_d_ino;
-	      de->d_ino = 0;
-	    }
+	  /* Untrusted file system.  Don't try to fetch inode number again. */
+	  if (de->d_ino == 0)
+	    dir->__flags &= ~dirent_set_d_ino;
 	}
     }
 
@@ -1928,8 +1928,7 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
-      if (pc.isgood_inode (de->d_ino))
-	de->d_ino = get_ino_by_handle (get_handle ());
+      de->d_ino = get_ino_by_handle (pc, get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;
@@ -1940,7 +1939,7 @@ go_ahead:
       if (!(dir->__flags & dirent_isroot))
 	de->d_ino = readdir_get_ino (get_name (), true);
       else
-	de->d_ino = get_ino_by_handle (get_handle ());
+	de->d_ino = get_ino_by_handle (pc, get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;

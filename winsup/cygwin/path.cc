@@ -2191,7 +2191,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  attr.Attributes = ci_flag;
+	  attr.Attributes = 0;
 	  if (NT_SUCCESS (status))
 	    {
 	      fs.update (&upath, h);
@@ -2265,6 +2265,9 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 						 &fdi_buf, sizeof fdi_buf,
 						 FileDirectoryInformation,
 						 TRUE, &basename, TRUE);
+		  /* Take the opportunity to check file system while we're
+		     having the handle to the parent dir. */
+		  fs.update (&upath, h);
 		  NtClose (dir);
 		  if (!NT_SUCCESS (status))
 		    {

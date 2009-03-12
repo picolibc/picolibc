@@ -1,5 +1,19 @@
 2009-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (path_conv::isgood_inode): Move to be defined
+	earlier.
+	(get_ino_by_handle): Take additional path_conv argument, accommodate
+	throughout.  Only use FileId if isgood_inode check is true.
+	(fhandler_base::open_fs): Simplify setting ino due to above change.
+	(readdir_get_ino): Make sure to return always a non-zero inode number.
+	(fhandler_disk_file::readdir): Always open file in dir with
+	FILE_OPEN_REPARSE_POINT so as not to open wrong file.
+	Drop call to isgood_inode here.
+	* path.cc (symlink_info::check): Call fs.update in case we're fetching
+	file information from call to NtQueryDirectoryFile.
+
+2009-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (fhandler_disk_file::lock): Don't test file open mode in
 	case of flock-type locks.  Explain why.
 
