@@ -652,14 +652,19 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 	a_op = F_UNLCK;
 	break;
       case F_RDLCK:
-	if (!(get_access () & GENERIC_READ))
+	/* flock semantics don't specify a requirement that the file has
+	   been opened with a specific open mode, in contrast to POSIX locks
+	   which require that a file is opened for reading to place a read
+	   lock and opened for writing to place a write lock. */
+	if ((a_flags & F_POSIX) && !(get_access () & GENERIC_READ))
 	  {
 	    set_errno (EBADF);
 	    return -1;
 	  }
 	break;
       case F_WRLCK:
-	if (!(get_access () & GENERIC_WRITE))
+	/* See above comment. */
+	if ((a_flags & F_POSIX) && !(get_access () & GENERIC_WRITE))
 	  {
 	    set_errno (EBADF);
 	    return -1;

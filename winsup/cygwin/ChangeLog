@@ -1,3 +1,8 @@
+2009-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (fhandler_disk_file::lock): Don't test file open mode in
+	case of flock-type locks.  Explain why.
+
 2009-03-12  Brian Ford <Brian.Ford@FlightSafety.com>
 
 	* gethostby_helper: Fix typos in DEBUGGING case.
