@@ -20,17 +20,21 @@ ANSI_SYNOPSIS
 			const wchar_t *<[format]>, const struct tm *<[timp]>);
 
 DESCRIPTION
-<<strftime>> is equivalent to <<strftime>>, except that:
+<<wcsftime>> is equivalent to <<strftime>>, except that:
  
-The argument s points to the initial element of an array of wide characters
+O+
+o The argument s points to the initial element of an array of wide characters
 into which the generated output is to be placed.
  
-The argument maxsize indicates the limiting number of wide characters.
+o The argument maxsize indicates the limiting number of wide characters.
  
-The argument format is a wide-character string and the conversion specifiers
+o The argument format is a wide-character string and the conversion specifiers
 are replaced by corresponding sequences of wide characters.
  
-The return value indicates the number of wide characters.
+o The return value indicates the number of wide characters.
+O-
+(The difference in all of the above being wide characters versus regular
+characters.)
  
 See <<strftime>> for the details of the format specifiers.
 
@@ -52,10 +56,10 @@ value beforehand to distinguish between failure and an empty string.
 This implementation does not support <<s>> being NULL, nor overlapping
 <<s>> and <<format>>.
 
+<<wcsftime>> requires no supporting OS subroutines.
+
 SEEALSO
 <<strftime>>
-
-<<wcsftime>> requires no supporting OS subroutines.
 */
 
 #include <time.h>
