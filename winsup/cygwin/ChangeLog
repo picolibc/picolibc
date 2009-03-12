@@ -1,3 +1,7 @@
+2009-03-12  Brian Ford <Brian.Ford@FlightSafety.com>
+
+	* gethostby_helper: Fix typos in DEBUGGING case.
+
 2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export wcscasecmp, wcsncasecmp.

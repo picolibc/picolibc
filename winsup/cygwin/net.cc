@@ -1057,7 +1057,7 @@ gethostby_helper (const char *name, const int af, const int type,
 	  complen = dn_expand (msg, eomsg, curptr->name (), string_ptr, string_size);
 #ifdef DEBUGGING
 	  if (complen != curptr->complen)  
-	    go to debugging;
+	    goto debugging;
 #endif
 	  ret->h_aliases[alias_count++] = string_ptr;
 	  namelen1 = curptr->namelen1;
@@ -1072,7 +1072,7 @@ gethostby_helper (const char *name, const int af, const int type,
 		  complen = dn_expand (msg, eomsg, curptr->name(), string_ptr, string_size);
 #ifdef DEBUGGING
 		  if (complen != curptr->complen)  
-		    go to debugging;
+		    goto debugging;
 #endif
 		  ret->h_name = string_ptr;
 		  namelen1 = curptr->namelen1;
@@ -1090,12 +1090,12 @@ gethostby_helper (const char *name, const int af, const int type,
 	    }
 #ifdef DEBUGGING
       /* Should not get here */
-      go to debugging;
+      goto debugging;
 #endif
     }
 #ifdef DEBUGGING
   if (string_size < 0)  
-    go to debugging;
+    goto debugging;
 #endif      
   
   free (msg);
