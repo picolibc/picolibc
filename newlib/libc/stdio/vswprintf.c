@@ -27,6 +27,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <limits.h>
 #include <stdarg.h>
 #include <errno.h>
+
 #include "local.h"
 
 int
@@ -42,7 +43,7 @@ _DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      ptr->_errno = EOVERFLOW;
+      ptr->_errno = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -50,10 +51,19 @@ _DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),
   f._bf._size = f._w = (size > 0 ? (size - 1) * sizeof (wchar_t) : 0);
   f._file = -1;  /* No file. */
   ret = _svfwprintf_r (ptr, &f, fmt, ap);
-  if (ret < EOF)
-    ptr->_errno = EOVERFLOW;
-  if (size > 0)
-    *f._p = 0;
+  /* _svfwprintf_r() does not put in a terminating NUL, so add one if
+   * appropriate, which is whenever size is > 0.  _svfwprintf_r() stops
+   * after n-1, so always just put at the end.  */
+  if (size > 0)  {
+    *(wchar_t *)f._p = L'\0';	/* terminate the string */
+  }
+  if(ret >= size)  {
+    /* _svfwprintf_r() returns how many wide characters it would have printed
+     * if there were enough space.  Return an error if too big to fit in str,
+     * unlike snprintf, which returns the size needed.  */
+    ptr->_errno = EOVERFLOW;	/* POSIX extension */
+    ret = -1;
+  }
   return ret;
 }
 

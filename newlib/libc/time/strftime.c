@@ -251,6 +251,10 @@ This implementation does not support <<s>> being NULL, nor overlapping
 <<s>> and <<format>>.
 
 <<strftime>> requires no supporting OS subroutines.
+
+BUGS
+<<strftime>> ignores the LC_TIME category of the current locale, hard-coding
+the "C" locale settings.
 */
 
 #include <stddef.h>
@@ -356,7 +360,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	_CONST struct tm *tim_p)
 {
   size_t count = 0;
-  int i;
+  int i, len;
 
   for (;;)
     {
@@ -455,28 +459,27 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    int century = tim_p->tm_year >= 0
 	      ? tim_p->tm_year / 100 + YEAR_BASE / 100
 	      : abs (tim_p->tm_year + YEAR_BASE) / 100;
-            count += snprintf (&s[count], maxsize - count, CQ("%s%.*d"),
+            len = snprintf (&s[count], maxsize - count, CQ("%s%.*d"),
                                neg ? CQ("-") : CQ(""), 2 - neg, century);
-            if (count >= maxsize)
-              return 0;
+            if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
 	  break;
 	case CQ('d'):
 	case CQ('e'):
-	  count += snprintf (&s[count], maxsize - count,
+	  len = snprintf (&s[count], maxsize - count,
 			*format == CQ('d') ? CQ("%.2d") : CQ("%2d"),
 			tim_p->tm_mday);
-	  if (count >= maxsize)  return 0;
+	  if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('D'):
 	case CQ('x'):
 	  /* %m/%d/%y */
-	  count += snprintf (&s[count], maxsize - count,
+	  len = snprintf (&s[count], maxsize - count,
 			CQ("%.2d/%.2d/%.2d"),
 			tim_p->tm_mon + 1, tim_p->tm_mday,
 			tim_p->tm_year >= 0 ? tim_p->tm_year % 100
 			: abs (tim_p->tm_year + YEAR_BASE) % 100);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('F'):
 	  { /* %F is equivalent to "%Y-%m-%d" */
@@ -500,9 +503,9 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 		adjust = 1;
 	    else if (adjust > 0 && tim_p->tm_year < -YEAR_BASE)
 		adjust = -1;
-	    count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 		       ((year + adjust) % 100 + 100) % 100);
-            if (count >= maxsize)  return 0;
+            if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
           break;
 	case CQ('G'):
@@ -532,18 +535,18 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 		year = 0;
 		++century;
 	      }
-            count += snprintf (&s[count], maxsize - count, CQ("%s%.*d%.2d"),
+            len = snprintf (&s[count], maxsize - count, CQ("%s%.*d%.2d"),
                                neg ? CQ("-") : CQ(""), 2 - neg, century, year);
-            if (count >= maxsize)
+            if (len < 0  ||  (count+=len) >= maxsize)
               return 0;
 	  }
           break;
 	case CQ('H'):
 	case CQ('k'):	/* newlib extension */
-	  count += snprintf (&s[count], maxsize - count,
+	  len = snprintf (&s[count], maxsize - count,
 			*format == CQ('k') ? CQ("%2d") : CQ("%.2d"),
 			tim_p->tm_hour);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('I'):
 	case CQ('l'):	/* newlib extension */
@@ -551,26 +554,26 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    register int  h12;
 	    h12 = (tim_p->tm_hour == 0 || tim_p->tm_hour == 12)  ?
 						12  :  tim_p->tm_hour % 12;
-	    count += snprintf (&s[count], maxsize - count,
+	    len = snprintf (&s[count], maxsize - count,
 			*format == CQ('I') ? CQ("%.2d") : CQ("%2d"),
 			h12);
-	    if (count >= maxsize)  return 0;
+	    if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
 	  break;
 	case CQ('j'):
-	  count += snprintf (&s[count], maxsize - count, CQ("%.3d"),
+	  len = snprintf (&s[count], maxsize - count, CQ("%.3d"),
 			tim_p->tm_yday + 1);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('m'):
-	  count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	  len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			tim_p->tm_mon + 1);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('M'):
-	  count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	  len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			tim_p->tm_min);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('n'):
 	  if (count < maxsize - 1)
@@ -598,24 +601,24 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    register int  h12;
 	    h12 = (tim_p->tm_hour == 0 || tim_p->tm_hour == 12)  ?
 						12  :  tim_p->tm_hour % 12;
-	    count += snprintf (&s[count], maxsize - count,
+	    len = snprintf (&s[count], maxsize - count,
 			CQ("%.2d:%.2d:%.2d %cM"),
 			h12, 
 			tim_p->tm_min,
 			tim_p->tm_sec,
 			(tim_p->tm_hour < 12)  ?  CQ('A') :  CQ('P'));
-	    if (count >= maxsize)  return 0;
+	    if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
 	  break;
 	case CQ('R'):
-          count += snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
+          len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
 			tim_p->tm_hour, tim_p->tm_min);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
           break;
 	case CQ('S'):
-	  count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	  len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			tim_p->tm_sec);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('t'):
 	  if (count < maxsize - 1)
@@ -625,9 +628,9 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	  break;
 	case CQ('T'):
 	case CQ('X'):
-          count += snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
+          len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
 			tim_p->tm_hour, tim_p->tm_min, tim_p->tm_sec);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
           break;
 	case CQ('u'):
           if (count < maxsize - 1)
@@ -641,10 +644,10 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
             return 0;
           break;
 	case CQ('U'):
-	  count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	  len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 		       (tim_p->tm_yday + 7 -
 			tim_p->tm_wday) / 7);
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('V'):
 	  {
@@ -662,8 +665,8 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 					     + (YEAR_BASE - 1
 						- (tim_p->tm_year < 0
 						   ? 0 : 2000)))));
-	    count += snprintf (&s[count], maxsize - count, CQ("%.2d"), week);
-            if (count >= maxsize)  return 0;
+	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"), week);
+            if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
           break;
 	case CQ('w'):
@@ -675,9 +678,9 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	case CQ('W'):
 	  {
 	    int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
-	    count += snprintf (&s[count], maxsize - count, CQ("%.2d"),
+	    len = snprintf (&s[count], maxsize - count, CQ("%.2d"),
 			(tim_p->tm_yday + 7 - wday) / 7);
-            if (count >= maxsize)  return 0;
+            if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  }
 	  break;
 	case CQ('y'):
@@ -686,8 +689,8 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 		 the asymmetric range of years.  */
 	      int year = tim_p->tm_year >= 0 ? tim_p->tm_year % 100
 		: abs (tim_p->tm_year + YEAR_BASE) % 100;
-	      count += snprintf (&s[count], maxsize - count, CQ("%.2d"), year);
-              if (count >= maxsize)  return 0;
+	      len = snprintf (&s[count], maxsize - count, CQ("%.2d"), year);
+              if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	    }
 	  break;
 	case CQ('Y'):
@@ -695,17 +698,17 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	   * gives at least 4 digits, with leading zeros as needed.  */
 	  if(tim_p->tm_year <= INT_MAX-YEAR_BASE)  {
 	    /* For normal, non-overflow case.  */
-	    count += snprintf (&s[count], maxsize - count, CQ("%04d"),
+	    len = snprintf (&s[count], maxsize - count, CQ("%04d"),
 				tim_p->tm_year + YEAR_BASE);
 	  }
 	  else  {
 	    /* int would overflow, so use unsigned instead.  */
 	    register unsigned year;
 	    year = (unsigned) tim_p->tm_year + (unsigned) YEAR_BASE;
-	    count += snprintf (&s[count], maxsize - count, CQ("%04u"),
+	    len = snprintf (&s[count], maxsize - count, CQ("%04u"),
 				tim_p->tm_year + YEAR_BASE);
 	  }
-          if (count >= maxsize)  return 0;
+          if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('z'):
           if (tim_p->tm_isdst >= 0)
@@ -718,10 +721,10 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	         but have to use __tzrule for daylight savings.  */
 	      offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 	      TZ_UNLOCK;
-	      count += snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
+	      len = snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
 			offset / SECSPERHOUR,
 			labs (offset / SECSPERMIN) % 60L);
-              if (count >= maxsize)  return 0;
+              if (len < 0  ||  (count+=len) >= maxsize)  return 0;
             }
           break;
 	case CQ('Z'):
@@ -803,7 +806,7 @@ const struct test  Vec0[] = {
 	/* Testing fields one at a time, expecting to pass, using exact
 	 * allowed length as what is needed.  */
 	/* Using tm0 for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%a"), 3+1, EXP(CQ("Tue")) },
 	{ CQ("%A"), 7+1, EXP(CQ("Tuesday")) },
 	{ CQ("%b"), 3+1, EXP(CQ("Dec")) },
@@ -862,8 +865,8 @@ const struct tm  tm1 = {
 const struct test  Vec1[] = {
 	/* Testing fields one at a time, expecting to pass, using exact
 	 * allowed length as what is needed.  */
-	/* Using tm0 for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	/* Using tm1 for time: */
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%a"), 3+1, EXP(CQ("Wed")) },
 	{ CQ("%A"), 9+1, EXP(CQ("Wednesday")) },
 	{ CQ("%b"), 3+1, EXP(CQ("Jul")) },
@@ -904,10 +907,11 @@ const struct test  Vec1[] = {
 	{ CQ("%Z"), 3+1, EXP(CQ("EDT")) },
 	{ CQ("%%"), 1+1, EXP(CQ("%")) },
 	#undef EXP
-	#define VEC(s)	s, sizeof(s), sizeof(s)-1, s
-	#define EXP(s)	sizeof(s), sizeof(s)-1, s
+	#define VEC(s)	s, sizeof(s)/sizeof(CHAR), sizeof(s)/sizeof(CHAR)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR), sizeof(s)/sizeof(CHAR)-1, s
 	{ VEC(CQ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")) },
 	{ CQ("0123456789%%%h:`~"), EXP(CQ("0123456789%Jul:`~")) },
+	{ CQ("%R%h:`~ %x %w"), EXP(CQ("23:01Jul:`~ 07/02/08 3")) },
 	#undef VEC
 	#undef EXP
 	};
@@ -949,7 +953,7 @@ const struct test  Vecyr0[] = {
 	/* Testing fields one at a time, expecting to pass, using a larger
 	 * allowed length than what is needed.  */
 	/* Using tmyr0 for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%C"), OUTSIZE, EXP(CENT) },
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:13 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
@@ -995,7 +999,7 @@ const struct test  Vecyr1[] = {
 	/* Testing fields one at a time, expecting to pass, using a larger
 	 * allowed length than what is needed.  */
 	/* Using tmyr1 for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%C"), OUTSIZE, EXP(CENT) },
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:13 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
@@ -1032,7 +1036,7 @@ const struct test  Vecyrzp[] = {
 	/* Testing fields one at a time, expecting to pass, using a larger
 	 * allowed length than what is needed.  */
 	/* Using tmyrzp for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%C"), OUTSIZE, EXP(CENT) },
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:60 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },
@@ -1067,7 +1071,7 @@ const struct test  Vecyrzn[] = {
 	/* Testing fields one at a time, expecting to pass, using a larger
 	 * allowed length than what is needed.  */
 	/* Using tmyrzn for time: */
-	#define EXP(s)	sizeof(s)-1, s
+	#define EXP(s)	sizeof(s)/sizeof(CHAR)-1, s
 	{ CQ("%C"), OUTSIZE, EXP(CENT) },
 	{ CQ("%c"), OUTSIZE, EXP(CQ("Wed Jul  2 23:01:00 ")YEAR) },
 	{ CQ("%D"), OUTSIZE, EXP(CQ("07/02/")Year) },

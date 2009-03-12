@@ -134,6 +134,8 @@ DESCRIPTION
         arguments must be requested somewhere within <[format]>.  If
         positional parameters are used, then all conversion
         specifications except for <<%%>> must specify a position.
+	This positional parameters method is a POSIX extension to the C
+	standard definition for the functions.
 
 	o <[flags]>
 
@@ -147,12 +149,13 @@ DESCRIPTION
 
 		o+
 		o '
-			Since newlib only supports the C locale, this
-			flag has no effect in this implementation.
-			But in other locales, when <[type]> is <<i>>,
-			<<d>>, <<u>>, <<f>>, <<F>>, <<g>>, or <<G>>,
-			the locale-dependent thousand's separator is
-			inserted prior to zero padding.
+			A POSIX extension to the C standard.  However, this
+			implementation presently treats it as a no-op, which
+			is the default behavior for the C locale, anyway.  (If
+			it did what it is supposed to, when <[type]> were <<i>>,
+			<<d>>, <<u>>, <<f>>, <<F>>, <<g>>, or <<G>>, the
+			integer portion of the conversion would be formatted
+			with thousands' grouping wide characters.)
 
 		o -
 			The result of the conversion is left
@@ -180,7 +183,7 @@ DESCRIPTION
 	        o 0
 			If the <[type]> character is <<d>>, <<i>>,
 			<<o>>, <<u>>, <<x>>, <<X>>, <<a>>, <<A>>,
-			<<e>>, <<E>>, <<f>>, <<g>>, or <<G>>: leading
+			<<e>>, <<E>>, <<f>>, <<F>>, <<g>>, or <<G>>:  leading
 			zeros are used to pad the field width
 			(following any indication of sign or base); no
 			spaces are used for padding.  If the zero
@@ -353,11 +356,10 @@ DESCRIPTION
 
 		o z
 			With <<d>>, <<i>>, <<o>>, <<u>>, <<x>>, or
-			<<X>>, specifies that the argument is a
-			<<ssize_t>> or <<size_t>>.
+			<<X>>, specifies that the argument is a <<size_t>>.
 
 			With <<n>>, specifies that the argument is a
-			pointer to a <<ssize_t>>.
+			pointer to a <<size_t>>.
 
 		o t
 			With <<d>>, <<i>>, <<o>>, <<u>>, <<x>>, or
@@ -389,7 +391,7 @@ DESCRIPTION
 			character is printed.
 
 		o C
-			Short for <<%lc>>.
+			Short for <<%lc>>.  A POSIX extension to the C standard.
 
 		o s
 			Prints the elements of a pointer to <<char>>
@@ -400,13 +402,13 @@ DESCRIPTION
 			multibyte characters before printing.
 
 		o S
-			Short for <<%ls>>.
+			Short for <<%ls>>.  A POSIX extension to the C standard.
 
 		o d or i
 			Prints a signed decimal integer; takes an
 			<<int>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o D
 			Newlib extension, short for <<%ld>>.
@@ -414,8 +416,8 @@ DESCRIPTION
 		o o
 			Prints an unsigned octal integer; takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o O
 			Newlib extension, short for <<%lo>>.
@@ -423,8 +425,8 @@ DESCRIPTION
 		o u
 			Prints an unsigned decimal integer; takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o U
 			Newlib extension, short for <<%lu>>.
@@ -433,8 +435,8 @@ DESCRIPTION
 			Prints an unsigned hexadecimal integer (using
 			<<abcdef>> as digits beyond <<9>>); takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o X
 			Like <<x>>, but uses <<ABCDEF>> as digits
@@ -540,6 +542,9 @@ If an error occurs, the result of <<printf>>, <<fprintf>>,
 to ENOMEM if allocation fails, and for <<snprintf>>, <<errno>> may be
 set to EOVERFLOW if <[size]> or the output length exceeds INT_MAX.
 
+BUGS
+The ``''' (quote) flag does not work when locale's thousands_sep is not empty.
+
 PORTABILITY
 ANSI C requires <<printf>>, <<fprintf>>, <<sprintf>>, and
 <<snprintf>>.  <<asprintf>> and <<asnprintf>> are newlib extensions.
@@ -595,7 +600,7 @@ _sprintf_r(ptr, str, fmt, va_alist)
 #endif
   ret = _svfprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
+  *f._p = '\0';	/* terminate the string */
   return (ret);
 }
 
@@ -628,7 +633,7 @@ sprintf(str, fmt, va_alist)
 #endif
   ret = _svfprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
-  *f._p = 0;
+  *f._p = '\0';	/* terminate the string */
   return (ret);
 }
 

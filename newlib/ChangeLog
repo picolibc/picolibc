@@ -1,3 +1,19 @@
+2009-03-09  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/stdio/swprintf.c (_swprintf_r, swprintf):
+	correct how terminating L'\0' is added;
+	change return to match standard for when output does not fit;
+	some corrections and enhancements to the docs.
+	* libc/stdio/vswprintf.c (_vswprintf_r):  ditto, except for docs.
+	* libc/stdio/vfwprintf.c:  some corrections to the docs and some
+	enhancements to comments.  (No code changes.)
+	* libc/time/strftime.c:  Correct some problems that made wcsftime()
+	not work correctly:  work properly with swprintf returns that are
+	different from snprintf returns, correct test vector lengths for
+	when sizeof(wchar_t) > 1.
+	* libc/stdio/sprintf.c:  Some documentation and comment corrections and
+	enhancements to match those done to swprintf.c.
+
 2009-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (wcscasecmp, wcsncasecmp): Declare.

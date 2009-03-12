@@ -33,25 +33,27 @@ INDEX
 	_swprintf_r
 
 ANSI_SYNOPSIS
-        #include <stdio.h>
+        #include <wchar.h>
 
         int wprintf(const wchar_t *<[format]>, ...);
         int fwprintf(FILE *<[fd]>, const wchar_t *<[format]>, ...);
-        int swprintf(wchar_t *<[str]>, const wchar_t *<[format]>, ...);
+        int swprintf(wchar_t *<[str]>, size_t <[size]>,
+			const wchar_t *<[format]>, ...);
 
         int _wprintf_r(struct _reent *<[ptr]>, const wchar_t *<[format]>, ...);
         int _fwprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
-                       const wchar_t *<[format]>, ...);
+			const wchar_t *<[format]>, ...);
         int _swprintf_r(struct _reent *<[ptr]>, wchar_t *<[str]>,
-                       const wchar_t *<[format]>, ...);
+			size_t <[size]>, const wchar_t *<[format]>, ...);
 
 DESCRIPTION
         <<wprintf>> accepts a series of arguments, applies to each a
         format specifier from <<*<[format]>>>, and writes the
         formatted data to <<stdout>>, without a terminating NUL
         wide character.  The behavior of <<wprintf>> is undefined if there
-        are not enough arguments for the format.  <<wprintf>> returns
-        when it reaches the end of the format string.  If there are
+        are not enough arguments for the format or if any argument is not the
+	right type for the corresponding conversion specifier.  <<wprintf>>
+	returns when it reaches the end of the format string.  If there are
         more arguments than the format requires, excess arguments are
         ignored.
 
@@ -59,10 +61,14 @@ DESCRIPTION
         to the stream <[fd]> rather than <<stdout>>.
 
         <<swprintf>> is like <<wprintf>>, except that output is directed
-        to the buffer <[str]>, and the resulting string length is limited
-	to at most <[size]> wide characters, including the terminating
-	<<NUL>>.  As a special case, if <[size]> is 0, <[str]> can be NULL,
-	and <<swprintf>> merely calculates how many bytes would be printed.
+        to the buffer <[str]> with a terminating wide <<NUL>>, and the
+	resulting string length is limited to at most <[size]> wide characters,
+	including the terminating <<NUL>>.  It is considered an error if the
+	output (including the terminating wide-<<NULL>>) does not fit into
+	<[size]> wide characters.  (This error behavior is not the same as for
+	<<snprintf>>, which <<swprintf>> is otherwise completely analogous to.
+	While <<snprintf>> allows the needed size to be known simply by giving
+	<[size]>=0, <<swprintf>> does not, giving an error instead.)
 
         For <<swprintf>> the behavior is undefined if the output
 	<<*<[str]>>> overlaps with one of the arguments.  Behavior is also
@@ -95,6 +101,8 @@ DESCRIPTION
         arguments must be requested somewhere within <[format]>.  If
         positional parameters are used, then all conversion
         specifications except for <<%%>> must specify a position.
+	This positional parameters method is a POSIX extension to the C
+	standard definition for the functions.
 
 	o <[flags]>
 
@@ -108,12 +116,13 @@ DESCRIPTION
 
 		o+
 		o '
-			Since newlib only supports the C locale, this
-			flag has no effect in this implementation.
-			But in other locales, when <[type]> is <<i>>,
-			<<d>>, <<u>>, <<f>>, <<F>>, <<g>>, or <<G>>,
-			the locale-dependent thousand's separator is
-			inserted prior to zero padding.
+			A POSIX extension to the C standard.  However, this
+			implementation presently treats it as a no-op, which
+			is the default behavior for the C locale, anyway.  (If
+			it did what it is supposed to, when <[type]> were <<i>>,
+			<<d>>, <<u>>, <<f>>, <<F>>, <<g>>, or <<G>>, the
+			integer portion of the conversion would be formatted
+			with thousands' grouping wide characters.)
 
 		o -
 			The result of the conversion is left
@@ -141,7 +150,7 @@ DESCRIPTION
 	        o 0
 			If the <[type]> character is <<d>>, <<i>>,
 			<<o>>, <<u>>, <<x>>, <<X>>, <<a>>, <<A>>,
-			<<e>>, <<E>>, <<f>>, <<g>>, or <<G>>: leading
+			<<e>>, <<E>>, <<f>>, <<F>>, <<g>>, or <<G>>:  leading
 			zeros are used to pad the field width
 			(following any indication of sign or base); no
 			spaces are used for padding.  If the zero
@@ -314,11 +323,10 @@ DESCRIPTION
 
 		o z
 			With <<d>>, <<i>>, <<o>>, <<u>>, <<x>>, or
-			<<X>>, specifies that the argument is a
-			<<ssize_t>> or <<size_t>>.
+			<<X>>, specifies that the argument is a <<size_t>>.
 
 			With <<n>>, specifies that the argument is a
-			pointer to a <<ssize_t>>.
+			pointer to a <<size_t>>.
 
 		o t
 			With <<d>>, <<i>>, <<o>>, <<u>>, <<x>>, or
@@ -352,7 +360,7 @@ DESCRIPTION
 			shall be converted to wchar_t, and written.
 
 		o C
-			Short for <<%lc>>.
+			Short for <<%lc>>.  A POSIX extension to the C standard.
 
 		o s
 			If no <<l>> qualifier is present, the application
@@ -383,32 +391,32 @@ DESCRIPTION
 			written.
 
 		o S
-			Short for <<%ls>>.
+			Short for <<%ls>>.  A POSIX extension to the C standard.
 
 		o d or i
 			Prints a signed decimal integer; takes an
 			<<int>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o o
 			Prints an unsigned octal integer; takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o u
 			Prints an unsigned decimal integer; takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o x
 			Prints an unsigned hexadecimal integer (using
 			<<abcdef>> as digits beyond <<9>>); takes an
 			<<unsigned>>.  Leading zeros are inserted as
-			necessary to reach the precision.  A precision
-			of 0 produces an empty string.
+			necessary to reach the precision.  A value of 0 with
+			a precision of 0 produces an empty string.
 
 		o X
 			Like <<x>>, but uses <<ABCDEF>> as digits
@@ -503,12 +511,16 @@ the output string, except the concluding <<NUL>> is not counted.
 
 If an error occurs, the result of <<wprintf>>, <<fwprintf>>, and
 <<swprintf>> is a negative value.  For <<wprintf>> and <<fwprintf>>,
-<<errno>> may be set according to <<fputwc>>.  For <<snwprintf>>, <<errno>>
-may be set to EOVERFLOW if <[size]> or the output length exceeds
-INT_MAX / sizeof (wchar_t).
+<<errno>> may be set according to <<fputwc>>.  For <<swprintf>>, <<errno>>
+may be set to EOVERFLOW if <[size]> is greater than INT_MAX / sizeof (wchar_t),
+or when the output does not fit into <[size]> wide characters (including the
+terminating wide <<NULL>>).
+
+BUGS
+The ``''' (quote) flag does not work when locale's thousands_sep is not empty.
 
 PORTABILITY
-POSIX-1.2008
+POSIX-1.2008 with extensions; C99 (compliant except for POSIX extensions).
 
 Depending on how newlib was configured, not all format specifiers are
 supported.
@@ -527,6 +539,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <errno.h>
 #include "local.h"
 
+/* NOTE:  _swprintf_r() should be identical to swprintf() except for the
+ * former having ptr as a parameter and the latter needing to declare it as
+ * a variable set to _REENT.  */
+
 int
 _DEFUN(_swprintf_r, (ptr, str, size, fmt),
        struct _reent *ptr _AND
@@ -540,7 +556,7 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      ptr->_errno = EOVERFLOW;
+      ptr->_errno = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -550,10 +566,19 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
   va_start (ap, fmt);
   ret = _svfwprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
-  if (ret < EOF)
-    ptr->_errno = EOVERFLOW;
-  if (size > 0)
-    *f._p = 0;
+  /* _svfwprintf_r() does not put in a terminating NUL, so add one if
+   * appropriate, which is whenever size is > 0.  _svfwprintf_r() stops
+   * after n-1, so always just put at the end.  */
+  if (size > 0)  {
+    *(wchar_t *)f._p = L'\0';	/* terminate the string */
+  }
+  if(ret >= size)  {
+    /* _svfwprintf_r() returns how many wide characters it would have printed
+     * if there were enough space.  Return an error if too big to fit in str,
+     * unlike snprintf, which returns the size needed.  */
+    ptr->_errno = EOVERFLOW;	/* POSIX extension */
+    ret = -1;
+  }
   return (ret);
 }
 
@@ -572,7 +597,7 @@ _DEFUN(swprintf, (str, size, fmt),
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      ptr->_errno = EOVERFLOW;
+      ptr->_errno = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -582,10 +607,19 @@ _DEFUN(swprintf, (str, size, fmt),
   va_start (ap, fmt);
   ret = _svfwprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
-  if (ret < EOF)
-    ptr->_errno = EOVERFLOW;
-  if (size > 0)
-    *f._p = 0;
+  /* _svfwprintf_r() does not put in a terminating NUL, so add one if
+   * appropriate, which is whenever size is > 0.  _svfwprintf_r() stops
+   * after n-1, so always just put at the end.  */
+  if (size > 0)  {
+    *(wchar_t *)f._p = L'\0';	/* terminate the string */
+  }
+  if(ret >= size)  {
+    /* _svfwprintf_r() returns how many wide characters it would have printed
+     * if there were enough space.  Return an error if too big to fit in str,
+     * unlike snprintf, which returns the size needed.  */
+    ptr->_errno = EOVERFLOW;	/* POSIX extension */
+    ret = -1;
+  }
   return (ret);
 }
 

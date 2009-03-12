@@ -50,17 +50,18 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
+	#include <wchar.h>
 	int vwprintf(const wchar_t *<[fmt]>, va_list <[list]>);
 	int vfwprintf(FILE *<[fp]>, const wchar_t *<[fmt]>, va_list <[list]>);
-	int vswprintf(wchar_t *<[str]>, const wchar_t *<[fmt]>,
-		      va_list <[list]>);
+	int vswprintf(wchar_t *<[str]>, size_t <[size]>, const wchar_t *<[fmt]>,
+			va_list <[list]>);
 
 	int _vwprintf_r(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
-                        va_list <[list]>);
+		va_list <[list]>);
 	int _vfwprintf_r(struct _reent *<[reent]>, FILE *<[fp]>,
-			 const wchar_t *<[fmt]>, va_list <[list]>);
+		const wchar_t *<[fmt]>, va_list <[list]>);
 	int _vswprintf_r(struct _reent *<[reent]>, wchar_t *<[str]>,
-			 const wchar_t *<[fmt]>, va_list <[list]>);
+		size_t <[size]>, const wchar_t *<[fmt]>, va_list <[list]>);
 
 DESCRIPTION
 <<vwprintf>>, <<vfwprintf>> and <<vswprintf>> are (respectively) variants
@@ -76,10 +77,13 @@ RETURNS
 The return values are consistent with the corresponding functions.
 
 PORTABILITY
-POSIX-1.2008
+POSIX-1.2008 with extensions; C99 (compliant except for POSIX extensions).
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
+
+SEEALSO
+<<wprintf>>, <<fwprintf>> and <<swprintf>>.
 */
 
 /*
@@ -244,7 +248,7 @@ static int wexponent(wchar_t *, int, int);
    mantissa, this would be 29 characters).  %e, %f, and %g use
    reentrant storage shared with mprec.  All other formats that use
    buf get by with fewer characters.  Making BUF slightly bigger
-   reduces the need for malloc in %.*a and %S, when large precision or
+   reduces the need for malloc in %.*a and %ls/%S, when large precision or
    long strings are processed.  */
 #define	BUF		40
 #if defined _MB_CAPABLE && MB_LEN_MAX > BUF
@@ -396,7 +400,7 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
-	wchar_t buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
+	wchar_t buf[BUF];	/* space for %c, %ls/%S, %[diouxX], %[aA] */
 	wchar_t ox[2];		/* space for 0x hex-prefix */
 	wchar_t *malloc_buf = NULL;/* handy pointer for malloced buffers */
 
@@ -576,10 +580,7 @@ reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case L'\'':
 		  /* The ' flag is required by POSIX, but not C99.
-		     In the C locale, LC_NUMERIC requires
-		     thousands_sep to be the empty string.  And since
-		     no other locales are supported (yet), this flag
-		     is currently a no-op.  */
+		     FIXME:  this flag is currently a no-op.  */
 		  goto rflag;
 #endif
 		case L' ':
@@ -742,7 +743,7 @@ reswitch:	switch (ch) {
 #endif
 				flags |= LONGINT;
 			goto rflag;
-		case L'q': /* extension */
+		case L'q': /* GNU extension */
 			flags |= QUADINT;
 			goto rflag;
 #ifdef _WANT_IO_C99_FORMATS
@@ -783,7 +784,7 @@ reswitch:	switch (ch) {
 		       have ptrdiff_t as wide as long long.  */
 		    flags |= QUADINT;
 		  goto rflag;
-		case L'C':
+		case L'C':	/* POSIX extension */
 #endif /* _WANT_IO_C99_FORMATS */
 		case L'c':
 			cp = buf;
@@ -1001,7 +1002,7 @@ reswitch:	switch (ch) {
 			goto nosign;
 		case L's':
 #ifdef _WANT_IO_C99_FORMATS
-		case L'S':
+		case L'S':	/* POSIX extension */
 #endif
 			sign = '\0';
 			cp = GET_ARG (N, ap, wchar_ptr_t);
@@ -1640,7 +1641,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		    break;
 		  case L's':
 # ifdef _WANT_IO_C99_FORMATS
-		  case L'S':
+		  case L'S':	/* POSIX extension */
 # endif
 		  case L'p':
 		  case L'n':
@@ -1655,7 +1656,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 		      spec_type = INT;
 		    break;
 # ifdef _WANT_IO_C99_FORMATS
-		  case L'C':
+		  case L'C':	/* POSIX extension */
 		    spec_type = WIDE_CHAR;
 		    break;
 # endif
