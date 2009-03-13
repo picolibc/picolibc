@@ -9,11 +9,6 @@ See the copyright at the bottom of this file. */
 #include <fcntl.h>
 #include <unistd.h>
 
-#define link_warning(symbol, msg) \
-  asm (".stabs \"" msg "\",30,0,0,0\n\t" \
-  ".stabs \"_" #symbol "\",1,0,0,0\n");
-
-
 static int _gettemp(char *, int *, int);
 static uint32_t arc4random ();
 
@@ -32,9 +27,6 @@ mkdtemp(char *path)
 {
   return _gettemp(path, NULL, 1) ? path : NULL;
 }
-
-link_warning (mktemp, "the use of `mktemp' is dangerous, better use `mkstemp'")
-link_warning (_imp__mktemp, "the use of `mktemp' is dangerous, better use `mkstemp'")
 
 extern "C" char *
 mktemp(char *path)
@@ -158,10 +150,6 @@ arc4random ()
 * 2. Redistributions in binary form must reproduce the above copyright
 *    notice, this list of conditions and the following disclaimer in the
 *    documentation and/or other materials provided with the distribution.
-* 3. All advertising materials mentioning features or use of this software
-*    must display the following acknowledgement:
-*	This product includes software developed by the University of
-*	California, Berkeley and its contributors.
 * 4. Neither the name of the University nor the names of its contributors
 *    may be used to endorse or promote products derived from this software
 *    without specific prior written permission.

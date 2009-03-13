@@ -1,5 +1,10 @@
 2009-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mktemp.cc: Remove STABS specific link-time warning.  Align copyright
+	text to upstream.
+
+2009-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc: Fix lockf copyright to latest version.
 
 2009-03-12  Corinna Vinschen  <corinna@vinschen.de>
