@@ -1,3 +1,7 @@
+2009-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc: Fix lockf copyright to latest version.
+
 2009-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (path_conv::isgood_inode): Move to be defined
