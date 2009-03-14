@@ -185,7 +185,7 @@ struct internal_extra_pe_aouthdr
      3 - WINDOWS_CUI runs in Windows char sub. (console app)
      5 - OS2_CUI runs in OS/2 character subsystem
      7 - POSIX_CUI runs in Posix character subsystem */
-  short   DllCharacteristics;	/* flags for DLL init, use 0 */
+  unsigned short DllCharacteristics; /* flags for DLL init  */
   bfd_vma SizeOfStackReserve;	/* amount of memory to reserve  */
   bfd_vma SizeOfStackCommit;	/* amount of memory initially committed for 
 				   initial thread's stack, default is 0x1000 */

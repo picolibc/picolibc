@@ -1,3 +1,18 @@
+2009-03-14  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* coff/internal.h (struct internal_extra_pe_aouthdr):  Correct type
+	of DllCharacteristics flags field to unsigned.
+	* coff/pe.h (IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLL_CHARACTERISTICS_NX_COMPAT,
+	IMAGE_DLLCHARACTERISTICS_NO_ISOLATION,
+	IMAGE_DLLCHARACTERISTICS_NO_SEH,
+	IMAGE_DLLCHARACTERISTICS_NO_BIND,
+	IMAGE_DLLCHARACTERISTICS_WDM_DRIVER,
+	IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE):  New macros to
+	define flag bit values for DllCharacteristics field of PEAOUTHDR,
+	PEPAOUTHDR.
+
 2008-12-01  Cary Coutant  <ccoutant@google.com>
 
 	* plugin-api.h (LDPS_BAD_HANDLE): New constant.

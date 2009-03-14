@@ -38,6 +38,17 @@
 #define IMAGE_FILE_UP_SYSTEM_ONLY            0x4000
 #define IMAGE_FILE_BYTES_REVERSED_HI         0x8000
 
+/* DllCharacteristics flag bits.  The inconsistent naming may seem
+   odd, but that is how they are defined in the PE specification.  */
+#define IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE          0x0040
+#define IMAGE_DLL_CHARACTERISTICS_FORCE_INTEGRITY       0x0080
+#define IMAGE_DLL_CHARACTERISTICS_NX_COMPAT             0x0100
+#define IMAGE_DLLCHARACTERISTICS_NO_ISOLATION           0x0200
+#define IMAGE_DLLCHARACTERISTICS_NO_SEH                 0x0400
+#define IMAGE_DLLCHARACTERISTICS_NO_BIND                0x0800
+#define IMAGE_DLLCHARACTERISTICS_WDM_DRIVER             0x2000
+#define IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE  0x8000
+
 /* Additional flags to be set for section headers to allow the NT loader to
    read and write to the section data (to replace the addresses of data in
    dlls for one thing); also to execute the section in .text's case.  */
