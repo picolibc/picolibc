@@ -1,3 +1,21 @@
+2009-03-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc: Rework to detect missing DLLs.
+	(start_process): Change to expect windows filename as input.
+	(tocyg): New function - convert cygwin fn to windows fn.
+	(print_dlls_and_kill_inferior): Accept extra argument denoting whether
+	to open input and look for nonexistent DLLs.  Use tocyg to convert
+	filename and pass it to start_process.
+	(report): Flag when an DLL-not-found exception occurs and pass this
+	information to print_dlls_and_kill_inferior.
+	(filelist): New structure.
+	(saw_file): New function.
+	(dump_import_directory): Ditto.
+	(map_file): Ditto.
+	(skip_dos_stub): Ditto.
+	(get_directory_index): Ditto.
+	(process_file): Ditto.
+
 2009-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.sgml: Fix typo.
