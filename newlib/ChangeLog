@@ -1,5 +1,10 @@
 2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/stdlib.h (_mkstemp_r, _mktemp_r): Move out of
+	!_REENT_ONLY section.
+
+2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/include/stdio.h (_mkstemp_r, _mktemp_r): Move declarations
 	to stdlib.h.
 	* libc/include/stdlib.h (mktemp, _mktemp_r): Warn when using.
