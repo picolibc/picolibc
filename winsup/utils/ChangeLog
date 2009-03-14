@@ -1,5 +1,10 @@
 2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (from_fstab): Use wcstombs/mbstowcs instead of
+	WideCharToMultiByte/MultiByteToWideChar to accommodate current locale.
+
+2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* wide_path.h (class wide_path): New class to convert Windows path
 	to WCHAR win32 path, including long path conversion if necessary.
 	* cygcheck.cc: Use class wide_path throughout to call Win32 functions

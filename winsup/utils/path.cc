@@ -1,6 +1,6 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -435,8 +435,7 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
   if (!user)
     {
       /* Create a default root dir from path. */
-      WideCharToMultiByte (GetACP (), 0, path, -1, buf, BUFSIZE,
-			   NULL, NULL);
+      wcstombs (buf, path, BUFSIZE);
       unconvert_slashes (buf);
       char *native_path = buf;
       if (!strncmp (native_path, "\\\\?\\", 4))
@@ -459,8 +458,7 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
 
   PWCHAR u = wcscpy (path_end, L"\\etc\\fstab") + 10;
   if (user)
-    MultiByteToWideChar (GetACP (), 0, get_user (), -1,
-    			 wcscpy (u, L".d\\") + 3, BUFSIZE - (u - path));
+    mbstowcs (wcscpy (u, L".d\\") + 3, get_user (), BUFSIZE - (u - path));
   HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, NULL,
                           OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (h == INVALID_HANDLE_VALUE)
