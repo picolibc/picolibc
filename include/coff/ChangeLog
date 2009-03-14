@@ -1,5 +1,10 @@
 2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
 
+	* xcoff.h (XCOFF_EXPALL, XCOFF_EXPFULL): New flags.
+	(xcoff_loader_info): Add auto_export_flags.
+
+2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
 	* internal.h (C_AIX_WEAKEXT): New macro.
 	(C_WEAKEXT): Use the GNU definition in the generic part of the file,
 	and conditionally reset it to C_AIX_WEAKEXT in the XCOFF part of

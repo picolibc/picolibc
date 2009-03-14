@@ -394,6 +394,9 @@ struct xcoff_link_hash_table
   asection *special_sections[XCOFF_NUMBER_OF_SPECIAL_SECTIONS];
 };
 
+/* These flags indicate which of -bexpall and -bexpfull are in effect.  */
+#define XCOFF_EXPALL 1
+#define XCOFF_EXPFULL 2
 
 /* This structure is used to pass information through
    xcoff_link_hash_traverse.  */
@@ -409,8 +412,8 @@ struct xcoff_loader_info
   /* Link information structure.  */
   struct bfd_link_info *info;
 
-  /* Whether all defined symbols should be exported.  */
-  bfd_boolean export_defineds;
+  /* A mask of XCOFF_EXPALL and XCOFF_EXPFULL flags.  */
+  unsigned int auto_export_flags;
 
   /* Number of ldsym structures.  */
   size_t ldsym_count;
