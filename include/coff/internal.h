@@ -273,12 +273,7 @@ struct internal_aouthdr
 #define C_LINE		104	/* line # reformatted as symbol table entry */
 #define C_ALIAS	 	105	/* duplicate tag		*/
 #define C_HIDDEN	106	/* ext symbol in dmert public lib */
-
-#if defined _AIX52 || defined AIX_WEAK_SUPPORT
-#define C_WEAKEXT	111	/* weak symbol -- AIX standard.  */
-#else
 #define C_WEAKEXT	127	/* weak symbol -- GNU extension.  */
-#endif
 
 /* New storage classes for TI COFF */
 #define C_UEXT		19	/* Tentative external definition */
@@ -311,6 +306,12 @@ struct internal_aouthdr
 #define C_HIDEXT        107	/* Un-named external symbol */
 #define C_BINCL         108	/* Marks beginning of include file */
 #define C_EINCL         109	/* Marks ending of include file */
+#define C_AIX_WEAKEXT   111	/* AIX definition of C_WEAKEXT.  */
+
+#if defined _AIX52 || defined AIX_WEAK_SUPPORT
+#undef C_WEAKEXT
+#define C_WEAKEXT       C_AIX_WEAKEXT
+#endif
 
  /* storage classes for stab symbols for RS/6000 */
 #define C_GSYM          (0x80)
@@ -335,6 +336,10 @@ struct internal_aouthdr
 #define C_THUMBLABEL    (128 + C_LABEL)		/* 134 */
 #define C_THUMBEXTFUNC  (C_THUMBEXT  + 20)	/* 150 */
 #define C_THUMBSTATFUNC (C_THUMBSTAT + 20)	/* 151 */
+
+/* True if XCOFF symbols of class CLASS have auxillary csect information.  */
+#define CSECT_SYM_P(CLASS) \
+  ((CLASS) == C_EXT || (CLASS) == C_AIX_WEAKEXT || (CLASS) == C_HIDEXT)
 
 /********************** SECTION HEADER **********************/
 

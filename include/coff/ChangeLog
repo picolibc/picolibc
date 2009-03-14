@@ -1,5 +1,15 @@
 2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
 
+	* internal.h (C_AIX_WEAKEXT): New macro.
+	(C_WEAKEXT): Use the GNU definition in the generic part of the file,
+	and conditionally reset it to C_AIX_WEAKEXT in the XCOFF part of
+	the file.
+	(CSECT_SYM_P): New macro.
+	* xcoff.h (L_WEAK): Define.
+	(EXTERN_SYM_P): New macro.
+
+2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
 	* xcoff.h (XCOFF_ALLOCATED): New flag.
 
 2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>

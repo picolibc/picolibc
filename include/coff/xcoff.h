@@ -214,6 +214,8 @@ struct internal_ldsym
 #define L_ENTRY (0x20)
 /* Exported symbol.  */
 #define L_EXPORT (0x10)
+/* Weak symbol.  */
+#define L_WEAK (0x08)
 
 /* The ldrel structure.  This is used to represent a reloc in the
    .loader section.  */
@@ -643,5 +645,9 @@ struct xcoff_ar_hdr_big
   ((struct xcoff_ar_hdr *) arch_eltdata (bfd)->arch_header)
 #define arch_xhdr_big(bfd) \
   ((struct xcoff_ar_hdr_big *) arch_eltdata (bfd)->arch_header)
+
+/* True if symbols of class CLASS are external.  */
+#define EXTERN_SYM_P(CLASS) \
+  ((CLASS) == C_EXT || (CLASS) == C_AIX_WEAKEXT)
 
 #endif /* _INTERNAL_XCOFF_H */
