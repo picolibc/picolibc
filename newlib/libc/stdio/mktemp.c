@@ -85,6 +85,13 @@ unless it could not generate an unused filename, or the pattern you
 provided is not suitable for a filename; in that case, it returns
 <<-1>>.
 
+NOTES
+Never use <<mktemp>>.  The generated filenames are easy to guess and
+there's a race between the test if the file exists and the creation
+of the file.  In combination this makes <<mktemp>> prone to attacks
+and using it is a security risk.  Whenever possible use <<mkstemp>>
+instead.  It doesn't suffer the race condition.
+
 PORTABILITY
 ANSI C does not require either <<mktemp>> or <<mkstemp>>; the System
 V Interface Definition requires <<mktemp>> as of Issue 2.

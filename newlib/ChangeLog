@@ -1,3 +1,11 @@
+2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (_mkstemp_r, _mktemp_r): Move declarations
+	to stdlib.h.
+	* libc/include/stdlib.h (mktemp, _mktemp_r): Warn when using.
+	* libc/stdio/mktemp.c: Explain the security risk when using
+	mktemp.
+
 2009-03-12  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/time/time.tex (wcsftime.def):  Include.

@@ -411,8 +411,6 @@ int	_EXFUN(_iprintf_r, (struct _reent *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 int	_EXFUN(_iscanf_r, (struct _reent *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3))));
-int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
-char *	_EXFUN(_mktemp_r, (struct _reent *, char *));
 FILE *	_EXFUN(_open_memstream_r, (struct _reent *, char **, size_t *));
 void	_EXFUN(_perror_r, (struct _reent *, const char *));
 int	_EXFUN(_printf_r, (struct _reent *, const char *, ...)
