@@ -504,7 +504,7 @@ path_conv::get_wide_win32_path (PWCHAR wc)
 void
 warn_msdos (const char *src)
 {
-  if (user_shared->warned_msdos || !dos_file_warning)
+  if (user_shared->warned_msdos || !dos_file_warning || !cygwin_finished_initializing)
     return;
   tmp_pathbuf tp;
   char *posix_path = tp.c_get ();
