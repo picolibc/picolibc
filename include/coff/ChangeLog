@@ -1,5 +1,9 @@
 2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
 
+	* xcoff.h (XCOFF_ALLOCATED): New flag.
+
+2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
 	* xcoff.h (XCOFF_CALLED, XCOFF_IMPORT): Update comments.
 	(XCOFF_WAS_UNDEFINED): New flag.
 	(xcoff_link_hash_table): Add an "rtld" field.

@@ -318,6 +318,8 @@ struct xcoff_link_hash_entry
 #define XCOFF_SYSCALL64        0x00010000 
 /* Symbol was not explicitly defined by the time it was marked.  */
 #define XCOFF_WAS_UNDEFINED    0x00020000
+/* We have assigned an output XCOFF entry to this symbol.  */
+#define XCOFF_ALLOCATED	       0x00040000
 
 /* The XCOFF linker hash table.  */
 
