@@ -1,6 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,6 +13,8 @@ details. */
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
+#include <wchar.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <argz.h>
 #include <limits.h>
@@ -26,6 +28,7 @@ details. */
 #include <ddk/ntddk.h>
 #include <ddk/winddk.h>
 #include <ddk/ntifs.h>
+#include "wide_path.h"
 
 static const char version[] = "$Revision$";
 
@@ -146,9 +149,9 @@ get_device_name (char *path)
   if (strncasecmp (path, "\\Device\\", 8))
     return ret;
 
-  if (!RtlAllocateUnicodeString (&ntdev, MAX_PATH * 2))
+  if (!RtlAllocateUnicodeString (&ntdev, 65536))
     return ret;
-  if (!RtlAllocateUnicodeString (&tgtdev, MAX_PATH * 2))
+  if (!RtlAllocateUnicodeString (&tgtdev, 65536))
     return ret;
   RtlInitAnsiString (&ans, path);
   RtlAnsiStringToUnicodeString (&ntdev, &ans, FALSE);
@@ -278,8 +281,8 @@ get_device_paths (char *path)
 static char *
 get_short_paths (char *path)
 {
-  char *sbuf;
-  char *sptr;
+  wchar_t *sbuf;
+  wchar_t *sptr;
   char *next;
   char *ptr = path;
   char *end = strrchr (path, 0);
@@ -292,7 +295,8 @@ get_short_paths (char *path)
       ptr = strchr (ptr, ';');
       if (ptr)
 	*ptr++ = 0;
-      len = GetShortPathName (next, NULL, 0);
+      wide_path wpath (next);
+      len = GetShortPathNameW (wpath, NULL, 0);
       if (!len)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
@@ -301,7 +305,7 @@ get_short_paths (char *path)
 	}
       acc += len + 1;
     }
-  sptr = sbuf = (char *) malloc (acc + 1);
+  sptr = sbuf = (wchar_t *) malloc ((acc + 1) * sizeof (wchar_t));
   if (sbuf == NULL)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
@@ -310,7 +314,8 @@ get_short_paths (char *path)
   ptr = path;
   for (;;)
     {
-      len = GetShortPathName (ptr, sptr, acc);
+      wide_path wpath (ptr);
+      len = GetShortPathNameW (wpath, sptr, acc);
       if (!len)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
@@ -319,74 +324,88 @@ get_short_paths (char *path)
 	}
 
       ptr = strrchr (ptr, 0);
-      sptr = strrchr (sptr, 0);
+      sptr = wcsrchr (sptr, 0);
       if (ptr == end)
 	break;
-      *sptr = ';';
+      *sptr = L';';
       ++ptr, ++sptr;
       acc -= len + 1;
     }
-  return sbuf;
+  len = wcstombs (NULL, sbuf, 0) + 1;
+  ptr = (char *) malloc (len);
+  if (ptr == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+  wcstombs (ptr, sbuf, len);
+  return ptr;
 }
 
 static char *
 get_short_name (const char *filename)
 {
-  char *sbuf, buf[MAX_PATH];
-  DWORD len = GetShortPathName (filename, buf, MAX_PATH);
+  wchar_t buf[32768];
+  char *sbuf;
+  wide_path wpath (filename);
+  DWORD len = GetShortPathNameW (wpath, buf, 32768);
   if (!len)
     {
       fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 	       filename);
       exit (2);
     }
-  sbuf = (char *) malloc (++len);
+  len = wcstombs (NULL, buf, 0) + 1;
+  sbuf = (char *) malloc (len);
   if (sbuf == NULL)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  return strcpy (sbuf, buf);
+  wcstombs (sbuf, buf, len);
+  return sbuf;
 }
 
 static DWORD WINAPI
-get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
+get_long_path_name_w32impl (LPCWSTR src, LPWSTR sbuf, DWORD)
 {
-  char buf1[MAX_PATH], buf2[MAX_PATH], *ptr;
-  const char *pelem, *next;
-  WIN32_FIND_DATA w32_fd;
-  int len;
+  wchar_t *buf1 = (wchar_t *) malloc (32768);
+  wchar_t *buf2 = (wchar_t *) malloc (32768);
+  wchar_t *ptr;
+  const wchar_t *pelem, *next;
+  WIN32_FIND_DATAW w32_fd;
+  DWORD len;
 
-  strcpy (buf1, src);
-  *buf2 = 0;
+  wcscpy (buf1, src);
+  *buf2 = L'\0';
   pelem = src;
   ptr = buf2;
   while (pelem)
     {
       next = pelem;
-      if (*next == '\\')
+      if (*next == L'\\')
 	{
-	  strcat (ptr++, "\\");
+	  wcscat (ptr++, L"\\");
 	  pelem++;
 	  if (!*pelem)
 	    break;
 	  continue;
 	}
-      pelem = strchr (next, '\\');
-      len = pelem ? (pelem++ - next) : strlen (next);
-      strncpy (ptr, next, len);
-      ptr[len] = 0;
-      if (next[1] != ':' && strcmp(next, ".") && strcmp(next, ".."))
+      pelem = wcschr (next, L'\\');
+      len = pelem ? (pelem++ - next) : wcslen (next);
+      wcsncpy (ptr, next, len);
+      ptr[len] = L'\0';
+      if (next[1] != L':' && wcscmp(next, L".") && wcscmp(next, L".."))
 	{
 	  HANDLE h;
-	  h = FindFirstFile (buf2, &w32_fd);
+	  h = FindFirstFileW (buf2, &w32_fd);
 	  if (h != INVALID_HANDLE_VALUE)
 	    {
-	    strcpy (ptr, w32_fd.cFileName);
+	      wcscpy (ptr, w32_fd.cFileName);
 	      FindClose (h);
 	    }
 	}
-      ptr += strlen (ptr);
+      ptr += wcslen (ptr);
       if (pelem)
 	{
 	  *ptr++ = '\\';
@@ -394,22 +413,27 @@ get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
 	}
     }
   if (sbuf)
-    strcpy (sbuf, buf2);
+    wcscpy (sbuf, buf2);
   SetLastError (0);
-  return strlen (buf2) + (sbuf ? 0 : 1);
+  len = wcslen (buf2) + (sbuf ? 0 : 1);
+  free (buf1);
+  free (buf2);
+  return len;
 }
 
 static char *
 get_long_name (const char *filename, DWORD& len)
 {
-  char *sbuf, buf[MAX_PATH];
+  char *sbuf;
+  wchar_t buf[32768];
   static HINSTANCE k32 = LoadLibrary ("kernel32.dll");
-  static DWORD (WINAPI *GetLongPathName) (LPCSTR, LPSTR, DWORD) =
-    (DWORD (WINAPI *) (LPCSTR, LPSTR, DWORD)) GetProcAddress (k32, "GetLongPathNameA");
+  static DWORD (WINAPI *GetLongPathName) (LPCWSTR, LPWSTR, DWORD) =
+    (DWORD (WINAPI *) (LPCWSTR, LPWSTR, DWORD)) GetProcAddress (k32, "GetLongPathNameW");
   if (!GetLongPathName)
     GetLongPathName = get_long_path_name_w32impl;
 
-  len = GetLongPathName (filename, buf, MAX_PATH);
+  wide_path wpath (filename);
+  len = GetLongPathName (wpath, buf, 32768);
   if (len == 0)
     {
       DWORD err = GetLastError ();
@@ -421,21 +445,22 @@ get_long_name (const char *filename, DWORD& len)
 	  exit (2);
 	}
       else if (err == ERROR_FILE_NOT_FOUND)
-	len = get_long_path_name_w32impl (filename, buf, MAX_PATH);
+	get_long_path_name_w32impl (wpath, buf, 32768);
       else
 	{
-	  buf[0] = '\0';
-	  strncat (buf, filename, MAX_PATH - 1);
-	  len = strlen (buf);
+	  buf[0] = L'\0';
+	  wcsncat (buf, wpath, 32767);
 	}
     }
+  len = wcstombs (NULL, buf, 0);
   sbuf = (char *) malloc (len + 1);
   if (!sbuf)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  return strcpy (sbuf, buf);
+  wcstombs (sbuf, buf, len + 1);
+  return sbuf;
 }
 
 static char *
@@ -535,7 +560,7 @@ get_user_folder (char* path, int id, int allid)
 static void
 do_sysfolders (char option)
 {
-  char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
+  char *buf, buf1[MAX_PATH], buf2[PATH_MAX];
   DWORD len = MAX_PATH;
   WIN32_FIND_DATA w32_fd;
   HINSTANCE k32;
@@ -607,7 +632,7 @@ do_sysfolders (char option)
   else if (!windows_flag)
     {
       if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, buf, buf2,
-	  MAX_PATH))
+	  PATH_MAX))
 	fprintf (stderr, "%s: error converting \"%s\" - %s\n",
 		 prog_name, buf, strerror (errno));
       else
@@ -645,17 +670,20 @@ static void
 do_pathconv (char *filename)
 {
   char *buf;
+  wchar_t *buf2;
   DWORD len;
   ssize_t err;
   cygwin_conv_path_t conv_func =
-		      (unix_flag ? CCP_WIN_A_TO_POSIX : CCP_POSIX_TO_WIN_A)
+		      (unix_flag ? CCP_WIN_A_TO_POSIX
+		      		 : (path_flag ? CCP_POSIX_TO_WIN_A
+					      : CCP_POSIX_TO_WIN_W))
 		    | (absolute_flag ? CCP_ABSOLUTE : CCP_RELATIVE);
 
   if (!path_flag)
     {
       len = strlen (filename);
       if (len)
-	len += MAX_PATH + 1001;
+	len = 32768;
       else if (ignore_flag)
 	exit (0);
       else
@@ -668,6 +696,8 @@ do_pathconv (char *filename)
     len = cygwin_conv_path_list (conv_func, filename, NULL, 0);
 
   buf = (char *) malloc (len);
+  if (!unix_flag && !path_flag)
+    buf2 = (wchar_t *) malloc (len * sizeof (wchar_t));
   if (buf == NULL)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
@@ -698,7 +728,8 @@ do_pathconv (char *filename)
     }
   else
     {
-      err = cygwin_conv_path (conv_func, filename, buf, len);
+      err = cygwin_conv_path (conv_func, filename,
+			      unix_flag ? (void *) buf : (void *) buf2, len);
       if (err)
 	{
 	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
@@ -707,6 +738,7 @@ do_pathconv (char *filename)
 	}
       if (!unix_flag)
 	{
+	  wcstombs (buf, buf2, 32768);
 	  buf = get_device_name (buf);
 	  if (shortname_flag)
 	    buf = get_short_name (buf);
@@ -714,6 +746,15 @@ do_pathconv (char *filename)
 	    buf = get_long_name (buf, len);
 	  if (mixed_flag)
 	    buf = get_mixed_name (buf);
+	  len = 4;
+	  if (strncmp (buf, "\\\\?\\UNC\\", 8) == 0)
+	    len = 6;
+	  if (strlen (buf) < MAX_PATH + len)
+	    {
+	      buf += len;
+	      if (len == 6)
+	        *buf = '\\';
+	    }
 	}
     }
 
@@ -938,6 +979,7 @@ main (int argc, char **argv)
 {
   int o;
 
+  setlocale (LC_ALL, "");
   prog_name = strrchr (argv[0], '/');
   if (!prog_name)
     prog_name = strrchr (argv[0], '\\');

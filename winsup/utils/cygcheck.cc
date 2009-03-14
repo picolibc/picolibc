@@ -20,6 +20,7 @@
 #include <windows.h>
 #include <wininet.h>
 #include "path.h"
+#include "wide_path.h"
 #include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
@@ -167,7 +168,7 @@ static int
 display_error (const char *fmt, const char *x)
 {
   char buf[4000];
-  sprintf (buf, fmt, x);
+  snprintf (buf, sizeof buf, fmt, x);
   return display_error (buf, false, false);
 }
 
@@ -178,7 +179,7 @@ display_error_fmt (const char *fmt, ...)
   va_list va;
 
   va_start (va, fmt);
-  vsprintf (buf, fmt, va);
+  vsnprintf (buf, sizeof buf, fmt, va);
   return display_error (buf, false, false);
 }
 
@@ -306,7 +307,8 @@ pathlike::check_existence (const char *fn, int showall, int verbose,
   strcat (file, ext1);
   strcat (file, ext2);
 
-  if (GetFileAttributes (file) != (DWORD) - 1)
+  wide_path wpath (file);
+  if (GetFileAttributesW (wpath) != (DWORD) - 1)
     {
       char *lastdot = strrchr (file, '.');
       bool is_link = lastdot && !strcmp (lastdot, LINK_EXTENSION);
@@ -754,9 +756,10 @@ track_down (const char *file, const char *suffix, int lvl)
 
   printf ("%s", path);
 
+  wide_path wpath (path);
   HANDLE fh =
-    CreateFile (path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    CreateFileW (wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		 NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
     {
       display_error ("cannot open - '%s'\n", path);
@@ -788,8 +791,10 @@ track_down (const char *file, const char *suffix, int lvl)
 static void
 ls (char *f)
 {
-  HANDLE h = CreateFile (f, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-			 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  wide_path wpath (f);
+  HANDLE h = CreateFileW (wpath, GENERIC_READ,
+			  FILE_SHARE_READ | FILE_SHARE_WRITE,
+			  0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
   BY_HANDLE_FILE_INFORMATION info;
 
   if (!GetFileInformationByHandle (h, &info))
@@ -812,13 +817,13 @@ ls (char *f)
 static char *
 dirname (const char *s)
 {
-  static char buf[MAX_PATH];
+  static char buf[PATH_MAX];
 
   if (!s)
     return NULL;
 
-  strncpy (buf, s, MAX_PATH);
-  buf[MAX_PATH - 1] = '\0';   // in case strlen(s) > MAX_PATH
+  strncpy (buf, s, PATH_MAX);
+  buf[PATH_MAX - 1] = '\0';   // in case strlen(s) > PATH_MAX
   char *lastsep = strrchr (buf, '\\');
   if (!lastsep)
     return NULL;          // no backslash -> no dirname
@@ -835,9 +840,10 @@ find_app_on_path (const char *app, bool showall = false)
 {
   const char *papp = find_on_path (app, ".exe", showall, false, true);
 
+  wide_path wpath (papp);
   HANDLE fh =
-    CreateFile (papp, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    CreateFileW (wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		 NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (fh == INVALID_HANDLE_VALUE)
     return NULL;
 
@@ -1705,14 +1711,16 @@ dump_sysinfo ()
   char cygdll_path[32768];
   for (pathlike *pth = paths; pth->dir; pth++)
     {
-      WIN32_FIND_DATA ffinfo;
+      WIN32_FIND_DATAW ffinfo;
       sprintf (tmp, "%s*.*", pth->dir);
-      HANDLE ff = FindFirstFile (tmp, &ffinfo);
+      wide_path wpath (tmp);
+      HANDLE ff = FindFirstFileW (wpath, &ffinfo);
       int found = (ff != INVALID_HANDLE_VALUE);
       found_cygwin_dll = NULL;
       while (found)
 	{
-	  char *f = ffinfo.cFileName;
+	  char f[FILENAME_MAX + 1];
+	  wcstombs (f, ffinfo.cFileName, sizeof f);
 	  if (strcasecmp (f + strlen (f) - 4, ".dll") == 0)
 	    {
 	      if (strncasecmp (f, "cyg", 3) == 0)
@@ -1731,7 +1739,7 @@ dump_sysinfo ()
 		    ls (tmp);
 		}
 	    }
-	  found = FindNextFile (ff, &ffinfo);
+	  found = FindNextFileW (ff, &ffinfo);
 	}
       if (found_cygwin_dll)
 	{

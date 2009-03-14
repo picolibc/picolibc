@@ -1,3 +1,24 @@
+2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wide_path.h (class wide_path): New class to convert Windows path
+	to WCHAR win32 path, including long path conversion if necessary.
+	* cygcheck.cc: Use class wide_path throughout to call Win32 functions
+	taking potentially long filenames.
+	(display_error): Use snprintf rather than sprintf.
+	(display_error_fmt): Ditto.
+	(dump_sysinfo): Use FindFirstFileW/FindNextFileW.
+	* cygpath.cc: Use class wide_path throughout to call Win32 functions
+	taking potentially long filenames.
+	(get_device_name): Raise buffer size to take long pathnames.
+	(get_short_paths): Convert to using GetShortPathNameW.
+	(get_short_name): Ditto.
+	(get_long_path_name_w32impl): Convert to equivalent of GetLongPathNameW.
+	(get_long_name): Convert to using GetLongPathNameW.
+	(do_sysfolders): Raise buffer size for POSIX pathname to PATH_MAX.
+	(do_pathconv): In case of POSIX->Win32 conversion, convert to wchar_t
+	Win32 path name and drop long pathname prefix if possible.
+	(main): Call setlocale to accommodate wide char/multibyte conversions.
+
 2009-03-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldd.cc: Rework to detect missing DLLs.
