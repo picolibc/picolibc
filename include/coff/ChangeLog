@@ -1,3 +1,9 @@
+2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* xcoff.h (XCOFF_CALLED, XCOFF_IMPORT): Update comments.
+	(XCOFF_WAS_UNDEFINED): New flag.
+	(xcoff_link_hash_table): Add an "rtld" field.
+
 2008-12-23  Johan Olmutz Nielsen  <jnielsen@ddci.com>
 
 	* ti.h (COFF_ADJUST_SCNHDR_OUT_PRE): Define.

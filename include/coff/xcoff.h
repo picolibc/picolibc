@@ -291,11 +291,12 @@ struct xcoff_link_hash_entry
 #define XCOFF_LDREL            0x00000008
 /* Symbol is the entry point.  */
 #define XCOFF_ENTRY            0x00000010
-/* Symbol is called; this is, it appears in a R_BR reloc.  */
+/* Symbol is for a function and is the target of a relocation.
+   The relocation may or may not be a branch-type relocation.  */
 #define XCOFF_CALLED           0x00000020
 /* Symbol needs the TOC entry filled in.  */
 #define XCOFF_SET_TOC          0x00000040
-/* Symbol is explicitly imported.  */
+/* Symbol is implicitly or explicitly imported.  */
 #define XCOFF_IMPORT           0x00000080
 /* Symbol is explicitly exported.  */
 #define XCOFF_EXPORT           0x00000100
@@ -315,6 +316,8 @@ struct xcoff_link_hash_entry
 #define XCOFF_SYSCALL32        0x00008000
 /* Symbol is an imported 64 bit syscall.  */
 #define XCOFF_SYSCALL64        0x00010000 
+/* Symbol was not explicitly defined by the time it was marked.  */
+#define XCOFF_WAS_UNDEFINED    0x00020000
 
 /* The XCOFF linker hash table.  */
 
@@ -367,6 +370,9 @@ struct xcoff_link_hash_table
 
   /* Whether the .text section must be read-only.  */
   bfd_boolean textro;
+
+  /* Whether -brtl was specified.  */
+  bfd_boolean rtld;
 
   /* Whether garbage collection was done.  */
   bfd_boolean gc;
