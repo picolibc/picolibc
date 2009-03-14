@@ -1,3 +1,7 @@
+2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Remove STABS directives.
+
 2009-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mktemp.cc: Remove STABS specific link-time warning.  Align copyright

@@ -99,7 +99,6 @@ EOF
 	$res = <<EOF . longjmp () . $res;
 	.text
 
-	.stabs	"_sigfe:F(0,1)",36,0,0,__sigfe
 __sigfe_maybe:
 	pushl	%ebx
 	pushl	%edx
@@ -139,7 +138,6 @@ __sigfe:
 	ret
 
 	.global	__sigbe
-	.stabs	"_sigbe:F(0,1)",36,0,0,__sigbe
 __sigbe:						# return here after cygwin syscall
 	pushl	%edx
 	pushl	%ebx
@@ -165,7 +163,6 @@ __sigbe:						# return here after cygwin syscall
 	ret
 
 	.global	_sigreturn
-	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
 _sigreturn:
 	movl	%fs:4,%ebx
 	incl	$tls::incyg(%ebx)
@@ -203,7 +200,6 @@ _sigreturn:
 	ret
 
 	.global	_sigdelayed
-	.stabs	"sigdelayed:F(0,1)",36,0,0,_sigdelayed
 _sigdelayed:
 	pushl	%ebp
 	movl	%esp,%ebp
