@@ -50,6 +50,7 @@ struct option longopts[] =
   {"help", no_argument, NULL, 0},
   {"version", no_argument, NULL, 0},
   {"data-relocs", no_argument, NULL, 'd'},
+  {"dll", no_argument, NULL, 'D'},
   {"function-relocs", no_argument, NULL, 'r'},
   {"unused", no_argument, NULL, 'u'},
   {0, no_argument, NULL, 0}
@@ -83,19 +84,65 @@ usage (const char *fmt, ...)
 
 static HANDLE hProcess;
 
+static char *
+get_module_filename (HANDLE hp, HMODULE hm)
+{
+  size_t len;
+  char *buf = NULL;
+  DWORD res;
+  for (len = 1024; (res = GetModuleFileNameEx (hp, hm, (buf = (char *) realloc (buf, len)), len)) == len; len += 1024)
+    continue;
+  if (!res)
+    {
+      free (buf);
+      buf = NULL;
+    }
+  return buf;
+}
+
+static char *
+load_dll (const char *fn)
+{
+  char *buf = get_module_filename (GetCurrentProcess (), NULL);
+  if (!buf)
+    {
+      printf ("ldd: GetModuleFileName returned an error %lu\n", GetLastError ());
+      exit (1);		/* FIXME */
+    }
+  buf = (char *) realloc (buf, sizeof (" \"--dll\" \"\"") + strlen (buf));
+  strcat (buf, " --dll \"");
+  strcat (buf, fn);
+  strcat (buf, "\"");
+  return buf;
+}
+
+
 static int
-start_process (const char *fn)
+start_process (const char *fn, bool& isdll)
 {
   STARTUPINFO si = {};
   PROCESS_INFORMATION pi;
   si.cb = sizeof (si);
-  if (CreateProcess (NULL, (CHAR *) fn, NULL, NULL, FALSE, DEBUG_PROCESS, NULL, NULL, &si, &pi))
+  CHAR *cmd;
+  if (strlen (fn) < 4 || strcasecmp (strchr (fn, '\0') - 4, ".dll") != 0)
     {
+      cmd = strdup (fn);
+      isdll = false;
+    }
+  else
+    {
+      cmd = load_dll (fn);
+      isdll = true;
+    }
+  if (CreateProcess (NULL, cmd, NULL, NULL, FALSE, DEBUG_PROCESS, NULL, NULL, &si, &pi))
+    {
+      free (cmd);
       hProcess = pi.hProcess;
       DebugSetProcessKillOnExit (true);
       return 0;
     }
 
+  free (cmd);
   set_errno_and_return (1);
 }
 
@@ -147,18 +194,31 @@ tocyg (char *win_fn)
   return fn;
 }
 
+#define CYGWIN_DLL_LEN (strlen ("\\cygwin1.dll"))
 static int
-print_dlls_and_kill_inferior (dlls *dll, const char *process_fn)
+print_dlls_and_kill_inferior (dlls *dll, const char *dllfn, const char *process_fn)
 {
+  bool printit = !dllfn;
   while ((dll = dll->next))
     {
       char *fn;
-      char fnbuf[MAX_PATH + 1];
-      DWORD len = GetModuleFileNameEx (hProcess, (HMODULE) dll->lpBaseOfDll, fnbuf, sizeof(fnbuf) - 1);
-      if (!len)
+      char *fullpath = get_module_filename (hProcess, (HMODULE) dll->lpBaseOfDll);
+      if (!fullpath)
 	fn = strdup ("???");
       else
-	fn = tocyg (fnbuf);
+	{
+	  if (printit)
+	    fn = tocyg (fullpath);
+	  else if (strcasecmp (fullpath, dllfn) != 0)
+	    continue;
+	  else
+	    {
+	      printit = true;
+	      free (fullpath);
+	      continue;
+	    }
+	  free (fullpath);
+	}
       printf ("\t%s => %s (%p)\n", basename (fn), fn, dll->lpBaseOfDll);
       free (fn);
     }
@@ -181,11 +241,12 @@ report (const char *in_fn, bool multiple)
   if (len <= 0)
     print_errno_error_and_return (fn);
 
+  bool isdll;
   char fn_win[len + 1];
   if (cygwin_conv_path (CCP_POSIX_TO_WIN_A, fn, fn_win, len))
     print_errno_error_and_return (fn);
 
-  if (!fn || start_process (fn_win))
+  if (!fn || start_process (fn_win, isdll))
     print_errno_error_and_return (in_fn);
 
   DEBUG_EVENT ev;
@@ -211,7 +272,7 @@ report (const char *in_fn, bool multiple)
       switch (ev.dwDebugEventCode)
 	{
 	case LOAD_DLL_DEBUG_EVENT:
-	  if (++dll_count == 2)
+	  if (!isdll && ++dll_count == 2)
 	    get_entry_point ();
 	  dll_last->next = (dlls *) malloc (sizeof (dlls));
 	  dll_last->next->lpBaseOfDll = ev.u.LoadDll.lpBaseOfDll;
@@ -219,10 +280,19 @@ report (const char *in_fn, bool multiple)
 	  dll_last = dll_last->next;
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
-	  if (ev.u.Exception.ExceptionRecord.ExceptionCode == STATUS_DLL_NOT_FOUND)
-	    process_fn = fn_win;
-	  else
-	    print_dlls_and_kill_inferior (&dll_list, process_fn);
+	  switch (ev.u.Exception.ExceptionRecord.ExceptionCode)
+	    {
+	    case STATUS_DLL_NOT_FOUND:
+	      process_fn = fn_win;
+	      break;
+	    case STATUS_BREAKPOINT:
+	      if (!isdll)
+		print_dlls_and_kill_inferior (&dll_list, isdll ? fn_win : NULL, process_fn);
+	      break;
+	    }
+	  break;
+	case EXIT_PROCESS_DEBUG_EVENT:
+	  print_dlls_and_kill_inferior (&dll_list, isdll ? fn_win : NULL, process_fn);
 	  break;
 	default:
 	  break;
@@ -252,6 +322,10 @@ main (int argc, char **argv)
       case 'u':
 	usage ("option not implemented `-%c'", optch);
 	exit (1);
+      case 'D':
+	if (!LoadLibrary (argv[optind]))
+	  exit (1);
+	exit (0);
       case 0:
 	if (index == 1)
 	  {

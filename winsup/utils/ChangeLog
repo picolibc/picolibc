@@ -1,3 +1,20 @@
+2009-03-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc (longopts): Add --dll option.
+	(get_module_filename): Generalized wrapper function which avoid path
+	length restrictions.
+	(load_dll): Handle special-case of inspecting a DLL.
+	(start_process): Accept an output parameter "isdll".  Detect when file
+	to start is a DLL and start a wrapper instead.
+	(print_dlls_and_kill_inferior): When dealing with a DLL, avoid printing
+	everything before the DLL itself first appears.  (This is not strictly
+	correct and should be fixed eventually)
+	(report): Deal with DLLs.  Don't set a breakpoint for DLLs, just let
+	captive ldd process terminate normally.  Pass dll info to
+	print_dlls_and_kill_inferior.
+	(main): Handle special-case "--dll" option by loading the DLL and
+	exiting.
+
 2009-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (from_fstab): Use wcstombs/mbstowcs instead of
