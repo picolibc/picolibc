@@ -1,3 +1,8 @@
+2009-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/inttypes.h: Remove "l" size specifier from all 16 and 32 bit
+	definitions.
+
 2009-03-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (warn_msdos): Don't warn about MS-DOS filenames encountered
