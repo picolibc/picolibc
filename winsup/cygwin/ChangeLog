@@ -1,3 +1,7 @@
+2009-03-15  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+
+	* errno.cc (_sys_errlist): Add ESTRPIPE.
+
 2009-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export wcsdup.

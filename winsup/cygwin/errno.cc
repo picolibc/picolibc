@@ -287,7 +287,8 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* EOVERFLOW 139 */	  "Value too large for defined data type",
 /* ECANCELED 140 */	  "Operation canceled",
 /* ENOTRECOVERABLE 141 */ "State not recoverable",
-/* EOWNERDEAD 142 */	  "Previous owner died"
+/* EOWNERDEAD 142 */	  "Previous owner died",
+/* ESTRPIPE 143 */	  "Streams pipe error"
 };
 
 int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
