@@ -283,6 +283,9 @@ State not recoverable
 o EOWNERDEAD
 Previous owner died
 
+o ESTRPIPE
+Strings pipe error
+
 o-
 
 RETURNS
@@ -759,6 +762,11 @@ _DEFUN (strerror, (errnum),
     case EOWNERDEAD:
         error = "Previous owner died";
         break;
+#endif
+#ifdef ESTRPIPE
+    case ESTRPIPE:
+	error = "Streams pipe error";
+	break;
 #endif
 #if defined(EOPNOTSUPP) && (!defined(ENOTSUP) || (ENOTSUP != EOPNOTSUPP))
     case EOPNOTSUPP:

@@ -151,6 +151,7 @@ extern __IMPORT int sys_nerr;
 #define ECANCELED 140	/* Operation canceled */
 #define ENOTRECOVERABLE 141	/* State not recoverable */
 #define EOWNERDEAD 142	/* Previous owner died */
+#define ESTRPIPE 143	/* Streams pipe error */
 
 
 /* From cygwin32.  */

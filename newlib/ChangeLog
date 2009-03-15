@@ -1,3 +1,8 @@
+2009-03-15  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/errno.h (ESTRPIPE): Define.
+	* libc/string/strerror.c (strerror): Decode it.
+
 2009-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (wcsdup, _wcsdup_r): Declare.
