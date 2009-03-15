@@ -1748,6 +1748,7 @@ _wcscmp = wcscmp NOSIGFE
 wcscoll NOSIGFE
 wcscpy NOSIGFE
 wcscspn NOSIGFE
+wcsdup NOSIGFE
 wcsftime SIGFE
 wcslcat NOSIGFE
 wcslcpy NOSIGFE

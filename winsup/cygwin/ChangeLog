@@ -1,5 +1,11 @@
 2009-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din: Export wcsdup.
+	* posix.sgml: Add wcsdup to SUSv4 list.
+	* include/cygwin/version.h: Bump API minor number.
+
+2009-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/inttypes.h: Remove "l" size specifier from all 16 and 32 bit
 	definitions.
 

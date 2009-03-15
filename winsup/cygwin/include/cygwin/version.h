@@ -355,12 +355,13 @@ details. */
       204: recv/send flag MSG_DONTWAIT added.
       205: Export wscanf, fwscanf, swscanf, vwscanf, vfwscanf, vswscanf.
       206: Export wcscasecmp, wcsncasecmp.
+      207: Export wcsdup.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 206
+#define CYGWIN_VERSION_API_MINOR 207
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

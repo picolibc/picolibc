@@ -828,6 +828,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcscoll
     wcscpy
     wcscspn
+    wcsdup
     wcsftime
     wcslen
     wcsncasecmp
