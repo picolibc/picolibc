@@ -79,16 +79,17 @@ strlen (const char* str)
        "add	ip, len, #4\n\t"
        "mov	ip, ip, asl #3\n\t"
        "mvn	r2, #0\n\t"
-       "it	ne\n\t"
        /* ... are masked out */
 #ifdef __thumb__
+       "itt	ne\n\t"
 # ifdef __ARMEB__
        "lslne	r2, ip\n\t"
 # else
        "lsrne	r2, ip\n\t"
 # endif
-       "orr	data, data, r2\n\t"
+       "orrne	data, data, r2\n\t"
 #else
+       "it	ne\n\t"
 # ifdef __ARMEB__
        "orrne	data, data, r2, lsl ip\n\t"
 # else
@@ -104,13 +105,15 @@ strlen (const char* str)
 #endif
        "orr	ip, ip, ip, lsl #16\n"
 
-	/* This is the main loop.  We subtract one from each byte in the
-	   word: the sign bit changes iff the byte was zero.  */
+	/* This is the main loop.  We subtract one from each byte in
+	   the word: the sign bit changes iff the byte was zero or
+	   0x80 -- we eliminate the latter case by anding the result
+	   with the 1-s complement of the data.  */
        "1:\n\t"
        /* test (data - 0x01010101)  */
        "sub	r2, data, ip\n\t"
-       /* ... ^ data */
-       "eor	r2, r2, data\n\t"
+       /* ... & ~data */
+       "bic	r2, r2, data\n\t"
        /* ... & 0x80808080 == 0? */
        "ands	r2, r2, ip, lsl #7\n\t"
 #ifdef _ISA_ARM_7
@@ -124,8 +127,8 @@ strlen (const char* str)
        /*  test (data - 0x01010101)  */
        "ittt	eq\n\t"
        "subeq	r2, data, ip\n\t"
-       /* ... ^ data */
-       "eoreq	r2, r2, data\n\t"
+       /* ... & ~data */
+       "biceq	r2, r2, data\n\t"
        /* ... & 0x80808080 == 0? */
        "andeqs	r2, r2, ip, lsl #7\n\t"
 #endif

@@ -1,3 +1,14 @@
+2009-03-16  Mark Mitchell  <mark@codesourcery.com>
+
+	* libc/machine/arm/strlen.c (strlen): Fix defect in Thumb-2 mode.
+
+2009-03-16  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/arm/strlen.c (strlen): Correctly detect
+	end-of-string.
+	* libc/machine/arm/strcpy.c (strcpy): Likewise.
+	* libc/machine/arm/strcmp.c (strcmp, strcmp_unaligned): Likewise.
+
 2009-03-15  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/errno.h (ESTRPIPE): Define.

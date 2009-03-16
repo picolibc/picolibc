@@ -97,7 +97,7 @@ __attribute__((naked)) strcmp (const char* s1, const char* s2)
       "cmp	ip, r3\n\t"
       "itttt	eq\n\t"
       /* check for any zero bytes in first word */
-      "eoreq	r2, r2, ip\n\t"
+      "biceq	r2, r2, ip\n\t"
       "tsteq	r2, "magic2(r4)"\n\t"
       "ldreq	ip, [r0], #4\n\t"
       "ldreq	r3, [r1], #4\n\t"
@@ -171,9 +171,9 @@ strcmp_unaligned(const char* s1, const char* s2)
 	  w2 RSHIFT= shift;						\
 	  break;							\
 	}								\
-      if (__builtin_expect(((w1 - b1) ^ w1) & (b1 << 7), 0))		\
+      if (__builtin_expect(((w1 - b1) & ~w1) & (b1 << 7), 0))		\
 	{								\
-	  if ((((w1 - b1) ^ w1) & (b1 << 7)) & mask)			\
+	  if ((((w1 - b1) & ~w1) & (b1 << 7)) & mask)			\
 	    w2 RSHIFT= shift;						\
 	  else								\
 	    {								\
@@ -284,7 +284,7 @@ strcmp_unaligned(const char* s1, const char* s2)
       "bic	t1, w1, #"MSB"\n\t"
       "cmp	t1, w2, "SHFT2LSB" #8\n\t"
       "sub	r3, w1, b1\n\t"
-      "eor	r3, r3, w1\n\t"
+      "bic	r3, r3, w1\n\t"
       "bne	4f\n\t"
       "ands	r3, r3, b1, lsl #7\n\t"
       "it	eq\n\t"
@@ -320,7 +320,7 @@ strcmp_unaligned(const char* s1, const char* s2)
       SHFT2MSB"	t1, w1, #16\n\t"
       "sub	r3, w1, b1\n\t"
       SHFT2LSB"	t1, t1, #16\n\t"
-      "eor	r3, r3, w1\n\t"
+      "bic	r3, r3, w1\n\t"
       "cmp	t1, w2, "SHFT2LSB" #16\n\t"
       "bne	4f\n\t"
       "ands	r3, r3, b1, lsl #7\n\t"
@@ -356,7 +356,7 @@ strcmp_unaligned(const char* s1, const char* s2)
       "and	t1, w1, #"LSB"\n\t"
       "cmp	t1, w2, "SHFT2LSB" #24\n\t"
       "sub	r3, w1, b1\n\t"
-      "eor	r3, r3, w1\n\t"
+      "bic	r3, r3, w1\n\t"
       "bne	4f\n\t"
       "ands	r3, r3, b1, lsl #7\n\t"
       "it	eq\n\t"
