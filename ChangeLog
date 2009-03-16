@@ -1,3 +1,24 @@
+2009-03-16  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from GCC:
+
+	2009-03-16  Joseph Myers  <joseph@codesourcery.com>
+
+	* configure.ac (--with-host-libstdcxx): New option.
+	* configure: Regenerate.
+
+	2009-01-29  Robert Millan  <rmh@aybabtu.com>
+
+	* configure.ac: Recognize GNU/kOpenSolaris (*-*-kopensolaris*-gnu).
+	* configure: Regenerate.
+
+	2009-01-12  Sebastian Pop <sebastian.pop@amd.com>
+
+	PR tree-optimization/38515
+	* configure.ac (cloog-polylib): Removed.
+	(with_ppl, with_cloog): Test for "no".
+	* configure: Regenerated.
+
 2009-03-01  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Backport from git Libtool:

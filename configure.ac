@@ -408,7 +408,7 @@ esac
 # Disable libmudflap on some systems.
 if test x$enable_libmudflap = x ; then
     case "${target}" in
-    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | bfin*-*-uclinux*)
+    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | bfin*-*-uclinux* | *-*-kopensolaris*-gnu)
         # Enable libmudflap by default in GNU and friends.
 	;;
     *-*-freebsd*)
@@ -425,7 +425,7 @@ fi
 if test x$enable_libgomp = x ; then
     # Enable libgomp by default on hosted POSIX systems.
     case "${target}" in
-    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
+    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | *-*-kopensolaris*-gnu)
 	;;
     *-*-netbsd* | *-*-freebsd* | *-*-openbsd*)
 	;;
@@ -923,7 +923,7 @@ case "${target}" in
   ip2k-*-*)
     noconfigdirs="$noconfigdirs target-libiberty target-libstdc++-v3 ${libgcj}"
     ;;
-  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
+  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | *-*-kopensolaris*-gnu)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   *-*-lynxos*)
@@ -1315,11 +1315,20 @@ fi
 AC_SUBST(gmplibs)
 AC_SUBST(gmpinc)
 
+# Allow host libstdc++ to be specified for static linking with PPL.
+AC_ARG_WITH(host-libstdcxx, [  --with-host-libstdcxx=L Use linker arguments L to link with libstdc++
+                          when linking with PPL])
+
+case $with_host_libstdcxx in
+  no|yes)
+    AC_MSG_ERROR([-with-host-libstdcxx needs an argument])
+    ;;
+esac
 
 # Check for PPL
 ppl_major_version=0
 ppl_minor_version=10
-ppllibs=" -lppl_c -lppl -lgmpxx "
+ppllibs=" -lppl_c -lppl -lgmpxx $with_host_libstdcxx "
 pplinc=
 
 AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the installed PPL package
@@ -1328,20 +1337,25 @@ AC_ARG_WITH(ppl, [  --with-ppl=PATH         Specify prefix directory for the ins
 AC_ARG_WITH(ppl_include, [  --with-ppl-include=PATH Specify directory for installed PPL include files])
 AC_ARG_WITH(ppl_lib, [  --with-ppl-lib=PATH     Specify the directory for the installed PPL library])
 
-if test "x$with_ppl" != x; then
-  ppllibs="-L$with_ppl/lib -lppl_c -lppl -lgmpxx"
-  pplinc="-I$with_ppl/include $pplinc"
-  LIBS="$ppllibs $LIBS"
-fi
+case $with_ppl in 
+  no)
+    ppllibs=
+    ;;
+  *)
+    ppllibs="-L$with_ppl/lib -lppl_c -lppl -lgmpxx $with_host_libstdcxx"
+    pplinc="-I$with_ppl/include $pplinc"
+    LIBS="$ppllibs $LIBS"
+    ;;
+esac
 if test "x$with_ppl_include" != x; then
   pplinc="-I$with_ppl_include $pplinc"
 fi
 if test "x$with_ppl_lib" != x; then
-  ppllibs="-L$with_ppl_lib -lppl_c -lppl -lgmpxx"
+  ppllibs="-L$with_ppl_lib -lppl_c -lppl -lgmpxx $with_host_libstdcxx"
   LIBS="$ppllibs $LIBS"
 fi
 if test "x$with_ppl$with_ppl_include$with_ppl_lib" = x && test -d ${srcdir}/ppl; then
-  ppllibs='-L$$r/$(HOST_SUBDIR)/ppl/.libs -L$$r/$(HOST_SUBDIR)/ppl/_libs -lppl_c -lppl -lgmpxx '
+  ppllibs='-L$$r/$(HOST_SUBDIR)/ppl/.libs -L$$r/$(HOST_SUBDIR)/ppl/_libs -lppl_c -lppl -lgmpxx '"$with_host_libstdcxx "
   pplinc='-I$$r/$(HOST_SUBDIR)/ppl/include -I$$s/ppl/include '
   LIBS="$ppllibs $LIBS"
 fi
@@ -1377,18 +1391,18 @@ AC_ARG_WITH(cloog, [  --with-cloog=PATH       Specify prefix directory for the i
                           plus --with-cloog-lib=PATH/lib])
 AC_ARG_WITH(cloog_include, [  --with-cloog-include=PATH Specify directory for installed CLooG include files])
 AC_ARG_WITH(cloog_lib, [  --with-cloog-lib=PATH   Specify the directory for the installed CLooG library])
-AC_ARG_WITH(cloog-polylib, [  --with-cloog-polylib=PATH Specify prefix directory for the installed CLooG-PolyLib package])
 
-if test "x$with_cloog" != x; then
-  clooglibs="-L$with_cloog/lib -lcloog"
-  clooginc="-I$with_cloog/include -DCLOOG_PPL_BACKEND "
-  LIBS="$clooglibs $LIBS"
-fi
-if test "x$with_cloog_polylib" != x; then
-  clooglibs="-L$with_cloog/lib -lcloog"
-  clooginc="-I$with_cloog/include "
-  LIBS="$clooglibs $LIBS"
-fi
+case $with_cloog in 
+  no)
+    clooglibs=
+    clooginc=
+    ;;
+  *)
+    clooglibs="-L$with_cloog/lib -lcloog"
+    clooginc="-I$with_cloog/include -DCLOOG_PPL_BACKEND "
+    LIBS="$clooglibs $LIBS"
+    ;;
+esac
 if test "x$with_cloog_include" != x; then
   clooginc="-I$with_cloog_include -DCLOOG_PPL_BACKEND "
 fi
@@ -2024,7 +2038,7 @@ case "${target}" in
   *-*-netware*)
     target_makefile_frag="config/mt-netware"
     ;;
-  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
+  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | *-*-kopensolaris*-gnu)
     target_makefile_frag="config/mt-gnu"
     ;;
   *-*-aix4.[[3456789]]* | *-*-aix[[56789]].*)
