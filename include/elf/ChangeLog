@@ -1,3 +1,7 @@
+2009-03-16  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* common.h (AT_RANDOM): Define.
+
 2009-03-04  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (R_PPC_TLSGD, R_PPC_TLSLD): Add new relocs.
