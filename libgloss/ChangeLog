@@ -1,3 +1,7 @@
+2009-03-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* m32r/m32r-stub.c: Replace with one from newer version of gdb.
+
 2009-01-07  Ben Elliston  <bje@au.ibm.com>
 
 	* Makefile.in (all): Add `+' to the command line so that the
