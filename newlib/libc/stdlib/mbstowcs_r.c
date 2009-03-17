@@ -9,25 +9,29 @@ _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
         size_t         n    _AND
         mbstate_t     *state)
 {
-  wchar_t *ptr = pwcs;
-  size_t max = n;
+  size_t ret = 0;
   char *t = (char *)s;
   int bytes;
 
+  if (!pwcs)
+    n = (size_t) 1; /* Value doesn't matter as long as it's not 0. */
   while (n > 0)
     {
-      bytes = _mbtowc_r (r, ptr, t, MB_CUR_MAX, state);
+      bytes = _mbtowc_r (r, pwcs, t, MB_CUR_MAX, state);
       if (bytes < 0)
 	{
 	  state->__count = 0;
 	  return -1;
 	}
       else if (bytes == 0)
-        return ptr - pwcs;
+	break;
       t += bytes;
-      ++ptr;
-      --n;
+      ++ret;
+      if (pwcs)
+	{
+	  ++pwcs;
+	  --n;
+	}
     }
-
-  return max;
+  return ret;
 }   

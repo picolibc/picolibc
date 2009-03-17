@@ -1,3 +1,8 @@
+2009-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/mbstowcs_r.c (_mbstowcs_r): Handle NULL destination
+	string correctly.
+
 2009-03-16  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/machine/arm/strlen.c (strlen): Fix defect in Thumb-2 mode.
