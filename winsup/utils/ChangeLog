@@ -1,3 +1,7 @@
+2009-03-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldh.cc: New file.
+
 2009-03-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldd.cc (load_dll): Start helper program rather than ldd.exe.
