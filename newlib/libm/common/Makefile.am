@@ -8,7 +8,7 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c s_infconst.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
-	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
+	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c
@@ -17,7 +17,7 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
-	sf_rint.c sf_logb.c \
+	sf_rint.c sf_logb.c sf_log2.c \
 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
@@ -92,6 +92,10 @@ sisnan.def: s_isnan.c
 
 slog1p.def: s_log1p.c
 	$(CHEW) < $(srcdir)/s_log1p.c >$@ 2>/dev/null
+	touch stmp-def
+
+slog2.def: s_log2.c
+	$(CHEW) < $(srcdir)/s_log2.c >$@ 2>/dev/null
 	touch stmp-def
 
 smodf.def: s_modf.c

@@ -250,6 +250,7 @@ extern double gamma _PARAMS((double));
 extern double lgamma _PARAMS((double));
 extern double erf _PARAMS((double));
 extern double erfc _PARAMS((double));
+extern double log2 _PARAMS((double));
 #define log2(x) (log (x) / _M_LOG2_E)
 
 #ifndef __math_68881
@@ -328,6 +329,7 @@ extern float gammaf _PARAMS((float));
 extern float lgammaf _PARAMS((float));
 extern float erff _PARAMS((float));
 extern float erfcf _PARAMS((float));
+extern float log2f _PARAMS((float));
 #define log2f(x) (logf (x) / (float) _M_LOG2_E)
 extern float hypotf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */

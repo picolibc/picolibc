@@ -1,3 +1,11 @@
+2009-03-18  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+
+	* libm/common/s_log2.c: New file.
+	* libm/common/sf_log2.c: Ditto.
+	* libm/common/Makefile.am: Add s_log2.c and sf_log2.c.
+	* libm/common/Makefile.in: Regenerated.
+	* libc/include/math.h: Add log2 and log2f function prototypes.
+
 2009-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/mbstowcs_r.c (_mbstowcs_r): Handle NULL destination
