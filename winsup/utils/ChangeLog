@@ -1,3 +1,21 @@
+2009-03-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc (load_dll): Start helper program rather than ldd.exe.
+	(set_entry_point_break): Rename from get_entry_point.
+	(print_dlls): Rename from print_dlls_and_kill_inferior.  Avoid printing
+	specific dll name if we're looking at a dll.
+	(report): Always dump dlls on process exit.  Don't allow thread
+	creation.  Accommodate get_entry_point rename.
+	(start_process): Start process with DEBUG_ONLY_THIS_PROCESS.
+	(longopts): Eliminate "dll" option.
+	(main): Ditto.
+
+2009-03-17  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc: Use wide character Win32 paths throughout.
+	(load_dll): Fix size expression (add fn) in realloc.
+
 2009-03-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldd.cc (longopts): Add --dll option.

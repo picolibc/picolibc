@@ -30,6 +30,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#undef wcscasecmp /* Disable definition from Cygwin's internal wchar.h. */
+#include <locale.h>
 #include <sys/cygwin.h>
 #include <unistd.h>
 #include <libgen.h>
@@ -50,13 +53,12 @@ struct option longopts[] =
   {"help", no_argument, NULL, 0},
   {"version", no_argument, NULL, 0},
   {"data-relocs", no_argument, NULL, 'd'},
-  {"dll", no_argument, NULL, 'D'},
   {"function-relocs", no_argument, NULL, 'r'},
   {"unused", no_argument, NULL, 'u'},
   {0, no_argument, NULL, 0}
 };
 
-static int process_file (const char *);
+static int process_file (const wchar_t *);
 
 static int
 usage (const char *fmt, ...)
@@ -84,13 +86,13 @@ usage (const char *fmt, ...)
 
 static HANDLE hProcess;
 
-static char *
+static wchar_t *
 get_module_filename (HANDLE hp, HMODULE hm)
 {
   size_t len;
-  char *buf = NULL;
+  wchar_t *buf = NULL;
   DWORD res;
-  for (len = 1024; (res = GetModuleFileNameEx (hp, hm, (buf = (char *) realloc (buf, len)), len)) == len; len += 1024)
+  for (len = 1024; (res = GetModuleFileNameExW (hp, hm, (buf = (wchar_t *) realloc (buf, len * sizeof (wchar_t))), len)) == len; len += 1024)
     continue;
   if (!res)
     {
@@ -100,33 +102,42 @@ get_module_filename (HANDLE hp, HMODULE hm)
   return buf;
 }
 
-static char *
-load_dll (const char *fn)
+static wchar_t *
+load_dll (const wchar_t *fn)
 {
-  char *buf = get_module_filename (GetCurrentProcess (), NULL);
+  wchar_t *buf = get_module_filename (GetCurrentProcess (), NULL);
   if (!buf)
     {
       printf ("ldd: GetModuleFileName returned an error %lu\n", GetLastError ());
       exit (1);		/* FIXME */
     }
-  buf = (char *) realloc (buf, sizeof (" \"--dll\" \"\"") + strlen (buf));
-  strcat (buf, " --dll \"");
-  strcat (buf, fn);
-  strcat (buf, "\"");
-  return buf;
+
+  wchar_t *newbuf = (wchar_t *) malloc ((sizeof (L"\"\" -- ") + wcslen (buf) + wcslen (fn)) * sizeof (wchar_t));
+  newbuf[0] = L'"';
+  wcscpy (newbuf + 1, buf);
+  wchar_t *p = wcsstr (newbuf, L"\\ldd");
+  if (!p)
+    {
+      printf ("ldd: can't parse my own filename \"%ls\"\n", buf);
+      exit (1);
+    }
+  p[3] = L'h';
+  wcscat (newbuf, L"\" -- ");
+  wcscat (newbuf, fn);
+  free (buf);
+  return newbuf;
 }
 
-
 static int
-start_process (const char *fn, bool& isdll)
+start_process (const wchar_t *fn, bool& isdll)
 {
-  STARTUPINFO si = {};
+  STARTUPINFOW si = {};
   PROCESS_INFORMATION pi;
   si.cb = sizeof (si);
-  CHAR *cmd;
-  if (strlen (fn) < 4 || strcasecmp (strchr (fn, '\0') - 4, ".dll") != 0)
+  wchar_t *cmd;
+  if (wcslen (fn) < 4 || wcscasecmp (wcschr (fn, L'\0') - 4, L".dll") != 0)
     {
-      cmd = strdup (fn);
+      cmd = wcsdup (fn);
       isdll = false;
     }
   else
@@ -134,7 +145,7 @@ start_process (const char *fn, bool& isdll)
       cmd = load_dll (fn);
       isdll = true;
     }
-  if (CreateProcess (NULL, cmd, NULL, NULL, FALSE, DEBUG_PROCESS, NULL, NULL, &si, &pi))
+  if (CreateProcessW (NULL, cmd, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, &si, &pi))
     {
       free (cmd);
       hProcess = pi.hProcess;
@@ -147,7 +158,7 @@ start_process (const char *fn, bool& isdll)
 }
 
 static int
-get_entry_point ()
+set_entry_point_break ()
 {
   HMODULE hm;
   DWORD cb;
@@ -172,57 +183,55 @@ struct dlls
 
 #define SLOP strlen (" (?)")
 char *
-tocyg (char *win_fn)
+tocyg (wchar_t *win_fn)
 {
-  win_fn[MAX_PATH] = '\0';
-  ssize_t cwlen = cygwin_conv_path (CCP_WIN_A_TO_POSIX, win_fn, NULL, 0);
+  ssize_t cwlen = cygwin_conv_path (CCP_WIN_W_TO_POSIX, win_fn, NULL, 0);
   char *fn;
   if (cwlen <= 0)
-    fn = strdup (win_fn);
+    {
+      int len = wcstombs (NULL, win_fn, 0) + 1;
+      if ((fn = (char *) malloc (len)))
+	wcstombs (fn, win_fn, len);
+    }
   else
     {
       char *fn_cyg = (char *) malloc (cwlen + SLOP + 1);
-      if (cygwin_conv_path (CCP_WIN_A_TO_POSIX, win_fn, fn_cyg, cwlen) == 0)
+      if (cygwin_conv_path (CCP_WIN_W_TO_POSIX, win_fn, fn_cyg, cwlen) == 0)
 	fn = fn_cyg;
       else
 	{
 	  free (fn_cyg);
-	  fn = (char *) malloc (strlen (win_fn) + SLOP + 1);
-	  strcpy (fn, win_fn);
+	  int len = wcstombs (NULL, win_fn, 0);
+	  fn = (char *) malloc (len + SLOP + 1);
+	  wcstombs (fn, win_fn, len + SLOP + 1);
 	}
     }
   return fn;
 }
 
-#define CYGWIN_DLL_LEN (strlen ("\\cygwin1.dll"))
+#define CYGWIN_DLL_LEN (wcslen (L"\\cygwin1.dll"))
 static int
-print_dlls_and_kill_inferior (dlls *dll, const char *dllfn, const char *process_fn)
+print_dlls (dlls *dll, const wchar_t *dllfn, const wchar_t *process_fn)
 {
-  bool printit = !dllfn;
   while ((dll = dll->next))
     {
       char *fn;
-      char *fullpath = get_module_filename (hProcess, (HMODULE) dll->lpBaseOfDll);
+      wchar_t *fullpath = get_module_filename (hProcess, (HMODULE) dll->lpBaseOfDll);
       if (!fullpath)
 	fn = strdup ("???");
+      else if (dllfn && wcscmp (fullpath, dllfn) == 0)
+	{
+	  free (fullpath);
+	  continue;
+	}
       else
 	{
-	  if (printit)
-	    fn = tocyg (fullpath);
-	  else if (strcasecmp (fullpath, dllfn) != 0)
-	    continue;
-	  else
-	    {
-	      printit = true;
-	      free (fullpath);
-	      continue;
-	    }
+	  fn = tocyg (fullpath);
 	  free (fullpath);
 	}
       printf ("\t%s => %s (%p)\n", basename (fn), fn, dll->lpBaseOfDll);
       free (fn);
     }
-  TerminateProcess (hProcess, 0);
   if (process_fn)
     return process_file (process_fn);
   return 0;
@@ -237,14 +246,21 @@ report (const char *in_fn, bool multiple)
   if (!fn)
     print_errno_error_and_return (in_fn);
 
-  ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_A, fn, NULL, 0);
+  ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_W, fn, NULL, 0);
   if (len <= 0)
     print_errno_error_and_return (fn);
 
   bool isdll;
-  char fn_win[len + 1];
-  if (cygwin_conv_path (CCP_POSIX_TO_WIN_A, fn, fn_win, len))
+  wchar_t fn_win_buf[len + 1];
+  if (cygwin_conv_path (CCP_POSIX_TO_WIN_W, fn, fn_win_buf, len))
     print_errno_error_and_return (fn);
+  wchar_t *fn_win = fn_win_buf + 4;
+
+  if (wcsncmp (fn_win_buf, L"\\\\?\\UNC\\", 8) == 0)
+    {
+      fn_win += 2;
+      *fn_win = L'\\';
+    }
 
   if (!fn || start_process (fn_win, isdll))
     print_errno_error_and_return (in_fn);
@@ -255,25 +271,18 @@ report (const char *in_fn, bool multiple)
 
   dlls dll_list = {};
   dlls *dll_last = &dll_list;
-  const char *process_fn = NULL;
+  const wchar_t *process_fn = NULL;
   while (1)
     {
-      if (WaitForDebugEvent (&ev, 1000))
-	/* ok */;
-      else
-	switch (GetLastError ())
-	  {
-	  case WAIT_TIMEOUT:
-	    continue;
-	  default:
-	    usleep (100000);
-	    goto out;
-	  }
+      bool exitnow = false;
+      DWORD cont = DBG_CONTINUE;
+      if (!WaitForDebugEvent (&ev, INFINITE))
+	break;
       switch (ev.dwDebugEventCode)
 	{
 	case LOAD_DLL_DEBUG_EVENT:
 	  if (!isdll && ++dll_count == 2)
-	    get_entry_point ();
+	    set_entry_point_break ();
 	  dll_last->next = (dlls *) malloc (sizeof (dlls));
 	  dll_last->next->lpBaseOfDll = ev.u.LoadDll.lpBaseOfDll;
 	  dll_last->next->next = NULL;
@@ -287,21 +296,27 @@ report (const char *in_fn, bool multiple)
 	      break;
 	    case STATUS_BREAKPOINT:
 	      if (!isdll)
-		print_dlls_and_kill_inferior (&dll_list, isdll ? fn_win : NULL, process_fn);
+		cont = DBG_EXCEPTION_NOT_HANDLED;
 	      break;
 	    }
 	  break;
+	case CREATE_THREAD_DEBUG_EVENT:
+	  TerminateProcess (hProcess, 0);
+	  break;
 	case EXIT_PROCESS_DEBUG_EVENT:
-	  print_dlls_and_kill_inferior (&dll_list, isdll ? fn_win : NULL, process_fn);
+	  print_dlls (&dll_list, isdll ? fn_win : NULL, process_fn);
+	  exitnow = true;
 	  break;
 	default:
 	  break;
 	}
-      if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId, DBG_CONTINUE))
+      if (!ContinueDebugEvent (ev.dwProcessId, ev.dwThreadId, cont))
 	{
 	  cygwin_internal (CW_SETERRNO, __FILE__, __LINE__ - 2);
 	  print_errno_error_and_return (in_fn);
 	}
+      if (exitnow)
+	break;
     }
 
 out:
@@ -314,6 +329,7 @@ main (int argc, char **argv)
 {
   int optch;
   int index;
+  setlocale (LC_ALL, "");
   while ((optch = getopt_long (argc, argv, "dru", longopts, &index)) != -1)
     switch (optch)
       {
@@ -322,10 +338,6 @@ main (int argc, char **argv)
       case 'u':
 	usage ("option not implemented `-%c'", optch);
 	exit (1);
-      case 'D':
-	if (!LoadLibrary (argv[optind]))
-	  exit (1);
-	exit (0);
       case 0:
 	if (index == 1)
 	  {
@@ -403,16 +415,21 @@ dump_import_directory (const void *const section_base,
   /* continue until address inaccessible or there's no DLL name */
   for (; !IsBadReadPtr (imp, sizeof (*imp)) && imp->Name; imp++)
     {
-      char full_path[MAX_PATH];
-      char *dummy;
+      wchar_t full_path[PATH_MAX];
+      wchar_t *dummy;
       char *fn = (char *) adr (imp->Name);
 
       if (saw_file (fn))
 	continue;
 
+      int len = mbstowcs (NULL, fn, 0);
+      if (len <= 0)
+      	continue;
+      wchar_t fnw[len + 1];
+      mbstowcs (fnw, fn, len + 1);
       /* output DLL's name */
       char *print_fn;
-      if (!SearchPath (NULL, fn, NULL, sizeof (full_path), full_path, &dummy))
+      if (!SearchPathW (NULL, fnw, NULL, PATH_MAX, full_path, &dummy))
 	{
 	  print_fn = strdup ("not found");
 	  printing = true;
@@ -437,14 +454,14 @@ dump_import_directory (const void *const section_base,
    return pointer to loaded file
    0 if no success  */
 static void *
-map_file (const char *filename)
+map_file (const wchar_t *filename)
 {
   HANDLE hFile, hMapping;
   void *basepointer;
-  if ((hFile = CreateFile (filename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+  if ((hFile = CreateFileW (filename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
 			   0, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0)) == INVALID_HANDLE_VALUE)
     {
-      fprintf (stderr, "couldn't open %s\n", filename);
+      fprintf (stderr, "couldn't open %ls\n", filename);
       return 0;
     }
   if (!(hMapping = CreateFileMapping (hFile, 0, PAGE_READONLY | SEC_COMMIT, 0, 0, 0)))
@@ -515,7 +532,7 @@ get_directory_index (const unsigned dir_rva,
 /* dump imports of a single file
    Returns 0 if successful, !=0 else */
 static int
-process_file (const char *filename)
+process_file (const wchar_t *filename)
 {
   void *basepointer;    /* Points to loaded PE file
 			 * This is memory mapped stuff
