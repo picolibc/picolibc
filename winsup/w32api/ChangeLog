@@ -1,3 +1,20 @@
+2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winnt.h: Add Vista token security extensions.
+	(SID_HASH_SIZE): Define.
+	(TOKEN_MANDATORY_POLICY_OFF, TOKEN_MANDATORY_POLICY_NO_WRITE_UP,
+	TOKEN_MANDATORY_POLICY_NEW_PROCESS_MIN,
+	TOKEN_MANDATORY_POLICY_VALID_MASK): Define.
+	(SID_HASH_ENTRY): Define.
+	(struct _SID_AND_ATTRIBUTES_HASH): Define.
+	(struct _TOKEN_LINKED_TOKEN): Define.
+	(struct _TOKEN_MANDATORY_LABEL): Define.
+	(struct _TOKEN_MANDATORY_POLICY): Define.
+	(struct _TOKEN_ELEVATION): Define.
+	(struct _TOKEN_ACCESS_INFORMATION): Define.
+	(enum _TOKEN_INFORMATION_CLASS): Conditionally define new Vista token
+	information enumeration values.
+
 2009-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winioctl.h (FSCTL_ALLOW_EXTENDED_DASD_IO): Copy definition
