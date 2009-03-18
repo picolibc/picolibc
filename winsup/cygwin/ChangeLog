@@ -1,3 +1,11 @@
+2009-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (lsaauth): Remove local definitions of struct
+	_TOKEN_LINKED_TOKEN and TokenLinkedToken in favor of definitions
+	from winnt.h.
+	(lsaprivkeyauth): As in lsaauth, fetch linked token if available and
+	return that in favor of default token.
+
 2009-03-15  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
 	* errno.cc (_sys_errlist): Add ESTRPIPE.

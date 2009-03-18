@@ -1108,12 +1108,6 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   if (wincap.has_mandatory_integrity_control ())
     {
-      typedef struct _TOKEN_LINKED_TOKEN
-      {
-	HANDLE LinkedToken;
-      } TOKEN_LINKED_TOKEN, *PTOKEN_LINKED_TOKEN;
-#     define TokenLinkedToken ((TOKEN_INFORMATION_CLASS) 19)
-
       TOKEN_LINKED_TOKEN linked;
 
       if (GetTokenInformation (user_token, TokenLinkedToken,
@@ -1200,13 +1194,28 @@ lsaprivkeyauth (struct passwd *pw)
       __seterrno ();
       token = NULL;
     }
-  else if (!SetHandleInformation (token,
-				  HANDLE_FLAG_INHERIT,
-				  HANDLE_FLAG_INHERIT))
+  else
     {
-      __seterrno ();
-      CloseHandle (token);
-      token = NULL;
+      if (wincap.has_mandatory_integrity_control ())
+	{
+	  TOKEN_LINKED_TOKEN linked;
+	  DWORD size;
+
+	  if (GetTokenInformation (token, TokenLinkedToken,
+				   (PVOID) &linked, sizeof linked, &size))
+	    {
+	      debug_printf ("Linked Token: %p", linked.LinkedToken);
+	      if (linked.LinkedToken)
+		token = linked.LinkedToken;
+	    }
+	}
+      if (!SetHandleInformation (token, HANDLE_FLAG_INHERIT,
+				 HANDLE_FLAG_INHERIT))
+	{
+	  __seterrno ();
+	  CloseHandle (token);
+	  token = NULL;
+	}
     }
 
 out:
