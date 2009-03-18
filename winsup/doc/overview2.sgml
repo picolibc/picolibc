@@ -245,7 +245,7 @@ Win32 paths containing drive letter and/or backslashes as well as UNC paths
 
 <sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
 <para>Interoperability with other Win32 programs such as text editors was
-critical to the success of the port of the development tools.  Most Red Hat
+critical to the success in the early days of Cygwin.  Most Red Hat
 customers upgrading from the older DOS-hosted toolchains expected the new
 Win32-hosted ones to continue to work with their old development
 sources.</para>
@@ -258,8 +258,8 @@ the fly by Cygwin into a single newline when reading in text mode.</para>
 violating the POSIX standard that states that text and binary mode will be
 identical. Consequently, processes that attempt to lseek through text files can
 no longer rely on the number of bytes read as an accurate indicator of position
-in the file.  For this reason, the CYGWIN environment variable can be
-set to override this behavior.</para>
+in the file.  For this reason, Cygwin allows to choose the mode in which to
+read a file in several ways.</para>
 </sect2>
 
 <sect2 id="ov-hi-ansiclib"><title>ANSI C Library</title>
