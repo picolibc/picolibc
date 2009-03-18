@@ -1,5 +1,14 @@
 2009-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin-ug-net.in.sgml: Update date.
+	* cygwinenv.sgml: Fix codepage:utf8 text in terms of setting
+	environment variables.
+	* new-features.sgml: New file describing new Cygwin 1.7 features.
+	Layout is preliminiary only.
+	* overview.sgml: Insert content of new-features.sgml.
+
+2009-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* overview2.sgml: Remove reference to CYGWIN=binmode.
 	* textbinary.sgml: Ditto.  Rephrase certain paragraphs to match
 	Cygwin 1.7 behaviour.  Add popen(3) and pipe(2) behaviour.  Make

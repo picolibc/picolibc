@@ -29,9 +29,9 @@ equipment manufacturers (OEMs).</para>
 do not display correctly in Cygwin, you can use this option to select an
 appropriate codepage.  Finally, <envar>utf8</envar> treats all file names
 and console characters as UTF-8 chars.  Please note that, for correct
-operation, you have to set the environment variable LC_CTYPE to "C-UTF-8"
-for the time being.  The reason is that newlib's multibyte conversion
-functions require this setting.</para>
+operation, you have to set the environment variable LANG or LC_ALL to
+somthing like "en_US.UTF-8", otherwise many applications will not be
+able to recognize UTF-8 strings correctly.</para>
 </listitem>
 
 <listitem>

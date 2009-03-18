@@ -1,0 +1,278 @@
+<sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
+
+<sect2 id="ov-new1.7-os"><title>OS releated changes</title>
+
+<screen>
+- Windows 95, 98 and Me are not supported anymore.  The new Cywin 1.7 DLL
+  will not run on any of these systems.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-file"><title>File Access related changes</title>
+
+<screen>
+- Mount points are no longer stored in the registry.  Use /etc/fstab
+  and /etc/fstab.d/$USER instead.  Mount points created with mount(1)
+  are only local to the current session and disappear when the last
+  Cygwin process in the session exits.
+
+- PATH_MAX is now 4096.  Internally, path names can be as long as the
+  underlying OS can handle (32K).
+  
+- UTF-8 filenames are supported now.  So far, this requires to set
+  the environment variable CYGWIN to contain "codepage:utf8". but this
+  will likely disappear at one point.  The setting of $LANG or $LC_CTYPE
+  will be used instead.
+
+- struct dirent now supports d_type, filled out with DT_REG or DT_DIR.
+  All other file types return as DT_UNKNOWN for performance reasons.
+
+- The CYGWIN environment variable options "ntsec" and "smbntsec" have
+  been replaced by the per-mount option "acl"/"noacl".
+
+- The CYGWIN environment variable option "ntea" has been removed without
+  substitute.
+
+- The CYGWIN environment variable option "check_case" has been removed
+  in favor of real case-sensitivity on file systems supporting it.
+
+- Creating filenames with special DOS characters '"', '*', ':', '&lt;',
+  '&gt;', '|' is supported.
+
+- Creating files with special DOS device filename components ("aux",
+  "nul", "prn") is supported.
+
+- File name are case sensitive if the OS and the underlying file system
+  supports it.  Works on NTFS and NFS.  Does not work on FAT and Samba
+  shares.  Requires to change a registry key (see the user's guide).
+  Can be switched off on a per-mount base.
+
+- Due to the above changes, managed mounts have been removed. 
+
+- Incoming DOS paths are always handled case-insensitive and get no POSIX
+  permission, as if they are mounted with noacl,posix=0 mount flags.
+
+- unlink(2) and rmdir(2) try very hard to remove files/directories even
+  if they are currently accessed or locked.  This is done by utilizing
+  the hidden recycle bin directories and marking the files for deletion.
+
+- rename(2) rewritten to be more POSIX conformant.
+
+- Add st_birthtim member to struct stat.
+
+- File locking is now advisory, not mandatory anymore.  The fcntl(2) and
+  the new lockf(2) APIs create and maintain locks with POSIX semantics,
+  the flock(2) API creates and maintains locks with BSD semantics.
+  POSIX and BSD locks are independent of each other.
+
+- Implement atomic O_APPEND mode.
+
+- New open(2) flags O_DIRECTORY, O_EXEC and O_SEARCH.
+
+- Handle NTFS native symlinks available since Vista/2008 as symlinks
+  (but don't create Vista/2008 symlinks due to unfortunate OS restrictions).
+
+- Recognize NFS shares and handle them using native mechanisms.
+  Recognize and create real symlinks on NFS shares.  Get correct
+  stat(2) information and set real mode bits on open(2), mkdir(2)
+  and chmod(2).
+
+- Recognize Netapp DataOnTap drives and fix inode number handling.
+
+- Recognize Samba version beginning with Samba 3.0.28a using the new
+  extended version information negotiated with the Samba developers.
+
+- List servers of all accessible domains and workgroups in // instead of
+  just the servers in the own domain/workgroup.
+
+- Support Linux-like extended attributes ([fl]getxattr, [fl]listxattr,
+  [fl]setxattr, [fl]removexattr).
+
+- New file conversion API for conversion from Win32 to POSIX path and
+  vice versa (cygwin_conv_path, cygwin_create_path, cygwin_conv_path_list).
+
+- New openat family of functions: openat, faccessat, fchmodat, fchownat,
+  fstatat, futimesat, linkat, mkdirat, mkfifoat, mknodat, readlinkat, renameat,
+  symlinkat, unlinkat.
+
+- Other new APIs: posix_fadvise, posix_fallocate, funopen, fopencookie,
+  open_memstream, open_wmemstream, fmemopen, fdopendir.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-net"><title>Network related changes</title>
+
+<screen>
+- New implementation for blocking sockets and select on sockets which
+  is supposed to allow POSIX-compatible sharing of sockets between
+  threads and processes.
+
+- send/sendto/sendmsg now send data in 64K chunks to circumvent an
+  internal buffer problem in WinSock (KB 201213).
+
+- New send/recv option MSG_DONTWAIT.
+
+- IPv6 support.  New API getaddrinfo, getnameinfo, freeaddrinfo,
+  gai_strerror, in6addr_any, in6addr_loopback.  On IPv6-less systems,
+  replacement functions are available for IPv4.  On systems with IPv6
+  enabled, the underlying WinSock functions are used.  While I tried
+  hard to get the functionality as POSIXy as possible, keep in mind that
+  a *fully* conformant implementation of getaddrinfo and other stuff is
+  only available starting with Windows Vista/2008.
+
+- Resolver functions (res_init, res_query, res_search, res_querydomain,
+  res_mkquery, res_send, dn_comp, dn_expand) are now part of Cygwin.
+  Applications don't have to link against minires anymore.  Actually,
+  this *is* the former libminires.a.
+
+- rcmd is now implemented inside of Cygwin, instead of calling the
+  WinSock function.  This allows rsh(1) usage on Vista/2008, which
+  dropped this function from WinSock.
+
+- Define multicast structures in netinet/in.h.  Note that fully
+  conformant multicast support is only available beginning with Vista/2008.
+
+- Improve get_ifconf.  Redefine struct ifreq and subsequent datastructures
+  to be able to keep more information.  Support SIOCGIFINDEX, SIOCGIFDSTADDR
+  and the Cygwin specific SIOCGIFFRNDLYNAM.  Support real interface flags
+  on systems supporting them.
+
+- Other new APIs: bindresvport, bindresvport_sa, gethostbyname2, iruserok_sa,
+  rcmd_af, rresvport_af.  getifaddrs, freeifaddrs, if_nametoindex,
+  if_indextoname, if_nameindex, if_freenameindex.
+
+- Add /proc/net/if_inet6.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-device"><title>Device related changes</title>
+
+<screen>
+- Reworked pipe implementation which uses overlapped IO to create
+  more reliable interruptible pipes and fifos.
+
+- The CYGWIN environment variable option "binmode" has been removed.
+
+- Improved fifo handling by using native Windows named pipes.
+
+- Detect when a stdin/stdout which looks like a pipe is really a tty.
+  Among other things, this allows a debugged application to recognize that
+  it is using the same tty as the debugger.
+
+- Support UTF-8 in console window.
+
+- Support up to 64 serial interfaces using /dev/ttyS0 - /dev/ttyS63.
+
+- Support up to 128 raw disk drives /dev/sda - /dev/sddx.
+
+- New API: cfmakeraw, posix_openpt.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-posix"><title>Other POSIX related changes</title>
+
+<screen>
+- Allow multiple concurrent read locks per thread for pthread_rwlock_t.
+
+- Implement pthread_kill(thread, 0) as per POSIX.
+
+- New API for POSIX IPC:
+  Named semaphores: sem_open, sem_close, sem_unlink.
+  Message queues: mq_open, mq_getattr, mq_setattr, mq_notify, mq_send,
+  mq_timedsend, mq_receive, mq_timedreceive, mq_close, mq_unlink.
+  Shared memory: shm_open, shm_unlink.
+
+- Only declare expected functions in &lt;strings.h&gt;, don't include
+  &lt;string.h&gt; from here.
+
+- New APIs: _Exit, confstr, insque, remque, sys_sigabbrev,
+  posix_madvise, posix_memalign, reallocf,
+  exp10, exp10f, pow10, pow10f, lrint, lrintf, rint, rintf, llrint, llrintf,
+  llrintl, lrintl, rintl,
+  mbsnrtowcs, strcasestr, stpcpy, stpncpy, wcpcpy, wcpncpy, wcsnlen,
+  wcsnrtombs, wcsftime, wcstod, wcstof, wcstoimax, wcstok, wcstol, wcstoll,
+  wcstoul, wcstoull, wcstoumax, wcsxfrm, wcscasecmp, wcsncasecmp,
+  fgetwc, fgetws, fputwc, fputws, fwide, getwc, getwchar, putwc, putwchar,
+  ungetwc, asnprintf, dprintf, vasnprintf, vdprintf,
+  wprintf, fwprintf, swprintf, vwprintf, vfwprintf, vswprintf,
+  wscanf, fwscanf, swscanf, vwscanf, vfwscanf, vswscanf.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-sec"><title>Security related changes</title>
+
+<screen>
+- Getting a domain user's groups is hopefully more bulletproof now.
+
+- Cygwin now comes with a real LSA authentication package.  This must
+  be manually installed by a privileged user using the /bin/cyglsa-config
+  script.  The advantages and disadvantages are noted in
+  http://cygwin.com/ml/cygwin-developers/2006-11/msg00000.html
+
+- Cygwin now allows to store and use user passwords in a hidden area of
+  the registry.  This is tried first when Cygwin is called by privileged
+  processes to switch the user context.  This allows, for instance,
+  ssh public key sessions with full network credentials to access shares
+  on other machines.
+
+- The mkpasswd and mkgroup tools have changed behaviour and a couple of
+  new options to ease consistent usage in multi-machine or multi-domain
+  environments.
+</screen>
+
+</sect2>
+
+<sect2 id="ov-new1.7-misc"><title>Miscellanous</title>
+
+<screen>
+- New ldd utility, similar to Linux.
+
+- Fallout from the long path names: If the current working directory is
+  longer than 260 bytes, or if the current working directory is a virtual
+  path (like /proc, /cygdrive, //server), don't call native Win32 programs
+  since they don't understand these paths.
+
+- On the first usage of a DOS path (C:\foo, \\foo\bar), the Cygwin DLL
+  emits a scary warning that DOS paths shouldn't be used.  There's also
+  the new CYGWIN=nodosfilewarning setting to disable that.
+
+- The CYGWIN environment variable option "server" has been removed.
+  Cygwin automatically uses cygserver if it's available.
+
+- Allow environment of arbitrary size instead of a maximum of 32K.
+
+- Don't force uppercase environment when started from a non-Cygwin process.
+  Except for certain Windows and POSIX variables which are always uppercased,
+  preserve environment case.  Switch back to old behaviour with the new
+  CYGWIN=upcaseenv setting.
+
+- Detect and report a missing DLL on process startup.
+
+- Add /proc/registry32 and /proc/registry64 paths to access 32 bit and
+  64 bit registry on 64 bit systems.
+
+- Add the ability to distinguish registry keys and registry values with the
+  same name in the same registry subtree.  The key is called "foo" and the
+  value will be called "foo%val" in this case.
+
+- Align /proc/cpuinfo more closly to Linux content.
+
+- Add /proc/$PID/mounts entries and a symlink /proc/mounts pointing to
+  /proc/self/mounts as on Linux.
+
+- Optimized strstr and memmem implementation.
+
+- Remove backwards compatibility with old signal masks (some *very* old
+  programs which use signal masks may no longer work correctly).
+
+</screen>
+
+</sect2>
+
+</sect1>
+
