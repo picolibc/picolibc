@@ -1,3 +1,7 @@
+2009-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (get_full_path_of_dll): Revert patch from 2008-07-16.
+
 2009-03-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din: Export log2, log2f as functions.
