@@ -4,8 +4,11 @@
 #include "mbctype.h"
 #include <wchar.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef _MB_CAPABLE
+extern char *__locale_charset ();
+
 typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, 
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
 typedef enum { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
@@ -117,10 +120,16 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -2;
 	  ch = t[i++];
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  if (state->__value.__wchb[0] < 0xc2)
-	    /* overlong UTF-8 sequence */
-	    return -1;
+	    {
+	      /* overlong UTF-8 sequence */
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  state->__count = 0;
 	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x1f) << 6)
 	    |    (wchar_t)(ch & 0x3f);
@@ -139,24 +148,36 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -2;
 	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
 	  if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0)
-	    /* overlong UTF-8 sequence */
-	    return -1;
+	    {
+	      /* overlong UTF-8 sequence */
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  state->__value.__wchb[1] = ch;
 	  state->__count = 2;
 	  if (n < 3)
 	    return -2;
 	  ch = t[i++];
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  state->__count = 0;
 	  tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
 	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
 	    |     (wchar_t)(ch & 0x3f);
 	
 	  if (tmp >= 0xd800 && tmp <= 0xdfff)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  *pwc = tmp;
 	  return i;
 	}
@@ -173,10 +194,16 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -2;
 	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
 	  if (state->__value.__wchb[0] == 0xf0 && ch < 0x90)
-	    /* overlong UTF-8 sequence */
-	    return -1;
+	    {
+	      /* overlong UTF-8 sequence */
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  state->__value.__wchb[1] = ch;
 	  if (state->__count == 1)
 	    state->__count = 2;
@@ -186,14 +213,20 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	    return -2;
 	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  state->__value.__wchb[2] = ch;
 	  state->__count = 3;
 	  if (n < 4)
 	    return -2;
 	  ch = t[i++];
 	  if (ch < 0x80 || ch > 0xbf)
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	  tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
 	    |   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
 	    |   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6)
@@ -217,7 +250,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	  return i;
 	}
       else
-	return -1;
+	{
+	  r->_errno = EILSEQ;
+	  return -1;
+	}
     }      
   else if (!strcmp (__locale_charset (), "SJIS"))
     {
@@ -246,7 +282,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	      return i;
 	    }
 	  else  
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	}
     }
   else if (!strcmp (__locale_charset (), "EUCJP"))
@@ -276,7 +315,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 	      return i;
 	    }
 	  else
-	    return -1;
+	    {
+	      r->_errno = EILSEQ;
+	      return -1;
+	    }
 	}
     }
   else if (!strcmp (__locale_charset (), "JIS"))
@@ -357,6 +399,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
               break;
             case ERROR:
             default:
+	      r->_errno = EILSEQ;
               return -1;
             }
 

@@ -5,6 +5,8 @@
 #include <locale.h>
 #include "mbctype.h"
 
+extern char *__locale_charset ();
+
 /* for some conversions, we use the __count field as a place to store a state value */
 #define __state __count
 

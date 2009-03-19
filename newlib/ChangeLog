@@ -1,3 +1,12 @@
+2009-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Return EILSEQ in case of an
+	invalid character sequence.
+
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Fix compiler warning due to
+	missing declaration of __locale_charset.
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Ditto.
+
 2009-03-18  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
 	* libm/common/s_log2.c: New file.
