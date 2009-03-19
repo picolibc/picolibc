@@ -1,3 +1,9 @@
+2009-03-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din: Export log2, log2f as functions.
+	* posix.sgml: Add them to SUSv4 list.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (lsaauth): Remove local definitions of struct

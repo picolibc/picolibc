@@ -368,6 +368,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     log10f
     log1p
     log1pf
+    log2
+    log2f
     logb
     logbf
     logf

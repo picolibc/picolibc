@@ -903,6 +903,8 @@ log1p NOSIGFE
 _log1p = log1p NOSIGFE
 log1pf NOSIGFE
 _log1pf = log1pf NOSIGFE
+log2 NOSIGFE
+log2f NOSIGFE
 logb NOSIGFE
 _logb = logb NOSIGFE
 logbf NOSIGFE
