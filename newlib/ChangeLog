@@ -1,3 +1,10 @@
+2009-03-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/errno.h: Protect various non-standard errnos
+	with either __LINUX_ERRNO_EXTENSIONS__ or __CYGWIN__.
+	* libc/include/sys/config.h[__CYGWIN__]: Define
+	__LINUX_ERRNO_EXTENSIONS__.
+
 2009-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Return EILSEQ in case of an

@@ -178,6 +178,7 @@
 
 #if defined(__CYGWIN__)
 #include <cygwin/config.h>
+#define __LINUX_ERRNO_EXTENSIONS__ 1
 #endif
 
 #if defined(__rtems__)
