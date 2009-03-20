@@ -1,3 +1,8 @@
+2009-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver-config: Remove misleading text describing the
+	"CYGWIN=server" setting for the client.
+
 2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
 
 	* Makefile.in: Add DESTDIR functionality.

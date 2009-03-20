@@ -198,12 +198,5 @@ echo "Further configuration options are available by editing the configuration"
 echo "file ${SYSCONFDIR}/cygserver.conf.  Please read the inline information in that"
 echo "file carefully. The best option for the start is to just leave it alone."
 echo
-echo "Please keep in mind, that a client application which wants to use"
-echo "the services provided by cygserver *must* have the environment variable"
-echo "CYGWIN set so that it contains the word \"server\".  So, if you don't"
-echo "need any other special CYGWIN setting, just set it to \"server\"".
-echo
-echo "It is advisable to add this setting to the Windows system environment."
-echo
 echo "Basic Cygserver configuration finished. Have fun!"
 echo
