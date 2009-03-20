@@ -1,3 +1,7 @@
+2009-03-20  Mikolaj Zalewski  <mikolajz@google.com>
+
+	* common.h (SHT_GNU_INCREMENTAL_INPUTS): Define.
+
 2009-03-14  Mark Kettenis  <kettenis@gnu.org>
 
 	* common.h (NT_OPENBSD_PROCINFO, NT_OPENBSD_AUXV) 
