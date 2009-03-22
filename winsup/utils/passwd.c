@@ -27,6 +27,8 @@ details. */
 #include <sys/types.h>
 #include <time.h>
 #include <errno.h>
+#include <locale.h>
+#include <wchar.h>
 
 #define USER_PRIV_ADMIN		 2
 
@@ -114,7 +116,7 @@ PUSER_INFO_3
 GetPW (char *user, int print_win_name, LPCWSTR server)
 {
   char usr_buf[UNLEN + 1];
-  WCHAR name[2 * (UNLEN + 1)];
+  WCHAR name[UNLEN + 1];
   DWORD ret;
   PUSER_INFO_3 ui;
   struct passwd *pw;
@@ -135,7 +137,7 @@ GetPW (char *user, int print_win_name, LPCWSTR server)
 	    }
 	}
     }
-  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
+  mbstowcs (name, user, UNLEN + 1);
   ret = NetUserGetInfo (server, name, 3, (void *) &ui);
   return EvalRet (ret, user) ? NULL : ui;
 }
@@ -144,11 +146,11 @@ int
 ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
 	  LPCWSTR server)
 {
-  WCHAR name[2 * (UNLEN + 1)], oldpass[512], pass[512];
+  WCHAR name[UNLEN + 1], oldpass[512], pass[512];
   DWORD ret;
 
-  MultiByteToWideChar (CP_ACP, 0, user, -1, name, 2 * (UNLEN + 1));
-  MultiByteToWideChar (CP_ACP, 0, pwd, -1, pass, 512);
+  mbstowcs (name, user, UNLEN + 1);
+  mbstowcs (pass, pwd, 512);
   if (! oldpwd)
     {
       USER_INFO_1003 ui;
@@ -158,7 +160,7 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
     }
   else
     {
-      MultiByteToWideChar (CP_ACP, 0, oldpwd, -1, oldpass, 512);
+      mbstowcs (oldpass, oldpwd, 512);
       ret = NetUserChangePassword (server, name, oldpass, pass);
     }
   if (justcheck && ret != ERROR_INVALID_PASSWORD)
@@ -327,11 +329,11 @@ Compiled on %s\n\
 int
 main (int argc, char **argv)
 {
-  char *c;
+  char *c, *logonserver;
   char user[UNLEN + 1], oldpwd[_PASSWORD_LEN + 1], newpwd[_PASSWORD_LEN + 1];
   int ret = 0;
   int cnt = 0;
-  int opt, len;
+  int opt;
   int Larg = -1;
   int xarg = -1;
   int narg = -1;
@@ -359,6 +361,8 @@ main (int argc, char **argv)
   c = strrchr (prog_name, '.');
   if (c)
     *c = '\0';
+
+  setlocale (LC_ALL, "");
 
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
@@ -417,10 +421,10 @@ main (int argc, char **argv)
 	  if (*optarg != '\\')
 	    strcpy (tmpbuf, "\\\\");
 	  strcat (tmpbuf, optarg);
-	  server = alloca ((strlen (tmpbuf) + 1) * sizeof (WCHAR));
-	  if (MultiByteToWideChar (CP_ACP, 0, tmpbuf, -1, server,
-				   strlen (tmpbuf) + 1) <= 0)
-	    server = NULL;
+	  size_t len = mbstowcs (NULL, tmpbuf, 0);
+	  if (len > 0 && len != (size_t) -1)
+	    mbstowcs (server = alloca ((len + 1) * sizeof (wchar_t)),
+		      tmpbuf, len + 1);
 	}
 	break;
 
@@ -513,15 +517,12 @@ main (int argc, char **argv)
       return 0;
     }
 
-  if (!server)
+  if (!server && (logonserver = getenv ("LOGONSERVER")))
     {
-      len = GetEnvironmentVariableW (L"LOGONSERVER", NULL, 0);
-      if (len > 0)
-	{
-	  server = alloca (len * sizeof (WCHAR));
-	  if (GetEnvironmentVariableW (L"LOGONSERVER", server, len) <= 0)
-	    server = NULL;
-	}
+      size_t len = mbstowcs (NULL, logonserver, 0);
+      if (len > 0 && len != (size_t) -1)
+	mbstowcs (server = alloca ((len + 1) * sizeof (wchar_t)),
+		  logonserver, len + 1);
     }
 
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)

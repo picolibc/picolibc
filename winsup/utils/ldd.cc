@@ -319,7 +319,6 @@ report (const char *in_fn, bool multiple)
 	break;
     }
 
-out:
   return 0;
 }
 

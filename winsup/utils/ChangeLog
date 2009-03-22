@@ -1,3 +1,11 @@
+2009-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldd.cc: Fix compiler warning.
+
+	* passwd.c: Use mbstowcs instead of MultiByteToWideChar throughout.
+	(main): Call setlocale.  Fix a bug in fetching the logon server from
+	the environment.
+
 2009-03-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldh.cc: New file.
