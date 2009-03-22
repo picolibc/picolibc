@@ -1,5 +1,10 @@
 2009-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* passwd.c (main): Always get logonserver from environment and
+	use when fetching user info for caller.
+
+2009-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ldd.cc: Fix compiler warning.
 
 	* passwd.c: Use mbstowcs instead of MultiByteToWideChar throughout.

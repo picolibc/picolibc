@@ -349,6 +349,7 @@ main (int argc, char **argv)
   int Sopt = 0;
   int Ropt = 0;
   PUSER_INFO_3 ui, li;
+  LPWSTR my_server = NULL;
   LPWSTR server = NULL;
 
   prog_name = strrchr (argv[0], '/');
@@ -517,12 +518,14 @@ main (int argc, char **argv)
       return 0;
     }
 
-  if (!server && (logonserver = getenv ("LOGONSERVER")))
+  if ((logonserver = getenv ("LOGONSERVER")))
     {
       size_t len = mbstowcs (NULL, logonserver, 0);
       if (len > 0 && len != (size_t) -1)
-	mbstowcs (server = alloca ((len + 1) * sizeof (wchar_t)),
+	mbstowcs (my_server = alloca ((len + 1) * sizeof (wchar_t)),
 		  logonserver, len + 1);
+      if (!server)
+	server = my_server;
     }
 
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)
@@ -534,7 +537,7 @@ main (int argc, char **argv)
 
   strcpy (user, optind >= argc ? getlogin () : argv[optind]);
 
-  li = GetPW (getlogin (), 0, server);
+  li = GetPW (getlogin (), 0, my_server);
   if (! li)
     return 1;
 
