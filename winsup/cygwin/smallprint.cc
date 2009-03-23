@@ -188,11 +188,12 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  break;
 		case 'W':
 		  w = va_arg (ap, PWCHAR);
-		  RtlInitUnicodeString (&uw, w);
-		  us = &uw;
+		  RtlInitUnicodeString (us = &uw, w ?: L"(null)");
 		  goto wfillin;
 		case 'S':
 		  us = va_arg (ap, PUNICODE_STRING);
+		  if (!us)
+		    RtlInitUnicodeString (us = &uw, L"(null)");
 		wfillin:
 		  {
 		    if (!sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
@@ -438,10 +439,12 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  break;
 		case L'W':
 		  w = va_arg (ap, PWCHAR);
-		  RtlInitUnicodeString (us = &uw, w);
+		  RtlInitUnicodeString (us = &uw, w ?: L"(null)");
 		  goto fillin;
 		case L'S':
 		  us = va_arg (ap, PUNICODE_STRING);
+		  if (!us)
+		    RtlInitUnicodeString (us = &uw, L"(null)");
 		fillin:
 		  if (us->Length / sizeof (WCHAR) < n)
 		    n = us->Length / sizeof (WCHAR);
