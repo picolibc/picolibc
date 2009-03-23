@@ -32,8 +32,6 @@ extern uint16_t	htons(uint16_t);
 
 extern __inline__ uint32_t	__ntohl(uint32_t);
 extern __inline__ uint16_t	__ntohs(uint16_t);
-extern __inline__ uint32_t	__constant_ntohl(uint32_t);
-extern __inline__ uint16_t	__constant_ntohs(uint16_t);
 
 extern __inline__ uint32_t
 __ntohl(uint32_t x)

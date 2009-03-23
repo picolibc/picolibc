@@ -1,5 +1,10 @@
 2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/asm/byteorder.h (__constant_ntohs): Remove declaration.
+	(__constant_ntohl): Ditto.
+
+2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export wordexp, wordfree.
 	* posix.sgml: Move them to SUSv4 list.
 	* include/cygwin/version.h: Bump API minor number.
