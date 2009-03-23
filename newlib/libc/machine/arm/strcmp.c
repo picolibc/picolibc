@@ -112,7 +112,26 @@ __attribute__((naked)) strcmp (const char* s1, const char* s2)
       "it	eq\n\t"
       SHFT2LSB"eq r3, r3, #8\n\t"
       "beq	2b\n\t"
-      "sub	r0, r0, r3, "SHFT2MSB" #24\n\t"
+      /* On a big-endian machine, r0 contains the desired byte in bits
+	 0-7; on a little-endian machine they are in bits 24-31.  In
+	 both cases the other bits in r0 are all zero.  For r3 the
+	 interesting byte is at the other end of the word, but the
+	 other bits are not necessarily zero.  We need a signed result
+	 representing the differnece in the unsigned bytes, so for the
+	 little-endian case we can't just shift the interesting bits
+	 up.  */
+#ifdef __ARMEB__
+      "sub	r0, r0, r3, lsr #24\n\t"
+#else
+      "and	r3, r3, #255\n\t"
+#ifdef __thumb2__
+      /* No RSB instruction in Thumb2 */
+      "lsr	r0, r0, #24\n\t"
+      "sub	r0, r0, r3\n\t"
+#else
+      "rsb	r0, r3, r0, lsr #24\n\t"
+#endif
+#endif
 #ifndef __thumb2__
       "ldr	r4, [sp], #4\n\t"
 #endif
