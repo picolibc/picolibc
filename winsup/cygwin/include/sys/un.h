@@ -1,6 +1,6 @@
 /* sys/un.h
 
-   Copyright 1999, 2001, 2005 Red Hat, Inc.
+   Copyright 1999, 2001, 2005, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 #ifndef _SYS_UN_H
 #define _SYS_UN_H
 
+#include <string.h>		/* for strlen */
 #include <cygwin/socket.h>
 
 /* POSIX requires only at least 100 bytes */
