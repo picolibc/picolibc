@@ -1,3 +1,9 @@
+2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export wordexp, wordfree.
+	* posix.sgml: Move them to SUSv4 list.
+	* include/cygwin/version.h: Bump API minor number.
+
 2009-03-22  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/sys/un.h: #include <string.h> for strlen.

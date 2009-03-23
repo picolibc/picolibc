@@ -357,12 +357,13 @@ details. */
       206: Export wcscasecmp, wcsncasecmp.
       207: Export wcsdup.
       208: Export log2, log2f.
+      209: Export wordexp, wordfree.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 208
+#define CYGWIN_VERSION_API_MINOR 209
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

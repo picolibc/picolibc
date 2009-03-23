@@ -1791,6 +1791,8 @@ wmemcmp NOSIGFE
 wmemcpy NOSIGFE
 wmemmove NOSIGFE
 wmemset NOSIGFE
+wordexp NOSIGFE
+wordfree NOSIGFE
 wprintf SIGFE
 write SIGFE
 _write = write SIGFE

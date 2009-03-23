@@ -866,6 +866,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wmemcpy
     wmemmove
     wmemset
+    wordexp
+    wordfree
     wprintf
     write
     writev
@@ -1350,8 +1352,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcsxfrm_l
     wctrans_l
     wctype_l
-    wordexp
-    wordfree
 </screen>
 
 </sect1>
