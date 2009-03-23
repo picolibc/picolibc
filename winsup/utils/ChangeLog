@@ -1,5 +1,12 @@
 2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* passwd.c (usage): Change description for -d option according to
+	previous change.
+	(main): Fix typo.
+	* utils.sgml: Add missing description for passwd -d option.
+
+2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.c (caller_is_admin): New function to test if calling user
 	is an administrator by inspecting user token.
 	(main): Drop fetching caller info from logonserver.  Only fetch

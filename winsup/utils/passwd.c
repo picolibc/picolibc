@@ -280,7 +280,9 @@ usage (FILE * stream, int status)
   "\n"
   "Other options:\n"
   "  -d, --logonserver SERVER connect to SERVER (e.g. domain controller).\n"
-  "                           default server is the content of $LOGONSERVER.\n"
+  "                           Default server is the local system, unless\n"
+  "                           changing the current user, in which case the\n"
+  "                           default is the content of $LOGONSERVER.\n"
   "  -S, --status             display password status for USER (locked, expired,\n"
   "                           etc.) plus global system password settings.\n"
   "  -h, --help               output usage information and exit.\n"
@@ -571,7 +573,7 @@ main (int argc, char **argv)
   strcpy (user, optind >= argc ? getlogin () : argv[optind]);
 
   /* Changing password for calling user?  Use logonserver for user as well. */
-  if (!server && optind < argc)
+  if (!server && optind >= argc)
     {
       myself = 1;
       if ((logonserver = getenv ("LOGONSERVER")))

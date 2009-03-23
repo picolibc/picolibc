@@ -919,6 +919,10 @@ System operations:
   -L, --length LEN         set system minimum password length to LEN.
 
 Other options:
+  -d, --logonserver SERVER connect to SERVER (e.g. domain controller).
+                           Default server is the local system, unless
+                           changing the current user, in which case the
+                           default is the content of $LOGONSERVER.
   -S, --status             display password status for USER (locked, expired,
                            etc.) plus global system password settings.
   -h, --help               output usage information and exit.
@@ -996,10 +1000,21 @@ to <emphasis>LEN</emphasis> characters.  Allowed values for the minimum
 password length are 0 to 14.  In any of the above cases, a value of 0
 means `no restrictions'.</para>
 
+<para>
+All operations affecting the current user are by default run against
+the logon server of the current user (taken from the environment
+variable <envar>LOGONSERVER</envar>.  When password or account information
+of other users should be changed, the default server is the local system.
+To change a user account on a remote machine, use the <literal>-d</literal>
+option to specify the machine to run the command against.  Note that the
+current user must be a valid member of the administrators group on the remote
+machine to perform such actions.
+</para>
+
 <para>Users can use the <command>passwd -R</command> to enter
-a password which then gets stored in a special area of the registry,
-which is also used by Windows to store passwords of accounts running
-Windows services.  When a privileged Cygwin application calls the
+a password which then gets stored in a special area of the registry on the
+local system, which is also used by Windows to store passwords of accounts
+running Windows services.  When a privileged Cygwin application calls the
 <command>set{e}uid(user_id)</command> system call, Cygwin checks if a
 password for that user has been stored in this registry area.  If so, it
 uses this password to switch to this user account using that password.
