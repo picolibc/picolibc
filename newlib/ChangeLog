@@ -1,3 +1,8 @@
+2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Fix typo in language and
+	territory evaluation.
+
 2009-03-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/errno.h: Protect various non-standard errnos

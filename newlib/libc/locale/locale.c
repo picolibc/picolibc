@@ -391,16 +391,16 @@ loadlocale(struct _reent *p, int category)
 
       /* Don't use ctype macros here, they might be localized. */
       /* Language */
-      if (c[0] <= 'a' || c[0] >= 'z'
-	  || c[1] <= 'a' || c[1] >= 'z')
+      if (c[0] < 'a' || c[0] > 'z'
+	  || c[1] < 'a' || c[1] > 'z')
 	return NULL;
       c += 2;
       if (c[0] == '_')
         {
 	  /* Territory */
 	  ++c;
-	  if (c[0] <= 'A' || c[0] >= 'Z'
-	      || c[1] <= 'A' || c[1] >= 'Z')
+	  if (c[0] < 'A' || c[0] > 'Z'
+	      || c[1] < 'A' || c[1] > 'Z')
 	    return NULL;
 	  c += 2;
 	}
