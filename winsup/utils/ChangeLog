@@ -1,3 +1,13 @@
+2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (caller_is_admin): New function to test if calling user
+	is an administrator by inspecting user token.
+	(main): Drop fetching caller info from logonserver.  Only fetch
+	server from environment when trying to change password for own
+	account.  Drop admin check entirely in case of doing account
+	maintainance.  Otherwise replace check for admin by result of
+	caller_is_admin call.
+
 2009-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.c (main): Always get logonserver from environment and

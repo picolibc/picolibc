@@ -303,6 +303,49 @@ usage (FILE * stream, int status)
   exit (status);
 }
 
+static int
+caller_is_admin ()
+{
+  static int is_admin = -1;
+  HANDLE token;
+  DWORD size;
+  PTOKEN_GROUPS grps;
+  SID_IDENTIFIER_AUTHORITY nt_auth = {SECURITY_NT_AUTHORITY};
+  PSID admin_grp; 
+  DWORD i;
+
+  if (is_admin == -1)
+    {
+      is_admin = 0;
+      if (OpenProcessToken (GetCurrentProcess (), TOKEN_READ, &token))
+	{
+	  GetTokenInformation (token, TokenGroups, NULL, 0, &size);
+	  grps = (PTOKEN_GROUPS) alloca (size);
+	  if (!GetTokenInformation(token, TokenGroups, grps, size, &size)
+	      || !AllocateAndInitializeSid (&nt_auth, 2,
+					    SECURITY_BUILTIN_DOMAIN_RID,
+					    DOMAIN_ALIAS_RID_ADMINS,
+					    0, 0, 0, 0, 0, 0, &admin_grp))
+	    is_admin = 0;
+	  else
+	    {
+	      for (i = 0; i < grps->GroupCount; ++i)
+		if (EqualSid (admin_grp, grps->Groups[i].Sid)
+		    && (grps->Groups[i].Attributes
+			& (SE_GROUP_ENABLED | SE_GROUP_USE_FOR_DENY_ONLY))
+		       == SE_GROUP_ENABLED)
+		  {
+		    is_admin = 1;
+		    break;
+		  }
+	      FreeSid (admin_grp);
+	    }
+	  CloseHandle (token);
+	}
+    }
+  return is_admin;
+}
+
 static void
 print_version ()
 {
@@ -348,8 +391,8 @@ main (int argc, char **argv)
   int Popt = 0;
   int Sopt = 0;
   int Ropt = 0;
-  PUSER_INFO_3 ui, li;
-  LPWSTR my_server = NULL;
+  PUSER_INFO_3 ui;
+  int myself = 0;
   LPWSTR server = NULL;
 
   prog_name = strrchr (argv[0], '/');
@@ -518,16 +561,6 @@ main (int argc, char **argv)
       return 0;
     }
 
-  if ((logonserver = getenv ("LOGONSERVER")))
-    {
-      size_t len = mbstowcs (NULL, logonserver, 0);
-      if (len > 0 && len != (size_t) -1)
-	mbstowcs (my_server = alloca ((len + 1) * sizeof (wchar_t)),
-		  logonserver, len + 1);
-      if (!server)
-	server = my_server;
-    }
-
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)
     {
       if (optind < argc)
@@ -537,9 +570,18 @@ main (int argc, char **argv)
 
   strcpy (user, optind >= argc ? getlogin () : argv[optind]);
 
-  li = GetPW (getlogin (), 0, my_server);
-  if (! li)
-    return 1;
+  /* Changing password for calling user?  Use logonserver for user as well. */
+  if (!server && optind < argc)
+    {
+      myself = 1;
+      if ((logonserver = getenv ("LOGONSERVER")))
+	{
+	  size_t len = mbstowcs (NULL, logonserver, 0);
+	  if (len > 0 && len != (size_t) -1)
+	    mbstowcs (server = alloca ((len + 1) * sizeof (wchar_t)),
+		      logonserver, len + 1);
+	}
+    }
 
   ui = GetPW (user, 1, server);
   if (! ui)
@@ -549,8 +591,6 @@ main (int argc, char **argv)
     {
       USER_INFO_1008 uif;
 
-      if (li->usri3_priv != USER_PRIV_ADMIN)
-        return eprint (0, "You have no maintenance privileges.");
       uif.usri1008_flags = ui->usri3_flags;
       if (lopt)
         {
@@ -584,14 +624,14 @@ main (int argc, char **argv)
       return 0;
     }
 
-  if (li->usri3_priv != USER_PRIV_ADMIN && strcmp (getlogin (), user))
+  if (!caller_is_admin () && !myself)
     return eprint (0, "You may not change the password for %s.", user);
 
   eprint (0, "Enter the new password (minimum of 5, maximum of 8 characters).");
   eprint (0, "Please use a combination of upper and lower case letters and numbers.");
 
   oldpwd[0] = '\0';
-  if (li->usri3_priv != USER_PRIV_ADMIN)
+  if (!caller_is_admin ())
     {
       strcpy (oldpwd, getpass ("Old password: "));
       if (ChangePW (user, oldpwd, oldpwd, 1, server))
