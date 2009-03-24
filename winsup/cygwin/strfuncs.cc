@@ -423,12 +423,13 @@ sys_cp_mbstowcs (UINT cp, PWCHAR dst, size_t dlen, const char *src, size_t nms)
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t)-1;
-  while (len > 0)
+  while (len > 0 && nms > 0)
     {
       /* ASCII SO.  Convert following UTF-8 sequence (if not UTF-8 anyway). */
       if (*pmbs == 0x0e && *charset != 'U'/*TF-8*/)
 	{
 	  pmbs++;
+	  --nms;
 	  bytes = __utf8_mbtowc (_REENT, ptr, pmbs, nms, charset, &ps);
 	  if (bytes < 0)
 	    {

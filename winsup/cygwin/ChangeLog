@@ -1,5 +1,9 @@
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (sys_cp_mbstowcs): Don't read beyond src + nms.
+
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shared_info.h (CURR_SHARED_MAGIC): Update.
 
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
