@@ -33,7 +33,7 @@ extern mbtowc_f __cp_mbtowc;
 
 extern char *__locale_charset ();
 
-extern mbtowc_p __set_charset_from_codepage (UINT cp, char *charset);
+extern mbtowc_p __set_charset_from_codepage (unsigned int cp, char *charset);
 
 #ifdef __cplusplus
 }
