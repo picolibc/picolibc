@@ -463,6 +463,7 @@ loadlocale(struct _reent *p, int category)
 #endif
     break;
     case 'E':
+    case 'e':
       if (strcmp (charset, "EUCJP") && strcmp (charset, "eucJP"))
 	return NULL;
       strcpy (charset, "EUCJP");
