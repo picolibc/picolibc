@@ -1,3 +1,9 @@
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Move "codepage:xxx" to the removed options section.
+	Change text accordingly.
+	* new-features.sgml: Try to explain new way to define character sets.
+
 2009-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin-ug-net.in.sgml: Update date.

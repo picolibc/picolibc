@@ -17,13 +17,18 @@
   are only local to the current session and disappear when the last
   Cygwin process in the session exits.
 
+- If a filename cannot be represented in the current character set,
+  the character will be converted to a sequence Ctrl-N + UTF-8 representation
+  of the character.  This allows to access all files, even those not
+  having a valid representation of their filename in the current character
+  set (codepage).  To have always a valid string, use the UTF-8 charset
+  by setting the environment variable $LANG, $LC_ALL, or $LC_CTYPE to a
+  valid POSIX value, for instance in Cygwin.bat like this:
+
+    set LC_CTYPE=en_US.UTF-8
+
 - PATH_MAX is now 4096.  Internally, path names can be as long as the
   underlying OS can handle (32K).
-  
-- UTF-8 filenames are supported now.  So far, this requires to set
-  the environment variable CYGWIN to contain "codepage:utf8". but this
-  will likely disappear at one point.  The setting of $LANG or $LC_CTYPE
-  will be used instead.
 
 - struct dirent now supports d_type, filled out with DT_REG or DT_DIR.
   All other file types return as DT_UNKNOWN for performance reasons.
@@ -176,6 +181,19 @@
 <sect2 id="ov-new1.7-posix"><title>Other POSIX related changes</title>
 
 <screen>
+- A lot of character sets are supported now via a call to setlocale().
+  The setting of the environment variables $LANG, $LC_ALL or $LC_CTYPE will
+  be used.  For instance, setting $LANG to "de_DE.ISO-8859-15" before
+  starting a Cygwin session will use the ISO-8859-15 character set in
+  the entire session.  UTF-8 is supported as well, as in "en_US.UTF-8".
+
+  The full list of supported character sets: "ASCII", "ISO-8859-x" with x
+  in 1-16, except 12, "UTF-8", Windows codepages "CPxxx", with xxx in
+  (437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
+  1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258), "JIS", "SJIS",
+  "eucJP", "Big5".  The leading language and territory part (en_US) is not
+  used by Cygwin yet, but is required for POSIX compatibility.
+
 - Allow multiple concurrent read locks per thread for pthread_rwlock_t.
 
 - Implement pthread_kill(thread, 0) as per POSIX.

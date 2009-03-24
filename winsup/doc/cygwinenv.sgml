@@ -12,29 +12,6 @@ by prefixing with <literal>no</literal>.</para>
 <itemizedlist mark="bullet">
 
 <listitem>
-<para><envar>codepage:[ansi|oem|utf8]</envar> - This option controls
-which single- or multibyte character set is used for file and console
-operations.  Windows is using UTF-16 characters internally and this
-option specifies how 8-byte character sets are converted to UTF-16 and
-vice versa.  The default setting is <envar>ansi</envar> which means,
-conversion is based on the current ANSI codepage, typically 1252 in
-many Western language versions of Windows.  The name originates from the
-ANSI Latin1 (ISO 8859-1) standard, used in Windows 1.0, though the
-character sets have since diverged from any standard.  The second
-setting selects an older, DOS-based character set, containing various
-line drawing and special characters.  It is called <envar>oem</envar>
-since it was originally encoded in the firmware of IBM PCs by original
-equipment manufacturers (OEMs).</para>
-<para>If you find that some characters (especially non-US or 'graphical' ones)
-do not display correctly in Cygwin, you can use this option to select an
-appropriate codepage.  Finally, <envar>utf8</envar> treats all file names
-and console characters as UTF-8 chars.  Please note that, for correct
-operation, you have to set the environment variable LANG or LC_ALL to
-somthing like "en_US.UTF-8", otherwise many applications will not be
-able to recognize UTF-8 strings correctly.</para>
-</listitem>
-
-<listitem>
 <para><envar>(no)dosfilewarning</envar> - If set, Cygwin will warn the
 first time a user uses an "MS-DOS" style path name rather than a POSIX-style
 path name.  Defaults to set.</para>
@@ -192,6 +169,16 @@ explicitely in the open(2) call.
 real case sensitivity and the per-mount option "posix=[0|1]".  For more
 information, read the documentation in <xref linkend="mount-table"></xref> and
 <xref linkend="pathnames-casesensitive"></xref>.</para>
+</listitem>
+
+<listitem>
+<para><envar>codepage:[ansi|oem]</envar> - This option controled
+which character set is used for file and console operations.  Since Cygwin
+is now doing all character conversion by itself, depending on the
+application call to the <function>setlocale()</function> function, and in
+turn by the setting of the environment variables <envar>$LANG</envar>,
+<envar>$LC_ALL</envar>, or <envar>$LC_CTYPE</envar>, this setting
+got useless.</para>
 </listitem>
 
 <listitem>
