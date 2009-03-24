@@ -1,4 +1,83 @@
-2009-03-23  Corinna Vinschen  <corinna@vinschen.de>
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ctype.cc (_CTYPE_DATA_0_127): Add _B class to TAB character.
+	(__ctype_default): New character class array for default ASCII
+	character set.
+	(__ctype_iso): New array of character class array for ISO charsets.
+	(__ctype_cp): Ditto for singlebyte Windows codepages.
+	(tolower): Implement as distinct function to support any singlebyte
+	charset.
+	(toupper): Ditto.
+	(__set_ctype): New function to copy singlebyte character classes
+	corresponding to current charset to ctype_b array.
+	Align copyright text to upstream.
+	* dcrt0.cc (dll_crt0_1): Reset current locale to "C" per POSIX.
+	* environ.cc (set_file_api_mode): Remove.
+	(codepage_init): Remove.
+	(parse_thing): Remove "codepage" setting.
+	(environ_init): Set locale according to environment settings, or
+	to current codepage, before converting environment to multibyte.
+	* fhandler.h (fhandler_console::write_replacement_char): Drop argument.
+	* fhandler_console.cc (dev_console::str_to_con): Call sys_cp_mbstowcs
+	rather than MultiByteToWideChar.
+	(fhandler_console::write_replacement_char): Always print a funny
+	half filled square if a character isn't in the current charset.
+	(fhandler_console::write_normal): Convert to using __mbtowc
+	rather than next_char.
+	* fork.cc (frok::child): Drop call to set_file_api_mode.
+	* globals.cc (enum codepage_type) Remove.
+	(current_codepage): Remove.
+	* miscfuncs.cc (cygwin_wcslwr): Unused, dangerous.  Remove.
+	(cygwin_wcsupr): Ditto.
+	(is_cp_multibyte): Remove.
+	(next_char): Remove.
+	* miscfuncs.h (is_cp_multibyte): Drop declaration.
+	(next_char): Ditto.
+	* strfuncs.cc (get_cp): Remove.
+	(__db_wctomb): New function to implement _wctomb_r functionality for
+	doublebyte charsets using WideCharToMultiByte.
+	(__sjis_wctomb): New function to replace unusable newlib function.
+	(__jis_wctomb): Ditto.
+	(__eucjp_wctomb): Ditto.
+	(__gbk_wctomb): New function.
+	(__kr_wctomb): Ditto.
+	(__big5_wctomb): Ditto.
+	(__db_mbtowc): New function to implement _mbtowc_r functionality for
+	doublebyte charsets using MultiByteToWideChar.
+	(__sjis_mbtowc): New function to replace unusable newlib function.
+	(__jis_mbtowc): Ditto.
+	(__eucjp_mbtowc): Ditto.
+	(__gbk_mbtowc): New function.
+	(__kr_mbtowc): New function
+	(__big5_mbtowc): New function
+	(__set_charset_from_codepage): New function.
+	(sys_wcstombs): Reimplement, basically using same wide char to multibyte
+	conversion as newlib's application level functions.  Plus extras.
+	Add lengthy comment to explain.  Change return type to size_t.
+	(sys_wcstombs_alloc): Just use sys_wcstombs.  Change return type to
+	size_t.
+	(sys_cp_mbstowcs): Replace sys_mbstowcs, take additional codepage
+	argument.  Explain why.  Change return type to size_t.
+	(sys_mbstowcs_alloc): Just use sys_mbstowcs.  Change return type to
+	size_t.
+	* wchar.h: Declare internal functions implemented in strfuncs.cc.
+	(wcscasecmp): Remove.
+	(wcsncasecmp): Remove.
+	(wcslwr): Remove.
+	(wcsupr): Remove.
+	* winsup.h (codepage_init): Remove declaration.
+	(get_cp): Ditto.
+	(sys_wcstombs): Align declaration to new implementation.
+	(sys_wcstombs_alloc): Ditto.
+	(sys_cp_mbstowcs): Add declaration.
+	(sys_mbstowcs): Define as inline function.
+	(sys_mbstowcs_alloc): Align declaration to new implementation.
+	(set_file_api_mode): Remove declaration.
+	* include/ctype.h (isblank): Redefine to use _B character class.
+	(toupper): Remove ASCII-only definition.
+	(tolower): Ditto.
+
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (str2buf2uni): Remove.
 	* security.h (str2buf2uni): Remove declaration.

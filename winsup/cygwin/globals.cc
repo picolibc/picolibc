@@ -25,8 +25,6 @@ HMODULE NO_COPY cygwin_hmodule;
 HANDLE hExeced;
 
 /* Codepage and multibyte string specific stuff. */
-enum codepage_type {ansi_cp, oem_cp, utf8_cp};
-codepage_type current_codepage = ansi_cp;
 UINT active_codepage;
 
 /* program exit the program */

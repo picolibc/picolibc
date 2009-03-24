@@ -16,6 +16,7 @@ details. */
 #include <stdlib.h>
 #include "glob.h"
 #include <ctype.h>
+#include <locale.h>
 #include "environ.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -921,6 +922,8 @@ dll_crt0_1 (void *)
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   ld_preload ();
+  /* Reset current locale to "C" per POSIX */
+  _setlocale_r (_GLOBAL_REENT, LC_CTYPE, "C");
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\

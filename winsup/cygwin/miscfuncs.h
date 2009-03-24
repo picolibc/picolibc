@@ -25,11 +25,6 @@ void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);
 #define isslash(c) ((c) == '/')
 
-/* multibyte stuff */
-bool is_cp_multibyte (UINT cp);
-const unsigned char *next_char (UINT cp, const unsigned char *str,
-				const unsigned char *end);
-
 /* Memory checking */
 int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 

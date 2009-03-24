@@ -205,8 +205,6 @@ frok::child (volatile char * volatile here)
     }
 #endif
 
-  set_file_api_mode (current_codepage);
-
   MALLOC_CHECK;
 
   /* Incredible but true:  If we use sockets and SYSV IPC shared memory,

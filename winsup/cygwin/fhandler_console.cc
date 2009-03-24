@@ -13,6 +13,7 @@ details. */
 #include "miscfuncs.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <winnls.h>
@@ -133,13 +134,13 @@ dev_console::con_to_str (char *d, int dlen, WCHAR w)
 inline UINT
 dev_console::get_console_cp ()
 {
-  return alternate_charset_active ? GetConsoleOutputCP () : get_cp ();
+  return alternate_charset_active ? GetConsoleOutputCP () : 0;
 }
 
 inline DWORD
 dev_console::str_to_con (PWCHAR d, const char *s, DWORD sz)
 {
-  return MultiByteToWideChar (get_console_cp (), 0, s, sz, d, CONVERT_LIMIT);
+  return sys_cp_mbstowcs (get_console_cp (), d, CONVERT_LIMIT, s, sz);
 }
 
 bool
@@ -1400,22 +1401,15 @@ beep ()
   MessageBeep (MB_OK);
 }
 
-/* This gets called when we found an invalid UTF-8 character.  We try with
-   the default ANSI codepage.  If that fails we just print a question mark.
-   Looks ugly but is a neat and alomst sane fallback for many languages. */
+/* This gets called when we found an invalid input character.  We just
+   print a half filled square (UTF 0x2592).  We have no chance to figure
+   out the "meaning" of the input char anyway. */
 void
-fhandler_console::write_replacement_char (const unsigned char *char_p)
+fhandler_console::write_replacement_char ()
 {
-  int n;
-  WCHAR def_cp_chars[2];
+  static const wchar_t replacement_char = 0x2592; /* Half filled square */
   DWORD done;
-
-  n = MultiByteToWideChar (GetACP (), 0, (const CHAR *) char_p, 1,
-			   def_cp_chars, 2);
-  if (n)
-    WriteConsoleW (get_output_handle (), def_cp_chars, n, &done, 0);
-  else
-    WriteConsoleW (get_output_handle (), L"?", 1, &done, 0);
+  WriteConsoleW (get_output_handle (), &replacement_char, 1, &done, 0);
 }
 
 const unsigned char *
@@ -1426,22 +1420,46 @@ fhandler_console::write_normal (const unsigned char *src,
   DWORD done;
   DWORD buf_len;
   const unsigned char *found = src;
-  const unsigned char *nfound;
+  size_t ret;
+  mbstate_t ps;
   UINT cp = dev_state->get_console_cp ();
+  char charsetbuf[32];
+  char *charset = __locale_charset ();
+  mbtowc_p f_mbtowc = __mbtowc;
+
+  if (cp)
+    f_mbtowc = __set_charset_from_codepage (cp, charset = charsetbuf);
 
   /* First check if we have cached lead bytes of a former try to write
      a truncated multibyte sequence.  If so, process it. */
   if (trunc_buf.len)
     {
+      const unsigned char *nfound;
       int cp_len = min (end - src, 4 - trunc_buf.len);
       memcpy (trunc_buf.buf + trunc_buf.len, src, cp_len);
-      nfound = next_char (cp, trunc_buf.buf,
-			  trunc_buf.buf + trunc_buf.len + cp_len);
-      /* Still truncated multibyte sequence?  Keep in trunc_buf. */
-      if (nfound == trunc_buf.buf)
+      memset (&ps, 0, sizeof ps);
+      switch (ret = f_mbtowc (_REENT, NULL, (const char *) trunc_buf.buf,
+			       trunc_buf.len + cp_len, charset, &ps))
 	{
+	case -2:
+	  /* Still truncated multibyte sequence?  Keep in trunc_buf. */
 	  trunc_buf.len += cp_len;
 	  return end;
+	case -1:
+	  /* Give up, print replacement chars for trunc_buf... */
+	  for (int i = 0; i < trunc_buf.len; ++i)
+	    write_replacement_char ();
+	  /* ... mark trunc_buf as unused... */
+	  trunc_buf.len = 0;
+	  /* ... and proceed. */
+	  nfound = NULL;
+	  break;
+	case 0:
+	  nfound = trunc_buf.buf + 1;
+	  break;
+	default:
+	  nfound = trunc_buf.buf + ret;
+	  break;
 	}
       /* Valid multibyte sequence?  Process. */
       if (nfound)
@@ -1454,28 +1472,32 @@ fhandler_console::write_normal (const unsigned char *src,
 	  trunc_buf.len = 0;
 	  return found;
 	}
-      /* Give up, print replacement chars for trunc_buf... */
-      for (int i = 0; i < trunc_buf.len; ++i)
-	write_replacement_char (trunc_buf.buf + i);
-      /* ... mark trunc_buf as unused... */
-      trunc_buf.len = 0;
-      /* ... and proceed. */
     }
 
+  memset (&ps, 0, sizeof ps);
   while (found < end
 	 && found - src < CONVERT_LIMIT
 	 && base_chars[*found] == NOR)
     {
-      nfound = next_char (cp, found, end);
-      if (!nfound)		/* Invalid multibyte sequence. */
-	break;
-      if (nfound == found)	/* Truncated multibyte sequence. */
-	{			/* Stick to it until the next write. */
+      switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
+			       end - found, charset, &ps))
+	{
+	case -2:
+	  /* Truncated multibyte sequence.  Stick to it until the next write. */
 	  trunc_buf.len = end - found;
 	  memcpy (trunc_buf.buf, found, trunc_buf.len);
 	  return end;
+	case -1:
+	  break;
+	case 0:
+	  found++;
+	  break;
+	default:
+	  found += ret;
+	  break;
 	}
-      found = nfound;
+      if (ret == (size_t) -1)		/* Invalid multibyte sequence. */
+	break;
     }
 
   /* Print all the base ones out */
@@ -1558,7 +1580,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  cursor_set (false, 8 * (x / 8 + 1), y);
 	  break;
 	case NOR:
-	  write_replacement_char (found);
+	  write_replacement_char ();
 	  break;
 	}
       found++;

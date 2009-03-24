@@ -104,21 +104,24 @@ extern const char case_folded_upper[];
 /* The one function we use from winuser.h most of the time */
 extern "C" DWORD WINAPI GetLastError (void);
 
-void codepage_init (const char *buf);
-UINT get_cp ();
-
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */
 #define HEAP_NOTHEAP -1
 
-int __stdcall sys_wcstombs (char *, int, const PWCHAR, int = -1)
+size_t __stdcall sys_wcstombs (char *, size_t, const PWCHAR, size_t = (size_t) -1)
   __attribute__ ((regparm(3)));
-int __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR, int = -1)
+size_t __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR, size_t = (size_t) -1)
   __attribute__ ((regparm(3)));
 
-int __stdcall sys_mbstowcs (PWCHAR, int, const char *, int = -1)
+size_t __stdcall sys_cp_mbstowcs (UINT, PWCHAR, size_t, const char *, size_t = (size_t) -1)
   __attribute__ ((regparm(3)));
-int __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *, int = -1)
+inline size_t
+sys_mbstowcs (PWCHAR dst, size_t dlen, const char *src,
+	      size_t nms = (size_t) -1)
+{
+  return sys_cp_mbstowcs (0, dst, dlen, src, nms);
+}
+size_t __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *, size_t = (size_t) -1)
   __attribute__ ((regparm(3)));
 
 /* Used to check if Cygwin DLL is dynamically loaded. */
@@ -333,8 +336,6 @@ inline void clear_procimptoken ()
       CloseHandle (old_procimp);
     }
 }
-
-void set_file_api_mode (codepage_type);
 #endif
 
 #endif /* defined __cplusplus */

@@ -927,7 +927,7 @@ class fhandler_console: public fhandler_termios
   void cursor_set (bool, int, int);
   void cursor_get (int *, int *);
   void cursor_rel (int, int);
-  void write_replacement_char (const unsigned char *);
+  void write_replacement_char ();
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
   void char_command (char);
   bool set_raw_win32_keyboard_mode (bool);

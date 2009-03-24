@@ -1,6 +1,6 @@
 /* wchar.h: Extra wchar defs
 
-   Copyright 2007 Red Hat, Inc.
+   Copyright 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,21 +17,22 @@ details. */
 extern "C" {
 #endif
 
-#undef wcscasecmp
-#define wcscasecmp cygwin_wcscasecmp
-int __stdcall cygwin_wcscasecmp (const wchar_t *, const wchar_t *);
+extern "C" int __utf8_wctomb (struct _reent *, char *, wchar_t,
+			      const char *, mbstate_t *);
 
-#undef wcsncasecmp
-#define wcsncasecmp cygwin_wcsncasecmp
-int __stdcall cygwin_wcsncasecmp (const wchar_t *, const wchar_t *, size_t);
+typedef int mbtowc_f (struct _reent *, wchar_t *, const char *, size_t,
+		      const char *, mbstate_t *);
+typedef mbtowc_f *mbtowc_p;
 
-#undef wcslwr
-#define wcslwr cygwin_wcslwr
-wchar_t * __stdcall cygwin_wcslwr (wchar_t *);
+extern "C" mbtowc_p __mbtowc;
+extern "C" mbtowc_f __ascii_mbtowc;
+extern "C" mbtowc_f __utf8_mbtowc;
+extern "C" mbtowc_f __iso_mbtowc;
+extern "C" mbtowc_f __cp_mbtowc;
 
-#undef wcsupr
-#define wcsupr cygwin_wcsupr
-wchar_t * __stdcall cygwin_wcsupr (wchar_t *);
+extern "C" char *__locale_charset ();
+
+extern "C" mbtowc_p __set_charset_from_codepage (UINT cp, char *charset);
 
 #ifdef __cplusplus
 }

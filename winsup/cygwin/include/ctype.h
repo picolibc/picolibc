@@ -49,7 +49,7 @@ extern const __declspec(dllimport) char _ctype_[];
 
 #if !defined(__cplusplus) || defined(__INSIDE_CYGWIN__)
 #define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))
-#define isblank(c)	((c) == ' ' || (c) == '\t')
+#define isblank(c)	((_ctype_+1)[(unsigned)(c)]&_B)
 #define	isupper(c)	((_ctype_+1)[(unsigned)(c)]&_U)
 #define	islower(c)	((_ctype_+1)[(unsigned)(c)]&_L)
 #define	isdigit(c)	((_ctype_+1)[(unsigned)(c)]&_N)
@@ -60,12 +60,6 @@ extern const __declspec(dllimport) char _ctype_[];
 #define isprint(c)	((_ctype_+1)[(unsigned)(c)]&(_P|_U|_L|_N|_B))
 #define	isgraph(c)	((_ctype_+1)[(unsigned)(c)]&(_P|_U|_L|_N))
 #define iscntrl(c)	((_ctype_+1)[(unsigned)(c)]&_C)
-/* Non-gcc versions will get the library versions, and will be
-   slightly slower */
-# define toupper(c) \
-	__extension__ ({ int __x = (c); islower(__x) ? (__x - 'a' + 'A') : __x;})
-# define tolower(c) \
-	__extension__ ({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif /* !__cplusplus */
 
 #if !defined(__STRICT_ANSI__) || defined(__INSIDE_CYGWIN__)
