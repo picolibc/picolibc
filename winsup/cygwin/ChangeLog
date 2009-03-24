@@ -1,5 +1,12 @@
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (__kr_wctomb): Use codepage 50949 rather than 949.
+	(__kr_mbtowc): Ditto.
+	(__set_charset_from_codepage): Translate codepages 949 and 50949 to
+	"EUCKR" and drop the charset name "CP949".
+
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* strfuncs.cc (sys_cp_mbstowcs): Don't read beyond src + nms.
 
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
