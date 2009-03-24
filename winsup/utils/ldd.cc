@@ -31,7 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-#undef wcscasecmp /* Disable definition from Cygwin's internal wchar.h. */
 #include <locale.h>
 #include <sys/cygwin.h>
 #include <unistd.h>

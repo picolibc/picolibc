@@ -651,7 +651,7 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
 		fprintf (ofile, "--- Process %lu, exception %p at %p\n", ev.dwProcessId,
-			 ev.u.Exception.ExceptionRecord.ExceptionCode,
+			 (void *) ev.u.Exception.ExceptionRecord.ExceptionCode,
 			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
 	    }
 	  break;

@@ -1540,7 +1540,7 @@ dump_sysinfo ()
                        (LPBYTE) &obcaseinsensitive, &size);
       RegCloseKey (key);
     }
-  printf ("obcaseinsensitive set to %d\n\n", obcaseinsensitive);
+  printf ("obcaseinsensitive set to %lu\n\n", obcaseinsensitive);
 
   if (givehelp)
     {
