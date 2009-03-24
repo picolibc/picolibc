@@ -31,7 +31,7 @@ public:
 
 #define SHARED_INFO_CB 39328
 
-#define CURR_SHARED_MAGIC 0x398d8baU
+#define CURR_SHARED_MAGIC 0x22f9ff0bU
 
 #define USER_VERSION	1	// increment when mount table changes and
 #define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
