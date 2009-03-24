@@ -1,3 +1,8 @@
+2009-03-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/errno.h: Move EFTYPE to general usage because
+	it is used in libc/search.
+
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/iswalpha.c: Handle all wchar_t as unicode on

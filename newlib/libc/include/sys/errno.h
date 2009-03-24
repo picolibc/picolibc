@@ -108,8 +108,8 @@ extern __IMPORT int sys_nerr;
 #define	EDOTDOT 76	/* Cross mount point (not really error) */
 #endif
 #define EBADMSG 77	/* Trying to read unreadable message */
-#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define EFTYPE 79	/* Inappropriate file type or format */
+#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define ENOTUNIQ 80	/* Given log. name not unique */
 #define EBADFD 81	/* f.d. invalid for this operation */
 #define EREMCHG 82	/* Remote address changed */
