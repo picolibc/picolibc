@@ -46,19 +46,20 @@ This is a minimal implementation, supporting only the required <<"POSIX">>
 and <<"C">> values for <[locale]>; strings representing other locales are not
 honored unless _MB_CAPABLE is defined in which case POSIX locale strings
 are allowed, plus five extensions supported for backward compatibility with
-older implementations using newlib: <<"C-UTF-8">>, <<"C-JIS">>, <<"C-EUCJP">>,
-<<"C-SJIS">>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
-xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
-1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].  Even when using POSIX
-locale strings, the only charsets allowed are <<"UTF-8">>, <<"JIS">>,
-<<"EUCJP">>, <<"SJIS">>, <<"ISO-8859-x">> with 1 <= x <= 15, or
-<<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866,
-874, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258]. 
+older implementations using newlib: <<"C-UTF-8">>, <<"C-JIS">>,
+<<"C-EUCJP">>/<<"C-eucJP">>, <<"C-SJIS">>, <<"C-ISO-8859-x">> with
+1 <= x <= 15, or <<"C-CPxxx">> with xxx in [437, 720, 737, 775, 850, 852,
+855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
+1257, 1258].  Even when using POSIX locale strings, the only charsets allowed
+are <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>/<<"eucJP">>, <<"SJIS">>,
+<<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in [437, 720,
+737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252,
+1253, 1254, 1255, 1256, 1257, 1258]. 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
 Under Cygwin, this implementation additionally supports the charsets <<"GBK">>,
-<<"CP949">>, and <<"BIG5">>.
+<<"eucKR">>, and <<"Big5">>.
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
 a pointer to the string representing the current locale (always
@@ -464,14 +465,28 @@ loadlocale(struct _reent *p, int category)
     break;
     case 'E':
     case 'e':
-      if (strcmp (charset, "EUCJP") && strcmp (charset, "eucJP"))
-	return NULL;
-      strcpy (charset, "EUCJP");
-      mbc_max = 2;
+      if (!strcmp (charset, "EUCJP") || !strcmp (charset, "eucJP"))
+	{
+	  strcpy (charset, "EUCJP");
+	  mbc_max = 2;
 #ifdef _MB_CAPABLE
-      __wctomb = __eucjp_wctomb;
-      __mbtowc = __eucjp_mbtowc;
+	  __wctomb = __eucjp_wctomb;
+	  __mbtowc = __eucjp_mbtowc;
 #endif
+	}
+#ifdef __CYGWIN__
+      else if (!strcmp (charset, "EUCKR") || !strcmp (charset, "eucKR"))
+	{
+	  strcpy (charset, "EUCKR");
+	  mbc_max = 2;
+#ifdef _MB_CAPABLE
+	  __wctomb = __kr_wctomb;
+	  __mbtowc = __kr_mbtowc;
+#endif
+	}
+#endif
+      else
+	return NULL;
     break;
     case 'S':
       if (strcmp (charset, "SJIS"))
@@ -542,15 +557,6 @@ loadlocale(struct _reent *p, int category)
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 #endif
 	  break;
-#ifdef __CYGWIN__
-	case 949:
-	  mbc_max = 2;
-#ifdef _MB_CAPABLE
-	  __wctomb = __kr_wctomb;
-	  __mbtowc = __kr_mbtowc;
-#endif
-	  break;
-#endif
 	default:
 	  return NULL;
 	}
