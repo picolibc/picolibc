@@ -75,6 +75,10 @@
 
 - New open(2) flags O_DIRECTORY, O_EXEC and O_SEARCH.
 
+- Make the original style symlinks (file with SYSTEM attribute set)
+  default again when creating symlinks.  Only create Windows shortcut
+  style symlinks if CYGWIN=winsymlinks is set in the environment.
+
 - Handle NTFS native symlinks available since Vista/2008 as symlinks
   (but don't create Vista/2008 symlinks due to unfortunate OS restrictions).
 

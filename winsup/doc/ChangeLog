@@ -1,5 +1,9 @@
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.sgml: Add section about chaged (no)winsymlink default.
+
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwinenv.sgml: Move "codepage:xxx" to the removed options section.
 	Change text accordingly.
 	* new-features.sgml: Try to explain new way to define character sets.
