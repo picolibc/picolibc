@@ -1,5 +1,9 @@
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wchar.h: Remove erroneous "C" specifier from extern declaration.
+
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ctype.cc (_CTYPE_DATA_0_127): Add _B class to TAB character.
 	(__ctype_default): New character class array for default ASCII
 	character set.
