@@ -371,8 +371,8 @@ struct _reent
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 
-  int _current_category;	/* used by setlocale */
-  _CONST char *_current_locale;
+  int _current_category;	/* unused */
+  _CONST char *_current_locale;	/* unused */
 
   struct _mprec *_mp;
 

@@ -179,6 +179,7 @@
 #if defined(__CYGWIN__)
 #include <cygwin/config.h>
 #define __LINUX_ERRNO_EXTENSIONS__ 1
+#define _MB_EXTENDED_CHARSETS_ALL 1
 #endif
 
 #if defined(__rtems__)
@@ -209,6 +210,14 @@
 #ifndef _REENT_SMALL
 #define _REENT_SMALL
 #endif
+#endif
+
+/* If _MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
+   charsets.  The extended charsets add a few functions and a couple
+   of tables of a few K each. */
+#ifdef _MB_EXTENDED_CHARSETS_ALL
+#define _MB_EXTENDED_CHARSETS_ISO 1
+#define _MB_EXTENDED_CHARSETS_WINDOWS 1
 #endif
 
 #endif /* __SYS_CONFIG_H__ */

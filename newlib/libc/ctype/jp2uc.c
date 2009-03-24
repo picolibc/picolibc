@@ -41,6 +41,11 @@
 wint_t
 _DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
 {
+/* Under Cygwin, the incoming wide character is already given in UTF due
+   to the requirements of the underlying OS. */
+#ifdef  __CYGWIN__
+  return c;
+#else
   int index, adj;
   unsigned char byte1, byte2;
   wint_t ret;
@@ -140,6 +145,7 @@ _DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
     }
 
   return WEOF; 
+#endif
 }
 
 #endif /* _MB_CAPABLE */

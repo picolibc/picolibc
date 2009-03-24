@@ -1,3 +1,65 @@
+2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/iswalpha.c: Handle all wchar_t as unicode on
+	_MB_CAPABLE systems.
+	* libc/ctype/iswblank.c: Ditto.
+	* libc/ctype/iswcntrl.c: Ditto.
+	* libc/ctype/iswprint.c: Ditto.
+	* libc/ctype/iswpunct.c: Ditto.
+	* libc/ctype/iswspace.c: Ditto.
+	* libc/ctype/jp2uc.c (__jp2uc): On Cygwin, just return c.
+	Explain why.
+	* libc/ctype/towlower.c: Ditto.
+	* libc/ctype/towupper.c: Ditto.
+	* libc/include/sys/config.h: Define _MB_EXTENDED_CHARSETS_ISO
+	and _MB_EXTENDED_CHARSETS_WINDOWS if _MB_EXTENDED_CHARSETS_ALL is
+	defined.  Define _MB_EXTENDED_CHARSETS_ALL on Cygwin only for now.
+	* libc/include/sys/reent.h (struct _reent): Mark _current_category
+	and _current_locale as unused.
+	* libc/locale/locale.c: Add new charset support to documentation.
+	Include ../stdio/local.h from here.
+	(lc_ctype_charset): Set to "ASCII" by default.
+	(lc_message_charset): Ditto.
+	(_setlocale_r): Don't set _current_category and _current_locale.
+	(loadlocale): Add Cygwin codepage support.  On _MB_CAPABLE
+	systems, set __mbtowc and __wctomb function pointers to function
+	corresponding with current charset.  Don't allow non-existant
+	ISO-8859-12 charset.  Add support for Windows singlebyte codepages.
+	On Cygwin, add support for GBK, CP949, and BIG5.  On Cygwin,
+	call __set_ctype() in case the catorgy is LC_CTYPE.  Don't set
+	_current_category and _current_locale.
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add sb_charsets.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/local.h: Add prototype for __locale_charset.
+	Add prototypes for __mbtowc and __wctomb pointers.
+	Add prototypes for charset-specific _wctomb_r and _mbtowc_r
+	functions.
+	Declare tables and functions from sb_charsets.c.
+	* libc/stdlib/mbtowc_r.c (__mbtowc): Define.  Set to __ascii_mbtowc
+	by default.
+	(_mbtowc_r): Just call __mbtowc from here.
+	(__ascii_mbtowc): New function.
+	(__iso_mbtowc): New function.
+	(__cp_mbtowc): New function.
+	(__utf8_mbtowc): New function.
+	(__sjis_mbtowc): New function.  Disable on Cygwin.
+	(__eucjp_mbtowc): New function.  Disable on Cygwin.
+	(__jis_mbtowc): New function.  Disable on Cygwin.
+	* libc/stdlib/sb_charsets.c: New file, adding singlebyte to UTF
+	conversion tables for all ISO and CP charsets.
+	(__iso_8859_index): New function.
+	(__cp_index): New function.
+	* libc/stdlib/wctomb_r.c (__wctomb): Define.  Set to __ascii_wctomb
+	by default.
+	(_wctomb_r): Just call __wctomb from here.
+	(__ascii_wctomb): New function.
+	(__utf8_wctomb): New function.
+	(__sjis_wctomb): New function.  Disable on Cygwin.
+	(__eucjp_wctomb): New function.  Disable on Cygwin.
+	(__jis_wctomb): New function.  Disable on Cygwin.
+	(__iso_wctomb): New function.
+	(__cp_wctomb): New function.
+
 2009-03-23  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/arm/strcmp.c (strcmp): Treat char as unsigned.

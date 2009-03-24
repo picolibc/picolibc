@@ -116,8 +116,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <locale.h>
 #include <math.h>
 
 double
@@ -167,9 +169,25 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
          * where it ended, count multibyte characters to find the
          * corresponding position in the wide char string.
          */
-        if (endptr != NULL)
-                /* XXX Assume each wide char is one byte. */
+        if (endptr != NULL) {
+		/* The only valid multibyte char in a float converted by
+		   strtod/wcstod is the radix char.  What we do here is,
+		   figure out if the radix char was in the valid leading
+		   float sequence in the incoming string.  If so, the
+		   multibyte float string is strlen(radix char) - 1 bytes
+		   longer than the incoming wide char string has characters.
+		   To fix endptr, reposition end as if the radix char was
+		   just one byte long.  The resulting difference (end - buf)
+		   is then equivalent to the number of valid wide characters
+		   in the input string. */
+		len = strlen (localeconv ()->decimal_point);
+		if (len > 1) {
+			char *d = strstr (buf, localeconv ()->decimal_point);
+			if (d && d < end)
+				end -= len - 1;
+		}
                 *endptr = (wchar_t *)nptr + (end - buf);
+	}
 
         _free_r(ptr, buf);
 

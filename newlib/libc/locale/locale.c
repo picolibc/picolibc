@@ -47,11 +47,18 @@ and <<"C">> values for <[locale]>; strings representing other locales are not
 honored unless _MB_CAPABLE is defined in which case POSIX locale strings
 are allowed, plus five extensions supported for backward compatibility with
 older implementations using newlib: <<"C-UTF-8">>, <<"C-JIS">>, <<"C-EUCJP">>,
-<<"C-SJIS">>, or <<"C-ISO-8859-x">> with 1 <= x <= 15.  Even when using
-POSIX locale strings, the only charsets allowed are <<"UTF-8">>, <<"JIS">>,
-<<"EUCJP">>, <<"SJIS">>, or <<"ISO-8859-x">> with 1 <= x <= 15.  (<<"">> is 
-also accepted; if given, the settings are read from the corresponding
-LC_* environment variables and $LANG according to POSIX rules.
+<<"C-SJIS">>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
+xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
+1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].  Even when using POSIX
+locale strings, the only charsets allowed are <<"UTF-8">>, <<"JIS">>,
+<<"EUCJP">>, <<"SJIS">>, <<"ISO-8859-x">> with 1 <= x <= 15, or
+<<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866,
+874, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258]. 
+(<<"">> is also accepted; if given, the settings are read from the
+corresponding LC_* environment variables and $LANG according to POSIX rules.
+
+Under Cygwin, this implementation additionally supports the charsets <<"GBK">>,
+<<"CP949">>, and <<"BIG5">>.
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
 a pointer to the string representing the current locale (always
@@ -84,6 +91,9 @@ this implementation, always those of the C locale).
 PORTABILITY
 ANSI C requires <<setlocale>>, but the only locale required across all
 implementations is the C locale.
+
+NOTES
+There is no ISO-8859-12 codepage.  It's also refused by this implementation.
 
 No supporting OS subroutines are required.
 */
@@ -129,6 +139,11 @@ No supporting OS subroutines are required.
 #include <limits.h>
 #include <reent.h>
 #include <stdlib.h>
+#include <wchar.h>
+#include "../stdlib/local.h"
+#ifdef __CYGWIN__
+#include <windows.h>
+#endif
 
 #define _LC_LAST      7
 #define ENCODING_LEN 31
@@ -190,8 +205,8 @@ static const char *__get_locale_env(struct _reent *, int);
 
 #endif
 
-static char lc_ctype_charset[ENCODING_LEN + 1] = "ISO-8859-1";
-static char lc_message_charset[ENCODING_LEN + 1] = "ISO-8859-1";
+static char lc_ctype_charset[ENCODING_LEN + 1] = "ASCII";
+static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
@@ -205,8 +220,6 @@ _DEFUN(_setlocale_r, (p, category, locale),
       if (strcmp (locale, "POSIX") && strcmp (locale, "C")
 	  && strcmp (locale, ""))
         return NULL;
-      p->_current_category = category;  
-      p->_current_locale = locale;
     }
   return "C";
 #else
@@ -361,6 +374,11 @@ currentlocale()
 #endif
 
 #ifdef _MB_CAPABLE
+#ifdef __CYGWIN__
+extern void *__set_charset_from_codepage (unsigned int, char *charset);
+extern void __set_ctype (const char *charset);
+#endif /* __CYGWIN__ */
+
 static char *
 loadlocale(struct _reent *p, int category)
 {
@@ -382,7 +400,7 @@ loadlocale(struct _reent *p, int category)
   if (!strcmp (locale, "POSIX"))
     strcpy (locale, "C");
   if (!strcmp (locale, "C"))				/* Default "C" locale */
-    strcpy (charset, "ISO-8859-1");
+    strcpy (charset, "ASCII");
   else if (locale[0] == 'C' && locale[1] == '-')	/* Old newlib style */
 	strcpy (charset, locale + 2);
   else							/* POSIX style */
@@ -414,7 +432,11 @@ loadlocale(struct _reent *p, int category)
 	}
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
+#ifdef __CYGWIN__
+	__set_charset_from_codepage (GetACP (), charset);
+#else
 	strcpy (charset, "ISO-8859-1");
+#endif
       else
 	/* Invalid string */
       	return NULL;
@@ -426,42 +448,155 @@ loadlocale(struct _reent *p, int category)
       if (strcmp (charset, "UTF-8"))
 	return NULL;
       mbc_max = 6;
+#ifdef _MB_CAPABLE
+      __wctomb = __utf8_wctomb;
+      __mbtowc = __utf8_mbtowc;
+#endif
     break;
     case 'J':
       if (strcmp (charset, "JIS"))
 	return NULL;
       mbc_max = 8;
+#ifdef _MB_CAPABLE
+      __wctomb = __jis_wctomb;
+      __mbtowc = __jis_mbtowc;
+#endif
     break;
     case 'E':
-      if (strcmp (charset, "EUCJP"))
+      if (strcmp (charset, "EUCJP") && strcmp (charset, "eucJP"))
 	return NULL;
+      strcpy (charset, "EUCJP");
       mbc_max = 2;
+#ifdef _MB_CAPABLE
+      __wctomb = __eucjp_wctomb;
+      __mbtowc = __eucjp_mbtowc;
+#endif
     break;
     case 'S':
       if (strcmp (charset, "SJIS"))
 	return NULL;
       mbc_max = 2;
+#ifdef _MB_CAPABLE
+      __wctomb = __sjis_wctomb;
+      __mbtowc = __sjis_mbtowc;
+#endif
     break;
     case 'I':
-    default:
-      /* Must be exactly one of ISO-8859-1, [...] ISO-8859-15. */
+      /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
+         ISO-8859-12. */
       if (strncmp (charset, "ISO-8859-", 9))
 	return NULL;
-      val = strtol (charset + 9, &end, 10);
-      if (val < 1 || val > 15 || *end)
+      val = _strtol_r (p, charset + 9, &end, 10);
+      if (val < 1 || val > 16 || val == 12 || *end)
 	return NULL;
       mbc_max = 1;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_ISO
+      __wctomb = __iso_wctomb;
+      __mbtowc = __iso_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_ISO */
+      __wctomb = __ascii_wctomb;
+      __mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_ISO */
+#endif
+    break;
+    case 'C':
+      if (charset[1] != 'P')
+	return NULL;
+      val = _strtol_r (p, charset + 2, &end, 10);
+      if (*end)
+	return NULL;
+      switch (val)
+	{
+	case 437:
+	case 720:
+	case 737:
+	case 775:
+	case 850:
+	case 852:
+	case 855:
+	case 857:
+	case 858:
+	case 862:
+	case 866:
+	case 874:
+	case 1125:
+	case 1250:
+	case 1251:
+	case 1252:
+	case 1253:
+	case 1254:
+	case 1255:
+	case 1256:
+	case 1257:
+	case 1258:
+	  mbc_max = 1;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+	  __wctomb = __cp_wctomb;
+	  __mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+	  __wctomb = __ascii_wctomb;
+	  __mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif
+	  break;
+#ifdef __CYGWIN__
+	case 949:
+	  mbc_max = 2;
+#ifdef _MB_CAPABLE
+	  __wctomb = __kr_wctomb;
+	  __mbtowc = __kr_mbtowc;
+#endif
+	  break;
+#endif
+	default:
+	  return NULL;
+	}
+    break;
+    case 'A':
+      if (strcmp (charset, "ASCII"))
+	return NULL;
+      mbc_max = 1;
+#ifdef _MB_CAPABLE
+      __wctomb = __ascii_wctomb;
+      __mbtowc = __ascii_mbtowc;
+#endif
       break;
+#ifdef __CYGWIN__
+    case 'G':
+      if (strcmp (charset, "GBK"))
+      	return NULL;
+      mbc_max = 2;
+#ifdef _MB_CAPABLE
+      __wctomb = __gbk_wctomb;
+      __mbtowc = __gbk_mbtowc;
+#endif
+      break;
+    case 'B':
+      if (strcmp (charset, "BIG5") && strcmp (charset, "Big5"))
+      	return NULL;
+      strcpy (charset, "BIG5");
+      mbc_max = 2;
+#ifdef _MB_CAPABLE
+      __wctomb = __big5_wctomb;
+      __mbtowc = __big5_mbtowc;
+#endif
+      break;
+#endif /* __CYGWIN__ */
+    default:
+      return NULL;
     }
   if (category == LC_CTYPE)
     {
       strcpy (lc_ctype_charset, charset);
       __mb_cur_max = mbc_max;
+#ifdef __CYGWIN__
+      __set_ctype (charset);
+#endif
     }
   else if (category == LC_MESSAGES)
     strcpy (lc_message_charset, charset);
-  p->_current_category = category;  
-  p->_current_locale = locale;
   return strcpy(current_categories[category], new_categories[category]);
 }
 
