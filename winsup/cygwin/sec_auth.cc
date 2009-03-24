@@ -126,19 +126,6 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   memcpy (buf, srcstr, tgt.MaximumLength);
 }
 
-/* The dimension of buf is assumed to be at least strlen(srcstr) + 1,
-   The result will be shorter if the input has multibyte chars */
-void
-str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
-{
-  tgt.Buffer = (PWCHAR) buf;
-  tgt.MaximumLength = (strlen (srcstr) + 1) * sizeof (WCHAR);
-  tgt.Length = sys_mbstowcs (buf, tgt.MaximumLength / sizeof (WCHAR), srcstr)
-	       * sizeof (WCHAR);
-  if (tgt.Length)
-    tgt.Length -= sizeof (WCHAR);
-}
-
 void
 str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
 {

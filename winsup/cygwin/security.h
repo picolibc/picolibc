@@ -365,7 +365,6 @@ int getacl (HANDLE, path_conv &, int, __acl32 *);
 int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
 
 struct _UNICODE_STRING;
-void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));
 void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
 
 /* Function creating a token by calling NtCreateToken. */
