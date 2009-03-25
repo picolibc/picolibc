@@ -8,6 +8,44 @@
  * is preserved.
  * ====================================================
  */
+/*
+FUNCTION
+<<lround>>, <<lroundf>>, <<llround>>, <<llroundf>>--round to integer, to nearest
+INDEX
+	lround
+INDEX
+	lroundf
+INDEX
+	llround
+INDEX
+	llroundf
+
+ANSI_SYNOPSIS
+	#include <math.h>
+	long int lround(double <[x]>);
+	long int lroundf(float <[x]>);
+	long long int llround(double <[x]>);
+	long long int llroundf(float <[x]>);
+
+DESCRIPTION
+	The <<lround>> and <<llround>> functions round their argument to the
+	nearest integer value, rounding halfway cases away from zero, regardless
+	of the current rounding direction.  If the rounded value is outside the
+	range of the return type, the numeric result is unspecified (depending
+	upon the floating-point implementation, not the library).  A range
+	error may occur if the magnitude of x is too large.
+
+RETURNS
+<[x]> rounded to an integral value as an integer.
+
+SEEALSO
+See the <<round>> functions for the return being the same floating-point type
+as the argument.  <<lrint>>, <<llrint>>.
+
+PORTABILITY
+ANSI C, POSIX
+
+*/
 
 #include "fdlibm.h"
 

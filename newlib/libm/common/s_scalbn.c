@@ -13,38 +13,44 @@
 
 /*
 FUNCTION
-<<scalbn>>, <<scalbnf>>---scale by power of two
+<<scalbn>>, <<scalbnf>>, <<scalbln>>, <<scalblnf>>--scale by power of FLT_RADIX (=2)
 INDEX
 	scalbn
 INDEX
 	scalbnf
+INDEX
+	scalbln
+INDEX
+	scalblnf
 
 ANSI_SYNOPSIS
 	#include <math.h>
-	double scalbn(double <[x]>, int <[y]>);
-	float scalbnf(float <[x]>, int <[y]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double scalbn(<[x]>,<[y]>)
-	double <[x]>;
-	int <[y]>;
-	float scalbnf(<[x]>,<[y]>)
-	float <[x]>;
-	int <[y]>;
+	double scalbn(double <[x]>, int <[n]>);
+	float scalbnf(float <[x]>, int <[n]>);
+	double scalbln(double <[x]>, long int <[n]>);
+	float scalblnf(float <[x]>, long int <[n]>);
 
 DESCRIPTION
-<<scalbn>> and <<scalbnf>> scale <[x]> by <[n]>, returning <[x]> times
-2 to the power <[n]>.  The result is computed by manipulating the
-exponent, rather than by actually performing an exponentiation or
-multiplication.
+The <<scalbn>> and <<scalbln>> functions compute 
+	@ifnottex
+	<[x]> times FLT_RADIX to the power <[n]>.
+	@end ifnottex
+	@tex
+	$x \cdot FLT\_RADIX^n$.
+	@end tex
+efficiently.  The result is computed by manipulating the exponent, rather than
+by actually performing an exponentiation or multiplication.  In this
+floating-point implementation FLT_RADIX=2, which makes the <<scalbn>>
+functions equivalent to the <<ldexp>> functions.
 
 RETURNS
-<[x]> times 2 to the power <[n]>.
+<[x]> times 2 to the power <[n]>.  A range error may occur.
 
 PORTABILITY
-Neither <<scalbn>> nor <<scalbnf>> is required by ANSI C or by the System V
-Interface Definition (Issue 2).
+ANSI C, POSIX
+
+SEEALSO
+<<ldexp>>
 
 */
 

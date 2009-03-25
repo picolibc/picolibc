@@ -8,6 +8,38 @@
  * is preserved.
  * ====================================================
  */
+/*
+FUNCTION
+<<round>>, <<roundf>>--round to integer, to nearest
+INDEX
+	round
+INDEX
+	roundf
+
+ANSI_SYNOPSIS
+	#include <math.h>
+	double round(double <[x]>);
+	float roundf(float <[x]>);
+
+DESCRIPTION
+	The <<round>> functions round their argument to the nearest integer
+	value in floating-point format, rounding halfway cases away from zero,
+	regardless of the current rounding direction.  (While the "inexact"
+	floating-point exception behavior is unspecified by the C standard, the
+	<<round>> functions are written so that "inexact" is not raised if the
+	result does not equal the argument, which behavior is as recommended by
+	IEEE 754 for its related functions.)
+
+RETURNS
+<[x]> rounded to an integral value.
+
+PORTABILITY
+ANSI C, POSIX
+
+SEEALSO
+<<nearbyint>>, <<rint>>
+
+*/
 
 #include "fdlibm.h"
 

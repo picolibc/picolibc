@@ -10,6 +10,40 @@
  * is preserved.
  * ====================================================
  */
+/*
+FUNCTION
+<<rint>>, <<rintf>>--round to integer
+INDEX
+	rint
+INDEX
+	rintf
+
+ANSI_SYNOPSIS
+	#include <math.h>
+	double rint(double <[x]>);
+	float rintf(float <[x]>);
+
+DESCRIPTION
+	The <<rint>> functions round their argument to an integer value in
+	floating-point format, using the current rounding direction.  They
+	raise the "inexact" floating-point exception if the result differs
+	in value from the argument.  See the <<nearbyint>> functions for the
+	same function with the "inexact" floating-point exception never being
+	raised.  Newlib does not directly support floating-point exceptions.
+	The <<rint>> functions are written so that the "inexact" exception is
+	raised in hardware implementations that support it, even though Newlib
+	does not provide access.
+
+RETURNS
+<[x]> rounded to an integral value, using the current rounding direction.
+
+PORTABILITY
+ANSI C, POSIX
+
+SEEALSO
+<<nearbyint>>, <<round>>
+
+*/
 
 /*
  * rint(x)

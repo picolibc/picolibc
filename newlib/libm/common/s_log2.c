@@ -14,7 +14,7 @@
 
 /*
 FUNCTION
-	<<log2>>, <<log2f>>---base 2 logarithm
+	<<log2>>, <<log2f>>--base 2 logarithm
 INDEX
 	log2
 INDEX
@@ -25,28 +25,40 @@ ANSI_SYNOPSIS
 	double log2(double <[x]>);
 	float log2f(float <[x]>);
 
-TRAD_SYNOPSIS
-	#include <math.h>
-	double log2(<[x]>);
-	double <[x]>;
-
-	float log2f(<[x]>);
-	float <[x]>;
-
 DESCRIPTION
-	<<log2>> returns the base 2 logarithm of <[x]>.
+The <<log2>> functions compute the base-2 logarithm of <[x]>.  A domain error
+occurs if the argument is less than zero.  A range error occurs if the
+argument is zero.
 
-	<<log2f>> is identical, save that it takes and returns <<float>> values.
+The Newlib implementations are not full, intrinisic calculations, but
+rather are derivatives based on <<log>>.  (Accuracy might be slightly off from
+a direct calculation.)  In addition to functions, they are also implemented as
+macros defined in math.h:
+. #define log2(x) (log (x) / _M_LOG2_E)
+. #define log2f(x) (logf (x) / (float) _M_LOG2_E)
+To use the functions instead, just undefine the macros first.
+
+You can use the (non-ANSI) function <<matherr>> to specify error
+handling for these functions, indirectly through the respective <<log>>
+function. 
 
 RETURNS
-	On success, <<log2>> and <<log2f>> return the calculated value.
-	If the result underflows, the returned value is <<0>>.  If the
-	result overflows, the returned value is <<HUGE_VAL>>.  In
-	either case, <<errno>> is set to <<ERANGE>>.
+The <<log2>> functions return
+@ifnottex
+<<log base-2(<[x]>)>>
+@end ifnottex
+@tex
+$log_2(x)$
+@end tex
+on success.
+When <[x]> is zero, the
+returned value is <<-HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
+When <[x]> is negative, the returned value is NaN (not a number) and
+<<errno>> is set to <<EDOM>>.  You can control the error behavior via
+<<matherr>>.
 
 PORTABILITY
-	<<log2>> and <<log2f>> are required by ISO/IEC 9899:1999 and the
-	System V Interface Definition (Issue 6).
+C99, POSIX, System V Interface Definition (Issue 6).
 */
 
 /*

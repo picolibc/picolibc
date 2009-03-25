@@ -65,14 +65,14 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj =	wacos.def wacosh.def wasin.def sasinh.def \
-	satan.def watan2.def watanh.def wj0.def \
-	wcosh.def serf.def wexp.def \
-	sfabs.def sfloor.def wfmod.def sfrexp.def \
-	wgamma.def whypot.def sldexp.def wlog.def \
-	wlog10.def \
-	wpow.def wremainder.def ssin.def wsinh.def \
-	wsqrt.def stan.def stanh.def
+chobj =	w_acos.def w_acosh.def w_asin.def s_asinh.def \
+	s_atan.def w_atan2.def w_atanh.def w_j0.def \
+	w_cosh.def s_erf.def w_exp.def w_exp2.def \
+	s_fabs.def s_floor.def w_fmod.def s_frexp.def \
+	w_gamma.def w_hypot.def s_ldexp.def w_log.def \
+	w_log10.def \
+	w_pow.def w_remainder.def s_sin.def w_sinh.def \
+	w_sqrt.def s_tan.def s_tanh.def
 
 SUFFIXES = .def
 
@@ -88,94 +88,6 @@ doc: $(chobj)
 	cat $(srcdir)/math.tex >> $(TARGETDOC)
 
 CLEANFILES = $(chobj) *.ref
-
-# Texinfo does not appear to support underscores in file names, so we
-# name the .def files without underscores.
-
-wacos.def: w_acos.c
-	$(CHEW) < $(srcdir)/w_acos.c >$@ 2>/dev/null
-	touch stmp-def
-wacosh.def: w_acosh.c
-	$(CHEW) < $(srcdir)/w_acosh.c >$@ 2>/dev/null
-	touch stmp-def
-wasin.def: w_asin.c
-	$(CHEW) < $(srcdir)/w_asin.c >$@ 2>/dev/null
-	touch stmp-def
-sasinh.def: s_asinh.c
-	$(CHEW) < $(srcdir)/s_asinh.c >$@ 2>/dev/null
-	touch stmp-def
-satan.def: s_atan.c
-	$(CHEW) < $(srcdir)/s_atan.c >$@ 2>/dev/null
-	touch stmp-def
-watan2.def: w_atan2.c
-	$(CHEW) < $(srcdir)/w_atan2.c >$@ 2>/dev/null
-	touch stmp-def
-watanh.def: w_atanh.c
-	$(CHEW) < $(srcdir)/w_atanh.c >$@ 2>/dev/null
-	touch stmp-def
-wj0.def: w_j0.c
-	$(CHEW) < $(srcdir)/w_j0.c >$@ 2>/dev/null
-	touch stmp-def
-scopysign.def: s_copysign.c
-	$(CHEW) < $(srcdir)/../common/s_copysign.c >$@ 2>/dev/null
-	touch stmp-def
-wcosh.def: w_cosh.c
-	$(CHEW) < $(srcdir)/w_cosh.c >$@ 2>/dev/null
-	touch stmp-def
-serf.def: s_erf.c
-	$(CHEW) < $(srcdir)/s_erf.c >$@ 2>/dev/null
-	touch stmp-def
-wexp.def: w_exp.c
-	$(CHEW) < $(srcdir)/w_exp.c >$@ 2>/dev/null
-	touch stmp-def
-sfabs.def: s_fabs.c
-	$(CHEW) < $(srcdir)/s_fabs.c >$@ 2>/dev/null
-	touch stmp-def
-sfloor.def: s_floor.c
-	$(CHEW) < $(srcdir)/s_floor.c >$@ 2>/dev/null
-	touch stmp-def
-wfmod.def: w_fmod.c
-	$(CHEW) < $(srcdir)/w_fmod.c >$@ 2>/dev/null
-	touch stmp-def
-sfrexp.def: s_frexp.c
-	$(CHEW) < $(srcdir)/s_frexp.c >$@ 2>/dev/null
-	touch stmp-def
-wgamma.def: w_gamma.c
-	$(CHEW) < $(srcdir)/w_gamma.c >$@ 2>/dev/null
-	touch stmp-def
-whypot.def: w_hypot.c
-	$(CHEW) < $(srcdir)/w_hypot.c >$@ 2>/dev/null
-	touch stmp-def
-sldexp.def: s_ldexp.c
-	$(CHEW) < $(srcdir)/s_ldexp.c >$@ 2>/dev/null
-	touch stmp-def
-wlog.def: w_log.c
-	$(CHEW) < $(srcdir)/w_log.c >$@ 2>/dev/null
-	touch stmp-def
-wlog10.def: w_log10.c
-	$(CHEW) < $(srcdir)/w_log10.c >$@ 2>/dev/null
-	touch stmp-def
-wpow.def: w_pow.c
-	$(CHEW) < $(srcdir)/w_pow.c >$@ 2>/dev/null
-	touch stmp-def
-wremainder.def: w_remainder.c
-	$(CHEW) < $(srcdir)/w_remainder.c >$@ 2>/dev/null
-	touch stmp-def
-ssin.def: s_sin.c
-	$(CHEW) < $(srcdir)/s_sin.c >$@ 2>/dev/null
-	touch stmp-def
-wsinh.def: w_sinh.c
-	$(CHEW) < $(srcdir)/w_sinh.c >$@ 2>/dev/null
-	touch stmp-def
-wsqrt.def: w_sqrt.c
-	$(CHEW) < $(srcdir)/w_sqrt.c >$@ 2>/dev/null
-	touch stmp-def
-stan.def: s_tan.c
-	$(CHEW) < $(srcdir)/s_tan.c >$@ 2>/dev/null
-	touch stmp-def
-stanh.def: s_tanh.c
-	$(CHEW) < $(srcdir)/s_tanh.c >$@ 2>/dev/null
-	touch stmp-def
 
 # A partial dependency list.
 

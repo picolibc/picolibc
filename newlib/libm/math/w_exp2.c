@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-	<<exp2>>, <<exp2f>>---exponential
+	<<exp2>>, <<exp2f>>--exponential, base 2
 INDEX
 	exp2
 INDEX
@@ -23,14 +23,6 @@ ANSI_SYNOPSIS
 	#include <math.h>
 	double exp2(double <[x]>);
 	float exp2f(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double exp2(<[x]>);
-	double <[x]>;
-
-	float exp2f(<[x]>);
-	float <[x]>;
 
 DESCRIPTION
 	<<exp2>> and <<exp2f>> calculate 2 ^ <[x]>, that is, 
@@ -49,6 +41,9 @@ RETURNS
 	If the result underflows, the returned value is <<0>>.  If the
 	result overflows, the returned value is <<HUGE_VAL>>.  In
 	either case, <<errno>> is set to <<ERANGE>>.
+
+PORTABILITY
+	ANSI C, POSIX.
 
 */
 

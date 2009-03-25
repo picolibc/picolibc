@@ -9,6 +9,7 @@ Two definitions from @file{math.h} are of particular interest.
 @item
 The representation of infinity as a @code{double} is defined as
 @code{HUGE_VAL}; this number is returned on overflow by many functions.
+The macro @code{HUGE_VALF} is a corresponding value for @code{float}.
 
 @item
 The structure @code{exception} is used when you write customized error
@@ -44,43 +45,59 @@ machines---are available when you include @file{fastmath.h} instead of
 * atan::	Arctangent
 * atan2::	Arctangent of y/x
 * atanh::	Inverse hyperbolic tangent
-* jN::	        Bessel functions  (jN, yN)
+* jN::	        Bessel functions (jN, yN)
 * cbrt::	Cube root
 * copysign::	Sign of Y, magnitude of X
 * cosh::	Hyperbolic cosine
-* erf::		Error function  (erf, erfc)
-* exp::		Exponential
-* expm1::	Exponential of x, - 1
+* erf::		Error function (erf, erfc)
+* exp::		Exponential, base e
+* exp2::	Exponential, base 2
+* expm1::	Exponential, base e, of x - 1
 * fabs::	Absolute value (magnitude)
-* floor::	Floor and ceiling  (floor, ceil)
+* fdim::	Positive difference
+* floor::	Floor and ceiling (floor, ceil)
+* fma::		Floating multiply add
+* fmax::	Maximum
+* fmin::	Minimum
 * fmod::	Floating-point remainder (modulo)
+* fpclassify::	Floating-point classification macro
 * frexp::	Split floating-point number
 * gamma::	Logarithmic gamma function
 * hypot::	Distance from origin
 * ilogb::	Get exponent
 * infinity::	Floating infinity
-* isnan::	Check type of number
-* ldexp::	Load exponent
+* isgreater::	Comparison macros
+* ldexp::	Scale by a power of 2
 * log::		Natural logarithms
 * log10::	Base 10 logarithms
 * log1p::	Log of 1 + X
+* log2::	Base 2 logarithms
+* logb::	Get exponent
+* lrint::	Round to integer
+* lround::	Round to integer, away from zero (lround, llround)
 * matherr::	Modifiable math error handler
 * modf::	Split fractional and integer parts
 * nan::		Floating Not a Number
+* nearbyint::	Round to integer
 * nextafter::	Get next representable number
 * pow::		X to the power Y
 * remainder::	remainder of X divided by Y 
-* scalbn::	scalbn
+* remquo::	Remainder and part of quotient
+* rint::	Round to integer
+* round::	Round to integer, away from zero
+* scalbn::	Scale by a power of FLT_RADIX (2)
+* signbit::	Does floating-point number have negative sign?
 * sin::		Sine or cosine (sin, cos)
 * sinh::	Hyperbolic sine
 * sqrt::	Positive square root
 * tan::		Tangent
 * tanh::	Hyperbolic tangent
+* trunc::	Round to integer, towards zero
 @end menu
 
 @page
 @node version
-@section Version of library
+@section Error Handling
 
 There are four different versions of the math library routines: IEEE,
 POSIX, X/Open, or SVID.  The version may be selected at runtime by
@@ -114,119 +131,89 @@ log: DOMAIN error
 
 The library is set to X/Open mode by default.
 
-@page
-@include math/wacos.def
+The aforementioned error reporting is the supported Newlib libm error
+handling method.  However, the majority of the functions are written
+so as to produce the floating-point exceptions (e.g. "invalid",
+"divide-by-zero") as required by the C and POSIX standards, for
+floating-point implementations that support them.  Newlib does not provide
+the floating-point exception access routines defined in the standards
+for fenv.h, though, which is why they are considered unsupported.  It is
+mentioned in case you have separately-provided access routines so that
+you are aware that they can be caused.
 
-@page
-@include math/wacosh.def
+@section Standards Compliance And Portability
+Most of the individual function descriptions describe the standards to which
+each function complies.  However, these descriptions are mostly out of date,
+having been written before C99 was released.  One of these days we'll get
+around to updating the rest of them.  (If you'd like to help, please let us
+know.)
 
-@page
-@include math/wasin.def
+``C99'' refers to ISO/IEC 9899:1999, ``Programming languages--C''.
+``POSIX'' refers to IEEE Standard 1003.1.  POSIX@registeredsymbol{} is a
+registered trademark of The IEEE.
 
-@page
-@include math/sasinh.def
+@c To sort the include list easily, keep the indentation right because want to
+@c skip the s_|w_ at the start of most--but not all--of the file names.
+@c (e.g., isgreater.def does not have a leading s nor w.)  Then, sort
+@c based on the column.  For example:  "sort -t@ -k3.17"
+@c A few hand-edits might be appropriate after a sort, although not necessary
+@c and are a nuisance as ought to be kept in sync with menu list above:
+@c atan2 after atan, exp2 after exp, log first in log list, and w_j0 to place
+@c to reflect function name of Bessel (as opposed to j; e.g. after atanh,
+@c before cbrt).
 
-@page
-@include math/satan.def
-
-@page
-@include math/watan2.def
-
-@page
-@include math/watanh.def
-
-@page
-@include math/wj0.def
-
-@page
-@include common/scbrt.def
-
-@page
-@include common/scopysign.def
-
-@page
-@include math/wcosh.def
-
-@page
-@include math/serf.def
-
-@page
-@include math/wexp.def
-
-@page
-@include common/sexpm1.def
-
-@page
-@include math/sfabs.def
-
-@page
-@include math/sfloor.def
-
-@page
-@include math/wfmod.def
-
-@page
-@include math/sfrexp.def
-
-@page
-@include math/wgamma.def
-
-@page
-@include math/whypot.def
-
-@page
-@include common/silogb.def
-
-@page
-@include common/sinfinity.def
-
-@page
-@include common/sisnan.def
-
-@page
-@include math/sldexp.def
-
-@page
-@include math/wlog.def
-
-@page
-@include math/wlog10.def
-
-@page
-@include common/slog1p.def
-
-@page
-@include common/smatherr.def
-
-@page
-@include common/smodf.def
-
-@page
-@include common/snan.def
-
-@page
-@include common/snextafter.def
-
-@page
-@include math/wpow.def
-
-@page
-@include math/wremainder.def
-
-@page
-@include common/sscalbn.def
-
-@page
-@include math/wsqrt.def
-
-@page
-@include math/ssin.def
-
-@page
-@include math/wsinh.def
-
-@page
-@include math/stan.def
-
-@page
-@include math/stanh.def
+@page @include   math/w_acos.def
+@page @include   math/w_acosh.def
+@page @include   math/w_asin.def
+@page @include   math/s_asinh.def
+@page @include   math/s_atan.def
+@page @include   math/w_atan2.def
+@page @include   math/w_atanh.def
+@page @include   math/w_j0.def
+@page @include common/s_cbrt.def
+@page @include common/s_copysign.def
+@page @include   math/w_cosh.def
+@page @include   math/s_erf.def
+@page @include   math/w_exp.def
+@page @include   math/w_exp2.def
+@page @include common/s_expm1.def
+@page @include   math/s_fabs.def
+@page @include common/s_fdim.def
+@page @include   math/s_floor.def
+@page @include common/s_fma.def
+@page @include common/s_fmax.def
+@page @include common/s_fmin.def
+@page @include   math/w_fmod.def
+@page @include   math/s_frexp.def
+@page @include   math/w_gamma.def
+@page @include   math/w_hypot.def
+@page @include common/s_ilogb.def
+@page @include common/s_infinity.def
+@page @include   common/isgreater.def
+@page @include common/s_isnan.def
+@page @include   math/s_ldexp.def
+@page @include   math/w_log.def
+@page @include   math/w_log10.def
+@page @include common/s_log1p.def
+@page @include common/s_log2.def
+@page @include common/s_logb.def
+@page @include common/s_lrint.def
+@page @include common/s_lround.def
+@page @include common/s_matherr.def
+@page @include common/s_modf.def
+@page @include common/s_nan.def
+@page @include common/s_nearbyint.def
+@page @include common/s_nextafter.def
+@page @include   math/w_pow.def
+@page @include   math/w_remainder.def
+@page @include common/s_remquo.def
+@page @include common/s_rint.def
+@page @include common/s_round.def
+@page @include common/s_scalbn.def
+@page @include common/s_signbit.def
+@page @include   math/s_sin.def
+@page @include   math/w_sinh.def
+@page @include   math/w_sqrt.def
+@page @include   math/s_tan.def
+@page @include   math/s_tanh.def
+@page @include common/s_trunc.def

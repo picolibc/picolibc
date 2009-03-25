@@ -12,11 +12,20 @@
  *
  */
 
+/* BUG:  FIXME?
+     According to Linux man pages for tgamma, lgamma, and gamma, the gamma
+function was originally defined in BSD as implemented here--the log of the gamma
+function.  BSD 4.3 changed the name to lgamma, apparently removing gamma.  BSD
+4.4 re-introduced the gamma name with the more intuitive, without logarithm,
+plain gamma function.  The C99 standard apparently wanted to avoid a problem
+with the poorly-named earlier gamma and used tgamma when adding a plain
+gamma function.
+     So the current gamma is matching an old, bad definition, and not
+matching a newer, better definition.  */
 /*
 FUNCTION
-        <<gamma>>, <<gammaf>>, <<lgamma>>, <<lgammaf>>, <<gamma_r>>,
-	<<gammaf_r>>, <<lgamma_r>>, <<lgammaf_r>>---logarithmic gamma
-	function
+        <<gamma>>, <<gammaf>>, <<lgamma>>, <<lgammaf>>, <<gamma_r>>, <<gammaf_r>>, <<lgamma_r>>, <<lgammaf_r>>, <<tgamma>>, and <<tgammaf>>--logarithmic and plain gamma functions
+
 INDEX
 gamma
 INDEX
@@ -33,6 +42,10 @@ INDEX
 lgamma_r
 INDEX
 lgammaf_r
+INDEX
+tgamma
+INDEX
+tgammaf
 
 ANSI_SYNOPSIS
 #include <math.h>
@@ -44,6 +57,8 @@ double gamma_r(double <[x]>, int *<[signgamp]>);
 float gammaf_r(float <[x]>, int *<[signgamp]>);
 double lgamma_r(double <[x]>, int *<[signgamp]>);
 float lgammaf_r(float <[x]>, int *<[signgamp]>);
+double tgamma(double <[x]>);
+float tgammaf(float <[x]>);
 
 TRAD_SYNOPSIS
 #include <math.h>
@@ -67,15 +82,19 @@ int <[signgamp]>;
 float lgammaf_r(<[x]>, <[signgamp]>)
 float <[x]>;
 int <[signgamp]>;
+double tgamma(<[x]>)
+double <[x]>;
+float tgammaf(<[x]>)
+float <[x]>;
 
 DESCRIPTION
-<<gamma>> calculates 
+<<gamma>> calculates
 @tex
-$\mit ln\bigl(\Gamma(x)\bigr)$, 
+$\mit ln\bigl(\Gamma(x)\bigr)$,
 @end tex
 the natural logarithm of the gamma function of <[x]>.  The gamma function
 (<<exp(gamma(<[x]>))>>) is a generalization of factorial, and retains
-the property that  
+the property that
 @ifnottex
 <<exp(gamma(N))>> is equivalent to <<N*exp(gamma(N-1))>>.
 @end ifnottex
@@ -83,13 +102,13 @@ the property that
 $\mit \Gamma(N)\equiv N\times\Gamma(N-1)$.
 @end tex
 Accordingly, the results of the gamma function itself grow very
-quickly.  <<gamma>> is defined as 
+quickly.  <<gamma>> is defined as
 @tex
 $\mit ln\bigl(\Gamma(x)\bigr)$ rather than simply $\mit \Gamma(x)$
 @end tex
 @ifnottex
 the natural log of the gamma function, rather than the gamma function
-itself, 
+itself,
 @end ifnottex
 to extend the useful range of results representable.
 
@@ -113,8 +132,17 @@ variable <<signgam>> is not used.  These functions may be used for
 reentrant calls (but they will still set the global variable <<errno>>
 if an error occurs).
 
+<<tgamma>> and <<tgammaf>> are the "true gamma" functions, returning
+@tex
+$\mit \Gamma(x)$,
+@end tex
+the gamma function of <[x]>--without a logarithm.
+(They are apparently so named because of the prior existence of the old,
+poorly-named <<gamma>> functions which returned the log of gamma up
+through BSD 4.2.)
+
 RETURNS
-Normally, the computed result is returned.  
+Normally, the computed result is returned.
 
 When <[x]> is a nonpositive integer, <<gamma>> returns <<HUGE_VAL>>
 and <<errno>> is set to <<EDOM>>.  If the result overflows, <<gamma>>
@@ -123,7 +151,12 @@ returns <<HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
 You can modify this error treatment using <<matherr>>.
 
 PORTABILITY
-Neither <<gamma>> nor <<gammaf>> is ANSI C.  */
+Neither <<gamma>> nor <<gammaf>> is ANSI C.  It is better not to use either
+of these; use <<lgamma>> or <<tgamma>> instead.@*
+<<lgamma>>, <<lgammaf>>, <<tgamma>>, and <<tgammaf>> are nominally C standard
+in terms of the base return values, although the <<matherr>> error-handling
+is not standard, nor is the <[signgam]> global for <<lgamma>>.
+*/
 
 /* double gamma(double x)
  * Return the logarithm of the Gamma function of x.

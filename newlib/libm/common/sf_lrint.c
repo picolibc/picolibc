@@ -95,7 +95,7 @@ TWO23[2]={
 	double x;
 #endif
 {
-  return (double) lrintf((float) x);
+  return lrintf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

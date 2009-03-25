@@ -15,8 +15,14 @@
         float z;
 #endif
 {
-  /* Let the implementation handle this. */
-  return (x * y) + z;
+  /* NOTE:  The floating-point exception behavior of this is not as
+   * required.  But since the basic function is not really done properly,
+   * it is not worth bothering to get the exceptions right, either.  */
+  /* Let the implementation handle this. */ /* <= NONSENSE! */
+  /* In floating-point implementations in which double is larger than float,
+   * computing as double should provide the desired function.  Otherwise,
+   * the behavior will not be as specified in the standards.  */
+  return (float) (((double) x * (double) y) + (double) z);
 }
 
 #ifdef _DOUBLE_IS_32BITS

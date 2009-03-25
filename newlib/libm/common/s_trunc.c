@@ -8,6 +8,35 @@
  * is preserved.
  * ====================================================
  */
+/*
+FUNCTION
+<<trunc>>, <<truncf>>--round to integer, towards zero
+INDEX
+	trunc
+INDEX
+	truncf
+
+ANSI_SYNOPSIS
+	#include <math.h>
+	double trunc(double <[x]>);
+	float truncf(float <[x]>);
+
+DESCRIPTION
+	The <<trunc>> functions round their argument to the integer value, in
+	floating format, nearest to but no larger in magnitude than the
+	argument, regardless of the current rounding direction.  (While the
+	"inexact" floating-point exception behavior is unspecified by the C
+	standard, the <<trunc>> functions are written so that "inexact" is not
+	raised if the result does not equal the argument, which behavior is as
+	recommended by IEEE 754 for its related functions.)
+
+RETURNS
+<[x]> truncated to an integral value.
+
+PORTABILITY
+ANSI C, POSIX
+
+*/
 
 #include "fdlibm.h"
 

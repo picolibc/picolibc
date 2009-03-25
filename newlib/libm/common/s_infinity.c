@@ -5,7 +5,7 @@
 
 /*
 FUNCTION
-	<<infinity>>, <<infinityf>>---representation of infinity
+	<<infinity>>, <<infinityf>>--representation of infinity
 
 INDEX
 	infinity
@@ -17,16 +17,17 @@ ANSI_SYNOPSIS
 	double infinity(void);
 	float infinityf(void);
 
-TRAD_SYNOPSIS
-	#include <math.h>
-	double infinity();
-	float infinityf();
-
-
 DESCRIPTION
 	<<infinity>> and <<infinityf>> return the special number IEEE
 	infinity in double- and single-precision arithmetic
 	respectively.
+
+PORTABILITY
+<<infinity>> and <<infinityf>> are neither standard C nor POSIX.  C and
+POSIX require macros HUGE_VAL and HUGE_VALF to be defined in math.h, which
+Newlib defines to be infinities corresponding to these archaic infinity()
+and infinityf() functions in floating-point implementations which do have
+infinities.
 
 QUICKREF
 	infinity - pure

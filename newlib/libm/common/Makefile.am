@@ -10,7 +10,7 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
 	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
-	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
+	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c
 
 fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
@@ -19,7 +19,7 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
 	sf_rint.c sf_logb.c sf_log2.c \
 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
-	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
+	sf_lround.c sf_llround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
@@ -37,9 +37,13 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj =	scbrt.def scopysign.def sexp10.def sexpm1.def silogb.def \
-	sinfinity.def sisnan.def slog1p.def smatherr.def smodf.def \
-	snan.def snextafter.def spow10.def sscalbn.def
+chobj =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
+	s_infinity.def s_isnan.def s_log1p.def s_matherr.def s_modf.def \
+	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
+	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
+	s_logb.def s_log2.def s_lrint.def s_lround.def s_nearbyint.def \
+	s_remquo.def s_rint.def s_round.def s_signbit.def s_trunc.def \
+	isgreater.def
 
 SUFFIXES = .def
 
@@ -54,73 +58,6 @@ TARGETDOC = ../tmp.texi
 doc: $(chobj)
 
 CLEANFILES = $(chobj) *.ref
-
-# Texinfo does not appear to support underscores in file names, so we
-# name the .def files without underscores.
-
-scopysign.def: s_copysign.c
-	$(CHEW) < $(srcdir)/s_copysign.c >$@ 2>/dev/null
-	touch stmp-def
-
-scbrt.def: s_cbrt.c
-	$(CHEW) < $(srcdir)/s_cbrt.c >$@ 2>/dev/null
-	touch stmp-def
-
-serf.def: s_erf.c
-	$(CHEW) < $(srcdir)/s_serf.c >$@ 2>/dev/null
-	touch stmp-def
-
-sexp10.def: s_exp10.c
-	$(CHEW) < $(srcdir)/s_exp10.c >$@ 2>/dev/null
-	touch stmp-def
-
-sexpm1.def: s_expm1.c
-	$(CHEW) < $(srcdir)/s_expm1.c >$@ 2>/dev/null
-	touch stmp-def
-
-silogb.def: s_ilogb.c
-	$(CHEW) < $(srcdir)/s_ilogb.c >$@ 2>/dev/null
-	touch stmp-def
-
-sinfinity.def: s_infinity.c
-	$(CHEW) < $(srcdir)/s_infinity.c >$@ 2>/dev/null
-	touch stmp-def
-
-sisnan.def: s_isnan.c
-	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
-	touch stmp-def
-
-slog1p.def: s_log1p.c
-	$(CHEW) < $(srcdir)/s_log1p.c >$@ 2>/dev/null
-	touch stmp-def
-
-slog2.def: s_log2.c
-	$(CHEW) < $(srcdir)/s_log2.c >$@ 2>/dev/null
-	touch stmp-def
-
-smodf.def: s_modf.c
-	$(CHEW) < $(srcdir)/s_modf.c >$@ 2>/dev/null
-	touch stmp-def
-
-smatherr.def: s_matherr.c
-	$(CHEW) < $(srcdir)/s_matherr.c >$@ 2>/dev/null
-	touch stmp-def
-
-snan.def: s_nan.c
-	$(CHEW) < $(srcdir)/s_nan.c >$@ 2>/dev/null
-	touch stmp-def
-
-snextafter.def: s_nextafter.c
-	$(CHEW) < $(srcdir)/s_nextafter.c >$@ 2>/dev/null
-	touch stmp-def
-
-spow10.def: s_pow10.c
-	$(CHEW) < $(srcdir)/s_pow10.c >$@ 2>/dev/null
-	touch stmp-def
-
-sscalbn.def: s_scalbn.c
-	$(CHEW) < $(srcdir)/s_scalbn.c >$@ 2>/dev/null
-	touch stmp-def
 
 # A partial dependency list.
 

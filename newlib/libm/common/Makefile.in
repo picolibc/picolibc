@@ -72,9 +72,10 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_fma.$(OBJEXT) lib_a-s_fmax.$(OBJEXT) \
 	lib_a-s_fmin.$(OBJEXT) lib_a-s_fpclassify.$(OBJEXT) \
 	lib_a-s_lrint.$(OBJEXT) lib_a-s_lround.$(OBJEXT) \
-	lib_a-s_nearbyint.$(OBJEXT) lib_a-s_remquo.$(OBJEXT) \
-	lib_a-s_round.$(OBJEXT) lib_a-s_scalbln.$(OBJEXT) \
-	lib_a-s_signbit.$(OBJEXT) lib_a-s_trunc.$(OBJEXT)
+	lib_a-s_llround.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
+	lib_a-s_remquo.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
+	lib_a-s_scalbln.$(OBJEXT) lib_a-s_signbit.$(OBJEXT) \
+	lib_a-s_trunc.$(OBJEXT)
 am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_modf.$(OBJEXT) lib_a-sf_scalbn.$(OBJEXT) \
 	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_exp10.$(OBJEXT) \
@@ -88,9 +89,10 @@ am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_fdim.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
 	lib_a-sf_fmax.$(OBJEXT) lib_a-sf_fmin.$(OBJEXT) \
 	lib_a-sf_fpclassify.$(OBJEXT) lib_a-sf_lrint.$(OBJEXT) \
-	lib_a-sf_lround.$(OBJEXT) lib_a-sf_nearbyint.$(OBJEXT) \
-	lib_a-sf_remquo.$(OBJEXT) lib_a-sf_round.$(OBJEXT) \
-	lib_a-sf_scalbln.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT)
+	lib_a-sf_lround.$(OBJEXT) lib_a-sf_llround.$(OBJEXT) \
+	lib_a-sf_nearbyint.$(OBJEXT) lib_a-sf_remquo.$(OBJEXT) \
+	lib_a-sf_round.$(OBJEXT) lib_a-sf_scalbln.$(OBJEXT) \
+	lib_a-sf_trunc.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -102,15 +104,16 @@ am__objects_3 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
 	s_log1p.lo s_nan.lo s_nextafter.lo s_pow10.lo s_rint.lo \
 	s_logb.lo s_log2.lo s_matherr.lo s_lib_ver.lo s_fdim.lo \
 	s_fma.lo s_fmax.lo s_fmin.lo s_fpclassify.lo s_lrint.lo \
-	s_lround.lo s_nearbyint.lo s_remquo.lo s_round.lo s_scalbln.lo \
-	s_signbit.lo s_trunc.lo
+	s_lround.lo s_llround.lo s_nearbyint.lo s_remquo.lo s_round.lo \
+	s_scalbln.lo s_signbit.lo s_trunc.lo
 am__objects_4 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
 	sf_cbrt.lo sf_exp10.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo \
 	sf_isinf.lo sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo \
 	sf_nan.lo sf_nextafter.lo sf_pow10.lo sf_rint.lo sf_logb.lo \
 	sf_log2.lo sf_fdim.lo sf_fma.lo sf_fmax.lo sf_fmin.lo \
-	sf_fpclassify.lo sf_lrint.lo sf_lround.lo sf_nearbyint.lo \
-	sf_remquo.lo sf_round.lo sf_scalbln.lo sf_trunc.lo
+	sf_fpclassify.lo sf_lrint.lo sf_lround.lo sf_llround.lo \
+	sf_nearbyint.lo sf_remquo.lo sf_round.lo sf_scalbln.lo \
+	sf_trunc.lo
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libcommon_la_OBJECTS = $(am_libcommon_la_OBJECTS)
@@ -280,7 +283,7 @@ src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
 	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
-	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
+	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
@@ -289,7 +292,7 @@ fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
 	sf_rint.c sf_logb.c sf_log2.c \
 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
-	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
+	sf_lround.c sf_llround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
@@ -300,9 +303,13 @@ libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-chobj = scbrt.def scopysign.def sexp10.def sexpm1.def silogb.def \
-	sinfinity.def sisnan.def slog1p.def smatherr.def smodf.def \
-	snan.def snextafter.def spow10.def sscalbn.def
+chobj = s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
+	s_infinity.def s_isnan.def s_log1p.def s_matherr.def s_modf.def \
+	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
+	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
+	s_logb.def s_log2.def s_lrint.def s_lround.def s_nearbyint.def \
+	s_remquo.def s_rint.def s_round.def s_signbit.def s_trunc.def \
+	isgreater.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -555,6 +562,12 @@ lib_a-s_lround.o: s_lround.c
 lib_a-s_lround.obj: s_lround.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lround.obj `if test -f 's_lround.c'; then $(CYGPATH_W) 's_lround.c'; else $(CYGPATH_W) '$(srcdir)/s_lround.c'; fi`
 
+lib_a-s_llround.o: s_llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_llround.o `test -f 's_llround.c' || echo '$(srcdir)/'`s_llround.c
+
+lib_a-s_llround.obj: s_llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_llround.obj `if test -f 's_llround.c'; then $(CYGPATH_W) 's_llround.c'; else $(CYGPATH_W) '$(srcdir)/s_llround.c'; fi`
+
 lib_a-s_nearbyint.o: s_nearbyint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_nearbyint.o `test -f 's_nearbyint.c' || echo '$(srcdir)/'`s_nearbyint.c
 
@@ -753,6 +766,12 @@ lib_a-sf_lround.o: sf_lround.c
 lib_a-sf_lround.obj: sf_lround.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_lround.obj `if test -f 'sf_lround.c'; then $(CYGPATH_W) 'sf_lround.c'; else $(CYGPATH_W) '$(srcdir)/sf_lround.c'; fi`
 
+lib_a-sf_llround.o: sf_llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_llround.o `test -f 'sf_llround.c' || echo '$(srcdir)/'`sf_llround.c
+
+lib_a-sf_llround.obj: sf_llround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_llround.obj `if test -f 'sf_llround.c'; then $(CYGPATH_W) 'sf_llround.c'; else $(CYGPATH_W) '$(srcdir)/sf_llround.c'; fi`
+
 lib_a-sf_nearbyint.o: sf_nearbyint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nearbyint.o `test -f 'sf_nearbyint.c' || echo '$(srcdir)/'`sf_nearbyint.c
 
@@ -942,73 +961,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	touch stmp-def
 
 doc: $(chobj)
-
-# Texinfo does not appear to support underscores in file names, so we
-# name the .def files without underscores.
-
-scopysign.def: s_copysign.c
-	$(CHEW) < $(srcdir)/s_copysign.c >$@ 2>/dev/null
-	touch stmp-def
-
-scbrt.def: s_cbrt.c
-	$(CHEW) < $(srcdir)/s_cbrt.c >$@ 2>/dev/null
-	touch stmp-def
-
-serf.def: s_erf.c
-	$(CHEW) < $(srcdir)/s_serf.c >$@ 2>/dev/null
-	touch stmp-def
-
-sexp10.def: s_exp10.c
-	$(CHEW) < $(srcdir)/s_exp10.c >$@ 2>/dev/null
-	touch stmp-def
-
-sexpm1.def: s_expm1.c
-	$(CHEW) < $(srcdir)/s_expm1.c >$@ 2>/dev/null
-	touch stmp-def
-
-silogb.def: s_ilogb.c
-	$(CHEW) < $(srcdir)/s_ilogb.c >$@ 2>/dev/null
-	touch stmp-def
-
-sinfinity.def: s_infinity.c
-	$(CHEW) < $(srcdir)/s_infinity.c >$@ 2>/dev/null
-	touch stmp-def
-
-sisnan.def: s_isnan.c
-	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
-	touch stmp-def
-
-slog1p.def: s_log1p.c
-	$(CHEW) < $(srcdir)/s_log1p.c >$@ 2>/dev/null
-	touch stmp-def
-
-slog2.def: s_log2.c
-	$(CHEW) < $(srcdir)/s_log2.c >$@ 2>/dev/null
-	touch stmp-def
-
-smodf.def: s_modf.c
-	$(CHEW) < $(srcdir)/s_modf.c >$@ 2>/dev/null
-	touch stmp-def
-
-smatherr.def: s_matherr.c
-	$(CHEW) < $(srcdir)/s_matherr.c >$@ 2>/dev/null
-	touch stmp-def
-
-snan.def: s_nan.c
-	$(CHEW) < $(srcdir)/s_nan.c >$@ 2>/dev/null
-	touch stmp-def
-
-snextafter.def: s_nextafter.c
-	$(CHEW) < $(srcdir)/s_nextafter.c >$@ 2>/dev/null
-	touch stmp-def
-
-spow10.def: s_pow10.c
-	$(CHEW) < $(srcdir)/s_pow10.c >$@ 2>/dev/null
-	touch stmp-def
-
-sscalbn.def: s_scalbn.c
-	$(CHEW) < $(srcdir)/s_scalbn.c >$@ 2>/dev/null
-	touch stmp-def
 
 # A partial dependency list.
 
