@@ -254,6 +254,7 @@ Problems with Cygwin</ulink>.
 
 DOCTOOL-INSERT-setup-env
 DOCTOOL-INSERT-setup-maxmem
+DOCTOOL-INSERT-setup-locale
 DOCTOOL-INSERT-ntsec
 DOCTOOL-INSERT-setup-files
 </chapter>

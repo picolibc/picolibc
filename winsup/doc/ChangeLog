@@ -1,3 +1,14 @@
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml: Add missing GB2312 and eucKR character sets.
+	* pathnames.sgml: Change "DOS devices" title to "Invalid filenames"
+	and rephrase that section.
+	Add section "Filenames with unusual (foreign) characters".
+	Fix an emphasis.
+	* setup-net.sgml: Integrate setup-locale section.
+	* setup2.sgml: Add locale variables to section "Environment Variables".
+	Add section "Internationalization".
+
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml: Add section about chaged (no)winsymlink default.

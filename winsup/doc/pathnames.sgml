@@ -311,21 +311,25 @@ to be readable by the $USER user account itself.</para>
 
 </sect2>
 
-<sect2 id="pathnames-dosdevices"><title>DOS devices</title>
+<sect2 id="pathnames-dosdevices"><title>Invalid filenames</title>
 
 <para>Filenames invalid under Win32 are not necessarily invalid
-under Cygwin since release 1.7.0.  There are a couple of rules which
-apply to Windows filenames.  First of all, DOS device names like
+under Cygwin since release 1.7.0.  There are a few rules which
+apply to Windows filenames.  Most notably, DOS device names like
 <filename>AUX</filename>, <filename>COM1</filename>,
 <filename>LPT1</filename> or <filename>PRN</filename> (to name a few)
-cannot be used in a native Win32 application, even with an
-extension (<filename>prn.txt</filename>).  Cygwin can handle files with
-these names just fine.</para>
+cannot be used as filename or extension in a native Win32 application.
+So filenames like <filename>prn.txt</filename> or <filename>foo.aux</filename>
+are invalid filenames for native Win32 applications.</para>
+
+<para>This restriction doesn't apply to Cygwin applications.  Cygwin
+can create and access files with such names just fine.  Just don't try
+to use these files with native Win32 aqpplications...</para>
 
 </sect2>
 
 <sect2 id="pathnames-specialchars">
-<title>Special characters in filenames</title>
+<title>Forbidden characters in filenames</title>
 
 <para>Win32 filenames can't contain trailing dots and spaces for backward
 compatibility.  When trying to create files with trailing dots or spaces,
@@ -343,6 +347,48 @@ access files with trailing dots and spaces without problems.</para>
 restriction.  All of the above characters, except for the backslash,
 are converted to special UNICODE characters in the range 0xf000 to 0xf0ff
 (the "Private use area") when creating or accessing files.</para>
+
+</sect2>
+
+<sect2 id="pathnames-unusual">
+<title>Filenames with unusual (foreign) characters</title>
+
+<para> Windows filesystems use the Unicode character set in the UTF-16
+encoding to store filename information.  If you don't use the UTF-8
+character set (see <xref linkend="setup-locale"></xref>) then there's a
+chance that a filename is using one or more characters which have no
+representation in the character set you're using.</para>
+
+<para>For instance, there are no chinese characters in the ISO-8859-1
+character set.  So, converting a filename containing a chinese character
+to ISO-8859-1 leaves you with a wrongly converted filename, for instance
+containing a question mark '?' as replacement for the unconvertable
+character.  When trying to access the file, Cygwin has to convert the
+filename back to UTF-16.  However, this doesn't result in the original
+filename because the question mark will not translate back to the original
+chinese character, but to a simple question mark instead.  This in turn
+results in strange "File not found" messages.</para>
+
+<note><para>To avoid this scenario altogether, just use always UTF-8 as
+character set.</para></note>
+
+<para>If you don't want or can't use UTF-8 as character set for whatever
+reason, you will nevertheless be able to access the file.  How does that
+work?  When Cygwin converts the filename from UTF-16 to your character
+set, it recognizes characters which can't be converted.  If that occurs,
+Cygwin replaces the non-convertible character with a special character
+sequence.  The sequence starts with an ASCII SO character (hex code
+0x0e, equivalent Control-N), followed by the UTF-8 representation of the
+character.  The result is a filename containing some ugly looking
+characters.  While it doesn't <emphasis>look</emphasis> nice, it
+<emphasis>is</emphasis> nice, because Cygwin knows how to convert this
+filename back to UTF-16.  The filename will be converted using your
+usual character set.  However, when Cygwin recognizes an ASCII SO
+character, it skips over the ASCII SO and handles the following bytes as
+a UTF-8 character.  Thus, the filename is symmetrically converted back to
+UTF-16 and you can access the file.</para>
+
+<para>Again, by using UTF-8 you can avoid this problem entirely.</para>
 
 </sect2>
 
@@ -369,7 +415,7 @@ HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel\obcaseinsensitive
 this registry value also on Windows NT4 and Windows 2000, which usually
 both don't know this registry key.  If you want case-sensitivity on these
 systems, create that registry value and set it to 0.  On these systems
-(and *only* on these systems) you don't have to reboot to bring it
+(and <emphasis role='bold'>only</emphasis> on these systems) you don't have to reboot to bring it
 into effect, rather stopping all Cygwin processes and then restarting them
 is sufficient.</para>
 
