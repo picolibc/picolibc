@@ -1,3 +1,8 @@
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Rename charset "GBK" to
+	"GB2312".  Fix documentation accordingly.
+
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Rename charset "CP949" to

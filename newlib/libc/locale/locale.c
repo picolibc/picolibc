@@ -58,8 +58,8 @@ are <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>/<<"eucJP">>, <<"SJIS">>,
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
-Under Cygwin, this implementation additionally supports the charsets <<"GBK">>,
-<<"eucKR">>, and <<"Big5">>.
+Under Cygwin, this implementation additionally supports the charsets
+<<"GB2312">>, <<"eucKR">>, and <<"Big5">>.
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
 a pointer to the string representing the current locale (always
@@ -572,7 +572,7 @@ loadlocale(struct _reent *p, int category)
       break;
 #ifdef __CYGWIN__
     case 'G':
-      if (strcmp (charset, "GBK"))
+      if (strcmp (charset, "GB2312"))
       	return NULL;
       mbc_max = 2;
 #ifdef _MB_CAPABLE
