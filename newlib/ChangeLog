@@ -1,3 +1,10 @@
+2009-03-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/wcsdup.c: Fix documentation error.
+	* libc/string/Makefile.am: Fix CHEWOUT files to contain
+	wcsdup.def rather than wcsdup.
+	* libc/string/Makefile.in: Regenerated.
+
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Only change __wctomb and __mbtowc

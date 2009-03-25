@@ -131,7 +131,7 @@ memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
 memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def \
 wcscasecmp.def	wcscat.def	wcschr.def	wcscmp.def wcscoll.def \
-wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def wcsdup \
+wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def wcsdup.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncasecmp.def wcsncat.def \
 wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \

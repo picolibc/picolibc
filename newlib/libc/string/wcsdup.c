@@ -12,16 +12,16 @@ ANSI_SYNOPSIS
 	wchar_t *wcsdup(const wchar_t *<[str]>);
 
 	#include <wchar.h>
-	wchar_t *_wcsdup_r(struct _reent *<ptr>, const wchar_t *<[str]>);
+	wchar_t *_wcsdup_r(struct _reent *<[ptr]>, const wchar_t *<[str]>);
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *wcsdup(<ptr>, <[str]>)
-	struct _reent *<ptr>;
+	wchar_t *wcsdup(<[ptr]>, <[str]>)
+	struct _reent *<[ptr]>;
 	wchar_t *<[str]>;
 
 DESCRIPTION
-	<<wcsdup>> allocates a new wide character string using <<malloc>,
+	<<wcsdup>> allocates a new wide character string using <<malloc>>,
 	and copies the content of the argument <[str]> into the newly
 	allocated string, thus making a copy of <[str]>.
 
