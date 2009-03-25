@@ -320,9 +320,8 @@ sys_wcstombs (char *dst, size_t len, const PWCHAR src, size_t nwc)
 	pw &= 0xff;
       int bytes = _wctomb_r (_REENT, buf, pw, &ps);
       /* Convert chars invalid in the current codepage to a sequence
-         ASCII SO; UTF-8 representation of invalid char.
-	 Do the same for ASCII SO itself. */
-      if ((bytes == -1 || pw == 0x0e) && *__locale_charset () != 'U'/*TF-8*/)
+         ASCII SO; UTF-8 representation of invalid char. */
+      if (bytes == -1 && *__locale_charset () != 'U'/*TF-8*/)
         {
 	  buf[0] = 0x0e; /* ASCII SO */
 	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, __locale_charset (), &ps);

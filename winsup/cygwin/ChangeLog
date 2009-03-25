@@ -1,5 +1,10 @@
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (sys_wcstombs): Don't convert ASCII SO into two
+	ASCII SO's.
+
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (environ_init): Break from locale loop after first hit.
 	* fhandler_console.cc (fhandler_console::write_normal): Print a SO
 	sequence using always valid Unicode chars.
