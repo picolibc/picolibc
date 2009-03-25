@@ -388,7 +388,12 @@ character, it skips over the ASCII SO and handles the following bytes as
 a UTF-8 character.  Thus, the filename is symmetrically converted back to
 UTF-16 and you can access the file.</para>
 
-<para>Again, by using UTF-8 you can avoid this problem entirely.</para>
+<note><para>Please be aware that this method is not entirely foolproof.
+In some character set combinations it might not work for certain native
+characters.</para>
+
+<para>Only by using the UTF-8 charset you can avoid this problem safely.
+</para></note>
 
 </sect2>
 

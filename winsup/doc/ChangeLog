@@ -1,5 +1,10 @@
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pathnames.sgml: Add a note that ASCII SO handling isn't foolproof
+	under all circumstances.
+
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml: Add missing GB2312 and eucKR character sets.
 	* pathnames.sgml: Change "DOS devices" title to "Invalid filenames"
 	and rephrase that section.
