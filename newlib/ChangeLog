@@ -1,3 +1,8 @@
+2009-03-25  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/arm/strcmp.c (strcmp_unaligned): Correctly
+	detect the nul-byte in a big-endian string.
+
 2009-03-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/wcsdup.c: Fix documentation error.

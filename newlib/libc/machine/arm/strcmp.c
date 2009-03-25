@@ -192,6 +192,7 @@ strcmp_unaligned(const char* s1, const char* s2)
 	}								\
       if (__builtin_expect(((w1 - b1) & ~w1) & (b1 << 7), 0))		\
 	{								\
+	  /* See comment in assembler below re syndrome on big-endian */\
 	  if ((((w1 - b1) & ~w1) & (b1 << 7)) & mask)			\
 	    w2 RSHIFT= shift;						\
 	  else								\
@@ -319,12 +320,22 @@ strcmp_unaligned(const char* s1, const char* s2)
       "b	8f\n"
 
  "5:\n\t"
-      "bics	r3, r3, #"MSB"\n\t"
+#ifdef __ARMEB__
+      /* The syndrome value may contain false ones if the string ends
+	 with the bytes 0x01 0x00 */
+      "tst	w1, #0xff000000\n\t"
+      "itt	ne\n\t"
+      "tstne	w1, #0x00ff0000\n\t"
+      "tstne	w1, #0x0000ff00\n\t"
+      "beq	7f\n\t"
+#else
+      "bics	r3, r3, #0xff000000\n\t"
       "bne	7f\n\t"
+#endif
       "ldrb	w2, [wp2]\n\t"
       SHFT2LSB"	t1, w1, #24\n\t"
 #ifdef __ARMEB__
-      SHFT2LSB"	w2, w2, #24\n\t"
+      "lsl	w2, w2, #24\n\t"
 #endif
       "b	8f\n"
 
@@ -353,12 +364,21 @@ strcmp_unaligned(const char* s1, const char* s2)
       "b	2b\n"
 
  "5:\n\t"
-      SHFT2MSB"s	r3, r3, #16\n\t"
+#ifdef __ARMEB__
+      /* The syndrome value may contain false ones if the string ends
+	 with the bytes 0x01 0x00 */
+      "tst	w1, #0xff000000\n\t"
+      "it	ne\n\t"
+      "tstne	w1, #0x00ff0000\n\t"
+      "beq	7f\n\t"
+#else
+      "lsls	r3, r3, #16\n\t"
       "bne	7f\n\t"
+#endif
       "ldrh	w2, [wp2]\n\t"
       SHFT2LSB"	t1, w1, #16\n\t"
 #ifdef __ARMEB__
-      SHFT2LSB"	w2, w2, #16\n\t"
+      "lsl	w2, w2, #16\n\t"
 #endif
       "b	8f\n"
 
@@ -390,8 +410,10 @@ strcmp_unaligned(const char* s1, const char* s2)
       SHFT2LSB"	w2, w2, #24\n\t"
       "b	8f\n"
  "5:\n\t"
-      "tst	r3, #128\n\t"
-      "bne	7f\n\t"
+      /* The syndrome value may contain false ones if the string ends
+	 with the bytes 0x01 0x00 */
+      "tst	w1, #"LSB"\n\t"
+      "beq	7f\n\t"
       "ldr	w2, [wp2], #4\n"
  "6:\n\t"
       SHFT2LSB"	t1, w1, #8\n\t"
