@@ -791,7 +791,10 @@ environ_init (char **envp, int envc)
 	  char *buf = (char *) alloca (i);
 	  GetEnvironmentVariableA (lc_arr[lc], buf, i);
 	  if (_setlocale_r (_GLOBAL_REENT, LC_CTYPE, buf))
-	    got_lc = true;
+	    {
+	      got_lc = true;
+	      break;
+	    }
 	}
     }
   /* No matching POSIX environment variable, use current codepage. */

@@ -1,5 +1,11 @@
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (environ_init): Break from locale loop after first hit.
+	* fhandler_console.cc (fhandler_console::write_normal): Print a SO
+	sequence using always valid Unicode chars.
+
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* strfuncs.cc (__kr_wctomb): Use codepage 51949 rather than 50949.
 	(__kr_mbtowc): Ditto.
 	(__set_charset_from_codepage): Ditto.  Translate codepage 936 to

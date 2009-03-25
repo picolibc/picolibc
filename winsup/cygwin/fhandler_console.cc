@@ -1573,7 +1573,25 @@ fhandler_console::write_normal (const unsigned char *src,
 	  cursor_set (false, 0, y);
 	  break;
 	case ERR:
-	  /* Don't print chars marked as ERR chars. */
+	  /* Don't print chars marked as ERR chars, except for a SO sequence
+	     which is printed as singlebyte chars from the UTF Basic Latin
+	     and Latin 1 Supplement plains. */
+	  if (*found == 0x0e)
+	    {
+	      write_replacement_char ();
+	      if (found + 1 < end)
+		{
+		  ret = __utf8_mbtowc (_REENT, NULL, (const char *) found + 1,
+				       end - found - 1, NULL, &ps);
+		  if (ret != (size_t) -1)
+		    while (ret-- > 0)
+		      {
+			WCHAR w = *(found + 1);
+			WriteConsoleW (get_output_handle (), &w, 1, &done, 0);
+			found++;
+		      }
+		}
+	    }
 	  break;
 	case TAB:
 	  cursor_get (&x, &y);
