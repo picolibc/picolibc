@@ -1,5 +1,10 @@
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c (loadlocale): Only change __wctomb and __mbtowc
+	pointers if category is LC_CTYPE.
+
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/locale.c (loadlocale): Rename charset "GBK" to
 	"GB2312".  Fix documentation accordingly.
 
