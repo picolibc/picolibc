@@ -39,12 +39,15 @@ There is  no
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 #define DEF_SIZE 5000
 #define STACK 50
+#define MIN_CMDLEN	4	/* Minimum length of a command */
 
 int internal_wanted;
 int internal_mode;
+int Verbose=0;
 
 
 
@@ -212,7 +215,7 @@ string_type *tos;
 
 unsigned int idx = 0; /* Pos in input buffer */
 string_type *ptr; /* and the buffer */
-typedef void (*stinst_type)();
+typedef void (*stinst_type)(NOARGS);
 stinst_type *pc;
 stinst_type sstack[STACK];
 stinst_type *ssp = &sstack[0];
@@ -234,7 +237,7 @@ struct dict_struct
     
 };
 typedef struct dict_struct dict_type;
-#define WORD(x) static void x()
+#define WORD(x) static void x(NOARGS)
 
 static void DEFUN(exec,(word),
 		  dict_type *word)
@@ -451,7 +454,6 @@ WORD(translatecomments)
 WORD(quickref)
 {
   string_type *nos = tos-1;
-  unsigned int scan=0;
   unsigned int nosscan = 0;
   unsigned int idx = 0;
   
@@ -487,6 +489,7 @@ WORD(quickref)
   
 }
 
+#if 0
 /* turn everything not starting with a . into a comment */
 
 WORD(manglecomments)
@@ -520,6 +523,7 @@ WORD(manglecomments)
     pc++;
     
 }
+#endif
 
 /* Mod tos so that only lines with leading dots remain */
 static void
@@ -640,12 +644,15 @@ WORD(courierize)
 }
 
 /* 
+bulletize:  look for bullet item commands at start of line
+ Bullet list:
    O+  emit @itemize @bullet
-   OO  emit @item
+   o   emit @item	[note lowercase]
    O-  emit @end itemize
 
+ Variable label list:
    o+  emit @table @code
-   oo  @item
+   o   emit @item
    o-  emit @end table
 */
 
@@ -653,19 +660,10 @@ WORD(courierize)
 WORD(bulletize)
 {
   unsigned int idx = 0;
-  int on = 0;
   string_type out;
   init_string(&out);
     
   while (at(tos, idx)) {
-      if (at(tos, idx) == '@' &&
-	  at(tos, idx+1) == '*') 
-      {
-	cattext(&out,"*");
-	idx+=2;
-      }
-	
-      else
        if (at(tos, idx) == '\n' &&  at(tos, idx+1) == 'o')
        {
 	 if (at(tos,idx+2) == '+') {
@@ -787,7 +785,10 @@ DEFUN( iscommand,(ptr, idx),
 	 }
 	    else if(at(ptr,idx) == '\n')
 	    {
-		if (len >4) return 1;
+		/* The length check will never fail on a real command
+		 * because the commands are screened as the definitions file
+		 * is read.  */
+		if (len >= MIN_CMDLEN) return 1;
 		return 0;
 	    }
 	    else return 0;
@@ -797,6 +798,7 @@ DEFUN( iscommand,(ptr, idx),
 }
 
 
+unsigned int
 DEFUN(copy_past_newline,(ptr, idx, dst),
       string_type *ptr AND
       unsigned int idx AND
@@ -833,7 +835,6 @@ WORD(kill_bogus_lines)
 {
     int sl ;
     
-    int nl = 0;
     int idx = 0;
     int c;
     int dot = 0    ;
@@ -1162,9 +1163,6 @@ static void DEFUN_VOID(perform)
 	    /* It's worth looking through the command list */
 	    if (iscommand(ptr, idx))
 	    {
-		unsigned int i;
-		int found = 0;
-
 		char *next;
 		dict_type *word ;
 		
@@ -1178,6 +1176,7 @@ static void DEFUN_VOID(perform)
 
 		if (word) 
 		{
+		    if(Verbose)  fprintf(stderr, "CMD '%s'\n", word->word);
 		    exec(word);
 		}
 		else
@@ -1234,17 +1233,11 @@ return     entry->code_end++;
 void
 DEFUN(add_intrinsic,(name, func),
       char *name AND
-      void (*func)())
+      void (*func)(NOARGS))
 {
     dict_type *new = newentry(name);
     add_to_definition(new, func);
     add_to_definition(new, 0);
-}
-
-WORD(push_addr)
-{
-    
-
 }
 
 void
@@ -1261,13 +1254,12 @@ DEFUN(add_var,(name),
 
 
 
-void 
+int
 DEFUN(compile, (string), 
       char *string)
 
 {
-    int jstack[STACK];
-    int *jptr = jstack;
+    int  ret=0;
     /* add words to the dictionary */
     char *word;
     string = nextword(string, &word);
@@ -1275,18 +1267,24 @@ DEFUN(compile, (string),
     {
 	if (strcmp(word,"var")==0) 
 	{
- string=nextword(string, &word);
+	  string=nextword(string, &word);
 	  
 	  add_var(word);
- string=nextword(string, &word);
+	  string=nextword(string, &word);
 	}
-else	
+	else	
 	    
 	if (word[0] == ':')
 	{
 	    dict_type *ptr;
 	    /* Compile a word and add to dictionary */
 	    string = nextword(string, &word);
+	    if(Verbose)  fprintf(stderr, "Found command '%s'\n", word);
+	    if(strlen(word) < MIN_CMDLEN)  {
+		fprintf(stderr, "ERROR:  Command '%s' is too short ", word);
+		fprintf(stderr, "(MIN_CMDLEN is %d)\n", MIN_CMDLEN);
+		ret++;
+	    }
 	    
 	    ptr = newentry(word);
 	    string = nextword(string, &word);
@@ -1330,9 +1328,11 @@ else
 	else 
 	{
 	    fprintf(stderr,"syntax error at %s\n",string-1);
+	    ret++;
 	}	    
     }
 
+return(ret);
 }
 
  
@@ -1378,11 +1378,13 @@ static void DEFUN(read_in, (str, file),
 }
 
 
+#if 0
 static void DEFUN_VOID(usage)
 {
-    fprintf(stderr,"usage: -[d|i|g] <file >file\n");
+    fprintf(stderr,"usage: -[i|v] -f macrofile <file >file\n");
     exit(33);    
 }
+#endif
 
 int DEFUN(main,(ac,av),
 int ac AND
@@ -1446,15 +1448,21 @@ char *av[])
 		  fprintf(stderr,"Can't open the input file %s\n",av[i+1]);
 		  return 33;
 		}
+		if(Verbose)  fprintf(stderr, "Reading -f '%s'\n", av[i+1]);
 		
 		  
 		read_in(&b, f);
-		compile(b.ptr);
+		if( compile(b.ptr) )  { fclose(f); exit(1); }
 		perform();	
+		fclose(f);
 	    }
 	    else    if (av[i][1] == 'i') 
 	    {
 		internal_wanted = 1;
+	    }
+	    else    if (av[i][1] == 'v') 
+	    {
+		Verbose++;
 	    }
 	}
 

@@ -1,0 +1,117 @@
+This HOWTO file contains notes for maintainers and contributors to Newlib.
+For information on using Newlib (building, installing), see README.  (In
+particular, the "Regenerating Configuration Files" section in README is of
+interest to both users and contributors.)
+ 
+(This file could probably use some other "sections" in addition to the
+initially-provided sections.  Please help by adding as appropriate.)
+
+DOCUMENTATION
+=============
+
+     All the documentation for Newlib comes as part of the machine-readable
+distribution.  Functions are documented in the source files, although not
+every file contains documentation, as many functions share manual page
+information.  For example, lround(), lroundf(), llround(), and llroundf()
+share a single man page, which is in the source for lround().  The documentation
+is written partially in a custom format and partially in Texinfo format.
+
+     The custom part comprises makedoc.c and doc.str, both of which are in the
+doc directory.  doc.str is a macro file that can be used to define things to
+be done by makedoc, using building blocks that are built into makedoc.c.
+The basic function of makedoc is two-fold.  First, it recognizes comments in
+the proper format to pull out of source files.  Second, it adds some Texinfo
+commands as well as translating certain sequences into the appropriate
+Texinfo commands.  Refer to makedoc.c and doc.str for what these are.
+(makedoc.c is not particularly-well commented.)  Another way to see how they
+work is to simply examine the source files with documentation comments.
+
+(A couple of examples that use some of the fancier options:
+	libm/common/s_isnan.c ("o+" variable-"bullet" list),
+	libc/stdio/sprintf.c ("O+" bullet list; "." for example code).)
+
+     In addition to the makedoc.c stuff, Texinfo commands can be directly
+used.  Texinfo is a documentation system that uses a single source file to
+produce both on-line information and a printed manual.  You can use one of the
+Info formatting commands to create the on-line version of the documentation
+and TeX (or `texi2roff') to typeset the printed version.  While Newlib contains
+a copy of the texinfo package (texinfo.tex), the manual for it is not
+included.  The latest one may be found at
+
+http://www.gnu.org/software/texinfo/manual/texinfo/texinfo.html
+
+(which could be for a newer version of texinfo.tex than is included in Newlib).
+
+     In addition to Texinfo commands, straight TeX commands can also be used,
+but these, however, should be carefully limited and be given alternates for
+when a non-printed manual is produced--such as when info pages are produced.
+For an example of this kind of usage, see libm/common/s_logb.c.
+
+     Please note that most files with documentation contain both an
+ANSI_SYNOPSIS and a TRAD_SYNOPSIS section.  The TRAD_SYNOPSIS section gets
+deleted (since at least 2000) by makedoc, so when working on files these
+can safely be deleted and if you're making a new file, there is no need
+to add the TRAD_SYNOPSIS section.
+
+     If writing a new function that requires documentation, the required
+sections are FUNCTION, INDEX, ANSI_SYNOPSIS (or SYNOPSIS), DESCRIPTION, RETURNS,
+and PORTABILITY.  BUGS and SEEALSO should be added as appropriate.
+
+     Source files which contain documentation are processed into ".def"
+files with the extracted information.  These .def files are noted in the
+makefiles as either CHEWOUT_FILES in the libc makefiles or chobj in the libm
+makefiles.  These .def files need to be included into an appropriate .tex 
+file for inclusion in the manuals (one each for libc and libm).  Pay special 
+attention under libc, as the manual is arranged by header file name, but not
+all header files are represented by directories (e.g.  wcsftime.c is found 
+under libc/time, but goes under wchar.h in the manual.)
+
+In summary, to add new documentation:
+
+1.  Add properly-formatted comments to source file (e.g. src.c);
+2.  add "chewout" file to list in Makefile.am (CHEWOUT_FILES in libc or chobj in
+    libm) (e.g. src.def), re-generate Makefile.in;
+3.  add file to something.tex;
+4.  make ChangeLog entry and generate patch.
+ 
+EL/IX (ELIX_LEVEL_n, ELIX_n_SOURCES)
+====================================
+
+     Some of the Makefiles contain definitions of ELIX_LEVEL_1 ... ELIX_LEVEL_4,
+and corresponding definitions for ELIX_1_SOURCES ... ELIX_4_SOURCES.
+These are referring to the EL/IX standards created by Red Hat for the
+purpose of Linux-based open standards for embedded development.  In brief,
+the intent is to define multiple levels for API functions that allows the
+user to size the library appropriately for their application--at least in
+terms of the predefined lists.  For full details, refer to the EL/IX home
+page at http://sources.redhat.com/elix/.  The likely best way to tell how to
+classify any new functions in terms of needing an ELIX level qualification
+is to ask Jeff Johnston.  To see how it works and try classification on your
+own, refer to the API specification on the web site,
+
+http://sources.redhat.com/elix/api/current/api.pdf.  
+
+(Unfortunately, it is not complete with respect to either the C99 or POSIX 
+standards, so particular C and POSIX functions may or may not be found.)
+
+     The following definitions of the levels are from the (draft) standard.
+
+Level 1
+     RTOS compatible layer.  Functions available in both Linux and a
+typical deeply embedded operating system (eCos, RTEMS, VxWorks, pSOS, VRTX32,
+etc.).  Some functions may have reduced or modified semantics.
+
+Level 2
+     Linux single process only. Includes level 1 plus any functions from Linux
+that are not easily implemented on an RTOS.  Also full implementations of
+reduced functions in Level 1.
+
+Level 3
+     Linux multiprocess for embedded applications.  This is basically POSIX.1
+with some of the functions that are obviously not for embedded applications
+(such as job control) removed.
+
+Level 4
+     Full POSIX or Linux compliance.  Essentially these are functions that are
+present in a standard Linux kernel but are irrelevant to an embedded system.
+These functions do not form part of the EL/IX API.
