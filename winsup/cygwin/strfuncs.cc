@@ -28,7 +28,7 @@ details. */
    implementation of the base functions for the conversion using
    the MulitByteToWideChar/WideCharToMultiByte functions. */
 
-/* GBK, eucKR, and Big5 conversions are not available so far in newlib. */
+/* GB2312, eucKR, and Big5 conversions are not available so far in newlib. */
 
 static int
 __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
@@ -84,7 +84,7 @@ extern "C" int
 __kr_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
 {
-  return __db_wctomb (r,s, wchar, 50949);
+  return __db_wctomb (r,s, wchar, 51949);
 }
 
 extern "C" int
@@ -190,7 +190,7 @@ extern "C" int
 __kr_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	       const char *charset, mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 50949, state);
+  return __db_mbtowc (r, pwc, s, n, 51949, state);
 }
 
 extern "C" int
@@ -253,10 +253,10 @@ __set_charset_from_codepage (UINT cp, char *charset)
       strcpy (charset, "SJIS");
       return __sjis_mbtowc;
     case 936:
-      strcpy (charset, "GBK");
+      strcpy (charset, "GB2312");
       return __gbk_mbtowc;
     case 949:
-    case 50949:
+    case 51949:
       strcpy (charset, "EUCKR");
       return __kr_mbtowc;
     case 950:
