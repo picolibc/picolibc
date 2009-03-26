@@ -1,5 +1,10 @@
 2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c (loadlocale): Revert to charset "GBK" instead
+	of "GB2312".  Fix documentation accordingly.
+
+2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/ctype/ctype_.c (_CTYPE_DATA_0_127): Mark TAB as blank character.
 	* libc/ctype/isblank.c: Replace hardcoded test with test for having _B
 	marker in ctype array.
