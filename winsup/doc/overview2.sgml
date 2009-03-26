@@ -215,6 +215,15 @@ Readonly DOS attribute set.  The advantage of file symlinks is speed,
 the advantage of shortcut symlinks is the fact that they can be utilized
 by non-Cygwin Win32 tools as well.</para>
 
+<para>Starting with Cygwin 1.7, symbolic links are using UTF-16 to encode
+the filename of the target file, to better support internationalization.
+Symlinks created by older Cygwin releases can be read just fine.  However,
+you could run into problems with them if you're now using another character
+set than the one you used when creating these symlinks
+(see <xref linkend="setup-locale-problems"></xref>.  Please note that this
+new UTF-16 style of symlinks is not compatible with older Cygwin release,
+which can't read the target filename correctly.</para>
+
 <para>Hard links are fully supported on NTFS and NFS file systems.  On FAT
 and some other file systems, the call falls back to simply copying the file,
 a strategy that works in many cases.</para>

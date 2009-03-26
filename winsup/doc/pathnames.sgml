@@ -291,12 +291,11 @@ Windows path, strips off the innermost directory component and adds
 well as the innermost directory (<filename>bin</filename>) is stripped
 off: <filename>C:\cygwin\</filename>.  Then "etc" and the filename to
 look for is attached: <filename>C:\cygwin\etc\fstab</filename>.  So the
-/etc directory must be parallel to the directory in which the cygwn1.dll
+/etc directory must be parallel to the directory in which the cygwin1.dll
 exists and <filename>/etc</filename> must not be a Cygwin symlink
 pointing to another directory.  Consequentially none of the files from
-the above list, including the directory
-<filename>/etc/fstab.d</filename>is allowed to be a Cygwin symlink
-either.</para>
+the above list, including the directory <filename>/etc/fstab.d</filename>
+is allowed to be a Cygwin symlink either.</para>
 
 <para>However, native NTFS symlinks and reparse points are transparent
 when accessing the above files so all these files as well as

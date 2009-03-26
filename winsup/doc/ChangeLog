@@ -1,4 +1,15 @@
-2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add text to explain new UTF-16 symlinks.
+	* faq-api.xml: Add FAQ entry "Why do some of my old symlinks don't
+	work anymore?"
+	* new-features.sgml: Fix symlink text.  Add new UTF-16 symlinks.
+	* overview2.sgml: Add text about new UTF-16 symlinks and potential
+	problems with old symlinks.
+	* pathnames.sgml: Fix typo.  
+	* setup2.sgml: Extend text about problems with symlinks.
+
+2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml: Replace GB2312 with GBK.
 	* setup2.sgml: Ditto.

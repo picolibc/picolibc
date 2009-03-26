@@ -75,9 +75,13 @@
 
 - New open(2) flags O_DIRECTORY, O_EXEC and O_SEARCH.
 
-- Make the original style symlinks (file with SYSTEM attribute set)
+- Make the "plain file with SYSTEM attribute set" style symlink
   default again when creating symlinks.  Only create Windows shortcut
   style symlinks if CYGWIN=winsymlinks is set in the environment.
+
+- Symlinks are now using UTF-16 encoding for the target filename for
+  better internationalization support.  Cygwin 1.7 can read all old style
+  symlinks, but the new style is not compatible with older Cygwin releases.
 
 - Handle NTFS native symlinks available since Vista/2008 as symlinks
   (but don't create Vista/2008 symlinks due to unfortunate OS restrictions).

@@ -290,14 +290,19 @@ the underscore for maximum portablilty.</para></note>
 
 <para>And here's another problem when switching charsets on the fly.
 Symbolic links.  A symbolic link contains the filename of the target
-file the symlink points to.  When a symlink is created, the current
-character set is used to store the target filename.  If the target
-filename contains non-ASCII characters and you switch to another
-character set, the target filename of the symlink is now potentially
-an invalid character sequence in the new character set.  This behaviour
-is not different from the behaviour in other Operating Systems.  So,
-if you suddenly can't access a symlink anymore, maybe it's because you
-switched to another character set?
+file the symlink points to.  When a symlink had been created with older
+versions of Cygwin, the current ANSI or OEM character set had been used
+to store the target filename, dependent on the old <envar>CYGWIN</envar>
+environment variable setting <envar>codepage</envar>
+(see <xref linkend="cygwinenv-removed-options"></xref>.  If the target
+filename contains non-ASCII characters and you use another
+character set than your default ANSI/OEM charset, the target filename of
+the symlink is now potentially an invalid character sequence in the new
+character set.  This behaviour is not different from the behaviour in other
+Operating Systems.  So, if you suddenly can't access a symlink anymore
+which worked all these years before, maybe it's because you switched to
+another character set.  This doesn't occur with symlinks created with
+Cygwin 1.7 or later.
 </para>
 
 </sect2>
