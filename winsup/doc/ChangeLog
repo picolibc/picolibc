@@ -1,5 +1,10 @@
 2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.sgml: Replace GB2312 with GBK.
+	* setup2.sgml: Ditto.
+
+2009-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pathnames.sgml: Add a note that ASCII SO handling isn't foolproof
 	under all circumstances.
 

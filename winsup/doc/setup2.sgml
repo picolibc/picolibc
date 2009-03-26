@@ -393,7 +393,7 @@ oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     ISO-8859-16             -   (not available)
 
     SJIS                    932 (ANSI/OEM Japanese)
-    GB2312                  936 (ANSI/OEM Simplified Chinese, GBK)
+    GBK                     936 (ANSI/OEM Simplified Chinese)
     Big5                    950 (ANSI/OEM Traditional Chinese)
     JIS                   50220 (ISO2022 Japanese w/o halfwidth Katakana)
     eucJP                 51932 (EUC Japanese)
