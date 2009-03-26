@@ -54,6 +54,10 @@ extern	__IMPORT _CONST char	*__ctype_ptr__;
 #define	isgraph(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N))
 #define iscntrl(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_C)
 
+#if !defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L
+#define isblank(c)      ((__ctype_ptr__)[(unsigned)((c)+1)]&_B)
+#endif
+
 
 /* Non-gcc versions will get the library versions, and will be
    slightly slower */

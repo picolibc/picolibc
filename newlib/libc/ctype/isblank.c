@@ -37,5 +37,5 @@ No supporting OS subroutines are required.
 int
 _DEFUN(isblank,(c),int c)
 {
-	return (c == ' ' || c == '\t');
+	return(__ctype_ptr__[c+1] & _B);
 }
