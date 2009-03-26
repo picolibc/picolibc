@@ -1,3 +1,11 @@
+2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_worker): Write target filename as UTF-16 string
+	with leading BOM marker.
+	(symlink_info::check_shortcut): If check for leading BOM marker 
+	succeeds, read filename as UTF-16 string.
+	(symlink_info::check_sysfile): Ditto.
+
 2009-03-26  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/asm/byteorder.h (__ntohl): Align definition to ISO C99.

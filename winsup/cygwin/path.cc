@@ -1559,15 +1559,22 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 
       /* Append the POSIX path after the regular shortcut data for
 	 the long path support. */
-      *(unsigned short *)cp = oldpath_len;
-      cp = stpcpy (cp += 2, oldpath);
+      unsigned short *plen = (unsigned short *) cp;
+      cp += 2;
+      *(PWCHAR) cp = 0xfeff;		/* BOM */
+      cp += 2;
+      *plen = sys_mbstowcs ((PWCHAR) cp, NT_MAX_PATH, oldpath) * sizeof (WCHAR);
+      cp += *plen;
     }
   else
     {
-      /* This is the old technique creating a symlink. */
-      buf = tp.c_get ();
+      /* Default technique creating a symlink. */
+      buf = (char *) tp.w_get ();
+      cp = stpcpy (buf, SYMLINK_COOKIE);
+      *(PWCHAR) cp = 0xfeff;		/* BOM */
+      cp += 2;
       /* Note that the terminating nul is written.  */
-      cp = stpcpy (stpcpy (buf, SYMLINK_COOKIE), oldpath) + 1;
+      cp += sys_mbstowcs ((PWCHAR) cp, NT_MAX_PATH, oldpath) * sizeof (WCHAR);
     }
 
   if (isdevice && win32_newpath.exists ())
@@ -1714,10 +1721,21 @@ symlink_info::check_shortcut (HANDLE in_h)
 	  len = *(unsigned short *) cp;
 	  cp += 2;
 	}
-      if (len > SYMLINK_MAX)
+      if (*(PWCHAR) cp == 0xfeff)	/* BOM */
+	{
+	  char *tmpbuf = tp.c_get ();
+	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) (cp + 2))
+	      > SYMLINK_MAX + 1)
+	    goto out;
+	  res = posixify (tmpbuf);
+	}
+      else if (len > SYMLINK_MAX)
 	goto out;
-      cp[len] = '\0';
-      res = posixify (cp);
+      else
+	{
+	  cp[len] = '\0';
+	  res = posixify (cp);
+	}
     }
   if (res) /* It's a symlink.  */
     pflags = PATH_SYMLINK | PATH_LNK;
@@ -1730,8 +1748,9 @@ out:
 int
 symlink_info::check_sysfile (HANDLE in_h)
 {
+  tmp_pathbuf tp;
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
-  char srcbuf[SYMLINK_MAX + 2];
+  char *srcbuf = tp.c_get ();
   int res = 0;
   UNICODE_STRING same = { 0, 0, (PWCHAR) L"" };
   OBJECT_ATTRIBUTES attr;
@@ -1761,12 +1780,21 @@ symlink_info::check_sysfile (HANDLE in_h)
       pflags = PATH_SYMLINK;
 
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
-			   SYMLINK_MAX + 2, NULL, NULL);
+			   NT_MAX_PATH, NULL, NULL);
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("ReadFile2 failed");
 	  if (status != STATUS_END_OF_FILE)
 	    set_error (EIO);
+	}
+      else if (*(PWCHAR) srcbuf == 0xfeff)	/* BOM */
+	{
+	  char *tmpbuf = tp.c_get ();
+	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) (srcbuf + 2))
+	      > SYMLINK_MAX + 1)
+	    debug_printf ("symlink string too long");
+	  else
+	    res = posixify (tmpbuf);
 	}
       else if (io.Information > SYMLINK_MAX + 1)
 	debug_printf ("symlink string too long");
