@@ -122,7 +122,9 @@ THIS SOFTWARE.
 /* #include <fenv.h> */
 /* #endif */
 
+#ifdef USE_LOCALE
 #include "locale.h"
+#endif
 
 #ifdef IEEE_Arith
 #ifndef NO_IEEE_Scale
@@ -305,10 +307,14 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		else if (nd < 16)
 			z = 10*z + c - '0';
 	nd0 = nd;
-	if (strcmp (s, localeconv()->decimal_point) == 0)
+#ifdef USE_LOCALE
+	if (c == *localeconv()->decimal_point)
+#else
+	if (c == '.')
+#endif
 		{
 		decpt = 1;
-		c = *(s += strlen (localeconv()->decimal_point));
+		c = *++s;
 		if (!nd) {
 			for(; c == '0'; c = *++s)
 				nz++;
