@@ -30,10 +30,10 @@ extern uint16_t	ntohs(uint16_t);
 extern uint32_t	htonl(uint32_t);
 extern uint16_t	htons(uint16_t);
 
-extern __inline__ uint32_t	__ntohl(uint32_t);
-extern __inline__ uint16_t	__ntohs(uint16_t);
-
-extern __inline__ uint32_t
+#if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
+extern
+#endif
+__inline__ uint32_t
 __ntohl(uint32_t x)
 {
 	__asm__("xchgb %b0,%h0\n\t"	/* swap lower bytes	*/
@@ -50,7 +50,10 @@ __ntohl(uint32_t x)
 		   (((uint32_t)(x) & 0x00ff0000U) >>  8) | \
 		   (((uint32_t)(x) & 0xff000000U) >> 24)))
 
-extern __inline__ uint16_t
+#if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
+extern
+#endif
+__inline__ uint16_t
 __ntohs(uint16_t x)
 {
 	__asm__("xchgb %b0,%h0"		/* swap bytes		*/
