@@ -2047,10 +2047,12 @@ extern "C" long int
 pathconf (const char *file, int v)
 {
   fhandler_base *fh;
+  long ret = -1;
 
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+
   if (!*file)
     {
       set_errno (ENOENT);
@@ -2059,11 +2061,11 @@ pathconf (const char *file, int v)
   if (!(fh = build_fh_name (file, NULL, PC_SYM_FOLLOW, stat_suffixes)))
     return -1;
   if (!fh->exists ())
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-  return fh->fpathconf (v);
+    set_errno (ENOENT);
+  else
+    ret = fh->fpathconf (v);
+  delete fh;
+  return ret;
 }
 
 extern "C" int
