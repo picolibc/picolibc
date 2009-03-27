@@ -166,7 +166,7 @@ fhandler_fifo::wait (bool iswrite)
 }
 
 void
-fhandler_fifo::read (void *in_ptr, size_t& len)
+fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
   if (!wait (false))
     len = 0;
@@ -175,7 +175,7 @@ fhandler_fifo::read (void *in_ptr, size_t& len)
 }
 
 int
-fhandler_fifo::write (const void *ptr, size_t len)
+fhandler_fifo::raw_write (const void *ptr, size_t len)
 {
   return wait (true) ? write_overlapped (ptr, len) : -1;
 }

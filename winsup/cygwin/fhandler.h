@@ -576,8 +576,8 @@ class fhandler_fifo: public fhandler_base
   bool wait (bool) __attribute__ ((regparm (1)));
 public:
   fhandler_fifo ();
-  void __stdcall read (void *, size_t&) __attribute__ ((regparm (3)));
-  int write (const void *, size_t);
+  void raw_read (void *, size_t&);
+  int raw_write (const void *, size_t);
   int open (int, mode_t);
   bool isfifo () { return true; }
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));

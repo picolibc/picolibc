@@ -1,5 +1,11 @@
 2009-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_fifo): Rename read/write methods to
+	raw_read/raw_write.
+	* fhandler_fifo.cc: Ditto.
+
+2009-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (pathconf): Fix memory leak.
 
 2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
