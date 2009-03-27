@@ -159,38 +159,6 @@ How to start Cygserver:
   /usr/bin/cygserver-config script.
 
 
-How to use the Cygserver services:
-
-  The Cygserver services are used by Cygwin applications only if you
-  set the environment variable CYGWIN to contain the string "server".
-  You must do this before starting the application.
-
-  Typically, you don't need any other option, so it's ok to set CYGWIN
-  just to "server".  It is not necessary to set the CYGWIN environment
-  variable prior to starting the Cygserver process itself, but it won't
-  hurt to do so.
-
-  The easiest way is to set the environment variable CYGWIN to the values
-  you want in the Windows system environment and to reboot the machine.
-  This is advisable, since it allows you to set the variable once and
-  then forget about it.  It also ensures that services as well as desktop
-  applications have the same setting.
-
-  If you don't want that for whatever reason, you can set the
-  variable in the /cygwin.bat file which is used in the net distribution,
-  to start a Cygwin bash from the desktop.  In that file, you can set
-  the CYGWIN variable using Windows command line interpreter syntax, e. g.:
-
-    set CYGWIN=server
-
-  If you don't set CYGWIN in the system environment, but you're running
-  other Cygwin services, these services need to get that CYGWIN value by
-  setting the environment using the appropriate cygrunsrv option '-e' when
-  installing the service.  Example installing a service 'foo':
-
-    cygrunsrv -I foo -p /usr/sbin/foo -e "CYGWIN=server"
-
-
 The Cygserver configuration file:
 
   Cygserver has many options, which allow to customize the server
