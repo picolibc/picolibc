@@ -933,8 +933,7 @@ operate on current user.  System operations must not be mixed with user
 operations.  Don't specify a USER when triggering a system operation. 
 
 Don't specify a user or any other option together with the -R option.
-Non-Admin users can only store their password if cygserver is running and
-the CYGWIN environment variable is set to contain the word 'server'.
+Non-Admin users can only store their password if cygserver is running.
 Note that storing even obfuscated passwords in the registry is not overly
 secure.  Use this feature only if the machine is adequately locked down.
 Don't use this feature if you don't need network access within a remote
@@ -1029,11 +1028,8 @@ privileged operation which only administrative accounts are allowed to
 do.  If normal, non-admin users should be allowed to enter their
 passwords using <command>passwd -R</command>, it's required to run
 <command>cygserver</command> as a service under the LocalSystem account
-and the environment variable CYGWIN
-(see <xref linkend="using-cygwinenv"></xref>)
-must be set to contain the "server" setting before running
-<command>passwd -R</command>.  This only affects storing passwords.
-Using passwords in privileged processes does not require
+before running <command>passwd -R</command>.  This only affects storing
+passwords.  Using passwords in privileged processes does not require
 <command>cygserver</command> to run.</para>
 
 <para>Limitations: Users may not be able to change their password on

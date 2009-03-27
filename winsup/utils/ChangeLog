@@ -1,3 +1,7 @@
+2009-03-26  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* utils.sgml (passwd -R): Remove references to CYGWIN="server".
+
 2009-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Fix compiler warning in printf.
