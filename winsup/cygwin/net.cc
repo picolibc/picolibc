@@ -4213,6 +4213,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
      convert the returned IPv4 addresses into v4-in-v6 entries.  This
      is done in ga_dup if the v4mapped flag is set. */
   if (!wincap.supports_all_posix_ai_flags ()
+      && hints
       && hints->ai_family == AF_INET6
       && (hints->ai_flags & AI_V4MAPPED)
       && (ret == EAI_NODATA || ret == EAI_NONAME
