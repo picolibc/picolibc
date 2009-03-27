@@ -3083,7 +3083,12 @@ inet_ntop6 (const u_char *src, char *dst, size_t size)
 	  break;
 	}
       __small_sprintf(tp, "%x", words[i]);
-      tp += strlen(tp);
+      while (*tp)
+	{
+	  if (isupper (*tp))
+	    *tp = _tolower (*tp);
+	  ++tp;
+	}
     }
   /* Was it a trailing run of 0x00's? */
   if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
