@@ -1,3 +1,8 @@
+2009-03-27  Eli Zaretskii  <eliz@gnu.org>
+
+	* djunpack.bat: Use ".." quoting in Sed command, for the sake of
+	Windows builds of Sed.
+
 2009-03-18  Tom Tromey  <tromey@redhat.com>
 
 	* configure: Rebuild.
