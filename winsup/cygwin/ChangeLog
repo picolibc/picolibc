@@ -1,3 +1,9 @@
+2009-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Perform some minor cleanup.  Revamp speclib handling.
+	* speclib: Rewrite to create libraries with dlltool rather than
+	attempting surgery on libcygwin.a.
+
 2009-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (inet_ntop6): Convert to lowercase hex digits on the fly.

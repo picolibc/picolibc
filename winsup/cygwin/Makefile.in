@@ -15,7 +15,7 @@ srcdir:=@srcdir@
 objdir:=.
 
 CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
-VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/regexp:$(srcdir)/lib:$(srcdir)/libc
+VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/lib:$(srcdir)/libc
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@
@@ -72,7 +72,6 @@ OBJDUMP:=@OBJDUMP@
 STRIP:=@STRIP@
 LDSCRIPT:=cygwin.sc
 MKDIRP:=$(INSTALL) -m 755 -d
-
 #
 # Include common definitions for winsup directory
 #
@@ -105,6 +104,8 @@ DLL_ENTRY:=@DLL_ENTRY@
 LIBGMON_A:=libgmon.a
 CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
+
+speclib=${word 1, $^} "${NM}" "$(DLLTOOL)" $(wordlist 2, $(words $^), $^)
 
 # Some things want these from libc, but they have their own static
 # data which apps can get to, which is a pain in the dll, so we
@@ -225,10 +226,9 @@ NEW_FUNCTIONS:=open _open64 \
 
 API_VER:=$(srcdir)/include/cygwin/version.h
 
-PWD:=${shell pwd}
-LIB_NAME:=$(PWD)/libcygwin.a
+LIB_NAME:=libcygwin.a
 LIBSERVER:=@LIBSERVER@
-SUBLIBS:=$(PWD)/libpthread.a $(PWD)/libutil.a $(PWD)/libm.a $(PWD)/libc.a $(PWD)/libdl.a $(PWD)/libresolv.a
+SUBLIBS:=libpthread.a libutil.a ${CURDIR}/libm.a ${CURDIR}/libc.a libdl.a libresolv.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a libtextreadmode.a
 INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
 TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
@@ -407,7 +407,6 @@ ${STATIC_LIB_NAME}: mkstatic ${TEST_DLL_NAME}
 
 # Rule to make stub library used by testsuite
 # dependency set to $(LIB_NAME) to accommodate make -j2.
-# Otherwise dlltool gets confused. cgf (11-16-2000)
 $(TEST_LIB_NAME): $(LIB_NAME)
 	perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
 
@@ -440,31 +439,28 @@ dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
 
-$(srcdir)/qevices.cc: cygwin-gperf devices.gperf devices.h
-	$^ > $@
-
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
 
-$(PWD)/libpthread.a: speclib $(LIB_NAME) pthread.o thread.o
-	${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+${CURDIR}/libc.a: speclib ${DEF_FILE} ./libm.a libpthread.a libutil.a
+	${speclib} -v ${@F}
 
-$(PWD)/libutil.a: speclib $(LIB_NAME) bsdlib.o
-	${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+${CURDIR}/libm.a: speclib ${DEF_FILE} $(LIBM)
+	${speclib} ${@F}
 
-$(PWD)/libm.a: speclib $(LIB_NAME) $(LIBM)
-	${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+libpthread.a: speclib ${DEF_FILE} pthread.o thread.o
+	${speclib} ${@F}
 
-$(PWD)/libc.a: speclib $(LIB_NAME) $(PWD)/libm.a libpthread.a libutil.a
-	${word 1, $^} -v $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+libutil.a: speclib ${DEF_FILE} bsdlib.o
+	${speclib} ${@F}
 
-$(PWD)/libdl.a: speclib $(LIB_NAME) dlfcn.o
-	${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+libdl.a: speclib ${DEF_FILE} dlfcn.o
+	${speclib} ${@F}
 
-$(PWD)/libresolv.a: speclib $(LIB_NAME) minires.o
-	${word 1, $^} $@ "${NM}" "$(AR)" ${wordlist 2, 99, $^}
+libresolv.a: speclib ${DEF_FILE} minires.o
+	${speclib} ${@F}
 
-lib%.a: %.o
+${EXTRALIBS}: lib%.a: %.o
 	$(AR) cru $@ $?
 
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)

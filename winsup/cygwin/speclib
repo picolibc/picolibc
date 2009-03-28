@@ -4,88 +4,49 @@ use File::Temp qw'tempdir';
 use File::Basename;
 use strict;
 
-sub dllname($;$);
-
-my $verbose;
-my $static;
-my $exclude;
-
-GetOptions('static!'=>\$static, 'v|exclude!'=>\$exclude);
-
-my $lib = shift;
 my $nm = shift;
-my $ar = shift;
-my $libdll = shift;
+my $dlltool = shift;
+my $def = shift;
+my $lib = pop;
 
-open my $nm_fd, '-|', $nm, '-Ap', '--defined-only', @ARGV, $libdll or
+my $inverse;
+if ($ARGV[$#ARGV] ne '-v') {
+    $inverse = 0;
+} else {
+    $inverse = 1;
+    $#ARGV--;
+}
+
+open my $def_fd, '<', $def or die "$0: couldn't open \"$def\" - $!\n";
+my %defsyms = ();
+my $newdef = '';
+while (<$def_fd>) {
+    if (/^\s*(?:EXPORTS\b|LIBRARY\b|\s*$)/o) {
+	$newdef .= $_;
+    } else {
+	my $sym = (split ' ')[0];
+	$defsyms{$sym} = $_;
+    }
+}
+close $def_fd;
+
+open my $nm_fd, '-|', $nm, '-pg', '--defined-only', @ARGV or
   die "$0: execution of $nm for object files failed - $!\n";
 
-my %match_syms = ();
-my $symfiles = ();
-my $lastfn;
-my @headtail = ();
-my %extract = ();
-my $libdllname;
 while (<$nm_fd>) {
-    study;
-    m%^\Q$libdll\E:([^:]*):\d+ i \.idata\$([56])% and do {
-	if ($2 eq 5) {
-	    push @headtail, $1;
-	} else {
-	    pop @headtail;
-	}
-	next;
-    };
-    m%^\Q$libdll\E:[^:]*:\d+ I (__head_.*)$% and do {
-	$libdllname = $1;
-	next;
-    };
-    next unless m%^([^:]*):([^:]*(?=:))?.* [DTI] (.*)%o;
-    if ($1 ne $libdll) {
-	 $match_syms{$3} = 1;
-     } elsif ($match_syms{$3} ? !$exclude : $exclude) {
-	 $extract{$2} = 1;
-     }
+    next unless /\S+\s+[A-Z]+\s+_(.*)$/o;
+    if ($inverse) {
+	delete $defsyms{$1};
+    } else {
+	$newdef .= $defsyms{$1} if exists $defsyms{$1};
+    }
 }
 close $nm_fd;
 
-%extract or die "$0: couldn't find symbols for $lib\n";
-defined($libdllname) or die "$0: couldn't determine __head_<NAME> - malformed import archive?\n";
-for (@headtail) {
-    $extract{$_} = 1;
-}
+$newdef .= join '', sort values %defsyms if $inverse;
 
-my $dir = tempdir(CLEANUP => 1);
-
-chdir $dir;
-# print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
-my $res = system $ar, 'x', $libdll, sort keys %extract;
-die "$0: $ar extraction exited with non-zero status\n" if $res;
-unlink $lib;
-$res = system $ar, 'crus', $lib, sort keys %extract;
-die "$0: $ar creation exited with non-zero status\n" if $res;
-
-open my $lib_fd, '<', $lib or die "$0: couldn't open $lib for input - $!\n";
-binmode $lib_fd;
-
-my $libname = dllname($lib, 'lib');
-my $pad = length($libdllname) - length($libname);
-die "$0: library name too long (" . length($libname) . ")\n" if $pad < 0;
-$libname .= "\0" x $pad;
-
-$res = sysread($lib_fd, $_, -s $lib);
-close $lib_fd;
-
-die "$0: couldn't read $lib - $!\n" if $res != -s _;
-0 while s/$libdllname/$libname/sog;
-
-open $lib_fd, '>', $lib or die "$0: couldn't open $lib for output - $!\n";
-syswrite($lib_fd, $_) == length($_) or die "$0: write to $lib failed - $!\n";
-close $lib_fd;
+open my $dlltool_fd, '|-', $dlltool, '-d', '/proc/self/fd/0', '-D', 'cygwin1.dll', '-l', $lib or
+    die "$0: couldn't start dlltool - $dlltool - $!\n";
+print $dlltool_fd $newdef;
+close $dlltool_fd or exit 1;
 exit 0;
-
-sub dllname($;$) {
-    my $x = basename($_[0], '.a');
-    $x =~ s/^lib//o;
-    return '__head_' . $_[1] . $x;
-}
