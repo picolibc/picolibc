@@ -1027,8 +1027,8 @@ behaviour which affect the operation of other programs, such as Cygwin.
 </para>
 <para>Among the software that has been found to cause difficulties are:</para>
 <para><itemizedlist>
-<listitem><para>Sonic Solutions burning software containing DLA component</para></listitem>
-<listitem><para>Norton/MacAffee/Symantec antivirus or antispyware</para></listitem>
+<listitem><para>Sonic Solutions burning software containing DLA component (when DLA disabled)</para></listitem>
+<listitem><para>Norton/MacAfee/Symantec antivirus or antispyware</para></listitem>
 <listitem><para>Logitech webcam software with "Logitech process monitor" service</para></listitem>
 <listitem><para>Kerio, Agnitum or ZoneAlarm Personal Firewall</para></listitem>
 <listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
@@ -1037,6 +1037,20 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Embassy Trust Suite fingerprint reader software wxvault.dll</para></listitem>
 <listitem><para>NOD32 Antivirus</para></listitem>
 <listitem><para>ByteMobile laptop optimization client</para></listitem>
+<listitem><para>Earthlink Total-Access</para></listitem>
+<listitem><para>Spybot S&amp;D TeaTimer</para></listitem>
+<listitem><para>AR Soft RAM Disk</para></listitem>
+<listitem><para>ATI Catalyst drivers</para></listitem>
+<listitem><para>Windows LiveOneCare</para></listitem>
+<listitem><para>Webroot Spy Sweeper with Antivirus</para></listitem>
+<listitem><para>COMODO Firewall Pro</para></listitem>
+<listitem><para>PC Tools Spyware Doctor</para></listitem>
+<listitem><para>Avira AntiVir</para></listitem>
+<listitem><para>Panda Internet Security</para></listitem>
+<listitem><para>BitDefender</para></listitem>
+<listitem><para>Google Desktop</para></listitem>
+<listitem><para>Sophos Anti-Virus 7</para></listitem>
+<listitem><para>Bufferzone from Trustware</para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable

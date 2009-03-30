@@ -1,3 +1,7 @@
+2009-03-30  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* faq-using.xml (faq.using.bloda):  Update with new entries.
+
 2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add text to explain new UTF-16 symlinks.
