@@ -187,6 +187,10 @@
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #endif
 
+#ifndef __EXPORT
+#define __EXPORT
+#endif
+
 #ifndef __IMPORT
 #define __IMPORT
 #endif

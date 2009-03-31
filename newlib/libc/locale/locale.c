@@ -149,11 +149,7 @@ No supporting OS subroutines are required.
 #define _LC_LAST      7
 #define ENCODING_LEN 31
 
-#ifdef __CYGWIN__
-int __declspec(dllexport) __mb_cur_max = 1;
-#else
-int __mb_cur_max = 1;
-#endif
+int __EXPORT __mb_cur_max = 1;
 
 int __nlocale_changed = 0;
 int __mlocale_changed = 0;
@@ -377,8 +373,9 @@ currentlocale()
 #ifdef _MB_CAPABLE
 #ifdef __CYGWIN__
 extern void *__set_charset_from_codepage (unsigned int, char *charset);
-extern void __set_ctype (const char *charset);
 #endif /* __CYGWIN__ */
+
+extern void __set_ctype (const char *charset);
 
 static char *
 loadlocale(struct _reent *p, int category)
@@ -604,9 +601,7 @@ loadlocale(struct _reent *p, int category)
 #ifdef _MB_CAPABLE
       __wctomb = l_wctomb;
       __mbtowc = l_mbtowc;
-#ifdef __CYGWIN__
       __set_ctype (charset);
-#endif
 #endif
     }
   else if (category == LC_MESSAGES)

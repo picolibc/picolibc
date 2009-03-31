@@ -38,6 +38,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+LIBOBJDIR =
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = ctype
@@ -81,8 +82,6 @@ am__objects_1 = lib_a-ctype_.$(OBJEXT) lib_a-isalnum.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-iswxdigit.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-jp2uc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-toascii.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-_tolower.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-_toupper.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-towctrans.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-towlower.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-towupper.$(OBJEXT) \
@@ -101,9 +100,9 @@ am__objects_3 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 @ELIX_LEVEL_1_FALSE@	iswctype.lo iswdigit.lo iswgraph.lo \
 @ELIX_LEVEL_1_FALSE@	iswlower.lo iswprint.lo iswpunct.lo \
 @ELIX_LEVEL_1_FALSE@	iswspace.lo iswupper.lo iswxdigit.lo \
-@ELIX_LEVEL_1_FALSE@	jp2uc.lo toascii.lo _tolower.lo \
-@ELIX_LEVEL_1_FALSE@	_toupper.lo towctrans.lo towlower.lo \
-@ELIX_LEVEL_1_FALSE@	towupper.lo wctrans.lo wctype.lo
+@ELIX_LEVEL_1_FALSE@	jp2uc.lo toascii.lo towctrans.lo \
+@ELIX_LEVEL_1_FALSE@	towlower.lo towupper.lo wctrans.lo \
+@ELIX_LEVEL_1_FALSE@	wctype.lo
 @USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libctype_la_OBJECTS = $(am_libctype_la_OBJECTS)
@@ -232,20 +231,8 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
-ac_ct_AR = @ac_ct_AR@
-ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
-ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
-ac_ct_DSYMUTIL = @ac_ct_DSYMUTIL@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
-ac_ct_LIPO = @ac_ct_LIPO@
-ac_ct_NMEDIT = @ac_ct_NMEDIT@
-ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
-ac_ct_OTOOL = @ac_ct_OTOOL@
-ac_ct_OTOOL64 = @ac_ct_OTOOL64@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_READELF = @ac_ct_READELF@
-ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -261,6 +248,9 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 extra_dir = @extra_dir@
 host = @host@
@@ -268,12 +258,14 @@ host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 lt_ECHO = @lt_ECHO@
@@ -283,8 +275,10 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
@@ -326,8 +320,6 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	iswxdigit.c 	\
 @ELIX_LEVEL_1_FALSE@	jp2uc.c 	\
 @ELIX_LEVEL_1_FALSE@	toascii.c 	\
-@ELIX_LEVEL_1_FALSE@	_tolower.c 	\
-@ELIX_LEVEL_1_FALSE@	_toupper.c 	\
 @ELIX_LEVEL_1_FALSE@	towctrans.c 	\
 @ELIX_LEVEL_1_FALSE@	towlower.c 	\
 @ELIX_LEVEL_1_FALSE@	towupper.c 	\
@@ -628,18 +620,6 @@ lib_a-toascii.o: toascii.c
 lib_a-toascii.obj: toascii.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-toascii.obj `if test -f 'toascii.c'; then $(CYGPATH_W) 'toascii.c'; else $(CYGPATH_W) '$(srcdir)/toascii.c'; fi`
 
-lib_a-_tolower.o: _tolower.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_tolower.o `test -f '_tolower.c' || echo '$(srcdir)/'`_tolower.c
-
-lib_a-_tolower.obj: _tolower.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_tolower.obj `if test -f '_tolower.c'; then $(CYGPATH_W) '_tolower.c'; else $(CYGPATH_W) '$(srcdir)/_tolower.c'; fi`
-
-lib_a-_toupper.o: _toupper.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_toupper.o `test -f '_toupper.c' || echo '$(srcdir)/'`_toupper.c
-
-lib_a-_toupper.obj: _toupper.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_toupper.obj `if test -f '_toupper.c'; then $(CYGPATH_W) '_toupper.c'; else $(CYGPATH_W) '$(srcdir)/_toupper.c'; fi`
-
 lib_a-towctrans.o: towctrans.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-towctrans.o `test -f 'towctrans.c' || echo '$(srcdir)/'`towctrans.c
 
@@ -677,7 +657,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool
+	-rm -f libtool config.lt
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -830,6 +810,8 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/ctype.tex >> $(TARGETDOC)
+
+$(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

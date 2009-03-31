@@ -41,8 +41,6 @@ ELIX_SOURCES = \
 	iswxdigit.c 	\
 	jp2uc.c 	\
 	toascii.c 	\
-	_tolower.c 	\
-	_toupper.c 	\
 	towctrans.c 	\
 	towlower.c 	\
 	towupper.c 	\
@@ -113,3 +111,5 @@ doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/ctype.tex >> $(TARGETDOC)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
+
+$(lpfx)ctype_.$(oext): ctype_.c ctype_iso.h ctype_cp.h

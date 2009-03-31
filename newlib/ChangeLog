@@ -1,3 +1,38 @@
+2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/Makefile.am: Remove _tolower.c and _toupper.c
+	source files.  Add a dependency rule for ctype_o to note
+	changes in ctype_iso.h and ctype_cp.h.
+	* libc/ctype/Makefile.in: Regenerate.
+	* libc/ctype/_tolower.c: Remove file.
+	* libc/ctype/_toupper.c: Remove file.
+	* libc/ctype/ctype_.c: Make sure ALLOW_NEGATIVE_CTYPE_INDEX
+	is always defined on Cygwin.
+	(_ctype_b): Don't make `static const' on Cygwin.
+	(ctype_iso.h): Include if _MB_EXTENDED_CHARSETS_ISO is set.
+	(ctype_cp.h): Include if _MB_EXTENDED_CHARSETS_WINDOWS is set.
+	(__ctype_ptr): Drop definition.
+	(__ctype_ptr__): De-constify.  Mark as __EXPORT symbol.
+	(_ctype_): Add Cygwin-specifc asm define.
+	(__set_ctype): New function to set __ctype_ptr__ according to
+	current charset.
+	* libc/ctype/ctype_cp.h: New file containing Windows codepage
+	specific character class tables.
+	* libc/ctype/ctype_iso.h: New file containing ISO-8859-x
+	specific character class tables.
+	* libc/ctype/tolower.c (tolower): Reimplement to support any singlebyte
+	charset if one of the extended charsets is enabled.
+	* libc/ctype/toupper.c (toupper): Ditto.
+	* libc/include/ctype.h (_tolower): Define as macro per POSIX.
+	(_toupper): Ditto.
+	(__ctype_ptr__): De-constify.
+	(toupper): Disable macro on systems supporting extended charsets.
+	(tolower): Ditto.
+	* libc/include/sys/config.h (__EXPORT): Define empty if not defined.
+	* libc/locale/locale.c (__mb_cur_max): Mark as __EXPORT symbol.
+	(__set_ctype): Declare unconditionally.
+	(loadlocale): Remove __CYGWIN__ guard around __set_ctype call.
+
 2009-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Revert to charset "GBK" instead

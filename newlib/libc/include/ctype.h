@@ -26,8 +26,8 @@ int _EXFUN(isblank, (int __c));
 #ifndef __STRICT_ANSI__
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
-int _EXFUN(_tolower, (int __c));
-int _EXFUN(_toupper, (int __c));
+#define _tolower(c) ((unsigned char)(c) - 'A' + 'a')
+#define _toupper(c) ((unsigned char)(c) - 'a' + 'A')
 #endif
 
 #define	_U	01
@@ -39,7 +39,7 @@ int _EXFUN(_toupper, (int __c));
 #define _X	0100
 #define	_B	0200
 
-extern	__IMPORT _CONST char	*__ctype_ptr__;
+extern	__IMPORT char	*__ctype_ptr__;
 
 #ifndef __cplusplus
 #define	isalpha(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))
@@ -60,8 +60,9 @@ extern	__IMPORT _CONST char	*__ctype_ptr__;
 
 
 /* Non-gcc versions will get the library versions, and will be
-   slightly slower */
-#ifdef __GNUC__
+   slightly slower.  These macros are not NLS-aware so they are
+   disabled if the system supports the extended character sets. */
+# if defined(__GNUC__) && !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
 # define toupper(c) \
 	__extension__ ({ int __x = (c); islower(__x) ? (__x - 'a' + 'A') : __x;})
 # define tolower(c) \
