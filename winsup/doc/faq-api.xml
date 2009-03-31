@@ -201,24 +201,6 @@ the environment variable CYGWIN.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.api.symlinkstoppedworking">
-<question><para>Why do some of my old symlinks don't work anymore?</para></question>
-<answer>
-
-<para>Beginning with Cygwin 1.7, Cygwin supports multiple character sets.
-Symlinks created with Cygwin 1.7 are using the UTF-16 character set, which is
-portable across all character sets.  Old symlinks were written using your
-current Windows codepage, which is not portable across all character sets.
-If the target of the symlink doesn't resolve anymore, it's very likely that
-the symlink points to a target filename using native, non-ASCII characters,
-and you're now using another character set than way back when you created
-the symlink.</para>
-
-<para>Solution: Delete the symlink and create it again under you new Cygwin.
-The new symlink will be correctly point to the target no matter what character
-set you're using in future.</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.api.executables">
 <question><para>Why do some files, which are not executables have the 'x' type.</para></question>
 <answer>

@@ -1,3 +1,8 @@
+2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.unicode): Modernize.
+	(faq.api.symlinkstoppedworking): Move here from faq-api.xml.
+
 2009-03-30  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* faq-using.xml (faq.using.bloda):  Update with new entries.

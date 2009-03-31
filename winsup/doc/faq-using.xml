@@ -367,19 +367,15 @@ formfeed character to your file.
 <answer>
 
 <para>Internationalization is a complex issue. The short answer is that
-Cygwin relies on the setting of the CYGWIN environment variable as well
-as on the setting of LANG/LC_xxx environment variables.</para>
+Cygwin relies on the setting of the setting of LANG/LC_xxx environment
+variables.</para>
 
-<para>To get UTF-8 support you must set the environment variable CYGWIN
-so that it contains the substring "codepage:utf8".  This is required in
-Cygwin so far to get correct translation from Windows wide character
-filenames to their UTF-8 counterpart.  Applications on the other hand
-require the setting of the LANG, LC_ALL, or LC_CTYPE environment variables.
-To get UTF-8 support you can set, for instance, $LANG to "en_US.UTF-8".
-This will give you support for the UTF-8 character set.  Note that the
-language part has to contain a valid language specifier, but is otherwise
-so far ignored by newlib, the underlying C library.  There's no support
-for correct language-specific collation, monetary or date/time-related
+<para>To get UTF-8 support you must set the LANG, LC_ALL, or LC_CTYPE
+environment variables.  To get UTF-8 support you can set, for instance,
+$LANG to "en_US.UTF-8".  This will give you support for the UTF-8 character
+set.  Note that the language part has to contain a valid language specifier,
+but is otherwise so far ignored.  There's no support for correct
+language-specific collation, monetary or date/time-related
 string handling.  This is planned for a later release, though.</para>
 
 <para>To type international characters (&pound;&auml;&ouml;) in
@@ -391,23 +387,19 @@ string handling.  This is planned for a later release, though.</para>
         set convert-meta off 
         set output-meta on 
 	set input-meta on
-	set kanji-code sjis
 </screen>
 
 <para>These are options to the <literal>readline</literal> library, which
 you can read about in the <literal>bash(1)</literal> and
 <literal>readline(3)</literal> man pages. Other tools that do not use
 <literal>readline</literal> for display, such as <literal>less</literal>
-and <literal>ls</literal>, require additional settings, which could be put
-in your <literal>~/.bashrc</literal>:
+and <literal>ls</literal>, might require additional settings for doublebyte
+or multibyte charsets, which could be put
+in your <literal>~/.bashrc</literal>, for instance:
 <screen>
 alias less='/bin/less -r'
 alias ls='/bin/ls -F --color=tty --show-control-chars'
-export LANG="ja_JP.SJIS"
-export OUTPUT_CHARSET="sjis"
 </screen>
-These examples use the Japanese Shift-JIS character set, obviously
-you will want to change them for your own locale. 
 </para>
 </answer></qandaentry>
 
@@ -973,6 +965,24 @@ Emacs or XEmacs from Cygwin Setup.
 Cygwin Setup.  You can use rxvt with or without X11, while mintty is a 
 Cygwin application providing a native GUI.
 </para>
+</answer></qandaentry>
+
+<qandaentry id="faq.api.symlinkstoppedworking">
+<question><para>Why do some of my old symlinks don't work anymore?</para></question>
+<answer>
+
+<para>Beginning with Cygwin 1.7, Cygwin supports multiple character sets.
+Symlinks created with Cygwin 1.7 are using the UTF-16 character set, which is
+portable across all character sets.  Old symlinks were written using your
+current Windows codepage, which is not portable across all character sets.
+If the target of the symlink doesn't resolve anymore, it's very likely that
+the symlink points to a target filename using native, non-ASCII characters,
+and you're now using another character set than way back when you created
+the symlink.</para>
+
+<para>Solution: Delete the symlink and create it again under you new Cygwin.
+The new symlink will be correctly point to the target no matter what character
+set you're using in future.</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.symlinks-samba">
