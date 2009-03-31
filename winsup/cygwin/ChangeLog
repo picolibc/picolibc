@@ -1,5 +1,14 @@
 2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* shm.cc (struct shm_attached_list): Convert access type to ULONG.
+	(fixup_shms_after_fork): Fix comment.  Use NtMapViewOfSection rather
+	than MapViewOfFileEx to recreate shared memory regions.  Add function
+	name to api_fatal output.
+	(shmat): Use NtMapViewOfSection to create shared memory region
+	top-down.
+
+2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ctype.cc: Remove implementation of ctype functions in favor of
 	pointer-based newlib implementation.
 	(_ctype_b): Declare.

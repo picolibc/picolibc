@@ -18,6 +18,7 @@ details. */
 #include "cygserver_shm.h"
 #include "cygtls.h"
 #include "sync.h"
+#include "ntdll.h"
 
 /*
  * client_request_shm Constructors
@@ -104,7 +105,7 @@ struct shm_attached_list {
   SLIST_ENTRY (shm_attached_list) sph_next;
   vm_object_t ptr;
   shm_shmid_list *parent;
-  int access;
+  ULONG access;
 };
 
 static SLIST_HEAD (, shm_attached_list) sph_list;
@@ -129,15 +130,18 @@ fixup_shms_after_fork ()
       return 0;
     }
   shm_attached_list *sph_entry;
-  /* Remove map from list... */
+  /* Reconstruct map from list... */
   SLIST_FOREACH (sph_entry, &sph_list, sph_next)
     {
-      vm_object_t ptr = MapViewOfFileEx (sph_entry->parent->hdl,
-					 sph_entry->access, 0, 0,
-					 sph_entry->parent->size,
-					 sph_entry->ptr);
-      if (ptr != sph_entry->ptr)
-	api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
+      NTSTATUS status;
+      vm_object_t ptr = sph_entry->ptr;
+      ULONG viewsize = sph_entry->parent->size;
+      status = NtMapViewOfSection (sph_entry->parent->hdl, GetCurrentProcess (),
+				   &ptr, 0, sph_entry->parent->size, NULL,
+				   &viewsize, ViewShare, 0, sph_entry->access);
+      if (!NT_SUCCESS (status) || ptr != sph_entry->ptr)
+	api_fatal ("fixup_shms_after_fork: NtMapViewOfSection (%p), status %p.  Terminating.",
+		   sph_entry->ptr, status);
     }
   return 0;
 }
@@ -213,12 +217,16 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       --ssh_entry->ref_count;
       return (void *) -1;
     }
-  DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
-  vm_object_t ptr = MapViewOfFileEx (ssh_entry->hdl, access, 0, 0,
-				     ssh_entry->size, attach_va);
-  if (!ptr)
+  NTSTATUS status;
+  vm_object_t ptr = NULL;
+  ULONG viewsize = ssh_entry->size;
+  ULONG access = (shmflg & SHM_RDONLY) ? PAGE_READONLY : PAGE_READWRITE;
+  status = NtMapViewOfSection (ssh_entry->hdl, GetCurrentProcess (), &ptr, 0,
+			       ssh_entry->size, NULL, &viewsize, ViewShare,
+			       MEM_TOP_DOWN, access);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       delete sph_entry;
       --ssh_entry->ref_count;
       return (void *) -1;
