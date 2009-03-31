@@ -1,3 +1,9 @@
+2009-03-31  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_INTEL178): New.
+	(EM_INTEL179): Likewise.
+	(EM_INTEL180): Likewise.
+
 2009-03-20  Mikolaj Zalewski  <mikolajz@google.com>
 
 	* common.h (SHT_GNU_INCREMENTAL_INPUTS): Define.
