@@ -6,6 +6,7 @@ __argv DATA
 _check_for_executable DATA
 __check_rhosts_file DATA
 _ctype_ DATA
+__ctype_ptr__ DATA
 __cygwin_environ DATA
 __cygwin_user_data DATA
 _daylight DATA

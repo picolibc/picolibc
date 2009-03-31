@@ -1,3 +1,19 @@
+2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ctype.cc: Remove implementation of ctype functions in favor of
+	pointer-based newlib implementation.
+	(_ctype_b): Declare.
+	(__ctype_cp): Move to newlib. Declare.
+	(__ctype_iso): Ditto.
+	(__set_ctype): Implement changing __ctype_ptr__.  Only copy character
+	class data in applications built under older Cygwin.
+	* cygwin.din (__ctype_ptr__): Export.
+	* include/ctype.h: Remove in favor of newlib implementation.
+	* include/cygwin/config.h (__EXPORT): Define alongside __IMPORT.
+	* include/cygwin/version.h (CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE):
+	Define check for old vs. new ctype implementation.
+	Bump API minor number.
+
 2009-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Perform some minor cleanup.  Revamp speclib handling.

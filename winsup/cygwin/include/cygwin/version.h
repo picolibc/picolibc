@@ -95,6 +95,9 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 161)
 
+#define CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE \
+  (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 209)
+
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
@@ -358,12 +361,13 @@ details. */
       207: Export wcsdup.
       208: Export log2, log2f.
       209: Export wordexp, wordfree.
+      210: New ctype layout using variable ctype pointer.  Export __ctype_ptr__.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 209
+#define CYGWIN_VERSION_API_MINOR 210
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
