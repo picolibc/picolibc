@@ -1,5 +1,9 @@
 2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml (setup-locale-problems): Fix an incomplete sentence.
+
+2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-using.xml (faq.using.unicode): Modernize.
 	(faq.api.symlinkstoppedworking): Move here from faq-api.xml.
 

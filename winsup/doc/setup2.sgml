@@ -280,9 +280,10 @@ of <envar>LC_ALL</envar>, <envar>LC_CTYPE</envar>, or <envar>LANG</envar>,
 is to use the current Windows ANSI codepage.</para>
 
 <para>As long as the environment only contains ASCII characters, this is
-no problem.  But if it does, and you're planning to use, say, UTF-8,
-the environment will result in invalid characters in the UTF-8 charset.
-This would be especially a problem in variables like <envar>PATH</envar>.</para>
+no problem.  But if it contains native characters, and you're planning
+to use, say, UTF-8, the environment will result in invalid characters in
+the UTF-8 charset.  This would be especially a problem in variables like
+<envar>PATH</envar>.</para>
 
 <note><para>Per POSIX, the name of an environment variable should only
 consist of valid ASCII characters, and only of uppercase letters, digits, and
