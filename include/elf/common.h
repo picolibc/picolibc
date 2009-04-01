@@ -236,9 +236,11 @@
 #define EM_MCST_ELBRUS	175	/* MCST Elbrus general purpose hardware architecture */
 #define EM_ECOG16	176	/* Cyan Technology eCOG16 family */
 #define EM_CR16		177	/* National Semiconductor CompactRISC 16-bit processor */
-#define EM_INTEL178	178	/* Reserved by Intel */
-#define EM_INTEL179	179	/* Reserved by Intel */
+#define EM_ETPU		178	/* Freescale Extended Time Processing Unit */
+#define EM_SLE9X	179	/* Infineon Technologies SLE9X core */
 #define EM_INTEL180	180	/* Reserved by Intel */
+#define EM_INTEL181	181	/* Reserved by Intel */
+#define EM_INTEL182	182	/* Reserved by Intel */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision

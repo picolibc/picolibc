@@ -1,3 +1,12 @@
+2009-04-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_INTEL178): Removed.
+	(EM_INTEL179): Likewise.
+	(EM_ETPU): New.
+	(EM_SLE9X): Likewise.
+	(EM_INTEL181): Likewise.
+	(EM_INTEL182): Likewise.
+
 2009-03-31  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h (EM_INTEL178): New.
