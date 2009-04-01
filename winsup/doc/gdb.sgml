@@ -32,17 +32,14 @@ information give your program enough information about the original
 sources so that the debugger can make debugging much easier for
 you.</para>
 
-<para>In Windows versions of GNUPro, GDB comes with a full-featured
-graphical interface.  In Cygwin Net distributions, GDB is only
-available as a command-line tool.  To invoke GDB, simply type
-<command>gdb myapp.exe</command> at the command prompt.  It will
-display some text telling you about itself, then
-<literal>(gdb)</literal> will appear to prompt you to enter commands.
-Whenever you see this prompt, it means that gdb is waiting for you to
-type in a command, like <command>run</command> or
+<para>To invoke GDB, simply type <command>gdb myapp.exe</command> at the
+command prompt.  It will display some text telling you about itself,
+then <literal>(gdb)</literal> will appear to prompt you to enter
+commands.  Whenever you see this prompt, it means that gdb is waiting
+for you to type in a command, like <command>run</command> or
 <command>help</command>.  Oh <literal>:-)</literal> type
-<command>help</command> to get help on the commands you can type in,
-or read the <citation>GDB User's Manual</citation> for a complete
+<command>help</command> to get help on the commands you can type in, or
+read the <citation>GDB User's Manual</citation> for a complete
 description of GDB and how to use it.</para>
 
 <para>If your program crashes and you're trying to figure out why it
