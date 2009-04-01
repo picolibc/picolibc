@@ -425,8 +425,12 @@ sys_cp_mbstowcs (UINT cp, PWCHAR dst, size_t dlen, const char *src, size_t nms)
     len = (size_t)-1;
   while (len > 0 && nms > 0)
     {
-      /* ASCII SO.  Convert following UTF-8 sequence (if not UTF-8 anyway). */
-      if (*pmbs == 0x0e && *charset != 'U'/*TF-8*/)
+      /* ASCII SO.  Sanity check: If this is a lead SO byte for a following
+	 UTF-8 sequence, there must be at least two more bytes left, and the
+	 next byte must be a valid UTF-8 start byte.  If the charset isn't
+	 UTF-8 anyway, try to convert the following bytes as UTF-8 sequence. */
+      if (*pmbs == 0x0e && nms > 2 && *(unsigned char *) (pmbs + 1) >= 0xc2
+	  && *(unsigned char *) (pmbs + 1) <= 0xf4 && *charset != 'U'/*TF-8*/)
 	{
 	  pmbs++;
 	  --nms;
