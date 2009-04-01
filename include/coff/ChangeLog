@@ -1,3 +1,7 @@
+2009-04-01  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* xcoff.h (xcoff_link_hash_table): Move to bfd/xcofflink.c.
+
 2009-03-14  Richard Sandiford  <r.sandiford@uk.ibm.com>
 
 	* xcoff.h (XCOFF_EXPALL, XCOFF_EXPFULL): New flags.
