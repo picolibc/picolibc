@@ -77,6 +77,15 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 #define ALLOW_NEGATIVE_CTYPE_INDEX
 #endif
 
+#if defined(_MB_CAPABLE)
+#if defined(_MB_EXTENDED_CHARSETS_ISO)
+#include "ctype_iso.h"
+#endif
+#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
+#include "ctype_cp.h"
+#endif
+#endif
+
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
@@ -89,16 +98,10 @@ char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_256
 };
 
-#if defined(_MB_CAPABLE)
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-#include "ctype_iso.h"
+#ifndef _MB_CAPABLE
+_CONST
 #endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-#include "ctype_cp.h"
-#endif
-#endif
-
-char __EXPORT *__ctype_ptr__ = _ctype_b + 127;
+char __EXPORT *__ctype_ptr__ = (char *) _ctype_b + 127;
 
 #  ifdef __CYGWIN__
 
@@ -120,7 +123,7 @@ _CONST char _ctype_[1 + 256] = {
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_256
 };
-#    endif /* !_HAVE_ARRAY_ALIASING */
+#  endif /* !_HAVE_ARRAY_ALIASING */
 
 #else	/* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
@@ -130,7 +133,11 @@ _CONST char _ctype_[1 + 256] = {
 	_CTYPE_DATA_128_256
 };
 
-_CONST char *__ctype_ptr__ = _ctype_;
+#ifndef _MB_CAPABLE
+_CONST
+#endif
+char *__ctype_ptr__ = (char *) _ctype_;
+
 #endif
 
 #if defined(_MB_CAPABLE)
@@ -140,7 +147,9 @@ _CONST char *__ctype_ptr__ = _ctype_;
 void
 __set_ctype (const char *charset)
 {
+#if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   int idx;
+#endif
 
   switch (*charset)
     {
@@ -154,7 +163,11 @@ __set_ctype (const char *charset)
         idx = 0;
       else
         ++idx;
+#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
       __ctype_ptr__ = (char *) (__ctype_iso[idx] + 127);
+#  else
+      __ctype_ptr__ = (char *) __ctype_iso[idx];
+#  endif
       return;
 #endif
 #if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
@@ -162,13 +175,21 @@ __set_ctype (const char *charset)
       idx = __cp_index (charset + 2);
       if (idx < 0)
         break;
+#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
       __ctype_ptr__ = (char *) (__ctype_cp[idx] + 127);
+#  else
+      __ctype_ptr__ = (char *) __ctype_cp[idx];
+#  endif
       return;
 #endif
     default:
       break;
     }
+#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
   __ctype_ptr__ = (char *) _ctype_b + 127;
+#  else
+  __ctype_ptr__ = (char *) _ctype_;
+#  endif
 }
 #endif /* !__CYGWIN__ */
 #endif /* _MB_CAPABLE */

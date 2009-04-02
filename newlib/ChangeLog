@@ -1,3 +1,13 @@
+2009-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/ctype_c.c: Move inclusion of ctype_iso.h and
+	ctype_cp.h out of ALLOW_NEGATIVE_CTYPE_INDEX case.
+	(__ctype_ptr__): Constify in !_MB_CAPABLE case.  Otherwise,
+	de-constify in !ALLOW_NEGATIVE_CTYPE_INDEX case, too.  Add comment.
+	(__set_ctype): Set __ctype_ptr__ pointer according to definition
+	of ALLOW_NEGATIVE_CTYPE_INDEX.
+	* libc/include/ctype.h (__ctype_ptr__): Constify in !_MB_CAPABLE case.
+
 2009-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/Makefile.am: Remove _tolower.c and _toupper.c

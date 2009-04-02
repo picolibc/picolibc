@@ -39,6 +39,9 @@ int _EXFUN(toascii, (int __c));
 #define _X	0100
 #define	_B	0200
 
+#ifndef _MB_CAPABLE
+_CONST
+#endif
 extern	__IMPORT char	*__ctype_ptr__;
 
 #ifndef __cplusplus
