@@ -1,3 +1,8 @@
+2009-04-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/netdb.h: #include <inttypes.h>, <netinet/in.h>,
+	and <sys/socket.h> per SUSv3.
+
 2009-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strfuncs.cc (sys_cp_mbstowcs): Check if ASCII SO is followed by at

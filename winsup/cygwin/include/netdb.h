@@ -63,8 +63,11 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <cygwin/socket.h>
+#include <inttypes.h>
+#include <sys/socket.h>
+#ifndef __INSIDE_CYGWIN_NET__
+#include <netinet/in.h>
+#endif
 
 /*
  * Structures returned by network data base library.  All addresses are
