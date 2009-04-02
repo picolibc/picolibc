@@ -1,3 +1,8 @@
+2009-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): Fix length calculation of resulting
+	wide char environment string.
+
 2009-04-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/netdb.h: #include <inttypes.h>, <netinet/in.h>,

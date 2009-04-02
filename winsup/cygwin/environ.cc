@@ -1080,7 +1080,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	  else
 	    p = *srcp;		/* Don't worry about it */
 
-	  len = strlen (p) + 1;
+	  len = sys_mbstowcs (NULL, 0, p);
 	  new_tl += len;	/* Keep running total of block length so far */
 
 	  /* See if we need to increase the size of the block. */
@@ -1097,7 +1097,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 		}
 	    }
 
-	  int slen = sys_mbstowcs (s, len, p, len);
+	  int slen = sys_mbstowcs (s, len, p);
 
 	  /* See if environment variable is "special" in a Windows sense.
 	     Under NT, the current directories for visited drives are stored
