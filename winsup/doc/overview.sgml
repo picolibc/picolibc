@@ -66,8 +66,8 @@ url="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technica
 </para>
 </note>
 <para>
-Cygwin began development in 1995 at Cygnus Solutions (now part of Red Hat
-Software).  The first thing done was to enhance the development tools 
+Cygwin began development in 1995 at Cygnus Solutions (now part of Red Hat,
+Inc.).  The first thing done was to enhance the development tools 
 (<command>gcc</command>, <command>gdb</command>, <command>gas</command>, 
 etc.) so that they could generate and interpret Win32 native
 object files.

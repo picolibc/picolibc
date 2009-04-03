@@ -56,7 +56,7 @@ escaped as '\040'.</para>
 
 <para>The third field describes the type of the filesystem.
 Cygwin supports any string here, since the file system type is usually
-not evaluated.  The noticable exception is the file system type
+not evaluated.  The notable exception is the file system type
 cygdrive.  This type is used to set the cygdrive prefix.</para>
 
 <para>The fourth field describes the mount options associated
@@ -323,7 +323,7 @@ are invalid filenames for native Win32 applications.</para>
 
 <para>This restriction doesn't apply to Cygwin applications.  Cygwin
 can create and access files with such names just fine.  Just don't try
-to use these files with native Win32 aqpplications...</para>
+to use these files with native Win32 applications.</para>
 
 </sect2>
 
@@ -332,8 +332,8 @@ to use these files with native Win32 aqpplications...</para>
 
 <para>Win32 filenames can't contain trailing dots and spaces for backward
 compatibility.  When trying to create files with trailing dots or spaces,
-all of them are removed before the file is created.  This restriction does
-only affect native Win32 applications.  Cygwin applications can create and
+all of them are removed before the file is created.  This restriction only
+affects native Win32 applications.  Cygwin applications can create and
 access files with trailing dots and spaces without problems.</para>
 
 <para>Some characters are disallowed in filenames on Windows filesystems:</para>
@@ -358,17 +358,17 @@ character set (see <xref linkend="setup-locale"></xref>) then there's a
 chance that a filename is using one or more characters which have no
 representation in the character set you're using.</para>
 
-<para>For instance, there are no chinese characters in the ISO-8859-1
-character set.  So, converting a filename containing a chinese character
-to ISO-8859-1 leaves you with a wrongly converted filename, for instance
+<para>For instance, there are no Chinese characters in the ISO-8859-1
+character set.  So, converting a filename containing a Chinese character
+to ISO-8859-1 leaves you with a wrongly converted filename, for instance,
 containing a question mark '?' as replacement for the unconvertable
 character.  When trying to access the file, Cygwin has to convert the
 filename back to UTF-16.  However, this doesn't result in the original
 filename because the question mark will not translate back to the original
-chinese character, but to a simple question mark instead.  This in turn
+Chinese character, but to a simple question mark instead.  This in turn
 results in strange "File not found" messages.</para>
 
-<note><para>To avoid this scenario altogether, just use always UTF-8 as
+<note><para>To avoid this scenario altogether, always use UTF-8 as the
 character set.</para></note>
 
 <para>If you don't want or can't use UTF-8 as character set for whatever
@@ -451,7 +451,7 @@ The reason is that the native Windows %PATH% environment variable is not
 always using the correct case for all paths in it.  As a result, if you use
 case-sensitivity on the <filename>/cygdrive</filename> prefix, your shell
 might claim that it can't find Windows commands like <command>attrib</command>
-or <command>net</command>.  To ease the pain the <filename>/cygdrive</filename>
+or <command>net</command>.  To ease the pain, the <filename>/cygdrive</filename>
 path is case-insensitive by default and you have to use the "posix=1" setting
 explicitely in <filename>/etc/fstab</filename> or
 <filename>/etc/fstab.d/$USER</filename> to switch it to case-sensitivity,
@@ -460,7 +460,7 @@ is using the correct case for all paths throughout.</para>
 
 <para>Note that mount points as well as device names and virtual
 paths like /proc are always case-sensitive!  The only exception are
-the subdirs and filenames under /proc/registry, /proc/registry32
+the subdirectories and filenames under /proc/registry, /proc/registry32
 and /proc/registry64.  Registry access is always case-insensitive.
 Read on for more information.</para>
 
@@ -547,16 +547,17 @@ The first floppy in the system is \device\floppy0, the first CD-ROM is
 
 <para>The mapping from physical device to the name of the device in the
 internal NT namespace can be found in various places.  For hard disks and
-CD/DVD drives the Windows "Disk management" (part of the "Computer Management"
-console) shoes the mapping "Disk 0" is \device\harddisk0, "CD-ROM 2" is
-\device\cdrom2.  Another place to find this mapping is the "Device Management"
-console.  Disks have a "Location" number, tapes have a "Tape Symbolic Name",
-etc.  Unfortunately the places where to find this information is not very
+CD/DVD drives, the Windows "Disk Management" utility (part of the
+"Computer Management" console) shows that the mapping of "Disk 0" is
+\device\harddisk0.  "CD-ROM 2" is \device\cdrom2.  Another place to find
+this mapping is the "Device Management" console.  Disks have a
+"Location" number, tapes have a "Tape Symbolic Name", etc.
+Unfortunately, the places where this information is found is not very
 well-defined.</para>
 
 <para>
 For external disks (USB-drives, CF-cards in a cardreader, etc) you can use
-Cygwin to find out the mapping.  <filename>/proc/partitions</filename>
+Cygwin to show the mapping.  <filename>/proc/partitions</filename>
 contains a list of raw drives known to Cygwin.  The <command>df</command>
 command shows a list of drives and their respective sizes.  If you match
 the information between <filename>/proc/partitions</filename> and the

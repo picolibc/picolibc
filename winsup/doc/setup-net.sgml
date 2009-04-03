@@ -62,7 +62,7 @@ or <literal>Download from Internet</literal>, then copy the whole
 </para>
 <para>
 Though this provides some basic mirroring functionality, if you
-are managing a wide Cygwin installation, to keep up to date we recommend 
+are managing a large Cygwin installation, to keep up to date we recommend 
 using a mirroring tool such as <command>wget</command>. A helpful user on 
 the Cygwin mailing list created a simple demonstration script to accomplish
 this; search the list for <command>mkcygwget</command> for ideas.
@@ -152,7 +152,7 @@ The chooser is the most complex part of <command>setup.exe</command>.
 Packages are grouped into categories, and one package may belong to multiple 
 categories (assigned by the volunteer package maintainer). Each package
 can be found under any of those categories in the heirarchial chooser view.
-By default <command>setup.exe</command>
+By default, <command>setup.exe</command>
 will install only the packages in the <literal>Base</literal> category
 and their dependencies, resulting in a minimal Cygwin installation.
 However, this will not include many commonly used tools such as 
@@ -177,8 +177,8 @@ Once you have an existing Cygwin installation, the <command>setup.exe</command>
 chooser is also used to manage your Cygwin installation. 
 Information on installed packages is kept in the
 <literal>/etc/setup/</literal> directory of your Cygwin installation; if 
-<command>setup.exe</command> cannot find this directory it will act just like
-you had no Cygwin installation.  If <command>setup.exe</command>
+<command>setup.exe</command> cannot find this directory it will act as if
+you have no Cygwin installation.  If <command>setup.exe</command>
 finds a newer version of an installed package available, it will automatically 
 mark it to be upgraded. 
 To <literal>Uninstall</literal>, <literal>Reinstall</literal>, or get the
@@ -208,7 +208,7 @@ to the local directory chosen earlier. Before installing,
 <command>setup.exe</command> performs a checksum on each package. If the
 local directory is a slow medium (such as a network drive) this can take
 a long time. During the download and installation, <command>setup.exe</command>
-show progress bars for the current task and total remaining disk space.
+shows progress bars for the current task and total remaining disk space.
 </para>
 </sect2>
 

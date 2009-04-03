@@ -193,17 +193,17 @@ versa.  Shell scripts and Makefiles cannot call these functions directly.
 Instead, they can do the same path translations by executing the
 <command>cygpath</command> utility program that we provide with Cygwin.</para>
 
-<para>Win32 applications handle filenames case preserving but case
-insensitive.  Cygwin supports case sensitivity on file systems supporting
-that.  Since Windows XP, the OS only supports case sensitivity when a
-specific registry value is changed.  Therefore case sensitivity is not
-the default usually.</para>
+<para>Win32 applications handle filenames in a case preserving, but case
+insensitive manner.  Cygwin supports case sensitivity on file systems
+supporting that.  Since Windows XP, the OS only supports case
+sensitivity when a specific registry value is changed.  Therefore, case
+sensitivity is not usually the default.</para>
 
 <para>Symbolic links are not present and supported on Windows up to and
-including Windows Server 2003 R2.  Only starting with Windows Vista,
-native symlinks are available.  Unfortunately they are strangly implemented
-and so not very useful for a POSIX emulation layer.  Consequentially
-Cygwin recognizes them as symlinks but does not create them.</para>
+including Windows Server 2003 R2.  Native symlinks are available starting
+with Windows Vista.  Due to their strange implementation, however,
+they are not useful in a POSIX emulation layer.  Cygwin recognizes
+native symlinks, but does not create them.</para>
 
 <para>Symbolic links are potentially created in two different ways.
 The file style symlinks are files containing a magic cookie followed by
@@ -240,10 +240,10 @@ problem because of the low probability of generating a duplicate inode number.
 <para><function>chroot(2)</function> is supported since Cygwin 1.1.3.
 However, chroot is not a concept known by Windows.  This implies some
 restrictions.  First of all, the <function>chroot</function> call isn't a
-privileged call.  Each user may call it.  Second, the chroot environment
-isn't safe against native windows processes.  If you want to support a
-chroot environment as, for example, by allowing an anonymous ftp with
-restricted access, you'll have to care that only native Cygwin applications
+privileged call.  Any user may call it.  Second, the chroot environment
+isn't safe against native windows processes.  If you want to use a
+chroot environment to, for example, allow anonymous ftp with restricted
+access, you must make sure care that only native Cygwin applications
 are accessible inside of the chroot environment.  Since those applications
 are only using the Cygwin POSIX API to access the file system their access
 can be restricted as it is intended.  This includes not only POSIX paths but
@@ -253,22 +253,24 @@ Win32 paths containing drive letter and/or backslashes as well as UNC paths
 </sect2>
 
 <sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
-<para>Interoperability with other Win32 programs such as text editors was
-critical to the success in the early days of Cygwin.  Most Red Hat
-customers upgrading from the older DOS-hosted toolchains expected the new
-Win32-hosted ones to continue to work with their old development
-sources.</para>
+<para>It is often important that files created by native Windows
+applications be interoperable with Cygwin applications.  For example, a
+file created by a native Windows text editor should be readable by a
+Cygwin application, and vice versa.</para>
 
-<para>Unfortunately, UNIX and Win32 use different end-of-line terminators in
-text files.  Consequently, carriage-return newlines have to be translated on
-the fly by Cygwin into a single newline when reading in text mode.</para>
+<para>Unfortunately, UNIX and Win32 have different end-of-line
+conventions in text files.  A UNIX text file will have a single newline
+character (LF) whereas a Win32 text file will instead use a two
+character sequence (CR+LF).  Consequently, the two character sequence
+must be translated on the fly by Cygwin into a single character newline
+when reading in text mode.</para>
 
-<para>This solution addresses the compatibility requirement at the expense of
-violating the POSIX standard that states that text and binary mode will be
-identical. Consequently, processes that attempt to lseek through text files can
-no longer rely on the number of bytes read as an accurate indicator of position
-in the file.  For this reason, Cygwin allows to choose the mode in which to
-read a file in several ways.</para>
+<para>This solution addresses the newline interoperability concern at
+the expense of violating the POSIX requirement that text and binary mode
+be identical.  Consequently, processes that attempt to lseek through
+text files can no longer rely on the number of bytes read to be an
+accurate indicator of position within the file.  For this reason, Cygwin
+allows you to choose the mode in which a file is read in several ways.</para>
 </sect2>
 
 <sect2 id="ov-hi-ansiclib"><title>ANSI C Library</title>
@@ -388,17 +390,17 @@ inherited file descriptor is a socket.</para>
 <para>AF_UNIX (AF_LOCAL) sockets are not available in Winsock.  They are
 implemented in Cygwin by using local AF_INET sockets instead.  This is
 completely transparent to the application.  Cygwin's implementation also
-supports the getpeereid BSD extension.  A yet missing feature is
-descriptor passing, though.</para>
+supports the getpeereid BSD extension.  However, Cygwin does not yet support
+descriptor passing.</para>
 
-<para>Starting with release 1.7.0, Cygwin gets IPv6 support.  However, this
-depends on the availability of the Windows IPv6 stack.  Up to Windows 2003,
-the IPv6 stack is treated as "experimental" and it's not feature complete.
-Full support is only available starting with Windows Vista and Windows Server
-2008.  The newly implemented <function>getaddrinfo</function> and
-<function>getnameinfo</function> functions are not dependent on the OS,
-though.  Cygwin 1.7.0 adds replacement functions which implement the full
-functionality for IPv4.</para>
+<para>IPv6 is supported beginning with Cygwin release 1.7.0.  This
+support is dependent, however, on the availability of the Windows IPv6
+stack.  The IPv6 stack was "experimental", i.e. not feature complete in
+Windows 2003 and earlier.  Full IPv6 support became available starting
+with Windows Vista and Windows Server 2008.  Cygwin does not depend on
+the underlying OS for the (newly implemented) <function>getaddrinfo</function>
+and <function>getnameinfo</function> functions.  Cygwin 1.7.0 adds
+replacement functions which implement the full functionality for IPv4.</para>
 
 </sect2>
 

@@ -1,3 +1,7 @@
+2009-04-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* Various syntactical and semantical fixes throughout.
+
 2009-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.symlinkstoppedworking): Rename.

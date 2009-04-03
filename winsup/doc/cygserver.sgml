@@ -53,7 +53,7 @@
   <screen>-f, --config-file &lt;file&gt;</screen>
   <para>  
     Use &lt;file&gt; as configuration file instead of the default configuration
-    line.  The default configuration file is /etc/cygserver.conf, typically. 
+    line.  The default configuration file is /etc/cygserver.conf. 
     The --help and --version options will print the default configuration
     pathname.
   </para>
@@ -194,10 +194,10 @@
 <sect2 id="cygserver-config"><title>The Cygserver configuration file</title>
 
 <para>
-  Cygserver has many options, which allow to customize the server
+  Cygserver has many options, which allow you to customize the server
   to your needs.  Customization is accomplished by editing the configuration
-  file, which is by default /etc/cygserver.conf.  This file is read only
-  once on startup of Cygserver.  There's no option to re-read the file on
+  file, which is by default /etc/cygserver.conf.  This file is only read
+  once, at startup of Cygserver.  There's no option to re-read the file at
   runtime by, say, sending a signal to Cygserver.
 </para>
 <para>

@@ -1,9 +1,9 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
-<sect2 id="ov-new1.7-os"><title>OS releated changes</title>
+<sect2 id="ov-new1.7-os"><title>OS related changes</title>
 
 <screen>
-- Windows 95, 98 and Me are not supported anymore.  The new Cywin 1.7 DLL
+- Windows 95, 98 and Me are not supported anymore.  The new Cygwin 1.7 DLL
   will not run on any of these systems.
 </screen>
 
@@ -21,7 +21,7 @@
   the character will be converted to a sequence Ctrl-N + UTF-8 representation
   of the character.  This allows to access all files, even those not
   having a valid representation of their filename in the current character
-  set (codepage).  To have always a valid string, use the UTF-8 charset
+  set (codepage).  To always have a valid string, use the UTF-8 charset
   by setting the environment variable $LANG, $LC_ALL, or $LC_CTYPE to a
   valid POSIX value, for instance in Cygwin.bat like this:
 
@@ -48,7 +48,7 @@
 - Creating files with special DOS device filename components ("aux",
   "nul", "prn") is supported.
 
-- File name are case sensitive if the OS and the underlying file system
+- File names are case sensitive if the OS and the underlying file system
   supports it.  Works on NTFS and NFS.  Does not work on FAT and Samba
   shares.  Requires to change a registry key (see the user's guide).
   Can be switched off on a per-mount base.
@@ -79,7 +79,7 @@
   default again when creating symlinks.  Only create Windows shortcut
   style symlinks if CYGWIN=winsymlinks is set in the environment.
 
-- Symlinks are now using UTF-16 encoding for the target filename for
+- Symlinks now use UTF-16 encoding for the target filename for
   better internationalization support.  Cygwin 1.7 can read all old style
   symlinks, but the new style is not compatible with older Cygwin releases.
 
@@ -241,20 +241,20 @@
   script.  The advantages and disadvantages are noted in
   http://cygwin.com/ml/cygwin-developers/2006-11/msg00000.html
 
-- Cygwin now allows to store and use user passwords in a hidden area of
+- Cygwin now allows storage and use of user passwords in a hidden area of
   the registry.  This is tried first when Cygwin is called by privileged
   processes to switch the user context.  This allows, for instance,
   ssh public key sessions with full network credentials to access shares
   on other machines.
 
-- The mkpasswd and mkgroup tools have changed behaviour and a couple of
-  new options to ease consistent usage in multi-machine or multi-domain
-  environments.
+- New options have been added to the mkpasswd and mkgroup tools to
+  ease use in multi-machine and multi-domain environments.  The existing
+  options have a slightly changed behaviour.
 </screen>
 
 </sect2>
 
-<sect2 id="ov-new1.7-misc"><title>Miscellanous</title>
+<sect2 id="ov-new1.7-misc"><title>Miscellaneous</title>
 
 <screen>
 - New ldd utility, similar to Linux.
@@ -265,8 +265,8 @@
   since they don't understand these paths.
 
 - On the first usage of a DOS path (C:\foo, \\foo\bar), the Cygwin DLL
-  emits a scary warning that DOS paths shouldn't be used.  There's also
-  the new CYGWIN=nodosfilewarning setting to disable that.
+  emits a scary warning that DOS paths shouldn't be used.  This warning
+  may be disabled via the new CYGWIN=nodosfilewarning setting.
 
 - The CYGWIN environment variable option "server" has been removed.
   Cygwin automatically uses cygserver if it's available.
@@ -294,7 +294,7 @@
 
 - Optimized strstr and memmem implementation.
 
-- Remove backwards compatibility with old signal masks (some *very* old
+- Remove backwards compatibility with old signal masks.  (Some *very* old
   programs which use signal masks may no longer work correctly).
 
 </screen>

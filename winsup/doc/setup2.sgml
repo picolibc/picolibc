@@ -1,12 +1,15 @@
 <sect1 id="setup-env"><title>Environment Variables</title>
 
 <para>
-Before starting bash, you may set some environment variables.  A .bat
-file is provided where the most important ones are set before bash in
-launched.  This is the safest way to launch bash initially.  The .bat
-file is installed in the root directory that you specified during setup
-and pointed to in the Start Menu under the "Cygwin" option.  You can
-edit it this file your liking.</para>
+You may wish to specify settings of several important environment
+variables that affect Cygwin's operation.  Some of these settings need
+to be in effect prior to launching the initial Cygwin session (before
+starting your bash shell, for instance), and are, consequentially, best
+placed in a .bat file.  An initial file is named Cygwin.bat and is created
+in the Cygwin root directory that you specified during setup.  Note that
+the "Cygwin" option of the Start Menu points to Cygwin.bat.  Edit
+Cygwin.bat to your liking or create your own .bat files to start
+Cygwin processes.</para>
 
 <para>
 The <envar>CYGWIN</envar> variable is used to configure many global
@@ -82,7 +85,7 @@ and set it to the desired memory limit in decimal MB. It is preferred to do
 this in Cygwin using the <command>regtool</command> program included in the 
 Cygwin package.
 (For more information about <command>regtool</command> or the other Cygwin 
-utilities, see <xref linkend="using-utils"></xref> or use each the
+utilities, see <xref linkend="using-utils"></xref> or use the
 <literal>--help</literal> option of each util.)  You should always be careful 
 when using <command>regtool</command> since damaging your system registry can 
 result in an unusable system.  This example sets memory limit to 1024 MB:
@@ -201,11 +204,11 @@ internationalization environment variables.
 </para></listitem>
 
 <listitem><para>
-Assuming you set one of the aforementioned environment variables to some
-valid POSIX locale value, other than "C" and "POSIX", and assuming you
+Assume that you've set one of the aforementioned environment variables to some
+valid POSIX locale value, other than "C" and "POSIX", and assume that you
 call an application which calls <function>setlocale</function> as above.</para>
 
-<para>Assuming further you're living in Japan.  So you might want to use
+<para>Assume further that you're living in Japan.  You might want to use
 the language code "ja" and the territory "JP", thus setting, say,
 <envar>LANG</envar> to "ja_JP".  You didn't set a character set, so
 what will Cygwin use now?  Easy!  It will use the default Windows ANSI
@@ -289,22 +292,21 @@ the UTF-8 charset.  This would be especially a problem in variables like
 consist of valid ASCII characters, and only of uppercase letters, digits, and
 the underscore for maximum portablilty.</para></note>
 
-<para>And here's another problem when switching charsets on the fly.
-Symbolic links.  A symbolic link contains the filename of the target
-file the symlink points to.  When a symlink had been created with older
-versions of Cygwin, the current ANSI or OEM character set had been used
-to store the target filename, dependent on the old <envar>CYGWIN</envar>
-environment variable setting <envar>codepage</envar>
-(see <xref linkend="cygwinenv-removed-options"></xref>.  If the target
-filename contains non-ASCII characters and you use another
-character set than your default ANSI/OEM charset, the target filename of
-the symlink is now potentially an invalid character sequence in the new
-character set.  This behaviour is not different from the behaviour in other
-Operating Systems.  So, if you suddenly can't access a symlink anymore
-which worked all these years before, maybe it's because you switched to
+<para>Symbolic links, too, may pose a problem when switching charsets on
+the fly.  A symbolic link contains the filename of the target file the
+symlink points to.  When a symlink had been created with older versions
+of Cygwin, the current ANSI or OEM character set had been used to store
+the target filename, dependent on the old <envar>CYGWIN</envar>
+environment variable setting <envar>codepage</envar> (see <xref
+linkend="cygwinenv-removed-options"></xref>.  If the target filename
+contains non-ASCII characters and you use another character set than
+your default ANSI/OEM charset, the target filename of the symlink is now
+potentially an invalid character sequence in the new character set.
+This behaviour is not different from the behaviour in other Operating
+Systems.  So, if you suddenly can't access a symlink anymore which
+worked all these years before, maybe it's because you switched to
 another character set.  This doesn't occur with symlinks created with
-Cygwin 1.7 or later.
-</para>
+Cygwin 1.7 or later.  </para>
 
 </sect2>
 
@@ -322,8 +324,8 @@ symbols, for a decimalpoint other than '.', no support for native time
 formats, and no support for native language sorting orders.
 </para>
 
-<para>However, internationalization is work in progress and we would be glad
-for coding help in this area.</para>
+<para>Cygwin's internationalization support is work in progress and we would
+be glad for coding help in this area.</para>
 
 </sect2>
 
@@ -415,7 +417,7 @@ oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
 <sect1 id="setup-files"><title>Customizing bash</title>
 
 <para>
-To set bash up so that cut and paste work properly, click on the
+To set up bash so that cut and paste work properly, click on the
 "Properties" button of the window, then on the "Misc" tab.  Make sure
 that "QuickEdit mode" and "Insert mode" are checked.  These settings
 will be remembered next time you run bash from that shortcut. Similarly

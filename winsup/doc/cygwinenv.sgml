@@ -44,7 +44,7 @@ There is no default set.
 </listitem>
 
 <listitem>
-<para><envar>forkchunk:32768</envar> - causes the <function>fork()</function>
+<para><envar>forkchunk:32768</envar> - causes <function>fork()</function>
 to copy memory some number of bytes at a time, in the above example 
 32768 bytes (32Kb) at a time. The default is to copy as many bytes as 
 possible, which is preferable in most cases but may slow some older systems
@@ -53,9 +53,10 @@ down.
 </listitem>
 
 <listitem>
-<para><envar>proc_retry:n</envar> - causes the <function>fork()</function> and <function>exec*()</function>
-to retry n times when a child process fails due to certain windows-specific errors.  These errors usually
-occur when processes are being started while a user is logging off.
+<para><envar>proc_retry:n</envar> - causes <function>fork()</function> and
+<function>exec*()</function> to retry n times when a child process fails
+due to certain windows-specific errors.  These errors usually occur when
+processes are being started while a user is logging off.
 </para>
 </listitem>
 
@@ -103,11 +104,11 @@ other terminals (i.e., rxvt or xterm).
 <listitem>
 <para><envar>(no)upcaseenv</envar> - if set, Cygwin converts all
 environment variables to all-uppercase, when a Cygwin process is started
-from a non-Cygwin native Windows process.  This is how it has been done
-until Cygwin 1.5.  If not set, Cygwin does not change the case of environment
-variables, except for a restricted set to maintain minimal backward
-compatibility and for correct handling of certain essential variables.
-The current list of always uppercased variables is:</para>
+from a non-Cygwin native Windows process.  This was the default behavior in
+releases prior to Cygwin 1.7.  If not set, Cygwin does not change the case
+of environment variables, except for a restricted set to maintain minimal
+backward compatibility and for correct handling of certain essential
+variables.  The current list of always uppercased variables is:</para>
 <screen>
   ALLUSERSPROFILE
   COMMONPROGRAMFILES
@@ -152,11 +153,12 @@ old symlinks used the current ANSI or OEM charset.</para>
 </sect2>
 
 <sect2 id="cygwinenv-removed-options">
-<title>Removed options</title>
+<title>Obsolete options</title>
 
 <para>
-Some CYGWIN options have been removed in Cygwin 1.7 for one reason or another.
-These removed options are listed below.</para>
+Certain CYGWIN options available in past releases have been removed in
+Cygwin 1.7 for one reason or another.  These obsolete options are listed
+below.</para>
 
 <itemizedlist mark="bullet">
 
@@ -181,7 +183,7 @@ is now doing all character conversion by itself, depending on the
 application call to the <function>setlocale()</function> function, and in
 turn by the setting of the environment variables <envar>$LANG</envar>,
 <envar>$LC_ALL</envar>, or <envar>$LC_CTYPE</envar>, this setting
-got useless.</para>
+became superfluous.</para>
 </listitem>
 
 <listitem>
@@ -221,7 +223,8 @@ Cygwin.</para>
 <listitem>
 <para><envar>(no)traverse</envar> - This option has been removed because
 traverse checking is not quite correctly implemented by Microsoft and
-it's behaviour is getting worse with each new OS version.</para>
+it's behaviour has been getting worse with each new OS version.  This
+complicates its usage so the option has been removed for now.</para>
 </listitem>
 
 </itemizedlist>
