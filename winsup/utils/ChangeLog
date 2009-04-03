@@ -1,3 +1,8 @@
+2009-04-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* utils.sgml: Various syntactical and semantical fixes.
+	* cygcheck.cc (usage): Fix --find-package explanation.
+
 2009-03-26  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* utils.sgml (passwd -R): Remove references to CYGWIN="server".

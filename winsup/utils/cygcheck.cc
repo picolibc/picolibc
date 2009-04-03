@@ -1984,7 +1984,7 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
                        plain console only, not from a pty/rxvt/xterm)\n\
-  -f, --find-package   find the package that FILE belongs to\n\
+  -f, --find-package   find the package to which FILE belongs\n\
   -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
                        repository (requires internet connectivity)\n\

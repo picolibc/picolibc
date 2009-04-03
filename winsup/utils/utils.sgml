@@ -32,7 +32,7 @@ At least one command option or a PROGRAM is required, as shown above.
   -r, --registry       also scan registry for Cygwin settings (with -s)
   -k, --keycheck       perform a keyboard check session (must be run from a
                        plain console only, not from a pty/rxvt/xterm)
-  -f, --find-package   find the package that FILE belongs to
+  -f, --find-package   find the package to which FILE belongs
   -l, --list-package   list contents of PACKAGE (or all packages if none given)
   -p, --package-query  search for REGEXP in the entire cygwin.com package
                        repository (requires internet connectivity)
@@ -373,7 +373,7 @@ ACL.  For directories <command>getfacl</command> displays additionally the
 default ACL.  With no options specified, <command>getfacl</command> displays 
 the filename, the owner, the group, and both the ACL and the default ACL, if 
 it exists. For more information on Cygwin and Windows ACLs, see
-see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.
+<xref linkend="ntsec"></xref> in the Cygwin User's Guide.
 The format for ACL output is as follows:
 <screen>
      # file: filename
@@ -442,7 +442,7 @@ given signal, or a list of all signal names if no signal is given.</para>
 
 <para>To send a specific signal, use the <literal>-signN</literal>
 option, either with a signal number or a signal name (minus the "SIG"
-part), like these examples:</para>
+part), as shown in these examples:</para>
 
 <example id="utils-kill-ex"><title>Using the kill command</title>
 <screen>
@@ -560,14 +560,14 @@ With the <literal>-d/-D</literal> options the program contacts a Domain
 Controller, which my be unreachable or have restricted access.
 Comma-separated from the machine or domain, you can specify an offset
 which is used as base added to the group's RID to compute the gid
-(offset + RID = gid).  This allows to create the same gids every time you
+(offset + RID = gid).  This allows you to create the same gids every time you
 re-run <command>mkgroup</command>.
 For very simple needs, an entry for the current user's group can be
 created by using the option <literal>-c</literal> or <literal>-C</literal>.
 If you want to use one of the <literal>-D</literal>, <literal>-L</literal>
 or <literal>-C</literal> options, but you don't like the backslash as
 domain/group separator, you can specify another separator using the
-<literal>-S</literal> option, for instance</para>
+<literal>-S</literal> option, for instance:</para>
 
 <example id="utils-mkgroup-ex"><title>Setting up group entry for current user with different domain/group separator</title>
 <screen>
@@ -580,11 +580,11 @@ DOMAIN+my_group:S-1-5-21-2913048732-1697188782-3448811101-1144:11144:
 <para>The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the GIDs might match otherwise.
 The <literal>-g</literal> option only prints the information for one group.
-The <literal>-U</literal> option allows to enumerate the standard UNIX
+The <literal>-U</literal> option allows you to enumerate the standard UNIX
 groups on a Samba machine.  It's used together with
 <literal>-l samba-server</literal> or <literal>-L samba-server</literal>.
 The normal UNIX groups are usually not enumerated, but they can show
-up as group in <command>ls -l</command> output.
+up as a group in <command>ls -l</command> output.
 </para>
 
 </sect2>
@@ -667,7 +667,7 @@ option <literal>-c</literal> or  <literal>-C</literal>.
 If you want to use one of the <literal>-D</literal>, <literal>-L</literal>
 or <literal>-C</literal> options, but you don't like the backslash as
 domain/group separator, you can specify another separator using the
-<literal>-S</literal> option, simialar to the <command>mkgroup</command>.
+<literal>-S</literal> option, similar to the <command>mkgroup</command>.
 The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the UIDs might match otherwise.
 The <literal>-m</literal> option bypasses the current
@@ -687,7 +687,7 @@ use the specified prefix instead of the account home dir or <literal>/home/
 would put local users' home directories in the Windows 'Profiles' directory. 
 The <literal>-u</literal> option creates just an entry for
 the specified user.
-The <literal>-U</literal> option allows to enumerate the standard UNIX
+The <literal>-U</literal> option allows you to enumerate the standard UNIX
 users on a Samba machine.  It's used together with
 <literal>-l samba-server</literal> or <literal>-L samba-server</literal>.
 The normal UNIX users are usually not enumerated, but they can show
@@ -808,7 +808,7 @@ the <filename>/etc/fstab</filename> file.</para>
 
 <para>
 The <literal>-m</literal> option causes the <command>mount</command> utility
-to output the current mount table in a series of fstab entries.  This allows
+to output the current mount table in a series of fstab entries.
 You can save this output as a backup when experimenting with the mount table.
 Copy the output to <filename>/etc/fstab</filename> to restore the old state.
 It also makes moving your settings to a different machine much easier.</para>
@@ -1017,13 +1017,13 @@ running Windows services.  When a privileged Cygwin application calls the
 <command>set{e}uid(user_id)</command> system call, Cygwin checks if a
 password for that user has been stored in this registry area.  If so, it
 uses this password to switch to this user account using that password.
-This allows to logon through, for instance, <command>ssh</command> with
-public key authentication and to get a full qualified user token with
+This allows you to logon through, for instance, <command>ssh</command> with
+public key authentication and get a full qualified user token with
 all credentials for network access.  However, the method has some
-drawbacks security-wise.  This is explained in more detail in the
-<xref linkend="ntsec"></xref> section.</para>
+drawbacks security-wise.  This is explained in more detail in
+<xref linkend="ntsec"></xref>.</para>
 
-<para>Please note that storing password in that registry area is a
+<para>Please note that storing passwords in that registry area is a
 privileged operation which only administrative accounts are allowed to
 do.  If normal, non-admin users should be allowed to enter their
 passwords using <command>passwd -R</command>, it's required to run
@@ -1078,7 +1078,7 @@ waiting to output.
 </para>
 
 <para>
-By default <command>ps</command> will only show processes owned by the
+By default, <command>ps</command> will only show processes owned by the
 current user. With either the <literal>-a</literal> or <literal>-e</literal>
 option, all user's processes (and system processes) are listed. There are
 historical UNIX reasons for the synonomous options, which are functionally
@@ -1166,18 +1166,18 @@ Conversely, the <literal>-q</literal> option supresses error messages,
 so you can use the exit status of the program to detect if a key
 exists or not (for example).</para>
 
-<para>The <literal>-w</literal> option allows to access the 64 bit view
-on the registry.  Several subkeys exist in a 32 bit and a 64 bit version
+<para>The <literal>-w</literal> option allows you to access the 64 bit view
+of the registry.  Several subkeys exist in a 32 bit and a 64 bit version
 when running on Windows 64.  Since Cygwin is running in 32 bit mode, it
-has only access to the 32 bit view of these registry keys.  When using
-the <literal>-w</literal> the 64 bit view is used and
+only has access to the 32 bit view of these registry keys.  When using
+the <literal>-w</literal> switch, the 64 bit view is used and
 <command>regtool</command> can access the entire registry.
 This option is simply ignored when running on 32 bit Windows versions.
 </para>
 
-<para>The <literal>-W</literal> option allows to access the 32 bit view
-on the registry.  The purpose of this  option is mainly symmetry.  It
-allows to create OS agnostic scripts which would also work in a hypothetic
+<para>The <literal>-W</literal> option allows you to access the 32 bit view
+on the registry.  The purpose of this option is mainly for symmetry.  It
+permits creation of OS agnostic scripts which would also work in a hypothetical
 64 bit version of Cygwin.</para>
 
 <para>You must provide <command>regtool</command> with an 
@@ -1190,7 +1190,7 @@ the action must be <literal>add</literal>, <literal>set</literal>,
 <para>The <literal>add</literal> action adds a new key.  The 
 <literal>check</literal> action checks to see if a key exists (the 
 exit code of the program is zero if it does, nonzero if it does not).
-The <literal>get</literal> action gets the value of a value of a key,
+The <literal>get</literal> action gets the value of a key,
 and prints it (and nothing else) to stdout.  Note: if the value
 doesn't exist, an error message is printed and the program returns a
 non-zero exit code.  If you give <literal>-q</literal>, it doesn't
