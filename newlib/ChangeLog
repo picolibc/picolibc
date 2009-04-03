@@ -1,5 +1,10 @@
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libc/machine/spu/spu-gmon.c: Tweaks to support simultaneous SPU
+	profiling.
+
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libc/include/math.h: Remove duplicate copysign prototype.
 	Fix __math_68881 define typo.  Guard functions of the rint family.
 

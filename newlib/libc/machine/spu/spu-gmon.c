@@ -43,6 +43,7 @@ Author: Ken Werner <ken.werner@de.ibm.com>
 #include <spu_mfcio.h>
 #include <spu_timer.h>
 #include <limits.h>
+#include <sys/linux_syscalls.h>
 
 /* Magic cookie.  */
 #define GMON_MAGIC_COOKIE "gmon"
@@ -112,6 +113,13 @@ struct rawarc
 /* start and end of the text section */
 extern char _start;
 extern char _etext;
+
+/* EAR entry for the starting address of SPE executable image.  */
+extern const unsigned long long _EAR_;
+asm (".section .toe,\"a\",@nobits\n\r"
+     ".align 4\n\r"
+     ".type _EAR_, @object\n\r"
+     ".size _EAR_, 16\n" "_EAR_: .space 16\n" ".previous");
 
 /* froms are indexing tos */
 static __ea unsigned short *froms;
@@ -251,8 +259,9 @@ __mcleanup (void)
 }
 
 void
-__monstartup (void)
+__monstartup (unsigned long long spu_id)
 {
+  char filename[64];
   s_lowpc =
     ROUNDDOWN ((uintptr_t) & _start, HISTFRACTION * sizeof (HISTCOUNTER));
   s_highpc =
@@ -284,23 +293,35 @@ __monstartup (void)
     }
   memset_ea (tos, 0, tolimit * sizeof (struct tostruct));
 
+  /* Determine the gmon.out file name.  */
+  if (spu_id)
+    snprintf (filename, sizeof (filename), "gmon-%d-%llu-%llu.out",
+	      linux_getpid (), spu_id, _EAR_);
+  else
+    strncpy (filename, "gmon.out", sizeof (filename));
   /* Open the gmon.out file.  */
-  fd = open ("gmon.out", O_RDWR | O_CREAT | O_TRUNC, 0644);
+  fd = open (filename, O_RDWR | O_CREAT | O_TRUNC, 0644);
   if (fd == -1)
     {
-      perror ("can't open gmon.out file");
+      char errstr[128];
+      snprintf (errstr, sizeof (errstr), "Cannot open file: %s", filename);
+      perror (errstr);
       return;
     }
   /* Truncate the file up to the size where the histogram fits in.  */
   if (ftruncate (fd,
-       sizeof (struct gmon_hdr) + 1 + sizeof (struct gmon_hist_hdr) + hist_size) ==
-       -1)
-    perror ("can't truncate the gmon.out file");
+		 sizeof (struct gmon_hdr) + 1 +
+		 sizeof (struct gmon_hist_hdr) + hist_size) == -1)
+    {
+      char errstr[128];
+      snprintf (errstr, sizeof (errstr), "Cannot truncate file: %s", filename);
+      perror (errstr);
+      return;
+    }
 
   /* Start the histogram sampler.  */
   spu_slih_register (MFC_DECREMENTER_EVENT, spu_clock_slih);
-  timer_id = spu_timer_alloc (spu_timebase () / SAMPLE_INTERVAL,
-                              __sample);
+  timer_id = spu_timer_alloc (spu_timebase () / SAMPLE_INTERVAL, __sample);
   spu_clock_start ();
   spu_timer_start (timer_id);
 
