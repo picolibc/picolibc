@@ -1,3 +1,10 @@
+2009-04-03  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_llrint.c: New file, implementing llrint().
+	* libm/common/sf_llrint.c: New file, implementing llrintf().
+	* libm/common/Makefile.am:  Add s_llrint.c (src); sf_llrint.c (fsrc).
+	* libm/common/Makefile.in:  Regenerate.
+
 2009-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/ctype_c.c: Move inclusion of ctype_iso.h and

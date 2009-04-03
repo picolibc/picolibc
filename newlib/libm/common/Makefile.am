@@ -9,7 +9,8 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
 	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
-	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
+	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c \
+	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c
 
@@ -18,7 +19,8 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
 	sf_rint.c sf_logb.c sf_log2.c \
-	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c sf_lrint.c \
+	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c \
+	sf_lrint.c sf_llrint.c \
 	sf_lround.c sf_llround.c sf_nearbyint.c sf_remquo.c sf_round.c \
 	sf_scalbln.c sf_trunc.c
 
