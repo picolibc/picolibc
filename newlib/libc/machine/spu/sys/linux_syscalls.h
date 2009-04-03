@@ -32,9 +32,8 @@ Author: Ken Werner <ken.werner@de.ibm.com>
 
 #ifndef __LINUX_SYSCALLS_H
 #define __LINUX_SYSCALLS_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+#include <sys/types.h>
 
 /* The system call numbers. See kernel source file
    arch/powerpc/include/asm/unistd.h.  */
@@ -294,8 +293,16 @@ struct spu_syscall_block
   unsigned long long parm[6];	/* System call arguments.  */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Issues a Linux system call.  */
 int __linux_syscall (struct spu_syscall_block *s);
+
+/* Linux system calls.  */
+pid_t linux_getpid(void);
+pid_t linux_gettid(void);
 
 #ifdef __cplusplus
 }

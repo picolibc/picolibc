@@ -1,5 +1,10 @@
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libc/machine/spu/sys/linux_syscalls.h: include <sys/types.h>
+	(linux_getpid, linux_gettid): Declare.
+
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libc/machine/spu/spu-gmon.c: Tweaks to support simultaneous SPU
 	profiling.
 
