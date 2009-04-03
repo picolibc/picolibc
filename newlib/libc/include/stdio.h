@@ -612,6 +612,8 @@ FILE *_EXFUN(_fopencookie_r,(struct _reent *, void *__cookie,
 #define _ELIDABLE_INLINE __inline__
 #endif
 
+_ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p);
+
 _ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p)
   {
     int __c = __sgetc_raw_r(__ptr, __p);
