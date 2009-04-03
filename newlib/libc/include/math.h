@@ -97,7 +97,7 @@ extern double floor _PARAMS((double));
 /* Non reentrant ANSI C functions.  */
 
 #ifndef _REENT_ONLY
-#ifndef __math_6881
+#ifndef __math_68881
 extern double acos _PARAMS((double));
 extern double asin _PARAMS((double));
 extern double atan2 _PARAMS((double, double));
@@ -232,7 +232,6 @@ extern long int lround _PARAMS((double));
 extern long long int llround _PARAMS((double));
 extern double trunc _PARAMS((double));
 extern double remquo _PARAMS((double, double, int *));
-extern double copysign _PARAMS((double, double));
 extern double fdim _PARAMS((double, double));
 extern double fmax _PARAMS((double, double));
 extern double fmin _PARAMS((double, double));
@@ -301,7 +300,6 @@ extern long int lroundf _PARAMS((float));
 extern long long int llroundf _PARAMS((float));
 extern float truncf _PARAMS((float));
 extern float remquof _PARAMS((float, float, int *));
-extern float copysignf _PARAMS((float, float));
 extern float fdimf _PARAMS((float, float));
 extern float fmaxf _PARAMS((float, float));
 extern float fminf _PARAMS((float, float));
@@ -337,9 +335,11 @@ extern float hypotf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
 
 /* Other long double precision functions.  */
+#ifdef __i386__
 extern _LONG_DOUBLE rintl _PARAMS((_LONG_DOUBLE));
 extern long int lrintl _PARAMS((_LONG_DOUBLE));
 extern _LONG_LONG_TYPE llrintl _PARAMS((_LONG_DOUBLE));
+#endif /* __i386__ */
 
 #endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L */
 

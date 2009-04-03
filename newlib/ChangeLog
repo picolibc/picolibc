@@ -1,3 +1,8 @@
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/include/math.h: Remove duplicate copysign prototype.
+	Fix __math_68881 define typo.  Guard functions of the rint family.
+
 2009-04-03  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/common/s_llrint.c: New file, implementing llrint().
