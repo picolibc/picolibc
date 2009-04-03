@@ -41,8 +41,13 @@ __ea void *mmap_ea (__ea void *start, size_ea_t length, int prot, int
              flags, int fd, off_t offset)
 {
 #ifdef __EA64__
-  return (__ea void *) mmap_eaddr ((unsigned long long) start, length,
-                                   prot, flags, fd, offset);
+  if (length > 0xffffffffULL) {
+    errno = ENOMEM;
+    return MAP_FAILED_EADDR;
+  } else {
+    return (__ea void *) mmap_eaddr ((unsigned long long) start,
+                                     (size_t) length, prot, flags, fd, offset);
+  }
 #else /* __EA32__ */
   unsigned long long res;
   /*

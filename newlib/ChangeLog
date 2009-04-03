@@ -1,5 +1,9 @@
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libc/machine/spu/mmap_ea.c (mmap_ea): Check length argument.
+
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libc/machine/spu/sys/linux_syscalls.h: include <sys/types.h>
 	(linux_getpid, linux_gettid): Declare.
 
