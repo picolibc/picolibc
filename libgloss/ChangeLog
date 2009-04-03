@@ -1,8 +1,15 @@
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 
+	* spu/Makefile.in: Add new files.
+	* spu/times.c: New File.
+	* spu/getitimer.c: Likewise.
+	* spu/setitimer.c: Likewise.
+
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
 	* spu/Makefile.in: Add linux_getpid.o and linux_gettid.o.
 	* spu/linux_getpid.c: New file.
-	* spu/linux_getpid.c: New file.
+	* spu/linux_gettid.c: New file.
 
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 

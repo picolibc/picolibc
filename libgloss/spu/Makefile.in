@@ -63,7 +63,8 @@ OBJS = \
 	munmap_eaddr.o nanosleep.o open.o pread.o pwrite.o read.o readlink.o \
 	readv.o rmdir.o sbrk.o sched_yield.o shm_open.o shm_unlink.o stat.o \
 	symlink.o sync.o syscalls.o truncate.o umask.o unlink.o utime.o utimes.o \
-	write.o writev.o linux_getpid.o linux_gettid.o
+	write.o writev.o linux_getpid.o linux_gettid.o times.o getitimer.o \
+	setitimer.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}
