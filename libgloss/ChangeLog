@@ -1,3 +1,7 @@
+2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/crt0.S (_start): Place spu_id in the first agument register.
+
 2009-03-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* m32r/m32r-stub.c: Replace with one from newer version of gdb.
