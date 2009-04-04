@@ -1,3 +1,8 @@
+2009-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/stdio.h (_ELIDABLE_INLINE): Move definition from here...
+	* libc/include/_ansi.h (_ELIDABLE_INLINE): ..to here.
+
 2009-04-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/stdio.h [__SCLE] (__sgetc_r): Prototype before define
