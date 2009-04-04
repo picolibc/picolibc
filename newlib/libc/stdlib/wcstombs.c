@@ -7,13 +7,13 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-	int wcstombs(const char *<[s]>, wchar_t *<[pwc]>, size_t <[n]>);
+	int wcstombs(char *<[s]>, const wchar_t *<[pwc]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
 	int wcstombs(<[s]>, <[pwc]>, <[n]>)
-	const char *<[s]>;
-	wchar_t *<[pwc]>;
+	char *<[s]>;
+	const wchar_t *<[pwc]>;
 	size_t <[n]>;
 
 DESCRIPTION
