@@ -1,3 +1,11 @@
+2009-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/asm/byteorder.h (__ntohl): Prototype before define to avoid
+	a warning with -Wmissing-prototypes.  Use _ELIDABLE_INLINE macro from
+	_ansi.h.
+	(__ntohs): Ditto.
+
 2009-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (build_env): Fix length calculation of resulting
