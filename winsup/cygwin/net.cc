@@ -14,6 +14,12 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
+
+/* unfortunately defined in windows header file but used in
+   cygwin header files too */
+#undef NOERROR
+#undef DELETE
+
 #include "miscfuncs.h"
 #include <ctype.h>
 #include <wchar.h>

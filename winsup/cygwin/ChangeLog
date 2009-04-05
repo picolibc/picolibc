@@ -1,3 +1,10 @@
+2009-04-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* net.cc: Undefine NOERROR and DELETE to avoid compiler warnings.
+	* shared_info.h (CURR_SHARED_MAGIC): Update.
+	* spawn.cc (spawn_guts): Avoid copying one line command line argument
+	if it hasn't been filled out.
+
 2009-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

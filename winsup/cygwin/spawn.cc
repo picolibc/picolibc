@@ -417,7 +417,10 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 	VerifyHandle (moreinfo->myself_pinfo);
     }
   WCHAR wone_line[one_line.ix + 1];
-  sys_mbstowcs (wone_line, one_line.ix + 1, one_line.buf);
+  if (one_line.ix)
+    sys_mbstowcs (wone_line, one_line.ix + 1, one_line.buf);
+  else
+    wone_line[0] = L'\0';
 
   PROCESS_INFORMATION pi;
   pi.hProcess = pi.hThread = NULL;
