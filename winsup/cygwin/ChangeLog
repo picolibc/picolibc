@@ -1,5 +1,14 @@
 2009-04-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* Makefile.in: Use all compile options when calculating magic values.
+	* shared_info.h (CURR_SHARED_MAGIC): Revert erroneous value.
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+
+	* fhandler.h (acquire_output_mutex): Remove unneeded ';'.
+	(release_output_mutex): Ditto.
+
+2009-04-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* net.cc: Undefine NOERROR and DELETE to avoid compiler warnings.
 	* shared_info.h (CURR_SHARED_MAGIC): Update.
 	* spawn.cc (spawn_guts): Avoid copying one line command line argument

@@ -790,10 +790,10 @@ class fhandler_serial: public fhandler_base
 };
 
 #define acquire_output_mutex(ms) \
-  __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms);
+  __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms)
 
 #define release_output_mutex() \
-  __release_output_mutex (__PRETTY_FUNCTION__, __LINE__);
+  __release_output_mutex (__PRETTY_FUNCTION__, __LINE__)
 
 class tty;
 class tty_min;
