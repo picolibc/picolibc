@@ -261,7 +261,7 @@ Unicode character.</para>
 
 </sect2>
 
-<sect2 id="setup-locale-problems"><title>Potential Problems</title>
+<sect2 id="setup-locale-problems"><title>Potential Problems when using Locales</title>
 
 <para>
 You can set the above internationalization variables not only in
