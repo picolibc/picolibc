@@ -403,9 +403,8 @@ oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     SJIS                    932 (ANSI/OEM Japanese)
     GBK                     936 (ANSI/OEM Simplified Chinese)
     Big5                    950 (ANSI/OEM Traditional Chinese)
-    JIS                   50220 (ISO2022 Japanese w/o halfwidth Katakana)
-    eucJP                 51932 (EUC Japanese)
-    eucKR                 51949 (EUC Korean)
+    eucJP                 20932 (EUC Japanese)
+    eucKR                   949 (EUC Korean)
 
     UTF-8                 65001 (UTF-8)
 </screen>
