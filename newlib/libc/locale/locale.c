@@ -468,7 +468,7 @@ loadlocale(struct _reent *p, int category)
       if (!strcmp (charset, "EUCJP") || !strcmp (charset, "eucJP"))
 	{
 	  strcpy (charset, "EUCJP");
-	  mbc_max = 2;
+	  mbc_max = 3;
 #ifdef _MB_CAPABLE
 	  l_wctomb = __eucjp_wctomb;
 	  l_mbtowc = __eucjp_mbtowc;

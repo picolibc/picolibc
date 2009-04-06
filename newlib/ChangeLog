@@ -1,3 +1,7 @@
+2009-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Set mbc_max to 3 for EUCJP.
+
 2009-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcstombs.c: Fix datatypes in documentation.
