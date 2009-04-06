@@ -1,3 +1,7 @@
+2009-04-06  Mike Burgess  <wizardsguild@earthlink.net>
+
+	* libc/string/strncasecmp.c: Optimized rewrite.
+
 2009-04-06  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/include/sys/features.h: Undefine _POSIX_TIMERS for spu.

@@ -49,16 +49,15 @@ _DEFUN (strncasecmp, (s1, s2, n),
 	_CONST char *s2 _AND
 	size_t n)
 {
-  if (n == 0)
-    return 0;
-
-  while (n-- != 0 && tolower(*s1) == tolower(*s2))
+  _CONST unsigned char *ucs1 = (_CONST unsigned char *) s1;
+  _CONST unsigned char *ucs2 = (_CONST unsigned char *) s2;
+  int d = 0;
+  for ( ; n != 0; n--)
     {
-      if (n == 0 || *s1 == '\0' || *s2 == '\0')
-	break;
-      s1++;
-      s2++;
+      _CONST int c1 = tolower(*ucs1++);
+      _CONST int c2 = tolower(*ucs2++);
+      if (((d = c1 - c2) != 0) || (c2 == '\0'))
+        break;
     }
-
-  return tolower(*(unsigned char *) s1) - tolower(*(unsigned char *) s2);
+  return d;
 }
