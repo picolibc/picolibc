@@ -1,3 +1,7 @@
+2009-04-06  Earl Chew <earl_chew@agilent.com>
+
+	* libc/rexec.cc (ruserpass): Use fstat64 instead of fstat.
+
 2009-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strfuncs.cc: Add comment to explain why we can't support JIS
