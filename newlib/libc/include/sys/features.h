@@ -170,11 +170,6 @@ extern "C" {
 #endif /* !__STRICT_ANSI__ || __cplusplus || __STDC_VERSION__ >= 199901L */
 #endif /* __CYGWIN__ */
 
-#ifdef __SPU__
-/* Not much for now! */
-#define _POSIX_TIMERS				     1
-#endif
-
 #ifdef __cplusplus
 }
 #endif

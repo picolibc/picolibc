@@ -1,3 +1,8 @@
+2009-04-06  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/include/sys/features.h: Undefine _POSIX_TIMERS for spu.
+	* libc/include/machine/time.h (nanosleep): Declare.
+
 2009-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Set mbc_max to 3 for EUCJP.
