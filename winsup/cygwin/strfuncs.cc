@@ -22,11 +22,17 @@ details. */
 #include "cygheap.h"
 #include "tls_pbuf.h"
 
-/* The SJIS, JIS and EUCJP conversion in newlib does not use UTF as
+/* The SJIS, JIS and eucJP conversion in newlib does not use UTF as
    wchar_t character representation.  That's unfortunate for us since
    we require UTF for the OS.  What we do here is to have our own
    implementation of the base functions for the conversion using
    the MulitByteToWideChar/WideCharToMultiByte functions. */
+
+/* FIXME: We can't support JIS (ISO-2022-JP) at all right now.  It's a
+   stateful charset encoding.  The translation from mbtowc to
+   MulitByteToWideChar is quite complex.  Given that we support SJIS and
+   eucJP, the both most used Japanese charset encodings, this shouldn't
+   be such a big problem. */
 
 /* GBK, eucKR, and Big5 conversions are not available so far in newlib. */
 
@@ -43,8 +49,8 @@ __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
     }
 
   BOOL def_used = false;
-  int ret = WideCharToMultiByte (cp, cp > 50000 ? 0 : WC_NO_BEST_FIT_CHARS,
-				 &wchar, 1, s, MB_CUR_MAX, NULL, &def_used);
+  int ret = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS, &wchar, 1, s,
+				 MB_CUR_MAX, NULL, &def_used);
   if (ret > 0 && !def_used)
     return ret;
 
@@ -59,18 +65,59 @@ __sjis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
   return __db_wctomb (r,s, wchar, 932);
 }
 
+extern "C" int __ascii_wctomb (struct _reent *, char *, wchar_t, const char *,
+			       mbstate_t *);
 extern "C" int
 __jis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
 {
-  return __db_wctomb (r,s, wchar, 50220);
+  /* FIXME: See comment at start of file. */
+  return __ascii_wctomb (r, s, wchar, charset, state);
 }
 
 extern "C" int
 __eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
 {
-  return __db_wctomb (r,s, wchar, 51932);
+  /* Unfortunately, the Windows eucJP codepage 20932 is not really 100%
+     compatible to eucJP.  It's a cute approximation which makes it a
+     doublebyte codepage.
+     The JIS-X-0212 three byte codes (0x8f,0xa1-0xfe,0xa1-0xfe) are folded
+     into two byte codes as follows: The 0x8f is stripped, the next byte is
+     taken as is, the third byte is mapped into the lower 7-bit area by
+     masking it with 0x7f.  So, for instance, the eucJP code 0x8f,0xdd,0xf8
+     becomes 0xdd,0x78 in CP 20932.
+
+     To be really eucJP compatible, we have to map the JIS-X-0212 characters
+     between CP 20932 and eucJP ourselves. */
+  if (s == NULL)
+    return 0;
+
+  if (wchar < 0x80)
+    {
+      *s = (char) wchar;
+      return 1;
+    }
+
+  BOOL def_used = false;
+  int ret = WideCharToMultiByte (20932, WC_NO_BEST_FIT_CHARS, &wchar, 1, s,
+				 MB_CUR_MAX, NULL, &def_used);
+  if (ret > 0 && !def_used)
+    {
+      /* CP20932 representation of JIS-X-0212 character? */
+      if (ret == 2 && (unsigned char) s[1] <= 0x7f)
+	{
+	  /* Yes, convert to eucJP three byte sequence */
+	  s[2] = s[1] | 0x80;
+	  s[1] = s[0];
+	  s[0] = 0x8f;
+	  ++ret;
+	}
+      return ret;
+    }
+
+  r->_errno = EILSEQ;
+  return -1;
 }
 
 extern "C" int
@@ -84,7 +131,7 @@ extern "C" int
 __kr_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
 {
-  return __db_wctomb (r,s, wchar, 51949);
+  return __db_wctomb (r,s, wchar, 949);
 }
 
 extern "C" int
@@ -95,21 +142,20 @@ __big5_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 }
 
 static int
-__db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	     UINT cp, mbstate_t *state)
+__db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
+	     mbstate_t *state)
 {
   wchar_t dummy;
-  char buf[2];
   int ret;
-  
-  if (pwc == NULL)
-    pwc = &dummy;
 
   if (s == NULL)
     return 0;  /* not state-dependent */
 
   if (n == 0)
     return -2;
+  
+  if (pwc == NULL)
+    pwc = &dummy;
 
   if (state->__count == 0)
     {
@@ -118,44 +164,35 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	  *pwc = *(unsigned char *) s;
 	  return *s ? 1 : 0;
 	}
-      ret = MultiByteToWideChar (cp, cp > 50000 ? 0 : MB_ERR_INVALID_CHARS,
-				 s, 2, pwc, 1);
+      size_t cnt = min (n, 2);
+      ret = MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1);
       if (ret)
-	return *s ? 2 : 0;
+	return cnt;
       if (n == 1)
 	{
-	  state->__count = 1;
+	  state->__count = n;
 	  state->__value.__wchb[0] = *s;
 	  return -2;
 	}
-      else
-	{
-	  /* These Win32 functions are really crappy.  Assuming n is 2
-	     but the first byte is a singlebyte charcode, the function
-	     does not convert that byte and return 1, rather it just
-	     returns 0.  So, what we do here is to check if the first
-	     byte returns a valid value... */
-	  ret = MultiByteToWideChar (cp,
-				     cp > 50000 ? 0 : MB_ERR_INVALID_CHARS,
-				     s, 1, pwc, 1);
-	  if (ret)
-	    return *s ? 1 : 0;
-	}
+      /* These Win32 functions are really crappy.  Assuming n is 2 but the
+	 first byte is a singlebyte charcode, the function does not convert
+	 that byte and return 1, rather it just returns 0.  So, what we do
+	 here is to check if the first byte returns a valid value... */
+      else if (MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS, s, 1, pwc, 1))
+	return 1;
       r->_errno = EILSEQ;
       return -1;
     }
-  if (!*s)
-    return -2;
-  buf[0] = state->__value.__wchb[0];
-  buf[1] = *s;
-  ret = MultiByteToWideChar (cp, cp > 50000 ? 0 : MB_ERR_INVALID_CHARS,
-			     buf, 2, pwc, 1);
+  state->__value.__wchb[state->__count] = *s;
+  ret = MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS,
+			     (const char *) state->__value.__wchb, 2, pwc, 1);
   if (!ret)
     {
       r->_errno = EILSEQ;
       return -1;
     }
-  return ret;
+  state->__count = 0;
+  return 1;
 }
 
 extern "C" int
@@ -169,14 +206,85 @@ extern "C" int
 __jis_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	       const char *charset, mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 50220, state);
+  /* FIXME: See comment at start of file. */
+  return __ascii_mbtowc (r, pwc, s, n, charset, state);
 }
 
 extern "C" int
 __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
+		const char *charset, mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 51932, state);
+  /* See comment in __eucjp_wctomb above. */
+  wchar_t dummy;
+  int ret = 0;
+
+  if (s == NULL)
+    return 0;  /* not state-dependent */
+
+  if (n == 0)
+    return -2;
+  
+  if (pwc == NULL)
+    pwc = &dummy;
+
+  if (state->__count == 0)
+    {
+      if (*(unsigned char *) s < 0x80)
+	{
+	  *pwc = *(unsigned char *) s;
+	  return *s ? 1 : 0;
+	}
+      if (*(unsigned char *) s == 0x8f)	/* JIS-X-0212 lead byte? */
+	{
+	  /* Yes.  Store sequence in mbstate and handle in the __count != 0
+	     case at the end of the function. */
+	  size_t i;
+	  for (i = 0; i < 3 && i < n; i++)
+	    state->__value.__wchb[i] = s[i];
+	  if ((state->__count = i) < 3)	/* Incomplete sequence? */
+	    return -2;
+	  ret = 3;
+	  goto jis_x_0212;
+	}
+      size_t cnt = min (n, 2);
+      if (MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1))
+	return cnt;
+      if (n == 1)
+	{
+	  state->__count = 1;
+	  state->__value.__wchb[0] = *s;
+	  return -2;
+	}
+      else if (MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS, s, 1, pwc, 1))
+	return 1;
+      r->_errno = EILSEQ;
+      return -1;
+    }
+  state->__value.__wchb[state->__count++] = *s;
+  ret = 1;
+jis_x_0212:
+  if (state->__value.__wchb[0] == 0x8f)
+    {
+      if (state->__count == 2)
+	{
+	  if (n == 1)
+	    return -2;
+	  state->__value.__wchb[state->__count] = s[1];
+	  ret = 2;
+	}
+      /* Ok, we have a full JIS-X-0212 sequence in mbstate.  Convert it
+	 to the CP 20932 representation and feed it to MultiByteToWideChar. */
+      state->__value.__wchb[0] = state->__value.__wchb[1];
+      state->__value.__wchb[1] = state->__value.__wchb[2] & 0x7f;
+    }
+  if (!MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS,
+			    (const char *) state->__value.__wchb, 2, pwc, 1))
+    {
+      r->_errno = EILSEQ;
+      return -1;
+    }
+  state->__count = 0;
+  return ret;
 }
 
 extern "C" int
@@ -190,7 +298,7 @@ extern "C" int
 __kr_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	       const char *charset, mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 51949, state);
+  return __db_mbtowc (r, pwc, s, n, 949, state);
 }
 
 extern "C" int
@@ -265,6 +373,7 @@ __set_charset_from_codepage (UINT cp, char *charset)
     case 50220:
       strcpy (charset, "JIS");
       return __jis_mbtowc;
+    case 20932:
     case 51932:
       strcpy (charset, "EUCJP");
       return __eucjp_mbtowc;

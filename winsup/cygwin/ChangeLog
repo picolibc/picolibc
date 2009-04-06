@@ -1,3 +1,23 @@
+2009-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* strfuncs.cc: Add comment to explain why we can't support JIS
+	for now.
+	(__db_wctomb): Alwaus use WC_NO_BEST_FIT_CHARS.
+	(__jis_wctomb): Just call __ascii_wctomb from here.
+	(__eucjp_wctomb): Convert to standalone implementation to fix up the
+	difference between eucJP and CP 20932 affecting JIS-X-0212 characters.
+	Explain.
+	(__kr_wctomb): Use codepage 949.
+	(__db_mbtowc): Reorder code slightly.  Always use MB_ERR_INVALID_CHARS
+	in call to MultiByteToWideChar.  Fix a problem with singlebyte
+	sequences.  Fix a bug in '\0' handling.  Reset state->__count on
+	successful return from non-zero state.
+	(__jis_mbtowc): Just call __ascii_mbtowc from here.
+	(__eucjp_mbtowc): Convert to standalone implementation to fix up the
+	difference between eucJP and CP 20932 affecting JIS-X-0212 characters.
+	(__kr_mbtowc): Use codepage 949.
+	(__set_charset_from_codepage): Handle codepage 20932 as eucJP.
+
 2009-04-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in: Use all compile options when calculating magic values.
