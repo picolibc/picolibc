@@ -1,5 +1,20 @@
 2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/stdint.h (int_least32_t): Define as int.
+	(uint_least32_t): Ditto, unsigned.
+	(int_fast16_t): Define as int.
+	(int_fast32_t): Ditto.
+	(uint_fast16_t): Ditto, unsigned.
+	(uint_fast32_t): Ditto.
+	(UINT32_MAX): Remove `L' long marker.
+	(UINT_LEAST32_MAX): Ditto.
+	(UINT_FAST16_MAX): Ditto.
+	(UINT_FAST32_MAX): Ditto.
+	(INT32_C): Ditto.
+	(UINT32_C): Ditto.
+
+2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* strfuncs.cc: Change WCHAR to wchar_t in multibyte<->widechar
 	conversion functions throughout.
 	* wchar.h: Ditto in declarations.  Guard them __INSIDE_CYGWIN__.

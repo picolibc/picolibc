@@ -33,24 +33,24 @@ typedef unsigned long long uint64_t;
 
 typedef signed char int_least8_t;
 typedef short int_least16_t;
-typedef long int_least32_t;
+typedef int int_least32_t;
 typedef long long int_least64_t;
 
 typedef unsigned char uint_least8_t;
 typedef unsigned short uint_least16_t;
-typedef unsigned long uint_least32_t;
+typedef unsigned int uint_least32_t;
 typedef unsigned long long uint_least64_t;
 
 /* Fastest minimum-width integer types */
 
 typedef signed char int_fast8_t;
-typedef long int_fast16_t;
-typedef long int_fast32_t;
+typedef int int_fast16_t;
+typedef int int_fast32_t;
 typedef long long int_fast64_t;
 
 typedef unsigned char uint_fast8_t;
-typedef unsigned long uint_fast16_t;
-typedef unsigned long uint_fast32_t;
+typedef unsigned int uint_fast16_t;
+typedef unsigned int uint_fast32_t;
 typedef unsigned long long uint_fast64_t;
 
 /* Integer types capable of holding object pointers */
@@ -80,7 +80,7 @@ typedef unsigned long long uintmax_t;
 
 #define UINT8_MAX (255)
 #define UINT16_MAX (65535)
-#define UINT32_MAX (4294967295UL)
+#define UINT32_MAX (4294967295U)
 #define UINT64_MAX (18446744073709551615ULL)
 
 /* Limits of minimum-width integer types */
@@ -97,7 +97,7 @@ typedef unsigned long long uintmax_t;
 
 #define UINT_LEAST8_MAX (255)
 #define UINT_LEAST16_MAX (65535)
-#define UINT_LEAST32_MAX (4294967295UL)
+#define UINT_LEAST32_MAX (4294967295U)
 #define UINT_LEAST64_MAX (18446744073709551615ULL)
 
 /* Limits of fastest minimum-width integer types */
@@ -113,8 +113,8 @@ typedef unsigned long long uintmax_t;
 #define INT_FAST64_MAX (9223372036854775807LL)
 
 #define UINT_FAST8_MAX (255)
-#define UINT_FAST16_MAX (4294967295UL)
-#define UINT_FAST32_MAX (4294967295UL)
+#define UINT_FAST16_MAX (4294967295U)
+#define UINT_FAST32_MAX (4294967295U)
 #define UINT_FAST64_MAX (18446744073709551615ULL)
 
 /* Limits of integer types capable of holding object pointers */
@@ -166,12 +166,12 @@ typedef unsigned long long uintmax_t;
 
 #define INT8_C(x) x
 #define INT16_C(x) x
-#define INT32_C(x) x ## L
+#define INT32_C(x) x
 #define INT64_C(x) x ## LL
 
 #define UINT8_C(x) x
 #define UINT16_C(x) x
-#define UINT32_C(x) x ## UL
+#define UINT32_C(x) x ## U
 #define UINT64_C(x) x ## ULL
 
 /* Macros for greatest-width integer constant expressions */
