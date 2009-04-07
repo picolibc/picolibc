@@ -183,7 +183,7 @@ readlink (HANDLE fh, char *path, int maxlen)
 
   if (!GetFileInformationByHandle (fh, &fi)
       || fi.nFileSizeHigh != 0
-      || fi.nFileSizeLow > 8192)
+      || fi.nFileSizeLow > 4 * 65536)
     return false;
 
   buf = (char *) alloca (fi.nFileSizeLow + 1);
@@ -211,17 +211,35 @@ readlink (HANDLE fh, char *path, int maxlen)
           len = *(unsigned short *) cp;
           cp += 2;
         }
-      if (len + 1 > maxlen)
+      if (*(PWCHAR) cp == 0xfeff)	/* BOM */
+	{
+	  len = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
+	  if (len == (size_t) -1 || len + 1 > maxlen)
+	    return false;
+	  wcstombs (path, (wchar_t *) (cp + 2), len + 1);
+	}
+      else if (len + 1 > maxlen)
         return false;
-      memcpy (path, cp, len);
+      else
+	memcpy (path, cp, len);
       path[len] = '\0';
       return true;
     }
   else if (strncmp (buf, SYMLINK_COOKIE, strlen (SYMLINK_COOKIE)) == 0
-           && fi.nFileSizeLow - strlen (SYMLINK_COOKIE) <= (unsigned) maxlen
            && buf[fi.nFileSizeLow - 1] == '\0')
     {
-      strcpy (path, &buf[strlen (SYMLINK_COOKIE)]);
+      cp = buf + strlen (SYMLINK_COOKIE);
+      if (*(PWCHAR) cp == 0xfeff)	/* BOM */
+	{
+	  len = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
+	  if (len == (size_t) -1 || len + 1 > maxlen)
+	    return false;
+	  wcstombs (path, (wchar_t *) (cp + 2), len + 1);
+	}
+      else if (fi.nFileSizeLow - strlen (SYMLINK_COOKIE) > (unsigned) maxlen)
+	return false;
+      else
+	strcpy (path, cp);
       return true;
     }      
   else
