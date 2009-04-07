@@ -44,30 +44,32 @@ extern mbtowc_p __set_charset_from_codepage (unsigned int cp, char *charset);
 }
 #endif
 
+#ifdef __INSIDE_CYGWIN__
 size_t __stdcall sys_cp_wcstombs (wctomb_p, char *, char *, size_t,
-				  const PWCHAR, size_t = (size_t) -1)
+				  const wchar_t *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 inline size_t
-__stdcall sys_wcstombs (char *dst, size_t len, const PWCHAR src,
+__stdcall sys_wcstombs (char *dst, size_t len, const wchar_t * src,
 			size_t nwc = (size_t) -1)
 {
   return sys_cp_wcstombs (__wctomb, __locale_charset (), dst, len, src, nwc);
 }
-size_t __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR,
+size_t __stdcall sys_wcstombs_alloc (char **, int, const wchar_t *,
 				     size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 
-size_t __stdcall sys_cp_mbstowcs (mbtowc_p, char *, PWCHAR, size_t,
+size_t __stdcall sys_cp_mbstowcs (mbtowc_p, char *, wchar_t *, size_t,
 				  const char *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 inline size_t
-sys_mbstowcs (PWCHAR dst, size_t dlen, const char *src,
+sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
 	      size_t nms = (size_t) -1)
 {
   return sys_cp_mbstowcs (__mbtowc, __locale_charset (), dst, dlen, src, nms);
 }
-size_t __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *,
+size_t __stdcall sys_mbstowcs_alloc (wchar_t **, int, const char *,
 				     size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
+#endif /* __INSIDE_CYGWIN__ */
 
 #endif /* _CYGWIN_WCHAR_H */

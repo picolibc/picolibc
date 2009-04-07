@@ -1,5 +1,11 @@
 2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc: Change WCHAR to wchar_t in multibyte<->widechar
+	conversion functions throughout.
+	* wchar.h: Ditto in declarations.  Guard them __INSIDE_CYGWIN__.
+
+2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class dev_console): Add members con_mbtowc, con_wctomb,
 	and con_charset.
 	(dev_console::str_to_con): Take mbtowc function pointer and charset

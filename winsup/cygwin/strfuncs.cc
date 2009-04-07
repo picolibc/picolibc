@@ -409,7 +409,7 @@ __set_charset_from_codepage (UINT cp, char *charset)
      and the buffer in the calling function should be raised. */
 size_t __stdcall
 sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
-		 const PWCHAR src, size_t nwc)
+		 const wchar_t *src, size_t nwc)
 {
   char buf[10];
   char *ptr = dst;
@@ -487,7 +487,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
    __small_vsprintf) and so when built there plain calloc is the
    only choice.  */
 size_t __stdcall
-sys_wcstombs_alloc (char **dst_p, int type, const PWCHAR src, size_t nwc)
+sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src, size_t nwc)
 {
   size_t ret;
 
@@ -513,7 +513,7 @@ sys_wcstombs_alloc (char **dst_p, int type, const PWCHAR src, size_t nwc)
    charset, which is the charset returned by GetConsoleCP ().  Most of the
    time this is used for box and line drawing characters. */
 size_t __stdcall
-sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, PWCHAR dst, size_t dlen,
+sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 		 const char *src, size_t nms)
 {
   wchar_t *ptr = dst;
@@ -593,7 +593,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, PWCHAR dst, size_t dlen,
 
 /* Same as sys_wcstombs_alloc, just backwards. */
 size_t __stdcall
-sys_mbstowcs_alloc (PWCHAR *dst_p, int type, const char *src, size_t nms)
+sys_mbstowcs_alloc (wchar_t **dst_p, int type, const char *src, size_t nms)
 {
   size_t ret;
 
@@ -603,9 +603,10 @@ sys_mbstowcs_alloc (PWCHAR *dst_p, int type, const char *src, size_t nms)
       size_t dlen = ret + 1;
 
       if (type == HEAP_NOTHEAP)
-	*dst_p = (PWCHAR) calloc (dlen, sizeof (WCHAR));
+	*dst_p = (wchar_t *) calloc (dlen, sizeof (wchar_t));
       else
-	*dst_p = (PWCHAR) ccalloc ((cygheap_types) type, dlen, sizeof (WCHAR));
+	*dst_p = (wchar_t *) ccalloc ((cygheap_types) type, dlen,
+				      sizeof (wchar_t));
       if (!*dst_p)
 	return 0;
       ret = sys_mbstowcs (*dst_p, dlen, src, nms);
@@ -622,7 +623,7 @@ RtlInt64ToHexUnicodeString (ULONGLONG value, PUNICODE_STRING dest,
   USHORT len = append ? dest->Length : 0;
   if (dest->MaximumLength - len < 16 * (int) sizeof (WCHAR))
     return STATUS_BUFFER_OVERFLOW;
-  PWCHAR end = (PWCHAR) ((PBYTE) dest->Buffer + len);
+  wchar_t *end = (PWCHAR) ((PBYTE) dest->Buffer + len);
   register PWCHAR p = end + 16;
   while (p-- > end)
     {
