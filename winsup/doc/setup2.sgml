@@ -261,6 +261,43 @@ Unicode character.</para>
 
 </sect2>
 
+<sect2 id="setup-locale-console"><title>The Windows Console character set</title>
+
+<para>Most of the time the Windows console is used to run Cygwin applications.
+While terminal emulations like <command>xterm</command> or
+<command>mintty</command> have a distinct way to set the character set
+used for in- and output, the Windows console hasn't such a way, since it's
+not an application in its own right.</para>
+
+<para>This problem is solved in Cygwin as follows.  When the first Cygwin
+process is started in a Windows console (either explicitely from cmd.exe,
+or implicitly by, for instance, clicking on the Cygwin desktop icon, or
+running the Cygwin.bat file), the Console character set is determined by the
+setting of the aforementioned internationalization environment variables,
+the same way as described in <xref linkend="setup-locale-how"></xref>.
+</para>
+
+<para>However, in contrast to the application's character set, which is
+determined by the <function>setlocale</function> call, the console
+character set stays fixed for all subsequent Cygwin processes started
+from this first Cygwin process in the console.  So, for instance, if
+<envar>LANG</envar> was set to "en_US.UTF-8" when the first Cygwin process
+started, the console is a UTF-8 terminal for the entire Cygwin process
+tree started from this first Cygwin process.</para>
+
+<para>You're asking "What is that good for?  Why not switch the console
+character set with the applications requirements?  After all, the
+application knows if it uses localization or not."  That's true, but
+what if the non-localized application calls a remote application which
+itself is localized?  This can happen with <command>ssh</command> or
+<command>rlogin</command>.  Both commands don't have and don't need
+localization and they never call <function>setlocale</function>.  This
+would have the unfortunate effect, that the console would run with the
+ASCII character set alone.  Native characters printed from the remote
+application would not show up correctly on your local console.</para>
+
+</sect2>
+
 <sect2 id="setup-locale-problems"><title>Potential Problems when using Locales</title>
 
 <para>
