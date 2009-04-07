@@ -1,3 +1,37 @@
+2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class dev_console): Add members con_mbtowc, con_wctomb,
+	and con_charset.
+	(dev_console::str_to_con): Take mbtowc function pointer and charset
+	as additional parameters.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Initialize
+	aforementioned new members.  Explain why.
+	(dev_console::con_to_str): Remove useless comment.  Call new
+	sys_cp_wcstombs function rather than sys_wcstombs.
+	(dev_console::str_to_con): Take mbtowc function pointer and charset
+	as additional parameters.  Call sys_cp_mbstowcs accordingly.
+	(fhandler_console::write_normal): Only initialize f_mbtowc and charset
+	once.  Accommodate changed str_to_con.
+	* strfuncs.cc (sys_cp_wcstombs): Renamed from sys_wcstombs.  Take
+	wctomb function pointer and charset as parameters.  Use throughout.
+	(sys_cp_mbstowcs): Take wctomb function pointer and charset as
+	parameters instead of codepage.  Remove matching local variables and
+	their initialization.
+	* wchar.h (ENCODING_LEN): Define as in newlib.
+	(__mbtowc): Use mbtowc_p typedef for declaration.
+	(wctomb_f): New type.
+	(wctomb_p): New type.
+	(__wctomb): Declare.
+	(__utf8_wctomb): Use wctomb_f typedef for declaration.
+	(sys_cp_wcstombs): Move declaration from winsup.h here.
+	(sys_wcstombs): Ditto.
+	(sys_wcstombs_alloc): Ditto.
+	(sys_cp_mbstowcs): Ditto.
+	(sys_mbstowcs): Ditto.
+	(sys_mbstowcs_alloc): Ditto.
+	* winsup.h: Move declaration of sys_FOO functions to wchar.h.  Include
+	wchar.h instead.
+
 2009-04-06  Earl Chew <earl_chew@agilent.com>
 
 	* libc/rexec.cc (ruserpass): Use fstat64 instead of fstat.

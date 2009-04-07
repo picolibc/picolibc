@@ -1,7 +1,7 @@
 /* fhandler_console.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008 Red Hat, Inc.
+   2006, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -97,6 +97,25 @@ fhandler_console::get_tty_stuff (int flags = 0)
 	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
       dev_state->set_default_attr ();
       shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
+
+      /* Set the console charset and the mb<->wc conversion functions from
+	 the current locale the first time the shared console info is created.
+	 When this initialization is called, the current locale is the one
+	 used when reading the environment.  This way we get a console setting
+	 which matches the setting of LC_ALL/LC_CTYPE/LANG at the time the
+	 first Cygwin process in this console starts.
+
+	 This has an interesting effect.  If none of the above environment
+	 variables is set, the setting is equivalent to before when
+	 CYGWIN=codepage was not set:  The console charset will be the
+	 default ANSI codepage.  So it's sort of backward compatible.
+
+	 TODO: Find out if that's a feasible approach.  It might be better
+	 in the long run to have a distinct console charset environment
+	 variable. */
+      dev_state->con_mbtowc = __mbtowc;
+      dev_state->con_wctomb = __wctomb;
+      strcpy (dev_state->con_charset, __locale_charset ());
     }
 
   return &shared_console_info->tty_min_state;
@@ -122,13 +141,10 @@ tty_list::get_tty (int n)
     return &nada;
 }
 
-/* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
-   cached, because a program or the user can change these values at
-   any time. */
 inline DWORD
 dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return sys_wcstombs (d, dlen, &w, 1);
+  return sys_cp_wcstombs (con_wctomb, con_charset, d, dlen, &w, 1);
 }
 
 inline UINT
@@ -138,9 +154,10 @@ dev_console::get_console_cp ()
 }
 
 inline DWORD
-dev_console::str_to_con (PWCHAR d, const char *s, DWORD sz)
+dev_console::str_to_con (mbtowc_p f_mbtowc, char *charset,
+			 PWCHAR d, const char *s, DWORD sz)
 {
-  return sys_cp_mbstowcs (get_console_cp (), d, CONVERT_LIMIT, s, sz);
+  return sys_cp_mbstowcs (f_mbtowc, charset, d, CONVERT_LIMIT, s, sz);
 }
 
 bool
@@ -1423,12 +1440,17 @@ fhandler_console::write_normal (const unsigned char *src,
   size_t ret;
   mbstate_t ps;
   UINT cp = dev_state->get_console_cp ();
-  char charsetbuf[32];
-  char *charset = __locale_charset ();
-  mbtowc_p f_mbtowc = __mbtowc;
+  char charsetbuf[ENCODING_LEN + 1];
+  char *charset;
+  mbtowc_p f_mbtowc;
 
   if (cp)
     f_mbtowc = __set_charset_from_codepage (cp, charset = charsetbuf);
+  else
+    {
+      f_mbtowc = dev_state->con_mbtowc;
+      charset = dev_state->con_charset;
+    }
 
   /* First check if we have cached lead bytes of a former try to write
      a truncated multibyte sequence.  If so, process it. */
@@ -1464,7 +1486,7 @@ fhandler_console::write_normal (const unsigned char *src,
       /* Valid multibyte sequence?  Process. */
       if (nfound)
 	{
-	  buf_len = dev_state->str_to_con (write_buf,
+	  buf_len = dev_state->str_to_con (f_mbtowc, charset, write_buf,
 					   (const char *) trunc_buf.buf,
 					   nfound - trunc_buf.buf);
 	  WriteConsoleW (get_output_handle (), write_buf, buf_len, &done, 0);
@@ -1504,7 +1526,8 @@ fhandler_console::write_normal (const unsigned char *src,
   if (found != src)
     {
       DWORD len = found - src;
-      buf_len = dev_state->str_to_con (write_buf, (const char *) src, len);
+      buf_len = dev_state->str_to_con (f_mbtowc, charset, write_buf,
+				       (const char *) src, len);
       if (!buf_len)
 	{
 	  debug_printf ("conversion error, handle %p",

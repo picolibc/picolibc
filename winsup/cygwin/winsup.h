@@ -108,22 +108,6 @@ extern "C" DWORD WINAPI GetLastError (void);
    description see there. */
 #define HEAP_NOTHEAP -1
 
-size_t __stdcall sys_wcstombs (char *, size_t, const PWCHAR, size_t = (size_t) -1)
-  __attribute__ ((regparm(3)));
-size_t __stdcall sys_wcstombs_alloc (char **, int, const PWCHAR, size_t = (size_t) -1)
-  __attribute__ ((regparm(3)));
-
-size_t __stdcall sys_cp_mbstowcs (UINT, PWCHAR, size_t, const char *, size_t = (size_t) -1)
-  __attribute__ ((regparm(3)));
-inline size_t
-sys_mbstowcs (PWCHAR dst, size_t dlen, const char *src,
-	      size_t nms = (size_t) -1)
-{
-  return sys_cp_mbstowcs (0, dst, dlen, src, nms);
-}
-size_t __stdcall sys_mbstowcs_alloc (PWCHAR *, int, const char *, size_t = (size_t) -1)
-  __attribute__ ((regparm(3)));
-
 /* Used to check if Cygwin DLL is dynamically loaded. */
 
 extern int cygserver_running;
@@ -133,6 +117,8 @@ extern int cygserver_running;
 #define TITLESIZE 1024
 
 #include "debug.h"
+
+#include <wchar.h>
 
 /**************************** Convenience ******************************/
 

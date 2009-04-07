@@ -312,9 +312,8 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
    Called from newlib's setlocale() with the current ANSI codepage, if the
    charset isn't given explicitely in the POSIX compatible locale specifier.
    The function also returns a pointer to the corresponding _mbtowc_r
-   function.  This is used below in the sys_cp_mbstowcs function which
-   is called directly from fhandler_console if the "Alternate Charset" has
-   been switched on by an escape sequence. */
+   function.  Also called from fhandler_console::write_normal() if the
+   "Alternate Charset" has been switched on by an escape sequence. */
 extern "C" mbtowc_p
 __set_charset_from_codepage (UINT cp, char *charset)
 {
@@ -409,7 +408,8 @@ __set_charset_from_codepage (UINT cp, char *charset)
      If the result is truncated due to buffer size, it's a bug in Cygwin
      and the buffer in the calling function should be raised. */
 size_t __stdcall
-sys_wcstombs (char *dst, size_t len, const PWCHAR src, size_t nwc)
+sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
+		 const PWCHAR src, size_t nwc)
 {
   char buf[10];
   char *ptr = dst;
@@ -427,13 +427,13 @@ sys_wcstombs (char *dst, size_t len, const PWCHAR src, size_t nwc)
 	 path names) is transform_chars in path.cc. */
       if ((pw & 0xff00) == 0xf000)
 	pw &= 0xff;
-      int bytes = _wctomb_r (_REENT, buf, pw, &ps);
+      int bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
       /* Convert chars invalid in the current codepage to a sequence
          ASCII SO; UTF-8 representation of invalid char. */
-      if (bytes == -1 && *__locale_charset () != 'U'/*TF-8*/)
+      if (bytes == -1 && *charset != 'U'/*TF-8*/)
         {
 	  buf[0] = 0x0e; /* ASCII SO */
-	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, __locale_charset (), &ps);
+	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
 	  if (bytes == -1)
 	    {
 	      ++pwcs;
@@ -450,8 +450,7 @@ sys_wcstombs (char *dst, size_t len, const PWCHAR src, size_t nwc)
 		  ps.__count = 0;
 		  continue;
 		}
-	      bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs,
-				      __locale_charset (), &ps);
+	      bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset, &ps);
 	    }
         }
       if (n + bytes <= len)
@@ -514,7 +513,8 @@ sys_wcstombs_alloc (char **dst_p, int type, const PWCHAR src, size_t nwc)
    charset, which is the charset returned by GetConsoleCP ().  Most of the
    time this is used for box and line drawing characters. */
 size_t __stdcall
-sys_cp_mbstowcs (UINT cp, PWCHAR dst, size_t dlen, const char *src, size_t nms)
+sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, PWCHAR dst, size_t dlen,
+		 const char *src, size_t nms)
 {
   wchar_t *ptr = dst;
   char *pmbs = (char *) src;
@@ -522,12 +522,6 @@ sys_cp_mbstowcs (UINT cp, PWCHAR dst, size_t dlen, const char *src, size_t nms)
   size_t len = dlen;
   int bytes;
   mbstate_t ps;
-  char charsetbuf[32];
-  char *charset = __locale_charset ();
-  mbtowc_p f_mbtowc = __mbtowc;
-
-  if (cp)
-    f_mbtowc = __set_charset_from_codepage (cp, charset = charsetbuf);
 
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
