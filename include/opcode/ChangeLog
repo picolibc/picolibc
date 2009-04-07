@@ -1,3 +1,7 @@
+2009-04-06  DJ Delorie  <dj@redhat.com>
+
+	* h8300.h: Add relaxation attributes to MOVA opcodes.
+
 2009-03-10  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (ppc_parse_cpu): Declare.
