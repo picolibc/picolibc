@@ -11908,8 +11908,8 @@ if test "${libc_cv_array_aliasing+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat > conftest.c <<EOF
-char x3 = { 'a', 'b', 'c' };
-extern char y2 __attribute__((alias ("x+1")));
+char x[3] = { 'a', 'b', 'c' };
+extern char y[2] __attribute__((alias ("x+1")));
 EOF
 if { ac_try='${CC} $CFLAGS $CPPFLAGS -c conftest.c
 		   1>&5'

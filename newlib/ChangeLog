@@ -1,3 +1,8 @@
+2009-04-08  Ken Werner  <ken.werner@de.ibm.com>
+
+	* configure.in: Add square brackets for the array aliasing conftest.
+	* configure: Regenerate.
+
 2009-04-06  Mike Burgess  <wizardsguild@earthlink.net>
 
 	* libc/string/strncasecmp.c: Optimized rewrite.
