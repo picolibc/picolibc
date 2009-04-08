@@ -322,6 +322,9 @@ struct bfd_link_info
   /* TRUE if we should warn when adding a DT_TEXTREL to a shared object.  */
   unsigned int warn_shared_textrel: 1;
 
+  /* TRUE if we should warn alternate ELF machine code.  */
+  unsigned int warn_alternate_em: 1;
+
   /* TRUE if unreferenced sections should be removed.  */
   unsigned int gc_sections: 1;
 

@@ -1,3 +1,7 @@
+2009-04-08  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Add warn_alternate_em.
+
 2009-03-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* alloca-conf.h: Revise based on autoconf-2.61, autoconf-2.13
