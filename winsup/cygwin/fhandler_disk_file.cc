@@ -24,6 +24,7 @@ details. */
 #include "ntdll.h"
 #include "tls_pbuf.h"
 #include "nfs.h"
+#include "pwdgrp.h"
 #include <winioctl.h>
 
 #define _COMPILING_NEWLIB
@@ -870,7 +871,8 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   mode_t attrib = 0;
   if (pc.isdir ())
     attrib |= S_IFDIR;
-  int res = get_file_attribute (get_handle (), pc, &attrib, NULL, NULL);
+  __uid32_t old_uid;
+  int res = get_file_attribute (get_handle (), pc, &attrib, &old_uid, NULL);
   if (!res)
     {
       /* Typical Windows default ACLs can contain permissions for one
@@ -883,6 +885,29 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       if (pc.issymlink ())
 	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
       res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
+      /* If you're running a Samba server which has no winbidd running, the
+         uid<->SID mapping is disfunctional.  Even trying to chown to your
+	 own account fails since the account used on the server is the UNIX
+	 account which gets used for the standard user mapping.  This is a
+	 default mechanism which doesn't know your real Windows SID.
+	 There are two possible error codes in different Samba releases for
+	 this situation, one of them is unfortunately the not very significant
+	 STATUS_ACCESS_DENIED.  Instead of relying on the error codes, we're
+	 using the below very simple heuristic.  If set_file_attribute failed,
+	 and the original user account was either already unknown, or one of
+	 the standard UNIX accounts, we're faking success. */
+      if (res == -1 && pc.fs_is_samba ())
+	{
+	  cygsid sid;
+
+	  if (old_uid == ILLEGAL_UID
+	      || (sid.getfrompw (internal_getpwuid (old_uid))
+		  && EqualPrefixSid (sid, well_known_samba_unix_user_fake_sid)))
+	    {
+	      debug_printf ("Faking chown worked on standalone Samba");
+	      res = 0;
+	    }
+	}
     }
   if (oret)
     close_fs ();

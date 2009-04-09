@@ -1,3 +1,17 @@
+2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Catch an
+	error when changing the user account on a standalone Samba server.
+	Explain why.
+	* sec_acl.cc (setacl): Accommodate additional parameter to set_file_sd.
+	* sec_helper.cc (SECURITY_SAMBA_UNIX_AUTHORITY): Define.
+	(well_known_samba_unix_user_fake_sid): Define.
+	* security.cc (set_file_sd): Take additional parameter if ownership
+	should be changed.  Restrict requested permissions accordingly.
+	(set_file_attribute): Accommodate additional parameter to set_file_sd.
+	* security.h (well_known_samba_unix_user_fake_sid): Declare.
+	(set_file_sd): Align declaration to above change.
+
 2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/stdint.h (int_least32_t): Define as int.

@@ -225,7 +225,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_ret.size ());
-  return set_file_sd (handle, pc, sd_ret);
+  return set_file_sd (handle, pc, sd_ret, false);
 }
 
 /* Temporary access denied bits */

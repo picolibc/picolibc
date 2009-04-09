@@ -327,6 +327,7 @@ extern cygpsid fake_logon_sid;
 extern cygpsid mandatory_medium_integrity_sid;
 extern cygpsid mandatory_high_integrity_sid;
 extern cygpsid mandatory_system_integrity_sid;
+extern cygpsid well_known_samba_unix_user_fake_sid;
 
 bool privilege_luid (const PWCHAR pname, LUID *luid);
 
@@ -345,7 +346,8 @@ int __stdcall set_file_attribute (HANDLE, path_conv &,
 				  __uid32_t, __gid32_t, int);
 int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *);
 LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
-LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
+LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd,
+			    bool is_chown);
 bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 int __stdcall check_file_access (path_conv &, int);

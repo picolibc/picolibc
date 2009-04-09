@@ -67,6 +67,10 @@ MKSID (mandatory_high_integrity_sid, "S-1-16-12288",
        SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_HIGH_RID);
 MKSID (mandatory_system_integrity_sid, "S-1-16-16384",
        SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_SYSTEM_RID);
+/* UNIX accounts on a Samba server have the SID prefix "S-1-22-1" */
+#define SECURITY_SAMBA_UNIX_AUTHORITY {0,0,0,0,0,22}
+MKSID (well_known_samba_unix_user_fake_sid, "S-1-22-1-0",
+       SECURITY_SAMBA_UNIX_AUTHORITY, 2, 1, 0);
 
 bool
 cygpsid::operator== (const char *nsidstr) const

@@ -83,7 +83,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 }
 
 LONG
-set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
+set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
 {
   NTSTATUS status = STATUS_SUCCESS;
   int retry = 0;
@@ -93,7 +93,10 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
     {
       if (fh)
 	{
-	  status = NtSetSecurityObject (fh, ALL_SECURITY_INFORMATION, sd);
+	  status = NtSetSecurityObject (fh,
+					is_chown ? ALL_SECURITY_INFORMATION
+						 : DACL_SECURITY_INFORMATION,
+					sd);
 	  if (NT_SUCCESS (status))
 	    {
 	      res = 0;
@@ -104,8 +107,7 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	{
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
-
-	  status = NtOpenFile (&fh, WRITE_OWNER | WRITE_DAC,
+	  status = NtOpenFile (&fh, (is_chown ? WRITE_OWNER  : 0) | WRITE_DAC,
 			       pc.get_object_attr (attr, sec_none_nih),
 			       &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT
@@ -712,7 +714,8 @@ set_file_attribute (HANDLE handle, path_conv &pc,
 
       if (!get_file_sd (handle, pc, sd)
 	  && alloc_sd (pc, uid, gid, attribute, sd))
-	ret = set_file_sd (handle, pc, sd);
+	ret = set_file_sd (handle, pc, sd,
+			   uid != ILLEGAL_UID || gid != ILLEGAL_GID);
     }
   else
     ret = 0;
