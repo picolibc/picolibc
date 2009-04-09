@@ -1,3 +1,8 @@
+2009-04-09  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* configure.ac: Bump minimum GMP/MPFR versions to 4.2 and 2.3.1.
+	* configure: Regenerate.
+
 2009-04-09  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR gas/10039
