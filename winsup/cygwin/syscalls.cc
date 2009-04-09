@@ -153,14 +153,13 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   PFILE_NAME_INFORMATION pfni;
   PFILE_INTERNAL_INFORMATION pfii;
   PFILE_RENAME_INFORMATION pfri;
-  /* Enforce alignment for multi-purpose infobuf buffer */
-  BYTE infobuf[sizeof (FILE_NAME_INFORMATION) + 32767 * sizeof (WCHAR)]
-	__attribute__ ((aligned));
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
 
+  tmp_pathbuf tp;
+  PBYTE infobuf = (PBYTE) tp.w_get ();
+
   pfni = (PFILE_NAME_INFORMATION) infobuf;
-  status = NtQueryInformationFile (fh, &io, pfni, sizeof infobuf,
-				   FileNameInformation);
+  status = NtQueryInformationFile (fh, &io, pfni, 65536, FileNameInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile (FileNameInformation) failed, %08x",
@@ -233,7 +232,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   /* Create hopefully unique filename. */
   RtlAppendUnicodeToString (&recycler, L"\\cyg");
   pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
-  status = NtQueryInformationFile (fh, &io, pfii, sizeof infobuf,
+  status = NtQueryInformationFile (fh, &io, pfii, 65536,
 				   FileInternalInformation);
   if (!NT_SUCCESS (status))
     {
@@ -248,8 +247,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   pfri->RootDirectory = rootdir;
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
-  status = NtSetInformationFile (fh, &io, pfri, sizeof infobuf,
-				 FileRenameInformation);
+  status = NtSetInformationFile (fh, &io, pfri, 65536, FileRenameInformation);
   if (status == STATUS_OBJECT_PATH_NOT_FOUND)
     {
       /* Ok, so the recycler and/or the recycler/SID directory don't exist.
@@ -350,7 +348,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	}
       NtClose (recyclerdir);
       /* Shoot again. */
-      status = NtSetInformationFile (fh, &io, pfri, sizeof infobuf,
+      status = NtSetInformationFile (fh, &io, pfri, 65536,
 				     FileRenameInformation);
     }
   if (!NT_SUCCESS (status))
@@ -397,7 +395,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 		    status);
       goto out;
     }
-  status = NtSetInformationFile (tmp_fh, &io, pfri, sizeof infobuf,
+  status = NtSetInformationFile (tmp_fh, &io, pfri, 65536,
 				 FileRenameInformation);
   NtClose (tmp_fh);
   if (!NT_SUCCESS (status))
