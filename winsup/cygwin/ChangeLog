@@ -1,5 +1,9 @@
 2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (try_to_bin): Fix alignment of infobuf.
+
+2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Catch an
 	error when changing the user account on a standalone Samba server.
 	Explain why.

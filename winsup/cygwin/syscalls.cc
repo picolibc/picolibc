@@ -153,7 +153,9 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   PFILE_NAME_INFORMATION pfni;
   PFILE_INTERNAL_INFORMATION pfii;
   PFILE_RENAME_INFORMATION pfri;
-  BYTE infobuf[sizeof (FILE_NAME_INFORMATION ) + 32767 * sizeof (WCHAR)];
+  /* Enforce alignment for multi-purpose infobuf buffer */
+  BYTE infobuf[sizeof (FILE_NAME_INFORMATION) + 32767 * sizeof (WCHAR)]
+	__attribute__ ((aligned));
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
 
   pfni = (PFILE_NAME_INFORMATION) infobuf;
