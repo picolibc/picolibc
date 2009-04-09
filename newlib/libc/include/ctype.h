@@ -46,8 +46,8 @@ extern	__IMPORT char	*__ctype_ptr__;
 
 #ifndef __cplusplus
 #define	isalpha(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))
-#define	isupper(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_U)
-#define	islower(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_L)
+#define	isupper(c)	(((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))==_U)
+#define	islower(c)	(((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))==_L)
 #define	isdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_N)
 #define	isxdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_X|_N))
 #define	isspace(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_S)
@@ -57,8 +57,10 @@ extern	__IMPORT char	*__ctype_ptr__;
 #define	isgraph(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N))
 #define iscntrl(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_C)
 
-#if !defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L
-#define isblank(c)      ((__ctype_ptr__)[(unsigned)((c)+1)]&_B)
+#if defined(__GNUC__) && \
+    (!defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L)
+#define isblank(c) \
+	__extension__ ({ int __c = (c); ((__ctype_ptr__)[(unsigned)((__c)+1)]&_B) || (__c) == '\t';})
 #endif
 
 

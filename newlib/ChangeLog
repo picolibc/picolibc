@@ -1,5 +1,21 @@
 2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/ctype/ctype_.c (_CTYPE_DATA_0_127): Remove _B flag from TAB.
+	* libc/ctype/ctype_cp.h: Mark non-cased letters in tables for codepages
+	720, 862, 874, 1255, and 1256 to _U|_L.  Fix a couple of incorrect
+	class mappings.
+	* libc/ctype/ctype_iso.h: Mark non-cased letters in ISO-8859 tables
+	6, 8, and 11 to _U|_L.  Fix a couple of incorrect class mappings.
+	* libc/ctype/isblank.c (isblank): Special case TAB.
+	* libc/ctype/islower.c (islower): Check explicitely for _L flag only
+	in (_U|_L).
+	* libc/ctype/isupper.c (isupper): Ditto, but check for _U flag.
+	* libc/include/ctype.h (islower): Same in macro.
+	(isupper): Ditto.
+	(isblank): Special case TAB.  Redefine macro for GCC only.
+
+2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdlib/local.h (__mbtowc): Declare extern.
 	(__wctomb): Ditto.
 
