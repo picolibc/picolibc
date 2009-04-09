@@ -1,3 +1,12 @@
+2009-04-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* speclib: Semi-revert to previous version but don't try to generate
+	well-formed import library.  Instead, just extract appropriate symbols
+	and let later libcygwin.a on link line fill in the rest of the import
+	stuff.
+	* gendef: Hopefully no-op modification to allow easier post-processing
+	on symbol values.
+
 2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (try_to_bin): Use tmp_pathbuf buffer to allocate infobuf

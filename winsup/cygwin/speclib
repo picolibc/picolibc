@@ -2,51 +2,52 @@
 use Getopt::Long;
 use File::Temp qw'tempdir';
 use File::Basename;
+use Cwd;
 use strict;
 
+sub dllname($;$);
+
+my $static;
+my $exclude;
+
+GetOptions('static!'=>\$static, 'v|exclude!'=>\$exclude);
+
 my $nm = shift;
-my $dlltool = shift;
-my $def = shift;
-my $lib = pop;
+my $ar = shift;
+my $libdll = Cwd::abs_path(shift @ARGV);
+my $lib = Cwd::abs_path(pop @ARGV);
 
-my $inverse;
-if ($ARGV[$#ARGV] ne '-v') {
-    $inverse = 0;
-} else {
-    $inverse = 1;
-    $#ARGV--;
-}
-
-open my $def_fd, '<', $def or die "$0: couldn't open \"$def\" - $!\n";
-my %defsyms = ();
-my $newdef = '';
-while (<$def_fd>) {
-    if (/^\s*(?:EXPORTS\b|LIBRARY\b|\s*$)/o) {
-	$newdef .= $_;
-    } else {
-	my $sym = (split ' ')[0];
-	$defsyms{$sym} = $_;
-    }
-}
-close $def_fd;
-
-open my $nm_fd, '-|', $nm, '-pg', '--defined-only', @ARGV or
+open my $nm_fd, '-|', $nm, '-Ap', '--defined-only', @ARGV, $libdll or
   die "$0: execution of $nm for object files failed - $!\n";
 
+my %match_syms = ();
+my $symfiles = ();
+my $lastfn;
+my %extract = ();
 while (<$nm_fd>) {
-    next unless /\S+\s+[A-Z]+\s+_(.*)$/o;
-    if ($inverse) {
-	delete $defsyms{$1};
-    } else {
-	$newdef .= $defsyms{$1} if exists $defsyms{$1};
-    }
+    study;
+    m%^\Q$libdll\E:([^:]*):\d+ i \.idata\$([56])% and do {
+	next;
+    };
+    m%^\Q$libdll\E:[^:]*:\d+ I (__head_.*)$% and do {
+	next;
+    };
+    next unless m%^([^:]*):([^:]*(?=:))?.* [DTI] (.*)%o;
+    if ($1 ne $libdll) {
+	 $match_syms{$3} = 1;
+     } elsif ($match_syms{$3} ? !$exclude : $exclude) {
+	 $extract{$2} = 1;
+     }
 }
 close $nm_fd;
 
-$newdef .= join '', sort values %defsyms if $inverse;
+%extract or die "$0: couldn't find symbols for $lib\n";
 
-open my $dlltool_fd, '|-', $dlltool, '-d', '/proc/self/fd/0', '-D', 'cygwin1.dll', '-l', $lib or
-    die "$0: couldn't start dlltool - $dlltool - $!\n";
-print $dlltool_fd $newdef;
-close $dlltool_fd or exit 1;
-exit 0;
+my $dir = tempdir(CLEANUP => 1);
+
+chdir $dir;
+# print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
+my $res = system $ar, 'x', $libdll, sort keys %extract;
+die "$0: $ar extraction exited with non-zero status\n" if $res;
+unlink $lib;
+exec $ar, 'crus', $lib, sort keys %extract;

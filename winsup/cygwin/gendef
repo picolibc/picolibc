@@ -34,13 +34,13 @@ close(IN);
 my %sigfe = ();
 my @data = ();
 my @nosigfuncs = ();
-my @out = ();
+my @text = ();
 for (@in) {
-    /\sDATA$/o and do {
-	push(@data, $_);
+    chomp;
+    s/\sDATA$//o and do {
+	push @data, $_;
 	next;
     };
-    chomp;
     if (/=/o) {
 	if (s/\s+NOSIGFE\s*$//) {
 	    # nothing
@@ -63,16 +63,18 @@ for (@in) {
     s/(\S)\s+(\S)/$1 $2/go;
     s/(\S)\s+$/$1/o;
     s/^\s+(\S)/$1/o;
-    push(@out, $_ . "\n");
+    push @text, $_;
 }
 
-for (@out) {
+for (@text) {
     my ($alias, $func) = /^(\S+) = (\S+)\s*$/o;
-    $_ = $alias . ' = ' . $sigfe{$func} . "\n"
+    $_ = $alias . ' = ' . $sigfe{$func}
       if defined($func) && $sigfe{$func};
 }
+
 open(OUT, '>', $out) or die "$0: couldn't open \"$out\" - $!\n";
-print OUT @top, @data, @out;
+push @top, (map {$_ . " DATA\n"} @data), (map {$_ . "\n"} @text);
+print OUT @top;
 close OUT;
 
 open(SIGFE, '>', $sigfe) or die "$0: couldn't open sigfe file \"$sigfe\" - $!\n";

@@ -105,7 +105,7 @@ LIBGMON_A:=libgmon.a
 CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
 
-speclib=${word 1, $^} "${NM}" "$(DLLTOOL)" $(wordlist 2, $(words $^), $^)
+speclib=${word 1, $^} "${NM}" "${AR}" $(wordlist 2, $(words $^), $^)
 
 # Some things want these from libc, but they have their own static
 # data which apps can get to, which is a pain in the dll, so we
@@ -442,22 +442,22 @@ shared.o: shared_info_magic.h
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
 
-${CURDIR}/libc.a: speclib ${DEF_FILE} ./libm.a libpthread.a libutil.a
+${CURDIR}/libc.a: speclib ${LIB_NAME} ./libm.a libpthread.a libutil.a
 	${speclib} -v ${@F}
 
-${CURDIR}/libm.a: speclib ${DEF_FILE} $(LIBM)
+${CURDIR}/libm.a: speclib ${LIB_NAME} $(LIBM)
 	${speclib} ${@F}
 
-libpthread.a: speclib ${DEF_FILE} pthread.o thread.o
+libpthread.a: speclib ${LIB_NAME} pthread.o thread.o
 	${speclib} ${@F}
 
-libutil.a: speclib ${DEF_FILE} bsdlib.o
+libutil.a: speclib ${LIB_NAME} bsdlib.o
 	${speclib} ${@F}
 
-libdl.a: speclib ${DEF_FILE} dlfcn.o
+libdl.a: speclib ${LIB_NAME} dlfcn.o
 	${speclib} ${@F}
 
-libresolv.a: speclib ${DEF_FILE} minires.o
+libresolv.a: speclib ${LIB_NAME} minires.o
 	${speclib} ${@F}
 
 ${EXTRALIBS}: lib%.a: %.o
