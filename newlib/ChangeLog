@@ -1,3 +1,18 @@
+2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/local.h (__mbtowc): Declare extern.
+	(__wctomb): Ditto.
+
+2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/mbctype.h (_iseucjp1): Like _iseucjp, but also
+	recognizes 0x8e and 0x8f lead bytes.
+	(_iseucjp2): Rename from _iseucjp.
+	* libc/stdlib/mbtowc_r.c (__eucjp_mbtowc): Convert JIS-X-0212
+	triplebyte sequences as well.
+	* libc/stdlib/wctomb_r.c (__eucjp_wctomb): Convert to JIS-X-0212
+	triplebyte sequences as well.
+
 2009-04-08  Ken Werner  <ken.werner@de.ibm.com>
 
 	* configure.in: Add square brackets for the array aliasing conftest.
