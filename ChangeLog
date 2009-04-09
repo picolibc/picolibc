@@ -1,3 +1,9 @@
+2009-04-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/10039
+	* configure.ac: Require texinfo 4.7.
+	* configure: Regenerated.
+
 2009-04-09  Steve Ellcey  <sje@cup.hp.com>
 
 	* Makefil.def (languages): New entries.
