@@ -195,11 +195,18 @@ _DEFUN (__eucjp_wctomb, (r, s, wchar, charset, state),
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_iseucjp (char1) && _iseucjp (char2)) 
+      if (_iseucjp1 (char1) && _iseucjp2 (char2)) 
 	{
 	  *s++ = (char)char1;
 	  *s = (char)char2;
 	  return 2;
+	}
+      else if (_iseucjp2 (char1) && _iseucjp2 (char2 | 0x80))
+	{
+	  *s++ = (char)0x8f;
+	  *s++ = (char)char1;
+	  *s = (char)(char2 | 0x80);
+	  return 3;
 	}
       else
 	{

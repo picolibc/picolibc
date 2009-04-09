@@ -470,7 +470,7 @@ _DEFUN (__eucjp_mbtowc, (r, pwc, s, n, charset, state),
   ch = t[i++];
   if (state->__count == 0)
     {
-      if (_iseucjp (ch))
+      if (_iseucjp1 (ch))
 	{
 	  state->__value.__wchb[0] = ch;
 	  state->__count = 1;
@@ -481,9 +481,35 @@ _DEFUN (__eucjp_mbtowc, (r, pwc, s, n, charset, state),
     }
   if (state->__count == 1)
     {
-      if (_iseucjp (ch))
+      if (_iseucjp2 (ch))
 	{
-	  *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
+	  if (state->__value.__wchb[0] == 0x8f)
+	    {
+	      state->__value.__wchb[1] = ch;
+	      state->__count = 2;
+	      if (n <= i)
+		return -2;
+	      ch = t[i++];
+	    }
+	  else
+	    {
+	      *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
+	      state->__count = 0;
+	      return i;
+	    }
+	}
+      else
+	{
+	  r->_errno = EILSEQ;
+	  return -1;
+	}
+    }
+  if (state->__count == 2)
+    {
+      if (_iseucjp2 (ch))
+	{
+	  *pwc = (((wchar_t)state->__value.__wchb[1]) << 8)
+		 + (wchar_t)(ch & 0x7f);
 	  state->__count = 0;
 	  return i;
 	}
