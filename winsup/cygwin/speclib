@@ -2,7 +2,7 @@
 use Getopt::Long;
 use File::Temp qw'tempdir';
 use File::Basename;
-use Cwd;
+use File::Spec;
 use strict;
 
 sub dllname($;$);
@@ -14,8 +14,8 @@ GetOptions('static!'=>\$static, 'v|exclude!'=>\$exclude);
 
 my $nm = shift;
 my $ar = shift;
-my $libdll = Cwd::abs_path(shift @ARGV);
-my $lib = Cwd::abs_path(pop @ARGV);
+my $libdll = File::Spec->rel2abs(shift @ARGV);
+my $lib =  File::Spec->rel2abs(pop @ARGV);
 
 open my $nm_fd, '-|', $nm, '-Ap', '--defined-only', @ARGV, $libdll or
   die "$0: execution of $nm for object files failed - $!\n";

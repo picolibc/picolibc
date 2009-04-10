@@ -1,3 +1,7 @@
+2009-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* speclib: Use a more robust method to derive full file path.
+
 2009-04-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* speclib: Semi-revert to previous version but don't try to generate
