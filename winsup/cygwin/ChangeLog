@@ -1,3 +1,8 @@
+2009-04-11  Dave Korn <dave.korn.cygwin@googlemail.com>
+
+	* include/stdint.h (INTPTR_MIN, INTPTR_MAX):  Add 'L' suffix.
+	(WINT_MAX):  Add 'U' suffix.
+
 2009-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* speclib: Use a more robust method to derive full file path.

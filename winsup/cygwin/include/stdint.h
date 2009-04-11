@@ -119,8 +119,8 @@ typedef unsigned long long uintmax_t;
 
 /* Limits of integer types capable of holding object pointers */
 
-#define INTPTR_MIN (-2147483647 - 1)
-#define INTPTR_MAX (2147483647)
+#define INTPTR_MIN (-2147483647L - 1L)
+#define INTPTR_MAX (2147483647L)
 #define UINTPTR_MAX (4294967295UL)
 
 /* Limits of greatest-width integer types */
@@ -144,7 +144,7 @@ typedef unsigned long long uintmax_t;
 #endif
 
 #ifndef SIZE_MAX
-#define SIZE_MAX (4294967295UL)
+#define SIZE_MAX (4294967295U)
 #endif
 
 #ifndef WCHAR_MIN
@@ -159,7 +159,7 @@ typedef unsigned long long uintmax_t;
 
 #ifndef WINT_MIN
 #define WINT_MIN 0U
-#define WINT_MAX UINT_MAX
+#define WINT_MAX (4294967295U)
 #endif
 
 /* Macros for minimum-width integer constant expressions */
