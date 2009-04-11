@@ -47,7 +47,7 @@ typedef unsigned long long   uint_least64_t;
  *  Not actually guaranteed to be fastest for all purposes
  *  Here we use the exact-width types for 8 and 16-bit ints. 
  */
-typedef char int_fast8_t;
+typedef signed char int_fast8_t;
 typedef unsigned char uint_fast8_t;
 typedef short  int_fast16_t;
 typedef unsigned short  uint_fast16_t;
@@ -187,13 +187,13 @@ typedef unsigned long long uintmax_t;
 	*expression* with *promoted* type."
 */
 
-#define INT8_C(val) ((int8_t) + (val))
-#define UINT8_C(val) ((uint8_t) + (val##U))
-#define INT16_C(val) ((int16_t) + (val))
-#define UINT16_C(val) ((uint16_t) + (val##U))
+#define INT8_C(val) val
+#define UINT8_C(val) val
+#define INT16_C(val) val
+#define UINT16_C(val) val
 
-#define INT32_C(val) val##L
-#define UINT32_C(val) val##UL
+#define INT32_C(val) val
+#define UINT32_C(val) val##U
 #define INT64_C(val) val##LL
 #define UINT64_C(val) val##ULL
 

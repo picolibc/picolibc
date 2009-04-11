@@ -1,3 +1,9 @@
+2009-04-11 Danny Smith <dannsymith@users.sourceforge.net>
+
+	* include/stdint.h (int_fast8_t): Specify as signed char.
+	(INT8_C, UINT8_C, INT16_C, UINT16_C): Simplify: just allow promotion to int.
+	(INT32_C, UINT32_C): Remove 'L' type specifier on constant.
+
 2009-03-05  Kai Tietz  <kai.tietz@onevision.com>
 
 	* pseudo-reloc.c: Rewrite to enable pseudo_reloc version 2.
