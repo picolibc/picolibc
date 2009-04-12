@@ -105,7 +105,14 @@ LIBGMON_A:=libgmon.a
 CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
 
-speclib=${word 1, $^} "${NM}" "${AR}" $(wordlist 2, $(words $^), $^)
+toolopts:=--ar=${AR} --as=${AS} --nm=${NM} --objcopy=${OBJCOPY} 
+speclib=\
+    ${srcdir}/speclib ${toolopts} \
+	--exclude='cygwin' \
+	--exclude='(?i:dll)' \
+	--exclude='reloc' \
+	--exclude='^_main$$' \
+	$^
 
 # Some things want these from libc, but they have their own static
 # data which apps can get to, which is a pain in the dll, so we
@@ -162,67 +169,60 @@ EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 
 GMON_OFILES:=gmon.o mcount.o profil.o
 
-OBSOLETE_FUNCTIONS:=open acl aclcheck aclfrommode aclfrompbits \
-		    aclfromtext aclsort acltomode acltopbits \
-		    acltotext chown facl fchown fcntl fdopen fgetpos fopen \
-		    freopen fseeko fsetpos fstat ftello ftruncate \
-		    getegid geteuid getgid getgrent getgrgid getgrnam \
-		    getgroups getpwuid getpwuid_r getuid initgroups \
-		    lchown lseek lstat mknod mmap seekdir setegid seteuid \
-		    setgid setgroups setregid setreuid setuid stat \
-		    telldir tmpfile truncate timezone
-
-NEW_FUNCTIONS:=open _open64 \
-	       acl _acl32 \
-	       aclcheck _aclcheck32 \
-	       aclfrommode _aclfrommode32 \
-	       aclfrompbits _aclfrompbits32 \
-	       aclfromtext _aclfromtext32 \
-	       aclsort _aclsort32 \
-	       acltomode _acltomode32 \
-	       acltopbits _acltopbits32 \
-	       acltotext _acltotext32 \
-	       chown _chown32 \
-	       facl _facl32 \
-	       fchown _fchown32 \
-	       fcntl _fcntl64 \
-	       fdopen _fdopen64 \
-	       fgetpos _fgetpos64 \
-	       fopen _fopen64 \
-	       freopen _freopen64 \
-	       fseeko _fseeko64 \
-	       fsetpos _fsetpos64 \
-	       fstat _fstat64 \
-	       ftello _ftello64 \
-	       ftruncate _ftruncate64 \
-	       getegid _getegid32 \
-	       geteuid _geteuid32 \
-	       getgid _getgid32 \
-	       getgrent _getgrent32 \
-	       getgrgid _getgrgid32 \
-	       getgrnam _getgrnam32 \
-	       getgroups _getgroups32 \
-	       getpwuid _getpwuid32 \
-	       getpwuid_r _getpwuid_r32 \
-	       getuid _getuid32 \
-	       initgroups _initgroups32 \
-	       lchown _lchown32 \
-	       lseek _lseek64 \
-	       lstat _lstat64 \
-	       mknod _mknod32 \
-	       mmap _mmap64 \
-	       seekdir _seekdir64 \
-	       setegid _setegid32 \
-	       seteuid _seteuid32 \
-	       setgid _setgid32 \
-	       setgroups _setgroups32 \
-	       setregid _setregid32 \
-	       setreuid _setreuid32 \
-	       setuid _setuid32 \
-	       stat _stat64 \
-	       telldir _telldir64 \
-	       tmpfile _tmpfile64 \
-	       truncate _truncate64
+NEW_FUNCTIONS:=$(addprefix --replace=,\
+	acl=_acl32 \
+	aclcheck=_aclcheck32 \
+	aclfrommode=_aclfrommode32 \
+	aclfrompbits=_aclfrompbits32 \
+	aclfromtext=_aclfromtext32 \
+	aclsort=_aclsort32 \
+	acltomode=_acltomode32 \
+	acltopbits=_acltopbits32 \
+	acltotext=_acltotext32 \
+	chown=_chown32 \
+	facl=_facl32 \
+	fchown=_fchown32 \
+	fcntl=_fcntl64 \
+	fdopen=_fdopen64 \
+	fgetpos=_fgetpos64 \
+	fopen=_fopen64 \
+	freopen=_freopen64 \
+	fseeko=_fseeko64 \
+	fsetpos=_fsetpos64 \
+	fstat=_fstat64 \
+	ftello=_ftello64 \
+	ftruncate=_ftruncate64 \
+	getegid=_getegid32 \
+	geteuid=_geteuid32 \
+	getgid=_getgid32 \
+	getgrent=_getgrent32 \
+	getgrgid=_getgrgid32 \
+	getgrnam=_getgrnam32 \
+	getgroups=_getgroups32 \
+	getpwuid=_getpwuid32 \
+	getpwuid_r=_getpwuid_r32 \
+	getuid=_getuid32 \
+	initgroups=_initgroups32 \
+	lchown=_lchown32 \
+	lseek=_lseek64 \
+	lstat=_lstat64 \
+	mknod=_mknod32 \
+	mmap=_mmap64 \
+	open=_open64 \
+	seekdir=_seekdir64 \
+	setegid=_setegid32 \
+	seteuid=_seteuid32 \
+	setgid=_setgid32 \
+	setgroups=_setgroups32 \
+	setregid=_setregid32 \
+	setreuid=_setreuid32 \
+	setuid=_setuid32 \
+	stat=_stat64 \
+	telldir=_telldir64 \
+	timezone= \
+	tmpfile=_tmpfile64 \
+	truncate=_truncate64 \
+)
 
 API_VER:=$(srcdir)/include/cygwin/version.h
 
@@ -396,11 +396,8 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(DLL_IMPORTS) $(LIBSERVER
 	@ln -f $@ new-$(DLL_NAME)
 
 # Rule to build libcygwin.a
-$(LIB_NAME): rmsym newsym $(TEST_DLL_NAME) $(LIBCOS)
-	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" $(OBSOLETE_FUNCTIONS) || exit 0
-	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" $(NEW_FUNCTIONS) || exit 0
-	(echo create $(LIB_NAME); echo addmod $(LIBCOS); echo addlib cygdll.a; echo save) | $(AR) -M
-	$(RANLIB) $@
+$(LIB_NAME): $(LIBCOS) | $(TEST_DLL_NAME) 
+	${srcdir}/mkimport ${toolopts} ${NEW_FUNCTIONS} $@ cygdll.a $^
 
 ${STATIC_LIB_NAME}: mkstatic ${TEST_DLL_NAME}
 	perl -d $< -x ${EXCLUDE_STATIC_OFILES} --library=${LIBC} --library=${LIBM} --ar=${AR} $@ cygwin.map
@@ -442,22 +439,22 @@ shared.o: shared_info_magic.h
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
 
-${CURDIR}/libc.a: speclib ${LIB_NAME} ./libm.a libpthread.a libutil.a
+${CURDIR}/libc.a: ${LIB_NAME} ./libm.a libpthread.a libutil.a
 	${speclib} -v ${@F}
 
-${CURDIR}/libm.a: speclib ${LIB_NAME} $(LIBM)
+${CURDIR}/libm.a: ${LIB_NAME} $(LIBM)
 	${speclib} ${@F}
 
-libpthread.a: speclib ${LIB_NAME} pthread.o thread.o
+libpthread.a: ${LIB_NAME} pthread.o thread.o
 	${speclib} ${@F}
 
-libutil.a: speclib ${LIB_NAME} bsdlib.o
+libutil.a: ${LIB_NAME} bsdlib.o
 	${speclib} ${@F}
 
-libdl.a: speclib ${LIB_NAME} dlfcn.o
+libdl.a: ${LIB_NAME} dlfcn.o
 	${speclib} ${@F}
 
-libresolv.a: speclib ${LIB_NAME} minires.o
+libresolv.a: ${LIB_NAME} minires.o
 	${speclib} ${@F}
 
 ${EXTRALIBS}: lib%.a: %.o

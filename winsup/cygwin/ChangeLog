@@ -1,3 +1,23 @@
+2009-04-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mkimport: New script to perform all operations necessary to create
+	libcygwin.a.
+	* rmsym: Delete.
+	* newsym: Delete.
+	* Makefile.in (toolopts): New variable which holds options relating to
+	binutils/gcc tools.
+	(speclib): Use toolopts.  Add symbols to avoid copying to special
+	libraries.
+	(OBSOLETE_FUNCTIONS): Delete.
+	(NEW_FUNCTIONS): Change to represent an argument to new mkimport
+	script.
+	(libcygwin.a): Use only new mkimport script to create libcygwin.a.
+	Only rely on ${LIBCOS}.
+	(*/lib*.a): Simplify speclib dependencies.
+	(speclib): Accept toolchain options.  Convert every argument to
+	absolute path.  Simplify parsing of nm output.  Accommodate new
+	exclude option.
+
 2009-04-11  Dave Korn <dave.korn.cygwin@googlemail.com>
 
 	* include/stdint.h (INTPTR_MIN, INTPTR_MAX):  Add 'L' suffix.
