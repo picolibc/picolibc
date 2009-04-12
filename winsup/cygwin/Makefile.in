@@ -376,7 +376,7 @@ uninstall-man:
 	done
 
 clean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h
 	-@$(MAKE) -C $(bupdir)/cygserver libclean
 
 maintainer-clean realclean: clean
@@ -424,7 +424,7 @@ version.cc winver.o: winver_stamp
 globals.h: mkglobals_h globals.cc
 	$^ > $@
 
-${DLL_OFILES}: globals.h
+${DLL_OFILES} ${LIBCOS}: globals.h
 
 shared_info_magic.h: cygmagic shared_info.h
 	/bin/sh $(word 1,$^) $@ "${COMPILE_CXX} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
