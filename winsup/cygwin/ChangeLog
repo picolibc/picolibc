@@ -1,5 +1,10 @@
 2009-04-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* speclib: Initial stab at cleaning up temp files.  More work needed.
+	* mkimport: Ditto.
+
+2009-04-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* Makefile.in (clean): Clean globals.h.
 	(LIBCOS): Depend on globals.h.
 

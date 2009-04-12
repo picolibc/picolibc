@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Getopt::Long;
-use File::Temp qw'tempdir';
+use File::Temp;
 use File::Basename;
 use File::Spec;
 use strict;
@@ -43,11 +43,14 @@ close $nm_fd;
 
 %extract or die "$0: couldn't find symbols for $lib\n";
 
-my $dir = tempdir(CLEANUP => 1);
+my $dir = File::Temp->newdir();
 
 chdir $dir;
 # print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
 my $res = system $ar, 'x', $libdll, sort keys %extract;
 die "$0: $ar extraction exited with non-zero status\n" if $res;
 unlink $lib;
-exec $ar, 'crus', $lib, sort keys %extract;
+$res = system $ar, 'crus', $lib, sort keys %extract;
+unlink keys %extract;
+die "$0: ar creation of $lib exited with non-zero status\n" if $res;
+exit 0;

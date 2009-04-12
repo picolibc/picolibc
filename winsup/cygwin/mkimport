@@ -77,4 +77,6 @@ for my $f (keys %text) {
 }
 
 unlink $libdll;
-exec $ar, 'crus', $libdll, glob('*.o'), @ARGV;
+system $ar, 'crus', $libdll, glob('*.o'), @ARGV;
+unlink glob('*.o');
+exit 1 if $?;
