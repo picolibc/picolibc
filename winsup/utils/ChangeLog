@@ -1,3 +1,7 @@
+2009-04-13  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* Makefile.in (dumper.exe):  Add -lz to ALL_LDFLAGS.
+
 2009-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (readlink): Accommodate new UTF-16 symlinks.
