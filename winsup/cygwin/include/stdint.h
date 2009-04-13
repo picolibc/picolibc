@@ -57,9 +57,9 @@ typedef unsigned long long uint_fast64_t;
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined
-typedef long intptr_t;
+typedef int intptr_t;
 #endif
-typedef unsigned long uintptr_t;
+typedef unsigned int uintptr_t;
 
 /* Greatest-width integer types */
 
@@ -119,9 +119,9 @@ typedef unsigned long long uintmax_t;
 
 /* Limits of integer types capable of holding object pointers */
 
-#define INTPTR_MIN (-2147483647L - 1L)
-#define INTPTR_MAX (2147483647L)
-#define UINTPTR_MAX (4294967295UL)
+#define INTPTR_MIN (-2147483647 - 1)
+#define INTPTR_MAX (2147483647)
+#define UINTPTR_MAX (4294967295U)
 
 /* Limits of greatest-width integer types */
 

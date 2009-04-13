@@ -1,3 +1,10 @@
+2009-04-13  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* include/stdint.h (intptr_t):  Remove long from type.
+	(uintptr_t):  Likewise.
+	(INTPTR_MIN):  Remove 'L' suffix.
+	(INTPTR_MAX, UINTPTR_MAX):  Likewise.
+
 2009-04-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* speclib: Initial stab at cleaning up temp files.  More work needed.
