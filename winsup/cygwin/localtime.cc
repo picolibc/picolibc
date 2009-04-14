@@ -859,6 +859,10 @@ tzload(const char *name, struct state *sp)
 			}
 		}
 	}
+	__gettzinfo ()->__tzrule[0].offset
+				= -sp->ttis[1].tt_gmtoff;
+	__gettzinfo ()->__tzrule[1].offset
+				= -sp->ttis[0].tt_gmtoff;
 	return 0;
 }
 
