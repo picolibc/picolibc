@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Getopt::Long;
-use File::Temp;
+use File::Temp qw'tempdir';
 use File::Basename;
 use File::Spec;
 use strict;
@@ -43,7 +43,7 @@ close $nm_fd;
 
 %extract or die "$0: couldn't find symbols for $lib\n";
 
-my $dir = File::Temp->tempdir(CLEANUP => 1);
+my $dir = tempdir(CLEANUP => 1);
 
 chdir $dir;
 # print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
