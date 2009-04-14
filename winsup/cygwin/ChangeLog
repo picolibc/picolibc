@@ -1,3 +1,7 @@
+2009-04-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* speclib: Revert to using tempdir.
+
 2009-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* localtime.cc (tzload): Implement setting __tzrule's offset member

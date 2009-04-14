@@ -43,7 +43,7 @@ close $nm_fd;
 
 %extract or die "$0: couldn't find symbols for $lib\n";
 
-my $dir = File::Temp->newdir();
+my $dir = File::Temp->tempdir(CLEANUP => 1);
 
 chdir $dir;
 # print join(' ', '+', $ar, 'x', sort keys %extract), "\n";
