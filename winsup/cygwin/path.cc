@@ -494,10 +494,11 @@ PWCHAR
 path_conv::get_wide_win32_path (PWCHAR wc)
 {
   get_nt_native_path ();
-  if (!wide_path || wide_path[1] != L'?') /* Native NT device path */
+  if (!wide_path)
     return NULL;
-  wcscpy (wc, wide_path);
-  wc[1] = L'\\';
+  wcpcpy (wc, wide_path);
+  if (wc[1] == L'?')
+    wc[1] = L'\\';
   return wc;
 }
 
@@ -2660,11 +2661,21 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       }
       break;
     case CCP_POSIX_TO_WIN_W:
-      p.check ((const char *) from,
-	       PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
-	       | (relative ? PC_NOFULL : 0));
+      p.check ((const char *) from, PC_POSIX | PC_SYM_FOLLOW
+				    | PC_NO_ACCESS_CHECK | PC_NOWARN
+				    | (relative ? PC_NOFULL : 0));
       if (p.error)
 	return_with_errno (p.error);
+      /* Relative Windows paths are always restricted to MAX_PATH chars. */
+      if (relative && !isabspath (p.get_win32 ())
+	  && sys_mbstowcs (NULL, 0, p.get_win32 ()) > MAX_PATH)
+	{
+	  /* Recreate as absolute path. */
+	  p.check ((const char *) from, PC_POSIX | PC_SYM_FOLLOW
+					| PC_NO_ACCESS_CHECK | PC_NOWARN);
+	  if (p.error)
+	    return_with_errno (p.error);
+	}
       lsiz = (p.get_wide_win32_path_len () + 1) * sizeof (WCHAR);
       break;
     case CCP_WIN_A_TO_POSIX:

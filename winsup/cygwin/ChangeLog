@@ -1,5 +1,12 @@
 2009-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::get_wide_win32_path): Allow relative paths.
+	(cygwin_conv_path): In case of CCP_POSIX_TO_WIN_W, convert relative 
+	paths to absolute paths if the relative pathname length exceeds
+	MAX_PATH.
+
+2009-04-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/bsdlib.cc: Align copyright with upstream.
 	* libc/fnmatch.c: Ditto.
 	* libc/fts.c: Ditto.
