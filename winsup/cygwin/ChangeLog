@@ -1,3 +1,13 @@
+2009-04-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/bsdlib.cc: Align copyright with upstream.
+	* libc/fnmatch.c: Ditto.
+	* libc/fts.c: Ditto.
+	* libc/inet_addr.c: Ditto.
+	* libc/inet_network.c: Ditto.
+	* libc/rcmd.cc: Ditto.
+	* libc/rexec.cc: Ditto.
+
 2009-04-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* speclib: Really revert to using tempdir.
