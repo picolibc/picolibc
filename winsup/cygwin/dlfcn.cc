@@ -36,16 +36,20 @@ check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 
 /* Search LD_LIBRARY_PATH for dll, if it exists.
    Return Windows version of given path. */
-static const char * __stdcall
-get_full_path_of_dll (const char* str, char *name)
+static bool __stdcall
+get_full_path_of_dll (const char* str, path_conv &real_filename)
 {
   int len = strlen (str);
 
-  /* empty string or too long to be legal win32 pathname? */
-  if (len == 0 || len >= PATH_MAX)
-    return str;		/* Yes.  Let caller deal with it. */
+  /* empty string? */
+  if (len == 0)
+    {
+      set_errno (EINVAL);
+      return false;		/* Yes.  Let caller deal with it. */
+    }
 
-  const char *ret;
+  tmp_pathbuf tp;
+  char *name = tp.c_get ();
 
   strcpy (name, str);	/* Put it somewhere where we can manipulate it. */
 
@@ -58,22 +62,16 @@ get_full_path_of_dll (const char* str, char *name)
 	strcat (name, ".dll");
     }
 
-  path_conv real_filename;
-
   if (isabspath (name) ||
-      (ret = check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
-	     ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
-    real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);	/* Convert */
+      (check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
+       ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
+    real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
 
   if (!real_filename.error)
-    ret = strcpy (name, real_filename.get_win32 ());
-  else
-    {
-      set_errno (real_filename.error);
-      ret = NULL;
-    }
+    return true;
 
-  return ret;
+  set_errno (real_filename.error);
+  return false;
 }
 
 void *
@@ -85,15 +83,17 @@ dlopen (const char *name, int)
     ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
   else
     {
-      tmp_pathbuf tp;
-      char *buf = tp.c_get ();
       /* handle for the named library */
-      const char *fullpath = get_full_path_of_dll (name, buf);
-      if (!fullpath)
+      path_conv pc;
+      if (!get_full_path_of_dll (name, pc))
 	ret = NULL;
       else
 	{
-	  ret = (void *) LoadLibrary (fullpath);
+	  tmp_pathbuf tp;
+	  wchar_t *path = tp.w_get ();
+
+	  pc.get_wide_win32_path (path);
+	  ret = (void *) LoadLibraryW (path);
 	  if (ret == NULL)
 	    __seterrno ();
 	}
