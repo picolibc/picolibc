@@ -470,8 +470,18 @@ unlink_nt (path_conv &pc)
      we can go straight to setting the delete disposition flag. */
   bin_status bin_stat = dont_move;
   status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
-  if (status == STATUS_SHARING_VIOLATION)
+  if (status == STATUS_SHARING_VIOLATION || status == STATUS_LOCK_NOT_GRANTED)
     {
+      /* STATUS_LOCK_NOT_GRANTED can be generated under not quite clear
+	 circumstances when trying to open a file on NFS with FILE_SHARE_DELETE
+	 only.  This has been observed with SFU 3.5 if the NFS share has been
+	 mounted under a drive letter.  It's not generated for all files, but
+	 only for some.  If it's generated once for a file, it will be
+	 generated all the time.  It looks like wrong file state information
+	 is stored within the NFS client, for no apparent reason, which never
+	 times out.  Opening the file with FILE_SHARE_VALID_FLAGS will work,
+	 though, and it is then possible to delete the file quite normally. */
+
       /* Bin is only accessible locally. */
       if (!pc.isremote ())
 	bin_stat = move_to_bin;
