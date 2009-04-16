@@ -1,3 +1,9 @@
+2009-04-16  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/machine/spu/Makefile.am: Add new File.
+	* libc/machine/spu/Makefile.in: Regenerate.
+	* libc/machine/spu/fdopen.c: New file.
+
 2009-04-16  Hans-Peter Nilsson  <hp@axis.com>
 
 	* libc/include/stdint.h (INTPTR_MIN, INTPTR_MAX, UINTPTR_MAX): Define.

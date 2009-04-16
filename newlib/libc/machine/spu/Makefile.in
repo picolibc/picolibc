@@ -103,7 +103,8 @@ DIST_COMMON = $(srcdir)/../../../../config.guess \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
 	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
-	$(srcdir)/../../../../compile $(srcdir)/../../../../compile
+	$(srcdir)/../../../../compile $(srcdir)/../../../../compile \
+	$(srcdir)/../../../../compile
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -201,7 +202,7 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-assert.$(OBJEXT) \
 	lib_a-spu_timer_slih_reg.$(OBJEXT) \
 	lib_a-spu_timer_svcs.$(OBJEXT) lib_a-spu_timer_stop.$(OBJEXT) \
 	lib_a-spu_timer_free.$(OBJEXT) lib_a-spu_timebase.$(OBJEXT) \
-	$(am__objects_1)
+	lib_a-fdopen.$(OBJEXT) $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -344,7 +345,7 @@ lib_a_SOURCES = setjmp.S assert.c clearerr.c creat.c fclose.c feof.c \
 	vsniprintf.c vsnprintf.c vsprintf.c vsscanf.c stack_reg_va.S \
 	spu_clock_svcs.c spu_clock_stop.c spu_timer_flih.S \
 	spu_timer_slih.c spu_timer_slih_reg.c spu_timer_svcs.c \
-	spu_timer_stop.c spu_timer_free.c spu_timebase.c \
+	spu_timer_stop.c spu_timer_free.c spu_timebase.c fdopen.c \
 	$(am__append_1)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -988,6 +989,12 @@ lib_a-spu_timebase.o: spu_timebase.c
 
 lib_a-spu_timebase.obj: spu_timebase.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-spu_timebase.obj `if test -f 'spu_timebase.c'; then $(CYGPATH_W) 'spu_timebase.c'; else $(CYGPATH_W) '$(srcdir)/spu_timebase.c'; fi`
+
+lib_a-fdopen.o: fdopen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fdopen.o `test -f 'fdopen.c' || echo '$(srcdir)/'`fdopen.c
+
+lib_a-fdopen.obj: fdopen.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fdopen.obj `if test -f 'fdopen.c'; then $(CYGPATH_W) 'fdopen.c'; else $(CYGPATH_W) '$(srcdir)/fdopen.c'; fi`
 
 lib_a-calloc_ea.o: calloc_ea.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-calloc_ea.o `test -f 'calloc_ea.c' || echo '$(srcdir)/'`calloc_ea.c
