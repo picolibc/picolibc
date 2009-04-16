@@ -52,8 +52,8 @@ __libc_fini_array (void)
   size_t i;
   
   count = __fini_array_end - __fini_array_start;
-  for (i = 0; i < count; i++)
-    __fini_array_start[i] ();
+  for (i = count; i > 0; i--)
+    __fini_array_start[i-1] ();
 
   _fini ();
 }

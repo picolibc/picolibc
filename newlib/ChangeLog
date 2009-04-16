@@ -1,3 +1,8 @@
+2009-04-16  Jeff johnston  <jjohnstn@redhat.com>
+
+	* libc/misc/init.c (__libc_fini_array): Process fini_array in
+	reverse order as compliant with the ELF specification.
+
 2009-04-16  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/Makefile.am: Add new File.
