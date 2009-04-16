@@ -38,7 +38,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-LIBOBJDIR =
+@HAVE_LONG_DOUBLE_TRUE@am__append_1 = \
+@HAVE_LONG_DOUBLE_TRUE@	strtold.c \
+@HAVE_LONG_DOUBLE_TRUE@	wcstold.c
+
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = stdlib
@@ -67,7 +70,9 @@ am__DEPENDENCIES_2 = $(lpfx)malignr.$(oext) $(lpfx)malloptr.$(oext) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_2)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_3 =  \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__DEPENDENCIES_2)
-am__objects_1 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
+@HAVE_LONG_DOUBLE_TRUE@am__objects_1 = lib_a-strtold.$(OBJEXT) \
+@HAVE_LONG_DOUBLE_TRUE@	lib_a-wcstold.$(OBJEXT)
+am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
 	lib_a-__ten_mu.$(OBJEXT) lib_a-_Exit.$(OBJEXT) \
 	lib_a-abort.$(OBJEXT) lib_a-abs.$(OBJEXT) \
@@ -93,8 +98,9 @@ am__objects_1 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-strtoul.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
 	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
 	lib_a-wcstombs.$(OBJEXT) lib_a-wcstombs_r.$(OBJEXT) \
-	lib_a-wctomb.$(OBJEXT) lib_a-wctomb_r.$(OBJEXT)
-am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
+	lib_a-wctomb.$(OBJEXT) lib_a-wctomb_r.$(OBJEXT) \
+	$(am__objects_1)
+am__objects_3 = lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-cxa_finalize.$(OBJEXT) lib_a-drand48.$(OBJEXT) \
 	lib_a-ecvtbuf.$(OBJEXT) lib_a-efgcvt.$(OBJEXT) \
 	lib_a-erand48.$(OBJEXT) lib_a-jrand48.$(OBJEXT) \
@@ -108,7 +114,7 @@ am__objects_2 = lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-wcstoll_r.$(OBJEXT) lib_a-wcstoull.$(OBJEXT) \
 	lib_a-wcstoull_r.$(OBJEXT) lib_a-atoll.$(OBJEXT) \
 	lib_a-llabs.$(OBJEXT) lib_a-lldiv.$(OBJEXT)
-am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
+am__objects_4 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-getopt.$(OBJEXT) lib_a-getsubopt.$(OBJEXT) \
 	lib_a-l64a.$(OBJEXT) lib_a-malign.$(OBJEXT) \
 	lib_a-mbrlen.$(OBJEXT) lib_a-mbrtowc.$(OBJEXT) \
@@ -117,21 +123,22 @@ am__objects_3 = lib_a-a64l.$(OBJEXT) lib_a-btowc.$(OBJEXT) \
 	lib_a-valloc.$(OBJEXT) lib_a-wcrtomb.$(OBJEXT) \
 	lib_a-wcsnrtombs.$(OBJEXT) lib_a-wcsrtombs.$(OBJEXT) \
 	lib_a-wctob.$(OBJEXT)
-am__objects_4 = lib_a-putenv.$(OBJEXT) lib_a-putenv_r.$(OBJEXT) \
+am__objects_5 = lib_a-putenv.$(OBJEXT) lib_a-putenv_r.$(OBJEXT) \
 	lib_a-setenv.$(OBJEXT) lib_a-setenv_r.$(OBJEXT)
-am__objects_5 = lib_a-system.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = $(am__objects_3) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_4) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_5)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_6 = $(am__objects_3) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_4)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_6 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_3)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_6)
+am__objects_6 = lib_a-system.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_7 = $(am__objects_4) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_5) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_6)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_7 = $(am__objects_4) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_5)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_7 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_4)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_2) \
+@USE_LIBTOOL_FALSE@	$(am__objects_3) $(am__objects_7)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_7 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
+@HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtold.lo wcstold.lo
+am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo atexit.lo \
 	atof.lo atoff.lo atoi.lo atol.lo calloc.lo div.lo dtoa.lo \
 	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo \
@@ -141,28 +148,28 @@ am__objects_7 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	mstats.lo rand.lo rand_r.lo realloc.lo reallocf.lo \
 	sb_charsets.lo strtod.lo strtol.lo strtoul.lo wcstod.lo \
 	wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
-	wctomb_r.lo
-am__objects_8 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
+	wctomb_r.lo $(am__objects_8)
+am__objects_10 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
 	srand48.lo strtoll.lo strtoll_r.lo strtoull.lo strtoull_r.lo \
 	wcstoll.lo wcstoll_r.lo wcstoull.lo wcstoull_r.lo atoll.lo \
 	llabs.lo lldiv.lo
-am__objects_9 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
+am__objects_11 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
 	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsnrtowcs.lo \
 	mbsrtowcs.lo on_exit.lo valloc.lo wcrtomb.lo wcsnrtombs.lo \
 	wcsrtombs.lo wctob.lo
-am__objects_10 = putenv.lo putenv_r.lo setenv.lo setenv_r.lo
-am__objects_11 = system.lo
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_12 = $(am__objects_9) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_10) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_11)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_12 = $(am__objects_9) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_10)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_12 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_9)
-@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_7) \
-@USE_LIBTOOL_TRUE@	$(am__objects_8) $(am__objects_12)
+am__objects_12 = putenv.lo putenv_r.lo setenv.lo setenv_r.lo
+am__objects_13 = system.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_14 = $(am__objects_11) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_12) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_13)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_14 = $(am__objects_11) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_12)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_14 =  \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_11)
+@USE_LIBTOOL_TRUE@am_libstdlib_la_OBJECTS = $(am__objects_9) \
+@USE_LIBTOOL_TRUE@	$(am__objects_10) $(am__objects_14)
 libstdlib_la_OBJECTS = $(am_libstdlib_la_OBJECTS)
 @USE_LIBTOOL_TRUE@am_libstdlib_la_rpath =
 DEFAULT_INCLUDES = -I. -I$(srcdir)
@@ -223,6 +230,8 @@ ENABLE_NEWLIB_ICONV_TRUE = @ENABLE_NEWLIB_ICONV_TRUE@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HAVE_LONG_DOUBLE_FALSE = @HAVE_LONG_DOUBLE_FALSE@
+HAVE_LONG_DOUBLE_TRUE = @HAVE_LONG_DOUBLE_TRUE@
 HAVE_POSIX_DIR_FALSE = @HAVE_POSIX_DIR_FALSE@
 HAVE_POSIX_DIR_TRUE = @HAVE_POSIX_DIR_TRUE@
 HAVE_SIGNAL_DIR_FALSE = @HAVE_SIGNAL_DIR_FALSE@
@@ -289,8 +298,20 @@ STRIP = @STRIP@
 USE_LIBTOOL_FALSE = @USE_LIBTOOL_FALSE@
 USE_LIBTOOL_TRUE = @USE_LIBTOOL_TRUE@
 VERSION = @VERSION@
+ac_ct_AR = @ac_ct_AR@
+ac_ct_AS = @ac_ct_AS@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_DLLTOOL = @ac_ct_DLLTOOL@
+ac_ct_DSYMUTIL = @ac_ct_DSYMUTIL@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_LIPO = @ac_ct_LIPO@
+ac_ct_NMEDIT = @ac_ct_NMEDIT@
+ac_ct_OBJDUMP = @ac_ct_OBJDUMP@
+ac_ct_OTOOL = @ac_ct_OTOOL@
+ac_ct_OTOOL64 = @ac_ct_OTOOL64@
+ac_ct_RANLIB = @ac_ct_RANLIB@
+ac_ct_READELF = @ac_ct_READELF@
+ac_ct_STRIP = @ac_ct_STRIP@
 aext = @aext@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -306,9 +327,6 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = @datadir@
-datarootdir = @datarootdir@
-docdir = @docdir@
-dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 extra_dir = @extra_dir@
 host = @host@
@@ -316,14 +334,12 @@ host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
-htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libm_machine_dir = @libm_machine_dir@
-localedir = @localedir@
 localstatedir = @localstatedir@
 lpfx = @lpfx@
 lt_ECHO = @lt_ECHO@
@@ -333,10 +349,8 @@ mkdir_p = @mkdir_p@
 newlib_basedir = @newlib_basedir@
 oext = @oext@
 oldincludedir = @oldincludedir@
-pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
-psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
@@ -345,62 +359,16 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-GENERAL_SOURCES = \
-	__adjust.c 	\
-	__atexit.c	\
-	__call_atexit.c	\
-	__exp10.c 	\
-	__ten_mu.c 	\
-	_Exit.c		\
-	abort.c  	\
-	abs.c 		\
-	assert.c  	\
-	atexit.c	\
-	atof.c 		\
-	atoff.c		\
-	atoi.c  	\
-	atol.c		\
-	calloc.c	\
-	div.c  		\
-	dtoa.c 		\
-	dtoastub.c 	\
-	environ.c	\
-	envlock.c	\
-	eprintf.c	\
-	exit.c 		\
-	gdtoa-gethex.c	\
-	gdtoa-hexnan.c	\
-	getenv.c  	\
-	getenv_r.c	\
-	labs.c 		\
-	ldiv.c  	\
-	ldtoa.c		\
-	malloc.c  	\
-	mblen.c		\
-	mblen_r.c	\
-	mbstowcs.c	\
-	mbstowcs_r.c	\
-	mbtowc.c	\
-	mbtowc_r.c	\
-	mlock.c		\
-	mprec.c		\
-	mstats.c	\
-	rand.c		\
-	rand_r.c	\
-	realloc.c	\
-	reallocf.c	\
-	sb_charsets.c	\
-	strtod.c	\
-	strtol.c	\
-	strtoul.c	\
-	wcstod.c	\
-	wcstol.c	\
-	wcstoul.c	\
-	wcstombs.c	\
-	wcstombs_r.c	\
-	wctomb.c	\
-	wctomb_r.c
-
+GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
+	__ten_mu.c _Exit.c abort.c abs.c assert.c atexit.c atof.c \
+	atoff.c atoi.c atol.c calloc.c div.c dtoa.c dtoastub.c \
+	environ.c envlock.c eprintf.c exit.c gdtoa-gethex.c \
+	gdtoa-hexnan.c getenv.c getenv_r.c labs.c ldiv.c ldtoa.c \
+	malloc.c mblen.c mblen_r.c mbstowcs.c mbstowcs_r.c mbtowc.c \
+	mbtowc_r.c mlock.c mprec.c mstats.c rand.c rand_r.c realloc.c \
+	reallocf.c sb_charsets.c strtod.c strtol.c strtoul.c wcstod.c \
+	wcstol.c wcstoul.c wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c \
+	$(am__append_1)
 EXTENDED_SOURCES = \
 	cxa_atexit.c	\
 	cxa_finalize.c	\
@@ -936,6 +904,18 @@ lib_a-wctomb_r.o: wctomb_r.c
 lib_a-wctomb_r.obj: wctomb_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctomb_r.obj `if test -f 'wctomb_r.c'; then $(CYGPATH_W) 'wctomb_r.c'; else $(CYGPATH_W) '$(srcdir)/wctomb_r.c'; fi`
 
+lib_a-strtold.o: strtold.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtold.o `test -f 'strtold.c' || echo '$(srcdir)/'`strtold.c
+
+lib_a-strtold.obj: strtold.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtold.obj `if test -f 'strtold.c'; then $(CYGPATH_W) 'strtold.c'; else $(CYGPATH_W) '$(srcdir)/strtold.c'; fi`
+
+lib_a-wcstold.o: wcstold.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstold.o `test -f 'wcstold.c' || echo '$(srcdir)/'`wcstold.c
+
+lib_a-wcstold.obj: wcstold.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstold.obj `if test -f 'wcstold.c'; then $(CYGPATH_W) 'wcstold.c'; else $(CYGPATH_W) '$(srcdir)/wcstold.c'; fi`
+
 lib_a-cxa_atexit.o: cxa_atexit.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cxa_atexit.o `test -f 'cxa_atexit.c' || echo '$(srcdir)/'`cxa_atexit.c
 
@@ -1237,7 +1217,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 
 distclean-libtool:
-	-rm -f libtool config.lt
+	-rm -f libtool
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

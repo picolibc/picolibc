@@ -1,3 +1,81 @@
+2009-04-16  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libm/libm.texinfo: Add long double function support chapter.
+	* libc/include/machine/ieeefp.h: Add _LDBL_EQ_DBL define.
+	* libc/include/stdlib.h: Include <machine/ieeefp.h>.
+	(strtold, wcstold): Declare.
+	* libc/stdlib/strtold.c: New File.
+	* libc/stdlib/wcstold.c: Likewise.
+	* libc/configure.in: Add long double check.
+	* libc/configure: Regenerate.
+	* libc/stdlib/Makefile.am: Add strtold.c and wcstold.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/include/math.h (atanl, cosl, sinl, tanl, tanhl): Declare.
+	(frexpl, modfl, ceill, fabsl, floorl, log1pl, expm1l, acosl): Ditto.
+	(asinl, atan2l, coshl, sinhl, expl, ldexpl, logl, log10l, powl): Ditto.
+	(sqrtl, fmodl, hypotl, copysignl, nanl, ilogbl, asinhl, cbrt): Ditto.
+	(nextafterl, rintl, scalbnl, exp2l, scalblnl, tgammal): Ditto.
+	(nearbyintl, lrintl, llrintl, roundl, lroundl, llround): Ditto.
+	(llroundl, truncl, remquol, fdiml, fmaxl, fminl, fmal, acoshl): Ditto.
+	(atanhl, remainderl, lgammal, erfl, erfcl): Ditto.
+	* libm/common/atanl.c: New File.
+	* libm/common/cosl.c: Likewise.
+	* libm/common/sinl.c: Likewise.
+	* libm/common/modfl.c: Likewise.
+	* libm/common/frexpl.c: Likewise.
+	* libm/common/tanhl.c: Likewise.
+	* libm/common/tanl.c: Likewise.
+	* libm/common/expm1l.c: Likewise.
+	* libm/common/log1pl.c: Likewise.
+	* libm/common/ceill.c: Likewise.
+	* libm/common/fabsl.c: Likewise.
+	* libm/common/floorl.c: Likewise.
+	* libm/common/acosl.c: Likewise.
+	* libm/common/asinl.c: Likewise.
+	* libm/common/atan2l.c: Likewise.
+	* libm/common/coshl.c: Likewise.
+	* libm/common/expl.c: Likewise.
+	* libm/common/fmodl.c: Likewise.
+	* libm/common/hypotl.c: Likewise.
+	* libm/common/ldexpl.c: Likewise.
+	* libm/common/log10l.c: Likewise.
+	* libm/common/logl.c: Likewise.
+	* libm/common/powl.c: Likewise.
+	* libm/common/sqrtl.c: Likewise.
+	* libm/common/copysignl.c: Likewise.
+	* libm/common/ilogbl.c: Likewise.
+	* libm/common/nanl.c: Likewise.
+	* libm/common/cbrtl.c: Likewise.
+	* libm/common/asinhl.c: Likewise.
+	* libm/common/nextafterl.c: Likewise.
+	* libm/common/rintl.c: Likewise.
+	* libm/common/scalbnl.c: Likewise.
+	* libm/common/exp2l.c: Likewise.
+	* libm/common/fdiml.c: Likewise.
+	* libm/common/fmal.c: Likewise.
+	* libm/common/fmaxl.c: Likewise.
+	* libm/common/fminl.c: Likewise.
+	* libm/common/lrintl.c: Likewise.
+	* libm/common/lroundl.c: Likewise.
+	* libm/common/nearbyintl.c: Likewise.
+	* libm/common/remquol.c: Likewise.
+	* libm/common/roundl.c: Likewise.
+	* libm/common/scalblnl.c: Likewise.
+	* libm/common/truncl.c: Likewise.
+	* libm/common/acoshl.c: Likewise.
+	* libm/common/atanhl.c: Likewise.
+	* libm/common/erfcl.c: Likewise.
+	* libm/common/erfl.c: Likewise.
+	* libm/common/lgammal.c: Likewise.
+	* libm/common/remainderl.c: Likewise.
+	* libm/common/tgammal.c: Likewise.
+	* libm/common/sinhl.c: Likewise.
+	* libm/common/llroundl.c: Likewise.
+	* libm/configure.in: Add long double check.
+	* libm/configure: Regenerate.
+	* libm/common/Makefile.am: Add new files.
+	* libm/common/Makefile.in: Regenerate.
+
 2009-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/ctype_.c (_CTYPE_DATA_0_127): Remove _B flag from TAB.

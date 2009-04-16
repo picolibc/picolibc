@@ -7,6 +7,7 @@
 #ifndef _STDLIB_H_
 #define _STDLIB_H_
 
+#include <machine/ieeefp.h>
 #include "_ansi.h"
 
 #define __need_size_t
@@ -197,6 +198,12 @@ _VOID	_EXFUN(_mstats_r,(struct _reent *, char *));
 int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
+
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
+extern long double strtold (const char *, char **);
+extern long double wcstold (const wchar_t *, wchar_t **);
+#endif /* LDBL_EQ_DBL */
 
 _END_STD_C
 

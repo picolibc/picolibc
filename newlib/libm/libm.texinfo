@@ -94,6 +94,7 @@ into another language, under the above conditions for modified versions.
 @menu
 * Math::           The mathematical functions (`math.h').
 * Reentrancy::     The functions in libm are not reentrant by default.
+* Long Double Functions:: The long double function support of libm.
 * Index::
 @end menu
 
@@ -123,6 +124,11 @@ In normal debugged programs, there are usually no math subroutine
 errors---and therefore no assignments to @code{errno} and no @code{matherr}
 calls; in that situation, the math functions behave reentrantly.
 
+@node Long Double Functions
+@chapter The long double function support of @code{libm}
+Currently, the full set of long double math functions is only provided
+on platforms where long double equals double.
+For such platforms, the long double math functions are implemented as calls to the double versions.
 @node Index
 @unnumbered Index
 @printindex cp

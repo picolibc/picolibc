@@ -334,12 +334,79 @@ extern float log2f _PARAMS((float));
 extern float hypotf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
 
-/* Other long double precision functions.  */
+/* On platforms where long double is as wide as double.  */
+#ifdef _LDBL_EQ_DBL
+/* Reentrant ANSI C functions.  */
+#ifndef __math_68881
+extern long double atanl _PARAMS((long double));
+extern long double cosl _PARAMS((long double));
+extern long double sinl _PARAMS((long double));
+extern long double tanl _PARAMS((long double));
+extern long double tanhl _PARAMS((long double));
+extern long double frexpl _PARAMS((long double value, int *));
+extern long double modfl _PARAMS((long double, long double *));
+extern long double ceill _PARAMS((long double));
+extern long double fabsl _PARAMS((long double));
+extern long double floorl _PARAMS((long double));
+extern long double log1pl _PARAMS((long double));
+extern long double expm1l _PARAMS((long double));
+#endif /* ! defined (__math_68881) */
+/* Non reentrant ANSI C functions.  */
+#ifndef _REENT_ONLY
+#ifndef __math_68881
+extern long double acosl _PARAMS((long double));
+extern long double asinl _PARAMS((long double));
+extern long double atan2l _PARAMS((long double, long double));
+extern long double coshl _PARAMS((long double));
+extern long double sinhl _PARAMS((long double));
+extern long double expl _PARAMS((long double));
+extern long double ldexpl _PARAMS((long double, int));
+extern long double logl _PARAMS((long double));
+extern long double log10l _PARAMS((long double));
+extern long double powl _PARAMS((long double, long double));
+extern long double sqrtl _PARAMS((long double));
+extern long double fmodl _PARAMS((long double, long double));
+extern long double hypotl _PARAMS((long double, long double));
+#endif /* ! defined (__math_68881) */
+#endif /* ! defined (_REENT_ONLY) */
+extern long double copysignl _PARAMS((long double, long double));
+extern long double nanl _PARAMS((const char *));
+extern int ilogbl _PARAMS((long double));
+extern long double asinhl _PARAMS((long double));
+extern long double cbrtl _PARAMS((long double));
+extern long double nextafterl _PARAMS((long double, long double));
+extern long double rintl _PARAMS((long double));
+extern long double scalbnl _PARAMS((long double, int));
+extern long double exp2l _PARAMS((long double));
+extern long double scalblnl _PARAMS((long double, long));
+extern long double tgammal _PARAMS((long double));
+extern long double nearbyintl _PARAMS((long double));
+extern long int lrintl _PARAMS((long double));
+extern long double roundl _PARAMS((long double));
+extern long lroundl _PARAMS((long double));
+extern _LONG_LONG_TYPE int llroundl _PARAMS((long double));
+extern long double truncl _PARAMS((long double));
+extern long double remquol _PARAMS((long double, long double, int *));
+extern long double fdiml _PARAMS((long double, long double));
+extern long double fmaxl _PARAMS((long double, long double));
+extern long double fminl _PARAMS((long double, long double));
+extern long double fmal _PARAMS((long double, long double, long double));
+#ifndef _REENT_ONLY
+extern long double acoshl _PARAMS((long double));
+extern long double atanhl _PARAMS((long double));
+extern long double remainderl _PARAMS((long double, long double));
+extern long double lgammal _PARAMS((long double));
+extern long double erfl _PARAMS((long double));
+extern long double erfcl _PARAMS((long double));
+#endif /* ! defined (_REENT_ONLY) */
+#else /* !_LDBL_EQ_DBL */
 #ifdef __i386__
+/* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl _PARAMS((_LONG_DOUBLE));
 extern long int lrintl _PARAMS((_LONG_DOUBLE));
 extern _LONG_LONG_TYPE llrintl _PARAMS((_LONG_DOUBLE));
 #endif /* __i386__ */
+#endif /* !_LDBL_EQ_DBL */
 
 #endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L */
 

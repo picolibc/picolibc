@@ -60,6 +60,12 @@ GENERAL_SOURCES = \
 	wctomb.c	\
 	wctomb_r.c
 
+if HAVE_LONG_DOUBLE
+GENERAL_SOURCES += \
+	strtold.c \
+	wcstold.c
+endif # HAVE_LONG_DOUBLE
+
 EXTENDED_SOURCES = \
 	cxa_atexit.c	\
 	cxa_finalize.c	\
