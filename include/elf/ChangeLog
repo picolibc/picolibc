@@ -1,3 +1,8 @@
+2009-04-15  Anthony Green  <green@moxielogic.com>
+
+	* common.h (EM_MOXIE): Define.
+	* moxie.h: New file.
+
 2009-04-07  DJ Delorie  <dj@redhat.com>
 
 	* mep.h (EF_MEP_CPU_C5): New.

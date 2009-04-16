@@ -110,7 +110,7 @@ TWO52[2]={
           GET_HIGH_WORD(i0, t);
           /* Detect the all-zeros representation of plus and
              minus zero, which fails the calculation below. */
-          if ((i0 & ~(1 << 31)) == 0)
+          if ((i0 & ~(1L << 31)) == 0)
               return 0;
           j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
           i0 &= 0x000fffff;
