@@ -459,7 +459,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all machine sys"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir SED DLLTOOL ac_ct_DLLTOOL OBJDUMP ac_ct_OBJDUMP LIBTOOL CFLAGS CPPFLAGS ac_ct_CC EXEEXT EGREP FGREP GREP LD DUMPBIN ac_ct_DUMPBIN NM LN_S lt_ECHO DSYMUTIL ac_ct_DSYMUTIL NMEDIT ac_ct_NMEDIT LIPO ac_ct_LIPO OTOOL ac_ct_OTOOL OTOOL64 ac_ct_OTOOL64 CPP subdirs CRT0 LIBC_POSIX_LIB HAVE_POSIX_DIR_TRUE HAVE_POSIX_DIR_FALSE LIBC_SIGNAL_LIB LIBC_SIGNAL_DEF HAVE_SIGNAL_DIR_TRUE HAVE_SIGNAL_DIR_FALSE LIBC_STDIO_LIB LIBC_STDIO_DEF HAVE_STDIO_DIR_TRUE HAVE_STDIO_DIR_FALSE LIBC_STDIO64_LIB LIBC_STDIO64_DEF HAVE_STDIO64_DIR_TRUE HAVE_STDIO64_DIR_FALSE LIBC_SYSCALL_LIB HAVE_SYSCALL_DIR_TRUE HAVE_SYSCALL_DIR_FALSE LIBC_UNIX_LIB HAVE_UNIX_DIR_TRUE HAVE_UNIX_DIR_FALSE LIBC_EXTRA_LIB LIBC_EXTRA_DEF extra_dir LIBC_SYS_LIB ENABLE_NEWLIB_ICONV_TRUE ENABLE_NEWLIB_ICONV_FALSE HAVE_LONG_DOUBLE_TRUE HAVE_LONG_DOUBLE_FALSE LIBC_MACHINE_LIB LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir SED DLLTOOL ac_ct_DLLTOOL OBJDUMP ac_ct_OBJDUMP LIBTOOL CFLAGS CPPFLAGS ac_ct_CC EXEEXT EGREP FGREP GREP LD DUMPBIN ac_ct_DUMPBIN NM LN_S lt_ECHO DSYMUTIL ac_ct_DSYMUTIL NMEDIT ac_ct_NMEDIT LIPO ac_ct_LIPO OTOOL ac_ct_OTOOL OTOOL64 ac_ct_OTOOL64 CPP subdirs CRT0 LIBC_POSIX_LIB HAVE_POSIX_DIR_TRUE HAVE_POSIX_DIR_FALSE LIBC_SIGNAL_LIB LIBC_SIGNAL_DEF HAVE_SIGNAL_DIR_TRUE HAVE_SIGNAL_DIR_FALSE LIBC_STDIO_LIB LIBC_STDIO_DEF HAVE_STDIO_DIR_TRUE HAVE_STDIO_DIR_FALSE LIBC_STDIO64_LIB LIBC_STDIO64_DEF HAVE_STDIO64_DIR_TRUE HAVE_STDIO64_DIR_FALSE LIBC_SYSCALL_LIB HAVE_SYSCALL_DIR_TRUE HAVE_SYSCALL_DIR_FALSE LIBC_UNIX_LIB HAVE_UNIX_DIR_TRUE HAVE_UNIX_DIR_FALSE LIBC_EXTRA_LIB LIBC_EXTRA_DEF extra_dir LIBC_SYS_LIB HAVE_LONG_DOUBLE_TRUE HAVE_LONG_DOUBLE_FALSE ENABLE_NEWLIB_ICONV_TRUE ENABLE_NEWLIB_ICONV_FALSE LIBC_MACHINE_LIB LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -11505,67 +11505,29 @@ fi
 
 
 
-
-
-if test x${newlib_iconv} != x; then
-  ENABLE_NEWLIB_ICONV_TRUE=
-  ENABLE_NEWLIB_ICONV_FALSE='#'
-else
-  ENABLE_NEWLIB_ICONV_TRUE='#'
-  ENABLE_NEWLIB_ICONV_FALSE=
-fi
-
-
 echo "$as_me:$LINENO: checking Checking long double support" >&5
 echo $ECHO_N "checking Checking long double support... $ECHO_C" >&6
 if test "${acnewlib_cv_type_long_double+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-int
-main ()
-{
-long double foo = 0.0L;
-  ;
-  return 0;
+  cat > conftest.c <<EOF
+int main() {
+long double x = 0.0L;
+return 0;
 }
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c conftest.c 1>&5'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  acnewlib_cv_type_long_double = yes;
+  (exit $ac_status); }; }
+then
+  acnewlib_cv_type_long_double=yes
 else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-acnewlib_cv_type_long_double = no;
+  acnewlib_cv_type_long_double=no
 fi
-rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f conftest*
 fi
 echo "$as_me:$LINENO: result: $acnewlib_cv_type_long_double" >&5
 echo "${ECHO_T}$acnewlib_cv_type_long_double" >&6
@@ -11577,6 +11539,17 @@ if test x"$acnewlib_cv_type_long_double" = x"yes"; then
 else
   HAVE_LONG_DOUBLE_TRUE='#'
   HAVE_LONG_DOUBLE_FALSE=
+fi
+
+
+
+
+if test x${newlib_iconv} != x; then
+  ENABLE_NEWLIB_ICONV_TRUE=
+  ENABLE_NEWLIB_ICONV_FALSE='#'
+else
+  ENABLE_NEWLIB_ICONV_TRUE='#'
+  ENABLE_NEWLIB_ICONV_FALSE=
 fi
 
 
@@ -11833,17 +11806,17 @@ echo "$as_me: error: conditional \"HAVE_UNIX_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_NEWLIB_ICONV_TRUE}" && test -z "${ENABLE_NEWLIB_ICONV_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${HAVE_LONG_DOUBLE_TRUE}" && test -z "${HAVE_LONG_DOUBLE_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_LONG_DOUBLE\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"HAVE_LONG_DOUBLE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_NEWLIB_ICONV_TRUE}" && test -z "${ENABLE_NEWLIB_ICONV_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"ENABLE_NEWLIB_ICONV\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -12784,10 +12757,10 @@ s,@LIBC_EXTRA_LIB@,$LIBC_EXTRA_LIB,;t t
 s,@LIBC_EXTRA_DEF@,$LIBC_EXTRA_DEF,;t t
 s,@extra_dir@,$extra_dir,;t t
 s,@LIBC_SYS_LIB@,$LIBC_SYS_LIB,;t t
-s,@ENABLE_NEWLIB_ICONV_TRUE@,$ENABLE_NEWLIB_ICONV_TRUE,;t t
-s,@ENABLE_NEWLIB_ICONV_FALSE@,$ENABLE_NEWLIB_ICONV_FALSE,;t t
 s,@HAVE_LONG_DOUBLE_TRUE@,$HAVE_LONG_DOUBLE_TRUE,;t t
 s,@HAVE_LONG_DOUBLE_FALSE@,$HAVE_LONG_DOUBLE_FALSE,;t t
+s,@ENABLE_NEWLIB_ICONV_TRUE@,$ENABLE_NEWLIB_ICONV_TRUE,;t t
+s,@ENABLE_NEWLIB_ICONV_FALSE@,$ENABLE_NEWLIB_ICONV_FALSE,;t t
 s,@LIBC_MACHINE_LIB@,$LIBC_MACHINE_LIB,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

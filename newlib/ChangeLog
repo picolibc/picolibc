@@ -1,3 +1,9 @@
+2009-04-17  Ken Werner  <ken.werner@de.ibm.com>
+
+	* libc/configure.in: Change AC_TRY_COMPILE to AC_TRY_COMMAND to
+	avoid executable test.
+	* libc/configure: Regenerate.
+
 2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Remove _HAVE_ARRAY_ALIASING check.

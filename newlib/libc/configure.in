@@ -137,18 +137,28 @@ fi
 AC_SUBST(LIBC_SYS_LIB)
 AC_SUBST(sys_dir)
 
-dnl iconv library will be compiled if --enable-newlib-iconv option is enabled
-AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test x${newlib_iconv} != x)
-
 dnl Autoconf 2.59 doesn't support the AC_TYPE_LONG_DOUBLE macro. Instead of:
 dnl   AC_TYPE_LONG_DOUBLE
 dnl   AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
 dnl we specify our own long double test.
-AC_CACHE_CHECK([Checking long double support], [acnewlib_cv_type_long_double],
-  [AC_TRY_COMPILE([], [long double foo = 0.0L;],
-    [acnewlib_cv_type_long_double = yes;],
-    [acnewlib_cv_type_long_double = no;])])
+AC_CACHE_CHECK([Checking long double support], [acnewlib_cv_type_long_double],[dnl
+cat > conftest.c <<EOF
+int main() {
+long double x = 0.0L;
+return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c conftest.c 1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_type_long_double=yes
+else
+  acnewlib_cv_type_long_double=no
+fi
+rm -f conftest*])
 AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$acnewlib_cv_type_long_double" = x"yes")
+
+dnl iconv library will be compiled if --enable-newlib-iconv option is enabled
+AM_CONDITIONAL(ENABLE_NEWLIB_ICONV, test x${newlib_iconv} != x)
 
 if test -n "${machine_dir}"; then
   if test "${use_libtool}" = "yes"; then
