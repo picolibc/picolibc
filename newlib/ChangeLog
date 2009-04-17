@@ -1,3 +1,65 @@
+2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
+
+	* libc/include/machine/ieeefp.h (_LDBL_EQ_DBL): Remove.
+	* libc/stdlib/local.h (_LDBL_EQ_DBL): Add.
+	* libc/stdlib/strtold.c: Include local.h.
+	* libc/stdlib/wcstold.c: Likewise.
+	* libm/common/atanl.c: Likewise.
+	* libm/common/cosl.c: Likewise.
+	* libm/common/sinl.c: Likewise.
+	* libm/common/modfl.c: Likewise.
+	* libm/common/frexpl.c: Likewise.
+	* libm/common/tanhl.c: Likewise.
+	* libm/common/tanl.c: Likewise.
+	* libm/common/expm1l.c: Likewise.
+	* libm/common/log1pl.c: Likewise.
+	* libm/common/ceill.c: Likewise.
+	* libm/common/fabsl.c: Likewise.
+	* libm/common/floorl.c: Likewise.
+	* libm/common/acosl.c: Likewise.
+	* libm/common/asinl.c: Likewise.
+	* libm/common/atan2l.c: Likewise.
+	* libm/common/coshl.c: Likewise.
+	* libm/common/expl.c: Likewise.
+	* libm/common/fmodl.c: Likewise.
+	* libm/common/hypotl.c: Likewise.
+	* libm/common/ldexpl.c: Likewise.
+	* libm/common/log10l.c: Likewise.
+	* libm/common/logl.c: Likewise.
+	* libm/common/powl.c: Likewise.
+	* libm/common/sqrtl.c: Likewise.
+	* libm/common/copysignl.c: Likewise.
+	* libm/common/ilogbl.c: Likewise.
+	* libm/common/nanl.c: Likewise.
+	* libm/common/cbrtl.c: Likewise.
+	* libm/common/asinhl.c: Likewise.
+	* libm/common/nextafterl.c: Likewise.
+	* libm/common/rintl.c: Likewise.
+	* libm/common/scalbnl.c: Likewise.
+	* libm/common/exp2l.c: Likewise.
+	* libm/common/fdiml.c: Likewise.
+	* libm/common/fmal.c: Likewise.
+	* libm/common/fmaxl.c: Likewise.
+	* libm/common/fminl.c: Likewise.
+	* libm/common/lrintl.c: Likewise.
+	* libm/common/lroundl.c: Likewise.
+	* libm/common/nearbyintl.c: Likewise.
+	* libm/common/remquol.c: Likewise.
+	* libm/common/roundl.c: Likewise.
+	* libm/common/scalblnl.c: Likewise.
+	* libm/common/truncl.c: Likewise.
+	* libm/common/acoshl.c: Likewise.
+	* libm/common/atanhl.c: Likewise.
+	* libm/common/erfcl.c: Likewise.
+	* libm/common/erfl.c: Likewise.
+	* libm/common/lgammal.c: Likewise.
+	* libm/common/remainderl.c: Likewise.
+	* libm/common/tgammal.c: Likewise.
+	* libm/common/sinhl.c: Likewise.
+	* libm/common/llroundl.c: Likewise.
+	* libm/common/llrintl.c: Likewise.
+	* libm/common/local.h: New file with _LDBL_EQ_DBL macro.
+
 2009-04-17  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/include/machine/ieeefp.h: _LDBL_EQ_DBL check fixed.

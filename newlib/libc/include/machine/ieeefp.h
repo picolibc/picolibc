@@ -331,10 +331,3 @@
 #endif /* not __IEEE_LITTLE_ENDIAN */
 #endif /* not __IEEE_BIG_ENDIAN */
 
-/* Check if long double is as wide as double. */
-#if (!defined(__STRICT_ANSI__) || __STDC_VERSION__ > 199901L || \
-  defined(__cplusplus)) && defined(__LDBL_MANT_DIG__) && \
-    (__DBL_MANT_DIG__ == __LDBL_MANT_DIG__ && __LDBL_MIN_EXP__ == __DBL_MIN_EXP__ && \
-    __LDBL_MAX_EXP__ == __DBL_MAX_EXP__)
- #define _LDBL_EQ_DBL
-#endif

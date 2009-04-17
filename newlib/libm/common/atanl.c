@@ -29,6 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <math.h>
+#include "local.h"
 
 /* On platforms where long double is as wide as double.  */
 #ifdef _LDBL_EQ_DBL
