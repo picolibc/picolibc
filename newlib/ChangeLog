@@ -2,6 +2,7 @@
 
 	* configure.in: Remove _HAVE_ARRAY_ALIASING check.
 	* configure: Regenerated.
+	* Makefile.in: Regenerated.
 	* newlib.hin: Remove _HAVE_ARRAY_ALIASING flag.
 	* libc/ctype/ctype_.c: Do not check for _HAVE_ARRAY_ALIASING.
 	* libm/configure.in: Change AC_TRY_COMPILE to AC_TRY_COMMAND to
