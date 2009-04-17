@@ -1,5 +1,13 @@
 2009-04-17  Ken Werner  <ken.werner@de.ibm.com>
 
+	* libc/include/machine/ieeefp.h: _LDBL_EQ_DBL check fixed.
+	* libc/include/math.h (llrintl): Declare.
+	* libm/common/llrintl.c: New File.
+	* libm/common/Makefile.am: New File added.
+	* libm/common/Makefile.in: Regenerate.
+
+2009-04-17  Ken Werner  <ken.werner@de.ibm.com>
+
 	* libc/configure.in: Change AC_TRY_COMPILE to AC_TRY_COMMAND to
 	avoid executable test.
 	* libc/configure: Regenerate.

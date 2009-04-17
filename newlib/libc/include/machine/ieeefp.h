@@ -333,8 +333,8 @@
 
 /* Check if long double is as wide as double. */
 #if (!defined(__STRICT_ANSI__) || __STDC_VERSION__ > 199901L || \
-  defined(__cplusplus)) && defined(LDBL_MANT_DIG) && \
-    (DBL_MANT_DIG == LDBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP && \
-    LDBL_MAX_EXP == DBL_MAX_EXP)
+  defined(__cplusplus)) && defined(__LDBL_MANT_DIG__) && \
+    (__DBL_MANT_DIG__ == __LDBL_MANT_DIG__ && __LDBL_MIN_EXP__ == __DBL_MIN_EXP__ && \
+    __LDBL_MAX_EXP__ == __DBL_MAX_EXP__)
  #define _LDBL_EQ_DBL
 #endif

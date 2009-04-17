@@ -382,6 +382,7 @@ extern long double scalblnl _PARAMS((long double, long));
 extern long double tgammal _PARAMS((long double));
 extern long double nearbyintl _PARAMS((long double));
 extern long int lrintl _PARAMS((long double));
+extern long long int llrintl _PARAMS((long double));
 extern long double roundl _PARAMS((long double));
 extern long lroundl _PARAMS((long double));
 extern _LONG_LONG_TYPE int llroundl _PARAMS((long double));

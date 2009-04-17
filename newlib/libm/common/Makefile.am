@@ -28,9 +28,9 @@ lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \
 	expl.c ldexpl.c logl.c log10l.c powl.c sqrtl.c fmodl.c hypotl.c \
 	copysignl.c nanl.c ilogbl.c asinhl.c cbrtl.c nextafterl.c rintl.c \
-	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c roundl.c \
-	lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c fmal.c \
-	acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
+	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c llrintl.c \
+	roundl.c lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c \
+	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 

@@ -114,14 +114,14 @@ am__objects_3 = lib_a-atanl.$(OBJEXT) lib_a-cosl.$(OBJEXT) \
 	lib_a-scalbnl.$(OBJEXT) lib_a-exp2l.$(OBJEXT) \
 	lib_a-scalblnl.$(OBJEXT) lib_a-tgammal.$(OBJEXT) \
 	lib_a-nearbyintl.$(OBJEXT) lib_a-lrintl.$(OBJEXT) \
-	lib_a-roundl.$(OBJEXT) lib_a-lroundl.$(OBJEXT) \
-	lib_a-llroundl.$(OBJEXT) lib_a-truncl.$(OBJEXT) \
-	lib_a-remquol.$(OBJEXT) lib_a-fdiml.$(OBJEXT) \
-	lib_a-fmaxl.$(OBJEXT) lib_a-fminl.$(OBJEXT) \
-	lib_a-fmal.$(OBJEXT) lib_a-acoshl.$(OBJEXT) \
-	lib_a-atanhl.$(OBJEXT) lib_a-remainderl.$(OBJEXT) \
-	lib_a-lgammal.$(OBJEXT) lib_a-erfl.$(OBJEXT) \
-	lib_a-erfcl.$(OBJEXT)
+	lib_a-llrintl.$(OBJEXT) lib_a-roundl.$(OBJEXT) \
+	lib_a-lroundl.$(OBJEXT) lib_a-llroundl.$(OBJEXT) \
+	lib_a-truncl.$(OBJEXT) lib_a-remquol.$(OBJEXT) \
+	lib_a-fdiml.$(OBJEXT) lib_a-fmaxl.$(OBJEXT) \
+	lib_a-fminl.$(OBJEXT) lib_a-fmal.$(OBJEXT) \
+	lib_a-acoshl.$(OBJEXT) lib_a-atanhl.$(OBJEXT) \
+	lib_a-remainderl.$(OBJEXT) lib_a-lgammal.$(OBJEXT) \
+	lib_a-erfl.$(OBJEXT) lib_a-erfcl.$(OBJEXT)
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@am__objects_4 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@	$(am__objects_3)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -151,10 +151,10 @@ am__objects_7 = atanl.lo cosl.lo sinl.lo tanl.lo tanhl.lo frexpl.lo \
 	ldexpl.lo logl.lo log10l.lo powl.lo sqrtl.lo fmodl.lo \
 	hypotl.lo copysignl.lo nanl.lo ilogbl.lo asinhl.lo cbrtl.lo \
 	nextafterl.lo rintl.lo scalbnl.lo exp2l.lo scalblnl.lo \
-	tgammal.lo nearbyintl.lo lrintl.lo roundl.lo lroundl.lo \
-	llroundl.lo truncl.lo remquol.lo fdiml.lo fmaxl.lo fminl.lo \
-	fmal.lo acoshl.lo atanhl.lo remainderl.lo lgammal.lo erfl.lo \
-	erfcl.lo
+	tgammal.lo nearbyintl.lo lrintl.lo llrintl.lo roundl.lo \
+	lroundl.lo llroundl.lo truncl.lo remquol.lo fdiml.lo fmaxl.lo \
+	fminl.lo fmal.lo acoshl.lo atanhl.lo remainderl.lo lgammal.lo \
+	erfl.lo erfcl.lo
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@am__objects_8 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@	$(am__objects_7)
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_5) \
@@ -346,9 +346,9 @@ lsrc = atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \
 	expl.c ldexpl.c logl.c log10l.c powl.c sqrtl.c fmodl.c hypotl.c \
 	copysignl.c nanl.c ilogbl.c asinhl.c cbrtl.c nextafterl.c rintl.c \
-	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c roundl.c \
-	lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c fmal.c \
-	acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
+	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c llrintl.c \
+	roundl.c lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c \
+	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcommon.la
@@ -1097,6 +1097,12 @@ lib_a-lrintl.o: lrintl.c
 
 lib_a-lrintl.obj: lrintl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lrintl.obj `if test -f 'lrintl.c'; then $(CYGPATH_W) 'lrintl.c'; else $(CYGPATH_W) '$(srcdir)/lrintl.c'; fi`
+
+lib_a-llrintl.o: llrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrintl.o `test -f 'llrintl.c' || echo '$(srcdir)/'`llrintl.c
+
+lib_a-llrintl.obj: llrintl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-llrintl.obj `if test -f 'llrintl.c'; then $(CYGPATH_W) 'llrintl.c'; else $(CYGPATH_W) '$(srcdir)/llrintl.c'; fi`
 
 lib_a-roundl.o: roundl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-roundl.o `test -f 'roundl.c' || echo '$(srcdir)/'`roundl.c
