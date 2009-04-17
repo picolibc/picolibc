@@ -229,7 +229,15 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 	    else if (s[1] == quote || s[1] == '\\')
 	      s++;
 	    *p++ = '\\';
-	    *p++ = *s;
+	    size_t cnt = mbtowc (NULL, s, MB_CUR_MAX);
+	    if (cnt <= 1 || cnt == (size_t)-1)
+	      *p++ = *s;
+	    else
+	      {
+		--s;
+	      	while (cnt-- > 0)
+		  *p++ = *++s;
+	      }
 	  }
 	if (*s == quote)
 	  p--;
