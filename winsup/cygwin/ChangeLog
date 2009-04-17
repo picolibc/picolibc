@@ -1,3 +1,14 @@
+2009-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (class inode_t): Add i_wait member and matching methods
+	wait(), unwait(), and waiting().
+	(inode_t::inode_t): Initialize i_wait to 0.
+	(fhandler_disk_file::lock): Only remove node if no other thread is
+	waiting for a blocking lock.
+	(lf_setlock): Manipulate node->i_wait to signal that a thread is
+	waiting for a blocking lock in this node.
+	(lf_findoverlap): Reinstantiate SELF test as in original code.
+
 2009-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dlfcn.cc (get_full_path_of_dll): Just return a bool value.  Drop

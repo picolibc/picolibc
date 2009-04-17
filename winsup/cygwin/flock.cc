@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008 Red Hat, Inc.
+   Copyright 2003, 2008, 2009 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -267,6 +267,8 @@ class inode_t
   private:
     HANDLE                i_dir;
     HANDLE                i_mtx;
+    unsigned long	  i_wait;   /* Number of blocked threads waiting for
+				       a blocking lock. */
 
   public:
     inode_t (__dev32_t dev, __ino64_t ino);
@@ -281,6 +283,10 @@ class inode_t
 
     void LOCK () { WaitForSingleObject (i_mtx, INFINITE); }
     void UNLOCK () { ReleaseMutex (i_mtx); }
+
+    void wait () { ++i_wait; }
+    void unwait () { if (i_wait > 0) --i_wait; }
+    bool waiting () { return i_wait > 0; } 
 
     lockf_t *get_all_locks_list ();
 
@@ -427,7 +433,7 @@ inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing)
 }
 
 inode_t::inode_t (__dev32_t dev, __ino64_t ino)
-: i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino)
+: i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino), i_wait (0L)
 {
   HANDLE parent_dir;
   WCHAR name[48];
@@ -823,7 +829,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
       delete lock;
       lock = n;
     }
-  if (node->i_lockf == NULL)
+  if (node->i_lockf == NULL && !node->waiting ())
     {
       INODE_LIST_LOCK ();
       LIST_REMOVE (node, i_next);
@@ -946,6 +952,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	      return EDEADLK;
 	    }
 	  HANDLE w4[3] = { obj, proc, signal_arrived };
+	  node->wait ();
 	  node->UNLOCK ();
 	  ret = WaitForMultipleObjects (3, w4, FALSE, INFINITE);
 	  CloseHandle (proc);
@@ -953,6 +960,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       else
 	{
 	  HANDLE w4[2] = { obj, signal_arrived };
+	  node->wait ();
 	  node->UNLOCK ();
 	  /* Unfortunately, since BSD flock locks are not attached to a
 	     specific process, we can't recognize an abandoned lock by
@@ -965,6 +973,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  while (ret == WAIT_TIMEOUT && get_obj_handle_count (obj) > 1);
 	}
       node->LOCK ();
+      node->unwait ();
       NtClose (obj);
       SetThreadPriority (GetCurrentThread (), old_prio);
       switch (ret)
@@ -1283,7 +1292,8 @@ lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
   end = lock->lf_end;
   while (lf != NOLOCKF)
     {
-      if (((type & OTHERS) && lf->lf_id == lock->lf_id)
+      if (((type & SELF) && lf->lf_id != lock->lf_id)
+	  || ((type & OTHERS) && lf->lf_id == lock->lf_id)
 	  /* As on Linux: POSIX locks and BSD flock locks don't interact. */
 	  || (lf->lf_flags & (F_POSIX | F_FLOCK))
 	     != (lock->lf_flags & (F_POSIX | F_FLOCK)))
