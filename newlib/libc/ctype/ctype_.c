@@ -112,18 +112,14 @@ __asm__ ("					\n\
 	.text                                   \n\
 ");
 
-#  elif defined(_HAVE_ARRAY_ALIASING)
-
-extern _CONST char _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
-
-#  else /* !_HAVE_ARRAY_ALIASING */
+#  else /* !__CYGWIN__ */
 
 _CONST char _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_256
 };
-#  endif /* !_HAVE_ARRAY_ALIASING */
+#  endif /* !__CYGWIN__ */
 
 #else	/* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 

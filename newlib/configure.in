@@ -395,25 +395,6 @@ if test $libc_cv_initfinit_array = yes; then
   AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
 fi
 
-AC_CACHE_CHECK(for array aliasing support,
-	       libc_cv_array_aliasing, [dnl
-cat > conftest.c <<EOF
-char x[[3]] = { 'a', 'b', 'c' };
-extern char y[[2]] __attribute__((alias ("x+1")));
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c conftest.c
-		   1>&AS_MESSAGE_LOG_FD])
-then
-  libc_cv_array_aliasing=yes
-else
-  libc_cv_array_aliasing=no
-fi
-rm -f conftest*])
-AC_SUBST(libc_cv_array_aliasing)
-if test $libc_cv_array_aliasing = yes; then
-  AC_DEFINE_UNQUOTED(_HAVE_ARRAY_ALIASING)
-fi
-
 AC_CONFIG_FILES([Makefile],
 [if test -n "$CONFIG_FILES"; then
   unset ac_file

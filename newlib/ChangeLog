@@ -1,3 +1,13 @@
+2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Remove _HAVE_ARRAY_ALIASING check.
+	* configure: Regenerated.
+	* newlib.hin: Remove _HAVE_ARRAY_ALIASING flag.
+	* libc/ctype/ctype_.c: Do not check for _HAVE_ARRAY_ALIASING.
+	* libm/configure.in: Change AC_TRY_COMPILE to AC_TRY_COMMAND to
+	avoid executable test.
+	* libm/configure: Regenerated.
+
 2009-04-16  Jeff johnston  <jjohnstn@redhat.com>
 
 	* libc/misc/init.c (__libc_fini_array): Process fini_array in

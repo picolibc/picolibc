@@ -46,9 +46,6 @@
    functions.  */
 #undef  _ATEXIT_DYNAMIC_ALLOC
 
-/* Define if the compiler supports aliasing an array to an address.  */
-#undef  _HAVE_ARRAY_ALIASING
-
 /*
  * Iconv encodings enabled ("to" direction)
  */

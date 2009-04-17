@@ -462,7 +462,7 @@ ac_subdirs_all="$ac_subdirs_all libc"
 ac_subdirs_all="$ac_subdirs_all libm"
 ac_subdirs_all="$ac_subdirs_all doc"
 ac_subdirs_all="$ac_subdirs_all iconvdata"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir SED DLLTOOL ac_ct_DLLTOOL OBJDUMP ac_ct_OBJDUMP LIBTOOL CFLAGS CPPFLAGS ac_ct_CC EXEEXT EGREP FGREP GREP LD DUMPBIN ac_ct_DUMPBIN NM LN_S lt_ECHO DSYMUTIL ac_ct_DSYMUTIL NMEDIT ac_ct_NMEDIT LIPO ac_ct_LIPO OTOOL ac_ct_OTOOL OTOOL64 ac_ct_OTOOL64 CPP NEWLIB_HW_FP_TRUE NEWLIB_HW_FP_FALSE CC_FOR_NEWLIB subdirs HAVE_DOC_TRUE HAVE_DOC_FALSE EXTRA_DIRS CRT0 CRT0_DIR CRT1 CRT1_DIR LIBM_MACHINE_OBJECTLIST MACHINE_OBJECTLIST SYS_OBJECTLIST SYS_MACH_OBJECTLIST POSIX_OBJECTLIST SIGNAL_OBJECTLIST SYSCALL_OBJECTLIST UNIX_OBJECTLIST STDIO64_OBJECTLIST CC_FOR_BUILD libc_cv_initfinit_array libc_cv_array_aliasing LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAY_SUPPLY_SYSCALLS_TRUE MAY_SUPPLY_SYSCALLS_FALSE newlib_basedir build build_cpu build_vendor build_os host host_cpu host_vendor host_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS ac_ct_AS AR ac_ct_AR RANLIB ac_ct_RANLIB READELF ac_ct_READELF MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CCAS CCASFLAGS NEWLIB_CFLAGS LDFLAGS ELIX_LEVEL_0_TRUE ELIX_LEVEL_0_FALSE ELIX_LEVEL_1_TRUE ELIX_LEVEL_1_FALSE ELIX_LEVEL_2_TRUE ELIX_LEVEL_2_FALSE ELIX_LEVEL_3_TRUE ELIX_LEVEL_3_FALSE ELIX_LEVEL_4_TRUE ELIX_LEVEL_4_FALSE USE_LIBTOOL_TRUE USE_LIBTOOL_FALSE OBJEXT oext aext lpfx libm_machine_dir machine_dir sys_dir SED DLLTOOL ac_ct_DLLTOOL OBJDUMP ac_ct_OBJDUMP LIBTOOL CFLAGS CPPFLAGS ac_ct_CC EXEEXT EGREP FGREP GREP LD DUMPBIN ac_ct_DUMPBIN NM LN_S lt_ECHO DSYMUTIL ac_ct_DSYMUTIL NMEDIT ac_ct_NMEDIT LIPO ac_ct_LIPO OTOOL ac_ct_OTOOL OTOOL64 ac_ct_OTOOL64 CPP NEWLIB_HW_FP_TRUE NEWLIB_HW_FP_FALSE CC_FOR_NEWLIB subdirs HAVE_DOC_TRUE HAVE_DOC_FALSE EXTRA_DIRS CRT0 CRT0_DIR CRT1 CRT1_DIR LIBM_MACHINE_OBJECTLIST MACHINE_OBJECTLIST SYS_OBJECTLIST SYS_MACH_OBJECTLIST POSIX_OBJECTLIST SIGNAL_OBJECTLIST SYSCALL_OBJECTLIST UNIX_OBJECTLIST STDIO64_OBJECTLIST CC_FOR_BUILD libc_cv_initfinit_array LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -11902,39 +11902,6 @@ _ACEOF
 
 fi
 
-echo "$as_me:$LINENO: checking for array aliasing support" >&5
-echo $ECHO_N "checking for array aliasing support... $ECHO_C" >&6
-if test "${libc_cv_array_aliasing+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat > conftest.c <<EOF
-char x[3] = { 'a', 'b', 'c' };
-extern char y[2] __attribute__((alias ("x+1")));
-EOF
-if { ac_try='${CC} $CFLAGS $CPPFLAGS -c conftest.c
-		   1>&5'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }
-then
-  libc_cv_array_aliasing=yes
-else
-  libc_cv_array_aliasing=no
-fi
-rm -f conftest*
-fi
-echo "$as_me:$LINENO: result: $libc_cv_array_aliasing" >&5
-echo "${ECHO_T}$libc_cv_array_aliasing" >&6
-
-if test $libc_cv_array_aliasing = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define _HAVE_ARRAY_ALIASING 1
-_ACEOF
-
-fi
-
           ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF
@@ -13046,7 +13013,6 @@ s,@UNIX_OBJECTLIST@,$UNIX_OBJECTLIST,;t t
 s,@STDIO64_OBJECTLIST@,$STDIO64_OBJECTLIST,;t t
 s,@CC_FOR_BUILD@,$CC_FOR_BUILD,;t t
 s,@libc_cv_initfinit_array@,$libc_cv_initfinit_array,;t t
-s,@libc_cv_array_aliasing@,$libc_cv_array_aliasing,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
