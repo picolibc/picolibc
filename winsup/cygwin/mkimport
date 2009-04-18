@@ -54,6 +54,7 @@ for my $f (keys %text) {
 	$text{$f} = 1;
 	open my $as_fd, '|-', $as, '-o', "$dir/t-$f", "-";
 	print $as_fd <<EOF;
+	.text
 	.extern	$imp_sym
 	.global	$glob_sym
 $glob_sym:

@@ -19,6 +19,8 @@ $_ = File::Spec->rel2abs($_) for @ARGV;
 
 my $libdll = shift;
 my $lib =  pop;
+(my $iname = basename $lib) =~ s/\.a$//o;
+$iname = '_' . $iname . '_dll_iname';
 
 open my $nm_fd, '-|', $nm, '-Apg', '--defined-only', @ARGV, $libdll or
   die "$0: execution of $nm for object files failed - $!\n";
@@ -29,17 +31,23 @@ my $lastfn;
 my %extract = ();
 my $exclude_regex = @exclude ? join('|', @exclude) : '\\UnLiKeLy//';
 $exclude_regex = qr/$exclude_regex/;
+my $dllname;
 while (<$nm_fd>) {
     study;
-    my ($file, $member, $symbol) = m%^([^:]*):([^:]*(?=:))?.* T (.*)%o;
-    next if !defined($symbol) || $symbol =~ $exclude_regex;
-    if ($file ne $libdll) {
-	 $match_syms{$symbol} = 1;
-     } elsif ($match_syms{$symbol} ? !$inverse : $inverse) {
-	 $extract{$member} = 1;
-     }
+    if (/ I _(.*)_dll_iname/o) {
+	$dllname ||= $1;
+    } else {
+	my ($file, $member, $symbol) = m%^([^:]*):([^:]*(?=:))?.* T (.*)%o;
+	next if !defined($symbol) || $symbol =~ $exclude_regex;
+	if ($file ne $libdll) {
+	     $match_syms{$symbol} = 1;
+	 } elsif ($match_syms{$symbol} ? !$inverse : $inverse) {
+	     $extract{$member} = 1;
+	 }
+    }
 }
 close $nm_fd;
+   
 
 %extract or die "$0: couldn't find symbols for $lib\n";
 
@@ -50,6 +58,20 @@ chdir $dir;
 my $res = system $ar, 'x', $libdll, sort keys %extract;
 die "$0: $ar extraction exited with non-zero status\n" if $res;
 unlink $lib;
+
+# Add a dummy .idata object for libtool so that it will think
+# this library is an import library.
+my $iname_o = 'd000000.o';
+$extract{$iname_o} = 1;
+open my $as_fd, '|-', $as, '-R', '-o', $iname_o, "-";
+print $as_fd <<EOF;
+	.section .idata\$7
+.global $iname
+$iname: .asciz "$dllname.dll"
+EOF
+close $as_fd or exit 1;
+system $objcopy, '-j', '.idata$7', $iname_o;
+
 $res = system $ar, 'crus', $lib, sort keys %extract;
 unlink keys %extract;
 die "$0: ar creation of $lib exited with non-zero status\n" if $res;

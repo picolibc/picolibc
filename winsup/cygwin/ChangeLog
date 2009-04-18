@@ -1,3 +1,9 @@
+2009-04-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mkimport: Specify .text for stub explicitly.
+	* speclib: Add a dummy '.idata$7' section referring to the dll
+	associated with the real import library.
+
 2009-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (globify): Only call mbtowc for non-ascii chars.
