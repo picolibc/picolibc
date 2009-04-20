@@ -971,6 +971,12 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	      ret = WaitForMultipleObjects (2, w4, FALSE, 100L);
 	    }
 	  while (ret == WAIT_TIMEOUT && get_obj_handle_count (obj) > 1);
+	  /* There's a good chance that the above loop is left with
+	     ret == WAIT_TIMEOUT if another process closes the file handle
+	     associated with this lock.  This is for all practical purposes
+	     equivalent to a signalled lock object. */
+	  if (ret == WAIT_TIMEOUT)
+	    ret = WAIT_OBJECT_0;
 	}
       node->LOCK ();
       node->unwait ();
@@ -991,6 +997,8 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  _my_tls.call_signal_handler ();
 	  return EINTR;
 	default:
+	  system_printf ("Shouldn't happen! ret = %lu, error: %lu\n",
+			 ret, GetLastError ());
 	  return geterrno_from_win_error ();
 	}
     }

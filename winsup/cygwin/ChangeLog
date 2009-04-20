@@ -1,3 +1,9 @@
+2009-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (lf_setlock): Handle border case which results in WFMO loop
+	exiting with ret == WAIT_TIMEOUT gracefully.  Add a system_printf to
+	uncover other potential problems with WFMO loop. 
+
 2009-04-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mkimport: Specify .text for stub explicitly.
