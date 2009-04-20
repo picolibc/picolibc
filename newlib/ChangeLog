@@ -1,3 +1,10 @@
+2009-04-20  Jeff johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h: Change _LDBL_EQ_DBL flag usage to
+	be _HAVE_LDBL_MATH.
+	* libc/include/stdlib.h: Change _LDBL_EQ_DBL flag usage to
+	be _HAVE_LDBL_STDLIB.
+
 2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/ieeefp.h (_LDBL_EQ_DBL): Remove.
