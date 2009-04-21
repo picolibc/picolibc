@@ -1,3 +1,11 @@
+2009-04-21  DJ Delorie  <dj@redhat.com>
+
+	* mep/Makefile.in (SCRIPTS): Update to new config.
+	* mep/default.ld: New.
+	* mep/gmap_default.ld: Change default endian to little.
+	* mep/sim-crt0.S: Maintain 8-byte stack alignment.
+	* mep/sim-crtn.S: Likewise.
+
 2009-04-03  Ken Werner  <ken.werner@de.ibm.com>
 
 	* spu/Makefile.in: Add new files.

@@ -1,26 +1,11 @@
 /******************************************************************************
 begin-header
 
-   Copyright (c) 2000-2007  Red Hat, Inc. All rights reserved.
+  DO NOT EDIT. THIS FILE IS MACHINE-GENERATED 
+  FROM THE TEMPLATE FILE gmap_default.ld.
+  ALL EDITS WILL BE ERASED WITH NEXT MeP-Integrator RUN. 
 
-   This copyrighted material is made available to anyone wishing to use, modify,
-   copy, or redistribute it subject to the terms and conditions of the BSD 
-   License.   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY expressed or implied, including the implied 
-   warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  A copy
-   of this license is available at http://www.opensource.org/licenses. Any 
-   Red Hat trademarks that are incorporated in the source code or documentation
-   are not subject to the BSD License and may only be used or replicated with
-   the express permission of Red Hat, Inc.
-
-   Default linker script for use with the Configuration Tool for
-   Toshiba Media Processor.
-
-   When generating a configuration for a media module, M, the
-   configuration tool will copy this file into a custom linker script
-   M.ld, and customize the script with settings from the media
-   module's global map file.
-
+  Custom linker script for the MeP Module default.
 end-header
 *******************************************************************************/
 
@@ -33,8 +18,17 @@ MEMORY
 {
 /* begin-memory */
   VEC	(r) : ORIGIN = 0x00000000, LENGTH = 0x000000b8
-  ROM	(r) : ORIGIN = 0x000000b8, LENGTH = 0x001fff48
-  RAM	(w) : ORIGIN = 0x00800000, LENGTH = 0x00800000
+  VEC_WARM	(w) : ORIGIN = 0x00200000, LENGTH = 0x000000b8
+  HWINIT	(r) : ORIGIN = 0x000000b8, LENGTH = 0x00000148
+  RAM1	(r) : ORIGIN = 0x00000200, LENGTH = 0x001ffe00
+  RAM2	(w) : ORIGIN = 0x00800000, LENGTH = 0x00800000
+/*RAM3	(w) : ORIGIN = 0x80000000, LENGTH = 0x00800000 */
+  IMEM0	(w) : ORIGIN = 0x002000b8, LENGTH = 0x00003f48
+  IMEM1	(w) : ORIGIN = 0x00204000, LENGTH = 0x00004000
+  DMEM0	(w) : ORIGIN = 0x00220000, LENGTH = 0x00008000
+  DMEM1	(w) : ORIGIN = 0x00228000, LENGTH = 0x00008000
+  DMEM2	(w) : ORIGIN = 0x00230000, LENGTH = 0x00008000
+  DMEM3	(w) : ORIGIN = 0x00238000, LENGTH = 0x00008000
 /* end-memory */
 }
 
@@ -47,16 +41,16 @@ SECTIONS
   .hwinit : { *(.hwinit) } >HWINIT /* HWINIT-section */
 
   /* Sections to be placed in the ROM area.  */
-  .gnu.version   : { *(.gnu.version)	} >ROM /* ROM-section */
-  .gnu.version_d : { *(.gnu.version_d)	} >ROM /* ROM-section */
-  .gnu.version_r : { *(.gnu.version_r)	} >ROM /* ROM-section */
+  .gnu.version   : { *(.gnu.version)	} >RAM1 /* ROM-section */
+  .gnu.version_d : { *(.gnu.version_d)	} >RAM1 /* ROM-section */
+  .gnu.version_r : { *(.gnu.version_r)	} >RAM1 /* ROM-section */
 
   /* Sections to be placed in the romdata.s area.  */
   .srodata :
   {
     __sdabase = . + 0x8000;
     *(.srodata) *(.srodata.*) *(.gnu.linkonce.srd.*)
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   /* Sections to be placed in the data.s area.  */
   .sdata     : 
@@ -64,7 +58,7 @@ SECTIONS
     *(.sdata) 
     *(.sdata.*)
     *(.gnu.linkonce.s.*)
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
   .sbss      :
   {
     PROVIDE (__sbss_start = .);
@@ -79,7 +73,7 @@ SECTIONS
     /* Assert maximum size */
     __assert_tiny_size = ASSERT ((. < __sdabase) || ((. - __sdabase) <= 0x8000),
 	 		         "tiny section overflow");
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   /* Sections to be placed in the data.m area.  */
   .data    :
@@ -89,11 +83,11 @@ SECTIONS
     *(.data.*)
     *(.gnu.linkonce.d.*)
     SORT(CONSTRUCTORS)
-  } >RAM /* DATA-section */
-  .data1   : { *(.data1) } >RAM /* DATA-section */
-  .eh_frame : { KEEP (*(.eh_frame))} >RAM /* DATA-section */
-  .gcc_except_table : { *(.gcc_except_table) *(.gcc_except_table.*) } >RAM /* DATA-section */
-  .dynamic       : { *(.dynamic) } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
+  .data1   : { *(.data1) } >RAM2 /* DATA-section */
+  .eh_frame : { KEEP (*(.eh_frame))} >RAM2 /* DATA-section */
+  .gcc_except_table : { *(.gcc_except_table) *(.gcc_except_table.*) } >RAM2 /* DATA-section */
+  .dynamic       : { *(.dynamic) } >RAM2 /* DATA-section */
   .ctors   : 
   {
     /* gcc uses crtbegin.o to find the start of
@@ -113,25 +107,25 @@ SECTIONS
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
   .dtors         :
   {
     KEEP (*crtbegin.o(.dtors))
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .dtors))
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
   .jcr :
   {
     . = ALIGN(4);
     *(.jcr)
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
   .got :
   {
     *(.got.plt) *(.got)
     _edata = .;
     PROVIDE (edata = .);
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
   .based :
   {
     __tpbase = .;
@@ -139,7 +133,7 @@ SECTIONS
     /* Assert maximum size */
     __assert_based_size = ASSERT ((. - __tpbase) <= 0x80,
 	                          "based section overflow");
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   .bss       :
   {
@@ -155,14 +149,14 @@ SECTIONS
     . = ALIGN(32 / 8);
     _end = .;
     PROVIDE (end = .);
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   /* Sections to be placed in the code.m area.  */
   .init          : 
   { 
     KEEP (*(.init))
-  } >RAM /* CODE-section */
-  .plt      : { *(.plt)	} >RAM /* DATA-section */
+  } >RAM2 /* CODE-section */
+  .plt      : { *(.plt)	} >RAM2 /* DATA-section */
   .text      :
   {
     *(.text)
@@ -171,59 +165,117 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
     *(.gnu.linkonce.t.*)
-  } >RAM /* CODE-section */ =0
+  } >RAM2 /* CODE-section */ =0
   .vtext ALIGN(8)    :
   {
     *(.vtext)
-  } >RAM /* CODE-section */
+  } >RAM2 /* CODE-section */
   .fini      :
   {
     KEEP (*(.fini))
     PROVIDE (__etext = .);
     PROVIDE (_etext = .);
     PROVIDE (etext = .);
-  } >RAM /* CODE-section */ =0
+  } >RAM2 /* CODE-section */ =0
 
   /* Sections to be placed in the romdata.m area.  */
-  .rodata   : { *(.rodata) *(.rodata.*) *(.gnu.linkonce.r.*) } >RAM /* DATA-section */
-  .rodata1   : { *(.rodata1) } >RAM /* DATA-section */
+  .rodata   : { *(.rodata) *(.rodata.*) *(.gnu.linkonce.r.*) } >RAM2 /* DATA-section */
+  .rodata1   : { *(.rodata1) } >RAM2 /* DATA-section */
 
   /* Sections to be placed in the code.l area.  */
-  .ftext : {  *(.ftext) *(.ftext.*) *(.gnu.linkonce.ft.*) } >RAM /* CODE-section */
+  .ftext : {  *(.ftext) *(.ftext.*) *(.gnu.linkonce.ft.*) } >RAM2 /* CODE-section */
   .vftext ALIGN(8)    :
   { 
     *(.vftext) *(.vftext.*) *(.gnu.linkonce.vf.*)
-  } >RAM /* CODE-section */
+  } >RAM2 /* CODE-section */
 
   /* Sections to be placed in the romdata.l area.  */
   .frodata :
   {
     *(.frodata) *(.frodata.*) *(.gnu.linkonce.frd.*)
     __assert_near_size = ASSERT (. <= 0x1000000, "near section overflow");
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   /* Sections to be placed in the data.l area.  */
-  .far : { *(.far) *(.far.*) *(.gnu.linkonce.far.*) } >RAM /* DATA-section */
+  .far : { *(.far) *(.far.*) *(.gnu.linkonce.far.*) } >RAM2 /* DATA-section */
   .farbss :
   { PROVIDE (__farbss_start = .);
     *(.farbss) *(.farbss.*)
     PROVIDE (__farbss_end = .);
-  } >RAM /* DATA-section */
+  } >RAM2 /* DATA-section */
 
   /* END-mep-sections */
 
-  /* begin-stack-table */
-  __stack0  = (__stack - (0 *  (__stack_size / 1)) + 15) / 16 * 16;
-
-  .rostacktab : 
+  .vec_warm :
   {
-    /* Emit a table describing the location of the different stacks.
-       Only 1 processor in the default configuration.  */
+    /* vec_warm is a place for the startup code to write the interrupt
+       vectors.  Allow 0xb8 bytes of space aligned on a 4 byte boundary.  */
+    . = ALIGN(4);
+    vec_warm = .;
+    . += 0xb8;
+  } >VEC_WARM
+
+  /* begin-stack-table */
+  __stack50 = (__stack - (0 *  (__stack_size / 1)) + 15) / 16 * 16;
+
+  .rostacktab :
+  {
+    /* Emit a table describing the location of the different stacks.  */
     . = ALIGN(4);
     __stack_table = .;
-    LONG (__stack0);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
+    LONG (__stack50);
     __stack_end = .;
-  } >RAM
+  } >RAM2
   /* end-stack-table */
 
   /* begin-heap */

@@ -13,11 +13,11 @@
 	.section	.init
         lw      $1, ($sp)
         stc     $1, $lp
-        add     $sp, 4
+        add     $sp, 8
         ret
 
 	.section	.fini
         lw      $1, ($sp)
         stc     $1, $lp
-        add     $sp, 4
+        add     $sp, 8
         ret

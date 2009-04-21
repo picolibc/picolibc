@@ -113,6 +113,17 @@ _start:
 	movh	$sp, %uhi(__stack_table)
 	or3	$sp, $sp, %lo(__stack_table)
 
+	# initialize sp, gp, tp
+	# get CPU ID
+	ldc	$0, $id
+	srl	$0, 16
+
+	# load ID-specific stack pointer	
+	sl2ad3	$0, $0, $sp              # $0 = ($0 << 2) + $sp
+	lw	$sp,($0)                 # $sp = *($0)
+	mov	$0,0xfff8
+	and	$sp, $0
+
 #ifndef NOVEC
 	# copy exception vector table
 
@@ -294,14 +305,6 @@ _start:
 .Lend_dc:	
 	# NOVEC	
 #endif
-	# initialize sp, gp, tp
-	# get CPU ID
-	ldc	$0, $id
-	srl	$0, 16
-
-	# load ID-specific stack pointer	
-	sl2ad3	$0, $0, $sp              # $0 = ($0 << 2) + $sp
-	lw	$sp,($0)                 # $sp = *($0)
 	mov	$0, 0
 	
 	movh	$gp, %uhi(__sdabase)
@@ -385,13 +388,13 @@ _exit_in_progress:	.word 0
 
 	.section	.init
 __invoke_init_section:
-	add	$sp, -4
+	add	$sp, -8
 	ldc	$0, $lp
 	sw	$0, ($sp)
 
 	.section .fini
 __invoke_fini_section:
-	add	$sp, -4
+	add	$sp, -8
 	ldc	$0, $lp
 	sw	$0, ($sp)
 

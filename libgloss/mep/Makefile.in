@@ -57,7 +57,7 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-SCRIPTS = min.ld simple.ld fmax.ld
+SCRIPTS = min.ld default.ld
 CRT = crt0.o sdram-crt0.o sim-crt0.o simnovec-crt0.o simsdram-crt0.o crtn.o sim-crtn.o
 SIM_BSP = libsim.a
 LIBNOSYS = ../libnosys/libnosys.a
