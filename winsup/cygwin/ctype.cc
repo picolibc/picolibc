@@ -34,7 +34,7 @@ __set_ctype (const char *charset)
       if (CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE)
       	{
 	  memcpy (_ctype_b, __ctype_iso[idx], 128);
-	  memcpy (_ctype_b + 256, __ctype_iso[idx], 128);
+	  memcpy (_ctype_b + 256, __ctype_iso[idx] + 256, 128);
 	}
       __ctype_ptr__ = (char *) (__ctype_iso[idx] + 127);
       return;
@@ -45,7 +45,7 @@ __set_ctype (const char *charset)
       if (CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE)
 	{
 	  memcpy (_ctype_b, __ctype_cp[idx], 128);
-	  memcpy (_ctype_b + 256, __ctype_cp[idx], 128);
+	  memcpy (_ctype_b + 256, __ctype_cp[idx] + 256, 128);
 	}
       __ctype_ptr__ = (char *) (__ctype_cp[idx] + 127);
       return;

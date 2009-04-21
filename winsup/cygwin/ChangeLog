@@ -1,3 +1,8 @@
+2009-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ctype.cc (__set_ctype): Copy exact part of the current active
+	character class array.
+
 2009-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (lf_setlock): Handle border case which results in WFMO loop
