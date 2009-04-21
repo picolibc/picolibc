@@ -1,3 +1,8 @@
+2009-04-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* libc/reent/impure.c (__sf_fake_stdin, __sf_fake_stdout)
+	(__sf_fake_stderr): Declare locally with weak attribute.
+
 2009-04-21  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/include/_ansi.h: Move C++ defines to top of file.
