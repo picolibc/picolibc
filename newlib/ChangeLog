@@ -1,3 +1,13 @@
+2009-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/ctype_.c (_CTYPE_DATA_128_255): Rename from
+	_CTYPE_DATA_128_256.
+	* libc/ctype/ctype_cp.h: Split off all character class values for
+	character 255 from the rest of the definitions.
+	(__ctype_cp): Use the new definitions.  Make sure that the table
+	always contains 0 for EOF (-1).
+	* libc/ctype/ctype_iso.h: Ditto.
+
 2009-04-21  Sandra Loosemore  <sandra@codesourcery.com>
 
 	* libc/reent/impure.c (__sf_fake_stdin, __sf_fake_stdout)

@@ -55,7 +55,7 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
 	_L,	_L,	_L,	_P,	_P,	_P,	_P,	_C
 
-#define _CTYPE_DATA_128_256 \
+#define _CTYPE_DATA_128_255 \
 	0,	0,	0,	0,	0,	0,	0,	0, \
 	0,	0,	0,	0,	0,	0,	0,	0, \
 	0,	0,	0,	0,	0,	0,	0,	0, \
@@ -93,9 +93,9 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 static _CONST
 #endif
 char _ctype_b[128 + 256] = {
-	_CTYPE_DATA_128_256,
+	_CTYPE_DATA_128_255,
 	_CTYPE_DATA_0_127,
-	_CTYPE_DATA_128_256
+	_CTYPE_DATA_128_255
 };
 
 #ifndef _MB_CAPABLE
@@ -117,7 +117,7 @@ __asm__ ("					\n\
 _CONST char _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
-	_CTYPE_DATA_128_256
+	_CTYPE_DATA_128_255
 };
 #  endif /* !__CYGWIN__ */
 
@@ -126,7 +126,7 @@ _CONST char _ctype_[1 + 256] = {
 _CONST char _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
-	_CTYPE_DATA_128_256
+	_CTYPE_DATA_128_255
 };
 
 #ifndef _MB_CAPABLE
