@@ -262,6 +262,10 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __moxie__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __ia64__
 #ifdef __BIG_ENDIAN__
 #define __IEEE_BIG_ENDIAN

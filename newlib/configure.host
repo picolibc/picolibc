@@ -208,6 +208,9 @@ case "${host_cpu}" in
 	default_newlib_io_long_long="yes"
 	machine_dir=mn10300
 	;;
+  moxie)
+	machine_dir=moxie
+        ;;
   mt*)
 	machine_dir=mt
 	;;
@@ -449,6 +452,9 @@ case "${host}" in
   mmix-knuth-mmixware)
 	sys_dir=mmixware
 	;;
+  moxie*)
+        sys_dir=
+        ;;
   powerpcle-*-pe)
 	posix_dir=posix
 	;;
@@ -680,6 +686,10 @@ case "${host}" in
   mn10?00-*-*)
 	syscall_dir=syscalls
 	;;
+  moxie-*-*)
+        syscall_dir=syscalls
+	default_newlib_io_long_long="yes"
+        ;;
   powerpc*-*-eabialtivec*)
 	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"

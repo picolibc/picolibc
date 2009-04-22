@@ -187,6 +187,10 @@ _BEGIN_STD_C
 #define _JBTYPE double
 #endif
 
+#ifdef __moxie__
+#define _JBLEN 16
+#endif
+
 #ifdef __CRX__
 #define _JBLEN 9
 #endif

@@ -1,3 +1,17 @@
+2009-04-22 Anthony Green <green@moxielogic.com>
+
+	* configure.host: Add moxie support.
+	* libc/machine/configure.in: Add moxie support.
+	* libc/machine/configure: Rebuilt.
+	* libc/machine/moxie/aclocal.m4: New file.
+	* libc/machine/moxie/configure: New file.
+	* libc/machine/moxie/configure.in: New file.
+	* libc/machine/moxie/Makefile.am: New file.
+	* libc/machine/moxie/Makefile.in: New file.
+	* libc/machine/moxie/setjmp.S: New file.
+	* libc/include/machine/setjmp.h (_JBLEN): Define for moxie.
+	* libc/include/machine/ieeefp.h: Add moxie support. 
+
 2009-04-22  Kazu Hirata  <kazu@codesourcery.com>
 
 	* libc/stdio/local.h (__chclass, __state_table, __action_table):
