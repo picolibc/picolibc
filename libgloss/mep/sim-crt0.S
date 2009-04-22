@@ -121,7 +121,7 @@ _start:
 	# load ID-specific stack pointer	
 	sl2ad3	$0, $0, $sp              # $0 = ($0 << 2) + $sp
 	lw	$sp,($0)                 # $sp = *($0)
-	mov	$0,0xfff8
+	mov	$0,0xfffffff8
 	and	$sp, $0
 
 #ifndef NOVEC

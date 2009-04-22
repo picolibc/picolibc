@@ -1,3 +1,7 @@
+2009-04-22  DJ Delorie  <dj@redhat.com>
+
+	* mep/sim-crt0.S (_start): Fix typo.
+
 2009-04-21  DJ Delorie  <dj@redhat.com>
 
 	* mep/Makefile.in (SCRIPTS): Update to new config.
