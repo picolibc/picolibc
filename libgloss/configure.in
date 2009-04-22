@@ -112,6 +112,10 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(mep)
 	config_testsuite = true;
 	;;
+  moxie-*-*)
+	AC_CONFIG_SUBDIRS(moxie)
+	config_testsuite=true
+	;;
   mt-*-*)
         AC_CONFIG_SUBDIRS(mt)
 	config_testsuite=true

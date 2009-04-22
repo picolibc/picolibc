@@ -1,3 +1,17 @@
+2009-04-22  Anthony Green  <green@moxielogic.com>
+
+	* configure.in: Add moxie support.
+	* configure: Regenerate.
+	* moxie/aclocal.m4, moxie/configure, moxie/configure.in,
+	moxie/crt0.S, moxie/fstat.c, moxie/getpid.c, isatty.c,
+	moxie/kill.c, moxie/Makefile.in, moxie/moxie-elf-common.ld,
+	moxie/print.c, moxie/putnum.c, moxie/qemu.ld, moxie/qemu-time.c,
+	moxie/qemu-write.c, moxie/sbrk.c, moxie/sim-close.S, 
+	moxie/sim-exit.S,
+	moxie/sim-inbyte.c, moxie/sim.ld, moxie/sim-lseek.c,
+	moxie/sim-lseek.S, moxie/sim-open.S, moxie/sim-read.S, moxie/sim-time.c,
+	moxie/sim-unlink.S, moxie/sim-write.S, moxie/stat.c: New files.
+
 2009-04-22  DJ Delorie  <dj@redhat.com>
 
 	* mep/sim-crt0.S (_start): Fix typo.
