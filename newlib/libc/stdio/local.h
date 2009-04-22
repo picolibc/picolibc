@@ -222,6 +222,6 @@ typedef enum {
   PWPOS,   /* get positional parameter value for variable width or precision */
 } __ACTION;
 
-_CONST __CH_CLASS __chclass[256];
-_CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
-_CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
+extern _CONST __CH_CLASS __chclass[256];
+extern _CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
+extern _CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];

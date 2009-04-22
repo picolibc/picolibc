@@ -57,10 +57,10 @@ int __big5_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
 #endif
 #endif
 
-wchar_t __iso_8859_conv[14][0x60];
+extern wchar_t __iso_8859_conv[14][0x60];
 int __iso_8859_index (const char *);
 
-wchar_t __cp_conv[12][0x80];
+extern wchar_t __cp_conv[12][0x80];
 int __cp_index (const char *);
 
 #include <float.h>

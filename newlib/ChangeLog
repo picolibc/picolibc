@@ -1,3 +1,9 @@
+2009-04-22  Kazu Hirata  <kazu@codesourcery.com>
+
+	* libc/stdio/local.h (__chclass, __state_table, __action_table):
+	Add extern to the declarations.
+	* libc/stdlib/local.h (__iso_8859_conv, __cp_conv): Likewise.
+
 2009-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/ctype_.c (_CTYPE_DATA_128_255): Rename from
