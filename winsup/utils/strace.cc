@@ -326,12 +326,22 @@ create_child (char **argv)
   make_command_line (one_line, argv);
 
   SetConsoleCtrlHandler (NULL, 0);
+  const char *cygwin_env = getenv ("CYGWIN");
+  const char *space;
+  if (cygwin_env)
+    space = " ";
+  else
+    space = cygwin_env = "";
+  char *newenv = (char *) malloc (sizeof ("CYGWIN=noglob") + strlen (space) + strlen (cygwin_env));
+  sprintf (newenv, "CYGWIN=noglob%s%s", space, cygwin_env);
+  _putenv (newenv);
   ret = CreateProcess (0, one_line.buf,	/* command line */
 		       NULL,	/* Security */
 		       NULL,	/* thread */
 		       TRUE,	/* inherit handles */
 		       flags,	/* start flags */
-		       NULL, NULL,	/* current directory */
+		       NULL,	/* default environment */
+		       NULL,	/* current directory */
 		       &si, &pi);
   if (!ret)
     error (0, "error creating process %s, (error %d)", *argv,

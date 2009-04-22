@@ -1,3 +1,8 @@
+2009-04-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* strace.cc (create_child): Set CYGWIN=noglob when starting new process
+	so that Cygwin will leave already-parsed the command line alonw.
+
 2009-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (do_pathconv): Only skip \\?\ prefix if it's really
