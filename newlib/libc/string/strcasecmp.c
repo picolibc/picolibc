@@ -22,7 +22,7 @@ DESCRIPTION
 RETURNS 
 
 	If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
-	both are converted to uppercase), <<strcasecmp>> returns a
+	both are converted to lowercase), <<strcasecmp>> returns a
 	number greater than zero.  If the two strings match,
 	<<strcasecmp>> returns zero.  If <<*<[a]>>> sorts
 	lexicographically before <<*<[b]>>>, <<strcasecmp>> returns a
@@ -35,7 +35,7 @@ PORTABILITY
 tolower() from elsewhere in this library.
 
 QUICKREF
-	strcasecmp 
+	strcasecmp
 */
 
 #include <string.h>
@@ -46,11 +46,15 @@ _DEFUN (strcasecmp, (s1, s2),
 	_CONST char *s1 _AND
 	_CONST char *s2)
 {
-  while (*s1 != '\0' && tolower(*s1) == tolower(*s2))
+  _CONST unsigned char *ucs1 = (_CONST unsigned char *) s1;
+  _CONST unsigned char *ucs2 = (_CONST unsigned char *) s2;
+  int d = 0;
+  for ( ; ; )
     {
-      s1++;
-      s2++;
+      _CONST int c1 = tolower(*ucs1++);
+      _CONST int c2 = tolower(*ucs2++);
+      if (((d = c1 - c2) != 0) || (c2 == '\0'))
+        break;
     }
-
-  return tolower(*(unsigned char *) s1) - tolower(*(unsigned char *) s2);
+  return d;
 }

@@ -24,7 +24,7 @@ DESCRIPTION
 RETURNS
 
 	If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
-	both are converted to uppercase), <<strncasecmp>> returns a
+	both are converted to lowercase), <<strncasecmp>> returns a
 	number greater than zero.  If the two strings are equivalent,
 	<<strncasecmp>> returns zero.  If <<*<[a]>>> sorts
 	lexicographically before <<*<[b]>>>, <<strncasecmp>> returns a

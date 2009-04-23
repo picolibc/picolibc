@@ -34,17 +34,13 @@ QUICKREF
 #include <ctype.h>
 
 char *
-strlwr (a)
-     char *a;
+_DEFUN (strlwr, (s),
+	char *s)
 {
-  char *ret = a;
-
-  while (*a != '\0')
+  unsigned char *ucs = (unsigned char *) s;
+  for ( ; *ucs != '\0'; ucs++)
     {
-      if (isupper (*a))
-	*a = tolower (*a);
-      ++a;
+      *ucs = tolower(*ucs);
     }
-
-  return ret;
+  return s;
 }

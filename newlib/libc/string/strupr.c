@@ -27,23 +27,20 @@ PORTABILITY
 <<strupr>> requires no supporting OS subroutines.
 
 QUICKREF
-	strupr */
+	strupr
+*/
 
 #include <string.h>
 #include <ctype.h>
 
 char *
-strupr (a)
-     char *a;
+_DEFUN (strupr, (s),
+	char *s)
 {
-  char *ret = a;
-
-  while (*a != '\0')
+  unsigned char *ucs = (unsigned char *) s;
+  for ( ; *ucs != '\0'; ucs++)
     {
-      if (islower (*a))
-	*a = toupper (*a);
-      ++a;
+      *ucs = toupper(*ucs);
     }
-
-  return ret;
+  return s;
 }

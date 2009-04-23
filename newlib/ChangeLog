@@ -1,3 +1,10 @@
+2009-04-23  Mike Burgess  <wizardsguild@earthlink.net>
+
+	* libc/string/strcasecmp.c: Optimized rewrite.
+	* libc/string/strncasecmp.c: Fix description.
+	* libc/string/strlwr.c: Avoid passing signed char to tolower.
+	* libc/string/strupr.c: Avoid passing signed char to tolower.
+
 2009-04-23  Paul Brook  <paul@codesourcery.com>
 	    Kazu Hirata  <kazu@codesourcery.com>
 
