@@ -7,6 +7,9 @@
 #include <reent.h>
 #include "atexit.h"
 
+/* Make this a weak reference to avoid pulling in free.  */
+void free(void *) _ATTRIBUTE((__weak__));
+
 /*
  * Call registered exit handlers.  If D is null then all handlers are called,
  * otherwise only the handlers from that DSO are called.
@@ -76,6 +79,11 @@ _DEFUN (__call_exitprocs, (code, d),
 #ifndef _ATEXIT_DYNAMIC_ALLOC
       break;
 #else
+      /* Don't dynamically free the atexit array if free is not
+	 available.  */
+      if (!free)
+	break;
+
       /* Move to the next block.  Free empty blocks except the last one,
 	 which is part of _GLOBAL_REENT.  */
       if (p->_ind == 0 && p->_next)
