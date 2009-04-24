@@ -11902,6 +11902,43 @@ _ACEOF
 
 fi
 
+echo "$as_me:$LINENO: checking long double equals double" >&5
+echo $ECHO_N "checking long double equals double... $ECHO_C" >&6
+if test "${newlib_ldbl_eq_dbl+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat > conftest.c <<EOF
+#include <float.h>
+#if DBL_MANT_DIG == LDBL_MANT_DIG  &&  LDBL_MIN_EXP == DBL_MIN_EXP  && \
+    LDBL_MAX_EXP == DBL_MAX_EXP
+  #define _LDBL_EQ_DBL
+ #else
+  #error "LDBL != DBL"
+#endif
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
+		   -static -nostartfiles -nostdlib 1>&5'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }
+then
+  newlib_ldbl_eq_dbl=yes;
+else
+  newlib_ldbl_eq_dbl=no;
+fi
+rm -f conftest*
+fi
+echo "$as_me:$LINENO: result: $newlib_ldbl_eq_dbl" >&5
+echo "${ECHO_T}$newlib_ldbl_eq_dbl" >&6
+if test $newlib_ldbl_eq_dbl = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define _LDBL_EQ_DBL 1
+_ACEOF
+
+fi
+
           ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF

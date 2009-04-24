@@ -334,8 +334,8 @@ extern float log2f _PARAMS((float));
 extern float hypotf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
 
-/* On platforms where long double math functions are supported.  */
-#ifdef _HAVE_LDBL_MATH
+/* On platforms where long double equals double.  */
+#ifdef _LDBL_EQ_DBL
 /* Reentrant ANSI C functions.  */
 #ifndef __math_68881
 extern long double atanl _PARAMS((long double));
@@ -400,14 +400,14 @@ extern long double lgammal _PARAMS((long double));
 extern long double erfl _PARAMS((long double));
 extern long double erfcl _PARAMS((long double));
 #endif /* ! defined (_REENT_ONLY) */
-#else /* !_HAVE_LDBL_MATH */
+#else /* !_LDBL_EQ_DBL */
 #ifdef __i386__
 /* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl _PARAMS((_LONG_DOUBLE));
 extern long int lrintl _PARAMS((_LONG_DOUBLE));
 extern _LONG_LONG_TYPE llrintl _PARAMS((_LONG_DOUBLE));
 #endif /* __i386__ */
-#endif /* !_HAVE_LDBL_MATH */
+#endif /* !_LDBL_EQ_DBL */
 
 #endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L */
 

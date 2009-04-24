@@ -199,11 +199,11 @@ int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
 
-/* On platforms where long double stdlib functions are supported.  */
-#ifdef _HAVE_LDBL_STDLIB
+/* On platforms where long double equals double.  */
+#ifdef _LDBL_EQ_DBL
 extern long double strtold (const char *, char **);
 extern long double wcstold (const wchar_t *, wchar_t **);
-#endif /* _HAVE_LDBL_STDLIB */
+#endif /* _LDBL_EQ_DBL */
 
 _END_STD_C
 

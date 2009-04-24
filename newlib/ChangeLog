@@ -1,3 +1,16 @@
+2009-04-24  Jeff johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Add configuration test for long double equals dbl
+	and set flag _LDBL_EQ_DBL if true.
+	* configure: Regenerated.
+	* newlib.hin: Add _LDBL_EQ_DBL flag.
+	* libc/include/math.h: Use _LDBL_EQ_DBL flag instead of
+	_HAVE_LDBL_MATH.
+	* libc/include/stdlib.h: Use _LDBL_EQ_DBL flag instead of
+	_HAVE_LDBL_STDLIB.
+	* libc/common/local.h: Remove _LDBL_EQ_DBL flag setting.
+	* libc/stdlib/local.h: Ditto.
+
 2009-04-24  Joseph Myers  <joseph@codesourcery.com>
 
 	* libc/include/stdint.h (UINTPTR_MAX): Define to __UINTPTR_MAX__
