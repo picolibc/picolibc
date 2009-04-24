@@ -1,3 +1,8 @@
+2009-04-24  Eli Zaretskii  <eliz@gnu.org>
+
+	* config.guess (pc:*:*:*): Return i586-pc-msdosdjgpp, for
+	consistency with config.sub.  (Update from upstream sources.)
+
 2009-04-21  Joseph Myers  <joseph@codesourcery.com>
 
 	* texinfo/texinfo.tex: Update to version 2009-03-28.05.
