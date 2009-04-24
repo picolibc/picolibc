@@ -244,7 +244,11 @@ typedef signed __PTRDIFF_TYPE__ intptr_t;
 typedef unsigned __PTRDIFF_TYPE__ uintptr_t;
 #define INTPTR_MAX PTRDIFF_MAX
 #define INTPTR_MIN PTRDIFF_MIN
+#ifdef __UINTPTR_MAX__
+#define UINTPTR_MAX __UINTPTR_MAX__
+#else
 #define UINTPTR_MAX (2UL * PTRDIFF_MAX + 1)
+#endif
 #else
 /*
  * Fallback to hardcoded values, 

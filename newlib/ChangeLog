@@ -1,3 +1,8 @@
+2009-04-24  Joseph Myers  <joseph@codesourcery.com>
+
+	* libc/include/stdint.h (UINTPTR_MAX): Define to __UINTPTR_MAX__
+	if __UINTPTR_MAX__ defined.
+
 2009-04-24  Eric Blake  <ebb9@byu.net>
 
 	Be namespace clean in ctype.h.
