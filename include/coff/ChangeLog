@@ -1,3 +1,32 @@
+2009-04-21  Kai Tietz  <kai.tietz@onevision.com>
+
+	* pe.h (pex64_runtime_function): New structure.
+	(external_pex64_runtime_function): Likewise.
+	(pex64_unwind_code): Likewise.
+	(external_pex64_unwind_code): Likewise.
+	(pex64_unwind_info): Likewise.
+	(external_pex64_unwind_info): Likewise.
+	(external_pex64_scope): Likewise.
+	(pex64_scope): Likewise.
+	(pex64_scope_entry):  Likewise.
+	(external_pex64_scope_entry): Likewise.
+	(PEX64_IS_RUNTIME_FUNCTION_CHAINED): New macro.
+	(PEX64_GET_UNWINDDATA_UNIFIED_RVA): Likewise.
+	(PEX64_UNWCODE_CODE): Likewise.
+	(PEX64_UNWCODE_INFO): Likewise.
+	(UWOP_...): Add defines for unwind code.
+	(UNW_FLAG_...): Add defined for unwind info flags.
+	(PEX64_SCOPE_ENTRY_SIZE): New macro.
+	(PEX64_UWI_VERSION): Likewise.
+	(PEX64_UWI_FLAGS): Likewise.
+	(PEX64_UWI_FRAMEREG): Likewise.
+	(PEX64_UWI_FRAMEOFF): Likewise.
+	(PEX64_UWI_SIZEOF_UWCODE_ARRAY): Likewise.
+	(PEX64_OFFSET_TO_UNWIND_CODE): Likewise.
+	(PEX64_OFFSET_TO_HANDLER_RVA): Likewise.
+	(PEX64_OFFSET_TO_SCOPE_COUNT): Likewise.
+	(PEX64_SCOPE_ENTRY): Likewise.
+
 2009-04-17  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* pe.h (IMAGE_SUBSYSTEM_EFI_ROM): Renamed to ...
@@ -31,6 +60,21 @@
 	* xcoff.h (XCOFF_CALLED, XCOFF_IMPORT): Update comments.
 	(XCOFF_WAS_UNDEFINED): New flag.
 	(xcoff_link_hash_table): Add an "rtld" field.
+
+2009-03-14  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* internal.h (struct internal_extra_pe_aouthdr):  Correct type
+	of DllCharacteristics flags field to unsigned.
+	* pe.h (IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLL_CHARACTERISTICS_NX_COMPAT,
+	IMAGE_DLLCHARACTERISTICS_NO_ISOLATION,
+	IMAGE_DLLCHARACTERISTICS_NO_SEH,
+	IMAGE_DLLCHARACTERISTICS_NO_BIND,
+	IMAGE_DLLCHARACTERISTICS_WDM_DRIVER,
+	IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE):  New macros to
+	define flag bit values for DllCharacteristics field of PEAOUTHDR,
+	PEPAOUTHDR.
 
 2008-12-23  Johan Olmutz Nielsen  <jnielsen@ddci.com>
 
