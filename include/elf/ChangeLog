@@ -1,3 +1,7 @@
+2009-04-24  Cary Coutant  <ccoutant@google.com>
+
+	 * dwarf2.h (DW_LNE_set_discriminator): New enum value.
+
 2009-04-15  Anthony Green  <green@moxielogic.com>
 
 	* common.h (EM_MOXIE): Define.

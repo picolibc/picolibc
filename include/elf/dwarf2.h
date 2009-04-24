@@ -709,6 +709,7 @@ enum dwarf_line_number_x_ops
     DW_LNE_end_sequence = 1,
     DW_LNE_set_address = 2,
     DW_LNE_define_file = 3,
+    DW_LNE_set_discriminator = 4,
     /* HP extensions.  */
     DW_LNE_HP_negate_is_UV_update      = 0x11,
     DW_LNE_HP_push_context             = 0x12,
