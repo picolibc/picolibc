@@ -26,8 +26,8 @@ int _EXFUN(isblank, (int __c));
 #ifndef __STRICT_ANSI__
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
-#define _tolower(c) ((unsigned char)(c) - 'A' + 'a')
-#define _toupper(c) ((unsigned char)(c) - 'a' + 'A')
+#define _tolower(__c) ((unsigned char)(__c) - 'A' + 'a')
+#define _toupper(__c) ((unsigned char)(__c) - 'a' + 'A')
 #endif
 
 #define	_U	01
@@ -48,23 +48,23 @@ extern	__IMPORT char	*__ctype_ptr__;
 /* These macros are intentionally written in a manner that will trigger
    a gcc -Wall warning if the user mistakenly passes a 'char' instead
    of an int containing an 'unsigned char'.  */
-#define	isalpha(c)	((__ctype_ptr__+1)[c]&(_U|_L))
-#define	isupper(c)	(((__ctype_ptr__+1)[c]&(_U|_L))==_U)
-#define	islower(c)	(((__ctype_ptr__+1)[c]&(_U|_L))==_L)
-#define	isdigit(c)	((__ctype_ptr__+1)[c]&_N)
-#define	isxdigit(c)	((__ctype_ptr__+1)[c]&(_X|_N))
-#define	isspace(c)	((__ctype_ptr__+1)[c]&_S)
-#define ispunct(c)	((__ctype_ptr__+1)[c]&_P)
-#define isalnum(c)	((__ctype_ptr__+1)[c]&(_U|_L|_N))
-#define isprint(c)	((__ctype_ptr__+1)[c]&(_P|_U|_L|_N|_B))
-#define	isgraph(c)	((__ctype_ptr__+1)[c]&(_P|_U|_L|_N))
-#define iscntrl(c)	((__ctype_ptr__+1)[c]&_C)
+#define	isalpha(__c)	((__ctype_ptr__+1)[__c]&(_U|_L))
+#define	isupper(__c)	(((__ctype_ptr__+1)[__c]&(_U|_L))==_U)
+#define	islower(__c)	(((__ctype_ptr__+1)[__c]&(_U|_L))==_L)
+#define	isdigit(__c)	((__ctype_ptr__+1)[__c]&_N)
+#define	isxdigit(__c)	((__ctype_ptr__+1)[__c]&(_X|_N))
+#define	isspace(__c)	((__ctype_ptr__+1)[__c]&_S)
+#define ispunct(__c)	((__ctype_ptr__+1)[__c]&_P)
+#define isalnum(__c)	((__ctype_ptr__+1)[__c]&(_U|_L|_N))
+#define isprint(__c)	((__ctype_ptr__+1)[__c]&(_P|_U|_L|_N|_B))
+#define	isgraph(__c)	((__ctype_ptr__+1)[__c]&(_P|_U|_L|_N))
+#define iscntrl(__c)	((__ctype_ptr__+1)[__c]&_C)
 
 #if defined(__GNUC__) && \
     (!defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L)
-#define isblank(c) \
-  __extension__ ({ __typeof__ (c) __c = (c);		\
-      ((__ctype_ptr__+1)[__c]&_B) || (__c) == '\t';})
+#define isblank(__c) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);		\
+      ((__ctype_ptr__+1)[__x]&_B) || (__x) == '\t';})
 #endif
 
 
@@ -72,18 +72,18 @@ extern	__IMPORT char	*__ctype_ptr__;
    slightly slower.  These macros are not NLS-aware so they are
    disabled if the system supports the extended character sets. */
 # if defined(__GNUC__) && !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
-# define toupper(c) \
-  __extension__ ({ __typeof__ (c) __x = (c);	\
+# define toupper(__c) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);	\
       islower(__x) ? (__x - 'a' + 'A') : __x;})
-# define tolower(c) \
-  __extension__ ({ __typeof__ (c) __x = (c);	\
+# define tolower(__c) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);	\
       isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif
 #endif /* !__cplusplus */
 
 #ifndef __STRICT_ANSI__
-#define isascii(c)	((unsigned)(c)<=0177)
-#define toascii(c)	((c)&0177)
+#define isascii(__c)	((unsigned)(__c)<=0177)
+#define toascii(__c)	((__c)&0177)
 #endif
 
 /* For C++ backward-compatibility only.  */

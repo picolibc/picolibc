@@ -1,5 +1,11 @@
 2009-04-24  Eric Blake  <ebb9@byu.net>
 
+	Be namespace clean in ctype.h.
+	* libc/include/ctype.h (_tolower, _toupper, isalpha, isupper)
+	(islower, isdigit, isxdigit, isspace, ispunct, isalnum)
+	(isprint, isgraph, iscntrl, isblank, toupper, tolower)
+	(isascii, toascii): Don't use 'c' as macro parameter name.
+
 	Trigger gcc warning if isFoo macros are called with plain char.
 	* libc/include/ctype.h (isalpha, isupper, islower, isdigit)
 	(isxdigit, isspace, ispunct, isalnum, isprint, isgraph)
