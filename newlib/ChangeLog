@@ -1,3 +1,11 @@
+2009-04-24  Eric Blake  <ebb9@byu.net>
+
+	Trigger gcc warning if isFoo macros are called with plain char.
+	* libc/include/ctype.h (isalpha, isupper, islower, isdigit)
+	(isxdigit, isspace, ispunct, isalnum, isprint, isgraph)
+	(iscntrl, isblank, toupper, tolower): Rewrite to let 'gcc -Wall'
+	warn when user calls macro with a char argument.
+
 2009-04-23  Mike Burgess  <wizardsguild@earthlink.net>
 
 	* libc/string/strcasecmp.c: Optimized rewrite.
@@ -25,7 +33,7 @@
 	* libc/machine/moxie/Makefile.in: New file.
 	* libc/machine/moxie/setjmp.S: New file.
 	* libc/include/machine/setjmp.h (_JBLEN): Define for moxie.
-	* libc/include/machine/ieeefp.h: Add moxie support. 
+	* libc/include/machine/ieeefp.h: Add moxie support.
 
 2009-04-22  Kazu Hirata  <kazu@codesourcery.com>
 
@@ -440,7 +448,7 @@
 	fpclassify(), isfinite(), isinf(), isnan(), and isnormal().
 	* libm/common/s_nearbyint.c: Add nearbyint() and nearbyintf()
 	documentation.
-	* libm/common/Makefile.am: Add s_llround.c (src); sf_llround.c (fsrc); 
+	* libm/common/Makefile.am: Add s_llround.c (src); sf_llround.c (fsrc);
 	s_fdim.def, s_fma.def, s_fmax.def, s_fmin.def,
 	s_logb.def, s_lrint.def, s_lround.def, s_nearbyint.def, s_remquo.def,
 	s_rint.def, s_round.def, s_signbit.def, s_trunc.def, and
@@ -818,7 +826,7 @@
 
 2009-02-26  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
-	* libc/machine/lm32/configure.in: Let 
+	* libc/machine/lm32/configure.in: Let
 	AC_CONFIG_SRCDIR point to setjmp.S instead of setjmp.s
 	* libs/machine/lm32/configure: Regenerate.
 
@@ -834,11 +842,11 @@
 
 2009-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Remove conversion of 5 and 6 
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Remove conversion of 5 and 6
 	byte UTF-8 sequences since they are invalid in the Unicode standard.
 	Handle surrogate pairs in case of wchar_t == UTF-16.
-	* libc/stdlib/wctomb_r.c (_wctomb_r): Don't convert invalid Unicode 
-	wchar_t values beyond 0x10ffff into UTF-8 chars.  Handle surrogate 
+	* libc/stdlib/wctomb_r.c (_wctomb_r): Don't convert invalid Unicode
+	wchar_t values beyond 0x10ffff into UTF-8 chars.  Handle surrogate
 	pairs in case of wchar_t == UTF-16.
 
 2009-02-24  Kevin Buettner  <kevinb@redhat.com>
@@ -1016,7 +1024,7 @@
 
 2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
-	* libc/sys/rtems/crt0.c: Add stubs for getdents(), nanosleep(), 
+	* libc/sys/rtems/crt0.c: Add stubs for getdents(), nanosleep(),
 	_execve(), _exit().
 
 2008-12-12  Ralf Corsepius  <ralf.corsepius@rtems.org>
@@ -1171,7 +1179,7 @@
 
 2008-11-27  Ralf Corsepius <ralf.corsepius@rtems.org>
 
-	* libc/posix/telldir.c: Use #if !defined() instead of #ifndef 
+	* libc/posix/telldir.c: Use #if !defined() instead of #ifndef
 	to fix GCC warning.
 
 2008-11-27  Ken Werner  <ken.werner@de.ibm.com>
@@ -1248,7 +1256,7 @@
 
 2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
 
-	* libc/posix/scandir.c: Fix memory leaks. 
+	* libc/posix/scandir.c: Fix memory leaks.
 
 2008-11-24  Joel Sherrill <joel.sherrill@oarcorp.com>
 
@@ -1343,9 +1351,9 @@
 
 2008-11-19  Ralf Corsepius <ralf.corsepius@rtems.org>
 
-	* libc/include/sys/config.h: Don't put 
+	* libc/include/sys/config.h: Don't put
 	__ATTRIBUTE_IMPURE_PTR__ into .sdata section for mips-rtems.
-		  
+
 2008-11-19  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/posix/runetype.h: Add include of stddef.h and remove
@@ -1382,7 +1390,7 @@
 
 2008-11-17  Joel Sherrill <joel.sherrill@oarcorp.com>
 
-	* configure.host: RTEMS now uses posix subdirectory. 
+	* configure.host: RTEMS now uses posix subdirectory.
 
 2008-11-17  Joel Sherrill <joel.sherrill@oarcorp.com>
 
@@ -1429,7 +1437,7 @@
 	* libc/include/glob.h: Ditto.
 	* libc/include/regex.h: Ditto.
 	* libc/include/wordexp.h: Ditto.
-	* libc/posix/Makefile.am: Add new files moved from 
+	* libc/posix/Makefile.am: Add new files moved from
 	libc/sys/linux/stdlib.
 	* libc/posix/Makefile.in: Regenerated.
 	* libc/posix/COPYRIGHT: New file moved from libc/sys/linux/stdlib.
@@ -1496,13 +1504,13 @@
 
 2008-10-16  Joel Sherrill <joel.sherrill@oarcorp.com>
 
-	* libc/include/sys/unistd.h: RTEMS follows standard for sync(). 
+	* libc/include/sys/unistd.h: RTEMS follows standard for sync().
 
 2008-10-16  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/time.h: Add CLOCK_MONOTONIC.
 	* libc/include/sys/features.h: Define
-	_POSIX_MONOTONIC_CLOCK for RTEMS. 
+	_POSIX_MONOTONIC_CLOCK for RTEMS.
 
 2008-10-15  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -1548,7 +1556,7 @@
 
 2008-10-02  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/include/sys/reent.h[_REENT_SMALL](_REENT_INIT_RAND48): Add 
+	* libc/include/sys/reent.h[_REENT_SMALL](_REENT_INIT_RAND48): Add
 	initialization of _rand_next to 1.
 
 2008-09-29  Peter O'Gorman  <pogma@thewrittenword.com>
@@ -1808,7 +1816,7 @@
 	* libc/sys/linux/dl/atomicity.h (exchange_and_add): Fix asm
 	statement to use "m" instead of "0".
 	(atomic_add): Ditto.
-	* libc/sys/linux/linuxthreads/spinlock.c (__pthread_release): Ditto. 
+	* libc/sys/linux/linuxthreads/spinlock.c (__pthread_release): Ditto.
 	* libc/sys/linux/net/getaddrinfo.c: Add limit.h include.
 	* libc/sys/linux/stdlib/glob.c: Ditto.
 
@@ -1913,20 +1921,20 @@
 
 	* libm/machine/spu/headers/cbrt.h: cbrt_factors[] declared.
 	* libm/machine/spu/headers/cbrtf.h: Likewise.
-		
+
 2008-09-01  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/include/spu_timer.h: spu_timebase function added.
 	* libc/machine/spu/spu_timebase.c: New file.
 	* libc/machine/spu/Makefile.am: Add new file.
 	* libc/machine/spu/Makefile.in: Regenerated.
-			
+
 2008-08-28  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/time/mktime.c (mktime): Fix tm_isdst value usage (allowing
 	any positive value from user (per std) rather than depending
 	upon 1).
-		
+
 2008-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Optimize condition
@@ -1937,12 +1945,12 @@
 	* libc/libc.texinfo: Remove "LOCAL KLUGE" that prevents it
 	from building pdfs.
 	* libm/libm.texinfo: Likewise.
-				
+
 2008-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Fix condition for
 	accepting a converted character and continuing the loop.
-		
+
 2008-07-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/ctype.h (_ctype_): Restore for C++ backward
@@ -2039,7 +2047,7 @@
 	* libc/machine/spu/sys/dirent.h: Add extern "C" specifier if C++.
 	* libc/machine/spu/sys/sched.h: Likewise.
 	* libc/machine/spu/sys/syscall.h: Likewise.
-	
+
 2008-06-16  Ken Werner  <ken.werner@de.ibm.com>
 
 	* libc/machine/spu/mk_syscalls: Provide .type and .size directives
@@ -2055,7 +2063,7 @@
 	and .size directives.
 	* libc/machine/spu/setjmp.S (setjmp): Likewise.
 	(longjmp): Likewise.
-	
+
 2008-06-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/_default_types.h: Fix GNUC check to
@@ -2081,7 +2089,7 @@
 
 	* libc/machine/spu/strcat.c: Return value fixed.
 	* libc/machine/spu/strncat.c: Likewise.
-		
+
 2008-05-28  Eric Blake  <ebb9@byu.net>
 
 	Fix bug in previous patch.

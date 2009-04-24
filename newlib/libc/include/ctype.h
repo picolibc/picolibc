@@ -45,22 +45,26 @@ _CONST
 extern	__IMPORT char	*__ctype_ptr__;
 
 #ifndef __cplusplus
-#define	isalpha(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))
-#define	isupper(c)	(((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))==_U)
-#define	islower(c)	(((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L))==_L)
-#define	isdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_N)
-#define	isxdigit(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_X|_N))
-#define	isspace(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_S)
-#define ispunct(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_P)
-#define isalnum(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_U|_L|_N))
-#define isprint(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N|_B))
-#define	isgraph(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&(_P|_U|_L|_N))
-#define iscntrl(c)	((__ctype_ptr__)[(unsigned)((c)+1)]&_C)
+/* These macros are intentionally written in a manner that will trigger
+   a gcc -Wall warning if the user mistakenly passes a 'char' instead
+   of an int containing an 'unsigned char'.  */
+#define	isalpha(c)	((__ctype_ptr__+1)[c]&(_U|_L))
+#define	isupper(c)	(((__ctype_ptr__+1)[c]&(_U|_L))==_U)
+#define	islower(c)	(((__ctype_ptr__+1)[c]&(_U|_L))==_L)
+#define	isdigit(c)	((__ctype_ptr__+1)[c]&_N)
+#define	isxdigit(c)	((__ctype_ptr__+1)[c]&(_X|_N))
+#define	isspace(c)	((__ctype_ptr__+1)[c]&_S)
+#define ispunct(c)	((__ctype_ptr__+1)[c]&_P)
+#define isalnum(c)	((__ctype_ptr__+1)[c]&(_U|_L|_N))
+#define isprint(c)	((__ctype_ptr__+1)[c]&(_P|_U|_L|_N|_B))
+#define	isgraph(c)	((__ctype_ptr__+1)[c]&(_P|_U|_L|_N))
+#define iscntrl(c)	((__ctype_ptr__+1)[c]&_C)
 
 #if defined(__GNUC__) && \
     (!defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L)
 #define isblank(c) \
-	__extension__ ({ int __c = (c); ((__ctype_ptr__)[(unsigned)((__c)+1)]&_B) || (__c) == '\t';})
+  __extension__ ({ __typeof__ (c) __c = (c);		\
+      ((__ctype_ptr__+1)[__c]&_B) || (__c) == '\t';})
 #endif
 
 
@@ -69,9 +73,11 @@ extern	__IMPORT char	*__ctype_ptr__;
    disabled if the system supports the extended character sets. */
 # if defined(__GNUC__) && !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
 # define toupper(c) \
-	__extension__ ({ int __x = (c); islower(__x) ? (__x - 'a' + 'A') : __x;})
+  __extension__ ({ __typeof__ (c) __x = (c);	\
+      islower(__x) ? (__x - 'a' + 'A') : __x;})
 # define tolower(c) \
-	__extension__ ({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
+  __extension__ ({ __typeof__ (c) __x = (c);	\
+      isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif
 #endif /* !__cplusplus */
 
