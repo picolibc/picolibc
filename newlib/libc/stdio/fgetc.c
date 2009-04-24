@@ -93,9 +93,11 @@ _DEFUN(fgetc, (fp),
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   int result;
   CHECK_INIT(_REENT, fp);
+  __sfp_lock_acquire ();
   _flockfile (fp);
   result = __sgetc_r (_REENT, fp);
   _funlockfile (fp);
+  __sfp_lock_release ();
   return result;
 #else
   return _fgetc_r (_REENT, fp);

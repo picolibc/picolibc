@@ -98,6 +98,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 
   CHECK_INIT(ptr, fp);
 
+  __sfp_lock_acquire ();
   _flockfile (fp);
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
@@ -113,10 +114,12 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
       if (c == EOF && s == buf)
         {
           _funlockfile (fp);
+	  __sfp_lock_release ();
           return NULL;
         }
       *s = 0;
       _funlockfile (fp);
+      __sfp_lock_release ();
       return buf;
     }
 #endif
@@ -135,6 +138,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	      if (s == buf)
                 {
                   _funlockfile (fp);
+		  __sfp_lock_release ();
                   return 0;
                 }
 	      break;
@@ -160,6 +164,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	  _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
 	  s[len] = 0;
           _funlockfile (fp);
+	  __sfp_lock_release ();
 	  return (buf);
 	}
       fp->_r -= len;
@@ -170,6 +175,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
   while ((n -= len) != 0);
   *s = 0;
   _funlockfile (fp);
+  __sfp_lock_release ();
   return buf;
 }
 

@@ -1,5 +1,19 @@
 2009-04-24  Jeff johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/fgetc.c: Make sure sfp lock is acquired before the
+	file lock and released before the file lock to avoid a deadlock
+	scenario.
+	* libc/stdio/fgets.c: Ditto.
+	* libc/stdio/fgetwc.c: Ditto.
+	* libc/stdio/fgetws.c: Ditto.
+	* libc/stdio/fread.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio/getc.c: Ditto.
+	* libc/stdio/getdelim.c: Ditto.
+	* libc/stdio/gets.c: Ditto.
+
+2009-04-24  Jeff johnston  <jjohnstn@redhat.com>
+
 	* configure.in: Add configuration test for long double equals dbl
 	and set flag _LDBL_EQ_DBL if true.
 	* configure: Regenerated.

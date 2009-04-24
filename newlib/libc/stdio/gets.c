@@ -79,12 +79,14 @@ _DEFUN(_gets_r, (ptr, buf),
   register int c;
   register char *s = buf;
 
+  __sfp_lock_acquire ();
   _flockfile (stdin);
   while ((c = __sgetc_r (ptr, stdin)) != '\n')
     if (c == EOF)
       if (s == buf)
 	{
 	  _funlockfile (stdin);
+	  __sfp_lock_release ();
 	  return NULL;
 	}
       else
@@ -93,6 +95,7 @@ _DEFUN(_gets_r, (ptr, buf),
       *s++ = c;
   *s = 0;
   _funlockfile (stdin);
+  __sfp_lock_release ();
   return buf;
 }
 
