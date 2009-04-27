@@ -1,3 +1,7 @@
+2009-04-26  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/cygwin/socket.h: Define SOL_IPV6.
+
 2009-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ctype.cc (__set_ctype): Copy exact part of the current active

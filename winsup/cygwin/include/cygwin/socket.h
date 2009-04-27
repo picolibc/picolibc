@@ -198,6 +198,7 @@ struct OLD_msghdr
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0
+#define SOL_IPV6	41
 #define SOL_IPX		256
 #define SOL_AX25	257
 #define SOL_ATALK	258
