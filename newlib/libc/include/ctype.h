@@ -71,14 +71,25 @@ extern	__IMPORT char	*__ctype_ptr__;
 /* Non-gcc versions will get the library versions, and will be
    slightly slower.  These macros are not NLS-aware so they are
    disabled if the system supports the extended character sets. */
-# if defined(__GNUC__) && !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
-# define toupper(__c) \
+# if defined(__GNUC__)
+#  if !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#   define toupper(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      islower(__x) ? (__x - 'a' + 'A') : __x;})
-# define tolower(__c) \
+      islower (__x) ? (int) __x - 'a' + 'A' : (int) __x;})
+#   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      isupper(__x) ? (__x - 'A' + 'a') : __x;})
-#endif
+      isupper (__x) ? (int) __x - 'A' + 'a' : (int) __x;})
+#  else /* _MB_EXTENDED_CHARSETS* */
+/* Allow a gcc warning if the user passed 'char', but defer to the
+   function.  */
+#   define toupper(__c) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);	\
+      (void) __ctype_ptr__[__x]; (toupper) (__x);})
+#   define tolower(__c) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);	\
+      (void) __ctype_ptr__[__x]; (tolower) (__x);})
+#  endif /* _MB_EXTENDED_CHARSETS* */
+# endif /* __GNUC__ */
 #endif /* !__cplusplus */
 
 #ifndef __STRICT_ANSI__

@@ -1,3 +1,11 @@
+2009-04-30  Eric Blake  <ebb9@byu.net>
+
+	Allow gcc warning for toupper even with extended charsets.
+	* libc/include/ctype.h (toupper, tolower)
+	[_MB_EXTENDED_CHARSETS_ISO]: Allow gcc warning when called with
+	'char' even when we must call the function for correct behavior.
+	[!_MB_EXTENDED_CHARSETS_ISO]: Fix regression in result type.
+
 2009-04-24  Jeff johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fgetc.c: Make sure sfp lock is acquired before the
