@@ -1,3 +1,8 @@
+2009-04-29  Anthony Green  <green@moxielogic.com>
+
+	* moxie/moxie-elf-common.ld: Move default stack out to accommodate
+	large GCC tests.
+
 2009-04-22  Anthony Green  <green@moxielogic.com>
 
 	* configure.in: Add moxie support.

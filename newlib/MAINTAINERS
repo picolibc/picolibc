@@ -34,11 +34,13 @@ CPU port maintainers may make changes in cpu-specific directories, as
 well as cpu-specific portions of the build system, without approval.
 
 m32c port		DJ Delorie		dj@redhat.com
+moxie			Anthony Green		green@moxielogic.com
 
 
 			Write After Approval
 
 These are users with general write privileges after getting approval:
 
+Anthony Green			green@moxielogic.com
 DJ Delorie			dj@redhat.com
 Jim Wilson			wilson@specifixinc.com
