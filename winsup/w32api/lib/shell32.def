@@ -1,5 +1,6 @@
 LIBRARY SHELL32.DLL
 EXPORTS
+SHGetImageList@12
 WOWShellExecute@28
 StrStrW@8
 StrStrIW@8

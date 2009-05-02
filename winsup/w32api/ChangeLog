@@ -1,3 +1,9 @@
+2009-05-01  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shellapi.h (SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE,
+	SHIL_SYSSMALL, SHIL_JUMBO, SHIL_LAST SHIL_JUMBO, SHGetImageList): Define.
+	* lib/shell32.def (SHGetImageList): Define.
+
 2009-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winnt.h: Add Vista token security extensions.
