@@ -1036,7 +1036,6 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
       DWORD nbytes = len > MAX_WRITE_CHARS ? MAX_WRITE_CHARS : len;
       if (!WriteConsoleW (get_output_handle (), buf, nbytes, &done, 0))
 	{
-	  debug_printf ("write failed, handle %p", get_output_handle ());
 	  __seterrno ();
 	  return false;
 	}
@@ -1512,7 +1511,6 @@ fhandler_console::write_normal (const unsigned char *src,
 	  if (!write_console (write_buf, buf_len, done))
 	    {
 	      debug_printf ("multibyte sequence write failed, handle %p", get_output_handle ());
-	      __seterrno ();
 	      return 0;
 	    }
 	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
@@ -1571,7 +1569,6 @@ fhandler_console::write_normal (const unsigned char *src,
       if (!write_console (write_buf, buf_len, done))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());
-	  __seterrno ();
 	  return 0;
 	}
       if (len >= CONVERT_LIMIT)
