@@ -1,3 +1,14 @@
+2009-05-03  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_console::MAX_WRITE_CHARS): Declare.
+	(fhandler_console::write_replacement_char): Declare as inline.
+	(fhandler_console::write_console): Declare new function.
+	* fhandler_console.cc (fhandler_console::MAX_WRITE_CHARS): Define.
+	(handler_console::write_console): Define.
+	(fhandler_console::write_replacement_char): Define as inline.
+	(fhandler_console::write_normal): Use write_console when writing
+	buffers of unknown length.
+
 2009-04-26  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/cygwin/socket.h: Define SOL_IPV6.

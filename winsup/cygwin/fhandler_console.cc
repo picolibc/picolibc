@@ -52,6 +52,8 @@ details. */
 
 const char * get_nonascii_key (INPUT_RECORD&, char *);
 
+const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
+
 static console_state NO_COPY *shared_console_info;
 
 dev_console NO_COPY *fhandler_console::dev_state;
@@ -1026,6 +1028,24 @@ fhandler_console::cursor_get (int *x, int *y)
   *x = dev_state->info.dwCursorPosition.X;
 }
 
+inline
+bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
+{
+  while (len > 0)
+    {
+      DWORD nbytes = len > MAX_WRITE_CHARS ? MAX_WRITE_CHARS : len;
+      if (!WriteConsoleW (get_output_handle (), buf, nbytes, &done, 0))
+	{
+	  debug_printf ("write failed, handle %p", get_output_handle ());
+	  __seterrno ();
+	  return false;
+	}
+      len -= done;
+      buf += done;
+    }
+  return true;
+}
+
 #define BAK 1
 #define ESC 2
 #define NOR 0
@@ -1421,7 +1441,7 @@ beep ()
 /* This gets called when we found an invalid input character.  We just
    print a half filled square (UTF 0x2592).  We have no chance to figure
    out the "meaning" of the input char anyway. */
-void
+inline void
 fhandler_console::write_replacement_char ()
 {
   static const wchar_t replacement_char = 0x2592; /* Half filled square */
@@ -1489,7 +1509,12 @@ fhandler_console::write_normal (const unsigned char *src,
 	  buf_len = dev_state->str_to_con (f_mbtowc, charset, write_buf,
 					   (const char *) trunc_buf.buf,
 					   nfound - trunc_buf.buf);
-	  WriteConsoleW (get_output_handle (), write_buf, buf_len, &done, 0);
+	  if (!write_console (write_buf, buf_len, done))
+	    {
+	      debug_printf ("multibyte sequence write failed, handle %p", get_output_handle ());
+	      __seterrno ();
+	      return 0;
+	    }
 	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
 	  trunc_buf.len = 0;
 	  return found;
@@ -1543,19 +1568,12 @@ fhandler_console::write_normal (const unsigned char *src,
 	  scroll_screen (x, y, -1, y, x + buf_len, y);
 	}
 
-      register PWCHAR buf = write_buf;
-      do
+      if (!write_console (write_buf, buf_len, done))
 	{
-	  if (!WriteConsoleW (get_output_handle (), buf, buf_len, &done, 0))
-	    {
-	      debug_printf ("write failed, handle %p", get_output_handle ());
-	      __seterrno ();
-	      return 0;
-	    }
-	  buf_len -= done;
-	  buf += done;
+	  debug_printf ("write failed, handle %p", get_output_handle ());
+	  __seterrno ();
+	  return 0;
 	}
-      while (buf_len > 0);
       if (len >= CONVERT_LIMIT)
 	return found;
     }
@@ -1776,7 +1794,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	}
     }
 
-  syscall_printf ("%d = write_console (,..%d)", len, len);
+  syscall_printf ("%d = fhandler_console::write (,..%d)", len, len);
 
   return len;
 }
