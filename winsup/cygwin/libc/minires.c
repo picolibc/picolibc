@@ -43,11 +43,11 @@ static int scanline(char * in, char **list, int * sizes, int maxnum)
   int i;
   char * startp;
   for (i = 0; i < maxnum; i++) {
-    while((*in) && (isspace(*in) || *in == ',')) in++;
+    while((*in) && (isspace((unsigned)*in) || *in == ',')) in++;
     if (*in == 0)
       break;
     startp = in++;
-    while((*in) && !isspace(*in) && *in != ',') in++;
+    while((*in) && !isspace((unsigned)*in) && *in != ',') in++;
     list[i] = startp;
     sizes[i] = in - startp + 1;
     if (*in)

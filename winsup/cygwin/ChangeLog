@@ -1,3 +1,10 @@
+2009-05-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* libc/minires.c (scanline): Accommodate ctype changes which disallow
+	use of an unadorned char argument to is* macros.
+	* regex/regcomp.c: Ditto, throughout.
+	* regex/regex2.h (ISWORD): Ditto.
+
 2009-05-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.h (fhandler_console::MAX_WRITE_CHARS): Declare.
