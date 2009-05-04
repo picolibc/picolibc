@@ -160,8 +160,7 @@ open_stackdumpfile ()
       status = NtCreateFile (&h, GENERIC_WRITE | SYNCHRONIZE, &attr, &io,
 			     NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_OVERWRITE_IF,
 			     FILE_SYNCHRONOUS_IO_NONALERT
-			     | FILE_OPEN_FOR_BACKUP_INTENT
-			     | FILE_OPEN_FOR_RECOVERY, NULL, 0);
+			     | FILE_OPEN_FOR_BACKUP_INTENT, NULL, 0);
       if (NT_SUCCESS (status))
 	{
 	  if (!myself->cygstarted)

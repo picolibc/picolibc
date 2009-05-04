@@ -213,6 +213,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
 			       ffai_buf.ffai.FileSystemNameLength);
   is_fat (RtlEqualUnicodePathPrefix (&fsname, L"FAT", TRUE));
+  RtlInitUnicodeString (&testname, L"CSC-CACHE");
+  is_csc_cache (RtlEqualUnicodeString (&fsname, &testname, FALSE));
   RtlInitUnicodeString (&testname, L"NTFS");
   if (is_remote_drive ())
     {
@@ -1367,8 +1369,12 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     strcpy (_my_tls.locals.mnt_type, (char *) "ntfs");
   else if (mntinfo.is_netapp ())
     strcpy (_my_tls.locals.mnt_type, (char *) "netapp");
+  else if (mntinfo.is_udf ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "udf");
   else if (mntinfo.is_cdrom ())
     strcpy (_my_tls.locals.mnt_type, (char *) "iso9660");
+  else if (mntinfo.is_csc_cache ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "csc-cache");
   else
     strcpy (_my_tls.locals.mnt_type, (char *) "unknown");
 

@@ -110,8 +110,7 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
 	  status = NtOpenFile (&fh, (is_chown ? WRITE_OWNER  : 0) | WRITE_DAC,
 			       pc.get_object_attr (attr, sec_none_nih),
 			       &io, FILE_SHARE_VALID_FLAGS,
-			       FILE_OPEN_FOR_BACKUP_INTENT
-			       | FILE_OPEN_FOR_RECOVERY);
+			       FILE_OPEN_FOR_BACKUP_INTENT);
 	  if (!NT_SUCCESS (status))
 	    {
 	      fh = NULL;

@@ -32,6 +32,7 @@ class fs_info
     unsigned is_netapp 			: 1;
     unsigned is_cdrom			: 1;
     unsigned is_udf			: 1;
+    unsigned is_csc_cache		: 1;
   } status;
   ULONG sernum;
  public:
@@ -54,6 +55,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_netapp)
   IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
   IMPLEMENT_STATUS_FLAG (bool, is_udf)
+  IMPLEMENT_STATUS_FLAG (bool, is_csc_cache)
   ULONG serial_number () const { return sernum; }
 
   bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));

@@ -460,7 +460,7 @@ fhandler_base::open (int flags, mode_t mode)
   ULONG file_attributes = 0;
   ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : FILE_SHARE_VALID_FLAGS);
   ULONG create_disposition;
-  ULONG create_options;
+  ULONG create_options = FILE_OPEN_FOR_BACKUP_INTENT;
   SECURITY_ATTRIBUTES sa = sec_none;
   security_descriptor sd;
   OBJECT_ATTRIBUTES attr;
@@ -477,38 +477,23 @@ fhandler_base::open (int flags, mode_t mode)
     {
       case query_read_control:
 	access = READ_CONTROL;
-	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_read_attributes:
 	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
-	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
 	break;
       case query_write_control:
 	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
-	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       case query_write_attributes:
 	access = READ_CONTROL | FILE_WRITE_ATTRIBUTES;
-	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
       default:
 	if ((flags & O_ACCMODE) == O_RDONLY)
-	  {
-	    access = GENERIC_READ;
-	    create_options = FILE_OPEN_FOR_BACKUP_INTENT;
-	  }
+	  access = GENERIC_READ;
 	else if ((flags & O_ACCMODE) == O_WRONLY)
-	  {
-	    access = GENERIC_WRITE | READ_CONTROL | FILE_READ_ATTRIBUTES;
-	    create_options = FILE_OPEN_FOR_BACKUP_INTENT
-			     | FILE_OPEN_FOR_RECOVERY;
-	  }
+	  access = GENERIC_WRITE | READ_CONTROL | FILE_READ_ATTRIBUTES;
 	else
-	  {
-	    access = GENERIC_READ | GENERIC_WRITE;
-	    create_options = FILE_OPEN_FOR_BACKUP_INTENT
-			     | FILE_OPEN_FOR_RECOVERY;
-	  }
+	  access = GENERIC_READ | GENERIC_WRITE;
 	if (flags & O_SYNC)
 	  create_options |= FILE_WRITE_THROUGH;
 	if (flags & O_DIRECT)

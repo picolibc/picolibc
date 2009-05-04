@@ -1,3 +1,15 @@
+2009-05-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (set_file_sd): Drop using FILE_OPEN_FOR_RECOVERY flag in
+	call to NtOpenFile.
+	* exceptions.cc (open_stackdumpfile): Ditto in call to NtCreateFile.
+	* fhandler.cc (fhandler_base::open): Ditto.  Simplify setting
+	create_options.
+
+	* mount.cc (fs_info::update): Recognize offline storage.
+	(fillout_mntent): Report UDF and offline storage.
+	* mount.h (class fs_info): Add is_csc_cache status flag.
+
 2009-05-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_console.cc (fhandler_console::write_console): Eliminate
