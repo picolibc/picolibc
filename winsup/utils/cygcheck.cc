@@ -1965,13 +1965,14 @@ static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: cygcheck PROGRAM [ -v ] [ -h ]\n\
-       cygcheck -c [ PACKAGE ] [ -d ]\n\
-       cygcheck -s [ -r ] [ -v ] [ -h ]\n\
+Usage: cygcheck [-v] [-h] PROGRAM\n\
+       cygcheck -c [-d] [PACKAGE]\n\
+       cygcheck -s [-r] [-v] [-h]\n\
        cygcheck -k\n\
-       cygcheck -f FILE [ FILE ... ]\n\
-       cygcheck -l [ PACKAGE ] [ PACKAGE ... ]\n\
+       cygcheck -f FILE [FILE]...\n\
+       cygcheck -l [PACKAGE]...\n\
        cygcheck -p REGEXP\n\
+       cygcheck -h\n\n\
 List system information, check installed packages, or query package database.\n\
 \n\
 At least one command option or a PROGRAM is required, as shown above.\n\

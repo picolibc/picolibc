@@ -1,3 +1,7 @@
+2009-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (usage): Fix option order and print.
+
 2009-04-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strace.cc (create_child): Set CYGWIN=noglob when starting new process
