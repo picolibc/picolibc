@@ -840,6 +840,9 @@ find_app_on_path (const char *app, bool showall = false)
 {
   const char *papp = find_on_path (app, ".exe", showall, false, true);
 
+  if (!papp)
+    return NULL;
+
   wide_path wpath (papp);
   HANDLE fh =
     CreateFileW (wpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
