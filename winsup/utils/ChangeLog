@@ -8,6 +8,11 @@
 	* setfacl.c: Ditto.
 	* ssp.c: Ditto.
 
+2009-05-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygcheck.cc (find_app_on_path): Avoid using NULL pointer if
+	find_on_path doesn't find the app on the path.
+
 2009-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (usage): Fix option order and print.
