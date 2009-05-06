@@ -1,6 +1,6 @@
 /* setfacl.c
 
-   Copyright 2000, 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -51,7 +51,7 @@ typedef enum {
 
 mode_t getperm (char *in)
 {
-  if (isdigit (*in) && !in[1])
+  if (isdigit ((unsigned char) *in) && !in[1])
     {
       int i = atoi (in);
       if (i < 0 || i > 7)
@@ -127,7 +127,7 @@ getaclentry (action_t action, char *c, aclent_t *ace)
           if (action == Delete)
             return FALSE;
         }
-      else if (isdigit (*c))
+      else if (isdigit ((unsigned char) *c))
         {
           char *c3;
 

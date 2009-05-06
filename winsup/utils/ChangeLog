@@ -1,3 +1,13 @@
+2009-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkpasswd.c (current_user): Don't use HOMEDRIVE/HOMEPATH to generate
+	user's homedir.
+
+	* mkgroup.c: Accommodate ctype changes.
+	* mkpasswd.c: Ditto.
+	* setfacl.c: Ditto.
+	* ssp.c: Ditto.
+
 2009-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (usage): Fix option order and print.

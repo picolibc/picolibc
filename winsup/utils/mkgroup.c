@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008 Red Hat, Inc.
+   2007, 2008, 2009 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -244,7 +244,7 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 
   for (gstr = strtok (grp_list, ","); gstr; gstr = strtok (NULL, ","))
     {
-      if (!isdigit (gstr[0]) && gstr[0] != '-')
+      if (!isdigit ((unsigned char) gstr[0]) && gstr[0] != '-')
 	{
 	  PWCHAR p = wcpcpy (grp, L"Unix Group\\");
 	  ret = mbstowcs (p, gstr, GNLEN + 1);
@@ -276,7 +276,7 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 	    start = strtol (p, &p, 10);
 	  if (!*p)
 	    stop = start;
-	  else if (*p++ != '-' || !isdigit (*p)
+	  else if (*p++ != '-' || !isdigit ((unsigned char) *p)
 		   || (stop = strtol (p, &p, 10)) < start || *p)
 	    {
 	      fprintf (stderr, "%s: Malformed unix group list entry '%s'.  "
@@ -807,7 +807,7 @@ main (int argc, char **argv)
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt
-		|| !isdigit (p[1])
+		|| !isdigit ((unsigned char) p[1])
 		|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
 		    , *ep))
 	      {

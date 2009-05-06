@@ -1,7 +1,7 @@
 /* mkpasswd.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006,
-   2008 Red Hat, Inc.
+   2008, 2009 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -146,7 +146,7 @@ put_sid (PSID sid)
 static void
 psx_dir (char *in, char *out)
 {
-  if (isalpha (in[0]) && in[1] == ':')
+  if (isalpha ((unsigned char) in[0]) && in[1] == ':')
     {
       sprintf (out, "/cygdrive/%c", in[0]);
       in += 2;
@@ -212,7 +212,7 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   SID_NAME_USE acc_type;
   int uid, gid;
-  char homedir_psx[PATH_MAX] = {0}, homedir_w32[MAX_PATH] = {0};
+  char homedir_psx[PATH_MAX] = {0};
 
   if (!curr_user.psid || !curr_pgrp.psid
       || !LookupAccountSidW (NULL, curr_user.psid, user, &ulen, dom, &dlen,
@@ -229,8 +229,6 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
   if (passed_home_path[0] == '\0')
     {
       char *envhome = getenv ("HOME");
-      char *envhomedrive = getenv ("HOMEDRIVE");
-      char *envhomepath = getenv ("HOMEPATH");
 
       if (envhome && envhome[0])
 	{
@@ -239,19 +237,6 @@ current_user (int print_cygpath, const char *sep, const char *passed_home_path,
 			      homedir_psx, PATH_MAX);
 	  else
 	    psx_dir (envhome, homedir_psx);
-	}
-      else if (envhomepath && envhomepath[0])
-	{
-	  if (envhomedrive)
-	    strlcpy (homedir_w32, envhomedrive, sizeof (homedir_w32));
-	  if (envhomepath[0] != '\\')
-	    strlcat (homedir_w32, "\\", sizeof (homedir_w32));
-	  strlcat (homedir_w32, envhomepath, sizeof (homedir_w32));
-	  if (print_cygpath)
-	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, homedir_w32,
-			      homedir_psx, PATH_MAX);
-	  else
-	    psx_dir (homedir_w32, homedir_psx);
 	}
       else
 	{
@@ -319,7 +304,7 @@ enum_unix_users (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 
   for (ustr = strtok (user_list, ","); ustr; ustr = strtok (NULL, ","))
     {
-      if (!isdigit (ustr[0]) && ustr[0] != '-')
+      if (!isdigit ((unsigned char) ustr[0]) && ustr[0] != '-')
 	{
 	  PWCHAR p = wcpcpy (user, L"Unix User\\");
 	  ret = mbstowcs (p, ustr, UNLEN + 1);
@@ -351,7 +336,7 @@ enum_unix_users (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 	    start = strtol (p, &p, 10);
 	  if (!*p)
 	    stop = start;
-	  else if (*p++ != '-' || !isdigit (*p)
+	  else if (*p++ != '-' || !isdigit ((unsigned char) *p)
 		   || (stop = strtol (p, &p, 10)) < start || *p)
 	    {
 	      fprintf (stderr, "%s: Malformed unix user list entry '%s'.  "
@@ -776,7 +761,7 @@ main (int argc, char **argv)
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt
-		|| !isdigit (p[1])
+		|| !isdigit ((unsigned char) p[1])
 		|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
 		    , *ep))
 	      {
