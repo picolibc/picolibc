@@ -1,5 +1,12 @@
 2009-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/minires.c (scanline): Fix type in calls to ctype functions
+	to stay in unsigned char range for char values >= 0x80.
+	* regex/regcomp.c: Ditto, throughout.
+	* regex/regex2.h (ISWORD): Ditto.
+
+2009-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_init): Set umask to a sane default.
 	* uinfo.cc (cygheap_user::ontherange): Don't use HOMEDRIVE/HOMEPATH
 	to set HOME.  Default to /home/USERNAME.
