@@ -1048,7 +1048,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	  get_ttyp ()->arg.value = val;
 	  SetEvent (ioctl_request_event);
 	  WaitForSingleObject (ioctl_done_event, INFINITE);
-	  *(unsigned char *) arg = get_ttyp ()->arg.value & 0xFF;
+	  *(unsigned char *) arg = (unsigned char) (get_ttyp ()->arg.value);
 	}
       break;
     case KDGKBMETA:

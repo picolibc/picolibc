@@ -1,3 +1,10 @@
+2009-05-06  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::ioctl): Properly treat
+	TIOCLINUX argument as a char.
+	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Use coercion to properly
+	set char value.
+
 2009-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/minires.c (scanline): Fix type in calls to ctype functions

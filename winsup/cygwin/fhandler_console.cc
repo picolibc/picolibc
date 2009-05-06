@@ -723,9 +723,9 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  }
 	return 0;
       case TIOCLINUX:
-	if (* (int *) buf == 6)
+	if (*(unsigned char *) buf == 6)
 	  {
-	    * (int *) buf = dev_state->nModifiers;
+	    *(unsigned char *) buf = (unsigned char) dev_state->nModifiers;
 	    return 0;
 	  }
 	else
