@@ -1,3 +1,9 @@
+2009-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_init): Set umask to a sane default.
+	* uinfo.cc (cygheap_user::ontherange): Don't use HOMEDRIVE/HOMEPATH
+	to set HOME.  Default to /home/USERNAME.
+
 2009-05-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (set_file_sd): Drop using FILE_OPEN_FOR_RECOVERY flag in

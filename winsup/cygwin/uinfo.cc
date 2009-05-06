@@ -248,15 +248,6 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   if (what == CH_HOME)
     {
       char *p;
-      if (homedrive)
-	newhomedrive = homedrive;
-      else if ((p = getenv ("HOMEDRIVE")))
-	newhomedrive = p;
-
-      if (homepath)
-	newhomepath = homepath;
-      else if ((p = getenv ("HOMEPATH")))
-	newhomepath = p;
 
       if ((p = getenv ("HOME")))
 	debug_printf ("HOME is already in the environment %s", p);
@@ -267,17 +258,12 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
 	      setenv ("HOME", pw->pw_dir, 1);
 	    }
-	  else if (!newhomedrive || !newhomepath)
-	    setenv ("HOME", "/", 1);
 	  else
 	    {
-	      char *home = tp.c_get ();
-	      char *buf = tp.c_get ();
-	      strcpy (buf, newhomedrive);
-	      strcat (buf, newhomepath);
-	      cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, buf, home,
-				NT_MAX_PATH);
-	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
+	      char home[strlen (name ()) + 8];
+
+	      debug_printf ("Set HOME to default /home/USER");
+	      __small_sprintf (home, "/home/%s", name ());
 	      setenv ("HOME", home, 1);
 	    }
 	}

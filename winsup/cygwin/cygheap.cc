@@ -156,6 +156,8 @@ cygheap_init ()
 					 _cygheap_mid - _cygheap_start);
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
+      /* Set umask to a sane default. */
+      cygheap->umask = 022;
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
