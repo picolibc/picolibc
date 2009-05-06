@@ -342,10 +342,7 @@ in order of decreasing priority:
 <listitem><para>The entry in /etc/passwd
 </para>
 </listitem>
-<listitem><para><literal>HOMEDRIVE</literal> and <literal>HOMEPATH</literal> from the Windows environment
-</para>
-</listitem>
-<listitem><para>/
+<listitem><para>/home/USERNAME
 </para>
 </listitem>
 </orderedlist>
