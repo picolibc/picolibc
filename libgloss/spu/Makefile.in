@@ -123,22 +123,22 @@ libgloss.a: $(EVALOBJS)
 
 # C Runtime Library startup code.
 crti.o: $(srcdir)/crti.S
-	$(CC) $(srcdir)/crti.S -c -o crti.o 
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crti.S -c -o crti.o
 
 crtn.o: $(srcdir)/crtn.S
-	$(CC) $(srcdir)/crtn.S -c -o crtn.o 
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crtn.S -c -o crtn.o
 
 crt1.o: $(srcdir)/crt0.S
-	$(CC) $(srcdir)/crt0.S -c -o crt1.o
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crt0.S -c -o crt1.o
 
 crt2.o: $(srcdir)/crt0.S
-	$(CC) $(srcdir)/crt0.S -D_STD_MAIN -c -o crt2.o
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crt0.S -D_STD_MAIN -c -o crt2.o
 
 gcrt1.o: $(srcdir)/crt0.S
-	$(CC) $(srcdir)/crt0.S -D_PROFILE -c -o gcrt1.o
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crt0.S -D_PROFILE -c -o gcrt1.o
 
 gcrt2.o: $(srcdir)/crt0.S
-	$(CC) $(srcdir)/crt0.S -D_PROFILE -D_STD_MAIN -c -o gcrt2.o
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(srcdir)/crt0.S -D_PROFILE -D_STD_MAIN -c -o gcrt2.o
 
 doc:	
 

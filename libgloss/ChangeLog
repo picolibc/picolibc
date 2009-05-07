@@ -1,3 +1,9 @@
+2009-05-07  Ken Werner  <ken.werner@de.ibm.com>
+
+	* spu/configure.in: Fix multilib support.
+	* spu/configure: Regenerate.
+	* spu/Makefile.in: Add CFLAGS_FOR_TARGET.
+
 2009-04-29  Anthony Green  <green@moxielogic.com>
 
 	* moxie/moxie-elf-common.ld: Move default stack out to accommodate
