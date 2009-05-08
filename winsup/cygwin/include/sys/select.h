@@ -1,5 +1,5 @@
 /* select.h
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2009 Red Hat, Inc.
 
    Written by Geoffrey Noer <noer@cygnus.com>
 
@@ -12,7 +12,7 @@ details. */
 #ifndef _SYS_SELECT_H
 #define _SYS_SELECT_H
 
-#if !defined (_POSIX_SOURCE) && !defined (__INSIDE_CYGWIN_NET__)
+#if !defined (_POSIX_SOURCE) && !defined (__INSIDE_CYGWIN_NET__) && !defined (__USE_W32_SOCKETS)
 
 #include <sys/cdefs.h>
 
