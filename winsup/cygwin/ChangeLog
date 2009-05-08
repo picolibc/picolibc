@@ -1,3 +1,9 @@
+2009-05-08  Corinna Vinschen  <corinna@vinschen.de>
+	    IWAMURO Motonori <deenheart@gmail.com>
+
+	* strfuncs.cc (sys_cp_wcstombs): save and restore previous errno value.
+	(sys_cp_mbstowcs): Ditto.
+
 2009-05-08  IWAMURO Motonori <deenheart@gmail.com>
 
 	* strfuncs.cc (sys_cp_wcstombs): Set errno to 0 before converting

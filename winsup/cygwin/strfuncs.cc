@@ -416,6 +416,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
   wchar_t *pwcs = (wchar_t *) src;
   size_t n = 0;
   mbstate_t ps;
+  save_errno save;
 
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
@@ -432,7 +433,6 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
          ASCII SO; UTF-8 representation of invalid char. */
       if (bytes == -1 && *charset != 'U'/*TF-8*/)
         {
-	  _REENT->_errno = 0;
 	  buf[0] = 0x0e; /* ASCII SO */
 	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
 	  if (bytes == -1)
@@ -523,6 +523,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
   size_t len = dlen;
   int bytes;
   mbstate_t ps;
+  save_errno save;
 
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
