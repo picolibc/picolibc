@@ -1,3 +1,8 @@
+2009-05-08  IWAMURO Motonori <deenheart@gmail.com>
+
+	* strfuncs.cc (sys_cp_wcstombs): Set errno to 0 before converting
+	wide char to SO/UTF-8 sequence.
+
 2009-05-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/select.h: Guard definitions with __USE_W32_SOCKETS as

@@ -432,6 +432,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
          ASCII SO; UTF-8 representation of invalid char. */
       if (bytes == -1 && *charset != 'U'/*TF-8*/)
         {
+	  _REENT->_errno = 0;
 	  buf[0] = 0x0e; /* ASCII SO */
 	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
 	  if (bytes == -1)
