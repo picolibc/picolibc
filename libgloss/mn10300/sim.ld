@@ -1,41 +1,32 @@
-/* Linker script for the MN10300 simulator.
-*/
+/* Linker script for the MN10300 simulator.  */
 
-OUTPUT_FORMAT("elf32-mn10300", "elf32-mn10300",
-	      "elf32-mn10300")
+OUTPUT_FORMAT("elf32-mn10300", "elf32-mn10300", "elf32-mn10300")
 OUTPUT_ARCH(mn10300)
 ENTRY(_start)
 GROUP(-lc -leval -lgcc)
- SEARCH_DIR(.);
-/* Do we need any of these for elf?
-   __DYNAMIC = 0;    */
+SEARCH_DIR(.);
+
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
   /* Start of RAM (leaving room for Cygmon data) */
   . = 4;
 
-  .interp     : { *(.interp) 	}
+  .interp	 : { *(.interp) 	}
   .hash          : { *(.hash)		}
   .dynsym        : { *(.dynsym)		}
   .dynstr        : { *(.dynstr)		}
   .gnu.version   : { *(.gnu.version)	}
-  .gnu.version_d   : { *(.gnu.version_d)	}
-  .gnu.version_r   : { *(.gnu.version_r)	}
-  .rel.text      :
-    { *(.rel.text) *(.rel.gnu.linkonce.t*) }
-  .rela.text     :
-    { *(.rela.text) *(.rela.gnu.linkonce.t*) }
-  .rel.data      :
-    { *(.rel.data) *(.rel.gnu.linkonce.d*) }
-  .rela.data     :
-    { *(.rela.data) *(.rela.gnu.linkonce.d*) }
-  .rel.rodata    :
-    { *(.rel.rodata) *(.rel.gnu.linkonce.r*) }
-  .rela.rodata   :
-    { *(.rela.rodata) *(.rela.gnu.linkonce.r*) }
-  .rel.got       : { *(.rel.got)		}
-  .rela.got      : { *(.rela.got)		}
+  .gnu.version_d : { *(.gnu.version_d)	}
+  .gnu.version_r : { *(.gnu.version_r)	}
+  .rel.text      : { *(.rel.text    .rel.text.*    .rel.gnu.linkonce.t*)  }
+  .rela.text     : { *(.rela.text   .rela.text.*   .rela.gnu.linkonce.t*) }
+  .rel.data      : { *(.rel.data    .rel.data.*    .rel.gnu.linkonce.d*)  }
+  .rela.data     : { *(.rela.data   .rela.data.*   .rela.gnu.linkonce.d*) }
+  .rel.rodata    : { *(.rel.rodata  .rel.rodata.*  .rel.gnu.linkonce.r*)  }
+  .rela.rodata   : { *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r*) }
+  .rel.got       : { *(.rel.got)	}
+  .rela.got      : { *(.rela.got)	}
   .rel.ctors     : { *(.rel.ctors)	}
   .rela.ctors    : { *(.rela.ctors)	}
   .rel.dtors     : { *(.rel.dtors)	}
@@ -44,15 +35,16 @@ SECTIONS
   .rela.init     : { *(.rela.init)	}
   .rel.fini      : { *(.rel.fini)	}
   .rela.fini     : { *(.rela.fini)	}
-  .rel.bss       : { *(.rel.bss)		}
-  .rela.bss      : { *(.rela.bss)		}
-  .rel.plt       : { *(.rel.plt)		}
-  .rela.plt      : { *(.rela.plt)		}
-  .init          : { *(.init)	} =0
-  .plt      : { *(.plt)	}
+  .rel.bss       : { *(.rel.bss  .rel.bss.*  .rel.gnu.linkonce.b.*)	}
+  .rela.bss      : { *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)	}
+  .rel.plt       : { *(.rel.plt)	}
+  .rela.plt      : { *(.rela.plt)	}
+  .init          : { KEEP (*(.init))	} =0
+  .plt      	 : { *(.plt)		}
   .text      :
   {
-    *(.text)
+    *(.text .stub .text.*)
+    KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
     *(.gnu.linkonce.t*)
@@ -60,16 +52,16 @@ SECTIONS
   } =0
   _etext = .;
   PROVIDE (etext = .);
-  .fini      : { *(.fini)    } =0
-  .rodata    : { *(.rodata) *(.gnu.linkonce.r*) }
+  .fini      : { KEEP (*(.fini))    } =0
+  .rodata    : { *(.rodata .rodata.* .gnu.linkonce.r*) }
   .rodata1   : { *(.rodata1) }
   /* Adjust the address for the data segment.  We want to adjust up to
      the same address within the page on the next page up.  */
   . = ALIGN(1) + (. & (1 - 1));
   .data    :
   {
-    *(.data)
-    *(.gnu.linkonce.d*)
+    *(.data .data.* .gnu.linkonce.d.*)
+    KEEP (*(.gnu.linkonce.d.*personality*))
     CONSTRUCTORS
   }
   .data1   : { *(.data1) }
@@ -94,15 +86,15 @@ SECTIONS
   /* We want the small data sections together, so single-instruction offsets
      can access them all, and initialized data all before uninitialized, so
      we can shorten the on-disk segment size.  */
-  .sdata     : { *(.sdata) }
+  .sdata     : { *(.sdata .sdata.* .gnu.linkonce.s.*) }
   _edata  =  .;
   PROVIDE (edata = .);
   __bss_start = .;
-  .sbss      : { *(.sbss) *(.scommon) }
+  .sbss      : { *(.dynsbss) *(.sbss .sbss.* .gnu.linkonce.sb.*) *(.scommon) }
   .bss       :
   {
    *(.dynbss)
-   *(.bss)
+   *(.bss .bss.* .gnu.linkonce.b.*)
    *(COMMON)
   }
   _end = . ;
@@ -128,7 +120,7 @@ SECTIONS
   .debug_aranges  0 : { *(.debug_aranges) }
   .debug_pubnames 0 : { *(.debug_pubnames) }
   /* DWARF 2 */
-  .debug_info     0 : { *(.debug_info) }
+  .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
   .debug_abbrev   0 : { *(.debug_abbrev) }
   .debug_line     0 : { *(.debug_line) }
   .debug_frame    0 : { *(.debug_frame) }
@@ -143,6 +135,4 @@ SECTIONS
   .debug_varnames  0 : { *(.debug_varnames) }
 
   .stack 0x80000 : { _stack = .; *(.stack) *(._stack) }
-
-  /* These must appear regardless of  .  */
 }
