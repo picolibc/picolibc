@@ -1,3 +1,8 @@
+2009-05-08  Nick Clifton  <nickc@redhat.com>
+
+	* MAINTAINERS: Add myself as a maintainer for the MN10300 and to
+	the write-after-approval list.
+
 2009-04-30  Anthony Green  <green@moxielogic.com>
 
 	* MAINTAINERS: Add myself as moxie maintainer and to the
