@@ -428,6 +428,16 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 		   upath->Buffer + upath->Length / sizeof (WCHAR) - 1);
 }
 
+static inline void
+str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
+{
+  int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR),
+			  (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR),
+			  srcstr);
+  if (len)
+    tgt.Length += (len - 1) * sizeof (WCHAR);
+}
+
 PUNICODE_STRING
 get_nt_native_path (const char *path, UNICODE_STRING& upath)
 {
@@ -438,7 +448,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
     {
       if (path[1] == ':')	/* X:\... */
 	{
-	  str2uni_cat (upath, "\\??\\");
+	  RtlAppendUnicodeToString (&upath, L"\\??\\");
 	  str2uni_cat (upath, path);
 	  /* The drive letter must be upper case. */
 	  upath.Buffer[4] = towupper (upath.Buffer[4]);
@@ -452,13 +462,13 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
   else if ((path[2] != '.' && path[2] != '?')
 	   || path[3] != '\\')	/* \\server\share\... */
     {
-      str2uni_cat (upath, "\\??\\UNC\\");
+      RtlAppendUnicodeToString (&upath, L"\\??\\UNC\\");
       str2uni_cat (upath, path + 2);
       transform_chars (&upath, 8);
     }
   else				/* \\.\device or \\?\foo */
     {
-      str2uni_cat (upath, "\\??\\");
+      RtlAppendUnicodeToString (&upath, L"\\??\\");
       str2uni_cat (upath, path + 4);
     }
   return &upath;

@@ -126,18 +126,6 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   memcpy (buf, srcstr, tgt.MaximumLength);
 }
 
-void
-str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
-{
-  int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR),
-			  (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR),
-			  srcstr);
-  if (len)
-    tgt.Length += (len - 1) * sizeof (WCHAR);
-  else
-    tgt.Length = tgt.MaximumLength = 0;
-}
-
 HANDLE
 open_local_policy (ACCESS_MASK access)
 {

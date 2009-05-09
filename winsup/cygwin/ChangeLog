@@ -1,3 +1,11 @@
+2009-05-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (str2uni_cat): Move from here...
+	* path.cc (str2uni_cat): ...to here.  Simplify.  Make static inline.
+	(get_nt_native_path): Use RtlAppendUnicodeToString rather than
+	str2uni_cat for constant strings for speed.
+	* security.h (str2uni_cat): Drop declaration.
+
 2009-05-08  Corinna Vinschen  <corinna@vinschen.de>
 	    IWAMURO Motonori <deenheart@gmail.com>
 

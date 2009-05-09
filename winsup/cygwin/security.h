@@ -366,9 +366,6 @@ extern "C" int acl32 (const char *, int, int, __acl32 *);
 int getacl (HANDLE, path_conv &, int, __acl32 *);
 int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
 
-struct _UNICODE_STRING;
-void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
-
 /* Function creating a token by calling NtCreateToken. */
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* LSA authentication function. */
