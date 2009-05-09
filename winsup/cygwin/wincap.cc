@@ -54,6 +54,7 @@ wincaps wincap_unknown __attribute__((section (".cygwin_dll_common"), shared)) =
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:false,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -90,6 +91,7 @@ wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:false,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -126,6 +128,7 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:false,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -162,6 +165,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -198,6 +202,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -234,6 +239,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -270,6 +276,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -306,6 +313,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -342,6 +350,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
+  has_console_handle_problem:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -378,6 +387,44 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_recvmsg:true,
   has_sendmsg:true,
   has_broken_udf:false,
+  has_console_handle_problem:false,
+};
+
+wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  chunksize:0,
+  heapslop:0x4,
+  max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
+  is_server:false,
+  has_dacl_protect:true,
+  has_ip_helper_lib:true,
+  has_broken_if_oper_status:false,
+  has_physical_mem_access:false,
+  has_process_io_counters:true,
+  has_terminal_services:true,
+  has_create_global_privilege:true,
+  has_ioctl_storage_get_media_types_ex:true,
+  has_extended_priority_class:true,
+  has_guid_volumes:true,
+  has_disk_ex_ioctls:true,
+  has_disabled_user_tos_setting:true,
+  has_fileid_dirinfo:true,
+  has_exclusiveaddruse:true,
+  has_enhanced_socket_security:true,
+  has_buggy_restart_scan:false,
+  has_mandatory_integrity_control:true,
+  needs_logon_sid_in_sid_list:false,
+  needs_count_in_si_lpres2:true,
+  has_recycle_dot_bin:true,
+  has_gaa_prefixes:true,
+  has_gaa_on_link_prefix:true,
+  supports_all_posix_ai_flags:true,
+  has_restricted_stack_args:false,
+  has_transactions:true,
+  ts_has_dep_problem:false,
+  has_recvmsg:true,
+  has_sendmsg:true,
+  has_broken_udf:false,
+  has_console_handle_problem:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -441,7 +488,15 @@ wincapc::init ()
 		}
 	      break;
 	    case 6:
-	      caps = &wincap_vista;
+	      switch (version.dwMinorVersion)
+		{
+		  case 0:
+		    caps = &wincap_vista;
+		    break;
+		  default:
+		    caps = &wincap_7;
+		    break;
+		}
 	      break;
 	    default:
 	      caps = &wincap_unknown;
@@ -474,6 +529,7 @@ wincapc::init ()
     {
       ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
       ((wincaps *)caps)->has_restricted_stack_args = false;
+      ((wincaps *)caps)->has_console_handle_problem = false;
     }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,

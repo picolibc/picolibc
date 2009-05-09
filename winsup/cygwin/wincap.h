@@ -46,6 +46,7 @@ struct wincaps
   unsigned has_recvmsg					: 1;
   unsigned has_sendmsg					: 1;
   unsigned has_broken_udf				: 1;
+  unsigned has_console_handle_problem			: 1;
 };
 
 class wincapc
@@ -98,6 +99,7 @@ public:
   bool	IMPLEMENT (has_recvmsg)
   bool	IMPLEMENT (has_sendmsg)
   bool	IMPLEMENT (has_broken_udf)
+  bool	IMPLEMENT (has_console_handle_problem)
 
 #undef IMPLEMENT
 };

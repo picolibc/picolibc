@@ -358,7 +358,32 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
 				    possible for some versions of handles */
-      fh->init (handle, access, bin);
+      /* FIXME: Workaround Windows 7 64 bit issue.  If the parent process of
+	 the process tree closes the original handles to the console window, 
+	 strange problems occur when starting child processes later on if
+	 stdio redirection is used.  How to reproduce:
+
+	   shell script foo:
+
+	     exec 2>foo.log
+	     FOO=$( uname -n | cat )
+	     echo $FOO
+
+	 start from cmd with `bash foo'.  The result is that the cat process
+	 will be started but dies before Cygwin strace output can be generated
+	 and $FOO stays empty.  The strace output shows that bash tries
+	 multiple times to start cat, but none of the invocations of cat will
+	 ever show up in the strace output.
+
+	 Remove the `exec 2>' or remove the cat call and the script will work.
+	 Start bash interactively, then start the script manually, and the
+	 script will work.
+	 
+	 This needs further investigation but the workaround not to close
+	 the handles will have a marginal hit of three extra handles per
+	 process at most. */
+      fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
+      		? INVALID_HANDLE_VALUE : handle, access, bin);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }

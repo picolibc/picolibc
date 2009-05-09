@@ -1,5 +1,15 @@
 2009-05-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::init_std_file_from_handle): Add workaround for
+	Windows 7 64 bit issue.  Add lengthy comment to explain what happens.
+	* wincap.h (wincaps::has_console_handle_problem): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincap_7): New wincaps structure for NT 6.1 kernels.
+	(wincapc::init): Set has_console_handle_problem to false for 32 bit
+	systems.
+
+2009-05-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (str2uni_cat): Move from here...
 	* path.cc (str2uni_cat): ...to here.  Simplify.  Make static inline.
 	(get_nt_native_path): Use RtlAppendUnicodeToString rather than
@@ -880,7 +890,7 @@
 	* path.cc (symlink_info::check): Add workaround for UDF bug in
 	terms of casesensitivity on certain OSes.
 	* wincap.h (wincaps::has_broken_udf): New element.
-	(wincaps::has_broken_udf): New element
+	* wincap.cc: Implement above element throughout.
 
 2009-01-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
