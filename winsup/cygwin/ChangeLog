@@ -1,3 +1,7 @@
+2009-05-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin/version.h (CYGWIN_VERSION_CYGWIN_CONV): New define.
+
 2009-05-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Add workaround for
