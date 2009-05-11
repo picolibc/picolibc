@@ -43,8 +43,9 @@ These functions return the rounded integer value of <[x]>.
 
 PORTABILITY
 <<llrint>>, <<llrintf>> and <<llrintl>> are ANSI.
-<<llrint>>, <<llrintf>> and <<llrintl>> are only available on i386 platforms when
-hardware floating point support is available and when compiling with GCC.
+The fast math versions of <<llrint>>, <<llrintf>> and <<llrintl>> are only
+available on i386 platforms when hardware floating point support is available
+and when compiling with GCC.
 
 */
 
@@ -63,11 +64,6 @@ long long int _f_llrint (double x)
   long long int _result;
   asm ("fistpll %0" : "=m" (_result) : "t" (x) : "st");
   return _result;
-}
-
-/* For now, we only have the fast math version.  */
-long long int llrint (double x) {
-  return _f_llrint(x);
 }
 
 #endif /* !_SOFT_FLOAT */

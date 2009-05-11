@@ -29,10 +29,5 @@ long long int _f_llrintf (float x)
   return _result;
 }
 
-/* For now, we only have the fast math version.  */
-long long int llrintf (float x) {
-  return _f_llrintf(x);
-} 
-
 #endif /* !_SOFT_FLOAT */
 #endif /* __GNUC__ */
