@@ -1,7 +1,7 @@
 /* ps.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2008 Red Hat, Inc.
+   2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <stdio.h>
+#include <wchar.h>
 #include <windows.h>
 #include <time.h>
 #include <getopt.h>
@@ -20,6 +21,8 @@ details. */
 #include <sys/cygwin.h>
 #include <tlhelp32.h>
 #include <psapi.h>
+#include <ddk/ntapi.h>
+#include <ddk/winddk.h>
 
 /* Maximum possible path length under NT.  There's no official define
    for that value.  Note that PATH_MAX is only 4K. */
@@ -248,6 +251,8 @@ Compiled on %s\n\
 ", prog_name, len, v, __DATE__);
 }
 
+char dosdevs[32000];
+
 int
 main (int argc, char *argv[])
 {
@@ -261,6 +266,7 @@ main (int argc, char *argv[])
   const char *ltitle = "      PID    PPID    PGID     WINPID  TTY  UID    STIME COMMAND\n";
   const char *lfmt   = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
   char ch;
+  PUNICODE_STRING uni = NULL;
 
   aflag = lflag = fflag = sflag = 0;
   uid = getuid ();
@@ -336,6 +342,26 @@ main (int argc, char *argv[])
 
   if (query == CW_GETPINFO_FULL && !init_win ())
     query = CW_GETPINFO;
+  if (query == CW_GETPINFO_FULL)
+    {
+      /* Enable debug privilege to allow to enumerate all processes,
+	 not only processes in current session. */
+      HANDLE tok;
+      if (OpenProcessToken (GetCurrentProcess (),
+			    TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+			    &tok))
+	{
+	  TOKEN_PRIVILEGES priv;
+
+	  priv.PrivilegeCount = 1;
+	  if (LookupPrivilegeValue (NULL, SE_DEBUG_NAME,
+				    &priv.Privileges[0].Luid))
+	    {
+	      priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	      AdjustTokenPrivileges (tok, FALSE, &priv, 0, NULL, NULL);
+	    }
+	}
+    }
 
   for (int pid = 0;
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
@@ -390,7 +416,53 @@ main (int argc, char *argv[])
 	  DWORD n = p->dwProcessId;
 	  if (!myEnumProcessModules (h, hm, sizeof (hm), &n))
 	    n = 0;
-	  if (!n || !myGetModuleFileNameEx (h, hm[0], pname, PATH_MAX))
+	  /* This occurs when trying to enum modules of a 64 bit process.
+	     GetModuleFileNameEx with a NULL module will return the same error.
+	     Only NtQueryInformationProcess allows to fetch the process image
+	     name in that case. */
+	  if (!n && GetLastError () == ERROR_PARTIAL_COPY)
+	    {
+	      NTSTATUS status;
+	      char pbuf[PATH_MAX];
+	      char dev[256];
+	      size_t len = sizeof (UNICODE_STRING) + PATH_MAX * sizeof (WCHAR);
+
+	      if (!uni)
+		{
+		  uni = (PUNICODE_STRING) alloca (len);
+		  QueryDosDevice (NULL, dosdevs, 32000);
+		}
+	      status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
+						  len, NULL);
+	      if (NT_SUCCESS (status)
+		  && (len = wcsnrtombs (pbuf, (const wchar_t **) &uni->Buffer,
+					uni->Length / sizeof (WCHAR), PATH_MAX,
+					NULL)) > 0)
+		{
+		  pbuf[len] = '\0';
+		  if (!strncmp (pbuf, "\\Device\\Mup\\", 12))
+		    {
+		      strcpy (pname, "\\\\");
+		      strcpy (pname + 2, pbuf + 12);
+		    }
+		  else
+		    {
+		      strcpy (pname, pbuf);
+		      for (char *d = dosdevs; *d; d = strchr (d, '\0') + 1)
+			if (QueryDosDevice (d, dev, 256)
+			    && strlen (d) < 3
+			    && !strncmp (dev, pbuf, strlen (dev)))
+			  {
+			    strcpy (pname, d);
+			    strcat (pname, pbuf + strlen (dev));
+			    break;
+			  }
+		    }
+		}
+	      else
+		strcpy (pname, "*** unknown ***");
+	    }
+	  else if (!n || !myGetModuleFileNameEx (h, hm[0], pname, PATH_MAX))
 	    strcpy (pname, "*** unknown ***");
 	  FILETIME ct, et, kt, ut;
 	  if (GetProcessTimes (h, &ct, &et, &kt, &ut))
