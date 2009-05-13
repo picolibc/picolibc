@@ -368,6 +368,11 @@ filename because the question mark will not translate back to the original
 Chinese character, but to a simple question mark instead.  This in turn
 results in strange "File not found" messages.</para>
 
+<note><para>In the default "C" locale, Cygwin creates filenames using
+the UTF-8 charset.  This will always result in some valid filename by
+default, but again might impose problems when switching to a non-"C"
+or non-"UTF-8" charset.</para></note>
+
 <note><para>To avoid this scenario altogether, always use UTF-8 as the
 character set.</para></note>
 
