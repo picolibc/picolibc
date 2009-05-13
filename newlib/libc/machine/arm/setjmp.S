@@ -55,6 +55,55 @@
    
    For Thumb-2 do everything in Thumb mode.  */
 
+#if defined(__ARM_ARCH_6M__)
+/* ARMv6-M has to be implemented in Thumb mode.  */
+
+.thumb
+.thumb_func
+	.globl SYM (setjmp)
+	TYPE (setjmp)
+SYM (setjmp):
+	/* Save registers in jump buffer.  */
+	stmia	r0!, {r4, r5, r6, r7}
+	mov	r1, r8
+	mov	r2, r9
+	mov	r3, r10
+	mov	r4, fp
+	mov	r5, sp
+	mov	r6, lr
+	stmia	r0!, {r1, r2, r3, r4, r5, r6}
+	sub	r0, r0, #40
+	/* Restore callee-saved low regs.  */
+	ldmia	r0!, {r4, r5, r6, r7}
+	/* Return zero.  */
+	mov	r0, #0
+	bx lr
+
+.thumb_func
+	.globl SYM (longjmp)
+	TYPE (longjmp)
+SYM (longjmp):
+	/* Restore High regs.  */
+	add	r0, r0, #16
+	ldmia	r0!, {r2, r3, r4, r5, r6}
+	mov	r8, r2
+	mov	r9, r3
+	mov	r10, r4
+	mov	fp, r5
+	mov	sp, r6
+	ldmia	r0!, {r3} /* lr */
+	/* Restore low regs.  */
+	sub	r0, r0, #40
+	ldmia	r0!, {r4, r5, r6, r7}
+	/* Return the result argument, or 1 if it is zero.  */
+	mov	r0, r1
+	bne	1f
+	mov	r0, #1
+1:
+	bx	r3
+
+#else
+
 #ifdef __APCS_26__
 #define RET	movs		pc, lr
 #elif defined(__thumb2__)
@@ -169,4 +218,4 @@ SYM (\name):
 	moveq		a1, #1
 
 	FUNC_END longjmp
-
+#endif
