@@ -1,3 +1,22 @@
+2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cwdstuff): Convert to class.  Make posix and dir private.
+	(cwdstuff::get_posix): New method.
+	(cwdstuff::reset_posix): New method.
+	* dcrt0.cc (dll_crt0_1): Call setlocale rather than _setlocale_r.
+	* environ.cc (environ_init): Ditto.  Prefer "C" locale over current
+	codepage default locale.
+	* path.cc (chdir): Use cwdstuff::get_posix method instead of accessing
+	cwdstuff::posix directly.
+	(cwdstuff::set): Defer creating posix path to first usage.
+	(cwdstuff::get_posix): Create posix path if it's empty, and return it.
+	(cwdstuff::get): Create posix path if it's empty.
+	* strfuncs.cc (sys_cp_wcstombs): Use UTF-8 conversion in the "C"
+	locale.
+	(sys_cp_mbstowcs): Ditto.
+	* syscalls.cc (gen_full_path_at): Fetch CWD posix path locked.
+	(setlocale): Implement here.  Reset CWD posix path.
+
 2009-05-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin/version.h (CYGWIN_VERSION_CYGWIN_CONV): New define.

@@ -2599,7 +2599,7 @@ chdir (const char *in_dir)
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
   syscall_printf ("%d = chdir() cygheap->cwd.posix '%s' native '%S'", res,
-		  cygheap->cwd.posix, path.get_nt_native_path ());
+		  cygheap->cwd.get_posix (), path.get_nt_native_path ());
   MALLOC_CHECK;
   return res;
 }
@@ -3230,8 +3230,8 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  posix_cwd = (const char *) tp.c_get ();
 	  mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
 	}
-      posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
-      stpcpy (posix, posix_cwd);
+      if (posix)
+      	posix[0] = '\0';
     }
 
 out:
@@ -3240,6 +3240,21 @@ out:
 }
 
 /* Copy the value for either the posix or the win32 cwd into a buffer. */
+char *
+cwdstuff::get_posix ()
+{
+  if (!posix || !*posix)
+    {
+      tmp_pathbuf tp;
+
+      char *tocopy = tp.c_get ();
+      mount_table->conv_to_posix_path (win32.Buffer, tocopy, 0);
+      posix = (char *) crealloc_abort (posix, strlen (tocopy) + 1);
+      stpcpy (posix, tocopy);
+    }
+  return posix;
+}
+
 char *
 cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
@@ -3264,6 +3279,13 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
       tocopy = tp.c_get ();
       sys_wcstombs (tocopy, NT_MAX_PATH, win32.Buffer,
 		    win32.Length / sizeof (WCHAR));
+    }
+  else if (!posix || !*posix)
+    {
+      tocopy = tp.c_get ();
+      mount_table->conv_to_posix_path (win32.Buffer, tocopy, 0);
+      posix = (char *) crealloc_abort (posix, strlen (tocopy) + 1);
+      stpcpy (posix, tocopy);
     }
   else
     tocopy = posix;

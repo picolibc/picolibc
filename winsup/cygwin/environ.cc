@@ -790,16 +790,13 @@ environ_init (char **envp, int envc)
       	{
 	  char *buf = (char *) alloca (i);
 	  GetEnvironmentVariableA (lc_arr[lc], buf, i);
-	  if (_setlocale_r (_GLOBAL_REENT, LC_CTYPE, buf))
+	  if (setlocale (LC_CTYPE, buf))
 	    {
 	      got_lc = true;
 	      break;
 	    }
 	}
     }
-  /* No matching POSIX environment variable, use current codepage. */
-  if (!got_lc)
-    _setlocale_r (_GLOBAL_REENT, LC_CTYPE, "en_US");
   /* We also need the CYGWIN variable early to know the value of the
      CYGWIN=upcaseenv setting for the below loop. */
   if ((i = GetEnvironmentVariableA ("CYGWIN", NULL, 0)))

@@ -931,7 +931,7 @@ dll_crt0_1 (void *)
      LoadLibrary serialization. */
   ld_preload ();
   /* Reset current locale to "C" per POSIX */
-  _setlocale_r (_GLOBAL_REENT, LC_CTYPE, "C");
+  setlocale (LC_CTYPE, "C");
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\

@@ -35,6 +35,7 @@ details. */
 #include <utmpx.h>
 #include <sys/uio.h>
 #include <ctype.h>
+#include <locale.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <rpc.h>
@@ -3726,7 +3727,11 @@ gen_full_path_at (char *path_ret, int dirfd, const char *pathname,
       char *p;
 
       if (dirfd == AT_FDCWD)
-	p = stpcpy (path_ret, cygheap->cwd.posix);
+	{
+	  cwdstuff::cwd_lock.acquire ();
+	  p = stpcpy (path_ret, cygheap->cwd.get_posix ());
+	  cwdstuff::cwd_lock.release ();
+	}
       else
 	{
 	  cygheap_fdget cfd (dirfd);
@@ -3999,4 +4004,17 @@ unlinkat (int dirfd, const char *pathname, int flags)
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
   return (flags & AT_REMOVEDIR) ? rmdir (path) : unlink (path);
+}
+
+extern "C" char *
+setlocale (int category, const char *locale)
+{
+  /* Each setlocale potentially changes the multibyte representation
+     of the CWD.  Therefore we have to rest the CWD's posix path and
+     reevaluate the next time it's used. */
+  /* FIXME: Other buffered paths might be affected as well. */
+  char *ret = _setlocale_r (_REENT, category, locale);
+  if (ret)
+    cygheap->cwd.reset_posix ();
+  return ret;
 }

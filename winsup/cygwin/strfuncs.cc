@@ -418,6 +418,8 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
   mbstate_t ps;
   save_errno save;
 
+  if (f_wctomb == __ascii_wctomb)
+    f_wctomb = __utf8_wctomb;
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t) -1;
@@ -525,6 +527,8 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
   mbstate_t ps;
   save_errno save;
 
+  if (f_mbtowc == __ascii_mbtowc)
+    f_mbtowc = __utf8_mbtowc;
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t)-1;
