@@ -654,6 +654,7 @@ _DEFUN(_localeconv_r, (data),
 
 #ifndef _REENT_ONLY
 
+#ifndef __CYGWIN__
 char *
 _DEFUN(setlocale, (category, locale),
        int category _AND
@@ -661,7 +662,7 @@ _DEFUN(setlocale, (category, locale),
 {
   return _setlocale_r (_REENT, category, locale);
 }
-
+#endif
 
 struct lconv *
 _DEFUN_VOID(localeconv)

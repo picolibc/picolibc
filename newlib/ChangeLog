@@ -1,3 +1,7 @@
+2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (setlocale): Don't build on Cygwin.
+
 2009-05-11  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/machine/i386/f_llrint.c: Remove llrint() definition.
