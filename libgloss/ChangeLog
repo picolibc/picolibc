@@ -1,3 +1,8 @@
+2009-05-13  Ken Werner  <ken.werner@de.ibm.com>
+
+	* configure.in: Introduce config_libnosys flag which defaults to true.
+	* configure: Regenerate.
+
 2009-05-13  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* spu/crtn.S: Add dummy to ensure nothing gets linked at address 0.

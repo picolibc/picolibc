@@ -273,7 +273,6 @@ PACKAGE_BUGREPORT=''
 
 ac_unique_file="libnosys"
 ac_subdirs_all="$ac_subdirs_all doc"
-ac_subdirs_all="$ac_subdirs_all libnosys"
 ac_subdirs_all="$ac_subdirs_all i386"
 ac_subdirs_all="$ac_subdirs_all m32r"
 ac_subdirs_all="$ac_subdirs_all m68hc11"
@@ -302,6 +301,7 @@ ac_subdirs_all="$ac_subdirs_all m32c"
 ac_subdirs_all="$ac_subdirs_all arm"
 ac_subdirs_all="$ac_subdirs_all spu"
 ac_subdirs_all="$ac_subdirs_all iq2000"
+ac_subdirs_all="$ac_subdirs_all libnosys"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar subdirs CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS AR LD RANLIB ac_ct_RANLIB CCAS CCASFLAGS host_makefile_frag_path LIBOBJS LTLIBOBJS'
 ac_subst_files='host_makefile_frag'
 
@@ -1823,10 +1823,9 @@ subdirs="$subdirs doc"
 
 fi
 
+config_testsuite=true
 
-
-subdirs="$subdirs libnosys"
-
+config_libnosys=true
 
 case "${target}" in
   i[3456]86-*-elf* | i[3456]86-*-coff*)
@@ -1834,49 +1833,42 @@ case "${target}" in
 
 subdirs="$subdirs i386"
 
-	config_testsuite=true
 	;;
   m32r-*-*)
 
 
 subdirs="$subdirs m32r"
 
-	config_testsuite=true
 	;;
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
 
 
 subdirs="$subdirs m68hc11"
 
-	config_testsuite=true
 	;;
   fido-*-* | m68*-*-*)
 
 
 subdirs="$subdirs m68k"
 
-	config_testsuite=true
 	;;
   hppa*-*-pro*)
 
 
 subdirs="$subdirs pa"
 
-	config_testsuite=true
 	;;
   i960-*-coff)
 
 
 subdirs="$subdirs i960"
 
-	config_testsuite=true
 	;;
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 
 
 subdirs="$subdirs sparc"
 
-	config_testsuite=true
 	;;
   sh*-*-pe | mips*-*-pe | *arm-wince-pe)
 
@@ -1889,42 +1881,36 @@ subdirs="$subdirs wince"
 
 subdirs="$subdirs mips"
 
-	config_testsuite=true
 	;;
   powerpc-*-*|powerpcle-*-*)
 
 
 subdirs="$subdirs rs6000"
 
-	config_testsuite=true
 	;;
   mn10200-*-*)
 
 
 subdirs="$subdirs mn10200"
 
-	config_testsuite=true
 	;;
   mn10300-*-*)
 
 
 subdirs="$subdirs mn10300"
 
-	config_testsuite=true
 	;;
   bfin-*-*)
 
 
 subdirs="$subdirs bfin"
 
-	config_testsuite=true
 	;;
   cris-*-* | crisv32-*-*)
 
 
 subdirs="$subdirs cris"
 
-	config_testsuite=true
 	;;
   crx-*-*)
 
@@ -1937,77 +1923,66 @@ subdirs="$subdirs crx"
 
 subdirs="$subdirs d30v"
 
-	config_testsuite=true
 	;;
   fr30-*-*)
 
 
 subdirs="$subdirs fr30"
 
-	config_testsuite=true
 	;;
   frv*-*-*)
 
 
 subdirs="$subdirs frv"
 
-	config_testsuite=true
 	;;
   lm32*-*-*)
 
 
 subdirs="$subdirs lm32"
 
-	config_testsuite=true
 	;;
   mcore-*-*)
 
 
 subdirs="$subdirs mcore"
 
-	config_testsuite=true
 	;;
   mep-*-*)
 
 
 subdirs="$subdirs mep"
 
-	config_testsuite = true;
 	;;
   moxie-*-*)
 
 
 subdirs="$subdirs moxie"
 
-	config_testsuite=true
 	;;
   mt-*-*)
 
 
 subdirs="$subdirs mt"
 
-	config_testsuite=true
 	;;
   xstormy16-*-*)
 
 
 subdirs="$subdirs xstormy16"
 
-	config_testsuite=true
 	;;
   m32c-*-*)
 
 
 subdirs="$subdirs m32c"
 
-	config_testsuite=true
 	;;
   strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)
 
 
 subdirs="$subdirs arm"
 
-	config_testsuite=true
 	;;
   spu-*-elf)
 
@@ -2015,20 +1990,23 @@ subdirs="$subdirs arm"
 subdirs="$subdirs spu"
 
 	config_testsuite=false
+	config_libnosys=false
 	;;
   iq2000-*-*)
 
 
 subdirs="$subdirs iq2000"
 
-	config_testsuite=true
 	;;
 esac
 
-# For now, don't bother configuring testsuite
-#
-# if test ${config_testsuite); then AC_CONFIG_SUBDIRS(testsuite); fi
-#
+
+if test "${config_libnosys}" = "true"; then
+
+
+subdirs="$subdirs libnosys"
+
+fi
 
 DEPDIR="${am__leading_dot}deps"
 
