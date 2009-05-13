@@ -1,5 +1,10 @@
 2009-05-13  Paul Brook  <paul@codesourcery.com>
 
+	* libc/machine/arm/setjmp.S: Don't bother saving IP.  Copy SP to
+	IP before saving.  Likewise when restoring.
+
+2009-05-13  Paul Brook  <paul@codesourcery.com>
+
 	* libc/machine/arm/setjmp.S: Add ARMv6-M implementation.
 
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>

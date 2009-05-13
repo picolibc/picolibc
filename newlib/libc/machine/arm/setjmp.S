@@ -170,8 +170,8 @@ SYM (\name):
 
 	/* Save all the callee-preserved registers into the jump buffer.  */
 #ifdef __thumb2__
+	mov		ip, sp
 	stmea		a1!, { v1-v7, fp, ip, lr }
-	str		sp, [a1],#+4
 #else
 	stmea		a1!, { v1-v7, fp, ip, sp, lr }
 #endif
@@ -198,7 +198,7 @@ SYM (\name):
 	/* Restore the registers, retrieving the state when setjmp() was called.  */
 #ifdef __thumb2__
 	ldmfd		a1!, { v1-v7, fp, ip, lr }
-	ldr		sp, [a1],#+4
+	mov		sp, ip
 #else
 	ldmfd		a1!, { v1-v7, fp, ip, sp, lr }
 #endif
