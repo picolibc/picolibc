@@ -1,3 +1,8 @@
+2009-05-13  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* spu/crtn.S: Add dummy to ensure nothing gets linked at address 0.
+	* spu/crti.S: Remove nop.
+
 2009-05-08  Nick Clifton  <nickc@redhat.com>
 
 	* mn10300/sim.ld: Add missing section names such as .bss.*

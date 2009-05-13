@@ -53,4 +53,12 @@
 	
 	FUNC_END
 	
+	# To ensure nothing is linked at address 0, provide a dummy
+	# .interrupt section.  This is in crtn.S to make sure any
+	# user-provided real .interrupt section will get linked
+	# in front of this dummy.
+	.section	".interrupt","ax"
+	.align 2
+	heq $0,$0
+
 # end of crtn.S

@@ -46,11 +46,6 @@
 
 	.section	".init"
 	.align 2
-
-        # To make sure the address of _init is not zero, because
-        # the default linker entry point is 0.       
-        nop
-
 	.global	_init
 	.type	_init, @function
 _init:
