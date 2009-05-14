@@ -31,6 +31,7 @@ details. */
 #include <ntdll.h>
 #include <wchar.h>
 #include <stdio.h>
+#include <assert.h>
 
 /* Determine if path prefix matches current cygdrive */
 #define iscygdrive(path) \
@@ -43,6 +44,10 @@ details. */
 
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len, false))
+
+bool mount_info::got_usr_bin;
+bool mount_info::got_usr_lib;
+int mount_info::root_idx = -1;
 
 /* is_unc_share: Return non-zero if PATH begins with //server/share
 		 or with one of the native prefixes //./ or //?/
@@ -298,10 +303,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 inline void
 mount_info::create_root_entry (const PWCHAR root)
 {
-  /* Create a default root dir from the path the Cygwin DLL is in. */
+ /* Create a default root dir derived from the location of the Cygwin DLL.
+    The entry is immutable, unless the "override" option is given in /etc/fstab. */
   char native_root[PATH_MAX];
   sys_wcstombs (native_root, PATH_MAX, root);
-  mount_table->add_item (native_root, "/", MOUNT_SYSTEM | MOUNT_BINARY);
+  mount_table->add_item (native_root, "/",
+			 MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_OVERRIDE | MOUNT_AUTOMATIC);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
@@ -322,12 +329,28 @@ mount_info::init ()
   pathend = wcpcpy (path, cygwin_shared->installation_root);
   create_root_entry (path);
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
-  if (from_fstab (false, path, pathend)   /* The single | is correct! */
-      | from_fstab (true, path, pathend))
-      return;
 
-  /* FIXME: Remove warning message before releasing 1.7.0. */
-  small_printf ("Huh?  No /etc/fstab file in %W?  Using default root and cygdrive prefix...\n", path);
+  from_fstab (false, path, pathend);
+  from_fstab (true, path, pathend);
+
+  if (!got_usr_bin || !got_usr_lib)
+    {
+      char native[PATH_MAX];
+      assert (root_idx != -1);
+      char *p = stpcpy (native, mount[root_idx].native_path);
+      if (!got_usr_bin)
+      {
+	stpcpy (p, "\\bin");
+	mount_table->add_item (native, "/usr/bin",
+			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC | MOUNT_CYGWIN_EXEC);
+      }
+      if (!got_usr_lib)
+      {
+	stpcpy (p, "\\lib");
+	mount_table->add_item (native, "/usr/lib",
+			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
+      }
+    }
 }
 
 static void
@@ -835,18 +858,19 @@ struct opt
   bool clear;
 } oopts[] =
 {
-  {"user", MOUNT_SYSTEM, 1},
-  {"nouser", MOUNT_SYSTEM, 0},
-  {"binary", MOUNT_BINARY, 0},
-  {"text", MOUNT_BINARY, 1},
-  {"exec", MOUNT_EXEC, 0},
-  {"notexec", MOUNT_NOTEXEC, 0},
-  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
-  {"nosuid", 0, 0},
   {"acl", MOUNT_NOACL, 1},
+  {"binary", MOUNT_BINARY, 0},
+  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"exec", MOUNT_EXEC, 0},
   {"noacl", MOUNT_NOACL, 0},
+  {"nosuid", 0, 0},
+  {"notexec", MOUNT_NOTEXEC, 0},
+  {"nouser", MOUNT_SYSTEM, 0},
+  {"override", MOUNT_OVERRIDE, 0},
+  {"posix=0", MOUNT_NOPOSIX, 0},
   {"posix=1", MOUNT_NOPOSIX, 1},
-  {"posix=0", MOUNT_NOPOSIX, 0}
+  {"text", MOUNT_BINARY, 1},
+  {"user", MOUNT_SYSTEM, 1}
 };
 
 static bool
@@ -1054,7 +1078,7 @@ mount_info::write_cygdrive_info (const char *cygdrive_prefix, unsigned flags)
       set_errno (EINVAL);
       return -1;
     }
-  /* Don't allow to override a system cygdrive prefix. */
+  /* Don't allow overriding of a system cygdrive prefix. */
   if (cygdrive_flags & MOUNT_SYSTEM)
     {
       set_errno (EPERM);
@@ -1238,14 +1262,26 @@ mount_info::add_item (const char *native, const char *posix,
     {
       if (!strcmp (mount[i].posix_path, posixtmp))
 	{
-	  /* Don't allow to override a system mount with a user mount. */
+	  /* Don't allow overriding of a system mount with a user mount. */
 	  if ((mount[i].flags & MOUNT_SYSTEM) && !(mountflags & MOUNT_SYSTEM))
 	    {
 	      set_errno (EPERM);
 	      return -1;
 	    }
-	  if ((mount[i].flags & MOUNT_SYSTEM) == (mountflags & MOUNT_SYSTEM))
+	  if ((mount[i].flags & MOUNT_SYSTEM) != (mountflags & MOUNT_SYSTEM))
+	    continue;
+	  else if (!(mount[i].flags & MOUNT_IMMUTABLE))
 	    break;
+	  else if (mountflags & MOUNT_OVERRIDE)
+	    {
+	      mountflags |= MOUNT_IMMUTABLE;
+	      break;
+	    }
+	  else
+	    {
+	      set_errno (EPERM);
+	      return -1;
+	    }
 	}
     }
 
@@ -1257,6 +1293,16 @@ mount_info::add_item (const char *native, const char *posix,
 
   if (i == nmounts)
     nmounts++;
+
+  if (strcmp (posixtmp, "/usr/bin") == 0)
+    got_usr_bin = true;
+
+  if (strcmp (posixtmp, "/usr/lib") == 0)
+    got_usr_lib = true;
+
+  if (posixtmp[0] == '/' && posixtmp[1] == '\0')
+    root_idx = i;
+
   mount[i].init (nativetmp, posixtmp, mountflags);
   sort ();
 
@@ -1301,8 +1347,8 @@ mount_info::del_item (const char *path, unsigned flags)
 	   ? !strcmp (mount[ent].posix_path, pathtmp)
 	   : strcasematch (mount[ent].native_path, pathtmp)))
 	{
-	  /* Don't allow to remove a system mount. */
-	  if ((mount[ent].flags & MOUNT_SYSTEM))
+	  /* Don't allow removal of a system mount. */
+	  if (mount[ent].flags & MOUNT_SYSTEM)
 	    {
 	      set_errno (EPERM);
 	      return -1;
@@ -1407,8 +1453,11 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
     strcat (_my_tls.locals.mnt_opts, (char *) ",user");
 
-  if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
+  if (flags & MOUNT_CYGDRIVE)		/* cygdrive */
     strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");
+
+  if (flags & (MOUNT_AUTOMATIC | MOUNT_CYGDRIVE))
+    strcat (_my_tls.locals.mnt_opts, (char *) ",auto");
 
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 
@@ -1487,8 +1536,9 @@ mount_item::init (const char *native, const char *posix, unsigned mountflags)
 extern "C" int
 mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
+  /* FIXME: Should we disallow setting MOUNT_SYSTEM in flags since it
+     isn't really supported except from fstab? */
   int res = -1;
-  flags &= ~MOUNT_SYSTEM;
 
   myfault efault;
   if (efault.faulted (EFAULT))

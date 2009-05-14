@@ -17,21 +17,26 @@ extern "C" {
 
 enum
 {
-  MOUNT_SYMLINK =	0x0001,	/* "mount point" is a symlink */
-  MOUNT_BINARY =	0x0002,	/* "binary" format read/writes */
-  MOUNT_SYSTEM =	0x0008,	/* mount point came from system table */
-  MOUNT_EXEC   =	0x0010,	/* Any file in the mounted directory gets 'x' bit */
-  MOUNT_CYGDRIVE   =	0x0020,	/* mount point refers to cygdrive device mount */
-  MOUNT_CYGWIN_EXEC =	0x0040,	/* file or directory is or contains a cygwin
-				   executable */
-  MOUNT_MIXED	=	0x0080,	/* reads are text, writes are binary
-				   not yet implemented */
-  MOUNT_NOTEXEC =	0x0100,	/* don't check files for executable magic */
-  MOUNT_DEVFS =		0x0200,	/* /device "filesystem" */
-  MOUNT_PROC =		0x0400,	/* /proc "filesystem" */
-  MOUNT_RO =		0x1000, /* read-only "filesystem" */
-  MOUNT_NOACL =		0x2000, /* support reading/writing ACLs */
-  MOUNT_NOPOSIX =	0x4000  /* Case insensitve path handling */
+  MOUNT_SYMLINK =	0x00001,	/* "mount point" is a symlink */
+  MOUNT_BINARY =	0x00002,	/* "binary" format read/writes */
+  MOUNT_SYSTEM =	0x00008,	/* mount point came from system table */
+  MOUNT_EXEC   =	0x00010,	/* Any file in the mounted directory
+					   gets 'x' bit */
+  MOUNT_CYGDRIVE   =	0x00020,	/* mount point refers to cygdrive
+					   device mount */
+  MOUNT_CYGWIN_EXEC =	0x00040,	/* file or directory is or contains a
+					   cygwin executable */
+  MOUNT_MIXED	=	0x00080,	/* reads are text, writes are binary
+					   not yet implemented */
+  MOUNT_NOTEXEC =	0x00100,	/* don't check files for executable magic */
+  MOUNT_DEVFS =		0x00200,	/* /device "filesystem" */
+  MOUNT_PROC =		0x00400,	/* /proc "filesystem" */
+  MOUNT_RO =		0x01000,	/* read-only "filesystem" */
+  MOUNT_NOACL =		0x02000,	/* support reading/writing ACLs */
+  MOUNT_NOPOSIX =	0x04000,	/* Case insensitve path handling */
+  MOUNT_OVERRIDE =	0x08000,	/* Allow overriding of root */
+  MOUNT_IMMUTABLE =	0x10000,	/* Mount point can't be changed */
+  MOUNT_AUTOMATIC =	0x20000		/* Mount point was added automatically */
 };
 
 int mount (const char *, const char *, unsigned __flags);

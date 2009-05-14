@@ -1,4 +1,30 @@
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc (mount_info::got_usr_bin): Define.
+	(mount_info::got_usr_lib): Ditto.
+	(mount_info::root_idx): Ditto.
+	(mount_info::create_root_entry): Create root entry as immutable and
+	flag as automatic.
+	(mount_info::init): Remove "Huh?  No /etc/fstab..." warning.
+	Unconditionally call from_fstab for user and system tables.  Fill in
+	/usr/bin and /usr/lib if they have not been specified in /etc/fstab.
+	(oopts): Alphabetize.  Add "override" option to allow overriding
+	immutable mount points.
+	(mount_info::add_item): Accommodate new MOUNT_IMMUTABLE flag intended
+	for root mount.
+	(mount_info::add_item): Detect "/usr/bin", "/usr/lib", and "/" and set
+	appropriate global state.
+	(fillout_mntent): Add ,auto to mount points added by Cygwin DLL.
+	(mount): Remove masking of MOUNT_SYSTEM.  Allow user to shoot
+	themselves.  Add comment.
+	* mount.h (mount_info::got_usr_bin): Declare.
+	(mount_info::got_usr_lib): Ditto.
+	(mount_info::root_idx): Ditto.
+	* include/sys/mount.h: Reformat enum.
+	Add MOUNT_{OVERRIDE,IMMUTABLE,AUTOMATIC}.
+
+2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cwdstuff): Convert to class.  Make posix and dir private.
 	(cwdstuff::get_posix): New method.

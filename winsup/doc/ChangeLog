@@ -1,4 +1,10 @@
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pathnames.sgml (mount-table): Sort mount options and add override
+	option.  Add description of root mount handling.
+
+2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml (pathnames-unusual): Talk about using UTF-8 in C
 	locale.

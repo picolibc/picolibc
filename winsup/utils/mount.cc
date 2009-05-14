@@ -1,7 +1,7 @@
 /* mount.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005,
-   2008 Red Hat, Inc.
+   2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -132,16 +132,19 @@ struct opt
   bool clear;
 } oopts[] =
 {
-  {"binary", MOUNT_BINARY, false},
-  {"text", MOUNT_BINARY, true},
-  {"exec", MOUNT_EXEC, false},
-  {"notexec", MOUNT_NOTEXEC, false},
-  {"cygexec", MOUNT_CYGWIN_EXEC, false},
-  {"nosuid", 0, 0},
   {"acl", MOUNT_NOACL, true},
+  {"auto", 0, false},
+  {"binary", MOUNT_BINARY, false},
+  {"cygexec", MOUNT_CYGWIN_EXEC, false},
+  {"exec", MOUNT_EXEC, false},
   {"noacl", MOUNT_NOACL, false},
-  {"posix=1", MOUNT_NOPOSIX, true},
+  {"nosuid", 0, false},
+  {"notexec", MOUNT_NOTEXEC, false},
+  {"override", MOUNT_OVERRIDE, true},
   {"posix=0", MOUNT_NOPOSIX, false},
+  {"posix=1", MOUNT_NOPOSIX, true},
+  {"text", MOUNT_BINARY, true},
+  {"user", MOUNT_SYSTEM, true}
 };
 
 static void
@@ -366,7 +369,7 @@ mount_entries (void)
   // write fstab entries for normal mount points
   while ((p = getmntent (m)) != NULL)
     // Only list non-cygdrives
-    if (!strstr (p->mnt_opts, ",noumount"))
+    if (!strstr (p->mnt_opts, ",noumount") && !strstr (p->mnt_opts, ",auto"))
       {
 	char fsname[NT_MAX_PATH], dirname[NT_MAX_PATH];
 	printf (format_mnt, convert_spaces (fsname, p->mnt_fsname),

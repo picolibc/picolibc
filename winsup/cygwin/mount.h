@@ -104,6 +104,10 @@ class mount_info
   int nmounts;
   mount_item mount[MAX_MOUNTS];
 
+  static bool got_usr_bin;
+  static bool got_usr_lib;
+  static int root_idx;
+
   /* cygdrive_prefix is used as the root of the path automatically
      prepended to a path when the path has no associated mount.
      cygdrive_flags are the default flags for the cygdrives. */

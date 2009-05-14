@@ -67,25 +67,26 @@ options are binary, text, nouser, user, exec, notexec, cygexec, nosuid,
 posix=[0|1].  The meaning of the options is as follows.</para>
 
 <screen>
-  acl      - Cygwin uses the filesystem's access control lists (ACLs) to
-             implement real POSIX permissions (default).  This flag only
-	     affects filesystems supporting ACLs (NTFS) and is ignored
-	     otherwise.
-  noacl    - Cygwin ignores filesystem ACLs and only fakes a subset of
-	     permission bits based on the DOS readonly attribute.  This
-	     behaviour is the default on FAT and FAT32.  The flag is
-	     ignored on NFS filesystems.
-  binary   - Files default to binary mode (default).
-  text     - Files default to CRLF text mode line endings.
-  nouser   - Mount is a system-wide mount.
-  user     - Mount is a user mount.
-  exec     - Treat all files below mount point as executable.
-  notexec  - Treat all files below mount point as not executable.
-  cygexec  - Treat all files below mount point as cygwin executables.
-  nosuid   - No suid files are allowed (currently unimplemented).
-  posix=0  - Switch off case sensitivity for paths under this mount point.
-  posix=1  - Switch on case sensitivity for paths under this mount point
-	     (default).
+  acl       - Cygwin uses the filesystem's access control lists (ACLs) to
+              implement real POSIX permissions (default).  This flag only
+	      affects filesystems supporting ACLs (NTFS) and is ignored
+	      otherwise.
+  binary    - Files default to binary mode (default).
+  cygexec   - Treat all files below mount point as cygwin executables.
+  exec      - Treat all files below mount point as executable.
+  noacl     - Cygwin ignores filesystem ACLs and only fakes a subset of
+	      permission bits based on the DOS readonly attribute.  This
+	      behaviour is the default on FAT and FAT32.  The flag is
+	      ignored on NFS filesystems.
+  nosuid    - No suid files are allowed (currently unimplemented).
+  notexec   - Treat all files below mount point as not executable.
+  nouser    - Mount is a system-wide mount.
+  override  - Force the override of an immutable mount point (currently "/").
+  posix=0   - Switch off case sensitivity for paths under this mount point.
+  posix=1   - Switch on case sensitivity for paths under this mount point
+	      (default).
+  text      - Files default to CRLF text mode line endings.
+  user      - Mount is a user mount.
 </screen>
 
 <para>While normally the execute permission bits are used to evaluate
@@ -105,8 +106,16 @@ overhead of opening each file to check for a '#!'.  The
 but also prevents Cygwin from setting up commands and environment variables
 for a normal Windows program, adding another small performance gain.  The
 opposite of these options is the <literal>notexec</literal> option, which
-means that no files should be marked as executable under that mount point.
-</para>
+means that no files should be marked as executable under that mount point.</para>
+<para>A correct root directory is quite essential to the operation of
+Cygwin.  A default root directory is evaluated at startup so a
+<filename>fstab</filename> entry for the root directory is not necessary.
+If it's wrong, nothing will work as expected.  Therefore, the root directory
+evaluated by Cygwin itself is treated as an immutable mount point and can't
+be overridden in /etc/fstab... unless you think you really know what you're
+doing.  In this case, use the <literal>override</literal> flag in the options
+field in the <filename>/etc/fstab</filename> file.  Since this is a dangerous
+thing to do, do so at your own risk.</para>
 
 <para><literal>nouser</literal> mount points are not overridable by a later
 call to <command>mount</command>.
