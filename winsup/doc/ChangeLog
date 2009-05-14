@@ -1,5 +1,13 @@
 2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-setup.xml (faq.setup.upgrade-mountpoints): New entry.
+	* faq-using.xml (faq.using.directory-structure): Align example to
+	latest mount output.
+	* pathnames.sgml (mount-table): Add note about upgrade helper scripts
+	to create /etc/fstab and /etc/fstab.f/${USER}.
+
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml: Add automounting of /, /usr/bin, and /usr/lib.
 	* pathnames.sgml (pathnames-intro): Be more verbose about POSIX and
 	Win32 paths.

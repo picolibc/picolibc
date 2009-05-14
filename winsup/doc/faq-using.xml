@@ -751,13 +751,12 @@ look something like this:
 </para>
 <screen>
 	bash$ mount
-	C:\cygwin\bin on /usr/bin type system (binmode)
-	C:\cygwin\lib on /usr/lib type system (binmode)
-	C:\cygwin on / type system (binmode)
+	C:\cygwin\bin on /usr/bin type ntfs (binary,auto)
+	C:\cygwin\lib on /usr/lib type ntfs (binary,auto)
+	C:\cygwin on / type ntfs (binary,auto)
+	C: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
 </screen>
 
-<para>(Exactly what you see depends on what options you gave to <literal>setup.exe</literal>.)
-</para>
 <para>Note that /bin and /usr/bin point to the same location, as do /lib and
 /usr/lib.  This is intentional, and you should not undo these mounts
 unless you <emphasis>really</emphasis> know what you are doing.
