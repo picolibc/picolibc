@@ -308,7 +308,7 @@ mount_info::create_root_entry (const PWCHAR root)
   char native_root[PATH_MAX];
   sys_wcstombs (native_root, PATH_MAX, root);
   mount_table->add_item (native_root, "/",
-			 MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_OVERRIDE | MOUNT_AUTOMATIC);
+			 MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
@@ -859,6 +859,7 @@ struct opt
 } oopts[] =
 {
   {"acl", MOUNT_NOACL, 1},
+  {"auto", 0, 0},
   {"binary", MOUNT_BINARY, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"exec", MOUNT_EXEC, 0},

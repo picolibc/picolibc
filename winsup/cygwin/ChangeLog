@@ -1,3 +1,9 @@
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (oopts): Add a no-op "auto" option.
+	(mount_info::create_root_entry): Set root dir to MOUNT_IMMUTABLE rather
+	than to MOUNT_OVERRIDE.
+
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me+cygwin@cgf.cx>
 
