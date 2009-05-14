@@ -258,6 +258,13 @@ struct cygheap_debug
 };
 #endif
 
+struct cygheap_locale
+{
+  mbtowc_p mbtowc;
+  wctomb_p wctomb;
+  char charset[ENCODING_LEN + 1];
+};
+
 struct user_heap_info
 {
   void *base;
@@ -281,6 +288,7 @@ struct init_cygheap
   char *buckets[32];
   cygheap_root root;
   cygheap_user user;
+  cygheap_locale locale;
   user_heap_info user_heap;
   mode_t umask;
   HANDLE console_h;

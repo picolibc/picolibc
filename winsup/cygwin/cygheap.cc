@@ -156,6 +156,10 @@ cygheap_init ()
 					 _cygheap_mid - _cygheap_start);
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
+      /* Default locale settings. */
+      cygheap->locale.mbtowc = __utf8_mbtowc;
+      cygheap->locale.wctomb = __utf8_wctomb;
+      strcpy (cygheap->locale.charset, "ASCII");
       /* Set umask to a sane default. */
       cygheap->umask = 022;
     }

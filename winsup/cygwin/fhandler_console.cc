@@ -99,25 +99,6 @@ fhandler_console::get_tty_stuff (int flags = 0)
 	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
       dev_state->set_default_attr ();
       shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
-
-      /* Set the console charset and the mb<->wc conversion functions from
-	 the current locale the first time the shared console info is created.
-	 When this initialization is called, the current locale is the one
-	 used when reading the environment.  This way we get a console setting
-	 which matches the setting of LC_ALL/LC_CTYPE/LANG at the time the
-	 first Cygwin process in this console starts.
-
-	 This has an interesting effect.  If none of the above environment
-	 variables is set, the setting is equivalent to before when
-	 CYGWIN=codepage was not set:  The console charset will be the
-	 default ANSI codepage.  So it's sort of backward compatible.
-
-	 TODO: Find out if that's a feasible approach.  It might be better
-	 in the long run to have a distinct console charset environment
-	 variable. */
-      dev_state->con_mbtowc = __mbtowc;
-      dev_state->con_wctomb = __wctomb;
-      strcpy (dev_state->con_charset, __locale_charset ());
     }
 
   return &shared_console_info->tty_min_state;
@@ -146,7 +127,9 @@ tty_list::get_tty (int n)
 inline DWORD
 dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return sys_cp_wcstombs (con_wctomb, con_charset, d, dlen, &w, 1);
+  return sys_cp_wcstombs (*cygheap->locale.charset == 'A'
+			  ? __ascii_wctomb : cygheap->locale.wctomb,
+			  cygheap->locale.charset, d, dlen, &w, 1);
 }
 
 inline UINT
@@ -1467,8 +1450,8 @@ fhandler_console::write_normal (const unsigned char *src,
     f_mbtowc = __set_charset_from_codepage (cp, charset = charsetbuf);
   else
     {
-      f_mbtowc = dev_state->con_mbtowc;
-      charset = dev_state->con_charset;
+      charset = cygheap->locale.charset;
+      f_mbtowc = (*charset == 'A') ? __ascii_mbtowc : cygheap->locale.mbtowc;
     }
 
   /* First check if we have cached lead bytes of a former try to write

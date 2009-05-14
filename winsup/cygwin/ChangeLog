@@ -1,3 +1,34 @@
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_init): Set Cygwin default locale values.
+	* cygheap.h (struct cygheap_locale): New structure.
+	(struct user_heap_info): Add cygheap_locale member locale.
+	* dcrt0.cc (dll_crt0_1): Revert to calling _setlocale_r so that only
+	the applications locale is reverted to "C".
+	* environ.cc (environ_init): Remove unused got_lc variable.
+	* fhandler.h (class dev_console): Remove now unsed locale variables.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Remove
+	setting dev_console's locale members.
+	(dev_console::con_to_str): Use internal locale settings.  Default to
+	__ascii_wctomb if charset is "ASCII".
+	(fhandler_console::write_normal): Ditto.
+	* strfuncs.cc (__ascii_wctomb): Drop declaration.
+	(__db_wctomb): Use fixed value 2 instead of not
+	necessarily matching MB_CUR_MAX.
+	(__eucjp_wctomb): Use 3 instead of MB_CUR_MAX.
+	(sys_cp_wcstombs): Remove special case for "C" locale.
+	(sys_wcstombs): Implement here.  Use internal locale data stored on
+	cygheap.
+	(sys_cp_mbstowcs): Remove special case for "C" locale.
+	(sys_mbstowcs): Implement here.  Use internal locale data stored on
+	cygheap.
+	* syscalls.cc (internal_setlocale): New function to set cygheap locale
+	data and to reset CWD posix path.
+	(setlocale): Just call internal_setlocale from here if necessary.
+	* wchar.h (__ascii_wctomb): Declare.
+	(sys_wcstombs): Don't define inline, just declare.
+	(sys_mbstowcs): Ditto.
+
 2009-05-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (mount_info::init): Remove MOUNT_CYGWIN_EXEC setting when

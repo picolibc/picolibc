@@ -50,7 +50,7 @@ __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
 
   BOOL def_used = false;
   int ret = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS, &wchar, 1, s,
-				 MB_CUR_MAX, NULL, &def_used);
+				 2, NULL, &def_used);
   if (ret > 0 && !def_used)
     return ret;
 
@@ -65,8 +65,6 @@ __sjis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
   return __db_wctomb (r,s, wchar, 932);
 }
 
-extern "C" int __ascii_wctomb (struct _reent *, char *, wchar_t, const char *,
-			       mbstate_t *);
 extern "C" int
 __jis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
@@ -101,7 +99,7 @@ __eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 
   BOOL def_used = false;
   int ret = WideCharToMultiByte (20932, WC_NO_BEST_FIT_CHARS, &wchar, 1, s,
-				 MB_CUR_MAX, NULL, &def_used);
+				 3, NULL, &def_used);
   if (ret > 0 && !def_used)
     {
       /* CP20932 representation of JIS-X-0212 character? */
@@ -418,8 +416,6 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
   mbstate_t ps;
   save_errno save;
 
-  if (f_wctomb == __ascii_wctomb)
-    f_wctomb = __utf8_wctomb;
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t) -1;
@@ -479,6 +475,13 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
   return n;
 }
 
+size_t __stdcall
+sys_wcstombs (char *dst, size_t len, const wchar_t * src, size_t nwc)
+{
+  return sys_cp_wcstombs (cygheap->locale.wctomb, cygheap->locale.charset,
+			  dst, len, src, nwc);
+}
+
 /* Allocate a buffer big enough for the string, always including the
    terminating '\0'.  The buffer pointer is returned in *dst_p, the return
    value is the number of bytes written to the buffer, as usual.
@@ -527,8 +530,6 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
   mbstate_t ps;
   save_errno save;
 
-  if (f_mbtowc == __ascii_mbtowc)
-    f_mbtowc = __utf8_mbtowc;
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t)-1;
@@ -595,6 +596,13 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
     }
 
   return count;
+}
+
+size_t __stdcall
+sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src, size_t nms)
+{
+  return sys_cp_mbstowcs (cygheap->locale.mbtowc, cygheap->locale.charset,
+			  dst, dlen, src, nms);
 }
 
 /* Same as sys_wcstombs_alloc, just backwards. */

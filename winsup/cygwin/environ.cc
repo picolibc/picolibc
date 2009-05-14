@@ -732,7 +732,6 @@ environ_init (char **envp, int envc)
   static char NO_COPY cygterm[] = "TERM=cygwin";
   myfault efault;
   tmp_pathbuf tp;
-  bool got_lc = false;
   static const char *lc_arr[] = { "LC_ALL", "LC_CTYPE", "LANG", NULL };
 
   if (efault.faulted ())
@@ -791,10 +790,7 @@ environ_init (char **envp, int envc)
 	  char *buf = (char *) alloca (i);
 	  GetEnvironmentVariableA (lc_arr[lc], buf, i);
 	  if (setlocale (LC_CTYPE, buf))
-	    {
-	      got_lc = true;
-	      break;
-	    }
+	    break;
 	}
     }
   /* We also need the CYGWIN variable early to know the value of the

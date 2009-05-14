@@ -34,6 +34,7 @@ typedef int wctomb_f (struct _reent *, char *, wchar_t, const char *,
 typedef wctomb_f *wctomb_p;
 
 extern wctomb_p __wctomb;
+extern wctomb_f __ascii_wctomb;
 extern wctomb_f __utf8_wctomb;
 
 extern char *__locale_charset ();
@@ -48,12 +49,9 @@ extern mbtowc_p __set_charset_from_codepage (unsigned int cp, char *charset);
 size_t __stdcall sys_cp_wcstombs (wctomb_p, char *, char *, size_t,
 				  const wchar_t *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
-inline size_t
-__stdcall sys_wcstombs (char *dst, size_t len, const wchar_t * src,
-			size_t nwc = (size_t) -1)
-{
-  return sys_cp_wcstombs (__wctomb, __locale_charset (), dst, len, src, nwc);
-}
+size_t __stdcall sys_wcstombs (char *dst, size_t len, const wchar_t * src,
+			       size_t nwc = (size_t) -1)
+       __attribute__ ((regparm(3)));
 size_t __stdcall sys_wcstombs_alloc (char **, int, const wchar_t *,
 				     size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
@@ -61,12 +59,9 @@ size_t __stdcall sys_wcstombs_alloc (char **, int, const wchar_t *,
 size_t __stdcall sys_cp_mbstowcs (mbtowc_p, char *, wchar_t *, size_t,
 				  const char *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
-inline size_t
-sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
-	      size_t nms = (size_t) -1)
-{
-  return sys_cp_mbstowcs (__mbtowc, __locale_charset (), dst, dlen, src, nms);
-}
+size_t sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
+		     size_t nms = (size_t) -1)
+       __attribute__ ((regparm(3)));
 size_t __stdcall sys_mbstowcs_alloc (wchar_t **, int, const char *,
 				     size_t = (size_t) -1)
        __attribute__ ((regparm(3)));

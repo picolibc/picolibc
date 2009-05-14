@@ -4006,15 +4006,32 @@ unlinkat (int dirfd, const char *pathname, int flags)
   return (flags & AT_REMOVEDIR) ? rmdir (path) : unlink (path);
 }
 
-extern "C" char *
-setlocale (int category, const char *locale)
+static void
+internal_setlocale ()
 {
+  if (*cygheap->locale.charset == 'A')
+    {
+      cygheap->locale.mbtowc = __utf8_mbtowc;
+      cygheap->locale.wctomb = __utf8_wctomb;
+    }
+  else
+    {
+      cygheap->locale.mbtowc = __mbtowc;
+      cygheap->locale.wctomb = __wctomb;
+    }
+  strcpy (cygheap->locale.charset, __locale_charset ());
   /* Each setlocale potentially changes the multibyte representation
      of the CWD.  Therefore we have to rest the CWD's posix path and
      reevaluate the next time it's used. */
   /* FIXME: Other buffered paths might be affected as well. */
+  cygheap->cwd.reset_posix ();
+}
+
+extern "C" char *
+setlocale (int category, const char *locale)
+{
   char *ret = _setlocale_r (_REENT, category, locale);
-  if (ret)
-    cygheap->cwd.reset_posix ();
+  if (ret && locale && (category == LC_ALL || category == LC_CTYPE))
+    internal_setlocale ();
   return ret;
 }
