@@ -1,3 +1,8 @@
+2009-05-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mount.cc (mount_info::init): Remove MOUNT_CYGWIN_EXEC setting when
+	auto-mounting /usr/bin.
+
 2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (oopts): Add a no-op "auto" option.

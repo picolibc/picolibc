@@ -342,7 +342,7 @@ mount_info::init ()
       {
 	stpcpy (p, "\\bin");
 	mount_table->add_item (native, "/usr/bin",
-			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC | MOUNT_CYGWIN_EXEC);
+			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
       }
       if (!got_usr_lib)
       {
