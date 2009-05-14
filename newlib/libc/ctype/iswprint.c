@@ -76,12 +76,7 @@ _DEFUN(iswprint,(c), wint_t c)
   int size;
   wint_t x;
   
-  if (!strcmp (__locale_charset (), "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (!strcmp (__locale_charset (), "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (!strcmp (__locale_charset (), "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
+  c = _jp2uc (c);
 
   x = (c >> 8);
   /* for some large sections, all characters are printuation so handle them here */

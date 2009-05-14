@@ -66,12 +66,7 @@ int
 _DEFUN(iswspace,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
-  if (!strcmp (__locale_charset (), "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (!strcmp (__locale_charset (), "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (!strcmp (__locale_charset (), "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
+  c = _jp2uc (c);
   return ((c >= 0x0009 && c <= 0x000d) || c == 0x0020 || c == 0x1680 ||
 	  (c >= 0x2000 && c <= 0x2006) ||
 	  (c >= 0x2008 && c <= 0x200b) ||

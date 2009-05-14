@@ -38,14 +38,14 @@
 #include "local.h"
 #include "jp2uc.h"
 
+/* Japanese encoding types supported */
+#define JP_JIS		1
+#define JP_SJIS		2
+#define JP_EUCJP	3
+
 wint_t
 _DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
 {
-/* Under Cygwin, the incoming wide character is already given in UTF due
-   to the requirements of the underlying OS. */
-#ifdef  __CYGWIN__
-  return c;
-#else
   int index, adj;
   unsigned char byte1, byte2;
   wint_t ret;
@@ -145,7 +145,22 @@ _DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
     }
 
   return WEOF; 
+}
+
+wint_t
+_DEFUN (_jp2uc, (c), wint_t c)
+{
+/* Under Cygwin, the incoming wide character is already given in UTF due
+   to the requirements of the underlying OS. */
+#ifndef __CYGWIN__
+  if (!strcmp (__locale_charset (), "JIS"))
+    c = __jp2uc (c, JP_JIS);
+  else if (!strcmp (__locale_charset (), "SJIS"))
+    c = __jp2uc (c, JP_SJIS);
+  else if (!strcmp (__locale_charset (), "EUCJP"))
+    c = __jp2uc (c, JP_EUCJP);
 #endif
+  return c;
 }
 
 #endif /* _MB_CAPABLE */

@@ -66,12 +66,7 @@ int
 _DEFUN(iswcntrl,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
-  if (!strcmp (__locale_charset (), "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (!strcmp (__locale_charset (), "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (!strcmp (__locale_charset (), "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
+  c = _jp2uc (c);
   return ((c >= 0x0000 && c <= 0x001f) || 
 	  (c >= 0x007f && c <= 0x009f) ||
 	  c == 0x2028 || c == 0x2029);

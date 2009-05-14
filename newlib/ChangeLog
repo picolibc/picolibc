@@ -1,3 +1,21 @@
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/local.h (JP_JIS, JP_SJIS, JP_EUCJP): Move definition
+	to jp2uc.c.
+	(__jp2uc): Remove declaration.
+	(_jp2uc): Declare.
+	* libc/ctype/jp2uc.c (JP_JIS, JP_SJIS, JP_EUCJP): Define.
+	(__jp2uc): Remove Cygwin special case.
+	(_jp2uc): New function.  On Cygwin, just return c.
+	* libc/ctype/iswalpha.c (iswalpha): Just call _jp2uc.
+	* libc/ctype/iswblank.c (iswblank): Ditto.
+	* libc/ctype/iswcntrl.c (iswcntrl): Ditto.
+	* libc/ctype/iswprint.c (iswprint): Ditto.
+	* libc/ctype/iswpunct.c (iswpunt): Ditto.
+	* libc/ctype/iswspace.c (iswspace): Ditto.
+	* libc/ctype/towlower.c (towlower): Ditto.
+	* libc/ctype/towupper.c (towupper): Ditto.
+
 2009-05-13  Paul Brook  <paul@codesourcery.com>
 
 	* libc/machine/arm/setjmp.S: Don't bother saving IP.  Copy SP to

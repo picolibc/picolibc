@@ -70,13 +70,7 @@ wint_t
 _DEFUN(towupper,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
-  if (!strcmp (__locale_charset (), "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (!strcmp (__locale_charset (), "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (!strcmp (__locale_charset (), "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
-
+  c = _jp2uc (c);
   if (c < 0x100)
     {
       if (c == 0x00b5)

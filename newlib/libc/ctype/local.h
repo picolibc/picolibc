@@ -22,11 +22,6 @@
 
 extern char *__locale_charset ();
 
-/* Japanese encoding types supported */
-#define JP_JIS		1
-#define JP_SJIS		2
-#define JP_EUCJP	3
-
 /* internal function to translate JP to Unicode */
-wint_t _EXFUN (__jp2uc, (wint_t, int));
+wint_t _EXFUN (_jp2uc, (wint_t));
 
