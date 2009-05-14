@@ -17,6 +17,10 @@
   are only local to the current session and disappear when the last
   Cygwin process in the session exits.
 
+- Cygwin creates the mount points for /, /usr/bin, and /usr/lib automatically
+  from it's own position on the disk.  They don't have to be specified in
+  /etc/fstab. 
+
 - If a filename cannot be represented in the current character set,
   the character will be converted to a sequence Ctrl-N + UTF-8 representation
   of the character.  This allows to access all files, even those not

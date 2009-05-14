@@ -1,3 +1,12 @@
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml: Add automounting of /, /usr/bin, and /usr/lib.
+	* pathnames.sgml (pathnames-intro): Be more verbose about POSIX and
+	Win32 paths.
+	(mount-table): Add "auto" flag.  Add a paragraph about /usr/bin and
+	/usr/lib.
+	(pathnames-mount-ex): Enhance flags output.
+
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me+cygwin@cgf.cx>
 
