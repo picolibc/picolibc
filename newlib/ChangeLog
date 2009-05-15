@@ -1,3 +1,19 @@
+2009-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/string/local.h: New file.
+	* libc/string/wcswidth.c (wcswidth):  Convert japanese wide
+	characters to Unicode here.  Handle surrogate pairs for UTF-16
+	systems.  Call __wcwidth rather than wcwidth.
+	* libc/string/wcwidth.c: New implementation using Markus Kuhn's
+	wcwidth implementation for Unicode.
+	(bisearch): New static function.
+	(__wcwidth): New function.  Take wint_t rather than wchar_t as
+	parameter to allow full Unicode handling on UTF-16 systems.
+	Move old wcwidth implementation here for non-multibyte aware
+	systems.
+	(wcwidth): Convert japanese wide characters to Unicode here.
+	Call __wcwidth rather than using iswprint/iswcntrl.
+
 2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/local.h (JP_JIS, JP_SJIS, JP_EUCJP): Move definition
