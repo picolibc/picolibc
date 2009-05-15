@@ -59,7 +59,7 @@ size_t __stdcall sys_wcstombs_alloc (char **, int, const wchar_t *,
 size_t __stdcall sys_cp_mbstowcs (mbtowc_p, char *, wchar_t *, size_t,
 				  const char *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
-size_t sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
+size_t __stdcall sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
 		     size_t nms = (size_t) -1)
        __attribute__ ((regparm(3)));
 size_t __stdcall sys_mbstowcs_alloc (wchar_t **, int, const char *,

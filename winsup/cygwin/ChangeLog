@@ -1,5 +1,9 @@
 2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wchar.h (sys_mbstowcs): Add missing __stdcall attribute.
+
+2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_init): Set Cygwin default locale values.
 	* cygheap.h (struct cygheap_locale): New structure.
 	(struct user_heap_info): Add cygheap_locale member locale.
