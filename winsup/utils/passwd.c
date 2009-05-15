@@ -408,8 +408,10 @@ main (int argc, char **argv)
   if (c)
     *c = '\0';
 
-  setlocale (LC_ALL, "");
-
+  /* Use locale from environment.  If not set or set to "C", use UTF-8. */
+  setlocale (LC_CTYPE, "");
+  if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
+    setlocale (LC_CTYPE, "en_US.UTF-8");
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {

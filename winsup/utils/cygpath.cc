@@ -982,7 +982,10 @@ main (int argc, char **argv)
 {
   int o;
 
-  setlocale (LC_ALL, "");
+  /* Use locale from environment.  If not set or set to "C", use UTF-8. */
+  setlocale (LC_CTYPE, "");
+  if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
+    setlocale (LC_CTYPE, "en_US.UTF-8");
   prog_name = strrchr (argv[0], '/');
   if (!prog_name)
     prog_name = strrchr (argv[0], '\\');

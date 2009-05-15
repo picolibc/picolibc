@@ -1,3 +1,12 @@
+2009-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (main): Only setlocale for LC_CTYPE category.  Fallback
+	to UTF-8 if locale is "C".
+	* ldd.cc (main): Ditto.
+	* mkgroup.c (main): Ditto.
+	* mkpasswd.c (main): Ditto.
+	* passwd.c (main): Ditto.
+
 2009-05-13  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me+cygwin@cgf.cx>
 

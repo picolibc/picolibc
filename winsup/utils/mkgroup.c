@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -749,6 +750,10 @@ main (int argc, char **argv)
   if (!isatty (1))
     setmode (1, O_BINARY);
 
+  /* Use locale from environment.  If not set or set to "C", use UTF-8. */
+  setlocale (LC_CTYPE, "");
+  if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
+    setlocale (LC_CTYPE, "en_US.UTF-8");
   load_dsgetdcname ();
   in_domain = fetch_primary_domain ();
   fetch_current_pgrp_sid ();

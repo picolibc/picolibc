@@ -327,7 +327,11 @@ main (int argc, char **argv)
 {
   int optch;
   int index;
-  setlocale (LC_ALL, "");
+
+  /* Use locale from environment.  If not set or set to "C", use UTF-8. */
+  setlocale (LC_CTYPE, "");
+  if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
+    setlocale (LC_CTYPE, "en_US.UTF-8");
   while ((optch = getopt_long (argc, argv, "dru", longopts, &index)) != -1)
     switch (optch)
       {
