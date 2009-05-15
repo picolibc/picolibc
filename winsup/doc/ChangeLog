@@ -1,3 +1,7 @@
+2009-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup2.sgml (setup-locale-console): Disable section for now.
+
 2009-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-setup.xml (faq.setup.upgrade-mountpoints): New entry.

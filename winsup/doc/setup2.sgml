@@ -261,6 +261,7 @@ Unicode character.</para>
 
 </sect2>
 
+<!-- TODO: This is not correct anymore.
 <sect2 id="setup-locale-console"><title>The Windows Console character set</title>
 
 <para>Most of the time the Windows console is used to run Cygwin applications.
@@ -297,6 +298,7 @@ ASCII character set alone.  Native characters printed from the remote
 application would not show up correctly on your local console.</para>
 
 </sect2>
+-->
 
 <sect2 id="setup-locale-problems"><title>Potential Problems when using Locales</title>
 
