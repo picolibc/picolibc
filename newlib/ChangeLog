@@ -1,3 +1,21 @@
+2009-05-15  Craig Howland <howland@LGSInnovations.com>
+
+	* configure.in:  Add configuration test for long double type existing
+	and set flag _HAVE_LONG_DOUBLE if true.  Fix INIT_ARRAY (.init_array)
+	and _LDBL_EQ_DBL tests to not link so that will work with
+	cross-compilers.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* newlib.hin: Add _HAVE_LONG_DOUBLE flag.
+	* libc/include/math.h:  Change non-builtin defines for HUGE_VAL,
+	HUGE_VALF, and HUGE_VALL to be constant expressions.  Add definitions
+	for the non-builtin case for INFINITY and NAN.  Gate HUGE_VALL and 
+	union __ldmath definitions with (new) _HAVE_LONG_DOUBLE.
+	*libm/common/s_infconst.c:  Change definitions to use values from
+	float.h instead of non-so-portable integer forms.  Mark as being
+	deprecated (because now removed from math.h, are not used anywhere
+	in Newlib, itself).
+
 2009-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/string/local.h: New file.

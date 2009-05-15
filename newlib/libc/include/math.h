@@ -8,23 +8,28 @@
 
 _BEGIN_STD_C
 
+/* __dmath, __fmath, and __ldmath are only here for backwards compatibility
+ * in case any code used them.  They are no longer used by Newlib, itself,
+ * other than legacy.  */
 union __dmath
 {
-  __ULong i[2];
   double d;
+  __ULong i[2];
 };
 
 union __fmath
 {
-  __ULong i[1];
   float f;
+  __ULong i[1];
 };
 
+#if defined(_HAVE_LONG_DOUBLE)
 union __ldmath
 {
+  long double ld;
   __ULong i[4];
-  _LONG_DOUBLE ld;
 };
+#endif
 
 /* Natural log of 2 */
 #define _M_LOG2_E        0.693147180559945309417
@@ -57,24 +62,45 @@ union __ldmath
 
 #else /* !gcc >= 3.3  */
 
- /* No builtins.  Use floating-point unions instead.  Declare as an array
-    without bounds so no matter what small data support a port and/or
-    library has, the reference will be via the general method for accessing
-    globals. */
+ /*      No builtins.  Use fixed defines instead.  (All 3 HUGE plus the INFINITY
+  * and NAN macros are required to be constant expressions.  Using a variable--
+  * even a static const--does not meet this requirement, as it cannot be
+  * evaluated at translation time.)
+  *      The infinities are done using numbers that are far in excess of
+  * something that would be expected to be encountered in a floating-point
+  * implementation.  (A more certain way uses values from float.h, but that is
+  * avoided because system includes are not supposed to include each other.)
+  *      This method might produce warnings from some compilers.  (It does in
+  * newer GCCs, but not for ones that would hit this #else.)  If this happens,
+  * please report details to the Newlib mailing list.  */
 
  #ifndef HUGE_VAL
-  extern __IMPORT const union __dmath __infinity[];
-  #define HUGE_VAL (__infinity[0].d)
+  #define HUGE_VAL (1.0e999999999)
  #endif
 
  #ifndef HUGE_VALF
-  extern __IMPORT const union __fmath __infinityf[];
-  #define HUGE_VALF (__infinityf[0].f)
+  #define HUGE_VALF (1.0e999999999F)
  #endif
 
- #ifndef HUGE_VALL
-  extern __IMPORT const union __ldmath __infinityld[];
-  #define HUGE_VALL (__infinityld[0].ld)
+ #if !defined(HUGE_VALL)  &&  defined(_HAVE_LONG_DOUBLE)
+  #define HUGE_VALL (1.0e999999999L)
+ #endif
+
+ #if !defined(INFINITY)
+  #define INFINITY (HUGE_VALF)
+ #endif
+
+ #if !defined(NAN)
+  #if defined(__GNUC__)  &&  defined(__cplusplus)
+    /* Exception:  older g++ versions warn about the divide by 0 used in the
+     * normal case (even though older gccs do not).  This trick suppresses the
+     * warning, but causes errors for plain gcc, so is only used in the one
+     * special case.  */
+    static const union { __ULong __i[1]; float __d; } __Nanf = {0x7FC00000};
+    #define NAN (__Nanf.__d)
+  #else
+    #define NAN (0.0F/0.0F)
+  #endif
  #endif
 
 #endif /* !gcc >= 3.3  */

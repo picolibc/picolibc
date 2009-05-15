@@ -46,6 +46,9 @@
    functions.  */
 #undef  _ATEXIT_DYNAMIC_ALLOC
 
+/* True if long double supported.  */
+#undef  _HAVE_LONG_DOUBLE
+
 /* True if long double supported and it is equal to double.  */
 #undef  _LDBL_EQ_DBL
 

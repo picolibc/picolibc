@@ -378,8 +378,8 @@ int __start (void) { return 0; }
 int foo (void) { return 1; }
 int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
 EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
-		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest conftest.c
+							1>&AS_MESSAGE_LOG_FD])
 then
   if ${READELF} -S conftest | grep -e INIT_ARRAY > /dev/null; then
     libc_cv_initfinit_array=yes
@@ -395,7 +395,41 @@ if test $libc_cv_initfinit_array = yes; then
   AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
 fi
 
-AC_CACHE_CHECK(long double equals double,
+dnl Autoconf 2.59 doesn't support the AC_TYPE_LONG_DOUBLE macro. Instead of:
+dnl   AC_TYPE_LONG_DOUBLE
+dnl   AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
+dnl we specify our own long double test.
+dnl Additionally, ac_cv_objext is broken so that AC_COMPILE_IFELSE cannot be
+dnl used, so use AC_TRY_COMMAND instead.
+AC_CACHE_CHECK(whether long double type exists,
+	       acnewlib_cv_type_long_double, [dnl
+cat > conftest.c <<EOF
+/* Check two ways:  float.h defines and direct type declaration.  */
+#include <float.h>
+#if defined(LDBL_MANT_DIG)
+  #define _HAVE_LONG_DOUBLE
+ #else
+  #error "LDBL != DBL"
+#endif
+long double test() {
+long double ld = 0.0L;
+return ld;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_type_long_double=yes;
+else
+  acnewlib_cv_type_long_double=no;
+fi
+rm -f conftest*])
+if test $acnewlib_cv_type_long_double = yes; then
+  AC_DEFINE_UNQUOTED(_HAVE_LONG_DOUBLE)
+fi
+AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$acnewlib_cv_type_long_double" = x"yes")
+
+AC_CACHE_CHECK(whether long double equals double,
 	       newlib_ldbl_eq_dbl, [dnl
 cat > conftest.c <<EOF
 #include <float.h>
@@ -406,8 +440,8 @@ cat > conftest.c <<EOF
   #error "LDBL != DBL"
 #endif
 EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
-		   -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
 then
   newlib_ldbl_eq_dbl=yes;
 else
