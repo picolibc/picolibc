@@ -71,8 +71,8 @@ cygcheck.exe: bloda.o path.o dump_setup.o
 
 # Provide any necessary per-target variable overrides.
 cygcheck.exe: MINGW_LDFLAGS += -lntdll
-cygpath.exe: ALL_LDFLAGS += -lntdll
-ps.exe: ALL_LDFLAGS += -lntdll
+cygpath.exe: ALL_LDFLAGS += -lcygwin -lntdll
+ps.exe: ALL_LDFLAGS += -lcygwin -lntdll
 
 ldd.exe: ALL_LDFLAGS += -lpsapi
 

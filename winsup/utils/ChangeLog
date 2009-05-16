@@ -1,3 +1,10 @@
+2009-05-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygpath.exe): Link against cygwin.a before linking
+	against ntdll.dll to avoid linking symbols defined in both DLLs
+	from ntdll.
+	(ps.exe): Ditto.
+
 2009-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (main): Only setlocale for LC_CTYPE category.  Fallback
