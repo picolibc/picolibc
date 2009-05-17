@@ -38,6 +38,7 @@ static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;
 static int mixed_flag, options_from_file_flag, mode_flag;
+static UINT codepage;
 
 static const char *format_type_arg;
 
@@ -66,10 +67,11 @@ static struct option long_options[] = {
   {(char *) "sysdir", no_argument, NULL, 'S'},
   {(char *) "windir", no_argument, NULL, 'W'},
   {(char *) "folder", required_argument, NULL, 'F'},
+  {(char *) "codepage", required_argument, NULL, 'C'},
   {0, no_argument, 0, 0}
 };
 
-static char options[] = "ac:df:hilmMopst:uvwADHOPSWF:";
+static char options[] = "ac:df:hilmMopst:uvwAC:DHOPSWF:";
 
 static void
 usage (FILE * stream, int status)
@@ -94,6 +96,11 @@ Path conversion options:\n\
   -l, --long-name       print Windows long form of NAMEs (with -w, -m only)\n\
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
   -s, --short-name      print DOS (short) form of NAMEs (with -w, -m only)\n\
+  -C, --codepage CP     print DOS, Windows, or mixed pathname in Windows\n\
+                        codepage CP.  CP can be a numeric codepage identifier,\n\
+                        or one of the reserved words ANSI, OEM, or UTF8.\n\
+                        If this option is missing, %s defaults to the\n\
+                        character set defined by the current locale.\n\
 System information:\n\
   -A, --allusers        use `All Users' instead of current user for -D, -O, -P\n\
   -D, --desktop         output `Desktop' directory and exit\n\
@@ -103,7 +110,7 @@ System information:\n\
   -S, --sysdir          output system directory and exit\n\
   -W, --windir          output `Windows' directory and exit\n\
   -F, --folder ID       output special folder with numeric ID and exit\n\
-", prog_name, prog_name, prog_name, prog_name);
+", prog_name, prog_name, prog_name, prog_name, prog_name);
   if (ignore_flag)
     /* nothing to do */;
   else if (stream != stdout)
@@ -130,6 +137,15 @@ RtlAllocateUnicodeString (PUNICODE_STRING uni, ULONG size)
   uni->MaximumLength = 512;
   uni->Buffer = (WCHAR *) malloc (size);
   return uni->Buffer != NULL;
+}
+
+static size_t
+my_wcstombs (char *dest, const wchar_t *src, size_t n)
+{
+  if (codepage)
+    return WideCharToMultiByte (codepage, 0, src, -1, dest, n, NULL, NULL);
+  else
+    return wcstombs (dest, src, n);
 }
 
 static char *
@@ -331,14 +347,14 @@ get_short_paths (char *path)
       ++ptr, ++sptr;
       acc -= len + 1;
     }
-  len = wcstombs (NULL, sbuf, 0) + 1;
+  len = my_wcstombs (NULL, sbuf, 0) + 1;
   ptr = (char *) malloc (len);
   if (ptr == NULL)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  wcstombs (ptr, sbuf, len);
+  my_wcstombs (ptr, sbuf, len);
   return ptr;
 }
 
@@ -355,14 +371,14 @@ get_short_name (const char *filename)
 	       filename);
       exit (2);
     }
-  len = wcstombs (NULL, buf, 0) + 1;
+  len = my_wcstombs (NULL, buf, 0) + 1;
   sbuf = (char *) malloc (len);
   if (sbuf == NULL)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  wcstombs (sbuf, buf, len);
+  my_wcstombs (sbuf, buf, len);
   return sbuf;
 }
 
@@ -452,14 +468,14 @@ get_long_name (const char *filename, DWORD& len)
 	  wcsncat (buf, wpath, 32767);
 	}
     }
-  len = wcstombs (NULL, buf, 0);
+  len = my_wcstombs (NULL, buf, 0);
   sbuf = (char *) malloc (len + 1);
   if (!sbuf)
     {
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  wcstombs (sbuf, buf, len + 1);
+  my_wcstombs (sbuf, buf, len + 1);
   return sbuf;
 }
 
@@ -738,7 +754,7 @@ do_pathconv (char *filename)
 	}
       if (!unix_flag)
 	{
-	  wcstombs (buf, buf2, 32768);
+	  my_wcstombs (buf, buf2, 32768);
 	  buf = get_device_name (buf);
 	  if (shortname_flag)
 	    buf = get_short_name (buf);
@@ -802,6 +818,7 @@ do_options (int argc, char **argv, int from_file)
   allusers_flag = 0;
   output_flag = 0;
   mode_flag = 0;
+  codepage = 0;
   if (!from_file)
     options_from_file_flag = 0;
   optind = 0;
@@ -891,6 +908,25 @@ do_options (int argc, char **argv, int from_file)
 
 	case 'A':
 	  allusers_flag = 1;
+	  break;
+
+	case 'C':
+	  if (!optarg)
+	    usage (stderr, 1);
+	  if (!strcasecmp (optarg, "ANSI"))
+	    codepage = GetACP ();
+	  else if (!strcasecmp (optarg, "OEM"))
+	    codepage = GetOEMCP ();
+	  else if (!strcasecmp (optarg, "UTF8")
+		   || !strcasecmp (optarg, "UTF-8"))
+	    codepage = CP_UTF8;
+	  else
+	    {
+	      char *c;
+	      codepage = (UINT) strtoul (optarg, &c, 10);
+	      if (*c)
+		usage (stderr, 1);
+	    }
 	  break;
 
 	case 'D':

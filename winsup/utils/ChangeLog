@@ -1,3 +1,13 @@
+2009-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (codepage): New variable.
+	(long_options): Add --codepage option.
+	(options): Add -C option.
+	(usage): Add -C/--codepage description.
+	(my_wcstombs): New function.  Use througout instead of wcstombs.
+	(do_options): Handle -C/--codepage option.
+	* utils.sgml (cygpath): Add description for new -C/--codepage option.
+
 2009-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygpath.exe): Link against cygwin.a before linking

@@ -207,6 +207,11 @@ Path conversion options:
   -l, --long-name       print Windows long form of NAMEs (with -w, -m only)
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')
   -s, --short-name      print DOS (short) form of NAMEs (with -w, -m only)
+  -C, --codepage CP     print DOS, Windows, or mixed pathname in Windows
+                        codepage CP.  CP can be a numeric codepage identifier,
+                        or one of the reserved words ANSI, OEM, or UTF8.
+                        If this option is missing, cygpath defaults to the
+                        character set defined by the current locale.
 System information:
   -A, --allusers        use `All Users' instead of current user for -D, -P
   -D, --desktop         output `Desktop' directory and exit
@@ -249,6 +254,30 @@ the <literal>-l</literal> and <literal>-s</literal> options to use normal
 identical to <literal>-w</literal> and <literal>-s</literal> together.
 </para>
 
+<para>The <literal>-C</literal> option allows to specify a Windows codepage
+to print DOS and Windows paths created with one of the <literal>-d</literal>,
+<literal>-m</literal>, or <literal>-w</literal> options.  The default is to
+use the character set of the current locale defined by one of the
+internationalization environment variables <envar>LC_ALL</envar>,
+<envar>LC_CTYPE</envar>, or <envar>LANG</envar>, see
+<xref linkend="setup-locale"></xref>.  This is sometimes not sufficent for
+interaction with native Windows tools, which might expect native, non-ASCII
+characters in a specific Windows codepage.  Console tools, for instance, might
+expect pathnames in the current OEM codepage, while graphical tools like
+Windows Explorer might expect pathnames in the current ANSI codepage.</para>
+
+<para>The <literal>-C</literal> option takes a single parameter:</para>
+<itemizedlist spacing="compact">
+<listitem><para><literal>ANSI</literal>, to specify the current ANSI codepage</para></listitem>
+<listitem><para><literal>OEM</literal>, to specify the current OEM (console) codepage</para></listitem>
+<listitem><para><literal>UTF8</literal>, to specify UTF-8.</para></listitem>
+<listitem><para>A numerical, decimal codepage number, for instance 936 for GBK,
+28593 for ISO-8859-3, etc.  A full list of supported codepages is listed on the
+Microsoft MSDN page
+<ulink url="http://msdn.microsoft.com/en-us/library/dd317756(VS.85).aspx">Code Page Identifiers</ulink>.  A codepage of 0 is the same as if the
+<literal>-C</literal> hasn't been specified at all.</para></listitem>
+</itemizedlist>
+
 <para>The <literal>-p</literal> option means that you want to convert
 a path-style string rather than a single filename.  For example, the
 PATH environment variable is semicolon-delimited in Windows, but
@@ -272,7 +301,7 @@ if [ "${1}" = "" ];
 	then
 		XPATH=".";
 	else
-		XPATH="$(cygpath -w "${1}")";
+		XPATH="$(cygpath -C ANSI -w "${1}")";
 fi
 explorer $XPATH &
 ]]>
