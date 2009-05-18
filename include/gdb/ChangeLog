@@ -1,3 +1,7 @@
+2009-05-18  Jon Beniston <jon@beniston.com>
+
+        * sim-lm32.h: New file.
+
 2009-01-07  Hans-Peter Nilsson  <hp@axis.com>
 
 	* callback.h (struct host_callback_struct): Mark member error as
