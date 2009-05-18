@@ -45,9 +45,9 @@ details. */
 #define isproc(path) \
   (path_prefix_p (proc, (path), proc_len, false))
 
-bool mount_info::got_usr_bin;
-bool mount_info::got_usr_lib;
-int mount_info::root_idx = -1;
+bool NO_COPY mount_info::got_usr_bin;
+bool NO_COPY mount_info::got_usr_lib;
+int NO_COPY mount_info::root_idx = -1;
 
 /* is_unc_share: Return non-zero if PATH begins with //server/share
 		 or with one of the native prefixes //./ or //?/
