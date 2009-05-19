@@ -1301,7 +1301,7 @@ mount_info::add_item (const char *native, const char *posix,
   if (strcmp (posixtmp, "/usr/lib") == 0)
     got_usr_lib = true;
 
-  if (posixtmp[0] == '/' && posixtmp[1] == '\0')
+  if (posixtmp[0] == '/' && posixtmp[1] == '\0' && !(mountflags & MOUNT_CYGDRIVE))
     root_idx = i;
 
   mount[i].init (nativetmp, posixtmp, mountflags);

@@ -1,5 +1,10 @@
 2009-05-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* mount.cc (mount_info::add_item): Avoid using any-old '/' as
+	indicating root.
+
+2009-05-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* mount.cc (mount_info::got_usr_bin): Mark as NO_COPY.
 	(mount_info::got_usr_lib): Ditto.
 	(mount_info::root_idx): Ditto.
