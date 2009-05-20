@@ -1,3 +1,7 @@
+2009-05-20  Eric Blake  <ebb9@byu.net>
+
+	* net.cc (gethostby_helper): Use correct signedness.
+
 2009-05-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mount.cc (mount_info::add_item): Avoid using any-old '/' as

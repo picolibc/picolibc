@@ -49,7 +49,7 @@ details. */
 #include "cygwin/in6.h"
 #include "ifaddrs.h"
 #include "tls_pbuf.h"
-#define _CYGWIN_IN_H 
+#define _CYGWIN_IN_H
 #include <resolv.h>
 
 extern "C"
@@ -63,7 +63,7 @@ extern "C"
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
   int dn_length1(const unsigned char *, const unsigned char *,
 		 const unsigned char *);
-  
+
 }				/* End of "C" section */
 
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
@@ -882,7 +882,7 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   return res;
 }
 
-static void 
+static void
 memcpy4to6 (char *dst, const u_char *src)
 {
   const unsigned int h[] = {0, 0, htonl (0xFFFF)};
@@ -890,7 +890,7 @@ memcpy4to6 (char *dst, const u_char *src)
   memcpy (dst + 12, src, NS_INADDRSZ);
 }
 
-static hostent * 
+static hostent *
 gethostby_helper (const char *name, const int af, const int type,
 		  const int addrsize_in, const int addrsize_out)
 {
@@ -916,7 +916,7 @@ gethostby_helper (const char *name, const int af, const int type,
 	}
       msg = ptr;
       anlen = res_search (name, ns_c_in, type, msg, msgsize);
-    } 
+    }
 
   if (ancount >= maxcount)
     {
@@ -929,22 +929,22 @@ gethostby_helper (const char *name, const int af, const int type,
       old_errno = errno;
       free (msg);
       set_errno (old_errno);
-      return NULL; 
+      return NULL;
     }
   u_char *eomsg = msg + anlen - 1;
 
 
-  /* We scan the answer records to determine the required memory size. 
+  /* We scan the answer records to determine the required memory size.
      They can be corrupted and we don't fully trust that the message
      follows the standard exactly. glibc applies some checks that
      we emulate.
      The answers are copied in the hostent structure in a second scan.
      To simplify the second scan we store information as follows:
      - "class" is replaced by the compressed name size
-     - the first 16 bits of the "ttl" store the expanded name size + 1 
+     - the first 16 bits of the "ttl" store the expanded name size + 1
      - the last 16 bits of the "ttl" store the offset to the next valid record.
      Note that "type" is rewritten in host byte order. */
-  
+
   class record {
   public:
     unsigned type: 16;		// type
@@ -960,7 +960,8 @@ gethostby_helper (const char *name, const int af, const int type,
 
   record * anptr = NULL, * prevptr = NULL, * curptr;
   int i, alias_count = 0, string_size = 0, address_count = 0;
-  int complen, namelen1 = 0, address_len = 0, antype, anclass, ansize;
+  int namelen1 = 0, address_len = 0, antype, anclass, ansize;
+  unsigned complen;
 
   /* Get the count of answers */
   ancount = ntohs (((HEADER *) msg)->ancount);
@@ -968,10 +969,10 @@ gethostby_helper (const char *name, const int af, const int type,
   /* Skip the question, it was verified by res_send */
   ptr = msg + sizeof (HEADER);
   if ((complen = dn_skipname (ptr, eomsg)) < 0)
-    goto corrupted;    
+    goto corrupted;
   /* Point to the beginning of the answer section */
   ptr += complen + NS_QFIXEDSZ;
-  
+
   /* Scan the answer records to determine the sizes */
   for (i = 0; i < ancount; i++, ptr = curptr->data + ansize)
     {
@@ -990,7 +991,7 @@ gethostby_helper (const char *name, const int af, const int type,
       if ((namelen1 = dn_length1 (msg, eomsg, curptr-> name())) <= 0)
 	goto corrupted;
 
-      if (antype == ns_t_cname) 
+      if (antype == ns_t_cname)
 	{
 	  alias_count++;
 	  string_size += namelen1;
@@ -1028,7 +1029,7 @@ gethostby_helper (const char *name, const int af, const int type,
       h_errno = NO_DATA;
       return NULL;
     }
-  
+
   /* Determine the total size */
   sz = DWORD_round (sizeof(hostent))
        + sizeof (char *) * (alias_count + address_count + 2)
@@ -1036,7 +1037,7 @@ gethostby_helper (const char *name, const int af, const int type,
        + address_count * addrsize_out;
 
   ret = realloc_ent (sz,  (hostent *) NULL);
-  if (! ret) 
+  if (! ret)
     {
       old_errno = errno;
       free (msg);
@@ -1050,7 +1051,7 @@ gethostby_helper (const char *name, const int af, const int type,
   ret->h_aliases = (char **) (((char *) ret) + DWORD_round (sizeof(hostent)));
   ret->h_addr_list = ret->h_aliases + alias_count + 1;
   string_ptr = (char *) (ret->h_addr_list + address_count + 1);
- 
+
   /* Rescan the answers */
   ancount = alias_count + address_count; /* Valid records */
   alias_count = address_count = 0;
@@ -1058,17 +1059,17 @@ gethostby_helper (const char *name, const int af, const int type,
   for (i = 0, curptr = anptr; i < ancount; i++, curptr = curptr->next ())
     {
       antype = curptr->type;
-      if (antype == ns_t_cname) 
+      if (antype == ns_t_cname)
 	{
 	  complen = dn_expand (msg, eomsg, curptr->name (), string_ptr, string_size);
 #ifdef DEBUGGING
-	  if (complen != curptr->complen)  
+	  if (complen != curptr->complen)
 	    goto debugging;
 #endif
 	  ret->h_aliases[alias_count++] = string_ptr;
 	  namelen1 = curptr->namelen1;
 	  string_ptr += namelen1;
-	  string_size -= namelen1;	  
+	  string_size -= namelen1;
 	  continue;
 	}
       if (antype == type)
@@ -1077,13 +1078,13 @@ gethostby_helper (const char *name, const int af, const int type,
 		{
 		  complen = dn_expand (msg, eomsg, curptr->name(), string_ptr, string_size);
 #ifdef DEBUGGING
-		  if (complen != curptr->complen)  
+		  if (complen != curptr->complen)
 		    goto debugging;
 #endif
 		  ret->h_name = string_ptr;
 		  namelen1 = curptr->namelen1;
 		  string_ptr += namelen1;
-		  string_size -= namelen1;	  
+		  string_size -= namelen1;
 		}
 	      ret->h_addr_list[address_count++] = string_ptr;
 	      if (addrsize_in != addrsize_out)
@@ -1100,15 +1101,15 @@ gethostby_helper (const char *name, const int af, const int type,
 #endif
     }
 #ifdef DEBUGGING
-  if (string_size < 0)  
+  if (string_size < 0)
     goto debugging;
-#endif      
-  
+#endif
+
   free (msg);
 
   ret->h_aliases[alias_count] = NULL;
   ret->h_addr_list[address_count] = NULL;
- 
+
   return ret;
 
  corrupted:
@@ -1143,7 +1144,7 @@ gethostbyname2 (const char *name, int af)
   bool v4to6 = _res.options & RES_USE_INET6;
 
   int type, addrsize_in, addrsize_out;
-  switch (af) 
+  switch (af)
     {
     case AF_INET:
       addrsize_in = NS_INADDRSZ;
@@ -1159,7 +1160,7 @@ gethostbyname2 (const char *name, int af)
       h_errno = NETDB_INTERNAL;
       return NULL;
     }
-  
+
   return gethostby_helper (name, af, type, addrsize_in, addrsize_out);
 }
 
@@ -1445,20 +1446,20 @@ struct sockaddr_in6_old {
 };
 
 typedef union sockaddr_gen{
-  struct sockaddr         Address;
-  struct sockaddr_in      AddressIn;
+  struct sockaddr	  Address;
+  struct sockaddr_in	  AddressIn;
   struct sockaddr_in6_old AddressIn6;
 } sockaddr_gen;
 
 typedef struct _INTERFACE_INFO {
-  u_long          iiFlags;
-  sockaddr_gen    iiAddress;
-  sockaddr_gen    iiBroadcastAddress;
-  sockaddr_gen    iiNetmask;
+  u_long	  iiFlags;
+  sockaddr_gen	  iiAddress;
+  sockaddr_gen	  iiBroadcastAddress;
+  sockaddr_gen	  iiNetmask;
 } INTERFACE_INFO, *LPINTERFACE_INFO;
 
 #ifndef IN_LOOPBACK
-#define IN_LOOPBACK(a)          ((((long int) (a)) & 0xff000000) == 0x7f000000)
+#define IN_LOOPBACK(a)	((((long int) (a)) & 0xff000000) == 0x7f000000)
 #endif
 
 static int in6_are_prefix_equal (struct in6_addr *, struct in6_addr *, int);
@@ -2360,7 +2361,7 @@ if_indextoname (unsigned ifindex, char *ifname)
 	       We identify the loopback device by its IfIndex of 1. */
 	    if (pap->IfIndex == 1 && pap->Ipv6IfIndex == 0)
 	      for (PIP_ADAPTER_ADDRESSES pap2 = pa0; pap2; pap2 = pap2->Next)
-	        if (pap2->Ipv6IfIndex == 1)
+		if (pap2->Ipv6IfIndex == 1)
 		  {
 		    pap = pap2;
 		    break;
