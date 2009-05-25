@@ -9,12 +9,12 @@
    the application unable to be configured for both "same" and "binary"
    variant systems.  */
 
-#define FOPEN_RB	"rb,rfm=var"
-#define FOPEN_WB 	"wb,rfm=var"
-#define FOPEN_AB 	"ab,rfm=var"
-#define FOPEN_RUB 	"r+b,rfm=var"
-#define FOPEN_WUB 	"w+b,rfm=var"
-#define FOPEN_AUB 	"a+b,rfm=var"
+#define FOPEN_RB	"rb,rfm=udf,rat=none"
+#define FOPEN_WB 	"wb,rfm=udf,rat=none"
+#define FOPEN_AB 	"ab,rfm=udf,rat=none"
+#define FOPEN_RUB 	"r+b,rfm=udf,rat=none"
+#define FOPEN_WUB 	"w+b,rfm=udf,rat=none"
+#define FOPEN_AUB 	"a+b,rfm=udf,rat=none"
 
 #define FOPEN_RT	"r"
 #define FOPEN_WT 	"w"
