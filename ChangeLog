@@ -1,3 +1,7 @@
+2009-05-25  Tristan Gingold  <gingold@adacore.com>
+
+	* setup.com: Complete the file with configuration and build.
+
 2009-05-18  Alexandre Oliva  <aoliva@redhat.com>
 
 	PR other/40159
