@@ -640,10 +640,12 @@
 #define DT_LOPROC	0x70000000
 #define DT_HIPROC	0x7fffffff
 
-/* The next four dynamic tags are used on Solaris.  We support them
-   everywhere.	Note these values lie outside of the (new) range for
-   OS specific values.	This is a deliberate special case and we
-   maintain it for backwards compatability.  */
+/* The next 2 dynamic tag ranges, integer value range (DT_VALRNGLO to
+   DT_VALRNGHI) and virtual address range (DT_ADDRRNGLO to DT_ADDRRNGHI),
+   are used on Solaris.  We support them everywhere.  Note these values
+   lie outside of the (new) range for OS specific values.  This is a
+   deliberate special case and we maintain it for backwards compatability.
+ */
 #define DT_VALRNGLO	0x6ffffd00
 #define DT_GNU_PRELINKED 0x6ffffdf5
 #define DT_GNU_CONFLICTSZ 0x6ffffdf6
