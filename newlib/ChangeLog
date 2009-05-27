@@ -1,3 +1,8 @@
+2009-05-27  Neal H. Walfield  <neal@gnu.org>
+
+	* libc/include/machine/setjmp.h (sigjmp_buf): Size according to
+	_JBTYPE and the size of sigset_t.
+
 2009-05-15  Craig Howland <howland@LGSInnovations.com>
 
 	* configure.in:  Add configuration test for long double type existing

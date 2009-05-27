@@ -267,7 +267,11 @@ extern "C" {
 #endif
 
 /* POSIX sigsetjmp/siglongjmp macros */
-typedef int sigjmp_buf[_JBLEN+2];
+#ifdef _JBTYPE
+typedef _JBTYPE sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (_JBTYPE))];
+#else
+typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
+#endif
 
 #define _SAVEMASK	_JBLEN
 #define _SIGMASK	(_JBLEN+1)
