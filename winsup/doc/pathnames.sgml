@@ -266,7 +266,7 @@ point.  For instance this:</para>
 </screen>
 
 <para>will not make file access using the /mnt/d path prefix suddenly using
-textmode.  If you want to mount any drive explicitely in another mode than
+textmode.  If you want to mount any drive explicitly in another mode than
 the cygdrive prefix, use a distinct path prefix:</para>
 
 <screen>
@@ -501,7 +501,7 @@ case-sensitivity on the <filename>/cygdrive</filename> prefix, your shell
 might claim that it can't find Windows commands like <command>attrib</command>
 or <command>net</command>.  To ease the pain, the <filename>/cygdrive</filename>
 path is case-insensitive by default and you have to use the "posix=1" setting
-explicitely in <filename>/etc/fstab</filename> or
+explicitly in <filename>/etc/fstab</filename> or
 <filename>/etc/fstab.d/$USER</filename> to switch it to case-sensitivity,
 or you have to make sure that the native Win32 %PATH% environment variable
 is using the correct case for all paths throughout.</para>

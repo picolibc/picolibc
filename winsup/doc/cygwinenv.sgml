@@ -165,7 +165,7 @@ below.</para>
 <listitem>
 <para><envar>(no)binmode</envar> - This option has been removed because
 all file opens default to binary mode, unless the open mode has been specified
-explicitely in the open(2) call.
+explicitly in the open(2) call.
 </para>
 </listitem>
 

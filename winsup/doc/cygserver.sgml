@@ -91,7 +91,7 @@
     Force logging to stderr.  This is the default if stderr is connected to
     a tty.  Otherwise, the default is logging to the system log.  By using
     the -e, -E, -y, -Y options (or the appropriate settings in the
-    configuration file), you can explicitely set the logging output as you
+    configuration file), you can explicitly set the logging output as you
     like, even to both, stderr and syslog.
     Configuration file option:  kern.log.stderr
   </para>

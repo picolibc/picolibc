@@ -222,7 +222,7 @@ supports all relevant default ANSI codepages...</para>
 
 <listitem><para>
 You don't want to use the default Windows codepage as character set?
-In that case you have to specify the charset explicitely.  For instance,
+In that case you have to specify the charset explicitly.  For instance,
 assume you're from Italy and don't want to use the default Windows codepage
 1252, but the more portable ISO-8859-15 character set.  What you can do is
 to set the <envar>LANG</envar> variable in the
@@ -271,7 +271,7 @@ used for in- and output, the Windows console hasn't such a way, since it's
 not an application in its own right.</para>
 
 <para>This problem is solved in Cygwin as follows.  When the first Cygwin
-process is started in a Windows console (either explicitely from cmd.exe,
+process is started in a Windows console (either explicitly from cmd.exe,
 or implicitly by, for instance, clicking on the Cygwin desktop icon, or
 running the Cygwin.bat file), the Console character set is determined by the
 setting of the aforementioned internationalization environment variables,

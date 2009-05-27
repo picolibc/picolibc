@@ -641,7 +641,7 @@ Unfortunately that's too simple.  Using <command>NtCreateToken</command>
 has a few drawbacks.</para>
 
 <para>First of all, beginning with Windows Server 2003,
-the permission "Create a token object" gets explicitely removed from
+the permission "Create a token object" gets explicitly removed from
 the SYSTEM user's access token, when starting services under that
 account.  That requires us to create a new account with this specific
 permission just to run this kind of services.  But that's a minor
