@@ -3180,8 +3180,9 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 				     pdir->Length + 2);
 	  RtlCopyUnicodeString (&win32, pdir);
 	  RtlReleasePebLock ();
-	  /* Remove trailing slash. */
-	  if (win32.Length > 3 * sizeof (WCHAR))
+	  /* Remove trailing slash if one exists.  FIXME: Is there a better way to
+	     do this? */
+	  if (win32.Length > 3 * sizeof (WCHAR) && win32.Buffer[win32.Length - 1] == L'\\')
 	    win32.Length -= sizeof (WCHAR);
 	  posix_cwd = NULL;
 	}
@@ -3197,15 +3198,17 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 		upath.Buffer[0] = L'\\';
 	      upath.Length = len * sizeof (WCHAR);
 	    }
-	  else if (upath.Length > 3 * sizeof (WCHAR))
-	    upath.Length -= sizeof (WCHAR); /* Strip trailing backslash */
+	  /* Remove trailing slash if one exists.  FIXME: Is there a better way to
+	     do this? */
+	  else if (upath.Length > 3 * sizeof (WCHAR) && upath.Buffer[upath.Length] == L'\\')
+	    upath.Length -= sizeof (WCHAR);
 	  RtlInitEmptyUnicodeString (&win32,
 				     (PWCHAR) crealloc_abort (win32.Buffer,
 							      upath.Length + 2),
 				     upath.Length + 2);
 	  RtlCopyUnicodeString (&win32, &upath);
 	}
-      /* Make sure it's NUL-termniated. */
+      /* Make sure it's NUL-terminated. */
       win32.Buffer[win32.Length / sizeof (WCHAR)] = L'\0';
       if (!doit)			 /* Virtual path */
 	drive_length = 0;

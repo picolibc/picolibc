@@ -63,7 +63,6 @@ extern "C"
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
   int dn_length1(const unsigned char *, const unsigned char *,
 		 const unsigned char *);
-
 }				/* End of "C" section */
 
 const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
@@ -118,7 +117,6 @@ inet_netof (struct in_addr in)
     res = (i & IN_CLASSB_NET) >> IN_CLASSB_NSHIFT;
   else
     res = (i & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
-
 
   return res;
 }
