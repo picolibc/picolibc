@@ -3180,10 +3180,13 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 				     pdir->Length + 2);
 	  RtlCopyUnicodeString (&win32, pdir);
 	  RtlReleasePebLock ();
+
+	  PWSTR eoBuffer = win32.Buffer + (win32.Length / sizeof (WCHAR));
 	  /* Remove trailing slash if one exists.  FIXME: Is there a better way to
 	     do this? */
-	  if (win32.Length > 3 * sizeof (WCHAR) && win32.Buffer[win32.Length - 1] == L'\\')
+	  if ((eoBuffer - win32.Buffer) > 3 && eoBuffer[-1] == L'\\')
 	    win32.Length -= sizeof (WCHAR);
+
 	  posix_cwd = NULL;
 	}
       else
@@ -3198,10 +3201,14 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 		upath.Buffer[0] = L'\\';
 	      upath.Length = len * sizeof (WCHAR);
 	    }
-	  /* Remove trailing slash if one exists.  FIXME: Is there a better way to
-	     do this? */
-	  else if (upath.Length > 3 * sizeof (WCHAR) && upath.Buffer[upath.Length] == L'\\')
-	    upath.Length -= sizeof (WCHAR);
+	  else
+	    {
+	      PWSTR eoBuffer = upath.Buffer + (upath.Length / sizeof (WCHAR));
+	      /* Remove trailing slash if one exists.  FIXME: Is there a better way to
+		 do this? */
+	      if ((eoBuffer - upath.Buffer) > 3 && eoBuffer[-1] == L'\\')
+		upath.Length -= sizeof (WCHAR);
+	    }
 	  RtlInitEmptyUnicodeString (&win32,
 				     (PWCHAR) crealloc_abort (win32.Buffer,
 							      upath.Length + 2),
