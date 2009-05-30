@@ -77,7 +77,7 @@ POSIX commands */
 #define CESC	'\\'
 #define CINTR	CTRL('C')
 #define CQUIT	0x0001c
-#define CERASE	CTRL('H')
+#define CERASE	CDEL
 #define CKILL	CTRL('U')
 #define CEOT	CTRL('D')
 #define CEOL	0

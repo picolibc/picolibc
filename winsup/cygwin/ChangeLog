@@ -1,5 +1,9 @@
 2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygwin/include/sys/termios.h: Make default erase character "^?".
+
+2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler_console.cc (fhandler_console::read): Convert backspace key
 	to DEL.
 
