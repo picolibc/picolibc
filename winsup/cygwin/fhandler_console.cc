@@ -50,7 +50,7 @@ details. */
 
 #define use_tty ISSTATE (myself, PID_USETTY)
 
-const char * get_nonascii_key (INPUT_RECORD&, char *);
+const char *get_nonascii_key (INPUT_RECORD&, char *);
 
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
@@ -315,9 +315,14 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  if (control_key_state & LEFT_ALT_PRESSED)
 	    dev_state->nModifiers |= 8;
 
-	  if (wch == 0 ||
+	  /* Adopt the linux standard of translating the backspace key to DEL
+	     except when ALT is pressed.  */
+	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
+	    toadd = (control_key_state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+	            ? "" : "\177";
+	  else if (wch == 0
 	      /* arrow/function keys */
-	      (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
+	      || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	    {
 	      toadd = get_nonascii_key (input_rec, tmp);
 	      if (!toadd)
@@ -1783,7 +1788,7 @@ static struct {
   int vk;
   const char *val[4];
 } keytable[] NO_COPY = {
-	       /* NORMAL */  /* SHIFT */    /* CTRL */       /* ALT */
+	       /* NORMAL */    /* SHIFT */     /* CTRL */     /* ALT */
   {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
   {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},
   {VK_UP,	{"\033[A",	"\033[A",	"\033[A",	"\033\033[A"}},

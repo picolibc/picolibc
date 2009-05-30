@@ -1,3 +1,8 @@
+2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::read): Convert backspace key
+	to DEL.
+
 2009-05-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (cwdstuff::set): Rewrite previous change to properly test the
