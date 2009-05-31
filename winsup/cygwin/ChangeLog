@@ -1,5 +1,10 @@
 2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* strfuncs.cc (sys_cp_mbstowcs): Treat src as unsigned char *.  Convert
+	failure of f_mbtowc into a single malformed utf-16 value.
+
+2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygwin/include/sys/termios.h: Make default erase character "^?".
 
 2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>

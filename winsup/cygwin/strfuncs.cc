@@ -523,7 +523,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 		 const char *src, size_t nms)
 {
   wchar_t *ptr = dst;
-  char *pmbs = (char *) src;
+  unsigned const char *pmbs = (unsigned const char *) src;
   size_t count = 0;
   size_t len = dlen;
   int bytes;
@@ -539,12 +539,13 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	 UTF-8 sequence, there must be at least two more bytes left, and the
 	 next byte must be a valid UTF-8 start byte.  If the charset isn't
 	 UTF-8 anyway, try to convert the following bytes as UTF-8 sequence. */
-      if (*pmbs == 0x0e && nms > 2 && *(unsigned char *) (pmbs + 1) >= 0xc2
-	  && *(unsigned char *) (pmbs + 1) <= 0xf4 && *charset != 'U'/*TF-8*/)
+      if (*pmbs == 0x0e && nms > 2 && pmbs[1] >= 0xc2
+	  && pmbs[1] <= 0xf4 && *charset != 'U'/*TF-8*/)
 	{
 	  pmbs++;
 	  --nms;
-	  bytes = __utf8_mbtowc (_REENT, ptr, pmbs, nms, charset, &ps);
+	  bytes = __utf8_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
+				 charset, &ps);
 	  if (bytes < 0)
 	    {
 	      /* Invalid UTF-8 sequence?  Treat the ASCII SO character as
@@ -560,7 +561,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	  if (ps.__count == 4) /* First half of a surrogate. */
 	    {
 	      wchar_t *ptr2 = dst ? ptr + 1 : NULL;
-	      int bytes2 = __utf8_mbtowc (_REENT, ptr2, pmbs + bytes,
+	      int bytes2 = __utf8_mbtowc (_REENT, ptr2, (const char *) pmbs + bytes,
 					  nms - bytes, charset, &ps);
 	      if (bytes2 < 0)
 		break;
@@ -571,8 +572,25 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	      --len;
 	    }
 	}
-      else
-	bytes = f_mbtowc (_REENT, ptr, pmbs, nms, charset, &ps);
+      else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms, charset, &ps)) < 0 && *pmbs > '\x80')
+	{
+	  /* This should probably be handled in f_mbtowc which can operate
+	     on sequences rather than individual characters.
+	     The technique is based on a discussion here:
+
+	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
+
+	     This is hardly perfect.  Windows doesn't do anything sensical with
+	     characters converted to this format and (currently) we don't convert
+	     them back into their original single byte form.  It does allow
+	     processing of src to continue, however, which, since there is no
+	     way to signal decoding errors, seems like the best we can do.
+
+	  */
+	  *ptr = L'\xdc80' | *pmbs;
+	  bytes = 1;
+	}
+
       if (bytes > 0)
         {
           pmbs += bytes;
