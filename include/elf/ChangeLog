@@ -1,3 +1,9 @@
+2009-06-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/10205
+	* i386.h (R_386_IRELATIVE): New.
+	* x86-64.h (R_X86_64_IRELATIVE): Likewise.
+
 2009-05-27  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h: Update comments for dynamic tag ranges.
