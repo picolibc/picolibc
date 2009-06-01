@@ -1,3 +1,12 @@
+2009-05-31  Ian Lance Taylor  <iant@google.com>
+
+	* ansidecl.h: Add extern "C" when compiling with C++.  Treat C++
+	the way we treat an ISO C compiler.  Don't define inline as a
+	macdro when compiling with C++.
+	* dyn-string.h: Add header guard DYN_STRING_H.  Add extern "C"
+	when compiling with C++.
+	* fibheap.h: Add extern "C" when compiling with C++.
+
 2009-05-25  Tristan Gingold  <gingold@adacore.com>
 
 	* fopen-vms.h (FOPEN_RB, FOPEN_WB, FOPEN_AB, FOPEN_RUB, FOPEN_WUB,
