@@ -1,3 +1,10 @@
+2009-06-02  IWAMURO Motonori  <deenheart@gmail.com>
+
+	* libc/ctype/jp2uc.c: Skip all definition if defined __CYGWIN__.
+	(__jp2uc): Change the scope to static function.
+	* libc/ctype/local.h (_jp2uc): Define as macro if defined __CYGWIN__.
+	* libc/string/local.h (_jp2uc): Include ../ctype/local.h.
+
 2009-05-27  Neal H. Walfield  <neal@gnu.org>
 
 	* libc/include/machine/setjmp.h (sigjmp_buf): Size according to

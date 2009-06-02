@@ -23,5 +23,10 @@
 extern char *__locale_charset ();
 
 /* internal function to translate JP to Unicode */
+#ifdef __CYGWIN__
+/* Under Cygwin, the incoming wide character is already given in UTF due
+   to the requirements of the underlying OS. */
+#define _jp2uc(c) (c)
+#else
 wint_t _EXFUN (_jp2uc, (wint_t));
-
+#endif
