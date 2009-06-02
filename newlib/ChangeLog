@@ -1,3 +1,8 @@
+2009-06-02  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/include/sys/config.h: Remove specification of _REENT_SMALL for
+	thumb2.
+
 2009-06-02  IWAMURO Motonori  <deenheart@gmail.com>
 
 	* libc/ctype/jp2uc.c: Skip all definition if defined __CYGWIN__.

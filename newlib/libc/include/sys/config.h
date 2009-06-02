@@ -125,11 +125,6 @@
 #define _REENT_SMALL
 #endif /* __m32c__ */
 
-#ifdef __thumb2__
-/* Thumb-2 based ARMv7M devices are really small.  */
-#define _REENT_SMALL
-#endif
-
 #ifdef __SPU__
 #define MALLOC_ALIGNMENT 16
 #define __CUSTOM_FILE_IO__
