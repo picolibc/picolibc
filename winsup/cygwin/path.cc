@@ -1046,7 +1046,10 @@ out:
 	  if (is_msdos)
 	    fs.has_acls (false);
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
-	  if (fs.has_acls ())
+	  /* CV: We could use this->has_acls() but I want to make sure that
+	     we don't forget that the PATH_NOACL flag must be taken into
+	     account here. */
+	  if (!(path_flags & PATH_NOACL) && fs.has_acls ())
 	    set_exec (0);  /* We really don't know if this is executable or not here
 			      but set it to not executable since it will be figured out
 			      later by anything which cares about this. */

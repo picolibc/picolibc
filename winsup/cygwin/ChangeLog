@@ -1,3 +1,8 @@
+2009-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Don't call set_exec for files on "noacl"
+	mount points.
+
 2009-05-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strfuncs.cc (sys_cp_mbstowcs): Treat src as unsigned char *.  Convert
