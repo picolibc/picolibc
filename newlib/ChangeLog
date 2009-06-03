@@ -1,3 +1,18 @@
+2009-06-03  IWAMURO Motonori  <deenheart@gmail.com>
+
+	* libc/string/wcwidth.c: Optimize for speed.
+
+2009-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (lc_ctype_cjk_lang): New static int.
+	(loadlocale): In case of setting LC_CTYPE, set lc_ctype_cjk_lang
+	to 1 if the language is "jp", "ko", or "zh", to 0 otherwise.
+	(__locale_cjk_lang): New function.
+	* libc/string/local.h (__locale_cjk_lang): Declare.
+	* libc/string/wcwidth.c: Fix comments.
+	(__wcwidth): Handle CJK Ambiguous Width characters according
+	to setting returned by __locale_cjk_lang.
+
 2009-06-02  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/include/sys/config.h: Remove specification of _REENT_SMALL for

@@ -204,6 +204,7 @@ static const char *__get_locale_env(struct _reent *, int);
 
 static char lc_ctype_charset[ENCODING_LEN + 1] = "ASCII";
 static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
+static int lc_ctype_cjk_lang = 0;
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
@@ -602,6 +603,14 @@ loadlocale(struct _reent *p, int category)
       __wctomb = l_wctomb;
       __mbtowc = l_mbtowc;
       __set_ctype (charset);
+      /* Check for the language part of the locale specifier.  In case
+         of "ja", "ko", or "zh", assume the use of CJK fonts.  This is
+	 stored in lc_ctype_cjk_lang and tested in wcwidth() to figure
+	 out the width to return (1 or 2) for the "CJK Ambiguous Width"
+	 category of characters. */
+      lc_ctype_cjk_lang = (strncmp (locale, "ja", 2) == 0
+			   || strncmp (locale, "ko", 2) == 0
+			   || strncmp (locale, "zh", 2) == 0);
 #endif
     }
   else if (category == LC_MESSAGES)
@@ -643,6 +652,12 @@ char *
 _DEFUN_VOID(__locale_msgcharset)
 {
   return lc_message_charset;
+}
+
+int
+_DEFUN_VOID(__locale_cjk_lang)
+{
+  return lc_ctype_cjk_lang;
 }
 
 struct lconv *
