@@ -584,7 +584,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	}
       else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
 				  charset, &ps)) < 0
-	       && *pmbs > '\x80')
+	       && *pmbs >= 0x80)
 	{
 	  /* This should probably be handled in f_mbtowc which can operate
 	     on sequences rather than individual characters.

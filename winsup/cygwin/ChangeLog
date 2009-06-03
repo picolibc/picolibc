@@ -1,3 +1,7 @@
+2009-06-03  IWAMURO Motnori  <deenheart@gmail.com>
+
+	* strfuncs.cc (sys_cp_mbstowcs): Fix condition.
+
 2009-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strfuncs.cc (sys_cp_wcstombs): Implement reverse functionality
