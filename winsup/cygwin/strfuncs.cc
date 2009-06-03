@@ -427,10 +427,19 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
       if ((pw & 0xff00) == 0xf000)
 	pw &= 0xff;
       int bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
-      /* Convert chars invalid in the current codepage to a sequence
-         ASCII SO; UTF-8 representation of invalid char. */
-      if (bytes == -1 && *charset != 'U'/*TF-8*/)
+      if (bytes == -1 && (pw & 0xff00) == 0xdc00)
+	{
+	  /* Reverse functionality of the single invalid second half of a
+	     surrogate pair in the 0xDCxx range specifying an invalid byte
+	     value when converting from MB to WC.
+	     The comment in sys_cp_mbstowcs below explains it. */
+	  buf[0] = (char) (pw & 0xff);
+	  bytes = 1;
+	}
+      else if (bytes == -1 && *charset != 'U'/*TF-8*/)
         {
+	  /* Convert chars invalid in the current codepage to a sequence
+	     ASCII SO; UTF-8 representation of invalid char. */
 	  buf[0] = 0x0e; /* ASCII SO */
 	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
 	  if (bytes == -1)
@@ -561,7 +570,8 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	  if (ps.__count == 4) /* First half of a surrogate. */
 	    {
 	      wchar_t *ptr2 = dst ? ptr + 1 : NULL;
-	      int bytes2 = __utf8_mbtowc (_REENT, ptr2, (const char *) pmbs + bytes,
+	      int bytes2 = __utf8_mbtowc (_REENT, ptr2,
+					  (const char *) pmbs + bytes,
 					  nms - bytes, charset, &ps);
 	      if (bytes2 < 0)
 		break;
@@ -572,7 +582,9 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	      --len;
 	    }
 	}
-      else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms, charset, &ps)) < 0 && *pmbs > '\x80')
+      else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
+				  charset, &ps)) < 0
+	       && *pmbs > '\x80')
 	{
 	  /* This should probably be handled in f_mbtowc which can operate
 	     on sequences rather than individual characters.
@@ -581,13 +593,11 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
 
 	     This is hardly perfect.  Windows doesn't do anything sensical with
-	     characters converted to this format and (currently) we don't convert
-	     them back into their original single byte form.  It does allow
-	     processing of src to continue, however, which, since there is no
-	     way to signal decoding errors, seems like the best we can do.
-
-	  */
-	  *ptr = L'\xdc80' | *pmbs;
+	     characters converted to this format.  It does allow processing of
+	     src to continue, however, which, since there is no way to signal
+	     decoding errors, seems like the best we can do. */
+	  if (dst)
+	    *ptr = L'\xdc80' | *pmbs;
 	  bytes = 1;
 	}
 

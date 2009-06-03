@@ -1,5 +1,12 @@
 2009-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (sys_cp_wcstombs): Implement reverse functionality
+	of the change to sys_cp_mbstowcs from 2009-05-30.
+	(sys_cp_mbstowcs): Slightly reformat.  Fix comment to accommodate
+	change to sys_cp_wcstombs.  Don't write to *ptr if dst is NULL.
+
+2009-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::read): Convert Alt-Backspace
 	to \033\177 or to \377 dependent on the setting of dev_state->metabit.
 
