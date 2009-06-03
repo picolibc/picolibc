@@ -1,3 +1,8 @@
+2009-06-03  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* symconst.h (btLong64, btULong64, btLongLong64, btULongLong64,
+	btAdr64, btInt64, btUInt64): New defines.
+
 2009-04-21  Kai Tietz  <kai.tietz@onevision.com>
 
 	* pe.h (pex64_runtime_function): New structure.

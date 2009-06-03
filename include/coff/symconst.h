@@ -163,6 +163,13 @@
 #define btVoid		26	/* void */
 #define btLongLong	27	/* long long */
 #define btULongLong	28	/* unsigned long long */
+#define btLong64	30	/* long (64-bit) */
+#define btULong64	31	/* unsigned long (64-bit) */
+#define btLongLong64	32	/* long long (64-bit) */
+#define btULongLong64	33	/* unsigned long long (64-bit) */
+#define btAdr64		34	/* address (64-bit) */
+#define btInt64		35	/* int (64-bit) */
+#define btUInt64	36	/* unsigned int (64-bit) */
 #define btMax		64
 
 #if (_MFG == _MIPS)
