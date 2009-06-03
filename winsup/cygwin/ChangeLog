@@ -1,3 +1,8 @@
+2009-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::read): Convert Alt-Backspace
+	to \033\177 or to \377 dependent on the setting of dev_state->metabit.
+
 2009-06-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Don't call set_exec for files on "noacl"

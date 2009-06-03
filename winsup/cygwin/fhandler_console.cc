@@ -318,8 +318,11 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  /* Adopt the linux standard of translating the backspace key to DEL
 	     except when ALT is pressed.  */
 	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
-	    toadd = (control_key_state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
-	            ? "" : "\177";
+	    {
+	      toadd = (control_key_state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+		      ? (dev_state->metabit ? "\377" : "\033\177") : "\177";
+	      nread = strlen (toadd);
+	    }
 	  else if (wch == 0
 	      /* arrow/function keys */
 	      || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
