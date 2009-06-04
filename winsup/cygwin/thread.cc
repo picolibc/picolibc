@@ -76,13 +76,8 @@ __cygwin_lock_fini (_LOCK_T *lock)
 extern "C" void
 __cygwin_lock_lock (_LOCK_T *lock)
 {
-  if (MT_INTERFACE->threadcount <= 1)
-    paranoid_printf ("threadcount %d.  not locking", MT_INTERFACE->threadcount);
-  else
-    {
-      paranoid_printf ("threadcount %d.  locking", MT_INTERFACE->threadcount);
-      pthread_mutex_lock ((pthread_mutex_t*) lock);
-    }
+  paranoid_printf ("threadcount %d.  locking", MT_INTERFACE->threadcount);
+  pthread_mutex_lock ((pthread_mutex_t*) lock);
 }
 
 extern "C" int
@@ -95,13 +90,8 @@ __cygwin_lock_trylock (_LOCK_T *lock)
 extern "C" void
 __cygwin_lock_unlock (_LOCK_T *lock)
 {
-  if (MT_INTERFACE->threadcount <= 1)
-    paranoid_printf ("threadcount %d.  not unlocking", MT_INTERFACE->threadcount);
-  else
-    {
-      pthread_mutex_unlock ((pthread_mutex_t*) lock);
-      paranoid_printf ("threadcount %d.  unlocked", MT_INTERFACE->threadcount);
-    }
+  pthread_mutex_unlock ((pthread_mutex_t*) lock);
+  paranoid_printf ("threadcount %d.  unlocked", MT_INTERFACE->threadcount);
 }
 
 static inline verifyable_object_state

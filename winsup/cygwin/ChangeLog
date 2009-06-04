@@ -1,3 +1,9 @@
+2009-06-04  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* thread.cc (__cygwin_lock_lock):  Delete racy optimisation.
+	(__cygwin_lock_unlock):  Likewise.
+
+
 2009-06-03  IWAMURO Motnori  <deenheart@gmail.com>
 
 	* strfuncs.cc (sys_cp_mbstowcs): Fix condition.
