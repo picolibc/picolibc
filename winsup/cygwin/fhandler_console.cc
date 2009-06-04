@@ -323,6 +323,10 @@ fhandler_console::read (void *pv, size_t& buflen)
 		      ? (dev_state->metabit ? "\377" : "\033\177") : "\177";
 	      nread = strlen (toadd);
 	    }
+	  /* Allow Ctrl-Space to emit ^@ */
+	  else if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
+		   && (control_key_state & CTRL_PRESSED))
+	    toadd = "";
 	  else if (wch == 0
 	      /* arrow/function keys */
 	      || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
