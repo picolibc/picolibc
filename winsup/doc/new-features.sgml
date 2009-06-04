@@ -181,6 +181,11 @@
 
 - Support UTF-8 in console window.
 
+- In the console window the backspace key now emits DEL (0x7f) instead
+  of BS (0x08), Alt-Backspace emits ESC-DEL (0x1b,0x7f) instead of DEL
+  (0x7f), same as the Linux console and xterm.
+  Control-Space now emits an ASCII NUL (0x0) character.
+
 - Support up to 64 serial interfaces using /dev/ttyS0 - /dev/ttyS63.
 
 - Support up to 128 raw disk drives /dev/sda - /dev/sddx.
