@@ -1,5 +1,14 @@
 2009-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_clipboard.cc: Avoid calling system_printf.
+	(set_clipboard): Add basic error checking.  Set errno here.  Per MSDN,
+	don't call GlobalFree on data block transferred to clipboard. 
+	(fhandler_dev_clipboard::write): Drop setting errno after call to
+	set_clipboard.
+	(fhandler_dev_clipboard::read): Add basic error checking. Simplify code.
+
+2009-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (set_console_title): Convert title string to
 	wchar_t and call SetConsoleTitleW.
 

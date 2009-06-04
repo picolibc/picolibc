@@ -81,69 +81,63 @@ set_clipboard (const void *buf, size_t len)
   HGLOBAL hmem;
   void *clipbuf;
   /* Native CYGWIN format */
-  OpenClipboard (0);
-  hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
-  if (!hmem)
+  if (OpenClipboard (NULL))
     {
-      system_printf ("Couldn't allocate global buffer for write");
-      return -1;
-    }
-  clipbuf = GlobalLock (hmem);
-  memcpy ((unsigned char *) clipbuf + sizeof (size_t), buf, len);
-  *(size_t *) (clipbuf) = len;
-  GlobalUnlock (hmem);
-  EmptyClipboard ();
-  if (!cygnativeformat)
-    cygnativeformat = RegisterClipboardFormat (CYGWIN_NATIVE);
-  if (!SetClipboardData (cygnativeformat, hmem))
-    {
-      system_printf
-	("Couldn't write native format to the clipboard %04x %x",
-	 cygnativeformat, hmem);
-/* FIXME: return an appriate error code &| set_errno(); */
-      return -1;
-    }
-  CloseClipboard ();
-  if (GlobalFree (hmem))
-    {
-      system_printf
-	("Couldn't free global buffer after write to the clipboard");
-/* FIXME: return an appriate error code &| set_errno(); */
-      return 0;
+      hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
+      if (!hmem)
+	{
+	  __seterrno ();
+	  CloseClipboard ();
+	  return -1;
+	}
+      clipbuf = GlobalLock (hmem);
+      memcpy ((unsigned char *) clipbuf + sizeof (size_t), buf, len);
+      *(size_t *) (clipbuf) = len;
+      GlobalUnlock (hmem);
+      EmptyClipboard ();
+      if (!cygnativeformat)
+	cygnativeformat = RegisterClipboardFormat (CYGWIN_NATIVE);
+      HANDLE ret = SetClipboardData (cygnativeformat, hmem);
+      CloseClipboard ();
+      /* According to MSDN, hmem must not be free'd after transferring the
+         data to the clipboard via SetClipboardData. */
+      /* GlobalFree (hmem); */
+      if (!ret)
+	{
+	  __seterrno ();
+	  return -1;
+	}
     }
 
   /* CF_TEXT/CF_OEMTEXT for copying to wordpad and the like */
-
-  OpenClipboard (0);
-
   len = sys_mbstowcs (NULL, 0, (const char *) buf, len);
   if (!len)
     {
-      system_printf ("Invalid string");
+      set_errno (EILSEQ);
       return -1;
     }
-  hmem = GlobalAlloc (GMEM_MOVEABLE, (len + 1) * sizeof (WCHAR));
-  if (!hmem)
+  if (OpenClipboard (NULL))
     {
-      system_printf ("Couldn't allocate global buffer for write");
-      return -1;
-    }
-  clipbuf = GlobalLock (hmem);
-  sys_mbstowcs ((PWCHAR) clipbuf, len, (const char *) buf);
-  *((PWCHAR) clipbuf + len) = L'\0';
-  GlobalUnlock (hmem);
-  if (!SetClipboardData (CF_UNICODETEXT, hmem))
-    {
-      system_printf ("Couldn't write to the clipboard");
-/* FIXME: return an appriate error code &| set_errno(); */
-      return -1;
-    }
-  CloseClipboard ();
-  if (GlobalFree (hmem))
-    {
-      system_printf
-	("Couldn't free global buffer after write to the clipboard");
-/* FIXME: return an appriate error code &| set_errno(); */
+      hmem = GlobalAlloc (GMEM_MOVEABLE, (len + 1) * sizeof (WCHAR));
+      if (!hmem)
+	{
+	  __seterrno ();
+	  CloseClipboard ();
+	  return -1;
+	}
+      clipbuf = GlobalLock (hmem);
+      sys_mbstowcs ((PWCHAR) clipbuf, len + 1, (const char *) buf);
+      GlobalUnlock (hmem);
+      HANDLE ret = SetClipboardData (CF_UNICODETEXT, hmem);
+      CloseClipboard ();
+      /* According to MSDN, hmem must not be free'd after transferring the
+         data to the clipboard via SetClipboardData. */
+      /* GlobalFree (hmem); */
+      if (!ret)
+	{
+	  __seterrno ();
+	  return -1;
+	}
     }
   return 0;
 }
@@ -159,7 +153,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
       void *tempbuffer = realloc (membuffer, cursize + len);
       if (!tempbuffer)
 	{
-	  system_printf ("Couldn't realloc() clipboard buffer for write");
+	  debug_printf ("Couldn't realloc() clipboard buffer for write");
 	  return -1;
 	}
       membuffer = tempbuffer;
@@ -169,8 +163,8 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
       /* now pass to windows */
       if (set_clipboard (membuffer, msize))
 	{
-	  /* FIXME: membuffer is now out of sync with pos, but msize is used above */
-	  set_errno (ENOSPC);
+	  /* FIXME: membuffer is now out of sync with pos, but msize
+	            is used above */
 	  return -1;
 	}
 
@@ -193,62 +187,68 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   size_t ret;
   UINT formatlist[2];
   int format;
+  size_t plen = len;
+
+  len = 0;
   if (eof)
-    len = 0;
+    return;
+  if (!OpenClipboard (NULL))
+    return;
+  formatlist[0] = cygnativeformat;
+  formatlist[1] = CF_UNICODETEXT;
+  if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0)
+    {
+      CloseClipboard ();
+      return;
+    }
+  if (!(hglb = GetClipboardData (format)))
+    {
+      CloseClipboard ();
+      return;
+    }
+  if (format == cygnativeformat)
+    {
+      unsigned char *buf;
+      
+      if (!(buf = (unsigned char *) GlobalLock (hglb)))
+	{
+	  CloseClipboard ();
+	  return;
+	}
+      size_t buflen = (*(size_t *) buf);
+      ret = ((plen > (buflen - pos)) ? (buflen - pos) : plen);
+      memcpy (ptr, buf + sizeof (size_t)+ pos , ret);
+      pos += ret;
+      if (pos + plen - ret >= buflen)
+	eof = true;
+    }
   else
     {
-      formatlist[0] = cygnativeformat;
-      formatlist[1] = CF_UNICODETEXT;
-      OpenClipboard (0);
-      if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0)
-	{
-	  CloseClipboard ();
-#if 0
-	  system_printf ("a non-accepted format! %d", format);
-#endif
-	  len = 0;
-	}
-      else
-	{
-	  hglb = GetClipboardData (format);
-	  if (format == cygnativeformat)
-	    {
-	      unsigned char *buf = (unsigned char *) GlobalLock (hglb);
-	      size_t buflen = (*(size_t *) buf);
-	      ret = ((len > (buflen - pos)) ? (buflen - pos) : len);
-	      memcpy (ptr, buf + sizeof (size_t)+ pos , ret);
-	      pos += ret;
-	      if (pos + len - ret >= buflen)
-		eof = true;
-	      GlobalUnlock (hglb);
-	    }
-	  else
-	    {
-	      int wret;
-	      PWCHAR buf;
-	      buf = (PWCHAR) GlobalLock (hglb);
-	      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
+      int wret;
+      PWCHAR buf;
 
-	      /* This loop is necessary because the number of bytes returned
-		 by WideCharToMultiByte does not indicate the number of wide
-		 chars used for it, so we could potentially drop wide chars. */
-	      if (glen - pos > len)
-	        glen = pos + len;
-	      while ((wret = sys_wcstombs (NULL, 0, buf + pos, glen - pos))
-		      != -1
-		     && (size_t) wret > len)
-	      	--glen;
-	      ret = sys_wcstombs ((char *) ptr, len, buf + pos, glen - pos);
-	      //ret = snprintf((char *) ptr, len, "%s", buf);//+pos);
-	      pos += ret;
-	      if (pos + len - ret >= wcslen (buf))
-		eof = true;
-	      GlobalUnlock (hglb);
-	    }
+      if (!(buf = (PWCHAR) GlobalLock (hglb)))
+	{
 	  CloseClipboard ();
-	  len = ret;
+	  return;
 	}
+      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
+      /* This loop is necessary because the number of bytes returned by
+	 sys_wcstombs does not indicate the number of wide chars used for
+	 it, so we could potentially drop wide chars. */
+      if (glen - pos > plen)
+	glen = pos + plen;
+      while ((wret = sys_wcstombs (NULL, 0, buf + pos, glen - pos)) != -1
+	     && (size_t) wret > plen)
+	--glen;
+      ret = sys_wcstombs ((char *) ptr, plen, buf + pos, glen - pos);
+      pos += ret;
+      if (pos + plen - ret >= wcslen (buf))
+	eof = true;
     }
+  GlobalUnlock (hglb);
+  CloseClipboard ();
+  len = ret;
 }
 
 _off64_t
