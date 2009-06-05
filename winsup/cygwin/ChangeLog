@@ -1,3 +1,7 @@
+2009-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (heap_init): Fix typo in comment.
+
 2009-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_clipboard.cc: Avoid calling system_printf.

@@ -41,7 +41,7 @@ heap_init ()
 	 arbitrary.  Experiments on Vista show a memory size of 0x37e000 or
 	 0x1fd000 overlapping the usual heap by at most 0x1ed000.  So what
 	 we do here is to allocate the heap with an extra slop of (by default)
-	 0x200000 and set the appropriate pointers to the start of the heap
+	 0x400000 and set the appropriate pointers to the start of the heap
 	 area + slop.  A forking child then creates its heap at the new start
 	 address and without the slop factor.  Since this is not entirely
 	 foolproof we add a registry setting "heap_slop_in_mb" so the slop
