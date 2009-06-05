@@ -38,22 +38,31 @@ ilockdecr (volatile long *m)
 extern __inline__ long
 ilockexch (volatile long *t, long v)
 {
-  register int __res;
-  __asm__ __volatile__ ("\n\
-1:	lock	cmpxchgl %3,(%1)\n\
-	jne 1b\n\
- 	": "=a" (__res), "=q" (t): "1" (t), "q" (v), "0" (*t): "cc");
-  return __res;
+  return
+  ({
+    register __typeof (*t) ret __asm ("%eax");
+    __asm __volatile ("\n"
+	"1:	lock cmpxchgl %2, %1\n"
+	"	jne  1b\n"
+	: "=a" (ret), "=m" (*t)
+	: "r" (v), "m" (*t), "0" (*t)
+	: "memory");
+    ret;
+  });
 }
 
 extern __inline__ long
 ilockcmpexch (volatile long *t, long v, long c)
 {
-  register int __res;
-  __asm__ __volatile__ ("\n\
-	lock cmpxchgl %3,(%1)\n\
-	": "=a" (__res), "=q" (t) : "1" (t), "q" (v), "0" (c): "cc");
-  return __res;
+  return
+  ({
+    register __typeof (*t) ret __asm ("%eax");
+    __asm __volatile ("lock cmpxchgl %2, %1"
+	: "=a" (ret), "=m" (*t)
+	: "r" (v), "m" (*t), "0" (c)
+	: "memory");
+    ret;
+  });
 }
 
 #undef InterlockedIncrement

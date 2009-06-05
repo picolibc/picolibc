@@ -1,3 +1,8 @@
+2009-06-05  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* winbase.h (ilockexch):  Fix asm constraints.
+	(ilockcmpexch):  Likewise.
+
 2009-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (heap_init): Fix typo in comment.
