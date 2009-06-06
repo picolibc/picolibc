@@ -1,3 +1,7 @@
+2009-06-06  Anthony Green  <green@moxielogic.com>
+
+	* moxie.h (MOXIE_F1_M): Define.
+
 2009-04-15  Anthony Green  <green@moxielogic.com>
 
 	* moxie.h: Created.
