@@ -1,5 +1,12 @@
 2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc: Use NtUnmapViewOfSection instead of UnmapViewOfFile
+	throughout for symmetry.
+	(fhandler_dev_mem::munmap): Use correct process handle in call to
+	NtUnmapViewOfSection.
+
+2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dll_init.h (struct dll): Set size of name element to ANYSIZE_ARRAY.
 	* dll_init.cc: Fix formatting.
 	(dll_list::alloc): Only allocate as much memory for struct dll as

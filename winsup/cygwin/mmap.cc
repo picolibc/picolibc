@@ -1480,7 +1480,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	    __seterrno ();
 	  else
 	    {
-	      UnmapViewOfFile (base);
+	      NtUnmapViewOfSection (GetCurrentProcess (), base);
 	      set_errno (EINVAL);
 	      debug_printf ("MapView: address shift with MAP_FIXED given");
 	    }
@@ -1499,7 +1499,7 @@ fhandler_dev_zero::munmap (HANDLE h, caddr_t addr, size_t len)
     VirtualFree (addr, 0, MEM_RELEASE);
   else
     {
-      UnmapViewOfFile (addr);
+      NtUnmapViewOfSection (GetCurrentProcess (), addr);
       NtClose (h);
     }
   return 0;
@@ -1560,7 +1560,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 	__seterrno ();
       else
 	{
-	  UnmapViewOfFile (base);
+	  NtUnmapViewOfSection (GetCurrentProcess (), base);
 	  set_errno (EINVAL);
 	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
@@ -1575,7 +1575,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 int
 fhandler_disk_file::munmap (HANDLE h, caddr_t addr, size_t len)
 {
-  UnmapViewOfFile (addr);
+  NtUnmapViewOfSection (GetCurrentProcess (), addr);
   NtClose (h);
   return 0;
 }
@@ -1673,7 +1673,7 @@ int
 fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
 {
   NTSTATUS ret;
-  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
+  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (GetCurrentProcess (), addr)))
     {
       __seterrno_from_nt_status (ret);
       return -1;
