@@ -1,3 +1,12 @@
+2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.h (struct dll): Set size of name element to ANYSIZE_ARRAY.
+	* dll_init.cc: Fix formatting.
+	(dll_list::alloc): Only allocate as much memory for struct dll as
+	necessary for given DLL name.
+	(dll_list::load_after_fork): Only read a single page of parent memory.
+	Only read more if namelen indicates that it's necessary.
+
 2009-06-05  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* winbase.h (ilockexch):  Fix asm constraints.

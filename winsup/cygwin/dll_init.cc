@@ -1,6 +1,7 @@
 /* dll_init.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006  Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -19,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include "cygtls.h"
 #include <wchar.h>
+#include <alloca.h>
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -108,6 +110,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
   WCHAR name[NT_MAX_PATH];
   DWORD namelen = GetModuleFileNameW (h, name, sizeof (name));
+  size_t d_size = sizeof (dll) + namelen * sizeof (WCHAR);
 
   /* Already loaded? */
   dll *d = dlls[name];
@@ -144,8 +147,8 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	    n = ((n - r) + s1.dwAllocationGranularity);
 
 	  /* First reserve the area of memory, then commit it. */
-	  if (VirtualAlloc ((void *) n, sizeof (dll), MEM_RESERVE, PAGE_READWRITE))
-	    d = (dll *) VirtualAlloc ((void *) n, sizeof (dll), MEM_COMMIT,
+	  if (VirtualAlloc ((void *) n, d_size, MEM_RESERVE, PAGE_READWRITE))
+	    d = (dll *) VirtualAlloc ((void *) n, d_size, MEM_COMMIT,
 				      PAGE_READWRITE);
 	  if (d)
 	    break;
@@ -265,11 +268,12 @@ release_upto (const PWCHAR name, DWORD here)
     else
       {
 	size = mb.RegionSize;
-	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS &&
-	    (((void *) start < cygheap->user_heap.base
-	      || (void *) start > cygheap->user_heap.top) &&
-	     ((void *) start < (void *) cygheap
-	      || (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
+	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS
+	    && (((void *) start < cygheap->user_heap.base
+		 || (void *) start > cygheap->user_heap.top)
+		 && ((void *) start < (void *) cygheap
+		     || (void *) start
+			> (void *) ((char *) cygheap + CYGHEAPSIZE)))))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
 	  api_fatal ("couldn't release memory %p(%d) for '%W' alignment, %E\n",
@@ -277,72 +281,82 @@ release_upto (const PWCHAR name, DWORD here)
       }
 }
 
-/* Reload DLLs after a fork.  Iterates over the list of dynamically loaded DLLs
-   and attempts to load them in the same place as they were loaded in the parent. */
+/* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
+   DLLs and attempts to load them in the same place as they were loaded in
+   the parent. */
 void
 dll_list::load_after_fork (HANDLE parent, dll *first)
 {
   int try2 = 0;
-  dll d;
+  dll *d = (dll *) alloca (sizeof (dll) + (NT_MAX_PATH - 1) * sizeof (WCHAR));
 
   void *next = first;
   while (next)
     {
       DWORD nb;
-      /* Read the dll structure from the parent. */
-      if (!ReadProcessMemory (parent, next, &d, sizeof (dll), &nb) ||
-	  nb != sizeof (dll))
+      /* Read 4K of the dll structure from the parent.  A full page has
+         been allocated anyway and this covers most, if not all DLL paths.
+	 Only if d->namelen indicates that more than 4K are required,
+	 read them in a second step. */
+      if (!ReadProcessMemory (parent, next, d, getsystempagesize (), &nb)
+	  || nb != getsystempagesize ())
+	return;
+      size_t namelen = d->namelen * sizeof (WCHAR);
+      if (namelen >= getsystempagesize () - sizeof (dll)
+	  && (!ReadProcessMemory (parent, next, d->name, namelen, &nb)
+	      || nb != namelen))
 	return;
 
       /* We're only interested in dynamically loaded dlls.
 	 Hopefully, this function wouldn't even have been called unless
 	 the parent had some of those. */
-      if (d.type == DLL_LOAD)
+      if (d->type == DLL_LOAD)
 	{
 	  bool unload = true;
-	  HMODULE h = LoadLibraryExW (d.name, NULL, DONT_RESOLVE_DLL_REFERENCES);
+	  HMODULE h = LoadLibraryExW (d->name, NULL,
+				      DONT_RESOLVE_DLL_REFERENCES);
 
 	  if (!h)
-	    system_printf ("can't reload %W", d.name);
+	    system_printf ("can't reload %W", d->name);
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.
-	     It sort of stinks that we can't invert the order of the FreeLibrary
-	     and LoadLibrary since Microsoft documentation seems to imply that that
-	     should do what we want.  However, since the library was loaded above,
-	     the second LoadLibrary does not execute it's startup code unless it
-	     is first unloaded. */
-	  else if (h == d.handle)
+	     It sort of stinks that we can't invert the order of the
+	     FreeLibrary and LoadLibrary since Microsoft documentation seems
+	     to imply that that should do what we want.  However, since the
+	     library was loaded above, the second LoadLibrary does not execute
+	     it's startup code unless it is first unloaded. */
+	  else if (h == d->handle)
 	    {
 	      if (unload)
 		{
 		  FreeLibrary (h);
-		  LoadLibraryW (d.name);
+		  LoadLibraryW (d->name);
 		}
 	    }
 	  else if (try2)
 	    api_fatal ("unable to remap %W to same address as parent(%p) != %p",
-		       d.name, d.handle, h);
+		       d->name, d->handle, h);
 	  else
 	    {
-	      /* It loaded in the wrong place.  Dunno why this happens but it always
-		 seems to happen when there are multiple DLLs attempting to load into
-		 the same address space.  In the "forked" process, the second DLL always
-		 loads into a different location. */
+	      /* It loaded in the wrong place.  Dunno why this happens but it
+		 always seems to happen when there are multiple DLLs attempting
+		 to load into the same address space.  In the "forked" process,
+		 the second DLL always loads into a different location. */
 	      FreeLibrary (h);
 	      /* Block all of the memory up to the new load address. */
-	      reserve_upto (d.name, (DWORD) d.handle);
+	      reserve_upto (d->name, (DWORD) d->handle);
 	      try2 = 1;		/* And try */
 	      continue;		/*  again. */
 	    }
-	  /* If we reached here, and try2 is set, then there is a lot of memory to
-	     release. */
+	  /* If we reached here, and try2 is set, then there is a lot of
+	     memory to release. */
 	  if (try2)
 	    {
-	      release_upto (d.name, (DWORD) d.handle);
+	      release_upto (d->name, (DWORD) d->handle);
 	      try2 = 0;
 	    }
 	}
-      next = d.next;	/* Get the address of the next DLL. */
+      next = d->next;	/* Get the address of the next DLL. */
     }
   in_forkee = false;
 }
