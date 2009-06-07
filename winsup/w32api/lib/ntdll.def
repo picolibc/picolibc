@@ -170,6 +170,7 @@ NtOpenSymbolicLinkObject@12
 NtOpenThread@16
 NtOpenThreadToken@16
 NtOpenTimer@12
+NtPlugPlayControl@12
 NtPowerInformation@20
 NtPrivilegeCheck@12
 NtPrivilegedServiceAuditAlarm@20
@@ -191,6 +192,7 @@ NtQueryInformationPort@20
 NtQueryInformationProcess@20
 NtQueryInformationThread@20
 NtQueryInformationToken@20
+NtQueryInstallUILanguage@4
 NtQueryIntervalProfile@8
 NtQueryIoCompletion@20
 NtQueryKey@20
@@ -792,6 +794,7 @@ ZwOpenSymbolicLinkObject@12
 ZwOpenThread@16
 ZwOpenThreadToken@16
 ZwOpenTimer@12
+ZwPlugPlayControl@12
 ZwPowerInformation@20
 ZwPrivilegeCheck@12
 ZwPrivilegedServiceAuditAlarm@20
@@ -813,6 +816,7 @@ ZwQueryInformationPort@20
 ZwQueryInformationProcess@20
 ZwQueryInformationThread@20
 ZwQueryInformationToken@20
+ZwQueryInstallUILanguage@4
 ZwQueryIntervalProfile@8
 ZwQueryIoCompletion@20
 ZwQueryKey@20

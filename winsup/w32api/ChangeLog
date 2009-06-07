@@ -1,3 +1,13 @@
+2009-06-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/ddk/ntapi.h: Add NtXxx equivalent to ZwXxx where missing
+	and vice versa.
+	* include/ddk/ntifs.h: Ditto.
+	* include/ddk/winddk.h: Ditto.
+	* lib/ntdll.def (NtPlugPlayControl, NtQueryInstallUILanguage,
+	ZwPlugPlayControl, ZwQueryInstallUILanguage): Add entry points defined
+	in header, but missing in lib.  Omit NT4-only entry points.
+
 2009-05-01  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shellapi.h (SHIL_LARGE, SHIL_SMALL, SHIL_EXTRALARGE,
