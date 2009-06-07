@@ -1,5 +1,13 @@
 2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.cc (dll_list::alloc): Allocate memory using a section
+	object.  Explain why.  Drop call to GetSystemInfo, rather call
+	getpagesize to get allocation granularity.  Only align to allocation
+	granularity under WOW64.  Use roundup2 to align.
+	(dll_list::detach): Call NtUnmapViewOfSection instead of VirtualFree.
+
+2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc: Use NtUnmapViewOfSection instead of UnmapViewOfFile
 	throughout for symmetry.
 	(fhandler_dev_mem::munmap): Use correct process handle in call to
