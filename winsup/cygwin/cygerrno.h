@@ -44,7 +44,7 @@ class save_errno
     save_errno (int what) {saved = get_errno (); set_errno (what); }
     void set (int what) {set_errno (what); saved = what;}
     void reset () {saved = get_errno ();}
-    ~save_errno () {set_errno (saved);}
+    ~save_errno () {errno = _impure_ptr->_errno = saved;}
   };
 
 extern const char *__sp_fn;
