@@ -1,5 +1,10 @@
 2009-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fork.cc (frok::parent): Remove ancient code erroneously flushing
+	stdout descriptor.
+
+2009-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygerrno.h (save_errno::~save_errno): Set errno directly to avoid
 	flooding debug output.
 

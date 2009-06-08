@@ -307,10 +307,6 @@ frok::parent (volatile char * volatile stack_here)
      in the parent and, when the stack is copied, in the child. */
   load_dlls = dlls.reload_on_fork && dlls.loaded_dlls;
 
-  /* This will help some of the confusion.  */
-  /* FIXME: Is this really appropriate?  What if stdout is closed? */
-  fflush (stdout);
-
   forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   if (forker_finished == NULL)
     {
