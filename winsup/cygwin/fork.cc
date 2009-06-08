@@ -34,7 +34,6 @@ details. */
 
 class frok
 {
-  dll *first_dll;
   bool load_dlls;
   child_info_fork ch;
   const char *error;
@@ -174,8 +173,7 @@ frok::child (volatile char * volatile here)
 		myself->pid, myself->ppid, __builtin_frame_address (0));
 
   sync_with_parent ("after longjmp", true);
-  sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
-		  first_dll, load_dlls);
+  sigproc_printf ("hParent %p, load_dlls %d", hParent, load_dlls);
 
   /* If we've played with the stack, stacksize != 0.  That means that
      fork() was invoked from other than the main thread.  Make sure that
@@ -230,7 +228,7 @@ frok::child (volatile char * volatile here)
     }
   else
     {
-      dlls.load_after_fork (hParent, first_dll);
+      dlls.load_after_fork (hParent);
       cygheap->fdtab.fixup_after_fork (hParent);
       sync_with_parent ("loaded dlls", true);
     }
@@ -304,14 +302,13 @@ frok::parent (volatile char * volatile stack_here)
   else
     c_flags |= DETACHED_PROCESS;
 
-  /* Remember the address of the first loaded dll and decide
-     if we need to load dlls.  We do this here so that this
-     information will be available in the parent and, when
-     the stack is copied, in the child. */
-  first_dll = dlls.start.next;
+  /* Remember if we need to load dynamically linked dlls.
+     We do this here so that this information will be available
+     in the parent and, when the stack is copied, in the child. */
   load_dlls = dlls.reload_on_fork && dlls.loaded_dlls;
 
   /* This will help some of the confusion.  */
+  /* FIXME: Is this really appropriate?  What if stdout is closed? */
   fflush (stdout);
 
   forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
@@ -570,7 +567,6 @@ fork ()
   frok grouped;
 
   debug_printf ("entering");
-  grouped.first_dll = NULL;
   grouped.load_dlls = 0;
 
   int res;

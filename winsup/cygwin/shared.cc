@@ -361,13 +361,13 @@ shared_info::initialize ()
 		   SHARED_INFO_CB, cb);
 }
 
-void __stdcall
-memory_init ()
+void
+memory_init (bool init_cygheap)
 {
   getpagesize ();
 
   /* Initialize the Cygwin heap, if necessary */
-  if (!cygheap)
+  if (init_cygheap)
     {
       cygheap_init ();
       cygheap->user.init ();

@@ -571,7 +571,7 @@ void
 child_info_fork::handle_fork ()
 {
   cygheap_fixup_in_child (false);
-  memory_init ();
+  memory_init (false);
   myself.thisproc (NULL);
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
@@ -598,7 +598,7 @@ child_info_spawn::handle_spawn ()
   extern void fixup_lockf_after_exec ();
   HANDLE h;
   cygheap_fixup_in_child (true);
-  memory_init ();
+  memory_init (false);
   if (!moreinfo->myself_pinfo ||
       !DuplicateHandle (hMainProc, moreinfo->myself_pinfo, hMainProc, &h, 0,
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
@@ -702,7 +702,7 @@ dll_crt0_0 ()
 
   child_proc_info = get_cygwin_startup_info ();
   if (!child_proc_info)
-    memory_init ();
+    memory_init (true);
   else
     {
       cygwin_user_h = child_proc_info->user_h;

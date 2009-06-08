@@ -79,7 +79,7 @@ enum shared_locations
 
 };
 
-void __stdcall memory_init ();
+void memory_init (bool) __attribute__ ((regparm(1)));
 void __stdcall shared_destroy ();
 
 #define shared_align_past(p) \

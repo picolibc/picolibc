@@ -51,8 +51,7 @@ struct dll
   HMODULE handle;
   int count;
   dll_type type;
-  int namelen;
-  WCHAR name[ANYSIZE_ARRAY];
+  WCHAR name[1];
   void detach ();
   int init ();
 };
@@ -73,7 +72,7 @@ public:
   dll *alloc (HINSTANCE, per_process *, dll_type);
   void detach (void *);
   void init ();
-  void load_after_fork (HANDLE, dll *);
+  void load_after_fork (HANDLE);
   dll *inext ()
   {
     while ((hold = hold->next))

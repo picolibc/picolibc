@@ -24,7 +24,12 @@
 #include <unistd.h>
 #include <wchar.h>
 
-init_cygheap NO_COPY *cygheap;
+static mini_cygheap NO_COPY cygheap_at_start =
+{
+  {__utf8_mbtowc, __utf8_wctomb}
+};
+
+init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_at_start;
 void NO_COPY *cygheap_max;
 
 extern "C" char  _cygheap_mid[] __attribute__((section(".cygheap")));
@@ -33,11 +38,11 @@ extern "C" char  _cygheap_end[];
 static NO_COPY muto cygheap_protect;
 
 struct cygheap_entry
-  {
-    int type;
-    struct cygheap_entry *next;
-    char data[0];
-  };
+{
+  int type;
+  struct cygheap_entry *next;
+  char data[0];
+};
 
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
@@ -150,7 +155,7 @@ extern "C" void __stdcall
 cygheap_init ()
 {
   cygheap_protect.init ("cygheap_protect");
-  if (!cygheap)
+  if (cygheap == &cygheap_at_start)
     {
       cygheap = (init_cygheap *) memset (_cygheap_start, 0,
 					 _cygheap_mid - _cygheap_start);

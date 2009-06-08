@@ -31,6 +31,7 @@ enum cygheap_types
   HEAP_1_EXEC,
   HEAP_1_MAX = 100,
   HEAP_2_STR,
+  HEAP_2_DLL,
   HEAP_MMAP = 200
 };
 
@@ -282,13 +283,17 @@ struct hook_chain
   struct hook_chain *next;
 };
 
-struct init_cygheap
+struct mini_cygheap
+{
+  cygheap_locale locale;
+};
+
+struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
   cygheap_root root;
   cygheap_user user;
-  cygheap_locale locale;
   user_heap_info user_heap;
   mode_t umask;
   HANDLE console_h;

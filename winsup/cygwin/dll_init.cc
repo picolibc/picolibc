@@ -20,14 +20,10 @@ details. */
 #include "pinfo.h"
 #include "cygtls.h"
 #include <wchar.h>
-#include <alloca.h>
-#include <unistd.h>
-#include <sys/param.h>
-#include "ntdll.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
-dll_list NO_COPY dlls;
+dll_list dlls;
 
 static bool dll_global_dtors_recorded;
 
@@ -107,7 +103,7 @@ dll_list::operator[] (const PWCHAR name)
 
 #define RETRIES 1000
 
-/* Allocate space for a dll struct contiguous with the just-loaded dll. */
+/* Allocate space for a dll struct. */
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
@@ -118,96 +114,16 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   dll *d = dlls[name];
   if (d)
     {
-      d->count++;	/* Yes.  Bump the usage count. */
+      if (!in_forkee)
+	d->count++;	/* Yes.  Bump the usage count. */
       return d;		/* Return previously allocated pointer. */
     }
 
-  void *s = p->bss_end;
-  size_t d_size = sizeof (dll) + namelen * sizeof (WCHAR);
-
-  MEMORY_BASIC_INFORMATION m;
-  NTSTATUS status = 0;
-  HANDLE sect_h;
-  OBJECT_ATTRIBUTES oa;
-  InitializeObjectAttributes (&oa, NULL, 0, NULL,
-			      sec_none.lpSecurityDescriptor);
-
-  /* Search for space after the DLL */
-  for (int i = 0; i <= RETRIES; i++, s = (char *) m.BaseAddress + m.RegionSize)
-    {
-      if (!VirtualQuery (s, &m, sizeof (m)))
-	return NULL;	/* Can't do it. */
-      if (m.State == MEM_FREE)
-	{
-	  /* Couldn't find any.  Uh oh.  FIXME: Issue an error? */
-	  if (i == RETRIES)
-	    return NULL;	/* Oh well.  Couldn't locate free space. */
-
-	  d = (dll *) m.BaseAddress;
-	  /* Instead of calling VirtualAlloc, which always allocates memory
-	     on a 64K boundary, we allocate the memory using a section
-	     object.  The disadvantage of the 64K boundary in this case is
-	     the fact that that boundary could be easily the start address
-	     of another DLL yet to load into memory.
-
-	     On x86, using a section object allows us to allocate the struct
-	     dll into a memory slot in the remainder of the last 64K slot of
-	     the DLL.  This memory slot will never be used for anything
-	     else.  Given that the struct dll will fit into a single page
-	     99.99% of the time anyway, this is a neat way to avoid DLL load
-	     address collisions in most cases.
-
-	     Of course, this doesn't help if the DLL needs all of the 64K
-	     memory slot but there's only a 1 in 16 chance for that.
-
-	     And, alas, it won't work on 64 bit systems because the
-	     AT_ROUND_TO_PAGE flag required to make a page-aligned allocation
-	     isn't supported under WOW64.  So, as with VirtualAlloc, ensure
-	     that address is rounded up to next 64K allocation boundary if
-	     running under WOW64. */
-	  if (wincap.is_wow64 ())
-	    d = (dll *) roundup2 ((uintptr_t) d, getpagesize ());
-
-	  LARGE_INTEGER so = { QuadPart: d_size };
-	  status = NtCreateSection (&sect_h, SECTION_ALL_ACCESS, &oa, &so,
-				    PAGE_READWRITE, SEC_COMMIT, NULL);
-	  if (NT_SUCCESS (status))
-	    {
-	      ULONG viewsize = 0;
-	      so.QuadPart = 0;
-	      status = NtMapViewOfSection (sect_h, GetCurrentProcess (),
-					   (void **) &d, 0, d_size, &so,
-					   &viewsize, ViewUnmap,
-					   wincap.is_wow64 ()
-					   ? 0 : AT_ROUND_TO_PAGE,
-					   PAGE_READWRITE);
-#ifdef DEBUGGING
-	      if (!NT_SUCCESS (status))
-		system_printf ("NtMapViewOfSection failed, %p", status);
-#endif
-	      NtClose (sect_h);
-	    }
-#ifdef DEBUGGING
-	  else
-	    system_printf ("NtCreateSection failed, %p", status);
-#endif
-
-	  if (NT_SUCCESS (status))
-	    break;
-	}
-    }
-
-  /* Did we succeed? */
-  if (!NT_SUCCESS (status))
-    {			/* Nope. */
-      __seterrno_from_nt_status (status);
-      return NULL;
-    }
+  d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
 
   /* Now we've allocated a block of information.  Fill it in with the supplied
      info about this DLL. */
   d->count = 1;
-  d->namelen = namelen;
   wcscpy (d->name, name);
   d->handle = h;
   d->p = p;
@@ -251,7 +167,7 @@ dll_list::detach (void *retaddr)
 	  loaded_dlls--;
 	if (end == d)
 	  end = d->prev;
-	NtUnmapViewOfSection (GetCurrentProcess (), d);
+	cfree (d);
 	break;
       }
 }
@@ -321,82 +237,51 @@ release_upto (const PWCHAR name, DWORD here)
 }
 
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
-   DLLs and attempts to load them in the same place as they were loaded in
-   the parent. */
+   DLLs and attempts to load them in the same place as they were loaded in the
+   parent. */
 void
-dll_list::load_after_fork (HANDLE parent, dll *first)
+dll_list::load_after_fork (HANDLE parent)
 {
-  int try2 = 0;
-  dll *d = (dll *) alloca (sizeof (dll) + (NT_MAX_PATH - 1) * sizeof (WCHAR));
-
-  void *next = first;
-  while (next)
-    {
-      DWORD nb;
-      /* Read 4K of the dll structure from the parent.  A full page has
-         been allocated anyway and this covers most, if not all DLL paths.
-	 Only if d->namelen indicates that more than 4K are required,
-	 read them in a second step. */
-      if (!ReadProcessMemory (parent, next, d, getsystempagesize (), &nb)
-	  || nb != getsystempagesize ())
-	return;
-      size_t namelen = d->namelen * sizeof (WCHAR);
-      if (namelen >= getsystempagesize () - sizeof (dll)
-	  && (!ReadProcessMemory (parent, next, d->name, namelen, &nb)
-	      || nb != namelen))
-	return;
-
-      /* We're only interested in dynamically loaded dlls.
-	 Hopefully, this function wouldn't even have been called unless
-	 the parent had some of those. */
-      if (d->type == DLL_LOAD)
+  for (dll *d = &dlls.start; (d = d->next) != NULL; )
+    if (d->type == DLL_LOAD)
+      for (int i = 0; i < 2; i++)
 	{
-	  bool unload = true;
-	  HMODULE h = LoadLibraryExW (d->name, NULL,
-				      DONT_RESOLVE_DLL_REFERENCES);
-
-	  if (!h)
-	    system_printf ("can't reload %W", d->name);
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.
-	     It sort of stinks that we can't invert the order of the
-	     FreeLibrary and LoadLibrary since Microsoft documentation seems
-	     to imply that that should do what we want.  However, since the
-	     library was loaded above, the second LoadLibrary does not execute
-	     it's startup code unless it is first unloaded. */
-	  else if (h == d->handle)
-	    {
-	      if (unload)
-		{
-		  FreeLibrary (h);
-		  LoadLibraryW (d->name);
-		}
-	    }
-	  else if (try2)
-	    api_fatal ("unable to remap %W to same address as parent(%p) != %p",
-		       d->name, d->handle, h);
+	     It stinks that we can't invert the order of the initial LoadLibrary
+	     and FreeLibrar  since Microsoft documentation seems to imply that
+	     should do what we want.  However, once a library is loaded as
+	     above, the second LoadLibrary will not execute its startup code
+	     unless it is first unloaded. */
+	  HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
+
+	  if (!h)
+	    system_printf ("can't reload %W, %E", d->name);
 	  else
 	    {
-	      /* It loaded in the wrong place.  Dunno why this happens but it
-		 always seems to happen when there are multiple DLLs attempting
-		 to load into the same address space.  In the "forked" process,
-		 the second DLL always loads into a different location. */
 	      FreeLibrary (h);
-	      /* Block all of the memory up to the new load address. */
-	      reserve_upto (d->name, (DWORD) d->handle);
-	      try2 = 1;		/* And try */
-	      continue;		/*  again. */
+	      if (h == d->handle)
+		h = LoadLibraryW (d->name);
 	    }
-	  /* If we reached here, and try2 is set, then there is a lot of
-	     memory to release. */
-	  if (try2)
-	    {
-	      release_upto (d->name, (DWORD) d->handle);
-	      try2 = 0;
-	    }
+	  /* If we reached here on the second iteration of the for loop
+	     then there is a lot of memory to release. */
+	  if (i > 0)
+	    release_upto (d->name, (DWORD) d->handle);
+	  if (h == d->handle)
+	    break;		/* Success */
+
+	  if (i > 0)
+	    /* We tried once to relocate the dll and it failed. */
+	    api_fatal ("unable to remap %W to same address as parent: %p != %p",
+		       d->name, d->handle, h);
+
+	  /* Dll loaded in the wrong place.  Dunno why this happens but it
+	     always seems to happen when there are multiple DLLs attempting to
+	     load into the same address space.  In the "forked" process, the
+	     second DLL always loads into a different location. So, block all
+	     of the memory up to the new load address and try again. */
+	  reserve_upto (d->name, (DWORD) d->handle);
 	}
-      next = d->next;	/* Get the address of the next DLL. */
-    }
   in_forkee = false;
 }
 

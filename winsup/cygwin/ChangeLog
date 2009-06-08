@@ -1,3 +1,32 @@
+2009-06-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.h (mini_cygheap): New struct.
+	(init_cygheap): Inherit locale field via mini_cygheap.
+	* cygheap.cc (cygheap_at_start): Define new variable.
+	(cygheap): Initialize as cygheap_at_start so that locale information is
+	always available.
+	(cygheap_init): Initialize cygheap iff it is set to cygheap_at_start.
+	* shared_info.h (memory_init): Accommodate argument change.
+	* memory.cc (memory_init): Accept an argument indicating whether
+	cygheap should be initialized or not.
+	* dcrt0.cc (child_info_fork::handle_fork): Pass false to memory_init().
+	(child_info_spawn::handle_spawn): Ditto.
+	(dll_crt0_0): Pass true to memory_init when not forking or execing.
+
+	* cygheap.h (cygheap_types::HEAP_2_DLL): New enum.
+	* dll_init.h (dll): Remove unused namelen field.
+	(dll_list::load_after_fork): Accommodate change in arguments.
+	* dll_init.cc (dll_list::alloc): Allocate dll information in the cygwin
+	heap.
+	(dll_list::detach): Free dll information from the cygwin heap.
+	(dll_list::load_after_fork): Use dll information in the cygwin heap
+	directly rather than querying parent.
+	* fork.cc (frok::first_dll): Delete.
+	(frok::child): Don't report on first_dll.  Don't pass it to
+	load_on_fork.
+	(frok::parent): Don't set first_dll.
+	(fork): Ditto.
+
 2009-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dll_init.cc (dll_list::alloc): Allocate memory using a section
