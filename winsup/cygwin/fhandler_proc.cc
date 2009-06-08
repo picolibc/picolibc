@@ -420,29 +420,33 @@ static _off64_t
 format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
-
   NTSTATUS ret;
-  SYSTEM_BASIC_INFORMATION sbi;
+  SYSTEM_INFO si;
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
   SYSTEM_PERFORMANCE_INFORMATION spi;
+  FILETIME idletime;
 
-  ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-				  sizeof sbi, NULL);
-  if (!NT_SUCCESS (ret))
-    {
-      debug_printf ("NtQuerySystemInformation: ret %d", ret);
-      sbi.NumberProcessors = 1;
-    }
+  GetSystemInfo (&si);
 
   ret = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
 				  sizeof stodi, NULL);
   if (NT_SUCCESS (ret))
     uptime = (stodi.CurrentTime.QuadPart - stodi.BootTime.QuadPart) / 100000ULL;
+  else
+    debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
+		  "status %p", ret);
 
-  ret = NtQuerySystemInformation (SystemPerformanceInformation, &spi,
-				  sizeof spi, NULL);
-  if (NT_SUCCESS (ret))
-    idle_time = (spi.IdleTime.QuadPart / sbi.NumberProcessors) / 100000ULL;
+  /* Can't use NtQuerySystemInformation on 64 bit systems, so we just use
+     the offical Win32 function and fall back to NtQuerySystemInformation
+     on older systems. */
+  if (GetSystemTimes (&idletime, NULL, NULL))
+    idle_time = ((unsigned long long) idletime.dwHighDateTime << 32)
+    		| idletime.dwLowDateTime;
+  else if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
+						 &spi, sizeof spi, NULL)))
+    idle_time = spi.IdleTime.QuadPart;
+  idle_time /= si.dwNumberOfProcessors;
+  idle_time /= 100000ULL;
 
   destbuf = (char *) crealloc_abort (destbuf, 80);
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
@@ -459,28 +463,24 @@ format_proc_stat (void *, char *&destbuf)
   NTSTATUS ret;
   SYSTEM_PERFORMANCE_INFORMATION spi;
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-  SYSTEM_BASIC_INFORMATION sbi;
+  SYSTEM_INFO si;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
   char *eobuf = buf;
 
-  if ((ret = NtQuerySystemInformation (SystemBasicInformation,
-				       (PVOID) &sbi, sizeof sbi, NULL))
-      != STATUS_SUCCESS)
-    {
-      debug_printf ("NtQuerySystemInformation: ret %d", ret);
-      sbi.NumberProcessors = 1;
-    }
+  GetSystemInfo (&si);
 
-  SYSTEM_PROCESSOR_TIMES spt[sbi.NumberProcessors];
+  SYSTEM_PROCESSOR_TIMES spt[si.dwNumberOfProcessors];
   ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				  sizeof spt[0] * sbi.NumberProcessors, NULL);
-  interrupt_count = 0;
-  if (ret == STATUS_SUCCESS)
+				  sizeof spt[0] * si.dwNumberOfProcessors, NULL);
+  if (!NT_SUCCESS (ret))
+    debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
+		  "status %p", ret);
+  else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (int i = 0; i < sbi.NumberProcessors; i++)
+      for (unsigned long i = 0; i < si.dwNumberOfProcessors; i++)
 	{
 	  kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart)
 			 * HZ / 10000000ULL;
@@ -491,7 +491,7 @@ format_proc_stat (void *, char *&destbuf)
       eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
 				user_time, 0ULL, kernel_time, idle_time);
       user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (int i = 0; i < sbi.NumberProcessors; i++)
+      for (unsigned long i = 0; i < si.dwNumberOfProcessors; i++)
 	{
 	  interrupt_count += spt[i].InterruptCount;
 	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
@@ -501,18 +501,29 @@ format_proc_stat (void *, char *&destbuf)
 				    user_time, 0ULL, kernel_time, idle_time);
 	}
 
+      /* This fails on WOW64 with STATUS_INFO_LENGTH_MISMATCH because the
+         SYSTEM_PERFORMANCE_INFORMATION struct is bigger.  This datastructure
+	 was always undocumented, but on 64 bit systems we don't know its
+	 layout and content at all.  So we just let it fail and set the
+	 entire structure to 0. */
       ret = NtQuerySystemInformation (SystemPerformanceInformation,
 				      (PVOID) &spi, sizeof spi, NULL);
+      if (!NT_SUCCESS (ret))
+	{
+	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
+	  		", status %p", ret);
+	  memset (&spi, 0, sizeof spi);
+	}
+      ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				      (PVOID) &stodi,
+				      sizeof stodi, NULL);
+      if (!NT_SUCCESS (ret))
+	debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
+		      "status %p", ret);
     }
-  if (ret == STATUS_SUCCESS)
-    ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
-				    (PVOID) &stodi,
-				    sizeof stodi, NULL);
-  if (ret != STATUS_SUCCESS)
-    {
-      debug_printf ("NtQuerySystemInformation: ret %d", ret);
-      return 0;
-    }
+  if (!NT_SUCCESS (ret))
+    return 0;
+
   pages_in = spi.PagesRead;
   pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;
   /*
@@ -989,7 +1000,7 @@ format_proc_partitions (void *, char *&destbuf)
   status = NtOpenDirectoryObject (&dirhdl, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenDirectoryObject %x", status);
+      debug_printf ("NtOpenDirectoryObject, status %p", status);
       return 0;
     }
 
@@ -1031,7 +1042,7 @@ format_proc_partitions (void *, char *&destbuf)
 			       FILE_SHARE_VALID_FLAGS, 0);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("NtOpenFile(%s) %x", devname, status);
+	      debug_printf ("NtOpenFile(%s), status %p", devname, status);
 	      continue;
 	    }
 	}
