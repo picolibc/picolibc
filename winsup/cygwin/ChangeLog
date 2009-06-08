@@ -1,3 +1,8 @@
+2009-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Return with error set to ENOENT if
+	STATUS_NO_MEDIA_IN_DEVICE is returned.
+
 2009-06-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.h (mini_cygheap): New struct.

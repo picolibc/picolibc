@@ -2268,7 +2268,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	     error in get_nt_native_path.  Both status codes are deliberately
 	     not tested here unless proved necessary. */
 	  if (status == STATUS_OBJECT_PATH_NOT_FOUND
-	      || status == STATUS_OBJECT_NAME_INVALID)
+	      || status == STATUS_OBJECT_NAME_INVALID
+	      || status == STATUS_NO_MEDIA_IN_DEVICE)
 	    {
 	      set_error (ENOENT);
 	      goto file_not_symlink;
