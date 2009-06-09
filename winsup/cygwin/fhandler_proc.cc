@@ -421,12 +421,17 @@ format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
   NTSTATUS ret;
-  SYSTEM_INFO si;
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-  SYSTEM_PERFORMANCE_INFORMATION spi;
-  FILETIME idletime;
+  /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
+     appears to contain some trailing additional information from
+     what I can tell after examining the content.
+     FIXME: It would be nice if this could be verified somehow. */
+  const size_t sizeof_spi = sizeof (SYSTEM_PERFORMANCE_INFORMATION) + 16;
+  PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
+					alloca (sizeof_spi);
 
-  GetSystemInfo (&si);
+  if (!system_info.dwNumberOfProcessors)
+    GetSystemInfo (&system_info);
 
   ret = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
 				  sizeof stodi, NULL);
@@ -436,17 +441,10 @@ format_proc_uptime (void *, char *&destbuf)
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
 		  "status %p", ret);
 
-  /* Can't use NtQuerySystemInformation on 64 bit systems, so we just use
-     the offical Win32 function and fall back to NtQuerySystemInformation
-     on older systems. */
-  if (GetSystemTimes (&idletime, NULL, NULL))
-    idle_time = ((unsigned long long) idletime.dwHighDateTime << 32)
-    		| idletime.dwLowDateTime;
-  else if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
-						 &spi, sizeof spi, NULL)))
-    idle_time = spi.IdleTime.QuadPart;
-  idle_time /= si.dwNumberOfProcessors;
-  idle_time /= 100000ULL;
+  if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
+						 spi, sizeof_spi, NULL)))
+    idle_time = (spi->IdleTime.QuadPart / system_info.dwNumberOfProcessors)
+		/ 100000ULL;
 
   destbuf = (char *) crealloc_abort (destbuf, 80);
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
@@ -461,26 +459,32 @@ format_proc_stat (void *, char *&destbuf)
 		context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
   time_t boot_time = 0;
   NTSTATUS ret;
-  SYSTEM_PERFORMANCE_INFORMATION spi;
+  /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
+     appears to contain some trailing additional information from
+     what I can tell after examining the content.
+     FIXME: It would be nice if this could be verified somehow. */
+  const size_t sizeof_spi = sizeof (SYSTEM_PERFORMANCE_INFORMATION) + 16;
+  PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
+					alloca (sizeof_spi);
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-  SYSTEM_INFO si;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
   char *eobuf = buf;
 
-  GetSystemInfo (&si);
+  if (!system_info.dwNumberOfProcessors)
+    GetSystemInfo (&system_info);
 
-  SYSTEM_PROCESSOR_TIMES spt[si.dwNumberOfProcessors];
+  SYSTEM_PROCESSOR_TIMES spt[system_info.dwNumberOfProcessors];
   ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				  sizeof spt[0] * si.dwNumberOfProcessors, NULL);
+				  sizeof spt[0] * system_info.dwNumberOfProcessors, NULL);
   if (!NT_SUCCESS (ret))
     debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
 		  "status %p", ret);
   else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (unsigned long i = 0; i < si.dwNumberOfProcessors; i++)
+      for (unsigned long i = 0; i < system_info.dwNumberOfProcessors; i++)
 	{
 	  kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart)
 			 * HZ / 10000000ULL;
@@ -491,7 +495,7 @@ format_proc_stat (void *, char *&destbuf)
       eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
 				user_time, 0ULL, kernel_time, idle_time);
       user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (unsigned long i = 0; i < si.dwNumberOfProcessors; i++)
+      for (unsigned long i = 0; i < system_info.dwNumberOfProcessors; i++)
 	{
 	  interrupt_count += spt[i].InterruptCount;
 	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
@@ -501,18 +505,13 @@ format_proc_stat (void *, char *&destbuf)
 				    user_time, 0ULL, kernel_time, idle_time);
 	}
 
-      /* This fails on WOW64 with STATUS_INFO_LENGTH_MISMATCH because the
-         SYSTEM_PERFORMANCE_INFORMATION struct is bigger.  This datastructure
-	 was always undocumented, but on 64 bit systems we don't know its
-	 layout and content at all.  So we just let it fail and set the
-	 entire structure to 0. */
       ret = NtQuerySystemInformation (SystemPerformanceInformation,
-				      (PVOID) &spi, sizeof spi, NULL);
+				      (PVOID) spi, sizeof_spi, NULL);
       if (!NT_SUCCESS (ret))
 	{
 	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
 	  		", status %p", ret);
-	  memset (&spi, 0, sizeof spi);
+	  memset (spi, 0, sizeof_spi);
 	}
       ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
 				      (PVOID) &stodi,
@@ -524,8 +523,8 @@ format_proc_stat (void *, char *&destbuf)
   if (!NT_SUCCESS (ret))
     return 0;
 
-  pages_in = spi.PagesRead;
-  pages_out = spi.PagefilePagesWritten + spi.MappedFilePagesWritten;
+  pages_in = spi->PagesRead;
+  pages_out = spi->PagefilePagesWritten + spi->MappedFilePagesWritten;
   /*
    * Note: there is no distinction made in this structure between pages
    * read from the page file and pages read from mapped files, but there
@@ -533,9 +532,9 @@ format_proc_stat (void *, char *&destbuf)
    * why. The value of swap_in, then, will obviously be wrong but its our
    * best guess.
    */
-  swap_in = spi.PagesRead;
-  swap_out = spi.PagefilePagesWritten;
-  context_switches = spi.ContextSwitches;
+  swap_in = spi->PagesRead;
+  swap_out = spi->PagefilePagesWritten;
+  context_switches = spi->ContextSwitches;
   boot_time = to_time_t ((FILETIME *) &stodi.BootTime.QuadPart);
 
   eobuf += __small_sprintf (eobuf, "page %u %u\n"

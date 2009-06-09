@@ -1,3 +1,14 @@
+2009-06-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetSystemTimes): Remove.
+	* fhandler_proc.cc (format_proc_uptime): Use global system_info rather
+	than retrieving a local copy of the SYSTEM_INFO.  Drop call to
+	GetSystemTimes and retrieve SystemPerformanceInformation on all systems
+	again with buffer size big enough for 64 bit systems.
+	(format_proc_stat): Use global system_info rather than retrieving a
+	local copy of the SYSTEM_INFO.  Retrieve SystemPerformanceInformation
+	with buffer size big enough for 64 bit systems.
+
 2009-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetSystemTimes): Define.
