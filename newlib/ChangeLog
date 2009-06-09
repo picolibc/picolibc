@@ -1,3 +1,9 @@
+2009-06-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/tolower.c (tolower): Cast conversion result from
+	mbtowc/wctomb to unsigned char to avoid negative return values.
+	* libc/ctype/toupper.c (toupper): Ditto.
+
 2009-06-03  IWAMURO Motonori  <deenheart@gmail.com>
 
 	* libc/string/wcwidth.c: Optimize for speed.

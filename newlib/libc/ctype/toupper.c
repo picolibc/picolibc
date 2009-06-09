@@ -66,7 +66,7 @@ _DEFUN(toupper,(c),int c)
       wchar_t wc;
       if (mbtowc (&wc, s, 1) >= 0
 	  && wctomb (s, (wchar_t) towupper ((wint_t) wc)) == 1)
-	c = s[0];
+	c = (unsigned char) s[0];
     }
   return c;
 #else
