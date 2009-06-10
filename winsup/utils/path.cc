@@ -309,18 +309,20 @@ static struct opt
   bool clear;
 } oopts[] =
 {
-  {"user", MOUNT_SYSTEM, 1},
-  {"nouser", MOUNT_SYSTEM, 0},
-  {"binary", MOUNT_BINARY, 0},
-  {"text", MOUNT_BINARY, 1},
-  {"exec", MOUNT_EXEC, 0},
-  {"notexec", MOUNT_NOTEXEC, 0},
-  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
-  {"nosuid", 0, 0},
   {"acl", MOUNT_NOACL, 1},
+  {"auto", 0, 0},
+  {"binary", MOUNT_BINARY, 0},
+  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"exec", MOUNT_EXEC, 0},
   {"noacl", MOUNT_NOACL, 0},
+  {"nosuid", 0, 0},
+  {"notexec", MOUNT_NOTEXEC, 0},
+  {"nouser", MOUNT_SYSTEM, 0},
+  {"override", MOUNT_OVERRIDE, 0},
+  {"posix=0", MOUNT_NOPOSIX, 0},
   {"posix=1", MOUNT_NOPOSIX, 1},
-  {"posix=0", MOUNT_NOPOSIX, 0}
+  {"text", MOUNT_BINARY, 1},
+  {"user", MOUNT_SYSTEM, 1}
 };
 
 static bool
@@ -405,21 +407,29 @@ from_fstab_line (mnt_t *m, char *line, bool user)
 	    return false;
 	  }
       m->posix = strdup (posix_path);
-      m->native = strdup (".");
+      m->native = strdup ("cygdrive prefix");
       m->flags = mount_flags | MOUNT_CYGDRIVE;
     }
   else
     {
       for (mnt_t *sm = mount_table; sm < m; ++sm)
-	if (!strcasecmp (sm->posix, posix_path))
+	if (!strcmp (sm->posix, posix_path))
 	  {
-	    if ((mount_flags & MOUNT_SYSTEM) || !(sm->flags & MOUNT_SYSTEM))
-	      {
-	      	if (sm->native)
-		  free (sm->native);
-		sm->native = strdup (native_path);
-		sm->flags = mount_flags;
-	      }
+	    /* Don't allow overriding of a system mount with a user mount. */
+	    if ((sm->flags & MOUNT_SYSTEM) && !(mount_flags & MOUNT_SYSTEM))
+	      return false;
+	    if ((sm->flags & MOUNT_SYSTEM) != (mount_flags & MOUNT_SYSTEM))
+	      continue;
+	    /* Changing immutable mount points require the override flag. */
+	    if ((sm->flags & MOUNT_IMMUTABLE)
+	    	&& !(mount_flags & MOUNT_OVERRIDE))
+	      return false;
+	    if (mount_flags & MOUNT_OVERRIDE)
+	      mount_flags |= MOUNT_IMMUTABLE;
+	    if (sm->native)
+	      free (sm->native);
+	    sm->native = strdup (native_path);
+	    sm->flags = mount_flags;
 	    return false;
 	  }
       m->posix = strdup (posix_path);
@@ -462,13 +472,26 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
         *(native_path += 2) = '\\';
       m->posix = strdup ("/");
       m->native = strdup (native_path);
-      m->flags = MOUNT_SYSTEM | MOUNT_BINARY;
+      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE
+		 | MOUNT_AUTOMATIC;
+      ++m;
+      /* Create default /usr/bin and /usr/lib entries. */
+      char *trail = strchr (native_path, '\0');
+      strcpy (trail, "\\bin");
+      m->posix = strdup ("/usr/bin");
+      m->native = strdup (native_path);
+      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC;
+      ++m;
+      strcpy (trail, "\\lib");
+      m->posix = strdup ("/usr/lib");
+      m->native = strdup (native_path);
+      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC;
       ++m;
       /* Create a default cygdrive entry.  Note that this is a user entry.
          This allows to override it with mount, unless the sysadmin created
          a cygdrive entry in /etc/fstab. */
       m->posix = strdup (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
-      m->native = strdup (".");
+      m->native = strdup ("cygdrive prefix");
       m->flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
       ++m;
       max_mount_entry = m - mount_table;
@@ -845,29 +868,33 @@ getmntent (FILE *)
   mnt.mnt_fsname = (char *) m->native;
   mnt.mnt_dir = (char *) m->posix;
   if (!mnt.mnt_type)
-    mnt.mnt_type = (char *) malloc (1024);
+    mnt.mnt_type = (char *) malloc (16);
   if (!mnt.mnt_opts)
-    mnt.mnt_opts = (char *) malloc (1024);
-  if (m->flags & MOUNT_SYSTEM)
-    strcpy (mnt.mnt_type, (char *) "system");
-  else
-    strcpy (mnt.mnt_type, (char *) "user");
+    mnt.mnt_opts = (char *) malloc (64);
+
+  strcpy (mnt.mnt_type, (char *) (m->flags & MOUNT_SYSTEM) ? "system" : "user");
+
   if (!(m->flags & MOUNT_BINARY))
-    strcpy (mnt.mnt_opts, (char *) "textmode");
+    strcpy (mnt.mnt_opts, (char *) "text");
   else
-    strcpy (mnt.mnt_opts, (char *) "binmode");
+    strcpy (mnt.mnt_opts, (char *) "binary");
+
   if (m->flags & MOUNT_CYGWIN_EXEC)
     strcat (mnt.mnt_opts, (char *) ",cygexec");
   else if (m->flags & MOUNT_EXEC)
     strcat (mnt.mnt_opts, (char *) ",exec");
   else if (m->flags & MOUNT_NOTEXEC)
     strcat (mnt.mnt_opts, (char *) ",noexec");
-  if ((m->flags & MOUNT_CYGDRIVE))	/* cygdrive */
-    strcat (mnt.mnt_opts, (char *) ",cygdrive");
-  if ((m->flags & MOUNT_NOACL))
+
+  if (m->flags & MOUNT_NOACL)
     strcat (mnt.mnt_opts, (char *) ",noacl");
-  if ((m->flags & MOUNT_NOPOSIX))
+
+  if (m->flags & MOUNT_NOPOSIX)
     strcat (mnt.mnt_opts, (char *) ",posix=0");
+
+  if (m->flags & (MOUNT_AUTOMATIC | MOUNT_CYGDRIVE))
+    strcat (mnt.mnt_opts, (char *) ",auto");
+
   mnt.mnt_freq = 1;
   mnt.mnt_passno = 1;
   m++;
