@@ -1,3 +1,7 @@
+2009-06-11  Anthony Green  <green@moxielogic.org>
+
+	* moxie.h (R_MOXIE_PCREL10): New.
+
 2009-06-01  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR ld/10205

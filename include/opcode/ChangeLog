@@ -1,3 +1,8 @@
+2009-06-11  Anthony Green  <green@moxielogic.com>
+
+	* moxie.h (MOXIE_F3_PCREL): Define.
+	(moxie_form3_opc_info): Grow.
+
 2009-06-06  Anthony Green  <green@moxielogic.com>
 
 	* moxie.h (MOXIE_F1_M): Define.
