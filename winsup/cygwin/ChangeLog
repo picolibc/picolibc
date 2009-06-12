@@ -1,7 +1,12 @@
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
-	* localtime.cc (time2): Add workaround for spring gap problem.  Add
-	explaining comment.
+	* localtime.cc (time2): Change "spring gap" to "spring forward gap"
+	in comment.
+
+2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (time2): Add workaround for spring forward gap problem.
+	Add explaining comment.
 
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 

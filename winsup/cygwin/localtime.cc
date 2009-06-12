@@ -1994,13 +1994,13 @@ time2(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
 	t = time2sub(tmp, funcp, offset, okayp, true);
 	if (*okayp)
 	  return t;
-	/* Workaround for the spring gap problem which results in the
-	   autoconf mktime usability test failing.
+	/* Workaround for the spring forward gap problem which results in
+	   the autoconf mktime usability test failing.
 	   What we do here is this:  The gap has 3600 seconds.  If we
 	   subtract 3600 from the tm_sec value and get a valid result,
 	   then we can simply add 3600 to the return value and are done.
 	   If the result is still not valid, the problem is not the
-	   spring gap and we can give up. */
+	   spring forward gap and we can give up. */
 	struct tm tmp2 = *tmp;
 	tmp2.tm_sec -= 3600;
 	t = time2sub(&tmp2, funcp, offset, okayp, true);
