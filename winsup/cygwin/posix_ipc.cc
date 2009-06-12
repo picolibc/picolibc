@@ -47,7 +47,7 @@ enum ipc_type_t
 static bool
 check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
 {
-  /* Note that we require the existance of the apprpriate /dev subdirectories
+  /* Note that we require the existance of the appropriate /dev subdirectories
      for POSIX IPC object support, similar to Linux (which supports the
      directories, but doesn't require to mount them).  We don't create
      these directory here, that's the task of the installer.  But we check
@@ -65,13 +65,21 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
       set_errno (EINVAL);
       return false;
     }
-  /* Name must start with a single slash. */
-  if (!name || name[0] != '/' || name[1] == '/' || !name[1])
+  /* Name must not be empty, or just be a single slash, or start with more
+     than one slash.  Same for backslash.
+     Apart from handling backslash like slash, the naming rules are identical
+     to Linux, including the names and requirements for subdirectories, if
+     the name contains further slashes. */
+  if (!name || (strchr ("/\\", name[0])
+		&& (!name[1] || strchr ("/\\", name[1]))))
     {
       debug_printf ("Invalid %s name '%s'", ipc_names[type].description, name);
       set_errno (EINVAL);
       return false;
     }
+  /* Skip leading (back-)slash. */
+  if (strchr ("/\\", name[0]))
+    ++name;
   if (len > PATH_MAX - ipc_names[type].prefix_len)
     {
       debug_printf ("%s name '%s' too long", ipc_names[type].description, name);
@@ -80,7 +88,7 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
     }
   __small_sprintf (res_name, "%s/%s%s", ipc_names[type].prefix,
 					type == semaphore ? "sem." : "",
-					name + 1);
+					name);
   return true;
 }
 
