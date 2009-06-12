@@ -1,5 +1,10 @@
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (SUBLIBS): Add librt.a.
+	(librt.a): New rule to build librt.a.
+
+2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix_ipc.cc (check_path): Fix typo in comment.  Align naming
 	convention rules to Linux.  Handle backslash same as slash.  Add
 	comment.

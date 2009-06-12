@@ -228,7 +228,7 @@ API_VER:=$(srcdir)/include/cygwin/version.h
 
 LIB_NAME:=libcygwin.a
 LIBSERVER:=@LIBSERVER@
-SUBLIBS:=libpthread.a libutil.a ${CURDIR}/libm.a ${CURDIR}/libc.a libdl.a libresolv.a
+SUBLIBS:=libpthread.a libutil.a ${CURDIR}/libm.a ${CURDIR}/libc.a libdl.a libresolv.a librt.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a libtextreadmode.a
 INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
 TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
@@ -455,6 +455,9 @@ libdl.a: ${LIB_NAME} dlfcn.o
 	${speclib} ${@F}
 
 libresolv.a: ${LIB_NAME} minires.o
+	${speclib} ${@F}
+
+librt.a: ${LIB_NAME} posix_ipc.o
 	${speclib} ${@F}
 
 ${EXTRALIBS}: lib%.a: %.o
