@@ -1,3 +1,7 @@
+2009-06-12  Ken Brown  <kbrown@cornell.edu>
+
+	* faq-using.xml (faq.using.emacs): Update.
+
 2009-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml: Add changes to console BS and Space key.
