@@ -1,5 +1,10 @@
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* localtime.cc (time2): Add workaround for spring gap problem.  Add
+	explaining comment.
+
+2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (SUBLIBS): Add librt.a.
 	(librt.a): New rule to build librt.a.
 
