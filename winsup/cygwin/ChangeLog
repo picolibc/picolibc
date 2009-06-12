@@ -1,7 +1,8 @@
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (check_path): Fix typo in comment.  Align naming
-	convention rules to Linux.  Add comment.
+	convention rules to Linux.  Handle backslash same as slash.  Add
+	comment.
 
 2009-06-09  Corinna Vinschen  <corinna@vinschen.de>
 
