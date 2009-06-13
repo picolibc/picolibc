@@ -1,3 +1,8 @@
+2009-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Set namelen
+	pointer to NULL if name pointer is NULL.  Explain why.
+
 2009-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* localtime.cc (time2): Change "spring gap" to "spring forward gap"

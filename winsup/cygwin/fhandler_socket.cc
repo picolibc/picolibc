@@ -1347,7 +1347,12 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	res = WSARecvMsg (get_socket (), wsamsg, &wret, NULL, NULL);
       else
 	res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &wret,
-			   &wsamsg->dwFlags, wsamsg->name, &wsamsg->namelen,
+			   &wsamsg->dwFlags, wsamsg->name,
+			   /* Winsock returns WSAEFAULT if namelen is a valid
+			      pointer while name is NULL.  Both parameters are
+			      ignored for TCP sockets, so this only occurs when
+			      using UDP socket. */
+			   wsamsg->name ? &wsamsg->namelen : NULL,
 			   NULL, NULL);
       if (!res)
 	{
