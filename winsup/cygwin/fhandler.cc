@@ -1684,8 +1684,13 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
   int res = 0;
 
   DWORD err;
-  if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
-   {
+  if (is_nonblocking ())
+    {
+      err = GetLastError ();
+      res = inres;
+    }
+  else if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
+    {
 #ifdef DEBUGGING
       if (!get_overlapped ())
 	system_printf ("get_overlapped is zero?");
@@ -1745,7 +1750,8 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
      app.  Sigh.).  Must do this after WFMO and GetOverlappedResult or suffer
      occasional sporadic problems:
 	http://cygwin.com/ml/cygwin/2008-08/msg00511.html */
-  ResetEvent (get_overlapped ()->hEvent);
+  if (err != ERROR_IO_PENDING)
+    ResetEvent (get_overlapped ()->hEvent);
   if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
     raise (SIGPIPE);
   return res;

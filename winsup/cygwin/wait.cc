@@ -100,8 +100,6 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	}
       else if (res != WAIT_OBJECT_0)
 	{
-	  /* We shouldn't set errno to any random value if we can help it.
-	     See the Posix manual for a list of valid values for `errno'.  */
 	  set_errno (EINVAL);
 	  res = -1;
 	}

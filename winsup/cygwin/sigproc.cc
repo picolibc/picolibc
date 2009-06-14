@@ -1045,13 +1045,13 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
     might_match = (w->pid == child->pid);
 
   if (!might_match)
-    return 0;
+    return false;
 
   int terminated;
 
   if (!((terminated = (child->process_state == PID_EXITED)) ||
       ((w->options & WUNTRACED) && child->stopsig)))
-    return 0;
+    return false;
 
   parent_w->next = w->next;	/* successful wait.  remove from wait queue */
   w->pid = child->pid;

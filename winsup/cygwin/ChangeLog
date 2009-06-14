@@ -1,3 +1,13 @@
+2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::wait_overlapped): Honor nonblocking flag
+	for writes.  Don't reset event handle when we see a ERROR_IO_PENDING.
+
+	* sigproc.cc (stopped_or_terminated): Use bool constants for
+	consistency.
+
+	* wait.cc (wait4): Remove nonsensical comment.
+
 2009-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recv_internal): Set namelen
