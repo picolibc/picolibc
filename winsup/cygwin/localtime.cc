@@ -2006,7 +2006,7 @@ time2(struct tm *tmp, void (*funcp) P((const time_t*, long, struct tm*)),
 	t = time2sub(&tmp2, funcp, offset, okayp, true);
 	if (*okayp)
 	  {
-	    if (tmp2.tm_sec + 3600 < t)	/* Sanity check */
+	    if (t + 3600 < 0)	/* Sanity check */
 	      return WRONG;
 	    return t + 3600;
 	  }

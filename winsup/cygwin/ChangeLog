@@ -1,3 +1,7 @@
+2009-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (time2): Take another stab at fixing a compiler warning.
+
 2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* localtime.cc (time2): Take a stab at fixing a compiler warning.
