@@ -1185,12 +1185,10 @@ int fhandler_base::fcntl (int cmd, void *arg)
       break;
     case F_SETFL:
       {
-	/*
-	 * Only O_APPEND, O_ASYNC and O_NONBLOCK/O_NDELAY are allowed.
-	 * Each other flag will be ignored.
-	 * Since O_ASYNC isn't defined in fcntl.h it's currently
-	 * ignored as well.
-	 */
+	/* Only O_APPEND, O_ASYNC and O_NONBLOCK/O_NDELAY are allowed.
+	   Each other flag will be ignored.
+	   Since O_ASYNC isn't defined in fcntl.h it's currently
+	   ignored as well.  */
 	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
 	int new_flags = (int) arg & allowed_flags;
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
@@ -1676,7 +1674,7 @@ fhandler_base::destroy_overlapped ()
 }
 
 int
-fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
+fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD len)
 {
   if (!get_overlapped ())
     return inres;
@@ -1686,8 +1684,22 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
   DWORD err;
   if (is_nonblocking ())
     {
-      err = GetLastError ();
-      res = inres;
+      if (inres || GetLastError () == ERROR_IO_PENDING)
+	{
+	  if (writing && !inres)
+	    *bytes = len;	/* This really isn't true but it seems like
+				   this is a corner-case for linux's
+				   non-blocking I/O implementation.  How can
+				   you know how many bytes were written until
+				   the I/O operation really completes? */
+	  res = 1;
+	  err = 0;
+	}
+      else
+	{
+	  res = 0;
+	  err = GetLastError ();
+	}
     }
   else if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
     {
@@ -1719,7 +1731,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes)
       else if (!wores)
 	{
 	  err = GetLastError ();
-	  debug_printf ("general error");
+	  debug_printf ("GetOverLappedResult failed");
 	}
       else
 	{
@@ -1779,7 +1791,7 @@ fhandler_base::write_overlapped (const void *ptr, size_t len)
     {
       bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
 			    get_overlapped ());
-      int wres = wait_overlapped (res, true, &bytes_written);
+      int wres = wait_overlapped (res, true, &bytes_written, (size_t) len);
       if (wres || !_my_tls.call_signal_handler ())
 	break;
     }

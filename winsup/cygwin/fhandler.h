@@ -143,7 +143,7 @@ class fhandler_base
   void del_my_locks (bool);
 
   HANDLE read_state;
-  int wait_overlapped (bool, bool, DWORD *) __attribute__ ((regparm (3)));
+  int wait_overlapped (bool, bool, DWORD *, DWORD = 0) __attribute__ ((regparm (3)));
   bool setup_overlapped (bool doit = true) __attribute__ ((regparm (2)));
   void destroy_overlapped () __attribute__ ((regparm (1)));
 

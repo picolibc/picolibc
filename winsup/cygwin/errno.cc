@@ -139,6 +139,7 @@ static NO_COPY struct
   X (WRITE_PROTECT,		EROFS),
   X (SEEK,			EINVAL),
   X (SECTOR_NOT_FOUND,		EINVAL),
+  X (IO_INCOMPLETE,		EAGAIN),
   { 0, NULL, 0}
 };
 

@@ -1,3 +1,18 @@
+2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* errno.cc (errmap): Add mapping for ERROR_IO_INCOMPLETE.
+	* fhandler.cc (fhandler_base::fcntl): Fix comment.
+	(fhandler_base::wait_overlapped): Accept an optional len parameter.
+	Use the len parameter when WriteFile fails with ERROR_IO_PENDING.  Make
+	debug output less alarming.
+	(fhandler_base::write_overlapped): Pass len to wait_overlapped.
+	* fhandler.h (fhandler_base::wait_overlapped): Add an optional argument
+	denoting the number of characters intended to be written.
+
+	* fhandler_tty.cc (fhandler_pty_master::close): Don't close archetype
+	handles when cygwin is still initializing since the handles aren't
+	actually opened at that point.
+
 2009-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* localtime.cc (time2): Take another stab at fixing a compiler warning.

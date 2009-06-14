@@ -1184,10 +1184,13 @@ fhandler_pty_master::close ()
   fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
   termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
 		  arch->from_master, arch->to_master, arch->dwProcessId);
-  if (!ForceCloseHandle (arch->from_master))
-    termios_printf ("error closing from_master %p, %E", arch->from_master);
-  if (!ForceCloseHandle (arch->to_master))
-    termios_printf ("error closing from_master %p, %E", arch->to_master);
+  if (cygwin_finished_initializing)
+    {
+      if (!ForceCloseHandle (arch->from_master))
+	termios_printf ("error closing from_master %p, %E", arch->from_master);
+      if (!ForceCloseHandle (arch->to_master))
+	termios_printf ("error closing from_master %p, %E", arch->to_master);
+    }
   fhandler_tty_common::close ();
 
   if (hExeced || get_ttyp ()->master_pid != myself->pid)
