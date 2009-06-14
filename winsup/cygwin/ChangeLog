@@ -1,5 +1,9 @@
 2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* localtime.cc (time2): Take a stab at fixing a compiler warning.
+
+2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.cc (fhandler_base::wait_overlapped): Honor nonblocking flag
 	for writes.  Don't reset event handle when we see a ERROR_IO_PENDING.
 
