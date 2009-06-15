@@ -1,3 +1,16 @@
+2009-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (get_flags): New static function to generate interface flags
+	value.
+	(get_ipv4fromreg_ipcnt): New static function to fetch number of
+	configured IPv4 addresses for a given NIC from registry.
+	(get_ipv4fromreg): New static function to fetch configured IPv4
+	addresses for a given NIC from registry.
+	(get_friendlyname): New static function to generate friendly name.
+	(get_hwaddr): New static function to copy hardware address.
+	(get_xp_ifs): Restructure slightly.  Add code to generate IPv4 entries
+	entries for interfaces which are disconnected.
+
 2009-06-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* errno.cc (errmap): Add mapping for ERROR_IO_INCOMPLETE.

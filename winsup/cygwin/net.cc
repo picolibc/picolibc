@@ -1587,6 +1587,149 @@ struct ifall {
   struct ifreq_frndlyname ifa_frndlyname;
 };
 
+static unsigned int
+get_flags (PIP_ADAPTER_ADDRESSES pap)
+{
+  unsigned int flags = IFF_UP;
+  if (pap->IfType == IF_TYPE_SOFTWARE_LOOPBACK)
+    flags |= IFF_LOOPBACK;
+  else if (pap->IfType == IF_TYPE_PPP)
+    flags |= IFF_POINTOPOINT;
+  if (!(pap->Flags & IP_ADAPTER_NO_MULTICAST))
+    flags |= IFF_MULTICAST;
+  if (pap->OperStatus == IfOperStatusUp
+      || pap->OperStatus == IfOperStatusUnknown)
+    flags |= IFF_RUNNING;
+  if (pap->OperStatus != IfOperStatusLowerLayerDown)
+    flags |= IFF_LOWER_UP;
+  if (pap->OperStatus == IfOperStatusDormant)
+    flags |= IFF_DORMANT;
+  return flags;
+}
+
+static ULONG
+get_ipv4fromreg_ipcnt (const char *name)
+{
+  HKEY key;
+  LONG ret;
+  char regkey[256], *c;
+  ULONG ifs = 1;
+  DWORD dhcp, size;
+
+  c = stpcpy (regkey, "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\"
+		      "Parameters\\Interfaces\\");
+  stpcpy (c, name);
+  if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ,
+			   &key)) != ERROR_SUCCESS)
+    {
+      debug_printf ("RegOpenKeyEx(%s), win32 error %ld", ret);
+      return 0;
+    }
+  /* If DHCP is used, we have only one address. */
+  if ((ret = RegQueryValueEx (key, "EnableDHCP", NULL, NULL, (PBYTE) &dhcp,
+			      (size = sizeof dhcp, &size))) == ERROR_SUCCESS
+      && dhcp == 0
+      && (ret = RegQueryValueEx (key, "IPAddress", NULL, NULL, NULL,
+				 &size)) == ERROR_SUCCESS)
+    {
+      char *ipa = (char *) alloca (size);
+      RegQueryValueEx (key, "IPAddress", NULL, NULL, (PBYTE) ipa, &size);
+      for (ifs = 0, c = ipa; *c; c += strlen (c) + 1)
+	ifs++;
+    }
+  RegCloseKey (key);
+  return ifs;
+}
+
+static void
+get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
+{
+  HKEY key;
+  LONG ret;
+  char regkey[256], *c;
+  DWORD ifs;
+  DWORD dhcp, size;
+
+  c = stpcpy (regkey, "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\"
+		      "Parameters\\Interfaces\\");
+  stpcpy (c, name);
+  if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ, &key))
+      != ERROR_SUCCESS)
+    {
+      debug_printf ("RegOpenKeyEx(%s), win32 error %ld", ret);
+      return;
+    }
+  /* If DHCP is used, we have only one address. */
+  if ((ret = RegQueryValueEx (key, "EnableDHCP", NULL, NULL, (PBYTE) &dhcp,
+			      (size = sizeof dhcp, &size))) == ERROR_SUCCESS)
+    {
+#define addr ((struct sockaddr_in *) &ifp->ifa_addr)
+#define mask ((struct sockaddr_in *) &ifp->ifa_netmask)
+#define brdc ((struct sockaddr_in *) &ifp->ifa_brddstaddr)
+      if (dhcp)
+	{
+	  if ((ret = RegQueryValueEx (key, "DhcpIPAddress", NULL, NULL,
+				      (PBYTE) regkey, (size = 256, &size)))
+	      == ERROR_SUCCESS)
+	    cygwin_inet_aton (regkey, &addr->sin_addr);
+	  if ((ret = RegQueryValueEx (key, "DhcpSubnetMask", NULL, NULL,
+				      (PBYTE) regkey, (size = 256, &size)))
+	      == ERROR_SUCCESS)
+	    cygwin_inet_aton (regkey, &mask->sin_addr);
+	}
+      else
+	{
+	  if ((ret = RegQueryValueEx (key, "IPAddress", NULL, NULL, NULL,
+				     &size)) == ERROR_SUCCESS)
+	    {
+	      char *ipa = (char *) alloca (size);
+	      RegQueryValueEx (key, "IPAddress", NULL, NULL, (PBYTE) ipa, &size);
+	      for (ifs = 0, c = ipa; *c && ifs < idx; c += strlen (c) + 1)
+		ifs++;
+	      if (*c)
+		cygwin_inet_aton (c, &addr->sin_addr);
+	    }
+	  if ((ret = RegQueryValueEx (key, "SubnetMask", NULL, NULL, NULL,
+				     &size)) == ERROR_SUCCESS)
+	    {
+	      char *ipa = (char *) alloca (size);
+	      RegQueryValueEx (key, "SubnetMask", NULL, NULL, (PBYTE) ipa, &size);
+	      for (ifs = 0, c = ipa; *c && ifs < idx; c += strlen (c) + 1)
+		ifs++;
+	      if (*c)
+		cygwin_inet_aton (c, &mask->sin_addr);
+	    }
+	}
+      if (ifp->ifa_ifa.ifa_flags & IFF_BROADCAST)
+	brdc->sin_addr.s_addr = (addr->sin_addr.s_addr
+				 & mask->sin_addr.s_addr)
+				| ~mask->sin_addr.s_addr;
+#undef addr
+#undef mask
+#undef brdc
+    }
+  RegCloseKey (key);
+}
+
+static void
+get_friendlyname (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
+{
+  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
+				 &ifp->ifa_frndlyname;
+  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
+				IFRF_FRIENDLYNAMESIZ,
+				pap->FriendlyName);
+}
+
+static void
+get_hwaddr (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
+{
+  for (UINT i = 0; i < IFHWADDRLEN; ++i)
+    if (i >= pap->PhysicalAddressLength)
+      ifp->ifa_hwaddr.sa_data[i] = '\0';
+    else
+      ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
+}
 /*
  * Get network interfaces XP SP1 and above.
  * Use IP Helper function GetAdaptersAddresses.
@@ -1605,7 +1748,15 @@ get_xp_ifs (ULONG family)
     goto done;
 
   for (pap = pa0; pap; pap = pap->Next)
-    for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
+    if (!pap->FirstUnicastAddress)
+      {
+	/* FirstUnicastAddress is NULL for interfaces which are disconnected.
+	   Fetch number of configured IPva addresses from registry and
+	   store in an unused member of the adapter addresses structure. */
+	pap->Ipv6IfIndex = get_ipv4fromreg_ipcnt (pap->AdapterName);
+	cnt += pap->Ipv6IfIndex;
+      }
+    else for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
       ++cnt;
 
   if (!(ifret = (struct ifall *) calloc (cnt, sizeof (struct ifall))))
@@ -1614,125 +1765,146 @@ get_xp_ifs (ULONG family)
 
   for (pap = pa0; pap; pap = pap->Next)
     {
-      int idx = 0;
-      for (pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
-	{
-	  struct sockaddr *sa = (struct sockaddr *) pua->Address.lpSockaddr;
+      DWORD idx = 0;
+      if (!pap->FirstUnicastAddress)
+	for (idx = 0; idx < pap->Ipv6IfIndex; ++idx)
+	  {
+	    /* Next in chain */
+	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+	    /* Interface name */
+	    if (idx)
+	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
+	    else
+	      strcpy (ifp->ifa_name, pap->AdapterName);
+	    ifp->ifa_ifa.ifa_name = ifp->ifa_name;
+	    /* Flags */
+	    ifp->ifa_ifa.ifa_flags = get_flags (pap);
+	    if (pap->IfType != IF_TYPE_PPP)
+	      ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
+	    /* Address */
+	    ifp->ifa_addr.ss_family = AF_INET;
+	    ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	    /* Broadcast/Destination address */
+	    ifp->ifa_brddstaddr.ss_family = AF_INET;
+	    ifp->ifa_ifa.ifa_dstaddr = NULL;
+	    /* Netmask */
+	    ifp->ifa_netmask.ss_family = AF_INET;
+	    ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	    /* Try to fetch real IPv4 address information from registry. */
+	    get_ipv4fromreg (ifp, pap->AdapterName, idx);
+	    /* Hardware address */
+	    get_hwaddr (ifp, pap);
+	    /* Metric */
+	    ifp->ifa_metric = 1;
+	    /* MTU */
+	    ifp->ifa_mtu = pap->Mtu;
+	    /* Interface index */
+	    ifp->ifa_ifindex = pap->IfIndex;
+	    /* Friendly name */
+	    get_friendlyname (ifp, pap);
+	    ++ifp;
+	  }
+      else
+	for (idx = 0, pua = pap->FirstUnicastAddress; pua;
+	     ++idx, pua = pua->Next)
+	  {
+	    struct sockaddr *sa = (struct sockaddr *) pua->Address.lpSockaddr;
 #         define sin	((struct sockaddr_in *) sa)
 #         define sin6	((struct sockaddr_in6 *) sa)
-	  size_t sa_size = (sa->sa_family == AF_INET6
-			    ? sizeof *sin6 : sizeof *sin);
-	  /* Next in chain */
-	  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
-	  /* Interface name */
-	  if (!idx)
-	    strcpy (ifp->ifa_name, pap->AdapterName);
-	  else
-	    __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
-	  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
-	  ++idx;
-	  /* Flags */
-	  ifp->ifa_ifa.ifa_flags = IFF_UP;
-	  if (pap->IfType == IF_TYPE_SOFTWARE_LOOPBACK)
-	    ifp->ifa_ifa.ifa_flags |= IFF_LOOPBACK;
-	  else if (pap->IfType == IF_TYPE_PPP)
-	    ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT;
-	  else if (sa->sa_family == AF_INET)
-	    ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
-	  if (!(pap->Flags & IP_ADAPTER_NO_MULTICAST))
-	    ifp->ifa_ifa.ifa_flags |= IFF_MULTICAST;
-	  if (pap->OperStatus == IfOperStatusUp
-	      || pap->OperStatus == IfOperStatusUnknown)
-	    ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
-	  if (pap->OperStatus != IfOperStatusLowerLayerDown)
-	    ifp->ifa_ifa.ifa_flags |= IFF_LOWER_UP;
-	  if (pap->OperStatus == IfOperStatusDormant)
-	    ifp->ifa_ifa.ifa_flags |= IFF_DORMANT;
-	  if (sa->sa_family == AF_INET)
-	    {
-	      ULONG hwaddr[2], hwlen = 6;
-	      if (SendARP (sin->sin_addr.s_addr, 0, hwaddr, &hwlen))
-		ifp->ifa_ifa.ifa_flags |= IFF_NOARP;
-	    }
-	  /* Address */
-	  memcpy (&ifp->ifa_addr, sa, sa_size);
-	  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
-	  /* Netmask */
-	  int prefix = ip_addr_prefix (pua, pap->FirstPrefix);
-	  switch (sa->sa_family)
-	    {
-	    case AF_INET:
-	      if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
-	      if_sin->sin_addr.s_addr = htonl (UINT32_MAX << (32 - prefix));
-	      if_sin->sin_family = AF_INET;
-	      break;
-	    case AF_INET6:
-	      if_sin6 = (struct sockaddr_in6 *) &ifp->ifa_netmask;
-	      for (cnt = 0; cnt < 4 && prefix; ++cnt, prefix -= 32)
-		if_sin6->sin6_addr.s6_addr32[cnt] = UINT32_MAX;
-		if (prefix < 32)
-		  if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
-	      break;
-	    }
-	  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
-	  if (pap->IfType == IF_TYPE_PPP)
-	    {
-	      /* Destination address */
-	      if (sa->sa_family == AF_INET)
-		{
-		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-		  if_sin->sin_addr.s_addr = get_routedst (pap->IfIndex);
-		  if_sin->sin_family = AF_INET;
-		}
-	      else
-		/* FIXME: No official way to get the dstaddr for ipv6? */
-		memcpy (&ifp->ifa_addr, sa, sa_size);
-	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
-					 &ifp->ifa_brddstaddr;
-	    }
-	  else
-	    {
-	      /* Broadcast address  */
-	      if (sa->sa_family == AF_INET)
-		{
-		  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-		  uint32_t mask =
-		  ((struct sockaddr_in *) &ifp->ifa_netmask)->sin_addr.s_addr;
-		  if_sin->sin_addr.s_addr = (sin->sin_addr.s_addr & mask) | ~mask;
-		  if_sin->sin_family = AF_INET;
-		  ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
-					       &ifp->ifa_brddstaddr;
-		}
-	      else /* No IPv6 broadcast */
-		ifp->ifa_ifa.ifa_broadaddr = NULL;
-	    }
-	  /* Hardware address */
-	  for (UINT i = 0; i < IFHWADDRLEN; ++i)
-	    if (i >= pap->PhysicalAddressLength)
-	      ifp->ifa_hwaddr.sa_data[i] = '\0';
+	    size_t sa_size = (sa->sa_family == AF_INET6
+			      ? sizeof *sin6 : sizeof *sin);
+	    /* Next in chain */
+	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
+	    /* Interface name */
+	    if (idx && sa->sa_family == AF_INET)
+	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
-	      ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
-	  /* Metric */
-	  if (wincap.has_gaa_on_link_prefix ())
-	    ifp->ifa_metric = (sa->sa_family == AF_INET
-			      ? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
-			      : ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric);
-	  else
-	    ifp->ifa_metric = 1;
-	  /* MTU */
-	  ifp->ifa_mtu = pap->Mtu;
-	  /* Interface index */
-	  ifp->ifa_ifindex = pap->IfIndex;
-	  /* Friendly name */
-	  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-					 &ifp->ifa_frndlyname;
-	  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
-					IFRF_FRIENDLYNAMESIZ,
-					pap->FriendlyName);
-	  ++ifp;
+	      strcpy (ifp->ifa_name, pap->AdapterName);
+	    ifp->ifa_ifa.ifa_name = ifp->ifa_name;
+	    /* Flags */
+	    ifp->ifa_ifa.ifa_flags = get_flags (pap);
+	    if (sa->sa_family == AF_INET
+		&& pap->IfType != IF_TYPE_SOFTWARE_LOOPBACK
+		&& pap->IfType != IF_TYPE_PPP)
+	      ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
+	    if (sa->sa_family == AF_INET)
+	      {
+		ULONG hwaddr[2], hwlen = 6;
+		if (SendARP (sin->sin_addr.s_addr, 0, hwaddr, &hwlen))
+		  ifp->ifa_ifa.ifa_flags |= IFF_NOARP;
+	      }
+	    /* Address */
+	    memcpy (&ifp->ifa_addr, sa, sa_size);
+	    ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
+	    /* Netmask */
+	    int prefix = ip_addr_prefix (pua, pap->FirstPrefix);
+	    switch (sa->sa_family)
+	      {
+	      case AF_INET:
+		if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
+		if_sin->sin_addr.s_addr = htonl (UINT32_MAX << (32 - prefix));
+		if_sin->sin_family = AF_INET;
+		break;
+	      case AF_INET6:
+		if_sin6 = (struct sockaddr_in6 *) &ifp->ifa_netmask;
+		for (cnt = 0; cnt < 4 && prefix; ++cnt, prefix -= 32)
+		  if_sin6->sin6_addr.s6_addr32[cnt] = UINT32_MAX;
+		  if (prefix < 32)
+		    if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
+		break;
+	      }
+	    ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
+	    if (pap->IfType == IF_TYPE_PPP)
+	      {
+		/* Destination address */
+		if (sa->sa_family == AF_INET)
+		  {
+		    if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		    if_sin->sin_addr.s_addr = get_routedst (pap->IfIndex);
+		    if_sin->sin_family = AF_INET;
+		  }
+		else
+		  /* FIXME: No official way to get the dstaddr for ipv6? */
+		  memcpy (&ifp->ifa_addr, sa, sa_size);
+		ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
+					   &ifp->ifa_brddstaddr;
+	      }
+	    else
+	      {
+		/* Broadcast address  */
+		if (sa->sa_family == AF_INET)
+		  {
+		    if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
+		    uint32_t mask =
+		    ((struct sockaddr_in *) &ifp->ifa_netmask)->sin_addr.s_addr;
+		    if_sin->sin_addr.s_addr = (sin->sin_addr.s_addr & mask)
+					      | ~mask;
+		    if_sin->sin_family = AF_INET;
+		    ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
+						 &ifp->ifa_brddstaddr;
+		  }
+		else /* No IPv6 broadcast */
+		  ifp->ifa_ifa.ifa_broadaddr = NULL;
+	      }
+	    /* Hardware address */
+	    get_hwaddr (ifp, pap);
+	    /* Metric */
+	    if (wincap.has_gaa_on_link_prefix ())
+	      ifp->ifa_metric = (sa->sa_family == AF_INET
+				? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
+				: ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric);
+	    else
+	      ifp->ifa_metric = 1;
+	    /* MTU */
+	    ifp->ifa_mtu = pap->Mtu;
+	    /* Interface index */
+	    ifp->ifa_ifindex = pap->IfIndex;
+	    /* Friendly name */
+	    get_friendlyname (ifp, pap);
+	    ++ifp;
 #         undef sin
 #         undef sin6
-	}
+	  }
     }
   /* Since every entry is set to the next entry, the last entry points to an
      invalid next entry now.  Fix it retroactively. */
