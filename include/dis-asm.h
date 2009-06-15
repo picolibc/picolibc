@@ -1,6 +1,6 @@
 /* Interface between the opcode library and its callers.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -39,14 +39,14 @@ extern "C" {
 
 enum dis_insn_type
 {
-  dis_noninsn,			/* Not a valid instruction */
-  dis_nonbranch,		/* Not a branch instruction */
-  dis_branch,			/* Unconditional branch */
-  dis_condbranch,		/* Conditional branch */
-  dis_jsr,			/* Jump to subroutine */
-  dis_condjsr,			/* Conditional jump to subroutine */
-  dis_dref,			/* Data reference instruction */
-  dis_dref2			/* Two data references in instruction */
+  dis_noninsn,			/* Not a valid instruction.  */
+  dis_nonbranch,		/* Not a branch instruction.  */
+  dis_branch,			/* Unconditional branch.  */
+  dis_condbranch,		/* Conditional branch.  */
+  dis_jsr,			/* Jump to subroutine.  */
+  dis_condjsr,			/* Conditional jump to subroutine.  */
+  dis_dref,			/* Data reference instruction.  */
+  dis_dref2			/* Two data references in instruction.  */
 };
 
 /* This struct is passed into the instruction decoding routine,
@@ -108,7 +108,13 @@ typedef struct disassemble_info
      The top 16 bits are reserved for public use (and are documented here).
      The bottom 16 bits are for the internal use of the disassembler.  */
   unsigned long flags;
-#define INSN_HAS_RELOC	0x80000000
+  /* Set if the disassembler has determined that there are one or more
+     relocations associated with the instruction being disassembled.  */
+#define INSN_HAS_RELOC	 (1 << 31)
+  /* Set if the user has requested the disassembly of data as well as code.  */
+#define DISASSEMBLE_DATA (1 << 30)
+
+  /* Use internally by the target specific disassembly code.  */
   void *private_data;
 
   /* Function used to get bytes to disassemble.  MEMADDR is the

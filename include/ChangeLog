@@ -1,3 +1,8 @@
+2009-06-15  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h (struct disassemble_info): New value for the flags
+	field.
+
 2009-06-02  Ian Lance Taylor  <iant@google.com>
 
 	* ansidecl.h (EXPORTED_CONST): Define.
