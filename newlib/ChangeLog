@@ -1,3 +1,15 @@
+2009-06-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Use actual length of
+	radix char instead of assuming length 1.
+	* libc/stdlib/gdtoa-gethex.c: Remove use of USE_LOCALE.
+	(gethex): Allow multibyte decimal point.
+	Fix compiler warnings due to different signedness of pointer types.
+	* libc/stdlib/strtod.c: Remove use of USE_LOCALE.
+	(_strtod_r): Allow multibyte decimal point.
+	* libc/stdlib/wcstod.c (_wcstod_r): Evaluate correct wide char
+	endptr position if the decimal point is a multibyte char.
+
 2009-06-16  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/ctype/local.h (__locale_charset): Add arguments to

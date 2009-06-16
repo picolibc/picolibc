@@ -35,10 +35,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 #include "gd_qnan.h"
-
-#ifdef USE_LOCALE
 #include "locale.h"
-#endif
 
 unsigned char hexdig[256];
 
@@ -151,11 +148,10 @@ _DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
 	int esign, havedig, irv, k, n, nbits, up, zret;
 	__ULong L, lostbits, *x;
 	Long e, e1;
-#ifdef USE_LOCALE
-	unsigned char decimalpoint = *localeconv()->decimal_point;
-#else
-#define decimalpoint '.'
-#endif
+	unsigned char *decimalpoint = (unsigned char *)
+				      _localeconv_r (ptr)->decimal_point;
+	size_t decp_len = strlen ((const char *) decimalpoint);
+	unsigned char decp_end = decimalpoint[decp_len - 1];
 
 	if (!hexdig['0'])
 		hexdig_init();
@@ -170,9 +166,10 @@ _DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
 	e = 0;
 	if (!hexdig[*s]) {
 		zret = 1;
-		if (*s != decimalpoint)
+		if (strncmp ((const char *) s, (const char *) decimalpoint,
+			     decp_len) != 0)
 			goto pcheck;
-		decpt = ++s;
+		decpt = (s += decp_len);
 		if (!hexdig[*s])
 			goto pcheck;
 		while(*s == '0')
@@ -184,8 +181,10 @@ _DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
 		}
 	while(hexdig[*s])
 		s++;
-	if (*s == decimalpoint && !decpt) {
-		decpt = ++s;
+	if (strncmp ((const char *) s, (const char *) decimalpoint,
+		     decp_len) == 0
+	    && !decpt) {
+		decpt = (s += decp_len);
 		while(hexdig[*s])
 			s++;
 		}
@@ -226,8 +225,12 @@ _DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
 	n = 0;
 	L = 0;
 	while(s1 > s0) {
-		if (*--s1 == decimalpoint)
+		if (*--s1 == decp_end && s1 - decp_len + 1 >= s0
+		    && strncmp ((const char *) s1 - decp_len + 1,
+				(const char *) decimalpoint, decp_len) == 0) {
+			s1 -= decp_len - 1; /* Note the --s1 above! */
 			continue;
+		}
 		if (n == 32) {
 			*x++ = L;
 			L = 0;

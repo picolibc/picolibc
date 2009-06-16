@@ -553,6 +553,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef FLOATING_POINT
 	char *decimal_point = _localeconv_r (data)->decimal_point;
+	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
 # define _fpvalue (_double_.fp)
@@ -1441,13 +1442,13 @@ number:			if ((dprec = prec) >= 0)
 					/* kludge for __dtoa irregularity */
 					PRINT ("0", 1);
 					if (expt < ndig || flags & ALT) {
-						PRINT (decimal_point, 1);
+						PRINT (decimal_point, decp_len);
 						PAD (ndig - 1, zeroes);
 					}
 				} else if (expt <= 0) {
 					PRINT ("0", 1);
 					if (expt || ndig || flags & ALT) {
-						PRINT (decimal_point, 1);
+						PRINT (decimal_point, decp_len);
 						PAD (-expt, zeroes);
 						PRINT (cp, ndig);
 					}
@@ -1455,18 +1456,18 @@ number:			if ((dprec = prec) >= 0)
 					PRINT (cp, ndig);
 					PAD (expt - ndig, zeroes);
 					if (flags & ALT)
-						PRINT (decimal_point, 1);
+						PRINT (decimal_point, decp_len);
 				} else {
 					PRINT (cp, expt);
 					cp += expt;
-					PRINT (decimal_point, 1);
+					PRINT (decimal_point, decp_len);
 					PRINT (cp, ndig - expt);
 				}
 			} else {	/* 'a', 'A', 'e', or 'E' */
 				if (ndig > 1 || flags & ALT) {
 					PRINT (cp, 1);
 					cp++;
-					PRINT (decimal_point, 1);
+					PRINT (decimal_point, decp_len);
 					if (_fpvalue) {
 						PRINT (cp, ndig - 1);
 					} else	/* 0.[0..] */
