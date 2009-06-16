@@ -1,5 +1,10 @@
 2009-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.cc (fhandler_base::read_overlapped): Use a better variable
+	name.
+
+2009-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.cc (fhandler_base::read_overlapped): Preserve len when
 	looping due to received signal.
 
