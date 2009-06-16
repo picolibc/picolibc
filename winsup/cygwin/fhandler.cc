@@ -1772,21 +1772,22 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
 void
 fhandler_base::read_overlapped (void *ptr, size_t& len)
 {
+  DWORD bytes_written;
   while (1)
     {
-      bool res = ReadFile (get_handle (), ptr, len, (DWORD *) &len,
+      bool res = ReadFile (get_handle (), ptr, len, &bytes_written,
 			   get_overlapped ());
-      int wres = wait_overlapped (res, false, (DWORD *) &len);
+      int wres = wait_overlapped (res, false, &bytes_written);
       if (wres || !_my_tls.call_signal_handler ())
 	break;
     }
+  len = (size_t) bytes_written;
 }
 
 int
 fhandler_base::write_overlapped (const void *ptr, size_t len)
 {
   DWORD bytes_written;
-
   while (1)
     {
       bool res = WriteFile (get_output_handle (), ptr, len, &bytes_written,
