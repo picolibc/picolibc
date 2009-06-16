@@ -181,14 +181,14 @@ extern int __fpclassifyd (double x);
 extern int __signbitf (float x);
 extern int __signbitd (double x);
 
-#define fpclassify(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? __fpclassifyf(__x) : __fpclassifyd(__x);}))
+#define fpclassify(__x) \
+	((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
+	__fpclassifyd(__x))
 
 #ifndef isfinite
-#define isfinite(y) \
-          (__extension__ ({__typeof__(y) __y = (y); \
-                           fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
+  #define isfinite(__y) \
+          (__extension__ ({int __cy = fpclassify(__y); \
+                           __cy != FP_INFINITE && __cy != FP_NAN;}))
 #endif
 
 /* Note: isinf and isnan were once functions in newlib that took double
@@ -197,21 +197,17 @@ extern int __signbitd (double x);
  *       now defined as macros.  Implementations of the old functions
  *       taking double arguments still exist for compatibility purposes.  */
 #ifndef isinf
-#define isinf(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? __isinff(__x) : __isinfd(__x);}))
+  #define isinf(y) (fpclassify(y) == FP_INFINITE)
 #endif
 
 #ifndef isnan
-#define isnan(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? __isnanf(__x) : __isnand(__x);}))
+  #define isnan(y) (fpclassify(y) == FP_NAN)
 #endif
 
 #define isnormal(y) (fpclassify(y) == FP_NORMAL)
-#define signbit(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof(__x) == sizeof(float)) ? __signbitf(__x) : __signbitd(__x);}))
+#define signbit(__x) \
+	((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
+		__signbitd(__x))
 
 #define isgreater(x,y) \
           (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \

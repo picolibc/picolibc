@@ -1,3 +1,10 @@
+2009-06-16  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/include/math.h:  Simplify fpclassify, isinf, isnan, and signbit
+	macros to remove un-necessary extension use.  isinf and isnan also
+	changed to use fpclassify.  isfinite macro modified to run faster by
+	only calling fpclassify once instead of possibly twice.
+
 2009-06-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/tolower.c (tolower): Cast conversion result from
