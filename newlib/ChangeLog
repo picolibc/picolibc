@@ -1,5 +1,11 @@
 2009-06-16  Craig Howland <howland@LGSInnovations.com>
 
+	* libc/ctype/local.h (__locale_charset): Add arguments to
+	prototype
+	* libc/stdlib/local.h (__locale_charset): Ditto.
+
+2009-06-16  Craig Howland <howland@LGSInnovations.com>
+
 	* libc/include/math.h:  Simplify fpclassify, isinf, isnan, and signbit
 	macros to remove un-necessary extension use.  isinf and isnan also
 	changed to use fpclassify.  isfinite macro modified to run faster by

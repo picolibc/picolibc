@@ -20,7 +20,7 @@
 #define WC_UPPER	11
 #define WC_XDIGIT	12
 
-extern char *__locale_charset ();
+extern char *__locale_charset(_NOARGS);
 
 /* internal function to translate JP to Unicode */
 #ifdef __CYGWIN__
