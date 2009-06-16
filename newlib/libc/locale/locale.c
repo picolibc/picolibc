@@ -160,6 +160,8 @@ static _CONST struct lconv lconv =
   ".", "", "", "", "", "", "", "", "", "",
   CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
   CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+  CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+  CHAR_MAX, CHAR_MAX
 };
 
 #ifdef _MB_CAPABLE
