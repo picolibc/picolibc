@@ -1,3 +1,10 @@
+2009-06-17  Michael Eager <eager@eagercon.com>
+
+	* libc/include/pthread.h: Support XMK (Xilinx) BSP, add RTEMS to
+	PTHREAD_MUTEX_NORMAL.
+	* libc/include/sys/features.h: Same.
+	* libc/include/sys/types.h: Same.
+
 2009-06-16  Corinna Vinschen  <corinna@vinschen.de>
 	
 	* libc/include/locale.h (struct lconv): Add missing members required

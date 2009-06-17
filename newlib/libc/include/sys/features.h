@@ -75,6 +75,13 @@ extern "C" {
 
 #endif
 
+/* XMK loosely adheres to POSIX -- 1003.1 */
+#ifdef __XMK__
+#define _POSIX_THREADS				1
+#define _POSIX_THREAD_PRIORITY_SCHEDULING	1
+#endif
+
+
 #ifdef __svr4__
 # define _POSIX_JOB_CONTROL     1
 # define _POSIX_SAVED_IDS       1
