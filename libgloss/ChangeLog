@@ -1,3 +1,10 @@
+2009-06-17  Michael Eager <eager@eagercon.com>
+
+	* rs6000/Makefile.in: Add xilinx support.
+	* rs6000/xil-crt0.s: New crt0 file for powerpc-xilinx-eabi.
+	* rs6000/xilinx.ld: New file.
+	* rs6000/xilinx440.ld: Ditto.
+
 2009-05-13  Ken Werner  <ken.werner@de.ibm.com>
 
 	* configure.in: Introduce config_libnosys flag which defaults to true.
