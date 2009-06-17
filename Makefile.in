@@ -862,9 +862,8 @@ all:
 	  $(MAKE) $(RECURSE_FLAGS_TO_PASS) all-host all-target \
 @if gcc-bootstrap
 	    ; \
-	fi \
+	fi
 @endif gcc-bootstrap
-	&& :
 
 .PHONY: all-build
 
@@ -52211,16 +52210,15 @@ compare:
 	: $(MAKE); $(stage); \
 	rm -f .bad_compare ; \
 	echo Comparing stages 2 and 3 ; \
-        sed=`echo stage3 | sed 's,^stage,,;s,.,.,g'`; \
-	files=`find stage3-* -name "*$(objext)" -print | \
-		 sed -n s,^stage$$sed-,,p` ; \
+	cd stage3-gcc; \
+	files=`find . -name "*$(objext)" -print` ; \
+	cd .. ; \
 	for file in $${files} ; do \
-	  f1=$$r/stage2-$$file; f2=$$r/stage3-$$file; \
-	  if test ! -f $$f1; then continue; fi; \
+	  f1=$$r/stage2-gcc/$$file; f2=$$r/stage3-gcc/$$file; \
 	  $(do-compare) > /dev/null 2>&1; \
 	  if test $$? -eq 1; then \
 	    case $$file in \
-	      gcc/cc*-checksum$(objext) | ./libgcc/* | ./gcc/ada/*tools/*) \
+	      ./cc*-checksum$(objext) | ./libgcc/* ) \
 	        echo warning: $$file differs ;; \
 	      *) \
 	        echo $$file differs >> .bad_compare ;; \
@@ -52537,16 +52535,15 @@ compare3:
 	: $(MAKE); $(stage); \
 	rm -f .bad_compare ; \
 	echo Comparing stages 3 and 4 ; \
-        sed=`echo stage4 | sed 's,^stage,,;s,.,.,g'`; \
-	files=`find stage4-* -name "*$(objext)" -print | \
-		 sed -n s,^stage$$sed-,,p` ; \
+	cd stage4-gcc; \
+	files=`find . -name "*$(objext)" -print` ; \
+	cd .. ; \
 	for file in $${files} ; do \
-	  f1=$$r/stage3-$$file; f2=$$r/stage4-$$file; \
-	  if test ! -f $$f1; then continue; fi; \
+	  f1=$$r/stage3-gcc/$$file; f2=$$r/stage4-gcc/$$file; \
 	  $(do-compare3) > /dev/null 2>&1; \
 	  if test $$? -eq 1; then \
 	    case $$file in \
-	      gcc/cc*-checksum$(objext) | ./libgcc/* | ./gcc/ada/*tools/*) \
+	      ./cc*-checksum$(objext) | ./libgcc/* ) \
 	        echo warning: $$file differs ;; \
 	      *) \
 	        echo $$file differs >> .bad_compare ;; \
