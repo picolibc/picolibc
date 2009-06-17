@@ -1,3 +1,7 @@
+2009-06-16 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/stdlib.h (_wtof): Define.
+
 2009-04-11 Danny Smith <dannsymith@users.sourceforge.net>
 
 	* include/stdint.h (int_fast8_t): Specify as signed char.

@@ -304,6 +304,7 @@ _CRTIMP double __cdecl __MINGW_NOTHROW	atof	(const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	atoi	(const char*);
 _CRTIMP long __cdecl __MINGW_NOTHROW 	atol	(const char*);
 #if !defined (__STRICT_ANSI__)
+_CRTIMP double __cdecl __MINGW_NOTHROW	_wtof (const wchar_t *);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wtoi (const wchar_t *);
 _CRTIMP long __cdecl __MINGW_NOTHROW _wtol (const wchar_t *);
 #endif
