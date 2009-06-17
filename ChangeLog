@@ -1,3 +1,7 @@
+2009-06-17  Michael Eager <eager@eagercon.com>
+
+	* COPYING.LIBGLOSS: Add Xilinx license.
+
 2009-06-15  Ryan Mansfield  <rmansfield@qnx.com>
 
 	* configure.ac: Define is_elf for QNX Neutrino targets.
