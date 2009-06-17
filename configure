@@ -2064,7 +2064,7 @@ if test "${ENABLE_GOLD}" = "yes"; then
   case "${target}" in
     *-*-elf* | *-*-sysv4* | *-*-unixware* | *-*-eabi* | hppa*64*-*-hpux* \
     | *-*-linux* | frv-*-uclinux* | *-*-irix5* | *-*-irix6* \
-    | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2* | *-*-nto*)
+    | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2*)
       case "${target}" in
         *-*-linux*aout* | *-*-linux*oldld*)
           ;;
@@ -2077,7 +2077,7 @@ if test "${ENABLE_GOLD}" = "yes"; then
   if test "$is_elf" = "yes"; then
     # Check for target supported by gold.
     case "${target}" in
-      i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-* | arm*-*-*)
+      i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-*)
         configdirs="`echo " ${configdirs} " | sed -e 's/ ld / gold /'`"
         ;;
     esac
