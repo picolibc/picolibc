@@ -1310,7 +1310,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   LPWSABUF wsabuf = wsamsg->lpBuffers;
   ULONG wsacnt = wsamsg->dwBufferCount;
   bool use_recvmsg = false;
-  static LPFN_WSARECVMSG WSARecvMsg;
+  static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
 
   bool waitall = !!(wsamsg->dwFlags & MSG_WAITALL);
   bool dontwait = !!(wsamsg->dwFlags & MSG_DONTWAIT);

@@ -1,3 +1,8 @@
+2009-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Mark WSARecvMsg
+	as NO_COPY.
+
 2009-06-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::read_overlapped): Use a better variable
