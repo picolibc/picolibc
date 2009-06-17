@@ -305,7 +305,7 @@ if test "${ENABLE_GOLD}" = "yes"; then
   case "${target}" in
     *-*-elf* | *-*-sysv4* | *-*-unixware* | *-*-eabi* | hppa*64*-*-hpux* \
     | *-*-linux* | frv-*-uclinux* | *-*-irix5* | *-*-irix6* \
-    | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2* | *-*-nto*)
+    | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2*)
       case "${target}" in
         *-*-linux*aout* | *-*-linux*oldld*)
           ;;
@@ -318,7 +318,7 @@ if test "${ENABLE_GOLD}" = "yes"; then
   if test "$is_elf" = "yes"; then
     # Check for target supported by gold.
     case "${target}" in
-      i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-* | arm*-*-*)
+      i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-*)
         configdirs="`echo " ${configdirs} " | sed -e 's/ ld / gold /'`"
         ;;
     esac
@@ -643,10 +643,6 @@ case "${target}" in
     ;;
   frv-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
-  moxie-*-*)
-    noconfigdirs="$noconfigdirs ${libgcj}"
-    noconfigdirs="$noconfigdirs gprof"
     ;;
   h8300*-*-*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
@@ -1268,7 +1264,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
   # Check GMP actually works
   AC_MSG_CHECKING([for correct version of gmp.h])
   AC_TRY_COMPILE([#include "gmp.h"],[
-  #if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 2)
+  #if __GNU_MP_VERSION < 4 || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 1)
   choke me
   #endif
   ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); have_gmp=no])
@@ -1276,11 +1272,11 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
   if test x"$have_gmp" = xyes; then
     saved_LIBS="$LIBS"
     LIBS="$LIBS $gmplibs"
-    dnl MPFR 2.3.1 is acceptable, but MPFR 2.3.2 is better.
+    dnl MPFR 2.3.0 is acceptable, but MPFR 2.3.2 is better.
     AC_MSG_CHECKING([for correct version of mpfr.h])
     AC_TRY_LINK([#include <gmp.h>
     #include <mpfr.h>],[
-    #if MPFR_VERSION < MPFR_VERSION_NUM(2,3,1)
+    #if MPFR_VERSION < MPFR_VERSION_NUM(2,3,0)
     choke me
     #endif
     mpfr_t n;
@@ -1304,7 +1300,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
   CFLAGS="$saved_CFLAGS"
 
   if test x$have_gmp != xyes; then
-    AC_MSG_ERROR([Building GCC requires GMP 4.2+ and MPFR 2.3.2+.
+    AC_MSG_ERROR([Building GCC requires GMP 4.1+ and MPFR 2.3.2+.
 Try the --with-gmp and/or --with-mpfr options to specify their locations.
 Copies of these libraries' source code can be found at their respective
 hosting sites as well as at ftp://gcc.gnu.org/pub/gcc/infrastructure/.
@@ -2730,10 +2726,10 @@ case " $build_configdirs " in
   *" texinfo "*) MAKEINFO='$$r/$(BUILD_SUBDIR)/texinfo/makeinfo/makeinfo' ;;
   *)
 changequote(,)
-    # For an installed makeinfo, we require it to be from texinfo 4.7 or
+    # For an installed makeinfo, we require it to be from texinfo 4.6 or
     # higher, else we use the "missing" dummy.
     if ${MAKEINFO} --version \
-       | egrep 'texinfo[^0-9]*(4\.([7-9]|[1-9][0-9])|[5-9]|[1-9][0-9])' >/dev/null 2>&1; then
+       | egrep 'texinfo[^0-9]*(4\.([6-9]|[1-9][0-9])|[5-9]|[1-9][0-9])' >/dev/null 2>&1; then
       :
     else
       MAKEINFO="$MISSING makeinfo"
