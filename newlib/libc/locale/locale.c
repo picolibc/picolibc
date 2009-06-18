@@ -44,29 +44,49 @@ locale.
 
 This is a minimal implementation, supporting only the required <<"POSIX">>
 and <<"C">> values for <[locale]>; strings representing other locales are not
-honored unless _MB_CAPABLE is defined in which case POSIX locale strings
-are allowed, plus five extensions supported for backward compatibility with
-older implementations using newlib: <<"C-UTF-8">>, <<"C-JIS">>,
-<<"C-EUCJP">>/<<"C-eucJP">>, <<"C-SJIS">>, <<"C-ISO-8859-x">> with
-1 <= x <= 15, or <<"C-CPxxx">> with xxx in [437, 720, 737, 775, 850, 852,
-855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
-1257, 1258].  Even when using POSIX locale strings, the only charsets allowed
-are <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>/<<"eucJP">>, <<"SJIS">>,
-<<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in [437, 720,
-737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252,
-1253, 1254, 1255, 1256, 1257, 1258]. 
+honored unless _MB_CAPABLE is defined.
+
+If _MB_CAPABLE is defined, POSIX locale strings are allowed, following
+the form
+
+  language[_TERRITORY][.charset][@@modifier]
+
+<<"language">> is a two character string per ISO 639.  <<"TERRITORY">> is a
+country code per ISO 3166.  For <<"charset">> and <<"modifier">> see below.
+
+Additionally to the POSIX specifier, five extensions are supported for
+backward compatibility with older implementations using newlib:
+<<"C-UTF-8">>, <<"C-JIS">>, <<"C-EUCJP">>/<<"C-eucJP">>, <<"C-SJIS">>,
+<<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with xxx in [437,
+720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251,
+1252, 1253, 1254, 1255, 1256, 1257, 1258].
+
+Even when using POSIX locale strings, the only charsets allowed are
+<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>/<<"eucJP">>, <<"SJIS">>, <<"ISO-8859-x">>
+with 1 <= x <= 15, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850,
+852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252, 1253, 1254,
+1255, 1256, 1257, 1258]. 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
 Under Cygwin, this implementation additionally supports the charsets
 <<"GBK">>, <<"eucKR">>, and <<"Big5">>.
 
-If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
-a pointer to the string representing the current locale (always
-<<"C">> in this implementation).  The acceptable values for
-<[category]> are defined in `<<locale.h>>' as macros beginning with
-<<"LC_">>, but this implementation does not check the values you pass
-in the <[category]> argument.
+This implementation also supports a single modifier, <<"cjknarrow">>.
+Any other modifier is ignored.  <<"cjknarrow">>, in conjunction with one
+of the language specifiers <<"ja">>, <<"ko">>, and <<"zh">> specifies
+how the functions <<wcwidth>> and <<wcswidth>> handle characters from
+the "CJK Ambiguous Width" character class described in
+http://www.unicode.org/unicode/reports/tr11/.  Usually these characters
+have a width of 1, unless you specify one of the aforementioned
+languages, in which case these characters have a width of 2.  By
+specifying the <<"cjknarrow">> modifier, these characters will have a
+width of one in the languages <<"ja">>, <<"ko">>, and <<"zh">> as well.
+
+If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns a
+pointer to the string representing the current locale.  The acceptable
+values for <[category]> are defined in `<<locale.h>>' as macros
+beginning with <<"LC_">>.
 
 <<localeconv>> returns a pointer to a structure (also defined in
 `<<locale.h>>') describing the locale-specific conventions currently
@@ -399,6 +419,9 @@ loadlocale(struct _reent *p, int category)
   int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		   const char *, mbstate_t *);
+#ifdef _MB_CAPABLE
+  int cjknarrow = 0;
+#endif
   
   /* "POSIX" is translated to "C", as on Linux. */
   if (!strcmp (locale, "POSIX"))
@@ -429,10 +452,14 @@ loadlocale(struct _reent *p, int category)
       if (c[0] == '.')
 	{
 	  /* Charset */
-	  strcpy (charset, c + 1);
-	  if ((c = strchr (charset, '@')))
+	  char *chp;
+
+	  ++c;
+	  strcpy (charset, c);
+	  if ((chp = strchr (charset, '@')))
 	    /* Strip off modifier */
-	    *c = '\0';
+	    *chp = '\0';
+	  c += strlen (charset);
 	}
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
@@ -444,6 +471,17 @@ loadlocale(struct _reent *p, int category)
       else
 	/* Invalid string */
       	return NULL;
+#ifdef _MB_CAPABLE
+      if (c[0] == '@')
+	{
+	  /* Modifier */
+	  /* Only one modifier is recognized right now.  "cjknarrow" is used
+	     to modify the behaviour of wcwidth() for East Asian languages.
+	     For details see the comment at the end of this function. */
+	  if (!strcmp (c + 1, "cjknarrow"))
+	    cjknarrow = 1;
+	}
+#endif
     }
   /* We only support this subset of charsets. */
   switch (charset[0])
@@ -606,13 +644,15 @@ loadlocale(struct _reent *p, int category)
       __mbtowc = l_mbtowc;
       __set_ctype (charset);
       /* Check for the language part of the locale specifier.  In case
-         of "ja", "ko", or "zh", assume the use of CJK fonts.  This is
-	 stored in lc_ctype_cjk_lang and tested in wcwidth() to figure
-	 out the width to return (1 or 2) for the "CJK Ambiguous Width"
-	 category of characters. */
-      lc_ctype_cjk_lang = (strncmp (locale, "ja", 2) == 0
-			   || strncmp (locale, "ko", 2) == 0
-			   || strncmp (locale, "zh", 2) == 0);
+         of "ja", "ko", or "zh", assume the use of CJK fonts, unless the
+	 "@cjknarrow" modifier has been specifed.
+	 The result is stored in lc_ctype_cjk_lang and tested in wcwidth()
+	 to figure out the width to return (1 or 2) for the "CJK Ambiguous
+	 Width" category of characters. */
+      lc_ctype_cjk_lang = !cjknarrow
+			  && ((strncmp (locale, "ja", 2) == 0
+			      || strncmp (locale, "ko", 2) == 0
+			      || strncmp (locale, "zh", 2) == 0));
 #endif
     }
   else if (category == LC_MESSAGES)

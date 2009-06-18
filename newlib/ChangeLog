@@ -1,3 +1,9 @@
+2009-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Add handling of "@cjknarrow"
+	modifier on _MB_CAPABLE targets.  Add comment to explain.  Improve
+	documentation.
+
 2009-06-17  Michael Eager <eager@eagercon.com>
 
 	* libc/include/pthread.h: Support XMK (Xilinx) BSP, add RTEMS to
