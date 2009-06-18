@@ -1,11 +1,16 @@
+2009-06-18  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h (USER_SPECIFIED_MACHINE_TYPE): New value for the flags
+	field of struct disassemble_info.
+
 2009-06-09  Ian Lance Taylor  <ian@airs.com>
 
 	* ansidecl.h (ATTRIBUTE_UNUSED_LABEL): Define for C++.
 
 2009-06-15  Nick Clifton  <nickc@redhat.com>
 
-	* dis-asm.h (struct disassemble_info): New value for the flags
-	field.
+	* dis-asm.h (DISASSEMBLE_DATA): New value for the flags field of
+	struct disassemble_info.
 
 2009-06-02  Ian Lance Taylor  <iant@google.com>
 
