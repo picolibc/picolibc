@@ -2575,7 +2575,11 @@ chdir (const char *in_dir)
   bool doit = false;
   const char *posix_cwd = NULL;
   int devn = path.get_devn ();
-  if (!isvirtual_dev (devn))
+  if (!path.exists ())
+    set_errno (ENOENT);
+  else if (!path.isdir ())
+    set_errno (ENOTDIR);
+  else if (!isvirtual_dev (devn))
     {
       /* The sequence chdir("xx"); chdir(".."); must be a noop if xx
 	 is not a symlink. This is exploited by find.exe.
@@ -2587,10 +2591,6 @@ chdir (const char *in_dir)
       res = 0;
       doit = true;
     }
-  else if (!path.exists ())
-    set_errno (ENOENT);
-  else if (!path.isdir ())
-    set_errno (ENOTDIR);
   else
    {
      posix_cwd = path.normalized_path;

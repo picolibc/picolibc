@@ -1,3 +1,7 @@
+2009-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (chdir): Check error conditions first.
+
 2009-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recv_internal): Mark WSARecvMsg
