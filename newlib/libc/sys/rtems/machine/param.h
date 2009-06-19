@@ -19,7 +19,7 @@
  * for all data types (int, long, ...).   The result is unsigned int
  * and must be cast to any desired pointer type.
  */
-#define ALIGNBYTES	(sizeof(int) - 1)
+#define ALIGNBYTES	(sizeof(double) - 1)
 #define ALIGN(p)	(((unsigned)(p) + ALIGNBYTES) & ~ALIGNBYTES)
 
 #define PAGE_SHIFT	12		/* LOG2(PAGE_SIZE) */

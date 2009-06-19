@@ -1,3 +1,8 @@
+2009-06-19  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/sys/rtems/machine/param.h: Change ALIGNBYTES
+	so it can point to an aligned structure or double.
+
 2009-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Add handling of "@cjknarrow"
