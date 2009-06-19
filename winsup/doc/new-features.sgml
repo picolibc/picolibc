@@ -268,6 +268,8 @@
 <screen>
 - New ldd utility, similar to Linux.
 
+- New link libraries libdl.a, libresolve.a, librt.a.
+
 - Fallout from the long path names: If the current working directory is
   longer than 260 bytes, or if the current working directory is a virtual
   path (like /proc, /cygdrive, //server), don't call native Win32 programs

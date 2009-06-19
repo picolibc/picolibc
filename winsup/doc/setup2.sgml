@@ -177,10 +177,27 @@ default ASCII-only behaviour.
 </para>
 
 <para>
-Right now the language and territory content is not evaluated by Cygwin any
-further.  The only important part so far is the character set.  How does that
-work?
-</para>
+Right now the language and territory, as well as the modifier, are not
+important to Cygwin, except to fix a single problem.  There's a class of
+characters in the Unicode character set, called the "CJK Ambiguous Width
+Character set".  For these characters the width returned by the
+wcwidth/wcswidth function is usually 1.  This is often a problem in
+East-Asian languages, which historically use character sets in which
+these characters have a width of 2.  Kind of explains why they are
+called "ambiguous"...</para>
+
+<para>
+The problem has been fixed for now like this.  wcwidth/wcswidth usually
+return 1 as the width of these characters.  However, if the language is
+specifed as "ja" (Japanese), "ko" (Korean), or "zh" (Chinese), wcwidth
+returns 2 for these characters.  Unfortunately this isn't correct in
+all circumstances, so the user can specify the modifier "@cjknarrow",
+which modifies the behaviour of wcwidth/wcswidth to return 1 for the
+ambiguous width characters to return 1 even in those languages.</para>
+
+<para>
+Other than that, the only important part so far is the character set.
+How does that work?</para>
 
 </sect2>
 
