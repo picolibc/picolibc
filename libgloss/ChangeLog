@@ -1,3 +1,9 @@
+2009-06-19  Joseph Myers  <joseph@codesourcery.com>
+
+	* Makefile.in (html, pdf): New.
+	* doc/Makefile.in (html, pdf, porting.pdf, porting.html): New.
+	* doc/porting.texi: Fix section structure.
+
 2009-06-17  Michael Eager <eager@eagercon.com>
 
 	* rs6000/Makefile.in: Add xilinx support.

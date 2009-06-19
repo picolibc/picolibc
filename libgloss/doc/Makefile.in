@@ -39,7 +39,11 @@ all:
 
 info:	porting.info 
 
+html:	porting.html
+
 dvi:	porting.dvi 
+
+pdf:	porting.pdf
 
 ps:	porting.ps 
 
@@ -53,9 +57,15 @@ porting: porting.dvi porting.info
 porting.dvi: $(srcdir)/porting.texi $(srcdir)/porting.texi
 	$(TEXI2DVI) $(srcdir)/porting.texi
 
+porting.pdf: $(srcdir)/porting.texi $(srcdir)/porting.texi
+	$(TEXI2DVI) --pdf $(srcdir)/porting.texi
+
 # info file for online browsing
 porting.info: $(srcdir)/porting.texi $(srcdir)/porting.texi
 	$(MAKEINFO) -I $(srcdir) -o porting.info $(srcdir)/porting.texi
+
+porting.html: $(srcdir)/porting.texi $(srcdir)/porting.texi
+	$(MAKEINFO) --html -I $(srcdir) -o porting.html $(srcdir)/porting.texi
 
 porting.ps: porting.dvi
 	dvips -f porting.dvi > porting.ps

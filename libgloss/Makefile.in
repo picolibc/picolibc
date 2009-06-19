@@ -155,7 +155,7 @@ distclean maintainer-clean realclean: clean-here
 	$(MAKE) DO=$@ DODIRS="$(SUBDIRS)" $(FLAGS_TO_PASS) subdir_do; \
 	$(MULTICLEAN) multi-clean DO=$@
 
-.PHONY: info install-info clean-info
+.PHONY: info install-info clean-info html pdf
 subdir_do:
 	@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
@@ -171,7 +171,7 @@ subdir_do:
 	  else true; fi; \
 	done
 
-info dvi docs:
+info dvi html pdf docs:
 	rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	$(MAKE) DO=$@ DODIRS=doc $(FLAGS_TO_PASS) subdir_do

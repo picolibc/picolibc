@@ -135,7 +135,7 @@ new library is called Libgloss, for Gnu Low-level OS support.
 @end menu
 
 @node Supported targets, Building libgloss, Libgloss, Libgloss
-@subsection Supported Targets
+@section Supported Targets
 Currently libgloss is being used for the following targets:
 
 @menu
@@ -233,7 +233,7 @@ has never been tested with the output of GNU SOM, as this manual is
 mostly for Unix based systems. 
 
 @node Building libgloss, Board support, Supported targets, Libgloss
-@subsection Configuring and building libgloss.
+@section Configuring and building libgloss.
 
 Libgloss uses an autoconf based script to configure. Autoconf scripts
 are portable shell scripts that are generated from a configure.in file.
@@ -302,7 +302,7 @@ and uninstalled object tree. It also makes it easier to debug the other
 tools using libgloss's test suites.
 
 @node Board support, , Building libgloss, Libgloss
-@subsection Adding Support for a New Board
+@section Adding Support for a New Board
 
 This section explains how to add support for a new board to libgloss.
 In order to add support for a board, you must already have developed a
@@ -378,7 +378,7 @@ is described elsewhere.
 @end menu
 
 @node Overview, Options, , GCC
-@subsection Compilation passes
+@section Compilation passes
 
 GCC by itself only compiles the C or C++ code into assembler. Typically
 GCC invokes all the passes required for you. These passes are cpp, cc1,
