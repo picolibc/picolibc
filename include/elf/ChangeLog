@@ -1,3 +1,7 @@
+2009-06-22  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX*): Define as enum.
+
 2009-06-11  Anthony Green  <green@moxielogic.org>
 
 	* moxie.h (R_MOXIE_PCREL10): New.
