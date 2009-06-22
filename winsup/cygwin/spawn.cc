@@ -357,6 +357,9 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext);
 
+  if (res)
+    goto out;
+
   if (!real_path.iscygexec ()
       && (cygheap->cwd.drive_length == 0
 	  || cygheap->cwd.win32.Length >= MAX_PATH * sizeof (WCHAR)))
@@ -371,9 +374,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
-
-  if (res)
-    goto out;
 
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
@@ -1077,6 +1077,11 @@ just_shell:
 	  pgm = (char *) "/bin/sh";
 	  arg1 = NULL;
 	}
+
+      /* Check if script is executable.  Otherwise we start non-executable
+	 scripts successfully, which is incorrect behaviour. */
+      if (check_file_access (real_path, X_OK) < 0)
+	return -1;	/* errno is already set. */
 
       /* Replace argv[0] with the full path to the script if this is the
 	 first time through the loop. */

@@ -1,3 +1,9 @@
+2009-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Don't run additional check for Win32
+	incompatible CWD if newargv.fixup bailed out already.
+	(av::fixup): Check shell scripts for executability.
+
 2009-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (chdir): Check error conditions first.
