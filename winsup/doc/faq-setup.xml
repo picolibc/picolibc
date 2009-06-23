@@ -318,6 +318,35 @@ what happened that wasn't supposed to happen, etc.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.setup.setup-failes-on-ts">
+<question><para>My installation on a Terminal Server machine goes wrong.  What can I do?</para></question>
+<answer>
+
+<para>The problem is that Terminal Server machines do some compatibility
+checks when running applications which are not marked as
+"Terminal Server-aware", and this compatibility check seems to be buggy,
+leaving parts of the application in a non-executable state.  Curious enough,
+this only happens if DEP (Data Execution Prevention) is turned on for
+all applications.</para>
+
+<para>So far, only few Cygwin packages have their binaries marked as
+TS-aware, which means there's a good chance that the postinstall scripts
+during the installation will break, and that after installation you
+can't start a shell, etc.</para>
+
+<para>So, for the time being, here's how you install Cygwin on a Terminal
+Server.  First, switch DEP to "Turn on DEP for essential Windows programs
+and services only" and reboot the machine.  Then install via setup.exe.
+You can leave it at that and run the Termin Server in the aforementioned
+DEP setting.  Or use the peflags tool from the rebaseall package to set
+the TS-aware flag in all executables, switch DEP back to "Turn on DEP for
+all programs and services except [...]" and reboot again.  However,
+please keep in mind that a package update might re-install a binary
+with the TS-aware flag switched off again.  So you will have to re-use
+the peflags utility once in a while.
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.setup.name-with-space">
 <question><para>My Windows logon name has a space in it, will this cause problems?</para></question>
 <answer>
