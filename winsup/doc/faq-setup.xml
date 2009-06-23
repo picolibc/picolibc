@@ -338,7 +338,7 @@ can't start a shell, etc.</para>
 Server.  First, switch DEP to "Turn on DEP for essential Windows programs
 and services only" and reboot the machine.  Then install via setup.exe.
 You can leave it at that and run the Termin Server in the aforementioned
-DEP setting.  Or use the peflags tool from the rebaseall package to set
+DEP setting.  Or use the peflags tool from the rebase package to set
 the TS-aware flag in all executables, switch DEP back to "Turn on DEP for
 all programs and services except [...]" and reboot again.  However,
 please keep in mind that a package update might re-install a binary

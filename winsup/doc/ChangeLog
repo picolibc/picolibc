@@ -1,5 +1,10 @@
 2009-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-setup.xml (faq.setup.setup-failes-on-ts): Change rebaseall to
+	rebase.
+
+2009-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-setup.xml (faq.setup.setup-failes-on-ts): New FAQ entry.
 
 2009-06-19  Corinna Vinschen  <corinna@vinschen.de>
