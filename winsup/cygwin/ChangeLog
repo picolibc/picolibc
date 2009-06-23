@@ -1,3 +1,8 @@
+2009-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_server_groups): Ignore errors from
+	get_user_local_groups.
+
 2009-06-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Don't run additional check for Win32

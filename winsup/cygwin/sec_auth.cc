@@ -404,12 +404,9 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
       && !get_user_groups (server, grp_list, user, domain)
       && get_logon_server (domain, server, true))
     get_user_groups (server, grp_list, user, domain);
-  if (get_user_local_groups (server, domain, grp_list, user))
-    {
-      get_unix_group_sidlist (pw, grp_list);
-      return true;
-    }
-  return false;
+  get_user_local_groups (server, domain, grp_list, user);
+  get_unix_group_sidlist (pw, grp_list);
+  return true;
 }
 
 static bool
