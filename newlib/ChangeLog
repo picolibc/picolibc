@@ -1,3 +1,9 @@
+2009-06-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (MATHOBJS_IN_LIBC): Add s_fpclassify and
+	sf_fpclassify as these are now used for infinity testing.
+	* Makefile.in: Regenerated.
+
 2009-06-19  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/sys/rtems/machine/param.h: Change ALIGNBYTES
