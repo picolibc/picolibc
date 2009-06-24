@@ -337,7 +337,7 @@ can't start a shell, etc.</para>
 <para>So, for the time being, here's how you install Cygwin on a Terminal
 Server.  First, switch DEP to "Turn on DEP for essential Windows programs
 and services only" and reboot the machine.  Then install via setup.exe.
-You can leave it at that and run the Termin Server in the aforementioned
+You can leave it at that and run the Terminal Server in the aforementioned
 DEP setting.  Or use the peflags tool from the rebase package to set
 the TS-aware flag in all executables, switch DEP back to "Turn on DEP for
 all programs and services except [...]" and reboot again.  However,

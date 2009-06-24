@@ -1,5 +1,9 @@
 2009-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-setup.xml (faq.setup.setup-fails-on-ts): Fix another typo.
+
+2009-06-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-setup.xml (faq.setup.setup-fails-on-ts): Fix typo.
 
 2009-06-23  Corinna Vinschen  <corinna@vinschen.de>
