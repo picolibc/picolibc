@@ -318,7 +318,7 @@ what happened that wasn't supposed to happen, etc.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.setup.setup-failes-on-ts">
+<qandaentry id="faq.setup.setup-fails-on-ts">
 <question><para>My installation on a Terminal Server machine goes wrong.  What can I do?</para></question>
 <answer>
 
