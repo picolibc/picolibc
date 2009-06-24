@@ -74,6 +74,7 @@ BOOL WINAPI WTSQuerySessionInformationA(HANDLE hServer, DWORD SessionId, WTS_INF
                                 LPSTR *ppBuffer, DWORD *pBytesReturned);
 BOOL WINAPI WTSQuerySessionInformationW(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass,
                                 LPTSTR *ppBuffer, DWORD *pBytesReturned);
+BOOL WINAPI WTSQueryUserToken(ULONG SessionId, PHANDLE pToken);
 void WINAPI WTSFreeMemory(PVOID pMemory);
 
 #ifdef UNICODE
@@ -85,6 +86,26 @@ void WINAPI WTSFreeMemory(PVOID pMemory);
 #endif /* _WIN32_WINNT >= 0x0501 */
 
 #if (_WIN32_WINNT >= 0x0500)
+
+typedef struct _WTS_SESSION_INFOW {
+  DWORD SessionId;
+  LPWSTR pWinStationName;
+  WTS_CONNECTSTATE_CLASS State;
+} WTS_SESSION_INFOW, *PWTS_SESSION_INFOW;
+
+typedef struct _WTS_SESSION_INFOA {
+  DWORD SessionId;
+  LPSTR pWinStationName;
+  WTS_CONNECTSTATE_CLASS State;
+} WTS_SESSION_INFOA, *PWTS_SESSION_INFOA;
+
+#ifdef UNICODE
+#define WTS_SESSION_INFO	WTS_SESSION_INFOW
+#define PWTS_SESSION_INFO	PWTS_SESSION_INFOW
+#else
+#define WTS_SESSION_INFO	WTS_SESSION_INFOA
+#define PWTS_SESSION_INFO	PWTS_SESSION_INFOA
+#endif
 
   // WTSWaitSystemEvent local server handle
 #define WTS_CURRENT_SERVER_HANDLE 0
@@ -106,6 +127,19 @@ void WINAPI WTSFreeMemory(PVOID pMemory);
 
 BOOL WINAPI WTSWaitSystemEvent(HANDLE hServer, DWORD EventMask, DWORD* pEventFlags);
 BOOL WINAPI WTSDisconnectSession(HANDLE hServer, DWORD SessionId, BOOL bWait);
+BOOL WINAPI WTSEnumerateSessionsW(HANDLE hServer, DWORD Reserved, DWORD Version,
+				  PWTS_SESSION_INFOW *ppSessionInfo,
+				  PDWORD pCount);
+BOOL WINAPI WTSEnumerateSessionsA(HANDLE hServer, DWORD Reserved, DWORD Version,
+				  PWTS_SESSION_INFOA *ppSessionInfo,
+				  PDWORD pCount);
+
+#ifdef UNICODE
+#define WTSEnumerateSessions WTSEnumerateSessionsW
+#else
+#define WTSEnumerateSessions WTSEnumerateSessionsA
+#endif
+
 #endif /* _WIN32_WINNT >= 0x0500 */
 
 #ifdef __cplusplus

@@ -1,3 +1,11 @@
+2009-06-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/wtsapi32.h (WTSQueryUserToken, WTSEnumerateSessionsW,
+	WTSEnumerateSessionsA): Add function prototypes.
+	(struct _WTS_SESSION_INFOW, struct _WTS_SESSION_INFOA): Add typedefs.
+	(WTS_SESSION_INFO, PWTS_SESSION_INFO, WTSEnumerateSessions): Add
+	defines dependent on UNICODE setting.
+
 2009-06-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/ddk/ntapi.h: Add NtXxx equivalent to ZwXxx where missing
