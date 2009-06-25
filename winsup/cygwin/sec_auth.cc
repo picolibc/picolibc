@@ -1087,7 +1087,10 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	{
 	  debug_printf ("Linked Token: %p", linked.LinkedToken);
 	  if (linked.LinkedToken)
-	    user_token = linked.LinkedToken;
+	    {
+	      CloseHandle (user_token);
+	      user_token = linked.LinkedToken;
+	    }
 	}
     }
 
@@ -1178,7 +1181,10 @@ lsaprivkeyauth (struct passwd *pw)
 	    {
 	      debug_printf ("Linked Token: %p", linked.LinkedToken);
 	      if (linked.LinkedToken)
-		token = linked.LinkedToken;
+		{
+		  CloseHandle (token);
+		  token = linked.LinkedToken;
+		}
 	    }
 	}
       if (!SetHandleInformation (token, HANDLE_FLAG_INHERIT,

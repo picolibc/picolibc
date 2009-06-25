@@ -1,3 +1,8 @@
+2009-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (lsaauth): Close unused handle.
+	(lsaprivkeyauth): Ditto.
+
 2009-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (get_server_groups): Ignore errors from
