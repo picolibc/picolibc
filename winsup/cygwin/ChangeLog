@@ -1,3 +1,8 @@
+2009-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.h (wincaps::has_broken_alloc_console): New element.
+	* wincap.cc: Implement above element throughout.
+
 2009-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (lsaauth): Close unused handle.
