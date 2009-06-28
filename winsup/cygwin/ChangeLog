@@ -1,9 +1,27 @@
 2009-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base::has_ongoing_io): Declare new function.
+	* fhandler.cc (fhandler_base::has_ongoing_io): Define new function.
+	(fhandler_base::read_overlapped): Use has_ongoing_io to avoid writing
+	when handle has not completed last I/O.
+	(fhandler_base::write_overlapped): Ditto.
+	* select.cc (peek_pipe): Be more careful about accessing hEvent field
+	from get_overlapped().
+
+2009-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* gendef (cleanup): Rename from 'nocr'.  Remove comments and trailing
 	spaces.
 	* cygwin.din: Add long-needed comment describing what
 	dll_crt0__FP11per_process demangles to.
+
+	* select.cc (peek_pipe): Flag handle as not ready for write if event is
+	not signalled.
+	* fhandler.cc (fhandler_base::setup_overlapped): Establish event as
+	already signalled.
+	(fhandler_base::wait_overlapped): Don't reset event after we've
+	successfully waited.  MSDN documentation says that this happens
+	automatically after a WriteFileEx/ReadFileEx.
 
 2009-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
