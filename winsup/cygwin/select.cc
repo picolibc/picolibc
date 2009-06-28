@@ -513,9 +513,7 @@ out:
       else if (fh->get_device () == FH_PIPER)
 	select_printf ("%s, select for write on read end of pipe",
 		       fh->get_name ());
-      else if (fh->get_overlapped () && fh->get_overlapped ()->hEvent
-	       && WaitForSingleObject (fh->get_overlapped ()->hEvent, 0)
-	           != WAIT_OBJECT_0)
+      else if (fh->has_ongoing_io ())
 	s->write_ready = false;
       else
 	{

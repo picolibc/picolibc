@@ -1,5 +1,10 @@
 2009-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* select.cc (peek_pipe): Use has_ongoing_io() to determine if the pipe
+	is ready for writing rather than performing brute-force checks.
+
+2009-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_base::has_ongoing_io): Declare new function.
 	* fhandler.cc (fhandler_base::has_ongoing_io): Define new function.
 	(fhandler_base::read_overlapped): Use has_ongoing_io to avoid writing
