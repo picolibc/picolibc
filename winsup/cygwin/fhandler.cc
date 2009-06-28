@@ -1652,7 +1652,7 @@ fhandler_base::setup_overlapped (bool doit)
   if (doit)
     {
       set_overlapped (ov);
-      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
+      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL));
     }
   else
     {
@@ -1758,12 +1758,6 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
       debug_printf ("EOF");
     }
 
-  /* Make sure the event is unsignalled (this is a potential race in a multi-threaded
-     app.  Sigh.).  Must do this after WFMO and GetOverlappedResult or suffer
-     occasional sporadic problems:
-	http://cygwin.com/ml/cygwin/2008-08/msg00511.html */
-  if (err != ERROR_IO_PENDING)
-    ResetEvent (get_overlapped ()->hEvent);
   if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
     raise (SIGPIPE);
   return res;

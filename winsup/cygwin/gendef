@@ -8,7 +8,8 @@
 # details.
 #
 use strict;
-sub nocr(@);
+sub cleanup(@);
+
 my $in = shift;
 my $tls_offsets = shift;
 my $out = shift;
@@ -24,11 +25,11 @@ require $tls_offsets;
 open(IN, $in) or die "$0: couldn't open \"$in\" - $!\n";
 my @top = ();
 while (<IN>) {
-    push(@top, nocr $_);
+    push(@top, cleanup $_);
     last if /^\s*exports\s*$/i;
 }
-my $libline = nocr scalar(<IN>);
-my @in = nocr <IN>;
+my $libline = cleanup scalar(<IN>);
+my @in = cleanup <IN>;
 close(IN);
 
 my %sigfe = ();
@@ -456,6 +457,8 @@ _longjmp:
 EOF
 }
 
-sub nocr(@) {
+sub cleanup(@) {
     map {s/\r//g; $_} @_;
+    map {s/#.*//g; $_} @_;
+    map {s/[ \t]+$//g; $_} @_;
 }

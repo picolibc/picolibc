@@ -1,3 +1,10 @@
+2009-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* gendef (cleanup): Rename from 'nocr'.  Remove comments and trailing
+	spaces.
+	* cygwin.din: Add long-needed comment describing what
+	dll_crt0__FP11per_process demangles to.
+
 2009-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.h (wincaps::has_broken_alloc_console): New element.

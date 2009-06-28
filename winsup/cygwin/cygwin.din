@@ -273,7 +273,7 @@ dlclose SIGFE
 dlerror NOSIGFE
 dlfork NOSIGFE
 _dll_crt0@0 NOSIGFE
-dll_crt0__FP11per_process NOSIGFE
+dll_crt0__FP11per_process NOSIGFE # dll_crt0(per_process *)
 dll_dllcrt0 NOSIGFE
 dll_entry@12 NOSIGFE
 dll_noncygwin_dllcrt0 NOSIGFE
