@@ -517,10 +517,6 @@ out:
 	s->write_ready = false;
       else
 	{
-#if 0
-/* FIXME: This code is not quite correct.  There's no better solution
-   so far but to make simple assumptions based on WriteQuotaAvailable. */
-
 	  IO_STATUS_BLOCK iosb = {0};
 	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
@@ -562,9 +558,6 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
-#else
-	  gotone += s->write_ready = true;
-#endif
 	}
     }
 
