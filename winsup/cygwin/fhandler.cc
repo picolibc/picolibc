@@ -1764,9 +1764,9 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
 }
 
 bool __stdcall
-fhandler_base::has_ongoing_io ()
+fhandler_base::has_ongoing_io (bool testit)
 {
-  if (get_overlapped () && get_overlapped ()->hEvent
+  if (testit && get_overlapped () && get_overlapped ()->hEvent
       && WaitForSingleObject (get_overlapped ()->hEvent, 0) != WAIT_OBJECT_0)
     {
       set_errno (EAGAIN);
@@ -1781,7 +1781,7 @@ fhandler_base::read_overlapped (void *ptr, size_t& len)
   DWORD nbytes;
   while (1)
     {
-      if (has_ongoing_io ())
+      if (has_ongoing_io (is_nonblocking ()))
 	{
 	  nbytes = (DWORD) -1;
 	  break;
@@ -1801,7 +1801,7 @@ fhandler_base::write_overlapped (const void *ptr, size_t len)
   DWORD nbytes;
   while (1)
     {
-      if (has_ongoing_io ())
+      if (has_ongoing_io (is_nonblocking ()))
 	{
 	  nbytes = (DWORD) -1;
 	  break;

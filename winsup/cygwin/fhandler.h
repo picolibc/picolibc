@@ -302,7 +302,7 @@ class fhandler_base
   virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  virtual bool __stdcall has_ongoing_io () __attribute__ ((regparm (1)));
+  virtual bool __stdcall has_ongoing_io (bool) __attribute__ ((regparm (2)));
   virtual int write (const void *ptr, size_t len);
   virtual int __stdcall write_overlapped (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);

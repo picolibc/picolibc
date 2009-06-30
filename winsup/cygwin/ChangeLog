@@ -1,3 +1,14 @@
+2009-06-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::has_ongoing_io): Accept an argument
+	indicating whether the overlapped event should be tested.
+	(fhandler_base::read_overlapped): Pass is_overlapped state to
+	has_ongoing_io.
+	(fhandler_base::write_overlapped): Ditto.
+	* fhandler.h (fhandler_base::has_ongoing_io): Accommodate argument
+	change.
+	* select.cc (peek_pipe): Ditto.
+
 2009-06-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (fdsock): Set default socket buffer sizes to 65520.  Change
