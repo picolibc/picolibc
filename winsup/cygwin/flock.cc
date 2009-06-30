@@ -286,7 +286,7 @@ class inode_t
 
     void wait () { ++i_wait; }
     void unwait () { if (i_wait > 0) --i_wait; }
-    bool waiting () { return i_wait > 0; } 
+    bool waiting () { return i_wait > 0; }
 
     lockf_t *get_all_locks_list ();
 

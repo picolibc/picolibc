@@ -1,5 +1,58 @@
 2009-06-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* select.h: New file split from fhandler.h.
+	(select_record::select_record): Define do-nothing constructor for "new"
+	to avoid gratuitous zeroing.
+	(select_info): New base class.
+	(select_pipe_info): New class with methods for dealing with pipes.
+	(select_socket_info): New class with methods for dealing with sockets.
+	(select_serial_info): Dummy class for serial.
+	(select_mailslot_info): Dummy class for mailslots.
+	(select_stuff): Define device_specific_* as actual classes rather than
+	void *.
+	* dtable.h (dtable::select_read): Accommodate return value change to
+	'bool' and argument change to "select_stuff".
+	(dtable::select_write): Ditto.
+	(dtable::select_except): Ditto.
+	* dtable.cc (dtable::select_read): Accommodate return value change to
+	'bool' and argument change to "select_stuff".
+	(dtable::select_write): Ditto.
+	(dtable::select_except): Ditto.
+	* fhandler.h: Excise select-related classes.
+	(fhandler_*::select_read): Change argument to select_stuff.
+	(fhandler_*::select_write): Ditto.
+	(fhandler_*::select_except): Ditto.
+	* select.cc (UNIX_FD_ZERO): Use memset rather than bzero.
+	(select_stuff::test_and_set): Change return type to bool.  Allocate
+	select_record on entry and let fhandler_*::select_* operate on the
+	start.next field of select_stuff.
+	(pipeinf): Delete.
+	(select_pipe_info::select_pipe_info): New constructor.  Allocates event
+	for controlling pipe waits.
+	(select_pipe_info::~select_pipe_info): New destructor.  Destroy event.
+	Stop thread.
+	(select_pipe_info::add_watch_handle): New function.
+	(thread_pipe): Wait for the hEvent part of any overlapped pipes before
+	peeking.
+	(start_thread_pipe): Don't allocate device_specific_pipe stuff here.
+	Assume that it has been allocated earlier.
+	(pipe_cleanup): Rely on select_pipe_info destructor to clean up pipe
+	paraphenalia.
+	(fhandler_*::select_*): Derive select_record from new select_stuff
+	argument.
+	(fhandler_pipe::select_*): Ditto.  Allocate pipe-specific field if not
+	already allocated.
+	(serialinf): Delete.
+	(thread_serial): serialinf -> select_serial_info.
+	(fhandler_base::ready_for_read): Rewrite to accommodate change in
+	argument to fhandler_*::select_*.
+	(socketinf): Delete.
+	(thread_socket): socketinf -> select_socket_info.
+	(mailslotinf): Delete.
+	(thread_mailslot): mailslotinf -> select_mailslot_info.
+
+2009-06-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.cc (fhandler_base::has_ongoing_io): Accept an argument
 	indicating whether the overlapped event should be tested.
 	(fhandler_base::read_overlapped): Pass is_overlapped state to

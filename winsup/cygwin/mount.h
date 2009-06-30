@@ -16,8 +16,8 @@ class fs_info
 {
   struct status_flags
   {
-    ULONG flags;                  /* Volume flags */
-    ULONG samba_version;          /* Samba version if available */
+    ULONG flags;		  /* Volume flags */
+    ULONG samba_version;	  /* Samba version if available */
     ULONG name_len;		  /* MaximumComponentNameLength */
     unsigned is_remote_drive		: 1;
     unsigned has_buggy_open		: 1;

@@ -547,7 +547,7 @@ unlink_nt (path_conv &pc)
 	 way (for instance, font files) by setting the delete disposition fails
 	 with STATUS_CANNOT_DELETE.  Strange enough, deleting these hardlinks
 	 using delete-on-close semantic works... most of the time.
-      
+
 	 Don't use delete-on-close on remote shares.  If two processes
 	 have open handles on a file and one of them calls unlink, the
 	 file is removed from the remote share even though the other
@@ -556,7 +556,7 @@ unlink_nt (path_conv &pc)
 	 Microsoft KB 837665 describes this problem as a bug in 2K3, but
 	 I have reproduced it on other systems. */
       if (status == STATUS_CANNOT_DELETE && !pc.isremote ())
-        {
+	{
 	  HANDLE fh2;
 	  UNICODE_STRING fname;
 
@@ -573,11 +573,11 @@ unlink_nt (path_conv &pc)
 	      syscall_printf ("Setting delete-on-close failed, status = %p",
 			      status);
 	      /* This is really the last chance.  If it hasn't been moved
-	         to the bin already, try it now.  If moving to the bin
+		 to the bin already, try it now.  If moving to the bin
 		 succeeds, we got rid of the file in some way, even if
 		 unlinking didn't work. */
 	      if (bin_stat == dont_move)
-	      	bin_stat = try_to_bin (pc, fh, access);
+		bin_stat = try_to_bin (pc, fh, access);
 	      if (bin_stat == has_been_moved)
 		status = STATUS_SUCCESS;
 	    }
@@ -1563,7 +1563,7 @@ static void
 start_transaction (HANDLE &old_trans, HANDLE &trans)
 {
   NTSTATUS status = NtCreateTransaction (&trans,
-  				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
+				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
 				NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
   if (NT_SUCCESS (status))
     {

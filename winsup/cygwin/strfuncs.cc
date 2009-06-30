@@ -151,7 +151,7 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 
   if (n == 0)
     return -2;
-  
+
   if (pwc == NULL)
     pwc = &dummy;
 
@@ -221,7 +221,7 @@ __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 
   if (n == 0)
     return -2;
-  
+
   if (pwc == NULL)
     pwc = &dummy;
 
@@ -437,7 +437,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
 	  bytes = 1;
 	}
       else if (bytes == -1 && *charset != 'U'/*TF-8*/)
-        {
+	{
 	  /* Convert chars invalid in the current codepage to a sequence
 	     ASCII SO; UTF-8 representation of invalid char. */
 	  buf[0] = 0x0e; /* ASCII SO */
@@ -460,20 +460,20 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
 		}
 	      bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset, &ps);
 	    }
-        }
+	}
       if (n + bytes <= len)
-        {
-          n += bytes;
-          if (dst)
-            {
-              for (int i = 0; i < bytes; ++i)
-                *ptr++ = buf[i];
-            }
-          if (*pwcs++ == 0x00)
+	{
+	  n += bytes;
+	  if (dst)
+	    {
+	      for (int i = 0; i < bytes; ++i)
+		*ptr++ = buf[i];
+	    }
+	  if (*pwcs++ == 0x00)
 	    break;
-        }
+	}
       else
-        break;
+	break;
     }
   if (n && dst)
     {
@@ -558,10 +558,10 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	  if (bytes < 0)
 	    {
 	      /* Invalid UTF-8 sequence?  Treat the ASCII SO character as
-	         stand-alone ASCII SO char. */
+		 stand-alone ASCII SO char. */
 	      bytes = 1;
 	      if (dst)
-	      	*ptr = 0x0e;
+		*ptr = 0x0e;
 	      memset (&ps, 0, sizeof ps);
 	      break;
 	    }
@@ -602,13 +602,13 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	}
 
       if (bytes > 0)
-        {
-          pmbs += bytes;
-          nms -= bytes;
-          ++count;
+	{
+	  pmbs += bytes;
+	  nms -= bytes;
+	  ++count;
 	  ptr = dst ? ptr + 1 : NULL;
-          --len;
-        }
+	  --len;
+	}
       else
 	{
 	  if (bytes == 0)

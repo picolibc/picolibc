@@ -209,7 +209,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   if (format == cygnativeformat)
     {
       unsigned char *buf;
-      
+
       if (!(buf = (unsigned char *) GlobalLock (hglb)))
 	{
 	  CloseClipboard ();

@@ -98,7 +98,7 @@ class pinfo;
 #define PTHREAD_RWLOCK_MAGIC PTHREAD_MAGIC+9
 #define PTHREAD_RWLOCKATTR_MAGIC PTHREAD_MAGIC+10
 
-#define MUTEX_OWNER_ANONYMOUS        ((pthread_t) -1)
+#define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
 /* verifyable_object should not be defined here - it's a general purpose class */
 

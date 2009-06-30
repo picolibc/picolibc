@@ -25,6 +25,7 @@ details. */
 #include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
+#include "select.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "tls_pbuf.h"
@@ -359,7 +360,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
 				    possible for some versions of handles */
       /* FIXME: Workaround Windows 7 64 bit issue.  If the parent process of
-	 the process tree closes the original handles to the console window, 
+	 the process tree closes the original handles to the console window,
 	 strange problems occur when starting child processes later on if
 	 stdio redirection is used.  How to reproduce:
 
@@ -378,7 +379,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	 Remove the `exec 2>' or remove the cat call and the script will work.
 	 Start bash interactively, then start the script manually, and the
 	 script will work.
-	 
+
 	 This needs further investigation but the workaround not to close
 	 the handles will have a marginal hit of three extra handles per
 	 process at most. */
@@ -654,26 +655,26 @@ done:
   return res;
 }
 
-select_record *
-dtable::select_read (int fd, select_record *s)
+bool
+dtable::select_read (int fd, select_stuff *ss)
 {
   if (not_open (fd))
     {
       set_errno (EBADF);
-      return NULL;
+      return false;
     }
   fhandler_base *fh = fds[fd];
-  s = fh->select_read (s);
+  select_record *s = fh->select_read (ss);
   s->fd = fd;
   if (!s->fh)
     s->fh = fh;
   s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
-  return s;
+  return true;
 }
 
-select_record *
-dtable::select_write (int fd, select_record *s)
+bool
+dtable::select_write (int fd, select_stuff *ss)
 {
   if (not_open (fd))
     {
@@ -681,16 +682,16 @@ dtable::select_write (int fd, select_record *s)
       return NULL;
     }
   fhandler_base *fh = fds[fd];
-  s = fh->select_write (s);
+  select_record *s = fh->select_write (ss);
   s->fd = fd;
   s->fh = fh;
   s->thread_errno = 0;
-  debug_printf ("%s fd %d", fh->get_name (), fd);
-  return s;
+  debug_printf ("%s fd %d", fh->get_name ());
+  return true;
 }
 
-select_record *
-dtable::select_except (int fd, select_record *s)
+bool
+dtable::select_except (int fd, select_stuff *ss)
 {
   if (not_open (fd))
     {
@@ -698,12 +699,12 @@ dtable::select_except (int fd, select_record *s)
       return NULL;
     }
   fhandler_base *fh = fds[fd];
-  s = fh->select_except (s);
+  select_record *s = fh->select_except (ss);
   s->fd = fd;
   s->fh = fh;
   s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
-  return s;
+  return true;
 }
 
 void

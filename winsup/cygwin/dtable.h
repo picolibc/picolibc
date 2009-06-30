@@ -57,9 +57,9 @@ public:
   int dup2 (int oldfd, int newfd);
   void fixup_after_exec ();
   inline fhandler_base *&operator [](int fd) const { return fds[fd]; }
-  select_record *select_read (int fd, select_record *s);
-  select_record *select_write (int fd, select_record *s);
-  select_record *select_except (int fd, select_record *s);
+  bool select_read (int fd, select_stuff *);
+  bool select_write (int fd, select_stuff *);
+  bool select_except (int fd, select_stuff *);
   operator fhandler_base **() {return fds;}
   void stdio_init ();
   void get_debugger_info ();

@@ -37,6 +37,7 @@ extern const char proc[];
 extern const int proc_len;
 
 class select_record;
+class select_stuff;
 class fhandler_disk_file;
 class inode_t;
 typedef struct __DIR DIR;
@@ -354,9 +355,9 @@ class fhandler_base
   virtual HANDLE& get_io_handle () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
   virtual bool hit_eof () {return false;}
-  virtual select_record *select_read (select_record *s);
-  virtual select_record *select_write (select_record *s);
-  virtual select_record *select_except (select_record *s);
+  virtual select_record *select_read (select_stuff *);
+  virtual select_record *select_write (select_stuff *);
+  virtual select_record *select_except (select_stuff *);
   virtual int ready_for_read (int fd, DWORD howlong);
   virtual const char *get_native_name ()
   {
@@ -394,7 +395,7 @@ class fhandler_mailslot : public fhandler_base
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
-  select_record *select_read (select_record *s);
+  select_record *select_read (select_stuff *);
 };
 
 struct wsa_event
@@ -507,9 +508,9 @@ class fhandler_socket: public fhandler_base
   void fixup_after_fork (HANDLE);
   char *get_proc_fd_name (char *buf);
 
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   int ready_for_read (int, DWORD) { return true; }
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
@@ -543,9 +544,9 @@ public:
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}
   _off64_t lseek (_off64_t offset, int whence);
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   char *get_proc_fd_name (char *buf);
   void raw_read (void *ptr, size_t& len);
   int raw_write (const void *, size_t);
@@ -584,9 +585,9 @@ public:
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   OVERLAPPED *get_overlapped () {return &io_status;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
 };
 
 class fhandler_dev_raw: public fhandler_base
@@ -784,9 +785,9 @@ class fhandler_serial: public fhandler_base
      permission checking on pgrps.  */
   virtual int tcgetpgrp () { return pgrp_; }
   virtual int tcsetpgrp (const pid_t pid) { pgrp_ = pid; return 0; }
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   bool is_slow () {return true;}
 };
 
@@ -964,9 +965,9 @@ class fhandler_console: public fhandler_termios
   void init (HANDLE, DWORD, mode_t);
   bool mouse_aware () {return dev_state->use_mouse;}
 
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   void fixup_after_fork_exec (bool);
   void fixup_after_exec () {fixup_after_fork_exec (true);}
   void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
@@ -1006,9 +1007,9 @@ class fhandler_tty_common: public fhandler_termios
   int close ();
   _off64_t lseek (_off64_t, int);
   void set_close_on_exec (bool val);
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   bool is_slow () {return true;}
 };
 
@@ -1033,7 +1034,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
 
-  select_record *select_read (select_record *s);
+  select_record *select_read (select_stuff *);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
   int get_unit ();
   virtual char const *ttyname () { return pc.dev.name; }
@@ -1090,9 +1091,9 @@ class fhandler_dev_null: public fhandler_base
  public:
   fhandler_dev_null ();
 
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
 };
 
 class fhandler_dev_zero: public fhandler_base
@@ -1194,9 +1195,9 @@ class fhandler_windows: public fhandler_base
 
   void set_close_on_exec (bool val);
   void fixup_after_fork (HANDLE parent);
-  select_record *select_read (select_record *s);
-  select_record *select_write (select_record *s);
-  select_record *select_except (select_record *s);
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   bool is_slow () {return true;}
 };
 
@@ -1384,55 +1385,4 @@ typedef union
   char __virtual[sizeof (fhandler_virtual)];
   char __windows[sizeof (fhandler_windows)];
 } fhandler_union;
-
-struct select_record
-{
-  int fd;
-  HANDLE h;
-  fhandler_base *fh;
-  int thread_errno;
-  bool windows_handle;
-  bool read_ready, write_ready, except_ready;
-  bool read_selected, write_selected, except_selected;
-  bool except_on_write;
-  int (*startup) (select_record *me, class select_stuff *stuff);
-  int (*peek) (select_record *, bool);
-  int (*verify) (select_record *me, fd_set *readfds, fd_set *writefds,
-		 fd_set *exceptfds);
-  void (*cleanup) (select_record *me, class select_stuff *stuff);
-  struct select_record *next;
-  void set_select_errno () {__seterrno (); thread_errno = errno;}
-  int saw_error () {return thread_errno;}
-
-  select_record (fhandler_base *in_fh = NULL) : fd (0), h (NULL),
-		 fh (in_fh), thread_errno (0), windows_handle (false),
-		 read_ready (false), write_ready (false), except_ready (false),
-		 read_selected (false), write_selected (false),
-		 except_selected (false), except_on_write (false),
-		 startup (NULL), peek (NULL), verify (NULL), cleanup (NULL),
-		 next (NULL) {}
-};
-
-class select_stuff
-{
- public:
-  ~select_stuff ();
-  bool always_ready, windows_used;
-  select_record start;
-  void *device_specific_pipe;
-  void *device_specific_socket;
-  void *device_specific_serial;
-  void *device_specific_mailslot;
-
-  int test_and_set (int i, fd_set *readfds, fd_set *writefds,
-		     fd_set *exceptfds);
-  int poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
-  int wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
-  void cleanup ();
-  select_stuff (): always_ready (0), windows_used (0), start (0),
-		   device_specific_pipe (0),
-		   device_specific_socket (0),
-		   device_specific_serial (0),
-		   device_specific_mailslot (0) {}
-};
 #endif /* _FHANDLER_H_ */

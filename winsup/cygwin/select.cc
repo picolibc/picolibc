@@ -27,6 +27,7 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "select.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
@@ -68,7 +69,7 @@ typedef long fd_mask;
 #define UNIX_FD_ISSET(n, p) \
   ((p)->fds_bits[(n)/UNIX_NFDBITS] & (1L << ((n) % UNIX_NFDBITS)))
 #define UNIX_FD_ZERO(p, n) \
-  bzero ((caddr_t)(p), sizeof_fd_set ((n)))
+  memset ((caddr_t) (p), 0, sizeof_fd_set ((n)))
 
 #define allocfd_set(n) ((fd_set *) memset (alloca (sizeof_fd_set (n)), 0, sizeof_fd_set (n)))
 #define copyfd_set(to, from, n) memcpy (to, from, sizeof_fd_set (n));
@@ -205,19 +206,27 @@ select_stuff::~select_stuff ()
 }
 
 /* Add a record to the select chain */
-int
+bool
 select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
 			    fd_set *exceptfds)
 {
-  select_record *s = NULL;
-  if (UNIX_FD_ISSET (i, readfds) && (s = cygheap->fdtab.select_read (i, s)) == NULL)
-    return 0; /* error */
-  if (UNIX_FD_ISSET (i, writefds) && (s = cygheap->fdtab.select_write (i, s)) == NULL)
-    return 0; /* error */
-  if (UNIX_FD_ISSET (i, exceptfds) && (s = cygheap->fdtab.select_except (i, s)) == NULL)
-    return 0; /* error */
-  if (s == NULL)
-    return 1; /* nothing to do */
+  if (!UNIX_FD_ISSET (i, readfds) && !UNIX_FD_ISSET (i, writefds)
+      && ! UNIX_FD_ISSET (i, exceptfds))
+    return true;
+
+  select_record *s = new select_record;
+  if (!s)
+    return false;
+
+  s->next = start.next;
+  start.next = s;
+
+  if (UNIX_FD_ISSET (i, readfds) && !cygheap->fdtab.select_read (i, this))
+    goto err;
+  if (UNIX_FD_ISSET (i, writefds) && !cygheap->fdtab.select_write (i, this))
+    goto err;
+  if (UNIX_FD_ISSET (i, exceptfds) && !cygheap->fdtab.select_except (i, this))
+    goto err; /* error */
 
   if (s->read_ready || s->write_ready || s->except_ready)
     always_ready = true;
@@ -225,9 +234,12 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
   if (s->windows_handle)
     windows_used = true;
 
-  s->next = start.next;
-  start.next = s;
-  return 1;
+  return true;
+
+err:
+  start.next = s->next;
+  delete s;
+  return false;
 }
 
 /* The heart of select.  Waits for an fd to do something interesting. */
@@ -566,36 +578,61 @@ out:
 
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
-struct pipeinf
-  {
-    cygthread *thread;
-    bool stop_thread_pipe;
-    select_record *start;
-  };
+select_pipe_info::select_pipe_info ()
+{
+  n = 1;
+  w4[0] = CreateEvent (&sec_none_nih, true, false, NULL);
+}
+
+select_pipe_info::~select_pipe_info ()
+{
+  if (thread)
+    {
+      SetEvent (w4[0]);
+      stop_thread = true;
+      thread->detach ();
+    }
+  ForceCloseHandle (w4[0]);
+}
+
+void
+select_pipe_info::add_watch_handle (fhandler_pipe *fh)
+{
+  if (fh->get_overlapped () && fh->get_overlapped ()->hEvent)
+    w4[n++] = fh->get_overlapped ()->hEvent;
+}
 
 static DWORD WINAPI
 thread_pipe (void *arg)
 {
-  pipeinf *pi = (pipeinf *) arg;
+  select_pipe_info *pi = (select_pipe_info *) arg;
   bool gotone = false;
   DWORD sleep_time = 0;
 
   for (;;)
     {
       select_record *s = pi->start;
+      if (pi->n > 1)
+	switch (WaitForMultipleObjects (pi->n, pi->w4, false, INFINITE))
+	  {
+	  case WAIT_OBJECT_0:
+	    goto out;
+	  default:
+	    break;
+	  }
       while ((s = s->next))
 	if (s->startup == start_thread_pipe)
 	  {
 	    if (peek_pipe (s, true))
 	      gotone = true;
-	    if (pi->stop_thread_pipe)
+	    if (pi->stop_thread)
 	      {
 		select_printf ("stopping");
 		goto out;
 	      }
 	  }
       /* Paranoid check */
-      if (pi->stop_thread_pipe)
+      if (pi->stop_thread)
 	{
 	  select_printf ("stopping from outer loop");
 	  break;
@@ -613,31 +650,27 @@ out:
 static int
 start_thread_pipe (select_record *me, select_stuff *stuff)
 {
-  if (stuff->device_specific_pipe)
+  select_pipe_info *pi = stuff->device_specific_pipe;
+  if (pi->start)
+    me->h = *((select_pipe_info *) stuff->device_specific_pipe)->thread;
+  else
     {
-      me->h = *((pipeinf *) stuff->device_specific_pipe)->thread;
-      return 1;
+      pi->start = &stuff->start;
+      pi->stop_thread = false;
+      pi->thread = new cygthread (thread_pipe, 0, pi, "select_pipe");
+      me->h = *pi->thread;
+      if (!me->h)
+	return 0;
     }
-  pipeinf *pi = new pipeinf;
-  pi->start = &stuff->start;
-  pi->stop_thread_pipe = false;
-  pi->thread = new cygthread (thread_pipe, 0, pi, "select_pipe");
-  me->h = *pi->thread;
-  if (!me->h)
-    return 0;
-  stuff->device_specific_pipe = (void *) pi;
   return 1;
 }
 
 static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
-  pipeinf *pi = (pipeinf *) stuff->device_specific_pipe;
-  if (pi && pi->thread)
+  if (stuff->device_specific_pipe)
     {
-      pi->stop_thread_pipe = true;
-      pi->thread->detach ();
-      delete pi;
+      delete stuff->device_specific_pipe;
       stuff->device_specific_pipe = NULL;
     }
 }
@@ -654,10 +687,14 @@ fhandler_pipe::ready_for_read (int fd, DWORD howlong)
 }
 
 select_record *
-fhandler_pipe::select_read (select_record *s)
+fhandler_pipe::select_read (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+  ss->device_specific_pipe->add_watch_handle (this);
+
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -668,10 +705,13 @@ fhandler_pipe::select_read (select_record *s)
 }
 
 select_record *
-fhandler_pipe::select_write (select_record *s)
+fhandler_pipe::select_write (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+  ss->device_specific_pipe->add_watch_handle (this);
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -682,10 +722,13 @@ fhandler_pipe::select_write (select_record *s)
 }
 
 select_record *
-fhandler_pipe::select_except (select_record *s)
+fhandler_pipe::select_except (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+  ss->device_specific_pipe->add_watch_handle (this);
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -696,10 +739,9 @@ fhandler_pipe::select_except (select_record *s)
 }
 
 select_record *
-fhandler_fifo::select_read (select_record *s)
+fhandler_fifo::select_read (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -710,10 +752,9 @@ fhandler_fifo::select_read (select_record *s)
 }
 
 select_record *
-fhandler_fifo::select_write (select_record *s)
+fhandler_fifo::select_write (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -724,10 +765,9 @@ fhandler_fifo::select_write (select_record *s)
 }
 
 select_record *
-fhandler_fifo::select_except (select_record *s)
+fhandler_fifo::select_except (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
@@ -804,11 +844,11 @@ verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
 
 
 select_record *
-fhandler_console::select_read (select_record *s)
+fhandler_console::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_console;
       set_cursor_maybe ();
@@ -822,11 +862,11 @@ fhandler_console::select_read (select_record *s)
 }
 
 select_record *
-fhandler_console::select_write (select_record *s)
+fhandler_console::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = no_verify;
       set_cursor_maybe ();
@@ -839,11 +879,11 @@ fhandler_console::select_write (select_record *s)
 }
 
 select_record *
-fhandler_console::select_except (select_record *s)
+fhandler_console::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = no_verify;
       set_cursor_maybe ();
@@ -856,21 +896,21 @@ fhandler_console::select_except (select_record *s)
 }
 
 select_record *
-fhandler_tty_common::select_read (select_record *s)
+fhandler_tty_common::select_read (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_read (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_read (ss);
 }
 
 select_record *
-fhandler_tty_common::select_write (select_record *s)
+fhandler_tty_common::select_write (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_write (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_write (ss);
 }
 
 select_record *
-fhandler_tty_common::select_except (select_record *s)
+fhandler_tty_common::select_except (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_except (s);
+  return ((fhandler_pipe *) this)->fhandler_pipe::select_except (ss);
 }
 
 static int
@@ -883,10 +923,9 @@ verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 select_record *
-fhandler_tty_slave::select_read (select_record *s)
+fhandler_tty_slave::select_read (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  select_record *s = ss->start.next;
   s->h = input_available_event;
   s->startup = no_startup;
   s->peek = peek_pipe;
@@ -898,11 +937,11 @@ fhandler_tty_slave::select_read (select_record *s)
 }
 
 select_record *
-fhandler_dev_null::select_read (select_record *s)
+fhandler_dev_null::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = no_verify;
     }
@@ -913,11 +952,11 @@ fhandler_dev_null::select_read (select_record *s)
 }
 
 select_record *
-fhandler_dev_null::select_write (select_record *s)
+fhandler_dev_null::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = no_verify;
     }
@@ -928,11 +967,11 @@ fhandler_dev_null::select_write (select_record *s)
 }
 
 select_record *
-fhandler_dev_null::select_except (select_record *s)
+fhandler_dev_null::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = no_verify;
     }
@@ -943,13 +982,6 @@ fhandler_dev_null::select_except (select_record *s)
 }
 
 static int start_thread_serial (select_record *me, select_stuff *stuff);
-
-struct serialinf
-  {
-    cygthread *thread;
-    bool stop_thread_serial;
-    select_record *start;
-  };
 
 static int
 peek_serial (select_record *s, bool)
@@ -1057,7 +1089,7 @@ err:
 static DWORD WINAPI
 thread_serial (void *arg)
 {
-  serialinf *si = (serialinf *) arg;
+  select_serial_info *si = (select_serial_info *) arg;
   bool gotone = false;
 
   for (;;)
@@ -1069,7 +1101,7 @@ thread_serial (void *arg)
 	    if (peek_serial (s, true))
 	      gotone = true;
 	  }
-      if (si->stop_thread_serial)
+      if (si->stop_thread)
 	{
 	  select_printf ("stopping");
 	  break;
@@ -1086,26 +1118,26 @@ static int
 start_thread_serial (select_record *me, select_stuff *stuff)
 {
   if (stuff->device_specific_serial)
+    me->h = *((select_serial_info *) stuff->device_specific_serial)->thread;
+  else
     {
-      me->h = *((serialinf *) stuff->device_specific_serial)->thread;
-      return 1;
+      select_serial_info *si = new select_serial_info;
+      si->start = &stuff->start;
+      si->stop_thread = false;
+      si->thread = new cygthread (thread_serial, 0,  si, "select_serial");
+      me->h = *si->thread;
+      stuff->device_specific_serial = si;
     }
-  serialinf *si = new serialinf;
-  si->start = &stuff->start;
-  si->stop_thread_serial = false;
-  si->thread = new cygthread (thread_serial, 0,  si, "select_serial");
-  me->h = *si->thread;
-  stuff->device_specific_serial = (void *) si;
   return 1;
 }
 
 static void
 serial_cleanup (select_record *, select_stuff *stuff)
 {
-  serialinf *si = (serialinf *) stuff->device_specific_serial;
+  select_serial_info *si = (select_serial_info *) stuff->device_specific_serial;
   if (si && si->thread)
     {
-      si->stop_thread_serial = true;
+      si->stop_thread = true;
       si->thread->detach ();
       delete si;
       stuff->device_specific_serial = NULL;
@@ -1113,11 +1145,11 @@ serial_cleanup (select_record *, select_stuff *stuff)
 }
 
 select_record *
-fhandler_serial::select_read (select_record *s)
+fhandler_serial::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = start_thread_serial;
       s->verify = verify_ok;
       s->cleanup = serial_cleanup;
@@ -1129,11 +1161,11 @@ fhandler_serial::select_read (select_record *s)
 }
 
 select_record *
-fhandler_serial::select_write (select_record *s)
+fhandler_serial::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1145,11 +1177,11 @@ fhandler_serial::select_write (select_record *s)
 }
 
 select_record *
-fhandler_serial::select_except (select_record *s)
+fhandler_serial::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1164,46 +1196,57 @@ int
 fhandler_base::ready_for_read (int fd, DWORD howlong)
 {
   bool avail = false;
-  select_record me (this);
-  me.fd = fd;
-  while (!avail)
+
+  select_stuff sel;
+  fd_set *thisfd = allocfd_set (fd + 1);
+  fd_set *dummy_writefds = allocfd_set (fd + 1);
+  fd_set *dummy_exceptfds = allocfd_set (fd + 1);
+  UNIX_FD_SET(fd, thisfd);
+
+  if (!sel.test_and_set (fd, thisfd, dummy_writefds, dummy_exceptfds))
+    select_printf ("aborting due to test_and_set error");
+  else
     {
-      select_read (&me);
-      avail = me.read_ready ?: me.peek (&me, false);
-
-      if (fd >= 0 && cygheap->fdtab.not_open (fd))
+      select_record *me = sel.start.next;
+      while (!avail)
 	{
-	  set_sig_errno (EBADF);
-	  avail = false;
-	  break;
-	}
+	  avail = me->read_ready ?: me->peek (me, false);
 
-      if (howlong != INFINITE)
-	{
-	  if (!avail)
-	    set_sig_errno (EAGAIN);
-	  break;
-	}
+	  if (fd >= 0 && cygheap->fdtab.not_open (fd))
+	    {
+	      set_sig_errno (EBADF);
+	      avail = false;
+	      break;
+	    }
 
-      if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
-	{
-	  debug_printf ("interrupted");
-	  set_sig_errno (EINTR);
-	  avail = false;
-	  break;
+	  if (howlong != INFINITE)
+	    {
+	      if (!avail)
+		set_sig_errno (EAGAIN);
+	      break;
+	    }
+
+	  if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
+	    {
+	      debug_printf ("interrupted");
+	      set_sig_errno (EINTR);
+	      avail = false;
+	      break;
+	    }
 	}
     }
 
-  select_printf ("read_ready %d, avail %d", me.read_ready, avail);
+  select_printf ("read_ready %d, avail %d", sel.start.next->read_ready, avail);
+  sel.cleanup ();
   return avail;
 }
 
 select_record *
-fhandler_base::select_read (select_record *s)
+fhandler_base::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1214,11 +1257,11 @@ fhandler_base::select_read (select_record *s)
 }
 
 select_record *
-fhandler_base::select_write (select_record *s)
+fhandler_base::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1229,11 +1272,11 @@ fhandler_base::select_write (select_record *s)
 }
 
 select_record *
-fhandler_base::select_except (select_record *s)
+fhandler_base::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1268,20 +1311,10 @@ peek_socket (select_record *me, bool)
 
 static int start_thread_socket (select_record *, select_stuff *);
 
-struct socketinf
-  {
-    cygthread *thread;
-    int max_w4;
-    int num_w4;
-    LONG *ser_num;
-    HANDLE *w4;
-    select_record *start;
-  };
-
 static DWORD WINAPI
 thread_socket (void *arg)
 {
-  socketinf *si = (socketinf *) arg;
+  select_socket_info *si = (select_socket_info *) arg;
   DWORD timeout = 64 / (si->max_w4 / MAXIMUM_WAIT_OBJECTS);
   bool event = false;
 
@@ -1317,15 +1350,15 @@ out:
 static int
 start_thread_socket (select_record *me, select_stuff *stuff)
 {
-  socketinf *si;
+  select_socket_info *si;
 
-  if ((si = (socketinf *) stuff->device_specific_socket))
+  if ((si = (select_socket_info *) stuff->device_specific_socket))
     {
       me->h = *si->thread;
       return 1;
     }
 
-  si = new socketinf;
+  si = new select_socket_info;
   si->ser_num = (LONG *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (LONG));
   si->w4 = (HANDLE *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (HANDLE));
   if (!si->ser_num || !si->w4)
@@ -1370,7 +1403,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
       continue_outer_loop:
 	;
       }
-  stuff->device_specific_socket = (void *) si;
+  stuff->device_specific_socket = si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
   si->thread = new cygthread (thread_socket, 0,  si, "select_socket");
@@ -1381,7 +1414,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 void
 socket_cleanup (select_record *, select_stuff *stuff)
 {
-  socketinf *si = (socketinf *) stuff->device_specific_socket;
+  select_socket_info *si = (select_socket_info *) stuff->device_specific_socket;
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
   if (si && si->thread)
     {
@@ -1400,11 +1433,11 @@ socket_cleanup (select_record *, select_stuff *stuff)
 }
 
 select_record *
-fhandler_socket::select_read (select_record *s)
+fhandler_socket::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = start_thread_socket;
       s->verify = verify_true;
       s->cleanup = socket_cleanup;
@@ -1416,11 +1449,11 @@ fhandler_socket::select_read (select_record *s)
 }
 
 select_record *
-fhandler_socket::select_write (select_record *s)
+fhandler_socket::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = start_thread_socket;
       s->verify = verify_true;
       s->cleanup = socket_cleanup;
@@ -1437,11 +1470,11 @@ fhandler_socket::select_write (select_record *s)
 }
 
 select_record *
-fhandler_socket::select_except (select_record *s)
+fhandler_socket::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = start_thread_socket;
       s->verify = verify_true;
       s->cleanup = socket_cleanup;
@@ -1482,11 +1515,11 @@ verify_windows (select_record *me, fd_set *rfds, fd_set *wfds,
 }
 
 select_record *
-fhandler_windows::select_read (select_record *s)
+fhandler_windows::select_read (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
     }
   s->verify = verify_windows;
@@ -1499,11 +1532,11 @@ fhandler_windows::select_read (select_record *s)
 }
 
 select_record *
-fhandler_windows::select_write (select_record *s)
+fhandler_windows::select_write (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1516,11 +1549,11 @@ fhandler_windows::select_write (select_record *s)
 }
 
 select_record *
-fhandler_windows::select_except (select_record *s)
+fhandler_windows::select_except (select_stuff *ss)
 {
-  if (!s)
+  select_record *s = ss->start.next;
+  if (!s->startup)
     {
-      s = new select_record;
       s->startup = no_startup;
       s->verify = verify_ok;
     }
@@ -1565,17 +1598,10 @@ verify_mailslot (select_record *me, fd_set *rfds, fd_set *wfds,
 
 static int start_thread_mailslot (select_record *me, select_stuff *stuff);
 
-struct mailslotinf
-  {
-    cygthread *thread;
-    bool stop_thread_mailslot;
-    select_record *start;
-  };
-
 static DWORD WINAPI
 thread_mailslot (void *arg)
 {
-  mailslotinf *mi = (mailslotinf *) arg;
+  select_mailslot_info *mi = (select_mailslot_info *) arg;
   bool gotone = false;
   DWORD sleep_time = 0;
 
@@ -1587,14 +1613,14 @@ thread_mailslot (void *arg)
 	  {
 	    if (peek_mailslot (s, true))
 	      gotone = true;
-	    if (mi->stop_thread_mailslot)
+	    if (mi->stop_thread)
 	      {
 		select_printf ("stopping");
 		goto out;
 	      }
 	  }
       /* Paranoid check */
-      if (mi->stop_thread_mailslot)
+      if (mi->stop_thread)
 	{
 	  select_printf ("stopping from outer loop");
 	  break;
@@ -1614,27 +1640,27 @@ start_thread_mailslot (select_record *me, select_stuff *stuff)
 {
   if (stuff->device_specific_mailslot)
     {
-      me->h = *((mailslotinf *) stuff->device_specific_mailslot)->thread;
+      me->h = *((select_mailslot_info *) stuff->device_specific_mailslot)->thread;
       return 1;
     }
-  mailslotinf *mi = new mailslotinf;
+  select_mailslot_info *mi = new select_mailslot_info;
   mi->start = &stuff->start;
-  mi->stop_thread_mailslot = false;
+  mi->stop_thread = false;
   mi->thread = new cygthread (thread_mailslot, 0,  mi, "select_mailslot");
   me->h = *mi->thread;
   if (!me->h)
     return 0;
-  stuff->device_specific_mailslot = (void *) mi;
+  stuff->device_specific_mailslot = mi;
   return 1;
 }
 
 static void
 mailslot_cleanup (select_record *, select_stuff *stuff)
 {
-  mailslotinf *mi = (mailslotinf *) stuff->device_specific_mailslot;
+  select_mailslot_info *mi = (select_mailslot_info *) stuff->device_specific_mailslot;
   if (mi && mi->thread)
     {
-      mi->stop_thread_mailslot = true;
+      mi->stop_thread = true;
       mi->thread->detach ();
       delete mi;
       stuff->device_specific_mailslot = NULL;
@@ -1642,10 +1668,9 @@ mailslot_cleanup (select_record *, select_stuff *stuff)
 }
 
 select_record *
-fhandler_mailslot::select_read (select_record *s)
+fhandler_mailslot::select_read (select_stuff *ss)
 {
-  if (!s)
-    s = new select_record;
+  select_record *s = ss->start.next;
   s->startup = start_thread_mailslot;
   s->peek = peek_mailslot;
   s->verify = verify_mailslot;

@@ -109,7 +109,7 @@ class cygheap_user
   /* Extendend user information.
      The information is derived from the internal_getlogin call
      when on a NT system. */
-  char  *pname;         /* user's name */
+  char  *pname;		/* user's name */
   char  *plogsrv;       /* Logon server, may be FQDN */
   char  *pdomain;       /* Logon domain of the user */
   char  *homedrive;	/* User's home drive */
