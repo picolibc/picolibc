@@ -1489,8 +1489,8 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
     {
       buf.buf = wsamsg->lpBuffers[i].buf + off;
       buf.len = wsamsg->lpBuffers[i].len - off;
-      if (buf.len > 65536)	/* See KB 823764 */
-	buf.len = 65536;
+      if (buf.len > 65520)	/* See net.cc:fdsock() and MSDN KB 823764 */
+	buf.len = 65520;
 
       do
 	{

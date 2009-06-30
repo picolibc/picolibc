@@ -1,3 +1,10 @@
+2009-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (fdsock): Set default socket buffer sizes to 65520.  Change
+	comment accordingly.
+	* fhandler_socket.cc (fhandler_socket::send_internal): Set maximum
+	send size to 65520 as well.
+
 2009-06-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.cc (peek_pipe): Turn on (temporarily?) the experimental code
