@@ -1,3 +1,9 @@
+2009-07-01  Anthony Green  <green@moxielogic.com>
+
+	* moxie/crt0.S (_start): Clear BSS at startup.  Register _fini()
+	with atexit().
+	* moxie/sim-open.S: Fix comment.
+
 2009-06-19  Joseph Myers  <joseph@codesourcery.com>
 
 	* Makefile.in (html, pdf): New.

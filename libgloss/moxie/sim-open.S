@@ -1,5 +1,5 @@
 /*
- * sim-open.S -- open interface for frv simulator
+ * sim-open.S -- open interface for moxie simulator
  * 
  * Copyright (c) 2008 Anthony Green
  *

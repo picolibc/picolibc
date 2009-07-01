@@ -1,6 +1,6 @@
 /* crt0.S -- startup file for moxie
  * 
- * Copyright (c) 2008 Anthony Green
+ * Copyright (c) 2008, 2009  Anthony Green
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -23,11 +23,21 @@ _start:
 	ldi.l	$fp, 0x0	/* zero fp to allow unwinders to stop */
 
 	/* zero the bss area */
-	/* TODO */
-	/* call memset */
+	dec	$sp, 12
+	ldi.l	$r0, __bss_start__
+	ldi.l	$r1, __bss_end__
+	sub.l	$r1, $r0
+	sto.l	8($sp), $r1
+	ldi.l	$r1, 0
+	jsra	memset
+	inc	$sp, 12
 
-	/* Call _init to invoke static constructors, etc. */
+	/* Call _init to invoke static constructors, etc.  */
 	jsra	_init
+	
+	/* Call _fini at exit time for static destructors.  */
+	ldi.l	$r0, _fini
+	jsra	atexit
 	
 	/* Set argc and argv.  These are populated by the simulator.  */
 	lda.l	$r0, 0x4
