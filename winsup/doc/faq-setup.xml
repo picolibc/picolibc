@@ -572,7 +572,7 @@ this purpose.  See <ulink url="http://rsync.samba.org/">http://rsync.samba.org/<
 <ulink url="http://wget.sunsite.dk/">http://wget.sunsite.dk/</ulink> for utilities that can do this for you.
 For more information on setting up a custom Cygwin package server, see
 the Cygwin Setup homepage at
-<ulink url="http://sources.redhat.com/cygwin-apps/setup.html">http://sources.redhat.com/cygwin-apps/setup.html</ulink>.
+<ulink url="http://sourceware.org/cygwin-apps/setup.html">http://sourceware.org/cygwin-apps/setup.html</ulink>.
 </para>
 </answer></qandaentry>
 

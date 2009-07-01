@@ -1,3 +1,7 @@
+2009-07-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Clean up some sources.redhat.com references.
+
 2009-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-setup.xml (faq.setup.setup-fails-on-ts): Fix another typo.

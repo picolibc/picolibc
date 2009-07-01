@@ -33,16 +33,6 @@ notation in your PATH or startup files.  Using <literal>//c</literal> means
 to contact the <emphasis>network server</emphasis> <literal>c</literal>, which
 will slow things down tremendously if it does not exist.  
 </para>
-<para>Using //c (for C:) doesn't work.  (Similarly for any drive
-letter, e.g. <literal>//z</literal> for <literal>Z:</literal>) This
-``feature'' has long been deprecated.
-For a detailed discussion of why this change was made, and how deal
-with it, refer to
-<ulink url="http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html">http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html</ulink>.
-Just note that, in contrast to what that posting claims, using
-<literal>/</literal> as the cygdrive prefix is not supported anymore for a
-long time (though it still might work).
-</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.shares">
