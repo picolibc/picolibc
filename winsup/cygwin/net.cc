@@ -1766,7 +1766,7 @@ get_xp_ifs (ULONG family)
     if (!pap->FirstUnicastAddress)
       {
 	/* FirstUnicastAddress is NULL for interfaces which are disconnected.
-	   Fetch number of configured IPva addresses from registry and
+	   Fetch number of configured IPv4 addresses from registry and
 	   store in an unused member of the adapter addresses structure. */
 	pap->Ipv6IfIndex = get_ipv4fromreg_ipcnt (pap->AdapterName);
 	cnt += pap->Ipv6IfIndex;
