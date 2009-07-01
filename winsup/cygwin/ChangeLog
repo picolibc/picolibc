@@ -1,3 +1,20 @@
+2009-07-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add class members and methods
+	to store and retrieve the SO_RCVBUF and SO_SNDBUF sizes.
+	* fhandler_socket.cc (fhandler_socket::dup): Duplicate new members.
+	(fhandler_socket::send_internal): Check for SO_SNDBUF size and
+	restrict send to 1 byte less per KB 823764.  Leave loop immediately
+	if WSASendMsg has been used.
+	* net.cc (fdsock): Change comment again.  Set buffer sizes to 65536.
+	Store values in fhandler_socket.
+	(cygwin_setsockopt): Store SO_RCVBUF and SO_SNDBUF sizes in
+	fhandler_socket.
+	(cygwin_sendto): Drop call to sig_dispatch_pending.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+
 2009-06-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.h: New file split from fhandler.h.

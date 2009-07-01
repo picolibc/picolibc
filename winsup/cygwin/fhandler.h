@@ -446,6 +446,15 @@ class fhandler_socket: public fhandler_base
   void af_local_set_sockpair_cred ();
 
  private:
+  int	    _rmem;
+  int	    _wmem;
+ public:
+  int &rmem () { return _rmem; }
+  int &wmem () { return _wmem; }
+  void rmem (int nrmem) { _rmem = nrmem; }
+  void wmem (int nwmem) { _wmem = nwmem; }
+
+ private:
   char *sun_path;
   struct status_flags
   {

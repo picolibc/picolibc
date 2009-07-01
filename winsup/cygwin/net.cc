@@ -495,18 +495,25 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 
   /* Raise default buffer sizes (instead of WinSock default 8K).
 
+     64K appear to have the best size/performance ratio for a default
+     value.  Tested with ssh/scp on Vista over Gigabit LAN.
+
      NOTE.  If the SO_RCVBUF size exceeds 65535(*), and if the socket is
-     connected to a remote machine, then duplicating the socket on fork/exec
-     fails with WinSock error 10022, WSAEINVAL.  An explanation for this
-     weird behaviour would be nice.
+     connected to a remote machine, then calling WSADuplicateSocket on
+     fork/exec fails with WinSock error 10022, WSAEINVAL.  Fortunately
+     we don't use WSADuplicateSocket anymore, rather we just utilize
+     handle inheritance.  An explanation for this weird behaviour would
+     be nice, though.
 
      (*) Maximum normal TCP window size.  Coincidence?  */
 
-  int rmem = 65520;
-  int wmem = 65520;
-  if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF, (char *) &rmem, sizeof (int)))
+  ((fhandler_socket *) fd)->rmem () = 65536;
+  ((fhandler_socket *) fd)->wmem () = 65536;
+  if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
+		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
     debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
-  if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF, (char *) &wmem, sizeof (int)))
+  if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF,
+		    (char *) &((fhandler_socket *) fd)->wmem (), sizeof (int)))
     debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
 
   return true;
@@ -560,7 +567,6 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 	       const struct sockaddr *to, socklen_t tolen)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -582,7 +588,6 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -683,8 +688,21 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	  else
 	    set_winsock_errno ();
 	}
-      else if (level == SOL_SOCKET && optname == SO_REUSEADDR)
-	fh->saw_reuseaddr (*(int *) optval);
+      else if (level == SOL_SOCKET)
+	switch (optname)
+	  {
+	  case SO_REUSEADDR:
+	    fh->saw_reuseaddr (*(int *) optval);
+	    break;
+	  case SO_RCVBUF:
+	    fh->rmem (*(int *) optval);
+	    break;
+	  case SO_SNDBUF:
+	    fh->wmem (*(int *) optval);
+	    break;
+	  default:
+	    break;
+	  }
     }
 
   syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",
@@ -2901,7 +2919,6 @@ extern "C" int
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -2924,7 +2941,6 @@ extern "C" int
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 

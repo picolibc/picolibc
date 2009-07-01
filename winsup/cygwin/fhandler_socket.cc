@@ -657,6 +657,8 @@ fhandler_socket::dup (fhandler_base *child)
     }
   fhs->wsock_events = wsock_events;
 
+  fhs->rmem (rmem ());
+  fhs->wmem (wmem ());
   fhs->addr_family = addr_family;
   fhs->set_socket_type (get_socket_type ());
   if (get_addr_family () == AF_LOCAL)
@@ -1487,10 +1489,15 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   for (DWORD i = 0; i < wsamsg->dwBufferCount;
        off >= wsamsg->lpBuffers[i].len && (++i, off = 0))
     {
-      buf.buf = wsamsg->lpBuffers[i].buf + off;
-      buf.len = wsamsg->lpBuffers[i].len - off;
-      if (buf.len > 65520)	/* See net.cc:fdsock() and MSDN KB 823764 */
-	buf.len = 65520;
+      /* FIXME?  Use the same technique in call to WSASendMsg? */
+      if (!use_sendmsg)
+      	{
+	  buf.buf = wsamsg->lpBuffers[i].buf + off;
+	  buf.len = wsamsg->lpBuffers[i].len - off;
+	  /* See net.cc:fdsock() and MSDN KB 823764 */
+	  if (buf.len >= (unsigned) wmem ())
+	    buf.len = (unsigned) wmem () - 1;
+	}
 
       do
 	{
@@ -1513,6 +1520,8 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	{
 	  off += ret;
 	  sum += ret;
+	  if (use_sendmsg)
+	    break;
 	}
       else if (is_nonblocking () || err != WSAEWOULDBLOCK)
 	break;
