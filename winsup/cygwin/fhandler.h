@@ -325,7 +325,7 @@ class fhandler_base
 
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
 
-  virtual void init (HANDLE, DWORD, mode_t);
+  virtual int init (HANDLE, DWORD, mode_t);
 
   virtual int tcflush (int);
   virtual int tcsendbreak (int);
@@ -566,7 +566,7 @@ public:
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int ready_for_read (int fd, DWORD howlong);
-  void init (HANDLE, DWORD, mode_t);
+  int init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, const char * = NULL);
   friend class fhandler_fifo;
@@ -771,7 +771,7 @@ class fhandler_serial: public fhandler_base
 
   int open (int flags, mode_t mode);
   int close ();
-  void init (HANDLE h, DWORD a, mode_t flags);
+  int init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
   int dup (fhandler_base *child);
   void raw_read (void *ptr, size_t& ulen);
@@ -971,7 +971,7 @@ class fhandler_console: public fhandler_termios
   int dup (fhandler_base *child);
 
   int ioctl (unsigned int cmd, void *);
-  void init (HANDLE, DWORD, mode_t);
+  int init (HANDLE, DWORD, mode_t);
   bool mouse_aware () {return dev_state->use_mouse;}
 
   select_record *select_read (select_stuff *);
@@ -1032,7 +1032,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int open (int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  void init (HANDLE, DWORD, mode_t);
+  int init (HANDLE, DWORD, mode_t);
 
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);

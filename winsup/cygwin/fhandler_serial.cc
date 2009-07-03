@@ -190,10 +190,10 @@ err:
   return -1;
 }
 
-void
+int
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  open (flags, bin & (O_BINARY | O_TEXT));
+  return open (flags, bin & (O_BINARY | O_TEXT));
 }
 
 int

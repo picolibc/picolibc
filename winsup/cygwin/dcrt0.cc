@@ -48,6 +48,8 @@ static char NO_COPY **envp;
 
 static char title_buf[TITLESIZE + 1];
 
+bool NO_COPY jit_debug;
+
 static void
 do_global_dtors ()
 {
@@ -499,6 +501,7 @@ initial_env ()
       if (strstr (buf1, buf))
 	{
 	  error_start_init (p);
+	  jit_debug = true;
 	  try_to_debug ();
 	  console_printf ("*** Sending Break.  gdb may issue spurious SIGTRAP message.\n");
 	  break_here ();

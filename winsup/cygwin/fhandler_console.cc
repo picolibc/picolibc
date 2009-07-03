@@ -1855,7 +1855,7 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
   return NULL;
 }
 
-void
+int
 fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 {
   // this->fhandler_termios::init (f, mode, bin);
@@ -1873,7 +1873,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
-  tcsetattr (0, &tc->ti);
+  return !tcsetattr (0, &tc->ti);
 }
 
 int

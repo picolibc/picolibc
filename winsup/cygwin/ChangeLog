@@ -1,3 +1,30 @@
+2009-07-03  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (jit_debug): New global.
+	(initial_env): Set jit_debug when we are automatically starting a gdb
+	process.
+	* dtable.cc (dtable::get_debugger_info): Don't tty tricks when we are
+	being debugged by our own captive gdb, as determined by jit_debug ==
+	true.
+	(dtable::init_std_file_from_handle): Detect errors when initializing a
+	tty early rather than at random points later.
+	* fhandler.h (fhandler_*::init): Return int to indicate
+	success/failure.
+	* fhandler.cc (fhandler_base::init): Reflect change in return value.
+	* pipe.cc (fhandler_pipe::init): Ditto.
+	(fhandler_pipe::create_selectable): Don't say we're retrying when we
+	aren't.
+	* fhandler_console.cc (fhandler_console::init): Ditto.  Return
+	success/failure.
+	* fhandler_serial.cc (fhandler_serial::init): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::init): Ditto.
+	(fhandler_tty_slave::open): Make debugging output more detailed.
+	* tty.cc (tty_list::terminate): Don't close I/O handles before all
+	slaves have checked in.
+	(tty::slave_alive): Make a non-inlined function.  Check if tty pipe
+	handles can be created as an additional exists check.
+	* tty.h (tty::slave_alive): Just define here.
+
 2009-07-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml: Add fpurge and mkstemps to BSD list.

@@ -559,7 +559,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 			    hMainProc, &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
-	  termios_printf ("can't duplicate input, %E");
+	  termios_printf ("can't duplicate input from %u/%p, %E",
+			  get_ttyp ()->master_pid, get_ttyp ()->from_master);
 	  __seterrno ();
 	  return 0;
 	}
@@ -654,7 +655,7 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
   return 1;
 }
 
-void
+int
 fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
 {
   int flags = 0;
@@ -667,7 +668,7 @@ fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
 
-  open (flags);
+  return open (flags);
 }
 
 int

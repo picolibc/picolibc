@@ -147,8 +147,6 @@ tty_list::terminate ()
   if (ttynum != -1 && tty_master && ttys[ttynum].master_pid == myself->pid)
     {
       tty *t = ttys + ttynum;
-      CloseHandle (tty_master->from_master);
-      CloseHandle (tty_master->to_master);
       /* Wait for children which rely on tty handling in this process to
 	 go away */
       for (int i = 0; ; i++)
@@ -166,6 +164,8 @@ tty_list::terminate ()
 	}
 
       lock_ttys here ();
+      CloseHandle (tty_master->from_master);
+      CloseHandle (tty_master->to_master);
 
       termios_printf ("tty %d master about to finish", ttynum);
       CloseHandle (tty_master->get_io_handle ());
@@ -209,7 +209,7 @@ tty_list::init ()
 /* Search for tty class for our console. Allocate new tty if our process is
    the only cygwin process in the current console.
    Return tty number or -1 if error.
-   If flag == 0, just find a free tty.
+   If with_console == 0, just find a free tty.
  */
 int
 tty_list::allocate (bool with_console)
@@ -217,8 +217,6 @@ tty_list::allocate (bool with_console)
   HWND console;
   int freetty = -1;
   HANDLE hmaster = NULL;
-
-  /* FIXME: This whole function needs a protective mutex. */
 
   lock_ttys here;
 
@@ -261,7 +259,7 @@ tty_list::allocate (bool with_console)
 	}
     }
 
-  /* There is no tty allocated to console, allocate the first free found */
+  /* There is no tty allocated to console; allocate the first free found */
   if (freetty == -1)
     goto out;
 
@@ -292,6 +290,30 @@ bool
 tty::slave_alive ()
 {
   return alive (TTY_SLAVE_ALIVE);
+}
+
+bool
+tty::exists ()
+{
+  /* Attempt to open the from-master side of the tty.  If it is accessible
+     then it exists although it may have been privileges to actually use it. */
+  char pipename[sizeof("ttyNNNN-from-master")];
+  __small_sprintf (pipename, "tty%d-from-master", ntty);
+  HANDLE r, w;
+  int res = fhandler_pipe::create_selectable (&sec_none_nih, r, w, 0, pipename);
+  if (res)
+    return true;
+
+  CloseHandle (r);
+  CloseHandle (w);
+
+  HANDLE h = open_output_mutex ();
+  if (h)
+    {
+      CloseHandle (h);
+      return true;
+    }
+  return slave_alive ();
 }
 
 bool

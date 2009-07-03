@@ -29,7 +29,7 @@ fhandler_pipe::fhandler_pipe ()
   uninterruptible_io (true);
 }
 
-void
+int
 fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
 {
   // FIXME: Have to clean this up someday
@@ -53,6 +53,7 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
   if (mode & O_NOINHERIT)
     close_on_exec (true);
   setup_overlapped (opened_properly);
+  return 1;
 }
 
 extern "C" int sscanf (const char *, const char *, ...);
@@ -259,12 +260,12 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	case ERROR_PIPE_BUSY:
 	  /* The pipe is already open with compatible parameters.
 	     Pick a new name and retry.  */
-	  debug_printf ("pipe busy, retrying");
+	  debug_printf ("pipe busy", name ? ", retrying" : "");
 	  break;
 	case ERROR_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
-	  debug_printf ("pipe access denied, retrying");
+	  debug_printf ("pipe access denied%s", name ? ", retrying" : "");
 	  break;
 	default:
 	  {

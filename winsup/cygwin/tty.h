@@ -102,18 +102,7 @@ public:
   HANDLE open_mutex (const char *mutex);
   HANDLE open_output_mutex ();
   HANDLE open_input_mutex ();
-  bool exists ()
-  {
-    if (!master_pid)
-      return false;
-    HANDLE h = open_output_mutex ();
-    if (h)
-      {
-	CloseHandle (h);
-	return 1;
-      }
-    return slave_alive ();
-  }
+  bool exists ();
   void set_master_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();

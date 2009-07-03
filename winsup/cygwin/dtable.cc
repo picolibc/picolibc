@@ -109,7 +109,8 @@ dtable::extend (int howmuch)
 void
 dtable::get_debugger_info ()
 {
-  if (being_debugged ())
+  extern bool jit_debug;
+  if (!jit_debug && being_debugged ())
     {
       char std[3][sizeof ("/dev/ttyNNNN")];
       std[0][0] = std[1][0] = std [2][0] = '\0';
@@ -383,9 +384,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	 This needs further investigation but the workaround not to close
 	 the handles will have a marginal hit of three extra handles per
 	 process at most. */
-      fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
-      		? INVALID_HANDLE_VALUE : handle, access, bin);
-      set_std_handle (fd);
+      if (fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
+		     ? INVALID_HANDLE_VALUE : handle, access, bin))
+	set_std_handle (fd);
+      else
+	api_fatal ("couldn't initialize fd %d for %s", fd, fh->get_name ());
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
 }

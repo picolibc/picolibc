@@ -1123,7 +1123,7 @@ fhandler_base::fstatvfs (struct statvfs *sfs)
   return fh.fstatvfs (sfs);
 }
 
-void
+int
 fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 {
   set_io_handle (f);
@@ -1139,6 +1139,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
   set_flags (flags | bin);
   set_open_status ();
   debug_printf ("created new fhandler_base for handle %p, bin %d", f, rbinary ());
+  return 1;
 }
 
 int
