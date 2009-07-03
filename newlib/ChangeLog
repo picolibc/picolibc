@@ -1,3 +1,13 @@
+2009-07-03  Eric Blake  <ebb9@byu.net>
+
+	Add fpurge.
+	* libc/stdio/fpurge.c (fpurge, _fpurge_r): New file.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES, CHEWOUT_FILES, fpurge):
+	Build it.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/include/stdio.h (fpurge, _fpurge_r): New declarations.
+	* libc/stdio/stdio.tex: Build documentation.
+
 2009-06-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am (MATHOBJS_IN_LIBC): Add s_fpclassify and
@@ -23,7 +33,7 @@
 	* libc/include/sys/types.h: Same.
 
 2009-06-16  Corinna Vinschen  <corinna@vinschen.de>
-	
+
 	* libc/include/locale.h (struct lconv): Add missing members required
 	by POSIX.1-2008.
 	* libc/locale/locale.c (lconv): Initialize new members to default

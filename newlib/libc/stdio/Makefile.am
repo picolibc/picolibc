@@ -121,6 +121,7 @@ ELIX_4_SOURCES = \
 	fgetws.c		\
 	fmemopen.c		\
 	fopencookie.c		\
+	fpurge.c		\
 	fputwc.c		\
 	fputws.c		\
 	funopen.c		\
@@ -250,6 +251,7 @@ CHEWOUT_FILES = \
 	fmemopen.def		\
 	fopen.def		\
 	fopencookie.def		\
+	fpurge.def		\
 	fputc.def		\
 	fputs.def		\
 	fputwc.def		\
@@ -331,6 +333,7 @@ $(lpfx)findfp.$(oext): local.h
 $(lpfx)fmemopen.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
 $(lpfx)fopencookie.$(oext): local.h
+$(lpfx)fpurge.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
 $(lpfx)fputwc.$(oext): local.h
 $(lpfx)fputws.$(oext): local.h fvwrite.h

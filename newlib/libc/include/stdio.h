@@ -391,6 +391,7 @@ FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_freopen_r, (struct _reent *, const char *, const char *, FILE *));
 int	_EXFUN(_fprintf_r, (struct _reent *, FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
+int	_EXFUN(_fpurge_r, (struct _reent *, FILE *));
 int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_fputs_r, (struct _reent *, const char *, FILE *));
 size_t	_EXFUN(_fread_r, (struct _reent *, _PTR, size_t _size, size_t _n, FILE *));
@@ -482,6 +483,9 @@ int	_EXFUN(_vsprintf_r, (struct _reent *, char *, const char *, __VALIST)
 int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 0))));
 
+/* Other extensions.  */
+
+int	_EXFUN(fpurge, (FILE *));
 ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
