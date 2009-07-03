@@ -1,5 +1,14 @@
 2009-07-03  Eric Blake  <ebb9@byu.net>
 
+	Add mkdtemp, mkstemps.
+	* libc/stdio/mktemp.c: Fix documentation.
+	(_gettemp): Add domkdir and length parameters.  Check for
+	insufficient 'X' suffix.  Drop cygwin-specific code.
+	(_mkstemp_r, _mktemp_r, mkstemp, mktemp): Adjust clients.
+	(_mkdtemp_r, _mkstemps_r, mkdtemp, mkstemps): New functions.
+	* libc/include/stdlib.h (_mkdtemp_r, _mkstemps_r, mkdtemp)
+	(mkstemps): Declare them.
+
 	Add fpurge.
 	* libc/stdio/fpurge.c (fpurge, _fpurge_r): New file.
 	* libc/stdio/Makefile.am (ELIX_4_SOURCES, CHEWOUT_FILES, fpurge):
