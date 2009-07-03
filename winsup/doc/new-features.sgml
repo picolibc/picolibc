@@ -114,7 +114,7 @@
   symlinkat, unlinkat.
 
 - Other new APIs: posix_fadvise, posix_fallocate, funopen, fopencookie,
-  open_memstream, open_wmemstream, fmemopen, fdopendir.
+  open_memstream, open_wmemstream, fmemopen, fdopendir, fpurge, mkstemps.
 </screen>
 
 </sect2>
