@@ -898,6 +898,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fiprintf
     flock
     forkpty
+    fpurge
     freeifaddrs
     fstatfs
     fts_children
@@ -931,6 +932,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     login_tty
     logout
     logwtmp
+    mkstemps
     openpty
     rcmd
     rcmd_af
