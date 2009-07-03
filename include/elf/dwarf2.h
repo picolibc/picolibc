@@ -541,6 +541,9 @@ enum dwarf_location_atom
     DW_OP_form_tls_address = 0x9b,
     DW_OP_call_frame_cfa = 0x9c,
     DW_OP_bit_piece = 0x9d,
+    /* DWARF 4 extensions.  */
+    DW_OP_implicit_value = 0x9e,
+    DW_OP_stack_value = 0x9f,
     /* GNU extensions.  */
     DW_OP_GNU_push_tls_address = 0xe0,
     DW_OP_GNU_uninit     = 0xf0,
