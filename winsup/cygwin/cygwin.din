@@ -505,6 +505,7 @@ __fpclassifyd NOSIGFE
 __fpclassifyf NOSIGFE
 fprintf SIGFE
 _fprintf = fprintf SIGFE
+fpurge SIGFE
 fputc SIGFE
 _fputc = fputc SIGFE
 fputs SIGFE
@@ -984,6 +985,7 @@ _mknod32 = mknod32 SIGFE
 mknodat SIGFE
 mkstemp SIGFE
 _mkstemp = mkstemp SIGFE
+mkstemps SIGFE
 mktemp SIGFE
 _mktemp = mktemp SIGFE
 mktime SIGFE

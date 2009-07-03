@@ -364,12 +364,13 @@ details. */
       208: Export log2, log2f.
       209: Export wordexp, wordfree.
       210: New ctype layout using variable ctype pointer.  Export __ctype_ptr__.
+      211: Export fpurge, mkstemps.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 210
+#define CYGWIN_VERSION_API_MINOR 211
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

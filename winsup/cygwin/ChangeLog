@@ -1,3 +1,19 @@
+2009-07-03  Eric Blake  <ebb9@byu.net>
+
+	* cygwin.din (fpurge, mkstemps): New exports.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* mktemp.cc (_gettemp): Add parameter.
+	(mkstemps): New function.
+	(mkstemp, mkdtemp, mktemp): Adjust clients.
+
+2009-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Fix typo in comment.
+	(ShowWindowAsync): Define.
+	(AttachConsole): Define.
+	* fhandler_console.cc (fhandler_console::need_invisible): Add band-aid
+	for Windows 7 AllocConsole bug.
+
 2009-07-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (get_xp_ifs): Fix typo in comment.
