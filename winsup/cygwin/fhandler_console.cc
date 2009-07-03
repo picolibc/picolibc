@@ -1977,9 +1977,20 @@ fhandler_console::need_invisible ()
 	  debug_printf ("window station is not visible");
 	  invisible_console = true;
 	}
-      else
+      /* Band-aid for Windows 7.  AllocConsole is broken on W7 in that it
+         doesn't allocate the console in the hidden, active WindowStation,
+	 but instead on the WindowStation on which the application has
+	 originally been started on.  This effectively disallows to create
+	 a hidden console.
+	 So what we do now is this.  First we try to attach to an existing
+	 console window of the parent process.  If that doesn't work, we
+	 skip generating a hidden WindowStation entirely.  After creating
+	 the new console, we hide it.  Unfortunately it's still visible in
+	 the taskbar.  Hopefully this will be fixed in SP1... */
+      else if (!wincap.has_broken_alloc_console () || !AttachConsole (-1))
 	{
-	  if (myself->ctty != TTY_CONSOLE)
+	  if (myself->ctty != TTY_CONSOLE
+	      && !wincap.has_broken_alloc_console ())
 	    {
 	      h = CreateWindowStationW (NULL, 0, WINSTA_ACCESS, NULL);
 	      termios_printf ("%p = CreateWindowStation(NULL), %E", h);
@@ -1991,6 +2002,8 @@ fhandler_console::need_invisible ()
 	    }
 	  b = AllocConsole ();	/* will cause flashing if CreateWindowStation
 				   failed */
+	  if (b && wincap.has_broken_alloc_console ())
+	    ShowWindowAsync (GetConsoleWindow (), SW_HIDE);
 	  debug_printf ("h %p, horig %p, flags %p", h, horig, oi.dwFlags);
 	  if (horig && h && h != horig && SetProcessWindowStation (horig))
 	    CloseWindowStation (h);

@@ -364,6 +364,7 @@ LoadDLLfunc (SendMessageA, 16, user32)
 LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetThreadDesktop, 4, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
+LoadDLLfuncEx (ShowWindowAsync, 8, user32, 1)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)
@@ -396,7 +397,7 @@ LoadDLLfunc (WSASetLastError, 4, ws2_32)
 // LoadDLLfunc (WSAStartup, 8, ws2_32)
 LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
 
-// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't supprot iphlpapi funcs
+// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
 LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetExtendedTcpTable, 24, iphlpapi, 1, 50)
 LoadDLLfuncEx2 (GetIfEntry, 4, iphlpapi, 1, 50)
@@ -408,6 +409,7 @@ LoadDLLfuncEx2 (SendARP, 16, iphlpapi, 1, 50)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
+LoadDLLfuncEx (AttachConsole, 0, kernel32, 1)
 LoadDLLfuncEx (FindFirstVolumeA, 8, kernel32, 1)
 LoadDLLfuncEx (FindNextVolumeA, 12, kernel32, 1)
 LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)
