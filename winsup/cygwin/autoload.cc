@@ -409,7 +409,7 @@ LoadDLLfuncEx2 (SendARP, 16, iphlpapi, 1, 50)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
-LoadDLLfuncEx (AttachConsole, 0, kernel32, 1)
+LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
 LoadDLLfuncEx (FindFirstVolumeA, 8, kernel32, 1)
 LoadDLLfuncEx (FindNextVolumeA, 12, kernel32, 1)
 LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)

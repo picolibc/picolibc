@@ -1,3 +1,7 @@
+2009-07-04  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* autoload.cc (AttachConsole):  Correct size of args.
+
 2009-07-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (jit_debug): New global.
