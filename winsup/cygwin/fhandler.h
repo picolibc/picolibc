@@ -950,6 +950,8 @@ class fhandler_console: public fhandler_termios
   int igncr_enabled ();
   int input_tcsetattr (int a, const struct termios *t);
   void set_cursor_maybe ();
+  static bool create_invisible_console (HWINSTA);
+  static bool create_invisible_console_workaround ();
 
  public:
   fhandler_console ();

@@ -1935,7 +1935,126 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 bool NO_COPY fhandler_console::invisible_console;
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
-#define WINSTA_ACCESS STANDARD_RIGHTS_READ
+#define WINSTA_ACCESS WINSTA_ALL_ACCESS
+
+/* Create a console in an invisible workstation.  This should work
+   in all versions of Windows NT except Windows 7 (so far). */
+bool
+fhandler_console::create_invisible_console (HWINSTA horig)
+{
+  HWINSTA h = CreateWindowStationW (NULL, 0, WINSTA_ACCESS, NULL);
+  termios_printf ("%p = CreateWindowStation(NULL), %E", h);
+  BOOL b;
+  if (h)
+    {
+      b = SetProcessWindowStation (h);
+      termios_printf ("SetProcessWindowStation %d, %E", b);
+    }
+  b = AllocConsole ();	/* will cause flashing if CreateWindowStation
+	 		   failed */
+  if (!h)
+    SetParent (GetConsoleWindow (), HWND_MESSAGE);
+  if (horig && h && h != horig && SetProcessWindowStation (horig))
+    CloseWindowStation (h);
+  termios_printf ("%d = AllocConsole (), %E", b);
+  invisible_console = true;
+  return b;
+}
+
+/* Ugly workaround for Windows 7.
+
+   First try to just attach to any console which may have started this
+   app.  If that works use this as our "invisible console".
+
+   This will fail if not started from the command prompt.  In that case, start
+   a dummy console application in a hidden state so that we can use its console
+   as our invisible console.  This probably works everywhere but process
+   creation is slow and to be avoided if possible so the workstation method
+   is vastly preferred.
+
+   FIXME: This is not completely thread-safe since it creates two inheritable
+   handles which are known only to this function.  If another thread starts
+   a process the new process will inherit these handles.  However, since this
+   function is currently only called at startup and during exec, it shouldn't
+   be a big deal.  */
+bool
+fhandler_console::create_invisible_console_workaround ()
+{
+  if (!AttachConsole (-1))
+    {
+      bool taskbar;
+      DWORD err = GetLastError ();
+      path_conv helper ("/bin/cygwin-console-helper.exe");
+      HANDLE hello = NULL;
+      HANDLE goodbye = NULL;
+      /* If err == ERROR_PROC_FOUND then this method won't work.  But that's
+	 ok.  The workstation method should work ok when AttachConsole doesn't
+	 work.
+
+	 If the helper doesn't exist or we can't create event handles then we
+	 can't use this method. */
+      if (err == ERROR_PROC_NOT_FOUND || !helper.exists ()
+	  || !(hello = CreateEvent (&sec_none, true, false, NULL))
+	  || !(goodbye = CreateEvent (&sec_none, true, false, NULL)))
+	{
+	  AllocConsole ();	/* This is just sanity check code.  We should
+				   never actually hit here unless we're running
+				   in an environment which lacks the helper
+				   app. */
+	  taskbar = true;
+	}
+      else
+	{
+	  STARTUPINFOW si = {};
+	  PROCESS_INFORMATION pi;
+	  size_t len = helper.get_wide_win32_path_len ();
+	  WCHAR cmd[len + (2 * strlen ("0xffffffff")) + 1];
+	  WCHAR title[] = L"invisible cygwin console";
+
+	  helper.get_wide_win32_path (cmd);
+	  __small_swprintf (cmd + len, L" %p %p", hello, goodbye);
+
+	  si.cb = sizeof (si);
+	  si.dwFlags = STARTF_USESHOWWINDOW;
+	  si.wShowWindow = SW_HIDE;
+	  si.lpTitle = title;
+
+	  /* Create a new hidden process.  Use the two event handles as
+	     argv[1] and argv[2]. */
+	  BOOL x = CreateProcessW (NULL, cmd, &sec_none_nih, &sec_none_nih, true,
+				   CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+	  if (x)
+	    {
+	      CloseHandle (pi.hProcess);	/* Don't need */
+	      CloseHandle (pi.hThread);		/*  these.    */
+	    }
+	  taskbar = false;
+	  /* Wait for subprocess to indicate that it is live.  This may not
+	     actually be needed but it's hard to say since it is possible that
+	     there will be no console for a brief time after the process
+	     returns and there is no easy way to determine if/when this happens
+	     in Windows.  So play it safe. */
+	  if (!x || (WaitForSingleObject (hello, 10000) != WAIT_OBJECT_0)
+	      || !AttachConsole (pi.dwProcessId))
+	    AllocConsole ();	/* Oh well.  Watch the flash. */
+	}
+
+      if (!taskbar)
+	/* Setting the owner of the console window to HWND_MESSAGE seems to
+	   hide it from the taskbar.  Don't know if this method is faster than
+	   calling ShowWindowAsync but it should guarantee no taskbar presence
+	   for the hidden console. */
+	SetParent (GetConsoleWindow (), HWND_MESSAGE);
+      if (hello)
+	CloseHandle (hello);
+      if (goodbye)
+	{
+	  SetEvent (goodbye);	/* Tell helper process it's ok to exit. */
+	  CloseHandle (goodbye);
+	}
+    }
+  return invisible_console = true;
+}
 
 bool
 fhandler_console::need_invisible ()
@@ -1945,7 +2064,7 @@ fhandler_console::need_invisible ()
     invisible_console = false;
   else
     {
-      HWINSTA h, horig;
+      HWINSTA h;
       /* The intent here is to allocate an "invisible" console if we have no
 	 controlling tty or to reuse the existing console if we already have
 	 a tty.  So, first get the old windows station.  If there is no controlling
@@ -1965,51 +2084,23 @@ fhandler_console::need_invisible ()
 	 - Non-displaying of characters in rxvt or xemacs if you start a
 	   process using setsid: bash -lc "setsid rxvt".  */
 
-      h = horig = GetProcessWindowStation ();
+      h = GetProcessWindowStation ();
 
       USEROBJECTFLAGS oi;
       DWORD len;
-      if (!horig
-	  || !GetUserObjectInformationW (horig, UOI_FLAGS, &oi, sizeof (oi), &len)
+      if (!h
+	  || !GetUserObjectInformationW (h, UOI_FLAGS, &oi, sizeof (oi), &len)
 	  || !(oi.dwFlags & WSF_VISIBLE))
 	{
 	  b = true;
 	  debug_printf ("window station is not visible");
+	  AllocConsole ();
 	  invisible_console = true;
 	}
-      /* Band-aid for Windows 7.  AllocConsole is broken on W7 in that it
-         doesn't allocate the console in the hidden, active WindowStation,
-	 but instead on the WindowStation on which the application has
-	 originally been started on.  This effectively disallows to create
-	 a hidden console.
-	 So what we do now is this.  First we try to attach to an existing
-	 console window of the parent process.  If that doesn't work, we
-	 skip generating a hidden WindowStation entirely.  After creating
-	 the new console, we hide it.  Unfortunately it's still visible in
-	 the taskbar.  Hopefully this will be fixed in SP1... */
-      else if (!wincap.has_broken_alloc_console () || !AttachConsole (-1))
-	{
-	  if (myself->ctty != TTY_CONSOLE
-	      && !wincap.has_broken_alloc_console ())
-	    {
-	      h = CreateWindowStationW (NULL, 0, WINSTA_ACCESS, NULL);
-	      termios_printf ("%p = CreateWindowStation(NULL), %E", h);
-	      if (h)
-		{
-		  b = SetProcessWindowStation (h);
-		  termios_printf ("SetProcessWindowStation %d, %E", b);
-		}
-	    }
-	  b = AllocConsole ();	/* will cause flashing if CreateWindowStation
-				   failed */
-	  if (b && wincap.has_broken_alloc_console ())
-	    ShowWindowAsync (GetConsoleWindow (), SW_HIDE);
-	  debug_printf ("h %p, horig %p, flags %p", h, horig, oi.dwFlags);
-	  if (horig && h && h != horig && SetProcessWindowStation (horig))
-	    CloseWindowStation (h);
-	  termios_printf ("%d = AllocConsole (), %E", b);
-	  invisible_console = true;
-	}
+      else if (wincap.has_broken_alloc_console ())
+	b = create_invisible_console_workaround ();
+      else
+	b = create_invisible_console (h);
     }
 
   debug_printf ("invisible_console %d", invisible_console);

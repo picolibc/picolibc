@@ -1,3 +1,19 @@
+2009-07-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (SetParent): Add new import.
+	* fhandler.h (fhandler_console::create_invisible_console): Declare new
+	function.
+	(create_invisible_console_workaround): Ditto.
+	* fhandler_console.cc (fhandler_console::create_invisible_console):
+	Define new function.
+	(create_invisible_console_workaround): Ditto.  Add too much code to
+	deal with broken Windows 7.  Use a helper app to start an invisible
+	console window.
+	(fhandler_console::need_invisible): Reorganize to use helper functions
+	to create invisible console.
+
+	* spawn.cc (spawn_guts): Avoid zeroing already zeroed fields in si.
+
 2009-07-04  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* autoload.cc (AttachConsole):  Correct size of args.

@@ -425,8 +425,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   PROCESS_INFORMATION pi;
   pi.hProcess = pi.hThread = NULL;
   pi.dwProcessId = pi.dwThreadId = 0;
-  si.lpReserved = NULL;
-  si.lpDesktop = NULL;
 
   /* Set up needed handles for stdio */
   si.dwFlags = STARTF_USESTDHANDLES;
