@@ -57,7 +57,7 @@ CYGWIN_BINS := ${addsuffix .exe,cygpath getfacl ldd kill mkgroup \
 
 # List all binaries to be linked in MinGW mode.  Each binary on this list
 # must have a corresponding .o of the same name.
-MINGW_BINS := ${addsuffix .exe,cygcheck ldh strace}
+MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
 
 # List all objects to be compiled in MinGW mode.  Any object not on this
 # list will will be compiled in Cygwin mode implicitly, so there is no
