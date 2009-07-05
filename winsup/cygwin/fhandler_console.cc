@@ -1937,7 +1937,7 @@ bool NO_COPY fhandler_console::invisible_console;
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
 #define WINSTA_ACCESS WINSTA_ALL_ACCESS
 
-/* Create a console in an invisible workstation.  This should work
+/* Create a console in an invisible window station.  This should work
    in all versions of Windows NT except Windows 7 (so far). */
 bool
 fhandler_console::create_invisible_console (HWINSTA horig)
@@ -1969,7 +1969,7 @@ fhandler_console::create_invisible_console (HWINSTA horig)
    This will fail if not started from the command prompt.  In that case, start
    a dummy console application in a hidden state so that we can use its console
    as our invisible console.  This probably works everywhere but process
-   creation is slow and to be avoided if possible so the workstation method
+   creation is slow and to be avoided if possible so the window station method
    is vastly preferred.
 
    FIXME: This is not completely thread-safe since it creates two inheritable
@@ -1988,7 +1988,7 @@ fhandler_console::create_invisible_console_workaround ()
       HANDLE hello = NULL;
       HANDLE goodbye = NULL;
       /* If err == ERROR_PROC_FOUND then this method won't work.  But that's
-	 ok.  The workstation method should work ok when AttachConsole doesn't
+	 ok.  The window station method should work ok when AttachConsole doesn't
 	 work.
 
 	 If the helper doesn't exist or we can't create event handles then we
@@ -2067,14 +2067,14 @@ fhandler_console::need_invisible ()
       HWINSTA h;
       /* The intent here is to allocate an "invisible" console if we have no
 	 controlling tty or to reuse the existing console if we already have
-	 a tty.  So, first get the old windows station.  If there is no controlling
-	 terminal, create a new windows station and then set it as the current
-	 windows station.  The subsequent AllocConsole will then be allocated
+	 a tty.  So, first get the old window station.  If there is no controlling
+	 terminal, create a new window station and then set it as the current
+	 window station.  The subsequent AllocConsole will then be allocated
 	 invisibly.  But, after doing that we have to restore any existing windows
 	 station or, strangely, characters will not be displayed in any windows
 	 drawn on the current screen.  We only do this if we have changed to
-	 a new windows station and if we had an existing windows station previously.
-	 We also close the previously opened workstation even though AllocConsole
+	 a new window station and if we had an existing windows station previously.
+	 We also close the previously opened window station even though AllocConsole
 	 is now "using" it.  This doesn't seem to cause any problems.
 
 	 Things to watch out for if you make changes in this code:
