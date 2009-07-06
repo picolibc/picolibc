@@ -1309,8 +1309,8 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   ssize_t res = 0;
   DWORD ret = 0, wret;
   int evt_mask = FD_READ | ((wsamsg->dwFlags & MSG_OOB) ? FD_OOB : 0);
-  LPWSABUF wsabuf = wsamsg->lpBuffers;
-  ULONG wsacnt = wsamsg->dwBufferCount;
+  LPWSABUF &wsabuf = wsamsg->lpBuffers;
+  ULONG &wsacnt = wsamsg->dwBufferCount;
   bool use_recvmsg = false;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
 
@@ -1383,20 +1383,23 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	break;
     }
 
-  if (!ret && res == SOCKET_ERROR)
+  if (res)
     {
       /* According to SUSv3, errno isn't set in that case and no error
 	 condition is returned. */
       if (WSAGetLastError () == WSAEMSGSIZE)
-	return ret;
+	return ret + wret;
 
-      /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
-	 in this case. */
-      if (WSAGetLastError () == WSAESHUTDOWN)
-	return 0;
+      if (!ret)
+	{
+	  /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
+	     in this case. */
+	  if (WSAGetLastError () == WSAESHUTDOWN)
+	    return 0;
 
-      set_winsock_errno ();
-      return SOCKET_ERROR;
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
+	}
     }
 
   return ret;
