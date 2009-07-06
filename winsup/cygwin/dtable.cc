@@ -891,8 +891,9 @@ handle_to_fn (HANDLE h, char *posix_fn)
   WCHAR *maxmatchdos = NULL;
   int maxmatchlen = 0;
 
-  NtQueryObject (h, ObjectNameInformation, &dummy_oni, sizeof (dummy_oni), &len);
-  if (!len)
+  NTSTATUS status = NtQueryObject (h, ObjectNameInformation, &dummy_oni,
+				   sizeof (dummy_oni), &len);
+  if (!NT_SUCCESS (status) || !len)
     debug_printf ("NtQueryObject failed 1");
   else
     {
