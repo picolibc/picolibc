@@ -150,7 +150,8 @@ _cygtls::remove (DWORD wait)
 	 select to control this themselves. */
       if (!locals.select.sockevt)
 	{
-	  CloseHandle (locals.select.sockevt);
+	  if (locals.select.sockevt)
+	    CloseHandle (locals.select.sockevt);
 	  locals.select.sockevt = NULL;
 	  free_local (select.ser_num);
 	  free_local (select.w4);
