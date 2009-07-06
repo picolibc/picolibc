@@ -58,7 +58,6 @@ struct select_pipe_info: public select_info
 
 struct select_socket_info: public select_info
 {
-  int max_w4;
   int num_w4;
   LONG *ser_num;
   HANDLE *w4;

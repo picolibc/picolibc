@@ -1,3 +1,25 @@
+2009-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (struct _local_storage): Add thread storage pointers for
+	memory used by socket select functions.  Combine them into a single
+	struct select.
+	* cygtls.cc: Accommodate above change throughout.
+	(_cygtls::init_thread): Drop initalizing of sockevt to
+	INVALID_HANDLE_VALUE.
+	(_cygtls::fixup_after_fork): Reset sockevt to NULL.
+	(_cygtls::remove): Don't use sockevt value to bail out prematurely.
+	Set sockevt to NULL.  Free malloced select members.
+	* select.h (struct select_socket_info): Drop max_w4 member.
+	* select.cc (thread_socket): Use INFINITE timeout value if number of
+	objects to wait for is <= MAXIMUM_WAIT_OBJECTS.  Use num_w4 member
+	of select_socket_info struct rather than dropped max_w4.
+	(init_tls_select_info): New inline function to initialize TLS select
+	members.
+	(start_thread_socket): Just call init_tls_select_info to initialize TLS
+	select members and use them later on.
+	(socket_cleanup): Don't free select_socket_info pointer members since
+	they are thread local now.
+
 2009-07-06  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (handle_to_fn): Detect failing NtQueryObject.

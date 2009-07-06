@@ -16,6 +16,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <sys/param.h>
 #include "ntdll.h"
 
 #include <wingdi.h>
@@ -1315,7 +1316,10 @@ static DWORD WINAPI
 thread_socket (void *arg)
 {
   select_socket_info *si = (select_socket_info *) arg;
-  DWORD timeout = 64 / (si->max_w4 / MAXIMUM_WAIT_OBJECTS);
+  DWORD timeout = (si->num_w4 <= MAXIMUM_WAIT_OBJECTS)
+		  ? INFINITE
+		  : (64 / (roundup2 (si->num_w4, MAXIMUM_WAIT_OBJECTS)
+			   / MAXIMUM_WAIT_OBJECTS));
   bool event = false;
 
   select_printf ("stuff_start %p", si->start);
@@ -1326,18 +1330,19 @@ thread_socket (void *arg)
 	  if (peek_socket (s, false))
 	    event = true;
       if (!event)
-	for (int i = 0; i < si->max_w4; i += MAXIMUM_WAIT_OBJECTS)
+	for (int i = 0; i < si->num_w4; i += MAXIMUM_WAIT_OBJECTS)
 	  switch (WaitForMultipleObjects (min (si->num_w4 - i,
 					       MAXIMUM_WAIT_OBJECTS),
 					  si->w4 + i, FALSE, timeout))
 	    {
 	    case WAIT_FAILED:
 	      goto out;
+	    case WAIT_TIMEOUT:
+	      continue;
 	    case WAIT_OBJECT_0:
 	      if (!i)	/* Socket event set. */
 		goto out;
-	      break;
-	    case WAIT_TIMEOUT:
+	      /*FALLTHRU*/
 	    default:
 	      break;
 	    }
@@ -1345,6 +1350,36 @@ thread_socket (void *arg)
 out:
   select_printf ("leaving thread_socket");
   return 0;
+}
+
+static inline bool init_tls_select_info () __attribute__ ((always_inline));
+static inline bool
+init_tls_select_info ()
+{
+  if (!_my_tls.locals.select.sockevt)
+    {
+      _my_tls.locals.select.sockevt = CreateEvent (&sec_none_nih, TRUE, FALSE,
+						   NULL);
+      if (!_my_tls.locals.select.sockevt)
+	return false;
+    }
+  if (!_my_tls.locals.select.ser_num)
+    {
+      _my_tls.locals.select.ser_num
+	      = (LONG *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (LONG));
+      if (!_my_tls.locals.select.ser_num)
+	return false;
+      _my_tls.locals.select.w4
+	      = (HANDLE *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (HANDLE));
+      if (!_my_tls.locals.select.w4)
+	{
+	  free (_my_tls.locals.select.ser_num);
+	  _my_tls.locals.select.ser_num = NULL;
+	  return false;
+	}
+      _my_tls.locals.select.max_w4 = MAXIMUM_WAIT_OBJECTS;
+    }
+  return true;
 }
 
 static int
@@ -1359,19 +1394,17 @@ start_thread_socket (select_record *me, select_stuff *stuff)
     }
 
   si = new select_socket_info;
-  si->ser_num = (LONG *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (LONG));
-  si->w4 = (HANDLE *) malloc (MAXIMUM_WAIT_OBJECTS * sizeof (HANDLE));
-  if (!si->ser_num || !si->w4)
+
+  if (!init_tls_select_info ())
     return 0;
-  si->max_w4 = MAXIMUM_WAIT_OBJECTS;
-  select_record *s = &stuff->start;
-  if (_my_tls.locals.select_sockevt != INVALID_HANDLE_VALUE)
-    si->w4[0] = _my_tls.locals.select_sockevt;
-  else if (!(si->w4[0] = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL)))
-    return 1;
-  else
-    _my_tls.locals.select_sockevt = si->w4[0];
+
+  si->ser_num = _my_tls.locals.select.ser_num;
+  si->w4 = _my_tls.locals.select.w4;
+
+  si->w4[0] = _my_tls.locals.select.sockevt;
   si->num_w4 = 1;
+
+  select_record *s = &stuff->start;
   while ((s = s->next))
     if (s->startup == start_thread_socket)
       {
@@ -1382,21 +1415,23 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	for (int i = 1; i < si->num_w4; ++i)
 	  if (si->ser_num[i] == ser_num)
 	    goto continue_outer_loop;
-	if (si->num_w4 >= si->max_w4)
+	if (si->num_w4 >= _my_tls.locals.select.max_w4)
 	  {
 	    LONG *nser = (LONG *) realloc (si->ser_num,
-					   (si->max_w4 + MAXIMUM_WAIT_OBJECTS)
+					   (_my_tls.locals.select.max_w4
+					    + MAXIMUM_WAIT_OBJECTS)
 					   * sizeof (LONG));
 	    if (!nser)
 	      return 0;
-	    si->ser_num = nser;
+	    _my_tls.locals.select.ser_num = si->ser_num = nser;
 	    HANDLE *nw4 = (HANDLE *) realloc (si->w4,
-					   (si->max_w4 + MAXIMUM_WAIT_OBJECTS)
+					   (_my_tls.locals.select.max_w4
+					    + MAXIMUM_WAIT_OBJECTS)
 					   * sizeof (HANDLE));
 	    if (!nw4)
 	      return 0;
-	    si->w4 = nw4;
-	    si->max_w4 += MAXIMUM_WAIT_OBJECTS;
+	    _my_tls.locals.select.w4 = si->w4 = nw4;
+	    _my_tls.locals.select.max_w4 += MAXIMUM_WAIT_OBJECTS;
 	  }
 	si->ser_num[si->num_w4] = ser_num;
 	si->w4[si->num_w4++] = ((fhandler_socket *) s->fh)->wsock_event ();
@@ -1423,10 +1458,6 @@ socket_cleanup (select_record *, select_stuff *stuff)
       si->thread->detach ();
       ResetEvent (si->w4[0]);
       stuff->device_specific_socket = NULL;
-      if (si->ser_num)
-	free (si->ser_num);
-      if (si->w4)
-	free (si->w4);
       delete si;
     }
   select_printf ("returning");

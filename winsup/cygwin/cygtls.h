@@ -104,7 +104,12 @@ struct _local_storage
   char mnt_dir[CYG_MAX_PATH];
 
   /* select.cc */
-  HANDLE select_sockevt;
+  struct {
+    HANDLE  sockevt;
+    int     max_w4;
+    LONG   *ser_num;			// note: malloced
+    HANDLE *w4;				// note: malloced
+  } select;
 
   /* strerror */
   char strerror_buf[sizeof ("Unknown error 4294967295")];
