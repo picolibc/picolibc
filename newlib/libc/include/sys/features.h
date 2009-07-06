@@ -73,6 +73,9 @@ extern "C" {
 #define _POSIX_INTERRUPT_CONTROL		1
 #define _POSIX_ADVISORY_INFO			1
 
+/* UNIX98 added some new pthread mutex attributes */
+#define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
+
 #endif
 
 /* XMK loosely adheres to POSIX -- 1003.1 */
