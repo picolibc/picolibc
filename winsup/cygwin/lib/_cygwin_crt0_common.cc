@@ -10,8 +10,34 @@ details. */
 
 #include "winsup.h"
 #include "crt0.h"
+#include "cygwin-cxx.h"
 
-/* Avoid an info message from linker when linking applications. */
+/* Weaken these declarations so the references don't pull in C++ dependencies 
+   unnecessarily.  */
+#define WEAK __attribute__ ((weak))
+
+/* Use asm names to bypass the --wrap that is being applied to redirect all other
+   references to these operators toward the redirectors in the Cygwin DLL; this
+   way we can record what definitions were visible at final link time but still
+   send all calls to the redirectors.  */
+extern WEAK void *operator new(std::size_t sz) throw (std::bad_alloc)
+			__asm__ ("___real__Znwj");
+extern WEAK void *operator new[](std::size_t sz) throw (std::bad_alloc)
+			__asm__ ("___real__Znaj");
+extern WEAK void operator delete(void *p) throw()
+			__asm__ ("___real__ZdlPv ");
+extern WEAK void operator delete[](void *p) throw()
+			__asm__ ("___real__ZdaPv");
+extern WEAK void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
+			__asm__ ("___real__ZnwjRKSt9nothrow_t");
+extern WEAK void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
+			__asm__ ("___real__ZnajRKSt9nothrow_t");
+extern WEAK void operator delete(void *p, const std::nothrow_t &nt) throw()
+			__asm__ ("___real__ZdlPvRKSt9nothrow_t");
+extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) throw()
+			__asm__ ("___real__ZdaPvRKSt9nothrow_t");
+
+/* Avoid an info message from linker when linking applications.  */
 extern __declspec(dllimport) struct _reent *_impure_ptr;
 
 #undef environ
@@ -25,6 +51,14 @@ int main (int, char **, char **);
 int _fmode;
 void _pei386_runtime_relocator ();
 
+struct per_process_cxx_malloc __cygwin_cxx_malloc = 
+{
+  &(operator new), &(operator new[]),
+  &(operator delete), &(operator delete[]),
+  &(operator new), &(operator new[]),
+  &(operator delete), &(operator delete[])
+};
+
 /* Set up pointers to various pieces so the dll can then use them,
    and then jump to the dll.  */
 
@@ -33,17 +67,15 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
 {
   /* This is used to record what the initial sp was.  The value is needed
      when copying the parent's stack to the child during a fork.  */
-  DWORD newu;
+  per_process *newu = (per_process *) cygwin_internal (CW_USER_DATA);
   int uwasnull;
 
   if (u != NULL)
-    uwasnull = 0;	/* Caller allocated space for per_process structure */
-  else if ((newu = cygwin_internal (CW_USER_DATA)) == (DWORD) -1)
-    return 0;
+    uwasnull = 0;	/* Caller allocated space for per_process structure.  */
   else
     {
-      u = (per_process *) newu;	/* Using DLL built-in per_process */
-      uwasnull = 1;	/* Remember for later */
+      u = newu;	/* Using DLL built-in per_process.  */
+      uwasnull = 1;	/* Remember for later.  */
     }
 
   /* The version numbers are the main source of compatibility checking.
@@ -64,8 +96,6 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   else
     u->impure_ptr_ptr = &_impure_ptr;	/* Older DLLs need this. */
 
-  u->forkee = 0;			/* This should only be set in dcrt0.cc
-					   when the process is actually forked */
   u->main = f;
 
   /* These functions are executed prior to main.  They are just stubs unless the
@@ -84,7 +114,28 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->realloc = &realloc;
   u->calloc = &calloc;
 
-  /* Setup the module handle so fork can get the path name. */
+  /* Likewise for the C++ memory operators - if any.  */
+  if (newu && newu->cxx_malloc)
+    {
+      /* Inherit what we don't override.  */
+#define CONDITIONALLY_OVERRIDE(MEMBER) \
+      if (!__cygwin_cxx_malloc.MEMBER) \
+	__cygwin_cxx_malloc.MEMBER = newu->cxx_malloc->MEMBER;
+      CONDITIONALLY_OVERRIDE(oper_new);
+      CONDITIONALLY_OVERRIDE(oper_new__);
+      CONDITIONALLY_OVERRIDE(oper_delete);
+      CONDITIONALLY_OVERRIDE(oper_delete__);
+      CONDITIONALLY_OVERRIDE(oper_new_nt);
+      CONDITIONALLY_OVERRIDE(oper_new___nt);
+      CONDITIONALLY_OVERRIDE(oper_delete_nt);
+      CONDITIONALLY_OVERRIDE(oper_delete___nt);
+    }
+
+  /* Now update the resulting set into the global redirectors.  */
+  if (newu)
+    newu->cxx_malloc = &__cygwin_cxx_malloc;
+
+  /* Setup the module handle so fork can get the path name.  */
   u->hmodule = GetModuleHandle (0);
 
   /* variables for fork */

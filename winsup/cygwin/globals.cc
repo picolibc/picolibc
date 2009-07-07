@@ -98,7 +98,7 @@ extern "C"
    /* premain */ {NULL, NULL, NULL, NULL},
    /* run_ctors_p */ 0,
    /* unused */ {0, 0, 0, 0, 0, 0, 0},
-   /* UNUSED forkee */ 0,
+   /* cxx_malloc */ &default_cygwin_cxx_malloc,
    /* hmodule */ NULL,
    /* api_major */ CYGWIN_VERSION_API_MAJOR,
    /* api_minor */ CYGWIN_VERSION_API_MINOR,

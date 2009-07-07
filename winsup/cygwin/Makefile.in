@@ -145,9 +145,9 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	fhandler_termios.o fhandler_tty.o fhandler_virtual.o fhandler_windows.o \
 	fhandler_zero.o flock.o fnmatch.o fork.o fts.o ftw.o getopt.o glob.o \
 	glob_pattern_p.o globals.o grp.o heap.o hookapi.o inet_addr.o inet_network.o \
-	init.o ioctl.o ipc.o kernel32.o localtime.o lsearch.o malloc_wrapper.o \
-	minires-os-if.o minires.o miscfuncs.o mktemp.o mmap.o msg.o mount.o \
-	net.o netdb.o nfs.o nftw.o ntea.o passwd.o path.o pinfo.o pipe.o \
+	init.o ioctl.o ipc.o kernel32.o libstdcxx_wrapper.o localtime.o lsearch.o \
+	malloc_wrapper.o minires-os-if.o minires.o miscfuncs.o mktemp.o mmap.o msg.o \
+	mount.o net.o netdb.o nfs.o nftw.o ntea.o passwd.o path.o pinfo.o pipe.o \
 	poll.o posix_ipc.o pthread.o random.o regcomp.o regerror.o regexec.o \
 	regfree.o registry.o resource.o rexec.o rcmd.o scandir.o sched.o \
 	sec_acl.o sec_auth.o sec_helper.o security.o select.o sem.o \
@@ -268,6 +268,7 @@ fhandler_windows_CFLAGS:=-fomit-frame-pointer
 fhandler_zero_CFLAGS:=-fomit-frame-pointer
 flock_CFLAGS:=-fomit-frame-pointer
 grp_CFLAGS:=-fomit-frame-pointer
+libstdcxx_wrapper_CFLAGS:=-fomit-frame-pointer
 malloc_CFLAGS:=-fomit-frame-pointer
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
@@ -284,6 +285,10 @@ syscalls_CFLAGS:=-fomit-frame-pointer
 sysconf_CFLAGS:=-fomit-frame-pointer
 uinfo_CFLAGS:=-fomit-frame-pointer
 endif
+
+_cygwin_crt0_common_STDINCFLAGS:=yes
+libstdcxx_wrapper_STDINCFLAGS:=yes
+cxx_STDINCFLAGS:=yes
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
 	install install-libs install-headers

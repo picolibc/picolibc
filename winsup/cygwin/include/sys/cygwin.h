@@ -194,6 +194,8 @@ enum
 class MTinterface;
 #endif
 
+struct per_process_cxx_malloc;
+
 struct per_process
 {
   char *initial_sp;
@@ -238,9 +240,8 @@ struct per_process
 
   DWORD unused[7];
 
-  /* Non-zero means the task was forked.  The value is the pid.
-     Inherited from parent. */
-  int forkee;
+  /* Pointers to real operator new/delete functions for forwarding.  */
+  struct per_process_cxx_malloc *cxx_malloc;
 
   HMODULE hmodule;
 

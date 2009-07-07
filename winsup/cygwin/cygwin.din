@@ -1808,3 +1808,11 @@ y1 NOSIGFE
 y1f NOSIGFE
 yn NOSIGFE
 ynf NOSIGFE
+__wrap__ZdaPv NOSIGFE               # void operator delete[](void *p) throw()
+__wrap__ZdaPvRKSt9nothrow_t NOSIGFE # void operator delete[](void *p, const std::nothrow_t &nt) throw()
+__wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
+__wrap__ZdlPvRKSt9nothrow_t NOSIGFE # void operator delete(void *p, const std::nothrow_t &nt) throw()
+__wrap__Znaj NOSIGFE                # void *operator new[](std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnajRKSt9nothrow_t NOSIGFE  # void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
+__wrap__Znwj NOSIGFE                # void *operator new(std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnwjRKSt9nothrow_t NOSIGFE  # void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()

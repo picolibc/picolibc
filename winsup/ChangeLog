@@ -1,3 +1,9 @@
+2009-07-07  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* Makefile.common (COMPILE_CXX): Add support for per-file overrides
+	to exclude $(nostdinc) and $(nostdincxx) from compiler flags.
+	(COMPILE_CC): Likewise for $(nostdinc).
+
 2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
 
 	* Makefile.in: Add DESTDIR functionality.

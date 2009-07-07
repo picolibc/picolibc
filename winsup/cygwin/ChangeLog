@@ -1,3 +1,50 @@
+2009-07-07  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* Makefile.in (DLL_OFILES): Add libstdcxx_wrapper.o
+	(libstdcxx_wrapper_CFLAGS): Add flags for new module.
+	(_cygwin_crt0_common_STDINCFLAGS): Define per-file override.
+	(libstdcxx_wrapper_STDINCFLAGS, cxx_STDINCFLAGS): Likewise.
+	* cxx.cc: Include "cygwin-cxx.h".
+	(operator new): Tweak prototype for full standards compliance.
+	(operator new[]): Likewise.
+	(operator new (nothrow)): New fallback function.
+	(operator new[] (nothrow), operator delete (nothrow),
+	operator delete[] (nothrow)): Likewise.
+	(default_cygwin_cxx_malloc): New struct of pointers to the above,
+	for final last-resort fallback default.
+	* cygwin-cxx.h: New file.
+	(struct per_process_cxx_malloc): Define.
+	(default_cygwin_cxx_malloc): Declare extern.
+	* cygwin.din (__wrap__ZdaPv): Export new wrapper.
+	(__wrap__ZdaPvRKSt9nothrow_t, __wrap__ZdlPv,
+	__wrap__ZdlPvRKSt9nothrow_t, __wrap__Znaj,
+	__wrap__ZnajRKSt9nothrow_t, __wrap__Znwj,
+	__wrap__ZnwjRKSt9nothrow_t): Likewise.
+	* globals.cc (__cygwin_user_data): Init newly-repurposed 'forkee'
+	field (now 'cxx_malloc') to point to default_cygwin_cxx_malloc.
+	* libstdcxx_wrapper.cc: New file.
+	(__wrap__ZdaPv, __wrap__ZdaPvRKSt9nothrow_t, __wrap__ZdlPv,
+	__wrap__ZdlPvRKSt9nothrow_t, __wrap__Znaj,
+	__wrap__ZnajRKSt9nothrow_t, __wrap__Znwj,
+	__wrap__ZnwjRKSt9nothrow_t): Define wrapper functions for libstdc++
+	malloc operators and their overrides.
+	* winsup.h (default_cygwin_cxx_malloc): Declare extern.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* include/sys/cygwin.h (struct per_process_cxx_malloc): Forward
+	declare here.
+	(struct per_process::forkee): Rename and repurpose from this ...
+	(struct per_process::cxx_malloc): ... to this.
+	* lib/_cygwin_crt0_common.cc: Include cygwin-cxx.h.
+	(WEAK): Define shorthand helper macro.
+	(__cygwin_cxx_malloc): Define and populate with weak references
+	to whatever libstdc++ malloc operators will be visible at final
+	link time for Cygwin apps and dlls.
+	(_cygwin_crt0_common): Always look up cygwin DLL's internal
+	per_process data, and don't test for (impossible) failure.  Inherit
+	any members of __cygwin_cxx_malloc that we don't have overrides
+	for from the DLL's default and store the resulting overall set of
+	overrides back into the DLL's global per_process data.
+
 2009-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::remove): Fix typo.

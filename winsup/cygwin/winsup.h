@@ -183,6 +183,9 @@ extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
 
+/* libstdc++ malloc operator wrapper support.  */
+extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
+
 /* UID/GID */
 void uinfo_init ();
 
