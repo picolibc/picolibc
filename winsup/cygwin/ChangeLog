@@ -116,7 +116,7 @@
 
 2009-07-04  Dave Korn  <dave.korn.cygwin@gmail.com>
 
-	* autoload.cc (AttachConsole):  Correct size of args.
+	* autoload.cc (AttachConsole): Correct size of args.
 
 2009-07-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
@@ -495,8 +495,8 @@
 
 2009-06-05  Dave Korn  <dave.korn.cygwin@gmail.com>
 
-	* winbase.h (ilockexch):  Fix asm constraints.
-	(ilockcmpexch):  Likewise.
+	* winbase.h (ilockexch): Fix asm constraints.
+	(ilockcmpexch): Likewise.
 
 2009-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -523,8 +523,8 @@
 
 2009-06-04  Dave Korn  <dave.korn.cygwin@gmail.com>
 
-	* thread.cc (__cygwin_lock_lock):  Delete racy optimisation.
-	(__cygwin_lock_unlock):  Likewise.
+	* thread.cc (__cygwin_lock_lock): Delete racy optimisation.
+	(__cygwin_lock_unlock): Likewise.
 
 2009-06-03  IWAMURO Motnori  <deenheart@gmail.com>
 
@@ -857,10 +857,10 @@
 
 2009-04-13  Dave Korn  <dave.korn.cygwin@gmail.com>
 
-	* include/stdint.h (intptr_t):  Remove long from type.
-	(uintptr_t):  Likewise.
-	(INTPTR_MIN):  Remove 'L' suffix.
-	(INTPTR_MAX, UINTPTR_MAX):  Likewise.
+	* include/stdint.h (intptr_t): Remove long from type.
+	(uintptr_t): Likewise.
+	(INTPTR_MIN): Remove 'L' suffix.
+	(INTPTR_MAX, UINTPTR_MAX): Likewise.
 
 2009-04-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
@@ -894,8 +894,8 @@
 
 2009-04-11  Dave Korn <dave.korn.cygwin@googlemail.com>
 
-	* include/stdint.h (INTPTR_MIN, INTPTR_MAX):  Add 'L' suffix.
-	(WINT_MAX):  Add 'U' suffix.
+	* include/stdint.h (INTPTR_MIN, INTPTR_MAX): Add 'L' suffix.
+	(WINT_MAX): Add 'U' suffix.
 
 2009-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
