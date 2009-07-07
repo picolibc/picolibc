@@ -40,7 +40,7 @@ ilockexch (volatile long *t, long v)
 {
   return
   ({
-    register __typeof (*t) ret __asm ("%eax");
+    register long ret __asm ("%eax");
     __asm __volatile ("\n"
 	"1:	lock cmpxchgl %2, %1\n"
 	"	jne  1b\n"
@@ -56,7 +56,7 @@ ilockcmpexch (volatile long *t, long v, long c)
 {
   return
   ({
-    register __typeof (*t) ret __asm ("%eax");
+    register long ret __asm ("%eax");
     __asm __volatile ("lock cmpxchgl %2, %1"
 	: "=a" (ret), "=m" (*t)
 	: "r" (v), "m" (*t), "0" (c)

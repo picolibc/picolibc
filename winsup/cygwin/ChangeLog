@@ -1,5 +1,10 @@
 2009-07-07  Dave Korn  <dave.korn.cygwin@gmail.com>
 
+	* winbase.h (ilockexch): Avoid making 'ret' volatile.
+	(ilockcmpexch): Likewise.
+
+2009-07-07  Dave Korn  <dave.korn.cygwin@gmail.com>
+
 	* Makefile.in (DLL_OFILES): Add libstdcxx_wrapper.o
 	(libstdcxx_wrapper_CFLAGS): Add flags for new module.
 	(_cygwin_crt0_common_STDINCFLAGS): Define per-file override.
