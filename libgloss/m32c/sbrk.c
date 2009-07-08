@@ -32,8 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern void _set_heaptop(void *ptr);
 
+/* Normally these would be in unistd.h but we don't rely on that being
+   available during this build.  */
+#if defined(__r8c_cpu__) || defined(__m16c_cpu__)
+#define PTRDIFF_T int
+#else
+#define PTRDIFF_T long
+#endif
+
 char *
-sbrk(int adj)
+sbrk(PTRDIFF_T adj)
 {
   extern char end;
   static char *heap = &end;
