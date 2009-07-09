@@ -1,3 +1,12 @@
+2009-07-09  Tom Tromey  <tromey@redhat.com>
+
+	* elf/dwarf2.h: Remove, renaming to...
+	* dwarf2.h: ... this.
+
+2009-06-29  Tom Tromey  <tromey@redhat.com>
+
+	* elf/dwarf2.h: New file.  Merged with gdb.
+
 2009-06-18  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h (USER_SPECIFIED_MACHINE_TYPE): New value for the flags
