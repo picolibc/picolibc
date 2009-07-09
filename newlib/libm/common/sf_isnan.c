@@ -15,10 +15,13 @@
 /*
  * isnanf(x) returns 1 is x is nan, else 0;
  *
- * isnanf is an extension declared in <ieeefp.h> and <math.h>.
+ * isnanf is an extension declared in <ieeefp.h>.
  */
 
 #include "fdlibm.h"
+#include <ieeefp.h>
+ 
+#undef isnanf
 
 int
 _DEFUN (isnanf, (x),

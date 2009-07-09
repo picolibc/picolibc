@@ -34,7 +34,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_acoshf(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(x<(float)1.0) {
             /* acoshf(x<1) */
             exc.type = DOMAIN;

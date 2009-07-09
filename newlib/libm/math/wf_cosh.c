@@ -33,7 +33,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_coshf(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabsf(x)>(float)8.9415985107e+01) {	
 	    /* coshf(finite) overflow */
 #ifndef HUGE_VAL

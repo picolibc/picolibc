@@ -34,7 +34,7 @@
 /*
  * On the SPU isinff(x) always returns 0.
  *
- * isinff is an extension declared in <ieeefp.h> and <math.h>.
+ * isinff is an extension declared in <ieeefp.h>.
  */
 int
 isinff (float x)

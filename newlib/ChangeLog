@@ -1,3 +1,32 @@
+2009-07-09  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/math/ef_scalb.c:  Replace isnanf() (pre-C99 function call) with
+	isnan() (C99 macro).
+	* libm/math/wf_log.c:  Ditto.
+	* libm/math/wf_j0.c:  Ditto.
+	* libm/math/wf_sqrt.c:  Ditto.
+	* libm/math/wf_pow.c:  Ditto.
+	* libm/math/wf_fmod.c:  Ditto.
+	* libm/math/wf_remainder.c:  Ditto.
+	* libm/math/wf_scalb.c:  Ditto.
+	* libm/math/wf_atanh.c:  Ditto.
+	* libm/math/wf_cosh.c:  Ditto.
+	* libm/math/wf_acos.c:  Ditto.
+	* libm/math/wf_acosh.c:  Ditto.
+	* libm/math/wf_jn.c:  Ditto.
+	* libm/math/wf_log10.c:  Ditto.
+	* libm/math/wf_asin.c:  Ditto.
+	* libm/math/wf_j1.c:  Ditto.
+	* libm/common/sf_isnan.c:  Add #include <ieeefp.h>, fix comment.
+	* libm/common/sf_isinf.c:  Add #include <ieeefp.h>, adjust comment to
+	match that from s_isinf.c.
+	* libc/include/machine/ieeefp.h:  Simplify isinf and isnan macros to
+	remove un-necessary extension use (in a similar manner to as was
+	recently done in math.h).
+	* libc/include/math.h:  Remove isnanf and isinff prototypes (are in
+	ieeefp.h).
+	* libm/machine/spu/sf_isinf.c:  Fix comment (remove <math.h>).
+
 2009-07-06  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/features.h: Enable UNIX98 mutex attributes

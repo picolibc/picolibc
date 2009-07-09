@@ -30,7 +30,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_jnf(n,x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x) ) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
 	if(fabsf(x)>(float)X_TLOSS) {
 	    /* jnf(|x|>X_TLOSS) */
             exc.type = TLOSS;
@@ -65,7 +65,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_ynf(n,x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x) ) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
         if(x <= (float)0.0){
 	    /* ynf(n,0) = -inf or ynf(x<0) = NaN */
 #ifndef HUGE_VAL 

@@ -195,7 +195,8 @@ extern int __signbitd (double x);
  *       arguments.  C99 specifies that these names are reserved for macros
  *       supporting multiple floating point types.  Thus, they are
  *       now defined as macros.  Implementations of the old functions
- *       taking double arguments still exist for compatibility purposes.  */
+ *       taking double arguments still exist for compatibility purposes
+ *       (prototypes for them are in <ieeefp.h>).  */
 #ifndef isinf
   #define isinf(y) (fpclassify(y) == FP_INFINITE)
 #endif
@@ -329,8 +330,6 @@ extern float fmaf _PARAMS((float, float, float));
 
 extern float infinityf _PARAMS((void));
 extern float nanf _PARAMS((const char *));
-extern int isnanf _PARAMS((float));
-extern int isinff _PARAMS((float));
 extern int finitef _PARAMS((float));
 extern float copysignf _PARAMS((float, float));
 extern int ilogbf _PARAMS((float));

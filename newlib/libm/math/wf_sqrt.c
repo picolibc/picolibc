@@ -33,7 +33,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_sqrtf(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(x<(float)0.0) {
             /* sqrtf(negative) */
             exc.type = DOMAIN;

@@ -33,7 +33,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_remainderf(x,y);
-	if(_LIB_VERSION == _IEEE_ || isnanf(y)) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(y)) return z;
 	if(y==(float)0.0) { 
             /* remainderf(x,0) */
             exc.type = DOMAIN;

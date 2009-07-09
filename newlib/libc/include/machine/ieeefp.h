@@ -80,12 +80,8 @@
           (__extension__ ({__typeof__(y) __y = (y); \
                            (sizeof (__y) == sizeof (float))  ? (1) : \
                            fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
-#define isinf(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? (0) : __isinfd(__x);}))
-#define isnan(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           (sizeof (__x) == sizeof (float))  ? (0) : __isnand(__x);}))
+#define isinf(__x) ((sizeof (__x) == sizeof (float))  ?  (0) : __isinfd(__x))
+#define isnan(__x) ((sizeof (__x) == sizeof (float))  ?  (0) : __isnand(__x))
 
 /*
  * Macros for use in ieeefp.h. We can't just define the real ones here

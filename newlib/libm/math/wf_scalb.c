@@ -50,7 +50,7 @@
 	struct exception exc;
 	z = __ieee754_scalbf(x,fn);
 	if(_LIB_VERSION == _IEEE_) return z;
-	if(!(finitef(z)||isnanf(z))&&finitef(x)) {
+	if(!(finitef(z)||isnan(z))&&finitef(x)) {
 	    /* scalbf overflow; SVID also returns +-HUGE_VAL */
 	    exc.type = OVERFLOW;
 	    exc.name = "scalbf";

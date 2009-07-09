@@ -33,7 +33,7 @@
 	float z;
 	struct exception exc;
 	z = __ieee754_fmodf(x,y);
-	if(_LIB_VERSION == _IEEE_ ||isnanf(y)||isnanf(x)) return z;
+	if(_LIB_VERSION == _IEEE_ ||isnan(y)||isnan(x)) return z;
 	if(y==(float)0.0) {
             /* fmodf(x,0) */
             exc.type = DOMAIN;

@@ -32,7 +32,7 @@
 	float z,y;
 	struct exception exc;
 	z = __ieee754_atanhf(x);
-	if(_LIB_VERSION == _IEEE_ || isnanf(x)) return z;
+	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	y = fabsf(x);
 	if(y>=(float)1.0) {
 	    if(y>(float)1.0) {
