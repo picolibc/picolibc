@@ -1,3 +1,7 @@
+2009-07-10  Tom Tromey  <tromey@redhat.com>
+
+	* dwarf2.h: Move to `..'.
+
 2009-07-10  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* dwarf2.h: Just include ../dwarf2.h.
