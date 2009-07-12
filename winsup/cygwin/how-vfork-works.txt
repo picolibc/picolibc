@@ -1,4 +1,4 @@
-Copyright 2001 Red Hat Inc., Christopher Faylor
+(THIS DESCRIPTION IS OUT-OF-DATE)
 
 How does vfork work?
 

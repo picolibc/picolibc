@@ -1,3 +1,4 @@
+(THIS DESCRIPTION IS OUT-OF-DATE)
 Spawn.cc in cygwin handles spawn, vfork and exec calls. It does this via
 a mode parameter that determines its behaviour with respect to the
 child.
