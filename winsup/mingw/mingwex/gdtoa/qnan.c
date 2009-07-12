@@ -74,12 +74,16 @@ main(void)
 		double d;
 		Ulong L[4];
 #ifndef NO_LONG_LONG
-		unsigned short u[5];
+/* need u[8] instead of u[5] for 64 bit */
+		unsigned short u[8];
 		long double D;
 #endif
 		} U;
 	U a, b, c;
 	int i;
+	a.L[0]=a.L[1]=a.L[2]=a.L[3]=0;
+	b.L[0]=b.L[1]=b.L[2]=b.L[3]=0;
+	c.L[0]=c.L[1]=c.L[2]=c.L[3]=0;
 
 	a.L[0] = b.L[0] = 0x7f800000;
 	c.f = a.f - b.f;

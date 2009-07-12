@@ -31,12 +31,11 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
- char *
-#ifdef KR_headers
-rv_alloc(i) int i;
-#else
-rv_alloc(int i)
+#ifndef MULTIPLE_THREADS
+char *dtoa_result;
 #endif
+
+char *rv_alloc (int i)
 {
 	int j, k, *r;
 
@@ -52,14 +51,9 @@ rv_alloc(int i)
 	dtoa_result =
 #endif
 		(char *)(r+1);
-	}
+}
 
- char *
-#ifdef KR_headers
-nrv_alloc(s, rve, n) char *s, **rve; int n;
-#else
-nrv_alloc(char *s, char **rve, int n)
-#endif
+char *nrv_alloc (char *s, char **rve, int n)
 {
 	char *rv, *t;
 
@@ -69,7 +63,7 @@ nrv_alloc(char *s, char **rve, int n)
 	if (rve)
 		*rve = t;
 	return rv;
-	}
+}
 
 /* freedtoa(s) must be used to free values s returned by dtoa
  * when MULTIPLE_THREADS is #defined.  It should be used in all cases,
@@ -77,12 +71,7 @@ nrv_alloc(char *s, char **rve, int n)
  * when MULTIPLE_THREADS is not defined.
  */
 
- void
-#ifdef KR_headers
-__freedtoa(s) char *s;
-#else
-__freedtoa(char *s)
-#endif
+void __freedtoa (char *s)
 {
 	Bigint *b = (Bigint *)((int *)s - 1);
 	b->maxwds = 1 << (b->k = *(int*)b);
@@ -91,15 +80,9 @@ __freedtoa(char *s)
 	if (s == dtoa_result)
 		dtoa_result = 0;
 #endif
-	}
+}
 
- int
-quorem
-#ifdef KR_headers
-	(b, S) Bigint *b, *S;
-#else
-	(Bigint *b, Bigint *S)
-#endif
+int quorem (Bigint *b, Bigint *S)
 {
 	int n;
 	ULong *bx, *bxe, q, *sx, *sxe;
@@ -157,15 +140,16 @@ quorem
 			*bx++ = y & 0xffff;
 #endif
 #endif
-			}
-			while(sx <= sxe);
+		} while(sx <= sxe);
+
 		if (!*bxe) {
 			bx = b->x;
 			while(--bxe > bx && !*bxe)
 				--n;
 			b->wds = n;
-			}
 		}
+	}
+
 	if (cmp(b, S) >= 0) {
 		q++;
 		borrow = 0;
@@ -198,15 +182,15 @@ quorem
 			*bx++ = y & 0xffff;
 #endif
 #endif
-			}
-			while(sx <= sxe);
+		} while(sx <= sxe);
+
 		bx = b->x;
 		bxe = bx + n;
 		if (!*bxe) {
 			while(--bxe > bx && !*bxe)
 				--n;
 			b->wds = n;
-			}
 		}
-	return q;
 	}
+	return q;
+}

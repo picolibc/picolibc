@@ -37,12 +37,7 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
- double
-#ifdef KR_headers
-__strtod(s, sp) CONST char *s; char **sp;
-#else
-__strtod(CONST char *s, char **sp)
-#endif
+double __strtod (const char *s, char **sp)
 {
 	static FPI fpi = { 53, 1-1023-53+1, 2046-1023-53+1, 1, SI };
 	ULong bits[2];
@@ -80,8 +75,8 @@ __strtod(CONST char *s, char **sp)
 	  case STRTOG_NaNbits:
 		u.L[_0] = 0x7ff00000 | bits[1];
 		u.L[_1] = bits[0];
-	  }
+	}
 	if (k & STRTOG_Neg)
 		u.L[_0] |= 0x80000000L;
 	return u.d;
-	}
+}

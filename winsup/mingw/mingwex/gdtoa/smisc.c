@@ -31,13 +31,7 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
- Bigint *
-s2b
-#ifdef KR_headers
-	(s, nd0, nd, y9) CONST char *s; int nd0, nd; ULong y9;
-#else
-	(CONST char *s, int nd0, int nd, ULong y9)
-#endif
+Bigint *s2b (const char *s, int nd0, int nd, ULong y9, int dplen)
 {
 	Bigint *b;
 	int i, k;
@@ -60,82 +54,51 @@ s2b
 		s += 9;
 		do b = multadd(b, 10, *s++ - '0');
 			while(++i < nd0);
-		s++;
-		}
+		s += dplen;
+	}
 	else
-		s += 10;
+		s += dplen + 9;
 	for(; i < nd; i++)
 		b = multadd(b, 10, *s++ - '0');
 	return b;
-	}
+}
 
- double
-ratio
-#ifdef KR_headers
-	(a, b) Bigint *a, *b;
-#else
-	(Bigint *a, Bigint *b)
-#endif
+double ratio (Bigint *a, Bigint *b)
 {
-	double da, db;
+	union _dbl_union da, db;
 	int k, ka, kb;
 
-	dval(da) = b2d(a, &ka);
-	dval(db) = b2d(b, &kb);
+	dval(&da) = b2d(a, &ka);
+	dval(&db) = b2d(b, &kb);
 	k = ka - kb + ULbits*(a->wds - b->wds);
-#ifdef IBM
-	if (k > 0) {
-		word0(da) += (k >> 2)*Exp_msk1;
-		if (k &= 3)
-			dval(da) *= 1 << k;
-		}
-	else {
-		k = -k;
-		word0(db) += (k >> 2)*Exp_msk1;
-		if (k &= 3)
-			dval(db) *= 1 << k;
-		}
-#else
 	if (k > 0)
-		word0(da) += k*Exp_msk1;
+		word0(&da) += k*Exp_msk1;
 	else {
 		k = -k;
-		word0(db) += k*Exp_msk1;
-		}
-#endif
-	return dval(da) / dval(db);
+		word0(&db) += k*Exp_msk1;
 	}
+	return dval(&da) / dval(&db);
+}
 
 #ifdef INFNAN_CHECK
 
- int
-match
-#ifdef KR_headers
-	(sp, t) char **sp, *t;
-#else
-	(CONST char **sp, char *t)
-#endif
+int match (const char **sp, char *t)
 {
 	int c, d;
-	CONST char *s = *sp;
+	const char *s = *sp;
 
 	while( (d = *t++) !=0) {
 		if ((c = *++s) >= 'A' && c <= 'Z')
 			c += 'a' - 'A';
 		if (c != d)
 			return 0;
-		}
+	}
 	*sp = s + 1;
 	return 1;
-	}
+}
 #endif /* INFNAN_CHECK */
 
- void
-#ifdef KR_headers
-copybits(c, n, b) ULong *c; int n; Bigint *b;
-#else
-copybits(ULong *c, int n, Bigint *b)
-#endif
+void copybits (ULong *c, int n, Bigint *b)
 {
 	ULong *ce, *x, *xe;
 #ifdef Pack_16
@@ -158,14 +121,9 @@ copybits(ULong *c, int n, Bigint *b)
 #endif
 	while(c < ce)
 		*c++ = 0;
-	}
+}
 
- ULong
-#ifdef KR_headers
-any_on(b, k) Bigint *b; int k;
-#else
-any_on(Bigint *b, int k)
-#endif
+ULong any_on (Bigint *b, int k)
 {
 	int n, nwds;
 	ULong *x, *x0, x1, x2;
@@ -181,11 +139,11 @@ any_on(Bigint *b, int k)
 		x1 <<= k;
 		if (x1 != x2)
 			return 1;
-		}
+	}
 	x0 = x;
 	x += n;
 	while(x > x0)
 		if (*--x)
 			return 1;
 	return 0;
-	}
+}

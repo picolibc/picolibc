@@ -51,20 +51,26 @@ THIS SOFTWARE.
 #define _4 0
 #endif
 
-static int
-#ifdef KR_headers
-__strtopx(s, sp, V) CONST char *s; char **sp; long double *V;
-#else
-__strtopx(CONST char *s, char **sp, long double *V)
-#endif
+typedef union lD {
+	UShort L[5];
+	long double D;
+} lD;
+
+static int __strtopx (const char *s, char **sp, lD *V)
 {
-	static FPI fpi = { 64, 1-16383-64+1, 32766 - 16383 - 64 + 1, 1, SI };
+	static FPI fpi0 = { 64, 1-16383-64+1, 32766 - 16383 - 64 + 1, 1, SI };
 	ULong bits[2];
 	Long exp;
 	int k;
-	UShort *L = (UShort*)V;
+	UShort *L = & (V->L[0]);
+#ifdef Honor_FLT_ROUNDS
+#include "gdtoa_fltrnds.h"
+#else
+#define fpi &fpi0
+#endif
+	V->D = 0.0L;
 
-	k = __strtodg(s, sp, &fpi, &exp, bits);
+	k = __strtodg(s, sp, fpi, &exp, bits);
 	switch(k & STRTOG_Retmask) {
 	  case STRTOG_NoNumber:
 	  case STRTOG_Zero:
@@ -97,23 +103,22 @@ __strtopx(CONST char *s, char **sp, long double *V)
 		L[2] = ldus_QNAN2;
 		L[3] = ldus_QNAN3;
 		L[4] = ldus_QNAN4;
-	  }
+	}
 	if (k & STRTOG_Neg)
 		L[_0] |= 0x8000;
 	return k;
-	}
-
-long double
-__cdecl
-__strtold (const char * __restrict__ src, char ** __restrict__ endptr)
-{
-   long double ret;
-   __strtopx(src, endptr,  &ret);
-   return ret;
 }
 
-long double
-__cdecl
+long double __cdecl
+__strtold (const char * __restrict__ src, char ** __restrict__ endptr)
+{
+	lD ret;
+	ret.D = 0.0L;
+	__strtopx(src, endptr,  &ret);
+	return ret.D;
+}
+
+long double __cdecl
 strtold (const char * __restrict__ src, char ** __restrict__ endptr)
   __attribute__((alias("__strtold")));
 

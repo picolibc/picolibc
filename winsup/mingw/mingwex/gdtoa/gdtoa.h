@@ -36,6 +36,15 @@ THIS SOFTWARE.
 #define GDTOA_H_INCLUDED
 
 #include "gd_arith.h"
+#include <stddef.h> /* for size_t */
+
+#if defined(__MINGW32__) || defined(__MINGW64__)
+/* keep the 'Long' definition as 'long' for compatibility
+ * with older/other software. long in w64 is 32 bits anyway..
+ */
+#define Long long	/* int */
+#undef  NO_LONG_LONG	/* we have long long type */
+#endif	/* MinGW */
 
 #ifndef Long
 #define Long long
@@ -47,25 +56,7 @@ typedef unsigned Long ULong;
 typedef unsigned short UShort;
 #endif
 
-#ifndef ANSI
-#ifdef KR_headers
-#define ANSI(x) ()
-#define Void /*nothing*/
-#else
-#define ANSI(x) x
-#define Void void
-#endif
-#endif /* ANSI */
-
-#ifndef CONST
-#ifdef KR_headers
-#define CONST /* blank */
-#else
-#define CONST const
-#endif
-#endif /* CONST */
-
- enum {	/* return values from strtodg */
+enum {	/* return values from strtodg */
 	STRTOG_Zero	= 0,
 	STRTOG_Normal	= 1,
 	STRTOG_Denormal	= 2,
@@ -77,49 +68,49 @@ typedef unsigned short UShort;
 
 	/* The following may be or-ed into one of the above values. */
 
-	STRTOG_Neg	= 0x08,
-	STRTOG_Inexlo	= 0x10,
-	STRTOG_Inexhi	= 0x20,
+	STRTOG_Neg	= 0x08, /* does not affect STRTOG_Inexlo or STRTOG_Inexhi */
+	STRTOG_Inexlo	= 0x10,	/* returned result rounded toward zero */
+	STRTOG_Inexhi	= 0x20, /* returned result rounded away from zero */
 	STRTOG_Inexact	= 0x30,
 	STRTOG_Underflow= 0x40,
 	STRTOG_Overflow	= 0x80
-	};
+};
 
- typedef struct
+typedef struct
 FPI {
 	int nbits;
 	int emin;
 	int emax;
 	int rounding;
 	int sudden_underflow;
-	} FPI;
+} FPI;
 
 enum {	/* FPI.rounding values: same as FLT_ROUNDS */
 	FPI_Round_zero = 0,
 	FPI_Round_near = 1,
 	FPI_Round_up = 2,
 	FPI_Round_down = 3
-	};
+};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern char* __dtoa  ANSI((double d, int mode, int ndigits, int *decpt,
-			  int *sign, char **rve));
-extern char* __gdtoa ANSI((FPI *fpi, int be, ULong *bits, int *kindp,
-			 int mode, int ndigits, int *decpt, char **rve));
-extern void __freedtoa ANSI((char*));
+extern char* __dtoa (double d, int mode, int ndigits, int *decpt,
+		     int *sign, char **rve);
+extern char* __gdtoa (FPI *fpi, int be, ULong *bits, int *kindp,
+		     int mode, int ndigits, int *decpt, char **rve);
+extern void __freedtoa (char *);
 
-extern int __strtodg ANSI((CONST char*, char**, FPI*, Long*, ULong*));
-extern float  __strtof ANSI((CONST char *, char **));
-extern double  __strtod ANSI((CONST char *, char **));
-extern long double strtold ANSI((CONST char *, char **));
+extern float  __strtof (const char *, char **);
+extern double __strtod (const char *, char **);
+extern long double __strtold (const char *, char **);
+extern int __strtodg (const char *, char **, FPI *, Long *, ULong *);
 
-extern char*	__g__fmt   ANSI((char *, char *, char *e, int, ULong));
-extern char*	__g_dfmt   ANSI((char*, double*, int, unsigned));
-extern char*	__g_ffmt   ANSI((char*, float*,  int, unsigned));
-extern char*	__g_xfmt   ANSI((char*, void*,   int, unsigned));
+extern char*	__g__fmt   (char*, char*, char*, int, ULong, size_t);
+extern char*	__g_dfmt   (char*, double*, int, size_t);
+extern char*	__g_ffmt   (char*, float*,  int, size_t);
+extern char*	__g_xfmt   (char*, void*,   int, size_t);
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,21 @@
+2009-06-28  Ozkan Sezer  <sezero@users.sourceforge.net>
+
+	* mingwex/gdtoa/README.mingw mingwex/gdtoa/gdtoa_fltrnds.h: New files.
+	* mingwex/gdtoa/README mingwex/gdtoa/dmisc.c mingwex/gdtoa/dtoa.c
+	mingwex/gdtoa/g__fmt.c mingwex/gdtoa/g_dfmt.c mingwex/gdtoa/g_ffmt.c
+	mingwex/gdtoa/g_xfmt.c mingwex/gdtoa/gd_arith.h mingwex/gdtoa/gd_qnan.h
+	mingwex/gdtoa/gdtoa.c mingwex/gdtoa/gdtoa.h mingwex/gdtoa/gdtoaimp.h
+	mingwex/gdtoa/gethex.c mingwex/gdtoa/gmisc.c mingwex/gdtoa/hd_init.c
+	mingwex/gdtoa/hexnan.c mingwex/gdtoa/misc.c mingwex/gdtoa/qnan.c
+	mingwex/gdtoa/smisc.c mingwex/gdtoa/strtodg.c mingwex/gdtoa/strtodnrp.c
+	mingwex/gdtoa/strtof.c mingwex/gdtoa/strtopx.c mingwex/gdtoa/sum.c
+	mingwex/gdtoa/ulp.c:  Update the gdtoa library to match the netlib.org
+	sources as of Apr. 20, 2009.  Update further to match the sources in
+	the mingw-w64 tree as of June 28, 2009, by removing IBM, CRAY and VAX
+	code, removing KR_headers, ANSI, Void and Char ifdefs, renaming the
+	double/ulong union from U to dbl_union for better grepping and white-
+	space tidy-ups.
+
 2009-06-16 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/stdlib.h (_wtof): Define.

@@ -51,21 +51,22 @@ THIS SOFTWARE.
 #define _4 0
 #endif
 
- char*
-#ifdef KR_headers
-__g_xfmt(buf, V, ndig, bufsize) char *buf; char *V; int ndig; unsigned bufsize;
-#else
-__g_xfmt(char *buf, void *V, int ndig, unsigned bufsize)
-#endif
+char *__g_xfmt (char *buf, void *V, int ndig, size_t bufsize)
 {
-	static FPI fpi = { 64, 1-16383-64+1, 32766 - 16383 - 64 + 1, 1, 0 };
+	static FPI fpi0 = { 64, 1-16383-64+1, 32766 - 16383 - 64 + 1, 1, 0 };
 	char *b, *s, *se;
 	ULong bits[2], sign;
 	UShort *L;
 	int decpt, ex, i, mode;
-
+#if defined(__MINGW32__) || defined(__MINGW64__)
 	int fptype = __fpclassifyl (*(long double*) V);
-          
+#endif	/* MinGW */
+#ifdef Honor_FLT_ROUNDS
+#include "gdtoa_fltrnds.h"
+#else
+#define fpi &fpi0
+#endif
+
 	if (ndig < 0)
 		ndig = 0;
 	if (bufsize < ndig + 10)
@@ -73,36 +74,54 @@ __g_xfmt(char *buf, void *V, int ndig, unsigned bufsize)
 
 	L = (UShort *)V;
 	sign = L[_0] & 0x8000;
-        ex = L[_0] & 0x7fff;
-
+	ex = L[_0] & 0x7fff;
 	bits[1] = (L[_1] << 16) | L[_2];
 	bits[0] = (L[_3] << 16) | L[_4];
 
-	if (fptype & FP_NAN) /* NaN or Inf */
-	  {
- 	    if (fptype & FP_NORMAL)
-	      {
-		b = buf;
-		*b++ = sign ? '-': '+';
-		strncpy (b, "Infinity", ndig ? ndig : 8);
+#if defined(__MINGW32__) || defined(__MINGW64__)
+	if (fptype & FP_NAN) {
+		/* NaN or Inf */
+		if (fptype & FP_NORMAL) {
+			b = buf;
+			*b++ = sign ? '-': '+';
+			strncpy (b, "Infinity", ndig ? ndig : 8);
+			return (buf + strlen (buf));
+		}
+		strncpy (buf, "NaN", ndig ? ndig : 3);
 		return (buf + strlen (buf));
-	      }
-	    strncpy (buf, "NaN", ndig ? ndig : 3);
-	    return (buf + strlen (buf));
-	  }
-			
-	else if (fptype & FP_NORMAL) /* Normal or subnormal */
-	  {
-	    if  (fptype & FP_ZERO)
-	      {
+	}
+	else if (fptype & FP_NORMAL) {
+		/* Normal or subnormal */
+		if  (fptype & FP_ZERO) {
+			i = STRTOG_Denormal;
+			ex = 1;
+		}
+		else
+			i = STRTOG_Normal;
+	}
+#else
+	if (ex != 0) {
+		if (ex == 0x7fff) {
+			/* Infinity or NaN */
+			if (bits[0] | bits[1])
+				b = strcp(buf, "NaN");
+			else {
+				b = buf;
+				if (sign)
+					*b++ = '-';
+				b = strcp(b, "Infinity");
+			}
+			return b;
+		}
+		i = STRTOG_Normal;
+	}
+	else if (bits[0] | bits[1]) {
 		i = STRTOG_Denormal;
 		ex = 1;
-	      }
-	    else
-	      i = STRTOG_Normal;
-	  }
+	}
+#endif
 	else {
-		i = STRTOG_Zero;
+	/*	i = STRTOG_Zero; */
 		b = buf;
 #ifndef IGNORE_ZERO_SIGN
 		if (sign)
@@ -111,15 +130,14 @@ __g_xfmt(char *buf, void *V, int ndig, unsigned bufsize)
 		*b++ = '0';
 		*b = 0;
 		return b;
-		}
-
+	}
 	ex -= 0x3fff + 63;
 	mode = 2;
 	if (ndig <= 0) {
 		if (bufsize < 32)
 			return 0;
 		mode = 0;
-		}
-	s = __gdtoa(&fpi, ex, bits, &i, mode, ndig, &decpt, &se);
-	return __g__fmt(buf, s, se, decpt, sign);
 	}
+	s = __gdtoa(fpi, ex, bits, &i, mode, ndig, &decpt, &se);
+	return __g__fmt(buf, s, se, decpt, sign, bufsize);
+}

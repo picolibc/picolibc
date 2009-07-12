@@ -30,16 +30,16 @@ THIS SOFTWARE.
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
 
-#ifdef __MINGW32__
-/* we have to include windows.h before gdtoa headers, otherwise
-   defines cause conflicts.  */
+#if defined(__MINGW32__) || defined(__MINGW64__)
+/* we have to include windows.h before gdtoa
+   headers, otherwise defines cause conflicts. */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #define NLOCKS 2
 
 #ifdef USE_WIN32_SL
-/* Use spin locks. */ 
+/* Use spin locks. */
 static long dtoa_sl[NLOCKS];
 
 #define ACQUIRE_DTOA_LOCK(n) \
@@ -47,7 +47,8 @@ static long dtoa_sl[NLOCKS];
      Sleep (0);
 #define FREE_DTOA_LOCK(n) InterlockedExchange (&dtoa_sl[n], 0);
 
-#else
+#else	/* USE_WIN32_SL */
+
 #include <stdlib.h>
 static CRITICAL_SECTION dtoa_CritSec[NLOCKS];
 static long dtoa_CS_init = 0;
@@ -55,69 +56,59 @@ static long dtoa_CS_init = 0;
    1 = initializing
    2 = initialized
    3 = deleted
-*/ 
-static void dtoa_lock_cleanup()
+*/
+static void dtoa_lock_cleanup (void)
 {
-  long last_CS_init = InterlockedExchange (&dtoa_CS_init,3);
-
-  if (2 == last_CS_init)
-    {
-      int i;
-      for (i = 0; i < NLOCKS; i++)
-       DeleteCriticalSection (&dtoa_CritSec[i]);
-    }
+	long last_CS_init = InterlockedExchange (&dtoa_CS_init,3);
+	if (2 == last_CS_init) {
+		int i;
+		for (i = 0; i < NLOCKS; i++)
+			DeleteCriticalSection (&dtoa_CritSec[i]);
+	}
 }
 
-static void dtoa_lock(int n)
+static void dtoa_lock (int n)
 {
-  if (2 == dtoa_CS_init)
-    {
-      EnterCriticalSection (&dtoa_CritSec[n]);
-      return;
-    }
+	if (2 == dtoa_CS_init) {
+		EnterCriticalSection (&dtoa_CritSec[n]);
+		return;
+	}
+	else if (0 == dtoa_CS_init) {
+		long last_CS_init = InterlockedExchange (&dtoa_CS_init, 1);
+		if (0 == last_CS_init) {
+			int i;
+			for (i = 0; i < NLOCKS;  i++)
+				InitializeCriticalSection (&dtoa_CritSec[i]);
+			atexit (dtoa_lock_cleanup);
+			dtoa_CS_init = 2;
+		}
+		else if (2 == last_CS_init)
+			dtoa_CS_init = 2;
+	}
+	/*  Another thread is initializing. Wait. */
+	while (1 == dtoa_CS_init)
+		Sleep (1);
 
-  else if (0 == dtoa_CS_init)
-    {
-      long last_CS_init = InterlockedExchange (&dtoa_CS_init, 1);
-      if (0 == last_CS_init)
-        {
-      	   int i;
-      	   for (i = 0; i < NLOCKS;  i++)
-             InitializeCriticalSection (&dtoa_CritSec[i]);
-           atexit (dtoa_lock_cleanup);
-           dtoa_CS_init = 2;
-         }
-      else if (2 == last_CS_init)
-        dtoa_CS_init = 2;
-    }
- /*  Another thread is initializing.  Wait.  */ 
-  while (1 == dtoa_CS_init)
-       Sleep (1);
-
-  /* It had better be initialized now. */
-  if (2 == dtoa_CS_init)
-    EnterCriticalSection(&dtoa_CritSec[n]);
+	/* It had better be initialized now. */
+	if (2 == dtoa_CS_init)
+		EnterCriticalSection(&dtoa_CritSec[n]);
 }
 
-static void dtoa_unlock(int n)
+static void dtoa_unlock (int n)
 {
-  if (2 == dtoa_CS_init)
-    LeaveCriticalSection (&dtoa_CritSec[n]);
+	if (2 == dtoa_CS_init)
+		LeaveCriticalSection (&dtoa_CritSec[n]);
 }
 
 #define ACQUIRE_DTOA_LOCK(n) dtoa_lock(n)
 #define FREE_DTOA_LOCK(n) dtoa_unlock(n)
-#endif
+#endif	/* USE_WIN32_SL */
 
-#endif /* __MINGW32__ */
+#endif	/* __MINGW32__ / __MINGW64__ */
 
 #include "gdtoaimp.h"
 
-#ifndef MULTIPLE_THREADS
- char *dtoa_result;
-#endif
-
- static Bigint *freelist[Kmax+1];
+static Bigint *freelist[Kmax+1];
 #ifndef Omit_Private_Memory
 #ifndef PRIVATE_MEM
 #define PRIVATE_MEM 2304
@@ -126,13 +117,7 @@ static void dtoa_unlock(int n)
 static double private_mem[PRIVATE_mem], *pmem_next = private_mem;
 #endif
 
- Bigint *
-Balloc
-#ifdef KR_headers
-	(k) int k;
-#else
-	(int k)
-#endif
+Bigint *Balloc (int k)
 {
 	int x;
 	Bigint *rv;
@@ -141,9 +126,11 @@ Balloc
 #endif
 
 	ACQUIRE_DTOA_LOCK(0);
-	if ( (rv = freelist[k]) !=0) {
+	/* The k > Kmax case does not need ACQUIRE_DTOA_LOCK(0), */
+	/* but this case seems very unlikely. */
+	if (k <= Kmax && (rv = freelist[k]) !=0) {
 		freelist[k] = rv->next;
-		}
+	}
 	else {
 		x = 1 << k;
 #ifdef Omit_Private_Memory
@@ -151,51 +138,44 @@ Balloc
 #else
 		len = (sizeof(Bigint) + (x-1)*sizeof(ULong) + sizeof(double) - 1)
 			/sizeof(double);
-		if (pmem_next - private_mem + len <= PRIVATE_mem) {
+		if (k <= Kmax && pmem_next - private_mem + len <= PRIVATE_mem) {
 			rv = (Bigint*)pmem_next;
 			pmem_next += len;
-			}
+		}
 		else
 			rv = (Bigint*)MALLOC(len*sizeof(double));
 #endif
 		rv->k = k;
 		rv->maxwds = x;
-		}
+	}
 	FREE_DTOA_LOCK(0);
 	rv->sign = rv->wds = 0;
 	return rv;
-	}
+}
 
- void
-Bfree
-#ifdef KR_headers
-	(v) Bigint *v;
-#else
-	(Bigint *v)
-#endif
+void Bfree (Bigint *v)
 {
 	if (v) {
-		ACQUIRE_DTOA_LOCK(0);
-		v->next = freelist[v->k];
-		freelist[v->k] = v;
-		FREE_DTOA_LOCK(0);
+		if (v->k > Kmax)
+			free((void*)v);
+		else {
+			ACQUIRE_DTOA_LOCK(0);
+			v->next = freelist[v->k];
+			freelist[v->k] = v;
+			FREE_DTOA_LOCK(0);
 		}
 	}
+}
 
-// Shift y so lowest bit is 1 and return the number of bits y was
-// shifted. 
-//  With __GNUC__, we use an inline wrapper for __builtin_clz() 
+/* lo0bits():  Shift y so lowest bit is 1 and return the
+ *		 number of bits y was shifted.
+ * With GCC, we use an inline wrapper for __builtin_clz()
+ */
 #ifndef __GNUC__
- int
-lo0bits
-#ifdef KR_headers
-	(y) ULong *y;
-#else
-	(ULong *y)
-#endif
+int lo0bits (ULong *y)
 {
-	register int k;
-	register ULong x = *y;
+	int k;
+	ULong x = *y;
 
 	if (x & 7) {
 		if (x & 1)
@@ -203,46 +183,39 @@ lo0bits
 		if (x & 2) {
 			*y = x >> 1;
 			return 1;
-			}
+		}
 		*y = x >> 2;
 		return 2;
-		}
+	}
 	k = 0;
 	if (!(x & 0xffff)) {
 		k = 16;
 		x >>= 16;
-		}
+	}
 	if (!(x & 0xff)) {
 		k += 8;
 		x >>= 8;
-		}
+	}
 	if (!(x & 0xf)) {
 		k += 4;
 		x >>= 4;
-		}
+	}
 	if (!(x & 0x3)) {
 		k += 2;
 		x >>= 2;
-		}
+	}
 	if (!(x & 1)) {
 		k++;
 		x >>= 1;
 		if (!x)
 			return 32;
-		}
+	}
 	*y = x;
 	return k;
-	}
+}
+#endif	/* __GNUC__ */
 
-#endif  /* __GNUC__ */
-
- Bigint *
-multadd
-#ifdef KR_headers
-	(b, m, a) Bigint *b; int m, a;
-#else
-	(Bigint *b, int m, int a)	/* multiply by m and add a */
-#endif
+Bigint *multadd (Bigint *b, int m, int a)	/* multiply by m and add a */
 {
 	int i, wds;
 #ifdef ULLong
@@ -278,66 +251,54 @@ multadd
 		*x++ = y & 0xffff;
 #endif
 #endif
-		}
-		while(++i < wds);
+	} while(++i < wds);
 	if (carry) {
 		if (wds >= b->maxwds) {
 			b1 = Balloc(b->k+1);
 			Bcopy(b1, b);
 			Bfree(b);
 			b = b1;
-			}
+		}
 		b->x[wds++] = carry;
 		b->wds = wds;
-		}
-	return b;
 	}
+	return b;
+}
 
-// With __GNUC__, we use an inline wrapper for __builtin_clz() 
+/* hi0bits(); 
+ * With GCC, we use an inline wrapper for __builtin_clz()
+ */
 #ifndef __GNUC__
- int
-hi0bits_D2A
-#ifdef KR_headers
-	(x) register ULong x;
-#else
-	(register ULong x)
-#endif
+int hi0bits_D2A (ULong x)
 {
-	register int k = 0;
+	int k = 0;
 
 	if (!(x & 0xffff0000)) {
 		k = 16;
 		x <<= 16;
-		}
+	}
 	if (!(x & 0xff000000)) {
 		k += 8;
 		x <<= 8;
-		}
+	}
 	if (!(x & 0xf0000000)) {
 		k += 4;
 		x <<= 4;
-		}
+	}
 	if (!(x & 0xc0000000)) {
 		k += 2;
 		x <<= 2;
-		}
+	}
 	if (!(x & 0x80000000)) {
 		k++;
 		if (!(x & 0x40000000))
 			return 32;
-		}
-	return k;
 	}
+	return k;
+}
+#endif	/* __GNUC__ */
 
-#endif
-
- Bigint *
-i2b
-#ifdef KR_headers
-	(i) int i;
-#else
-	(int i)
-#endif
+Bigint *i2b (int i)
 {
 	Bigint *b;
 
@@ -345,15 +306,9 @@ i2b
 	b->x[0] = i;
 	b->wds = 1;
 	return b;
-	}
+}
 
- Bigint *
-mult
-#ifdef KR_headers
-	(a, b) Bigint *a, *b;
-#else
-	(Bigint *a, Bigint *b)
-#endif
+Bigint *mult (Bigint *a, Bigint *b)
 {
 	Bigint *c;
 	int k, wa, wb, wc;
@@ -372,7 +327,7 @@ mult
 		c = a;
 		a = b;
 		b = c;
-		}
+	}
 	k = a->k;
 	wa = a->wds;
 	wb = b->wds;
@@ -397,11 +352,10 @@ mult
 				z = *x++ * (ULLong)y + *xc + carry;
 				carry = z >> 32;
 				*xc++ = z & 0xffffffffUL;
-				}
-				while(x < xae);
+			} while(x < xae);
 			*xc = carry;
-			}
 		}
+	}
 #else
 #ifdef Pack_32
 	for(; xb < xbe; xb++, xc0++) {
@@ -415,10 +369,9 @@ mult
 				z2 = (*x++ >> 16) * y + (*xc >> 16) + carry;
 				carry = z2 >> 16;
 				Storeinc(xc, z2, z);
-				}
-				while(x < xae);
+			} while(x < xae);
 			*xc = carry;
-			}
+		}
 		if ( (y = *xb >> 16) !=0) {
 			x = xa;
 			xc = xc0;
@@ -430,11 +383,10 @@ mult
 				Storeinc(xc, z, z2);
 				z2 = (*x++ >> 16) * y + (*xc & 0xffff) + carry;
 				carry = z2 >> 16;
-				}
-				while(x < xae);
+			} while(x < xae);
 			*xc = z2;
-			}
 		}
+	}
 #else
 	for(; xb < xbe; xc0++) {
 		if ( (y = *xb++) !=0) {
@@ -445,27 +397,20 @@ mult
 				z = *x++ * y + *xc + carry;
 				carry = z >> 16;
 				*xc++ = z & 0xffff;
-				}
-				while(x < xae);
+			} while(x < xae);
 			*xc = carry;
-			}
 		}
+	}
 #endif
 #endif
 	for(xc0 = c->x, xc = xc0 + wc; wc > 0 && !*--xc; --wc) ;
 	c->wds = wc;
 	return c;
-	}
+}
 
- static Bigint *p5s;
+static Bigint *p5s;
 
- Bigint *
-pow5mult
-#ifdef KR_headers
-	(b, k) Bigint *b; int k;
-#else
-	(Bigint *b, int k)
-#endif
+Bigint *pow5mult (Bigint *b, int k)
 {
 	Bigint *b1, *p5, *p51;
 	int i;
@@ -483,19 +428,19 @@ pow5mult
 		if (!(p5 = p5s)) {
 			p5 = p5s = i2b(625);
 			p5->next = 0;
-			}
+		}
 		FREE_DTOA_LOCK(1);
 #else
 		p5 = p5s = i2b(625);
 		p5->next = 0;
 #endif
-		}
+	}
 	for(;;) {
 		if (k & 1) {
 			b1 = mult(b, p5);
 			Bfree(b);
 			b = b1;
-			}
+		}
 		if (!(k >>= 1))
 			break;
 		if ((p51 = p5->next) == 0) {
@@ -504,26 +449,19 @@ pow5mult
 			if (!(p51 = p5->next)) {
 				p51 = p5->next = mult(p5,p5);
 				p51->next = 0;
-				}
+			}
 			FREE_DTOA_LOCK(1);
 #else
 			p51 = p5->next = mult(p5,p5);
 			p51->next = 0;
 #endif
-			}
-		p5 = p51;
 		}
-	return b;
+		p5 = p51;
 	}
+	return b;
+}
 
-
- Bigint *
-lshift
-#ifdef KR_headers
-	(b, k) Bigint *b; int k;
-#else
-	(Bigint *b, int k)
-#endif
+Bigint *lshift (Bigint *b, int k)
 {
 	int i, k1, n, n1;
 	Bigint *b1;
@@ -547,8 +485,7 @@ lshift
 		do {
 			*x1++ = *x << k | z;
 			z = *x++ >> k1;
-			}
-			while(x < xe);
+		} while(x < xe);
 		if ((*x1 = z) !=0)
 			++n1;
 #else
@@ -557,27 +494,20 @@ lshift
 		do {
 			*x1++ = *x << k  & 0xffff | z;
 			z = *x++ >> k1;
-			}
-			while(x < xe);
+		} while(x < xe);
 		if (*x1 = z)
 			++n1;
 #endif
-		}
+	}
 	else do
 		*x1++ = *x++;
 		while(x < xe);
 	b1->wds = n1 - 1;
 	Bfree(b);
 	return b1;
-	}
+}
 
- int
-cmp
-#ifdef KR_headers
-	(a, b) Bigint *a, *b;
-#else
-	(Bigint *a, Bigint *b)
-#endif
+int cmp (Bigint *a, Bigint *b)
 {
 	ULong *xa, *xa0, *xb, *xb0;
 	int i, j;
@@ -601,17 +531,11 @@ cmp
 			return *xa < *xb ? -1 : 1;
 		if (xa <= xa0)
 			break;
-		}
-	return 0;
 	}
+	return 0;
+}
 
- Bigint *
-diff
-#ifdef KR_headers
-	(a, b) Bigint *a, *b;
-#else
-	(Bigint *a, Bigint *b)
-#endif
+Bigint *diff (Bigint *a, Bigint *b)
 {
 	Bigint *c;
 	int i, wa, wb;
@@ -631,13 +555,13 @@ diff
 		c->wds = 1;
 		c->x[0] = 0;
 		return c;
-		}
+	}
 	if (i < 0) {
 		c = a;
 		a = b;
 		b = c;
 		i = 1;
-		}
+	}
 	else
 		i = 0;
 	c = Balloc(a->k);
@@ -655,13 +579,12 @@ diff
 		y = (ULLong)*xa++ - *xb++ - borrow;
 		borrow = y >> 32 & 1UL;
 		*xc++ = y & 0xffffffffUL;
-		}
-		while(xb < xbe);
+	} while(xb < xbe);
 	while(xa < xae) {
 		y = *xa++ - borrow;
 		borrow = y >> 32 & 1UL;
 		*xc++ = y & 0xffffffffUL;
-		}
+	}
 #else
 #ifdef Pack_32
 	do {
@@ -670,52 +593,40 @@ diff
 		z = (*xa++ >> 16) - (*xb++ >> 16) - borrow;
 		borrow = (z & 0x10000) >> 16;
 		Storeinc(xc, z, y);
-		}
-		while(xb < xbe);
+	} while(xb < xbe);
 	while(xa < xae) {
 		y = (*xa & 0xffff) - borrow;
 		borrow = (y & 0x10000) >> 16;
 		z = (*xa++ >> 16) - borrow;
 		borrow = (z & 0x10000) >> 16;
 		Storeinc(xc, z, y);
-		}
+	}
 #else
 	do {
 		y = *xa++ - *xb++ - borrow;
 		borrow = (y & 0x10000) >> 16;
 		*xc++ = y & 0xffff;
-		}
-		while(xb < xbe);
+	} while(xb < xbe);
 	while(xa < xae) {
 		y = *xa++ - borrow;
 		borrow = (y & 0x10000) >> 16;
 		*xc++ = y & 0xffff;
-		}
+	}
 #endif
 #endif
 	while(!*--xc)
 		wa--;
 	c->wds = wa;
 	return c;
-	}
+}
 
- double
-b2d
-#ifdef KR_headers
-	(a, e) Bigint *a; int *e;
-#else
-	(Bigint *a, int *e)
-#endif
+double b2d (Bigint *a, int *e)
 {
 	ULong *xa, *xa0, w, y, z;
 	int k;
-	double d;
-#ifdef VAX
-	ULong d0, d1;
-#else
-#define d0 word0(d)
-#define d1 word1(d)
-#endif
+	union _dbl_union d;
+#define d0 word0(&d)
+#define d1 word1(&d)
 
 	xa0 = a->x;
 	xa = xa0 + a->wds;
@@ -731,17 +642,17 @@ b2d
 		w = xa > xa0 ? *--xa : 0;
 		d1 = y << ((32-Ebits) + k) | w >> (Ebits - k);
 		goto ret_d;
-		}
+	}
 	z = xa > xa0 ? *--xa : 0;
 	if (k -= Ebits) {
 		d0 = Exp_1 | y << k | z >> (32 - k);
 		y = xa > xa0 ? *--xa : 0;
 		d1 = z << k | y >> (32 - k);
-		}
+	}
 	else {
 		d0 = Exp_1 | y;
 		d1 = z;
-		}
+	}
 #else
 	if (k < Ebits + 16) {
 		z = xa > xa0 ? *--xa : 0;
@@ -750,7 +661,7 @@ b2d
 		y = xa > xa0 ? *--xa : 0;
 		d1 = z << k + 16 - Ebits | w << k - Ebits | y >> 16 + Ebits - k;
 		goto ret_d;
-		}
+	}
 	z = xa > xa0 ? *--xa : 0;
 	w = xa > xa0 ? *--xa : 0;
 	k -= Ebits + 16;
@@ -759,37 +670,23 @@ b2d
 	d1 = w << k + 16 | y << k;
 #endif
  ret_d:
-#ifdef VAX
-	word0(d) = d0 >> 16 | d0 << 16;
-	word1(d) = d1 >> 16 | d1 << 16;
-#endif
-	return dval(d);
-	}
+	return dval(&d);
 #undef d0
 #undef d1
+}
 
- Bigint *
-d2b
-#ifdef KR_headers
-	(d, e, bits) double d; int *e, *bits;
-#else
-	(double d, int *e, int *bits)
-#endif
+Bigint *d2b (double dd, int *e, int *bits)
 {
 	Bigint *b;
+	union _dbl_union d;
 #ifndef Sudden_Underflow
 	int i;
 #endif
 	int de, k;
 	ULong *x, y, z;
-#ifdef VAX
-	ULong d0, d1;
-	d0 = word0(d) >> 16 | word0(d) << 16;
-	d1 = word1(d) >> 16 | word1(d) << 16;
-#else
-#define d0 word0(d)
-#define d1 word1(d)
-#endif
+#define d0 word0(&d)
+#define d1 word1(&d)
+	d.d = dd;
 
 #ifdef Pack_32
 	b = Balloc(1);
@@ -802,9 +699,7 @@ d2b
 	d0 &= 0x7fffffff;	/* clear sign bit, which we ignore */
 #ifdef Sudden_Underflow
 	de = (int)(d0 >> Exp_shift);
-#ifndef IBM
 	z |= Exp_msk11;
-#endif
 #else
 	if ( (de = (int)(d0 >> Exp_shift)) !=0)
 		z |= Exp_msk1;
@@ -814,19 +709,15 @@ d2b
 		if ( (k = lo0bits(&y)) !=0) {
 			x[0] = y | z << (32 - k);
 			z >>= k;
-			}
+		}
 		else
 			x[0] = y;
 #ifndef Sudden_Underflow
 		i =
 #endif
 		     b->wds = (x[1] = z) !=0 ? 2 : 1;
-		}
+	}
 	else {
-#ifdef DEBUG
-		if (!z)
-			Bug("Zero passed to d2b");
-#endif
 		k = lo0bits(&z);
 		x[0] = z;
 #ifndef Sudden_Underflow
@@ -834,7 +725,7 @@ d2b
 #endif
 		    b->wds = 1;
 		k += 32;
-		}
+	}
 #else
 	if ( (y = d1) !=0) {
 		if ( (k = lo0bits(&y)) !=0)
@@ -843,22 +734,22 @@ d2b
 				x[1] = z >> k - 16 & 0xffff;
 				x[2] = z >> k;
 				i = 2;
-				}
+			}
 			else {
 				x[0] = y & 0xffff;
 				x[1] = y >> 16 | z << 16 - k & 0xffff;
 				x[2] = z >> k & 0xffff;
 				x[3] = z >> k+16;
 				i = 3;
-				}
+			}
 		else {
 			x[0] = y & 0xffff;
 			x[1] = y >> 16;
 			x[2] = z & 0xffff;
 			x[3] = z >> 16;
 			i = 3;
-			}
 		}
+	}
 	else {
 #ifdef DEBUG
 		if (!z)
@@ -868,14 +759,14 @@ d2b
 		if (k >= 16) {
 			x[0] = z;
 			i = 0;
-			}
+		}
 		else {
 			x[0] = z & 0xffff;
 			x[1] = z >> 16;
 			i = 1;
-			}
-		k += 32;
 		}
+		k += 32;
+	}
 	while(!x[i])
 		--i;
 	b->wds = i + 1;
@@ -883,15 +774,10 @@ d2b
 #ifndef Sudden_Underflow
 	if (de) {
 #endif
-#ifdef IBM
-		*e = (de - Bias - (P-1) << 2) + k;
-		*bits = 4*P + 8 - k - hi0bits(word0(d) & Frac_mask);
-#else
 		*e = de - Bias - (P-1) + k;
 		*bits = P - k;
-#endif
 #ifndef Sudden_Underflow
-		}
+	}
 	else {
 		*e = de - Bias - (P-1) + 1 + k;
 #ifdef Pack_32
@@ -899,64 +785,39 @@ d2b
 #else
 		*bits = (i+2)*16 - hi0bits(x[i]);
 #endif
-		}
+	}
 #endif
 	return b;
-	}
 #undef d0
 #undef d1
+}
 
- CONST double
-#ifdef IEEE_Arith
+const double
 bigtens[] = { 1e16, 1e32, 1e64, 1e128, 1e256 };
-CONST double tinytens[] = { 1e-16, 1e-32, 1e-64, 1e-128, 1e-256
-		};
-#else
-#ifdef IBM
-bigtens[] = { 1e16, 1e32, 1e64 };
-CONST double tinytens[] = { 1e-16, 1e-32, 1e-64 };
-#else
-bigtens[] = { 1e16, 1e32 };
-CONST double tinytens[] = { 1e-16, 1e-32 };
-#endif
-#endif
+const double tinytens[] = { 1e-16, 1e-32, 1e-64, 1e-128, 1e-256 };
 
- CONST double
+const double
 tens[] = {
 		1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
 		1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16, 1e17, 1e18, 1e19,
 		1e20, 1e21, 1e22
-#ifdef VAX
-		, 1e23, 1e24
-#endif
-		};
+};
 
- char *
-#ifdef KR_headers
-strcp_D2A(a, b) char *a; char *b;
-#else
-strcp_D2A(char *a, CONST char *b)
-#endif
+char *strcp_D2A (char *a, const char *b)
 {
 	while((*a = *b++))
 		a++;
 	return a;
-	}
+}
 
 #ifdef NO_STRING_H
-
- Char *
-#ifdef KR_headers
-memcpy_D2A(a, b, len) Char *a; Char *b; size_t len;
-#else
-memcpy_D2A(void *a1, void *b1, size_t len)
-#endif
+void *memcpy_D2A (void *a1, void *b1, size_t len)
 {
-	register char *a = (char*)a1, *ae = a + len;
-	register char *b = (char*)b1, *a0 = a;
+	char *a = (char*)a1, *ae = a + len;
+	char *b = (char*)b1, *a0 = a;
 	while(a < ae)
 		*a++ = *b++;
 	return a0;
-	}
-
+}
 #endif /* NO_STRING_H */
+
