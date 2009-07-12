@@ -734,7 +734,8 @@ char *__pformat_cvt( int mode, __pformat_fpreg_t x, int nd, int *dp, int *sign )
    * his `__gdtoa()' function in a manner to provide extended precision
    * replacements for `ecvt()' and `fcvt()'.
    */
-  unsigned int k, e = 0; char *ep;
+  int k;
+  unsigned int e = 0; char *ep;
   static FPI fpi = { 64, 1-16383-64+1, 32766-16383-64+1, FPI_Round_near, 0 };
  
   /* Classify the argument into an appropriate `__gdtoa()' category...
@@ -1816,7 +1817,7 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
       /* Save the current format scan position, so that we can backtrack
        * in the event of encountering an invalid format specification...
        */
-      char *backtrack = fmt;
+      const char *backtrack = fmt;
 
       /* Restart capture for dynamic field width and precision specs...
        */
@@ -1882,7 +1883,8 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 	       * `wchar_t' data, (which is promoted to an `int' argument)...
 	       */
 	      argval.__pformat_ullong_t = (wchar_t)(va_arg( argv, int ));
-	      __pformat_wputchars( (wchar_t *)(&argval), 1, &stream );
+        void *tmp = &argval;
+	      __pformat_wputchars( (wchar_t *)tmp, 1, &stream );
 	    }
 
 	    else

@@ -1,3 +1,7 @@
+2009-07-12  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* mingwex/stdio/pformat.c: Fix compiler warnings with GCC 4.4.0.
+
 2009-06-28  Ozkan Sezer  <sezero@users.sourceforge.net>
 
 	* mingwex/gdtoa/README.mingw mingwex/gdtoa/gdtoa_fltrnds.h: New files.
