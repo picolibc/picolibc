@@ -331,16 +331,35 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   if (pc.fs_is_nfs ())
     return fstat_by_nfs_ea (buf);
 
-  struct {
-    FILE_ALL_INFORMATION fai;
-    WCHAR buf[NAME_MAX + 1];
-  } fai_buf;
+  /* Don't use FileAllInformation info class.  It returns a pathname rather
+     than a filename, so it needs a really big buffer for no good reason
+     since we don't need the name anyway.  So we just call the three info
+     classes necessary to get all information required by stat(2). */
+  FILE_BASIC_INFORMATION fbi;
+  FILE_STANDARD_INFORMATION fsi;
+  FILE_INTERNAL_INFORMATION fii;
 
-  status = NtQueryInformationFile (get_handle (), &io, &fai_buf.fai,
-				   sizeof fai_buf, FileAllInformation);
+  status = NtQueryInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+				   FileBasicInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("%p = NtQueryInformationFile(%S)",
+      debug_printf ("%p = NtQueryInformationFile(%S, FileBasicInformation)",
+		    status, pc.get_nt_native_path ());
+      return -1;
+    }
+  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				   FileStandardInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("%p = NtQueryInformationFile(%S, FileStandardInformation)",
+		    status, pc.get_nt_native_path ());
+      return -1;
+    }
+  status = NtQueryInformationFile (get_handle (), &io, &fii, sizeof fii,
+				   FileInternalInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
 		    status, pc.get_nt_native_path ());
       return -1;
     }
@@ -348,21 +367,21 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
      support a change timestamp.  In that case use the LastWriteTime
      entry, as in other calls to fstat_helper. */
   if (pc.is_rep_symlink ())
-    fai_buf.fai.BasicInformation.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  pc.file_attributes (fai_buf.fai.BasicInformation.FileAttributes);
+    fbi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+  pc.file_attributes (fbi.FileAttributes);
   return fstat_helper (buf,
-		   fai_buf.fai.BasicInformation.ChangeTime.QuadPart
-		   ? *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.ChangeTime
-		   : *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastWriteTime,
-		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastAccessTime,
-		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.LastWriteTime,
-		   *(FILETIME *) (void *) &fai_buf.fai.BasicInformation.CreationTime,
+		   fbi.ChangeTime.QuadPart
+		   ? *(FILETIME *) (void *) &fbi.ChangeTime
+		   : *(FILETIME *) (void *) &fbi.LastWriteTime,
+		   *(FILETIME *) (void *) &fbi.LastAccessTime,
+		   *(FILETIME *) (void *) &fbi.LastWriteTime,
+		   *(FILETIME *) (void *) &fbi.CreationTime,
 		   get_dev (),
-		   fai_buf.fai.StandardInformation.EndOfFile.QuadPart,
-		   fai_buf.fai.StandardInformation.AllocationSize.QuadPart,
-		   fai_buf.fai.InternalInformation.FileId.QuadPart,
-		   fai_buf.fai.StandardInformation.NumberOfLinks,
-		   fai_buf.fai.BasicInformation.FileAttributes);
+		   fsi.EndOfFile.QuadPart,
+		   fsi.AllocationSize.QuadPart,
+		   fii.FileId.QuadPart,
+		   fsi.NumberOfLinks,
+		   fbi.FileAttributes);
 }
 
 int __stdcall

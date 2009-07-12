@@ -1,3 +1,9 @@
+2009-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Don't use
+	FileAllInformation info class since it needs a big buffer.  Add a
+	comment.
+
 2009-07-07  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* winbase.h (ilockexch): Avoid making 'ret' volatile.
