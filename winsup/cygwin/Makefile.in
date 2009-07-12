@@ -496,3 +496,5 @@ deps:=${wildcard *.d}
 ifneq (,$(deps))
 include $(deps)
 endif
+
+%: RCS/%,v

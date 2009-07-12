@@ -924,7 +924,6 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
       wr_proc_pipe_owner = dwProcessId;
       sigproc_printf ("duped wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
 		      pid, dwProcessId);
-      res = true;
     }
   return orig_wr_proc_pipe;
 }

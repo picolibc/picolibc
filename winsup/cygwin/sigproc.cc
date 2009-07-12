@@ -555,7 +555,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
   pack.wakeup = NULL;
   bool wait_for_completion;
-  if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
+  if (!(its_me = (!hExeced && (p == NULL || p == myself || p == myself_nowait))))
     {
       /* It is possible that the process is not yet ready to receive messages
        * or that it has exited.  Detect this.

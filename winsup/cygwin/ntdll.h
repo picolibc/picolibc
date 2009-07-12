@@ -471,7 +471,7 @@ typedef enum _PROCESSINFOCLASS
   ProcessVmCounters = 3,
   ProcessTimes = 4,
   ProcessSessionInformation = 24,
-  ProcessWow64Information = 26,
+  ProcessWow64Information = 26
 } PROCESSINFOCLASS;
 
 typedef struct _DEBUG_BUFFER
