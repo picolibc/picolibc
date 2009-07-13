@@ -1255,11 +1255,8 @@ dump_sysinfo ()
 	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
 			    ? "Vista" : "2008");
 	  else if (osversion.dwMinorVersion == 1)
-	    {
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "7" : "2008 R2");
-	      strcat (osname, " (Not yet supported!)");
-	    }
+	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			    ? "7" : "2008 R2");
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
 			      osversion.dwMinorVersion,
