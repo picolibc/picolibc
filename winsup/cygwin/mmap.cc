@@ -835,14 +835,12 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
       /* You can't create mappings with PAGE_EXECUTE protection if
 	 the file isn't explicitely opened with EXECUTE access. */
-      UNICODE_STRING fname;
       OBJECT_ATTRIBUTES attr;
       NTSTATUS status;
       HANDLE h;
       IO_STATUS_BLOCK io;
 
-      RtlInitUnicodeString (&fname, L"");
-      InitializeObjectAttributes (&attr, &fname, fh->pc.objcaseinsensitive (),
+      InitializeObjectAttributes (&attr, &ro_u_empty, fh->pc.objcaseinsensitive (),
 				  fh->get_handle (), NULL);
       status = NtOpenFile (&h,
 			   fh->get_access () | GENERIC_EXECUTE | SYNCHRONIZE,
@@ -1622,11 +1620,8 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  UNICODE_STRING memstr;
-  RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
-
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes (&attr, &memstr,
+  InitializeObjectAttributes (&attr, &ro_u_pmem,
 			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      NULL, NULL);
 

@@ -77,11 +77,8 @@ fhandler_dev_mem::open (int flags, mode_t)
       return 0;
     }
 
-  UNICODE_STRING memstr;
-  RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
-
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes (&attr, &memstr,
+  InitializeObjectAttributes (&attr, &ro_u_pmem,
 			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      NULL, NULL);
 

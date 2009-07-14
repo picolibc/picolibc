@@ -123,7 +123,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     FILE_FS_VOLUME_INFORMATION ffvi;
     WCHAR buf[NAME_MAX + 1];
   } ffvi_buf;
-  UNICODE_STRING fsname, testname;
+  UNICODE_STRING fsname;
 
   clear ();
   if (in_vol)
@@ -173,7 +173,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 
   if (ffdi.Characteristics & FILE_REMOTE_DEVICE
       || (!ffdi.DeviceType
-	  && RtlEqualUnicodePathPrefix (attr.ObjectName, L"\\??\\UNC\\", TRUE)))
+	  && RtlEqualUnicodePathPrefix (attr.ObjectName, &ro_u_uncp, TRUE)))
     is_remote_drive (true);
   else
     is_remote_drive (false);
@@ -217,10 +217,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_NAMED_STREAMS)
   RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
 			       ffai_buf.ffai.FileSystemNameLength);
-  is_fat (RtlEqualUnicodePathPrefix (&fsname, L"FAT", TRUE));
-  RtlInitUnicodeString (&testname, L"CSC-CACHE");
-  is_csc_cache (RtlEqualUnicodeString (&fsname, &testname, FALSE));
-  RtlInitUnicodeString (&testname, L"NTFS");
+  is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE));
+  is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE));
   if (is_remote_drive ())
     {
       /* This always fails on NT4. */
@@ -239,35 +237,32 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       /* Test for Samba on NT4 or for older Samba releases not supporting
 	 extended info. */
       if (!is_samba ())
-	is_samba (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+	is_samba (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
 		  && FS_IS_SAMBA);
 
       if (!is_samba ())
 	{
-	  is_netapp (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+	  is_netapp (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
 		     && FS_IS_NETAPP_DATAONTAP);
 
-	  RtlInitUnicodeString (&testname, L"NFS");
-	  is_nfs (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+	  is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE));
 
 	  if (!is_nfs ())
 	    {
 	      /* Known remote file systems which can't handle calls to
 		 NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
-	      RtlInitUnicodeString (&testname, L"UNIXFS");
 	      has_buggy_fileid_dirinfo (RtlEqualUnicodeString (&fsname,
-							       &testname,
+							       &ro_u_unixfs,
 							       FALSE));
 
 	      /* Known remote file systems with buggy open calls.  Further
 		 explanation in fhandler.cc (fhandler_disk_file::open). */
-	      RtlInitUnicodeString (&testname, L"SUNWNFS");
-	      has_buggy_open (RtlEqualUnicodeString (&fsname, &testname,
+	      has_buggy_open (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs,
 						     FALSE));
 	    }
 	}
     }
-  is_ntfs (RtlEqualUnicodeString (&fsname, &testname, FALSE)
+  is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
 	   && !is_samba () && !is_netapp ());
 
   has_acls (flags () & FS_PERSISTENT_ACLS);
@@ -283,8 +278,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
   if (is_cdrom ())
     {
-      RtlInitUnicodeString (&testname, L"UDF");
-      is_udf (RtlEqualUnicodeString (&fsname, &testname, FALSE));
+      is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
       /* UDF on NT 5.x is broken (at least) in terms of case sensitivity.  The
 	 UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability but:
 	 - Opening the root directory for query seems to work at first, but the

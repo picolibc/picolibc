@@ -453,8 +453,7 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
     api_fatal ("NtCreateDirectoryObject(inode): %p", status);
   /* Create a mutex object in the file specific dir, which is used for
      access synchronization on the dir and its objects. */
-  RtlInitUnicodeString (&uname, L"mtx");
-  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF, i_dir,
+  InitializeObjectAttributes (&attr, &ro_u_mtx, OBJ_INHERIT | OBJ_OPENIF, i_dir,
 			      everyone_sd (CYG_MUTANT_ACCESS));
   status = NtCreateMutant (&i_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))

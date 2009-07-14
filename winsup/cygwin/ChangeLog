@@ -1,5 +1,28 @@
 2009-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout avoid having to initialize constant UNICODE_STRINGs.
+	* globals.cc: Define constant UNICODE_STRINGs and store in .rdata
+	section.
+	* fhandler_disk_file.cc: Throughout, use readonly UNICODE_STRINGs
+	rather then initializing local UNICODE_STRING variable where
+	applicable.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Ditto.
+	* flock.cc (inode_t::inode_t): Ditto.
+	* mmap.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* mount.cc (fs_info::update): Ditto.
+	* path.cc: Ditto.
+
+	* ntdll.h (RtlEqualUnicodePathPrefix): Redefine to take prefix as
+	UNICODE_STRING.
+	(RtlEqualUnicodePathSuffix): Redefine to take suffix as UNICODE_STRING.
+	* fhandler_disk_file.cc: Accommodate throughout.
+	* mount.cc (fs_info::update): Ditto.
+	* path.cc (cwdstuff::set): Ditto.
+	* syscalls.cc: Ditto.
+
+2009-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* globals.cc (active_codepage): Remove.
 
 2009-07-12  Christopher Faylor  <me+cygwin@cgf.cx>

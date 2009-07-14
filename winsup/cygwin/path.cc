@@ -448,7 +448,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
     {
       if (path[1] == ':')	/* X:\... */
 	{
-	  RtlAppendUnicodeToString (&upath, L"\\??\\");
+	  RtlAppendUnicodeStringToString (&upath, &ro_u_natp);
 	  str2uni_cat (upath, path);
 	  /* The drive letter must be upper case. */
 	  upath.Buffer[4] = towupper (upath.Buffer[4]);
@@ -462,13 +462,13 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
   else if ((path[2] != '.' && path[2] != '?')
 	   || path[3] != '\\')	/* \\server\share\... */
     {
-      RtlAppendUnicodeToString (&upath, L"\\??\\UNC\\");
+      RtlAppendUnicodeStringToString (&upath, &ro_u_uncp);
       str2uni_cat (upath, path + 2);
       transform_chars (&upath, 8);
     }
   else				/* \\.\device or \\?\foo */
     {
-      RtlAppendUnicodeToString (&upath, L"\\??\\");
+      RtlAppendUnicodeStringToString (&upath, &ro_u_natp);
       str2uni_cat (upath, path + 4);
     }
   return &upath;
@@ -3079,7 +3079,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
       else
 	{
 	  len = upath.Length / sizeof (WCHAR) - 4;
-	  if (RtlEqualUnicodePathPrefix (&upath, L"\\??\\UNC\\", TRUE))
+	  if (RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
 	    len -= 2;
 	}
     }

@@ -187,7 +187,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
     goto out;
   /* Is the file a subdir of the recycler? */
   RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
-  if (RtlEqualUnicodePathPrefix (&fname, recycler.Buffer, TRUE))
+  if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
     goto out;
   /* Is fname the recycler?  Temporarily hide trailing backslash. */
   recycler.Length -= sizeof (WCHAR);
@@ -558,12 +558,10 @@ unlink_nt (path_conv &pc)
       if (status == STATUS_CANNOT_DELETE && !pc.isremote ())
 	{
 	  HANDLE fh2;
-	  UNICODE_STRING fname;
 
 	  /* Re-open from handle so we open the correct file no matter if it
 	     has been moved to the bin or not. */
-	  RtlInitUnicodeString (&fname, L"");
-	  InitializeObjectAttributes (&attr, &fname, 0, fh, NULL);
+	  InitializeObjectAttributes (&attr, &ro_u_empty, 0, fh, NULL);
 	  status = NtOpenFile (&fh2, DELETE, &attr, &io,
 			       bin_stat == move_to_bin ? FILE_SHARE_VALID_FLAGS
 						       : FILE_SHARE_DELETE,
@@ -1750,11 +1748,11 @@ rename (const char *oldpath, const char *newpath)
 	}
       else if (oldpc.is_lnk_symlink ()
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					      L".lnk", TRUE))
+					      &ro_u_lnk, TRUE))
 	rename_append_suffix (newpc, newpath, nlen, ".lnk");
       else if (oldpc.is_binary () && !old_explicit_suffix
 	   && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  L".exe", TRUE))
+					  &ro_u_exe, TRUE))
 	/* To rename an executable foo.exe to bar-without-exe-suffix, the
 	   .exe suffix must be given explicitly in oldpath. */
 	rename_append_suffix (newpc, newpath, nlen, ".exe");
@@ -1781,7 +1779,7 @@ rename (const char *oldpath, const char *newpath)
 	{
 	  if (!newpc.is_lnk_symlink ()
 	      && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					     L".lnk", TRUE))
+					     &ro_u_lnk, TRUE))
 	    {
 	      rename_append_suffix (new2pc, newpath, nlen, ".lnk");
 	      removepc = &newpc;
@@ -1790,7 +1788,7 @@ rename (const char *oldpath, const char *newpath)
       else if (oldpc.is_binary ())
 	{
 	  if (!RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  L".exe", TRUE))
+					  &ro_u_exe, TRUE))
 	    {
 	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
 	      removepc = &newpc;
@@ -1799,9 +1797,9 @@ rename (const char *oldpath, const char *newpath)
       else
 	{
 	  if ((RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  L".lnk", TRUE)
+					  &ro_u_lnk, TRUE)
 	       || RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					     L".exe", TRUE))
+					     &ro_u_exe, TRUE))
 	      && !new_explicit_suffix)
 	    {
 	      new2pc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);

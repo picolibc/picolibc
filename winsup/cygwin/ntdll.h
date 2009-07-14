@@ -1040,32 +1040,32 @@ extern "C"
   }
   /* Check if prefix is a prefix of path. */
   inline
-  BOOLEAN NTAPI RtlEqualUnicodePathPrefix (PUNICODE_STRING path, PCWSTR prefix,
+  BOOLEAN NTAPI RtlEqualUnicodePathPrefix (PUNICODE_STRING path,
+					   PUNICODE_STRING prefix,
 					   BOOLEAN caseinsensitive)
   {
-    UNICODE_STRING p, pref;
+    UNICODE_STRING p;
 
-    RtlInitUnicodeString (&pref, prefix);
     RtlInitCountedUnicodeString (&p, path->Buffer,
-				 pref.Length < path->Length
-				 ? pref.Length : path->Length);
-    return RtlEqualUnicodeString (&p, &pref, caseinsensitive);
+				 prefix->Length < path->Length
+				 ? prefix->Length : path->Length);
+    return RtlEqualUnicodeString (&p, prefix, caseinsensitive);
   }
   /* Check if sufffix is a sufffix of path. */
   inline
-  BOOL NTAPI RtlEqualUnicodePathSuffix (PUNICODE_STRING path, PCWSTR suffix,
+  BOOL NTAPI RtlEqualUnicodePathSuffix (PUNICODE_STRING path,
+					PUNICODE_STRING suffix,
 					BOOLEAN caseinsensitive)
   {
-    UNICODE_STRING p, suf;
+    UNICODE_STRING p;
 
-    RtlInitUnicodeString (&suf, suffix);
-    if (suf.Length < path->Length)
+    if (suffix->Length < path->Length)
       RtlInitCountedUnicodeString (&p, (PWCHAR) ((PBYTE) path->Buffer
-				       + path->Length - suf.Length),
-				   suf.Length);
+				       + path->Length - suffix->Length),
+				   suffix->Length);
     else
       RtlInitCountedUnicodeString (&p, path->Buffer, path->Length);
-    return RtlEqualUnicodeString (&p, &suf, caseinsensitive);
+    return RtlEqualUnicodeString (&p, suffix, caseinsensitive);
   }
   /* Implemented in strfuncs.cc.  Create a Hex UNICODE_STRING from a given
      64 bit integer value.  If append is TRUE, append the hex string,

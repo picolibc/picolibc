@@ -79,10 +79,7 @@ public:
     {
       if (parent_dir_len == 1)	/* root dir */
 	{
-	  UNICODE_STRING proc;
-
-	  RtlInitUnicodeString (&proc, L"proc");
-	  if (RtlEqualUnicodeString (fname, &proc, FALSE))
+	  if (RtlEqualUnicodeString (fname, &ro_u_proc, FALSE))
 	    {
 	      found[__DIR_PROC] = true;
 	      return 2;
@@ -636,22 +633,21 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	    {
 	      PUNICODE_STRING path = pc.get_nt_native_path ();
 
-	      if (RtlEqualUnicodePathSuffix (path, L".exe", TRUE)
-		  || RtlEqualUnicodePathSuffix (path, L".bat", TRUE)
-		  || RtlEqualUnicodePathSuffix (path, L".com", TRUE))
+	      if (RtlEqualUnicodePathSuffix (path, &ro_u_exe, TRUE)
+		  || RtlEqualUnicodePathSuffix (path, &ro_u_lnk, TRUE)
+		  || RtlEqualUnicodePathSuffix (path, &ro_u_com, TRUE))
 		pc.set_exec ();
 	    }
 	  /* No known sufix, check file header.  This catches binaries and
 	     shebang scripts. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
-	      UNICODE_STRING same;
 	      OBJECT_ATTRIBUTES attr;
 	      HANDLE h;
 	      IO_STATUS_BLOCK io;
 
-	      RtlInitUnicodeString (&same, L"");
-	      InitializeObjectAttributes (&attr, &same, 0, get_handle (), NULL);
+	      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (),
+					  NULL);
 	      if (NT_SUCCESS (NtOpenFile (&h, FILE_READ_DATA, &attr, &io,
 					  FILE_SHARE_VALID_FLAGS, 0)))
 		{
@@ -1199,9 +1195,9 @@ fhandler_disk_file::link (const char *newpath)
       else if (!pc.isdir ()
 	       && pc.is_binary ()
 	       && RtlEqualUnicodePathSuffix (pc.get_nt_native_path (),
-					     L".exe", TRUE)
+					     &ro_u_exe, TRUE)
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					      L".exe", TRUE))
+					      &ro_u_exe, TRUE))
 	{
 	  /* Executable hack. */
 	  stpcpy (stpcpy (new_buf, newpath), ".exe");
@@ -1766,14 +1762,12 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
   if ((attr & FILE_ATTRIBUTE_READONLY) && fname->Length > 4 * sizeof (WCHAR))
     {
       UNICODE_STRING uname;
-      UNICODE_STRING lname;
 
       RtlInitCountedUnicodeString (&uname,
 				   fname->Buffer
 				   + fname->Length / sizeof (WCHAR) - 4,
 				   4 * sizeof (WCHAR));
-      RtlInitUnicodeString (&lname, (PWCHAR) L".lnk");
-      if (RtlEqualUnicodeString (&uname, &lname, TRUE))
+      if (RtlEqualUnicodeString (&uname, &ro_u_lnk, TRUE))
 	{
 	  tmp_pathbuf tp;
 	  UNICODE_STRING fbuf;
@@ -2018,14 +2012,12 @@ fhandler_disk_file::rewinddir (DIR *dir)
 	 to NtQueryDirectoryFile on remote shares is ignored, thus
 	 resulting in not being able to rewind on remote shares.  By
 	 reopening the directory, we get a fresh new directory pointer. */
-      UNICODE_STRING fname;
       OBJECT_ATTRIBUTES attr;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       HANDLE new_dir;
 
-      RtlInitUnicodeString (&fname, L"");
-      InitializeObjectAttributes (&attr, &fname, pc.objcaseinsensitive (),
+      InitializeObjectAttributes (&attr, &ro_u_empty, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
