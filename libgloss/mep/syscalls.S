@@ -51,7 +51,7 @@ S(link)
 S(_Sid_config)
 
 sysret:
-	add3	$sp, $sp, -12
+	add3	$sp, $sp, -16
 	sw	$0, 0($sp)
 	sw	$1, 4($sp)
 	ldc	$2, $lp
@@ -62,5 +62,5 @@ sysret:
 	lw	$0, 0($sp)
 	lw	$2, 8($sp)
 	stc	$2, $lp
-	add3	$sp, $sp, 12
+	add3	$sp, $sp, 16
 	ret

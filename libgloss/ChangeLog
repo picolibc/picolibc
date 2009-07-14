@@ -1,3 +1,7 @@
+2009-07-14  DJ Delorie  <dj@redhat.com>
+
+	* mep/syscalls.S (sysret): Maintain 16-byte stack alignment.
+
 2009-07-08  DJ Delorie  <dj@redhat.com>
 
 	* m32c/sbrk.c (sbrk): Change to take ptrdiff_t, not int.
