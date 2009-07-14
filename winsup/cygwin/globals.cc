@@ -24,9 +24,6 @@ HANDLE NO_COPY hProcImpToken;
 HMODULE NO_COPY cygwin_hmodule;
 HANDLE hExeced;
 
-/* Codepage and multibyte string specific stuff. */
-UINT active_codepage;
-
 /* program exit the program */
 
 enum exit_states
