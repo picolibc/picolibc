@@ -221,7 +221,6 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
 
       nr.lpRemoteName = namebuf;
       nr.dwType = RESOURCETYPE_DISK;
-      nro = (NETRESOURCE *) alloca (4096);
       nh = (struct net_hdls *) ccalloc (HEAP_FHANDLER, 1, sizeof *nh);
       ret = create_thread_and_wait (len == 2 ? GET_RESOURCE_OPENENUMTOP
 					     : GET_RESOURCE_OPENENUM,
