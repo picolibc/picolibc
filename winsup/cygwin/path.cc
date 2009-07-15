@@ -3195,6 +3195,8 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	}
       else
 	{
+	  bool unc = false;
+
 	  if (upath.Buffer[0] == L'/') /* Virtual path, don't mangle. */
 	    ;
 	  else if (!doit)
@@ -3202,7 +3204,7 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	      /* Convert to a Win32 path. */
 	      upath.Buffer += upath.Length / sizeof (WCHAR) - len;
 	      if (upath.Buffer[1] == L'\\') /* UNC path */
-		upath.Buffer[0] = L'\\';
+		unc = true;
 	      upath.Length = len * sizeof (WCHAR);
 	    }
 	  else
@@ -3218,6 +3220,8 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 							      upath.Length + 2),
 				     upath.Length + 2);
 	  RtlCopyUnicodeString (&win32, &upath);
+	  if (unc)
+	    win32.Buffer[0] = L'\\';
 	}
       /* Make sure it's NUL-terminated. */
       win32.Buffer[win32.Length / sizeof (WCHAR)] = L'\0';
