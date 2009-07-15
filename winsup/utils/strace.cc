@@ -1,6 +1,7 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -983,7 +984,7 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	numerror ^= 1;
 	break;
       case 'o':
-	if ((ofile = fopen (cygpath (optarg, NULL), "w")) == NULL)
+	if ((ofile = fopen (cygpath (optarg, NULL), "wb")) == NULL)
 	  error (1, "can't open %s", optarg);
 #ifdef F_SETFD
 	(void) fcntl (fileno (ofile), F_SETFD, 0);
