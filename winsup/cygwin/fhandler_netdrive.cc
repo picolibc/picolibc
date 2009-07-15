@@ -23,7 +23,6 @@ details. */
 
 enum
   {
-    GET_RESOURCE_INFO = 0,
     GET_RESOURCE_OPENENUM = 1,
     GET_RESOURCE_OPENENUMTOP = 2,
     GET_RESOURCE_ENUM = 3
@@ -57,11 +56,6 @@ thread_netdrive (void *arg)
   ReleaseSemaphore (ndi->sem, 1, NULL);
   switch (ndi->what)
     {
-    case GET_RESOURCE_INFO:
-      nro = (LPNETRESOURCE) alloca (size = 4096);
-      ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
-					     nro, &size, &dummy);
-      break;
     case GET_RESOURCE_OPENENUMTOP:
       nro = (LPNETRESOURCE) alloca (size = 4096);
       nh = (struct net_hdls *) ndi->out;
@@ -164,15 +158,20 @@ fhandler_netdrive::exists ()
     *to = (*from == '/') ? '\\' : *from;
   *to = '\0';
 
+  struct net_hdls nh =  { NULL, NULL };
   NETRESOURCE nr = {0};
-  nr.dwScope = RESOURCE_GLOBALNET;
   nr.dwType = RESOURCETYPE_DISK;
-  nr.lpLocalName = NULL;
   nr.lpRemoteName = namebuf;
-  DWORD ret = create_thread_and_wait (GET_RESOURCE_INFO, &nr, NULL, 0,
-				      "WNetGetResourceInformation");
-  if (ret != ERROR_MORE_DATA && ret != NO_ERROR)
-    return 0;
+  DWORD ret = create_thread_and_wait (GET_RESOURCE_OPENENUM,
+				      &nr, &nh, 0, "WNetOpenEnum");
+  if (ret != NO_ERROR)
+    {
+      if (nh.dom)
+	WNetCloseEnum (nh.dom);
+      if (nh.net)
+	WNetCloseEnum (nh.net);
+      return 0;
+    }
   return 1;
 }
 
