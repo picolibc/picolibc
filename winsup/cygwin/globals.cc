@@ -84,16 +84,17 @@ UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");
 UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
 UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
 UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\device\\physicalmemory");
-UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");
-UNICODE_STRING _RDATA ro_u_fat = _ROU (L"FAT");
-UNICODE_STRING _RDATA ro_u_csc = _ROU (L"CSC-CACHE");
-UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
-UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
-UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
-UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
-UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
 UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");
+UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");
+UNICODE_STRING _RDATA ro_u_csc = _ROU (L"CSC-CACHE");
+UNICODE_STRING _RDATA ro_u_fat = _ROU (L"FAT");
+UNICODE_STRING _RDATA ro_u_mvfs = _ROU (L"MVFS");
+UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
+UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
+UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
+UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
+UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
 #undef _RDATA
 #undef _ROU
 

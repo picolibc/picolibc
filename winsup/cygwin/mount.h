@@ -20,21 +20,30 @@ class fs_info
     ULONG samba_version;	  /* Samba version if available */
     ULONG name_len;		  /* MaximumComponentNameLength */
     unsigned is_remote_drive		: 1;
-    unsigned has_buggy_open		: 1;
-    unsigned has_buggy_fileid_dirinfo	: 1;
     unsigned has_acls			: 1;
     unsigned hasgood_inode		: 1;
     unsigned caseinsensitive		: 1;
-    unsigned is_fat			: 1;
-    unsigned is_ntfs			: 1;
-    unsigned is_samba			: 1;
-    unsigned is_nfs			: 1;
-    unsigned is_netapp 			: 1;
-    unsigned is_cdrom			: 1;
-    unsigned is_udf			: 1;
-    unsigned is_csc_cache		: 1;
+    union
+    {
+      struct
+      {
+	unsigned is_fat			: 1;
+	unsigned is_ntfs		: 1;
+	unsigned is_samba		: 1;
+	unsigned is_nfs			: 1;
+	unsigned is_netapp 		: 1;
+	unsigned is_cdrom		: 1;
+	unsigned is_udf			: 1;
+	unsigned is_csc_cache		: 1;
+	unsigned is_sunwnfs		: 1;
+	unsigned is_unixfs		: 1;
+      };
+      unsigned long fs_flags;
+    };
   } status;
   ULONG sernum;
+  unsigned long got_fs () { return status.fs_flags; }
+
  public:
   void clear () { memset (&status, 0 , sizeof status); sernum = 0UL; }
   fs_info () { clear (); }
@@ -43,8 +52,6 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (ULONG, samba_version)
   IMPLEMENT_STATUS_FLAG (ULONG, name_len)
   IMPLEMENT_STATUS_FLAG (bool, is_remote_drive)
-  IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
-  IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
   IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
@@ -56,7 +63,12 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
   IMPLEMENT_STATUS_FLAG (bool, is_udf)
   IMPLEMENT_STATUS_FLAG (bool, is_csc_cache)
+  IMPLEMENT_STATUS_FLAG (bool, is_sunwnfs)
+  IMPLEMENT_STATUS_FLAG (bool, is_unixfs)
   ULONG serial_number () const { return sernum; }
+
+  int has_buggy_open () const {return is_sunwnfs ();}
+  int has_buggy_fileid_dirinfo () const {return is_unixfs ();}
 
   bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
 };

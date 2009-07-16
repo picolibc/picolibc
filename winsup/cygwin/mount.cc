@@ -171,12 +171,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!NT_SUCCESS (status))
     ffdi.DeviceType = ffdi.Characteristics = 0;
 
-  if (ffdi.Characteristics & FILE_REMOTE_DEVICE
+  if ((ffdi.Characteristics & FILE_REMOTE_DEVICE)
       || (!ffdi.DeviceType
 	  && RtlEqualUnicodePathPrefix (attr.ObjectName, &ro_u_uncp, TRUE)))
     is_remote_drive (true);
-  else
-    is_remote_drive (false);
 
   if (!no_media)
     status = NtQueryVolumeInformationFile (vol, &io, &ffai_buf.ffai,
@@ -217,8 +215,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_NAMED_STREAMS)
   RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
 			       ffai_buf.ffai.FileSystemNameLength);
-  is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE));
-  is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE));
   if (is_remote_drive ())
     {
       /* This always fails on NT4. */
@@ -234,60 +230,50 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	      samba_version (extended_info->samba_version);
 	    }
 	}
-      /* Test for Samba on NT4 or for older Samba releases not supporting
-	 extended info. */
-      if (!is_samba ())
-	is_samba (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
-		  && FS_IS_SAMBA);
-
-      if (!is_samba ())
-	{
-	  is_netapp (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
-		     && FS_IS_NETAPP_DATAONTAP);
-
-	  is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE));
-
-	  if (!is_nfs ())
-	    {
-	      /* Known remote file systems which can't handle calls to
-		 NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
-	      has_buggy_fileid_dirinfo (RtlEqualUnicodeString (&fsname,
-							       &ro_u_unixfs,
-							       FALSE));
-
-	      /* Known remote file systems with buggy open calls.  Further
-		 explanation in fhandler.cc (fhandler_disk_file::open). */
-	      has_buggy_open (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs,
-						     FALSE));
-	    }
-	}
+      if (!got_fs ()
+	  /* Test for Samba on NT4 or for older Samba releases not supporting
+	     extended info. */
+	  && !is_samba (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
+			&& FS_IS_SAMBA)
+	  /* Netapp inode info is unusable. */
+	  && !is_netapp (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
+			 && FS_IS_NETAPP_DATAONTAP)
+	  /* Microsoft NFS needs distinct access methods for metadata. */
+	  && !is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE))
+	  /* Known remote file system which can't handle calls to
+	     NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
+	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
+	/* Known remote file system with buggy open calls.  Further
+	   explanation in fhandler.cc (fhandler_disk_file::open). */
+	is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
     }
-  is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
-	   && !is_samba () && !is_netapp ());
+  if (!got_fs ()
+      && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
+      && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
+      && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
+      && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
+    {
+      is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
+      /* UDF on NT 5.x is broken (at least) in terms of case sensitivity.
+	 The UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability
+	 but:
+	 - Opening the root directory for query seems to work at first,
+	   but the filenames in the directory listing are mutilated.
+	 - When trying to open a file or directory case sensitive, the file
+	   appears to be non-existant. */
+      if (is_udf () && wincap.has_broken_udf ())
+	caseinsensitive (true);
+    }
 
   has_acls (flags () & FS_PERSISTENT_ACLS);
-  hasgood_inode (((flags () & FILE_PERSISTENT_ACLS) && !is_netapp ())
-		 || is_nfs ());
+  /* Netapp inodes numbers are fly-by-night. */
+  hasgood_inode ((has_acls () && !is_netapp ()) || is_nfs ());
   /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
      except on Samba which handles Windows clients case insensitive.
      NFS doesn't set the FILE_CASE_SENSITIVE_SEARCH flag but is case
      sensitive. */
   caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
 		   && !is_nfs ());
-
-  is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM);
-  if (is_cdrom ())
-    {
-      is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
-      /* UDF on NT 5.x is broken (at least) in terms of case sensitivity.  The
-	 UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability but:
-	 - Opening the root directory for query seems to work at first, but the
-	   filenames in the directory listing are mutilated.
-	 - When trying to open a file or directory case sensitive, the file
-	   appears to be non-existant. */
-      if (is_udf () && wincap.has_broken_udf ())
-	caseinsensitive (true);
-    }
 
   if (!in_vol)
     NtClose (vol);

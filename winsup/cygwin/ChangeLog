@@ -1,5 +1,19 @@
 2009-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc: Reorder constant UNICODE_STRINGs for clarity.
+	* mount.h (fs_info::sttaus): Move filesystem type flags into
+	substructure.  Add union to allow simple test for having set any
+	one filesystem type flag.  Replace has_buggy_open flag with is_sunwnfs
+	flag.  Replace has_buggy_fileid_dirinfo with is_unixfs flag.
+	(fs_info::got_fs): New private method.
+	(fs_info::has_buggy_open): New explicit implementation.
+	(fs_info::has_buggy_fileid_dirinfo): Ditto.
+	* mount.cc (fs_info::update): Optimize filesystem checks for speed.
+	* winsup.h (IMPLEMENT_STATUS_FLAG): Change write accessor to return
+	value just set.
+
+2009-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_netdrive.cc (GET_RESOURCE_INFO): Remove.
 	(thread_netdrive): Drop GET_RESOURCE_INFO case.
 	(fhandler_netdrive::exists): Use GET_RESOURCE_OPENENUM info class

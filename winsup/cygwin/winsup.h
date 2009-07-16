@@ -124,7 +124,7 @@ extern int cygserver_running;
 
 /* Used to define status flag accessor methods */
 #define IMPLEMENT_STATUS_FLAG(type,flag) \
-  void flag (type val) { status.flag = (val); } \
+  type flag (type val) { return (type) (status.flag = (val)); } \
   type flag () const { return (type) status.flag; }
 
 /* Used when treating / and \ as equivalent. */
