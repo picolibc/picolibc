@@ -445,17 +445,13 @@ NTSTATUS
 unlink_nt (path_conv &pc)
 {
   NTSTATUS status;
-  HANDLE fh;
+  HANDLE fh, fh_ro = NULL;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
 
-  ACCESS_MASK access = DELETE;
-  /* If the R/O attribute is set, we have to open the file with
-     FILE_WRITE_ATTRIBUTES to be able to remove this flags before trying
-     to delete it. */
-  if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
-    access |= FILE_WRITE_ATTRIBUTES;
+  bin_status bin_stat = dont_move;
 
+  ACCESS_MASK access = DELETE;
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
   /* Add the reparse point flag to native symlinks, otherwise we remove the
      target, not the symlink. */
@@ -463,13 +459,31 @@ unlink_nt (path_conv &pc)
     flags |= FILE_OPEN_REPARSE_POINT;
 
   pc.get_object_attr (attr, sec_none_nih);
+  /* If the R/O attribute is set, we have to open the file with
+     FILE_WRITE_ATTRIBUTES to be able to remove this flags before trying
+     to delete it.  We do this separately because there are filesystems
+     out there (MVFS), which refuse a request to open a file for DELETE
+     if the DOS R/O attribute is set for the file.  After removing the R/O
+     attribute, just re-open the file for DELETE and go ahead. */
+  if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+    {
+      access |= FILE_WRITE_ATTRIBUTES;
+      status = NtOpenFile (&fh_ro, FILE_WRITE_ATTRIBUTES, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, flags);
+      if (NT_SUCCESS (status))
+	{
+	  NtSetAttributesFile (fh_ro, pc.file_attributes ()
+				      & ~FILE_ATTRIBUTE_READONLY);
+	  InitializeObjectAttributes (&attr, &ro_u_empty,
+				      pc.objcaseinsensitive (), fh_ro, NULL);
+      	}
+    }
   /* First try to open the file with only allowing sharing for delete.  If
      the file has an open handle on it, other than just for deletion, this
      will fail.  That indicates that the file has to be moved to the recycle
      bin so that it actually disappears from its directory even though its
      in use.  Otherwise, if opening doesn't fail, the file is not in use and
      we can go straight to setting the delete disposition flag. */
-  bin_status bin_stat = dont_move;
   status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
   if (status == STATUS_SHARING_VIOLATION || status == STATUS_LOCK_NOT_GRANTED)
     {
@@ -512,11 +526,15 @@ unlink_nt (path_conv &pc)
 	      if (!NT_SUCCESS (status))
 		{
 		  NtClose (fh);
+		  if (fh_ro)
+		    NtClose (fh_ro);
 		  return status;
 		}
 	    }
 	}
     }
+  if (fh_ro)
+    NtClose (fh_ro);
   if (!NT_SUCCESS (status))
     {
       if (status == STATUS_DELETE_PENDING)
@@ -527,9 +545,6 @@ unlink_nt (path_conv &pc)
       syscall_printf ("Opening file for delete failed, status = %p", status);
       return status;
     }
-  /* Get rid of read-only attribute. */
-  if (access & FILE_WRITE_ATTRIBUTES)
-    NtSetAttributesFile (fh, pc.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
   /* Try to move to bin if a sharing violation occured.  If that worked,
      we're done. */
   if (bin_stat == move_to_bin
