@@ -845,8 +845,7 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (S_ISSOCK (mode))
     pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
 
-  status = NtSetAttributesFile (get_handle (), pc.file_attributes ()
-					       ?: FILE_ATTRIBUTE_NORMAL);
+  status = NtSetAttributesFile (get_handle (), pc.file_attributes ());
   /* Correct NTFS security attributes have higher priority */
   if (!pc.has_acls ())
     {
