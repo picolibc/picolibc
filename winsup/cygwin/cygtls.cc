@@ -228,6 +228,9 @@ extern exception_list *_except_list asm ("%fs:0");
 void
 _cygtls::init_exception_handler (exception_handler *eh)
 {
+  for (exception_list *e = _except_list; e->prev != NULL && e->prev != (exception_list *)-1; e = e->prev)
+    if (e == &el)
+      return;
   el.handler = eh;
   /* Apparently Windows stores some information about an exception and tries
      to figure out if the SEH which returned 0 last time actually solved the
