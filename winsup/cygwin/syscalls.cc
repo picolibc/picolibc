@@ -497,7 +497,19 @@ unlink_nt (path_conv &pc)
 	 times out.  Opening the file with FILE_SHARE_VALID_FLAGS will work,
 	 though, and it is then possible to delete the file quite normally. */
 
-      /* Bin is only accessible locally. */
+      /* The recycle bin is only accessible locally.  For in-use remote
+	 files we drop back to just returning EBUSY. */
+      if (pc.isremote () && status == STATUS_SHARING_VIOLATION)
+	{
+	  if (fh_ro)
+	    {
+	      /* Try to reset R/O attribute and close handle. */
+	      NtSetAttributesFile (fh_ro, pc.file_attributes ());
+	      NtClose (fh_ro);
+	    }
+	  return status;
+	}
+      /* Only local FS and NFS w/ STATUS_LOCK_NOT_GRANTED should arrive here. */
       if (!pc.isremote ())
 	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())
