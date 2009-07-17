@@ -28,7 +28,7 @@ extern void *operator new(std::size_t sz) throw (std::bad_alloc)
 extern void *operator new[](std::size_t sz) throw (std::bad_alloc)
 			__asm__ ("___wrap__Znaj");
 extern void operator delete(void *p) throw()
-			__asm__ ("___wrap__ZdlPv ");
+			__asm__ ("___wrap__ZdlPv");
 extern void operator delete[](void *p) throw()
 			__asm__ ("___wrap__ZdaPv");
 extern void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
