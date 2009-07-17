@@ -240,6 +240,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			 && FS_IS_NETAPP_DATAONTAP)
 	  /* Microsoft NFS needs distinct access methods for metadata. */
 	  && !is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE))
+	  /* MVFS == Rational ClearCase remote filesystem.  Has a couple of
+	     drawbacks, like not supporting DOS attributes other than R/O
+	     and stuff like that. */
+	  && !is_mvfs (RtlEqualUnicodePathPrefix (&fsname, &ro_u_mvfs, FALSE))
 	  /* Known remote file system which can't handle calls to
 	     NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
@@ -1386,22 +1390,28 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
 
-  if (mntinfo.is_samba())
+  if (mntinfo.is_ntfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "ntfs");
+  else if (mntinfo.is_fat ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "vfat");
+  else if (mntinfo.is_samba())
     strcpy (_my_tls.locals.mnt_type, (char *) "smbfs");
   else if (mntinfo.is_nfs ())
     strcpy (_my_tls.locals.mnt_type, (char *) "nfs");
-  else if (mntinfo.is_fat ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "vfat");
-  else if (mntinfo.is_ntfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "ntfs");
-  else if (mntinfo.is_netapp ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "netapp");
   else if (mntinfo.is_udf ())
     strcpy (_my_tls.locals.mnt_type, (char *) "udf");
   else if (mntinfo.is_cdrom ())
     strcpy (_my_tls.locals.mnt_type, (char *) "iso9660");
+  else if (mntinfo.is_netapp ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "netapp");
   else if (mntinfo.is_csc_cache ())
     strcpy (_my_tls.locals.mnt_type, (char *) "csc-cache");
+  else if (mntinfo.is_mvfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "mvfs");
+  else if (mntinfo.is_unixfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "unixfs");
+  else if (mntinfo.is_sunwnfs ())
+    strcpy (_my_tls.locals.mnt_type, (char *) "sunwnfs");
   else
     strcpy (_my_tls.locals.mnt_type, (char *) "unknown");
 

@@ -231,6 +231,7 @@ class path_conv
   bool fs_is_nfs () const {return fs.is_nfs ();}
   bool fs_is_netapp () const {return fs.is_netapp ();}
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
+  bool fs_is_mvfs () const {return fs.is_mvfs ();}
   ULONG fs_serial_number () const {return fs.serial_number ();}
   void set_path (const char *p) {strcpy (path, p);}
   void fillin (HANDLE h);

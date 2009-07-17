@@ -37,6 +37,7 @@ class fs_info
 	unsigned is_csc_cache		: 1;
 	unsigned is_sunwnfs		: 1;
 	unsigned is_unixfs		: 1;
+	unsigned is_mvfs		: 1;
       };
       unsigned long fs_flags;
     };
@@ -65,6 +66,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, is_csc_cache)
   IMPLEMENT_STATUS_FLAG (bool, is_sunwnfs)
   IMPLEMENT_STATUS_FLAG (bool, is_unixfs)
+  IMPLEMENT_STATUS_FLAG (bool, is_mvfs)
   ULONG serial_number () const { return sernum; }
 
   int has_buggy_open () const {return is_sunwnfs ();}

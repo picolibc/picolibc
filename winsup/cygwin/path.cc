@@ -1367,6 +1367,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   HANDLE fh;
   tmp_pathbuf tp;
   unsigned check_opt;
+  bool mk_winsym = use_winsym;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -1397,7 +1398,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   check_opt = PC_SYM_NOFOLLOW | PC_POSIX | (isdevice ? PC_NOWARN : 0);
   /* We need the normalized full path below. */
   win32_newpath.check (newpath, check_opt, stat_suffixes);
-  if (use_winsym && !win32_newpath.exists ()
+  /* MVFS doesn't handle the SYSTEM DOS attribute, but it handles the R/O
+     attribute.  Therefore we create symlinks on MVFS always as shortcuts. */
+  mk_winsym |= win32_newpath.fs_is_mvfs ();
+
+  if (mk_winsym && !win32_newpath.exists ()
       && (isdevice || !win32_newpath.fs_is_nfs ()))
     {
       char *newplnk = tp.c_get ();
@@ -1449,7 +1454,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  if (use_winsym)
+  if (mk_winsym)
     {
       ITEMIDLIST *pidl = NULL;
       size_t full_len = 0;
@@ -1634,8 +1639,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
   if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
     {
-      status = NtSetAttributesFile (fh, use_winsym ? FILE_ATTRIBUTE_READONLY
-						   : FILE_ATTRIBUTE_SYSTEM);
+      status = NtSetAttributesFile (fh, mk_winsym ? FILE_ATTRIBUTE_READONLY
+						  : FILE_ATTRIBUTE_SYSTEM);
       if (!NT_SUCCESS (status))
 	debug_printf ("Setting attributes failed, status = %p", status);
       res = 0;
@@ -1653,7 +1658,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 
 done:
   syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, oldpath,
-		  newpath, use_winsym, isdevice);
+		  newpath, mk_winsym, isdevice);
   return res;
 }
 

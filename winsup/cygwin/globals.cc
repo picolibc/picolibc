@@ -72,7 +72,13 @@ char NO_COPY almost_null[1];
 
 char *old_title;
 
-/* Heavily-used const UNICODE_STRINGs are defined here once. */
+/* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
+   speed improvement by not having to initialize a UNICODE_STRING every time
+   we make a string comparison.  The strings are not defined as const,
+   because the respective NT functions are not taking const arguments
+   and doing so here results in lots of extra casts for no good reason.
+   Rather, the strings are placed in the R/O section .rdata, so we get
+   a SEGV if some code erroneously tries to overwrite these strings. */
 #define _ROU(_s) \
         { Length: sizeof (_s) - sizeof (WCHAR), \
           MaximumLength: sizeof (_s), \
