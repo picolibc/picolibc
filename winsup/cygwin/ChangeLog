@@ -1,5 +1,12 @@
 2009-07-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygtls.cc (_cygtls::init_exception_handler): Test for e, not e->prev
+	or we could still end up adding our handler twice.  Add comment
+	explaining what we're doing.
+	* dll_init.cc (dll_dllcrt0_1): Clarify comment.
+
+2009-07-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygtls.cc (_cygtls::init_exception_handler): Avoid adding our
 	exception handler twice.
 

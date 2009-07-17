@@ -312,12 +312,13 @@ dll_dllcrt0_1 (VOID *x)
   per_process*& p = ((dllcrt0_info *)x)->p;
   int& res = ((dllcrt0_info *)x)->res;
 
-  /* Windows apparently installs a bunch of exception handlers prior to
-     this function getting called and one of them may trip before cygwin
-     gets to it.  So, install our own exception handler only.
-     FIXME: It is possible that we may have to save state of the
-     previous exception handler chain and restore it, if problems
-     are noted. */
+  /* Make sure that our exception handler is installed.
+     That should always be the case but this just makes sure.
+
+     At some point, we may want to just remove this code since
+     the exception handler should be guaranteed to be installed.
+     I'm leaving it in until potentially after the release of
+     1.7.1 */
   _my_tls.init_exception_handler (_cygtls::handle_exceptions);
 
   if (p == NULL)

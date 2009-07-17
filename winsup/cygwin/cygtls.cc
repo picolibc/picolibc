@@ -228,7 +228,23 @@ extern exception_list *_except_list asm ("%fs:0");
 void
 _cygtls::init_exception_handler (exception_handler *eh)
 {
-  for (exception_list *e = _except_list; e->prev != NULL && e->prev != (exception_list *)-1; e = e->prev)
+  /* Here in the distant past of 17-Jul-2009, we had an issue where Windows
+     2008 became YA perplexed because the cygwin exception handler was added
+     at the start of the SEH while still being in the list further on.  This
+     was because we added a loop by setting el.prev to _except_list here.
+     Since el is reused in this thread, and this function can be called
+     more than once when a dll is loaded, this is not a good thing.
+
+     So, for now, until the next required tweak, we will just avoid adding the
+     cygwin exception handler if it is already on this list.  This could present
+     a problem if some previous exception handler tries to do things that are
+     better left to Cygwin.  I await the cygwin mailing list notification of
+     this event with bated breath.
+
+     (cgf 2009-07-17) */
+  for (exception_list *e = _except_list;
+       e != NULL && e != (exception_list *) -1;
+       e = e->prev)
     if (e == &el)
       return;
   el.handler = eh;
