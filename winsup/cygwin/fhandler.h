@@ -572,22 +572,19 @@ public:
   friend class fhandler_fifo;
 };
 
+enum fifo_state
+{
+  fifo_unknown,
+  fifo_wait_for_client,
+  fifo_wait_for_server,
+  fifo_ok
+};
 class fhandler_fifo: public fhandler_base
 {
-  enum fifo_state
-  {
-    fifo_unknown,
-    fifo_wait_for_client,
-    fifo_wait_for_server,
-    fifo_wait_for_next_client,
-    fifo_eof,
-    fifo_ok
-  };
   fifo_state wait_state;
   HANDLE open_nonserver (const char *, unsigned, LPSECURITY_ATTRIBUTES);
   OVERLAPPED io_status;
   bool wait (bool) __attribute__ ((regparm (1)));
-  char *fifo_name (char *) __attribute__ ((regparm (2)));
 public:
   fhandler_fifo ();
   void raw_read (void *, size_t&);
