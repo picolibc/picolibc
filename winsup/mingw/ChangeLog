@@ -1,3 +1,7 @@
+2009-07-18  Gregory McGarry  <gregorymcgarry@users.sourceforge.net>
+
+	* include/_mingw.h: Changes required for PCC compiler.
+
 2009-07-18 Jeff Lu  <jll544@yahoo.com>
 
 	* mingwex/usleep.c: round up to next ms
