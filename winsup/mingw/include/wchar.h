@@ -144,9 +144,11 @@ _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_wpopen (const wchar_t*, const wchar_t*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl __MINGW_NOTHROW snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW
 vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
+#endif
 int __cdecl __MINGW_NOTHROW vwscanf (const wchar_t * __restrict__, __VALIST);
 int __cdecl __MINGW_NOTHROW vfwscanf (FILE * __restrict__,
 		       const wchar_t * __restrict__, __VALIST);
@@ -247,9 +249,11 @@ _CRTIMP  wchar_t* __cdecl __MINGW_NOTHROW __wcserror(const wchar_t*);
 
 #ifndef	_NO_OLDNAMES
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
   {return _wcsicmp (__ws1, __ws2);}
+#endif
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW wcsdup (const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	wcsicmp (const wchar_t*, const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	wcsicoll (const wchar_t*, const wchar_t*);

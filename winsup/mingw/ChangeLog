@@ -1,5 +1,11 @@
 2009-07-18  Gregory McGarry  <gregorymcgarry@users.sourceforge.net>
 
+	* include/inttypes.h include/math.h include/stdio.h include/stdlib.h
+	include/string.h include/unistd.h include/wchar.h: Add __NO_INLINE__ guard
+	to all inline functions.
+
+2009-07-18  Gregory McGarry  <gregorymcgarry@users.sourceforge.net>
+
 	* CRT_fp8.c: Add PCC alternative to GCC-specific constructs.
 	* CRT_fp10.c: Ditto.
 

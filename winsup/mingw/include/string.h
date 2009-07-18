@@ -92,17 +92,21 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	memicmp (const void*, const void*, size_t);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strdup (const char*) __MINGW_ATTRIB_MALLOC;
 _CRTIMP int __cdecl __MINGW_NOTHROW	strcmpi (const char*, const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	stricmp (const char*, const char*);
-__CRT_INLINE int __cdecl __MINGW_NOTHROW strcasecmp (const char*, const char *);
+int __cdecl __MINGW_NOTHROW strcasecmp (const char*, const char *);
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW
 strcasecmp (const char * __sz1, const char * __sz2)
   {return _stricmp (__sz1, __sz2);}
+#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW	stricoll (const char*, const char*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strlwr (char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	strnicmp (const char*, const char*, size_t);
-__CRT_INLINE int  __cdecl __MINGW_NOTHROW strncasecmp (const char *, const char *, size_t);
+int  __cdecl __MINGW_NOTHROW strncasecmp (const char *, const char *, size_t);
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW
 strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
   {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
+#endif
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strnset (char*, int, size_t);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strrev (char*);
 _CRTIMP char* __cdecl __MINGW_NOTHROW	strset (char*, int);
@@ -167,9 +171,11 @@ _CRTIMP  wchar_t* __cdecl __MINGW_NOTHROW __wcserror(const wchar_t*);
 #ifndef	_NO_OLDNAMES
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
 int __cdecl __MINGW_NOTHROW wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2);
+#ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __MINGW_NOTHROW
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
   {return _wcsicmp (__ws1, __ws2);}
+#endif
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW wcsdup (const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	wcsicmp (const wchar_t*, const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	wcsicoll (const wchar_t*, const wchar_t*);

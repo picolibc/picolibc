@@ -255,8 +255,11 @@ typedef struct {
 
 #endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
+intmax_t __cdecl __MINGW_NOTHROW imaxabs (intmax_t j);
+#ifndef __NO_INLINE__
 __CRT_INLINE intmax_t __cdecl __MINGW_NOTHROW imaxabs (intmax_t j)
 	{return	(j >= 0 ? j : -j);}
+#endif
 imaxdiv_t __cdecl __MINGW_NOTHROW imaxdiv (intmax_t numer, intmax_t denom);
 
 /* 7.8.2 Conversion functions for greatest-width integer types */
