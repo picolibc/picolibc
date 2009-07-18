@@ -10,7 +10,10 @@
 #define DENORMAL 1
 #define VOLATILE
 #define mtherr(fname, code) 
-#define XPD 0,
+#define XPD 0
+
+typedef union uLD { const unsigned short sh[6]; long double ld; } uLD;
+typedef union uD { const unsigned short sh[4]; double d; } uD;
 
 #define _CEPHES_USE_ERRNO
 
@@ -163,16 +166,17 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
  */
 static  __inline__ double polevl( x, p, n )
 double x;
-const void *p;
+const uD *p;
 int n;
 {
 register double y;
-register double *P = (double *)p;
 
-y = *P++;
+y = p->d;
+p++;
 do
 	{
-	y = y * x + *P++;
+	y = y * x + p->d;
+  p++;
 	}
 while( --n );
 return(y);
@@ -185,17 +189,18 @@ return(y);
  */
 static __inline__  double p1evl( x, p, n )
 double x;
-const void *p;
+const uD *p;
 int n;
 {
 register double y;
-register double *P = (double *)p;
 
 n -= 1;
-y = x + *P++;
+y = x + p->d;
+p++;
 do
 	{
-	y = y * x + *P++;
+	y = y * x + p->d;
+  p++;
 	}
 while( --n );
 return( y );
@@ -259,16 +264,17 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
  */
 static  __inline__ long double polevll( x, p, n )
 long double x;
-const void *p;
+const uLD *p;
 int n;
 {
 register long double y;
-register long double *P = (long double *)p;
 
-y = *P++;
+y = p->ld;
+p++;
 do
 	{
-	y = y * x + *P++;
+	y = y * x + p->ld;
+  p++;
 	}
 while( --n );
 return(y);
@@ -281,17 +287,18 @@ return(y);
  */
 static __inline__ long double p1evll( x, p, n )
 long double x;
-const void *p;
+const uLD *p;
 int n;
 {
 register long double y;
-register long double *P = (long double *)p;
 
 n -= 1;
-y = x + *P++;
+y = x + p->ld;
+p++;
 do
 	{
-	y = y * x + *P++;
+	y = y * x + p->ld;
+  p++;
 	}
 while( --n );
 return( y );

@@ -1,3 +1,10 @@
+2009-07-17  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* mingwex/math/cephes_mconf.h mingwex/math/erfl.c mingwex/math/lgamma.c
+	mingwex/math/lgammal.c mingwex/math/powl.c mingwex/math/sinhl.c
+	mingwex/math/tanhl.c mingwex/math/tgamma.c mingwex/math/tgammal.c: Based on
+	the fixes from the mingw-w64 code tree, fixed strict-aliasing issues.
+
 2009-07-12  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* mingwex/stdio/pformat.c: Fix compiler warnings with GCC 4.4.0.
