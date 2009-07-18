@@ -1,3 +1,7 @@
+2009-07-18 Jeff Lu  <jll544@yahoo.com>
+
+	* mingwex/usleep.c: round up to next ms
+
 2009-07-17  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* mingwex/math/cephes_mconf.h mingwex/math/erfl.c mingwex/math/lgamma.c
