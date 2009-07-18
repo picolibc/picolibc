@@ -760,6 +760,7 @@ sig_handle_tty_stop (int sig)
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
       reset_signal_arrived ();
+      myself->stopsig = SIGCONT;
       myself->alert_parent (SIGCONT);
       break;
     default:

@@ -1,6 +1,6 @@
 /* cygwin/wait.h
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,6 +13,8 @@ details. */
 
 #define WNOHANG 1
 #define WUNTRACED 2
+#define WCONTINUED 8
+#define __W_CONTINUED	0xffff
 
 /* A status looks like:
       <2 bytes info> <2 bytes code>
@@ -26,6 +28,7 @@ details. */
 #define WIFEXITED(w)	(((w) & 0xff) == 0)
 #define WIFSIGNALED(w)	(((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
 #define WIFSTOPPED(w)	(((w) & 0xff) == 0x7f)
+#define WIFCONTINUED(w)	(((w) & 0xffff) == __W_CONTINUED)
 #define WEXITSTATUS(w)	(((w) >> 8) & 0xff)
 #define WTERMSIG(w)	((w) & 0x7f)
 #define WSTOPSIG	WEXITSTATUS

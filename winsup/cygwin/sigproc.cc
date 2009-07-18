@@ -1050,7 +1050,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   int terminated;
 
   if (!((terminated = (child->process_state == PID_EXITED)) ||
-      ((w->options & WUNTRACED) && child->stopsig)))
+      ((w->options & (WUNTRACED | WCONTINUED)) && child->stopsig)))
     return false;
 
   parent_w->next = w->next;	/* successful wait.  remove from wait queue */
@@ -1059,7 +1059,10 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   if (!terminated)
     {
       sigproc_printf ("stopped child");
-      w->status = (child->stopsig << 8) | 0x7f;
+      if (child->stopsig == SIGCONT)
+	w->status = __W_CONTINUED;
+      else
+	w->status = (child->stopsig << 8) | 0x7f;
       child->stopsig = 0;
     }
   else

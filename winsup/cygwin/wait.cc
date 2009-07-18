@@ -52,7 +52,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   while (1)
     {
       sig_dispatch_pending ();
-      if (options & ~(WNOHANG | WUNTRACED))
+      if (options & ~(WNOHANG | WUNTRACED | WCONTINUED))
 	{
 	  set_errno (EINVAL);
 	  res = -1;
