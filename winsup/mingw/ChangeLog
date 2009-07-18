@@ -1,5 +1,11 @@
 2009-07-18  Gregory McGarry  <gregorymcgarry@users.sourceforge.net>
 
+	* cpu_features.c: replace gcc-specific construct with portable alternative
+	and match the code a few lines above.
+	* crt1.c: remove gcc-specific noreturn attribute with mingw alternative
+
+2009-07-18  Gregory McGarry  <gregorymcgarry@users.sourceforge.net>
+
 	* include/_mingw.h: Changes required for PCC compiler.
 
 2009-07-18 Jeff Lu  <jll544@yahoo.com>

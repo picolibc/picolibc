@@ -181,7 +181,7 @@ _gnu_exception_handler (EXCEPTION_POINTERS * exception_data)
 /*
  * The function mainCRTStartup is the entry point for all console programs.
  */
-static void  __attribute__((noreturn))
+static void  __MINGW_ATTRIB_NORETURN
 __mingw_CRTStartup (void)
 {
   int nRet;

@@ -19,7 +19,7 @@
 #define EDX_LM (1 << 29) /*LONG MODE */
 
 #define __cpuid(level,a,b,c,d)			 		\
-  __asm__ __volatile__ ("cpuid;"				\
+  asm volatile ("cpuid;"				\
 			: "=a" (a), "=b" (b), "=c" (c), "=d" (d)\
 			: "0" (level))
 
