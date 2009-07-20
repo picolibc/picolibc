@@ -225,6 +225,8 @@
 - Only declare expected functions in &lt;strings.h&gt;, don't include
   &lt;string.h&gt; from here.
 
+- Support for WCONTINUED, WIFCONTINUED() added to waitpid and wait4.
+
 - New APIs: _Exit, confstr, insque, remque, sys_sigabbrev,
   posix_madvise, posix_memalign, reallocf,
   exp10, exp10f, pow10, pow10f, lrint, lrintf, rint, rintf, llrint, llrintf,
