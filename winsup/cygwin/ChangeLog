@@ -1,5 +1,21 @@
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wincap.h (wincaps::has_always_all_codepages): New element.
+	* wincap.cc: Implement above element throughout.
+	* wchar.h (__sjis_mbtowc): Declare.
+	(__eucjp_mbtowc): Ditto.
+	(__gbk_mbtowc): Ditto.
+	(__kr_mbtowc): Ditto.
+	(__big5_mbtowc): Ditto.
+	* syscalls.cc (internal_setlocale): Convert to char * function.
+	Return parameter by default.  Return NULL if request to use a
+	charset can't be satisfied due to missing codepage support in the
+	underlying OS.  Fix comment.
+	(setlocale): Store original locale.  Restore to original locale if
+	internal_setlocale returns NULL.
+
+2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fork.cc (fork): Create local tmp_pathbuf.  Explain why.
 
 2009-07-18  Christopher Faylor  <me+cygwin@cgf.cx>

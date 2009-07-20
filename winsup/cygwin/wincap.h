@@ -48,6 +48,7 @@ struct wincaps
   unsigned has_broken_udf				: 1;
   unsigned has_console_handle_problem			: 1;
   unsigned has_broken_alloc_console			: 1;
+  unsigned has_always_all_codepages			: 1;
 };
 
 class wincapc
@@ -102,6 +103,7 @@ public:
   bool	IMPLEMENT (has_broken_udf)
   bool	IMPLEMENT (has_console_handle_problem)
   bool	IMPLEMENT (has_broken_alloc_console)
+  bool	IMPLEMENT (has_always_all_codepages)
 
 #undef IMPLEMENT
 };

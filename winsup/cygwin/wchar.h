@@ -28,6 +28,11 @@ extern mbtowc_f __ascii_mbtowc;
 extern mbtowc_f __utf8_mbtowc;
 extern mbtowc_f __iso_mbtowc;
 extern mbtowc_f __cp_mbtowc;
+extern mbtowc_f __sjis_mbtowc;
+extern mbtowc_f __eucjp_mbtowc;
+extern mbtowc_f __gbk_mbtowc;
+extern mbtowc_f __kr_mbtowc;
+extern mbtowc_f __big5_mbtowc;
 
 typedef int wctomb_f (struct _reent *, char *, wchar_t, const char *,
 		      mbstate_t *);

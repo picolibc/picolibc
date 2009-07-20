@@ -24,6 +24,7 @@ details. */
 #define pwrite __FOO_pwrite
 
 #include "winsup.h"
+#include "winnls.h"
 #include "miscfuncs.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
@@ -36,6 +37,7 @@ details. */
 #include <sys/uio.h>
 #include <ctype.h>
 #include <locale.h>
+#include <wchar.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <rpc.h>
@@ -4031,32 +4033,61 @@ unlinkat (int dirfd, const char *pathname, int flags)
   return (flags & AT_REMOVEDIR) ? rmdir (path) : unlink (path);
 }
 
-static void
-internal_setlocale ()
+static char *
+internal_setlocale (char *ret)
 {
-  if (*cygheap->locale.charset == 'A')
+  if (*__locale_charset () == 'A')
     {
       cygheap->locale.mbtowc = __utf8_mbtowc;
       cygheap->locale.wctomb = __utf8_wctomb;
     }
   else
     {
+      if (!wincap.has_always_all_codepages ())
+	{
+	  /* Prior to Windows Vista, many codepages are not installed by
+	     default, or can be deinstalled.  The following codepages require
+	     that the respective conversion tables are installed into the OS.
+	     So we check if they are installed and if not, setlocale should
+	     fail. */
+	  CPINFO cpi;
+	  UINT cp = 0;
+	  if (__mbtowc == __sjis_mbtowc)
+	    cp = 932;
+	  else if (__mbtowc == __eucjp_mbtowc)
+	    cp = 20932;
+	  else if (__mbtowc == __gbk_mbtowc)
+	    cp = 963;
+	  else if (__mbtowc == __kr_mbtowc)
+	    cp = 949;
+	  else if (__mbtowc == __big5_mbtowc)
+	    cp = 950;
+	  if (cp && !GetCPInfo (cp, &cpi)
+	      && GetLastError () == ERROR_INVALID_PARAMETER)
+	    return NULL;
+	}
       cygheap->locale.mbtowc = __mbtowc;
       cygheap->locale.wctomb = __wctomb;
     }
   strcpy (cygheap->locale.charset, __locale_charset ());
   /* Each setlocale potentially changes the multibyte representation
-     of the CWD.  Therefore we have to rest the CWD's posix path and
+     of the CWD.  Therefore we have to reset the CWD's posix path and
      reevaluate the next time it's used. */
   /* FIXME: Other buffered paths might be affected as well. */
   cygheap->cwd.reset_posix ();
+  return ret;
 }
 
 extern "C" char *
 setlocale (int category, const char *locale)
 {
+  char old[(LC_MESSAGES + 1) * (ENCODING_LEN + 1/*"/"*/ + 1)];
+  if (locale && (category == LC_ALL || category == LC_CTYPE)
+      && !wincap.has_always_all_codepages ())
+    stpcpy (old, _setlocale_r (_REENT, category, NULL));
   char *ret = _setlocale_r (_REENT, category, locale);
-  if (ret && locale && (category == LC_ALL || category == LC_CTYPE))
-    internal_setlocale ();
+  if (ret && locale && (category == LC_ALL || category == LC_CTYPE)
+      && !(ret = internal_setlocale (ret)))
+    _setlocale_r (_REENT, category, old);
   return ret;
 }

@@ -56,6 +56,7 @@ wincaps wincap_unknown __attribute__((section (".cygwin_dll_common"), shared)) =
   has_broken_udf:false,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -94,6 +95,7 @@ wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:false,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -132,6 +134,7 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_broken_udf:false,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -170,6 +173,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -208,6 +212,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -246,6 +251,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -284,6 +290,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -322,6 +329,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -360,6 +368,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:true,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -398,6 +407,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:false,
   has_console_handle_problem:false,
   has_broken_alloc_console:false,
+  has_always_all_codepages:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -436,6 +446,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_udf:false,
   has_console_handle_problem:true,
   has_broken_alloc_console:true,
+  has_always_all_codepages:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
