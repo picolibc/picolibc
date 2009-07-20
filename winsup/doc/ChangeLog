@@ -1,5 +1,9 @@
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.sgml (ov-new1.7-misc): Add stdc++ new/delete wrappers.
+
+2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml (ov-new1.7-posix): Add WCONTINUED, WIFCONTINUED.
 
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>

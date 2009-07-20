@@ -310,6 +310,10 @@
 - Remove backwards compatibility with old signal masks.  (Some *very* old
   programs which use signal masks may no longer work correctly).
 
+- Cygwin now exports wrapper functions for libstdc++ operators new and
+  delete, to support the toolchain in implementing full C++ standards
+  conformance when working with shared libraries.
+
 </screen>
 
 </sect2>
