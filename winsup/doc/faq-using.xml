@@ -43,7 +43,7 @@ will slow things down tremendously if it does not exist.
 (sshd, inetd, etc), then it depends on the method used to switch to
 another user.  This problem as well as its solution is described in
 detail in the Cygwin User's Guide, see
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/ntsec.html" />.
+<ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />.
 </para>
 <para>Workarounds include using public network share that does not require
 authentication (for non-critical files), providing your password to a
@@ -271,7 +271,7 @@ for memory cards or USB sticks to exchange pictures...
 <para>For other cases, understand that Cygwin attempts to show UNIX 
 permissions based on the security features of Windows, so the Windows 
 ACLs are likely the source of your problem.  See the Cygwin User's 
-Guide at <ulink url="http://cygwin.com/1.7/cygwin-ug-net/ntsec.html" />
+Guide at <ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />
 for more information on how Cygwin maps Windows permissions.
 </para>
 </answer></qandaentry>
@@ -359,7 +359,7 @@ formfeed character to your file.
 <para>Internationalization is a complex issue. The short answer is that
 Cygwin relies on the setting of the setting of LANG/LC_xxx environment
 variables. The long answer can be found in the User's Guide in the
-section <ulink url="http://cygwin.com/1.7/cygwin-ug-net/setup-locale.html">Internationalization</ulink>
+section <ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html">Internationalization</ulink>
 </para>
 
 <para>To get UTF-8 support you must set the LANG, LC_ALL, or LC_CTYPE
@@ -411,7 +411,7 @@ You can do that, for instance, by setting the variable in your
 
 <para>
 For a more detailed explanation see the section
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/setup-locale.html#setup-locale-console">The Windows Console character set</ulink> in the Cygwin User's Guide.</para>
+<ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html#setup-locale-console">The Windows Console character set</ulink> in the Cygwin User's Guide.</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.multiple-copies">
@@ -601,7 +601,7 @@ of your current Cygwin session.
 </para>
 <para>You can change the default <literal>cygdrive</literal> prefix and whether it is binmode or textmode using the <filename>/etc/fstab</filename> file
 as well.  See the Cygwin User's Guide at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using.html#mount-table">http://cygwin.com/1.7/cygwin-ug-net/using.html#mount-table</ulink>
+<ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table">http://cygwin.com/cygwin-ug-net/using.html#mount-table</ulink>
 for more details.
 </para>
 </answer></qandaentry>
@@ -684,7 +684,7 @@ configuration fails.
 <para>To help with this problem, Cygwin supports casesensitivity
 starting with Cygwin 1.7.0.  For a detailed description how to use that
 feature see the Cygwin User's Guilde at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-specialnames.html">http://cygwin.com/1.7/cygwin-ug-net/using-specialnames.html</ulink>.
+<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>.
 </para>
 
 </answer></qandaentry>
@@ -704,7 +704,7 @@ letters 'aux' in it will hang.
 <para>At least that's what happens when using native Windows tools.  Cygwin
 1.7.0 and later can deal with these filenames just fine.  Again, see the
 User's Guide at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-specialnames.html">http://cygwin.com/1.7/cygwin-ug-net/using-specialnames.html</ulink>
+<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>
 for a detailed description of what's possible with filenames and what is not.
 </para>
 </answer></qandaentry>
@@ -1018,7 +1018,7 @@ file:
 </para>
 <para>Alternatively, use Windows shortcuts as symlinks.  See the CYGWIN
 environment variable option "winsymlinks" 
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-cygwinenv.html">http://cygwin.com/1.7/cygwin-ug-net/using-cygwinenv.html</ulink>
+<ulink url="http://cygwin.com/cygwin-ug-net/using-cygwinenv.html">http://cygwin.com/cygwin-ug-net/using-cygwinenv.html</ulink>
 </para>
 </answer></qandaentry>
 

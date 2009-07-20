@@ -116,7 +116,7 @@ done
 </screen>
 
 <para>
-See <ulink url="http://cygwin.com/1.7/cygwin-ug-net/using.html#mount-table" /> 
+See <ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table" /> 
 for more information on using mount.
 </para>
 
@@ -129,7 +129,7 @@ error?</para></question>
 
 <para>
 Try running cygserver.  Read 
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-cygserver.html" />. If you're
+<ulink url="http://cygwin.com/cygwin-ug-net/using-cygserver.html" />. If you're
 trying to use PostgreSQL, also read 
 <literal>/usr/share/doc/Cygwin/postgresql-*.README</literal>.
 </para>
@@ -492,7 +492,7 @@ incompatibilities. Please send us patches if you do this work!
 <answer>
 
 <para>If you need to change the maximum amount of memory available to Cygwin, see
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/setup-maxmem.html">http://cygwin.com/1.7/cygwin-ug-net/setup-maxmem.html</ulink>. Otherwise,
+<ulink url="http://cygwin.com/cygwin-ug-net/setup-maxmem.html">http://cygwin.com/cygwin-ug-net/setup-maxmem.html</ulink>. Otherwise,
 just pass heap/stack linker arguments to gcc.  To create foo.exe with
 a heap size of 200MB and a stack size of 8MB, you would invoke
 gcc as:
@@ -518,7 +518,7 @@ recursively, provided the command is in your path.
 <answer>
 
 <para>There's documentation that explains the process in the Cygwin User's
-Guide here: <ulink url="http://cygwin.com/1.7/cygwin-ug-net/dll.html">http://cygwin.com/1.7/cygwin-ug-net/dll.html</ulink>
+Guide here: <ulink url="http://cygwin.com/cygwin-ug-net/dll.html">http://cygwin.com/cygwin-ug-net/dll.html</ulink>
 </para>
 </answer></qandaentry>
 

@@ -96,7 +96,7 @@ freedoms, so it is free software.
 
 <para>To find the version of the Cygwin DLL installed, you can use
 <filename>uname</filename> as on Linux or <filename>cygcheck</filename>. Refer to each command's
-<literal>--help</literal> output and the <ulink url='http://cygwin.com/1.7/cygwin-ug-net/'>Cygwin User's Guide</ulink> for more information.
+<literal>--help</literal> output and the <ulink url='http://cygwin.com/cygwin-ug-net/'>Cygwin User's Guide</ulink> for more information.
 </para>
 <para>If you are looking for the version number for the whole Cygwin
 release, there is none. Each package in the Cygwin release has its own
@@ -109,7 +109,7 @@ download the Cygwin Setup program from
 <ulink url='http://cygwin.com/setup.exe'>http://cygwin.com/setup.exe</ulink>.  This program will handle the task
 of updating the packages on your system to the latest version. For
 more information about using Cygwin's <filename>setup.exe</filename>, see 
-<ulink url='http://cygwin.com/1.7/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
+<ulink url='http://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
 in the Cygwin User's Guide. 
 </para></answer></qandaentry>
 

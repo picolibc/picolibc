@@ -8,7 +8,7 @@ installer ``Cygwin Setup''.  It is flexible and easy to use.
 You can pick and choose the packages you wish to install, and update
 them individually.  Full source code is available for all packages and
 tools.  More information on using Cygwin Setup may be found at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/setup-net.html" />.
+<ulink url="http://cygwin.com/cygwin-ug-net/setup-net.html" />.
 </para>
 <para>If you do it any other way, you're on your own!  That said, keep in mind
 that the GUI installer is a "work in progress", so there might be a few
@@ -126,7 +126,7 @@ HKEY_CURRENT_USER branch of the registry.  There's a bash script for your
 convenience, which creates a user-specific /etc/fstab/${USER} file for you,
 called /bin/copy-user-registry-fstab.  For more information on the new fstab
 files see the User's Guide at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using.html#mount-table">http://cygwin.com/1.7/cygwin-ug-net/using.html#mount-table</ulink>
+<ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table">http://cygwin.com/cygwin-ug-net/using.html#mount-table</ulink>
 </para>
 </answer></qandaentry>
 
@@ -187,7 +187,7 @@ you will have to select it explicitly.  See
 <ulink url="http://cygwin.com/packages/" /> for a searchable list of available
 packages, or use <literal>cygcheck -p </literal> as described in the Cygwin
 User's Guide at
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-utils.html#cygcheck" />.
+<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#cygcheck" />.
 </para>
 <para>If you want to build programs, of course you'll need <literal>gcc</literal>,
 <literal>binutils</literal>, <literal>make</literal> and probably other packages from the
@@ -459,7 +459,7 @@ installed are <literal>sshd</literal>, <literal>cron</literal>,
 that might be running in the background.  Exit the command prompt and ensure
 that no Cygwin processes remain.  Note: If you want to save your mount points for a later 
 reinstall, first save the output of <literal>mount -m</literal> as described at 
-<ulink url="http://cygwin.com/1.7/cygwin-ug-net/using-utils.html#mount" />.
+<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount" />.
 </para>
 </listitem>
 <listitem><para>Delete the Cygwin root folder and all subfolders.  If you get an error 
