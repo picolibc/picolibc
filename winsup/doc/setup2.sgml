@@ -454,9 +454,9 @@ oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     ISO-8859-9            28599 (ISO-8859-9)
     ISO-8859-10             -   (not available)
     ISO-8859-11             -   (not available)
-    ISO-8859-13           28563 (ISO-8859-13)
+    ISO-8859-13           28603 (ISO-8859-13)
     ISO-8859-14             -   (not available)
-    ISO-8859-15           28565 (ISO-8859-15)
+    ISO-8859-15           28605 (ISO-8859-15)
     ISO-8859-16             -   (not available)
 
     SJIS                    932 (ANSI/OEM Japanese)
