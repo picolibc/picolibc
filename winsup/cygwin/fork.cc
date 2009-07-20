@@ -580,6 +580,11 @@ fork ()
 
   {
     hold_everything held_everything (ischild);
+    /* This tmp_pathbuf constructor is required here because the below setjmp
+       magic will otherwise not restore the original buffer count values in
+       the thread-local storage.  A process forking too deeply will run into
+       the problem to be out of temporary TLS path buffers. */
+    tmp_pathbuf tp;
 
     if (!held_everything)
       {
