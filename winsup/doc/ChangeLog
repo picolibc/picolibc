@@ -1,5 +1,12 @@
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (all): Fix wrong target names.
+	(cygwin-ug-net/cygwin-ug-net-nochunks.html.gz): Ditto.
+	(cygwin-ug-net/cygwin-ug-net.pdf): Convert to use docbook2pdf.
+	(cygwin-api/cygwin-api.pdf): Ditto.
+
+2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq: Throughout, revert references to User's Guide to default URL.
 
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>

@@ -32,18 +32,18 @@ FAQ_SOURCES:= faq-api.xml faq-programming.xml faq-resources.xml \
 
 all : \
 	cygwin-ug-net/cygwin-ug-net.html \
-	cygwin-ug-net/cygwin-ug-net.html.gz \
+	cygwin-ug-net/cygwin-ug-net-nochunks.html.gz \
 	cygwin-api/cygwin-api.html \
 	faq/faq.html faq/faq-nochunks.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
-	cygwin-api/cygwin-api.html
+	cygwin-api/cygwin-api.pdf
 
 clean:
 	rm -Rf $(TOCLEAN)
 
 install:	all
 
-cygwin-ug-net/cygwin-ug-net.html.gz : cygwin-ug-net.sgml doctool
+cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.sgml doctool
 	-xmlto html-nochunks -m $(srcdir)/cygwin.dsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
@@ -52,8 +52,9 @@ cygwin-ug-net/cygwin-ug-net.html.gz : cygwin-ug-net.sgml doctool
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 	-xmlto html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
 
-cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.sgml doctool
-	-xmlto --extension -v pdf -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
+# Some versions of jw hang with the -o option
+cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.sgml
+	-cd cygwin-ug-net && docbook2pdf ../$<
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
@@ -62,7 +63,7 @@ cygwin-api/cygwin-api.html : cygwin-api.sgml
 	-xmlto html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.sgml
-	-xmlto --extension -v pdf -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
+	-cd cygwin-api && docbook2pdf ../$<
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
