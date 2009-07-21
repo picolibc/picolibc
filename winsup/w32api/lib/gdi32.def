@@ -143,7 +143,9 @@ GetColorAdjustment@8
 GetColorSpace@4
 GetCurrentObject@8
 GetCurrentPositionEx@8
+GetDCBrushColor@4
 GetDCOrgEx@8
+GetDCPenColor@4
 GetDIBColorTable@16
 GetDIBits@28
 GetDeviceCaps@8

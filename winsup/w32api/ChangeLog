@@ -1,3 +1,9 @@
+2009-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lib/msimg32.def (GetDCBrushColor, GetDCPenColor): Move entry points
+	from here...
+	* lib/gdo32.dll: ...to here.
+
 2009-07-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/comctl32.def (StrCSpnA@8, StrCSpnIA@8, StrCSpnW@8, StrChrA@8,
