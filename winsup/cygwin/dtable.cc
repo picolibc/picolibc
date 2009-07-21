@@ -621,7 +621,7 @@ dtable::dup2 (int oldfd, int newfd)
 
   if (newfd == oldfd)
     {
-      res = 0;
+      res = newfd;
       goto done;
     }
 
