@@ -1,3 +1,12 @@
+2009-07-21  Corinna Vinschen  <corinna@vinschen.de>
+	    Eric Blake  <ebb9@byu.net>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Add special case
+	for MVFS.  Explain why.
+	(fhandler_disk_file::utimens): Drop local variables lastaccess and
+	lastwrite.  Copy timestamps right into FILE_BASIC_INFORMATION structure
+	to avoid copying them twice.  
+
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.h (wincaps::has_always_all_codepages): New element.

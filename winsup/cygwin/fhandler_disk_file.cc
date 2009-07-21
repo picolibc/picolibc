@@ -846,6 +846,25 @@ fhandler_disk_file::fchmod (mode_t mode)
     pc |= (DWORD) FILE_ATTRIBUTE_SYSTEM;
 
   status = NtSetAttributesFile (get_handle (), pc.file_attributes ());
+  /* MVFS needs a good amount of kicking to be convinced that it has to write
+     back metadata changes and to invalidate the cached metadata information
+     stored for the given handle.  This method to open a second handle to
+     the file and write the same metadata information twice has been found
+     experimentally: http://cygwin.com/ml/cygwin/2009-07/msg00533.html */
+  if (pc.fs_is_mvfs () && NT_SUCCESS (status) && !oret)
+    {
+      OBJECT_ATTRIBUTES attr;
+      HANDLE fh;
+
+      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (), NULL);
+      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
+				  FILE_SHARE_VALID_FLAGS,
+				  FILE_OPEN_FOR_BACKUP_INTENT)))
+	{
+	  NtSetAttributesFile (fh, pc.file_attributes ());
+	  NtClose (fh);
+	}
+    }
   /* Correct NTFS security attributes have higher priority */
   if (!pc.has_acls ())
     {
@@ -1260,7 +1279,6 @@ fhandler_disk_file::utimens (const struct timespec *tvp)
 int
 fhandler_base::utimens_fs (const struct timespec *tvp)
 {
-  LARGE_INTEGER lastaccess, lastwrite;
   struct timespec timeofday;
   struct timespec tmp[2];
   bool closeit = false;
@@ -1299,20 +1317,36 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       tmp[0] = (tvp[0].tv_nsec == UTIME_NOW) ? timeofday : tvp[0];
       tmp[1] = (tvp[1].tv_nsec == UTIME_NOW) ? timeofday : tvp[1];
     }
-  /* UTIME_OMIT is handled in timespec_to_filetime by setting FILETIME to 0. */
-  timespec_to_filetime (&tmp[0], (FILETIME *) &lastaccess);
-  timespec_to_filetime (&tmp[1], (FILETIME *) &lastwrite);
   debug_printf ("incoming lastaccess %08x %08x", tmp[0].tv_sec, tmp[0].tv_nsec);
 
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
+
   fbi.CreationTime.QuadPart = 0LL;
-  fbi.LastAccessTime = lastaccess;
-  fbi.LastWriteTime = lastwrite;
+  /* UTIME_OMIT is handled in timespec_to_filetime by setting FILETIME to 0. */
+  timespec_to_filetime (&tmp[0], (LPFILETIME) &fbi.LastAccessTime);
+  timespec_to_filetime (&tmp[1], (LPFILETIME) &fbi.LastWriteTime);
   fbi.ChangeTime.QuadPart = 0LL;
   fbi.FileAttributes = 0;
   NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,
 					  FileBasicInformation);
+  /* For this special case for MVFS see the comment in
+     fhandler_disk_file::fchmod. */
+  if (pc.fs_is_mvfs () && NT_SUCCESS (status) && !closeit)
+    {
+      OBJECT_ATTRIBUTES attr;
+      HANDLE fh;
+
+      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (), NULL);
+      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
+				  FILE_SHARE_VALID_FLAGS,
+				  FILE_OPEN_FOR_BACKUP_INTENT)))
+	{
+	  NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
+				FileBasicInformation);
+	  NtClose (fh);
+	}
+    }
   if (closeit)
     close_fs ();
   /* Opening a directory on a 9x share from a NT machine works(!), but
