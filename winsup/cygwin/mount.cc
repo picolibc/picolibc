@@ -310,7 +310,7 @@ mount_info::init ()
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
 
-  pathend = wcpcpy (path, cygwin_shared->installation_root);
+  pathend = wcpcpy (path, installation_root);
   create_root_entry (path);
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
 
@@ -1433,7 +1433,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   else if (flags & MOUNT_EXEC)
     strcat (_my_tls.locals.mnt_opts, (char *) ",exec");
   else if (flags & MOUNT_NOTEXEC)
-    strcat (_my_tls.locals.mnt_opts, (char *) ",noexec");
+    strcat (_my_tls.locals.mnt_opts, (char *) ",notexec");
 
   if (flags & MOUNT_NOACL)
     strcat (_my_tls.locals.mnt_opts, (char *) ",noacl");
