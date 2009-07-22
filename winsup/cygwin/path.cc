@@ -2210,6 +2210,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			     eabuf, easize);
       /* No right to access EAs or EAs not supported? */
       if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED
+	  || status == STATUS_NOT_SUPPORTED
 	  /* Or a bug in Samba 3.2.x (x <= 7) when accessing a share's root dir
 	     which has EAs enabled? */
 	  || status == STATUS_INVALID_PARAMETER)
@@ -2217,7 +2218,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
-	  if (status == STATUS_EAS_NOT_SUPPORTED)
+	  if (status == STATUS_EAS_NOT_SUPPORTED
+	      || status == STATUS_NOT_SUPPORTED)
 	    {
 	      eabuf = NULL;
 	      easize = 0;
