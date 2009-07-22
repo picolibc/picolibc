@@ -2216,7 +2216,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	{
 	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
-	     whith suffixes attached.  So we set eabuf/easize to 0 here once. */
+	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED)
 	    {
 	      eabuf = NULL;
