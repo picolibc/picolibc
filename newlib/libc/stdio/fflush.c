@@ -93,6 +93,9 @@ _DEFUN(_fflush_r, (ptr, fp),
 
   CHECK_INIT (ptr, fp);
 
+  if (!fp->_flags)
+    return 0;
+
   _flockfile (fp);
 
   t = fp->_flags;

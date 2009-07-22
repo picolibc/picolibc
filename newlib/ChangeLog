@@ -1,3 +1,9 @@
+2009-07-22  Eric Blake  <ebb9@byu.net>
+
+	Avoid a fault from locking a closed standard file.
+	* libc/stdio/fflush.c (_fflush_r): Give up early if stream has
+	been previously closed.
+
 2009-07-09  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/math/ef_scalb.c:  Replace isnanf() (pre-C99 function call) with
@@ -30,7 +36,7 @@
 2009-07-06  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/features.h: Enable UNIX98 mutex attributes
-	for RTEMS. 
+	for RTEMS.
 
 2009-07-03  Eric Blake  <ebb9@byu.net>
 
@@ -156,7 +162,7 @@
 	* newlib.hin: Add _HAVE_LONG_DOUBLE flag.
 	* libc/include/math.h:  Change non-builtin defines for HUGE_VAL,
 	HUGE_VALF, and HUGE_VALL to be constant expressions.  Add definitions
-	for the non-builtin case for INFINITY and NAN.  Gate HUGE_VALL and 
+	for the non-builtin case for INFINITY and NAN.  Gate HUGE_VALL and
 	union __ldmath definitions with (new) _HAVE_LONG_DOUBLE.
 	*libm/common/s_infconst.c:  Change definitions to use values from
 	float.h instead of non-so-portable integer forms.  Mark as being
@@ -1553,8 +1559,8 @@
 	be in sync with current kernels.
 
 2008-11-20  Ken Werner  <ken.werner@de.ibm.com>
-            Patrick Mansfield  <patmans@us.ibm.com>
-            Joel Schopp   <jschopp@austin.ibm.com>
+	    Patrick Mansfield  <patmans@us.ibm.com>
+	    Joel Schopp   <jschopp@austin.ibm.com>
 
 	* libc/machine/spu/configure.in: Add __ea detection.
 	* libc/machine/spu/Makefile.am: Add new files.
@@ -2347,7 +2353,7 @@
 	* libc/machine/spu/Makefile.am: Add new files.
 	* libc/machine/spu/Makefile.in: Likewise.
 	* libc/machine/spu/include/spu_timer.h: New file to add timer support
-        using interrupts.
+	using interrupts.
 	* libc/machine/spu/spu_clock_stop.c: Likewise.
 	* libc/machine/spu/spu_clock_svcs.c: Likewise.
 	* libc/machine/spu/spu_timer_flih.S: Likewise.
