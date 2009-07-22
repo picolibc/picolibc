@@ -100,7 +100,7 @@ do_mount (const char *dev, const char *where, int flags)
       strcat (devtmp, "\\");
       if (GetDriveType (devtmp) == DRIVE_REMOTE)
 	{
-	  fprintf (stderr, "%s: defaulting to '--no-executable' flag for speed since native path\n"
+	  fprintf (stderr, "%s: defaulting to 'notexec' mount option for speed since native path\n"
 		   "%*creferences a remote share.  Use '-f' option to override.\n", progname,
 		   strlen(progname) + 2, ' ');
 	  flags |= MOUNT_NOTEXEC;

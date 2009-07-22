@@ -882,7 +882,7 @@ getmntent (FILE *)
   else if (m->flags & MOUNT_EXEC)
     strcat (mnt.mnt_opts, (char *) ",exec");
   else if (m->flags & MOUNT_NOTEXEC)
-    strcat (mnt.mnt_opts, (char *) ",noexec");
+    strcat (mnt.mnt_opts, (char *) ",notexec");
 
   if (m->flags & MOUNT_NOACL)
     strcat (mnt.mnt_opts, (char *) ",noacl");
