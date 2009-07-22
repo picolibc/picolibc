@@ -93,6 +93,12 @@ enum query_state {
   query_write_attributes = 4
 };
 
+enum del_lock_called_from {
+  on_close,
+  after_fork,
+  after_exec
+};
+
 class fhandler_base
 {
   friend class dtable;
@@ -141,7 +147,7 @@ class fhandler_base
 
   /* Used for advisory file locking.  See flock.cc.  */
   long long unique_id;
-  void del_my_locks (bool);
+  void del_my_locks (del_lock_called_from);
 
   HANDLE read_state;
   int wait_overlapped (bool, bool, DWORD *, DWORD = 0) __attribute__ ((regparm (3)));

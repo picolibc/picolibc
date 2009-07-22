@@ -344,14 +344,24 @@ inode_t::del_my_locks (long long id, HANDLE fhdl)
    case the close_on_exec flag is set.  The whole inode is deleted as
    soon as no lock exists on it anymore. */
 void
-fhandler_base::del_my_locks (bool after_fork)
+fhandler_base::del_my_locks (del_lock_called_from from)
 {
   INODE_LIST_LOCK ();
   inode_t *node = inode_t::get (get_dev (), get_ino (), false);
   if (node)
     {
+      /* When we're called from fixup_after_exec, the fhandler is a
+	 close-on-exec fhandler.  In this case our io handle is already
+	 invalid.  We can't use it to test for the object reference count.
+	 However, that shouldn't be necessary for the following reason.
+	 After exec, there are no threads in the current process waiting for
+	 the lock.  So, either we're the only process accessing the file table
+	 entry and there are no threads which require signalling, or we have
+	 a parent process still accessing the file object and signalling the
+	 lock event would be premature. */
       bool no_locks_left =
-	node->del_my_locks (after_fork ? 0 : get_unique_id (), get_handle ());
+	node->del_my_locks (from == after_fork ? 0 : get_unique_id (),
+			    from == after_exec ? NULL : get_handle ());
       if (no_locks_left)
 	{
 	  LIST_REMOVE (node, i_next);

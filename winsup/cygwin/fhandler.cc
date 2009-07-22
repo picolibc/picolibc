@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1034,7 +1034,7 @@ fhandler_base::close ()
   /* Delete all POSIX locks on the file.  Delete all flock locks on the
      file if this is the last reference to this file. */
   if (unique_id)
-    del_my_locks (false);
+    del_my_locks (on_close);
   if (nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else
@@ -1359,7 +1359,7 @@ fhandler_base::fixup_after_fork (HANDLE parent)
     setup_overlapped ();
   /* POSIX locks are not inherited across fork. */
   if (unique_id)
-    del_my_locks (true);
+    del_my_locks (after_fork);
 }
 
 void
@@ -1369,7 +1369,7 @@ fhandler_base::fixup_after_exec ()
   if (get_overlapped ())
     setup_overlapped ();
   if (unique_id && close_on_exec ())
-    del_my_locks (false);
+    del_my_locks (after_exec);
 }
 
 bool
