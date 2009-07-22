@@ -69,6 +69,10 @@ MINGW_OBJS := bloda.o cygcheck.o dump_setup.o ldh.o path.o strace.o
 strace.exe: path.o
 cygcheck.exe: bloda.o path.o dump_setup.o
 
+path-mount.o: path.cc
+	$(CXX) -c $(CXXFLAGS) -DFSTAB_ONLY -I$(updir) $< -o $@
+mount.exe: path-mount.o
+
 # Provide any necessary per-target variable overrides.
 cygcheck.exe: MINGW_LDFLAGS += -lntdll
 cygpath.exe: ALL_LDFLAGS += -lcygwin -lntdll

@@ -729,8 +729,11 @@ up as file owners in <command>ls -l</command> output.
 
 <screen>
 Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
+       mount -a
+       mount &lt;posixpath&gt;
 Display information about mounted filesystems, or mount a filesystem
 
+  -a, --all                     mount all filesystems mentioned in fstab
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
   -f, --force                   force mount, don't warn about missing mount
                                 point directories
@@ -835,6 +838,30 @@ most of the options are duplicates of other mount flags):</para>
 <para>Note that all mount points added with <command>mount</command> are
 user mount points.  System mount points can only be specified in
 the <filename>/etc/fstab</filename> file.</para>
+
+<para>If you added mount points to <filename>/etc/fstab</filename> or your
+<filename>/etc/fstab.d/&lt;username&gt;</filename> file, you can add these
+mount points to your current user session using the <literal>-a/--all</literal>
+option, or by specifing the posix path alone on the command line.  As an
+example, consider you added a mount point with the POSIX path
+<filename>/my/mount</filename>.  You can add this mount point with either
+one of the following two commands to your current user session.</para>
+
+<screen>
+<prompt>$</prompt> <userinput>mount /my/mount</userinput>
+<prompt>$</prompt> <userinput>mount -a</userinput>
+</screen>
+
+<para>The first command just adds the <filename>/my/mount</filename> mount
+point to your current session, the <command>mount -a</command> adds all
+new mount points to your user session.</para>
+
+<para>If you change a mount point to point to another native path, or
+if you changed the flags of a mount point, you have to <command>umount</command>
+the mount point first, before you can add it again.  Please note that
+all such added mount points are added as user mount points, and that the
+rule that system mount points can't be removed or replaced in a running
+session still applies.</para>
 
 <para>
 The <literal>-m</literal> option causes the <command>mount</command> utility

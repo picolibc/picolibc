@@ -16,8 +16,10 @@ details. */
 #include <windows.h>
 #include <sys/cygwin.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <getopt.h>
 #include <dirent.h>
+#include "path.h"
 
 #ifdef errno
 #undef errno
@@ -35,7 +37,7 @@ static void change_cygdrive_prefix (const char *new_prefix, int flags);
 static int mount_already_exists (const char *posix_path, int flags);
 
 // static short create_missing_dirs = FALSE;
-static short force = FALSE;
+static bool force = false;
 
 static const char version[] = "$Revision$";
 static const char *progname;
@@ -111,8 +113,71 @@ do_mount (const char *dev, const char *where, int flags)
   exit (0);
 }
 
+static void
+from_fstab (bool user)
+{
+  char path[PATH_MAX];
+  char buf[65536];
+  mnt_t *m = mount_table + max_mount_entry;
+
+  strcpy (path, "/etc/fstab");
+  if (user)
+    {
+      strcat (path, ".d/");
+      strcat (path, getlogin ());
+    }
+  FILE *fh = fopen (path, "rt");
+  if (!fh)
+    return;
+  while (fgets (buf, 65536, fh))
+    {
+      char *c = strrchr (buf, '\n');
+      if (*c)
+      	*c = '\0';
+      if (from_fstab_line (m, buf, user))
+	++m;
+    }
+  max_mount_entry = m - mount_table;
+  fclose (fh);
+}
+
+static void
+do_mount_from_fstab (const char *where)
+{
+  force = true;
+  /* Read fstab entries. */
+  from_fstab (false);
+  from_fstab (true);
+  /* Loop through fstab entries and see if it matches `where'.  If `where'
+     is NULL, all entries match. */
+  bool exists = false;
+  for (mnt_t *m = mount_table; m - mount_table < max_mount_entry; ++m)
+    if (!(m->flags & MOUNT_CYGDRIVE) && (!where || !strcmp (where, m->posix)))
+      {
+	exists = true;
+	/* Compare with existing mount table.  If the entry doesn't exist,
+	   mount it. */
+	FILE *mt = setmntent ("/-not-used-", "r");
+	struct mntent *p;
+
+	while ((p = getmntent (mt)) != NULL)
+	  if (!strcmp (m->posix, p->mnt_dir))
+	    break;
+	if (!p)
+	  do_mount (m->native, m->posix, m->flags);
+	endmntent (mt);
+	if (where)
+	  break;
+      }
+  if (!exists && where)
+    fprintf (stderr,
+	     "%s: can't find %s in /etc/fstab or in /etc/fstab.d/$USER\n",
+	     progname, where);
+}
+
 static struct option longopts[] =
 {
+  {"all", no_argument, NULL, 'a'},
   {"change-cygdrive-prefix", no_argument, NULL, 'c'},
   {"force", no_argument, NULL, 'f'},
   {"help", no_argument, NULL, 'h' },
@@ -123,7 +188,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cfhmpvo:";
+static char opts[] = "acfhmpvo:";
 
 struct opt
 {
@@ -151,8 +216,11 @@ static void
 usage (FILE *where = stderr)
 {
   fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
+       %s -a\n\
+       %s <posixpath>\n\
 Display information about mounted filesystems, or mount a filesystem\n\
 \n\
+  -a, --all                     mount all filesystems mentioned in fstab\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
@@ -163,7 +231,7 @@ Display information about mounted filesystems, or mount a filesystem\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -v, --version                 output version information and exit\n\
 \n\
-Valid options are:\n\n  ", progname);
+Valid options are:\n\n  ", progname, progname, progname);
   for (opt *o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
     fprintf (where, "%s%s", o == oopts ? "" : ",", o->name);
   fputs ("\n\n", where);
@@ -212,7 +280,8 @@ main (int argc, char **argv)
     nada,
     saw_change_cygdrive_prefix,
     saw_show_cygdrive_prefix,
-    saw_mount_commands
+    saw_mount_commands,
+    saw_mount_all,
   } do_what = nada;
 
   progname = strrchr (argv[0], '/');
@@ -232,6 +301,12 @@ main (int argc, char **argv)
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
+      case 'a':
+	if (do_what == nada)
+	  do_what = saw_mount_all;
+	else
+	  usage ();
+	break;
       case 'c':
 	if (do_what == nada)
 	  do_what = saw_change_cygdrive_prefix;
@@ -239,7 +314,7 @@ main (int argc, char **argv)
 	  usage ();
 	break;
       case 'f':
-	force = TRUE;
+	force = true;
 	break;
       case 'h':
 	usage (stdout);
@@ -251,7 +326,9 @@ main (int argc, char **argv)
 	  usage ();
 	break;
       case 'o':
-	if (*options)
+	if (do_what == saw_mount_all)
+	  usage ();
+	else if (*options)
 	  options = concat3 (options, ",", optarg);
 	else
 	  options = strdup (optarg);
@@ -320,16 +397,20 @@ main (int argc, char **argv)
 	usage ();
       mount_entries ();
       break;
+    case saw_mount_all:
+      if (optind <= argc)
+      	usage ();
+      do_mount_from_fstab (NULL);
+      break;
     default:
-      if (optind != (argc - 1))
+      if (optind == argc)
+	do_mount_from_fstab (argv[optind]);
+      else if (optind != (argc - 1))
 	{
-	  if (optind >= argc)
-	    fprintf (stderr, "%s: not enough arguments\n", progname);
-	  else
-	    fprintf (stderr, "%s: too many arguments\n", progname);
+	  fprintf (stderr, "%s: too many arguments\n", progname);
 	  usage ();
 	}
-      if (force || !mount_already_exists (argv[optind + 1], flags))
+      else if (force || !mount_already_exists (argv[optind + 1], flags))
 	do_mount (argv[optind], argv[optind + 1], flags);
       else
 	{

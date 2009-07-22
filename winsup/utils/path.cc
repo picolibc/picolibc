@@ -27,6 +27,7 @@ details. */
 #include "cygwin/include/mntent.h"
 #include "testsuite.h"
 
+#ifndef FSTAB_ONLY
 /* Used when treating / and \ as equivalent. */
 #define isslash(ch) \
   ({ \
@@ -245,24 +246,16 @@ readlink (HANDLE fh, char *path, int maxlen)
   else
     return false;
 }
-
-struct mnt_t
-{
-  char *native;
-  char *posix;
-  unsigned flags;
-};
+#endif /* !FSTAB_ONLY */
 
 #ifndef TESTSUITE
-static mnt_t mount_table[255];
-static int max_mount_entry;
+mnt_t mount_table[255];
+int max_mount_entry;
 #else
 #  define TESTSUITE_MOUNT_TABLE
 #  include "testsuite.h"
 #  undef TESTSUITE_MOUNT_TABLE
 #endif
-
-mnt_t *root_here = NULL;
 
 inline void
 unconvert_slashes (char* name)
@@ -355,7 +348,7 @@ read_flags (char *options, unsigned &flags)
   return true;
 }
 
-static bool
+bool
 from_fstab_line (mnt_t *m, char *line, bool user)
 {
   char *native_path, *posix_path, *fs_type;
@@ -439,6 +432,8 @@ from_fstab_line (mnt_t *m, char *line, bool user)
     }
   return true;
 }
+
+#ifndef FSTAB_ONLY
 
 #define BUFSIZE 65536
 
@@ -540,7 +535,10 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
   max_mount_entry = m - mount_table;
   CloseHandle (h);
 }
-#endif
+#endif /* !FSTAB_ONLY */
+#endif /* !TESTSUITE */
+
+#ifndef FSTAB_ONLY
 
 static int
 mnt_sort (const void *a, const void *b)
@@ -900,3 +898,5 @@ getmntent (FILE *)
   m++;
   return &mnt;
 }
+
+#endif /* !FSTAB_ONLY */

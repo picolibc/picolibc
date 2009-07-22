@@ -1,3 +1,27 @@
+2009-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (path-mount.o): Add a rule to build stripped down version
+	of path.cc for usage in mount.
+	(mount.exe): Add dependency to path-mount.o.
+	* mount.cc (force): Convert to bool value.  Accommodate throughout.
+	(from_fstab): New function.
+	(do_mount_from_fstab): New function.
+	(longopts): Add --all option.
+	(opts): Add -a option.
+	(usage): Document -a/--all option.
+	(main): Handle -a option as well as single parameter.
+	* path.cc: Add FSTAB_ONLY conditional to allow building path-mount.o.
+	(mount_table): Remove static storage class.
+	(max_mount_entry): Ditto.
+	(root_here): Unused.  Remove.
+	(from_fstab_line): Remove static.
+	* path.h (struct mnt_t): Define here rather than in path.cc.
+	(from_fstab_line): Declare.
+	(mount_table): Declare.
+	(max_mount_entry): Declare.
+	* utils.sgml (mount): Document -a/--all option and mounting of single
+	path from fstab files.
+
 2009-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strace.cc (main): Open trace output file in UNIX mode.
