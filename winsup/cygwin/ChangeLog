@@ -1,5 +1,9 @@
 2009-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc: Revert accidental checkin.
+
+2009-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Handle STATUS_NOT_SUPPORTED from
 	NtCreateFile just like STATUS_EAS_NOT_SUPPORTED.
 
