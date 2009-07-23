@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
+   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -555,6 +555,7 @@
 #define STB_GLOBAL	1		/* Symbol visible outside obj */
 #define STB_WEAK	2		/* Like globals, lower precedence */
 #define STB_LOOS	10		/* OS-specific semantics */
+#define STB_GNU_UNIQUE	10		/* Symbol is unique in namespace */
 #define STB_HIOS	12		/* OS-specific semantics */
 #define STB_LOPROC	13		/* Processor-specific semantics */
 #define STB_HIPROC	15		/* Processor-specific semantics */
