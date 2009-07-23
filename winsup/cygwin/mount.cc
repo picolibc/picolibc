@@ -276,7 +276,14 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       if (is_udf () && wincap.has_broken_udf ())
 	caseinsensitive (true);
     }
-
+  if (!got_fs ())
+    {
+      /* The filesystem name is only used in fillout_mntent and only if
+         the filesystem isn't one of the well-known filesystems anyway. */
+      sys_wcstombs (fsn, sizeof fsn, ffai_buf.ffai.FileSystemName,
+		    ffai_buf.ffai.FileSystemNameLength / sizeof (WCHAR));
+      strlwr (fsn);
+    }
   has_acls (flags () & FS_PERSISTENT_ACLS);
   /* Netapp inodes numbers are fly-by-night. */
   hasgood_inode ((has_acls () && !is_netapp ()) || is_nfs ());
@@ -1421,7 +1428,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   else if (mntinfo.is_sunwnfs ())
     strcpy (_my_tls.locals.mnt_type, (char *) "sunwnfs");
   else
-    strcpy (_my_tls.locals.mnt_type, (char *) "unknown");
+    strcpy (_my_tls.locals.mnt_type, mntinfo.fsname ());
 
   ret.mnt_type = _my_tls.locals.mnt_type;
 

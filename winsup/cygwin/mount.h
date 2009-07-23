@@ -43,10 +43,16 @@ class fs_info
     };
   } status;
   ULONG sernum;
+  char fsn[80];
   unsigned long got_fs () { return status.fs_flags; }
 
  public:
-  void clear () { memset (&status, 0 , sizeof status); sernum = 0UL; }
+  void clear ()
+  {
+    memset (&status, 0 , sizeof status);
+    sernum = 0UL; 
+    fsn[0] = '\0';
+  }
   fs_info () { clear (); }
 
   IMPLEMENT_STATUS_FLAG (ULONG, flags)
@@ -71,6 +77,7 @@ class fs_info
 
   int has_buggy_open () const {return is_sunwnfs ();}
   int has_buggy_fileid_dirinfo () const {return is_unixfs ();}
+  const char *fsname () const { return fsn[0] ? fsn : "unknown"; }
 
   bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
 };

@@ -1,5 +1,16 @@
 2009-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.h (fs_info::fsn): New member.
+	(fs_info::clear): Clear fsn.
+	(fs_info::fsname): New read accessor for fsn.
+	* mount.cc (fs_info::update): Fill in fsn member with lowercased
+	filesystem name if filesystem is not well-known.  Fall back to
+	"unknown" if filesystem name is missing.
+	(fillout_mntent): Print filesystem name retrieved in fs_info::update
+	rather than static string "unknown".
+
+2009-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fs_info::update): Revert to open filesystem with access set
 	to READ_CONTROL.  If that fails, try additionally with FILE_READ_DATA.
 
