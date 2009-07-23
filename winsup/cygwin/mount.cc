@@ -130,14 +130,20 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     vol = in_vol;
   else
     {
+      ULONG access = READ_CONTROL;
       /* Always caseinsensitive.  We really just need access to the drive. */
       InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
 				  NULL);
-      /* At least one filesystem (HGFS, VMware shared folders) doesn't like
-         to be opened with acces set to just READ_CONTROL.  No worries, since
-	 filesystem information is available without any access bit set. */
-      status = NtOpenFile (&vol, 0, &attr, &io, FILE_SHARE_VALID_FLAGS,
+      status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_OPEN_FOR_BACKUP_INTENT);
+      /* At least one filesystem (HGFS, VMware shared folders) doesn't like
+         to be opened with access set to just READ_CONTROL. */
+      if (status == STATUS_INVALID_PARAMETER)
+      	{
+	  access |= FILE_READ_DATA;
+	  status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT);
+	}
       while (!NT_SUCCESS (status)
 	     && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
 		 || status == STATUS_NO_MEDIA_IN_DEVICE))
@@ -152,7 +158,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	    }
 	  else if (dir.Length > 7 * sizeof (WCHAR))
 	    dir.Length -= sizeof (WCHAR);
-	  status = NtOpenFile (&vol, 0, &attr, &io, FILE_SHARE_VALID_FLAGS,
+	  status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
 	}
       if (!NT_SUCCESS (status))
