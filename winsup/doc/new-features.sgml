@@ -145,8 +145,8 @@
   this *is* the former libminires.a.
 
 - rcmd is now implemented inside of Cygwin, instead of calling the
-  WinSock function.  This allows rsh(1) usage on Vista/2008, which
-  dropped this function from WinSock.
+  WinSock function.  This allows rsh(1) usage on Vista/2008 and later,
+  which dropped this function from WinSock.
 
 - Define multicast structures in netinet/in.h.  Note that fully
   conformant multicast support is only available beginning with Vista/2008.

@@ -1039,8 +1039,8 @@ elsewhere in this FAQ.
 <question><para>Why do I get "Address family not supported" errors when playing with IPv6?</para></question>
 <answer>
 
-<para>IPv6 is fully supported and available right from the start with
-Windows Vista and Windows Server 2008.</para>
+<para>IPv6 is only fully supported and available right from the start
+beginning with Windows Vista and Windows Server 2008.</para>
 
 <para>The previous generation of Windows,
 Windows XP and Windows Server 2003, only support IPv6 on an "experimental"
@@ -1048,7 +1048,8 @@ basis.  On these Windows versions, the IPv6 TCP/IP stack is not installed
 automatically, rather the system administrator has to install it manually.
 Unless this has already been done on your machine, your machine is not
 IPv6-capable and that's why you see the "Address family not supported"
-error message.</para>
+error message.  Note, however, that the IPv6 stack on these systems
+don't fully support all features of IPv6.</para>
 
 <para>There's also a very experimental IPv6 stack for Windows 2000, and
 Cygwin will try its best to support it, but it's not recommended to install
