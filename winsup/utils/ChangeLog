@@ -1,3 +1,8 @@
+2009-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Add missing "Server Foundation" to
+	products array.
+
 2009-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (do_mount): Replace --no-executable flag with notexec

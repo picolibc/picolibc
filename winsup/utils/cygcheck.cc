@@ -1301,7 +1301,7 @@ dump_sysinfo ()
 		  " Essential Business Server Management Server",
 		  " Essential Business Server Security Server"
 		  " Essential Business Server Messaging Server",
-		  "",
+		  " Server Foundation",
 		  "",
 		  " without Hyper-V for Windows Essential Server Solutions",
 		  " Server Standard without Hyper-V",
