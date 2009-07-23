@@ -1,3 +1,8 @@
+2009-07-22  Eric Blake  <ebb9@byu.net>
+
+	* exceptions.cc (handle_exceptions): Set si_addr according to
+	POSIX for SIGSEGV.
+
 2009-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fs_info::update): Open filesystem with access set to 0.
@@ -43,7 +48,7 @@
 	for MVFS.  Explain why.
 	(fhandler_disk_file::utimens): Drop local variables lastaccess and
 	lastwrite.  Copy timestamps right into FILE_BASIC_INFORMATION structure
-	to avoid copying them twice.  
+	to avoid copying them twice.
 
 2009-07-20  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -189,7 +194,7 @@
 	* ntdll.h (PROCESSINFOCLASS): Remove unneeded trailing comma.
 
 	* pinfo.cc (_pinfo::dup_proc_pipe): Remove unneeded assignment.
-	
+
 	* sigproc.cc (sig_send): Don't send signal to myself if this is an exec
 	stub.
 
@@ -712,7 +717,7 @@
 
 	* fhandler_clipboard.cc: Avoid calling system_printf.
 	(set_clipboard): Add basic error checking.  Set errno here.  Per MSDN,
-	don't call GlobalFree on data block transferred to clipboard. 
+	don't call GlobalFree on data block transferred to clipboard.
 	(fhandler_dev_clipboard::write): Drop setting errno after call to
 	set_clipboard.
 	(fhandler_dev_clipboard::read): Add basic error checking. Simplify code.
@@ -989,7 +994,7 @@
 
 	* flock.cc (lf_setlock): Handle border case which results in WFMO loop
 	exiting with ret == WAIT_TIMEOUT gracefully.  Add a system_printf to
-	uncover other potential problems with WFMO loop. 
+	uncover other potential problems with WFMO loop.
 
 2009-04-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
@@ -1033,7 +1038,7 @@
 2009-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::get_wide_win32_path): Allow relative paths.
-	(cygwin_conv_path): In case of CCP_POSIX_TO_WIN_W, convert relative 
+	(cygwin_conv_path): In case of CCP_POSIX_TO_WIN_W, convert relative
 	paths to absolute paths if the relative pathname length exceeds
 	MAX_PATH.
 
@@ -1312,7 +1317,7 @@
 
 	* path.cc (symlink_worker): Write target filename as UTF-16 string
 	with leading BOM marker.
-	(symlink_info::check_shortcut): If check for leading BOM marker 
+	(symlink_info::check_shortcut): If check for leading BOM marker
 	succeeds, read filename as UTF-16 string.
 	(symlink_info::check_sysfile): Ditto.
 

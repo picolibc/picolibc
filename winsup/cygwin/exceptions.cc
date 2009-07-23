@@ -686,7 +686,9 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
       me.signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
     }
 
-  si.si_addr = (void *) in->Eip;
+  si.si_addr =  (si.si_signo == SIGSEGV || si.si_signo == SIGBUS
+                 ? (void *) e->ExceptionInformation[1]
+                 : (void *) in->Eip);
   si.si_errno = si.si_pid = si.si_uid = 0;
   me.incyg++;
   sig_send (NULL, si, &me);	// Signal myself
