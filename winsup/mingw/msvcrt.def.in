@@ -680,7 +680,9 @@ swscanf
 system
 tan
 tanh
+#if  !(__msvcr90__ || msvcr90d__)
 time
+#endif
 tmpfile
 tmpnam
 tolower
