@@ -30,7 +30,7 @@ fhandler_dev_zero::open (int flags, mode_t)
   return 1;
 }
 
-int
+ssize_t __stdcall
 fhandler_dev_zero::write (const void *, size_t len)
 {
   if (get_device () == FH_FULL)

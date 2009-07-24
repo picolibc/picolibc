@@ -21,7 +21,7 @@
 #include "cygtls.h"
 
 fhandler_fifo::fhandler_fifo ():
-  wait_state (fifo_unknown)
+  wait_state (fifo_unknown), dummy_client (NULL)
 {
   get_overlapped ()->hEvent = NULL;
   need_fork_fixup (true);
@@ -54,80 +54,87 @@ fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
     }
 }
 
+char *
+fhandler_fifo::fifo_name (char *buf)
+{
+  /* Generate a semi-unique name to associate with this fifo. */
+  __small_sprintf (buf, "\\\\.\\pipe\\__cygfifo__%08x_%016X",
+		   get_dev (), get_ino ());
+  return buf;
+}
+
 #define FIFO_PIPE_MODE (PIPE_TYPE_BYTE | PIPE_READMODE_BYTE)
+#define FIFO_BUF_SIZE  4096
+#define cnp(m, s) CreateNamedPipe(npname, (m), FIFO_PIPE_MODE, \
+			       PIPE_UNLIMITED_INSTANCES, (s), (s), \
+			       NMPWAIT_WAIT_FOREVER, sa_buf)
+
 
 int
 fhandler_fifo::open (int flags, mode_t)
 {
-  int res;
+  int res = 1;
   char npname[MAX_PATH];
-  DWORD mode = 0;
 
-  /* Generate a semi-unique name to associate with this fifo. */
-  __small_sprintf (npname, "\\\\.\\pipe\\__cygfifo__%08x_%016X",
-		   get_dev (), get_ino ());
-
+  fifo_name (npname);
   unsigned low_flags = flags & O_ACCMODE;
-  if (low_flags == O_RDONLY)
-    mode = PIPE_ACCESS_INBOUND;
-  else if (low_flags == O_WRONLY)
+  DWORD mode = 0;
+  if (low_flags == O_WRONLY)
     mode = PIPE_ACCESS_OUTBOUND;
-  else if (low_flags == O_RDWR)
+  else if (low_flags == O_RDONLY || low_flags == O_RDWR)
     mode = PIPE_ACCESS_DUPLEX;
-
-  if (!mode)
+  else
     {
       set_errno (EINVAL);
       res = 0;
     }
-  else
+
+  if (res)
     {
       char char_sa_buf[1024];
       LPSECURITY_ATTRIBUTES sa_buf =
 	sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-      mode |= FILE_FLAG_OVERLAPPED;
 
       HANDLE h;
-      DWORD err;
       bool nonblocking_write = !!((flags & (O_WRONLY | O_NONBLOCK)) == (O_WRONLY | O_NONBLOCK));
-      if (nonblocking_write)
+      wait_state = fifo_unknown;
+      if (mode != PIPE_ACCESS_OUTBOUND)
 	{
-	  h = INVALID_HANDLE_VALUE;
-	  err = ERROR_ACCESS_DENIED;
+	  h = cnp (mode |  FILE_FLAG_OVERLAPPED, FIFO_BUF_SIZE);
+	  wait_state = fifo_wait_for_client;
 	}
       else
 	{
-	  h = CreateNamedPipe(npname, mode, FIFO_PIPE_MODE,
-			      PIPE_UNLIMITED_INSTANCES, 0, 0,
-			      NMPWAIT_WAIT_FOREVER, sa_buf);
-	  err = GetLastError ();
-	}
-      if (h != INVALID_HANDLE_VALUE)
-	wait_state = fifo_wait_for_client;
-      else
-	  switch (err)
+	  h = open_nonserver (npname, low_flags, sa_buf);
+	  if (h != INVALID_HANDLE_VALUE)
+	    wait_state = fifo_ok;
+	  else if (nonblocking_write)
+	    set_errno (ENXIO);
+	  else if ((h = cnp (PIPE_ACCESS_DUPLEX, 1)) != INVALID_HANDLE_VALUE)
 	    {
-	    case ERROR_ACCESS_DENIED:
-	      h = open_nonserver (npname, low_flags, sa_buf);
-	      if (h != INVALID_HANDLE_VALUE)
+	      if ((dummy_client = open_nonserver (npname, low_flags, sa_buf))
+		  != INVALID_HANDLE_VALUE)
 		{
 		  wait_state = fifo_wait_for_server;
-		  break;
+		  ProtectHandle (dummy_client);
 		}
-	      if (nonblocking_write && GetLastError () == ERROR_FILE_NOT_FOUND)
+	      else
 		{
-		  set_errno (ENXIO);
-		  break;
+		  DWORD saveerr = GetLastError ();
+		  CloseHandle (h);
+		  h = INVALID_HANDLE_VALUE;
+		  SetLastError (saveerr);
 		}
-	      /* fall through intentionally */
-	    default:
-	      __seterrno ();
-	      break;
 	    }
-      if (!h || h == INVALID_HANDLE_VALUE)
-	res = 0;
+	}
+      if (h == INVALID_HANDLE_VALUE)
+	{
+	  __seterrno ();
+	  res = 0;
+	}
       else if (!setup_overlapped ())
 	{
+	  CloseHandle (h);
 	  __seterrno ();
 	  res = 0;
 	}
@@ -146,35 +153,116 @@ fhandler_fifo::open (int flags, mode_t)
 bool
 fhandler_fifo::wait (bool iswrite)
 {
+  DWORD ninstances;
   switch (wait_state)
     {
+    case fifo_wait_for_next_client:
+      DisconnectNamedPipe (get_handle ());
+      if (!GetNamedPipeHandleState (get_handle (), NULL, &ninstances, NULL, NULL, NULL, 0))
+	{
+	  __seterrno ();
+	  wait_state = fifo_error;
+	  return false;
+	}
+      if (ninstances <= 1)
+	{
+	  wait_state = fifo_eof;
+	  return false;
+	}
     case fifo_wait_for_client:
       {
-	bool res = ConnectNamedPipe (get_handle (), get_overlapped ());
 	DWORD dummy_bytes;
-	if (res || GetLastError () == ERROR_PIPE_CONNECTED)
-	  return true;
-	return wait_overlapped (res, iswrite, &dummy_bytes);
+	while (1)
+	  {
+	    int res = ConnectNamedPipe (get_handle (), get_overlapped ());
+	    if (GetLastError () != ERROR_NO_DATA && GetLastError () != ERROR_PIPE_CONNECTED)
+	      {
+		res = wait_overlapped (res, iswrite, &dummy_bytes);
+		if (!res)
+		  {
+		    if (get_errno () != EINTR)
+		      wait_state = fifo_error;
+		    else if (!_my_tls.call_signal_handler ())
+		      wait_state = fifo_eintr;
+		    else
+		      continue;
+		    return false;
+		  }
+	      }
+	    wait_state = fifo_ok;
+	    break;
+	  }
       }
-    case fifo_unknown:
+      break;
     case fifo_wait_for_server:
-      /* CGF FIXME SOON: test if these really need to be handled. */
+      char npname[MAX_PATH];
+      fifo_name (npname);
+      char char_sa_buf[1024];
+      LPSECURITY_ATTRIBUTES sa_buf;
+      sa_buf = sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+      while (1)
+	{
+	  if (WaitNamedPipe (npname, 10))
+	    /* connected, maybe */;
+	  else if (GetLastError () != ERROR_SEM_TIMEOUT)
+	    {
+	      __seterrno ();
+	      return false;
+	    }
+	  else if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+	    continue;
+	  else if (_my_tls.call_signal_handler ())
+	    continue;
+	  else
+	    {
+	      set_errno (EINTR);
+	      return false;
+	    }
+	  HANDLE h = open_nonserver (npname, get_flags () & O_ACCMODE, sa_buf);
+	  if (h != INVALID_HANDLE_VALUE)
+	    {
+	      ForceCloseHandle (get_handle ());
+	      ForceCloseHandle (dummy_client);
+	      dummy_client = NULL;
+	      wait_state = fifo_ok;
+	      set_io_handle (h);
+	      break;
+	    }
+	  if (GetLastError () == ERROR_PIPE_LISTENING)
+	    continue;
+	  else
+	    {
+	      __seterrno ();
+	      return false;
+	    }
+	}
     default:
       break;
     }
     return true;
 }
 
-void
+void __stdcall
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
-  if (!wait (false))
-    len = 0;
-  else
-    read_overlapped (in_ptr, len);
+  while (wait_state != fifo_eof && wait_state != fifo_error && wait_state != fifo_eintr)
+    if (!wait (false))
+      len = (wait_state == fifo_error || wait_state == fifo_eintr) ? (size_t) -1 : 0;
+    else
+      {
+	size_t prev_len = len;
+	read_overlapped (in_ptr, len);
+	if (len)
+	  break;
+	wait_state = fifo_wait_for_next_client;
+	len = prev_len;
+      }
+  if (wait_state == fifo_eintr)
+    wait_state = fifo_wait_for_client;
+  debug_printf ("returning %d, mode %d, %E\n", len, get_errno ());
 }
 
-int
+ssize_t __stdcall
 fhandler_fifo::raw_write (const void *ptr, size_t len)
 {
   return wait (true) ? write_overlapped (ptr, len) : -1;
@@ -186,4 +274,45 @@ fhandler_fifo::fstatvfs (struct statvfs *sfs)
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fstatvfs (sfs);
+}
+
+int
+fhandler_fifo::close ()
+{
+  wait_state = fifo_eof;
+  if (dummy_client)
+    {
+      ForceCloseHandle (dummy_client);
+      dummy_client = NULL;
+    }
+  return fhandler_base::close ();
+}
+
+int
+fhandler_fifo::dup (fhandler_base *child)
+{
+  int res = fhandler_base::dup (child);
+  fhandler_fifo *fifo_child = (fhandler_fifo *) child;
+  if (res == 0 && dummy_client)
+    {
+      bool dres = DuplicateHandle (hMainProc, dummy_client, hMainProc,
+				   &fifo_child->dummy_client, 0,
+				   TRUE, DUPLICATE_SAME_ACCESS);
+      if (!dres)
+	{
+	  fifo_child->dummy_client = NULL;
+	  child->close ();
+	  __seterrno ();
+	  res = -1;
+	}
+    }
+  return res;
+}
+
+void
+fhandler_fifo::set_close_on_exec (bool val)
+{
+  fhandler_base::set_close_on_exec (val);
+  if (dummy_client)
+    set_no_inheritance (dummy_client, val);
 }

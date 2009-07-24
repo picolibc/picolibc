@@ -1,3 +1,61 @@
+2009-07-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.h (wait_for_sigthread): Eliminate parameter.
+	* sigproc.cc (wait_for_sigthread): Ditto.  Don't synchronize with
+	wait_sig after receiving an event that it is ready to go.
+	(init_sig_pipe): New function.
+	(wait_sig): Call init_sig_pipe to create pipes for communicating
+	signals to this process.  Don't send sigCONT signal when initializing.
+	* fork.cc (frok::child): Accommodate wait_for_sigpipe parameter change.
+
+2009-07-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_*::write): Make ssize_t/__stdcall.
+	(fhandler_*::write_overlapped): Ditto.
+	(fhandler_*::raw_write): Ditto.
+	(fhandler_*::readv): Ditto.
+	(fhandler_*::writev): Ditto.
+	(fhandler_*::raw_read): Make __stdcall.
+	* fhandler: Accommodate changes to read/write functions throughout.
+	* fhandler_clipboard.cc: Ditto.
+	* fhandler_console.cc: Ditto.
+	* fhandler_dsp.cc: Ditto.
+	* fhandler_fifo.cc: Ditto.
+	* fhandler_mailslot.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_mem.cc: Ditto.
+	* fhandler_random.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_tty.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* fhandler_windows.cc: Ditto.
+	* fhandler_zero.cc: Ditto.
+	* syscalls.cc (readv): Use ssize_t as temp variable.
+
+	* fhandler.cc (fhandler_base::read): Coerce returned len to signed or
+	it will never be treated as < 0.
+	(fhandler_base::wait_overlapped): Minimize calls to GetLastError.
+	Remove duplicate debugging test.  Fix error return.
+
+	* fhandler.h (fhandler_fifo::fifo_name): Declare new function.
+	(fhandler_fifo::close): Ditto.
+	(fhandler_fifo::dup): Ditto.
+	(fhandler_fifo::close_on_exec): Ditto.
+	* fhandler.cc (fhandler_fifo::fifo_name): Define new function.
+	(FIFO_BUF_SIZE): New define.
+	(cnp): Ditto.
+	(fhandler_fifo::open): Rework.  Use cnp to open named pipe.  Always
+	open write side as a client.  Open dummy client when writing and can't
+	connect.
+	(wait): Rework.  Implement fifo_wait_for_next_client.  Handle signals
+	during connect better.  Add new fifo_wait_for_server code which polls
+	(sigh) waiting for server.
+	(fhandler_fifo::raw_read): Handle transition states when one client
+	closes and another is available.
+	(fhandler_fifo::close): Define.
+	(fhandler_fifo::dup): Ditto.
+	(fhandler_fifo::close_on_exec): Ditto.
+
 2009-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (internal_setlocale): Fix typo in GBK codepage.

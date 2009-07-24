@@ -113,7 +113,7 @@ fhandler_dev_mem::open (int flags, mode_t)
   return 1;
 }
 
-int
+ssize_t __stdcall
 fhandler_dev_mem::write (const void *ptr, size_t ulen)
 {
   if (!ulen || pos >= mem_size)

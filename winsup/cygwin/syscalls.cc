@@ -842,7 +842,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
   extern int sigcatchers;
   const int e = get_errno ();
 
-  int res = -1;
+  ssize_t res = -1;
 
   const ssize_t tot = check_iovec_for_read (iov, iovcnt);
 

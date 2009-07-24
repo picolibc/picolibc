@@ -37,7 +37,7 @@ fhandler_serial::overlapped_setup ()
   overlapped_armed = 0;
 }
 
-void
+void __stdcall
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   int tot;
@@ -144,7 +144,7 @@ out:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-int
+ssize_t __stdcall
 fhandler_serial::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;

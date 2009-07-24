@@ -255,7 +255,7 @@ fhandler_dev_floppy::get_current_position ()
   return off.QuadPart;
 }
 
-void
+void __stdcall
 fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 {
   DWORD bytes_read = 0;
@@ -387,7 +387,7 @@ err:
   ulen = (size_t) -1;
 }
 
-int
+int __stdcall
 fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written = 0;

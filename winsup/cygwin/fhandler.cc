@@ -209,7 +209,7 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
    semantics and use of errno.  */
-void
+void __stdcall
 fhandler_base::raw_read (void *ptr, size_t& ulen)
 {
 #define bytes_read ulen
@@ -278,7 +278,7 @@ retry:
 static LARGE_INTEGER off_current = { QuadPart:FILE_USE_FILE_POINTER_POSITION };
 static LARGE_INTEGER off_append = { QuadPart:FILE_WRITE_TO_END_OF_FILE };
 
-int
+ssize_t __stdcall
 fhandler_base::raw_write (const void *ptr, size_t len)
 {
   NTSTATUS status;
@@ -649,7 +649,7 @@ done:
    an \n.  If last char is an \r, look ahead one more char, if \n then
    modify \r, if not, remember char.
 */
-void
+void __stdcall
 fhandler_base::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
@@ -676,7 +676,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
   else
     len = copied_chars;
 
-  if (rbinary () || len <= 0)
+  if (rbinary () || (ssize_t) len <= 0)
     goto out;
 
   /* Scan buffer and turn \r\n into \n */
@@ -739,7 +739,7 @@ out:
   debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
 }
 
-int
+ssize_t __stdcall
 fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
@@ -834,7 +834,7 @@ fhandler_base::write (const void *ptr, size_t len)
   return res;
 }
 
-ssize_t
+ssize_t __stdcall
 fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
 		      ssize_t tot)
 {
@@ -891,7 +891,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   return len;
 }
 
-ssize_t
+ssize_t __stdcall
 fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
 		       ssize_t tot)
 {
@@ -1682,10 +1682,10 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
 
   int res = 0;
 
-  DWORD err;
+  DWORD err = GetLastError ();
   if (is_nonblocking ())
     {
-      if (inres || GetLastError () == ERROR_IO_PENDING)
+      if (inres || err == ERROR_IO_PENDING)
 	{
 	  if (writing && !inres)
 	    *bytes = len;	/* This really isn't true but it seems like
@@ -1696,17 +1696,10 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
 	  res = 1;
 	  err = 0;
 	}
-      else
-	{
-	  res = 0;
-	  err = GetLastError ();
-	}
     }
-  else if (inres || ((err = GetLastError ()) == ERROR_IO_PENDING))
+  else if (inres || err == ERROR_IO_PENDING)
     {
 #ifdef DEBUGGING
-      if (!get_overlapped ())
-	system_printf ("get_overlapped is zero?");
       if (!get_overlapped ()->hEvent)
 	system_printf ("hEvent is zero?");
 #endif
@@ -1749,7 +1742,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
       debug_printf ("err %u", err);
       __seterrno_from_win_error (err);
       *bytes = (DWORD) -1;
-      res = -1;
+      res = 0;
     }
   else
     {
@@ -1796,7 +1789,7 @@ fhandler_base::read_overlapped (void *ptr, size_t& len)
   len = (size_t) nbytes;
 }
 
-int __stdcall
+ssize_t __stdcall
 fhandler_base::write_overlapped (const void *ptr, size_t len)
 {
   DWORD nbytes;

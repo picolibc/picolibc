@@ -180,7 +180,7 @@ fhandler_virtual::close ()
   return 0;
 }
 
-void
+void __stdcall
 fhandler_virtual::read (void *ptr, size_t& len)
 {
   if (len == 0)
@@ -205,7 +205,7 @@ fhandler_virtual::read (void *ptr, size_t& len)
   position += len;
 }
 
-int
+ssize_t __stdcall
 fhandler_virtual::write (const void *ptr, size_t len)
 {
   set_errno (EACCES);

@@ -143,7 +143,7 @@ set_clipboard (const void *buf, size_t len)
 }
 
 /* FIXME: arbitrary seeking is not handled */
-int
+ssize_t __stdcall
 fhandler_dev_clipboard::write (const void *buf, size_t len)
 {
   if (!eof)

@@ -997,7 +997,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
 #define IS_WRITE() ((get_flags() & O_ACCMODE) != O_RDONLY)
 #define IS_READ() ((get_flags() & O_ACCMODE) != O_WRONLY)
 
-int
+ssize_t __stdcall
 fhandler_dev_dsp::write (const void *ptr, size_t len)
 {
   debug_printf ("ptr=%08x len=%d", ptr, len);

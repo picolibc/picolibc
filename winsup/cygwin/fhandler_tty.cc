@@ -671,7 +671,7 @@ fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
   return open (flags);
 }
 
-int
+ssize_t __stdcall
 fhandler_tty_slave::write (const void *ptr, size_t len)
 {
   DWORD n, towrite = len;
@@ -1202,7 +1202,7 @@ fhandler_pty_master::close ()
   return 0;
 }
 
-int
+ssize_t __stdcall
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
   int i;

@@ -242,7 +242,7 @@ frok::child (volatile char * volatile here)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
-  wait_for_sigthread (true);
+  wait_for_sigthread ();
   cygwin_finished_initializing = true;
   return 0;
 }

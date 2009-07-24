@@ -128,24 +128,16 @@ signal_fixup_after_exec ()
 }
 
 void __stdcall
-wait_for_sigthread (bool forked)
+wait_for_sigthread ()
 {
-  char char_sa_buf[1024];
-  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-  if (!CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0))
-    api_fatal ("couldn't create signal pipe%s, %E", forked ? " for forked process" : "");
-  ProtectHandle (my_readsig);
-  myself->sendsig = my_sendsig;
-
-  myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~PID_INITIALIZING;
-
   sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
   HANDLE hsig_inited = wait_sig_inited;
   WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
+  myself->sendsig = my_sendsig;
+  myself->process_state |= PID_ACTIVE;
+  myself->process_state &= ~PID_INITIALIZING;
   ForceCloseHandle1 (hsig_inited, wait_sig_inited);
-  SetEvent (sigCONT);
   sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
@@ -1152,11 +1144,28 @@ pending_signals::next ()
   return res;
 }
 
+/* Called separately to allow stack space reutilization by wait_sig.
+   This function relies on the fact that it will be called after cygheap
+   has been set up.  For the case of non-dynamic DLL initialization this
+   means that it relies on the implicit serialization guarantted by being
+   run as part of DLL_PROCESS_ATTACH. */
+static void __attribute__ ((noinline))
+init_sig_pipe()
+{
+  char char_sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+  if (!CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0))
+    api_fatal ("couldn't create signal pipe, %E");
+  ProtectHandle (my_readsig);
+}
+
+
 /* Process signals by waiting for signal data to arrive in a pipe.
    Set a completion event if one was specified. */
 static DWORD WINAPI
 wait_sig (VOID *)
 {
+  init_sig_pipe ();
   /* Initialization */
   SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
@@ -1169,7 +1178,7 @@ wait_sig (VOID *)
 		  my_readsig, my_sendsig);
 
   sigpacket pack;
-  pack.si.si_signo = __SIGHOLD;
+  pack.si.si_signo = 0;
   for (;;)
     {
       if (pack.si.si_signo == __SIGHOLD)

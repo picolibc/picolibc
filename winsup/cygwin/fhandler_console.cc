@@ -1639,7 +1639,7 @@ fhandler_console::write_normal (const unsigned char *src,
   return found;
 }
 
-int
+ssize_t __stdcall
 fhandler_console::write (const void *vsrc, size_t len)
 {
   /* Run and check for ansi sequences */
