@@ -42,6 +42,7 @@ START_RELOC_NUMBERS (elf_spu_reloc_type)
      RELOC_NUMBER (R_SPU_ADDR16X,	14)
      RELOC_NUMBER (R_SPU_PPU32,		15)
      RELOC_NUMBER (R_SPU_PPU64,		16)
+     RELOC_NUMBER (R_SPU_ADD_PIC,	17)
 END_RELOC_NUMBERS (R_SPU_max)
 
 /* Program header extensions */

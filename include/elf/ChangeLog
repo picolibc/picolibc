@@ -1,3 +1,8 @@
+2009-07-24  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* spu.h (R_SPU_ADD_PIC): New.
+
 2009-07-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* common.h (STB_GNU_UNIQUE): Define.
