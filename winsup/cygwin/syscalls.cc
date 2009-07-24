@@ -500,8 +500,9 @@ unlink_nt (path_conv &pc)
 	 though, and it is then possible to delete the file quite normally. */
 
       /* The recycle bin is only accessible locally.  For in-use remote
-	 files we drop back to just returning EBUSY. */
-      if (pc.isremote () && status == STATUS_SHARING_VIOLATION)
+	 files we drop back to just returning EBUSY, except for NFS. */
+      if (pc.isremote () && status == STATUS_SHARING_VIOLATION
+	  && !pc.fs_is_nfs ())
 	{
 	  if (fh_ro)
 	    {
@@ -511,7 +512,7 @@ unlink_nt (path_conv &pc)
 	    }
 	  return status;
 	}
-      /* Only local FS and NFS w/ STATUS_LOCK_NOT_GRANTED should arrive here. */
+      /* Only local FS and NFS should arrive here. */
       if (!pc.isremote ())
 	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())

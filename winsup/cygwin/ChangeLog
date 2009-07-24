@@ -1,3 +1,8 @@
+2009-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (unlink_nt): Ignore sharing violation on NFS.  Align
+	comments.
+
 2009-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.h (fs_info::fsn): New member.
