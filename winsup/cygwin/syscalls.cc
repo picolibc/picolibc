@@ -4058,7 +4058,7 @@ internal_setlocale (char *ret)
 	  else if (__mbtowc == __eucjp_mbtowc)
 	    cp = 20932;
 	  else if (__mbtowc == __gbk_mbtowc)
-	    cp = 963;
+	    cp = 936;
 	  else if (__mbtowc == __kr_mbtowc)
 	    cp = 949;
 	  else if (__mbtowc == __big5_mbtowc)
