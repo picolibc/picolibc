@@ -1,3 +1,36 @@
+2009-07-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_L1OM): New.
+
+2009-07-24  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* spu.h (R_SPU_ADD_PIC): New.
+
+2009-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* common.h (STB_GNU_UNIQUE): Define.
+
+2009-07-10  Tom Tromey  <tromey@redhat.com>
+
+	* dwarf2.h: Move to `..'.
+
+2009-07-10  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* dwarf2.h: Just include ../dwarf2.h.
+
+2009-07-10  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_IRELATIVE): Add.
+	(R_PPC_RELAX32, R_PPC_RELAX32PC,
+	R_PPC_RELAX32_PLT, R_PPC_RELAX32PC_PLT): Renumber.
+	* ppc64.h (R_PPC64_IRELATIVE): Add.
+
+2009-07-03  Jakub Jelinek  <jakub@redhat.com>
+
+	* dwarf2.h (enum dwarf_location_atom): Add DW_OP_implicit_value
+	and DW_OP_stack_value.
+
 2009-06-22  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (R_PPC_RELAX*): Define as enum.

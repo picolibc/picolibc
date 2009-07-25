@@ -1,3 +1,9 @@
+2009-07-02  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.ac: Do not exclude gas for i386-*-darwin.
+	Add a case for x86_64-*-darwin.
+	* configure: Regenerate.
+
 2009-06-26  Doug Evans  <dje@sebabeach.org>
 
 	* Makefile.def (host_modules): Add cgen.

@@ -71,6 +71,14 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
   RELOC_NUMBER (R_PPC_SECTOFF_HA,	 36)
   RELOC_NUMBER (R_PPC_ADDR30,		 37)
 
+#ifndef RELOC_MACROS_GEN_FUNC
+/* Fake relocations for branch stubs, only used internally by ld.  */
+  RELOC_NUMBER (R_PPC_RELAX32,		 48)
+  RELOC_NUMBER (R_PPC_RELAX32PC,	 49)
+  RELOC_NUMBER (R_PPC_RELAX32_PLT,	 50)
+  RELOC_NUMBER (R_PPC_RELAX32PC_PLT,	 51)
+#endif
+
   /* Relocs added to support TLS.  */
   RELOC_NUMBER (R_PPC_TLS,		 67)
   RELOC_NUMBER (R_PPC_DTPMOD32,		 68)
@@ -122,13 +130,8 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
   RELOC_NUMBER (R_PPC_EMB_BIT_FLD,	115)
   RELOC_NUMBER (R_PPC_EMB_RELSDA,	116)
 
-#ifndef RELOC_MACROS_GEN_FUNC
-/* Fake relocations for branch stubs, only used internally by ld.  */
-  RELOC_NUMBER (R_PPC_RELAX32,		245)
-  RELOC_NUMBER (R_PPC_RELAX32PC,	246)
-  RELOC_NUMBER (R_PPC_RELAX32_PLT,	247)
-  RELOC_NUMBER (R_PPC_RELAX32PC_PLT,	248)
-#endif
+/* Support STT_GNU_IFUNC plt calls.  */
+  RELOC_NUMBER (R_PPC_IRELATIVE,	248)
 
 /* These are GNU extensions used in PIC code sequences.  */
   RELOC_NUMBER (R_PPC_REL16,		249)

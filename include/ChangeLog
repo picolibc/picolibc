@@ -1,3 +1,41 @@
+2009-07-24  Ian Lance Taylor  <iant@google.com>
+
+	* libiberty.h (crc32): Declare.
+
+2009-07-20  Cary Coutant  <ccoutant@google.com>
+	    Doug Evans  <dje@google.com>
+
+	Add some dwarf4 values.
+	* dwarf2.h (enum dwarf_tag): Add DW_TAG_type_unit.
+	(enum dwarf_form): Add DW_FORM_sec_offset, DW_FORM_exprloc,
+	DW_FORM_flag_present, DW_FORM_sig8.
+	(enum dwarf_attribute): Add DW_AT_signature.
+
+2009-07-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* demangle.h
+	(enum demangle_component_type <DEMANGLE_COMPONENT_GLOBAL_CONSTRUCTORS>)
+	(enum demangle_component_type <DEMANGLE_COMPONENT_GLOBAL_DESTRUCTORS>):
+	New.
+
+2009-07-10  Tom Tromey  <tromey@redhat.com>
+
+	* dwarf2.h: New file, moved from elf/.
+
+2009-07-09  Jakub Jelinek  <jakub@redhat.com>
+
+	* dwarf2.h (enum dwarf_location_atom): Add DW_OP_implicit_value
+	and DW_OP_stack_value.
+
+2009-07-09  Tom Tromey  <tromey@redhat.com>
+
+	* elf/dwarf2.h: Remove, renaming to...
+	* dwarf2.h: ... this.
+
+2009-06-29  Tom Tromey  <tromey@redhat.com>
+
+	* elf/dwarf2.h: New file.  Merged with gdb.
+
 2009-06-18  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h (USER_SPECIFIED_MACHINE_TYPE): New value for the flags

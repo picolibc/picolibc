@@ -1,7 +1,7 @@
 /* Declarations and definitions of codes relating to the DWARF2 and
    DWARF3 symbolic debugging information formats.
    Copyright (C) 1992, 1993, 1995, 1996, 1997, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006, 2008 Free Software Foundation, Inc.
+   2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
    Written by Gary Funck (gary@intrepid.com) The Ada Joint Program
    Office (AJPO), Florida State University and Silicon Graphics Inc.
@@ -14,7 +14,7 @@
 
    GCC is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
+   Software Foundation; either version 3, or (at your option) any later
    version.
 
    GCC is distributed in the hope that it will be useful, but WITHOUT
@@ -22,10 +22,14 @@
    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
    License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with GCC; see the file COPYING.  If not, write to the Free
-   Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
-   02110-1301, USA.  */
+   Under Section 7 of GPL version 3, you are granted additional
+   permissions described in the GCC Runtime Library Exception, version
+   3.1, as published by the Free Software Foundation.
+
+   You should have received a copy of the GNU General Public License and
+   a copy of the GCC Runtime Library Exception along with this program;
+   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
 /* This file is derived from the DWARF specification (a public document)
    Revision 2.0.0 (July 27, 1993) developed by the UNIX International
@@ -190,6 +194,12 @@ enum dwarf_tag
     DW_TAG_imported_unit = 0x3d,
     DW_TAG_condition = 0x3f,
     DW_TAG_shared_type = 0x40,
+    /* DWARF 4.  */
+    DW_TAG_type_unit = 0x41,
+
+    DW_TAG_lo_user = 0x4080,
+    DW_TAG_hi_user = 0xffff,
+
     /* SGI/MIPS Extensions.  */
     DW_TAG_MIPS_loop = 0x4081,
     /* HP extensions.  See: ftp://ftp.hp.com/pub/lang/tools/WDB/wdb-4.0.tar.gz .  */
@@ -208,9 +218,6 @@ enum dwarf_tag
     DW_TAG_PGI_kanji_type      = 0xA000,
     DW_TAG_PGI_interface_block = 0xA020
   };
-
-#define DW_TAG_lo_user	0x4080
-#define DW_TAG_hi_user	0xffff
 
 /* Flag that tells whether entry has a child or not.  */
 #define DW_children_no   0
@@ -239,7 +246,12 @@ enum dwarf_form
     DW_FORM_ref4 = 0x13,
     DW_FORM_ref8 = 0x14,
     DW_FORM_ref_udata = 0x15,
-    DW_FORM_indirect = 0x16
+    DW_FORM_indirect = 0x16,
+    /* DWARF 4.  */
+    DW_FORM_sec_offset = 0x17,
+    DW_FORM_exprloc = 0x18,
+    DW_FORM_flag_present = 0x19,
+    DW_FORM_sig8 = 0x20
   };
 
 /* Attribute names and codes.  */
@@ -312,7 +324,7 @@ enum dwarf_attribute
     DW_AT_allocated     = 0x4e,
     DW_AT_associated    = 0x4f,
     DW_AT_data_location = 0x50,
-    DW_AT_byte_stride        = 0x51,
+    DW_AT_byte_stride   = 0x51,
 #define DW_AT_stride   DW_AT_byte_stride  /* Note: The use of DW_AT_stride is deprecated.  */
     DW_AT_entry_pc      = 0x52,
     DW_AT_use_UTF8      = 0x53,
@@ -337,6 +349,12 @@ enum dwarf_attribute
     DW_AT_elemental     = 0x66,
     DW_AT_pure          = 0x67,
     DW_AT_recursive     = 0x68,
+    /* DWARF 4.  */
+    DW_AT_signature     = 0x69,
+
+    DW_AT_lo_user = 0x2000,	/* Implementation-defined range start.  */
+    DW_AT_hi_user = 0x3ff0,	/* Implementation-defined range end.  */
+
     /* SGI/MIPS extensions.  */
     DW_AT_MIPS_fde = 0x2001,
     DW_AT_MIPS_loop_begin = 0x2002,
@@ -381,9 +399,6 @@ enum dwarf_attribute
     DW_AT_PGI_soffset  = 0x3a01,
     DW_AT_PGI_lstride  = 0x3a02
   };
-
-#define DW_AT_lo_user	0x2000	/* Implementation-defined range start.  */
-#define DW_AT_hi_user	0x3fff	/* Implementation-defined range end.  */
 
 /* Location atom names and codes.  */
 enum dwarf_location_atom
@@ -541,8 +556,17 @@ enum dwarf_location_atom
     DW_OP_form_tls_address = 0x9b,
     DW_OP_call_frame_cfa = 0x9c,
     DW_OP_bit_piece = 0x9d,
+
+    /* DWARF 4 extensions.  */
+    DW_OP_implicit_value = 0x9e,
+    DW_OP_stack_value = 0x9f,
+
+    DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
+    DW_OP_hi_user = 0xff,	/* Implementation-defined range end.  */
+
     /* GNU extensions.  */
     DW_OP_GNU_push_tls_address = 0xe0,
+    /* The following is for marking variables that are uninitialized.  */
     DW_OP_GNU_uninit     = 0xf0,
     DW_OP_GNU_encoded_addr = 0xf1,
     /* HP extensions.  */
@@ -556,9 +580,6 @@ enum dwarf_location_atom
     /* PGI (STMicroelectronics) extensions.  */
     DW_OP_PGI_omp_thread_num = 0xf8
   };
-
-#define DW_OP_lo_user	0xe0	/* Implementation-defined range start.  */
-#define DW_OP_hi_user	0xff	/* Implementation-defined range end.  */
 
 /* Type encodings.  */
 enum dwarf_type
@@ -580,6 +601,10 @@ enum dwarf_type
     DW_ATE_signed_fixed = 0xd,
     DW_ATE_unsigned_fixed = 0xe,
     DW_ATE_decimal_float = 0xf,
+
+    DW_ATE_lo_user = 0x80,
+    DW_ATE_hi_user = 0xff,
+
     /* HP extensions.  */
     DW_ATE_HP_float80            = 0x80, /* Floating-point (80 bit).  */
     DW_ATE_HP_complex_float80    = 0x81, /* Complex floating-point (80 bit).  */
@@ -589,9 +614,6 @@ enum dwarf_type
     DW_ATE_HP_imaginary_float80  = 0x85,
     DW_ATE_HP_imaginary_float128 = 0x86
   };
-
-#define	DW_ATE_lo_user 0x80
-#define	DW_ATE_hi_user 0xff
 
 /* Decimal sign encodings.  */
 enum dwarf_decimal_sign_encoding
@@ -610,11 +632,11 @@ enum dwarf_endianity_encoding
     /* DWARF 3.  */
     DW_END_default = 0x00,
     DW_END_big = 0x01,
-    DW_END_little = 0x02
-  };
+    DW_END_little = 0x02,
 
-#define DW_END_lo_user 0x40
-#define DW_END_hi_user 0xff
+    DW_END_lo_user = 0x40,
+    DW_END_hi_user = 0xff
+  };
 
 /* Array ordering names and codes.  */
 enum dwarf_array_dim_ordering
@@ -662,11 +684,12 @@ enum dwarf_calling_convention
     DW_CC_normal = 0x1,
     DW_CC_program = 0x2,
     DW_CC_nocall = 0x3,
+
+    DW_CC_lo_user = 0x40,
+    DW_CC_hi_user = 0xff,
+
     DW_CC_GNU_renesas_sh = 0x40
   };
-
-#define DW_CC_lo_user 0x40
-#define DW_CC_hi_user 0xff
 
 /* Inline attribute.  */
 enum dwarf_inline_attribute
@@ -720,11 +743,11 @@ enum dwarf_line_number_x_ops
     DW_LNE_HP_negate_post_semantics    = 0x17,
     DW_LNE_HP_negate_function_exit     = 0x18,
     DW_LNE_HP_negate_front_end_logical = 0x19,
-    DW_LNE_HP_define_proc              = 0x20
-  };
+    DW_LNE_HP_define_proc              = 0x20,
 
-#define DW_LNE_lo_user 0x80
-#define DW_LNE_hi_user 0xff
+    DW_LNE_lo_user = 0x80,
+    DW_LNE_hi_user = 0xff
+  };
 
 /* Call frame information.  */
 enum dwarf_call_frame_info
@@ -756,6 +779,10 @@ enum dwarf_call_frame_info
     DW_CFA_val_offset = 0x14,
     DW_CFA_val_offset_sf = 0x15,
     DW_CFA_val_expression = 0x16,
+
+    DW_CFA_lo_user = 0x1c,
+    DW_CFA_hi_user = 0x3f,
+
     /* SGI/MIPS specific.  */
     DW_CFA_MIPS_advance_loc8 = 0x1d,
     /* GNU extensions.  */
@@ -765,11 +792,10 @@ enum dwarf_call_frame_info
   };
 
 #define DW_CIE_ID	  0xffffffff
+#define DW64_CIE_ID	  0xffffffffffffffffULL
 #define DW_CIE_VERSION	  1
 
 #define DW_CFA_extended   0
-#define DW_CFA_lo_user    0x1c
-#define DW_CFA_hi_user    0x3f
 
 #define DW_CHILDREN_no		     0x00
 #define DW_CHILDREN_yes		     0x01
@@ -799,14 +825,15 @@ enum dwarf_source_language
     DW_LANG_ObjC_plus_plus = 0x0011,
     DW_LANG_UPC = 0x0012,
     DW_LANG_D = 0x0013,
+
+    DW_LANG_lo_user = 0x8000,	/* Implementation-defined range start.  */
+    DW_LANG_hi_user = 0xffff,	/* Implementation-defined range start.  */
+
     /* MIPS.  */
     DW_LANG_Mips_Assembler = 0x8001,
     /* UPC.  */
     DW_LANG_Upc = 0x8765
   };
-
-#define DW_LANG_lo_user 0x8000	/* Implementation-defined range start.  */
-#define DW_LANG_hi_user 0xffff	/* Implementation-defined range start.  */
 
 /* Names and codes for macro information.  */
 enum dwarf_macinfo_record_type
