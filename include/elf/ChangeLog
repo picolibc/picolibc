@@ -1,3 +1,7 @@
+2009-07-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_L1OM): New.
+
 2009-07-24  Trevor Smigiel  <Trevor_Smigiel@playstation.sony.com>
 	    Alan Modra  <amodra@bigpond.net.au>
 

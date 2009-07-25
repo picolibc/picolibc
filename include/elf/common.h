@@ -238,7 +238,7 @@
 #define EM_CR16		177	/* National Semiconductor CompactRISC 16-bit processor */
 #define EM_ETPU		178	/* Freescale Extended Time Processing Unit */
 #define EM_SLE9X	179	/* Infineon Technologies SLE9X core */
-#define EM_INTEL180	180	/* Reserved by Intel */
+#define EM_L1OM		180	/* Intel L1OM */
 #define EM_INTEL181	181	/* Reserved by Intel */
 #define EM_INTEL182	182	/* Reserved by Intel */
 
