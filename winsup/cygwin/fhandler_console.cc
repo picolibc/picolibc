@@ -1892,8 +1892,8 @@ fhandler_console::set_close_on_exec (bool val)
 void __stdcall
 set_console_title (char *title)
 {
-  wchar_t buf[257];
-  sys_mbstowcs (buf, sizeof buf, title);
+  wchar_t buf[TITLESIZE + 1];
+  sys_mbstowcs (buf, TITLESIZE + 1, title);
   lock_ttys here (15000);
   SetConsoleTitleW (buf);
   debug_printf ("title '%W'", buf);
