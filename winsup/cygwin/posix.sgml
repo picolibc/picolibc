@@ -1369,6 +1369,11 @@ Windows however.</para>
 and <function>clock_setres</function> only support CLOCK_REALTIME for
 now.</para>
 
+<para>BSD file locks created via <function>flock</function> are not
+propagated to the parent process and sibling processes.  The locks are
+only valid in the creating process and subsequently started child processes
+shaing the same file descriptor.</para>
+
 <para><function>fpclassify</function>, <function>isfinite</function>,
 <function>isgreater</function>, <function>isgreaterequal</function>,
 <function>isinf</function>, <function>isless</function>,

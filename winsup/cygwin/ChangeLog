@@ -1,5 +1,9 @@
 2009-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml (std-notes): Add flock restriction.
+
+2009-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (set_console_title): Set buffer size to
 	TITLESIZE + 1.  Call sys_mbstowcs with correct destination length.
 
