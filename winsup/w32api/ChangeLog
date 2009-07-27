@@ -1,3 +1,11 @@
+2009-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (FILE_SUPPORTS_HARD_LINKS,
+	FILE_SUPPORTS_EXTENDED_ATTRIBUTES, FILE_SUPPORTS_OPEN_BY_FILE_ID,
+	FILE_SUPPORTS_USN_JOURNALS): Define.  Add comment.
+	* include/ddk/ntifs.h: Ditto.
+	(FILE_SEQUENTIAL_WRITE_ONCE, FILE_SUPPORTS_TRANSACTIONS): Define.
+
 2009-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/msimg32.def (GetDCBrushColor, GetDCPenColor): Move entry points

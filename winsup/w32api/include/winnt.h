@@ -380,6 +380,13 @@ typedef DWORD FLONG;
 #define FILE_READ_ONLY_VOLUME           0x00080000
 #define FILE_SEQUENTIAL_WRITE_ONCE      0x00100000
 #define FILE_SUPPORTS_TRANSACTIONS      0x00200000
+/* Note: These flags only have a meaning starting with Windows 7/2008 R2.
+   Their absence on older OSes does NOT mean that a filesystem is missing
+   that property. */
+#define FILE_SUPPORTS_HARD_LINKS        0x00400000
+#define FILE_SUPPORTS_EXTENDED_ATTRIBUTES 0x00800000
+#define FILE_SUPPORTS_OPEN_BY_FILE_ID   0x01000000
+#define FILE_SUPPORTS_USN_JOURNAL       0x02000000
 
 
 #define IO_COMPLETION_QUERY_STATE       0x0001
