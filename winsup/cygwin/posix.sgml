@@ -1408,8 +1408,6 @@ ENOSYS.</para>
 <function>shmdt</function>, <function>shmget</function>,
 <function>msgctl</function>, <function>msgget</function>,
 <function>msgrcv</function> and <function>msgsnd</function> are only
-available when cygserver is running and the <envar>CYGWIN</envar>
-environment variable is set so that it contains the string
-<envar>server</envar>.</para>
+available when cygserver is running.</para>
 
 </sect1>
