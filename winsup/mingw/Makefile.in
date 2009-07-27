@@ -17,11 +17,17 @@
 
 # This makefile requires GNU make.
 
+PACKAGE = @PACKAGE_TARNAME@
 VERSION = @PACKAGE_VERSION@
 CYGRELEASE = 1
 
 VPATH = @srcdir@
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+top_builddir = @top_builddir@
+
+# FIXME: I see no reason to define `objdir';
+# it appears to be unused, and could be removed.
 objdir = .
 
 host_alias = @host_alias@
@@ -30,20 +36,27 @@ target_alias = @target_alias@
 with_cross_host = @with_cross_host@
 prefix = @prefix@
 conf_prefix = @prefix@
-# FIXME: this needs an appropriate AC_SUBST
-host_os = mingw32
+host_os = @host_os@
 
-ifneq (,$(findstring cygwin, $(target_alias)))
-PACKAGE = mingw-runtime
-else
-PACKAGE = mingwrt
-endif
-
+datarootdir = @datarootdir@
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+
 ifneq (,$(findstring cygwin,$(target_alias)))
+# 
+# FIXME: What is the purpose of such logic, testing `target_alias'?
+#
+# Firstly, there is no code generator being built here.  The concept
+# of `target' is meaningless, and there is no valid reason to expect
+# that `target_alias' would be anything other than an empty string.
+# Thus, the validity of such tests is extremely suspect.
+#
+# Secondly, the decisions being taken, on the basis of these tests,
+# rightfully belong in the configure script; all this logic should be
+# removed, and properly implemented in `configure.in'.
+#
 mandir = $(prefix)/share/man
 mansection = mingw
 else
@@ -64,12 +77,29 @@ datadir = @datadir@
 infodir = @infodir@
 includedir = @includedir@
 ifneq (,$(findstring cygwin,$(target_alias)))
+#
+# FIXME: Doubtful use of `target_alias', again.
+#
+# Here we not only have a dubious test, based on `target_alias',
+# but we also assign local alternatives for the standard autoconf
+# installation path macros.  This should not be necessary; the
+# configure script should simply assign appropriate values to
+# the standard macros, which should be used herein.
+#
 inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include/mingw
 inst_libdir:=$(tooldir)/lib/mingw
 inst_docdir:=$(tooldir)/share/doc/mingw-runtime
 else
 ifneq (,$(with_cross_host))
+#
+# FIXME: What is the intended purpose of `with_cross_host'?
+#
+# Notwithstanding that this conforms to no known standard, and
+# is completely undocumented, it does not belong here; every one
+# of these settings is the prerogative of the configure script,
+# and they should use standard names, as noted above.
+#
 inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include
 inst_libdir:=$(tooldir)/lib
@@ -95,6 +125,14 @@ mkinstalldirs = $(SHELL) @MKINSTALLDIRS@
 
 CC := @CC@
 ifneq (,$(findstring cygwin,$(target_alias)))
+#
+# FIXME: What is the purpose of this hideous kludge?
+#
+# Again, we have a dubious use of `target_alias'.  Worse, `CC'
+# should have been appropriately set by the configure script; to
+# mess with it, in this fashion, should neither be necessary,
+# nor accepted.
+#
 override CC := ${filter-out -L% -B%,${shell echo $(CC) | sed -e 's%\(-isystem\|-iwithprefixbefore\)  *[^ ]*\( \|$$\)% %g'}}
 endif
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -106,6 +144,10 @@ CXXFLAGS = @CXXFLAGS@
 # compiling with Cygwin?
 NO_CYGWIN := @NO_CYGWIN@
 ifdef NO_CYGWIN
+#
+# FIXME: Again, this should have been resolved by `configure',
+# and this kludge should be unnecessary.
+#
 override CC := ${NO_CYGWIN} $(firstword ${CC})
 endif
 
@@ -148,8 +190,10 @@ TAR = tar
 TARFLAGS = z
 TARFILEEXT = .tar.gz
 
-SUBDIRS := @subdirs@
+SUBDIRS = mingwex profile
 
+# FIXME: Most of these are either redundant, or should be set
+# directly in the subdirectories' Makefiles, by `configure'.
 FLAGS_TO_PASS:=\
 	AS="$(AS)" \
 	CC="$(CC)" \
@@ -225,7 +269,6 @@ all_dlls_host = @all_dlls_host@
 install_dlls_host = @install_dlls_host@
 
 all: $(CRT0S) $(LIBS) $(all_dlls_host)
-	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 all_dlls_host: $(DLLS)
 
@@ -264,12 +307,11 @@ libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
 	$(RANLIB) $@
 
-msvcrt.def msvcrtd.def \
+msvcrt.def  msvcrtd.def \
 msvcr70.def msvcr70d.def \
 msvcr71.def msvcr71d.def \
 msvcr80.def msvcr80d.def \
-msvcr90.def msvcr90d.def \
-: msvcrt.def.in
+msvcr90.def msvcr90d.def: msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
 		-D__$(basename $(notdir $@))__=1 \
 		-D__MSVCRT__ -C -E -P \
@@ -314,7 +356,8 @@ libmoldname90.a libmoldname90d.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-# The special rules are necessary.
+# These special rules are necessary...
+#
 crt1.o dllcrt1.o:
 	$(CC) -c -D__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) $< -o $@
 
@@ -365,6 +408,12 @@ else
 endif
 
 ifneq (,$(findstring cygwin, $(target_alias)))
+#
+# FIXME: Dubious use of `target_alias', yet again.
+#
+# Once more, the default settings for these macros could be
+# more productively determined by `configure'.
+#
   TARFLAGS = j
   TARFILEEXT = .tar.bz2
   dist_prefix = $(conf_prefix)
@@ -483,21 +532,9 @@ install: all install-dirs $(install_dlls_host)
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 subdirs: $(SUBDIRS)
-	@true
-
-# The . is here because SUBDIRS may be empty
-
-. $(SUBDIRS): force
-	@if [ -d ./$@ ]; then \
-	  echo "Making $(DO) in $@..." ; \
-	  if (rootme=`pwd`/ ; export rootme ; \
-	    rootsrc=`cd $(srcdir); pwd`/ ; export rootsrc ; \
-	    cd ./$@; \
-	    $(MAKE) $(FLAGS_TO_PASS) $(DO)) ; then true ; \
-	  else exit 1 ; \
-	  fi ; \
-	else true ; \
-	fi
+$(SUBDIRS): force
+	@test -n "$(DO)" && g="$(DO)" || g=all; echo "Making \`$$g' in \`$@'"
+	@cd $@; $(MAKE) $(FLAGS_TO_PASS) $(DO)
 
 force:
 
@@ -567,3 +604,4 @@ libcrtdll.a  libcrtdlld.a:  ofmt_stub.o
 .c.o:
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
 
+# $RCSfile$: end of file

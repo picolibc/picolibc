@@ -4,16 +4,24 @@
 # This makefile requires GNU make.
 
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
 VPATH = $(srcdir):$(srcdir)/math:$(srcdir)/stdio:$(srcdir)/complex $(srcdir)/gdtoa
+
+# FIXME: I see no reason to define `objdir';
+# it appears to be unused, and could be removed.
 objdir = .
 
 target_alias = @target_alias@
 prefix = @prefix@
 
+datarootdir = @datarootdir@
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+
+# FIXME: Use of `target_alias' is extremely suspect here;
+# (see relevant note in top level Makefile).
 tooldir = $(exec_prefix)/$(target_alias)
 datadir = @datadir@
 infodir = @infodir@
@@ -108,11 +116,18 @@ WARNFLAGS = -Wall
 # compiling with Cygwin?
 NO_CYGWIN := @NO_CYGWIN@
 ifdef NO_CYGWIN
+#
+# FIXME: What is the purpose of this hideous kludge?
+#
+# `CC' should have been appropriately set by the configure script;
+# to mess with it, in this fashion, should neither be necessary,
+# nor accepted.
+#
 override CC := ${NO_CYGWIN} $(firstword $(filter-out ${NO_CYGWIN},${CC}))
 endif
 
 W32API_INCLUDE = @W32API_INCLUDE@
-INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../include \
+INCLUDES = -I${srcdir} -I${top_srcdir} -I${top_srcdir}/include \
   -nostdinc \
   -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(WARNFLAGS) $(OPTFLAGS) $(INCLUDES) $(W32API_INCLUDE)
@@ -226,11 +241,13 @@ $(MATH_LROUND_OBJS) $(MATH_LLROUND_OBJS): lround_generic.c
 	$(CC) $(ALL_CFLAGS) -I$(srcdir)/math -c -o $@ \
 	  -D FUNCTION=$* $(srcdir)/math/lround_generic.c
 
-Makefile: Makefile.in config.status configure
-	$(SHELL) config.status
+top_builddir = @top_builddir@
 
-config.status: configure
-	$(SHELL) config.status --recheck
+Makefile: Makefile.in ${top_builddir}/config.status ${top_srcdir}/configure
+	cd ${top_builddir}; $(SHELL) config.status
+
+${top_builddir}/config.status: ${top_srcdir}/configure
+	cd ${top_builddir}; $(SHELL) config.status --recheck
 
 info:
 
@@ -316,3 +333,5 @@ dist:
 	@for i in $(GDTOA_DISTFILES); do\
 		cp -p $(srcdir)/gdtoa/$$i $(distdir)/mingwex/gdtoa/$$i ; \
 	done
+
+# $RCSfile$: end of file

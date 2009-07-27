@@ -1,3 +1,50 @@
+2009-07-27  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Convert to monolithic configuration procedure.
+
+	* configure.in (AC_CHECK_TOOL): All instances; tabulate arguments.
+	(AC_SUBST): Use its 2nd argument to initialise MinGW default settings.
+	(PACKAGE_TARNAME) [target_os ~ cygwin]: Redefine it as appropriate.
+	(W32API_INCLUDE): Redefine; make it relative to `top_srcdir'.
+	(CRT0S): Relocate from `profile'; define it as appropriate.
+	(LIBM_A): Define and AC_SUBST it unconditionally.
+	(AC_CONFIG_SUBDIRS): Remove; none to configure.
+	(AC_OUTPUT_FILES): Add `Makefile' for each of...
+	(mingwex, profile): ...these subdirectories.
+
+	* configure: Regenerated.
+
+	* Makefile.in (PACKAGE, host_os): Let AC_SUBST define them.
+	(top_srcdir, top_builddir): New macros; let AC_SUBST define them.
+	(datarootdir): New macro; autoconf > 2.59 wants AC_SUBST to define it.
+	(SUBDIRS): Define explicitly, to run recursive `make' in...
+	(mingwex, profile): ...these; simplify build commands...
+	(rootme, rootsrc): ...without these shell variables.
+	(all, subdirs): Delete redundant build commands.
+	(FIXME): Flag various issues for follow up.
+
+	* mingwex/Makefile.in (INCLUDES): Redefined macro; refer it to...
+	(top_srcdir): ...this new macro; let AC_SUBST define it.
+	(top_builddir, datarootdir): New macros; let AC_SUBST define them.
+	(Makefile): Make it depend on...
+	(top_builddir/config.status): ...this, itself depending on...
+	(top_srcdir/configure): ...this.
+	(FIXME): Flag various issues for follow up.
+
+	* mingwex/aclocal.m4: File no longer required; delete it.
+	* mingwex/configure mingwex/configure.in: Likewise.
+
+	* profile/Makefile.in (INCLUDES): Redefined macro; refer it to...
+	(top_srcdir): ...this new macro; let AC_SUBST define it.
+	(top_builddir, datarootdir): New macros; let AC_SUBST define them.
+	(Makefile): Make it depend on...
+	(top_builddir/config.status): ...this, itself depending on...
+	(top_srcdir/configure): ...this.
+	(FIXME): Flag various issues for follow up.
+
+	* profile/aclocal.m4: File no longer required; delete it.
+	* profile/configure profile/configure.in: Likewise.
+
 2009-07-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* msvcrt.def.in: disable time symbol for libmsvcr90.a and libmsvcr90d.a due

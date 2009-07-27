@@ -32,34 +32,36 @@ AC_SUBST([with_cross_host])
 AC_SUBST([all_dlls_host])
 AC_SUBST([install_dlls_host])
 
-AC_CHECK_TOOL([AR], [ar], [ar])
-AC_CHECK_TOOL([AS], [as], [as])
-AC_CHECK_TOOL([RANLIB], [ranlib], [ranlib])
-AC_CHECK_TOOL([LD], [ld], [ld])
-AC_CHECK_TOOL([NM], [nm], [nm])
+AC_CHECK_TOOL([AR],      [ar],      [ar])
+AC_CHECK_TOOL([AS],      [as],      [as])
+AC_CHECK_TOOL([RANLIB],  [ranlib],  [ranlib])
+AC_CHECK_TOOL([LD],      [ld],      [ld])
+AC_CHECK_TOOL([NM],      [nm],      [nm])
 AC_CHECK_TOOL([OBJCOPY], [objcopy], [objcopy])
 AC_CHECK_TOOL([DLLTOOL], [dlltool], [dlltool])
 AC_CHECK_TOOL([DLLWRAP], [dlltool], [dlltool])
 AC_CHECK_TOOL([WINDRES], [windres], [windres])
 
-AC_CONFIG_SUBDIRS([profile mingwex])
-HEADER_SUBDIR=""
+AC_SUBST([NO_CYGWIN])
+AC_SUBST([HEADER_SUBDIR])
+AC_SUBST([W32API_INCLUDE], ['-I ${top_srcdir}/../w32api/include'])
 
-LIBGMON_A=libgmon.a
+# The following are used by the GCC profiling hooks...
+#
+AC_SUBST([LIBGMON_A], [libgmon.a])
+AC_SUBST([CRT0S], ["gcrt1.o gcrt2.o"])
 
-W32API_INCLUDE='-I $(srcdir)/../w32api/include'
-
+# FIXME: Why is this case determined on `target_os'?
+# There is no code generator to be built here, so `target_os'
+# should be irrelevant.  Should it not rather be `host_os'?
+#
 case "$target_os" in
 *cygwin*)
-  NO_CYGWIN="$(cd ${srcdir}/../utils; pwd)/mingw"
-  LIBM_A=libm.a
+  PACKAGE_TARNAME="mingw-runtime"
+  NO_CYGWIN="`cd ${srcdir}/../utils; pwd`/mingw"
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
-  ;;
-*)
-  # Build it for MSVCRT by default.
-  NO_CYGWIN=
-  LIBM_A=libm.a
+  CRT0S="gcrt0.o"
   ;;
 esac
 
@@ -70,17 +72,18 @@ esac
 # to match the libmingwthrd.a name.
 AC_SUBST([THREAD_DLL], [mingwm])
 
+# LIBM_A also used be set in the preceding case statement; it had the
+# exact same assignment, (libm.a), in every case, so we may just as well
+# assign it unconditionally, (making the default case redundant).
+#
+AC_SUBST([LIBM_A], [libm.a])
+
 AC_SUBST([MKINSTALLDIRS], [$ac_aux_dir/mkinstalldirs])
-AC_SUBST([NO_CYGWIN])
-AC_SUBST([LIBM_A])
-AC_SUBST([LIBGMON_A])
-AC_SUBST([HEADER_SUBDIR])
-AC_SUBST([W32API_INCLUDE])
 
 AC_PROG_INSTALL
 MINGW_AC_MANPAGE_TRANSFORM
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile mingwex/Makefile profile/Makefile])
 AC_OUTPUT
 
 # $RCSfile$: end of file

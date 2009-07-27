@@ -601,21 +601,20 @@ PACKAGE_STRING='MinGW Runtime v3.x'
 PACKAGE_BUGREPORT='http://mingw.org/reporting_bugs'
 
 ac_unique_file="include/_mingw.h"
-enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 mingw_manpage_transform
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
+MKINSTALLDIRS
+LIBM_A
+THREAD_DLL
+CRT0S
+LIBGMON_A
 W32API_INCLUDE
 HEADER_SUBDIR
-LIBGMON_A
-LIBM_A
 NO_CYGWIN
-MKINSTALLDIRS
-THREAD_DLL
-subdirs
 WINDRES
 DLLWRAP
 DLLTOOL
@@ -697,7 +696,7 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS'
-ac_subdirs_all='profile mingwex'
+
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3758,25 +3757,27 @@ fi
 
 
 
-subdirs="$subdirs profile mingwex"
+W32API_INCLUDE='-I ${top_srcdir}/../w32api/include'
 
-HEADER_SUBDIR=""
 
+# The following are used by the GCC profiling hooks...
+#
 LIBGMON_A=libgmon.a
 
-W32API_INCLUDE='-I $(srcdir)/../w32api/include'
+CRT0S="gcrt1.o gcrt2.o"
 
+
+# FIXME: Why is this case determined on `target_os'?
+# There is no code generator to be built here, so `target_os'
+# should be irrelevant.  Should it not rather be `host_os'?
+#
 case "$target_os" in
 *cygwin*)
-  NO_CYGWIN="$(cd ${srcdir}/../utils; pwd)/mingw"
-  LIBM_A=libm.a
+  PACKAGE_TARNAME="mingw-runtime"
+  NO_CYGWIN="`cd ${srcdir}/../utils; pwd`/mingw"
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
-  ;;
-*)
-  # Build it for MSVCRT by default.
-  NO_CYGWIN=
-  LIBM_A=libm.a
+  CRT0S="gcrt0.o"
   ;;
 esac
 
@@ -3788,12 +3789,14 @@ esac
 THREAD_DLL=mingwm
 
 
+# LIBM_A also used be set in the preceding case statement; it had the
+# exact same assignment, (libm.a), in every case, so we may just as well
+# assign it unconditionally, (making the default case redundant).
+#
+LIBM_A=libm.a
+
+
 MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
-
-
-
-
-
 
 
 # Find a good install program.  We prefer a C program (faster),
@@ -3901,7 +3904,7 @@ fi
  mingw_manpage_transform=${mingw_manpage_transform-'s,x,x,'}
 
 
-ac_config_files="$ac_config_files Makefile"
+ac_config_files="$ac_config_files Makefile mingwex/Makefile profile/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4513,6 +4516,8 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "mingwex/Makefile") CONFIG_FILES="$CONFIG_FILES mingwex/Makefile" ;;
+    "profile/Makefile") CONFIG_FILES="$CONFIG_FILES profile/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -5013,193 +5018,6 @@ if test "$no_create" != yes; then
   # Use ||, not &&, to avoid exiting from the if with $? = 1, which
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
-fi
-
-#
-# CONFIG_SUBDIRS section.
-#
-if test "$no_recursion" != yes; then
-
-  # Remove --cache-file, --srcdir, and --disable-option-checking arguments
-  # so they do not pile up.
-  ac_sub_configure_args=
-  ac_prev=
-  eval "set x $ac_configure_args"
-  shift
-  for ac_arg
-  do
-    if test -n "$ac_prev"; then
-      ac_prev=
-      continue
-    fi
-    case $ac_arg in
-    -cache-file | --cache-file | --cache-fil | --cache-fi \
-    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
-      ac_prev=cache_file ;;
-    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
-    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* \
-    | --c=*)
-      ;;
-    --config-cache | -C)
-      ;;
-    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
-      ac_prev=srcdir ;;
-    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
-      ;;
-    -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
-      ac_prev=prefix ;;
-    -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
-      ;;
-    --disable-option-checking)
-      ;;
-    *)
-      case $ac_arg in
-      *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-      esac
-      ac_sub_configure_args="$ac_sub_configure_args '$ac_arg'" ;;
-    esac
-  done
-
-  # Always prepend --prefix to ensure using the same prefix
-  # in subdir configurations.
-  ac_arg="--prefix=$prefix"
-  case $ac_arg in
-  *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-  esac
-  ac_sub_configure_args="'$ac_arg' $ac_sub_configure_args"
-
-  # Pass --silent
-  if test "$silent" = yes; then
-    ac_sub_configure_args="--silent $ac_sub_configure_args"
-  fi
-
-  # Always prepend --disable-option-checking to silence warnings, since
-  # different subdirs can have different --enable and --with options.
-  ac_sub_configure_args="--disable-option-checking $ac_sub_configure_args"
-
-  ac_popdir=`pwd`
-  for ac_dir in : $subdirs; do test "x$ac_dir" = x: && continue
-
-    # Do not complain, so a configure script can configure whichever
-    # parts of a large source tree are present.
-    test -d "$srcdir/$ac_dir" || continue
-
-    ac_msg="=== configuring in $ac_dir (`pwd`/$ac_dir)"
-    $as_echo "$as_me:$LINENO: $ac_msg" >&5
-    $as_echo "$ac_msg" >&6
-    { as_dir="$ac_dir"
-  case $as_dir in #(
-  -*) as_dir=./$as_dir;;
-  esac
-  test -d "$as_dir" || { $as_mkdir_p && mkdir -p "$as_dir"; } || {
-    as_dirs=
-    while :; do
-      case $as_dir in #(
-      *\'*) as_qdir=`$as_echo "$as_dir" | sed "s/'/'\\\\\\\\''/g"`;; #'(
-      *) as_qdir=$as_dir;;
-      esac
-      as_dirs="'$as_qdir' $as_dirs"
-      as_dir=`$as_dirname -- "$as_dir" ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$as_dir" : 'X\(//\)[^/]' \| \
-	 X"$as_dir" : 'X\(//\)$' \| \
-	 X"$as_dir" : 'X\(/\)' \| . 2>/dev/null ||
-$as_echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)[^/].*/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
-	    s//\1/
-	    q
-	  }
-	  s/.*/./; q'`
-      test -d "$as_dir" && break
-    done
-    test -z "$as_dirs" || eval "mkdir $as_dirs"
-  } || test -d "$as_dir" || { { $as_echo "$as_me:$LINENO: error: cannot create directory $as_dir" >&5
-$as_echo "$as_me: error: cannot create directory $as_dir" >&2;}
-   { (exit 1); exit 1; }; }; }
-    ac_builddir=.
-
-case "$ac_dir" in
-.) ac_dir_suffix= ac_top_builddir_sub=. ac_top_build_prefix= ;;
-*)
-  ac_dir_suffix=/`$as_echo "$ac_dir" | sed 's|^\.[\\/]||'`
-  # A ".." for each directory in $ac_dir_suffix.
-  ac_top_builddir_sub=`$as_echo "$ac_dir_suffix" | sed 's|/[^\\/]*|/..|g;s|/||'`
-  case $ac_top_builddir_sub in
-  "") ac_top_builddir_sub=. ac_top_build_prefix= ;;
-  *)  ac_top_build_prefix=$ac_top_builddir_sub/ ;;
-  esac ;;
-esac
-ac_abs_top_builddir=$ac_pwd
-ac_abs_builddir=$ac_pwd$ac_dir_suffix
-# for backward compatibility:
-ac_top_builddir=$ac_top_build_prefix
-
-case $srcdir in
-  .)  # We are building in place.
-    ac_srcdir=.
-    ac_top_srcdir=$ac_top_builddir_sub
-    ac_abs_top_srcdir=$ac_pwd ;;
-  [\\/]* | ?:[\\/]* )  # Absolute name.
-    ac_srcdir=$srcdir$ac_dir_suffix;
-    ac_top_srcdir=$srcdir
-    ac_abs_top_srcdir=$srcdir ;;
-  *) # Relative name.
-    ac_srcdir=$ac_top_build_prefix$srcdir$ac_dir_suffix
-    ac_top_srcdir=$ac_top_build_prefix$srcdir
-    ac_abs_top_srcdir=$ac_pwd/$srcdir ;;
-esac
-ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
-
-
-    cd "$ac_dir"
-
-    # Check for guested configure; otherwise get Cygnus style configure.
-    if test -f "$ac_srcdir/configure.gnu"; then
-      ac_sub_configure=$ac_srcdir/configure.gnu
-    elif test -f "$ac_srcdir/configure"; then
-      ac_sub_configure=$ac_srcdir/configure
-    elif test -f "$ac_srcdir/configure.in"; then
-      # This should be Cygnus configure.
-      ac_sub_configure=$ac_aux_dir/configure
-    else
-      { $as_echo "$as_me:$LINENO: WARNING: no configuration information is in $ac_dir" >&5
-$as_echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2;}
-      ac_sub_configure=
-    fi
-
-    # The recursion is here.
-    if test -n "$ac_sub_configure"; then
-      # Make the cache file name correct relative to the subdirectory.
-      case $cache_file in
-      [\\/]* | ?:[\\/]* ) ac_sub_cache_file=$cache_file ;;
-      *) # Relative name.
-	ac_sub_cache_file=$ac_top_build_prefix$cache_file ;;
-      esac
-
-      { $as_echo "$as_me:$LINENO: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&5
-$as_echo "$as_me: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&6;}
-      # The eval makes quoting arguments work.
-      eval "\$SHELL \"\$ac_sub_configure\" $ac_sub_configure_args \
-	   --cache-file=\"\$ac_sub_cache_file\" --srcdir=\"\$ac_srcdir\"" ||
-	{ { $as_echo "$as_me:$LINENO: error: $ac_sub_configure failed for $ac_dir" >&5
-$as_echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
-
-    cd "$ac_popdir"
-  done
 fi
 if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:$LINENO: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
