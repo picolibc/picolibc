@@ -1,3 +1,7 @@
+2009-07-27  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* mingwex/stdio/pformat.c: Implement better fix for type punned warning.
+
 2009-07-27  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Convert to monolithic configuration procedure.

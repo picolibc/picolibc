@@ -1883,8 +1883,7 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 	       * `wchar_t' data, (which is promoted to an `int' argument)...
 	       */
 	      argval.__pformat_ullong_t = (wchar_t)(va_arg( argv, int ));
-        void *tmp = &argval;
-	      __pformat_wputchars( (wchar_t *)tmp, 1, &stream );
+	      __pformat_wputchars( (wchar_t *)argval.__pformat_ptr_t, 1, &stream );
 	    }
 
 	    else
