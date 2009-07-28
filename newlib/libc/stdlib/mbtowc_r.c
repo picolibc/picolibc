@@ -220,11 +220,7 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
   if (state->__count == 0)
     ch = t[i++];
   else
-    {
-      if (n < (size_t)-1)
-	++n;
-      ch = state->__value.__wchb[0];
-    }
+    ch = state->__value.__wchb[0];
 
   if (ch == '\0')
     {
@@ -244,7 +240,10 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
     {
       /* two-byte sequence */
       state->__value.__wchb[0] = ch;
-      state->__count = 1;
+      if (state->__count == 0)
+	state->__count = 1;
+      else if (n < (size_t)-1)
+	++n;
       if (n < 2)
 	return -2;
       ch = t[i++];
@@ -288,7 +287,10 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
 	  return -1;
 	}
       state->__value.__wchb[1] = ch;
-      state->__count = 2;
+      if (state->__count == 1)
+	state->__count = 2;
+      else if (n < (size_t)-1)
+	++n;
       if (n < 3)
 	return -2;
       ch = t[i++];
@@ -347,7 +349,10 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
 	  return -1;
 	}
       state->__value.__wchb[2] = ch;
-      state->__count = 3;
+      if (state->__count == 2)
+	state->__count = 3;
+      else if (n < (size_t)-1)
+	++n;
       if (n < 4)
 	return -2;
       ch = t[i++];
