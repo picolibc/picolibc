@@ -1,3 +1,20 @@
+2009-07-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.h (enum fs_info_type): New type.
+	(IMPLEMENT_FS_FLAG): New define.
+	(class fs_info): Convert filesystem type status flags into an enum
+	fs_info_type.  Add cifs FS.  Revert change to has_buggy_open and
+	has_buggy_fileid_dirinfo.  Make them normal; status flags again.
+	Implement is_FS functions using IMPLEMENT_FS_FLAG.
+	* mount.cc (fs_info::update): Define MINIMAL_WIN_NTFS_FLAGS and
+	FS_IS_WINDOWS_NTFS.  Add comment.  Only test remote filesystems
+	for "NTFS" once.  Add is_cifs check using FS_IS_WINDOWS_NTFS.
+	Set has_buggy_open flag for SUNWNFS.  Set has_buggy_fileid_dirinfo
+	flag for UNIXFS and all cifs type filesystems.  Only check for
+	caseinsensitivity once.
+	(fillout_mntent): Create locale fs_names array.  Use for setting
+	_my_tls.locals.mnt_type.
+
 2009-07-27  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
 	* posix.sgml (std-notes): Remove obsolete reference to CYGWIN=server.

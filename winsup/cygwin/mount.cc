@@ -198,6 +198,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     }
    flags (ffai_buf.ffai.FileSystemAttributes);
    name_len (ffai_buf.ffai.MaximumComponentNameLength);
+  RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
+			       ffai_buf.ffai.FileSystemNameLength);
+  if (is_remote_drive ())
+    {
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
@@ -215,16 +219,23 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_PERSISTENT_ACLS)
+/* Netapp DataOnTap.  TODO: Find out if that's the only flag combination. */
 #define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags (), \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_PERSISTENT_ACLS \
 			     | FILE_NAMED_STREAMS)
-  RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
-			       ffai_buf.ffai.FileSystemNameLength);
-  if (is_remote_drive ())
-    {
+/* These are the minimal flags supported by NTFS since NT4.  Every filesystem
+   not supporting these flags is not a native NTFS.  We subsume them under
+   the filesystem type "cifs". */
+#define MINIMAL_WIN_NTFS_FLAGS (FILE_CASE_SENSITIVE_SEARCH \
+				| FILE_CASE_PRESERVED_NAMES \
+				| FILE_UNICODE_ON_DISK \
+				| FILE_PERSISTENT_ACLS \
+				| FILE_FILE_COMPRESSION)
+#define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
+				    MINIMAL_WIN_NTFS_FLAGS)
       /* This always fails on NT4. */
       status = NtQueryVolumeInformationFile (vol, &io, &ffoi, sizeof ffoi,
 					     FileFsObjectIdInformation);
@@ -238,14 +249,17 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	      samba_version (extended_info->samba_version);
 	    }
 	}
-      if (!got_fs ()
+      /* First check the remote filesystems faking to be NTFS. */
+      if (!got_fs () && RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
 	  /* Test for Samba on NT4 or for older Samba releases not supporting
 	     extended info. */
-	  && !is_samba (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
-			&& FS_IS_SAMBA)
+	  && !is_samba (FS_IS_SAMBA)
 	  /* Netapp inode info is unusable. */
-	  && !is_netapp (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
-			 && FS_IS_NETAPP_DATAONTAP)
+	  && !is_netapp (FS_IS_NETAPP_DATAONTAP))
+	/* Any other remote FS faking to be NTFS. */
+	is_cifs (!FS_IS_WINDOWS_NTFS);
+      /* Then check remote filesystems honest about their name. */
+      if (!got_fs ()
 	  /* Microsoft NFS needs distinct access methods for metadata. */
 	  && !is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE))
 	  /* MVFS == Rational ClearCase remote filesystem.  Has a couple of
@@ -257,25 +271,23 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
 	/* Known remote file system with buggy open calls.  Further
 	   explanation in fhandler.cc (fhandler_disk_file::open). */
-	is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
+	{
+	  is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
+	  has_buggy_open (is_sunwnfs ());
+	}
+      /* Not only UNIXFS is known to choke on FileIdBothDirectoryInformation.
+	 Some other CIFS servers have problems with this call as well.
+	 Know example: EMC NS-702.  We just don't use that info class on
+	 any remote CIFS.  */
+      if (got_fs ())
+	has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
     }
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
-    {
-      is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
-      /* UDF on NT 5.x is broken (at least) in terms of case sensitivity.
-	 The UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability
-	 but:
-	 - Opening the root directory for query seems to work at first,
-	   but the filenames in the directory listing are mutilated.
-	 - When trying to open a file or directory case sensitive, the file
-	   appears to be non-existant. */
-      if (is_udf () && wincap.has_broken_udf ())
-	caseinsensitive (true);
-    }
+    is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
   if (!got_fs ())
     {
       /* The filesystem name is only used in fillout_mntent and only if
@@ -289,10 +301,20 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   hasgood_inode ((has_acls () && !is_netapp ()) || is_nfs ());
   /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
      except on Samba which handles Windows clients case insensitive.
+
      NFS doesn't set the FILE_CASE_SENSITIVE_SEARCH flag but is case
-     sensitive. */
-  caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
-		   && !is_nfs ());
+     sensitive.
+
+     UDF on NT 5.x is broken (at least) in terms of case sensitivity.
+     The UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability
+     but:
+     - Opening the root directory for query seems to work at first,
+       but the filenames in the directory listing are mutilated.
+     - When trying to open a file or directory case sensitive, the file
+       appears to be non-existant. */
+  caseinsensitive (((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
+		    && !is_nfs ())
+		   || (is_udf () && wincap.has_broken_udf ()));
 
   if (!in_vol)
     NtClose (vol);
@@ -1405,28 +1427,25 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
 
-  if (mntinfo.is_ntfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "ntfs");
-  else if (mntinfo.is_fat ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "vfat");
-  else if (mntinfo.is_samba())
-    strcpy (_my_tls.locals.mnt_type, (char *) "smbfs");
-  else if (mntinfo.is_nfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "nfs");
-  else if (mntinfo.is_udf ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "udf");
-  else if (mntinfo.is_cdrom ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "iso9660");
-  else if (mntinfo.is_netapp ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "netapp");
-  else if (mntinfo.is_csc_cache ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "csc-cache");
-  else if (mntinfo.is_mvfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "mvfs");
-  else if (mntinfo.is_unixfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "unixfs");
-  else if (mntinfo.is_sunwnfs ())
-    strcpy (_my_tls.locals.mnt_type, (char *) "sunwnfs");
+  /* Order must be identical to mount.h, enum fs_info_type. */
+  const char *fs_names[] = {
+    "none",
+    "vfat",
+    "ntfs",
+    "smbfs",
+    "nfs",
+    "netapp",
+    "iso9660",
+    "udf",
+    "csc-cache",
+    "sunwnfs",
+    "unixfs",
+    "mvfs",
+    "cifs"
+  };
+
+  if (mntinfo.what_fs () > 0 && mntinfo.what_fs () < max_fs_type)
+    strcpy (_my_tls.locals.mnt_type, fs_names[mntinfo.what_fs ()]);
   else
     strcpy (_my_tls.locals.mnt_type, mntinfo.fsname ());
 

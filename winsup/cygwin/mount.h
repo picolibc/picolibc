@@ -12,39 +12,47 @@ details. */
 #ifndef _MOUNT_H
 #define _MOUNT_H
 
+enum fs_info_type
+{
+  none = 0,
+  fat,
+  ntfs,
+  samba,
+  nfs,
+  netapp,
+  cdrom,
+  udf,
+  csc_cache,
+  sunwnfs,
+  unixfs,
+  mvfs,
+  cifs,
+  /* Always last. */
+  max_fs_type
+};
+
+#define IMPLEMENT_FS_FLAG(func, flag) \
+  bool func (bool val) { if (val) status.fs_type = flag; return val; } \
+  bool func () const   { return status.fs_type == flag; }
+
 class fs_info
 {
   struct status_flags
   {
-    ULONG flags;		  /* Volume flags */
-    ULONG samba_version;	  /* Samba version if available */
-    ULONG name_len;		  /* MaximumComponentNameLength */
+    ULONG flags;		/* Volume flags */
+    ULONG samba_version;	/* Samba version if available */
+    ULONG name_len;		/* MaximumComponentNameLength */
+    fs_info_type fs_type;	/* Filesystem type */
     unsigned is_remote_drive		: 1;
     unsigned has_acls			: 1;
     unsigned hasgood_inode		: 1;
     unsigned caseinsensitive		: 1;
-    union
-    {
-      struct
-      {
-	unsigned is_fat			: 1;
-	unsigned is_ntfs		: 1;
-	unsigned is_samba		: 1;
-	unsigned is_nfs			: 1;
-	unsigned is_netapp 		: 1;
-	unsigned is_cdrom		: 1;
-	unsigned is_udf			: 1;
-	unsigned is_csc_cache		: 1;
-	unsigned is_sunwnfs		: 1;
-	unsigned is_unixfs		: 1;
-	unsigned is_mvfs		: 1;
-      };
-      unsigned long fs_flags;
-    };
+    unsigned has_buggy_open		: 1;
+    unsigned has_buggy_fileid_dirinfo	: 1;
   } status;
-  ULONG sernum;
-  char fsn[80];
-  unsigned long got_fs () { return status.fs_flags; }
+  ULONG sernum;			/* Volume Serial Number */
+  char fsn[80];			/* Windows filesystem name */
+  unsigned long got_fs () const { return status.fs_type != none; }
 
  public:
   void clear ()
@@ -62,21 +70,24 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_acls)
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
   IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
-  IMPLEMENT_STATUS_FLAG (bool, is_fat)
-  IMPLEMENT_STATUS_FLAG (bool, is_ntfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_samba)
-  IMPLEMENT_STATUS_FLAG (bool, is_nfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_netapp)
-  IMPLEMENT_STATUS_FLAG (bool, is_cdrom)
-  IMPLEMENT_STATUS_FLAG (bool, is_udf)
-  IMPLEMENT_STATUS_FLAG (bool, is_csc_cache)
-  IMPLEMENT_STATUS_FLAG (bool, is_sunwnfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_unixfs)
-  IMPLEMENT_STATUS_FLAG (bool, is_mvfs)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
+  IMPLEMENT_FS_FLAG (is_fat, fat)
+  IMPLEMENT_FS_FLAG (is_ntfs, ntfs)
+  IMPLEMENT_FS_FLAG (is_samba, samba)
+  IMPLEMENT_FS_FLAG (is_nfs, nfs)
+  IMPLEMENT_FS_FLAG (is_netapp, netapp)
+  IMPLEMENT_FS_FLAG (is_cdrom, cdrom)
+  IMPLEMENT_FS_FLAG (is_udf, udf)
+  IMPLEMENT_FS_FLAG (is_csc_cache, csc_cache)
+  IMPLEMENT_FS_FLAG (is_sunwnfs, sunwnfs)
+  IMPLEMENT_FS_FLAG (is_unixfs, unixfs)
+  IMPLEMENT_FS_FLAG (is_mvfs, mvfs)
+  IMPLEMENT_FS_FLAG (is_cifs, cifs)
+  fs_info_type what_fs () const { return status.fs_type; }
+
   ULONG serial_number () const { return sernum; }
 
-  int has_buggy_open () const {return is_sunwnfs ();}
-  int has_buggy_fileid_dirinfo () const {return is_unixfs ();}
   const char *fsname () const { return fsn[0] ? fsn : "unknown"; }
 
   bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
