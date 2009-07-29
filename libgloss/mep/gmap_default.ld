@@ -174,7 +174,7 @@ SECTIONS
   } >RAM /* CODE-section */ =0
   .vtext ALIGN(8)    :
   {
-    *(.vtext)
+    *(.vtext) *(.vtext.*) *(.gnu.linkonce.v.*)
   } >RAM /* CODE-section */
   .fini      :
   {
