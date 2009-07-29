@@ -205,18 +205,6 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
   if (n == 0)
     return -2;
 
-  if (state->__count == 4)
-    {
-      /* Create the second half of the surrogate pair.  For a description
-	 see the comment below. */
-      wint_t tmp = (wchar_t)((state->__value.__wchb[0] & 0x07) << 18)
-	|   (wchar_t)((state->__value.__wchb[1] & 0x3f) << 12)
-	|   (wchar_t)((state->__value.__wchb[2] & 0x3f) << 6)
-	|   (wchar_t)(state->__value.__wchb[3] & 0x3f);
-      state->__count = 0;
-      *pwc = 0xdc00 | ((tmp - 0x10000) & 0x3ff);
-      return 2;
-    }
   if (state->__count == 0)
     ch = t[i++];
   else
@@ -303,7 +291,7 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
       tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
 	|    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
 	|     (wchar_t)(ch & 0x3f);
-    
+      /* Check for invalid CESU-8 encoding of UTF-16 surrogate values. */
       if (tmp >= 0xd800 && tmp <= 0xdfff)
 	{
 	  r->_errno = EILSEQ;
@@ -312,7 +300,7 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
       *pwc = tmp;
       return i;
     }
-  if (ch >= 0xf0 && ch <= 0xf7)
+  if (ch >= 0xf0 && ch <= 0xf4)
     {
       /* four-byte sequence */
       wint_t tmp;
@@ -324,9 +312,10 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
       if (n < 2)
 	return -2;
       ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
-      if (state->__value.__wchb[0] == 0xf0 && ch < 0x90)
+      if ((state->__value.__wchb[0] == 0xf0 && ch < 0x90)
+	  || (state->__value.__wchb[0] == 0xf4 && ch >= 0x90))
 	{
-	  /* overlong UTF-8 sequence */
+	  /* overlong UTF-8 sequence or result is > 0x10ffff */
 	  r->_errno = EILSEQ;
 	  return -1;
 	}
@@ -353,6 +342,26 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
 	state->__count = 3;
       else if (n < (size_t)-1)
 	++n;
+      if (state->__count == 3 && sizeof(wchar_t) == 2)
+	{
+	  /* On systems which have wchar_t being UTF-16 values, the value
+	     doesn't fit into a single wchar_t in this case.  So what we
+	     do here is to store the state with a special value of __count
+	     and return the first half of a surrogate pair.  The first
+	     three bytes of a UTF-8 sequence are enough to generate the
+	     first half of a UTF-16 surrogate pair.  As return value we
+	     choose to return the number of bytes actually read up to
+	     here.
+	     The second half of the surrogate pair is returned in case we
+	     recognize the special __count value of four, and the next
+	     byte is actually a valid value.  See below. */
+	  tmp = (wint_t)((state->__value.__wchb[0] & 0x07) << 18)
+	    |   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
+	    |   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6);
+	  state->__count = 4;
+	  *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
+	  return i;
+	}
       if (n < 4)
 	return -2;
       ch = t[i++];
@@ -365,21 +374,12 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
 	|   (wint_t)((state->__value.__wchb[1] & 0x3f) << 12)
 	|   (wint_t)((state->__value.__wchb[2] & 0x3f) << 6)
 	|   (wint_t)(ch & 0x3f);
-      if (tmp > 0xffff && sizeof(wchar_t) == 2)
-	{
-	  /* On systems which have wchar_t being UTF-16 values, the value
-	     doesn't fit into a single wchar_t in this case.  So what we
-	     do here is to store the state with a special value of __count
-	     and return the first half of a surrogate pair.  As return
-	     value we choose to return the half of the actual UTF-8 char.
-	     The second half is returned in case we recognize the special
-	     __count value above. */
-	  state->__value.__wchb[3] = ch;
-	  state->__count = 4;
-	  *pwc = 0xd800 | (((tmp - 0x10000) >> 10) & 0x3ff);
-	  return 2;
-	}
-      *pwc = tmp;
+      if (state->__count == 4 && sizeof(wchar_t) == 2)
+	/* Create the second half of the surrogate pair for systems with
+	   wchar_t == UTF-16 . */
+	*pwc = 0xdc00 | (tmp & 0x3ff);
+      else
+	*pwc = tmp;
       state->__count = 0;
       return i;
     }
