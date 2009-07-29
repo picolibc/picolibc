@@ -172,7 +172,7 @@ _DEFUN (a64l, (input),
 	case 'x':
 	case 'y':
 	case 'z':
-	  digit = (ch - 'A') + 38;
+	  digit = (ch - 'a') + 38;
 	  break;
 	default:
 	  digit = 0;
