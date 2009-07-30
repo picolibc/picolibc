@@ -376,21 +376,13 @@ path_conv::fillin (HANDLE h)
 void
 path_conv::set_normalized_path (const char *path_copy)
 {
-  char *p = strchr (path_copy, '\0');
-  size_t n = 1 + p - path_copy;
-
-  normalized_path = path + sizeof (path) - n;
-
-  char *eopath = strchr (path, '\0');
-  if (normalized_path > eopath)
-    normalized_path_size = n;
-  else
+  if (path_copy)
     {
-      normalized_path = (char *) cmalloc_abort (HEAP_STR, n);
-      normalized_path_size = 0;
-    }
+      size_t n = strlen (path_copy) + 1;
 
-  memcpy (normalized_path, path_copy, n);
+      normalized_path = (char *) cmalloc_abort (HEAP_STR, n);
+      memcpy (normalized_path, path_copy, n);
+    }
 }
 
 WCHAR tfx_chars[] NO_COPY = {
@@ -627,9 +619,11 @@ path_conv::check (const char *src, unsigned opt,
   char *path_copy = tp.c_get ();
   char *pathbuf = tp.c_get ();
   char *tmp_buf = tp.t_get ();
+  char *THIS_path = tp.c_get ();
   symlink_info sym;
   bool need_directory = 0;
   bool saw_symlinks = 0;
+  bool add_ext = false;
   bool is_relpath;
   char *tail, *path_end;
 
@@ -658,9 +652,12 @@ path_conv::check (const char *src, unsigned opt,
   if (wide_path)
     cfree (wide_path);
   wide_path = NULL;
+  if (path)
+    cfree (path);
+  path = NULL;
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
-  if (!normalized_path_size && normalized_path)
+  if (normalized_path)
     cfree (normalized_path);
   normalized_path = NULL;
   int component = 0;		// Number of translated components
@@ -729,7 +726,7 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      suff = suffixes;
 	      sym.pflags = path_flags;
-	      full_path = this->path;
+	      full_path = THIS_path;
 	    }
 
 	  /* Convert to native path spec sans symbolic link info. */
@@ -747,7 +744,7 @@ path_conv::check (const char *src, unsigned opt,
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
 	      else
 		{
-		  fileattr = getfileattr (this->path,
+		  fileattr = getfileattr (THIS_path,
 					  sym.pflags & MOUNT_NOPOSIX);
 		  dev.devn = FH_FS;
 		}
@@ -757,7 +754,7 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      dev.devn = FH_FS;
 #if 0
-	      fileattr = getfileattr (this->path, sym.pflags & MOUNT_NOPOSIX);
+	      fileattr = getfileattr (THIS_path, sym.pflags & MOUNT_NOPOSIX);
 	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
 		{
 		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
@@ -882,7 +879,7 @@ is_virtual_symlink:
 	    {
 	      error = sym.error;
 	      if (component == 0)
-		add_ext_from_sym (sym);
+		add_ext = true;
 	      else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
 		{
 		  error = ENOTDIR;
@@ -903,10 +900,10 @@ is_virtual_symlink:
 		  set_symlink (symlen); // last component of path is a symlink.
 		  if (opt & PC_SYM_CONTENTS)
 		    {
-		      strcpy (path, sym.contents);
+		      strcpy (THIS_path, sym.contents);
 		      goto out;
 		    }
-		  add_ext_from_sym (sym);
+		  add_ext = true;
 		  goto out;
 		}
 	      else
@@ -966,7 +963,7 @@ virtual_component_retry:
 	{
 	too_long:
 	  error = ENAMETOOLONG;
-	  strcpy (path, "::ENAMETOOLONG::");
+	  this->path = cstrdup ("::ENAMETOOLONG::");
 	  return;
 	}
 
@@ -993,9 +990,13 @@ virtual_component_retry:
     }
 
   if (!(opt & PC_SYM_CONTENTS))
-    add_ext_from_sym (sym);
+    add_ext = true;
 
 out:
+  this->path = (char *) cmalloc_abort (HEAP_STR, strlen (THIS_path) + 7);
+  stpcpy (this->path, THIS_path);
+  if (add_ext)
+    add_ext_from_sym (sym);
   if (dev.devn == FH_NETDRIVE && component)
     {
       /* This case indicates a non-existant resp. a non-retrievable
@@ -1089,9 +1090,7 @@ out:
   if (saw_symlinks)
     set_has_symlinks ();
 
-  if (!(opt & PC_POSIX))
-    normalized_path_size = 0;
-  else
+  if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
@@ -1111,10 +1110,15 @@ out:
 
 path_conv::~path_conv ()
 {
-  if (!normalized_path_size && normalized_path)
+  if (normalized_path)
     {
       cfree (normalized_path);
       normalized_path = NULL;
+    }
+  if (path)
+    {
+      cfree (path);
+      path = NULL;
     }
   if (wide_path)
     {

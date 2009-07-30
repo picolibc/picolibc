@@ -87,6 +87,14 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
   return ext;
 }
 
+inline void
+path_conv::set_path (const char *p)
+{
+  if (path)
+    cfree (path);
+  path = cstrdup (p);
+}
+
 /* Find an executable name, possibly by appending known executable
    suffixes to it.  The win32-translated name is placed in 'buf'.
    Any found suffix is returned in known_suffix.

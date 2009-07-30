@@ -1,3 +1,18 @@
+2009-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (class path_conv): Convert path from char array to char *.
+	Initialize to NULL in constructors.  Drop normalized_path_size member.
+	(path_conv::size): Remove.
+	(path_conv::operator =): Always copy with sizeof path_conv.  Always
+	duplicate path on cygheap.
+	(path_conv::set_path): Move implementation to spawn.cc.
+	* path.cc (path_conv::set_normalized_path): Always allocate
+	normalized_path on cygheap.
+	(path_conv::check): Don't work on path, rather allocate THIS_path in
+	TLS and use it throughout.  When finished, allocate path on cygheap
+	and copy over.  Defer tacking on extension after having copied path.
+	* spawn.cc (path_conv::set_path): Implement here.
+
 2009-07-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.h (enum fs_info_type): New type.

@@ -83,6 +83,8 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
+extern "C" char *__stdcall cstrdup (const char *s);
+
 class symlink_info;
 
 class path_conv
@@ -163,40 +165,36 @@ class path_conv
 
   path_conv (const device& in_dev)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
-    known_suffix (NULL), error (0), dev (in_dev), normalized_path (NULL),
-    normalized_path_size (0)
+    known_suffix (NULL), error (0), dev (in_dev), normalized_path (NULL)
   {
-    strcpy (path, in_dev.native);
+    path = cstrdup (in_dev.native);
   }
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
+  : wide_path (NULL), normalized_path (NULL), path (NULL)
   {
     check (src, opt, suffixes);
   }
 
   path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
+  : wide_path (NULL), normalized_path (NULL), path (NULL)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), normalized_path_size (0)
+  : wide_path (NULL), normalized_path (NULL), path (NULL)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv ()
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
-    known_suffix (NULL), error (0), normalized_path (NULL),
-    normalized_path_size (0)
-  {
-    path[0] = '\0';
-  }
+    known_suffix (NULL), error (0), normalized_path (NULL), path (NULL)
+  {}
 
   ~path_conv ();
   inline char *get_win32 () { return path; }
@@ -214,7 +212,8 @@ class path_conv
   operator int () {return fileattr; }
   path_conv &operator =(path_conv &pc)
   {
-    memcpy (this, &pc, pc.size ());
+    memcpy (this, &pc, sizeof pc);
+    path = cstrdup (pc.path);
     set_normalized_path (pc.normalized_path);
     wide_path = NULL;
     return *this;
@@ -233,22 +232,17 @@ class path_conv
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
   bool fs_is_mvfs () const {return fs.is_mvfs ();}
   ULONG fs_serial_number () const {return fs.serial_number ();}
-  void set_path (const char *p) {strcpy (path, p);}
+  inline void set_path (const char *p);
   void fillin (HANDLE h);
-  inline size_t size ()
-  {
-    return (sizeof (*this) - sizeof (path)) + strlen (path) + 1 + normalized_path_size;
-  }
   bool is_binary ();
 
   unsigned __stdcall ndisk_links (DWORD);
   char *normalized_path;
-  size_t normalized_path_size;
   void set_normalized_path (const char *) __attribute__ ((regparm (2)));
   DWORD get_symlink_length () { return symlink_length; };
  private:
   DWORD symlink_length;
-  char path[NT_MAX_PATH];
+  char *path;
 };
 
 /* Symlink marker */
