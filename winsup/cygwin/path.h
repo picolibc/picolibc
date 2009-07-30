@@ -83,7 +83,7 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
-extern "C" char *__stdcall cstrdup (const char *s);
+extern "C" char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
 
 class symlink_info;
 
