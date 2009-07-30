@@ -993,8 +993,17 @@ cygwin_dll_init ()
 extern "C" void
 __main (void)
 {
+  /* Ordering is critical here.  DLL ctors have already been
+     run as they were being loaded, so we should stack the 
+     queued call to DLL dtors now.  */
+  atexit (dll_global_dtors);
   do_global_ctors (user_data->ctors, false);
+  /* Now we have run global ctors, register their dtors.  */
   atexit (do_global_dtors);
+  /* At exit, global dtors will run first, so the app can still
+     use shared library functions while terminating; then the
+     DLLs will be destroyed; finally newlib will shut down stdio
+     and terminate itself.  */
 }
 
 void __stdcall
@@ -1012,12 +1021,6 @@ do_exit (int status)
 #endif
 
   lock_process until_exit (true);
-
-  if (exit_state < ES_GLOBAL_DTORS)
-    {
-      exit_state = ES_GLOBAL_DTORS;
-      dll_global_dtors ();
-    }
 
   if (exit_state < ES_EVENTS_TERMINATE)
     {

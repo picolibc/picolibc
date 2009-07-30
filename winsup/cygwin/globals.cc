@@ -30,7 +30,6 @@ enum exit_states
   {
     ES_NOT_EXITING = 0,
     ES_PROCESS_LOCKED,
-    ES_GLOBAL_DTORS,
     ES_EVENTS_TERMINATE,
     ES_THREADTERM,
     ES_SIGNAL,
