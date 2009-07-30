@@ -2,7 +2,7 @@
 
 	Correct disposition of wchar_t output in printf().
 
-	mingwex/stdio/pformat.c (__pformat) [%C]: Create new instance of...
+	* mingwex/stdio/pformat.c (__pformat) [%C]: Create new instance of...
 	(argval): ...this, in inner scope, with singular type `wchar_t'; use
 	it to pass one wchar to __pformat_wputchars(), for output.
 
