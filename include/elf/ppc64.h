@@ -140,7 +140,14 @@ START_RELOC_NUMBERS (elf_ppc64_reloc_type)
   RELOC_NUMBER (R_PPC64_TLSLD,		   108)
 
 /* Support STT_GNU_IFUNC plt calls.  */
+  RELOC_NUMBER (R_PPC64_JMP_IREL,	   247)
   RELOC_NUMBER (R_PPC64_IRELATIVE,	   248)
+
+/* These are GNU extensions used in PIC code sequences.  */
+  RELOC_NUMBER (R_PPC64_REL16,		   249)
+  RELOC_NUMBER (R_PPC64_REL16_LO,	   250)
+  RELOC_NUMBER (R_PPC64_REL16_HI,	   251)
+  RELOC_NUMBER (R_PPC64_REL16_HA,	   252)
 
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_PPC64_GNU_VTINHERIT,	   253)
