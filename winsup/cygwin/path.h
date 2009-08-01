@@ -232,7 +232,7 @@ class path_conv
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
   bool fs_is_mvfs () const {return fs.is_mvfs ();}
   ULONG fs_serial_number () const {return fs.serial_number ();}
-  inline void set_path (const char *p);
+  inline char *set_path (const char *p);
   void fillin (HANDLE h);
   bool is_binary ();
 

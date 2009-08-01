@@ -87,12 +87,12 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
   return ext;
 }
 
-inline void
+inline char *
 path_conv::set_path (const char *p)
 {
   if (path)
     cfree (path);
-  path = cstrdup (p);
+  return path = cstrdup (p);
 }
 
 /* Find an executable name, possibly by appending known executable
@@ -210,7 +210,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
  out:
   if (posix)
-    buf.set_path (posix);
+    retval = buf.set_path (posix);
   debug_printf ("%s = find_exec (%s)", (char *) buf.get_win32 (), name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf.get_win32 (), '\0');
@@ -402,7 +402,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       one_line.add (argv[1]);
       one_line.add (" ");
       one_line.add (argv[2]);
-      strcpy (real_path.get_win32 (), argv[0]);
+      real_path.set_path (argv[0]);
       null_app_name = true;
     }
   else

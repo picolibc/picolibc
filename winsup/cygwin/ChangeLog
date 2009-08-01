@@ -1,3 +1,9 @@
+2009-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.h (path_conv::set_path): Change return value.
+	* spawn.cc (path_conv::set_path): Return newly set value.
+	(find_exec): Set retval to newly set value when calling set_path.
+
 2009-07-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* spawn.cc (find_exec): Fix one more path where retval was not set.
