@@ -151,7 +151,7 @@ _csbrk (int sbs)
   return prebrk;
 }
 
-extern "C" void __stdcall
+void __stdcall
 cygheap_init ()
 {
   cygheap_protect.init ("cygheap_protect");

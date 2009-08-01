@@ -1,5 +1,34 @@
 2009-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygheap_malloc.h: New file.
+	* cygheap.h: Remove stuff now included in cygheap_malloc.h and include
+	that file.  Make cygheap_init a standard c++ function.  Remove unneeded
+	child_info declaration.
+	* path.h: Include cygheap_malloc.h. Remove extra cstrdup declaration.
+	(path_conv): Reorganize to group variables together.
+	(path_conv::path): Make const char *.
+	(path_conv::known_suffix): Ditto.
+	(path_conv::normalized_path): Ditto.
+	(path_conv::path_conv): Reorganize initializers to reflect new element
+	ordering.
+	(path_conv::get_win32): Change return value to const char *.
+	(path_conv::set_path): Move back here from spawn.cc.
+	(parh_conv::modifiable_path): New function.
+	* path.cc (path_conv::add_ext_from_sym): Accommodate const'ness of
+	known_suffixes.
+	(path_conv::set_normalized_path): Ditto for normalized_path.
+	(path_conv::check): Use modifiable_path whereever we need to modify the
+	path element.  Use set_path to set the path.
+	(path_conv::~path_conv): Accommodate new const'ness.
+	* spawn.cc (perhaps_suffix): Declare ext as const since that's what is
+	being returned.
+	(path_conv::set_path): Move back to path.h.
+	* winf.f (linebuf): Perform minor cleanup.
+	(linebuf::fromargv): Change second parameter to const.
+	* winf.cc (linebuf::fromargv): Ditto.
+
+2009-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* path.h (path_conv::set_path): Change return value.
 	* spawn.cc (path_conv::set_path): Return newly set value.
 	(find_exec): Set retval to newly set value when calling set_path.

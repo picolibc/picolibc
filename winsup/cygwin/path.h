@@ -11,6 +11,7 @@ details. */
 
 #include "devices.h"
 #include "mount.h"
+#include "cygheap_malloc.h"
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -83,8 +84,6 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
-extern "C" char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
-
 class symlink_info;
 
 class path_conv
@@ -95,10 +94,12 @@ class path_conv
   PWCHAR wide_path;
   UNICODE_STRING uni_path;
   void add_ext_from_sym (symlink_info&);
+  DWORD symlink_length;
+  const char *path;
  public:
-
   unsigned path_flags;
-  char *known_suffix;
+  const char *known_suffix;
+  const char *normalized_path;
   int error;
   device dev;
 
@@ -165,39 +166,39 @@ class path_conv
 
   path_conv (const device& in_dev)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
-    known_suffix (NULL), error (0), dev (in_dev), normalized_path (NULL)
+    known_suffix (NULL), normalized_path (NULL), error (0), dev (in_dev)
   {
     path = cstrdup (in_dev.native);
   }
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), path (NULL)
+  : wide_path (NULL), path (NULL), normalized_path (NULL)
   {
     check (src, opt, suffixes);
   }
 
   path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), path (NULL)
+  : wide_path (NULL), path (NULL), normalized_path (NULL)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), normalized_path (NULL), path (NULL)
+  : wide_path (NULL), path (NULL), normalized_path (NULL)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv ()
-  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
-    known_suffix (NULL), error (0), normalized_path (NULL), path (NULL)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
+    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
   {}
 
   ~path_conv ();
-  inline char *get_win32 () { return path; }
+  inline const char *get_win32 () { return path; }
   PUNICODE_STRING get_nt_native_path ();
   POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
 				      SECURITY_ATTRIBUTES &sa);
@@ -232,17 +233,22 @@ class path_conv
   bool fs_is_cdrom () const {return fs.is_cdrom ();}
   bool fs_is_mvfs () const {return fs.is_mvfs ();}
   ULONG fs_serial_number () const {return fs.serial_number ();}
-  inline char *set_path (const char *p);
+  inline const char *set_path (const char *p)
+  {
+    if (path)
+      cfree (modifiable_path ());
+    char *new_path = (char *) cmalloc_abort (HEAP_STR, strlen (p) + 7);
+    strcpy (new_path, p);
+    return path = new_path;
+  }
   void fillin (HANDLE h);
   bool is_binary ();
 
   unsigned __stdcall ndisk_links (DWORD);
-  char *normalized_path;
   void set_normalized_path (const char *) __attribute__ ((regparm (2)));
   DWORD get_symlink_length () { return symlink_length; };
  private:
-  DWORD symlink_length;
-  char *path;
+  char *modifiable_path () {return (char *) path;}
 };
 
 /* Symlink marker */

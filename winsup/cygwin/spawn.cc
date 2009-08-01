@@ -61,7 +61,7 @@ child_info_spawn *chExeced;
 static const char *
 perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 {
-  char *ext;
+  const char *ext;
 
   err = 0;
   debug_printf ("prog '%s'", prog);
@@ -85,14 +85,6 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 
   debug_printf ("buf %s, suffix found '%s'", (char *) buf.get_win32 (), ext);
   return ext;
-}
-
-inline char *
-path_conv::set_path (const char *p)
-{
-  if (path)
-    cfree (path);
-  return path = cstrdup (p);
 }
 
 /* Find an executable name, possibly by appending known executable

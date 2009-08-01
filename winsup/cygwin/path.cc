@@ -328,11 +328,13 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     {
       known_suffix = path + sym.extn;
       if (sym.ext_tacked_on)
-	strcpy (known_suffix, sym.ext_here);
+	strcpy ((char *) known_suffix, sym.ext_here);
     }
 }
 
-static void __stdcall mkrelpath (char *dst, bool caseinsensitive) __attribute__ ((regparm (2)));
+static void __stdcall mkrelpath (char *dst, bool caseinsensitive)
+  __attribute__ ((regparm (2)));
+
 static void __stdcall
 mkrelpath (char *path, bool caseinsensitive)
 {
@@ -379,9 +381,8 @@ path_conv::set_normalized_path (const char *path_copy)
   if (path_copy)
     {
       size_t n = strlen (path_copy) + 1;
-
-      normalized_path = (char *) cmalloc_abort (HEAP_STR, n);
-      memcpy (normalized_path, path_copy, n);
+      char *p = (char *) cmalloc_abort (HEAP_STR, n);
+      normalized_path = (const char *) memcpy (p, path_copy, n);
     }
 }
 
@@ -653,13 +654,17 @@ path_conv::check (const char *src, unsigned opt,
     cfree (wide_path);
   wide_path = NULL;
   if (path)
-    cfree (path);
-  path = NULL;
+    {
+      cfree (modifiable_path ());
+      path = NULL;
+    }
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
   if (normalized_path)
-    cfree (normalized_path);
-  normalized_path = NULL;
+    {
+      cfree ((void *) normalized_path);
+      normalized_path = NULL;
+    }
   int component = 0;		// Number of translated components
 
   if (!(opt & PC_NULLEMPTY))
@@ -993,8 +998,7 @@ virtual_component_retry:
     add_ext = true;
 
 out:
-  this->path = (char *) cmalloc_abort (HEAP_STR, strlen (THIS_path) + 7);
-  stpcpy (this->path, THIS_path);
+  set_path (THIS_path);
   if (add_ext)
     add_ext_from_sym (sym);
   if (dev.devn == FH_NETDRIVE && component)
@@ -1014,7 +1018,7 @@ out:
   else if (!need_directory || error)
     /* nothing to do */;
   else if (fileattr == INVALID_FILE_ATTRIBUTES)
-    strcat (path, "\\"); /* Reattach trailing dirsep in native path. */
+    strcat (modifiable_path (), "\\"); /* Reattach trailing dirsep in native path. */
   else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
     path_flags &= ~PATH_SYMLINK;
   else
@@ -1067,7 +1071,7 @@ out:
     {
       if (is_relpath)
 	{
-	  mkrelpath (this->path, !!caseinsensitive);
+	  mkrelpath (this->modifiable_path (), !!caseinsensitive);
 	  /* Invalidate wide_path so that wide relpath can be created
 	     in later calls to get_nt_native_path or get_wide_win32_path. */
 	  if (wide_path)
@@ -1081,8 +1085,8 @@ out:
 	  if (this->path[n - 1] != '\\' &&
 	      (strncmp (this->path, "\\\\.\\", 4) != 0))
 	    {
-	      this->path[n] = '\\';
-	      this->path[n + 1] = '\0';
+	      this->modifiable_path ()[n] = '\\';
+	      this->modifiable_path ()[n + 1] = '\0';
 	    }
 	}
     }
@@ -1112,12 +1116,12 @@ path_conv::~path_conv ()
 {
   if (normalized_path)
     {
-      cfree (normalized_path);
+      cfree ((void *) normalized_path);
       normalized_path = NULL;
     }
   if (path)
     {
-      cfree (path);
+      cfree (modifiable_path ());
       path = NULL;
     }
   if (wide_path)

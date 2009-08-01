@@ -78,11 +78,11 @@ class linebuf
   size_t alloced;
   linebuf () : ix (0), buf (NULL), alloced (0) {}
   ~linebuf () {if (buf) free (buf);}
-  void add (const char *what, int len) __attribute__ ((regparm (3)));
+  void add (const char *, int) __attribute__ ((regparm (3)));
   void add (const char *what) {add (what, strlen (what));}
-  void prepend (const char *what, int len);
+  void prepend (const char *, int);
   void finish (bool) __attribute__ ((regparm (2)));
-  bool fromargv(av&, char *, bool) __attribute__ ((regparm (3)));;
+  bool fromargv(av&, const char *, bool) __attribute__ ((regparm (3)));;
   operator char *() {return buf;}
 };
 

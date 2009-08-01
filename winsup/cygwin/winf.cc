@@ -65,7 +65,7 @@ linebuf::prepend (const char *what, int len)
 }
 
 bool
-linebuf::fromargv (av& newargv, char *real_path, bool cmdlenoverflow_ok)
+linebuf::fromargv (av& newargv, const char *real_path, bool cmdlenoverflow_ok)
 {
   bool success = true;
   for (int i = 0; i < newargv.argc; i++)
