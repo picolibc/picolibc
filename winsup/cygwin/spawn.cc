@@ -188,6 +188,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 	      *eotmp++ = '/';
 	      strcpy (eotmp, name);
 	    }
+	  retval = buf.get_win32 ();
 	  goto out;
 	}
     }
