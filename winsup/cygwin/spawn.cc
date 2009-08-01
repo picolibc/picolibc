@@ -109,7 +109,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 {
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
-  const char *retval = buf.get_win32 ();
+  const char *retval;
   tmp_pathbuf tp;
   char *tmp = tp.c_get ();
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
@@ -129,6 +129,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 	  strcpy (tmp + 2, name);
 	  posix = tmp;
 	}
+      retval = buf.get_win32 ();
       goto out;
     }
 
@@ -198,10 +199,13 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
      Take the appropriate action based on null_if_not_found. */
   if (opt & FE_NNF)
     retval = NULL;
-  else if (opt & FE_NATIVE)
-    buf.check (name);
-  else
+  else if (!(opt & FE_NATIVE))
     retval = name;
+  else
+    {
+      buf.check (name);
+      retval = buf.get_win32 ();
+    }
 
  out:
   if (posix)

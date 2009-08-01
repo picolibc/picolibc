@@ -1,3 +1,8 @@
+2009-07-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* spawn.cc (find_exec): Stop relying on the ability to set retval to a
+	fixed path_conv buffer and set it on the fly instead.
+
 2009-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (cstrdup): Fix declaration.
