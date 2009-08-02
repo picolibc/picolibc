@@ -220,7 +220,7 @@ tcsetpgrp (int fd, pid_t pgid)
   else
     res = cfd->tcsetpgrp (pgid);
 
-  termios_printf ("%d = tcsetpgrp (%d, %x)", res, fd, pgid);
+  termios_printf ("%d = tcsetpgrp (%d, %d)", res, fd, pgid);
   return res;
 }
 

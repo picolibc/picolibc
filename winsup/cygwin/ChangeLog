@@ -1,3 +1,9 @@
+2009-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.cc (stopped_or_terminated): Don't return a match when stopsig
+	== SIGCONT and not WCONTINUED.
+	* termios.cc (tcsetpgrp): Improve debugging output.
+
 2009-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap_malloc.h: New file.
