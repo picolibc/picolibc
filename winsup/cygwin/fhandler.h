@@ -759,7 +759,7 @@ class fhandler_cygdrive: public fhandler_disk_file
   };
   int ndrives;
   const char *pdrive;
-  char pdrive_buf[2 * 26 * DRVSZ];
+  char pdrive_buf[1 + (2 * 26 * DRVSZ)];
   void set_drives ();
  public:
   fhandler_cygdrive ();

@@ -1,5 +1,9 @@
 2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (pdrive_buf): Defensively allocate one extra byte.
+
+2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_cygdrive:DRVSZ): New enum.
 	(pdrive_buf): New place to hold information about cygdrive.
 	* fhandler_disk_file.cc (fhandler_cygdrive::set_drives): Store drive
