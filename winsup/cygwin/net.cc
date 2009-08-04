@@ -507,8 +507,8 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 
      (*) Maximum normal TCP window size.  Coincidence?  */
 
-  ((fhandler_socket *) fd)->rmem () = 65536;
-  ((fhandler_socket *) fd)->wmem () = 65536;
+  ((fhandler_socket *) fd)->rmem () = 65535;
+  ((fhandler_socket *) fd)->wmem () = 65535;
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
     debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());

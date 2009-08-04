@@ -1,5 +1,15 @@
 2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler_socket.cc (fhandler_socket::send_internal): Just use wmem
+	size if the length exceeds it.
+	* net.cc (fdsock): Use 65535 as window size, just like the comment
+	says or we run into problems with DuplicateHandle.
+
+	* path.cc (patch_conv::check): Use set_path to set invalid filename.
+	* path.h (path_conv::path_conv): Ditto.
+
+2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (pdrive_buf): Defensively allocate one extra byte.
 
 2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>

@@ -1499,7 +1499,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	  buf.len = wsamsg->lpBuffers[i].len - off;
 	  /* See net.cc:fdsock() and MSDN KB 823764 */
 	  if (buf.len >= (unsigned) wmem ())
-	    buf.len = (unsigned) wmem () - 1;
+	    buf.len = (unsigned) wmem ();
 	}
 
       do

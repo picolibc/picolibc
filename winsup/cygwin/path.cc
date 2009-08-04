@@ -968,7 +968,7 @@ virtual_component_retry:
 	{
 	too_long:
 	  error = ENAMETOOLONG;
-	  this->path = cstrdup ("::ENAMETOOLONG::");
+	  set_path ("::ENAMETOOLONG::");
 	  return;
 	}
 
