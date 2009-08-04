@@ -89,7 +89,7 @@ __cxa_guard_release ()
 /* These routines are made available as last-resort fallbacks
    for the application.  Should not be used in practice.  */
 
-struct per_process_cxx_malloc default_cygwin_cxx_malloc = 
+struct per_process_cxx_malloc default_cygwin_cxx_malloc =
 {
   &(operator new),
   &(operator new[]),

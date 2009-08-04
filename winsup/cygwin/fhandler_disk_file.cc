@@ -2123,14 +2123,11 @@ fhandler_cygdrive::close ()
   return 0;
 }
 
-#define DRVSZ sizeof ("x:\\")
 void
 fhandler_cygdrive::set_drives ()
 {
-  const int len = 2 + 26 * DRVSZ;
-  char *p = const_cast<char *> (get_win32_name ());
-  pdrive = p;
-  ndrives = GetLogicalDriveStrings (len, p) / DRVSZ;
+  pdrive = pdrive_buf;
+  ndrives = GetLogicalDriveStrings (sizeof pdrive_buf, pdrive_buf) / DRVSZ;
 }
 
 int
@@ -2146,7 +2143,7 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
   for (const char *p = pdrive; p && *p; p = strchr (p, '\0') + 1)
     if (is_floppy ((flptst[0] = *p, flptst))
 	|| GetFileAttributes (p) == INVALID_FILE_ATTRIBUTES)
-      --n;
+      n--;
   buf->st_nlink = n + 2;
   return 0;
 }
@@ -2198,13 +2195,13 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 void
 fhandler_cygdrive::rewinddir (DIR *dir)
 {
-  pdrive = get_win32_name ();
+  pdrive = pdrive_buf;
   dir->__d_position = 0;
 }
 
 int
 fhandler_cygdrive::closedir (DIR *dir)
 {
-  pdrive = get_win32_name ();
+  pdrive = pdrive_buf;
   return 0;
 }

@@ -211,7 +211,7 @@ class path_conv
   PWCHAR get_wide_win32_path (PWCHAR wc);
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
-  path_conv &operator =(path_conv &pc)
+  path_conv &operator =(path_conv& pc)
   {
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);

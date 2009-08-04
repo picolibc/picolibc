@@ -994,7 +994,7 @@ extern "C" void
 __main (void)
 {
   /* Ordering is critical here.  DLL ctors have already been
-     run as they were being loaded, so we should stack the 
+     run as they were being loaded, so we should stack the
      queued call to DLL dtors now.  */
   atexit (dll_global_dtors);
   do_global_ctors (user_data->ctors, false);

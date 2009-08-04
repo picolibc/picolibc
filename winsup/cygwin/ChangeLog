@@ -1,3 +1,16 @@
+2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_cygdrive:DRVSZ): New enum.
+	(pdrive_buf): New place to hold information about cygdrive.
+	* fhandler_disk_file.cc (fhandler_cygdrive::set_drives): Store drive
+	info in pdrive_buf since get_win32_name() could now be too small to
+	hold everything.
+	(fhandler_cygdrive::rewinddir): Reset pdrive to pdrive_buf.
+	(fhandler_cygdrive::closedir): Ditto.
+	* pipe.cc (fhandler_pipe::init): Be more defensive when referencing
+	get_win32_name().  Rework logic which made a copy of the POSIX path and
+	then never used it.
+
 2009-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (stopped_or_terminated): Don't return a match when stopsig

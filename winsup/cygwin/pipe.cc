@@ -32,13 +32,15 @@ fhandler_pipe::fhandler_pipe ()
 int
 fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
 {
-  // FIXME: Have to clean this up someday
-  if (!*get_win32_name () && get_name ())
+  /* FIXME: Have to clean this up someday
+     FIXME: Do we have to check for both !get_win32_name() and
+     !*get_win32_name()? */
+  if ((!get_win32_name () || !*get_win32_name ()) && get_name ())
     {
+      char *d;
+      const char *s;
       char *hold_normalized_name = (char *) alloca (strlen (get_name ()) + 1);
-      strcpy (hold_normalized_name, get_name ());
-      char *s, *d;
-      for (s = hold_normalized_name, d = (char *) get_win32_name (); *s; s++, d++)
+      for (s = get_name (), d = hold_normalized_name; *s; s++, d++)
 	if (*s == '/')
 	  *d = '\\';
 	else

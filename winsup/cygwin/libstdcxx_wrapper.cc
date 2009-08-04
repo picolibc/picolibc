@@ -76,13 +76,13 @@ operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
   return (*user_data->cxx_malloc->oper_new___nt) (sz, nt);
 }
 
-extern void 
+extern void
 operator delete(void *p, const std::nothrow_t &nt) throw()
 {
   (*user_data->cxx_malloc->oper_delete_nt) (p, nt);
 }
 
-extern void 
+extern void
 operator delete[](void *p, const std::nothrow_t &nt) throw()
 {
   (*user_data->cxx_malloc->oper_delete___nt) (p, nt);
