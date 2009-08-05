@@ -631,8 +631,8 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
-  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p",
-		newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
+  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p, new win32_name %p, old win32_name %p",
+		newfh->get_io_handle (), fds[oldfd]->get_io_handle (), newfh->get_win32_name (), fds[oldfd]->get_win32_name ());
 
   if (!not_open (newfd))
     close (newfd);

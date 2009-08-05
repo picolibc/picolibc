@@ -230,7 +230,6 @@ public:
 struct cygheap_debug
 {
   handle_list starth;
-  handle_list *endh;
   handle_list freeh[500];
 };
 #endif

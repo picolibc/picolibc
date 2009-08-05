@@ -1,3 +1,22 @@
+2009-08-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.h (cygheap_debug::endh): Delete.
+	* debug.cc (lock_debug::acquired): Delete.
+	(lock_debug::lock_debug): Simplify.
+	(lock_debug::unlock): Ditto.
+	(find_handle): Don't set endh here.
+	(add_handle): Add new handle to beginning of the list rather than
+	trying to maintain an end list pointer.
+	(delete_handle): Minor optimization.
+	(mark_closed): Make logic clearer.
+	(verify_handle): Lock handle list before scanning.
+	(setclexec): Ditto.
+	(modify_handle): Ditto.
+	(newh): Don't lock handle list here.  Assume caller did this.
+	(mark_closed): Ditto.
+	(close_handle): Remove unneeded #if.
+	* dtable.cc (dtable::dup2): Tweak debug output.
+
 2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (patch_conv::check): Zero path before setting it.
