@@ -165,8 +165,9 @@ class path_conv
 	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
 
   path_conv (const device& in_dev)
-  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path_flags (0),
-    known_suffix (NULL), normalized_path (NULL), error (0), dev (in_dev)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
+    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0),
+    dev (in_dev)
   {
     set_path (in_dev.native);
   }

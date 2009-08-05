@@ -1,5 +1,9 @@
 2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* path.cc (patch_conv::check): Zero path before setting it.
+
+2009-08-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler_socket.cc (fhandler_socket::send_internal): Just use wmem
 	size if the length exceeds it.
 	* net.cc (fdsock): Use 65535 as window size, just like the comment
