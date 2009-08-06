@@ -4458,20 +4458,27 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   if (!getnameinfo)
     return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
 
-  /* When the incoming port number is set to 0, Winsock's getnameinfo
-     returns with error WSANO_DATA instead of simply ignoring the port.
-     To avoid this strange behaviour, we check manually, if the port number
-     is 0.  If so, set the NI_NUMERICSERV flag to avoid this problem. */
-  switch (sa->sa_family)
+  /* When the incoming port number does not resolve to a well-known service,
+     Winsock's getnameinfo up to Windows 2003 returns with error WSANO_DATA
+     instead of setting `serv' to the numeric port number string, as required
+     by RFC 3493.  This is fixed on Vista and later.  To avoid the error on
+     systems up to Windows 2003, we check if the port number resolves
+     to a well-known service.  If not, we set the NI_NUMERICSERV flag. */
+  if (!wincap.supports_all_posix_ai_flags ())
     {
-    case AF_INET:
-      if (((struct sockaddr_in *) sa)->sin_port == 0)
+      int port = 0;
+
+      switch (sa->sa_family)
+	{
+	case AF_INET:
+	  port = ((struct sockaddr_in *) sa)->sin_port;
+	  break;
+	case AF_INET6:
+	  port = ((struct sockaddr_in6 *) sa)->sin6_port;
+	  break;
+	}
+      if (!port || !getservbyport (port, flags & NI_DGRAM ? "udp" : "tcp"))
 	flags |= NI_NUMERICSERV;
-      break;
-    case AF_INET6:
-      if (((struct sockaddr_in6 *) sa)->sin6_port == 0)
-	flags |= NI_NUMERICSERV;
-      break;
     }
   int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
 					 servlen, flags));

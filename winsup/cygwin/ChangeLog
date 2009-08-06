@@ -1,3 +1,9 @@
+2009-08-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getnameinfo): Force setting NI_NUMERICSERV only
+	on Windows 2003 and earlier, only if the port number doesn't
+	resolve to a well-known service.  Change comment accordingly.
+
 2009-08-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.h (cygheap_debug::endh): Delete.
