@@ -241,6 +241,8 @@
 #define EM_L1OM		180	/* Intel L1OM */
 #define EM_INTEL181	181	/* Reserved by Intel */
 #define EM_INTEL182	182	/* Reserved by Intel */
+#define EM_MICROBLAZE   183     /* Xilinx MicroBlaze */
+
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -343,6 +345,8 @@
 
 /* Old Sunplus S+core7 backend magic number. Written in the absence of an ABI.  */
 #define EM_SCORE_OLD            95
+
+#define EM_MICROBLAZE_OLD	0xbaab	/* Old MicroBlaze */
 
 /* See the above comment before you add a new EM_* value here.  */
 

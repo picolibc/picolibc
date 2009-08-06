@@ -1,3 +1,7 @@
+2009-08-06  Michael Eager <eager@eagercon.com>
+
+	* dis-asm.h: Decl print_insn_microblaze().
+
 2009-07-24  Ian Lance Taylor  <iant@google.com>
 
 	* libiberty.h (crc32): Declare.
