@@ -360,26 +360,20 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
 				    possible for some versions of handles */
-      /* FIXME: Workaround Windows 7 64 bit issue.  If the parent process of
+      /* FIXME: Workaround Windows 7 issue.  If the parent process of
 	 the process tree closes the original handles to the console window,
 	 strange problems occur when starting child processes later on if
-	 stdio redirection is used.  How to reproduce:
+	 stdio redirection is used.
 
-	   shell script foo:
-
-	     exec 2>foo.log
-	     FOO=$( uname -n | cat )
-	     echo $FOO
-
-	 start from cmd with `bash foo'.  The result is that the cat process
-	 will be started but dies before Cygwin strace output can be generated
-	 and $FOO stays empty.  The strace output shows that bash tries
-	 multiple times to start cat, but none of the invocations of cat will
-	 ever show up in the strace output.
-
-	 Remove the `exec 2>' or remove the cat call and the script will work.
-	 Start bash interactively, then start the script manually, and the
-	 script will work.
+	 CV 2009-08-08:  It looks like this problem has been fixed only
+	 half-heartedly in RTM.  Unfortunately the new implementation
+	 has still a problem which now also occurs on the 32 bit release
+	 of Windows 7.  It's still not quite clear what happens but it's
+	 easily reproducible.  Just start X via the start menu entry.
+	 This opens an xterm window with a shell.  Exit from the shell,
+	 and you get a Windows error box reporting a crash in the
+	 Console Window Host application (conhost.exe) due to an access
+	 violation.
 
 	 This needs further investigation but the workaround not to close
 	 the handles will have a marginal hit of three extra handles per

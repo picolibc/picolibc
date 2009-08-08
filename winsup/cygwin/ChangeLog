@@ -1,3 +1,10 @@
+2009-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Fix comment to
+	document change in the Windows 7 workaround.
+	* wincap.cc (wincapc::init): Don't set has_console_handle_problem
+	to false on 32 bit systems.
+
 2009-08-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getnameinfo): Force setting NI_NUMERICSERV only
