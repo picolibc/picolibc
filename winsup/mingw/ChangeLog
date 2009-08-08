@@ -1,3 +1,13 @@
+2009-08-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (__fpclassifyl, __isnan, __isnanf, isnanl, __signbit,
+	__signbitf, __signbitl, sinhf, tanhf, expf, frexpf, ldexpf, hypotf, powf,
+	__fp_unordered_compare): Add prototypes.
+	* include/stdio.h (vsnwprintf): Add prototype.
+	* include/wchar.h (vsnwprintf): Add prototype.
+	* include/stdlib.h (_Exit): Protect inline definition with !__STRICT_ANSI__.
+	* include/unistd.h (ftruncate): Move prototype out of __NO_INLINE__ guard.
+
 2009-07-29  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Correct disposition of wchar_t output in printf().

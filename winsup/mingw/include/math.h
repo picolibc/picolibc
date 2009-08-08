@@ -353,6 +353,7 @@ typedef long double double_t;
 
 extern int __cdecl __fpclassifyf (float);
 extern int __cdecl __fpclassify (double);
+extern int __cdecl __fpclassifyl (long double);
 
 #ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __fpclassifyl (long double x){
@@ -375,6 +376,9 @@ __CRT_INLINE int __cdecl __fpclassifyl (long double x){
 /* 7.12.3.4 */
 /* We don't need to worry about truncation here:
    A NaN stays a NaN. */
+extern int __cdecl __isnan (double);
+extern int __cdecl __isnanf (float);
+extern int __cdecl __isnanl (long double);
 #ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __isnan (double _x)
 {
@@ -412,6 +416,9 @@ __CRT_INLINE int __cdecl __isnanl (long double _x)
 #define isnormal(x) (fpclassify(x) == FP_NORMAL)
 
 /* 7.12.3.6 The signbit macro */
+extern int __cdecl __signbit (double);
+extern int __cdecl __signbitf (float);
+extern int __cdecl __signbitl (long double);
 #ifndef __NO_INLINE__
 __CRT_INLINE int __cdecl __signbit (double x) {
   unsigned short stw;
@@ -459,18 +466,21 @@ extern float __cdecl atan2f (float, float);
 extern long double __cdecl atan2l (long double, long double);
 
 /* 7.12.5 Hyperbolic functions: Double in C89  */
+extern float __cdecl sinhf (float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl sinhf (float x)
   {return (float) sinh (x);}
 #endif
 extern long double __cdecl sinhl (long double);
 
+extern float __cdecl coshf (float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl coshf (float x)
   {return (float) cosh (x);}
 #endif
 extern long double __cdecl coshl (long double);
 
+extern float __cdecl tanhf (float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl tanhf (float x)
   {return (float) tanh (x);}
@@ -495,6 +505,7 @@ extern long double __cdecl atanhl (long double);
 
 /* Exponentials and logarithms  */
 /* 7.12.6.1 Double in C89 */
+extern float __cdecl expf (float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl expf (float x)
   {return (float) exp (x);}
@@ -513,6 +524,7 @@ extern float __cdecl expm1f(float);
 extern long double __cdecl expm1l(long double);
 
 /* 7.12.6.4 Double in C89 */
+extern float __cdecl frexpf (float, int*);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl frexpf (float x, int* expn)
   {return (float) frexp (x, expn);}
@@ -527,6 +539,7 @@ extern int __cdecl ilogbf (float);
 extern int __cdecl ilogbl (long double);
 
 /* 7.12.6.6  Double in C89 */
+extern float __cdecl ldexpf (float, int);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl ldexpf (float x, int expn)
   {return (float) ldexp (x, expn);}
@@ -611,6 +624,7 @@ extern long double __cdecl fabsl (long double x);
 
 /* 7.12.7.3  */
 extern double __cdecl hypot (double, double); /* in libmoldname.a */
+extern float __cdecl hypotf (float, float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl hypotf (float x, float y)
   { return (float) hypot (x, y);}
@@ -618,6 +632,7 @@ __CRT_INLINE float __cdecl hypotf (float x, float y)
 extern long double __cdecl hypotl (long double, long double);
 
 /* 7.12.7.4 The pow functions. Double in C89 */
+extern float __cdecl powf (float, float);
 #ifndef __NO_INLINE__
 __CRT_INLINE float __cdecl powf (float x, float y)
   {return (float) pow (x, y);}
@@ -860,6 +875,7 @@ extern long double __cdecl fmal (long double, long double, long double);
 
 #else
 /*  helper  */
+extern int  __cdecl __fp_unordered_compare (long double, long double);
 #ifndef __NO_INLINE__
 __CRT_INLINE int  __cdecl
 __fp_unordered_compare (long double x, long double y){

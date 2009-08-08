@@ -503,7 +503,7 @@ _CRTIMP char* __cdecl __MINGW_NOTHROW	gcvt (double, int, char*);
 
 /* C99 name for _exit */
 void __cdecl __MINGW_NOTHROW _Exit(int) __MINGW_ATTRIB_NORETURN;
-#ifndef __NO_INLINE__
+#if !defined __NO_INLINE__ && !defined __STRICT_ANSI__
 __CRT_INLINE void __cdecl __MINGW_NOTHROW _Exit(int __status)
 	{  _exit (__status); }
 #endif 
