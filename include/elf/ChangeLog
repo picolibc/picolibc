@@ -1,3 +1,8 @@
+2009-08-09  Michael Eager <eager@eagercon.com>
+
+	* elf/common.h: Define EM_resnnn reserved values. Add EM_AVR32,
+	EM_STM8, EM_TILE64, EM_TILEPRO.  Change EM_MICROBLAZE. 
+
 2009-08-06  Michael Eager <eager@eagercon.com>
 
 	* elf/common.h: Define EM_MICROBLAZE & EM_MICROBLAZE_OLD.
