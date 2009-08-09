@@ -109,8 +109,6 @@ do_mount (const char *dev, const char *where, int flags)
 
   if (mount (dev, where, flags))
     error (where);
-
-  exit (0);
 }
 
 static void

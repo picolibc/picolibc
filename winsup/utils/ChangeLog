@@ -1,3 +1,7 @@
+2009-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (do_mount): Don't exit, just return.
+
 2009-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Add missing "Server Foundation" to
