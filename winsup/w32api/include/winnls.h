@@ -405,6 +405,9 @@ extern "C" {
 #define LGRPID_INDIC 15
 #define LGRPID_GEORGIAN 16
 #define LGRPID_ARMENIAN 17
+#define IS_HIGH_SURROGATE(c) (((c) & 0xFC00) == 0xD800)
+#define IS_LOW_SURROGATE(c) (((c) & 0xFC00) == 0xDC00)
+#define IS_SURROGATE_PAIR(hc,lc) (IS_HIGH_SURROGATE(hc) && IS_LOW_SURROGATE(lc))
 #if (WINVER >= 0x0410)
 #define CAL_SYEARMONTH 47
 #define CAL_ITWODIGITYEARMAX 48
