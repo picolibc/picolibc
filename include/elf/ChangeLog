@@ -1,3 +1,26 @@
+2006-08-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	From Mike Frysinger <michael.frysinger@analog.com>
+	* bfin.h (R_BFIN_UNUSED, R_BFIN_PCREL5M2, R_BFIN_UNUSED1,
+	R_BFIN_PCREL10, R_BFIN_PCREL12_JUMP, R_BFIN_RIMM16,
+	R_BFIN_LUIMM16, R_BFIN_HUIMM16, R_BFIN_PCREL12_JUMP_S,
+	R_BFIN_PCREL24_JUMP_X, R_BFIN_PCREL24, R_BFIN_UNUSEDB,
+	R_BFIN_UNUSEDC, R_BFIN_PCREL24_JUMP_L, R_BFIN_PCREL24_CALL_X,
+	R_BFIN_VAR_EQ_SYMB, R_BFIN_BYTE_DATA, R_BFIN_BYTE2_DATA,
+	R_BFIN_BYTE4_DATA, R_BFIN_PCREL11, R_BFIN_PUSH, R_BFIN_CONST,
+	R_BFIN_ADD, R_BFIN_SUB, R_BFIN_MULT, R_BFIN_DIV, R_BFIN_MOD,
+	R_BFIN_LSHIFT, R_BFIN_RSHIFT, R_BFIN_AND, R_BFIN_OR, R_BFIN_XOR,
+	R_BFIN_LAND, R_BFIN_LOR, R_BFIN_LEN, R_BFIN_NEG, R_BFIN_COMP,
+	R_BFIN_PAGE, R_BFIN_HWPAGE, R_BFIN_ADDR, R_BFIN_PLTPLC,
+	R_BFIN_GOT, R_BFIN_MAX): Renamed from R_unused0, R_pcrel5ms,
+	R_unused1, R_pcrel10, R_pcrel12_jump, R_rimm16, R_luimm16,
+	R_huimm16, R_pcrel12_jump_s, R_pcrel24_jump_x, R_pcrel24,
+	R_unusedb, R_unusedc, R_pcrel24_jump_l, R_pcrel24_call_x,
+	R_var_eq_symb, R_byte_data, R_byte2_data, R_byte4_data, R_pcrel11,
+	R_push, R_const, R_add, R_sub, R_mult, R_div, R_mod, R_lshift,
+	R_rshift, R_and, R_or, R_xor, R_land, R_lor, R_len, R_neg, R_comp,
+	R_page, R_hwpage, R_addr, R_pltpc, R_got.
+	
 2009-08-09  Michael Eager <eager@eagercon.com>
 
 	* elf/common.h: Define EM_resnnn reserved values. Add EM_AVR32,
