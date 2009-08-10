@@ -1,3 +1,8 @@
+2009-08-10  Daniel Gutson  <dgutson@codesourcery.com>
+
+	* arm.h: (SHT_ARM_DEBUGOVERLAY): New define.
+	(SHT_ARM_OVERLAYSECTION): New define.
+
 2006-08-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	From Mike Frysinger <michael.frysinger@analog.com>

@@ -1,5 +1,5 @@
 /* ARM ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2009
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -41,9 +41,9 @@
 #define PT_ARM_EXIDX (PT_LOPROC + 1)
 
 /* Other constants defined in the ARM ELF spec. version B-01.  */
-#define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK */
-#define EF_ARM_DYNSYMSUSESEGIDX 0x08	/* NB conflicts with EF_APCS26 */
-#define EF_ARM_MAPSYMSFIRST 0x10	/* NB conflicts with EF_APCS_FLOAT */
+#define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK.  */
+#define EF_ARM_DYNSYMSUSESEGIDX 0x08	/* NB conflicts with EF_APCS26.  */
+#define EF_ARM_MAPSYMSFIRST 0x10	/* NB conflicts with EF_APCS_FLOAT.  */
 #define EF_ARM_EABIMASK      0xFF000000
 
 /* Constants defined in AAELF.  */
@@ -71,9 +71,11 @@
 #define STT_ARM_16BIT      STT_HIPROC   /* A Thumb label.  */
 
 /* Additional section types.  */
-#define SHT_ARM_EXIDX	   0x70000001	/* Section holds ARM unwind info.  */
-#define SHT_ARM_PREEMPTMAP 0x70000002	/* Section pre-emption details.  */
-#define SHT_ARM_ATTRIBUTES 0x70000003	/* Section holds attributes.  */
+#define SHT_ARM_EXIDX	       0x70000001	/* Section holds ARM unwind info.  */
+#define SHT_ARM_PREEMPTMAP     0x70000002	/* Section pre-emption details.  */
+#define SHT_ARM_ATTRIBUTES     0x70000003	/* Section holds attributes.  */
+#define SHT_ARM_DEBUGOVERLAY   0x70000004	/* Section holds overlay debug info.  */
+#define SHT_ARM_OVERLAYSECTION 0x70000005	/* Section holds GDB and overlay integration info.  */
 
 /* ARM-specific values for sh_flags.  */
 #define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
