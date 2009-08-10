@@ -1,5 +1,11 @@
 2009-08-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	Fix references past allocated memory for i386-*-go32.
+	* ti.h (COFF_ADJUST_FILEHDR_IN_POST, COFF_ADJUST_FILEHDR_OUT_POST):
+	Reference F_TARGET_ID only when !COFF0_P.
+
+2009-08-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Stop using bfd_usrdata in libbfd.
 	* go32exe.h (struct external_filehdr_go32_exe <stub>, FILHSZ): Replace
 	STUBSIZE by GO32_STUBSIZE.

@@ -102,19 +102,21 @@ struct external_filehdr
 #define COFF_ADJUST_FILEHDR_IN_POST(abfd, src, dst) \
   do									\
     {									\
-      ((struct internal_filehdr *)(dst))->f_target_id =			\
-	H_GET_16 (abfd, ((FILHDR *)(src))->f_target_id);		\
+      if (!COFF0_P (abfd))						\
+	((struct internal_filehdr *)(dst))->f_target_id =		\
+	  H_GET_16 (abfd, ((FILHDR *)(src))->f_target_id);		\
     }									\
   while (0)
 #endif
 
 #ifndef COFF_ADJUST_FILEHDR_OUT_POST
 #define COFF_ADJUST_FILEHDR_OUT_POST(abfd, src, dst) \
-  do									\
-    {									\
-      H_PUT_16 (abfd, ((struct internal_filehdr *)(src))->f_target_id,	\
-	       ((FILHDR *)(dst))->f_target_id);				\
-    }									\
+  do									 \
+    {									 \
+      if (!COFF0_P (abfd))						 \
+	H_PUT_16 (abfd, ((struct internal_filehdr *)(src))->f_target_id, \
+		 ((FILHDR *)(dst))->f_target_id);			 \
+    }									 \
   while (0)
 #endif
 
