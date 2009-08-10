@@ -14,7 +14,8 @@ dir=$(cd $(dirname $("$compiler" -print-prog-name=ld))/../..; pwd)
 #
 [ "$dir" = '/' ] && dir=''
 mingw_dir=''
-for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-mingw*; do
+for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-mingw* \
+         /*-mingw32 /usr/*-mingw32 /*-mingw* /usr/*-mingw*; do
     case "$d" in
 	*\**)	continue ;;
 	*)	mingw_dir=$d; break;

@@ -1,3 +1,8 @@
+2009-08-10  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* mingw: Add fallbacks to search for MinGW components in standard
+	install locations if not found in compiler's $prefix.
+
 2009-08-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (do_mount): Don't exit, just return.
