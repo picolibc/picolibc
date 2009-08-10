@@ -1,3 +1,8 @@
+2009-08-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/wcstombs.c: Change documentation to specify size_t
+	return type instead of int.
+
 2009-07-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/a64l.c: Fix to use 'a' instead of 'A' in calculation
