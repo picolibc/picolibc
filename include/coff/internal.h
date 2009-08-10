@@ -58,9 +58,18 @@ struct internal_extra_pe_filehdr
   bfd_vma  nt_signature;   	/* required NT signature, 0x4550 */ 
 };
 
+#define GO32_STUBSIZE 2048
+
 struct internal_filehdr
 {
   struct internal_extra_pe_filehdr pe;
+
+  /* coff-stgo32 EXE stub header before BFD tdata has been allocated.
+     Its data is kept in INTERNAL_FILEHDR.GO32STUB afterwards.
+     
+     F_GO32STUB is set iff go32stub contains a valid data.  Artifical headers
+     created in BFD have no pre-set go32stub.  */
+  char go32stub[GO32_STUBSIZE];
 
   /* Standard coff internal info.  */
   unsigned short f_magic;	/* magic number			*/
@@ -84,7 +93,8 @@ struct internal_filehdr
  	F_AR32W		file is 32-bit big-endian
  	F_DYNLOAD	rs/6000 aix: dynamically loadable w/imports & exports
  	F_SHROBJ	rs/6000 aix: file is a shared object
-        F_DLL           PE format DLL.  */
+	F_DLL           PE format DLL
+	F_GO32STUB      Field go32stub contains valid data.  */
 
 #define	F_RELFLG	(0x0001)
 #define	F_EXEC		(0x0002)
@@ -96,6 +106,7 @@ struct internal_filehdr
 #define	F_DYNLOAD	(0x1000)
 #define	F_SHROBJ	(0x2000)
 #define F_DLL           (0x2000)
+#define F_GO32STUB      (0x4000)
 
 /* Extra structure which is used in the optional header.  */
 typedef struct _IMAGE_DATA_DIRECTORY 

@@ -1,3 +1,12 @@
+2009-08-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Stop using bfd_usrdata in libbfd.
+	* go32exe.h (struct external_filehdr_go32_exe <stub>, FILHSZ): Replace
+	STUBSIZE by GO32_STUBSIZE.
+	(STUBSIZE): Move the definition ...
+	* internal.h (GO32_STUBSIZE): ... here and rename it.
+	(struct internal_filehdr <go32stub>, F_GO32STUB): New.
+
 2009-06-03  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* symconst.h (btLong64, btULong64, btLongLong64, btULongLong64,
