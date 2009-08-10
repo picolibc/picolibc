@@ -1,3 +1,8 @@
+2009-08-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_console.cc (create_invisible_console_workaround): Fix size
+	of cmd in the way originally intended.
+
 2009-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (create_invisible_console_workaround):  Fix

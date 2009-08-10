@@ -2008,7 +2008,7 @@ fhandler_console::create_invisible_console_workaround ()
 	  STARTUPINFOW si = {};
 	  PROCESS_INFORMATION pi;
 	  size_t len = helper.get_wide_win32_path_len ();
-	  WCHAR cmd[len + (2 * strlen ("0xffffffff")) + 2 /* spaces */ + 1];
+	  WCHAR cmd[len + (2 * strlen (" 0xffffffff")) + 1];
 	  WCHAR title[] = L"invisible cygwin console";
 
 	  helper.get_wide_win32_path (cmd);
