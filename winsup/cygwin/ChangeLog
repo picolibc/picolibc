@@ -1,5 +1,10 @@
 2009-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (av::fixup): Check shell scripts for executability only on
+	filesystems/mounts supporting real permissions.
+
+2009-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (DEV_SOCKET): New static WCHAR string.  Name of
 	the native NT socket device.
 	(dtable::init_std_file_from_handle): Remove unused tmp_pathbuf

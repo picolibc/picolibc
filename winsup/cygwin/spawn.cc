@@ -1083,7 +1083,7 @@ just_shell:
 
       /* Check if script is executable.  Otherwise we start non-executable
 	 scripts successfully, which is incorrect behaviour. */
-      if (check_file_access (real_path, X_OK) < 0)
+      if (real_path.has_acls () && check_file_access (real_path, X_OK) < 0)
 	return -1;	/* errno is already set. */
 
       /* Replace argv[0] with the full path to the script if this is the
