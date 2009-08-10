@@ -40,6 +40,7 @@ static bool handle_to_fn (HANDLE, char *);
 #define WCLEN(x) ((sizeof (x) / sizeof (WCHAR)) - 1)
 char unknown_file[] = "some disk file";
 const WCHAR DEV_NULL[] = L"\\Device\\Null";
+static const WCHAR DEV_SOCKET[] = L"\\Device\\Afd";
 
 const WCHAR DEVICE_PREFIX[] = L"\\device\\";
 const size_t DEVICE_PREFIX_LEN WCLEN (DEVICE_PREFIX);
@@ -271,12 +272,9 @@ void
 dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
   CONSOLE_SCREEN_BUFFER_INFO buf;
-  struct sockaddr sa;
-  int sal = sizeof (sa);
   DCB dcb;
   unsigned bin = O_BINARY;
   device dev;
-  tmp_pathbuf tp;
 
   dev.devn = 0;		/* FIXME: device */
   first_fd_for_open = 0;
@@ -293,8 +291,21 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     /* can't figure out what this is */;
   else if (ft == FILE_TYPE_PIPE)
     {
+      int rcv = 0, len = sizeof (int);
+
       if (handle_to_fn (handle, name))
 	/* ok */;
+      else if (strcmp (name, ":sock:") == 0
+	       /* On NT4, NtQueryObject returns STATUS_NOT_IMPLEMENTED when
+	          called for a socket handle. */
+	       || (strcmp (name, unknown_file) == 0
+		   && !::getsockopt ((SOCKET) handle, SOL_SOCKET, SO_RCVBUF,
+				     (char *) &rcv, &len)))
+	{
+	  /* socket */
+	  dev = *tcp_dev;
+	  name[0] = '\0';
+	}
       else if (fd == 0)
 	dev = *piper_dev;
       else
@@ -318,9 +329,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	dev = *console_dev;
     }
-  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-    /* socket */
-    dev = *tcp_dev;
   else if (GetCommState (handle, &dcb))
     /* serial */
     dev.parse (DEV_TTYS_MAJOR, 0);
@@ -881,122 +889,118 @@ handle_to_fn (HANDLE h, char *posix_fn)
 {
   tmp_pathbuf tp;
   ULONG len = 0;
-  OBJECT_NAME_INFORMATION dummy_oni;
   WCHAR *maxmatchdos = NULL;
   int maxmatchlen = 0;
+  OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) tp.w_get ();
 
-  NTSTATUS status = NtQueryObject (h, ObjectNameInformation, &dummy_oni,
-				   sizeof (dummy_oni), &len);
-  if (!NT_SUCCESS (status) || !len)
-    debug_printf ("NtQueryObject failed 1");
+  NTSTATUS status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryObject failed, %p", status);
+  // NT seems to do this on an unopened file
+  else if (!ntfn->Name.Buffer)
+    debug_printf ("nt->Name.Buffer == NULL");
   else
     {
-      OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) alloca (len + sizeof (WCHAR));
-      NTSTATUS res = NtQueryObject (h, ObjectNameInformation, ntfn, len, NULL);
+      WCHAR *w32 = ntfn->Name.Buffer;
+      size_t w32len = ntfn->Name.Length / sizeof (WCHAR);
+      w32[w32len] = L'\0';
 
-      if (!NT_SUCCESS (res))
-	  debug_printf ("NtQueryObject failed 2");
-      // NT seems to do this on an unopened file
-      else if (!ntfn->Name.Buffer)
-	debug_printf ("nt->Name.Buffer == NULL");
-      else
+      if (wcscasecmp (w32, DEV_NULL) == 0)
 	{
-	  WCHAR *w32 = ntfn->Name.Buffer;
-	  size_t w32len = ntfn->Name.Length / sizeof (WCHAR);
-	  w32[w32len] = L'\0';
-
-	  if (wcscasecmp (w32, DEV_NULL) == 0)
-	    {
-	      strcpy (posix_fn, "/dev/null");
-	      return false;
-	    }
-
-	  if (wcsncasecmp (w32, DEV_NAMED_PIPE, DEV_NAMED_PIPE_LEN) == 0)
-	    {
-	      w32 += DEV_NAMED_PIPE_LEN;
-	      if (wcsncmp (w32, L"cygwin-", WCLEN (L"cygwin-")) != 0)
-		return false;
-	      w32 += WCLEN (L"cygwin-");
-	      bool istty = wcsncmp (w32, L"tty", WCLEN (L"tty")) == 0;
-	      if (istty)
-		decode_tty (posix_fn, w32 + WCLEN (L"tty"));
-	      else if (wcsncmp (w32, L"pipe", WCLEN (L"pipe")) == 0)
-		strcpy (posix_fn, "/dev/pipe");
-	      return istty;
-	    }
-
-
-	  WCHAR fnbuf[64 * 1024];
-	  if (wcsncasecmp (w32, DEVICE_PREFIX, DEVICE_PREFIX_LEN) != 0
-	      || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf)))
-	    {
-	      sys_wcstombs (posix_fn, NT_MAX_PATH, w32, w32len);
-	      return false;
-	    }
-
-	  for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
-	    {
-	      WCHAR device[NT_MAX_PATH];
-	      if (!QueryDosDeviceW (s, device, sizeof (device)))
-		continue;
-	      if (wcschr (s, ':') == NULL)
-		continue;
-	      WCHAR *q = wcsrchr (device, ';');
-	      if (q)
-		{
-		  WCHAR *r = wcschr (q, '\\');
-		  if (r)
-		    wcscpy (q, r + 1);
-		}
-	      int devlen = wcslen (device);
-	      if (device[devlen - 1] == L'\\')
-		device[--devlen] = L'\0';
-	      if (devlen < maxmatchlen)
-		continue;
-	      if (wcsncmp (device, w32, devlen) != 0||
-		  (w32[devlen] != L'\0' && w32[devlen] != L'\\'))
-		continue;
-	      maxmatchlen = devlen;
-	      maxmatchdos = s;
-	      debug_printf ("current match '%W' = '%W'\n", s, device);
-	    }
-
-	  if (maxmatchlen)
-	    {
-	      WCHAR *p = wcschr (w32 + DEVICE_PREFIX_LEN, L'\\');
-	      size_t n = wcslen (maxmatchdos);
-	      WCHAR ch;
-	      if (!p)
-		ch = L'\0';
-	      else
-		{
-		  if (maxmatchdos[n - 1] == L'\\')
-		    n--;
-		  w32 += maxmatchlen - n;
-		  ch = L'\\';
-		}
-	      memcpy (w32, maxmatchdos, n * sizeof (WCHAR));
-	      w32[n] = ch;
-	    }
-	  else if (wcsncmp (w32, DEV_REMOTE, DEV_REMOTE_LEN) == 0)
-	    {
-	      w32 += DEV_REMOTE_LEN - 2;
-	      *w32 = L'\\';
-	      debug_printf ("remote drive");
-	    }
-	  else if (wcsncmp (w32, DEV_REMOTE1, DEV_REMOTE1_LEN) == 0)
-	    {
-	      w32 += DEV_REMOTE1_LEN - 2;
-	      *w32 = L'\\';
-	      debug_printf ("remote drive");
-	    }
-
-	  cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_ABSOLUTE, w32, posix_fn,
-			    NT_MAX_PATH);
-
-	  debug_printf ("derived path '%W', posix '%s'", w32, posix_fn);
+	  strcpy (posix_fn, "/dev/null");
 	  return false;
 	}
+
+      if (wcscasecmp (w32, DEV_SOCKET) == 0)
+	{
+	  strcpy (posix_fn, ":sock:");
+	  return false;
+	}
+
+      if (wcsncasecmp (w32, DEV_NAMED_PIPE, DEV_NAMED_PIPE_LEN) == 0)
+	{
+	  w32 += DEV_NAMED_PIPE_LEN;
+	  if (wcsncmp (w32, L"cygwin-", WCLEN (L"cygwin-")) != 0)
+	    return false;
+	  w32 += WCLEN (L"cygwin-");
+	  bool istty = wcsncmp (w32, L"tty", WCLEN (L"tty")) == 0;
+	  if (istty)
+	    decode_tty (posix_fn, w32 + WCLEN (L"tty"));
+	  else if (wcsncmp (w32, L"pipe", WCLEN (L"pipe")) == 0)
+	    strcpy (posix_fn, "/dev/pipe");
+	  return istty;
+	}
+
+      WCHAR fnbuf[64 * 1024];
+      if (wcsncasecmp (w32, DEVICE_PREFIX, DEVICE_PREFIX_LEN) != 0
+	  || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf)))
+	{
+	  sys_wcstombs (posix_fn, NT_MAX_PATH, w32, w32len);
+	  return false;
+	}
+
+      for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
+	{
+	  WCHAR device[NT_MAX_PATH];
+	  if (!QueryDosDeviceW (s, device, sizeof (device)))
+	    continue;
+	  if (wcschr (s, ':') == NULL)
+	    continue;
+	  WCHAR *q = wcsrchr (device, ';');
+	  if (q)
+	    {
+	      WCHAR *r = wcschr (q, '\\');
+	      if (r)
+		wcscpy (q, r + 1);
+	    }
+	  int devlen = wcslen (device);
+	  if (device[devlen - 1] == L'\\')
+	    device[--devlen] = L'\0';
+	  if (devlen < maxmatchlen)
+	    continue;
+	  if (wcsncmp (device, w32, devlen) != 0||
+	      (w32[devlen] != L'\0' && w32[devlen] != L'\\'))
+	    continue;
+	  maxmatchlen = devlen;
+	  maxmatchdos = s;
+	  debug_printf ("current match '%W' = '%W'\n", s, device);
+	}
+
+      if (maxmatchlen)
+	{
+	  WCHAR *p = wcschr (w32 + DEVICE_PREFIX_LEN, L'\\');
+	  size_t n = wcslen (maxmatchdos);
+	  WCHAR ch;
+	  if (!p)
+	    ch = L'\0';
+	  else
+	    {
+	      if (maxmatchdos[n - 1] == L'\\')
+		n--;
+	      w32 += maxmatchlen - n;
+	      ch = L'\\';
+	    }
+	  memcpy (w32, maxmatchdos, n * sizeof (WCHAR));
+	  w32[n] = ch;
+	}
+      else if (wcsncmp (w32, DEV_REMOTE, DEV_REMOTE_LEN) == 0)
+	{
+	  w32 += DEV_REMOTE_LEN - 2;
+	  *w32 = L'\\';
+	  debug_printf ("remote drive");
+	}
+      else if (wcsncmp (w32, DEV_REMOTE1, DEV_REMOTE1_LEN) == 0)
+	{
+	  w32 += DEV_REMOTE1_LEN - 2;
+	  *w32 = L'\\';
+	  debug_printf ("remote drive");
+	}
+
+      cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_ABSOLUTE, w32, posix_fn,
+			NT_MAX_PATH);
+
+      debug_printf ("derived path '%W', posix '%s'", w32, posix_fn);
+      return false;
     }
 
   strcpy (posix_fn,  unknown_file);

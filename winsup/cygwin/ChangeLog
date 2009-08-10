@@ -1,3 +1,15 @@
+2009-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (DEV_SOCKET): New static WCHAR string.  Name of
+	the native NT socket device.
+	(dtable::init_std_file_from_handle): Remove unused tmp_pathbuf
+	variable.  Move check for sockets into FILE_TYPE_PIPE clause.
+	Rely on handle_to_fn having recognized socket, or check if
+	getsockopt works to accommodate NT4 shortcoming.
+	(handle_to_fn): Use tmp_pathbuf for OBJECT_NAME_INFORMATION
+	buffer and simplify code due to that.  Check name returned by
+	NtQueryObject for socket device.
+
 2009-08-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_console.cc (create_invisible_console_workaround): Fix size
