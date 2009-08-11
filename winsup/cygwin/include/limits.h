@@ -404,7 +404,7 @@ details. */
 /* Max num groups for a user, value taken from NT documentation */
 /* Must match <sys/param.h> NGROUPS */
 #undef NGROUPS_MAX
-#define NGROUPS_MAX 16
+#define NGROUPS_MAX 1024
 
 /* Maximum number of repeated occurrences of a regular expression when
    using the interval notation \{m,n\} */

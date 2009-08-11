@@ -19,7 +19,7 @@
 #define NOFILE		8192
 
 /* Max number of groups; must keep in sync with NGROUPS_MAX in limits.h */
-#define NGROUPS		16
+#define NGROUPS		1024
 
 /* Ticks/second for system calls such as times() */
 /* FIXME: is this the appropriate value? */
