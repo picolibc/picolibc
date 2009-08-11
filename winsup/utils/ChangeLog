@@ -1,3 +1,11 @@
+2009-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (enum_local_groups): Avoid error message if given group
+	name isn't found and return 0 to allow searching to proceed.  Always
+	return 0 or 1, not -1.
+	(enum_groups): Avoid error message if given group name isn't found.
+	* mkpasswd.c (enum_users): Ditto.
+
 2009-08-10  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* mingw: Add fallbacks to search for MinGW components in standard

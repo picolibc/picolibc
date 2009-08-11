@@ -346,12 +346,17 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
     {
       DWORD i;
 
-      if (disp_groupname != NULL)
+      if (disp_groupname)
 	{
 	  mbstowcs (gname, disp_groupname, GNLEN + 1);
 	  rc = NetLocalGroupGetInfo (servername, gname, 0, (void *) &buffer);
 	  if (rc == ERROR_SUCCESS)
 	    entriesread = 1;
+	  /* Allow further searching for the group and avoid annoying
+	     error messages just because the group is not a local group or
+	     the group hasn't been found. */
+	  else if (rc == ERROR_NO_SUCH_ALIAS || rc == NERR_GroupNotFound)
+	    return 0;
 	}
       else
 	rc = NetLocalGroupEnum (servername, 0, (void *) &buffer,
@@ -453,10 +458,10 @@ skip_group:
     }
   while (rc == ERROR_MORE_DATA);
 
-  /* Return -1 if the single group we're looking for has been found here to
+  /* Return 1 if the single group we're looking for has been found here to
      avoid calling enum_groups for the same group, thus avoiding a spurious
      error message "group name could not be found" in enum_groups. */
-  return disp_groupname && entriesread ? -1 : 0;
+  return disp_groupname && entriesread ? 1 : 0;
 }
 
 static void
@@ -502,6 +507,10 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  rc = NetGroupGetInfo (servername, (LPWSTR) & gname, 2,
 				(void *) &buffer);
 	  entriesread=1;
+	  /* Avoid annoying error messages just because the group hasn't been
+	     found. */
+	  if (rc == NERR_GroupNotFound)
+	    return;
 	}
       else
 	rc = NetGroupEnum (servername, 2, (void *) & buffer,

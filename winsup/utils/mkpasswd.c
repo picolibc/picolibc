@@ -411,6 +411,10 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  rc = NetUserGetInfo (servername, (LPWSTR) &uni_name, 3,
 			       (void *) &buffer);
 	  entriesread = 1;
+	  /* Avoid annoying error messages just because the user hasn't been
+	     found. */
+	  if (rc == NERR_UserNotFound)
+	    return 0;
 	}
       else
 	rc = NetUserEnum (servername, 3, FILTER_NORMAL_ACCOUNT,
