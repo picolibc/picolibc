@@ -116,6 +116,7 @@ struct timezone;
 #define _kill_r(__reent, __pid, __signal)         kill(__pid, __signal)
 #define _link_r(__reent, __oldpath, __newpath)    link(__oldpath, __newpath)
 #define _lseek_r(__reent, __fdes, __off, __w)     lseek(__fdes, __off, __w)
+#define _mkdir_r(__reent, __path, __m)		  mkdir(__path, __m)
 #define _open_r(__reent, __path, __flag, __m)     open(__path, __flag, __m)
 #define _read_r(__reent, __fd, __buff, __cnt)     read(__fd, __buff, __cnt)
 #define _rename_r(__reent, __old, __new)	  rename(__old, __new)
@@ -146,6 +147,7 @@ extern int _isatty_r _PARAMS ((struct _reent *, int));
 extern int _kill_r _PARAMS ((struct _reent *, int, int));
 extern int _link_r _PARAMS ((struct _reent *, const char *, const char *));
 extern _off_t _lseek_r _PARAMS ((struct _reent *, int, _off_t, int));
+extern int _mkdir_r _PARAMS ((struct _reent *, const char *, int));
 extern int _open_r _PARAMS ((struct _reent *, const char *, int, int));
 extern _ssize_t _read_r _PARAMS ((struct _reent *, int, void *, size_t));
 extern int _rename_r _PARAMS ((struct _reent *, const char *, const char *));

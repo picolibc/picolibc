@@ -42,6 +42,7 @@ GENERAL_SOURCES = \
 	isattyr.c \
 	linkr.c \
 	lseekr.c \
+	mkdirr.c \
 	openr.c \
 	readr.c \
 	renamer.c \
@@ -77,6 +78,7 @@ CHEWOUT_FILES = \
 	gettimeofdayr.def \
 	linkr.def \
 	lseekr.def \
+	mkdirr.def \
 	openr.def \
 	readr.def \
 	renamer.def \

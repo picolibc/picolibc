@@ -62,11 +62,12 @@ am__objects_1 = lib_a-closer.$(OBJEXT) lib_a-reent.$(OBJEXT) \
 	lib_a-fstatr.$(OBJEXT) lib_a-getreent.$(OBJEXT) \
 	lib_a-gettimeofdayr.$(OBJEXT) lib_a-isattyr.$(OBJEXT) \
 	lib_a-linkr.$(OBJEXT) lib_a-lseekr.$(OBJEXT) \
-	lib_a-openr.$(OBJEXT) lib_a-readr.$(OBJEXT) \
-	lib_a-renamer.$(OBJEXT) lib_a-signalr.$(OBJEXT) \
-	lib_a-signgam.$(OBJEXT) lib_a-sbrkr.$(OBJEXT) \
-	lib_a-statr.$(OBJEXT) lib_a-timesr.$(OBJEXT) \
-	lib_a-unlinkr.$(OBJEXT) lib_a-writer.$(OBJEXT)
+	lib_a-mkdirr.$(OBJEXT) lib_a-openr.$(OBJEXT) \
+	lib_a-readr.$(OBJEXT) lib_a-renamer.$(OBJEXT) \
+	lib_a-signalr.$(OBJEXT) lib_a-signgam.$(OBJEXT) \
+	lib_a-sbrkr.$(OBJEXT) lib_a-statr.$(OBJEXT) \
+	lib_a-timesr.$(OBJEXT) lib_a-unlinkr.$(OBJEXT) \
+	lib_a-writer.$(OBJEXT)
 @HAVE_STDIO64_DIR_TRUE@am__objects_2 = lib_a-fstat64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-lseek64r.$(OBJEXT) \
 @HAVE_STDIO64_DIR_TRUE@	lib_a-stat64r.$(OBJEXT) \
@@ -85,8 +86,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libreent_la_LIBADD =
 am__objects_6 = closer.lo reent.lo impure.lo fcntlr.lo fstatr.lo \
 	getreent.lo gettimeofdayr.lo isattyr.lo linkr.lo lseekr.lo \
-	openr.lo readr.lo renamer.lo signalr.lo signgam.lo sbrkr.lo \
-	statr.lo timesr.lo unlinkr.lo writer.lo
+	mkdirr.lo openr.lo readr.lo renamer.lo signalr.lo signgam.lo \
+	sbrkr.lo statr.lo timesr.lo unlinkr.lo writer.lo
 @HAVE_STDIO64_DIR_TRUE@am__objects_7 = fstat64r.lo lseek64r.lo \
 @HAVE_STDIO64_DIR_TRUE@	stat64r.lo open64r.lo
 am__objects_8 = $(am__objects_7)
@@ -158,6 +159,8 @@ ENABLE_NEWLIB_ICONV_TRUE = @ENABLE_NEWLIB_ICONV_TRUE@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HAVE_LONG_DOUBLE_FALSE = @HAVE_LONG_DOUBLE_FALSE@
+HAVE_LONG_DOUBLE_TRUE = @HAVE_LONG_DOUBLE_TRUE@
 HAVE_POSIX_DIR_FALSE = @HAVE_POSIX_DIR_FALSE@
 HAVE_POSIX_DIR_TRUE = @HAVE_POSIX_DIR_TRUE@
 HAVE_SIGNAL_DIR_FALSE = @HAVE_SIGNAL_DIR_FALSE@
@@ -313,6 +316,7 @@ GENERAL_SOURCES = \
 	isattyr.c \
 	linkr.c \
 	lseekr.c \
+	mkdirr.c \
 	openr.c \
 	readr.c \
 	renamer.c \
@@ -341,6 +345,7 @@ CHEWOUT_FILES = \
 	gettimeofdayr.def \
 	linkr.def \
 	lseekr.def \
+	mkdirr.def \
 	openr.def \
 	readr.def \
 	renamer.def \
@@ -482,6 +487,12 @@ lib_a-lseekr.o: lseekr.c
 
 lib_a-lseekr.obj: lseekr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lseekr.obj `if test -f 'lseekr.c'; then $(CYGPATH_W) 'lseekr.c'; else $(CYGPATH_W) '$(srcdir)/lseekr.c'; fi`
+
+lib_a-mkdirr.o: mkdirr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.o `test -f 'mkdirr.c' || echo '$(srcdir)/'`mkdirr.c
+
+lib_a-mkdirr.obj: mkdirr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mkdirr.obj `if test -f 'mkdirr.c'; then $(CYGPATH_W) 'mkdirr.c'; else $(CYGPATH_W) '$(srcdir)/mkdirr.c'; fi`
 
 lib_a-openr.o: openr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-openr.o `test -f 'openr.c' || echo '$(srcdir)/'`openr.c

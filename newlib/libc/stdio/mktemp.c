@@ -201,10 +201,15 @@ _DEFUN(_gettemp, (ptr, path, doopen, domkdir, suffixlen),
 #if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
       if (domkdir)
 	{
+#ifdef HAVE_MKDIR
 	  if (_mkdir_r (ptr, path, 0700) == 0)
 	    return 1;
 	  if (ptr->_errno != EEXIST)
 	    return 0;
+#else /* !HAVE_MKDIR */
+	  ptr->_errno = ENOSYS;
+	  return 0;
+#endif /* !HAVE_MKDIR */
 	}
       else
 #endif /* _ELIX_LEVEL */

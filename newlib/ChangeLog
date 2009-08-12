@@ -1,3 +1,16 @@
+2009=08-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/mktemp.c (_gettemp): Do not call _mkdir_r unless
+	HAVE_MKDIR is defined.
+
+2009-08-12  Hans-Peter Nilsson  <hp@axis.com>
+
+	* libc/include/reent.h: Add prototype and definition of _mkdir_r.
+	* libc/reent/Makefile.am (GENERAL_SOURCES): Add mkdirr.c.
+	(CHEWOUT_FILES): Add mkdirr.def.
+	* libc/reent/Makefile.in: Regenerate.
+	* libc/reent/mkdirr.c: New file.
+
 2009-08-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/wcstombs.c: Change documentation to specify size_t
