@@ -1,3 +1,10 @@
+2009-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::accept): Always use local
+	sockaddr_storage to store peer address and copy over to incoming
+	peer address if available.  Truncate data as necessary according
+	to POSIX.
+
 2009-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/limits.h (NGROUPS_MAX): Set to a more sane value.

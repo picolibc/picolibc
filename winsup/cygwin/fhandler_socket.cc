@@ -1117,27 +1117,13 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   /* Allows NULL peer and len parameters. */
-  struct sockaddr_in peer_dummy;
-  int len_dummy;
-  if (!peer)
-    peer = (struct sockaddr *) &peer_dummy;
-  if (!len)
-    {
-      len_dummy = sizeof (struct sockaddr_in);
-      len = &len_dummy;
-    }
-
-  /* accept on NT fails if len < sizeof (sockaddr_in)
-   * some programs set len to
-   * sizeof (name.sun_family) + strlen (name.sun_path) for UNIX domain
-   */
-  if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
-    *len = sizeof (struct sockaddr_in);
-
+  struct sockaddr_storage lpeer;
+  int llen = sizeof (struct sockaddr_storage);
 
   int res = 0;
   while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE))
-	 && (res = ::accept (get_socket (), peer, len)) == SOCKET_ERROR
+	 && (res = ::accept (get_socket (), (struct sockaddr *) &lpeer, &llen))
+	    == SOCKET_ERROR
 	 && WSAGetLastError () == WSAEWOULDBLOCK)
     ;
   if (res == (int) INVALID_SOCKET)
@@ -1175,6 +1161,11 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  sock->wsock_events->owner = wsock_events->owner;
 	  sock->connect_state (connected);
 	  res = res_fd;
+	  if (peer)
+	    {
+	      *len = min (*len, llen);
+	      memcpy (peer, &lpeer, *len);
+	    }
 	}
       else
 	{
