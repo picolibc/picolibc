@@ -1077,7 +1077,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <para>Among the software that has been found to cause difficulties are:</para>
 <para><itemizedlist>
 <listitem><para>Sonic Solutions burning software containing DLA component (when DLA disabled)</para></listitem>
-<listitem><para>Norton/MacAfee/Symantec antivirus or antispyware</para></listitem>
+<listitem><para>Norton/McAfee/Symantec antivirus or antispyware</para></listitem>
 <listitem><para>Logitech webcam software with "Logitech process monitor" service</para></listitem>
 <listitem><para>Kerio, Agnitum or ZoneAlarm Personal Firewall</para></listitem>
 <listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
