@@ -1,5 +1,14 @@
 2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::accept): Use sizeof rather
+	then constant size.  Truncate returned data, but return full address
+	length as per POSIX.
+	(fhandler_socket::getsockname): Truncate returned data, but return full
+	address length as per POSIX.
+	(fhandler_socket::getpeername): Ditto.
+
+2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_socket): Add peer_sun_path member.
 	(fhandler_socket::set_peer_sun_path): New method.
 	(fhandler_socket::get_peer_sun_path): New method.

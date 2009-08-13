@@ -1174,13 +1174,13 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 		     bound socket name of the peer's socket.  For now
 		     we just fake an unbound socket on the other side. */
 		  static struct sockaddr_un un = { AF_LOCAL, "" };
-		  *len = min (*len, 2);
-		  memcpy (peer, &un, *len);
+		  memcpy (peer, &un, min (*len, (int) sizeof (un.sun_family)));
+		  *len = (int) sizeof (un.sun_family);
 		}
 	      else
 		{
-		  *len = min (*len, llen);
-		  memcpy (peer, &lpeer, *len);
+		  memcpy (peer, &lpeer, min (*len, llen));
+		  *len = llen;
 		}
 	    }
 	}
@@ -1208,8 +1208,8 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       sun.sun_path[0] = '\0';
       if (get_sun_path ())
       	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
-      *namelen = min (*namelen, (int) SUN_LEN (&sun) + 1);
-      memcpy (name, &sun, *namelen);
+      memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
+      *namelen = (int) SUN_LEN (&sun) + 1;
       res = 0;
     }
   else
@@ -1222,8 +1222,8 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       res = ::getsockname (get_socket (), (struct sockaddr *) &sock, &len);
       if (!res)
 	{
-	  *namelen = min (*namelen, len);
-	  memcpy (name, &sock, *namelen);
+	  memcpy (name, &sock, min (*namelen, len));
+	  *namelen = len;
 	}
       else
 	{
@@ -1233,15 +1233,17 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		 unbound.  Per SUSv3 this is not an error condition.
 		 We're faking a valid return value here by creating the
 		 same content in the sockaddr structure as on Linux. */
+	      memset (&sock, 0, sizeof sock);
+	      sock.ss_family = get_addr_family ();
 	      switch (get_addr_family ())
 		{
 		case AF_INET:
 		  res = 0;
-		  *namelen = min (*namelen, (int) sizeof (struct sockaddr_in));
+		  len = (int) sizeof (struct sockaddr_in);
 		  break;
 		case AF_INET6:
 		  res = 0;
-		  *namelen = min (*namelen, (int) sizeof (struct sockaddr_in6));
+		  len = (int) sizeof (struct sockaddr_in6);
 		  break;
 		default:
 		  WSASetLastError (WSAEOPNOTSUPP);
@@ -1249,8 +1251,8 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		}
 	      if (!res)
 		{
-		  memset (name, 0, *namelen);
-		  name->sa_family = get_addr_family ();
+		  memcpy (name, &sock, min (*namelen, len));
+		  *namelen = len;
 		}
 	    }
 	  if (res)
@@ -1280,13 +1282,13 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
       sun.sun_path[0] = '\0';
       if (get_peer_sun_path ())
       	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
-      *namelen = min (*namelen, (int) SUN_LEN (&sun) + 1);
-      memcpy (name, &sun, *namelen);
+      memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
+      *namelen = (int) SUN_LEN (&sun) + 1;
     }
   else
     {
-      *namelen = min (*namelen, len);
-      memcpy (name, &sock, *namelen);
+      memcpy (name, &sock, min (*namelen, len));
+      *namelen = len;
     }
 
   return res;
