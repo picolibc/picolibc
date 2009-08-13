@@ -152,6 +152,7 @@ fhandler_socket::fhandler_socket () :
   wsock_mtx (NULL),
   wsock_evt (NULL),
   sun_path (NULL),
+  peer_sun_path (NULL),
   status ()
 {
   need_fork_fixup (true);
@@ -161,6 +162,8 @@ fhandler_socket::~fhandler_socket ()
 {
   if (sun_path)
     cfree (sun_path);
+  if (peer_sun_path)
+    cfree (peer_sun_path);
 }
 
 char *
@@ -664,6 +667,7 @@ fhandler_socket::dup (fhandler_base *child)
   if (get_addr_family () == AF_LOCAL)
     {
       fhs->set_sun_path (get_sun_path ());
+      fhs->set_peer_sun_path (get_peer_sun_path ());
       if (get_socket_type () == SOCK_STREAM)
 	{
 	  fhs->sec_pid = sec_pid;
@@ -1043,7 +1047,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     }
 
   if (get_addr_family () == AF_LOCAL && (!res || in_progress))
-    set_sun_path (name->sa_data);
+    set_peer_sun_path (name->sa_data);
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
@@ -1141,6 +1145,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  if (get_addr_family () == AF_LOCAL)
 	    {
 	      sock->set_sun_path (get_sun_path ());
+	      sock->set_peer_sun_path (get_peer_sun_path ());
 	      if (get_socket_type () == SOCK_STREAM)
 		{
 		  /* Don't forget to copy credentials from accepting
@@ -1163,8 +1168,20 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  res = res_fd;
 	  if (peer)
 	    {
-	      *len = min (*len, llen);
-	      memcpy (peer, &lpeer, *len);
+	      if (get_addr_family () == AF_LOCAL)
+	      	{
+		  /* FIXME: Right now we have no way to determine the
+		     bound socket name of the peer's socket.  For now
+		     we just fake an unbound socket on the other side. */
+		  static struct sockaddr_un un = { AF_LOCAL, "" };
+		  *len = min (*len, 2);
+		  memcpy (peer, &un, *len);
+		}
+	      else
+		{
+		  *len = min (*len, llen);
+		  memcpy (peer, &lpeer, *len);
+		}
 	    }
 	}
       else
@@ -1186,28 +1203,29 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 
   if (get_addr_family () == AF_LOCAL)
     {
-      struct sockaddr_un *sun = (struct sockaddr_un *) name;
-      memset (sun, 0, *namelen);
-      sun->sun_family = AF_LOCAL;
-
-      if (!get_sun_path ())
-	sun->sun_path[0] = '\0';
-      else
-	/* According to SUSv2 "If the actual length of the address is
-	   greater than the length of the supplied sockaddr structure, the
-	   stored address will be truncated."  We play it save here so
-	   that the path always has a trailing 0 even if it's truncated. */
-	strncpy (sun->sun_path, get_sun_path (),
-		 *namelen - sizeof *sun + sizeof sun->sun_path - 1);
-
-      *namelen = sizeof *sun - sizeof sun->sun_path
-		 + strlen (sun->sun_path) + 1;
+      struct sockaddr_un sun;
+      sun.sun_family = AF_LOCAL;
+      sun.sun_path[0] = '\0';
+      if (get_sun_path ())
+      	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
+      *namelen = min (*namelen, (int) SUN_LEN (&sun) + 1);
+      memcpy (name, &sun, *namelen);
       res = 0;
     }
   else
     {
-      res = ::getsockname (get_socket (), name, namelen);
-      if (res)
+      /* Always use a local big enough buffer and truncate later as necessary
+	 per POSIX.  WinSock unfortunaltey only returns WSAEFAULT if the buffer
+	 is too small. */
+      struct sockaddr_storage sock;
+      int len = sizeof sock;
+      res = ::getsockname (get_socket (), (struct sockaddr *) &sock, &len);
+      if (!res)
+	{
+	  *namelen = min (*namelen, len);
+	  memcpy (name, &sock, *namelen);
+	}
+      else
 	{
 	  if (WSAGetLastError () == WSAEINVAL)
 	    {
@@ -1219,11 +1237,11 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		{
 		case AF_INET:
 		  res = 0;
-		  *namelen = sizeof (struct sockaddr_in);
+		  *namelen = min (*namelen, (int) sizeof (struct sockaddr_in));
 		  break;
 		case AF_INET6:
 		  res = 0;
-		  *namelen = sizeof (struct sockaddr_in6);
+		  *namelen = min (*namelen, (int) sizeof (struct sockaddr_in6));
 		  break;
 		default:
 		  WSASetLastError (WSAEOPNOTSUPP);
@@ -1246,9 +1264,30 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 int
 fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
 {
-  int res = ::getpeername (get_socket (), name, namelen);
+  /* Always use a local big enough buffer and truncate later as necessary
+     per POSIX.  WinSock unfortunately only returns WSAEFAULT if the buffer
+     is too small. */
+  struct sockaddr_storage sock;
+  int len = sizeof sock;
+  int res = ::getpeername (get_socket (), (struct sockaddr *) &sock, &len);
   if (res)
     set_winsock_errno ();
+  else if (get_addr_family () == AF_LOCAL)
+    {
+      struct sockaddr_un sun;
+      memset (&sun, 0, sizeof sun);
+      sun.sun_family = AF_LOCAL;
+      sun.sun_path[0] = '\0';
+      if (get_peer_sun_path ())
+      	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
+      *namelen = min (*namelen, (int) SUN_LEN (&sun) + 1);
+      memcpy (name, &sun, *namelen);
+    }
+  else
+    {
+      *namelen = min (*namelen, len);
+      memcpy (name, &sock, *namelen);
+    }
 
   return res;
 }
@@ -1913,6 +1952,12 @@ void
 fhandler_socket::set_sun_path (const char *path)
 {
   sun_path = path ? cstrdup (path) : NULL;
+}
+
+void
+fhandler_socket::set_peer_sun_path (const char *path)
+{
+  peer_sun_path = path ? cstrdup (path) : NULL;
 }
 
 int

@@ -1,4 +1,24 @@
 2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add peer_sun_path member.
+	(fhandler_socket::set_peer_sun_path): New method.
+	(fhandler_socket::get_peer_sun_path): New method.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Initialize
+	peer_sun_path to NULL.
+	(fhandler_socket::~fhandler_socket): Free peer_sun_path if necessary.
+	(fhandler_socket::dup): Duplicate peer_sun_path.
+	(fhandler_socket::accept): Ditto.  Return fake unbound peer content
+	and len in case of AF_LOCAL sockets.
+	(fhandler_socket::getsockname): Always use local sockaddr_storage to
+	store socket address and copy over to incoming address.  Handle every
+	namelen correctly per POSIX.
+	(fhandler_socket::getpeername): Ditto.  Add code path to return
+	correct value for AF_LOCAL sockets.
+	(fhandler_socket::set_peer_sun_path): New method.
+	* net.cc (socketpair): Set peer_sun_path to empty string, just like
+	sun_path.
+
+2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
 	    Dave Korn <dave.korn.cygwin@googlemail.com>
 
 	* cxx.cc (default_cygwin_cxx_malloc): Enhance commenting.

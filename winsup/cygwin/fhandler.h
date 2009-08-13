@@ -462,6 +462,7 @@ class fhandler_socket: public fhandler_base
 
  private:
   char *sun_path;
+  char *peer_sun_path;
   struct status_flags
   {
     unsigned async_io              : 1; /* async I/O */
@@ -533,6 +534,8 @@ class fhandler_socket: public fhandler_base
   int get_socket_type () {return type;}
   void set_sun_path (const char *path);
   char *get_sun_path () {return sun_path;}
+  void set_peer_sun_path (const char *path);
+  char *get_peer_sun_path () {return peer_sun_path;}
 
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
