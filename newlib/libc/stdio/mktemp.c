@@ -301,7 +301,7 @@ _DEFUN(mkstemp, (path),
 
 # if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
 char *
-_DEFUN(mkdemp, (path),
+_DEFUN(mkdtemp, (path),
        char *path)
 {
   return (_gettemp (_REENT, path, (int *) NULL, 1, 0) ? path : NULL);

@@ -1,4 +1,8 @@
-2009=08-12  Jeff Johnston  <jjohnstn@redhat.com>
+2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/mktemp.c (mkdtemp): Fix type in function name.
+
+2009-08-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/mktemp.c (_gettemp): Do not call _mkdir_r unless
 	HAVE_MKDIR is defined.
