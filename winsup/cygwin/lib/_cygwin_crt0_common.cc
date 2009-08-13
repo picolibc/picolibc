@@ -40,6 +40,9 @@ extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) throw()
 /* Avoid an info message from linker when linking applications.  */
 extern __declspec(dllimport) struct _reent *_impure_ptr;
 
+/* Initialised in _cygwin_dll_entry. */
+extern int __dynamically_loaded;
+
 #undef environ
 
 extern "C"
@@ -70,11 +73,13 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   per_process *newu = (per_process *) cygwin_internal (CW_USER_DATA);
   int uwasnull;
 
+  /* u is non-NULL if we are in a DLL, and NULL in the main exe.
+     newu is the Cygwin DLL's internal per_process and never NULL.  */
   if (u != NULL)
     uwasnull = 0;	/* Caller allocated space for per_process structure.  */
   else
     {
-      u = newu;	/* Using DLL built-in per_process.  */
+      u = newu;		/* Using DLL built-in per_process.  */
       uwasnull = 1;	/* Remember for later.  */
     }
 
@@ -114,8 +119,10 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->realloc = &realloc;
   u->calloc = &calloc;
 
-  /* Likewise for the C++ memory operators - if any.  */
-  if (newu && newu->cxx_malloc)
+  /* Likewise for the C++ memory operators, if any, but not if we
+     were dlopen()'d, as we might get dlclose()'d and that would
+     leave stale function pointers behind.    */
+  if (newu && newu->cxx_malloc && !__dynamically_loaded)
     {
       /* Inherit what we don't override.  */
 #define CONDITIONALLY_OVERRIDE(MEMBER) \
@@ -129,11 +136,9 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
       CONDITIONALLY_OVERRIDE(oper_new___nt);
       CONDITIONALLY_OVERRIDE(oper_delete_nt);
       CONDITIONALLY_OVERRIDE(oper_delete___nt);
+      /* Now update the resulting set into the global redirectors.  */
+      *newu->cxx_malloc = __cygwin_cxx_malloc;
     }
-
-  /* Now update the resulting set into the global redirectors.  */
-  if (newu)
-    newu->cxx_malloc = &__cygwin_cxx_malloc;
 
   /* Setup the module handle so fork can get the path name.  */
   u->hmodule = GetModuleHandle (0);

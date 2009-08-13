@@ -328,6 +328,26 @@ dll_dllcrt0_1 (VOID *x)
 
   bool linked = !in_forkee && !cygwin_finished_initializing;
 
+  /* Broken DLLs built against Cygwin versions 1.7.0-49 up to 1.7.0-57
+     override the cxx_malloc pointer in their DLL initialization code,
+     when loaded either statically or dynamically.  Because this leaves
+     a stale pointer into demapped memory space if the DLL is unloaded
+     by a call to dlclose, we prevent this happening for dynamically
+     loaded DLLS in dlopen by saving and restoring cxx_malloc around
+     the call to LoadLibrary, which invokes the DLL's startup sequence.
+     Modern DLLs won't even attempt to override the pointer when loaded
+     statically, but will write their overrides directly into the
+     struct it points to.  With all modern DLLs, this will remain the
+     default_cygwin_cxx_malloc struct in cxx.cc, but if any broken DLLs
+     are in the mix they will have overridden the pointer and subsequent
+     overrides will go into their embedded cxx_malloc structs.  This is
+     almost certainly not a problem as they can never be unloaded, but
+     if we ever did want to do anything about it, we could check here to
+     see if the pointer had been altered in the early parts of the DLL's
+     startup, and if so copy back the new overrides and reset it here.
+     However, that's just a note for the record; at the moment, we can't
+     see any need to worry about this happening.  */
+
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
     dll_crt0 (p);

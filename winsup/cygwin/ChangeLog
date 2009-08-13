@@ -1,3 +1,14 @@
+2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
+	    Dave Korn <dave.korn.cygwin@googlemail.com>
+
+	* cxx.cc (default_cygwin_cxx_malloc): Enhance commenting.
+	* dll_init.cc (dll_dllcrt0_1): Likewise.
+	* dlfcn.cc (dlopen): Prevent dlopen()'d DLL from installing any
+	cxx malloc overrides.
+	* include/cygwin/cygwin_dll.h (__dynamically_loaded): New variable.
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Check it and only
+	install cxx malloc overrides when statically loaded.  Extend comments.
+
 2009-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::accept): Always use local

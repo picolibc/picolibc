@@ -87,7 +87,10 @@ __cxa_guard_release ()
 }
 
 /* These routines are made available as last-resort fallbacks
-   for the application.  Should not be used in practice.  */
+   for the application.  Should not be used in practice; the
+   entries in this struct get overwritten by each DLL as it
+   is loaded, and libstdc++ will override the whole lot first
+   thing of all.   */
 
 struct per_process_cxx_malloc default_cygwin_cxx_malloc =
 {
