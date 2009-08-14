@@ -1994,7 +1994,7 @@ go_ahead:
 		 
 		 Worse, trying to open a symlink without setting the special
 		 "ActOnSymlink" EA triggers a bug in Windows 7 which results
-		 in a timeout of about 20 seconds, followed by two exceptions
+		 in a timeout of up to 20 seconds, followed by two exceptions
 		 in the NT kernel.
 
 		 Since both results are far from desirable, we open symlinks

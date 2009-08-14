@@ -1,5 +1,10 @@
 2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Change comment
+	to be fair.
+
+2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Remove
 	ill-advised attempt to optimize "." and ".." handling by checking for
 	specific position in directory listing.  Explain why.
