@@ -1,3 +1,12 @@
+2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* (fhandler_socket::getsockname): Fix length returned for unbound
+	AF_LOCAL sockets.
+	(fhandler_socket::getpeername): Ditto.
+	* net.cc (socketpair): Don't set sun_path and peer_sun_path to
+	make sure getsockname and getpeername return the correct values
+	for AF_LOCAL sockets.
+
 2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::accept): Use sizeof rather

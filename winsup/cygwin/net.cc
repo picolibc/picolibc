@@ -2866,8 +2866,6 @@ socketpair (int family, int type, int protocol, int *sb)
 
     if (sb0 >= 0 && fdsock (sb0, dev, insock))
       {
-	((fhandler_socket *) sb0)->set_sun_path ("");
-	((fhandler_socket *) sb0)->set_peer_sun_path ("");
 	((fhandler_socket *) sb0)->set_addr_family (family);
 	((fhandler_socket *) sb0)->set_socket_type (type);
 	((fhandler_socket *) sb0)->connect_state (connected);
@@ -2878,8 +2876,6 @@ socketpair (int family, int type, int protocol, int *sb)
 
 	if (sb1 >= 0 && fdsock (sb1, dev, outsock))
 	  {
-	    ((fhandler_socket *) sb1)->set_sun_path ("");
-	    ((fhandler_socket *) sb1)->set_peer_sun_path ("");
 	    ((fhandler_socket *) sb1)->set_addr_family (family);
 	    ((fhandler_socket *) sb1)->set_socket_type (type);
 	    ((fhandler_socket *) sb1)->connect_state (connected);

@@ -1209,7 +1209,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       if (get_sun_path ())
       	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
       memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
-      *namelen = (int) SUN_LEN (&sun) + 1;
+      *namelen = (int) SUN_LEN (&sun) + (get_sun_path () ? 1 : 0);
       res = 0;
     }
   else
@@ -1283,7 +1283,7 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
       if (get_peer_sun_path ())
       	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
       memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
-      *namelen = (int) SUN_LEN (&sun) + 1;
+      *namelen = (int) SUN_LEN (&sun) + (get_peer_sun_path () ? 1 : 0);
     }
   else
     {
