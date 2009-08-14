@@ -1,5 +1,14 @@
 2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Remove
+	ill-advised attempt to optimize "." and ".." handling by checking for
+	specific position in directory listing.  Explain why.
+	(fhandler_disk_file.cc (fhandler_disk_file::readdir): Ditto.
+	Special-case opening file on NFS to fetch inode number and add longish
+	comment to explain why.
+
+2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* (fhandler_socket::getsockname): Fix length returned for unbound
 	AF_LOCAL sockets.
 	(fhandler_socket::getpeername): Ditto.

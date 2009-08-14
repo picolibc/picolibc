@@ -1828,10 +1828,16 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
   sys_wcstombs (de->d_name, NAME_MAX + 1, fname->Buffer,
 		fname->Length / sizeof (WCHAR));
 
-  if (dir->__d_position == 0 && !strcmp (de->d_name, "."))
-    dir->__flags |= dirent_saw_dot;
-  else if (dir->__d_position == 1 && !strcmp (de->d_name, ".."))
-    dir->__flags |= dirent_saw_dot_dot;
+  /* Don't try to optimize relative to dir->__d_position.  On several
+     filesystems it's no safe bet that "." and ".." entries always
+     come first. */
+  if (de->d_name[0] == '.')
+    {
+      if (de->d_name[1] == '\0')
+	dir->__flags |= dirent_saw_dot;
+      else if (de->d_name[1] == '.' && de->d_name[2] == '\0')
+	dir->__flags |= dirent_saw_dot_dot;
+    }
   return 0;
 }
 
@@ -1960,28 +1966,51 @@ go_ahead:
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{
-	  OBJECT_ATTRIBUTES attr;
-
-	  if (dir->__d_position == 0 && FileNameLength == 2
-	      && FileName[0] == '.')
+	  /* Don't try to optimize relative to dir->__d_position.  On several
+	     filesystems it's no safe bet that "." and ".." entries always
+	     come first. */
+	  if (FileNameLength == sizeof (WCHAR) && FileName[0] == '.')
 	    de->d_ino = get_ino_by_handle (pc, get_handle ());
-	  else if (dir->__d_position == 1 && FileNameLength == 4
+	  else if (FileNameLength == sizeof (WCHAR)
 		   && FileName[0] == L'.' && FileName[1] == L'.')
-	    if (!(dir->__flags & dirent_isroot))
-	      de->d_ino = readdir_get_ino (get_name (), true);
-	    else
-	      de->d_ino = get_ino_by_handle (pc, get_handle ());
+	    {
+	      if (!(dir->__flags & dirent_isroot))
+		de->d_ino = readdir_get_ino (get_name (), true);
+	      else
+		de->d_ino = get_ino_by_handle (pc, get_handle ());
+	    }
 	  else
 	    {
+	      OBJECT_ATTRIBUTES attr;
 	      HANDLE hdl;
+	      NTSTATUS f_status;
 
 	      InitializeObjectAttributes (&attr, &fname,
 					  pc.objcaseinsensitive (),
 					  get_handle (), NULL);
-	      if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
-					  FILE_SHARE_VALID_FLAGS,
-					  FILE_OPEN_FOR_BACKUP_INTENT
-					  | FILE_OPEN_REPARSE_POINT)))
+	      /* FILE_OPEN_REPARSE_POINT on NFS is a no-op, so the normal
+	         NtOpenFile here returns the inode number of the symlink target,
+		 rather than the inode number of the symlink itself.
+		 
+		 Worse, trying to open a symlink without setting the special
+		 "ActOnSymlink" EA triggers a bug in Windows 7 which results
+		 in a timeout of about 20 seconds, followed by two exceptions
+		 in the NT kernel.
+
+		 Since both results are far from desirable, we open symlinks
+		 on NFS so that we get the right inode and a happy W7.
+		 And, since some filesystems choke on the EAs, we don't
+		 use them unconditionally. */
+	      f_status = (dir->__flags & dirent_nfs_d_ino)
+			 ? NtCreateFile (&hdl, READ_CONTROL, &attr, &io,
+					 NULL, 0, FILE_SHARE_VALID_FLAGS,
+					 FILE_OPEN, FILE_OPEN_FOR_BACKUP_INTENT,
+					 &nfs_aol_ffei, sizeof nfs_aol_ffei)
+			 : NtOpenFile (&hdl, READ_CONTROL, &attr, &io,
+				       FILE_SHARE_VALID_FLAGS,
+				       FILE_OPEN_FOR_BACKUP_INTENT
+				       | FILE_OPEN_REPARSE_POINT);
+	      if (NT_SUCCESS (f_status))
 		{
 		  de->d_ino = get_ino_by_handle (pc, hdl);
 		  NtClose (hdl);
