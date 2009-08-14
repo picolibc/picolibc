@@ -1,5 +1,10 @@
 2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Fix length
+	check for ".." dir.
+
+2009-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Change comment
 	to be fair.
 

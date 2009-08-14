@@ -1971,7 +1971,7 @@ go_ahead:
 	     come first. */
 	  if (FileNameLength == sizeof (WCHAR) && FileName[0] == '.')
 	    de->d_ino = get_ino_by_handle (pc, get_handle ());
-	  else if (FileNameLength == sizeof (WCHAR)
+	  else if (FileNameLength == 2 * sizeof (WCHAR)
 		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    {
 	      if (!(dir->__flags & dirent_isroot))
