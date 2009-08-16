@@ -19,6 +19,10 @@
 	* tls.m4 (GCC_CHECK_TLS): Also test TLS in a shared library when
 	cross-compiling.
 
+2009-06-25  Olivier Hainque  <hainque@adacore.com>
+
+	* config/mh-ppc-aix (BOOT_ADAFLAGS): Remove -mminimal-toc.
+
 2009-05-26  Rafael Avila de Espindola  <espindola@google.com>
 
 	* plugins.m4: New.
@@ -38,6 +42,27 @@
 	(SC_LOAD_TCLCONFIG): Quote all uses of TCL_BIN_DIR, it may contain
 	"# no Tcl configs found".
 	(SC_LOAD_TKCONFIG): Similarily for TK_BIN_DIR.
+
+2009-04-09  Jakub Jelinek  <jakub@redhat.com>
+
+	* lead-dot.m4: Change copyright header to refer to version
+	3 of the GNU General Public License and to point readers at the
+	COPYING3 file and the FSF's license web page.
+	* warnings.m4: Likewise.
+
+2009-02-11  Kai Tietz  <kai.tietz@onevision.com>
+
+	* mh-cygwin (LDFLAGS): Add linker option to increase stack limit
+	up to 8MB.
+
+2009-01-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* tls.m4 (GCC_CHECK_EMUTLS): Define.
+
+2008-12-21  Andrew Pinski  <pinskia@gmail.com>
+
+	PR target/38300
+	* unwind_ipinfo.m4: Darwin before 9 does not have _Unwind_GetIPInfo.
 
 2008-11-21  Kai Tietz  <kai.tietz@onevision.com>
 
