@@ -71,16 +71,16 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   /* This is used to record what the initial sp was.  The value is needed
      when copying the parent's stack to the child during a fork.  */
   per_process *newu = (per_process *) cygwin_internal (CW_USER_DATA);
-  int uwasnull;
+  bool uwasnull;
 
   /* u is non-NULL if we are in a DLL, and NULL in the main exe.
      newu is the Cygwin DLL's internal per_process and never NULL.  */
   if (u != NULL)
-    uwasnull = 0;	/* Caller allocated space for per_process structure.  */
+    uwasnull = false;	/* Caller allocated space for per_process structure.  */
   else
     {
       u = newu;		/* Using DLL built-in per_process.  */
-      uwasnull = 1;	/* Remember for later.  */
+      uwasnull = true;	/* Remember for later.  */
     }
 
   /* The version numbers are the main source of compatibility checking.

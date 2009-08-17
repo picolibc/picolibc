@@ -228,7 +228,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
-	__small_sprintf (pipename + strlen(PIPE_INTRO), "%p-%p", myself->pid,
+	__small_sprintf (pipename + strlen(PIPE_INTRO), "pipe-%p-%p", myself->pid,
 			InterlockedIncrement ((LONG *) &pipe_unique_id));
       else
 	strcpy (pipename + strlen(PIPE_INTRO), name);
