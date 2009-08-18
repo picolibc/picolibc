@@ -48,6 +48,13 @@
 
 /* Define if the compiler supports aliasing an array to an address.  */
 #undef  _HAVE_ARRAY_ALIASING
+
+/* Define if the platform supports long double type.  */
+#undef  _HAVE_LONG_DOUBLE
+
+/* Define if the platform long double type is equal to double.  */
+#undef  _LDBL_EQ_DBL
+
 @BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)
