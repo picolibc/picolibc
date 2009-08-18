@@ -187,6 +187,7 @@ crt1.o: $(CRT1_DIR)$(CRT1)
 
 $(CRT1_DIR)$(CRT1): ; @true
 
+$(srcdir)/newlib.hin:
 
 all-recursive: stmp-targ-include
 

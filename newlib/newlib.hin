@@ -1,4 +1,7 @@
-/* newlib.hin.  Generated from configure.in by autoheader.  */
+/* newlib.hin.  Manually edited from the output of autoheader to
+   remove all PACKAGE_ macros which will collide with any user
+   package using newlib header files and having its own package name,
+   version, etc...  */
 #ifndef __NEWLIB_H__
 
 #define __NEWLIB_H__ 1

@@ -459,10 +459,6 @@ newlib.h: stamp-h1
 stamp-h1: $(srcdir)/newlib.hin $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status newlib.h
-$(srcdir)/newlib.hin: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) $(top_srcdir)/acconfig.h
-	cd $(top_srcdir) && $(AUTOHEADER)
-	rm -f stamp-h1
-	touch $@
 
 distclean-hdr:
 	-rm -f newlib.h stamp-h1
@@ -865,6 +861,8 @@ crt1.o: $(CRT1_DIR)$(CRT1)
 	 || cp $< $@
 
 $(CRT1_DIR)$(CRT1): ; @true
+
+$(srcdir)/newlib.hin:
 
 all-recursive: stmp-targ-include
 

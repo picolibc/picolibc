@@ -1,5 +1,11 @@
 2009-08-18  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* newlib.hin: Add comment regarding file being manually edited.
+	* Makefile.am: Add no-op rule for newlib.hin.
+	* Makefile.in: Regenerated.
+
+2009-08-18  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* acconfig.h: Add templates for _HAVE_LONG_DOUBLE and _LDBL_EQ_DBL.
 
 2009-08-18  Eric Blake  <ebb9@byu.net>
