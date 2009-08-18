@@ -1,3 +1,11 @@
+2009-08-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (dtable::fixup_after_exec): Close any popen'ed file handles here.
+	* fhandler.h (fhandler_*::ispipe): New function.
+	(fhandler_base::get_popen_pid): Define virtual function.
+	(fhandler_*::isdevice): Make const.
+	(fhandler_*::isfifo): Ditto.
+
 2009-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* syscalls.cc (popen): Reorganize slightly for clarity.  Fix a comment.

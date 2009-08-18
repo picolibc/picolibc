@@ -342,8 +342,10 @@ class fhandler_base
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
   virtual bool is_tty () const { return false; }
-  virtual bool isdevice () { return true; }
-  virtual bool isfifo () { return false; }
+  virtual bool ispipe () const { return false; }
+  virtual pid_t get_popen_pid () const {return 0;}
+  virtual bool isdevice () const { return true; }
+  virtual bool isfifo () const { return false; }
   virtual char *ptsname () { return NULL;}
   virtual class fhandler_socket *is_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
@@ -559,6 +561,8 @@ public:
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
 
+  bool ispipe() const { return true; }
+
   void set_popen_pid (pid_t pid) {popen_pid = pid;}
   pid_t get_popen_pid () const {return popen_pid;}
   _off64_t lseek (_off64_t offset, int whence);
@@ -607,7 +611,7 @@ public:
   int open (int, mode_t);
   int close ();
   int dup (fhandler_base *child);
-  bool isfifo () { return true; }
+  bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   OVERLAPPED *get_overlapped () {return &io_status;}
@@ -723,7 +727,7 @@ class fhandler_disk_file: public fhandler_base
 
   int open (int flags, mode_t mode);
   int lock (int, struct __flock64 *);
-  bool isdevice () { return false; }
+  bool isdevice () const { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));

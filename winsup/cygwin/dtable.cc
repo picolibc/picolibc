@@ -753,6 +753,8 @@ dtable::fixup_after_exec ()
 	      }
 	    release (i);
 	  }
+	else if (fh->get_popen_pid ())
+	  close (i);
 	else if (i == 0)
 	  SetStdHandle (std_consts[i], fh->get_io_handle ());
 	else if (i <= 2)
