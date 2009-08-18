@@ -1,3 +1,8 @@
+2009-08-17  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/string/wcsncpy.c (wcsncpy):  Re-write function based on small
+	version of strncpy() (fixing two bugs).
+
 2009-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/mktemp.c (mkdtemp): Fix typo in function name.
