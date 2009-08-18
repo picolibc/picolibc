@@ -51,7 +51,8 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared	
 
-CHEWOUT_FILES =
+CHEWOUT_FILES = \
+	popen.def
 
 SUFFIXES = .def
 
@@ -63,8 +64,8 @@ CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 
 TARGETDOC = ../tmp.texi
 
-# No doc for posix.
-doc:
+doc: $(CHEWOUT_FILES)
+	cat $(srcdir)/posix.tex >> $(TARGETDOC)
 
 AM_CFLAGS = -D_GNU_SOURCE
 

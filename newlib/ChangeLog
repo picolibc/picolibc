@@ -1,3 +1,14 @@
+2009-08-18  Eric Blake  <ebb9@byu.net>
+
+	Improve popen compatibility with glibc.
+	* libc/posix/popen.c (popen): The 2006-08-22 change to use
+	FD_CLOEXEC disagrees with other implementations; instead, use
+	pidlist to work even when fcntl is not available.  Meanwhile,
+	support the 'e' modifier to set CLOEXEC, as in glibc.  Drop
+	cygwin-specific code, now that cygwin has its own version.
+	* libc/posix/Makefile.am (CHEWOUT_FILES): Document popen.
+	* libc/posix/posix.tex: New file.
+
 2009-08-17  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/string/wcsncpy.c (wcsncpy):  Re-write function based on small
