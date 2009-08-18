@@ -1,5 +1,10 @@
 2009-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* syscalls.cc (popen): Rewrite to accommodate situations where stdin,
+	stdout, or stderr are closed.
+
+2009-08-17  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* pipe.cc (fhandler_pipe::create_selectable): Add -pipe to default pipe names.
 
 	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Use bool/true/false

@@ -3618,6 +3618,7 @@ popen (const char *command, const char *in_type)
   const char *type = in_type;
   char rw = *type++;
 
+  /* Sanity check in_type */
   if (*type == 'b' || *type == 't')
     type++;
   if ((rw != 'r' && rw != 'w') || (*type != '\0'))
@@ -3626,62 +3627,86 @@ popen (const char *command, const char *in_type)
       return NULL;
     }
 
-  int fd, other_fd, __stdin, __stdout, stdwhat;
-
   int fds[2];
   if (pipe (fds) < 0)
     return NULL;
 
-  switch (rw)
+  int orig_fds[2] = {fds[0], fds[1]};
+  int myix = rw == 'r' ? 0 : 1;
+  int __std[2];
+  __std[myix] = -1;	/* -1 denotes don't pass this fd to child process */
+
+  lock_process now;
+  FILE *fp = fdopen (fds[myix], in_type);
+  if (fp)
     {
-    case 'r':
-      __stdin = -1;
-      stdwhat = 1;
-      other_fd = __stdout = fds[1];
-      fd = fds[0];
-      break;
-    case 'w':
-      __stdout = -1;
-      stdwhat = 0;
-      other_fd = __stdin = fds[0];
-      fd = fds[1];
-      break;
-    default:
-      return NULL;	/* avoid a compiler warning */
+      /* If fds are in the range of stdin/stdout/stderr, move them
+	 out of the way (possibly temporarily).  Otherwise, spawn_guts
+	 will be confused.  We do this here rather than adding logic to
+	 spawn_guts because spawn_guts is likely to be a more frequently
+	 used routine and having stdin/stdout/stderr closed and reassigned
+	 to pipe handles is an unlikely event. */
+      for (int i = 0; i < 2; i++)
+	if (fds[i] <= 2)
+	  {
+	    cygheap_fdnew newfd(3);
+	    cygheap->fdtab.move_fd (fds[i], newfd);
+	    fds[i] = newfd;
+	  }
+
+      int myfd = fds[myix];	/* myfd - convenience variable for manipulation
+				   of the "parent" end of the pipe. */
+      int stdchild = myix ^ 1;	/* stdchild denotes the index into fd for the
+				   handle which will be redirected to
+				   stdin/stdout */
+      __std[stdchild] = fds[stdchild];
+
+      const char *argv[4] =
+	{
+	  "/bin/sh",
+	  "-c",
+	  command,
+	  NULL
+	};
+
+      /* Don't pass our end of the pipe to the child process */
+      int fd_state = fcntl64 (myfd, F_GETFD, 0);
+      fcntl64 (myfd, F_SETFD, fd_state | FD_CLOEXEC);
+
+      /* Also don't pass the file handle currently associated with stdin/stdout
+	 to the child.  This function may actually fail if the stdchild fd
+	 is closed.  But that's ok. */
+      int stdchild_state = fcntl64 (stdchild, F_GETFD, 0);
+      fcntl64 (stdchild, F_SETFD, stdchild_state | FD_CLOEXEC);
+
+      /* Start a shell process to run the given command without forking. */
+      pid_t pid = spawn_guts ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
+			       __std[0], __std[1]);
+
+      /* Reinstate the close-on-exec state */
+      fcntl64 (stdchild, F_SETFD, stdchild_state);
+
+      /* If pid >= 0 then spawn_guts succeeded.  */
+      if (pid >= 0)
+	{
+	  close (fds[stdchild]);	/* Close the child end of the pipe. */
+	  /* Move the fd back to its original slot if it has been moved since
+	     we're always supposed to open the lowest numbered available fd
+	     and, if fds[mix] != orig_fds[myix] then orig_fds[myix] is
+	     presumably lower. */
+	  if (fds[myix] != orig_fds[myix])
+	    cygheap->fdtab.move_fd (fds[myix], myfd = orig_fds[myix]);
+	  fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[myfd];
+	  /* Flag that this handle is associated with popen and then reset
+	     the handle's original close-on-exec state. */
+	  fh->set_popen_pid (pid);
+	  fcntl64 (myfd, F_SETFD, fd_state);
+	  return fp;
+	}
     }
 
-  FILE *fp = fdopen (fd, in_type);
-  fcntl64 (fd, F_SETFD, fcntl64 (fd, F_GETFD, 0) | FD_CLOEXEC);
-
-  if (!fp)
-    goto err;
-
-  pid_t pid;
-  const char *argv[4];
-
-  argv[0] = "/bin/sh";
-  argv[1] = "-c";
-  argv[2] = command;
-  argv[3] = NULL;
-
-  {
-    lock_process now;
-    int state = fcntl64 (stdwhat, F_GETFD, 0);
-    fcntl64 (stdwhat, F_SETFD, state | FD_CLOEXEC);
-    pid = spawn_guts ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
-		      __stdin, __stdout);
-    fcntl64 (stdwhat, F_SETFD, state);
-  }
-
-  if (pid >= 0)
-    {
-      close (other_fd);
-      fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[fd];
-      fh->set_popen_pid (pid);
-      return fp;
-    }
-
-err:
+  /* If we reach here we've seen an error but the pipe handles are open.
+     Close them and return NULL. */
   int save_errno = get_errno ();
   close (fds[0]);
   close (fds[1]);
