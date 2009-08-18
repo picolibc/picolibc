@@ -3631,10 +3631,7 @@ popen (const char *command, const char *in_type)
   if (pipe (fds) < 0)
     return NULL;
 
-  int orig_fds[2] = {fds[0], fds[1]};
   int myix = rw == 'r' ? 0 : 1;
-  int __std[2];
-  __std[myix] = -1;	/* -1 denotes don't pass this fd to child process */
 
   lock_process now;
   FILE *fp = fdopen (fds[myix], in_type);
@@ -3646,6 +3643,7 @@ popen (const char *command, const char *in_type)
 	 spawn_guts because spawn_guts is likely to be a more frequently
 	 used routine and having stdin/stdout/stderr closed and reassigned
 	 to pipe handles is an unlikely event. */
+      int orig_fds[2] = {fds[0], fds[1]};
       for (int i = 0; i < 2; i++)
 	if (fds[i] <= 2)
 	  {
@@ -3659,7 +3657,10 @@ popen (const char *command, const char *in_type)
       int stdchild = myix ^ 1;	/* stdchild denotes the index into fd for the
 				   handle which will be redirected to
 				   stdin/stdout */
-      __std[stdchild] = fds[stdchild];
+      int __std[2];
+      __std[myix] = -1;		/* -1 means don't pass this fd to the child
+				   process */
+      __std[stdchild] = fds[stdchild]; /* Do pass this as the std handle */
 
       const char *argv[4] =
 	{
