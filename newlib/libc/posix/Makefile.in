@@ -162,6 +162,8 @@ ENABLE_NEWLIB_ICONV_TRUE = @ENABLE_NEWLIB_ICONV_TRUE@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HAVE_LONG_DOUBLE_FALSE = @HAVE_LONG_DOUBLE_FALSE@
+HAVE_LONG_DOUBLE_TRUE = @HAVE_LONG_DOUBLE_TRUE@
 HAVE_POSIX_DIR_FALSE = @HAVE_POSIX_DIR_FALSE@
 HAVE_POSIX_DIR_TRUE = @HAVE_POSIX_DIR_TRUE@
 HAVE_SIGNAL_DIR_FALSE = @HAVE_SIGNAL_DIR_FALSE@
@@ -319,7 +321,9 @@ libposix_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-CHEWOUT_FILES = 
+CHEWOUT_FILES = \
+	popen.def
+
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi
@@ -730,8 +734,8 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	$(CHEW) < $< > $*.def 2> $*.ref
 	touch stmp-def
 
-# No doc for posix.
-doc:
+doc: $(CHEWOUT_FILES)
+	cat $(srcdir)/posix.tex >> $(TARGETDOC)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
