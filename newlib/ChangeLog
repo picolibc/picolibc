@@ -1,5 +1,7 @@
 2009-08-18  Eric Blake  <ebb9@byu.net>
 
+	* libc/posix/popen.c (popen): Fix documented prototype.
+
 	Improve popen compatibility with glibc.
 	* libc/posix/popen.c (popen): The 2006-08-22 change to use
 	FD_CLOEXEC disagrees with other implementations; instead, use

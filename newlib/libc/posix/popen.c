@@ -43,7 +43,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	FILE *popen(char *<[s]>, char *<[mode]>);
+	FILE *popen(const char *<[s]>, const char *<[mode]>);
 
 	int pclose(FILE *<[f]>);
 
