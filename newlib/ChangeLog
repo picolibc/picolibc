@@ -1,3 +1,8 @@
+2009-08-19  Eric Blake  <ebb9@byu.net>
+
+	* libc/Makefile.am (SUBDEFS): Correctly build popen docs.
+	* libc/libc.texinfo (Top): Add posix node to menu.
+
 2009-08-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* newlib.hin: Add comment regarding file being manually edited.

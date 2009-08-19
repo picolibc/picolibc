@@ -13,7 +13,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents the ANSI C library.
 
-Copyright (C) 1992, 1993, 1994-2008 Red Hat, Inc.
+Copyright (C) 1992, 1993, 1994-2009 Red Hat, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -162,6 +162,7 @@ into another language, under the above conditions for modified versions.
 * Reentrancy::
 
 * Misc::
+* Posix::
 * Syscalls::
 * Arglists::
 @ifset ICONV
