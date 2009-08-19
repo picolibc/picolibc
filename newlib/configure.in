@@ -430,7 +430,7 @@ fi
 AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$acnewlib_cv_type_long_double" = x"yes")
 
 AC_CACHE_CHECK(whether long double equals double,
-	       newlib_ldbl_eq_dbl, [dnl
+	       newlib_cv_ldbl_eq_dbl, [dnl
 cat > conftest.c <<EOF
 #include <float.h>
 #if DBL_MANT_DIG == LDBL_MANT_DIG  &&  LDBL_MIN_EXP == DBL_MIN_EXP  && \
@@ -443,12 +443,12 @@ EOF
 if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
 							1>&AS_MESSAGE_LOG_FD])
 then
-  newlib_ldbl_eq_dbl=yes;
+  newlib_cv_ldbl_eq_dbl=yes;
 else
-  newlib_ldbl_eq_dbl=no;
+  newlib_cv_ldbl_eq_dbl=no;
 fi
 rm -f conftest*])
-if test $newlib_ldbl_eq_dbl = yes; then
+if test $newlib_cv_ldbl_eq_dbl = yes; then
   AC_DEFINE_UNQUOTED(_LDBL_EQ_DBL)
 fi
 

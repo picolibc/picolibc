@@ -1,3 +1,9 @@
+2009-08-19  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.in (newlib_cv_ldbl_eq_dbl): Rename cache variable
+	from newlib_ldbl_eq_dbl.
+	* configure: Regenerate.
+
 2009-08-19  Eric Blake  <ebb9@byu.net>
 
 	* libc/Makefile.am (SUBDEFS): Correctly build popen docs.
