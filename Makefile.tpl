@@ -11,7 +11,7 @@ in
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 # 
 # This program is distributed in the hope that it will be useful,
@@ -20,8 +20,8 @@ in
 # GNU General Public License for more details.
 # 
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# along with this program; see the file COPYING3.  If not see
+# <http://www.gnu.org/licenses/>.
 #
 
 # First, test for a proper version of make, but only where one is required.
@@ -120,6 +120,19 @@ BUILD_SUBDIR = @build_subdir@
 # directories built for the build system.
 BUILD_CONFIGARGS = @build_configargs@ --with-build-subdir="$(BUILD_SUBDIR)"
 
+# Linker flags to use on the host, for stage1 or when not
+# bootstrapping.
+STAGE1_LDFLAGS = @stage1_ldflags@
+
+# Libraries to use on the host, for stage1 or when not bootstrapping.
+STAGE1_LIBS = @stage1_libs@
+
+# Linker flags to use for stage2 and later.
+POSTSTAGE1_LDFLAGS = @poststage1_ldflags@
+
+# Libraries to use for stage2 and later.
+POSTSTAGE1_LIBS = @poststage1_libs@
+
 # This is the list of variables to export in the environment when
 # configuring any subdirectory.  It must also be exported whenever
 # recursing into a build directory in case that directory's Makefile
@@ -185,7 +198,7 @@ HOST_EXPORTS = \
 	CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
 	DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
 	LD="$(LD)"; export LD; \
-	LDFLAGS="$(LDFLAGS)"; export LDFLAGS; \
+	LDFLAGS="$(STAGE1_LDFLAGS) $(LDFLAGS)"; export LDFLAGS; \
 	NM="$(NM)"; export NM; \
 	RANLIB="$(RANLIB)"; export RANLIB; \
 	WINDRES="$(WINDRES)"; export WINDRES; \
@@ -200,6 +213,7 @@ HOST_EXPORTS = \
 	OBJDUMP_FOR_TARGET="$(OBJDUMP_FOR_TARGET)"; export OBJDUMP_FOR_TARGET; \
 	RANLIB_FOR_TARGET="$(RANLIB_FOR_TARGET)"; export RANLIB_FOR_TARGET; \
 	TOPLEVEL_CONFIGURE_ARGUMENTS="$(TOPLEVEL_CONFIGURE_ARGUMENTS)"; export TOPLEVEL_CONFIGURE_ARGUMENTS; \
+	HOST_LIBS="$(STAGE1_LIBS)"; export HOST_LIBS; \
 	GMPLIBS="$(HOST_GMPLIBS)"; export GMPLIBS; \
 	GMPINC="$(HOST_GMPINC)"; export GMPINC; \
 	PPLLIBS="$(HOST_PPLLIBS)"; export PPLLIBS; \
@@ -218,8 +232,16 @@ POSTSTAGE1_HOST_EXPORTS = \
 	  -B$$r/$(HOST_SUBDIR)/prev-gcc/ -B$(build_tooldir)/bin/ \
 	  $(XGCC_FLAGS_FOR_TARGET) $$TFLAGS"; export CC; \
 	CC_FOR_BUILD="$$CC"; export CC_FOR_BUILD; \
-	GNATBIND="$$r/$(HOST_SUBDIR)/prev-gcc/gnatbind"; export GNATBIND \
-	LDFLAGS="$(BOOT_LDFLAGS)"; export LDFLAGS;
+	CXX="$(STAGE_CC_WRAPPER) $$r/$(HOST_SUBDIR)/prev-gcc/g++$(exeext) \
+	  -B$$r/$(HOST_SUBDIR)/prev-gcc/ -B$(build_tooldir)/bin/ -nostdinc++ \
+	  -I$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/include/$(TARGET_SUBDIR) \
+	  -I$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/include \
+	  -I$$r/$(srcdir)/libstdc++-v3/libsupc++ \
+	  -L$$r/prev-$(TARGET_SUBDIR)/libstdc++-v3/src/.libs"; export CXX; \
+	CXX_FOR_BUILD="$$CXX"; export CXX_FOR_BUILD; \
+	GNATBIND="$$r/$(HOST_SUBDIR)/prev-gcc/gnatbind"; export GNATBIND; \
+	LDFLAGS="$(POSTSTAGE1_LDFLAGS) $(BOOT_LDFLAGS)"; export LDFLAGS; \
+	HOST_LIBS="$(POSTSTAGE1_LIBS)"; export HOST_LIBS;
 
 # Target libraries are put under this directory:
 TARGET_SUBDIR = @target_subdir@
@@ -540,8 +562,11 @@ X11_FLAGS_TO_PASS = \
 # Flags to pass to stage2 and later makes.
 
 POSTSTAGE1_FLAGS_TO_PASS = \
-	CC="$${CC}" CC_FOR_BUILD="$${CC_FOR_BUILD}" GNATBIND="$${GNATBIND}" \
-	LDFLAGS="$(BOOT_LDFLAGS)" \
+	CC="$${CC}" CC_FOR_BUILD="$${CC_FOR_BUILD}" \
+	CXX="$${CXX}" CXX_FOR_BUILD="$${CXX_FOR_BUILD}" \
+	GNATBIND="$${GNATBIND}" \
+	LDFLAGS="$(POSTSTAGE1_LDFLAGS) $(BOOT_LDFLAGS)" \
+	HOST_LIBS="$(POSTSTAGE1_LIBS)" \
 	"`echo 'ADAFLAGS=$(BOOT_ADAFLAGS)' | sed -e s'/[^=][^=]*=$$/XFOO=/'`"
 
 # Flags to pass down to makes which are built with the target environment.
@@ -1436,7 +1461,7 @@ do-clean: clean-stage[+id+]
 	  $(do-[+compare-target+]) > /dev/null 2>&1; \
 	  if test $$? -eq 1; then \
 	    case $$file in \
-	      gcc/cc*-checksum$(objext) | ./libgcc/* | ./gcc/ada/*tools/*) \
+	      @compare_exclusions@) \
 	        echo warning: $$file differs ;; \
 	      *) \
 	        echo $$file differs >> .bad_compare ;; \
