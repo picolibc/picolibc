@@ -97,7 +97,7 @@ stamp-srcs: Makefile template.S template_r.S
 
 $(TEMPLATE_SFILES:_=.S) $(TEMPLATE_SFILES_R:_=.S): stamp-srcs
 
-all: crt0.o
+all-local: crt0.o
 
 close_r.o: close.S
 fork_r.o: fork.S

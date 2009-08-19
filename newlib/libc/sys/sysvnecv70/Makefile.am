@@ -13,7 +13,7 @@ lib_a_SOURCES = ioctl.S isatty.S read.S lseek.S close.S sbrk.S fstat.S \
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-all: crt0.o
+all-local: crt0.o
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

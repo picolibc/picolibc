@@ -90,7 +90,7 @@ $(COPYRENAMEOFILES):
 $(COPYOMFILES):
 	$(AR) x /lib/libm.a $(COPYOMFILES) 
 
-all: crt0.o
+all-local: crt0.o
 
 crt0.o:
 	cp /lib/crt0.o crt0.o

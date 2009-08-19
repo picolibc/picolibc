@@ -469,8 +469,6 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 	uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 
-all: Makefile
-
 install-data-local: install-pkglibLTLIBRARIES $(srcdir)/gconv-modules
 	$(INSTALL_DATA) $(srcdir)/gconv-modules $(DESTDIR)$(pkglibdir)/gconv-modules
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

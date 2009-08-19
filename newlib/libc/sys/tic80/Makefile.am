@@ -17,7 +17,7 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 EXTRA_LIBRARIES = libfoo.a
 libfoo_a_SOURCES = crt0.c
 
-all: crt0.o
+all-local: crt0.o
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

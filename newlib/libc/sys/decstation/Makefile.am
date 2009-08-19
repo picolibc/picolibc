@@ -38,7 +38,7 @@ lib_a_LIBADD = $(COPYOFILES)
 $(COPYOFILES):
 	ar x /lib/libc.a $(COPYOFILES) 
 
-all: crt0.o
+all-local: crt0.o
 
 crt0.o:
 	cp /lib/crt0.o crt0.o

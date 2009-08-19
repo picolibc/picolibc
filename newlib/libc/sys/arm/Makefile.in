@@ -329,7 +329,8 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 check-am:
 check: check-am
-all-am: Makefile $(LIBRARIES)
+@MAY_SUPPLY_SYSCALLS_FALSE@all-local:
+all-am: Makefile $(LIBRARIES) all-local
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -405,8 +406,8 @@ ps-am:
 
 uninstall-am:
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-generic clean-noinstLIBRARIES ctags distclean \
+.PHONY: CTAGS GTAGS all all-am all-local am--refresh check check-am \
+	clean clean-generic clean-noinstLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-tags dvi dvi-am \
 	html html-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am install-info \
@@ -417,7 +418,7 @@ uninstall-am:
 	uninstall-am uninstall-info-am
 
 
-@MAY_SUPPLY_SYSCALLS_TRUE@all: crt0.o
+@MAY_SUPPLY_SYSCALLS_TRUE@all-local: crt0.o
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

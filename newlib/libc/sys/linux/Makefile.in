@@ -1560,7 +1560,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 check-am:
 check: check-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) all-local
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -1641,8 +1641,8 @@ uninstall-am:
 
 uninstall-info: uninstall-info-recursive
 
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
-	check-am clean clean-generic clean-libtool \
+.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am all-local \
+	am--refresh check check-am clean clean-generic clean-libtool \
 	clean-noinstLIBRARIES clean-noinstLTLIBRARIES clean-recursive \
 	ctags ctags-recursive distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-recursive \
@@ -1683,7 +1683,7 @@ objectlist.awk.in: $(noinst_LTLIBRARIES) $(SUBLIBS)
 	    fi; \
 	done
 
-all: crt0.o crt1.o
+all-local: crt0.o crt1.o
 
 crt0.o: machine/crt0.o
 	rm -f $@

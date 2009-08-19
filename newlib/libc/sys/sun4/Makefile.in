@@ -383,7 +383,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 check-am:
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) all-local
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -459,8 +459,8 @@ ps-am:
 
 uninstall-am:
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-generic clean-noinstLIBRARIES ctags distclean \
+.PHONY: CTAGS GTAGS all all-am all-local am--refresh check check-am \
+	clean clean-generic clean-noinstLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-tags dvi dvi-am \
 	html html-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am install-info \
@@ -481,7 +481,7 @@ $(COPYRENAMEOFILES):
 $(COPYOMFILES):
 	$(AR) x /lib/libm.a $(COPYOMFILES) 
 
-all: crt0.o
+all-local: crt0.o
 
 crt0.o:
 	cp /lib/crt0.o crt0.o

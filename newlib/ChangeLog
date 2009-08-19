@@ -1,5 +1,59 @@
 2009-08-19  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
+	* iconvdata/Makefile.am (all): Remove.
+	* libc/sys/a29khif/Makefile.am (all-am): Rename from ...
+	(all): ... this.
+	* libc/sys/arc/Makefile.am: Likewise.
+	* libc/sys/arm/Makefile.am: Likewise.
+	* libc/sys/d10v/Makefile.am: Likewise.
+	* libc/sys/decstation/Makefile.am: Likewise.
+	* libc/sys/h8300hms/Makefile.am: Likewise.
+	* libc/sys/h8500hms/Makefile.am: Likewise.
+	* libc/sys/linux/Makefile.am: Likewise.
+	* libc/sys/linux/machine/i386/Makefile.am: Likewise.
+	* libc/sys/m88kbug/Makefile.am: Likewise.
+	* libc/sys/mmixware/Makefile.am: Likewise.
+	* libc/sys/netware/Makefile.am: Likewise.
+	* libc/sys/rdos/Makefile.am: Likewise.
+	* libc/sys/rtems/Makefile.am: Likewise.
+	* libc/sys/sh/Makefile.am: Likewise.
+	* libc/sys/sparc64/Makefile.am: Likewise.
+	* libc/sys/sun4/Makefile.am: Likewise.
+	* libc/sys/sysmec/Makefile.am: Likewise.
+	* libc/sys/sysnec810/Makefile.am: Likewise.
+	* libc/sys/sysnecv850/Makefile.am: Likewise.
+	* libc/sys/sysvi386/Makefile.am: Likewise.
+	* libc/sys/sysvnecv70/Makefile.am: Likewise.
+	* libc/sys/tic80/Makefile.am: Likewise.
+	* libc/sys/w65/Makefile.am: Likewise.
+	* libc/sys/z8ksim/Makefile.am: Likewise.
+	* iconvdata/Makefile.in: Regenerate.
+	* libc/sys/a29khif/Makefile.in: Likewise.
+	* libc/sys/arc/Makefile.in: Likewise.
+	* libc/sys/arm/Makefile.in: Likewise.
+	* libc/sys/d10v/Makefile.in: Likewise.
+	* libc/sys/decstation/Makefile.in: Likewise.
+	* libc/sys/h8300hms/Makefile.in: Likewise.
+	* libc/sys/h8500hms/Makefile.in: Likewise.
+	* libc/sys/linux/Makefile.in: Likewise.
+	* libc/sys/linux/machine/i386/Makefile.in: Likewise.
+	* libc/sys/m88kbug/Makefile.in: Likewise.
+	* libc/sys/mmixware/Makefile.in: Likewise.
+	* libc/sys/netware/Makefile.in: Likewise.
+	* libc/sys/rdos/Makefile.in: Likewise.
+	* libc/sys/rtems/Makefile.in: Likewise.
+	* libc/sys/sh/Makefile.in: Likewise.
+	* libc/sys/sparc64/Makefile.in: Likewise.
+	* libc/sys/sun4/Makefile.in: Likewise.
+	* libc/sys/sysmec/Makefile.in: Likewise.
+	* libc/sys/sysnec810/Makefile.in: Likewise.
+	* libc/sys/sysnecv850/Makefile.in: Likewise.
+	* libc/sys/sysvi386/Makefile.in: Likewise.
+	* libc/sys/sysvnecv70/Makefile.in: Likewise.
+	* libc/sys/tic80/Makefile.in: Likewise.
+	* libc/sys/w65/Makefile.in: Likewise.
+	* libc/sys/z8ksim/Makefile.in: Likewise.
+
 	* configure.in (newlib_cv_ldbl_eq_dbl): Rename cache variable
 	from newlib_ldbl_eq_dbl.
 	* configure: Regenerate.

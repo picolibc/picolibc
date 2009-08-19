@@ -12,8 +12,6 @@ endif
 
 AM_CFLAGS = -DNDEBUG
 
-all: Makefile
-
 pkglib_LTLIBRARIES = EUC-JP.la
 EUC_JP_la_SOURCES = dummy.c
 EUC_JP_la_LIBADD = $(LIB_OBJS)
