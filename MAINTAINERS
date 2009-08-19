@@ -10,20 +10,20 @@ Makefile.*; configure; configure.ac; src-release
 	be kept in sync with their counterparts in the GCC
 	repository.  Also please notify the following of
 	any committed patches:
-		binutils@sources.redhat.com
-		gdb-patches@sources.redhat.com
+		binutils@sourceware.org
+		gdb-patches@sourceware.org
 
 bfd/; binutils/; elfcpp/; gas/; gold/; gprof/; ld/; opcodes/; cpu/;
 BFD's part of include/
 
-	binutils: http://sources.redhat.com/binutils/
-	Patches to binutils@sources.redhat.com.
+	binutils: http://sourceware.org/binutils/
+	Patches to binutils@sourceware.org.
 	Please notify the following of any interface changes:
-		gdb-patches@sources.redhat.com
+		gdb-patches@sourceware.org
 
 cgen/; cgen parts of opcodes/, sim/ & include/
-	cgen: http://sources.redhat.com/cgen/
-	Patches to cgen@sources.redhat.com
+	cgen: http://sourceware.org/cgen/
+	Patches to cgen@sourceware.org
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
@@ -35,15 +35,15 @@ config.guess; config.sub; readline/support/config.{sub,guess}
 	in via a merge.  When updating any of these files, please be
 	sure to update all of them.
 	Please notify the following of any committed patches:
-		binutils@sources.redhat.com
-		gdb-patches@sources.redhat.com
+		binutils@sourceware.org
+		gdb-patches@sourceware.org
 
 depcomp
         Send bug reports and patches to bug-automake@gnu.org.
 
 gdb/; readline/; sim/; GDB's part of include/
 	GDB: http://www.gnu.org/software/gdb/
-	Patches to gdb-patches@sources.redhat.com.
+	Patches to gdb-patches@sourceware.org.
 	See also gdb/MAINTAINERS and sim/MAINTAINERS.
 
 include/
@@ -81,12 +81,12 @@ symlink-tree
 	See libiberty.
 
 newlib/; libgloss/
-	http://sources.redhat.com/newlib/
-	Patches to newlib@sources.redhat.com.
+	http://sourceware.org/newlib/
+	Patches to newlib@sourceware.org.
 
 sid/; SID's part of cgen/
-	sid: http://sources.redhat.com/sid/
-	Patches to sid@sources.redhat.com
+	sid: http://sourceware.org/sid/
+	Patches to sid@sourceware.org
 
 texinfo/texinfo.tex
 	texinfo: http://ftp.gnu.org.
@@ -95,14 +95,13 @@ texinfo/texinfo.tex
 	Please not use GCC's texinfo.  Please do not import texinfo.
 
 tcl/; tix/; itcl/; tk/; libgui/
-	insight: http://sources.redhat.com/insight/
-	Contact insight@sources.redhat.com.
+	insight: http://sourceware.org/insight/
+	Contact insight@sourceware.org.
 
 winsup/
-	cygwin: http://sources.redhat.com/cygwin
-	Patches to cygwin-patches@sources.redhat.com.
-	General discussion cygwin@sources.redhat.com.
-	See also winsup/MAINTAINERS.
+	cygwin: http://sourceware.org/cygwin
+	Patches to cygwin-patches@cygwin.com.
+	General discussion cygwin@cygwin.com.
 
 config-ml.in; makefile.vms; mkdep; setup.com;
 etc/; utils/;
@@ -117,11 +116,9 @@ config/
 	counterparts in the GCC repository.
 
 modules file
-	Obviously changes to this file should not go through
-	overseers@sources.redhat.com.  If you understand the file
-	format (or can cut-and-paste existing entries), modify it. If
-	it scares you, get someone who does understand it to help you.
-	Be prepared to fix it if you do break it.
+	If you understand the file format (or can cut-and-paste existing
+	entries), modify it. If it scares you, get someone who does
+	understand it to help you.  Be prepared to fix it if you do break it.
 
 /* Local variables: */
 /* change-log-default-name: "/dev/null" */
