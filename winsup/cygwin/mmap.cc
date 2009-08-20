@@ -536,7 +536,7 @@ void
 mmap_record::free_fh (fhandler_base *fh)
 {
   if (!anonymous ())
-    cfree (fh);
+    delete fh;
 }
 
 mmap_record *

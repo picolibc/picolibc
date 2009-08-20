@@ -1,3 +1,14 @@
+2009-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (build_fh_dev): Take additional bool parameter indicating
+	whether set_name should be called or not.
+	(dtable::dup_worker): Call build_fh_pc with new second parameter set
+	to false.  Explain why.  If fhandler's dup failed, delete rather than
+	cfree newfh and set newfh to NULL to indicate failure correctly.
+	* dtable.h (build_fh_pc): Change declaration according to above change.
+	Default set_name parameter to true.
+	* mmap.cc (mmap_record::free_fh): Delete rather than cfree fh.
+
 2009-08-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dtable.cc (dtable::fixup_after_exec): Close any popen'ed file handles here.

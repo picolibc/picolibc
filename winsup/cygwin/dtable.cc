@@ -444,7 +444,7 @@ build_fh_dev (const device& dev, const char *unix_name)
 
 #define fh_unset ((fhandler_base *) 1)
 fhandler_base *
-build_fh_pc (path_conv& pc)
+build_fh_pc (path_conv& pc, bool set_name)
 {
   fhandler_base *fh = fh_unset;
 
@@ -564,10 +564,10 @@ build_fh_pc (path_conv& pc)
   if (fh == fh_unset)
     fh = cnew (fhandler_nodevice) ();
 
-  if (fh)
-    fh->set_name (pc);
-  else
+  if (!fh)
     set_errno (EMFILE);
+  else if (set_name)
+    fh->set_name (pc);
 
   debug_printf ("fh %p", fh);
   return fh;
@@ -576,7 +576,10 @@ build_fh_pc (path_conv& pc)
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fh_pc (oldfh->pc);
+  /* Don't call set_name in build_fh_pc.  It will be called in
+     fhandler_base::operator= below.  Calling it twice will result
+     in double allocation. */
+  fhandler_base *newfh = build_fh_pc (oldfh->pc, false);
   if (!newfh)
     debug_printf ("build_fh_pc failed");
   else
@@ -585,7 +588,8 @@ dtable::dup_worker (fhandler_base *oldfh)
       newfh->set_io_handle (NULL);
       if (oldfh->dup (newfh))
 	{
-	  cfree (newfh);
+	  delete newfh;
+	  newfh = NULL;
 	  debug_printf ("oldfh->dup failed");
 	}
       else

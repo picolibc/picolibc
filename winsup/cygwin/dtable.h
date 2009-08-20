@@ -83,7 +83,7 @@ public:
 fhandler_base *build_fh_dev (const device&, const char * = NULL);
 fhandler_base *build_fh_name (const char *, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
 fhandler_base *build_fh_name (const UNICODE_STRING *, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
-fhandler_base *build_fh_pc (path_conv& pc);
+fhandler_base *build_fh_pc (path_conv& pc, bool set_name = true);
 
 void dtable_init ();
 void stdio_init ();
