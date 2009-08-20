@@ -597,6 +597,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "bb",		0xc0006000, 0xffe06000, "?Bnx,!,w", pa20, FLAG_STRICT}, 
 { "bb",		0xc4004000, 0xfc006000, "?bnx,Q,w", pa10, FLAG_STRICT}, 
 { "bb",		0xc4004000, 0xfc004000, "?Bnx,B,w", pa20, FLAG_STRICT}, 
+{ "bb",		0xc4004000, 0xfc006000, "?bnx,Q,w", pa10, 0}, 
 { "bvb",	0xc0004000, 0xffe04000, "?bnx,w", pa10, 0},
 { "clrbts",	0xe8004005, 0xffffffff, "", pa20, FLAG_STRICT},
 { "popbts",	0xe8004005, 0xfffff007, "$", pa20, FLAG_STRICT},
