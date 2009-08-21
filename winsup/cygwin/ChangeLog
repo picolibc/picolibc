@@ -1,5 +1,14 @@
 2009-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* dll_init.h (has_dtors): New flag.
+	(run_dtors): New wrapper function which avoids calling dtors more than
+	once.
+	* dll_init.cc (dll_global_dtors): Use dll.run_dtors wrapper.
+	(dll_list::detach): Ditto.
+	(dll_list::alloc): Set has_dtors flag.
+
+2009-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fcntl.cc (fcntl64): Detect negative fd as error.
 
 2009-08-21  Corinna Vinschen  <corinna@vinschen.de>

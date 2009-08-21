@@ -35,7 +35,7 @@ dll_global_dtors ()
   dll_global_dtors_recorded = false;
   if (recorded && dlls.start.next)
     for (dll *d = dlls.end; d != &dlls.start; d = d->prev)
-      d->p.run_dtors ();
+      d->run_dtors ();
 }
 
 /* Run all constructors associated with a dll */
@@ -119,6 +119,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       return d;		/* Return previously allocated pointer. */
     }
 
+  /* FIXME: Change this to new at some point. */
   d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
 
   /* Now we've allocated a block of information.  Fill it in with the supplied
@@ -126,6 +127,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   d->count = 1;
   wcscpy (d->name, name);
   d->handle = h;
+  d->has_dtors = true;
   d->p = p;
   d->type = type;
   if (end == NULL)
@@ -159,7 +161,7 @@ dll_list::detach (void *retaddr)
       system_printf ("WARNING: trying to detach an already detached dll ...");
     else if (--d->count == 0)
       {
-	d->p.run_dtors ();
+	d->run_dtors ();
 	d->prev->next = d->next;
 	if (d->next)
 	  d->next->prev = d->prev;

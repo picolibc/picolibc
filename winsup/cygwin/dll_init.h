@@ -50,10 +50,19 @@ struct dll
   per_module p;
   HMODULE handle;
   int count;
+  bool has_dtors;
   dll_type type;
   WCHAR name[1];
   void detach ();
   int init ();
+  void run_dtors ()
+  {
+    if (has_dtors)
+      {
+	has_dtors = 0;
+	p.run_dtors ();
+      }
+  }
 };
 
 #define MAX_DLL_BEFORE_INIT     100
