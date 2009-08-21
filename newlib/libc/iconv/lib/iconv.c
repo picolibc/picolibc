@@ -45,7 +45,7 @@ ANSI_SYNOPSIS
 	#include <iconv.h>
 	iconv_t iconv_open (const char *<[to]>, const char *<[from]>);
 	int iconv_close (iconv_t <[cd]>);
-        size_t iconv (iconv_t <[cd]>, const char **<[inbuf]>, 
+        size_t iconv (iconv_t <[cd]>, char **<[inbuf]>, 
 	              size_t *<[inbytesleft]>, 
 		      char **<[outbuf]>, size_t *<[outbytesleft]>),
 
@@ -61,7 +61,7 @@ TRAD_SYNOPSIS
 	#include <iconv.h>
         size_t iconv (<[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>)
 	iconv_t <[cd]>;
-	const char **<[in]>;
+	char **<[in]>;
 	size_t *<[inleft]>; 
         char **<[out]>;
        	size_t *<[outleft]>);
@@ -168,12 +168,13 @@ _DEFUN(iconv_open, (to, from),
 size_t
 _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
               iconv_t cd          _AND
-              _CONST char **inbuf _AND
+              char **inbuf _AND
               size_t *inbytesleft _AND
               char **outbuf       _AND
               size_t *outbytesleft)
 {
-    return _iconv_r (_REENT, cd, inbuf, inbytesleft, outbuf, outbytesleft);
+    return _iconv_r (_REENT, cd, (_CONST char **) inbuf, inbytesleft,
+		     outbuf, outbytesleft);
 }
 
 

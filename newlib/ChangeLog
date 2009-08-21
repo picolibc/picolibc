@@ -1,3 +1,8 @@
+2009-08-21  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/iconv.h (iconv): Match POSIX prototype.
+	* libc/iconv/lib/iconv.c (iconv): Likewise.
+
 2009-08-21  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/common/s_remquo.c (remquo):  Fix sign of quotient when |x|==|y|.
