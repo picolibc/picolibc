@@ -1,3 +1,7 @@
+2009-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fcntl.cc (fcntl64): Detect negative fd as error.
+
 2009-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Allocate fh_disk_file on cygheap.  Delete

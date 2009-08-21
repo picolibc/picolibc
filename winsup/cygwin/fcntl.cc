@@ -40,7 +40,13 @@ fcntl64 (int fd, int cmd, ...)
   switch (cmd)
     {
     case F_DUPFD:
-      res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
+      if ((int) arg >= 0)
+	res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
+      else
+	{
+	  set_errno (EINVAL);
+	  res = -1;
+	}
       break;
     case F_GETLK:
     case F_SETLK:
