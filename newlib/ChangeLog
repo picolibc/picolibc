@@ -1,3 +1,8 @@
+2009-08-21  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_remquo.c (remquo):  Fix sign of quotient when |x|==|y|.
+	* libc/stdio/mktemp.c:  Add #include <stdlib.h> for function prototypes.
+
 2009-08-19  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* iconvdata/Makefile.am (all): Remove.

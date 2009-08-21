@@ -55,22 +55,6 @@ ANSI_SYNOPSIS
 	int *_mkstemp_r(struct _reent *<[reent]>, char *<[path]>);
 	int *_mkstemps_r(struct _reent *<[reent]>, char *<[path]>, int <[len]>);
 
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	char *mktemp(<[path]>)
-	char *<[path]>;
-
-	int mkstemp(<[path]>)
-	char *<[path]>;
-
-	char *_mktemp_r(<[reent]>, <[path]>)
-	struct _reent *<[reent]>;
-	char *<[path]>;
-
-	int _mkstemp_r(<[reent]>, <[path]>)
-	struct _reent *<[reent]>;
-	char *<[path]>;
-
 DESCRIPTION
 <<mktemp>>, <<mkstemp>>, and <<mkstemps>> attempt to generate a file name
 that is not yet in use for any existing file.  <<mkstemp>> and <<mkstemps>>
@@ -122,6 +106,7 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 */
 
 #include <_ansi.h>
+#include <stdlib.h>
 #include <reent.h>
 #include <sys/types.h>
 #include <fcntl.h>

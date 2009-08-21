@@ -104,8 +104,8 @@ remquo(double x, double y, int *quo)
 		goto fixup;	/* |x|<|y| return x or x-y */
 	    }
 	    if(lx==ly) {
-		*quo = 1;
-		return Zero[(__uint32_t)sx>>31];	/* |x|=|y| return x*0*/
+		*quo = (sxy ? -1 : 1);
+		return Zero[(__uint32_t)sx>>31];	/* |x|=|y| return x*0 */
 	    }
 	}
 
