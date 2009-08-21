@@ -1,3 +1,9 @@
+2009-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Throughout check charset string
+	case insensitive and store internal charset string uppercased.  Allow
+	"UTF8" additionally to "UTF-8".  Add this change to documentation.
+
 2009-08-21  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/iconv.h (iconv): Match POSIX prototype.
