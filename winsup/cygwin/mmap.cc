@@ -849,7 +849,8 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 			   | FILE_OPEN_FOR_BACKUP_INTENT);
       if (NT_SUCCESS (status))
 	{
-	  fh_disk_file = new (alloca (sizeof *fh_disk_file)) fhandler_disk_file;
+	  fh_disk_file = new (ccalloc (HEAP_FHANDLER, 1, sizeof *fh_disk_file))
+			     fhandler_disk_file;
 	  fh_disk_file->set_name (fh->pc);
 	  fh_disk_file->set_io_handle (h);
 	  fh_disk_file->set_access (fh->get_access () | GENERIC_EXECUTE);
@@ -1042,7 +1043,10 @@ out_with_unlock:
 out:
 
   if (fh_disk_file)
-    NtClose (fh_disk_file->get_handle ());
+    {
+      NtClose (fh_disk_file->get_handle ());
+      delete fh;
+    }
 
   syscall_printf ("%p = mmap() ", ret);
   return ret;

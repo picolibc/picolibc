@@ -1,3 +1,8 @@
+2009-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Allocate fh_disk_file on cygheap.  Delete
+	explicitely before returning.
+
 2009-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (build_fh_dev): Take additional bool parameter indicating
