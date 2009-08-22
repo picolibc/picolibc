@@ -1,3 +1,12 @@
+2009-08-22  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* compile: Sync from Automake 1.11.
+	* depcomp: Likewise.
+	* install-sh: Likewise.
+	* missing: Likewise.
+	* mkinstalldirs: Likewise.
+	* ylwrap: Likewise.
+
 2009-08-19  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure.ac: Call AC_DISABLE_OPTION_CHECKING.
