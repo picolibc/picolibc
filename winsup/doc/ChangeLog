@@ -1,3 +1,8 @@
+2009-08-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup2.sgml (setup-locale-charsetlist): Add description of
+	case-insensitivity of charsets.  Fix a typo.  Add "UTF8" to the list.
+
 2009-08-12  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* faq-using.xml (faq.using.bloda): Typofix MacAfee -> McAfee.

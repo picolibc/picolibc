@@ -387,12 +387,16 @@ formats, and no support for native language sorting orders.
 be glad for coding help in this area.</para>
 
 </sect2>
-
+ 
 <sect2 id="setup-locale-charsetlist"><title>List of supported character sets</title>
 
 <para>Last but not least, here's the list of currently supported character
 sets.  The left-hand expression is the name of the charset, as you would use
 it in the internationalization environment variables as outlined above.
+Note that charset specifiers are case-insensitive.  <literal>EUCJP</literal>
+is equivalent to <literal>eucJP</literal> or <literal>eUcJp</literal>.
+Writing the charset in the exact case as given in the list below is a
+good convention, though.
 </para>
 
 <para>The right-hand side is the number of the equivalent Windows
@@ -400,7 +404,7 @@ codepage as well as the Windows name of the codepage.  They are only
 noted here for reference.  Don't try to use the bare codepage number or
 the Windows name of the codepage as charset in locale specifiers, unless
 they happen to be identical with the left-hand side.  Especially in case
-oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
+of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
 
 <para>This works:</para>
 
@@ -465,7 +469,7 @@ oif the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     eucJP                 20932 (EUC Japanese)
     eucKR                   949 (EUC Korean)
 
-    UTF-8                 65001 (UTF-8)
+    UTF-8 or UTF8         65001 (UTF-8)
 </screen>
 
 </sect2>
