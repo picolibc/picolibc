@@ -1,5 +1,13 @@
 2009-08-22  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
+	* README-maintainer-mode: Point directly to upstream locations
+	for autoconf, automake, libtool, gettext, instead of copies on
+	sources.redhat.com.  Document required versions.
+	* configure.ac: Do not substitute datarootdir, htmldir,
+	pdfdir, docdir.  Do not process --with-datarootdir,
+	--with-htmldir, --with-pdfdir, --with-docdir.
+	* configure: Regenerate.
+
 	* configure: Regenerate.
 
 	* compile: Sync from Automake 1.11.
