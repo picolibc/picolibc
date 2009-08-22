@@ -339,6 +339,8 @@ __set_charset_from_codepage (UINT cp, char *charset)
     case 1256:
     case 1257:
     case 1258:
+    case 20866:
+    case 21866:
       __small_sprintf (charset, "CP%u", cp);
       return __cp_mbtowc;
     case 28591:

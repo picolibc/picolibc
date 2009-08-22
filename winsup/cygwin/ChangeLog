@@ -1,3 +1,8 @@
+2009-08-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* strfuncs.cc (__set_charset_from_codepage): Add codepages 20866
+	(KOI8-R) and 21866 (KOI8-U).
+
 2009-08-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll_init.h (has_dtors): New flag.
