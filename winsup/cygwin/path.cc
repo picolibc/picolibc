@@ -1865,9 +1865,16 @@ symlink_info::check_reparse_point (HANDLE h)
     }
   else if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
-      if (rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+      UNICODE_STRING subst;
+
+      RtlInitCountedUnicodeString (&subst, 
+		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
+			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
+		  rp->MountPointReparseBuffer.SubstituteNameLength);
+      if (rp->MountPointReparseBuffer.PrintNameLength == 0
+	  || RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
 	{
-	  /* Likely a volume mount point.  Not treated as symlink. */
+	  /* Volume mount point.  Not treated as symlink. */
 	  return 0;
 	}
       sys_wcstombs (srcbuf, SYMLINK_MAX + 1,

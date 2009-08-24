@@ -100,6 +100,7 @@ UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
 UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
 UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
+UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
 #undef _RDATA
 #undef _ROU
 
