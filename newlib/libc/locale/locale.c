@@ -54,20 +54,21 @@ the form
 <<"language">> is a two character string per ISO 639.  <<"TERRITORY">> is a
 country code per ISO 3166.  For <<"charset">> and <<"modifier">> see below.
 
-Additionally to the POSIX specifier, five extensions are supported for
+Additionally to the POSIX specifier, seven extensions are supported for
 backward compatibility with older implementations using newlib:
-<<"C-UTF-8">>, <<"C-JIS">>, <<"C-EUCJP">>/<<"C-eucJP">>, <<"C-SJIS">>,
-<<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with xxx in [437,
-720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251,
-1252, 1253, 1254, 1255, 1256, 1257, 1258].
+<<"C-UTF-8">>, <<"C-JIS">>, <<"C-eucJP">>, <<"C-SJIS">>, <<C-KOI8-R>>,
+<<C-KOI8-U>>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
+xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
+1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 
 Even when using POSIX locale strings, the only charsets allowed are
-<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>/<<"eucJP">>, <<"SJIS">>, <<"ISO-8859-x">>
-with 1 <= x <= 15, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850,
-852, 855, 857, 858, 862, 866, 874, 1125, 1250, 1251, 1252, 1253, 1254,
-1255, 1256, 1257, 1258].  Charsets are case insensitive.  For instance,
-<<"UTF-8">> and <<"utf-8">> are equivalent.  <<"UTF-8">> can also be
-written without dash, as in <<"UTF8">> or <<"utf8">>.
+<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<KOI8-R>>, <<KOI8-U>>,
+<<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
+[437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
+1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
+Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
+are equivalent.  <<"UTF-8">> can also be written without dash, as in
+<<"UTF8">> or <<"utf8">>.
 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
@@ -615,6 +616,24 @@ loadlocale(struct _reent *p, int category)
 	  return NULL;
 	}
     break;
+    case 'K':
+    case 'k':
+      if (!strcasecmp (charset, "KOI8-R"))
+	strcpy (charset, "CP20866");
+      else if (!strcasecmp (charset, "KOI8-U"))
+	strcpy (charset, "CP21866");
+      else
+	return NULL;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif
+      break;
     case 'A':
     case 'a':
       if (strcasecmp (charset, "ASCII"))

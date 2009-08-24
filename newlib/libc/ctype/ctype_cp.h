@@ -397,6 +397,43 @@
 	_L,	_L,	_P,	_L,	_L,	_L,	_L,	_P, \
 	_L,	_L,	_L,	_L,	_L,	_L,	_P
 #define _CTYPE_CP1258_255 _L
+#define _CTYPE_CP20866_128_254 \
+   	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_S|_B,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_L,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_U,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U
+#define _CTYPE_CP20866_255 _U
+#define _CTYPE_CP21866_128_254 \
+   	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_S|_B,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_L,	_L,	_P,	_L,	_L, \
+	_P,	_P,	_P,	_P,	_P,	_L,	_P,	_P, \
+	_P,	_P,	_P,	_U,	_U,	_P,	_U,	_U, \
+	_P,	_P,	_P,	_P,	_P,	_U,	_P,	_P, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U
+#define _CTYPE_CP21866_255 _U
+
 
 extern int __cp_index (const char *charset_ext);
 
@@ -405,7 +442,7 @@ extern int __cp_index (const char *charset_ext);
 #ifndef __CYGWIN__
 static _CONST
 #endif
-char __ctype_cp[22][128 + 256] = {
+char __ctype_cp[24][128 + 256] = {
   { _CTYPE_CP437_128_254,
     0,
     _CTYPE_DATA_0_127,
@@ -538,6 +575,18 @@ char __ctype_cp[22][128 + 256] = {
     _CTYPE_CP1258_128_254,
     _CTYPE_CP1258_255
   },
+  { _CTYPE_CP20866_128_254,
+    0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP20866_128_254,
+    _CTYPE_CP20866_255
+  },
+  { _CTYPE_CP21866_128_254,
+    0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP21866_128_254,
+    _CTYPE_CP21866_255
+  },
 };
 
 #else /* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
@@ -652,6 +701,16 @@ static _CONST char __ctype_cp[22][1 + 256] = {
     _CTYPE_DATA_0_127,
     _CTYPE_CP1258_128_254,
     _CTYPE_CP1258_255
+  },
+  { 0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP20866_128_254,
+    _CTYPE_CP20866_255
+  },
+  { 0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_CP21866_128_254,
+    _CTYPE_CP21866_255
   },
 };
 
