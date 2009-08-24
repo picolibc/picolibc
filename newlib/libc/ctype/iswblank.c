@@ -67,7 +67,8 @@ _DEFUN(iswblank,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);
-  return (c == 0x0009 || c == 0x0020 || c == 0x1680 ||
+  return (c == 0x0009 || c == 0x0020 ||
+	  c == 0x00A0 || c == 0x1680 ||
 	  (c >= 0x2000 && c <= 0x2006) ||
 	  (c >= 0x2008 && c <= 0x200b) ||
 	  c == 0x205f || c == 0x3000);
