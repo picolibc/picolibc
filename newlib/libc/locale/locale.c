@@ -624,6 +624,7 @@ loadlocale(struct _reent *p, int category)
 	strcpy (charset, "CP21866");
       else
 	return NULL;
+      mbc_max = 1;
 #ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;

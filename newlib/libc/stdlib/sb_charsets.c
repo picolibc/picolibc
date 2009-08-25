@@ -625,7 +625,7 @@ __micro_atoi (const char *s)
     return -1;
   while (*s)
     {
-      if (*s < '0' || *s > '9' || ret >= 10000)
+      if (*s < '0' || *s > '9' || ret >= 100000)
 	return -1;
       ret = 10 * ret + (*s++ - '0');
     }
