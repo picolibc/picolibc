@@ -134,6 +134,9 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       /* Always caseinsensitive.  We really just need access to the drive. */
       InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
 				  NULL);
+      /* Note: Don't use the FILE_OPEN_REPARSE_POINT flag here.  The reason
+         is that symlink_info::check relies on being able to open a handle
+	 to the target of a volume mount point. */
       status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_OPEN_FOR_BACKUP_INTENT);
       /* At least one filesystem (HGFS, VMware shared folders) doesn't like

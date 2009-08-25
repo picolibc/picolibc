@@ -1874,8 +1874,10 @@ symlink_info::check_reparse_point (HANDLE h)
       if (rp->MountPointReparseBuffer.PrintNameLength == 0
 	  || RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
 	{
-	  /* Volume mount point.  Not treated as symlink. */
-	  return 0;
+	  /* Volume mount point.  Not treated as symlink. The return
+	     value of -1 is a hint for the caller to treat this as a
+	     volume mount point. */
+	  return -1;
 	}
       sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
 		    (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
@@ -2410,7 +2412,17 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
       else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
 	{
 	  res = check_reparse_point (h);
-	  if (res)
+	  if (res == -1)
+	    {
+	      /* Volume mount point.  The filesystem information for the top
+		 level directory should be for the volume top level directory
+		 itself, rather than for the reparse point itself.  So we
+		 fetch the filesystem information again, but with a NULL
+		 handle.  This does what we want because fs_info::update opens
+		 the handle without FILE_OPEN_REPARSE_POINT. */
+	      fs.update (&upath, NULL);
+	    }
+	  else if (res)
 	    break;
 	}
 

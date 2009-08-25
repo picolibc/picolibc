@@ -1,5 +1,13 @@
 2009-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (fs_info::update): Add comment.
+	* path.cc (symlink_info::check_reparse_point): Return -1 for volume
+	mount points.  Explain why.
+	(symlink_info::check): Call fs.update again for volume mount points.
+	Explain why.
+
+2009-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* globals.cc (ro_u_volume): New R/O unicode string.
 	* path.cc (symlink_info::check_reparse_point): Fix check for volume
 	mount points to work on Vista and later as well.
