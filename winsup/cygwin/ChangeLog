@@ -1,3 +1,8 @@
+2009-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Only set R/O attribute if ACLs
+	are not used.
+
 2009-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fs_info::update): Add comment.

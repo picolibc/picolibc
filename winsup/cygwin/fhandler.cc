@@ -553,8 +553,9 @@ fhandler_base::open (int flags, mode_t mode)
 	{
 	  file_attributes |= FILE_ATTRIBUTE_NORMAL;
 
-	  /* If mode has no write bits set, we set the R/O attribute. */
-	  if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+	  /* If mode has no write bits set, and ACLs are not used, we set
+	     the DOS R/O attribute. */
+	  if (!has_acls () && !(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
 
 	  /* If the file should actually be created and has ACLs,
