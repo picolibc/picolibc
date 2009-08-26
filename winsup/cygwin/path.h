@@ -258,6 +258,9 @@ class path_conv
 /* Socket marker */
 #define SOCKET_COOKIE  "!<socket >"
 
+/* Interix symlink marker */
+#define INTERIX_SYMLINK_COOKIE  "IntxLNK\1"
+
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
 
 enum fe_types

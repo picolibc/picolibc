@@ -1,5 +1,10 @@
 2009-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.h (INTERIX_SYMLINK_COOKIE): Define.
+	* path.cc (symlink_info::check_sysfile): Read Interix symlinks as well.
+
+2009-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Only set R/O attribute if ACLs
 	are not used.
 

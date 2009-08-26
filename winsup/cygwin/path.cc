@@ -1784,6 +1784,7 @@ symlink_info::check_sysfile (HANDLE in_h)
   NTSTATUS status;
   HANDLE h;
   IO_STATUS_BLOCK io;
+  bool interix_symlink = false;
 
   InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
   status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
@@ -1805,7 +1806,26 @@ symlink_info::check_sysfile (HANDLE in_h)
     {
       /* It's a symlink.  */
       pflags = PATH_SYMLINK;
-
+    }
+  else if (io.Information == sizeof (cookie_buf)
+	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
+    pflags |= PATH_SOCKET;
+  else if (io.Information >= sizeof (INTERIX_SYMLINK_COOKIE)
+	   && memcmp (cookie_buf, INTERIX_SYMLINK_COOKIE,
+		      sizeof (INTERIX_SYMLINK_COOKIE) - 1) == 0)
+    {
+      /* It's an Interix symlink.  */
+      pflags = PATH_SYMLINK;
+      interix_symlink = true;
+      /* Interix symlink cookies are shorter than Cygwin symlink cookies, so
+         in case of an Interix symlink cooky we have read too far into the
+	 file.  Set file pointer back to the position right after the cookie. */
+      FILE_POSITION_INFORMATION fpi;
+      fpi.CurrentByteOffset.QuadPart = sizeof (INTERIX_SYMLINK_COOKIE) - 1;
+      NtSetInformationFile (h, &io, &fpi, sizeof fpi, FilePositionInformation);
+    }
+  if (pflags == PATH_SYMLINK)
+    {
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
 			   NT_MAX_PATH, NULL, NULL);
       if (!NT_SUCCESS (status))
@@ -1814,10 +1834,17 @@ symlink_info::check_sysfile (HANDLE in_h)
 	  if (status != STATUS_END_OF_FILE)
 	    set_error (EIO);
 	}
-      else if (*(PWCHAR) srcbuf == 0xfeff)	/* BOM */
+      else if (*(PWCHAR) srcbuf == 0xfeff 	/* BOM */
+	       || interix_symlink)
 	{
+	  /* Add trailing 0 to Interix symlink target.  Skip BOM in Cygwin
+	     symlinks. */
+	  if (interix_symlink)
+	    ((PWCHAR) srcbuf)[io.Information / sizeof (WCHAR)] = L'\0';
+	  else
+	    srcbuf += 2;
 	  char *tmpbuf = tp.c_get ();
-	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) (srcbuf + 2))
+	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) srcbuf)
 	      > SYMLINK_MAX + 1)
 	    debug_printf ("symlink string too long");
 	  else
@@ -1828,9 +1855,6 @@ symlink_info::check_sysfile (HANDLE in_h)
       else
 	res = posixify (srcbuf);
     }
-  else if (io.Information == sizeof (cookie_buf)
-	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
-    pflags |= PATH_SOCKET;
   NtClose (h);
   return res;
 }
