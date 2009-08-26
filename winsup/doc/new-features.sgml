@@ -207,10 +207,10 @@
   The full list of supported character sets: "ASCII", "ISO-8859-x" with x
   in 1-16, except 12, "UTF-8", Windows codepages "CPxxx", with xxx in
   (437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
-  1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258), "SJIS",
-  "GBK", "eucJP", "eucKR", and "Big5".  The leading language and territory
-  part (en_US, for instance) is not used by Cygwin yet, but is required
-  for POSIX compatibility.
+  1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258), "KOI8-R", "KOI8-U",
+  "SJIS", "GBK", "eucJP", "eucKR", and "Big5".  The leading language and
+  territory part (en_US, for instance) is not used by Cygwin yet, but is
+  required for POSIX compatibility.
 
 - Allow multiple concurrent read locks per thread for pthread_rwlock_t.
 
