@@ -241,9 +241,9 @@ typedef struct _template
 #define Imm_SInt  2
 #define Imm_UInt  3
 }
-template;
+insn_template;
 
-static const template tic30_optab[] = {
+static const insn_template tic30_optab[] = {
   { "absf"   ,2,0x00000000,AddressMode, { GAddr1, Rn, 0 }, Imm_Float },
   { "absi"   ,2,0x00800000,AddressMode, { GAddr2, AllReg, 0 }, Imm_SInt },
   { "addc"   ,2,0x01000000,AddressMode, { GAddr2, AllReg, 0 }, Imm_SInt },
@@ -604,7 +604,7 @@ static const template tic30_optab[] = {
   { ""       ,0,0x00000000,0,           { 0, 0, 0 }, 0 }
 };
 
-static const template *const tic30_optab_end =
+static const insn_template *const tic30_optab_end =
   tic30_optab + sizeof(tic30_optab)/sizeof(tic30_optab[0]);
 
 typedef struct {

@@ -147,17 +147,17 @@ typedef struct _template
   const char* parname;
   enum optype paroperand_types[MAX_OPERANDS];
 
-} template;
+} insn_template;
 
-extern const template tic54x_unknown_opcode;
-extern const template tic54x_optab[];
-extern const template tic54x_paroptab[];
+extern const insn_template tic54x_unknown_opcode;
+extern const insn_template tic54x_optab[];
+extern const insn_template tic54x_paroptab[];
 extern const symbol mmregs[], regs[];
 extern const symbol condition_codes[], cc2_codes[], status_bits[];
 extern const symbol cc3_codes[];
 extern const char *misc_symbols[];
 struct disassemble_info;
-extern const template* tic54x_get_insn (struct disassemble_info *, 
+extern const insn_template* tic54x_get_insn (struct disassemble_info *, 
                                         bfd_vma, unsigned short, int *);
 
 #endif /* _opcode_tic54x_h_ */
