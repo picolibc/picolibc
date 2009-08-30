@@ -1,3 +1,10 @@
+2009-08-30  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/wtsapi32.h (WTSQuerySessionInformationA,
+	WTSQuerySessionInformationW, WTSQuerySessionInformation, WTSFreeMemory):
+	Moved to (_WIN32_WINNT >= 0x0500) guard.
+	(thanks to Pierre Ossman)
+
 2009-08-09  Andy Koppe  <andy.koppe@gmail.com>
 
 	* include/winnls.h (IS_HIGH_SURROGATE, IS_LOW_SURROGATE,

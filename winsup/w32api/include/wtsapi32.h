@@ -70,18 +70,7 @@ typedef enum _WTS_CONNECTSTATE_CLASS {
 
 BOOL WINAPI WTSRegisterSessionNotification(HWND hWnd, DWORD dwFlags);
 BOOL WINAPI WTSUnRegisterSessionNotification(HWND hWnd);
-BOOL WINAPI WTSQuerySessionInformationA(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass,
-                                LPSTR *ppBuffer, DWORD *pBytesReturned);
-BOOL WINAPI WTSQuerySessionInformationW(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass,
-                                LPTSTR *ppBuffer, DWORD *pBytesReturned);
 BOOL WINAPI WTSQueryUserToken(ULONG SessionId, PHANDLE pToken);
-void WINAPI WTSFreeMemory(PVOID pMemory);
-
-#ifdef UNICODE
-#define WTSQuerySessionInformation WTSQuerySessionInformationW
-#else
-#define WTSQuerySessionInformation WTSQuerySessionInformationA
-#endif
 
 #endif /* _WIN32_WINNT >= 0x0501 */
 
@@ -125,6 +114,10 @@ typedef struct _WTS_SESSION_INFOA {
 #define WTS_EVENT_ALL				0x7FFFFFFF
 #define WTS_EVENT_FLUSH				0x80000000
 
+BOOL WINAPI WTSQuerySessionInformationA(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass,
+                                LPSTR *ppBuffer, DWORD *pBytesReturned);
+BOOL WINAPI WTSQuerySessionInformationW(HANDLE hServer, DWORD SessionId, WTS_INFO_CLASS WTSInfoClass,
+                                LPTSTR *ppBuffer, DWORD *pBytesReturned);
 BOOL WINAPI WTSWaitSystemEvent(HANDLE hServer, DWORD EventMask, DWORD* pEventFlags);
 BOOL WINAPI WTSDisconnectSession(HANDLE hServer, DWORD SessionId, BOOL bWait);
 BOOL WINAPI WTSEnumerateSessionsW(HANDLE hServer, DWORD Reserved, DWORD Version,
@@ -133,11 +126,14 @@ BOOL WINAPI WTSEnumerateSessionsW(HANDLE hServer, DWORD Reserved, DWORD Version,
 BOOL WINAPI WTSEnumerateSessionsA(HANDLE hServer, DWORD Reserved, DWORD Version,
 				  PWTS_SESSION_INFOA *ppSessionInfo,
 				  PDWORD pCount);
+void WINAPI WTSFreeMemory(PVOID pMemory);
 
 #ifdef UNICODE
 #define WTSEnumerateSessions WTSEnumerateSessionsW
+#define WTSQuerySessionInformation WTSQuerySessionInformationW
 #else
 #define WTSEnumerateSessions WTSEnumerateSessionsA
+#define WTSQuerySessionInformation WTSQuerySessionInformationA
 #endif
 
 #endif /* _WIN32_WINNT >= 0x0500 */
