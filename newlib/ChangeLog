@@ -1,3 +1,9 @@
+2009-08-31  Takaki Makino  <t@snowelm.com>
+
+	* libm/machine/i386/f_pow.c(_f_pow): Alter ASM so it works with
+	newer gcc versions.
+	* libm/maachine/i386/f_powf.c(_f_powf): Ditto.
+
 2009-08-25  Andy Koppe  <andy.koppe@gmail.com>
 
 	* libc/stdlib/sb_charsets.c (__micro_atoi): Allow five-digit codepage
