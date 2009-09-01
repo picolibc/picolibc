@@ -1,3 +1,11 @@
+2009-09-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Avoid multiple link time definitions of _printf() for C++;
+	(problem reported by Alexander Shaduri, via MinGW-users ML).
+
+	* include/stdio.h [__USE_MINGW_ANSI_STDIO]:
+	(__mingw_stdio_redirect__) [__cplusplus]: remove `static' keyword.
+
 2009-08-14 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.16.

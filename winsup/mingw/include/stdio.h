@@ -220,7 +220,7 @@ extern int __mingw_stdio_redirect__(vsnprintf)(char*, size_t, const char*, __VAL
  * For C++ we use inline implementations, to avoid interference
  * with namespace qualification, which may result from using #defines.
  */
-#  define __mingw_stdio_redirect__  static inline __cdecl __MINGW_NOTHROW
+#  define __mingw_stdio_redirect__  inline __cdecl __MINGW_NOTHROW
 
 # elif defined __GNUC__
 /*
