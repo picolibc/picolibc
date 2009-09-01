@@ -812,6 +812,7 @@ peek_console (select_record *me, bool)
       break;
     else
       {
+	fh->send_winch_maybe ();
 	if (irec.EventType == KEY_EVENT)
 	  {
 	    if (irec.Event.KeyEvent.bKeyDown
@@ -821,7 +822,6 @@ peek_console (select_record *me, bool)
 	  }
 	else
 	  {
-	    fh->send_winch_maybe ();
 	    if (irec.EventType == MOUSE_EVENT
 		&& fh->mouse_aware ()
 		&& (irec.Event.MouseEvent.dwEventFlags == 0
