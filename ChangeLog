@@ -1,3 +1,8 @@
+2009-09-01  Tristan Gingold  <gingold@adacore.com>
+
+	* setup.com: Ported to Itanium VMS.  Can also build using DCL scripts.
+	Remove logical names.
+
 2009-08-31  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* ltmain.sh (func_normal_abspath): New function.
