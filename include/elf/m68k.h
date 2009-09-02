@@ -1,5 +1,6 @@
 /* MC68k ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2002, 2005, 2006 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002, 2005, 2006, 2007, 2009
+   Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 

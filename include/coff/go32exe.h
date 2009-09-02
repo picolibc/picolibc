@@ -1,6 +1,6 @@
 /* COFF information for PC running go32.
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2005, 2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

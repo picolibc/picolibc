@@ -1,6 +1,6 @@
 /* Opcode table for the H8/300
    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2001, 2002,
-   2003, 2004, 2008
+   2003, 2004, 2005, 2008, 2009
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
