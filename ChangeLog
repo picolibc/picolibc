@@ -1,3 +1,17 @@
+2009-09-02  Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.tpl (AWK): Fix typo.
+	* Makefile.in: Regenerate.
+
+2009-09-02  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure.ac: Detect awk and sed.
+	* Makefile.def (flags_to_pass): Add AWK and SED.
+	* Makefile.tpl (AWK, SED): New.
+	(BASE_FLAGS_TO_PASS): Add AWK and SED.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+
 2009-09-01  Tristan Gingold  <gingold@adacore.com>
 
 	* setup.com: Ported to Itanium VMS.  Can also build using DCL scripts.
