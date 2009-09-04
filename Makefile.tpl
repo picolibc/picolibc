@@ -143,8 +143,6 @@ BASE_EXPORTS = \
 	BISON="$(BISON)"; export BISON; \
 	YACC="$(YACC)"; export YACC; \
 	M4="$(M4)"; export M4; \
-	SED="$(SED)"; export SED; \
-	AWK="$(AWK)"; export AWK; \
 	MAKEINFO="$(MAKEINFO)"; export MAKEINFO;
 
 # This is the list of variables to export in the environment when
@@ -339,8 +337,6 @@ BOOT_CFLAGS= -g -O2
 BOOT_LDFLAGS=
 BOOT_ADAFLAGS=-gnatpg -gnata
 
-AWK = @AWK@
-SED = @SED@
 BISON = @BISON@
 YACC = @YACC@
 FLEX = @FLEX@
