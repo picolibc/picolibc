@@ -939,7 +939,7 @@ typedef struct
 
 /*  PseudoDbg_assert
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
+| 1 | 1 | 1 | 1 | 0 | - | - | - | dbgop |.grp.......|.regtest...|
 |.expected......................................................|
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
@@ -951,6 +951,8 @@ typedef struct
   int mask_expected;
   int bits_regtest;
   int mask_regtest;
+  int bits_grp;
+  int mask_grp;
   int bits_dbgop;
   int mask_dbgop;
   int bits_dontcare;
@@ -964,10 +966,12 @@ typedef struct
 #define PseudoDbg_Assert_expected_mask	0xffff
 #define PseudoDbg_Assert_regtest_bits	16
 #define PseudoDbg_Assert_regtest_mask	0x7
-#define PseudoDbg_Assert_dbgop_bits	19
-#define PseudoDbg_Assert_dbgop_mask	0x7
-#define PseudoDbg_Assert_dontcare_bits	22
-#define PseudoDbg_Assert_dontcare_mask	0x1f
+#define PseudoDbg_Assert_grp_bits	19
+#define PseudoDbg_Assert_grp_mask	0x7
+#define PseudoDbg_Assert_dbgop_bits	22
+#define PseudoDbg_Assert_dbgop_mask	0x3
+#define PseudoDbg_Assert_dontcare_bits	24
+#define PseudoDbg_Assert_dontcare_mask	0x7
 #define PseudoDbg_Assert_code_bits	27
 #define PseudoDbg_Assert_code_mask	0x1f
 
@@ -976,6 +980,7 @@ typedef struct
   PseudoDbg_Assert_opcode,						\
   PseudoDbg_Assert_expected_bits, 	PseudoDbg_Assert_expected_mask,	\
   PseudoDbg_Assert_regtest_bits, 	PseudoDbg_Assert_regtest_mask,	\
+  PseudoDbg_Assert_grp_bits,		PseudoDbg_Assert_grp_mask,	\
   PseudoDbg_Assert_dbgop_bits, 		PseudoDbg_Assert_dbgop_mask,	\
   PseudoDbg_Assert_dontcare_bits, 	PseudoDbg_Assert_dontcare_mask,	\
   PseudoDbg_Assert_code_bits,	 	PseudoDbg_Assert_code_mask	\

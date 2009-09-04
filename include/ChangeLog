@@ -1,3 +1,13 @@
+2009-09-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* opcode/bfin.h (PseudoDbg_Assert): Add bits_grp and mask_grp.
+	(PseudoDbg_Assert_grp_bits, PseudoDbg_Assert_grp_mask): Define.
+	(PseudoDbg_Assert_dbgop_bits, PseudoDbg_Assert_dbgop_mask,
+	PseudoDbg_Assert_dontcare_bits, PseudoDbg_Assert_dontcare_mask):
+	Adjust accordingly.
+	(init_PseudoDbg_Assert): Add PseudoDbg_Assert_grp_bits and
+	PseudoDbg_Assert_grp_mask.
+
 2009-08-06  Michael Eager <eager@eagercon.com>
 
 	* dis-asm.h: Decl print_insn_microblaze().
