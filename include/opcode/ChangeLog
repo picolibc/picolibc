@@ -1,3 +1,7 @@
+2009-09-05  Martin Thuresson  <martin@mtme.org>
+
+	* ia64.h (struct ia64_operand): Renamed member class to op_class.
+
 2009-08-29  Martin Thuresson  <martin@mtme.org>
 
 	* tic30.h (template): Rename type template to
