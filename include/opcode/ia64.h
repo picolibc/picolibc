@@ -327,7 +327,7 @@ enum ia64_operand_class
 
 struct ia64_operand
 {
-  enum ia64_operand_class class;
+  enum ia64_operand_class op_class;
 
   /* Set VALUE as the operand bits for the operand of type SELF in the
      instruction pointed to by CODE.  If an error occurs, *CODE is not
