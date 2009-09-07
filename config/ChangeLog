@@ -1,3 +1,19 @@
+2009-09-03  Alexandre Oliva  <aoliva@redhat.com>
+
+	* bootstrap-debug-big.mk (STAGE2_CFLAGS): Drop -gtoggle.
+	* bootstrap-debug-lean.mk: Update comments.
+	(STAGE2_CFLAGS): Likewise.
+	(do-compare): Don't override.
+
+2009-09-01  Alexandre Oliva  <aoliva@redhat.com>
+
+	* bootstrap-debug.mk: Add comments.
+	* bootstrap-debug-big.mk: New.
+	* bootstrap-debug-lean.mk: New.
+	* bootstrap-debug-ckovw.mk: Add comments.
+	* bootstrap-debug-lib.mk: Drop CFLAGS for stages.  Use -g0
+	for TFLAGS in stage1.  Drop -fvar-tracking-assignments-toggle.
+
 2009-08-22  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* override.m4 (_GCC_AUTOCONF_VERSION): Bump to 2.64.
