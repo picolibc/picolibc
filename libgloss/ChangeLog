@@ -1,3 +1,7 @@
+2009-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/include/ccblkfn.h: New file.
+
 2009-09-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/sys/_adi_platform.h: Convert __ASSEMBLY__ to
