@@ -1,3 +1,8 @@
+2009-09-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (basiccrt.o, basiccrts.o): Don't use
+	-mcpu=bf532-any for the default multilib.
+
 2009-07-28  DJ Delorie  <dj@redhat.com>
 
 	* mep/gmap_default.ld: Add linkonce sections for .vtext.
