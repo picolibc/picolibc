@@ -1,3 +1,9 @@
+2009-09-08  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/include/sys/_adi_platform.h: Convert __ASSEMBLY__ to
+	__ASSEMBLER__.
+	* bfin/include/sys/pll.h: Likewise
+
 2009-09-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/Makefile.in (basiccrt.o, basiccrts.o): Don't use

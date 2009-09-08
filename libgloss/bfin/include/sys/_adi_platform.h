@@ -12,13 +12,13 @@
 
 /*
 ** Include appropriate header file for platform.
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 */
 
 #ifndef __ADI_PLATFORM_H
 #define __ADI_PLATFORM_H
 
-#ifdef __ASSEMBLY__
+#ifndef __ASSEMBLER__
 
 #if defined (__ADSPBF531__)
 #include <cdefBF531.h>
@@ -136,7 +136,7 @@
 #error Processor Type Not Supported
 #endif
 
-#endif /* __ASSEMBLY__ */
+#endif /* __ASSEMBLER__ */
 
 #endif /* __INC_BLACKFIN__ */
 
