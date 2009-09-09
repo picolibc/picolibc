@@ -1,3 +1,8 @@
+2009-09-09  Martin Thuresson  <martin@mtme.org>
+
+	* bfdlink.h (struct bfd_link_hash_common_entry): Move to top
+	level.
+
 2009-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* opcode/bfin.h (PseudoDbg_Assert): Add bits_grp and mask_grp.
