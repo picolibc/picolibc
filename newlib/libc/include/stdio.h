@@ -675,12 +675,14 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	fileno(p)	__sfileno(p)
 #endif
 
+#ifndef __OPTIMIZE_SIZE__
 #ifndef __CYGWIN__
 #ifndef lint
 #define	getc(fp)	__sgetc_r(_REENT, fp)
 #define putc(x, fp)	__sputc_r(_REENT, x, fp)
 #endif /* lint */
 #endif /* __CYGWIN__ */
+#endif /* __OPTIMIZE_SIZE__ */
 
 #ifndef __STRICT_ANSI__
 /* fast always-buffered version, true iff error */

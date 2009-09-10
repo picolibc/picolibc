@@ -241,6 +241,9 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 #endif
+#ifdef __mxp__
+#define  __IEEE_LITTLE_ENDIAN
+#endif
 
 #ifdef __CRX__
 #define __IEEE_LITTLE_ENDIAN

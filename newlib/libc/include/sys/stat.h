@@ -38,6 +38,13 @@ struct	stat
   time_t	st_mtime;
   time_t	st_ctime;
 #else
+#ifdef __arc__
+  long		st_blksize;
+  long		st_blocks;
+  time_t	st_atime;
+  time_t	st_mtime;
+  time_t	st_ctime;
+#else /* !__arc__ */
   time_t	st_atime;
   long		st_spare1;
   time_t	st_mtime;
@@ -46,6 +53,7 @@ struct	stat
   long		st_spare3;
   long		st_blksize;
   long		st_blocks;
+#endif /* __arc__ */
   long	st_spare4[2];
 #endif
 };

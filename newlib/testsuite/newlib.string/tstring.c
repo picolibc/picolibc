@@ -12,6 +12,8 @@
 #ifndef MAX_1
 #ifdef __SPU__
 #define MAX_1 11000
+#elif defined (__arc__)
+#define MAX_1 3300 /* default stack size is 64 KB .  */
 #else
 #define MAX_1 33000
 #endif

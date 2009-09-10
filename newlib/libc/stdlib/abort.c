@@ -60,7 +60,11 @@ _DEFUN_VOID (abort)
   while (1)
     {
       raise (SIGABRT);
+#ifdef REENTRANT_SYSCALLS_PROVIDED
+      _exit_r (_REENT, 1);
+#else
       _exit (1);
+#endif
     }
 }
 

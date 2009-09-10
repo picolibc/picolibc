@@ -62,5 +62,9 @@ _DEFUN (exit, (code),
 
   if (_GLOBAL_REENT->__cleanup)
     (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
+#ifdef REENTRANT_SYSCALLS_PROVIDED
+  _exit_r (_GLOBAL_REENT, code);
+#else
   _exit (code);
+#endif
 }

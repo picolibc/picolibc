@@ -11,7 +11,11 @@
 #endif
 
 #define	_CLOCK_T_	unsigned long		/* clock() */
+#ifdef __arc__
+#define	_TIME_T_	long long		/* time() */
+#else
 #define	_TIME_T_	long			/* time() */
+#endif
 #define _CLOCKID_T_ 	unsigned long
 #define _TIMER_T_   	unsigned long
 

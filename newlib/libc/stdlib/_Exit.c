@@ -42,5 +42,9 @@ void
 _DEFUN (_Exit, (code),
 	int code)
 {
+#ifdef REENTRANT_SYSCALLS_PROVIDED
+  _exit_r (_REENT, code);
+#else
   _exit (code);
+#endif
 }

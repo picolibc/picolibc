@@ -1,0 +1,69 @@
+From codito-20070401:
+ added files:
+A    src/newlib/libc/machine/arc/configure
+A    src/newlib/libc/machine/arc/Makefile.in
+A    src/newlib/libc/machine/arc/setjmp.S
+A    src/newlib/libc/machine/arc/configure.in
+A    src/newlib/libc/machine/arc/Makefile.am
+A    src/newlib/libc/machine/arc/memcpy.S
+A    src/newlib/libc/machine/arc/aclocal.m4
+A    src/newlib/libc/sys/arc/stubs.c
+     src/newlib/ChangeLog.ARC
+     src/newlib/libc/sys/arc/sys/fcntl.h
+ changed files:
+  src/newlib/testsuite/newlib.string/tstring.c (merged)
+  src/newlib/configure.host
+  src/newlib/libc/include/stdio.h
+  src/newlib/libc/include/machine/setjmp.h
+  src/newlib/libc/sys/arc/Makefile.am
+  src/config-ml.in (from src/newlib/config-ml.in)
+New files added during merge:
+ src/MANIFEST (this file)
+
+By ARC employees:
+ added files:
+  src/ChangeLog.ARC
+  src/newlib/libc/machine/arc/memcpy-700.S
+  src/newlib/libc/machine/arc/memcmp.S
+  src/newlib/libc/machine/arc/memset.S
+  src/newlib/libc/machine/arc/memset-a4.c
+  src/newlib/libc/machine/arc/strcmp.S
+  src/newlib/libc/machine/arc/strcmp-a4.c
+  src/newlib/libc/machine/arc/strcpy.S
+  src/newlib/libc/machine/arc/strcpy-a5.c
+  src/newlib/libc/machine/arc/strchr.S
+  src/newlib/libc/machine/arc/strchr-700.S
+  src/newlib/libc/machine/arc/strchr-a4.c
+  src/newlib/libc/machine/arc/strlenp.S
+  src/newlib/libc/machine/arc/strlen-a4.c
+  src/newlib/libc/machine/arc/strlen-600.S
+  src/newlib/libc/machine/arc/strcpy-600.S
+  src/newlib/libc/machine/arc/strncpy.S
+  src/newlib/libc/machine/arc/asm.h
+  src/newlib/libc/sys/arc/_exit.c
+ replaced file:
+  src/newlib/libc/sys/arc/sbrk.c (contains code from codito's stubs.c)
+  src/newlib/libc/sys/arc/sys/syscall.h (contains code from codito's linux)
+  src/newlib/libc/machine/arc/aclocal.m4 (copied from sibling directory)
+ replaced file (regenerated):
+  src/newlib/libc/machine/arc/configure
+  src/newlib/libc/machine/arc/Makefile.in
+  src/newlib/libc/sys/arc/Makefile.in
+  src/newlib/libc/machine/configure
+ changed files:
+  src/config.sub
+  src/newlib/configure.host
+  src/newlib/libc/stdlib/_Exit.c
+  src/newlib/libc/stdlib/exit.c
+  src/newlib/libc/stdlib/abort.c
+  src/newlib/libc/sys/arc/crt0.S
+  src/newlib/libc/sys/arc/syscalls.c
+  src/newlib/ChangeLog
+  src/newlib/libc/sys/arc/Makefile.am
+  src/newlib/libc/machine/arc/Makefile.am
+  src/newlib/libc/machine/arc/configure.in
+  src/newlib/libc/machine/configure.in
+  src/newlib/libc/include/machine/types.h
+  src/newlib/libc/include/sys/types.h
+  src/newlib/libc/include/sys/stat.h
+  src/newlib/libc/stdlib/strtod.c

@@ -225,13 +225,14 @@ done
 
 case "${host}" in
 arc-*-elf*)
-	if [ x$enable_biendian != xyes ]
+	if [ x$enable_biendian = xno ]
 	then
-	  old_multidirs=${multidirs}
+	  old_multidirs="${multidirs}"
 	  multidirs=""
 	  for x in ${old_multidirs}; do
-	    case "${x}" in
-	      *be*) : ;;
+	    case "$x" in
+	      *le* ) : ;;
+	      *be* ) : ;;
 	      *) multidirs="${multidirs} ${x}" ;;
 	    esac
 	  done

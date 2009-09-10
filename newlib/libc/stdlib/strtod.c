@@ -1184,9 +1184,21 @@ _DEFUN (strtof, (s00, se),
 	char **se)
 {
   double retval = _strtod_r (_REENT, s00, se);
+  float f_retval;
+
   if (isnan (retval))
     return nanf (NULL);
-  return (float)retval;
+  f_retval = (float)retval;
+#ifndef NO_ERRNO
+  if (f_retval == 0 && retval != 0)
+    _REENT->_errno = ERANGE;
+#ifdef __GNUC__
+  else if (f_retval == __builtin_huge_valf()
+	   || f_retval == -__builtin_huge_valf())
+    _REENT->_errno = ERANGE;
+#endif
+#endif /* NO_ERRNO */
+  return f_retval;
 }
 
 #endif

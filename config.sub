@@ -273,6 +273,7 @@ case $basic_machine in
 	| mn10200 | mn10300 \
 	| mt \
 	| msp430 \
+	| mxp \
 	| nios | nios2 \
 	| ns16k | ns32k \
 	| or32 \
@@ -357,6 +358,7 @@ case $basic_machine in
 	| mmix-* \
 	| mt-* \
 	| msp430-* \
+	| mxp-* \
 	| nios-* | nios2-* \
 	| none-* | np1-* | ns16k-* | ns32k-* \
 	| orion-* \
