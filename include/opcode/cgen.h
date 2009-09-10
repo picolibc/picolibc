@@ -1339,7 +1339,7 @@ typedef struct cgen_cpu_desc
   int (* dis_hash_p) (const CGEN_INSN *);
 
   /* Disassembler hash function.  */
-  unsigned int (* dis_hash) (const char *, CGEN_INSN_INT);
+  unsigned int (* dis_hash) (const char *, CGEN_INSN_INT, int);
 
   /* Number of entries in disassembler hash table.  */
   unsigned int dis_hash_size;
