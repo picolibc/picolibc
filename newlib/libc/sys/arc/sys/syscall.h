@@ -1,6 +1,6 @@
 /* Copyright (C) 2004, 2007 Free Software Foundation, Inc.
    This program is free software; you can redistribute it and/or modify
-   it under the same terms as libgloss/syscall.h .  */
+   it under the same terms as libgloss/syscall.h .
 
    Authors: Amit Bhor, Joern Rennecke .  */
 

@@ -6,19 +6,6 @@
    it under the same terms as a file of your choice in
    newlib/libc/string/{memcmp,memcpy,memset}.c or
    {strchr,strcmp,strcpy,strlen,strncpy}.c .  */
-memcmp.S
-memcpy-700.S
-memcpy.S
-memset.S
-strchr-700.S
-strchr.S
-strcmp.S
-strcpy-600.S
-strcpy-700.S
-strlen-600.S
-strlen.S
-strncpy.S
-
 
 #define _ENTRY(name) \
 	.text ` .balign 4 ` .globl name ` name:
