@@ -210,7 +210,6 @@ typedef struct disassemble_info
 typedef int (*disassembler_ftype) (bfd_vma, disassemble_info *);
 
 extern int print_insn_alpha		(bfd_vma, disassemble_info *);
-extern int print_insn_arc		(bfd_vma, disassemble_info *);
 extern int print_insn_avr		(bfd_vma, disassemble_info *);
 extern int print_insn_bfin		(bfd_vma, disassemble_info *);
 extern int print_insn_big_arm		(bfd_vma, disassemble_info *);
@@ -284,7 +283,7 @@ extern int print_insn_z80		(bfd_vma, disassemble_info *);
 extern int print_insn_z8001		(bfd_vma, disassemble_info *);
 extern int print_insn_z8002		(bfd_vma, disassemble_info *);
 
-extern disassembler_ftype arc_get_disassembler (bfd *);
+extern disassembler_ftype arc_get_disassembler (void *);
 extern disassembler_ftype cris_get_disassembler (bfd *);
 
 extern void print_i386_disassembler_options (FILE *);

@@ -757,9 +757,7 @@ enum dwarf_call_frame_info
     /* GNU extensions.  */
     DW_CFA_GNU_window_save = 0x2d,
     DW_CFA_GNU_args_size = 0x2e,
-    DW_CFA_GNU_negative_offset_extended = 0x2f,
-    /* Metaware High C compiler extensions. */
-    DW_CFA_MWARC_info = 0x34
+    DW_CFA_GNU_negative_offset_extended = 0x2f
   };
 
 #define DW_CIE_ID	  0xffffffff

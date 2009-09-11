@@ -1,0 +1,146 @@
+Building gdb
+============
+
+You can build ARC GDB in two possible ways: one for debugging linux applications,
+and one for debugging programs directly on the CPU using either the built-in simulator,
+or the xISS (a fast instruction set simulator), or a JTAG connection to a hardware target.
+
+
+arc-linux-uclibc-gdb
+--------------------
+
+You will need to build GDB as well as gdbserver.
+
+For building GDB, do
+   $ ./configure --target=arc-linux-uclibc --prefix=/install/path
+   $ make 
+   $ make install
+
+(Where /install/path is a path to a directory where you want to install GDB.)
+
+
+For building gdbserver:
+
+You will need the arc-linux-uclibc-gcc toolchain.  It should be in your path.
+
+   $ cd gdbserver
+   $ source ./build_gdbserver.sh
+   $ ./configure --host=i386-redhat-linux-gnu --target=arc-linux-uclibc --prefix=/install/path
+   $ make
+   $ make install
+
+If you do not have the build_gdbserver.sh script, you will need these variables set in your
+environment:
+
+   CFLAGS="-mA7 -static -O0"
+   LDFLAGS="-mA7"
+   CC=arc-linux-uclibc-gcc
+
+You will find a gdbserver in your install path.
+Copy it to an NFS share that is accessible from the board.
+
+Please use the script at <SOURCE-DIR>/insight/src/build_gdbserver.sh for reference.
+
+
+arc-elf32-gdb
+-------------
+
+Do
+   $ ./configure --target=arc-elf32 --prefix=/install/path \
+                 --with-expat [ --with-libexpat-prefix=/expat/install/path ] \
+                 [ --with-xiss  --with-xiss-prefix=/xISS/install/path ]
+   $ make 
+   $ make install
+
+(Where /install/path is a path to a directory where you want to install GDB.)
+
+You will need to have the expat library (available from http://www.libexpat.org) installed on your machine.
+The `configure' script will search for this library in several standard locations; if it is installed in an
+unusual path, you can use the `--with-libexpat-prefix' option to specify its location. 
+
+If you have the xISS (ARC Fast Instruction Set Simulator) installed, you may optionally build gdb to be able
+to use it directly, by specifying the --with-xiss and --with-xiss-prefix options.  In this case, the xISS
+installation must have been built with the option "--enable-mdb" specified to the 'configure' script in
+order that the required header files are located in the /xISS/install/path/include directory.
+
+
+Running gdb
+===========
+
+XISS
+----
+If you have built arc-elf32-gdb to be able to use the xISS directly, you will need to set the environment
+variable XISS_HOME to identify the /xISS/install/path directory in order to be able to use the gdb
+'target arcxiss' command.
+
+
+XISS instruction address trace file
+-----------------------------------
+arc-elf32-gdb may be used in conjection with the xISS to trace instruction execution; it may create a file
+containing the address of each instruction executed, in the order in which they were executed.  This file
+contains the data in a compressed encoding which results in a saving of about 80% of the uncompressed data
+size.  See the ARC gdb 'Getting Started' manual for more information.
+
+
+Auxiliary registers XML file
+----------------------------
+
+When using gdb, you will need to provide it with a file which describes the auxiliary registers of the target
+(e.g. ARCAngel 4, simulator) upon which you are debugging.
+
+By default, gdb will look for a file named 'arc-registers.xml'; it will look first in your current working
+directory, and then in your home directory.  Alternatively, a file may be specified by means of the
+'arc-reg-read-file' command.
+
+It is also possible to add new descriptions using the 'arc-reg-read-extra-file' command, thus allowing
+processor variants to be described by sets of common files and variant-specific files.
+
+Files containing descriptions for the ARC700, ARC600 and A5 variants of the ARC processor architecture are
+provided at
+
+   gdb/features/arc700-cpu.xml
+   gdb/features/arc600-cpu.xml
+   gdb/features/arc-a5-cpu.xml
+
+It is suggested that you copy the appropriate file for your target architecture to your home or working directory,
+and rename it to 'arc-registers.xml'.
+
+It is simple to define a new target description; the XML schema for the description is defined in the
+file
+
+    gdb/features/arc-registers.dtd 
+
+
+In essence, a target description consists of a set of register descriptions. Each register description has
+these attributes:
+
+        name        : the register name (case-insensitive); may be 'unused'
+        description : an (optional) textual description of the register's function
+        number      : the number of the register in the auxiliary register set (e.g. 0x0A for STATUS32)
+        mask        : a 32-bit mask which defines which bits of the register are valid (0xFFFFFFFF by default)
+        access      : the register's read/write access: R/O, R/W or W/O (R/W by default)
+
+
+Each register description may also have a set of field descriptions. Each field description has
+these attributes:
+
+        name        : the field name (case-insensitive); may be 'reserved'
+        description : an (optional) textual description of the field's function
+        onwrite     : the (optional) value (for a reserved field) which must be supplied on a write operation
+        offset      : the offset in bits of the field from the least significant bit (0) of the register
+        size        : the size of the field in bits
+        access      : the field's read/write access: R/O, R/W or W/O (the register's access by default)
+
+
+Each field description may also have a set of field meanings.  Each field meaning has these attributes:
+
+        value       : a value that the field may contain
+        description : a textual explanation of the meaning of the field when it contains that value
+
+
+There may also be a set of Build Configuration Registers (BCRs).  The descriptions of these registers do
+not have an access attribute; and, although a BCR may have a number of fields (which do not have access
+or onwrite attributes), these fields do not have field meanings.
+
+It is also possible to include definitions of Extension Core Registers: the descriptions of these have 
+merely the register number (which must be between 32 and 59 inclusive), and mask and access attributes.

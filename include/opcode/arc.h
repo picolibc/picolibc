@@ -174,8 +174,8 @@ struct arc_operand_value {
 
 struct arc_ext_operand_value {
   struct arc_ext_operand_value *next;
-  struct arc_operand_value operand;
-};
+  struct arc_operand_value     operand;
+} *arc_ext_operands;
 
 /* List of extension condition codes, core registers and auxiliary registers.
    Calls to gas/config/tc-arc.c:arc_extoper built up this list.  */
@@ -357,14 +357,24 @@ struct arc_operand {
 		   const struct arc_operand_value **opval, int *invalid);
 };
 
-enum 
+enum
 {
   BR_exec_when_no_jump,
   BR_exec_always,
   BR_exec_when_jump
 };
+enum ARC_Debugger_OperandType
+{
+    ARC_UNDEFINED,
+    ARC_LIMM,
+    ARC_SHIMM,
+    ARC_REGISTER, 
+    ARCOMPACT_REGISTER /* Valid only for the 
+			  registers allowed in
+			  16 bit mode */
+};
 
-enum Flow 
+enum Flow
 {
   noflow,
   direct_jump,
@@ -377,7 +387,7 @@ enum Flow
 enum { no_reg = 99 };
 enum { allOperandsSize = 256 };
 
-struct arcDisState 
+struct arcDisState
 {
   void *_this;
   int instructionLen;
@@ -386,7 +396,7 @@ struct arcDisState
   const char *(*auxRegName)(void*, int);
   const char *(*condCodeName)(void*, int);
   const char *(*instName)(void*, int, int, int*);
-  
+
   unsigned char* instruction;
   unsigned index;
   const char *comm[6]; /* instr name, cond, NOP, 3 operands */
@@ -462,8 +472,6 @@ extern const struct arc_operand arc_operands_a4[];
 extern const struct arc_operand arc_operands_ac[];
 extern const struct arc_operand *arc_operands;
 extern int arc_operand_count;
-extern /*const*/ struct arc_opcode arc_opcodes[];
-extern const int arc_opcodes_count;
 extern const struct arc_operand_value arc_suffixes_a4[];
 extern const struct arc_operand_value arc_suffixes_ac[];
 extern const struct arc_operand_value *arc_suffixes;

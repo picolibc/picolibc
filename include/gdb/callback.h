@@ -320,14 +320,6 @@ int cb_is_stdin PARAMS ((host_callback *, int));
 int cb_is_stdout PARAMS ((host_callback *, int));
 int cb_is_stderr PARAMS ((host_callback *, int));
 
-/* Utility of cb_syscall to fetch a path name.
-   The buffer is malloc'd and the address is stored in BUFP.
-   The result is that of get_string, but prepended with
-   simulator_sysroot if the string starts with '/'.
-   If an error occurs, no buffer is left malloc'd.  */
-#define TADDR unsigned long
-int get_path PARAMS ((host_callback *, CB_SYSCALL *, TADDR, char **));
-
 /* Perform a system call.  */
 CB_RC cb_syscall PARAMS ((host_callback *, CB_SYSCALL *));
 
