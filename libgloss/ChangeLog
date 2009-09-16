@@ -1,3 +1,12 @@
+2009-09-16  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf512.ld, bf514.ld,
+	and bf516.ld, bf518.ld.
+	* bfin/bf512.ld: New file.
+	* bfin/bf514.ld: Likewise.
+	* bfin/bf516.ld: Likewise.
+	* bfin/bf518.ld: Likewise
+
 2009-09-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/*.ld: Fix typos in comments.

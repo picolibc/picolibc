@@ -60,8 +60,8 @@ SIM_TEST	= sim-test
 SIM_INSTALL	= install-sim
 
 # Here is all of the development board stuff
-# BF531, BF532, BF533, BF537
 BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
+	bf512.ld bf514.ld bf516.ld bf518.ld \
 	bf522.ld bf523.ld bf524.ld bf525.ld bf526.ld bf527.ld \
 	bf531.ld bf532.ld bf533.ld \
 	bf534.ld bf536.ld bf537.ld \
