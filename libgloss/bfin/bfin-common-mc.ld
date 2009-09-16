@@ -1,5 +1,5 @@
 /*
- * The common part of the default linker stripts for standalone executables
+ * The common part of the default linker scripts for standalone executables
  * running on single core Blackfin processors.
  *
  * Copyright (C) 2008 Analog Devices, Inc.

@@ -1,3 +1,7 @@
+2009-09-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/*.ld: Fix typos in comments.
+
 2009-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/include/ccblkfn.h: New file.

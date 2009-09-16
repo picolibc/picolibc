@@ -1,5 +1,5 @@
 /*
- * The default linker stript for standalone executables running on
+ * The default linker script for standalone executables running on
  * ADSP-BF561 processor (single core).
  *
  * Copyright (C) 2008 Analog Devices, Inc.
