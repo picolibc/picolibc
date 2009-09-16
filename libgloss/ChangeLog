@@ -1,5 +1,44 @@
 2009-09-16  Mike Frysinger  <michael.frysinger@analog.com>
 
+	* bfin/include/cdefBF512.h, bfin/include/cdefBF514.h,
+	bfin/include/cdefBF516.h, bfin/include/cdefBF518.h,
+	bfin/include/cdefBF51x_base.h, bfin/include/cdefBF523.h,
+	bfin/include/cdefBF524.h, bfin/include/cdefBF526.h,
+	bfin/include/cdefBF542M.h, bfin/include/cdefBF544M.h,
+	bfin/include/cdefBF547M.h, bfin/include/cdefBF548M.h,
+	bfin/include/cdefBF549M.h, bfin/include/defBF512.h,
+	bfin/include/defBF514.h, bfin/include/defBF516.h,
+	bfin/include/defBF518.h, bfin/include/defBF51x_base.h,
+	bfin/include/defBF523.h, bfin/include/defBF524.h,
+	bfin/include/defBF526.h, bfin/include/defBF542M.h,
+	bfin/include/defBF544M.h, bfin/include/defBF547M.h,
+	bfin/include/defBF548M.h, bfin/include/defBF549M.h:
+	New file.
+	* bfin/include/ccblkfn.h, bfin/include/cdefBF525.h,
+	bfin/include/cdefBF527.h, bfin/include/cdefBF52x_base.h,
+	bfin/include/cdefBF532.h, bfin/include/cdefBF534.h,
+	bfin/include/cdefBF535.h, bfin/include/cdefBF538.h,
+	bfin/include/cdefBF539.h, bfin/include/cdefBF542.h,
+	bfin/include/cdefBF544.h, bfin/include/cdefBF547.h,
+	bfin/include/cdefBF548.h, bfin/include/cdefBF549.h,
+	bfin/include/cdefBF54x_base.h, bfin/include/cdefBF561.h,
+	bfin/include/cdefblackfin.h, bfin/include/cdef_LPBlackfin.h,
+	bfin/include/cplb.h, bfin/include/defBF527.h,
+	bfin/include/defBF52x_base.h, bfin/include/defBF532.h,
+	bfin/include/defBF534.h, bfin/include/defBF535.h,
+	bfin/include/defBF537.h, bfin/include/defBF538.h,
+	bfin/include/defBF539.h, bfin/include/defBF542.h,
+	bfin/include/defBF544.h, bfin/include/defBF547.h,
+	bfin/include/defBF548.h, bfin/include/defBF549.h,
+	bfin/include/defBF54x_base.h, bfin/include/defBF561.h,
+	bfin/include/defblackfin.h, bfin/include/def_LPBlackfin.h,
+	bfin/include/sys/_adi_platform.h,
+	bfin/include/sys/anomaly_macros_rtl.h,
+	bfin/include/sys/exception.h, bfin/include/sysreg.h:
+	Update to Visual DSP 5.0 Update 6.
+
+2009-09-16  Mike Frysinger  <michael.frysinger@analog.com>
+
 	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf512.ld, bf514.ld,
 	and bf516.ld, bf518.ld.
 	* bfin/bf512.ld: New file.

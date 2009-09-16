@@ -13,7 +13,7 @@
 /*
 ** defBF54x_base.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -1103,7 +1103,7 @@
 #define                         CAN0_EWR  0xffc02ab0   /* CAN Controller 0 Programmable Warning Level Register */
 #define                         CAN0_ESR  0xffc02ab4   /* CAN Controller 0 Error Status Register */
 #define                       CAN0_UCCNT  0xffc02ac4   /* CAN Controller 0 Universal Counter Register */
-#define                        CAN0_UCRC  0xffc02ac8   /* CAN Controller 0 Universal Counter Force Reload Register */
+#define                        CAN0_UCRC  0xffc02ac8   /* Universal Counter Reload/Capture Register */
 #define                       CAN0_UCCNF  0xffc02acc   /* CAN Controller 0 Universal Counter Configuration Register */
 
 /* CAN Controller 0 Acceptance Registers */
@@ -1797,6 +1797,8 @@
 #define AMBEN_B0                0x0002        /* Enable Async Memory Bank 0 only */
 #define AMBEN_B0_B1             0x0004        /* Enable Async Memory Banks 0 & 1 only */
 #define AMBEN_B0_B1_B2          0x0006        /* Enable Async Memory Banks 0, 1, and 2 */
+#define AMBEN_B0_B1_B2_B3       0x0008        /* Enable Async Memory Banks 0, 1,  2 and 3 */
+#define AMBEN_ALL               0x0008        /* Enable All Async Memory Banks */
 
 /* Bit masks for EBIU_AMBCTL0 */
 
@@ -1820,17 +1822,32 @@
 #define                     B1WAT  0xf0000000 /* Bank 1 write access time */
 
 /* EBIU_AMBCTL0 Macros */
+#ifdef _MISRA_RULES
+#define SET_B1WAT(x)            (((x)&0xFu) << 28)   /* B1 Write Access Time = x cycles */
+#define SET_B1RAT(x)            (((x)&0xFu) << 24)   /* B1 Read Access Time = x cycles */
+#define SET_B1HT(x)             (((x)&0x3u) << 22)   /* B1 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B1ST(x)             (((x)&0x3u) << 20)   /* B1 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B1TT(x)             (((x)&0x3u) << 18)   /* B1 Transition Time (Read to Write) = x cycles */
+
+#define SET_B0WAT(x)            (((x)&0xFu) << 12)   /* B0 Write Access Time = x cycles */
+#define SET_B0RAT(x)            (((x)&0xFu) << 8)    /* B0 Read Access Time = x cycles */
+#define SET_B0HT(x)             (((x)&0x3u) << 6)    /* B0 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B0ST(x)             (((x)&0x3u) << 4)    /* B0 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B0TT(x)             (((x)&0x3u) << 2)    /* B0 Transition Time (Read to Write) = x cycles */
+#else
 #define SET_B1WAT(x)            (((x)&0xF) << 28)   /* B1 Write Access Time = x cycles */
 #define SET_B1RAT(x)            (((x)&0xF) << 24)   /* B1 Read Access Time = x cycles */
 #define SET_B1HT(x)             (((x)&0x3) << 22)   /* B1 Hold Time (~Read/Write to ~AOE) = x cycles */
-#define SET_B1ST[x)             (((x)&0x3) << 20)   /* B1 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B1ST(x)             (((x)&0x3) << 20)   /* B1 Setup Time (AOE to Read/Write) = x cycle */
 #define SET_B1TT(x)             (((x)&0x3) << 18)   /* B1 Transition Time (Read to Write) = x cycles */
 
 #define SET_B0WAT(x)            (((x)&0xF) << 12)   /* B0 Write Access Time = x cycles */
 #define SET_B0RAT(x)            (((x)&0xF) << 8)    /* B0 Read Access Time = x cycles */
 #define SET_B0HT(x)             (((x)&0x3) << 6)    /* B0 Hold Time (~Read/Write to ~AOE) = x cycles */
-#define SET_B0ST[x)             (((x)&0x3) << 4)    /* B0 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B0ST(x)             (((x)&0x3) << 4)    /* B0 Setup Time (AOE to Read/Write) = x cycle */
 #define SET_B0TT(x)             (((x)&0x3) << 2)    /* B0 Transition Time (Read to Write) = x cycles */
+#endif /* _MISRA_RULES */
+
 
 /* Bit masks for EBIU_AMBCTL1 */
 
@@ -1854,17 +1871,31 @@
 #define                     B3WAT  0xf0000000 /* Bank 3 write access time */
 
 /* EBIU_AMBCTL1 Macros */
+#ifdef _MISRA_RULES
+#define SET_B3WAT(x)            (((x)&0xFu) << 28)   /* B3 Write Access Time = x cycles */
+#define SET_B3RAT(x)            (((x)&0xFu) << 24)   /* B3 Read Access Time = x cycles */
+#define SET_B3HT(x)             (((x)&0x3u) << 22)   /* B3 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B3ST(x)             (((x)&0x3u) << 20)   /* B3 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B3TT(x)             (((x)&0x3u) << 18)   /* B3 Transition Time (Read to Write) = x cycles */
+
+#define SET_B2WAT(x)            (((x)&0xFu) << 12)   /* B2 Write Access Time = x cycles */
+#define SET_B2RAT(x)            (((x)&0xFu) << 8)    /* B2 Read Access Time = x cycles */
+#define SET_B2HT(x)             (((x)&0x3u) << 6)    /* B2 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B2ST(x)             (((x)&0x3u) << 4)    /* B2 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B2TT(x)             (((x)&0x3u) << 2)    /* B2 Transition Time (Read to Write) = x cycles */
+#else
 #define SET_B3WAT(x)            (((x)&0xF) << 28)   /* B3 Write Access Time = x cycles */
 #define SET_B3RAT(x)            (((x)&0xF) << 24)   /* B3 Read Access Time = x cycles */
 #define SET_B3HT(x)             (((x)&0x3) << 22)   /* B3 Hold Time (~Read/Write to ~AOE) = x cycles */
-#define SET_B3ST[x)             (((x)&0x3) << 20)   /* B3 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B3ST(x)             (((x)&0x3) << 20)   /* B3 Setup Time (AOE to Read/Write) = x cycle */
 #define SET_B3TT(x)             (((x)&0x3) << 18)   /* B3 Transition Time (Read to Write) = x cycles */
 
 #define SET_B2WAT(x)            (((x)&0xF) << 12)   /* B2 Write Access Time = x cycles */
 #define SET_B2RAT(x)            (((x)&0xF) << 8)    /* B2 Read Access Time = x cycles */
 #define SET_B2HT(x)             (((x)&0x3) << 6)    /* B2 Hold Time (~Read/Write to ~AOE) = x cycles */
-#define SET_B2ST[x)             (((x)&0x3) << 4)    /* B2 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B2ST(x)             (((x)&0x3) << 4)    /* B2 Setup Time (AOE to Read/Write) = x cycle */
 #define SET_B2TT(x)             (((x)&0x3) << 2)    /* B2 Transition Time (Read to Write) = x cycles */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for EBIU_MBSCTL */
 
@@ -1920,7 +1951,11 @@
 #define BCLK4                   0x00000006          /* Burst clock frequency: 11 - SCLK/4 */
 
 /* Macros for EBIU_FCTL */
+#ifdef _MISRA_RULES
+#define SET_PGWS(x)             (((x)&0x7u) << 0x3)  /* PGWS[5:3] Page Wait States - 000 to 100 - 0 to 4 cycles */
+#else
 #define SET_PGWS(x)             (((x)&0x7) << 0x3)  /* PGWS[5:3] Page Wait States - 000 to 100 - 0 to 4 cycles */
+#endif /* _MISRA_RULES */
                                                     /* Burst clock frequency: 00 - Reserved */
 /* Bit masks for EBIU_ARBSTAT */
 
@@ -1937,11 +1972,19 @@
 #define                       TRC  0x3c000000 /* Active-to-active time */
 
 /* Macros for EBIU_DDRCTL0 */
+#ifdef _MISRA_RULES
+#define SET_tRC(x)              (((x)&0xFu) << 26)   /* tRC (Active-to-Active)[29:26] - Number of clock cycles from an active command to next active command (Default: 0x2) */
+#define SET_tRAS(x)             (((x)&0xFu) << 22)   /* tRAS (Minimum Active-to-Precharge time) [3:0] - Number of clock cycles from an ACTIVE command until a PRE-CHARGE command is issued. To obtain this value, one should divide the minimum RAS to pre-charge delay of SDRAM by clock cycle time (Default: 0x6) */
+#define SET_tRP(x)              (((x)&0xFu) << 18)   /* tRP (Precharge-to-Active Command period)[3:0] - Number of clock cycles needed for DDR to recover from a precharge command and ready to accept next active command (Default: 0x3) */
+#define SET_tRFC(x)             (((x)&0xFu) << 14)   /* tRFC[3:0] AUTO-REFRESH Command Period[3:0] - Number of clock cycles needed for DDR to recover from a refresh to be ready for next active command (tRFC/Clock Period) (Default: 0xA) */
+#define SET_tREFI(x)            ((x)&0x3FFFu)        /* tREFI (Refresh Interval)[13:0] - Number of clock cycles from one refresh cycle to next refresh cycle. To obtain this value, divide the DDR refresh period (tREF) by total number of rows to be refreshed. Then divide the result by total time. (Default: 0x0411) */
+#else
 #define SET_tRC(x)              (((x)&0xF) << 26)   /* tRC (Active-to-Active)[29:26] - Number of clock cycles from an active command to next active command (Default: 0x2) */
 #define SET_tRAS(x)             (((x)&0xF) << 22)   /* tRAS (Minimum Active-to-Precharge time) [3:0] - Number of clock cycles from an ACTIVE command until a PRE-CHARGE command is issued. To obtain this value, one should divide the minimum RAS to pre-charge delay of SDRAM by clock cycle time (Default: 0x6) */
 #define SET_tRP(x)              (((x)&0xF) << 18)   /* tRP (Precharge-to-Active Command period)[3:0] - Number of clock cycles needed for DDR to recover from a precharge command and ready to accept next active command (Default: 0x3) */
 #define SET_tRFC(x)             (((x)&0xF) << 14)   /* tRFC[3:0] AUTO-REFRESH Command Period[3:0] - Number of clock cycles needed for DDR to recover from a refresh to be ready for next active command (tRFC/Clock Period) (Default: 0xA) */
 #define SET_tREFI(x)            ((x)&0x3FFF)        /* tREFI (Refresh Interval)[13:0] - Number of clock cycles from one refresh cycle to next refresh cycle. To obtain this value, divide the DDR refresh period (tREF) by total number of rows to be refreshed. Then divide the result by total time. (Default: 0x0411) */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for EBIU_DDRCTL1 */
 
@@ -1978,10 +2021,17 @@
 #define DDR_DEVSIZE_256         0x000C0000
 
 /* Macros for EBIU_DDRCTL1 */
+#ifdef _MISRA_RULES
+#define SET_tWTR(x)             (((x)&0xFu) << 28)   /* tWTR (Write-to-Read Delay)[3:0] - The Write to read delay (last write data to the next read command) as specified by DDR Data sheet (Default: 0x0001) */
+#define SET_tWR(x)              (((x)&0x3u) << 8)    /* tWR Write Recovery Time[9:8] */
+#define SET_tMRD(x)             (((x)&0xFu) << 4)    /* tMRD Mode register set to active[7:4] */
+#define SET_tRCD(x)             ((x)&0xFu)           /* tRCD ACTIVE-to-READ/WRITE delay[3:0] */
+#else
 #define SET_tWTR(x)             (((x)&0xF) << 28)   /* tWTR (Write-to-Read Delay)[3:0] - The Write to read delay (last write data to the next read command) as specified by DDR Data sheet (Default: 0x0001) */
 #define SET_tWR(x)              (((x)&0x3) << 8)    /* tWR Write Recovery Time[9:8] */
 #define SET_tMRD(x)             (((x)&0xF) << 4)    /* tMRD Mode register set to active[7:4] */
 #define SET_tRCD(x)             ((x)&0xF)           /* tRCD ACTIVE-to-READ/WRITE delay[3:0] */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for EBIU_DDRCTL2 */
 #define               BURSTLENGTH  0x7        /* Burst length */
@@ -2011,15 +2061,15 @@
 #define                      PASR  0x7        /* Partial array self-refresh */
 
 /* Bit masks for EBIU_DDRQUE */
-#define                DEB0_PFLEN  0x30       /* Pre fetch length for DEB0 accesses */
-#define                DEB1_PFLEN  0x3        /* Pre fetch length for DEB1 accesses */
-#define                DEB2_PFLEN  0xc        /* Pre fetch length for DEB2 accesses */
+#define                DEB0_PFLEN  0x3        /* Pre fetch length for DEB0 accesses */
+#define                DEB1_PFLEN  0xc        /* Pre fetch length for DEB1 accesses */
+#define                DEB2_PFLEN  0x30       /* Pre fetch length for DEB2 accesses */
 #define          DEB_ARB_PRIORITY  0x700      /* Arbitration between DEB busses */
-#define               DEB0_URGENT  0x4000     /* DEB0 Urgent */
+#define               DEB0_URGENT  0x1000     /* DEB0 Urgent */
 #define              nDEB0_URGENT  0x0
-#define               DEB1_URGENT  0x1000     /* DEB1 Urgent */
+#define               DEB1_URGENT  0x2000     /* DEB1 Urgent */
 #define              nDEB1_URGENT  0x0
-#define               DEB2_URGENT  0x2000     /* DEB2 Urgent */
+#define               DEB2_URGENT  0x4000     /* DEB2 Urgent */
 #define              nDEB2_URGENT  0x0
 
 /* Bit masks for EBIU_DDRQUE (DEB0_PFLEN) */
@@ -2091,8 +2141,6 @@
 #define                    nSRREQ  0x0
 #define                     SRACK  0x10       /* Self-refresh acknowledge */
 #define                    nSRACK  0x0
-#define                MDDRENABLE  0x20       /* Mobile DDR enable */
-#define               nMDDRENABLE  0x0
 
 /* Bit masks for EBIU_DDRBRC0 */
 
@@ -2636,46 +2684,6 @@
 #define                      PREN  0x1        /* Prescaler Enable */
 #define                     nPREN  0x0
 
-/* Bit masks for OTP_CONTROL */
-
-#define                FUSE_FADDR  0x1ff      /* OTP/Fuse Address */
-#define                      FIEN  0x800      /* OTP/Fuse Interrupt Enable */
-#define                     nFIEN  0x0
-#define                  FTESTDEC  0x1000     /* OTP/Fuse Test Decoder */
-#define                 nFTESTDEC  0x0
-#define                   FWRTEST  0x2000     /* OTP/Fuse Write Test */
-#define                  nFWRTEST  0x0
-#define                     FRDEN  0x4000     /* OTP/Fuse Read Enable */
-#define                    nFRDEN  0x0
-#define                     FWREN  0x8000     /* OTP/Fuse Write Enable */
-#define                    nFWREN  0x0
-
-/* Bit masks for OTP_BEN */
-
-#define                      FBEN  0xffff     /* OTP/Fuse Byte Enable */
-
-/* Bit masks for OTP_STATUS */
-
-#define                     FCOMP  0x1        /* OTP/Fuse Access Complete */
-#define                    nFCOMP  0x0
-#define                    FERROR  0x2        /* OTP/Fuse Access Error */
-#define                   nFERROR  0x0
-#define                  MMRGLOAD  0x10       /* Memory Mapped Register Gasket Load */
-#define                 nMMRGLOAD  0x0
-#define                  MMRGLOCK  0x20       /* Memory Mapped Register Gasket Lock */
-#define                 nMMRGLOCK  0x0
-#define                    FPGMEN  0x40       /* OTP/Fuse Program Enable */
-#define                   nFPGMEN  0x0
-
-/* Bit masks for OTP_TIMING */
-
-#define                   USECDIV  0xff       /* Micro Second Divider */
-#define                   READACC  0x7f00     /* Read Access Time */
-#define                   CPUMPRL  0x38000    /* Charge Pump Release Time */
-#define                   CPUMPSU  0xc0000    /* Charge Pump Setup Time */
-#define                   CPUMPHD  0xf00000   /* Charge Pump Hold Time */
-#define                   PGMTIME  0xff000000 /* Program Time */
-
 /* Bit masks for SECURE_SYSSWT */
 
 #define                   EMUDABL  0x1        /* Emulation Disable. */
@@ -2729,7 +2737,11 @@
 #define CSEL_DIV8               0x0030              /* CCLK = VCO / 8 */
 
 /* PLL_DIV Macros */
+#ifdef _MISRA_RULES
+#define SET_SSEL(x)             ((x)&0xFu)           /* Set SSEL = 0-15 --> SCLK = VCO/SSEL */
+#else
 #define SET_SSEL(x)             ((x)&0xF)           /* Set SSEL = 0-15 --> SCLK = VCO/SSEL */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for PLL_CTL */
 
@@ -2750,7 +2762,11 @@
 #define                       nDF  0x0
 
 /* PLL_CTL Macros (Only Use With Logic OR While Setting Lower Order Bits) */
+#ifdef _MISRA_RULES
+#define SET_MSEL(x)             (((x)&0x3Fu) << 9) /* Set MSEL = 0-63 --> VCO = CLKIN*MSEL */
+#else
 #define SET_MSEL(x)             (((x)&0x3F) << 9) /* Set MSEL = 0-63 --> VCO = CLKIN*MSEL */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for PLL_STAT */
 
@@ -4477,8 +4493,8 @@
 #define                       MFD  0xf000     /* Multi channel Frame Delay */
 #define                      FSDR  0x80       /* Frame Sync to Data Relationship */
 #define                     nFSDR  0x0
-#define                     MCMEM  0x10       /* Multi channel Frame Mode Enable */
-#define                    nMCMEM  0x0
+#define                     MCMEN  0x10       /* Multi channel Frame Mode Enable */
+#define                    nMCMEN  0x0
 #define                   MCDRXPE  0x8        /* Multi channel DMA Receive Packing */
 #define                  nMCDRXPE  0x0
 #define                   MCDTXPE  0x4        /* Multi channel DMA Transmit Packing */
@@ -4604,6 +4620,8 @@
 #define                     nBDIE  0x0
 #define                      MBDI  0x40       /* Mask Block Done Interrupt */
 #define                     nMBDI  0x0
+#define                       SND  0x80       /* Source/Not Destination */
+#define                      nSND  0x0
 #define                       DRQ  0x300      /* Handshake MDMA Request Type */
 #define                       RBC  0x1000     /* Force Reload of BCOUNT */
 #define                      nRBC  0x0
@@ -4618,12 +4636,26 @@
 /*     MULTI BIT MACRO ENUMERATIONS            */
 /* ******************************************* */
 
-/* BCODE bit field options (SYSCFG register) */
+/* SYSCR Masks */
 
-#define BCODE_WAKEUP    0x0000  /* boot according to wake-up condition */
-#define BCODE_FULLBOOT  0x0010  /* always perform full boot */
-#define BCODE_QUICKBOOT 0x0020  /* always perform quick boot */
-#define BCODE_NOBOOT    0x0030  /* always perform full boot */
+#define BMODE 0x000F /* Boot Mode. Mirror of BMODE Mode Pins */
+#define NOBOOT 0x0030 /* Execute From L1 or ASYNC Bank 0 When BMODE = 0 */
+
+
+#define BCODE 0x00F0
+#define BCODE_NORMAL 0x0000 /* normal boot, update PLL/VR, quickboot as by WURESET */
+#define BCODE_NOBOOT 0x0010 /* bypass boot, don't update PLL/VR */
+#define BCODE_QUICKBOOT 0x0020 /* quick boot, overrule WURESET, don't update PLL/VR */
+#define BCODE_ALLBOOT 0x0040 /* no quick boot, overrule WURESET, don't update PLL/VR */
+#define BCODE_FULLBOOT 0x0060 /* no quick boot, overrule WURESET, update PLL/VR */
+
+#define CDMAPRIO 0x0100 /* DMA1 gets higher priority than DMA0 to L1 memory */
+#define L2DMAPRIO 0x0200 /* DMA1 gets higher priority than DMA0 to L2 memory */
+
+#define WURESET 0x1000 /* wakeup event since last hardware reset */
+#define DFRESET 0x2000 /* recent reset was due to a double fault event */
+#define WDRESET 0x4000 /* recent reset was due to a watchdog event */
+#define SWRESET 0x8000 /* recent reset was issued by software */
 
 /* CNT_COMMAND bit field options */
 
@@ -5039,6 +5071,25 @@ PORTJ_FER registers
 #define MUX15_2 0x80000000
 #define MUX15_3 0xC0000000
 
+#ifdef _MISRA_RULES
+#define MUX(b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
+    ((((b15)&3u) << 30) | \
+     (((b14)&3u) << 28) | \
+     (((b13)&3u) << 26) | \
+     (((b12)&3u) << 24) | \
+     (((b11)&3u) << 22) | \
+     (((b10)&3u) << 20) | \
+     (((b9) &3u) << 18) | \
+     (((b8) &3u) << 16) | \
+     (((b7) &3u) << 14) | \
+     (((b6) &3u) << 12) | \
+     (((b5) &3u) << 10) | \
+     (((b4) &3u) << 8)  | \
+     (((b3) &3u) << 6)  | \
+     (((b2) &3u) << 4)  | \
+     (((b1) &3u) << 2)  | \
+     (((b0) &3u)))
+#else
 #define MUX(b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) \
     ((((b15)&3) << 30) | \
      (((b14)&3) << 28) | \
@@ -5056,6 +5107,7 @@ PORTJ_FER registers
      (((b2) &3) << 4)  | \
      (((b1) &3) << 2)  | \
      (((b0) &3)))
+#endif /* _MISRA_RULES */
 
 /* Bit fields for PINT0_ASSIGN and PINT1_ASSIGN registers */
 
@@ -5113,7 +5165,11 @@ PORTJ_FER registers
 
 /* for legacy compatibility */
 
+#ifdef _MISRA_RULES
+#define WLS(x)  (((x)-5u) & 0x03u) /* Word Length Select */
+#else
 #define WLS(x)  (((x)-5) & 0x03) /* Word Length Select */
+#endif /* _MISRA_RULES */
 #define W1LMAX_MAX W1LMAX_MIN
 #define EBIU_AMCBCTL0 EBIU_AMBCTL0
 #define EBIU_AMCBCTL1 EBIU_AMBCTL1
@@ -5121,12 +5177,6 @@ PORTJ_FER registers
 #define PINT1_IRQ PINT1_REQUEST
 #define PINT2_IRQ PINT2_REQUEST
 #define PINT3_IRQ PINT3_REQUEST
-
-#ifdef _MISRA_RULES
-#pragma diag(pop)
-#endif /* _MISRA_RULES */
-
-#endif /* _DEF_BF54X_H */
 
 
 /*********************************************************************************** */
@@ -5148,7 +5198,13 @@ PORTJ_FER registers
 #define NDSIZE_7        0x0700          /* Next Descriptor Size = 7 */
 #define NDSIZE_8        0x0800          /* Next Descriptor Size = 8 */
 #define NDSIZE_9        0x0900          /* Next Descriptor Size = 9 */
-#define SET_NDSIZE(x)   (((x)&0xF)<<8)  /* NDSIZE[3:0] (Flex Descriptor Size)
+
+#ifdef _MISRA_RULES
+#define SET_NDSIZE(x)   (((x)&0xFu)<<8)
+#else
+#define SET_NDSIZE(x)   (((x)&0xF)<<8)
+#endif
+                                        /* NDSIZE[3:0] (Flex Descriptor Size)
                                             Size of next descriptor
                                             0000 - Required if in Stop or Autobuffer mode
                                             0001 - 1001 - Descriptor size
@@ -5167,10 +5223,6 @@ PORTJ_FER registers
 #define RESET_DOUBLE    0x2000          /* SW Reset Generated By Core Double-Fault */
 #define RESET_WDOG      0x4000          /* SW Reset Generated By Watchdog Timer */
 #define RESET_SOFTWARE  0x8000          /* SW Reset Occurred Since Last Read Of SWRST */
-
-/* SYSCR Masks */
-#define BMODE           0x0006          /* Boot Mode - Latched During HW Reset From Mode Pins */
-#define NOBOOT          0x0010          /* Execute From L1 or ASYNC Bank 0 When BMODE = 0 */
 
 
 /* ******************************************* */
@@ -5363,144 +5415,211 @@ PORTJ_DIR_CLEAR, PORTJ_INEN, PORTJ_FER */
 #define nPJ15 0x0
 
 
+#ifdef _MISRA_RULES
+#define _MF15 0xFu
+#define _MF7 7u
+#else
+#define _MF15 0xF
+#define _MF7 7
+#endif /* _MISRA_RULES */
+
 /* *************  SYSTEM INTERRUPT CONTROLLER MASKS *************************************/
+
 /* Peripheral Masks For SIC_ISR, SIC_IWR, SIC_IMASK                                     */
 
+/* SIC_IMASKx Masks */
+/* masks are 32 bit wide, so two writes reguired for "64 bit" wide registers */
+#define SIC_UNMASK_ALL  0x00000000  /* Unmask all peripheral interrupts */
+#define SIC_MASK_ALL    0xFFFFFFFF  /* Mask all peripheral interrupts */
+
+/* SIC_IMASKx Macros */
+#ifdef _MISRA_RULES
+#define SIC_MASK(x)     (1 << (x))  /* Mask Peripheral #x interrupt */
+#define SIC_UNMASK(x)   (0xFFFFFFFFu ^ (1 << (x))) /* Unmask Peripheral #x interrupt */
+#else
+#define SIC_MASK(x)     (1 << (x))  /* Mask Peripheral #x interrupt */
+#define SIC_UNMASK(x)   (0xFFFFFFFF ^ (1 << (x))) /* Unmask Peripheral #x interrupt */
+#endif /* _MISRA_RULES */
+
+/* SIC_IWR Masks */
+#define IWR_DISABLE_ALL 0x00000000          /* Wakeup Disable all peripherals */
+#define IWR_ENABLE_ALL  0xFFFFFFFF          /* Wakeup Enable all peripherals */
+
+/* SIC_IWR Macros */
+/* x = pos 0 to 31, for 32-63 use value-32 */
+#ifdef _MISRA_RULES
+#define IWR_ENABLE(x)   (1 << (x))          /* Wakeup Enable Peripheral #x */
+#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
+#else
+#define IWR_ENABLE(x)   (1 << (x))          /* Wakeup Enable Peripheral #x */
+#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
+#endif /* _MISRA_RULES */
+
+#define PIVG(PNr, IVGNr) ( (IVGNr) - 7) << ( ((PNr)%8) * 4) /* Peripheral #PNr assigned IVG #IVGNr  */
+/* Rx.L = lo(PIVG(62,10)); */
+/* Rx.H = hi(PIVG(62,10)); */
+/* PNr = 0 to 95 */
+/* IVGNr = 7 to 15 */
+
 /* SIC_IAR0 Macros */
-#define P0_IVG(x)       (((x)&0xF)-7)           /* Peripheral #0 assigned IVG #x    */
-#define P1_IVG(x)       (((x)&0xF)-7) << 0x4    /* Peripheral #1 assigned IVG #x    */
-#define P2_IVG(x)       (((x)&0xF)-7) << 0x8    /* Peripheral #2 assigned IVG #x    */
-#define P3_IVG(x)       (((x)&0xF)-7) << 0xC    /* Peripheral #3 assigned IVG #x    */
-#define P4_IVG(x)       (((x)&0xF)-7) << 0x10   /* Peripheral #4 assigned IVG #x    */
-#define P5_IVG(x)       (((x)&0xF)-7) << 0x14   /* Peripheral #5 assigned IVG #x    */
-#define P6_IVG(x)       (((x)&0xF)-7) << 0x18   /* Peripheral #6 assigned IVG #x    */
-#define P7_IVG(x)       (((x)&0xF)-7) << 0x1C   /* Peripheral #7 assigned IVG #x    */
+#define P0_IVG(x)       (((x)&_MF15)-_MF7)           /* Peripheral #0 assigned IVG #x    */
+#define P1_IVG(x)       (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #1 assigned IVG #x    */
+#define P2_IVG(x)       (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #2 assigned IVG #x    */
+#define P3_IVG(x)       (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #3 assigned IVG #x    */
+#define P4_IVG(x)       (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #4 assigned IVG #x    */
+#define P5_IVG(x)       (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #5 assigned IVG #x    */
+#define P6_IVG(x)       (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #6 assigned IVG #x    */
+#define P7_IVG(x)       (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #7 assigned IVG #x    */
 
 /* SIC_IAR1 Macros */
-#define P8_IVG(x)       (((x)&0xF)-7)           /* Peripheral #8 assigned IVG #x    */
-#define P9_IVG(x)       (((x)&0xF)-7) << 0x4    /* Peripheral #9 assigned IVG #x    */
-#define P10_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #10 assigned IVG #x   */
-#define P11_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #11 assigned IVG #x   */
-#define P12_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #12 assigned IVG #x   */
-#define P13_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #13 assigned IVG #x   */
-#define P14_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #14 assigned IVG #x   */
-#define P15_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #15 assigned IVG #x   */
+#define P8_IVG(x)       (((x)&_MF15)-_MF7)           /* Peripheral #8 assigned IVG #x    */
+#define P9_IVG(x)       (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #9 assigned IVG #x    */
+#define P10_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #10 assigned IVG #x   */
+#define P11_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #11 assigned IVG #x   */
+#define P12_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #12 assigned IVG #x   */
+#define P13_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #13 assigned IVG #x   */
+#define P14_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #14 assigned IVG #x   */
+#define P15_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #15 assigned IVG #x   */
 
 /* SIC_IAR2 Macros */
-#define P16_IVG(x)      (((x)&0xF)-7)           /* Peripheral #16 assigned IVG #x   */
-#define P17_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #17 assigned IVG #x   */
-#define P18_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #18 assigned IVG #x   */
-#define P19_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #19 assigned IVG #x   */
-#define P20_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #20 assigned IVG #x   */
-#define P21_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #21 assigned IVG #x   */
-#define P22_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #22 assigned IVG #x   */
-#define P23_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #23 assigned IVG #x   */
+#define P16_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #16 assigned IVG #x   */
+#define P17_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #17 assigned IVG #x   */
+#define P18_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #18 assigned IVG #x   */
+#define P19_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #19 assigned IVG #x   */
+#define P20_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #20 assigned IVG #x   */
+#define P21_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #21 assigned IVG #x   */
+#define P22_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #22 assigned IVG #x   */
+#define P23_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #23 assigned IVG #x   */
 
 /* SIC_IAR3 Macros */
-#define P24_IVG(x)      (((x)&0xF)-7)           /* Peripheral #24 assigned IVG #x   */
-#define P25_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #25 assigned IVG #x   */
-#define P26_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #26 assigned IVG #x   */
-#define P27_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #27 assigned IVG #x   */
-#define P28_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #28 assigned IVG #x   */
-#define P29_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #29 assigned IVG #x   */
-#define P30_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #30 assigned IVG #x   */
-#define P31_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #31 assigned IVG #x   */
+#define P24_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #24 assigned IVG #x   */
+#define P25_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #25 assigned IVG #x   */
+#define P26_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #26 assigned IVG #x   */
+#define P27_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #27 assigned IVG #x   */
+#define P28_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #28 assigned IVG #x   */
+#define P29_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #29 assigned IVG #x   */
+#define P30_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #30 assigned IVG #x   */
+#define P31_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #31 assigned IVG #x   */
 
 /* SIC_IAR4 Macros */
-#define P32_IVG(x)      (((x)&0xF)-7)           /* Peripheral #32 assigned IVG #x   */
-#define P33_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #33 assigned IVG #x   */
-#define P34_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #34 assigned IVG #x   */
-#define P35_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #35 assigned IVG #x   */
-#define P36_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #36 assigned IVG #x   */
-#define P37_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #37 assigned IVG #x   */
-#define P38_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #38 assigned IVG #x   */
-#define P39_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #39 assigned IVG #x   */
+#define P32_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #32 assigned IVG #x   */
+#define P33_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #33 assigned IVG #x   */
+#define P34_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #34 assigned IVG #x   */
+#define P35_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #35 assigned IVG #x   */
+#define P36_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #36 assigned IVG #x   */
+#define P37_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #37 assigned IVG #x   */
+#define P38_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #38 assigned IVG #x   */
+#define P39_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #39 assigned IVG #x   */
 
 /* SIC_IAR4 Macros */
-#define P40_IVG(x)      (((x)&0xF)-7)           /* Peripheral #40 assigned IVG #x   */
-#define P41_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #41 assigned IVG #x   */
-#define P42_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #42 assigned IVG #x   */
-#define P43_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #43 assigned IVG #x   */
-#define P44_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #44 assigned IVG #x   */
-#define P45_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #45 assigned IVG #x   */
-#define P46_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #46 assigned IVG #x   */
-#define P47_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #47 assigned IVG #x   */
+#define P40_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #40 assigned IVG #x   */
+#define P41_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #41 assigned IVG #x   */
+#define P42_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #42 assigned IVG #x   */
+#define P43_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #43 assigned IVG #x   */
+#define P44_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #44 assigned IVG #x   */
+#define P45_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #45 assigned IVG #x   */
+#define P46_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #46 assigned IVG #x   */
+#define P47_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #47 assigned IVG #x   */
 
 /* SIC_IAR5 Macros */
-#define P48_IVG(x)      (((x)&0xF)-7)           /* Peripheral #48 assigned IVG #x   */
-#define P49_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #49 assigned IVG #x   */
-#define P50_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #50 assigned IVG #x   */
-#define P51_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #51 assigned IVG #x   */
-#define P52_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #52 assigned IVG #x   */
-#define P53_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #53 assigned IVG #x   */
-#define P54_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #54 assigned IVG #x   */
-#define P55_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #55 assigned IVG #x   */
+#define P48_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #48 assigned IVG #x   */
+#define P49_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #49 assigned IVG #x   */
+#define P50_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #50 assigned IVG #x   */
+#define P51_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #51 assigned IVG #x   */
+#define P52_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #52 assigned IVG #x   */
+#define P53_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #53 assigned IVG #x   */
+#define P54_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #54 assigned IVG #x   */
+#define P55_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #55 assigned IVG #x   */
 
 /* SIC_IAR5 Macros */
-#define P56_IVG(x)      (((x)&0xF)-7)           /* Peripheral #56 assigned IVG #x   */
-#define P57_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #57 assigned IVG #x   */
-#define P58_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #58 assigned IVG #x   */
-#define P59_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #59 assigned IVG #x   */
-#define P60_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #60 assigned IVG #x   */
-#define P61_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #61 assigned IVG #x   */
-#define P62_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #62 assigned IVG #x   */
-#define P63_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #63 assigned IVG #x   */
+#define P56_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #56 assigned IVG #x   */
+#define P57_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #57 assigned IVG #x   */
+#define P58_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #58 assigned IVG #x   */
+#define P59_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #59 assigned IVG #x   */
+#define P60_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #60 assigned IVG #x   */
+#define P61_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #61 assigned IVG #x   */
+#define P62_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #62 assigned IVG #x   */
+#define P63_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #63 assigned IVG #x   */
 
 /* SIC_IAR6 Macros */
-#define P64_IVG(x)      (((x)&0xF)-7)           /* Peripheral #64 assigned IVG #x   */
-#define P65_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #65 assigned IVG #x   */
-#define P66_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #66 assigned IVG #x   */
-#define P67_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #67 assigned IVG #x   */
-#define P68_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #68 assigned IVG #x   */
-#define P69_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #69 assigned IVG #x   */
-#define P70_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #70 assigned IVG #x   */
-#define P71_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #71 assigned IVG #x   */
+#define P64_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #64 assigned IVG #x   */
+#define P65_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #65 assigned IVG #x   */
+#define P66_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #66 assigned IVG #x   */
+#define P67_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #67 assigned IVG #x   */
+#define P68_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #68 assigned IVG #x   */
+#define P69_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #69 assigned IVG #x   */
+#define P70_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #70 assigned IVG #x   */
+#define P71_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #71 assigned IVG #x   */
 
 /* SIC_IAR7 Macros */
-#define P72_IVG(x)      (((x)&0xF)-7)           /* Peripheral #72 assigned IVG #x   */
-#define P73_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #73 assigned IVG #x   */
-#define P74_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #74 assigned IVG #x   */
-#define P75_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #75 assigned IVG #x   */
-#define P76_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #76 assigned IVG #x   */
-#define P77_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #77 assigned IVG #x   */
-#define P78_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #78 assigned IVG #x   */
-#define P79_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #79 assigned IVG #x   */
-
-/* SIC_IAR7 Macros */
-#define P72_IVG(x)      (((x)&0xF)-7)           /* Peripheral #72 assigned IVG #x   */
-#define P73_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #73 assigned IVG #x   */
-#define P74_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #74 assigned IVG #x   */
-#define P75_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #75 assigned IVG #x   */
-#define P76_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #76 assigned IVG #x   */
-#define P77_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #77 assigned IVG #x   */
-#define P78_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #78 assigned IVG #x   */
-#define P79_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #79 assigned IVG #x   */
+#define P72_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #72 assigned IVG #x   */
+#define P73_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #73 assigned IVG #x   */
+#define P74_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #74 assigned IVG #x   */
+#define P75_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #75 assigned IVG #x   */
+#define P76_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #76 assigned IVG #x   */
+#define P77_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #77 assigned IVG #x   */
+#define P78_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #78 assigned IVG #x   */
+#define P79_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #79 assigned IVG #x   */
 
 /* SIC_IAR8 Macros */
-#define P80_IVG(x)      (((x)&0xF)-7)           /* Peripheral #80 assigned IVG #x   */
-#define P81_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #81 assigned IVG #x   */
-#define P82_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #82 assigned IVG #x   */
-#define P83_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #83 assigned IVG #x   */
-#define P84_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #84 assigned IVG #x   */
-#define P85_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #85 assigned IVG #x   */
-#define P86_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #86 assigned IVG #x   */
-#define P87_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #87 assigned IVG #x   */
+#define P80_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #80 assigned IVG #x   */
+#define P81_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #81 assigned IVG #x   */
+#define P82_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #82 assigned IVG #x   */
+#define P83_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #83 assigned IVG #x   */
+#define P84_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #84 assigned IVG #x   */
+#define P85_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #85 assigned IVG #x   */
+#define P86_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #86 assigned IVG #x   */
+#define P87_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #87 assigned IVG #x   */
 
-/* SIC_IAR8 Macros */
-#define P88_IVG(x)      (((x)&0xF)-7)           /* Peripheral #88 assigned IVG #x   */
-#define P89_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #89 assigned IVG #x   */
-#define P90_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #90 assigned IVG #x   */
-#define P91_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #91 assigned IVG #x   */
-#define P92_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #92 assigned IVG #x   */
-#define P93_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #93 assigned IVG #x   */
-#define P94_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #94 assigned IVG #x   */
-#define P95_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #95 assigned IVG #x   */
+/* SIC_IAR9 Macros */
+#define P88_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #88 assigned IVG #x   */
+#define P89_IVG(x)      (((x)&_MF15)-_MF7) << 0x4    /* Peripheral #89 assigned IVG #x   */
+#define P90_IVG(x)      (((x)&_MF15)-_MF7) << 0x8    /* Peripheral #90 assigned IVG #x   */
+#define P91_IVG(x)      (((x)&_MF15)-_MF7) << 0xC    /* Peripheral #91 assigned IVG #x   */
+#define P92_IVG(x)      (((x)&_MF15)-_MF7) << 0x10   /* Peripheral #92 assigned IVG #x   */
+#define P93_IVG(x)      (((x)&_MF15)-_MF7) << 0x14   /* Peripheral #93 assigned IVG #x   */
+#define P94_IVG(x)      (((x)&_MF15)-_MF7) << 0x18   /* Peripheral #94 assigned IVG #x   */
+#define P95_IVG(x)      (((x)&_MF15)-_MF7) << 0x1C   /* Peripheral #95 assigned IVG #x   */
 
+
+/* ***********  SERIAL PERIPHERAL INTERFACE (SPI) MASKS  ****************************/
+
+/* Bit masks for SPIx_CTL */
+#define RDBR_CORE   0x0         /* RDBR Read Initiates, IRQ when RDBR Full */
+#define TDBR_CORE   0x1         /* TDBR Write Initiates, IRQ when TDBR Empty */
+#define RDBR_DMA    0x2         /* DMA Read, DMA Until FIFO Empty */
+#define TDBR_DMA    0x3         /* DMA Write, DMA Until FIFO Full */
+
+
+/*  ********************  TWO-WIRE INTERFACE (TWI) MASKS  ***********************/
+
+/* Bit macros for TWIx_CONTROL */
+#define SET_TWI_PRESCALE(x)     ( (x) & PRESCALE )
+#define SET_TWI_DCNT(x)         ( ((x) << 0x6) & DCNT )
+
+/* Bit masks for TWIx_INT_MASK */
+#define SCLIM       0x8000      /* Serial Clock Interrupt */
+#define nSCLIM      0x0
+#define SDAIM       0x4000      /* Serial Data Interrupt */
+#define nSDAIM      0x0
+
+/* Bit masks for TWIx_INT_STAT */
+#define SCLI        0x8000      /* Serial Clock Interrupt */
+#define nSCLI       0x0
+#define SDAI        0x4000      /* Serial Data Interrupt */
+#define nSDAI       0x0
+
+/* Bit macros for TWIx_MASTER_ADDR */
+#define SET_TWI_ADDR(x)         ( (x) & 0x7F )
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
 
 /* Watchdog Timer WDOG_CTL Register Masks */
+#ifdef _MISRA_RULES
+#define SET_WDEV(x)     (((x)<<1) & 0x0006u)     /* event generated on roll over */
+#else
 #define SET_WDEV(x)     (((x)<<1) & 0x0006)     /* event generated on roll over */
+#endif /* _MISRA_RULES */
 #define WDEV_RESET      0x0000                  /* generate reset event on roll over */
 #define nWDEV_RESET     0x0
 #define WDEV_NMI        0x0002                  /* generate NMI event on roll over */
@@ -5517,7 +5636,16 @@ PORTJ_DIR_CLEAR, PORTJ_INEN, PORTJ_FER */
 #define ENABLE_PRESCALE             PREN        /* Enable prescaler so RTC runs at 1 Hz */
 
 /* RTC_ALARM Macro: z=day, y=hr, x=min, w=sec */
+#ifdef _MISRA_RULES
+#define SET_ALARM(z,y,x,w)  ((((z)&0x7FFFu)<<0x11)|(((y)&0x1Fu)<<0xC)|(((x)&0x3Fu)<<0x6)|((w)&0x3Fu))
+#else
 #define SET_ALARM(z,y,x,w)  ((((z)&0x7FFF)<<0x11)|(((y)&0x1F)<<0xC)|(((x)&0x3F)<<0x6)|((w)&0x3F))
+#endif /* _MISRA_RULES */
+
+/* ************** UART CONTROLLER MASKS *************************/
+/* Bit masks for UART Divisor Latch Registers: UARTx_DLL & UARTx_DLH */
+#define UARTDLL      0x00FF   /* Divisor Latch Low Byte */
+#define UARTDLH      0xFF00   /* Divisor Latch High Byte */
 
 
 /* ******************************************* */
@@ -5541,4 +5669,19 @@ PORTJ_DIR_CLEAR, PORTJ_INEN, PORTJ_FER */
 #define nW1ZMONCE       0x0
 
 /* Bit macros for CNT_DEBOUNCE */
+#ifdef _MISRA_RULES
+#define SET_DPRESCALE(x)   ((x)&0x7u)    /* 0000: 1x -> 0111: 128x, 1xxx Reserved */
+#else
 #define SET_DPRESCALE(x)   ((x)&0x7)    /* 0000: 1x -> 0111: 128x, 1xxx Reserved */
+#endif /* _MISRA_RULES */
+
+/* Alternate Deprecated Macros Provided For Backwards Code Compatibility */
+#define                     MCMEM  MCMEN
+#define                    nMCMEM  0x0
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
+
+#endif /* _DEF_BF54X_H */
+

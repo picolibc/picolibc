@@ -14,7 +14,7 @@
  *
  * defblackfin.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -33,8 +33,12 @@
 #if defined(__ADSPLPBLACKFIN__)
 #warning defblackfin.h should only be included for 535 compatible chips.
 #endif
-/* Macro parameters should be enclosed in parantheses to avoid incorrect expression evaluation. MISRA Rule 19.10 */
+/* Macro parameters should be enclosed in parentheses to avoid incorrect expression evaluation. MISRA Rule 19.10 */
+#ifdef _MISRA_RULES
+#define MK_BMSK_( x ) (1ul<<(x))    /* Make a bit mask from a bit position */
+#else
 #define MK_BMSK_( x ) (1<<(x))    /* Make a bit mask from a bit position */
+#endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
 /* System Register Bits */
@@ -429,9 +433,18 @@
 
 
 /* DCPLB_DATA and ICPLB_DATA Bit Positions */
-#define CPLB_VALID_P           0x00000000  /* 0=invalid entry, 1=valid entry */
-#define CPLB_LOCK_P            0x00000001  /* 0=entry may be replaced, 1=entry locked */
-#define CPLB_USER_RD_P         0x00000002  /*  */
+#define CPLB_VALID_P            0  /* 0=invalid entry, 1=valid entry */
+#define CPLB_LOCK_P             1  /* 0=entry may be replaced, 1=entry locked */
+#define CPLB_USER_RD_P          2  /* 0=no read access, 1=read access allowed (user mode) */
+/*** DCPLB_DATA only */
+#define CPLB_USER_WR_P          3  /* 0=no write access, 0=write access allowed (user mode) */
+#define CPLB_SUPV_WR_P          4  /* 0=no write access, 0=write access allowed (supervisor mode) */
+#define CPLB_L1SRAM_P           5  /* 0=SRAM mapped in L1, 0=SRAM not mapped to L1 */
+#define CPLB_DA0ACC_P           6  /* 0=access allowed from either DAG, 1=access from DAG0 only */
+#define CPLB_DIRTY_P            7  /* 1=dirty, 0=clean */
+#define CPLB_L1_CHBL_P          12 /* 0=non-cacheable in L1, 1=cacheable in L1 */
+#define CPLB_WT_P               14 /* 0=write-back, 1=write-through */
+
 
 /* Alternate Deprecated Macros Provided For Backwards Code Compatibility */
 #if !defined(__ADSPLPBLACKFIN__)

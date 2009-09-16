@@ -14,7 +14,7 @@
  *
  * def_LPBlackfin.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -34,7 +34,11 @@
 #warning def_LPBlackfin.h should only be included for 532 compatible chips.
 #endif
 /* ensure macro params bracketed to avoid unexpected evaluations. (GA), MISRA Rule 19.10 */
+#ifdef _MISRA_RULES
+#define MK_BMSK_( x ) (1ul<<(x))    /* Make a bit mask from a bit position */
+#else
 #define MK_BMSK_( x ) (1<<(x))    /* Make a bit mask from a bit position */
+#endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
 /* System Register Bits */
@@ -367,8 +371,6 @@
 
 /* IMEM_CONTROL Register */
 /* ** Bit Positions */
-#define ENIM_P						 0x00  /* Enable L1 Code Memory  */
-#define IMCTL_ENIM_P                 0x00  /* "" (older define) */
 #define ENICPLB_P					 0x01  /* Enable ICPLB */
 #define IMCTL_ENICPLB_P				 0x01  /* "" (older define) */
 #define IMC_P						 0x02  /* Enable  */
@@ -379,7 +381,6 @@
 #define ILOC3_P						 0x06  /* Lock Way 3 */
 #define LRUPRIORST_P				 0x0D  /* Least Recently Used Replacement Priority */
 /* ** Masks */
-#define ENIM                   0x00000001  /* Enable L1 Code Memory */
 #define ENICPLB                0x00000002  /* Enable ICPLB */
 #define IMC                    0x00000004  /* Configure L1 code memory as cache (0=SRAM) */
 #define ILOC0				   0x00000008  /* Lock Way 0 */
@@ -400,12 +401,23 @@
 #define TAUTORLD_P              0x00000002  /* Timer auto reload */
 #define TINT_P                  0x00000003  /* Timer generated interrupt 0=no interrupt has been generated, 1=interrupt has been generated (sticky) */
 
-/* DCPLB_DATA and ICPLB_DATA Registers */
-/*** Bit Positions */
-#define CPLB_VALID_P            0x00000000  /* 0=invalid entry, 1=valid entry */
-#define CPLB_LOCK_P             0x00000001  /* 0=entry may be replaced, 1=entry locked */
-#define CPLB_USER_RD_P          0x00000002  /* 0=no read access, 1=read access allowed (user mode) */
-/*** Masks */
+/* DCPLB_DATA and ICPLB_DATA Registers - bit positions */
+#define CPLB_VALID_P            0  /* 0=invalid entry, 1=valid entry */
+#define CPLB_LOCK_P             1  /* 0=entry may be replaced, 1=entry locked */
+#define CPLB_USER_RD_P          2  /* 0=no read access, 1=read access allowed (user mode) */
+#define CPLB_PORTPRIO_P         9  /* 0=low priority port, 1= high priority port */
+/*** ICPLB_DATA only */
+#define CPLB_LRUPRIO_P          8  /* 0=can be replaced by any line, 1=priority for non-replacement */
+/*** DCPLB_DATA only */
+#define CPLB_USER_WR_P          3  /* 0=no write access, 0=write access allowed (user mode) */
+#define CPLB_SUPV_WR_P          4  /* 0=no write access, 0=write access allowed (supervisor mode) */
+#define CPLB_DIRTY_P            7  /* 1=dirty, 0=clean */
+#define CPLB_L1_CHBL_P          12 /* 0=non-cacheable in L1, 1=cacheable in L1 */
+#define CPLB_WT_P               14 /* 0=write-back, 1=write-through */
+#define CPLB_L1_AOW_P           15 /* 0=do not allocate cache lines on write-through writes,  */
+                                   /* 1= allocate cache lines on write-through writes. */
+
+/* DCPLB_DATA and ICPLB_DATA Registers - Masks */
 #define CPLB_VALID             0x00000001  /* 0=invalid entry, 1=valid entry */
 #define CPLB_LOCK              0x00000002  /* 0=entry may be replaced, 1=entry locked */
 #define CPLB_USER_RD           0x00000004  /* 0=no read access, 1=read access allowed (user mode) */
@@ -413,16 +425,16 @@
 #define PAGE_SIZE_4KB          0x00010000  /* 4 KB page size */
 #define PAGE_SIZE_1MB          0x00020000  /* 1 MB page size */
 #define PAGE_SIZE_4MB          0x00030000  /* 4 MB page size */
-#define CPLB_PORTPRIO		   0x00000200  /* 0=low priority port, 1= high priority port */
+#define CPLB_PORTPRIO          0x00000200  /* 0=low priority port, 1= high priority port */
 #define CPLB_L1_CHBL           0x00001000  /* 0=non-cacheable in L1, 1=cacheable in L1 */
 /*** ICPLB_DATA only */
-#define CPLB_LRUPRIO		   0x00000100  /* 0=can be replaced by any line, 1=priority for non-replacement */
+#define CPLB_LRUPRIO           0x00000100  /* 0=can be replaced by any line, 1=priority for non-replacement */
 /*** DCPLB_DATA only */
 #define CPLB_USER_WR           0x00000008  /* 0=no write access, 0=write access allowed (user mode) */
 #define CPLB_SUPV_WR           0x00000010  /* 0=no write access, 0=write access allowed (supervisor mode) */
 #define CPLB_DIRTY             0x00000080  /* 1=dirty, 0=clean */
-#define CPLB_L1_AOW			   0x00008000  /* 0=do not allocate cache lines on write-through writes,  */
-										   /* 1= allocate cache lines on write-through writes. */
+#define CPLB_L1_AOW            0x00008000  /* 0=do not allocate cache lines on write-through writes,  */
+                                           /* 1= allocate cache lines on write-through writes. */
 #define CPLB_WT                0x00004000  /* 0=write-back, 1=write-through */
 
 
@@ -442,7 +454,11 @@
 #define TEST_MB2			   0x00020000  /* Select Mini-Bank 2 */
 #define TEST_MB3			   0x00030000  /* Select Mini-Bank 3 */
 /* ensure macro params bracketed to avoid unexpected evaluations. (GA) MISRA Rule 19.10 */
+#ifdef _MISRA_RULES
+#define TEST_SET(x)		       (((x) << 5) & 0x03E0u)  /* Set Index 0->31 */
+#else
 #define TEST_SET(x)		       (((x) << 5) & 0x03E0)  /* Set Index 0->31 */
+#endif /* _MISRA_RULES */
 #define TEST_WAY0			   0x00000000  /* Access Way0 */
 #define TEST_WAY1			   0x04000000  /* Access Way1 */
 /*** ITEST_COMMAND only */

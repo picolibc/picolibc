@@ -13,7 +13,7 @@
 /*
 ** defBF542.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -31,6 +31,12 @@
 
 /* Include defBF54x_base.h for the set of #defines that are common to all ADSP-BF54x processors */
 #include <defBF54x_base.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macros violate rule 19.4")
+#pragma diag(suppress:misra_rule_19_7:"Allow function-like macros ")
+#endif /* _MISRA_RULES */
 
 /* The following are the #defines needed by ADSP-BF542 that are not in the common header */
 
@@ -364,14 +370,23 @@
 #define                KPAD_ROWEN  0x1c00     /* Row Enable Width */
 #define                KPAD_COLEN  0xe000     /* Column Enable Width */
 
+#ifdef _MISRA_RULES
+#define         SET_KPAD_ROWEN(x)  (((x)&0x7u)<<10) /* 000: row 0 enabled, 111: rows 0-7 enabled */
+#define         SET_KPAD_COLEN(x)  (((x)&0x7u)<<13) /* 000: column 0 enabled, 111: columns 0-7 enabled */
+#else
 #define         SET_KPAD_ROWEN(x)  (((x)&0x7)<<10) /* 000: row 0 enabled, 111: rows 0-7 enabled */
 #define         SET_KPAD_COLEN(x)  (((x)&0x7)<<13) /* 000: column 0 enabled, 111: columns 0-7 enabled */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for KPAD_PRESCALE */
 
 #define         KPAD_PRESCALE_VAL  0x3f       /* Key Prescale Value */
 
+#ifdef _MISRA_RULES
+#define      SET_KPAD_PRESCALE(x)  ((x)&0x3Fu)   /* KPAD_PRESCALE_VAL (Key Prescale) Key Prescale Value (5:0) */
+#else
 #define      SET_KPAD_PRESCALE(x)  ((x)&0x3F)   /* KPAD_PRESCALE_VAL (Key Prescale) Key Prescale Value (5:0) */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for KPAD_MSEL */
 
@@ -383,8 +398,13 @@
 #define                  KPAD_ROW  0xff       /* Rows Pressed */
 #define                  KPAD_COL  0xff00     /* Columns Pressed */
 
+#ifdef _MISRA_RULES
+#define    SET_KPAD_DBON_SCALE(x)  ((x)&0xFFu)   /* DBON_SCALE (Debounce Scale) Debounce Delay Multiplier Select [7:0] */
+#define  SET_KPAD_COLDRV_SCALE(x)  (((x)&0xFFu)<<8) /* COLDRV_SCALE (Column Driver Scale) Column Driver Period Multiplier Select [15:8] */
+#else
 #define    SET_KPAD_DBON_SCALE(x)  ((x)&0xFF)   /* DBON_SCALE (Debounce Scale) Debounce Delay Multiplier Select [7:0] */
 #define  SET_KPAD_COLDRV_SCALE(x)  (((x)&0xFF)<<8) /* COLDRV_SCALE (Column Driver Scale) Column Driver Period Multiplier Select [15:8] */
+#endif /* _MISRA_RULES */
 
 /* Bit masks for KPAD_STAT */
 
@@ -1211,5 +1231,8 @@
 /*     MULTI BIT MACRO ENUMERATIONS            */
 /* ******************************************* */
 
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF542_H */

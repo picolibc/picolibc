@@ -14,7 +14,7 @@
  *
  * defBF561.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -866,12 +866,44 @@
 #define PLL_CLKIN_DIV2         	0x0001  /* Pass CLKIN/2 to PLL */
 #define PLL_OFF                	0x0002  /* Shut off PLL clocks */
 #define STOPCK_OFF             	0x0008  /* Core clock off */
-#define ALT_TIMING		0x0010  /* Enable Alternate PPI Timing (0.5 Silicon And Beyond) */
+#define ALT_TIMING		0x0010  /* Enable Alternate PPI Timing */
 #define PDWN                   	0x0020  /* Put the PLL in a Deep Sleep state */
 #define BYPASS                 	0x0100  /* Bypass the PLL */
+#define DF                      0x0001  /* 0: PLL = CLKIN, 1: PLL = CLKIN/2 */
+#define MSEL                    0x7E00  /* Multiplier Select For CCLK/VCO Factors */
+#define IN_DELAY                0x0040  /* Add 200ps Delay on EBIU Inputs */
+#define OUT_DELAY               0x0080  /* Add 200ps Delay on EBIU Outputs */
+#define SPORT_HYS               0x8000  /* Add 250mV Hysteresis to SPORT Inputs */
+
+/* PLL_CTL Macros (Only Use With Logic OR While Setting Lower Order Bits) */
+#ifdef _MISRA_RULES
+#define SET_MSEL(x)    (((x)&0x3Fu) << 0x9) /* Set MSEL = 0-63 --> VCO = CLKIN*MSEL */
+#else
+#define SET_MSEL(x)    (((x)&0x3F) << 0x9) /* Set MSEL = 0-63 --> VCO = CLKIN*MSEL */
+#endif /* _MISRA_RULES */
 
 /* PLL_DIV Masks */
+#define SSEL         0x000F      /* System Select */
+#define CSEL         0x0030      /* Core Select */
 #define SCLK_DIV(x)  (x)		   /* SCLK = VCO / x */
+
+/* PLL_DIV Macros */
+#ifdef _MISRA_RULES
+#define SET_SSEL(x)  ((x)&0xFu)    /* Set SSEL = 0-15 --> SCLK = VCO/SSEL */
+#else
+#define SET_SSEL(x)  ((x)&0xF)    /* Set SSEL = 0-15 --> SCLK = VCO/SSEL */
+#endif /* _MISRA_RULES */
+
+/* PLL_STAT Macros */
+#define VSTAT       0x0080   /* Voltage Regulator Status: Regulator at programmed voltage */
+#define CORE_IDLE   0x0040   /* processor is in the IDLE operating mode */
+#define PLL_LOCKED  0x0020   /* PLL_LOCKCNT Has Been Reached */
+#define SLEEP       0x0010   /* processor is in the Sleep operating mode */
+#define DEEP_SLEEP  0x0008   /* processor is in the Deep Sleep operating mode */
+#define ACTIVE_PLLDISABLED   0x0004   /* Processor In Active Mode With PLL Disabled */
+#define FULL_ON               0x0002  /* Processor In Full On Mode */
+#define ACTIVE_PLLENABLED     0x0001              /* Processor In Active Mode With PLL Enabled */
+
 
 #define CCLK_DIV1              0x00000000  /* CCLK = VCO / 1 */
 #define CCLK_DIV2              0x00000010  /* CCLK = VCO / 2 */
@@ -879,12 +911,12 @@
 #define CCLK_DIV8              0x00000030  /* CCLK = VCO / 8 */
 
 /* SWRST Mask */
-#define SYSTEM_RESET           0x00000007  /* Initiates a system software reset */
-#define SWRST_DBL_FAULT_B      0x00000800  /* SWRST Core B Double Fault */
-#define SWRST_DBL_FAULT_A      0x00001000  /* SWRST Core A Double Fault */
-#define SWRST_WDT_B		       0x00002000  /* SWRST Watchdog B */
-#define SWRST_WDT_A		       0x00004000  /* SWRST Watchdog A */
-#define SWRST_OCCURRED         0x00008000  /* SWRST Status */
+#define SYSTEM_RESET           0x0007  /* Initiates a system software reset */
+#define SWRST_DBL_FAULT_A      0x0800  /* SWRST Core A Double Fault */
+#define SWRST_DBL_FAULT_B      0x1000  /* SWRST Core B Double Fault */
+#define SWRST_WDT_B		       0x2000  /* SWRST Watchdog B */
+#define SWRST_WDT_A		       0x4000  /* SWRST Watchdog A */
+#define SWRST_OCCURRED         0x8000  /* SWRST Status */
 
 /* VR_CTL Masks																	*/
 #define	FREQ			0x0003	/* Switching Oscillator Frequency For Regulator	*/
@@ -892,6 +924,9 @@
 #define	FREQ_333		0x0001	/* 	Switching Frequency Is 333 kHz			*/
 #define	FREQ_667		0x0002	/* 	Switching Frequency Is 667 kHz			*/
 #define	FREQ_1000		0x0003	/* 	Switching Frequency Is 1 MHz			*/
+#define  WAKE        0x0100  /* Enable RTC/Reset Wakeup From Hibernate */
+#define  SCKELOW     0x8000  /* Enable Drive CKE Low During Reset */
+
 
 #define GAIN			0x000C	/* Voltage Level Gain	*/
 #define	GAIN_5			0x0000	/* 	GAIN = 5		*/
@@ -910,6 +945,13 @@
 #define	VLEV_120		0x00D0	/* 	VLEV = 1.20 V (See Datasheet for Regulator Tolerance)	*/
 #define	VLEV_125		0x00E0	/* 	VLEV = 1.25 V (See Datasheet for Regulator Tolerance)	*/
 #define	VLEV_130		0x00F0	/* 	VLEV = 1.30 V (See Datasheet for Regulator Tolerance)	*/
+
+/* SYSCR Masks */
+#define BMODE_BYPASS  0x0000  /* Bypass boot ROM, execute from 16-bit external memory */
+#define BMODE_FLASH   0x0001  /* Use Boot ROM to load from 8-bit or 16-bit flash */
+#define BMODE_SPIHOST 0x0002  /* Boot from SPI0 host (slave mode) */
+#define BMODE_SPIMEM  0x0003  /* Boot from serial SPI memory */
+
 
 
 /* *************  SYSTEM INTERRUPT CONTROLLER MASKS ***************** */
@@ -942,13 +984,21 @@
 #define IWR_ENABLE(x)	       (1 << (x))    /* Wakeup Enable Peripheral #x */
 #define IWR_DISABLE(x) (0xFFFFFFFF ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
 
+/* Peripheral Masks For SIC_ISR, SIC_IWR, SIC_IMASK */
+#define PLL_WAKEUP_IRQ      0x00000001      /* PLL Wakeup Interrupt Request */
+#define IRQ_PLL_WAKEUP      0x00000001      /* PLL Wakeup Interrupt Request */
+
 
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
 
 /* Watchdog Timer WDOG_CTL Register Masks */
 
+#ifdef _MISRA_RULES
+#define WDEV(x) (((x)<<1) & 0x0006u) /* event generated on roll over */
+#else
 #define WDEV(x) (((x)<<1) & 0x0006) /* event generated on roll over */
+#endif /* _MISRA_RULES */
 #define WDEV_RESET 0x0000 /* generate reset event on roll over */
 #define WDEV_NMI 0x0002 /* generate NMI event on roll over */
 #define WDEV_GPI 0x0004 /* generate GP IRQ on roll over */
@@ -986,7 +1036,11 @@
 #define EPS     0x10
 #define PEN	0x08
 #define STB	0x04
+#ifdef _MISRA_RULES
+#define WLS(x) (((x)-5u) & 0x03u) /* Word Length Select */
+#else
 #define WLS(x) (((x)-5) & 0x03) /* Word Length Select */
+#endif /* _MISRA_RULES */
 
 #define DLAB_P	0x07
 #define SB_P	0x06
@@ -1028,7 +1082,11 @@
 #define ERBFI_P	0x00
 
 /* UART_IIR Register */
+#ifdef _MISRA_RULES
+#define STATUS(x)	(((x) << 1) & 0x06u)
+#else
 #define STATUS(x)	(((x) << 1) & 0x06)
+#endif /* _MISRA_RULES */
 #define NINT		0x01
 #define STATUS_P1	0x02
 #define STATUS_P0	0x01
@@ -1123,7 +1181,11 @@
 #define SKIP_EO              0x00000400  /* PPI Skip Even/Odd Elements */
 #define DLENGTH              0x00003800  /* PPI Data Length  */
 #define DLEN_8		     0x0	     /* PPI Data Length mask for DLEN=8 */
+#ifdef _MISRA_RULES
+#define DLEN(x)	((((x)-9u) & 0x07u) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
+#else
 #define DLEN(x)	((((x)-9) & 0x07) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
+#endif /* _MISRA_RULES */
 #define POL                  0x0000C000  /* PPI Signal Polarities       */
 
 
@@ -1352,7 +1414,11 @@
 #define CLK_SEL		0x0080
 #define TOGGLE_HI	0x0100
 #define EMU_RUN		0x0200
+#ifdef _MISRA_RULES
+#define ERR_TYP(x)	(((x) & 0x03u) << 14)
+#else
 #define ERR_TYP(x)	(((x) & 0x03) << 14)
+#endif /* _MISRA_RULES */
 
 #define TMODE_P0		0x00
 #define TMODE_P1		0x01
@@ -1678,8 +1744,10 @@
 #define SCTLE			0x00000001 /* Enable SCLK[0], /SRAS, /SCAS, /SWE, SDQM[3:0] */
 #define CL_2			0x00000008 /* SDRAM CAS latency = 2 cycles */
 #define CL_3			0x0000000C /* SDRAM CAS latency = 3 cycles */
+#define CL           0x0000000C /* SDRAM CAS latency */
 #define PFE			0x00000010 /* Enable SDRAM prefetch */
 #define PFP			0x00000020 /* Prefetch has priority over AMC requests */
+#define PASR      0x00000030 /* SDRAM partial array self-refresh */
 #define TRAS_1			0x00000040 /* SDRAM tRAS = 1 cycle */
 #define TRAS_2			0x00000080 /* SDRAM tRAS = 2 cycles */
 #define TRAS_3			0x000000C0 /* SDRAM tRAS = 3 cycles */
@@ -1695,6 +1763,7 @@
 #define TRAS_13			0x00000340 /* SDRAM tRAS = 13 cycles */
 #define TRAS_14			0x00000380 /* SDRAM tRAS = 14 cycles */
 #define TRAS_15			0x000003C0 /* SDRAM tRAS = 15 cycles */
+#define TRAS            0x000003C0 /* SDRAM tRAS in SCLK cycles */
 #define TRP_1			0x00000800 /* SDRAM tRP = 1 cycle */
 #define TRP_2			0x00001000 /* SDRAM tRP = 2 cycles */
 #define TRP_3			0x00001800 /* SDRAM tRP = 3 cycles */
@@ -1702,6 +1771,7 @@
 #define TRP_5			0x00002800 /* SDRAM tRP = 5 cycles */
 #define TRP_6			0x00003000 /* SDRAM tRP = 6 cycles */
 #define TRP_7			0x00003800 /* SDRAM tRP = 7 cycles */
+#define TRP          0x00003800 /* SDRAM tRP in SCLK cycles */
 #define TRCD_1			0x00008000 /* SDRAM tRCD = 1 cycle */
 #define TRCD_2			0x00010000 /* SDRAM tRCD = 2 cycles */
 #define TRCD_3			0x00018000 /* SDRAM tRCD = 3 cycles */
@@ -1709,9 +1779,11 @@
 #define TRCD_5			0x00028000 /* SDRAM tRCD = 5 cycles */
 #define TRCD_6			0x00030000 /* SDRAM tRCD = 6 cycles */
 #define TRCD_7			0x00038000 /* SDRAM tRCD = 7 cycles */
+#define TRCD         0x00030000 /* SDRAM tRCD in SCLK cycles */
 #define TWR_1			0x00080000 /* SDRAM tWR = 1 cycle */
 #define TWR_2			0x00100000 /* SDRAM tWR = 2 cycles */
 #define TWR_3			0x00180000 /* SDRAM tWR = 3 cycles */
+#define TWR          0x00180000 /* SDRAM tWR in SCLK cycles */
 #define PUPSD			0x00200000 /*Power-up start delay */
 #define PSM			0x00400000 /* SDRAM power-up sequence = Precharge, mode register set, 8 CBR refresh cycles */
 #define PSS				0x00800000 /* enable SDRAM power-up sequence on next SDRAM access */
@@ -1723,6 +1795,8 @@
 #define CDDBG			0x40000000 /* Tristate SDRAM controls during bus grant */
 
 /* EBIU_SDBCTL Masks */
+#define EBSZ            0x000E    /* SDRAM external bank size */
+#define EBCAW           0x0030    /* SDRAM external bank column address width */
 #define EB0_E				0x00000001 /* Enable SDRAM external bank 0 */
 #define EB0_SZ_16			0x00000000 /* SDRAM external bank size = 16MB */
 #define EB0_SZ_32			0x00000002 /* SDRAM external bank size = 32MB */

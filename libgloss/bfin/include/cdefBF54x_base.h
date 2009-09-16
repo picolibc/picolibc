@@ -13,7 +13,7 @@
 /*
 ** cdefBF54x_base.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -26,6 +26,11 @@
 #define _CDEF_BF54X_H
 
 #include <defBF54x_base.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
 
 /* ************************************************************** */
 /*   SYSTEM & MMR ADDRESS DEFINITIONS COMMON TO ALL ADSP-BF54x    */
@@ -1461,13 +1466,6 @@
 #define                          pCNT_MAX ((volatile unsigned long *)CNT_MAX)
 #define                          pCNT_MIN ((volatile unsigned long *)CNT_MIN)
 
-/* OTP/FUSE Registers */
-
-#define                      pOTP_CONTROL ((volatile unsigned short *)OTP_CONTROL)
-#define                          pOTP_BEN ((volatile unsigned short *)OTP_BEN)
-#define                       pOTP_STATUS ((volatile unsigned short *)OTP_STATUS)
-#define                       pOTP_TIMING ((volatile unsigned long *)OTP_TIMING)
-
 /* Security Registers */
 
 #define                    pSECURE_SYSSWT ((volatile unsigned long *)SECURE_SYSSWT)
@@ -1512,6 +1510,10 @@
 #define pPINT1_IRQ pPINT1_REQUEST
 #define pPINT2_IRQ pPINT2_REQUEST
 #define pPINT3_IRQ pPINT3_REQUEST
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF54X_H */
 

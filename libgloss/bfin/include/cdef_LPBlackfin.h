@@ -14,7 +14,7 @@
  *
  * cdef_LPBlackfin.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -25,6 +25,11 @@
 #warning cdef_LPBlackfin.h should only be included for 532 compatible chips.
 #endif
 #include <def_LPBlackfin.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
 
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
@@ -176,5 +181,9 @@
 #define pPFCTL ((volatile unsigned long *)PFCTL)
 #define pPFCNTR0 ((volatile unsigned long *)PFCNTR0)
 #define pPFCNTR1 ((volatile unsigned long *)PFCNTR1)
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_LPBLACKFIN_H */

@@ -14,7 +14,7 @@
 **
 ** defBF538.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 *************************************************************************/
 
@@ -624,9 +624,8 @@
 #define CAN_MBTD			0xFFC02AAC	/* Mailbox Temporary Disable Feature				*/
 #define CAN_EWR				0xFFC02AB0	/* Programmable Warning Level						*/
 #define CAN_ESR				0xFFC02AB4	/* Error Status Register							*/
-#define CAN_UCREG			0xFFC02AC0	/* Universal Counter Register/Capture Register		*/
 #define CAN_UCCNT			0xFFC02AC4	/* Universal Counter								*/
-#define CAN_UCRC			0xFFC02AC8	/* Universal Counter Force Reload Register			*/
+#define CAN_UCRC			0xFFC02AC8	/* Universal Counter Reload/Capture Register			*/
 #define CAN_UCCNF			0xFFC02ACC	/* Universal Counter Configuration Register			*/
 
 /* Mailbox Acceptance Masks 												*/
@@ -1008,11 +1007,17 @@
 /* ********************* PLL AND RESET MASKS ****************************************/
 
 /* PLL_CTL Masks (IN_DELAY and OUT_DELAY bit field definitions differ from BF533/BF532/BF531) */
+#define MSEL                    0x7E00              /* Multiplier Select For CCLK/VCO Factors */
 #define IN_DELAY			0x0014  /* EBIU Input Delay Select */
 #define OUT_DELAY			0x00C0  /* EBIU Output Delay Select */
 
+#ifdef _MISRA_RULES
+#define SET_OUT_DELAY(x)	(((x)&0x03u) << 0x6)
+#define SET_IN_DELAY(x)		((((x)&0x02u) << 0x3) | (((x)&0x01u) << 0x2))
+#else
 #define SET_OUT_DELAY(x)	(((x)&0x03) << 0x6)
 #define SET_IN_DELAY(x)		((((x)&0x02) << 0x3) | (((x)&0x01) << 0x2))
+#endif /* _MISRA_RULES */
 
 /* VR_CTL Masks	(Additional WakeUp Events) */
 #define	CANWE				0x0200	/* Enable CAN Wakeup From Hibernate */
@@ -1058,46 +1063,52 @@
 #define MDMA1_0_IRQ			0x00020000	/* MemDMA1 Stream 0 Interrupt Request */
 #define MDMA1_1_IRQ			0x00040000	/* MemDMA1 Stream 1 Interrupt Request */
 
-
+#ifdef _MISRA_RULES
+#define _MF15 0xFu
+#define _MF7 7u
+#else
+#define _MF15 0xF
+#define _MF7 7
+#endif /* _MISRA_RULES */
 /* SIC_IAR3 Macros															*/
-#define P24_IVG(x)		(((x)-7)&0xF)			/* Peripheral #24 assigned IVG #x	*/
-#define P25_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #25 assigned IVG #x	*/
-#define P26_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #26 assigned IVG #x	*/
-#define P27_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #27 assigned IVG #x	*/
-#define P28_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #28 assigned IVG #x	*/
-#define P29_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #29 assigned IVG #x	*/
-#define P30_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #30 assigned IVG #x	*/
-#define P31_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #31 assigned IVG #x	*/
+#define P24_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #24 assigned IVG #x	*/
+#define P25_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #25 assigned IVG #x	*/
+#define P26_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #26 assigned IVG #x	*/
+#define P27_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #27 assigned IVG #x	*/
+#define P28_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #28 assigned IVG #x	*/
+#define P29_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #29 assigned IVG #x	*/
+#define P30_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #30 assigned IVG #x	*/
+#define P31_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #31 assigned IVG #x	*/
 
 /* SIC_IAR4 Macros															*/
-#define P32_IVG(x)		(((x)-7)&0xF)			/* Peripheral #32 assigned IVG #x	*/
-#define P33_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #33 assigned IVG #x	*/
-#define P34_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #34 assigned IVG #x	*/
-#define P35_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #35 assigned IVG #x	*/
-#define P36_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #36 assigned IVG #x	*/
-#define P37_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #37 assigned IVG #x	*/
-#define P38_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #38 assigned IVG #x	*/
-#define P39_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #39 assigned IVG #x	*/
+#define P32_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #32 assigned IVG #x	*/
+#define P33_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #33 assigned IVG #x	*/
+#define P34_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #34 assigned IVG #x	*/
+#define P35_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #35 assigned IVG #x	*/
+#define P36_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #36 assigned IVG #x	*/
+#define P37_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #37 assigned IVG #x	*/
+#define P38_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #38 assigned IVG #x	*/
+#define P39_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #39 assigned IVG #x	*/
 
 /* SIC_IAR5 Macros															*/
-#define P40_IVG(x)		(((x)-7)&0xF)			/* Peripheral #40 assigned IVG #x	*/
-#define P41_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #41 assigned IVG #x	*/
-#define P42_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #42 assigned IVG #x	*/
-#define P43_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #43 assigned IVG #x	*/
-#define P44_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #44 assigned IVG #x	*/
-#define P45_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #45 assigned IVG #x	*/
-#define P46_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #46 assigned IVG #x	*/
-#define P47_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #47 assigned IVG #x	*/
+#define P40_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #40 assigned IVG #x	*/
+#define P41_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #41 assigned IVG #x	*/
+#define P42_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #42 assigned IVG #x	*/
+#define P43_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #43 assigned IVG #x	*/
+#define P44_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #44 assigned IVG #x	*/
+#define P45_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #45 assigned IVG #x	*/
+#define P46_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #46 assigned IVG #x	*/
+#define P47_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #47 assigned IVG #x	*/
 
 /* SIC_IAR6 Macros															*/
-#define P48_IVG(x)		(((x)-7)&0xF)			/* Peripheral #48 assigned IVG #x	*/
-#define P49_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #49 assigned IVG #x	*/
-#define P50_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #50 assigned IVG #x	*/
-#define P51_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #51 assigned IVG #x	*/
-#define P52_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #52 assigned IVG #x	*/
-#define P53_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #53 assigned IVG #x	*/
-#define P54_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #54 assigned IVG #x	*/
-#define P55_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #55 assigned IVG #x	*/
+#define P48_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #48 assigned IVG #x	*/
+#define P49_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #49 assigned IVG #x	*/
+#define P50_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #50 assigned IVG #x	*/
+#define P51_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #51 assigned IVG #x	*/
+#define P52_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #52 assigned IVG #x	*/
+#define P53_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #53 assigned IVG #x	*/
+#define P54_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #54 assigned IVG #x	*/
+#define P55_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #55 assigned IVG #x	*/
 
 
 /*******************   GPIO MASKS  *********************/
@@ -1210,11 +1221,27 @@
 #define PMAP_UART2RX        0xA000  /* PMAP UART2 Receive DMA */
 #define PMAP_UART2TX        0xB000  /* PMAP UART2 Transmit DMA */
 
+/* EBIU_SDBCTL Masks		*/
+#define EBSZ      0x0006   /* SDRAM external bank size */
+#define EBCAW     0x0030   /* SDRAM external bank column address width */
+
+/* EBIU_SDGCTL Masks */
+#define CL        0x0000000C  /* SDRAM CAS latency */
+#define PASR      0x00000030  /* SDRAM partial array self-refresh */
+#define TRAS      0x000003C0  /* SDRAM tRAS in SCLK cycles */
+#define TRP       0x00003800  /* SDRAM tRP in SCLK cycles */
+#define TRCD      0x00030000  /* SDRAM tRCD in SCLK cycles */
+#define TWR       0x00180000  /* SDRAM tWR in SCLK cycles */
 
 /*  ********************  TWO-WIRE INTERFACE (TWIx) MASKS  ***********************/
 /* TWIx_CLKDIV Macros (Use: *pTWIx_CLKDIV = CLKLOW(x)|CLKHI(y);  )				*/
+#ifdef _MISRA_RULES
+#define	CLKLOW(x)	((x) & 0xFFu)		/* Periods Clock Is Held Low			*/
+#define CLKHI(y)	(((y)&0xFFu)<<0x8)	/* Periods Before New Clock Low			*/
+#else
 #define	CLKLOW(x)	((x) & 0xFF)		/* Periods Clock Is Held Low			*/
 #define CLKHI(y)	(((y)&0xFF)<<0x8)	/* Periods Before New Clock Low			*/
+#endif /* _MISRA_RULES */
 
 /* TWIx_PRESCALE Masks															*/
 #define	PRESCALE	0x007F		/* SCLKs Per Internal Time Reference (10MHz)	*/

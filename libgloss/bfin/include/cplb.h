@@ -14,7 +14,7 @@
  *
  * cplb.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -83,6 +83,9 @@
 #define CPLB_EVT_ICPLB_MISS   0
 #define CPLB_EVT_DCPLB_MISS   1
 #define CPLB_EVT_DCPLB_WRITE  2
+
+/* size of cplb tables */
+#define __CPLB_TABLE_SIZE    16
 
 #ifdef _MISRA_RULES
 #pragma diag(pop)

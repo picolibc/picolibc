@@ -14,7 +14,7 @@
  *
  * defBF532.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -31,6 +31,7 @@
 
 #ifdef _MISRA_RULES
 #pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
 #pragma diag(suppress:misra_rule_19_7)
 #endif /* _MISRA_RULES */
 
@@ -50,7 +51,6 @@
 /* System Interrupt Controller (0xFFC00100 - 0xFFC001FF) */
 #define SWRST			0xFFC00100  /* Software Reset Register (16-bit) */
 #define SYSCR			0xFFC00104  /* System Configuration registe */
-#define SIC_RVECT		0xFFC00108  /* Interrupt Reset Vector Address Register */
 #define SIC_IMASK		0xFFC0010C  /* Interrupt Mask Register */
 #define SIC_IAR0		0xFFC00110  /* Interrupt Assignment Register 0 */
 #define SIC_IAR1		0xFFC00114  /* Interrupt Assignment Register 1 */
@@ -396,6 +396,15 @@
 
 /* ********************* PLL AND RESET MASKS ************************ */
 /*// PLL_CTL Masks */
+#define MSEL                    0x7E00              /* Multiplier Select For CCLK/VCO Factors */
+#define SPORT_HYS               0x8000              /* Add 250mV of Hysteresis to SPORT Inputs */
+
+/* PLL_STAT Masks */
+#define VSTAT         0x0080  /* Voltage Regulator Status: Regulator at programmed voltage */
+#define CORE_IDLE     0x0040  /* processor is in the IDLE operating mode */
+#define SLEEP         0x0010  /* processor is in the Sleep operating mode */
+#define DEEP_SLEEP    0x0008  /* processor is in the Deep Sleep operating mode */
+
 #define PLL_CLKIN			0x0000  /* Pass CLKIN to PLL */
 #define PLL_CLKIN_DIV2		0x0001  /* Pass CLKIN/2 to PLL */
 #define DF					0x0001	 /* 0: PLL = CLKIN, 1: PLL = CLKIN/2					*/
@@ -412,7 +421,11 @@
 
 #define BYPASS				0x0100  /* Bypass the PLL */
 /* PLL_CTL Macros											*/
+#ifdef _MISRA_RULES
+#define	SET_MSEL(x)		(((x)&0x3Fu) << 0x9)	/* Set MSEL = 0-63 --> VCO = CLKIN*MSEL		*/
+#else
 #define	SET_MSEL(x)		(((x)&0x3F) << 0x9)	/* Set MSEL = 0-63 --> VCO = CLKIN*MSEL		*/
+#endif /* _MISRA_RULES */
 
 /* PLL_DIV Masks */
 #define SSEL				0x000F	/* System Select						*/
@@ -425,7 +438,11 @@
 #define CCLK_DIV4			0x0020  /* CCLK = VCO / 4 */
 #define CCLK_DIV8			0x0030  /* CCLK = VCO / 8 */
 /* PLL_DIV Macros														*/
+#ifdef _MISRA_RULES
+#define SET_SSEL(x)			((x)&0xFu)	/* Set SSEL = 0-15 --> SCLK = VCO/SSEL	*/
+#else
 #define SET_SSEL(x)			((x)&0xF)	/* Set SSEL = 0-15 --> SCLK = VCO/SSEL	*/
+#endif /* _MISRA_RULES */
 
 /* PLL_STAT Masks																	*/
 #define ACTIVE_PLLENABLED	0x0001	/* Processor In Active Mode With PLL Enabled	*/
@@ -469,6 +486,10 @@
 #define RESET_SOFTWARE	0x8000	/* SW Reset Occurred Since Last Read Of SWRST	*/
 
 /* SYSCR Masks																				*/
+#define BMODE_BYPASS  0x0000  /* Bypass boot ROM, execute from 16-bit external memory */
+#define BMODE_FLASH   0x0001  /* Use Boot ROM to load from 8-bit or 16-bit flash */
+#define BMODE_SPIHOST 0x0002  /* Boot from SPI0 host (slave mode) */
+#define BMODE_SPIMEM  0x0003  /* Boot from serial SPI memory */
 #define BMODE			0x0006	/* Boot Mode - Latched During HW Reset From Mode Pins	*/
 #define	NOBOOT			0x0010	/* Execute From L1 or ASYNC Bank 0 When BMODE = 0		*/
 
@@ -501,61 +522,88 @@
 #define MDMA1_IRQ		0x00400000      /* MemDMA Stream 1 Interrupt Request */
 #define WDOG_IRQ		0x00800000      /* Software Watchdog Timer Interrupt Request */
 
+#ifdef _MISRA_RULES
+#define _MF15 0xFu
+#define _MF7 7u
+#else
+#define _MF15 0xF
+#define _MF7 7
+#endif /* _MISRA_RULES */
 
 /* SIC_IAR0 Macros															*/
-#define P0_IVG(x)		(((x)-7)&0xF)			/* Peripheral #0 assigned IVG #x	*/
-#define P1_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #1 assigned IVG #x	*/
-#define P2_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #2 assigned IVG #x	*/
-#define P3_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #3 assigned IVG #x	*/
-#define P4_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #4 assigned IVG #x	*/
-#define P5_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #5 assigned IVG #x	*/
-#define P6_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #6 assigned IVG #x	*/
-#define P7_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #7 assigned IVG #x	*/
+#define P0_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #0 assigned IVG #x	*/
+#define P1_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #1 assigned IVG #x	*/
+#define P2_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #2 assigned IVG #x	*/
+#define P3_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #3 assigned IVG #x	*/
+#define P4_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #4 assigned IVG #x	*/
+#define P5_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #5 assigned IVG #x	*/
+#define P6_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #6 assigned IVG #x	*/
+#define P7_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #7 assigned IVG #x	*/
 
 /* SIC_IAR1 Macros															*/
-#define P8_IVG(x)		(((x)-7)&0xF)			/* Peripheral #8 assigned IVG #x	*/
-#define P9_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #9 assigned IVG #x	*/
-#define P10_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #10 assigned IVG #x	*/
-#define P11_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #11 assigned IVG #x	*/
-#define P12_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #12 assigned IVG #x	*/
-#define P13_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #13 assigned IVG #x	*/
-#define P14_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #14 assigned IVG #x	*/
-#define P15_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #15 assigned IVG #x	*/
+#define P8_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #8 assigned IVG #x	*/
+#define P9_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #9 assigned IVG #x	*/
+#define P10_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #10 assigned IVG #x	*/
+#define P11_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #11 assigned IVG #x	*/
+#define P12_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #12 assigned IVG #x	*/
+#define P13_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #13 assigned IVG #x	*/
+#define P14_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #14 assigned IVG #x	*/
+#define P15_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #15 assigned IVG #x	*/
 
 /* SIC_IAR2 Macros															*/
-#define P16_IVG(x)		(((x)-7)&0xF)			/* Peripheral #16 assigned IVG #x	*/
-#define P17_IVG(x)		(((x)-7)&0xF) << 0x4	/* Peripheral #17 assigned IVG #x	*/
-#define P18_IVG(x)		(((x)-7)&0xF) << 0x8	/* Peripheral #18 assigned IVG #x	*/
-#define P19_IVG(x)		(((x)-7)&0xF) << 0xC	/* Peripheral #19 assigned IVG #x	*/
-#define P20_IVG(x)		(((x)-7)&0xF) << 0x10	/* Peripheral #20 assigned IVG #x	*/
-#define P21_IVG(x)		(((x)-7)&0xF) << 0x14	/* Peripheral #21 assigned IVG #x	*/
-#define P22_IVG(x)		(((x)-7)&0xF) << 0x18	/* Peripheral #22 assigned IVG #x	*/
-#define P23_IVG(x)		(((x)-7)&0xF) << 0x1C	/* Peripheral #23 assigned IVG #x	*/
+#define P16_IVG(x)		(((x)-_MF7)&_MF15)			/* Peripheral #16 assigned IVG #x	*/
+#define P17_IVG(x)		(((x)-_MF7)&_MF15) << 0x4	/* Peripheral #17 assigned IVG #x	*/
+#define P18_IVG(x)		(((x)-_MF7)&_MF15) << 0x8	/* Peripheral #18 assigned IVG #x	*/
+#define P19_IVG(x)		(((x)-_MF7)&_MF15) << 0xC	/* Peripheral #19 assigned IVG #x	*/
+#define P20_IVG(x)		(((x)-_MF7)&_MF15) << 0x10	/* Peripheral #20 assigned IVG #x	*/
+#define P21_IVG(x)		(((x)-_MF7)&_MF15) << 0x14	/* Peripheral #21 assigned IVG #x	*/
+#define P22_IVG(x)		(((x)-_MF7)&_MF15) << 0x18	/* Peripheral #22 assigned IVG #x	*/
+#define P23_IVG(x)		(((x)-_MF7)&_MF15) << 0x1C	/* Peripheral #23 assigned IVG #x	*/
 
 /* SIC_IARx Macros */
+#ifdef _MISRA_RULES
+#define PX_IVG_CLR(x)  (0xFFFFFFFFu ^ (0xFu << (((x)%8)*4)))  /* Clear IVG Select for Peripheral #x */
+/* Usage: *pSIC_IAR1 &= PX_IVG_CLR(11);	// Clears IVG Level of Peripheral #11 */
+#define PX_IVG(x,y)     ((((y)-7u)&0xFu) << (((x)%8)*4))      /* Set IVG Select to #y for Peripheral #x */
+/* Usage: *pSIC_IAR1 |= PX_IVG(11, 8);	// Sets Peripheral #11 to IVG8 */
+#else
 #define PX_IVG_CLR(x)  (0xFFFFFFFF ^ (0xF << (((x)%8)*4)))  /* Clear IVG Select for Peripheral #x */
 /* Usage: *pSIC_IAR1 &= PX_IVG_CLR(11);	// Clears IVG Level of Peripheral #11 */
 #define PX_IVG(x,y)     ((((y)-7)&0xF) << (((x)%8)*4))      /* Set IVG Select to #y for Peripheral #x */
 /* Usage: *pSIC_IAR1 |= PX_IVG(11, 8);	// Sets Peripheral #11 to IVG8 */
+#endif /* _MISRA_RULES */
 
 /* SIC_IMASK Masks																		*/
 #define SIC_UNMASK_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
 #define SIC_MASK_ALL	0xFFFFFFFF					/* Mask all peripheral interrupts	*/
+#ifdef _MISRA_RULES
+#define SIC_MASK(x)		(1 << ((x)&0x1Fu))					/* Mask Peripheral #x interrupt		*/
+#define SIC_UNMASK(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))	/* Unmask Peripheral #x interrupt	*/
+#else
 #define SIC_MASK(x)		(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
 #define SIC_UNMASK(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
+#endif /* _MISRA_RULES */
 
 /* SIC_IWR Masks																		*/
 #define IWR_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
 #define IWR_ENABLE_ALL	0xFFFFFFFF					/* Wakeup Enable all peripherals	*/
+#ifdef _MISRA_RULES
+#define IWR_ENABLE(x)	(1 << ((x)&0x1Fu))					/* Wakeup Enable Peripheral #x		*/
+#define IWR_DISABLE(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu))) 	/* Wakeup Disable Peripheral #x		*/
+#else
 #define IWR_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
 #define IWR_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
-
+#endif /* _MISRA_RULES */
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
 
 /* Watchdog Timer WDOG_CTL Register Masks */
 
+#ifdef _MISRA_RULES
+#define WDEV(x)			(((x)<<1) & 0x0006u) 	/* event generated on roll over */
+#else
 #define WDEV(x)			(((x)<<1) & 0x0006) 	/* event generated on roll over */
+#endif /* _MISRA_RULES */
 #define WDEV_RESET		0x0000 				/* generate reset event on roll over */
 #define WDEV_NMI		0x0002 				/* generate NMI event on roll over */
 #define WDEV_GPI		0x0004 				/* generate GP IRQ on roll over */
@@ -618,7 +666,11 @@
          	/* ** Must be set after power-up for proper operation of RTC */
 
 /* RTC_ALARM Macro			z=day		y=hr	x=min	w=sec		*/
+#ifdef _MISRA_RULES
+#define SET_ALARM(z,y,x,w)	((((z)&0x7FFFu)<<0x11)|(((y)&0x1Fu)<<0xC)|(((x)&0x3Fu)<<0x6)|((w)&0x3Fu))
+#else
 #define SET_ALARM(z,y,x,w)	((((z)&0x7FFF)<<0x11)|(((y)&0x1F)<<0xC)|(((x)&0x3F)<<0x6)|((w)&0x3F))
+#endif /* _MISRA_RULES */
 
 /* Deprecated RTC_STAT and RTC_ALARM Masks										*/
 #define	RTC_SEC			RTSEC	/* Real-Time Clock Seconds	*/
@@ -640,7 +692,11 @@
 /* ***************************** UART CONTROLLER MASKS ********************** */
 /* UART_LCR Register */
 
+#ifdef _MISRA_RULES
+#define WLS(x)		(((x)-5u) & 0x03u)	/* Word Length Select */
+#else
 #define WLS(x)		(((x)-5) & 0x03)	/* Word Length Select */
+#endif /* _MISRA_RULES */
 #define STB			0x04				/* Stop Bits			*/
 #define PEN			0x08				/* Parity Enable		*/
 #define EPS			0x10				/* Even Parity Select	*/
@@ -689,7 +745,11 @@
 #define ERBFI_P		0x00
 
 /* UART_IIR Register */
+#ifdef _MISRA_RULES
+#define STATUS(x)	(((x) << 1) & 0x06u)
+#else
 #define STATUS(x)	(((x) << 1) & 0x06)
+#endif /* _MISRA_RULES */
 #define NINT		0x01
 #define STATUS_P1	0x02
 #define STATUS_P0	0x01
@@ -735,7 +795,11 @@
     defined(__ADSPBF533__)
 # define SLEN		0x001F
 #else
+#ifdef _MISRA_RULES
+# define SLEN(x)		((x)&0x1Fu)	/* SPORT TX Word Length (2 - 31)				*/
+#else
 # define SLEN(x)		((x)&0x1F)	/* SPORT TX Word Length (2 - 31)				*/
+#endif /* _MISRA_RULES */
 #endif
 #define TXSE		0x0100  /*TX Secondary Enable */
 #define TSFSE		0x0200  /*TX Stereo Frame Sync Enable */
@@ -777,9 +841,15 @@
 #define WSIZE			0x0000F000 	/*Multichannel Window Size Field */
 #define WOFF			0x000003FF 	/*Multichannel Window Offset Field */
 /* SPORTx_MCMC1 Macros															*/
+#ifdef _MISRA_RULES
+#define SET_WOFF(x)		((x) & 0x3FFu) 	/* Multichannel Window Offset Field			*/
+/* Only use SET_WSIZE Macro With Logic OR While Setting Lower Order Bits						*/
+#define SET_WSIZE(x)	(((((x)>>0x3)-1u)&0xFu) << 0xC)	/* Multichannel Window Size = (x/8)-1	*/
+#else
 #define SET_WOFF(x)		((x) & 0x3FF) 	/* Multichannel Window Offset Field			*/
 /* Only use SET_WSIZE Macro With Logic OR While Setting Lower Order Bits						*/
 #define SET_WSIZE(x)	(((((x)>>0x3)-1)&0xF) << 0xC)	/* Multichannel Window Size = (x/8)-1	*/
+#endif /* _MISRA_RULES */
 
 /*SPORTx_MCMC2 Masks */
 #define MCCRM		0x0003 	/*Multichannel Clock Recovery Mode */
@@ -830,7 +900,11 @@
 #define DLEN_14		0x2800		/* Data Length = 14 Bits			*/
 #define DLEN_15		0x3000		/* Data Length = 15 Bits			*/
 #define DLEN_16		0x3800		/* Data Length = 16 Bits			*/
+#ifdef _MISRA_RULES
+#define DLEN(x)		((((x)-9u) & 0x07u) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
+#else
 #define DLEN(x)		((((x)-9) & 0x07) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
+#endif /* _MISRA_RULES */
 #define POL			0xC000  /* PPI Signal Polarities       */
 #define POLC		0x4000		/* PPI Clock Polarity				*/
 #define POLS		0x8000		/* PPI Frame Sync Polarity			*/
@@ -974,7 +1048,11 @@
 #define CLK_SEL			0x0080
 #define TOGGLE_HI		0x0100
 #define EMU_RUN			0x0200
+#ifdef _MISRA_RULES
+#define ERR_TYP(x)		(((x) & 0x03u) << 14)
+#else
 #define ERR_TYP(x)		(((x) & 0x03) << 14)
+#endif /* _MISRA_RULES */
 
 #define TMODE_P0		0x00
 #define TMODE_P1		0x01
@@ -1297,14 +1375,18 @@
 
 /* **********************  SDRAM CONTROLLER MASKS  *************************** */
 /* EBIU_SDGCTL Masks */
+
+
 #define SCTLE			0x00000001 /* Enable SCLK[0], /SRAS, /SCAS, /SWE, SDQM[3:0] */
 #define CL_2			0x00000008 /* SDRAM CAS latency = 2 cycles */
 #define CL_3			0x0000000C /* SDRAM CAS latency = 3 cycles */
+#define CL           0x0000000C  /* SDRAM CAS latency */
 #define PFE				0x00000010 /* Enable SDRAM prefetch */
 #define PFP				0x00000020 /* Prefetch has priority over AMC requests */
 #define PASR_ALL		0x00000000	/* All 4 SDRAM Banks Refreshed In Self-Refresh				*/
 #define PASR_B0_B1		0x00000010	/* SDRAM Banks 0 and 1 Are Refreshed In Self-Refresh		*/
 #define PASR_B0			0x00000020	/* Only SDRAM Bank 0 Is Refreshed In Self-Refresh			*/
+#define PASR         0x00000030  /* SDRAM partial array self-refresh */
 #define TRAS_1			0x00000040 /* SDRAM tRAS = 1 cycle */
 #define TRAS_2			0x00000080 /* SDRAM tRAS = 2 cycles */
 #define TRAS_3			0x000000C0 /* SDRAM tRAS = 3 cycles */
@@ -1320,6 +1402,7 @@
 #define TRAS_13			0x00000340 /* SDRAM tRAS = 13 cycles */
 #define TRAS_14			0x00000380 /* SDRAM tRAS = 14 cycles */
 #define TRAS_15			0x000003C0 /* SDRAM tRAS = 15 cycles */
+#define TRAS            0x000003C0 /* SDRAM tRAS in SCLK cycles */
 #define TRP_1			0x00000800 /* SDRAM tRP = 1 cycle */
 #define TRP_2			0x00001000 /* SDRAM tRP = 2 cycles */
 #define TRP_3			0x00001800 /* SDRAM tRP = 3 cycles */
@@ -1327,6 +1410,7 @@
 #define TRP_5			0x00002800 /* SDRAM tRP = 5 cycles */
 #define TRP_6			0x00003000 /* SDRAM tRP = 6 cycles */
 #define TRP_7			0x00003800 /* SDRAM tRP = 7 cycles */
+#define TRP          0x00003800 /* SDRAM tRP in SCLK cycles */
 #define TRCD_1			0x00008000 /* SDRAM tRCD = 1 cycle */
 #define TRCD_2			0x00010000 /* SDRAM tRCD = 2 cycles */
 #define TRCD_3			0x00018000 /* SDRAM tRCD = 3 cycles */
@@ -1334,9 +1418,11 @@
 #define TRCD_5			0x00028000 /* SDRAM tRCD = 5 cycles */
 #define TRCD_6			0x00030000 /* SDRAM tRCD = 6 cycles */
 #define TRCD_7			0x00038000 /* SDRAM tRCD = 7 cycles */
+#define TRCD         0x00030000 /* SDRAM tRCD in SCLK cycles */
 #define TWR_1			0x00080000 /* SDRAM tWR = 1 cycle */
 #define TWR_2			0x00100000 /* SDRAM tWR = 2 cycles */
 #define TWR_3			0x00180000 /* SDRAM tWR = 3 cycles */
+#define TWR          0x00180000  /* SDRAM tWR in SCLK cycles */
 #define PUPSD			0x00200000 /*Power-up start delay */
 #define PSM				0x00400000 /* SDRAM power-up sequence = Precharge, mode register set, 8 CBR refresh cycles */
 #define PSS				0x00800000 /* enable SDRAM power-up sequence on next SDRAM access */
@@ -1349,14 +1435,16 @@
 
 /* EBIU_SDBCTL Masks */
 #define EBE				0x00000001 /* Enable SDRAM external bank */
-#define EBSZ_16			0x00000000 /* SDRAM external bank size = 16MB */
-#define EBSZ_32			0x00000002 /* SDRAM external bank size = 32MB */
-#define EBSZ_64			0x00000004 /* SDRAM external bank size = 64MB */
+#define EBSZ_16		0x00000000 /* SDRAM external bank size = 16MB */
+#define EBSZ_32		0x00000002 /* SDRAM external bank size = 32MB */
+#define EBSZ_64		0x00000004 /* SDRAM external bank size = 64MB */
 #define EBSZ_128		0x00000006 /* SDRAM external bank size = 128MB */
-#define EBCAW_8			0x00000000 /* SDRAM external bank column address width = 8 bits */
-#define EBCAW_9			0x00000010 /* SDRAM external bank column address width = 9 bits */
+#define EBCAW_8		0x00000000 /* SDRAM external bank column address width = 8 bits */
+#define EBSZ         0x0006 /* SDRAM external bank size */
+#define EBCAW_9		0x00000010 /* SDRAM external bank column address width = 9 bits */
 #define EBCAW_10		0x00000020 /* SDRAM external bank column address width = 9 bits */
 #define EBCAW_11		0x00000030 /* SDRAM external bank column address width = 9 bits */
+#define EBCAW        0x0030 /* SDRAM external bank column address width */
 
 /* EBIU_SDSTAT Masks */
 #define SDCI			0x00000001 /* SDRAM controller is idle  */

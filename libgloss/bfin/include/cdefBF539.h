@@ -11,7 +11,7 @@
  */
 
 /*
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -34,6 +34,12 @@
 /* include built-in mneumonic macros */
 #include <ccblkfn.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#pragma diag(suppress:misra_rule_19_7:"ADI header allows function macros")
+#endif /* _MISRA_RULES */
+
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
 #define _PTR_TO_VOL_VOID_PTR (void * volatile *)
@@ -54,7 +60,6 @@
 /* System Interrupt Controllers */
 #define pSWRST 			((volatile unsigned short *)SWRST)
 #define pSYSCR 			((volatile unsigned short *)SYSCR)
-#define	pSIC_RVECT		((void * volatile *)SIC_RVECT)
 
 #define pSIC_IMASK0 		((volatile unsigned long *)SIC_IMASK0)
 #define pSIC_IMASK1				((volatile unsigned long  *)SIC_IMASK1)
@@ -1023,7 +1028,6 @@
 #define pCAN_MBTD			((volatile unsigned short *)CAN_MBTD)
 #define pCAN_EWR			((volatile unsigned short *)CAN_EWR)
 #define pCAN_ESR			((volatile unsigned short *)CAN_ESR)
-#define pCAN_UCREG			((volatile unsigned short *)CAN_UCREG)
 #define pCAN_UCCNT			((volatile unsigned short *)CAN_UCCNT)
 #define pCAN_UCRC			((volatile unsigned short *)CAN_UCRC)
 #define pCAN_UCCNF			((volatile unsigned short *)CAN_UCCNF)
@@ -1408,6 +1412,10 @@
 #define pTWI1_PRESCALE		pTWI1_CONTROL
 #define pTWI1_INT_SRC		pTWI1_INT_STAT
 #define pTWI1_INT_ENABLE	pTWI1_INT_MASK
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF539_H */
 

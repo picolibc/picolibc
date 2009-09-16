@@ -14,7 +14,7 @@
  *
  * defBF535.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -29,6 +29,10 @@
 /* include all Core registers and bit definitions */
 #include <defblackfin.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
 /* Memory Map */
@@ -113,7 +117,6 @@
 #define CHIPID                 0xFFC048C0      /* Device ID Register */
 
 /* System Interrupt Controller (0xFFC0 0C00-0xFFC0 0FFF) */
-#define SIC_RVECT              0xFFC00C00  /* Reset Vector Register */
 #define SIC_IAR0               0xFFC00C04  /* Interrupt Assignment Register 0 */
 #define SIC_IAR1               0xFFC00C08  /* Interrupt Assignment Register 1 */
 #define SIC_IAR2               0xFFC00C0C  /* Interrupt Assignment Register 2 */
@@ -1144,5 +1147,8 @@
 #define B7WAT_14               0x0000E000  /* Bank 7 Write Access Time = 14 cycles */
 #define B7WAT_15               0x0000F000  /* Bank 7 Write Access Time = 15 cycles */
 
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* __DEF_BF535_H */

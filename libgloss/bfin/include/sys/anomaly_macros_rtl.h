@@ -14,7 +14,7 @@
  *
  * anomaly_macros_rtl.h : $Revision$
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  * This file defines macros used within the run-time libraries to enable
  * certain anomaly workarounds for the appropriate chips and silicon
@@ -29,6 +29,12 @@
  *
  ************************************************************************/
 
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_2_4:"Assembly code in comment used to illustrate anomalous behaviour")
+#pragma diag(suppress:misra_rule_19_4:"The definition of WA_05000204_CHECK_AVOID_FOR_REV cannot be parenthasised as it would fail when used in assembly library code.")
+#endif /* _MISRA_RULES */
 
 #if !defined(__SILICON_REVISION__)
 #define __FORCE_LEGACY_WORKAROUNDS__
@@ -100,6 +106,18 @@
    defined(__FORCE_LEGACY_WORKAROUNDS__)))
 
 
+/* 05-00-0127 - Signbits instruction not functional under certain conditions
+**
+**  ADSP-BF561 - from rev 0.0 (not yet fixed)
+**
+** The SIGNBITS instruction requires a NOP before it if one of its operands
+** is defined in the preceding instruction.
+**
+*/
+#define WA_05000127 \
+  (defined(__SILICON_REVISION__) && defined(__ADSPBF561__))
+
+
 /* 05-00-0137 - DMEM_CONTROL<12> is not set on Reset
 **
 **  ADSP-BF531/2/3 - revs 0.0-0.2 (fixed 0.3)
@@ -135,6 +153,70 @@
      (__SILICON_REVISION__ >= 0x3 && \
       __SILICON_REVISION__ < 0x5))) || \
    defined(__FORCE_LEGACY_WORKAROUNDS__)))
+
+
+/* 05-00-0162 - DMEM_CONTROL<12> is not set on Reset
+**
+**  ADSP-BF561 - revs 0.0-0.2 (fixed 0.3)
+**
+** Changes to start code.
+**
+*/
+#define WA_05000162 \
+  (defined(__ADSPBF561__) && \
+  ((defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ == 0xffff || __SILICON_REVISION__ <= 0x2)) || \
+   defined(__FORCE_LEGACY_WORKAROUNDS__)))
+
+/* 05-00-0198 - System MMR accesses may fail when stalled by preceding memory
+** read.
+**
+**  Impacted:
+**     ADSP-BF531 - rev 0.1-0.4 (fixed 0.5)
+**     ADSP-BF532 - rev 0.1-0.4 (fixed 0.5)
+**     ADSP-BF533 - rev 0.1-0.4 (fixed 0.5)
+**     ADSP-BF534 - rev 0.0 (fixed 0.1)
+**     ADSP-BF536 - rev 0.0 (fixed 0.1)
+**     ADSP-BF537 - rev 0.0 (fixed 0.1)
+**     ADSP-BF561 - rev 0.2-0.3 (fixed 0.4)
+**
+*/
+#define WA_05000198 \
+  (((defined(__ADSPBF531__) ||  \
+    defined(__ADSPBF532__) ||  \
+    defined(__ADSPBF533__)) && \
+  (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x4 || __SILICON_REVISION__ == 0xffff))) || \
+  ((defined(__ADSPBF534__) ||  \
+    defined(__ADSPBF536__) ||  \
+    defined(__ADSPBF537__) ||  \
+    defined(__ADSPBF539__)) && \
+  (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ == 0x0 || __SILICON_REVISION__ == 0xffff))) || \
+    (defined(__ADSPBF561__) && \
+  (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))))
+
+
+/* 05-00-0199 - Current DMA Address Shows Wrong Value During Carry Fix
+**
+**  Impacted:
+**     ADSP-BF53[123] - rev 0.0-0.3 (fixed 0.4)
+**     ADSP-BF53[89] - rev 0.0-0.3 (fixed 0.4)
+**     ADSP-BF561 - rev 0.0-0.3 (fixed 0.4)
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000199 \
+  ((defined(__ADSPBF533_FAMILY__) && \
+    (defined(__SILICON_REVISION__) && \
+    (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))) || \
+   (defined(__ADSPBF538_FAMILY__) && \
+    (defined(__SILICON_REVISION__) && \
+    (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))) || \
+   (defined(__ADSPBF561__) && \
+    (defined(__SILICON_REVISION__) && \
+     (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))))
 
 
 /* 05-00-0204 - "Incorrect data read with write-through cache and
@@ -192,6 +274,46 @@
 /* do not check at RT for 0.4 revs when doing 204 workaround */
 #endif
 
+
+/* 05-00-0209 - Speed Path in Computational Unit Affects Certain Instructions
+**
+**  ADSP-BF531/2/3 - revs 0.0 - 0.3 (fixed in 0.4)
+**  ADSP-BF534/6/7 - rev 0.0 (fixed in 0.1)
+**  ADSP-BF538/9   - rev 0.0 (fixed in 0.1)
+**  ADSP-BF561     - revs 0.0 - 0.3 (fixed in 0.4)
+**
+** SIGNBITS, EXTRACT, DEPOSIT, EXPADJ require a NOP before them if
+** one of their operands is defined in the preceding instruction.
+*/
+#define WA_05000209 \
+  (defined(__SILICON_REVISION__) &&  \
+   (((defined(__ADSPBF531__) ||  \
+      defined(__ADSPBF532__) ||  \
+      defined(__ADSPBF533__)) &&  \
+     (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff)) ||  \
+    ((defined(__ADSPBF534__) ||  \
+      defined(__ADSPBF536__) ||  \
+      defined(__ADSPBF537__) ||  \
+      defined(__ADSPBF538__) ||  \
+      defined(__ADSPBF539__)) && \
+     (__SILICON_REVISION__ == 0x0 || __SILICON_REVISION__ == 0xffff)) || \
+    ((defined(__ADSPBF561__)) && \
+     (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))))
+
+
+/* 05-00-0212 - PORTx_FER, PORT_MUX Registers Do Not accept "writes" correctly
+**
+**  Impacted:
+**     ADSP-BF53[467] - rev 0.0 (fixed 0.1)
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000212 \
+  (defined(__ADSPBF537_FAMILY__) && \
+   (defined(__SILICON_REVISION__) && \
+    (__SILICON_REVISION__ == 0x0 || __SILICON_REVISION__ == 0xffff)))
+
+
 /* 05-00-0258 - "Instruction Cache is corrupted when bit 9 and 12 of
  * the ICPLB Data registers differ"
  *
@@ -205,27 +327,34 @@
  * BF531/2/3 - 0.0-0.4 (fixed 0.5)
  * BF534/6/7/8/9 - 0.0-0.2 (fixed 0.3)
  * BF561 - 0.0-0.4 (fixed 0.5)
+ * BF566 - 0.0-0.1 (fixed 0.2)
  * BF535/AD6532/AD6900 - all revs
  */
-
 #define WA_05000258 \
-  defined(__SILICON_REVISION__) && \
-    (__SILICON_REVISION__ == 0xffff || \
-     !defined(__ADSPLPBLACKFIN__) || \
-     ((defined(__ADSPBF531__) ||  \
-       defined(__ADSPBF532__) ||  \
-       defined(__ADSPBF533__)) && \
-      (__SILICON_REVISION__ <= 0x4)) || \
-     ((defined(__ADSPBF534__) ||  \
-       defined(__ADSPBF536__) ||  \
-       defined(__ADSPBF537__) ||  \
-       defined(__ADSPBF538__) ||  \
-       defined(__ADSPBF539__)) && \
-      (__SILICON_REVISION__ <= 0x2)) || \
-     ((defined(__ADSPBF561__)) && \
-      (__SILICON_REVISION__ <= 0x4)) || \
-     ((defined(__ADSPBF561__)) && \
-      (__SILICON_REVISION__ < 0x1)))
+  (((defined(__ADSPBF531__) || \
+    defined(__ADSPBF532__) || \
+    defined(__ADSPBF533__)) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x4 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+  ((defined(__ADSPBF534__) || \
+    defined(__ADSPBF536__) || \
+    defined(__ADSPBF537__) || \
+    defined(__ADSPBF538__) || \
+    defined(__ADSPBF539__)) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x2 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+   (defined(__ADSPBF561__) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x4 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+   (defined(__ADSPBF566__) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x1 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+  (!defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__)))
+
 
 /* 05-00-0259 - "Non-deterministic ICPLB descriptors delivered to
  * hardware". Whenever ICPLBs are disabled via an MMR write, immediately
@@ -264,22 +393,24 @@
  */
 
 #define WA_05000261 \
-	defined(__SILICON_REVISION__) && \
-	 (__SILICON_REVISION__ == 0xffff || \
-	  ((defined(__ADSPBF531__) ||  \
-	    defined(__ADSPBF532__) ||  \
-	    defined(__ADSPBF533__)) && \
-	   (__SILICON_REVISION__ <= 0x4)) || \
-	  ((defined(__ADSPBF534__) ||  \
-	    defined(__ADSPBF536__) ||  \
-	    defined(__ADSPBF537__) ||  \
-	    defined(__ADSPBF538__) ||  \
-	    defined(__ADSPBF539__)) && \
-	   (__SILICON_REVISION__ <= 0x2)) || \
-	  ((defined(__ADSPBF561__)) && \
-	   (__SILICON_REVISION__ <= 0x4)) || \
-	  ((defined(__ADSPBF561__)) && \
-	   (__SILICON_REVISION__ < 0x1)))
+  (((defined(__ADSPBF531__) || \
+    defined(__ADSPBF532__) || \
+    defined(__ADSPBF533__)) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x4 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+  ((defined(__ADSPBF534__) || \
+    defined(__ADSPBF536__) || \
+    defined(__ADSPBF537__) || \
+    defined(__ADSPBF538__) || \
+    defined(__ADSPBF539__)) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x2 || \
+    __SILICON_REVISION__ == 0xffff))) || \
+   (defined(__ADSPBF561__) && \
+   (defined(__SILICON_REVISION__) && \
+   (__SILICON_REVISION__ <= 0x4 || \
+    __SILICON_REVISION__ == 0xffff))))
 
 /* 05-00-0229 - "SPI Slave Boot Mode Modifies Registers".
  * When the SPI slave boot completes, the final DMA IRQ is cleared
@@ -311,12 +442,173 @@
  * after a not predicted conditional jump.
  *
  * This problem impacts:
- * BF531/2/3 - all revs
- * BF534/6/7/8/9 - all revs
- * BF561/6 - all revs
+ * BF531/2/3 - < 0.6
+ * BF534/6/7 - < 0.3
+ * BF538/9 - < 0.4
+ * BF561/6 - < 0.5
+ *
+ * Since this impacts 538/9 0.3 but not 534 0.3 (the libraries that they use)
+ * we have to enable this workaround for the 534 0.3 libraries (see bottom
+ * two lines).
  */
 
 #define WA_05000283 \
- defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__)
+        (defined (__SILICON_REVISION__) && \
+         (((defined(__ADSPBF531__) ||  \
+            defined(__ADSPBF532__) ||  \
+            defined(__ADSPBF533__)) && \
+           (__SILICON_REVISION__ == 0xffff || \
+            __SILICON_REVISION__ < 0x6)) || \
+          ((defined(__ADSPBF534__) ||  \
+            defined(__ADSPBF536__) ||  \
+            defined(__ADSPBF537__)) && \
+           (__SILICON_REVISION__ == 0xffff || \
+            __SILICON_REVISION__ < 0x3)) || \
+          ((defined(__ADSPBF538__) ||  \
+            defined(__ADSPBF539__)) &&  \
+           (__SILICON_REVISION__ == 0xffff || \
+            __SILICON_REVISION__ < 0x4)) || \
+          (defined(__ADSPBF561__)) || \
+          (defined(__ADSPBF534__) && __SILICON_REVISION__ == 0x3 && \
+           defined(__ADI_LIB_BUILD__))))
 
+
+/* 05-00-0311 - Erroneous Flag (GPIO) Pin Operations under Specific Sequences
+**
+**  Impacted:
+**     ADSP-BF53[123] - 0.0-0.5 (fixed in 0.6)
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000311 \
+  (defined(__ADSPBF533_FAMILY__) && \
+   (defined(__SILICON_REVISION__) && \
+    (__SILICON_REVISION__ <= 0x5 || __SILICON_REVISION__ == 0xffff)))
+
+
+/* 05-00-0323 - Erroneous Flag (GPIO) Pin Operations under Specific Sequences
+**
+**  Impacted:
+**     ADSP-BF561 - all supported revisions
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000323 \
+  (defined(__ADSPBF561__) && defined(__SILICON_REVISION__))
+
+
+/* 05-00-0365 - DMAs that Go Urgent during Tight Core Writes to External
+**              Memory Are Blocked
+**
+**  Impacted:
+**     ADSP-BF54[24789] - all supported revisions
+**     ADSP-BF54[24789]M - all supported revisions
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000365 \
+  ((defined(__ADSPBF548_FAMILY__) || defined(__ADSPBF548M_FAMILY__)) && \
+   defined(__SILICON_REVISION__))
+
+
+/* 05-00-0380 - Data Read From L3 Memory by USB DMA May be Corrupted
+**
+**  Impacted:
+**     ADSP-BF52[357] - rev 0.0-0.1 (fixed 0.2)
+**
+** Use by System Services/Device Drivers.
+*/
+#define WA_05000380 \
+  (defined(__ADSPBF527_FAMILY__) && \
+   (defined(__SILICON_REVISION__) && \
+    (__SILICON_REVISION__ <= 0x1 || __SILICON_REVISION__ == 0xffff)))
+
+
+/* 05-00-0412 - "TESTSET Instruction Causes Data Corruption with Writeback Data
+ * Cache Enabled"
+ *
+ * If you use the testset instruction to operate on L2 memory and you have data
+ * in external memory that is cached using WB mode, data in external memory
+ * and/or L2 memory can be corrupted.
+ *
+ * Workaround: Either do not use writeback cache or precede the TESTSET
+ * instruction with an SSYNC instruction. If preceding the TESTSET instruction
+ * by an SSYNC instruction, do the following:
+ *
+ *   CLI R0
+ *   R1 = [P0]  // perform a dummy read to make sure CPLB is installed
+ *   NOP
+ *   NOP
+ *   SSYNC
+ *   TESTSET (P0)
+ *   STI R0
+ *
+ * This problem impacts:
+ * BF561/6 - rev 0.0-0.5
+ *
+ */
+
+#define WA_05000412 \
+        (defined (__SILICON_REVISION__) && defined(__ADSPBF561__))
+
+
+/* 05-00-0428 - "Lost/Corrupted Write to L2 Memory Following Speculative Read
+ * by Core B from L2 Memory"
+ *
+ * This issue occurs only when the accesses are performed by core B of a BF561.
+ *
+ * When a write to internal L2 memory follows a speculative read from internal
+ * L2 memory, the L2 write may be lost or corrupted. For this anomaly to occur,
+ * the speculative read must be caused by a read in the shadow of a branch. The
+ * accesses do not have to be consecutive accesses. In other words, the problem
+ * can occur even if there are multiple instructions between the speculative
+ * read and the write, as shown in the following example:
+ *
+ *   R1 = 1; R2 = 1;
+ *   CC = R1 == R2;
+ *   IF CC JUMP X;  // Always true...
+ *   R0 = [P0];     // If any of these three loads accesses L2 memory from Core
+ *   R1 = [P1];     // B, speculative execution in the pipeline causes the
+ *   R2 = [P2];     // anomaly trigger condition.
+ *   X:
+ *   ...            // Any number of instructions...
+ *   [P0] = R0;  // This write can be corrupted or lost.
+ *
+ * The issue does not occur if the speculative read access is caused by an
+ * interrupt or exception.
+ *
+ * The workaround required depends upon the conditional branch instruction.
+ * If the evaluated condition is true and the branch is predicted, then the
+ * workaround is to ensure that the target instruction is not be a load
+ * instruction, for example:
+ *
+ *   IF CC JUMP X (BP);
+ *   ...
+ *   X: <load that might be from L2 memory>
+ *
+ * If the evaluated condition is false and the branch is not predicted, then
+ * the workaround is to make sure that none of the three instructions that
+ * are executed after the conditional JUMP are load instructions, for example:
+ *
+ *   IF CC JUMP ...;
+ *   <load that might be from L2 memory>
+ *   <load that might be from L2 memory>
+ *   <load that might be from L2 memory>
+ *
+ * This problem impacts:
+ * BF561 - rev 0.4,0.5
+ *
+ */
+
+#define WA_05000428 \
+        (defined(__SILICON_REVISION__) && \
+         defined(__ADSPBF561__)        && \
+         ((__SILICON_REVISION__ == 0xffff) || \
+          (__SILICON_REVISION__ == 0x4)    || \
+          (__SILICON_REVISION__ == 0x5)))
+
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 

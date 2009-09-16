@@ -10,10 +10,10 @@
  * they apply.
  */
 
-/* This file must be used with compiler version 8.0.1.5 */
+/* This file must be used with compiler version 8.0.6.4 */
 
 #ifdef __VERSIONNUM__
-#if __VERSIONNUM__ != 0x08000105
+#if __VERSIONNUM__ != 0x08000604
 #error The compiler version does not match the version of the sysreg.h include
 #endif
 #endif
@@ -22,7 +22,7 @@
  *
  * sysreg.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ***********************************************************************/
 
@@ -40,6 +40,8 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_2_4)
 #pragma diag(suppress:misra_rule_6_3)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
 #pragma diag(suppress:misra_rule_19_10)
 #endif /* _MISRA_RULES */
 

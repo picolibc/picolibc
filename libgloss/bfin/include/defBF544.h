@@ -13,7 +13,7 @@
 /*
 ** defBF544.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -139,7 +139,7 @@
 #define                         CAN1_EWR  0xffc032b0   /* CAN Controller 1 Programmable Warning Level Register */
 #define                         CAN1_ESR  0xffc032b4   /* CAN Controller 1 Error Status Register */
 #define                       CAN1_UCCNT  0xffc032c4   /* CAN Controller 1 Universal Counter Register */
-#define                        CAN1_UCRC  0xffc032c8   /* CAN Controller 1 Universal Counter Force Reload Register */
+#define                        CAN1_UCRC  0xffc032c8   /* Universal Counter Reload/Capture Register */
 #define                       CAN1_UCCNF  0xffc032cc   /* CAN Controller 1 Universal Counter Configuration Register */
 
 /* CAN Controller 1 Mailbox Acceptance Registers */

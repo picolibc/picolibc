@@ -13,7 +13,7 @@
 /*
 ** cdefBF547.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -37,6 +37,11 @@
 
 /* include cdefBF54x_base.h for the set of #defines that are common to all ADSP-BF54x processors */
 #include <cdefBF54x_base.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
 
 /* The following are the #defines needed by ADSP-BF547 that are not in the common header */
 
@@ -486,5 +491,9 @@
 #define                       pPIXC_BVCON ((volatile unsigned long *)PIXC_BVCON)
 #define                      pPIXC_CCBIAS ((volatile unsigned long *)PIXC_CCBIAS)
 #define                          pPIXC_TC ((volatile unsigned long *)PIXC_TC)
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF547_H */

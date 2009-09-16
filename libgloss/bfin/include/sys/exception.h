@@ -18,7 +18,7 @@
  *
  * exception.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -27,6 +27,7 @@
 
 #ifdef _MISRA_RULES
 #pragma diag(push)
+#pragma diag(suppress:misra_rule_5_6)
 #pragma diag(suppress:misra_rule_5_7)
 #pragma diag(suppress:misra_rule_6_3)
 #pragma diag(suppress:misra_rule_19_4)
@@ -180,7 +181,7 @@ typedef void (*ex_handler_fn)();
 
 #define EX_HANDLER(KIND,NAME) \
 _Pragma(#KIND) \
-void NAME ()
+void NAME (void)
 
 #define EX_HANDLER_PROTO(KIND, NAME) EX_HANDLER(KIND, NAME)
 

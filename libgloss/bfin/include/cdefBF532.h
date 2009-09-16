@@ -14,7 +14,7 @@
  *
  * cdefBF532.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -53,7 +53,6 @@
 /* System Interrupt Controller */
 #define pSWRST 			((volatile unsigned short *)SWRST)
 #define pSYSCR 			((volatile unsigned short *)SYSCR)
-#define	pSIC_RVECT		((void * volatile *)SIC_RVECT)
 #define pSIC_IMASK 		((volatile unsigned long *)SIC_IMASK)
 #define pSIC_IAR0 		((volatile unsigned long *)SIC_IAR0)
 #define pSIC_IAR1 		((volatile unsigned long *)SIC_IAR1)

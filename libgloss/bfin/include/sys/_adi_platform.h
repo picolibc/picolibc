@@ -56,22 +56,56 @@
 #include <cdefAD6903.h>
 #elif defined (__AD6904__)
 #include <cdefAD6904.h>
+#elif defined (__AD6905__)
+#include <cdefAD6905.h>
+#elif defined (__MT6906__)
+#include <cdefMT6906.h>
+#elif defined (__ADSPBF504__)
+#include <cdefBF504.h>
+#elif defined (__ADSPBF505__)
+#include <cdefBF505.h>
+#elif defined (__ADSPBF506__)
+#include <cdefBF506.h>
+#elif defined (__ADSPBF512__)
+#include <cdefBF512.h>
+#elif defined (__ADSPBF514__)
+#include <cdefBF514.h>
+#elif defined (__ADSPBF516__)
+#include <cdefBF516.h>
+#elif defined (__ADSPBF518__)
+#include <cdefBF518.h>
 #elif defined (__ADSPBF522__)
 #include <cdefBF522.h>
+#elif defined (__ADSPBF523__)
+#include <cdefBF523.h>
+#elif defined (__ADSPBF524__)
+#include <cdefBF524.h>
 #elif defined (__ADSPBF525__)
 #include <cdefBF525.h>
+#elif defined (__ADSPBF526__)
+#include <cdefBF526.h>
 #elif defined (__ADSPBF527__)
 #include <cdefBF527.h>
 #elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
 #include <cdefBF542.h>
+#elif defined (__ADSPBF542M__)
+#include <cdefBF542M.h>
 #elif defined (__ADSPBF544__)
 #include <cdefBF544.h>
+#elif defined (__ADSPBF544M__)
+#include <cdefBF544M.h>
 #elif defined (__ADSPBF547__)
 #include <cdefBF547.h>
+#elif defined (__ADSPBF547M__)
+#include <cdefBF547M.h>
 #elif defined (__ADSPBF548__)
 #include <cdefBF548.h>
+#elif defined (__ADSPBF548M__)
+#include <cdefBF548M.h>
 #elif defined (__ADSPBF549__)
 #include <cdefBF549.h>
+#elif defined (__ADSPBF549M__)
+#include <cdefBF549M.h>
 #else
 #error Processor Type Not Supported
 #endif
@@ -115,22 +149,56 @@
 #include <defAD6903.h>
 #elif defined (__AD6904__)
 #include <defAD6904.h>
+#elif defined (__AD6905__)
+#include <defAD6905.h>
+#elif defined (__MT6906__)
+#include <defMT6906.h>
+#elif defined (__ADSPBF504__)
+#include <defBF504.h>
+#elif defined (__ADSPBF505__)
+#include <defBF505.h>
+#elif defined (__ADSPBF506__)
+#include <defBF506.h>
+#elif defined (__ADSPBF512__)
+#include <defBF512.h>
+#elif defined (__ADSPBF514__)
+#include <defBF514.h>
+#elif defined (__ADSPBF516__)
+#include <defBF516.h>
+#elif defined (__ADSPBF518__)
+#include <defBF518.h>
 #elif defined (__ADSPBF522__)
 #include <defBF522.h>
+#elif defined (__ADSPBF523__)
+#include <defBF523.h>
+#elif defined (__ADSPBF524__)
+#include <defBF524.h>
 #elif defined (__ADSPBF525__)
 #include <defBF525.h>
+#elif defined (__ADSPBF526__)
+#include <defBF526.h>
 #elif defined (__ADSPBF527__)
 #include <defBF527.h>
 #elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
 #include <defBF542.h>
+#elif defined (__ADSPBF542M__)
+#include <defBF542M.h>
 #elif defined (__ADSPBF544__)
 #include <defBF544.h>
+#elif defined (__ADSPBF544M__)
+#include <defBF544M.h>
 #elif defined (__ADSPBF547__)
 #include <defBF547.h>
+#elif defined (__ADSPBF547M__)
+#include <defBF547M.h>
 #elif defined (__ADSPBF548__)
 #include <defBF548.h>
+#elif defined (__ADSPBF548M__)
+#include <defBF548M.h>
 #elif defined (__ADSPBF549__)
 #include <defBF549.h>
+#elif defined (__ADSPBF549M__)
+#include <defBF549M.h>
 
 #else
 #error Processor Type Not Supported

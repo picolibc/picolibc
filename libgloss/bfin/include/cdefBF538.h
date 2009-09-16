@@ -14,7 +14,7 @@
  *
  * cdefBF538.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * Copyright (C) 2008, 2009 Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -32,6 +32,11 @@
 /* include common system register pointer definitions from ADSP-BF532 */
 #include <cdefBF532.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#pragma diag(suppress:misra_rule_19_7:"ADI header allows function macros")
+#endif /* _MISRA_RULES */
 
 /* System Interrupt Controller (0xFFC00100 - 0xFFC001FF)				*/
 /* ADSP-BF538 SIC0 is same as SIC on ADSP-BF532 */
@@ -616,7 +621,6 @@
 #define pCAN_MBTD			((volatile unsigned short *)CAN_MBTD)
 #define pCAN_EWR			((volatile unsigned short *)CAN_EWR)
 #define pCAN_ESR			((volatile unsigned short *)CAN_ESR)
-#define pCAN_UCREG			((volatile unsigned short *)CAN_UCREG)
 #define pCAN_UCCNT			((volatile unsigned short *)CAN_UCCNT)
 #define pCAN_UCRC			((volatile unsigned short *)CAN_UCRC)
 #define pCAN_UCCNF			((volatile unsigned short *)CAN_UCCNF)
@@ -1001,6 +1005,10 @@
 #define pTWI1_PRESCALE		pTWI1_CONTROL
 #define pTWI1_INT_SRC		pTWI1_INT_STAT
 #define pTWI1_INT_ENABLE	pTWI1_INT_MASK
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF538_H */
 

@@ -13,7 +13,7 @@
 /*
 ** cdefBF52x_base.h
 **
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -26,6 +26,11 @@
 #define _CDEF_BF52X_H
 
 #include <defBF52x_base.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
 
 /* ==== begin from cdefBF534.h ==== */
 
@@ -51,7 +56,6 @@
 #define pSWRST 			((volatile unsigned short *)SWRST)
 #define pSYSCR 			((volatile unsigned short *)SYSCR)
 
-#define	pSIC_RVECT		(_PTR_TO_VOL_VOID_PTR SIC_RVECT)
 #define pSIC_IMASK0 		((volatile unsigned long  *)SIC_IMASK0)
 /* legacy register name (below) provided for backwards code compatibility */
 #define pSIC_IMASK 		((volatile unsigned long  *)SIC_IMASK0)
@@ -605,14 +609,10 @@
 #define                      pPORTF_DRIVE ((volatile unsigned short *)PORTF_DRIVE)
 #define                      pPORTG_DRIVE ((volatile unsigned short *)PORTG_DRIVE)
 #define                      pPORTH_DRIVE ((volatile unsigned short *)PORTH_DRIVE)
-#define                       pPORTF_SLEW ((volatile unsigned short *)PORTF_SLEW)
-#define                       pPORTG_SLEW ((volatile unsigned short *)PORTG_SLEW)
-#define                       pPORTH_SLEW ((volatile unsigned short *)PORTH_SLEW)
 #define                 pPORTF_HYSTERESIS ((volatile unsigned short *)PORTF_HYSTERESIS)
 #define                 pPORTG_HYSTERESIS ((volatile unsigned short *)PORTG_HYSTERESIS)
 #define                 pPORTH_HYSTERESIS ((volatile unsigned short *)PORTH_HYSTERESIS)
 #define                   pNONGPIO_DRIVE ((volatile unsigned short *)NONGPIO_DRIVE)
-#define                    pNONGPIO_SLEW ((volatile unsigned short *)NONGPIO_SLEW)
 #define              pNONGPIO_HYSTERESIS ((volatile unsigned short *)NONGPIO_HYSTERESIS)
 
 /* HOST Port Registers */
@@ -631,13 +631,6 @@
 #define                      pCNT_COUNTER ((volatile unsigned long *)CNT_COUNTER)
 #define                          pCNT_MAX ((volatile unsigned long *)CNT_MAX)
 #define                          pCNT_MIN ((volatile unsigned long *)CNT_MIN)
-
-/* OTP/FUSE Registers */
-
-#define                      pOTP_CONTROL ((volatile unsigned short *)OTP_CONTROL)
-#define                          pOTP_BEN ((volatile unsigned short *)OTP_BEN)
-#define                       pOTP_STATUS ((volatile unsigned short *)OTP_STATUS)
-#define                       pOTP_TIMING ((volatile unsigned long *)OTP_TIMING)
 
 /* Security Registers */
 
@@ -670,5 +663,9 @@
 #define                          pNFC_CMD ((volatile unsigned short *)NFC_CMD)
 #define                      pNFC_DATA_WR ((volatile unsigned short *)NFC_DATA_WR)
 #define                      pNFC_DATA_RD ((volatile unsigned short *)NFC_DATA_RD)
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF52X_H */

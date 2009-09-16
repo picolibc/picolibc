@@ -11,7 +11,7 @@
  */
 
 /*
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2008, 2009 Analog Devices, Inc.
 **
 ************************************************************************************
 **
@@ -32,6 +32,7 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_19_4)
 #pragma diag(suppress:misra_rule_19_7)
+#pragma diag(suppress:misra_rule_19_11)
 #endif /* _MISRA_RULES */
 
 
@@ -224,8 +225,13 @@
 #define	REGAD		0x000007C0	/* STA Register Address								*/
 #define	PHYAD		0x0000F800	/* PHY Device Address								*/
 
+#ifdef _MISRA_RULES
+#define	SET_REGAD(x)	(((x)&0x1Fu)<<  6 )	/* Set STA Register Address				*/
+#define	SET_PHYAD(x)	(((x)&0x1Fu)<< 11 )	/* Set PHY Device Address				*/
+#else
 #define	SET_REGAD(x)	(((x)&0x1F)<<  6 )	/* Set STA Register Address				*/
 #define	SET_PHYAD(x)	(((x)&0x1F)<< 11 )	/* Set PHY Device Address				*/
+#endif /* _MISRA_RULES */
 
 /* EMAC_STADAT Mask											*/
 #define	STADATA		0x0000FFFF	/* Station Management Data	*/
@@ -237,7 +243,11 @@
 #define	BKPRSEN		0x00000008	/* Enable Backpressure								*/
 #define	FLCPAUSE	0xFFFF0000	/* Pause Time										*/
 
+#ifdef _MISRA_RULES
+#define	SET_FLCPAUSE(x)	(((x)&0xFFFFu)<< 16)	/* Set Pause Time						*/
+#else
 #define	SET_FLCPAUSE(x)	(((x)&0xFFFF)<< 16)	/* Set Pause Time						*/
+#endif /* _MISRA_RULES */
 
 /* EMAC_WKUP_CTL Masks																*/
 #define	CAPWKFRM	0x00000001	/* Capture Wake-Up Frames							*/
@@ -263,10 +273,18 @@
 #define	WF2_OFF		0x00FF0000	/* Wake-Up Filter 2 Pattern Offset					*/
 #define	WF3_OFF		0xFF000000	/* Wake-Up Filter 3 Pattern Offset					*/
 
+#ifdef _MISRA_RULES
+#define	SET_WF0_OFF(x) (((x)&0xFFu)<<  0 ) /* Set Wake-Up Filter 0 Byte Offset		*/
+#define	SET_WF1_OFF(x) (((x)&0xFFu)<<  8 ) /* Set Wake-Up Filter 1 Byte Offset		*/
+#define	SET_WF2_OFF(x) (((x)&0xFFu)<< 16 ) /* Set Wake-Up Filter 2 Byte Offset		*/
+#define	SET_WF3_OFF(x) (((x)&0xFFu)<< 24 ) /* Set Wake-Up Filter 3 Byte Offset		*/
+#else
 #define	SET_WF0_OFF(x) (((x)&0xFF)<<  0 ) /* Set Wake-Up Filter 0 Byte Offset		*/
 #define	SET_WF1_OFF(x) (((x)&0xFF)<<  8 ) /* Set Wake-Up Filter 1 Byte Offset		*/
 #define	SET_WF2_OFF(x) (((x)&0xFF)<< 16 ) /* Set Wake-Up Filter 2 Byte Offset		*/
 #define	SET_WF3_OFF(x) (((x)&0xFF)<< 24 ) /* Set Wake-Up Filter 3 Byte Offset		*/
+#endif /* _MISRA_RULES */
+
 /* Set ALL Offsets																	*/
 #define	SET_WF_OFFS(x0,x1,x2,x3) 	(SET_WF0_OFF((x0))|SET_WF1_OFF((x1))|SET_WF2_OFF((x2))|SET_WF3_OFF((x3)))
 
@@ -274,23 +292,40 @@
 #define	WF0_CRC		0x0000FFFF	/* Wake-Up Filter 0 Pattern CRC						*/
 #define	WF1_CRC		0xFFFF0000	/* Wake-Up Filter 1 Pattern CRC						*/
 
+#ifdef _MISRA_RULES
+#define	SET_WF0_CRC(x) (((x)&0xFFFFu)<<   0 ) /* Set Wake-Up Filter 0 Target CRC		*/
+#define	SET_WF1_CRC(x) (((x)&0xFFFFu)<<  16 ) /* Set Wake-Up Filter 1 Target CRC		*/
+#else
 #define	SET_WF0_CRC(x) (((x)&0xFFFF)<<   0 ) /* Set Wake-Up Filter 0 Target CRC		*/
 #define	SET_WF1_CRC(x) (((x)&0xFFFF)<<  16 ) /* Set Wake-Up Filter 1 Target CRC		*/
+#endif /* _MISRA_RULES */
 
 /* EMAC_WKUP_FFCRC1 Masks															*/
 #define	WF2_CRC		0x0000FFFF	/* Wake-Up Filter 2 Pattern CRC						*/
 #define	WF3_CRC		0xFFFF0000	/* Wake-Up Filter 3 Pattern CRC						*/
 
+#ifdef _MISRA_RULES
+#define	SET_WF2_CRC(x) (((x)&0xFFFFu)<<   0 ) /* Set Wake-Up Filter 2 Target CRC		*/
+#define	SET_WF3_CRC(x) (((x)&0xFFFFu)<<  16 ) /* Set Wake-Up Filter 3 Target CRC		*/
+#else
 #define	SET_WF2_CRC(x) (((x)&0xFFFF)<<   0 ) /* Set Wake-Up Filter 2 Target CRC		*/
 #define	SET_WF3_CRC(x) (((x)&0xFFFF)<<  16 ) /* Set Wake-Up Filter 3 Target CRC		*/
+#endif /* _MISRA_RULES */
 
 /* EMAC_SYSCTL Masks																*/
 #define	PHYIE		0x00000001	/* PHY_INT Interrupt Enable							*/
 #define	RXDWA		0x00000002	/* Receive Frame DMA Word Alignment (Odd/Even*)		*/
 #define	RXCKS		0x00000004	/* Enable RX Frame TCP/UDP Checksum Computation		*/
 #define	MDCDIV		0x00003F00	/* SCLK:MDC Clock Divisor [MDC=SCLK/(2*(N+1))]		*/
-
+#if !defined(__SILICON_REVISION__) || (__SILICON_REVISION__>0x2)
+/* In BF536/7 revs. 0.0, 0.1 and 0.2, this bit was reserved */
+#define TXDWA 0x00000010  /* Transmit Frame DMA Word Alignment(Even/Odd*) */
+#endif
+#ifdef _MISRA_RULES
+#define	SET_MDCDIV(x)	(((x)&0x3Fu)<< 8)	/* Set MDC Clock Divisor				*/
+#else
 #define	SET_MDCDIV(x)	(((x)&0x3F)<< 8)	/* Set MDC Clock Divisor				*/
+#endif /* _MISRA_RULES */
 
 /* EMAC_SYSTAT Masks															*/
 #define	PHYINT		0x00000001	/* PHY_INT Interrupt Status						*/
