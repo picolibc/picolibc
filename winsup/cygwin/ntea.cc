@@ -214,11 +214,16 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
      user namespace item, we remove the leading namespace from the name.
      This keeps tools like attr/getfattr/setfattr happy.  Otherwise
      setting the EA fails as if we don't have the permissions. */
-  if (pc.fs_is_samba () && ascii_strncasematch (name, "user.", 5))
+      /* Samba hides the user namespace from Windows clients.  If we try to
+	 retrieve a user namespace item, we remove the leading namespace from
+	 the name, otherwise the search fails. */
+  if (!pc.fs_is_samba ())
+    /* nothing to do */;
+  else if (ascii_strncasematch (name, "user.", 5))
     name += 5;
   else
     {
-      set_errno (EOPNOTSUPP);
+      set_errno (ENOATTR);
       goto out;
     }
 

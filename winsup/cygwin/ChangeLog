@@ -1,3 +1,7 @@
+2009-09-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ntea.c (write_ea): Don't abort if not-samba.
+
 2009-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.cc (peek_console): Always check window size when there is ANY
