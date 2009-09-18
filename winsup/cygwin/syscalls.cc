@@ -2056,7 +2056,7 @@ getdtablesize ()
   return cygheap->fdtab.size > OPEN_MAX ? cygheap->fdtab.size : OPEN_MAX;
 }
 
-extern "C" size_t
+extern "C" int
 getpagesize ()
 {
   if (!system_info.dwAllocationGranularity)

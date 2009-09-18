@@ -1,3 +1,10 @@
+2009-09-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Give sigwait() processing
+	precedence even when a handler is present.
+
+	* syscalls.cc (getpagesize): Change return to 'int'.
+
 2009-09-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ntea.c (write_ea): Don't abort if not-samba.

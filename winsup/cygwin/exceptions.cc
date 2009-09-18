@@ -1207,11 +1207,12 @@ sigpacket::process ()
     insigwait_mask = false;
   else if (tls)
     insigwait_mask = sigismember (&tls->sigwait_mask, si.si_signo);
+  else if (!(tls = _cygtls::find_tls (si.si_signo)))
+    insigwait_mask = false;
   else
     {
-      insigwait_mask = !handler && (tls = _cygtls::find_tls (si.si_signo));
-      if (tls)
-	use_tls = tls;
+      use_tls = tls;
+      insigwait_mask = true;
     }
 
   if (insigwait_mask)
