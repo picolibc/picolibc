@@ -54,7 +54,7 @@ char    _EXFUN(*getlogin, (void ));
 int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
 char 	_EXFUN(*getpass, (__const char *__prompt));
-size_t  _EXFUN(getpagesize, (void));
+int  _EXFUN(getpagesize, (void));
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
