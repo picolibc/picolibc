@@ -1298,6 +1298,7 @@ done:
 thread_specific:
   use_tls->sig = si.si_signo;
   use_tls->set_siginfo (this);
+  use_tls->func = NULL;
   sigproc_printf ("releasing sigwait for thread");
   SetEvent (use_tls->event);
   goto done;
@@ -1374,7 +1375,7 @@ _cygtls::call_signal_handler ()
 {
   int this_sa_flags = 0;
   /* Call signal handler.  */
-  while (sig)
+  while (sig && func)
     {
       lock ();
       this_sa_flags = sa_flags;

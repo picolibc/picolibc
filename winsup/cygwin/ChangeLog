@@ -1,3 +1,10 @@
+2009-09-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Explicitly set thread-specific
+	handler function to zero to avoid transferring to incorrect location.
+	(_cygtls::call_signal_handler): Don't transfer to handler if there is
+	no handler to transfer to.
+
 2009-09-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* exceptions.cc (sigpacket::process): Give sigwait() processing
