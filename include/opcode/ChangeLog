@@ -1,3 +1,7 @@
+2009-09-21  Ben Elliston  <bje@au.ibm.com>
+
+	* ppc.h (PPC_OPCODE_PPCA2): New.
+
 2009-09-05  Martin Thuresson  <martin@mtme.org>
 
 	* ia64.h (struct ia64_operand): Renamed member class to op_class.
