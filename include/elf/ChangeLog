@@ -1,3 +1,8 @@
+2009-09-21  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (DT_PPC_TLSOPT): Define.
+	* ppc64.h (DT_PPC64_TLSOPT): Define.
+
 2009-08-10  Daniel Gutson  <dgutson@codesourcery.com>
 
 	* arm.h: (SHT_ARM_DEBUGOVERLAY): New define.

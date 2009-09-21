@@ -153,7 +153,10 @@ END_RELOC_NUMBERS (R_PPC_max)
   ((R) >= R_PPC_TLS && (R) <= R_PPC_GOT_DTPREL16_HA)
 
 /* Specify the value of _GLOBAL_OFFSET_TABLE_.  */
-#define DT_PPC_GOT		DT_LOPROC
+#define DT_PPC_GOT		(DT_LOPROC)
+
+/* Specify that tls descriptors should be optimized.  */
+#define DT_PPC_TLSOPT		(DT_LOPROC + 1)
 
 /* Processor specific flags for the ELF header e_flags field.  */
 
