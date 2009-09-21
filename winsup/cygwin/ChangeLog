@@ -1,5 +1,20 @@
 2009-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (cwdstuff::get_posix): Convert to const inline method just
+	returning pointer to posix path.
+	(cwdstuff::reset_posix): Convert to non-inline method taking a wchar_t
+	pointer.
+	* path.cc (cwdstuff::set): Revert change from 2009-05-13.  Set posix
+	to valid incoming path again.
+	(cwdstuff::reset_posix): New implementation setting posix path from
+	incoming wchar_t path.  Explain usage.
+	(cwdstuff::get_posix): Drop implementation.
+	(cwdstuff::get): Drop special case to handle empty posix path.
+	* syscalls.cc (internal_setlocale): Store old posix cwd as wide char
+	path.  Restore posix cwd using new charset.  Explain why.
+
+2009-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Drop faking hardlink
 	creation on filesystems not supporting hardlinks.
 

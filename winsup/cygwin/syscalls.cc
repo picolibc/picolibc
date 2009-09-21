@@ -4063,6 +4063,16 @@ unlinkat (int dirfd, const char *pathname, int flags)
 static char *
 internal_setlocale (char *ret)
 {
+  tmp_pathbuf tp;
+
+  /* Each setlocale potentially changes the multibyte representation
+     of the CWD.  Therefore we have to reevaluate the CWD's posix path and
+     store in the new charset. */
+  /* FIXME: Other buffered paths might be affected as well. */
+  wchar_t *w_cwd = tp.w_get ();
+  cwdstuff::cwd_lock.acquire ();
+  sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
+
   if (*__locale_charset () == 'A')
     {
       cygheap->locale.mbtowc = __utf8_mbtowc;
@@ -4097,11 +4107,10 @@ internal_setlocale (char *ret)
       cygheap->locale.wctomb = __wctomb;
     }
   strcpy (cygheap->locale.charset, __locale_charset ());
-  /* Each setlocale potentially changes the multibyte representation
-     of the CWD.  Therefore we have to reset the CWD's posix path and
-     reevaluate the next time it's used. */
-  /* FIXME: Other buffered paths might be affected as well. */
-  cygheap->cwd.reset_posix ();
+
+  /* See above. */
+  cygheap->cwd.reset_posix (w_cwd);
+  cwdstuff::cwd_lock.release ();
   return ret;
 }
 

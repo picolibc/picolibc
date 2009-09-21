@@ -3306,8 +3306,8 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  posix_cwd = (const char *) tp.c_get ();
 	  mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
 	}
-      if (posix)
-      	posix[0] = '\0';
+      posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
+      stpcpy (posix, posix_cwd);
     }
 
 out:
@@ -3315,20 +3315,14 @@ out:
   return res;
 }
 
-/* Copy the value for either the posix or the win32 cwd into a buffer. */
-char *
-cwdstuff::get_posix ()
+/* Store incoming wchar_t path as current posix cwd.  This is called from
+   setlocale so that the cwd is always stored in the right charset. */
+void
+cwdstuff::reset_posix (wchar_t *w_cwd)
 {
-  if (!posix || !*posix)
-    {
-      tmp_pathbuf tp;
-
-      char *tocopy = tp.c_get ();
-      mount_table->conv_to_posix_path (win32.Buffer, tocopy, 0);
-      posix = (char *) crealloc_abort (posix, strlen (tocopy) + 1);
-      stpcpy (posix, tocopy);
-    }
-  return posix;
+  size_t len = sys_wcstombs (NULL, (size_t) -1, w_cwd);
+  posix = (char *) crealloc_abort (posix, len + 1);
+  sys_wcstombs (posix, len + 1, w_cwd);
 }
 
 char *
@@ -3355,13 +3349,6 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
       tocopy = tp.c_get ();
       sys_wcstombs (tocopy, NT_MAX_PATH, win32.Buffer,
 		    win32.Length / sizeof (WCHAR));
-    }
-  else if (!posix || !*posix)
-    {
-      tocopy = tp.c_get ();
-      mount_table->conv_to_posix_path (win32.Buffer, tocopy, 0);
-      posix = (char *) crealloc_abort (posix, strlen (tocopy) + 1);
-      stpcpy (posix, tocopy);
     }
   else
     tocopy = posix;

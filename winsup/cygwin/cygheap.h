@@ -211,8 +211,8 @@ public:
   UNICODE_STRING win32;
   DWORD drive_length;
   static muto cwd_lock;
-  char *get_posix ();
-  void reset_posix () { if (posix) posix[0] = '\0'; }
+  const char *get_posix () const { return posix; };
+  void reset_posix (wchar_t *);
   char *get (char *, int = 1, int = 0, unsigned = NT_MAX_PATH);
   HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
