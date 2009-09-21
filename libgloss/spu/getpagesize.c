@@ -34,15 +34,9 @@
 #include <unistd.h>
 #include "jsre.h"
 
-size_t
+int
 getpagesize (void)
 {
-  int sys;
-
-  /*
-   * linux/ppc has int getpagesize(void), but even if size_t were 8 bytes
-   * we are OK since we are converting the int returned from
-   * __send_to_ppe.
-   */
+  vector unsigned int sys;
   return __send_to_ppe (JSRE_POSIX1_SIGNALCODE, JSRE_GETPAGESIZE, &sys);
 }

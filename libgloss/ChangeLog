@@ -1,3 +1,7 @@
+2009-09-21  Ken Werner  <ken.werner@de.ibm.com>
+
+        * spu/getpagesize.c: Align getpagesize implementation to POSIX
+
 2009-09-16  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/cdefBF512.h, bfin/include/cdefBF514.h,
