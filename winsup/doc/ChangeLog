@@ -1,3 +1,9 @@
+2009-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7-file): Add new hardlink behaviour on
+	filesystems not supporting hardlinks.
+	* overview2.sgml (ov-hi-files): Change descripton accordingly.
+
 2009-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7-posix): Add "KOI8-R" and "KOI8-U"

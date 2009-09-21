@@ -225,8 +225,8 @@ new UTF-16 style of symlinks is not compatible with older Cygwin release,
 which can't read the target filename correctly.</para>
 
 <para>Hard links are fully supported on NTFS and NFS file systems.  On FAT
-and some other file systems, the call falls back to simply copying the file,
-a strategy that works in many cases.</para>
+and other file systems which don't support hardlinks, the call returns with
+an error, just like on other POSIX systems.</para>
 
 <para>On file systems which don't support unique persistent file IDs (FAT,
 older Samba shares) the inode number for a file is calculated by hashing its
