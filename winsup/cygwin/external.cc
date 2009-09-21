@@ -195,6 +195,11 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return 1;
 
       case CW_USER_DATA:
+	/* This is a kludge to work around a version of _cygwin_common_crt0
+	   which overwrote the cxx_malloc field with the local DLL copy.
+	   Hilarity ensues if the DLL is not loaded like while the process
+	   is forking. */
+	__cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
 	return (DWORD) &__cygwin_user_data;
 
       case CW_PERFILE:

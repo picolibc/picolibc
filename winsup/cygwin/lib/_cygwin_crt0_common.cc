@@ -68,8 +68,6 @@ struct per_process_cxx_malloc __cygwin_cxx_malloc =
 int __stdcall
 _cygwin_crt0_common (MainFunc f, per_process *u)
 {
-  /* This is used to record what the initial sp was.  The value is needed
-     when copying the parent's stack to the child during a fork.  */
   per_process *newu = (per_process *) cygwin_internal (CW_USER_DATA);
   bool uwasnull;
 
@@ -110,6 +108,9 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->premain[2] = cygwin_premain2;
   u->premain[3] = cygwin_premain3;
   u->fmode_ptr = &_fmode;
+
+  /* This is used to record what the initial sp was.  The value is needed
+     when copying the parent's stack to the child during a fork.  */
   u->initial_sp = (char *) __builtin_frame_address (1);
 
   /* Remember whatever the user linked his application with - or

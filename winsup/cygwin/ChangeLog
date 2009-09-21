@@ -1,3 +1,11 @@
+2009-09-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* external.cc (cygwin_internal): Add hack to always reset cxx_malloc to
+	proper value.
+
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Relocate wayward
+	comment.
+
 2009-09-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* exceptions.cc (sigpacket::process): Explicitly set thread-specific
