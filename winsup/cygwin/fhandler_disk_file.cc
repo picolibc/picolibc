@@ -1249,17 +1249,9 @@ fhandler_disk_file::link (const char *newpath)
     {
       if (status == STATUS_INVALID_DEVICE_REQUEST)
 	{
-	  /* FS doesn't support hard links.  Try to copy file. */
-	  WCHAR pcw[(pc.get_nt_native_path ()->Length / sizeof (WCHAR)) + 1];
-	  WCHAR newpcw[(newpc.get_nt_native_path ()->Length / sizeof (WCHAR))
-		       + 1];
-	  if (!CopyFileW (pc.get_wide_win32_path (pcw),
-			  newpc.get_wide_win32_path (newpcw), TRUE))
-	    {
-	      __seterrno ();
-	      return -1;
-	    }
-	  SetFileAttributesW (newpcw, pc.file_attributes ());
+	  /* FS doesn't support hard links.  Linux returns EPERM. */
+	  set_errno (EPERM);
+	  return -1;
 	}
       else
 	{
