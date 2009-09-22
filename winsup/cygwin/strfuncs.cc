@@ -600,6 +600,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	     decoding errors, seems like the best we can do. */
 	  if (dst)
 	    *ptr = L'\xdc80' | *pmbs;
+	  memset (&ps, 0, sizeof ps);
 	  bytes = 1;
 	}
 
