@@ -124,6 +124,12 @@ dup (int fd)
 int
 dup2 (int oldfd, int newfd)
 {
+  if (newfd >= OPEN_MAX_MAX)
+    {
+      syscall_printf ("-1 = dup2 (%d, %d) (%d too large)", oldfd, newfd, newfd);
+      set_errno (EBADF);
+      return -1;
+    }
   return cygheap->fdtab.dup2 (oldfd, newfd);
 }
 

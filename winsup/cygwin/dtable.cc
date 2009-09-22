@@ -80,7 +80,7 @@ dtable::extend (int howmuch)
   if (howmuch <= 0)
     return 0;
 
-  if (new_size > (100 * NOFILE_INCR))
+  if (new_size > OPEN_MAX_MAX)
     {
       set_errno (EMFILE);
       return 0;

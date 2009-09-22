@@ -1,6 +1,7 @@
 /* dtable.h: fd table definition.
 
-   Copyright 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red
+   Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +11,8 @@ details. */
 
 /* Initial and increment values for cygwin's fd table */
 #define NOFILE_INCR    32
+/* Maximum size we allow expanding to.  */
+#define OPEN_MAX_MAX (100 * NOFILE_INCR)
 
 #include "thread.h"
 #include "sync.h"

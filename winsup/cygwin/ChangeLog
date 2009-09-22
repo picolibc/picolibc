@@ -1,3 +1,11 @@
+2009-09-22  Eric Blake  <ebb9@byu.net>
+
+	* dtable.h (OPEN_MAX_MAX): New macro.
+	* resource.cc (getrlimit) [RLIMIT_NOFILE]: Use it.
+	* dtable.cc (dtable::extend): Likewise.
+	* fcntl.cc (fcntl64): Obey POSIX rule with too-large F_DUPFD.
+	* syscalls.cc (dup2): Likewise.
+
 2009-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cwdstuff::get_posix): Convert to const inline method just

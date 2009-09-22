@@ -1,6 +1,7 @@
 /* fcntl.cc: fcntl syscall
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2008 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2008,
+   2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -40,7 +41,7 @@ fcntl64 (int fd, int cmd, ...)
   switch (cmd)
     {
     case F_DUPFD:
-      if ((int) arg >= 0)
+      if ((int) arg >= 0 && (int) arg < OPEN_MAX_MAX)
 	res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
       else
 	{
