@@ -1,3 +1,7 @@
+2009-09-22  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* ppc.h (ppc_cpu_t): Typedef to uint64_t.
+
 2009-09-21  Ben Elliston  <bje@au.ibm.com>
 
 	* ppc.h (PPC_OPCODE_PPCA2): New.
