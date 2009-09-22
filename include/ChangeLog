@@ -1,3 +1,8 @@
+2009-09-22  Dodji Seketeli  <dodji@redhat.com>
+
+	* dwarf2.h (enum dwarf_tag): Add
+	DW_TAG_template_parameter_pack and DW_TAG_formal_parameter_pack.
+
 2009-09-09  Martin Thuresson  <martin@mtme.org>
 
 	* bfdlink.h (struct bfd_link_hash_common_entry): Move to top
