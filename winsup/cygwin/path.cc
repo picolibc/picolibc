@@ -1376,6 +1376,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   tmp_pathbuf tp;
   unsigned check_opt;
   bool mk_winsym = use_winsym;
+  bool has_trailing_dirsep = false;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -1395,12 +1396,13 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  len = strlen (newpath);
   /* Trailing dirsep is a no-no. */
-  if (isdirsep (newpath[len - 1]))
+  len = strlen (newpath);
+  has_trailing_dirsep = isdirsep (newpath[len - 1]);
+  if (has_trailing_dirsep)
     {
-      set_errno (ENOENT);
-      goto done;
+      newpath = strdup (newpath);
+      ((char *) newpath)[len - 1] = '\0';
     }
 
   check_opt = PC_SYM_NOFOLLOW | PC_POSIX | (isdevice ? PC_NOWARN : 0);
@@ -1431,6 +1433,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       || win32_newpath.is_auto_device ())
     {
       set_errno (EEXIST);
+      goto done;
+    }
+  if (has_trailing_dirsep && !win32_newpath.exists ())
+    {
+      set_errno (ENOENT);
       goto done;
     }
 
@@ -1667,6 +1674,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 done:
   syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, oldpath,
 		  newpath, mk_winsym, isdevice);
+  if (has_trailing_dirsep)
+    free ((void *) newpath);
   return res;
 }
 

@@ -1,3 +1,8 @@
+2009-09-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_worker): Rework error handling to generate Linux
+	compatible errno in case of trailing slash in newpath.
+
 2009-09-22  Eric Blake  <ebb9@byu.net>
 
 	* dtable.h (OPEN_MAX_MAX): New macro.
