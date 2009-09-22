@@ -166,7 +166,7 @@ case "${host_cpu}" in
 	;;
   m32c)
 	machine_dir=m32c
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DABORT_PROVIDED -DSMALL_MEMORY"
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
 	;;
 
   m32r*)
@@ -648,7 +648,7 @@ case "${host}" in
 	;;
   m32c-*-*)
 	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DABORT_PROVIDED"
 	syscall_dir=
   	;;
   m32r-*-*)

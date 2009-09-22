@@ -1,3 +1,8 @@
+2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+
+	* configure.host (m32c): Move setting -DABORT_PROVIDED to second 
+	"case $host".
+
 2009-09-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* libc/include/sys/unistd.h: Declare getpagesize as returning
