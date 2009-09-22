@@ -1,5 +1,10 @@
 2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
 
+	* configure.host (*-rtems*): Remove -DMISSING_SYSCALL_NAMES.
+	Add -DHAVE_BLKSIZE, -D_NO_WORDEXP -D_NO_POPEN.
+
+2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+
 	* configure.host (m32c): Move setting -DABORT_PROVIDED to second 
 	"case $host".
 
