@@ -578,7 +578,7 @@
 	* include/cygwin/version.h: Bump API_MINOR to accommodate below
 	changes.
 
-002-11-14  Sergey Okhapkin  <sos@prospect.com.ru>
+2002-11-14  Sergey Okhapkin  <sos@prospect.com.ru>
 
 	* cygwin.din (siginterrupt): New export.
 	* signal.cc (siginterrupt): New.

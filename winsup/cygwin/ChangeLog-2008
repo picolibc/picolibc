@@ -1380,7 +1380,7 @@
 
 	* devices.in: Remove "Global" from tty device.
 
-008-06-09  Eric Blake  <ebb9@byu.net>
+2008-06-09  Eric Blake  <ebb9@byu.net>
 
 	* signal.cc (abort): Only flush streams after signal handler.
 
