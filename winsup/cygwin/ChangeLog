@@ -1,3 +1,9 @@
+2009-09-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (WSARecv): Define.
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Call WSARecv
+	instead of WSARecvFrom if no name parameter is given.  Explain why.
+
 2009-09-22  Eric Blake  <ebb9@byu.net>
 
 	* syscalls.cc (faccessat): Fix typo, reject bad flags.

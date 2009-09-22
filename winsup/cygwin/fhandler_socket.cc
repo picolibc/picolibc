@@ -1379,14 +1379,30 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
     {
       if (use_recvmsg)
 	res = WSARecvMsg (get_socket (), wsamsg, &wret, NULL, NULL);
+      /* This is working around a really weird problem in WinSock.
+
+         Assume you create a socket, fork the process (thus duplicating
+	 the socket), connect the socket in the child, then call recv
+	 on the original socket handle in the parent process.
+	 In this scenario, calls to WinSock's recvfrom and WSARecvFrom
+	 in the parent will fail with WSAEINVAL, regardless whether both
+	 address parameters, name and namelen, are NULL or point to valid
+	 storage.  However, calls to recv and WSARecv succeed as expected.
+	 Per MSDN, WSAEINVAL in the context of recv means  "The socket has not
+	 been bound".  It is as if the recvfrom functions test if the socket
+	 is bound locally, but in the parent process, WinSock doesn't know
+	 about that and fails, while the same test is omitted in the recv
+	 functions.
+	 
+	 This also covers another weird case: Winsock returns WSAEFAULT if
+	 namelen is a valid pointer while name is NULL.  Both parameters are
+	 ignored for TCP sockets, so this only occurs when using UDP socket. */
+      else if (!wsamsg->name)
+	res = WSARecv (get_socket (), wsabuf, wsacnt, &wret, &wsamsg->dwFlags,
+		       NULL, NULL);
       else
 	res = WSARecvFrom (get_socket (), wsabuf, wsacnt, &wret,
-			   &wsamsg->dwFlags, wsamsg->name,
-			   /* Winsock returns WSAEFAULT if namelen is a valid
-			      pointer while name is NULL.  Both parameters are
-			      ignored for TCP sockets, so this only occurs when
-			      using UDP socket. */
-			   wsamsg->name ? &wsamsg->namelen : NULL,
+			   &wsamsg->dwFlags, wsamsg->name, &wsamsg->namelen,
 			   NULL, NULL);
       if (!res)
 	{
