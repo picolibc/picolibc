@@ -1,5 +1,9 @@
 2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
 
+	* libc/include/stdlib.h: Add posix_memalign.
+
+2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+
 	* configure.host (*-rtems*): Remove -DMISSING_SYSCALL_NAMES.
 	Add -DHAVE_BLKSIZE, -D_NO_WORDEXP -D_NO_POPEN.
 
