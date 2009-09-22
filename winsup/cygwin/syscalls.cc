@@ -3851,7 +3851,8 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
   char *path = tp.c_get ();
   if (!gen_full_path_at (path, dirfd, pathname))
     {
-      if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+      if ((mode & ~(F_OK|R_OK|W_OK|X_OK))
+	  || (flags & ~(AT_SYMLINK_NOFOLLOW|AT_EACCESS)))
 	set_errno (EINVAL);
       else
 	{
@@ -3877,6 +3878,11 @@ fchmodat (int dirfd, const char *pathname, mode_t mode, int flags)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+  if (flags & ~AT_SYMLINK_NOFOLLOW)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3891,6 +3897,11 @@ fchownat (int dirfd, const char *pathname, __uid32_t uid, __gid32_t gid,
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+  if (flags & ~AT_SYMLINK_NOFOLLOW)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3905,6 +3916,11 @@ fstatat (int dirfd, const char *pathname, struct __stat64 *st, int flags)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+  if (flags & ~AT_SYMLINK_NOFOLLOW)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
@@ -3922,6 +3938,11 @@ utimensat (int dirfd, const char *pathname, const struct timespec *times,
   if (efault.faulted (EFAULT))
     return -1;
   char *path = tp.c_get ();
+  if (flags & ~AT_SYMLINK_NOFOLLOW)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
   path_conv win32 (path, PC_POSIX | ((flags & AT_SYMLINK_NOFOLLOW)
@@ -3952,6 +3973,11 @@ linkat (int olddirfd, const char *oldpathname,
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+  if (flags & ~AT_SYMLINK_FOLLOW)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   char *oldpath = tp.c_get ();
   if (gen_full_path_at (oldpath, olddirfd, oldpathname))
     return -1;
@@ -4060,6 +4086,11 @@ unlinkat (int dirfd, const char *pathname, int flags)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+  if (flags & ~AT_REMOVEDIR)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
