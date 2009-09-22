@@ -22,7 +22,9 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #ifndef PPC_H
 #define PPC_H
 
-typedef unsigned long ppc_cpu_t;
+#include "bfd_stdint.h"
+
+typedef uint64_t ppc_cpu_t;
 
 /* The opcode table is an array of struct powerpc_opcode.  */
 
