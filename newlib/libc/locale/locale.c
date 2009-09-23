@@ -166,9 +166,6 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 #include <wchar.h>
 #include "../stdlib/local.h"
-#ifdef __CYGWIN__
-#include <windows.h>
-#endif
 
 #define _LC_LAST      7
 #define ENCODING_LEN 31
@@ -468,7 +465,7 @@ loadlocale(struct _reent *p, int category)
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
 #ifdef __CYGWIN__
-	__set_charset_from_codepage (GetACP (), charset);
+	__set_charset_from_codepage (0, charset);
 #else
 	strcpy (charset, "ISO-8859-1");
 #endif
