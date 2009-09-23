@@ -307,7 +307,7 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 }
 
 /* Convert Windows codepage to a setlocale compatible character set code.
-   Called from newlib's setlocale() with the current ANSI codepage, if the
+   Called from newlib's setlocale() with codepage set to 0, if the
    charset isn't given explicitely in the POSIX compatible locale specifier.
    The function also returns a pointer to the corresponding _mbtowc_r
    function.  Also called from fhandler_console::write_normal() if the
@@ -315,6 +315,8 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 extern "C" mbtowc_p
 __set_charset_from_codepage (UINT cp, char *charset)
 {
+  if (cp == 0)
+    cp = GetACP ();
   switch (cp)
     {
     case 437:

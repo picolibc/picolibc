@@ -1,5 +1,10 @@
 2009-09-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (__set_charset_from_codepage): Fetch current ANSI
+	codepage if cp is 0.
+
+2009-09-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* strfuncs.cc (sys_cp_wcstombs): Convert lone surrogate pair
 	second halves to unambiguous ASCII SO sequence.  When converting
 	chars invalid in current codepage to ASCII SO sequence, make
