@@ -3,7 +3,7 @@
 	* strfuncs.cc (sys_cp_wcstombs): Convert lone surrogate pair
 	second halves to unambiguous ASCII SO sequence.  When converting
 	chars invalid in current codepage to ASCII SO sequence, make
-	sure to check for surrogate pair second half only if ct least
+	sure to check for surrogate pair second half only if at least
 	one wide characters is left.  Decrement nwc if valid second half has
 	been converted.
 	(sys_cp_mbstowcs): Improve ASCII SO handling.  Never break from loop
