@@ -1,3 +1,16 @@
+2009-09-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* strfuncs.cc (sys_cp_wcstombs): Convert lone surrogate pair
+	second halves to unambiguous ASCII SO sequence.  When converting
+	chars invalid in current codepage to ASCII SO sequence, make
+	sure to check for surrogate pair second half only if ct least
+	one wide characters is left.  Decrement nwc if valid second half has
+	been converted.
+	(sys_cp_mbstowcs): Improve ASCII SO handling.  Never break from loop
+	if invalid character has been found.  Recognize ASCII SO sequence
+	representing originally invalid mulitbyte char converted into a
+	lone surrogate pair second half.  Convert accordingly.
+
 2009-09-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (WSARecv): Define.

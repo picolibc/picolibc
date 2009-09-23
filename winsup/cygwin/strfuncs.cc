@@ -435,8 +435,10 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
 	     surrogate pair in the 0xDCxx range specifying an invalid byte
 	     value when converting from MB to WC.
 	     The comment in sys_cp_mbstowcs below explains it. */
-	  buf[0] = (char) (pw & 0xff);
-	  bytes = 1;
+	  buf[0] = 0x0e; /* ASCII SO */
+	  buf[1] = 0xff;
+	  buf[2] = (char) (pw & 0xff);
+	  bytes = 3;
 	}
       else if (bytes == -1 && *charset != 'U'/*TF-8*/)
 	{
@@ -451,7 +453,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
 	      continue;
 	    }
 	  ++bytes; /* Add the ASCII SO to the byte count. */
-	  if (ps.__count == -4) /* First half of a surrogate pair. */
+	  if (ps.__count == -4 && nwc > 0) /* First half of a surrogate pair. */
 	    {
 	      ++pwcs;
 	      if ((*pwcs & 0xfc00) != 0xdc00) /* Invalid second half. */
@@ -461,6 +463,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
 		  continue;
 		}
 	      bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset, &ps);
+	      nwc--;
 	    }
 	}
       if (n + bytes <= len)
@@ -546,42 +549,64 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
     len = (size_t)-1;
   while (len > 0 && nms > 0)
     {
-      /* ASCII SO.  Sanity check: If this is a lead SO byte for a following
-	 UTF-8 sequence, there must be at least two more bytes left, and the
-	 next byte must be a valid UTF-8 start byte.  If the charset isn't
-	 UTF-8 anyway, try to convert the following bytes as UTF-8 sequence. */
-      if (*pmbs == 0x0e && nms > 2 && pmbs[1] >= 0xc2
-	  && pmbs[1] <= 0xf4 && *charset != 'U'/*TF-8*/)
+      /* ASCII SO handling. */
+      if (*pmbs == 0x0e)
 	{
-	  pmbs++;
-	  --nms;
-	  bytes = __utf8_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
-				 charset, &ps);
-	  if (bytes < 0)
+	  /* Sanity check: If this is a lead SO byte for a following UTF-8
+	     sequence, there must be at least two more bytes left, and the
+	     next byte must be a valid UTF-8 start byte.  If the charset
+	     isn't UTF-8 anyway, try to convert the following bytes as UTF-8
+	     sequence. */
+	  if (nms > 2 && pmbs[1] >= 0xc2 && pmbs[1] <= 0xf4 && *charset != 'U'/*TF-8*/)
 	    {
-	      /* Invalid UTF-8 sequence?  Treat the ASCII SO character as
-		 stand-alone ASCII SO char. */
+	      bytes = __utf8_mbtowc (_REENT, ptr, (const char *) pmbs + 1,
+				     nms - 1, charset, &ps);
+	      if (bytes < 0)
+		{
+		  /* Invalid UTF-8 sequence?  Treat the ASCII SO character as
+		     stand-alone ASCII SO char. */
+		  bytes = 1;
+		  if (dst)
+		    *ptr = 0x0e;
+		  memset (&ps, 0, sizeof ps);
+		}
+	      else
+		{
+		  ++bytes; /* Count SO byte */
+		  if (bytes > 1 && ps.__count == 4)
+		    {
+		      /* First half of a surrogate. */
+		      wchar_t *ptr2 = dst ? ptr + 1 : NULL;
+		      int bytes2 = __utf8_mbtowc (_REENT, ptr2,
+						  (const char *) pmbs + bytes,
+						  nms - bytes, charset, &ps);
+		      if (bytes2 < 0)
+			memset (&ps, 0, sizeof ps);
+		      else
+			{
+			  bytes += bytes2;
+			  ++count;
+			  ptr = dst ? ptr + 1 : NULL;
+			  --len;
+			}
+		    }
+		}
+	    }
+	  /* Sequence for an invalid byte originally created in the next outer
+	     else branch below.  This must be converted back to a 0xDCxx value
+	     as well. */
+	  else if (nms > 2 && pmbs[1] == 0xff)
+	    {
+	      bytes = 3;
+	      if (dst)
+		*ptr = L'\xdc80' | pmbs[2];
+	    }
+	  /* Otherwise it's just a simple ASCII SO. */
+	  else
+	    {
 	      bytes = 1;
 	      if (dst)
 		*ptr = 0x0e;
-	      memset (&ps, 0, sizeof ps);
-	      break;
-	    }
-	  if (bytes == 0)
-	    break;
-	  if (ps.__count == 4) /* First half of a surrogate. */
-	    {
-	      wchar_t *ptr2 = dst ? ptr + 1 : NULL;
-	      int bytes2 = __utf8_mbtowc (_REENT, ptr2,
-					  (const char *) pmbs + bytes,
-					  nms - bytes, charset, &ps);
-	      if (bytes2 < 0)
-		break;
-	      pmbs += bytes2;
-	      nms -= bytes2;
-	      ++count;
-	      ptr = dst ? ptr + 1 : NULL;
-	      --len;
 	    }
 	}
       else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
@@ -598,10 +623,10 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 	     characters converted to this format.  It does allow processing of
 	     src to continue, however, which, since there is no way to signal
 	     decoding errors, seems like the best we can do. */
+	  bytes = 1;
 	  if (dst)
 	    *ptr = L'\xdc80' | *pmbs;
 	  memset (&ps, 0, sizeof ps);
-	  bytes = 1;
 	}
 
       if (bytes > 0)
