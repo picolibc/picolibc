@@ -1,5 +1,11 @@
 2009-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc (mq_open): Avoid closing the same descriptor twice in
+	case of errors.
+	(sem_open): Ditto.
+
+2009-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* kernel32.cc (CreateMutexW): Use correct access mask.
 	(CreateSemaphoreW): Ditto.
 

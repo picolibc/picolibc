@@ -312,7 +312,7 @@ extern "C" void *mmap64 (void *, size_t, int, int, int, _off64_t);
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
-  int i, fd, nonblock, created;
+  int i, fd = -1, nonblock, created;
   long msgsize, index;
   _off64_t filesize = 0;
   va_list ap;
@@ -449,6 +449,7 @@ exists:
 	  if (errno == ENOENT && (oflag & O_CREAT))
 	    {
 	      close (fd);
+	      fd = -1;
 	      goto again;
 	    }
 	  goto err;
@@ -469,6 +470,7 @@ exists:
   if (mptr == (int8_t *) MAP_FAILED)
     goto err;
   close (fd);
+  fd = -1;
 
   /* Allocate one mq_info{} for each open */
   if (!(mqinfo = (struct mq_info *) malloc (sizeof (struct mq_info))))
@@ -500,7 +502,8 @@ err:
     munmap((void *) mptr, (size_t) filesize);
   if (mqinfo)
     free (mqinfo);
-  close (fd);
+  if (fd >= 0)
+    close (fd);
   return (mqd_t) -1;
 }
 
@@ -909,7 +912,7 @@ struct sem_finfo
 extern "C" sem_t *
 sem_open (const char *name, int oflag, ...)
 {
-  int i, fd, created;
+  int i, fd = -1, created;
   va_list ap;
   mode_t mode = 0;
   unsigned int value = 0;
@@ -985,6 +988,7 @@ exists:
 	  if (errno == ENOENT && (oflag & O_CREAT))
 	    {
 	      close (fd);
+	      fd = -1;
 	      goto again;
 	    }
 	  goto err;
@@ -1023,7 +1027,8 @@ err:
     unlink (semname);
   if (sem != SEM_FAILED)
     semaphore::close (sem);
-  close (fd);
+  if (fd >= 0)
+    close (fd);
   return SEM_FAILED;
 }
 
