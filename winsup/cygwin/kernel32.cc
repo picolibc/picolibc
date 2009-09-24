@@ -131,7 +131,7 @@ CreateMutexW (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 			      lpName ? get_shared_parent_dir () : NULL,
 			      lpMutexAttributes
 			      ? lpMutexAttributes->lpSecurityDescriptor : NULL);
-  status = NtCreateMutant (&mtx, CYG_EVENT_ACCESS, &attr, bInitialOwner);
+  status = NtCreateMutant (&mtx, CYG_MUTANT_ACCESS, &attr, bInitialOwner);
   if (!NT_SUCCESS (status))
     {
       SetLastError (RtlNtStatusToDosError (status));
@@ -222,7 +222,7 @@ CreateSemaphoreW (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
 			      lpSemaphoreAttributes
 			      ? lpSemaphoreAttributes->lpSecurityDescriptor
 			      : NULL);
-  status = NtCreateSemaphore (&sem, CYG_EVENT_ACCESS, &attr,
+  status = NtCreateSemaphore (&sem, CYG_SEMAPHORE_ACCESS, &attr,
 			      lInitialCount, lMaximumCount);
   if (!NT_SUCCESS (status))
     {
