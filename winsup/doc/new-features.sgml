@@ -19,7 +19,7 @@
 
 - Cygwin creates the mount points for /, /usr/bin, and /usr/lib automatically
   from it's own position on the disk.  They don't have to be specified in
-  /etc/fstab. 
+  /etc/fstab.
 
 - If a filename cannot be represented in the current character set,
   the character will be converted to a sequence Ctrl-N + UTF-8 representation
@@ -57,7 +57,7 @@
   shares.  Requires to change a registry key (see the user's guide).
   Can be switched off on a per-mount base.
 
-- Due to the above changes, managed mounts have been removed. 
+- Due to the above changes, managed mounts have been removed.
 
 - Incoming DOS paths are always handled case-insensitive and get no POSIX
   permission, as if they are mounted with noacl,posix=0 mount flags.
@@ -67,6 +67,10 @@
   the hidden recycle bin directories and marking the files for deletion.
 
 - rename(2) rewritten to be more POSIX conformant.
+
+- access(2) now performs checks using the real user ID, as required by
+  POSIX; the old behavior of querying based on effective user ID is
+  available through the new faccessat(2) and euidaccess(2) APIs.
 
 - Add st_birthtim member to struct stat.
 
@@ -118,7 +122,8 @@
   symlinkat, unlinkat.
 
 - Other new APIs: posix_fadvise, posix_fallocate, funopen, fopencookie,
-  open_memstream, open_wmemstream, fmemopen, fdopendir, fpurge, mkstemps.
+  open_memstream, open_wmemstream, fmemopen, fdopendir, fpurge,
+  mkstemps, eaccess, euidaccess, canonicalize_file_name.
 </screen>
 
 </sect2>
@@ -323,4 +328,3 @@
 </sect2>
 
 </sect1>
-

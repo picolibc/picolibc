@@ -1,3 +1,8 @@
+2009-09-25  Eric Blake  <ebb9@byu.net>
+
+	* new-features.sgml (ov-new1.7-file): Mention eaccess, euidaccess,
+	canonicalize_file_name, and document change in access semantics.
+
 2009-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-locale-problems): Fix charset names of codepages
