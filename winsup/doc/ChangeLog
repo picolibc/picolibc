@@ -1,3 +1,8 @@
+2009-09-24  Eric Blake  <ebb9@byu.net>
+
+	* setup2.sgml (setup-locale-problems): Document how to install
+	non-default charsets.
+
 2009-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7-file): Add new hardlink behaviour on

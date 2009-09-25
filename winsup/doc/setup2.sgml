@@ -367,6 +367,14 @@ worked all these years before, maybe it's because you switched to
 another character set.  This doesn't occur with symlinks created with
 Cygwin 1.7 or later.  </para>
 
+<para>Another problem you might encounter is that older versions of
+Windows did not install all charsets by default.  If you are running
+Windows XP or older, you can open the "Regional and Language Options"
+portion of the Control Panel, select the "Advanced" tab, and select
+entries from the "Code page conversion tables" list.  The following
+entries are useful to cygwin: 932/SJIS, 936/EUC-KR, 949/GBK, 950/Big5,
+20932/EUC-JP.</para>
+
 </sect2>
 
 <sect2 id="setup-locale-missing"><title>What does not work?</title>
