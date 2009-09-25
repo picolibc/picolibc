@@ -372,7 +372,7 @@ Windows did not install all charsets by default.  If you are running
 Windows XP or older, you can open the "Regional and Language Options"
 portion of the Control Panel, select the "Advanced" tab, and select
 entries from the "Code page conversion tables" list.  The following
-entries are useful to cygwin: 932/SJIS, 936/EUC-KR, 949/GBK, 950/Big5,
+entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,
 20932/EUC-JP.</para>
 
 </sect2>
