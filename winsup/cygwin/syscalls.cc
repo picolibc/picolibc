@@ -1580,6 +1580,29 @@ access (const char *fn, int flags)
   return res;
 }
 
+/* Linux provides this extension; it is basically a wrapper around the
+   POSIX:2008 faccessat (AT_FDCWD, fn, flags, AT_EACCESS).  We also
+   provide eaccess as an alias for this, in cygwin.din.  */
+extern "C" int
+euidaccess (const char *fn, int flags)
+{
+  // flags were incorrectly specified
+  int res = -1;
+  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+    set_errno (EINVAL);
+  else
+    {
+      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
+      if (fh)
+	{
+	  res =  fh->fhaccess (flags, true);
+	  delete fh;
+	}
+    }
+  debug_printf ("returning %d", res);
+  return res;
+}
+
 static void
 rename_append_suffix (path_conv &pc, const char *path, size_t len,
 		      const char *suffix)
@@ -3878,9 +3901,12 @@ fchmodat (int dirfd, const char *pathname, mode_t mode, int flags)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  if (flags & ~AT_SYMLINK_NOFOLLOW)
+  if (flags)
     {
-      set_errno (EINVAL);
+      /* BSD has lchmod, but Linux does not.  POSIX says
+	 AT_SYMLINK_NOFOLLOW is allowed to fail on symlinks; but Linux
+	 blindly fails even for non-symlinks.  */
+      set_errno ((flags & ~AT_SYMLINK_NOFOLLOW) ? EINVAL : EOPNOTSUPP);
       return -1;
     }
   char *path = tp.c_get ();

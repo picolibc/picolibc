@@ -1,5 +1,16 @@
 2009-09-25  Eric Blake  <ebb9@byu.net>
 
+	* syscalls.cc (fchmodat): lchmod is not yet implemented.
+	(euidaccess): New function.
+	* path.cc (realpath): Update comment.
+	(canonicalize_file_name): New function.
+	* include/cygwin/stdlib.h (canonicalize_file_name): Declare it.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* cygwin.din: Export canonicalize_file_name, eaccess, euidaccess.
+	* posix.sgml: Mention them.
+
+2009-09-25  Eric Blake  <ebb9@byu.net>
+
 	* fhandler.h (fhandler_base::fhaccess): Add parameter.
 	* security.h (check_file_access, check_registry_access): Likewise.
 	* security.cc (check_file_access, check_registry_access)

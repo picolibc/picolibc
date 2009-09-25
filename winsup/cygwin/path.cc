@@ -2845,7 +2845,7 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 			   MAX_PATH);
 }
 
-/* The realpath function is supported on some UNIX systems.  */
+/* The realpath function is required by POSIX:2008.  */
 
 extern "C" char *
 realpath (const char *path, char *resolved)
@@ -2876,11 +2876,9 @@ realpath (const char *path, char *resolved)
   path_conv real_path (tpath, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
 
 
-  /* Linux has this funny non-standard extension.  If "resolved" is NULL,
-     realpath mallocs the space by itself and returns it to the application.
-     The application is responsible for calling free() then.  This extension
-     is backed by POSIX, which allows implementation-defined behaviour if
-     "resolved" is NULL.  That's good enough for us to do the same here. */
+  /* POSIX 2008 requires malloc'ing if resolved is NULL, and states
+     that using non-NULL resolved is asking for portability
+     problems.  */
 
   if (!real_path.error && real_path.exists ())
     {
@@ -2894,12 +2892,22 @@ realpath (const char *path, char *resolved)
       return resolved;
     }
 
-  /* FIXME: on error, we are supposed to put the name of the path
-     component which could not be resolved into RESOLVED.  */
+  /* FIXME: on error, Linux puts the name of the path
+     component which could not be resolved into RESOLVED, but POSIX
+     does not require this.  */
   if (resolved)
     resolved[0] = '\0';
   set_errno (real_path.error ?: ENOENT);
   return NULL;
+}
+
+/* Linux provides this extension.  Since the only portable use of
+   realpath requires a NULL second argument, we might as well have a
+   one-argument wrapper.  */
+extern "C" char *
+canonicalize_file_name (const char *path)
+{
+  return realpath (path, NULL);
 }
 
 /* Return non-zero if path is a POSIX path list.

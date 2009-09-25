@@ -1,6 +1,6 @@
 /* stdlib.h
 
-   Copyright 2005, 2006, 2007 Red Hat Inc.
+   Copyright 2005, 2006, 2007, 2008, 2009 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -23,6 +23,7 @@ void	setprogname (const char *);
 
 #ifndef __STRICT_ANSI__
 char *realpath (const char *, char *);
+char *canonicalize_file_name (const char *);
 int unsetenv (const char *);
 char *initstate (unsigned seed, char *state, size_t size);
 long random (void);

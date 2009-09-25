@@ -890,6 +890,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     dn_expand
     dn_skipname
     drem
+    eaccess
     endusershell
     err
     errx
@@ -1005,6 +1006,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asnprintf
     asprintf
     asprintf_r
+    canonicalize_file_name
     dremf
     envz_add
     envz_entry
@@ -1012,6 +1014,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     envz_merge
     envz_remove
     envz_strip
+    euidaccess
     exp10
     exp10f
     fcloseall
