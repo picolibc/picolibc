@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2008, 2009 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -725,15 +725,16 @@ set_file_attribute (HANDLE handle, path_conv &pc,
 
 static int
 check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
-	      DWORD desired, int flags)
+	      DWORD desired, int flags, bool effective)
 {
   int ret = -1;
   BOOL status;
   DWORD granted;
   DWORD plen = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
   PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plen);
-  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.imp_token ()
-					 : hProcImpToken;
+  HANDLE tok = ((effective && cygheap->user.issetuid ())
+		? cygheap->user.imp_token ()
+		: hProcImpToken);
 
   if (!tok && !DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
 				 SecurityImpersonation, TokenImpersonation,
@@ -794,7 +795,7 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 }
 
 int
-check_file_access (path_conv &pc, int flags)
+check_file_access (path_conv &pc, int flags, bool effective)
 {
   security_descriptor sd;
   int ret = -1;
@@ -810,13 +811,13 @@ check_file_access (path_conv &pc, int flags)
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
   if (!get_file_sd (NULL, pc, sd))
-    ret = check_access (sd, mapping, desired, flags);
+    ret = check_access (sd, mapping, desired, flags, effective);
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;
 }
 
 int
-check_registry_access (HANDLE hdl, int flags)
+check_registry_access (HANDLE hdl, int flags, bool effective)
 {
   security_descriptor sd;
   int ret = -1;
@@ -832,7 +833,7 @@ check_registry_access (HANDLE hdl, int flags)
   if (flags & X_OK)
     desired |= KEY_QUERY_VALUE;
   if (!get_reg_sd (hdl, sd))
-    ret = check_access (sd, mapping, desired, flags);
+    ret = check_access (sd, mapping, desired, flags, effective);
   /* As long as we can't write the registry... */
   if (flags & W_OK)
     {

@@ -344,11 +344,11 @@ fhandler_base::device_access_denied (int flags)
   if (!mode)
     mode |= R_OK;
 
-  return fhaccess (mode);
+  return fhaccess (mode, true);
 }
 
 int
-fhandler_base::fhaccess (int flags)
+fhandler_base::fhaccess (int flags, bool effective)
 {
   int res = -1;
   if (error ())
@@ -373,12 +373,12 @@ fhandler_base::fhaccess (int flags)
     goto eaccess_done;
   else if (has_acls ())
     {
-      res = check_file_access (pc, flags);
+      res = check_file_access (pc, flags, effective);
       goto done;
     }
   else if (get_device () == FH_REGISTRY && open (O_RDONLY, 0) && get_handle ())
     {
-      res = check_registry_access (get_handle (), flags);
+      res = check_registry_access (get_handle (), flags, effective);
       close ();
       return res;
     }
@@ -389,12 +389,12 @@ fhandler_base::fhaccess (int flags)
 
   if (flags & R_OK)
     {
-      if (st.st_uid == myself->uid)
+      if (st.st_uid == (effective ? myself->uid : cygheap->user.real_uid))
 	{
 	  if (!(st.st_mode & S_IRUSR))
 	    goto eaccess_done;
 	}
-      else if (st.st_gid == myself->gid)
+      else if (st.st_gid == (effective ? myself->gid : cygheap->user.real_gid))
 	{
 	  if (!(st.st_mode & S_IRGRP))
 	    goto eaccess_done;
@@ -405,12 +405,12 @@ fhandler_base::fhaccess (int flags)
 
   if (flags & W_OK)
     {
-      if (st.st_uid == myself->uid)
+      if (st.st_uid == (effective ? myself->uid : cygheap->user.real_uid))
 	{
 	  if (!(st.st_mode & S_IWUSR))
 	    goto eaccess_done;
 	}
-      else if (st.st_gid == myself->gid)
+      else if (st.st_gid == (effective ? myself->gid : cygheap->user.real_gid))
 	{
 	  if (!(st.st_mode & S_IWGRP))
 	    goto eaccess_done;
@@ -421,12 +421,12 @@ fhandler_base::fhaccess (int flags)
 
   if (flags & X_OK)
     {
-      if (st.st_uid == myself->uid)
+      if (st.st_uid == (effective ? myself->uid : cygheap->user.real_uid))
 	{
 	  if (!(st.st_mode & S_IXUSR))
 	    goto eaccess_done;
 	}
-      else if (st.st_gid == myself->gid)
+      else if (st.st_gid == (effective ? myself->gid : cygheap->user.real_gid))
 	{
 	  if (!(st.st_mode & S_IXGRP))
 	    goto eaccess_done;

@@ -169,7 +169,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       if ((suffix = perhaps_suffix (tmp, buf, err, opt)) != NULL)
 	{
-	  if (buf.has_acls () && check_file_access (buf, X_OK))
+	  if (buf.has_acls () && check_file_access (buf, X_OK, true))
 	    continue;
 
 	  if (posix == tmp)
@@ -1083,7 +1083,8 @@ just_shell:
 
       /* Check if script is executable.  Otherwise we start non-executable
 	 scripts successfully, which is incorrect behaviour. */
-      if (real_path.has_acls () && check_file_access (real_path, X_OK) < 0)
+      if (real_path.has_acls ()
+	  && check_file_access (real_path, X_OK, true) < 0)
 	return -1;	/* errno is already set. */
 
       /* Replace argv[0] with the full path to the script if this is the

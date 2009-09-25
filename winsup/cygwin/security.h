@@ -350,8 +350,8 @@ LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd,
 			    bool is_chown);
 bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
-int __stdcall check_file_access (path_conv &, int);
-int __stdcall check_registry_access (HANDLE, int);
+int __stdcall check_file_access (path_conv &, int, bool);
+int __stdcall check_registry_access (HANDLE, int, bool);
 
 void set_security_attribute (path_conv &pc, int attribute,
 			     PSECURITY_ATTRIBUTES psa,

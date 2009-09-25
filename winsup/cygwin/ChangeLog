@@ -1,3 +1,14 @@
+2009-09-25  Eric Blake  <ebb9@byu.net>
+
+	* fhandler.h (fhandler_base::fhaccess): Add parameter.
+	* security.h (check_file_access, check_registry_access): Likewise.
+	* security.cc (check_file_access, check_registry_access)
+	(check_access): Implement new parameter.
+	* fhandler.cc (fhandler_base::fhaccess): Likewise.
+	(device_access_denied): Update caller.
+	* syscalls.cc (access, faccessat): Update callers.
+	* spawn.cc (find_exec, fixup): Likewise.
+
 2009-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (mq_open): Avoid closing the same descriptor twice in

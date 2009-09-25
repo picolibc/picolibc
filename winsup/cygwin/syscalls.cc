@@ -1572,7 +1572,7 @@ access (const char *fn, int flags)
       fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
       if (fh)
 	{
-	  res =  fh->fhaccess (flags);
+	  res =  fh->fhaccess (flags, false);
 	  delete fh;
 	}
     }
@@ -3862,7 +3862,7 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
 					     stat_suffixes);
 	  if (fh)
 	    {
-	      res =  fh->fhaccess (mode);
+	      res =  fh->fhaccess (mode, flags & AT_EACCESS);
 	      delete fh;
 	    }
 	}

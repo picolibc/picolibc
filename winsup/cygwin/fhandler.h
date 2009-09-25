@@ -392,7 +392,7 @@ class fhandler_base
   bool is_fs_special () {return pc.is_fs_special ();}
   bool issymlink () {return pc.issymlink ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
-  int fhaccess (int flags) __attribute__ ((regparm (2)));
+  int fhaccess (int flags, bool) __attribute__ ((regparm (3)));
 };
 
 class fhandler_mailslot : public fhandler_base
