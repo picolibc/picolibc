@@ -38,7 +38,9 @@ int	_EXFUN(daemon, (int nochdir, int noclose));
 int     _EXFUN(dup, (int __fildes ));
 int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
 #if defined(__CYGWIN__)
+int	_EXFUN(eaccess, (const char *__path, int __mode));
 void	_EXFUN(endusershell, (void));
+int	_EXFUN(euidaccess, (const char *__path, int __mode));
 #endif
 int     _EXFUN(execl, (const char *__path, const char *, ... ));
 int     _EXFUN(execle, (const char *__path, const char *, ... ));

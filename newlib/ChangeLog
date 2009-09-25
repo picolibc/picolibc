@@ -1,3 +1,8 @@
+2009-09-24  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/sys/unistd.h (eaccess, euidaccess) [__CYGWIN__]:
+	Add declarations.
+
 2009-09-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c: Drop Cygwin-specific windows.h include.
