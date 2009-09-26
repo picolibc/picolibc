@@ -1541,7 +1541,7 @@ fhandler_base::ftruncate (_off64_t length, bool allow_truncate)
 int
 fhandler_base::link (const char *newpath)
 {
-  set_errno (EINVAL);
+  set_errno (EPERM);
   return -1;
 }
 

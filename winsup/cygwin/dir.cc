@@ -1,6 +1,7 @@
 /* dir.cc: Posix directory-related routines
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006, 2007 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006, 2007,
+   2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,6 +22,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygtls.h"
+#include "tls_pbuf.h"
 
 extern "C" int
 dirfd (DIR *dir)
@@ -273,11 +275,30 @@ mkdir (const char *dir, mode_t mode)
 {
   int res = -1;
   fhandler_base *fh = NULL;
+  tmp_pathbuf tp;
 
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
+  /* POSIX says mkdir("symlink-to-missing/") should create the
+     directory "missing", but Linux rejects it with EEXIST.  Copy
+     Linux behavior for now.  */
+
+  if (!*dir)
+    {
+      set_errno (ENOENT);
+      goto done;
+    }
+  if (isdirsep (dir[strlen (dir) - 1]))
+    {
+      /* This converts // to /, but since both give EEXIST, we're okay.  */
+      char *buf;
+      char *p = stpcpy (buf = tp.c_get (), dir) - 1;
+      dir = buf;
+      while (p > dir && isdirsep (*p))
+        *p-- = '\0';
+    }
   if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 

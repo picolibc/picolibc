@@ -1124,13 +1124,6 @@ isatty (int fd)
 }
 EXPORT_ALIAS (isatty, _isatty)
 
-/* Under NT, try to make a hard link using backup API.  If that
-   fails or we are Win 95, just copy the file.
-   FIXME: We should actually be checking partition type, not OS.
-   Under NTFS, we should support hard links.  On FAT partitions,
-   we should just copy the file.
-*/
-
 extern "C" int
 link (const char *oldpath, const char *newpath)
 {
@@ -1145,6 +1138,10 @@ link (const char *oldpath, const char *newpath)
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
+  else if (fh->pc.isdir ())
+    set_errno (EPERM); /* We do not permit linking directories.  */
+  else if (!fh->pc.exists ())
+    set_errno (ENOENT);
   else
     res = fh->link (newpath);
 
@@ -1651,7 +1648,6 @@ rename (const char *oldpath, const char *newpath)
 {
   tmp_pathbuf tp;
   int res = -1;
-  char *oldbuf, *newbuf;
   path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
   bool old_dir_requested = false, new_dir_requested = false;
   bool old_explicit_suffix = false, new_explicit_suffix = false;
@@ -1670,16 +1666,21 @@ rename (const char *oldpath, const char *newpath)
   if (efault.faulted (EFAULT))
     return -1;
 
+  if (!*oldpath || !*newpath)
+    {
+      set_errno (ENOENT);
+      goto out;
+    }
   if (has_dot_last_component (oldpath, true))
     {
       oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
-      set_errno (oldpc.isdir () ? EBUSY : ENOTDIR);
+      set_errno (oldpc.isdir () ? EINVAL : ENOTDIR);
       goto out;
     }
   if (has_dot_last_component (newpath, true))
     {
       newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
-      set_errno (!newpc.exists () ? ENOENT : newpc.isdir () ? EBUSY : ENOTDIR);
+      set_errno (!newpc.exists () ? ENOENT : newpc.isdir () ? EINVAL : ENOTDIR);
       goto out;
     }
 
@@ -1689,10 +1690,20 @@ rename (const char *oldpath, const char *newpath)
   olen = strlen (oldpath);
   if (isdirsep (oldpath[olen - 1]))
     {
-      stpcpy (oldbuf = tp.c_get (), oldpath);
-      while (olen > 0 && isdirsep (oldbuf[olen - 1]))
-	oldbuf[--olen] = '\0';
-      oldpath = oldbuf;
+      char *buf;
+      char *p = stpcpy (buf = tp.c_get (), oldpath) - 1;
+      oldpath = buf;
+      while (p >= oldpath && isdirsep (*p))
+        *p-- = '\0';
+      olen = p + 1 - oldpath;
+      if (!olen)
+        {
+          /* The root directory cannot be renamed.  This also rejects
+             the corner case of rename("/","/"), even though it is the
+             same file.  */
+          set_errno (EINVAL);
+          goto out;
+        }
       old_dir_requested = true;
     }
   oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -1724,10 +1735,17 @@ rename (const char *oldpath, const char *newpath)
   nlen = strlen (newpath);
   if (isdirsep (newpath[nlen - 1]))
     {
-      stpcpy (newbuf = tp.c_get (), newpath);
-      while (nlen > 0 && isdirsep (newbuf[nlen - 1]))
-	newbuf[--nlen] = '\0';
-      newpath = newbuf;
+      char *buf;
+      char *p = stpcpy (buf = tp.c_get (), newpath) - 1;
+      newpath = buf;
+      while (p >= newpath && isdirsep (*p))
+        *p-- = '\0';
+      nlen = p + 1 - newpath;
+      if (!nlen) /* The root directory is never empty.  */
+        {
+          set_errno (ENOTEMPTY);
+          goto out;
+        }
       new_dir_requested = true;
     }
   newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -1741,9 +1759,22 @@ rename (const char *oldpath, const char *newpath)
       set_errno (EROFS);
       goto out;
     }
-  if (new_dir_requested && !newpc.isdir ())
+  if (new_dir_requested)
     {
-      set_errno (ENOTDIR);
+      if (!newpc.exists())
+        {
+          set_errno (ENOENT);
+          goto out;
+        }
+      if (!newpc.isdir ())
+        {
+          set_errno (ENOTDIR);
+          goto out;
+        }
+    }
+  if (newpc.exists () && (oldpc.isdir () ? !newpc.isdir () : newpc.isdir ()))
+    {
+      set_errno (newpc.isdir () ? EISDIR : ENOTDIR);
       goto out;
     }
   if (newpc.known_suffix
@@ -1774,22 +1805,23 @@ rename (const char *oldpath, const char *newpath)
     }
   else if (oldpc.isdir ())
     {
-      if (newpc.exists () && !newpc.isdir ())
-	{
-	  set_errno (ENOTDIR);
-	  goto out;
-	}
-      /* Check for newpath being a subdir of oldpath. */
+      /* Check for newpath being identical or a subdir of oldpath. */
       if (RtlPrefixUnicodeString (oldpc.get_nt_native_path (),
 				  newpc.get_nt_native_path (),
-				  TRUE)
-	  && newpc.get_nt_native_path ()->Length >
-	     oldpc.get_nt_native_path ()->Length
-	  && *(PWCHAR) ((PBYTE) newpc.get_nt_native_path ()->Buffer
-			+ oldpc.get_nt_native_path ()->Length) == L'\\')
+				  TRUE))
 	{
-	  set_errno (EINVAL);
-	  goto out;
+	  if (newpc.get_nt_native_path ()->Length
+	      == oldpc.get_nt_native_path ()->Length)
+	    {
+	      res = 0;
+	      goto out;
+	    }
+	  if (*(PWCHAR) ((PBYTE) newpc.get_nt_native_path ()->Buffer
+			 + oldpc.get_nt_native_path ()->Length) == L'\\')
+	    {
+	      set_errno (EINVAL);
+	      goto out;
+	    }
 	}
     }
   else if (!newpc.exists ())
@@ -1815,11 +1847,6 @@ rename (const char *oldpath, const char *newpath)
 	/* To rename an executable foo.exe to bar-without-exe-suffix, the
 	   .exe suffix must be given explicitly in oldpath. */
 	rename_append_suffix (newpc, newpath, nlen, ".exe");
-    }
-  else if (newpc.isdir ())
-    {
-      set_errno (EISDIR);
-      goto out;
     }
   else
     {

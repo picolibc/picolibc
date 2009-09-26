@@ -1,3 +1,15 @@
+2009-09-26  Eric Blake  <ebb9@byu.net>
+
+	* syscalls.cc (link): Delete obsolete comment.  Reject directories
+	and missing source up front.
+	(rename): Use correct errno for trailing '.'.  Detect empty
+	strings.  Allow trailing slash to newpath iff oldpath is
+	directory.
+	* dir.cc (mkdir): Reject dangling symlink with trailing slash.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Reject
+	trailing slash.
+	* fhandler.cc (fhandler_base::link): Match Linux errno.
+
 2009-09-25  Eric Blake  <ebb9@byu.net>
 
 	* syscalls.cc (fchmodat): lchmod is not yet implemented.

@@ -1186,7 +1186,8 @@ fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
 int
 fhandler_disk_file::link (const char *newpath)
 {
-  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
+  size_t nlen = strlen (newpath);
+  path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_POSIX | PC_NULLEMPTY, stat_suffixes);
   if (newpc.error)
     {
       set_errno (newpc.error);
@@ -1200,7 +1201,13 @@ fhandler_disk_file::link (const char *newpath)
       return -1;
     }
 
-  char new_buf[strlen (newpath) + 5];
+  if (isdirsep (newpath[nlen - 1]) || has_dot_last_component (newpath, false))
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  char new_buf[nlen + 5];
   if (!newpc.error)
     {
       if (pc.is_lnk_special ())
