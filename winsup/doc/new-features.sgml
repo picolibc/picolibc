@@ -123,7 +123,7 @@
 
 - Other new APIs: posix_fadvise, posix_fallocate, funopen, fopencookie,
   open_memstream, open_wmemstream, fmemopen, fdopendir, fpurge,
-  mkstemps, eaccess, euidaccess, canonicalize_file_name.
+  mkstemps, eaccess, euidaccess, canonicalize_file_name, fexecve, execvpe.
 </screen>
 
 </sect2>
