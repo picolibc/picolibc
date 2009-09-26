@@ -49,6 +49,7 @@ int     _EXFUN(execv, (const char *__path, char * const __argv[] ));
 int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
 #if defined(__CYGWIN__)
+int     _EXFUN(execvpe, (const char *__file, char * const __argv[], char * const __envp[] ));
 int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
 #endif
 #if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
@@ -60,6 +61,7 @@ int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 #endif
 #if defined(__CYGWIN__)
 int	_EXFUN(fchownat, (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags));
+int	_EXFUN(fexecve, (int __fd, char * const __argv[], char * const __envp[] ));
 #endif
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
