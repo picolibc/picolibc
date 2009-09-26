@@ -1,5 +1,13 @@
 2009-09-26  Eric Blake  <ebb9@byu.net>
 
+	* exec.cc (fexecve): New function.
+	* cygwin.din (execvpe, fexecve): Export new fexecve and existing
+	execvpe.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* posix.sgml: Mention them.
+
+2009-09-26  Eric Blake  <ebb9@byu.net>
+
 	* syscalls.cc (link): Delete obsolete comment.  Reject directories
 	and missing source up front.
 	(rename): Use correct errno for trailing '.'.  Detect empty

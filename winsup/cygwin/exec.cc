@@ -1,6 +1,6 @@
 /* exec.cc: exec system call support.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,10 @@ details. */
 #include "cygerrno.h"
 #include "path.h"
 #include "environ.h"
+#include "sync.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #undef _execve
 
 /* This is called _execve and not execve because the real execve is defined
@@ -90,4 +94,16 @@ execvpe (const char *path, char * const *argv, char *const *envp)
 {
   path_conv buf;
   return  execve (find_exec (path, buf), argv, envp);
+}
+
+extern "C" int
+fexecve (int fd, char * const *argv, char *const *envp)
+{
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    {
+      syscall_printf ("-1 = fexecve (%d, %p, %p)", fd, argv, envp);
+      return -1;
+    }
+  return execve (cfd->pc.get_win32 (), argv, envp);
 }

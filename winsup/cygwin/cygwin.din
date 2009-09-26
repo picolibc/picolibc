@@ -356,6 +356,7 @@ execve SIGFE
 _execve = execve SIGFE
 execvp SIGFE
 _execvp = execvp SIGFE
+execvpe SIGFE
 exit = cygwin_exit SIGFE
 _exit SIGFE
 exp NOSIGFE
@@ -454,6 +455,7 @@ feof SIGFE
 _feof = feof SIGFE
 ferror SIGFE
 _ferror = ferror SIGFE
+fexecve SIGFE
 fflush SIGFE
 _fflush = fflush SIGFE
 ffs NOSIGFE

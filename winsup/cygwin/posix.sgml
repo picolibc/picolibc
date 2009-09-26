@@ -152,6 +152,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fdopendir
     feof
     ferror
+    fexecve
     fflush
     ffs
     fgetc
@@ -1015,6 +1016,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     envz_remove
     envz_strip
     euidaccess
+    execvpe
     exp10
     exp10f
     fcloseall
@@ -1227,7 +1229,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fesetround
     fetestexcept
     feupdateenv
-    fexecve
     floorl
     fmal
     fmaxl
