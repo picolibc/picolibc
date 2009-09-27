@@ -9,7 +9,11 @@
 
 int (*__mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		 const char *, mbstate_t *)
+#ifdef __CYGWIN__
+   = __utf8_mbtowc;
+#else
    = __ascii_mbtowc;
+#endif
 
 int
 _DEFUN (_mbtowc_r, (r, pwc, s, n, state),

@@ -225,8 +225,13 @@ static const char *__get_locale_env(struct _reent *, int);
 
 #endif
 
+#ifdef __CYGWIN__
+static char lc_ctype_charset[ENCODING_LEN + 1] = "UTF-8";
+static char lc_message_charset[ENCODING_LEN + 1] = "UTF-8";
+#else
 static char lc_ctype_charset[ENCODING_LEN + 1] = "ASCII";
 static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
+#endif
 static int lc_ctype_cjk_lang = 0;
 
 char *
@@ -428,7 +433,11 @@ loadlocale(struct _reent *p, int category)
   if (!strcmp (locale, "POSIX"))
     strcpy (locale, "C");
   if (!strcmp (locale, "C"))				/* Default "C" locale */
+#ifdef __CYGWIN__
+    strcpy (charset, "UTF-8");
+#else
     strcpy (charset, "ASCII");
+#endif
   else if (locale[0] == 'C' && locale[1] == '-')	/* Old newlib style */
 	strcpy (charset, locale + 2);
   else							/* POSIX style */

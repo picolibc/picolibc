@@ -8,7 +8,11 @@
 
 int (*__wctomb) (struct _reent *, char *, wchar_t, const char *charset,
 		 mbstate_t *)
+#ifdef __CYGWIN__
+    = __utf8_wctomb;
+#else
     = __ascii_wctomb;
+#endif
 
 int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
