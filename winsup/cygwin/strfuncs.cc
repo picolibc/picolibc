@@ -310,8 +310,7 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
    Called from newlib's setlocale() with codepage set to 0, if the
    charset isn't given explicitely in the POSIX compatible locale specifier.
    The function also returns a pointer to the corresponding _mbtowc_r
-   function.  Also called from fhandler_console::write_normal() if the
-   "Alternate Charset" has been switched on by an escape sequence. */
+   function. */
 extern "C" mbtowc_p
 __set_charset_from_codepage (UINT cp, char *charset)
 {
@@ -400,17 +399,17 @@ __set_charset_from_codepage (UINT cp, char *charset)
      multibyte charset, then usually you wouldn't be able to access the
      file.  To fix this problem, sys_wcstombs creates a replacement multibyte
      sequences for the non-representable wide-char.  The sequence starts with
-     an ASCII SO (0x0e, Ctrl-N), followed by the UTF-8 representation of the
-     character.  The sys_(cp_)mbstowcs function detects ASCII SO characters
+     an ASCII CAN (0x18, Ctrl-X), followed by the UTF-8 representation of the
+     character.  The sys_(cp_)mbstowcs function detects ASCII CAN characters
      in the input multibyte string and converts the following multibyte
      sequence in by treating it as an UTF-8 char.  If that fails, the ASCII
-     SO was probably standalone and it gets just copied over as ASCII SO.
+     CAN was probably standalone and it gets just copied over as ASCII CAN.
 
    - The functions always create 0-terminated results, no matter what.
      If the result is truncated due to buffer size, it's a bug in Cygwin
      and the buffer in the calling function should be raised. */
 size_t __stdcall
-sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
+sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
 		 const wchar_t *src, size_t nwc)
 {
   char buf[10];
@@ -426,46 +425,47 @@ sys_cp_wcstombs (wctomb_p f_wctomb, char *charset, char *dst, size_t len,
   while (n < len && nwc-- > 0)
     {
       wchar_t pw = *pwcs;
-      /* Convert UNICODE private use area.  Reverse functionality (only for
-	 path names) is transform_chars in path.cc. */
-      if ((pw & 0xff00) == 0xf000)
-	pw &= 0xff;
-      int bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
-      if (bytes == -1 && (pw & 0xff00) == 0xdc00)
+      int bytes;
+
+      /* Convert UNICODE private use area.  Reverse functionality for the
+         ASCII area <= 0x7f (only for path names) is transform_chars in
+	 path.cc.  Reverse functionality for invalid bytes in a multibyte
+	 sequence is in sys_cp_mbstowcs. */
+      if ((pw & 0xff00) == 0xf000 && ((pw & 0xff) <= 0x7f || MB_CUR_MAX > 1))
 	{
-	  /* Reverse functionality of the single invalid second half of a
-	     surrogate pair in the 0xDCxx range specifying an invalid byte
-	     value when converting from MB to WC.
-	     The comment in sys_cp_mbstowcs below explains it. */
-	  buf[0] = 0x0e; /* ASCII SO */
-	  buf[1] = 0xff;
-	  buf[2] = (char) (pw & 0xff);
-	  bytes = 3;
-	}
-      else if (bytes == -1 && *charset != 'U'/*TF-8*/)
+	  buf[0] = pw & 0xff;
+	  bytes = 1;
+      	}
+      else
 	{
-	  /* Convert chars invalid in the current codepage to a sequence
-	     ASCII SO; UTF-8 representation of invalid char. */
-	  buf[0] = 0x0e; /* ASCII SO */
-	  bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
-	  if (bytes == -1)
+	  bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
+	  if (bytes == -1 && *charset != 'U'/*TF-8*/)
 	    {
-	      ++pwcs;
-	      ps.__count = 0;
-	      continue;
-	    }
-	  ++bytes; /* Add the ASCII SO to the byte count. */
-	  if (ps.__count == -4 && nwc > 0) /* First half of a surrogate pair. */
-	    {
-	      ++pwcs;
-	      if ((*pwcs & 0xfc00) != 0xdc00) /* Invalid second half. */
+	      /* Convert chars invalid in the current codepage to a sequence
+		 ASCII CAN; UTF-8 representation of invalid char. */
+	      buf[0] = 0x18; /* ASCII CAN */
+	      bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
+	      if (bytes == -1)
 		{
 		  ++pwcs;
 		  ps.__count = 0;
 		  continue;
 		}
-	      bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset, &ps);
-	      nwc--;
+	      ++bytes; /* Add the ASCII CAN to the byte count. */
+	      if (ps.__count == -4 && nwc > 0)
+		{
+		  /* First half of a surrogate pair. */
+		  ++pwcs;
+		  if ((*pwcs & 0xfc00) != 0xdc00) /* Invalid second half. */
+		    {
+		      ++pwcs;
+		      ps.__count = 0;
+		      continue;
+		    }
+		  bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset,
+					  &ps);
+		  nwc--;
+		}
 	    }
 	}
       if (n + bytes <= len)
@@ -535,8 +535,8 @@ sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src, size_t nwc)
    charset, which is the charset returned by GetConsoleCP ().  Most of the
    time this is used for box and line drawing characters. */
 size_t __stdcall
-sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
-		 const char *src, size_t nms)
+sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
+		 size_t dlen, const char *src, size_t nms)
 {
   wchar_t *ptr = dst;
   unsigned const char *pmbs = (unsigned const char *) src;
@@ -551,10 +551,10 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
     len = (size_t)-1;
   while (len > 0 && nms > 0)
     {
-      /* ASCII SO handling. */
-      if (*pmbs == 0x0e)
+      /* ASCII CAN handling. */
+      if (*pmbs == 0x18)
 	{
-	  /* Sanity check: If this is a lead SO byte for a following UTF-8
+	  /* Sanity check: If this is a lead CAN byte for a following UTF-8
 	     sequence, there must be at least two more bytes left, and the
 	     next byte must be a valid UTF-8 start byte.  If the charset
 	     isn't UTF-8 anyway, try to convert the following bytes as UTF-8
@@ -565,16 +565,16 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 				     nms - 1, charset, &ps);
 	      if (bytes < 0)
 		{
-		  /* Invalid UTF-8 sequence?  Treat the ASCII SO character as
-		     stand-alone ASCII SO char. */
+		  /* Invalid UTF-8 sequence?  Treat the ASCII CAN character as
+		     stand-alone ASCII CAN char. */
 		  bytes = 1;
 		  if (dst)
-		    *ptr = 0x0e;
+		    *ptr = 0x18;
 		  memset (&ps, 0, sizeof ps);
 		}
 	      else
 		{
-		  ++bytes; /* Count SO byte */
+		  ++bytes; /* Count CAN byte */
 		  if (bytes > 1 && ps.__count == 4)
 		    {
 		      /* First half of a surrogate. */
@@ -594,40 +594,28 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, char *charset, wchar_t *dst, size_t dlen,
 		    }
 		}
 	    }
-	  /* Sequence for an invalid byte originally created in the next outer
-	     else branch below.  This must be converted back to a 0xDCxx value
-	     as well. */
-	  else if (nms > 2 && pmbs[1] == 0xff)
-	    {
-	      bytes = 3;
-	      if (dst)
-		*ptr = L'\xdc80' | pmbs[2];
-	    }
-	  /* Otherwise it's just a simple ASCII SO. */
+	  /* Otherwise it's just a simple ASCII CAN. */
 	  else
 	    {
 	      bytes = 1;
 	      if (dst)
-		*ptr = 0x0e;
+		*ptr = 0x18;
 	    }
 	}
       else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
 				  charset, &ps)) < 0
-	       && *pmbs >= 0x80)
+	       || (bytes == 3 && pmbs[0] == 0xef && (pmbs[1] & 0xf4) == 0x80))
 	{
-	  /* This should probably be handled in f_mbtowc which can operate
-	     on sequences rather than individual characters.
-	     The technique is based on a discussion here:
-
+	  /* The technique is based on a discussion here:
 	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
 
-	     This is hardly perfect.  Windows doesn't do anything sensical with
-	     characters converted to this format.  It does allow processing of
-	     src to continue, however, which, since there is no way to signal
-	     decoding errors, seems like the best we can do. */
+	     Invalid bytes in a multibyte secuence are converted to
+	     the private use area which is already used to store ASCII
+	     chars invalid in Windows filenames.  This techinque allows 
+	     to store them in a symmetric way. */
 	  bytes = 1;
 	  if (dst)
-	    *ptr = L'\xdc80' | *pmbs;
+	    *ptr = L'\xf000' | *pmbs;
 	  memset (&ps, 0, sizeof ps);
 	}
 

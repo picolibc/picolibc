@@ -1,5 +1,31 @@
 2009-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class dev_console): Constify charset parameter of
+	str_to_con.
+	* fhandler_console.cc (dev_console::con_to_str): Simplify.  Always
+	default to the current internal locale.
+	(dev_console::get_console_cp): Always use codepage 437 for alternate
+	charset.
+	(dev_console::str_to_con): Constify charset parameter.
+	(fhandler_console::write_normal): Always use codepage 437 for alternate
+	charset.  Otherwise always default to the current internal locale.
+	Replace ASCII SO with ASCII CAN.
+	* strfuncs.cc: Tweka comments according to below changes.
+	(sys_cp_wcstombs): Constify charset parameter.  Convert all wchar_t
+	values in the Unicode private use area U+F0xx to the singlebyte
+	counterpart.  Drop special handling creating ASCII SO sequence from
+	U+DCxx value.  Rearrange for performance.  Replace ASCII SO with
+	ASCII CAN.
+	(sys_cp_mbstowcs): Constify charset parameter.  Replace ASCII SO with
+	ASCII CAN.  Drop special case for U+DCxx ASCII SO sequences.  Always
+	create a replacement from the Unicode private use area U+F0xx for
+	invalid byte values in a multibyte sequence.  Do the same for wchar_t
+	values from the U+F0xx range to make them roundtrip safe.
+	* wchar.h (sys_cp_wcstombs): Constify charset parameter.
+	(sys_cp_mbstowcs): Ditto.
+
+2009-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_init): Default locale.charset to "UTF-8".
 	* dcrt0.cc (dll_crt0_1): Call setlocale (LC_CTYPE, "") here, just
 	before resetting application locale to "C".

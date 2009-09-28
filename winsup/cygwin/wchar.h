@@ -51,7 +51,7 @@ extern mbtowc_p __set_charset_from_codepage (unsigned int cp, char *charset);
 #endif
 
 #ifdef __INSIDE_CYGWIN__
-size_t __stdcall sys_cp_wcstombs (wctomb_p, char *, char *, size_t,
+size_t __stdcall sys_cp_wcstombs (wctomb_p, const char *, char *, size_t,
 				  const wchar_t *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 size_t __stdcall sys_wcstombs (char *dst, size_t len, const wchar_t * src,
@@ -61,7 +61,7 @@ size_t __stdcall sys_wcstombs_alloc (char **, int, const wchar_t *,
 				     size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 
-size_t __stdcall sys_cp_mbstowcs (mbtowc_p, char *, wchar_t *, size_t,
+size_t __stdcall sys_cp_mbstowcs (mbtowc_p, const char *, wchar_t *, size_t,
 				  const char *, size_t = (size_t) -1)
        __attribute__ ((regparm(3)));
 size_t __stdcall sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,

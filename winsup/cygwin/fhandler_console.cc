@@ -127,19 +127,19 @@ tty_list::get_tty (int n)
 inline DWORD
 dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return sys_cp_wcstombs (*cygheap->locale.charset == 'A'
-			  ? __ascii_wctomb : cygheap->locale.wctomb,
-			  cygheap->locale.charset, d, dlen, &w, 1);
+  return sys_cp_wcstombs (cygheap->locale.wctomb, cygheap->locale.charset,
+			  d, dlen, &w, 1);
 }
 
 inline UINT
 dev_console::get_console_cp ()
 {
-  return alternate_charset_active ? GetConsoleOutputCP () : 0;
+  /* The alternate charset is always 437, just as in the Linux console. */
+  return alternate_charset_active ? 437 : 0;
 }
 
 inline DWORD
-dev_console::str_to_con (mbtowc_p f_mbtowc, char *charset,
+dev_console::str_to_con (mbtowc_p f_mbtowc, const char *charset,
 			 PWCHAR d, const char *s, DWORD sz)
 {
   return sys_cp_mbstowcs (f_mbtowc, charset, d, CONVERT_LIMIT, s, sz);
@@ -1454,16 +1454,19 @@ fhandler_console::write_normal (const unsigned char *src,
   size_t ret;
   mbstate_t ps;
   UINT cp = dev_state->get_console_cp ();
-  char charsetbuf[ENCODING_LEN + 1];
-  char *charset;
+  const char *charset;
   mbtowc_p f_mbtowc;
 
   if (cp)
-    f_mbtowc = __set_charset_from_codepage (cp, charset = charsetbuf);
+    {
+      /* The alternate charset is always 437, just as in the Linux console. */
+      f_mbtowc = __cp_mbtowc;
+      charset = "CP437";
+    }
   else
     {
+      f_mbtowc = cygheap->locale.mbtowc;
       charset = cygheap->locale.charset;
-      f_mbtowc = (*charset == 'A') ? __ascii_mbtowc : cygheap->locale.mbtowc;
     }
 
   /* First check if we have cached lead bytes of a former try to write
@@ -1606,10 +1609,10 @@ fhandler_console::write_normal (const unsigned char *src,
 	  cursor_set (false, 0, y);
 	  break;
 	case ERR:
-	  /* Don't print chars marked as ERR chars, except for a SO sequence
-	     which is printed as singlebyte chars from the UTF Basic Latin
-	     and Latin 1 Supplement plains. */
-	  if (*found == 0x0e)
+	  /* Don't print chars marked as ERR chars, except for a ASCII CAN
+	     sequence which is printed as singlebyte chars from the UTF
+	     Basic Latin and Latin 1 Supplement plains. */
+	  if (*found == 0x18)
 	    {
 	      write_replacement_char ();
 	      if (found + 1 < end)
