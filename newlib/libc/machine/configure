@@ -480,6 +480,7 @@ ac_subdirs_all="$ac_subdirs_all m68hc11"
 ac_subdirs_all="$ac_subdirs_all m68k"
 ac_subdirs_all="$ac_subdirs_all m88k"
 ac_subdirs_all="$ac_subdirs_all mep"
+ac_subdirs_all="$ac_subdirs_all microblaze"
 ac_subdirs_all="$ac_subdirs_all mips"
 ac_subdirs_all="$ac_subdirs_all mn10200"
 ac_subdirs_all="$ac_subdirs_all mn10300"
@@ -11458,6 +11459,10 @@ subdirs="$subdirs m88k"
 	mep )
 
 subdirs="$subdirs mep"
+ ;;
+	microblaze)
+
+subdirs="$subdirs microblaze"
  ;;
 	mips)
 

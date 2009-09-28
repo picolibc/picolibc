@@ -140,6 +140,11 @@ _BEGIN_STD_C
 #define _JBTYPE double
 #endif
 
+#ifdef __MICROBLAZE__
+#define _JBLEN  20
+#define _JBTYPE unsigned int
+#endif
+
 #ifdef __hppa__
 /* %r30, %r2-%r18, %r27, pad, %fr12-%fr15.
    Note space exists for the FP registers, but they are not

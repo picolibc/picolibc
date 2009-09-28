@@ -2323,7 +2323,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 {
 #ifdef MALLOC_PROVIDED
 
-  malloc (bytes);
+  return malloc (bytes); // Make sure that the pointer returned by malloc is returned back.
 
 #else
 
