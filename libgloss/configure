@@ -302,6 +302,7 @@ ac_subdirs_all="$ac_subdirs_all arm"
 ac_subdirs_all="$ac_subdirs_all spu"
 ac_subdirs_all="$ac_subdirs_all iq2000"
 ac_subdirs_all="$ac_subdirs_all libnosys"
+ac_subdirs_all="$ac_subdirs_all microblaze"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar subdirs CC DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE AS AR LD RANLIB ac_ct_RANLIB CCAS CCASFLAGS host_makefile_frag_path LIBOBJS LTLIBOBJS'
 ac_subst_files='host_makefile_frag'
 
@@ -1996,6 +1997,13 @@ subdirs="$subdirs spu"
 
 
 subdirs="$subdirs iq2000"
+
+	;;
+
+  microblaze*-*-*)
+
+
+subdirs="$subdirs microblaze"
 
 	;;
 esac
