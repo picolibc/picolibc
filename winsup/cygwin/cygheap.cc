@@ -164,7 +164,7 @@ cygheap_init ()
       /* Default locale settings. */
       cygheap->locale.mbtowc = __utf8_mbtowc;
       cygheap->locale.wctomb = __utf8_wctomb;
-      strcpy (cygheap->locale.charset, "ASCII");
+      strcpy (cygheap->locale.charset, "UTF-8");
       /* Set umask to a sane default. */
       cygheap->umask = 022;
     }

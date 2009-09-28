@@ -732,7 +732,6 @@ environ_init (char **envp, int envc)
   static char NO_COPY cygterm[] = "TERM=cygwin";
   myfault efault;
   tmp_pathbuf tp;
-  static const char *lc_arr[] = { "LC_ALL", "LC_CTYPE", "LANG", NULL };
 
   if (efault.faulted ())
     api_fatal ("internal error reading the windows environment - too many environment variables?");
@@ -777,22 +776,6 @@ environ_init (char **envp, int envc)
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
 
-  /* We need the locale variables' content before we can loop through
-     the whole environment, so that the wide-char to multibyte conversion
-     can be done according to the $LC_ALL/$LC_CTYPE/$LANG/current_codepage
-     setting, as well as the uppercasing according to the "upcaseenv"
-     setting.  Note that we have to reset the LC_CTYPE setting to "C"
-     before calling main() for POSIX compatibility. */
-  for (int lc = 0; lc_arr[lc]; ++lc)
-    {
-      if ((i = GetEnvironmentVariableA (lc_arr[lc], NULL, 0)))
-      	{
-	  char *buf = (char *) alloca (i);
-	  GetEnvironmentVariableA (lc_arr[lc], buf, i);
-	  if (setlocale (LC_CTYPE, buf))
-	    break;
-	}
-    }
   /* We also need the CYGWIN variable early to know the value of the
      CYGWIN=upcaseenv setting for the below loop. */
   if ((i = GetEnvironmentVariableA ("CYGWIN", NULL, 0)))

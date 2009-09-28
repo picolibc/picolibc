@@ -1,3 +1,17 @@
+2009-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_init): Default locale.charset to "UTF-8".
+	* dcrt0.cc (dll_crt0_1): Call setlocale (LC_CTYPE, "") here, just
+	before resetting application locale to "C".
+	* environ.cc (environ_init): Drop code setting locale here.
+	* syscalls.cc (check_codepage): Break out check for required codepage
+	from internal_setlocale.
+	(internal_setlocale): Just convert CWD and $PATH from old charset to
+	new charset and set internal charset.
+	(setlocale): Change accordingly.  Don't require LC_ALL or LC_CTYPE to
+	store old locale value.  Always call internal_setlocale if charset
+	changed due to locale environment changes.
+
 2009-09-26  Eric Blake  <ebb9@byu.net>
 
 	* exec.cc (fexecve): New function.

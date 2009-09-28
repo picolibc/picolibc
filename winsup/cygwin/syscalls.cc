@@ -4151,69 +4151,79 @@ unlinkat (int dirfd, const char *pathname, int flags)
 }
 
 static char *
-internal_setlocale (char *ret)
+check_codepage (char *ret)
 {
-  tmp_pathbuf tp;
+  if (!wincap.has_always_all_codepages ())
+    {
+      /* Prior to Windows Vista, many codepages are not installed by
+	 default, or can be deinstalled.  The following codepages require
+	 that the respective conversion tables are installed into the OS.
+	 So we check if they are installed and if not, setlocale should
+	 fail. */
+      CPINFO cpi;
+      UINT cp = 0;
+      if (__mbtowc == __sjis_mbtowc)
+	cp = 932;
+      else if (__mbtowc == __eucjp_mbtowc)
+	cp = 20932;
+      else if (__mbtowc == __gbk_mbtowc)
+	cp = 936;
+      else if (__mbtowc == __kr_mbtowc)
+	cp = 949;
+      else if (__mbtowc == __big5_mbtowc)
+	cp = 950;
+      if (cp && !GetCPInfo (cp, &cpi)
+	  && GetLastError () == ERROR_INVALID_PARAMETER)
+	return NULL;
+    }
+  return ret;
+}
 
-  /* Each setlocale potentially changes the multibyte representation
-     of the CWD.  Therefore we have to reevaluate the CWD's posix path and
-     store in the new charset. */
+static void
+internal_setlocale ()
+{
+  /* Each setlocale from the environment potentially changes the
+     multibyte representation of the CWD.  Therefore we have to
+     reevaluate the CWD's posix path and store in the new charset.
+     Same for the PATH environment variable. */
   /* FIXME: Other buffered paths might be affected as well. */
-  wchar_t *w_cwd = tp.w_get ();
+  tmp_pathbuf tp;
+  wchar_t *w_path, *w_cwd;
+
+  debug_printf ("Cygwin charset changed from %s to %s",
+		cygheap->locale.charset, __locale_charset ());
+  /* Fetch CWD and PATH and convert to wchar_t in previous charset. */
+  w_path = tp.w_get ();
+  sys_mbstowcs (w_path, 32768, getenv ("PATH"));
+  w_cwd = tp.w_get ();
   cwdstuff::cwd_lock.acquire ();
   sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
-
-  if (*__locale_charset () == 'A')
-    {
-      cygheap->locale.mbtowc = __utf8_mbtowc;
-      cygheap->locale.wctomb = __utf8_wctomb;
-    }
-  else
-    {
-      if (!wincap.has_always_all_codepages ())
-	{
-	  /* Prior to Windows Vista, many codepages are not installed by
-	     default, or can be deinstalled.  The following codepages require
-	     that the respective conversion tables are installed into the OS.
-	     So we check if they are installed and if not, setlocale should
-	     fail. */
-	  CPINFO cpi;
-	  UINT cp = 0;
-	  if (__mbtowc == __sjis_mbtowc)
-	    cp = 932;
-	  else if (__mbtowc == __eucjp_mbtowc)
-	    cp = 20932;
-	  else if (__mbtowc == __gbk_mbtowc)
-	    cp = 936;
-	  else if (__mbtowc == __kr_mbtowc)
-	    cp = 949;
-	  else if (__mbtowc == __big5_mbtowc)
-	    cp = 950;
-	  if (cp && !GetCPInfo (cp, &cpi)
-	      && GetLastError () == ERROR_INVALID_PARAMETER)
-	    return NULL;
-	}
-      cygheap->locale.mbtowc = __mbtowc;
-      cygheap->locale.wctomb = __wctomb;
-    }
+  /* Set charset for internal conversion functions. */
+  cygheap->locale.mbtowc = __mbtowc;
+  cygheap->locale.wctomb = __wctomb;
   strcpy (cygheap->locale.charset, __locale_charset ());
-
-  /* See above. */
+  /* Restore CWD and PATH in new charset. */
   cygheap->cwd.reset_posix (w_cwd);
   cwdstuff::cwd_lock.release ();
-  return ret;
+  char *c_path = tp.c_get ();
+  sys_wcstombs (c_path, 32768, w_path);
+  setenv ("PATH", c_path, 1);
 }
 
 extern "C" char *
 setlocale (int category, const char *locale)
 {
   char old[(LC_MESSAGES + 1) * (ENCODING_LEN + 1/*"/"*/ + 1)];
-  if (locale && (category == LC_ALL || category == LC_CTYPE)
-      && !wincap.has_always_all_codepages ())
+  if (locale && !wincap.has_always_all_codepages ())
     stpcpy (old, _setlocale_r (_REENT, category, NULL));
   char *ret = _setlocale_r (_REENT, category, locale);
-  if (ret && locale && (category == LC_ALL || category == LC_CTYPE)
-      && !(ret = internal_setlocale (ret)))
-    _setlocale_r (_REENT, category, old);
+  if (ret && locale)
+    {
+      if (!(ret = check_codepage (ret)))
+	_setlocale_r (_REENT, category, old);
+      else if (!*locale && strcmp (cygheap->locale.charset,
+				   __locale_charset ()) != 0)
+	internal_setlocale ();
+    }
   return ret;
 }
