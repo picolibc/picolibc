@@ -2021,9 +2021,22 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 
 	  case 'p':
 	    /*
-	     * Pointer argument; format as hexadecimal, with `0x' prefix...
+	     * Pointer argument; format as hexadecimal, subject to...
 	     */
-	    stream.flags |= PFORMAT_HASHED;
+	    if( (state == PFORMAT_INIT) && (stream.flags == flags) )
+	    {
+	      /* Here, the user didn't specify any particular
+	       * formatting attributes.  We must choose a default
+	       * which will be compatible with Microsoft's (broken)
+	       * scanf() implementation, (i.e. matching the default
+	       * used by MSVCRT's printf(), which appears to resemble
+	       * "%0.8X" for 32-bit pointers); in particular, we MUST
+	       * NOT adopt a GNU-like format resembling "%#x", because
+	       * Microsoft's scanf() will choke on the "0x" prefix.
+	       */
+	      stream.flags |= PFORMAT_ZEROFILL;
+	      stream.precision = 2 * sizeof( uintptr_t );
+	    }
 	    argval.__pformat_ullong_t = va_arg( argv, uintptr_t );
 	    __pformat_xint( 'x', argval, &stream );
 	    goto format_scan;

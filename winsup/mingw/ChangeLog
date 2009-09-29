@@ -1,3 +1,16 @@
+2009-09-29  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Make MinGW printf() "%p" format compatible with MSVCRT scanf().
+	(Based on MinGW-patch 2844514 by Peter Rosin <peda@lysator.liu.se>)
+
+	* mingwex/stdio/pformat.c (__printf) [%p]: Do not arbitrarily apply...
+	(PFORMAT_HASHED): ...this formatting attribute; honour only user
+	specified format qualifiers, except in special case...
+	[%p && stream.flags == flags && state == PFORMAT_INIT]: Apply...
+	(PFORMAT_ZEROFILL): ...this default formatting attribute...
+	(stream.precision): ...filled to at least 2 * sizeof( uintptr_t )
+	hexadecimal digits.
+
 2009-09-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Avoid multiple link time definitions of _printf() for C++;
