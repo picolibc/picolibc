@@ -165,4 +165,7 @@ END_RELOC_NUMBERS (R_PPC64_max)
 #define DT_PPC64_OPD		(DT_LOPROC + 1)
 #define DT_PPC64_OPDSZ		(DT_LOPROC + 2)
 
+/* Specify that tls descriptors should be optimized.  */
+#define DT_PPC64_TLSOPT		(DT_LOPROC + 3)
+
 #endif /* _ELF_PPC64_H */

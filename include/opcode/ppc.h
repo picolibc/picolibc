@@ -22,7 +22,9 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #ifndef PPC_H
 #define PPC_H
 
-typedef unsigned long ppc_cpu_t;
+#include "bfd_stdint.h"
+
+typedef uint64_t ppc_cpu_t;
 
 /* The opcode table is an array of struct powerpc_opcode.  */
 
@@ -164,6 +166,9 @@ extern const int powerpc_num_opcodes;
 
 /* Opcode is supported by Vector-Scalar (VSX) Unit */
 #define PPC_OPCODE_VSX		 0x80000000
+
+/* Opcode is supported by A2.  */
+#define PPC_OPCODE_PPCA2	 0x100000000ULL
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
