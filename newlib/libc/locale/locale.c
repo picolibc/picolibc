@@ -61,6 +61,11 @@ backward compatibility with older implementations using newlib:
 xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 
+Instead of <<"C-">>, you can specify also <<"C.">>.  Both variations allow
+to specify language neutral locales while using other charsets than ASCII,
+for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
+but uses the UTF-8 charset.
+
 Even when using POSIX locale strings, the only charsets allowed are
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<KOI8-R>>, <<KOI8-U>>,
 <<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
@@ -438,8 +443,14 @@ loadlocale(struct _reent *p, int category)
 #else
     strcpy (charset, "ASCII");
 #endif
-  else if (locale[0] == 'C' && locale[1] == '-')	/* Old newlib style */
-	strcpy (charset, locale + 2);
+  else if (locale[0] == 'C'
+	   && (locale[1] == '-'		/* Old newlib style */
+	       || locale[1] == '.'))	/* Extension for the C locale to allow
+					   specifying different charsets while
+					   sticking to the C locale in terms
+					   of sort order, etc.  Proposed in
+					   the Debian project. */
+    strcpy (charset, locale + 2);
   else							/* POSIX style */
     {
       char *c = locale;

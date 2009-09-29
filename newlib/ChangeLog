@@ -1,4 +1,9 @@
-2009-09-27  Corinna Vinschen  <corinna@vinschen.de>
+2009-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Allow "C." same as "C-" as locale
+	prefix.  Add some words to documentation.
+
+2009-09-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/sb_charsets.c: Throughout, translate undefined
 	characters to their corresponding Windows Unicode value.
