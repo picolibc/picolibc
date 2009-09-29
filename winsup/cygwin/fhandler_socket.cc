@@ -1397,7 +1397,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	 This also covers another weird case: Winsock returns WSAEFAULT if
 	 namelen is a valid pointer while name is NULL.  Both parameters are
 	 ignored for TCP sockets, so this only occurs when using UDP socket. */
-      else if (!wsamsg->name)
+      else if (!wsamsg->name || get_socket_type () == SOCK_STREAM)
 	res = WSARecv (get_socket (), wsabuf, wsacnt, &wret, &wsamsg->dwFlags,
 		       NULL, NULL);
       else

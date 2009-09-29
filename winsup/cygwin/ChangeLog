@@ -1,3 +1,8 @@
+2009-09-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recv_internal): Always call
+	WSARecv on SOCK_STREAM sockets.
+
 2009-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class dev_console): Constify charset parameter of
