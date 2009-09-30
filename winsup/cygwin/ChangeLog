@@ -1,3 +1,7 @@
+2009-09-29  Eric Blake  <ebb9@byu.net>
+
+	* syscalls.cc (rename): Fix regression in rename("dir","d/").
+
 2009-09-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::recv_internal): Always call

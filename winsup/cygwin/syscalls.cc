@@ -1668,17 +1668,20 @@ rename (const char *oldpath, const char *newpath)
 
   if (!*oldpath || !*newpath)
     {
+      /* Reject rename("","x"), rename("x","").  */
       set_errno (ENOENT);
       goto out;
     }
   if (has_dot_last_component (oldpath, true))
     {
+      /* Reject rename("dir/.","x").  */
       oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
       set_errno (oldpc.isdir () ? EINVAL : ENOTDIR);
       goto out;
     }
   if (has_dot_last_component (newpath, true))
     {
+      /* Reject rename("dir","x/.").  */
       newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
       set_errno (!newpc.exists () ? ENOENT : newpc.isdir () ? EINVAL : ENOTDIR);
       goto out;
@@ -1724,6 +1727,7 @@ rename (const char *oldpath, const char *newpath)
     }
   if (old_dir_requested && !oldpc.isdir ())
     {
+      /* Reject rename("file/","x").  */
       set_errno (ENOTDIR);
       goto out;
     }
@@ -1759,21 +1763,16 @@ rename (const char *oldpath, const char *newpath)
       set_errno (EROFS);
       goto out;
     }
-  if (new_dir_requested)
+  if (new_dir_requested && !(newpc.exists ()
+                             ? newpc.isdir () : oldpc.isdir ()))
     {
-      if (!newpc.exists())
-        {
-          set_errno (ENOENT);
-          goto out;
-        }
-      if (!newpc.isdir ())
-        {
-          set_errno (ENOTDIR);
-          goto out;
-        }
+      /* Reject rename("file1","file2/"), but allow rename("dir","d/").  */
+      set_errno (newpc.exists () ? ENOTDIR : ENOENT);
+      goto out;
     }
   if (newpc.exists () && (oldpc.isdir () ? !newpc.isdir () : newpc.isdir ()))
     {
+      /* Reject rename("file","dir") and rename("dir","file").  */
       set_errno (newpc.isdir () ? EISDIR : ENOTDIR);
       goto out;
     }
