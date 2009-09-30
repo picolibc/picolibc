@@ -1,3 +1,9 @@
+2009-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (beep): Move up to avoid forward declaration.
+	(fhandler_console::read): Just beep on characters invalid in current
+	charset.  Add comment.
+
 2009-09-29  Eric Blake  <ebb9@byu.net>
 
 	* syscalls.cc (rename): Fix regression in rename("dir","d/").

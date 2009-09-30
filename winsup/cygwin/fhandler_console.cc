@@ -58,6 +58,23 @@ static console_state NO_COPY *shared_console_info;
 
 dev_console NO_COPY *fhandler_console::dev_state;
 
+static void
+beep ()
+{
+  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, "AppEvents", "Schemes", "Apps",
+	     ".Default", ".Default", ".Current", NULL);
+  if (r.created ())
+    {
+      char *buf = NULL;
+      UINT len = GetWindowsDirectory (buf, 0);
+      buf = (char *) alloca (len += sizeof ("\\media\\ding.wav"));
+      UINT res = GetWindowsDirectory (buf, len);
+      if (res && res <= len)
+	r.set_string ("", strcat (buf, "\\media\\ding.wav"));
+    }
+  MessageBeep (MB_OK);
+}
+
 /* Allocate and initialize the shared record for the current console.
    Returns a pointer to shared_console_info. */
 tty_min *
@@ -350,7 +367,18 @@ fhandler_console::read (void *pv, size_t& buflen)
 		     && ((control_key_state & CTRL_PRESSED) == 0
 			 || (wch <= 0x1f || wch == 0x7f));
 	      if (!meta)
-		toadd = tmp + 1;
+		{
+		  /* Determine if the character is in the current multibyte
+		     charset.  The test is easy.  If the multibyte sequence
+		     is > 1 and the first byte is ASCII CAN, the character
+		     has been translated into the ASCII CAN + UTF-8 replacement
+		     sequence.  If so, just ignore the keypress.
+		     FIXME: Is there a better solution? */
+		  if (nread > 1 && tmp[1] == 0x18)
+		    beep ();
+		  else
+		    toadd = tmp + 1;
+		}
 	      else if (dev_state->metabit)
 		{
 		  tmp[1] |= 0x80;
@@ -1413,23 +1441,6 @@ fhandler_console::char_command (char c)
 bad_escape:
       break;
     }
-}
-
-static void
-beep ()
-{
-  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, "AppEvents", "Schemes", "Apps",
-	     ".Default", ".Default", ".Current", NULL);
-  if (r.created ())
-    {
-      char *buf = NULL;
-      UINT len = GetWindowsDirectory (buf, 0);
-      buf = (char *) alloca (len += sizeof ("\\media\\ding.wav"));
-      UINT res = GetWindowsDirectory (buf, len);
-      if (res && res <= len)
-	r.set_string ("", strcat (buf, "\\media\\ding.wav"));
-    }
-  MessageBeep (MB_OK);
 }
 
 /* This gets called when we found an invalid input character.  We just
