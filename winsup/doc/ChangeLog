@@ -1,3 +1,14 @@
+2009-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7-file): Ctrl-X, not Ctrl-N.
+	* pathnames.sgml (pathnames-unusual): Ditto.
+	* setup2.sgml (setup-locale-ov): Change description according to
+	latest changes.
+	(setup-locale-how): Rewrite.
+	(setup-locale-console): Enable section again.  Change to reflect
+	recent changes.
+	(setup-locale-problems): Change to reflect recent changes.
+
 2009-09-26  Eric Blake  <ebb9@byu.net>
 
 	* new-features.sgml (ov-new1.7-file): Mention fexecve, execvpe.

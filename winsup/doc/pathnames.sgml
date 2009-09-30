@@ -424,14 +424,14 @@ reason, you will nevertheless be able to access the file.  How does that
 work?  When Cygwin converts the filename from UTF-16 to your character
 set, it recognizes characters which can't be converted.  If that occurs,
 Cygwin replaces the non-convertible character with a special character
-sequence.  The sequence starts with an ASCII SO character (hex code
-0x0e, equivalent Control-N), followed by the UTF-8 representation of the
+sequence.  The sequence starts with an ASCII CAN character (hex code
+0x18, equivalent Control-X), followed by the UTF-8 representation of the
 character.  The result is a filename containing some ugly looking
 characters.  While it doesn't <emphasis>look</emphasis> nice, it
 <emphasis>is</emphasis> nice, because Cygwin knows how to convert this
 filename back to UTF-16.  The filename will be converted using your
-usual character set.  However, when Cygwin recognizes an ASCII SO
-character, it skips over the ASCII SO and handles the following bytes as
+usual character set.  However, when Cygwin recognizes an ASCII CAN
+character, it skips over the ASCII CAN and handles the following bytes as
 a UTF-8 character.  Thus, the filename is symmetrically converted back to
 UTF-16 and you can access the file.</para>
 

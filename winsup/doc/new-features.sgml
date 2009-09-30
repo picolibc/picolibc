@@ -22,7 +22,7 @@
   /etc/fstab.
 
 - If a filename cannot be represented in the current character set,
-  the character will be converted to a sequence Ctrl-N + UTF-8 representation
+  the character will be converted to a sequence Ctrl-X + UTF-8 representation
   of the character.  This allows to access all files, even those not
   having a valid representation of their filename in the current character
   set (codepage).  To always have a valid string, use the UTF-8 charset
