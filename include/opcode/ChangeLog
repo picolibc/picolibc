@@ -1,3 +1,7 @@
+2009-10-01  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* ppc.h (PPC_OPCODE_A2): Rename from PPC_OPCODE_PPCA2.
+
 2009-09-22  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (ppc_cpu_t): Typedef to uint64_t.

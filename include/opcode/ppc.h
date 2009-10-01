@@ -168,7 +168,7 @@ extern const int powerpc_num_opcodes;
 #define PPC_OPCODE_VSX		 0x80000000
 
 /* Opcode is supported by A2.  */
-#define PPC_OPCODE_PPCA2	 0x100000000ULL
+#define PPC_OPCODE_A2	 	0x100000000ULL
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
