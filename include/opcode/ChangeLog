@@ -1,3 +1,7 @@
+2009-10-02  Peter Bergner  <bergner@vnet.ibm.com>
+
+	* ppc.h (PPC_OPCODE_476): Define.
+
 2009-10-01  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (PPC_OPCODE_A2): Rename from PPC_OPCODE_PPCA2.

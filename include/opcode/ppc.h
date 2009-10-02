@@ -170,6 +170,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by A2.  */
 #define PPC_OPCODE_A2	 	0x100000000ULL
 
+/* Opcode is supported by PowerPC 476 processor.  */
+#define PPC_OPCODE_476		 0x200000000ULL
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 
