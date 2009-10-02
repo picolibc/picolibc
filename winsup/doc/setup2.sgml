@@ -177,7 +177,7 @@ another charset, you can define this by setting one of the locale environment
 variables to "C.charset".  For instance</para>
 
 <screen>
-  "C.ISO-9959-1"
+  "C.ISO-8859-1"
 </screen>
 
 <para>Windows uses the UTF-16 charset exclusively to store the names
@@ -185,9 +185,15 @@ of any object used by the Operating System.  This is especially important
 with filenames.  Cygwin uses the setting of the locale environment variables
 <envar>LC_ALL</envar>, <envar>LC_CTYPE</envar>, and <envar>LANG</envar>, to
 determine how to convert Windows filenames from their UTF-16 representation
-to the singlebyte or multibyte character set used by Cygwin.  Setting
+to the singlebyte or multibyte character set used by Cygwin.</para>
+
+<para>
+The setting of the locale environment variables at process startup
+is effective for Cygwin's internal conversions to and from the Windows UTF-16
+object names for the entire lifetime of the current process.  Changing
 the environment variables to another value changes the way filenames are
-converted in subsequently stated programs.</para>
+converted in subsequently started child processes, but not within the same
+process.</para>
 
 <para>
 However, even if one of the locale environment variables is set to
