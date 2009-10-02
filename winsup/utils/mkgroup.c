@@ -35,7 +35,7 @@
 
 static const char version[] = "$Revision$";
 
-extern char *__progname;
+extern char *__progname __declspec(dllimport);
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
