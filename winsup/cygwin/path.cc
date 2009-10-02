@@ -203,23 +203,32 @@ has_dot_last_component (const char *dir, bool test_dot_dot)
   /* SUSv3: . and .. are not allowed as last components in various system
      calls.  Don't test for backslash path separator since that's a Win32
      path following Win32 rules. */
-  const char *last_comp = strrchr (dir, '/');
-  if (!last_comp)
-    last_comp = dir;
-  else {
-    /* Check for trailing slash.  If so, hop back to the previous slash. */
-    if (!last_comp[1])
-      while (last_comp > dir)
-	if (*--last_comp == '/')
-	  break;
-    if (*last_comp == '/')
-      ++last_comp;
-  }
-  return last_comp[0] == '.'
-	 && ((last_comp[1] == '\0' || last_comp[1] == '/')
-	     || (test_dot_dot
-		 && last_comp[1] == '.'
-		 && (last_comp[2] == '\0' || last_comp[2] == '/')));
+  const char *last_comp = strchr (dir, '\0');
+
+  if (last_comp == dir)
+    return false;	/* Empty string.  Probably shouldn't happen here? */
+
+  /* Detect run of trailing slashes */
+  while (last_comp > dir && *--last_comp == '/')
+    continue;
+
+  /* Detect just a run of slashes or a path that does not end with a slash. */
+  if (*last_comp != '.')
+    return false;
+
+  /* We know we have a trailing dot here.  Check that it really is a standalone "."
+     path component by checking that it is at the beginning of the string or is
+     preceded by a "/" */
+  if (last_comp == dir || *--last_comp == '/')
+    return true;
+
+  /* If we're not checking for '..' we're done.  Ditto if we're now pointing to
+     a non-dot. */
+  if (!test_dot_dot || *last_comp != '.')
+    return false;		/* either not testing for .. or this was not '..' */
+
+  /* Repeat previous test for standalone or path component. */
+  return last_comp == dir || last_comp[-1] == '/';
 }
 
 /* Normalize a POSIX path.

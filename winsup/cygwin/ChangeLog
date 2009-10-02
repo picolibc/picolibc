@@ -1,3 +1,13 @@
+2009-10-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Move cxx_malloc reset kluge from here.
+	(check_sanity_and_sync):  to here.
+
+2009-09-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (has_dot_last_component): Rewrite to detect some corner cases
+	that were previously uncaught.
+
 2009-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (beep): Move up to avoid forward declaration.

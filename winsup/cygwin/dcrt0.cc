@@ -375,6 +375,12 @@ check_sanity_and_sync (per_process *p)
   if (p->api_major > cygwin_version.api_major)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d > %d",
 	       p->api_major, cygwin_version.api_major);
+
+  /* This is a kludge to work around a version of _cygwin_common_crt0
+     which overwrote the cxx_malloc field with the local DLL copy.
+     Hilarity ensues if the DLL is not loaded while the process
+     is forking. */
+  __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
 }
 
 child_info NO_COPY *child_proc_info = NULL;
@@ -765,12 +771,6 @@ dll_crt0_1 (void *)
   if (dynamically_loaded)
     sigproc_init ();
   check_sanity_and_sync (user_data);
-
-  /* This is a kludge to work around a version of _cygwin_common_crt0
-     which overwrote the cxx_malloc field with the local DLL copy.
-     Hilarity ensues if the DLL is not loaded like while the process
-     is forking. */
-  __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
 
   /* Initialize malloc and then call user_shared_initialize since it relies
      on a functioning malloc and it's possible that the user's program may
