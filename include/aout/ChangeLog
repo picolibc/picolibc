@@ -1,3 +1,9 @@
+2009-10-02  Alan Modra  <amodra@bigpond.net.au>
+
+	* aout64.h (N_SHARED_LIB): Define as zero if not already defined.
+	* sun4.h (N_SHARED_LIB): Define.
+	* hp300hpux.h (N_SHARED_LIB): Don't define.
+
 2008-08-28  Tristan Gingold  <gingold@adacore.com>
 
 	* stab.def: Add BNSYM, ENSYM, OSO for darwin.
