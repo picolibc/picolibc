@@ -4209,6 +4209,24 @@ internal_setlocale ()
   setenv ("PATH", c_path, 1);
 }
 
+/* Called from dll_crt0_1, before calling the application's main().
+   Set the internal charset according to the environment locale settings.
+   Check if a required codepage is available, and only switch internal
+   charset if so.  Afterwards, reset application locale to "C" per POSIX. */
+void
+initial_setlocale ()
+{
+  char *ret = _setlocale_r (_REENT, LC_CTYPE, "");
+  if (ret && check_codepage (ret)
+      && strcmp (cygheap->locale.charset, __locale_charset ()) != 0)
+    internal_setlocale ();
+  _setlocale_r (_REENT, LC_CTYPE, "C");
+}
+
+/* Like newlib's setlocale, but additionally check if the charset needs
+   OS support and the required codepage is actually installed.  If codepage
+   is not available, revert to previous locale and return NULL.  For details
+   about codepage availability, see the comment in check_codepage() above. */
 extern "C" char *
 setlocale (int category, const char *locale)
 {
@@ -4216,13 +4234,7 @@ setlocale (int category, const char *locale)
   if (locale && !wincap.has_always_all_codepages ())
     stpcpy (old, _setlocale_r (_REENT, category, NULL));
   char *ret = _setlocale_r (_REENT, category, locale);
-  if (ret && locale)
-    {
-      if (!(ret = check_codepage (ret)))
-	_setlocale_r (_REENT, category, old);
-      else if (!*locale && strcmp (cygheap->locale.charset,
-				   __locale_charset ()) != 0)
-	internal_setlocale ();
-    }
+  if (ret && locale && !(ret = check_codepage (ret)))
+    _setlocale_r (_REENT, category, old);
   return ret;
 }

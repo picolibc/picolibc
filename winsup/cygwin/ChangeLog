@@ -1,3 +1,11 @@
+2009-10-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_1): Drop calls to setlocale/_setlocale_r.  Just
+	call initial_setlocale from here.
+	* syscalls.cc (initial_setlocale): Set internal charset and revert
+	application locale to "C".
+	(setlocale): Don't set Cygwin's internal charset here.
+
 2009-10-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_1): Move cxx_malloc reset kluge from here.

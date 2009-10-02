@@ -768,6 +768,8 @@ dll_crt0_0 ()
 void
 dll_crt0_1 (void *)
 {
+  extern void initial_setlocale ();
+
   if (dynamically_loaded)
     sigproc_init ();
   check_sanity_and_sync (user_data);
@@ -940,9 +942,7 @@ dll_crt0_1 (void *)
      LoadLibrary serialization. */
   ld_preload ();
   /* Set internal locale to the environment settings. */
-  setlocale (LC_CTYPE, "");
-  /* Reset application locale to "C" per POSIX */
-  _setlocale_r (_REENT, LC_CTYPE, "C");
+  initial_setlocale ();
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\
