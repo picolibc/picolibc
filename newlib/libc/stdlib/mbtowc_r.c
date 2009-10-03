@@ -295,12 +295,6 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
       tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
 	|    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
 	|     (wchar_t)(ch & 0x3f);
-      /* Check for invalid CESU-8 encoding of UTF-16 surrogate values. */
-      if (tmp >= 0xd800 && tmp <= 0xdfff)
-	{
-	  r->_errno = EILSEQ;
-	  return -1;
-	}
       *pwc = tmp;
       return i;
     }
