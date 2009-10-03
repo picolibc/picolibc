@@ -1100,6 +1100,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Google Desktop</para></listitem>
 <listitem><para>Sophos Anti-Virus 7</para></listitem>
 <listitem><para>Bufferzone from Trustware</para></listitem>
+<listitem><para>Lenovo IPS Core Service (ipssvc)</para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable

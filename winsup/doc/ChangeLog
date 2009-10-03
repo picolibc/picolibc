@@ -1,3 +1,7 @@
+2009-10-03  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* faq-using.xml (faq.using.bloda): Add Lenovo IPS Core Service.
+
 2009-10-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-locale-ov): Fix typo in C+charset example.
