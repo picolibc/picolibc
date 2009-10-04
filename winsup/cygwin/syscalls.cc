@@ -4186,6 +4186,8 @@ internal_setlocale ()
      reevaluate the CWD's posix path and store in the new charset.
      Same for the PATH environment variable. */
   /* FIXME: Other buffered paths might be affected as well. */
+  /* FIXME: It could be necessary to convert the entire environment,
+	    not just PATH. */
   tmp_pathbuf tp;
   wchar_t *w_path, *w_cwd;
 
