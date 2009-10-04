@@ -55,7 +55,8 @@ CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS=@CFLAGS@
-override CFLAGS+=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
+override CFLAGS+=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer \
+  -mno-use-libstdc-wrappers $(CCEXTRA)
 CXX=@CXX@
 override CXXFLAGS=@CXXFLAGS@
 

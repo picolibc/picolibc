@@ -1,3 +1,7 @@
+2009-10-04  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* Makefile.in (CFLAGS): Add -mno-use-libstdc-wrappers.
+
 2009-10-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (internal_setlocale): Add comment.
