@@ -1,3 +1,11 @@
+2009-10-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (CreateRestrictedToken): Declare for >= Win 2000.
+	_WIN32_WINNT >= 0x0500.
+	(DISABLE_MAX_PRIVILEGE, SANDBOX_INERT, LUA_TOKEN,
+	WRITE_RESTRICTED): Define.
+	(IsTokenRestricted): Declare for >= Win 2000.
+
 2009-08-30  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wtsapi32.h (WTSQuerySessionInformationA,
