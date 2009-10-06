@@ -1,5 +1,18 @@
 2009-10-05  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
+	Add cygwin wrapper for ExitProcess and TerminateProcess.
+	* include/sys/cygwin.h: Declare new cygwin_getinfo_type
+	CW_EXIT_PROCESS.
+	* external.cc (exit_process): New function.
+	(cygwin_internal): Handle CW_EXIT_PROCESS.
+	* pinfo.h (pinfo::set_exit_code): New method.
+	* pinfo.cc (pinfo::set_exit_code): New, refactored from...
+	(pinfo::maybe_set_exit_code_from_windows): here. Call it.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR
+	to 215 to reflect the above change. 
+
+2009-10-05  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
 	* exceptions.cc: Move global variable sigExeced...
 	* globals.cc: here.
 	* pinfo.cc (pinfo::maybe_set_exit_code_from_windows): Remove now

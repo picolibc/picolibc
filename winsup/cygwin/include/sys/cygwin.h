@@ -142,7 +142,8 @@ typedef enum
     CW_CYGTLS_PADSIZE,
     CW_SET_DOS_FILE_WARNING,
     CW_SET_PRIV_KEY,
-    CW_SETERRNO
+    CW_SETERRNO,
+    CW_EXIT_PROCESS
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */

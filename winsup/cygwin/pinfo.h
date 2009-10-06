@@ -155,6 +155,7 @@ public:
   }
   void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
   void maybe_set_exit_code_from_windows () __attribute__ ((regparm(1)));
+  void set_exit_code (DWORD n) __attribute__ ((regparm(2)));
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}

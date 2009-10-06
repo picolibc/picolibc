@@ -136,6 +136,14 @@ status_exit (DWORD x)
 
 # define self (*this)
 void
+pinfo::set_exit_code (DWORD x)
+{
+  if (x >= 0xc0000000UL)
+    x = status_exit (x);
+  self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
+}
+
+void
 pinfo::maybe_set_exit_code_from_windows ()
 {
   DWORD x = 0xdeadbeef;
@@ -147,9 +155,7 @@ pinfo::maybe_set_exit_code_from_windows ()
 						   process hasn't quite exited
 						   after closing pipe */
       GetExitCodeProcess (hProcess, &x);
-      if (x >= 0xc0000000UL)
-	x = status_exit (x);
-      self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
+      set_exit_code (x);
     }
   sigproc_printf ("pid %d, exit value - old %p, windows %p, cygwin %p",
 		  self->pid, oexitcode, x, self->exitcode);
