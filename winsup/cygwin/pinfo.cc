@@ -140,7 +140,6 @@ pinfo::maybe_set_exit_code_from_windows ()
 {
   DWORD x = 0xdeadbeef;
   DWORD oexitcode = self->exitcode;
-  extern int sigExeced;
 
   if (hProcess && !(self->exitcode & EXITCODE_SET))
     {

@@ -23,6 +23,7 @@ HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
 HMODULE NO_COPY cygwin_hmodule;
 HANDLE hExeced;
+int NO_COPY sigExeced;
 
 /* program exit the program */
 

@@ -40,7 +40,6 @@ extern void sigdelayed ();
 };
 
 extern child_info_spawn *chExeced;
-int NO_COPY sigExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 static WCHAR windows_system_directory[1024];

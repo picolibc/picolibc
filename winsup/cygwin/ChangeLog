@@ -1,3 +1,10 @@
+2009-10-05  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* exceptions.cc: Move global variable sigExeced...
+	* globals.cc: here.
+	* pinfo.cc (pinfo::maybe_set_exit_code_from_windows): Remove now
+	unneeded declaration.
+
 2009-10-04  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* Makefile.in (CFLAGS): Add -mno-use-libstdc-wrappers.
