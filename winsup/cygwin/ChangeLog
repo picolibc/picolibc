@@ -1,5 +1,10 @@
 2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (seteuid32): Call set_cygwin_privileges on primary token
+	as well.
+
+2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_pty_master::tcgetpgrp): Declare.
 	* fhandler_termios.cc (fhandler_termios::tcgetpgrp): Only return
 	valid pgid if tty is controlling tty.  Set errno to ENOTTY and

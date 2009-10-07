@@ -2805,6 +2805,7 @@ seteuid32 (__uid32_t uid)
 	  cygheap->user.curr_primary_token = NO_IMPERSONATION;
 	  return -1;
 	}
+      set_cygwin_privileges (cygheap->user.curr_primary_token);
       set_cygwin_privileges (cygheap->user.curr_imp_token);
     }
   if (!cygheap->user.reimpersonate ())
