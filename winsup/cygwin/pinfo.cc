@@ -128,6 +128,10 @@ status_exit (DWORD x)
 	x = 127;
       }
       break;
+    case STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION: /* custom error value */
+      /* We've already printed the error message in pseudo-reloc.c */
+      x = 127;
+      break;
     default:
       x = 127;
     }

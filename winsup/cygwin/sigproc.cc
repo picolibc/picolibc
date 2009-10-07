@@ -923,6 +923,8 @@ child_info::proc_retry (HANDLE h)
       break;
     case STATUS_DLL_NOT_FOUND:
       return exit_code;
+    case STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION: /* pseudo-reloc.c specific */
+      return exit_code;
     case STATUS_CONTROL_C_EXIT:
       if (saw_ctrl_c ())
 	return EXITCODE_OK;

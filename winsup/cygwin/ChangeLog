@@ -1,3 +1,32 @@
+2009-10-07  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Additional pseudo-reloc-v2 support
+	* ntdll.h: Add custom NTSTATUS value for pseudo-reloc
+	errors STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION.
+	* pinfo.cc (status_exit): Map custom pseudo-reloc
+	error value STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION to 127.
+	* sigproc.cc (child_info::proc_retry): Return exit code when
+	STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION.
+
+	Cygwin modifications to pseudo-reloc.c
+	* lib/pseudo-reloc.c: Added comments throughout and various
+	whitespace fixes. Exploit cygwin_internal(CW_EXIT_PROCESS,...)
+	for fatal error handling that is consistent with cygwin process
+	life-cycle. Ensure state variable (in _pei386_runtime_relocator)
+	is unique to each address space, across fork().
+	(__print_reloc_error): New function for reporting errors in a
+	manner supported by cygwin at this early stage of the process
+	life-cycle.
+	(_pei386_runtime_relocator): Ensure relocations performed
+	only once for each address space, but are repeated after fork()
+	in the new address space.
+	only once for each address space (e.g. across fork()).
+	(__write_memory) [MINGW]: Ensure that b is always initialized
+	by call to VirtualQuery, even if -DNDEBUG.
+
+	* lib/pseudo-reloc.c: Import new implementation to support
+	v2 pseudo-relocs implemented by Kai Tietz from mingw.
+
 2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid32): Call set_cygwin_privileges on primary token
