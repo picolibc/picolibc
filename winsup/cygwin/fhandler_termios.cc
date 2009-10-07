@@ -99,7 +99,16 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 int
 fhandler_termios::tcgetpgrp ()
 {
-  return tc->pgid;
+  if (myself->ctty != -1 && myself->ctty == tc->ntty)
+    return tc->pgid;
+  set_errno (ENOTTY);
+  return -1;
+}
+
+int
+fhandler_pty_master::tcgetpgrp ()
+{
+  return myself->ctty != -1 && myself->ctty == tc->ntty ? tc->pgid : 0;
 }
 
 void

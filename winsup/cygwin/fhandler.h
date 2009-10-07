@@ -1109,6 +1109,7 @@ public:
   int dup (fhandler_base *);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
+  int tcgetpgrp ();
 };
 
 class fhandler_tty_master: public fhandler_pty_master

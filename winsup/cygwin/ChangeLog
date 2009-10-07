@@ -1,3 +1,12 @@
+2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_pty_master::tcgetpgrp): Declare.
+	* fhandler_termios.cc (fhandler_termios::tcgetpgrp): Only return
+	valid pgid if tty is controlling tty.  Set errno to ENOTTY and
+	return -1 otherwise.
+	(fhandler_pty_master::tcgetpgrp): New function.  Return 0 for
+	master side of pty if it's not the controlling tty of the process.
+
 2009-10-05  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	Add cygwin wrapper for ExitProcess and TerminateProcess.
