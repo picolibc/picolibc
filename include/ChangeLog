@@ -1,3 +1,8 @@
+2008-10-03  Rafael Espindola  <espindola@google.com>
+
+	* plugin-api.h: New.
+	* lto-symtab.h: New.
+
 2009-10-05   Rafael Espindola  <espindola@google.com>
 
 	* plugin-api.h (ld_plugin_status): Add LDPS_BAD_HANDLE.
