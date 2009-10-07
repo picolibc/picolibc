@@ -37,9 +37,13 @@
 #include "lmonetary.h"
 #include "lmessages.h"
 
+#ifndef __CYGWIN__
 #define TRANSITION_PERIOD_HACK
+#endif
 
 #define _REL(BASE) ((int)item-BASE)
+
+extern char *__locale_charset ();
 
 char *
 _DEFUN(nl_langinfo, (item), 
@@ -54,6 +58,9 @@ _DEFUN(nl_langinfo, (item),
 
    switch (item) {
 	case CODESET:
+#ifdef __CYGWIN__
+		ret = __locale_charset ();
+#else
 		ret = "";
 		if ((s = setlocale(LC_CTYPE, NULL)) != NULL) {
 			if ((cs = strchr(s, '.')) != NULL) {
@@ -92,6 +99,7 @@ _DEFUN(nl_langinfo, (item),
 				  )
 				ret = "US-ASCII";
 		}
+#endif /* __CYGWIN__ */
 		break;
 	case D_T_FMT:
 		ret = (char *) __get_current_time_locale()->c_fmt;

@@ -1,3 +1,8 @@
+2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/nl_langinfo.c (nl_langinfo): Just return current locale
+	charset on Cygwin.
+
 2009-10-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/mbtowc_r.c (__utf8_mbtowc): Allow CESU-8 surrogate
