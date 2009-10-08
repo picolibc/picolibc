@@ -1,3 +1,8 @@
+2009-10-08  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (_cygtls::signal_exit): There's no need to set
+	signal_arrived if we're exiting.
+
 2009-10-08  Eric Blake  <ebb9@byu.net>
 
 	* fhandler_disk_file.cc (utimens_fs): Plug fd leak on EINVAL.
