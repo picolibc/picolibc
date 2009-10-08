@@ -1310,6 +1310,8 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       if ((tvp[0].tv_nsec < UTIME_NOW || tvp[0].tv_nsec > 999999999L)
 	  || (tvp[1].tv_nsec < UTIME_NOW || tvp[1].tv_nsec > 999999999L))
 	{
+	  if (closeit)
+	    close_fs ();
 	  set_errno (EINVAL);
 	  return -1;
 	}

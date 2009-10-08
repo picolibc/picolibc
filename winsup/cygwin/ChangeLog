@@ -1,3 +1,7 @@
+2009-10-08  Eric Blake  <ebb9@byu.net>
+
+	* fhandler_disk_file.cc (utimens_fs): Plug fd leak on EINVAL.
+
 2009-10-07  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	Additional pseudo-reloc-v2 support
