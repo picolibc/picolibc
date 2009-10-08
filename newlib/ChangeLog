@@ -1,3 +1,9 @@
+2009-10-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: For RTEMS, define HAVE_ASSERT_FUNC.
+	* libc/stdlib/assert.c (_assert_func): Do not specify
+	__assert_func if HAVE_ASSERT_FUNC flag is set.
+
 2009-10-08  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/getopt.h (__getopt_r, __getopt_long_r)

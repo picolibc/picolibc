@@ -549,7 +549,7 @@ case "${host}" in
   *-*-rtems*)
 	default_newlib_io_long_long="yes"
 	default_newlib_io_c99_formats="yes"
-	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DEXIT_PROVIDED -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_NANOSLEEP -DHAVE_BLKSIZE -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DEXIT_PROVIDED -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_NANOSLEEP -DHAVE_BLKSIZE -DHAVE_FCNTL -DHAVE_ASSERT_FUNC"
         # turn off unsupported items in posix directory 
 	newlib_cflags="${newlib_cflags} -D_NO_GETLOGIN -D_NO_GETPWENT -D_NO_GETUT -D_NO_GETPASS -D_NO_SIGSET -D_NO_WORDEXP -D_NO_POPEN"
 	;;

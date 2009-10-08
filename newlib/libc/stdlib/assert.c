@@ -47,6 +47,7 @@ Supporting OS subroutines required (only if enabled): <<close>>, <<fstat>>,
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef HAVE_ASSERT_FUNC
 /* func can be NULL, in which case no function information is given.  */
 void
 _DEFUN (__assert_func, (file, line, func, failedexpr),
@@ -62,6 +63,7 @@ _DEFUN (__assert_func, (file, line, func, failedexpr),
   abort();
   /* NOTREACHED */
 }
+#endif /* HAVE_ASSERT_FUNC */
 
 void
 _DEFUN (__assert, (file, line, failedexpr),
