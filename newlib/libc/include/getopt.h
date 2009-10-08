@@ -164,6 +164,7 @@ extern "C"
 	      (int __argc, char *const __argv[], const char *__shortopts,
 	       const struct option * __longopts, int *__longind));
 
+#ifdef __need_getopt_newlib
   int _EXFUN (__getopt_r,
 	      (int __argc, char *const __argv[], const char *__optstring,
 	       struct getopt_data * __data));
@@ -177,6 +178,7 @@ extern "C"
 	      (int __argc, char *const __argv[], const char *__shortopts,
 	       const struct option * __longopts, int *__longind,
 	       struct getopt_data * __data));
+#endif /* __need_getopt_newlib */
 
 #ifdef __cplusplus
 };

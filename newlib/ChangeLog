@@ -1,3 +1,9 @@
+2009-10-08  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/getopt.h (__getopt_r, __getopt_long_r)
+	(__getopt_long_only_r): Protect declarations, to avoid compiler
+	warning.
+
 2009-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/nl_langinfo.c (nl_langinfo): Just return current locale
