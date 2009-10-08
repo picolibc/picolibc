@@ -99,10 +99,18 @@ ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 crt0.o: crt0.S
 
 basiccrt.o: basiccrt.S
+ifeq (,$(findstring mcpu=,$(CFLAGS)))
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+else
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
+endif
 
 basiccrts.o: basiccrt.S
+ifeq (,$(findstring mcpu=,$(CFLAGS)))
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+else
 	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
+endif
 
 basiccrt561.o: basiccrt.S
 ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
