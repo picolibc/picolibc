@@ -1,5 +1,11 @@
 2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (tfx_chars): Convert all ASCII control characters except
+	ASCII NUL as well.  Change layout to make the conversions more clear.
+	Add comment.
+
+2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/config.h (DEFAULT_LOCALE): Define as "C.UTF-8".
 
 2009-10-08  Christopher Faylor  <me+cygwin@cgf.cx>
