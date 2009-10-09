@@ -67,6 +67,8 @@ extern char *_tlsbase __asm__ ("%fs:4");
 #define __WCHAR_MAX__ 0xffffu
 #endif
 
+#define DEFAULT_LOCALE "C.UTF-8"
+
 #ifdef __cplusplus
 }
 #endif

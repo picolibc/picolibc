@@ -1,3 +1,7 @@
+2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/config.h (DEFAULT_LOCALE): Define as "C.UTF-8".
+
 2009-10-08  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* exceptions.cc (_cygtls::signal_exit): There's no need to set
