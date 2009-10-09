@@ -1,3 +1,8 @@
+2009-10-09  Dave Korn  <dave.korn@artimi.com>
+
+	* libc/include/sys/time.h (_TIMEVAL_DEFINED): Define when
+	defining struct timeval.
+
 2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (DEFAULT_LOCALE): New define.
