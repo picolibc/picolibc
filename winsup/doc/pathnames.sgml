@@ -379,7 +379,10 @@ all of them are removed before the file is created.  This restriction only
 affects native Win32 applications.  Cygwin applications can create and
 access files with trailing dots and spaces without problems.</para>
 
-<para>Some characters are disallowed in filenames on Windows filesystems:</para>
+<para>Additionally, some characters are disallowed in filenames on Windows
+filesystems.  These forbidden characters are the ASCII control characters
+from ASCII value 1 to 31, plus the following charcters which have a special
+menaing in the Win32 API:</para>
 
 <screen>
   "   *   :   &lt;   &gt;   ?   |   \
@@ -389,6 +392,10 @@ access files with trailing dots and spaces without problems.</para>
 restriction.  All of the above characters, except for the backslash,
 are converted to special UNICODE characters in the range 0xf000 to 0xf0ff
 (the "Private use area") when creating or accessing files.</para>
+
+<para>The backslash has to be exempt from this conversion, because Cygwin
+accepts Win32 filenames including backslashes as path separators on input. 
+Converting backslashes using the above method would make this impossible.</para>
 
 </sect2>
 

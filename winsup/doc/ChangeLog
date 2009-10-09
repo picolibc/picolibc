@@ -1,3 +1,8 @@
+2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml (pathnames-specialchars): Add control chars to the
+	list.  Explain backslash exception.
+
 2009-10-03  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* faq-using.xml (faq.using.bloda): Add Lenovo IPS Core Service.
