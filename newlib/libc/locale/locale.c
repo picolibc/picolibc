@@ -205,6 +205,18 @@ static char *categories[_LC_LAST] = {
 };
 
 /*
+ * Default locale per POSIX.  Can be overridden on a per-target base.
+ */
+#ifndef DEFAULT_LOCALE
+#define DEFAULT_LOCALE	"C"
+#endif
+/*
+ * This variable can be changed by any outside mechanism.  This allows,
+ * for instance, to load the default locale from a file.
+ */
+char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
+
+/*
  * Current locales for each category
  */
 static char current_categories[_LC_LAST][ENCODING_LEN + 1] = {
@@ -731,9 +743,9 @@ __get_locale_env(struct _reent *p, int category)
   if (env == NULL || !*env)
     env = _getenv_r (p, "LANG");
 
-  /* 4. if none is set, fall to "C" */
+  /* 4. if none is set, fall to default locale */
   if (env == NULL || !*env)
-    env = "C";
+    env = __default_locale;
 
   return env;
 }

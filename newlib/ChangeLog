@@ -1,3 +1,9 @@
+2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (DEFAULT_LOCALE): New define.
+	(__default_locale): New global variable set to the default locale.
+	(__get_locale_env): Return __default_locale rather than fixed "C".
+
 2009-10-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: For RTEMS, define HAVE_ASSERT_FUNC.
