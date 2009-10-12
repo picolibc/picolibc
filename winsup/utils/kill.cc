@@ -249,10 +249,8 @@ main (int argc, char **argv)
 	case '?':
 	  if (gotasig)
 	    {
-	      pid = strtoll (argv[optind], &p, 10);
-	      if (pid < 0)
-		goto out;
-	      usage ();
+	      --optind;
+	      goto out;
 	    }
 	  optreset = 1;
 	  optind = 1 + av - argv;

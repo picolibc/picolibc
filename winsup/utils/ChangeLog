@@ -1,3 +1,8 @@
+2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* kill.cc (main): Skip to PID loop on invalid option to handle
+	negative pids there.
+
 2009-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (enum_local_groups): Avoid error message if given group
