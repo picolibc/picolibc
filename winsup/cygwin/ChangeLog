@@ -1,5 +1,10 @@
 2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (cygwin_internal): Return 0 in CW_SET_DOS_FILE_WARNING
+	and CW_SETERRNO cases.
+
+2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::link): Only append .lnk
 	if the original device had one, too.  Add comment.
 

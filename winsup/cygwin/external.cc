@@ -393,6 +393,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  extern bool dos_file_warning;
 	  dos_file_warning = va_arg (arg, int);
+	  return 0;
 	}
 	break;
       case CW_SET_PRIV_KEY:
@@ -405,6 +406,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  const char *file = va_arg (arg, const char *);
 	  int line = va_arg (arg, int);
 	  seterrno(file, line);
+	  return 0;
 	}
 	break;
       case CW_EXIT_PROCESS:
