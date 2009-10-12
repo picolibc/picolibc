@@ -1,3 +1,11 @@
+2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Only append .lnk
+	if the original device had one, too.  Add comment.
+
+	* fhandler_socket.cc (fhandler_socket::fstat): Always return a size of
+	0 on sockets.
+
 2009-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (tfx_chars): Convert all ASCII control characters except

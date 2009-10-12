@@ -698,6 +698,7 @@ fhandler_socket::fstat (struct __stat64 *buf)
       if (!res)
 	{
 	  buf->st_mode = (buf->st_mode & ~S_IFMT) | S_IFSOCK;
+	  buf->st_size = 0;
 	}
     }
   else
@@ -708,6 +709,7 @@ fhandler_socket::fstat (struct __stat64 *buf)
 	  buf->st_dev = 0;
 	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+	  buf->st_size = 0;
 	}
     }
   return res;
