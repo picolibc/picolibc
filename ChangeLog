@@ -1,3 +1,93 @@
+2009-10-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac: Add 'lto' to enable_languages, not
+	new_enable_languages, and only if not already present.
+	* configure: Regenerate.
+
+2009-10-06  Ian Lance Taylor  <iant@google.com>
+
+	* Makefile.def: check-gold depends upon all-gas.
+	* Makefile.in: Rebuild.
+
+2009-10-03  2009-02-05  Rafael Avila de Espindola  <espindola@google.com>
+
+	* Makefile.def: all-lto-plugin depends on all-libiberty.
+	set bootstrap=true for lto-plugin.
+	Add lto-plugin.
+	* Makefile.in: Regenerate.
+	* configure.ac (host_libs): Add lto-plugin.
+	* configure: Regenerate.
+
+2009-10-03  Diego Novillo  <dnovillo@google.com>
+
+	* Makefile.tpl (HOST_EXPORTS): Add LIBELFLIBS and LIBELFINC.
+	(HOST_LIBELFLIBS): Define.
+	(HOST_LIBELFINC): Define.
+	* Makefile.in: Regenerate.
+	* configure.ac: Add --enable-lto.
+	Add --with-libelf, --with-libelf-include and --with-libelf-lib.
+	If --enable-lto is used, add 'lto' to new_enable_languages.
+	If --enable-lto is used and gold is enabled, add
+	lto-plugin to configdirs.
+	* configure: Regenerate.
+
+2009-10-03  Simon Baldwin  <simonb@google.com>
+
+	* configure.ac: If --with-system-zlib, suppress local zlib and
+	pass --with-system-zlib to subdir configure scripts.
+	* configure: Regenerate.
+
+2009-10-01  Loren J. Rittle <ljrittle@acm.org>
+	    Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.tpl (POSTSTAGE1_HOST_EXPORTS): Use $$s rather than
+	$(srcdir).
+	* Makefile.in: Rebuilt.
+
+2009-09-29  Paolo Bonzini  <bonzini@gnu.org>
+
+	Sync from gcc:
+	2009-09-26  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* configure.ac: Update minimum MPC version to 0.7.
+	* configure: Regenerate.
+
+2009-09-25  Nick Clifton  <nickc@redhat.com>
+
+	* configure.ac: Pass any --cache-file=/dev/null option on to
+	subconfigures.
+	* configure: Regenerate.
+
+2009-09-23  Nick Clifton  <nickc@redhat.com>
+
+	* config.sub, config.guess: Update from upstream sources.
+
+2009-09-22  Loren J. Rittle <ljrittle@acm.org>
+
+	* Makefile.tpl (POSTSTAGE1_HOST_EXPORTS): Remove stray $$r/.
+	* Makefile.in: Rebuilt.
+
+2009-09-22  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	PR bootstrap/32272
+	* configure.ac: Error out if $srcdir isn't '.' but contains
+	host-${host_noncanonical}.
+	* configure: Regenerate.
+
+2009-09-21  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac: If bootstrapping a combined tree with
+	--enable-gold, require c++ in stage1_languages.
+	* configure: Regenerate.
+
+	* configure.ac: Also add target_libs of stage1_languages to
+	bootstrap_target_libs.
+	* configure: Regenerate.
+
+	* configure.ac: Diagnose --enable-build-with-cxx bootstrap
+	with --enable-languages not containing c++.
+	* configure: Regenerate.
+
 2009-09-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* configure.ac: Disable java and boehm-gc for bfin-*-*.

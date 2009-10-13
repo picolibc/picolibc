@@ -235,6 +235,11 @@ fi
 
 # Find the build and target subdir names.
 GCC_TOPLEV_SUBDIRS
+# Be sure to cover against remnants of an in-tree build.
+if test $srcdir != .  && test -d $srcdir/host-${host_noncanonical}; then
+  AC_MSG_ERROR([building out of tree but $srcdir contains host-${host_noncanonical}.
+Use a pristine source tree when building in a separate tree])
+fi
 
 # Skipdirs are removed silently.
 skipdirs=
@@ -253,6 +258,13 @@ use_gnu_as=
 if test x$with_gnu_as = xno ; then
   use_gnu_as=no
   noconfigdirs="$noconfigdirs gas"
+fi
+
+use_included_zlib=
+# Make sure we don't let ZLIB be added if we didn't want it.
+if test x$with_system_zlib = xyes ; then
+  use_included_zlib=no
+  noconfigdirs="$noconfigdirs zlib"
 fi
 
 # some tools are so dependent upon X11 that if we're not building with X, 
@@ -1353,7 +1365,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
     CFLAGS="$CFLAGS $mpcinc"
     AC_MSG_CHECKING([for the correct version of mpc.h])
     AC_TRY_COMPILE([#include <mpc.h>],[
-    #if MPC_VERSION < MPC_VERSION_NUM (0,6,0)
+    #if MPC_VERSION < MPC_VERSION_NUM (0,7,0)
     choke me
     #endif
     ], [AC_MSG_RESULT([yes]); have_mpc=maybe],
@@ -1399,6 +1411,7 @@ if test -d ${srcdir}/gcc && test "x$have_gmp" = xno; then
     mpc_proj (n, n, MPC_RNDNN);
     mpc_neg (n, n, MPC_RNDNN);
     mpc_sqr (n, n, MPC_RNDNN);
+    mpc_pow (n, n, n, MPC_RNDNN);
     mpc_clear (n);
     ], [AC_MSG_RESULT([yes]); have_mpc=yes],
        [AC_MSG_RESULT([no]); have_mpc=no; mpclibs= ; mpcinc= ])
@@ -1605,6 +1618,127 @@ fi
 AC_SUBST(clooglibs)
 AC_SUBST(clooginc)
 
+# Check for LTO support.
+AC_ARG_ENABLE(lto,
+[  --enable-lto            enable link time optimization support],
+enable_lto=$enableval,
+enable_lto=yes; default_enable_lto=yes)
+
+if test x"$enable_lto" = x"yes" ; then
+  # Make sure that libelf.h and gelf.h are available.
+  AC_ARG_WITH(libelf, [  --with-libelf=PATH       Specify prefix directory for the installed libelf package
+                          Equivalent to --with-libelf-include=PATH/include
+                          plus --with-libelf-lib=PATH/lib])
+
+  AC_ARG_WITH(libelf_include, [  --with-libelf-include=PATH Specify directory for installed libelf include files])
+
+  AC_ARG_WITH(libelf_lib, [  --with-libelf-lib=PATH   Specify the directory for the installed libelf library])
+
+  case $with_libelf in 
+    "")
+      libelflibs="-lelf"
+      libelfinc="-I/usr/include/libelf"
+      ;;
+    *)
+      libelflibs="-L$with_libelf/lib -lelf"
+      libelfinc="-I$with_libelf/include -I$with_libelf/include/libelf"
+      LIBS="$libelflibs $LIBS"
+      ;;
+  esac
+
+  if test "x$with_libelf_include" != x; then
+    libelfinc="-I$with_libelf_include"
+  fi
+
+  if test "x$with_libelf_lib" != x; then
+    libelflibs="-L$with_libelf_lib -lelf"
+    LIBS="$libelflibs $LIBS"
+  fi
+
+  if test "x$with_libelf$with_libelf_include$with_libelf_lib" = x \
+     && test -d ${srcdir}/libelf; then
+    libelflibs='-L$$r/$(HOST_SUBDIR)/libelf/.libs -L$$r/$(HOST_SUBDIR)/libelf/_libs -lelf '
+    libelfinc='-I$$r/$(HOST_SUBDIR)/libelf/include -I$$s/libelf/include'
+    LIBS="$libelflibs $LIBS"
+  fi
+
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+
+  CFLAGS="$CFLAGS $libelfinc"
+  CPPFLAGS="$CPPFLAGS $libelfinc"
+  LIBS="$LIBS $libelflibs"
+
+  AC_CHECK_HEADERS(libelf.h, [have_libelf_h=yes])
+  AC_CHECK_HEADERS(gelf.h, [have_gelf_h=yes])
+
+  AC_CHECK_HEADERS(libelf/libelf.h, [have_libelf_libelf_h=yes])
+  AC_CHECK_HEADERS(libelf/gelf.h, [have_libelf_gelf_h=yes])
+
+  # If we couldn't find libelf.h and the user forced it, emit an error.
+  if test x"$have_libelf_h" != x"yes" \
+     && test x"$have_libelf_libelf_h" != x"yes" ; then
+    if test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([LTO support requires libelf.h or libelf/libelf.h.])
+    else
+      enable_lto=no
+      libelflibs=
+      libelfinc=
+    fi
+  fi
+
+  # If we couldn't find gelf.h and the user forced it, emit an error.
+  if test x"$have_gelf_h" != x"yes" \
+     && test x"$have_libelf_gelf_h" != x"yes" ; then
+    if test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([LTO support requires gelf.h or libelf/gelf.h.])
+    else
+      enable_lto=no
+      libelflibs=
+      libelfinc=
+    fi
+  fi
+
+  # Check that the detected libelf has the functions we need.  We cannot
+  # rely on just detecting the headers since they do not include 
+  # versioning information.  Add functions, if needed.
+  if test x"$enable_lto" = x"yes" ; then
+    AC_MSG_CHECKING([for the correct version of libelf])
+    AC_TRY_LINK(
+      [#include <libelf.h>],[
+      elf_errmsg (0);
+      elf_getscn (0, 0);
+      elf_nextscn (0, 0);
+      elf_strptr (0, 0, 0);
+      elf_getident (0, 0);
+      elf_getshdrstrndx (0, 0);
+      elf_begin (0, 0, 0);
+      elf_ndxscn (0);
+      elf_end (0);
+      ],
+      [AC_MSG_RESULT([yes]);],
+      [AC_MSG_RESULT([no]); enable_lto=no; libelflibs= ; libelfinc= ]
+    )
+
+    # If we couldn't enable LTO and the user forced it, emit an error.
+    if test x"$enable_lto" = x"no" \
+       && test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([To enable LTO, GCC requires libelf v0.8.12+.
+Try the --with-libelf, --with-libelf-include and --with-libelf-lib options
+to specify its location.])
+    fi
+  fi
+
+  CFLAGS="$saved_CFLAGS"
+  CPPFLAGS="$saved_CPPFLAGS"
+  LIBS="$saved_LIBS"
+
+  # Flags needed for libelf.
+  AC_SUBST(libelflibs)
+  AC_SUBST(libelfinc)
+fi
+
 
 # By default, C is the only stage 1 language.
 stage1_languages=,c,
@@ -1673,6 +1807,21 @@ if test -d ${srcdir}/gcc; then
   done
 
   new_enable_languages=,c,
+
+  # If LTO is enabled, add the LTO front end.
+  extra_host_libiberty_configure_flags=
+  if test "$enable_lto" = "yes" ; then
+    case ,${enable_languages}, in
+      *,lto,*) ;;
+      *) enable_languages="${enable_languages},lto" ;;
+    esac
+    if test "${ENABLE_GOLD}" = "yes" ; then
+      configdirs="$configdirs lto-plugin"
+      extra_host_libiberty_configure_flags=--enable-shared
+    fi
+  fi
+  AC_SUBST(extra_host_libiberty_configure_flags)
+
   missing_languages=`echo ",$enable_languages," | sed -e s/,all,/,/ -e s/,c,/,/ `
   potential_languages=,c,
 
@@ -1763,10 +1912,13 @@ if test -d ${srcdir}/gcc; then
 	    new_enable_languages="${new_enable_languages}${language},"
             potential_languages="${potential_languages}${language},"
 	    missing_languages=`echo "$missing_languages" | sed "s/,$language,/,/"`
-	    case ${boot_language} in
-	      yes)
+	    case "${boot_language}:,$enable_stage1_languages," in
+	      yes:* | *:*,$language,* | *:*,yes, | *:*,all,)
 		# Add to (comma-separated) list of stage 1 languages.
-		stage1_languages="${stage1_languages}${language},"
+		case ",$stage1_languages," in
+		  *,$language,* | ,yes, | ,all,) ;;
+		  *) stage1_languages="${stage1_languages}${language}," ;;
+		esac
 		# We need to bootstrap any supporting libraries.
 		bootstrap_target_libs="${bootstrap_target_libs}${target_libs},"
 		;;
@@ -2079,7 +2231,7 @@ if test x"${with_libs}" != x && test x"${with_libs}" != xno ; then
   fi
 fi
 
-# Set with_gnu_as and with_gnu_ld as appropriate.
+# Set with_gnu_as, with_gnu_ld, and with_system_zlib as appropriate.
 #
 # This is done by determining whether or not the appropriate directory
 # is available, and by checking whether or not specific configurations
@@ -2090,7 +2242,9 @@ fi
 #
 # If the default for a toolchain is to use GNU as and ld, and you don't 
 # want to do that, then you should use the --without-gnu-as and
-# --without-gnu-ld options for the configure script.
+# --without-gnu-ld options for the configure script.  Similarly, if
+# the default is to use the included zlib and you don't want to do that,
+# you should use the --with-system-zlib option for the configure script.
 
 if test x${use_gnu_as} = x &&
    echo " ${configdirs} " | grep " gas " > /dev/null 2>&1 ; then
@@ -2102,6 +2256,14 @@ if test x${use_gnu_ld} = x &&
    echo " ${configdirs} " | egrep " (go)?ld " > /dev/null 2>&1 ; then
   with_gnu_ld=yes
   extra_host_args="$extra_host_args --with-gnu-ld"
+fi
+
+if test x${use_included_zlib} = x &&
+   echo " ${configdirs} " | grep " zlib " > /dev/null 2>&1 ; then
+  :
+else
+  with_system_zlib=yes
+  extra_host_args="$extra_host_args --with-system-zlib"
 fi
 
 # If using newlib, add --with-newlib to the extra_host_args so that gcc/configure
@@ -2460,6 +2622,20 @@ case "$have_compiler:$host:$target:$enable_bootstrap" in
     ;;
 esac
 
+case ",$enable_languages,:$ENABLE_BUILD_WITH_CXX:$enable_bootstrap" in
+  *,c++,*:yes:yes) ;;
+  *:yes:yes)
+    AC_MSG_ERROR([bootstrapping with --enable-build-with-cxx requires c++ in --enable-languages])
+    ;;
+esac
+
+case "$enable_bootstrap:$ENABLE_GOLD: $configdirs :,$stage1_languages," in
+  yes:yes:*\ gold\ *:*,c++,*) ;;
+  yes:yes:*\ gold\ *:*)
+    AC_MSG_ERROR([in a combined tree, bootstrapping with --enable-gold requires c++ in stage1_languages])
+    ;;
+esac
+
 # Adjust the toplevel makefile according to whether bootstrap was selected.
 case $enable_bootstrap in
   yes)
@@ -2610,9 +2786,11 @@ AC_SUBST_FILE(serialization_dependencies)
 
 # Base args.  Strip norecursion, cache-file, srcdir, host, build,
 # target, nonopt, and variable assignments.  These are the ones we
-# might not want to pass down to subconfigures.  Also strip
-# program-prefix, program-suffix, and program-transform-name, so that
-# we can pass down a consistent program-transform-name.
+# might not want to pass down to subconfigures.  The exception being
+# --cache-file=/dev/null, which is used to turn off the use of cache
+# files altogether, and which should be passed on to subconfigures.
+# Also strip program-prefix, program-suffix, and program-transform-name,
+# so that we can pass down a consistent program-transform-name.
 baseargs=
 keep_next=no
 skip_next=no
@@ -2651,6 +2829,13 @@ do
   esac
 
   case "$ac_arg" in
+    --cache-file=/dev/null | \
+    -cache-file=/dev/null )
+      # Handled here to avoid the test to skip args below.
+      baseargs="$baseargs '$ac_arg'"
+      # Assert: $separate_arg should always be no.
+      keep_next=$separate_arg
+      ;;
     --no*)
       continue
       ;;
