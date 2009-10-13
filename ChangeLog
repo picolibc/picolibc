@@ -1,3 +1,9 @@
+2009-10-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac: Add 'lto' to enable_languages, not
+	new_enable_languages, and only if not already present.
+	* configure: Regenerate.
+
 2009-10-06  Ian Lance Taylor  <iant@google.com>
 
 	* Makefile.def: check-gold depends upon all-gas.
