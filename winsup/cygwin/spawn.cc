@@ -537,7 +537,8 @@ loop:
   if (!cygheap->user.issetuid ()
       || (cygheap->user.saved_uid == cygheap->user.real_uid
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
-	  && !cygheap->user.groups.issetgroups ()))
+	  && !cygheap->user.groups.issetgroups ()
+	  && !cygheap->user.setuid_to_restricted))
     {
       rc = CreateProcessW (runpath,	  /* image name - with full path */
 			   wone_line,	  /* what was passed to exec */
@@ -571,7 +572,8 @@ loop:
 	 risk, but we don't want to disable this behaviour for older
 	 OSes because it's still heavily used by some users.  They have
 	 been warned. */
-      if (wcscasecmp (wstname, L"WinSta0") != 0)
+      if (!cygheap->user.setuid_to_restricted
+	  && wcscasecmp (wstname, L"WinSta0") != 0)
 	{
 	  WCHAR sid[128];
 

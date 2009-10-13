@@ -2664,7 +2664,28 @@ seteuid32 (__uid32_t uid)
   debug_printf ("uid: %u myself->uid: %u myself->gid: %u",
 		uid, myself->uid, myself->gid);
 
-  if (uid == myself->uid && !cygheap->user.groups.ischanged)
+  /* Same uid as we're just running under is usually a no-op.
+
+     Except we have an external token which is a restricted token.  Or,
+     the external token is NULL, but the current impersonation token is
+     a restricted token.  This allows to restrict user rights temporarily
+     like this:
+
+       cygwin_internal(CW_SET_EXTERNAL_TOKEN, restricted_token,
+                       CW_TOKEN_RESTRICTED);
+       setuid (getuid ());
+       [...do stuff with restricted rights...]
+       cygwin_internal(CW_SET_EXTERNAL_TOKEN, INVALID_HANDLE_VALUE,
+                       CW_TOKEN_RESTRICTED);
+       setuid (getuid ());
+
+    Note that using the current uid is a requirement!  Starting with Windows
+    Vista, we have restricted tokens galore (UAC), so this is really just
+    a special case to restict your own processes to lesser rights. */
+  bool request_restricted_uid_switch = (uid == myself->uid
+      && cygheap->user.ext_token_is_restricted);
+  if (uid == myself->uid && !cygheap->user.groups.ischanged
+      && !request_restricted_uid_switch)
     {
       debug_printf ("Nothing happens");
       return 0;
@@ -2686,6 +2707,22 @@ seteuid32 (__uid32_t uid)
   cygheap->user.deimpersonate ();
 
   /* Verify if the process token is suitable. */
+  /* First of all, skip all checks if a switch to a restricted token has been
+     requested, or if trying to switch back from it. */
+  if (request_restricted_uid_switch)
+    {
+      if (cygheap->user.external_token != NO_IMPERSONATION)
+	{
+	  debug_printf ("Switch to restricted token");
+	  new_token = cygheap->user.external_token;
+	}
+      else
+	{
+	  debug_printf ("Switch back from restricted token");
+	  new_token = hProcToken;
+	  cygheap->user.ext_token_is_restricted = false;
+	}
+    }
   /* TODO, CV 2008-11-25: The check against saved_sid is a kludge and a
      shortcut.  We must check if it's really feasible in the long run.
      The reason to add this shortcut is this:  sshd switches back to the
@@ -2701,8 +2738,9 @@ seteuid32 (__uid32_t uid)
      Therefore we try this shortcut now.  When switching back to the
      privileged user, we probably always want a correct (aka original)
      user token for this privileged user, not only in sshd. */
-  if ((uid == cygheap->user.saved_uid && usersid == cygheap->user.saved_sid ())
-      || verify_token (hProcToken, usersid, groups))
+  else if ((uid == cygheap->user.saved_uid
+	   && usersid == cygheap->user.saved_sid ())
+	   || verify_token (hProcToken, usersid, groups))
     new_token = hProcToken;
   /* Verify if the external token is suitable */
   else if (cygheap->user.external_token != NO_IMPERSONATION
@@ -2763,9 +2801,12 @@ seteuid32 (__uid32_t uid)
 
   if (new_token != hProcToken)
     {
-      /* Avoid having HKCU use default user */
-      WCHAR name[128];
-      load_registry_hive (usersid.string (name));
+      if (!request_restricted_uid_switch)
+	{
+	  /* Avoid having HKCU use default user */
+	  WCHAR name[128];
+	  load_registry_hive (usersid.string (name));
+	}
 
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
@@ -2790,6 +2831,8 @@ seteuid32 (__uid32_t uid)
   cygheap->user.set_sid (usersid);
   cygheap->user.curr_primary_token = new_token == hProcToken ? NO_IMPERSONATION
 							: new_token;
+  cygheap->user.curr_token_is_restricted = false;
+  cygheap->user.setuid_to_restricted = false;
   if (cygheap->user.curr_imp_token != NO_IMPERSONATION)
     {
       CloseHandle (cygheap->user.curr_imp_token);
@@ -2797,14 +2840,19 @@ seteuid32 (__uid32_t uid)
     }
   if (cygheap->user.curr_primary_token != NO_IMPERSONATION)
     {
-      if (!DuplicateTokenEx (cygheap->user.curr_primary_token, MAXIMUM_ALLOWED,
-			     &sec_none, SecurityImpersonation,
-			     TokenImpersonation, &cygheap->user.curr_imp_token))
+      /* HANDLE_FLAG_INHERIT may be missing in external token.  */
+      if (!SetHandleInformation (cygheap->user.curr_primary_token,
+				 HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT)
+	  || !DuplicateTokenEx (cygheap->user.curr_primary_token,
+				MAXIMUM_ALLOWED, &sec_none,
+				SecurityImpersonation, TokenImpersonation,
+				&cygheap->user.curr_imp_token))
 	{
 	  __seterrno ();
 	  cygheap->user.curr_primary_token = NO_IMPERSONATION;
 	  return -1;
 	}
+      cygheap->user.curr_token_is_restricted = request_restricted_uid_switch;
       set_cygwin_privileges (cygheap->user.curr_primary_token);
       set_cygwin_privileges (cygheap->user.curr_imp_token);
     }
@@ -2835,7 +2883,11 @@ setuid32 (__uid32_t uid)
 {
   int ret = seteuid32 (uid);
   if (!ret)
-    cygheap->user.real_uid = myself->uid;
+    {
+      cygheap->user.real_uid = myself->uid;
+      /* If restricted token, forget original privileges on exec ().  */
+      cygheap->user.setuid_to_restricted = cygheap->user.curr_token_is_restricted;
+    }
   debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
   return ret;
 }

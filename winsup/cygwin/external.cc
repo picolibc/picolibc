@@ -415,6 +415,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  int useTerminateProcess = va_arg (arg, int);
 	  exit_process (status, !!useTerminateProcess); /* no return */
 	}
+      case CW_SET_EXTERNAL_TOKEN:
+	{
+	  HANDLE token = va_arg (arg, HANDLE);
+	  int type = va_arg (arg, int);
+	  set_imp_token (token, type);
+	  return 0;
+	}
 
       default:
 	break;

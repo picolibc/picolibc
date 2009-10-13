@@ -366,6 +366,8 @@ extern "C" int acl32 (const char *, int, int, __acl32 *);
 int getacl (HANDLE, path_conv &, int, __acl32 *);
 int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
 
+/* Set impersonation or restricted token.  */
+void set_imp_token (HANDLE token, int type);
 /* Function creating a token by calling NtCreateToken. */
 HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
 /* LSA authentication function. */

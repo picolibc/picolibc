@@ -1,3 +1,23 @@
+2009-10-13  Christian Franke  <franke@computer.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h: Add new cygwin_getinfo_type
+	CW_SET_EXTERNAL_TOKEN.
+	Add new enum CW_TOKEN_IMPERSONATION, CW_TOKEN_RESTRICTED.
+	* cygheap.h (cyguser): New flags ext_token_is_restricted,
+	curr_token_is_restricted and setuid_to_restricted.
+	* external.cc (cygwin_internal): Add CW_SET_EXTERNAL_TOKEN.
+	* sec_auth.cc (set_imp_token): New function.
+	(cygwin_set_impersonation_token): Call set_imp_token ().
+	* security.h (set_imp_token): New prototype.
+	* spawn.cc (spawn_guts): Use CreateProcessAsUserW if restricted token
+	was enabled by setuid().  Do not create new window station in this case.
+	* syscalls.cc (seteuid32): Add handling of restricted external tokens.
+	Set HANDLE_FLAG_INHERIT for primary token.
+	(setuid32): Set setuid_to_restricted flag.
+	* uinfo.cc (uinfo_init): Do not reimpersonate if restricted token was
+	enabled by setuid ().  Initialize user.*_restricted flags.
+
 2009-10-13  Eric Blake  <ebb9@byu.net>
 
 	* hires.h (hires_ms): Change initime_us to initime_ns, with 10x

@@ -143,8 +143,16 @@ typedef enum
     CW_SET_DOS_FILE_WARNING,
     CW_SET_PRIV_KEY,
     CW_SETERRNO,
-    CW_EXIT_PROCESS
+    CW_EXIT_PROCESS,
+    CW_SET_EXTERNAL_TOKEN
   } cygwin_getinfo_types;
+
+/* Token type for CW_SET_EXTERNAL_TOKEN */
+enum
+{
+  CW_TOKEN_IMPERSONATION = 0,
+  CW_TOKEN_RESTRICTED    = 1
+};
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
 unsigned long cygwin_internal (cygwin_getinfo_types, ...);

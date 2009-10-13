@@ -108,6 +108,9 @@ public:
   HANDLE internal_token;
   HANDLE curr_primary_token;
   HANDLE curr_imp_token;
+  bool ext_token_is_restricted;  /* external_token is restricted token */
+  bool curr_token_is_restricted; /* curr_primary_token is restricted token */
+  bool setuid_to_restricted;     /* switch to restricted token by setuid () */
 
   /* CGF 2002-06-27.  I removed the initializaton from this constructor
      since this class is always allocated statically.  That means that everything

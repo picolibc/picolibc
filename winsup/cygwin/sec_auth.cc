@@ -30,11 +30,19 @@ details. */
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
 
+void
+set_imp_token (HANDLE token, int type)
+{
+  debug_printf ("set_imp_token (%d, %d)", token, type);
+  cygheap->user.external_token = (token == INVALID_HANDLE_VALUE
+				  ? NO_IMPERSONATION : token);
+  cygheap->user.ext_token_is_restricted = (type == CW_TOKEN_RESTRICTED);
+}
+
 extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
-  debug_printf ("set_impersonation_token (%d)", hToken);
-  cygheap->user.external_token = hToken == INVALID_HANDLE_VALUE ? NO_IMPERSONATION : hToken;
+  set_imp_token (hToken, CW_TOKEN_IMPERSONATION);
 }
 
 void

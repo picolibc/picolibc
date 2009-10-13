@@ -136,7 +136,8 @@ uinfo_init ()
   else if (cygheap->user.issetuid ()
 	   && cygheap->user.saved_uid == cygheap->user.real_uid
 	   && cygheap->user.saved_gid == cygheap->user.real_gid
-	   && !cygheap->user.groups.issetgroups ())
+	   && !cygheap->user.groups.issetgroups ()
+	   && !cygheap->user.setuid_to_restricted)
     {
       cygheap->user.reimpersonate ();
       return;
@@ -150,6 +151,9 @@ uinfo_init ()
   cygheap->user.internal_token = NO_IMPERSONATION;
   cygheap->user.curr_primary_token = NO_IMPERSONATION;
   cygheap->user.curr_imp_token = NO_IMPERSONATION;
+  cygheap->user.ext_token_is_restricted = false;
+  cygheap->user.curr_token_is_restricted = false;
+  cygheap->user.setuid_to_restricted = false;
   cygheap->user.set_saved_sid ();	/* Update the original sid */
   cygheap->user.reimpersonate ();
 }
