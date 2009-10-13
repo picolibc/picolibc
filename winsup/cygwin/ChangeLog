@@ -1,3 +1,7 @@
+2009-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2009-10-13  Christian Franke  <franke@computer.org>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
