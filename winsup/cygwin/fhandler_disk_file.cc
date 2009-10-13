@@ -1306,8 +1306,7 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       closeit = true;
     }
 
-  gettimeofday (reinterpret_cast<struct timeval *> (&timeofday), 0);
-  timeofday.tv_nsec *= 1000;
+  clock_gettime (CLOCK_REALTIME, &timeofday);
   if (!tvp)
     tmp[1] = tmp[0] = timeofday;
   else

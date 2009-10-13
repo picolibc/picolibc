@@ -1,6 +1,6 @@
 /* hires.h: Definitions for hires clock calculations
 
-   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,14 +39,15 @@ class hires_us : hires_base
 
 class hires_ms : hires_base
 {
-  LONGLONG initime_us;
+  LONGLONG initime_ns;
   void prime ();
  public:
-  LONGLONG usecs ();
-  LONGLONG msecs () {return usecs () / 1000LL;}
+  LONGLONG nsecs ();
+  LONGLONG usecs () {return nsecs () / 10LL;}
+  LONGLONG msecs () {return nsecs () / 10000LL;}
   UINT dmsecs () { return timeGetTime (); }
   UINT resolution ();
-  LONGLONG uptime () {return (usecs () - initime_us) / 1000LL;}
+  LONGLONG uptime () {return (nsecs () - initime_ns) / 10000LL;}
 };
 
 extern hires_ms gtod;

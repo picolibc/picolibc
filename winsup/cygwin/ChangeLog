@@ -1,3 +1,18 @@
+2009-10-13  Eric Blake  <ebb9@byu.net>
+
+	* hires.h (hires_ms): Change initime_us to initime_ns, with 10x
+	more resolution.
+	(hires_ms::nsecs): New prototype.
+	(hires_ms::usecs, hires_ms::msecs, hires_ms::uptime): Adjust.
+	* times.cc (systime_ns): New helper function.
+	(hires_ms::prime): Use it for more resolution.
+	(hires_ms::usecs): Change to...
+	(hires_ms::nsecs): ...with more resolution.
+	(clock_gettime): Use more resolution.
+	(systime): Rewrite in terms of systime_ns.
+	(timespec_to_filetime): Rewrite math to reflect true operation.
+	* fhandler_disk_file.cc (utimens_fs): Use higher resolution.
+
 2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Return 0 in CW_SET_DOS_FILE_WARNING

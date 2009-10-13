@@ -29,7 +29,7 @@ details. */
 #define NSPERSEC 10000000LL
 
 static inline LONGLONG
-systime ()
+systime_ns ()
 {
   LARGE_INTEGER x;
   FILETIME ft;
@@ -37,8 +37,13 @@ systime ()
   x.HighPart = ft.dwHighDateTime;
   x.LowPart = ft.dwLowDateTime;
   x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
-  x.QuadPart /= 10;		/* Convert to microseconds */
   return x.QuadPart;
+}
+
+static inline LONGLONG
+systime ()
+{
+  return systime_ns () / 10;
 }
 
 /* Cygwin internal */
@@ -191,7 +196,7 @@ timespec_to_filetime (const struct timespec *time_in, FILETIME *out)
   else
     {
       long long x = time_in->tv_sec * NSPERSEC +
-			    time_in->tv_nsec / (NSPERSEC/100000) + FACTOR;
+			    time_in->tv_nsec / (1000000000/NSPERSEC) + FACTOR;
       out->dwHighDateTime = x >> 32;
       out->dwLowDateTime = x;
     }
@@ -667,7 +672,7 @@ hires_ms::prime ()
     {
       int priority = GetThreadPriority (GetCurrentThread ());
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-      initime_us = systime () - (((LONGLONG) timeGetTime ()) * 1000LL);
+      initime_ns = systime_ns () - (((LONGLONG) timeGetTime ()) * 10000LL);
       inited = true;
       SetThreadPriority (GetCurrentThread (), priority);
     }
@@ -675,18 +680,18 @@ hires_ms::prime ()
 }
 
 LONGLONG
-hires_ms::usecs ()
+hires_ms::nsecs ()
 {
   if (!inited)
     prime ();
 
-  LONGLONG t = systime ();
-  LONGLONG res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
-  if (res < (t - 40000LL))
+  LONGLONG t = systime_ns ();
+  LONGLONG res = initime_ns + (((LONGLONG) timeGetTime ()) * 10000LL);
+  if (res < (t - 40 * 10000LL))
     {
       inited = false;
       prime ();
-      res = initime_us + (((LONGLONG) timeGetTime ()) * 1000LL);
+      res = initime_ns + (((LONGLONG) timeGetTime ()) * 10000LL);
     }
   return res;
 }
@@ -700,12 +705,12 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       return -1;
     }
 
-  LONGLONG now = gtod.usecs ();
+  LONGLONG now = gtod.nsecs ();
   if (now == (LONGLONG) -1)
     return -1;
 
-  tp->tv_sec = now / 1000000;
-  tp->tv_nsec = (now % 1000000) * 1000;
+  tp->tv_sec = now / NSPERSEC;
+  tp->tv_nsec = (now % NSPERSEC) * (1000000000 / NSPERSEC);
   return 0;
 }
 
