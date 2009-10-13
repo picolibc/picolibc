@@ -1,3 +1,9 @@
+2009-10-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/signal.h: Include <sys/types.h> always.
+	[__CYGWIN__, __rtems__]: Define kill first argument as pid_t per
+	standards.
+
 2009-10-09  Dave Korn  <dave.korn@artimi.com>
 
 	* libc/include/sys/time.h (_TIMEVAL_DEFINED): Define when

@@ -8,12 +8,9 @@ extern "C" {
 
 #include "_ansi.h"
 #include <sys/features.h>
+#include <sys/types.h>
 
 /* #ifndef __STRICT_ANSI__*/
-
-#if defined(_POSIX_THREADS)
-#include <sys/types.h>   /* for pthread data types */
-#endif
 
 typedef unsigned long sigset_t;
 
@@ -144,11 +141,8 @@ int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
 #undef sigemptyset
 #undef sigfillset
 #undef sigismember
-/* The first argument to kill should be pid_t.  Right now
-   <sys/types.h> always defines pid_t to be int.  If that ever
-   changes, then we will need to do something else, perhaps along the
-   lines of <machine/types.h>.  */
-int _EXFUN(kill, (int, int));
+
+int _EXFUN(kill, (pid_t, int));
 int _EXFUN(killpg, (pid_t, int));
 int _EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
 int _EXFUN(sigaddset, (sigset_t *, const int));
