@@ -1,3 +1,8 @@
+2009-10-13  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/sys/unistd.h: Add _PC*, _CS*, and _SC* constants
+	new to POSIX 2008.
+
 2009-10-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/signal.h: Include <sys/types.h> always.
