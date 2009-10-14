@@ -67,7 +67,7 @@ enum bfd_link_hash_type
   bfd_link_hash_warning		/* Like indirect, but warn if referenced.  */
 };
 
-enum bfd_link_common_skip_ar_aymbols
+enum bfd_link_common_skip_ar_symbols
 {
   bfd_link_common_skip_none,
   bfd_link_common_skip_text,
@@ -371,9 +371,9 @@ struct bfd_link_info
   /* Which local symbols to discard.  */
   enum bfd_link_discard discard;
 
-  /* Criteria for skipping symbols when detemining
+  /* Criteria for skipping symbols when determining
      whether to include an object from an archive. */
-  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+  enum bfd_link_common_skip_ar_symbols common_skip_ar_symbols;
 
   /* Char that may appear as the first char of a symbol, but should be
      skipped (like symbol_leading_char) when looking up symbols in
