@@ -274,6 +274,7 @@ strace::prntf (unsigned category, const char *func, const char *fmt, ...)
 
   va_start (ap, fmt);
   vprntf (category, func, fmt, ap);
+  va_end (ap);
 }
 
 extern "C" void
@@ -285,6 +286,7 @@ strace_printf (unsigned category, const char *func, const char *fmt, ...)
     {
       va_start (ap, fmt);
       strace.vprntf (category, func, fmt, ap);
+      va_end (ap);
     }
 }
 

@@ -1,3 +1,11 @@
+2009-10-13  Eric Blake  <ebb9@byu.net>
+
+	* external.cc (cygwin_internal): Use va_end.
+	* fork.cc (child_copy): Likewise.
+	* libc/bsdlib.cc (warn, warnx, err, errx): Likewise.
+	* pinfo.cc (commune_request): Likewise.
+	* strace.cc (strace::prntf, strace_printf): Likewise.
+
 2009-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.

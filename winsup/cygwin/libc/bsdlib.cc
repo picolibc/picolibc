@@ -181,6 +181,7 @@ warn (const char *fmt, ...)
   va_list ap;
   va_start (ap, fmt);
   vwarn (fmt, ap);
+  va_end (ap);
 }
 
 extern "C" void
@@ -189,6 +190,7 @@ warnx (const char *fmt, ...)
   va_list ap;
   va_start (ap, fmt);
   vwarnx (fmt, ap);
+  va_end (ap);
 }
 
 extern "C" void
@@ -211,6 +213,7 @@ err (int eval, const char *fmt, ...)
   va_list ap;
   va_start (ap, fmt);
   vwarn (fmt, ap);
+  va_end (ap);
   exit (eval);
 }
 
@@ -220,6 +223,7 @@ errx (int eval, const char *fmt, ...)
   va_list ap;
   va_start (ap, fmt);
   vwarnx (fmt, ap);
+  va_end (ap);
   exit (eval);
 }
 

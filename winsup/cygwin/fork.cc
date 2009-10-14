@@ -758,10 +758,12 @@ child_copy (HANDLE hp, bool write, ...)
 	}
     }
 
+  va_end (args);
   debug_printf ("done");
   return true;
 
  err:
+  va_end (args);
   TerminateProcess (hp, 1);
   set_errno (EAGAIN);
   return false;

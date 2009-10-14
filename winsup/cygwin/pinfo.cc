@@ -584,8 +584,6 @@ _pinfo::commune_request (__uint32_t code, ...)
   HANDLE request_sync = NULL;
   bool locked = false;
 
-  va_start (args, code);
-
   res.s = NULL;
   res.n = 0;
 
@@ -595,6 +593,7 @@ _pinfo::commune_request (__uint32_t code, ...)
       goto err;
     }
 
+  va_start (args, code);
   si._si_commune._si_code = code;
   switch (code)
     {
@@ -608,6 +607,7 @@ _pinfo::commune_request (__uint32_t code, ...)
 
     break;
     }
+  va_end (args);
 
   locked = true;
   char name_buf[MAX_PATH];
