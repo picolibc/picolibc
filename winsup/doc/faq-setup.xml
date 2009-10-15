@@ -268,7 +268,7 @@ their URLs  (named <literal>ftp%3a%2f...</literal>).
 <para>Of course, you can keep them around in case you want to reinstall a
 package. If you want to clean out only the outdated packages, Michael Chase
 has written a script called <literal>clean_setup.pl</literal>, available
-at <ulink url="http://home.ix.netcom.com/~mchase/zip/" />.
+at <ulink url="http://cygwin.com/clean_setup.pl" />.
 </para>
 </answer></qandaentry>
 
