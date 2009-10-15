@@ -60,6 +60,12 @@ _DEFUN(nl_langinfo, (item),
 	case CODESET:
 #ifdef __CYGWIN__
 		ret = __locale_charset ();
+		/* Temporary exception for KOI8 charsets which are
+		   incorrectly treated by calling applications otherwise. */
+		if (strcmp (ret, "CP20866") == 0)
+		  ret = "KOI8-R";
+		else if (strcmp (ret, "CP21866") == 0)
+		  ret = "KOI8-U";
 #else
 		ret = "";
 		if ((s = setlocale(LC_CTYPE, NULL)) != NULL) {

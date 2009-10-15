@@ -1,3 +1,8 @@
+2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/nl_langinfo.c (nl_langinfo): Add Cygwin-specific temporary
+	exception for KOI8 charsets.
+
 2009-10-13  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/sys/unistd.h: Add _PC*, _CS*, and _SC* constants
