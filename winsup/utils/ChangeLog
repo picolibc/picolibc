@@ -1,3 +1,11 @@
+2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (get_special_folder): Fetch path as WCHAR and convert
+	using my_wcstombs.
+	(get_user_folder): Remove.
+	(do_sysfolders): Use get_special_folder instead of get_user_folder.
+	Fetch system paths as WCHAR and convert using my_wcstombs.
+
 2009-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* kill.cc (main): Skip to PID loop on invalid option to handle

@@ -558,45 +558,46 @@ get_mixed_name (const char* filename)
 static bool
 get_special_folder (char* path, int id)
 {
-  path[0] = 0;
+  WCHAR wpath[MAX_PATH];
+
+  path[0] = '\0';
+  wpath[0] = L'\0';
   LPITEMIDLIST pidl = 0;
   if (SHGetSpecialFolderLocation (NULL, id, &pidl) != S_OK)
     return false;
-  if (!SHGetPathFromIDList (pidl, path) || !path[0])
+  if (!SHGetPathFromIDListW (pidl, wpath) || !wpath[0])
     return false;
+  my_wcstombs (path, wpath, PATH_MAX);
   return true;
-}
-
-static void
-get_user_folder (char* path, int id, int allid)
-{
-  get_special_folder (path, allusers_flag ? allid : id);
 }
 
 static void
 do_sysfolders (char option)
 {
-  char *buf, buf1[MAX_PATH], buf2[PATH_MAX];
+  char *buf, buf1[PATH_MAX], buf2[PATH_MAX];
+  WCHAR wbuf[MAX_PATH];
   DWORD len = MAX_PATH;
-  WIN32_FIND_DATA w32_fd;
+  WIN32_FIND_DATAW w32_fd;
   HINSTANCE k32;
-  BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
+  BOOL (*GetProfilesDirectoryAPtrW) (LPWSTR, LPDWORD) = 0;
 
   buf = buf1;
   buf[0] = 0;
   switch (option)
     {
     case 'D':
-      get_user_folder (buf, CSIDL_DESKTOPDIRECTORY,
-			    CSIDL_COMMON_DESKTOPDIRECTORY);
+      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_DESKTOPDIRECTORY
+					     : CSIDL_DESKTOPDIRECTORY);
       break;
 
     case 'P':
-      get_user_folder (buf, CSIDL_PROGRAMS, CSIDL_COMMON_PROGRAMS);
+      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_PROGRAMS
+					     : CSIDL_PROGRAMS);
       break;
 
     case 'O':
-      get_user_folder (buf, CSIDL_PERSONAL, CSIDL_COMMON_DOCUMENTS);
+      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_DOCUMENTS
+					     : CSIDL_PERSONAL);
       break;
 
     case 'F':
@@ -616,25 +617,35 @@ do_sysfolders (char option)
     case 'H':
       k32 = LoadLibrary ("userenv");
       if (k32)
-	GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
-	  GetProcAddress (k32, "GetProfilesDirectoryA");
-      if (GetProfilesDirectoryAPtr)
-	(*GetProfilesDirectoryAPtr) (buf, &len);
+	GetProfilesDirectoryAPtrW = (BOOL (*) (LPWSTR, LPDWORD))
+	  GetProcAddress (k32, "GetProfilesDirectoryW");
+      if (GetProfilesDirectoryAPtrW)
+	(*GetProfilesDirectoryAPtrW) (wbuf, &len);
       else
 	{
-	  GetWindowsDirectory (buf, MAX_PATH);
-	  strcat (buf, "\\Profiles");
+	  GetWindowsDirectoryW (wbuf, MAX_PATH);
+	  wcscat (wbuf, L"\\Profiles");
 	}
+      my_wcstombs (buf, wbuf, PATH_MAX);
       break;
 
     case 'S':
-      GetSystemDirectory (buf, MAX_PATH);
-      FindFirstFile (buf, &w32_fd);
-      strcpy (strrchr (buf, '\\') + 1, w32_fd.cFileName);
+      {
+	HANDLE fh;
+
+	GetSystemDirectoryW (wbuf, MAX_PATH);
+	if ((fh = FindFirstFileW (wbuf, &w32_fd)) != INVALID_HANDLE_VALUE)
+	  {
+	    FindClose (fh);
+	    wcscpy (wcsrchr (wbuf, L'\\') + 1, w32_fd.cFileName);
+	  }
+	my_wcstombs (buf, wbuf, PATH_MAX);
+      }
       break;
 
     case 'W':
-      GetWindowsDirectory (buf, MAX_PATH);
+      GetWindowsDirectoryW (wbuf, MAX_PATH);
+      my_wcstombs (buf, wbuf, PATH_MAX);
       break;
 
     default:
