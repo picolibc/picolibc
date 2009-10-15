@@ -1,3 +1,8 @@
+2009-10-15  Jakub Jelinek  <jakub@redhat.com>
+
+	* include/dwarf2.h (DW_LANG_Python): Add comment that it is
+	a DWARF 4 addition.
+
 2009-10-14  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (enum bfd_link_common_skip_ar_symbols): Rename from
