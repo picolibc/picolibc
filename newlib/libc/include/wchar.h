@@ -38,6 +38,10 @@
 
 _BEGIN_STD_C
 
+/* As required by POSIX.1-2008, declare tm as incomplete type.
+   The actual definition is in time.h. */
+struct tm;
+
 #ifndef _MBSTATE_T
 #define _MBSTATE_T
 typedef _mbstate_t mbstate_t;

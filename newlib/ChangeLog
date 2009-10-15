@@ -1,5 +1,9 @@
 2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/wchar.h (struct tm0: Declare as incomplete type.
+
+2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/nl_langinfo.c (nl_langinfo): Add Cygwin-specific temporary
 	exception for KOI8 charsets.
 
