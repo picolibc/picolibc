@@ -1,3 +1,13 @@
+2009-10-09  Rafael Espindola  <espindola@google.com>
+
+	* plugin-api.h (ld_plugin_add_input_library): Change argument name to
+	libname.
+
+2008-10-03  Rafael Espindola  <espindola@google.com>
+
+	* plugin-api.h: New.
+	* lto-symtab.h: New.
+
 2009-09-09  Martin Thuresson  <martin@mtme.org>
 
 	* bfdlink.h (struct bfd_link_hash_common_entry): Move to top
