@@ -1,3 +1,8 @@
+2009-10-06  Ian Lance Taylor  <iant@google.com>
+
+	* Makefile.def: check-gold depends upon all-gas.
+	* Makefile.in: Rebuild.
+
 2009-09-02  Paolo Bonzini  <bonzini@gnu.org>
 
 	* Makefile.tpl (AWK): Fix typo.
