@@ -30,6 +30,15 @@
 /* Type of cpu is stored in flags.  */
 #define F_MACHMASK 0xF000
 
+/* Z80 COFF encodes the section alignment in the section header flags */
+#define COFF_ALIGN_IN_SECTION_HEADER 1
+#define COFF_ALIGN_IN_S_FLAGS 1
+#define F_ALGNMASK 0x0F00
+/* requires a power-of-two argument */
+#define COFF_ENCODE_ALIGNMENT(S,X) ((S).s_flags |= (((unsigned)(X)&0xF)<<8))
+/* result is a power of two */
+#define COFF_DECODE_ALIGNMENT(X) (((X)>>8)&0xF)
+
 #define	Z80MAGIC   0x805A
 
 #define Z80BADMAG(x) (((x).f_magic != Z80MAGIC))

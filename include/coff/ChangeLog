@@ -1,3 +1,8 @@
+2009-10-17  Arnold Metselaar  <arnold.metselaar@planet.nl>
+
+	* z80.h: Store alignment requirement in section header, to allow
+	ld to preserve alignment. Some code was copied from ti.h. 
+
 2009-09-05  Martin Thuresson  <martin@mtme.org>
 
 	* ti.h (GET_LNSZ_SIZE, PUT_LNSZ_SIZE): Updated name of class
