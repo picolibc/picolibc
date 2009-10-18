@@ -155,7 +155,7 @@ uinfo_init ()
   cygheap->user.curr_token_is_restricted = false;
   cygheap->user.setuid_to_restricted = false;
   cygheap->user.set_saved_sid ();	/* Update the original sid */
-  cygheap->user.reimpersonate ();
+  cygheap->user.deimpersonate ();
 }
 
 extern "C" int

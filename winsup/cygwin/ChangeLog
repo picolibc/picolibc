@@ -1,3 +1,8 @@
+2009-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (uinfo_init): Deimpersonate, don't reimpersonate, if
+	not in a setuid condition.
+
 2009-10-13  Eric Blake  <ebb9@byu.net>
 
 	* external.cc (cygwin_internal): Use va_end.
