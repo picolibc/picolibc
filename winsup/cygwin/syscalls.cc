@@ -4242,13 +4242,17 @@ internal_setlocale ()
   /* FIXME: It could be necessary to convert the entire environment,
 	    not just PATH. */
   tmp_pathbuf tp;
-  wchar_t *w_path, *w_cwd;
+  char *path = getenv ("PATH");
+  wchar_t *w_path = NULL, *w_cwd;
 
   debug_printf ("Cygwin charset changed from %s to %s",
 		cygheap->locale.charset, __locale_charset ());
-  /* Fetch CWD and PATH and convert to wchar_t in previous charset. */
-  w_path = tp.w_get ();
-  sys_mbstowcs (w_path, 32768, getenv ("PATH"));
+  /* Fetch PATH and CWD and convert to wchar_t in previous charset. */
+  if (path && *path)	/* $PATH can be potentially unset. */
+    {
+      w_path = tp.w_get ();
+      sys_mbstowcs (w_path, 32768, path);
+    }
   w_cwd = tp.w_get ();
   cwdstuff::cwd_lock.acquire ();
   sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
@@ -4259,9 +4263,12 @@ internal_setlocale ()
   /* Restore CWD and PATH in new charset. */
   cygheap->cwd.reset_posix (w_cwd);
   cwdstuff::cwd_lock.release ();
-  char *c_path = tp.c_get ();
-  sys_wcstombs (c_path, 32768, w_path);
-  setenv ("PATH", c_path, 1);
+  if (w_path)
+    {
+      char *c_path = tp.c_get ();
+      sys_wcstombs (c_path, 32768, w_path);
+      setenv ("PATH", c_path, 1);
+    }
 }
 
 /* Called from dll_crt0_1, before calling the application's main().

@@ -1,5 +1,10 @@
 2009-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (internal_setlocale): Only convert $PATH if there is a
+	$PATH.
+
+2009-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (av::fixup): Treat non-readable, but executable files as
 	Cygwin executables.
 
