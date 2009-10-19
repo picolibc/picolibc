@@ -1,3 +1,8 @@
+2009-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (av::fixup): Treat non-readable, but executable files as
+	Cygwin executables.
+
 2009-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (uinfo_init): Deimpersonate, don't reimpersonate, if

@@ -1003,7 +1003,18 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_NON_DIRECTORY_FILE);
       if (!NT_SUCCESS (status))
-	goto err;
+	{
+	  /* File is not readable?  Doesn't mean it's not executable.
+	     Test for executablility and if so, just assume the file is
+	     a cygwin executable and go ahead. */
+	  if (status == STATUS_ACCESS_DENIED && real_path.has_acls ()
+	      && check_file_access (real_path, X_OK, true) == 0)
+	    {
+	      real_path.set_cygexec (true);
+	      break;
+	    }
+	  goto err;
+	}
 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
       NtClose (h);
