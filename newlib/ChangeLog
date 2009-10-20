@@ -1,3 +1,10 @@
+2009-10-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/config.h[__CYGWIN__]: Set __USE_XOPEN2K flag
+	if not __STRICT_ANSI__ or stdc version C99 or greater.
+	* libc/include/stdio.h[__STRICT_ANSI__]: Add __USE_XOPEN2K check 
+	for fseeko and ftello prototypes.
+
 2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/wchar.h (struct tm0: Declare as incomplete type.
