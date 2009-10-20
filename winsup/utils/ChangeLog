@@ -1,3 +1,7 @@
+2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Update with latest NT 6.1 versions.
+
 2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (get_special_folder): Fetch path as WCHAR and convert
