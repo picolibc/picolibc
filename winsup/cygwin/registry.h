@@ -30,10 +30,17 @@ public:
   int killvalue (const char *name);
 
   HKEY get_key ();
-  int get_int (const char *,int def);
-  int get_string (const char *, char *buf, size_t len, const char *def);
-  int set_string (const char *,const char *);
-  int set_int (const char *, int val);
+
+  int get_int (const char *, int);
+  int get_int (const PWCHAR, int);
+  int get_string (const char *, char *, size_t, const char *);
+  int get_string (const PWCHAR, PWCHAR, size_t, const PWCHAR);
+
+  int set_int (const char *, int);
+  int set_int (const PWCHAR, int);
+  int set_string (const char *, const char *);
+  int set_string (const PWCHAR, const PWCHAR);
+
   bool created () const {return _disposition & REG_CREATED_NEW_KEY;}
 
   ~reg_key ();

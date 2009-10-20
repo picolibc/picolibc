@@ -115,8 +115,25 @@ reg_key::get_int (const char *name, int def)
   if (key_is_invalid)
     return def;
 
-  LONG res = RegQueryValueExA (key, name, 0, &type, (unsigned char *) &dst,
-			       &size);
+  LONG res = RegQueryValueExA (key, name, 0, &type, (LPBYTE) &dst, &size);
+
+  if (type != REG_DWORD || res != ERROR_SUCCESS)
+    return def;
+
+  return dst;
+}
+
+int
+reg_key::get_int (const PWCHAR name, int def)
+{
+  DWORD type;
+  DWORD dst;
+  DWORD size = sizeof (dst);
+
+  if (key_is_invalid)
+    return def;
+
+  LONG res = RegQueryValueExW (key, name, 0, &type, (LPBYTE) &dst, &size);
 
   if (type != REG_DWORD || res != ERROR_SUCCESS)
     return def;
@@ -134,14 +151,25 @@ reg_key::set_int (const char *name, int val)
     return key_is_invalid;
 
   return (int) RegSetValueExA (key, name, 0, REG_DWORD,
-			       (unsigned char *) &value, sizeof (value));
+			       (const BYTE *) &value, sizeof (value));
+}
+
+int
+reg_key::set_int (const PWCHAR name, int val)
+{
+  DWORD value = val;
+  if (key_is_invalid)
+    return key_is_invalid;
+
+  return (int) RegSetValueExW (key, name, 0, REG_DWORD,
+			       (const BYTE *) &value, sizeof (value));
 }
 
 /* Given the current registry key, return the specific string value
    requested.  Return zero on success, non-zero on failure. */
 
 int
-reg_key::get_string (const char *name, char *dst, size_t max, const char * def)
+reg_key::get_string (const char *name, char *dst, size_t max, const char *def)
 {
   DWORD size = max;
   DWORD type;
@@ -150,10 +178,27 @@ reg_key::get_string (const char *name, char *dst, size_t max, const char * def)
   if (key_is_invalid)
     res = key_is_invalid;
   else
-    res = RegQueryValueExA (key, name, 0, &type, (unsigned char *) dst, &size);
+    res = RegQueryValueExA (key, name, 0, &type, (LPBYTE) dst, &size);
 
   if ((def != 0) && ((type != REG_SZ) || (res != ERROR_SUCCESS)))
     strcpy (dst, def);
+  return (int) res;
+}
+
+int
+reg_key::get_string (const PWCHAR name, PWCHAR dst, size_t max, const PWCHAR def)
+{
+  DWORD size = max;
+  DWORD type;
+  LONG res;
+
+  if (key_is_invalid)
+    res = key_is_invalid;
+  else
+    res = RegQueryValueExW (key, name, 0, &type, (LPBYTE) dst, &size);
+
+  if ((def != 0) && ((type != REG_SZ) || (res != ERROR_SUCCESS)))
+    wcscpy (dst, def);
   return (int) res;
 }
 
@@ -164,8 +209,17 @@ reg_key::set_string (const char *name, const char *src)
 {
   if (key_is_invalid)
     return key_is_invalid;
-  return (int) RegSetValueExA (key, name, 0, REG_SZ, (unsigned char*) src,
+  return (int) RegSetValueExA (key, name, 0, REG_SZ, (const BYTE*) src,
 			       strlen (src) + 1);
+}
+
+int
+reg_key::set_string (const PWCHAR name, const PWCHAR src)
+{
+  if (key_is_invalid)
+    return key_is_invalid;
+  return (int) RegSetValueExW (key, name, 0, REG_SZ, (const BYTE*) src,
+			       (wcslen (src) + 1) * sizeof (WCHAR));
 }
 
 /* Return the handle to key. */

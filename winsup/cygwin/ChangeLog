@@ -1,5 +1,14 @@
 2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* registry.cc (reg_key::get_int): Add alternative implementation
+	taking WCHAR strings.
+	(reg_key::set_int): Ditto.
+	(reg_key::get_string): Ditto.
+	(reg_key::set_string): Ditto.
+	* registry.h (struct reg_key): Add prototypes for added methods.
+
+2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* smallprint.cc (__small_vsprintf): Simplify UNICODE string handling
 	and allow empty strings.
 
