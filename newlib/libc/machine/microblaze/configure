@@ -2886,7 +2886,6 @@ if test $ac_cv_c_compiler_gnu = yes; then
   GCC=yes
   ac_test_CFLAGS="${CFLAGS+set}"
   ac_save_CFLAGS="$CFLAGS"
-  CFLAGS=
   ac_test_CFLAGS=${CFLAGS+set}
 ac_save_CFLAGS=$CFLAGS
 { $as_echo "$as_me:$LINENO: checking whether $CC accepts -g" >&5

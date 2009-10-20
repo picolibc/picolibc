@@ -1,3 +1,28 @@
+2009-10-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Don't set -O2 flag in newlib_cflags.  Leave
+	that to CFLAGS.
+	* acinclude.m4: Don't reset CFLAGS before calling _AC_PROG_CC_G
+	as it sets the same flags as we are using.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* Makefile.in: Ditto.
+	* iconvdata/aclocal.m4: Ditto.
+	* iconvdata/configure: Ditto.
+	* iconvdata/Makefile.in: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* doc/Makefile.in: Ditto.
+	* libc/aclocal.m4: Ditto.
+	* libc/configure: Ditto.
+	* libc/Makefile.in: Ditto.
+	* libc/*Makefile.in: Ditto.
+	* libc/*aclocal.m4: Ditto.
+	* libc/*configure: Ditto.
+	* libm/*Makefile.in: Ditto.
+	* libm/*aclocal.m4: Ditto.
+	* libm/*configure: Ditto.
+
 2009-10-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/config.h[__CYGWIN__]: Set __USE_XOPEN2K flag

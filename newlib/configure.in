@@ -452,6 +452,8 @@ if test $newlib_cv_ldbl_eq_dbl = yes; then
   AC_DEFINE_UNQUOTED(_LDBL_EQ_DBL)
 fi
 
+AC_SUBST(CFLAGS)
+
 AC_CONFIG_FILES([Makefile],
 [if test -n "$CONFIG_FILES"; then
   unset ac_file

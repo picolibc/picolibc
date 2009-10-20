@@ -80,7 +80,6 @@ case "${target_optspace}:${host}" in
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
-    newlib_cflags="${newlib_cflags} -O2"
     ;;
 esac
 

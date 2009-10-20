@@ -157,7 +157,6 @@ dnl plays around with CFLAGS (such as to build both debugging and
 dnl normal versions of a library), tasteless as that idea is.
   ac_test_CFLAGS="${CFLAGS+set}"
   ac_save_CFLAGS="$CFLAGS"
-  CFLAGS=
   _AC_PROG_CC_G
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
