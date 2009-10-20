@@ -1870,10 +1870,13 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 					 FALSE, NULL, dir->__d_position == 0);
 	  /* FileIdBothDirectoryInformation isn't supported for remote drives
 	     on NT4 and 2K systems, and it's also not supported on 2K at all,
-	     when accessing network drives on any remote OS.  We just fall
-	     back to using a standard directory query in this case and note
-	     this case using the dirent_get_d_ino flag. */
+	     when accessing network drives on any remote OS.  There are also
+	     hacked versions of Samba 3.0.x out there (Debian-based it seems),
+	     which return STATUS_NOT_SUPPORTED rather than handling this info
+	     class.  We just fall back to using a standard directory query in
+	     this case and note this case using the dirent_get_d_ino flag. */
 	  if (status == STATUS_INVALID_LEVEL
+	      || status == STATUS_NOT_SUPPORTED
 	      || status == STATUS_INVALID_PARAMETER
 	      || status == STATUS_INVALID_INFO_CLASS)
 	    dir->__flags &= ~dirent_get_d_ino;

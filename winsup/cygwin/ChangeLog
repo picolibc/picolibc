@@ -1,3 +1,8 @@
+2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhander_disk_file::readdir): Handle a status
+	code STATUS_NOT_SUPPORTED.  Add matching comment.
+
 2009-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (internal_setlocale): Only convert $PATH if there is a
