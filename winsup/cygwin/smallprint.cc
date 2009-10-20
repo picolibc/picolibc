@@ -195,16 +195,11 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  if (!us)
 		    RtlInitUnicodeString (us = &uw, L"(null)");
 		wfillin:
+		if (sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
+				  us->Length / sizeof (WCHAR)))
 		  {
-		    if (!sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
-				       us->Length / sizeof (WCHAR)))
-		      {
-			s = "invalid UNICODE_STRING";
-			goto fillin;
-		      }
-		    char *t = tmp;
-		    for (i = 0; *t && i < n; i++)
-		      *dst++ = *t++;
+		    s = tmp;
+		    goto fillin;
 		  }
 		  break;
 		default:
