@@ -1,3 +1,20 @@
+2009-10-23  Charles Wilson  <mingw@cwilson.fastmail.fm>
+
+	Sync pseudo-reloc.c with cygwin/lib/
+	* pseudo-reloc.c [CYGWIN]: Added comments throughout and various
+	whitespace fixes. Exploit cygwin_internal(CW_EXIT_PROCESS,...)
+	for fatal error handling that is consistent with cygwin process
+	life-cycle. Ensure state variable (in _pei386_runtime_relocator)
+	is unique to each address space, across fork().
+	[CYGWIN] (__print_reloc_error): New function for reporting
+	errors in a manner supported by cygwin at this early stage of
+	the process life-cycle.
+	[CYGWIN] (_pei386_runtime_relocator): Ensure relocations
+	performed only once for each address space, but are repeated
+	after fork() in the new address space.
+	[MINGW] (__write_memory): Ensure that b is always initialized
+	by call to VirtualQuery, even if -DNDEBUG.
+
 2009-09-29  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Make MinGW printf() "%p" format compatible with MSVCRT scanf().
