@@ -1,3 +1,8 @@
+2009-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_random.cc (fhandler_dev_random::lseek): Allow negative
+	dummy file positions as on Linux.
+
 2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* registry.cc (reg_key::get_int): Add alternative implementation
