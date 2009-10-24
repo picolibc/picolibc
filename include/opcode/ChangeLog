@@ -1,3 +1,8 @@
+2009-10-23  Doug Evans  <dje@sebabeach.org>
+
+	* cgen-bitset.h: Delete, moved to ../cgen/bitset.h.
+	* cgen.h: Update.  Improve multi-inclusion macro name.
+
 2009-10-02  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* ppc.h (PPC_OPCODE_476): Define.

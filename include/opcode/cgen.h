@@ -1,6 +1,6 @@
 /* Header file for targets using CGEN: Cpu tools GENerator.
 
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2009
 Free Software Foundation, Inc.
 
 This file is part of GDB, the GNU debugger, and the GNU Binutils.
@@ -19,11 +19,12 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef CGEN_H
-#define CGEN_H
+#ifndef OPCODE_CGEN_H
+#define OPCODE_CGEN_H
 
 #include "symcat.h"
-#include "cgen-bitset.h"
+#include "cgen/bitset.h"
+
 /* ??? This file requires bfd.h but only to get bfd_vma.
    Seems like an awful lot to require just to get such a fundamental type.
    Perhaps the definition of bfd_vma can be moved outside of bfd.h.
@@ -1470,4 +1471,4 @@ extern void cgen_clear_signed_overflow_ok (CGEN_CPU_DESC);
 /* Will an error message be generated if a signed field in an instruction overflows ? */
 extern unsigned int cgen_signed_overflow_ok_p (CGEN_CPU_DESC);
 
-#endif /* CGEN_H */
+#endif /* OPCODE_CGEN_H */
