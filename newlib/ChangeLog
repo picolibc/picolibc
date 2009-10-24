@@ -1,3 +1,10 @@
+2009-10-24  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/ctype.h (__ctype_lookup): New macro.
+	(isalpha, isupper, islower, isdigit, isxdigit, isspace, ispunct)
+	(isalnum, isprint, isgraph, iscntrl, isblank): Use it to fix bug
+	on 64-bit machines.
+
 2009-10-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Don't set -O2 flag in newlib_cflags.  Leave
@@ -27,7 +34,7 @@
 
 	* libc/include/sys/config.h[__CYGWIN__]: Set __USE_XOPEN2K flag
 	if not __STRICT_ANSI__ or stdc version C99 or greater.
-	* libc/include/stdio.h[__STRICT_ANSI__]: Add __USE_XOPEN2K check 
+	* libc/include/stdio.h[__STRICT_ANSI__]: Add __USE_XOPEN2K check
 	for fseeko and ftello prototypes.
 
 2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
@@ -152,7 +159,7 @@
 
 2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
 
-	* configure.host (m32c): Move setting -DABORT_PROVIDED to second 
+	* configure.host (m32c): Move setting -DABORT_PROVIDED to second
 	"case $host".
 
 2009-09-18  Christopher Faylor  <me+cygwin@cgf.cx>

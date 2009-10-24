@@ -47,24 +47,32 @@ extern	__IMPORT char	*__ctype_ptr__;
 #ifndef __cplusplus
 /* These macros are intentionally written in a manner that will trigger
    a gcc -Wall warning if the user mistakenly passes a 'char' instead
-   of an int containing an 'unsigned char'.  */
-#define	isalpha(__c)	((__ctype_ptr__+1)[__c]&(_U|_L))
-#define	isupper(__c)	(((__ctype_ptr__+1)[__c]&(_U|_L))==_U)
-#define	islower(__c)	(((__ctype_ptr__+1)[__c]&(_U|_L))==_L)
-#define	isdigit(__c)	((__ctype_ptr__+1)[__c]&_N)
-#define	isxdigit(__c)	((__ctype_ptr__+1)[__c]&(_X|_N))
-#define	isspace(__c)	((__ctype_ptr__+1)[__c]&_S)
-#define ispunct(__c)	((__ctype_ptr__+1)[__c]&_P)
-#define isalnum(__c)	((__ctype_ptr__+1)[__c]&(_U|_L|_N))
-#define isprint(__c)	((__ctype_ptr__+1)[__c]&(_P|_U|_L|_N|_B))
-#define	isgraph(__c)	((__ctype_ptr__+1)[__c]&(_P|_U|_L|_N))
-#define iscntrl(__c)	((__ctype_ptr__+1)[__c]&_C)
+   of an int containing an 'unsigned char'.  Note that the sizeof will
+   always be 1, which is what we want for mapping EOF to __ctype_ptr__[0];
+   the use of a raw index inside the sizeof triggers the gcc warning if
+   __c was of type char, and sizeof masks side effects of the extra __c.
+   Meanwhile, the real index to __ctype_ptr__+1 must be cast to int,
+   since isalpha(0x100000001LL) must equal isalpha(1), rather than being
+   an out-of-bounds reference on a 64-bit machine.  */
+#define __ctype_lookup(__c) ((__ctype_ptr__+sizeof(""[__c]))[(int)__c])
+
+#define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
+#define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)
+#define	islower(__c)	((__ctype_lookup(__c)&(_U|_L))==_L)
+#define	isdigit(__c)	(__ctype_lookup(__c)&_N)
+#define	isxdigit(__c)	(__ctype_lookup(__c)&(_X|_N))
+#define	isspace(__c)	(__ctype_lookup(__c)&_S)
+#define ispunct(__c)	(__ctype_lookup(__c)&_P)
+#define isalnum(__c)	(__ctype_lookup(__c)&(_U|_L|_N))
+#define isprint(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N|_B))
+#define	isgraph(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N))
+#define iscntrl(__c)	(__ctype_lookup(__c)&_C)
 
 #if defined(__GNUC__) && \
     (!defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L)
 #define isblank(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);		\
-      ((__ctype_ptr__+1)[__x]&_B) || (__x) == '\t';})
+        (__ctype_lookup(__x)&_B) || (int) (__x) == '\t';})
 #endif
 
 
