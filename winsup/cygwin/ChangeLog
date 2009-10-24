@@ -1,5 +1,14 @@
 2009-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Always create file with default
+	security descriptor and fix descriptor afterwards.  Change comment to
+	explain why.
+	* security.cc (alloc_sd): Drop setting the SE_DACL_PROTECTED flag.
+	* wincap.cc: Remove has_dacl_protect throughout.
+	* wincap.h: Ditto.
+
+2009-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_random.cc (fhandler_dev_random::lseek): Allow negative
 	dummy file positions as on Linux.
 

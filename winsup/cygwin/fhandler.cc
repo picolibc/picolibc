@@ -553,20 +553,7 @@ fhandler_base::open (int flags, mode_t mode)
 	{
 	  file_attributes |= FILE_ATTRIBUTE_NORMAL;
 
-	  /* If mode has no write bits set, and ACLs are not used, we set
-	     the DOS R/O attribute. */
-	  if (!has_acls () && !(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
-	    file_attributes |= FILE_ATTRIBUTE_READONLY;
-
-	  /* If the file should actually be created and has ACLs,
-	     set files attributes, except on remote file systems.
-	     See below. */
-	  if (has_acls () && !pc.isremote ())
-	    {
-	      set_security_attribute (pc, mode, &sa, sd);
-	      attr.SecurityDescriptor = sa.lpSecurityDescriptor;
-	    }
-	  else if (pc.fs_is_nfs ())
+	  if (pc.fs_is_nfs ())
 	    {
 	      /* When creating a file on an NFS share, we have to set the
 		 file mode by writing a NFS fattr3 structure with the
@@ -586,6 +573,10 @@ fhandler_base::open (int flags, mode_t mode)
 	      nfs_attr->type = NF3REG;
 	      nfs_attr->mode = mode;
 	    }
+	  else if (!has_acls () && !(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+	    /* If mode has no write bits set, and ACLs are not used, we set
+	       the DOS R/O attribute. */
+	    file_attributes |= FILE_ATTRIBUTE_READONLY;
 	  /* The file attributes are needed for later use in, e.g. fchmod. */
 	  pc.file_attributes (file_attributes);
 	}
@@ -606,24 +597,27 @@ fhandler_base::open (int flags, mode_t mode)
 	goto done;
    }
 
-  /* After some discussion on the samba-technical list, starting here:
-     http://lists.samba.org/archive/samba-technical/2008-July/060247.html
+  /* Always create files using a NULL SD.  Create correct permission bits
+     afterwards, maintaining the owner and group information just like chmod.
 
-     Always create files on a remote share using a NULL SD.  Create
-     correct permission bits afterwards, maintaing the owner and group
-     information just like chmod.
+     This is done for two reasons.
 
-     The reason to do this is to maintain the Windows behaviour when
-     creating files on a remote share.  Files on a remote share are
-     created as the user used for authentication.  In a domain that's
+     On Windows filesystems we need to create the file with default
+     permissions to allow inheriting ACEs.  When providing an explicit DACL
+     in calls to [Nt]CreateFile, the created file will not inherit default
+     permissions from the parent object.  This breaks not only Windows
+     inheritance, but also POSIX ACL inheritance.
+
+     Another reason to do this are remote shares.  Files on a remote share
+     are created as the user used for authentication.  In a domain that's
      usually the user you're logged in as.  Outside of a domain you're
      authenticating using a local user account on the sharing machine.
      If the SIDs of the client machine are used, that's entirely
-     unexpected behaviour.
-
-     Doing it like we do here creates the expected SD in a domain as
-     well as on standalone servers. */
-  if ((flags & O_CREAT) && has_acls () && pc.isremote ())
+     unexpected behaviour.  Doing it like we do here creates the expected SD
+     in a domain as well as on standalone servers.
+     This is the result of a discussion on the samba-technical list, starting at
+     http://lists.samba.org/archive/samba-technical/2008-July/060247.html */
+  if ((flags & O_CREAT) && has_acls ())
     set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, mode);
 
   set_io_handle (fh);

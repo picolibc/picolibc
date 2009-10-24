@@ -17,7 +17,6 @@ struct wincaps
   DWORD    heapslop;
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
-  unsigned has_dacl_protect                             : 1;
   unsigned has_ip_helper_lib                            : 1;
   unsigned has_broken_if_oper_status                    : 1;
   unsigned has_physical_mem_access                      : 1;
@@ -72,7 +71,6 @@ public:
   DWORD IMPLEMENT (heapslop)
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
-  bool  IMPLEMENT (has_dacl_protect)
   bool  IMPLEMENT (has_ip_helper_lib)
   bool  IMPLEMENT (has_broken_if_oper_status)
   bool  IMPLEMENT (has_physical_mem_access)
