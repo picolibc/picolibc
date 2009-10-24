@@ -461,8 +461,6 @@ fhandler_base::open (int flags, mode_t mode)
   ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : FILE_SHARE_VALID_FLAGS);
   ULONG create_disposition;
   ULONG create_options = FILE_OPEN_FOR_BACKUP_INTENT;
-  SECURITY_ATTRIBUTES sa = sec_none;
-  security_descriptor sd;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
@@ -471,7 +469,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
 
-  pc.get_object_attr (attr, sa);
+  pc.get_object_attr (attr, sec_none);
 
   switch (query_open ())
     {

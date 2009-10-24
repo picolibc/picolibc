@@ -1,3 +1,7 @@
+2009-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Remove unused variables sa and sd.
+
 2009-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Always create file with default
