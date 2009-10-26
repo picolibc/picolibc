@@ -1,5 +1,9 @@
 2009-10-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* faq-setup.xml: Fix clean_setup.pl reference.
+
+2009-10-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* faq-setup.xml: Change clean_setup.pl reference.
 
 2009-10-15  Corinna Vinschen  <corinna@vinschen.de>
