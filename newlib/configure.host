@@ -223,6 +223,11 @@ case "${host_cpu}" in
   powerpc*)
 	machine_dir=powerpc
 	;;
+  rx)
+	machine_dir=rx
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
+	;;
   sh | sh64)
 	machine_dir=sh
 	;;

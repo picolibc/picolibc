@@ -298,6 +298,7 @@ ac_subdirs_all="$ac_subdirs_all moxie"
 ac_subdirs_all="$ac_subdirs_all mt"
 ac_subdirs_all="$ac_subdirs_all xstormy16"
 ac_subdirs_all="$ac_subdirs_all m32c"
+ac_subdirs_all="$ac_subdirs_all rx"
 ac_subdirs_all="$ac_subdirs_all arm"
 ac_subdirs_all="$ac_subdirs_all spu"
 ac_subdirs_all="$ac_subdirs_all iq2000"
@@ -1977,6 +1978,12 @@ subdirs="$subdirs xstormy16"
 
 
 subdirs="$subdirs m32c"
+
+	;;
+  rx*-*-elf)
+
+
+subdirs="$subdirs rx"
 
 	;;
   strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)

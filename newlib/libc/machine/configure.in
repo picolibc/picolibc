@@ -52,6 +52,7 @@ if test -n "${machine_dir}"; then
 	mt) AC_CONFIG_SUBDIRS(mt) ;;
 	necv70) AC_CONFIG_SUBDIRS(necv70) ;;
 	powerpc) AC_CONFIG_SUBDIRS(powerpc) ;;
+	rx) AC_CONFIG_SUBDIRS(rx) ;;
 	sh) AC_CONFIG_SUBDIRS(sh) ;;
 	sparc) AC_CONFIG_SUBDIRS(sparc) ;;
 	spu) AC_CONFIG_SUBDIRS(spu) ;;

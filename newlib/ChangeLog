@@ -1,3 +1,13 @@
+2009-10-26  DJ Delorie  <dj@redhat.com>
+
+	* configure.host: Add support for RX architecture.
+	* libc/include/machine/ieeefp.h: Likewise.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/include/machine/configure.in: Likewise.
+	* libc/include/machine/configure: Regenerate.
+	* libc/machine/rx: New directory.
+	* libc/machine/rx/*: New files to support RX architecture.
+
 2009-10-24  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/ctype.h (__ctype_lookup): New macro.

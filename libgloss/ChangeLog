@@ -1,3 +1,10 @@
+2009-10-26  DJ Delorie  <dj@redhat.com>
+
+	* configure.in: Add support for RX sub-directory.
+	* configure: Regenerate.
+	* rx: New directory.
+	* rx/*: New files to support RX architecture.
+
 2009-10-26  Nick Clifton  <nickc@redhat.com>
 
 	* arm/linux-syscalls0.S (SYSCALL0, SYSCALL3, SYSCALL6, SYSCALL4):

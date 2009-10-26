@@ -326,6 +326,24 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __RX__
+
+#ifdef __RX_BIG_ENDIAN__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifndef __RX_64BIT_DOUBLES__
+#define _DOUBLE_IS_32BITS
+#endif
+
+#ifdef __RX_16BIT_INTS__
+#define __SMALL_BITFIELDS
+#endif
+
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

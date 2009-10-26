@@ -112,6 +112,9 @@ case "${target}" in
   m32c-*-*)
 	AC_CONFIG_SUBDIRS([m32c])
 	;;
+  rx*-*-elf)
+	AC_CONFIG_SUBDIRS([rx])
+	;;
   strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)
 	AC_CONFIG_SUBDIRS([arm])
 	;;
