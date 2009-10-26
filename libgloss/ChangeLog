@@ -1,3 +1,9 @@
+2009-10-26  Nick Clifton  <nickc@redhat.com>
+
+	* arm/linux-syscalls0.S (SYSCALL0, SYSCALL3, SYSCALL6, SYSCALL4):
+	Delete Thumb definitions - the ARM versions work correctly in
+	Thumb mode.
+
 2009-10-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/Makefile.in (basiccrt.o, basiccrts.o): Use
