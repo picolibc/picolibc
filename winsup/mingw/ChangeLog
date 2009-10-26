@@ -1,3 +1,20 @@
+2009-10-25  Charles Wilson  <mingw@cwilson.fastmail.fm>
+
+	Sync pseudo-reloc.c with mingw64
+	* psuedo-reloc.c: Remove unnecessary includes.
+	Forward declare _pei386_runtime_relocator.
+	Decorate _image_base__ symbol with macro for
+	mingw64 compatibility. Whitespace changes.
+	(__print_reloc_error): Renamed to...
+	(__report_error): This. "Returns" void, and
+	always aborts. Now used on all platforms.
+	(__write_memory): Remove special case error handling
+	for different platforms - always call __report_error.
+	(do_pseudo_reloc): Remove special case error handling
+	for different platforms - always call __report_error.
+	(_pei386_runtime_relocator): Decorate _image_base__
+	symbol with mingw64 compatibility macro.
+
 2009-10-23  Charles Wilson  <mingw@cwilson.fastmail.fm>
 
 	Sync pseudo-reloc.c with cygwin/lib/
