@@ -1,3 +1,8 @@
+2009-10-26  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* lib/pseudo-reloc.c (__report_error) [CYGWIN]: Correct size bug
+	regarding error messages.
+
 2009-10-25  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	Sync pseudo-reloc.c with mingw64
