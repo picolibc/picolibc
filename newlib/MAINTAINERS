@@ -33,6 +33,7 @@ Web pages:			jjohnstn@redhat.com
 CPU port maintainers may make changes in cpu-specific directories, as
 well as cpu-specific portions of the build system, without approval.
 
+arm                     Nick Clifton            nickc@redhat.com
 m32c port		DJ Delorie		dj@redhat.com
 mn10300			Nick Clifton		nickc@redhat.com
 moxie			Anthony Green		green@moxielogic.com

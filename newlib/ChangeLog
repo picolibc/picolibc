@@ -1,3 +1,7 @@
+2009-10-27  Nick Clifton  <nickc@redhat.com>
+
+	* MAINTAINERS (ARM): Add myself as an ARM maintainer.
+
 2009-10-26  DJ Delorie  <dj@redhat.com>
 
 	* configure.host: Add support for RX architecture.
