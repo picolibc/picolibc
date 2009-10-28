@@ -489,10 +489,14 @@ set to case sensitivity.
 </note>
 
 <para>After you set this registry value to 0, Cygwin will be case-sensitive
-by default on NTFS and NFS filesystems.  Be aware that using two filenames
-which only differ by case might result in some weird interoperability
-issues with native Win32 applications.  You're using case-sensitivity 
-at your own risk.  You have been warned!</para>
+by default on NTFS and NFS filesystems.  However, there are limitations: 
+while two <emphasis role='bold'>programs</emphasis> <filename>Abc.exe</filename>
+and <filename>aBc.exe</filename> can be created and accessed like other files,
+starting applications is still case-insensitive due to Windows limitations
+and so the program you try to launch may not be the one actually started.  Also,
+be aware that using two filenames which only differ by case might
+result in some weird interoperability issues with native Win32 applications.  
+You're using case-sensitivity at your own risk.  You have been warned! </para>
 
 <para>Even if you use case-sensitivity, it might be feasible to switch to
 case-insensitivity for certain paths for better interoperability with
