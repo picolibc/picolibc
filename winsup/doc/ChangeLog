@@ -1,3 +1,9 @@
+2009-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7-posix): Mention UTF-8 as "C" default
+	and the default locale "C.UTF-8".
+	* setup2.sgml (setup-locale-ov): Ditto.
+
 2009-10-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* faq-setup.xml: Fix clean_setup.pl reference.

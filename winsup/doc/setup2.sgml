@@ -180,6 +180,9 @@ variables to "C.charset".  For instance</para>
   "C.ISO-8859-1"
 </screen>
 
+<para>The default locale in the absence of the aforementioned locale
+environment variables is "C.UTF-8".</para>
+
 <para>Windows uses the UTF-16 charset exclusively to store the names
 of any object used by the Operating System.  This is especially important
 with filenames.  Cygwin uses the setting of the locale environment variables
@@ -206,7 +209,10 @@ own purpose, typically by using the call</para>
   setlocale (LC_ALL, "");
 </screen>
 
-<para>early in the application code.</para>
+<para>early in the application code.  Again, so that this doesn't get
+lost:  If the application calls setlocale as above, and there is none
+of the important locale variables set in the environment, the locale
+is set to the default locale, which is "C.UTF-8".</para>
 
 <para>
 Right now the language and territory, as well as the modifier, are not

@@ -211,7 +211,9 @@
   The setting of the environment variables $LANG, $LC_ALL or $LC_CTYPE will
   be used.  For instance, setting $LANG to "de_DE.ISO-8859-15" before
   starting a Cygwin session will use the ISO-8859-15 character set in
-  the entire session.  UTF-8 is supported as well, as in "en_US.UTF-8".
+  the entire session.  The default charset is "UTF-8", even in the
+  default locale "C".  The default locale in the absence of one of the
+  aforementioned environment variables is "C.UTF-8".
 
   The full list of supported character sets: "ASCII", "ISO-8859-x" with x
   in 1-16, except 12, "UTF-8", Windows codepages "CPxxx", with xxx in
