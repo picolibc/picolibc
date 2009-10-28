@@ -1,3 +1,10 @@
+2009-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (pretty_id): Drop arguments.  Don't change CYGWIN
+	environment variable.
+	(dump_sysinfo): Don't tweak CYGWIN environment variable, just call
+	pretty_id once.
+
 2009-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Update with latest NT 6.1 versions.

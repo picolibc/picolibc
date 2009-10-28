@@ -1031,13 +1031,9 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygwin, bool wow64)
 }
 
 void
-pretty_id (const char *s, char *cygwin, size_t cyglen)
+pretty_id ()
 {
   char *groups[16384];
-
-  strcpy (cygwin + cyglen++, " ");
-  strcpy (cygwin + cyglen, s);
-  putenv (cygwin);
 
   char *id = cygpath ("/bin/id.exe", NULL);
   for (char *p = id; (p = strchr (p, '/')); p++)
@@ -1094,7 +1090,7 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     }
   ng--;
 
-  printf ("\nOutput from %s (%s)\n", id, s);
+  printf ("\nOutput from %s\n", id);
   int n = 80 / (int) ++sz;
   int i = n > 2 ? n - 2 : 0;
   sz = -sz;
@@ -1479,17 +1475,7 @@ dump_sysinfo ()
 
   fflush (stdout);
 
-  char *cygwin = getenv ("CYGWIN");
-  if (cygwin)
-    cygwin -= strlen ("CYGWIN=");
-  else
-    cygwin = const_cast <char *> ("CYGWIN=");
-  size_t cyglen = strlen (cygwin);
-  cygwin = strcpy ((char *) malloc (cyglen + sizeof (" nontsec")), cygwin);
-  pretty_id ("nontsec", cygwin, cyglen);
-  pretty_id ("ntsec", cygwin, cyglen);
-  cygwin[cyglen] = 0;
-  putenv (cygwin);
+  pretty_id ();
 
   if (!GetSystemDirectory (tmp, 4000))
     display_error ("dump_sysinfo: GetSystemDirectory()");
