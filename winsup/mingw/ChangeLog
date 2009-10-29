@@ -1,3 +1,21 @@
+2009-10-29  Charles Wilson  <mingw@cwilson.fastmail.fm>
+
+	Honor DESTDIR for winsup/mingw and winsup/w32api.
+	Detect and report error if installation paths are win32
+	format, but DESTDIR is non-empty.
+
+	* Makefile.in (DESTDIR): Honor per convention.
+	(need-DESTDIR-compatibility): New macro; define it and a
+	corresponding rule.
+	(fail-DESTDIR-compatibility): New dependency goal.
+	(install-dirs): Require need-DESTDIR-compatibility.
+	* mingwex/Makefile.in (DESTDIR): Honor per convention.
+	(need-DESTDIR-compatibility): New macro; define it and a
+	corresponding rule.
+	(fail-DESTDIR-compatibility): New dependency goal.
+	(install): Require need-DESTDIR-compatibility.
+	* profile/Makefile.in: Ditto.
+
 2009-10-25  Charles Wilson  <mingw@cwilson.fastmail.fm>
 
 	Sync pseudo-reloc.c with mingw64

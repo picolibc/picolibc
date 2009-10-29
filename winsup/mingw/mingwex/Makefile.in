@@ -255,10 +255,22 @@ info-html:
 
 install-info: info
 
-install: all
-	$(mkinstalldirs) $(inst_libdir)
+need-DESTDIR-compatibility = prefix libdir
+.PHONY: $(need-DESTDIR-compatibility) fail-DESTDIR-compatibility
+
+$(need-DESTDIR-compatibility):
+	@test -z "$(DESTDIR)" || case "$($@)" in ?:*) \
+	  $(MAKE) --no-print-directory reject="$@" fail-DESTDIR-compatibility ;; \
+	esac
+
+fail-DESTDIR-compatibility:
+	$(error DESTDIR is not supported when $(reject) contains Win32 path `$($(reject))'; \
+	try `make install $(reject)=$(shell echo '$($(reject))' | sed s,:,:$(DESTDIR),) ...' instead)
+
+install: all $(need-DESTDIR-compatibility)
+	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
 	done
 
 clean:

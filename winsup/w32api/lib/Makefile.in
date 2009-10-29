@@ -208,24 +208,36 @@ lib%.a: %.o
 	$(AR) rc $@ $*.o
 	$(RANLIB) $@
 
+need-DESTDIR-compatibility = prefix libdir includedir
+.PHONY: $(need-DESTDIR-compatibility) fail-DESTDIR-compatibility
+
+$(need-DESTDIR-compatibility):
+	@test -z "$(DESTDIR)" || case "$($@)" in ?:*) \
+	  $(MAKE) --no-print-directory reject="$@" fail-DESTDIR-compatibility ;; \
+	esac
+
+fail-DESTDIR-compatibility:
+	$(error DESTDIR is not supported when $(reject) contains Win32 path `$($(reject))'; \
+	try `make install $(reject)=$(shell echo '$($(reject))' | sed s,:,:$(DESTDIR),) ...' instead)
+
 .PHONY: install install-libraries install-headers install-ddk
 # install headers and libraries in a target specified directory.
 install: install-libraries install-headers install-ddk install-directx
 
-install-libraries: all
-	$(mkinstalldirs) $(inst_libdir)
+install-libraries: all $(need-DESTDIR-compatibility)
+	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
 	done
 
-install-headers:
-	$(mkinstalldirs) $(inst_includedir)
+install-headers: $(need-DESTDIR-compatibility)
+	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(inst_includedir)/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(DESTDIR)$(inst_includedir)/$$i ; \
 	done
-	$(mkinstalldirs) $(inst_includedir)/GL
+	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/GL
 	for i in $(GL_HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(inst_includedir)/GL/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(DESTDIR)$(inst_includedir)/GL/$$i ; \
 	done
 
 install-ddk: install-libraries install-headers
@@ -237,17 +249,17 @@ install-directx: install-libraries install-headers
 # uninstall headers and libraries from a target specified directory
 uninstall: uninstall-ddk uninstall-directx uninstall-libraries uninstall-headers
 
-uninstall-libraries:
+uninstall-libraries: $(need-DESTDIR-compatibility)
 	@for i in $(LIBS); do \
-		rm -f $(inst_libdir)/$$i ; \
+		rm -f $(DESTDIR)$(inst_libdir)/$$i ; \
 	done
-	rmdir $(inst_libdir)
+	rmdir $(DESTDIR)$(inst_libdir)
 
-uninstall-headers:
+uninstall-headers: $(need-DESTDIR-compatibility)
 	@for i in $(HEADERS); do \
-		rm -r $(inst_includedir)/$$i ; \
+		rm -r $(DESTDIR)$(inst_includedir)/$$i ; \
 	done
-	rmdir $(inst_includedir)
+	rmdir $(DESTDIR)$(inst_includedir)
 
 uninstall-ddk:
 	cd ddk && $(MAKE) -C uninstall $(FLAGS_TO_PASS)

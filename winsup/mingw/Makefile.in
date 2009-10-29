@@ -90,6 +90,7 @@ inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include/mingw
 inst_libdir:=$(tooldir)/lib/mingw
 inst_docdir:=$(tooldir)/share/doc/mingw-runtime
+need-DESTDIR-compatibility = prefix exec_prefix tooldir mandir
 else
 ifneq (,$(with_cross_host))
 #
@@ -104,11 +105,13 @@ inst_bindir:=$(tooldir)/bin
 inst_includedir:=$(tooldir)/include
 inst_libdir:=$(tooldir)/lib
 inst_docdir:=$(tooldir)/share/doc/mingw-runtime
+need-DESTDIR-compatibility = prefix exec_prefix tooldir mandir
 else
 inst_bindir:=$(bindir)
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
 inst_docdir:=$(prefix)/doc/runtime
+need-DESTDIR-compatibility = prefix bindir includedir libdir mandir
 endif
 endif
 
@@ -274,7 +277,7 @@ all_dlls_host: $(DLLS)
 
 install_dlls_host:
 	for i in $(DLLS); do \
-		$(INSTALL_PROGRAM) $$i $(inst_bindir)/$$i ; \
+		$(INSTALL_PROGRAM) $$i $(DESTDIR)$(inst_bindir)/$$i ; \
 	done
 
 _libm_dummy.o:
@@ -493,25 +496,36 @@ info-html:
 
 install-info: info
 
-install-dirs:
-	$(mkinstalldirs) $(inst_bindir)
-	$(mkinstalldirs) $(inst_includedir)
-	$(mkinstalldirs) $(inst_libdir)
-	$(mkinstalldirs) $(inst_docdir)
-	$(mkinstalldirs) $(mandir)/man$(mansection)
+.PHONY: $(need-DESTDIR-compatibility) fail-DESTDIR-compatibility
+
+$(need-DESTDIR-compatibility):
+	@test -z "$(DESTDIR)" || case "$($@)" in ?:*) \
+	  $(MAKE) --no-print-directory reject="$@" fail-DESTDIR-compatibility ;; \
+	esac
+
+fail-DESTDIR-compatibility:
+	$(error DESTDIR is not supported when $(reject) contains Win32 path `$($(reject))'; \
+	try `make install $(reject)=$(shell echo '$($(reject))' | sed s,:,:$(DESTDIR),) ...' instead)
+
+install-dirs: $(need-DESTDIR-compatibility)
+	$(mkinstalldirs) $(DESTDIR)$(inst_bindir)
+	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
+	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
+	$(mkinstalldirs) $(DESTDIR)$(inst_docdir)
+	$(mkinstalldirs) $(DESTDIR)$(mandir)/man$(mansection)
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
 	done
 	for i in $(INSTDOCS); do \
-		$(INSTALL_DATA) $(srcdir)/$$i $(inst_docdir)/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(inst_docdir)/$$i ; \
 	done
 	for sub in . sys ; do \
-		dstdir=$(inst_includedir)/$$sub ; \
+		dstdir=$(DESTDIR)$(inst_includedir)/$$sub ; \
 		$(mkinstalldirs) $$dstdir ; \
 		for i in $(srcdir)/include/$$sub/*.h ; do \
 		  $(INSTALL_DATA) $$i $$dstdir/`basename $$i` ; \
@@ -521,10 +535,10 @@ install: all install-dirs $(install_dlls_host)
 # This provisional hack installs the only manpage we have at present...
 # It simply CANNOT suffice, when we have more manpages to ship.
 #
-	$(mkinstalldirs) $(mandir)/man$(mansection)
-	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man$(mansection)/`\
+	$(mkinstalldirs) $(DESTDIR)$(mandir)/man$(mansection)
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(DESTDIR)$(mandir)/man$(mansection)/`\
 	  echo dirname.man|sed '$(manpage_transform);s,man$$,$(mansection),'`
-	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(mandir)/man$(mansection)/`\
+	$(INSTALL_DATA) $(srcdir)/man/dirname.man $(DESTDIR)$(mandir)/man$(mansection)/`\
 	  echo basename.man|sed '$(manpage_transform);s,man$$,$(mansection),'`
 #
 # End provisional hack.

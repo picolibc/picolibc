@@ -89,7 +89,7 @@ test:
 
 install uninstall:
 	for i in $(SUBDIRS); do \
-		(cd $$i; $(MAKE) $@); \
+		(cd $$i; $(MAKE) $@ $(FLAGS_TO_PASS)); \
 	done
 
 ifdef SNAPDATE
