@@ -160,6 +160,11 @@ fhandler_dev_random::lseek (_off64_t off, int whence)
       set_errno (EINVAL);
       return (_off64_t) -1;
     }
+  if (new_off < 0)
+    {
+      set_errno (EINVAL);
+      return (_off64_t) -1;
+    }
   return dummy_offset = new_off;
 }
 

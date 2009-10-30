@@ -1,5 +1,10 @@
 2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_random.cc (fhandler_dev_random::lseek): Revert change from
+	2009-10-23.
+
+2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* smallprint.cc (hex_str): New const string.
 	(__rn): Drop str and use hex_str instead.
 	(__small_vsprintf): If 'l' modifier has been found, print subsequent
