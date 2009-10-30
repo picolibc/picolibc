@@ -21,13 +21,14 @@ details. */
 #define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
 #define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
 
+static const char hex_str[] = "0123456789ABCDEF";
+
 static char __fastcall *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
   unsigned long long uval = 0;
   char res[20];
-  static const char str[] = "0123456789ABCDEF";
   int l = 0;
 
   if (dosign && val < 0)
@@ -47,7 +48,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
 
   do
     {
-      res[l++] = str[uval % base];
+      res[l++] = hex_str[uval % base];
       uval /= base;
     }
   while (uval);
@@ -75,6 +76,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   while (*fmt)
     {
       int i, n = 0x7fff;
+      bool l_opt = false;
       if (*fmt != '%')
 	*dst++ = *fmt++;
       else
@@ -110,6 +112,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  len = len * 10 + (c - '0');
 		  continue;
 		case 'l':
+		  l_opt = true;
 		  continue;
 		case 'c':
 		  {
@@ -184,7 +187,16 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		    s = "(null)";
 		fillin:
 		  for (i = 0; *s && i < n; i++)
-		    *dst++ = *s++;
+		    if (l_opt && ((*(unsigned char *)s <= 0x1f && *s != '\n')
+				  || *(unsigned char *)s >= 0x7f))
+		      {
+		      	*dst++ = '\\';
+			*dst++ = 'x';
+			*dst++ = hex_str[*(unsigned char *)s >> 4];
+			*dst++ = hex_str[*(unsigned char *)s++ & 0xf];
+		      }
+		    else
+		      *dst++ = *s++;
 		  break;
 		case 'W':
 		  w = va_arg (ap, PWCHAR);
@@ -195,12 +207,30 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  if (!us)
 		    RtlInitUnicodeString (us = &uw, L"(null)");
 		wfillin:
-		if (sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
-				  us->Length / sizeof (WCHAR)))
-		  {
-		    s = tmp;
-		    goto fillin;
-		  }
+		  if (l_opt)
+		    {
+		      for (USHORT i = 0; i < us->Length / sizeof (WCHAR); ++i)
+			{
+			  WCHAR w = us->Buffer[i];
+			  if ((w <= 0x1f && w != '\n') || w >= 0x7f)
+			    {
+			      *dst++ = '\\';
+			      *dst++ = 'x';
+			      *dst++ = hex_str[(w >> 12) & 0xf];
+			      *dst++ = hex_str[(w >>  8) & 0xf];
+			      *dst++ = hex_str[(w >>  4) & 0xf];
+			      *dst++ = hex_str[w & 0xf];
+			    }
+			  else
+			    *dst++ = w;
+			}
+		    }
+		  else if (sys_wcstombs (tmp, NT_MAX_PATH, us->Buffer,
+				    us->Length / sizeof (WCHAR)))
+		    {
+		      s = tmp;
+		      goto fillin;
+		    }
 		  break;
 		default:
 		  *dst++ = '?';
@@ -288,7 +318,6 @@ __wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsign
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
   unsigned long long uval = 0;
   WCHAR res[20];
-  static const WCHAR str[] = L"0123456789ABCDEF";
   int l = 0;
 
   if (dosign && val < 0)
@@ -308,7 +337,7 @@ __wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsign
 
   do
     {
-      res[l++] = str[uval % base];
+      res[l++] = hex_str[uval % base];
       uval /= base;
     }
   while (uval);

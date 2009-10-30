@@ -2053,7 +2053,8 @@ go_ahead:
       res = 0;
     }
 
-  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, &de, res ? "***" : de->d_name);
+  syscall_printf ("%d = readdir (%p, %p) (L\"%lS\" > \"%ls\")", res, dir, &de,
+		  res ? NULL : &fname, res ? "***" : de->d_name);
   return res;
 }
 
