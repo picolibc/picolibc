@@ -115,31 +115,39 @@ _DEFUN(_fflush_r, (ptr, fp),
          to miss a code scenario.  */
       if ((fp->_r > 0 || fp->_ur > 0) && fp->_seek != NULL)
 	{
-	  int tmp;
+	  int tmp_errno;
 #ifdef __LARGE64_FILES
 	  _fpos64_t curoff;
 #else
 	  _fpos_t curoff;
 #endif
 
+	  /* Save last errno and set errno to 0, so we can check if a device
+	     returns with a valid position -1.  We restore the last errno if
+	     no other error condition has been encountered. */
+	  tmp_errno = ptr->_errno;
+	  ptr->_errno = 0;
 	  /* Get the physical position we are at in the file.  */
 	  if (fp->_flags & __SOFF)
 	    curoff = fp->_offset;
 	  else
 	    {
 	      /* We don't know current physical offset, so ask for it.
-		 Only ESPIPE is ignorable.  */
+		 Only ESPIPE and EINVAL are ignorable.  */
 #ifdef __LARGE64_FILES
 	      if (fp->_flags & __SL64)
 		curoff = fp->_seek64 (ptr, fp->_cookie, 0, SEEK_CUR);
 	      else
 #endif
 		curoff = fp->_seek (ptr, fp->_cookie, 0, SEEK_CUR);
-	      if (curoff == -1L)
+	      if (curoff == -1L && ptr->_errno != 0)
 		{
 		  int result = EOF;
-		  if (ptr->_errno == ESPIPE)
-		    result = 0;
+		  if (ptr->_errno == ESPIPE || ptr->_errno == EINVAL)
+		    {
+		      result = 0;
+		      ptr->_errno = tmp_errno;
+		    }
 		  else
 		    fp->_flags |= __SERR;
 		  _funlockfile (fp);
@@ -157,18 +165,21 @@ _DEFUN(_fflush_r, (ptr, fp),
 	  /* Now physically seek to after byte last read.  */
 #ifdef __LARGE64_FILES
 	  if (fp->_flags & __SL64)
-	    tmp = (fp->_seek64 (ptr, fp->_cookie, curoff, SEEK_SET) == curoff);
+	    curoff = fp->_seek64 (ptr, fp->_cookie, curoff, SEEK_SET);
 	  else
 #endif
-	    tmp = (fp->_seek (ptr, fp->_cookie, curoff, SEEK_SET) == curoff);
-	  if (tmp)
+	    curoff = fp->_seek (ptr, fp->_cookie, curoff, SEEK_SET);
+	  if (curoff != -1 || ptr->_errno == 0
+	      || ptr->_errno == ESPIPE || ptr->_errno == EINVAL)
 	    {
-	      /* Seek successful.  We can clear read buffer now.  */
+	      /* Seek successful or ignorable error condition.
+		 We can clear read buffer now.  */
 	      fp->_flags &= ~__SNPT;
 	      fp->_r = 0;
 	      fp->_p = fp->_bf._base;
-	      if (fp->_flags & __SOFF)
+	      if ((fp->_flags & __SOFF) && (curoff != -1 || ptr->_errno == 0))
 		fp->_offset = curoff;
+	      ptr->_errno = tmp_errno;
 	      if (HASUB (fp))
 		FREEUB (ptr, fp);
 	    }

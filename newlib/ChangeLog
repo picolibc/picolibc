@@ -1,3 +1,11 @@
+2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/fflush.c (_fflush_r): Store old errno to check for
+	low-level seek error condition.  Restore old errno in case of
+	success.  Don't use new position after seek as error condition,
+	rather check for return value of -1 and errno.  Handle EINVAL
+	just like ESPIPE.  Only set fp->_offset if errno is 0.
+
 2009-10-27  Nick Clifton  <nickc@redhat.com>
 
 	* MAINTAINERS (ARM): Add myself as an ARM maintainer.
