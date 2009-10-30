@@ -890,15 +890,11 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	fattr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none_nih;
-      security_descriptor sd;
-      /* See comments in fhander_base::open () for an explanation why we defer
-	 setting security attributes on remote files. */
-      if (pc.has_acls () && !pc.isremote ())
-	set_security_attribute (pc, mode, &sa, sd);
       NTSTATUS status;
       HANDLE fh;
       OBJECT_ATTRIBUTES attr;
       IO_STATUS_BLOCK io;
+
       status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
 			     pc.get_object_attr (attr, sa), &io, NULL, fattr,
 			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
@@ -915,8 +911,9 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	}
       else
 	{
-	  if (pc.has_acls () && pc.isremote ())
-	    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, mode);
+	  if (pc.has_acls ())
+	    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID,
+				S_JUSTCREATED | mode);
 	  char buf[sizeof (SOCKET_COOKIE) + 80];
 	  __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port,
 			   get_socket_type () == SOCK_STREAM ? 's'

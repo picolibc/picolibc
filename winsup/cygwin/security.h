@@ -14,6 +14,10 @@ details. */
 
 #include <accctrl.h>
 
+/* Special file attribute set, for instance, in open() and mkdir() to
+   flag that a file has just been created.  Used in alloc_sd, see there. */
+#define S_JUSTCREATED 0x80000000
+
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
 #define UNKNOWN_UID 400 /* Non conflicting number */
 #define UNKNOWN_GID 401
@@ -279,6 +283,7 @@ public:
   }
   inline operator const PSECURITY_DESCRIPTOR () { return psd; }
   inline operator PSECURITY_DESCRIPTOR *() { return &psd; }
+  inline void operator =(PSECURITY_DESCRIPTOR nsd) { psd = nsd; }
 };
 
 class user_groups {

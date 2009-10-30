@@ -123,7 +123,8 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 	allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
-			  ? (SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY)
+			  ? (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+			     | INHERIT_ONLY_ACE)
 			  : NO_INHERITANCE;
       /*
        * If a specific acl contains a corresponding default entry with
@@ -138,7 +139,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 			       ? aclbufp[i].a_id : ILLEGAL_UID)) >= 0
 	  && aclbufp[i].a_perm == aclbufp[i + 1 + pos].a_perm)
 	{
-	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+	  inheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
 	  /* This invalidates the corresponding default entry. */
 	  aclbufp[i + 1 + pos].a_type = USER|GROUP|ACL_DEFAULT;
 	}
@@ -365,12 +366,13 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 
 	  if (!type)
 	    continue;
-	  if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
+	  if (!(ace->Header.AceFlags & INHERIT_ONLY_ACE || type & ACL_DEFAULT))
 	    {
 	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 	    }
-	  if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+	  if ((ace->Header.AceFlags
+	      & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
 	      && pc.isdir ())
 	    {
 	      if (type == USER_OBJ)

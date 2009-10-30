@@ -1,5 +1,30 @@
 2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_helper.cc (security_descriptor::free): If sd_size is 0, call
+	LocalFree instead of ::free.
+
+	* sec_acl.cc: Throughout replace old ACE flag definitions with current
+	definitions as used in MSDN man pages.
+	* security.cc: Ditto.
+
+	* fhandler.cc (fhandler_base::open): Make sure file has really been
+	just created before fixing file permissions.  Add S_JUSTCREATED
+	attribute to set_file_attribute call.
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Always create dir
+	with default security descriptor and fix descriptor afterwards.
+	Add S_JUSTCREATED flag to set_file_attribute call.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto for AF_LOCAL
+	socket files.
+	* path.cc (symlink_worker): Ditto for symlinks.
+	* security.cc (get_file_sd): Call GetSecurityInfo rather than
+	NtQuerySecurityObject.  Explain why.  Change error handling accordingly.
+	(alloc_sd): Skip non-inherited, non-standard entries in ACL if
+	S_JUSTCREATED attribute is set.  Explain why.  Minor format fixes.
+	* security.h (S_JUSTCREATED): New define.
+	(security_descriptor::operator=): New operator.
+
+2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_random.cc (fhandler_dev_random::lseek): Revert change from
 	2009-10-23.
 

@@ -24,6 +24,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "pwdgrp.h"
+#include <aclapi.h>
 
 #define ALL_SECURITY_INFORMATION (DACL_SECURITY_INFORMATION \
 				  | GROUP_SECURITY_INFORMATION \
@@ -32,8 +33,7 @@ details. */
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 {
-  NTSTATUS status = STATUS_SUCCESS;
-  ULONG len = 0;
+  DWORD error = ERROR_SUCCESS;
   int retry = 0;
   int res = -1;
 
@@ -41,20 +41,17 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
     {
       if (fh)
 	{
-	  status = NtQuerySecurityObject (fh, ALL_SECURITY_INFORMATION,
-					  sd, len, &len);
-	  if (status == STATUS_BUFFER_TOO_SMALL)
+	  /* Amazing but true.  If you want to know if an ACE is inherited
+	     from the parent object, you can't use the NtQuerySecurityObject
+	     function.  In the DACL returned by this functions, the
+	     INHERITED_ACE flag is never set.  Only by calling GetSecurityInfo
+	     you get this information.  Oh well. */
+	  PSECURITY_DESCRIPTOR psd;
+	  error = GetSecurityInfo (fh, SE_FILE_OBJECT, ALL_SECURITY_INFORMATION,
+				   NULL, NULL, NULL, NULL, &psd);
+	  if (error == ERROR_SUCCESS)
 	    {
-	      if (!sd.malloc (len))
-		{
-		  set_errno (ENOMEM);
-		  break;
-		}
-	      status = NtQuerySecurityObject (fh, ALL_SECURITY_INFORMATION,
-					      sd, len, &len);
-	    }
-	  if (NT_SUCCESS (status))
-	    {
+	      sd = psd;
 	      res = 0;
 	      break;
 	    }
@@ -63,6 +60,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	{
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
+	  NTSTATUS status;
 
 	  status = NtOpenFile (&fh, READ_CONTROL,
 			       pc.get_object_attr (attr, sec_none_nih),
@@ -71,14 +69,15 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
 	  if (!NT_SUCCESS (status))
 	    {
 	      fh = NULL;
+	      error = RtlNtStatusToDosError (status);
 	      break;
 	    }
 	}
     }
   if (retry && fh)
     NtClose (fh);
-  if (!NT_SUCCESS (status))
-    __seterrno_from_nt_status (status);
+  if (error != ERROR_SUCCESS)
+    __seterrno_from_win_error (error);
   return res;
 }
 
@@ -138,7 +137,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
     {
       if (!GetAce (acl, i, (PVOID *) &ace))
 	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY)
+      if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
 	continue;
       switch (ace->Header.AceType)
 	{
@@ -386,6 +385,9 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 {
   BOOL dummy;
 
+  /* NOTE: If the high bit of attribute is set, we have just created
+     a file or directory.  See below for an explanation. */
+
   debug_printf("uid %d, gid %d, attribute %x", uid, gid, attribute);
 
   /* Get owner and group from current security descriptor. */
@@ -583,15 +585,24 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	      || (ace_sid == group_sid)
 	      || (ace_sid == well_known_world_sid))
 	    {
-	      if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
-		ace->Header.AceFlags |= INHERIT_ONLY;
+	      if (ace->Header.AceFlags
+		  & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
+		ace->Header.AceFlags |= INHERIT_ONLY_ACE;
 	      else
 		continue;
 	    }
+	  else if ((attribute & S_JUSTCREATED)
+		   && !(ace->Header.AceFlags & INHERITED_ACE))
+	    /* Since files and dirs are created with a NULL descriptor,
+	       inheritence rules kick in.  However, if no inheritable entries
+	       exist in the parent object, Windows will create entries from the
+	       user token's default DACL in the file DACL.  These entries are
+	       not desired and we drop them silently here. */
+	    continue;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
-	   * FIXME: this would break the order of the inherit_only ACEs
+	   * FIXME: this would break the order of the inherit-only ACEs
 	   */
 	  if (!AddAce (acl, ACL_REVISION,
 		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE?
@@ -611,9 +622,10 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
      impact. */
 
   /* Construct appropriate inherit attribute for new directories */
-  if (S_ISDIR (attribute) && !acl_exists)
+  if (S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
     {
-      const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
+      const DWORD inherit = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+			    | INHERIT_ONLY_ACE;
 
 #if 0 /* FIXME: Not done currently as this breaks the canonical order */
       /* Set deny ACE for owner. */
@@ -630,7 +642,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 #endif
       /* Set allow ACE for owner. */
       if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-				   well_known_creator_owner_sid, acl_len, inherit))
+				   well_known_creator_owner_sid, acl_len,
+				   inherit))
 	return NULL;
 #if 0 /* FIXME: Not done currently as this breaks the canonical order and
 	 won't be preserved on chown and chmod */
@@ -642,7 +655,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 #endif
       /* Set allow ACE for group. */
       if (!add_access_allowed_ace (acl, ace_off++, group_allow,
-				   well_known_creator_group_sid, acl_len, inherit))
+				   well_known_creator_group_sid, acl_len,
+				   inherit))
 	return NULL;
       /* Set allow ACE for everyone. */
       if (!add_access_allowed_ace (acl, ace_off++, other_allow,

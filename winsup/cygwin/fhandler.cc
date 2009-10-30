@@ -615,8 +615,8 @@ fhandler_base::open (int flags, mode_t mode)
      in a domain as well as on standalone servers.
      This is the result of a discussion on the samba-technical list, starting at
      http://lists.samba.org/archive/samba-technical/2008-July/060247.html */
-  if ((flags & O_CREAT) && has_acls ())
-    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, mode);
+  if (io.Information == FILE_CREATED && has_acls ())
+    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, S_JUSTCREATED | mode);
 
   set_io_handle (fh);
   set_flags (flags, pc.binmode ());

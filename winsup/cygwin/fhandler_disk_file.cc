@@ -1463,14 +1463,6 @@ fhandler_disk_file::mkdir (mode_t mode)
 {
   int res = -1;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
-  security_descriptor sd;
-
-  /* See comments in fhander_base::open () for an explanation why we defer
-     setting security attributes on remote files. */
-  if (has_acls () && !pc.isremote ())
-    set_security_attribute (pc, S_IFDIR | ((mode & 07777) & ~cygheap->umask),
-			    &sa, sd);
-
   NTSTATUS status;
   HANDLE dir;
   OBJECT_ATTRIBUTES attr;
@@ -1505,9 +1497,10 @@ fhandler_disk_file::mkdir (mode_t mode)
 			 p, plen);
   if (NT_SUCCESS (status))
     {
-      if (has_acls () && pc.isremote ())
+      if (has_acls ())
 	set_file_attribute (dir, pc, ILLEGAL_UID, ILLEGAL_GID,
-			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
+			    S_JUSTCREATED | S_IFDIR
+			    | ((mode & 07777) & ~cygheap->umask));
       NtClose (dir);
       res = 0;
     }

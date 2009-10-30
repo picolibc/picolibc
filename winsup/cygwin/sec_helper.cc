@@ -298,7 +298,12 @@ void
 security_descriptor::free ()
 {
   if (psd)
-    ::free (psd);
+    {
+      if (!sd_size)
+	LocalFree (psd);
+      else
+	::free (psd);
+    }
   psd = NULL;
   sd_size = 0;
 }
