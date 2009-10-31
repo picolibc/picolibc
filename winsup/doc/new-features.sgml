@@ -325,6 +325,14 @@
   delete, to support the toolchain in implementing full C++ standards
   conformance when working with shared libraries.
 
+- Different Cygwin installations in different paths can be run in parallel
+  without knowing of each other.  The path of the Cygwin DLL used in a
+  process is a key used when creating IPC objects.  So different Cygwin
+  DLLs are running in different namespaces.
+
+- Each Cygwin DLL stores its path and installation key in the registry.
+  This allows troubleshooting of problems which could be a result of having
+  multiple concurrent Cygwin installations.
 </screen>
 
 </sect2>
