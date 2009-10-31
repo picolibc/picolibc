@@ -288,6 +288,9 @@ security_descriptor::realloc (size_t nsize)
 {
   PSECURITY_DESCRIPTOR tmp;
 
+  /* Can't re-use buffer allocated by GetSecurityInfo. */
+  if (psd && !sd_size)
+    free ();
   if (!(tmp = (PSECURITY_DESCRIPTOR) ::realloc (psd, nsize)))
     return NULL;
   sd_size = nsize;
