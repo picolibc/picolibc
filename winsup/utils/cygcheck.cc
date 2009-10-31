@@ -24,6 +24,7 @@
 #include <getopt.h>
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
+#include "cygwin/cygprops.h"
 #undef cygwin_internal
 
 #define alloca __builtin_alloca
@@ -38,6 +39,8 @@ int dump_only = 0;
 int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
+int del_orphaned_reg = 0;
+int unique_object_name_opt = 0;
 
 static char emptystr[] = "";
 
@@ -57,7 +60,8 @@ void package_find (int, char **);
 void package_list (int, char **);
 /* In bloda.cc  */
 void dump_dodgy_apps (int verbose);
-
+/* Forward declaration */
+static void usage (FILE *, int);
 
 static const char version[] = "$Revision$";
 
@@ -118,6 +122,15 @@ static common_apps[] = {
   {"vi", 0},
   {"vim", 0},
   {0, 0}
+};
+
+/* Options without ASCII single char representation. */
+enum
+{
+  CO_DELETE_KEYS = 0x100,
+  CO_ENABLE_UON = 0x101,
+  CO_DISABLE_UON = 0x102,
+  CO_SHOW_UON = 0x103
 };
 
 static int num_paths, max_paths;
@@ -1203,6 +1216,172 @@ dump_sysinfo_services ()
     puts ("No Cygwin services found.\n");
 }
 
+enum handle_reg_t
+{
+  PRINT_KEY,
+  DELETE_KEY
+};
+
+void
+handle_reg_installation (handle_reg_t what)
+{
+  HKEY key;
+
+  if (what == PRINT_KEY)
+    printf ("Cygwin installations found in the registry:\n");
+  for (int i = 0; i < 2; ++i)
+    if (RegOpenKeyEx (i ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE,
+		      "SOFTWARE\\Cygwin\\Installations", 0,
+		      what == DELETE_KEY ? KEY_READ | KEY_WRITE : KEY_READ,
+		      &key)
+	== ERROR_SUCCESS)
+      {
+	char name[32], data[PATH_MAX];
+	DWORD nsize, dsize, type;
+	LONG ret;
+
+	for (DWORD index = 0;
+	     (ret = RegEnumValue (key, index, name, (nsize = 32, &nsize), 0,
+				  &type, (PBYTE) data,
+				  (dsize = PATH_MAX, &dsize)))
+	     != ERROR_NO_MORE_ITEMS; ++index)
+	  if (ret == ERROR_SUCCESS && dsize > 5)
+	    {
+	      char *path = data + 4;
+	      if (path[1] != ':')
+	      	*(path += 2) = '\\';
+	      if (what == PRINT_KEY)
+		printf ("  %s Key: %s Path: %s", i ? "User:  " : "System:",
+			name, path);
+	      strcat (path, "\\bin\\cygwin1.dll");
+	      if (what == PRINT_KEY)
+		printf ("%s\n", access (path, F_OK) ? " (ORPHANED)" : "");
+	      else if (access (path, F_OK))
+		{
+		  RegDeleteValue (key, name);
+		  /* Start over since index is not reliable anymore. */
+		  --i;
+		  break;
+		}
+	    }
+	RegCloseKey (key);
+      }
+  if (what == PRINT_KEY)
+    printf ("\n");
+}
+
+void
+print_reg_installations ()
+{
+  handle_reg_installation (PRINT_KEY);
+}
+
+void
+del_orphaned_reg_installations ()
+{
+  handle_reg_installation (DELETE_KEY);
+}
+
+/* Unfortunately neither mingw nor Windows know this function. */
+char *
+memmem (char *haystack, size_t haystacklen,
+        const char *needle, size_t needlelen)
+{
+  if (needlelen == 0)
+    return haystack;
+  while (needlelen <= haystacklen)
+    {
+      if (!memcmp (haystack, needle, needlelen))
+        return haystack;
+      haystack++;
+      haystacklen--;
+    }
+  return NULL;
+}
+ 
+int
+handle_unique_object_name (int opt, char *path)
+{
+  HANDLE fh, fm;
+  void *haystack;
+
+  if (!path || !*path)
+    usage (stderr, 1);
+
+  DWORD access, share, protect, mapping;
+
+  if (opt == CO_SHOW_UON)
+    {
+      access = GENERIC_READ;
+      share = FILE_SHARE_VALID_FLAGS;
+      protect = PAGE_READONLY;
+      mapping = FILE_MAP_READ;
+    }
+  else
+    {
+      access = GENERIC_READ | GENERIC_WRITE;
+      share = 0;
+      protect = PAGE_READWRITE;
+      mapping = FILE_MAP_WRITE;
+    }
+
+  fh = CreateFile (path, access, share, NULL, OPEN_EXISTING,
+		   FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  if (fh == INVALID_HANDLE_VALUE)
+    {
+      DWORD err = GetLastError ();
+      switch (err)
+	{
+	case ERROR_SHARING_VIOLATION:
+	  display_error ("%s still used by other Cygwin processes.\n"
+			 "Please stop all of them and retry.", path);
+	  break;
+	case ERROR_ACCESS_DENIED:
+	  display_error (
+	    "Your permissions are not sufficient to change the file \"%s\"",
+	    path);
+	  break;
+	case ERROR_FILE_NOT_FOUND:
+	  display_error ("%s: No such file.", path);
+	  break;
+	default:
+	  display_error (path, true, false);
+	  break;
+	}
+      return 1;
+    }
+  if (!(fm = CreateFileMapping (fh, NULL, protect, 0, 0, NULL)))
+    display_error ("CreateFileMapping");
+  else if (!(haystack = MapViewOfFile (fm, mapping, 0, 0, 0)))
+    display_error ("MapViewOfFile");
+  else
+    {
+      size_t haystacklen = GetFileSize (fh, NULL);
+      cygwin_props_t *cygwin_props = (cygwin_props_t *) 
+	       memmem ((char *) haystack, haystacklen,
+		       CYGWIN_PROPS_MAGIC, sizeof (CYGWIN_PROPS_MAGIC));
+      if (!cygwin_props)
+	display_error ("Can't find Cygwin properties in %s", path);
+      else
+	{
+	  if (opt != CO_SHOW_UON)
+	    cygwin_props->disable_key = opt - CO_ENABLE_UON;
+	  printf ("Unique object names are %s\n",
+		  cygwin_props->disable_key ? "disabled" : "enabled");
+	  UnmapViewOfFile (haystack);
+	  CloseHandle (fm);
+	  CloseHandle (fh);
+	  return 0;
+	}
+    }
+  if (haystack)
+    UnmapViewOfFile (haystack);
+  if (fm)
+    CloseHandle (fm);
+  CloseHandle (fh);
+  return 1;
+}
+
 static void
 dump_sysinfo ()
 {
@@ -1556,6 +1735,8 @@ dump_sysinfo ()
       RegCloseKey (key);
     }
   printf ("obcaseinsensitive set to %lu\n\n", obcaseinsensitive);
+
+  print_reg_installations ();
 
   if (givehelp)
     {
@@ -1987,6 +2168,10 @@ Usage: cygcheck [-v] [-h] PROGRAM\n\
        cygcheck -f FILE [FILE]...\n\
        cygcheck -l [PACKAGE]...\n\
        cygcheck -p REGEXP\n\
+       cygcheck --delete-orphaned-installation-keys\n\
+       cygcheck --enable-unique-object-names Cygwin-DLL\n\
+       cygcheck --disable-unique-object-names Cygwin-DLL\n\
+       cygcheck --show-unique-object-names Cygwin-DLL\n\
        cygcheck -h\n\n\
 List system information, check installed packages, or query package database.\n\
 \n\
@@ -2004,6 +2189,19 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
                        repository (requires internet connectivity)\n\
+  --delete-orphaned-installation-keys\n\
+                       Delete installation keys of old, now unused\n\
+                       installations from the registry.  Requires the right\n\
+                       to change the registry.\n\
+  --enable-unique-object-names Cygwin-DLL\n\
+  --disable-unique-object-names Cygwin-DLL\n\
+  --show-unique-object-names Cygwin-DLL\n\
+                       Enable, disable, or show the setting of the\n\
+                       \"unique object names\" setting in the Cygwin DLL\n\
+                       given as argument to this option.  The DLL path must\n\
+                       be given as valid Windows(!) path.\n\
+                       See the users guide for more information.\n\
+                       If you don't know what this means, don't change it.\n\
   -v, --verbose        produce more verbose output\n\
   -h, --help           annotate output with explanatory comments when given\n\
                        with another command, otherwise print this help\n\
@@ -2026,6 +2224,10 @@ struct option longopts[] = {
   {"find-package", no_argument, NULL, 'f'},
   {"list-package", no_argument, NULL, 'l'},
   {"package-query", no_argument, NULL, 'p'},
+  {"delete-orphaned-installation-keys", no_argument, NULL, CO_DELETE_KEYS},
+  {"enable-unique-object-names", no_argument, NULL, CO_ENABLE_UON},
+  {"disable-unique-object-names", no_argument, NULL, CO_DISABLE_UON},
+  {"show-unique-object-names", no_argument, NULL, CO_SHOW_UON},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
@@ -2127,7 +2329,7 @@ main (int argc, char **argv)
      user's original environment.  */
   char *posixly = getenv ("POSIXLY_CORRECT");
   if (posixly == NULL)
-    (void) putenv("POSIXLY_CORRECT=1");
+    (void) putenv ("POSIXLY_CORRECT=1");
   while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (i)
       {
@@ -2161,6 +2363,14 @@ main (int argc, char **argv)
       case 'h':
 	givehelp = 1;
 	break;
+      case CO_DELETE_KEYS:
+      	del_orphaned_reg = 1;
+	break;
+      case CO_ENABLE_UON:
+      case CO_DISABLE_UON:
+      case CO_SHOW_UON:
+      	unique_object_name_opt = i;
+	break;
       case 'V':
 	print_version ();
 	exit (0);
@@ -2172,7 +2382,8 @@ main (int argc, char **argv)
   if (posixly == NULL)
     putenv ("POSIXLY_CORRECT=");
 
-  if ((argc == 0) && !sysinfo && !keycheck && !check_setup && !list_package)
+  if ((argc == 0) && !sysinfo && !keycheck && !check_setup && !list_package
+      && !del_orphaned_reg)
     {
       if (givehelp)
 	usage (stdout, 0);
@@ -2180,11 +2391,18 @@ main (int argc, char **argv)
 	usage (stderr, 1);
     }
 
-  if ((check_setup || sysinfo || find_package || list_package || grep_packages)
+  if ((check_setup || sysinfo || find_package || list_package || grep_packages
+       || del_orphaned_reg || unique_object_name_opt)
       && keycheck)
     usage (stderr, 1);
 
-  if ((find_package || list_package || grep_packages) && check_setup)
+  if ((find_package || list_package || grep_packages)
+      && (check_setup || del_orphaned_reg))
+    usage (stderr, 1);
+
+  if ((check_setup || sysinfo || find_package || list_package || grep_packages
+       || del_orphaned_reg)
+      && unique_object_name_opt)
     usage (stderr, 1);
 
   if (dump_only && !check_setup)
@@ -2195,6 +2413,10 @@ main (int argc, char **argv)
 
   if (keycheck)
     return check_keys ();
+  if (unique_object_name_opt)
+    return handle_unique_object_name (unique_object_name_opt, *argv);
+  if (del_orphaned_reg)
+    del_orphaned_reg_installations ();
   if (grep_packages)
     return package_grep (*argv);
 

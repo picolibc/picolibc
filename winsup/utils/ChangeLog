@@ -1,3 +1,23 @@
+2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc: Include cygprops.h.
+	(del_orphaned_reg): New option variable.
+	(unique_object_name_opt): Ditto.
+	(handle_reg_installation): New function.
+	(print_reg_installations): Ditto.
+	(del_orphaned_reg_installations): Ditto.
+	(memmem): Ditto.
+	(handle_unique_object_name): Ditto.
+	(dump_sysinfo): Call print_reg_installations from here.
+	(usage): Add usage for new options --delete-orphaned-installation-keys,
+	--enable-unique-object-names, --disable-unique-object-names, and
+	--show-unique-object-names.
+	(longopts): Add new options --delete-orphaned-installation-keys,
+	--enable-unique-object-names, --disable-unique-object-names, and
+	--show-unique-object-names.
+	(main): Handle new options.
+	* utils.sgml (cygcheck): Change documentaion accordingly.
+
 2009-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (pretty_id): Drop arguments.  Don't change CYGWIN
