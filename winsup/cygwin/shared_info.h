@@ -29,9 +29,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 39328
+#define SHARED_INFO_CB 31136
 
-#define CURR_SHARED_MAGIC 0x22f9ff0bU
+#define CURR_SHARED_MAGIC 0x18da899eU
 
 #define USER_VERSION	1	// increment when mount table changes and
 #define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
@@ -51,12 +51,10 @@ class shared_info
   DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;
-  WCHAR installation_root[PATH_MAX];
   DWORD obcaseinsensitive;
   mtinfo mt;
 
   void initialize ();
-  void init_installation_root ();
   void init_obcaseinsensitive ();
   unsigned heap_chunk_size ();
   unsigned heap_slop_size ();
@@ -105,4 +103,6 @@ void *__stdcall open_shared (const WCHAR *name, int n, HANDLE &shared_h,
 			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_create (bool reinit);
 extern void user_shared_initialize ();
-
+extern void init_installation_root ();
+extern WCHAR installation_root[PATH_MAX];
+extern UNICODE_STRING installation_key;

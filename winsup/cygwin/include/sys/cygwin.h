@@ -144,7 +144,8 @@ typedef enum
     CW_SET_PRIV_KEY,
     CW_SETERRNO,
     CW_EXIT_PROCESS,
-    CW_SET_EXTERNAL_TOKEN
+    CW_SET_EXTERNAL_TOKEN,
+    CW_GET_INSTKEY
   } cygwin_getinfo_types;
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */

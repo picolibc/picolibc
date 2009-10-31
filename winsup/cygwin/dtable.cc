@@ -929,6 +929,14 @@ handle_to_fn (HANDLE h, char *posix_fn)
 	  if (wcsncmp (w32, L"cygwin-", WCLEN (L"cygwin-")) != 0)
 	    return false;
 	  w32 += WCLEN (L"cygwin-");
+	  /* Check for installation key and trailing dash. */
+	  w32len = installation_key.Length / sizeof (WCHAR);
+	  if (w32len && wcsncmp (w32, installation_key.Buffer, w32len) != 0)
+	    return false;
+	  w32 += w32len;
+	  if (*w32 != L'-')
+	    return false;
+	  ++w32;
 	  bool istty = wcsncmp (w32, L"tty", WCLEN (L"tty")) == 0;
 	  if (istty)
 	    decode_tty (posix_fn, w32 + WCLEN (L"tty"));

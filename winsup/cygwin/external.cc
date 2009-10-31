@@ -460,6 +460,14 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+      case CW_GET_INSTKEY:
+	{
+	  extern WCHAR installation_key_buf[18];
+	  PWCHAR dest = va_arg (arg, PWCHAR);
+	  wcscpy (dest, installation_key_buf);
+	  res = 0;
+	}
+	break;
 
       default:
 	set_errno (ENOSYS);

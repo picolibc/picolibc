@@ -21,6 +21,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "shared_info.h"
 
 fhandler_pipe::fhandler_pipe ()
   : fhandler_base (), popen_pid (0), overlapped (NULL)
@@ -216,7 +217,10 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   if (psize < PIPE_BUF)
     psize = PIPE_BUF;
 
-  char pipename[MAX_PATH] = PIPE_INTRO;
+  char pipename[MAX_PATH];
+  const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
+				      &installation_key);
+
   /* FIXME: Eventually make ttys work with overlapped I/O. */
   DWORD overlapped = name ? 0 : FILE_FLAG_OVERLAPPED;
 
@@ -228,10 +232,10 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
-	__small_sprintf (pipename + strlen(PIPE_INTRO), "pipe-%p-%p", myself->pid,
+	__small_sprintf (pipename + len, "pipe-%p-%p", myself->pid,
 			InterlockedIncrement ((LONG *) &pipe_unique_id));
       else
-	strcpy (pipename + strlen(PIPE_INTRO), name);
+	strcpy (pipename + len, name);
 
       debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
 

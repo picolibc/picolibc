@@ -370,12 +370,13 @@ details. */
       214: Export execvpe, fexecve.
       215: CW_EXIT_PROCESS added.
       216: CW_SET_EXTERNAL_TOKEN added.
+      217: CW_GET_INSTKEY added.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 216
+#define CYGWIN_VERSION_API_MINOR 217
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
@@ -410,6 +411,7 @@ details. */
 
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
 #define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
+#define CYGWIN_INFO_INSTALLATIONS_NAME   "Installations"
 
      /* The default cygdrive prefix. */
 

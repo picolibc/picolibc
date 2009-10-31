@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include "cygtls.h"
 #include "perprocess.h"
+#include "cygprops.h"
 #include "thread.h"
 #include <malloc.h>
 #include <cygwin/version.h>
@@ -72,6 +73,9 @@ char NO_COPY almost_null[1];
 
 char *old_title;
 
+/* Define globally used, but readonly variables using the _RDATA attribute. */
+#define _RDATA __attribute__ ((section(".rdata")))
+
 /* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
    speed improvement by not having to initialize a UNICODE_STRING every time
    we make a string comparison.  The strings are not defined as const,
@@ -83,7 +87,6 @@ char *old_title;
         { Length: sizeof (_s) - sizeof (WCHAR), \
           MaximumLength: sizeof (_s), \
           Buffer: (PWSTR) (_s) }
-#define _RDATA __attribute__ ((section(".rdata")))
 UNICODE_STRING _RDATA ro_u_empty = _ROU (L"");
 UNICODE_STRING _RDATA ro_u_lnk = _ROU (L".lnk");
 UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");
@@ -102,8 +105,21 @@ UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
 UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
 UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
-#undef _RDATA
 #undef _ROU
+
+/* Cygwin properties are meant to be readonly data placed in the DLL, but
+   which can be changed by external tools to make adjustments to the
+   behaviour of a DLL based on the binary of the DLL itself.  This is
+   different from $CYGWIN since it only affects that very DLL, not all
+   DLLs which have access to the $CYGWIN environment variable. */
+cygwin_props_t _RDATA cygwin_props =
+{
+  CYGWIN_PROPS_MAGIC,
+  sizeof (cygwin_props_t),
+  0
+};
+
+#undef _RDATA
 
 extern "C"
 {

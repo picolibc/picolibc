@@ -1,5 +1,49 @@
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygprops.h: New file.
+	* dtable.cc (handle_to_fn): Add check for correct installation_key
+	string in object name for pipes and ttys.
+	* external.cc (cygwin_internal): Add CW_GET_INSTKEY to allow fetching
+	the installation_key from cygserver.
+	* fhandler_fifo.cc (fhandler_fifo::fifo_name): Add installation_key
+	to fifo name.
+	* globals.cc: Include cygprops.h.
+	(_RDATA): Move slightly and add comment.
+	(cygwin_props): Define.
+	* mount.cc (mount_info::init): Accommodate the fact that
+	installation_root is now a global variable in DLL common shared memory,
+	rather than a member of cygwin_shared.
+	* pipe.cc (fhandler_pipe::create_selectable): Add installation_key to
+	pipe name.
+	* shared.cc (installation_root): Define here for storage in DLL
+	common shared memory.
+	(installation_key): Ditto.
+	(installation_key_buf): Ditto.
+	(init_installation_root): Convert from shared_info method to ordinary
+	function.  Add initializing installation_key.  Invalidate
+	installation_key depending of value of disable_key property.  Add
+	comment to explain.
+	(get_shared_parent_dir): Add installation_key to directory name.
+	(get_session_parent_dir): Ditto.
+	(shared_info::initialize): Move call to init_installation_root from
+	here...
+	(memory_init): ...to here.  Add debug output to print installation root
+	and installation key.  Add comment to explain why.
+	* shared_info.h (SHARED_INFO_CB): Recalculate.
+	(CURR_SHARED_MAGIC): Ditto.
+	(class shared_info): Remove definition of installation_root and
+	declaration of init_installation_root.
+	(init_installation_root): Declare.
+	(installation_root): Declare.
+	(installation_key): Declare.
+	* uinfo.cc (pwdgrp::load): Accommodate the fact that installation_root
+	is now a global variable in DLL common shared memory.
+	* include/cygwin/version.h: Bump API minor number.
+	(CYGWIN_INFO_INSTALLATIONS_NAME): Add.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_GET_INSTKEY.
+
+2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_helper.cc (security_descriptor::realloc): Call free first if
 	current security desriptor has been allocated by GetSecurityInfo.
 

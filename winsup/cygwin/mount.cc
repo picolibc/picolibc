@@ -350,7 +350,7 @@ mount_info::init ()
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
 
-  pathend = wcpcpy (path, cygwin_shared->installation_root);
+  pathend = wcpcpy (path, installation_root);
   create_root_entry (path);
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
 

@@ -518,13 +518,13 @@ pwdgrp::load (const wchar_t *rel_path)
   curr_lines = 0;
 
   if (!path &&
-      !(path = (PWCHAR) malloc ((wcslen (cygwin_shared->installation_root)
+      !(path = (PWCHAR) malloc ((wcslen (installation_root)
 				 + wcslen (rel_path) + 1) * sizeof (WCHAR))))
     {
       paranoid_printf ("malloc (%W) failed", rel_path);
       goto out;
     }
-  wcpcpy (wcpcpy (path, cygwin_shared->installation_root), rel_path);
+  wcpcpy (wcpcpy (path, installation_root), rel_path);
   RtlInitUnicodeString (&upath, path);
 
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);

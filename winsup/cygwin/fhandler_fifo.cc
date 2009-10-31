@@ -19,6 +19,7 @@
 #include "cygheap.h"
 #include "sigproc.h"
 #include "cygtls.h"
+#include "shared_info.h"
 
 fhandler_fifo::fhandler_fifo ():
   wait_state (fifo_unknown), dummy_client (NULL)
@@ -58,8 +59,8 @@ char *
 fhandler_fifo::fifo_name (char *buf)
 {
   /* Generate a semi-unique name to associate with this fifo. */
-  __small_sprintf (buf, "\\\\.\\pipe\\__cygfifo__%08x_%016X",
-		   get_dev (), get_ino ());
+  __small_sprintf (buf, "\\\\.\\pipe\\__cygfifo__%S_%08x_%016X",
+		   &installation_key, get_dev (), get_ino ());
   return buf;
 }
 

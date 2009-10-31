@@ -26,11 +26,95 @@ details. */
 #include "ntdll.h"
 #include <alloca.h>
 #include <wchar.h>
+#include <wingdi.h>
+#include <winuser.h>
 
 shared_info NO_COPY *cygwin_shared;
 user_info NO_COPY *user_shared;
 HANDLE NO_COPY cygwin_shared_h;
 HANDLE NO_COPY cygwin_user_h;
+
+WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
+UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
+WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
+
+/* Use absolute path of cygwin1.dll to derive the Win32 dir which
+   is our installation_root.  Note that we can't handle Cygwin installation
+   root dirs of more than 4K path length.  I assume that's ok...
+
+   This function also generates the installation_key value.  It's a 64 bit
+   hash value based on the path of the Cygwin DLL itself.  It's subsequently
+   used when generating shared object names.  Thus, different Cygwin
+   installations generate different object names and so are isolated from
+   each other.
+   
+   Having this information, the installation key together with the
+   installation root path is written to the registry.  The idea is that
+   cygcheck can print the paths into which the Cygwin DLL has been
+   installed for debugging purposes.
+   
+   Last but not least, the new cygwin properties datastrcuture is checked
+   for the "disabled_key" value, which is used to determine whether the
+   installation key is actually added to all object names or not.  This is
+   used as a last resort for debugging purposes, usually.  However, there
+   could be another good reason to re-enable object name collisions between
+   multiple Cygwin DLLs, which we're just not aware of right now.  Cygcheck
+   can be used to change the value in an existing Cygwin DLL binary. */
+
+void
+init_installation_root ()
+{
+  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "GetModuleFileNameW(%p, %p, %u), %E",
+	       cygwin_hmodule, installation_root, PATH_MAX);
+  PWCHAR p = installation_root;
+  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+    {
+      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+	{
+	  p = wcpcpy (p, L"\\??\\UN");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	  *p = L'C';
+	}
+      else
+	{
+	  p = wcpcpy (p, L"\\??\\");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	}
+    }
+  installation_root[1] = L'?';
+
+  RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
+			     sizeof installation_key_buf);
+  RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
+			      &installation_key, FALSE);
+
+  PWCHAR w = wcsrchr (installation_root, L'\\');
+  if (w)
+    {
+      *w = L'\0';
+      w = wcsrchr (installation_root, L'\\');
+    }
+  if (!w)
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "Invalid DLL path");
+  *w = L'\0';
+
+  for (int i = 1; i >= 0; --i)
+    {
+      reg_key r (i, KEY_WRITE, CYGWIN_INFO_INSTALLATIONS_NAME, NULL);
+      if (r.set_string (installation_key_buf, installation_root)
+	  == ERROR_SUCCESS)
+      	break;
+    }
+
+  if (cygwin_props.disable_key)
+    {
+      installation_key.Length = 0;
+      installation_key.Buffer[0] = L'\0';
+    }
+}
 
 /* This function returns a handle to the top-level directory in the global
    NT namespace used to implement global objects including shared memory. */
@@ -46,9 +130,10 @@ get_shared_parent_dir ()
   if (!dir)
     {
       WCHAR bnoname[MAX_PATH];
-      __small_swprintf (bnoname, L"\\BaseNamedObjects\\%s%s",
+      __small_swprintf (bnoname, L"\\BaseNamedObjects\\%s%s-%S",
 			cygwin_version.shared_id,
-			_cygwin_testing ? cygwin_version.dll_build_date : "");
+			_cygwin_testing ? cygwin_version.dll_build_date : "",
+			&installation_key);
       RtlInitUnicodeString (&uname, bnoname);
       InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
 				  NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
@@ -79,9 +164,10 @@ get_session_parent_dir ()
 	{
 	  WCHAR bnoname[MAX_PATH];
 	  __small_swprintf (bnoname,
-			    L"\\Sessions\\BNOLINKS\\%d\\%s%s",
+			    L"\\Sessions\\BNOLINKS\\%d\\%s%s-%S",
 			    psi.SessionId, cygwin_version.shared_id,
-			    _cygwin_testing ? cygwin_version.dll_build_date : "");
+			    _cygwin_testing ? cygwin_version.dll_build_date : "",
+			    &installation_key);
 	  RtlInitUnicodeString (&uname, bnoname);
 	  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
 				      NULL, everyone_sd(CYG_SHARED_DIR_ACCESS));
@@ -270,46 +356,6 @@ shared_destroy ()
   UnmapViewOfFile (user_shared);
 }
 
-/* Use absolute path of cygwin1.dll to derive the Win32 dir which
-   is our installation root.  Note that we can't handle Cygwin installation
-   root dirs of more than 4K path length.  I assume that's ok... */
-void
-shared_info::init_installation_root ()
-{
-  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
-    api_fatal ("Can't initialize Cygwin installation root dir.\n"
-	       "GetModuleFileNameW(%p, %p, %u), %E",
-	       cygwin_hmodule, installation_root, PATH_MAX);
-  PWCHAR p = installation_root;
-  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
-    {
-      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
-	{
-	  p = wcpcpy (p, L"\\??\\UN");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
-	  *p = L'C';
-	}
-      else
-	{
-	  p = wcpcpy (p, L"\\??\\");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
-	}
-    }
-  installation_root[1] = L'?';
-
-  PWCHAR w = wcsrchr (installation_root, L'\\');
-  if (w)
-    {
-      *w = L'\0';
-      w = wcsrchr (installation_root, L'\\');
-    }
-  if (!w)
-    api_fatal ("Can't initialize Cygwin installation root dir.\n"
-	       "Invalid DLL path");
-
-  *w = L'\0';
-}
-
 /* Initialize obcaseinsensitive.  Default to case insensitive on pre-XP. */
 void
 shared_info::init_obcaseinsensitive ()
@@ -349,7 +395,6 @@ shared_info::initialize ()
 
   if (!sversion)
     {
-      init_installation_root ();/* Initialize installation root dir. */
       init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
       tty.init ();		/* Initialize tty table.  */
       mt.initialize ();		/* Initialize shared tape information. */
@@ -373,6 +418,10 @@ memory_init (bool init_cygheap)
       cygheap->user.init ();
     }
 
+  /* Initialize installation root dir. */
+  if (!installation_root[0])
+    init_installation_root ();
+
   /* Initialize general shared memory */
   shared_locations sh_cygwin_shared;
   cygwin_shared = (shared_info *) open_shared (L"shared",
@@ -380,6 +429,11 @@ memory_init (bool init_cygheap)
 					       cygwin_shared_h,
 					       sizeof (*cygwin_shared),
 					       sh_cygwin_shared = SH_CYGWIN_SHARED);
+  /* Defer debug output printing the installation root and installation key
+     up to this point.  Debug output except for system_printf requires
+     the global shared memory to exist. */
+  debug_printf ("Installation root: <%W> key: <%S>",
+		installation_root, &installation_key);
   cygwin_shared->initialize ();
   user_shared_create (false);
 }
