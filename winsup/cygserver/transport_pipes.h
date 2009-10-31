@@ -13,6 +13,9 @@ details. */
 #ifndef _TRANSPORT_PIPES_H
 #define _TRANSPORT_PIPES_H
 
+#define PIPE_NAME_PREFIX	L"\\\\.\\pipe\\cygwin-"
+#define PIPE_NAME_SUFFIX	L"-lpc"
+
 /* Named pipes based transport, for security on NT */
 class transport_layer_pipes : public transport_layer_base
 {
@@ -36,7 +39,7 @@ public:
   virtual ~transport_layer_pipes ();
 
 private:
-  const char *const _pipe_name;
+  wchar_t _pipe_name[40];
   HANDLE _hPipe;
   const bool _is_accepted_endpoint;
   bool _is_listening_endpoint;

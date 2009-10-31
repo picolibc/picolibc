@@ -1,6 +1,6 @@
 /* transport_pipes.cc
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2009 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -23,6 +23,8 @@ details. */
 #include <netdb.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <wchar.h>
+#include <sys/cygwin.h>
 
 #include "cygerrno.h"
 #include "transport.h"
@@ -65,24 +67,33 @@ initialise_pipe_instance_lock ()
 #ifndef __INSIDE_CYGWIN__
 
 transport_layer_pipes::transport_layer_pipes (const HANDLE hPipe)
-  : _pipe_name (""),
-    _hPipe (hPipe),
+  : _hPipe (hPipe),
     _is_accepted_endpoint (true),
     _is_listening_endpoint (false)
 {
   assert (_hPipe);
   assert (_hPipe != INVALID_HANDLE_VALUE);
-
+  _pipe_name[0] = L'\0';
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
 
 transport_layer_pipes::transport_layer_pipes ()
-  : _pipe_name ("\\\\.\\pipe\\cygwin_lpc"),
-    _hPipe (NULL),
+  : _hPipe (NULL),
     _is_accepted_endpoint (false),
     _is_listening_endpoint (false)
 {
+#ifdef __INSIDE_CYGWIN__
+  extern WCHAR installation_key_buf[18];
+  wcpcpy (wcpcpy (wcpcpy (_pipe_name, PIPE_NAME_PREFIX), installation_key_buf),
+	  PIPE_NAME_SUFFIX);
+#else
+  wchar_t cyg_instkey[18];
+
+  wchar_t *p = wcpcpy (_pipe_name, PIPE_NAME_PREFIX);
+  if (cygwin_internal (CW_GET_INSTKEY, cyg_instkey))
+    wcpcpy (wcpcpy (p, cyg_instkey), PIPE_NAME_SUFFIX);
+#endif
 }
 
 transport_layer_pipes::~transport_layer_pipes ()
@@ -124,7 +135,7 @@ transport_layer_pipes::accept (bool *const recoverable)
   const bool first_instance = (pipe_instance == 0);
 
   const HANDLE accept_pipe =
-    CreateNamedPipe (_pipe_name,
+    CreateNamedPipeW (_pipe_name,
 		     (PIPE_ACCESS_DUPLEX
 		      | (first_instance ? FILE_FLAG_FIRST_PIPE_INSTANCE : 0)),
 		     (PIPE_TYPE_BYTE | PIPE_WAIT),
@@ -270,13 +281,13 @@ transport_layer_pipes::connect ()
 
   while (rc)
     {
-      _hPipe = CreateFile (_pipe_name,
-			   GENERIC_READ | GENERIC_WRITE,
-			   FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   &sec_all_nih,
-			   OPEN_EXISTING,
-			   SECURITY_IMPERSONATION,
-			   NULL);
+      _hPipe = CreateFileW (_pipe_name,
+			    GENERIC_READ | GENERIC_WRITE,
+			    FILE_SHARE_READ | FILE_SHARE_WRITE,
+			    &sec_all_nih,
+			    OPEN_EXISTING,
+			    SECURITY_IMPERSONATION,
+			    NULL);
 
       if (_hPipe != INVALID_HANDLE_VALUE)
 	{
@@ -302,7 +313,7 @@ transport_layer_pipes::connect ()
        * with ERROR_FILE_NOT_FOUND.
        */
       while (retries != MAX_WAIT_NAMED_PIPE_RETRY
-	     && !(rc = WaitNamedPipe (_pipe_name, WAIT_NAMED_PIPE_TIMEOUT)))
+	     && !(rc = WaitNamedPipeW (_pipe_name, WAIT_NAMED_PIPE_TIMEOUT)))
 	{
 	  if (GetLastError () == ERROR_FILE_NOT_FOUND)
 	    Sleep (0);		// Give the server a chance.

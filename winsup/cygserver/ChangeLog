@@ -1,3 +1,19 @@
+2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.h (PIPE_NAME_PREFIX): New define.
+	(PIPE_NAME_SUFFIX): Ditto.
+	(class transport_layer_pipes): Convert _pipe_name from char pointer
+	to wchar_t array.
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Accommodate the fact that _pipe_name is a wchar_t array, rather than
+	a char pointer.
+	(transport_layer_pipes::transport_layer_pipes): Initialize _pipe_name
+	with variable pipe name based in installation key fetched from Cygwin
+	DLL.
+	(transport_layer_pipes::accept): Call CreateNamedPipeW explicitely.
+	(transport_layer_pipes::connect): Call CreateFileW and WaitNamedPipeW
+	explicitely.
+
 2009-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (CXXFLAGS): Allow override.
