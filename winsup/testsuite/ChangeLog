@@ -1,3 +1,7 @@
+2009-11-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Use utils mingw front-end to generate non-cygwin binary.
+
 2008-11-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Revert erroneous checkin.

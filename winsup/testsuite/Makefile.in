@@ -1,5 +1,5 @@
 # Makefile.in for Cygwin's testsuite.
-# Copyright 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+# Copyright 2000, 2001, 2002, 2003, 2005, 2006, 2009 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -57,6 +57,7 @@ endif
 
 AR:=@AR@
 AR_FLAGS:=qv
+MINGW_FE:=$(dir ${srcdir})/utils/mingw
 
 #
 # Include common definitions for winsup directory
@@ -169,7 +170,7 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	runtest --tool winsup $(RUNTESTFLAGS) ;\
 
 cygrun.o: cygrun.c
-	$(CC) $(MINGW_CFLAGS) -o $@ -c $<
+	${MINGW_FE} $(CC) $(MINGW_CFLAGS) -o $@ -c $<
 
 cygrun.exe : cygrun.o
-	$(CC) ${MINGW_LDFLAGS} -mno-cygwin -o $@ $<
+	${MINGW_FE} $(CC) ${MINGW_LDFLAGS} -o $@ $<
