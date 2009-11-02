@@ -62,10 +62,13 @@
 #define FPU_VFP_EXT_V1xD 0x08000000	/* Base VFP instruction set.  */
 #define FPU_VFP_EXT_V1	 0x04000000	/* Double-precision insns.    */
 #define FPU_VFP_EXT_V2	 0x02000000	/* ARM10E VFPr1.	      */
-#define FPU_VFP_EXT_V3	 0x01000000	/* VFPv3 insns.	              */
-#define FPU_NEON_EXT_V1	 0x00800000	/* Neon (SIMD) insns.	      */
-#define FPU_VFP_EXT_D32  0x00400000	/* Registers D16-D31.	      */
-#define FPU_NEON_FP16	 0x00200000	/* Half-precision extensions. */
+#define FPU_VFP_EXT_V3xD 0x01000000	/* VFPv3 single-precision.    */
+#define FPU_VFP_EXT_V3	 0x00800000	/* VFPv3 double-precision.    */
+#define FPU_NEON_EXT_V1	 0x00400000	/* Neon (SIMD) insns.	      */
+#define FPU_VFP_EXT_D32  0x00200000	/* Registers D16-D31.	      */
+#define FPU_VFP_EXT_FP16 0x00100000	/* Half-precision extensions. */
+#define FPU_NEON_EXT_FMA 0x00080000	/* Neon fused multiply-add    */
+#define FPU_VFP_EXT_FMA	 0x00040000	/* VFP fused multiply-add     */
 
 /* Architectures are the sum of the base and extensions.  The ARM ARM (rev E)
    defines the following: ARMv3, ARMv3M, ARMv4xM, ARMv4, ARMv4TxM, ARMv4T,
@@ -120,9 +123,13 @@
 #define FPU_VFP_V1xD	(FPU_VFP_EXT_V1xD | FPU_ENDIAN_PURE)
 #define FPU_VFP_V1	(FPU_VFP_V1xD | FPU_VFP_EXT_V1)
 #define FPU_VFP_V2	(FPU_VFP_V1 | FPU_VFP_EXT_V2)
-#define FPU_VFP_V3D16	(FPU_VFP_V2 | FPU_VFP_EXT_V3)
+#define FPU_VFP_V3D16	(FPU_VFP_V2 | FPU_VFP_EXT_V3xD | FPU_VFP_EXT_V3)
 #define FPU_VFP_V3	(FPU_VFP_V3D16 | FPU_VFP_EXT_D32)
+#define FPU_VFP_V3xD	(FPU_VFP_V1xD | FPU_VFP_EXT_V2 | FPU_VFP_EXT_V3xD)
+#define FPU_VFP_V4D16	(FPU_VFP_V3D16 | FPU_VFP_EXT_FP16 | FPU_VFP_EXT_FMA)
+#define FPU_VFP_V4	(FPU_VFP_V3 | FPU_VFP_EXT_FP16 | FPU_VFP_EXT_FMA)
 #define FPU_VFP_HARD	(FPU_VFP_EXT_V1xD | FPU_VFP_EXT_V1 | FPU_VFP_EXT_V2 \
+			 | FPU_VFP_EXT_V3xD | FPU_VFP_EXT_FMA | FPU_NEON_EXT_FMA \
                          | FPU_VFP_EXT_V3 | FPU_NEON_EXT_V1 | FPU_VFP_EXT_D32)
 #define FPU_FPA		(FPU_FPA_EXT_V1 | FPU_FPA_EXT_V2)
 
@@ -136,13 +143,22 @@
 #define FPU_ARCH_VFP_V1	  ARM_FEATURE (0, FPU_VFP_V1)
 #define FPU_ARCH_VFP_V2	  ARM_FEATURE (0, FPU_VFP_V2)
 #define FPU_ARCH_VFP_V3D16	ARM_FEATURE (0, FPU_VFP_V3D16)
+#define FPU_ARCH_VFP_V3D16_FP16 \
+  ARM_FEATURE (0, FPU_VFP_V3D16 | FPU_VFP_EXT_FP16)
 #define FPU_ARCH_VFP_V3	  ARM_FEATURE (0, FPU_VFP_V3)
+#define FPU_ARCH_VFP_V3_FP16	ARM_FEATURE (0, FPU_VFP_V3 | FPU_VFP_EXT_FP16)
+#define FPU_ARCH_VFP_V3xD	ARM_FEATURE (0, FPU_VFP_V3xD)
+#define FPU_ARCH_VFP_V3xD_FP16	ARM_FEATURE (0, FPU_VFP_V3xD | FPU_VFP_EXT_FP16)
 #define FPU_ARCH_NEON_V1  ARM_FEATURE (0, FPU_NEON_EXT_V1)
 #define FPU_ARCH_VFP_V3_PLUS_NEON_V1 \
   ARM_FEATURE (0, FPU_VFP_V3 | FPU_NEON_EXT_V1)
 #define FPU_ARCH_NEON_FP16 \
-  ARM_FEATURE (0, FPU_VFP_V3 | FPU_NEON_EXT_V1 | FPU_NEON_FP16)
+  ARM_FEATURE (0, FPU_VFP_V3 | FPU_NEON_EXT_V1 | FPU_VFP_EXT_FP16)
 #define FPU_ARCH_VFP_HARD ARM_FEATURE (0, FPU_VFP_HARD)
+#define FPU_ARCH_VFP_V4 ARM_FEATURE(0, FPU_VFP_V4)
+#define FPU_ARCH_VFP_V4D16 ARM_FEATURE(0, FPU_VFP_V4D16)
+#define FPU_ARCH_NEON_VFP_V4 \
+  ARM_FEATURE(0, FPU_VFP_V4 | FPU_NEON_EXT_V1 | FPU_NEON_EXT_FMA)
 
 #define FPU_ARCH_ENDIAN_PURE ARM_FEATURE (0, FPU_ENDIAN_PURE)
 
