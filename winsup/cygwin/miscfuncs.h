@@ -25,6 +25,14 @@ void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);
 #define isslash(c) ((c) == '/')
 
+extern void transform_chars (PWCHAR, PWCHAR);
+inline void
+transform_chars (PUNICODE_STRING upath, USHORT start_idx)
+{
+  transform_chars (upath->Buffer + start_idx,
+		   upath->Buffer + upath->Length / sizeof (WCHAR) - 1);
+}
+
 /* Memory checking */
 int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 

@@ -22,6 +22,55 @@ details. */
 #include "cygheap.h"
 #include "tls_pbuf.h"
 
+/* Transform characters invalid for Windows filenames to the Unicode private
+   use area in the U+f0XX range.  The affected characters are all control
+   chars 1 <= c <= 31, as well as the characters " * : < > ? |.  The backslash
+   is affected as well, but we can't transform it as long as we accept Win32
+   paths as input.
+   The reverse functionality is in function sys_cp_wcstombs. */
+static const WCHAR tfx_chars[] = {
+            0, 0xf000 |   1, 0xf000 |   2, 0xf000 |   3,
+ 0xf000 |   4, 0xf000 |   5, 0xf000 |   6, 0xf000 |   7,
+ 0xf000 |   8, 0xf000 |   9, 0xf000 |  10, 0xf000 |  11,
+ 0xf000 |  12, 0xf000 |  13, 0xf000 |  14, 0xf000 |  15,
+ 0xf000 |  16, 0xf000 |  17, 0xf000 |  18, 0xf000 |  19,
+ 0xf000 |  20, 0xf000 |  21, 0xf000 |  22, 0xf000 |  23,
+ 0xf000 |  24, 0xf000 |  25, 0xf000 |  26, 0xf000 |  27,
+ 0xf000 |  28, 0xf000 |  29, 0xf000 |  30, 0xf000 |  31,
+          ' ',          '!', 0xf000 | '"',          '#',
+          '$',          '%',          '&',           39,
+          '(',          ')', 0xf000 | '*',          '+',
+          ',',          '-',          '.',          '\\',
+          '0',          '1',          '2',          '3',
+          '4',          '5',          '6',          '7',
+          '8',          '9', 0xf000 | ':',          ';',
+ 0xf000 | '<',          '=', 0xf000 | '>', 0xf000 | '?',
+          '@',          'A',          'B',          'C',
+          'D',          'E',          'F',          'G',
+          'H',          'I',          'J',          'K',
+          'L',          'M',          'N',          'O',
+          'P',          'Q',          'R',          'S',
+          'T',          'U',          'V',          'W',
+          'X',          'Y',          'Z',          '[',
+          '\\',          ']',          '^',          '_',
+          '`',          'a',          'b',          'c',
+          'd',          'e',          'f',          'g',
+          'h',          'i',          'j',          'k',
+          'l',          'm',          'n',          'o',
+          'p',          'q',          'r',          's',
+          't',          'u',          'v',          'w',
+          'x',          'y',          'z',          '{',
+ 0xf000 | '|',          '}',          '~',          127
+};
+
+void
+transform_chars (PWCHAR path, PWCHAR path_end)
+{
+  for (; path <= path_end; ++path)
+    if (*path < 128)
+      *path = tfx_chars[*path];
+}
+
 /* The SJIS, JIS and eucJP conversion in newlib does not use UTF as
    wchar_t character representation.  That's unfortunate for us since
    we require UTF for the OS.  What we do here is to have our own
@@ -426,16 +475,19 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
     {
       wchar_t pw = *pwcs;
       int bytes;
+      unsigned char cwc;
 
       /* Convert UNICODE private use area.  Reverse functionality for the
-         ASCII area <= 0x7f (only for path names) is transform_chars in
-	 path.cc.  Reverse functionality for invalid bytes in a multibyte
-	 sequence is in sys_cp_mbstowcs. */
-      if ((pw & 0xff00) == 0xf000 && ((pw & 0xff) <= 0x7f || MB_CUR_MAX > 1))
+         ASCII area <= 0x7f (only for path names) is transform_chars above.
+	 Reverse functionality for invalid bytes in a multibyte sequence is
+	 in sys_cp_mbstowcs below. */
+      if ((pw & 0xff00) == 0xf000
+	  && (((cwc = (pw & 0xff)) <= 0x7f && tfx_chars[cwc] >= 0xf000)
+	      || (cwc >= 0x80 && MB_CUR_MAX > 1)))
 	{
-	  buf[0] = pw & 0xff;
+	  buf[0] = (char) cwc;
 	  bytes = 1;
-      	}
+	}
       else
 	{
 	  bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
@@ -603,15 +655,14 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 	    }
 	}
       else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
-				  charset, &ps)) < 0
-	       || (bytes == 3 && pmbs[0] == 0xef && (pmbs[1] & 0xf4) == 0x80))
+				  charset, &ps)) < 0)
 	{
 	  /* The technique is based on a discussion here:
 	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
 
 	     Invalid bytes in a multibyte secuence are converted to
 	     the private use area which is already used to store ASCII
-	     chars invalid in Windows filenames.  This techinque allows 
+	     chars invalid in Windows filenames.  This technque allows 
 	     to store them in a symmetric way. */
 	  bytes = 1;
 	  if (dst)

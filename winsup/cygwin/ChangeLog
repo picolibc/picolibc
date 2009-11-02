@@ -1,5 +1,19 @@
 2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.h (transform_chars): Declare.  Define inline variation here.
+	* mount.cc (mount_info::from_fstab): Remove extern declaration of
+	transform_chars.
+	* path.cc (tfx_chars): Move to strfuncs.cc.
+	(transform_chars): Ditto.
+	* strfunc.cc (tfx_chars): Moved here from path.cc.
+	(transform_chars): Ditto.
+	(sys_cp_wcstombs): Make UNICODE private use area conversion roundtrip
+	save for all characters.
+	(sys_cp_mbstowcs): Ditto, by removing special case for UTF-8 sequences
+	representing U+f0XX UNICODE chars.  Fix typo in comment.
+
+2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (tfx_chars): Constify.
 
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
@@ -362,7 +376,7 @@
 	(fhandler_console::write_normal): Always use codepage 437 for alternate
 	charset.  Otherwise always default to the current internal locale.
 	Replace ASCII SO with ASCII CAN.
-	* strfuncs.cc: Tweka comments according to below changes.
+	* strfuncs.cc: Tweak comments according to below changes.
 	(sys_cp_wcstombs): Constify charset parameter.  Convert all wchar_t
 	values in the Unicode private use area U+F0xx to the singlebyte
 	counterpart.  Drop special handling creating ASCII SO sequence from

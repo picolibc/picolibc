@@ -997,7 +997,6 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 
   if (user)
     {
-      extern void transform_chars (PWCHAR, PWCHAR);
       PWCHAR username;
       sys_mbstowcs (username = wcpcpy (fstab_end, L".d\\"),
 		    NT_MAX_PATH - (fstab_end - fstab),
