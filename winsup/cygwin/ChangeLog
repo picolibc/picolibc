@@ -1,3 +1,7 @@
+2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (tfx_chars): Constify.
+
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygprops.h: New file.
