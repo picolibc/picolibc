@@ -615,12 +615,6 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  acl_len += ace->Header.AceSize;
 	}
 
-#if 0
-  /* CV 2009-02-04: Setting these inherit attributes for new dirs never was
-     really POSIX-like but rather a concession for native Win32 processes.
-     Disabled for now.  Let's test if that has really a visible negative
-     impact. */
-
   /* Construct appropriate inherit attribute for new directories */
   if (S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
     {
@@ -663,7 +657,6 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 				   well_known_world_sid, acl_len, inherit))
 	return NULL;
     }
-#endif
 
   /* Set AclSize to computed value. */
   acl->AclSize = acl_len;

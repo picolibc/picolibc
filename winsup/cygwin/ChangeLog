@@ -1,5 +1,10 @@
 2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): Re-enable generating default permission
+	entries for directories.
+
+2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (get_full_path_of_dll): Drop enforcing a .dll suffix.
 	(dlopen): If last path component has no dot, append one to override
 	automatic .dll suffix in LoadLibrary.
