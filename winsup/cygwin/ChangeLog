@@ -1,5 +1,11 @@
 2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (get_full_path_of_dll): Drop enforcing a .dll suffix.
+	(dlopen): If last path component has no dot, append one to override
+	automatic .dll suffix in LoadLibrary.
+
+2009-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.h (transform_chars): Declare.  Define inline variation here.
 	* mount.cc (mount_info::from_fstab): Remove extern declaration of
 	transform_chars.

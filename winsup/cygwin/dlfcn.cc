@@ -53,15 +53,6 @@ get_full_path_of_dll (const char* str, path_conv &real_filename)
 
   strcpy (name, str);	/* Put it somewhere where we can manipulate it. */
 
-  /* Add extension if necessary */
-  if (str[len - 1] != '.')
-    {
-      /* Add .dll only if no extension provided. */
-      const char *p = strrchr (str, '.');
-      if (!p || strpbrk (p, "\\/"))
-	strcat (name, ".dll");
-    }
-
   if (isabspath (name) ||
       (check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
        ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
@@ -93,6 +84,12 @@ dlopen (const char *name, int)
 	  wchar_t *path = tp.w_get ();
 
 	  pc.get_wide_win32_path (path);
+	  /* Check if the last path component contains a dot.  If so,
+	     leave the filename alone.  Otherwise add a traiing dot
+	     to override LoadLibrary's automatic adding of a ".dll" suffix. */
+	  wchar_t *last_bs = wcsrchr (path, L'\\');
+	  if (last_bs && !wcschr (last_bs, L'.'))
+	    wcscat (last_bs, L".");
 
 	  /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
 	     up to 1.7.0-57.  They override the cxx_malloc pointer in their
