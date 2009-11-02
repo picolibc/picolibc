@@ -401,7 +401,7 @@ path_conv::set_normalized_path (const char *path_copy)
    is affected as well, but we can't transform it as long as we accept Win32
    paths as input.
    The reverse functionality is in strfuncs.cc, function sys_cp_wcstombs. */
-WCHAR tfx_chars[] NO_COPY = {
+static const WCHAR tfx_chars[] = {
             0, 0xf000 |   1, 0xf000 |   2, 0xf000 |   3,
  0xf000 |   4, 0xf000 |   5, 0xf000 |   6, 0xf000 |   7,
  0xf000 |   8, 0xf000 |   9, 0xf000 |  10, 0xf000 |  11,
