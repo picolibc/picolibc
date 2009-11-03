@@ -434,6 +434,11 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
       return NULL;
     }
 
+  /* We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
+   * modified by inheritable ACEs.  This flag is available since Win2K.  */
+  if (wincap.has_dacl_protect ())
+    sd.Control |= SE_DACL_PROTECTED;
+
   /* Create owner for local security descriptor. */
   if (!SetSecurityDescriptorOwner (&sd, owner_sid, FALSE))
     {
@@ -591,27 +596,36 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	      else
 		continue;
 	    }
-	  else if ((attribute & S_JUSTCREATED)
-		   && !(ace->Header.AceFlags & INHERITED_ACE))
-	    /* Since files and dirs are created with a NULL descriptor,
-	       inheritence rules kick in.  However, if no inheritable entries
-	       exist in the parent object, Windows will create entries from the
-	       user token's default DACL in the file DACL.  These entries are
-	       not desired and we drop them silently here. */
-	    continue;
+	  else if (attribute & S_JUSTCREATED)
+	    {
+	      /* Since files and dirs are created with a NULL descriptor,
+		 inheritence rules kick in.  If no inheritable entries exist
+		 in the parent object, Windows will create entries from the
+		 user token's default DACL in the file DACL.  These entries
+		 are not desired and we drop them silently. */
+	      if (!(ace->Header.AceFlags & INHERITED_ACE))
+		continue;
+	      /* Remove the INHERITED_ACE flag since on POSIX systems
+		 inheritance is settled when the file has been created.
+		 This also avoids error messages in Windows Explorer when
+		 opening a file's security tab.  Explorer complains if
+		 inheritable ACEs are preceding non-inheritable ACEs. */
+	      ace->Header.AceFlags &= ~INHERITED_ACE;
+	    }
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
 	   * FIXME: this would break the order of the inherit-only ACEs
 	   */
 	  if (!AddAce (acl, ACL_REVISION,
-		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE?
-		       (owner_deny ? 1 : 0) : MAXDWORD,
+		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
+		       ?  (owner_deny ? 1 : 0) : MAXDWORD,
 		       (LPVOID) ace, ace->Header.AceSize))
 	    {
 	      __seterrno ();
 	      return NULL;
 	    }
+	  ace_off++;
 	  acl_len += ace->Header.AceSize;
 	}
 
@@ -620,7 +634,6 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
     {
       const DWORD inherit = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
 			    | INHERIT_ONLY_ACE;
-
 #if 0 /* FIXME: Not done currently as this breaks the canonical order */
       /* Set deny ACE for owner. */
       if (owner_deny
