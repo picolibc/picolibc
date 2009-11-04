@@ -556,6 +556,8 @@ mnt_sort (const void *a, const void *b)
   return strcmp (ma->posix, mb->posix);
 }
 
+extern "C" WCHAR cygwin_dll_path[];
+
 static void
 read_mounts ()
 {
@@ -567,6 +569,7 @@ read_mounts ()
   DWORD len;
   WCHAR path[32768];
   PWCHAR path_end;
+  HMODULE h;
 
   for (mnt_t *m1 = mount_table; m1->posix; m1++)
     {
@@ -577,9 +580,16 @@ read_mounts ()
     }
   max_mount_entry = 0;
 
-  /* First check where cygcheck is living itself and try to fetch installation
-     path from here.  Does cygwin1.dll exist in the same path? */
-  if (!GetModuleFileNameW (NULL, path, 32768))
+  /* First fetch the cygwin1.dll path from the LoadLibrary call in load_cygwin.
+     This utilizes the DLL search order to find a matching cygwin1.dll and to
+     compute the installation path from that DLL's path. */
+  if (cygwin_dll_path[0])
+    wcscpy (path, cygwin_dll_path);
+  /* If we can't load cygwin1.dll, check where cygcheck is living itself and
+     try to fetch installation path from here.  Does cygwin1.dll exist in the
+     same path?  This should only kick in if the cygwin1.dll in the same path
+     has been made non-executable for the current user accidentally. */
+  else if (!GetModuleFileNameW (NULL, path, 32768))
     return;
   path_end = wcsrchr (path, L'\\');
   if (path_end)
@@ -612,21 +622,11 @@ read_mounts ()
 	      break;
 	  }
       if (ret == ERROR_SUCCESS)
-	{
-	  printf ("\n"
-"Warning!  Computing mount points from setup registry key. Mount points might\n"
-"be wrong if you have multiple Cygwin installations on this machine.\n");
-	  path_end = wcschr (path, L'\0');
-	}
+	path_end = wcschr (path, L'\0');
     }
   /* If we can't fetch an installation dir, bail out. */
   if (!path_end)
-    {
-      printf ("\n"
-"Warning!  Could not generate mount table since no valid installation path\n"
-"could be found.\n");
-      return;
-    }
+    return;
   *path_end = L'\0';
 
   from_fstab (false, path, path_end);
