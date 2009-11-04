@@ -1,3 +1,7 @@
+2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygpath.exe): Add -fno-threadsafe-statics to CXXFLAGS.
+
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc: Include cygprops.h.
