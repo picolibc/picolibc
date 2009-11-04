@@ -577,33 +577,56 @@ read_mounts ()
     }
   max_mount_entry = 0;
 
-  for (int i = 0; i < 2; ++i)
-    if ((ret = RegOpenKeyExW (i ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER,
-			      L"Software\\Cygwin\\setup", 0,
-			      KEY_READ, &setup_key)) == ERROR_SUCCESS)
-      {
-	len = 32768 * sizeof (WCHAR);
-	ret = RegQueryValueExW (setup_key, L"rootdir", NULL, NULL,
-				(PBYTE) path, &len);
-	RegCloseKey (setup_key);
-	if (ret == ERROR_SUCCESS)
-	  break;
-      }
-  if (ret == ERROR_SUCCESS)
-    path_end = wcschr (path, L'\0');
-  else
+  /* First check where cygcheck is living itself and try to fetch installation
+     path from here.  Does cygwin1.dll exist in the same path? */
+  if (!GetModuleFileNameW (NULL, path, 32768))
+    return;
+  path_end = wcsrchr (path, L'\\');
+  if (path_end)
     {
-      if (!GetModuleFileNameW (NULL, path, 32768))
-	return;
-      path_end = wcsrchr (path, L'\\');
-      if (path_end)
+      wcscpy (path_end, L"\\cygwin1.dll");
+      DWORD attr = GetFileAttributesW (path);
+      if (attr == (DWORD) -1
+	  || (attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)))
+	path_end = NULL;
+      else
 	{
 	  *path_end = L'\0';
 	  path_end = wcsrchr (path, L'\\');
 	}
     }
+  /* If we can't create a valid installation dir from that, try to fetch
+     the installation dir from the setup registry key. */
   if (!path_end)
-    return;
+    {
+      for (int i = 0; i < 2; ++i)
+	if ((ret = RegOpenKeyExW (i ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER,
+				  L"Software\\Cygwin\\setup", 0,
+				  KEY_READ, &setup_key)) == ERROR_SUCCESS)
+	  {
+	    len = 32768 * sizeof (WCHAR);
+	    ret = RegQueryValueExW (setup_key, L"rootdir", NULL, NULL,
+				    (PBYTE) path, &len);
+	    RegCloseKey (setup_key);
+	    if (ret == ERROR_SUCCESS)
+	      break;
+	  }
+      if (ret == ERROR_SUCCESS)
+	{
+	  printf ("\n"
+"Warning!  Computing mount points from setup registry key. Mount points might\n"
+"be wrong if you have multiple Cygwin installations on this machine.\n");
+	  path_end = wcschr (path, L'\0');
+	}
+    }
+  /* If we can't fetch an installation dir, bail out. */
+  if (!path_end)
+    {
+      printf ("\n"
+"Warning!  Could not generate mount table since no valid installation path\n"
+"could be found.\n");
+      return;
+    }
   *path_end = L'\0';
 
   from_fstab (false, path, path_end);

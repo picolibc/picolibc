@@ -1,5 +1,11 @@
 2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (read_mounts): First get installation path from own path.
+	Check if cygwin1.dll exists in same directory.  Only if not, try to
+	get installation path from setup registry key.  Add ample warnings.
+
+2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (cygpath.exe): Add -fno-threadsafe-statics to CXXFLAGS.
 
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
