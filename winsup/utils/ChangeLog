@@ -1,5 +1,10 @@
 2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (read_mounts): Skip unnecessary test if path has been
+	fetched from loaded cygwin1.dll.
+
+2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (cygwin_dll_path): New global variable.
 	(load_cygwin): Fetch cygwin DLL path and store in cygwin_dll_path.
 	* strace.cc: Full ditto.

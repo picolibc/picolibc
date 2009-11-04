@@ -594,12 +594,16 @@ read_mounts ()
   path_end = wcsrchr (path, L'\\');
   if (path_end)
     {
-      wcscpy (path_end, L"\\cygwin1.dll");
-      DWORD attr = GetFileAttributesW (path);
-      if (attr == (DWORD) -1
-	  || (attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)))
-	path_end = NULL;
-      else
+      if (!cygwin_dll_path[0])
+	{
+	  wcscpy (path_end, L"\\cygwin1.dll");
+	  DWORD attr = GetFileAttributesW (path);
+	  if (attr == (DWORD) -1
+	      || (attr & (FILE_ATTRIBUTE_DIRECTORY
+			  | FILE_ATTRIBUTE_REPARSE_POINT)))
+	    path_end = NULL;
+	}
+      if (path_end)
 	{
 	  *path_end = L'\0';
 	  path_end = wcsrchr (path, L'\\');
