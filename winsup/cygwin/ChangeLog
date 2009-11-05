@@ -1,5 +1,11 @@
 2009-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (nt_path_has_suffix): New function.
+	(rename): Don't append .exe suffix if binary target name has any suffix
+	at all.
+
+2009-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (dll_suffixes): Disable.  Explain why.
 	(perhaps_suffix): Use stat_suffixes instead of dll_suffixes.
 

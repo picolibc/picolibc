@@ -1643,6 +1643,30 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
   return status;
 }
 
+/* This function tests if a filename has *any* suffix.  In order to
+   make this quick and simple, we define a suffix as being not longer
+   than 4 chars, plus the leading dot. */
+static inline bool
+nt_path_has_suffix (PUNICODE_STRING upath)
+{
+  USHORT pos = upath->Length / sizeof (WCHAR);
+  const PWCHAR path = upath->Buffer;
+  USHORT upto;
+
+  /* Too short for a native path? */
+  if (pos < 8)
+    return false;
+  upto = pos - 5;
+  while (--pos >= upto)
+    {
+      if (path[pos] == L'.')
+	return true;
+      if (path[pos] == L'\\')
+	break;
+    }
+  return false;
+}
+
 extern "C" int
 rename (const char *oldpath, const char *newpath)
 {
@@ -1841,9 +1865,8 @@ rename (const char *oldpath, const char *newpath)
 					      &ro_u_lnk, TRUE))
 	rename_append_suffix (newpc, newpath, nlen, ".lnk");
       else if (oldpc.is_binary () && !old_explicit_suffix
-	   && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  &ro_u_exe, TRUE))
-	/* To rename an executable foo.exe to bar-without-exe-suffix, the
+	       && !nt_path_has_suffix (newpc.get_nt_native_path ()))
+	/* To rename an executable foo.exe to bar-without-suffix, the
 	   .exe suffix must be given explicitly in oldpath. */
 	rename_append_suffix (newpc, newpath, nlen, ".exe");
     }
@@ -1872,8 +1895,8 @@ rename (const char *oldpath, const char *newpath)
 	}
       else if (oldpc.is_binary ())
 	{
-	  if (!RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  &ro_u_exe, TRUE))
+	  /* Never append .exe suffix if file has any suffix already. */
+	  if (!nt_path_has_suffix (newpc.get_nt_native_path ()))
 	    {
 	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
 	      removepc = &newpc;
