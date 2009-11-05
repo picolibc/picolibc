@@ -1,3 +1,8 @@
+2009-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (dll_suffixes): Disable.  Explain why.
+	(perhaps_suffix): Use stat_suffixes instead of dll_suffixes.
+
 2009-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Re-introduce setting the SE_DACL_PROTECTED

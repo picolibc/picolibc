@@ -42,6 +42,11 @@ static suffix_info exe_suffixes[] =
   suffix_info (NULL)
 };
 
+#if 0
+/* CV, 2009-11-05: Used to be used when searching for DLLs in calls to
+   dlopen().  However, dlopen() on other platforms never adds a suffix by
+   its own.  Therefore we use stat_suffixes now, which only adds a .exe
+   suffix for symmetry. */
 static suffix_info dll_suffixes[] =
 {
   suffix_info (".dll"),
@@ -49,6 +54,7 @@ static suffix_info dll_suffixes[] =
   suffix_info (".exe", 1),
   suffix_info (NULL)
 };
+#endif
 
 child_info_spawn *chExeced;
 
@@ -66,7 +72,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
   err = 0;
   debug_printf ("prog '%s'", prog);
   buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY,
-	     (opt & FE_DLL) ? dll_suffixes : exe_suffixes);
+	     (opt & FE_DLL) ? stat_suffixes : exe_suffixes);
 
   if (buf.isdir ())
     {
