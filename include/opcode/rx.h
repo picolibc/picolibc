@@ -139,10 +139,7 @@ typedef enum
 
   RXO_clrpsw,	/* flag index in d */
   RXO_setpsw,	/* flag index in d */
-
-  RXO_mvtcp,	/* cop# in s2, cop[d] = s */
-  RXO_mvfcp,	/* cop# in s2, d = cop[s] */
-  RXO_opecp,	/* cop# in s2, do cop[s] */
+  RXO_mvtipl,	/* new IPL in s */
 
   RXO_rtfi,
   RXO_rte,
