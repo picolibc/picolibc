@@ -1,3 +1,7 @@
+2009-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* libc/include/ctype.h (__ctype_lookup): Fix precedence.
+
 2009-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/fflush.c (_fflush_r): Store old errno to check for
