@@ -1,3 +1,10 @@
+2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Check cygwin_internal for returning 0 rather than for != 0.
+	(transport_layer_pipes::accept): Add debug output.
+	(transport_layer_pipes::connect): Ditto.
+
 2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* transport_pipes.h (PIPE_NAME_PREFIX): New define.

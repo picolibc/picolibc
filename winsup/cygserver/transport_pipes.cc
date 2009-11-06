@@ -91,7 +91,7 @@ transport_layer_pipes::transport_layer_pipes ()
   wchar_t cyg_instkey[18];
 
   wchar_t *p = wcpcpy (_pipe_name, PIPE_NAME_PREFIX);
-  if (cygwin_internal (CW_GET_INSTKEY, cyg_instkey))
+  if (!cygwin_internal (CW_GET_INSTKEY, cyg_instkey))
     wcpcpy (wcpcpy (p, cyg_instkey), PIPE_NAME_SUFFIX);
 #endif
 }
@@ -133,6 +133,8 @@ transport_layer_pipes::accept (bool *const recoverable)
   // FIXME: Remove FILE_CREATE_PIPE_INSTANCE.
 
   const bool first_instance = (pipe_instance == 0);
+
+  debug ("Try to create named pipe: %ls", _pipe_name);
 
   const HANDLE accept_pipe =
     CreateNamedPipeW (_pipe_name,
@@ -279,6 +281,7 @@ transport_layer_pipes::connect ()
   BOOL rc = TRUE;
   int retries = 0;
 
+  debug_printf ("Try to connect to named pipe: %W", _pipe_name);
   while (rc)
     {
       _hPipe = CreateFileW (_pipe_name,
