@@ -1,3 +1,10 @@
+2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (inst_root_inited): New static bool variable.
+	(init_installation_root): Set inst_root_inited to true.
+	(memory_init): Print installation root debug output only if
+	inst_root_inited is true.
+
 2009-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (nt_path_has_suffix): New function.

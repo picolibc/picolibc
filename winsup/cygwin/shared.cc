@@ -37,6 +37,7 @@ HANDLE NO_COPY cygwin_user_h;
 WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
 UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
 WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
+static bool inst_root_inited;
 
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation_root.  Note that we can't handle Cygwin installation
@@ -114,6 +115,8 @@ init_installation_root ()
       installation_key.Length = 0;
       installation_key.Buffer[0] = L'\0';
     }
+
+  inst_root_inited = true;
 }
 
 /* This function returns a handle to the top-level directory in the global
@@ -432,8 +435,9 @@ memory_init (bool init_cygheap)
   /* Defer debug output printing the installation root and installation key
      up to this point.  Debug output except for system_printf requires
      the global shared memory to exist. */
-  debug_printf ("Installation root: <%W> key: <%S>",
-		installation_root, &installation_key);
+  if (inst_root_inited)
+    debug_printf ("Installation root: <%W> key: <%S>",
+		  installation_root, &installation_key);
   cygwin_shared->initialize ();
   user_shared_create (false);
 }
