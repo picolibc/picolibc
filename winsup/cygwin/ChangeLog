@@ -1,5 +1,16 @@
 2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc (ro_u_scr): New R/O unicode string.
+	(ro_u_sys): Ditto.
+	* syscalls.cc (nt_path_has_suffix): Replace with ...
+	(nt_path_has_executable_suffix): New function checking for explicit
+	executable suffixes.
+	(rename): Call nt_path_has_executable_suffix instead of
+	nt_path_has_suffix.  Check oldpath for nt_path_has_executable_suffix
+	as well to set old_explicit_suffix.
+
+2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shared.cc (inst_root_inited): New static bool variable.
 	(init_installation_root): Set inst_root_inited to true.
 	(memory_init): Print installation root debug output only if
