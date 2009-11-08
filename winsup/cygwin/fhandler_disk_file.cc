@@ -670,6 +670,12 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
       /* This fakes the permissions of all files to match the current umask. */
       buf->st_mode &= ~(cygheap->umask);
+      /* If the FS supports ACLs, we're here because we couldn't even open
+	 the file for READ_CONTROL access.  Chances are high that the file's
+	 security descriptor has no ACE for "Everyone", so we should not fake
+	 any access for "others". */
+      if (has_acls ())
+	buf->st_mode &= ~(S_IROTH | S_IWOTH | S_IXOTH);
     }
 
  done:

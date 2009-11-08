@@ -1,3 +1,9 @@
+2009-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Drop all "other"
+	permissions from st_mode, if the reading the file's security descriptor
+	failed.  Explain why.
+
 2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (ro_u_scr): New R/O unicode string.
