@@ -1,3 +1,8 @@
+2009-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::read): Restrict generating
+	META key sequences to singlebyte input chars.
+
 2009-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Drop all "other"
