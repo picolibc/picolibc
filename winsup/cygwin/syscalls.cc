@@ -1758,6 +1758,16 @@ rename (const char *oldpath, const char *newpath)
       set_errno (EROFS);
       goto out;
     }
+  if (oldpc.has_attribute (FILE_ATTRIBUTE_REPARSE_POINT) && !oldpc.issymlink ())
+    {
+      /* Volume mount point.  If we try to rename a volume mount point, NT
+	 returns STATUS_NOT_SAME_DEVICE ==> Win32 ERROR_NOT_SAME_DEVICE ==>
+	 errno EXDEV.  That's bad since mv(1) will now perform a cross-device
+	 move.  So what we do here is to treat the volume mount point just
+	 like Linux treats a mount point. */
+      set_errno (EBUSY);
+      goto out;
+    }
   if (old_dir_requested && !oldpc.isdir ())
     {
       /* Reject rename("file/","x").  */

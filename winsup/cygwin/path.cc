@@ -1873,18 +1873,15 @@ symlink_info::check_reparse_point (HANDLE h)
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
 		  rp->MountPointReparseBuffer.SubstituteNameLength);
-      if (rp->MountPointReparseBuffer.PrintNameLength == 0
-	  || RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
+      if (RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
 	{
 	  /* Volume mount point.  Not treated as symlink. The return
 	     value of -1 is a hint for the caller to treat this as a
 	     volume mount point. */
 	  return -1;
 	}
-      sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
-		    (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
-			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
-		    rp->MountPointReparseBuffer.SubstituteNameLength / sizeof (WCHAR));
+      sys_wcstombs (srcbuf, SYMLINK_MAX + 1, subst.Buffer,
+		    subst.Length / sizeof (WCHAR));
       pflags = PATH_SYMLINK | PATH_REP;
       fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }

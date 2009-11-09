@@ -1,5 +1,13 @@
 2009-11-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check_reparse_point): Always check
+	SubstituteName for volume string to recognize volume mount points.
+	Reuse subst when calling sys_wcstombs.
+	* syscalls.cc (rename): Set errno to EBUSY when trying to rename
+	volume mount points.  Explain why.
+
+2009-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::read): Restrict generating
 	META key sequences to singlebyte input chars.
 
