@@ -154,6 +154,7 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
   bool ret = false;
   IO_STATUS_BLOCK io;
   HANDLE reph;
+  UNICODE_STRING subst;
 
   if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, attr, &io,
 			      FILE_SHARE_VALID_FLAGS,
@@ -166,7 +167,11 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
 		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
 		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
 	  && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
-	  && rp->SymbolicLinkReparseBuffer.PrintNameLength == 0)
+	  && (RtlInitCountedUnicodeString (&subst, 
+		(WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
+			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
+		rp->MountPointReparseBuffer.SubstituteNameLength),
+	      RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE)))
 	ret = true;
       NtClose (reph);
     }

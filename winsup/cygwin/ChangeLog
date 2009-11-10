@@ -1,3 +1,10 @@
+2009-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (is_volume_mountpoint): Align check with
+	symlink_info::check_reparse_point().
+	* path.cc (symlink_info::check_reparse_point): Rearrange slightly.
+	Add code path for unrecognized repare point types.  Add comment.
+
 2009-11-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check_reparse_point): Always check

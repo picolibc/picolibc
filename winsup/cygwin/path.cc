@@ -1844,6 +1844,7 @@ symlink_info::check_reparse_point (HANDLE h)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   PREPARSE_DATA_BUFFER rp = (PREPARSE_DATA_BUFFER) tp.c_get ();
+  UNICODE_STRING subst;
   char srcbuf[SYMLINK_MAX + 7];
 
   status = NtFsControlFile (h, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
@@ -1857,18 +1858,12 @@ symlink_info::check_reparse_point (HANDLE h)
       return 0;
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
-    {
-      sys_wcstombs (srcbuf, SYMLINK_MAX + 1,
-		    (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
-			  + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
-		    rp->SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof (WCHAR));
-      pflags = PATH_SYMLINK | PATH_REP;
-      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
-    }
+    RtlInitCountedUnicodeString (&subst,
+		  (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
+			+ rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
+		  rp->SymbolicLinkReparseBuffer.SubstituteNameLength);
   else if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
-      UNICODE_STRING subst;
-
       RtlInitCountedUnicodeString (&subst, 
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
@@ -1880,11 +1875,20 @@ symlink_info::check_reparse_point (HANDLE h)
 	     volume mount point. */
 	  return -1;
 	}
-      sys_wcstombs (srcbuf, SYMLINK_MAX + 1, subst.Buffer,
-		    subst.Length / sizeof (WCHAR));
-      pflags = PATH_SYMLINK | PATH_REP;
-      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
     }
+  else
+    {
+      /* Maybe it's a reparse point, but it's certainly not one we
+	 recognize.  Drop the REPARSE file attribute so we don't even
+	 try to use the flag for some special handling.  It's just some
+	 arbitrary file or directory for us. */
+      fileattr &= ~FILE_ATTRIBUTE_REPARSE_POINT;
+      return 0;
+    }
+  sys_wcstombs (srcbuf, SYMLINK_MAX + 7, subst.Buffer,
+		subst.Length / sizeof (WCHAR));
+  pflags = PATH_SYMLINK | PATH_REP;
+  fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
   return posixify (srcbuf);
 }
 
