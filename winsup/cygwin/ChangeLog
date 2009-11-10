@@ -1,5 +1,10 @@
 2009-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::read): Revert change from
+	2009-11-09.
+
+2009-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (is_volume_mountpoint): Align check with
 	symlink_info::check_reparse_point().
 	* path.cc (symlink_info::check_reparse_point): Rearrange slightly.

@@ -379,23 +379,18 @@ fhandler_console::read (void *pv, size_t& buflen)
 		  else
 		    toadd = tmp + 1;
 		}
-	      else if (nread == 1)
+	      else if (dev_state->metabit)
 		{
-		  /* META handling is restricted to singlebyte (ASCII)
-		     character values. */
-		  if (dev_state->metabit)
-		    {
-		      tmp[1] |= 0x80;
-		      toadd = tmp + 1;
-		    }
-		  else
-		    {
-		      tmp[0] = '\033';
-		      tmp[1] = cyg_tolower (tmp[1]);
-		      toadd = tmp;
-		      nread++;
-		      dev_state->nModifiers &= ~4;
-		    }
+		  tmp[1] |= 0x80;
+		  toadd = tmp + 1;
+		}
+	      else
+		{
+		  tmp[0] = '\033';
+		  tmp[1] = cyg_tolower (tmp[1]);
+		  toadd = tmp;
+		  nread++;
+		  dev_state->nModifiers &= ~4;
 		}
 	    }
 #undef ich
