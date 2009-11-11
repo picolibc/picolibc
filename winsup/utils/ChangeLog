@@ -1,3 +1,10 @@
+2009-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl.c (print_version): Fix copyright.
+	(main): Don't reuse local variables confusingly.  Don't print any file
+	information if acl() fails.  Improve error message.  Always print a
+	trailing empty line.  Set return code to 2 if accessing some file fails.
+
 2009-11-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (read_mounts): Skip unnecessary test if path has been

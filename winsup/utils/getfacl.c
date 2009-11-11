@@ -1,6 +1,6 @@
 /* getfacl.c
 
-   Copyright 2000, 2001, 2002 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -19,6 +19,7 @@ details. */
 #include <sys/acl.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
 
 static const char version[] = "$Revision$";
 static char *prog_name;
@@ -135,7 +136,7 @@ print_version ()
   printf ("\
 getfacl (cygwin) %.*s\n\
 ACL Utility\n\
-Copyright (c) 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright (c) 2000, 2001, 2002, 2003, 2004, 2009 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }
@@ -143,11 +144,11 @@ Compiled on %s\n\
 int
 main (int argc, char **argv)
 {
-  int c, i;
+  int c;
+  int ret = 0;
   int aopt = 0;
   int dopt = 0;
   int nopt = 0;
-  int first = 1;
   struct stat st;
   aclent_t acls[MAX_ACL_ENTRIES];
 
@@ -186,17 +187,18 @@ main (int argc, char **argv)
       usage (stderr);
       return 1;
     }
-  while ((c = optind++) < argc)
+  for (; optind < argc; ++optind)
     {
-      if (stat (argv[c], &st))
+      int i, num_acls;
+      if (stat (argv[optind], &st)
+	  || (num_acls = acl (argv[optind], GETACL, MAX_ACL_ENTRIES, acls)) < 0)
 	{
-	  perror (argv[0]);
+	  fprintf (stderr, "%s: %s: %s\n",
+		   prog_name, argv[optind], strerror (errno));
+	  ret = 2;
 	  continue;
 	}
-      if (!first)
-	putchar ('\n');
-      first = 0;
-      printf ("# file: %s\n", argv[c]);
+      printf ("# file: %s\n", argv[optind]);
       if (nopt)
         {
 	  printf ("# owner: %lu\n", (unsigned long)st.st_uid);
@@ -207,12 +209,7 @@ main (int argc, char **argv)
 	  printf ("# owner: %s\n", username (st.st_uid));
 	  printf ("# group: %s\n", groupname (st.st_gid));
 	}
-      if ((c = acl (argv[c], GETACL, MAX_ACL_ENTRIES, acls)) < 0)
-	{
-	  perror (argv[0]);
-	  continue;
-	}
-      for (i = 0; i < c; ++i)
+      for (i = 0; i < num_acls; ++i)
 	{
 	  if (acls[i].a_type & ACL_DEFAULT)
 	    {
@@ -251,6 +248,7 @@ main (int argc, char **argv)
 	    }
 	  printf ("%s\n", permstr (acls[i].a_perm));
 	}
+      putchar ('\n');
     }
-  return 0;
+  return ret;
 }
