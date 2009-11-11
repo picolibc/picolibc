@@ -397,6 +397,7 @@ class fhandler_base
 
 class fhandler_mailslot : public fhandler_base
 {
+  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &, PUNICODE_STRING);
  public:
   fhandler_mailslot ();
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

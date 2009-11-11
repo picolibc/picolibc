@@ -15,6 +15,8 @@
 #include "path.h"
 #include "fhandler.h"
 #include "ntdll.h"
+#include "shared_info.h"
+#include "tls_pbuf.h"
 
 /**********************************************************************/
 /* fhandler_mailslot */
@@ -43,6 +45,18 @@ fhandler_mailslot::fstat (struct __stat64 *buf)
   return 0;
 }
 
+POBJECT_ATTRIBUTES
+fhandler_mailslot::get_object_attr (OBJECT_ATTRIBUTES &attr,
+				    PUNICODE_STRING path)
+{
+  
+  RtlCopyUnicodeString (path, pc.get_nt_native_path ());
+  RtlAppendUnicodeStringToString (path, &installation_key);
+  InitializeObjectAttributes (&attr, path, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, NULL);
+  return &attr;
+}
+
 int
 fhandler_mailslot::open (int flags, mode_t mode)
 {
@@ -52,13 +66,17 @@ fhandler_mailslot::open (int flags, mode_t mode)
   OBJECT_ATTRIBUTES attr;
   HANDLE x;
   LARGE_INTEGER timeout;
+  tmp_pathbuf tp;
+  UNICODE_STRING path;
 
+  tp.u_get (&path);
+  
   switch (flags & O_ACCMODE)
     {
     case O_RDONLY:	/* Server */
       timeout.QuadPart = (flags & O_NONBLOCK) ? 0LL : 0x8000000000000000LL;
       status = NtCreateMailslotFile (&x, GENERIC_READ | SYNCHRONIZE,
-				     pc.get_object_attr (attr, sec_none),
+				     get_object_attr (attr, &path),
 				     &io, FILE_SYNCHRONOUS_IO_NONALERT,
 				     0, 0, &timeout);
       if (!NT_SUCCESS (status))
@@ -79,7 +97,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	      break;
 	    }
 	  status = NtOpenFile (&x, GENERIC_READ | SYNCHRONIZE,
-			       pc.get_object_attr (attr, sec_none), &io,
+			       get_object_attr (attr, &path), &io,
 			       FILE_SHARE_VALID_FLAGS,
 			       FILE_SYNCHRONOUS_IO_NONALERT);
 #endif
@@ -104,7 +122,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	  break;
 	}
       status = NtOpenFile (&x, GENERIC_WRITE | SYNCHRONIZE,
-			   pc.get_object_attr (attr, sec_none), &io,
+			   get_object_attr (attr, &path), &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT);
       if (!NT_SUCCESS (status))

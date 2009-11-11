@@ -1,3 +1,11 @@
+2009-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_mailslot): Declare new private method
+	get_object_attr.
+	* fhandler_mailslot.cc (fhandler_mailslot::get_object_attr): Implement.
+	(fhandler_mailslot::open): Replace calls to path_conv::get_object_attr
+	with calls to fhandler_mailslot::get_object_attr.
+
 2009-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::read): Revert change from
