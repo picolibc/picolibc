@@ -5,6 +5,8 @@
 <screen>
 - Windows 95, 98 and Me are not supported anymore.  The new Cygwin 1.7 DLL
   will not run on any of these systems.
+
+- Add support for Windows 7 and Windows Server 2008 R2.
 </screen>
 
 </sect2>
@@ -199,7 +201,8 @@
 
 - Support up to 128 raw disk drives /dev/sda - /dev/sddx.
 
-- New API: cfmakeraw, posix_openpt.
+- New API: cfmakeraw, get_avphys_pages, get_nprocs, get_nprocs_conf,
+  get_phys_pages, posix_openpt.
 </screen>
 
 </sect2>
