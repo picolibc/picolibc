@@ -1,3 +1,15 @@
+2009-11-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (get_nprocs): New function.
+	(get_nprocs_conf): Ditto.
+	(get_avphys_pages): Ditto.
+	(get_phys_pages): Ditto.
+	* cygwin.din: Export them.
+	* include/sys/sysinfo.h: New header, decalre above new functions.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* posix.sgml: Mention them as GNU extensions.
+
 2009-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_mailslot): Declare new private method

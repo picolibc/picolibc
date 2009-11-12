@@ -1,7 +1,7 @@
 /* sysconf.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <sys/sysinfo.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -291,4 +292,28 @@ confstr (int in, char *buf, size_t len)
   /* Invalid option value. */
   set_errno (EINVAL);
   return 0;
+}
+
+extern "C" int
+get_nprocs_conf (void)
+{
+  return get_nproc_values (_SC_NPROCESSORS_CONF);
+}
+
+extern "C" int
+get_nprocs (void)
+{
+  return get_nproc_values (_SC_NPROCESSORS_ONLN);
+}
+
+extern "C" long
+get_phys_pages (void)
+{
+  return get_nproc_values (_SC_PHYS_PAGES);
+}
+
+extern "C" long
+get_avphys_pages (void)
+{
+  return get_avphys (_SC_AVPHYS_PAGES);
 }

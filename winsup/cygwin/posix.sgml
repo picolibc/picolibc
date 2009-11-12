@@ -1026,6 +1026,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fopencookie
     fremovexattr
     fsetxattr
+    get_avphys_pages
+    get_phys_pages
+    get_nprocs
+    get_nprocs_conf
     getopt_long
     getopt_long_only
     getxattr

@@ -371,12 +371,13 @@ details. */
       215: CW_EXIT_PROCESS added.
       216: CW_SET_EXTERNAL_TOKEN added.
       217: CW_GET_INSTKEY added.
+      218: Export get_nprocs, get_nprocs_conf, get_phys_pages, get_avphys_pages.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 217
+#define CYGWIN_VERSION_API_MINOR 218
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

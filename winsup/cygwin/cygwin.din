@@ -598,8 +598,12 @@ gcvt SIGFE
 _gcvt = gcvt SIGFE
 gcvtf SIGFE
 _gcvtf = gcvtf SIGFE
+get_avphys_pages SIGFE
+get_nprocs SIGFE
+get_nprocs_conf SIGFE
 get_osfhandle SIGFE
 _get_osfhandle = get_osfhandle SIGFE
+get_phys_pages SIGFE
 getaddrinfo = cygwin_getaddrinfo SIGFE
 getc SIGFE
 _getc = getc SIGFE
