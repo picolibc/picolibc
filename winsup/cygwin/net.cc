@@ -483,6 +483,8 @@ cygwin_getprotobynumber (int number)
 bool
 fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
+  int size;
+
   fd = build_fh_dev (*dev);
   if (!fd.isopen ())
     return false;
@@ -506,15 +508,26 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      be nice, though.
 
      (*) Maximum normal TCP window size.  Coincidence?  */
-
   ((fhandler_socket *) fd)->rmem () = 65535;
   ((fhandler_socket *) fd)->wmem () = 65535;
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
-    debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+    {
+      debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+      if (::getsockopt (soc, SOL_SOCKET, SO_RCVBUF,
+			(char *) &((fhandler_socket *) fd)->rmem (),
+			(size = sizeof (int), &size)))
+	system_printf ("getsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+    }
   if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF,
 		    (char *) &((fhandler_socket *) fd)->wmem (), sizeof (int)))
-    debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+    {
+      debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+      if (::getsockopt (soc, SOL_SOCKET, SO_SNDBUF,
+			(char *) &((fhandler_socket *) fd)->wmem (),
+			(size = sizeof (int), &size)))
+	system_printf ("getsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+    }
 
   return true;
 }

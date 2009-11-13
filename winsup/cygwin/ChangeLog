@@ -1,3 +1,8 @@
+2009-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (fdsock): Fill _rmem and _wmem with valid values returned
+	from getsockopt if setsockopt with desired values failed.
+
 2009-11-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
