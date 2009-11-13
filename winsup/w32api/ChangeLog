@@ -1,4 +1,10 @@
+2009-13-09  Jan Nijtmans  <nijtmans@users.sourceforge.net>
+
+	* include/winuser.h (SendMessageTimeoutA, SendMessageTimeoutW): Correct
+	definition.
+
 2009-11-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winnt.h (PROCESS_SUSPEND_RESUME): Define.
 
 2009-10-29  Charles Wilson  <mingw@cwilson.fastmail.fm>
