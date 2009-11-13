@@ -1,3 +1,6 @@
+2009-11-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+	* include/winnt.h (PROCESS_SUSPEND_RESUME): Define.
+
 2009-10-29  Charles Wilson  <mingw@cwilson.fastmail.fm>
 
 	Honor DESTDIR for winsup/mingw and winsup/w32api.
