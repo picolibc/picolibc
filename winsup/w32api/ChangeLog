@@ -1,3 +1,7 @@
+2009-13-09  Jacky Lai  <crazyjacky@users.sourceforge.net>
+
+	* include/winerror.h: Fix typos in macro names.
+
 2009-13-09  Jan Nijtmans  <nijtmans@users.sourceforge.net>
 
 	* include/winuser.h (SendMessageTimeoutA, SendMessageTimeoutW): Correct
