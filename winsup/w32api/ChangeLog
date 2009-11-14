@@ -1,16 +1,22 @@
 2009-14-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/wingdi.h (_devicemodeW, _devicemodeA): Correct definition.
+
+	Thanks to Bruno Martinez for the report.
+
+2009-14-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/shlobj.h (IDO_SHGIOI_SHARE, IDO_SHGIOI_LINK, IDO_SHGIOI_SLOWFILE,
 	IDO_SHGIOI_DEFAULT, SHGetIconOverlayIndexW, SHGetIconOverlayIndexA,
 	SHGetIconOverlayIndex): Define.
 
-	Thanks to Tim Kosse for report.
+	Thanks to Tim Kosse for the report.
 
 2009-13-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wincon.h (AttachConsole): Correct guard.
 
-	Thanks to Alexander Shaduri for report.
+	Thanks to Alexander Shaduri for the report.
 
 2009-13-09  Robert Moerland  <rjmoerland@users.sourceforge.net>
 

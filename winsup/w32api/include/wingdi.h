@@ -1502,9 +1502,11 @@ typedef struct _devicemodeA {
       short dmDefaultSource; 
       short dmPrintQuality; 
     } DUMMYSTRUCTNAME;
-    POINTL dmPosition;
-    DWORD  dmDisplayOrientation;
-    DWORD  dmDisplayFixedOutput;
+    _ANONYMOUS_STRUCT struct {
+      POINTL dmPosition;
+      DWORD  dmDisplayOrientation;
+      DWORD  dmDisplayFixedOutput;
+    } DUMMYSTRUCTNAME2;
   } DUMMYUNIONNAME;
 
   short  dmColor; 
@@ -1553,9 +1555,11 @@ typedef struct _devicemodeW {
       short dmDefaultSource; 
       short dmPrintQuality; 
     } DUMMYSTRUCTNAME;
-    POINTL dmPosition;
-    DWORD  dmDisplayOrientation;
-    DWORD  dmDisplayFixedOutput;
+    _ANONYMOUS_STRUCT struct {
+      POINTL dmPosition;
+      DWORD  dmDisplayOrientation;
+      DWORD  dmDisplayFixedOutput;
+    } DUMMYSTRUCTNAME2;
   } DUMMYUNIONNAME;
 
   short  dmColor; 
