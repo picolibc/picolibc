@@ -665,7 +665,7 @@ typedef struct _INTERNET_CACHE_ENTRY_INFOA {
 } INTERNET_CACHE_ENTRY_INFOA,*LPINTERNET_CACHE_ENTRY_INFOA;
 typedef struct _INTERNET_CACHE_ENTRY_INFOW {
 	DWORD dwStructSize;
-	LPSTR lpszSourceUrlName;
+	LPWSTR lpszSourceUrlName;
 	LPWSTR lpszLocalFileName;
 	DWORD CacheEntryType;
 	DWORD dwUseCount;
@@ -856,7 +856,9 @@ HANDLE WINAPI FindFirstUrlCacheEntryW(LPCSTR,LPINTERNET_CACHE_ENTRY_INFOW,PDWORD
 BOOL WINAPI FindNextUrlCacheEntryA(HANDLE,LPINTERNET_CACHE_ENTRY_INFOA,PDWORD);
 BOOL WINAPI FindNextUrlCacheEntryW(HANDLE,LPINTERNET_CACHE_ENTRY_INFOW,PDWORD);
 BOOL WINAPI FindCloseUrlCache(HANDLE);
-BOOL WINAPI DeleteUrlCacheEntry(LPCSTR);
+BOOL WINAPI DeleteUrlCacheEntryA(LPCSTR);
+BOOL WINAPI DeleteUrlCacheEntryW(LPCWSTR);
+
 DWORD AuthenticateUser(PVOID*,LPSTR,LPSTR,DWORD,LPSTR,DWORD,LPSTR,LPSTR);
 BOOL WINAPI HttpSendRequestExA(HINTERNET,LPINTERNET_BUFFERSA,LPINTERNET_BUFFERSA,DWORD,DWORD);
 BOOL WINAPI HttpSendRequestExW(HINTERNET,LPINTERNET_BUFFERSW,LPINTERNET_BUFFERSW,DWORD,DWORD);
@@ -929,6 +931,8 @@ BOOL WINAPI SetUrlCacheGroupAttributeW(GROUPID,DWORD,DWORD,LPINTERNET_CACHE_GROU
 #define HttpEndRequest		 HttpEndRequestW
 #define GetUrlCacheGroupAttribute  GetUrlCacheGroupAttributeW
 #define SetUrlCacheGroupAttribute  SetUrlCacheGroupAttributeW
+#define DeleteUrlCacheEntry  DeleteUrlCacheEntryW
+
 #else
 #define GopherGetAttribute GopherGetAttributeA
 #define InternetCrackUrl InternetCrackUrlA
@@ -978,6 +982,8 @@ BOOL WINAPI SetUrlCacheGroupAttributeW(GROUPID,DWORD,DWORD,LPINTERNET_CACHE_GROU
 #define HttpEndRequest		 HttpEndRequestA
 #define GetUrlCacheGroupAttribute  GetUrlCacheGroupAttributeA
 #define SetUrlCacheGroupAttribute  SetUrlCacheGroupAttributeA
+#define DeleteUrlCacheEntry  DeleteUrlCacheEntryA
+
 #endif /* UNICODE */
 #endif /* RC_INVOKED */
 #ifdef __cplusplus

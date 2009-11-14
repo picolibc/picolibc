@@ -1,3 +1,8 @@
+2009-13-09  Robert Moerland  <rjmoerland@users.sourceforge.net>
+
+	* include/wininet.h (NTERNET_CACHE_ENTRY_INFOW): Correct definition.
+	(DeleteUrlCacheEntryW, DeleteUrlCacheEntryA): Define.
+
 2009-13-09  Jacky Lai  <crazyjacky@users.sourceforge.net>
 
 	* include/winerror.h: Fix typos in macro names.
