@@ -1,3 +1,9 @@
+2009-11-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/io.h (_open_osfhandle): Correct definition.
+
+	Thanks to Alexander Shaduri for the information.
+
 2009-11-02  Charles Wilson  <mingw@cwilson.fastmail.fm>
 
 	Final sync of pseudo-reloc.c with mingw64 and cygwin
