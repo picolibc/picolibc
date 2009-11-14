@@ -1414,6 +1414,10 @@ BOOL WINAPI PathResolve(LPWSTR, LPCWSTR*, UINT);
 #define PRF_TRYPROGRAMEXTENSIONS    (0x0002 | PRF_VERIFYEXISTS)
 #define PRF_FIRSTDIRDEF             0x0004
 #define PRF_DONTFINDLNK             0x0008
+#define IDO_SHGIOI_SHARE            0x0FFFFFFF
+#define IDO_SHGIOI_LINK             0x0FFFFFFE
+#define IDO_SHGIOI_SLOWFILE         0x0FFFFFFD
+#define IDO_SHGIOI_DEFAULT          0x0FFFFFFC
 #endif
 
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
@@ -1440,6 +1444,8 @@ HRESULT WINAPI SHGetFolderPathW(HWND,int,HANDLE,DWORD,LPWSTR);
 HRESULT WINAPI SHGetFolderLocation(HWND,int,HANDLE,DWORD,LPITEMIDLIST*);
 #endif
 #if (_WIN32_WINNT >= 0x0500)
+INT WINAPI SHGetIconOverlayIndexW(LPCWSTR pszIconPath, int iIconIndex);
+INT WINAPI SHGetIconOverlayIndexA(LPCSTR pszIconPath, int iIconIndex);
 INT WINAPI SHCreateDirectoryExA(HWND,LPCSTR,LPSECURITY_ATTRIBUTES);
 INT WINAPI SHCreateDirectoryExW(HWND,LPCWSTR,LPSECURITY_ATTRIBUTES);
 HRESULT WINAPI SHBindToParent(LPCITEMIDLIST,REFIID,VOID**,LPCITEMIDLIST*);
@@ -1484,6 +1490,7 @@ typedef BROWSEINFOW BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #endif
 #define SHGetFolderPath SHGetFolderPathW 
 #if (_WIN32_WINNT >= 0x0500)
+#define SHGetIconOverlayIndex SHGetIconOverlayIndexW
 #define SHCreateDirectoryEx SHCreateDirectoryExW
 #endif
 #if (_WIN32_WINNT >= 0x0501)
@@ -1506,6 +1513,7 @@ typedef BROWSEINFOA BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #endif
 #define SHGetFolderPath SHGetFolderPathA
 #if (_WIN32_WINNT >= 0x0500)
+#define SHGetIconOverlayIndex SHGetIconOverlayIndexA
 #define SHCreateDirectoryEx SHCreateDirectoryExA
 #endif
 #if (_WIN32_WINNT >= 0x0501)

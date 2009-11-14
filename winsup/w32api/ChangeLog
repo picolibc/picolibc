@@ -1,3 +1,11 @@
+2009-14-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shlobj.h (IDO_SHGIOI_SHARE, IDO_SHGIOI_LINK, IDO_SHGIOI_SLOWFILE,
+	IDO_SHGIOI_DEFAULT, SHGetIconOverlayIndexW, SHGetIconOverlayIndexA,
+	SHGetIconOverlayIndex): Define.
+
+	Thanks to Tim Kosse for report.
+
 2009-13-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wincon.h (AttachConsole): Correct guard.
