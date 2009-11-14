@@ -130,7 +130,7 @@ typedef struct _INPUT_RECORD {
 } INPUT_RECORD,*PINPUT_RECORD;
 
 BOOL WINAPI AllocConsole(void);
-#if (_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0501)
 #define ATTACH_PARENT_PROCESS	((DWORD)-1)
 BOOL WINAPI AttachConsole(DWORD);
 #endif
