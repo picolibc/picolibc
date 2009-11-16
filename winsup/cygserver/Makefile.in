@@ -69,7 +69,7 @@ libclean:
 fullclean: clean libclean
 
 cygserver.exe: $(CYGWIN_LIB) $(OBJS) $(CYGWIN_OBJS)
-	$(CXX) -o $@ ${wordlist 2,999,$^} -static-libgcc -L$(cygwin_build) -lntdll
+	$(CXX) -o $@ ${wordlist 2,999,$^} -static -static-libgcc -L$(cygwin_build) -lntdll
 
 $(cygwin_build)/%.o: $(cygwin_source)/%.cc
 	@$(MAKE) -C $(@D) $(@F)
