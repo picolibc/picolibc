@@ -381,8 +381,8 @@ access files with trailing dots and spaces without problems.</para>
 
 <para>Additionally, some characters are disallowed in filenames on Windows
 filesystems.  These forbidden characters are the ASCII control characters
-from ASCII value 1 to 31, plus the following charcters which have a special
-menaing in the Win32 API:</para>
+from ASCII value 1 to 31, plus the following characters which have a special
+meaning in the Win32 API:</para>
 
 <screen>
   "   *   :   &lt;   &gt;   ?   |   \
