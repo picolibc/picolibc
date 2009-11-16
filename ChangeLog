@@ -1,3 +1,55 @@
+2009-11-16  Alexandre Oliva  <aoliva@redhat.com>
+
+	* configure.ac: Add libelf to host_libs.  Enable in-tree configury
+	of ppl and cloog.  Fix in-tree configury of libelf, skip tests.
+	Fix portability of test of C++ as bootstrap language.  Add
+	ppl/src/ppl-config.o to the bootstrap compare exclusion list.
+	* configure: Rebuild.
+	* Makefile.def: Drop host and target settings from gmp, mpfr, ppl,
+	and cloog.  Fix in-tree ppl configuration.  Introduce libelf
+	in-tree building.
+	* Makefile.tpl (POSTSTAGE1_CXX_EXPORT): New.
+	(POSTSTAGE1_HOST_EXPORTS): Use it.
+	(STAGE[+id+]_CXXFLAGS): New.
+	(BASE_FLAGS_TO_PASS): Pass it down.
+	(configure-stage[+id+]-[+prefix+][+module+]): Use it.  Add
+	extra_exports.
+	(all-stage[+id+]-[+prefix+][+module+]): Likewise.
+	(configure-[+prefix+][+module+], all-[+prefix+][+module+]): Add
+	extra_exports.
+	* Makefile.in: Rebuild.
+
+2009-11-06  Ozkan Sezer  <sezeroz@gmail.com>
+
+	* configure.ac (FLAGS_FOR_TARGET):  Add -L and -isystem
+	paths for *-w64-mingw* and x86_64-*mingw*.
+	* configure: Regenerated.
+
+2009-10-30  Kai Tietz  <kai.tietz@onevision.com>
+
+	* configure.ac: Disable target-winsup & co for
+	x86_64-*-mingw* and *-w64-mingw* targets.
+	* configure: Regenerated.
+
+2009-10-23  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (CLooG test): Use = with test.
+	* configure: Regenerate.
+
+2009-10-22  Richard Guenther  <rguenther@suse.de>
+
+	* configure.ac: Do not set LIBS for ppl/cloog checks.  Disable
+	cloog if the ppl version check failed.  Move flags saving
+	before setting in libelf check.
+	* configure: Regenerate.
+
+2009-10-21  Richard Guenther  <rguenther@suse.de>
+
+	* configure.ac: Adjust the ppl and cloog configure to work as
+	documented.  Disable cloog if ppl was disabled.  Omit the version
+	checks if they were disabled.
+	* configure: Re-generate.
+
 2009-10-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure.ac: Add 'lto' to enable_languages, not
