@@ -413,10 +413,11 @@ setenv (const char *name, const char *value, int overwrite)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
-  if (!*name)
-    return 0;
-  if (*value == '=')
-    value++;
+  if (!name || !*name || strchr (name, '='))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   return _addenv (name, value, !!overwrite);
 }
 
@@ -427,7 +428,9 @@ unsetenv (const char *name)
   register char **e;
   int offset;
   myfault efault;
-  if (efault.faulted () || *name == '\0' || strchr (name, '='))
+  if (efault.faulted (EFAULT))
+    return -1;
+  if (!name || *name == '\0' || strchr (name, '='))
     {
       set_errno (EINVAL);
       return -1;

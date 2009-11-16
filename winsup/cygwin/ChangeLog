@@ -1,3 +1,8 @@
+2009-11-16  Eric Blake  <ebb9@byu.net>
+
+	* environ.cc (setenv): Detect invalid argument.
+	(unsetenv): Distinguish EFAULT from EINVAL.
+
 2009-11-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (fdsock): Fill _rmem and _wmem with valid values returned
