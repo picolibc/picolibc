@@ -236,6 +236,7 @@ extern double infinity _PARAMS((void));
 extern double nan _PARAMS((const char *));
 extern int finite _PARAMS((double));
 extern double copysign _PARAMS((double, double));
+extern double logb _PARAMS((double));
 extern int ilogb _PARAMS((double));
 
 extern double asinh _PARAMS((double));
@@ -332,6 +333,7 @@ extern float infinityf _PARAMS((void));
 extern float nanf _PARAMS((const char *));
 extern int finitef _PARAMS((float));
 extern float copysignf _PARAMS((float, float));
+extern float logbf _PARAMS((float));
 extern int ilogbf _PARAMS((float));
 
 extern float asinhf _PARAMS((float));

@@ -1,3 +1,8 @@
+2009-11-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libm/common/fdlibm.h (logb, logbf): Move decls from here...
+	* libc/include/math.h (logb, logbf): ...to here.
+
 2009-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* libc/include/ctype.h (__ctype_lookup): Fix precedence.

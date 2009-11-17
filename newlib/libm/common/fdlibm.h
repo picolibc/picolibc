@@ -139,7 +139,6 @@
 
 /* Functions that are not documented, and are not in <math.h>.  */
 
-extern double logb __P((double));
 #ifdef _SCALB_INT
 extern double scalb __P((double, int));
 #else
@@ -186,7 +185,6 @@ extern double __kernel_tan __P((double,double,int));
 extern int    __kernel_rem_pio2 __P((double*,double*,int,int,int,const __int32_t*));
 
 /* Undocumented float functions.  */
-extern float logbf __P((float));
 #ifdef _SCALB_INT
 extern float scalbf __P((float, int));
 #else
