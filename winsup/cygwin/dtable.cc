@@ -248,6 +248,8 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
+      if (fds[fd]->need_fixup_before ())
+	dec_need_fixup_before ();
       fhandler_base *arch = fds[fd]->archetype;
       delete fds[fd];
       if (arch && !arch->usecount)
@@ -1020,3 +1022,31 @@ handle_to_fn (HANDLE h, char *posix_fn)
   strcpy (posix_fn,  unknown_file);
   return false;
 }
+
+void
+dtable::fixup_before_fork (DWORD target_proc_id)
+{
+  lock ();
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL)
+      {
+        debug_printf ("fd %d (%s)", i, fh->get_name ());
+        fh->fixup_before_fork_exec (target_proc_id);
+      }
+  unlock ();
+} 
+void
+dtable::fixup_before_exec (DWORD target_proc_id)
+{
+  lock ();
+  fhandler_base *fh;
+  for (size_t i = 0; i < size; i++)
+    if ((fh = fds[i]) != NULL && !fh->close_on_exec ())
+      {
+        debug_printf ("fd %d (%s)", i, fh->get_name ());
+        fh->fixup_before_fork_exec (target_proc_id);
+      }
+  unlock ();
+} 
+

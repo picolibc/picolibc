@@ -31,13 +31,21 @@ class dtable
   unsigned farchetype;
   static const int initial_archetype_size = 8;
   int first_fd_for_open;
+  int cnt_need_fixup_before;
   void lock () {lock_process::locker.acquire ();}
   void unlock () {lock_process::locker.release ();}
 public:
   size_t size;
 
-  dtable () : archetypes (NULL), narchetypes (0), farchetype (0), first_fd_for_open(3) {}
+  dtable () : archetypes (NULL), narchetypes (0), farchetype (0), first_fd_for_open(3), cnt_need_fixup_before(0) {}
   void init () {first_fd_for_open = 3;}
+
+  void dec_need_fixup_before ()
+    { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }
+  void inc_need_fixup_before ()
+    { cnt_need_fixup_before++; }
+  bool need_fixup_before ()
+    { return cnt_need_fixup_before > 0; }
 
   void move_fd (int, int);
   int vfork_child_dup ();
@@ -73,6 +81,8 @@ public:
   fhandler_base *find_archetype (device& dev);
   fhandler_base **add_archetype ();
   void delete_archetype (fhandler_base *);
+  void fixup_before_exec (DWORD win_proc_id);
+  void fixup_before_fork (DWORD win_proc_id);
   friend void dtable_init ();
   friend void __stdcall close_all_files (bool);
   friend class fhandler_disk_file;

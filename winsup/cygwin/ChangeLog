@@ -1,3 +1,44 @@
+2009-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	Reintegrate socket duplication via WSADuplicateSocket/WSASocket.
+	* autoload.cc (WSADuplicateSocketW): Define.
+	(WSASocketW): Define.
+	* dtable.cc (dtable::release): Call dec_need_fixup_before if necessary.
+	(dtable::fixup_before_fork): New function.
+	(dtable::fixup_before_exec): New function.
+	* dtable.h (class dtable): Add member cnt_need_fixup_before.  Add
+	declarations for above new functions.
+	(dtable::dec_need_fixup_before): New inline method.
+	(dtable::inc_need_fixup_before): New inline method.
+	(dtable::need_fixup_before): New inline method.
+	* fhandler.h (fhandler_base::fixup_before_fork_exec): New virtual
+	method.
+	(fhandler_base::need_fixup_before): New virtual method.
+	(class fhandler_socket): Add member prot_info_ptr.
+	(fhandler_socket::init_fixup_before): Declare.
+	(fhandler_socket::need_fixup_before): New inline method.
+	(fhandler_socket::fixup_before_fork_exec): Declare.
+	(fhandler_socket::fixup_after_exec): Declare.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Initialize
+	prot_info_ptr to NULL.
+	(fhandler_socket::~fhandler_socket): Free prot_info_ptr conditionally.
+	(fhandler_socket::init_fixup_before): New method.
+	(fhandler_socket::fixup_before_fork_exec): Ditto.
+	(fhandler_socket::fixup_after_fork): Use WSASocketW to duplicate
+	socket if necessary.
+	(fhandler_socket::fixup_after_exec): New method.
+	(fhandler_socket::dup): Use fixup_before_fork_exec/fixup_after_fork
+	to duplicate socket if necessary.
+	* fork.cc (frok::parent): Start child suspended if some fhandler
+	needs fixup before fork.  If so, call dtable::fixup_before_fork after
+	CreateProcess and resume child.
+	* net.cc (fdsock): Try to find out if socket needs fixup before and
+	initialize socket accordingly.  Add HUGE comment to explain what happens
+	and why.
+	* spawn.cc (spawn_guts): Start child suspended if some fhandler needs
+	fixup before exec.  If so, call dtable::fixup_before_exec after
+	CreateProcess.
+
 2009-11-16  Eric Blake  <ebb9@byu.net>
 
 	* environ.cc (setenv): Detect invalid argument.

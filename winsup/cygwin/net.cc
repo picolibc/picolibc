@@ -495,6 +495,34 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd->uninterruptible_io (true);
   debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
 
+  /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
+     scanners or other network-oriented software replace normal sockets
+     with their own kind, which is running through a filter driver.
+     
+     The result is that these new sockets are not normal kernel objects
+     anymore.  They are typically not marked as inheritable, nor are they
+     IFS handles, as normal OS sockets are.  They are in fact not inheritable
+     to child processes, and subsequent socket calls in the child process
+     will fail with error 10038, WSAENOTSOCK.  And worse, while DuplicateHandle
+     on these sockets mostly works in the process which created the socket,
+     DuplicateHandle does quite often not work anymore in a child process.
+     It does not help to mark them inheritable via SetHandleInformation.
+
+     The only way to make these sockets usable in child processes is to
+     duplicate them via WSADuplicateSocket/WSASocket calls.  This requires
+     some incredible amount of extra processing so we only do this on
+     affected systems.  If we recognize a non-inheritable socket, or if
+     the XP1_IFS_HANDLES flag is not set in a call to WSADuplicateSocket,
+     we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
+     that socket. */
+  DWORD flags;
+  WSAPROTOCOL_INFOW wpi;
+  if (!GetHandleInformation ((HANDLE) soc, &flags)
+      || !(flags & HANDLE_FLAG_INHERIT)
+      || WSADuplicateSocketW (soc, GetCurrentProcessId (), &wpi)
+      || !(wpi.dwServiceFlags1 & XP1_IFS_HANDLES))
+    ((fhandler_socket *) fd)->init_fixup_before ();
+
   /* Raise default buffer sizes (instead of WinSock default 8K).
 
      64K appear to have the best size/performance ratio for a default

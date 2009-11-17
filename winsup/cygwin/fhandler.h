@@ -226,6 +226,7 @@ class fhandler_base
       return close_on_exec () ? &sec_none_nih : &sec_none;
   }
 
+  virtual int fixup_before_fork_exec (DWORD) { return 0; }
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec ();
   void create_read_state (LONG n)
@@ -270,6 +271,7 @@ class fhandler_base
 
   /* fixup fd possibly non-inherited handles after fork */
   bool fork_fixup (HANDLE, HANDLE &, const char *);
+  virtual bool need_fixup_before () const {return false;}
 
   virtual int open (int, mode_t = 0);
   int open_fs (int, mode_t = 0);
@@ -464,6 +466,12 @@ class fhandler_socket: public fhandler_base
   void wmem (int nwmem) { _wmem = nwmem; }
 
  private:
+  struct _WSAPROTOCOL_INFOW *prot_info_ptr;
+ public:
+  void init_fixup_before ();
+  bool need_fixup_before () const {return prot_info_ptr != NULL;}
+
+ private:
   char *sun_path;
   char *peer_sun_path;
   struct status_flags
@@ -524,7 +532,9 @@ class fhandler_socket: public fhandler_base
   int dup (fhandler_base *child);
 
   void set_close_on_exec (bool val);
+  int fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
   char *get_proc_fd_name (char *buf);
 
   select_record *select_read (select_stuff *);

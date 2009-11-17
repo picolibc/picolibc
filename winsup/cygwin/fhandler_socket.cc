@@ -151,6 +151,7 @@ fhandler_socket::fhandler_socket () :
   wsock_events (NULL),
   wsock_mtx (NULL),
   wsock_evt (NULL),
+  prot_info_ptr (NULL),
   sun_path (NULL),
   peer_sun_path (NULL),
   status ()
@@ -160,6 +161,8 @@ fhandler_socket::fhandler_socket () :
 
 fhandler_socket::~fhandler_socket ()
 {
+  if (prot_info_ptr)
+    cfree (prot_info_ptr);
   if (sun_path)
     cfree (sun_path);
   if (peer_sun_path)
@@ -631,12 +634,62 @@ fhandler_socket::release_events ()
   NtClose (wsock_mtx);
 }
 
+/* Called from net.cc:fdsock() if a freshly created socket is not
+   inheritable.  In that case we use fixup_before_fork_exec.  See
+   the comment in fdsock() for a description of the problem. */
+void
+fhandler_socket::init_fixup_before ()
+{
+  prot_info_ptr = (LPWSAPROTOCOL_INFOW)
+		  cmalloc_abort (HEAP_BUF, sizeof (WSAPROTOCOL_INFOW));
+  cygheap->fdtab.inc_need_fixup_before ();
+}
+
+int
+fhandler_socket::fixup_before_fork_exec (DWORD win_pid)
+{
+  SOCKET ret = WSADuplicateSocketW (get_socket (), win_pid, prot_info_ptr);
+  if (ret)
+    set_winsock_errno ();
+  else
+    debug_printf ("WSADuplicateSocket succeeded");
+  return (int) ret;
+}
+
 void
 fhandler_socket::fixup_after_fork (HANDLE parent)
 {
   fork_fixup (parent, wsock_mtx, "wsock_mtx");
   fork_fixup (parent, wsock_evt, "wsock_evt");
-  fhandler_base::fixup_after_fork (parent);
+
+  if (!need_fixup_before ())
+    {
+      fhandler_base::fixup_after_fork (parent);
+      return;
+    }
+    
+  SOCKET new_sock = WSASocketW (FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO,
+				FROM_PROTOCOL_INFO, prot_info_ptr, 0, 0);
+  if (new_sock == INVALID_SOCKET)
+    {
+      set_winsock_errno ();
+      set_io_handle ((HANDLE) INVALID_SOCKET);
+    }
+  else
+    {
+      /* Even though the original socket was not inheritable, the duplicated
+         socket is potentially inheritable again. */
+      SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
+      set_io_handle ((HANDLE) new_sock);
+      debug_printf ("WSASocket succeeded");
+    }
+}
+
+void
+fhandler_socket::fixup_after_exec ()
+{
+  if (need_fixup_before () && !close_on_exec ())
+    fixup_after_fork (NULL);
 }
 
 int
@@ -679,13 +732,33 @@ fhandler_socket::dup (fhandler_base *child)
 	}
     }
   fhs->connect_state (connect_state ());
-  int ret = fhandler_base::dup (child);
-  if (ret)
+
+  if (!need_fixup_before ())
     {
-      NtClose (fhs->wsock_evt);
-      NtClose (fhs->wsock_mtx);
+      int ret = fhandler_base::dup (child);
+      if (ret)
+	{
+	  NtClose (fhs->wsock_evt);
+	  NtClose (fhs->wsock_mtx);
+	}
+      return ret;
     }
-  return ret;
+
+  cygheap->user.deimpersonate ();
+  fhs->init_fixup_before ();
+  fhs->set_io_handle (get_io_handle ());
+  if (!fhs->fixup_before_fork_exec (GetCurrentProcessId ()))
+    {
+      cygheap->user.reimpersonate ();
+      fhs->fixup_after_fork (hMainProc);
+      if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
+	return 0;
+    }
+  cygheap->user.reimpersonate ();
+  cygheap->fdtab.dec_need_fixup_before ();
+  NtClose (fhs->wsock_evt);
+  NtClose (fhs->wsock_mtx);
+  return -1;
 }
 
 int __stdcall
