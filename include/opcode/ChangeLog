@@ -1,3 +1,10 @@
+2009-11-17  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* arm.h (ARM_EXT_V6_DSP): Define.
+	(ARM_AEXT_V6T2, ARM_AEXT_NOTM): Include ARM_EXT_V6_DSP.
+	(ARM_AEXT_V7EM, ARM_ARCH_V7EM): Define.
+
 2009-11-04  DJ Delorie  <dj@redhat.com>
 
 	* rx.h (rx_decode_opcode) (mvtipl): Add.

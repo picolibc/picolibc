@@ -1,3 +1,8 @@
+2009-11-17  Paul Brook  <paul@codesourcery.com>
+	Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* arm.h (TAG_CPU_ARCH_V7E_M): Define.
+
 2009-09-29  DJ Delorie  <dj@redhat.com>
 
 	* rx.h: New file.
