@@ -1,3 +1,7 @@
+2009-11-18  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (FPU_VFP_V4_SP_D16, FPU_ARCH_VFP_V4_SP_D16): Define.
+
 2009-11-17  Paul Brook  <paul@codesourcery.com>
 	Daniel Jacobowitz  <dan@codesourcery.com>
 
