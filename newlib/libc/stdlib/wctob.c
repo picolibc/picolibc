@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "local.h"
 
 int
 wctob (wint_t c)
@@ -16,7 +17,7 @@ wctob (wint_t c)
 
   _REENT_CHECK_MISC(_REENT);
 
-  retval = _wctomb_r (_REENT, &pwc, c, &mbs);
+  retval = __wctomb (_REENT, &pwc, c, __locale_charset (), &mbs);
 
   if (c == EOF || retval != 1)
     return WEOF;

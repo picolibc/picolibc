@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "local.h"
 
 size_t
 _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
@@ -25,9 +26,9 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 #endif
 
   if (s == NULL)
-    retval = _mbtowc_r (ptr, NULL, "", 1, ps);
+    retval = __mbtowc (ptr, NULL, "", 1, __locale_charset (), ps);
   else
-    retval = _mbtowc_r (ptr, pwc, s, n, ps);
+    retval = __mbtowc (ptr, pwc, s, n, __locale_charset (), ps);
 
   if (retval == -1)
     {
@@ -47,6 +48,32 @@ _DEFUN (mbrtowc, (pwc, s, n, ps),
 	size_t n _AND
 	mbstate_t *ps)
 {
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   return _mbrtowc_r (_REENT, pwc, s, n, ps);
+#else
+  int retval = 0;
+
+#ifdef _MB_CAPABLE
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(_REENT);
+      ps = &(_REENT_MBRTOWC_STATE(_REENT));
+    }
+#endif
+
+  if (s == NULL)
+    retval = __mbtowc (_REENT, NULL, "", 1, __locale_charset (), ps);
+  else
+    retval = __mbtowc (_REENT, pwc, s, n, __locale_charset (), ps);
+
+  if (retval == -1)
+    {
+      ps->__count = 0;
+      _REENT->_errno = EILSEQ;
+      return (size_t)(-1);
+    }
+  else
+    return (size_t)retval;
+#endif /* not PREFER_SIZE_OVER_SPEED */
 }
 #endif /* !_REENT_ONLY */

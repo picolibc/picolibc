@@ -122,6 +122,7 @@ Supporting OS subroutines required:
 #include <stdarg.h>
 #include <errno.h>
 #include "local.h"
+#include "../stdlib/local.h"
 
 #ifdef INTEGER_ONLY
 #define VFSCANF vfiscanf
@@ -506,7 +507,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
       wc = *fmt;
 #else
       memset (&state, '\0', sizeof (state));
-      nbytes = _mbtowc_r (rptr, &wc, fmt, MB_CUR_MAX, &state);
+      nbytes = __mbtowc (rptr, &wc, fmt, MB_CUR_MAX, __locale_charset (),
+			 &state);
 #endif
       fmt += nbytes;
       if (wc == 0)

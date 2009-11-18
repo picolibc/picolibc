@@ -99,6 +99,7 @@ PORTABILITY
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include "local.h"
 
 size_t
 _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
@@ -134,7 +135,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = _wcrtomb_r (r, buff, *pwcs, ps);
+      int bytes = __wctomb (r, buff, *pwcs, __locale_charset (), ps);
       if (bytes == -1)
 	{
 	  r->_errno = EILSEQ;
@@ -160,7 +161,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
 	}
       else
 	{
-	  /* not enough room, we must back up state to before _wctomb_r call */
+	  /* not enough room, we must back up state to before __wctomb call */
 	  ps->__count = count;
 	  ps->__value.__wch = wch;
           len = 0;

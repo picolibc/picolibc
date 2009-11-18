@@ -46,6 +46,7 @@ effects vary with the locale.
 #include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "local.h"
 
 int
 _DEFUN (_mblen_r, (r, s, n, state), 
@@ -56,7 +57,7 @@ _DEFUN (_mblen_r, (r, s, n, state),
 {
 #ifdef _MB_CAPABLE
   int retval;
-  retval = _mbtowc_r (r, NULL, s, n, state);
+  retval = __mbtowc (r, NULL, s, n, __locale_charset (), state);
 
   if (retval < 0)
     {

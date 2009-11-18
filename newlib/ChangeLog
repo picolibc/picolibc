@@ -1,3 +1,33 @@
+2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/vfprintf.c: Include ../stdlib/local.h.  Replace call to
+	_mbtowc_r with direct call to __mbtowc.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdlib/btowc.c: Include local.h.  Replace call to _mbtowc_r
+	with direct call to __mbtowc.
+	* libc/stdlib/mblen.c: Ditto.
+	* libc/stdlib/mblen_r.c: Ditto.
+	* libc/stdlib/mbrtowc.c: Ditto.
+	* libc/stdlib/mbstowcs_r.c: Ditto.
+	* libc/stdlib/mbtowc.c: Ditto.
+	* libc/stdlib/wcrtomb.c: Include local.h.  Replace call to _wctomb_r
+	with direct call to __wctomb.
+	* libc/stdlib/wcsnrtombs.c: Ditto.
+	(_wcsnrtombs_r): Ditto.
+	* libc/stdlib/wcstombs_r.c: Ditto.
+	* libc/stdlib/wctob.c: Ditto.
+	* libc/stdlib/wctomb.c: Ditto.
+
+	* libc/stdlib/mbrtowc.c (mbrtowc): Implement independently from
+	_mbrtowc_r, unless PREFER_SIZE_OVER_SPEED or __OPTIMIZE_SIZE__ are
+	defined.
+	* libc/stdlib/wcrtomb.c (wcrtomb): Implement independently from
+	_wcrtomb_r, unless PREFER_SIZE_OVER_SPEED or __OPTIMIZE_SIZE__ are
+	defined.
+
+	* libc/stdlib/mbtowc_r.c (__utf8_mbtowc): Drop unnecessary test for
+	ch >= 0.
+
 2009-11-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libm/common/fdlibm.h (logb, logbf): Move decls from here...

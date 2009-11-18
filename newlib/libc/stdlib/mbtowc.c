@@ -54,6 +54,7 @@ effects vary with the locale.
 #include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "local.h"
 
 int
 _DEFUN (mbtowc, (pwc, s, n),
@@ -68,7 +69,7 @@ _DEFUN (mbtowc, (pwc, s, n),
   _REENT_CHECK_MISC(_REENT);
   ps = &(_REENT_MBTOWC_STATE(_REENT));
   
-  retval = _mbtowc_r (_REENT, pwc, s, n, ps);
+  retval = __mbtowc (_REENT, pwc, s, n, __locale_charset (), ps);
   
   if (retval < 0)
     {

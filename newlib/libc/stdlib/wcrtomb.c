@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include "local.h"
 
 size_t
 _DEFUN (_wcrtomb_r, (ptr, s, wc, ps),
@@ -24,9 +25,9 @@ _DEFUN (_wcrtomb_r, (ptr, s, wc, ps),
 #endif
 
   if (s == NULL)
-    retval = _wctomb_r (ptr, buf, L'\0', ps);
+    retval = __wctomb (ptr, buf, L'\0', __locale_charset (), ps);
   else
-    retval = _wctomb_r (ptr, s, wc, ps);
+    retval = __wctomb (ptr, s, wc, __locale_charset (), ps);
 
   if (retval == -1)
     {
@@ -45,6 +46,33 @@ _DEFUN (wcrtomb, (s, wc, ps),
 	wchar_t wc _AND
 	mbstate_t *ps)
 {
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   return _wcrtomb_r (_REENT, s, wc, ps);
+#else
+  int retval = 0;
+  char buf[10];
+
+#ifdef _MB_CAPABLE
+  if (ps == NULL)
+    {
+      _REENT_CHECK_MISC(_REENT);
+      ps = &(_REENT_WCRTOMB_STATE(_REENT));
+    }
+#endif
+
+  if (s == NULL)
+    retval = __wctomb (_REENT, buf, L'\0', __locale_charset (), ps);
+  else
+    retval = __wctomb (_REENT, s, wc, __locale_charset (), ps);
+
+  if (retval == -1)
+    {
+      ps->__count = 0;
+      _REENT->_errno = EILSEQ;
+      return (size_t)(-1);
+    }
+  else
+    return (size_t)retval;
+#endif /* not PREFER_SIZE_OVER_SPEED */
 }
 #endif /* !_REENT_ONLY */

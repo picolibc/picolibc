@@ -159,6 +159,7 @@ static char *rcsid = "$Id$";
 #include <sys/lock.h>
 #include <stdarg.h>
 #include "local.h"
+#include "../stdlib/local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
 
@@ -722,7 +723,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	for (;;) {
 	        cp = fmt;
 #ifdef _MB_CAPABLE
-	        while ((n = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
+	        while ((n = __mbtowc (data, &wc, fmt, MB_CUR_MAX,
+				      __locale_charset (), &state)) > 0) {
                     if (wc == '%')
                         break;
                     fmt += n;
@@ -1794,7 +1796,8 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   while (*fmt && n >= numargs)
     {
 # ifdef _MB_CAPABLE
-      while ((nbytes = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0)
+      while ((nbytes = __mbtowc (data, &wc, fmt, MB_CUR_MAX,
+				 __locale_charset (), &wc_state)) > 0)
 	{
 	  fmt += nbytes;
 	  if (wc == '%')

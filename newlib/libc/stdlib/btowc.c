@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <reent.h>
 #include <string.h>
+#include "local.h"
 
 wint_t
 btowc (int c)
@@ -19,7 +20,7 @@ btowc (int c)
 
   _REENT_CHECK_MISC(_REENT);
 
-  retval = _mbtowc_r (_REENT, &pwc, &b, 1, &mbs);
+  retval = __mbtowc (_REENT, &pwc, &b, 1, __locale_charset (), &mbs);
 
   if (c == EOF || retval != 1)
     return WEOF;

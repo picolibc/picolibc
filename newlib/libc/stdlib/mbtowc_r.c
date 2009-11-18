@@ -221,7 +221,7 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, charset, state),
       return 0; /* s points to the null character */
     }
 
-  if (ch >= 0x0 && ch <= 0x7f)
+  if (ch <= 0x7f)
     {
       /* single-byte sequence */
       state->__count = 0;
