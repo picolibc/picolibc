@@ -177,9 +177,9 @@ the mount points point to Win32 paths.  An installation with
 <command>setup.exe</command> installs a <filename>fstab</filename> file by
 default, which can easily be changed using the editor of your choice.</para>
 
-<para>In addition to selecting the root partition, the
-<filename>fstab</filename> file allows mounting arbitrary Win32 paths into
-the POSIX file system space.  A special case is the so-called cygdrive prefix.
+<para>The <filename>fstab</filename> file allows mounting arbitrary Win32
+paths into the POSIX file system space.  A special case is the so-called
+cygdrive prefix.
 It's the path under which every available drive in the system is mounted
 under its drive letter.  The default value is <filename>/cygdrive</filename>,
 so you can access the drives as <filename>/cygdrive/c</filename>,
@@ -237,18 +237,23 @@ guaranteed to be unique.  However, we have not found this to be a significant
 problem because of the low probability of generating a duplicate inode number.
 </para>
 
-<para><function>chroot(2)</function> is supported since Cygwin 1.1.3.
-However, chroot is not a concept known by Windows.  This implies some
+<para>Cygwin 1.7 and later supports Extended Attributes (EAs) via the
+linux-specific function calls <function>getxattr</function>,
+<function>setxattr</function>, <function>listxattr</function>, and
+<function>removexattr</function>.  All EAs on Samba or NTFS are treated as
+user EAs, so, if the name of an EA is "foo" from the Windows perspective,
+it's transformed into "user.foo" within Cygwin.  This allows Linux-compatible
+EA operations and keeps tools like <command>attr</command>, or
+<command>setfattr</command> happy.
+</para>
+
+<para><function>chroot</function> is supported since Cygwin 1.1.3.
+However, chroot is not a concept known by Windows.  This implies some serious
 restrictions.  First of all, the <function>chroot</function> call isn't a
 privileged call.  Any user may call it.  Second, the chroot environment
-isn't safe against native windows processes.  If you want to use a
-chroot environment to, for example, allow anonymous ftp with restricted
-access, you must make sure care that only native Cygwin applications
-are accessible inside of the chroot environment.  Since those applications
-are only using the Cygwin POSIX API to access the file system their access
-can be restricted as it is intended.  This includes not only POSIX paths but
-Win32 paths containing drive letter and/or backslashes as well as UNC paths
-(<filename>//server/share</filename> or <filename>\\server\share</filename>).
+isn't safe against native windows processes.  Given that, chroot in Cygwin
+is only a hack which pretends security where there is none.  For that reason
+the usage of chroot is discouraged.
 </para>
 </sect2>
 

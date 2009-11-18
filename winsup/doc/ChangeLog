@@ -1,3 +1,9 @@
+2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* overview2.sgml (ov-hi-files): Remove reference to root directory when
+	explaining fstab content.  Add paragraph about Extended Attributes.
+	Discourage chroot.
+
 2009-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml (pathnames-specialchars): Fix typos.
