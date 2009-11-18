@@ -1,3 +1,9 @@
+2009-11-18  Dave Korn  <dave.korn.cygwin@googlemail.com>
+
+	* libm/machine/i386/f_tan.S (_f_tan): Free fp stack register
+	containing useless constant before advancing fp sp over it.
+	(_f_tanf): Likewise.
+
 2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/vfprintf.c: Include ../stdlib/local.h.  Replace call to

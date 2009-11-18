@@ -29,6 +29,7 @@ SYM (_f_tan):
 	movl esp,ebp
 	fldl 8(ebp)
 	fptan
+	ffree %st(0)
 	fincstp
 
 	leave
