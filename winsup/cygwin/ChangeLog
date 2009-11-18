@@ -1,5 +1,10 @@
 2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntea.cc (read_ea): Always add length of "user." prefix, not only
+	on Samba.  Change comment.
+
+2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntea.cc (read_ea): Try to open file first to have more sensible
 	error codes.  Always refuse non "user." EAs for Linux compatibility
 	and return EOPNOTSUPP.  Fix handling of empty (== non-existant) EAs.

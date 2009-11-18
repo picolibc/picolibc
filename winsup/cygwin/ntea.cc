@@ -156,8 +156,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       ret = 0;
       do
 	{
-	  if (pc.fs_is_samba ())	/* See below. */
-	    fea->EaNameLength += 5;
+	  fea->EaNameLength += 5;	/* "user." */
 	  if (size > 0)
 	    {
 	      if ((size_t) ret + fea->EaNameLength + 1 > size)
@@ -165,11 +164,11 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 		  set_errno (ERANGE);
 		  goto out;
 		}
-	      /* Samba hides the user namespace from Windows clients.  We add
-		 it in EA listings to keep tools like attr/getfattr/setfattr
-		 happy. */
-	      char tmpbuf[MAX_EA_NAME_LEN * 2], *tp = tmpbuf;
-	      tp = stpcpy (tmpbuf, "user.");
+	      /* For compatibility with Linux, we always prepend "user." to
+		 the attribute name, so effectively we only support user
+		 attributes from a application point of view. */
+	      char tmpbuf[MAX_EA_NAME_LEN * 2];
+	      char *tp = stpcpy (tmpbuf, "user.");
 	      stpcpy (tp, fea->EaName);
 	      /* NTFS stores all EA names in uppercase unfortunately.  To keep
 		 compatibility with ext/xfs EA namespaces and accompanying
