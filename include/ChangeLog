@@ -1,3 +1,7 @@
+2009-11-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* alloca-conf.h: Clarify comment.
+
 2009-11-06  Jonas Maebe  <jonas.maebe@elis.ugent.be>
 
 	Add DWARF attribute value for the "Borland fastcall" calling

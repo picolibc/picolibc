@@ -15,7 +15,8 @@
 #  if defined _AIX
 /* Indented so that pre-ansi C compilers will ignore it, rather than
    choke on it.  Some versions of AIX require this to be the first
-   thing in the file except for comments and preprocessor directives.  */
+   thing seen by the compiler except for comments and preprocessor
+   directives.  */
     #pragma alloca
 #  else
 #   if defined _MSC_VER && !defined C_ALLOCA
