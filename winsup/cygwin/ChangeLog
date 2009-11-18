@@ -1,3 +1,14 @@
+2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntea.cc (read_ea): Try to open file first to have more sensible
+	error codes.  Always refuse non "user." EAs for Linux compatibility
+	and return EOPNOTSUPP.  Fix handling of empty (== non-existant) EAs.
+	Always prepend "user." prefix to EA names.
+	(write_ea): Try to open file first to have more sensible error codes.
+	Always refuse non "user." EAs for Linux compatibility and return
+	EOPNOTSUPP.  Delay skipping "user." prefix until after potential call
+	to read_ea.
+
 2009-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	Reintegrate socket duplication via WSADuplicateSocket/WSASocket.

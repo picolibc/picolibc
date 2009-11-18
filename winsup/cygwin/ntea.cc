@@ -56,22 +56,34 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
   debug_printf ("read_ea (%S, %s, %p, %lu)",
 		attr.ObjectName, name, value, size);
 
+  /* Early open if handle is NULL.  This allows to return error codes like
+     ENOENT before we actually check for the correctness of the EA name and
+     stuff like that. */
+  if (!hdl)
+    {
+      status = NtOpenFile (&h, READ_CONTROL | FILE_READ_EA, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+      hdl = NULL;
+    }
+
   fea = (PFILE_FULL_EA_INFORMATION) alloca (EA_BUFSIZ);
 
   if (name)
     {
       size_t nlen;
 
-      /* Samba hides the user namespace from Windows clients.  If we try to
-	 retrieve a user namespace item, we remove the leading namespace from
-	 the name, otherwise the search fails. */
-      if (!pc.fs_is_samba ())
-	/* nothing to do */;
-      else if (ascii_strncasematch (name, "user.", 5))
+      /* For compatibility with Linux, we only allow user xattrs and
+         return EOPNOTSUPP otherwise. */
+      if (ascii_strncasematch (name, "user.", 5))
 	name += 5;
       else
 	{
-	  set_errno (ENOATTR);
+	  set_errno (EOPNOTSUPP);
 	  goto out;
 	}
 
@@ -117,6 +129,16 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
     }
   if (name)
     {
+      /* Another weird behaviour of ZwQueryEaFile.  If you ask for a
+	 specific EA which is not present in the file's EA list, you don't
+	 get a useful error code like STATUS_NONEXISTENT_EA_ENTRY.  Rather
+	 ZwQueryEaFile returns success with the entry's EaValueLength
+	 set to 0. */
+      if (!fea->EaValueLength)
+	{
+	  set_errno (ENOATTR);
+	  goto out;
+	}
       if (size > 0)
 	{
 	  if (size < fea->EaValueLength)
@@ -124,19 +146,8 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 	      set_errno (ERANGE);
 	      goto out;
 	    }
-	  /* Another weird behaviour of ZwQueryEaFile.  If you ask for a
-	     specific EA which is not present in the file's EA list, you don't
-	     get a useful error code like STATUS_NONEXISTENT_EA_ENTRY.  Rather
-	     ZwQueryEaFile returns success with the entry's EaValueLength
-	     set to 0. */
-	  if (!fea->EaValueLength)
-	    {
-	      set_errno (ENOATTR);
-	      goto out;
-	    }
-	  else
-	    memcpy (value, fea->EaName + fea->EaNameLength + 1,
-		    fea->EaValueLength);
+	  memcpy (value, fea->EaName + fea->EaNameLength + 1,
+		  fea->EaValueLength);
 	}
       ret = fea->EaValueLength;
     }
@@ -158,8 +169,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 		 it in EA listings to keep tools like attr/getfattr/setfattr
 		 happy. */
 	      char tmpbuf[MAX_EA_NAME_LEN * 2], *tp = tmpbuf;
-	      if (pc.fs_is_samba ())
-		tp = stpcpy (tmpbuf, "user.");
+	      tp = stpcpy (tmpbuf, "user.");
 	      stpcpy (tp, fea->EaName);
 	      /* NTFS stores all EA names in uppercase unfortunately.  To keep
 		 compatibility with ext/xfs EA namespaces and accompanying
@@ -210,20 +220,26 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
   debug_printf ("write_ea (%S, %s, %p, %lu, %d)",
 		attr.ObjectName, name, value, size, flags);
 
-  /* Samba hides the user namespace from Windows clients.  If we get a
-     user namespace item, we remove the leading namespace from the name.
-     This keeps tools like attr/getfattr/setfattr happy.  Otherwise
-     setting the EA fails as if we don't have the permissions. */
-      /* Samba hides the user namespace from Windows clients.  If we try to
-	 retrieve a user namespace item, we remove the leading namespace from
-	 the name, otherwise the search fails. */
-  if (!pc.fs_is_samba ())
-    /* nothing to do */;
-  else if (ascii_strncasematch (name, "user.", 5))
-    name += 5;
-  else
+  /* Early open if handle is NULL.  This allows to return error codes like
+     ENOENT before we actually check for the correctness of the EA name and
+     stuff like that. */
+  if (!hdl)
     {
-      set_errno (ENOATTR);
+      status = NtOpenFile (&h, READ_CONTROL | FILE_WRITE_EA, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+      hdl = NULL;
+    }
+
+  /* For compatibility with Linux, we only allow user xattrs and
+     return EOPNOTSUPP otherwise. */
+  if (!ascii_strncasematch (name, "user.", 5))
+    {
+      set_errno (EOPNOTSUPP);
       goto out;
     }
 
@@ -248,6 +264,9 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
       if (flags == XATTR_REPLACE && rret < 0)
 	goto out;
     }
+
+  /* Skip "user." prefix. */
+  name += 5;
 
   if ((nlen = strlen (name)) >= MAX_EA_NAME_LEN)
     {
