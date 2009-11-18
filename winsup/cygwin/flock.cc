@@ -767,8 +767,13 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 
   lockf_t **head = &node->i_lockf;
 
+#if 0
   /*
    * Avoid the common case of unlocking when inode_t has no locks.
+   *
+   * This shortcut is invalid for Cygwin because the above inode_t::get
+   * call returns with an empty lock list if this process has no locks
+   * on the file yet.
    */
   if (*head == NULL)
     {
@@ -779,6 +784,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 	  return 0;
 	}
     }
+#endif
   /*
    * Allocate a spare structure in case we have to split.
    */

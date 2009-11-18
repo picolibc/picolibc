@@ -1,5 +1,10 @@
 2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (fhandler_disk_file::lock): Disable a shortcut from the
+	original BSD code, but keep it in and documented why we can't use it.
+
+2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntea.cc (read_ea): Always add length of "user." prefix, not only
 	on Samba.  Change comment.
 
