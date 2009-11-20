@@ -1,3 +1,7 @@
+2009-20-10  Aleksey Chernov  <virxkane@users.sourceforge.net>
+
+	* include/sspi.h: Include ntsecapi.h to correct postgresql build error.
+
 2009-20-10  Heiko Hund  <heiko@ist.eigentlich.net>
 
 	* include/commctrl.h (GetMUILanguage, InitMUILanguage): Add prototypes.
