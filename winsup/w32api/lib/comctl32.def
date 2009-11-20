@@ -55,6 +55,7 @@ FindMRUStringW@12
 Free@4
 FreeMRUList@4
 GetEffectiveClientRect@12
+GetMUILanguage@0
 GetSize@4
 GetWindowSubclass@16
 ImageList_Add@12
@@ -96,6 +97,7 @@ ImageList_SetOverlayImage@12
 ImageList_Write@8
 InitCommonControls@0
 InitCommonControlsEx@4
+InitMUILanguage@4
 LBItemFromPt@16
 MakeDragList@4
 MenuHelp@28

@@ -2985,6 +2985,9 @@ void WINAPI DrawInsert(HWND,HWND,int);
 void WINAPI DrawStatusTextA(HDC,LPRECT,LPCSTR,UINT);
 void WINAPI DrawStatusTextW(HDC,LPRECT,LPCWSTR,UINT);
 void WINAPI GetEffectiveClientRect(HWND,LPRECT,LPINT);
+#if (_WIN32_IE >= 0x0500)
+LANGID WINAPI GetMUILanguage(VOID);
+#endif
 #define Header_GetItemCount(w) (int)SNDMSG((w),HDM_GETITEMCOUNT,0,0)
 #define Header_InsertItem(w,i,phdi) (int)SNDMSG((w),HDM_INSERTITEM,(WPARAM)(int)(i),(LPARAM)(const HD_ITEM*)(phdi))
 #define Header_DeleteItem(w,i) (BOOL)SNDMSG((w),HDM_DELETEITEM,(WPARAM)(int)(i),0)
@@ -3090,6 +3093,9 @@ HIMAGELIST WINAPI ImageList_Duplicate(HIMAGELIST himl);
 void WINAPI InitCommonControls(void);
 #if (_WIN32_IE >= 0x0300)
 BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
+#endif
+#if (_WIN32_IE >= 0x0500)
+VOID WINAPI InitMUILanguage(LANGID);
 #endif
 int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 #define ListView_GetBkColor(w) (COLORREF)SNDMSG((w),LVM_GETBKCOLOR,0,0)

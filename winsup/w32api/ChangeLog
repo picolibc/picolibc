@@ -1,3 +1,8 @@
+2009-20-10  Heiko Hund  <heiko@ist.eigentlich.net>
+
+	* include/commctrl.h (GetMUILanguage, InitMUILanguage): Add prototypes.
+	* lib/comctl32.def (GetMUILanguage, InitMUILanguage): Define.
+
 2009-20-10  Michael James  <james.me@gmail.com>
 
 	* include/wingdi.h (CLEARTYPE_QUALITY): Define.
