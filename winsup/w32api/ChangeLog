@@ -1,3 +1,13 @@
+2009-20-10  Michael James  <james.me@gmail.com>
+
+	* include/wingdi.h (CLEARTYPE_QUALITY): Define.
+	* include/winuser.h (WM_KEYLAST): Alternative definition when _WIN32_WINNT
+	>= 0x0501.
+	(WM_UNICHAR,UNICODE_NOCHAR): Define.
+	* lib/comctl32.def (DefSubclassProc@16,GetWindowSubclass@16,
+	RemoveWindowSubclass@12): Add exports.
+	* lib/gdi32.def (GetDCBrushColor@4,GetDCPenColor@4): Add exports.
+
 2009-20-10  Jarkko Sakkinen  <jarkko.sakkinen@iki.fi>
 
 	* include/winuser.h (WM_TOUCHMOVE, WM_TOUCHDOWN, WM_TOUCHUP,

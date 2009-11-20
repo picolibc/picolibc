@@ -358,7 +358,7 @@ extern "C" {
 #define OUT_RASTER_PRECIS	6
 #define OUT_TT_ONLY_PRECIS	7
 #define OUT_OUTLINE_PRECIS	8
-//http://www.pinvoke.net/default.aspx/Structures/LOGFONT.html
+/* http://www.pinvoke.net/default.aspx/Structures/LOGFONT.html */
 #define OUT_PS_ONLY_PRECIS      10
 #define CLIP_DEFAULT_PRECIS	0
 #define CLIP_CHARACTER_PRECIS	1
@@ -372,6 +372,9 @@ extern "C" {
 #define PROOF_QUALITY	2
 #define NONANTIALIASED_QUALITY 3
 #define ANTIALIASED_QUALITY 4
+#if _WIN32_WINNT >= 0x0500
+#define CLEARTYPE_QUALITY 5
+#endif
 #define DEFAULT_PITCH	0
 #define FIXED_PITCH	1
 #define VARIABLE_PITCH	2

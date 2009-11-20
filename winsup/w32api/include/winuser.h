@@ -1554,7 +1554,13 @@ extern "C" {
 #define WM_WINDOWPOSCHANGING 70
 #define WM_WININICHANGE 26
 #define WM_KEYFIRST 256
+#if _WIN32_WINNT >= 0x0501
+#define WM_KEYLAST 265
+#define WM_UNICHAR 265
+#define UNICODE_NOCHAR 0xffff
+#else
 #define WM_KEYLAST 264
+#endif
 #define WM_SYNCPAINT  136
 #define WM_MOUSEACTIVATE 33
 #define WM_MOUSEMOVE 512
