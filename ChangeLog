@@ -1,3 +1,8 @@
+2009-11-20  Paolo Bonzini  <bonzini@gnu.org>
+
+	* config.guess: Sync with upstream and gcc.
+	* config.sub: Sync with upstream and gcc.
+
 2009-11-16  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.def: Restore host and target settings for gmp.
