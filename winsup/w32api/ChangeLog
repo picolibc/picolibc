@@ -1,3 +1,7 @@
+2009-20-10  Dmitry Potapov  <dpotapov@users.sourceforge.net>
+
+	* include/winver.h (VerQueryValue[AW]): Correct definition.
+
 2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shlobj.h (SHARD): Add enum.
