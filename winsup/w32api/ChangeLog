@@ -1,3 +1,10 @@
+2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shlobj.h (SHARD): Add enum.
+	(SHARD_PATH): Define based on UNICODE.
+
+	Thanks to Jacek Caban for the report.
+
 2009-14-09  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wingdi.h (_devicemodeW, _devicemodeA): Correct definition.
