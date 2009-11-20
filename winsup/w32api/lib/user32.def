@@ -63,6 +63,7 @@ ClientToScreen@8
 ClipCursor@4
 CloseClipboard@0
 CloseDesktop@4
+CloseTouchInputHandle@4
 CloseWindow@4
 CloseWindowStation@4
 CopyAcceleratorTableA@12
@@ -331,6 +332,7 @@ GetTabbedTextExtentW@20
 GetThreadDesktop@4
 GetTitleBarInfo@8
 GetTopWindow@4
+GetTouchInputInfo@16
 GetUpdateRect@12
 GetUpdateRgn@12
 GetUserObjectInformationA@20
@@ -390,6 +392,7 @@ IsHungAppWindow@4
 IsIconic@4
 IsMenu@4
 IsRectEmpty@4
+IsTouchWindow@8
 IsWinEventHookInstalled@4
 IsWindow@4
 IsWindowEnabled@4
@@ -487,6 +490,7 @@ RegisterDeviceNotificationW@12
 RegisterPowerSettingNotification@12
 RegisterHotKey@16
 RegisterRawInputDevices@12
+RegisterTouchWindow@8
 RegisterWindowMessageA@4
 RegisterWindowMessageW@4
 ReleaseCapture@0
@@ -615,6 +619,7 @@ UnregisterClassA@8
 UnregisterClassW@8
 UnregisterDeviceNotification@4
 UnregisterPowerSettingNotification@4
+UnregisterTouchWindow@4
 UnregisterHotKey@8
 UpdateLayeredWindow@36
 UpdateWindow@4

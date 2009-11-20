@@ -1584,6 +1584,11 @@ extern "C" {
 #define GET_WHEEL_DELTA_WPARAM(wparam) ((short)HIWORD (wparam))
 #define WHEEL_PAGESCROLL UINT_MAX
 #endif
+#if (_WIN32_WINNT >= 0x0601)
+#define WM_TOUCHMOVE 576
+#define WM_TOUCHDOWN 577
+#define WM_TOUCHUP 578
+#endif
 #define BM_CLICK 245
 #define BM_GETCHECK 240
 #define BM_GETIMAGE 246
@@ -2465,6 +2470,21 @@ extern "C" {
 #define RIDEV_APPKEYS      0x00000400
 #endif
 
+#if (_WIN32_WINNT >= 0x0601)
+#define TOUCHEVENTF_DOWN	    0x0001
+#define TOUCHEVENTF_INRANGE	    0x0008
+#define TOUCHEVENTF_MOVE	    0x0002
+#define TOUCHEVENTF_NOCOALESCE	0x0020
+#define TOUCHEVENTF_PALM	    0x0080
+#define TOUCHEVENTF_PEN	        0x0040
+#define TOUCHEVENTF_PRIMARY	    0x0010
+#define TOUCHEVENTF_UP	        0x0004
+
+#define TOUCHEVENTMASKF_CONTACTAREA	    0x0004
+#define TOUCHEVENTMASKF_EXTRAINFO	    0x0002
+#define TOUCHEVENTMASKF_TIMEFROMSYSTEM	0x0001
+#endif
+
 #ifndef RC_INVOKED
 typedef BOOL(CALLBACK *DLGPROC)(HWND,UINT,WPARAM,LPARAM);
 typedef VOID(CALLBACK *TIMERPROC)(HWND,UINT,UINT,DWORD);
@@ -3249,6 +3269,21 @@ typedef struct tagINPUT {
   } DUMMYUNIONNAME;
 } INPUT,*PINPUT,*LPINPUT;
 #endif /* (_WIN32_WINNT >= 0x0403) */
+#if (_WIN32_WINNT >= 0x0601)
+typedef struct _TOUCHINPUT {
+  LONG x;
+  LONG y;
+  HANDLE hSource;
+  DWORD dwID;
+  DWORD dwFlags;
+  DWORD dwMask;
+  DWORD dwTime;
+  ULONG_PTR dwExtraInfo;
+  DWORD cxContact;
+  DWORD cyContact;
+} TOUCHINPUT, 
+ *PTOUCHINPUT;
+#endif /* (_WIN32_WINNT >= 0x0601) */
 #if (WINVER >= 0x0500)
 typedef struct tagGUITHREADINFO {
 	DWORD cbSize;
@@ -4117,6 +4152,15 @@ WINUSERAPI BOOL WINAPI UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLO
 #if (_WIN32_WINNT >= 0x0501)
 WINUSERAPI BOOL WINAPI GetLayeredWindowAttributes(HWND,COLORREF*,BYTE*,DWORD*);
 #endif
+
+#if (_WIN32_WINNT >= 0x0601)
+BOOL WINAPI CloseTouchInputHandle(HANDLE hTouchInput);
+BOOL WINAPI GetTouchInputInfo(HANDLE hTouchInput, UINT cInputs, PTOUCHINPUT pInputs, int cbSize);
+BOOL WINAPI IsTouchWindow(HWND hWnd, PULONG pulFlags);
+BOOL WINAPI RegisterTouchWindow(HWND hWnd, ULONG ulFlags);
+BOOL WINAPI UnregisterTouchWindow(HWND hWnd);
+#endif
+
 #ifdef UNICODE
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCW
 #define PROPENUMPROC PROPENUMPROCW

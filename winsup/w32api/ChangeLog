@@ -1,3 +1,15 @@
+2009-20-10  Jarkko Sakkinen  <jarkko.sakkinen@iki.fi>
+
+	* include/winuser.h (WM_TOUCHMOVE, WM_TOUCHDOWN, WM_TOUCHUP,
+	TOUCHEVENTF_DOWN, TOUCHEVENTF_INRANGE, TOUCHEVENTF_MOVE,
+	TOUCHEVENTF_NOCOALESCE, TOUCHEVENTF_PALM, TOUCHEVENTF_PEN,
+	TOUCHEVENTF_PRIMARY, TOUCHEVENTF_UP, TOUCHEVENTMASKF_CONTACTAREA,
+	TOUCHEVENTMASKF_EXTRAINFO, TOUCHEVENTMASKF_TIMEFROMSYSTEM, TOUCHINPUT,
+	CloseTouchInputHandle, GetTouchInputInfo, IsTouchWindow,
+	RegisterTouchWindow, UnregisterTouchWindow): Define.
+	* lib/user32.def (CloseTouchInputHandle, GetTouchInputInfo, IsTouchWindow,
+	RegisterTouchWindow, UnregisterTouchWindow): Define.
+
 2009-20-10  Dmitry Potapov  <dpotapov@users.sourceforge.net>
 
 	* include/winver.h (VerQueryValue[AW]): Correct definition.
