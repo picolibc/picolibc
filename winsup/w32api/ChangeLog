@@ -1,3 +1,9 @@
+2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shlobj.h (SHParseDisplayName): Define.
+
+	Thanks to James Roberts-Thomson for the report.
+
 2009-20-10  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
 
 	* include/wingdi.h (ENHMFENUMPROC): Correct definition.
