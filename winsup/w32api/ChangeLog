@@ -1,3 +1,7 @@
+2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/shlobj.h (SHParseDisplayName): Fix definition.
+
 2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.14.
