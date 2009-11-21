@@ -1,3 +1,9 @@
+2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winbase.h (UnmapViewOfFile): Correct definition.
+
+	Thanks to Dimitry Sibiryakov for the report.
+
 2009-20-10  Aleksey Chernov  <virxkane@users.sourceforge.net>
 
 	* include/sspi.h: Include ntsecapi.h to correct postgresql build error.
