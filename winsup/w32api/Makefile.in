@@ -68,7 +68,7 @@ FLAGS_TO_PASS = \
 SUBDIRS = lib
 
 PACKAGE = w32api
-VERSION = 3.13
+VERSION = 3.14
 CYGRELEASE = 1
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
