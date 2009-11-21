@@ -1,3 +1,9 @@
+2009-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (ro_u_dll): New R/O unicode string.
+	* syscalls.cc (nt_path_has_executable_suffix): Add ro_u_dll to
+	blessed_executable_suffixes array.  Explain why.
+
 2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (fhandler_disk_file::lock): Disable a shortcut from the

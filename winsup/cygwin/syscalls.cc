@@ -1651,6 +1651,12 @@ nt_path_has_executable_suffix (PUNICODE_STRING upath)
   const PUNICODE_STRING blessed_executable_suffixes[] =
   {
     &ro_u_com,
+    &ro_u_dll,	/* Messy, messy.  Per MSDN, the GetBinaryType function is
+		   supposed to return with ERROR_BAD_EXE_FORMAT. if the file
+		   is a DLL.  On 64-bit Windows, this works as expected for
+		   32-bit and 64-bit DLLs.  On 32-bit Windows this only works
+		   for 32-bit DLLs.  For 64-bit DLLs, 32-bit Windows returns
+		   true with the type set to SCS_64BIT_BINARY. */
     &ro_u_exe,
     &ro_u_scr,
     &ro_u_sys,
