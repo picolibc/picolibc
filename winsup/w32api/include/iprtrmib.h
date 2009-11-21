@@ -57,7 +57,7 @@ typedef struct {
   DWORD dwBCastAddr;
   DWORD dwReasmSize;
   unsigned short unused1;
-  unsigned short unused2;
+  unsigned short wType;
 } MIB_IPADDRROW, *PMIB_IPADDRROW;
 typedef struct {
   DWORD dwNumEntries;

@@ -1,5 +1,11 @@
 2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/iprtrmib.h (MIB_IPADDRROW): Correct definition.
+
+	Thanks to Thomas Denk for the report.
+
+2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winbase.h (UnmapViewOfFile): Correct definition.
 
 	Thanks to Dimitry Sibiryakov for the report.
