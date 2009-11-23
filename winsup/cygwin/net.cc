@@ -510,17 +510,27 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 
      The only way to make these sockets usable in child processes is to
      duplicate them via WSADuplicateSocket/WSASocket calls.  This requires
-     some incredible amount of extra processing so we only do this on
+     to start the child process in SUSPENDED state so we only do this on
      affected systems.  If we recognize a non-inheritable socket, or if
      the XP1_IFS_HANDLES flag is not set in a call to WSADuplicateSocket,
      we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
      that socket. */
   DWORD flags;
+#if 0
+  /* Disable checking for IFS handle for now.  In theory, checking the fact
+     that the socket handle is not inheritable should be sufficient. */
   WSAPROTOCOL_INFOW wpi;
+#endif
   if (!GetHandleInformation ((HANDLE) soc, &flags)
-      || !(flags & HANDLE_FLAG_INHERIT)
+      || !(flags & HANDLE_FLAG_INHERIT))
+#if 0
       || WSADuplicateSocketW (soc, GetCurrentProcessId (), &wpi)
+      /* dwProviderReserved contains the actual SOCKET value of the duplicated
+	 socket.  Close it or suffer a handle leak.  Worse, one socket for each
+	 connection remains in CLOSE_WAIT state. */
+      || (closesocket ((SOCKET) wpi.dwProviderReserved), FALSE)
       || !(wpi.dwServiceFlags1 & XP1_IFS_HANDLES))
+#endif
     ((fhandler_socket *) fd)->init_fixup_before ();
 
   /* Raise default buffer sizes (instead of WinSock default 8K).

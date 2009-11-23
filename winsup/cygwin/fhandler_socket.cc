@@ -652,7 +652,7 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_pid)
   if (ret)
     set_winsock_errno ();
   else
-    debug_printf ("WSADuplicateSocket succeeded");
+    debug_printf ("WSADuplicateSocket succeeded (%lx)", prot_info_ptr->dwProviderReserved);
   return (int) ret;
 }
 
@@ -669,7 +669,8 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
     
   SOCKET new_sock = WSASocketW (FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO,
-				FROM_PROTOCOL_INFO, prot_info_ptr, 0, 0);
+				FROM_PROTOCOL_INFO, prot_info_ptr, 0,
+				WSA_FLAG_OVERLAPPED);
   if (new_sock == INVALID_SOCKET)
     {
       set_winsock_errno ();
@@ -681,7 +682,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
          socket is potentially inheritable again. */
       SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
       set_io_handle ((HANDLE) new_sock);
-      debug_printf ("WSASocket succeeded");
+      debug_printf ("WSASocket succeeded (%lx)", new_sock);
     }
 }
 

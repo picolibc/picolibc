@@ -1,5 +1,14 @@
 2009-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::fixup_before_fork_exec): Add
+	socket handle value to debug output.
+	(fhandler_socket::fixup_after_fork): Ditto.  Make new socket handle
+	OVERLAPPED, just as if it has been created with socket().
+	* net.cc (fdsock): Close duplicated socket and explain why.  Disable
+	the entire WSADuplicateSocket test for now and explain why.
+
+2009-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::set_close_on_exec): Only call
 	fhandler_base::set_close_on_exec for inheritable sockets.
 
