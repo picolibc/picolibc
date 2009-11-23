@@ -55,7 +55,7 @@ _DEFUN (_reclaim_reent, (ptr),
       if (_REENT_MP_FREELIST(ptr))
 	{
 	  int i;
-	  for (i = 0; i < 15 /* _Kmax */; i++) 
+	  for (i = 0; i < _Kmax; i++) 
 	    {
 	      struct _Bigint *thisone, *nextone;
 	

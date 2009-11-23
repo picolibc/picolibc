@@ -86,8 +86,12 @@
 #include <reent.h>
 #include "mprec.h"
 
-/* reent.c knows this value */
+/* This is defined in sys/reent.h as (sizeof (size_t) << 3) now, as in NetBSD.
+   The old value of 15 was wrong and made newlib vulnerable against buffer
+   overrun attacks (CVE-2009-0689), same as other implementations of gdtoa
+   based on BSD code.
 #define _Kmax 15
+*/
 
 _Bigint *
 _DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)

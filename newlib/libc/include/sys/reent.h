@@ -800,6 +800,11 @@ struct _reent
 
 #endif /* !_REENT_SMALL */
 
+/* This value is used in stdlib/misc.c.  reent/reent.c has to know it
+   as well to make sure the freelist is correctly free'd.  Therefore
+   we define it here, rather than in stdlib/misc.c, as before. */
+#define _Kmax (sizeof (size_t) << 3)
+
 /*
  * All references to struct _reent are via this pointer.
  * Internally, newlib routines that need to reference it should use _REENT.

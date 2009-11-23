@@ -1,3 +1,12 @@
+2009-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	Use NetBSD fix for CVE-2009-0689 security vulnerability.
+	* libc/include/sys/reent.h (_Kmax): Define here based on the sizeof
+	size_t, as in latest NetBSD.
+	* libc/reent/reent.c (_reclaim_reent): Use _Kmax rather than constant
+	value 15.
+	* libc/stdlib/mprec.c (_Kmax): Don't define here.  Explain why.
+
 2009-11-20  Nick Clifton  <nickc@redhat.com>
 
 	* libc/machine/rx/strncat.S (_strncat): Replace use of r6
