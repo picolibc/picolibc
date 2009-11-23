@@ -1,3 +1,8 @@
+2009-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::set_close_on_exec): Only call
+	fhandler_base::set_close_on_exec for inheritable sockets.
+
 2009-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (ro_u_dll): New R/O unicode string.

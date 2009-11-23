@@ -2034,8 +2034,13 @@ fhandler_socket::set_close_on_exec (bool val)
 {
   set_no_inheritance (wsock_mtx, val);
   set_no_inheritance (wsock_evt, val);
-  fhandler_base::set_close_on_exec (val);
-  debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+  if (need_fixup_before ())
+    {
+      close_on_exec (val);
+      debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+    }
+  else
+    fhandler_base::set_close_on_exec (val);
 }
 
 void
