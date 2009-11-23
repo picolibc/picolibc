@@ -25,6 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "symcat.h"
 #include "cgen/bitset.h"
 
+/* ??? IWBN to replace bfd in the name.  */
+#include "bfd_stdint.h"
+
 /* ??? This file requires bfd.h but only to get bfd_vma.
    Seems like an awful lot to require just to get such a fundamental type.
    Perhaps the definition of bfd_vma can be moved outside of bfd.h.
@@ -66,6 +69,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
    when an array of characters the value is in target byte order.  */
 
 typedef unsigned int CGEN_INSN_INT;
+typedef int64_t CGEN_INSN_LGSINT; /* large/long SINT */
+typedef uint64_t CGEN_INSN_LGUINT; /* large/long UINT */
+
 #if CGEN_INT_INSN_P
 typedef CGEN_INSN_INT CGEN_INSN_BYTES;
 typedef CGEN_INSN_INT *CGEN_INSN_BYTES_PTR;
