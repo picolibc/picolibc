@@ -1,3 +1,8 @@
+2009-11-25  DJ Delorie  <dj@redhat.com>
+
+	* rx/rx.ld: Place .sbss properly.
+	* rx/rx-sim.ld: Likewise.
+
 2009-10-26  DJ Delorie  <dj@redhat.com>
 
 	* configure.in: Add support for RX sub-directory.

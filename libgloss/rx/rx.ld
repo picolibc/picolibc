@@ -148,6 +148,7 @@ SECTIONS
     . = ALIGN(4);
     PROVIDE (__bssstart = .);
     *(.dynbss)
+    *(.sbss .sbss.*)
     *(.bss B B_2 B_1 .bss.* .gnu.linkonce.b.*)
     . = ALIGN(4);
     *(COMMON)
