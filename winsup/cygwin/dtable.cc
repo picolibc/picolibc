@@ -177,12 +177,16 @@ dtable::stdio_init ()
     {
       /* Since this code is not invoked for forked tasks, we don't have
 	 to worry about the close-on-exec flag here.  */
-      if (!DuplicateHandle (hMainProc, out, hMainProc, &err, 0, true,
-			    DUPLICATE_SAME_ACCESS))
+      /* CV 2009-11-26: Using hMainProc results in ERROR_INVALID_PARAMETER
+	 when trying to duplicate a console handle.  It only works using
+	 the GetCurrentProcess () pseudo handle for some unknown reason. */
+      if (!DuplicateHandle (GetCurrentProcess (), out,
+			    GetCurrentProcess (), &err,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	{
 	  /* If that fails, do this as a fall back.  */
 	  err = out;
-	  system_printf ("couldn't make stderr distinct from stdout");
+	  system_printf ("couldn't make stderr distinct from stdout, %E");
 	}
     }
 
