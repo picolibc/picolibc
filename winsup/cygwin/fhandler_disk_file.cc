@@ -576,8 +576,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
-  /* Using a side effect: get_file_attibutes checks for
-     directory. This is used, to set S_ISVTX, if needed.  */
+  /* Using a side effect: get_file_attributes checks for directory.
+     This is used, to set S_ISVTX, if needed.  */
   if (pc.isdir ())
     buf->st_mode = S_IFDIR;
   else if (pc.issymlink ())
@@ -643,7 +643,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		  || RtlEqualUnicodePathSuffix (path, &ro_u_com, TRUE))
 		pc.set_exec ();
 	    }
-	  /* No known sufix, check file header.  This catches binaries and
+	  /* No known suffix, check file header.  This catches binaries and
 	     shebang scripts. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
@@ -653,8 +653,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
 	      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (),
 					  NULL);
-	      if (NT_SUCCESS (NtOpenFile (&h, FILE_READ_DATA, &attr, &io,
-					  FILE_SHARE_VALID_FLAGS, 0)))
+	      if (NT_SUCCESS (NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
+					  &attr, &io, FILE_SHARE_VALID_FLAGS,
+					  FILE_SYNCHRONOUS_IO_NONALERT)))
 		{
 		  LARGE_INTEGER off = { QuadPart:0LL };
 		  char magic[3];

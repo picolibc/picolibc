@@ -1,3 +1,9 @@
+2009-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix typos in
+	comments.  Always open file synchronized when reading header bytes,
+	otherwise suffer stack corruption.
+
 2009-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::stdio_init): Use GetCurrentProcess() rather than
