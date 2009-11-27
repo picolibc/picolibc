@@ -1,3 +1,7 @@
+2009-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Fix typo in products.
+
 2009-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getfacl.c (print_version): Fix copyright.

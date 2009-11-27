@@ -1492,7 +1492,7 @@ dump_sysinfo ()
  /* 0x0000002e */ "",
  /* 0x0000002f */ " Starter N",
  /* 0x00000030 */ " Professional",
- /* 0x00000031 */ " Proffesional N",
+ /* 0x00000031 */ " Professional N",
  /* 0x00000032 */ "",
  /* 0x00000033 */ "",
  /* 0x00000034 */ "",
