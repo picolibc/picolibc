@@ -74,6 +74,7 @@
 #define ELFOSABI_OPENVMS     13	/* OpenVMS */
 #define ELFOSABI_NSK	     14	/* Hewlett-Packard Non-Stop Kernel */
 #define ELFOSABI_AROS	     15	/* AROS */
+#define ELFOSABI_FENIXOS     16 /* FenixOS */
 #define ELFOSABI_ARM	     97	/* ARM */
 #define ELFOSABI_STANDALONE 255	/* Standalone (embedded) application */
 
@@ -240,9 +241,9 @@
 #define EM_VIDEOCORE3	137	/* Broadcom VideoCore III processor */
 #define EM_LATTICEMICO32 138	/* RISC processor for Lattice FPGA architecture */
 #define EM_SE_C17	139	/* Seiko Epson C17 family */
-#define EM_res140	140	/* Reserved */
-#define EM_res141	141	/* Reserved */
-#define EM_res142	142	/* Reserved */
+#define EM_TI_C6000	140	/* Texas Instruments TMS320C6000 DSP family */
+#define EM_TI_C2000	141	/* Texas Instruments TMS320C2000 DSP family */
+#define EM_TI_C5500	142	/* Texas Instruments TMS320C55x DSP family */
 #define EM_res143	143	/* Reserved */
 #define EM_res144	144	/* Reserved */
 #define EM_res145	145	/* Reserved */
@@ -291,6 +292,7 @@
 #define EM_TILE64	187	/* Tilera TILE64 multicore architecture family */
 #define EM_TILEPRO	188	/* Tilera TILEPro multicore architecture family */
 #define EM_MICROBLAZE	189	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
+#define EM_CUDA		190	/* NVIDIA CUDA architecture */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
