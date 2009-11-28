@@ -1,3 +1,8 @@
+2009-11-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* mingwex/gdtoa/misc.c: Fix security vulnerability in gdtoa:
+ http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0689
+
 2009-11-13  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/io.h (_open_osfhandle): Correct definition.
