@@ -1,3 +1,7 @@
+2009-11-29 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.17.
+
 2009-11-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* mingwex/gdtoa/misc.c: Fix security vulnerability in gdtoa:
