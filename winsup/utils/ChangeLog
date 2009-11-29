@@ -1,3 +1,8 @@
+2009-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (getaclentry): Allow to delete default entries for the
+	owner and owner group.
+
 2009-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Fix typo in products.

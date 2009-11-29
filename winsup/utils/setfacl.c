@@ -120,9 +120,18 @@ getaclentry (action_t action, char *c, aclent_t *ace)
             return FALSE;
           *c2 = '\0';
         }
-      else if (action != Delete)
+      else if (action == Delete)
+	{
+	  /* Only default ugo entries are allowed to be removed, not the 
+	     standard ugo entries. */
+	  if (!(ace->a_type & ACL_DEFAULT))
+	    return FALSE;
+	}
+      else
         return FALSE;
-      if (c2 == c)
+      if (!c2 && !*c) /* Deleting a default ug entry is allowed. */
+	;
+      else if (c2 == c)
         {
           if (action == Delete)
             return FALSE;
@@ -149,7 +158,7 @@ getaclentry (action_t action, char *c, aclent_t *ace)
             return FALSE;
           ace->a_id = gr->gr_gid;
         }
-      if (c2 != c)
+      if (c2 && c2 != c)
         {
 	  if (ace->a_type & USER_OBJ)
 	    {
