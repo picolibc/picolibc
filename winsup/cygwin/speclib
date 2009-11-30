@@ -35,7 +35,7 @@ my $dllname;
 while (<$nm_fd>) {
     study;
     if (/ I _(.*)_dll_iname/o) {
-	$dllname ||= $1;
+	$dllname = $1;
     } else {
 	my ($file, $member, $symbol) = m%^([^:]*):([^:]*(?=:))?.* T (.*)%o;
 	next if !defined($symbol) || $symbol =~ $exclude_regex;

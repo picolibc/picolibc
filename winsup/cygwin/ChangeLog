@@ -1,3 +1,8 @@
+2009-11-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* speclib: Use last dll found since that's the real name of the cygwin
+	DLL.
+
 2009-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix typos in
