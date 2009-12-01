@@ -664,6 +664,8 @@ fhandler_registry::open (int flags, mode_t mode)
       else
 	{
 	  flags |= O_DIROPEN;
+	  /* Marking as nohandle allows to call dup. */
+	  nohandle (true);
 	  goto success;
 	}
     }
