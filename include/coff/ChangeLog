@@ -1,3 +1,9 @@
+2009-12-02  Jerker Bäck  <jerker.back@gmail.com>
+
+	PR binutils/11017
+	* i386lh (COFF_PAGE_SIZE): Define.
+	* x86_64.h (COFF_PAGE_SIZE): Define.
+
 2009-10-17  Arnold Metselaar  <arnold.metselaar@planet.nl>
 
 	* z80.h: Store alignment requirement in section header, to allow

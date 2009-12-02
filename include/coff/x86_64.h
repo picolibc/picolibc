@@ -1,5 +1,5 @@
 /* COFF information for AMD 64.
-   Copyright 2006 Free Software Foundation, Inc.
+   Copyright 2006, 2009 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -23,6 +23,8 @@
 #define INCLUDE_COMDAT_FIELDS_IN_AUXENT
 
 #include "coff/external.h"
+
+#define COFF_PAGE_SIZE	0x1000
 
 #define AMD64MAGIC	0x8664
 

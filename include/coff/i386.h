@@ -1,6 +1,6 @@
 /* coff information for Intel 386/486.
    
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,12 +20,14 @@
 #define INCLUDE_COMDAT_FIELDS_IN_AUXENT
 #include "coff/external.h"
 
+#define COFF_PAGE_SIZE	0x1000
+
 /* Bits for f_flags:
- 	F_RELFLG	relocation info stripped from file
- 	F_EXEC		file is executable (no unresolved external references)
- 	F_LNNO		line numbers stripped from file
- 	F_LSYMS		local symbols stripped from file
- 	F_AR32WR	file has byte ordering of an AR32WR machine (e.g. vax).  */
+ 	F_RELFLG	Relocation info stripped from file
+ 	F_EXEC		File is executable (no unresolved external references)
+ 	F_LNNO		Line numbers stripped from file
+ 	F_LSYMS		Local symbols stripped from file
+ 	F_AR32WR	File has byte ordering of an AR32WR machine (e.g. vax).  */
 
 #define F_RELFLG	(0x0001)
 #define F_EXEC		(0x0002)
@@ -36,7 +38,7 @@
 #define I386PTXMAGIC	0x154
 #define I386AIXMAGIC	0x175
 
-/* This is Lynx's all-platform magic number for executables. */
+/* This is Lynx's all-platform magic number for executables.  */
 
 #define LYNXCOFFMAGIC	0415
 
@@ -45,19 +47,19 @@
 		       && (x).f_magic != I386PTXMAGIC \
 		       && (x).f_magic != LYNXCOFFMAGIC)
 
-#define OMAGIC          0404    /* object files, eg as output */
-#define ZMAGIC          0413    /* demand load format, eg normal ld output */
-#define STMAGIC		0401	/* target shlib */
-#define SHMAGIC		0443	/* host   shlib */
+#define OMAGIC          0404    /* Object files, eg as output.  */
+#define ZMAGIC          0413    /* Demand load format, eg normal ld output.  */
+#define STMAGIC		0401	/* Target shlib.  */
+#define SHMAGIC		0443	/* Host shlib.  */
 
-/* define some NT default values */
+/* Define some NT default values.  */
 /*  #define NT_IMAGE_BASE        0x400000 moved to internal.h */
 #define NT_SECTION_ALIGNMENT 0x1000
 #define NT_FILE_ALIGNMENT    0x200
 #define NT_DEF_RESERVE       0x100000
 #define NT_DEF_COMMIT        0x1000
 
-/********************** RELOCATION DIRECTIVES **********************/
+/* Relocation directives.  */
 
 struct external_reloc
 {
