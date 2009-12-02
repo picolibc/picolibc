@@ -1613,8 +1613,10 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   for (DWORD i = 0; i < wsamsg->dwBufferCount;
        off >= wsamsg->lpBuffers[i].len && (++i, off = 0))
     {
-      /* FIXME?  Use the same technique in call to WSASendMsg? */
-      if (!use_sendmsg)
+      /* CV 2009-12-02: Don't split datagram messages. */
+      /* FIXME: Look for a way to split a message into the least number of
+		pieces to minimize the number of WsaSendTo calls. */
+      if (get_socket_type () == SOCK_STREAM)
       	{
 	  buf.buf = wsamsg->lpBuffers[i].buf + off;
 	  buf.len = wsamsg->lpBuffers[i].len - off;
@@ -1627,8 +1629,12 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	{
 	  if (use_sendmsg)
 	    res = WSASendMsg (get_socket (), wsamsg, flags, &ret, NULL, NULL);
-	  else
+	  else if (get_socket_type () == SOCK_STREAM)
 	    res = WSASendTo (get_socket (), &buf, 1, &ret, flags,
+			     wsamsg->name, wsamsg->namelen, NULL, NULL);
+	  else
+	    res = WSASendTo (get_socket (), wsamsg->lpBuffers,
+			     wsamsg->dwBufferCount, &ret, flags,
 			     wsamsg->name, wsamsg->namelen, NULL, NULL);
 	  if (res && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
 	    {
@@ -1644,7 +1650,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	{
 	  off += ret;
 	  sum += ret;
-	  if (use_sendmsg)
+	  if (get_socket_type () != SOCK_STREAM)
 	    break;
 	}
       else if (is_nonblocking () || err != WSAEWOULDBLOCK)

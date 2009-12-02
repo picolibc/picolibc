@@ -1,7 +1,7 @@
 /* syslog.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -274,6 +274,10 @@ vsyslog (int priority, const char *message, va_list ap)
 		    priority, _my_tls.locals.process_logmask);
       return;
     }
+
+  /* Set default facility to LOG_USER if not yet set via openlog. */
+  if (!_my_tls.locals.process_facility)
+    _my_tls.locals.process_facility = LOG_USER;
 
   /* Add default facility if not in the given priority. */
   if (!(priority & LOG_FACMASK))
