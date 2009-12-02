@@ -4,7 +4,9 @@
 You may wish to specify settings of several important environment
 variables that affect Cygwin's operation.  Some of these settings need
 to be in effect prior to launching the initial Cygwin session (before
-starting your bash shell, for instance), and are, consequentially, best
+starting your bash shell, for instance).  They should therefore be set
+in the Windows environment; all Windows environment variables are
+imported when Cygwin starts.  Such settings can be
 placed in a .bat file.  An initial file is named Cygwin.bat and is created
 in the Cygwin root directory that you specified during setup.  Note that
 the "Cygwin" option of the Start Menu points to Cygwin.bat.  Edit
@@ -64,6 +66,34 @@ directories to search for .dll files to load.  This environment variable
 is converted from Windows format to UNIX format when a Cygwin process
 first starts.  Most Cygwin applications do not make use of the
 <function>dlopen ()</function> call and do not need this variable.
+</para>
+
+<para>
+In addition to <envar>PATH</envar>, <envar>HOME</envar>,
+and <envar>LD_LIBRARY_PATH</envar>, there are three other environment
+variables which, if they exist in the Windows environment, are
+converted to UNIX format: <envar>TMPDIR</envar>, <envar>TMP</envar>,
+and <envar>TEMP</envar>.  The first is not set by default in the
+Windows environment but the other two are, and they point to the
+default Windows temporary directory.  If set, these variables will be
+used by some Cygwin applications, possibly with unexpected results.
+You may therefore want to unset them by adding the following two lines
+to your <filename>~/.bashrc</filename> file:
+
+<screen>
+unset TMP
+unset TEMP
+</screen>
+
+This is done in the default <filename>~/.bashrc</filename> file.
+Alternatively, you could set <envar>TMP</envar>
+and <envar>TEMP</envar> to point to <filename>/tmp</filename> or to
+any other temporary directory of your choice.  For example:
+
+<screen>
+export TMP=/tmp
+export TEMP=/tmp
+</screen>
 </para>
 
 </sect1>

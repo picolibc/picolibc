@@ -1,3 +1,8 @@
+2009-12-02  Ken Brown  <kbrown@cornell.edu>
+
+	* setup2.sgml (setup-env): Clarify that Windows environment gets
+	copied over.  Add paragraph about TMP, TEMP, and TMPDIR.
+
 2009-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* overview2.sgml (ov-hi-files): Remove reference to root directory when
