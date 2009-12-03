@@ -1,3 +1,9 @@
+2009-12-03  Craig Howland <howland@LGSInnovations.com>
+
+	* libc/stdlib/strtod.c:  Correct "NO_REENT" to "_REENT_ONLY".
+	* libc/stdlib/wcstod.c:  Ditto.
+	* libc/stdlib/dtoastub.c:  Ditto.
+
 2009-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	Use NetBSD fix for CVE-2009-0689 security vulnerability.

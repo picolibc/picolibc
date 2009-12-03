@@ -207,7 +207,7 @@ _DEFUN (_wcstof_r, (ptr, nptr, endptr),
   return (float)retval;
 }
 
-#ifndef NO_REENT
+#ifndef _REENT_ONLY
 
 double
 _DEFUN (wcstod, (nptr, endptr),

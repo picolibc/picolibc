@@ -1164,7 +1164,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	return sign ? -dval(rv) : dval(rv);
 }
 
-#ifndef NO_REENT
+#ifndef _REENT_ONLY
 
 double
 _DEFUN (strtod, (s00, se),
