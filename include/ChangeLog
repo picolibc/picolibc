@@ -1,3 +1,8 @@
+2009-12-03  David Daney  <ddaney@caviumnetworks.com>
+	    Adam Nemet  <adambnemet@gmail.com>
+
+	* elf/mips.h (E_MIPS_MACH_OCTEON2): New machine flag.
+
 2009-11-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* alloca-conf.h: Clarify comment.
