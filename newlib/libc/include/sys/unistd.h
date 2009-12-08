@@ -242,6 +242,10 @@ ssize_t _EXFUN(readlink, (const char *__path, char *__buf, size_t __buflen));
 ssize_t	_EXFUN(readlinkat, (int __dirfd1, const char *__path, char *__buf, size_t __buflen));
 #endif
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
+#if defined(__CYGWIN__)
+int	_EXFUN(symlinkat, (const char *, int, const char *));
+int	_EXFUN(unlinkat, (int, const char *, int));
+#endif
 
 #define	F_OK	0
 #define	R_OK	4

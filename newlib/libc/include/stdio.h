@@ -348,7 +348,6 @@ FILE *	_EXFUN(fmemopen, (void *, size_t, const char *));
 FILE *	_EXFUN(open_memstream, (char **, size_t *));
 #if defined (__CYGWIN__)
 int	_EXFUN(renameat, (int, const char *, int, const char *));
-int	_EXFUN(symlinkat, (const char *, int, const char *));
 #endif
 int	_EXFUN(vdprintf, (int, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));

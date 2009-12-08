@@ -1,3 +1,11 @@
+2009-12-08  Eric Blake  <ebb9@byu.net>
+
+	Fix some *at declarations.
+	* libc/include/stdio.h (symlinkat): Move this...
+	* libc/include/sys/_default_fcntl.h (unlinkat): ...and this...
+	* libc/include/sys/unistd.h (symlinkat, unlinkat): ...here, to
+	match POSIX.
+
 2009-12-03  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/stdlib/strtod.c:  Correct "NO_REENT" to "_REENT_ONLY".

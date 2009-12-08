@@ -181,7 +181,6 @@ extern int fcntl _PARAMS ((int, int, ...));
 #include <sys/time.h>
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
 extern int openat _PARAMS ((int, const char *, int, ...));
-extern int unlinkat _PARAMS ((int, const char *, int));
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
