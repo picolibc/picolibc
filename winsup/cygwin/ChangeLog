@@ -1,3 +1,10 @@
+2009-12-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_fifo.cc (fhandler_fifo::open): Avoid resetting errno after
+	it has been explicitly set.
+
+	* include/cygwin/version.h: Bump DLL minor version number to 2.
+
 2009-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 1.

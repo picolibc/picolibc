@@ -1,6 +1,6 @@
 /* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -95,6 +95,7 @@ fhandler_fifo::open (int flags, mode_t)
       char char_sa_buf[1024];
       LPSECURITY_ATTRIBUTES sa_buf =
 	sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+      bool do_seterrno = true;
 
       HANDLE h;
       bool nonblocking_write = !!((flags & (O_WRONLY | O_NONBLOCK)) == (O_WRONLY | O_NONBLOCK));
@@ -110,7 +111,10 @@ fhandler_fifo::open (int flags, mode_t)
 	  if (h != INVALID_HANDLE_VALUE)
 	    wait_state = fifo_ok;
 	  else if (nonblocking_write)
-	    set_errno (ENXIO);
+	    {
+	      set_errno (ENXIO);
+	      do_seterrno = false;
+	    }
 	  else if ((h = cnp (PIPE_ACCESS_DUPLEX, 1)) != INVALID_HANDLE_VALUE)
 	    {
 	      if ((dummy_client = open_nonserver (npname, low_flags, sa_buf))
@@ -130,7 +134,8 @@ fhandler_fifo::open (int flags, mode_t)
 	}
       if (h == INVALID_HANDLE_VALUE)
 	{
-	  __seterrno ();
+	  if (do_seterrno)
+	    __seterrno ();
 	  res = 0;
 	}
       else if (!setup_overlapped ())
