@@ -269,6 +269,9 @@ case "${host_cpu}" in
   x86_64)
 	machine_dir=x86_64
 	;;
+  xc16x*)
+    machine_dir=xc16x
+    ;;
   xstormy16)
 	machine_dir=xstormy16
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
@@ -779,7 +782,10 @@ case "${host}" in
   w65-*-*)
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
-	;;	
+	;;
+  xc16x-*)
+          syscall_dir=syscalls
+        ;;
   xscale-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"

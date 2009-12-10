@@ -29,6 +29,10 @@
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif
 
+#if defined (__xc16x__) || defined (__xc16xL__) || defined (__xc16xS__)
+#define __SMALL_BITFIELDS
+#endif
+
 #ifdef __W65__
 #define __SMALL_BITFIELDS
 #endif

@@ -118,6 +118,13 @@
 #define _DOUBLE_IS_32BITS
 #endif
 
+#if defined (__xc16x__) || defined (__xc16xL__) || defined (__xc16xS__)
+#define __IEEE_LITTLE_ENDIAN
+#define _FLOAT_ARG float
+#define _DOUBLE_IS_32BITS
+#endif
+
+
 #ifdef __sh__
 #ifdef __LITTLE_ENDIAN__
 #define __IEEE_LITTLE_ENDIAN

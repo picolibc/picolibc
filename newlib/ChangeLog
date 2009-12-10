@@ -1,3 +1,21 @@
+2009-12-10  Conny Marco Menebrocker  <c-m-m@gmx.de>
+
+	* configure.host: Add xc16x support.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/sys/config.h: Ditto.
+	* libc/machine/configure.in: Ditto.
+	* libc/machine/Makefile.in: Regenerated.
+	* libc/machine/aclocal.m4: Ditto.
+	* libc/machine/configure: Ditto.
+	* libc/machine/xc16x/Makefile.am: New file.
+	* libc/machine/xc16x/Makefile.in: Ditto.
+	* libc/machine/xc16x/aclocal.m4: Ditto.
+	* libc/machine/xc16x/configure: Ditto.
+	* libc/machine/xc16x/configure.in: Ditto.
+	* libc/machine/xc16x/putchar.c: Ditto.
+	* libc/machine/xc16x/puts.c: Ditto.
+	* libc/machine/xc16x/setjmp.S: Ditto.
+
 2009-12-08  Eric Blake  <ebb9@byu.net>
 
 	Fix some *at declarations.
