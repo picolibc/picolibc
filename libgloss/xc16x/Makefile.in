@@ -69,8 +69,8 @@ CRT0 = crt0.o crt0_cygmon.o crt0_redboot.o
 
 # Generic object files common to all targets.
 GENOBJS_NO_TRAP = close.o create.o crt0.o fstat.o getchar1.o \
-    isatty.o lseek.o mem-layout.o misc.o open.o putchar.o \
-    puts.o read.o sbrk.o syscalls.o write.o
+    isatty.o lseek.o mem-layout.o misc.o open.o \
+    read.o sbrk.o syscalls.o write.o
 GENOBJS = ${GENOBJS_NO_TRAP} trap_handle.o
 
 # Object files specific to particular targets.
