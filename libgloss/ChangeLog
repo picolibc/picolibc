@@ -1,3 +1,28 @@
+2009-12-10  Conny Marco Menebrocker <c-m-m@gmx.de>
+
+	* configure.in: Add xc16x support.
+	* configure: Regenerated.
+	* xc16x/Makefile.in: New file for xc16x port.
+	* xc16x/aclocal.m4: Ditto.
+	* xc16x/close.S: Ditto.
+	* xc16x/configure: Ditto.
+	* xc16x/configure.in: Ditto.
+	* xc16x/create.c: Ditto.
+	* xc16x/crt0.S: Ditto.
+	* xc16x/fstat.S: Ditto.
+	* xc16x/getchar1.c: Ditto.
+	* xc16x/isatty.c: Ditto.
+	* xc16x/lseek.c: Ditto.
+	* xc16x/mem-layout.c: Ditto.
+	* xc16x/misc.c: Ditto.
+	* xc16x/open.c: Ditto.
+	* xc16x/read.c: Ditto.
+	* xc16x/sbrk.c: Ditto.
+	* xc16x/syscalls.c: Ditto.
+	* xc16x/trap_handle.c: Ditto.
+	* xc16x/write.c: Ditto.
+	* xc16x/sys/syscall.h: Ditto.
+
 2009-11-25  DJ Delorie  <dj@redhat.com>
 
 	* rx/rx.ld: Place .sbss properly.
