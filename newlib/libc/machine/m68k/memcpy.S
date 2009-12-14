@@ -15,6 +15,12 @@
 
 #include "m68kasm.h"
 
+#if defined (__mcoldfire__) || defined (__mcpu32__) || defined (__mc68010__) || defined (__mc68020__) || defined (__mc68030__) || defined (__mc68040__) || defined (__mc68060__)
+# define MISALIGNED_OK 1
+#else
+# define MISALIGNED_OK 0
+#endif
+	
 	.text
 	.align	4
 
@@ -40,6 +46,15 @@ SYM(memcpy):
 	cmp.l	#8,d1		| if fewer than 8 bytes to transfer,
 	blo	.Lresidue	| do not optimise
 
+#if !MISALIGNED_OK
+	/* Goto .Lresidue if either dest or src is not 4-byte aligned */
+	move.l	a0,d0
+	and.l	#3,d0
+	bne	.Lresidue
+	move.l	a1,d0
+	and.l	#3,d0
+	bne	.Lresidue
+#else /* MISALIGNED_OK */
 	/* align dest */
 	move.l	a0,d0		| copy of dest
 	neg.l	d0
@@ -54,6 +69,7 @@ SYM(memcpy):
 	bcc	2f
 	move.w	(a1)+,(a0)+
 2:
+#endif /* !MISALIGNED_OK */
 
 	/* long word transfers */
 	move.l	d1,d0

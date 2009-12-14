@@ -1,3 +1,8 @@
+2009-12-14  Maxim Kuvyrkov <maxim@codesourcery.com>
+
+	* libc/machine/m68k/memcpy.S: Patch to support
+	boards which do not support unaligned read/write.
+
 2009-12-10  Conny Marco Menebrocker  <c-m-m@gmx.de>
 
 	* configure.host: Add xc16x support.
