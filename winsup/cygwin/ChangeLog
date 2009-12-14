@@ -1,3 +1,9 @@
+2009-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/getopt.c (getopt_internal): Set optreset according to optind
+	setting earlier.  Reevaluate POSIXLY_CORRECT if optreset is set to !0.
+	Handle a leading '-' in options independently of posixly_correct.
+
 2009-12-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_fifo.cc (fhandler_fifo::open): Avoid resetting errno after

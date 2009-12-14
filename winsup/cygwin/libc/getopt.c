@@ -304,24 +304,27 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 		return (-1);
 
 	/*
-	 * Disable GNU extensions if POSIXLY_CORRECT is set or options
-	 * string begins with a '+'.
-	 */
-	if (posixly_correct == -1)
-		posixly_correct = (getenv("POSIXLY_CORRECT") != NULL);
-	if (posixly_correct || *options == '+')
-		flags &= ~FLAG_PERMUTE;
-	else if (*options == '-')
-		flags |= FLAG_ALLARGS;
-	if (*options == '+' || *options == '-')
-		options++;
-
-	/*
 	 * XXX Some GNU programs (like cvs) set optind to 0 instead of
 	 * XXX using optreset.  Work around this braindamage.
 	 */
 	if (optind == 0)
 		optind = optreset = 1;
+
+	/*
+	 * Disable GNU extensions if POSIXLY_CORRECT is set or options
+	 * string begins with a '+'.
+	 *
+	 * CV, 2009-12-14: Check POSIXLY_CORRECT anew if optind == 0 or
+	 *                 optreset != 0 for GNU compatibility.
+	 */
+	if (posixly_correct == -1 || optreset != 0)
+		posixly_correct = (getenv("POSIXLY_CORRECT") != NULL);
+	if (*options == '-')
+		flags |= FLAG_ALLARGS;
+	else if (posixly_correct || *options == '+')
+		flags &= ~FLAG_PERMUTE;
+	if (*options == '+' || *options == '-')
+		options++;
 
 	optarg = NULL;
 	if (optreset)
