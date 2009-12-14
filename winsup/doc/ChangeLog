@@ -1,3 +1,7 @@
+2009-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-setup.xml (faq.setup.mirror): Fix URL to wget.
+
 2009-12-02  Ken Brown  <kbrown@cornell.edu>
 
 	* setup2.sgml (setup-env): Clarify that Windows environment gets

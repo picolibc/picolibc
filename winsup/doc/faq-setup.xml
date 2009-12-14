@@ -569,7 +569,7 @@ files, reinstall the "<literal>cygwin</literal>" package using Setup.
 
 <para>NO.  Cygwin Setup cannot do this for you.  Use a tool designed for
 this purpose.  See <ulink url="http://rsync.samba.org/">http://rsync.samba.org/</ulink>,
-<ulink url="http://wget.sunsite.dk/">http://wget.sunsite.dk/</ulink> for utilities that can do this for you.
+<ulink url="http://www.gnu.org/software/wget/">http://www.gnu.org/software/wget/</ulink> for utilities that can do this for you.
 For more information on setting up a custom Cygwin package server, see
 the Cygwin Setup homepage at
 <ulink url="http://sourceware.org/cygwin-apps/setup.html">http://sourceware.org/cygwin-apps/setup.html</ulink>.
