@@ -52,7 +52,7 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-putc.$(OBJEXT) \
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-puts.$(OBJEXT) \
 	lib_a-putchar.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -172,7 +172,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = setjmp.S putc.c putchar.c
+lib_a_SOURCES = setjmp.S puts.c putchar.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -247,11 +247,11 @@ lib_a-setjmp.obj: setjmp.S
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-lib_a-putc.o: putc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putc.o `test -f 'putc.c' || echo '$(srcdir)/'`putc.c
+lib_a-puts.o: puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-puts.o `test -f 'puts.c' || echo '$(srcdir)/'`puts.c
 
-lib_a-putc.obj: putc.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putc.obj `if test -f 'putc.c'; then $(CYGPATH_W) 'putc.c'; else $(CYGPATH_W) '$(srcdir)/putc.c'; fi`
+lib_a-puts.obj: puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-puts.obj `if test -f 'puts.c'; then $(CYGPATH_W) 'puts.c'; else $(CYGPATH_W) '$(srcdir)/puts.c'; fi`
 
 lib_a-putchar.o: putchar.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putchar.o `test -f 'putchar.c' || echo '$(srcdir)/'`putchar.c

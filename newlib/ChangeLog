@@ -1,3 +1,9 @@
+2009-12-15  Conny Marco Menebrocker  <c-m-m@gmx.de>
+
+	* libc/machine/xc16x/Makefile.am: Fix typo and refer
+	to puts.c instead of putc.c.
+	* libc/machine/xc16x/Makefile.in: Regenerated.
+
 2009-12-14  Maxim Kuvyrkov <maxim@codesourcery.com>
 
 	* libc/machine/m68k/memcpy.S: Patch to support
