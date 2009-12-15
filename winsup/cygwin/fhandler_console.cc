@@ -1136,7 +1136,10 @@ fhandler_console::char_command (char c)
 	     case 1:    /* bold */
 	       dev_state->intensity = INTENSITY_BOLD;
 	       break;
-	     case 4:
+	     case 2:	/* dim */
+	       dev_state->intensity = INTENSITY_DIM;
+	       break;
+	     case 4:	/* underlined */
 	       dev_state->underline = 1;
 	       break;
 	     case 5:    /* blink mode */
@@ -1148,17 +1151,21 @@ fhandler_console::char_command (char c)
 	     case 8:    /* invisible */
 	       dev_state->intensity = INTENSITY_INVISIBLE;
 	       break;
-	     case 9:    /* dim */
-	       dev_state->intensity = INTENSITY_DIM;
-	       break;
 	     case 10:   /* end alternate charset */
 	       dev_state->alternate_charset_active = false;
 	       break;
 	     case 11:   /* start alternate charset */
 	       dev_state->alternate_charset_active = true;
 	       break;
+	     case 22:
+	     case 28:
+	       dev_state->intensity = INTENSITY_NORMAL;
+	       break;
 	     case 24:
 	       dev_state->underline = false;
+	       break;
+	     case 25:
+	       dev_state->blink = false;
 	       break;
 	     case 27:
 	       dev_state->reverse = false;

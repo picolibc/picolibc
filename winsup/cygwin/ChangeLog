@@ -1,3 +1,9 @@
+2009-12-15  Thomas Wolff  <towo@towo.net>
+
+	* fhandler_console.cc (char_command): Fix code to select dim mode 
+	to 2 rather than 9.  Add entries for mode 22 (normal, not bold) 
+	28 (visible, not invisible), 25 (not blinking).
+
 2009-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/getopt.c (getopt_internal): Set optreset according to optind
