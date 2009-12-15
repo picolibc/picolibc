@@ -1,3 +1,11 @@
+2009-12-14  Doug Kwan  <dougkwan@google.com>
+
+	* bfdlink.h (struct bfd_link_callbacks): Rename function parameters
+	to avoid shadowed variable warnings.
+	* dis-asm.h (struct disassemble_info): Ditto.
+	(disassemble_init_for_target): Ditto.
+	(init_disassemble_info): Ditto.
+
 2009-12-03  David Daney  <ddaney@caviumnetworks.com>
 	    Adam Nemet  <adambnemet@gmail.com>
 
