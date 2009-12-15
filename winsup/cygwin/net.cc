@@ -693,11 +693,12 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	optname = convert_ws1_ip_optname (optname);
 
       /* On systems supporting "enhanced socket security (2K3 and later),
-	 the default behaviour of socket binding is equivalent to the POSIX
-	 behaviour with SO_REUSEADDR.  Setting SO_REUSEADDR would only result
-	 in wrong behaviour.  See also fhandler_socket::bind(). */
+	 the default behaviour of stream socket binding is equivalent to the
+	 POSIX behaviour with SO_REUSEADDR.  Setting SO_REUSEADDR would only
+	 result in wrong behaviour.  See also fhandler_socket::bind(). */
       if (level == SOL_SOCKET && optname == SO_REUSEADDR
-	  && wincap.has_enhanced_socket_security ())
+	  && wincap.has_enhanced_socket_security ()
+	  && fh->get_socket_type () == SOCK_STREAM)
 	res = 0;
       else
 	res = setsockopt (fh->get_socket (), level, optname,

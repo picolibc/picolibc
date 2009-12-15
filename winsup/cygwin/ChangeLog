@@ -1,3 +1,8 @@
+2009-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Only skip calling setsockopt(SO_REUSEADDR)
+	on stream sockets under systems supporting enhanced socket security.
+
 2009-12-15  Thomas Wolff  <towo@towo.net>
 
 	* fhandler_console.cc (char_command): Fix code to select dim mode 
