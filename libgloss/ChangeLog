@@ -1,3 +1,10 @@
+2009-12-16  Conny Marco Menebrocker <c-m-m@gmx.de>
+
+	* xc16x/Makefile.in: Remove extraneous stuff
+	brought in by copy.
+	* xc16x/configure.in: Ditto.
+	* xc16x/configure: Regenerated.
+
 2009-12-10  Conny Marco Menebrocker <c-m-m@gmx.de>
 
 	* configure.in: Add xc16x support.

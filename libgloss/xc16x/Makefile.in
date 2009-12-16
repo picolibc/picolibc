@@ -65,7 +65,7 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-CRT0 = crt0.o crt0_cygmon.o crt0_redboot.o
+CRT0 = crt0.o
 
 # Generic object files common to all targets.
 GENOBJS_NO_TRAP = close.o create.o crt0.o fstat.o getchar1.o \
@@ -93,7 +93,7 @@ BSP = @bsp_list@
 # it to link is a good test, so we ignore all the errors for now.
 #
 
-all: ${CRT0} test.o ${BSP}
+all: ${CRT0} ${BSP}
 
 #
 # here's where we build the board support packages for each target
@@ -107,16 +107,6 @@ libcygmon.a: $(CYGMONOBJS)
 	${AR} ${ARFLAGS} $@ $(CYGMONOBJS)
 	${RANLIB} $@
 
-
-# compile a fully linked binary. The -Wl,-T*.ld is for the linker
-# script. By using -Wl, the linker script is put on the proper place
-# in the comand line for ld, and all the symbols will get fully
-# resolved.
-
-test: ${CRT0} test.o
-	${CC} $(CFLAGS_FOR_TARGET) -L${srcdir} -L${objdir} \
-	test.o -o $@ $(NEWLIB_LDFLAGS) -Wl,-Teval.ld
-	@echo Done...
 
 doc:	
 
@@ -142,11 +132,8 @@ info:
 install-info:
 clean-info:
 
-test.o:	${srcdir}/test.c
-
 # these are for the BSPs
 crt0.o: ${srcdir}/crt0.S
-crt0_cygmon.o: ${srcdir}/crt0_cygmon.S
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@
