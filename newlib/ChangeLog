@@ -1,5 +1,9 @@
 2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
+	* libc/search/hcreate.c: Don't include <sys/queue.h> (Unused).
+
+2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+
 	* libc/sys/rtems/machine/_types.h: New (Derived from 
 	machine/_default_types.h).
         * libc/sys/rtems/crt0.c: Rework. Introduce macro RTEMS_STUB.

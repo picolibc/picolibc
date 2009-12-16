@@ -49,7 +49,6 @@ __RCSID("$NetBSD: hcreate.c,v 1.2 2001/02/19 21:26:04 ross Exp $");
 #endif
 
 #include <sys/types.h>
-#include <sys/queue.h>
 #include <errno.h>
 #include <search.h>
 #include <stdlib.h>
