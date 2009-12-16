@@ -1,3 +1,17 @@
+2009-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc: Throughout, convert all registry calls to wide char
+	calls and use string conversion according to current locale.
+	(longopts): Change "dword-le" to "dword-be", as was originally
+	intended.
+	(usage): Change usage accordingly.
+	(print_version): Simplify copyright dates in output.
+	(cmd_list): Handle REG_LINK like REG_SZ.
+	(cmd_get): Ditto.
+	(main): Call setlocale.
+	* utils.sgml (regtool): Fix options and add missing descriptions for
+	new features.
+
 2009-11-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (getaclentry): Allow to delete default entries for the

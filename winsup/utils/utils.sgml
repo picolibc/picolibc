@@ -1257,12 +1257,17 @@ Options for 'list' Action:
 
 Options for 'get' Action:
  -b, --binary         print REG_BINARY data as hex bytes
+ -n, --none           print data as stream of bytes as stored in registry
+ -x, --hex            print numerical data as hex numbers
 
 Options for 'set' Action:
  -b, --binary         set type to REG_BINARY (hex args or '-')
+ -D, --dword-be       set type to REG_DWORD_BIG_ENDIAN
  -e, --expand-string  set type to REG_EXPAND_SZ
  -i, --integer        set type to REG_DWORD
  -m, --multi-string   set type to REG_MULTI_SZ
+ -n, --none           set type to REG_NONE
+ -Q, --qword          set type to REG_QWORD
  -s, --string         set type to REG_SZ
 
 Options for 'set' and 'unset' Actions:
@@ -1343,23 +1348,35 @@ before you may remove it, but don't rely on this stopping you from
 accidentally removing too much.  
 </para>
 
+<para>The <literal>get</literal> action prints a value within a key.
+With the <literal>-b</literal> option, data is printed as hex bytes.
+<literal>-n</literal> allows to print the data as a typeless stream of
+bytes.  Integer values (REG_DWORD, REG_QWORD) are usually printed
+as decimal values.  The <literal>-x</literal> option allows to print
+the numbers as hexadecimal values.</para>
+
 <para>The <literal>set</literal> action sets a value within a key.
 <literal>-b</literal> means it's binary data (REG_BINARY).
 The binary values are specified as hex bytes in the argument list.
 If the argument is <literal>'-'</literal>, binary data is read
 from stdin instead.
+<literal>-d</literal> or <literal>-i</literal> means the value is a 32 bit
+integer value (REG_DWORD).
+<literal>-D</literal> means the value is a 32 bit integer value in
+Big Endian representation (REG_DWORD_BIG_ENDIAN).
+<literal>-Q</literal> means the value is a 64 bit integer value (REG_QWORD).
+<literal>-s</literal> means the value is a string (REG_SZ).
 <literal>-e</literal> means it's an expanding string (REG_EXPAND_SZ)
 that contains embedded environment variables.  
-<literal>-i</literal> means the value is an integer (REG_DWORD).
 <literal>-m</literal> means it's a multi-string (REG_MULTI_SZ).  
-<literal>-s</literal> means the value is a string (REG_SZ).
 If you don't specify one of these, <command>regtool</command> tries to
 guess the type based on the value you give.  If it looks like a
-number, it's a DWORD.  If it starts with a percent, it's an expanding
+number, it's a DWORD, unless it's value doesn't fit into 32 bit, in which
+case it's a QWORD.  If it starts with a percent, it's an expanding
 string.  If you give multiple values, it's a multi-string.  Else, it's
-a regular string.
-The <literal>unset</literal> action removes a value from a key.
-</para>
+a regular string.</para>
+
+<para>The <literal>unset</literal> action removes a value from a key.</para>
 
 <para>The <literal>load</literal> action adds a new subkey and loads
 the contents of a registry hive into it.
