@@ -15,10 +15,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -47,7 +43,6 @@
 #include <sys/config.h>
 #include <machine/endian.h>
 
-# define HZ (60)
 # define PATHSIZE (1024)
 
 /* end of from newlib's <sys/param.h> */
@@ -86,13 +81,13 @@
 #define MAXHOSTNAMELEN	256		/* max hostname size */
 
 /* More types and definitions used throughout the kernel. */
-#ifdef KERNEL
+#if defined(KERNEL) || defined(_KERNEL)
 #include <sys/cdefs.h>
 #include <sys/errno.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <sys/ucred.h>
 #include <sys/uio.h>
+#include <sys/priority.h>
 
 #ifndef FALSE
 #define	FALSE	0
@@ -109,23 +104,6 @@
 #include <machine/param.h>
 #include <machine/limits.h>
 
-/*
- * Priorities.  Note that with 32 run queues, differences less than 4 are
- * insignificant.
- */
-#define	PSWP	0
-#define	PVM	4
-#define	PINOD	8
-#define	PRIBIO	16
-#define	PVFS	20
-#define	PZERO	22		/* No longer magic, shouldn't be here.  XXX */
-#define	PSOCK	24
-#define	PWAIT	32
-#define	PLOCK	36
-#define	PPAUSE	40
-#define	PUSER	50
-#define	MAXPRI	127		/* Priorities range from 0 through MAXPRI. */
-
 #define	PRIMASK	0x0ff
 #define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
 
@@ -135,15 +113,6 @@
 
 #define	CMASK	022		/* default file mask: S_IWGRP|S_IWOTH */
 #define	NODEV	(dev_t)(-1)	/* non-existent device */
-
-/*
- * Clustering of hardware pages on machines with ridiculously small
- * page sizes is done here.  The paging subsystem deals with units of
- * CLSIZE pte's describing PAGE_SIZE (from machine/machparam.h) pages each.
- */
-#if 0
-#define	CLBYTES		(CLSIZE*PAGE_SIZE)
-#endif
 
 #define	CBLOCK	128		/* Clist block size, must be a power of 2. */
 #define CBQSIZE	(CBLOCK/NBBY)	/* Quote bytes/cblock - can do better. */
@@ -200,7 +169,7 @@
 #define powerof2(x)	((((x)-1)&(x))==0)
 
 /* Macros for min/max. */
-#ifndef KERNEL
+#if !(defined(KERNEL) || defined(_KERNEL))
 #define	MIN(a,b) (((a)<(b))?(a):(b))
 #define	MAX(a,b) (((a)>(b))?(a):(b))
 #endif

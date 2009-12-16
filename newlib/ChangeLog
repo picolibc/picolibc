@@ -1,3 +1,17 @@
+2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+
+	* libc/sys/rtems/machine/_types.h: New (Derived from 
+	machine/_default_types.h).
+        * libc/sys/rtems/crt0.c: Rework. Introduce macro RTEMS_STUB.
+	* libc/sys/rtems/sys/param.h:
+        Update copyright notice from FreeBSD.
+        Remove HZ.
+        Add #include <sys/priority.h>
+        Remove priority handling (moved to sys/priority.h).
+        Remove CLBYTES (Unused, abandoned in BSD).
+	* libc/sys/rtems/sys/queue.h: Update copyright (from FreeBSD).
+        Remove CIRCLEQ_*.
+
 2009-12-15  Conny Marco Menebrocker  <c-m-m@gmx.de>
 
 	* libc/machine/xc16x/Makefile.am: Fix typo and refer
