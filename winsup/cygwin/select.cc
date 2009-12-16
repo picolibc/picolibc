@@ -823,9 +823,9 @@ peek_console (select_record *me, bool)
 	else
 	  {
 	    if (irec.EventType == MOUSE_EVENT
-		&& fh->mouse_aware ()
-		&& (irec.Event.MouseEvent.dwEventFlags == 0
-		    || irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+		&& fh->mouse_aware (irec.Event.MouseEvent))
+		return me->read_ready = true;
+	    if (irec.EventType == FOCUS_EVENT && fh->focus_aware ())
 		return me->read_ready = true;
 	  }
 

@@ -936,11 +936,15 @@ class dev_console
     } info;
 
   COORD dwLastCursorPosition;
-  DWORD dwLastButtonState;
+  COORD dwMousePosition;	/* scroll-adjusted coord of mouse event */
+  COORD dwLastMousePosition;	/* scroll-adjusted coord of previous mouse event */
+  DWORD dwLastButtonState;	/* (not noting mouse wheel events) */
+  int last_button_code;		/* transformed mouse report button code */
   int nModifiers;
 
   bool insert_mode;
-  bool use_mouse;
+  int use_mouse;
+  bool use_focus;
   bool raw_win32_keyboard_mode;
 
   inline UINT get_console_cp ();
@@ -1012,7 +1016,8 @@ class fhandler_console: public fhandler_termios
 
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
-  bool mouse_aware () {return dev_state->use_mouse;}
+  bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
+  bool focus_aware () {return dev_state->use_focus;}
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);

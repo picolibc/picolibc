@@ -1,3 +1,23 @@
+2009-12-16  Thomas Wolff  <towo@towo.net>
+
+	* fhandler_console.cc (read): Detect and handle mouse wheel scrolling
+	events (for completion of mouse reporting mode 1000) and mouse
+	movement events (for additional mouse reporting modes 1002 and 1003).
+	Use mouse_aware() as a guard and only condition for mouse
+	reporting in order to enforce consistence of read() and select().
+	Add focus reports (for additional focus reporting mode 1004).
+	(mouse_aware): Enable detection of additional mouse events for select().
+	Tune function to precisely match actual reporting criteria.
+	Move adjustment of mouse position (by window scroll offset)
+	here to avoid duplicate code.
+	(char_command): Initialization of enhanced mouse reporting modes.
+	Initialization of focus reporting mode.
+	* fhandler.h (use_mouse): Change flag (bool->int) to indicate
+	additional mouse modes. Add flag to indicate focus reporting.
+	(mouse_aware): Move enhanced function into fhandler_console.cc.
+	* select.cc (peek_console): Use modified mouse_aware() for more
+	general detection of mouse events. Also check for focus reports.
+
 2009-12-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* registry.cc (cygnus_class): Remove.
