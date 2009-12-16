@@ -1,3 +1,8 @@
+2009-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* registry.cc (cygnus_class): Remove.
+	(reg_key::build_reg): Don't set class when creating key.
+
 2009-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_setsockopt): Only skip calling setsockopt(SO_REUSEADDR)

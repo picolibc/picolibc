@@ -18,7 +18,6 @@ details. */
 #include "cygheap.h"
 #include "tls_pbuf.h"
 #include <wchar.h>
-static const char cygnus_class[] = "cygnus";
 
 reg_key::reg_key (HKEY top, REGSAM access, ...): _disposition (0)
 {
@@ -84,7 +83,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
       int res = RegCreateKeyExA (r,
 				 name,
 				 0,
-				 (char *) cygnus_class,
+				 NULL,
 				 REG_OPTION_NON_VOLATILE,
 				 access,
 				 &sec_none_nih,
