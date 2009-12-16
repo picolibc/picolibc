@@ -127,9 +127,7 @@ extern __IMPORT int sys_nerr;
 #define ENAMETOOLONG 91	/* File or path name too long */
 #define ELOOP 92	/* Too many symbolic links */
 #define EOPNOTSUPP 95	/* Operation not supported on transport endpoint */
-#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define EPFNOSUPPORT 96 /* Protocol family not supported */
-#endif
 #define ECONNRESET 104  /* Connection reset by peer */
 #define ENOBUFS 105	/* No buffer space available */
 #define EAFNOSUPPORT 106 /* Address family not supported by protocol family */
@@ -145,9 +143,7 @@ extern __IMPORT int sys_nerr;
 #define ENETUNREACH 114		/* Network is unreachable */
 #define ENETDOWN 115		/* Network interface is not configured */
 #define ETIMEDOUT 116		/* Connection timed out */
-#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define EHOSTDOWN 117		/* Host is down */
-#endif
 #define EHOSTUNREACH 118	/* Host is unreachable */
 #define EINPROGRESS 119		/* Connection already in progress */
 #define EALREADY 120		/* Socket already connected */
@@ -161,8 +157,8 @@ extern __IMPORT int sys_nerr;
 #define ENETRESET 126
 #define EISCONN 127		/* Socket is already connected */
 #define ENOTCONN 128		/* Socket is not connected */
-#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define ETOOMANYREFS 129
+#ifdef __LINUX_ERRNO_EXTENSIONS__
 #define EPROCLIM 130
 #define EUSERS 131
 #endif

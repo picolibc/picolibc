@@ -1,3 +1,9 @@
+2009-12-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/errno.h: Move EHOSTDOWN, EPFNOSUPPORT,
+	and ETOOMANYREFS into general list as they are referenced
+	by OpenGroup and needed by RTEMS.
+
 2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* libc/search/hcreate.c: Don't include <sys/queue.h> (Unused).
