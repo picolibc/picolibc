@@ -33,21 +33,10 @@ extern "C" {
 #include <time.h>
 #include <sys/sched.h>
 
-/* Register Fork Handlers, P1003.1c/Draft 10, P1003.1c/Draft 10, p. 27
-  
-    If an OS does not support processes, then it falls under this provision
-    and may not provide pthread_atfork():
-  
-    "Either the implementation shall support the pthread_atfork() function
-     as described above or the pthread_atfork() funciton shall not be 
-     provided."
-  
-    NOTE: RTEMS does not provide pthread_atfork().  */
-
-#if !defined(__rtems__) && !defined(__XMK__)
-#warning "Add pthread_atfork() prototype"
-#endif
-
+/* Register Fork Handlers */
+int	_EXFUN(pthread_atfork,(void (*prepare)(void), void (*parent)(void),
+                   void (*child)(void)));
+          
 /* Mutex Initialization Attributes, P1003.1c/Draft 10, p. 81 */
 
 int	_EXFUN(pthread_mutexattr_init, (pthread_mutexattr_t *__attr));
@@ -345,6 +334,7 @@ int	_EXFUN(pthread_rwlock_rdlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_timedrdlock,
         (pthread_rwlock_t *__rwlock, _CONST struct timespec *__abstime));
+int	_EXFUN(pthread_rwlock_unlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_wrlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_trywrlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_timedwrlock,

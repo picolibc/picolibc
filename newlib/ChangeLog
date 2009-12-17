@@ -1,3 +1,10 @@
+2009-12-17  Ralf Corsepius <ralf.corsepius@rtems.org>
+
+	* libc/include/pthread.h: Add pthread_atfork, pthread_rwlock_unlock 
+	* libc/include/sys/stat.h: Use struct timespec st_*tim,
+	blksize_t st_blksize, blkcnt_t st_blocks.
+	Add st_*time compatibility macros.
+
 2009-12-16  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/sys/rtems/machine/param.h: Only use sizeof(double) -1
