@@ -27,7 +27,7 @@ _BEGIN_STD_C
 
 /* necv70 was 9 as well. */
 
-#ifdef __mc68000__
+#if defined(__m68k__) || defined(__mc68000__)
 /*
  * onsstack,sigmask,sp,pc,psl,d2-d7,a2-a6,
  * fp2-fp7	for 68881.
