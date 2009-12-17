@@ -182,12 +182,12 @@ struct __sFILE {
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
 					   char *, int));
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
 					    const char *, int));
-  _fpos_t _EXFUN((*_seek),(struct _reent *, _PTR, _fpos_t, int));
-  int _EXFUN((*_close),(struct _reent *, _PTR));
+  _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
+  int _EXFNPTR(_close, (struct _reent *, _PTR));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -237,12 +237,12 @@ struct __sFILE64 {
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_read),(struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
 					   char *, int));
-  _READ_WRITE_RETURN_TYPE _EXFUN((*_write),(struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
 					    const char *, int));
-  _fpos_t _EXFUN((*_seek),(struct _reent *, _PTR, _fpos_t, int));
-  int _EXFUN((*_close),(struct _reent *, _PTR));
+  _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
+  int _EXFNPTR(_close, (struct _reent *, _PTR));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -261,7 +261,7 @@ struct __sFILE64 {
   int   _flags2;        /* for future use */
 
   _off64_t _offset;     /* current lseek offset */
-  _fpos64_t _EXFUN((*_seek64),(struct _reent *, _PTR, _fpos64_t, int));
+  _fpos64_t _EXFNPTR(_seek64, (struct _reent *, _PTR, _fpos64_t, int));
 
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */
@@ -376,7 +376,7 @@ struct _reent
 
   struct _mprec *_mp;
 
-  void _EXFUN((*__cleanup),(struct _reent *));
+  void _EXFNPTR(__cleanup, (struct _reent *));
 
   int _gamma_signgam;
 
@@ -593,7 +593,7 @@ struct _reent
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 
-  void _EXFUN((*__cleanup),(struct _reent *));
+  void _EXFNPTR(__cleanup, (struct _reent *));
 
   /* used by mprec routines */
   struct _Bigint *_result;

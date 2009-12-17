@@ -60,7 +60,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int
 _DEFUN (atexit,
 	(fn),
-	_VOID _EXFUN ((*fn), (_VOID)))
+	_VOID _EXFNPTR(fn, (_VOID)))
 {
   return __register_exitproc (__et_atexit, fn, NULL, NULL);
 }

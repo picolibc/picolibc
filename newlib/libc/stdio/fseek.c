@@ -123,7 +123,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
        long offset        _AND
        int whence)
 {
-  _fpos_t _EXFUN((*seekfn), (struct _reent *, _PTR, _fpos_t, int));
+  _fpos_t _EXFNPTR(seekfn, (struct _reent *, _PTR, _fpos_t, int));
   _fpos_t target;
   _fpos_t curoff = 0;
   size_t n;

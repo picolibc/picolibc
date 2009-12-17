@@ -1,3 +1,18 @@
+2009-12-17  Jerker Back  <jerker.back@gmail.com>
+
+	* libc/include/_ansi.h: Add new _EXFNPTR macro for using with
+	function pointer arguments.
+	* libc/iconv/lib/conv.h: Use _EXFNPTR rather than _EXPARM macro.
+	* libc/iconv/lib/ucsconv.h: Ditto.
+	* libc/include/stdlib.h: Use new _EXFNPTR macro for function pointers.
+	* libc/include/sys/reent.h: Ditto.
+	* libc/include/sys/unistd.h: Ditto.
+	* libc/search/bsearch.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio64/fseeko64.c: Ditto.
+	* libc/stdlib/atexit.c: Ditto.
+	* libc/stdlib/on_exit.c: Ditto.
+
 2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/machine/ieeefp.h: Rework __IEEE_*_ENDIAN handling.

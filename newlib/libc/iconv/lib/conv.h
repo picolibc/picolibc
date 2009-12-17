@@ -63,7 +63,7 @@ typedef struct
    *   Pointer to conversion-specific data if success. In case of error
    *   returns NULL and sets current thread's/process's errno.
    */
-  _VOID_PTR _EXPARM(open, (struct _reent *rptr,
+  _VOID_PTR _EXFNPTR(open, (struct _reent *rptr,
                           _CONST char *to,
                           _CONST char *from));
   
@@ -81,7 +81,7 @@ typedef struct
    *   When successful, returns (size_t)0. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv_open()).
    */
-  size_t _EXPARM(close, (struct _reent *rptr,
+  size_t _EXFNPTR(close, (struct _reent *rptr,
                         _VOID_PTR data));
   
   /* convert - perform encoding conversion.
@@ -114,7 +114,7 @@ typedef struct
    *   Reversible conversions are not counted. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv()).
    */
-  size_t _EXPARM(convert, (struct _reent *rptr,
+  size_t _EXFNPTR(convert, (struct _reent *rptr,
                            _VOID_PTR data,
                            _CONST unsigned char **inbuf,
                            size_t *inbytesleft,
@@ -135,7 +135,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  _VOID _EXPARM(get_state, (_VOID_PTR data,
+  _VOID _EXFNPTR(get_state, (_VOID_PTR data,
                            mbstate_t *state,
                            int direction));
 
@@ -154,7 +154,7 @@ typedef struct
    *   "to" encoding is set.
    *   Returns 0 if '*state' object has right format, -1 else.
    */
-  int _EXPARM(set_state, (_VOID_PTR data,
+  int _EXFNPTR(set_state, (_VOID_PTR data,
                          mbstate_t *state,
                          int direction));
   
@@ -170,7 +170,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXPARM(get_mb_cur_max, (_VOID_PTR data,
+  int _EXFNPTR(get_mb_cur_max, (_VOID_PTR data,
                               int direction));
   
   /*
@@ -185,7 +185,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXPARM(is_stateful, (_VOID_PTR data,
+  int _EXFNPTR(is_stateful, (_VOID_PTR data,
                            int direction));
   
 } iconv_conversion_handlers_t;

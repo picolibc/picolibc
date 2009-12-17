@@ -69,7 +69,7 @@ _DEFUN (bsearch, (key, base, nmemb, size, compar),
 	_CONST _PTR base _AND
 	size_t nmemb _AND
 	size_t size _AND
-	int _EXFUN ((*compar), (const _PTR, const _PTR)))
+	int _EXFNPTR(compar, (const _PTR, const _PTR)))
 {
   _PTR current;
   size_t lower = 0;

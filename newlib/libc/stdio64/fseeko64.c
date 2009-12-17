@@ -104,7 +104,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
      _off64_t offset _AND
      int whence)
 {
-  _fpos64_t _EXFUN ((*seekfn), (struct _reent *, void *, _fpos64_t, int));
+  _fpos64_t _EXFNPTR(seekfn, (struct _reent *, void *, _fpos64_t, int));
   _fpos64_t target, curoff;
   size_t n;
 

@@ -30,8 +30,8 @@ int     _EXFUN(close, (int __fildes ));
 #if defined(__CYGWIN__)
 size_t	_EXFUN(confstr, (int __name, char *__buf, size_t __len));
 #endif
-char    _EXFUN(*ctermid, (char *__s ));
-char    _EXFUN(*cuserid, (char *__s ));
+char *  _EXFUN(ctermid, (char *__s ));
+char *  _EXFUN(cuserid, (char *__s ));
 #if defined(__CYGWIN__)
 int	_EXFUN(daemon, (int nochdir, int noclose));
 #endif
@@ -67,7 +67,7 @@ pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
 int     _EXFUN(fdatasync, (int __fd));
-char    _EXFUN(*getcwd, (char *__buf, size_t __size ));
+char *  _EXFUN(getcwd, (char *__buf, size_t __size ));
 #if defined(__CYGWIN__)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
 #endif
@@ -80,11 +80,11 @@ int     _EXFUN(getgroups, (int __gidsetsize, gid_t __grouplist[] ));
 #if defined(__CYGWIN__)
 long    _EXFUN(gethostid, (void));
 #endif
-char    _EXFUN(*getlogin, (void ));
+char *  _EXFUN(getlogin, (void ));
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
 int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
-char 	_EXFUN(*getpass, (const char *__prompt));
+char *  _EXFUN(getpass, (const char *__prompt));
 int	_EXFUN(getpagesize, (void));
 #if defined(__CYGWIN__)
 int    _EXFUN(getpeereid, (int, uid_t *, gid_t *));
@@ -101,7 +101,7 @@ uid_t   _EXFUN(getuid, (void ));
 #endif
 #ifdef __CYGWIN__
 char *	_EXFUN(getusershell, (void));
-char    _EXFUN(*getwd, (char *__buf ));
+char *  _EXFUN(getwd, (char *__buf ));
 int	_EXFUN(iruserok, (unsigned long raddr, int superuser, const char *ruser, const char *luser));
 #endif
 int     _EXFUN(isatty, (int __fildes ));
@@ -169,7 +169,7 @@ void    _EXFUN(swab, (const void *, void *, ssize_t));
 long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
-char    _EXFUN(*ttyname, (int __fildes ));
+char *  _EXFUN(ttyname, (int __fildes ));
 #if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(ttyname_r, (int, char *, size_t)); 
 #endif

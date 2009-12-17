@@ -65,7 +65,7 @@ Supporting OS subroutines required: None
 int
 _DEFUN (on_exit,
 	(fn, arg),
-	_VOID _EXFUN ((*fn), (int, _PTR)) _AND
+	_VOID _EXFNPTR(fn, (int, _PTR)) _AND
         _PTR arg)
 {
   return __register_exitproc (__et_onexit, (void (*)(void)) fn, arg, NULL);
