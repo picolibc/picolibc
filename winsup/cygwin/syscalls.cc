@@ -185,61 +185,75 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
     goto out;
   /* Initialize recycler path. */
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
-  if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
-    RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
-  else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
-    RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
-  else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
-    RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
-  else
-    goto out;
-  /* Is the file a subdir of the recycler? */
-  RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
-  if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
-    goto out;
-  /* Is fname the recycler?  Temporarily hide trailing backslash. */
-  recycler.Length -= sizeof (WCHAR);
-  if (RtlEqualUnicodeString (&fname, &recycler, TRUE))
-    goto out;
-
-  /* Create root dir path from file name information. */
-  RtlSplitUnicodePath (&fname, &fname, NULL);
-  RtlSplitUnicodePath (pc.get_nt_native_path (), &root, NULL);
-  root.Length -= fname.Length - sizeof (WCHAR);
-
-  /* Open root directory.  All recycler bin ops are caseinsensitive. */
-  InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  status = NtOpenFile (&rootdir, FILE_TRAVERSE, &attr, &io,
-		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-  if (!NT_SUCCESS (status))
+  if (!pc.isremote ())
     {
-      debug_printf ("NtOpenFile (%S) failed, %08x", &root, status);
-      goto out;
-    }
+      if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
+	RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
+      else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
+	RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
+      else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
+	RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
+      else
+	goto out;
+      /* Is the file a subdir of the recycler? */
+      RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
+      if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
+	goto out;
+      /* Is fname the recycler?  Temporarily hide trailing backslash. */
+      recycler.Length -= sizeof (WCHAR);
+      if (RtlEqualUnicodeString (&fname, &recycler, TRUE))
+	goto out;
 
-  /* Strip leading backslash */
-  ++recycler.Buffer;
-  recycler.Length -= sizeof (WCHAR);
-  /* Store length of recycler base dir, should it be necessary to create it. */
-  recycler_base_len = recycler.Length;
-  /* On NTFS the recycler dir contains user specific subdirs, which are the
-     actual recycle bins per user.  The name if this dir is the string
-     representation of the user SID. */
-  if (pc.fs_is_ntfs ())
-    {
-      UNICODE_STRING sid;
-      WCHAR sidbuf[128];
-      /* Unhide trailing backslash. */
-      recycler.Length += sizeof (WCHAR);
-      RtlInitEmptyUnicodeString (&sid, sidbuf, sizeof sidbuf);
-      /* In contrast to what MSDN claims, this function is already available
-	 since NT4. */
-      RtlConvertSidToUnicodeString (&sid, cygheap->user.sid (), FALSE);
-      RtlAppendUnicodeStringToString (&recycler, &sid);
-      recycler_user_len = recycler.Length;
+      /* Create root dir path from file name information. */
+      RtlSplitUnicodePath (&fname, &fname, NULL);
+      RtlSplitUnicodePath (pc.get_nt_native_path (), &root, NULL);
+      root.Length -= fname.Length - sizeof (WCHAR);
+
+      /* Open root directory.  All recycler bin ops are caseinsensitive. */
+      InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE,
+				  NULL, NULL);
+      status = NtOpenFile (&rootdir, FILE_TRAVERSE, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtOpenFile (%S) failed, %08x", &root, status);
+	  goto out;
+	}
+
+      /* Strip leading backslash */
+      ++recycler.Buffer;
+      recycler.Length -= sizeof (WCHAR);
+      /* Store length of recycler base dir, if it's necessary to create it. */
+      recycler_base_len = recycler.Length;
+      /* On NTFS the recycler dir contains user specific subdirs, which are the
+	 actual recycle bins per user.  The name if this dir is the string
+	 representation of the user SID. */
+      if (pc.fs_is_ntfs ())
+	{
+	  UNICODE_STRING sid;
+	  WCHAR sidbuf[128];
+	  /* Unhide trailing backslash. */
+	  recycler.Length += sizeof (WCHAR);
+	  RtlInitEmptyUnicodeString (&sid, sidbuf, sizeof sidbuf);
+	  /* In contrast to what MSDN claims, this function is already available
+	     since NT4. */
+	  RtlConvertSidToUnicodeString (&sid, cygheap->user.sid (), FALSE);
+	  RtlAppendUnicodeStringToString (&recycler, &sid);
+	  recycler_user_len = recycler.Length;
+	}
+      RtlAppendUnicodeToString (&recycler, L"\\");
     }
-  /* Create hopefully unique filename. */
-  RtlAppendUnicodeToString (&recycler, L"\\cyg");
+  /* Create hopefully unique filename.
+     Since we have to stick to the current directory on remote shares, make
+     the new filename at least very unlikely to match by accident.  It starts
+     with ".cyg", with "cyg" transposed into the Unicode low surrogate area
+     starting at U+dc00.  Use plain ASCII chars on filesystems not supporting
+     Unicode.  The rest of the filename is the inode number in hex encoding
+     and a hash of the full NT path in hex.  The combination allows to remove
+     multiple hardlinks to the same file. */
+  RtlAppendUnicodeToString (&recycler,
+			    pc.fs_flags () & FILE_UNICODE_ON_DISK
+			    ? L".\xdc63\xdc79\xdc67" : L".cyg");
   pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
   status = NtQueryInformationFile (fh, &io, pfii, 65536,
 				   FileInternalInformation);
@@ -250,14 +264,16 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
       goto out;
     }
   RtlInt64ToHexUnicodeString (pfii->FileId.QuadPart, &recycler, TRUE);
+  RtlInt64ToHexUnicodeString (hash_path_name (0, pc.get_nt_native_path ()),
+			      &recycler, TRUE);
   /* Shoot. */
   pfri = (PFILE_RENAME_INFORMATION) infobuf;
   pfri->ReplaceIfExists = TRUE;
-  pfri->RootDirectory = rootdir;
+  pfri->RootDirectory = pc.isremote () ? NULL : rootdir;
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
   status = NtSetInformationFile (fh, &io, pfri, 65536, FileRenameInformation);
-  if (status == STATUS_OBJECT_PATH_NOT_FOUND)
+  if (status == STATUS_OBJECT_PATH_NOT_FOUND && !pc.isremote ())
     {
       /* Ok, so the recycler and/or the recycler/SID directory don't exist.
 	 First reopen root dir with permission to create subdirs. */
@@ -503,23 +519,12 @@ unlink_nt (path_conv &pc)
 	 generated all the time.  It looks like wrong file state information
 	 is stored within the NFS client, for no apparent reason, which never
 	 times out.  Opening the file with FILE_SHARE_VALID_FLAGS will work,
-	 though, and it is then possible to delete the file quite normally. */
+	 though, and it is then possible to delete the file quite normally.
 
-      /* The recycle bin is only accessible locally.  For in-use remote
-	 files we drop back to just returning EBUSY, except for NFS. */
-      if (pc.isremote () && status == STATUS_SHARING_VIOLATION
-	  && !pc.fs_is_nfs ())
-	{
-	  if (fh_ro)
-	    {
-	      /* Try to reset R/O attribute and close handle. */
-	      NtSetAttributesFile (fh_ro, pc.file_attributes ());
-	      NtClose (fh_ro);
-	    }
-	  return status;
-	}
-      /* Only local FS and NFS should arrive here. */
-      if (!pc.isremote ())
+         NFS implements its own mechanism to remove in-use files which
+	 looks quite similar to what we do in try_to_bin for remote files.
+	 That's why we don't call try_to_bin on NFS. */
+      if (!pc.fs_is_nfs ())
 	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())
 	status = NtOpenFile (&fh, access, &attr, &io,

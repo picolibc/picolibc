@@ -1,3 +1,11 @@
+2009-12-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (try_to_bin): Handle remote shares as well.  Just rename
+	files in this case, instead of moving them to the recycler.  Create
+	even more unique filename.  Add comment to explain filename.
+	(unlink_nt): Remove code returning with EBUSY on remote shares.
+	Set bin_stat to move_to_bin except on NFS.  Add comment to explain.
+
 2009-12-17  Eric Blake  <ebb9@byu.net>
 
 	* signal.cc (nanosleep): Support 'infinite' sleep times.
