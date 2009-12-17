@@ -15,6 +15,10 @@
         * libm/libm.texinfo: Ditto.
         * libc/sys/linux/shared.ld: Add VERS_1.18
 
+2009-12-17  Jeff Johnston <jjohnstn@redhat.com>
+
+	* libc/include/_syslist.h: Add _mkdir transform.
+
 2009-12-17  Jerker Back  <jerker.back@gmail.com>
 
 	* libc/iconv/lib/local.h[!__GNUC__]: Add alternative version of

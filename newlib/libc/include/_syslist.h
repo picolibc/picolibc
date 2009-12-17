@@ -15,6 +15,7 @@
 #define _kill kill
 #define _link link
 #define _lseek lseek
+#define _mkdir mkdir
 #define _open open
 #define _read read
 #define _sbrk sbrk
