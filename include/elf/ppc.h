@@ -73,10 +73,9 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
 
 #ifndef RELOC_MACROS_GEN_FUNC
 /* Fake relocations for branch stubs, only used internally by ld.  */
-  RELOC_NUMBER (R_PPC_RELAX32,		 48)
-  RELOC_NUMBER (R_PPC_RELAX32PC,	 49)
-  RELOC_NUMBER (R_PPC_RELAX32_PLT,	 50)
-  RELOC_NUMBER (R_PPC_RELAX32PC_PLT,	 51)
+  RELOC_NUMBER (R_PPC_RELAX,		 48)
+  RELOC_NUMBER (R_PPC_RELAX_PLT,	 49)
+  RELOC_NUMBER (R_PPC_RELAX_PLTREL24,	 50)
 #endif
 
   /* Relocs added to support TLS.  */

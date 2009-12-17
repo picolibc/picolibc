@@ -1,3 +1,9 @@
+2009-12-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX32, R_PPC_RELAX32PC, R_PPC_RELAX32_PLT,
+	R_PPC_RELAX32PC_PLT): Delete.
+	(R_PPC_RELAX, R_PPC_RELAX_PLT, R_PPC_RELAX_PLTREL24): Define.
+
 2009-09-21  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (DT_PPC_TLSOPT): Define.
