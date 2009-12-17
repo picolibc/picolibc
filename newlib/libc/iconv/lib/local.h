@@ -41,7 +41,11 @@
 #define ICONV_DATA_EXT        ".cct"
 
 /* This macro is used to zero mbstate_t objects */
+#ifdef __GNUC__
 #define ICONV_ZERO_MB_STATE_T ((mbstate_t){0, {0}})
+#else
+#define ICONV_ZERO_MB_STATE_T {0}
+#endif
 
 /* Define the maximum multi-byte character length produced by iconv library */
 #if MB_LEN_MAX < 6

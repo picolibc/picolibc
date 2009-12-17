@@ -1,5 +1,12 @@
 2009-12-17  Jerker Back  <jerker.back@gmail.com>
 
+	* libc/iconv/lib/local.h[!__GNUC__]: Add alternative version of
+	ICONV_ZERO_MB_STATE_T macro.
+	* libc/iconv/lib/ucsconv.c (ucs_based_conversion_get_state): Use
+	temporary local variable nullstate to hold empty mbstate_t.
+
+2009-12-17  Jerker Back  <jerker.back@gmail.com>
+
 	* libc/include/_ansi.h: Add new _EXFNPTR macro for using with
 	function pointer arguments.
 	* libc/iconv/lib/conv.h: Use _EXFNPTR rather than _EXPARM macro.

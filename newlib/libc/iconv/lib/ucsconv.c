@@ -258,20 +258,21 @@ _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
                                        int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
+  mbstate_t nullstate = ICONV_ZERO_MB_STATE_T;
  
   if (direction == 0)
     {
       if (uc->to_ucs.handlers->get_state != NULL)
         uc->to_ucs.handlers->get_state (uc->to_ucs.data, state);
       else
-        *state = ICONV_ZERO_MB_STATE_T;
+        *state = nullstate; /* internal copy */
     }
   else
     {
       if (uc->from_ucs.handlers->get_state != NULL)
         uc->from_ucs.handlers->get_state (uc->from_ucs.data, state);
       else
-        *state = ICONV_ZERO_MB_STATE_T;
+        *state = nullstate; /* internal copy */
     }
 
   return;
