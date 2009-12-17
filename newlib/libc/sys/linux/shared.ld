@@ -29,3 +29,7 @@ VERS_1.16 {
 VERS_1.17 {
 	global: *;
 };
+
+VERS_1.18 {
+	global: *;
+};

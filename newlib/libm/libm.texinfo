@@ -46,7 +46,7 @@ into another language, under the above conditions for modified versions.
 @titlepage
 @title The Red Hat newlib C Math Library
 @sp 1
-@subtitle @code{libm} 1.17.0
+@subtitle @code{libm} 1.18.0
 @subtitle December 2008
 @author {Steve Chamberlain}
 @author {Roland Pesch}
