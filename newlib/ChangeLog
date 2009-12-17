@@ -1,5 +1,11 @@
 2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
+	* libc/include/machine/ieeefp.h: Rework __IEEE_*_ENDIAN handling.
+	* libc/machine/arm/machine/endian.h: Remove (Conflicts with 
+	libc/include/machine/endian.h)
+
+2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+
 	* libc/include/machine/setjmp.h: Set up _JBLEN #ifdef __m68k__.
 
 2009-12-17  Ralf Corsepius <ralf.corsepius@rtems.org>

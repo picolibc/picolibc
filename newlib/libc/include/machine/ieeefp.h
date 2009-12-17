@@ -62,8 +62,12 @@
 #  define __IEEE_BIG_ENDIAN
 # endif
 #else
-# define __IEEE_BIG_ENDIAN
 # ifdef __ARMEL__
+#  define __IEEE_LITTLE_ENDIAN
+# else
+#  define __IEEE_BIG_ENDIAN
+# endif
+# ifdef __ARMWEL__
 #  define __IEEE_BYTES_LITTLE_ENDIAN
 # endif
 #endif
