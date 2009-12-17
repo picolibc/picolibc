@@ -1,3 +1,20 @@
+2008-12-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * NEWS: Update with 1.18.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 1.18.0.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+        * doc/aclocal.m4: Ditto.
+        * doc/configure: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/configure: Ditto.
+        * libc/libc.texinfo: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+        * libm/*/configure: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_1.18
+
 2009-12-17  Jerker Back  <jerker.back@gmail.com>
 
 	* libc/iconv/lib/local.h[!__GNUC__]: Add alternative version of

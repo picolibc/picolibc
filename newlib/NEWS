@@ -1,3 +1,17 @@
+*** Major changes in newlib version 1.18.0:
+
+* wide-char enhancements
+* long double math routines added for platforms where LDBL == DBL
+* long long math routines added
+* math cleanup
+* UTF-16 modifications for Cygwin
+* major locale charset overhaul including added charsets
+* added moxie platform
+* added rx platform
+* added xc16x platform
+* various cleanups
+* various bug fixes
+
 *** Major changes in newlib version 1.17.0:
 
 * new C99 wide-char function additions
