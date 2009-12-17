@@ -1,3 +1,8 @@
+2009-12-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* mn10300/Makefile.in: Add mkdir call to make installation
+	directory when installing.
+
 2009-12-16  Conny Marco Menebrocker <c-m-m@gmx.de>
 
 	* xc16x/Makefile.in: Remove extraneous stuff

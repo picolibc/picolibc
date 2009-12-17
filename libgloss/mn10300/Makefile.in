@@ -128,6 +128,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:
+	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR};
 	@for crt in ${CRT0}; do \
 	$(INSTALL_PROGRAM) $${crt} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$${crt}; \
 	done
