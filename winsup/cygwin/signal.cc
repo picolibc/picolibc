@@ -1,7 +1,7 @@
 /* signal.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -87,33 +87,63 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   sig_dispatch_pending ();
   pthread_testcancel ();
 
-  if ((unsigned int) rqtp->tv_sec > (HIRES_DELAY_MAX / 1000 - 1)
-      || (unsigned int) rqtp->tv_nsec > 999999999)
+  if ((unsigned int) rqtp->tv_nsec > 999999999)
     {
       set_errno (EINVAL);
       return -1;
     }
+  unsigned int sec = rqtp->tv_sec;
   DWORD resolution = gtod.resolution ();
-  DWORD req = ((rqtp->tv_sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
-		+ resolution - 1) / resolution) * resolution;
-  DWORD end_time = gtod.dmsecs () + req;
-  syscall_printf ("nanosleep (%ld)", req);
-
-  int rc = cancelable_wait (signal_arrived, req);
+  bool done = false;
+  DWORD req;
   DWORD rem;
-  if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
-    rem = 0;
-  if (rc == WAIT_OBJECT_0)
+
+  while (!done)
     {
-      _my_tls.call_signal_handler ();
-      set_errno (EINTR);
-      res = -1;
+      /* Divide user's input into transactions no larger than 49.7
+         days at a time.  */
+      if (sec > HIRES_DELAY_MAX)
+        {
+          req = ((HIRES_DELAY_MAX * 1000 + resolution - 1)
+                 / resolution * resolution);
+          sec -= HIRES_DELAY_MAX;
+        }
+      else
+        {
+          req = ((sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
+                  + resolution - 1) / resolution) * resolution;
+          sec = 0;
+          done = true;
+        }
+
+      DWORD end_time = gtod.dmsecs () + req;
+      syscall_printf ("nanosleep (%ld)", req);
+
+      int rc = cancelable_wait (signal_arrived, req);
+      if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
+        rem = 0;
+      if (rc == WAIT_OBJECT_0)
+        {
+          _my_tls.call_signal_handler ();
+          set_errno (EINTR);
+          res = -1;
+          break;
+        }
     }
 
   if (rmtp)
     {
-      rmtp->tv_sec = rem / 1000;
+      rmtp->tv_sec = sec + rem / 1000;
       rmtp->tv_nsec = (rem % 1000) * 1000000;
+      if (sec)
+        {
+          rmtp->tv_nsec += rqtp->tv_nsec;
+          if (rmtp->tv_nsec >= 1000000000)
+            {
+              rmtp->tv_nsec -= 1000000000;
+              rmtp->tv_sec++;
+            }
+        }
     }
 
   syscall_printf ("%d = nanosleep (%ld, %ld)", res, req, rem);
@@ -126,8 +156,9 @@ sleep (unsigned int seconds)
   struct timespec req, rem;
   req.tv_sec = seconds;
   req.tv_nsec = 0;
-  nanosleep (&req, &rem);
-  return rem.tv_sec + (rem.tv_nsec > 0);
+  if (nanosleep (&req, &rem))
+    return rem.tv_sec + (rem.tv_nsec > 0);
+  return 0;
 }
 
 extern "C" unsigned int
@@ -136,7 +167,7 @@ usleep (useconds_t useconds)
   struct timespec req;
   req.tv_sec = useconds / 1000000;
   req.tv_nsec = (useconds % 1000000) * 1000;
-  int res = nanosleep (&req, 0);
+  int res = nanosleep (&req, NULL);
   return res;
 }
 
