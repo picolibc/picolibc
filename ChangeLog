@@ -1,3 +1,8 @@
+2009-12-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update copyright date.
+	* COPYING.LIBGLOSS: Ditto.
+
 2009-12-07  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	PR middle-end/30447

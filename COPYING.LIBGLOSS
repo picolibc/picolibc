@@ -6,7 +6,7 @@ notices will apply to the contents of the libgloss subdirectory:
 
 (1) Red Hat Incorporated
 
-Copyright (c) 1994-2007  Red Hat, Inc. All rights reserved.
+Copyright (c) 1994-2009  Red Hat, Inc. All rights reserved.
 
 This copyrighted material is made available to anyone wishing to use, modify,
 copy, or redistribute it subject to the terms and conditions of the BSD 
@@ -229,7 +229,7 @@ POSSIBILITY OF SUCH DAMAGE.
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-(13) - Xilinx, Inc. (powerpc-* targets)
+(13) - Xilinx, Inc. (micrroblaze-* and powerpc-* targets)
 
 Copyright (c) 2004, 2009 Xilinx, Inc.  All rights reserved.
 
