@@ -96,16 +96,16 @@ static HKEY open_key (const char *name, REGSAM access, DWORD wow64, bool isValue
 /* Return true if char must be encoded.
  */
 static inline bool
-must_encode (char c)
+must_encode (wchar_t c)
 {
-  return (isdirsep (c) || c == ':' || c == '%');
+  return (iswdirsep (c) || c == L':' || c == L'%');
 }
 
 /* Encode special chars in registry key or value name.
  * Returns 0: success, -1: error.
  */
 static int
-encode_regname (char * dst, const char * src, bool add_val)
+encode_regname (char *dst, const wchar_t *src, bool add_val)
 {
   int di = 0;
   if (!src[0])
@@ -113,10 +113,11 @@ encode_regname (char * dst, const char * src, bool add_val)
   else
     for (int si = 0; src[si]; si++)
       {
-	char c = src[si];
+	wchar_t c = src[si];
 	if (must_encode (c) ||
-	    (si == 0 && ((c == '.' && (!src[1] || (src[1] == '.' && !src[2]))) ||
-			(c == '@' && !src[1]))))
+	    (si == 0 && ((c == L'.'
+			  && (!src[1] || (src[1] == L'.' && !src[2])))
+			 || (c == L'@' && !src[1]))))
 	  {
 	    if (di + 3 >= NAME_MAX + 1)
 	      return -1;
@@ -124,7 +125,7 @@ encode_regname (char * dst, const char * src, bool add_val)
 	    di += 3;
 	  }
 	else
-	  dst[di++] = c;
+	  di += sys_wcstombs (dst + di, NAME_MAX + 1 - di, &c, 1);
       }
 
   if (add_val)
@@ -143,12 +144,13 @@ encode_regname (char * dst, const char * src, bool add_val)
  * Returns 0: success, 1: "%val" detected, -1: error.
  */
 static int
-decode_regname (char * dst, const char * src, int len = -1)
+decode_regname (wchar_t *wdst, const char *src, int len = -1)
 {
   if (len < 0)
     len = strlen (src);
-
+  char dst[len + 1];
   int res = 0;
+
   if (len > 4 && !memcmp (src + len - 4, "%val", 4))
     {
       len -= 4;
@@ -169,7 +171,7 @@ decode_regname (char * dst, const char * src, int len = -1)
 	    char s[] = {src[si+1], src[si+2], '\0'};
 	    char *p;
 	    c = strtoul (s, &p, 16);
-	    if (!(must_encode (c) ||
+	    if (!(must_encode ((wchar_t) c) ||
 		  (si == 0 && ((c == '.' && (len == 3 || (src[3] == '.' && len == 4))) ||
 			       (c == '@' && len == 3)))))
 	      return -1;
@@ -181,6 +183,7 @@ decode_regname (char * dst, const char * src, int len = -1)
       }
 
   dst[di] = 0;
+  sys_mbstowcs (wdst, NAME_MAX + 1, dst);
   return res;
 }
 
@@ -216,10 +219,10 @@ private:
 /* Return true if subkey NAME exists in key PARENT.
  */
 static bool
-key_exists (HKEY parent, const char * name, DWORD wow64)
+key_exists (HKEY parent, const wchar_t *name, DWORD wow64)
 {
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
-  LONG error = RegOpenKeyEx (parent, name, 0, KEY_READ | wow64, &hKey);
+  LONG error = RegOpenKeyExW (parent, name, 0, KEY_READ | wow64, &hKey);
   if (error == ERROR_SUCCESS)
     RegCloseKey (hKey);
 
@@ -239,7 +242,7 @@ fhandler_registry::exists ()
   int file_type = 0, index = 0, pathlen;
   DWORD buf_size = NAME_MAX + 1;
   LONG error;
-  char buf[buf_size];
+  wchar_t buf[buf_size];
   const char *file;
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
 
@@ -273,7 +276,7 @@ fhandler_registry::exists ()
     }
   else
     {
-      char dec_file[NAME_MAX + 1];
+      wchar_t dec_file[NAME_MAX + 1];
 
       int val_only = decode_regname (dec_file, file);
       if (val_only < 0)
@@ -310,11 +313,11 @@ fhandler_registry::exists ()
 	  if (!val_only && dec_file[0])
 	    {
 	      while (ERROR_SUCCESS ==
-		     (error = RegEnumKeyEx (hKey, index++, buf, &buf_size,
-					    NULL, NULL, NULL, NULL))
+		     (error = RegEnumKeyExW (hKey, index++, buf, &buf_size,
+					     NULL, NULL, NULL, NULL))
 		     || (error == ERROR_MORE_DATA))
 		{
-		  if (strcasematch (buf, dec_file))
+		  if (!wcscasecmp (buf, dec_file))
 		    {
 		      file_type = 1;
 		      goto out;
@@ -331,11 +334,11 @@ fhandler_registry::exists ()
 	    }
 
 	  while (ERROR_SUCCESS ==
-		 (error = RegEnumValue (hKey, index++, buf, &buf_size, NULL, NULL,
-					NULL, NULL))
+		 (error = RegEnumValueW (hKey, index++, buf, &buf_size,
+					 NULL, NULL, NULL, NULL))
 		 || (error == ERROR_MORE_DATA))
 	    {
-	      if (strcasematch (buf, dec_file))
+	      if (!wcscasecmp (buf, dec_file))
 		{
 		  file_type = -1;
 		  goto out;
@@ -437,12 +440,28 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		  while (!isdirsep (*value_name))
 		    value_name--;
 		  value_name++;
-		  char dec_value_name[NAME_MAX + 1];
-		  DWORD dwSize;
-		  if (decode_regname (dec_value_name, value_name) >= 0 &&
-		      ERROR_SUCCESS ==
-		      RegQueryValueEx (hKey, dec_value_name, NULL, NULL, NULL,
-				       &dwSize))
+		  wchar_t dec_value_name[NAME_MAX + 1];
+		  DWORD dwSize = 0;
+		  DWORD type;
+		  if (decode_regname (dec_value_name, value_name) >= 0
+		      && RegQueryValueExW (hKey, dec_value_name, NULL, &type,
+					   NULL, &dwSize) == ERROR_SUCCESS
+		      && (type == REG_SZ || type == REG_EXPAND_SZ
+			  || type == REG_MULTI_SZ || type == REG_LINK))
+		    {
+		      PBYTE tmpbuf = (PBYTE) malloc (dwSize);
+		      if (!tmpbuf
+			  || RegQueryValueExW (hKey, dec_value_name,
+					       NULL, NULL, tmpbuf, &dwSize)
+			     != ERROR_SUCCESS)
+			buf->st_size = dwSize / sizeof (wchar_t);
+		      else
+			buf->st_size = sys_wcstombs (NULL, 0,
+						     (wchar_t *) tmpbuf,
+						     dwSize / sizeof (wchar_t));
+		      free (tmpbuf);
+		    }
+		  else
 		    buf->st_size = dwSize;
 		}
 	      __uid32_t uid;
@@ -481,7 +500,7 @@ int
 fhandler_registry::readdir (DIR *dir, dirent *de)
 {
   DWORD buf_size = NAME_MAX + 1;
-  char buf[buf_size];
+  wchar_t buf[buf_size];
   HANDLE handle;
   const char *path = dir->__d_dirname + proc_len + 1 + prefix_len;
   LONG error;
@@ -529,14 +548,14 @@ retry:
     /* For the moment, the type of key is ignored here. when write access is added,
      * maybe add an extension for the type of each value?
      */
-    error = RegEnumValue ((HKEY) dir->__handle,
-			  (dir->__d_position & ~REG_ENUM_VALUES_MASK) >> 16,
-			  buf, &buf_size, NULL, NULL, NULL, NULL);
+    error = RegEnumValueW ((HKEY) dir->__handle,
+			   (dir->__d_position & ~REG_ENUM_VALUES_MASK) >> 16,
+			   buf, &buf_size, NULL, NULL, NULL, NULL);
   else
     error =
-      RegEnumKeyEx ((HKEY) dir->__handle, dir->__d_position -
-		    SPECIAL_DOT_FILE_COUNT, buf, &buf_size, NULL, NULL, NULL,
-		    NULL);
+      RegEnumKeyExW ((HKEY) dir->__handle, dir->__d_position -
+		     SPECIAL_DOT_FILE_COUNT, buf, &buf_size,
+		     NULL, NULL, NULL, NULL);
   if (error == ERROR_NO_MORE_ITEMS
       && (dir->__d_position & REG_ENUM_VALUES_MASK) == 0)
     {
@@ -727,7 +746,7 @@ fhandler_registry::open (int flags, mode_t mode)
     }
   else
     {
-      char dec_file[NAME_MAX + 1];
+      wchar_t dec_file[NAME_MAX + 1];
       int val_only = decode_regname (dec_file, file);
       if (val_only < 0)
 	{
@@ -752,7 +771,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	flags |= O_DIROPEN;
 
       set_io_handle (handle);
-      value_name = cstrdup (dec_file);
+      value_name = cwcsdup (dec_file);
 
       if (!(flags & O_DIROPEN) && !fill_filebuf ())
 	{
@@ -809,7 +828,7 @@ fhandler_registry::fill_filebuf ()
 
   if (handle != HKEY_PERFORMANCE_DATA)
     {
-      error = RegQueryValueEx (handle, value_name, NULL, &type, NULL, &size);
+      error = RegQueryValueExW (handle, value_name, NULL, &type, NULL, &size);
       if (error != ERROR_SUCCESS)
 	{
 	  if (error != ERROR_FILE_NOT_FOUND)
@@ -819,17 +838,28 @@ fhandler_registry::fill_filebuf ()
 	    }
 	  goto value_not_found;
 	}
-      bufalloc = size;
-      filebuf = (char *) cmalloc_abort (HEAP_BUF, bufalloc);
+      PBYTE tmpbuf = (PBYTE) cmalloc_abort (HEAP_BUF, size);
       error =
-	RegQueryValueEx (handle, value_name, NULL, NULL, (BYTE *) filebuf,
-			 &size);
+	RegQueryValueExW (handle, value_name, NULL, NULL, tmpbuf, &size);
       if (error != ERROR_SUCCESS)
 	{
 	  seterrno_from_win_error (__FILE__, __LINE__, error);
 	  return true;
 	}
-      filesize = size;
+      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ
+	  || type == REG_LINK)
+	bufalloc = sys_wcstombs (NULL, 0, (wchar_t *) tmpbuf,
+				 size / sizeof (wchar_t));
+      else
+	bufalloc = size;
+      filebuf = (char *) cmalloc_abort (HEAP_BUF, bufalloc);
+      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ
+	  || type == REG_LINK)
+	sys_wcstombs (filebuf, bufalloc, (wchar_t *) tmpbuf,
+		      size / sizeof (wchar_t));
+      else
+	memcpy (filebuf, tmpbuf, bufalloc);
+      filesize = bufalloc;
     }
   else
     {
@@ -839,8 +869,8 @@ fhandler_registry::fill_filebuf ()
 	  bufalloc += 16 * 1024;
 	  filebuf = (char *) crealloc_abort (filebuf, bufalloc);
 	  size = bufalloc;
-	  error = RegQueryValueEx (handle, value_name, NULL, &type,
-				   (BYTE *) filebuf, &size);
+	  error = RegQueryValueExW (handle, value_name, NULL, &type,
+				    (PBYTE) filebuf, &size);
 	  if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
 	    {
 	      seterrno_from_win_error (__FILE__, __LINE__, error);
@@ -855,13 +885,13 @@ fhandler_registry::fill_filebuf ()
   return true;
 value_not_found:
   DWORD buf_size = NAME_MAX + 1;
-  char buf[buf_size];
+  wchar_t buf[buf_size];
   int index = 0;
   while (ERROR_SUCCESS ==
-	 (error = RegEnumKeyEx (handle, index++, buf, &buf_size, NULL, NULL,
-				NULL, NULL)) || (error == ERROR_MORE_DATA))
+	 (error = RegEnumKeyExW (handle, index++, buf, &buf_size, NULL, NULL,
+				 NULL, NULL)) || (error == ERROR_MORE_DATA))
     {
-      if (strcasematch (buf, value_name))
+      if (!wcscasecmp (buf, value_name))
 	{
 	  set_errno (EISDIR);
 	  return false;
@@ -884,7 +914,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
   HKEY hParentKey = (HKEY) INVALID_HANDLE_VALUE;
   bool parentOpened = false;
-  char component[NAME_MAX + 1];
+  wchar_t component[NAME_MAX + 1];
 
   while (*name)
     {
@@ -919,13 +949,13 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 	  REGSAM effective_access = KEY_READ;
 	  if ((strchr (name, '/') == NULL && isValue == true) || *name == 0)
 	    effective_access = access;
-	  LONG error = RegOpenKeyEx (hParentKey, component, 0,
-				     effective_access | wow64, &hKey);
+	  LONG error = RegOpenKeyExW (hParentKey, component, 0,
+				      effective_access | wow64, &hKey);
 	  if (error == ERROR_ACCESS_DENIED) /* Try opening with backup intent */
-	    error = RegCreateKeyEx (hParentKey, component, 0, NULL,
-				    REG_OPTION_BACKUP_RESTORE,
-				    effective_access | wow64, NULL,
-				    &hKey, NULL);
+	    error = RegCreateKeyExW (hParentKey, component, 0, NULL,
+				     REG_OPTION_BACKUP_RESTORE,
+				     effective_access | wow64, NULL,
+				     &hKey, NULL);
 	  if (parentOpened)
 	    RegCloseKey (hParentKey);
 	  if (error != ERROR_SUCCESS)
@@ -940,7 +970,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
       else
 	{
 	  for (int i = 0; registry_listing[i]; i++)
-	    if (strcasematch (component, registry_listing[i]))
+	    if (strncasematch (anchor, registry_listing[i], name - anchor - 1))
 	      hKey = registry_keys[i];
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return hKey;

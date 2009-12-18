@@ -1,5 +1,15 @@
 2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_registry::value_name): Convert to wchar_t*.
+	* fhandler_registry.cc: Call UNICODE registry functions throughout
+	and convert to multibyte using current locale's charset.  Accommodate
+	throughout.
+	(must_encode): Take wchar_t.
+	(encode_regname): Convert from wchar_t *.
+	(decode_regname): Convert to wchar_t *.
+
+2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.sgml (func-cygwin-conv-path): Clarify meaning of size parameter.
 	(func-cygwin-conv-path-list): Fix typo.
 	(func-cygwin-posix-path-list-p): Ditto.

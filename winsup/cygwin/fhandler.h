@@ -1349,7 +1349,7 @@ class fhandler_netdrive: public fhandler_virtual
 class fhandler_registry: public fhandler_proc
 {
  private:
-  char *value_name;
+  wchar_t *value_name;
   DWORD wow64;
   int prefix_len;
  public:
