@@ -258,6 +258,7 @@ main (int argc, char *argv[])
 {
   external_pinfo *p;
   int aflag, lflag, fflag, sflag, uid, proc_id;
+  bool found_proc_id = true;
   cygwin_getinfo_types query = CW_GETPINFO;
   const char *dtitle = "    PID TTY     STIME COMMAND\n";
   const char *dfmt   = "%7d%4s%10s %s\n";
@@ -299,6 +300,7 @@ main (int argc, char *argv[])
       case 'p':
 	proc_id = atoi (optarg);
 	aflag = 1;
+	found_proc_id = false;
 	break;
       case 's':
 	sflag = 1;
@@ -369,6 +371,8 @@ main (int argc, char *argv[])
     {
       if ((proc_id > 0) && (p->pid != proc_id))
 	continue;
+      else
+	found_proc_id = true;
 
       if (aflag)
 	/* nothing to do */;
@@ -499,6 +503,5 @@ main (int argc, char *argv[])
     }
   (void) cygwin_internal (CW_UNLOCK_PINFO);
 
-  return 0;
+  return found_proc_id ? 0 : 1;
 }
-
