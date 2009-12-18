@@ -1,3 +1,7 @@
+2009-12-18  Ben Elliston  <bje@au.ibm.com>
+
+	* config.sub, config.guess: Update from upstream sources.
+
 2009-12-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Update copyright date.
