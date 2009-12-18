@@ -699,14 +699,16 @@ fhandler_socket::dup (fhandler_base *child)
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
 
-  if (!DuplicateHandle (hMainProc, wsock_mtx, hMainProc, &fhs->wsock_mtx, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess (), wsock_mtx,
+			GetCurrentProcess (), &fhs->wsock_mtx,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       return -1;
     }
-  if (!DuplicateHandle (hMainProc, wsock_evt, hMainProc, &fhs->wsock_evt, 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess (), wsock_evt,
+			GetCurrentProcess (), &fhs->wsock_evt,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       NtClose (fhs->wsock_mtx);
@@ -751,7 +753,7 @@ fhandler_socket::dup (fhandler_base *child)
   if (!fhs->fixup_before_fork_exec (GetCurrentProcessId ()))
     {
       cygheap->user.reimpersonate ();
-      fhs->fixup_after_fork (hMainProc);
+      fhs->fixup_after_fork (GetCurrentProcess ());
       if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
 	return 0;
     }

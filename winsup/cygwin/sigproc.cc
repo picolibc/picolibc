@@ -608,8 +608,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  goto out;
 	}
       VerifyHandle (hp);
-      if (!DuplicateHandle (hp, dupsig, hMainProc, &sendsig, false, 0,
-			    DUPLICATE_SAME_ACCESS) || !sendsig)
+      if (!DuplicateHandle (hp, dupsig, GetCurrentProcess (), &sendsig, false,
+			    0, DUPLICATE_SAME_ACCESS) || !sendsig)
 	{
 	  __seterrno ();
 	  sigproc_printf ("DuplicateHandle failed, %E");
@@ -631,7 +631,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	      __seterrno ();
 	      goto out;
 	    }
-	  if (!DuplicateHandle (hMainProc, tome, hp, &tome, false, 0,
+	  if (!DuplicateHandle (GetCurrentProcess (), tome, hp, &tome, false, 0,
 				DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	    {
 	      sigproc_printf ("DuplicateHandle for __SIGCOMMUNE failed, %E");
@@ -818,7 +818,8 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &parent, 0, TRUE,
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
+			GetCurrentProcess (), &parent, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     system_printf ("couldn't create handle to myself for child, %E");
 }

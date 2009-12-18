@@ -18,8 +18,6 @@ details. */
 #include <malloc.h>
 #include <cygwin/version.h>
 
-HANDLE NO_COPY hMainProc = (HANDLE) -1;
-HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
 HMODULE NO_COPY cygwin_hmodule;

@@ -859,6 +859,10 @@ typedef enum _EVENT_INFORMATION_CLASS
 
 /* Function declarations for ntdll.dll.  These don't appear in any
    standard Win32 header.  */
+
+#define NtCurrentProcess() ((HANDLE) 0xffffffff)
+#define NtCurrentThread()  ((HANDLE) 0xfffffffe)
+
 extern "C"
 {
   NTSTATUS NTAPI NtAdjustPrivilegesToken (HANDLE, BOOLEAN, PTOKEN_PRIVILEGES,

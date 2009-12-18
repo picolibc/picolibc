@@ -484,7 +484,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 
   if (debugging && ++debugging < 500000)
     {
-      SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL);
       return 0;
     }
 
@@ -1307,7 +1307,7 @@ exit_sig:
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
-      GetThreadContext (hMainThread, &c);
+      GetThreadContext (GetCurrentThread (), &c);
       use_tls->copy_context (&c);
       si.si_signo |= 0x80;
     }

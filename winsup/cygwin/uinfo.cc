@@ -78,8 +78,8 @@ cygheap_user::init ()
       if (!SetTokenInformation (hProcToken, TokenDefaultDacl, &dacl,
       				sizeof (dacl)))
 	system_printf ("SetTokenInformation (TokenDefaultDacl), %E");
-      if ((status = NtSetSecurityObject (hMainProc, DACL_SECURITY_INFORMATION,
-					 psd)))
+      if ((status = NtSetSecurityObject (NtCurrentProcess (),
+					 DACL_SECURITY_INFORMATION, psd)))
 	system_printf ("NtSetSecurityObject, %lx", status);
     }
   else

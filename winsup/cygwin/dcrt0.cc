@@ -609,7 +609,8 @@ child_info_spawn::handle_spawn ()
   cygheap_fixup_in_child (true);
   memory_init (false);
   if (!moreinfo->myself_pinfo ||
-      !DuplicateHandle (hMainProc, moreinfo->myself_pinfo, hMainProc, &h, 0,
+      !DuplicateHandle (GetCurrentProcess (), moreinfo->myself_pinfo,
+			GetCurrentProcess (), &h, 0,
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
   myself.thisproc (h);
@@ -660,7 +661,7 @@ disable_dep ()
     }
   if (dep_system_policy < OptIn)
     return;
-  if (!GetProcessDEPPolicy (hMainProc, &ppolicy, &perm))
+  if (!GetProcessDEPPolicy (GetCurrentProcess (), &ppolicy, &perm))
     {
       debug_printf ("GetProcessDEPPolicy: %E");
       return;
@@ -694,15 +695,7 @@ dll_crt0_0 ()
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
 
-  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-		       GetCurrentProcess (), &hMainProc, 0, FALSE,
-			DUPLICATE_SAME_ACCESS))
-    hMainProc = GetCurrentProcess ();
-
-  DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
-		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
-
-  OpenProcessToken (hMainProc, MAXIMUM_ALLOWED, &hProcToken);
+  OpenProcessToken (GetCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
   device::init ();
@@ -787,9 +780,6 @@ dll_crt0_1 (void *)
   while (i--)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
-
-  ProtectHandle (hMainProc);
-  ProtectHandle (hMainThread);
 
   cygheap->cwd.init ();
 

@@ -75,7 +75,7 @@ respawn_wow64_process ()
 
   /* Unfortunately there's no simpler way to retrieve the
      parent process in NT, as far as I know.  Hints welcome. */
-  ret = NtQueryInformationProcess (GetCurrentProcess (),
+  ret = NtQueryInformationProcess (NtCurrentProcess (),
 				   ProcessBasicInformation,
 				   &pbi, sizeof pbi, NULL);
   if (NT_SUCCESS (ret)

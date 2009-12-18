@@ -301,7 +301,8 @@ fhandler_fifo::dup (fhandler_base *child)
   fhandler_fifo *fifo_child = (fhandler_fifo *) child;
   if (res == 0 && dummy_client)
     {
-      bool dres = DuplicateHandle (hMainProc, dummy_client, hMainProc,
+      bool dres = DuplicateHandle (GetCurrentProcess (), dummy_client,
+				   GetCurrentProcess (),
 				   &fifo_child->dummy_client, 0,
 				   TRUE, DUPLICATE_SAME_ACCESS);
       if (!dres)

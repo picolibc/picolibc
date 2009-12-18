@@ -94,7 +94,7 @@ getrusage (int intwho, struct rusage *rusage_in)
   if (intwho == RUSAGE_SELF)
     {
       memset (&r, 0, sizeof (r));
-      fill_rusage (&r, hMainProc);
+      fill_rusage (&r, GetCurrentProcess ());
       *rusage_in = r;
     }
   else if (intwho == RUSAGE_CHILDREN)

@@ -117,7 +117,7 @@ fhandler_pipe::open (int flags, mode_t mode)
       goto out;
     }
   inh = !(flags & O_NOINHERIT);
-  if (!DuplicateHandle (proc, pipe_hdl, hMainProc, &nio_hdl,
+  if (!DuplicateHandle (proc, pipe_hdl, GetCurrentProcess (), &nio_hdl,
 			0, inh, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();

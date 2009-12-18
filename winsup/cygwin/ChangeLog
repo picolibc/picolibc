@@ -1,5 +1,18 @@
 2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout, replace hMainProc with GetCurrentProcess/NtCurrentProcess
+	according to context.  Throughout, replace hMainThread with
+	GetCurrentThread/NtCurrentThread according to context.
+	* dcrt0.cc (dll_crt0_0): Drop duplication of GetCurrentProcess to
+	hMainProc.  Drop duplication of GetCurrentThread to hMainThread.
+	* dtable.cc (dtable::stdio_init): Remove useless comment.
+	* globals.cc (hMainProc): Remove.
+	(hMainThread): Remove.
+	* ntdll.h (NtCurrentProcess): Define.
+	(NtCurrentThread: Define.
+
+2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_registry::value_name): Convert to wchar_t*.
 	* fhandler_registry.cc: Call UNICODE registry functions throughout
 	and convert to multibyte using current locale's charset.  Accommodate

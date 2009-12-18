@@ -136,7 +136,7 @@ fixup_shms_after_fork ()
       NTSTATUS status;
       vm_object_t ptr = sph_entry->ptr;
       ULONG viewsize = sph_entry->parent->size;
-      status = NtMapViewOfSection (sph_entry->parent->hdl, GetCurrentProcess (),
+      status = NtMapViewOfSection (sph_entry->parent->hdl, NtCurrentProcess (),
 				   &ptr, 0, sph_entry->parent->size, NULL,
 				   &viewsize, ViewShare, 0, sph_entry->access);
       if (!NT_SUCCESS (status) || ptr != sph_entry->ptr)
@@ -221,7 +221,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   vm_object_t ptr = NULL;
   ULONG viewsize = ssh_entry->size;
   ULONG access = (shmflg & SHM_RDONLY) ? PAGE_READONLY : PAGE_READWRITE;
-  status = NtMapViewOfSection (ssh_entry->hdl, GetCurrentProcess (), &ptr, 0,
+  status = NtMapViewOfSection (ssh_entry->hdl, NtCurrentProcess (), &ptr, 0,
 			       ssh_entry->size, NULL, &viewsize, ViewShare,
 			       MEM_TOP_DOWN, access);
   if (!NT_SUCCESS (status))

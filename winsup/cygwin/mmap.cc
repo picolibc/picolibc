@@ -208,12 +208,12 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
 
      Note: Retrying the mapping might be unnecessary, now that mmap64 checks
 	   for a valid memory area first. */
-  ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
+  ret = NtMapViewOfSection (h, NtCurrentProcess (), &base, 0, commitsize,
 			    &offset, &viewsize, ViewShare, alloc_type, protect);
   if (!NT_SUCCESS (ret) && addr && !fixed (flags))
     {
       base = NULL;
-      ret = NtMapViewOfSection (h, GetCurrentProcess (), &base, 0, commitsize,
+      ret = NtMapViewOfSection (h, NtCurrentProcess (), &base, 0, commitsize,
 				&offset, &viewsize, ViewShare, 0, protect);
     }
   if (!NT_SUCCESS (ret))
@@ -1290,7 +1290,8 @@ mlock (const void *addr, size_t len)
   NTSTATUS status = 0;
   do
     {
-      status = NtLockVirtualMemory (hMainProc, &base, &size, LOCK_VM_IN_RAM);
+      status = NtLockVirtualMemory (NtCurrentProcess (), &base, &size,
+				    LOCK_VM_IN_RAM);
       if (status == STATUS_WORKING_SET_QUOTA)
 	{
 	  /* The working set is too small, try to increase it so that the
@@ -1304,7 +1305,7 @@ mlock (const void *addr, size_t len)
 	     further, or until NtLockVirtualMemory returns successfully (or
 	     with another error).  */
 	  ULONG min, max;
-	  if (!GetProcessWorkingSetSize (hMainProc, &min, &max))
+	  if (!GetProcessWorkingSetSize (GetCurrentProcess (), &min, &max))
 	    {
 	      set_errno (ENOMEM);
 	      break;
@@ -1317,7 +1318,7 @@ mlock (const void *addr, size_t len)
 	    min += pagesize;
 	  if (max < min)
 	    max = min;
-	  if (!SetProcessWorkingSetSize (hMainProc, min, max))
+	  if (!SetProcessWorkingSetSize (GetCurrentProcess (), min, max))
 	    {
 	      set_errno (ENOMEM);
 	      break;
@@ -1346,7 +1347,7 @@ munlock (const void *addr, size_t len)
   size_t pagesize = getpagesize ();
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
   ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
-  NTSTATUS status = NtUnlockVirtualMemory (hMainProc, &base, &size,
+  NTSTATUS status = NtUnlockVirtualMemory (NtCurrentProcess (), &base, &size,
 					   LOCK_VM_IN_RAM);
   if (!NT_SUCCESS (status))
     __seterrno_from_nt_status (status);
@@ -1482,7 +1483,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	    __seterrno ();
 	  else
 	    {
-	      NtUnmapViewOfSection (GetCurrentProcess (), base);
+	      NtUnmapViewOfSection (NtCurrentProcess (), base);
 	      set_errno (EINVAL);
 	      debug_printf ("MapView: address shift with MAP_FIXED given");
 	    }
@@ -1501,7 +1502,7 @@ fhandler_dev_zero::munmap (HANDLE h, caddr_t addr, size_t len)
     VirtualFree (addr, 0, MEM_RELEASE);
   else
     {
-      NtUnmapViewOfSection (GetCurrentProcess (), addr);
+      NtUnmapViewOfSection (NtCurrentProcess (), addr);
       NtClose (h);
     }
   return 0;
@@ -1562,7 +1563,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 	__seterrno ();
       else
 	{
-	  NtUnmapViewOfSection (GetCurrentProcess (), base);
+	  NtUnmapViewOfSection (NtCurrentProcess (), base);
 	  set_errno (EINVAL);
 	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
@@ -1577,7 +1578,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
 int
 fhandler_disk_file::munmap (HANDLE h, caddr_t addr, size_t len)
 {
-  NtUnmapViewOfSection (GetCurrentProcess (), addr);
+  NtUnmapViewOfSection (NtCurrentProcess (), addr);
   NtClose (h);
   return 0;
 }
@@ -1656,7 +1657,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
 	__seterrno ();
       else
 	{
-	  NtUnmapViewOfSection (GetCurrentProcess (), base);
+	  NtUnmapViewOfSection (NtCurrentProcess (), base);
 	  set_errno (EINVAL);
 	  debug_printf ("MapView: address shift with MAP_FIXED given");
 	}
@@ -1672,7 +1673,7 @@ int
 fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
 {
   NTSTATUS ret;
-  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (GetCurrentProcess (), addr)))
+  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (NtCurrentProcess (), addr)))
     {
       __seterrno_from_nt_status (ret);
       return -1;

@@ -155,7 +155,8 @@ allow_others_to_sync ()
      to avoid having to alloc 64K from the stack. */
   tmp_pathbuf tp;
   PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) tp.w_get ();
-  status = NtQuerySecurityObject (hMainProc, DACL_SECURITY_INFORMATION, sd,
+  status = NtQuerySecurityObject (NtCurrentProcess (),
+				  DACL_SECURITY_INFORMATION, sd,
 				  NT_MAX_PATH * sizeof (WCHAR), &len);
   if (!NT_SUCCESS (status))
     {
@@ -182,7 +183,7 @@ allow_others_to_sync ()
     }
   dacl->AclSize = (char *) ace - (char *) dacl;
   /* Write the DACL back. */
-  status = NtSetSecurityObject (hMainProc, DACL_SECURITY_INFORMATION, sd);
+  status = NtSetSecurityObject (NtCurrentProcess (), DACL_SECURITY_INFORMATION, sd);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtSetSecurityObject: %p", status);

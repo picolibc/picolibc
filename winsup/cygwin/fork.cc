@@ -263,8 +263,9 @@ slow_pid_reuse (HANDLE h)
      windows from reusing the same pid.  */
   if (last_fork_procs[nfork_procs])
     ForceCloseHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
-  if (DuplicateHandle (hMainProc, h, hMainProc, &last_fork_procs[nfork_procs],
-			0, FALSE, DUPLICATE_SAME_ACCESS))
+  if (DuplicateHandle (GetCurrentProcess (), h,
+		       GetCurrentProcess (), &last_fork_procs[nfork_procs],
+		       0, FALSE, DUPLICATE_SAME_ACCESS))
     ProtectHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
   else
     {
@@ -287,7 +288,7 @@ frok::parent (volatile char * volatile stack_here)
   pinfo child;
   static char errbuf[256];
 
-  int c_flags = GetPriorityClass (hMainProc);
+  int c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
 
   /* If we don't have a console, then don't create a console for the

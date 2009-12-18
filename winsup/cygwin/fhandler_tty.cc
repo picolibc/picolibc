@@ -556,7 +556,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	}
 
       if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
-			    hMainProc, &from_master_local, 0, TRUE,
+			    GetCurrentProcess (), &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
 	  termios_printf ("can't duplicate input from %u/%p, %E",
@@ -567,7 +567,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
       VerifyHandle (from_master_local);
       if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master,
-			  hMainProc, &to_master_local, 0, TRUE,
+			  GetCurrentProcess (), &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
 	{
 	  termios_printf ("can't duplicate output, %E");
@@ -1459,10 +1459,10 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
   if (arch->dwProcessId != wpid)
     {
       tty& t = *get_ttyp ();
-      if (!DuplicateHandle (parent, arch->from_master, hMainProc,
+      if (!DuplicateHandle (parent, arch->from_master, GetCurrentProcess (),
 			    &arch->from_master, 0, false, DUPLICATE_SAME_ACCESS))
 	system_printf ("couldn't duplicate from_parent(%p), %E", arch->from_master);
-      if (!DuplicateHandle (parent, arch->to_master, hMainProc,
+      if (!DuplicateHandle (parent, arch->to_master, GetCurrentProcess (),
 			    &arch->to_master, 0, false, DUPLICATE_SAME_ACCESS))
 	system_printf ("couldn't duplicate to_parent(%p), %E", arch->from_master);
       if (myself->pid == t.master_pid)

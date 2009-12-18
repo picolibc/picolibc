@@ -77,7 +77,7 @@ times (struct tms *buf)
      overflow. */
   clock_t tc = (clock_t) (ticks * CLOCKS_PER_SEC / 1000);
 
-  GetProcessTimes (hMainProc, &creation_time, &exit_time,
+  GetProcessTimes (GetCurrentProcess (), &creation_time, &exit_time,
 		   &kernel_time, &user_time);
 
   syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);

@@ -100,8 +100,9 @@ close_all_files (bool norelease)
 	debug_printf ("closing fd %d", i);
 #endif
 	if (i == 2)
-	  DuplicateHandle (GetCurrentProcess (), fh->get_output_handle (), GetCurrentProcess (), &h, 0, false,
-			   DUPLICATE_SAME_ACCESS);
+	  DuplicateHandle (GetCurrentProcess (), fh->get_output_handle (),
+			   GetCurrentProcess (), &h,
+			   0, false, DUPLICATE_SAME_ACCESS);
 	fh->close ();
 	if (!norelease)
 	  cygheap->fdtab.release (i);
@@ -3131,7 +3132,7 @@ setpriority (int which, id_t who, int value)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
 	{
-	  if (!SetPriorityClass (hMainProc, prio))
+	  if (!SetPriorityClass (GetCurrentProcess (), prio))
 	    {
 	      set_errno (EACCES);
 	      return -1;

@@ -1428,8 +1428,9 @@ fhandler_dev_tape::dup (fhandler_base *child)
 {
   lock (-1);
   fhandler_dev_tape *fh = (fhandler_dev_tape *) child;
-  if (!DuplicateHandle (hMainProc, mt_mtx, hMainProc, &fh->mt_mtx, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess (), mt_mtx,
+  			GetCurrentProcess (), &fh->mt_mtx,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("dup(%s) failed, mutex handle %x, %E",
 		    get_name (), mt_mtx);
@@ -1438,8 +1439,9 @@ fhandler_dev_tape::dup (fhandler_base *child)
     }
   fh->mt_evt = NULL;
   if (mt_evt &&
-      !DuplicateHandle (hMainProc, mt_evt, hMainProc, &fh->mt_evt, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
+      !DuplicateHandle (GetCurrentProcess (), mt_evt,
+			GetCurrentProcess (), &fh->mt_evt,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("dup(%s) failed, event handle %x, %E",
 		    get_name (), mt_evt);

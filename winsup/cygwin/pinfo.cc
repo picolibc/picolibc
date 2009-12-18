@@ -105,7 +105,7 @@ pinfo_init (char **envp, int envc)
       myself->uid = ILLEGAL_UID;
       myself->gid = UNKNOWN_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
-      myself->nice = winprio_to_nice (GetPriorityClass (hMainProc));
+      myself->nice = winprio_to_nice (GetPriorityClass (GetCurrentProcess ()));
       debug_printf ("Set nice to %d", myself->nice);
     }
 
@@ -185,7 +185,7 @@ pinfo::exit (DWORD n)
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for that, though.  */
   struct rusage r;
-  fill_rusage (&r, hMainProc);
+  fill_rusage (&r, GetCurrentProcess ());
   add_rusage (&self->rusage_self, &r);
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
@@ -920,8 +920,8 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
      parent sees it.  */
   if (this != myself || is_toplevel_proc)
     flags |= DUPLICATE_CLOSE_SOURCE;
-  bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
-			      0, FALSE, flags);
+  bool res = DuplicateHandle (GetCurrentProcess (), wr_proc_pipe,
+			      hProcess, &wr_proc_pipe, 0, FALSE, flags);
   if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
     {
       wr_proc_pipe = orig_wr_proc_pipe;

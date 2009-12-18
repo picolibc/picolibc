@@ -544,7 +544,7 @@ wincapc::init ()
 	     == VER_SUITE_TERMINAL)
 	((wincaps *)caps)->ts_has_dep_problem = true;
     }
-  if (NT_SUCCESS (NtQueryInformationProcess (GetCurrentProcess (),
+  if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,
 					     &wow64, sizeof wow64, NULL))
       && !wow64)

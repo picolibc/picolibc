@@ -420,9 +420,9 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       moreinfo->argv = newargv;
 
       if (mode != _P_OVERLAY ||
-	  !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
-			    &moreinfo->myself_pinfo, 0, TRUE,
-			    DUPLICATE_SAME_ACCESS))
+	  !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
+			    GetCurrentProcess (), &moreinfo->myself_pinfo,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	moreinfo->myself_pinfo = NULL;
       else
 	VerifyHandle (moreinfo->myself_pinfo);
@@ -445,7 +445,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   si.cb = sizeof (si);
 
-  c_flags = GetPriorityClass (hMainProc);
+  c_flags = GetPriorityClass (GetCurrentProcess ());
   sigproc_printf ("priority class %d", c_flags);
   c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
 
@@ -473,9 +473,9 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 	 generating its own pids again? */
       if (cygheap->pid_handle)
 	/* already done previously */;
-      else if (DuplicateHandle (hMainProc, hMainProc, hMainProc,
-      				&cygheap->pid_handle, PROCESS_QUERY_INFORMATION,
-				TRUE, 0))
+      else if (DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
+				GetCurrentProcess (), &cygheap->pid_handle,
+				PROCESS_QUERY_INFORMATION, TRUE, 0))
 	ProtectHandleINH (cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
@@ -729,8 +729,8 @@ loop:
 	 the fields filled out by child.remember do not disappear and so there
 	 is not a brief period during which the pid is not available.
 	 However, we should try to find another way to do this eventually. */
-      DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
-			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+      DuplicateHandle (GetCurrentProcess (), child.shared_handle (),
+		       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       child->start_time = time (NULL); /* Register child's starting time. */
       child->nice = myself->nice;
       if (!child.remember (mode == _P_DETACH))

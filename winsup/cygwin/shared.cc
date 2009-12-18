@@ -158,7 +158,7 @@ get_session_parent_dir ()
   if (!dir)
     {
       PROCESS_SESSION_INFORMATION psi;
-      status = NtQueryInformationProcess (GetCurrentProcess (),
+      status = NtQueryInformationProcess (NtCurrentProcess (),
 					  ProcessSessionInformation,
 					  &psi, sizeof psi, NULL);
       if (!NT_SUCCESS (status) || psi.SessionId == 0)

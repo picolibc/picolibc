@@ -1143,8 +1143,9 @@ fhandler_base::dup (fhandler_base *child)
   HANDLE nh;
   if (!nohandle ())
     {
-      if (!DuplicateHandle (hMainProc, get_handle (), hMainProc, &nh, 0, TRUE,
-			    DUPLICATE_SAME_ACCESS))
+      if (!DuplicateHandle (GetCurrentProcess (), get_handle (),
+			    GetCurrentProcess (), &nh,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	{
 	  debug_printf ("dup(%s) failed, handle %x, %E",
 			get_name (), get_handle ());
@@ -1319,8 +1320,8 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
   bool res = false;
   if (/* !is_socket () && */ !close_on_exec ())
     debug_printf ("handle %p already opened", h);
-  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !close_on_exec (),
-			     DUPLICATE_SAME_ACCESS))
+  else if (!DuplicateHandle (parent, h, GetCurrentProcess (), &h,
+			     0, !close_on_exec (), DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
   else
     {

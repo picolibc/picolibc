@@ -312,8 +312,9 @@ pthread::init_mainthread ()
 
   set_tls_self_pointer (thread);
   thread->thread_id = GetCurrentThreadId ();
-  if (!DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
-			&thread->win32_obj_id, 0, FALSE, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
+			GetCurrentProcess (), &thread->win32_obj_id,
+			0, FALSE, DUPLICATE_SAME_ACCESS))
     api_fatal ("failed to create mainthread handle");
   if (!thread->create_cancel_event ())
     api_fatal ("couldn't create cancel event for main thread");
