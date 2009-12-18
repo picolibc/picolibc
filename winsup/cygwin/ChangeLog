@@ -1,3 +1,9 @@
+2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.sgml (func-cygwin-conv-path): Clarify meaning of size parameter.
+	(func-cygwin-conv-path-list): Fix typo.
+	(func-cygwin-posix-path-list-p): Ditto.
+
 2009-12-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (try_to_bin): Handle remote shares as well.  Just rename

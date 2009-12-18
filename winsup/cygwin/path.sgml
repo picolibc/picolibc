@@ -35,10 +35,11 @@ default.</para>
   CCP_RELATIVE = 0x100    /* Request to keep path relative.               */
 </programlisting>
 
-<para>If <parameter>size</parameter> is 0,
-<function>cygwin_conv_path</function> just returns the required buffer
-size in bytes.  Otherwise, it returns 0 on success, or -1 on error and
-errno is set to one of the below values.</para>
+<para><parameter>size</parameter> is the size of the buffer pointed to
+by <parameter>to</parameter> in bytes.  If <parameter>size</parameter>
+is 0, <function>cygwin_conv_path</function> just returns the required
+buffer size in bytes.  Otherwise, it returns 0 on success, or -1 on
+error and errno is set to one of the below values.</para>
 
 <programlisting>
     EINVAL        what has an invalid value.
@@ -80,7 +81,7 @@ else
 
 <funcsynopsis><funcprototype>
 <funcdef>extern "C" ssize_t
-<function>cygwin_conv_path</function></funcdef>
+<function>cygwin_conv_path_list</function></funcdef>
 <paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
 <paramdef>const void * <parameter>from</parameter></paramdef>
 <paramdef>void * <parameter>to</parameter></paramdef>
@@ -95,6 +96,8 @@ convert it to the equivalent Win32 %PATH%-style string (i.e. d:\;e:\bar).</para>
 <para>If <parameter>what</parameter> is CCP_WIN_A_TO_POSIX or
 CCP_WIN_W_TO_POSIX, given a Win32 %PATH%-style string (i.e. d:\;e:\bar)
 convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
+<para><parameter>size</parameter> is the size of the buffer pointed to by
+<parameter>to</parameter> in bytes.</para>
 
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
 
@@ -134,7 +137,7 @@ errno can be set to the below value.</para>
 
 <funcsynopsis><funcprototype>
 <funcdef>extern "C" int
-<function>posix_path_list_p</function></funcdef>
+<function>cygwin_posix_path_list_p</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 </funcprototype></funcsynopsis>
 
