@@ -1,3 +1,7 @@
+2009-12-18  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* common.h (NT_S390_HIGH_GPRS): Define.
+
 2009-12-17  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (R_PPC_RELAX32, R_PPC_RELAX32PC, R_PPC_RELAX32_PLT,
