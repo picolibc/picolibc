@@ -102,11 +102,11 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
     {
       /* Divide user's input into transactions no larger than 49.7
          days at a time.  */
-      if (sec > HIRES_DELAY_MAX)
+      if (sec > HIRES_DELAY_MAX / 1000)
         {
-          req = ((HIRES_DELAY_MAX * 1000 + resolution - 1)
+          req = ((HIRES_DELAY_MAX + resolution - 1)
                  / resolution * resolution);
-          sec -= HIRES_DELAY_MAX;
+          sec -= HIRES_DELAY_MAX / 1000;
         }
       else
         {

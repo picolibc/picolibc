@@ -1,3 +1,7 @@
+2009-12-18  Eric Blake  <ebb9@byu.net>
+
+	* signal.cc (nanosleep): Fix bug in previous patch.
+
 2009-12-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout, replace hMainProc with GetCurrentProcess/NtCurrentProcess
