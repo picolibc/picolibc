@@ -405,9 +405,12 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
-	      bool meta;
-	      meta = (control_key_state & ALT_PRESSED) != 0
+	      bool meta =
+		     /* Alt but not AltGr (= left ctrl + right alt)? */
+		     (control_key_state & ALT_PRESSED) != 0
 		     && ((control_key_state & CTRL_PRESSED) == 0
+			    /* but also allow Alt-AltGr: */
+			 || (control_key_state & ALT_PRESSED) == ALT_PRESSED
 			 || (wch <= 0x1f || wch == 0x7f));
 	      if (!meta)
 		{
@@ -1113,9 +1116,50 @@ fhandler_console::cursor_get (int *x, int *y)
   *x = dev_state->info.dwCursorPosition.X;
 }
 
+static wchar_t __vt100_conv [31] = {
+/* VT100 line drawing graphics mode maps `abcdefghijklmnopqrstuvwxyz{|}~ to
+   graphical characters */
+	0x25C6, /* Black Diamond */
+	0x2592, /* Medium Shade */
+	0x2409, /* Symbol for Horizontal Tabulation */
+	0x240C, /* Symbol for Form Feed */
+	0x240D, /* Symbol for Carriage Return */
+	0x240A, /* Symbol for Line Feed */
+	0x00B0, /* Degree Sign */
+	0x00B1, /* Plus-Minus Sign */
+	0x2424, /* Symbol for Newline */
+	0x240B, /* Symbol for Vertical Tabulation */
+	0x2518, /* Box Drawings Light Up And Left */
+	0x2510, /* Box Drawings Light Down And Left */
+	0x250C, /* Box Drawings Light Down And Right */
+	0x2514, /* Box Drawings Light Up And Right */
+	0x253C, /* Box Drawings Light Vertical And Horizontal */
+	0x23BA, /* Horizontal Scan Line-1 */
+	0x23BB, /* Horizontal Scan Line-3 */
+	0x2500, /* Box Drawings Light Horizontal */
+	0x23BC, /* Horizontal Scan Line-7 */
+	0x23BD, /* Horizontal Scan Line-9 */
+	0x251C, /* Box Drawings Light Vertical And Right */
+	0x2524, /* Box Drawings Light Vertical And Left */
+	0x2534, /* Box Drawings Light Up And Horizontal */
+	0x252C, /* Box Drawings Light Down And Horizontal */
+	0x2502, /* Box Drawings Light Vertical */
+	0x2264, /* Less-Than Or Equal To */
+	0x2265, /* Greater-Than Or Equal To */
+	0x03C0, /* Greek Small Letter Pi */
+	0x2260, /* Not Equal To */
+	0x00A3, /* Pound Sign */
+	0x00B7, /* Middle Dot */
+};
+
 inline
 bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
+  if (dev_state->vt100_graphics_mode_active)
+    for (DWORD i = 0; i < len; i ++)
+      if (buf[i] >= (unsigned char) '`' && buf[i] <= (unsigned char) '~')
+        buf[i] = __vt100_conv[buf[i] - (unsigned char) '`'];
+
   while (len > 0)
     {
       DWORD nbytes = len > MAX_WRITE_CHARS ? MAX_WRITE_CHARS : len;
@@ -1144,11 +1188,13 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 #define TAB 8 /* We should't let the console deal with these */
 #define CR 13
 #define LF 10
+#define SO 14
+#define SI 15
 
 static const char base_chars[256] =
 {
 /*00 01 02 03 04 05 06 07 */ IGN, ERR, ERR, NOR, NOR, NOR, NOR, BEL,
-/*08 09 0A 0B 0C 0D 0E 0F */ BAK, TAB, DWN, ERR, ERR, CR,  ERR, IGN,
+/*08 09 0A 0B 0C 0D 0E 0F */ BAK, TAB, DWN, ERR, ERR, CR,  SO,  SI,
 /*10 11 12 13 14 15 16 17 */ NOR, NOR, ERR, ERR, ERR, ERR, ERR, ERR,
 /*18 19 1A 1B 1C 1D 1E 1F */ NOR, NOR, ERR, ESC, ERR, ERR, ERR, ERR,
 /*   !  "  #  $  %  &  '  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
@@ -1497,7 +1543,16 @@ fhandler_console::char_command (char c)
 	WriteFile (get_output_handle (), &dev_state->args_[0], 1, (DWORD *) &x, 0);
       break;
     case 'c':				/* u9 - Terminal enquire string */
-      strcpy (buf, "\033[?6c");
+      if (dev_state->saw_greater_than_sign)
+	/* Generate Secondary Device Attribute report, using 67 = ASCII 'C' 
+	   to indicate Cygwin (convention used by Rxvt, Urxvt, Screen, Mintty), 
+	   and cygwin version for terminal version. */
+	__small_sprintf (buf, "\033[>67;%d%02d;0c", CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
+      else
+	strcpy (buf, "\033[?6c");
+      /* The generated report needs to be injected for read-ahead into the 
+         fhandler_console object associated with standard input.
+         The current call does not work. */
       puts_readahead (buf);
       break;
     case 'n':
@@ -1673,6 +1728,12 @@ fhandler_console::write_normal (const unsigned char *src,
       int x, y;
       switch (base_chars[*found])
 	{
+	case SO:
+	  dev_state->vt100_graphics_mode_active = true;
+	  break;
+	case SI:
+	  dev_state->vt100_graphics_mode_active = false;
+	  break;
 	case BEL:
 	  beep ();
 	  break;
@@ -1763,45 +1824,54 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    return -1;
 	  break;
 	case gotesc:
-	  if (*src == '[')
+	  if (*src == '[')		/* CSI Control Sequence Introducer */
 	    {
 	      dev_state->state_ = gotsquare;
 	      dev_state->saw_question_mark = false;
+	      dev_state->saw_greater_than_sign = false;
 	      for (dev_state->nargs_ = 0; dev_state->nargs_ < MAXARGS; dev_state->nargs_++)
 		dev_state->args_[dev_state->nargs_] = 0;
 	      dev_state->nargs_ = 0;
 	    }
-	  else if (*src == ']')
+	  else if (*src == ']')		/* OSC Operating System Command */
 	    {
 	      dev_state->rarg = 0;
 	      dev_state->my_title_buf[0] = '\0';
 	      dev_state->state_ = gotrsquare;
 	    }
-	  else if (*src == 'M')		/* Reverse Index */
+	  else if (*src == '(')		/* Designate G0 character set */
+	    {
+	      dev_state->state_ = gotparen;
+	    }
+	  else if (*src == ')')		/* Designate G1 character set */
+	    {
+	      dev_state->state_ = gotrparen;
+	    }
+	  else if (*src == 'M')		/* Reverse Index (scroll down) */
 	    {
 	      dev_state->fillin_info (get_output_handle ());
 	      scroll_screen (0, 0, -1, -1, 0, dev_state->info.winTop + 1);
 	      dev_state->state_ = normal;
 	    }
-	  else if (*src == 'c')		/* Reset Linux terminal */
+	  else if (*src == 'c')		/* RIS Full Reset */
 	    {
 	      dev_state->set_default_attr ();
 	      clear_screen (0, 0, -1, -1);
 	      cursor_set (true, 0, 0);
 	      dev_state->state_ = normal;
 	    }
-	  else if (*src == '8')		/* Restore cursor position */
+	  else if (*src == '8')		/* DECRC Restore cursor position */
 	    {
 	      cursor_set (true, dev_state->savex, dev_state->savey);
 	      dev_state->state_ = normal;
 	    }
-	  else if (*src == '7')		/* Save cursor position */
+	  else if (*src == '7')		/* DECSC Save cursor position */
 	    {
 	      cursor_get (&dev_state->savex, &dev_state->savey);
 	      dev_state->savey -= dev_state->info.winTop;
 	      dev_state->state_ = normal;
 	    }
-	  else if (*src == 'R')
+	  else if (*src == 'R')		/* ? */
 	      dev_state->state_ = normal;
 	  else
 	    {
@@ -1875,11 +1945,30 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      if (*src == '?')
 		dev_state->saw_question_mark = true;
+	      else if (*src == '>')
+		dev_state->saw_greater_than_sign = true;
 	      /* ignore any extra chars between [ and first arg or command */
 	      src++;
 	    }
 	  else
 	    dev_state->state_ = gotarg1;
+	  break;
+	case gotparen:
+	  if (*src == '0')
+	    dev_state->vt100_graphics_mode_active = true;
+	  else
+	    dev_state->vt100_graphics_mode_active = false;
+	  dev_state->state_ = normal;
+	  src++;
+	  break;
+	case gotrparen:
+	  /* This is not strictly needed, ^N/^O can just always be enabled */
+	  if (*src == '0')
+	    /*dev_state->vt100_graphics_mode_SOSI_enabled = true*/;
+	  else
+	    /*dev_state->vt100_graphics_mode_SOSI_enabled = false*/;
+	  dev_state->state_ = normal;
+	  src++;
 	  break;
 	}
     }

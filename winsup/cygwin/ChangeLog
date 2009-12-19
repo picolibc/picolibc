@@ -1,3 +1,26 @@
+2009-12-19  Thomas Wolff  <towo@towo.net>
+
+	* fhandler_console.cc (write_console): Check for VT100
+	graphics mode and transform wide characters in ASCII small
+	letter range to corresponding graphics.
+	(__vt100_conv): Table to transform small ASCII letters to line
+	drawing graphics for use in VT100 graphics mode.
+	(write_normal): Check for SO/SI control characters to
+	enable/disable VT100 graphics mode.
+	(base_chars): Enable SO/SI control characters for detection.
+	(write): Check for ESC ( 0 / ESC ( B escape sequences to
+	enable/disable VT100 graphics mode. Also detect ">" while
+	parsing ESC [ sequences to distinguish specific requests.
+	(char_command): Distinguish Secondary from Primary Device Attribute
+	request to report more details about cygwin console terminal version.
+	* fhandler.h (vt100_graphics_mode_active): New flag to indicate mode.
+	(saw_greater_than_sign): New parse flag for ESC [ > sequences.
+	(gotparen, gotrparen): New state values to parse ESC ( / ) sequences.
+
+	* fhandler_console.cc (read): Allow combined Alt-AltGr modifiers
+	to also produce an ESC prefix like a plain Alt modifier, e.g. to make
+	Alt-@ work on a keyboard where @ is AltGr-q.
+
 2009-12-18  Eric Blake  <ebb9@byu.net>
 
 	* signal.cc (nanosleep): Fix bug in previous patch.

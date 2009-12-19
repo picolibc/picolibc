@@ -889,6 +889,8 @@ enum ansi_intensity
 #define gotcommand 5
 #define gettitle 6
 #define eattitle 7
+#define gotparen 8
+#define gotrparen 9
 #define MAXARGS 10
 
 class dev_console
@@ -904,6 +906,8 @@ class dev_console
   int nargs_;
   unsigned rarg;
   bool saw_question_mark;
+  bool saw_greater_than_sign;
+  bool vt100_graphics_mode_active;
   bool alternate_charset_active;
   bool metabit;
 
