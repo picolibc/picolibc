@@ -1116,9 +1116,9 @@ fhandler_console::cursor_get (int *x, int *y)
   *x = dev_state->info.dwCursorPosition.X;
 }
 
-static wchar_t __vt100_conv [31] = {
 /* VT100 line drawing graphics mode maps `abcdefghijklmnopqrstuvwxyz{|}~ to
    graphical characters */
+static wchar_t __vt100_conv [31] = {
 	0x25C6, /* Black Diamond */
 	0x2592, /* Medium Shade */
 	0x2409, /* Symbol for Horizontal Tabulation */

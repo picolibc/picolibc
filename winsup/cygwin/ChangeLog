@@ -1,3 +1,7 @@
+2009-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (__vt100_conv): Minor formatting change.
+
 2009-12-19  Thomas Wolff  <towo@towo.net>
 
 	* fhandler_console.cc (write_console): Check for VT100
