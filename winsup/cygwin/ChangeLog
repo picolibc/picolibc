@@ -1,3 +1,15 @@
+2009-12-21  Thomas Wolff  <towo@towo.net>
+
+	* fhandler_console.cc (get_nonascii_key): Generate ESC prefix 
+	for Alt modifier generically for function keys and keypad keys.
+	Distinguish Normal, Ctrl, Shift, Ctrl-Shift rather 
+	than Normal, Ctrl, Shift, Alt, so that in combination with generic 
+	Alt handling all 8 combinations of these modifiers are distinguished.
+	(keytable): Add escape sequences for remaining modified 
+	function keys as a compatible extension using rxvt escape codes.
+	Also distinguish keypad keys modified with Ctrl, Shift, Ctrl-Shift 
+	using xterm-style modifier coding.
+
 2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout, revert ill-conceived replacement of hMainThread with

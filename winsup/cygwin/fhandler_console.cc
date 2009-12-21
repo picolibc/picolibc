@@ -1982,33 +1982,39 @@ static struct {
   int vk;
   const char *val[4];
 } keytable[] NO_COPY = {
-	       /* NORMAL */    /* SHIFT */     /* CTRL */     /* ALT */
-  {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
-  {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},
-  {VK_UP,	{"\033[A",	"\033[A",	"\033[A",	"\033\033[A"}},
-  {VK_DOWN,	{"\033[B",	"\033[B",	"\033[B",	"\033\033[B"}},
-  {VK_PRIOR,	{"\033[5~",	"\033[5~",	"\033[5~",	"\033\033[5~"}},
-  {VK_NEXT,	{"\033[6~",	"\033[6~",	"\033[6~",	"\033\033[6~"}},
-  {VK_HOME,	{"\033[1~",	"\033[1~",	"\033[1~",	"\033\033[1~"}},
-  {VK_END,	{"\033[4~",	"\033[4~",	"\033[4~",	"\033\033[4~"}},
-  {VK_INSERT,	{"\033[2~",	"\033[2~",	"\033[2~",	"\033\033[2~"}},
-  {VK_DELETE,	{"\033[3~",	"\033[3~",	"\033[3~",	"\033\033[3~"}},
-  {VK_F1,	{"\033[[A",	"\033[23~",	NULL,		NULL}},
-  {VK_F2,	{"\033[[B",	"\033[24~",	NULL,		NULL}},
-  {VK_F3,	{"\033[[C",	"\033[25~",	NULL,		NULL}},
-  {VK_F4,	{"\033[[D",	"\033[26~",	NULL,		NULL}},
-  {VK_F5,	{"\033[[E",	"\033[28~",	NULL,		NULL}},
-  {VK_F6,	{"\033[17~",	"\033[29~",	"\036",		NULL}},
-  {VK_F7,	{"\033[18~",	"\033[31~",	NULL,		NULL}},
-  {VK_F8,	{"\033[19~",	"\033[32~",	NULL,		NULL}},
-  {VK_F9,	{"\033[20~",	"\033[33~",	NULL,		NULL}},
-  {VK_F10,	{"\033[21~",	"\033[34~",	NULL,		NULL}},
-  {VK_F11,	{"\033[23~",	NULL,		NULL,		NULL}},
-  {VK_F12,	{"\033[24~",	NULL,		NULL,		NULL}},
-  {VK_NUMPAD5,	{"\033[G",	NULL,		NULL,		NULL}},
-  {VK_CLEAR,	{"\033[G",	NULL,		NULL,		NULL}},
+	       /* NORMAL */    /* SHIFT */     /* CTRL */     /* CTRL-SHIFT */
+  /* Unmodified and Alt-modified keypad keys comply with linux console
+     SHIFT, CTRL, CTRL-SHIFT modifiers comply with xterm modifier usage */
+  {VK_NUMPAD5,	{"\033[G",	"\033[1;2G",	"\033[1;5G",	"\033[1;6G"}},
+  {VK_CLEAR,	{"\033[G",	"\033[1;2G",	"\033[1;5G",	"\033[1;6G"}},
+  {VK_LEFT,	{"\033[D",	"\033[1;2D",	"\033[1;5D",	"\033[1;6D"}},
+  {VK_RIGHT,	{"\033[C",	"\033[1;2C",	"\033[1;5C",	"\033[1;6C"}},
+  {VK_UP,	{"\033[A",	"\033[1;2A",	"\033[1;5A",	"\033[1;6A"}},
+  {VK_DOWN,	{"\033[B",	"\033[1;2B",	"\033[1;5B",	"\033[1;6B"}},
+  {VK_PRIOR,	{"\033[5~",	"\033[5;2~",	"\033[5;5~",	"\033[5;6~"}},
+  {VK_NEXT,	{"\033[6~",	"\033[6;2~",	"\033[6;5~",	"\033[6;6~"}},
+  {VK_HOME,	{"\033[1~",	"\033[1;2~",	"\033[1;5~",	"\033[1;6~"}},
+  {VK_END,	{"\033[4~",	"\033[4;2~",	"\033[4;5~",	"\033[4;6~"}},
+  {VK_INSERT,	{"\033[2~",	"\033[2;2~",	"\033[2;5~",	"\033[2;6~"}},
+  {VK_DELETE,	{"\033[3~",	"\033[3;2~",	"\033[3;5~",	"\033[3;6~"}},
+  /* F1...F12, SHIFT-F1...SHIFT-F10 comply with linux console
+     F6...F12, and all modified F-keys comply with rxvt (compatible extension) */
+  {VK_F1,	{"\033[[A",	"\033[23~",	"\033[11^",	"\033[23^"}},
+  {VK_F2,	{"\033[[B",	"\033[24~",	"\033[12^",	"\033[24^"}},
+  {VK_F3,	{"\033[[C",	"\033[25~",	"\033[13^",	"\033[25^"}},
+  {VK_F4,	{"\033[[D",	"\033[26~",	"\033[14^",	"\033[26^"}},
+  {VK_F5,	{"\033[[E",	"\033[28~",	"\033[15^",	"\033[28^"}},
+  {VK_F6,	{"\033[17~",	"\033[29~",	"\033[17^",	"\033[29^"}},
+  {VK_F7,	{"\033[18~",	"\033[31~",	"\033[18^",	"\033[31^"}},
+  {VK_F8,	{"\033[19~",	"\033[32~",	"\033[19^",	"\033[32^"}},
+  {VK_F9,	{"\033[20~",	"\033[33~",	"\033[20^",	"\033[33^"}},
+  {VK_F10,	{"\033[21~",	"\033[34~",	"\033[21^",	"\033[34^"}},
+  {VK_F11,	{"\033[23~",	"\033[23$",	"\033[23^",	"\033[23@"}},
+  {VK_F12,	{"\033[24~",	"\033[24$",	"\033[24^",	"\033[24@"}},
+  /* CTRL-6 complies with Windows cmd console but should be fixed */
   {'6',		{NULL,		NULL,		"\036",		NULL}},
-  {0,		{"",		NULL,		NULL,		NULL}}
+  /* Table end marker */
+  {0}
 };
 
 const char *
@@ -2017,21 +2023,29 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 #define NORMAL  0
 #define SHIFT	1
 #define CONTROL	2
-#define ALT	3
-  int modifier_index = NORMAL;
+/*#define CONTROLSHIFT	3*/
 
+  int modifier_index = NORMAL;
   if (input_rec.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED)
     modifier_index = SHIFT;
-  else if (input_rec.Event.KeyEvent.dwControlKeyState &
+  if (input_rec.Event.KeyEvent.dwControlKeyState &
 		(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-    modifier_index = CONTROL;
-  else if (input_rec.Event.KeyEvent.dwControlKeyState &
-		(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
-    modifier_index = ALT;
+    modifier_index += CONTROL;
 
   for (int i = 0; keytable[i].vk; i++)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
-      return keytable[i].val[modifier_index];
+      {
+        if ((input_rec.Event.KeyEvent.dwControlKeyState &
+		(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+	    && keytable[i].val[modifier_index] != NULL)
+          { /* Generic ESC prefixing if Alt is pressed */
+	    tmp[0] = '\033';
+	    strcpy (tmp + 1, keytable[i].val[modifier_index]);
+	    return tmp;
+          }
+        else
+          return keytable[i].val[modifier_index];
+      }
 
   if (input_rec.Event.KeyEvent.uChar.AsciiChar)
     {
