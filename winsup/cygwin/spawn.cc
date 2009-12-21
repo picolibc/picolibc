@@ -281,12 +281,19 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
-      set_errno (EINVAL);
+      set_errno (EFAULT);	/* As on Linux. */
+      return -1;
+    }
+  if (!prog_arg[0])
+    {
+      syscall_printf ("prog_arg is empty");
+      set_errno (ENOENT);	/* Per POSIX */
       return -1;
     }
 
   syscall_printf ("spawn_guts (%d, %.9500s)", mode, prog_arg);
 
+  /* FIXME: This is no error condition on Linux. */
   if (argv == NULL)
     {
       syscall_printf ("argv is NULL");

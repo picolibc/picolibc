@@ -1,3 +1,12 @@
+2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exec.cc (execvp): Call find_exec with FE_NNF flag to enforce
+	a NULL return when executable isn't found in $PATH.  Convert NULL
+	to "".
+	(execvpe): Ditto.
+	* spawn.cc (spawn_guts): Return with EFAULT if prog_arg is NULL.
+	Return with ENOENT if prog_arg is empty string.  Add a comment.
+
 2009-12-21  Thomas Wolff  <towo@towo.net>
 
 	* fhandler_console.cc (get_nonascii_key): Generate ESC prefix 

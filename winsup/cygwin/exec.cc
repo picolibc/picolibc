@@ -86,14 +86,14 @@ extern "C" int
 execvp (const char *path, char * const *argv)
 {
   path_conv buf;
-  return  execv (find_exec (path, buf), argv);
+  return execv (find_exec (path, buf, "PATH=", FE_NNF) ?: "", argv);
 }
 
 extern "C" int
 execvpe (const char *path, char * const *argv, char *const *envp)
 {
   path_conv buf;
-  return  execve (find_exec (path, buf), argv, envp);
+  return execve (find_exec (path, buf, "PATH=", FE_NNF) ?: "", argv, envp);
 }
 
 extern "C" int
