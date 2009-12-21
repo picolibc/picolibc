@@ -1,5 +1,10 @@
 2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (cygwin_conv_path): Add band-aid including comment to avoid
+	conversion from POSIX "." to Win32 ".\\".
+
+2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exec.cc (execvp): Call find_exec with FE_NNF flag to enforce
 	a NULL return when executable isn't found in $PATH.  Convert NULL
 	to "".

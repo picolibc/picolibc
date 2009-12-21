@@ -2709,6 +2709,16 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	      *(buf += 2) = '\\';
 	  }
 	lsiz = strlen (buf) + 1;
+	/* TODO: Incoming "." is a special case which leads to a trailing
+	   backslash ".\\" in the Win32 path.  That's a result of the
+	   conversion in normalize_posix_path.  This should not occur
+	   so the below code is just a band-aid. */
+	if (!strcmp ((const char *) from, ".") && relative
+	    && !strcmp (buf, ".\\"))
+	  {
+	    --lsiz;
+	    buf[lsiz - 1] = '\0';
+	  }
       }
       break;
     case CCP_POSIX_TO_WIN_W:
@@ -2727,7 +2737,16 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  if (p.error)
 	    return_with_errno (p.error);
 	}
-      lsiz = (p.get_wide_win32_path_len () + 1) * sizeof (WCHAR);
+      lsiz = p.get_wide_win32_path_len () + 1;
+      /* TODO: Same ".\\" band-aid as in CCP_POSIX_TO_WIN_A case. */
+      if (!strcmp ((const char *) from, ".") && relative
+	  && !wcscmp (p.get_nt_native_path ()->Buffer, L".\\"))
+      	{
+	  --lsiz;
+	  p.get_nt_native_path ()->Length -= sizeof (WCHAR);
+	  p.get_nt_native_path ()->Buffer[lsiz - 1] = L'\0';
+	}
+      lsiz *= sizeof (WCHAR);
       break;
     case CCP_WIN_A_TO_POSIX:
       buf = tp.c_get ();
