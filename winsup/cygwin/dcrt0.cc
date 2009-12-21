@@ -695,6 +695,10 @@ dll_crt0_0 ()
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
 
+  DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
+		   GetCurrentProcess (), &hMainThread,
+		   0, false, DUPLICATE_SAME_ACCESS);
+
   OpenProcessToken (GetCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
@@ -780,6 +784,8 @@ dll_crt0_1 (void *)
   while (i--)
     small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
 #endif
+
+  ProtectHandle (hMainThread);
 
   cygheap->cwd.init ();
 

@@ -1,3 +1,10 @@
+2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout, revert ill-conceived replacement of hMainThread with
+	GetCurrentThread/NtCurrentThread.
+	* dcrt0.cc (dll_crt0_0): Duplicate main thread handle to hMainThread
+	again.
+
 2009-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (__vt100_conv): Minor formatting change.

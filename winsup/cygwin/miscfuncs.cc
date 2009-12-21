@@ -253,7 +253,7 @@ low_priority_sleep (DWORD secs)
       if (GetCurrentThreadId () == cygthread::main_thread_id)
 	new_prio = THREAD_PRIORITY_LOWEST;
       else
-	new_prio = GetThreadPriority (GetCurrentThread ());
+	new_prio = GetThreadPriority (hMainThread);
 
       if (curr_prio != new_prio)
 	/* Force any threads in normal priority to be scheduled */
