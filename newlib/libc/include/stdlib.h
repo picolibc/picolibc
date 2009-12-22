@@ -83,6 +83,10 @@ char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
 char *	_EXFUN(_findenv,(_CONST char *, int *));
 char *	_EXFUN(_findenv_r,(struct _reent *, _CONST char *, int *));
+#ifndef __STRICT_ANSI__
+extern char *suboptarg;			/* getsubopt(3) external variable */
+int	_EXFUN(getsubopt,(char **, char * const *, char **));
+#endif
 long	_EXFUN(labs,(long));
 ldiv_t	_EXFUN(ldiv,(long __numer, long __denom));
 _PTR	_EXFUN_NOTHROW(malloc,(size_t __size));

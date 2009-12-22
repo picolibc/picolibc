@@ -191,9 +191,6 @@ extern int optreset;			/* getopt(3) external variable */
 
 #ifndef        _POSIX_SOURCE
 pid_t   _EXFUN(vfork, (void ));
-
-extern char *suboptarg;			/* getsubopt(3) external variable */
-int	 getsubopt(char **, char * const *, char **);
 #endif /* _POSIX_SOURCE */
 
 #ifdef _COMPILING_NEWLIB

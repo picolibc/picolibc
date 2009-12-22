@@ -1,19 +1,24 @@
+2009-12-22  Eric Blake  <ebb9@byu.net>
+
+	* libc/include/sys/unistd.h (suboptarg, getsubopt): Move...
+	* libc/include/stdlib.h: ...here, to match POSIX for getsubopt.
+
 2009-12-17  Jeff Johnston  <jjohnstn@redhat.com>
 
-        * NEWS: Update with 1.18.0 info.
-        * README: Ditto.
-        * acinclude.m4: Change version number to 1.18.0.
-        * aclocal.m4: Regenerated.
-        * configure: Ditto.
-        * doc/aclocal.m4: Ditto.
-        * doc/configure: Ditto.
-        * libc/*/aclocal.m4: Ditto.
-        * libc/*/configure: Ditto.
-        * libc/libc.texinfo: Ditto.
-        * libm/*/aclocal.m4: Ditto.
-        * libm/*/configure: Ditto.
-        * libm/libm.texinfo: Ditto.
-        * libc/sys/linux/shared.ld: Add VERS_1.18
+	* NEWS: Update with 1.18.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.18.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.18
 
 2009-12-17  Jeff Johnston <jjohnstn@redhat.com>
 
@@ -44,7 +49,7 @@
 2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/machine/ieeefp.h: Rework __IEEE_*_ENDIAN handling.
-	* libc/machine/arm/machine/endian.h: Remove (Conflicts with 
+	* libc/machine/arm/machine/endian.h: Remove (Conflicts with
 	libc/include/machine/endian.h)
 
 2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
@@ -53,7 +58,7 @@
 
 2009-12-17  Ralf Corsepius <ralf.corsepius@rtems.org>
 
-	* libc/include/pthread.h: Add pthread_atfork, pthread_rwlock_unlock 
+	* libc/include/pthread.h: Add pthread_atfork, pthread_rwlock_unlock
 	* libc/include/sys/stat.h: Use struct timespec st_*tim,
 	blksize_t st_blksize, blkcnt_t st_blocks.
 	Add st_*time compatibility macros.
@@ -75,17 +80,17 @@
 
 2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
-	* libc/sys/rtems/machine/_types.h: New (Derived from 
+	* libc/sys/rtems/machine/_types.h: New (Derived from
 	machine/_default_types.h).
-        * libc/sys/rtems/crt0.c: Rework. Introduce macro RTEMS_STUB.
+	* libc/sys/rtems/crt0.c: Rework. Introduce macro RTEMS_STUB.
 	* libc/sys/rtems/sys/param.h:
-        Update copyright notice from FreeBSD.
-        Remove HZ.
-        Add #include <sys/priority.h>
-        Remove priority handling (moved to sys/priority.h).
-        Remove CLBYTES (Unused, abandoned in BSD).
+	Update copyright notice from FreeBSD.
+	Remove HZ.
+	Add #include <sys/priority.h>
+	Remove priority handling (moved to sys/priority.h).
+	Remove CLBYTES (Unused, abandoned in BSD).
 	* libc/sys/rtems/sys/queue.h: Update copyright (from FreeBSD).
-        Remove CIRCLEQ_*.
+	Remove CIRCLEQ_*.
 
 2009-12-15  Conny Marco Menebrocker  <c-m-m@gmx.de>
 
