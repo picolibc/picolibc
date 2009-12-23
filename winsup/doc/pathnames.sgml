@@ -225,7 +225,7 @@ The old user mount points in your HKEY_CURRENT_USER branch of the registry
 are not used to generate <filename>/etc/fstab</filename>.  If you want
 to create a user specific <filename>/etc/fstab.d/${USER}</filename> file
 from your old entries, there's a script available which does exactly
-that for you, <filename>bin/copy-user-registry-fstab</filename>.  Just
+that for you, <filename>/bin/copy-user-registry-fstab</filename>.  Just
 start the script and it will create your user specific fstab file.  Stop
 all your Cygwin processes and restart them, and you can simply use your
 old user mount points as before.

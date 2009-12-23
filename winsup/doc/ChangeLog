@@ -1,3 +1,7 @@
+2009-12-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml (mount-table): Add missing slash in pathname.
+
 2009-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-setup.xml (faq.setup.mirror): Fix URL to wget.
