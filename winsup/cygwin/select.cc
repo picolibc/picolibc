@@ -742,6 +742,9 @@ fhandler_pipe::select_except (select_stuff *ss)
 select_record *
 fhandler_fifo::select_read (select_stuff *ss)
 {
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
@@ -755,6 +758,9 @@ fhandler_fifo::select_read (select_stuff *ss)
 select_record *
 fhandler_fifo::select_write (select_stuff *ss)
 {
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
@@ -768,6 +774,9 @@ fhandler_fifo::select_write (select_stuff *ss)
 select_record *
 fhandler_fifo::select_except (select_stuff *ss)
 {
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;

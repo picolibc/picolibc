@@ -1,3 +1,10 @@
+2009-12-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* select.cc (fhandler_fifo::select_read): Fill in device specific
+	record.
+	(fhandler_fifo::select_write): Ditto.
+	(fhandler_fifo::select_except): Ditto.
+
 2009-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cygwin_conv_path): Add band-aid including comment to avoid
