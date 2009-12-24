@@ -1,3 +1,8 @@
+2009-12-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Set fileattr to
+	FILE_ATTRIBUTE_DIRECTORY in a certain error condition.  Explain why.
+
 2009-12-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.cc (fhandler_fifo::select_read): Fill in device specific

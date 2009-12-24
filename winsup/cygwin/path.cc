@@ -2327,7 +2327,12 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      if (!NT_SUCCESS (status))
 		{
 		  debug_printf ("%p = NtOpenFile(%S)", status, &dirname);
-		  fileattr = 0;
+		  /* There's a special case if the file is itself the root
+		     of a drive which is not accessible by the current user.
+		     This case is only recognized by the length of the
+		     basename part.  If it's 0, the incoming file is the
+		     root of a drive.  So we at least know it's a directory. */
+		  fileattr = basename.Length ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 		}
 	      else
 		{
