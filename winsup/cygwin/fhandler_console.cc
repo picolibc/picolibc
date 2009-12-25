@@ -375,13 +375,20 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  if (control_key_state & LEFT_ALT_PRESSED)
 	    dev_state->nModifiers |= 8;
 
-	  /* Adopt the linux standard of translating the backspace key to DEL
-	     except when ALT is pressed.  */
+	  /* Send the VERASE character from the terminal settings as backspace keycode. */
 	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
 	    {
-	      toadd = (control_key_state & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
-		      ? (dev_state->metabit ? "\377" : "\033\177") : "\177";
-	      nread = strlen (toadd);
+	      char c = ti.c_cc[VERASE];
+	      nread = 0;
+	      if (control_key_state & ALT_PRESSED) {
+		if (dev_state->metabit)
+		  c |= 0x80;
+		else
+		  tmp[nread++] = '\e';
+	      }
+	      tmp[nread++] = c;
+	      tmp[nread] = 0;
+	      toadd = tmp;
 	    }
 	  /* Allow Ctrl-Space to emit ^@ */
 	  else if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE

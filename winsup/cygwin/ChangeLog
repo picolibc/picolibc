@@ -1,3 +1,8 @@
+2009-12-25  Andy Koppe  <andy.koppe@gmail.com>
+
+	* fhandler_console.cc (handler_console::read): Use the tty's VERASE
+	character as the backspace keycode.
+
 2009-12-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Set fileattr to
