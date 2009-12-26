@@ -1,3 +1,9 @@
+2009-12-26  Eric Blake  <ebb9@byu.net>
+
+	* include/pty.h (openpty, forkpty): Mark last two arguments const,
+	to match glibc 2.8.
+	* libc/bsdlib.cc (openpty, forkpty): Likewise.
+
 2009-12-25  Andy Koppe  <andy.koppe@gmail.com>
 
 	* fhandler_console.cc (handler_console::read): Use the tty's VERASE

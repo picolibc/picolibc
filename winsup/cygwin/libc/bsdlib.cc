@@ -97,8 +97,8 @@ login_tty (int fd)
 }
 
 extern "C" int
-openpty (int *amaster, int *aslave, char *name, struct termios *termp,
-	 struct winsize *winp)
+openpty (int *amaster, int *aslave, char *name, const struct termios *termp,
+	 const struct winsize *winp)
 {
   int master, slave;
   char pts[TTY_NAME_MAX];
@@ -130,7 +130,8 @@ openpty (int *amaster, int *aslave, char *name, struct termios *termp,
 }
 
 extern "C" int
-forkpty (int *amaster, char *name, struct termios *termp, struct winsize *winp)
+forkpty (int *amaster, char *name, const struct termios *termp,
+	 const struct winsize *winp)
 {
   int master, slave, pid;
 
