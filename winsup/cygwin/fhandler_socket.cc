@@ -1099,7 +1099,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)
-    res = wait_for_events (FD_CONNECT | FD_CLOSE);
+    res = wait_for_events (FD_CONNECT | FD_CLOSE, false);
 
   if (!res)
     err = 0;
@@ -1200,7 +1200,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   int llen = sizeof (struct sockaddr_storage);
 
   int res = 0;
-  while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE))
+  while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, false))
 	 && (res = ::accept (get_socket (), (struct sockaddr *) &lpeer, &llen))
 	    == SOCKET_ERROR
 	 && WSAGetLastError () == WSAEWOULDBLOCK)
@@ -1646,7 +1646,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	    }
 	}
       while (res && err == WSAEWOULDBLOCK
-	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE), dontwait));
+	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE, dontwait)));
 
       if (!res)
 	{

@@ -1,3 +1,12 @@
+2009-12-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::wait_for_events): Drop parameter default
+	value.
+	* fhandler_socket.cc (fhandler_socket::connect): Add false as second
+	parameter to wait_for_events call.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::send_internal): Fix typo in call to wait_for_events.
+
 2009-12-26  Eric Blake  <ebb9@byu.net>
 
 	* include/pty.h (openpty, forkpty): Mark last two arguments const,
