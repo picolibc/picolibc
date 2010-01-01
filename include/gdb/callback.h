@@ -1,5 +1,5 @@
 /* Remote target system call callback support.
-   Copyright 1997, 2007, 2008, 2009 Free Software Foundation, Inc.
+   Copyright 1997, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
    Contributed by Cygnus Solutions.
 
    This file is part of GDB.
