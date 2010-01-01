@@ -1,3 +1,9 @@
+2010-01-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Move internal locale setting prior to
+	potential globify to prevent creation of unglobbed filenames in the
+	wrong character set.
+
 2009-12-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::wait_for_events): Drop parameter default

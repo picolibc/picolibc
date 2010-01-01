@@ -853,6 +853,9 @@ dll_crt0_1 (void *)
   /* Connect to tty. */
   tty::init_session ();
 
+  /* Set internal locale to the environment settings. */
+  initial_setlocale ();
+
   if (!__argc)
     {
       PWCHAR wline = GetCommandLineW ();
@@ -937,8 +940,6 @@ dll_crt0_1 (void *)
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   ld_preload ();
-  /* Set internal locale to the environment settings. */
-  initial_setlocale ();
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\
