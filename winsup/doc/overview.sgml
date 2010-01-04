@@ -46,9 +46,9 @@ information on how the GNU GPL may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.
 For more information about the proprietary-use license, please go to
-<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/</ulink>. 
+<ulink url="http://www.redhat.com/services/custom/cygwin/">http://www.redhat.com/services/custom/cygwin/</ulink>. 
 Customers of the native Win32 GNUPro should feel free to submit bug
-reports and ask questions through the normal channels.  All other
+reports and ask questions through Red hat channels.  All other
 questions should be sent to the project mailing list
 <email>cygwin@cygwin.com</email>.</para>
 

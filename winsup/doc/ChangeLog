@@ -1,3 +1,7 @@
+2010-01-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* overview.sgml: Fix Red Hat URL.
+
 2009-12-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml (mount-table): Add missing slash in pathname.
