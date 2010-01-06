@@ -46,4 +46,7 @@ typedef uint64_t UDI;
 typedef int INT;
 typedef unsigned int UINT;
 
+/* Cover macro to create a 64-bit integer.  */
+#define MAKEDI(hi, lo) ((((DI) (SI) (hi)) << 32) | ((UDI) (USI) (lo)))
+
 #endif /* CGEN_BASIC_MODES_H */

@@ -1,3 +1,7 @@
+2010-01-05  Doug Evans  <dje@sebabeach.org>
+
+	* basic-modes.h (MAKEDI): New macro.
+
 2009-10-23  Doug Evans  <dje@sebabeach.org>
 
 	* basic-modes.h: New file.  Moved here from opcodes/cgen-types.h.
