@@ -1,3 +1,7 @@
+2010-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* overview.sgml: Fix Red Hat brand name.
+
 2010-01-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* overview.sgml: Fix Red Hat URL.
