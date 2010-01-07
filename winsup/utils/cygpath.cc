@@ -226,6 +226,7 @@ get_device_name (char *path)
 		 a valid DOS device name, if prepended with "\\.\".  Return that
 		 valid DOS path. */
 	      ULONG len = RtlUnicodeStringToAnsiSize (&odi->ObjectName);
+	      free (ret);
 	      ret = (char *) malloc (len + 4);
 	      strcpy (ret, "\\\\.\\");
 	      ans.Length = 0;
@@ -666,10 +667,18 @@ do_sysfolders (char option)
     }
   else
     {
+      char *tmp;
+
       if (shortname_flag)
-	buf = get_short_name (buf);
+	{
+	  buf = get_short_name (tmp = buf);
+	  free (tmp);
+	}
       if (mixed_flag)
-	buf = get_mixed_name (buf);
+	{
+	  buf = get_mixed_name (tmp = buf);
+	  free (tmp);
+	}
     }
   printf ("%s\n", buf);
 }
@@ -695,8 +704,8 @@ report_mode (char *filename)
 static void
 do_pathconv (char *filename)
 {
-  char *buf;
-  wchar_t *buf2;
+  char *buf = NULL, *tmp;
+  wchar_t *buf2 = NULL;
   DWORD len;
   ssize_t err;
   cygwin_conv_path_t conv_func =
@@ -737,13 +746,23 @@ do_pathconv (char *filename)
 	{
 	  if (err)
 	    /* oops */;
-	  buf = get_device_paths (buf);
+	  buf = get_device_paths (tmp = buf);
+	  free (tmp);
 	  if (shortname_flag)
-	    buf = get_short_paths (buf);
+	    {
+	      buf = get_short_paths (tmp = buf);
+	      free (tmp);
+	    }
 	  if (longname_flag)
-	    buf = get_long_paths (buf);
+	    {
+	      buf = get_long_paths (tmp = buf);
+	      free (tmp);
+	    }
 	  if (mixed_flag)
-	    buf = get_mixed_name (buf);
+	    {
+	      buf = get_mixed_name (tmp = buf);
+	      free (tmp);
+	    }
 	}
       if (err)
 	{
@@ -765,11 +784,21 @@ do_pathconv (char *filename)
       if (!unix_flag)
 	{
 	  my_wcstombs (buf, buf2, 32768);
-	  buf = get_device_name (buf);
+	  buf = get_device_name (tmp = buf);
+	  free (tmp);
 	  if (shortname_flag)
-	    buf = get_short_name (buf);
+	    {
+	      buf = get_short_name (tmp = buf);
+	      free (tmp);
+	    }
 	  if (longname_flag)
-	    buf = get_long_name (buf, len);
+	    {
+	      buf = get_long_name (tmp = buf, len);
+	      free (tmp);
+	    }
+	  /* buf gets moved into the array so we have to set tmp for later
+	     freeing beforehand. */
+	  tmp = buf;
 	  if (strncmp (buf, "\\\\?\\", 4) == 0)
 	    {
 	      len = 4;
@@ -783,11 +812,18 @@ do_pathconv (char *filename)
 		}
 	    }
 	  if (mixed_flag)
-	    buf = get_mixed_name (buf);
+	    {
+	      buf = get_mixed_name (buf);
+	      free (tmp);
+	    }
 	}
     }
 
   puts (buf);
+  if (buf2)
+    free (buf2);
+  if (buf)
+    free (buf);
 }
 
 static void
