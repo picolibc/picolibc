@@ -1,3 +1,11 @@
+2010-01-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (main): Remove enforcing "en_US.UTF-8" locale.
+	Revert usage of argz functions when reading input from file and
+	simplify option usage.  Allow only one option argument and use
+	the rest as filename argument to allow spaces in filenames.  Restrict
+	processing special folder type options to one line.
+
 2009-12-17  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ps.cc (main): Return 0 if pid found.

@@ -1,6 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -16,7 +16,6 @@ details. */
 #include <wchar.h>
 #include <locale.h>
 #include <stdlib.h>
-#include <argz.h>
 #include <limits.h>
 #include <getopt.h>
 #include <windows.h>
@@ -1029,10 +1028,7 @@ main (int argc, char **argv)
 {
   int o;
 
-  /* Use locale from environment.  If not set or set to "C", use UTF-8. */
   setlocale (LC_CTYPE, "");
-  if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
-    setlocale (LC_CTYPE, "en_US.UTF-8");
   prog_name = strrchr (argv[0], '/');
   if (!prog_name)
     prog_name = strrchr (argv[0], '\\');
@@ -1070,35 +1066,33 @@ main (int argc, char **argv)
 
       while (fgets (buf, sizeof (buf), fp))
 	{
-	  size_t azl = 0;
-	  int ac;
-	  char *az, **av;
+	  int ac = 0;
+	  char *av[4] = { NULL, NULL, NULL, NULL };
 	  char *p = strchr (buf, '\n');
 	  if (p)
 	    *p = '\0';
-	  if (argz_create_sep (buf, ' ', &az, &azl))
+	  p = buf;
+	  av[ac++] = prog_name;
+	  av[ac++] = p;
+	  if (options_from_file_flag && *p == '-')
 	    {
-	      perror ("cygpath");
-	      exit (1);
+	      while (*p && !isspace (*p))
+		++p;
+	      if (*p)
+		{
+		  *p++ = '\0';
+		  while (*p && isspace (*p))
+		    ++p;
+		  av[ac++] = p;
+		}
+	      o = do_options (ac, av, 1);
 	    }
-	  if (!az)
-	    continue;
-	  ac = argz_count (az, azl) + 1;
-	  av = (char **) malloc ((ac + 1) * sizeof (char *));
-	  if (!av)
-	    {
-	      perror ("cygpath");
-	      exit (1);
-	    }
-	  av[0] = prog_name;
-	  argz_extract (az, azl, av + 1);
-	  if (options_from_file_flag)
-	    o = do_options (ac, av, 1);
 	  else
-	    optind = 1;
+	    {
+	      output_flag = 0;
+	      optind = 1;
+	    }
 	  action (ac, av, o);
-	  free (az);
-	  free (av);
 	}
     }
   exit (0);
