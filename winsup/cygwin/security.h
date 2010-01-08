@@ -1,7 +1,7 @@
 /* security.h: security declarations
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -328,6 +328,7 @@ extern cygpsid well_known_authenticated_users_sid;
 extern cygpsid well_known_this_org_sid;
 extern cygpsid well_known_system_sid;
 extern cygpsid well_known_admins_sid;
+extern cygpsid well_known_users_sid;
 extern cygpsid fake_logon_sid;
 extern cygpsid mandatory_medium_integrity_sid;
 extern cygpsid mandatory_high_integrity_sid;

@@ -1,3 +1,10 @@
+2010-01-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_token_group_sidlist): Add BUILTIN\Users account
+	to all created tokens.
+	* sec_helper.cc (well_known_users_sid): Define as BUILTIN\Users.
+	* security.h (well_known_users_sid): Declare.
+
 2010-01-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc: Bump copyright.

@@ -1,6 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2009,
+   2010 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -59,6 +60,9 @@ MKSID (well_known_system_sid, "S-1-5-18",
 MKSID (well_known_admins_sid, "S-1-5-32-544",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_ADMINS);
+MKSID (well_known_users_sid, "S-1-5-32-545",
+       SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
+				 DOMAIN_ALIAS_RID_USERS);
 MKSID (fake_logon_sid, "S-1-5-5-0-0",
        SECURITY_NT_AUTHORITY, 3, SECURITY_LOGON_IDS_RID, 0, 0);
 MKSID (mandatory_medium_integrity_sid, "S-1-16-8192",

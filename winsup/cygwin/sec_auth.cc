@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -365,11 +365,13 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 	grp_list *= well_known_service_sid;
       if (sid_in_token_groups (my_grps, well_known_this_org_sid))
 	grp_list *= well_known_this_org_sid;
+      grp_list *= well_known_users_sid;
     }
   else
     {
       grp_list += well_known_local_sid;
       grp_list *= well_known_interactive_sid;
+      grp_list *= well_known_users_sid;
     }
   if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
