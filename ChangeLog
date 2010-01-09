@@ -1,3 +1,11 @@
+2009-12-09  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* libtool.m4: Sync from git Libtool.
+	* ltmain.sh: Likewise.
+	* ltoptions.m4: Likewise.
+	* ltversion.m4: Likewise.
+	* lt~obsolete.m4: Likewise.
+
 2010-01-07  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
             Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
 
@@ -6,7 +14,7 @@
         (_LT_CHECK_OBJDIR): Call it.
 	(extra_mpc_mpfr_configure_flags, extra_mpc_gmp_configure_flags,
 	gmplibs, ppllibs, clooglibs): Use $lt_cv_objdir.
-	
+
 	* configure: Regenerate.
 
 2010-01-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
