@@ -40,7 +40,11 @@ _DEFUN (__ascii_wctomb, (r, s, wchar, charset, state),
   if (s == NULL)
     return 0;
  
+#ifdef __CYGWIN__
+  if ((size_t)wchar >= 0x80)
+#else
   if ((size_t)wchar >= 0x100)
+#endif
     {
       r->_errno = EILSEQ;
       return -1;

@@ -47,6 +47,14 @@ _DEFUN (__ascii_mbtowc, (r, pwc, s, n, charset, state),
   if (n == 0)
     return -2;
 
+#ifdef __CYGWIN__
+  if ((wchar_t)*t >= 0x80)
+    {
+      r->_errno = EILSEQ;
+      return -1;
+    }
+#endif
+
   *pwc = (wchar_t)*t;
   
   if (*t == '\0')

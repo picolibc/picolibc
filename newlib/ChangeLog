@@ -1,3 +1,9 @@
+2010-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/mbtowc_r.c (__ascii_mbtowc): Disallow conversion of
+	non-ASCII chars on Cygwin.
+	* libc/stdlib/wctomb_r.c (__ascii_wctomb): Ditto.
+
 2009-12-22  Eric Blake  <ebb9@byu.net>
 
 	* libc/include/sys/unistd.h (suboptarg, getsubopt): Move...
@@ -46,13 +52,13 @@
 	* libc/stdlib/atexit.c: Ditto.
 	* libc/stdlib/on_exit.c: Ditto.
 
-2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+2009-12-17  Ralf CorsÃÂ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/machine/ieeefp.h: Rework __IEEE_*_ENDIAN handling.
 	* libc/machine/arm/machine/endian.h: Remove (Conflicts with
 	libc/include/machine/endian.h)
 
-2009-12-17  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+2009-12-17  Ralf CorsÃÂ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/machine/setjmp.h: Set up _JBLEN #ifdef __m68k__.
 
@@ -74,11 +80,11 @@
 	and ETOOMANYREFS into general list as they are referenced
 	by OpenGroup and needed by RTEMS.
 
-2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+2009-12-16  Ralf CorsÃÂ©pius <ralf.corsepius@rtems.org>
 
 	* libc/search/hcreate.c: Don't include <sys/queue.h> (Unused).
 
-2009-12-16  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
+2009-12-16  Ralf CorsÃÂ©pius <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/machine/_types.h: New (Derived from
 	machine/_default_types.h).
@@ -366,16 +372,16 @@
 	* libc/locale/locale.c: Drop Cygwin-specific windows.h include.
 	(loadlocale): Call __set_charset_from_codepage with 0 codepage.
 
-2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+2009-09-22  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/stdlib.h: Add posix_memalign.
 
-2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+2009-09-22  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* configure.host (*-rtems*): Remove -DMISSING_SYSCALL_NAMES.
 	Add -DHAVE_BLKSIZE, -D_NO_WORDEXP -D_NO_POPEN.
 
-2009-09-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+2009-09-22  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* configure.host (m32c): Move setting -DABORT_PROVIDED to second
 	"case $host".
@@ -5453,7 +5459,7 @@
 	* libc/include/sys/unistd.h: Define all _SC_xxx values as
 	required by SUSv3.  Unify formatting.
 
-2007-02-02  Ralf Corsépius <ralf.corsepius@rtems.org>
+2007-02-02  Ralf CorsÃ©pius <ralf.corsepius@rtems.org>
 
 	* libc/include/sys/errno.h: Add ECANCELED.
 
