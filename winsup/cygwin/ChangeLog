@@ -1,3 +1,13 @@
+2010-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::fstat_helper): Declare timestamps as
+	PLARGE_INTEGER.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle):
+	Accommodate fstat_helper change of timestamp arguments.
+	(fhandler_base::fstat_by_name): Ditto.
+	(fhandler_base::fstat_helper): Define with timestamps as PLARGE_INTEGER.
+	Accommodate in call to to_timestruc_t.
+
 2010-01-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (get_token_group_sidlist): Add BUILTIN\Users account

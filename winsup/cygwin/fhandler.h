@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -280,10 +280,10 @@ class fhandler_base
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_helper (struct __stat64 *buf,
-			      FILETIME ftChangeTime,
-			      FILETIME ftLastAccessTime,
-			      FILETIME ftLastWriteTime,
-			      FILETIME ftCreationTime,
+			      PLARGE_INTEGER ChangeTime,
+			      PLARGE_INTEGER LastAccessTime,
+			      PLARGE_INTEGER LastWriteTime,
+			      PLARGE_INTEGER CreationTime,
 			      DWORD dwVolumeSerialNumber,
 			      ULONGLONG nFileSize,
 			      LONGLONG nAllocSize,
