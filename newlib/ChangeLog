@@ -1,3 +1,7 @@
+2010-01-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/posix/telldir.c (_cleanupdir): Fixed usage of freed memory.
+
 2010-01-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/math.h (log2, log2f): Disable macro versions for C++,

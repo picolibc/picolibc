@@ -169,26 +169,26 @@ _DEFUN(_cleanupdir, (dirp),
 	__lock_acquire(dd_hash_lock);
 #endif
 	for (i = 0; i < NDIRHASH; ++i) {
+		struct ddloc head;
 		register struct ddloc *lp;
 		register struct ddloc *prevlp;
+
 		lp = dd_hash[i];
-		while (lp != NULL && lp->loc_dirp == dirp) {
-			dd_hash[i] = lp->loc_next;
-			prevlp = lp;
-			free((caddr_t)lp);
-			lp = prevlp->loc_next;
-		}
-		prevlp = lp;
+		head.loc_next = lp;
+		prevlp = &head;
 		while (lp != NULL) {
-			lp = lp->loc_next;
-			if (lp != NULL && lp->loc_dirp == dirp) {
-				prevlp->loc_next = lp->loc_next;
+			struct ddloc *nextlp;
+
+			nextlp = lp->loc_next;
+			if (lp->loc_dirp == dirp) {
+				prevlp->loc_next = nextlp;
 				free((caddr_t)lp);
-				lp = prevlp;
 			}
 			else
 				prevlp = lp;
+			lp = nextlp;
 		}
+		dd_hash[i] = head.loc_next;
 	}
 #ifdef HAVE_DD_LOCK
 	__lock_release(dd_hash_lock);
