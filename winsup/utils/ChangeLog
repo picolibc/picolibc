@@ -1,3 +1,7 @@
+2010-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (do_mount_from_fstab): Allow to change cygdrive prefix, too.
+
 2010-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc: Throughout, free obsolete path buffers.

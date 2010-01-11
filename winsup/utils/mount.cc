@@ -1,7 +1,7 @@
 /* mount.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005,
-   2008, 2009 Red Hat, Inc.
+   2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -150,22 +150,41 @@ do_mount_from_fstab (const char *where)
      is NULL, all entries match. */
   bool exists = false;
   for (mnt_t *m = mount_table; m - mount_table < max_mount_entry; ++m)
-    if (!(m->flags & MOUNT_CYGDRIVE) && (!where || !strcmp (where, m->posix)))
+    if (!where || !strcmp (where, m->posix))
       {
-	exists = true;
-	/* Compare with existing mount table.  If the entry doesn't exist,
-	   mount it. */
-	FILE *mt = setmntent ("/-not-used-", "r");
-	struct mntent *p;
+	if (m->flags & MOUNT_CYGDRIVE)
+	  {
+	    /* Get the cygdrive info */
+	    char user[MAX_PATH];
+	    char system[MAX_PATH];
+	    char user_flags[MAX_PATH];
+	    char system_flags[MAX_PATH];
 
-	while ((p = getmntent (mt)) != NULL)
-	  if (!strcmp (m->posix, p->mnt_dir))
-	    break;
-	if (!p)
-	  do_mount (m->native, m->posix, m->flags);
-	endmntent (mt);
-	if (where)
-	  break;
+	    exists = true;
+	    cygwin_internal (CW_GET_CYGDRIVE_INFO, user, system, user_flags,
+			     system_flags);
+	    if ((*user && strcmp (user, m->posix) != 0)
+		|| (*system && strcmp (system, m->posix) != 0))
+	      if (mount (NULL, m->posix, m->flags))
+		error (m->posix);
+	  }
+	else
+	  {
+	    exists = true;
+	    /* Compare with existing mount table.  If the entry doesn't exist,
+	       mount it. */
+	    FILE *mt = setmntent ("/-not-used-", "r");
+	    struct mntent *p;
+
+	    while ((p = getmntent (mt)) != NULL)
+	      if (!strcmp (m->posix, p->mnt_dir))
+		break;
+	    if (!p)
+	      do_mount (m->native, m->posix, m->flags);
+	    endmntent (mt);
+	    if (where)
+	      break;
+	  }
       }
   if (!exists && where)
     fprintf (stderr,
