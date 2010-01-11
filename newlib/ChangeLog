@@ -1,3 +1,8 @@
+2010-01-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/math.h (log2, log2f): Disable macro versions for C++,
+	as they are incompatible with OpenMP/C++ headers.
+
 2010-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/mbtowc_r.c (__ascii_mbtowc): Disallow conversion of
