@@ -555,7 +555,7 @@ format_proc_stat (void *, char *&destbuf)
 #define read_value(x,y) \
       do {\
 	dwCount = BUFSIZE; \
-	if ((dwError = RegQueryValueEx (hKey, x, NULL, &dwType, (BYTE *) szBuffer, &dwCount)), \
+	if ((dwError = RegQueryValueEx (hKey, x, NULL, &dwType, in_buf.b, &dwCount)), \
 	    (dwError != ERROR_SUCCESS && dwError != ERROR_MORE_DATA)) \
 	  { \
 	    debug_printf ("RegQueryValueEx failed retcode %d", dwError); \
@@ -583,7 +583,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
   DWORD dwOldThreadAffinityMask;
   int cpu_number;
   const int BUFSIZE = 256;
-  CHAR szBuffer[BUFSIZE];
+  union
+  {
+    BYTE b[BUFSIZE];
+    char s[BUFSIZE];
+    DWORD d;
+    unsigned m[13];
+  } in_buf;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
@@ -595,9 +601,9 @@ format_proc_cpuinfo (void *, char *&destbuf)
       if (cpu_number)
 	print ("\n");
 
-      __small_sprintf (szBuffer, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
+      __small_sprintf (in_buf.s, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
 
-      if ((dwError = RegOpenKeyEx (HKEY_LOCAL_MACHINE, szBuffer, 0, KEY_QUERY_VALUE, &hKey)) != ERROR_SUCCESS)
+      if ((dwError = RegOpenKeyEx (HKEY_LOCAL_MACHINE, in_buf.s, 0, KEY_QUERY_VALUE, &hKey)) != ERROR_SUCCESS)
 	{
 	  if (dwError == ERROR_FILE_NOT_FOUND)
 	    break;
@@ -633,11 +639,11 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  read_value ("VendorIdentifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", szBuffer);
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", in_buf.s);
 	  read_value ("Identifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
+	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", in_buf.s);
 	  read_value ("~Mhz", REG_DWORD);
-	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
+	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", in_buf.d);
 
 	  print ("flags           :");
 	  if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
@@ -675,7 +681,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  bufptr += __small_sprintf (bufptr, "vendor_id\t: %s\n",
 				     (char *)vendor_id);
 	  read_value ("~Mhz", REG_DWORD);
-	  unsigned cpu_mhz = *(DWORD *)szBuffer;
+	  unsigned cpu_mhz = in_buf.d;
 	  if (maxf >= 1)
 	    {
 	      unsigned features2, features1, extra_info, cpuid_sig;
@@ -698,19 +704,18 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
 	      if (maxe >= 0x80000004)
 		{
-		  unsigned *model_name = (unsigned *) szBuffer;
-		  cpuid (&model_name[0], &model_name[1], &model_name[2],
-			 &model_name[3], 0x80000002);
-		  cpuid (&model_name[4], &model_name[5], &model_name[6],
-			 &model_name[7], 0x80000003);
-		  cpuid (&model_name[8], &model_name[9], &model_name[10],
-			 &model_name[11], 0x80000004);
-		  model_name[12] = 0;
+		  cpuid (&in_buf.m[0], &in_buf.m[1], &in_buf.m[2],
+			 &in_buf.m[3], 0x80000002);
+		  cpuid (&in_buf.m[4], &in_buf.m[5], &in_buf.m[6],
+			 &in_buf.m[7], 0x80000003);
+		  cpuid (&in_buf.m[8], &in_buf.m[9], &in_buf.m[10],
+			 &in_buf.m[11], 0x80000004);
+		  in_buf.m[12] = 0;
 		}
 	      else
 		{
 		  // could implement a lookup table here if someone needs it
-		  strcpy (szBuffer, "unknown");
+		  strcpy (in_buf.s, "unknown");
 		}
 	      int cache_size = -1,
 		  tlb_size = -1,
@@ -744,7 +749,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 						 "cpu MHz\t\t: %d\n",
 					 family,
 					 model,
-					 szBuffer + strspn (szBuffer, " 	"),
+					 in_buf.s + strspn (in_buf.s, " 	"),
 					 stepping,
 					 cpu_mhz);
 	      if (cache_size >= 0)
@@ -866,6 +871,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		    print (" mmxext");
 		  if (features & (1 << 25))
 		    print (" fxsr_opt");
+		  if (features & (1 << 26))
+		    print (" pdpe1gb");
 		  if (features & (1 << 27))
 		    print (" rdtscp");
 		  if (features & (1 << 29))
@@ -880,21 +887,58 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		print (" pni");
 	      if (is_intel)
 		{
+		  if (features2 & (1 << 2))
+		    print (" dtes64");
 		  if (features2 & (1 << 3))
 		    print (" monitor");
 		  if (features2 & (1 << 4))
 		    print (" ds_cpl");
+		  if (features2 & (1 << 5))
+		    print (" vmx");
+		  if (features2 & (1 << 6))
+		    print (" smx");
 		  if (features2 & (1 << 7))
-		    print (" tm2");
-		  if (features2 & (1 << 8))
 		    print (" est");
+		  if (features2 & (1 << 8))
+		    print (" tm2");
+		  if (features2 & (1 << 9))
+		    print (" ssse3");
 		  if (features2 & (1 << 10))
 		    print (" cid");
+		  if (features2 & (1 << 12))
+		    print (" fma");
 		}
 	      if (features2 & (1 << 13))
 		print (" cx16");
+	      if (is_intel)
+		{
+		  if (features2 & (1 << 14))
+		    print (" xtpr");
+		  if (features2 & (1 << 15))
+		    print (" pdcm");
+		  if (features2 & (1 << 18))
+		    print (" dca");
+		  if (features2 & (1 << 19))
+		    print (" sse4_1");
+		  if (features2 & (1 << 20))
+		    print (" sse4_2");
+		  if (features2 & (1 << 21))
+		    print (" x2apic");
+		  if (features2 & (1 << 22))
+		    print (" movbe");
+		  if (features2 & (1 << 23))
+		    print (" popcnt");
+		  if (features2 & (1 << 25))
+		    print (" aes");
+		  if (features2 & (1 << 26))
+		    print (" xsave");
+		  if (features2 & (1 << 27))
+		    print (" osxsave");
+		  if (features2 & (1 << 28))
+		    print (" avx");
+		}
 
-	      if (is_amd && maxe >= 0x80000001)
+	      if (maxe >= 0x80000001)
 		{
 		  unsigned features;
 		  cpuid (&unused, &unused, &features, &unused, 0x80000001);
@@ -903,10 +947,36 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		    print (" lahf_lm");
 		  if (features & (1 << 1))
 		    print (" cmp_legacy");
-		  if (features & (1 << 2))
-		    print (" svm");
-		  if (features & (1 << 4))
-		    print (" cr8_legacy");
+		  if (is_amd)
+		    {
+		      if (features & (1 << 2))
+			print (" svm");
+		      if (features & (1 << 3))
+			print (" extapic");
+		      if (features & (1 << 4))
+			print (" cr8_legacy");
+		      if (features & (1 << 5))
+			print (" abm");
+		      if (features & (1 << 6))
+			print (" sse4a");
+		      if (features & (1 << 7))
+			print (" misalignsse");
+		      if (features & (1 << 8))
+			print (" 3dnowprefetch");
+		      if (features & (1 << 9))
+			print (" osvw");
+		    }
+		  if (features & (1 << 10))
+		    print (" ibs");
+		  if (is_amd)
+		    {
+		      if (features & (1 << 11))
+			print (" sse5");
+		      if (features & (1 << 12))
+			print (" skinit");
+		      if (features & (1 << 13))
+			print (" wdt");
+		    }
 		}
 
 	      print ("\n");
@@ -955,6 +1025,10 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		    print (" tm");
 		  if (features2 & (1 << 5))
 		    print (" stc");
+		  if (features2 & (1 << 6))
+		    print (" 100mhzsteps");
+		  if (features2 & (1 << 7))
+		    print (" hwpstate");
 		}
 	    }
 	  else

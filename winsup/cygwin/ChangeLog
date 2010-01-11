@@ -1,3 +1,10 @@
+2010-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_stat): Use new in_buf.
+	(format_proc_cpuinfo): Replace szBuffer with a union in_buf.  Use type
+	correct throughout.  Add a couple of missing or newer cpu flags.  Allow
+	certain AMD flags for intel as well.
+
 2010-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::fstat_helper): Declare timestamps as
