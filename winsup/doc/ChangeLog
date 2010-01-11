@@ -1,3 +1,8 @@
+2010-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml (mount-table): Add info that posix=0 is default for
+	the cygdrive prefix.
+
 2010-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* overview.sgml: Fix Red Hat brand name.

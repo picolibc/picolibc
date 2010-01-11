@@ -88,9 +88,10 @@ posix=[0|1].  The meaning of the options is as follows.</para>
   notexec   - Treat all files below mount point as not executable.
   nouser    - Mount is a system-wide mount.
   override  - Force the override of an immutable mount point (currently "/").
-  posix=0   - Switch off case sensitivity for paths under this mount point.
+  posix=0   - Switch off case sensitivity for paths under this mount point
+	      (default for the cygdrive prefix).
   posix=1   - Switch on case sensitivity for paths under this mount point
-	      (default).
+	      (default for all other mount points).
   text      - Files default to CRLF text mode line endings.
   user      - Mount is a user mount.
 </screen>
