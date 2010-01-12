@@ -111,6 +111,7 @@ class path_conv
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
+  int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)

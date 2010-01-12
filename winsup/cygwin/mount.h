@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,6 +27,7 @@ enum fs_info_type
   unixfs,
   mvfs,
   cifs,
+  nwfs,
   /* Always last. */
   max_fs_type
 };
@@ -49,6 +50,7 @@ class fs_info
     unsigned caseinsensitive		: 1;
     unsigned has_buggy_open		: 1;
     unsigned has_buggy_fileid_dirinfo	: 1;
+    unsigned has_buggy_basic_info	: 1;
   } status;
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
@@ -72,6 +74,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_FS_FLAG (is_fat, fat)
   IMPLEMENT_FS_FLAG (is_ntfs, ntfs)
   IMPLEMENT_FS_FLAG (is_samba, samba)
@@ -84,6 +87,7 @@ class fs_info
   IMPLEMENT_FS_FLAG (is_unixfs, unixfs)
   IMPLEMENT_FS_FLAG (is_mvfs, mvfs)
   IMPLEMENT_FS_FLAG (is_cifs, cifs)
+  IMPLEMENT_FS_FLAG (is_nwfs, nwfs)
   fs_info_type what_fs () const { return status.fs_type; }
 
   ULONG serial_number () const { return sernum; }

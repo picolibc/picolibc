@@ -2260,9 +2260,16 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 		}
 	    }
 	}
+
+      /* Check file system while we're having the file open anyway.
+	 This speeds up path_conv noticably (~10%). */
+      if (!fs_update_called)
+	fs.update (&upath, h);
+
       if (NT_SUCCESS (status)
-	  && NT_SUCCESS (status
-			 = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
+			 ? NtQueryAttributesFile (&attr, &fbi)
+			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
 						   FileBasicInformation)))
 	fileattr = fbi.FileAttributes;
       else
@@ -2358,11 +2365,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	  set_error (ENOENT);
 	  continue;
 	}
-
-      /* Check file system while we're having the file open anyway.
-	 This speeds up path_conv noticably (~10%). */
-      if (!fs_update_called)
-	fs.update (&upath, h);
 
       ext_tacked_on = !!*ext_here;
 

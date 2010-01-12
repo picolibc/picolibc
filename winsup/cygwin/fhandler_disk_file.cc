@@ -337,12 +337,25 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
      than a filename, so it needs a really big buffer for no good reason
      since we don't need the name anyway.  So we just call the three info
      classes necessary to get all information required by stat(2). */
-  FILE_BASIC_INFORMATION fbi;
+
+  union {
+    FILE_BASIC_INFORMATION fbi;
+    FILE_NETWORK_OPEN_INFORMATION fnoi;
+  } fi;
   FILE_STANDARD_INFORMATION fsi;
   FILE_INTERNAL_INFORMATION fii;
 
-  status = NtQueryInformationFile (get_handle (), &io, &fbi, sizeof fbi,
-				   FileBasicInformation);
+  if (pc.has_buggy_basic_info ())
+    {
+      status = NtQueryInformationFile (get_handle (), &io, &fi, sizeof fi,
+				       FileNetworkOpenInformation);
+      /* The timestamps are in the same relative memory location, only
+	 the DOS attributes have to be moved. */
+      fi.fbi.FileAttributes = fi.fnoi.FileAttributes;
+    }
+  else
+    status = NtQueryInformationFile (get_handle (), &io, &fi.fbi, sizeof fi.fbi,
+				     FileBasicInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("%p = NtQueryInformationFile(%S, FileBasicInformation)",
@@ -369,20 +382,20 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
      support a change timestamp.  In that case use the LastWriteTime
      entry, as in other calls to fstat_helper. */
   if (pc.is_rep_symlink ())
-    fbi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  pc.file_attributes (fbi.FileAttributes);
+    fi.fbi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+  pc.file_attributes (fi.fbi.FileAttributes);
   return fstat_helper (buf,
-		   fbi.ChangeTime.QuadPart ? &fbi.ChangeTime
-					   : &fbi.LastWriteTime,
-		   &fbi.LastAccessTime,
-		   &fbi.LastWriteTime,
-		   &fbi.CreationTime,
-		   get_dev (),
-		   fsi.EndOfFile.QuadPart,
-		   fsi.AllocationSize.QuadPart,
-		   fii.FileId.QuadPart,
-		   fsi.NumberOfLinks,
-		   fbi.FileAttributes);
+		       fi.fbi.ChangeTime.QuadPart ? &fi.fbi.ChangeTime
+						  : &fi.fbi.LastWriteTime,
+		       &fi.fbi.LastAccessTime,
+		       &fi.fbi.LastWriteTime,
+		       &fi.fbi.CreationTime,
+		       get_dev (),
+		       fsi.EndOfFile.QuadPart,
+		       fsi.AllocationSize.QuadPart,
+		       fii.FileId.QuadPart,
+		       fsi.NumberOfLinks,
+		       fi.fbi.FileAttributes);
 }
 
 int __stdcall

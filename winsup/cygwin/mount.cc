@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -289,6 +289,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
+      && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
     is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
   if (!got_fs ())
@@ -300,8 +301,14 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       strlwr (fsn);
     }
   has_acls (flags () & FS_PERSISTENT_ACLS);
-  /* Netapp inodes numbers are fly-by-night. */
+  /* Netapp inode numbers are fly-by-night. */
   hasgood_inode ((has_acls () && !is_netapp ()) || is_nfs ());
+  /* NWFS is known to have a broken FileBasicInformation info class.  It
+     can't be used to fetch information, only to set information.  Therefore,
+     for NWFS we have to fallback to the FileNetworkOpenInformation info
+     class.  Unfortunately we can't use FileNetworkOpenInformation all the
+     time since that fails on other filesystems like NFS. */
+  has_buggy_basic_info (is_nwfs ());
   /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
      except on Samba which handles Windows clients case insensitive.
 
@@ -1443,7 +1450,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     "sunwnfs",
     "unixfs",
     "mvfs",
-    "cifs"
+    "cifs",
+    "nwfs"
   };
 
   if (mntinfo.what_fs () > 0 && mntinfo.what_fs () < max_fs_type)

@@ -1,5 +1,19 @@
 2010-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc (ro_u_nwfs): New R/O unicode string.
+	* mount.cc (fs_info::update): Check for NWFS filesystem.  Set
+	has_buggy_basic_info, if so.  Add comment to explain why.
+	(fillout_mntent): Add "nwfs" string to fs_names array.
+	* mount.h (enum fs_info_type): Add nwfs.
+	(class fs_info): Add has_buggy_basic_info status flag.  Add accessors
+	for has_buggy_basic_info and is_nwfs.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Accommodate
+	filesystems with broken FileBasicInformation handling.
+	* path.cc (symlink_info::check): Ditto.
+	* path.h (path_conv::has_buggy_basic_info): Add method.
+
+2010-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (build_fh_name_worker): Remove.  Move all functionality
 	back into build_fh_name.
 	(build_fh_name): Drop unused HANDLE parameter.  Drop call to pc.fillin.
