@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -400,9 +400,10 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 
-static fhandler_base *
-build_fh_name_worker (path_conv& pc, HANDLE h, unsigned opt, suffix_info *si)
+fhandler_base *
+build_fh_name (const char *name, unsigned opt, suffix_info *si)
 {
+  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
   if (pc.error)
     {
       fhandler_base *fh = cnew (fhandler_nodevice) ();
@@ -412,27 +413,8 @@ build_fh_name_worker (path_conv& pc, HANDLE h, unsigned opt, suffix_info *si)
       return fh;
     }
 
-  if (!pc.exists () && h)
-    pc.fillin (h);
-
   return build_fh_pc (pc);
 }
-fhandler_base *
-build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
-{
-  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
-  return build_fh_name_worker (pc, h, opt, si);
-}
-
-#if 0 /* Not needed yet */
-#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
-fhandler_base *
-build_fh_name (const UNICODE_STRING *name, HANDLE h, unsigned opt, suffix_info *si)
-{
-  path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
-  return build_fh_name_worker (pc, h, opt, si);
-}
-#endif
 
 fhandler_base *
 build_fh_dev (const device& dev, const char *unix_name)

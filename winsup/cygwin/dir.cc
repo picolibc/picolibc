@@ -1,7 +1,7 @@
 /* dir.cc: Posix directory-related routines
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006, 2007,
-   2008, 2009 Red Hat, Inc.
+   2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -54,7 +54,7 @@ opendir (const char *name)
   fhandler_base *fh;
   DIR *res;
 
-  fh = build_fh_name (name, NULL, PC_SYM_FOLLOW);
+  fh = build_fh_name (name, PC_SYM_FOLLOW);
   if (!fh)
     res = NULL;
   else if (fh->exists ())
@@ -299,7 +299,7 @@ mkdir (const char *dir, mode_t mode)
       while (p > dir && isdirsep (*p))
         *p-- = '\0';
     }
-  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
+  if (!(fh = build_fh_name (dir, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
   if (fh->error ())
@@ -329,7 +329,7 @@ rmdir (const char *dir)
   if (efault.faulted (EFAULT))
     return -1;
 
-  if (!(fh = build_fh_name (dir, NULL, PC_SYM_NOFOLLOW)))
+  if (!(fh = build_fh_name (dir, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;
 
   if (fh->error ())

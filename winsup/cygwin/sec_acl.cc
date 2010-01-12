@@ -1,6 +1,7 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009, 2010 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -418,7 +419,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 	    unsigned fmode)
 {
   int res = -1;
-  fhandler_base *fh = build_fh_name (path, NULL, fmode, stat_suffixes);
+  fhandler_base *fh = build_fh_name (path, fmode, stat_suffixes);
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());

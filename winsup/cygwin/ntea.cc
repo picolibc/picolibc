@@ -1,6 +1,6 @@
 /* ntea.cc: code for manipulating Extended Attributes
 
-   Copyright 1997, 1998, 2000, 2001, 2006, 2008 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2006, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -329,7 +329,7 @@ getxattr_worker (path_conv &pc, const char *name, void *value, size_t size)
 
   if (pc.error)
     {
-      debug_printf ("got %d error from build_fh_name", pc.error);
+      debug_printf ("got %d error from path_conv", pc.error);
       set_errno (pc.error);
     }
   else if (pc.exists ())
@@ -424,7 +424,7 @@ setxattr_worker (path_conv &pc, const char *name, const void *value,
 
   if (pc.error)
     {
-      debug_printf ("got %d error from build_fh_name", pc.error);
+      debug_printf ("got %d error from path_conv", pc.error);
       set_errno (pc.error);
     }
   else if (pc.exists ())

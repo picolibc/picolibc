@@ -1,7 +1,7 @@
 /* dtable.h: fd table definition.
 
-   Copyright 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red
-   Hat, Inc.
+   Copyright 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -94,8 +94,7 @@ public:
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);
-fhandler_base *build_fh_name (const char *, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
-fhandler_base *build_fh_name (const UNICODE_STRING *, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
+fhandler_base *build_fh_name (const char *, unsigned = 0, suffix_info * = NULL);
 fhandler_base *build_fh_pc (path_conv& pc, bool set_name = true);
 
 void dtable_init ();

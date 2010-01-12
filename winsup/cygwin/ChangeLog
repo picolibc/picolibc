@@ -1,3 +1,22 @@
+2010-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (build_fh_name_worker): Remove.  Move all functionality
+	back into build_fh_name.
+	(build_fh_name): Drop unused HANDLE parameter.  Drop call to pc.fillin.
+	Remove disabled build_fh_name with UNICODE_STRING name parameter.
+	* dtable.h (build_fh_name): Drop HANDLE parameter from declaration.
+	Remove declaration for build_fh_name with UNICODE_STRING name parameter.
+	* path.cc (path_conv::fillin): Remove.
+	(symlink_info::check): Fix comment.
+	* path.h (path_conv::fillin): Remove declaration.
+	* dir.cc: Accommodate change in build_fh_name parameters throughout.
+	* sec_acl.cc: Ditto.
+	* syscalls.cc: Ditto.
+
+	* ntea.cc (getxattr_worker): Fix debug output.
+	(setxattr_worker): Ditto.
+	* times.cc (utimens_worker): Ditto.
+
 2010-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_stat): Use new in_buf.

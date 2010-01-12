@@ -1,7 +1,7 @@
 /* syscalls.cc: syscalls
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1009,7 +1009,7 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
-	  if (!(fh = build_fh_name (unix_path, NULL,
+	  if (!(fh = build_fh_name (unix_path,
 				    (flags & (O_NOFOLLOW | O_EXCL))
 				    ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
 				    stat_suffixes)))
@@ -1136,7 +1136,7 @@ link (const char *oldpath, const char *newpath)
   int res = -1;
   fhandler_base *fh;
 
-  if (!(fh = build_fh_name (oldpath, NULL, PC_SYM_NOFOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (oldpath, PC_SYM_NOFOLLOW, stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -1168,7 +1168,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
   int res = -1;
   fhandler_base *fh;
 
-  if (!(fh = build_fh_name (name, NULL, fmode, stat_suffixes)))
+  if (!(fh = build_fh_name (name, fmode, stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -1260,7 +1260,7 @@ chmod (const char *path, mode_t mode)
 {
   int res = -1;
   fhandler_base *fh;
-  if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (path, PC_SYM_FOLLOW, stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -1471,7 +1471,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 
   if (pc.error)
     {
-      debug_printf ("got %d error from build_fh_name", pc.error);
+      debug_printf ("got %d error from path_conv", pc.error);
       set_errno (pc.error);
     }
   else if (pc.exists ())
@@ -1572,7 +1572,7 @@ access (const char *fn, int flags)
     set_errno (EINVAL);
   else
     {
-      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
+      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW, stat_suffixes);
       if (fh)
 	{
 	  res =  fh->fhaccess (flags, false);
@@ -1595,7 +1595,7 @@ euidaccess (const char *fn, int flags)
     set_errno (EINVAL);
   else
     {
-      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
+      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW, stat_suffixes);
       if (fh)
 	{
 	  res =  fh->fhaccess (flags, true);
@@ -2207,7 +2207,7 @@ pathconf (const char *file, int v)
       set_errno (ENOENT);
       return -1;
     }
-  if (!(fh = build_fh_name (file, NULL, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (file, PC_SYM_FOLLOW, stat_suffixes)))
     return -1;
   if (!fh->exists ())
     set_errno (ENOENT);
@@ -2502,7 +2502,7 @@ statvfs (const char *name, struct statvfs *sfs)
   if (efault.faulted (EFAULT))
     goto error;
 
-  if (!(fh = build_fh_name (name, NULL, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (name, PC_SYM_FOLLOW, stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -4013,7 +4013,7 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
 	set_errno (EINVAL);
       else
 	{
-	  fhandler_base *fh = build_fh_name (path, NULL,
+	  fhandler_base *fh = build_fh_name (path,
 					     (flags & AT_SYMLINK_NOFOLLOW)
 					     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
 					     stat_suffixes);
