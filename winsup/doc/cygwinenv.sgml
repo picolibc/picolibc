@@ -142,10 +142,12 @@ variables.  The current list of always uppercased variables is:</para>
 symlinks as Windows shortcuts with a special header and the R/O attribute
 set. If not set, Cygwin creates symlinks as plain files with a magic number,
 a path and the system attribute set. Defaults to not set since plain
-file symlinks are faster to write and faster to read.  The new style of
-plain file symlinks is incompatible with older Cygwin releases because
-the new symlinks use UTF-16 to encode the target filename, while the
-old symlinks used the current ANSI or OEM charset.</para>
+file symlinks are faster to write and faster to read.</para>
+
+<para>Please note that symlinks created under Cygwin 1.7 or later are
+not readable by older Cygwin releases because the new symlinks use UTF-16
+to encode the target filename, while the old symlinks used the current
+ANSI or OEM charset.</para>
 </listitem>
 
 </itemizedlist>
