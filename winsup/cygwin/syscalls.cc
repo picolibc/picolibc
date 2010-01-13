@@ -1765,7 +1765,7 @@ rename (const char *oldpath, const char *newpath)
       set_errno (ENOENT);
       goto out;
     }
-  if (oldpc.isspecial ()) /* No renames from virtual FS */
+  if (oldpc.isspecial () && !oldpc.issocket ()) /* No renames from virtual FS */
     {
       set_errno (EROFS);
       goto out;
@@ -1814,7 +1814,7 @@ rename (const char *oldpath, const char *newpath)
       set_errno (newpc.error);
       goto out;
     }
-  if (newpc.isspecial ()) /* No renames to virtual FSes */
+  if (newpc.isspecial () && !newpc.issocket ()) /* No renames to virtual FSes */
     {
       set_errno (EROFS);
       goto out;
