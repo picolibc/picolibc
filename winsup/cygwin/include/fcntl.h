@@ -1,6 +1,6 @@
 /* fcntl.h
 
-   Copyright 1996, 1998, 2001, 2005, 2006, 2009 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2005, 2006, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,6 +19,10 @@ details. */
 #define _FNOFOLLOW	0x100000
 #define _FDIRECTORY	0x200000
 #define _FEXECSRCH	0x400000
+
+/* POSIX-1.2008 requires this flag and allows to set it to 0 if its
+   functionality is not required. */
+#define O_TTY_INIT	0
 
 #define O_DIRECT	_FDIRECT
 #define O_NOFOLLOW	_FNOFOLLOW

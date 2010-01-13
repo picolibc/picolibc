@@ -1,5 +1,9 @@
 2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/fcntl.h (O_TTY_INIT): Define as 0.
+
+2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_tty_master::init): Don't erase all default
 	termios settings of slave console.
 
