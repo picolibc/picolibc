@@ -1,7 +1,7 @@
 /* fhandler_tty.cc
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -64,10 +64,6 @@ fhandler_tty_master::init ()
       termios_printf ("can't create fhandler");
       return -1;
     }
-
-  termios ti;
-  memset (&ti, 0, sizeof (ti));
-  console->tcsetattr (0, &ti);
 
   if (!setup (false))
     return 1;

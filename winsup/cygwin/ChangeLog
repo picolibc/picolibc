@@ -1,5 +1,10 @@
 2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_tty_master::init): Don't erase all default
+	termios settings of slave console.
+
+2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): Don't exit prematurely with EROFS when trying
 	to rename an AF_LOCAL socket or when trying to replace an AF_LOCAL
 	socket.
