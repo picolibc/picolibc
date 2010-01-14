@@ -724,8 +724,13 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	        cp = fmt;
 #ifdef _MB_CAPABLE
 	        while ((n = __mbtowc (data, &wc, fmt, MB_CUR_MAX,
-				      __locale_charset (), &state)) > 0) {
-                    if (wc == '%')
+				      __locale_charset (), &state)) != 0) {
+		    if (n < 0) {
+			/* Wave invalid chars through. */
+			memset (&state, 0, sizeof state);
+			n = 1;
+		    }
+                    else if (wc == '%')
                         break;
                     fmt += n;
 		}
