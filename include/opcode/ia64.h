@@ -381,14 +381,14 @@ extern struct ia64_opcode ia64_opcodes_f[];
 extern struct ia64_opcode ia64_opcodes_d[];
 
 
-extern struct ia64_opcode *ia64_find_opcode (const char *name);
-extern struct ia64_opcode *ia64_find_next_opcode (struct ia64_opcode *ent);
+extern struct ia64_opcode *ia64_find_opcode (const char *);
+extern struct ia64_opcode *ia64_find_next_opcode (struct ia64_opcode *);
 
-extern struct ia64_opcode *ia64_dis_opcode (ia64_insn insn,
-					    enum ia64_insn_type type);
+extern struct ia64_opcode *ia64_dis_opcode (ia64_insn,
+					    enum ia64_insn_type);
 
-extern void ia64_free_opcode (struct ia64_opcode *ent);
-extern const struct ia64_dependency *ia64_find_dependency (int index);
+extern void ia64_free_opcode (struct ia64_opcode *);
+extern const struct ia64_dependency *ia64_find_dependency (int);
 
 /* To avoid circular library dependencies, this array is implemented
    in bfd/cpu-ia64-opc.c: */
