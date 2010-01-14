@@ -940,6 +940,8 @@ dll_crt0_1 (void *)
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   ld_preload ();
+  /* Per POSIX set the default application locale back to "C". */
+  _setlocale_r (_REENT, LC_CTYPE, "C");
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\

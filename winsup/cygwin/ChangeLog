@@ -1,5 +1,12 @@
 2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_1): Reset locale to "C" at the last moment before
+	calling the application's main.
+	* syscalls.cc (internal_setlocale): Don't reset locale to "C here.
+	Change comment accordingly.
+
+2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (dup3): Export.
 	(pipe2): Export.
 	* dtable.cc (dtable::dup_worker): Take additional flags parameter.

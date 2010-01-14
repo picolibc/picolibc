@@ -4362,10 +4362,11 @@ internal_setlocale ()
     }
 }
 
-/* Called from dll_crt0_1, before calling the application's main().
+/* Called from dll_crt0_1, before fetching the command line from Windows.
    Set the internal charset according to the environment locale settings.
    Check if a required codepage is available, and only switch internal
-   charset if so.  Afterwards, reset application locale to "C" per POSIX. */
+   charset if so.
+   Make sure to reset the application locale to "C" per POSIX. */
 void
 initial_setlocale ()
 {
@@ -4373,7 +4374,6 @@ initial_setlocale ()
   if (ret && check_codepage (ret)
       && strcmp (cygheap->locale.charset, __locale_charset ()) != 0)
     internal_setlocale ();
-  _setlocale_r (_REENT, LC_CTYPE, "C");
 }
 
 /* Like newlib's setlocale, but additionally check if the charset needs
