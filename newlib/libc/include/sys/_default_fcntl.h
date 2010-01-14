@@ -51,6 +51,8 @@ extern "C" {
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
 #define O_NOINHERIT	_FNOINHERIT
+/* O_CLOEXEC is the Linux equivalent to O_NOINHERIT */
+#define O_CLOEXEC	_FNOINHERIT
 
 /* The windows header files define versions with a leading underscore.  */
 #define _O_RDONLY	O_RDONLY
@@ -122,6 +124,9 @@ extern "C" {
 #define	F_CNVT 		12	/* Convert a fhandle to an open fd */
 #define	F_RSETLKW 	13	/* Set or Clear remote record-lock(Blocking) */
 #endif	/* !_POSIX_SOURCE */
+#ifdef __CYGWIN__
+#define	F_DUPFD_CLOEXEC	14	/* As F_DUPFD, but set close-on-exec flag */
+#endif
 
 /* fcntl(2) flags (l_type field of flock structure) */
 #define	F_RDLCK		1	/* read lock */

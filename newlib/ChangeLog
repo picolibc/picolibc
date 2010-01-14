@@ -1,5 +1,12 @@
 2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/sys/_default_fcntl.h (O_CLOEXEC): Define as _FNOINHERIT.
+	(F_DUPFD_CLOEXEC): Define for Cygwin.
+	* libc/include/sys/unistd.h (dup3): Define for Cygwin.
+	(pipe2): Ditto.
+
+2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Just wave bytes invalid in
 	the current charset through.
 
