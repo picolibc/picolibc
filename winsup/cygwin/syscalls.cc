@@ -116,13 +116,13 @@ close_all_files (bool norelease)
   cygheap->fdtab.unlock ();
 }
 
-int
+extern "C" int
 dup (int fd)
 {
-  return cygheap->fdtab.dup2 (fd, cygheap_fdnew ());
+  return cygheap->fdtab.dup3 (fd, cygheap_fdnew (), 0);
 }
 
-int
+extern "C" int
 dup2 (int oldfd, int newfd)
 {
   if (newfd >= OPEN_MAX_MAX)
@@ -131,7 +131,39 @@ dup2 (int oldfd, int newfd)
       set_errno (EBADF);
       return -1;
     }
-  return cygheap->fdtab.dup2 (oldfd, newfd);
+  if (newfd == oldfd)
+    {
+      cygheap_fdget cfd (oldfd);
+      if (cfd < 0)
+	{
+	  syscall_printf ("-1 = dup2 (%d, %d) (oldfd not open)", oldfd, newfd);
+	  return -1;
+	}
+      syscall_printf ("%d = dup2 (%d, %d) (newfd==oldfd)", oldfd, oldfd, newfd);
+      return oldfd;
+    }
+  return cygheap->fdtab.dup3 (oldfd, newfd, 0);
+}
+
+extern "C" int
+dup3 (int oldfd, int newfd, int flags)
+{
+  if (newfd >= OPEN_MAX_MAX)
+    {
+      syscall_printf ("-1 = dup3 (%d, %d, %p) (%d too large)",
+		      oldfd, newfd, flags, newfd);
+      set_errno (EBADF);
+      return -1;
+    }
+  if (newfd == oldfd)
+    {
+      cygheap_fdget cfd (oldfd, false, false);
+      set_errno (cfd < 0 ? EBADF : EINVAL);
+      syscall_printf ("-1 = dup3 (%d, %d, %p) (newfd==oldfd)",
+		      oldfd, newfd, flags);
+      return -1;
+    }
+  return cygheap->fdtab.dup3 (oldfd, newfd, flags);
 }
 
 static char desktop_ini[] =
@@ -1037,16 +1069,20 @@ open (const char *unix_path, int flags, ...)
 	      delete fh;
 	      res = -1;
 	    }
-	  else if (!fh->open (flags, (mode & 07777) & ~cygheap->umask))
-	    {
-	      delete fh;
-	      res = -1;
-	    }
 	  else
 	    {
-	      cygheap->fdtab[fd] = fh;
-	      if ((res = fd) <= 2)
-		set_std_handle (res);
+	      fh->close_on_exec (flags & O_CLOEXEC);
+	      if (!fh->open (flags, (mode & 07777) & ~cygheap->umask))
+		{
+		  delete fh;
+		  res = -1;
+		}
+	      else
+		{
+		  cygheap->fdtab[fd] = fh;
+		  if ((res = fd) <= 2)
+		    set_std_handle (res);
+		}
 	    }
 	}
     }

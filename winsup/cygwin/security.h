@@ -437,6 +437,8 @@ extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID 
 extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
 #define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
 
+#define sec_none_cloexec(f) (((f) & O_CLOEXEC ? &sec_none_nih : &sec_none))
+
 extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
@@ -460,4 +462,5 @@ sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1, PSID sid2 = NULL,
 {
   return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
 }
+
 #endif /*_SECURITY_H*/

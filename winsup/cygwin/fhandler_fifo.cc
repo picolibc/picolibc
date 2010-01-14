@@ -1,6 +1,6 @@
 /* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -70,6 +70,11 @@ fhandler_fifo::fifo_name (char *buf)
 			       PIPE_UNLIMITED_INSTANCES, (s), (s), \
 			       NMPWAIT_WAIT_FOREVER, sa_buf)
 
+inline PSECURITY_ATTRIBUTES
+sec_user_cloexec (bool cloexec, PSECURITY_ATTRIBUTES sa, PSID sid)
+{
+  return cloexec ? sec_user_nih (sa, sid) : sec_user (sa, sid);
+}
 
 int
 fhandler_fifo::open (int flags, mode_t)
@@ -94,7 +99,8 @@ fhandler_fifo::open (int flags, mode_t)
     {
       char char_sa_buf[1024];
       LPSECURITY_ATTRIBUTES sa_buf =
-	sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+	sec_user_cloexec (flags & O_CLOEXEC, (PSECURITY_ATTRIBUTES) char_sa_buf,
+			  cygheap->user.sid());
       bool do_seterrno = true;
 
       HANDLE h;
@@ -205,7 +211,9 @@ fhandler_fifo::wait (bool iswrite)
       fifo_name (npname);
       char char_sa_buf[1024];
       LPSECURITY_ATTRIBUTES sa_buf;
-      sa_buf = sec_user ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+      sa_buf = sec_user_cloexec (close_on_exec (),
+				 (PSECURITY_ATTRIBUTES) char_sa_buf,
+				 cygheap->user.sid());
       while (1)
 	{
 	  if (WaitNamedPipe (npname, 10))

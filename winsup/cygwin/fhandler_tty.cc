@@ -581,6 +581,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
+  set_close_on_exec (!!(flags & O_CLOEXEC));
 
   set_open_status ();
   if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1

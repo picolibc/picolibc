@@ -1,7 +1,7 @@
 /* fhandler_mem.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009,
+   2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -79,7 +79,8 @@ fhandler_dev_mem::open (int flags, mode_t)
 
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes (&attr, &ro_u_pmem,
-			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      OBJ_CASE_INSENSITIVE
+			      | (flags & O_CLOEXEC ? 0 : OBJ_INHERIT),
 			      NULL, NULL);
 
   ACCESS_MASK section_access;

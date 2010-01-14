@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -469,7 +469,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
 
-  pc.get_object_attr (attr, sec_none);
+  pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
   switch (query_open ())
     {

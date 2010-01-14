@@ -1,7 +1,6 @@
 /* fhandler_mailslot.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2005, 2007, 2008, 2009
-   Red Hat, Inc.
+   Copyright 2005, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -47,12 +46,15 @@ fhandler_mailslot::fstat (struct __stat64 *buf)
 
 POBJECT_ATTRIBUTES
 fhandler_mailslot::get_object_attr (OBJECT_ATTRIBUTES &attr,
-				    PUNICODE_STRING path)
+				    PUNICODE_STRING path,
+				    int flags)
 {
   
   RtlCopyUnicodeString (path, pc.get_nt_native_path ());
   RtlAppendUnicodeStringToString (path, &installation_key);
-  InitializeObjectAttributes (&attr, path, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+  InitializeObjectAttributes (&attr, path,
+			      OBJ_CASE_INSENSITIVE
+			      | (flags & O_CLOEXEC ? 0 : OBJ_INHERIT),
 			      NULL, NULL);
   return &attr;
 }
@@ -76,7 +78,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
     case O_RDONLY:	/* Server */
       timeout.QuadPart = (flags & O_NONBLOCK) ? 0LL : 0x8000000000000000LL;
       status = NtCreateMailslotFile (&x, GENERIC_READ | SYNCHRONIZE,
-				     get_object_attr (attr, &path),
+				     get_object_attr (attr, &path, flags),
 				     &io, FILE_SYNCHRONOUS_IO_NONALERT,
 				     0, 0, &timeout);
       if (!NT_SUCCESS (status))
@@ -97,7 +99,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	      break;
 	    }
 	  status = NtOpenFile (&x, GENERIC_READ | SYNCHRONIZE,
-			       get_object_attr (attr, &path), &io,
+			       get_object_attr (attr, &path, flags), &io,
 			       FILE_SHARE_VALID_FLAGS,
 			       FILE_SYNCHRONOUS_IO_NONALERT);
 #endif
@@ -122,7 +124,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	  break;
 	}
       status = NtOpenFile (&x, GENERIC_WRITE | SYNCHRONIZE,
-			   get_object_attr (attr, &path), &io,
+			   get_object_attr (attr, &path, flags), &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT);
       if (!NT_SUCCESS (status))

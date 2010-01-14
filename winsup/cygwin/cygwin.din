@@ -297,6 +297,7 @@ dup SIGFE
 _dup = dup SIGFE
 dup2 SIGFE
 _dup2 = dup2 SIGFE
+dup3 SIGFE
 eaccess = euidaccess SIGFE
 ecvt SIGFE
 _ecvt = ecvt SIGFE
@@ -1071,6 +1072,7 @@ perror SIGFE
 _perror = perror SIGFE
 pipe SIGFE
 _pipe SIGFE
+pipe2 SIGFE
 poll SIGFE
 _poll = poll SIGFE
 popen SIGFE

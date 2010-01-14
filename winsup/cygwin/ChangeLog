@@ -1,3 +1,51 @@
+2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (dup3): Export.
+	(pipe2): Export.
+	* dtable.cc (dtable::dup_worker): Take additional flags parameter.
+	Handle O_CLOEXEC flag.
+	(dtable::dup3): Rename from dup2.  Take additional flags parameter.
+	Check for valid flags.  Drop check for newfd == oldfd.
+	* dtable.h (dtable::dup_worker): Add flags parameter.
+	(dtable::dup3): Rename from dup2.
+	* fcntl.cc (fcntl64): Add F_DUPFD_CLOEXEC case.
+	* fhandler.h (fhandler_mailslot::get_object_attr): Add flags parameter.
+	* fhandler.cc (fhandler_base::open): Use security attribute with
+	inheritance according to setting of O_CLOEXEC flag.
+	* fhandler_console.cc (fhandler_console::open): Ditto.
+	* fhandler_fifo.cc (sec_user_cloexec): New inline function to
+	create security attribute with inheritance according to setting of
+	O_CLOEXEC flag.
+	(fhandler_fifo::open): Call sec_user_cloexec to fetch security
+	attribute.
+	(fhandler_fifo::wait): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Ditto.
+	* fhandler_mailslot.cc (fhandler_mailslot::get_object_attr): Take
+	additional flags parameter.  Use security attribute with inheritance
+	according to setting of O_CLOEXEC flag.
+	(fhandler_mailslot::open): Call get_object_attr with flags parameter.
+	* fhandler_registry.cc (fhandler_registry::open): Call set_close_on_exec
+	on real handles to accommodate O_CLOEXEC flag.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* fhandler_tape.cc: Create mutex with inheritance according to setting
+	of O_CLOEXEC flag.
+	* pipe.cc: Replace usage of O_NOINHERIT with O_CLOEXEC.
+	 (fhandler_pipe::init): Simplify setting close_on_exec flag.
+	(fhandler_pipe::open): Remove setting close_on_exec flag.
+	(fhandler_pipe::create): Use security attribute with inheritance
+	according to setting of O_CLOEXEC flag.
+	(pipe2): New exported function.
+	* posix_ipc.cc: Throughout, open backing files with O_CLOEXEC
+	flag to follow POSIX semantics.
+	* security.h (sec_none_cloexec): New define.
+	* syscalls.cc (dup): Add missing extern "C" qualifier.  Accommodate
+	renaming of dtable::dup2 to dtable::dup3.
+	(dup2): Ditto.  Check newfd == oldfd here.
+	(dup3): New function.  Check newfd == oldfd here.
+	(open): Set close_on_exec flag according to O_CLOEXEC flag before
+	calling fhandler->open.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/fcntl.h (O_TTY_INIT): Define as 0.

@@ -1,6 +1,6 @@
 /* posix_ipc.cc: POSIX IPC API for Cygwin.
 
-   Copyright 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -248,7 +248,7 @@ shm_open (const char *name, int oflag, mode_t mode)
       return -1;
     }
 
-  return open (shmname, oflag, mode & 0777);
+  return open (shmname, oflag | O_CLOEXEC, mode & 0777);
 }
 
 extern "C" int
@@ -351,7 +351,7 @@ again:
       va_end (ap);
 
       /* Open and specify O_EXCL and user-execute */
-      fd = open (mqname, oflag | O_EXCL | O_RDWR, mode | S_IXUSR);
+      fd = open (mqname, oflag | O_EXCL | O_RDWR | O_CLOEXEC, mode | S_IXUSR);
       if (fd < 0)
 	{
 	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
@@ -435,7 +435,7 @@ again:
 
 exists:
   /* Open the file then memory map */
-  if ((fd = open (mqname, O_RDWR)) < 0)
+  if ((fd = open (mqname, O_RDWR | O_CLOEXEC)) < 0)
     {
       if (errno == ENOENT && (oflag & O_CREAT))
 	goto again;
@@ -944,7 +944,7 @@ again:
       va_end (ap);
 
       /* Open and specify O_EXCL and user-execute */
-      fd = open (semname, oflag | O_EXCL | O_RDWR, mode | S_IXUSR);
+      fd = open (semname, oflag | O_EXCL | O_RDWR | O_CLOEXEC, mode | S_IXUSR);
       if (fd < 0)
 	{
 	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
@@ -974,7 +974,7 @@ again:
 
 exists:
   /* Open the file and fetch the semaphore name. */
-  if ((fd = open (semname, O_RDWR)) < 0)
+  if ((fd = open (semname, O_RDWR | O_CLOEXEC)) < 0)
     {
       if (errno == ENOENT && (oflag & O_CREAT))
 	goto again;

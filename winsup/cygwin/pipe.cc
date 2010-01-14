@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009 Hat, Inc.
+   2008, 2009, 2010 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -53,8 +53,7 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
   bool opened_properly = a & FILE_CREATE_PIPE_INSTANCE;
   a &= ~FILE_CREATE_PIPE_INSTANCE;
   fhandler_base::init (f, a, mode);
-  if (mode & O_NOINHERIT)
-    close_on_exec (true);
+  close_on_exec (mode & O_CLOEXEC);
   setup_overlapped (opened_properly);
   return 1;
 }
@@ -116,7 +115,7 @@ fhandler_pipe::open (int flags, mode_t mode)
       set_errno (EACCES);
       goto out;
     }
-  inh = !(flags & O_NOINHERIT);
+  inh = !(flags & O_CLOEXEC);
   if (!DuplicateHandle (proc, pipe_hdl, GetCurrentProcess (), &nio_hdl,
 			0, inh, DUPLICATE_SAME_ACCESS))
     {
@@ -124,8 +123,6 @@ fhandler_pipe::open (int flags, mode_t mode)
       goto out;
     }
   init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
-  if (flags & O_NOINHERIT)
-    close_on_exec (true);
   uninterruptible_io (fh->uninterruptible_io ());
   cfree (fh);
   CloseHandle (proc);
@@ -312,7 +309,7 @@ int
 fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 {
   HANDLE r, w;
-  SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
+  SECURITY_ATTRIBUTES *sa = sec_none_cloexec (mode);
   int res;
 
   int ret = create_selectable (sa, r, w, psize);
@@ -408,4 +405,10 @@ _pipe (int filedes[2], unsigned int psize, int mode)
     }
 
   return res;
+}
+
+extern "C" int
+pipe2 (int filedes[2], int mode)
+{
+  return _pipe (filedes, DEFAULT_PIPEBUFSIZE, mode);
 }

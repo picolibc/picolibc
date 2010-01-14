@@ -1,7 +1,7 @@
 /* fhandler_console.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009 Red Hat, Inc.
+   2006, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -705,7 +705,7 @@ fhandler_console::open (int flags, mode_t)
 
   /* Open the input handle as handle_ */
   h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
-		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
 		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
@@ -717,7 +717,7 @@ fhandler_console::open (int flags, mode_t)
   uninterruptible_io (true);	// Handled explicitly in read code
 
   h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
-		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
 		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)

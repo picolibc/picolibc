@@ -1,6 +1,7 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
-   Copyright 2002, 2003, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -771,6 +772,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	flags |= O_DIROPEN;
 
       set_io_handle (handle);
+      set_close_on_exec (!!(flags & O_CLOEXEC));
       value_name = cwcsdup (dec_file);
 
       if (!(flags & O_DIROPEN) && !fill_filebuf ())

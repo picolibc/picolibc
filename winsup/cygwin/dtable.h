@@ -51,7 +51,7 @@ public:
   int vfork_child_dup ();
   void vfork_parent_restore ();
   void vfork_child_fixup ();
-  fhandler_base *dup_worker (fhandler_base *oldfh);
+  fhandler_base *dup_worker (fhandler_base *oldfh, int flags);
   int extend (int howmuch);
   void fixup_after_fork (HANDLE);
   inline int not_open (int fd)
@@ -65,7 +65,7 @@ public:
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle);
-  int dup2 (int oldfd, int newfd);
+  int dup3 (int oldfd, int newfd, int flags);
   void fixup_after_exec ();
   inline fhandler_base *&operator [](int fd) const { return fds[fd]; }
   bool select_read (int fd, select_stuff *);

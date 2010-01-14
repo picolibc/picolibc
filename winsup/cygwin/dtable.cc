@@ -559,7 +559,7 @@ build_fh_pc (path_conv& pc, bool set_name)
 }
 
 fhandler_base *
-dtable::dup_worker (fhandler_base *oldfh)
+dtable::dup_worker (fhandler_base *oldfh, int flags)
 {
   /* Don't call set_name in build_fh_pc.  It will be called in
      fhandler_base::operator= below.  Calling it twice will result
@@ -579,7 +579,11 @@ dtable::dup_worker (fhandler_base *oldfh)
 	}
       else
 	{
-	  newfh->close_on_exec (false);
+	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
+	  if (flags & O_CLOEXEC)
+	    newfh->set_close_on_exec (true);
+	  else
+	    newfh->close_on_exec (false);
 	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
 	}
     }
@@ -587,13 +591,13 @@ dtable::dup_worker (fhandler_base *oldfh)
 }
 
 int
-dtable::dup2 (int oldfd, int newfd)
+dtable::dup3 (int oldfd, int newfd, int flags)
 {
   int res = -1;
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
 
   MALLOC_CHECK;
-  debug_printf ("dup2 (%d, %d)", oldfd, newfd);
+  debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
   lock ();
 
   if (not_open (oldfd))
@@ -602,21 +606,20 @@ dtable::dup2 (int oldfd, int newfd)
       set_errno (EBADF);
       goto done;
     }
-
   if (newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
       goto done;
     }
-
-  if (newfd == oldfd)
+  if ((flags & ~O_CLOEXEC) != 0)
     {
-      res = newfd;
-      goto done;
+      syscall_printf ("invalid flags value %x", flags);
+      set_errno (EINVAL);
+      return -1;
     }
 
-  if ((newfh = dup_worker (fds[oldfd])) == NULL)
+  if ((newfh = dup_worker (fds[oldfd], flags)) == NULL)
     {
       res = -1;
       goto done;
@@ -644,7 +647,7 @@ dtable::dup2 (int oldfd, int newfd)
 done:
   MALLOC_CHECK;
   unlock ();
-  syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
+  syscall_printf ("%d = dup3 (%d, %d, %p)", res, oldfd, newfd, flags);
 
   return res;
 }

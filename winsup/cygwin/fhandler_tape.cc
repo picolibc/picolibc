@@ -2,7 +2,7 @@
    classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Red Hat, Inc.
+   2008, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1174,7 +1174,7 @@ fhandler_dev_tape::open (int flags, mode_t)
       set_errno (ENOENT);
       return 0;
     }
-  if (!(mt_mtx = CreateMutex (&sec_all, TRUE, NULL)))
+  if (!(mt_mtx = CreateMutex (&sec_all, !!(flags & O_CLOEXEC), NULL)))
     {
       __seterrno ();
       return 0;
