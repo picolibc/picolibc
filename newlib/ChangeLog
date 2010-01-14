@@ -3,16 +3,6 @@
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Just wave bytes invalid in
 	the current charset through.
 
-2010-01-13  Corinna Vinschen  <corinna@vinschen.de>
-
-	* libc/locale/locale.c (lc_ctype_charset): Disable defaulting to
-	"UTF-8" on Cygwin.
-	(lc_message_charset): Ditto.
-	(loadlocale): Disable setting charset of the "C" locale to "UTF-8" on
-	Cygwin.
-	* libc/stdlib/mbtowc_r.c (__mbtowc): Add Cygwin-specific comment.
-	* libc/stdlib/wctomb_r.c (__wctomb): Ditto.
-
 2010-01-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/posix/telldir.c (_cleanupdir): Fixed usage of freed memory.
