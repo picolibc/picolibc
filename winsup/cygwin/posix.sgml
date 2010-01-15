@@ -992,6 +992,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-gnu"><title>System interfaces compatible with GNU or Linux extensions:</title>
 
 <screen>
+    accept4
     argz_add
     argz_add_sep
     argz_append

@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -577,7 +577,16 @@ cygwin_socket (int af, int type, int protocol)
   int res = -1;
   SOCKET soc = 0;
 
-  debug_printf ("socket (%d, %d, %d)", af, type, protocol);
+  int flags = type & _SOCK_FLAG_MASK;
+  type &= ~_SOCK_FLAG_MASK;
+
+  debug_printf ("socket (%d, %d (flags %p), %d)", af, type, flags, protocol);
+
+  if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
 
   soc = socket (af == AF_LOCAL ? AF_INET : af, type,
 		af == AF_LOCAL ? 0 : protocol);
@@ -603,12 +612,17 @@ cygwin_socket (int af, int type, int protocol)
       {
 	((fhandler_socket *) fd)->set_addr_family (af);
 	((fhandler_socket *) fd)->set_socket_type (type);
+	if (flags & SOCK_NONBLOCK)
+	  ((fhandler_socket *) fd)->set_nonblocking (true);
+	if (flags & SOCK_CLOEXEC)
+	  ((fhandler_socket *) fd)->set_close_on_exec (true);
 	res = fd;
       }
   }
 
 done:
-  syscall_printf ("%d = socket (%d, %d, %d)", res, af, type, protocol);
+  syscall_printf ("%d = socket (%d, %d (flags %p), %d)",
+		  res, af, type, flags, protocol);
   return res;
 }
 
@@ -1242,9 +1256,32 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    res = fh->accept (peer, len);
+    res = fh->accept4 (peer, len, 0);
 
   syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
+  return res;
+}
+
+extern "C" int
+accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
+{
+  int res;
+  sig_dispatch_pending ();
+
+  fhandler_socket *fh = get (fd);
+
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
+    res = -1;
+  else if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
+      res = -1;
+    }
+  else
+    res = fh->accept4 (peer, len, flags);
+
+  syscall_printf ("%d = accept4 (%d, %p, %p, %p)", res, fd, peer, len, flags);
   return res;
 }
 
@@ -2777,6 +2814,9 @@ socketpair (int family, int type, int protocol, int *sb)
   if (efault.faulted (EFAULT))
     return -1;
 
+  int flags = type & _SOCK_FLAG_MASK;
+  type &= ~_SOCK_FLAG_MASK;
+
   if (family != AF_LOCAL && family != AF_INET)
     {
       set_errno (EAFNOSUPPORT);
@@ -2785,6 +2825,11 @@ socketpair (int family, int type, int protocol, int *sb)
   if (type != SOCK_STREAM && type != SOCK_DGRAM)
     {
       set_errno (EPROTOTYPE);
+      goto done;
+    }
+  if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
       goto done;
     }
   if ((family == AF_LOCAL && protocol != PF_UNSPEC && protocol != PF_LOCAL)
@@ -2921,6 +2966,10 @@ socketpair (int family, int type, int protocol, int *sb)
 	((fhandler_socket *) sb0)->set_addr_family (family);
 	((fhandler_socket *) sb0)->set_socket_type (type);
 	((fhandler_socket *) sb0)->connect_state (connected);
+	if (flags & SOCK_NONBLOCK)
+	  ((fhandler_socket *) sb0)->set_nonblocking (true);
+	if (flags & SOCK_CLOEXEC)
+	  ((fhandler_socket *) sb0)->set_close_on_exec (true);
 	if (family == AF_LOCAL && type == SOCK_STREAM)
 	  ((fhandler_socket *) sb0)->af_local_set_sockpair_cred ();
 
@@ -2931,6 +2980,10 @@ socketpair (int family, int type, int protocol, int *sb)
 	    ((fhandler_socket *) sb1)->set_addr_family (family);
 	    ((fhandler_socket *) sb1)->set_socket_type (type);
 	    ((fhandler_socket *) sb1)->connect_state (connected);
+	    if (flags & SOCK_NONBLOCK)
+	      ((fhandler_socket *) sb1)->set_nonblocking (true);
+	    if (flags & SOCK_CLOEXEC)
+	      ((fhandler_socket *) sb1)->set_close_on_exec (true);
 	    if (family == AF_LOCAL && type == SOCK_STREAM)
 	      ((fhandler_socket *) sb1)->af_local_set_sockpair_cred ();
 

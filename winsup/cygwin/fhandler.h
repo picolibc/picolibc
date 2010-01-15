@@ -505,7 +505,7 @@ class fhandler_socket: public fhandler_base
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);
   int listen (int backlog);
-  int accept (struct sockaddr *peer, int *len);
+  int accept4 (struct sockaddr *peer, int *len, int flags);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
   int getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid);

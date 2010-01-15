@@ -1,7 +1,7 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -373,12 +373,13 @@ details. */
       217: CW_GET_INSTKEY added.
       218: Export get_nprocs, get_nprocs_conf, get_phys_pages, get_avphys_pages.
       219: Export dup3, pipe2, O_CLOEXEC, F_DUPFD_CLOEXEC.
+      220: Export accept4, SOCK_CLOEXEC, SOCK_NONBLOCK.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 219
+#define CYGWIN_VERSION_API_MINOR 220
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

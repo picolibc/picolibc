@@ -1,5 +1,25 @@
 2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (accept4): Export.
+	* fhandler.h (fhandler_socket::accept4): Rename from accept.  Take
+	additional flag parameter.
+	* fhandler_socket.cc (fhandler_socket::accept4): Ditto.  Handle
+	SOCK_NONBLOCK and SOCK_CLOEXEC flags.
+	* net.cc (cygwin_socket): Handle SOCK_NONBLOCK and SOCK_CLOEXEC flags
+	in type.  Check for invalid flag values.
+	(socketpair): Ditto.
+	(cygwin_accept): Accommodate renaming of fhandler_socket::accept
+	function to accept4.
+	(accept4): New function.
+	* posix.sgml: Mention accept4 as GNU extensions.
+	* include/cygwin/socket.h (SOCK_NONBLOCK): Define.
+	(SOCK_CLOEXEC): Define.
+	(_SOCK_FLAG_MASK): Define when building Cygwin.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* include/sys/socket.h (accept4): Declare.
+
+2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml: Mention dup3 and pipe2 as GNU extensions.
 
 2010-01-14  Corinna Vinschen  <corinna@vinschen.de>

@@ -1,6 +1,7 @@
 /* sys/socket.h
 
-   Copyright 1996-2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2005, 2006,
+   2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,6 +28,7 @@ extern "C"
 
 #ifndef __INSIDE_CYGWIN_NET__
   int accept (int, struct sockaddr *__peer, socklen_t *);
+  int accept4 (int, struct sockaddr *__peer, socklen_t *, int flags);
   int bind (int, const struct sockaddr *__my_addr, socklen_t __addrlen);
   int connect (int, const struct sockaddr *, socklen_t);
   int getpeername (int, struct sockaddr *__peer, socklen_t *);

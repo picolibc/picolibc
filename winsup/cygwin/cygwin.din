@@ -37,6 +37,7 @@ _abort = abort SIGFE
 abs NOSIGFE
 _abs = abs NOSIGFE
 accept = cygwin_accept SIGFE
+accept4 SIGFE
 access SIGFE
 _access = access SIGFE
 acl SIGFE

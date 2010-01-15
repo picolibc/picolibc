@@ -1,6 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009, 2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1193,7 +1194,7 @@ fhandler_socket::listen (int backlog)
 }
 
 int
-fhandler_socket::accept (struct sockaddr *peer, int *len)
+fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 {
   /* Allows NULL peer and len parameters. */
   struct sockaddr_storage lpeer;
@@ -1216,7 +1217,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  sock->set_addr_family (get_addr_family ());
 	  sock->set_socket_type (get_socket_type ());
 	  sock->async_io (async_io ());
-	  sock->set_nonblocking (is_nonblocking ());
 	  if (get_addr_family () == AF_LOCAL)
 	    {
 	      sock->set_sun_path (get_sun_path ());
@@ -1236,6 +1236,10 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 		    }
 		}
 	    }
+	  sock->set_nonblocking (flags & SOCK_NONBLOCK
+				 ? true : is_nonblocking ());
+	  if (flags & SOCK_CLOEXEC)
+	    sock->set_close_on_exec (true);
 	  /* No locking necessary at this point. */
 	  sock->wsock_events->events = wsock_events->events | FD_WRITE;
 	  sock->wsock_events->owner = wsock_events->owner;
