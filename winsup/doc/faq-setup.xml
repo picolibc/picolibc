@@ -52,22 +52,30 @@ For other options, search the mailing lists with terms such as
 when you run <literal>setup.exe --help</literal>. The current options are:
 <screen>
 Command Line Options:
- -D --download                          Download from internet
- -L --local-install                     Install from local directory
- -s --site                              Download site
- -R --root                              Root installation directory
- -q --quiet-mode                        Unattended setup mode
- -h --help                              print help
- -l --local-package-dir                 Local package directory
- -r --no-replaceonreboot                Disable replacing in-use files on next
-                                        reboot.
- -n --no-shortcuts                      Disable creation of desktop and start
-                                        menu shortcuts
- -N --no-startmenu                      Disable creation of start menu shortcut
- -d --no-desktop                        Disable creation of desktop shortcut
  -A --disable-buggy-antivirus           Disable known or suspected buggy anti
-                                        virus software packages during
-                                        execution.
+ 					virus software packages during execution.
+ -C --categories                        Specify entire categories to install
+ -D --download                          Download from internet
+ -d --no-desktop                        Disable creation of desktop shortcut
+ -h --help                              print help
+ -K --pubkey                            Path to extra public key file (gpg format)
+ -L --local-install                     Install from local directory
+ -l --local-package-dir                 Local package directory
+ -n --no-shortcuts                      Disable creation of desktop and start menu
+ 					shortcuts
+ -N --no-startmenu                      Disable creation of start menu shortcut
+ -O --only-site                         Ignore all sites except for -s
+ -P --packages                          Specify packages to install
+ -p --proxy                             HTTP/FTP proxy (host:port)
+ -q --quiet-mode                        Unattended setup mode
+ -r --no-replaceonreboot                Disable replacing in-use files on next
+ 					reboot.
+ -R --root                              Root installation directory
+ -S --sexpr-pubkey                      Extra public key in s-expr format
+ -s --site                              Download site
+ -U --keep-untrusted-keys               Use untrusted keys and retain all
+ -u --untrusted-keys                    Use untrusted keys from last-extrakeys
+ -X --no-verify                         Don't verify setup.ini signatures
 </screen>
 </para>
 </answer></qandaentry>
