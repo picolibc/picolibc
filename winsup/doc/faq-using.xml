@@ -1083,7 +1083,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
 <listitem><para>LanDesk</para></listitem>
 <listitem><para>Windows Defender </para></listitem>
-<listitem><para>Embassy Trust Suite fingerprint reader software wxvault.dll</para></listitem>
+<listitem><para>Various programs by Wave Systems Corp using wxvault.dll, including Embassy Trust Suite and Embassy Security Center</para></listitem>
 <listitem><para>NOD32 Antivirus</para></listitem>
 <listitem><para>ByteMobile laptop optimization client</para></listitem>
 <listitem><para>Earthlink Total-Access</para></listitem>

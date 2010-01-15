@@ -1,3 +1,8 @@
+2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	Suggested by Frank Fesevur <ffes@users.sourceforge.net>:
+	* faq-using.xml (faq.using.bloda): Clarify wxvault.dll.
+
 2010-01-15  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* faq-setup.xml: Add missing setup options.  Sort options.
