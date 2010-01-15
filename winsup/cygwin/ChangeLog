@@ -1,3 +1,9 @@
+2010-01-15  Pierre A. Humblet  <phumblet@phumblet.no-ip.org>
+
+	* fhandler_socket.cc (fhandler_socket::accept4): Set nonblocking
+	flag exactly according to flags, as on Linux.
+	* net.cc (cygwin_accept): Maintain BSD semantics here.
+
 2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (accept4): Export.

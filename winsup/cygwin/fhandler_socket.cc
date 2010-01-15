@@ -1236,8 +1236,7 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 		    }
 		}
 	    }
-	  sock->set_nonblocking (flags & SOCK_NONBLOCK
-				 ? true : is_nonblocking ());
+	  sock->set_nonblocking (flags & SOCK_NONBLOCK);
 	  if (flags & SOCK_CLOEXEC)
 	    sock->set_close_on_exec (true);
 	  /* No locking necessary at this point. */

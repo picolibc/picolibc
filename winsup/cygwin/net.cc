@@ -1256,7 +1256,7 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
   else
-    res = fh->accept4 (peer, len, 0);
+    res = fh->accept4 (peer, len, fh->is_nonblocking () ? SOCK_NONBLOCK : 0);
 
   syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
   return res;
