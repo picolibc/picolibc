@@ -539,22 +539,6 @@ convert_slashes (char* name)
    }
 }
 
-static char *
-get_mixed_name (const char* filename)
-{
-  char* mixed_buf = strdup (filename);
-
-  if (mixed_buf == NULL)
-    {
-      fprintf (stderr, "%s: out of memory\n", prog_name);
-      exit (1);
-    }
-
-  convert_slashes (mixed_buf);
-
-  return mixed_buf;
-}
-
 static bool
 get_special_folder (char* path, int id)
 {
@@ -575,6 +559,7 @@ static void
 do_sysfolders (char option)
 {
   char *buf, buf1[PATH_MAX], buf2[PATH_MAX];
+  char *tmp = NULL;
   WCHAR wbuf[MAX_PATH];
   DWORD len = MAX_PATH;
   WIN32_FIND_DATAW w32_fd;
@@ -667,20 +652,14 @@ do_sysfolders (char option)
     }
   else
     {
-      char *tmp;
-
       if (shortname_flag)
-	{
-	  buf = get_short_name (tmp = buf);
-	  free (tmp);
-	}
+	  tmp = buf = get_short_name (buf);
       if (mixed_flag)
-	{
-	  buf = get_mixed_name (tmp = buf);
-	  free (tmp);
-	}
+	convert_slashes (buf);
     }
   printf ("%s\n", buf);
+  if (tmp)
+    free (tmp);
 }
 
 static void
@@ -759,10 +738,7 @@ do_pathconv (char *filename)
 	      free (tmp);
 	    }
 	  if (mixed_flag)
-	    {
-	      buf = get_mixed_name (tmp = buf);
-	      free (tmp);
-	    }
+	    convert_slashes (buf);
 	}
       if (err)
 	{
@@ -812,10 +788,7 @@ do_pathconv (char *filename)
 		}
 	    }
 	  if (mixed_flag)
-	    {
-	      buf = get_mixed_name (buf);
-	      free (tmp);
-	    }
+	    convert_slashes (buf);
 	}
     }
 
@@ -823,7 +796,7 @@ do_pathconv (char *filename)
   if (buf2)
     free (buf2);
   if (buf)
-    free (buf);
+    free (tmp);
 }
 
 static void

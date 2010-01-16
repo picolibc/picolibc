@@ -1,3 +1,10 @@
+2010-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (get_mixed_name): Drop function.  Replace with call to
+	convert_slashes throughout.
+	(do_sysfolders): Free allocated buffer.
+	(do_pathconv): Fix freeing last buffer.
+
 2010-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (do_mount_from_fstab): Allow to change cygdrive prefix, too.
