@@ -1,5 +1,9 @@
 2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/fnmatch.c: Replace with multibyte capable version from FreeBSD.
+
+2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::accept4): Reset async flag
 	on accepted socket.
 
