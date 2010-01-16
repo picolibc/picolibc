@@ -57,8 +57,7 @@ directory and place <command>setup.exe</command> in it. Run
 <command>setup.exe</command> to <literal>Install from Internet</literal>
 or <literal>Download from Internet</literal>, then copy the whole
 <literal>C:\cache\</literal> to each machine and instead choose
-<literal>Install from Local Directory</literal>. Unfortunately
-<command>setup.exe</command> does not yet support unattended installs.
+<literal>Install from Local Directory</literal>.
 </para>
 <para>
 Though this provides some basic mirroring functionality, if you

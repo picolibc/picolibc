@@ -1,3 +1,7 @@
+2010-01-16  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* setup-net.sgml: Remove obsolete assertion.
+
 2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	Suggested by Frank Fesevur <ffes@users.sourceforge.net>:
