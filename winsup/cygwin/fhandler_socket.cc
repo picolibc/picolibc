@@ -1216,7 +1216,7 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 	  fhandler_socket *sock = (fhandler_socket *) res_fd;
 	  sock->set_addr_family (get_addr_family ());
 	  sock->set_socket_type (get_socket_type ());
-	  sock->async_io (async_io ());
+	  sock->async_io (false); /* fdsock switches async mode off. */
 	  if (get_addr_family () == AF_LOCAL)
 	    {
 	      sock->set_sun_path (get_sun_path ());
