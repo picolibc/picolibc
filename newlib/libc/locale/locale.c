@@ -51,8 +51,10 @@ the form
 
   language[_TERRITORY][.charset][@@modifier]
 
-<<"language">> is a two character string per ISO 639.  <<"TERRITORY">> is a
-country code per ISO 3166.  For <<"charset">> and <<"modifier">> see below.
+<<"language">> is a two character string per ISO 639, or, if not available
+for a given language, a three character string per ISO 639-2.
+<<"TERRITORY">> is a country code per ISO 3166.  For <<"charset">> and
+<<"modifier">> see below.
 
 Additionally to the POSIX specifier, seven extensions are supported for
 backward compatibility with older implementations using newlib:
@@ -473,6 +475,9 @@ loadlocale(struct _reent *p, int category)
 	  || c[1] < 'a' || c[1] > 'z')
 	return NULL;
       c += 2;
+      /* Allow three character Language per ISO 639-2 */
+      if (c[0] >= 'a' && c[0] <= 'z')
+      	++c;
       if (c[0] == '_')
         {
 	  /* Territory */
