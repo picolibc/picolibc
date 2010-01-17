@@ -1,3 +1,14 @@
+2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup2.sgml (setup-locale): Mention three character codes per
+	ISO 639-3.
+
+2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
+	    Andy Koppe <andy.koppe@gmail.com>
+
+	* setup2.sgml (setup-locale): Adapt description to the C using ASCII
+	change in 1.7.2.
+
 2010-01-16  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* setup-net.sgml: Remove obsolete assertion.

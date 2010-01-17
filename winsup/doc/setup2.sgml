@@ -183,8 +183,11 @@ specifier is</para>
   language[[_TERRITORY][.charset][@modifier]]
 </screen>
 
-<para>"language" is a lowercase two character string per ISO 639-1,
-"TERRITORY" is an uppercase two character string per ISO 3166, charset is
+<para>"language" is a lowercase two character string per ISO 639-1, or,
+if there is no ISO 639-1 code for the language (for instance, "Lower Sorbian"),
+a three character string per ISO 639-3.</para>
+
+<para>"TERRITORY" is an uppercase two character string per ISO 3166, charset is
 one of a list of supported character sets, and the modifier doesn't matter
 here (though it might for some applications).  If you're interested in the
 exact description, you can find it in the online publication of the POSIX
@@ -197,21 +200,23 @@ manual pages on the homepage of the
   "de_CH"	   language = German, territory = Switzerland, default charset
   "fr_FR.UTF-8"    language = french, territory = France, charset = UTF-8
   "ko_KR.eucKR"    language = korean, territory = South Korea, charset = eucKR
+  "syr_SY"         language = Syriac, territory = Syria, default charset
 </screen>
 
 <para>
 At application startup, the application's locale is set to the default
-"C" or "POSIX" locale.  Under Cygwin, this locale defaults to the UTF-8
-character set.  If you want to stick to the "C" locale and only change to
-another charset, you can define this by setting one of the locale environment
-variables to "C.charset".  For instance</para>
+"C" or "POSIX" locale.  Under Cygwin 1.7.2 and later, this locale defaults
+to the ASCII character set on the application level.  If you want to stick
+to the "C" locale and only change to another charset, you can define this
+by setting one of the locale environment variables to "C.charset".  For
+instance</para>
 
 <screen>
   "C.ISO-8859-1"
 </screen>
 
-<para>The default locale in the absence of the aforementioned locale
-environment variables is "C.UTF-8".</para>
+<note><para>The default locale in the absence of the aforementioned locale
+environment variables is "C.UTF-8".</para></note>
 
 <para>Windows uses the UTF-16 charset exclusively to store the names
 of any object used by the Operating System.  This is especially important
@@ -232,8 +237,8 @@ process.</para>
 However, even if one of the locale environment variables is set to
 some other value than "C", this does <emphasis>only</emphasis> affect
 how Cygwin itself converts filenames.  As the POSIX standard requires,
-it's the applications responsibility to activate that locale for its
-own purpose, typically by using the call</para>
+it's the application's responsibility to activate that locale for its
+own purposes, typically by using the call</para>
 
 <screen>
   setlocale (LC_ALL, "");
@@ -243,6 +248,18 @@ own purpose, typically by using the call</para>
 lost:  If the application calls setlocale as above, and there is none
 of the important locale variables set in the environment, the locale
 is set to the default locale, which is "C.UTF-8".</para>
+
+<para>But what about applications which are not locale-aware?  Per POSIX,
+they are running in the "C" or "POSIX" locale, which implies the ASCII
+charset.  The Cygwin DLL itself, however, will nevertheless use the locale
+set in the environment (or the "C.UTF-8" default locale) for converting
+filenames etc.</para>
+
+<para>When the locale set in the environment specifies an ASCII charset,
+for example "C" or "en_US.ASCII", Cygwin will still use UTF-8
+under the hood to translate filenames.  This allows for easier
+interoperability with applications running in the default "C.UTF-8" locale.
+</para>
 
 <para>
 Right now the language and territory, as well as the modifier, are not
@@ -273,11 +290,6 @@ How does that work?</para>
 <sect2 id="setup-locale-how"><title>How to set the locale</title>
 
 <itemizedlist mark="bullet">
-
-<listitem><para>
-The default locale is the "C" or "POSIX" locale.  Under Cygwin this locale
-defaults to the UTF-8 character set.</para>
-</listitem>
 
 <listitem><para>
 Assume that you've set one of the aforementioned environment variables to some
