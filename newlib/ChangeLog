@@ -1,3 +1,13 @@
+2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (lc_ctype_charset): Disable defaulting to
+	"UTF-8" on Cygwin.
+	(lc_message_charset): Ditto.
+	(loadlocale): Disable setting charset of the "C" locale to "UTF-8" on
+	Cygwin.
+	* libc/stdlib/mbtowc_r.c (__mbtowc): Add Cygwin-specific comment.
+	* libc/stdlib/wctomb_r.c (__wctomb): Ditto.
+
 2010-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/_default_fcntl.h (O_CLOEXEC): Define as _FNOINHERIT.
