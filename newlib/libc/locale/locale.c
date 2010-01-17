@@ -52,7 +52,7 @@ the form
   language[_TERRITORY][.charset][@@modifier]
 
 <<"language">> is a two character string per ISO 639, or, if not available
-for a given language, a three character string per ISO 639-2.
+for a given language, a three character string per ISO 639-3.
 <<"TERRITORY">> is a country code per ISO 3166.  For <<"charset">> and
 <<"modifier">> see below.
 
@@ -475,7 +475,7 @@ loadlocale(struct _reent *p, int category)
 	  || c[1] < 'a' || c[1] > 'z')
 	return NULL;
       c += 2;
-      /* Allow three character Language per ISO 639-2 */
+      /* Allow three character Language per ISO 639-3 */
       if (c[0] >= 'a' && c[0] <= 'z')
       	++c;
       if (c[0] == '_')

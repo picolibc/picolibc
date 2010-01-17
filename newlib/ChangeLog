@@ -1,5 +1,10 @@
 2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c (loadlocale): Change comments to refer to
+	ISO 639-3 rather than 639-2.
+
+2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/locale.c (loadlocale): Allow three character
 	language codes to accommodate ISO 639-2 codes.
 
