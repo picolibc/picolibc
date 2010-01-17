@@ -4348,8 +4348,16 @@ internal_setlocale ()
   cwdstuff::cwd_lock.acquire ();
   sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
   /* Set charset for internal conversion functions. */
-  cygheap->locale.mbtowc = __mbtowc;
-  cygheap->locale.wctomb = __wctomb;
+  if (*__locale_charset () == 'A'/*SCII*/)
+    {
+      cygheap->locale.mbtowc = __utf8_mbtowc;
+      cygheap->locale.wctomb = __utf8_wctomb;
+    }
+  else
+    {
+      cygheap->locale.mbtowc = __mbtowc;
+      cygheap->locale.wctomb = __wctomb;
+    }
   strcpy (cygheap->locale.charset, __locale_charset ());
   /* Restore CWD and PATH in new charset. */
   cygheap->cwd.reset_posix (w_cwd);

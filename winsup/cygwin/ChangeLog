@@ -1,3 +1,8 @@
+2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (internal_setlocale): Use UTF-8 internally if external
+	charset is ASCII.
+
 2010-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/fnmatch.c: Replace with multibyte capable version from FreeBSD.
