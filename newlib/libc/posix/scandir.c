@@ -142,12 +142,13 @@ fail:
 
 /*
  * Alphabetic order comparison routine for those who want it.
+ * POSIX 2008 requires that alphasort() uses strcoll().
  */
 int
-alphasort (const struct dirent **d1,
-       const struct dirent **d2)
+alphasort(const struct dirent **d1, const struct dirent **d2)
 {
-       return(strcmp((*d1)->d_name, (*d2)->d_name));
+
+	return (strcoll((*d1)->d_name, (*d2)->d_name));
 }
 
 #endif /* ! HAVE_OPENDIR */
