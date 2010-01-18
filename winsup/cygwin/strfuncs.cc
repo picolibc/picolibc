@@ -1,7 +1,7 @@
 /* strfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,13 +14,10 @@ details. */
 #include <wchar.h>
 #include <winnls.h>
 #include <ntdll.h>
-#include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "tls_pbuf.h"
 
 /* Transform characters invalid for Windows filenames to the Unicode private
    use area in the U+f0XX range.  The affected characters are all control
