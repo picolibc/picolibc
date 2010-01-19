@@ -459,7 +459,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
-  char *lptr;                   /* literal pointer */
+  unsigned char *lptr;          /* literal pointer */
 
   char *cp;
   short *sp;
@@ -501,16 +501,25 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 
   nassigned = 0;
   nread = 0;
+#ifdef _MB_CAPABLE
+  memset (&state, 0, sizeof (state));
+#endif
+
   for (;;)
     {
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      memset (&state, '\0', sizeof (state));
       nbytes = __mbtowc (rptr, &wc, fmt, MB_CUR_MAX, __locale_charset (),
 			 &state);
+      if (nbytes < 0) {
+	wc = 0xFFFD; /* Unicode replacement character */
+	nbytes = 1;
+	memset (&state, 0, sizeof (state));
+      }
 #endif
       fmt += nbytes;
+
       if (wc == 0)
 	goto all_done;
       if (nbytes == 1 && isspace (wc))
@@ -839,6 +848,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
             {
+              mbstate_t state;
+              memset (&state, 0, sizeof (mbstate_t));
               if ((flags & SUPPRESS) == 0)
                 wcp = GET_ARG (N, ap, wchar_t *);
               else
@@ -851,7 +862,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
                   if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
@@ -971,6 +981,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
           if (flags & LONG)
             {
               /* Process %S and %ls placeholders */
+              mbstate_t state;
+              memset (&state, 0, sizeof (mbstate_t));
               if ((flags & SUPPRESS) == 0)
                 wcp = GET_ARG (N, ap, wchar_t *);
               else
@@ -983,7 +995,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
                   if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;

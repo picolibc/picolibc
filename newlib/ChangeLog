@@ -1,3 +1,8 @@
+2010-01-19  Andy Koppe  <andy.koppe@gmail.com>
+
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Fix handling of non-ASCII
+	characters and allow invalid bytes in format string.
+
 2010-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wcstombs_r.c (_wcstombs_r): Handle invalid characters
