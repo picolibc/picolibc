@@ -1,3 +1,7 @@
+2010-01-19  Daisuke Hatayama  <d.hatayama@jp.fujitsu.com>
+
+        * common.h (PN_XNUM): Define.
+
 2009-12-18  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (NT_S390_HIGH_GPRS): Define.
