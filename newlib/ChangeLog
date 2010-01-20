@@ -1,3 +1,8 @@
+2010-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/nl_langinfo.c (nl_langinfo): On Cygwin, translate
+	often-used charsets into Linux compatible codesets.
+
 2010-01-19  Andy Koppe  <andy.koppe@gmail.com>
 
 	* libc/stdio/vfscanf.c (__SVFSCANF_R): Fix handling of non-ASCII

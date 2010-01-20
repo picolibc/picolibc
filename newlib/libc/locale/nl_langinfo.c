@@ -60,12 +60,25 @@ _DEFUN(nl_langinfo, (item),
 	case CODESET:
 #ifdef __CYGWIN__
 		ret = __locale_charset ();
-		/* Temporary exception for KOI8 charsets which are
-		   incorrectly treated by calling applications otherwise. */
-		if (strcmp (ret, "CP20866") == 0)
-		  ret = "KOI8-R";
-		else if (strcmp (ret, "CP21866") == 0)
-		  ret = "KOI8-U";
+		/* Convert charset to Linux compatible codeset string. */
+		if (ret[0] == 'A'/*SCII*/)
+		  ret = "ANSI_X3.4-1968";
+		else if (ret[0] == 'E')
+		  {
+		    if (strcmp (ret, "EUCJP") == 0)
+		      ret = "EUC-JP";
+		    else if (strcmp (ret, "EUCKR") == 0)
+		      ret = "EUC-KR";
+		  }
+		else if (ret[0] == 'C'/*Pxxxx*/)
+		  {
+		    if (strcmp (ret + 2, "874") == 0)
+		      ret = "TIS-620";
+		    else if (strcmp (ret + 2, "20866") == 0)
+		      ret = "KOI8-R";
+		    else if (strcmp (ret + 2, "21866") == 0)
+		      ret = "KOI8-U";
+		  }
 #else
 		ret = "";
 		if ((s = setlocale(LC_CTYPE, NULL)) != NULL) {
