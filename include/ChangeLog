@@ -1,3 +1,7 @@
+2010-01-21  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+	
+	* s390.h (EF_S390_HIGH_GPRS): Added macro definition.
+
 2010-01-13  Joel Brobecker  <brobecker@adacore.com>
 
 	Add new DW_AT_use_GNAT_descriptive_type CU attribute.

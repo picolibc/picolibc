@@ -33,6 +33,10 @@
 
 #include "elf/reloc-macros.h"
 
+/* Processor specific flags for the ELF header e_flags field.  */
+
+#define EF_S390_HIGH_GPRS        0x00000001
+
 /* Relocation types.  */
 
 START_RELOC_NUMBERS (elf_s390_reloc_type)
