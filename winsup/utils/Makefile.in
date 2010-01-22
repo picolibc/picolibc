@@ -1,6 +1,6 @@
 # Makefile for Cygwin utilities
 # Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+# 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -52,7 +52,7 @@ MINGW_CXX        := ${srcdir}/mingw ${CXX} -I${updir}
 
 # List all binaries to be linked in Cygwin mode.  Each binary on this list
 # must have a corresponding .o of the same name.
-CYGWIN_BINS := ${addsuffix .exe,cygpath getfacl ldd kill mkgroup \
+CYGWIN_BINS := ${addsuffix .exe,cygpath getfacl getlocale ldd kill mkgroup \
         mkpasswd mount passwd ps regtool setfacl setmetamode ssp umount}
 
 # List all binaries to be linked in MinGW mode.  Each binary on this list

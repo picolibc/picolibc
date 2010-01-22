@@ -1,3 +1,9 @@
+2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_BINS): Add getlocale.
+	* getlocale.c: New file.
+	* utils.sgml (getlocale): New section describing new getlocale tool.
+
 2010-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (get_mixed_name): Drop function.  Replace with call to

@@ -501,6 +501,54 @@ The format for ACL output is as follows:
 </para>
 </sect2>
 
+<sect2 id="getlocale"><title>getlocale</title>
+
+<screen>
+Usage: getlocale [-asuh]
+Print Windows locale(s)
+
+Options:
+
+  -a, --all       List all available locales
+  -s, --system    Print system default locale
+                  (default is current user default locale)
+  -u, --utf       Attach ".UTF-8" to the result
+  -h, --help      this text
+</screen>
+
+<para><command>getlocale</command> without parameters just prints the
+current user's Windows default locale to stdout.  The <literal>-s</literal>
+option prints the systems default locale instead.  With the
+<literal>-u</literal> option <command>getlocale</command> appends a ".UTF-8".
+This can be used in scripts to set the Cygwin locale, for instance:
+</para>
+
+<screen>
+bash$ export LANG=$(getlocale -u)
+bash$ echo $LANG
+en_US.UTF-8
+</screen>
+
+<para>The <literal>-a</literal> option is helpful to learn which locales
+are supported by your Windows machine.  It prints the locales and their
+actual meaning, like this:</para>
+
+<screen>
+bash$ getlocale -a
+ar_SA            Arabic (Saudi Arabia)
+ar_IQ            Arabic (Iraq)
+zh_TW            Chinese (Traditional) (Taiwan)
+zh_CN            Chinese (Simplified) (People's Republic of China)
+zh_HK            Chinese (Traditional) (Hong Kong S.A.R.)
+da_DK            Danish (Denmark)
+en_US            English (United States)
+en_GB            English (United Kingdom)
+en_AU            English (Australia)
+...
+</screen>
+
+</sect2>
+
 <sect2 id="kill"><title>kill</title>
 
 <screen>
