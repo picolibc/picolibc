@@ -1,3 +1,14 @@
+2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.2): Add chapter for news in 1.7.2.
+	* setup2.sgml (setup-locale-ov): Describe how valid locales are
+	determined by Windows locale support.  Change description for modifiers
+	in locale environment variables.
+	(setup-locale-how): Describe new charset behaviour.  Mention new
+	getlocale tool to fetch valid locale information from Windows.
+	(setup-locale-missing): Drop now implemented LC_foo options.
+	Explain missing LC_MESSAGES in more detail.
+
 2010-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-locale): Mention three character codes per

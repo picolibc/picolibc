@@ -1,5 +1,43 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.2"><title>What's new and what changed from 1.7.1 to 1.7.2</title>
+
+<screen>
+- Localization support has been much improved.
+
+  - Cygwin now handles locales using the underlying Windows locale support.
+    The locale must exists in Windows to be recognized.
+
+  - New tool "getlocale" to fetch valid locale values from Windows.
+
+  - Default charset for locales without explicit charset is now choosen
+    from a list of Linx-compatible charsets.  For instance en_US -> ISO-8859-1,
+    ja_JP -> EUC-JP.
+
+  - Support for the @euro locale modifier to switch to the ISO-8859-15
+    charset.
+
+  - Default charset in the "C" or "POSIX" locale has been changed back from
+    UTF-8 to ASCII, to circumvent problems with applications expecting a
+    singlebyte charset in the "C"/"POSIX" locale.  Still use UTF-8 internally
+    for filename conversion in this case.
+
+  - LC_COLLATE, LC_MONETARY, LC_NUMERIC, and LC_TIME localization is enabled
+    via Windows locale support.
+    
+  - New strfmon(3) call.
+
+- Support open(2) flags O_CLOEXEC and O_TTY_INIT flags.  Support
+  fcntl flag F_DUPFD_CLOEXEC.  Support socket flags SOCK_CLOEXEC and
+  SOCK_NONBLOCK).
+
+- Add new Linux-compatible API calls accept4(2), dup3(2), and pipe2(2).
+
+- fnmatch(3) call is now multibyte-aware.
+</screen>
+
+</sect2>
+
 <sect2 id="ov-new1.7-os"><title>OS related changes</title>
 
 <screen>

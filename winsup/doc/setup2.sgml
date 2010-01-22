@@ -255,35 +255,41 @@ charset.  The Cygwin DLL itself, however, will nevertheless use the locale
 set in the environment (or the "C.UTF-8" default locale) for converting
 filenames etc.</para>
 
-<para>When the locale set in the environment specifies an ASCII charset,
+<para>When the locale in the environment specifies an ASCII charset,
 for example "C" or "en_US.ASCII", Cygwin will still use UTF-8
 under the hood to translate filenames.  This allows for easier
 interoperability with applications running in the default "C.UTF-8" locale.
 </para>
 
 <para>
-Right now the language and territory, as well as the modifier, are not
-important to Cygwin, except to fix a single problem.  There's a class of
-characters in the Unicode character set, called the "CJK Ambiguous Width
-Character set".  For these characters the width returned by the
-wcwidth/wcswidth function is usually 1.  This is often a problem in
-East-Asian languages, which historically use character sets in which
-these characters have a width of 2.  Kind of explains why they are
-called "ambiguous"...</para>
+Starting with Cygwin 1.7.2, the language and territory are used to
+fetch locale-dependent information from Windows.  If the language and
+territory are not known to Windows, the <function>setlocale</function>
+function fails.</para>
 
-<para>
-The problem has been fixed like this.  wcwidth/wcswidth usually
-return 1 as the width of these characters.  However, if the language is
-specifed as "ja" (Japanese), "ko" (Korean), or "zh" (Chinese), wcwidth
-returns 2 for these characters.  Unfortunately this isn't correct in
-all circumstances, so the user can specify the modifier "@cjknarrow",
-which modifies the behaviour of wcwidth/wcswidth to return 1 for the
-ambiguous width characters to return 1 even in those languages.</para>
+<para>The modifier is used for two cases.</para>
 
-<para>
-Other than that, the only important part so far is the character set.
+<itemizedlist mark="bullet">
 
-How does that work?</para>
+<listitem><para>For languages which default to one of the ISO-8859 character
+sets, the modifier "@euro" can be added to enforce usage of the ISO-8859-15
+character set, which includes a character for the "Euro" currency sign .</para>
+</listitem>
+
+<listitem><para>There's a class of characters in the Unicode character set,
+called the "CJK Ambiguous Width Character set".  For these characters the width
+returned by the wcwidth/wcswidth function is usually 1.  This is often a
+problem in East-Asian languages, which historically use character sets in
+which these characters have a width of 2.  By default, the wcwidth/wcswidth
+functions return 1 as the width of these characters, except if the language is
+specifed as "ja" (Japanese), "ko" (Korean), or "zh" (Chinese).  In these
+languages wcwidth and wcswidth return 2 for these characters.  This is not
+correct in all circumstances, so the user of one of these languages can specify
+the modifier "@cjknarrow", which modifies the behaviour of wcwidth/wcswidth to
+return 1 for the ambiguous width characters.</para>
+</listitem>
+
+</itemizedlist>
 
 </sect2>
 
@@ -296,32 +302,47 @@ Assume that you've set one of the aforementioned environment variables to some
 valid POSIX locale value, other than "C" and "POSIX".  Assume further that
 you're living in Japan.  You might want to use the language code "ja" and the
 territory "JP", thus setting, say, <envar>LANG</envar> to "ja_JP".  You didn't
-set a character set, so what will Cygwin use now?  Easy!  It will use the
-default Windows ANSI codepage of your system, if it's supported by Cygwin.
-Hopefully Cygwin supports all relevant default ANSI codepages...</para>
+set a character set, so what will Cygwin use now?  Starting with Cygwin 1.7.2,
+the default character set is determined by the default Windows ANSI codepage
+for this language and territory.  Cygwin uses a character set which is the
+typical Unix-equivalent to the Windows ANSI codepage.  For instance:</para>
 
-<note><para>For a list of supported character sets, see
-<xref linkend="setup-locale-charsetlist"></xref>
-</para></note>
+<screen>
+  "en_US"		ISO-8859-1
+  "el_GR"		ISO-8859-7
+  "pl_PL"		ISO-8859-2
+  "pl_PL@euro"		ISO-8859-15
+  "ja_JP"		EUCJP
+  "ko_KR"		EUCKR
+  "te_IN"		UTF-8
+</screen>
 </listitem>
 
 <listitem><para>
-You don't want to use the default Windows codepage as character set?
-In that case you have to specify the charset explicitly.  For instance,
-assume you're from Italy and don't want to use the Italian default Windows
-ANSI codepage 1252, but the more portable ISO-8859-15 character set.
-What you can do, for instance, is to set the <envar>LANG</envar> variable
-in the <filename>C:\cygwin\Cygwin.bat</filename> file which is the batch file
-to start a Cygwin session from the "Cygwin" desktop shortcut.</para>
+You don't want to use the default character set?  In that case you have to
+specify the charset explicitly.  For instance, assume you're from Japan and
+don't want to use the japanese default charset EUC-JP, but the Windows
+default charset SJIS.  What you can do, for instance, is to set the
+<envar>LANG</envar> variable in the <filename>C:\cygwin\Cygwin.bat</filename>
+file which is the batch file to start a Cygwin session from the "Cygwin"
+desktop shortcut.</para>
 
 <screen>
   @echo off
 
   C:
   chdir C:\cygwin\bin
-  set LANG=it_IT.ISO-8859-15
+  set LANG=ja_JP.SJIS
   bash --login -i
 </screen>
+
+<note><para>For a list of locales supported by your Windows machine, use the new
+><command>getlocale -a</command> command, which is part of the Cygwin package.
+For a description see <xref linkend="getlocale"></xref></para></note>
+
+<note><para>For a list of supported character sets, see
+<xref linkend="setup-locale-charsetlist"></xref>
+</para></note>
 </listitem>
 
 <listitem><para>
@@ -435,19 +456,18 @@ entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,
 <sect2 id="setup-locale-missing"><title>What does not work?</title>
 
 <para>
-Except for <envar>LC_ALL</envar>, <envar>LC_CTYPE</envar>,
-and <envar>LANG</envar>, all other LC_xxx environment variables,
-<envar>LC_COLLATE</envar>, <envar>LC_MESSAGES</envar>,
-<envar>LC_MONETARY</envar>, <envar>LC_NUMERIC</envar>,
-and <envar>LC_TIME</envar>, are ignored right now.  This means, while Cygwin
-supports different character sets, it does <emphasis>not</emphasis> support
-real localization so far.  There's no support for locale-specific monetary
-symbols, for a decimalpoint other than '.', no support for native time
-formats, and no support for native language sorting orders.
-</para>
+The environment variable and locale setting <envar>LC_MESSAGES</envar>
+is ignored right now.  There's no known WIndows function to fetch the
+regular expressions to recognize user input with the meaning of "yes"
+or "no" from some Windows function.  Therefore,
+<function>nl_langinfo(YESEXPR)</function> and
+<function>nl_langinfo(NOEXPR)</function> always return a string
+suitable only for the English language.</para>
 
-<para>Cygwin's internationalization support is work in progress and we would
-be glad for coding help in this area.</para>
+<para>If somebody knows a simple solution to this problem, feel free
+to notify us on the 
+<ulink url="mailto:cygwin@cygin.com">Cygwin mailing list</ulink>.
+</para>
 
 </sect2>
  
