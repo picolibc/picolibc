@@ -70,9 +70,28 @@ cnv(const char *str) {
 }
 
 int
-__monetary_load_locale(const char *name) {
-
+__monetary_load_locale(const char *name , void *f_wctomb, const char *charset)
+{
 	int ret;
+
+#ifdef __CYGWIN__
+	extern int __set_lc_monetary_from_win (const char *,
+					       struct lc_monetary_T *,
+					       void *, const char *);
+	int old_monetary_using_locale = _monetary_using_locale;
+	_monetary_using_locale = 0;
+	ret = __set_lc_monetary_from_win (name, &_monetary_locale,
+					  f_wctomb, charset);
+	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+	if (ret < 0)
+	  _monetary_using_locale = old_monetary_using_locale;
+	else
+	  {
+	    _monetary_using_locale = ret;
+	    __mlocale_changed = 1;
+	    ret = 0;
+	  }
+#else
 	__mlocale_changed = 1;
 	ret = __part_load_locale(name, &_monetary_using_locale,
 		_monetary_locale_buf, "LC_MONETARY",
@@ -94,6 +113,7 @@ __monetary_load_locale(const char *name) {
 		M_ASSIGN_CHAR(p_sign_posn);
 		M_ASSIGN_CHAR(n_sign_posn);
 	}
+#endif
 	return ret;
 }
 

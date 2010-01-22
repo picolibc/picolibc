@@ -48,10 +48,28 @@ static int	_numeric_using_locale;
 static char	*_numeric_locale_buf;
 
 int
-__numeric_load_locale(const char *name) {
-
+__numeric_load_locale(const char *name , void *f_wctomb, const char *charset)
+{
 	int ret;
 
+#ifdef __CYGWIN__
+	extern int __set_lc_numeric_from_win (const char *,
+					      struct lc_numeric_T *,
+					      void *, const char *);
+	int old_numeric_using_locale = _numeric_using_locale;
+	_numeric_using_locale = 0;
+	ret = __set_lc_numeric_from_win (name, &_numeric_locale,
+					 f_wctomb, charset);
+	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+	if (ret < 0)
+	  _numeric_using_locale = old_numeric_using_locale;
+	else
+	  {
+	    _numeric_using_locale = ret;
+	    __nlocale_changed = 1;
+	    ret = 0;
+	  }
+#else
 	__nlocale_changed = 1;
 	ret = __part_load_locale(name, &_numeric_using_locale,
 		_numeric_locale_buf, "LC_NUMERIC",
@@ -60,6 +78,7 @@ __numeric_load_locale(const char *name) {
 	if (ret == 0 && _numeric_using_locale)
 		_numeric_locale.grouping =
 			__fix_locale_grouping_str(_numeric_locale.grouping);
+#endif
 	return ret;
 }
 

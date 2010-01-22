@@ -75,7 +75,9 @@ Even when using POSIX locale strings, the only charsets allowed are
 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  <<"UTF-8">> can also be written without dash, as in
-<<"UTF8">> or <<"utf8">>.
+<<"UTF8">> or <<"utf8">>.  <<"EUCJP">> and <<"EUCKR"> can also contain a
+dash, <<"EUC-JP">> and <<"EUC-KR">>.
+
 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
@@ -172,6 +174,8 @@ No supporting OS subroutines are required.
 #include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "lmonetary.h"
+#include "lnumeric.h"
 #include "../stdlib/local.h"
 
 #define _LC_LAST      7
@@ -183,7 +187,11 @@ int __nlocale_changed = 0;
 int __mlocale_changed = 0;
 char *_PathLocale = NULL;
 
-static _CONST struct lconv lconv = 
+static
+#ifndef __CYGWIN__
+_CONST
+#endif
+struct lconv lconv = 
 {
   ".", "", "", "", "", "", "", "", "", "",
   CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -420,7 +428,8 @@ currentlocale()
 
 #ifdef _MB_CAPABLE
 #ifdef __CYGWIN__
-extern void *__set_charset_from_codepage (unsigned int, char *charset);
+extern void __set_charset_from_locale (const char *locale, char *charset);
+extern int __collate_load_locale (const char *, void *, const char *);
 #endif /* __CYGWIN__ */
 
 extern void __set_ctype (const char *charset);
@@ -446,6 +455,9 @@ loadlocale(struct _reent *p, int category)
 		   const char *, mbstate_t *);
 #ifdef _MB_CAPABLE
   int cjknarrow = 0;
+#endif
+#ifdef __CYGWIN__
+  int ret = 0;
 #endif
   
   /* "POSIX" is translated to "C", as on Linux. */
@@ -502,7 +514,7 @@ loadlocale(struct _reent *p, int category)
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
 #ifdef __CYGWIN__
-	__set_charset_from_codepage (0, charset);
+	__set_charset_from_locale (locale, charset);
 #else
 	strcpy (charset, "ISO-8859-1");
 #endif
@@ -548,7 +560,7 @@ loadlocale(struct _reent *p, int category)
     break;
     case 'E':
     case 'e':
-      if (!strcasecmp (charset, "EUCJP"))
+      if (!strcasecmp (charset, "EUCJP") || !strcasecmp (charset, "EUC-JP"))
 	{
 	  strcpy (charset, "EUCJP");
 	  mbc_max = 3;
@@ -558,7 +570,8 @@ loadlocale(struct _reent *p, int category)
 #endif
 	}
 #ifdef __CYGWIN__
-      else if (!strcasecmp (charset, "EUCKR"))
+      else if (!strcasecmp (charset, "EUCKR")
+	       || !strcasecmp (charset, "EUC-KR"))
 	{
 	  strcpy (charset, "EUCKR");
 	  mbc_max = 2;
@@ -729,6 +742,18 @@ loadlocale(struct _reent *p, int category)
     }
   else if (category == LC_MESSAGES)
     strcpy (lc_message_charset, charset);
+#ifdef __CYGWIN__
+  else if (category == LC_COLLATE)
+    ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+  else if (category == LC_MONETARY)
+    ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
+  else if (category == LC_NUMERIC)
+    ret = __numeric_load_locale (locale, (void *) l_wctomb, charset);
+  else if (category == LC_TIME)
+    ret = __time_load_locale (locale, (void *) l_wctomb, charset);
+  if (ret)
+    return NULL;
+#endif
   return strcpy(current_categories[category], new_categories[category]);
 }
 
@@ -778,6 +803,42 @@ struct lconv *
 _DEFUN(_localeconv_r, (data), 
       struct _reent *data)
 {
+#ifdef __CYGWIN__
+  if (__nlocale_changed)
+    {
+      struct lc_numeric_T *n = __get_current_numeric_locale ();
+      lconv.decimal_point = n->decimal_point;
+      lconv.thousands_sep = n->thousands_sep;
+      lconv.grouping = n->grouping;
+      __nlocale_changed = 0;
+    }
+  if (__mlocale_changed)
+    {
+      struct lc_monetary_T *m = __get_current_monetary_locale ();
+      lconv.int_curr_symbol = m->int_curr_symbol;
+      lconv.currency_symbol = m->currency_symbol;
+      lconv.mon_decimal_point = m->mon_decimal_point;
+      lconv.mon_thousands_sep = m->mon_thousands_sep;
+      lconv.mon_grouping = m->mon_grouping;
+      lconv.positive_sign = m->positive_sign;
+      lconv.negative_sign = m->negative_sign;
+      lconv.int_frac_digits = m->int_frac_digits[0];
+      lconv.frac_digits = m->frac_digits[0];
+      lconv.p_cs_precedes = m->p_cs_precedes[0];
+      lconv.p_sep_by_space = m->p_sep_by_space[0];
+      lconv.n_cs_precedes = m->n_cs_precedes[0];
+      lconv.n_sep_by_space = m->n_sep_by_space[0];
+      lconv.p_sign_posn = m->p_sign_posn[0];
+      lconv.n_sign_posn = m->n_sign_posn[0];
+      lconv.int_n_cs_precedes = m->n_cs_precedes[0];
+      lconv.int_n_sep_by_space = m->n_sep_by_space[0];
+      lconv.int_n_sign_posn = m->n_sign_posn[0];
+      lconv.int_p_cs_precedes = m->p_cs_precedes[0];
+      lconv.int_p_sep_by_space = m->p_sep_by_space[0];
+      lconv.int_p_sign_posn = m->p_sign_posn[0];
+      __mlocale_changed = 0;
+    }
+#endif
   return (struct lconv *) &lconv;
 }
 

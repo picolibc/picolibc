@@ -133,10 +133,10 @@ _DEFUN(nl_langinfo, (item),
 		ret = (char *) __get_current_time_locale()->ampm_fmt;
 		break;
 	case AM_STR:
-		ret = (char *) __get_current_time_locale()->am;
+		ret = (char *) __get_current_time_locale()->am_pm[0];
 		break;
 	case PM_STR:
-		ret = (char *) __get_current_time_locale()->pm;
+		ret = (char *) __get_current_time_locale()->am_pm[1];
 		break;
 	case DAY_1: case DAY_2: case DAY_3:
 	case DAY_4: case DAY_5: case DAY_6: case DAY_7:

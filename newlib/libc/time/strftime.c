@@ -52,26 +52,26 @@ following ways:
 
 o+
 o %a
-A three-letter abbreviation for the day of the week. [tm_wday]
+The abbreviated weekday name according to the current locale. [tm_wday]
 
 o %A
-The full name for the day of the week, one of `<<Sunday>>',
-`<<Monday>>', `<<Tuesday>>', `<<Wednesday>>', `<<Thursday>>',
-`<<Friday>>', or `<<Saturday>>'. [tm_wday]
+The full weekday name according to the current locale.
+In the default "C" locale, one of `<<Sunday>>', `<<Monday>>', `<<Tuesday>>',
+`<<Wednesday>>', `<Thursday>>', `<<Friday>>', `<<Saturday>>'. [tm_wday]
 
 o %b
-A three-letter abbreviation for the month name. [tm_mon]
+The abbreviated month name according to the current locale. [tm_mon]
 
 o %B
-The full name of the month, one of `<<January>>', `<<February>>',
+The full month name according to the current locale.
+In the default "C" locale, one of `<<January>>', `<<February>>',
 `<<March>>', `<<April>>', `<<May>>', `<<June>>', `<<July>>',
 `<<August>>', `<<September>>', `<<October>>', `<<November>>',
 `<<December>>'. [tm_mon]
 
 o %c
-A string representing the complete date and time, in the form
-`<<"%a %b %e %H:%M:%S %Y">>' (example "Mon Apr 01 13:13:13
-1992"). [tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday]
+The preferred date and time representation for the current locale.
+[tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday]
 
 o %C
 The century, that is, the year divided by 100 then truncated.  For
@@ -93,8 +93,7 @@ The day of the month, formatted with leading space if single digit
 
 o %E<<x>>
 In some locales, the E modifier selects alternative representations of
-certain modifiers <<x>>.  But in the "C" locale supported by newlib,
-it is ignored, and treated as %<<x>>.
+certain modifiers <<x>>.  In newlib, it is ignored, and treated as %<<x>>.
 
 o %F
 A string representing the ISO 8601:2000 date format, in the form
@@ -115,8 +114,7 @@ Example: "%G" for Saturday 2nd January 1999 gives "1998", and for
 Tuesday 30th December 1997 gives "1998". [tm_year, tm_wday, tm_yday]
 
 o %h
-A three-letter abbreviation for the month name (synonym for
-"%b"). [tm_mon]
+Synonym for "%b". [tm_mon]
 
 o %H
 The hour (on a 24-hour clock), formatted with two digits (from
@@ -150,15 +148,19 @@ A newline character (`<<\n>>').
 
 o %O<<x>>
 In some locales, the O modifier selects alternative digit characters
-for certain modifiers <<x>>.  But in the "C" locale supported by newlib, it
-is ignored, and treated as %<<x>>.
+for certain modifiers <<x>>.  In newlib, it is ignored, and treated as %<<x>>.
 
 o %p
-Either `<<AM>>' or `<<PM>>' as appropriate. [tm_hour]
+Either `<<AM>>' or `<<PM>>' as appropriate, or the corresponding strings for
+the current locale. [tm_hour]
+
+o %P
+Same as '<<%p>>', but in lowercase.  This is a GNU extension. [tm_hour]
 
 o %r
-The 12-hour time, to the second.  Equivalent to "%I:%M:%S %p". [tm_sec,
-tm_min, tm_hour]
+Replaced by the time in a.m. and p.m. notation.  In the "C" locale this
+is equivalent to "%I:%M:%S %p".  In locales which don't define a.m./p.m.
+notations, the result is an empty string. [tm_sec, tm_min, tm_hour]
 
 o %R
 The 24-hour time, to the minute.  Equivalent to "%H:%M". [tm_min, tm_hour]
@@ -198,12 +200,13 @@ Monday in a year, and earlier days are in week 0.  Formatted with two
 digits (from `<<00>>' to `<<53>>'). [tm_wday, tm_yday]
 
 o %x
-A string representing the complete date, equivalent to "%m/%d/%y".
+Replaced by the preferred date representation in the current locale.
+In the "C" locale this is equivalent to "%m/%d/%y".
 [tm_mon, tm_mday, tm_year]
 
 o %X
-A string representing the full time of day (hours, minutes, and
-seconds), equivalent to "%H:%M:%S". [tm_sec, tm_min, tm_hour]
+Replaced by the preferred time representation in the current locale.
+In the "C" locale this is equivalent to "%H:%M:%S". [tm_sec, tm_min, tm_hour]
 
 o %y
 The last two digits of the year (from `<<00>>' to `<<99>>'). [tm_year]
@@ -263,7 +266,10 @@ the "C" locale settings.
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <ctype.h>
+#include <wctype.h>
 #include "local.h"
+#include "../locale/timelocal.h"
  
 /* Defines to make the file dual use for either strftime() or wcsftime().
  * To get wcsftime, define MAKE_WCSFTIME.
@@ -276,13 +282,28 @@ the "C" locale settings.
 #  define CHAR		char		/* string type basis */
 #  define CQ(a)		a		/* character constant qualifier */
 #  define SFLG				/* %s flag (null for normal char) */
+#  define _ctloc(x) (ctloclen = strlen (ctloc = _CurrentTimeLocale->x), ctloc)
+#  define TOLOWER(c)	tolower((int)(unsigned char)(c))
 # else
 #  define strftime	wcsftime	/* Alternate function name */
 #  define CHAR		wchar_t		/* string type basis */
 #  define CQ(a)		L##a		/* character constant qualifier */
 #  define snprintf	swprintf	/* wide-char equivalent function name */
 #  define strncmp	wcsncmp		/* wide-char equivalent function name */
+#  define TOLOWER(c)	towlower((wint_t)(c))
 #  define SFLG		"l"		/* %s flag (l for wide char) */
+#  define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
+   const wchar_t *
+   __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
+   {
+     buf[CTLOCBUFLEN - 1] = L'\0';
+     *len_ret = mbstowcs (buf, elem, CTLOCBUFLEN - 1);
+     if (*len_ret == (size_t) -1 )
+       *len_ret = 0;
+     return buf;
+   }
+#  define _ctloc(x) (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x, \
+		     &ctloclen))
 #endif  /* MAKE_WCSFTIME */
 
 /* Enforce the coding assumptions that YEAR_BASE is positive.  (%C, %Y, etc.) */
@@ -292,18 +313,6 @@ the "C" locale settings.
 
 static _CONST int dname_len[7] =
 {6, 6, 7, 9, 8, 6, 8};
-
-static _CONST CHAR *_CONST dname[7] =
-{CQ("Sunday"), CQ("Monday"), CQ("Tuesday"), CQ("Wednesday"),
- CQ("Thursday"), CQ("Friday"), CQ("Saturday")};
-
-static _CONST int mname_len[12] =
-{7, 8, 5, 5, 3, 4, 4, 6, 9, 7, 8, 8};
-
-static _CONST CHAR *_CONST mname[12] =
-{CQ("January"), CQ("February"), CQ("March"), CQ("April"),
- CQ("May"), CQ("June"), CQ("July"), CQ("August"),
- CQ("September"), CQ("October"), CQ("November"), CQ("December")};
 
 /* Using the tm_year, tm_wday, and tm_yday components of TIM_P, return
    -1, 0, or 1 as the adjustment to add to the year for the ISO week
@@ -361,7 +370,13 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 {
   size_t count = 0;
   int i, len;
+  const CHAR *ctloc;
+#ifdef MAKE_WCSFTIME
+  CHAR ctlocbuf[CTLOCBUFLEN];
+#endif
+  size_t ctloclen;
 
+  struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
   for (;;)
     {
       while (*format && *format != CQ('%'))
@@ -382,56 +397,68 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
       switch (*format)
 	{
 	case CQ('a'):
-	  for (i = 0; i < 3; i++)
+	  _ctloc (wday[tim_p->tm_wday]);
+	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
-		s[count++] =
-		  dname[tim_p->tm_wday][i];
+		s[count++] = ctloc[i];
 	      else
 		return 0;
 	    }
 	  break;
 	case CQ('A'):
-	  for (i = 0; i < dname_len[tim_p->tm_wday]; i++)
+	  _ctloc (weekday[tim_p->tm_wday]);
+	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
-		s[count++] =
-		  dname[tim_p->tm_wday][i];
+		s[count++] = ctloc[i];
 	      else
 		return 0;
 	    }
 	  break;
 	case CQ('b'):
 	case CQ('h'):
-	  for (i = 0; i < 3; i++)
+	  _ctloc (mon[tim_p->tm_mon]);
+	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
-		s[count++] =
-		  mname[tim_p->tm_mon][i];
+		s[count++] = ctloc[i];
 	      else
 		return 0;
 	    }
 	  break;
 	case CQ('B'):
-	  for (i = 0; i < mname_len[tim_p->tm_mon]; i++)
+	  _ctloc (month[tim_p->tm_mon]);
+	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
-		s[count++] =
-		  mname[tim_p->tm_mon][i];
+		s[count++] = ctloc[i];
 	      else
 		return 0;
 	    }
 	  break;
 	case CQ('c'):
-	  {
-	    /* Recurse to avoid need to replicate %Y formation. */
-	    size_t adjust = strftime (&s[count], maxsize - count,
-				      CQ("%a %b %e %H:%M:%S %Y"), tim_p);
-	    if (adjust > 0)
-	      count += adjust;
-	    else
-	      return 0;
-	  }
+	  _ctloc (c_fmt);
+	  goto recurse;
+	case CQ('r'):
+	  _ctloc (ampm_fmt);
+	  goto recurse;
+	case CQ('x'):
+	  _ctloc (x_fmt);
+	  goto recurse;
+	case CQ('X'):
+	  _ctloc (X_fmt);
+recurse:
+	  if (*ctloc)
+	    {
+	      /* Recurse to avoid need to replicate %Y formation. */
+	      size_t adjust = strftime (&s[count], maxsize - count, ctloc,
+					tim_p);
+	      if (adjust > 0)
+		count += adjust;
+	      else
+		return 0;
+	    }
 	  break;
 	case CQ('C'):
 	  {
@@ -472,7 +499,6 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	  if (len < 0  ||  (count+=len) >= maxsize)  return 0;
 	  break;
 	case CQ('D'):
-	case CQ('x'):
 	  /* %m/%d/%y */
 	  len = snprintf (&s[count], maxsize - count,
 			CQ("%.2d/%.2d/%.2d"),
@@ -582,33 +608,16 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case CQ('p'):
-	  if (count < maxsize - 1)
+	case CQ('P'):
+	  _ctloc (am_pm[tim_p->tm_hour < 12 ? 0 : 1]);
+	  for (i = 0; i < ctloclen; i++)
 	    {
-	      if (tim_p->tm_hour < 12)
-		s[count++] = CQ('A');
+	      if (count < maxsize - 1)
+		s[count++] = (*format == CQ('P') ? TOLOWER (ctloc[i])
+						 : ctloc[i]);
 	      else
-		s[count++] = CQ('P');
+		return 0;
 	    }
-	  if (count < maxsize - 1)
-	    {
-	      s[count++] = CQ('M');
-	    }
-	  else
-	    return 0;
-	  break;
-	case CQ('r'):
-	  {
-	    register int  h12;
-	    h12 = (tim_p->tm_hour == 0 || tim_p->tm_hour == 12)  ?
-						12  :  tim_p->tm_hour % 12;
-	    len = snprintf (&s[count], maxsize - count,
-			CQ("%.2d:%.2d:%.2d %cM"),
-			h12, 
-			tim_p->tm_min,
-			tim_p->tm_sec,
-			(tim_p->tm_hour < 12)  ?  CQ('A') :  CQ('P'));
-	    if (len < 0  ||  (count+=len) >= maxsize)  return 0;
-	  }
 	  break;
 	case CQ('R'):
           len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
@@ -627,7 +636,6 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case CQ('T'):
-	case CQ('X'):
           len = snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
 			tim_p->tm_hour, tim_p->tm_min, tim_p->tm_sec);
           if (len < 0  ||  (count+=len) >= maxsize)  return 0;

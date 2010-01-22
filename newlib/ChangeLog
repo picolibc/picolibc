@@ -1,3 +1,47 @@
+2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/lmonetary.c (__monetary_load_locale): Take additional
+	parameters for wide char to multibyte conversion.  Call
+	__set_lc_monetary_from_win on Cygwin.
+	* libc/locale/lmonetary.h: Make C++-safe.
+	(__monetary_load_locale): Change declaration.
+	* libc/locale/lnumeric.c (__numeric_load_locale): Take additional
+	parameters for wide char to multibyte conversion.  Call
+	__set_lc_numeric_from_win on Cygwin.
+	* libc/locale/lnumeric.h: Make C++-safe.
+	(__numeric_load_locale): Change declaration.
+	* libc/locale/locale.c (lconv): De-constify for Cygwin.
+	(__set_charset_from_locale): Rename from
+	__set_charset_from_codepage.  Take locale as parameter instead of
+	a codepage.
+	(loadlocale): Allow "EUC-JP" for "EUCJP" and "EUC-KR" for "EUCKR".
+	Change documnetation accordingly.  Enable LC_COLLATE, LC_MONETARY,
+	LC_NUMERIC, and LC_TIME handling on Cygwin.
+	(_localeconv_r): On Cygwin, copy values from monetary and numeric
+	domain if change has been noted.
+	* libc/locale/nl_langinfo.c (nl_langinfo): Accommodate change of
+	am/pm layout in struct lc_time_T.
+	* libc/locale/timelocal.c (_C_time_locale): Accommodate
+	redefinition of am/pm members.
+	(__time_load_locale): Take additional parameters for wide char
+	to multibyte conversion.  Call __set_lc_time_from_win on Cygwin.
+	* libc/locale/timelocal.h: Make C++-safe.
+	(struct lc_time_T): Convert am and pm to a am_pm array for easier
+	consumption by strftime and strptime.
+	(__time_load_locale): Change declaration.
+	* libc/time/strftime.c: Change documentation to reflect changes to
+	strftime.  Remove locale constant strings in favor of access to
+	locale-specifc data.
+	(_ctloc): Define access method for locale-specifc data.
+	(TOLOWER): Define for tolower conversion.
+	(strftime): Throughout, convert locale-specific formats to use
+	locale-specific data.  Add GNU-specific "%P" format.
+	* libc/time/strptime.c: Remove locale constant strings in favor of
+	access to locale-specifc data.
+	(_ctloc): Define access method for locale-specifc data.
+	(strptime): Throughout, convert locale-specific formats to use
+	locale-specific data.
+
 2010-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/nl_langinfo.c (nl_langinfo): On Cygwin, translate

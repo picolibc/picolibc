@@ -36,66 +36,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "../locale/timelocal.h"
 
-static const char *abb_weekdays[] = {
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat",
-    NULL
-};
-
-static const char *full_weekdays[] = {
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    NULL
-};
-
-static const char *abb_month[] = {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-    NULL
-};
-
-static const char *full_month[] = {
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-    NULL,
-};
-
-static const char *ampm[] = {
-    "am",
-    "pm",
-    NULL
-};
+#define _ctloc(x) (_CurrentTimeLocale->x)
 
 /*
  * tm_year is relative this year 
@@ -205,6 +148,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 {
     char c;
 
+    struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
 	int ret;
@@ -218,26 +162,26 @@ _DEFUN (strptime, (buf, format, timeptr),
 		c = *++format;
 	    switch (c) {
 	    case 'A' :
-		ret = match_string (&buf, full_weekdays);
+		ret = match_string (&buf, _ctloc (weekday));
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		break;
 	    case 'a' :
-		ret = match_string (&buf, abb_weekdays);
+		ret = match_string (&buf, _ctloc (wday));
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		break;
 	    case 'B' :
-		ret = match_string (&buf, full_month);
+		ret = match_string (&buf, _ctloc (month));
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
 		break;
 	    case 'b' :
 	    case 'h' :
-		ret = match_string (&buf, abb_month);
+		ret = match_string (&buf, _ctloc (mon));
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -250,7 +194,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		buf = s;
 		break;
 	    case 'c' :		/* %a %b %e %H:%M:%S %Y */
-		s = strptime (buf, "%a %b %e %H:%M:%S %Y", timeptr);
+		s = strptime (buf, _ctloc (c_fmt), timeptr);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
@@ -316,7 +260,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    return NULL;
 		break;
 	    case 'p' :
-		ret = match_string (&buf, ampm);
+		ret = match_string (&buf, _ctloc (am_pm));
 		if (ret < 0)
 		    return NULL;
 		if (timeptr->tm_hour == 0) {
@@ -326,7 +270,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    timeptr->tm_hour += 12;
 		break;
 	    case 'r' :		/* %I:%M:%S %p */
-		s = strptime (buf, "%I:%M:%S %p", timeptr);
+		s = strptime (buf, _ctloc (ampm_fmt), timeptr);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
@@ -351,7 +295,6 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    return NULL;
 		break;
 	    case 'T' :		/* %H:%M:%S */
-	    case 'X' :
 		s = strptime (buf, "%H:%M:%S", timeptr);
 		if (s == NULL)
 		    return NULL;
@@ -393,11 +336,17 @@ _DEFUN (strptime, (buf, format, timeptr),
 		buf = s;
 		break;
 	    case 'x' :
-		s = strptime (buf, "%Y:%m:%d", timeptr);
+		s = strptime (buf, _ctloc (x_fmt), timeptr);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		break;
+	    case 'X' :
+		s = strptime (buf, _ctloc (X_fmt), timeptr);
+		if (s == NULL)
+		    return NULL;
+		buf = s;
+	    	break;
 	    case 'y' :
 		ret = strtol (buf, &s, 10);
 		if (s == buf)

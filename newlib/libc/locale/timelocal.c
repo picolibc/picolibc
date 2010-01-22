@@ -70,11 +70,8 @@ static const struct lc_time_T	_C_time_locale = {
 	 */
 	"%a %b %e %H:%M:%S %Y",
 
-	/* am */
-	"AM",
-
-	/* pm */
-	"PM",
+	/* am pm */
+	{ "AM", "PM" },
 
 	/* date_fmt */
 	"%a %b %e %H:%M:%S %Z %Y",
@@ -106,14 +103,29 @@ __get_current_time_locale(void) {
 }
 
 int
-__time_load_locale(const char *name) {
+__time_load_locale(const char *name, void *f_wctomb, const char *charset) {
 
 	int	ret;
 
+#ifdef __CYGWIN__
+	extern int __set_lc_time_from_win (const char *, struct lc_time_T *,
+					   void *, const char *);
+	int old_time_using_locale = _time_using_locale;
+	_time_using_locale = 0;
+	ret = __set_lc_time_from_win (name, &_time_locale, f_wctomb, charset);
+	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+	if (ret < 0)
+	  _time_using_locale = old_time_using_locale;
+	else
+	  {
+	    _time_using_locale = ret;
+	    ret = 0;
+	  }
+#else
 	ret = __part_load_locale(name, &_time_using_locale,
 			time_locale_buf, "LC_TIME",
 			LCTIME_SIZE, LCTIME_SIZE,
 			(const char **)&_time_locale);
-
+#endif
 	return (ret);
 }
