@@ -1,3 +1,29 @@
+2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add nlsfunc.o and strfmon.o.
+	* autoload.cc (LocaleNameToLCID): Define.
+	* cygwin.din (strfmon): Export.
+	* nlsfuncs.cc: New file.  Define a lot of internal functions called
+	from setlocale.
+	(wcscoll): Implement locale-aware here, using CompareStringW function.
+	(strcoll): Ditto.
+	(wcsxfrm): Implement locale-aware here, usingLCMapStringW function.
+	(strxfrm): Ditto.
+	(__set_charset_from_locale): Replace __set_charset_from_codepage.
+	Return Linux-compatible charset.
+	* strfuncs.cc (__set_charset_from_codepage): Remove.
+	* wchar.h (__set_charset_from_codepage): Drop definition.
+	* wincap.h (wincaps::has_localenames): New element.
+	* wincap.cc: Implement above element throughout.
+	* libc/strfmon.c: New file.
+	* libc/strptime.cc: Remove locale constant strings in favor of
+	access to locale-specifc data.
+	(strptime): Point _CurrentTimeLocale to locale-specific data.
+	Throughout use correct locale-specific format fields for all
+	locale-specific formats.
+	* include/monetary.h: New file.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2010-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strfuncs.cc: Remove needless includes.

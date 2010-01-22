@@ -1,6 +1,7 @@
 /* autoload.cc: all dynamic load stuff.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -422,6 +423,7 @@ LoadDLLfuncEx (GetSystemWindowsDirectoryW, 8, kernel32, 1)
 LoadDLLfuncEx (GetVolumeNameForVolumeMountPointA, 12, kernel32, 1)
 LoadDLLfuncEx (GetSystemDEPPolicy, 0, kernel32, 1)
 LoadDLLfuncEx (GetProcessDEPPolicy, 12, kernel32, 1)
+LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 LoadDLLfuncEx (SetProcessDEPPolicy, 4, kernel32, 1)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)

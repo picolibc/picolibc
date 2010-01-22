@@ -1,6 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -49,6 +50,7 @@ struct wincaps
   unsigned has_console_handle_problem			: 1;
   unsigned has_broken_alloc_console			: 1;
   unsigned has_always_all_codepages			: 1;
+  unsigned has_localenames				: 1;
 };
 
 class wincapc
@@ -104,6 +106,7 @@ public:
   bool	IMPLEMENT (has_console_handle_problem)
   bool	IMPLEMENT (has_broken_alloc_console)
   bool	IMPLEMENT (has_always_all_codepages)
+  bool	IMPLEMENT (has_localenames)
 
 #undef IMPLEMENT
 };

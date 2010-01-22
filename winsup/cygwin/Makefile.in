@@ -1,6 +1,6 @@
 # Makefile.in for Cygwin.
 # Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+# 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -148,12 +148,12 @@ DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	glob_pattern_p.o globals.o grp.o heap.o hookapi.o inet_addr.o inet_network.o \
 	init.o ioctl.o ipc.o kernel32.o libstdcxx_wrapper.o localtime.o lsearch.o \
 	malloc_wrapper.o minires-os-if.o minires.o miscfuncs.o mktemp.o mmap.o msg.o \
-	mount.o net.o netdb.o nfs.o nftw.o ntea.o passwd.o path.o pinfo.o pipe.o \
-	poll.o posix_ipc.o pthread.o random.o regcomp.o regerror.o regexec.o \
-	regfree.o registry.o resource.o rexec.o rcmd.o scandir.o sched.o \
-	sec_acl.o sec_auth.o sec_helper.o security.o select.o sem.o \
-	setlsapwd.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o \
-	spawn.o strace.o strfuncs.o strptime.o strsep.o strsig.o sync.o \
+	mount.o net.o netdb.o nfs.o nftw.o nlsfuncs.o ntea.o passwd.o path.o \
+	pinfo.o pipe.o poll.o posix_ipc.o pthread.o random.o regcomp.o \
+	regerror.o regexec.o regfree.o registry.o resource.o rexec.o rcmd.o \
+	scandir.o sched.o sec_acl.o sec_auth.o sec_helper.o security.o select.o \
+	sem.o setlsapwd.o shared.o shm.o sigfe.o signal.o sigproc.o smallprint.o \
+	spawn.o strace.o strfmon.o strfuncs.o strptime.o strsep.o strsig.o sync.o \
 	syscalls.o sysconf.o syslog.o termios.o thread.o timer.o times.o \
 	tls_pbuf.o tty.o uinfo.o uname.o wait.o wincap.o window.o winf.o \
 	xsique.o \

@@ -1,6 +1,6 @@
 /* wchar.h: Extra wchar defs
 
-   Copyright 2007, 2009 Red Hat, Inc.
+   Copyright 2007, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -43,8 +43,6 @@ extern wctomb_f __ascii_wctomb;
 extern wctomb_f __utf8_wctomb;
 
 extern char *__locale_charset ();
-
-extern mbtowc_p __set_charset_from_codepage (unsigned int cp, char *charset);
 
 #ifdef __cplusplus
 }

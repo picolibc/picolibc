@@ -1527,6 +1527,7 @@ strerror SIGFE
 _strerror = strerror SIGFE
 strerror_r SIGFE
 _strerror_r = strerror_r SIGFE
+strfmon SIGFE
 strftime SIGFE
 _strftime = strftime SIGFE
 strlcat NOSIGFE
