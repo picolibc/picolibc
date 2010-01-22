@@ -714,6 +714,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strdup
     strerror
     strerror_r
+    strfmon
     strftime
     strlen
     strncasecmp
@@ -1341,7 +1342,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sqrtl
     strcasecmp_l
     strcoll_l
-    strfmon
     strfmon_l
     strncasecmp_l
     strtold

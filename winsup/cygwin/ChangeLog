@@ -1,5 +1,9 @@
 2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml (strfmon): Move to implemented SUSv4 API.
+
+2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Add nlsfunc.o and strfmon.o.
 	* autoload.cc (LocaleNameToLCID): Define.
 	* cygwin.din (strfmon): Export.
