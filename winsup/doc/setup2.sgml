@@ -506,6 +506,8 @@ of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
 
 <screen>
     Charset               Codepage
+    -------------------   -------------------------------------------
+    ASCII                 20127 (US_ASCII)
 
     CP437                   437 (OEM United States)
     CP720                   720 (DOS Arabic)
@@ -551,10 +553,11 @@ of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     SJIS                    932 (ANSI/OEM Japanese)
     GBK                     936 (ANSI/OEM Simplified Chinese)
     Big5                    950 (ANSI/OEM Traditional Chinese)
-    eucJP                 20932 (EUC Japanese)
-    eucKR                   949 (EUC Korean)
+    EUCJP or euc-JP       20932 (EUC Japanese)
+    EUCKR or euc-KR         949 (EUC Korean)
+    TIS620 or TIS-620       874 (ANSI/OEM Thai)
 
-    UTF-8 or UTF8         65001 (UTF-8)
+    UTF-8 or utf8         65001 (UTF-8)
 </screen>
 
 </sect2>

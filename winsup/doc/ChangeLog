@@ -1,3 +1,8 @@
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup2.sgml (setup-locale-charsetlist): Add ASCII and TIS-620.  Add
+	various aliases and case differences.
+
 2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.2): Add chapter for news in 1.7.2.
