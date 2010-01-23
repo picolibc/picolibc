@@ -60,8 +60,8 @@ Additionally to the POSIX specifier, seven extensions are supported for
 backward compatibility with older implementations using newlib:
 <<"C-UTF-8">>, <<"C-JIS">>, <<"C-eucJP">>, <<"C-SJIS">>, <<C-KOI8-R>>,
 <<C-KOI8-U>>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
-xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
-1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
+xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 932,
+1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 
 Instead of <<"C-">>, you can specify also <<"C.">>.  Both variations allow
 to specify language neutral locales while using other charsets than ASCII,
@@ -71,7 +71,7 @@ but uses the UTF-8 charset.
 Even when using POSIX locale strings, the only charsets allowed are
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<KOI8-R>>, <<KOI8-U>>,
 <<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
-[437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
+[437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 932, 1125, 1250,
 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  <<"UTF-8">> can also be written without dash, as in
@@ -190,7 +190,7 @@ char *_PathLocale = NULL;
 static
 #ifndef __CYGWIN__
 _CONST
-#endif
+#endif /* !__CYGWIN__ */
 struct lconv lconv = 
 {
   ".", "", "", "", "", "", "", "", "", "",
@@ -559,7 +559,7 @@ loadlocale(struct _reent *p, int category)
       l_mbtowc = __jis_mbtowc;
 #endif
     break;
-#endif
+#endif /* !__CYGWIN__ */
     case 'E':
     case 'e':
       if (!strcasecmp (charset, "EUCJP") || !strcasecmp (charset, "EUC-JP"))
@@ -582,7 +582,7 @@ loadlocale(struct _reent *p, int category)
 	  l_mbtowc = __kr_mbtowc;
 #endif
 	}
-#endif
+#endif /* __CYGWIN__ */
       else
 	return NULL;
     break;
@@ -659,6 +659,13 @@ loadlocale(struct _reent *p, int category)
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif
+	  break;
+	case 932:
+	  mbc_max = 2;
+#ifdef _MB_CAPABLE
+	  l_wctomb = __sjis_wctomb;
+	  l_mbtowc = __sjis_mbtowc;
 #endif
 	  break;
 	default:
@@ -766,7 +773,7 @@ loadlocale(struct _reent *p, int category)
     ret = __time_load_locale (locale, (void *) l_wctomb, charset);
   if (ret)
     return NULL;
-#endif
+#endif /* __CYGWIN__ */
   return strcpy(current_categories[category], new_categories[category]);
 }
 
@@ -851,7 +858,7 @@ _DEFUN(_localeconv_r, (data),
       lconv.int_p_sign_posn = m->p_sign_posn[0];
       __mlocale_changed = 0;
     }
-#endif
+#endif /* __CYGWIN__ */
   return (struct lconv *) &lconv;
 }
 
@@ -865,7 +872,7 @@ _DEFUN(setlocale, (category, locale),
 {
   return _setlocale_r (_REENT, category, locale);
 }
-#endif
+#endif /* __CYGWIN__ */
 
 struct lconv *
 _DEFUN_VOID(localeconv)

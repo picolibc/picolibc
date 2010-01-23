@@ -1,5 +1,10 @@
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c (loadlocale): Allow CP932 as alias for SJIS.
+	Add to documentation.  Add a few comments to #endif's for Cygwin.  
+
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/locale.c (loadlocale): Disable JIS entirely on Cygwin.
 	Allow TIS620 and TIS-620 as aliases for CP874 on Cygwin.
 
