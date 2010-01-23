@@ -1,3 +1,8 @@
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Disable JIS entirely on Cygwin.
+	Allow TIS620 and TIS-620 as aliases for CP874 on Cygwin.
+
 2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/lmonetary.c (__monetary_load_locale): Take additional

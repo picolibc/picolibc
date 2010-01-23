@@ -83,7 +83,7 @@ dash, <<"EUC-JP">> and <<"EUC-KR">>.
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
 Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"eucKR">>, and <<"Big5">>.
+<<"GBK">>, <<"eucKR">>, <<"Big5">>, and <<"TIS-620">>.
 
 This implementation also supports a single modifier, <<"cjknarrow">>.
 Any other modifier is ignored.  <<"cjknarrow">>, in conjunction with one
@@ -547,6 +547,7 @@ loadlocale(struct _reent *p, int category)
       l_mbtowc = __utf8_mbtowc;
 #endif
     break;
+#ifndef __CYGWIN__
     case 'J':
     case 'j':
       if (strcasecmp (charset, "JIS"))
@@ -558,6 +559,7 @@ loadlocale(struct _reent *p, int category)
       l_mbtowc = __jis_mbtowc;
 #endif
     break;
+#endif
     case 'E':
     case 'e':
       if (!strcasecmp (charset, "EUCJP") || !strcasecmp (charset, "EUC-JP"))
@@ -714,6 +716,17 @@ loadlocale(struct _reent *p, int category)
 #ifdef _MB_CAPABLE
       l_wctomb = __big5_wctomb;
       l_mbtowc = __big5_mbtowc;
+#endif
+      break;
+    case 'T':
+    case 't':
+      if (strcasecmp (charset, "TIS620") && strcasecmp (charset, "TIS-620"))
+      	return NULL;
+      strcpy (charset, "CP874");
+      mbc_max = 1;
+#ifdef _MB_CAPABLE
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
 #endif
       break;
 #endif /* __CYGWIN__ */
