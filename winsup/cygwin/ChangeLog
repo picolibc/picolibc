@@ -1,5 +1,13 @@
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strfuncs.cc (__sjis_wctomb): Special handling for characters which
+	differ between SJIS and Windows codepage 932, if charset is "SJIS".
+	(__sjis_mbtowc): Ditto.
+	(_jis_wctomb): Remove.
+	(__jis_mbtowc): Remove.
+
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* nlsfuncs.cc (wcsxfrm): Call LCMapStringW with LCMAP_BYTEREV flag to
 	allow correct comparison using wcscmp.
 

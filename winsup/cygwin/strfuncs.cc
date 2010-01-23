@@ -108,15 +108,24 @@ extern "C" int
 __sjis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 	       mbstate_t *state)
 {
+  if (*charset == 'S')
+    {
+      /* SJIS is not exactly CP932.  Two ASCII code points are converted
+	 differently. */
+      if (wchar == L'\x00a5')	 /* SJIS has Yen sign in place of Backslash */
+	{
+	  if (s)
+	    *s = '\x5c';
+	  return 1;
+	}
+      else if (wchar == L'\x203e') /* SJIS has Overline in place of Tilde */
+	{
+	  if (s)
+	    *s = '\x7e';
+	  return 1;
+	}
+    }
   return __db_wctomb (r,s, wchar, 932);
-}
-
-extern "C" int
-__jis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
-{
-  /* FIXME: See comment at start of file. */
-  return __ascii_wctomb (r, s, wchar, charset, state);
 }
 
 extern "C" int
@@ -243,15 +252,17 @@ extern "C" int
 __sjis_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	       const char *charset, mbstate_t *state)
 {
-  return __db_mbtowc (r, pwc, s, n, 932, state);
-}
-
-extern "C" int
-__jis_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
-{
-  /* FIXME: See comment at start of file. */
-  return __ascii_mbtowc (r, pwc, s, n, charset, state);
+  int ret = __db_mbtowc (r, pwc, s, n, 932, state);
+  if (*charset == 'S' && pwc && ret == 1)
+    {
+      /* CP932 is not exactly SJIS.  Two ASCII code points are converted
+	 differently. */
+      if (*s == '\x5c')		/* SJIS has Yen sign in place of Backslash */
+      	*pwc = L'\x00a5';
+      else if (*s == '\x7e')	/* SJIS has Overline in place of Tilde */
+	*pwc = L'\x203e';
+    }
+  return ret;
 }
 
 extern "C" int
