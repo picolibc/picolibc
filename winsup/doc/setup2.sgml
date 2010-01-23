@@ -521,6 +521,7 @@ of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     CP862                   862 (OEM Hebrew)
     CP866                   866 (OEM Russian)
     CP874                   874 (ANSI/OEM Thai)
+    CP932		    932 (Shift_JIS, not exactly identical to SJIS)
     CP1125                 1125 (OEM Ukraine)
     CP1250                 1250 (ANSI Central European)
     CP1251                 1251 (ANSI Cyrillic)
@@ -550,7 +551,7 @@ of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
 
     KOI8-R                20866 (KOI8-R Russian Cyrillic)
     KOI8-U                21866 (KOI8-U Ukrainian Cyrillic)
-    SJIS                    932 (ANSI/OEM Japanese)
+    SJIS                      - (not available, almost, but not exactly CP932)
     GBK                     936 (ANSI/OEM Simplified Chinese)
     Big5                    950 (ANSI/OEM Traditional Chinese)
     EUCJP or euc-JP       20932 (EUC Japanese)

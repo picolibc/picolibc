@@ -1,5 +1,10 @@
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml (setup-locale-charsetlist): Add CP932.  Change description
+	for SJIS.
+
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setup2.sgml (setup-locale-charsetlist): Add ASCII and TIS-620.  Add
 	various aliases and case differences.
 
