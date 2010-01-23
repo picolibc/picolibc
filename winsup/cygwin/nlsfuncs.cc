@@ -637,7 +637,7 @@ wcsxfrm (wchar_t *ws1, const wchar_t *ws2, size_t wsn)
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
-  ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY,
+  ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY | LCMAP_BYTEREV,
 		      ws2, -1, ws1, wsn * sizeof (wchar_t));
   /* LCMapStringW returns byte count including the terminating NUL character,
      wcsxfrm is supposed to return length in wchar_t excluding the NUL.

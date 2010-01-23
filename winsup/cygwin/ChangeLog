@@ -1,3 +1,8 @@
+2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (wcsxfrm): Call LCMapStringW with LCMAP_BYTEREV flag to
+	allow correct comparison using wcscmp.
+
 2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml (strfmon): Move to implemented SUSv4 API.
