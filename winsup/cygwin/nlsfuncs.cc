@@ -690,9 +690,7 @@ strxfrm (char *s1, const char *s2, size_t sn)
 
 /* Fetch default ANSI codepage from locale info and generate a setlocale
    compatible character set code.  Called from newlib's setlocale(), if the
-   charset isn't given explicitely in the POSIX compatible locale specifier.
-   The function also returns a pointer to the corresponding _mbtowc_r function
-   which is used subsequently. */
+   charset isn't given explicitely in the POSIX compatible locale specifier. */
 extern "C" void
 __set_charset_from_locale (const char *locale, char *charset)
 {

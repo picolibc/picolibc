@@ -1,5 +1,9 @@
 2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__set_charset_from_locale): Fix comment.
+
+2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* nlsfuncs.cc (check_codepage): Move from syscalls.cc here.
 	(internal_setlocale): Ditto.
 	(initial_setlocale): Ditto.
