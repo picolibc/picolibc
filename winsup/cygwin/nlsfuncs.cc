@@ -9,8 +9,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
 #include <winnls.h>
+#include <stdlib.h>
+#include <locale.h>
 #include <wchar.h>
 #include "path.h"
 #include "fhandler.h"
@@ -761,4 +762,111 @@ __set_charset_from_locale (const char *locale, char *charset)
       if (c && !strcmp (c + 1, "euro"))
       	strcpy (charset, "ISO-8859-15");
     }
+}
+
+static char *
+check_codepage (char *ret)
+{
+  if (!wincap.has_always_all_codepages ())
+    {
+      /* Prior to Windows Vista, many codepages are not installed by
+	 default, or can be deinstalled.  The following codepages require
+	 that the respective conversion tables are installed into the OS.
+	 So we check if they are installed and if not, setlocale should
+	 fail. */
+      CPINFO cpi;
+      UINT cp = 0;
+      if (__mbtowc == __sjis_mbtowc)
+	cp = 932;
+      else if (__mbtowc == __eucjp_mbtowc)
+	cp = 20932;
+      else if (__mbtowc == __gbk_mbtowc)
+	cp = 936;
+      else if (__mbtowc == __kr_mbtowc)
+	cp = 949;
+      else if (__mbtowc == __big5_mbtowc)
+	cp = 950;
+      if (cp && !GetCPInfo (cp, &cpi)
+	  && GetLastError () == ERROR_INVALID_PARAMETER)
+	return NULL;
+    }
+  return ret;
+}
+
+static void
+internal_setlocale ()
+{
+  /* Each setlocale from the environment potentially changes the
+     multibyte representation of the CWD.  Therefore we have to
+     reevaluate the CWD's posix path and store in the new charset.
+     Same for the PATH environment variable. */
+  /* FIXME: Other buffered paths might be affected as well. */
+  /* FIXME: It could be necessary to convert the entire environment,
+	    not just PATH. */
+  tmp_pathbuf tp;
+  char *path = getenv ("PATH");
+  wchar_t *w_path = NULL, *w_cwd;
+
+  debug_printf ("Cygwin charset changed from %s to %s",
+		cygheap->locale.charset, __locale_charset ());
+  /* Fetch PATH and CWD and convert to wchar_t in previous charset. */
+  if (path && *path)	/* $PATH can be potentially unset. */
+    {
+      w_path = tp.w_get ();
+      sys_mbstowcs (w_path, 32768, path);
+    }
+  w_cwd = tp.w_get ();
+  cwdstuff::cwd_lock.acquire ();
+  sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
+  /* Set charset for internal conversion functions. */
+  if (*__locale_charset () == 'A'/*SCII*/)
+    {
+      cygheap->locale.mbtowc = __utf8_mbtowc;
+      cygheap->locale.wctomb = __utf8_wctomb;
+    }
+  else
+    {
+      cygheap->locale.mbtowc = __mbtowc;
+      cygheap->locale.wctomb = __wctomb;
+    }
+  strcpy (cygheap->locale.charset, __locale_charset ());
+  /* Restore CWD and PATH in new charset. */
+  cygheap->cwd.reset_posix (w_cwd);
+  cwdstuff::cwd_lock.release ();
+  if (w_path)
+    {
+      char *c_path = tp.c_get ();
+      sys_wcstombs (c_path, 32768, w_path);
+      setenv ("PATH", c_path, 1);
+    }
+}
+
+/* Called from dll_crt0_1, before fetching the command line from Windows.
+   Set the internal charset according to the environment locale settings.
+   Check if a required codepage is available, and only switch internal
+   charset if so.
+   Make sure to reset the application locale to "C" per POSIX. */
+void
+initial_setlocale ()
+{
+  char *ret = _setlocale_r (_REENT, LC_CTYPE, "");
+  if (ret && check_codepage (ret)
+      && strcmp (cygheap->locale.charset, __locale_charset ()) != 0)
+    internal_setlocale ();
+}
+
+/* Like newlib's setlocale, but additionally check if the charset needs
+   OS support and the required codepage is actually installed.  If codepage
+   is not available, revert to previous locale and return NULL.  For details
+   about codepage availability, see the comment in check_codepage() above. */
+extern "C" char *
+setlocale (int category, const char *locale)
+{
+  char old[(LC_MESSAGES + 1) * (ENCODING_LEN + 1/*"/"*/ + 1)];
+  if (locale && !wincap.has_always_all_codepages ())
+    stpcpy (old, _setlocale_r (_REENT, category, NULL));
+  char *ret = _setlocale_r (_REENT, category, locale);
+  if (ret && locale && !(ret = check_codepage (ret)))
+    _setlocale_r (_REENT, category, old);
+  return ret;
 }

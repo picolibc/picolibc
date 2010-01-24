@@ -1,3 +1,13 @@
+2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (check_codepage): Move from syscalls.cc here.
+	(internal_setlocale): Ditto.
+	(initial_setlocale): Ditto.
+	(setlocale): Ditto.
+	* strfuncs.cc (__sjis_wctomb): Revert previous patch.
+	(__sjis_mbtowc): Ditto.
+	* syscalls.cc: Move setlocale-related functions to nlsfuncs.cc.
+
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strfuncs.cc (__sjis_wctomb): Special handling for characters which
