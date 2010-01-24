@@ -1,3 +1,8 @@
+2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml: Rework layout to use itemizedlist.  Fix typo.
+	Add two missing entries.
+
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-locale-charsetlist): Add CP932.  Change description
