@@ -1,3 +1,8 @@
+2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/nl_langinfo.c (nl_langinfo): Return "CP932" when using
+	SJIS on Cygwin.  Explain why.
+
 2010-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Allow CP932 as alias for SJIS.

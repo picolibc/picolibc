@@ -79,6 +79,20 @@ _DEFUN(nl_langinfo, (item),
 		    else if (strcmp (ret + 2, "21866") == 0)
 		      ret = "KOI8-U";
 		  }
+		else if (ret[0] == 'S'/*JIS*/)
+		  {
+		    /* Cygwin uses MSFT's implementation of SJIS, which differs
+		       in some codepoints from the real thing, especially
+		       0x5c: yen sign instead of backslash,
+		       0x7e: overline instead of tilde.
+		       We can't use the real SJIS since otherwise Win32
+		       pathnames would become invalid.  OTOH, if we return
+		       "SJIS" here, then libiconv will do mb<->wc conversion
+		       differently to our internal functions.  Therefore we
+		       return what we really implement, CP932.  This is handled
+		       fine by libiconv. */
+		    ret = "CP932";
+		  }
 #else
 		ret = "";
 		if ((s = setlocale(LC_CTYPE, NULL)) != NULL) {
