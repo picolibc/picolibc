@@ -1,5 +1,10 @@
 2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__set_charset_from_locale): Rearrange to set charset
+	more closely aligned to Glibc.
+
+2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (spawn_guts): Only try to remove long path prefix from
 	runpath if runpath is not NULL.
 

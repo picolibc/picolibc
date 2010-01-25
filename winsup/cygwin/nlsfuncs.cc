@@ -748,6 +748,8 @@ strxfrm (char *s1, const char *s2, size_t sn)
   return ret - 1;
 }
 
+#define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
+
 /* Fetch default ANSI codepage from locale info and generate a setlocale
    compatible character set code.  Called from newlib's setlocale(), if the
    charset isn't given explicitely in the POSIX compatible locale specifier. */
@@ -759,67 +761,126 @@ __set_charset_from_locale (const char *locale, char *charset)
 
   /* "C" locale, or invalid locale? */
   if (lcid == 0 || lcid == (LCID) -1)
-    {
-      __small_sprintf (charset, "ASCII");
-      return;
-    }
-  if (!GetLocaleInfoW (lcid,
-		       LOCALE_IDEFAULTANSICODEPAGE | LOCALE_RETURN_NUMBER,
-		       (PWCHAR) &cp, sizeof cp))
+    cp = 20127;
+  else if (!GetLocaleInfoW (lcid,
+			    LOCALE_IDEFAULTANSICODEPAGE | LOCALE_RETURN_NUMBER,
+			    (PWCHAR) &cp, sizeof cp))
     cp = 0;
-  /* codepage to de-facto standard charset transition. */
+  /* Translate codepage and lcid to a charset closely aligned with the default
+     charsets defined in Glibc. */
+  const char *cs;
+  const char *modifier = strchr (locale, '@') ?: "";
   switch (cp)
     {
+    case 20127:
+      cs = "ASCII";
+      break;
     case 874:
-      __small_sprintf (charset, "CP%u", cp);
+      cs = "CP874";
       break;
     case 932:
-      strcpy (charset, "EUCJP");
+      cs = "EUCJP";
       break;
     case 936:
-      strcpy (charset, "GBK");
+      cs = "GBK";
       break;
     case 949:
-      strcpy (charset, "EUCKR");
+      cs = "EUCKR";
       break;
     case 950:
-      strcpy (charset, "BIG5");
+      cs = "BIG5";
       break;
     case 1250:
-      strcpy (charset, "ISO-8859-2");
+      if (lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro) */
+	  || lcid == 0x241a		/* sr_RS (Serbian Language/Serbia) */
+	  || lcid == 0x0442)		/* tk_TM (Turkmen/Turkmenistan) */
+      	cs = "UTF-8";
+      else if (has_modifier ("@euro"))
+	cs = "ISO-8859-15";
+      else if (lcid == 0x041c)		/* sq_AL (Albanian/Albania) */
+	cs = "ISO-8859-1";
+      else
+	cs = "ISO-8859-2";
       break;
     case 1251:
-      strcpy (charset, "ISO-8859-5");
+      if (lcid == 0x0440		/* ky_KG (Kyrgyz/Kyrgyzstan) */
+	  || lcid == 0x0450		/* mn_MN (Mongolian/Mongolia) */
+					/* tt_RU (Tatar/Russia),
+						 IQTElif alphabet */
+	  || (lcid == 0x0444 && has_modifier ("@iqtelif")))	
+      	cs = "UTF-8";
+      else if (lcid == 0x0423)		/* be_BY (Belarusian/Belarus) */
+	cs = has_modifier ("@latin") ? "UTF-8" : "CP1251";
+      else if (lcid == 0x0402)		/* bg_BG (Bulgarian/Bulgaria) */
+      	cs = "CP1251";
+      else if (lcid == 0x0422)		/* uk_UA (Ukrainian/Ukraine) */
+	cs = "KOI8-U";
+      else if (has_modifier ("@euro"))
+	cs = "ISO-8859-15";
+      else
+	cs = "ISO-8859-5";
       break;
     case 1252:
-      strcpy (charset, "ISO-8859-1");
+      if (lcid == 0x0452)		/* cy_GB (Welsh/Great Britain) */
+	cs = "ISO-8859-14";
+      else if (lcid == 0x4009		/* en_IN (English/India) */
+	       || lcid == 0x0464	/* fil_PH (Filipino/Philippines) */
+	       || lcid == 0x0462	/* fy_NL (Frisian/Netherlands) */
+	       || lcid == 0x0468	/* ha_NG (Hausa/Nigeria) */
+	       || lcid == 0x0470	/* ig_NG (Igbo/Nigeria) */
+	       || lcid == 0x046c	/* nso_ZA (Northern Sotho/South Africa) */
+	       || lcid == 0x0487	/* rw_RW (Kinyarwanda/Rwanda) */
+	       || lcid == 0x043b	/* se_NO (Northern Saami/Norway) */
+	       || lcid == 0x0432	/* tn_ZA (Tswana/South Africa) */
+	       || lcid == 0x0488	/* wo_SN (Wolof/Senegal) */
+	       || lcid == 0x046a)	/* yo_NG (Yoruba/Nigeria) */
+      	cs = "UTF-8";
+      else if (lcid == 0x042e)		/* hsb_DE (Upper Sorbian/Germany) */
+	cs = "ISO-8859-2";
+      else if (lcid == 0x0491		/* gd_GB (Scots Gaelic/Great Britain) */
+	       || has_modifier ("@euro"))
+	cs = "ISO-8859-15";
+      else
+	cs = "ISO-8859-1";
       break;
     case 1253:
-      strcpy (charset, "ISO-8859-7");
+      cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-7";
       break;
     case 1254:
-      strcpy (charset, "ISO-8859-9");
+      if (lcid == 0x042c		/* az_AZ (Azeri/Azerbaijan) */
+	  || lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
+      	cs = "UTF-8";
+      else
+	cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-9";
       break;
     case 1255:
-      strcpy (charset, "ISO-8859-8");
+      cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-8";
       break;
     case 1256:
-      strcpy (charset, "ISO-8859-6");
+      if (lcid == 0x0429		/* fa_IR (Persian/Iran) */
+	  || lcid == 0x0480		/* ug_CN (Uyghur/China) */
+	  || lcid == 0x0420)		/* ur_PK (Urdu/Pakistan) */
+	cs = "UTF-8";
+      else
+	cs = "ISO-8859-6";
       break;
     case 1257:
-      strcpy (charset, "ISO-8859-13");
+      if (lcid == 0x0425)		/* et_EE (Estonian/Estonia) */
+	cs = "ISO-8859-15";
+      else
+	cs = "ISO-8859-13";
       break;
     case 1258:
     default:
-      strcpy (charset, "UTF-8");
+      if (lcid == 0x0481)		/* mi_NZ (Maori/New Zealand) */
+	cs = "ISO-8859-13";
+      else if (lcid == 0x043a)		/* mt_MT (Maltese/Malta) */
+	cs = "ISO-8859-3";
+      else
+	cs = "UTF-8";
       break;
     }
-  if (cp >= 1250 && cp <= 1257)
-    {
-      char *c = strchr (locale, '@');
-      if (c && !strcmp (c + 1, "euro"))
-      	strcpy (charset, "ISO-8859-15");
-    }
+  stpcpy (charset, cs);
 }
 
 static char *
