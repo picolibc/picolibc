@@ -362,13 +362,8 @@ variables. The long answer can be found in the User's Guide in the
 section <ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html">Internationalization</ulink>
 </para>
 
-<para>To get UTF-8 support you must set the LANG, LC_ALL, or LC_CTYPE
-environment variables.  To get UTF-8 support you can set, for instance,
-$LANG to "en_US.UTF-8".  This will give you support for the UTF-8 character
-set.  Note that the language part has to contain a valid language specifier,
-but is otherwise so far ignored.  There's no support for correct
-language-specific collation, monetary or date/time-related
-string handling.  This is planned for a later release, though.</para>
+<para> Cygwin uses UTF-8 by default.  To use a different character set, you
+need to set the LC_ALL, LC_CTYPE or LANG environment variables.</para>
 
 <para>To type international characters (&pound;&auml;&ouml;) in
 <literal>bash</literal>, check if the following settings are available in
@@ -400,10 +395,10 @@ alias ls='/bin/ls -F --color=tty --show-control-chars'
 <question><para>My application prints international characters but I only
 see gray boxes</para></question>
 <answer>
-<para>Very likely you didn't set your Console character set to the preferred
+<para>Very likely you didn't set your console character set to the preferred
 character set before the first Cygwin application was started in the
 console.  To make sure the console is using the desired character set,
-maile sure that one of the internationalization environment variables
+make sure that one of the internationalization environment variables
 LC_ALL, LC_CTYPE, or LANG is set before the first Cygwin process starts.
 You can do that, for instance, by setting the variable in your
 <literal>Cygwin.bat</literal> file from which you start your Cygwin shell.

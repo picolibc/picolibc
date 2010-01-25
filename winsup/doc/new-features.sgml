@@ -10,15 +10,15 @@
 
   <listitem><para>
   Cygwin now handles locales using the underlying Windows locale
-  support.  The locale must exists in Windows to be recognized.
+  support.  The locale must exist in Windows to be recognized.
   </para></listitem>
 
   <listitem><para>
-  New tool "getlocale" to fetch valid locale values from Windows.
+  New tool "getlocale" to fetch valid locale identifiers from Windows.
   </para></listitem>
 
   <listitem><para>
-  Default charset for locales without explicit charset is now choosen
+  Default charset for locales without explicit charset is now chosen
   from a list of Linux-compatible charsets.
   </para>
   
@@ -32,7 +32,7 @@
 
   <listitem><para>
   Default charset in the "C" or "POSIX" locale has been changed back
-  from UTF-8 to ASCII, to circumvent problems with applications
+  from UTF-8 to ASCII, to avoid problems with applications
   expecting a singlebyte charset in the "C"/"POSIX" locale.  Still use
   UTF-8 internally for filename conversion in this case.
   </para></listitem>
@@ -48,6 +48,10 @@
 
   <listitem><para>
   New strfmon(3) call.
+  </para></listitem>
+
+  <listitem><para>
+  The console's backspace keycode can be changed using 'stty erase'.
   </para></listitem>
 
   </itemizedlist>
@@ -110,7 +114,7 @@ If a filename cannot be represented in the current character set, the
 character will be converted to a sequence Ctrl-X + UTF-8 representation
 of the character.  This allows to access all files, even those not
 having a valid representation of their filename in the current character
-set (codepage).  To always have a valid string, use the UTF-8 charset by
+set.  To always have a valid string, use the UTF-8 charset by
 setting the environment variable $LANG, $LC_ALL, or $LC_CTYPE to a valid
 POSIX value, for instance in Cygwin.bat like this:
 </para>
@@ -159,8 +163,8 @@ Creating files with special DOS device filename components ("aux",
 <listitem><para>
 File names are case sensitive if the OS and the underlying file system
 supports it.  Works on NTFS and NFS.  Does not work on FAT and Samba
-shares.  Requires to change a registry key (see the user's guide).  Can
-be switched off on a per-mount base.
+shares.  Requires to change a registry key (see the User's Guide).  Can
+be switched off on a per-mount basis.
 </para></listitem>
 
 <listitem><para>
@@ -302,7 +306,7 @@ New send/recv option MSG_DONTWAIT.
 </para></listitem>
 
 <listitem><para>
-IPv6 support.  New API getaddrinfo, getnameinfo, freeaddrinfo,
+IPv6 support.  New APIs getaddrinfo, getnameinfo, freeaddrinfo,
 gai_strerror, in6addr_any, in6addr_loopback.  On IPv6-less systems,
 replacement functions are available for IPv4.  On systems with IPv6
 enabled, the underlying WinSock functions are used.  While I tried hard
@@ -410,8 +414,7 @@ A lot of character sets are supported now via a call to setlocale().
 The setting of the environment variables $LANG, $LC_ALL or $LC_CTYPE
 will be used.  For instance, setting $LANG to "de_DE.ISO-8859-15" before
 starting a Cygwin session will use the ISO-8859-15 character set in the
-entire session.  The default charset is "UTF-8", even in the default
-locale "C".  The default locale in the absence of one of the
+entire session.  The default locale in the absence of one of the
 aforementioned environment variables is "C.UTF-8".
 </para>
 
@@ -420,9 +423,7 @@ The full list of supported character sets: "ASCII", "ISO-8859-x" with x
 in 1-16, except 12, "UTF-8", Windows codepages "CPxxx", with xxx in
 (437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258), "KOI8-R", "KOI8-U",
-"SJIS", "GBK", "eucJP", "eucKR", and "Big5".  The leading language and
-territory part (en_US, for instance) is not used by Cygwin yet, but is
-required for POSIX compatibility.
+"SJIS", "GBK", "eucJP", "eucKR", and "Big5".
 </para>
 
 </listitem>

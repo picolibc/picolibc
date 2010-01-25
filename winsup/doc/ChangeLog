@@ -1,3 +1,10 @@
+2010-01-25  Andy Koppe  <andy.koppe@gmail.com>
+
+	* faq-using.xml: Fix typos and remove incorrect locale-specific
+	documentation.
+	* new-features.sgml: Ditto.
+	* pathnames.sgml: Ditto.
+
 2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml: Rework layout to use itemizedlist.  Fix typo.

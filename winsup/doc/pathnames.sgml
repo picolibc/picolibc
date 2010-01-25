@@ -403,21 +403,11 @@ Converting backslashes using the above method would make this impossible.</para>
 <sect2 id="pathnames-unusual">
 <title>Filenames with unusual (foreign) characters</title>
 
-<para> Windows filesystems use the Unicode character set in the UTF-16
-encoding to store filename information.  If you don't use the UTF-8
+<para> Windows filesystems use Unicode encoded as UTF-16
+to store filename information.  If you don't use the UTF-8
 character set (see <xref linkend="setup-locale"></xref>) then there's a
 chance that a filename is using one or more characters which have no
 representation in the character set you're using.</para>
-
-<para>For instance, there are no Chinese characters in the ISO-8859-1
-character set.  So, converting a filename containing a Chinese character
-to ISO-8859-1 leaves you with a wrongly converted filename, for instance,
-containing a question mark '?' as replacement for the unconvertable
-character.  When trying to access the file, Cygwin has to convert the
-filename back to UTF-16.  However, this doesn't result in the original
-filename because the question mark will not translate back to the original
-Chinese character, but to a simple question mark instead.  This in turn
-results in strange "File not found" messages.</para>
 
 <note><para>In the default "C" locale, Cygwin creates filenames using
 the UTF-8 charset.  This will always result in some valid filename by
