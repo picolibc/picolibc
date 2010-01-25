@@ -1,3 +1,16 @@
+2010-01-25  Kai Tietz  <kai.tietz@onevision.com>
+
+	Implement TLS Callback.
+
+	* tlsmcrt.c: New file.
+	* tlsmthread.c: Ditto.
+	* tlssup.c: Ditto.
+	* tlsthrd.c: Ditto.
+	* Makefile.in: Include new files.
+	* crt1.c: Implement TLS Callback.
+	* dllcrt1.c: Ditto.
+	* mthr_stub.c: Remove.
+
 2009-11-29 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.17.

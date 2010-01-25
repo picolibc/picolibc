@@ -34,6 +34,9 @@ extern void _pei386_runtime_relocator (void);
 
 extern int main (int, char **, char **);
 
+/* TLS initialization hook.  */
+extern const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback;
+
 /*
  * Must have the correct app type for MSVCRT. 
  */
@@ -185,6 +188,10 @@ static void  __MINGW_ATTRIB_NORETURN
 __mingw_CRTStartup (void)
 {
   int nRet;
+
+  /* Initialize TLS callback.  */
+  if (__dyn_tls_init_callback != NULL)
+    __dyn_tls_init_callback (NULL, DLL_THREAD_ATTACH, NULL);
 
   /*
    * Set up the top-level exception handler so that signal handling

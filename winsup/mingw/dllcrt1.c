@@ -14,6 +14,9 @@
 #include <errno.h>
 #include <windows.h>
 
+/* TLS initialization hook. */
+extern const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback;
+
 /* Unlike normal crt1, I don't initialize the FPU, because the process
  * should have done that already. I also don't set the file handle modes,
  * because that would be rude. */
@@ -61,6 +64,12 @@ DllMainCRTStartup (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 	}
       *first_atexit =  NULL;
       next_atexit = first_atexit;
+
+      /* Initialize TLS callback.  */
+      if (__dyn_tls_init_callback != NULL)
+        {
+          __dyn_tls_init_callback (hDll, DLL_THREAD_ATTACH, lpReserved);
+        }
 
       /* Adust references to dllimported data (from other DLL's)
 	 that have non-zero offsets.  */ 

@@ -227,8 +227,9 @@ FLAGS_TO_PASS:=\
 CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
 	CRT_fp8.o CRT_fp10.o txtmode.o binmode.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
-	     main.o crtst.o mthr_stub.o CRT_fp10.o txtmode.o \
-	     pseudo-reloc.o pseudo-reloc-list.o cpu_features.o
+	     main.o crtst.o CRT_fp10.o txtmode.o \
+	     pseudo-reloc.o pseudo-reloc-list.o cpu_features.o \
+	     tlsmcrt.o tlsmthread.o tlssup.o tlsthrd.o
 
 MOLD_OBJS = isascii.o iscsym.o iscsymf.o toascii.o \
 	strcasecmp.o strncasecmp.o wcscmpi.o
@@ -247,6 +248,7 @@ LIBS = libcrtdll.a \
        libmoldname80.a libmoldname80d.a \
        libmoldname90.a libmoldname90d.a \
        $(LIBM_A) \
+       libmingwthrd_old.a \
        libmingwthrd.a
 
 DLLS = $(THREAD_DLL_NAME)
@@ -260,7 +262,7 @@ Makefile.in README TODO config.guess config.sub configure configure.in \
 aclocal.m4 crt1.c crtdll.def crtmt.c crtst.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs \
 moldname.def.in msvcrt.def.in ofmt_stub.s \
-mthr.c mthr_init.c mthr_stub.c readme.txt \
+mthr.c mthr_init.c tlsmcrt.c tlsmthread.c tlssup.c tlsthrd.c readme.txt \
 isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
@@ -290,7 +292,11 @@ libm.a: _libm_dummy.o
 	$(AR) rc $@ _libm_dummy.o
 	$(RANLIB) $@
 
-libmingwthrd.a: crtmt.o mingwthrd.def
+libmingwthrd.a: crtmt.o
+	$(AR) $(ARFLAGS) $@ crtmt.o
+	$(RANLIB) $@
+
+libmingwthrd_old.a: crtmt.o mingwthrd.def
 	$(DLLTOOL) $(DLLTOOL_FLAGS) --dllname $(THREAD_DLL_NAME) \
 	  --def mingwthrd.def --output-lib $@
 	$(AR) $(ARFLAGS) $@ crtmt.o
