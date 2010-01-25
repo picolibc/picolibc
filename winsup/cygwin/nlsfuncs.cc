@@ -57,6 +57,7 @@ __get_lcid_from_locale (const char *name)
   char *c;
   LCID lcid;
 
+  /* Speed up reusing the same locale as before, for instance in LC_ALL case. */
   if (!strcmp (name, last_locale))
     {
       debug_printf ("LCID=0x%04x", last_lcid);
@@ -72,16 +73,17 @@ __get_lcid_from_locale (const char *name)
     *c = '\0';
   /* "POSIX" already converted to "C" in loadlocale. */
   if (!strcmp (locale, "C"))
-    return 0;
+    return last_lcid = 0;
   c = strchr (locale, '_');
+  if (!c)
+    return last_lcid = (LCID) -1;
   if (wincap.has_localenames ())
     {
       wchar_t wlocale[ENCODING_LEN + 1];
 
       /* Convert to RFC 4646 syntax which is the standard for the locale names
 	 replacing LCIDs starting with Vista. */
-      if (c)
-	*c = '-';
+      *c = '-';
       mbstowcs (wlocale, locale, ENCODING_LEN + 1);
       lcid = LocaleNameToLCID (wlocale, 0);
       if (lcid == 0)
@@ -97,10 +99,10 @@ __get_lcid_from_locale (const char *name)
 	    { "ha-NG" , L"ha-Latn-NG"  },
 	    { "iu-CA" , L"iu-Cans-CA"  },
 	    { "mn-CN" , L"mn-Mong-CN"  },
-	    { "sr-CS" , L"sr-Latn-CS"  },
 	    { "sr-BA" , L"sr-Latn-BA"  },
-	    { "sr-RS" , L"sr-Latn-RS"  },
+	    { "sr-CS" , L"sr-Latn-CS"  },
 	    { "sr-ME" , L"sr-Latn-ME"  },
+	    { "sr-RS" , L"sr-Latn-RS"  },
 	    { "tg-TJ" , L"tg-Cyrl-TJ"  },
 	    { "tzm-DZ", L"tzm-Latn-DZ" },
 	    { "uz-UZ" , L"uz-Latn-UZ"  },
@@ -111,6 +113,10 @@ __get_lcid_from_locale (const char *name)
 	    if (!strcmp (locale, sc_only_locale[i].loc))
 	      {
 		lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
+		/* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
+		   deprecated sr-CS.  So we map ME and RS to CS here. */
+		if (lcid == 0 && !strncmp (locale, "sr-", 3))
+		  lcid = LocaleNameToLCID (L"sr-Latn-CS", 0);
 		break;
 	      }
 	}
@@ -120,8 +126,7 @@ __get_lcid_from_locale (const char *name)
     }
   /* Pre-Vista we have to loop through the LCID values and see if they
      match language and TERRITORY. */
-  if (c)
-    *c++ = '\0';
+  *c++ = '\0';
   /* locale now points to the language, c points to the TERRITORY */
   const char *language = locale;
   const char *territory = c;
@@ -154,10 +159,14 @@ __get_lcid_from_locale (const char *name)
     }
   if (lcid == 0 && territory)
     {
-      /* Unfortunately there are a four language LCID number areas
-         representing multiple languages.  Fortunately onle two of them
-	 already existed pre-Vista.  The concealed languages have to be
-	 tested explicitly, since they are not catched by the above loops. */
+      /* Unfortunately there are four language LCID number areas representing
+	 multiple languages.  Fortunately only two of them already existed
+	 pre-Vista.  The concealed languages have to be tested explicitly,
+	 since they are not catched by the above loops.
+	 This also enables the serbian ISO 3166 territory codes which have
+	 been changed post 2003, and maps them to the old wrong (SP was never
+	 a valid ISO 3166 code) territory code sr_SP which fortunately has the
+	 same LCID as the newer sr_CS. */
       struct {
 	const char *loc;
 	LCID	    lcid;
@@ -166,6 +175,9 @@ __get_lcid_from_locale (const char *name)
         { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK) },
 	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
 			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_LATIN)  },
+	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
+	{ "sr_ME", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
+	{ "sr_RS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
 	{ "sr_SP", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
 	{ NULL,    0 },
       };
@@ -791,7 +803,9 @@ __set_charset_from_locale (const char *locale, char *charset)
       cs = "BIG5";
       break;
     case 1250:
-      if (lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro) */
+      if (lcid == 0x081a		/* sr_CS (Serbian Language/Former
+						  Serbia and Montenegro) */
+	  || lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro)*/
 	  || lcid == 0x241a		/* sr_RS (Serbian Language/Serbia) */
 	  || lcid == 0x0442)		/* tk_TM (Turkmen/Turkmenistan) */
       	cs = "UTF-8";

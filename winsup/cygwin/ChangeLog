@@ -1,5 +1,14 @@
 2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__get_lcid_from_locale): Add comments.  Fix typos in
+	comments.  Make sure to set last_lcid every time.  Return locale
+	without territory part as invalid.  Handle modern serbian territory
+	names per ISO 3166 on older systems as well.  Add appropriate comment.
+	(__set_charset_from_locale): Handle LCID for sr_CS as well to make older
+	systems happy.
+
+2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* nlsfuncs.cc (__set_charset_from_locale): Rearrange to set charset
 	more closely aligned to Glibc.
 
