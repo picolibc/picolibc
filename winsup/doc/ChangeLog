@@ -1,3 +1,9 @@
+2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-setup.xml: Drop references to non-NT systems.
+	* faq-using.xml: Ditto.
+	(faq.using.sshd-in-domain): New FAQ entry.
+
 2010-01-25  Andy Koppe  <andy.koppe@gmail.com>
 
 	* faq-using.xml: Fix typos and remove incorrect locale-specific

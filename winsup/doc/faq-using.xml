@@ -331,7 +331,7 @@ PostScript files on non-PostScript Windows printers).  Start at
 <ulink url="http://cygwin.com/ml/cygwin/2001-04/msg00657.html">http://cygwin.com/ml/cygwin/2001-04/msg00657.html</ulink>.  Note that the
 <literal>file</literal> command is now available as part of Cygwin setup.
 </para>
-<para>Alternatively, on NT, you can use the Windows <literal>print</literal>
+<para>Alternatively, you can use the Windows <literal>print</literal>
 command.  (It does not seem to be available on Win9x.)  Type
 </para>
 <screen>
@@ -1015,6 +1015,76 @@ file:
 environment variable option "winsymlinks" 
 <ulink url="http://cygwin.com/cygwin-ug-net/using-cygwinenv.html">http://cygwin.com/cygwin-ug-net/using-cygwinenv.html</ulink>
 </para>
+</answer></qandaentry>
+
+<qandaentry id="faq.using.sshd-in-domain">
+<question><para>How do I setup sshd in a domain?</para></question>
+<answer>
+
+<para>
+If you want to be able to logon with domain accounts to a domain member
+machine, you should make sure that the "cyg_server" account under which
+the sshd service is usually running, is a domain account as well.  Here's
+how you set this up.
+</para>
+
+<para>
+First of all, create a new domain account called "cyg_server".  This
+account must be an administrative account, so make sure it's in the
+"Administrators" group.  Now create a domain policy which is propagated
+to all machines which are supposed to run an sshd service.  This domain
+policy should give the following user rights to the "cyg_server" account:
+</para>
+
+<screen>
+  Act as part of the operating system (SeTcbPrivilege)
+  Create a token object               (SeCreateTokenPrivilege)
+  Replace a process level token       (SeAssignPrimaryTokenPrivilege)
+</screen>
+
+<para>
+Now to install sshd on the member machine, logon to that machine as
+an admin.  Make sure the aforementioend global policy has been propagated
+to this machine.  Examine the Local Security Policy settings and, if
+necessary, call gpupdate.
+</para>
+
+<para>
+If everything looks ok, run bash.  Starting with Windows Vista, make
+sure you're running bash elevated.
+</para>
+
+<para>
+If "cyg_server" is not already in <literal>/etc/passwd</literal>, add it
+using <literal>mkpasswd</literal>.  Make sure all domain accounts which are
+supposed to be able to logon via ssh are in <literal>/etc/passwd</literal>.
+Also make sure that all important domain groups are in
+<literal>/etc/group</literal>.  If in doubt, call
+</para>
+
+<screen>
+  $ mkpasswd -l -d your_domain > /etc/passwd
+  $ mkgroup -l -d your_domain > /etc/group
+</screen>
+
+<para>
+Then run ssh-host-config.  Answer all questions so that "cyg_server" is
+used to run the service.  When done, check ownership of
+<literal>/var/empty</literal> and all <literal>/etc/ssh*</literal>
+files.  All of them must be owned by "cyg_server".  If that's ok, you're
+usually all set and you can start the sshd service via
+</para>
+
+<screen>
+  $ cygrunsrv -S sshd
+</screen>
+
+<para>or</para>
+
+<screen>
+  $ net start sshd
+</screen>
+
 </answer></qandaentry>
 
 <qandaentry id="faq.using.tcl-tk">

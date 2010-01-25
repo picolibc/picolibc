@@ -364,7 +364,7 @@ character as a word delimiter.  Under certain circumstances, it is
 possible to get around this with various shell quoting mechanisms, but
 you are much better off if you can avoid the problem entirely.
 </para>
-<para>On Windows NT/2000/XP you have two choices:
+<para>You have two choices:
 </para><orderedlist>
 <listitem><para>You can rename the user in the Windows User Manager GUI and then
 run mkpasswd.
@@ -376,10 +376,6 @@ run mkpasswd.
 </listitem>
 </orderedlist>
 
-<para>On Windows 95/98/ME you can create a new user and run mkpasswd, 
-or you can delete the offending entry from /etc/passwd. 
-Cygwin will then use the name in the default entry with uid 500.
-</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.setup.home">
