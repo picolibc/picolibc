@@ -489,23 +489,24 @@ spawn_guts (const char *prog_arg, const char *const *argv,
     }
 
   runpath = null_app_name ? NULL : real_path.get_wide_win32_path (runpath);
-  { /* If the executable path length is < MAX_PATH, make sure the long path
-       win32 prefix is removed from the path to make subsequent native Win32
-       child processes happy which are not long path aware. */
-    USHORT len = real_path.get_nt_native_path ()->Length;
-    if (len < (MAX_PATH + 4) * sizeof (WCHAR)
-    	|| (runpath[5] != L':'				/* UNC path */
-	    && len < (MAX_PATH + 6) * sizeof (WCHAR)))
-      {
-	PWCHAR r = runpath + 4;
-	if (r[1] != L':') /* UNC path */
-	  *(r += 2) = L'\\';
-	if (!RtlIsDosDeviceName_U (r))
-	  runpath = r;
-	else if (*r == L'\\')
-	  *r = L'C';
-      }
-  }
+  if (runpath)
+    { /* If the executable path length is < MAX_PATH, make sure the long path
+	 win32 prefix is removed from the path to make subsequent native Win32
+	 child processes happy which are not long path aware. */
+      USHORT len = real_path.get_nt_native_path ()->Length;
+      if (len < (MAX_PATH + 4) * sizeof (WCHAR)
+	  || (runpath[5] != L':'				/* UNC path */
+	      && len < (MAX_PATH + 6) * sizeof (WCHAR)))
+	{
+	  PWCHAR r = runpath + 4;
+	  if (r[1] != L':') /* UNC path */
+	    *(r += 2) = L'\\';
+	  if (!RtlIsDosDeviceName_U (r))
+	    runpath = r;
+	  else if (*r == L'\\')
+	    *r = L'C';
+	}
+    }
 
   syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
 		  runpath, wone_line);
