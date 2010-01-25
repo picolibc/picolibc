@@ -1,3 +1,8 @@
+2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getlocale.c (main): Use setlocale and fetch string from Windows
+	using GetLocaleInfoW.  Explain why.
+
 2010-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (CYGWIN_BINS): Add getlocale.

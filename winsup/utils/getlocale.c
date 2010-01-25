@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <locale.h>
 #define WINVER 0x0601
 #include <windows.h>
 
@@ -83,6 +84,7 @@ int main (int argc, char **argv)
   const char *utf = "";
   char name[32];
 
+  setlocale (LC_ALL, "");
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
@@ -112,13 +114,15 @@ int main (int argc, char **argv)
 	    lcid = (sublang << 10) | lang;
 	    if (getlocale (lcid, name))
 	      {
-		char lang[256];
-		char country[256];
+		wchar_t lang[256];
+		wchar_t country[256];
 		char loc[32];
-		GetLocaleInfo (lcid, LOCALE_SENGLANGUAGE, lang, 256);
-		GetLocaleInfo (lcid, LOCALE_SENGCOUNTRY, country, 256);
+		/* Go figure.  Even the English name of a language or
+		   locale might contain native characters. */
+		GetLocaleInfoW (lcid, LOCALE_SENGLANGUAGE, lang, 256);
+		GetLocaleInfoW (lcid, LOCALE_SENGCOUNTRY, country, 256);
 		stpcpy (stpcpy (loc, name), utf);
-		printf ("%-16s %s (%s)\n", loc, lang, country);
+		printf ("%-16s %ls (%ls)\n", loc, lang, country);
 	      }
 	  }
       return 0;
