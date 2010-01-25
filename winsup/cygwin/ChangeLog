@@ -1,3 +1,8 @@
+2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__get_lcid_from_locale):  Fix a comment.  Handle special
+	language/TERRITORY combinations explicitely.  Explain why.
+
 2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__set_charset_from_locale): Fix comment.

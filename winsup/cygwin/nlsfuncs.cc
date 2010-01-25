@@ -73,15 +73,47 @@ __get_lcid_from_locale (const char *name)
   /* "POSIX" already converted to "C" in loadlocale. */
   if (!strcmp (locale, "C"))
     return 0;
-  /* Convert to form understood by LocaleNameToLCID */
   c = strchr (locale, '_');
-  if (c)
-    *c = '-';
   if (wincap.has_localenames ())
     {
       wchar_t wlocale[ENCODING_LEN + 1];
+
+      /* Convert to RFC 4646 syntax which is the standard for the locale names
+	 replacing LCIDs starting with Vista. */
+      if (c)
+	*c = '-';
       mbstowcs (wlocale, locale, ENCODING_LEN + 1);
       lcid = LocaleNameToLCID (wlocale, 0);
+      if (lcid == 0)
+	{
+	  /* Unfortunately there are a couple of locales for which no form
+	     without a Script part per RFC 4646 exists. */
+	  struct {
+	    const char    *loc;
+	    const wchar_t *wloc;
+	  } sc_only_locale[] = {
+	    { "az-AZ" , L"az-Latn-AZ"  },
+	    { "bs-BA" , L"bs-Latn-BA"  },
+	    { "ha-NG" , L"ha-Latn-NG"  },
+	    { "iu-CA" , L"iu-Cans-CA"  },
+	    { "mn-CN" , L"mn-Mong-CN"  },
+	    { "sr-CS" , L"sr-Latn-CS"  },
+	    { "sr-BA" , L"sr-Latn-BA"  },
+	    { "sr-RS" , L"sr-Latn-RS"  },
+	    { "sr-ME" , L"sr-Latn-ME"  },
+	    { "tg-TJ" , L"tg-Cyrl-TJ"  },
+	    { "tzm-DZ", L"tzm-Latn-DZ" },
+	    { "uz-UZ" , L"uz-Latn-UZ"  },
+	    { NULL    , NULL          }
+	  };
+	  for (int i = 0; sc_only_locale[i].loc
+			  && sc_only_locale[i].loc[0] <= locale[0]; ++i)
+	    if (!strcmp (locale, sc_only_locale[i].loc))
+	      {
+		lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
+		break;
+	      }
+	}
       last_lcid = lcid ?: (LCID) -1;
       debug_printf ("LCID=0x%04x", last_lcid);
       return last_lcid;
@@ -119,6 +151,34 @@ __get_lcid_from_locale (const char *name)
 	}
       if (sublang > 0x14)
 	lcid = 0;
+    }
+  if (lcid == 0 && territory)
+    {
+      /* Unfortunately there are a four language LCID number areas
+         representing multiple languages.  Fortunately onle two of them
+	 already existed pre-Vista.  The concealed languages have to be
+	 tested explicitly, since they are not catched by the above loops. */
+      struct {
+	const char *loc;
+	LCID	    lcid;
+      } ambiguous_locale[] = {
+	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			  },
+        { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK) },
+	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
+			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_LATIN)  },
+	{ "sr_SP", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
+	{ NULL,    0 },
+      };
+      *--c = '_';
+      for (int i = 0; ambiguous_locale[i].loc
+		      && ambiguous_locale[i].loc[0] <= locale[0]; ++i)
+	if (!strcmp (locale, ambiguous_locale[i].loc)
+	    && GetLocaleInfo (ambiguous_locale[i].lcid, LOCALE_SISO639LANGNAME,
+			      iso, 10))
+	  {
+	    lcid = ambiguous_locale[i].lcid;
+	    break;
+	  }
     }
   last_lcid = lcid ?: (LCID) -1;
   debug_printf ("LCID=0x%04x", last_lcid);
