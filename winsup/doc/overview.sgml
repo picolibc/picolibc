@@ -84,16 +84,16 @@ new interface the Cygwin API. Once written, it was possible to build working
 Win32 tools using UNIX-hosted cross-compilers, linking against this
 library.</para>
 
-<para>From this point, we pursued the goal of producing native tools
+<para>From this point, we pursued the goal of producing Windows-hosted tools
 capable of rebuilding themselves under Windows 9x and NT (this is
 often called self-hosting). Since neither OS ships with standard UNIX
 user tools (fileutils, textutils, bash, etc...), we had to get the GNU
-equivalents working with the Cygwin API. Most of these tools were
+equivalents working with the Cygwin API. Many of these tools were
 previously only built natively so we had to modify their configure
 scripts to be compatible with cross-compilation. Other than the
 configuration changes, very few source-level changes had to be
-made. Running bash with the development tools and user tools in place,
-Windows 9x and NT look like a flavor of UNIX from the perspective of
+made since Cygwin provided a UNIX-like API. Running bash with the development tools and user tools in place,
+Windows 9x and NT looked like a flavor of UNIX from the perspective of
 the GNU configure mechanism. Self hosting was achieved as of the beta
 17.1 release in October 1996.</para>
 
@@ -101,7 +101,7 @@ the GNU configure mechanism. Self hosting was achieved as of the beta
 The entire Cygwin toolset was available as a monolithic install. In
 April 2000, the project announced a
 <ulink url="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
-New Cygwin Net Release</ulink> which provided the native Win32 program
+New Cygwin Net Release</ulink> which provided the native non-Cygwin Win32 program
 <command>setup.exe</command> to install and upgrade each package
 separately. Since then, the Cygwin DLL and <command>setup.exe</command> 
 have seen continuous development.

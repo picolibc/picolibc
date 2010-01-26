@@ -17,6 +17,8 @@ CC:=@CC@
 CC_FOR_TARGET:=@CC@
 exeext:=@build_exeext@
 
+XMLTO:=xmlto --skip-validation
+
 include $(srcdir)/../Makefile.common
 
 TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool.exe *.junk \
@@ -44,13 +46,13 @@ clean:
 install:	all
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.sgml doctool
-	-xmlto html-nochunks -m $(srcdir)/cygwin.dsl $<
+	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.dsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
-	-xmlto html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
+	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
 
 # Some versions of jw hang with the -o option
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.sgml
@@ -60,7 +62,7 @@ cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.sgml
-	-xmlto html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
+	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.sgml
 	-cd cygwin-api && docbook2pdf ../$<
@@ -69,11 +71,11 @@ cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 faq/faq.html : $(FAQ_SOURCES)
-	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
+	-${XMLTO} html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.*.html
 
 faq/faq-nochunks.html : $(FAQ_SOURCES)
-	-xmlto html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
+	-${XMLTO} html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq-nochunks.html
 
 ./doctool : doctool.c

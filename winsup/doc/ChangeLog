@@ -1,3 +1,11 @@
+2010-01-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Skip validation in xmlto step.
+
+2010-01-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* overview.sgml: Clarify language in "A brief history of Cygwin".
+
 2010-01-26  Thomas Wolff  <towo@towo.net>
 
 	* new-features.sgml (ov-new1.7.2): Add console enhancements.
