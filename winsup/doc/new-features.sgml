@@ -61,11 +61,46 @@
 <listitem><para>
 Support open(2) flags O_CLOEXEC and O_TTY_INIT flags.  Support fcntl
 flag F_DUPFD_CLOEXEC.  Support socket flags SOCK_CLOEXEC and SOCK_NONBLOCK.
-</para></listitem>
-
-<listitem><para>
 Add new Linux-compatible API calls accept4(2), dup3(2), and pipe2(2).
 </para></listitem>
+
+<listitem><para>Enhanced console window support.</para>
+
+  <itemizedlist mark="bullet">
+
+  <listitem><para>
+  Function keys send distinguished escape sequences compatible with rxvt.
+  Keypad keys send distinguished escape sequences, xterm-style.
+  </para></listitem>
+
+  <listitem><para>
+  Support of combining Alt and AltGr modifiers in console window
+  (compatible with xterm and mintty), so that e.g. Alt-@ sends ESC @
+  also on keyboards where @ is mapped to an AltGr combination.
+  </para></listitem>
+
+  <listitem><para>
+  Report mouse wheel scroll events in mouse reporting mode 1000 (note:
+  this doesn't seem to work on all systems, assumedly due to driver
+  interworking issues).
+  Add mouse reporting mode 1002 to report mouse drag movement.
+  Add mouse reporting mode 1003 to report any mouse movement.
+  Add focus event reporting (mode 1004), compatible with xterm and mintty.
+  </para></listitem>
+
+  <listitem><para>
+  Add escape sequences for not bold (22), not invisible (28), not
+  blinking (25) (compatible with xterm and mintty).
+  </para></listitem>
+
+  <listitem><para>
+  Support VT100 line drawing graphics mode in console window (compatible
+  with xterm and mintty).
+  </para></listitem>
+
+  </itemizedlist>
+
+</listitem>
 
 <listitem><para>
 Recognize NWFS filesystem and workaround broken OS call.

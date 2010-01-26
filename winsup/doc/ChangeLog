@@ -1,3 +1,7 @@
+2010-01-26  Thomas Wolff  <towo@towo.net>
+
+	* new-features.sgml (ov-new1.7.2): Add console enhancements.
+
 2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-setup.xml: Drop references to non-NT systems.
