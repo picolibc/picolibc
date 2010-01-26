@@ -69,7 +69,7 @@ Windows applications can deal with POSIX \n line endings just fine
 (unfortunate exception: Notepad).  So we suggest to use binary mode
 as much as possible and only convert files from or to DOS text mode
 using tools specifically created to do that job, for instance, d2u and
-u2d from the util-linux package.
+u2d from the cygutils package.
 </para>
 <para>It is rather easy for the porter of a Unix package to fix the source
 code by supplying the appropriate file processing mode switches to the
