@@ -493,6 +493,11 @@ sigfe.o: sigfe.s
 
 winsup.h: config.h
 
+ctags: CTAGS
+tags:  CTAGS
+CTAGS:
+	-cd $(srcdir) && ctags -R --regex-C++='/^([a-zA-Z0-9_]*::[a-zA-Z0-9_]*) /\1/f/' .
+
 deps:=${wildcard *.d}
 ifneq (,$(deps))
 include $(deps)

@@ -1,3 +1,7 @@
+2010-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (tags, ctags, CTAGS)): Add rules to create tags file.
+
 2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__get_lcid_from_locale): Add comments.  Fix typos in
