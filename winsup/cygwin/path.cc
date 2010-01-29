@@ -514,7 +514,7 @@ getfileattr (const char *path, bool caseinsensitive) /* path has to be always ab
 	 directory query. */
       UNICODE_STRING dirname, basename;
       HANDLE dir;
-      FILE_DIRECTORY_INFORMATION fdi;
+      FILE_BOTH_DIRECTORY_INFORMATION fdi;
 
       RtlSplitUnicodePath (&upath, &dirname, &basename);
       InitializeObjectAttributes (&attr, &dirname,
@@ -529,7 +529,7 @@ getfileattr (const char *path, bool caseinsensitive) /* path has to be always ab
 	{
 	  status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io,
 					 &fdi, sizeof fdi,
-					 FileDirectoryInformation,
+					 FileBothDirectoryInformation,
 					 TRUE, &basename, TRUE);
 	  NtClose (dir);
 	  if (NT_SUCCESS (status) || status == STATUS_BUFFER_OVERFLOW)
@@ -2209,18 +2209,22 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	 Fortunately it's ignored on most other file systems so we don't have
 	 to special case NFS too much. */
       status = NtCreateFile (&h,
-			     READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_EA,
+			     READ_CONTROL | FILE_READ_ATTRIBUTES,
 			     &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
 			     FILE_OPEN,
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
+      debug_printf ("%p = NtCreateFile (%S)", status, &upath);
       /* No right to access EAs or EAs not supported? */
-      if (status == STATUS_ACCESS_DENIED || status == STATUS_EAS_NOT_SUPPORTED
-	  || status == STATUS_NOT_SUPPORTED
-	  /* Or a bug in Samba 3.2.x (x <= 7) when accessing a share's root dir
-	     which has EAs enabled? */
-	  || status == STATUS_INVALID_PARAMETER)
+      if (!NT_SUCCESS (status)
+	  && (status == STATUS_ACCESS_DENIED
+	      || status == STATUS_EAS_NOT_SUPPORTED
+	      || status == STATUS_NOT_SUPPORTED
+	      || status == STATUS_INVALID_NETWORK_RESPONSE
+	      /* Or a bug in Samba 3.2.x (x <= 7) when accessing a share's
+		 root dir which has EAs enabled? */
+	      || status == STATUS_INVALID_PARAMETER))
 	{
 	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
@@ -2235,6 +2239,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  debug_printf ("%p = NtOpenFile (no-EA, %S)", status, &upath);
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND && ci_flag == 0
 	  && wincap.has_broken_udf ())
@@ -2247,6 +2252,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  debug_printf ("%p = NtOpenFile (broken-UDF, %S)", status, &upath);
 	  attr.Attributes = 0;
 	  if (NT_SUCCESS (status))
 	    {
@@ -2261,12 +2267,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	    }
 	}
 
-      /* Check file system while we're having the file open anyway.
-	 This speeds up path_conv noticably (~10%). */
-      if (!fs_update_called)
-	fs.update (&upath, h);
-
       if (NT_SUCCESS (status)
+	  /* Check file system while we're having the file open anyway.
+	     This speeds up path_conv noticably (~10%). */
+	  && (fs_update_called || fs.update (&upath, h))
 	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
 			 ? NtQueryAttributesFile (&attr, &fbi)
 			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
@@ -2306,7 +2310,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	      OBJECT_ATTRIBUTES dattr;
 	      HANDLE dir;
 	      struct {
-		FILE_DIRECTORY_INFORMATION fdi;
+		FILE_BOTH_DIRECTORY_INFORMATION fdi;
 		WCHAR dummy_buf[NAME_MAX + 1];
 	      } fdi_buf;
 
@@ -2332,7 +2336,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 		{
 		  status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
 						 &fdi_buf, sizeof fdi_buf,
-						 FileDirectoryInformation,
+						 FileBothDirectoryInformation,
 						 TRUE, &basename, TRUE);
 		  /* Take the opportunity to check file system while we're
 		     having the handle to the parent dir. */

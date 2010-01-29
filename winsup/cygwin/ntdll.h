@@ -1,7 +1,7 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009 Red Hat, Inc.
+   2009, 2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -39,6 +39,7 @@
 #define STATUS_DISK_FULL              ((NTSTATUS) 0xc000007f)
 #define STATUS_WORKING_SET_QUOTA      ((NTSTATUS) 0xc00000a1)
 #define STATUS_NOT_SUPPORTED          ((NTSTATUS) 0xc00000bb)
+#define STATUS_INVALID_NETWORK_RESPONSE ((NTSTATUS) 0xc00000c3)
 #define STATUS_DIRECTORY_NOT_EMPTY    ((NTSTATUS) 0xc0000101)
 #define STATUS_CANNOT_DELETE          ((NTSTATUS) 0xc0000121)
 #define STATUS_INVALID_LEVEL          ((NTSTATUS) 0xc0000148)
@@ -153,7 +154,7 @@ typedef struct _FILE_DIRECTORY_INFORMATION {
   WCHAR  FileName[1];
 } FILE_DIRECTORY_INFORMATION, *PFILE_DIRECTORY_INFORMATION;
 
-typedef struct _FILE_BOTH_DIR_INFORMATION
+typedef struct _FILE_BOTH_DIRECTORY_INFORMATION
 {
   ULONG  NextEntryOffset;
   ULONG  FileIndex;
@@ -169,7 +170,7 @@ typedef struct _FILE_BOTH_DIR_INFORMATION
   CCHAR  ShortNameLength;
   WCHAR  ShortName[12];
   WCHAR  FileName[1];
-} FILE_BOTH_DIR_INFORMATION, *PFILE_BOTH_DIR_INFORMATION;
+} FILE_BOTH_DIRECTORY_INFORMATION, *PFILE_BOTH_DIRECTORY_INFORMATION;
 
 typedef struct _FILE_ID_BOTH_DIR_INFORMATION
 {

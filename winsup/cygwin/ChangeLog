@@ -1,3 +1,22 @@
+2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout, use FileBothDirectoryInformation info class rather than
+	FileDirectoryInformation info class to avoid problems with incomplete
+	filesystem implementations.  Fix comments accordingly.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Set
+	fname->Length to 0 in error case to avoid potential crash in debug
+	output.
+	(fhandler_disk_file::readdir): Try to speed up the working default case.
+	Check for STATUS_INVALID_NETWORK_RESPONSE as potential status value
+	returned by filesystems not implementing FileIdBothDirectoryInformation.
+	* ntdll.h (STATUS_INVALID_NETWORK_RESPONSE): Define.
+	(FILE_BOTH_DIRECTORY_INFORMATION): Rename to official name.
+	* path.cc (symlink_info::check): Don't request FILE_READ_EA access, it's
+	not required for NFS.  Try to speed up the working default case.  Check
+	for STATUS_INVALID_NETWORK_RESPONSE as potential status value returned
+	by filesystems not supporting non-NULL EA parameters.  Fix the way
+	fs.update is called.  Improve debug output.
+
 2010-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (tags, ctags, CTAGS)): Add rules to create tags file.

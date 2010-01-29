@@ -211,11 +211,11 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 
   unsigned count = 0;
   bool first = true;
-  PFILE_DIRECTORY_INFORMATION fdibuf = (PFILE_DIRECTORY_INFORMATION)
+  PFILE_BOTH_DIRECTORY_INFORMATION fdibuf = (PFILE_BOTH_DIRECTORY_INFORMATION)
 				       alloca (65536);
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
   while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, NULL, &io, fdibuf,
-					   65536, FileDirectoryInformation,
+					   65536, FileBothDirectoryInformation,
 					   FALSE, NULL, first)))
     {
       if (first)
@@ -227,9 +227,9 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	  if (fdibuf->FileNameLength != 2 || fdibuf->FileName[0] != L'.')
 	    count = 2;
 	}
-      for (PFILE_DIRECTORY_INFORMATION pfdi = fdibuf;
+      for (PFILE_BOTH_DIRECTORY_INFORMATION pfdi = fdibuf;
 	   pfdi;
-	   pfdi = (PFILE_DIRECTORY_INFORMATION)
+	   pfdi = (PFILE_BOTH_DIRECTORY_INFORMATION)
 		  (pfdi->NextEntryOffset ? (PBYTE) pfdi + pfdi->NextEntryOffset
 					 : NULL))
 	{
@@ -434,7 +434,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
   else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, NULL,
 						 &io, &fdi_buf.fdi,
 						 sizeof fdi_buf,
-						 FileDirectoryInformation,
+						 FileBothDirectoryInformation,
 						 TRUE, &basename, TRUE)))
     FileId.QuadPart = 0; /* get_ino is called in fstat_helper. */
   if (!NT_SUCCESS (status))
@@ -1665,7 +1665,7 @@ fhandler_disk_file::opendir (int fd)
 	     OS/FS combinations (say, Win2K/CDFS or so).  Instead of
 	     testing in readdir for yet another error code, let's use
 	     FileIdBothDirectoryInformation only on filesystems supporting
-	     persistent ACLs, FileDirectoryInformation otherwise.
+	     persistent ACLs, FileBothDirectoryInformation otherwise.
 
 	     NFS clients hide dangling symlinks from directory queries,
 	     unless you use the FileNamesInformation info class.
@@ -1770,7 +1770,10 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
 	added = true;
       if (!added)
-	return geterrno_from_win_error (w32_err);
+	{
+	  fname->Length = 0;
+	  return geterrno_from_win_error (w32_err);
+	}
 
       attr = 0;
       dir->__flags &= ~dirent_set_d_ino;
@@ -1891,30 +1894,32 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 	     which return STATUS_NOT_SUPPORTED rather than handling this info
 	     class.  We just fall back to using a standard directory query in
 	     this case and note this case using the dirent_get_d_ino flag. */
-	  if (status == STATUS_INVALID_LEVEL
-	      || status == STATUS_NOT_SUPPORTED
-	      || status == STATUS_INVALID_PARAMETER
-	      || status == STATUS_INVALID_INFO_CLASS)
+	  if (!NT_SUCCESS (status) && status != STATUS_NO_MORE_FILES
+	      && (status == STATUS_INVALID_LEVEL
+		  || status == STATUS_NOT_SUPPORTED
+		  || status == STATUS_INVALID_PARAMETER
+		  || status == STATUS_INVALID_NETWORK_RESPONSE
+		  || status == STATUS_INVALID_INFO_CLASS))
 	    dir->__flags &= ~dirent_get_d_ino;
 	  /* Something weird happens on Samba up to version 3.0.21c, which is
 	     fixed in 3.0.22.  FileIdBothDirectoryInformation seems to work
 	     nicely, but only up to the 128th entry in the directory.  After
 	     reaching this entry, the next call to NtQueryDirectoryFile
 	     (FileIdBothDirectoryInformation) returns STATUS_INVALID_LEVEL.
-	     Why should we care, we can just switch to FileDirectoryInformation,
-	     isn't it?  Nope!  The next call to
-	       NtQueryDirectoryFile(FileDirectoryInformation)
-	     actually returns STATUS_NO_MORE_FILES, regardless how many files
-	     are left unread in the directory.  This does not happen when using
-	     FileDirectoryInformation right from the start, but since
+	     Why should we care, we can just switch to
+	     FileBothDirectoryInformation, isn't it?  Nope!  The next call to
+	     NtQueryDirectoryFile(FileBothDirectoryInformation) actually
+	     returns STATUS_NO_MORE_FILES, regardless how many files are left
+	     unread in the directory.  This does not happen when using
+	     FileBothDirectoryInformation right from the start, but since
 	     we can't decide whether the server we're talking with has this
 	     bug or not, we end up serving Samba shares always in the slow
-	     mode using FileDirectoryInformation.  So, what we do here is
+	     mode using FileBothDirectoryInformation.  So, what we do here is
 	     to implement the solution suggested by Andrew Tridgell,  we just
 	     reread all entries up to dir->d_position using
-	     FileDirectoryInformation.
+	     FileBothDirectoryInformation.
 	     However, We do *not* mark this server as broken and fall back to
-	     using FileDirectoryInformation further on.  This would slow
+	     using FileBothDirectoryInformation further on.  This would slow
 	     down every access to such a server, even for directories under
 	     128 entries.  Also, bigger dirs only suffer from one additional
 	     call per full directory scan, which shouldn't be too big a hit.
@@ -1929,7 +1934,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 		      status = NtQueryDirectoryFile (get_handle (), NULL, NULL,
 					   NULL, &io, d_cache (dir),
 					   DIR_BUF_SIZE,
-					   FileDirectoryInformation,
+					   FileBothDirectoryInformation,
 					   FALSE, NULL, cnt == 0);
 		      if (!NT_SUCCESS (status))
 			goto go_ahead;
@@ -1949,7 +1954,7 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 				       d_cache (dir), DIR_BUF_SIZE,
 				       (dir->__flags & dirent_nfs_d_ino)
 				       ? FileNamesInformation
-				       : FileDirectoryInformation,
+				       : FileBothDirectoryInformation,
 				       FALSE, NULL, dir->__d_position == 0);
     }
 
@@ -1982,9 +1987,11 @@ go_ahead:
 	}
       else
 	{
-	  FileName = ((PFILE_DIRECTORY_INFORMATION) buf)->FileName;
-	  FileNameLength = ((PFILE_DIRECTORY_INFORMATION) buf)->FileNameLength;
-	  FileAttributes = ((PFILE_DIRECTORY_INFORMATION) buf)->FileAttributes;
+	  FileName = ((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileName;
+	  FileNameLength =
+		((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileNameLength;
+	  FileAttributes =
+		((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileAttributes;
 	}
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
