@@ -47,7 +47,9 @@ endif # USE_LIBTOOL
 
 SUFFIXES = .def
 
-CHEWOUT_FILES =
+CHEWOUT_FILES = \
+	bsearch.def \
+	qsort.def
 
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 

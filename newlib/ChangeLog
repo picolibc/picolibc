@@ -1,3 +1,9 @@
+2010-01-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/search/Makefile.am: Create .def files for bsearch and qsort.
+	* libc/search/Makefile.in: Regenerated.
+	* libc/stdlib/stdlib.tex: Add bsearch and qsort.
+
 2010-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/nl_langinfo.c (nl_langinfo): Return "CP932" when using

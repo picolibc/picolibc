@@ -14,6 +14,7 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * atof::        String to double or float
 * atoi::        String to integer
 * atoll::       String to long long
+* bsearch::	Binary search
 * calloc::      Allocate space for arrays
 * div::         Divide two integers
 * ecvtbuf::     Double or float to string of digits
@@ -34,6 +35,7 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * mblen::	Minimal multibyte length
 * mbtowc::      Minimal multibyte to wide character converter
 * on_exit::     Request execution of functions at program exit
+* qsort::	Array sort
 * rand::        Pseudo-random numbers
 * rand48::      Uniformly distributed pseudo-random numbers
 * strtod::      String to double or float
@@ -78,6 +80,9 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 
 @page
 @include stdlib/atoll.def
+
+@page
+@include search/bsearch.def
 
 @page
 @include stdlib/calloc.def
@@ -135,6 +140,9 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 
 @page
 @include stdlib/on_exit.def
+
+@page
+@include search/qsort.def
 
 @page
 @include stdlib/rand.def
