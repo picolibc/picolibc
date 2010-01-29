@@ -25,5 +25,6 @@ rem the security checks and there's apparently no runtmchk.lib anymore.
 rem I leave the old statements in for reference.
 rem cl /Wp64 /c cyglsa.c
 rem link /nodefaultlib /dll /machine:x64 /entry:DllMain /out:cyglsa64.dll /def:mslsa.def cyglsa.obj runtmchk.lib advapi32.lib kernel32.lib ntdll.lib
-cl /Wp64 /EHs-c- /GS- /GR- /GL- /c cyglsa.c
+rem cl /Wp64 /EHs-c- /GS- /GR- /GL- /c cyglsa.c
+cl /EHs-c- /GS- /GR- /GL- /c cyglsa.c
 link /nodefaultlib /dll /machine:x64 /entry:DllMain /out:cyglsa64.dll /def:mslsa.def cyglsa.obj advapi32.lib kernel32.lib ntdll.lib

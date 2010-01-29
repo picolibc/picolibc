@@ -1,3 +1,11 @@
+2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Include lmcons.h instead of lm.h to make newer WinDDK happy.
+	(LsaApLogonUserEx): Use CYG_LSA_MAGIC as checksum start value to 
+	decouple from Cygwin release.
+	* make-64bit-version-with-visual-c.bat: Avoid compiler warning.
+	* cyglsa64.dll: New build.
+
 2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
 
 	* Makefile.in: Add DESTDIR functionality.

@@ -1,6 +1,6 @@
 /* cyglsa.c: LSA authentication module for Cygwin
 
-   Copyright 2006, 2008 Red Hat, Inc.
+   Copyright 2006, 2008, 2010 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -16,7 +16,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include <wchar.h>
 #include <windows.h>
 #include <wininet.h>
-#include <lm.h>
+#include <lmcons.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
 #ifdef __MINGW32__
@@ -322,8 +322,7 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       cyglsa_printf ("Invalid authentication parameter.\n");
       return STATUS_INVALID_PARAMETER;
     }
-  checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
-				   CYGWIN_VERSION_DLL_MINOR);
+  checksum = CYG_LSA_MAGIC;
   csp = (PDWORD) &authinf->username;
   csp_end = (PDWORD) ((PBYTE) authinf + auth_len);
   while (csp < csp_end)
