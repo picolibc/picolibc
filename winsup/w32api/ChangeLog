@@ -1,5 +1,10 @@
 2010-01-26  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
 
+	* include/shldisp.h (AUTOCOMPLETEOPTIONS): Add version guard around
+	ACO_WORD_FILTER and ACO_NOPREFIXFILTERING.
+
+2010-01-26  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
+
 	* include/shldisp.h (AUTOCOMPLETEOPTIONS): Add enum.
 
 2009-20-10  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
