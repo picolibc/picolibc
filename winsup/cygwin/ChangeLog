@@ -1,5 +1,11 @@
 2010-01-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* dll_init.cc (remove_dll_atexit): New function.
+	(dll_list::detach): Run any atexit handlers registered in the DLL prior
+	to unloading.
+
+2010-01-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* libc/strfmon.c (__setup_vars): Fix compiler warning about assigning
 	const strings.  Compare a pointer to NULL rather than '\0'.
 

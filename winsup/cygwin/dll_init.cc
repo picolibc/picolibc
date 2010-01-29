@@ -20,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include "cygtls.h"
 #include <wchar.h>
+#include <sys/reent.h>
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -142,6 +143,32 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   return d;
 }
 
+/* This function looks for every atexit function registered in the
+   about-to-be-unloaded DLL and runs it.
+
+   newlib does not provide any method for selectively running elements
+   from the atexit() queue so we have to roll our own.
+
+   Note that this is not foolproof since a function in the DLL could
+   register an atexit function outside of the DLL and that should be
+   run when the DLL detachs.  */
+static void
+remove_dll_atexit (MEMORY_BASIC_INFORMATION& m)
+{
+  unsigned char *dll_beg = (unsigned char *) m.AllocationBase;
+  unsigned char *dll_end = (unsigned char *) m.AllocationBase + m.RegionSize;
+  struct _atexit *p = _GLOBAL_REENT->_atexit;
+  for (int n = p->_ind - 1; n >= 0; n--)
+    {
+      void (*fn) (void) = p->_fns[n];
+      if ((unsigned char *) fn >= dll_beg && (unsigned char *) fn < dll_end)
+	{
+	  fn ();
+	  p->_fns[n] = NULL;
+	}
+    }
+}
+
 /* Detach a DLL from the chain. */
 void
 dll_list::detach (void *retaddr)
@@ -161,6 +188,7 @@ dll_list::detach (void *retaddr)
       system_printf ("WARNING: trying to detach an already detached dll ...");
     else if (--d->count == 0)
       {
+	remove_dll_atexit (m);
 	d->run_dtors ();
 	d->prev->next = d->next;
 	if (d->next)
