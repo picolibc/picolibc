@@ -251,7 +251,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
       /* Win 95 seems to return NULL instead of INVALID_HANDLE_VALUE */
-      if (r && r != INVALID_HANDLE_VALUE)
+      if (r != INVALID_HANDLE_VALUE)
 	{
 	  debug_printf ("pipe read handle %p", r);
 	  break;

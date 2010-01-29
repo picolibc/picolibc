@@ -384,7 +384,7 @@ dll_dllcrt0_1 (VOID *x)
     res = (DWORD) d;
 }
 
-/* OBSOLETE: This function is obsolescent and will go away in the
+/* OBSOLETE: This function is obsolete and will go away in the
    future.  Cygwin can now handle being loaded from a noncygwin app
    using the same entry point. */
 
