@@ -1053,8 +1053,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   authinf->inf.DefaultDacl.DefaultDacl = offset;
   memcpy ((PBYTE) &authinf->inf + offset, dacl, dsize);
 
-  authinf->checksum = CYGWIN_VERSION_MAGIC (CYGWIN_VERSION_DLL_MAJOR,
-					    CYGWIN_VERSION_DLL_MINOR);
+  authinf->checksum = CYG_LSA_MAGIC;
   PDWORD csp;
   PDWORD csp_end;
   csp = (PDWORD) &authinf->username;

@@ -1,5 +1,10 @@
 2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (lsaauth): Use CYG_LSA_MAGIC as checksum start value to
+	decouple from Cygwin release.
+
+2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/strfmon.c (__setup_vars): Test for an empty string rather than
 	for a NULL pointer.
 
