@@ -1,3 +1,8 @@
+2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/strfmon.c (__setup_vars): Test for an empty string rather than
+	for a NULL pointer.
+
 2010-01-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll_init.cc (remove_dll_atexit): New function.
