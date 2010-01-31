@@ -1,3 +1,10 @@
+2010-01-31  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	Sync from gcc:
+	* configure.ac: Add "recommended" version checks for GMP/MPC.
+	Update recommended GMP/MPFR/MPC versions.
+	* configure: Regenerate.
+
 2010-01-25  Joern Rennecke  <amylaar@spamcop.net>
 
 	gcc PR libstdc++/36101, gcc PR libstdc++/42813
