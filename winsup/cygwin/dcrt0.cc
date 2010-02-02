@@ -1108,24 +1108,18 @@ do_exit (int status)
   myself.exit (n);
 }
 
-static NO_COPY muto atexit_lock;
-
 extern "C" int
-cygwin_atexit (void (*function)(void))
+cygwin_atexit (void (*fn) (void))
 {
   int res;
-  atexit_lock.init ("atexit_lock");
-  atexit_lock.acquire ();
-  res = atexit (function);
-  atexit_lock.release ();
+  dll *d = dlls.find ((void *) _my_tls.retaddr ());
+  res = d ? __cxa_atexit ((void (*) (void *)) fn, NULL, d) : atexit (fn);
   return res;
 }
 
 extern "C" void
 cygwin_exit (int n)
 {
-  if (atexit_lock)
-    atexit_lock.acquire ();
   exit (n);
 }
 

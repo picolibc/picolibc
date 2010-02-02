@@ -126,7 +126,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
 
-      /* Is the stack at an unusual address?  This is, an address which
+      /* Is the stack at an unusual address?  That is, an address which
 	 is in the usual space occupied by the process image, but below
 	 the auto load address of DLLs?
 	 Check if we're running in WOW64 on a 64 bit machine *and* are

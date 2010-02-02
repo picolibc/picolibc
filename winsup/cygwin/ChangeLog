@@ -1,3 +1,21 @@
+2010-02-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (atexit_lock): Delete.
+	(cygwin_exit): Remove atexit lock.
+	(cygwin_atexit): Ditto.  Rename parameter to match newlib.  Call
+	__cxa_atexit when invoked by a registered DLL.
+	* dll_init.cc (remove_dll_atexit): Delete.
+	(dll_list::find): New function.
+	(dll_list::detach): Use dll_list::find to find dll associated with
+	return address.  Use __cxa_finalize to run atexit functions associated
+	with the dll.
+	(cygwin_detach_dll): Don't assume that HANDLE == void *.
+	* dll_init.h (dll_list::find): Declare.
+	(__cxa_atexit): Ditto.
+	(__cxa_finalize): Ditto.
+
+	* init.cc (dll_entry): Clarify comment.
+
 2010-02-02  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* how-startup-shutdown-works.txt: Add new document.

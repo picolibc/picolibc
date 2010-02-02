@@ -79,6 +79,7 @@ public:
   int reload_on_fork;
   dll *operator [] (const PWCHAR name);
   dll *alloc (HINSTANCE, per_process *, dll_type);
+  dll *find (void *);
   void detach (void *);
   void init ();
   void load_after_fork (HANDLE);
@@ -100,3 +101,8 @@ public:
 
 extern dll_list dlls;
 void dll_global_dtors ();
+
+/* These probably belong in a newlib header but we can keep them here
+   for now.  */
+extern "C" int __cxa_atexit(void (*)(void*), void*, void*);
+extern "C" int __cxa_finalize(void*);

@@ -143,63 +143,43 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   return d;
 }
 
-/* This function looks for every atexit function registered in the
-   about-to-be-unloaded DLL and runs it.
-
-   newlib does not provide any method for selectively running elements
-   from the atexit() queue so we have to roll our own.
-
-   Note that this is not foolproof since a function in the DLL could
-   register an atexit function outside of the DLL and that should be
-   run when the DLL detachs.  */
-static void
-remove_dll_atexit (MEMORY_BASIC_INFORMATION& m)
+dll *
+dll_list::find (void *retaddr)
 {
-  unsigned char *dll_beg = (unsigned char *) m.AllocationBase;
-  unsigned char *dll_end = (unsigned char *) m.AllocationBase + m.RegionSize;
-  struct _atexit *p = _GLOBAL_REENT->_atexit;
-  for (int n = p->_ind - 1; n >= 0; n--)
-    {
-      void (*fn) (void) = p->_fns[n];
-      if ((unsigned char *) fn >= dll_beg && (unsigned char *) fn < dll_end)
-	{
-	  fn ();
-	  p->_fns[n] = NULL;
-	}
-    }
+  MEMORY_BASIC_INFORMATION m;
+  if (!VirtualQuery (retaddr, &m, sizeof m))
+    return NULL;
+  HMODULE h = (HMODULE) m.AllocationBase;
+
+  dll *d = &start;
+  while ((d = d->next))
+    if (d->handle == h)
+      break;
+  return d;
 }
 
 /* Detach a DLL from the chain. */
 void
 dll_list::detach (void *retaddr)
 {
-  if (!myself || exit_state)
+  dll *d;
+  if (!myself || exit_state || !(d = find (retaddr)))
     return;
-  MEMORY_BASIC_INFORMATION m;
-  if (!VirtualQuery (retaddr, &m, sizeof m))
-    return;
-  HMODULE h = (HMODULE) m.AllocationBase;
-
-  dll *d = &start;
-  while ((d = d->next))
-    if (d->handle != h)
-      continue;
-    else if (d->count <= 0)
-      system_printf ("WARNING: trying to detach an already detached dll ...");
-    else if (--d->count == 0)
-      {
-	remove_dll_atexit (m);
-	d->run_dtors ();
-	d->prev->next = d->next;
-	if (d->next)
-	  d->next->prev = d->prev;
-	if (d->type == DLL_LOAD)
-	  loaded_dlls--;
-	if (end == d)
-	  end = d->prev;
-	cfree (d);
-	break;
-      }
+  if (d->count <= 0)
+    system_printf ("WARNING: trying to detach an already detached dll ...");
+  if (--d->count == 0)
+    {
+      __cxa_finalize (d);
+      d->run_dtors ();
+      d->prev->next = d->next;
+      if (d->next)
+	d->next->prev = d->prev;
+      if (d->type == DLL_LOAD)
+	loaded_dlls--;
+      if (end == d)
+	end = d->prev;
+      cfree (d);
+    }
 }
 
 /* Initialization for all linked DLLs, called by dll_crt0_1. */
@@ -427,7 +407,7 @@ cygwin_detach_dll (dll *)
 {
   HANDLE retaddr;
   if (_my_tls.isinitialized ())
-    retaddr = (HANDLE) _my_tls.retaddr ();
+    retaddr = (void *) _my_tls.retaddr ();
   else
     retaddr = __builtin_return_address (0);
   dlls.detach (retaddr);
