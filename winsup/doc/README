@@ -3,10 +3,11 @@ http://cygwin.com/cvs.html for more information.
 
 BUILD REQUIREMENTS:
 
-ash
+bash
 bzip2
 coreutils
 cygwin
+docbook-utils
 docbook-xml42
 docbook-xsl
 gzip
@@ -20,9 +21,7 @@ OTHER NOTES:
 
 You may use docbook2X to convert the DocBook files into info pages.
 I have not been able to get a working docbook2X installation on Cygwin,
-so currently I convert the files on a machine running GNU/Linux. PDF
-generation is also problematic; I use 'jw -b pdf' right now but have
-also used 'xmlto pdf' and jade.
+so currently I convert the files on a machine running GNU/Linux.
 
 A few handmade files (cygwin.texi, intro.3, etc.) are found in the
 cygwin-doc-x.y-z-src.tar.bz2 package. It also contains the utilities for

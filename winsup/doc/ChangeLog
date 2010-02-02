@@ -1,3 +1,7 @@
+2010-02-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* README: Update for Cygwin docbook-utils package.
+
 2010-01-26  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* faq-api.xml: d2u/u2d are from cygutils, not util-linux.
