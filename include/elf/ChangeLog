@@ -1,6 +1,10 @@
+2010-02-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (NT_386_XSTATE): New.
+
 2010-01-19  Daisuke Hatayama  <d.hatayama@jp.fujitsu.com>
 
-        * common.h (PN_XNUM): Define.
+	* common.h (PN_XNUM): Define.
 
 2009-12-18  Ulrich Weigand  <uweigand@de.ibm.com>
 
