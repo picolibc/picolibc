@@ -1,0 +1,165 @@
+Copyright 2010 Red Hat Inc., contributed by Dave Korn.
+
+
+    How the C runtime handles startup and termination.
+    --------------------------------------------------
+
+This file documents the processes involved in starting up and shutting down
+a Cygwin executable.  The responsibility is divided between code that is
+statically linked into each Cygwin-based DLL or executable as part of the
+C runtime, and code in the Cygwin DLL itself that co-operates with it.  The
+runtime library code lives in the winsup/cygwin/lib directory, and a little
+of it is in winsup/cygwin/include/cygwin/cygwin_dll.h
+
+
+
+  Process overall startup sequence.
+  =================================
+
+Overall process startup (and indeed termination) is under the control of the
+underlying Windows OS.  The details of the Win32 CreateProcess API and the
+underlying NT Native API ZwCreateProcess calls are far more complex (and
+unknown, since proprietary) than we need go into here; the important details
+are that the process address space is first created, then an initial thread
+is spawned that performs DLL initialisation, calling the DllMain functions of
+all statically-linked DLLs in load order.  This thread is also serialised under
+the Windows OS global loader lock, and DllMain functions are very limited in
+what they can do as a consequence; to help deal with this, cygwin wraps the
+user's DllMain function and defers calling it until runtime.  Once the DLLs
+have been initialised, the initial thread then performs C runtime setup and
+calls into the executable's main() function.
+
+
+  Entry sequence for Cygwin-based DLLs.
+  =====================================
+
+In the compiler's LINK_SPEC, a -e option sets the entry point (what Windows
+regards as DllMain) to __cygwin_dll_entry@12.  This is defined in
+include/cygwin/cygwin_dll.h.  The user's DllMain function, if any, is called
+from within this function - directly in the case of thread attach/detach
+notifications and process detach, but indirectly at process attach time via
+cygwin_attach_dll in lib/cygwin_attach_dll.c, which calls the CRT common code
+_cygwin_crt0_common and then hands off to the Cygwin DLL at dll_dllcrt0.  The
+CRT common code doesn't call the user DllMain at once; it caches a pointer to
+it in the 'main' member of the DLL's per_process struct.
+
+
+  __cygwin_dll_entry@12 -> cygwin_attach_dll -> (_cygwin_crt0_common) 
+	-> dll_dllcrt0 -> (DllMain?maybe?)
+
+dll_dllcrt0 is in dll_init.cc sets up exception handler, ensures cygwin DLL is
+at least partially initialised, allocates a new entry for the DLL chain, and
+either calls the 'main' function (via dll::init) before returning to the OS
+loader, or defers doing so until dll_crt0_1 runs dlls.dll_list::init() during
+the application's startup sequence, depending on whether Cygwin DLL was fully
+initialised yet or not.  In general statically linked DLLs will defer, while
+dlopen'd DLLs will run at once.  The Cygwin DLL runs the dependent DLL's ctors
+immediately prior to making the call, whether immediate or deferred.
+
+
+  Entry sequence for Cygwin-based executables.
+  ============================================
+
+The entry point is the windows standard entrypoint, WinMainCRTStartup, aliased
+to mainCRTStartup, defined in crt0.c.  It aligns the stack, sets the x87 fpu
+cw, and hands off to cygwin_crt0 in lib/cygwin_crt0.c, which calls the CRT
+common init code in _cygwin_crt0_common and heads off into the DLL, never to
+return from _dll_crt0.
+
+  mainCRTStartup -> cygwin_crt0 -> (_cygwin_crt0_common) -> _dll_crt0
+	-> dll_crt0_1 -> (n*DllMain?maybe?) -> main -> (__main) -> cygwin_exit
+
+This is a wrapper that does some fork-related stack sorting out then hands off
+to dll_crt0_1, which completes all Cygwin DLL initialisation, runs any
+deferred DllMain calls, and jumps into the application, returning via the
+termination routines.
+
+
+  Post-entry construction.
+  ========================
+
+The compiler automatically inserts a hidden call to __main at the start of the
+user's main() function.  During startup, DLL constructors are run in dll:init()
+immediately prior to calling that DLL's DllMain function (not in a forkee,
+though; once is enough).  In __main, all statically-loaded DLL ctors are now
+complete, so we queue an atexit call to dll_global_dtors, then run the
+application's ctors and queue an atexit call to do_global_dtors.
+
+
+
+  Process overall termination sequence.
+  =====================================
+
+The program termination sequence can begin in one of the following ways:
+
+- by returning from main()
+- by calling exit(), _Exit() or _exit()
+- by calling abort()
+  (this can be implicit, such as when an unhandled C++ exception is thrown,
+  or when an SEH exception is raised and not trapped, or an unhandled signal
+  terminates the program).
+
+
+  Unload sequence for Cygwin-based DLLS.
+  ======================================
+
+  _cygwin_dll_entry@12 -> (DllMain) -> cygwin_detach_dll -> dll_list::detach
+	-> (remove_dll_atexit) -> (dll::run_dtors)
+
+When a DLL is unloaded, whether as a result of dlclose() calling FreeLibrary(),
+or when then entire process is terminating, the OS arranges to call the DLL's
+DllMain function with a DLL_PROCESS_DETACH notification.  As during the entry
+sequence, this is also wrapped by _cygwin_dll_entry(), although there is in
+this case no need to defer calling the user's DllMain hook; it is called at
+once.  If no error is indicated, the dll is then detached from Cygwin's
+internal tracking list, and any atexit functions it has registered are run and
+cancelled from the atexit list.  Finally any static destructors are run.
+
+
+  Exit sequence for Cygwin-based executables.
+  ============================================
+
+This diagram illustrates the code paths, listed above, by which the main
+executable can terminate:
+
+   +-------------->-- exception handling --->----------------------------+
+   |                                                                     |
+   +-------------->--------- abort --------->--- stdio cleanup ----------+
+   |                                                                     |
+   +-------------->-- direct or via _Exit -->-------------------+        |
+   |                                                            |        |
+   +-------------->----------+                                  |        |
+   |                         V                stdio cleanup,    V        V
+ main -> dll_crt0_1 -> cygwin_exit -> exit -> atexit funcs -> _exit -> do_exit 
+	-> pinfo::exit -> ExitProcess -> END.
+
+Returning from main() transfers control back to dll_crt0_1(), which passes the
+return value to cygwin_exit(); this is the same as calling exit(), which is
+an export name alias for cygwin_exit() anyway.  cygwin_exit() calls the real
+exit() function in newlib, which runs the atexit functions and shuts down
+stdio before exiting via _exit(), which immediately passes the exit status
+through to do_exit().  If exiting via abort(), stdio is cleaned up, but no
+atexit functions are run.
+
+All the termination sequences end up in do_exit(), which takes care of POSIXy
+stuff like process group and child signalling, tty disconnection, etc.  This
+finally passes control to pinfo::exit(), which takes care of indicating the
+correct overall exit status and then gives control to the OS process shutdown
+routine, ExitProcess().
+
+During ExitProcess(), all the statically-linked DLLs in the application are
+terminated, by calling their DllMain functions with the DLL_PROCESS_DETACH
+notification.
+
+
+  Static object destruction.
+  ==========================
+
+Static object destruction for any statically-linked DLLs, or any dlopen()ed
+DLLs that have still not been dlclose()d by termination time, is handled in
+dll_global_dtors().  As the description above makes clear, this relies on the
+atexit functions being run, and so only takes place during a graceful exit,
+and not in the case of termination via _exit(), _Exit(), abort() or through an
+unhandled signal or exception.  The destructors are run before stdio has been
+terminated, and in reverse of DLL load order.
+

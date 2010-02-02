@@ -1,3 +1,7 @@
+2010-02-02  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* how-startup-shutdown-works.txt: Add new document.
+
 2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (lsaauth): Use CYG_LSA_MAGIC as checksum start value to
