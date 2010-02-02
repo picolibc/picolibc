@@ -420,7 +420,7 @@ installed; you at least need <literal>gcc</literal>, <literal>make</literal>,
 <literal>perl</literal>, and <literal>cocom</literal>. If you want to run 
 the tests, <literal>dejagnu</literal> is also required.
 Normally, building ignores any errors in building the documentation,
-which requires the <literal>docbook-xml42</literal>, <literal>docbook-xsl</literal>, and
+which requires the <literal>docbook-utils</literal>, <literal>docbook-xml42</literal>, <literal>docbook-xsl</literal>, and
 <literal>xmlto</literal> packages.  For more information on building the
 documentation, see the README included in the <literal>cygwin-doc</literal> package.
 </para>

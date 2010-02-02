@@ -1,6 +1,7 @@
 2010-02-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* README: Update for Cygwin docbook-utils package.
+	* faq-programming.xml: Ditto.
 
 2010-01-26  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
