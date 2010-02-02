@@ -1,3 +1,10 @@
+2010-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/paths.h (_PATH_MNTTAB): Define.
+	(_PATH_MOUNTED): Define.
+	* include/mntent.h: Include paths.h.  Define MNTTAB and MOUNTED as their
+	paths.h equivalents.  Add comment.
+
 2010-02-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (atexit_lock): Delete.

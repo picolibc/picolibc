@@ -1,6 +1,6 @@
 /* paths.h
 
-   Copyright 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,6 +19,8 @@ details. */
 #define _PATH_LASTLOG	"/var/log/lastlog"
 #define _PATH_MAN	"/usr/share/man"
 #define _PATH_MEM	"/dev/mem"
+#define _PATH_MNTTAB	"/etc/fstab"
+#define _PATH_MOUNTED	"/etc/mtab"
 #define _PATH_STDPATH	"/bin:/usr/sbin:/sbin"
 #define _PATH_TMP	"/tmp/"
 #define _PATH_TTY	"/dev/tty"

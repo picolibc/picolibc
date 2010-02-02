@@ -1,6 +1,6 @@
 /* mntent.h
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2006, 2009 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2006, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,8 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <paths.h>
 
 struct mntent
 {
@@ -32,12 +34,17 @@ struct mntent *getmntent (FILE *__filep);
 int endmntent (FILE *__filep);
 #endif
 
+/* The following two defines are deprecated.  Use the equivalent
+   names from paths.h instead. */
+#ifndef MNTTAB
+#define MNTTAB _PATH_MNTTAB
+#endif
 /* This next file does exist, but the implementation of these
    functions does not actually use it.
    However, applications need the define to pass to setmntent().
 */
 #ifndef MOUNTED
-#define MOUNTED "/etc/mtab"
+#define MOUNTED _PATH_MOUNTED
 #endif
 
 #ifdef __cplusplus
