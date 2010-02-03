@@ -1,3 +1,11 @@
+2010-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Workaround
+	another bug in NWFS.  Add comment to explain why.  Improve debug output
+	in case the NT calls to test for binary fail.
+	* path.h (path_conv::fs_is_cifs): New method.
+	(path_conv::fs_is_nwfs): New method.
+
 2010-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/paths.h (_PATH_MNTTAB): Define.

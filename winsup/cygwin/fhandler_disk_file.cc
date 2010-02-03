@@ -659,27 +659,46 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      OBJECT_ATTRIBUTES attr;
+	      NTSTATUS status;
 	      HANDLE h;
 	      IO_STATUS_BLOCK io;
 
-	      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (),
-					  NULL);
-	      if (NT_SUCCESS (NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
-					  &attr, &io, FILE_SHARE_VALID_FLAGS,
-					  FILE_SYNCHRONOUS_IO_NONALERT)))
+	      /* The NWFS implementation is frighteningly incomplete.  When
+	         re-opening a file by handle, the subsequent NtReadFile
+		 returns with the weird status STATUS_FILE_IS_A_DIRECTORY.
+		 We're still using the re-open by handle method for all
+		 other filesystems since it's 8-10% faster than opening
+		 by name. */
+	      if (pc.fs_is_nwfs ())
+		InitializeObjectAttributes (&attr, pc.get_nt_native_path (),
+					    OBJ_CASE_INSENSITIVE, NULL, NULL)
+	      else
+		InitializeObjectAttributes (&attr, &ro_u_empty, 0,
+					    get_handle (), NULL);
+	      status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
+				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_SYNCHRONOUS_IO_NONALERT);
+	      if (NT_SUCCESS (status))
 		{
 		  LARGE_INTEGER off = { QuadPart:0LL };
 		  char magic[3];
 
-		  if (NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL, &io, magic,
-					      3, &off, NULL))
+		  status = NtReadFile (h, NULL, NULL, NULL, &io, magic,
+				       3, &off, NULL);
+		  if (NT_SUCCESS (status)
 		      && has_exec_chars (magic, io.Information))
 		    {
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
+		  else
+		    debug_printf ("%p = NtReadFile(%S)", status,
+				  pc.get_nt_native_path ());
 		  NtClose (h);
 		}
+	      else
+		debug_printf ("%p = NtOpenFile(%S)", status,
+			      pc.get_nt_native_path ());
 	    }
 	}
       if (pc.exec_state () == is_executable)
