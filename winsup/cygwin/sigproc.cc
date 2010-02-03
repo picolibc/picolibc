@@ -165,7 +165,7 @@ get_proc_lock (DWORD what, DWORD val)
       sigproc_printf ("sync_proc_subproc is NULL (2)");
       return false;
     }
-  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), last %d, %E",
+  system_printf ("Couldn't acquire sync_proc_subproc for(%d,%d), last %d, %E",
 		  what, val, lastwhat);
   return true;
 }

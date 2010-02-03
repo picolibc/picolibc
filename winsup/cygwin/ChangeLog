@@ -1,3 +1,7 @@
+2010-02-03  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.cc (get_proc_lock): Fix error message typo.
+
 2010-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Workaround
