@@ -43,7 +43,7 @@
   </para></listitem>
 
   <listitem><para>
-  fnmatch(3) call is now multibyte-aware.
+  fnmatch(3), regcomp(3), regexec(3) calls are now multibyte-aware.
   </para></listitem>
 
   <listitem><para>
