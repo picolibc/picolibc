@@ -1,3 +1,9 @@
+2010-02-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* regcomp.c (p_ere): Workaround incorrect compiler warning.
+	* regerror.c (regatoi): Return non-const string or compiler complains
+	in certain inexplicable situations.
+
 2010-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/engine.c (step): Declare and define with `int ch' rather than

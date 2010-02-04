@@ -178,7 +178,7 @@ regatoi(const regex_t *preg, char *localbuf)
 	if (r->code == 0)
 #ifdef __CYGWIN__ /* Avoid whining compiler */
 	    {
-		static const char null[] = "0";
+		static char null[] = "0";
 		return null;
 	    }
 #else
