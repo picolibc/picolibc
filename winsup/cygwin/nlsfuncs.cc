@@ -638,9 +638,9 @@ __set_lc_monetary_from_win (const char *name,
   return 1;
 }
 
-static LCID collate_lcid = 0;
+LCID collate_lcid = 0;
 static mbtowc_p collate_mbtowc = __ascii_mbtowc;
-static char collate_charset[ENCODING_LEN + 1] = "ASCII";
+char collate_charset[ENCODING_LEN + 1] = "ASCII";
 
 /* Called from newlib's setlocale() if category is LC_COLLATE.  Stores
    LC_COLLATE locale information.  This is subsequently accessed by the

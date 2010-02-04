@@ -1,3 +1,40 @@
+2010-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	Replace regex files with multibyte-aware version from FreeBSD.
+	* Makefile.in (install-headers): Remove extra command to install
+	regex.h.
+	(uninstall-headers): Remove extra command to uninstall regex.h.
+	* nlsfuncs.cc (collate_lcid): Make externally available to allow
+	access to collation internals from regex functions.
+	(collate_charset): Ditto.
+	* wchar.h: Add __cplusplus guards to make C-clean.
+	* include/regex.h: New file, replacing regex/regex.h.  Remove UCB
+	advertising clause.
+	* regex/COPYRIGHT: Accommodate BSD license.  Remove UCB advertising
+	clause.
+	* regex/cclass.h: Remove.
+	* regex/cname.h: New file from FreeBSD.
+	* regex/engine.c: Ditto.
+	(NONCHAR): Tweak for Cygwin.
+	* regex/engine.ih: Remove.
+	* regex/mkh: Remove.
+	* regex/regcomp.c: New file from FreeBSD.  Tweak slightly for Cygwin.
+	Import required collate internals from nlsfunc.cc.
+	(p_ere_exp): Add GNU-specific \< and \> handling for word boundaries.
+	(p_simp_re): Ditto.
+	(__collate_range_cmp): Define.
+	(p_b_term): Use Cygwin-specific collate internals.
+	(findmust): Ditto.
+	* regex/regcomp.ih: Remove.
+	* regex/regerror.c: New file from FreeBSD.  Fix a few compiler warnings.
+	* regex/regerror.ih: Remove.
+	* regex/regex.7: New file from FreeBSD.  Remove UCB advertising clause.
+	* regex/regex.h: Remove.  Replaced by include/regex.h.
+	* regex/regexec.c: New file from FreeBSD.  Fix a few compiler warnings.
+	* regex/regfree.c: New file from FreeBSD.
+	* regex/tests: Remove.
+	* regex/utils.h: New file from FreeBSD.
+
 2010-02-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (get_proc_lock): Fix error message typo.

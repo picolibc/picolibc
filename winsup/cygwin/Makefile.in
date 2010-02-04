@@ -329,7 +329,6 @@ install-headers:
 	      $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
 	done ; \
-	$(INSTALL_DATA) regex/regex.h $(DESTDIR)$(tooldir)/include/regex.h
 
 install-man:
 	@$(MKDIRP) $(DESTDIR)$(mandir)/man2 $(DESTDIR)$(mandir)/man3 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man7
@@ -364,7 +363,6 @@ uninstall-headers:
 	      rm -f $(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
 	done ; \
-	rm -f $(tooldir)/include/regex.h
 
 uninstall-man:
 	cd $(srcdir); \
