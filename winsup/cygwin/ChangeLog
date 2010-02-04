@@ -1,5 +1,11 @@
 2010-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regex/engine.c (step): Declare and define with `int ch' rather than
+	`wint_t ch' parameter.  Explain why.
+	(NONCHAR): Remove related Cygwin patch here, including wrong comment.
+
+2010-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	Replace regex files with multibyte-aware version from FreeBSD.
 	* Makefile.in (install-headers): Remove extra command to install
 	regex.h.

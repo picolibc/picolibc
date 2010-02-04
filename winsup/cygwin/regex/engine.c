@@ -106,7 +106,11 @@ static const char *dissect(struct match *m, const char *start, const char *stop,
 static const char *backref(struct match *m, const char *start, const char *stop, sopno startst, sopno stopst, sopno lev, int);
 static const char *fast(struct match *m, const char *start, const char *stop, sopno startst, sopno stopst);
 static const char *slow(struct match *m, const char *start, const char *stop, sopno startst, sopno stopst);
+#ifdef __CYGWIN__
+static states step(struct re_guts *g, sopno start, sopno stop, states bef, int ch, states aft);
+#else
 static states step(struct re_guts *g, sopno start, sopno stop, states bef, wint_t ch, states aft);
+#endif
 #define MAX_RECURSION	100
 #define	BOL	(OUT-1)
 #define	EOL	(BOL-1)
@@ -115,13 +119,7 @@ static states step(struct re_guts *g, sopno start, sopno stop, states bef, wint_
 #define	BOW	(BOL-4)
 #define	EOW	(BOL-5)
 #define	BADCHAR	(BOL-6)
-#ifdef __CYGWIN__
-/* In contrast to BSD, wint_t on Cygwin is unsigned.  This breaks this test,
-   unless the compared values are casted to signed. */
-#define	NONCHAR(c)	((int)(c) <= (int)OUT)
-#else
 #define	NONCHAR(c)	((c) <= OUT)
-#endif
 #ifdef REDEBUG
 static void print(struct match *m, const char *caption, states st, int ch, FILE *d);
 #endif
@@ -995,7 +993,14 @@ step(struct re_guts *g,
 	sopno start,		/* start state within strip */
 	sopno stop,		/* state after stop state within strip */
 	states bef,		/* states reachable before */
+#ifdef __CYGWIN__
+	/* When using wint_t, which is defined as unsigned int on BSD,
+	   as well as on Cygwin or Linux, the NONCHAR test is broken.
+	   I'm wondering how this is supposed to work at all... */
+	int ch,			/* character or NONCHAR code */
+#else
 	wint_t ch,		/* character or NONCHAR code */
+#endif
 	states aft)		/* states already known reachable after */
 {
 	cset *cs;
