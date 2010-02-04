@@ -1,3 +1,11 @@
+2010-02-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* libc/stdlib/__atexit.c (__atexit_lock): Define a global lock for
+	atexit functions.
+	(__register_exitproc): Use __atexit_lock rather than a local static
+	lock.
+	* libc/stdlib/__call_atexit.c: Ditto.
+
 2010-01-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/search/Makefile.am: Create .def files for bsearch and qsort.
