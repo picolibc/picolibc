@@ -1,5 +1,10 @@
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c (loadlocale): Handle ISO-8859 and KOI8 charsets
+	so that the dashes are optional.  Align documentation.
+
+2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdio/vfprintf.c: Include locale.h also if _WANT_IO_C99_FORMATS
 	is defined.  Raise conversion buffer size to make sure it has enough
 	room for numbers plus grouping character.  Define GROUPING flag.

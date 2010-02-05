@@ -69,15 +69,14 @@ for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
 but uses the UTF-8 charset.
 
 Even when using POSIX locale strings, the only charsets allowed are
-<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<KOI8-R>>, <<KOI8-U>>,
+<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
 <<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
 [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 932, 1125, 1250,
 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
-are equivalent.  <<"UTF-8">> can also be written without dash, as in
-<<"UTF8">> or <<"utf8">>.  <<"EUCJP">> and <<"EUCKR"> can also contain a
-dash, <<"EUC-JP">> and <<"EUC-KR">>.
-
+are equivalent.  Charset names with dashes can also be written without
+dashes, as in <<"UTF8">>, <<"iso88591">> or <<"koi8r">>.  <<"EUCJP">> and
+<<"EUCKR"> are also recognized with dash, <<"EUC-JP">> and <<"EUC-KR">>.
 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
@@ -448,7 +447,7 @@ loadlocale(struct _reent *p, int category)
   char *locale = new_categories[category];
   char charset[ENCODING_LEN + 1];
   unsigned long val;
-  char *end;
+  char *end, *c;
   int mbc_max;
   int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
@@ -479,7 +478,7 @@ loadlocale(struct _reent *p, int category)
     strcpy (charset, locale + 2);
   else							/* POSIX style */
     {
-      char *c = locale;
+      c = locale;
 
       /* Don't use ctype macros here, they might be localized. */
       /* Language */
@@ -600,13 +599,26 @@ loadlocale(struct _reent *p, int category)
     case 'I':
     case 'i':
       /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
-         ISO-8859-12. */
-      if (strncasecmp (charset, "ISO-8859-", 9))
+         ISO-8859-12.  This code also recognizes the aliases without dashes. */
+      if (strncasecmp (charset, "ISO", 3))
 	return NULL;
-      strncpy (charset, "ISO", 3);
-      val = _strtol_r (p, charset + 9, &end, 10);
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (strncasecmp (c, "8859", 4))
+	return NULL;
+      c += 4;
+      if (*c == '-')
+	++c;
+      val = _strtol_r (p, c, &end, 10);
       if (val < 1 || val > 16 || val == 12 || *end)
 	return NULL;
+      strcpy (charset, "ISO-8859-");
+      c = charset + 9;
+      if (val > 10)
+      	*c++ = '1';
+      *c++ = val % 10 + '0';
+      *c = '\0';
       mbc_max = 1;
 #ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_ISO
@@ -674,9 +686,15 @@ loadlocale(struct _reent *p, int category)
     break;
     case 'K':
     case 'k':
-      if (!strcasecmp (charset, "KOI8-R"))
+      /* KOI8-R, KOI8-U and the aliases without dash */
+      if (strncasecmp (charset, "KOI8", 4))
+	return NULL;
+      c = charset + 4;
+      if (*c == '-')
+	++c;
+      if (*c == 'R' || *c == 'r')
 	strcpy (charset, "CP20866");
-      else if (!strcasecmp (charset, "KOI8-U"))
+      else if (*c == 'U' || *c == 'u')
 	strcpy (charset, "CP21866");
       else
 	return NULL;
