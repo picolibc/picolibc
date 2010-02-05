@@ -1,3 +1,12 @@
+2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/vfprintf.c: Include locale.h also if _WANT_IO_C99_FORMATS
+	is defined.  Raise conversion buffer size to make sure it has enough
+	room for numbers plus grouping character.  Define GROUPING flag.
+	(_VFPRINTF_R): Add PRINTANDPAD macro.  Handle grouping flag character.
+	Handle grouping for decimal integer and float values.
+	* libc/stdio/vfwprintf.c: Ditto.
+
 2010-02-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* libc/stdlib/__atexit.c (__atexit_lock): Define a global lock for
