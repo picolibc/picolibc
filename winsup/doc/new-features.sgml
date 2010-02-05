@@ -47,6 +47,13 @@
   </para></listitem>
 
   <listitem><para>
+  printf(3), wprintf(3) families of functions now handle the grouping
+  flag, the apostrophe <literal>'</literal>, per POSIX-1.2008.  The
+  integer portion of the result of a decimal conversion (%i, %d, %u, %f,
+  %F, %g, %G) will be formatted with thousands' grouping characters.
+  </para></listitem>
+
+  <listitem><para>
   New strfmon(3) call.
   </para></listitem>
 
