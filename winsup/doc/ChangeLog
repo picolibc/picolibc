@@ -1,5 +1,11 @@
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml (setup-locale-ov): Add description for "uz_UZ@cyrillic"
+	and "tt_RU@iqtelif" modifiers.  Slightly rephrase locale specifier
+	description in terms of the modifier string.
+
+2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml (ov-new1.7.2): Add grouping for printf/wprintf.
 
 2010-02-04  Corinna Vinschen  <corinna@vinschen.de>

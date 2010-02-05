@@ -188,8 +188,8 @@ if there is no ISO 639-1 code for the language (for instance, "Lower Sorbian"),
 a three character string per ISO 639-3.</para>
 
 <para>"TERRITORY" is an uppercase two character string per ISO 3166, charset is
-one of a list of supported character sets, and the modifier doesn't matter
-here (though it might for some applications).  If you're interested in the
+one of a list of supported character sets.  The modifier doesn't matter
+here (though some are recognized, see below).  If you're interested in the
 exact description, you can find it in the online publication of the POSIX
 manual pages on the homepage of the
 <ulink url="http://www.opengroup.org/">Open Group</ulink>.</para>
@@ -267,7 +267,8 @@ fetch locale-dependent information from Windows.  If the language and
 territory are not known to Windows, the <function>setlocale</function>
 function fails.</para>
 
-<para>The modifier is used for two cases.</para>
+<para>The following modifiers are recognized.  Any other modifier is simply
+ignored for now.</para>
 
 <itemizedlist mark="bullet">
 
@@ -275,6 +276,16 @@ function fails.</para>
 sets, the modifier "@euro" can be added to enforce usage of the ISO-8859-15
 character set, which includes a character for the "Euro" currency sign .</para>
 </listitem>
+
+<listitem><para>
+The default charset of the "uz_UZ" locale is ISO-8859-1.  With the "@cyrillic"
+modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "tt_RU" locale is ISO-8859-5.  With the "@iqtelif"
+modifier it's UTF-8.
+</para></listitem>
 
 <listitem><para>There's a class of characters in the Unicode character set,
 called the "CJK Ambiguous Width Character set".  For these characters the width
