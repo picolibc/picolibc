@@ -1,3 +1,8 @@
+2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__set_charset_from_locale): Set default locale for
+	"uz_UZ" locale to ISO-8859-1, with the "@cyrillic" modifier to UTF-8.
+
 2010-02-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll_init.cc (per_module::run_dtors): Use consistent method for

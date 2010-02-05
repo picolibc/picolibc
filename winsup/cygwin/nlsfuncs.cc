@@ -861,9 +861,10 @@ __set_charset_from_locale (const char *locale, char *charset)
       cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-7";
       break;
     case 1254:
-      if (lcid == 0x042c		/* az_AZ (Azeri/Azerbaijan) */
-	  || lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
+      if (lcid == 0x042c)		/* az_AZ (Azeri/Azerbaijan) */
       	cs = "UTF-8";
+      else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
+	cs = has_modifier ("@cyrillic") ? "UTF-8" : "ISO-8859-1";
       else
 	cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-9";
       break;
