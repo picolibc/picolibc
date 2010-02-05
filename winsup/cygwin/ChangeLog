@@ -1,3 +1,8 @@
+2010-02-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dll_init.cc (per_module::run_dtors): Use consistent method for
+	running destructors.
+
 2010-02-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* regcomp.c (p_ere): Workaround incorrect compiler warning.

@@ -63,8 +63,8 @@ void
 per_module::run_dtors ()
 {
   void (**pfunc)() = dtors;
-  for (int i = 1; pfunc[i]; i++)
-    (pfunc[i]) ();
+  while (*++pfunc)
+    (*pfunc) ();
 }
 
 /* Initialize an individual DLL */
