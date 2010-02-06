@@ -78,6 +78,10 @@ _DEFUN(nl_langinfo, (item),
 		      ret = "KOI8-R";
 		    else if (strcmp (ret + 2, "21866") == 0)
 		      ret = "KOI8-U";
+		    else if (strcmp (ret + 2, "101") == 0)
+		      ret = "GEORGIAN-PS";
+		    else if (strcmp (ret + 2, "102") == 0)
+		      ret = "PT154";
 		  }
 		else if (ret[0] == 'S'/*JIS*/)
 		  {

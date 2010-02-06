@@ -433,6 +433,42 @@
 	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
 	_U,	_U,	_U,	_U,	_U,	_U,	_U
 #define _CTYPE_CP21866_255 _U
+#define _CTYPE_GEORGIAN_PS_128_254 \
+   	_P,	0,	_P,	_L,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_U,	_P,	_U,	_U,	0,	0,  \
+	0,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_L,	_P,	_L,	0,	_L,	_U, \
+	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L, \
+	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L, \
+	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L, \
+	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L, \
+	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_U|_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_P, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L
+#define _CTYPE_GEORGIAN_PS_255 _L
+#define _CTYPE_PT154_128_254 \
+   	_U,	_U,	_U,	_L,	_P,	_P,	_U,	_U, \
+	_U,	_L,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_L,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_S|_B,	_U,	_L,	_U,	_U,	_U,	_U,	_P, \
+	_U,	_P,	_U,	_P,	_P,	_L,	_P,	_U, \
+	_P,	_L,	_U,	_L,	_L,	_L,	_P,	_P, \
+	_L,	_P,	_L,	_P,	_L,	_U,	_L,	_L, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
+	_L,	_L,	_L,	_L,	_L,	_L,	_L
+#define _CTYPE_PT154_255 _L
 
 
 extern int __cp_index (const char *charset_ext);
@@ -442,7 +478,7 @@ extern int __cp_index (const char *charset_ext);
 #ifndef __CYGWIN__
 static _CONST
 #endif
-char __ctype_cp[24][128 + 256] = {
+char __ctype_cp[26][128 + 256] = {
   { _CTYPE_CP437_128_254,
     0,
     _CTYPE_DATA_0_127,
@@ -587,11 +623,23 @@ char __ctype_cp[24][128 + 256] = {
     _CTYPE_CP21866_128_254,
     _CTYPE_CP21866_255
   },
+  { _CTYPE_GEORGIAN_PS_128_254,
+    0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_GEORGIAN_PS_128_254,
+    _CTYPE_GEORGIAN_PS_255
+  },
+  { _CTYPE_PT154_128_254,
+    0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_PT154_128_254,
+    _CTYPE_PT154_255
+  },
 };
 
 #else /* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
-static _CONST char __ctype_cp[22][1 + 256] = {
+static _CONST char __ctype_cp[26][1 + 256] = {
   { 0,
     _CTYPE_DATA_0_127,
     _CTYPE_CP437_128_254,
@@ -711,6 +759,16 @@ static _CONST char __ctype_cp[22][1 + 256] = {
     _CTYPE_DATA_0_127,
     _CTYPE_CP21866_128_254,
     _CTYPE_CP21866_255
+  },
+  { 0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_GEORGIAN_PS_128_254,
+    _CTYPE_GEORGIAN_PS_255
+  },
+  { 0,
+    _CTYPE_DATA_0_127,
+    _CTYPE_PT154_128_254,
+    _CTYPE_PT154_255
   },
 };
 

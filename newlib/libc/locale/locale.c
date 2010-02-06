@@ -56,33 +56,35 @@ for a given language, a three character string per ISO 639-3.
 <<"TERRITORY">> is a country code per ISO 3166.  For <<"charset">> and
 <<"modifier">> see below.
 
-Additionally to the POSIX specifier, seven extensions are supported for
-backward compatibility with older implementations using newlib:
-<<"C-UTF-8">>, <<"C-JIS">>, <<"C-eucJP">>, <<"C-SJIS">>, <<C-KOI8-R>>,
-<<C-KOI8-U>>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
-xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 932,
-1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
-
-Instead of <<"C-">>, you can specify also <<"C.">>.  Both variations allow
+Additionally to the POSIX specifier, the following extension is supported
+for backward compatibility with older implementations using newlib:
+<<"C-charset">>.
+Instead of <<"C-">>, you can also specify <<"C.">>.  Both variations allow
 to specify language neutral locales while using other charsets than ASCII,
 for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
 but uses the UTF-8 charset.
 
-Even when using POSIX locale strings, the only charsets allowed are
+The following charsets are recogized:
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
-<<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
-[437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 932, 1125, 1250,
-1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
+<<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">> with
+1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855,
+857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
+1257, 1258].
+
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  Charset names with dashes can also be written without
 dashes, as in <<"UTF8">>, <<"iso88591">> or <<"koi8r">>.  <<"EUCJP">> and
 <<"EUCKR"> are also recognized with dash, <<"EUC-JP">> and <<"EUC-KR">>.
 
+Full support for all of the above charsets requires that newlib has been
+build with multibyte support and support for all ISO and Windows Codepage.
+Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
+only newlib for Cygwin is built with full charset support by default.
+Under Cygwin, this implementation additionally supports the charsets
+<<"GBK">>, <<"eucKR">>, and <<"Big5">>.  Cygwin does not support <<"JIS">>.
+
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
-
-Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"eucKR">>, <<"Big5">>, and <<"TIS-620">>.
 
 This implementation also supports a single modifier, <<"cjknarrow">>.
 Any other modifier is ignored.  <<"cjknarrow">>, in conjunction with one
@@ -720,18 +722,82 @@ loadlocale(struct _reent *p, int category)
       l_mbtowc = __ascii_mbtowc;
 #endif
       break;
-#ifdef __CYGWIN__
     case 'G':
     case 'g':
-      if (strcasecmp (charset, "GBK"))
-      	return NULL;
-      strcpy (charset, "GBK");
-      mbc_max = 2;
+#ifdef __CYGWIN__
+      if (!strcasecmp (charset, "GBK"))
+      	{
+	  strcpy (charset, "GBK");
+	  mbc_max = 2;
 #ifdef _MB_CAPABLE
-      l_wctomb = __gbk_wctomb;
-      l_mbtowc = __gbk_mbtowc;
+	  l_wctomb = __gbk_wctomb;
+	  l_mbtowc = __gbk_mbtowc;
+#endif
+	}
+      else
+#endif /* __CYGWIN__ */
+      /* GEORGIAN-PS and the alias without dash */
+      if (!strncasecmp (charset, "GEORGIAN", 8))
+	{
+	  c = charset + 8;
+	  if (*c == '-')
+	    ++c;
+	  if (strcasecmp (c, "PS"))
+	    return NULL;
+	  strcpy (charset, "CP101");
+	  mbc_max = 1;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+	  l_wctomb = __cp_wctomb;
+	  l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+	  l_wctomb = __ascii_wctomb;
+	  l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif
+	}
+      else
+	return NULL;
+      break;
+    case 'P':
+    case 'p':
+      /* PT154 */
+      if (strcasecmp (charset, "PT154"))
+	return NULL;
+      strcpy (charset, "CP102");
+      mbc_max = 1;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 #endif
       break;
+    case 'T':
+    case 't':
+      if (strncasecmp (charset, "TIS", 3))
+      	return NULL;
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (strcasecmp (c, "620"))
+      	return NULL;
+      strcpy (charset, "CP874");
+      mbc_max = 1;
+#ifdef _MB_CAPABLE
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif
+      break;
+#ifdef __CYGWIN__
     case 'B':
     case 'b':
       if (strcasecmp (charset, "BIG5"))
@@ -741,17 +807,6 @@ loadlocale(struct _reent *p, int category)
 #ifdef _MB_CAPABLE
       l_wctomb = __big5_wctomb;
       l_mbtowc = __big5_mbtowc;
-#endif
-      break;
-    case 'T':
-    case 't':
-      if (strcasecmp (charset, "TIS620") && strcasecmp (charset, "TIS-620"))
-      	return NULL;
-      strcpy (charset, "CP874");
-      mbc_max = 1;
-#ifdef _MB_CAPABLE
-      l_wctomb = __cp_wctomb;
-      l_mbtowc = __cp_mbtowc;
 #endif
       break;
 #endif /* __CYGWIN__ */

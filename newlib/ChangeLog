@@ -1,3 +1,21 @@
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/ctype_cp.h (_CTYPE_GEORGIAN_PS_128_254): Define.
+	(_CTYPE_GEORGIAN_PS_255): Define.
+	(_CTYPE_PT154_128_254): Define.
+	(_CTYPE_PT154_255): Define.
+	(__ctype_cp): Add array members for above ctype definitions.
+	* libc/locale/locale.c (loadlocale): Make TIS-620 charset name
+	available for all targets.  Add guards for setting the conversion
+	function pointers.  Add support for GEORGIAN-PS and PT154 charsets.
+	Change documentation to reflect current behaviour more closely.
+	* libc/locale/nl_langinfo.c (nl_langinfo): On Cygwin, translate
+	"CP101" to "GEORGIAN-PS" and "CP102" to "PT154".
+	* libc/stdlib/sb_charsets.c (__cp_conv): Add conversion arrays
+	for GEORGIAN-PS and PT154.
+	(__cp_index): Map invalid Windows codepage number 101 to
+	GEORGIAN-PS conversion array, 102 to PT154 conversion array.
+
 2010-02-06  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/posix/telldir.c: Remove bogus nested prototype of lseek().
