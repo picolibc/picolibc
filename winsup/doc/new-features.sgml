@@ -27,7 +27,11 @@
   </para></listitem>
 
   <listitem><para>
-  Support for the @euro locale modifier to switch to the ISO-8859-15 charset.
+  Added support for the charsets GEORGIAN-PS, PT154, and TIS-620.
+  </para></listitem>
+
+  <listitem><para>
+  Support for the various locale modifiers to switch charsets as on Linux.
   </para></listitem>
 
   <listitem><para>
