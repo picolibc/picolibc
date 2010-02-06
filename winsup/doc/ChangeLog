@@ -1,5 +1,10 @@
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml (setup-locale-ov): Align description of working modifiers
+	to latest changes.
+
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml (ov-new1.7.2): Add support for new charsets.
 	Change text for modifier support.
 	(setup-locale-charsetlist): Add new GEORGIAN-PS and PT154 charsets

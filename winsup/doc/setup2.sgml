@@ -272,33 +272,47 @@ ignored for now.</para>
 
 <itemizedlist mark="bullet">
 
-<listitem><para>For languages which default to one of the ISO-8859 character
-sets, the modifier "@euro" can be added to enforce usage of the ISO-8859-15
-character set, which includes a character for the "Euro" currency sign .</para>
-</listitem>
-
-<listitem><para>
-The default charset of the "uz_UZ" locale is ISO-8859-1.  With the "@cyrillic"
-modifier it's UTF-8.
+<listitem><para>For languages which default to the ISO-8859-1 character
+set, the modifier "@euro" can be added to enforce usage of the ISO-8859-15
+character set, which includes a character for the "Euro" currency sign.
+Beware, that also works for non-european locales.
 </para></listitem>
 
 <listitem><para>
-The default charset of the "tt_RU" locale is ISO-8859-5.  With the "@iqtelif"
-modifier it's UTF-8.
+The default script used for all Serbian language locales (sr_BA, sr_ME, sr_RS,
+and the deprecated sr_CS and sr_SP) is cyrillic.  With the "@latin" modifier
+it gets switched to the latin script with the respective collation behaviour.
 </para></listitem>
 
-<listitem><para>There's a class of characters in the Unicode character set,
-called the "CJK Ambiguous Width Character set".  For these characters the width
+<listitem><para>
+The default charset of the "be_BY" locale (Belarusian/Belarus) is CP1251.
+With the "@latin" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "tt_RU" locale (Tatar/Russia) is ISO-8859-5.
+With the "@iqtelif" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "uz_UZ" locale (Uzbek/Uzbekistan) is ISO-8859-1.
+With the "@cyrillic" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+There's a class of characters in the Unicode character set, called the
+"CJK Ambiguous Width Character set".  For these characters the width
 returned by the wcwidth/wcswidth function is usually 1.  This is often a
-problem in East-Asian languages, which historically use character sets in
-which these characters have a width of 2.  By default, the wcwidth/wcswidth
-functions return 1 as the width of these characters, except if the language is
-specifed as "ja" (Japanese), "ko" (Korean), or "zh" (Chinese).  In these
-languages wcwidth and wcswidth return 2 for these characters.  This is not
-correct in all circumstances, so the user of one of these languages can specify
-the modifier "@cjknarrow", which modifies the behaviour of wcwidth/wcswidth to
-return 1 for the ambiguous width characters.</para>
-</listitem>
+problem in East-Asian languages, which historically use character sets
+in which these characters have a width of 2.  By default, the
+wcwidth/wcswidth functions return 1 as the width of these characters,
+except if the language is specifed as "ja" (Japanese), "ko" (Korean), or
+"zh" (Chinese).  In these languages wcwidth and wcswidth return 2 for
+these characters.  This is not correct in all circumstances, so the user
+of one of these languages can specify the modifier "@cjknarrow", which
+modifies the behaviour of wcwidth/wcswidth to return 1 for the ambiguous
+width characters.
+</para></listitem>
 
 </itemizedlist>
 
