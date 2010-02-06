@@ -119,7 +119,6 @@ _DEFUN(_seekdir, (dirp, loc),
 	register struct ddloc *lp;
 	register struct ddloc **prevlp;
 	struct dirent *dp;
-	extern long lseek();
 
 #ifdef HAVE_DD_LOCK
 	__lock_acquire(dd_hash_lock);

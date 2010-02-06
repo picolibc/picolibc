@@ -1,3 +1,7 @@
+2010-02-06  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
+	* libc/posix/telldir.c: Remove bogus nested prototype of lseek().
+
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Handle ISO-8859 and KOI8 charsets
