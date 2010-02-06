@@ -30,6 +30,58 @@ details. */
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
 
+/* Starting with Windows Vista, the token returned by system functions
+   is a restricted token.  The full admin token is linked to it and can
+   be fetched with GetTokenInformation.  This function returns the original
+   token on pre-Vista, and the elevated token on Vista++ if it's available,
+   the original token otherwise.  The token handle is also made inheritable
+   since that's necessary anyway. */
+static HANDLE
+get_full_privileged_inheritable_token (HANDLE token)
+{
+  if (wincap.has_mandatory_integrity_control ())
+    {
+      TOKEN_LINKED_TOKEN linked;
+      DWORD size;
+
+      /* When fetching the linked token without TCB privs, then the linked
+	 token is not a primary token, only an impersonation token, which is
+	 not suitable for CreateProcessAsUser.  Converting it to a primary
+	 token using DuplicateTokenEx does NOT work for the linked token in
+	 this case.  So we have to switch on TCB privs to get a primary token.
+	 This is generally performed in the calling functions.  */
+      if (GetTokenInformation (token, TokenLinkedToken,
+			       (PVOID) &linked, sizeof linked, &size))
+	{
+	  debug_printf ("Linked Token: %p", linked.LinkedToken);
+	  if (linked.LinkedToken)
+	    {
+	      TOKEN_TYPE type;
+
+	      /* At this point we don't know if the user actually had TCB
+		 privileges.  Check if the linked token is a primary token.
+		 If not, just return the original token. */
+	      if (GetTokenInformation (token, TokenType, (PVOID) &type,
+				       sizeof type, &size)
+		  && type != TokenPrimary)
+		debug_printf ("Linked Token is not a primary token!");
+	      else
+		{
+		  CloseHandle (token);
+		  token = linked.LinkedToken;
+		}
+	    }
+	}
+    }
+  if (!SetHandleInformation (token, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
+    {
+      __seterrno ();
+      CloseHandle (token);
+      token = NULL;
+    }
+  return token;
+}
+
 void
 set_imp_token (HANDLE token, int type)
 {
@@ -104,13 +156,15 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
       __seterrno ();
       hToken = INVALID_HANDLE_VALUE;
     }
-  else if (!SetHandleInformation (hToken,
-				  HANDLE_FLAG_INHERIT,
-				  HANDLE_FLAG_INHERIT))
+  else
     {
-      __seterrno ();
-      CloseHandle (hToken);
-      hToken = INVALID_HANDLE_VALUE;
+      /* See the comment in get_full_privileged_inheritable_token for a
+      description why we enable TCB privileges here. */
+      push_self_privilege (SE_TCB_PRIVILEGE, true);
+      hToken = get_full_privileged_inheritable_token (hToken);
+      pop_self_privilege ();
+      if (!hToken)
+	hToken = INVALID_HANDLE_VALUE;
     }
   cygheap->user.reimpersonate ();
   debug_printf ("%d = logon_user(%s,...)", hToken, pw->pw_name);
@@ -1086,27 +1140,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 #endif /* JUST_ANOTHER_NONWORKING_SOLUTION */
       LsaFreeReturnBuffer (profile);
     }
-
-  if (wincap.has_mandatory_integrity_control ())
-    {
-      TOKEN_LINKED_TOKEN linked;
-
-      if (GetTokenInformation (user_token, TokenLinkedToken,
-			       (PVOID) &linked, sizeof linked, &size))
-	{
-	  debug_printf ("Linked Token: %p", linked.LinkedToken);
-	  if (linked.LinkedToken)
-	    {
-	      CloseHandle (user_token);
-	      user_token = linked.LinkedToken;
-	    }
-	}
-    }
-
-  /* The token returned by LsaLogonUser is not inheritable.  Make it so. */
-  if (!SetHandleInformation (user_token, HANDLE_FLAG_INHERIT,
-			     HANDLE_FLAG_INHERIT))
-    system_printf ("SetHandleInformation %E");
+  user_token = get_full_privileged_inheritable_token (user_token);
 
 out:
   if (privs)
@@ -1179,31 +1213,7 @@ lsaprivkeyauth (struct passwd *pw)
       token = NULL;
     }
   else
-    {
-      if (wincap.has_mandatory_integrity_control ())
-	{
-	  TOKEN_LINKED_TOKEN linked;
-	  DWORD size;
-
-	  if (GetTokenInformation (token, TokenLinkedToken,
-				   (PVOID) &linked, sizeof linked, &size))
-	    {
-	      debug_printf ("Linked Token: %p", linked.LinkedToken);
-	      if (linked.LinkedToken)
-		{
-		  CloseHandle (token);
-		  token = linked.LinkedToken;
-		}
-	    }
-	}
-      if (!SetHandleInformation (token, HANDLE_FLAG_INHERIT,
-				 HANDLE_FLAG_INHERIT))
-	{
-	  __seterrno ();
-	  CloseHandle (token);
-	  token = NULL;
-	}
-    }
+    token = get_full_privileged_inheritable_token (token);
 
 out:
   close_local_policy (lsa);

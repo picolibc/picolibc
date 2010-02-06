@@ -1,3 +1,15 @@
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_full_privileged_inheritable_token): New function
+	to fetch token with full privileges from logon token in Vista and
+	later, and to make token inheritable.  Add lengthy comments to explain
+	the function's job.
+	(cygwin_logon_user): Drop calling SetHandleInformation.  Enable TCB
+	privilege and call get_full_privileged_inheritable_token.
+	(lsaauth): Don't fetch linked token and don't make handle inheritable
+	here, just call get_full_privileged_inheritable_token instead.
+	(lsaprivkeyauth): Ditto.
+
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__set_charset_from_locale): Set default locale for
