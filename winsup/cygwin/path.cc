@@ -1884,6 +1884,7 @@ symlink_info::check_nfs_symlink (HANDLE h)
 {
   tmp_pathbuf tp;
   NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   struct {
     FILE_GET_EA_INFORMATION fgei;
@@ -1892,6 +1893,11 @@ symlink_info::check_nfs_symlink (HANDLE h)
   PFILE_FULL_EA_INFORMATION pffei;
   int res = 0;
 
+  InitializeObjectAttributes (&attr, &ro_u_empty, 0, h, NULL);
+  status = NtOpenFile (&h, FILE_READ_EA, &attr, &io, FILE_SHARE_VALID_FLAGS,
+		       FILE_OPEN_REPARSE_POINT | FILE_OPEN_FOR_BACKUP_INTENT);
+  if (!NT_SUCCESS (status))
+    return 0;
   /* To find out if the file is a symlink and to get the symlink target,
      try to fetch the NfsSymlinkTargetName EA. */
   fgei_buf.fgei.NextEntryOffset = 0;
@@ -1900,6 +1906,7 @@ symlink_info::check_nfs_symlink (HANDLE h)
   pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
   status = NtQueryEaFile (h, &io, pffei, NT_MAX_PATH * sizeof (WCHAR), TRUE,
 			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
+  NtClose (h);
   if (NT_SUCCESS (status) && pffei->EaValueLength > 0)
     {
       PWCHAR spath = (PWCHAR)

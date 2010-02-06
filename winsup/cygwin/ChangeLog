@@ -1,5 +1,11 @@
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check_nfs_symlink): Reopen file with
+	FILE_READ_EA access since, surprisingly, you need it to read EAs even
+	on NFS.
+
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_full_privileged_inheritable_token): New function
 	to fetch token with full privileges from logon token in Vista and
 	later, and to make token inheritable.  Add lengthy comments to explain
