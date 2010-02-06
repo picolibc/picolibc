@@ -1,5 +1,10 @@
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__set_charset_from_locale): Set default charset for
+	"ka_GE" locale to GEORGIAN-PS, for "kk_KZ" to PT154.
+
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check_nfs_symlink): Reopen file with
 	FILE_READ_EA access since, surprisingly, you need it to read EAs even
 	on NFS.
@@ -18,7 +23,7 @@
 
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
-	* nlsfuncs.cc (__set_charset_from_locale): Set default locale for
+	* nlsfuncs.cc (__set_charset_from_locale): Set default charset for
 	"uz_UZ" locale to ISO-8859-1, with the "@cyrillic" modifier to UTF-8.
 
 2010-02-05  Christopher Faylor  <me+cygwin@cgf.cx>

@@ -891,6 +891,10 @@ __set_charset_from_locale (const char *locale, char *charset)
 	cs = "ISO-8859-13";
       else if (lcid == 0x043a)		/* mt_MT (Maltese/Malta) */
 	cs = "ISO-8859-3";
+      else if (lcid == 0x0437)		/* ka_GE (Georgian/Georgia) */
+	cs = "GEORGIAN-PS";
+      else if (lcid == 0x043f)		/* kk_KZ (Kazakh/Kazakhstan) */
+	cs = "PT154";
       else
 	cs = "UTF-8";
       break;
