@@ -1,5 +1,10 @@
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__get_lcid_from_locale): Handle no_NO as nb_NO, rather
+	than nn_NO.
+
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* nlsfuncs.cc (has_modifier): MOve up in file to use in
 	__get_lcid_from_locale as well.
 	(__get_lcid_from_locale): Handle no_NO locale as alias for nn_NO.

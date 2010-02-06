@@ -94,8 +94,7 @@ __get_lcid_from_locale (const char *name)
 	{
 	  /* Unfortunately there are a couple of locales for which no form
 	     without a Script part per RFC 4646 exists.
-	     Linux also supports the no_NO locale which is equivalent to
-	     nn_NO. */
+	     Linux also supports no_NO which is equivalent to nb_NO. */
 	  struct {
 	    const char    *loc;
 	    const wchar_t *wloc;
@@ -105,7 +104,7 @@ __get_lcid_from_locale (const char *name)
 	    { "ha-NG" , L"ha-Latn-NG"  },
 	    { "iu-CA" , L"iu-Cans-CA"  },
 	    { "mn-CN" , L"mn-Mong-CN"  },
-	    { "no-NO" , L"nn-NO"       },
+	    { "no-NO" , L"nb-NO"       },
 	    { "sr-BA" , L"sr-Cyrl-BA"  },
 	    { "sr-CS" , L"sr-Cyrl-CS"  },
 	    { "sr-ME" , L"sr-Cyrl-ME"  },
@@ -181,14 +180,15 @@ __get_lcid_from_locale (const char *name)
 	 This also enables the serbian ISO 3166 territory codes which have
 	 been changed post 2003, and maps them to the old wrong (SP was never
 	 a valid ISO 3166 code) territory code sr_SP which fortunately has the
-	 same LCID as the newer sr_CS. */
+	 same LCID as the newer sr_CS.
+	 Linux also supports no_NO which is equivalent to nb_NO. */
       struct {
 	const char *loc;
 	LCID	    lcid;
       } ambiguous_locale[] = {
 	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			    },
         { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
-        { "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
+        { "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL)    },
 	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
 			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_CYRILLIC) },
 	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
