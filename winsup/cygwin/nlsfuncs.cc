@@ -35,6 +35,8 @@ static char *lc_monetary_buf;
 	    __eval_datetimefmt(lcid,(type),(force),&lc_time_ptr,\
 			       lc_time_end-lc_time_ptr,f_wctomb, charset)
 
+#define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
+
 /* Vista and later.  Not defined in w32api yet. */
 extern "C" {
 WINBASEAPI LCID WINAPI LocaleNameToLCID (LPCWSTR, DWORD);
@@ -65,6 +67,8 @@ __get_lcid_from_locale (const char *name)
     }
   stpcpy (last_locale, name);
   stpcpy (locale, name);
+  /* Store modifier for later use. */
+  const char *modifier = strchr (last_locale, '@') ? : "";
   /* Drop charset and modifier */
   c = strchr (locale, '.');
   if (!c)
@@ -89,7 +93,9 @@ __get_lcid_from_locale (const char *name)
       if (lcid == 0)
 	{
 	  /* Unfortunately there are a couple of locales for which no form
-	     without a Script part per RFC 4646 exists. */
+	     without a Script part per RFC 4646 exists.
+	     Linux also supports the no_NO locale which is equivalent to
+	     nn_NO. */
 	  struct {
 	    const char    *loc;
 	    const wchar_t *wloc;
@@ -99,10 +105,11 @@ __get_lcid_from_locale (const char *name)
 	    { "ha-NG" , L"ha-Latn-NG"  },
 	    { "iu-CA" , L"iu-Cans-CA"  },
 	    { "mn-CN" , L"mn-Mong-CN"  },
-	    { "sr-BA" , L"sr-Latn-BA"  },
-	    { "sr-CS" , L"sr-Latn-CS"  },
-	    { "sr-ME" , L"sr-Latn-ME"  },
-	    { "sr-RS" , L"sr-Latn-RS"  },
+	    { "no-NO" , L"nn-NO"       },
+	    { "sr-BA" , L"sr-Cyrl-BA"  },
+	    { "sr-CS" , L"sr-Cyrl-CS"  },
+	    { "sr-ME" , L"sr-Cyrl-ME"  },
+	    { "sr-RS" , L"sr-Cyrl-RS"  },
 	    { "tg-TJ" , L"tg-Cyrl-TJ"  },
 	    { "tzm-DZ", L"tzm-Latn-DZ" },
 	    { "uz-UZ" , L"uz-Latn-UZ"  },
@@ -113,10 +120,18 @@ __get_lcid_from_locale (const char *name)
 	    if (!strcmp (locale, sc_only_locale[i].loc))
 	      {
 		lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
-		/* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
-		   deprecated sr-CS.  So we map ME and RS to CS here. */
-		if (lcid == 0 && !strncmp (locale, "sr-", 3))
-		  lcid = LocaleNameToLCID (L"sr-Latn-CS", 0);
+		if (!strncmp (locale, "sr-", 3))
+		  {
+		    /* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
+		       deprecated sr-CS.  So we map ME and RS to CS here. */
+		    if (lcid == 0)
+		      lcid = LocaleNameToLCID (L"sr-Cyrl-CS", 0);
+		    /* "@latin" modifier for the sr_XY locales changes
+			collation behaviour so lcid should accommodate that
+			by being set to the Latin sublang. */
+		    if (lcid != 0 && has_modifier ("@latin"))
+		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
+		  }
 		break;
 	      }
 	}
@@ -171,14 +186,15 @@ __get_lcid_from_locale (const char *name)
 	const char *loc;
 	LCID	    lcid;
       } ambiguous_locale[] = {
-	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			  },
-        { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK) },
+	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			    },
+        { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
+        { "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
 	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
-			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_LATIN)  },
-	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
-	{ "sr_ME", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
-	{ "sr_RS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
-	{ "sr_SP", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_LATIN)       },
+			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_CYRILLIC) },
+	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
+	{ "sr_ME", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
+	{ "sr_RS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
+	{ "sr_SP", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
 	{ NULL,    0 },
       };
       *--c = '_';
@@ -189,6 +205,11 @@ __get_lcid_from_locale (const char *name)
 			      iso, 10))
 	  {
 	    lcid = ambiguous_locale[i].lcid;
+	    /* "@latin" modifier for the sr_XY locales changes collation
+	       behaviour so lcid should accommodate that by being set to
+	       the Latin sublang. */
+	    if (!strncmp (locale, "sr_", 3) && has_modifier ("@latin"))
+	      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
 	    break;
 	  }
     }
@@ -760,8 +781,6 @@ strxfrm (char *s1, const char *s2, size_t sn)
   return ret - 1;
 }
 
-#define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
-
 /* Fetch default ANSI codepage from locale info and generate a setlocale
    compatible character set code.  Called from newlib's setlocale(), if the
    charset isn't given explicitely in the POSIX compatible locale specifier. */
@@ -805,19 +824,25 @@ __set_charset_from_locale (const char *locale, char *charset)
     case 1250:
       if (lcid == 0x081a		/* sr_CS (Serbian Language/Former
 						  Serbia and Montenegro) */
-	  || lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro)*/
+	  || lcid == 0x181a		/* sr_BA (Serbian Language/Bosnia
+						  and Herzegovina) */
 	  || lcid == 0x241a		/* sr_RS (Serbian Language/Serbia) */
+	  || lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro)*/
 	  || lcid == 0x0442)		/* tk_TM (Turkmen/Turkmenistan) */
       	cs = "UTF-8";
-      else if (has_modifier ("@euro"))
-	cs = "ISO-8859-15";
       else if (lcid == 0x041c)		/* sq_AL (Albanian/Albania) */
 	cs = "ISO-8859-1";
       else
 	cs = "ISO-8859-2";
       break;
     case 1251:
-      if (lcid == 0x0440		/* ky_KG (Kyrgyz/Kyrgyzstan) */
+      if (lcid == 0x0c1a		/* sr_CS (Serbian Language/Former
+						  Serbia and Montenegro) */
+	  || lcid == 0x1c1a		/* sr_BA (Serbian Language/Bosnia
+						  and Herzegovina) */
+	  || lcid == 0x281a		/* sr_RS (Serbian Language/Serbia) */
+	  || lcid == 0x301a		/* sr_ME (Serbian Language/Montenegro)*/
+	  || lcid == 0x0440		/* ky_KG (Kyrgyz/Kyrgyzstan) */
 	  || lcid == 0x0450		/* mn_MN (Mongolian/Mongolia) */
 					/* tt_RU (Tatar/Russia),
 						 IQTElif alphabet */
@@ -829,8 +854,6 @@ __set_charset_from_locale (const char *locale, char *charset)
       	cs = "CP1251";
       else if (lcid == 0x0422)		/* uk_UA (Ukrainian/Ukraine) */
 	cs = "KOI8-U";
-      else if (has_modifier ("@euro"))
-	cs = "ISO-8859-15";
       else
 	cs = "ISO-8859-5";
       break;
@@ -858,7 +881,7 @@ __set_charset_from_locale (const char *locale, char *charset)
 	cs = "ISO-8859-1";
       break;
     case 1253:
-      cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-7";
+      cs = "ISO-8859-7";
       break;
     case 1254:
       if (lcid == 0x042c)		/* az_AZ (Azeri/Azerbaijan) */
@@ -866,10 +889,10 @@ __set_charset_from_locale (const char *locale, char *charset)
       else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
 	cs = has_modifier ("@cyrillic") ? "UTF-8" : "ISO-8859-1";
       else
-	cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-9";
+	cs = "ISO-8859-9";
       break;
     case 1255:
-      cs = has_modifier ("@euro") ? "ISO-8859-15" : "ISO-8859-8";
+      cs = "ISO-8859-8";
       break;
     case 1256:
       if (lcid == 0x0429		/* fa_IR (Persian/Iran) */

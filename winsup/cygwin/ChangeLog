@@ -1,5 +1,16 @@
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (has_modifier): MOve up in file to use in
+	__get_lcid_from_locale as well.
+	(__get_lcid_from_locale): Handle no_NO locale as alias for nn_NO.
+	Default all sr_XY locales to Cyrillic script.  Change lcid to Latin
+	script if "@latin" modifier has been specified.
+	(__set_charset_from_locale): Handle Serbian in codepage 1251 case as
+	well.  Also check for sr_BA lcid.  Restrict "@euro" modifier to
+	locales otherwise defaulting to ISO-8859-1.
+
+2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* nlsfuncs.cc (__set_charset_from_locale): Set default charset for
 	"ka_GE" locale to GEORGIAN-PS, for "kk_KZ" to PT154.
 
