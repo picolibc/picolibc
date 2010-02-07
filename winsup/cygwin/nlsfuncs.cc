@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <winnls.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <wchar.h>
@@ -923,6 +924,68 @@ __set_charset_from_locale (const char *locale, char *charset)
       break;
     }
   stpcpy (charset, cs);
+}
+
+/* This function is called from newlib's loadlocale if the locale identifier
+   was invalid, one way or the other.  It looks for the file
+
+     /usr/share/locale/locale.alias
+
+   which is part of the gettext package, and if it finds the locale alias
+   in that file, it replaces the locale with the correct locale string from
+   that file.
+   
+   If successful, it returns a pointer to new_locale, NULL otherwise.*/
+extern "C" char *
+__set_locale_from_locale_alias (const char *locale, char *new_locale)
+{
+  wchar_t wlocale[ENCODING_LEN + 1];
+  wchar_t walias[ENCODING_LEN + 1];
+#define LOCALE_ALIAS_LINE_LEN 255
+  char alias_buf[LOCALE_ALIAS_LINE_LEN + 1], *c;
+  const char *alias, *replace;
+  char *ret = NULL;
+
+  FILE *fp = fopen ("/usr/share/locale/locale.alias", "rt");
+  if (!fp)
+    return NULL;
+  /* The incoming locale is given in the application charset, or in
+     the Cygwin internal charset.  We try both. */
+  if (mbstowcs (wlocale, locale, ENCODING_LEN + 1) == (size_t) -1)
+    sys_mbstowcs (wlocale, ENCODING_LEN + 1, locale);
+  wlocale[ENCODING_LEN] = L'\0';
+  while (fgets (alias_buf, LOCALE_ALIAS_LINE_LEN + 1, fp))
+    {
+      alias_buf[LOCALE_ALIAS_LINE_LEN] = '\0';
+      c = strrchr (alias_buf, '\n');
+      if (c)
+	*c = '\0';
+      c = alias_buf;
+      c += strspn (c, " \t");
+      if (!*c || *c == '#')
+	continue;
+      alias = c;
+      c += strcspn (c, " \t");
+      *c++ = '\0';
+      c += strspn (c, " \t");
+      if (*c == '#')
+	continue;
+      replace = c;
+      c += strcspn (c, " \t");
+      *c++ = '\0';
+      if (strlen (replace) > ENCODING_LEN)
+	continue;
+      /* The file is latin1 encoded */
+      lc_mbstowcs (__iso_mbtowc, "ISO-8859-1", walias, alias, ENCODING_LEN + 1);
+      walias[ENCODING_LEN] = L'\0';
+      if (!wcscmp (wlocale, walias))
+	{
+	  ret = strcpy (new_locale, replace);
+	  break;
+	}
+    }
+  fclose (fp);
+  return ret;
 }
 
 static char *
