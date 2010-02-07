@@ -1,5 +1,15 @@
 2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/locale/locale.c: Add Cygwin's /usr/share/locale/locale.alias
+	support to documentation.
+	(__set_locale_from_locale_alias): Declare when build for Cygwin.
+	(loadlocale): On Cygwin, if locale can't be recognized, call
+	__set_locale_from_locale_alias to check for locale alias.
+	Define FAIL macro to replace `return NULL' statements.  Replace
+	throughout.
+
+2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/locale.c: Fix typo in documentation.  Remove useless
 	_MB_CAPABLE guards within other _MB_CAPABLE guards.  Add comment
 	to remaining #endif's.

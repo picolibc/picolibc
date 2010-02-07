@@ -83,6 +83,9 @@ only newlib for Cygwin is built with full charset support by default.
 Under Cygwin, this implementation additionally supports the charsets
 <<"GBK">>, <<"eucKR">>, and <<"Big5">>.  Cygwin does not support <<"JIS">>.
 
+Cygwin additionally supports locales from the file
+/usr/share/locale/locale.alias.
+
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
@@ -430,6 +433,7 @@ currentlocale()
 #ifdef _MB_CAPABLE
 #ifdef __CYGWIN__
 extern void __set_charset_from_locale (const char *locale, char *charset);
+extern int __set_locale_from_locale_alias (const char *, char *);
 extern int __collate_load_locale (const char *, void *, const char *);
 #endif /* __CYGWIN__ */
 
@@ -446,7 +450,7 @@ loadlocale(struct _reent *p, int category)
      backward compatibility.  If the local string is correct, the charset
      is extracted and stored in lc_ctype_charset or lc_message_charset
      dependent on the cateogry. */
-  char *locale = new_categories[category];
+  char *locale = NULL;
   char charset[ENCODING_LEN + 1];
   unsigned long val;
   char *end, *c;
@@ -456,9 +460,24 @@ loadlocale(struct _reent *p, int category)
 		   const char *, mbstate_t *);
   int cjknarrow = 0;
 #ifdef __CYGWIN__
+  char tmp_locale[ENCODING_LEN + 1];
   int ret = 0;
+
+restart:
+  if (!locale)
+    locale = new_categories[category];
+  else if (locale != tmp_locale)
+    {
+      locale = __set_locale_from_locale_alias (locale, tmp_locale);
+      if (!locale)
+	return NULL;
+    }
+# define FAIL	goto restart
+#else
+  locale = new_categories[category];
+# define FAIL	return NULL
 #endif
-  
+
   /* "POSIX" is translated to "C", as on Linux. */
   if (!strcmp (locale, "POSIX"))
     strcpy (locale, "C");
@@ -484,7 +503,7 @@ loadlocale(struct _reent *p, int category)
       /* Language */
       if (c[0] < 'a' || c[0] > 'z'
 	  || c[1] < 'a' || c[1] > 'z')
-	return NULL;
+	FAIL;
       c += 2;
       /* Allow three character Language per ISO 639-3 */
       if (c[0] >= 'a' && c[0] <= 'z')
@@ -495,7 +514,7 @@ loadlocale(struct _reent *p, int category)
 	  ++c;
 	  if (c[0] < 'A' || c[0] > 'Z'
 	      || c[1] < 'A' || c[1] > 'Z')
-	    return NULL;
+	    FAIL;
 	  c += 2;
 	}
       if (c[0] == '.')
@@ -519,7 +538,7 @@ loadlocale(struct _reent *p, int category)
 #endif
       else
 	/* Invalid string */
-      	return NULL;
+      	FAIL;
       if (c[0] == '@')
 	{
 	  /* Modifier */
@@ -536,7 +555,7 @@ loadlocale(struct _reent *p, int category)
     case 'U':
     case 'u':
       if (strcasecmp (charset, "UTF-8") && strcasecmp (charset, "UTF8"))
-	return NULL;
+	FAIL;
       strcpy (charset, "UTF-8");
       mbc_max = 6;
       l_wctomb = __utf8_wctomb;
@@ -546,7 +565,7 @@ loadlocale(struct _reent *p, int category)
     case 'J':
     case 'j':
       if (strcasecmp (charset, "JIS"))
-	return NULL;
+	FAIL;
       strcpy (charset, "JIS");
       mbc_max = 8;
       l_wctomb = __jis_wctomb;
@@ -573,12 +592,12 @@ loadlocale(struct _reent *p, int category)
 	}
 #endif /* __CYGWIN__ */
       else
-	return NULL;
+	FAIL;
     break;
     case 'S':
     case 's':
       if (strcasecmp (charset, "SJIS"))
-	return NULL;
+	FAIL;
       strcpy (charset, "SJIS");
       mbc_max = 2;
       l_wctomb = __sjis_wctomb;
@@ -589,18 +608,18 @@ loadlocale(struct _reent *p, int category)
       /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
          ISO-8859-12.  This code also recognizes the aliases without dashes. */
       if (strncasecmp (charset, "ISO", 3))
-	return NULL;
+	FAIL;
       c = charset + 3;
       if (*c == '-')
 	++c;
       if (strncasecmp (c, "8859", 4))
-	return NULL;
+	FAIL;
       c += 4;
       if (*c == '-')
 	++c;
       val = _strtol_r (p, c, &end, 10);
       if (val < 1 || val > 16 || val == 12 || *end)
-	return NULL;
+	FAIL;
       strcpy (charset, "ISO-8859-");
       c = charset + 9;
       if (val > 10)
@@ -619,11 +638,11 @@ loadlocale(struct _reent *p, int category)
     case 'C':
     case 'c':
       if (charset[1] != 'P' && charset[1] != 'p')
-	return NULL;
+	FAIL;
       strncpy (charset, "CP", 2);
       val = _strtol_r (p, charset + 2, &end, 10);
       if (*end)
-	return NULL;
+	FAIL;
       switch (val)
 	{
 	case 437:
@@ -663,14 +682,14 @@ loadlocale(struct _reent *p, int category)
 	  l_mbtowc = __sjis_mbtowc;
 	  break;
 	default:
-	  return NULL;
+	  FAIL;
 	}
     break;
     case 'K':
     case 'k':
       /* KOI8-R, KOI8-U and the aliases without dash */
       if (strncasecmp (charset, "KOI8", 4))
-	return NULL;
+	FAIL;
       c = charset + 4;
       if (*c == '-')
 	++c;
@@ -679,7 +698,7 @@ loadlocale(struct _reent *p, int category)
       else if (*c == 'U' || *c == 'u')
 	strcpy (charset, "CP21866");
       else
-	return NULL;
+	FAIL;
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;
@@ -692,7 +711,7 @@ loadlocale(struct _reent *p, int category)
     case 'A':
     case 'a':
       if (strcasecmp (charset, "ASCII"))
-	return NULL;
+	FAIL;
       strcpy (charset, "ASCII");
       mbc_max = 1;
       l_wctomb = __ascii_wctomb;
@@ -717,7 +736,7 @@ loadlocale(struct _reent *p, int category)
 	  if (*c == '-')
 	    ++c;
 	  if (strcasecmp (c, "PS"))
-	    return NULL;
+	    FAIL;
 	  strcpy (charset, "CP101");
 	  mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
@@ -729,13 +748,13 @@ loadlocale(struct _reent *p, int category)
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 	}
       else
-	return NULL;
+	FAIL;
       break;
     case 'P':
     case 'p':
       /* PT154 */
       if (strcasecmp (charset, "PT154"))
-	return NULL;
+	FAIL;
       strcpy (charset, "CP102");
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
@@ -749,12 +768,12 @@ loadlocale(struct _reent *p, int category)
     case 'T':
     case 't':
       if (strncasecmp (charset, "TIS", 3))
-      	return NULL;
+      	FAIL;
       c = charset + 3;
       if (*c == '-')
 	++c;
       if (strcasecmp (c, "620"))
-      	return NULL;
+      	FAIL;
       strcpy (charset, "CP874");
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
@@ -769,7 +788,7 @@ loadlocale(struct _reent *p, int category)
     case 'B':
     case 'b':
       if (strcasecmp (charset, "BIG5"))
-      	return NULL;
+      	FAIL;
       strcpy (charset, "BIG5");
       mbc_max = 2;
       l_wctomb = __big5_wctomb;
@@ -777,7 +796,7 @@ loadlocale(struct _reent *p, int category)
       break;
 #endif /* __CYGWIN__ */
     default:
-      return NULL;
+      FAIL;
     }
   if (category == LC_CTYPE)
     {
@@ -809,7 +828,7 @@ loadlocale(struct _reent *p, int category)
   else if (category == LC_TIME)
     ret = __time_load_locale (locale, (void *) l_wctomb, charset);
   if (ret)
-    return NULL;
+    FAIL;
 #endif /* __CYGWIN__ */
   return strcpy(current_categories[category], new_categories[category]);
 }
