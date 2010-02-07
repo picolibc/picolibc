@@ -559,7 +559,7 @@ New ldd utility, similar to Linux.
 </para></listitem>
 
 <listitem><para>
-New link libraries libdl.a, libresolve.a, librt.a.
+New link libraries libdl.a, libresolv.a, librt.a.
 </para></listitem>
 
 <listitem><para>
