@@ -2,6 +2,10 @@
 
 	* common.h (NT_386_XSTATE): New.
 
+2010-01-21  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+	
+	* s390.h (EF_S390_HIGH_GPRS): Added macro definition.
+
 2010-01-19  Daisuke Hatayama  <d.hatayama@jp.fujitsu.com>
 
 	* common.h (PN_XNUM): Define.
