@@ -1,3 +1,9 @@
+2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.2): Add support for locales from
+	/usr/share/locale/locale.alias.
+	* setup2.sgml (setup-locale-ov): Ditto.
+
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-locale-ov): Align description of working modifiers

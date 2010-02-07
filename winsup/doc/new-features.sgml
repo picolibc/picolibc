@@ -11,6 +11,8 @@
   <listitem><para>
   Cygwin now handles locales using the underlying Windows locale
   support.  The locale must exist in Windows to be recognized.
+  Locale aliases from the file /usr/share/locale/locale.alias are also
+  allowed, as long as their replacement is supported by the underlying Windows.
   </para></listitem>
 
   <listitem><para>

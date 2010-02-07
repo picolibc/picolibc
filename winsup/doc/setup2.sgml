@@ -204,6 +204,25 @@ manual pages on the homepage of the
 </screen>
 
 <para>
+If the locale specifier does not follow the above form, Cygwin checks
+if the locale is one of the locale aliases defined in the file
+<filename>/usr/share/locale/locale.alias</filename>.  If so, and if
+the replacement localename is supported by the underlying Windows,
+the locale is accepted, too.  So, given the default content of the
+<filename>/usr/share/locale/locale.alias</filename> file, the below
+examples would be valid locale specifiers as well.
+</para>
+
+<screen>
+  "catalan"        defined as "ca_ES.ISO-8859-1" in locale.alias
+  "japanese"       defined as "ja_JP.eucJP"      in locale.alias
+  "turkish"        defined as "tr_TR.ISO-8859-9" in locale.alias
+</screen>
+
+<para>The file <filename>/usr/share/locale/locale.alias</filename> is
+provided by the gettext package under Cygwin.</para>
+
+<para>
 At application startup, the application's locale is set to the default
 "C" or "POSIX" locale.  Under Cygwin 1.7.2 and later, this locale defaults
 to the ASCII character set on the application level.  If you want to stick
