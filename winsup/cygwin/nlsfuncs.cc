@@ -132,6 +132,12 @@ __get_lcid_from_locale (const char *name)
 		    if (lcid != 0 && has_modifier ("@latin"))
 		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
 		  }
+		else if (!strncmp (locale, "uz-", 3))
+		  {
+		    /* Equivalent for "@cyrillic" modifier in uz_UZ locale */
+		    if (lcid != 0 && has_modifier ("@cyrillic"))
+		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
+		  }
 		break;
 	      }
 	}
@@ -213,6 +219,12 @@ __get_lcid_from_locale (const char *name)
 	      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
 	    break;
 	  }
+    }
+  else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
+    {
+      /* Equivalent for "@cyrillic" modifier in uz_UZ locale */
+      if (lcid != 0 && has_modifier ("@cyrillic"))
+	lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
     }
   last_lcid = lcid ?: (LCID) -1;
   debug_printf ("LCID=0x%04x", last_lcid);
@@ -844,10 +856,11 @@ __set_charset_from_locale (const char *locale, char *charset)
 	  || lcid == 0x281a		/* sr_RS (Serbian Language/Serbia) */
 	  || lcid == 0x301a		/* sr_ME (Serbian Language/Montenegro)*/
 	  || lcid == 0x0440		/* ky_KG (Kyrgyz/Kyrgyzstan) */
-	  || lcid == 0x0450		/* mn_MN (Mongolian/Mongolia) */
+	  || lcid == 0x0843		/* uz_UZ (Uzbek/Uzbekistan) */
 					/* tt_RU (Tatar/Russia),
 						 IQTElif alphabet */
-	  || (lcid == 0x0444 && has_modifier ("@iqtelif")))	
+	  || (lcid == 0x0444 && has_modifier ("@iqtelif"))
+	  || lcid == 0x0450)		/* mn_MN (Mongolian/Mongolia) */
       	cs = "UTF-8";
       else if (lcid == 0x0423)		/* be_BY (Belarusian/Belarus) */
 	cs = has_modifier ("@latin") ? "UTF-8" : "CP1251";
@@ -888,7 +901,7 @@ __set_charset_from_locale (const char *locale, char *charset)
       if (lcid == 0x042c)		/* az_AZ (Azeri/Azerbaijan) */
       	cs = "UTF-8";
       else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
-	cs = has_modifier ("@cyrillic") ? "UTF-8" : "ISO-8859-1";
+	cs = "ISO-8859-1";
       else
 	cs = "ISO-8859-9";
       break;
