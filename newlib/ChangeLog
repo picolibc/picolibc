@@ -1,3 +1,9 @@
+2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c: Fix typo in documentation.  Remove useless
+	_MB_CAPABLE guards within other _MB_CAPABLE guards.  Add comment
+	to remaining #endif's.
+
 2010-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/ctype_cp.h (_CTYPE_GEORGIAN_PS_128_254): Define.

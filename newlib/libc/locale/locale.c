@@ -64,7 +64,7 @@ to specify language neutral locales while using other charsets than ASCII,
 for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
 but uses the UTF-8 charset.
 
-The following charsets are recogized:
+The following charsets are recognized:
 <<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
 <<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">> with
 1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855,
@@ -251,7 +251,7 @@ static char *currentlocale(void);
 static char *loadlocale(struct _reent *, int);
 static const char *__get_locale_env(struct _reent *, int);
 
-#endif
+#endif /* _MB_CAPABLE */
 
 #if 0 /*def __CYGWIN__  TODO: temporarily(?) disable C == UTF-8 */
 static char lc_ctype_charset[ENCODING_LEN + 1] = "UTF-8";
@@ -276,7 +276,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
         return NULL;
     }
   return "C";
-#else
+#else /* !_MB_CAPABLE */
   int i, j, len, saverr;
   const char *env, *r;
 
@@ -403,7 +403,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 	}
     }
   return currentlocale ();
-#endif
+#endif /* !_MB_CAPABLE */
 }
 
 #ifdef _MB_CAPABLE
@@ -425,7 +425,7 @@ currentlocale()
                 }
         return (current_locale_string);
 }
-#endif
+#endif /* _MB_CAPABLE */
 
 #ifdef _MB_CAPABLE
 #ifdef __CYGWIN__
@@ -454,9 +454,7 @@ loadlocale(struct _reent *p, int category)
   int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		   const char *, mbstate_t *);
-#ifdef _MB_CAPABLE
   int cjknarrow = 0;
-#endif
 #ifdef __CYGWIN__
   int ret = 0;
 #endif
@@ -522,7 +520,6 @@ loadlocale(struct _reent *p, int category)
       else
 	/* Invalid string */
       	return NULL;
-#ifdef _MB_CAPABLE
       if (c[0] == '@')
 	{
 	  /* Modifier */
@@ -532,7 +529,6 @@ loadlocale(struct _reent *p, int category)
 	  if (!strcmp (c + 1, "cjknarrow"))
 	    cjknarrow = 1;
 	}
-#endif
     }
   /* We only support this subset of charsets. */
   switch (charset[0])
@@ -543,10 +539,8 @@ loadlocale(struct _reent *p, int category)
 	return NULL;
       strcpy (charset, "UTF-8");
       mbc_max = 6;
-#ifdef _MB_CAPABLE
       l_wctomb = __utf8_wctomb;
       l_mbtowc = __utf8_mbtowc;
-#endif
     break;
 #ifndef __CYGWIN__
     case 'J':
@@ -555,10 +549,8 @@ loadlocale(struct _reent *p, int category)
 	return NULL;
       strcpy (charset, "JIS");
       mbc_max = 8;
-#ifdef _MB_CAPABLE
       l_wctomb = __jis_wctomb;
       l_mbtowc = __jis_mbtowc;
-#endif
     break;
 #endif /* !__CYGWIN__ */
     case 'E':
@@ -567,10 +559,8 @@ loadlocale(struct _reent *p, int category)
 	{
 	  strcpy (charset, "EUCJP");
 	  mbc_max = 3;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __eucjp_wctomb;
 	  l_mbtowc = __eucjp_mbtowc;
-#endif
 	}
 #ifdef __CYGWIN__
       else if (!strcasecmp (charset, "EUCKR")
@@ -578,10 +568,8 @@ loadlocale(struct _reent *p, int category)
 	{
 	  strcpy (charset, "EUCKR");
 	  mbc_max = 2;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __kr_wctomb;
 	  l_mbtowc = __kr_mbtowc;
-#endif
 	}
 #endif /* __CYGWIN__ */
       else
@@ -593,10 +581,8 @@ loadlocale(struct _reent *p, int category)
 	return NULL;
       strcpy (charset, "SJIS");
       mbc_max = 2;
-#ifdef _MB_CAPABLE
       l_wctomb = __sjis_wctomb;
       l_mbtowc = __sjis_mbtowc;
-#endif
     break;
     case 'I':
     case 'i':
@@ -622,7 +608,6 @@ loadlocale(struct _reent *p, int category)
       *c++ = val % 10 + '0';
       *c = '\0';
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_ISO
       l_wctomb = __iso_wctomb;
       l_mbtowc = __iso_mbtowc;
@@ -630,7 +615,6 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_ISO */
-#endif
     break;
     case 'C':
     case 'c':
@@ -665,7 +649,6 @@ loadlocale(struct _reent *p, int category)
 	case 1257:
 	case 1258:
 	  mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 	  l_wctomb = __cp_wctomb;
 	  l_mbtowc = __cp_mbtowc;
@@ -673,14 +656,11 @@ loadlocale(struct _reent *p, int category)
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
 	  break;
 	case 932:
 	  mbc_max = 2;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __sjis_wctomb;
 	  l_mbtowc = __sjis_mbtowc;
-#endif
 	  break;
 	default:
 	  return NULL;
@@ -701,7 +681,6 @@ loadlocale(struct _reent *p, int category)
       else
 	return NULL;
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;
       l_mbtowc = __cp_mbtowc;
@@ -709,7 +688,6 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
       break;
     case 'A':
     case 'a':
@@ -717,10 +695,8 @@ loadlocale(struct _reent *p, int category)
 	return NULL;
       strcpy (charset, "ASCII");
       mbc_max = 1;
-#ifdef _MB_CAPABLE
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
-#endif
       break;
     case 'G':
     case 'g':
@@ -729,10 +705,8 @@ loadlocale(struct _reent *p, int category)
       	{
 	  strcpy (charset, "GBK");
 	  mbc_max = 2;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __gbk_wctomb;
 	  l_mbtowc = __gbk_mbtowc;
-#endif
 	}
       else
 #endif /* __CYGWIN__ */
@@ -746,7 +720,6 @@ loadlocale(struct _reent *p, int category)
 	    return NULL;
 	  strcpy (charset, "CP101");
 	  mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 	  l_wctomb = __cp_wctomb;
 	  l_mbtowc = __cp_mbtowc;
@@ -754,7 +727,6 @@ loadlocale(struct _reent *p, int category)
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
 	}
       else
 	return NULL;
@@ -766,7 +738,6 @@ loadlocale(struct _reent *p, int category)
 	return NULL;
       strcpy (charset, "CP102");
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;
       l_mbtowc = __cp_mbtowc;
@@ -774,7 +745,6 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
       break;
     case 'T':
     case 't':
@@ -787,7 +757,6 @@ loadlocale(struct _reent *p, int category)
       	return NULL;
       strcpy (charset, "CP874");
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;
       l_mbtowc = __cp_mbtowc;
@@ -795,7 +764,6 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
       break;
 #ifdef __CYGWIN__
     case 'B':
@@ -804,10 +772,8 @@ loadlocale(struct _reent *p, int category)
       	return NULL;
       strcpy (charset, "BIG5");
       mbc_max = 2;
-#ifdef _MB_CAPABLE
       l_wctomb = __big5_wctomb;
       l_mbtowc = __big5_mbtowc;
-#endif
       break;
 #endif /* __CYGWIN__ */
     default:
@@ -817,7 +783,6 @@ loadlocale(struct _reent *p, int category)
     {
       strcpy (lc_ctype_charset, charset);
       __mb_cur_max = mbc_max;
-#ifdef _MB_CAPABLE
       __wctomb = l_wctomb;
       __mbtowc = l_mbtowc;
       __set_ctype (charset);
@@ -831,7 +796,6 @@ loadlocale(struct _reent *p, int category)
 			  && ((strncmp (locale, "ja", 2) == 0
 			      || strncmp (locale, "ko", 2) == 0
 			      || strncmp (locale, "zh", 2) == 0));
-#endif
     }
   else if (category == LC_MESSAGES)
     strcpy (lc_message_charset, charset);
@@ -872,7 +836,7 @@ __get_locale_env(struct _reent *p, int category)
 
   return env;
 }
-#endif
+#endif /* _MB_CAPABLE */
 
 char *
 _DEFUN_VOID(__locale_charset)
