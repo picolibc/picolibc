@@ -1,3 +1,14 @@
+2010-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add CW_INT_SETLOCALE case to
+	allow to call internal_setlocale().
+	* nlsfuncs.cc (internal_setlocale): Make externally available.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_INT_SETLOCALE.
+
+	* nlsfuncs.cc (lc_mbstowcs): Fix call to f_mbtowc.
+	(__set_locale_from_locale_alias): Ignore "@cjknarrow" modifier.
+
 2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__get_lcid_from_locale): Handle "@cyrillic" modifier

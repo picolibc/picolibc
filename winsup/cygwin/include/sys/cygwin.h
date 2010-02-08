@@ -1,7 +1,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009 Red Hat, Inc.
+   2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -145,7 +145,8 @@ typedef enum
     CW_SETERRNO,
     CW_EXIT_PROCESS,
     CW_SET_EXTERNAL_TOKEN,
-    CW_GET_INSTKEY
+    CW_GET_INSTKEY,
+    CW_INT_SETLOCALE
   } cygwin_getinfo_types;
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */

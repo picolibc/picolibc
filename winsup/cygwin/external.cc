@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -468,6 +468,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = 0;
 	}
 	break;
+      case CW_INT_SETLOCALE:
+	{
+	  extern void internal_setlocale ();
+	  internal_setlocale ();
+	  res = 0;
+	}
 
       default:
 	set_errno (ENOSYS);
