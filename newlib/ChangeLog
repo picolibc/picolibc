@@ -1,3 +1,8 @@
+2010-02-08  Josef Wolf  <jw@raven.inka.de>
+
+	* libc/machine/m68k/memcpy.S: MISALIGEND_OK should not be set for
+	__mcpu32__.
+
 2010-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c: Add Cygwin's /usr/share/locale/locale.alias
