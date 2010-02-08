@@ -294,7 +294,8 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
     n = 1;
   while (n > 0)
     {
-      bytes = f_mbtowc (_REENT, pwcs, t, n, charset, &state);
+      bytes = f_mbtowc (_REENT, pwcs, t, 6 /* fake, always enough */,
+			charset, &state);
       if (bytes == (size_t) -1)
         {
           state.__count = 0;
@@ -956,6 +957,7 @@ __set_locale_from_locale_alias (const char *locale, char *new_locale)
   wchar_t walias[ENCODING_LEN + 1];
 #define LOCALE_ALIAS_LINE_LEN 255
   char alias_buf[LOCALE_ALIAS_LINE_LEN + 1], *c;
+  wchar_t *wc;
   const char *alias, *replace;
   char *ret = NULL;
 
@@ -967,6 +969,10 @@ __set_locale_from_locale_alias (const char *locale, char *new_locale)
   if (mbstowcs (wlocale, locale, ENCODING_LEN + 1) == (size_t) -1)
     sys_mbstowcs (wlocale, ENCODING_LEN + 1, locale);
   wlocale[ENCODING_LEN] = L'\0';
+  /* Ignore @cjknarrow modifier since it's a very personal thing between
+     Cygwin and newlib... */
+  if ((wc = wcschr (wlocale, L'@')) && !wcscmp (wc + 1, L"cjknarrow"))
+    *wc = L'\0';
   while (fgets (alias_buf, LOCALE_ALIAS_LINE_LEN + 1, fp))
     {
       alias_buf[LOCALE_ALIAS_LINE_LEN] = '\0';
@@ -1030,7 +1036,9 @@ check_codepage (char *ret)
   return ret;
 }
 
-static void
+/* Can be called via cygwin_internal (CW_INTERNAL_SETLOCALE) for application
+   which really (think they) know what they are doing. */
+extern "C" void
 internal_setlocale ()
 {
   /* Each setlocale from the environment potentially changes the
