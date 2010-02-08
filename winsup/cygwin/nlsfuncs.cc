@@ -294,7 +294,7 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
     n = 1;
   while (n > 0)
     {
-      bytes = f_mbtowc (_REENT, pwcs, t, MB_CUR_MAX, charset, &state);
+      bytes = f_mbtowc (_REENT, pwcs, t, n, charset, &state);
       if (bytes == (size_t) -1)
         {
           state.__count = 0;
