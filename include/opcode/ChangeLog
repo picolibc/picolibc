@@ -1,3 +1,7 @@
+2010-02-08  Philipp Tomsich  <philipp.tomsich@theobroma-systems.com>
+
+	* opcode/ppc.h (PPC_OPCODE_TITAN): Define.
+
 2010-01-14  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* ia64.h (ia64_find_opcode): Remove argument name.
