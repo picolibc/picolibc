@@ -229,12 +229,13 @@ __get_lcid_from_locale (const char *name)
   return last_lcid;
 }
 
-/* Never returns -1, *iff* s is not NULL.  Just skips invalid chars
-   instead.  s==NULL returns -1 since it's used to recognize invalid
-   strings in the used charset. */
+/* Never returns -1.  Just skips invalid chars instead.  Only if return_invalid
+   is set, s==NULL returns -1 since then it's used to recognize invalid strings
+   in the used charset. */
 static size_t
 lc_wcstombs (wctomb_p f_wctomb, const char *charset,
-	     char *s, const wchar_t *pwcs, size_t n)
+	     char *s, const wchar_t *pwcs, size_t n,
+	     bool return_invalid = false)
 {
   char *ptr = s;
   size_t max = n;
@@ -249,9 +250,10 @@ lc_wcstombs (wctomb_p f_wctomb, const char *charset,
       while (*pwcs != 0)
 	{
 	  bytes = f_wctomb (_REENT, buf, *pwcs++, charset, &state);
-	  if (bytes == (size_t) -1)
+	  if (bytes != (size_t) -1)
+	    num_bytes += bytes;
+	  else if (return_invalid)
 	    return (size_t) -1;
-	  num_bytes += bytes;
 	}
       return num_bytes;
     }
@@ -610,7 +612,7 @@ __set_lc_monetary_from_win (const char *name,
        given charset, use int_curr_symbol. */
     wchar_t wbuf[14];
     GetLocaleInfoW (lcid, LOCALE_SCURRENCY, wbuf, 14);
-    if (lc_wcstombs (f_wctomb, charset, NULL, wbuf, 0) == (size_t) -1)
+    if (lc_wcstombs (f_wctomb, charset, NULL, wbuf, 0, true) == (size_t) -1)
       {
 	_monetary_locale->currency_symbol = lc_monetary_ptr;
 	lc_monetary_ptr = stpncpy (lc_monetary_ptr,
@@ -717,23 +719,16 @@ __set_lc_messages_from_win (const char *name,
   if (!res)
     return 0;
 
-  /* Evaluate string length in target charset. */
-  size_t len, total = 0;
-  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->yesexpr, 0)) + 1;
-  if (len == (size_t) -1)
-    return -1;
-  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->noexpr, 0)) + 1;
-  if (len == (size_t) -1)
-    return -1;
-  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->yesstr, 0)) + 1;
-  if (len == (size_t) -1)
-    return -1;
-  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->nostr, 0)) + 1;
-  if (len == (size_t) -1)
-    return -1;
+  /* Evaluate string length in target charset.  Characters invalid in the
+     target charset are simply ignored, as on Linux. */
+  size_t len = 0;
+  len += lc_wcstombs (f_wctomb, charset, NULL, res->yesexpr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, res->noexpr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, res->yesstr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, res->nostr, 0) + 1;
   /* Allocate. */
-  char *new_lc_messages_buf = (char *) malloc (total);
-  const char *lc_messages_end = new_lc_messages_buf + total;
+  char *new_lc_messages_buf = (char *) malloc (len);
+  const char *lc_messages_end = new_lc_messages_buf + len;
 
   if (!new_lc_messages_buf)
     return -1;
