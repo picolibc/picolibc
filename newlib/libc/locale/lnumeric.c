@@ -54,11 +54,12 @@ __numeric_load_locale(const char *name , void *f_wctomb, const char *charset)
 
 #ifdef __CYGWIN__
 	extern int __set_lc_numeric_from_win (const char *,
-					      struct lc_numeric_T *,
+					      struct lc_numeric_T *, char **,
 					      void *, const char *);
 	int old_numeric_using_locale = _numeric_using_locale;
 	_numeric_using_locale = 0;
 	ret = __set_lc_numeric_from_win (name, &_numeric_locale,
+					 &_numeric_locale_buf,
 					 f_wctomb, charset);
 	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
 	if (ret < 0)

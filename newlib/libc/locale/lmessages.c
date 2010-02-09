@@ -49,8 +49,29 @@ static int	_messages_using_locale;
 static char	*_messages_locale_buf;
 
 int
-__messages_load_locale(const char *name) {
+__messages_load_locale (const char *name, void *f_wctomb, const char *charset)
+{
+#ifdef __CYGWIN__
+	extern int __set_lc_messages_from_win (const char *,
+					       struct lc_messages_T *, char **,
+					       void *, const char *);
+	int ret;
 
+	int old_messages_using_locale = _messages_using_locale;
+	_messages_using_locale = 0;
+	ret = __set_lc_messages_from_win (name, &_messages_locale,
+					  &_messages_locale_buf,
+					  f_wctomb, charset);
+	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+	if (ret < 0)
+	  _messages_using_locale = old_messages_using_locale;
+	else
+	  {
+	    _messages_using_locale = ret;
+	    ret = 0;
+	  }
+	return ret;
+#else
 	/*
 	 * Propose that we can have incomplete locale file (w/o "{yes,no}str").
 	 * Initialize them before loading.  In case of complete locale, they'll
@@ -63,6 +84,7 @@ __messages_load_locale(const char *name) {
 		_messages_locale_buf, "LC_MESSAGES",
 		LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
 		(const char **)&_messages_locale);
+#endif
 }
 
 struct lc_messages_T *

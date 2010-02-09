@@ -109,10 +109,11 @@ __time_load_locale(const char *name, void *f_wctomb, const char *charset) {
 
 #ifdef __CYGWIN__
 	extern int __set_lc_time_from_win (const char *, struct lc_time_T *,
-					   void *, const char *);
+					   char **, void *, const char *);
 	int old_time_using_locale = _time_using_locale;
 	_time_using_locale = 0;
-	ret = __set_lc_time_from_win (name, &_time_locale, f_wctomb, charset);
+	ret = __set_lc_time_from_win (name, &_time_locale, &time_locale_buf,
+				      f_wctomb, charset);
 	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
 	if (ret < 0)
 	  _time_using_locale = old_time_using_locale;

@@ -817,7 +817,13 @@ restart:
 			      || strncmp (locale, "zh", 2) == 0));
     }
   else if (category == LC_MESSAGES)
-    strcpy (lc_message_charset, charset);
+    {
+#ifdef __CYGWIN__
+      ret = __messages_load_locale (locale, (void *) l_wctomb, charset);
+      if (!ret)
+#endif
+      strcpy (lc_message_charset, charset);
+    }
 #ifdef __CYGWIN__
   else if (category == LC_COLLATE)
     ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);

@@ -1,3 +1,19 @@
+2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/lmessages.c (__messages_load_locale): Take additional
+	parameters for wide char to multibyte conversion.  Call
+	__set_lc_messages_from_win on Cygwin.
+	* libc/locale/lmessages.h: Make C++-safe.
+	(__messages_load_locale): Change declaration.
+	* libc/locale/lmonetary.c (__monetary_load_locale): Use
+	_monetary_locale_buf as buffer pointer.
+	* libc/locale/lnumeric.c (__numeric_load_locale): Use
+	_numeric_locale_buf as buffer pointer.
+	* libc/locale/timelocal.c (__time_load_locale): Use time_locale_buf
+	as buffer pointer.
+	* libc/locale/locale.c (loadlocale): Enable loading LC_MESSAGES data
+	on Cygwin.
+
 2010-02-08  Josef Wolf  <jw@raven.inka.de>
 
 	* libc/machine/m68k/memcpy.S: MISALIGEND_OK should not be set for
