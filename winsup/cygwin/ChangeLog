@@ -1,5 +1,9 @@
 2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__set_lc_messages_from_win): Fix typo.
+
+2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* lc_msg.h: New file, fix a problem in locales with modifiers.
 
 2010-02-09  Corinna Vinschen  <corinna@vinschen.de>

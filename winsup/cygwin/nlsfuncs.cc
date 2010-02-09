@@ -705,7 +705,7 @@ __set_lc_messages_from_win (const char *name,
       c2 = strchr (c + 1, '@');
       /* Ignore @cjknarrow modifier since it's a very personal thing between
 	 Cygwin and newlib... */
-      if (c2 && !strcmp (c2, "@cjknarrow"))
+      if (c2 && strcmp (c2, "@cjknarrow"))
       	memmove (c, c2, strlen (c2) + 1);
     }
   /* Now search in the alphabetically order lc_msg array for the
