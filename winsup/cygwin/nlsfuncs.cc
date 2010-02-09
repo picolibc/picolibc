@@ -23,10 +23,8 @@ details. */
 #include "../locale/timelocal.h"
 #include "../locale/lnumeric.h"
 #include "../locale/lmonetary.h"
-
-static char *lc_time_buf;
-static char *lc_numeric_buf;
-static char *lc_monetary_buf;
+#include "../locale/lmessages.h"
+#include "lc_msg.h"
 
 #define _LC(x)	&lc_##x##_ptr,lc_##x##_end-lc_##x##_ptr
 
@@ -295,7 +293,7 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
   while (n > 0)
     {
       bytes = f_mbtowc (_REENT, pwcs, t, 6 /* fake, always enough */,
-			charset, &state);
+      			charset, &state);
       if (bytes == (size_t) -1)
         {
           state.__count = 0;
@@ -465,7 +463,8 @@ conv_grouping (LCID lcid, LCTYPE type, char **lc_ptr)
    accessed by functions like nl_langinfo, strftime, strptime. */
 extern "C" int
 __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
-			wctomb_p f_wctomb, const char *charset)
+			char **lc_time_buf, wctomb_p f_wctomb,
+			const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
   if (!lcid || lcid == (LCID) -1)
@@ -527,9 +526,9 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
       free (new_lc_time_buf);
       return -1;
     }
-  if (lc_time_buf)
-    free (lc_time_buf);
-  lc_time_buf = tmp;
+  if (*lc_time_buf)
+    free (*lc_time_buf);
+  *lc_time_buf = tmp;
   return 1;
 }
 
@@ -540,7 +539,8 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
 extern "C" int
 __set_lc_numeric_from_win (const char *name,
 			   struct lc_numeric_T *_numeric_locale,
-			   wctomb_p f_wctomb, const char *charset)
+			   char **lc_numeric_buf, wctomb_p f_wctomb,
+			   const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
   if (!lcid || lcid == (LCID) -1)
@@ -569,9 +569,9 @@ __set_lc_numeric_from_win (const char *name,
       free (new_lc_numeric_buf);
       return -1;
     }
-  if (lc_numeric_buf)
-    free (lc_numeric_buf);
-  lc_numeric_buf = tmp;
+  if (*lc_numeric_buf)
+    free (*lc_numeric_buf);
+  *lc_numeric_buf = tmp;
   return 1;
 }
 
@@ -582,7 +582,8 @@ __set_lc_numeric_from_win (const char *name,
 extern "C" int
 __set_lc_monetary_from_win (const char *name,
 			    struct lc_monetary_T *_monetary_locale,
-			    wctomb_p f_wctomb, const char *charset)
+			    char **lc_monetary_buf, wctomb_p f_wctomb,
+			    const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
   if (!lcid || lcid == (LCID) -1)
@@ -667,9 +668,89 @@ __set_lc_monetary_from_win (const char *name,
       free (new_lc_monetary_buf);
       return -1;
     }
-  if (lc_monetary_buf)
-    free (lc_monetary_buf);
-  lc_monetary_buf = tmp;
+  if (*lc_monetary_buf)
+    free (*lc_monetary_buf);
+  *lc_monetary_buf = tmp;
+  return 1;
+}
+
+static int
+locale_cmp (const void *a, const void *b)
+{
+  struct lc_msg_t *la = (struct lc_msg_t *) a;
+  struct lc_msg_t *lb = (struct lc_msg_t *) b;
+  return strcmp (la->locale, lb->locale);
+}
+
+extern "C" int
+__set_lc_messages_from_win (const char *name,
+			    struct lc_messages_T *_messages_locale,
+			    char **lc_messages_buf,
+			    wctomb_p f_wctomb, const char *charset)
+{
+  LCID lcid = __get_lcid_from_locale (name);
+  if (!lcid || lcid == (LCID) -1)
+    return lcid;
+
+  char locale[ENCODING_LEN + 1];
+  char *c, *c2;
+
+  strcpy (locale, name);
+  /* Removes the charset from the locale and attach the modifer to the
+     language_TERRITORY part. */
+  c = strchr (locale, '.');
+  if (c)
+    {
+      *c = '\0';
+      c2 = strchr (c + 1, '@');
+      /* Ignore @cjknarrow modifier since it's a very personal thing between
+	 Cygwin and newlib... */
+      if (c2 && !strcmp (c2, "@cjknarrow"))
+      	memmove (c, c2, strlen (c2) + 1);
+    }
+  /* Now search in the alphabetically order lc_msg array for the
+     locale. */
+  lc_msg_t locale_key = { locale, NULL, NULL, NULL, NULL };
+  lc_msg_t *res = (lc_msg_t *) bsearch ((void *) &locale_key, (void *) lc_msg,
+					sizeof lc_msg / sizeof *lc_msg,
+					sizeof *lc_msg, locale_cmp);
+  if (!res)
+    return 0;
+
+  /* Evaluate string length in target charset. */
+  size_t len, total = 0;
+  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->yesexpr, 0)) + 1;
+  if (len == (size_t) -1)
+    return -1;
+  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->noexpr, 0)) + 1;
+  if (len == (size_t) -1)
+    return -1;
+  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->yesstr, 0)) + 1;
+  if (len == (size_t) -1)
+    return -1;
+  total += (len = lc_wcstombs (f_wctomb, charset, NULL, res->nostr, 0)) + 1;
+  if (len == (size_t) -1)
+    return -1;
+  /* Allocate. */
+  char *new_lc_messages_buf = (char *) malloc (total);
+  const char *lc_messages_end = new_lc_messages_buf + total;
+
+  if (!new_lc_messages_buf)
+    return -1;
+  /* Copy over. */
+  c = new_lc_messages_buf;
+  _messages_locale->yesexpr = (const char *) c;
+  len = lc_wcstombs (f_wctomb, charset, c, res->yesexpr, lc_messages_end - c);
+  _messages_locale->noexpr = (const char *) (c += len + 1);
+  len = lc_wcstombs (f_wctomb, charset, c, res->noexpr, lc_messages_end - c);
+  _messages_locale->yesstr = (const char *) (c += len + 1);
+  len = lc_wcstombs (f_wctomb, charset, c, res->yesstr, lc_messages_end - c);
+  _messages_locale->nostr = (const char *) (c += len + 1);
+  lc_wcstombs (f_wctomb, charset, c, res->nostr, lc_messages_end - c);
+  /* Aftermath. */
+  if (*lc_messages_buf)
+    free (*lc_messages_buf);
+  *lc_messages_buf = new_lc_messages_buf;
   return 1;
 }
 
