@@ -51,7 +51,8 @@
 #define _ISA_ARM_4T
 #endif
 
-#if defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7__)
+#if defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7__) || \
+    defined (__ARM_ARCH_7EM__)
 #define _ISA_THUMB_2
 #endif
 

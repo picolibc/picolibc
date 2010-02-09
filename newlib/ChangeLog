@@ -1,3 +1,8 @@
+2010-02-09  Daniel Gutson  <dgutson@codesourcery.com>
+
+	* libc/machine/arm/arm_asm.h (_ISA_THUMB_2): __ARM_ARCH_7EM__
+	added to the preprocessor condition.
+
 2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/lmessages.c (__messages_load_locale): Take additional
