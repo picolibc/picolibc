@@ -517,6 +517,16 @@
 					/*   note name must be "LINUX".  */
 #define NT_S390_HIGH_GPRS 0x300		/* S/390 upper halves of GPRs  */
 					/*   note name must be "LINUX".  */
+#define NT_S390_TIMER	0x301		/* S390 timer */
+					/*   note name must be "LINUX".  */
+#define NT_S390_TODCMP	0x302		/* S390 TOD clock comparator */
+					/*   note name must be "LINUX".  */
+#define NT_S390_TODPREG	0x303		/* S390 TOD programmable register */
+					/*   note name must be "LINUX".  */
+#define NT_S390_CTRS	0x304		/* S390 control registers */
+					/*   note name must be "LINUX".  */
+#define NT_S390_PREFIX	0x305		/* S390 prefix register */
+					/*   note name must be "LINUX".  */
 
 /* Note segments for core files on dir-style procfs systems.  */
 

@@ -1,3 +1,8 @@
+2010-02-09  Michael Holzheu  <holzheu@de.ibm.com>
+
+	* common.h (NT_S390_TIMER, NT_S390_TODCMP, NT_S390_TODPREG,
+	NT_S390_CTRS and NT_S390_PREFIX): Define.
+
 2010-02-02  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h (NT_386_XSTATE): New.
