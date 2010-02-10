@@ -879,6 +879,7 @@ __set_charset_from_locale (const char *locale, char *charset)
 {
   UINT cp;
   LCID lcid = __get_lcid_from_locale (locale);
+  wchar_t wbuf[9];
 
   /* "C" locale, or invalid locale? */
   if (lcid == 0 || lcid == (LCID) -1)
@@ -967,7 +968,9 @@ __set_charset_from_locale (const char *locale, char *charset)
       else if (lcid == 0x042e)		/* hsb_DE (Upper Sorbian/Germany) */
 	cs = "ISO-8859-2";
       else if (lcid == 0x0491		/* gd_GB (Scots Gaelic/Great Britain) */
-	       || has_modifier ("@euro"))
+	       || (has_modifier ("@euro")
+		   && GetLocaleInfoW (lcid, LOCALE_SINTLSYMBOL, wbuf, 9)
+		   && !wcsncmp (wbuf, L"EUR", 3)))
 	cs = "ISO-8859-15";
       else
 	cs = "ISO-8859-1";
