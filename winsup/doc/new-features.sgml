@@ -45,7 +45,8 @@
 
   <listitem><para>
   LC_COLLATE, LC_MONETARY, LC_NUMERIC, and LC_TIME localization is
-  enabled via Windows locale support.
+  enabled via Windows locale support.  LC_MESSAGES is enabled via a big
+  table with localized strings.
   </para></listitem>
 
   <listitem><para>

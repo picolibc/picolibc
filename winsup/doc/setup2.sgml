@@ -291,10 +291,10 @@ ignored for now.</para>
 
 <itemizedlist mark="bullet">
 
-<listitem><para>For languages which default to the ISO-8859-1 character
-set, the modifier "@euro" can be added to enforce usage of the ISO-8859-15
-character set, which includes a character for the "Euro" currency sign.
-Beware, that also works for non-european locales.
+<listitem><para>
+For locales which use the Euro (EUR) as currency, the modifier "@euro"
+can be added to enforce usage of the ISO-8859-15 character set, which
+includes a character for the "Euro" currency sign.
 </para></listitem>
 
 <listitem><para>
@@ -497,24 +497,6 @@ entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,
 
 </sect2>
 
-<sect2 id="setup-locale-missing"><title>What does not work?</title>
-
-<para>
-The environment variable and locale setting <envar>LC_MESSAGES</envar>
-is ignored right now.  There's no known WIndows function to fetch the
-regular expressions to recognize user input with the meaning of "yes"
-or "no" from some Windows function.  Therefore,
-<function>nl_langinfo(YESEXPR)</function> and
-<function>nl_langinfo(NOEXPR)</function> always return a string
-suitable only for the English language.</para>
-
-<para>If somebody knows a simple solution to this problem, feel free
-to notify us on the 
-<ulink url="mailto:cygwin@cygin.com">Cygwin mailing list</ulink>.
-</para>
-
-</sect2>
- 
 <sect2 id="setup-locale-charsetlist"><title>List of supported character sets</title>
 
 <para>Last but not least, here's the list of currently supported character
