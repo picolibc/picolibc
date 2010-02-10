@@ -1,3 +1,9 @@
+2010-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__get_lcid_from_locale): Convert iu_CA to iu-Latn-CA
+	rather than iu-Cans-CA on Vista and later.
+	(__set_charset_from_locale): Set default charset for iu_CA to UTF-8.
+
 2010-02-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (_dll_crt0): Set _main_tls as early as possible.
@@ -36,6 +42,15 @@
 	* thread.cc (pthread::exit): Avoid potential double call to
 	_my_tls.remove.
 	* tlsoffsets.h: Regenerate.
+
+2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (lc_wcstombs): Add `return_invalid' flag to specify
+	whether invalid chars should be ignored or not.  Change comment.
+	(__set_lc_monetary_from_win): Call lc_wcstombs with return_invalid
+	flag set.
+	(__set_lc_messages_from_win): Simplify to accommodate the fact that
+	lc_wcstombs just ignores invalid chars.  Explain why.
 
 2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
 

@@ -101,7 +101,7 @@ __get_lcid_from_locale (const char *name)
 	    { "az-AZ" , L"az-Latn-AZ"  },
 	    { "bs-BA" , L"bs-Latn-BA"  },
 	    { "ha-NG" , L"ha-Latn-NG"  },
-	    { "iu-CA" , L"iu-Cans-CA"  },
+	    { "iu-CA" , L"iu-Latn-CA"  },
 	    { "mn-CN" , L"mn-Mong-CN"  },
 	    { "no-NO" , L"nb-NO"       },
 	    { "sr-BA" , L"sr-Cyrl-BA"  },
@@ -961,7 +961,8 @@ __set_charset_from_locale (const char *locale, char *charset)
 	       || lcid == 0x043b	/* se_NO (Northern Saami/Norway) */
 	       || lcid == 0x0432	/* tn_ZA (Tswana/South Africa) */
 	       || lcid == 0x0488	/* wo_SN (Wolof/Senegal) */
-	       || lcid == 0x046a)	/* yo_NG (Yoruba/Nigeria) */
+	       || lcid == 0x046a	/* yo_NG (Yoruba/Nigeria) */
+	       || lcid == 0x085d)	/* iu_CA (Inuktitut/Canada) */
       	cs = "UTF-8";
       else if (lcid == 0x042e)		/* hsb_DE (Upper Sorbian/Germany) */
 	cs = "ISO-8859-2";
