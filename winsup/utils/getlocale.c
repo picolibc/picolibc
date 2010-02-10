@@ -40,11 +40,11 @@ usage (FILE * stream, int status)
 {
   fprintf (stream,
 	   "Usage: %s [-asuh]\n"
-	   "Print Windows locale(s)\n"
+	   "Print default locale or list of all supported locales\n"
 	   "\n"
 	   "Options:\n"
 	   "\n"
-	   "  -a, --all       List all available locales\n"
+	   "  -a, --all       List all available supported locales\n"
 	   "  -s, --system    Print system default locale\n"
 	   "                  (default is current user default locale)\n"
 	   "  -u, --utf       Attach \".UTF-8\" to the result\n"

@@ -1,5 +1,9 @@
 2010-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* getlocale.c (usage): Change text slightly.
+
+2010-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* getlocale.c (main): Restrict -a loop to avoid psudo language entries
 	on Vista and later.
 
