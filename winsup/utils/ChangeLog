@@ -1,3 +1,8 @@
+2010-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getlocale.c (main): Revamp -a loop to avoid duplicates and to print
+	locales with the correct, supported modifiers.
+
 2010-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getlocale.c (main): Use setlocale and fetch string from Windows

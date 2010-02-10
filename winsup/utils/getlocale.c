@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <string.h>
+#include <wchar.h>
 #include <locale.h>
 #define WINVER 0x0601
 #include <windows.h>
@@ -109,22 +110,81 @@ int main (int argc, char **argv)
       unsigned lang, sublang;
 
       for (lang = 1; lang <= 0x3ff; ++lang)
-	for (sublang = 1; sublang <= 0x3f; ++sublang)
-	  {
-	    lcid = (sublang << 10) | lang;
-	    if (getlocale (lcid, name))
-	      {
-		wchar_t lang[256];
-		wchar_t country[256];
-		char loc[32];
-		/* Go figure.  Even the English name of a language or
-		   locale might contain native characters. */
-		GetLocaleInfoW (lcid, LOCALE_SENGLANGUAGE, lang, 256);
-		GetLocaleInfoW (lcid, LOCALE_SENGCOUNTRY, country, 256);
-		stpcpy (stpcpy (loc, name), utf);
-		printf ("%-16s %ls (%ls)\n", loc, lang, country);
-	      }
-	  }
+	{
+	  struct {
+	    wchar_t lang[256];
+	    wchar_t country[256];
+	    char loc[32];
+	  } loc_list[32];
+	  int lcnt = 0;
+
+	  for (sublang = 1; sublang <= 0x3f; ++sublang)
+	    {
+	      lcid = (sublang << 10) | lang;
+	      if (getlocale (lcid, name))
+		{
+		  wchar_t lang[256];
+		  wchar_t country[256];
+		  int i;
+		  char *c, loc[32];
+		  wchar_t wbuf[9];
+
+		  /* Go figure.  Even the English name of a language or
+		     locale might contain native characters. */
+		  GetLocaleInfoW (lcid, LOCALE_SENGLANGUAGE, lang, 256);
+		  GetLocaleInfoW (lcid, LOCALE_SENGCOUNTRY, country, 256);
+		  /* Avoid dups */
+		  for (i = 0; i < lcnt; ++ i)
+		    if (!wcscmp (loc_list[i].lang, lang)
+			&& !wcscmp (loc_list[i].country, country))
+		      break;
+		  if (i < lcnt)
+		    continue;
+		  if (lcnt < 32)
+		    {
+		      wcscpy (loc_list[lcnt].lang, lang);
+		      wcscpy (loc_list[lcnt].country, country);
+		    }
+		  /* Now check certain conditions to figure out if that
+		     locale requires a modifier. */
+		  c = stpcpy (loc, name);
+		  if (wcsstr (lang, L"(Latin)")
+		      && (!strncmp (loc, "sr_", 3)
+			  || !strcmp (loc, "be_BY")))
+		    stpcpy (c, "@latin");
+		  else if (wcsstr (lang, L"(Cyrillic)")
+			   && !strcmp (loc, "uz_UZ"))
+		    stpcpy (c, "@cyrillic");
+		  /* Avoid more dups */
+		  for (i = 0; i < lcnt; ++ i)
+		    if (!strcmp (loc_list[i].loc, loc))
+		      {
+			lcnt++;
+			break;
+		      }
+		  if (i < lcnt)
+		    continue;
+		  if (lcnt < 32)
+		    strcpy (loc_list[lcnt++].loc, loc);
+		  /* Print */
+		  printf ("%-16s %ls (%ls)\n", loc, lang, country);
+		  /* Check for locales which sport a modifier for
+		     changing the codeset and other stuff. */
+		  if (!strcmp (loc, "tt_RU"))
+		    stpcpy (c, "@iqtelif");
+		  else if (GetLocaleInfoW (lcid, LOCALE_SINTLSYMBOL, wbuf, 9)
+			   && !wcsncmp (wbuf, L"EUR", 3))
+		    stpcpy (c, "@euro");
+		  else if (!strncmp (loc, "ja_", 3)
+			   || !strncmp (loc, "ko_", 3)
+			   || !strncmp (loc, "zh_", 3))
+		    stpcpy (c, "@cjknarrow");
+		  else
+		    continue;
+		  printf ("%-16s %ls (%ls)\n", loc, lang, country);
+		}
+	    }
+	}
       return 0;
     }
   if (getlocale (lcid, name))
