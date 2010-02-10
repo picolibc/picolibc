@@ -109,7 +109,7 @@ int main (int argc, char **argv)
     {
       unsigned lang, sublang;
 
-      for (lang = 1; lang <= 0x3ff; ++lang)
+      for (lang = 1; lang <= 0xff; ++lang)
 	{
 	  struct {
 	    wchar_t lang[256];
