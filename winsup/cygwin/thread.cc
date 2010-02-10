@@ -1,7 +1,7 @@
 /* thread.cc: Locking and threading module functions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -187,9 +187,8 @@ pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
     return false;
   /* Check if the mutex is owned by the current thread and can be unlocked.
    * Also check for the ANONYMOUS owner to cover NORMAL mutexes as well. */
-  return ((*mutex)->recursion_counter == 1
-	  && ((*mutex)->owner == MUTEX_OWNER_ANONYMOUS
-	      || pthread::equal ((*mutex)->owner, self)));
+  return (*mutex)->recursion_counter == 1
+	 && pthread::equal ((*mutex)->owner, self);
 }
 
 inline bool
@@ -302,7 +301,7 @@ MTinterface::fixup_after_fork ()
 void
 pthread::init_mainthread ()
 {
-  pthread *thread = get_tls_self_pointer ();
+  pthread *thread = _my_tls.tid;
   if (!thread)
     {
       thread = new pthread ();
@@ -325,19 +324,13 @@ pthread::init_mainthread ()
 pthread *
 pthread::self ()
 {
-  pthread *thread = get_tls_self_pointer ();
+  pthread *thread = _my_tls.tid;
   if (!thread)
     {
       thread = pthread_null::get_null_pthread ();
       set_tls_self_pointer (thread);
     }
   return thread;
-}
-
-pthread *
-pthread::get_tls_self_pointer ()
-{
-  return _my_tls.tid;
 }
 
 void
@@ -1561,7 +1554,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   type (PTHREAD_MUTEX_ERRORCHECK),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
-  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
     {
       magic = 0;
@@ -1592,8 +1585,9 @@ pthread_mutex::~pthread_mutex ()
 }
 
 int
-pthread_mutex::_lock (pthread_t self)
+pthread_mutex::lock ()
 {
+  pthread_t self = ::pthread_self ();
   int result = 0;
 
   if (InterlockedIncrement ((long *)&lock_counter) == 1)
@@ -1616,8 +1610,31 @@ pthread_mutex::_lock (pthread_t self)
 }
 
 int
-pthread_mutex::_trylock (pthread_t self)
+pthread_mutex::unlock ()
 {
+  pthread_t self = ::pthread_self ();
+  if (!pthread::equal (owner, self))
+    return EPERM;
+
+  /* Don't try to unlock anything if recursion_counter == 0 initially.
+     That means that we've forked. */
+  if (recursion_counter > 0 && --recursion_counter == 0)
+    {
+      owner = NULL;
+#ifdef DEBUGGING
+      tid = 0;
+#endif
+      if (InterlockedDecrement ((long *) &lock_counter))
+	::SetEvent (win32_obj_id); // Another thread may be waiting
+    }
+
+  return 0;
+}
+
+int
+pthread_mutex::trylock ()
+{
+  pthread_t self = ::pthread_self ();
   int result = 0;
 
   if (InterlockedCompareExchange ((long *) &lock_counter, 1, 0) == 0)
@@ -1631,31 +1648,9 @@ pthread_mutex::_trylock (pthread_t self)
 }
 
 int
-pthread_mutex::_unlock (pthread_t self)
+pthread_mutex::destroy ()
 {
-  if (!pthread::equal (owner, self))
-    return EPERM;
-
-  /* Don't try to unlock anything if recursion_counter == 0 initially.
-     That means that we've forked. */
-  if (recursion_counter > 0 && --recursion_counter == 0)
-    {
-      owner = NULL;
-#ifdef DEBUGGING
-      tid = 0;
-#endif
-      if (InterlockedDecrement ((long *) &lock_counter))
-	// Another thread is waiting
-	::ReleaseSemaphore (win32_obj_id, 1, NULL);
-    }
-
-  return 0;
-}
-
-int
-pthread_mutex::_destroy (pthread_t self)
-{
-  if (condwaits || _trylock (self))
+  if (condwaits || trylock ())
     // Do not destroy a condwaited or locked mutex
     return EBUSY;
   else if (recursion_counter > 1)
@@ -1683,7 +1678,7 @@ pthread_mutex::_fixup_after_fork ()
 #ifdef DEBUGGING
   tid = 0xffffffff;	/* Don't know the tid after a fork */
 #endif
-  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
     api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
 }
@@ -2665,40 +2660,40 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 		     const pthread_mutexattr_t *attr,
 		     const pthread_mutex_t initializer)
 {
-  pthread_mutex_t new_mutex;
-
   if (attr && !pthread_mutexattr::is_good_object (attr))
     return EINVAL;
 
   mutex_initialization_lock.lock ();
-
-  new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
-  if (!is_good_object (&new_mutex))
+  if (pthread_mutex::is_good_initializer (mutex))
     {
-      delete new_mutex;
-      mutex_initialization_lock.unlock ();
-      return EAGAIN;
-    }
+      pthread_mutex_t new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
+      if (!is_good_object (&new_mutex))
+	{
+	  delete new_mutex;
+	  mutex_initialization_lock.unlock ();
+	  return EAGAIN;
+	}
 
-  if (!attr && initializer)
-    {
-      if (initializer == PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
-	new_mutex->type = PTHREAD_MUTEX_RECURSIVE;
-      else if (initializer == PTHREAD_NORMAL_MUTEX_INITIALIZER_NP)
-	new_mutex->type = PTHREAD_MUTEX_NORMAL;
-      else if (initializer == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
-	new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
-    }
+      if (!attr && initializer)
+	{
+	  if (initializer == PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
+	    new_mutex->type = PTHREAD_MUTEX_RECURSIVE;
+	  else if (initializer == PTHREAD_NORMAL_MUTEX_INITIALIZER_NP)
+	    new_mutex->type = PTHREAD_MUTEX_NORMAL;
+	  else if (initializer == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
+	    new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
+	}
 
-  myfault efault;
-  if (efault.faulted ())
-    {
-      delete new_mutex;
-      mutex_initialization_lock.unlock ();
-      return EINVAL;
-    }
+      myfault efault;
+      if (efault.faulted ())
+	{
+	  delete new_mutex;
+	  mutex_initialization_lock.unlock ();
+	  return EINVAL;
+	}
 
-  *mutex = new_mutex;
+      *mutex = new_mutex;
+    }
   mutex_initialization_lock.unlock ();
 
   return 0;

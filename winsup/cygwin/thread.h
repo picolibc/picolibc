@@ -1,7 +1,7 @@
 /* thread.h: Locking and threading module definitions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
-   2008, 2009 Red Hat, Inc.
+   2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -57,10 +57,10 @@ public:
   bool init ()
   {
     lock_counter = 0;
-    win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+    win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
     if (!win32_obj_id)
       {
-	debug_printf ("CreateSemaphore failed. %E");
+	debug_printf ("CreateEvent failed. %E");
 	return false;
       }
     return true;
@@ -75,7 +75,7 @@ public:
   void unlock ()
   {
     if (InterlockedDecrement ((long *) &lock_counter))
-      ::ReleaseSemaphore (win32_obj_id, 1, NULL);
+      ::SetEvent (win32_obj_id);
   }
 
 private:
@@ -285,29 +285,10 @@ public:
   int type;
   int pshared;
 
-  pthread_t get_pthread_self () const
-  {
-    return PTHREAD_MUTEX_NORMAL == type ? MUTEX_OWNER_ANONYMOUS :
-      ::pthread_self ();
-  }
-
-  int lock ()
-  {
-    return _lock (get_pthread_self ());
-  }
-  int trylock ()
-  {
-    return _trylock (get_pthread_self ());
-  }
-  int unlock ()
-  {
-    return _unlock (get_pthread_self ());
-  }
-  int destroy ()
-  {
-    return _destroy (get_pthread_self ());
-  }
-
+  int lock ();
+  int trylock ();
+  int unlock ();
+  int destroy ();
   void set_owner (pthread_t self)
   {
     recursion_counter = 1;
@@ -337,11 +318,6 @@ public:
   }
 
 private:
-  int _lock (pthread_t self);
-  int _trylock (pthread_t self);
-  int _unlock (pthread_t self);
-  int _destroy (pthread_t self);
-
   void _fixup_after_fork ();
 
   static List<pthread_mutex> mutexes;
@@ -446,7 +422,6 @@ private:
   void precreate (pthread_attr *);
   void postcreate ();
   bool create_cancel_event ();
-  static pthread *get_tls_self_pointer ();
   static void set_tls_self_pointer (pthread *);
   void cancel_self ();
   DWORD get_thread_id ();

@@ -1,3 +1,35 @@
+2010-02-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (_dll_crt0): Set _main_tls as early as possible.
+	* thread.cc (pthread_mutex::can_be_unlocked): Remove check for
+	MUTEX_OWNER_ANONYMOUS since it is racy and unsafe.
+	(pthread::init_mainthread): Initialize thread directly from _my_tls.
+	(pthread::self): Ditto.
+	(pthread::get_tls_self_pointer): Delete.
+	(pthread_mutex::pthread_mutex): Use an event rather than a semaphore.
+	(pthread_mutex::lock): Rename from _<func>.  Derive self directly.
+	(pthread_mutex::tryunlock): Ditto.
+	(pthread_mutex::destroy): Ditto.
+	(pthread_mutex::unlock): Ditto.  Accommodate change from semaphore to
+	event.
+	(pthread_mutex::_fixup_after_fork): Accommodate change from semaphore
+	to event.
+	(pthread_mutex::init): Don't attempt to initialize a semaphore unless
+	it is in an initialized state.  Do this check under
+	mutex_initialization_lock.lock
+	* thread.h (fast_mutex::init): Use event rather than semaphore.
+	(fast_mutex::lock): Ditto.
+	(pthread_mutex::_lock): Delete.
+	(pthread_mutex::_unlock): Ditto.
+	(pthread_mutex::_trylock): Ditto.
+	(pthread_mutex::_destroy): Ditto.
+	(pthread_mutex::get_pthread_self): Ditto.
+	(pthread_mutex::get_tls_self_pointer): Ditto.
+	(pthread_mutex::lock): Un-inline.
+	(pthread_mutex::unlock): Ditto.
+	(pthread_mutex::trylock): Ditto.
+	(pthread_mutex::destroy): Ditto.
+
 2010-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (struct _cygtls): Remove unneeded elements.

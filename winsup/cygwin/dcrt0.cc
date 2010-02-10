@@ -955,11 +955,16 @@ _dll_crt0 ()
 {
   main_environ = user_data->envptr;
   if (in_forkee)
-    fork_info->alloc_stack ();
+    {
+      fork_info->alloc_stack ();
+      _main_tls = &_my_tls;
+    }
   else
-    __sinit (_impure_ptr);
+    {
+      _main_tls = &_my_tls;
+      __sinit (_impure_ptr);
+    }
 
-  _main_tls = &_my_tls;
   _main_tls->call ((DWORD (*) (void *, void *)) dll_crt0_1, NULL);
 }
 
