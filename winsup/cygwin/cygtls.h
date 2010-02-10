@@ -207,7 +207,6 @@ struct _cygtls
   class cygthread *_ctinfo;
   san andreas;
   waitq wq;
-  struct _cygtls *prev, *next;
   int sig;
   unsigned incyg;
   unsigned spinning;

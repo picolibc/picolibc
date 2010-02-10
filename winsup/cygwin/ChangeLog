@@ -1,3 +1,10 @@
+2010-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.h (struct _cygtls): Remove unneeded elements.
+	* thread.cc (pthread::exit): Avoid potential double call to
+	_my_tls.remove.
+	* tlsoffsets.h: Regenerate.
+
 2010-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__set_lc_messages_from_win): Fix typo.

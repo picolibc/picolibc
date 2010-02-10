@@ -486,14 +486,10 @@ pthread::exit (void *value_ptr)
     _my_tls.local_clib.__sdidinit = 0;
   (_reclaim_reent) (_REENT);
 
-
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
   else
-    {
-      _my_tls.remove (INFINITE);
-      ExitThread (0);
-    }
+    ExitThread (0);
 }
 
 int
