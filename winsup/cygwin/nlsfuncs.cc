@@ -1129,12 +1129,17 @@ internal_setlocale ()
   /* FIXME: It could be necessary to convert the entire environment,
 	    not just PATH. */
   tmp_pathbuf tp;
-  char *path = getenv ("PATH");
+  char *path;
   wchar_t *w_path = NULL, *w_cwd;
+
+  /* Don't do anything if the charset hasn't actually changed. */
+  if (strcmp (cygheap->locale.charset, __locale_charset ()) == 0)
+    return;
 
   debug_printf ("Cygwin charset changed from %s to %s",
 		cygheap->locale.charset, __locale_charset ());
   /* Fetch PATH and CWD and convert to wchar_t in previous charset. */
+  path = getenv ("PATH");
   if (path && *path)	/* $PATH can be potentially unset. */
     {
       w_path = tp.w_get ();
@@ -1175,8 +1180,7 @@ void
 initial_setlocale ()
 {
   char *ret = _setlocale_r (_REENT, LC_CTYPE, "");
-  if (ret && check_codepage (ret)
-      && strcmp (cygheap->locale.charset, __locale_charset ()) != 0)
+  if (ret && check_codepage (ret))
     internal_setlocale ();
 }
 
