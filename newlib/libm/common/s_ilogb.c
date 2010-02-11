@@ -44,13 +44,24 @@ DESCRIPTION
 RETURNS
 
 <<ilogb>> and <<ilogbf>> return the power of two used to form the
-floating-point argument.  If <[val]> is <<0>>, they return <<-
-INT_MAX>> (<<INT_MAX>> is defined in limits.h).  If <[val]> is
-infinite, or NaN, they return <<INT_MAX>>.
+floating-point argument.
+If <[val]> is <<0>>, they return <<FP_ILOGB0>>.
+If <[val]> is infinite, they return <<INT_MAX>>.
+If <[val]> is NaN, they return <<FP_ILOGBNAN>>.
+(<<FP_ILOGB0>> and <<FP_ILOGBNAN>> are defined in math.h, but in turn are
+defined as INT_MIN or INT_MAX from limits.h.  The value of FP_ILOGB0 may be
+either INT_MIN or -INT_MAX.  The value of FP_ILOGBNAN may be either INT_MAX or
+INT_MIN.)
+
+@comment The bugs might not be worth noting, given the mass non-C99/POSIX
+@comment behavior of much of the Newlib math library.
+@commentBUGS
+@commentOn errors, errno is not set per C99 and POSIX requirements even if
+@comment(math_errhandling & MATH_ERRNO) is non-zero.
 
 PORTABILITY
-	Neither <<ilogb>> nor <<ilogbf>> is required by ANSI C or by
-	the System V Interface Definition (Issue 2).  */
+C99, POSIX
+*/
 
 /* ilogb(double x)
  * return the binary exponent of non-zero x
@@ -58,8 +69,8 @@ PORTABILITY
  * ilogb(inf/NaN) = 0x7fffffff (no signal is raised)
  */
 
-#include "fdlibm.h"
 #include <limits.h>
+#include "fdlibm.h"
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -76,7 +87,7 @@ PORTABILITY
 	hx &= 0x7fffffff;
 	if(hx<0x00100000) {
 	    if((hx|lx)==0) 
-		return - INT_MAX;	/* ilogb(0) = 0x80000001 */
+		return FP_ILOGB0;	/* ilogb(0) = special case error */
 	    else			/* subnormal x */
 		if(hx==0) {
 		    for (ix = -1043; lx>0; lx<<=1) ix -=1;
@@ -86,7 +97,10 @@ PORTABILITY
 	    return ix;
 	}
 	else if (hx<0x7ff00000) return (hx>>20)-1023;
-	else return INT_MAX;
+	#if FP_ILOGBNAN != INT_MAX
+	else if (hx>0x7ff00000) return FP_ILOGBNAN;	/* NAN */
+	#endif
+	else return INT_MAX;	/* infinite (or, possibly, NAN) */
 }
 
 #endif /* _DOUBLE_IS_32BITS */

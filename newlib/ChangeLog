@@ -1,3 +1,16 @@
+2010-02-11  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_ilogb.c:  Adjust documentation to reflect new returns
+	(see next items) and that ilogb() and ilogbf() are C99/POSIX.
+	* libm/common/s_ilogb.c (ilogb):  Use C99/POSIX FP_ILOGB0 and
+	FP_ILOGBNAN returns for 0 and NAN arguments, respectively, instead of
+	the prior -INT_MAX and INT_MAX.  The FP_ILOGBx defines in math.h
+	presently match the prior hard-codes, so no functional change is
+	actually introduced.  (Not at this time, nor planned, but the values
+	are permitted to be different, so subsequent edits of math.h could
+	possibly cause a functional change.)
+	* libm/common/sf_ilogb.c (ilogbf):  Ditto.
+
 2010-02-09  Daniel Gutson  <dgutson@codesourcery.com>
 
 	* libc/machine/arm/arm_asm.h (_ISA_THUMB_2): __ARM_ARCH_7EM__
