@@ -16,7 +16,8 @@
   </para></listitem>
 
   <listitem><para>
-  New tool "getlocale" to fetch valid locale identifiers from Windows.
+  New tool "getlocale" to fetch the default locale based on the Windows
+  default settings and to list all supported locales.
   </para></listitem>
 
   <listitem><para>
