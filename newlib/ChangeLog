@@ -1,4 +1,9 @@
 2010-02-11  Craig Howland <howland@LGSInnovations.com>
+       
+	* libc/include/machine/ieeefp.h:  isfinite macro modified to run faster
+	by only calling fpclassify once instead of possibly twice.
+
+2010-02-11  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/common/s_ilogb.c:  Adjust documentation to reflect new returns
 	(see next items) and that ilogb() and ilogbf() are C99/POSIX.

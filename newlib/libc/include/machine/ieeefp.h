@@ -80,10 +80,11 @@
 #ifdef __SPU__
 #define __IEEE_BIG_ENDIAN
 
-#define isfinite(y) \
-          (__extension__ ({__typeof__(y) __y = (y); \
-                           (sizeof (__y) == sizeof (float))  ? (1) : \
-                           fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
+#define isfinite(__y) \
+	(__extension__ ({int __cy; \
+		(sizeof (__y) == sizeof (float))  ? (1) : \
+		(__cy = fpclassify(__y)) != FP_INFINITE && __cy != FP_NAN;}))
+
 #define isinf(__x) ((sizeof (__x) == sizeof (float))  ?  (0) : __isinfd(__x))
 #define isnan(__x) ((sizeof (__x) == sizeof (float))  ?  (0) : __isnand(__x))
 
