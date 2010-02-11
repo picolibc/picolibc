@@ -520,7 +520,8 @@ Options:
 current user's Windows default locale to stdout.  The <literal>-s</literal>
 option prints the systems default locale instead.  With the
 <literal>-u</literal> option <command>getlocale</command> appends a ".UTF-8".
-This can be used in scripts to set the Cygwin locale, for instance:
+This can be used in scripts to set the Cygwin locale to the Windows user
+or system default, for instance, for a US-based user:
 </para>
 
 <screen>
@@ -530,20 +531,26 @@ en_US.UTF-8
 </screen>
 
 <para>The <literal>-a</literal> option is helpful to learn which locales
-are supported by your Windows machine.  It prints the locales and their
-actual meaning, like this:</para>
+are supported by your Windows machine.  It prints all available locales,
+their meaning, and the allowed modifiers.  Example:</para>
 
 <screen>
 bash$ getlocale -a
 ar_SA            Arabic (Saudi Arabia)
 ar_IQ            Arabic (Iraq)
+...
 zh_TW            Chinese (Traditional) (Taiwan)
-zh_CN            Chinese (Simplified) (People's Republic of China)
-zh_HK            Chinese (Traditional) (Hong Kong S.A.R.)
-da_DK            Danish (Denmark)
+zh_TW@cjknarrow  Chinese (Traditional) (Taiwan)
+...
+de_AT            German (Austria)
+de_AT@euro       German (Austria)
+...
 en_US            English (United States)
 en_GB            English (United Kingdom)
 en_AU            English (Australia)
+...
+sr_RS            Serbian (Cyrillic) (Serbia)
+sr_RS@latin      Serbian (Latin) (Serbia)
 ...
 </screen>
 

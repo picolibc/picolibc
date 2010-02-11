@@ -1,3 +1,12 @@
+2010-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getlocale.c (main): Rename local variable to avoid problems.
+	Avoid string comparisons, rather test language and sublanguage codes
+	wheere possible.  Add more code to handle Serbian language/territory
+	state identical on all Windows versions.  Fix handling for "@latin"
+	modifier in Belarusian locale.
+	* utils.sgml (getlocale): Try to make wording and example clearer.
+
 2010-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getlocale.c (usage): Change text slightly.

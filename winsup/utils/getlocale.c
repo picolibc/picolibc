@@ -84,6 +84,7 @@ int main (int argc, char **argv)
   int all = 0;
   const char *utf = "";
   char name[32];
+  DWORD cp;
 
   setlocale (LC_ALL, "");
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
@@ -112,7 +113,7 @@ int main (int argc, char **argv)
       for (lang = 1; lang <= 0xff; ++lang)
 	{
 	  struct {
-	    wchar_t lang[256];
+	    wchar_t language[256];
 	    wchar_t country[256];
 	    char loc[32];
 	  } loc_list[32];
@@ -123,7 +124,7 @@ int main (int argc, char **argv)
 	      lcid = (sublang << 10) | lang;
 	      if (getlocale (lcid, name))
 		{
-		  wchar_t lang[256];
+		  wchar_t language[256];
 		  wchar_t country[256];
 		  int i;
 		  char *c, loc[32];
@@ -131,29 +132,37 @@ int main (int argc, char **argv)
 
 		  /* Go figure.  Even the English name of a language or
 		     locale might contain native characters. */
-		  GetLocaleInfoW (lcid, LOCALE_SENGLANGUAGE, lang, 256);
+		  GetLocaleInfoW (lcid, LOCALE_SENGLANGUAGE, language, 256);
 		  GetLocaleInfoW (lcid, LOCALE_SENGCOUNTRY, country, 256);
 		  /* Avoid dups */
 		  for (i = 0; i < lcnt; ++ i)
-		    if (!wcscmp (loc_list[i].lang, lang)
+		    if (!wcscmp (loc_list[i].language, language)
 			&& !wcscmp (loc_list[i].country, country))
 		      break;
 		  if (i < lcnt)
 		    continue;
 		  if (lcnt < 32)
 		    {
-		      wcscpy (loc_list[lcnt].lang, lang);
+		      wcscpy (loc_list[lcnt].language, language);
 		      wcscpy (loc_list[lcnt].country, country);
+		    }
+		  c = stpcpy (loc, name);
+		  /* Convert old sr_SP silently to sr_CS on old systems.
+		     Make sure sr_CS country is in recent shape. */
+		  if (lang == LANG_SERBIAN
+		      && (sublang == SUBLANG_SERBIAN_LATIN
+			  || sublang == SUBLANG_SERBIAN_CYRILLIC))
+		    {
+		      c = stpcpy (loc, "sr_CS");
+		      wcscpy (country, L"Serbia and Montenegro (Former)");
 		    }
 		  /* Now check certain conditions to figure out if that
 		     locale requires a modifier. */
-		  c = stpcpy (loc, name);
-		  if (wcsstr (lang, L"(Latin)")
-		      && (!strncmp (loc, "sr_", 3)
-			  || !strcmp (loc, "be_BY")))
+		  if (lang == LANG_SERBIAN && !strncmp (loc, "sr_", 3)
+		      && wcsstr (language, L"(Latin)"))
 		    stpcpy (c, "@latin");
-		  else if (wcsstr (lang, L"(Cyrillic)")
-			   && !strcmp (loc, "uz_UZ"))
+		  else if (lang == LANG_UZBEK
+			   && sublang == SUBLANG_UZBEK_CYRILLIC)
 		    stpcpy (c, "@cyrillic");
 		  /* Avoid more dups */
 		  for (i = 0; i < lcnt; ++ i)
@@ -167,21 +176,55 @@ int main (int argc, char **argv)
 		  if (lcnt < 32)
 		    strcpy (loc_list[lcnt++].loc, loc);
 		  /* Print */
-		  printf ("%-16s %ls (%ls)\n", loc, lang, country);
+		  printf ("%-16s %ls (%ls)\n", loc, language, country);
 		  /* Check for locales which sport a modifier for
 		     changing the codeset and other stuff. */
-		  if (!strcmp (loc, "tt_RU"))
+		  if (lang == LANG_BELARUSIAN
+		      && sublang == SUBLANG_BELARUSIAN_BELARUS)
+		    stpcpy (c, "@latin");
+		  else if (lang == LANG_TATAR
+			   && sublang == SUBLANG_TATAR_RUSSIA)
 		    stpcpy (c, "@iqtelif");
-		  else if (GetLocaleInfoW (lcid, LOCALE_SINTLSYMBOL, wbuf, 9)
+		  else if (GetLocaleInfoW (lcid,
+					   LOCALE_IDEFAULTANSICODEPAGE
+					   | LOCALE_RETURN_NUMBER,
+					   (PWCHAR) &cp, sizeof cp)
+			   && cp == 1252 /* Latin1*/
+			   && GetLocaleInfoW (lcid, LOCALE_SINTLSYMBOL, wbuf, 9)
 			   && !wcsncmp (wbuf, L"EUR", 3))
 		    stpcpy (c, "@euro");
-		  else if (!strncmp (loc, "ja_", 3)
-			   || !strncmp (loc, "ko_", 3)
-			   || !strncmp (loc, "zh_", 3))
+		  else if (lang == LANG_JAPANESE
+			   || lang == LANG_KOREAN
+			   || lang == LANG_CHINESE)
 		    stpcpy (c, "@cjknarrow");
 		  else
 		    continue;
-		  printf ("%-16s %ls (%ls)\n", loc, lang, country);
+		  printf ("%-16s %ls (%ls)\n", loc, language, country);
+		}
+	    }
+	  /* Check Serbian language for the available territories.  Up to
+	     Server 2003 we only had sr_SP (silently converted to sr_CS
+	     above), in Vista we had only sr_CS.  First starting with W7 we
+	     have the actual sr_RS and sr_ME.  However, all of them are
+	     supported on all systems in Cygwin.  So we fake them here, if
+	     they are missing. */
+	  if (lang == LANG_SERBIAN)
+	    {
+	      int sr_CS_idx = -1;
+	      int sr_RS_idx = -1;
+	      int i;
+
+	      for (i = 0; i < lcnt; ++ i)
+		if (!strcmp (loc_list[i].loc, "sr_CS"))
+		  sr_CS_idx = i;
+		else if (!strcmp (loc_list[i].loc, "sr_RS"))
+		  sr_RS_idx = i;
+	      if (sr_CS_idx > 0 && sr_RS_idx == -1)
+	      	{
+		  puts ("sr_RS@latin      Serbian (Latin) (Serbia)");
+		  puts ("sr_RS            Serbian (Latin) (Serbia)");
+		  puts ("sr_ME@latin      Serbian (Latin) (Montenegro)");
+		  puts ("sr_ME            Serbian (Latin) (Montenegro)");
 		}
 	    }
 	}
