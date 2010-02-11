@@ -762,7 +762,8 @@ p_bracket(struct parse *p)
 	if (cs->invert && p->g->cflags&REG_NEWLINE)
 		cs->bmp['\n' >> 3] |= 1 << ('\n' & 7);
 
-	if ((ch = singleton(cs)) != OUT) {	/* optimize singleton sets */
+	if ((ch = singleton(cs)) != OUT		/* optimize singleton sets */
+	     && cs->invert == 0) {		/* But not in invert case. */
 		ordinary(p, ch);
 		freeset(p, cs);
 	} else
@@ -833,6 +834,9 @@ p_b_term(struct parse *p, cset *cs)
 				finish = '-';
 			else
 				finish = p_b_symbol(p);
+		} else if (SEE('-') && !MORE2()) {
+			SETERROR(REG_EBRACK);
+			return;
 		} else
 			finish = start;
 		if (start == finish)
@@ -1212,9 +1216,9 @@ singleton(cset *cs)
 			n++;
 			s = i;
 		}
-	if (n == 1)
+	if (n == 1 && cs->nwides == 0)
 		return (s);
-	if (cs->nwides == 1 && cs->nranges == 0 && cs->ntypes == 0 &&
+	if (n == 0 && cs->nwides == 1 && cs->nranges == 0 && cs->ntypes == 0 &&
 	    cs->icase == 0)
 		return (cs->wides[0]);
 	/* Don't bother handling the other cases. */
@@ -1467,7 +1471,7 @@ findmust(struct parse *p, struct re_guts *g)
 	 */
 	if (MB_CUR_MAX > 1 &&
 #ifdef __CYGWIN__
-	    strcmp(collate_charset, "UTF-8") != 0)
+	    strcmp(__locale_charset (), "UTF-8") != 0)
 #else
 	    strcmp(_CurrentRuneLocale->__encoding, "UTF-8") != 0)
 #endif

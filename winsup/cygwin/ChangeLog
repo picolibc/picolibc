@@ -1,3 +1,20 @@
+2010-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regex/engine.c (step): Drop Cygwin-specific definition.
+	(NONCHAR): Better cast here to make the test work.  Move comment
+	from step here.
+	(matcher): Disable skipping initial string in multibyte case.
+	* regex/regcomp.c (p_bracket): Don't simplify singleton in the invert
+	case.
+	(p_b_term): Handle early end of pattern after dash in bracket
+	expression.
+	(singleton): Don't ignore the wides just because there's already a
+	singleton in the single byte chars.  Fix condition for a singleton
+	wide accordingly.
+	(findmust): Check for LC_CTYPE charset, rather than LC_COLLATE charset.
+	* regex2.h (CHIN): Fix condition in the icase & invert case.
+	(ISWORD): Fix wrong cast to unsigned char.
+
 2010-02-11  Andy Koppe  <andy.koppe@gmail.com>
 
 	* nlsfuncs.cc (initial_setlocale): Move check whether charset has

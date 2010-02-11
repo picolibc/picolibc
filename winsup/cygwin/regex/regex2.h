@@ -151,10 +151,14 @@ CHIN(cset *cs, wint_t ch)
 	if (ch < NC)
 		return (((cs->bmp[ch >> 3] & (1 << (ch & 7))) != 0) ^
 		    cs->invert);
-	else if (cs->icase)
-		return (CHIN1(cs, ch) || CHIN1(cs, towlower(ch)) ||
-		    CHIN1(cs, towupper(ch)));
-	else
+	else if (cs->icase) {
+		if (cs->invert)
+			return (CHIN1(cs, ch) && CHIN1(cs, towlower(ch)) &&
+			    CHIN1(cs, towupper(ch)));
+		else
+			return (CHIN1(cs, ch) || CHIN1(cs, towlower(ch)) ||
+			    CHIN1(cs, towupper(ch)));
+	} else
 		return (CHIN1(cs, ch));
 }
 
@@ -189,4 +193,4 @@ struct re_guts {
 
 /* misc utilities */
 #define	OUT	(CHAR_MIN - 1)	/* a non-character value */
-#define ISWORD(c)       (iswalnum((uch)(c)) || (c) == '_')
+#define ISWORD(c)       (iswalnum((wint_t)(c)) || (c) == '_')
