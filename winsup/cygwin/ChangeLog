@@ -1,3 +1,9 @@
+2010-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regex/regcomp.c (wgetnext): Use size_t as type for n2 since that's
+	what's returned by mbrtowc.
+	* regex/regexec.c (xmbrtowc): Ditto.
+
 2010-02-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pthread.cc (pthread_mutex_init): Explicitly fill out third arg to

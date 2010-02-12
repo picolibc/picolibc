@@ -88,7 +88,7 @@ xmbrtowc(wint_t *wi, const char *s, size_t n, mbstate_t *mbs, wint_t dummy)
 		if (sizeof (wchar_t) == 2 && wc >= 0xd800 && wc <= 0xdbff) {
 			/* UTF-16 surrogate pair.  Fetch second half and
 			   compute UTF-32 value */
-			int n2 = mbrtowc(&wc, s + nr, n - nr, mbs);
+			size_t n2 = mbrtowc(&wc, s + nr, n - nr, mbs);
 			if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2) {
 				memset(mbs, 0, sizeof(*mbs));
 				if (wi != NULL)

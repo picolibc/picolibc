@@ -1152,7 +1152,8 @@ wgetnext(struct parse *p)
 	else if (sizeof (wchar_t) == 2 && wc >= 0xd800 && wc <= 0xdbff) {
 		/* UTF-16 surrogate pair.  Fetch second half and
 		   compute UTF-32 value */
-		int n2 = mbrtowc(&wc, p->next + n, p->end - p->next - n, &mbs);
+		size_t n2 = mbrtowc(&wc, p->next + n,
+				    p->end - p->next - n, &mbs);
 		if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2) {
 			SETERROR(REG_ILLSEQ);
 			return (0);
