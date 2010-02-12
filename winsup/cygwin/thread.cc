@@ -41,7 +41,7 @@ details. */
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
 static inline verifyable_object_state
-  verifyable_object_isvalid (void const * objectptr, long magic,
+  verifyable_object_isvalid (void const * objectptr, thread_magic_t magic,
 			     void *static_ptr1 = NULL,
 			     void *static_ptr2 = NULL,
 			     void *static_ptr3 = NULL);
@@ -95,7 +95,7 @@ __cygwin_lock_unlock (_LOCK_T *lock)
 }
 
 static inline verifyable_object_state
-verifyable_object_isvalid (void const *objectptr, long magic, void *static_ptr1,
+verifyable_object_isvalid (void const *objectptr, thread_magic_t magic, void *static_ptr1,
 			   void *static_ptr2, void *static_ptr3)
 {
   myfault efault;
@@ -1503,28 +1503,7 @@ pthread_key::run_destructor ()
     }
 }
 
-/* pshared mutexs:
-
-   REMOVED FROM CURRENT. These can be reinstated with the daemon, when all the
-   gymnastics can be a lot easier.
-
-   the mutex_t (size 4) is not used as a verifyable object because we cannot
-   guarantee the same address space for all processes.
-   we use the following:
-   high bit set (never a valid address).
-   second byte is reserved for the priority.
-   third byte is reserved
-   fourth byte is the mutex id. (max 255 cygwin mutexs system wide).
-   creating mutex's does get slower and slower, but as creation is a one time
-   job, it should never become an issue
-
-   And if you're looking at this and thinking, why not an array in cygwin for all mutexs,
-   - you incur a penalty on _every_ mutex call and you have toserialise them all.
-   ... Bad karma.
-
-   option 2? put everything in userspace and update the ABI?
-   - bad karma as well - the HANDLE, while identical across process's,
-   Isn't duplicated, it's reopened. */
+/* pshared mutexs */
 
 /* static members */
 
@@ -1533,9 +1512,6 @@ List<pthread_mutex> pthread_mutex::mutexes;
 /* This is used for mutex creation protection within a single process only */
 fast_mutex NO_COPY pthread_mutex::mutex_initialization_lock;
 
-/* We can only be called once.
-   TODO: (no rush) use a non copied memory section to
-   hold an initialization flag.  */
 void
 pthread_mutex::init_mutex ()
 {
@@ -1544,7 +1520,7 @@ pthread_mutex::init_mutex ()
 }
 
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
-  verifyable_object (PTHREAD_MUTEX_MAGIC),
+  verifyable_object (0),	/* set magic to zero initially */
   lock_counter (0),
   win32_obj_id (NULL), recursion_counter (0),
   condwaits (0), owner (NULL),
@@ -1556,23 +1532,16 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
 {
   win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
-    {
-      magic = 0;
-      return;
-    }
+    return;
   /*attr checked in the C call */
-  if (attr)
-    {
-      if (attr->pshared == PTHREAD_PROCESS_SHARED)
-	{
-	  // fail
-	  magic = 0;
-	  return;
-	}
+  if (!attr)
+    /* handled in the caller */;
+  else if (attr->pshared != PTHREAD_PROCESS_SHARED)
+    type = attr->mutextype;
+  else
+    return;		/* Not implemented */
 
-      type = attr->mutextype;
-    }
-
+  magic = PTHREAD_MUTEX_MAGIC;
   mutexes.insert (this);
 }
 
@@ -1625,7 +1594,7 @@ pthread_mutex::unlock ()
       tid = 0;
 #endif
       if (InterlockedDecrement ((long *) &lock_counter))
-	::SetEvent (win32_obj_id); // Another thread may be waiting
+	::SetEvent (win32_obj_id); // Another thread is waiting
     }
 
   return 0;
@@ -1690,16 +1659,6 @@ pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
 
 pthread_mutexattr::~pthread_mutexattr ()
 {
-}
-
-verifyable_object::verifyable_object (long verifyer):
-magic (verifyer)
-{
-}
-
-verifyable_object::~verifyable_object ()
-{
-  magic = 0;
 }
 
 DWORD WINAPI
@@ -2664,7 +2623,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     return EINVAL;
 
   mutex_initialization_lock.lock ();
-  if (pthread_mutex::is_good_initializer (mutex))
+  if (initializer == NULL || pthread_mutex::is_good_initializer (mutex))
     {
       pthread_mutex_t new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
       if (!is_good_object (&new_mutex))

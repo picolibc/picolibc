@@ -88,7 +88,7 @@ pthread_t pthread_self ()
 int
 pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 {
-  return pthread_mutex::init (mutex, attr);
+  return pthread_mutex::init (mutex, attr, NULL);
 }
 
 /* Synchronisation */

@@ -100,15 +100,17 @@ class pinfo;
 
 #define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
+typedef unsigned long thread_magic_t;
+
 /* verifyable_object should not be defined here - it's a general purpose class */
 
 class verifyable_object
 {
 public:
-  long magic;
+  thread_magic_t magic;
 
-  verifyable_object (long);
-  virtual ~verifyable_object ();
+  verifyable_object (thread_magic_t verifyer): magic (verifyer) {}
+  virtual ~verifyable_object () { magic = 0; }
 };
 
 typedef enum
@@ -268,11 +270,11 @@ public:
   static bool is_good_object (pthread_mutex_t const *);
   static bool is_good_initializer (pthread_mutex_t const *);
   static bool is_good_initializer_or_object (pthread_mutex_t const *);
-  static bool is_good_initializer_or_bad_object (pthread_mutex_t const *mutex);
-  static bool can_be_unlocked (pthread_mutex_t const *mutex);
+  static bool is_good_initializer_or_bad_object (pthread_mutex_t const *);
+  static bool can_be_unlocked (pthread_mutex_t const *);
   static void init_mutex ();
-  static int init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attr,
-		   const pthread_mutex_t initializer = NULL);
+  static int init (pthread_mutex_t *, const pthread_mutexattr_t *attr,
+		   const pthread_mutex_t);
 
   unsigned long lock_counter;
   HANDLE win32_obj_id;

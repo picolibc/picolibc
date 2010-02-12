@@ -1,3 +1,25 @@
+2010-02-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pthread.cc (pthread_mutex_init): Explicitly fill out third arg to
+	pthread_mutex::init.
+	* thread.cc: Remov some obsolete comments.
+	(verifyable_object_isvalid): Reflect change to use thread_magic_t for
+	magic numbers.
+	(pthread_mutex::pthread_mutex): Set magic number to invalid initially
+	until we've verified that everything is valid.
+	(pthread_mutex::unlock): Fix a comment.
+	(verifyable_object::verifyable_object): Delete here.
+	(~verifyable_object::~verifyable_object): Ditto.
+	(pthread_mutex::init): Don't run is_good_initializer for non-static
+	objects.
+	* thread.h (thread_magic_t): New typedef.
+	(verifyable_object::verifyable_object): Use thread_magic_t;
+	(verifyable_object::magic): Ditto.
+	(pthread_mutex::is_good_initializer_or_bad_object): Remove unneeded
+	variable names.
+	(pthread_mutex::can_be_unlocked): Ditto.
+	(pthread_mutex::init): Ditto.  Remove default for third argument.
+
 2010-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/regcomp.c (xwcrtomb): New function to convert wide chars
