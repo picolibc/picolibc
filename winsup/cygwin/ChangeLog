@@ -1,5 +1,13 @@
 2010-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regex/regcomp.c (xwcrtomb): New function to convert wide chars
+	outside of the base plane to UTF-8.  Call throughout instead of
+	wcrtomb.
+	(wgetnext): Handle surrogate pairs on UTF-16 systems.
+	* regex/regexec.c (xmbrtowc): Ditto.
+
+2010-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_user_local_groups): Retrieve name of well known
 	builtin group from system.  Explain why.
 	* sec_helper.cc (well_known_builtin_sid): New SID for BUILTIN group.

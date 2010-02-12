@@ -140,6 +140,7 @@ static void computejumps(struct parse *p, struct re_guts *g);
 static void computematchjumps(struct parse *p, struct re_guts *g);
 static sopno pluscount(struct parse *p, struct re_guts *g);
 static wint_t wgetnext(struct parse *p);
+static size_t xwcrtomb (char *s, wint_t wc, mbstate_t *ps);
 
 #ifdef __cplusplus
 }
@@ -994,7 +995,7 @@ bothcases(struct parse *p, wint_t ch)
 	assert(othercase(ch) != ch);	/* p_bracket() would recurse */
 	p->next = bracket;
 	memset(&mbs, 0, sizeof(mbs));
-	n = wcrtomb(bracket, ch, &mbs);
+	n = xwcrtomb(bracket, ch, &mbs);
 	assert(n != (size_t)-1);
 	bracket[n] = ']';
 	bracket[n + 1] = '\0';
@@ -1136,6 +1137,7 @@ wgetnext(struct parse *p)
 {
 	mbstate_t mbs;
 	wchar_t wc;
+	wint_t ret;
 	size_t n;
 
 	memset(&mbs, 0, sizeof(mbs));
@@ -1144,11 +1146,42 @@ wgetnext(struct parse *p)
 		SETERROR(REG_ILLSEQ);
 		return (0);
 	}
+	ret = wc;
 	if (n == 0)
 		n = 1;
+	else if (sizeof (wchar_t) == 2 && wc >= 0xd800 && wc <= 0xdbff) {
+		/* UTF-16 surrogate pair.  Fetch second half and
+		   compute UTF-32 value */
+		int n2 = mbrtowc(&wc, p->next + n, p->end - p->next - n, &mbs);
+		if (n2 == 0 || n2 == (size_t)-1 || n2 == (size_t)-2) {
+			SETERROR(REG_ILLSEQ);
+			return (0);
+		}
+		ret = (((ret & 0x3ff) << 10) | (wc & 0x3ff))
+		      + 0x10000;
+		n += n2;
+	  }
 	p->next += n;
-	return (wc);
+	return (ret);
 }
+
+static size_t
+xwcrtomb (char *s, wint_t wc, mbstate_t *ps)
+{
+  if (sizeof (wchar_t) == 2 && wc >= 0x10000)
+    {
+      /* UTF-16 systems can't handle these values directly.  Since the
+         rest of the code isn't surrogate pair aware, we handle this here,
+	 invisible for the rest of the code. */
+      *s++ = 0xf0 | ((wc & 0x1c0000) >> 18);
+      *s++ = 0x80 | ((wc &  0x3f000) >> 12);
+      *s++ = 0x80 | ((wc &    0xfc0) >> 6);
+      *s   = 0x80 |  (wc &     0x3f);
+      return 4;
+    }
+  return wcrtomb (s, wc, ps);
+}
+
 
 /*
  - seterr - set an error condition
@@ -1490,7 +1523,7 @@ findmust(struct parse *p, struct re_guts *g)
 				memset(&mbs, 0, sizeof(mbs));
 				newstart = scan - 1;
 			}
-			clen = wcrtomb(buf, OPND(s), &mbs);
+			clen = xwcrtomb(buf, OPND(s), &mbs);
 			if (clen == (size_t)-1)
 				goto toohard;
 			newlen += clen;
@@ -1609,7 +1642,7 @@ findmust(struct parse *p, struct re_guts *g)
 	while (cp < g->must + g->mlen) {
 		while (OP(s = *scan++) != OCHAR)
 			continue;
-		clen = wcrtomb(cp, OPND(s), &mbs);
+		clen = xwcrtomb(cp, OPND(s), &mbs);
 		assert(clen != (size_t)-1);
 		cp += clen;
 	}
