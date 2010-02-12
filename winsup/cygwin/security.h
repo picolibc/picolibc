@@ -327,6 +327,7 @@ extern cygpsid well_known_service_sid;
 extern cygpsid well_known_authenticated_users_sid;
 extern cygpsid well_known_this_org_sid;
 extern cygpsid well_known_system_sid;
+extern cygpsid well_known_builtin_sid;
 extern cygpsid well_known_admins_sid;
 extern cygpsid well_known_users_sid;
 extern cygpsid fake_logon_sid;

@@ -57,6 +57,8 @@ MKSID (well_known_this_org_sid, "S-1-5-15",
        SECURITY_NT_AUTHORITY, 1, 15);
 MKSID (well_known_system_sid, "S-1-5-18",
        SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
+MKSID (well_known_builtin_sid, "S-1-5-32",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_BUILTIN_DOMAIN_RID);
 MKSID (well_known_admins_sid, "S-1-5-32-544",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_ADMINS);

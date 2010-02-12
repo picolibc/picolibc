@@ -320,20 +320,19 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
     }
 
   WCHAR domlocal_grp[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
-  WCHAR builtin_grp[sizeof ("BUILTIN\\") + GNLEN + 2];
-  PWCHAR dg_ptr, bg_ptr;
+  WCHAR builtin_grp[2 * GNLEN + 2];
+  PWCHAR dg_ptr, bg_ptr = NULL;
   SID_NAME_USE use;
 
   dg_ptr = wcpcpy (domlocal_grp, domain);
   *dg_ptr++ = L'\\';
-  bg_ptr = wcpcpy (builtin_grp, L"BUILTIN\\");
 
   for (DWORD i = 0; i < cnt; ++i)
     {
       cygsid gsid;
       DWORD glen = MAX_SID_LEN;
       WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
-      DWORD domlen = sizeof (dom);
+      DWORD domlen = MAX_DOMAIN_NAME_LEN + 1;
 
       use = SidTypeInvalid;
       wcscpy (dg_ptr, buf[i].lgrpi0_name);
@@ -348,17 +347,36 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
       else if (GetLastError () == ERROR_NONE_MAPPED)
 	{
 	  /* Check if it's a builtin group. */
-	  wcscpy (bg_ptr, dg_ptr);
-	  if (LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
-				  dom, &domlen, &use))
+	  if (!bg_ptr)
 	    {
-	      if (!legal_sid_type (use))
-		debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+	      /* Retrieve name of builtin group from system since it's
+	         localized. */
+	      glen = 2 * GNLEN + 2;
+	      if (!LookupAccountSidW (NULL, well_known_builtin_sid,
+				      builtin_grp, &glen, domain, &domlen, &use))
+		debug_printf ("LookupAccountSid(BUILTIN), %E");
 	      else
-		grp_list *= gsid;
+		{
+		  bg_ptr = builtin_grp + wcslen (builtin_grp);
+		  bg_ptr = wcpcpy (builtin_grp, L"\\");
+		}
 	    }
-	  else
-	    debug_printf ("LookupAccountName(%W), %E", builtin_grp);
+	  if (bg_ptr)
+	    {
+	      wcscpy (bg_ptr, dg_ptr);
+	      glen = MAX_SID_LEN;
+	      domlen = MAX_DOMAIN_NAME_LEN + 1;
+	      if (LookupAccountNameW (NULL, builtin_grp, gsid, &glen,
+				      dom, &domlen, &use))
+		{
+		  if (!legal_sid_type (use))
+		    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+		  else
+		    grp_list *= gsid;
+		}
+	      else
+		debug_printf ("LookupAccountName(%W), %E", builtin_grp);
+	    }
 	}
       else
 	debug_printf ("LookupAccountName(%W), %E", domlocal_grp);
