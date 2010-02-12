@@ -266,7 +266,7 @@ get_registry_hive_path (const PWCHAR name, PWCHAR path)
 
   if (!name || !path)
     return NULL;
-  kend = wcpcpy (key, L"SOFTWARE\\Microsoft\\WindowsNT\\CurrentVersion\\ProfileList\\");
+  kend = wcpcpy (key, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\");
   wcpcpy (kend, name);
   if (!RegOpenKeyExW (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
