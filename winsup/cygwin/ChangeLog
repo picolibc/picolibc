@@ -1,3 +1,9 @@
+2010-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regex/regcomp.c (xwcrtomb): Don't convert Unicode chars outside the
+	base plane always to UTF-8.  Call wcsnrtombs instead to allow arbitrary
+	multibyte charsets.
+
 2010-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/regcomp.c (wgetnext): Use size_t as type for n2 since that's

@@ -1171,14 +1171,17 @@ xwcrtomb (char *s, wint_t wc, mbstate_t *ps)
 {
   if (sizeof (wchar_t) == 2 && wc >= 0x10000)
     {
-      /* UTF-16 systems can't handle these values directly.  Since the
-         rest of the code isn't surrogate pair aware, we handle this here,
-	 invisible for the rest of the code. */
-      *s++ = 0xf0 | ((wc & 0x1c0000) >> 18);
-      *s++ = 0x80 | ((wc &  0x3f000) >> 12);
-      *s++ = 0x80 | ((wc &    0xfc0) >> 6);
-      *s   = 0x80 |  (wc &     0x3f);
-      return 4;
+      /* UTF-16 wcrtomb can't handle these values directly.  The rest of the
+	 code isn't surrogate pair aware, so we handle this here.  Convert
+	 value to UTF-16 surrogate and call wcsrtombs to convert the "string"
+	 to the correct multibyte representation, if any. */
+      wchar_t ws[2], *wsp = ws;
+      size_t n;
+
+      wc -= 0x10000;
+      ws[0] = 0xd800 | (wc >> 10);
+      ws[1] = 0xdc00 | (wc & 0x3ff);
+      return wcsnrtombs (s, &wsp, 2, MB_CUR_MAX, ps);
     }
   return wcrtomb (s, wc, ps);
 }
