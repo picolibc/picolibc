@@ -1,3 +1,7 @@
+2010-02-13  Ilguiz Latypov  <ilatypov@infradead.org>
+
+	* cygpath.cc (do_pathconv): Fix potential crash.
+
 2010-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getlocale.c (main): Rename local variable to avoid problems.
