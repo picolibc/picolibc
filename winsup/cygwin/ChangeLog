@@ -1,3 +1,8 @@
+2010-02-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* regex/regcomp.c (xwcrtomb): Fix one explicable and one inexcplicable
+	C warning.
+
 2010-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/regcomp.c (xwcrtomb): Don't convert Unicode chars outside the

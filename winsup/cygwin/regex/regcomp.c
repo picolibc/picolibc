@@ -1175,8 +1175,8 @@ xwcrtomb (char *s, wint_t wc, mbstate_t *ps)
 	 code isn't surrogate pair aware, so we handle this here.  Convert
 	 value to UTF-16 surrogate and call wcsrtombs to convert the "string"
 	 to the correct multibyte representation, if any. */
-      wchar_t ws[2], *wsp = ws;
-      size_t n;
+      wchar_t ws[2];
+      const wchar_t *wsp = ws;
 
       wc -= 0x10000;
       ws[0] = 0xd800 | (wc >> 10);
