@@ -1,5 +1,9 @@
 2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::check): Treat native DOS paths as "noacl".
+
+2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (mount_info::conv_to_win32_path): Set UNC path flags to
 	cygdrive prefix path flags.
 

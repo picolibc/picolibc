@@ -828,12 +828,14 @@ is_virtual_symlink:
 	    {
 	      fileattr = sym.fileattr;
 	      path_flags = sym.pflags;
-	      /* If the OS is caseinsensitive or the FS is caseinsensitive or
-	         the incoming path was given in DOS notation, don't handle
-		 path casesensitive. */
-	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ()
-		  || is_msdos)
+	      /* If the OS is caseinsensitive or the FS is caseinsensitive,
+	         don't handle path casesensitive. */
+	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
 		path_flags |= PATH_NOPOSIX;
+	      /* If the incoming path was given in DOS notation, always treat
+	         it as caseinsensitive,noacl path. */
+	      else if (is_msdos)
+		path_flags |= PATH_NOPOSIX | PATH_NOACL;
 	      caseinsensitive = (path_flags & PATH_NOPOSIX)
 				? OBJ_CASE_INSENSITIVE : 0;
 	    }
