@@ -526,8 +526,6 @@ out:
       else if (fh->get_device () == FH_PIPER)
 	select_printf ("%s, select for write on read end of pipe",
 		       fh->get_name ());
-      else if (fh->has_ongoing_io (true))
-	s->write_ready = false;
       else
 	{
 	  IO_STATUS_BLOCK iosb = {0};

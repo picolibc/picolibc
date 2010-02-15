@@ -1,5 +1,16 @@
 2010-02-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.cc (fhandler_base::setup_overlapped): Don't set signalled
+	state to true initially.
+	(fhandler_base::has_ongoing_io): Delete ill-advised function.
+	(fhandler_base::read_overlapped): Rely on caller having checked
+	nonblocking state.  Don't attempt to (incorrectly) check it here.
+	(fhandler_base::write_overlapped): Remove call to has_ongoing_io.
+	* select.cc (peek_pipe): Ditto.
+	* fhandler.h (fhandler_base::has_ongoing_io): Delete declaration.
+
+2010-02-14  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* regex/regcomp.c (xwcrtomb): Fix one explicable and one inexcplicable
 	C warning.
 

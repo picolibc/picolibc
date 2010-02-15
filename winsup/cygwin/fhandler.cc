@@ -1647,7 +1647,7 @@ fhandler_base::setup_overlapped (bool doit)
   if (doit)
     {
       set_overlapped (ov);
-      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL));
+      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
     }
   else
     {
@@ -1751,29 +1751,12 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
   return res;
 }
 
-bool __stdcall
-fhandler_base::has_ongoing_io (bool testit)
-{
-  if (testit && get_overlapped () && get_overlapped ()->hEvent
-      && WaitForSingleObject (get_overlapped ()->hEvent, 0) != WAIT_OBJECT_0)
-    {
-      set_errno (EAGAIN);
-      return true;
-    }
-  return false;
-}
-
 void __stdcall
 fhandler_base::read_overlapped (void *ptr, size_t& len)
 {
   DWORD nbytes;
   while (1)
     {
-      if (has_ongoing_io (is_nonblocking ()))
-	{
-	  nbytes = (DWORD) -1;
-	  break;
-	}
       bool res = ReadFile (get_handle (), ptr, len, &nbytes,
 			   get_overlapped ());
       int wres = wait_overlapped (res, false, &nbytes);
@@ -1789,11 +1772,6 @@ fhandler_base::write_overlapped (const void *ptr, size_t len)
   DWORD nbytes;
   while (1)
     {
-      if (has_ongoing_io (is_nonblocking ()))
-	{
-	  nbytes = (DWORD) -1;
-	  break;
-	}
       bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
 			    get_overlapped ());
       int wres = wait_overlapped (res, true, &nbytes, (size_t) len);
