@@ -500,6 +500,15 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	  dev = *netdrive_dev;
 	  set_flags (flags, PATH_BINARY);
 	}
+      else
+	{
+	  /* For UNC paths, use the cygdrive prefix flags as default setting.
+	     This is more natural since UNC paths, just like cygdrive paths,
+	     are rather (warning, poetic description ahead) windows into the
+	     native Win32 world.  This also gives the user an elegant way to
+	     change the settings for those paths in a central place. */
+	  set_flags (flags, (unsigned) cygdrive_flags);
+	}
       backslashify (src_path, dst, 0);
       /* Go through chroot check */
       goto out;

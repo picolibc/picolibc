@@ -1,3 +1,8 @@
+2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (mount_info::conv_to_win32_path): Set UNC path flags to
+	cygdrive prefix path flags.
+
 2010-02-14  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::setup_overlapped): Don't set signalled
