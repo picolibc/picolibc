@@ -118,6 +118,15 @@ Add new Linux-compatible API calls accept4(2), dup3(2), and pipe2(2).
 </listitem>
 
 <listitem><para>
+Handle native DOS paths always as if mounted with "posix=0,noacl".
+</para></listitem>
+
+<listitem><para>
+Handle UNC paths starting with slashes identical to /cygdrive paths.
+In other words, use the /cygdrive mount flags for these paths as well.
+</para></listitem>
+
+<listitem><para>
 Recognize NWFS filesystem and workaround broken OS call.
 </para></listitem>
 

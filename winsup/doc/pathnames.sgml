@@ -6,11 +6,13 @@
 delimiters may be either forward slashes or backslashes.  Paths using
 backslashes are always handled as Win32 paths.  POSIX paths must only
 use forward slashes as delimiter, otherwise they are treated as Win32
-paths and file access might fail in surprising ways.  Note that the
-usage of Win32 paths, though possible, is deprecated, since it
-circumvents important internal path handling mechanisms.  UNC pathnames
-(starting with two slashes and a network name) are also supported.
-</para>
+paths and file access might fail in surprising ways.  UNC pathnames
+(starting with two slashes and a network name) are also supported.</para>
+
+<note><para>The usage of Win32 paths, though possible, is deprecated,
+since it circumvents important internal path handling mechanisms. 
+See <xref linkend="pathnames-win32"></xref> for more information.
+</para></note>
 
 <para>POSIX operating systems (such as Linux) do not have the concept
 of drive letters.  Instead, all absolute paths begin with a
@@ -257,6 +259,25 @@ binary mode by default (mount option <literal>binary</literal>, and the case
 of the filename doesn't matter (mount option <literal>posix=0</literal>.
 </para>
 
+<para>The cygdrive prefix flags are also used for all UNC paths starting with
+two slashes, unless they are accessed through a mount point.  For instance,
+consider these <filename>/etc/fstab</filename> entries:</para>
+
+<screen>
+  //server/share /mysrv    ntfs     posix=1,acl   0 0
+  none           /cygdrive cygdrive posix=0,noacl 0 0
+</screen>
+
+<para>Assume there's a file <filename>\\server\share\foo</filename> on the
+share.  When accessing it as <filename>/mysrv/foo</filename>, then the flags
+<literal>posix=1,acl</literal> of the /mysrv mount point are used.  When
+accessing it as <filename>//server/share/foo</filename>, then the flags
+for the cygdrive prefix, <literal>posix=0,noacl</literal> are used.</para>
+
+<note><para>This only applies to UNC paths using forward slashes.  When
+using backslashes the flags for native paths are used.  See
+<xref linkend="pathnames-win32"></xref>.</para></note>
+
 <para>The cygdrive prefix may be changed in the fstab file as outlined above.
 Please note that you must not use the cygdrive prefix for any other mount
 point.  For instance this:</para>
@@ -274,6 +295,45 @@ the cygdrive prefix, use a distinct path prefix:</para>
   none /cygdrive cygdrive binary 0 0
   D:   /mnt/d somefs text 0 0
 </screen>
+
+</sect2>
+
+<sect2 id="pathnames-win32"><title>Using native Win32 paths</title>
+
+<para>Using native Win32 paths in Cygwin, while possible, is generally
+inadvisable.  Those paths circumvent all internal integrity checking and
+bypass the information given in the Cygwin mount table.</para>
+
+<para>The following paths are treated as native Win32 paths in Cygwin:</para>
+
+<itemizedlist spacing="compact">
+  <listitem>
+    <para>All paths starting with a drive specifier</para>
+    <screen>
+       C:\foo
+       C:/foo
+    </screen>
+  </listitem>
+  <listitem>
+    <para>All paths containing at least one backslash as path component</para>
+    <screen>
+       C:/foo/bar<emphasis role='bold'>\</emphasis>baz/...
+    </screen>
+  </listitem>
+  <listitem>
+    <para>UNC paths using backslashes</para>
+    <screen>
+       \\server\share\...
+    </screen>
+  </listitem>
+</itemizedlist>
+
+<para>When accessing files using native Win32 paths as above, Cygwin uses a
+default setting for the mount flags.  All paths using DOS notation will be
+treated as caseinsensitive, and permissions are just faked as if the
+underlying drive is a FAT drive.  This also applies to NTFS and other
+filesystems which usually are capable of casesensitivity and storing
+permissions.</para>
 
 </sect2>
 
