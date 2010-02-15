@@ -1,3 +1,7 @@
+2010-02-15  Nick Clifton  <nickc@redhat.com>
+
+	* elf.m4: Import from gcc mainline.
+
 2009-11-30  Joseph Myers  <joseph@codesourcery.com>
 
 	* largefile.m4 (ACX_LARGEFILE): Require AC_CANONICAL_HOST and
