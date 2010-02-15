@@ -1,3 +1,8 @@
+2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Drop printing a redundant
+	decimal point in case the float argument is an integral value.
+
 2010-02-11  Craig Howland <howland@LGSInnovations.com>
        
 	* libc/include/machine/ieeefp.h:  isfinite macro modified to run faster

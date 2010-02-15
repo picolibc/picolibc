@@ -1578,7 +1578,7 @@ number:			if ((dprec = prec) >= 0)
 						cp = convbuf + ndig;
 					}
 #endif
-					if (prec || flags & ALT)
+					if (expt < ndig || flags & ALT)
 					    PRINT (decimal_point, decp_len);
 					PRINTANDPAD (cp, convbuf + ndig,
 						     ndig - expt, zeroes);
