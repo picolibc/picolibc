@@ -1,5 +1,12 @@
 2010-02-15  Nick Clifton  <nickc@redhat.com>
 
+	PR 11238
+	* configure.ac: Delete config.cache files in sub-directories when
+	deleting Makefiles.
+	* configure: Regenerate.
+
+2010-02-15  Nick Clifton  <nickc@redhat.com>
+
 	* configure.ac: Sync from gcc.
 	* configure: Regenerate.
 
