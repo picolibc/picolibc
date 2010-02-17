@@ -321,7 +321,11 @@ msvcr70.def msvcr70d.def \
 msvcr71.def msvcr71d.def \
 msvcr80.def msvcr80d.def \
 msvcr90.def msvcr90d.def: msvcrt.def.in
+	V=`echo $@ | sed -e 's|[a-z]*\([0-9]*\).*|\1|'`; \
+	test -z "$$V" && V=60; \
+	V="0x0$${V}0"; \
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
+		-D__MSVCRT_VERSION__=$$V \
 		-D__$(basename $(notdir $@))__=1 \
 		-D__MSVCRT__ -C -E -P \
 		-xc-header $? > $@
@@ -387,6 +391,21 @@ check-headers: force
 		echo "$$lang -ansi"; \
 		$(CC) -x$$lang -ansi $(TEST_H_OPTIONS) ; \
 	done
+	@echo; echo "Testing runtime 8.0 headers..."
+	@for lang in c c++ objective-c ; do \
+		echo "$$lang ..."; \
+		$(CC) -x$$lang -Wall -D__MSVCRT_VERSION__=0x0800 $(TEST_H_OPTIONS) ; \
+		echo "$$lang -ansi"; \
+		$(CC) -x$$lang -Wall -D__MSVCRT_VERSION__=0x0800 -ansi $(TEST_H_OPTIONS) ; \
+	done
+	@echo; echo "Testing runtime 8.0(time32) headers..."
+	@for lang in c c++ objective-c ; do \
+		echo "$$lang ..."; \
+		$(CC) -x$$lang -Wall -D__MSVCRT_VERSION__=0x0800 -D_USE_32BIT_TIME_T $(TEST_H_OPTIONS) ; \
+		echo "$$lang -ansi"; \
+		$(CC) -x$$lang -Wall -D__MSVCRT_VERSION__=0x0800 -D_USE_32BIT_TIME_T -ansi $(TEST_H_OPTIONS) ; \
+	done
+	@echo; echo "Testing runtime 8.0(time32) headers..."
 # specify -std=xx only for C
 	@for std in gnu89 gnu99 c89 c99 ; do \
 		echo "std = $$std"; \

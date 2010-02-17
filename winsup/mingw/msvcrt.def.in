@@ -185,10 +185,12 @@ _filelength
 _filelengthi64
 _fileno
 _findclose
+#if __MSVCRT_VERSION__ < 0x0800
 _findfirst
 _findfirsti64
 _findnext
 _findnexti64
+#endif
 _finite
 _flsbuf
 _flushall
@@ -199,12 +201,16 @@ _fpreset DATA
 _fputchar
 _fputwchar
 _fsopen
+#if __MSVCRT_VERSION__ < 0x0800
 _fstat
 _fstati64
 _ftime
+#endif
 _ftol
 _fullpath
+#if __MSVCRT_VERSION__ < 0x0800
 _futime
+#endif
 _gcvt
 _get_osfhandle
 _get_sbh_threshold
@@ -402,8 +408,10 @@ _spawnve
 _spawnvp
 _spawnvpe
 _splitpath
+#if __MSVCRT_VERSION__ < 0x0800
 _stat
 _stati64
+#endif
 _statusfp
 _strcmpi
 _strdate
@@ -440,7 +448,9 @@ _ungetch
 _unlink
 _unloaddll
 _unlock
+#if __MSVCRT_VERSION__ < 0x0800
 _utime
+#endif
 _vsnprintf
 _vsnwprintf
 _waccess
@@ -460,7 +470,9 @@ _wcsnset
 _wcsrev
 _wcsset
 _wcsupr
+#if __MSVCRT_VERSION__ < 0x0800
 _wctime
+#endif
 _wenviron DATA
 _wexecl
 _wexecle
@@ -471,10 +483,12 @@ _wexecve
 _wexecvp
 _wexecvpe
 _wfdopen
+#if __MSVCRT_VERSION__ < 0x0800
 _wfindfirst
 _wfindfirsti64
 _wfindnext
 _wfindnexti64
+#endif
 _wfopen
 _wfreopen
 _wfsopen
@@ -509,8 +523,10 @@ _wspawnve
 _wspawnvp
 _wspawnvpe
 _wsplitpath
+#if __MSVCRT_VERSION__ < 0x0800
 _wstat
 _wstati64
+#endif
 _wstrdate
 _wstrtime
 _wsystem
@@ -520,7 +536,9 @@ _wtoi
 _wtoi64
 _wtol
 _wunlink
+#if __MSVCRT_VERSION__ < 0x0800
 _wutime
+#endif
 _y0
 _y1
 _yn
@@ -542,8 +560,10 @@ clearerr
 clock
 cos
 cosh
+#if __MSVCRT_VERSION__ < 0x0800
 ctime
 difftime
+#endif
 div
 exit
 exp
@@ -582,7 +602,9 @@ getenv
 gets
 getwc
 getwchar
+#if __MSVCRT_VERSION__ < 0x0800
 gmtime
+#endif
 is_wctype
 isalnum
 isalpha
@@ -613,7 +635,9 @@ labs
 ldexp
 ldiv
 localeconv
+#if __MSVCRT_VERSION__ < 0x0800
 localtime
+#endif
 log
 log10
 longjmp
@@ -626,7 +650,9 @@ memcmp
 memcpy
 memmove
 memset
+#if __MSVCRT_VERSION__ < 0x0800
 mktime
+#endif
 modf
 perror
 pow
@@ -680,7 +706,7 @@ swscanf
 system
 tan
 tanh
-#if  !(__msvcr90__ || msvcr90d__)
+#if __MSVCRT_VERSION__ < 0x0800
 time
 #endif
 tmpfile
@@ -826,3 +852,40 @@ _ftelli64
 _fseeki64_nolock
 _ftelli64_nolock
 #endif /* 8.0 */
+#if __MSVCRT_VERSION__ >= 0x0800
+_ctime32
+_difftime32
+_difftime64
+_findfirst32
+_findfirst32i64
+_findfirst64i32
+_findnext32
+_findnext32i64
+_findnext64i32
+_fstat32
+_fstat32i64
+_fstat64i32
+_ftime32
+_futime32
+_gmtime32
+_localtime32
+_mkgmtime32
+_mkgmtime64
+_mktime32
+_stat32
+_stat32i64
+_stat64i32
+_time32
+_utime32
+_wctime32
+_wfindfirst32
+_wfindfirst32i64
+_wfindfirst64i32
+_wfindnext32
+_wfindnext32i64
+_wfindnext64i32
+_wstat32
+_wstat32i64
+_wstat64i32
+_wutime32
+#endif

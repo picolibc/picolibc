@@ -23,14 +23,28 @@
 
 #ifndef RC_INVOKED
 
-#ifndef _TIME_T_DEFINED
-typedef	long	time_t;
-#define	_TIME_T_DEFINED
+#ifndef _TIME32_T_DEFINED
+typedef __int32 __time32_t;
+#define _TIME32_T_DEFINED
 #endif
 
 #ifndef _TIME64_T_DEFINED
 typedef __int64 __time64_t;
 #define _TIME64_T_DEFINED
+#endif
+
+#ifndef _TIME_T_DEFINED
+/* FIXME __STRICT_ANSI__ ! */
+#if __MSVCRT_VERSION__ >= 0x0800
+#ifndef _USE_32BIT_TIME_T
+typedef	__time64_t time_t;
+#else
+typedef	__time32_t time_t;
+#endif /* !_USE_32BIT_TIME_T */
+#else
+typedef	__time32_t time_t;
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
+#define _TIME_T_DEFINED
 #endif
 
 #ifndef	_OFF_T_

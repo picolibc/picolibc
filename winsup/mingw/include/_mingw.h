@@ -195,6 +195,12 @@
 # endif
 #endif
 
+# ifdef __GNUC__
+#  define _CRTALIAS __CRT_INLINE __attribute__ ((__always_inline__))
+# else
+#  define _CRTALIAS __CRT_INLINE
+# endif
+
 #ifdef __cplusplus
 # define __UNUSED_PARAM(x)
 #else

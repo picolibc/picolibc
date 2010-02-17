@@ -1,3 +1,29 @@
+2010-02-14  Roumen Petrov  <rumen@users.sourceforge.net>
+
+	Issue [2134161]: time64 functions and types for msvcrt >= 8.0
+	(initial implementation)
+
+	* new type: __time32_t
+
+	* new structures: _finddata32_t, _finddata32i64_t, _finddata64i32_t,
+	__stat32, _stat32i64, _stat64i32, __timeb32, __utimbuf32,
+	__wfinddata32_t, _wfinddata32i64_t, _wfinddata64i32_t
+
+	* new functions: _ctime32, _difftime32, _difftime64, _findfirst32
+	_findfirst32i64, _findfirst64i32, _findnext32, _findnext32i64,
+	_findnext64i32, _fstat32, _fstat32i64, _fstat64i32, _ftime32,
+	_futime32, _gmtime32, _localtime32, _mkgmtime32, _mkgmtime64,
+	_mktime32, _stat32, _stat32i64, _stat64i32, _time32, _utime32,
+	_wctime32, _wfindfirst32, _wfindfirst32i64, _wfindfirst64i32,
+	_wfindnext32, _wfindnext32i64, _wfindnext64i32, _wstat32,
+	_wstat32i64, _wstat64i32,_wutime32
+
+	* new define _USE_32BIT_TIME_T set 32 or 64 aliases for: time_t,
+	ctime, difftime, _findfirst, _findfirsti64, _findnext, _findnexti64,
+	_fstat, _fstati64, _ftime, _futime, gmtime, localtime, mktime,
+	_stat, _stati64, time, _utime, _wctime, _wfindfirst, _wfindfirsti64,
+	_wfindnext, _wfindnexti64, _wstat, _wstati64, _wutime
+
 2010-01-25  Kai Tietz  <kai.tietz@onevision.com>
 
 	Implement TLS Callback.

@@ -147,7 +147,49 @@ struct __stat64
     __time64_t st_mtime;
     __time64_t st_ctime;
 };
-#endif /* __MSVCRT_VERSION__ */
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#if __MSVCRT_VERSION__ >= 0x0800
+struct __stat32
+{
+	_dev_t		st_dev;
+	_ino_t		st_ino;
+	_mode_t		st_mode;
+	short		st_nlink;
+	short		st_uid;
+	short		st_gid;
+	_dev_t		st_rdev;
+	__int32		st_size;
+	__time32_t	st_atime;
+	__time32_t	st_mtime;
+	__time32_t	st_ctime;
+};
+struct _stat32i64 {
+	_dev_t		st_dev;
+	_ino_t		st_ino;
+	_mode_t		st_mode;
+	short		st_nlink;
+	short		st_uid;
+	short		st_gid;
+	_dev_t		st_rdev;
+	__int64		st_size;
+	__time32_t	st_atime;
+	__time32_t	st_mtime;
+	__time32_t	st_ctime;
+};
+struct _stat64i32 {
+	_dev_t		st_dev;
+	_ino_t		st_ino;
+	_mode_t		st_mode;
+	short		st_nlink;
+	short		st_uid;
+	short		st_gid;
+	_dev_t		st_rdev;
+	__int32		st_size;
+	__time64_t	st_atime;
+	__time64_t	st_mtime;
+	__time64_t	st_ctime;
+};
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #endif /* __MSVCRT__ */
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
@@ -156,12 +198,16 @@ struct __stat64
 extern "C" {
 #endif
 
+#if __MSVCRT_VERSION__ < 0x0800
 _CRTIMP int __cdecl __MINGW_NOTHROW	_fstat (int, struct _stat*);
+#endif
 _CRTIMP int __cdecl __MINGW_NOTHROW	_chmod (const char*, int);
+#if __MSVCRT_VERSION__ < 0x0800
 _CRTIMP int __cdecl __MINGW_NOTHROW	_stat (const char*, struct _stat*);
+#endif
 
 #ifndef	_NO_OLDNAMES
-
+/* FIXME for __MSVCRT_VERSION__ >= 0x0800 */
 /* These functions live in liboldnames.a. */
 _CRTIMP int __cdecl __MINGW_NOTHROW	fstat (int, struct stat*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	chmod (const char*, int);
@@ -170,19 +216,56 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	stat (const char*, struct stat*);
 #endif	/* Not _NO_OLDNAMES */
 
 #if defined (__MSVCRT__)
+#if __MSVCRT_VERSION__ < 0x0800
 _CRTIMP int __cdecl __MINGW_NOTHROW  _fstati64(int, struct _stati64 *);
 _CRTIMP int __cdecl __MINGW_NOTHROW  _stati64(const char *, struct _stati64 *);
+#endif
 /* These require newer versions of msvcrt.dll (6.10 or higher).  */ 
 #if __MSVCRT_VERSION__ >= 0x0601
 _CRTIMP int __cdecl __MINGW_NOTHROW _fstat64 (int, struct __stat64*);
 _CRTIMP int __cdecl __MINGW_NOTHROW _stat64 (const char*, struct __stat64*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#if __MSVCRT_VERSION__ >= 0x0800
+_CRTIMP int __cdecl __MINGW_NOTHROW	_fstat32 (int, struct __stat32*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_stat32 (const char*, struct __stat32*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_fstat32i64 (int, struct _stat32i64*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_fstat64i32 (int, struct _stat64i32*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_stat32i64 (const char*, struct _stat32i64*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_stat64i32 (const char*, struct _stat64i32*);
+#ifndef _USE_32BIT_TIME_T
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_fstat (int _v1, struct _stat* _v2)		 { return(_fstat64i32 (_v1,(struct _stat64i32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_stat (const char* _v1, struct _stat* _v2)	 { return(_stat64i32  (_v1,(struct _stat64i32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_fstati64 (int _v1, struct _stati64* _v2)	 { return(_fstat64 (_v1,(struct __stat64*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_stati64 (const char* _v1, struct _stati64* _v2) { return(_stat64  (_v1,(struct __stat64*)_v2)); }
+#else
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_fstat (int _v1, struct _stat* _v2)		 { return(_fstat32 (_v1,(struct __stat32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_stat (const char* _v1, struct _stat* _v2)	 { return(_stat32  (_v1,(struct __stat32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_fstati64 (int _v1, struct _stati64* _v2)	 { return(_fstat32i64 (_v1,(struct _stat32i64*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_stati64 (const char* _v1, struct _stati64* _v2) { return(_stat32i64  (_v1,(struct _stat32i64*)_v2)); }
+#endif /* !_USE_32BIT_TIME_T */
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
+
+
 #if !defined ( _WSTAT_DEFINED) /* also declared in wchar.h */
+#if __MSVCRT_VERSION__ < 0x0800
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wstat(const wchar_t*, struct _stat*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wstati64 (const wchar_t*, struct _stati64*);
+#endif
 #if __MSVCRT_VERSION__ >= 0x0601
 _CRTIMP int __cdecl __MINGW_NOTHROW _wstat64 (const wchar_t*, struct __stat64*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#if __MSVCRT_VERSION__ >= 0x0800
+_CRTIMP int __cdecl __MINGW_NOTHROW	_wstat32 (const wchar_t*, struct __stat32*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_wstat32i64 (const wchar_t*, struct _stat32i64*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_wstat64i32 (const wchar_t*, struct _stat64i32*);
+#ifndef _USE_32BIT_TIME_T
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_wstat (const wchar_t* _v1, struct _stat* _v2)	     { return(_wstat64i32 (_v1,(struct _stat64i32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_wstati64 (const wchar_t* _v1, struct _stati64* _v2) { return(_wstat64 (_v1,(struct __stat64*)_v2)); }
+#else
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_wstat (const wchar_t* _v1, struct _stat* _v2)	     { return(_wstat32 (_v1,(struct __stat32*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_wstati64 (const wchar_t* _v1, struct _stati64* _v2) { return(_wstat32i64 (_v1,(struct _stat32i64*)_v2)); }
+#endif /* !_USE_32BIT_TIME_T */
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #define _WSTAT_DEFINED
 #endif /* _WSTAT_DEFIND */
 #endif /* __MSVCRT__ */

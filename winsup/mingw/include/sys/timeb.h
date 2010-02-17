@@ -28,6 +28,19 @@ struct _timeb
 	short	dstflag;
 };
 
+#if __MSVCRT_VERSION__ >= 0x0800
+/*
+ * TODO: Structure not tested.
+ */
+struct __timeb32
+{
+	__time32_t	time;
+	short	millitm;
+	short	timezone;
+	short	dstflag;
+};
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
+
 #ifndef	_NO_OLDNAMES
 /*
  * TODO: Structure not tested.
@@ -49,6 +62,7 @@ extern "C" {
 _CRTIMP void __cdecl __MINGW_NOTHROW	_ftime (struct _timeb*);
 
 #ifndef	_NO_OLDNAMES
+/* FIXME for __MSVCRT_VERSION__ >= 0x0800 */
 _CRTIMP void __cdecl __MINGW_NOTHROW	ftime (struct timeb*);
 #endif	/* Not _NO_OLDNAMES */
 
@@ -64,6 +78,15 @@ struct __timeb64
 
 _CRTIMP void __cdecl __MINGW_NOTHROW	_ftime64 (struct __timeb64*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
+
+#if __MSVCRT_VERSION__ >= 0x0800
+_CRTIMP void __cdecl __MINGW_NOTHROW	_ftime32 (struct __timeb32*);
+#ifndef _USE_32BIT_TIME_T
+_CRTALIAS void __cdecl __MINGW_NOTHROW	_ftime (struct _timeb* _v) { return(_ftime64 ((struct __timeb64*)_v)); }
+#else
+_CRTALIAS void __cdecl __MINGW_NOTHROW	_ftime (struct _timeb* _v) { return(_ftime32 ((struct __timeb32*)_v)); }
+#endif
+#endif /* __MSVCRT_VERSION__ >= 0x0800 */
 
 #ifdef	__cplusplus
 }
