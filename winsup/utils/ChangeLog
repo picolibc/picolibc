@@ -1,3 +1,12 @@
+2010-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_BINS): Rename getlocale to locale.
+	* getlocale.c: Rename to ...
+	* locale.cc: Revamp to add full functionality of POSIX locale(1) tool,
+	as far as Cygwin supports it.
+	* utils.sgml (getlocale): Move and rename to ...
+	(locale): Accommodate new functionality.
+
 2010-02-13  Ilguiz Latypov  <ilatypov@infradead.org>
 
 	* cygpath.cc (do_pathconv): Fix potential crash.
