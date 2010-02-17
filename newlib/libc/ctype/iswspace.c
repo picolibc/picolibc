@@ -67,10 +67,13 @@ _DEFUN(iswspace,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);
+  /* Based on Unicode 5.2.  Control chars 09-0D, plus all characters
+     from general category "Zs", which are not marked as decomposition
+     type "noBreak". */
   return ((c >= 0x0009 && c <= 0x000d) || c == 0x0020 ||
-	  c == 0x00A0 || c == 0x1680 ||
+	  c == 0x1680 || c == 0x180e ||
 	  (c >= 0x2000 && c <= 0x2006) ||
-	  (c >= 0x2008 && c <= 0x200b) ||
+	  (c >= 0x2008 && c <= 0x200a) ||
 	  c == 0x2028 || c == 0x2029 ||
 	  c == 0x205f || c == 0x3000);
 #else

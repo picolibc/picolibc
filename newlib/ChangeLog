@@ -1,3 +1,10 @@
+2010-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/ctype/iswblank.c (iswblank): Remove Unicode characters
+	U+00A0 and U+200B.  Add Unicode character U+180E.  Add comment
+	to explain how to generate from Unicode data file.
+	* libc/ctype/iswspace.c (iswspace): Ditto.
+
 2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Apply previous patch here
