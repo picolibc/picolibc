@@ -1,3 +1,9 @@
+2010-02-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* arm.h (Tag_MPextension_use): Renumber.
+	(Tag_DIV_use): Add.
+	(Tag_MPextension_use_legacy): Likewise.
+
 2010-02-09  Michael Holzheu  <holzheu@de.ibm.com>
 
 	* common.h (NT_S390_TIMER, NT_S390_TODCMP, NT_S390_TODPREG,
