@@ -1,3 +1,12 @@
+2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (eval_datetimefmt): Rename force to flags.
+	(enum dt_flags): Define.
+	(__eval_datetimefmt): Change force to flags and change type to
+	dt_flags.  Accommodate throughout.
+	(__set_lc_time_from_win): Accommodate above change.  Set era-related
+	values to empty strings for now.
+
 2010-02-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base::setup_overlapped): Revert to starting

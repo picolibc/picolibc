@@ -30,8 +30,8 @@ details. */
 
 #define getlocaleinfo(category,type) \
 	    __getlocaleinfo(lcid,(type),_LC(category),f_wctomb,charset)
-#define eval_datetimefmt(type,force) \
-	    __eval_datetimefmt(lcid,(type),(force),&lc_time_ptr,\
+#define eval_datetimefmt(type,flags) \
+	    __eval_datetimefmt(lcid,(type),(flags),&lc_time_ptr,\
 			       lc_time_end-lc_time_ptr,f_wctomb, charset)
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
@@ -338,8 +338,17 @@ getlocaleint (LCID lcid, LCTYPE type)
 			 sizeof val) ? val : 0;
 }
 
+enum dt_flags {
+  DT_DEFAULT	= 0x00,
+  DT_AMPM	= 0x01,	/* Enforce 12 hour time format. */
+  DT_ABBREV	= 0x02,	/* Enforce abbreviated month and day names. */
+  DT_ERACAL	= 0x04,	/* Retrieve era information (ignored otherwise).
+			   Also switch to optional calendar with era
+			   information, if necessary. */
+};
+
 static char *
-__eval_datetimefmt (LCID lcid, LCTYPE type, int force, char **ptr,
+__eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
 		    size_t size, wctomb_p f_wctomb, const char *charset)
 {
   wchar_t buf[80];
@@ -378,21 +387,20 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, int force, char **ptr,
       case L'M':
       case L'y':
 	t_str = (fc == L'd' ? day_str : fc == L'M' ? mon_str : year_str);
-	if (fc == L'y')
-	  force = 0;
-	for (idx = 1; fmt[1] == fc; ++idx, ++fmt);
-	if (--idx > 3)
+	for (idx = 0; fmt[1] == fc; ++idx, ++fmt);
+	if (idx > 3)
 	  idx = 3;
-	if (force && idx == 3)
+	if ((flags & DT_ABBREV) && fc != L'y' && idx == 3)
 	  idx = 2;
 	*p++ = '%';
 	*p++ = t_str[idx];
 	break;
       case L'g':
+	/* TODO */
 	break;
       case L'h':
       case L'H':
-	t_str = (fc == L'h' || force ? hour12_str : hour24_str);
+	t_str = (fc == L'h' || (flags & DT_AMPM) ? hour12_str : hour24_str);
 	idx = 0;
 	if (fmt[1] == fc)
 	  {
@@ -495,22 +503,22 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   for (int i = 0; i < 6; ++i)
     _time_locale->weekday[i + 1] = getlocaleinfo (time, LOCALE_SDAYNAME1 + i);
   /* X_fmt */
-  _time_locale->X_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, 0);
+  _time_locale->X_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
   /* x_fmt */
-  _time_locale->x_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, 0);
+  _time_locale->x_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, DT_DEFAULT);
   /* c_fmt */
-  _time_locale->c_fmt = eval_datetimefmt (LOCALE_SLONGDATE, 1);
+  _time_locale->c_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
   --lc_time_ptr;
   *lc_time_ptr++ = ' ';
-  eval_datetimefmt (LOCALE_STIMEFORMAT, 0);
+  eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
   /* AM/PM */
   _time_locale->am_pm[0] = getlocaleinfo (time, LOCALE_S1159);
   _time_locale->am_pm[1] = getlocaleinfo (time, LOCALE_S2359);
   /* date_fmt */
-  _time_locale->date_fmt = eval_datetimefmt (LOCALE_SLONGDATE, 1);
+  _time_locale->date_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
   --lc_time_ptr;
   *lc_time_ptr++ = ' ';
-  eval_datetimefmt (LOCALE_STIMEFORMAT, 0);
+  eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
   --lc_time_ptr;
   lc_time_ptr = stpcpy (lc_time_ptr, " %Z") + 1;
   /* md */
@@ -520,7 +528,25 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
     lc_time_ptr = stpcpy (lc_time_ptr, *buf == L'1' ? "dm" : "md") + 1;
   }
   /* ampm_fmt */
-  _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, 1);
+  _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
+
+  /* TODO */
+
+  /* era */
+  _time_locale->era = lc_time_ptr;
+  *lc_time_ptr++ = '\0';
+  /* era_d_fmt */
+  _time_locale->era_d_fmt = lc_time_ptr;
+  *lc_time_ptr++ = '\0';
+  /* era_d_t_fmt */
+  _time_locale->era_d_t_fmt = lc_time_ptr;
+  *lc_time_ptr++ = '\0';
+  /* era_t_fmt */
+  _time_locale->era_t_fmt = lc_time_ptr;
+  *lc_time_ptr++ = '\0';
+  /* alt_digits */
+  _time_locale->alt_digits = lc_time_ptr;
+  *lc_time_ptr++ = '\0';
 
   char *tmp = (char *) realloc (new_lc_time_buf, lc_time_ptr - new_lc_time_buf);
   if (!tmp)
