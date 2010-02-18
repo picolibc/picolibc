@@ -1349,6 +1349,33 @@ DECLARE_INTERFACE_(IShellIconOverlayIdentifier,IUnknown)
 };
 #undef INTERFACE
 
+#if (_WIN32_WINNT >= 0x0501) /* WXP */
+typedef _COM_interface IFolderView *LPFOLDERVIEW;
+
+#define INTERFACE IFolderView
+DECLARE_INTERFACE_(IFolderView,IUnknown)
+{
+   STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+   STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+   STDMETHOD_(ULONG,Release)(THIS) PURE;
+   STDMETHOD(GetAutoArrange)(THIS) PURE;
+   STDMETHOD(GetCurrentViewMode)(THIS_ UINT) PURE;
+   STDMETHOD(GetDefaultSpacing)(THIS_ POINT*) PURE;
+   STDMETHOD(GetFocusedItem)(THIS_ int*) PURE;
+   STDMETHOD(GetFolder)(THIS_ REFIID,PVOID*) PURE;
+   STDMETHOD(GetItemPosition)(THIS_ LPCITEMIDLIST,POINT*) PURE;
+   STDMETHOD(GetSelectionMarkedItem)(THIS_ int*) PURE;
+   STDMETHOD(GetSpacing)(THIS_ POINT*) PURE;
+   STDMETHOD(Item)(THIS_ int,LPITEMIDLIST*) PURE;
+   STDMETHOD(ItemCount)(THIS_ UINT,int*) PURE;
+   STDMETHOD(Items)(THIS_ UINT,REFIID,PVOID*) PURE;
+   STDMETHOD(SelectAndPositionItems)(THIS_ UINT,LPCITEMIDLIST*,POINT*,DWORD) PURE;
+   STDMETHOD(SelectItem)(THIS_ int,DWORD) PURE;
+   STDMETHOD(SetCurrentViewMode)(THIS_ UINT) PURE;
+};
+#undef INTERFACE
+#endif /* _WIN32_WINNT >= 0x0501 */
+
 #define ISIOI_ICONFILE 0x00000001
 #define ISIOI_ICONINDEX 0x00000002
 

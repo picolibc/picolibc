@@ -79,6 +79,9 @@ extern const GUID IID_IPersistFolder3;
 extern const GUID IID_IShellFolder2;
 extern const GUID IID_IFileSystemBindData;
 #endif
+#if (_WIN32_WINNT >= 0x501)
+extern const GUID IID_IFolderView;
+#endif
 #ifdef UNICODE
 #define IID_IFileViewer	IID_IFileViewerW
 #define IID_IShellLink	IID_IShellLinkW

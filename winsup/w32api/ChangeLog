@@ -1,3 +1,9 @@
+2010-02-17  LRN  <lrn1986@gmail.com>
+
+	* include/shlguid.h (IID_IFolderView): Define.
+	* include/shlobj.h (IFolderView interface): Define.
+	* lib/shell32.c (IID_IFolderView): Export.
+
 2010-01-26  Chris Sutcliffe  <ir0n3h4d@users.sourceforge.net>
 
 	* include/shldisp.h (AUTOCOMPLETEOPTIONS): Add version guard around
