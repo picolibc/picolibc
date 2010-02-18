@@ -684,8 +684,8 @@ clooginc
 clooglibs
 pplinc
 ppllibs
-poststage1_ldflags
 poststage1_libs
+poststage1_ldflags
 stage1_libs
 stage1_ldflags
 extra_mpc_mpfr_configure_flags
@@ -797,8 +797,8 @@ with_gmp_lib
 with_host_libstdcxx
 with_stage1_ldflags
 with_stage1_libs
-with_boot_libs
 with_boot_ldflags
+with_boot_libs
 with_ppl
 with_ppl_include
 with_ppl_lib
@@ -1532,8 +1532,8 @@ Optional Packages:
                           when linking with PPL
   --with-stage1-ldflags=FLAGS Linker flags for stage1
   -with-stage1-libs=LIBS      Libraries for stage1
-  --with-boot-libs=LIBS     Libraries for stage2 and later
   --with-boot-ldflags=FLAGS Linker flags for stage2 and later
+  --with-boot-libs=LIBS     Libraries for stage2 and later
   --with-ppl=PATH         Specify prefix directory for the installed PPL package
                           Equivalent to --with-ppl-include=PATH/include
                           plus --with-ppl-lib=PATH/lib
@@ -3261,7 +3261,6 @@ case "${target}" in
     case "${target}" in
       i*86-*-*) ;;
       alpha*-*-*) ;;
-      x86_64-*-*) ;;
       *)
 	noconfigdirs="$noconfigdirs ${libgcj}"
 	;;
@@ -5739,6 +5738,25 @@ fi
 
 
 
+# Linker flags to use for stage2 and later builds.
+
+# Check whether --with-boot-ldflags was given.
+if test "${with_boot_ldflags+set}" = set; then :
+  withval=$with_boot_ldflags; if test "$withval" = "no" -o "$withval" = "yes"; then
+   poststage1_ldflags=
+ else
+   poststage1_ldflags=$withval
+ fi
+else
+  if test "$ENABLE_BUILD_WITH_CXX" = "yes"; then
+   poststage1_ldflags=-static-libstdc++
+ else
+   poststage1_ldflags=
+ fi
+fi
+
+
+
 # Libraries to use for stage2 and later builds.  This defaults to the
 # argument passed to --with-host-libstdcxx.
 
@@ -5751,27 +5769,6 @@ if test "${with_boot_libs+set}" = set; then :
  fi
 else
   poststage1_libs=$with_host_libstdcxx
-fi
-
-
-
-# Linker flags to use for stage2 and later builds.
-
-# Check whether --with-boot-ldflags was given.
-if test "${with_boot_ldflags+set}" = set; then :
-  withval=$with_boot_ldflags; if test "$withval" = "no" -o "$withval" = "yes"; then
-   poststage1_ldflags=
- else
-   poststage1_ldflags=$withval
- fi
-else
-  poststage1_ldflags=
- # With --enable-build-with-cxx, default to linking libstdc++ and
- # libgcc statically.  But if the user explicitly specified the
- # libraries to use, trust that they are doing what they want.
- if test "$ENABLE_BUILD_WITH_CXX" = "yes" -a "$poststage1_libs" = ""; then
-   poststage1_ldflags="-static-libstdc++ -static-libgcc"
- fi
 fi
 
 
@@ -5930,8 +5927,8 @@ fi
 if test "x$with_cloog" != "xno" -a "${ENABLE_CLOOG_CHECK}" = "yes"; then
   saved_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS $clooginc $gmpinc $pplinc"
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for version 0.15.5 (or later revision) of CLooG" >&5
-$as_echo_n "checking for version 0.15.5 (or later revision) of CLooG... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for correct version of CLooG" >&5
+$as_echo_n "checking for correct version of CLooG... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include "cloog/cloog.h"
@@ -5939,7 +5936,7 @@ int
 main ()
 {
 
-  #if CLOOG_VERSION_MAJOR != 0 || CLOOG_VERSION_MINOR != 15 || CLOOG_VERSION_REVISION < 5
+  #if CLOOG_VERSION_MAJOR != 0 || CLOOG_VERSION_MINOR != 15
   choke me
   #endif
 
@@ -5968,35 +5965,6 @@ if test "${enable_lto+set}" = set; then :
   enableval=$enable_lto; enable_lto=$enableval
 else
   enable_lto=yes; default_enable_lto=yes
-fi
-
-
-
-
-
-target_elf=no
-case $target in
-  *-darwin* | *-aix* | *-cygwin* | *-mingw* | *-aout* | *-*coff* | \
-  *-msdosdjgpp* | *-netware* | *-vms* | *-wince* | *-*-pe* | \
-  alpha*-dec-osf* | *-interix*)
-    target_elf=no
-    ;;
-  *)
-    target_elf=yes
-    ;;
-esac
-
-if test $target_elf = yes; then :
-
-else
-  if test x"$default_enable_lto" = x"yes" ; then
-  enable_lto=no
-else
-  if test x"$enable_lto" = x"yes"; then
-    as_fn_error "LTO support requires an ELF target." "$LINENO" 5
-  fi
-fi
-default_enable_lto=no
 fi
 
 

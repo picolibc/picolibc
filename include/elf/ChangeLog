@@ -1,25 +1,6 @@
-2010-02-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
-
-	* arm.h (Tag_MPextension_use): Renumber.
-	(Tag_DIV_use): Add.
-	(Tag_MPextension_use_legacy): Likewise.
-
-2010-02-09  Michael Holzheu  <holzheu@de.ibm.com>
-
-	* common.h (NT_S390_TIMER, NT_S390_TODCMP, NT_S390_TODPREG,
-	NT_S390_CTRS and NT_S390_PREFIX): Define.
-
-2010-02-02  H.J. Lu  <hongjiu.lu@intel.com>
-
-	* common.h (NT_386_XSTATE): New.
-
-2010-01-21  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
-	
-	* s390.h (EF_S390_HIGH_GPRS): Added macro definition.
-
 2010-01-19  Daisuke Hatayama  <d.hatayama@jp.fujitsu.com>
 
-	* common.h (PN_XNUM): Define.
+        * common.h (PN_XNUM): Define.
 
 2009-12-18  Ulrich Weigand  <uweigand@de.ibm.com>
 

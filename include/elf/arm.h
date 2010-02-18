@@ -288,18 +288,13 @@ enum
   Tag_undefined37,
   Tag_ABI_FP_16bit_format,
   Tag_undefined39,
-  Tag_undefined40,
-  Tag_undefined41,
-  Tag_MPextension_use,
-  Tag_undefined_43,
-  Tag_DIV_use,
   Tag_nodefaults = 64,
   Tag_also_compatible_with,
   Tag_T2EE_use,
   Tag_conformance,
   Tag_Virtualization_use,
   Tag_undefined69,
-  Tag_MPextension_use_legacy
+  Tag_MPextension_use
 };
 
 #endif

@@ -1,28 +1,3 @@
-2010-02-17  Nick Clifton  <nickc@redhat.com>
-
-	PR 11238
-	* Makefile.tpl (local-distclean): Also remove config.cache files in
-	sub-directories as there may not be Makefiles present in the
-	sub-directories.
-	* Makefile.tpl: Use "-exec rm {}" rather than "-delete" to delete
-	the config.cache files found by the find command.
-
-	* Makefile.in: Regenerate.
-	* configure.ac: Revert previous delta.
-	* configure: Regenerate.
-
-2010-02-15  Nick Clifton  <nickc@redhat.com>
-
-	PR 11238
-	* configure.ac: Delete config.cache files in sub-directories when
-	deleting Makefiles.
-	* configure: Regenerate.
-
-2010-02-15  Nick Clifton  <nickc@redhat.com>
-
-	* configure.ac: Sync from gcc.
-	* configure: Regenerate.
-
 2010-01-31  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	Sync from gcc:
