@@ -175,24 +175,19 @@ _DEFUN(nl_langinfo, (item),
 		ret = (char*) __get_current_time_locale()->mon[_REL(ABMON_1)];
 		break;
 	case ERA:
-		/* XXX: need to be implemented  */
-		ret = "";
+		ret = (char*) __get_current_time_locale()->era;
 		break;
 	case ERA_D_FMT:
-		/* XXX: need to be implemented  */
-		ret = "";
+		ret = (char*) __get_current_time_locale()->era_d_fmt;
 		break;
 	case ERA_D_T_FMT:
-		/* XXX: need to be implemented  */
-		ret = "";
+		ret = (char*) __get_current_time_locale()->era_d_t_fmt;
 		break;
 	case ERA_T_FMT:
-		/* XXX: need to be implemented  */
-		ret = "";
+		ret = (char*) __get_current_time_locale()->era_t_fmt;
 		break;
 	case ALT_DIGITS:
-		/* XXX: need to be implemented  */
-		ret = "";
+		ret = (char*) __get_current_time_locale()->alt_digits;
 		break;
 	case RADIXCHAR:
 		ret = (char*) __get_current_numeric_locale()->decimal_point;

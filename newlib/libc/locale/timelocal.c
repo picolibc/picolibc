@@ -92,7 +92,33 @@ static const struct lc_time_T	_C_time_locale = {
 	/* ampm_fmt
 	 * To determine 12-hour clock format time (empty, if N/A)
 	 */
-	"%I:%M:%S %p"
+	"%I:%M:%S %p",
+
+	/* era
+	 * Era.  This and the following entries are used if the alternative
+	 * date format is specified in strftime
+	 */
+	"",
+
+	/* era_d_fmt
+	 * Era date format used with the %Ex
+	 */
+	"",
+
+	/* era_d_t_fmt
+	 * Era date/time format (%Ec)
+	 */
+	"",
+
+	/* era_t_fmt
+	 * Era time format (%EX)
+	 */
+	"",
+
+	/* alt_digits
+	 * Alternate digits used if %O format prefix is specified
+	 */
+	""
 };
 
 struct lc_time_T *

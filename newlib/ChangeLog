@@ -1,3 +1,12 @@
+2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/timelocal.h (struct lc_time_T): Add missing ERA-related
+	members.
+	* libc/locale/timelocal.c (_C_time_local): Set new members to empty
+	strings.
+	* libc/locale/nl_langinfo.c (nl_langinfo): Return values from
+	__get_current_time_locale() for ERA related requests.
+
 2010-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/iswblank.c (iswblank): Remove Unicode characters

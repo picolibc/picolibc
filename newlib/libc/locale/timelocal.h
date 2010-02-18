@@ -50,6 +50,11 @@ struct lc_time_T {
 	const char	*alt_month[12];
 	const char	*md_order;
 	const char	*ampm_fmt;
+	const char	*era;
+	const char	*era_d_fmt;
+	const char	*era_d_t_fmt;
+	const char	*era_t_fmt;
+	const char	*alt_digits;
 };
 
 struct lc_time_T *__get_current_time_locale(void);
