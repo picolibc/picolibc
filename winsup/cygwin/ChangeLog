@@ -1,3 +1,8 @@
+2010-02-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::setup_overlapped): Revert to starting
+	with handle in signalled state as it seems to fix some hangs.
+
 2010-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Treat native DOS paths as "noacl".

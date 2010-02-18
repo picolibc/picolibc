@@ -1647,7 +1647,7 @@ fhandler_base::setup_overlapped (bool doit)
   if (doit)
     {
       set_overlapped (ov);
-      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, false, NULL));
+      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL));
     }
   else
     {
