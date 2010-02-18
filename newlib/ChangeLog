@@ -1,5 +1,20 @@
 2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/ctype/iswalpha.c (iswalpha): Update to Unicode 5.2.
+	* libc/ctype/iswprint.c (iswprint): Ditto.
+	* libc/ctype/iswpunct.c (iswpunct): Drop standalone implementation.
+	Define in terms of other wctype functions instead.
+	* libc/ctype/towlower.c (towlower): Update to Unicode 5.2.  Add comment
+	to explain how to fetch the data from the Unicode database.
+	* libc/ctype/towupper.c (towupper): Ditto.
+	* libc/ctype/utf8alpha.h: Ditto.
+	* libc/ctype/utf8print.h: Ditto.
+	* libc/ctype/utf8punct.h: Remove.
+	* libc/ctype/iswcntrl.c (iswcntrl): Add comment to explain how to
+	fetch the data from the Unicode database.
+
+2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/timelocal.h (struct lc_time_T): Add missing ERA-related
 	members.
 	* libc/locale/timelocal.c (_C_time_local): Set new members to empty

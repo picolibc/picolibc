@@ -67,6 +67,9 @@ _DEFUN(iswcntrl,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);
+
+  /* Based on Unicode 5.2.  All characters from general category "Cc", "Zl",
+     and "Zp".  */
   return ((c >= 0x0000 && c <= 0x001f) || 
 	  (c >= 0x007f && c <= 0x009f) ||
 	  c == 0x2028 || c == 0x2029);

@@ -71,15 +71,19 @@ _DEFUN(towlower,(c), wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);
+  /* Based on and tested against Unicode 5.2 */
+
+  /* Expression used to filter out the characters for the below code:
+
+     awk -F\; '{ if ( $14 != "" ) print $1; }' UnicodeData.txt
+  */
   if (c < 0x100)
     {
       if ((c >= 0x0041 && c <= 0x005a) ||
-	  (c >= 0x00c0 && c <= 0x00de))
+	  (c >= 0x00c0 && c <= 0x00d6) ||
+	  (c >= 0x00d8 && c <= 0x00de))
 	return (c + 0x20);
 
-      if (c == 0x00b5)
-	return 0x03bc;
-      
       return c;
     }
   else if (c < 0x300)
@@ -96,8 +100,11 @@ _DEFUN(towlower,(c), wint_t c)
 	  return c;
 	}
 
+      if (c == 0x0130)
+	return 0x0069;
+
       if ((c >= 0x0139 && c <= 0x0147) ||
-	  (c >= 0x01cd && c <= 0x91db))
+	  (c >= 0x01cd && c <= 0x01db))
 	{
 	  if (c & 0x01)
 	    return (c + 1);
@@ -145,9 +152,6 @@ _DEFUN(towlower,(c), wint_t c)
 	    case 0x01f2:
 	    case 0x01f4:
 	      k = c + 1;
-	      break;
-	    case 0x017f:
-	      k = 0x0073;
 	      break;
 	    case 0x0181:
 	      k = 0x0253;
@@ -227,17 +231,56 @@ _DEFUN(towlower,(c), wint_t c)
 	  if (k != 0)
 	    return k;
 	}
-
-      if (c == 0x0220)
-	return 0x019e;
+      else if (c == 0x0220)
+      	return 0x019e;
+      else if (c >= 0x023a && c <= 0x024e)
+      	{
+	  wint_t k;
+	  switch (c)
+	    {
+	    case 0x023a:
+	      k = 0x2c65;
+	      break;
+	    case 0x023b:
+	    case 0x0241:
+	    case 0x0246:
+	    case 0x0248:
+	    case 0x024a:
+	    case 0x024c:
+	    case 0x024e:
+	      k = c + 1;
+	      break;
+	    case 0x023d:
+	      k = 0x019a;
+	      break;
+	    case 0x023e:
+	      k = 0x2c66;
+	      break;
+	    case 0x0243:
+	      k = 0x0180;
+	      break;
+	    case 0x0244:
+	      k = 0x0289;
+	      break;
+	    case 0x0245:
+	      k = 0x028c;
+	      break;
+	    default:
+	      k = 0;
+	    }
+	  if (k != 0)
+	    return k;
+	}
     }
   else if (c < 0x0400)
     {
+      if (c == 0x0370 || c == 0x0372 || c == 0x0376)
+      	return (c + 1);
       if (c >= 0x0391 && c <= 0x03ab && c != 0x03a2)
 	return (c + 0x20);
       if (c >= 0x03d8 && c <= 0x03ee && !(c & 0x01))
 	return (c + 1);
-      if (c >= 0x0386 && c <= 0x03f5)
+      if (c >= 0x0386 && c <= 0x03ff)
 	{
 	  wint_t k;
 	  switch (c)
@@ -261,37 +304,31 @@ _DEFUN(towlower,(c), wint_t c)
 	      k = 0x03cd;
 	      break;
 	    case 0x038f:
-	      k = 0x038f;
+	      k = 0x03ce;
 	      break;
-	    case 0x03c2:
-	      k = 0x03c3;
-	      break;
-	    case 0x03d0:
-	      k = 0x03b2;
-	      break;
-	    case 0x03d1:
-	      k = 0x03b8;
-	      break;
-	    case 0x03d5:
-	      k = 0x03c6;
-	      break;
-	    case 0x03d6:
-	      k = 0x03c0;
-	      break;
-	    case 0x03f0:
-	      k = 0x03ba;
-	      break;
-	    case 0x03f1:
-	      k = 0x03c1;
-	      break;
-	    case 0x03f2:
-	      k = 0x03c3;
+	    case 0x03cf:
+	      k = 0x03d7;
 	      break;
 	    case 0x03f4:
 	      k = 0x03b8;
 	      break;
-	    case 0x03f5:
-	      k = 0x03b5;
+	    case 0x03f7:
+	      k = 0x03f8;
+	      break;
+	    case 0x03f9:
+	      k = 0x03f2;
+	      break;
+	    case 0x03fa:
+	      k = 0x03fb;
+	      break;
+	    case 0x03fd:
+	      k = 0x037b;
+	      break;
+	    case 0x03fe:
+	      k = 0x037c;
+	      break;
+	    case 0x03ff:
+	      k = 0x037d;
 	      break;
 	    default:
 	      k = 0;
@@ -299,9 +336,6 @@ _DEFUN(towlower,(c), wint_t c)
 	  if (k != 0)
 	    return k;
 	}
-
-      if (c == 0x0345)
-	return 0x03b9;
     }
   else if (c < 0x500)
     {
@@ -313,14 +347,16 @@ _DEFUN(towlower,(c), wint_t c)
       
       if ((c >= 0x0460 && c <= 0x0480) ||
 	  (c >= 0x048a && c <= 0x04be) ||
-	  (c >= 0x04d0 && c <= 0x04f4) ||
-	  (c == 0x04f8))
+	  (c >= 0x04d0 && c <= 0x04fe))
 	{
 	  if (!(c & 0x01))
 	    return (c + 1);
 	  return c;
 	}
       
+      if (c == 0x04c0)
+	return 0x04cf;
+
       if (c >= 0x04c1 && c <= 0x04cd)
 	{
 	  if (c & 0x01)
@@ -331,6 +367,7 @@ _DEFUN(towlower,(c), wint_t c)
   else if (c < 0x1f00)
     {
       if ((c >= 0x0500 && c <= 0x050e) ||
+	  (c >= 0x0510 && c <= 0x0524) ||
 	  (c >= 0x1e00 && c <= 0x1e94) ||
 	  (c >= 0x1ea0 && c <= 0x1ef8))
 	{
@@ -342,8 +379,14 @@ _DEFUN(towlower,(c), wint_t c)
       if (c >= 0x0531 && c <= 0x0556)
 	return (c + 0x30);
 
-      if (c == 0x1e9b)
-	return 0x1e61;
+      if (c >= 0x10a0 && c <= 0x10c5)
+	return (c + 0x1c60);
+
+      if (c == 0x1e9e)
+	return 0x00df;
+
+      if (c >= 0x1efa && c <= 0x1efe && !(c & 0x01))
+	return (c + 1);
     }
   else if (c < 0x2000)
     {
@@ -385,9 +428,6 @@ _DEFUN(towlower,(c), wint_t c)
 	    case 0x1fbc:
 	      k = 0x1fb3;
 	      break;
-	    case 0x1fbe:
-	      k = 0x03b9;
-	      break;
 	    case 0x1fc8:
 	    case 0x1fc9:
 	    case 0x1fca:
@@ -408,6 +448,10 @@ _DEFUN(towlower,(c), wint_t c)
 	    case 0x1fec:
 	      k = 0x1fe5;
 	      break;
+	    case 0x1ff8:
+	    case 0x1ff9:
+	      k = c - 0x80;
+	      break;
 	    case 0x1ffa:
 	    case 0x1ffb:
 	      k = c - 0x7e;
@@ -422,26 +466,100 @@ _DEFUN(towlower,(c), wint_t c)
 	    return k;
 	}
     }
-  else 
+  else if (c < 0x2c00)
     {
       if (c >= 0x2160 && c <= 0x216f)
 	return (c + 0x10);
-      
+
       if (c >= 0x24b6 && c <= 0x24cf)
 	return (c + 0x1a);
       
+      switch (c)
+      	{
+	case 0x2126:
+	  return 0x03c9;
+	case 0x212a:
+	  return 0x006b;
+	case 0x212b:
+	  return 0x00e5;
+	case 0x2132:
+	  return 0x214e;
+	case 0x2183:
+	  return 0x2184;
+	}
+    }
+  else if (c < 0x2d00)
+    {
+      if (c >= 0x2c00 && c <= 0x2c2e)
+	return (c + 0x30);
+
+      if (c >= 0x2c80 && c <= 0x2ce2 && !(c & 0x01))
+	return (c + 1);
+
+      switch (c)
+      	{
+	case 0x2c60:
+	  return 0x2c61;
+	case 0x2c62:
+	  return 0x026b;
+	case 0x2c63:
+	  return 0x1d7d;
+	case 0x2c64:
+	  return 0x027d;
+	case 0x2c67:
+	case 0x2c69:
+	case 0x2c6b:
+	case 0x2c72:
+	case 0x2c75:
+	case 0x2ceb:
+	case 0x2ced:
+	  return c + 1;
+	case 0x2c6d:
+	  return 0x0251;
+	case 0x2c6e:
+	  return 0x0271;
+	case 0x2c6f:
+	  return 0x0250;
+	case 0x2c70:
+	  return 0x0252;
+	case 0x2c7e:
+	  return 0x023f;
+	case 0x2c7f:
+	  return 0x0240;
+	}
+    }
+  else if (c >= 0xa600 && c < 0xa800)
+    {
+      if ((c >= 0xa640 && c <= 0xa65e) ||
+	  (c >= 0xa662 && c <= 0xa66c) ||
+	  (c >= 0xa680 && c <= 0xa696) ||
+	  (c >= 0xa722 && c <= 0xa72e) ||
+	  (c >= 0xa732 && c <= 0xa76e) ||
+	  (c >= 0xa77f && c <= 0xa786))
+	{
+	  if (!(c & 1))
+	    return (c + 1);
+	  return c;
+	}
+
+      switch (c)
+      	{
+	case 0xa779:
+	case 0xa77b:
+	case 0xa77e:
+	case 0xa78b:
+	  return (c + 1);
+	case 0xa77d:
+	  return 0x1d79;
+	}
+    }
+  else
+    {
       if (c >= 0xff21 && c <= 0xff3a)
 	return (c + 0x20);
       
-      if (c >= 0x10400 && c <= 0x10425)
+      if (c >= 0x10400 && c <= 0x10427)
 	return (c + 0x28);
-
-      if (c == 0x2126)
-	return 0x03c9;
-      if (c == 0x212a)
-	return 0x006b;
-      if (c == 0x212b)
-	return 0x00e5;
     }
   return c;
 #else

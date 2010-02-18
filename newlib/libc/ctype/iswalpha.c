@@ -78,12 +78,17 @@ _DEFUN(iswalpha,(c), wint_t c)
 
   c = _jp2uc (c);
 
+  /* Based on and tested against Unicode 5.2
+     See utf8alpha.h for a description how to fetch the data. */
   x = (c >> 8);
   /* for some large sections, all characters are alphabetic so handle them here */
   if ((x >= 0x34 && x <= 0x4c) ||
       (x >= 0x4e && x <= 0x9e) ||
       (x >= 0xac && x <= 0xd6) ||
-      (x >= 0x200 && x <= 0x2a5))
+      (x >= 0x120 && x <= 0x122) ||
+      (x >= 0x130 && x <= 0x133) ||
+      (x >= 0x200 && x <= 0x2a5) ||
+      (x >= 0x2a7 && x <= 0x2b6))
     return 1;
   
   switch (x)
@@ -93,11 +98,14 @@ _DEFUN(iswalpha,(c), wint_t c)
       size = sizeof(u0);
       break;
     case 0x01:
+    case 0x11:
     case 0x15:
+    case 0x1e:
     case 0xa0:
     case 0xa1:
     case 0xa2:
     case 0xa3:
+    case 0xa5:
     case 0xf9:
     case 0xfc:
     case 0x2f8:
@@ -126,6 +134,10 @@ _DEFUN(iswalpha,(c), wint_t c)
     case 0x07:
       table = u7;
       size = sizeof(u7);
+      break;
+    case 0x08:
+      table = u8;
+      size = sizeof(u8);
       break;
     case 0x09:
       table = u9;
@@ -159,10 +171,6 @@ _DEFUN(iswalpha,(c), wint_t c)
       table = u10;
       size = sizeof(u10);
       break;
-    case 0x11:
-      table = u11;
-      size = sizeof(u11);
-      break;
     case 0x12:
       table = u12;
       size = sizeof(u12);
@@ -187,9 +195,25 @@ _DEFUN(iswalpha,(c), wint_t c)
       table = u18;
       size = sizeof(u18);
       break;
-    case 0x1e:
-      table = u1e;
-      size = sizeof(u1e);
+    case 0x19:
+      table = u19;
+      size = sizeof(u19);
+      break;
+    case 0x1a:
+      table = u1a;
+      size = sizeof(u1a);
+      break;
+    case 0x1b:
+      table = u1b;
+      size = sizeof(u1b);
+      break;
+    case 0x1c:
+      table = u1c;
+      size = sizeof(u1c);
+      break;
+    case 0x1d:
+      table = u1d;
+      size = sizeof(u1d);
       break;
     case 0x1f:
       table = u1f;
@@ -206,6 +230,18 @@ _DEFUN(iswalpha,(c), wint_t c)
     case 0x24:
       table = u24;
       size = sizeof(u24);
+      break;
+    case 0x2c:
+      table = u2c;
+      size = sizeof(u2c);
+      break;
+    case 0x2d:
+      table = u2d;
+      size = sizeof(u2d);
+      break;
+    case 0x2e:
+      table = u2e;
+      size = sizeof(u2e);
       break;
     case 0x30:
       table = u30;
@@ -226,6 +262,30 @@ _DEFUN(iswalpha,(c), wint_t c)
     case 0xa4:
       table = ua4;
       size = sizeof(ua4);
+      break;
+    case 0xa6:
+      table = ua6;
+      size = sizeof(ua6);
+      break;
+    case 0xa7:
+      table = ua7;
+      size = sizeof(ua7);
+      break;
+    case 0xa8:
+      table = ua8;
+      size = sizeof(ua8);
+      break;
+    case 0xa9:
+      table = ua9;
+      size = sizeof(ua9);
+      break;
+    case 0xaa:
+      table = uaa;
+      size = sizeof(uaa);
+      break;
+    case 0xab:
+      table = uab;
+      size = sizeof(uab);
       break;
     case 0xd7:
       table = ud7;
@@ -251,6 +311,18 @@ _DEFUN(iswalpha,(c), wint_t c)
       table = uff;
       size = sizeof(uff);
       break;
+    case 0x100:
+      table = u100;
+      size = sizeof(u100);
+      break;
+    case 0x101:
+      table = u101;
+      size = sizeof(u101);
+      break;
+    case 0x102:
+      table = u102;
+      size = sizeof(u102);
+      break;
     case 0x103:
       table = u103;
       size = sizeof(u103);
@@ -258,6 +330,42 @@ _DEFUN(iswalpha,(c), wint_t c)
     case 0x104:
       table = u104;
       size = sizeof(u104);
+      break;
+    case 0x108:
+      table = u108;
+      size = sizeof(u108);
+      break;
+    case 0x109:
+      table = u109;
+      size = sizeof(u109);
+      break;
+    case 0x10a:
+      table = u10a;
+      size = sizeof(u10a);
+      break;
+    case 0x10b:
+      table = u10b;
+      size = sizeof(u10b);
+      break;
+    case 0x10c:
+      table = u10c;
+      size = sizeof(u10c);
+      break;
+    case 0x110:
+      table = u110;
+      size = sizeof(u110);
+      break;
+    case 0x123:
+      table = u123;
+      size = sizeof(u123);
+      break;
+    case 0x124:
+      table = u124;
+      size = sizeof(u124);
+      break;
+    case 0x134:
+      table = u134;
+      size = sizeof(u134);
       break;
     case 0x1d4:
       table = u1d4;
@@ -275,9 +383,17 @@ _DEFUN(iswalpha,(c), wint_t c)
       table = u1d7;
       size = sizeof(u1d7);
       break;
+    case 0x1f1:
+      table = u1f1;
+      size = sizeof(u1f1);
+      break;
     case 0x2a6:
       table = u2a6;
       size = sizeof(u2a6);
+      break;
+    case 0x2b7:
+      table = u2b7;
+      size = sizeof(u2b7);
       break;
     case 0x2fa:
       table = u2fa;
