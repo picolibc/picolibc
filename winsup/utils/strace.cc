@@ -731,6 +731,7 @@ static const mask_mnemonic mnemonic_table[] = {
   {_STRACE_NOMUTEX, "nomutex"},
   {_STRACE_MALLOC, "malloc"},
   {_STRACE_THREAD, "thread"},
+  {_STRACE_PTHREAD, "pthread"},
   {0, NULL}
 };
 
@@ -872,6 +873,7 @@ Trace system calls and signals\n\
     wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).\n\
     sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.\n\
     minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
+    pthread  0x02000 (_STRACE_PTHREAD)	Pthread calls.\n\
     exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
     system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.\n\
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\

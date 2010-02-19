@@ -1877,6 +1877,7 @@ Trace system calls and signals
     wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
     sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
     minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
+    pthread  0x02000 (_STRACE_PTHREAD)  Pthread calls.
     exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
     system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
