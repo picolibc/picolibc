@@ -25,6 +25,7 @@ details. */
 #include "../locale/lmonetary.h"
 #include "../locale/lmessages.h"
 #include "lc_msg.h"
+#include "lc_era.h"
 
 #define _LC(x)	&lc_##x##_ptr,lc_##x##_end-lc_##x##_ptr
 
@@ -316,6 +317,14 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
   return ret;
 }
 
+static int
+locale_cmp (const void *a, const void *b)
+{
+  char **la = (char **) a;
+  char **lb = (char **) b;
+  return strcmp (*la, *lb);
+}
+
 static char *
 __getlocaleinfo (LCID lcid, LCTYPE type, char **ptr, size_t size,
 		 wctomb_p f_wctomb, const char *charset)
@@ -531,22 +540,90 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
 
   /* TODO */
+  char locale[ENCODING_LEN + 1];
+  char *c, *c2;
 
-  /* era */
-  _time_locale->era = lc_time_ptr;
-  *lc_time_ptr++ = '\0';
-  /* era_d_fmt */
-  _time_locale->era_d_fmt = lc_time_ptr;
-  *lc_time_ptr++ = '\0';
-  /* era_d_t_fmt */
-  _time_locale->era_d_t_fmt = lc_time_ptr;
-  *lc_time_ptr++ = '\0';
-  /* era_t_fmt */
-  _time_locale->era_t_fmt = lc_time_ptr;
-  *lc_time_ptr++ = '\0';
-  /* alt_digits */
-  _time_locale->alt_digits = lc_time_ptr;
-  *lc_time_ptr++ = '\0';
+  strcpy (locale, name);
+  /* Removes the charset from the locale and attach the modifer to the
+     language_TERRITORY part. */
+  c = strchr (locale, '.');
+  if (c)
+    {
+      *c = '\0';
+      c2 = strchr (c + 1, '@');
+      /* Ignore @cjknarrow modifier since it's a very personal thing between
+	 Cygwin and newlib... */
+      if (c2 && strcmp (c2, "@cjknarrow"))
+      	memmove (c, c2, strlen (c2) + 1);
+    }
+  /* Now search in the alphabetically order lc_era array for the
+     locale. */
+  lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL };
+  lc_era_t *res = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
+					sizeof lc_era / sizeof *lc_era,
+					sizeof *lc_era, locale_cmp);
+  if (res)
+    {
+      /* Evaluate string length in target charset.  Characters invalid in the
+	 target charset are simply ignored, as on Linux. */
+      size_t len = 0;
+      len += lc_wcstombs (f_wctomb, charset, NULL, res->era, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_d_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_d_t_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_t_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, res->alt_digits, 0) + 1;
+
+      /* Make sure data fits into the buffer */
+      if (lc_time_ptr + len > lc_time_end)
+	{
+	  len = lc_time_ptr + len - new_lc_time_buf;
+	  char *tmp = (char *) realloc (new_lc_time_buf, len);
+	  if (!tmp)
+	    res = NULL;
+	  else
+	    {
+	      lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
+	      new_lc_time_buf = tmp;
+	      lc_time_end = new_lc_time_buf + len;
+	    }
+	}
+      /* Copy over */
+      if (res)
+	{
+	  /* era */
+	  _time_locale->era = (const char *) lc_time_ptr;
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era,
+			     lc_time_end - lc_time_ptr) + 1;
+	  /* era_d_fmt */
+	  _time_locale->era_d_fmt = (const char *) (lc_time_ptr += len);
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_d_fmt,
+			     lc_time_end - lc_time_ptr) + 1;
+	  /* era_d_t_fmt */
+	  _time_locale->era_d_t_fmt = (const char *) (lc_time_ptr += len);
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_d_t_fmt,
+			     lc_time_end - lc_time_ptr) + 1;
+	  /* era_t_fmt */
+	  _time_locale->era_t_fmt = (const char *) (lc_time_ptr += len);
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_t_fmt,
+			     lc_time_end - lc_time_ptr) + 1;
+	  /* alt_digits */
+	  _time_locale->alt_digits = (const char *) (lc_time_ptr += len);
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->alt_digits,
+			     lc_time_end - lc_time_ptr) + 1;
+	  lc_time_ptr += len;
+	}
+    }
+  if (!res)
+    {
+      _time_locale->era =
+      _time_locale->era_d_fmt = 
+      _time_locale->era_d_t_fmt =
+      _time_locale->era_t_fmt =
+      _time_locale->alt_digits = (const char *) lc_time_ptr;
+      /* Twice, to make sure era and alt_strings are correctly terminated
+         with two NULs */
+      *lc_time_ptr++ = '\0';
+    }
 
   char *tmp = (char *) realloc (new_lc_time_buf, lc_time_ptr - new_lc_time_buf);
   if (!tmp)
@@ -700,14 +777,6 @@ __set_lc_monetary_from_win (const char *name,
     free (*lc_monetary_buf);
   *lc_monetary_buf = tmp;
   return 1;
-}
-
-static int
-locale_cmp (const void *a, const void *b)
-{
-  struct lc_msg_t *la = (struct lc_msg_t *) a;
-  struct lc_msg_t *lb = (struct lc_msg_t *) b;
-  return strcmp (la->locale, lb->locale);
 }
 
 extern "C" int
