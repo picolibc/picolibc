@@ -1,3 +1,11 @@
+2010-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper):  Set st_rdev
+	to same value as st_dev.  Avoid useless debug output in executable
+	check.  Add filename to debug output.
+	(fhandler_disk_file::facl): Simplify code calling fstat methods to
+	just call fstat to avoid errors with the cygdrive directory.
+
 2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (eval_datetimefmt): Rename force to flags.

@@ -547,7 +547,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t ((PFILETIME) LastWriteTime, &buf->st_mtim);
   to_timestruc_t ((PFILETIME) ChangeTime, &buf->st_ctim);
   to_timestruc_t ((PFILETIME) CreationTime, &buf->st_birthtim);
-  buf->st_dev = dwVolumeSerialNumber;
+  buf->st_rdev = buf->st_dev = dwVolumeSerialNumber;
   buf->st_size = (_off64_t) nFileSize;
   /* The number of links to a directory includes the
      number of subdirectories in the directory, since all
@@ -685,11 +685,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
 		  status = NtReadFile (h, NULL, NULL, NULL, &io, magic,
 				       3, &off, NULL);
-		  if (NT_SUCCESS (status)
-		      && has_exec_chars (magic, io.Information))
+		  if (NT_SUCCESS (status))
 		    {
-		      pc.set_exec ();
-		      buf->st_mode |= STD_XBITS;
+		      if (has_exec_chars (magic, io.Information))
+			{
+			  /* Heureka, it's an executable */
+			  pc.set_exec ();
+			  buf->st_mode |= STD_XBITS;
+			}
 		    }
 		  else
 		    debug_printf ("%p = NtReadFile(%S)", status,
@@ -715,9 +718,10 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     }
 
  done:
-  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%D, sizeof=%d",
-		  buf, buf->st_atime, buf->st_size, buf->st_mode,
-		  buf->st_ino, sizeof (*buf));
+  syscall_printf ("0 = fstat (%S, %p) st_atime=%x st_size=%D, st_mode=%p, "
+		  "st_ino=%D, sizeof=%d",
+		  pc.get_nt_native_path (), buf, buf->st_atime, buf->st_size,
+		  buf->st_mode, buf->st_ino, sizeof (*buf));
   return 0;
 }
 
@@ -1017,13 +1021,7 @@ cant_access_acl:
 	      set_errno (ENOSPC);
 	    else
 	      {
-		if (!get_handle ())
-		  {
-		    query_open (query_read_attributes);
-		    oret = open (O_BINARY, 0);
-		  }
-		if ((oret && !fstat_by_handle (&st))
-		    || !fstat_by_name (&st))
+		if (!fstat (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
 		    aclbufp[0].a_id = st.st_uid;
