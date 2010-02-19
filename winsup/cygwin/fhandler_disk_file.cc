@@ -1660,19 +1660,41 @@ fhandler_disk_file::opendir (int fd)
 	      OBJECT_ATTRIBUTES attr;
 	      NTSTATUS status;
 	      IO_STATUS_BLOCK io;
+	      /* Tools like ls(1) call dirfd() to fetch the directory
+		 descriptor for calls to facl or fstat.  The tight access mask
+		 used so far is not sufficient to reuse the handle for these
+		 calls, instead the facl/fstat calls find the handle to be
+		 unusable and have to re-open the file for reading attributes
+		 and control data.  So, what we do here is to try to open the
+		 directory with more relaxed access mask which enables to use
+		 the handle for the aforementioned purpose.  This should work
+		 in almost all cases.  Only if it doesn't work due to
+		 permission problems, we drop the additional access bits and
+		 try again. */
+	      ACCESS_MASK fstat_mask = READ_CONTROL | FILE_READ_ATTRIBUTES;
 
-	      status = NtOpenFile (&get_handle (),
-				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
-				   pc.get_object_attr (attr, sec_none_nih),
-				   &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_SYNCHRONOUS_IO_NONALERT
-				   | FILE_OPEN_FOR_BACKUP_INTENT
-				   | FILE_DIRECTORY_FILE);
-	      if (!NT_SUCCESS (status))
+	      do
 		{
-		  __seterrno_from_nt_status (status);
-		  goto free_mounts;
+		  status = NtOpenFile (&get_handle (),
+				       SYNCHRONIZE | FILE_LIST_DIRECTORY
+				       | fstat_mask,
+				       pc.get_object_attr (attr, sec_none_nih),
+				       &io, FILE_SHARE_VALID_FLAGS,
+				       FILE_SYNCHRONOUS_IO_NONALERT
+				       | FILE_OPEN_FOR_BACKUP_INTENT
+				       | FILE_DIRECTORY_FILE);
+		  if (!NT_SUCCESS (status))
+		    {
+		      if (status == STATUS_ACCESS_DENIED && fstat_mask)
+			fstat_mask = 0;
+		      else
+			{
+			  __seterrno_from_nt_status (status);
+			  goto free_mounts;
+			}
+		    }
 		}
+	      while (!NT_SUCCESS (status));
 	    }
 
 	  /* FileIdBothDirectoryInformation is apparently unsupported on

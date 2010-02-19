@@ -1,5 +1,10 @@
 2010-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Try to open
+	directory with stat()-friendly access mask first.  Explain why.
+
+2010-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper):  Set st_rdev
 	to same value as st_dev.  Avoid useless debug output in executable
 	check.  Add filename to debug output.
