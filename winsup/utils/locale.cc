@@ -318,6 +318,36 @@ print_lc_svalue (int key, const char *name, const char *value)
 }
 
 void
+print_lc_sepstrings (int key, const char *name, const char *value)
+{
+  char *c;
+
+  if (key)
+    printf ("%s=", name);
+  while (value && *value)
+    {
+      if (key)
+	fputc ('"', stdout);
+      c = strchr (value, ';');
+      if (!c)
+	{
+	  fputs (value, stdout);
+	  value = NULL;
+	}
+      else
+	{
+	  printf ("%.*s", c - value, value);
+	  value = c + 1;
+	}
+      if (key)
+	fputc ('"', stdout);
+      if (value && *value)
+      	fputc (';', stdout);
+    }
+  fputc ('\n', stdout);
+}
+
+void
 print_lc_strings (int key, const char *name, int from, int to)
 {
   if (key)
@@ -360,6 +390,7 @@ enum type_t
   is_grouping_lconv,
   is_string_linf,
   is_mstrings_linf,
+  is_sepstrings_linf,
   is_mb_cur_max,
   is_codeset,
   is_end
@@ -413,9 +444,9 @@ lc_names_t lc_time_names[] =
   { "d_fmt",		is_string_linf,    D_FMT,		0        },
   { "t_fmt",		is_string_linf,    T_FMT,		0        },
   { "t_fmt_ampm",	is_string_linf,    T_FMT_AMPM,		0	 },
-  { "era",		is_string_linf,    ERA,			0	 },
+  { "era",		is_sepstrings_linf,ERA,			0	 },
   { "era_d_fmt",	is_string_linf,    ERA_D_FMT,		0	 },
-  { "alt_digits",	is_string_linf,    ALT_DIGITS,		0	 },
+  { "alt_digits",	is_sepstrings_linf,ALT_DIGITS,		0	 },
   { "era_d_t_fmt",	is_string_linf,    ERA_D_T_FMT,		0	 },
   { "era_t_fmt",	is_string_linf,    ERA_T_FMT,		0	 },
   { "time-codeset",	is_codeset,	   LC_TIME,		0	 },
@@ -491,6 +522,9 @@ print_lc (int cat, int key, const char *category, const char *name,
 	  break;
 	case is_string_linf:
 	  print_lc_svalue (key, lc->name, nl_langinfo (lc->fromval));
+	  break;
+	case is_sepstrings_linf:
+	  print_lc_sepstrings (key, lc->name, nl_langinfo (lc->fromval));
 	  break;
 	case is_mstrings_linf:
 	  print_lc_strings (key, lc->name, lc->fromval, lc->toval);

@@ -1,3 +1,13 @@
+2010-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (print_lc_mstrings): New function to print
+	semicolon-separated strings.
+	(enum type_t): New type is_sepstrings_linf.
+	(lc_time_names): Change type of era and alt_digits entry to
+	is_sepstrings_linf.
+	(print_lc): Add case for is_sepstrings_linf and call print_lc_mstrings
+	in that case.
+
 2010-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (CYGWIN_BINS): Rename getlocale to locale.
