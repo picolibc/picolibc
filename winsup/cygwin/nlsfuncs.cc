@@ -351,9 +351,6 @@ enum dt_flags {
   DT_DEFAULT	= 0x00,
   DT_AMPM	= 0x01,	/* Enforce 12 hour time format. */
   DT_ABBREV	= 0x02,	/* Enforce abbreviated month and day names. */
-  DT_ERACAL	= 0x04,	/* Retrieve era information (ignored otherwise).
-			   Also switch to optional calendar with era
-			   information, if necessary. */
 };
 
 static char *
@@ -363,6 +360,7 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
   wchar_t buf[80];
   wchar_t fc;
   size_t num;
+  DWORD cal;
   mbstate_t mb;
   size_t idx;
   const char *day_str = "edaA";
@@ -402,6 +400,17 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
 	if ((flags & DT_ABBREV) && fc != L'y' && idx == 3)
 	  idx = 2;
 	*p++ = '%';
+	/* Check for default calender with offset to gregorian calendar.
+	   If so, make era representation the default. */
+	if (fc == L'y'
+	    && GetLocaleInfoW (lcid, LOCALE_ICALENDARTYPE
+				     | LOCALE_RETURN_NUMBER,
+			       (PWCHAR) &cal, sizeof cal / sizeof (WCHAR))
+	    && cal > CAL_GREGORIAN_US)
+	  {
+	    *p++ = 'E';
+	    idx = 2;
+	  }
 	*p++ = t_str[idx];
 	break;
       case L'g':

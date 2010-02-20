@@ -1,5 +1,15 @@
 2010-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* lc_era.h (lc_era): Fix "ja_JP" era_t_fmt entry to use traditional
+	format.
+	* nlsfuncs.cc (dt_flags): Remove DT_ERACAL since crippled era data
+	in Windows makes it useless.
+	(__eval_datetimefmt): Check if locale's default calender has
+	non-gregorian start year.  Use era year also in default date entries,
+	if so.
+
+2010-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (warn_msdos): Enforce extended hex printing of multibyte
 	pathnames.
 
