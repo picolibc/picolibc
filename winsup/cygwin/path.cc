@@ -476,10 +476,10 @@ warn_msdos (const char *src)
   small_printf ("cygwin warning:\n");
   if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, src,
 			posix_path, NT_MAX_PATH))
-    small_printf ("  MS-DOS style path detected: %s\n  POSIX equivalent preferred.\n",
+    small_printf ("  MS-DOS style path detected: %ls\n  POSIX equivalent preferred.\n",
 		  src);
   else
-    small_printf ("  MS-DOS style path detected: %s\n  Preferred POSIX equivalent is: %s\n",
+    small_printf ("  MS-DOS style path detected: %ls\n  Preferred POSIX equivalent is: %ls\n",
 		  src, posix_path);
   small_printf ("  CYGWIN environment variable option \"nodosfilewarning\" turns off this warning.\n"
 		"  Consult the user's guide for more details about POSIX paths:\n"

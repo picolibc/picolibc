@@ -1,3 +1,8 @@
+2010-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (warn_msdos): Enforce extended hex printing of multibyte
+	pathnames.
+
 2010-02-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/sys/strace.h: Remove old code.  Add support for ptrace
