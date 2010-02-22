@@ -1864,25 +1864,27 @@ Trace system calls and signals
 
     Mnemonic Hex     Corresponding Def  Description
     =========================================================================
-    all      0x00001 (_STRACE_ALL)      All strace messages.
-    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.
-    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.
-    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.
-    syscall  0x00010 (_STRACE_SYSCALL)  System calls.
-    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.
-    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. 
-    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.
-    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
-    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.
-    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
-    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.
-    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.
-    pthread  0x02000 (_STRACE_PTHREAD)  Pthread calls.
-    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.
-    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
-    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
-    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.
-    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.
+    all      0x000001 (_STRACE_ALL)      All strace messages.
+    flush    0x000002 (_STRACE_FLUSH)    Flush output buffer after each message.
+    inherit  0x000004 (_STRACE_INHERIT)  Children inherit mask from parent.
+    uhoh     0x000008 (_STRACE_UHOH)     Unusual or weird phenomenon.
+    syscall  0x000010 (_STRACE_SYSCALL)  System calls.
+    startup  0x000020 (_STRACE_STARTUP)  argc/envp printout at startup.
+    debug    0x000040 (_STRACE_DEBUG)    Info to help debugging. 
+    paranoid 0x000080 (_STRACE_PARANOID) Paranoid info.
+    termios  0x000100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
+    select   0x000200 (_STRACE_SELECT)   Info on ugly select internals.
+    wm       0x000400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).
+    sigp     0x000800 (_STRACE_SIGP)     Trace signal and process handling.
+    minimal  0x001000 (_STRACE_MINIMAL)  Very minimal strace output.
+    pthread  0x002000 (_STRACE_PTHREAD)	Pthread calls.
+    exitdump 0x004000 (_STRACE_EXITDUMP) Dump strace cache on exit.
+    system   0x008000 (_STRACE_SYSTEM)   Serious error; goes to console and log.
+    nomutex  0x010000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.
+    malloc   0x020000 (_STRACE_MALLOC)   Trace malloc calls.
+    thread   0x040000 (_STRACE_THREAD)   Thread-locking calls.
+    special  0x100000 (_STRACE_SPECIAL)  Special debugging printfs for
+                                         non-checked-in code
 </screen>
 
 <para>The <command>strace</command> program executes a program, and

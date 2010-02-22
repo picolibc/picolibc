@@ -732,6 +732,7 @@ static const mask_mnemonic mnemonic_table[] = {
   {_STRACE_MALLOC, "malloc"},
   {_STRACE_THREAD, "thread"},
   {_STRACE_PTHREAD, "pthread"},
+  {_STRACE_SPECIAL, "special"},
   {0, NULL}
 };
 
@@ -860,25 +861,27 @@ Trace system calls and signals\n\
 \n\
     Mnemonic Hex     Corresponding Def  Description\n\
     =========================================================================\n\
-    all      0x00001 (_STRACE_ALL)      All strace messages.\n\
-    flush    0x00002 (_STRACE_FLUSH)    Flush output buffer after each message.\n\
-    inherit  0x00004 (_STRACE_INHERIT)  Children inherit mask from parent.\n\
-    uhoh     0x00008 (_STRACE_UHOH)     Unusual or weird phenomenon.\n\
-    syscall  0x00010 (_STRACE_SYSCALL)  System calls.\n\
-    startup  0x00020 (_STRACE_STARTUP)  argc/envp printout at startup.\n\
-    debug    0x00040 (_STRACE_DEBUG)    Info to help debugging. \n\
-    paranoid 0x00080 (_STRACE_PARANOID) Paranoid info.\n\
-    termios  0x00100 (_STRACE_TERMIOS)  Info for debugging termios stuff.\n\
-    select   0x00200 (_STRACE_SELECT)   Info on ugly select internals.\n\
-    wm       0x00400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).\n\
-    sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.\n\
-    minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
-    pthread  0x02000 (_STRACE_PTHREAD)	Pthread calls.\n\
-    exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
-    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.\n\
-    nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
-    malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.\n\
-    thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.\n\
+    all      0x000001 (_STRACE_ALL)      All strace messages.\n\
+    flush    0x000002 (_STRACE_FLUSH)    Flush output buffer after each message.\n\
+    inherit  0x000004 (_STRACE_INHERIT)  Children inherit mask from parent.\n\
+    uhoh     0x000008 (_STRACE_UHOH)     Unusual or weird phenomenon.\n\
+    syscall  0x000010 (_STRACE_SYSCALL)  System calls.\n\
+    startup  0x000020 (_STRACE_STARTUP)  argc/envp printout at startup.\n\
+    debug    0x000040 (_STRACE_DEBUG)    Info to help debugging. \n\
+    paranoid 0x000080 (_STRACE_PARANOID) Paranoid info.\n\
+    termios  0x000100 (_STRACE_TERMIOS)  Info for debugging termios stuff.\n\
+    select   0x000200 (_STRACE_SELECT)   Info on ugly select internals.\n\
+    wm       0x000400 (_STRACE_WM)       Trace Windows msgs (enable _strace_wm).\n\
+    sigp     0x000800 (_STRACE_SIGP)     Trace signal and process handling.\n\
+    minimal  0x001000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
+    pthread  0x002000 (_STRACE_PTHREAD)	Pthread calls.\n\
+    exitdump 0x004000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
+    system   0x008000 (_STRACE_SYSTEM)   Serious error; goes to console and log.\n\
+    nomutex  0x010000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
+    malloc   0x020000 (_STRACE_MALLOC)   Trace malloc calls.\n\
+    thread   0x040000 (_STRACE_THREAD)   Thread-locking calls.\n\
+    special  0x100000 (_STRACE_SPECIAL)  Special debugging printfs for\n\
+                                         non-checked-in code\n\
 ");
   if (where == stderr)
     fprintf (stderr, "Try '%s --help' for more information.\n", pgm);
