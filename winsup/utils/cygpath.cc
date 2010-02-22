@@ -687,6 +687,7 @@ do_pathconv (char *filename)
   wchar_t *buf2 = NULL;
   DWORD len;
   ssize_t err;
+  bool print_tmp = false;
   cygwin_conv_path_t conv_func =
 		      (unix_flag ? CCP_WIN_A_TO_POSIX
 		      		 : (path_flag ? CCP_POSIX_TO_WIN_A
@@ -783,6 +784,7 @@ do_pathconv (char *filename)
 		  tmp += len;
 		  if (len == 6)
 		    *tmp = '\\';
+		  print_tmp = true;
 		}
 	    }
 	  if (mixed_flag)
@@ -790,7 +792,7 @@ do_pathconv (char *filename)
 	}
     }
 
-  puts (buf);
+  puts (print_tmp ? tmp : buf);
   if (buf2)
     free (buf2);
   if (buf)
