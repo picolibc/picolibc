@@ -267,15 +267,42 @@ public:
 class pthread_mutex: public verifyable_object
 {
 public:
-  static bool is_good_object (pthread_mutex_t const *);
-  static bool is_good_initializer (pthread_mutex_t const *);
-  static bool is_good_initializer_or_object (pthread_mutex_t const *);
-  static bool is_good_initializer_or_bad_object (pthread_mutex_t const *);
-  static bool can_be_unlocked (pthread_mutex_t const *);
   static void init_mutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *attr,
 		   const pthread_mutex_t);
+  static bool is_good_object (pthread_mutex_t const *);
+  static bool is_initializer (pthread_mutex_t const *);
+  static bool is_initializer_or_object (pthread_mutex_t const *);
+  static bool is_initializer_or_bad_object (pthread_mutex_t const *);
 
+  int lock ();
+  int trylock ();
+  int unlock ();
+  int destroy ();
+  void set_type (int in_type) {type = in_type;}
+
+  int lock_recursive ()
+  {
+    if (recursion_counter == UINT_MAX)
+      return EAGAIN;
+    recursion_counter++;
+    return 0;
+  }
+
+  bool can_be_unlocked ();
+
+  pthread_mutex (pthread_mutexattr * = NULL);
+  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
+  ~pthread_mutex ();
+
+  class pthread_mutex *next;
+  static void fixup_after_fork ()
+  {
+    mutexes.fixup_after_fork ();
+    mutexes.for_each (&pthread_mutex::_fixup_after_fork);
+  }
+
+private:
   unsigned long lock_counter;
   HANDLE win32_obj_id;
   unsigned int recursion_counter;
@@ -287,10 +314,6 @@ public:
   int type;
   int pshared;
 
-  int lock ();
-  int trylock ();
-  int unlock ();
-  int destroy ();
   void set_owner (pthread_t self)
   {
     recursion_counter = 1;
@@ -299,31 +322,16 @@ public:
     tid = GetCurrentThreadId ();
 #endif
   }
+  static const pthread_t _new_mutex;
+  static const pthread_t _unlocked_mutex;
+  static const pthread_t _destroyed_mutex;
 
-  int lock_recursive ()
-  {
-    if (UINT_MAX == recursion_counter)
-      return EAGAIN;
-    ++recursion_counter;
-    return 0;
-  }
-
-  pthread_mutex (pthread_mutexattr * = NULL);
-  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
-  ~pthread_mutex ();
-
-  class pthread_mutex * next;
-  static void fixup_after_fork ()
-  {
-    mutexes.fixup_after_fork ();
-    mutexes.for_each (&pthread_mutex::_fixup_after_fork);
-  }
-
-private:
+  bool no_owner ();
   void _fixup_after_fork ();
 
   static List<pthread_mutex> mutexes;
   static fast_mutex mutex_initialization_lock;
+  friend class pthread_cond;
 };
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
@@ -467,9 +475,9 @@ class pthread_cond: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_cond_t const *);
-  static bool is_good_initializer (pthread_cond_t const *);
-  static bool is_good_initializer_or_object (pthread_cond_t const *);
-  static bool is_good_initializer_or_bad_object (pthread_cond_t const *);
+  static bool is_initializer (pthread_cond_t const *);
+  static bool is_initializer_or_object (pthread_cond_t const *);
+  static bool is_initializer_or_bad_object (pthread_cond_t const *);
   static void init_mutex ();
   static int init (pthread_cond_t *, const pthread_condattr_t *);
 
@@ -518,9 +526,9 @@ class pthread_rwlock: public verifyable_object
 {
 public:
   static bool is_good_object (pthread_rwlock_t const *);
-  static bool is_good_initializer (pthread_rwlock_t const *);
-  static bool is_good_initializer_or_object (pthread_rwlock_t const *);
-  static bool is_good_initializer_or_bad_object (pthread_rwlock_t const *);
+  static bool is_initializer (pthread_rwlock_t const *);
+  static bool is_initializer_or_object (pthread_rwlock_t const *);
+  static bool is_initializer_or_bad_object (pthread_rwlock_t const *);
   static void init_mutex ();
   static int init (pthread_rwlock_t *, const pthread_rwlockattr_t *);
 

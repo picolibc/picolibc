@@ -1,3 +1,43 @@
+2010-02-22  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/sys/strace.h: Define _STRACE_SPECIAL.
+	(strace_printf_wrap): Fix NOSTRACE definitions.
+	(strace_printf_wrap1): Fix NOSTRACE definitions.
+	(special_printf): Define.
+
+	* thread.cc: Perform minor syntax fix in a comment.  Rename
+	"is_good_initialzer*" to "is_initializer*" throughout.  Use
+	pthread_printf rather than debug_printf throughout.  Add extra
+	pthread_printf debugging throughout.
+	(pthread_mutex::_new_mutex): New constant value.
+	(pthread_mutex::_unlocked_mutex): Ditto.
+	(pthread_mutex::_destroyed_mutex): Ditto.
+	(pthread_mutex::no_owner): Define new function.
+	(pthread_mutex::can_be_unlocked): Detect no_owner situation.  Handle
+	PTHREAD_MUTEX_NORMAL as a special case.
+	(pthread::create_cancel_event): Use C++ boolean values.
+	(pthread::precreate): Use method to set mutex type.
+	(pthread_cond::pthread_cond): Ditto.
+	(pthread_rwlock::pthread_rwlock): Ditto.
+	(pthread_mutex::pthread_mutex): Set owner to _new_mutex initially.
+	(pthread_mutex::~pthread_mutex): Reset various elements to make it
+	clearer if they are incorrectly reused.
+	(pthread_mutex::lock): Add clarifying comment.
+	(pthread_mutex::unlock): Attempt to handle various mutex types
+	correctly.  In particular, reinstate ability to have one thread unlock
+	another thread's mutex if type == PTHREAD_MUTEX_NORMAL.
+	(semaphore::_fixup_after_fork): Avoid redundancy.
+	(pthread_mutex::_fixup_after_fork): Ditto.  Fix debugging statement.
+	(__pthread_cond_dowait): Accommodate changes to remove previously
+	inexplicable use can_be_unblocked() as a static function.
+	* thread.h: Rename "is_good_initialzer*" to "is_initializer*"
+	throughout.
+	(pthread_mutex): Reorganize.  Make many things private.
+	(pthread_mutex::no_owner): Define new method.
+	(pthread_mutex::_new_mutex): Define new constant.
+	(pthread_mutex::_unlocked_mutex): Ditto.
+	(pthread_mutex::_destroyed_mutex): Ditto.
+
 2010-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_era.h: Redefine lc_era_t to keep

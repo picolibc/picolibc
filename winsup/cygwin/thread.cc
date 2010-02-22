@@ -16,7 +16,7 @@ details. */
    the constraints we either pretend to be conformant, or return an error
    code.
 
-   Some caveats: PROCESS_SHARED objects while they pretend to be process
+   Some caveats: PROCESS_SHARED objects, while they pretend to be process
    shared, may not actually work.  Some test cases are needed to determine
    win32's behaviour.  My suspicion is that the win32 handle needs to be
    opened with different flags for proper operation.
@@ -47,6 +47,31 @@ static inline verifyable_object_state
 			     void *static_ptr3 = NULL);
 
 extern int threadsafe;
+
+const pthread_t pthread_mutex::_new_mutex = (pthread_t) 1;
+const pthread_t pthread_mutex::_unlocked_mutex = (pthread_t) 2;
+const pthread_t pthread_mutex::_destroyed_mutex = (pthread_t) 3;
+
+inline bool
+pthread_mutex::no_owner()
+{
+    int res;
+    if (!owner)
+      {
+	debug_printf ("NULL owner value");
+	res = 1;
+      }
+    else if (owner == _destroyed_mutex)
+      {
+	paranoid_printf ("attempt to use destroyed mutex");
+	res = 1;
+      }
+    else if (owner == _new_mutex || owner == _unlocked_mutex)
+      res = 1;
+    else
+      res = 0;
+    return res;
+}
 
 #undef __getreent
 extern "C" struct _reent *
@@ -157,7 +182,7 @@ pthread_mutex::is_good_object (pthread_mutex_t const *mutex)
 }
 
 inline bool
-pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
+pthread_mutex::is_initializer (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
 				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
@@ -168,7 +193,7 @@ pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
 }
 
 inline bool
-pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
+pthread_mutex::is_initializer_or_object (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
 				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
@@ -178,17 +203,17 @@ pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
   return true;
 }
 
+/* FIXME: Accommodate PTHREAD_MUTEX_ERRORCHECK */
 inline bool
-pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
+pthread_mutex::can_be_unlocked ()
 {
   pthread_t self = pthread::self ();
-
-  if (!is_good_object (mutex))
-    return false;
   /* Check if the mutex is owned by the current thread and can be unlocked.
    * Also check for the ANONYMOUS owner to cover NORMAL mutexes as well. */
-  return (*mutex)->recursion_counter == 1
-	 && pthread::equal ((*mutex)->owner, self);
+  bool res = type == PTHREAD_MUTEX_NORMAL || no_owner ()
+	     || (recursion_counter == 1 && pthread::equal (owner, self));
+  pthread_printf ("recursion_counter %d res %d", recursion_counter, res);
+  return res;
 }
 
 inline bool
@@ -217,7 +242,7 @@ pthread_cond::is_good_object (pthread_cond_t const *cond)
 }
 
 inline bool
-pthread_cond::is_good_initializer (pthread_cond_t const *cond)
+pthread_cond::is_initializer (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) != VALID_STATIC_OBJECT)
     return false;
@@ -225,7 +250,7 @@ pthread_cond::is_good_initializer (pthread_cond_t const *cond)
 }
 
 inline bool
-pthread_cond::is_good_initializer_or_object (pthread_cond_t const *cond)
+pthread_cond::is_initializer_or_object (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == INVALID_OBJECT)
     return false;
@@ -242,7 +267,7 @@ pthread_rwlock::is_good_object (pthread_rwlock_t const *rwlock)
 }
 
 inline bool
-pthread_rwlock::is_good_initializer (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_initializer (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) != VALID_STATIC_OBJECT)
     return false;
@@ -250,7 +275,7 @@ pthread_rwlock::is_good_initializer (pthread_rwlock_t const *rwlock)
 }
 
 inline bool
-pthread_rwlock::is_good_initializer_or_object (pthread_rwlock_t const *rwlock)
+pthread_rwlock::is_initializer_or_object (pthread_rwlock_t const *rwlock)
 {
   if (verifyable_object_isvalid (rwlock, PTHREAD_RWLOCK_MAGIC, PTHREAD_RWLOCK_INITIALIZER) == INVALID_OBJECT)
     return false;
@@ -367,7 +392,7 @@ pthread::~pthread ()
 bool
 pthread::create_cancel_event ()
 {
-  cancel_event = ::CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  cancel_event = ::CreateEvent (&sec_none_nih, true, false, NULL);
   if (!cancel_event)
     {
       system_printf ("couldn't create cancel event, %E");
@@ -402,7 +427,7 @@ pthread::precreate (pthread_attr *newattr)
       return;
     }
   /* Change the mutex type to NORMAL to speed up mutex operations */
-  mutex.type = PTHREAD_MUTEX_NORMAL;
+  mutex.set_type (PTHREAD_MUTEX_NORMAL);
   if (!create_cancel_event ())
     magic = 0;
 }
@@ -957,7 +982,7 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
    * Change the mutex type to NORMAL.
    * This mutex MUST be of type normal
   */
-  mtx_in.type = PTHREAD_MUTEX_NORMAL;
+  mtx_in.set_type (PTHREAD_MUTEX_NORMAL);
 
   verifyable_mutex_obj = &mtx_out;
   if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
@@ -967,12 +992,12 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
       return;
     }
   /* Change the mutex type to NORMAL to speed up mutex operations */
-  mtx_out.type = PTHREAD_MUTEX_NORMAL;
+  mtx_out.set_type (PTHREAD_MUTEX_NORMAL);
 
   sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!sem_wait)
     {
-      debug_printf ("CreateSemaphore failed. %E");
+      pthread_printf ("CreateSemaphore failed. %E");
       magic = 0;
       return;
     }
@@ -1171,7 +1196,7 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
       return;
     }
   /* Change the mutex type to NORMAL to speed up mutex operations */
-  mtx.type = PTHREAD_MUTEX_NORMAL;
+  mtx.set_type (PTHREAD_MUTEX_NORMAL);
 
   verifyable_cond_obj = &cond_readers;
   if (!pthread_cond::is_good_object (&verifyable_cond_obj))
@@ -1523,7 +1548,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   verifyable_object (0),	/* set magic to zero initially */
   lock_counter (0),
   win32_obj_id (NULL), recursion_counter (0),
-  condwaits (0), owner (NULL),
+  condwaits (0), owner (_new_mutex),
 #ifdef DEBUGGING
   tid (0),
 #endif
@@ -1548,9 +1573,14 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
 pthread_mutex::~pthread_mutex ()
 {
   if (win32_obj_id)
-    CloseHandle (win32_obj_id);
+    {
+      CloseHandle (win32_obj_id);
+      win32_obj_id = NULL;
+    }
 
   mutexes.remove (this);
+  owner = _destroyed_mutex;
+  magic = 0;
 }
 
 int
@@ -1559,9 +1589,10 @@ pthread_mutex::lock ()
   pthread_t self = ::pthread_self ();
   int result = 0;
 
-  if (InterlockedIncrement ((long *)&lock_counter) == 1)
+  if (InterlockedIncrement ((long *) &lock_counter) == 1)
     set_owner (self);
-  else if (type == PTHREAD_MUTEX_NORMAL || !pthread::equal (owner, self))
+  else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
+	   || !pthread::equal (owner, self))
     {
       cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
       set_owner (self);
@@ -1575,29 +1606,38 @@ pthread_mutex::lock ()
 	result = EDEADLK;
     }
 
+  pthread_printf ("mutex %p, self %p, owner %p, lock_counter %d, recursion_counter %d",
+		  this, self, owner, lock_counter, recursion_counter);
   return result;
 }
 
 int
 pthread_mutex::unlock ()
 {
+  int res;
   pthread_t self = ::pthread_self ();
-  if (!pthread::equal (owner, self))
-    return EPERM;
-
-  /* Don't try to unlock anything if recursion_counter == 0 initially.
-     That means that we've forked. */
+  if (type == PTHREAD_MUTEX_NORMAL)
+    /* no error checking */;
+  else if (no_owner ())
+    return type == PTHREAD_MUTEX_ERRORCHECK ? EINVAL : 0;
+  else if (!pthread::equal (owner, self))
+    res = EPERM;
   if (recursion_counter > 0 && --recursion_counter == 0)
+    /* Don't try to unlock anything if recursion_counter == 0.
+       This means the mutex was never locked or that we've forked. */
     {
-      owner = NULL;
+      owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
       tid = 0;
 #endif
       if (InterlockedDecrement ((long *) &lock_counter))
 	::SetEvent (win32_obj_id); // Another thread is waiting
+      res = 0;
     }
 
-  return 0;
+  pthread_printf ("mutex %p, owner %p, self %p, lock_counter %d, recursion_counter %d, res %d",
+		  this, owner, self, lock_counter, recursion_counter, res);
+  return res;
 }
 
 int
@@ -1636,7 +1676,7 @@ pthread_mutex::destroy ()
 void
 pthread_mutex::_fixup_after_fork ()
 {
-  debug_printf ("mutex %p in _fixup_after_fork", this);
+  pthread_printf ("mutex %p", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("pthread_mutex::_fixup_after_fork () doesn't understand PROCESS_SHARED mutex's");
 
@@ -1649,7 +1689,7 @@ pthread_mutex::_fixup_after_fork ()
 #endif
   win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
   if (!win32_obj_id)
-    api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 semaphore for mutex");
+    api_fatal ("pthread_mutex::_fixup_after_fork () failed to recreate win32 event for mutex");
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
@@ -2222,7 +2262,7 @@ pthread_getspecific (pthread_key_t key)
 extern "C" int
 pthread_cond_destroy (pthread_cond_t *cond)
 {
-  if (pthread_cond::is_good_initializer (cond))
+  if (pthread_cond::is_initializer (cond))
     return 0;
   if (!pthread_cond::is_good_object (cond))
     return EINVAL;
@@ -2272,7 +2312,7 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 extern "C" int
 pthread_cond_broadcast (pthread_cond_t *cond)
 {
-  if (pthread_cond::is_good_initializer (cond))
+  if (pthread_cond::is_initializer (cond))
     return 0;
   if (!pthread_cond::is_good_object (cond))
     return EINVAL;
@@ -2285,7 +2325,7 @@ pthread_cond_broadcast (pthread_cond_t *cond)
 extern "C" int
 pthread_cond_signal (pthread_cond_t *cond)
 {
-  if (pthread_cond::is_good_initializer (cond))
+  if (pthread_cond::is_initializer (cond))
     return 0;
   if (!pthread_cond::is_good_object (cond))
     return EINVAL;
@@ -2301,10 +2341,10 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 {
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
-  if (!pthread_mutex::can_be_unlocked (mutex))
+  if (!(*mutex)->can_be_unlocked ())
     return EPERM;
 
-  if (pthread_cond::is_good_initializer (cond))
+  if (pthread_cond::is_initializer (cond))
     pthread_cond::init (cond, NULL);
   if (!pthread_cond::is_good_object (cond))
     return EINVAL;
@@ -2405,7 +2445,7 @@ pthread_condattr_destroy (pthread_condattr_t *condattr)
 extern "C" int
 pthread_rwlock_destroy (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     return 0;
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2457,7 +2497,7 @@ pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2468,7 +2508,7 @@ pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2481,7 +2521,7 @@ pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
 {
   pthread_testcancel ();
 
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2492,7 +2532,7 @@ pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     pthread_rwlock::init (rwlock, NULL);
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2503,7 +2543,7 @@ pthread_rwlock_trywrlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 {
-  if (pthread_rwlock::is_good_initializer (rwlock))
+  if (pthread_rwlock::is_initializer (rwlock))
     return 0;
   if (!pthread_rwlock::is_good_object (rwlock))
     return EINVAL;
@@ -2623,7 +2663,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
     return EINVAL;
 
   mutex_initialization_lock.lock ();
-  if (initializer == NULL || pthread_mutex::is_good_initializer (mutex))
+  if (initializer == NULL || pthread_mutex::is_initializer (mutex))
     {
       pthread_mutex_t new_mutex = new pthread_mutex (attr ? (*attr) : NULL);
       if (!is_good_object (&new_mutex))
@@ -2654,6 +2694,7 @@ pthread_mutex::init (pthread_mutex_t *mutex,
       *mutex = new_mutex;
     }
   mutex_initialization_lock.unlock ();
+  pthread_printf ("*mutex %p, attr %p, initializer %p", *mutex, attr, initializer);
 
   return 0;
 }
@@ -2675,7 +2716,7 @@ pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
 extern "C" int
 pthread_mutex_lock (pthread_mutex_t *mutex)
 {
-  if (pthread_mutex::is_good_initializer (mutex))
+  if (pthread_mutex::is_initializer (mutex))
     pthread_mutex::init (mutex, NULL, *mutex);
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2685,7 +2726,7 @@ pthread_mutex_lock (pthread_mutex_t *mutex)
 extern "C" int
 pthread_mutex_trylock (pthread_mutex_t *mutex)
 {
-  if (pthread_mutex::is_good_initializer (mutex))
+  if (pthread_mutex::is_initializer (mutex))
     pthread_mutex::init (mutex, NULL, *mutex);
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2695,7 +2736,7 @@ pthread_mutex_trylock (pthread_mutex_t *mutex)
 extern "C" int
 pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
-  if (pthread_mutex::is_good_initializer (mutex))
+  if (pthread_mutex::is_initializer (mutex))
     return EPERM;
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2707,7 +2748,7 @@ pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
   int rv;
 
-  if (pthread_mutex::is_good_initializer (mutex))
+  if (pthread_mutex::is_initializer (mutex))
     return 0;
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2980,7 +3021,7 @@ semaphore::_timedwait (const struct timespec *abstime)
       set_errno (ETIMEDOUT);
       return -1;
     default:
-      debug_printf ("cancelable_wait failed. %E");
+      pthread_printf ("cancelable_wait failed. %E");
       __seterrno ();
       return -1;
     }
@@ -2999,7 +3040,7 @@ semaphore::_wait ()
       set_errno (EINTR);
       return -1;
     default:
-      debug_printf ("cancelable_wait failed. %E");
+      pthread_printf ("cancelable_wait failed. %E");
       break;
     }
   return 0;
@@ -3010,7 +3051,7 @@ semaphore::_fixup_after_fork ()
 {
   if (shared == PTHREAD_PROCESS_PRIVATE)
     {
-      debug_printf ("sem %x in _fixup_after_fork", this);
+      pthread_printf ("sem %x", this);
       /* FIXME: duplicate code here and in the constructor. */
       this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
 					      LONG_MAX, NULL);
