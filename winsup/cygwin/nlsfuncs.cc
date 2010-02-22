@@ -360,7 +360,6 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
   wchar_t buf[80];
   wchar_t fc;
   size_t num;
-  DWORD cal;
   mbstate_t mb;
   size_t idx;
   const char *day_str = "edaA";
@@ -400,17 +399,6 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
 	if ((flags & DT_ABBREV) && fc != L'y' && idx == 3)
 	  idx = 2;
 	*p++ = '%';
-	/* Check for default calender with offset to gregorian calendar.
-	   If so, make era representation the default. */
-	if (fc == L'y'
-	    && GetLocaleInfoW (lcid, LOCALE_ICALENDARTYPE
-				     | LOCALE_RETURN_NUMBER,
-			       (PWCHAR) &cal, sizeof cal / sizeof (WCHAR))
-	    && cal > CAL_GREGORIAN_US)
-	  {
-	    *p++ = 'E';
-	    idx = 2;
-	  }
 	*p++ = t_str[idx];
 	break;
       case L'g':
@@ -504,6 +492,29 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   if (!new_lc_time_buf)
     return -1;
   char *lc_time_ptr = new_lc_time_buf;
+
+  char locale[ENCODING_LEN + 1];
+  strcpy (locale, name);
+  /* Removes the charset from the locale and attach the modifer to the
+     language_TERRITORY part. */
+  char *c = strchr (locale, '.');
+  if (c)
+    {
+      *c = '\0';
+      char *c2 = strchr (c + 1, '@');
+      /* Ignore @cjknarrow modifier since it's a very personal thing between
+	 Cygwin and newlib... */
+      if (c2 && strcmp (c2, "@cjknarrow"))
+      	memmove (c, c2, strlen (c2) + 1);
+    }
+  /* Now search in the alphabetically order lc_era array for the
+     locale. */
+  lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL ,
+				  NULL, NULL, NULL, NULL, NULL };
+  lc_era_t *era = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
+					sizeof lc_era / sizeof *lc_era,
+					sizeof *lc_era, locale_cmp);
+
   /* mon */
   for (int i = 0; i < 12; ++i)
     _time_locale->mon[i] = getlocaleinfo (time, LOCALE_SABBREVMONTHNAME1 + i);
@@ -520,25 +531,63 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   _time_locale->weekday[0] = getlocaleinfo (time, LOCALE_SDAYNAME7);
   for (int i = 0; i < 6; ++i)
     _time_locale->weekday[i + 1] = getlocaleinfo (time, LOCALE_SDAYNAME1 + i);
+
+  size_t len;
   /* X_fmt */
-  _time_locale->X_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+  if (era && *era->t_fmt)
+    {
+      _time_locale->X_fmt = (const char *) lc_time_ptr;
+      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->t_fmt,
+			 lc_time_end - lc_time_ptr) + 1;
+      lc_time_ptr += len;
+    }
+  else
+    _time_locale->X_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
   /* x_fmt */
-  _time_locale->x_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, DT_DEFAULT);
+  if (era && *era->d_fmt)
+    {
+      _time_locale->x_fmt = (const char *) lc_time_ptr;
+      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->d_fmt,
+			 lc_time_end - lc_time_ptr) + 1;
+      lc_time_ptr += len;
+    }
+  else
+    _time_locale->x_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, DT_DEFAULT);
   /* c_fmt */
-  _time_locale->c_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
-  --lc_time_ptr;
-  *lc_time_ptr++ = ' ';
-  eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+  if (era && *era->d_t_fmt)
+    {
+      _time_locale->c_fmt = (const char *) lc_time_ptr;
+      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->d_t_fmt,
+			 lc_time_end - lc_time_ptr) + 1;
+      lc_time_ptr += len;
+    }
+  else
+    {
+      _time_locale->c_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
+      --lc_time_ptr;
+      *lc_time_ptr++ = ' ';
+      eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+    }
   /* AM/PM */
   _time_locale->am_pm[0] = getlocaleinfo (time, LOCALE_S1159);
   _time_locale->am_pm[1] = getlocaleinfo (time, LOCALE_S2359);
   /* date_fmt */
-  _time_locale->date_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
-  --lc_time_ptr;
-  *lc_time_ptr++ = ' ';
-  eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
-  --lc_time_ptr;
-  lc_time_ptr = stpcpy (lc_time_ptr, " %Z") + 1;
+  if (era && *era->date_fmt)
+    {
+      _time_locale->date_fmt = (const char *) lc_time_ptr;
+      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->date_fmt,
+			 lc_time_end - lc_time_ptr) + 1;
+      lc_time_ptr += len;
+    }
+  else
+    {
+      _time_locale->date_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
+      --lc_time_ptr;
+      *lc_time_ptr++ = ' ';
+      eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+      --lc_time_ptr;
+      lc_time_ptr = stpcpy (lc_time_ptr, " %Z") + 1;
+    }
   /* md */
   {
     wchar_t buf[80];
@@ -546,41 +595,26 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
     lc_time_ptr = stpcpy (lc_time_ptr, *buf == L'1' ? "dm" : "md") + 1;
   }
   /* ampm_fmt */
-  _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
-
-  /* TODO */
-  char locale[ENCODING_LEN + 1];
-  char *c, *c2;
-
-  strcpy (locale, name);
-  /* Removes the charset from the locale and attach the modifer to the
-     language_TERRITORY part. */
-  c = strchr (locale, '.');
-  if (c)
+  if (era)
     {
-      *c = '\0';
-      c2 = strchr (c + 1, '@');
-      /* Ignore @cjknarrow modifier since it's a very personal thing between
-	 Cygwin and newlib... */
-      if (c2 && strcmp (c2, "@cjknarrow"))
-      	memmove (c, c2, strlen (c2) + 1);
+      _time_locale->ampm_fmt = (const char *) lc_time_ptr;
+      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->t_fmt_ampm,
+			 lc_time_end - lc_time_ptr) + 1;
+      lc_time_ptr += len;
     }
-  /* Now search in the alphabetically order lc_era array for the
-     locale. */
-  lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL };
-  lc_era_t *res = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
-					sizeof lc_era / sizeof *lc_era,
-					sizeof *lc_era, locale_cmp);
-  if (res)
+  else
+    _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
+
+  if (era)
     {
       /* Evaluate string length in target charset.  Characters invalid in the
 	 target charset are simply ignored, as on Linux. */
-      size_t len = 0;
-      len += lc_wcstombs (f_wctomb, charset, NULL, res->era, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_d_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_d_t_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, res->era_t_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, res->alt_digits, 0) + 1;
+      len = 0;
+      len += lc_wcstombs (f_wctomb, charset, NULL, era->era, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_t_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_t_fmt, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, era->alt_digits, 0) + 1;
 
       /* Make sure data fits into the buffer */
       if (lc_time_ptr + len > lc_time_end)
@@ -588,7 +622,7 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
 	  len = lc_time_ptr + len - new_lc_time_buf;
 	  char *tmp = (char *) realloc (new_lc_time_buf, len);
 	  if (!tmp)
-	    res = NULL;
+	    era = NULL;
 	  else
 	    {
 	      lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
@@ -597,32 +631,32 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
 	    }
 	}
       /* Copy over */
-      if (res)
+      if (era)
 	{
 	  /* era */
 	  _time_locale->era = (const char *) lc_time_ptr;
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era,
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era,
 			     lc_time_end - lc_time_ptr) + 1;
 	  /* era_d_fmt */
 	  _time_locale->era_d_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_d_fmt,
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_d_fmt,
 			     lc_time_end - lc_time_ptr) + 1;
 	  /* era_d_t_fmt */
 	  _time_locale->era_d_t_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_d_t_fmt,
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_d_t_fmt,
 			     lc_time_end - lc_time_ptr) + 1;
 	  /* era_t_fmt */
 	  _time_locale->era_t_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->era_t_fmt,
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_t_fmt,
 			     lc_time_end - lc_time_ptr) + 1;
 	  /* alt_digits */
 	  _time_locale->alt_digits = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, res->alt_digits,
+	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->alt_digits,
 			     lc_time_end - lc_time_ptr) + 1;
 	  lc_time_ptr += len;
 	}
     }
-  if (!res)
+  if (!era)
     {
       _time_locale->era =
       _time_locale->era_d_fmt = 
@@ -817,19 +851,19 @@ __set_lc_messages_from_win (const char *name,
   /* Now search in the alphabetically order lc_msg array for the
      locale. */
   lc_msg_t locale_key = { locale, NULL, NULL, NULL, NULL };
-  lc_msg_t *res = (lc_msg_t *) bsearch ((void *) &locale_key, (void *) lc_msg,
+  lc_msg_t *msg = (lc_msg_t *) bsearch ((void *) &locale_key, (void *) lc_msg,
 					sizeof lc_msg / sizeof *lc_msg,
 					sizeof *lc_msg, locale_cmp);
-  if (!res)
+  if (!msg)
     return 0;
 
   /* Evaluate string length in target charset.  Characters invalid in the
      target charset are simply ignored, as on Linux. */
   size_t len = 0;
-  len += lc_wcstombs (f_wctomb, charset, NULL, res->yesexpr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, res->noexpr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, res->yesstr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, res->nostr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesexpr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, msg->noexpr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesstr, 0) + 1;
+  len += lc_wcstombs (f_wctomb, charset, NULL, msg->nostr, 0) + 1;
   /* Allocate. */
   char *new_lc_messages_buf = (char *) malloc (len);
   const char *lc_messages_end = new_lc_messages_buf + len;
@@ -839,13 +873,13 @@ __set_lc_messages_from_win (const char *name,
   /* Copy over. */
   c = new_lc_messages_buf;
   _messages_locale->yesexpr = (const char *) c;
-  len = lc_wcstombs (f_wctomb, charset, c, res->yesexpr, lc_messages_end - c);
+  len = lc_wcstombs (f_wctomb, charset, c, msg->yesexpr, lc_messages_end - c);
   _messages_locale->noexpr = (const char *) (c += len + 1);
-  len = lc_wcstombs (f_wctomb, charset, c, res->noexpr, lc_messages_end - c);
+  len = lc_wcstombs (f_wctomb, charset, c, msg->noexpr, lc_messages_end - c);
   _messages_locale->yesstr = (const char *) (c += len + 1);
-  len = lc_wcstombs (f_wctomb, charset, c, res->yesstr, lc_messages_end - c);
+  len = lc_wcstombs (f_wctomb, charset, c, msg->yesstr, lc_messages_end - c);
   _messages_locale->nostr = (const char *) (c += len + 1);
-  lc_wcstombs (f_wctomb, charset, c, res->nostr, lc_messages_end - c);
+  lc_wcstombs (f_wctomb, charset, c, msg->nostr, lc_messages_end - c);
   /* Aftermath. */
   if (*lc_messages_buf)
     free (*lc_messages_buf);

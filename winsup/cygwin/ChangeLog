@@ -1,3 +1,14 @@
+2010-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lc_era.h: Redefine lc_era_t to keep
+	default date and time formats as well to workaround YA Windows
+	shortcoming.  Refresh with latest data.
+	* lc_msg.h: Refresh with latest data.
+	* nlsfuncs.cc (__eval_datetimefmt): Revert latest change.
+	(__set_lc_time_from_win): Rename res to era.  Prefer default date and
+	time formats from era array if available.
+	(__set_lc_messages_from_win): Rename res to msg.
+
 2010-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_era.h (lc_era): Fix "ja_JP" era_t_fmt entry to use traditional
