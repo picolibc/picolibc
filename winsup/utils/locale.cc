@@ -449,6 +449,7 @@ lc_names_t lc_time_names[] =
   { "alt_digits",	is_sepstrings_linf,ALT_DIGITS,		0	 },
   { "era_d_t_fmt",	is_string_linf,    ERA_D_T_FMT,		0	 },
   { "era_t_fmt",	is_string_linf,    ERA_T_FMT,		0	 },
+  { "date_fmt",		is_string_linf,    _DATE_FMT,		0	 },
   { "time-codeset",	is_codeset,	   LC_TIME,		0	 },
   { NULL, 		is_end,		   0,			0	 }
 };
