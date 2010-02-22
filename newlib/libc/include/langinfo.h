@@ -133,6 +133,9 @@ typedef int nl_item;
 #define _NL_CTYPE_EXTRA_MAP_13 82
 #define _NL_CTYPE_EXTRA_MAP_14 83
 
+#define _NL_TIME_DATE_FMT 84
+#define _DATE_FMT _NL_TIME_DATE_FMT
+
 __BEGIN_DECLS
 char	*nl_langinfo(nl_item);
 __END_DECLS

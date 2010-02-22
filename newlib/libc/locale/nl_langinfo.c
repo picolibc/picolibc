@@ -189,6 +189,9 @@ _DEFUN(nl_langinfo, (item),
 	case ALT_DIGITS:
 		ret = (char*) __get_current_time_locale()->alt_digits;
 		break;
+	case _DATE_FMT:	/* GNU extension */
+		ret = (char*) __get_current_time_locale()->date_fmt;
+		break;
 	case RADIXCHAR:
 		ret = (char*) __get_current_numeric_locale()->decimal_point;
 		break;

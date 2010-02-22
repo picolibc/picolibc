@@ -1,3 +1,10 @@
+2010-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/langinfo.h (_NL_TIME_DATE_FMT): Define new nl_item
+	value for LC_TIME entry date_fmt.
+	(_DATE_FMT): Define "official" GNU name same as _NL_TIME_DATE_FMT.
+	* libc/locale/nl_langinfo.c (nl_langinfo): Add case for _DATE_FMT.
+
 2010-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/iswalpha.c (iswalpha): Update to Unicode 5.2.
