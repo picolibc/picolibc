@@ -24,14 +24,19 @@
  * SUCH DAMAGE.
  */
 #include <stdio.h>
+#include <ctype.h>
 #include <getopt.h>
 #include <string.h>
 #include <wchar.h>
 #include <locale.h>
 #include <langinfo.h>
 #include <limits.h>
+#include <sys/cygwin.h>
 #define WINVER 0x0601
 #include <windows.h>
+
+#define LOCALE_ALIAS		"/usr/share/locale/locale.alias"
+#define LOCALE_ALIAS_LINE_LEN	255
 
 extern char *__progname;
 
@@ -89,14 +94,155 @@ getlocale (LCID lcid, char *name)
   return 1;
 }
 
+typedef struct {
+  const char *name;
+  const wchar_t *language;
+  const wchar_t *territory;
+  const char *codeset;
+  bool alias;
+} loc_t;
+loc_t *locale;
+size_t loc_max;
+size_t loc_num;
+
 void
-printlocale (int verbose, const char *loc,
-	     const wchar_t *lang, const wchar_t *ctry)
+print_codeset (const char *codeset)
 {
-  printf ("%-16s", loc);
+  for (; *codeset; ++codeset)
+    if (*codeset != '-')
+      putc (tolower ((int)(unsigned char) *codeset), stdout);
+}
+
+void
+print_locale_with_codeset (int verbose, loc_t *locale, const char *name,
+			   bool utf8, const char *modifier)
+{
+  static const char *sysroot;
+  char locname[32];
+
+  if (verbose
+      && (!strcmp (locale->name, "C") || !strcmp (locale->name, "POSIX")))
+    return;
+  if (!sysroot)
+    {
+      char sysbuf[PATH_MAX];
+      stpcpy (stpcpy (sysbuf, getenv ("SYSTEMROOT")),
+	      "\\system32\\kernel32.dll");
+      sysroot = (const char *) cygwin_create_path (CCP_WIN_A_TO_POSIX, sysbuf);
+      if (!sysroot)
+      	sysroot = "kernel32.dll";
+    }
+  stpcpy (stpcpy (stpcpy (locname, name), utf8 ? ".utf8" : ""), modifier ?: "");
   if (verbose)
-    printf ("%ls (%ls)", lang, ctry);
-  fputc ('\n', stdout);
+    fputs ("locale: ", stdout);
+  printf ("%-15s ", locname);
+  if (verbose)
+    {
+      printf ("archive: %s\n",
+      locale->alias ? LOCALE_ALIAS : sysroot);
+      puts ("-------------------------------------------------------------------------------");
+      printf (" language | %ls\n", locale->language);
+      printf ("territory | %ls\n", locale->territory);
+      printf ("  codeset | %s\n", utf8 ? "UTF-8" : locale->codeset);
+    }
+  putc ('\n', stdout);
+}
+
+void
+print_locale (int verbose, loc_t *locale)
+{
+  print_locale_with_codeset (verbose, locale, locale->name, false, NULL);
+  char *modifier = strchr (locale->name, '@');
+  if (!locale->alias)
+    {
+      if (!modifier)
+	print_locale_with_codeset (verbose, locale, locale->name, true, NULL);
+      else if (!strcmp (modifier, "@cjknarrow"))
+	{
+	  *modifier++ = '\0';
+	  print_locale_with_codeset (verbose, locale, locale->name, true,
+				     modifier);
+	}
+    }
+}
+
+int
+compare_locales (const void *a, const void *b)
+{
+  const loc_t *la = (const loc_t *) a;
+  const loc_t *lb = (const loc_t *) b;
+  return strcmp (la->name, lb->name);
+}
+
+void
+add_locale (const char *name, const wchar_t *language, const wchar_t *territory,
+	    bool alias = false)
+{
+  char orig_locale[32];
+
+  if (loc_num >= loc_max)
+    {
+      loc_t *tmp = (loc_t *) realloc (locale, (loc_max + 32) * sizeof (loc_t));
+      if (!tmp)
+      	{
+	  fprintf (stderr, "Out of memory!\n");
+	  exit (1);
+	}
+      locale = tmp;
+      loc_max += 32;
+    }
+  locale[loc_num].name = strdup (name);
+  locale[loc_num].language = wcsdup (language);
+  locale[loc_num].territory = wcsdup (territory);
+  strcpy (orig_locale, setlocale (LC_CTYPE, NULL));
+  setlocale (LC_CTYPE, name);
+  locale[loc_num].codeset = strdup (nl_langinfo (CODESET));
+  setlocale (LC_CTYPE, orig_locale);
+  locale[loc_num].alias = alias;
+  ++loc_num;
+}
+
+void
+add_locale_alias_locales ()
+{
+  char alias_buf[LOCALE_ALIAS_LINE_LEN + 1], *c;
+  const char *alias, *replace;
+  char orig_locale[32];
+  loc_t search, *loc;
+
+  FILE *fp = fopen (LOCALE_ALIAS, "rt");
+  if (!fp)
+    return;
+  strcpy (orig_locale, setlocale (LC_CTYPE, NULL));
+  while (fgets (alias_buf, LOCALE_ALIAS_LINE_LEN + 1, fp))
+    {
+      alias_buf[LOCALE_ALIAS_LINE_LEN] = '\0';
+      c = strrchr (alias_buf, '\n');
+      if (c)
+        *c = '\0';
+      c = alias_buf;
+      c += strspn (c, " \t");
+      if (!*c || *c == '#')
+        continue;
+      alias = c;
+      c += strcspn (c, " \t");
+      *c++ = '\0';
+      c += strspn (c, " \t");
+      if (*c == '#')
+        continue;
+      replace = c;
+      c += strcspn (c, " \t");
+      *c++ = '\0';
+      c = strchr (replace, '.');
+      if (c)
+	*c = '\0';
+      search.name = replace;
+      loc = (loc_t *) bsearch (&search, locale, loc_num, sizeof (loc_t),
+			       compare_locales);
+      add_locale (alias, loc ? loc->language : L"", loc ? loc->territory : L"",
+		  true);
+    }
+  fclose (fp);
 }
 
 void
@@ -108,8 +254,8 @@ print_all_locales (int verbose)
 
   unsigned lang, sublang;
 
-  printlocale (verbose, "C", L"C", L"POSIX");
-  printlocale (verbose, "POSIX", L"C", L"POSIX");
+  add_locale ("C", L"C", L"POSIX");
+  add_locale ("POSIX", L"C", L"POSIX", true);
   for (lang = 1; lang <= 0xff; ++lang)
     {
       struct {
@@ -176,7 +322,7 @@ print_all_locales (int verbose)
 	      if (lcnt < 32)
 		strcpy (loc_list[lcnt++].loc, loc);
 	      /* Print */
-	      printlocale (verbose, loc, language, country);
+	      add_locale (loc, language, country);
 	      /* Check for locales which sport a modifier for
 		 changing the codeset and other stuff. */
 	      if (lang == LANG_BELARUSIAN
@@ -199,7 +345,7 @@ print_all_locales (int verbose)
 		stpcpy (c, "@cjknarrow");
 	      else
 		continue;
-	      printlocale (verbose, loc, language, country);
+	      add_locale (loc, language, country);
 	    }
 	}
       /* Check Serbian language for the available territories.  Up to
@@ -221,17 +367,19 @@ print_all_locales (int verbose)
 	      sr_RS_idx = i;
 	  if (sr_CS_idx > 0 && sr_RS_idx == -1)
 	    {
-	      printlocale (verbose, "sr_RS@latin",
-			   L"Serbian (Latin)", L"Serbia");
-	      printlocale (verbose, "sr_RS",
-			   L"Serbian (Cyrillic)", L"Serbia");
-	      printlocale (verbose, "sr_ME@latin",
-			   L"Serbian (Latin)", L"Montenegro");
-	      printlocale (verbose, "sr_ME",
-			   L"Serbian (Cyrillic)", L"Montenegro");
+	      add_locale ("sr_RS@latin", L"Serbian (Latin)", L"Serbia");
+	      add_locale ("sr_RS", L"Serbian (Cyrillic)", L"Serbia");
+	      add_locale ("sr_ME@latin", L"Serbian (Latin)", L"Montenegro");
+	      add_locale ("sr_ME", L"Serbian (Cyrillic)", L"Montenegro");
 	    }
 	}
     }
+  /* First sort allows add_locale_alias_locales to bsearch in locales. */
+  qsort (locale, loc_num, sizeof (loc_t), compare_locales);
+  add_locale_alias_locales ();
+  qsort (locale, loc_num, sizeof (loc_t), compare_locales);
+  for (size_t i = 0; i < loc_num; ++i)
+    print_locale (verbose, &locale[i]);
 }
 
 void

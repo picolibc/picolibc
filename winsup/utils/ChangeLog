@@ -1,3 +1,20 @@
+2010-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (printlocale): Remove.
+	(loc_t): New type to keep locale information for printing.
+	(print_codeset): New function to print codeset as on Linux.
+	(print_locale_with_codeset): New function to print single locale.
+	Print verbose style as the Linux locale(1) tool.
+	(print_locale): New function to print single locale plus its UTF-8
+	variation, if available.
+	(compare_locales): New helper function for bsearch and qsort on loc_t.
+	(add_locale): New function to store locale in loc_t array.
+	(add_locale_alias_locales): New function to store locales from
+	locale.alias file in loc_t.
+	(print_all_locales): Call add_locale instead of printlocale.
+	Call add_locale_alias_locales, sort locales alphabetically and print
+	them.
+
 2010-02-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* strace.cc (mnemonic_table): Add "special" mask option.
