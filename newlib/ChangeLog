@@ -1,3 +1,8 @@
+2010-02-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/types.h: Fix __XMK__ sectioning and remove
+	redundant code section for __XMK__.
+
 2010-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/langinfo.h (_NL_TIME_DATE_FMT): Define new nl_item
