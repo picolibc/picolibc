@@ -1,3 +1,8 @@
+2010-02-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* thread.cc (pthread_mutex::unlock): Don't attempt to unlock if there
+	is an error.
+
 2010-02-22  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/sys/strace.h: Define _STRACE_SPECIAL.

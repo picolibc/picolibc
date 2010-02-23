@@ -1614,15 +1614,15 @@ pthread_mutex::lock ()
 int
 pthread_mutex::unlock ()
 {
-  int res;
+  int res = 0;
   pthread_t self = ::pthread_self ();
   if (type == PTHREAD_MUTEX_NORMAL)
     /* no error checking */;
   else if (no_owner ())
-    return type == PTHREAD_MUTEX_ERRORCHECK ? EINVAL : 0;
+    res = type == PTHREAD_MUTEX_ERRORCHECK ? EINVAL : 0;
   else if (!pthread::equal (owner, self))
     res = EPERM;
-  if (recursion_counter > 0 && --recursion_counter == 0)
+  if (!res && recursion_counter > 0 && --recursion_counter == 0)
     /* Don't try to unlock anything if recursion_counter == 0.
        This means the mutex was never locked or that we've forked. */
     {
@@ -1635,8 +1635,8 @@ pthread_mutex::unlock ()
       res = 0;
     }
 
-  pthread_printf ("mutex %p, owner %p, self %p, lock_counter %d, recursion_counter %d, res %d",
-		  this, owner, self, lock_counter, recursion_counter, res);
+  pthread_printf ("mutex %p, owner %p, self %p, lock_counter %d, recursion_counter %d, type %d, res %d",
+		  this, owner, self, lock_counter, recursion_counter, type, res);
   return res;
 }
 
