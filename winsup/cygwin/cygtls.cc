@@ -240,14 +240,30 @@ _cygtls::init_exception_handler (exception_handler *eh)
      a problem if some previous exception handler tries to do things that are
      better left to Cygwin.  I await the cygwin mailing list notification of
      this event with bated breath.
+     (cgf 2009-07-17)
 
-     (cgf 2009-07-17) */
-  for (exception_list *e = _except_list;
-       e != NULL && e != (exception_list *) -1;
-       e = e->prev)
-    if (e == &el)
-      return;
-  el.handler = eh;
+     A change in plans:  In the not-so-distant past of 2010-02-23 it was
+     discovered that something was moving in ahead of cygwin's exception
+     handler so just detecting that the exception handler was loaded wasn't
+     good enough.  I sort of anticipated this.  So, the next step is to remove
+     the old exception handler from the list and add it to the beginning.
+
+     The next step will probably be to call this function at various points
+     in cygwin (like from _cygtls::setup_fault maybe) to absoltely ensure that
+     we have control.  For now, however, this seems good enough.
+     (cgf 2010-02-23) 
+    */
+  exception_list *e = _except_list;
+  if (e == &el)
+    return;
+  while (e && e  != (exception_list *) -1)
+    if (e->prev != &el)
+      e = e->prev;
+    else
+      {
+	e->prev = el.prev;
+	break;
+      }
   /* Apparently Windows stores some information about an exception and tries
      to figure out if the SEH which returned 0 last time actually solved the
      problem, or if the problem still persists (e.g. same exception at same
@@ -259,6 +275,7 @@ _cygtls::init_exception_handler (exception_handler *eh)
      Windows 2008, which irremediably gets into an endless loop, taking 100%
      CPU.  That's why we reverted to a normal SEH chain and changed the way
      the exception handler returns to the application. */
+  el.handler = eh;
   el.prev = _except_list;
   _except_list = &el;
 }
