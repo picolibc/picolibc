@@ -61,8 +61,8 @@ get_full_privileged_inheritable_token (HANDLE token)
 	      /* At this point we don't know if the user actually had TCB
 		 privileges.  Check if the linked token is a primary token.
 		 If not, just return the original token. */
-	      if (GetTokenInformation (token, TokenType, (PVOID) &type,
-				       sizeof type, &size)
+	      if (GetTokenInformation (linked.LinkedToken, TokenType,
+				       (PVOID) &type, sizeof type, &size)
 		  && type != TokenPrimary)
 		debug_printf ("Linked Token is not a primary token!");
 	      else

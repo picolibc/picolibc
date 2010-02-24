@@ -1,3 +1,8 @@
+2010-02-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_full_privileged_inheritable_token): Fix dumb typo
+	when checking linked token for being a primary token.
+
 2010-02-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dlfcn.cc (dlopen): Make sure exception handler is really loaded after
