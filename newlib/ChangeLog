@@ -1,3 +1,35 @@
+2010-02-24  Charles Wilson  <...>
+
+        Work around issues with new libtool files in ..
+	* configure.in: Unconditionally call _LT_PROG_ECHO_BACKSLASH.
+	* iconvdata/configure.in: Ditto.
+	* libc/configure.in: Ditto.
+	* libc/machine/configure.in: Ditto.
+	* libc/machine/i386/configure.in: Ditto.
+	* libc/sys/configure.in: Ditto.
+	* libc/sys/linux/configure.in: Ditto.
+	* libc/sys/linux/linuxthreads/configure.in: Ditto.
+	* libc/sys/linux/linuxthreads/machine/configure.in: Ditto.
+	* libc/sys/linux/linuxthreads/machine/i386/configure.in: Ditto.
+	* libc/sys/linux/machine/configure.in: Ditto.
+	* libc/sys/linux/machine/i386/configure.in: Ditto.
+	* libm/configure.in: Ditto.
+	* libm/machine/configure.in: Ditto.
+	* libm/machine/i386/configure.in: Ditto.
+	* libc/machine/sh/configure.in: Ditto.  Also, call
+	AC_NO_EXECUTABLES before NEWLIB_CONFIGURE.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+	* Makefile.in: Ditto.
+        * doc/aclocal.m4: Ditto.
+	* doc/Makefile.in: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/Makefile.in: Ditto.
+        * libc/*/configure: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+	* libm/*/Makefile.in: Ditto.
+        * libm/*/configure: Ditto.
+
 2010-02-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/__call_exit.c: Add include of sys/lock.h.

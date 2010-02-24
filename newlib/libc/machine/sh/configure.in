@@ -8,9 +8,9 @@ AC_CONFIG_SRCDIR([asm.h])
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(../../../..)
 
-NEWLIB_CONFIGURE(../../..)
-
 AC_NO_EXECUTABLES
+
+NEWLIB_CONFIGURE(../../..)
 
 AC_EGREP_CPP([sh5], [
 #if __SH5__
