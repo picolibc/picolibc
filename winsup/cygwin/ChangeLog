@@ -1,3 +1,8 @@
+2010-02-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dlfcn.cc (dlopen): Make sure exception handler is really loaded after
+	dynamic load.
+
 2010-02-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.cc (_cygtls::init_exception_handler): Force installation of

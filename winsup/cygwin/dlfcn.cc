@@ -109,6 +109,9 @@ dlopen (const char *name, int)
 
 	  ret = (void *) LoadLibraryW (path);
 
+	  /* In case it was removed by LoadLibrary. */
+	  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
 
