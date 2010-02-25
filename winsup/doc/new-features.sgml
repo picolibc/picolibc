@@ -66,10 +66,6 @@
   New strfmon(3) call.
   </para></listitem>
 
-  <listitem><para>
-  The console's backspace keycode can be changed using 'stty erase'.
-  </para></listitem>
-
   </itemizedlist>
 
 </listitem>
@@ -80,9 +76,13 @@ flag F_DUPFD_CLOEXEC.  Support socket flags SOCK_CLOEXEC and SOCK_NONBLOCK.
 Add new Linux-compatible API calls accept4(2), dup3(2), and pipe2(2).
 </para></listitem>
 
-<listitem><para>Enhanced console window support.</para>
+<listitem><para>Enhanced Windows console support.</para>
 
   <itemizedlist mark="bullet">
+
+  <listitem><para>
+  The console's backspace keycode can be changed using 'stty erase'.
+  </para></listitem>
 
   <listitem><para>
   Function keys send distinguished escape sequences compatible with rxvt.
