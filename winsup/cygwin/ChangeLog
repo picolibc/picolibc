@@ -1,3 +1,7 @@
+2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lc_era.h (lc_era_t): Fix apparent glibc bug in ja_JP era definition.
+
 2010-02-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_auth.cc (get_full_privileged_inheritable_token): Fix dumb typo
