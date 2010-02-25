@@ -1,3 +1,8 @@
+2010-02-23  Andrew Zabolotny  <anpaza@mail.ru>
+
+	PR binutils/11297
+	* avr.h: (R_AVR_8): New relocation number.
+
 2010-02-18  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* arm.h (Tag_MPextension_use): Renumber.
@@ -14,7 +19,7 @@
 	* common.h (NT_386_XSTATE): New.
 
 2010-01-21  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
-	
+
 	* s390.h (EF_S390_HIGH_GPRS): Added macro definition.
 
 2010-01-19  Daisuke Hatayama  <d.hatayama@jp.fujitsu.com>
@@ -78,11 +83,11 @@
 	R_push, R_const, R_add, R_sub, R_mult, R_div, R_mod, R_lshift,
 	R_rshift, R_and, R_or, R_xor, R_land, R_lor, R_len, R_neg, R_comp,
 	R_page, R_hwpage, R_addr, R_pltpc, R_got.
-	
+
 2009-08-09  Michael Eager <eager@eagercon.com>
 
 	* elf/common.h: Define EM_resnnn reserved values. Add EM_AVR32,
-	EM_STM8, EM_TILE64, EM_TILEPRO.  Change EM_MICROBLAZE. 
+	EM_STM8, EM_TILE64, EM_TILEPRO.  Change EM_MICROBLAZE.
 
 2009-08-06  Michael Eager <eager@eagercon.com>
 
@@ -188,8 +193,8 @@
 
 2009-03-14  Mark Kettenis  <kettenis@gnu.org>
 
-	* common.h (NT_OPENBSD_PROCINFO, NT_OPENBSD_AUXV) 
-	(NT_OPENBSD_REGS, NT_OPENBSD_FPREGS, NT_OPENBSD_XFPREGS) 
+	* common.h (NT_OPENBSD_PROCINFO, NT_OPENBSD_AUXV)
+	(NT_OPENBSD_REGS, NT_OPENBSD_FPREGS, NT_OPENBSD_XFPREGS)
 	(NT_OPENBSD_WCOOKIE): New defines.
 
 2009-03-16  Jan Kratochvil  <jan.kratochvil@redhat.com>
@@ -272,7 +277,7 @@
 2008-11-14  Nathan Sidwell  <nathan@codesourcery.com>
 
 	* internal.h (struct elf_segment_map): Add header_size field.
- 
+
 2008-10-13  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (AT_BASE_PLATFORM, AT_EXECFN): Define.
@@ -346,7 +351,7 @@
 	END_RELOC_NUMBERS symbol as a sentinel value.
 
 2008-05-15  Christophe Lyon  <christophe.lyon@st.com>
-	
+
 	* arm.h (END_RELOC_NUMBERS): Provide a maximum value.
 
 2008-04-16  David S. Miller  <davem@davemloft.net>

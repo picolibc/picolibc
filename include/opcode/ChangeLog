@@ -1,3 +1,7 @@
+2010-02-25  Wu Zhangjin  <wuzhangjin@gmail.com>
+
+	* mips.h: (LOONGSON2F_NOP_INSN): New macro.
+
 2010-02-08  Philipp Tomsich  <philipp.tomsich@theobroma-systems.com>
 
 	* opcode/ppc.h (PPC_OPCODE_TITAN): Define.
