@@ -1,3 +1,12 @@
+2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c:  Throughout, extensively comment on the
+	reason for using __CYGWIN__.
+	(lconv): Remove _CONST entirely.
+	(loadlocale): Guard calls to function loading locale-specific
+	category data with __HAVE_LOCALE_INFO__ rather than __CYGWIN__.
+	* libc/sys/config.h (__HAVE_LOCALE_INFO__): Define for Cygwin.
+
 2010-02-24  Charles Wilson  <...>
 
         Work around issues with new libtool files in ..

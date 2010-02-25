@@ -192,9 +192,6 @@ int __mlocale_changed = 0;
 char *_PathLocale = NULL;
 
 static
-#ifndef __CYGWIN__
-_CONST
-#endif /* !__CYGWIN__ */
 struct lconv lconv = 
 {
   ".", "", "", "", "", "", "", "", "", "",
@@ -460,6 +457,15 @@ loadlocale(struct _reent *p, int category)
 		   const char *, mbstate_t *);
   int cjknarrow = 0;
 #ifdef __CYGWIN__
+  /* This additional code handles the case that the incoming locale string
+     is not valid.  If so, it calls the function __set_locale_from_locale_alias,
+     which is only available on Cygwin right now.  The function reads the
+     file /usr/share/locale/locale.alias.  The file contains locale aliases
+     and their replacement locale.  For instance, the alias "french" is
+     translated to "fr_FR.ISO-8859-1", the alias "thai" is translated to
+     "th_TH.TIS-620".  If successful, the function returns with a pointer
+     to the second argument, which is a buffer in which the reaplcement locale
+     gets stored.  Otherwise the function returns NULL. */
   char tmp_locale[ENCODING_LEN + 1];
   int ret = 0;
 
@@ -532,6 +538,12 @@ restart:
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
 #ifdef __CYGWIN__
+	/* The Cygwin-only function __set_charset_from_locale checks
+	   for the default charset which is connected to the given locale.
+	   The function uses Windows functions in turn so it can't be easily
+	   adapted to other targets.  However, if any other target provides
+	   equivalent functionality, preferrably using the same function name
+	   it would be sufficient to change the guarding #ifdef. */
 	__set_charset_from_locale (locale, charset);
 #else
 	strcpy (charset, "ISO-8859-1");
@@ -562,6 +574,7 @@ restart:
       l_mbtowc = __utf8_mbtowc;
     break;
 #ifndef __CYGWIN__
+    /* Cygwin does not support JIS at all. */
     case 'J':
     case 'j':
       if (strcasecmp (charset, "JIS"))
@@ -582,6 +595,8 @@ restart:
 	  l_mbtowc = __eucjp_mbtowc;
 	}
 #ifdef __CYGWIN__
+      /* Newlib does not provide EUC-KR and Cygwin's implementation
+	 requires Windows support. */
       else if (!strcasecmp (charset, "EUCKR")
 	       || !strcasecmp (charset, "EUC-KR"))
 	{
@@ -720,6 +735,8 @@ restart:
     case 'G':
     case 'g':
 #ifdef __CYGWIN__
+      /* Newlib does not provide GBK and Cygwin's implementation
+	 requires Windows support. */
       if (!strcasecmp (charset, "GBK"))
       	{
 	  strcpy (charset, "GBK");
@@ -785,6 +802,8 @@ restart:
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
       break;
 #ifdef __CYGWIN__
+    /* Newlib does not provide Big5 and Cygwin's implementation
+       requires Windows support. */
     case 'B':
     case 'b':
       if (strcasecmp (charset, "BIG5"))
@@ -818,15 +837,18 @@ restart:
     }
   else if (category == LC_MESSAGES)
     {
-#ifdef __CYGWIN__
+#ifdef __HAVE_LOCALE_INFO__
       ret = __messages_load_locale (locale, (void *) l_wctomb, charset);
       if (!ret)
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
       strcpy (lc_message_charset, charset);
     }
+#ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
+  /* Right now only Cygwin supports a __collate_load_locale function at all. */
   else if (category == LC_COLLATE)
     ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+#endif
   else if (category == LC_MONETARY)
     ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
   else if (category == LC_NUMERIC)
@@ -835,7 +857,7 @@ restart:
     ret = __time_load_locale (locale, (void *) l_wctomb, charset);
   if (ret)
     FAIL;
-#endif /* __CYGWIN__ */
+#endif /* __HAVE_LOCALE_INFO__ */
   return strcpy(current_categories[category], new_categories[category]);
 }
 
@@ -885,7 +907,7 @@ struct lconv *
 _DEFUN(_localeconv_r, (data), 
       struct _reent *data)
 {
-#ifdef __CYGWIN__
+#ifdef __HAVE_LOCALE_INFO__
   if (__nlocale_changed)
     {
       struct lc_numeric_T *n = __get_current_numeric_locale ();
@@ -920,13 +942,15 @@ _DEFUN(_localeconv_r, (data),
       lconv.int_p_sign_posn = m->p_sign_posn[0];
       __mlocale_changed = 0;
     }
-#endif /* __CYGWIN__ */
+#endif /* __HAVE_LOCALE_INFO__ */
   return (struct lconv *) &lconv;
 }
 
 #ifndef _REENT_ONLY
 
 #ifndef __CYGWIN__
+/* Cygwin provides its own version of setlocale to perform some more
+   initialization work.  It calls _setlocale_r, though. */
 char *
 _DEFUN(setlocale, (category, locale),
        int category _AND
