@@ -638,27 +638,60 @@ en_US.UTF-8
 
 <para>The <literal>-a</literal> option is helpful to learn which locales
 are supported by your Windows machine.  It prints all available locales
-and the allowed modifiers.  The <literal>-v</literal> option prints
-additionally the English names of the language and territory connected
-to this locale.  Example:</para>
+and the allowed modifiers.  Example:</para>
+
+<screen>
+bash$ locale -a
+C
+C.utf8
+POSIX
+af_ZA
+af_ZA.utf8
+am_ET
+am_ET.utf8
+...
+be_BY
+be_BY.utf8
+be_BY@latin
+...
+ca_ES
+ca_ES.utf8
+ca_ES@euro
+catalan
+...
+</screen>
+
+<para>The <literal>-v</literal> option prints more detailed information about
+each available locale.  Example:</para>
 
 <screen>
 bash$ locale -av
-ar_SA            Arabic (Saudi Arabia)
-ar_IQ            Arabic (Iraq)
+locale: af_ZA           archive: /cygdrive/c/Windows/system32/kernel32.dll
+-------------------------------------------------------------------------------
+ language | Afrikaans
+territory | South Africa
+  codeset | ISO-8859-1
+
+locale: af_ZA.utf8      archive: /cygdrive/c/Windows/system32/kernel32.dll
+-------------------------------------------------------------------------------
+ language | Afrikaans
+territory | South Africa
+  codeset | UTF-8
+
 ...
-zh_TW            Chinese (Traditional) (Taiwan)
-zh_TW@cjknarrow  Chinese (Traditional) (Taiwan)
-...
-de_AT            German (Austria)
-de_AT@euro       German (Austria)
-...
-en_US            English (United States)
-en_GB            English (United Kingdom)
-en_AU            English (Australia)
-...
-sr_RS            Serbian (Cyrillic) (Serbia)
-sr_RS@latin      Serbian (Latin) (Serbia)
+
+locale: ca_ES@euro      archive: /mnt/c/Windows/system32/kernel32.dll
+-------------------------------------------------------------------------------
+ language | Catalan
+territory | Spain
+  codeset | ISO-8859-15
+
+locale: catalan         archive: /usr/share/locale/locale.alias
+-------------------------------------------------------------------------------
+ language | Catalan
+territory | Spain
+  codeset | ISO-8859-1
+
 ...
 </screen>
 
