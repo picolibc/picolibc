@@ -1,6 +1,10 @@
 2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* libc/locale/locale.c:  Throughout, extensively comment on the
+	* libc/locale/locale.c (loadlocale): Fix typo in comment.
+
+2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c: Throughout, extensively comment on the
 	reason for using __CYGWIN__.
 	(lconv): Remove _CONST entirely.
 	(loadlocale): Guard calls to function loading locale-specific

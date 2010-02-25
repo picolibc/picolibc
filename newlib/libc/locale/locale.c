@@ -464,7 +464,7 @@ loadlocale(struct _reent *p, int category)
      and their replacement locale.  For instance, the alias "french" is
      translated to "fr_FR.ISO-8859-1", the alias "thai" is translated to
      "th_TH.TIS-620".  If successful, the function returns with a pointer
-     to the second argument, which is a buffer in which the reaplcement locale
+     to the second argument, which is a buffer in which the replacement locale
      gets stored.  Otherwise the function returns NULL. */
   char tmp_locale[ENCODING_LEN + 1];
   int ret = 0;
