@@ -1,6 +1,6 @@
 /* mips.h.  Mips opcode list for GDB, the GNU debugger.
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2008, 2009
+   2003, 2004, 2005, 2008, 2009, 2010
    Free Software Foundation, Inc.
    Contributed by Ralph Campbell and OSF
    Commented and modified by Ian Lance Taylor, Cygnus Support
@@ -1105,5 +1105,9 @@ extern int bfd_mips_num_opcodes;
 
 extern const struct mips_opcode mips16_opcodes[];
 extern const int bfd_mips16_num_opcodes;
+
+/* A NOP insn impemented as "or at,at,zero".
+   Used to implement -mfix-loongson2f.  */
+#define LOONGSON2F_NOP_INSN	0x00200825
 
 #endif /* _MIPS_H_ */
