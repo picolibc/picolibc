@@ -1,6 +1,6 @@
 /* strsig.cc
 
-   Copyright 2004 Red Hat, Inc.
+   Copyright 2004, 2007, 2008, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -49,7 +49,7 @@ struct sigdesc
   _s(SIGVTALRM, "Virtual timer expired"),	/* 26 */ \
   _s(SIGPROF, "Profiling timer expired"),	/* 27 */ \
   _s(SIGWINCH, "Window changed"),		/* 28 */ \
-  _s2(SIGPWR, "Power failure",				/* 29 */ \
+  _s2(SIGPWR, "Power failure",			/* 29 */ \
       SIGLOST, "Resource lost"),			 \
   _s(SIGUSR1, "User defined signal 1"),		/* 30 */ \
   _s(SIGUSR2, "User defined signal 2"),		/* 31 */ \
