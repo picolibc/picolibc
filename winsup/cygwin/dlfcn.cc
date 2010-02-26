@@ -110,7 +110,7 @@ dlopen (const char *name, int)
 	  ret = (void *) LoadLibraryW (path);
 
 	  /* In case it was removed by LoadLibrary. */
-	  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+	  _my_tls.init_exception_handler ();
 
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
@@ -160,9 +160,18 @@ dlsym (void *handle, const char *name)
 int
 dlclose (void *handle)
 {
-  int ret = -1;
-  if (handle == GetModuleHandle (NULL) || FreeLibrary ((HMODULE) handle))
+  int ret;
+  if (handle == GetModuleHandle (NULL))
     ret = 0;
+  else
+    {
+      if (FreeLibrary ((HMODULE) handle))
+	ret = 0;
+      else
+	ret = -1;
+      /* In case it was removed by FreeLibrary */
+      _my_tls.init_exception_handler ();
+    }
   if (ret)
     set_dl_error ("dlclose");
   return ret;

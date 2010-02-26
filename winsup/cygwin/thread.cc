@@ -124,9 +124,7 @@ verifyable_object_isvalid (void const *objectptr, thread_magic_t magic, void *st
 			   void *static_ptr2, void *static_ptr3)
 {
   myfault efault;
-  /* Check for NULL pointer specifically since it is a cheap test and avoids the
-     overhead of setting up the fault handler.  */
-  if (!objectptr || efault.faulted ())
+  if (efault.faulted (objectptr))
     return INVALID_OBJECT;
 
   verifyable_object **object = (verifyable_object **) objectptr;

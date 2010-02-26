@@ -1,5 +1,28 @@
 2010-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygtls.h (_cygtls::init_exception_handler): Eliminate argument.
+	(_cygtls::andreas): Convert to a pointer.
+	(san): Convert to a real class with methods.  Use a linked list to
+	keep track of previous handlers on the "stack".
+	(myfault): Rewrite to use new san class rather than calling directly
+	into _cygtls.
+	* cygtls.cc (_cygtls::init_exception_handler): Just assume that we're
+	always using the standard exception handler.
+	(_cygtls::init_thread): Reflect loss of argument to
+	init_exception_handler.
+	* dcrt0.cc (dll_crt0_1): Ditto.
+	* dfcn.cc (dlopen): Ditto.
+	(dlclose): Reset the exception handler after FreeLibrary.
+	* dll_init.cc (dll_list::detach): Make sure that the exception handler
+	is initialized before calling destructors.
+	* exceptions.cc (_cygtls::handle_exceptions): Accommodate new andreas
+	pointer.
+	* thread.cc (verifyable_object_isvalid): Pass objectptr to faulted for
+	explicit NULL pointer checking.
+	* tlsoffsets.h: Regenerate.
+
+2010-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* mkimport: cd away from temp directory or Windows will have problems
 	removing the directory.
 

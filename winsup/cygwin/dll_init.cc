@@ -169,6 +169,8 @@ dll_list::detach (void *retaddr)
     system_printf ("WARNING: trying to detach an already detached dll ...");
   if (--d->count == 0)
     {
+      /* Make sure our exception handler is enabled for destructors */
+      _my_tls.init_exception_handler ();
       __cxa_finalize (d);
       d->run_dtors ();
       d->prev->next = d->next;
@@ -329,7 +331,7 @@ dll_dllcrt0_1 (VOID *x)
      the exception handler should be guaranteed to be installed.
      I'm leaving it in until potentially after the release of
      1.7.1 */
-  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+  _my_tls.init_exception_handler ();
 
   if (p == NULL)
     p = &__cygwin_user_data;

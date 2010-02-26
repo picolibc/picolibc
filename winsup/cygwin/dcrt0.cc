@@ -823,7 +823,7 @@ dll_crt0_1 (void *)
 	{
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;
-	  _my_tls.init_exception_handler (_cygtls::handle_exceptions);
+	  _my_tls.init_exception_handler ();
 	}
 
       longjmp (fork_info->jmp, true);

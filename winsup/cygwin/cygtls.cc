@@ -91,7 +91,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
       /* Initialize this thread's ability to respond to things like
 	 SIGSEGV or SIGFPE. */
-      init_exception_handler (handle_exceptions);
+      init_exception_handler ();
     }
 
   thread_id = GetCurrentThreadId ();
@@ -226,7 +226,7 @@ _cygtls::set_siginfo (sigpacket *pack)
 extern exception_list *_except_list asm ("%fs:0");
 
 void
-_cygtls::init_exception_handler (exception_handler *eh)
+_cygtls::init_exception_handler ()
 {
   /* Here in the distant past of 17-Jul-2009, we had an issue where Windows
      2008 became YA perplexed because the cygwin exception handler was added
@@ -249,7 +249,7 @@ _cygtls::init_exception_handler (exception_handler *eh)
      the old exception handler from the list and add it to the beginning.
 
      The next step will probably be to call this function at various points
-     in cygwin (like from _cygtls::setup_fault maybe) to absoltely ensure that
+     in cygwin (like from _cygtls::setup_fault maybe) to absolutely ensure that
      we have control.  For now, however, this seems good enough.
      (cgf 2010-02-23) 
     */
@@ -275,7 +275,7 @@ _cygtls::init_exception_handler (exception_handler *eh)
      Windows 2008, which irremediably gets into an endless loop, taking 100%
      CPU.  That's why we reverted to a normal SEH chain and changed the way
      the exception handler returns to the application. */
-  el.handler = eh;
+  el.handler = handle_exceptions;
   el.prev = _except_list;
   _except_list = &el;
 }

@@ -53,6 +53,7 @@ public:
   void destroy ();
   friend class tmp_pathbuf;
   friend class _cygtls;
+  friend class san;
 };
 
 class unionent
@@ -157,14 +158,6 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
-typedef struct
-{
-  void *_myfault;
-  int _myfault_errno;
-  int _myfault_c_cnt;
-  int _myfault_w_cnt;
-} san;
-
 /* Changes to the below structure may require acompanying changes to the very
    simple parser in the perl script 'gentls_offsets' (<<-- start parsing here).
    The union in this structure is used to force alignment between the version
@@ -205,7 +198,7 @@ struct _cygtls
   };
   struct _local_storage locals;
   class cygthread *_ctinfo;
-  san andreas;
+  class san *andreas;
   waitq wq;
   int sig;
   unsigned incyg;
@@ -239,7 +232,7 @@ struct _cygtls
   /* exception handling */
   static int handle_exceptions (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
   bool inside_kernel (CONTEXT *);
-  void init_exception_handler (int (*) (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void*));
+  void init_exception_handler () __attribute__ ((regparm(1)));
   void signal_exit (int) __attribute__ ((noreturn, regparm(2)));
   void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
   void signal_debugger (int) __attribute__ ((regparm(2)));
@@ -256,34 +249,6 @@ struct _cygtls
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
-  void*& fault_guarded () {return andreas._myfault;}
-  void return_from_fault ()
-  {
-    if (andreas._myfault_errno)
-      set_errno (andreas._myfault_errno);
-    /* Restore tls_pathbuf counters in case of error. */
-    locals.pathbufs.c_cnt = andreas._myfault_c_cnt;
-    locals.pathbufs.w_cnt = andreas._myfault_w_cnt;
-    __ljfault ((int *) andreas._myfault, 1);
-  }
-  int setup_fault (jmp_buf j, san& old_j, int myerrno) __attribute__ ((always_inline))
-  {
-    old_j._myfault = andreas._myfault;
-    old_j._myfault_errno = andreas._myfault_errno;
-    old_j._myfault_c_cnt = andreas._myfault_c_cnt;
-    old_j._myfault_w_cnt = andreas._myfault_w_cnt;
-    andreas._myfault = (void *) j;
-    andreas._myfault_errno = myerrno;
-    /* Save tls_pathbuf counters. */
-    andreas._myfault_c_cnt = locals.pathbufs.c_cnt;
-    andreas._myfault_w_cnt = locals.pathbufs.w_cnt;
-    return __sjfault (j);
-  }
-  void reset_fault (san& old_j) __attribute__ ((always_inline))
-  {
-    andreas._myfault = old_j._myfault;
-    andreas._myfault_errno = old_j._myfault_errno;
-  }
   /*gentls_offsets*/
 };
 #pragma pack(pop)
@@ -298,15 +263,54 @@ extern char *_tlstop __asm__ ("%fs:8");
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 
+class san
+{
+  san *_clemente;
+  jmp_buf _context;
+  int _errno;
+  int _c_cnt;
+  int _w_cnt;
+public:
+  int setup (int myerrno = 0) __attribute__ ((always_inline))
+  {
+    _clemente = _my_tls.andreas;
+    _my_tls.andreas = this;
+    _errno = myerrno;
+    _c_cnt = _my_tls.locals.pathbufs.c_cnt;
+    _w_cnt = _my_tls.locals.pathbufs.w_cnt;
+    return __sjfault (_context);
+  }
+  void leave () __attribute__ ((always_inline))
+  {
+    if (_errno)
+      set_errno (_errno);
+    /* Restore tls_pathbuf counters in case of error. */
+    _my_tls.locals.pathbufs.c_cnt = _c_cnt;
+    _my_tls.locals.pathbufs.w_cnt = _w_cnt;
+    __ljfault (_context, 1);
+  }
+  void reset () __attribute__ ((always_inline))
+  {
+    _my_tls.andreas = _clemente;
+  }
+};
+
 class myfault
 {
-  jmp_buf buf;
   san sebastian;
 public:
-  ~myfault () __attribute__ ((always_inline)) { _my_tls.reset_fault (sebastian); }
-  inline int faulted (int myerrno = 0) __attribute__ ((always_inline))
+  ~myfault () __attribute__ ((always_inline)) { sebastian.reset (); }
+  inline int faulted () __attribute__ ((always_inline))
   {
-    return _my_tls.setup_fault (buf, sebastian, myerrno);
+    return sebastian.setup (0);
+  }
+  inline int faulted (void const *obj, int myerrno = 0) __attribute__ ((always_inline))
+  {
+    return (!obj || !(*(const char **)obj)) || sebastian.setup (myerrno);
+  }
+  inline int faulted (int myerrno) __attribute__ ((always_inline))
+  {
+    return sebastian.setup (myerrno);
   }
 };
 

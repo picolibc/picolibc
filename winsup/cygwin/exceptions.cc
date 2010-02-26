@@ -622,8 +622,8 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 	break;
       }
 
-  if (me.fault_guarded ())
-    me.return_from_fault ();
+  if (me.andreas)
+    me.andreas->leave ();	/* Return from a "san" caught fault */
 
   me.copy_context (in);
 
