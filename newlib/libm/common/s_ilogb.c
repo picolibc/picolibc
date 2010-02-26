@@ -55,9 +55,9 @@ INT_MIN.)
 
 @comment The bugs might not be worth noting, given the mass non-C99/POSIX
 @comment behavior of much of the Newlib math library.
-@commentBUGS
-@commentOn errors, errno is not set per C99 and POSIX requirements even if
-@comment(math_errhandling & MATH_ERRNO) is non-zero.
+@comment BUGS
+@comment On errors, errno is not set per C99 and POSIX requirements even if
+@comment (math_errhandling & MATH_ERRNO) is non-zero.
 
 PORTABILITY
 C99, POSIX

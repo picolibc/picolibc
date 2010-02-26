@@ -1,3 +1,8 @@
+2010-02-26  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_ilogb.c:  Fix typo in comments that causes doc
+	generation to fail.
+
 2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/time/strftime.c: Add support for era and alt_digits data from
