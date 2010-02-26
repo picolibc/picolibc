@@ -250,6 +250,7 @@ struct sigaction
 #define	SIGPROF	27	/* profiling time alarm */
 #define	SIGWINCH 28	/* window changed */
 #define	SIGLOST 29	/* resource lost (eg, record-lock lost) */
+#define	SIGPWR  SIGLOST	/* power failure */
 #define	SIGUSR1 30	/* user defined signal 1 */
 #define	SIGUSR2 31	/* user defined signal 2 */
 

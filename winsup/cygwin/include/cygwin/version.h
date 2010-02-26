@@ -376,12 +376,13 @@ details. */
       220: Export accept4, SOCK_CLOEXEC, SOCK_NONBLOCK.
       221: Export strfmon.
       222: CW_INT_SETLOCALE added.
+      223: SIGPWR added.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 222
+#define CYGWIN_VERSION_API_MINOR 223
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

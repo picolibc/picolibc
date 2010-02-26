@@ -49,7 +49,8 @@ struct sigdesc
   _s(SIGVTALRM, "Virtual timer expired"),	/* 26 */ \
   _s(SIGPROF, "Profiling timer expired"),	/* 27 */ \
   _s(SIGWINCH, "Window changed"),		/* 28 */ \
-  _s(SIGLOST, "Resource lost"),			/* 29 */ \
+  _s2(SIGPWR, "Power failure",				/* 29 */ \
+      SIGLOST, "Resource lost"),			 \
   _s(SIGUSR1, "User defined signal 1"),		/* 30 */ \
   _s(SIGUSR2, "User defined signal 2"),		/* 31 */ \
   _s2(SIGRTMIN, "Real-time signal 0",		/* 32 */ \

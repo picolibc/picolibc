@@ -1,3 +1,9 @@
+2010-02-25  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/cygwin/signal.h: Define SIGPWR as synonym for SIGLOST.
+	* strsig.cc: Ditto.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR.
+
 2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_era.h (lc_era_t): Fix apparent glibc bug in ja_JP era definition.
