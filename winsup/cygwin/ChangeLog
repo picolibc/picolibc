@@ -1,3 +1,8 @@
+2010-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* mkimport: cd away from temp directory or Windows will have problems
+	removing the directory.
+
 2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/strptime.cc: Implement support for era, alt_digits and POSIX
