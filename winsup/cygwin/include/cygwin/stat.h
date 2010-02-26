@@ -1,6 +1,6 @@
 /* cygwin/stat.h
 
-   Copyright 2002, 2007 Red Hat Inc.
+   Copyright 2002, 2007, 2010 Red Hat Inc.
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.
@@ -74,19 +74,13 @@ struct stat
   timestruc_t   st_ctim;
   blksize_t     st_blksize;
   blkcnt_t      st_blocks;
-#ifdef __CYGWIN_USE_BIG_TYPES__
   timestruc_t   st_birthtim;
-#else
-  long          st_spare4[2];
-#endif
 };
 
 #define st_atime st_atim.tv_sec
 #define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec
-#ifdef __CYGWIN_USE_BIG_TYPES__
 #define st_birthtime st_birthtim.tv_sec
-#endif
 
 /* POSIX IPC objects are not implemented as distinct file types, so the
    below macros have to return 0.  The expression is supposed to catch

@@ -1,6 +1,6 @@
 /* ipc.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2010 Red Hat, Inc.
 
    Originally written by Robert Collins <robert.collins@hotmail.com>
    Updated to 64 bit key_t by Charles Wilson <cygwin@cwilson.fastmail.fm>
@@ -26,7 +26,7 @@ ftok (const char *path, int id)
       return (key_t) -1;
     }
 
-  /* Since __CYGWIN_USE_BIG_TYPES__,
+  /* Since Cygwin 1.5
      dev_t is 32bits for cygwin
      ino_t is 64bits for cygwin
      and we need 8 bits for the id.

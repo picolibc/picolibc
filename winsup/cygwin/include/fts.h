@@ -125,8 +125,6 @@ typedef struct _ftsent {
 
 #ifdef __INSIDE_CYGWIN__
 	struct __stat64 *fts_statp;	/* stat(2) information */
-#elif defined (__CYGWIN__) && !defined (__CYGWIN_USE_BIG_TYPES__)
-	#error "fts requires __CYGWIN_USE_BIG_TYPES__"
 #else
 	struct stat *fts_statp;		/* stat(2) information */
 #endif

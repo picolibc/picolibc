@@ -1,6 +1,6 @@
 /* types.h
 
-   Copyright 2001, 2002, 2003, 2005 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2010 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -33,11 +33,7 @@ typedef struct timespec timestruc_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef _off64_t off_t;
-#else
-typedef _off_t off_t;
-#endif
 #endif /*__off_t_defined*/
 
 typedef __loff_t loff_t;
@@ -46,11 +42,7 @@ typedef __loff_t loff_t;
 #define __dev_t_defined
 typedef short __dev16_t;
 typedef unsigned long __dev32_t;
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __dev32_t dev_t;
-#else
-typedef __dev16_t dev_t;
-#endif
 #endif /*__dev_t_defined*/
 
 #ifndef __blksize_t_defined
@@ -62,11 +54,7 @@ typedef long blksize_t;
 #define __blkcnt_t_defined
 typedef long __blkcnt32_t;
 typedef long long __blkcnt64_t;
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __blkcnt64_t  blkcnt_t;
-#else
-typedef __blkcnt32_t  blkcnt_t;
-#endif
 #endif /*__blkcnt_t_defined*/
 
 #ifndef __fsblkcnt_t_defined
@@ -83,33 +71,21 @@ typedef unsigned long fsfilcnt_t;
 #define __uid_t_defined
 typedef unsigned short __uid16_t;
 typedef unsigned long  __uid32_t;
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __uid32_t uid_t;
-#else
-typedef __uid16_t uid_t;
-#endif
 #endif /*__uid_t_defined*/
 
 #ifndef __gid_t_defined
 #define __gid_t_defined
 typedef unsigned short __gid16_t;
 typedef unsigned long  __gid32_t;
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __gid32_t gid_t;
-#else
-typedef __gid16_t gid_t;
-#endif
 #endif /*__gid_t_defined*/
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
 typedef unsigned long __ino32_t;
 typedef unsigned long long __ino64_t;
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef __ino64_t ino_t;
-#else
-typedef __ino32_t ino_t;
-#endif
 #endif /*__ino_t_defined*/
 
 /* Generic ID type, must match at least pid_t, uid_t and gid_t in size. */
@@ -142,12 +118,7 @@ struct flock {
 	short	 l_whence;	/* flag to choose starting offset */
 	off_t	 l_start;	/* relative offset, in bytes */
 	off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
-#ifdef __CYGWIN_USE_BIG_TYPES__
 	pid_t	 l_pid;		/* returned with F_GETLK */
-#else
-	short	 l_pid;		/* returned with F_GETLK */
-	short	 l_xxx;		/* reserved for future use */
-#endif
 };
 
 #ifndef __key_t_defined

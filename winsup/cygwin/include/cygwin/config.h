@@ -4,7 +4,7 @@
    sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
-   Copyright 2003, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2003, 2007, 2008, 2009, 2010 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -44,17 +44,17 @@ extern char *_tlsbase __asm__ ("%fs:4");
 #endif  /* _COMPILING_NEWLIB */
 
 #define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
+
+/* The following block of macros is required to build newlib correctly for
+   Cygwin.  Changing them in applications has no or not the desired effect.
+   Just leave them alone. */
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #define __LARGE64_FILES 1
-#define __CYGWIN_USE_BIG_TYPES__ 1
-#ifdef __CYGWIN_USE_BIG_TYPES__
-/* __USE_INTERNAL_STAT64 is needed when building newlib for Cygwin.
-   It must be set when __CYGWIN_USE_BIG_TYPES__ is set.  In this case
-   newlib will call the 64 bit stat calls internally.  Otherwise the
-   struct stat used in newlib is not matching the struct stat used in
-   Cygwin. */
 #define __USE_INTERNAL_STAT64 1
-#endif
+#define __LINUX_ERRNO_EXTENSIONS__ 1
+#define _MB_EXTENDED_CHARSETS_ALL 1
+#define __HAVE_LOCALE_INFO__ 1
+#define _WANT_C99_TIME_FORMATS 1
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __EXPORT __declspec(dllexport)
 #define __IMPORT

@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2010 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -17,7 +17,6 @@
 #define __DIRENT_VERSION	2
 
 #pragma pack(push,4)
-#if defined(__INSIDE_CYGWIN__) || defined (__CYGWIN_USE_BIG_TYPES__)
 #define _DIRENT_HAVE_D_TYPE
 struct dirent
 {
@@ -28,16 +27,6 @@ struct dirent
   __uint32_t __d_internal1;
   char d_name[NAME_MAX + 1];
 };
-#else
-struct dirent
-{
-  long d_version;
-  long d_reserved[2];
-  long d_fd;
-  ino_t d_ino;
-  char d_name[NAME_MAX + 1];
-};
-#endif
 #pragma pack(pop)
 
 #define __DIRENT_COOKIE 0xdede4242
