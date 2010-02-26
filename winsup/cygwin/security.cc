@@ -751,16 +751,17 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 		? cygheap->user.imp_token ()
 		: hProcImpToken);
 
-  if (!tok && !DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
-				 SecurityImpersonation, TokenImpersonation,
-				 &hProcImpToken))
-#ifdef DEBUGGING
-	system_printf ("DuplicateTokenEx failed, %E");
-#else
-	syscall_printf ("DuplicateTokenEx failed, %E");
-#endif
-  else
-    tok = hProcImpToken;
+  if (!tok)
+    {
+      if (!DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
+		            SecurityImpersonation, TokenImpersonation,
+			    &hProcImpToken))
+         {
+            __seterrno ();
+            return ret;
+         } 
+      tok = hProcImpToken;
+    } 
 
   if (!AccessCheck (sd, tok, desired, &mapping, pset, &plen, &granted, &status))
     __seterrno ();

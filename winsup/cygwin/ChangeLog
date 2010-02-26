@@ -1,3 +1,8 @@
+2010-02-26  Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* security.cc (check_access): Use user.imp_token if appropriate.
+        Set errno and return if DuplicateTokenEx fails .
+
 2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	Remove all traces of __CYGWIN_USE_BIG_TYPES__.
