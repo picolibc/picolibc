@@ -585,8 +585,10 @@ SIGSTOP     17    sendable stop signal not from tty
 SIGTSTP     18    stop signal from tty
 SIGCONT     19    continue a stopped process
 SIGCHLD     20    to parent on child stop or exit
+SIGCLD      20    System V name for SIGCHLD
 SIGTTIN     21    to readers pgrp upon background tty read
 SIGTTOU     22    like TTIN for output if (tp-&gt;t_local&amp;LTOSTOP)
+SIGIO       23    input/output possible
 SIGPOLL     23    System V name for SIGIO
 SIGXCPU     24    exceeded CPU time limit
 SIGXFSZ     25    exceeded file size limit
@@ -594,6 +596,7 @@ SIGVTALRM   26    virtual time alarm
 SIGPROF     27    profiling time alarm
 SIGWINCH    28    window changed
 SIGLOST     29    resource lost (eg, record-lock lost)
+SIGPWR      29    power failure
 SIGUSR1     30    user defined signal 1
 SIGUSR2     31    user defined signal 2
 </screen>
