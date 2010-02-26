@@ -1,5 +1,9 @@
 2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.sgml (ov-new1.7.2): Add strptime changes.
+
+2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml (ov-new1.7.2): Add strftime/wcsftime changes.
 
 2010-02-25  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
