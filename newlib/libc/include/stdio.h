@@ -50,11 +50,7 @@ _BEGIN_STD_C
 typedef __FILE FILE;
 
 #ifdef __CYGWIN__
-#ifdef __CYGWIN_USE_BIG_TYPES__
 typedef _fpos64_t fpos_t;
-#else
-typedef _fpos_t fpos_t;
-#endif
 #else
 typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES

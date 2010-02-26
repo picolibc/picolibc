@@ -188,9 +188,6 @@
 
 #if defined(__CYGWIN__)
 #include <cygwin/config.h>
-#define __LINUX_ERRNO_EXTENSIONS__ 1
-#define _MB_EXTENDED_CHARSETS_ALL 1
-#define __HAVE_LOCALE_INFO__ 1
 #if !defined (__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 #define __USE_XOPEN2K 1
 #endif

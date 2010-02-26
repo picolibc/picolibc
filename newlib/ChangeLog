@@ -1,3 +1,36 @@
+2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/time/strftime.c: Add support for era and alt_digits data from
+	LC_TIME locale category.  Conditionalize using _WANT_C99_TIME_FORMATS
+	flag.
+	(STRTOUL): Define differently for building strftime or wcsftime.
+	(STRCPY): Ditto.
+	(STRCHR): Ditto.
+	(STRLEN): Ditto.
+	(CHECK_LENGTH): Define to simplify code.
+	(era_info_t): New type to store era info.
+	(get_era_info): New function to fetch era info matching incoming
+	struct tm.
+	(free_era_info): New function to free era info.
+	(alt_digits_t): New type to store alternative digits.
+	(get_alt_digits): New function to convert alt_digits string into
+	alt_digits_t structure.
+	(free_alt_digits): New function to free alt_digits info.
+	(conv_to_alt_digits): New function to convert unsigned value into
+	alternative digits.
+	(strftime): Conditionalize on _WANT_C99_TIME_FORMATS.  If
+	_WANT_C99_TIME_FORMATS is defined, define as just a wrapper function
+	providing era_info and alt_digits pointers and call ...
+	(__strftime): Rename from strftime and make static if
+	_WANT_C99_TIME_FORMATS is defined.  Add parameters for era_info and
+	alt_digits pointers.  Handle conversion modifiers according to
+	POSIX-1.2008.  Redefine %F and %Y according to POSIX.  Add default case
+	to allow to bail out on invalid conversion specifiers.
+	* libc/include/sys/config.h: Move Cygwin build flags to Cygwin's
+	config.h.
+
+	* libc/include/stdio.h: Remove __CYGWIN_USE_BIG_TYPES__ condition.
+
 2010-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Fix typo in comment.
