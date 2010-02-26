@@ -1,3 +1,10 @@
+2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove all traces of __CYGWIN_USE_BIG_TYPES__.
+
+	* include/cygwin/config.h: Move Cygwin-specific build flags from
+	newlib's sys/config.h here.  Add a comment.
+
 2010-02-25  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/cygwin/signal.h: Define SIGPWR as synonym for SIGLOST.
