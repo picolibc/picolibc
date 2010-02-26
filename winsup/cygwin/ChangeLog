@@ -1,5 +1,26 @@
 2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/strptime.cc: Implement support for era, alt_digits and POSIX
+	padding and width modifiers.
+	(era_info_t): New type.
+	(free_era_info): New static function to free era_info_t storage.
+	(get_era_info): New static function to create era_info_t storage
+	from LC_TIME era information.
+	(alt_digits_t): New type.
+	(get_alt_digits): New static function to create alt_digits_t storage
+	from LC_TIME alt_digits information.
+	(free_alt_digits): New static function to free alt_digits_t storage.
+	(find_alt_digits): New static function to scan input for alternative
+	digits and return them, if any.  Return NULL otherwise.
+	(__strptime): New static function taking all code from strptime.
+	Implement handling for E, O, +, 0, and width modifiers per POSIX-1.2008.
+	(strptime): Convert into wrapper function to provide era_info and
+	alt_digits pointers and call __strptime.
+	(conv_num): Take additional alt_digits_t parameter and if it's not
+	NULL, call find_alt_digits to convert.
+
+2010-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* strsig.cc: Fix formatting and copyright.
 
 2010-02-26  Pierre Humblet <Pierre.Humblet@ieee.org>
