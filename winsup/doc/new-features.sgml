@@ -74,6 +74,7 @@
 Support open(2) flags O_CLOEXEC and O_TTY_INIT flags.  Support fcntl
 flag F_DUPFD_CLOEXEC.  Support socket flags SOCK_CLOEXEC and SOCK_NONBLOCK.
 Add new Linux-compatible API calls accept4(2), dup3(2), and pipe2(2).
+Support the signal SIGPWR.
 </para></listitem>
 
 <listitem><para>Enhanced Windows console support.</para>
