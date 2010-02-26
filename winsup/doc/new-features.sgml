@@ -63,6 +63,14 @@
   </para></listitem>
 
   <listitem><para>
+  strftime(3) and wcsftime(3) now handle the E and O format modifiers to
+  print alternative date and time representations or to use alternative
+  digits in locales which support this.  Additionally these functions now
+  also support the padding modifiers '0' and '+', as well as a minimum field
+  width per POSIX-1.2008.
+  </para></listitem>
+
+  <listitem><para>
   New strfmon(3) call.
   </para></listitem>
 
