@@ -1,6 +1,6 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2008, 2009, 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -17,7 +17,6 @@ details. */
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
 #include <setjmp.h>
-#include <exceptions.h>
 
 #define CYGTLS_INITIALIZED 0xc763173f
 
@@ -173,10 +172,11 @@ extern "C" int __ljfault (jmp_buf, int);
 /*gentls_offsets*/
 
 typedef __uint32_t __stack_t;
-struct _cygtls
+
+class _cygtls
 {
+public:
   void (*func) /*gentls_offsets*/(int)/*gentls_offsets*/;
-  exception_list el;
   int saved_errno;
   int sa_flags;
   sigset_t oldmask;
@@ -213,7 +213,6 @@ struct _cygtls
   static void init ();
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
-  void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _cygtls *find_tls (int sig);
   void remove (DWORD);
   void push (__stack_t) __attribute__ ((regparm (2)));
@@ -229,10 +228,7 @@ struct _cygtls
 				  struct sigaction& siga)
     __attribute__((regparm(3)));
 
-  /* exception handling */
-  static int handle_exceptions (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
   bool inside_kernel (CONTEXT *);
-  void init_exception_handler () __attribute__ ((regparm(1)));
   void signal_exit (int) __attribute__ ((noreturn, regparm(2)));
   void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
   void signal_debugger (int) __attribute__ ((regparm(2)));
@@ -249,6 +245,8 @@ struct _cygtls
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
+private:
+  void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   /*gentls_offsets*/
 };
 #pragma pack(pop)
@@ -306,7 +304,7 @@ public:
   }
   inline int faulted (void const *obj, int myerrno = 0) __attribute__ ((always_inline))
   {
-    return (!obj || !(*(const char **)obj)) || sebastian.setup (myerrno);
+    return !obj || !(*(const char **) obj) || sebastian.setup (myerrno);
   }
   inline int faulted (int myerrno) __attribute__ ((always_inline))
   {

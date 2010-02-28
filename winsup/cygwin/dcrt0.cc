@@ -34,6 +34,7 @@ details. */
 #include "dll_init.h"
 #include "heap.h"
 #include "tls_pbuf.h"
+#include "exception.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -823,7 +824,6 @@ dll_crt0_1 (void *)
 	{
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;
-	  _my_tls.init_exception_handler ();
 	}
 
       longjmp (fork_info->jmp, true);

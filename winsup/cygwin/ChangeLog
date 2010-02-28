@@ -1,3 +1,27 @@
+2010-02-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Update some copyrights.
+	* cygtls.cc (_cygtls::call): Invoke new exception protection here.
+	(_cygtls::init_thread): Remove conditionalized exception handler setup.
+	(exception_list): Delete declaration.
+	(_cygtls::init_exception_handler): Delete obsolete function.
+	* cygtls.h: Remove (now) unneeded include.
+	(_cygtls): Make this a real C++ class.
+	(_cygtls::handle_exceptions): Remove.
+	(_cygtls::init_exception_handler): Remove.
+	(_cygtls::call2): Make private.
+	(myfault::faulted): Remove unneeded parentheses.
+	* dcrt0.cc (dll_crt0_1): Remove exception handler setup.
+	* dlfcn.cc (dlopen): Ditto.
+	(dlclose): Ditto.
+	* dll_init.cc (dll_dllcrt0_1): Ditto.
+	(dll_list::detach): Use new exception handler protection.
+	* exceptions.cc (dump_exception): Rename to prevent confusion with new
+	class.
+	(exception::handle): Rename from _cygtls::handle_exceptions.
+	Accommodate new exception class.  Accommodate rename to dump_exception.
+	* tlsoffsets.h: Regenerate.
+
 2010-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h (_cygtls::init_exception_handler): Eliminate argument.

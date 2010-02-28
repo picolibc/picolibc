@@ -1,6 +1,6 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -15,6 +15,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
+#include "exception.h"
 
 class sentry
 {
@@ -54,6 +55,9 @@ void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
 {
   char buf[CYGTLS_PADSIZE];
+  /* Initialize this thread's ability to respond to things like
+     SIGSEGV or SIGFPE. */
+  exception protect;
   _my_tls.call2 (func, arg, buf);
 }
 
@@ -89,9 +93,6 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	}
       local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
-      /* Initialize this thread's ability to respond to things like
-	 SIGSEGV or SIGFPE. */
-      init_exception_handler ();
     }
 
   thread_id = GetCurrentThreadId ();
@@ -218,64 +219,4 @@ void
 _cygtls::set_siginfo (sigpacket *pack)
 {
   infodata = pack->si;
-}
-
-/* Set up the exception handler for the current thread.  The x86 uses segment
-   register fs, offset 0 to point to the current exception handler. */
-
-extern exception_list *_except_list asm ("%fs:0");
-
-void
-_cygtls::init_exception_handler ()
-{
-  /* Here in the distant past of 17-Jul-2009, we had an issue where Windows
-     2008 became YA perplexed because the cygwin exception handler was added
-     at the start of the SEH while still being in the list further on.  This
-     was because we added a loop by setting el.prev to _except_list here.
-     Since el is reused in this thread, and this function can be called
-     more than once when a dll is loaded, this is not a good thing.
-
-     So, for now, until the next required tweak, we will just avoid adding the
-     cygwin exception handler if it is already on this list.  This could present
-     a problem if some previous exception handler tries to do things that are
-     better left to Cygwin.  I await the cygwin mailing list notification of
-     this event with bated breath.
-     (cgf 2009-07-17)
-
-     A change in plans:  In the not-so-distant past of 2010-02-23 it was
-     discovered that something was moving in ahead of cygwin's exception
-     handler so just detecting that the exception handler was loaded wasn't
-     good enough.  I sort of anticipated this.  So, the next step is to remove
-     the old exception handler from the list and add it to the beginning.
-
-     The next step will probably be to call this function at various points
-     in cygwin (like from _cygtls::setup_fault maybe) to absolutely ensure that
-     we have control.  For now, however, this seems good enough.
-     (cgf 2010-02-23) 
-    */
-  exception_list *e = _except_list;
-  if (e == &el)
-    return;
-  while (e && e  != (exception_list *) -1)
-    if (e->prev != &el)
-      e = e->prev;
-    else
-      {
-	e->prev = el.prev;
-	break;
-      }
-  /* Apparently Windows stores some information about an exception and tries
-     to figure out if the SEH which returned 0 last time actually solved the
-     problem, or if the problem still persists (e.g. same exception at same
-     address).  In this case Windows seems to decide that it can't trust
-     that SEH and calls the next handler in the chain instead.
-
-     At one point this was a loop (el.prev = &el;).  This outsmarted the
-     above behaviour.  Unfortunately this trick doesn't work anymore with
-     Windows 2008, which irremediably gets into an endless loop, taking 100%
-     CPU.  That's why we reverted to a normal SEH chain and changed the way
-     the exception handler returns to the application. */
-  el.handler = handle_exceptions;
-  el.prev = _except_list;
-  _except_list = &el;
 }

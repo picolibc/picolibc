@@ -1,6 +1,6 @@
 /* dlfcn.cc
 
-   Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2008, 2009 Red Hat, Inc.
+   Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -109,9 +109,6 @@ dlopen (const char *name, int)
 
 	  ret = (void *) LoadLibraryW (path);
 
-	  /* In case it was removed by LoadLibrary. */
-	  _my_tls.init_exception_handler ();
-
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
 
@@ -163,15 +160,10 @@ dlclose (void *handle)
   int ret;
   if (handle == GetModuleHandle (NULL))
     ret = 0;
+  else if (FreeLibrary ((HMODULE) handle))
+    ret = 0;
   else
-    {
-      if (FreeLibrary ((HMODULE) handle))
-	ret = 0;
-      else
-	ret = -1;
-      /* In case it was removed by FreeLibrary */
-      _my_tls.init_exception_handler ();
-    }
+    ret = -1;
   if (ret)
     set_dl_error ("dlclose");
   return ret;

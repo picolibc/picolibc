@@ -1,7 +1,7 @@
 /* dll_init.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009 Red Hat, Inc.
+   2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -19,6 +19,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "cygtls.h"
+#include "exception.h"
 #include <wchar.h>
 #include <sys/reent.h>
 
@@ -169,8 +170,8 @@ dll_list::detach (void *retaddr)
     system_printf ("WARNING: trying to detach an already detached dll ...");
   if (--d->count == 0)
     {
-      /* Make sure our exception handler is enabled for destructors */
-      _my_tls.init_exception_handler ();
+      /* Ensure our exception handler is enabled for destructors */
+      exception protect;
       __cxa_finalize (d);
       d->run_dtors ();
       d->prev->next = d->next;
@@ -323,15 +324,6 @@ dll_dllcrt0_1 (VOID *x)
   HMODULE& h = ((dllcrt0_info *)x)->h;
   per_process*& p = ((dllcrt0_info *)x)->p;
   int& res = ((dllcrt0_info *)x)->res;
-
-  /* Make sure that our exception handler is installed.
-     That should always be the case but this just makes sure.
-
-     At some point, we may want to just remove this code since
-     the exception handler should be guaranteed to be installed.
-     I'm leaving it in until potentially after the release of
-     1.7.1 */
-  _my_tls.init_exception_handler ();
 
   if (p == NULL)
     p = &__cygwin_user_data;

@@ -1,7 +1,7 @@
 /* exceptions.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -30,6 +30,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include "ntdll.h"
+#include "exception.h"
 
 #define CALL_HANDLER_RETRY 20
 
@@ -174,7 +175,7 @@ open_stackdumpfile ()
 /* Utilities for dumping the stack, etc.  */
 
 static void
-exception (EXCEPTION_RECORD *e,  CONTEXT *in)
+dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 {
   const char *exception_name = NULL;
 
@@ -476,7 +477,7 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 extern exception_list *_except_list asm ("%fs:0");
 
 int
-_cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
+exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
 {
   static bool NO_COPY debugging;
   static int NO_COPY recursed;
@@ -630,7 +631,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
   /* Temporarily replace windows top level SEH with our own handler.
      We don't want any Windows magic kicking in.  This top level frame
      will be removed automatically after our exception handler returns. */
-  _except_list->handler = _cygtls::handle_exceptions;
+  _except_list->handler = handle;
 
   if (masked
       || &me == _sig_tls
@@ -662,7 +663,7 @@ _cygtls::handle_exceptions (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT 
 
 	  rtl_unwind (frame, e);
 	  open_stackdumpfile ();
-	  exception (e, in);
+	  dump_exception (e, in);
 	  stackdump ((DWORD) ebp, 0, 1);
 	}
 
