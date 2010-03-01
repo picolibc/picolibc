@@ -1,6 +1,6 @@
 /* exception.h
 
-   Copyright 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
