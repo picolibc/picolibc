@@ -34,5 +34,5 @@ public:
 #endif
 };
 
-#endif /*_CYGTLS_H*/ /*gentls_offsets*/
+#endif /*_EXCEPTION_H*/
 

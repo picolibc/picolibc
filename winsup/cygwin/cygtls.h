@@ -314,4 +314,4 @@ public:
 
 #define __getreent() (&_my_tls.local_clib)
 
-#endif /*_CYGTLS_H*/ /*gentls_offsets*/
+#endif /*_CYGTLS_H*/
