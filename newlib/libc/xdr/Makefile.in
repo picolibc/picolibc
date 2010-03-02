@@ -58,19 +58,23 @@ lib_a_LIBADD =
 am__objects_1 = lib_a-xdr_private.$(OBJEXT) lib_a-xdr.$(OBJEXT) \
 	lib_a-xdr_float.$(OBJEXT) lib_a-xdr_array.$(OBJEXT) \
 	lib_a-xdr_mem.$(OBJEXT) lib_a-xdr_rec.$(OBJEXT) \
-	lib_a-xdr_reference.$(OBJEXT) lib_a-xdr_sizeof.$(OBJEXT) \
-	lib_a-xdr_stdio.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@am__objects_2 = $(am__objects_1)
+	lib_a-xdr_reference.$(OBJEXT) lib_a-xdr_sizeof.$(OBJEXT)
+am__objects_2 = lib_a-xdr_stdio.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_FALSE@am__objects_3 = $(am__objects_1)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@am__objects_3 = $(am__objects_1) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@	$(am__objects_2)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = lib_a-dummy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libxdr_la_LIBADD =
-am__objects_3 = xdr_private.lo xdr.lo xdr_float.lo xdr_array.lo \
-	xdr_mem.lo xdr_rec.lo xdr_reference.lo xdr_sizeof.lo \
-	xdr_stdio.lo
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@am__objects_4 = $(am__objects_3)
-@USE_LIBTOOL_TRUE@am_libxdr_la_OBJECTS = dummy.lo $(am__objects_4)
+am__objects_4 = xdr_private.lo xdr.lo xdr_float.lo xdr_array.lo \
+	xdr_mem.lo xdr_rec.lo xdr_reference.lo xdr_sizeof.lo
+am__objects_5 = xdr_stdio.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_FALSE@am__objects_6 = $(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@am__objects_6 = $(am__objects_4) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@	$(am__objects_5)
+@USE_LIBTOOL_TRUE@am_libxdr_la_OBJECTS = dummy.lo $(am__objects_6)
 libxdr_la_OBJECTS = $(am_libxdr_la_OBJECTS)
 libxdr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -164,6 +168,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -243,14 +248,21 @@ GENERAL_SOURCES = \
   xdr_mem.c \
   xdr_rec.c \
   xdr_reference.c \
-  xdr_sizeof.c \
+  xdr_sizeof.c
+
+STDIO_SOURCES = \
   xdr_stdio.c
 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@ELIX_SOURCES = $(GENERAL_SOURCES)
+EXTRA_SOURCES = \
+  xdr_float_vax.c
+
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_FALSE@ELIX_SOURCES = $(GENERAL_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@@HAVE_STDIO_DIR_TRUE@ELIX_SOURCES = $(GENERAL_SOURCES) $(STDIO_SOURCES)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_TRUE@ELIX_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = 
 @ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+EXTRA_DIST = README $(EXTRA_SOURCES)
 libxdr_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libxdr.la
 @USE_LIBTOOL_TRUE@libxdr_la_SOURCES = dummy.c $(ELIX_SOURCES)

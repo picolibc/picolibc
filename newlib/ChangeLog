@@ -1,3 +1,7 @@
+2010-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/xdr/Makefile.in: Regenerate.
+
 2010-03-02  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	Add eXtensible Data Record (XDR) support
