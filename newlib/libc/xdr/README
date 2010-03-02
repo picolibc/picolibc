@@ -1,9 +1,10 @@
 INTRODUCTION
 ======================
-This directory contains a port of the Sun RPC code (derived
-from the relicensed -- to 3-clause BSD -- implementation in
-Fedora 11's libtirpc package version 0.1.10-7). It has been
-adapted for newlib in the following ways:
+This directory contains a port of eXternal Data Representation
+(XDR) code from SunRPC (derived from the relicensed -- to
+3-clause BSD -- implementation in Fedora 11's libtirpc package
+version 0.1.10-7). It has been adapted for newlib in the
+following ways:
 
 1) xdr_* functions for fixed-width integral types have been
    added, such as xdr_int32_t() and similar. The implementation
@@ -58,7 +59,7 @@ xdr_float.c:
   ...
   #elif defined(__vax__)
   #include "xdr_float_vax.c"
- +#else defined(__my_platform__)
+ +#elif defined(__my_platform__)
  +#include "xdr_float_my_platform.c"
   #endif
 
@@ -121,7 +122,7 @@ The desired callback can be registered by calling:
 The return value is the "old" function pointer, which may
 be NULL.
 
-However, neither the typedef or the registration function
+However, neither the typedef nor the registration function
 are declared in the public headers. Clients wishing to use
 them must either declare the necessary symbols manually,
 or #include "xdr_private.h". More on this point, below.
@@ -143,13 +144,13 @@ For instance:
     ...
   }
 
-Will cause xdr-generated error messages to go to stderr.
+will cause xdr-generated error messages to go to stderr.
 
 It is not expected that end-user applications will make use
 of this facility.  Rather, it is expected that IF certain
 *platforms* desire that these error messages be recorded,
-rather expecting client apps print error messages as
-necessary, then those platforms will, in their startup
+instead of expecting client apps to print error messages as
+necessary (*), then those platforms will, in their startup
 objects or static initialization, direct these messages to
 a logging facility, strace debug facility, etc.
 
@@ -158,14 +159,15 @@ Therefore, the platform startup code, if part of newlib, can
 from that file.
 
 However, most newlib targets will probably be satisfied with
-the default (silent) behavior. Note that the original Sun RPC,
-as well as the glibc implementation, print these error messages
-to stderr.  Cygwin, for greater similarity to glibc, registers
-an error message handler similar to the example above, within
-its startup code.
+the default (silent) behavior. Note that the original Sun RPC
+implementation of XDR, as well as the glibc implementation,
+print these error messages to stderr.  Cygwin, for greater
+similarity to glibc, registers an error message handler similar
+to the example above, within its startup code.
 
-(*) Client apps should already check for FALSE return values;
-    in this case they would then check errno and act appropriately.
+(*) Client apps should already check for FALSE return values.
+    In this case when xdr function return FALSE, the client
+    app would then check errno and act appropriately.
 
 
 LICENSING AND PEDIGREE
@@ -185,7 +187,7 @@ As documented in the libtirpc rpm.spec file from Fedora 11:
 
 So, in the XDR implementation from Fedora 11's libtirpc package,
 after the modification above by Tom Callaway, each file carries
-the 3-clause BSD license, and not the so-called "SunRPC" license.
+the 3-clause BSD license and not the so-called "SunRPC" license.
 It is from this version that the newlib implementation here was
 derived, with the modifications described in the introduction,
 above.

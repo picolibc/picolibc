@@ -17,7 +17,7 @@ GENERAL_SOURCES = \
 STDIO_SOURCES = \
   xdr_stdio.c
 
-EXTRA_SOURCES = \
+EXTRA_SRC = \
   xdr_float_vax.c
 
 ## None of these functions are specified by EL/IX
@@ -43,7 +43,7 @@ endif
 endif
 endif
 
-EXTRA_DIST = README $(EXTRA_SOURCES)
+EXTRA_DIST = README $(EXTRA_SRC)
 
 libxdr_la_LDFLAGS = -Xcompiler -nostdlib
 

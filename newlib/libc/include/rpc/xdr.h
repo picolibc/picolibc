@@ -224,6 +224,16 @@ typedef bool_t _EXFNPTR(xdrproc_t, (XDR *, ...));
     } while (0)
 
 /*
+ * Solaris strips the '_t' from these types -- not sure why.
+ * But, let's be compatible.
+ */
+#define xdr_rpcvers(xdrs, versp) xdr_u_int32(xdrs, versp)
+#define xdr_rpcprog(xdrs, progp) xdr_u_int32(xdrs, progp)
+#define xdr_rpcproc(xdrs, procp) xdr_u_int32(xdrs, procp)
+#define xdr_rpcprot(xdrs, protp) xdr_u_int32(xdrs, protp)
+#define xdr_rpcport(xdrs, portp) xdr_u_int32(xdrs, portp)
+
+/*
  * Support struct for discriminated unions.
  * You create an array of xdrdiscrim structures, terminated with
  * an entry with a null procedure pointer.  The xdr_union routine gets

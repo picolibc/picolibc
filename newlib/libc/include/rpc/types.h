@@ -52,6 +52,12 @@ typedef int64_t   quad_t;
 typedef int32_t   bool_t;
 typedef int32_t   enum_t;
 
+typedef u_int32_t rpcprog_t;
+typedef u_int32_t rpcvers_t;
+typedef u_int32_t rpcproc_t;
+typedef u_int32_t rpcprot_t;
+typedef u_int32_t rpcport_t;
+typedef   int32_t rpc_inline_t;
 
 #ifndef NULL
 # define NULL 0

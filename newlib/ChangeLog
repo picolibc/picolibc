@@ -1,3 +1,13 @@
+2010-03-02  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* libc/xdr/README: Correct grammatical errors.
+	* libc/include/rpc/types.h: Add public types used
+	by RPC implementations.
+	* libc/include/rpc/xdr.h: Add defines used by RPC
+	implementations.
+	* libc/xdr/Makefile.am: Eliminate automake warning.
+	* libc/xdr/Makefile.in: Regenerate.
+
 2010-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/xdr/Makefile.in: Regenerate.
