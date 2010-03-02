@@ -68,19 +68,20 @@ am__DEPENDENCIES_1 =
 @USE_LIBTOOL_FALSE@am__DEPENDENCIES_3 = argz/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) ctype/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	search/lib.$(aext) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) string/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) time/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	locale/lib.$(aext) reent/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) errno/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	misc/lib.$(aext) $(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1)
+@USE_LIBTOOL_FALSE@	string/lib.$(aext) $(am__DEPENDENCIES_1) \
+@USE_LIBTOOL_FALSE@	time/lib.$(aext) locale/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	reent/lib.$(aext) $(am__DEPENDENCIES_1) \
+@USE_LIBTOOL_FALSE@	errno/lib.$(aext) misc/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 @USE_LIBTOOL_TRUE@am__DEPENDENCIES_3 = argz/libargz.$(aext) \
 @USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
 @USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
 @USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
 @USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
 @USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) time/libtime.$(aext) \
 @USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
@@ -162,7 +163,7 @@ ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = argz stdlib ctype search stdio stdio64 string signal \
 	time locale sys reent @extra_dir@ errno misc machine unix \
-	posix syscalls iconv .
+	posix syscalls iconv xdr .
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -212,6 +213,8 @@ LIBC_STDIO_LIB = @LIBC_STDIO_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBC_XDR_DEF = @LIBC_XDR_DEF@
+LIBC_XDR_LIB = @LIBC_XDR_LIB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -313,11 +316,13 @@ AUTOMAKE_OPTIONS = cygnus
 @ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_DIRS = iconv
 @ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_LIBS = 
 @ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_LIBS = iconv/ces/lib.$(aext) iconv/ccs/lib.$(aext) iconv/lib/lib.$(aext)
+@HAVE_XDR_DIR_TRUE@XDR_SUBDIR = xdr
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) .
+	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
+	$(XDR_SUBDIR) .
 
 noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
@@ -328,6 +333,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_FALSE@	search/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_STDIO_LIB) \
 @USE_LIBTOOL_FALSE@	$(LIBC_STDIO64_LIB) \
+@USE_LIBTOOL_FALSE@	$(LIBC_XDR_LIB) \
 @USE_LIBTOOL_FALSE@	string/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
 @USE_LIBTOOL_FALSE@	time/lib.$(aext) \
@@ -350,6 +356,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_STDIO_LIB) \
 @USE_LIBTOOL_TRUE@	$(LIBC_STDIO64_LIB) \
+@USE_LIBTOOL_TRUE@	$(LIBC_XDR_LIB) \
 @USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
 @USE_LIBTOOL_TRUE@	time/libtime.$(aext) \
@@ -379,6 +386,7 @@ SUBDEFS = \
 	ctype/stmp-def \
 	$(LIBC_STDIO_DEF) \
 	$(LIBC_STDIO64_DEF) \
+	$(LIBC_XDR_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \
 	time/stmp-def \

@@ -34,10 +34,15 @@ NEWLIB_ICONV_DIRS =
 NEWLIB_ICONV_LIBS =
 endif
 
+if HAVE_XDR_DIR
+XDR_SUBDIR = xdr
+endif
+
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) .
+	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
+	$(XDR_SUBDIR) .
 
 noinst_DATA = $(CRT0)
 
@@ -50,6 +55,7 @@ SUBLIBS = \
 	search/libsearch.$(aext) \
 	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
+	$(LIBC_XDR_LIB) \
 	string/libstring.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
 	time/libtime.$(aext) \
@@ -72,6 +78,7 @@ SUBLIBS = \
 	search/lib.$(aext) \
 	$(LIBC_STDIO_LIB) \
 	$(LIBC_STDIO64_LIB) \
+	$(LIBC_XDR_LIB) \
 	string/lib.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
 	time/lib.$(aext) \
@@ -125,6 +132,7 @@ SUBDEFS = \
 	ctype/stmp-def \
 	$(LIBC_STDIO_DEF) \
 	$(LIBC_STDIO64_DEF) \
+	$(LIBC_XDR_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \
 	time/stmp-def \

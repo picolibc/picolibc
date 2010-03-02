@@ -675,6 +675,10 @@ LIBC_UNIX_LIB
 HAVE_SYSCALL_DIR_FALSE
 HAVE_SYSCALL_DIR_TRUE
 LIBC_SYSCALL_LIB
+HAVE_XDR_DIR_FALSE
+HAVE_XDR_DIR_TRUE
+LIBC_XDR_DEF
+LIBC_XDR_LIB
 HAVE_STDIO64_DIR_FALSE
 HAVE_STDIO64_DIR_TRUE
 LIBC_STDIO64_DEF
@@ -12395,7 +12399,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12398 "configure"
+#line 12402 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12501,7 +12505,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12504 "configure"
+#line 12508 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12833,6 +12837,27 @@ else
 fi
 
 
+LIBC_XDR_LIB=
+LIBC_XDR_DEF=
+if test -n "${xdr_dir}"; then
+  if test "${use_libtool}" = "yes"; then
+    LIBC_XDR_LIB=${xdr_dir}/lib${xdr_dir}.${aext}
+  else
+    LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
+  fi
+  LIBC_XDR_DEF=${xdr_dir}/stmp-def
+fi
+
+
+ if test x${xdr_dir} != x; then
+  HAVE_XDR_DIR_TRUE=
+  HAVE_XDR_DIR_FALSE='#'
+else
+  HAVE_XDR_DIR_TRUE='#'
+  HAVE_XDR_DIR_FALSE=
+fi
+
+
 LIBC_SYSCALL_LIB=
 if test -n "${syscall_dir}"; then
   if test "${use_libtool}" = "yes"; then
@@ -12943,7 +12968,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile"
+ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile xdr/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13188,6 +13213,13 @@ if test -z "${HAVE_STDIO64_DIR_TRUE}" && test -z "${HAVE_STDIO64_DIR_FALSE}"; th
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_STDIO64_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_STDIO64_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_XDR_DIR_TRUE}" && test -z "${HAVE_XDR_DIR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_XDR_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_XDR_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -13994,6 +14026,7 @@ do
     "iconv/ccs/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/ccs/Makefile" ;;
     "iconv/ccs/binary/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/ccs/binary/Makefile" ;;
     "iconv/lib/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/lib/Makefile" ;;
+    "xdr/Makefile") CONFIG_FILES="$CONFIG_FILES xdr/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

@@ -94,6 +94,20 @@ AC_SUBST(LIBC_STDIO64_LIB)
 AC_SUBST(LIBC_STDIO64_DEF)
 AM_CONDITIONAL(HAVE_STDIO64_DIR, test x${stdio64_dir} != x)
 
+LIBC_XDR_LIB=
+LIBC_XDR_DEF=
+if test -n "${xdr_dir}"; then
+  if test "${use_libtool}" = "yes"; then
+    LIBC_XDR_LIB=${xdr_dir}/lib${xdr_dir}.${aext}
+  else
+    LIBC_XDR_LIB=${xdr_dir}/lib.${aext}
+  fi
+  LIBC_XDR_DEF=${xdr_dir}/stmp-def
+fi
+AC_SUBST(LIBC_XDR_LIB)
+AC_SUBST(LIBC_XDR_DEF)
+AM_CONDITIONAL(HAVE_XDR_DIR, test x${xdr_dir} != x)
+
 LIBC_SYSCALL_LIB=
 if test -n "${syscall_dir}"; then
   if test "${use_libtool}" = "yes"; then
@@ -171,5 +185,5 @@ fi
 AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
 
-AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile])
+AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile xdr/Makefile])
 AC_OUTPUT

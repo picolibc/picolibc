@@ -38,7 +38,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
-subdir = time
+subdir = xdr
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../libtool.m4 \
 	$(top_srcdir)/../../ltoptions.m4 \
@@ -55,31 +55,27 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-asctime.$(OBJEXT) lib_a-asctime_r.$(OBJEXT) \
-	lib_a-clock.$(OBJEXT) lib_a-ctime.$(OBJEXT) \
-	lib_a-ctime_r.$(OBJEXT) lib_a-difftime.$(OBJEXT) \
-	lib_a-gettzinfo.$(OBJEXT) lib_a-gmtime.$(OBJEXT) \
-	lib_a-gmtime_r.$(OBJEXT) lib_a-lcltime.$(OBJEXT) \
-	lib_a-lcltime_r.$(OBJEXT) lib_a-mktime.$(OBJEXT) \
-	lib_a-mktm_r.$(OBJEXT) lib_a-strftime.$(OBJEXT) \
-	lib_a-strptime.$(OBJEXT) lib_a-time.$(OBJEXT) \
-	lib_a-tzlock.$(OBJEXT) lib_a-tzset.$(OBJEXT) \
-	lib_a-tzset_r.$(OBJEXT) lib_a-tzvars.$(OBJEXT) \
-	lib_a-wcsftime.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+am__objects_1 = lib_a-xdr_private.$(OBJEXT) lib_a-xdr.$(OBJEXT) \
+	lib_a-xdr_float.$(OBJEXT) lib_a-xdr_array.$(OBJEXT) \
+	lib_a-xdr_mem.$(OBJEXT) lib_a-xdr_rec.$(OBJEXT) \
+	lib_a-xdr_reference.$(OBJEXT) lib_a-xdr_sizeof.$(OBJEXT) \
+	lib_a-xdr_stdio.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@am__objects_2 = $(am__objects_1)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = lib_a-dummy.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libtime_la_LIBADD =
-am__objects_2 = asctime.lo asctime_r.lo clock.lo ctime.lo ctime_r.lo \
-	difftime.lo gettzinfo.lo gmtime.lo gmtime_r.lo lcltime.lo \
-	lcltime_r.lo mktime.lo mktm_r.lo strftime.lo strptime.lo \
-	time.lo tzlock.lo tzset.lo tzset_r.lo tzvars.lo wcsftime.lo
-@USE_LIBTOOL_TRUE@am_libtime_la_OBJECTS = $(am__objects_2)
-libtime_la_OBJECTS = $(am_libtime_la_OBJECTS)
-libtime_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+libxdr_la_LIBADD =
+am__objects_3 = xdr_private.lo xdr.lo xdr_float.lo xdr_array.lo \
+	xdr_mem.lo xdr_rec.lo xdr_reference.lo xdr_sizeof.lo \
+	xdr_stdio.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@am__objects_4 = $(am__objects_3)
+@USE_LIBTOOL_TRUE@am_libxdr_la_OBJECTS = dummy.lo $(am__objects_4)
+libxdr_la_OBJECTS = $(am_libxdr_la_OBJECTS)
+libxdr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libtime_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_LIBTOOL_TRUE@am_libtime_la_rpath =
+	$(libxdr_la_LDFLAGS) $(LDFLAGS) -o $@
+@USE_LIBTOOL_TRUE@am_libxdr_la_rpath =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
@@ -92,7 +88,7 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(lib_a_SOURCES) $(libtime_la_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(libxdr_la_SOURCES)
 DATA = $(noinst_DATA)
 ETAGS = etags
 CTAGS = ctags
@@ -239,52 +235,32 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-LIB_SOURCES = \
-	asctime.c	\
-	asctime_r.c	\
-	clock.c		\
-	ctime.c		\
-	ctime_r.c	\
-	difftime.c	\
-	gettzinfo.c	\
-	gmtime.c	\
-	gmtime_r.c	\
-	lcltime.c	\
-	lcltime_r.c	\
-	mktime.c	\
-	mktm_r.c	\
-	strftime.c  	\
-	strptime.c	\
-	time.c		\
-	tzlock.c	\
-	tzset.c		\
-	tzset_r.c	\
-	tzvars.c	\
-	wcsftime.c
+GENERAL_SOURCES = \
+  xdr_private.c \
+  xdr.c \
+  xdr_float.c \
+  xdr_array.c \
+  xdr_mem.c \
+  xdr_rec.c \
+  xdr_reference.c \
+  xdr_sizeof.c \
+  xdr_stdio.c
 
-libtime_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libtime.la
-@USE_LIBTOOL_TRUE@libtime_la_SOURCES = $(LIB_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_FALSE@ELIX_SOURCES = $(GENERAL_SOURCES)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@ELIX_LEVEL_4_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+libxdr_la_LDFLAGS = -Xcompiler -nostdlib
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libxdr.la
+@USE_LIBTOOL_TRUE@libxdr_la_SOURCES = dummy.c $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = dummy.c $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-CHEWOUT_FILES = \
-	asctime.def	\
-	clock.def 	\
-	ctime.def	\
-	difftime.def	\
-	gmtime.def	\
-	lcltime.def	\
-	mktime.def	\
-	strftime.def	\
-	time.def	\
-	tzlock.def	\
-	tzset.def	\
-	wcsftime.def
-
 SUFFIXES = .def
+CHEWOUT_FILES = 
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi
 CLEANFILES = $(CHEWOUT_FILES) *.ref
@@ -301,9 +277,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/..
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus time/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus xdr/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus time/Makefile
+	  $(AUTOMAKE) --cygnus xdr/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -338,8 +314,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libtime.la: $(libtime_la_OBJECTS) $(libtime_la_DEPENDENCIES) 
-	$(libtime_la_LINK) $(am_libtime_la_rpath) $(libtime_la_OBJECTS) $(libtime_la_LIBADD) $(LIBS)
+libxdr.la: $(libxdr_la_OBJECTS) $(libxdr_la_DEPENDENCIES) 
+	$(libxdr_la_LINK) $(am_libxdr_la_rpath) $(libxdr_la_OBJECTS) $(libxdr_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -356,131 +332,65 @@ distclean-compile:
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
 
-lib_a-asctime.o: asctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.o `test -f 'asctime.c' || echo '$(srcdir)/'`asctime.c
+lib_a-dummy.o: dummy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.o `test -f 'dummy.c' || echo '$(srcdir)/'`dummy.c
 
-lib_a-asctime.obj: asctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime.obj `if test -f 'asctime.c'; then $(CYGPATH_W) 'asctime.c'; else $(CYGPATH_W) '$(srcdir)/asctime.c'; fi`
+lib_a-dummy.obj: dummy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummy.obj `if test -f 'dummy.c'; then $(CYGPATH_W) 'dummy.c'; else $(CYGPATH_W) '$(srcdir)/dummy.c'; fi`
 
-lib_a-asctime_r.o: asctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.o `test -f 'asctime_r.c' || echo '$(srcdir)/'`asctime_r.c
+lib_a-xdr_private.o: xdr_private.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.o `test -f 'xdr_private.c' || echo '$(srcdir)/'`xdr_private.c
 
-lib_a-asctime_r.obj: asctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asctime_r.obj `if test -f 'asctime_r.c'; then $(CYGPATH_W) 'asctime_r.c'; else $(CYGPATH_W) '$(srcdir)/asctime_r.c'; fi`
+lib_a-xdr_private.obj: xdr_private.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_private.obj `if test -f 'xdr_private.c'; then $(CYGPATH_W) 'xdr_private.c'; else $(CYGPATH_W) '$(srcdir)/xdr_private.c'; fi`
 
-lib_a-clock.o: clock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.o `test -f 'clock.c' || echo '$(srcdir)/'`clock.c
+lib_a-xdr.o: xdr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.o `test -f 'xdr.c' || echo '$(srcdir)/'`xdr.c
 
-lib_a-clock.obj: clock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clock.obj `if test -f 'clock.c'; then $(CYGPATH_W) 'clock.c'; else $(CYGPATH_W) '$(srcdir)/clock.c'; fi`
+lib_a-xdr.obj: xdr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr.obj `if test -f 'xdr.c'; then $(CYGPATH_W) 'xdr.c'; else $(CYGPATH_W) '$(srcdir)/xdr.c'; fi`
 
-lib_a-ctime.o: ctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.o `test -f 'ctime.c' || echo '$(srcdir)/'`ctime.c
+lib_a-xdr_float.o: xdr_float.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.o `test -f 'xdr_float.c' || echo '$(srcdir)/'`xdr_float.c
 
-lib_a-ctime.obj: ctime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime.obj `if test -f 'ctime.c'; then $(CYGPATH_W) 'ctime.c'; else $(CYGPATH_W) '$(srcdir)/ctime.c'; fi`
+lib_a-xdr_float.obj: xdr_float.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_float.obj `if test -f 'xdr_float.c'; then $(CYGPATH_W) 'xdr_float.c'; else $(CYGPATH_W) '$(srcdir)/xdr_float.c'; fi`
 
-lib_a-ctime_r.o: ctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.o `test -f 'ctime_r.c' || echo '$(srcdir)/'`ctime_r.c
+lib_a-xdr_array.o: xdr_array.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.o `test -f 'xdr_array.c' || echo '$(srcdir)/'`xdr_array.c
 
-lib_a-ctime_r.obj: ctime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ctime_r.obj `if test -f 'ctime_r.c'; then $(CYGPATH_W) 'ctime_r.c'; else $(CYGPATH_W) '$(srcdir)/ctime_r.c'; fi`
+lib_a-xdr_array.obj: xdr_array.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_array.obj `if test -f 'xdr_array.c'; then $(CYGPATH_W) 'xdr_array.c'; else $(CYGPATH_W) '$(srcdir)/xdr_array.c'; fi`
 
-lib_a-difftime.o: difftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.o `test -f 'difftime.c' || echo '$(srcdir)/'`difftime.c
+lib_a-xdr_mem.o: xdr_mem.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.o `test -f 'xdr_mem.c' || echo '$(srcdir)/'`xdr_mem.c
 
-lib_a-difftime.obj: difftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-difftime.obj `if test -f 'difftime.c'; then $(CYGPATH_W) 'difftime.c'; else $(CYGPATH_W) '$(srcdir)/difftime.c'; fi`
+lib_a-xdr_mem.obj: xdr_mem.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_mem.obj `if test -f 'xdr_mem.c'; then $(CYGPATH_W) 'xdr_mem.c'; else $(CYGPATH_W) '$(srcdir)/xdr_mem.c'; fi`
 
-lib_a-gettzinfo.o: gettzinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.o `test -f 'gettzinfo.c' || echo '$(srcdir)/'`gettzinfo.c
+lib_a-xdr_rec.o: xdr_rec.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.o `test -f 'xdr_rec.c' || echo '$(srcdir)/'`xdr_rec.c
 
-lib_a-gettzinfo.obj: gettzinfo.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettzinfo.obj `if test -f 'gettzinfo.c'; then $(CYGPATH_W) 'gettzinfo.c'; else $(CYGPATH_W) '$(srcdir)/gettzinfo.c'; fi`
+lib_a-xdr_rec.obj: xdr_rec.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_rec.obj `if test -f 'xdr_rec.c'; then $(CYGPATH_W) 'xdr_rec.c'; else $(CYGPATH_W) '$(srcdir)/xdr_rec.c'; fi`
 
-lib_a-gmtime.o: gmtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.o `test -f 'gmtime.c' || echo '$(srcdir)/'`gmtime.c
+lib_a-xdr_reference.o: xdr_reference.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.o `test -f 'xdr_reference.c' || echo '$(srcdir)/'`xdr_reference.c
 
-lib_a-gmtime.obj: gmtime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime.obj `if test -f 'gmtime.c'; then $(CYGPATH_W) 'gmtime.c'; else $(CYGPATH_W) '$(srcdir)/gmtime.c'; fi`
+lib_a-xdr_reference.obj: xdr_reference.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_reference.obj `if test -f 'xdr_reference.c'; then $(CYGPATH_W) 'xdr_reference.c'; else $(CYGPATH_W) '$(srcdir)/xdr_reference.c'; fi`
 
-lib_a-gmtime_r.o: gmtime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.o `test -f 'gmtime_r.c' || echo '$(srcdir)/'`gmtime_r.c
+lib_a-xdr_sizeof.o: xdr_sizeof.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.o `test -f 'xdr_sizeof.c' || echo '$(srcdir)/'`xdr_sizeof.c
 
-lib_a-gmtime_r.obj: gmtime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gmtime_r.obj `if test -f 'gmtime_r.c'; then $(CYGPATH_W) 'gmtime_r.c'; else $(CYGPATH_W) '$(srcdir)/gmtime_r.c'; fi`
+lib_a-xdr_sizeof.obj: xdr_sizeof.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_sizeof.obj `if test -f 'xdr_sizeof.c'; then $(CYGPATH_W) 'xdr_sizeof.c'; else $(CYGPATH_W) '$(srcdir)/xdr_sizeof.c'; fi`
 
-lib_a-lcltime.o: lcltime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.o `test -f 'lcltime.c' || echo '$(srcdir)/'`lcltime.c
+lib_a-xdr_stdio.o: xdr_stdio.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.o `test -f 'xdr_stdio.c' || echo '$(srcdir)/'`xdr_stdio.c
 
-lib_a-lcltime.obj: lcltime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime.obj `if test -f 'lcltime.c'; then $(CYGPATH_W) 'lcltime.c'; else $(CYGPATH_W) '$(srcdir)/lcltime.c'; fi`
-
-lib_a-lcltime_r.o: lcltime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.o `test -f 'lcltime_r.c' || echo '$(srcdir)/'`lcltime_r.c
-
-lib_a-lcltime_r.obj: lcltime_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lcltime_r.obj `if test -f 'lcltime_r.c'; then $(CYGPATH_W) 'lcltime_r.c'; else $(CYGPATH_W) '$(srcdir)/lcltime_r.c'; fi`
-
-lib_a-mktime.o: mktime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.o `test -f 'mktime.c' || echo '$(srcdir)/'`mktime.c
-
-lib_a-mktime.obj: mktime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.obj `if test -f 'mktime.c'; then $(CYGPATH_W) 'mktime.c'; else $(CYGPATH_W) '$(srcdir)/mktime.c'; fi`
-
-lib_a-mktm_r.o: mktm_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktm_r.o `test -f 'mktm_r.c' || echo '$(srcdir)/'`mktm_r.c
-
-lib_a-mktm_r.obj: mktm_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktm_r.obj `if test -f 'mktm_r.c'; then $(CYGPATH_W) 'mktm_r.c'; else $(CYGPATH_W) '$(srcdir)/mktm_r.c'; fi`
-
-lib_a-strftime.o: strftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.o `test -f 'strftime.c' || echo '$(srcdir)/'`strftime.c
-
-lib_a-strftime.obj: strftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.obj `if test -f 'strftime.c'; then $(CYGPATH_W) 'strftime.c'; else $(CYGPATH_W) '$(srcdir)/strftime.c'; fi`
-
-lib_a-strptime.o: strptime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.o `test -f 'strptime.c' || echo '$(srcdir)/'`strptime.c
-
-lib_a-strptime.obj: strptime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strptime.obj `if test -f 'strptime.c'; then $(CYGPATH_W) 'strptime.c'; else $(CYGPATH_W) '$(srcdir)/strptime.c'; fi`
-
-lib_a-time.o: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.o `test -f 'time.c' || echo '$(srcdir)/'`time.c
-
-lib_a-time.obj: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.obj `if test -f 'time.c'; then $(CYGPATH_W) 'time.c'; else $(CYGPATH_W) '$(srcdir)/time.c'; fi`
-
-lib_a-tzlock.o: tzlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.o `test -f 'tzlock.c' || echo '$(srcdir)/'`tzlock.c
-
-lib_a-tzlock.obj: tzlock.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.obj `if test -f 'tzlock.c'; then $(CYGPATH_W) 'tzlock.c'; else $(CYGPATH_W) '$(srcdir)/tzlock.c'; fi`
-
-lib_a-tzset.o: tzset.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.o `test -f 'tzset.c' || echo '$(srcdir)/'`tzset.c
-
-lib_a-tzset.obj: tzset.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset.obj `if test -f 'tzset.c'; then $(CYGPATH_W) 'tzset.c'; else $(CYGPATH_W) '$(srcdir)/tzset.c'; fi`
-
-lib_a-tzset_r.o: tzset_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.o `test -f 'tzset_r.c' || echo '$(srcdir)/'`tzset_r.c
-
-lib_a-tzset_r.obj: tzset_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzset_r.obj `if test -f 'tzset_r.c'; then $(CYGPATH_W) 'tzset_r.c'; else $(CYGPATH_W) '$(srcdir)/tzset_r.c'; fi`
-
-lib_a-tzvars.o: tzvars.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.o `test -f 'tzvars.c' || echo '$(srcdir)/'`tzvars.c
-
-lib_a-tzvars.obj: tzvars.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzvars.obj `if test -f 'tzvars.c'; then $(CYGPATH_W) 'tzvars.c'; else $(CYGPATH_W) '$(srcdir)/tzvars.c'; fi`
-
-lib_a-wcsftime.o: wcsftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.o `test -f 'wcsftime.c' || echo '$(srcdir)/'`wcsftime.c
-
-lib_a-wcsftime.obj: wcsftime.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsftime.obj `if test -f 'wcsftime.c'; then $(CYGPATH_W) 'wcsftime.c'; else $(CYGPATH_W) '$(srcdir)/wcsftime.c'; fi`
+lib_a-xdr_stdio.obj: xdr_stdio.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xdr_stdio.obj `if test -f 'xdr_stdio.c'; then $(CYGPATH_W) 'xdr_stdio.c'; else $(CYGPATH_W) '$(srcdir)/xdr_stdio.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -654,23 +564,18 @@ uninstall-am:
 	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am
 
-objectlist.awk.in: $(noinst_LTLIBRARIES)
-	-rm -f objectlist.awk.in
-	for i in `ls *.lo` ; \
-	do \
-	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
-	done
-
-# This rule is needed so that wcsftime.o is rebuilt when strftime.c changes.
-
-$(lpfx)wcsftime.$(oext): strftime.c
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref
 	touch stmp-def
 
 doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/time.tex >> $(TARGETDOC)
+objectlist.awk.in: $(noinst_LTLIBRARIES)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	do \
+	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

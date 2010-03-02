@@ -974,6 +974,10 @@ install-data-local:	install-toollibLIBRARIES
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done; \
+	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/rpc; \
+	  for i in $(srcdir)/libc/include/rpc/*.h; do \
+	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/rpc/`basename $$i`; \
+	  done; \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/sys; \
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \

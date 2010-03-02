@@ -55,6 +55,7 @@ posix_dir=
 signal_dir=signal
 stdio_dir=stdio
 stdio64_dir=
+xdr_dir=
 syscall_dir=
 unix_dir=
 mach_add_setjmp=
@@ -349,6 +350,7 @@ case "${host}" in
   *-*-cygwin*)
 	posix_dir=posix
 	stdio64_dir=stdio64
+	xdr_dir=xdr
 	;;
   *-*-netware*)
 	signal_dir=

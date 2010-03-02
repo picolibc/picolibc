@@ -1,3 +1,54 @@
+2010-03-02  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Add eXtensible Data Record (XDR) support
+	* configure.host: Build libc/xdr only on cygwin.
+	* Makefile.am: Install xdr headers.
+	* libc/configure.in: Support new libc/xdr subdirectory.
+	* libc/Makefile.am: Support new libc/xdr subdirectory.
+	* libc/include/rpc/types.h: New.
+	* libc/include/rpc/xdr.h: New.
+	* libc/xdr/README: New.
+	* libc/xdr/Makefile.am: New.
+	* libc/xdr/dummy.c: New.
+	* libc/xdr/xdr.c: New.
+	* libc/xdr/xdr_array.c: New.
+	* libc/xdr/xdr_float.c: New.
+	* libc/xdr/xdr_float_vax.c: New.
+	* libc/xdr/xdr_mem.c: New.
+	* libc/xdr/xdr_private.c: New.
+	* libc/xdr/xdr_private.h: New.
+	* libc/xdr/xdr_rec.c: New.
+	* libc/xdr/xdr_reference.c: New.
+	* libc/xdr/xdr_sizeof.c: New.
+	* libc/xdr/xdr_stdio.c: New.
+
+	Regenerate using ac-2.63 and am-1.11.1
+	* libc/xdr/Makefile.in: New.
+	* Makefile.in: Regenerate.
+	* libc/configure: Regenerate.
+	* libc/Makefile.in: Regenerate.
+	* libc/argz/Makefile.in: Regenerate.
+	* libc/ctype/Makefile.in: Regenerate.
+	* libc/errno/Makefile.in: Regenerate.
+	* libc/iconv/ccs/binary/Makefile.in: Regenerate.
+	* libc/iconv/ccs/Makefile.in: Regenerate.
+	* libc/iconv/ces/Makefile.in: Regenerate.
+	* libc/iconv/lib/Makefile.in: Regenerate.
+	* libc/iconv/Makefile.in: Regenerate.
+	* libc/locale/Makefile.in: Regenerate.
+	* libc/misc/Makefile.in: Regenerate.
+	* libc/posix/Makefile.in: Regenerate.
+	* libc/reent/Makefile.in: Regenerate.
+	* libc/search/Makefile.in: Regenerate.
+	* libc/signal/Makefile.in: Regenerate.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio64/Makefile.in: Regenerate.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/syscalls/Makefile.in: Regenerate.
+	* libc/time/Makefile.in: Regenerate.
+	* libc/unix/Makefile.in: Regenerate.
+
 2010-02-26  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/common/s_ilogb.c:  Fix typo in comments that causes doc
