@@ -1,5 +1,9 @@
 2010-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygtls.h: Replace /*gentls_offsets*/ at end.
+
+2010-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* exception.h: Fix copyright.
 
 2010-02-27  Christopher Faylor  <me+cygwin@cgf.cx>
