@@ -1,3 +1,11 @@
+2010-03-02  Craig Howland <howland@LGSInnovations.com>
+       
+	* libc/include/sys/features.h:  Add POSIX.1-permitted definition of
+	_POSIX_C_SOURCE if not already defined and _XOPEN_SOURCE has an
+	appropriate value.  Specifically, check for POSIX.1-2008 & 2001 values.
+	* libc/include/sys/config.h:  Add #include <sys/features.h> so that all
+	includes get the new check added to it.
+
 2010-03-02  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	* libc/xdr/README: Correct grammatical errors.

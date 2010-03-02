@@ -2,6 +2,7 @@
 #define __SYS_CONFIG_H__
 
 #include <machine/ieeefp.h>  /* floating point macros */
+#include <sys/features.h>	/* POSIX defs */
 
 /* exceptions first */
 #if defined(__H8500__) || defined(__W65__)
