@@ -140,6 +140,14 @@ In other words, use the /cygdrive mount flags for these paths as well.
 Recognize NWFS filesystem and workaround broken OS call.
 </para></listitem>
 
+<listitem><para>
+New support for eXtensible Data Record (XDR) encoding and decoding,
+as defined by RFCs 1014, 1832, and 4506.  The XDR protocol and
+functions are useful for cross-platfrom data exchange, and are
+commonly used as the core data interchange format for Remote
+Procedure Call (RPC) and NFS.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
