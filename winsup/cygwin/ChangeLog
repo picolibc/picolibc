@@ -1,3 +1,16 @@
+2010-03-03  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Add XDR support.
+	* cygwin.din: Export xdr functions.
+	* include/cygwin/version.h: Bump version.
+	* cygxdr.cc: New.
+	* cygxdr.h: New.
+	* dcrt0.cc (dll_crt0_1): Print the (rare) xdr-related
+	error messages to stderr.
+	* Makefile.in: Add cygxdr.
+	* posix.sgml: Add new XDR functions to list of implemented Solaris
+	functions.
+
 2010-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygtls.h: Replace /*gentls_offsets*/ at end.

@@ -35,6 +35,7 @@ details. */
 #include "heap.h"
 #include "tls_pbuf.h"
 #include "exception.h"
+#include "cygxdr.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -911,6 +912,7 @@ dll_crt0_1 (void *)
       set_console_title (cp);
     }
 
+  (void) xdr_set_vprintf (&cygxdr_vwarnx);
   cygwin_finished_initializing = true;
   /* Call init of loaded dlls. */
   dlls.init ();

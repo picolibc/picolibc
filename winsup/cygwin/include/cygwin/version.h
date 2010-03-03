@@ -377,12 +377,13 @@ details. */
       221: Export strfmon.
       222: CW_INT_SETLOCALE added.
       223: SIGPWR added.
+      224: Export xdr* functions.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 223
+#define CYGWIN_VERSION_API_MINOR 224
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
