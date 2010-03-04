@@ -1,3 +1,10 @@
+2010-03-04  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* cygwin.din: Export __xdr functions.
+	* include/cygwin/version.h: Bump version.
+	* posix.sgml: Add a few more XDR functions to list
+	of implemented Solaris functions.
+
 2010-03-03  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	Add XDR support.

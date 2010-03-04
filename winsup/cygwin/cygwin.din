@@ -1861,6 +1861,8 @@ xdrrec_create SIGFE
 xdrrec_endofrecord SIGFE
 xdrrec_eof SIGFE
 xdrrec_skiprecord SIGFE
+__xdrrec_getrec SIGFE
+__xdrrec_setnonblock SIGFE
 xdrstdio_create SIGFE
 y0 NOSIGFE
 y0f NOSIGFE

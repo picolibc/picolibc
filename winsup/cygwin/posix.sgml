@@ -1124,6 +1124,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     xdrrec_endofrecord
     xdrrec_eof
     xdrrec_skiprecord
+    __xdrrec_getrec
+    __xdrrec_setnonblock
     xdrstdio_create
 </screen>
 
