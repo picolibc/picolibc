@@ -1,3 +1,10 @@
+2010-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (nt_path_has_executable_suffix): Change storage class of
+	blessed_executable_suffixes to static.
+	(rename): Revert meaning of old_explicit_suffix.  Change the rules
+	for appending a .exe suffix and (yikes!) document them.
+
 2010-03-04  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	* cygwin.din: Export __xdr functions.

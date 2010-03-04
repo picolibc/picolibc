@@ -1688,7 +1688,7 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
 static inline bool
 nt_path_has_executable_suffix (PUNICODE_STRING upath)
 {
-  const PUNICODE_STRING blessed_executable_suffixes[] =
+  static const PUNICODE_STRING blessed_executable_suffixes[] =
   {
     &ro_u_com,
     &ro_u_dll,	/* Messy, messy.  Per MSDN, the GetBinaryType function is
@@ -1820,10 +1820,9 @@ rename (const char *oldpath, const char *newpath)
       set_errno (ENOTDIR);
       goto out;
     }
-  if ((oldpc.known_suffix
+  if (oldpc.known_suffix
        && (ascii_strcasematch (oldpath + olen - 4, ".lnk")
 	   || ascii_strcasematch (oldpath + olen - 4, ".exe")))
-      || nt_path_has_executable_suffix (oldpc.get_nt_native_path ()))
     old_explicit_suffix = true;
 
   nlen = strlen (newpath);
@@ -1931,9 +1930,14 @@ rename (const char *oldpath, const char *newpath)
 					      &ro_u_lnk, TRUE))
 	rename_append_suffix (newpc, newpath, nlen, ".lnk");
       else if (oldpc.is_binary () && !old_explicit_suffix
+	       && oldpc.known_suffix
 	       && !nt_path_has_executable_suffix (newpc.get_nt_native_path ()))
-	/* To rename an executable foo.exe to bar-without-suffix, the
-	   .exe suffix must be given explicitly in oldpath. */
+	/* Never append .exe suffix if oldpath had .exe suffix given
+	   explicitely, or if oldpath wasn't already a .exe file, or
+	   if the destination filename has one of the blessed executable
+	   suffixes.
+	   Note: To rename an executable foo.exe to bar-without-suffix,
+	   the .exe suffix must be given explicitly in oldpath. */
 	rename_append_suffix (newpc, newpath, nlen, ".exe");
     }
   else
@@ -1961,8 +1965,13 @@ rename (const char *oldpath, const char *newpath)
 	}
       else if (oldpc.is_binary ())
 	{
-	  /* Never append .exe suffix if file has any suffix already. */
-	  if (!nt_path_has_executable_suffix (newpc.get_nt_native_path ()))
+	  /* Never append .exe suffix if oldpath had .exe suffix given
+	     explicitely, or if newfile is a binary (in which case the given
+	     name probably makes sesne as it is), or if the destination
+	     filename has one of the blessed executable suffixes. */
+	  if (!old_explicit_suffix && oldpc.known_suffix
+	      && !newpc.is_binary ()
+	      && !nt_path_has_executable_suffix (newpc.get_nt_native_path ()))	
 	    {
 	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
 	      removepc = &newpc;
