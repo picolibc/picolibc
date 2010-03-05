@@ -812,10 +812,16 @@
 #define VER_DEF_CURRENT		1
 
 /* These constants appear in the vd_flags field of a Elf32_Verdef
-   structure.  */
+   structure.
+
+   Cf. the Solaris Linker and Libraries Guide, Ch. 7, Object File Format,
+   Versioning Sections, for a description:
+
+   http://docs.sun.com/app/docs/doc/819-0690/chapter6-93046?l=en&a=view  */
 
 #define VER_FLG_BASE		0x1
 #define VER_FLG_WEAK		0x2
+#define VER_FLG_INFO		0x4
 
 /* These special constants can be found in an Elf32_Versym field.  */
 
