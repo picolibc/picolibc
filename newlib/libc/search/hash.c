@@ -53,6 +53,7 @@ static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
 #include <assert.h>
 #endif
 
+#define __DBINTERFACE_PRIVATE	/* activate prototypes from db_local.h */
 #include "db_local.h"
 #include "hash.h"
 #include "page.h"
@@ -103,10 +104,12 @@ int hash_accesses, hash_collisions, hash_expansions, hash_overflows;
 /* OPEN/CLOSE */
 
 extern DB *
-__hash_open(file, flags, mode, info, dflags)
-	const char *file;
-	int flags, mode, dflags;
-	const HASHINFO *info;	/* Special directives for create */
+_DEFUN(__hash_open, (file, flags, mode, info, dflags),
+	const char *file _AND
+	int flags _AND
+	int mode _AND
+	int dflags _AND
+	const HASHINFO *info)	/* Special directives for create */
 {
 	HTAB *hashp;
 

@@ -22,15 +22,11 @@
 #include <machine/weakalias.h>
 #include <machine/huge_val.h>
 
-#define INFINITY HUGE_VALF
-
 #define __nan nan
 #define __isnan isnan
 #define __isinf isinf
 #define __copysignf copysignf
 #define __copysign copysign
-#define __isnanf isnanf
-#define __isinff isinff
 #define __nanf nanf
 #define feraiseexcept(x) /* nothing */
 #define __sincos sincos

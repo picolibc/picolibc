@@ -29,7 +29,6 @@ static	float	one	= 1.0, tiny=1.0e-30;
 #endif
 {
 	float z;
-	__int32_t 	sign = (__int32_t)0x80000000; 
 	__uint32_t r,hx;
 	__int32_t ix,s,q,m,t,i;
 

@@ -86,7 +86,6 @@ _DEFUN (getenv, (name),
 	_CONST char *name)
 {
   int offset;
-  char *_findenv_r ();
 
   return _findenv_r (_REENT, name, &offset);
 }

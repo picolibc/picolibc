@@ -210,7 +210,7 @@ DB *dbopen(const char *, int, int, DBTYPE, const void *);
 
 #ifdef __DBINTERFACE_PRIVATE
 DB	*__bt_open(const char *, int, int, const BTREEINFO *, int);
-DB	*__hash_open(const char *, int, int, const HASHINFO *, int);
+DB	*__hash_open(const char *, int, int, int, const HASHINFO *);
 DB	*__rec_open(const char *, int, int, const RECNOINFO *, int);
 void	 __dbpanic(DB *dbp);
 #endif

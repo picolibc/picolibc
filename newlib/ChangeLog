@@ -1,5 +1,18 @@
+2010-03-05  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/math/ef_sqrt.c: Delete unused variable sign.
+	* libc/stdlib/getenv.c: Delete "char *_findenv_r ();", as is not a
+	proper prototype, and is properly prototyped in stdlib.h, anyway.
+	* libc/stdlib/getenv_r.c: Ditto.
+	* libc/search/hash.c: Add _DEFUN to __hash_open() declaration; add
+	#define __DBINTERFACE_PRIVATE to activate prototypes from db_local.h.
+	* libc/search/db_local.h: Correct __hash_open() prototype.
+	* libc/sys/linux/cmath/math_private.h:  Eliminate compiler warnings:
+	Remove #define INFINITY (redefines from math.h); remove #define __isnanf
+	and #define __isinff isinff.
+
 2010-03-02  Craig Howland <howland@LGSInnovations.com>
-       
+
 	* libc/include/sys/features.h:  Add POSIX.1-permitted definition of
 	_POSIX_C_SOURCE if not already defined and _XOPEN_SOURCE has an
 	appropriate value.  Specifically, check for POSIX.1-2008 & 2001 values.
