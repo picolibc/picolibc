@@ -1,3 +1,7 @@
+2010-03-06 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.18.
+
 2010-03-02  Daniel Atallah <datallah@users.sourceforge.net>
 
 	* include/stdio.h: (_vscprintf, _vscwprintf)
