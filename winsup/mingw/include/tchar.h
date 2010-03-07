@@ -81,6 +81,7 @@ typedef wchar_t _TCHAR;
 #define	_vftprintf	vfwprintf
 #define _vstprintf	vswprintf
 #define	_vsntprintf	_vsnwprintf
+#define	_vsctprintf	_vscwprintf
 #define	_tscanf		wscanf
 #define	_ftscanf	fwscanf
 #define	_stscanf	swscanf
@@ -298,6 +299,7 @@ typedef char	_TCHAR;
 #define	_vftprintf	vfprintf
 #define _vstprintf	vsprintf
 #define	_vsntprintf	_vsnprintf
+#define	_vsctprintf	_vscprintf
 #define	_tscanf		scanf
 #define	_ftscanf	fscanf
 #define	_stscanf	sscanf

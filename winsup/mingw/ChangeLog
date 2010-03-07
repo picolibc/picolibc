@@ -1,3 +1,8 @@
+2010-03-02  Daniel Atallah <datallah@users.sourceforge.net>
+
+	* include/stdio.h: (_vscprintf, _vscwprintf)
+	* include/tchar.h: (_vsctprintf)
+	
 2010-02-14  Roumen Petrov  <rumen@users.sourceforge.net>
 
 	Issue [2134161]: time64 functions and types for msvcrt >= 8.0
