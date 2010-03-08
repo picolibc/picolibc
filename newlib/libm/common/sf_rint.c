@@ -57,7 +57,7 @@ TWO23[2]={
 		i = (0x007fffff)>>j0;
 		if((i0&i)==0) return x; /* x is integral */
 		i>>=1;
-		if((i0&i)!=0) i0 = (i0&(~i))|((0x100000)>>j0);
+		if((i0&i)!=0) i0 = (i0&(~i))|((0x200000)>>j0);
 	    }
 	} else {
 	    if(!FLT_UWORD_IS_FINITE(ix)) return x+x; /* inf or NaN */

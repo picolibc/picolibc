@@ -1,3 +1,12 @@
+2010-03-08  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_rint.c:  Fix error when integral part had 18 bits and
+	fraction had bits set beyond first radix bit.  Also, make 2-part
+	adjustment consistent with 1-part adjustment when adjusting fractional
+	bits.
+	* libm/common/sf_rint.c:  Make fractional-bit adjustment consistent
+	with s_rint.c by setting 0b.01 instead of 0b.001.
+
 2010-03-05  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/math/ef_sqrt.c: Delete unused variable sign.
