@@ -1,3 +1,9 @@
+2010-03-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/posix/telldir.c (dd_loccnt): Change start index to be 1 
+	instead of 0.
+	(_seekdir): A loc of 0 now means rewind dir.
+
 2010-03-08  Craig Howland <howland@LGSInnovations.com>
 
 	* libm/common/s_rint.c:  Fix error when integral part had 18 bits and
