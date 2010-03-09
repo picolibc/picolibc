@@ -37,6 +37,7 @@ HANDLE NO_COPY cygwin_user_h;
 WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
 UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
 WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
+static LONG shared_mem_inited __attribute__((section (".cygwin_dll_common"), shared));
 
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation_root.  Note that we can't handle Cygwin installation
@@ -114,7 +115,6 @@ init_installation_root ()
       installation_key.Length = 0;
       installation_key.Buffer[0] = L'\0';
     }
-
 }
 
 /* This function returns a handle to the top-level directory in the global
@@ -216,16 +216,23 @@ static ptrdiff_t offsets[] =
 
 void * __stdcall
 open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
-	     shared_locations& m, PSECURITY_ATTRIBUTES psa, DWORD access)
+	     shared_locations m, PSECURITY_ATTRIBUTES psa, DWORD access)
+{
+  return open_shared (name, n, shared_h, size, &m, psa, access);
+}
+
+void * __stdcall
+open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
+	     shared_locations *m, PSECURITY_ATTRIBUTES psa, DWORD access)
 {
   void *shared;
 
   void *addr;
-  if (m == SH_JUSTCREATE || m == SH_JUSTOPEN)
+  if (*m == SH_JUSTCREATE || *m == SH_JUSTOPEN)
     addr = NULL;
   else
     {
-      addr = off_addr (m);
+      addr = off_addr (*m);
       VirtualFree (addr, 0, MEM_RELEASE);
     }
 
@@ -233,23 +240,23 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
   WCHAR *mapname = NULL;
 
   if (shared_h)
-    m = SH_JUSTOPEN;
+    *m = SH_JUSTOPEN;
   else
     {
       if (name)
 	mapname = shared_name (map_buf, name, n);
-      if (m == SH_JUSTOPEN)
+      if (*m == SH_JUSTOPEN)
 	shared_h = OpenFileMappingW (access, FALSE, mapname);
       else
 	{
 	  shared_h = CreateFileMappingW (INVALID_HANDLE_VALUE, psa,
 					PAGE_READWRITE, 0, size, mapname);
 	  if (GetLastError () == ERROR_ALREADY_EXISTS)
-	    m = SH_JUSTOPEN;
+	    *m = SH_JUSTOPEN;
 	}
       if (shared_h)
 	/* ok! */;
-      else if (m != SH_JUSTOPEN)
+      else if (*m != SH_JUSTOPEN)
 	api_fatal ("CreateFileMapping %W, %E.  Terminating.", mapname);
       else
 	return NULL;
@@ -272,7 +279,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
   if (!shared)
     api_fatal ("MapViewOfFileEx '%W'(%p), %E.  Terminating.", mapname, shared_h);
 
-  if (m == SH_CYGWIN_SHARED && offsets[0])
+  if (*m == SH_CYGWIN_SHARED && offsets[0])
     {
       ptrdiff_t delta = (caddr_t) shared - (caddr_t) off_addr (0);
       offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
@@ -337,10 +344,9 @@ user_shared_create (bool reinit)
   if (!cygwin_user_h)
     cygheap->user.get_windows_id (name);
 
-  shared_locations sh_user_shared = SH_USER_SHARED;
   user_shared = (user_info *) open_shared (name, USER_VERSION,
-					    cygwin_user_h, sizeof (user_info),
-					    sh_user_shared, &sec_none);
+					   cygwin_user_h, sizeof (user_info),
+					   SH_USER_SHARED, &sec_none);
   debug_printf ("opening user shared for '%W' at %p", name, user_shared);
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
@@ -382,26 +388,16 @@ shared_info::initialize ()
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
   if (!sversion)
     {
-      /* Initialize installation root dir. This is put here just to piggyback on the
-	 shared memory spinlock.  The installation root does not live in shared_info
-	 shared memory.  */
-      init_installation_root ();
-      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
-      tty.init ();		/* Initialize tty table.  */
-      mt.initialize ();		/* Initialize shared tape information. */
-      debug_printf ("Installation root: <%W> key: <%S>",
-		    installation_root, &installation_key);
-      cb = sizeof (*this);	/* Do last, after all shared memory initialization */
+      cb = sizeof (*this);
+      get_session_parent_dir ();	/* Create session dir if first process. */
+      init_obcaseinsensitive ();	/* Initialize obcaseinsensitive */
+      tty.init ();			/* Initialize tty table  */
+      mt.initialize ();			/* Initialize shared tape information */
     }
-  else
+  else if (sversion != SHARED_VERSION_MAGIC)
     {
-      if (sversion != SHARED_VERSION_MAGIC)
-	{
-	  InterlockedExchange ((LONG *) &version, sversion);
-	  multiple_cygwin_problem ("system shared memory version", sversion, SHARED_VERSION_MAGIC);
-	}
-      while (!cb)
-	low_priority_sleep (0);	// Should be hit only very very rarely
+      InterlockedExchange ((LONG *) &version, sversion);
+      multiple_cygwin_problem ("system shared memory version", sversion, SHARED_VERSION_MAGIC);
     }
 
   if (cb != SHARED_INFO_CB)
@@ -422,15 +418,39 @@ memory_init (bool init_cygheap)
     }
 
   /* Initialize general shared memory */
-  shared_locations sh_cygwin_shared;
-  cygwin_shared = (shared_info *) open_shared (L"shared",
-					       CYGWIN_VERSION_SHARED_DATA,
-					       cygwin_shared_h,
-					       sizeof (*cygwin_shared),
-					       sh_cygwin_shared = SH_CYGWIN_SHARED);
-  cygwin_shared->initialize ();
+  for (;;)
+    {
+      LONG smi = InterlockedExchange (&shared_mem_inited, -1);
+      if (smi < 0)
+	{
+	  low_priority_sleep (0);
+	  continue;
+	}
+
+      if (!smi)
+	/* Initialize installation root dir */
+	init_installation_root ();
+
+      /* Installation root dir has been globally initialized */
+      cygwin_shared = (shared_info *) open_shared (L"shared",
+						   CYGWIN_VERSION_SHARED_DATA,
+						   cygwin_shared_h,
+						   sizeof (*cygwin_shared),
+						   SH_CYGWIN_SHARED);
+	if (!smi)
+	  {
+	    cygwin_shared->initialize ();
+	    /* Defer debug output printing the installation root and installation key
+	       up to this point.  Debug output except for system_printf requires
+	       the global shared memory to exist. */
+	    debug_printf ("Installation root: <%W> key: <%S>",
+			  installation_root, &installation_key);
+	    smi = 1;
+	  }
+      InterlockedExchange (&shared_mem_inited, smi);
+      break;
+    }
   heap_init ();
-  get_session_parent_dir ();	/* Create session dir if first process. */
   user_shared_create (false);
 }
 

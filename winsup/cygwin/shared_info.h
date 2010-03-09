@@ -97,10 +97,12 @@ HANDLE get_shared_parent_dir ();
 HANDLE get_session_parent_dir ();
 char *__stdcall shared_name (char *, const char *, int);
 WCHAR *__stdcall shared_name (WCHAR *, const WCHAR *, int);
-void *__stdcall open_shared (const WCHAR *name, int n, HANDLE &shared_h,
-			     DWORD size, shared_locations&,
-			     PSECURITY_ATTRIBUTES psa = &sec_all,
-			     DWORD access = FILE_MAP_READ | FILE_MAP_WRITE);
+void *__stdcall open_shared (const WCHAR *, int, HANDLE&, DWORD,
+			     shared_locations, PSECURITY_ATTRIBUTES = &sec_all,
+			     DWORD = FILE_MAP_READ | FILE_MAP_WRITE);
+void *__stdcall open_shared (const WCHAR *, int, HANDLE&, DWORD,
+			     shared_locations *, PSECURITY_ATTRIBUTES = &sec_all,
+			     DWORD = FILE_MAP_READ | FILE_MAP_WRITE);
 extern void user_shared_create (bool reinit);
 extern void user_shared_initialize ();
 extern void init_installation_root ();

@@ -897,7 +897,6 @@ format_process_mounts (void *data, char *&destbuf)
   if (p->pid != myself->pid)
     {
       WCHAR sid_string[UNLEN + 1] = L""; /* Large enough for SID */
-      shared_locations sl = SH_JUSTOPEN;
 
       cygsid p_sid;
 
@@ -905,7 +904,7 @@ format_process_mounts (void *data, char *&destbuf)
       	return 0;
       p_sid.string (sid_string);
       u_shared = (user_info *) open_shared (sid_string, USER_VERSION, u_hdl,
-					    sizeof (user_info), sl,
+					    sizeof (user_info), SH_JUSTOPEN,
 					    &sec_none_nih);
       if (!u_shared)
 	return 0;

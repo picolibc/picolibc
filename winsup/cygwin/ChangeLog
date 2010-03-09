@@ -1,3 +1,21 @@
+2010-03-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* shared_info.h (open_shared): Create function wrapper for common use
+	case.
+	(open_shared): Change fifth argument to a pointer rather than a
+	reference.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Eliminate use
+	of dummy variable and call open_shared with constant.
+	* fhandler_process.cc (format_process_mounts): Ditto.
+	* pinfo.cc (pinfo::init): Pass pointer to shloc.
+	* shared.cc (shared_mem_inited): New variable.
+	(open_shared): Crate function wrapper for common use case.
+	(open_shared): Accommodate change to fifth argument to a pointer.
+	(shared_info::initialize): Remove spinlock test.  Simplify function.
+	Move get_session_parent_dir call back here.
+	(memory_init): Protect global shared settings with shared_mem_inited
+	spinlock.  Move get_session_parent_dir call to shared_info::initialize.
+
 2010-03-09  Christopher Faylor  <me.cygwin@cgf.cx>
 
 	* shared.cc (inst_root_inited): Delete.
