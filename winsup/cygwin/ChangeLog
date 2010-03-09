@@ -1,3 +1,12 @@
+2010-03-09  Christopher Faylor  <me.cygwin@cgf.cx>
+
+	* shared.cc (inst_root_inited): Delete.
+	* (shared_info::initialize): Reorganize.  Move call to
+	init_installation_root here under spinlock control.  Move unneeded
+	non-shared_info initialization out of this function.
+	(memory_init): Remove call to init_installation_root.  Call heap_init
+	and get_session_parent_dir here.
+
 2010-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (nt_path_has_executable_suffix): Change storage class of

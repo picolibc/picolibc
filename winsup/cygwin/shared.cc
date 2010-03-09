@@ -37,7 +37,6 @@ HANDLE NO_COPY cygwin_user_h;
 WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
 UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
 WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
-static bool inst_root_inited;
 
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation_root.  Note that we can't handle Cygwin installation
@@ -116,7 +115,6 @@ init_installation_root ()
       installation_key.Buffer[0] = L'\0';
     }
 
-  inst_root_inited = true;
 }
 
 /* This function returns a handle to the top-level directory in the global
@@ -382,7 +380,20 @@ void
 shared_info::initialize ()
 {
   DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
-  if (sversion)
+  if (!sversion)
+    {
+      /* Initialize installation root dir. This is put here just to piggyback on the
+	 shared memory spinlock.  The installation root does not live in shared_info
+	 shared memory.  */
+      init_installation_root ();
+      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
+      tty.init ();		/* Initialize tty table.  */
+      mt.initialize ();		/* Initialize shared tape information. */
+      debug_printf ("Installation root: <%W> key: <%S>",
+		    installation_root, &installation_key);
+      cb = sizeof (*this);	/* Do last, after all shared memory initialization */
+    }
+  else
     {
       if (sversion != SHARED_VERSION_MAGIC)
 	{
@@ -391,17 +402,6 @@ shared_info::initialize ()
 	}
       while (!cb)
 	low_priority_sleep (0);	// Should be hit only very very rarely
-    }
-
-  heap_init ();
-  get_session_parent_dir ();	/* Create session dir if first process. */
-
-  if (!sversion)
-    {
-      init_obcaseinsensitive ();/* Initialize obcaseinsensitive. */
-      tty.init ();		/* Initialize tty table.  */
-      mt.initialize ();		/* Initialize shared tape information. */
-      cb = sizeof (*this);	/* Do last, after all shared memory initialization */
     }
 
   if (cb != SHARED_INFO_CB)
@@ -421,10 +421,6 @@ memory_init (bool init_cygheap)
       cygheap->user.init ();
     }
 
-  /* Initialize installation root dir. */
-  if (!installation_root[0])
-    init_installation_root ();
-
   /* Initialize general shared memory */
   shared_locations sh_cygwin_shared;
   cygwin_shared = (shared_info *) open_shared (L"shared",
@@ -432,13 +428,9 @@ memory_init (bool init_cygheap)
 					       cygwin_shared_h,
 					       sizeof (*cygwin_shared),
 					       sh_cygwin_shared = SH_CYGWIN_SHARED);
-  /* Defer debug output printing the installation root and installation key
-     up to this point.  Debug output except for system_printf requires
-     the global shared memory to exist. */
-  if (inst_root_inited)
-    debug_printf ("Installation root: <%W> key: <%S>",
-		  installation_root, &installation_key);
   cygwin_shared->initialize ();
+  heap_init ();
+  get_session_parent_dir ();	/* Create session dir if first process. */
   user_shared_create (false);
 }
 
