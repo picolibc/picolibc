@@ -417,7 +417,7 @@ memory_init (bool init_cygheap)
       cygheap->user.init ();
     }
 
-  /* Initialize general shared memory */
+  /* Initialize general shared memory under spinlock control */
   for (;;)
     {
       LONG smi = InterlockedExchange (&shared_mem_inited, -1);
@@ -437,16 +437,17 @@ memory_init (bool init_cygheap)
 						   cygwin_shared_h,
 						   sizeof (*cygwin_shared),
 						   SH_CYGWIN_SHARED);
-	if (!smi)
-	  {
-	    cygwin_shared->initialize ();
-	    /* Defer debug output printing the installation root and installation key
-	       up to this point.  Debug output except for system_printf requires
-	       the global shared memory to exist. */
-	    debug_printf ("Installation root: <%W> key: <%S>",
-			  installation_root, &installation_key);
-	    smi = 1;
-	  }
+      if (!smi)
+	{
+	  cygwin_shared->initialize ();
+	  /* Defer debug output printing the installation root and installation key
+	     up to this point.  Debug output except for system_printf requires
+	     the global shared memory to exist. */
+	  debug_printf ("Installation root: <%W> key: <%S>",
+			installation_root, &installation_key);
+	  smi = 1;
+	}
+
       InterlockedExchange (&shared_mem_inited, smi);
       break;
     }
