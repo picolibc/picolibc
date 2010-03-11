@@ -1,3 +1,7 @@
+2010-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.bloda): Add "Credant Guardian Shield".
+
 2010-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup2.sgml (setup-env): Add cross reference to using-cygwinenv.
