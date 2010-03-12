@@ -160,7 +160,7 @@ tty_list::terminate ()
 	      i = 0;
 	    }
 
-	  low_priority_sleep (200);
+	  Sleep (200);
 	}
 
       lock_ttys here ();

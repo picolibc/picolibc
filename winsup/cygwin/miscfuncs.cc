@@ -228,43 +228,11 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return (ssize_t) tot;
 }
 
-extern "C" int
-low_priority_sleep (DWORD secs)
+void
+yield ()
 {
-  HANDLE thisthread = GetCurrentThread ();
-  int curr_prio = GetThreadPriority (thisthread);
-  bool staylow;
-  if (secs != INFINITE)
-    staylow = false;
-  else
-    {
-      secs = 0;
-      staylow = true;
-    }
-
-  if (!secs)
-    {
-      for (int i = 0; i < 3; i++)
-	SwitchToThread ();
-    }
-  else
-    {
-      int new_prio;
-      if (GetCurrentThreadId () == cygthread::main_thread_id)
-	new_prio = THREAD_PRIORITY_LOWEST;
-      else
-	new_prio = GetThreadPriority (hMainThread);
-
-      if (curr_prio != new_prio)
-	/* Force any threads in normal priority to be scheduled */
-	SetThreadPriority (thisthread, new_prio);
-      Sleep (secs);
-
-      if (!staylow && curr_prio != new_prio)
-	SetThreadPriority (thisthread, curr_prio);
-    }
-
-  return curr_prio;
+  for (int i = 0; i < 3; i++)
+    SwitchToThread ();
 }
 
 /* Get a default value for the nice factor.  When changing these values,

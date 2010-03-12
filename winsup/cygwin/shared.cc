@@ -318,7 +318,7 @@ user_shared_initialize ()
   else
     {
       while (!user_shared->cb)
-	low_priority_sleep (0);	// Should be hit only very very rarely
+	yield ();	// Should be hit only very very rarely
       if (user_shared->version != sversion)
 	multiple_cygwin_problem ("user shared memory version", user_shared->version, sversion);
       else if (user_shared->cb != sizeof (*user_shared))
@@ -423,7 +423,7 @@ memory_init (bool init_cygheap)
       LONG smi = InterlockedExchange (&shared_mem_inited, -1);
       if (smi < 0)
 	{
-	  low_priority_sleep (0);
+	  yield ();
 	  continue;
 	}
 
@@ -431,12 +431,13 @@ memory_init (bool init_cygheap)
 	/* Initialize installation root dir */
 	init_installation_root ();
 
-      /* Installation root dir has been globally initialized */
       cygwin_shared = (shared_info *) open_shared (L"shared",
 						   CYGWIN_VERSION_SHARED_DATA,
 						   cygwin_shared_h,
 						   sizeof (*cygwin_shared),
 						   SH_CYGWIN_SHARED);
+      heap_init ();
+
       if (!smi)
 	{
 	  cygwin_shared->initialize ();
@@ -451,7 +452,6 @@ memory_init (bool init_cygheap)
       InterlockedExchange (&shared_mem_inited, smi);
       break;
     }
-  heap_init ();
   user_shared_create (false);
 }
 

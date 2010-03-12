@@ -1,3 +1,15 @@
+2010-03-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	Throughout change all calls of low_priority_sleep (0) to yield ().
+	* miscfuncs.cc (yield): Rename from low_priority_sleep.  Remove all of
+	the logic which called Sleep() and just use SwitchToThread.
+	* miscfuncs.h (yield): Rename from low_priority_sleep.
+	(SLEEP_0_STAY_LOW): Delete unused define.
+	* shared.cc (memory_init): Move heap_init() call directly after shared
+	memory initialization to more closely mimic long-standing program flow.
+	* tty.cc (tty_list::terminate): Replace call to low_priority_sleep with
+	Sleep.
+
 2010-03-10  Christopher Faylor  <me.cygwin@cgf.cx>
 
 	* shared.cc (memory_init): Fix comment.  Fix indentation.

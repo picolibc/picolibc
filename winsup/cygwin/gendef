@@ -126,8 +126,7 @@ __sigfe:
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	xorl	%eax,%eax				# nope.  It was not zero
-	call	_low_priority_sleep			# should be a short-time thing, so
+	call	_yield			# should be a short-time thing, so
 	jmp	1b					# sleep and loop
 2:	movl	\$4,%eax				# have the lock, now increment the
 	xadd	%eax,$tls::stackptr(%ebx)		#  stack pointer and get pointer
@@ -151,8 +150,7 @@ __sigbe:						# return here after cygwin syscall
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	xorl	%eax,%eax				# nope.  not zero
-	call	_low_priority_sleep			# sleep
+	call	_yield			# sleep
 	jmp	1b					#  and loop
 2:	movl	\$-4,%eax				# now decrement aux stack
 	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
@@ -177,8 +175,7 @@ _sigreturn:
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	xorl	%eax,%eax				# nope.  not zero
-	call	_low_priority_sleep			# sleep
+	call	_yield			# sleep
 	jmp	1b					#  and loop
 2:	popl	%edx					# saved errno
 	testl	%edx,%edx				# Is it < 0
@@ -258,8 +255,7 @@ __ZN7_cygtls4lockEv:
 	lock	xchgl %eax,$tls::pstacklock(%ebx)
 	testl	%eax,%eax
 	jz	2f
-	xorl	%eax,%eax
-	call	_low_priority_sleep
+	call	_yield
 	jmp	1b
 2:	popl	%ebx
 	ret
@@ -283,8 +279,7 @@ stabilize_sig_stack:
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax
 	jz	2f
-	xorl	%eax,%eax
-	call	_low_priority_sleep
+	call	_yield
 	jmp	1b
 2:	cmpl	\$0,$tls::sig(%ebx)
 	jz	3f

@@ -258,7 +258,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	      mapaddr = NULL;
 	    }
 	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
-	  low_priority_sleep (0);
+	  yield ();
 	  continue;
 	}
 
@@ -313,7 +313,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
     loop:
       release ();
       if (h0)
-	low_priority_sleep (0);
+	yield ();
     }
 
   if (h)
@@ -978,7 +978,7 @@ _pinfo::sync_proc_pipe ()
 {
   if (wr_proc_pipe && wr_proc_pipe != INVALID_HANDLE_VALUE)
     while (wr_proc_pipe_owner != GetCurrentProcessId ())
-      low_priority_sleep (0);
+      yield ();
 }
 
 /* function to send a "signal" to the parent when something interesting happens

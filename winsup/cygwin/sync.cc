@@ -36,7 +36,7 @@ muto::init (const char *s)
   char *already_exists = (char *) InterlockedExchangePointer (&name, s);
   if (already_exists)
     while (!bruteforce)
-      low_priority_sleep (0);
+      yield ();
   else
     {
       waiters = -1;

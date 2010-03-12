@@ -456,7 +456,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
     {
       postcreate ();
       while (!cygtls)
-	low_priority_sleep (0);
+	yield ();
     }
   retval = magic;
   mutex.unlock ();

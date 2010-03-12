@@ -2775,7 +2775,7 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
   for (int i = 0; i < NUM_PORTS; i++)
     {
       while ((myport = InterlockedExchange (&cygwin_shared->last_used_bindresvport, -1)) == -1)
-	low_priority_sleep (0);
+	yield ();
       if (myport == 0 || --myport < PORT_LOW)
 	myport = PORT_HIGH;
       InterlockedExchange (&cygwin_shared->last_used_bindresvport, myport);

@@ -557,7 +557,7 @@ get_cygwin_startup_info ()
 	      {
 		res->ready (false);
 		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
-		  low_priority_sleep (0);
+		  yield ();
 		strace.hello ();
 	      }
 	    break;

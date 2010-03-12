@@ -616,7 +616,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	debug_printf ("SetThreadAffinityMask failed %E");
       // I'm not sure whether the thread changes processor immediately
       // and I'm not sure whether this function will cause the thread to be rescheduled
-      low_priority_sleep (0);
+      yield ();
 
       bool has_cpuid = false;
 

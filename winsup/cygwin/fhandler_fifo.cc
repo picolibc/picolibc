@@ -46,7 +46,7 @@ fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
       if (h != INVALID_HANDLE_VALUE || GetLastError () != ERROR_PIPE_NOT_CONNECTED)
 	return h;
       if (&_my_tls != _main_tls)
-	low_priority_sleep (0);
+	yield ();
       else if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
 	{
 	  set_errno (EINTR);

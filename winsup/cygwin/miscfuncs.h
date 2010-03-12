@@ -18,8 +18,7 @@ bool __stdcall create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
   __attribute__ ((regparm (3)));
 #define CreatePipe create_pipe
 
-extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
-#define SLEEP_0_STAY_LOW INFINITE
+extern "C" void yield ();
 
 void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);

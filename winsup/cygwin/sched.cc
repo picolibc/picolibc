@@ -483,7 +483,7 @@ sched_setscheduler (pid_t pid, int policy,
 int
 sched_yield ()
 {
-  low_priority_sleep (0);
+  yield ();
   return 0;
 }
 }

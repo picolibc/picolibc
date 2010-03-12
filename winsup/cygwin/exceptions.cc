@@ -440,7 +440,7 @@ try_to_debug (bool waitloop)
 	return dbg;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	low_priority_sleep (0);
+	yield ();
       Sleep (2000);
     }
 
@@ -901,7 +901,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	break;
 
       sigproc_printf ("couldn't interrupt.  trying again.");
-      low_priority_sleep (0);
+      yield ();
     }
 
 out:

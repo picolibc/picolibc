@@ -41,7 +41,7 @@ cygthread::callfunc (bool issimplestub)
     {
       /* Wait for main thread to assign 'h' */
       while (!h)
-	low_priority_sleep (0);
+	yield ();
       if (ev)
 	CloseHandle (ev);
       ev = h;
@@ -196,7 +196,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, size_t n, void *param,
       if (ev)
 	ResetEvent (ev);
       while (!thread_sync)
-	low_priority_sleep (0);
+	yield ();
       SetEvent (thread_sync);
       thread_printf ("activated name '%s', thread_sync %p for thread %p", name, thread_sync, id);
       htobe = h;
@@ -217,7 +217,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, size_t n, void *param,
   if (n)
     {
       while (!ev)
-	low_priority_sleep (0);
+	yield ();
       WaitForSingleObject (ev, INFINITE);
       ResetEvent (ev);
     }
@@ -256,7 +256,7 @@ cygthread::operator
 HANDLE ()
 {
   while (!ev)
-    low_priority_sleep (0);
+    yield ();
   return ev;
 }
 
@@ -287,7 +287,7 @@ cygthread::terminate_thread ()
   bool terminated = true;
   debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", __name, id, inuse, stack_ptr);
   while (inuse && !stack_ptr)
-    low_priority_sleep (0);
+    yield ();
 
   if (!inuse)
     goto force_notterminated;

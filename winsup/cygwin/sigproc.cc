@@ -583,7 +583,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       HANDLE dupsig;
       DWORD dwProcessId;
       for (int i = 0; !p->sendsig && i < 10000; i++)
-	low_priority_sleep (0);
+	yield ();
       if (p->sendsig)
 	{
 	  dupsig = p->sendsig;
@@ -1011,7 +1011,7 @@ remove_proc (int ci)
 	 the proc_waiter thread has already done this by the time we
 	 get here.  */
       while (!procs[nprocs].waiter_ready)
-	low_priority_sleep (0);
+	yield ();
       procs[ci] = procs[nprocs];
     }
   return 0;

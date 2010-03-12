@@ -216,7 +216,7 @@ std_dll_init ()
     do
       {
 	InterlockedDecrement (&dll->here);
-	low_priority_sleep (0);
+	yield ();
       }
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
@@ -259,7 +259,7 @@ wsock_init ()
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
-      low_priority_sleep (0);
+      yield ();
     }
 
   if (!wsock_started)
