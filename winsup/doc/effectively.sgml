@@ -155,23 +155,24 @@ endings, but <systemitem>cygutils</systemitem> provides several dedicated progra
 Another problem area is between Unix-style links, which link one file
 to another, and Microsoft .lnk files, which provide a shortcut to a
 file.  They seem similar at first glance but, in reality, are fairly 
-different.  By default, Cygwin uses a mechanism that creates symbolic
-links that are compatible with standard Microsoft .lnk files. However,
-they do not include much of the information that is available in a 
-standard Microsoft shortcut, such as the working directory, an icon, 
-etc.  The <systemitem>cygutils</systemitem> package includes a 
-<command>mkshortcut</command> 
-utility for creating standard Microsoft .lnk files.
+different.  By default, Cygwin does not create symlinks as .lnk files,
+but there's an option to do that, see <xref linkend="using-cygwinenv"></xref>.
+These symlink .lnk files are compatible with Windows-created .lnk files,
+but they are still different.  They do not include much of the information
+that is available in a standard Microsoft shortcut, such as the working
+directory, an icon, etc.  The <systemitem>cygutils</systemitem>
+package includes a <command>mkshortcut</command> utility for creating
+standard native Microsoft .lnk files.
 </para>
 
 <para>
-If Cygwin handled these native shortcuts like any other symlink, 
-you could not archive Microsoft .lnk files into <command>tar</command>
-archives and keep all the information in them.  After unpacking, 
-these shortcuts would have lost all the extra information and would
-be no different than standard Cygwin symlinks. Therefore these two types 
-of links are treated differently.  Unfortunately, this means that the 
-usual Unix way of creating and using symlinks does not work with 
+But here's the problem.  If Cygwin handled these native shortcuts like any
+other symlink, you could not archive Microsoft .lnk files into
+<command>tar</command> archives and keep all the information in them. 
+After unpacking, these shortcuts would have lost all the extra information
+and would be no different than standard Cygwin symlinks. Therefore these two
+types of links are treated differently.  Unfortunately, this means that the 
+usual Unix way of creating and using symlinks does not work with native
 Windows shortcuts. 
 </para>
 </sect2>

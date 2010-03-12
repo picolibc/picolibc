@@ -1,3 +1,7 @@
+2010-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* effectively.sgml (using-shortcuts): Match chapter with reality.
+
 2010-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.bloda): Add "Credant Guardian Shield".
