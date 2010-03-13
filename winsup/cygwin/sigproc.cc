@@ -494,7 +494,9 @@ sigproc_terminate (exit_states es)
 {
   exit_states prior_exit_state = exit_state;
   exit_state = es;
-  if (prior_exit_state >= ES_FINAL)
+  if (!cygwin_finished_initializing)
+    sigproc_printf ("don't worry about signal thread");
+  else if (prior_exit_state >= ES_FINAL)
     sigproc_printf ("already performed");
   else
     {

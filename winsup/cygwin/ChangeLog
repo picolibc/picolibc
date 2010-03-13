@@ -1,3 +1,16 @@
+2010-03-13  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* spinlock.h: New file.
+	(spinlock): New class.
+	* shared.cc: Include spinlock.h.
+	(memory_init): Use new spinlock methods rather than roll-your-own.
+	Time out after ten seconds if shared_mem_inited is not initialized.
+
+	* sync.h: Update copyright.  Remove vanity attribution.
+
+	* sigproc.cc (sigproc_terminate): Avoid attempts to kill the signal
+	thread while we're still initializing or suffer a deadlock.
+
 2010-03-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	Throughout change all calls of low_priority_sleep (0) to yield ().

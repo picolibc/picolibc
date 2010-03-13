@@ -23,6 +23,7 @@ details. */
 #include "registry.h"
 #include "cygwin_version.h"
 #include "pwdgrp.h"
+#include "spinlock.h"
 #include "ntdll.h"
 #include <alloca.h>
 #include <wchar.h>
@@ -418,40 +419,28 @@ memory_init (bool init_cygheap)
     }
 
   /* Initialize general shared memory under spinlock control */
-  for (;;)
-    {
-      LONG smi = InterlockedExchange (&shared_mem_inited, -1);
-      if (smi < 0)
-	{
-	  yield ();
-	  continue;
-	}
+  {
+    spinlock smi (shared_mem_inited, 10000);
+    if (!smi)
+      init_installation_root ();	/* Initialize installation root dir */
 
-      if (!smi)
-	/* Initialize installation root dir */
-	init_installation_root ();
+    cygwin_shared = (shared_info *) open_shared (L"shared",
+						 CYGWIN_VERSION_SHARED_DATA,
+						 cygwin_shared_h,
+						 sizeof (*cygwin_shared),
+						 SH_CYGWIN_SHARED);
+    heap_init ();
 
-      cygwin_shared = (shared_info *) open_shared (L"shared",
-						   CYGWIN_VERSION_SHARED_DATA,
-						   cygwin_shared_h,
-						   sizeof (*cygwin_shared),
-						   SH_CYGWIN_SHARED);
-      heap_init ();
-
-      if (!smi)
-	{
-	  cygwin_shared->initialize ();
-	  /* Defer debug output printing the installation root and installation key
-	     up to this point.  Debug output except for system_printf requires
-	     the global shared memory to exist. */
-	  debug_printf ("Installation root: <%W> key: <%S>",
-			installation_root, &installation_key);
-	  smi = 1;
-	}
-
-      InterlockedExchange (&shared_mem_inited, smi);
-      break;
-    }
+    if (!smi)
+      {
+	cygwin_shared->initialize ();
+	/* Defer debug output printing the installation root and installation key
+	   up to this point.  Debug output except for system_printf requires
+	   the global shared memory to exist. */
+	debug_printf ("Installation root: <%W> key: <%S>",
+		      installation_root, &installation_key);
+      }
+  }
   user_shared_create (false);
 }
 
