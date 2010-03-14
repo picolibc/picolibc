@@ -1,3 +1,11 @@
+2010-03-14  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from gcc:
+	2010-01-11  Richard Guenther  <rguenther@suse.de>
+	PR lto/41569
+	* Makefile.def (all-lto-plugin): Depend on all-gcc.
+	* Makefile.in: Regenerated.
+
 2010-03-01  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 
 	PR libstdc++/32499
