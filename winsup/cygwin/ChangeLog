@@ -1,5 +1,10 @@
 2010-03-15  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* sigproc.cc (no_signals_available): Get sense of the test right for
+	previous botched change.
+
+2010-03-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* sigproc.cc (no_signals_available): Don't try to send a signal if
 	still in cygwin startup code.
 
