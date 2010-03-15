@@ -2965,7 +2965,7 @@ seteuid32 (__uid32_t uid)
   groups.ischanged = FALSE;
   if (!issamesid)
     /* Recreate and fill out the user shared region for a new user. */
-    user_shared_create (true);
+    user_info::create (true);
   return 0;
 }
 

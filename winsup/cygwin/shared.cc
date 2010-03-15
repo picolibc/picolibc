@@ -24,7 +24,6 @@ details. */
 #include "cygwin_version.h"
 #include "pwdgrp.h"
 #include "spinlock.h"
-#include "ntdll.h"
 #include <alloca.h>
 #include <wchar.h>
 #include <wingdi.h>
@@ -38,7 +37,9 @@ HANDLE NO_COPY cygwin_user_h;
 WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
 UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
 WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
-static LONG shared_mem_inited __attribute__((section (".cygwin_dll_common"), shared));
+static LONG installation_root_inited __attribute__((section (".cygwin_dll_common"), shared));
+
+#define SPIN_WAIT 10000
 
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation_root.  Note that we can't handle Cygwin installation
@@ -63,58 +64,61 @@ static LONG shared_mem_inited __attribute__((section (".cygwin_dll_common"), sha
    multiple Cygwin DLLs, which we're just not aware of right now.  Cygcheck
    can be used to change the value in an existing Cygwin DLL binary. */
 
-void
+void inline
 init_installation_root ()
 {
-  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
-    api_fatal ("Can't initialize Cygwin installation root dir.\n"
-	       "GetModuleFileNameW(%p, %p, %u), %E",
-	       cygwin_hmodule, installation_root, PATH_MAX);
-  PWCHAR p = installation_root;
-  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+  if (!spinlock (installation_root_inited))
     {
-      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+      if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+	api_fatal ("Can't initialize Cygwin installation root dir.\n"
+		   "GetModuleFileNameW(%p, %p, %u), %E",
+		   cygwin_hmodule, installation_root, PATH_MAX);
+      PWCHAR p = installation_root;
+      if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
 	{
-	  p = wcpcpy (p, L"\\??\\UN");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
-	  *p = L'C';
+	  if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+	    {
+	      p = wcpcpy (p, L"\\??\\UN");
+	      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	      *p = L'C';
+	    }
+	  else
+	    {
+	      p = wcpcpy (p, L"\\??\\");
+	      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	    }
 	}
-      else
+      installation_root[1] = L'?';
+
+      RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
+				 sizeof installation_key_buf);
+      RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
+				  &installation_key, FALSE);
+
+      PWCHAR w = wcsrchr (installation_root, L'\\');
+      if (w)
 	{
-	  p = wcpcpy (p, L"\\??\\");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	  *w = L'\0';
+	  w = wcsrchr (installation_root, L'\\');
 	}
-    }
-  installation_root[1] = L'?';
-
-  RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
-			     sizeof installation_key_buf);
-  RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
-			      &installation_key, FALSE);
-
-  PWCHAR w = wcsrchr (installation_root, L'\\');
-  if (w)
-    {
+      if (!w)
+	api_fatal ("Can't initialize Cygwin installation root dir.\n"
+		   "Invalid DLL path");
       *w = L'\0';
-      w = wcsrchr (installation_root, L'\\');
-    }
-  if (!w)
-    api_fatal ("Can't initialize Cygwin installation root dir.\n"
-	       "Invalid DLL path");
-  *w = L'\0';
 
-  for (int i = 1; i >= 0; --i)
-    {
-      reg_key r (i, KEY_WRITE, CYGWIN_INFO_INSTALLATIONS_NAME, NULL);
-      if (r.set_string (installation_key_buf, installation_root)
-	  == ERROR_SUCCESS)
-      	break;
-    }
+      for (int i = 1; i >= 0; --i)
+	{
+	  reg_key r (i, KEY_WRITE, CYGWIN_INFO_INSTALLATIONS_NAME, NULL);
+	  if (r.set_string (installation_key_buf, installation_root)
+	      == ERROR_SUCCESS)
+	    break;
+	}
 
-  if (cygwin_props.disable_key)
-    {
-      installation_key.Length = 0;
-      installation_key.Buffer[0] = L'\0';
+      if (cygwin_props.disable_key)
+	{
+	  installation_key.Length = 0;
+	  installation_key.Buffer[0] = L'\0';
+	}
     }
 }
 
@@ -301,35 +305,32 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 
 /* Second half of user shared initialization: Initialize content. */
 void
-user_shared_initialize ()
+user_info::initialize ()
 {
-  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &user_shared->version, USER_VERSION_MAGIC);
   /* Wait for initialization of the Cygwin per-user shared, if necessary */
+  spinlock sversion (version, CURR_USER_MAGIC);
   if (!sversion)
     {
+      cb =  sizeof (*user_shared);
       cygpsid sid (cygheap->user.sid ());
       struct passwd *pw = internal_getpwsid (sid);
       /* Correct the user name with what's defined in /etc/passwd before
 	 loading the user fstab file. */
       if (pw)
 	cygheap->user.set_name (pw->pw_name);
-      user_shared->mountinfo.init ();	/* Initialize the mount table.  */
-      user_shared->cb =  sizeof (*user_shared);
+      mountinfo.init ();	/* Initialize the mount table.  */
     }
-  else
-    {
-      while (!user_shared->cb)
-	yield ();	// Should be hit only very very rarely
-      if (user_shared->version != sversion)
-	multiple_cygwin_problem ("user shared memory version", user_shared->version, sversion);
-      else if (user_shared->cb != sizeof (*user_shared))
-	multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
-    }
+  else if (sversion != CURR_USER_MAGIC)
+    sversion.multiple_cygwin_problem ("user shared memory version", version,
+				      sversion);
+  else if (user_shared->cb != sizeof (*user_shared))
+    sversion.multiple_cygwin_problem ("user shared memory size", cb,
+				      sizeof (*user_shared));
 }
 
 /* First half of user shared initialization: Create shared mem region. */
 void
-user_shared_create (bool reinit)
+user_info::create (bool reinit)
 {
   WCHAR name[UNLEN + 1] = L""; /* Large enough for SID */
 
@@ -352,7 +353,7 @@ user_shared_create (bool reinit)
   ProtectHandleINH (cygwin_user_h);
   debug_printf ("user shared version %x", user_shared->version);
   if (reinit)
-    user_shared_initialize ();
+    user_shared->initialize ();
 }
 
 void __stdcall
@@ -383,10 +384,21 @@ shared_info::init_obcaseinsensitive ()
   debug_printf ("obcaseinsensitive set to %d", obcaseinsensitive);
 }
 
+void inline
+shared_info::create ()
+{
+  cygwin_shared = (shared_info *) open_shared (L"shared",
+					       CYGWIN_VERSION_SHARED_DATA,
+					       cygwin_shared_h,
+					       sizeof (*cygwin_shared),
+					       SH_CYGWIN_SHARED);
+  cygwin_shared->initialize ();
+}
+
 void
 shared_info::initialize ()
 {
-  DWORD sversion = (DWORD) InterlockedExchange ((LONG *) &version, SHARED_VERSION_MAGIC);
+  spinlock sversion (version, CURR_SHARED_MAGIC);
   if (!sversion)
     {
       cb = sizeof (*this);
@@ -394,16 +406,19 @@ shared_info::initialize ()
       init_obcaseinsensitive ();	/* Initialize obcaseinsensitive */
       tty.init ();			/* Initialize tty table  */
       mt.initialize ();			/* Initialize shared tape information */
+      /* Defer debug output printing the installation root and installation key
+	 up to this point.  Debug output except for system_printf requires
+	 the global shared memory to exist. */
+      debug_printf ("Installation root: <%W> key: <%S>",
+		    installation_root, &installation_key);
     }
-  else if (sversion != SHARED_VERSION_MAGIC)
-    {
-      InterlockedExchange ((LONG *) &version, sversion);
-      multiple_cygwin_problem ("system shared memory version", sversion, SHARED_VERSION_MAGIC);
-    }
-
-  if (cb != SHARED_INFO_CB)
+  else if (sversion != (LONG) CURR_SHARED_MAGIC)
+    sversion.multiple_cygwin_problem ("system shared memory version",
+				      sversion, CURR_SHARED_MAGIC);
+  else if (cb != sizeof (*this))
     system_printf ("size of shared memory region changed from %u to %u",
-		   SHARED_INFO_CB, cb);
+		   sizeof (*this), cb);
+  heap_init ();
 }
 
 void
@@ -418,30 +433,9 @@ memory_init (bool init_cygheap)
       cygheap->user.init ();
     }
 
-  /* Initialize general shared memory under spinlock control */
-  {
-    spinlock smi (shared_mem_inited, 10000);
-    if (!smi)
-      init_installation_root ();	/* Initialize installation root dir */
-
-    cygwin_shared = (shared_info *) open_shared (L"shared",
-						 CYGWIN_VERSION_SHARED_DATA,
-						 cygwin_shared_h,
-						 sizeof (*cygwin_shared),
-						 SH_CYGWIN_SHARED);
-    heap_init ();
-
-    if (!smi)
-      {
-	cygwin_shared->initialize ();
-	/* Defer debug output printing the installation root and installation key
-	   up to this point.  Debug output except for system_printf requires
-	   the global shared memory to exist. */
-	debug_printf ("Installation root: <%W> key: <%S>",
-		      installation_root, &installation_key);
-      }
-  }
-  user_shared_create (false);
+  init_installation_root ();	/* Initialize installation root dir */
+  shared_info::create ();	/* Initialize global shared memory */
+  user_info::create (false);	/* Initialize per-user shared memory */
 }
 
 unsigned

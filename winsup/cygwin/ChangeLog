@@ -1,5 +1,55 @@
 2010-03-15  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* shared_info.h (user_info): Add dll_crt0_1 as a friend.
+	(user_info::version): Make LONG to accommodate spinlock use.
+	(user_info::create): New static function renamed from user_info_create.
+	(user_info::initialize): New private function renamed from
+	user_info_initialize.
+	(SHARED_VERSION): Delete.
+	(SHARED_VERSION_MAGIC): Ditto.
+	(USER_VERSION_MAGIC): Ditto.
+	(SHARED_INFO_CB): Ditto.
+	(USER_VERSION): Ditto.
+	(USER_VERSION_MAGIC): Ditto.
+	(CURR_SHARED_MAGIC): Update.
+	(CURR_USER_MAGIC): Ditto.
+	(shared_info::version): Make LONG to accommodate spinlock use.
+	(shared_info::create): New static function mirroring user_info::create.
+	(dll_crt0_1): Accommodate change to user_info::initialize.
+	* spinlock.h (spinlock::setto): New variable member.
+	(spinlock::done): New function.
+	(spinlock::spinlock): Generalize to allow arbitrary values and
+	timeouts.  Call done() when lock is not needed.
+	* ntdll.h: Make multiple-inclusion safe.
+	(NtQuerySystemTime): Declare.
+	* shared.cc (installation_root_inited): Rename from shared_mem_inited.
+	(init_installation_root): Make inline.  Use a spinlock to ensure that
+	this is initialized only once per session.
+	(user_info::initialize): Rename from user_shared_initialize.  Protect
+	with spinlock on sversion and remove other spinlock-like things.
+	Remove reference to user_shared since it is now implicit.  Refer to
+	spinlock version of multiple_cygwin_problem to ensure that any spinlock
+	is released.
+	(user_info::create): Rename from user_shared_create.  Accommodate
+	change from user_shared_initialize to user_info::initialize.
+	(shared_info::create): New inline function.
+	(shared_info::initialize): Protect with spinlock on sversion.  Move
+	heap_init back under specific control of shared_info spinlock.  Remove
+	reference to SHARED_INFO_CB and just use sizeof(*this).
+	(memory_init): Move all locking into respective functions where it is
+	needed.  Accommodate name changes.  Remove call to heap_init().
+	* syscalls.cc (seteuid32): Accommodate name change to
+	user_info::create().
+
+	* mount.cc (mount_info::create_root_entry): Report on errors from
+	add_item since they should be nonexistent.
+	(mount_info::init): Don't initialize nmounts.  It should already be
+	zero.  Give more verbose error when root_idx < 0.  Implicitly use this
+	pointer rather than explicitly referencing mount_table->.
+	(mount_info::add_item): Minor whitespace fix.
+
+2010-03-15  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* sigproc.cc (no_signals_available): Get sense of the test right for
 	previous botched change.
 

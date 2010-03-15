@@ -9,6 +9,8 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#ifndef _NTDLL_H
+#define _NTDLL_H 1
 #define STATUS_NOT_ALL_ASSIGNED       ((NTSTATUS) 0x00000106)
 #define STATUS_OBJECT_NAME_EXISTS     ((NTSTATUS) 0x40000000)
 #define STATUS_BUFFER_OVERFLOW        ((NTSTATUS) 0x80000005)
@@ -937,6 +939,9 @@ extern "C"
 				ULONG, ULONG *);
   NTSTATUS NTAPI NtQuerySystemInformation (SYSTEM_INFORMATION_CLASS,
 					   PVOID, ULONG, PULONG);
+
+  NTSTATUS WINAPI NtQuerySystemTime (PLARGE_INTEGER);
+
   NTSTATUS NTAPI NtQuerySecurityObject (HANDLE, SECURITY_INFORMATION,
 					PSECURITY_DESCRIPTOR, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryVirtualMemory (HANDLE, PVOID, MEMORY_INFORMATION_CLASS,
@@ -1094,3 +1099,4 @@ extern "C"
     return NtSetInformationFile(h, &io, &fbi, sizeof fbi, FileBasicInformation);
   }
 }
+#endif /*_NTDLL_H*/

@@ -778,7 +778,7 @@ dll_crt0_1 (void *)
      have overridden malloc.  We only know about that at this stage,
      unfortunately. */
   malloc_init ();
-  user_shared_initialize ();
+  user_shared->initialize ();
 
 #ifdef CGF
   int i = 0;

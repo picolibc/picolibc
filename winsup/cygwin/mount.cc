@@ -338,8 +338,11 @@ mount_info::create_root_entry (const PWCHAR root)
     The entry is immutable, unless the "override" option is given in /etc/fstab. */
   char native_root[PATH_MAX];
   sys_wcstombs (native_root, PATH_MAX, root);
-  mount_table->add_item (native_root, "/",
-			 MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
+  assert (*native_root != '\0');
+  if (add_item (native_root, "/",
+		MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC)
+      < 0)
+    api_fatal ("add_item (\"%W\", \"/\", ...) failed, errno %d", native_root, errno);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
@@ -353,7 +356,6 @@ mount_info::create_root_entry (const PWCHAR root)
 void
 mount_info::init ()
 {
-  nmounts = 0;
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
 
@@ -367,19 +369,20 @@ mount_info::init ()
   if (!got_usr_bin || !got_usr_lib)
     {
       char native[PATH_MAX];
-      assert (root_idx != -1);
+      if (root_idx < 0)
+	api_fatal ("root_idx %d, user_shared magic %p, nmounts %d", root_idx, user_shared->version, nmounts);
       char *p = stpcpy (native, mount[root_idx].native_path);
       if (!got_usr_bin)
       {
 	stpcpy (p, "\\bin");
-	mount_table->add_item (native, "/usr/bin",
-			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
+	add_item (native, "/usr/bin",
+		  MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
       }
       if (!got_usr_lib)
       {
 	stpcpy (p, "\\lib");
-	mount_table->add_item (native, "/usr/lib",
-			       MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
+	add_item (native, "/usr/lib",
+		  MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
       }
     }
 }
@@ -1285,7 +1288,7 @@ mount_info::add_item (const char *native, const char *posix,
 
   if (nativeerr || posixerr)
     {
-      set_errno (nativeerr?:posixerr);
+      set_errno (nativeerr ?: posixerr);
       return -1;
     }
 
