@@ -364,31 +364,6 @@ section <ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html">Internati
 
 <para> Cygwin uses UTF-8 by default.  To use a different character set, you
 need to set the LC_ALL, LC_CTYPE or LANG environment variables.</para>
-
-<para>To type international characters (&pound;&auml;&ouml;) in
-<literal>bash</literal>, check if the following settings are available in
-your <literal>bash</literal>, and if not, add them to your
-<literal>~/.inputrc</literal> file and restart <literal>bash</literal>:
-</para>
-<screen>
-	set meta-flag on 
-        set convert-meta off 
-        set output-meta on 
-	set input-meta on
-</screen>
-
-<para>These are options to the <literal>readline</literal> library, which
-you can read about in the <literal>bash(1)</literal> and
-<literal>readline(3)</literal> man pages. Other tools that do not use
-<literal>readline</literal> for display, such as <literal>less</literal>
-and <literal>ls</literal>, might require additional settings for doublebyte
-or multibyte charsets, which could be put
-in your <literal>~/.bashrc</literal>, for instance:
-<screen>
-alias less='/bin/less -r'
-alias ls='/bin/ls -F --color=tty --show-control-chars'
-</screen>
-</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.weirdchars">
