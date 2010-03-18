@@ -1,3 +1,8 @@
+2010-03-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* common.h (VER_FLG_*): Document.
+	(VER_FLG_INFO): Define.
+
 2010-02-23  Andrew Zabolotny  <anpaza@mail.ru>
 
 	PR binutils/11297
@@ -13,6 +18,10 @@
 
 	* common.h (NT_S390_TIMER, NT_S390_TODCMP, NT_S390_TODPREG,
 	NT_S390_CTRS and NT_S390_PREFIX): Define.
+
+2010-02-08  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h (R_SPARC_JMP_IREL, R_SPARC_IRELATIVE): Define.
 
 2010-02-02  H.J. Lu  <hongjiu.lu@intel.com>
 

@@ -1,12 +1,3 @@
-2010-03-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
-
-	* elf/common.h (VER_FLG_*): Document.
-	(VER_FLG_INFO): Define.
-
-2010-02-08  David S. Miller  <davem@davemloft.net>
-
-	* elf/sparc.h (R_SPARC_JMP_IREL, R_SPARC_IRELATIVE): Define.
-
 2010-01-13  Joel Brobecker  <brobecker@adacore.com>
 
 	Add new DW_AT_use_GNAT_descriptive_type CU attribute.
