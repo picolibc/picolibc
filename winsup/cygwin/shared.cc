@@ -67,7 +67,8 @@ static LONG installation_root_inited __attribute__((section (".cygwin_dll_common
 void inline
 init_installation_root ()
 {
-  if (!spinlock (installation_root_inited))
+  spinlock iri (installation_root_inited);
+  if (!iri)
     {
       if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
 	api_fatal ("Can't initialize Cygwin installation root dir.\n"

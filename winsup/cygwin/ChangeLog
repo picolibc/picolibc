@@ -1,3 +1,8 @@
+2010-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (init_installation_root): Change to make sure that scope of
+	the lock lasts the entire function.
+
 2010-03-15  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* shared_info.h (user_info): Add dll_crt0_1 as a friend.
