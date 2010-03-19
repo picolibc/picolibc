@@ -1,3 +1,8 @@
+2010-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_cygdrive::fstat): Add standard read
+	permissions again.
+
 2010-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (init_installation_root): Change to make sure that scope of

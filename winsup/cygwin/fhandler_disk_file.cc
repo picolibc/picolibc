@@ -2235,7 +2235,7 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_ino = 2;
-  buf->st_mode = S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+  buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
   if (!ndrives)
     set_drives ();
   char flptst[] = "X:";
