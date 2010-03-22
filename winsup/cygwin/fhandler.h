@@ -432,7 +432,7 @@ class fhandler_socket: public fhandler_base
   const HANDLE wsock_event () const { return wsock_evt; }
   const LONG serial_number () const { return wsock_events->serial_number; }
  private:
-  int wait_for_events (const long event_mask, bool dontwait);
+  int wait_for_events (const long event_mask, const DWORD flags);
   void release_events ();
 
   pid_t     sec_pid;

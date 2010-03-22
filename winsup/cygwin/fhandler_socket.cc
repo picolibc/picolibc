@@ -540,7 +540,7 @@ fhandler_socket::init_events ()
 
 int
 fhandler_socket::evaluate_events (const long event_mask, long &events,
-				  bool erase)
+				  const bool erase)
 {
   int ret = 0;
   long events_now = 0;
@@ -587,7 +587,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 }
 
 int
-fhandler_socket::wait_for_events (const long event_mask, bool dontwait)
+fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 {
   if (async_io ())
     return 0;
@@ -595,9 +595,10 @@ fhandler_socket::wait_for_events (const long event_mask, bool dontwait)
   int ret;
   long events;
 
-  while (!(ret = evaluate_events (event_mask, events, true)) && !events)
+  while (!(ret = evaluate_events (event_mask, events, !(flags & MSG_PEEK)))
+	 && !events)
     {
-      if (is_nonblocking () || dontwait)
+      if (is_nonblocking () || (flags & MSG_DONTWAIT))
 	{
 	  WSASetLastError (WSAEWOULDBLOCK);
 	  return SOCKET_ERROR;
@@ -1100,7 +1101,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)
-    res = wait_for_events (FD_CONNECT | FD_CLOSE, false);
+    res = wait_for_events (FD_CONNECT | FD_CLOSE, 0);
 
   if (!res)
     err = 0;
@@ -1201,7 +1202,7 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
   int llen = sizeof (struct sockaddr_storage);
 
   int res = 0;
-  while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, false))
+  while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, 0))
 	 && (res = ::accept (get_socket (), (struct sockaddr *) &lpeer, &llen))
 	    == SOCKET_ERROR
 	 && WSAGetLastError () == WSAEWOULDBLOCK)
@@ -1424,8 +1425,8 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   bool use_recvmsg = false;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
 
-  bool waitall = !!(wsamsg->dwFlags & MSG_WAITALL);
-  bool dontwait = !!(wsamsg->dwFlags & MSG_DONTWAIT);
+  DWORD wait_flags = wsamsg->dwFlags;
+  bool waitall = !!(wait_flags & MSG_WAITALL);
   wsamsg->dwFlags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
     {
@@ -1452,7 +1453,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
   /* Note: Don't call WSARecvFrom(MSG_PEEK) without actually having data
      waiting in the buffers, otherwise the event handling gets messed up
      for some reason. */
-  while (!(res = wait_for_events (evt_mask | FD_CLOSE, dontwait))
+  while (!(res = wait_for_events (evt_mask | FD_CLOSE, wait_flags))
 	 || saw_shutdown_read ())
     {
       if (use_recvmsg)
@@ -1609,7 +1610,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   DWORD ret = 0, err = 0, sum = 0, off = 0;
   WSABUF buf;
   bool use_sendmsg = false;
-  bool dontwait = !!(flags & MSG_DONTWAIT);
+  DWORD wait_flags = flags & MSG_DONTWAIT;
   bool nosignal = !(flags & MSG_NOSIGNAL);
 
   flags &= (MSG_OOB | MSG_DONTROUTE);
@@ -1649,7 +1650,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	    }
 	}
       while (res && err == WSAEWOULDBLOCK
-	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE, dontwait)));
+	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE, wait_flags)));
 
       if (!res)
 	{

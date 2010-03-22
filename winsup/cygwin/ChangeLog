@@ -1,3 +1,21 @@
+2010-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::evaluate_events): Make erase
+	const in parameter list.
+	(fhandler_socket::wait_for_events): Take a DWORD flags value instead of
+	just a bool.  Call evaluate_events with erase flag according to
+	MSG_PEEK value in flags.  Replace check for dontwait with check for
+	MSG_DONTWAIT in flags.
+	(fhandler_socket::connect): Call wait_for_events with 0 flags value.
+	(fhandler_socket::accept4): Ditto.
+	(fhandler_socket::recv_internal): Save flags in wait_flags.  Drop
+	dontwait variable.  Call wait_for_events with wait_flags.
+	(fhandler_socket::send_internal): Save MSG_DONTWAIT flag in wait_flags
+	and call wait_for_events with wait_flags as argument.  Drop dontwait
+	variable.
+	* fhandler.h (class fhandler_socket): Change second parameter in
+	declaration of wait_for_events to const DWORD.
+
 2010-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_cygdrive::fstat): Add standard read
