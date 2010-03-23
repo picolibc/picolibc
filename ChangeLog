@@ -1,5 +1,10 @@
 2010-03-23  Joseph Myers  <joseph@codesourcery.com>
 
+	* configure.ac (tic6x-*-*): New case.
+	* configure: Regenerate.
+
+2010-03-23  Joseph Myers  <joseph@codesourcery.com>
+
 	Merge from gcc:
 	2010-03-19  Jack Howarth <howarth@bromo.med.uc.edu>
 	PR ada/42554
