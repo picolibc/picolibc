@@ -209,6 +209,7 @@ add_locale_alias_locales ()
   const char *alias, *replace;
   char orig_locale[32];
   loc_t search, *loc;
+  size_t orig_loc_num = loc_num;
 
   FILE *fp = fopen (LOCALE_ALIAS, "rt");
   if (!fp)
@@ -237,7 +238,7 @@ add_locale_alias_locales ()
       if (c)
 	*c = '\0';
       search.name = replace;
-      loc = (loc_t *) bsearch (&search, locale, loc_num, sizeof (loc_t),
+      loc = (loc_t *) bsearch (&search, locale, orig_loc_num, sizeof (loc_t),
 			       compare_locales);
       add_locale (alias, loc ? loc->language : L"", loc ? loc->territory : L"",
 		  true);

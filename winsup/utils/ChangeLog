@@ -1,5 +1,10 @@
 2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* locale.cc (add_locale_alias_locales): Always use loc_num at function
+	start to avoid confusing bsearch.
+
+2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* locale.cc: Revert accidental checkin of unfinished changes.
 
 2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
