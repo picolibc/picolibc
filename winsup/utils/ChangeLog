@@ -1,3 +1,10 @@
+2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (print_locale_with_codeset): Drop redundant name parameter.
+	Simplify creating locale string.  Add "@" in case of a modifier.
+	(print_locale): Drop name parameter in calls to
+	print_locale_with_codeset.
+
 2010-02-25  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* utils.sgml (kill): Add SIGIO, SIGCLD, and SIGPWR.
