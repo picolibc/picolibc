@@ -1,5 +1,9 @@
 2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* locale.cc: Revert accidental checkin of unfinished changes.
+
+2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* locale.cc (print_locale_with_codeset): Drop redundant name parameter.
 	Simplify creating locale string.  Add "@" in case of a modifier.
 	(print_locale): Drop name parameter in calls to
