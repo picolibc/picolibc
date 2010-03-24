@@ -377,7 +377,7 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
 	  if (value)
 	    free (value);
 	  len = mbstowcs (NULL, n, 0) + 1;
-	  value = (wchar_t *) malloc (len);
+	  value = (wchar_t *) malloc (len * sizeof (wchar_t));
 	  mbstowcs (value, n, len);
 	  return;
 	}
@@ -387,7 +387,7 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
 	  if (value)
 	    free (value);
 	  len = mbstowcs (NULL, e + 1, 0) + 1;
-	  value = (wchar_t *) malloc (len);
+	  value = (wchar_t *) malloc (len * sizeof (wchar_t));
 	  mbstowcs (value, e + 1, len);
 	}
     }

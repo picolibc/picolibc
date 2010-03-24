@@ -1,3 +1,7 @@
+2010-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (find_key): Fix allocation size of "value".
+
 2010-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* locale.cc (add_locale_alias_locales): Always use loc_num at function
