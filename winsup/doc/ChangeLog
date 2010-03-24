@@ -1,3 +1,7 @@
+2010-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* legal.sgml: Bump copyright date.
+
 2010-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.unicode): Remove old examples.
