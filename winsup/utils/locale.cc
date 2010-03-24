@@ -114,8 +114,8 @@ print_codeset (const char *codeset)
 }
 
 void
-print_locale_with_codeset (int verbose, loc_t *locale, const char *name,
-			   bool utf8, const char *modifier)
+print_locale_with_codeset (int verbose, loc_t *locale, bool utf8,
+			   const char *modifier)
 {
   static const char *sysroot;
   char locname[32];
@@ -132,7 +132,8 @@ print_locale_with_codeset (int verbose, loc_t *locale, const char *name,
       if (!sysroot)
       	sysroot = "kernel32.dll";
     }
-  stpcpy (stpcpy (stpcpy (locname, name), utf8 ? ".utf8" : ""), modifier ?: "");
+  snprintf (locname, 32, "%s%s%s%s", locale->name, utf8 ? ".utf8" : "",
+				     modifier ? "@" : "", modifier ?: "");
   if (verbose)
     fputs ("locale: ", stdout);
   printf ("%-15s ", locname);
@@ -151,17 +152,16 @@ print_locale_with_codeset (int verbose, loc_t *locale, const char *name,
 void
 print_locale (int verbose, loc_t *locale)
 {
-  print_locale_with_codeset (verbose, locale, locale->name, false, NULL);
+  print_locale_with_codeset (verbose, locale, false, NULL);
   char *modifier = strchr (locale->name, '@');
   if (!locale->alias)
     {
       if (!modifier)
-	print_locale_with_codeset (verbose, locale, locale->name, true, NULL);
+	print_locale_with_codeset (verbose, locale, true, NULL);
       else if (!strcmp (modifier, "@cjknarrow"))
 	{
 	  *modifier++ = '\0';
-	  print_locale_with_codeset (verbose, locale, locale->name, true,
-				     modifier);
+	  print_locale_with_codeset (verbose, locale, true, modifier);
 	}
     }
 }
@@ -209,6 +209,7 @@ add_locale_alias_locales ()
   const char *alias, *replace;
   char orig_locale[32];
   loc_t search, *loc;
+  size_t orig_loc_num = loc_num;
 
   FILE *fp = fopen (LOCALE_ALIAS, "rt");
   if (!fp)
@@ -237,7 +238,7 @@ add_locale_alias_locales ()
       if (c)
 	*c = '\0';
       search.name = replace;
-      loc = (loc_t *) bsearch (&search, locale, loc_num, sizeof (loc_t),
+      loc = (loc_t *) bsearch (&search, locale, orig_loc_num, sizeof (loc_t),
 			       compare_locales);
       add_locale (alias, loc ? loc->language : L"", loc ? loc->territory : L"",
 		  true);
