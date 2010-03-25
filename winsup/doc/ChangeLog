@@ -1,3 +1,8 @@
+2010-03-25  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* pathnames.sgml: Clarify wording of user-specific fstab files.  Fix
+	typo.
+
 2010-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* legal.sgml: Bump copyright date.
