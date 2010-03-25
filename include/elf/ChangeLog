@@ -1,3 +1,8 @@
+2010-03-25  Joseph Myers  <joseph@codesourcery.com>
+
+	* common.h (ELFOSABI_C6000_ELFABI, ELFOSABI_C6000_LINUX): Define.
+	* tic6x.h: New.
+
 2010-03-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 
 	* common.h (VER_FLG_*): Document.

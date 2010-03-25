@@ -1,3 +1,8 @@
+2010-03-25  Joseph Myers  <joseph@codesourcery.com>
+
+	* tic6x-control-registers.h, tic6x-insn-formats.h,
+	tic6x-opcode-table.h, tic6x.h: New.
+
 2010-02-25  Wu Zhangjin  <wuzhangjin@gmail.com>
 
 	* mips.h: (LOONGSON2F_NOP_INSN): New macro.

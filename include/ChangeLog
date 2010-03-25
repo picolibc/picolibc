@@ -1,3 +1,7 @@
+2010-03-25  Joseph Myers  <joseph@codesourcery.com>
+
+	* dis-asm.h (print_insn_tic6x): Declare.
+
 2010-03-23  Joseph Myers  <joseph@codesourcery.com>
 
 	* symcat.h (CONCAT5, CONCAT6, XCONCAT5, XCONCAT6): Define.
