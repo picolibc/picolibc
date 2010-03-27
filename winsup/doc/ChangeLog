@@ -1,5 +1,9 @@
 2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml (setup-locale-charsetlist): Add EUC-CN and GB2312.
+
+2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* textbinary.sgml: Add missing </para>.
 
 2010-03-27  Christopher Faylor  <me+cygwin@cgf.cx>

@@ -579,8 +579,10 @@ of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
     ISO-8859-16             -   (not available)
 
     Big5                    950 (ANSI/OEM Traditional Chinese)
+    EUCCN or euc-CN         936 (ANSI/OEM Simplified Chinese)
     EUCJP or euc-JP       20932 (EUC Japanese)
     EUCKR or euc-KR         949 (EUC Korean)
+    GB2312                  936 (ANSI/OEM Simplified Chinese)
     GBK                     936 (ANSI/OEM Simplified Chinese)
     GEORGIAN-PS             -   (not available)
     KOI8-R                20866 (KOI8-R Russian Cyrillic)
