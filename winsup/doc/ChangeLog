@@ -1,3 +1,7 @@
+2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* textbinary.sgml: Add missing </para>.
+
 2010-03-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* textbinary.sgml: Remove tr example and just mention u2d and d2u

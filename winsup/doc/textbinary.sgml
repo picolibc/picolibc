@@ -72,6 +72,7 @@ and <command> program &lt; filename </command> are not equivalent when
 be used to add or remove CR's from a file.  <command>u2d</command> add's CR's before a NL.
 <command>d2u</command> removes CR's.  Use the --help option to these commands
 for more information.
+</para>
 </listitem>
 </orderedlist>
 </sect2>
