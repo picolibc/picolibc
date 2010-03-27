@@ -68,43 +68,12 @@ Non-Cygwin shells always pipe and redirect with binary mode. With
 non-Cygwin shells the commands <command> cat filename | program </command>
 and <command> program &lt; filename </command> are not equivalent when
 <filename>filename</filename> is on a text-mounted partition. </para>
+<para>The programs <command>u2d</command> and <command>d2u</command> can
+be used to add or remove CR's from a file.  <command>u2d</command> add's CR's before a NL.
+<command>d2u</command> removes CR's.  Use the --help option to these commands
+for more information.
 </listitem>
 </orderedlist>
-</sect2>
-
-<sect2 id="textbin-example"><title>Example</title>
-<para>To illustrate the various rules, we provide scripts to delete CRs
-from files by using the <command>tr</command> program, which can only write
-to standard output. 
-The script</para>
-<screen>
-<![CDATA[
-#!/bin/sh
-# Remove \r from the file given as argument
-tr -d '\r' < "$1" > "$1".nocr
-]]>
-</screen>
-<para> will not work on a text mounted systems because the \r will be 
-reintroduced on writing. However scripts such as </para>
-<screen>
-<![CDATA[
-#!/bin/sh
-# Remove \r from the file given as argument
-tr -d '\r' | gzip | gunzip > "$1".nocr
-]]>
-</screen>
-<para>and the .bat file</para>
-<screen>
-<![CDATA[
-REM Remove \r from the file given as argument
-@echo off
-tr -d \r < %1 > %1.nocr
-]]>
-</screen>
-<para> work fine. In the first case we rely on <command>gunzip</command> to
-set its output to binary mode, possibly overriding the mode used by the shell.
-In the second case we rely on the DOS shell to redirect in binary mode.
-</para>
 </sect2>
 
 <sect2 id="textbin-question"><title>Binary or text?</title>

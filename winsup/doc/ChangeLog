@@ -1,3 +1,8 @@
+2010-03-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* textbinary.sgml: Remove tr example and just mention u2d and d2u
+	instead.
+
 2010-03-25  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pathnames.sgml: Clarify wording of user-specific fstab files.  Fix
