@@ -1,3 +1,7 @@
+2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (print_charmaps): Add EUC-CN and GB2312.
+
 2010-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (find_key): Fix allocation size of "value".
