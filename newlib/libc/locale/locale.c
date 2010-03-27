@@ -81,7 +81,8 @@ build with multibyte support and support for all ISO and Windows Codepage.
 Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
 only newlib for Cygwin is built with full charset support by default.
 Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"eucKR">>, and <<"Big5">>.  Cygwin does not support <<"JIS">>.
+<<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and <<"Big5">>.  Cygwin
+does not support <<"JIS">>.
 
 Cygwin additionally supports locales from the file
 /usr/share/locale/locale.alias.
@@ -587,7 +588,12 @@ restart:
 #endif /* !__CYGWIN__ */
     case 'E':
     case 'e':
-      if (!strcasecmp (charset, "EUCJP") || !strcasecmp (charset, "EUC-JP"))
+      if (strncasecmp (charset, "EUC", 3))
+	FAIL;
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (!strcasecmp (c, "JP"))
 	{
 	  strcpy (charset, "EUCJP");
 	  mbc_max = 3;
@@ -595,15 +601,21 @@ restart:
 	  l_mbtowc = __eucjp_mbtowc;
 	}
 #ifdef __CYGWIN__
-      /* Newlib does not provide EUC-KR and Cygwin's implementation
-	 requires Windows support. */
-      else if (!strcasecmp (charset, "EUCKR")
-	       || !strcasecmp (charset, "EUC-KR"))
+      /* Newlib does neither provide EUC-KR nor EUC-CN, and Cygwin's
+      	 implementation requires Windows support. */
+      else if (!strcasecmp (c, "KR"))
 	{
 	  strcpy (charset, "EUCKR");
 	  mbc_max = 2;
 	  l_wctomb = __kr_wctomb;
 	  l_mbtowc = __kr_mbtowc;
+	}
+      else if (!strcasecmp (c, "CN"))
+	{
+	  strcpy (charset, "EUCCN");
+	  mbc_max = 2;
+	  l_wctomb = __gbk_wctomb;
+	  l_mbtowc = __gbk_mbtowc;
 	}
 #endif /* __CYGWIN__ */
       else
@@ -735,11 +747,12 @@ restart:
     case 'G':
     case 'g':
 #ifdef __CYGWIN__
-      /* Newlib does not provide GBK and Cygwin's implementation
+      /* Newlib does not provide GBK/GB2312 and Cygwin's implementation
 	 requires Windows support. */
-      if (!strcasecmp (charset, "GBK"))
+      if (!strcasecmp (charset, "GBK")
+	  || !strcasecmp (charset, "GB2312"))
       	{
-	  strcpy (charset, "GBK");
+	  strcpy (charset, charset[2] == '2' ? "GB2312" : "GBK");
 	  mbc_max = 2;
 	  l_wctomb = __gbk_wctomb;
 	  l_mbtowc = __gbk_mbtowc;

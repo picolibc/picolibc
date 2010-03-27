@@ -1,3 +1,11 @@
+2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/locale.c (loadlocale): Optimize "EUC" charset check.
+	Cygwin only: Allow GB2312 and EUC-CN as alternative codeset names
+	for GBK.  Add to documentation.
+	* libc/locale/nl_langinfo.c (nl_langinfo): On Cygwin, translate EUCCN
+	to GB2312.
+
 2010-03-17  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/include/sys/features.h:  Allow for _XOPEN_SOURCE to have an

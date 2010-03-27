@@ -69,6 +69,8 @@ _DEFUN(nl_langinfo, (item),
 		      ret = "EUC-JP";
 		    else if (strcmp (ret, "EUCKR") == 0)
 		      ret = "EUC-KR";
+		    else if (strcmp (ret, "EUCCN") == 0)
+		      ret = "GB2312";
 		  }
 		else if (ret[0] == 'C'/*Pxxxx*/)
 		  {
