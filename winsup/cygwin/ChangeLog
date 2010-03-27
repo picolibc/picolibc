@@ -1,3 +1,8 @@
+2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__set_charset_from_locale):  Set default charset for
+	locales defaulting to codepage 936 to GB2312.
+
 2010-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Make erase

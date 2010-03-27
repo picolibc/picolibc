@@ -1042,7 +1042,7 @@ __set_charset_from_locale (const char *locale, char *charset)
       cs = "EUCJP";
       break;
     case 936:
-      cs = "GBK";
+      cs = "GB2312";
       break;
     case 949:
       cs = "EUCKR";
