@@ -1,6 +1,6 @@
 2010-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
-	* fhandler.cc (fhandler_base::fstat): Set st_mtime time to current time.
+	* fhandler.cc (fhandler_base::fstat): Set st_mtime to current time.
 
 2010-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
