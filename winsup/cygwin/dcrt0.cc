@@ -1127,6 +1127,7 @@ cygwin_atexit (void (*fn) (void))
 extern "C" void
 cygwin_exit (int n)
 {
+  exit_state = ES_EXIT_STARTING;
   exit (n);
 }
 

@@ -30,6 +30,7 @@ int NO_COPY sigExeced;
 enum exit_states
   {
     ES_NOT_EXITING = 0,
+    ES_EXIT_STARTING,
     ES_PROCESS_LOCKED,
     ES_EVENTS_TERMINATE,
     ES_THREADTERM,

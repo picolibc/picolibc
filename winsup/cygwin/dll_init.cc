@@ -164,7 +164,7 @@ void
 dll_list::detach (void *retaddr)
 {
   dll *d;
-  if (!myself || exit_state || !(d = find (retaddr)))
+  if (!myself || !(d = find (retaddr)))
     return;
   if (d->count <= 0)
     system_printf ("WARNING: trying to detach an already detached dll ...");
@@ -172,7 +172,9 @@ dll_list::detach (void *retaddr)
     {
       /* Ensure our exception handler is enabled for destructors */
       exception protect;
-      __cxa_finalize (d);
+      /* Call finalize function if we are not already exiting */
+      if (!exit_state)
+	__cxa_finalize (d);
       d->run_dtors ();
       d->prev->next = d->next;
       if (d->next)
