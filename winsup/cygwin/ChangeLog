@@ -1,5 +1,9 @@
 2010-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.cc (fhandler_base::fstat): Set st_mtime time to current time.
+
+2010-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* globals.cc (exit_status): Add new ES_EXIT_STARTING enum.
 	* dcrt0.cc (cygwin_exit): Set exit_state to ES_EXIT_STARTING prior to
 	calling real exit.
