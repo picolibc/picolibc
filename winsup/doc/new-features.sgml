@@ -1,5 +1,23 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.3"><title>What's new and what changed from 1.7.2 to 1.7.3</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for GB2312/EUC-CN.  These charsets are implemented as aliases to GBK.
+GB2312 is now the default charset name for the locales zh_CN and zh_SG, just
+as on Linux.
+</para></listitem>
+
+<listitem><para>
+Modification and access timestamps of devices reflect the current time.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.2"><title>What's new and what changed from 1.7.1 to 1.7.2</title>
 
 <itemizedlist mark="bullet">
