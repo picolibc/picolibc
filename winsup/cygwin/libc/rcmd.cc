@@ -291,11 +291,9 @@ again:
 		case AF_INET:
 			aport = ntohs(((struct sockaddr_in *)&from)->sin_port);
 			break;
-#ifdef INET6
 		case AF_INET6:
 			aport = ntohs(((struct sockaddr_in6 *)&from)->sin6_port);
 			break;
-#endif
 		default:
 			aport = 0;	/* error */
 			break;
@@ -373,12 +371,10 @@ cygwin_rresvport_af(int *alport, int family)
 		sport = &((struct sockaddr_in *)&ss)->sin_port;
 		((struct sockaddr_in *)&ss)->sin_addr.s_addr = INADDR_ANY;
 		break;
-#ifdef INET6
 	case AF_INET6:
 		sport = &((struct sockaddr_in6 *)&ss)->sin6_port;
 		((struct sockaddr_in6 *)&ss)->sin6_addr = in6addr_any;
 		break;
-#endif
 	default:
 		errno = EAFNOSUPPORT;
 		return -1;
@@ -586,7 +582,6 @@ __ivaliduser_af(FILE *hostf, const void *raddr, const char *luser,
 		salen = sizeof(struct sockaddr_in);
 		memcpy(&sin->sin_addr, raddr, sizeof(sin->sin_addr));
 		break;
-#ifdef INET6
 	case AF_INET6:
 		if (len != sizeof(sin6->sin6_addr))
 			return -1;
@@ -596,7 +591,6 @@ __ivaliduser_af(FILE *hostf, const void *raddr, const char *luser,
 		salen = sizeof(struct sockaddr_in6);
 		memcpy(&sin6->sin6_addr, raddr, sizeof(sin6->sin6_addr));
 		break;
-#endif
 	default:
 		return -1;
 	}
