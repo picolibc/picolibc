@@ -1,5 +1,10 @@
 2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::fstat): Keep st_ctime and st_birthtime
+	fixed to 2006-12-01 00:00 UTC.
+
+2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/rcmd.c: Enable IPv6.
 
 2010-03-28  Christopher Faylor  <me+cygwin@cgf.cx>
