@@ -1,5 +1,13 @@
 2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (find_exec): Enable finding paths in backslash notation,
+	especially for the exec[vl]p functions.
+
+	* path.cc (symlink_info::check): Disable returning directories with
+	suffix appended here.
+
+2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h: Bump DLL minor version number to 3.
 
 2010-03-29  Corinna Vinschen  <corinna@vinschen.de>

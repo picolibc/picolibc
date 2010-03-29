@@ -2197,6 +2197,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
 
+  bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
       FILE_BASIC_INFORMATION fbi;
@@ -2380,6 +2381,15 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	}
 
       ext_tacked_on = !!*ext_here;
+      /* Don't allow to returns directories with appended suffix.  If we found
+         a directory with a suffix which has been appended here, then this
+	 directory doesn't match the request.  So, just do as usual if file
+	 hasn't been found. */
+      if (ext_tacked_on && !had_ext && (fileattr & FILE_ATTRIBUTE_DIRECTORY))
+	{
+	  set_error (ENOENT);
+	  continue;
+	}
 
       res = -1;
 

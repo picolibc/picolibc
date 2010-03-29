@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -111,7 +111,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   tmp_pathbuf tp;
   char *tmp = tp.c_get ();
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
-  bool has_slash = strchr (name, '/');
+  bool has_slash = !!strpbrk (name, "/\\");
   int err;
 
   /* Check to see if file can be opened as is first.
