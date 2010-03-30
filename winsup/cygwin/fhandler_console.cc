@@ -1161,7 +1161,9 @@ static wchar_t __vt100_conv [31] = {
 inline
 bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
-  if (dev_state->vt100_graphics_mode_active)
+  if (dev_state->iso_2022_G1
+	? dev_state->vt100_graphics_mode_G1
+	: dev_state->vt100_graphics_mode_G0)
     for (DWORD i = 0; i < len; i ++)
       if (buf[i] >= (unsigned char) '`' && buf[i] <= (unsigned char) '~')
         buf[i] = __vt100_conv[buf[i] - (unsigned char) '`'];
@@ -1734,11 +1736,11 @@ fhandler_console::write_normal (const unsigned char *src,
       int x, y;
       switch (base_chars[*found])
 	{
-	case SO:
-	  dev_state->vt100_graphics_mode_active = true;
+	case SO:	/* Shift Out: Invoke G1 character set (ISO 2022) */
+	  dev_state->iso_2022_G1 = true;
 	  break;
-	case SI:
-	  dev_state->vt100_graphics_mode_active = false;
+	case SI:	/* Shift In: Invoke G0 character set (ISO 2022) */
+	  dev_state->iso_2022_G1 = false;
 	  break;
 	case BEL:
 	  beep ();
@@ -1862,6 +1864,9 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else if (*src == 'c')		/* RIS Full Reset */
 	    {
 	      dev_state->set_default_attr ();
+	      dev_state->vt100_graphics_mode_G0 = false;
+	      dev_state->vt100_graphics_mode_G1 = false;
+	      dev_state->iso_2022_G1 = false;
 	      clear_screen (0, 0, -1, -1);
 	      cursor_set (true, 0, 0);
 	      dev_state->state_ = normal;
@@ -1959,20 +1964,19 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else
 	    dev_state->state_ = gotarg1;
 	  break;
-	case gotparen:
+	case gotparen:	/* Designate G0 Character Set (ISO 2022) */
 	  if (*src == '0')
-	    dev_state->vt100_graphics_mode_active = true;
+	    dev_state->vt100_graphics_mode_G0 = true;
 	  else
-	    dev_state->vt100_graphics_mode_active = false;
+	    dev_state->vt100_graphics_mode_G0 = false;
 	  dev_state->state_ = normal;
 	  src++;
 	  break;
-	case gotrparen:
-	  /* This is not strictly needed, ^N/^O can just always be enabled */
+	case gotrparen:	/* Designate G1 Character Set (ISO 2022) */
 	  if (*src == '0')
-	    /*dev_state->vt100_graphics_mode_SOSI_enabled = true*/;
+	    dev_state->vt100_graphics_mode_G1 = true;
 	  else
-	    /*dev_state->vt100_graphics_mode_SOSI_enabled = false*/;
+	    dev_state->vt100_graphics_mode_G1 = false;
 	  dev_state->state_ = normal;
 	  src++;
 	  break;

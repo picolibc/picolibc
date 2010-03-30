@@ -1,3 +1,11 @@
+2010-03-30  Thomas Wolff  <towo@towo.net>
+
+	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.
+	Add flags vt100_graphics_mode_G0, vt100_graphics_mode_G1 and
+	iso_2022_G1.
+	* fhandler_console.cc: Throughout, tune VT100 graphics mode switching
+	to follow ISO 2022 strictly.
+
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (open): Remove call to sig_dispatch_pending.
