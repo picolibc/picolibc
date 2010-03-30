@@ -213,6 +213,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define GETVOLINFO_VALID_MASK (0x003701ffUL)
 #define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
 
+/* FIXME: This flag twist is getting awkward.  There should really be some
+   other method.  Maybe we need mount flags to allow the user to fix file
+   system problems without having to wait for a Cygwin fix. */
+
 /* Volume quotas are potentially supported since Samba 3.0, object ids and
    the unicode on disk flag since Samba 3.2. */
 #define SAMBA_IGNORE (FILE_VOLUME_QUOTAS \
@@ -222,8 +226,9 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_PERSISTENT_ACLS)
-/* Netapp DataOnTap.  TODO: Find out if that's the only flag combination. */
-#define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags (), \
+/* Netapp DataOnTap. */
+#define NETAPP_IGNORE FILE_SUPPORTS_SPARSE_FILES
+#define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags () & ~NETAPP_IGNORE, \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \

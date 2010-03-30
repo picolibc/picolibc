@@ -1,3 +1,8 @@
+2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (fs_info::update): Allow variable FILE_SUPPORTS_SPARSE_FILES
+	flag in netapp flag test.  Add comment.
+
 2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (find_exec): Enable finding paths in backslash notation,
