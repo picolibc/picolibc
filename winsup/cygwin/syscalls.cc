@@ -1019,7 +1019,6 @@ open (const char *unix_path, int flags, ...)
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  sig_dispatch_pending ();
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
   myfault efault;

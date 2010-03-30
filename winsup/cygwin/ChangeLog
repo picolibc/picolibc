@@ -1,5 +1,9 @@
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (open): Remove call to sig_dispatch_pending.
+
+2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc: Remove calls to sig_dispatch_pending throughout.
 	* libc/rexec.cc: Ditto.
 
