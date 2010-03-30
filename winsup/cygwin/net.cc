@@ -820,7 +820,6 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 extern "C" int
 getpeereid (int fd, __uid32_t *euid, __gid32_t *egid)
 {
-  sig_dispatch_pending ();
   fhandler_socket *fh = get (fd);
   if (fh)
     return fh->getpeereid (NULL, euid, egid);
@@ -832,7 +831,6 @@ extern "C" int
 cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -851,7 +849,6 @@ cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
@@ -865,7 +862,6 @@ cygwin_getservbyname (const char *name, const char *proto)
 extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
@@ -878,7 +874,6 @@ cygwin_getservbyport (int port, const char *proto)
 extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -901,7 +896,6 @@ cygwin_gethostname (char *name, size_t len)
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
       return NULL;
@@ -948,7 +942,6 @@ cygwin_gethostbyname (const char *name)
 extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
@@ -1213,7 +1206,6 @@ gethostby_helper (const char *name, const int af, const int type,
 extern "C" struct hostent *
 gethostbyname2 (const char *name, int af)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return NULL;
@@ -1248,7 +1240,6 @@ extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1266,7 +1257,6 @@ extern "C" int
 accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1290,7 +1280,6 @@ extern "C" int
 cygwin_bind (int fd, const struct sockaddr *my_addr, socklen_t addrlen)
 {
   int res;
-  sig_dispatch_pending ();
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -1308,7 +1297,6 @@ extern "C" int
 cygwin_getsockname (int fd, struct sockaddr *addr, socklen_t *namelen)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1327,7 +1315,6 @@ extern "C" int
 cygwin_listen (int fd, int backlog)
 {
   int res;
-  sig_dispatch_pending ();
   fhandler_socket *fh = get (fd);
 
   if (!fh)
@@ -1344,7 +1331,6 @@ extern "C" int
 cygwin_shutdown (int fd, int how)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1410,7 +1396,6 @@ extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 {
   int res;
-  sig_dispatch_pending ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1442,7 +1427,6 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
 extern "C" int
 getdomainname (char *domain, size_t len)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -2494,7 +2478,6 @@ freeifaddrs (struct ifaddrs *ifp)
 int
 get_ifconf (struct ifconf *ifc, int what)
 {
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -2727,8 +2710,6 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
   socklen_t salen;
   int ret;
 
-  sig_dispatch_pending ();
-
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -2809,7 +2790,6 @@ socketpair (int family, int type, int protocol, int *sb)
   struct sockaddr_in sock_in, sock_out;
   int len;
 
-  sig_dispatch_pending ();
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;

@@ -319,7 +319,6 @@ cygwin_rexec (char **ahost, unsigned short rport, char *name, char *pass,
 	char c;
 	char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 
-	sig_dispatch_pending ();
 	myfault efault;
 	if (efault.faulted (EFAULT))
 		return -1;
