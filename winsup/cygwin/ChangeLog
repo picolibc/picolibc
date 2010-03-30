@@ -1,3 +1,8 @@
+2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait_for_events): Remove call to
+	sig_dispatch_pending.
+
 2010-03-30  Thomas Wolff  <towo@towo.net>
 
 	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.

@@ -613,10 +613,7 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 
 	  case WSA_WAIT_EVENT_0 + 1:
 	    if (_my_tls.call_signal_handler ())
-	      {
-		sig_dispatch_pending ();
-		break;
-	      }
+	      break;
 	    WSASetLastError (WSAEINTR);
 	    return SOCKET_ERROR;
 
