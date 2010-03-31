@@ -47,4 +47,18 @@ struct vms_egps
   unsigned char name[31];
 };
 
+#define EGPS__V_PIC (1 << 0)	/* Not meaningful.  */
+#define EGPS__V_LIB (1 << 1)	/* Defined in a shareable image.  */
+#define EGPS__V_OVR (1 << 2)	/* Overlaid contribution.  */
+#define EGPS__V_REL (1 << 3)	/* Relocatable.  */
+#define EGPS__V_GBL (1 << 4)	/* Global.  */
+#define EGPS__V_SHR (1 << 5)	/* Shareable.  */
+#define EGPS__V_EXE (1 << 6)	/* Executable.  */
+#define EGPS__V_RD  (1 << 7)	/* Readable.  */
+#define EGPS__V_WRT (1 << 8)	/* Writable.  */
+#define EGPS__V_VEC (1 << 9)	/* Change mode dispatch or message vectors.  */
+#define EGPS__V_NOMOD (1 << 10)	/* Demand-zero.  */
+#define EGPS__V_COM (1 << 11)	/* Conditional storage.  */
+#define EGPS__V_ALLOC_64BIT (1 << 12)	/* Allocated in 64-bit space.  */
+
 #endif /* _VMS_EGPS_H */

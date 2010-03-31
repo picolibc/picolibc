@@ -36,7 +36,7 @@ struct vms_eihd
   /* Byte offset to ISD (Image Section Descriptors) list.  */
   unsigned char isdoff[4];
 
-  /* Byte offset to activation data.  */
+  /* Byte offset to activation data (off=16).  */
   unsigned char activoff[4];
 
   /* Byte offset to symbol table and debugging data.  */ 
@@ -48,13 +48,13 @@ struct vms_eihd
   /* Byte offset to patch data.  */
   unsigned char patchoff[4];
 
-  /* RVA of fixup info.  */
+  /* RVA of fixup info (off=32).  */
   unsigned char iafva[8];
 
   /* RVA of symbol vector.  */
   unsigned char symvva[8];
 
-  /* Byte offset to version number array.  */
+  /* Byte offset to version number array (off=48).  */
   unsigned char version_array_off[4];
 
   /* Image type.  */
@@ -66,7 +66,7 @@ struct vms_eihd
   /* Size in bytes of image I/O section requested.  */
   unsigned char imgiocnt[4];
 
-  /* Nbr of channels requested.  */
+  /* Nbr of channels requested (off=64).  */
   unsigned char iochancnt[4];
 
   /* Requested privilege mask.  */
@@ -113,6 +113,10 @@ struct vms_eihd
 #define EIHD__K_EXE		1	/* Executable image	*/
 #define EIHD__K_LIM		2	/* Linkable image.  */
 
+/* Image subtype.  */
+#define EIHD__C_NATIVE		0	/* Alpha native image.  */
+#define EIHD__C_CLI		1	/* Image is a CLI, run LOGINOUT.  */
+
 /* Linker image flags.  */
 #define EIHD__M_LNKDEBUG	0x0001	/* Full debugging requested.  */
 #define EIHD__M_LNKNOTFR	0x0002	/* No first transfer address.  */
@@ -129,12 +133,13 @@ struct vms_eihd
 #define EIHD__M_OMV_READY	0x1000	/* Can be processed by OMV.  */
 #define EIHD__M_EXT_BIND_SECT	0x2000	/* May be moved, using ext fixups.  */
 
-
 /* Offsets of some fields.  */
 #define EIHD__L_SIZE		8
 #define EIHD__L_ISDOFF		12
 #define EIHD__L_SYMDBGOFF	20
 #define EIHD__Q_SYMVVA		40
 #define EIHD__L_IMGTYPE		52
+
+#define EIHD__C_LENGTH 104
 
 #endif /* _VMS_EIHD_H */

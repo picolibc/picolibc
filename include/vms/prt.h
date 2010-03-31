@@ -1,4 +1,4 @@
-/* Alpha VMS external format of Extended GSD Global Symbol Reference.
+/* Alpha VMS external format of Protection values.
 
    Copyright 2010 Free Software Foundation, Inc.
    Written by Tristan Gingold <gingold@adacore.com>, AdaCore.
@@ -20,17 +20,24 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
    MA 02110-1301, USA.  */
 
-#ifndef _VMS_ESRF_H
-#define _VMS_ESRF_H
+#ifndef _VMS_PRT_H
+#define _VMS_PRT_H
 
-struct vms_esrf
-{
-  struct vms_egsy header;
+#define PRT__C_NA	0	/* No access.  */
+#define PRT__C_RESERVED 1
+#define PRT__C_KW	2	/* Kernel RW.  */
+#define PRT__C_KR	3	/* Kernel RO. */
+#define PRT__C_UW	4	/* User RW.  */
+#define PRT__C_EW	5	/* Executive RW.  */
+#define PRT__C_ERKW	6	/* Executive RO, Kernel RW.  */
+#define PRT__C_ER	7	/* Executive RO.  */
+#define PRT__C_SW	8	/* Supervisor RW.  */
+#define PRT__C_SREW	9	/* Supervisor RO, Executive RW.  */
+#define PRT__C_SRKW	10	/* Supervisor RO, Kernel RW.  */
+#define PRT__C_SR	11	/* Supervisor RO.  */
+#define PRT__C_URSW	12	/* User RO, Supervisor RW.  */
+#define PRT__C_UREW	13	/* User RO, Executive RW.  */
+#define PRT__C_URKW	14	/* User RO, Kernel RW.  */
+#define PRT__C_UR	15	/* User RO.  */
 
-  unsigned char namlng;
-  unsigned char name[31];
-};
-
-#define ESRF__B_NAMLNG   8
-
-#endif /* _VMS_ESRF_H */
+#endif /* _VMS_PRT_H */

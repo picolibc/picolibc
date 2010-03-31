@@ -71,7 +71,7 @@ struct vms_eiaf
   unsigned char permctx[4];
 
   /* Base address of the image itself.  */
-  unsigned char base_va[8];
+  unsigned char base_va[4];
 
   /* Offset to linkage pair with procedure signature fixups.  */
   unsigned char lppsbfixoff[4];

@@ -36,4 +36,6 @@ struct vms_esdf
   unsigned char name[31];
 };
 
+#define ESDF__B_NAMLNG		32
+
 #endif /* _VMS_ESDF_H */

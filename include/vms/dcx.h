@@ -1,4 +1,4 @@
-/* Alpha VMS external format of Extended Image Header Version.
+/* Alpha VMS external format for DeCompression.
 
    Copyright 2010 Free Software Foundation, Inc.
    Written by Tristan Gingold <gingold@adacore.com>, AdaCore.
@@ -20,39 +20,31 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
    MA 02110-1301, USA.  */
 
-#ifndef _VMS_EIHVN_H
-#define _VMS_EIHVN_H
+#ifndef _VMS_DCX_H
+#define _VMS_DCX_H
 
-struct vms_eihvn
+struct vms_dcxmap
 {
-  unsigned char subsystem_mask[4];
+  unsigned char size[4];
+  unsigned char version[2];
+
+  unsigned char pad[2];
+  unsigned char sanity[4];
+  unsigned char flags[4];
+  unsigned char nsubs[2];
+  unsigned char sub0[2];
 };
 
-struct vms_eihvn_subversion
+struct vms_dcxsbm
 {
-  unsigned char minor[2];
-  unsigned char major[2];
+  unsigned char size[2];
+  unsigned char min_char;
+  unsigned char max_char;
+  unsigned char escape;
+  unsigned char flags_bits;
+  unsigned char flags[2];
+  unsigned char nodes[2];
+  unsigned char next[2];
 };
 
-#define EIHVN__BASE_IMAGE_BIT		0
-#define EIHVN__MEMORY_MANAGEMENT_BIT	1
-#define EIHVN__IO_BIT			2
-#define EIHVN__FILES_VOLUMES_BIT	3
-#define EIHVN__PROCESS_SCHED_BIT	4
-#define EIHVN__SYSGEN_BIT		5
-#define EIHVN__CLUSTERS_LOCKMGR_BIT	6
-#define EIHVN__LOGICAL_NAMES_BIT	7
-#define EIHVN__SECURITY_BIT		8
-#define EIHVN__IMAGE_ACTIVATOR_BIT	9
-#define EIHVN__NETWORKS_BIT		10
-#define EIHVN__COUNTERS_BIT		11
-#define EIHVN__STABLE_BIT		12
-#define EIHVN__MISC_BIT			13
-#define EIHVN__CPU_BIT			14
-#define EIHVN__VOLATILE_BIT		15
-#define EIHVN__SHELL_BIT		16
-#define EIHVN__POSIX_BIT		17
-#define EIHVN__MULTI_PROCESSING_BIT	18
-#define EIHVN__GALAXY_BIT		19
-
-#endif /* _VMS_EIHVN_H */
+#endif /* _VMS_DCX_H */

@@ -45,6 +45,10 @@ struct vms_eiha
   /* Fourth (must be 0).  */
   unsigned char tfradr4[4];
   unsigned char tfradr4_h[4];
+
+  /* Shared image initialization (only if EIHD__V_INISHR is set).  */
+  unsigned char inishr[4];
+  unsigned char inishr_h[4];
 };
 
 #endif /* _VMS_EIHA_H */

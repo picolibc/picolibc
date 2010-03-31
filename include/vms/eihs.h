@@ -59,5 +59,4 @@ struct vms_eihs
 #define EIHS__L_DMTVBN		24
 #define EIHS__L_DMTBYTES	28
 
-
 #endif /* _VMS_EIHS_H */

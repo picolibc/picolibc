@@ -57,5 +57,4 @@ struct vms_egsd_entry
   unsigned char gsdsiz[2];
 };
 
-
 #endif /* _VMS_EGSD_H */

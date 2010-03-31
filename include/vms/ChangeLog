@@ -1,3 +1,34 @@
+2010-03-31  Tristan Gingold  <gingold@adacore.com>
+
+	* dcx.h: New file.
+	* dsc.h: New file.
+	* esdfm.h: New file.
+	* esdfv.h: New file.
+	* internal.h: New file.
+	* lbr.h: New file.
+	* prt.h: New file.
+	* shl.h (struct vms_shl): Add comments.
+	* esrf.h (ESRF__B_NAMLNG): New macro.
+	* esdf.h (ESDF__B_NAMLNG): New macro.
+	* emh.h: Add macros for fields maximum value.
+	* eisd.h (EISD__M_PROTECT): Fix typo in comment.
+	Add macros for offsets, version, section type and match control.
+	Merge vms_eisd_ext into vms_eisd.
+	* eihvn.h (EIHVN__MULTI_PROCESSING_BIT, EIHVN__GALAXY_BIT): Added.
+	* eihs.h: Remove blank line.
+	* eihd.h (struct vms_eihd): Add comments, add image subtype names.
+	* eiha.h (struct vms_eiha): Add inishr and inishr_h fields.
+	* eiaf.h (struct vms_eiaf): Fix base_va size.
+	* egsy.h: Add comments.
+	* egsd.h: Remove blank line.
+	* egps.h: Add flag names.
+	* eeom.h (EEOM__M_WKTFR): Added.
+	* dst.h (DST__K_CXX): Added, and reident languages.
+	(DST__K_SRC_INCRLNUM_B): Added.
+	Indent and order pcline commands.
+	Add record begin/end, enumerations, type specification, value
+	specification, label, discontinue range definitions.
+
 2010-02-17  Tristan Gingold  <gingold@adacore.com>
 
 	* dmt.h, dst.h, eeom.h, egps.h, egsd.h, egst.h, egsy.h: New Files.

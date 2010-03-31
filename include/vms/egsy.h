@@ -25,14 +25,14 @@
 
 #define EGSY__W_FLAGS  6
 
-#define EGSY__V_WEAK		0x0001
-#define EGSY__V_DEF		0x0002
-#define EGSY__V_UNI		0x0004
-#define EGSY__V_REL		0x0008
-#define EGSY__V_COMM		0x0010
-#define EGSY__V_VECEP		0x0020
-#define EGSY__V_NORM		0x0040
-#define EGSY__V_QUAD_VAL	0x0080
+#define EGSY__V_WEAK		0x0001	/* Weak symbol definition.  */
+#define EGSY__V_DEF		0x0002	/* Symbol definition.  */
+#define EGSY__V_UNI		0x0004	/* Reserved.  */
+#define EGSY__V_REL		0x0008	/* Relocatable (vs absolute).  */
+#define EGSY__V_COMM		0x0010	/* Conditional symbol def.  */
+#define EGSY__V_VECEP		0x0020	/* Reserved.  */
+#define EGSY__V_NORM		0x0040	/* Normal procedure definition.  */
+#define EGSY__V_QUAD_VAL	0x0080	/* Value exceed 32 bits.  */
 
 struct vms_egsy
 {

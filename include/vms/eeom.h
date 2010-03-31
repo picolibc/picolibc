@@ -57,4 +57,6 @@ struct vms_eeom
   unsigned char tfradr[8];
 };
 
+#define EEOM__M_WKTFR (1 << 0)	/* Transfer address is weak.  */
+
 #endif /* _VMS_EEOM_H */

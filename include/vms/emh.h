@@ -62,6 +62,13 @@ struct vms_emh_mhd
   /* Compile data: ASCIC.  */
 };
 
+#define EOBJ__C_MAXRECSIZ 8192  /* Maximum legal record size.  */
+#define EOBJ__C_STRLVL 2	/* Structure level.  */
+#define EOBJ__C_SYMSIZ 64	/* Maximum symbol length.  */
+#define EOBJ__C_SECSIZ 31	/* Maximum section name length.  */
+#define EOBJ__C_STOREPLIM -1	/* Maximum repeat count on store commands.  */
+#define EOBJ__C_PSCALILIM 16	/* Maximum p-sect alignment.  */
+
 struct vms_emh_lnm
 {
   struct vms_emh_common common;

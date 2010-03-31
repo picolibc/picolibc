@@ -1,4 +1,4 @@
-/* Alpha VMS external format of Extended GSD Global Symbol Reference.
+/* Alpha VMS external format of Extended Symbol Def for Vectored symbols.
 
    Copyright 2010 Free Software Foundation, Inc.
    Written by Tristan Gingold <gingold@adacore.com>, AdaCore.
@@ -20,17 +20,30 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
    MA 02110-1301, USA.  */
 
-#ifndef _VMS_ESRF_H
-#define _VMS_ESRF_H
+#ifndef _VMS_ESDFV_H
+#define _VMS_ESDFV_H
 
-struct vms_esrf
+struct vms_esdfv
 {
-  struct vms_egsy header;
+  /* Entry type.  */
+  unsigned char gsdtyp[2];
 
+  /* Length of the entry.  */
+  unsigned char size[2];
+
+  /* Data type.  */
+  unsigned char datyp;
+
+  /* Pad for alignment.  */
+  unsigned char temp;
+
+  unsigned char flags[2];
+
+  unsigned char value[8];
+  unsigned char psindx[4];
+  unsigned char vector[4];
   unsigned char namlng;
   unsigned char name[31];
 };
 
-#define ESRF__B_NAMLNG   8
-
-#endif /* _VMS_ESRF_H */
+#endif /* _VMS_ESDFV_H */

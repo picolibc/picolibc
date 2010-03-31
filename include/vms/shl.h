@@ -37,11 +37,15 @@ struct vms_shl
   /* Permanent shareable image context.  */
   unsigned char permctx[4];
 
+  /* Size of this structure.  */
   unsigned char size;
+
   unsigned char fill_1[2];
+
+  /* Flags.  */
   unsigned char flags;
 
-  /* Address of the image control block.  */
+  /* Address of the image control block (in memory).  */
   unsigned char icb[4];
 
   /* Image name.  ASCIC.  */
