@@ -34,11 +34,12 @@
 
 2010-03-30  Thomas Wolff  <towo@towo.net>
 
-	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.
-	Add flags vt100_graphics_mode_G0, vt100_graphics_mode_G1 and
-	iso_2022_G1.
+	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.  Add
+	flags vt100_graphics_mode_G0, vt100_graphics_mode_G1 and iso_2022_G1.
 	* fhandler_console.cc: Throughout, tune VT100 graphics mode switching
 	to follow ISO 2022 strictly.
+	(fhandler_console::write) Reset VT100 graphic mode flags on terminal
+	full reset (ESC c).
 
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
