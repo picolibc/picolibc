@@ -1,3 +1,10 @@
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwinenv.sgml: Remove/deprecate mention of rxvt.
+	* effectively.sgml: Ditto.
+	* faq-using.xml: Ditto.
+	* setup-net.sgml: Ditto.
+
 2010-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.3): New section.

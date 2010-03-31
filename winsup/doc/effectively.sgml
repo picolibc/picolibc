@@ -87,10 +87,12 @@ Windows programs, use a DOS prompt, running only the occasional Cygwin
 command or script. Next would be to run <command>bash</command> within 
 a default DOS box. To make Cygwin more Unix compatible in this case, 
 set <envar>CYGWIN=tty</envar> (see <xref linkend="using-cygwinenv"></xref>).
-Alternatively, the optional <systemitem>rxvt</systemitem> package provides 
-a native-Windows version of the popular X11 terminal emulator (it is not 
-necessary to set <envar>CYGWIN=tty</envar> with <command>rxvt</command>). 
-Using <command>rxvt.exe</command> provides the most Unix-like environment, 
+Alternatively, the optional <systemitem>mintty</systemitem> package
+provides a terminal emulator similar to such X11 programs as
+<command>xterm</command> (it is not necessary to set
+<envar>CYGWIN=tty</envar> with <command>mintty</command> nor is it
+necessary to be running <systemitem>/Cygwin/X</systemitem>).  Using
+<command>mintty.exe</command> provides the most Unix-like environment,
 but expect some compatibility problems with Windows programs.
 </para>
 

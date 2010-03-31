@@ -215,7 +215,7 @@ shows progress bars for the current task and total remaining disk space.
 <para>
 You may choose to install shortcuts on the Desktop and/or Start Menu
 to start a <literal>bash</literal> shell. If you prefer to use a different
-shell or the native Windows version of <literal>rxvt</literal>, you can
+shell or the native Windows version of <literal>mintty</literal> or <literal>rxvt</literal>, you can
 use these shortcuts as a guide to creating your own. 
 </para>
 </sect2>

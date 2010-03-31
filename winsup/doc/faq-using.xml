@@ -580,8 +580,8 @@ for more details.
 <question><para>How can I copy and paste into Cygwin console windows?</para></question>
 <answer>
 
-<para>First, consider using rxvt or mintty instead of the standard console
-window.  In rxvt/mintty, selecting with the left-mouse also copies,
+<para>First, consider using mintty instead of the standard console
+window.  In mintty, selecting with the left-mouse also copies,
 and middle-mouse pastes.  It couldn't be easier!
 </para>
 <para>In Windows's console window, open the properties dialog.
@@ -946,9 +946,9 @@ Emacs or XEmacs from Cygwin Setup.
 <question><para>Is there a better alternative to the standard console window?</para></question>
 <answer>
 
-<para>Yes!  Use rxvt or mintty instead.  Both are optional packages in
-Cygwin Setup.  You can use rxvt with or without X11, while mintty is a 
-Cygwin application providing a native GUI.
+<para>Yes!  Use <command>mintty</command> instead.  <command>mintty</command> is an optional packages in
+Cygwin Setup.  <command>mintty</command> is a Cygwin application providing a native GUI without
+the need of X11.
 </para>
 </answer></qandaentry>
 
