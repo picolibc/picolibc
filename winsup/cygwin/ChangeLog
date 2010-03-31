@@ -1,3 +1,32 @@
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::dup): Call setup_overlapped
+	unconditionally.
+	(fhandler_base::fork_fixup): Ditto.
+	(fhandler_base::fixup_after_fork): Ditto.
+	(fhandler_base::fixup_after_exec): Ditto.
+	(fhandler_base_overlapped::setup_overlapped): Move to this class from
+	fhandler_base.
+	(handler_base_overlapped::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped::wait_overlapped): Ditto.  Track when we
+	expect pending I/O.
+	(fhandler_base_overlapped::read_overlapped): Move to this class from
+	fhandler_base.  Return error if ongoing I/O.
+	(fhandler_base_overlapped::write_overlapped): Ditto.
+	(fhandler_base_overlapped::has_ongoing_io): Semi-reinstate previous
+	function.
+	* fhandler.h (fhandler_base::wait_overlapped): Move to
+	fhandler_base_overlapped class.
+	(fhandler_base::write_overlapped): Ditto.
+	(fhandler_base::get_overlapped): Ditto.
+	(fhandler_base::get_overlapped_buffer): Ditto.
+	(fhandler_base_overlapped): New class.
+	(fhandler_pipe): Inherit from fhandler_base_overlapped.  Remove
+	overlapped stuff as a result.
+	(fhandler_fifo): Ditto.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Initialize fhandler_base_overlapped.
+	(pipe): Put a descriptive name in the fhandler.
+
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::wait_for_events): Remove call to

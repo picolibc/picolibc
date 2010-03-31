@@ -24,7 +24,7 @@ details. */
 #include "shared_info.h"
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), popen_pid (0), overlapped (NULL)
+  : fhandler_base_overlapped (), popen_pid (0)
 {
   need_fork_fixup (true);
   uninterruptible_io (true);
@@ -378,6 +378,11 @@ pipe (int filedes[2])
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
+      char buf[sizeof ("/dev/fd/pipe:[2147483647]")];
+      __small_sprintf (buf, "/dev/fd/pipe:[%d]", (int) fdin);
+      fhs[0]->pc.set_normalized_path (buf);
+      __small_sprintf (buf, "pipe:[%d]", (int) fdout);
+      fhs[1]->pc.set_normalized_path (buf);
       fdin = fhs[0];
       fdout = fhs[1];
       filedes[0] = fdin;

@@ -1162,8 +1162,7 @@ fhandler_base::dup (fhandler_base *child)
       VerifyHandle (nh);
       child->set_io_handle (nh);
     }
-  if (get_overlapped ())
-    child->setup_overlapped ();
+  child->setup_overlapped ();
   return 0;
 }
 
@@ -1335,8 +1334,7 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 	VerifyHandle (h);
       res = true;
     }
-  if (get_overlapped ())
-    setup_overlapped ();
+  setup_overlapped ();
   return res;
 }
 
@@ -1355,8 +1353,7 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   debug_printf ("inheriting '%s' from parent", get_name ());
   if (!nohandle ())
     fork_fixup (parent, io_handle, "io_handle");
-  if (get_overlapped ())
-    setup_overlapped ();
+  setup_overlapped ();
   /* POSIX locks are not inherited across fork. */
   if (unique_id)
     del_my_locks (after_fork);
@@ -1366,8 +1363,7 @@ void
 fhandler_base::fixup_after_exec ()
 {
   debug_printf ("here for '%s'", get_name ());
-  if (get_overlapped ())
-    setup_overlapped ();
+  setup_overlapped ();
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
 }
@@ -1645,7 +1641,7 @@ fhandler_base::fpathconf (int v)
 /* Overlapped I/O */
 
 bool
-fhandler_base::setup_overlapped (bool doit)
+fhandler_base_overlapped::setup_overlapped (bool doit)
 {
   OVERLAPPED *ov = get_overlapped_buffer ();
   memset (ov, 0, sizeof (*ov));
@@ -1664,7 +1660,7 @@ fhandler_base::setup_overlapped (bool doit)
 }
 
 void
-fhandler_base::destroy_overlapped ()
+fhandler_base_overlapped::destroy_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped ();
   if (ov && ov->hEvent)
@@ -1674,8 +1670,22 @@ fhandler_base::destroy_overlapped ()
     }
 }
 
+bool
+fhandler_base_overlapped::has_ongoing_io ()
+{
+  if (!io_pending)
+    return false;
+  if (WaitForSingleObject (get_overlapped ()->hEvent, 0) != WAIT_OBJECT_0)
+    {
+      set_errno (EAGAIN);
+      return true;
+    }
+  io_pending = false;
+  return false;
+}
+
 int
-fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD len)
+fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD len)
 {
   if (!get_overlapped ())
     return inres;
@@ -1687,6 +1697,7 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
     {
       if (inres || err == ERROR_IO_PENDING)
 	{
+	  io_pending = err == ERROR_IO_PENDING;
 	  if (writing && !inres)
 	    *bytes = len;	/* This really isn't true but it seems like
 				   this is a corner-case for linux's
@@ -1758,32 +1769,38 @@ fhandler_base::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD le
 }
 
 void __stdcall
-fhandler_base::read_overlapped (void *ptr, size_t& len)
+fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
 {
   DWORD nbytes;
-  while (1)
-    {
-      bool res = ReadFile (get_handle (), ptr, len, &nbytes,
-			   get_overlapped ());
-      int wres = wait_overlapped (res, false, &nbytes);
-      if (wres || !_my_tls.call_signal_handler ())
-	break;
-    }
+  if (has_ongoing_io ())
+    nbytes = (DWORD) -1;
+  else
+    while (1)
+      {
+	bool res = ReadFile (get_handle (), ptr, len, &nbytes,
+			     get_overlapped ());
+	int wres = wait_overlapped (res, false, &nbytes);
+	if (wres || !_my_tls.call_signal_handler ())
+	  break;
+      }
   len = (size_t) nbytes;
 }
 
 ssize_t __stdcall
-fhandler_base::write_overlapped (const void *ptr, size_t len)
+fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
 {
   DWORD nbytes;
-  while (1)
-    {
-      bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
-			    get_overlapped ());
-      int wres = wait_overlapped (res, true, &nbytes, (size_t) len);
-      if (wres || !_my_tls.call_signal_handler ())
-	break;
-    }
+  if (has_ongoing_io ())
+    nbytes = (DWORD) -1;
+  else
+    while (1)
+      {
+	bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
+			      get_overlapped ());
+	int wres = wait_overlapped (res, true, &nbytes, (size_t) len);
+	if (wres || !_my_tls.call_signal_handler ())
+	  break;
+      }
   debug_printf ("returning %u", nbytes);
   return nbytes;
 }

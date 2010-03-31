@@ -150,9 +150,6 @@ class fhandler_base
   void del_my_locks (del_lock_called_from);
 
   HANDLE read_state;
-  int wait_overlapped (bool, bool, DWORD *, DWORD = 0) __attribute__ ((regparm (3)));
-  bool setup_overlapped (bool doit = true) __attribute__ ((regparm (2)));
-  void destroy_overlapped () __attribute__ ((regparm (1)));
 
  public:
   class fhandler_base *archetype;
@@ -310,9 +307,7 @@ class fhandler_base
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  virtual void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual ssize_t __stdcall write (const void *ptr, size_t len);
-  virtual ssize_t __stdcall write_overlapped (const void *ptr, size_t len);
   virtual ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t __stdcall pread (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
@@ -354,9 +349,6 @@ class fhandler_base
 
   virtual void __stdcall raw_read (void *ptr, size_t& ulen);
   virtual ssize_t __stdcall raw_write (const void *ptr, size_t ulen);
-  virtual OVERLAPPED *get_overlapped () {return NULL;}
-  virtual OVERLAPPED *get_overlapped_buffer () {return NULL;}
-  virtual void set_overlapped (OVERLAPPED *) {}
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
@@ -394,6 +386,8 @@ class fhandler_base
   bool issymlink () {return pc.issymlink ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
   int fhaccess (int flags, bool) __attribute__ ((regparm (3)));
+  virtual void destroy_overlapped () __attribute__ ((regparm (1))) {}
+  virtual bool setup_overlapped () {return false;}
 };
 
 class fhandler_mailslot : public fhandler_base
@@ -558,18 +552,32 @@ class fhandler_socket: public fhandler_base
   bool is_slow () {return true;}
 };
 
-class fhandler_pipe: public fhandler_base
+class fhandler_base_overlapped: public fhandler_base
 {
-private:
-  pid_t popen_pid;
+protected:
+  bool io_pending;
   OVERLAPPED io_status;
   OVERLAPPED *overlapped;
 public:
-  fhandler_pipe ();
-
+  int wait_overlapped (bool, bool, DWORD *, DWORD = 0) __attribute__ ((regparm (3)));
+  bool setup_overlapped (bool doit = true) __attribute__ ((regparm (2)));
+  void destroy_overlapped () __attribute__ ((regparm (1)));
+  void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  ssize_t __stdcall write_overlapped (const void *ptr, size_t len);
   OVERLAPPED *get_overlapped () {return overlapped;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
+  fhandler_base_overlapped (): io_pending (false), overlapped (NULL) {}
+  bool has_ongoing_io ();
+};
+
+class fhandler_pipe: public fhandler_base_overlapped
+{
+private:
+  pid_t popen_pid;
+public:
+  fhandler_pipe ();
+
 
   bool ispipe() const { return true; }
 
@@ -595,7 +603,7 @@ public:
   friend class fhandler_fifo;
 };
 
-class fhandler_fifo: public fhandler_base
+class fhandler_fifo: public fhandler_base_overlapped
 {
   enum fifo_state
   {
@@ -611,7 +619,6 @@ class fhandler_fifo: public fhandler_base
   fifo_state wait_state;
   HANDLE dummy_client;
   HANDLE open_nonserver (const char *, unsigned, LPSECURITY_ATTRIBUTES);
-  OVERLAPPED io_status;
   bool wait (bool) __attribute__ ((regparm (1)));
   char *fifo_name (char *) __attribute__ ((regparm (2)));
 public:
@@ -624,8 +631,6 @@ public:
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
-  OVERLAPPED *get_overlapped () {return &io_status;}
-  OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
