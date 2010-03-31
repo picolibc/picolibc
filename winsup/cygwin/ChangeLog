@@ -1,5 +1,13 @@
 2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* sigproc.cc (wait_sig): Make sure that strace is activated on
+	__SIGSTRACE by calling new strace::activate function.
+	* strace.cc (strace::activate): Rename from strace::strace.
+	* strace.h (strace::activate): Define new function.
+	(strace::strace): Call activate.
+
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_base_overlapped): Temporarily (?) make
 	select_pipe_info a friend until the fhandler_tty intertangling can be
 	worked out.

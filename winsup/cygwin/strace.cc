@@ -31,7 +31,8 @@ class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 
-strace::strace ()
+void
+strace::activate ()
 {
   if (!dynamically_loaded && !_active && being_debugged ())
     {

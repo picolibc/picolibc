@@ -39,7 +39,8 @@ class strace
   void write (unsigned category, const char *buf, int count);
   unsigned char _active;
 public:
-  strace ();
+  void activate ();
+  strace () {activate ();}
   int microseconds ();
   int version;
   int lmicrosec;
