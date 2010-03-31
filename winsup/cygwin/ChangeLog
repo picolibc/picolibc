@@ -1,5 +1,15 @@
 2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base_overlapped): Temporarily (?) make
+	select_pipe_info a friend until the fhandler_tty intertangling can be
+	worked out.
+	* select.cc (select_pipe_info::add_watch_handle): Don't inspect the
+	overlapped event if we're not waiting for I/O.
+	(fhandler_tty_common::select_*): Change to standard function.  Don't do
+	kludgy fhandler_pipe coercion.
+
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.cc (fhandler_base::dup): Call setup_overlapped
 	unconditionally.
 	(fhandler_base::fork_fixup): Ditto.

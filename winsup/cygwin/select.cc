@@ -597,7 +597,7 @@ select_pipe_info::~select_pipe_info ()
 void
 select_pipe_info::add_watch_handle (fhandler_pipe *fh)
 {
-  if (fh->get_overlapped () && fh->get_overlapped ()->hEvent)
+  if (fh->io_pending && fh->get_overlapped () && fh->get_overlapped ()->hEvent)
     w4[n++] = fh->get_overlapped ()->hEvent;
 }
 
@@ -906,19 +906,50 @@ fhandler_console::select_except (select_stuff *ss)
 select_record *
 fhandler_tty_common::select_read (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_read (ss);
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+
+  select_record *s = ss->start.next;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->read_selected = true;
+  s->read_ready = false;
+  return s;
 }
 
 select_record *
 fhandler_tty_common::select_write (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_write (ss);
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+  select_record *s = ss->start.next;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->write_selected = true;
+  s->write_ready = false;
+  return s;
 }
 
 select_record *
 fhandler_tty_common::select_except (select_stuff *ss)
 {
-  return ((fhandler_pipe *) this)->fhandler_pipe::select_except (ss);
+  if (!ss->device_specific_pipe
+      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+    return NULL;
+  select_record *s = ss->start.next;
+  s->startup = start_thread_pipe;
+  s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
+  s->except_selected = true;
+  s->except_ready = false;
+  return s;
 }
 
 static int

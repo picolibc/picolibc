@@ -569,6 +569,8 @@ public:
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
   fhandler_base_overlapped (): io_pending (false), overlapped (NULL) {}
   bool has_ongoing_io ();
+  friend class select_pipe_info;	/* FIXME: At least correct the naming
+					   here */
 };
 
 class fhandler_pipe: public fhandler_base_overlapped
