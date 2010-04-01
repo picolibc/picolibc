@@ -1,3 +1,7 @@
+2010-04-01  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* setup-net.sgml: Remove more mentions of rxvt.
+
 2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwinenv.sgml: Remove/deprecate mention of rxvt.
