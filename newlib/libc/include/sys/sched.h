@@ -1,7 +1,7 @@
 /*
  *  Written by Joel Sherrill <joel@OARcorp.com>.
  *
- *  COPYRIGHT (c) 1989-2000.
+ *  COPYRIGHT (c) 1989-2010.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  Permission to use, copy, modify, and distribute this software for any
@@ -18,47 +18,49 @@
  */
 
 
-#ifndef __POSIX_SYS_SCHEDULING_h
-#define __POSIX_SYS_SCHEDULING_h
+#ifndef _SYS_SCHED_H_
+#define _SYS_SCHED_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <sys/unistd.h>
-
-#include <sys/types.h>
-#include <sys/time.h>
-
-/* Scheduling Policies, P1003.1b-1993, p. 250
-   NOTE:  SCHED_SPORADIC added by P1003.4b/D8, p. 34.  */
-
+/* Scheduling Policies */
+/* Open Group Specifications Issue 6 */
+#if defined(__CYGWIN__)
+#define SCHED_OTHER    3
+#else
 #define SCHED_OTHER    0
+#endif
+
 #define SCHED_FIFO     1
 #define SCHED_RR       2
 
 #if defined(_POSIX_SPORADIC_SERVER)
-#define SCHED_SPORADIC 3 
+#define SCHED_SPORADIC 4
 #endif
 
-/* Scheduling Parameters, P1003.1b-1993, p. 249
-   NOTE:  Fields whose name begins with "ss_" added by P1003.4b/D8, p. 33.  */
+/* Scheduling Parameters */
+/* Open Group Specifications Issue 6 */
 
 struct sched_param {
   int sched_priority;           /* Process execution scheduling priority */
 
-#if defined(_POSIX_SPORADIC_SERVER)
-  int ss_low_priority;          /* Low scheduling priority for sporadic */
+#if defined(_POSIX_SPORADIC_SERVER) || defined(_POSIX_THREAD_SPORADIC_SERVER)
+  int sched_ss_low_priority;    /* Low scheduling priority for sporadic */
                                 /*   server */
-  struct timespec ss_replenish_period; 
+  struct timespec sched_ss_repl_period;
                                 /* Replenishment period for sporadic server */
-  struct timespec ss_initial_budget;   /* Initial budget for sporadic server */
+  struct timespec sched_ss_init_budget;
+                               /* Initial budget for sporadic server */
+  int sched_ss_max_repl;       /* Maximum pending replenishments for */
+                               /* sporadic server */
 #endif
 };
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif
 /* end of include file */

@@ -1,3 +1,11 @@
+2010-04-01  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/sched.h: Include prototypes for
+	sched_* methods.
+	* libc/include/sys/sched.h: Update to POSIX
+	1003.1b-2008.  Rework constants to allow sharing
+	between RTEMS and Cygwin.
+
 2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/locale/locale.c (loadlocale): Optimize "EUC" charset check.
