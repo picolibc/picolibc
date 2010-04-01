@@ -325,6 +325,21 @@ locale_cmp (const void *a, const void *b)
   return strcmp (*la, *lb);
 }
 
+/* Helper function to workaround reallocs which move blocks even if they shrink.
+   Cygwin's realloc is not doing this, but tcsh's, for instance.  All lc_foo
+   structures consist entirely of pointers so they are practically pointer
+   arrays.  What we do here is just treat the lc_foo pointers as char ** and
+   rebase all char * pointers within, up to the given size of the structure. */
+static void
+rebase_locale_buf (const void *ptrv, const char *newbase, const char *oldbase,
+                   const void *ptrvend)
+{
+  const char **ptrs = (const char **) ptrv;
+  const char **ptrsend = (const char **) ptrvend;
+  while (ptrs < ptrsend)
+    *ptrs++ += newbase - oldbase;
+}
+
 static char *
 __getlocaleinfo (LCID lcid, LCTYPE type, char **ptr, size_t size,
 		 wctomb_p f_wctomb, const char *charset)
@@ -625,6 +640,9 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
 	    era = NULL;
 	  else
 	    {
+	      if (tmp != new_lc_time_buf)
+		rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
+				   _time_locale + 1);
 	      lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
 	      new_lc_time_buf = tmp;
 	      lc_time_end = new_lc_time_buf + len;
@@ -674,6 +692,9 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
       free (new_lc_time_buf);
       return -1;
     }
+  if (tmp != new_lc_time_buf)
+    rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
+                       _time_locale + 1);
   if (*lc_time_buf)
     free (*lc_time_buf);
   *lc_time_buf = tmp;
@@ -717,6 +738,9 @@ __set_lc_numeric_from_win (const char *name,
       free (new_lc_numeric_buf);
       return -1;
     }
+  if (tmp != new_lc_numeric_buf)
+    rebase_locale_buf (_numeric_locale, tmp, new_lc_numeric_buf,
+                       _numeric_locale + 1);
   if (*lc_numeric_buf)
     free (*lc_numeric_buf);
   *lc_numeric_buf = tmp;
@@ -816,6 +840,9 @@ __set_lc_monetary_from_win (const char *name,
       free (new_lc_monetary_buf);
       return -1;
     }
+  if (tmp != new_lc_monetary_buf)
+    rebase_locale_buf (_monetary_locale, tmp, new_lc_monetary_buf,
+                       _monetary_locale + 1);
   if (*lc_monetary_buf)
     free (*lc_monetary_buf);
   *lc_monetary_buf = tmp;

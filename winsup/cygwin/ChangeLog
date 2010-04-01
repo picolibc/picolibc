@@ -1,3 +1,11 @@
+2010-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (rebase_locale_buf): New helper function to rebase
+	function pointers in locale structures.  Explain why this is necessary.
+	(__set_lc_time_from_win): Use rebase_locale_buf after realloc.
+	(__set_lc_numeric_from_win): Ditto.
+	(__set_lc_monetary_from_win): Ditto.
+
 2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (wait_sig): Make sure that strace is activated on
