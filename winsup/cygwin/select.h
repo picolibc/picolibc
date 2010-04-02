@@ -53,7 +53,6 @@ struct select_pipe_info: public select_info
   HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_pipe_info ();
   ~select_pipe_info ();
-  void add_watch_handle (fhandler_pipe *);
 };
 
 struct select_socket_info: public select_info

@@ -594,13 +594,6 @@ select_pipe_info::~select_pipe_info ()
   ForceCloseHandle (w4[0]);
 }
 
-void
-select_pipe_info::add_watch_handle (fhandler_pipe *fh)
-{
-  if (fh->io_pending && fh->get_overlapped () && fh->get_overlapped ()->hEvent)
-    w4[n++] = fh->get_overlapped ()->hEvent;
-}
-
 static DWORD WINAPI
 thread_pipe (void *arg)
 {
@@ -691,7 +684,6 @@ fhandler_pipe::select_read (select_stuff *ss)
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
     return NULL;
-  ss->device_specific_pipe->add_watch_handle (this);
 
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
@@ -709,7 +701,6 @@ fhandler_pipe::select_write (select_stuff *ss)
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
     return NULL;
-  ss->device_specific_pipe->add_watch_handle (this);
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
@@ -726,7 +717,6 @@ fhandler_pipe::select_except (select_stuff *ss)
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
     return NULL;
-  ss->device_specific_pipe->add_watch_handle (this);
   select_record *s = ss->start.next;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
