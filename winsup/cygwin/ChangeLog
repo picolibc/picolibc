@@ -1,3 +1,8 @@
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Properly initialize
+	overlapped part of this class.
+
 2010-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::close): Revert previous change.

@@ -22,9 +22,8 @@
 #include "shared_info.h"
 
 fhandler_fifo::fhandler_fifo ():
-  wait_state (fifo_unknown), dummy_client (NULL)
+  fhandler_base_overlapped (), wait_state (fifo_unknown), dummy_client (NULL)
 {
-  get_overlapped ()->hEvent = NULL;
   need_fork_fixup (true);
 }
 
