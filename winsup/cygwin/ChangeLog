@@ -1,3 +1,7 @@
+2010-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Revert previous change.
+
 2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.h (select_pipe_info::add_watch_handle): Delete declaration.
