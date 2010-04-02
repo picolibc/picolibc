@@ -1,7 +1,7 @@
 2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* select.h (select_pipe_info::add_watch_handle): Delete declaration.
-	* select.cc (select_pipe_info::add_watch_handle): Delete deinition.
+	* select.cc (select_pipe_info::add_watch_handle): Delete definition.
 	(fhandler_pipe::select_read): Delete call to add_watch_handle.
 	(fhandler_pipe::select_write): Ditto.
 	(fhandler_pipe::select_except): Ditto.
