@@ -913,7 +913,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 		      fd, iov, iovcnt, wait ? "" : "non", sigcatchers);
 
       if (wait && (!cfd->is_slow () || cfd->uninterruptible_io ()))
-	debug_printf ("no need to call ready_for_read");
+	/* no need to call ready_for_read */;
       else if (!cfd->ready_for_read (fd, wait))
 	{
 	  res = -1;

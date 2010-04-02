@@ -97,7 +97,7 @@ Note that this has been changed such that ^D works as
 expected instead of ^Z, and is settable via <command>stty</command>.
 This option must be specified before starting a Cygwin shell 
 and it cannot be changed in the shell.  It should not be set when using
-other terminals (i.e., rxvt or xterm). 
+other terminals (i.e., mintty or xterm). 
 </para>
 </listitem>
 

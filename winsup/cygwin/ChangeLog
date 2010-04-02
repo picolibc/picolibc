@@ -1,3 +1,127 @@
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_base::has_ongoing_io): Declare virtual method.
+	* select.cc (peek_pipe): Reorganize slightly.  Don't attempt to check a
+	handle if it has ongoing I/O.
+	(select_pipe_info::select_pipe_info): Delete definition.
+	(select_pipe_info::~select_pipe_info): Delete definition.
+	(thread_pipe): Get rid of WFMO call.  Reorganize loop.
+	(pipe_cleanup): Remove dependence on destructor.
+	(thread_serial): Reorganize loop.
+	* select.h (select_pipe_info): Empty this class since it no longer has
+	any special requirements (for now).
+
+	* syscalls.cc (readv): Remove an unneeded debug printf.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_base::setup_overlapped): Delete virtual
+	declaration.
+	(fhandler_base::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped): Remove now-unneeded friend.
+	(fhandler_base_overlapped::setup_overlapped): Return int, remove
+	parameter.
+	(fhandler_base_overlapped::get_overlapped): Return reference.
+	(fhandler_base_overlapped::fhandler_base_overlapped): Be more assertive
+	about zeroing everything.
+	(fhandler_base_overlapped::fixup_after_fork): Declare new function.
+	(fhandler_base_overlapped::fixup_after_exec): Ditto.
+	(fhandler_base_overlapped::dup): Ditto.
+	(fhandler_base_overlapped::close): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::dup): Call
+	fhandler_base_overlapped::dup rather than fhandler_base::dup.
+	* pipe.cc (fhandler_pipe::dup): Ditto.
+	(fhandler_pipe::init): Accommodate change in setup_overlapped arguments
+	for "opened_properly" case.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Properly initialize
+	overlapped part of this class.
+
+2010-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Revert previous change.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* select.h (select_pipe_info::add_watch_handle): Delete declaration.
+	* select.cc (select_pipe_info::add_watch_handle): Delete definition.
+	(fhandler_pipe::select_read): Delete call to add_watch_handle.
+	(fhandler_pipe::select_write): Ditto.
+	(fhandler_pipe::select_except): Ditto.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Avoid adding fh to
+	fdtab until we know that it is good.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Handle
+	error conditions more consistently.  Avoid handle leakage on error.
+
+2010-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Avoid potential crash
+	if former open call has been unsuccessful.
+
+2010-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc: Fix indentation.
+
+2010-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (rebase_locale_buf): New helper function to rebase
+	function pointers in locale structures.  Explain why this is necessary.
+	(__set_lc_time_from_win): Use rebase_locale_buf after realloc.
+	(__set_lc_numeric_from_win): Ditto.
+	(__set_lc_monetary_from_win): Ditto.
+
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.cc (wait_sig): Make sure that strace is activated on
+	__SIGSTRACE by calling new strace::activate function.
+	* strace.cc (strace::activate): Rename from strace::strace.
+	* strace.h (strace::activate): Define new function.
+	(strace::strace): Call activate.
+
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_base_overlapped): Temporarily (?) make
+	select_pipe_info a friend until the fhandler_tty intertangling can be
+	worked out.
+	* select.cc (select_pipe_info::add_watch_handle): Don't inspect the
+	overlapped event if we're not waiting for I/O.
+	(fhandler_tty_common::select_*): Change to standard function.  Don't do
+	kludgy fhandler_pipe coercion.
+
+2010-03-31  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base::dup): Call setup_overlapped
+	unconditionally.
+	(fhandler_base::fork_fixup): Ditto.
+	(fhandler_base::fixup_after_fork): Ditto.
+	(fhandler_base::fixup_after_exec): Ditto.
+	(fhandler_base_overlapped::setup_overlapped): Move to this class from
+	fhandler_base.
+	(handler_base_overlapped::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped::wait_overlapped): Ditto.  Track when we
+	expect pending I/O.
+	(fhandler_base_overlapped::read_overlapped): Move to this class from
+	fhandler_base.  Return error if ongoing I/O.
+	(fhandler_base_overlapped::write_overlapped): Ditto.
+	(fhandler_base_overlapped::has_ongoing_io): Semi-reinstate previous
+	function.
+	* fhandler.h (fhandler_base::wait_overlapped): Move to
+	fhandler_base_overlapped class.
+	(fhandler_base::write_overlapped): Ditto.
+	(fhandler_base::get_overlapped): Ditto.
+	(fhandler_base::get_overlapped_buffer): Ditto.
+	(fhandler_base_overlapped): New class.
+	(fhandler_pipe): Inherit from fhandler_base_overlapped.  Remove
+	overlapped stuff as a result.
+	(fhandler_fifo): Ditto.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Initialize fhandler_base_overlapped.
+	(pipe): Put a descriptive name in the fhandler.
+
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::wait_for_events): Remove call to
@@ -5,11 +129,12 @@
 
 2010-03-30  Thomas Wolff  <towo@towo.net>
 
-	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.
-	Add flags vt100_graphics_mode_G0, vt100_graphics_mode_G1 and
-	iso_2022_G1.
+	* fhandler.h (class dev_console): Drop vt100_graphics_mode_active.  Add
+	flags vt100_graphics_mode_G0, vt100_graphics_mode_G1 and iso_2022_G1.
 	* fhandler_console.cc: Throughout, tune VT100 graphics mode switching
 	to follow ISO 2022 strictly.
+	(fhandler_console::write) Reset VT100 graphic mode flags on terminal
+	full reset (ESC c).
 
 2010-03-30  Corinna Vinschen  <corinna@vinschen.de>
 

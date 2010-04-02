@@ -450,6 +450,20 @@ fhandler_tty_slave::fhandler_tty_slave ()
 int
 fhandler_tty_slave::open (int flags, mode_t)
 {
+  HANDLE tty_owner, from_master_local, to_master_local;
+  HANDLE *handles[] =
+  {
+    &from_master_local, &input_available_event, &input_mutex, &inuse,
+    &ioctl_done_event, &ioctl_request_event, &output_done_event,
+    &output_mutex, &to_master_local, &tty_owner,
+    NULL
+  };
+
+  const char *errmsg = NULL;
+
+  for (HANDLE **h = handles; *h; h++)
+    **h = NULL;
+
   if (get_device () == FH_TTY)
     dev().tty_to_real_device ();
   fhandler_tty_slave *arch = (fhandler_tty_slave *) cygheap->fdtab.find_archetype (pc.dev);
@@ -480,22 +494,19 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   if (!(output_mutex = get_ttyp ()->open_output_mutex ()))
     {
-      termios_printf ("open output mutex failed, %E");
-      __seterrno ();
-      return 0;
+      errmsg = "open output mutex failed, %E";
+      goto err;
     }
   if (!(input_mutex = get_ttyp ()->open_input_mutex ()))
     {
-      termios_printf ("open input mutex failed, %E");
-      __seterrno ();
-      return 0;
+      errmsg = "open input mutex failed, %E";
+      goto err;
     }
   shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
   if (!(input_available_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
     {
-      termios_printf ("open input event failed, %E");
-      __seterrno ();
-      return 0;
+      errmsg = "open input event failed, %E";
+      goto err;
     }
 
   /* The ioctl events may or may not exist.  See output_done_event,
@@ -515,30 +526,26 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   if (!get_ttyp ()->from_master || !get_ttyp ()->to_master)
     {
-      termios_printf ("tty handles have been closed");
+      errmsg = "tty handles have been closed";
       set_errno (EACCES);
-      return 0;
+      goto err_no_errno;
     }
-
-  HANDLE from_master_local;
-  HANDLE to_master_local;
-  from_master_local = to_master_local = NULL;
 
   if (cygserver_running == CYGSERVER_UNAVAIL
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
     {
       if (get_ttyp ()->master_pid < 0)
 	{
+	  errmsg = "*** master is closed";
 	  set_errno (EAGAIN);
-	  termios_printf ("*** master is closed");
-	  return 0;
+	  goto err_no_errno;
 	}
       pinfo p (get_ttyp ()->master_pid);
       if (!p)
 	{
+	  errmsg = "*** couldn't find tty master";
 	  set_errno (EAGAIN);
-	  termios_printf ("*** couldn't find tty master");
-	  return 0;
+	  goto err_no_errno;
 	}
       termios_printf ("cannot dup handles via server. using old method.");
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
@@ -548,7 +555,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  termios_printf ("can't open tty (%d) handle process %d",
 			  get_unit (), get_ttyp ()->master_pid);
 	  __seterrno ();
-	  return 0;
+	  goto err_no_msg;
 	}
 
       if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
@@ -558,7 +565,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  termios_printf ("can't duplicate input from %u/%p, %E",
 			  get_ttyp ()->master_pid, get_ttyp ()->from_master);
 	  __seterrno ();
-	  return 0;
+	  goto err_no_msg;
 	}
 
       VerifyHandle (from_master_local);
@@ -566,9 +573,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 			  GetCurrentProcess (), &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
 	{
-	  termios_printf ("can't duplicate output, %E");
-	  __seterrno ();
-	  return 0;
+	  errmsg = "can't duplicate output, %E";
+	  goto err;
 	}
       VerifyHandle (to_master_local);
       CloseHandle (tty_owner);
@@ -601,6 +607,16 @@ out:
   myself->set_ctty (get_ttyp (), flags, arch);
 
   return 1;
+
+err:
+  __seterrno ();
+err_no_errno:
+  termios_printf (errmsg);
+err_no_msg:
+  for (HANDLE **h = handles; *h; h++)
+    if (**h && **h != INVALID_HANDLE_VALUE)
+      CloseHandle (**h);
+  return 0;
 }
 
 int

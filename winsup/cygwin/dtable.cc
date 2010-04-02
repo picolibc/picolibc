@@ -350,9 +350,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	fh = build_fh_name (name);
 
-      if (fh)
-	cygheap->fdtab[fd] = fh;
-
       if (name[0])
 	{
 	  bin = fh->pc_binmode ();
@@ -389,11 +386,12 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	 This needs further investigation but the workaround not to close
 	 the handles will have a marginal hit of three extra handles per
 	 process at most. */
-      if (fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
+      if (!fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
 		     ? INVALID_HANDLE_VALUE : handle, access, bin))
-	set_std_handle (fd);
-      else
 	api_fatal ("couldn't initialize fd %d for %s", fd, fh->get_name ());
+
+      cygheap->fdtab[fd] = fh;
+      set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
 }

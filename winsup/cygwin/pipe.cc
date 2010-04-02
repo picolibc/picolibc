@@ -24,7 +24,7 @@ details. */
 #include "shared_info.h"
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (), popen_pid (0), overlapped (NULL)
+  : fhandler_base_overlapped (), popen_pid (0)
 {
   need_fork_fixup (true);
   uninterruptible_io (true);
@@ -54,7 +54,10 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
   a &= ~FILE_CREATE_PIPE_INSTANCE;
   fhandler_base::init (f, a, mode);
   close_on_exec (mode & O_CLOEXEC);
-  setup_overlapped (opened_properly);
+  if (opened_properly)
+    setup_overlapped ();
+  else
+    destroy_overlapped ();
   return 1;
 }
 
@@ -185,7 +188,7 @@ fhandler_pipe::dup (fhandler_base *child)
   ftp->set_popen_pid (0);
 
   int res;
-  if (get_handle () && fhandler_base::dup (child))
+  if (get_handle () && fhandler_base_overlapped::dup (child))
     res = -1;
   else
     res = 0;
@@ -378,6 +381,11 @@ pipe (int filedes[2])
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
+      char buf[sizeof ("/dev/fd/pipe:[2147483647]")];
+      __small_sprintf (buf, "/dev/fd/pipe:[%d]", (int) fdin);
+      fhs[0]->pc.set_normalized_path (buf);
+      __small_sprintf (buf, "pipe:[%d]", (int) fdout);
+      fhs[1]->pc.set_normalized_path (buf);
       fdin = fhs[0];
       fdout = fhs[1];
       filedes[0] = fdin;
