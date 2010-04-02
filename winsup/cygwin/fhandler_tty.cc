@@ -613,10 +613,11 @@ fhandler_tty_slave::close ()
      close this normally.  cgf 2006-05-20 */
   cygheap->manage_console_count ("fhandler_tty_slave::close", -1);
 
-  archetype->usecount--;
+  if (archetype)
+    archetype->usecount--;
   report_tty_counts (this, "closed", "");
 
-  if (archetype->usecount)
+  if (archetype && archetype->usecount)
     {
 #ifdef DEBUGGING
       if (archetype->usecount < 0)
