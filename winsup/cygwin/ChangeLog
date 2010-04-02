@@ -1,3 +1,10 @@
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Avoid adding fh to
+	fdtab until we know that it is good.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Handle
+	error conditions more consistently.  Avoid handle leakage on error.
+
 2010-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::close): Avoid potential crash
