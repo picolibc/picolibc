@@ -386,8 +386,6 @@ class fhandler_base
   bool issymlink () {return pc.issymlink ();}
   bool device_access_denied (int) __attribute__ ((regparm (2)));
   int fhaccess (int flags, bool) __attribute__ ((regparm (3)));
-  virtual void destroy_overlapped () __attribute__ ((regparm (1))) {}
-  virtual bool setup_overlapped () {return false;}
 };
 
 class fhandler_mailslot : public fhandler_base
@@ -560,17 +558,24 @@ protected:
   OVERLAPPED *overlapped;
 public:
   int wait_overlapped (bool, bool, DWORD *, DWORD = 0) __attribute__ ((regparm (3)));
-  bool setup_overlapped (bool doit = true) __attribute__ ((regparm (2)));
+  int setup_overlapped () __attribute__ ((regparm (1)));
   void destroy_overlapped () __attribute__ ((regparm (1)));
   void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall write_overlapped (const void *ptr, size_t len);
-  OVERLAPPED *get_overlapped () {return overlapped;}
+  OVERLAPPED *&get_overlapped () {return overlapped;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
-  fhandler_base_overlapped (): io_pending (false), overlapped (NULL) {}
+  fhandler_base_overlapped (): io_pending (false), overlapped (NULL)
+  {
+    memset (&io_status, 0, sizeof io_status);
+  }
   bool has_ongoing_io ();
-  friend class select_pipe_info;	/* FIXME: At least correct the naming
-					   here */
+
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
+
+  int close ();
+  int dup (fhandler_base *child);
 };
 
 class fhandler_pipe: public fhandler_base_overlapped

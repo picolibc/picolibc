@@ -54,7 +54,10 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
   a &= ~FILE_CREATE_PIPE_INSTANCE;
   fhandler_base::init (f, a, mode);
   close_on_exec (mode & O_CLOEXEC);
-  setup_overlapped (opened_properly);
+  if (opened_properly)
+    setup_overlapped ();
+  else
+    destroy_overlapped ();
   return 1;
 }
 
@@ -185,7 +188,7 @@ fhandler_pipe::dup (fhandler_base *child)
   ftp->set_popen_pid (0);
 
   int res;
-  if (get_handle () && fhandler_base::dup (child))
+  if (get_handle () && fhandler_base_overlapped::dup (child))
     res = -1;
   else
     res = 0;

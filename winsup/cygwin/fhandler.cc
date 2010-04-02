@@ -1037,8 +1037,15 @@ fhandler_base::close ()
 
       __seterrno ();
     }
-  destroy_overlapped ();
   return res;
+}
+
+
+int
+fhandler_base_overlapped::close ()
+{
+  destroy_overlapped ();
+  return fhandler_base::close ();
 }
 
 int
@@ -1162,8 +1169,15 @@ fhandler_base::dup (fhandler_base *child)
       VerifyHandle (nh);
       child->set_io_handle (nh);
     }
-  child->setup_overlapped ();
   return 0;
+}
+
+int
+fhandler_base_overlapped::dup (fhandler_base *child)
+{
+  int res = fhandler_base::dup (child) ||
+	    ((fhandler_base_overlapped *) child)->setup_overlapped ();
+  return res;
 }
 
 int fhandler_base::fcntl (int cmd, void *arg)
@@ -1334,7 +1348,6 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 	VerifyHandle (h);
       res = true;
     }
-  setup_overlapped ();
   return res;
 }
 
@@ -1353,19 +1366,30 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   debug_printf ("inheriting '%s' from parent", get_name ());
   if (!nohandle ())
     fork_fixup (parent, io_handle, "io_handle");
-  setup_overlapped ();
   /* POSIX locks are not inherited across fork. */
   if (unique_id)
     del_my_locks (after_fork);
 }
 
 void
+fhandler_base_overlapped::fixup_after_fork (HANDLE parent)
+{
+  setup_overlapped ();
+  fhandler_base::fixup_after_fork (parent);
+}
+
+void
 fhandler_base::fixup_after_exec ()
 {
   debug_printf ("here for '%s'", get_name ());
-  setup_overlapped ();
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
+}
+void
+fhandler_base_overlapped::fixup_after_exec ()
+{
+  setup_overlapped ();
+  fhandler_base::fixup_after_exec ();
 }
 
 bool
@@ -1640,23 +1664,14 @@ fhandler_base::fpathconf (int v)
 
 /* Overlapped I/O */
 
-bool
-fhandler_base_overlapped::setup_overlapped (bool doit)
+int
+fhandler_base_overlapped::setup_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped_buffer ();
   memset (ov, 0, sizeof (*ov));
-  bool res;
-  if (doit)
-    {
-      set_overlapped (ov);
-      res = !!(ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL));
-    }
-  else
-    {
-      set_overlapped (NULL);
-      res = false;
-    }
-  return res;
+  set_overlapped (ov);
+  ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL);
+  return ov->hEvent ? 0 : -1;
 }
 
 void
@@ -1668,6 +1683,8 @@ fhandler_base_overlapped::destroy_overlapped ()
       CloseHandle (ov->hEvent);
       ov->hEvent = NULL;
     }
+  io_pending = false;
+  get_overlapped () = NULL;
 }
 
 bool

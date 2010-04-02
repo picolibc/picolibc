@@ -1,5 +1,26 @@
 2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base::setup_overlapped): Delete virtual
+	declaration.
+	(fhandler_base::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped): Remove now-unneeded friend.
+	(fhandler_base_overlapped::setup_overlapped): Return int, remove
+	parameter.
+	(fhandler_base_overlapped::get_overlapped): Return reference.
+	(fhandler_base_overlapped::fhandler_base_overlapped): Be more assertive
+	about zeroing everything.
+	(fhandler_base_overlapped::fixup_after_fork): Declare new function.
+	(fhandler_base_overlapped::fixup_after_exec): Ditto.
+	(fhandler_base_overlapped::dup): Ditto.
+	(fhandler_base_overlapped::close): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::dup): Call
+	fhandler_base_overlapped::dup rather than fhandler_base::dup.
+	* pipe.cc (fhandler_pipe::dup): Ditto.
+	(fhandler_pipe::init): Accommodate change in setup_overlapped arguments
+	for "opened_properly" case.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Properly initialize
 	overlapped part of this class.
 

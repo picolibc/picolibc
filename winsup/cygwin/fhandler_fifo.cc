@@ -304,7 +304,7 @@ fhandler_fifo::close ()
 int
 fhandler_fifo::dup (fhandler_base *child)
 {
-  int res = fhandler_base::dup (child);
+  int res = fhandler_base_overlapped::dup (child);
   fhandler_fifo *fifo_child = (fhandler_fifo *) child;
   if (res == 0 && dummy_client)
     {
