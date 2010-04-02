@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -429,12 +429,17 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 static int
 peek_pipe (select_record *s, bool from_select)
 {
-  int n = 0;
-  int gotone = 0;
-  fhandler_base *fh = s->fh;
-
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
+
+  int n = 0;
+  int gotone = 0;
+  fhandler_base *fh = (fhandler_base *) s->fh;
+
+  /* Don't check if this is a non-blocking fd and I/O is still active.
+     That could give a false-positive with peek_pipe and friends. */
+  if (fh->has_ongoing_io ())
+    return 0;
 
   /* Don't perform complicated tests if we don't need to. */
   if (!s->read_selected && !s->except_selected)
@@ -577,65 +582,35 @@ out:
 
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
-select_pipe_info::select_pipe_info ()
-{
-  n = 1;
-  w4[0] = CreateEvent (&sec_none_nih, true, false, NULL);
-}
-
-select_pipe_info::~select_pipe_info ()
-{
-  if (thread)
-    {
-      SetEvent (w4[0]);
-      stop_thread = true;
-      thread->detach ();
-    }
-  ForceCloseHandle (w4[0]);
-}
-
 static DWORD WINAPI
 thread_pipe (void *arg)
 {
   select_pipe_info *pi = (select_pipe_info *) arg;
-  bool gotone = false;
   DWORD sleep_time = 0;
+  bool looping = true;
 
-  for (;;)
+  while (looping)
     {
-      select_record *s = pi->start;
-      if (pi->n > 1)
-	switch (WaitForMultipleObjects (pi->n, pi->w4, false, INFINITE))
-	  {
-	  case WAIT_OBJECT_0:
-	    goto out;
-	  default:
-	    break;
-	  }
-      while ((s = s->next))
+      for (select_record *s = pi->start; (s = s->next); )
 	if (s->startup == start_thread_pipe)
 	  {
 	    if (peek_pipe (s, true))
-	      gotone = true;
+	      looping = false;
 	    if (pi->stop_thread)
 	      {
 		select_printf ("stopping");
-		goto out;
+		looping = false;
+		break;
 	      }
 	  }
-      /* Paranoid check */
-      if (pi->stop_thread)
-	{
-	  select_printf ("stopping from outer loop");
-	  break;
-	}
-      if (gotone)
+      if (!looping)
 	break;
       Sleep (sleep_time >> 3);
       if (sleep_time < 80)
 	++sleep_time;
+      if (pi->stop_thread)
+	break;
     }
-out:
   return 0;
 }
 
@@ -660,9 +635,12 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
 static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
-  if (stuff->device_specific_pipe)
+  select_pipe_info *pi = (select_pipe_info *) stuff->device_specific_pipe;
+  if (pi && pi->thread)
     {
-      delete stuff->device_specific_pipe;
+      pi->stop_thread = true;
+      pi->thread->detach ();
+      delete pi;
       stuff->device_specific_pipe = NULL;
     }
 }
@@ -1119,25 +1097,23 @@ static DWORD WINAPI
 thread_serial (void *arg)
 {
   select_serial_info *si = (select_serial_info *) arg;
-  bool gotone = false;
+  bool looping = true;
 
-  for (;;)
-    {
-      select_record *s = si->start;
-      while ((s = s->next))
-	if (s->startup == start_thread_serial)
-	  {
-	    if (peek_serial (s, true))
-	      gotone = true;
-	  }
-      if (si->stop_thread)
+  while (looping)
+    for (select_record *s = si->start; (s = s->next); )
+      if (s->startup != start_thread_serial)
+	continue;
+      else
 	{
-	  select_printf ("stopping");
-	  break;
+	  if (peek_serial (s, true))
+	    looping = false;
+	  if (si->stop_thread)
+	    {
+	      select_printf ("stopping");
+	      looping = false;
+	      break;
+	    }
 	}
-      if (gotone)
-	break;
-    }
 
   select_printf ("exiting");
   return 0;

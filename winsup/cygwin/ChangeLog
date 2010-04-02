@@ -1,5 +1,20 @@
 2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler.h (fhandler_base::has_ongoing_io): Declare virtual method.
+	* select.cc (peek_pipe): Reorganize slightly.  Don't attempt to check a
+	handle if it has ongoing I/O.
+	(select_pipe_info::select_pipe_info): Delete definition.
+	(select_pipe_info::~select_pipe_info): Delete definition.
+	(thread_pipe): Get rid of WFMO call.  Reorganize loop.
+	(pipe_cleanup): Remove dependence on destructor.
+	(thread_serial): Reorganize loop.
+	* select.h (select_pipe_info): Empty this class since it no longer has
+	any special requirements (for now).
+
+	* syscalls.cc (readv): Remove an unneeded debug printf.
+
+2010-04-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_base::setup_overlapped): Delete virtual
 	declaration.
 	(fhandler_base::destroy_overlapped): Ditto.
