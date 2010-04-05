@@ -66,7 +66,6 @@ typedef struct
   unsigned short li_version;
   unsigned int   li_prologue_length;
   unsigned char  li_min_insn_length;
-  unsigned char  li_max_ops_per_insn;
   unsigned char  li_default_is_stmt;
   int            li_line_base;
   unsigned char  li_line_range;
