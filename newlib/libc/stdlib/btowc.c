@@ -13,6 +13,9 @@ btowc (int c)
   wchar_t pwc;
   unsigned char b;
 
+  if (c == EOF)
+    return WEOF;
+
   b = (unsigned char)c;
 
   /* Put mbs in initial state. */
@@ -22,8 +25,8 @@ btowc (int c)
 
   retval = __mbtowc (_REENT, &pwc, &b, 1, __locale_charset (), &mbs);
 
-  if (c == EOF || retval != 1)
+  if (retval != 0 && retval != 1)
     return WEOF;
-  else
-    return (wint_t)pwc;
+
+  return (wint_t)pwc;
 }
