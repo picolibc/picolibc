@@ -1,3 +1,10 @@
+2010-04-06  Dave Korn  <dave.korn.cygwin@googlemail.com>
+
+	* libc/stdlib/__atexit.c (__atexit_lock): Initialise as recursive
+	rather than non-recursive lock type.
+	(__register_exitproc): Use recursive locking APIs on it.
+	* libc/stdlib/__call_atexit.c (__call_exitprocs): Likewise.
+
 2010-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/btowc.c (btowc): Reorganize EOF check.  Fix incorrect

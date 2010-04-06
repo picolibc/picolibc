@@ -33,7 +33,7 @@ _DEFUN (__call_exitprocs, (code, d),
 
 
 #ifndef __SINGLE_THREAD__
-  __lock_acquire(__atexit_lock);
+  __lock_acquire_recursive(__atexit_lock);
 #endif
 
  restart:
@@ -115,7 +115,7 @@ _DEFUN (__call_exitprocs, (code, d),
 #endif
     }
 #ifndef __SINGLE_THREAD__
-  __lock_release(__atexit_lock);
+  __lock_release_recursive(__atexit_lock);
 #endif
 
 }

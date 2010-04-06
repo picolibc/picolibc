@@ -10,7 +10,7 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 void * malloc(size_t) _ATTRIBUTE((__weak__));
-__LOCK_INIT(, __atexit_lock);
+__LOCK_INIT_RECURSIVE(, __atexit_lock);
 
 /*
  * Register a function to be performed at exit or on shared library unload.
@@ -28,7 +28,7 @@ _DEFUN (__register_exitproc,
   register struct _atexit *p;
 
 #ifndef __SINGLE_THREAD__
-  __lock_acquire(__atexit_lock);
+  __lock_acquire_recursive(__atexit_lock);
 #endif
 
   p = _GLOBAL_REENT->_atexit;
@@ -48,7 +48,7 @@ _DEFUN (__register_exitproc,
       if (p == NULL)
 	{
 #ifndef __SINGLE_THREAD__
-	  __lock_release(__atexit_lock);
+	  __lock_release_recursive(__atexit_lock);
 #endif
 	  return -1;
 	}
@@ -93,7 +93,7 @@ _DEFUN (__register_exitproc,
     }
   p->_fns[p->_ind++] = fn;
 #ifndef __SINGLE_THREAD__
-  __lock_release(__atexit_lock);
+  __lock_release_recursive(__atexit_lock);
 #endif
   return 0;
 }
