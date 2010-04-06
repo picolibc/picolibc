@@ -40,6 +40,8 @@ details. */
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
+extern "C" int valid_sched_parameters(const struct sched_param *);
+extern "C" int sched_set_thread_priority(HANDLE thread, int priority);
 static inline verifyable_object_state
   verifyable_object_isvalid (void const * objectptr, thread_magic_t magic,
 			     void *static_ptr1 = NULL,
