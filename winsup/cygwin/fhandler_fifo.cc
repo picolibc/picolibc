@@ -143,7 +143,7 @@ fhandler_fifo::open (int flags, mode_t)
 	    __seterrno ();
 	  res = 0;
 	}
-      else if (!setup_overlapped ())
+      else if (setup_overlapped ())
 	{
 	  CloseHandle (h);
 	  __seterrno ();
