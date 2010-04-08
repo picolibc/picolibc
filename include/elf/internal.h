@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1998, 2000, 2001, 2002,
-   2003, 2006, 2007, 2008 Free Software Foundation, Inc.
+   2003, 2006, 2007, 2008, 2010 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -306,7 +306,8 @@ struct elf_segment_map
 	 || segment->p_type == PT_GNU_RELRO				\
 	 || segment->p_type == PT_LOAD))				\
     || ((sec_hdr->sh_flags & SHF_TLS) == 0				\
-	&& segment->p_type != PT_TLS))					\
+	&& segment->p_type != PT_TLS					\
+	&& segment->p_type != PT_PHDR))					\
    /* Any section besides one of type SHT_NOBITS must have a file	\
       offset within the segment.  */					\
    && (sec_hdr->sh_type == SHT_NOBITS					\
