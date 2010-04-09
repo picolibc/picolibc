@@ -607,6 +607,7 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   {
     wchar_t buf[80];
     GetLocaleInfoW (lcid, LOCALE_IDATE, buf, 80);
+    _time_locale->md_order = (const char *) lc_time_ptr;
     lc_time_ptr = stpcpy (lc_time_ptr, *buf == L'1' ? "dm" : "md") + 1;
   }
   /* ampm_fmt */

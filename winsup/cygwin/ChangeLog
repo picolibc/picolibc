@@ -1,3 +1,8 @@
+2010-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__set_lc_time_from_win): Actually set
+	_time_locale->md_order to the D_MD_ORDER value written to the buffer.
+
 2010-04-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (path_conv::set_normalized_path): Use crealloc_abort to avoid
