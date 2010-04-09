@@ -1,3 +1,11 @@
+2010-04-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (path_conv::set_normalized_path): Use crealloc_abort to avoid
+	a memory leak.
+	* path.h (path_conv::operator =): Just use cstrdup to allocate
+	normalized_path, avoiding attempt to free a pointer which is allocated
+	in another pc.
+
 2010-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 4.

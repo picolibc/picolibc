@@ -217,7 +217,7 @@ class path_conv
   {
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);
-    set_normalized_path (pc.normalized_path);
+    normalized_path = cstrdup(pc.normalized_path);
     wide_path = NULL;
     return *this;
   }

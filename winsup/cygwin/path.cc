@@ -377,7 +377,7 @@ path_conv::set_normalized_path (const char *path_copy)
   if (path_copy)
     {
       size_t n = strlen (path_copy) + 1;
-      char *p = (char *) cmalloc_abort (HEAP_STR, n);
+      char *p = (char *) crealloc_abort ((void *) normalized_path, n);
       normalized_path = (const char *) memcpy (p, path_copy, n);
     }
 }
