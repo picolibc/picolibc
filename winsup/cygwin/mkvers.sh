@@ -25,36 +25,13 @@ windres="$3"
 #
 # Load the current date so we can work on individual fields
 #
-build_date=`date`
-set -$- $build_date
-#
-# Translate the month into a number
-#
-case "$2" in
-    Jan) m=01 ;;
-    Feb) m=02 ;;
-    Mar) m=03 ;;
-    Apr) m=04 ;;
-    May) m=05 ;;
-    Jun) m=06 ;;
-    Jul) m=07 ;;
-    Aug) m=08 ;;
-    Sep) m=09 ;;
-    Oct) m=10 ;;
-    Nov) m=11 ;;
-    Dec) m=12 ;;
-esac
-
-if [ "$3" -lt 10 ]; then
-    d=0$3
-else
-    d=$3
-fi
-hhmm="`echo $4 | sed 's/:..$//'`"
+set -$- $(date +"%m %d %Y %H:%M")
+m=$1 d=$2 y=$3 hhmm=$4
 #
 # Set date into YYYY-MM-DD HH:MM:SS format
 #
-builddate="${6-$5}-$m-$d $hhmm"
+builddate="$y-$m-$d $hhmm"
+echo "$builddate"
 
 set -$- ''
 
