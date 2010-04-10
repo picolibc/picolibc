@@ -377,7 +377,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  /* Send the VERASE character from the terminal settings as backspace keycode. */
 	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
 	    {
-	      char c = ti.c_cc[VERASE];
+	      char c = ti.c_cc[VERASE] ?: CERASE;
 	      nread = 0;
 	      if (control_key_state & ALT_PRESSED) {
 		if (dev_state->metabit)
@@ -2120,20 +2120,10 @@ fhandler_console::fixup_after_fork_exec (bool execing)
     cygheap->manage_console_count ("fhandler_console::fixup_after_fork_exec", -1);
   else
     {
-      bool sawerr = false;
       if (!get_io_handle ())
-	{
-	  system_printf ("error opening input console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
-	  sawerr = true;
-	}
+	system_printf ("error opening input console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
       if (!get_output_handle ())
-	{
-	  system_printf ("error opening output console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
-	  sawerr = true;
-	}
-
-      if (!sawerr)
-	system_printf ("error opening console after fork/exec, errno %d, %E", get_errno ());
+	system_printf ("error opening output console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
     }
 
   if (!close_on_exec ())

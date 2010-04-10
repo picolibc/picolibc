@@ -1,5 +1,12 @@
 2010-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler_console.cc (fhandler_console::read): Default to sending
+	CERASE character if termios VERASE field is zero.
+	(fhandler_console::fixup_after_fork_exec): Avoid a spurious debug
+	message.
+
+2010-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* mkvers.sh: Use modern date formats to construct the date.
 
 2010-04-09  Corinna Vinschen  <corinna@vinschen.de>
