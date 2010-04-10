@@ -1,7 +1,7 @@
 #!/bin/sh
 # mkvers.sh - Make version information for cygwin DLL
 #
-#   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+#   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2010 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
