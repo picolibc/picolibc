@@ -3,14 +3,10 @@
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
                 version='1.0'>
 
-<!-- See /usr/share/docbook-xsl/params/ -->
 <xsl:param name="chunker.output.doctype-public" 
   select="'-//W3C//DTD HTML 4.01 Transitional//EN'" />
 <xsl:param name="html.stylesheet" select="'docbook.css'"/>
 <xsl:param name="use.id.as.filename" select="1" />
 <xsl:param name="root.filename" select="@id" />
 
-<!-- TODO: make URLs and paths wrap with PDF output -->
-
 </xsl:stylesheet>
-
