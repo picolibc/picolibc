@@ -118,6 +118,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
       if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
 	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
       dev_state->set_default_attr ();
+      dev_state->backspace_keycode = CERASE;
       shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
     }
 
@@ -374,10 +375,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  if (control_key_state & LEFT_ALT_PRESSED)
 	    dev_state->nModifiers |= 8;
 
-	  /* Send the VERASE character from the terminal settings as backspace keycode. */
 	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
 	    {
-	      char c = ti.c_cc[VERASE] ?: CERASE;
+	      char c = dev_state->backspace_keycode;
 	      nread = 0;
 	      if (control_key_state & ALT_PRESSED) {
 		if (dev_state->metabit)
@@ -1396,6 +1396,10 @@ fhandler_console::char_command (char c)
 	      dev_state->savebuf = NULL;
 	      dev_state->savebufsiz.X = dev_state->savebufsiz.Y = 0;
 	    }
+	  break;
+
+	case 67: /* DECBKM ("DEC Backarrow Key Mode") */
+	  dev_state->backspace_keycode = (c == 'h' ? CTRL('H') : CERASE);
 	  break;
 
 	case 1000: /* Mouse tracking */

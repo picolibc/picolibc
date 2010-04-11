@@ -924,6 +924,7 @@ class dev_console
   bool iso_2022_G1;
   bool alternate_charset_active;
   bool metabit;
+  char backspace_keycode;
 
   char my_title_buf [TITLESIZE + 1];
 

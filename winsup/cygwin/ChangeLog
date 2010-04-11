@@ -1,3 +1,12 @@
+2010-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class dev_console): Add backspace_keycode member.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Initialize
+	backspace_keycode with CERASE.
+	(fhandler_console::read): Return dev_state->backspace_keycode if the
+	backspace key is pressed.
+	(fhandler_console::char_command): Implement DECBKM escape sequence.
+
 2010-04-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_console.cc (fhandler_console::read): Default to sending
