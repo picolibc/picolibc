@@ -1,3 +1,7 @@
+2010-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.5): New section.
+
 2010-04-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin-api.in.sgml: Update to DocBook SGML 4.5 DTD.

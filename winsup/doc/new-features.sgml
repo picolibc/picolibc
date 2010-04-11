@@ -1,5 +1,18 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.5"><title>What's new and what changed from 1.7.3 to 1.7.5</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for DEC Backarrow Key Mode escape sequences (ESC [ ? 67 h, ESC [ ? 67 l)
+in Windows console.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.3"><title>What's new and what changed from 1.7.2 to 1.7.3</title>
 
 <itemizedlist mark="bullet">
