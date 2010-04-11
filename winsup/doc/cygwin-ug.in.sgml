@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"[
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
   <!ENTITY cygnus-copyright "<year>1999,2000,2001,2002,2003,2004,2005,2006,2007,2008</year>
   <holder>Red Hat, Inc.</holder>">
   <!ENTITY cygnus-code-copyright "

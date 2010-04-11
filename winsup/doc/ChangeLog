@@ -1,3 +1,11 @@
+2010-04-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin-api.in.sgml: Update to DocBook SGML 4.5 DTD.
+	* cygwin-ug-net.in.sgml: Ditto.
+	* cygwin-ug.in.sgml: Ditto.
+	* faq-sections.xml: Ditto.
+	* faq.xml: Ditto.
+
 2010-04-01  Charles Wilson  <cygwin@cwilson.fastmail.fm>
 
 	* setup-net.sgml: Remove more mentions of rxvt.

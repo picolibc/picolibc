@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
-<!DOCTYPE article PUBLIC '-//OASIS//DTD DocBook XML V4.2//EN'
-                      "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!DOCTYPE article PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN'
+                      "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
       <!-- see http://www.unicode.org/charts/PDF/U0080.pdf -->
 	<!ENTITY pound      "&#x00A3;">
 	<!ENTITY brokenpipe "&#x00A6;">
