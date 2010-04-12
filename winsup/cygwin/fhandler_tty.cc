@@ -531,7 +531,8 @@ fhandler_tty_slave::open (int flags, mode_t)
       goto err_no_errno;
     }
 
-  if (cygserver_running == CYGSERVER_UNAVAIL
+  if (myself->pid == get_ttyp ()->master_pid
+      || cygserver_running == CYGSERVER_UNAVAIL
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
     {
       if (get_ttyp ()->master_pid < 0)
@@ -547,15 +548,24 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  set_errno (EAGAIN);
 	  goto err_no_errno;
 	}
-      termios_printf ("cannot dup handles via server. using old method.");
-      HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-				      p->dwProcessId);
-      if (tty_owner == NULL)
+      HANDLE tty_owner;
+      if (myself->pid == get_ttyp ()->master_pid)
 	{
-	  termios_printf ("can't open tty (%d) handle process %d",
-			  get_unit (), get_ttyp ()->master_pid);
-	  __seterrno ();
-	  goto err_no_msg;
+	  /* This is the most common case, just calling openpty. */
+	  termios_printf ("dup handles within myself.");
+	  tty_owner = GetCurrentProcess ();
+	}
+      else
+	{
+	  termios_printf ("cannot dup handles via server. using old method.");
+	  tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->dwProcessId);
+	  if (tty_owner == NULL)
+	    {
+	      termios_printf ("can't open tty (%d) handle process %d",
+			      get_unit (), get_ttyp ()->master_pid);
+	      __seterrno ();
+	      goto err_no_msg;
+	    }
 	}
 
       if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
@@ -577,7 +587,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  goto err;
 	}
       VerifyHandle (to_master_local);
-      CloseHandle (tty_owner);
+      if (tty_owner != GetCurrentProcess ())
+	CloseHandle (tty_owner);
     }
 
   termios_printf ("duplicated from_master %p->%p from tty_owner",
@@ -655,7 +666,11 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
-  client_request_attach_tty req ((DWORD) get_ttyp ()->master_pid,
+  pinfo p (get_ttyp ()->master_pid);
+  if (!p)
+    return 0;
+
+  client_request_attach_tty req (p->dwProcessId,
 				 (HANDLE) get_ttyp ()->from_master,
 				 (HANDLE) get_ttyp ()->to_master);
 

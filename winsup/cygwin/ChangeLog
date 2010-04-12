@@ -1,3 +1,10 @@
+2010-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Add code to duplicate
+	handles within a single process to simplify openpty case.
+	(fhandler_tty_slave::cygserver_attach_tty): Correctly send Windows PID
+	to cygserver, rather than the Cygwin PID.
+
 2010-04-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class dev_console): Add backspace_keycode member.
