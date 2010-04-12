@@ -1449,8 +1449,9 @@ only support ITIMER_REAL for now.</para>
 a true hardlink.  This is true at least for FAT and FAT32 filesystems.
 NTFS supports hardlinks.  </para>
 
-<para><function>lseek</function> only works properly on binary
-files.</para>
+<para><function>lseek</function> only works properly on files opened in
+binary mode.  On files opened in textmode (via mount mode or explicit
+open flag) its positioning is potentially unreliable.</para>
 
 <para><function>setuid</function> is only safe against reverting the user
 switch after a call to one of the exec(2) functions took place.  Windows
