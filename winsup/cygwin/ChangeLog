@@ -1,5 +1,9 @@
 2010-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h: Bump DLL minor version number to 5.
+
+2010-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml (std-notes): Improve lseek description.
 
 2010-04-12  Corinna Vinschen  <corinna@vinschen.de>
