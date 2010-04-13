@@ -38,6 +38,7 @@
 #include "cygtls.h"
 #include "cygwin/in6.h"
 #include "ntdll.h"
+#include "miscfuncs.h"
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 #define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
@@ -94,21 +95,33 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  set_errno (ENOENT);
 	  return 0;
 	}
-      if (!pc.issocket ())
+      /* Do NOT test for the file being a socket file here.  The socket file
+	 creation is not an atomic operation, so there is a chance that socket
+	 files which are just in the process of being created are recognized
+	 as non-socket files.  To work around this problem we now create the
+	 file with all sharing disabled.  If the below NtOpenFile fails
+	 with STATUS_SHARING_VIOLATION we know that the file already exists,
+	 but the creating process isn't finished yet.  So we yield and try
+	 again, until we can either open the file successfully, or some error
+	 other than STATUS_SHARING_VIOLATION occurs.
+	 Since we now don't know if the file is actually a socket file, we
+	 perform this check here explicitely. */
+      pc.get_object_attr (attr, sec_none_nih);
+      do
 	{
-	  set_errno (EBADF);
-	  return 0;
+	  status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  if (status == STATUS_SHARING_VIOLATION)
+	    yield ();
+	  else if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      return 0;
+	    }
 	}
-      status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE,
-			   pc.get_object_attr (attr, sec_none_nih), &io,
-			   FILE_SHARE_VALID_FLAGS,
-			   FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_FOR_BACKUP_INTENT);
-      if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
-	  return 0;
-	}
+      while (status == STATUS_SHARING_VIOLATION);
       int ret = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
@@ -119,6 +132,11 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  struct sockaddr_in sin;
 	  char ctype;
 	  sin.sin_family = AF_INET;
+	  if (strncmp (buf, SOCKET_COOKIE, strlen (SOCKET_COOKIE)))
+	    {
+	      set_errno (EBADF);
+	      return 0;
+	    }
 	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %c %08x-%08x-%08x-%08x",
 		  &sin.sin_port,
 		  &ctype,
@@ -972,7 +990,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 
       status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
 			     pc.get_object_attr (attr, sa), &io, NULL, fattr,
-			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			     0, FILE_CREATE,
 			     FILE_NON_DIRECTORY_FILE
 			     | FILE_SYNCHRONOUS_IO_NONALERT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,

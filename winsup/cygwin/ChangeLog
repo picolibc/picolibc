@@ -1,3 +1,10 @@
+2010-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Only test the file for being a
+	socket after opening it.  Retry if opening failed with sharing
+	violation.  Explain why we do this.
+	(fhandler_socket::bind): Create file with no sharing allowed.
+
 2010-04-13  John Bowman  <bowman@math.ualberta.ca>
 
 	* cygheap.cc (cwcsdup): Fix allocation size to accommodate sizeof WCHAR.
