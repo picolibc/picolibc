@@ -363,7 +363,7 @@ extern "C" PWCHAR __stdcall
 cwcsdup (const PWCHAR s)
 {
   MALLOC_CHECK;
-  PWCHAR p = (PWCHAR) cmalloc (HEAP_STR, wcslen (s) + 1);
+  PWCHAR p = (PWCHAR) cmalloc (HEAP_STR, (wcslen (s) + 1) * sizeof (WCHAR));
   if (!p)
     return NULL;
   wcpcpy (p, s);
@@ -375,7 +375,7 @@ extern "C" PWCHAR __stdcall
 cwcsdup1 (const PWCHAR s)
 {
   MALLOC_CHECK;
-  PWCHAR p = (PWCHAR) cmalloc (HEAP_1_STR, wcslen (s) + 1);
+  PWCHAR p = (PWCHAR) cmalloc (HEAP_1_STR, (wcslen (s) + 1) * sizeof (WCHAR));
   if (!p)
     return NULL;
   wcpcpy (p, s);
