@@ -104,7 +104,7 @@ struct bfd;
    sim_create_inferior.  FIXME: What should the state of the simulator
    be? */
 
-SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *abfd, char **argv));
+SIM_DESC sim_open (SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *abfd, char **argv);
 
 
 /* Destory a simulator instance.
@@ -115,7 +115,7 @@ SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *call
    and mmap'd areas.  You cannot assume sim_kill has already been
    called. */
 
-void sim_close PARAMS ((SIM_DESC sd, int quitting));
+void sim_close (SIM_DESC sd, int quitting);
 
 
 /* Load program PROG into the simulators memory.
@@ -141,7 +141,7 @@ void sim_close PARAMS ((SIM_DESC sd, int quitting));
    Such manipulation should probably (?) occure in
    sim_create_inferior. */
 
-SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct bfd *abfd, int from_tty));
+SIM_RC sim_load (SIM_DESC sd, char *prog, struct bfd *abfd, int from_tty);
 
 
 /* Prepare to run the simulated program.
@@ -161,21 +161,21 @@ SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct bfd *abfd, int from_tty
    address space (according to the applicable ABI) and the program
    counter and stack pointer set accordingly. */
 
-SIM_RC sim_create_inferior PARAMS ((SIM_DESC sd, struct bfd *abfd, char **argv, char **env));
+SIM_RC sim_create_inferior (SIM_DESC sd, struct bfd *abfd, char **argv, char **env);
 
 
 /* Fetch LENGTH bytes of the simulated program's memory.  Start fetch
    at virtual address MEM and store in BUF.  Result is number of bytes
    read, or zero if error.  */
 
-int sim_read PARAMS ((SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length));
+int sim_read (SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length);
 
 
 /* Store LENGTH bytes from BUF into the simulated program's
    memory. Store bytes starting at virtual address MEM. Result is
    number of bytes write, or zero if error.  */
 
-int sim_write PARAMS ((SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length));
+int sim_write (SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length);
 
 
 /* Fetch register REGNO storing its raw (target endian) value in the
@@ -187,7 +187,7 @@ int sim_write PARAMS ((SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int 
    If LENGTH does not match the size of REGNO no data is transfered
    (the actual register size is still returned). */
 
-int sim_fetch_register PARAMS ((SIM_DESC sd, int regno, unsigned char *buf, int length));
+int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length);
 
 
 /* Store register REGNO from the raw (target endian) value in BUF.
@@ -199,14 +199,14 @@ int sim_fetch_register PARAMS ((SIM_DESC sd, int regno, unsigned char *buf, int 
    If LENGTH does not match the size of REGNO no data is transfered
    (the actual register size is still returned). */
 
-int sim_store_register PARAMS ((SIM_DESC sd, int regno, unsigned char *buf, int length));
+int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length);
 
 
 /* Print whatever statistics the simulator has collected.
 
    VERBOSE is currently unused and must always be zero.  */
 
-void sim_info PARAMS ((SIM_DESC sd, int verbose));
+void sim_info (SIM_DESC sd, int verbose);
 
 
 /* Run (or resume) the simulated program.
@@ -231,14 +231,14 @@ void sim_info PARAMS ((SIM_DESC sd, int verbose));
    continued.  A zero SIGRC value indicates that the program should
    continue as normal. */
 
-void sim_resume PARAMS ((SIM_DESC sd, int step, int siggnal));
+void sim_resume (SIM_DESC sd, int step, int siggnal);
 
 
 /* Asynchronous request to stop the simulation.
    A nonzero return indicates that the simulator is able to handle
    the request */
 
-int sim_stop PARAMS ((SIM_DESC sd));
+int sim_stop (SIM_DESC sd);
 
 
 /* Fetch the REASON why the program stopped.
@@ -265,14 +265,14 @@ int sim_stop PARAMS ((SIM_DESC sd));
 
 enum sim_stop { sim_running, sim_polling, sim_exited, sim_stopped, sim_signalled };
 
-void sim_stop_reason PARAMS ((SIM_DESC sd, enum sim_stop *reason, int *sigrc));
+void sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc);
 
 
 /* Passthru for other commands that the simulator might support.
    Simulators should be prepared to deal with any combination of NULL
    or empty CMD. */
 
-void sim_do_command PARAMS ((SIM_DESC sd, char *cmd));
+void sim_do_command (SIM_DESC sd, char *cmd);
 
 #ifdef __cplusplus
 }

@@ -72,59 +72,59 @@ typedef struct host_callback_struct host_callback;
 
 struct host_callback_struct 
 {
-  int (*close) PARAMS ((host_callback *,int));
-  int (*get_errno) PARAMS ((host_callback *));
-  int (*isatty) PARAMS ((host_callback *, int));
-  int (*lseek) PARAMS ((host_callback *, int, long , int));
-  int (*open) PARAMS ((host_callback *, const char*, int mode));
-  int (*read) PARAMS ((host_callback *,int,  char *, int));
-  int (*read_stdin) PARAMS (( host_callback *, char *, int));
-  int (*rename) PARAMS ((host_callback *, const char *, const char *));
-  int (*system) PARAMS ((host_callback *, const char *));
-  long (*time) PARAMS ((host_callback *, long *));
-  int (*unlink) PARAMS ((host_callback *, const char *));
-  int (*write) PARAMS ((host_callback *,int, const char *, int));
-  int (*write_stdout) PARAMS ((host_callback *, const char *, int));
-  void (*flush_stdout) PARAMS ((host_callback *));
-  int (*write_stderr) PARAMS ((host_callback *, const char *, int));
-  void (*flush_stderr) PARAMS ((host_callback *));
-  int (*stat) PARAMS ((host_callback *, const char *, struct stat *));
-  int (*fstat) PARAMS ((host_callback *, int, struct stat *));
-  int (*lstat) PARAMS ((host_callback *, const char *, struct stat *));
-  int (*ftruncate) PARAMS ((host_callback *, int, long));
-  int (*truncate) PARAMS ((host_callback *, const char *, long));
-  int (*pipe) PARAMS ((host_callback *, int *));
+  int (*close) (host_callback *,int);
+  int (*get_errno) (host_callback *);
+  int (*isatty) (host_callback *, int);
+  int (*lseek) (host_callback *, int, long , int);
+  int (*open) (host_callback *, const char*, int mode);
+  int (*read) (host_callback *,int,  char *, int);
+  int (*read_stdin) ( host_callback *, char *, int);
+  int (*rename) (host_callback *, const char *, const char *);
+  int (*system) (host_callback *, const char *);
+  long (*time) (host_callback *, long *);
+  int (*unlink) (host_callback *, const char *);
+  int (*write) (host_callback *,int, const char *, int);
+  int (*write_stdout) (host_callback *, const char *, int);
+  void (*flush_stdout) (host_callback *);
+  int (*write_stderr) (host_callback *, const char *, int);
+  void (*flush_stderr) (host_callback *);
+  int (*stat) (host_callback *, const char *, struct stat *);
+  int (*fstat) (host_callback *, int, struct stat *);
+  int (*lstat) (host_callback *, const char *, struct stat *);
+  int (*ftruncate) (host_callback *, int, long);
+  int (*truncate) (host_callback *, const char *, long);
+  int (*pipe) (host_callback *, int *);
 
   /* Called by the framework when a read call has emptied a pipe buffer.  */
-  void (*pipe_empty) PARAMS ((host_callback *, int read_fd, int write_fd));
+  void (*pipe_empty) (host_callback *, int read_fd, int write_fd);
 
   /* Called by the framework when a write call makes a pipe buffer
      non-empty.  */
-  void (*pipe_nonempty) PARAMS ((host_callback *, int read_fd, int write_fd));
+  void (*pipe_nonempty) (host_callback *, int read_fd, int write_fd);
 
   /* When present, call to the client to give it the oportunity to
      poll any io devices for a request to quit (indicated by a nonzero
      return value). */
-  int (*poll_quit) PARAMS ((host_callback *));
+  int (*poll_quit) (host_callback *);
 
   /* Used when the target has gone away, so we can close open
      handles and free memory etc etc.  */
-  int (*shutdown) PARAMS ((host_callback *));
-  int (*init)     PARAMS ((host_callback *));
+  int (*shutdown) (host_callback *);
+  int (*init)     (host_callback *);
 
   /* depreciated, use vprintf_filtered - Talk to the user on a console.  */
-  void (*printf_filtered) PARAMS ((host_callback *, const char *, ...));
+  void (*printf_filtered) (host_callback *, const char *, ...);
 
   /* Talk to the user on a console.  */
-  void (*vprintf_filtered) PARAMS ((host_callback *, const char *, va_list));
+  void (*vprintf_filtered) (host_callback *, const char *, va_list);
 
   /* Same as vprintf_filtered but to stderr.  */
-  void (*evprintf_filtered) PARAMS ((host_callback *, const char *, va_list));
+  void (*evprintf_filtered) (host_callback *, const char *, va_list);
 
   /* Print an error message and "exit".
      In the case of gdb "exiting" means doing a longjmp back to the main
      command loop.  */
-  void (*error) PARAMS ((host_callback *, const char *, ...))
+  void (*error) (host_callback *, const char *, ...)
 #ifdef __GNUC__
     __attribute__ ((__noreturn__))
 #endif
@@ -260,12 +260,12 @@ typedef struct cb_syscall {
      argument here.  We mimic sim_{read,write} for now.  Be careful to
      test any changes with -Wall -Werror, mixed signed comparisons
      will get you.  */
-  int (*read_mem) PARAMS ((host_callback * /*cb*/, struct cb_syscall * /*sc*/,
-			   unsigned long /*taddr*/, char * /*buf*/,
-			   int /*bytes*/));
-  int (*write_mem) PARAMS ((host_callback * /*cb*/, struct cb_syscall * /*sc*/,
-			    unsigned long /*taddr*/, const char * /*buf*/,
-			    int /*bytes*/));
+  int (*read_mem) (host_callback * /*cb*/, struct cb_syscall * /*sc*/,
+		   unsigned long /*taddr*/, char * /*buf*/,
+		   int /*bytes*/);
+  int (*write_mem) (host_callback * /*cb*/, struct cb_syscall * /*sc*/,
+		    unsigned long /*taddr*/, const char * /*buf*/,
+		    int /*bytes*/);
 
   /* For sanity checking, should be last entry.  */
   int magic;
@@ -294,37 +294,37 @@ typedef enum {
 } CB_RC;
 
 /* Read in target values for system call numbers, errno values, signals.  */
-CB_RC cb_read_target_syscall_maps PARAMS ((host_callback *, const char *));
+CB_RC cb_read_target_syscall_maps (host_callback *, const char *);
 
 /* Translate target to host syscall function numbers.  */
-int cb_target_to_host_syscall PARAMS ((host_callback *, int));
+int cb_target_to_host_syscall (host_callback *, int);
 
 /* Translate host to target errno value.  */
-int cb_host_to_target_errno PARAMS ((host_callback *, int));
+int cb_host_to_target_errno (host_callback *, int);
 
 /* Translate target to host open flags.  */
-int cb_target_to_host_open PARAMS ((host_callback *, int));
+int cb_target_to_host_open (host_callback *, int);
 
 /* Translate target signal number to host.  */
-int cb_target_to_host_signal PARAMS ((host_callback *, int));
+int cb_target_to_host_signal (host_callback *, int);
 
 /* Translate host signal number to target.  */
-int cb_host_to_target_signal PARAMS ((host_callback *, int));
+int cb_host_to_target_signal (host_callback *, int);
 
 /* Translate host stat struct to target.
    If stat struct ptr is NULL, just compute target stat struct size.
    Result is size of target stat struct or 0 if error.  */
-int cb_host_to_target_stat PARAMS ((host_callback *, const struct stat *, PTR));
+int cb_host_to_target_stat (host_callback *, const struct stat *, PTR);
 
 /* Translate a value to target endian.  */
-void cb_store_target_endian PARAMS ((host_callback *, char *, int, long));
+void cb_store_target_endian (host_callback *, char *, int, long);
 
 /* Tests for special fds.  */
-int cb_is_stdin PARAMS ((host_callback *, int));
-int cb_is_stdout PARAMS ((host_callback *, int));
-int cb_is_stderr PARAMS ((host_callback *, int));
+int cb_is_stdin (host_callback *, int);
+int cb_is_stdout (host_callback *, int);
+int cb_is_stderr (host_callback *, int);
 
 /* Perform a system call.  */
-CB_RC cb_syscall PARAMS ((host_callback *, CB_SYSCALL *));
+CB_RC cb_syscall (host_callback *, CB_SYSCALL *);
 
 #endif
