@@ -175,7 +175,7 @@ int sim_read PARAMS ((SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length)
    memory. Store bytes starting at virtual address MEM. Result is
    number of bytes write, or zero if error.  */
 
-int sim_write PARAMS ((SIM_DESC sd, SIM_ADDR mem, unsigned char *buf, int length));
+int sim_write PARAMS ((SIM_DESC sd, SIM_ADDR mem, const unsigned char *buf, int length));
 
 
 /* Fetch register REGNO storing its raw (target endian) value in the

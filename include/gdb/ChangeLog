@@ -1,3 +1,7 @@
+2010-04-13  Mike Frysinger  <vapier@gentoo.org>
+
+	* remote-sim.h (sim_write): Add const to buf arg.
+
 2009-11-24  DJ Delorie  <dj@redhat.com>
 
 	* sim-rx.h: New.
