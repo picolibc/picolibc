@@ -425,8 +425,18 @@ out:
 void
 set_cygwin_privileges (HANDLE token)
 {
+  /* Setting these rights at process startup allows processes running under
+     user tokens which are in the administrstors group to have root-like
+     permissions. */
+  /* Allow to access all files, independent of their ACL settings. */
   set_privilege (token, SE_RESTORE_PRIVILEGE, true);
   set_privilege (token, SE_BACKUP_PRIVILEGE, true);
+  /* Allow full access to other user's processes. */
+  set_privilege (token, SE_DEBUG_PRIVILEGE, true);
+  /* Allow to create global shared memory.  This shouldn't be required since
+     Cygwin 1.7.  It uses its own subdirectories in the global NT namespace
+     which isn't affected by the SE_CREATE_GLOBAL_PRIVILEGE restriction.
+     Anyway, better safe than sorry. */
   if (wincap.has_create_global_privilege ())
     set_privilege (token, SE_CREATE_GLOBAL_PRIVILEGE, true);
 }

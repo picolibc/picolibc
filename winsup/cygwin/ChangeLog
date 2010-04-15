@@ -1,3 +1,8 @@
+2010-04-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_helper.cc (set_cygwin_privileges): Enable SE_DEBUG_PRIVILEGE, if
+	available.  Add comments.
+
 2010-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (get_inet_addr): Only test the file for being a
