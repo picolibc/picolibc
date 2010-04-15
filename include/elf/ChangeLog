@@ -1,3 +1,8 @@
+2010-04-15  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* arm.h (Tag_FP_arch, Tag_ABI_align_needed, Tag_ABI_align_preserved,
+	Tag_FP_HP_extension): Add new ABI attribute tags.
+
 2010-04-15  Nick Clifton  <nickc@redhat.com>
 
 	* alpha.h: Update copyright notice to use GPLv3.
