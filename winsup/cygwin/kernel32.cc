@@ -1,6 +1,6 @@
 /* kernel32.cc: Win32 replacement functions.
 
-   Copyright 2008 Red Hat, Inc.
+   Copyright 2008, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -37,7 +37,7 @@ CreateEventW (LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset,
 			      lpName ? get_shared_parent_dir () : NULL,
 			      lpEventAttributes
 			      ? lpEventAttributes->lpSecurityDescriptor : NULL);
-  status = NtCreateEvent (&evt, CYG_EVENT_ACCESS, &attr,
+  status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
 			  bManualReset ? NotificationEvent
 				       : SynchronizationEvent,
 			  bInitialState);
@@ -131,7 +131,7 @@ CreateMutexW (LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner,
 			      lpName ? get_shared_parent_dir () : NULL,
 			      lpMutexAttributes
 			      ? lpMutexAttributes->lpSecurityDescriptor : NULL);
-  status = NtCreateMutant (&mtx, CYG_MUTANT_ACCESS, &attr, bInitialOwner);
+  status = NtCreateMutant (&mtx, MUTEX_ALL_ACCESS, &attr, bInitialOwner);
   if (!NT_SUCCESS (status))
     {
       SetLastError (RtlNtStatusToDosError (status));
@@ -222,7 +222,7 @@ CreateSemaphoreW (LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
 			      lpSemaphoreAttributes
 			      ? lpSemaphoreAttributes->lpSecurityDescriptor
 			      : NULL);
-  status = NtCreateSemaphore (&sem, CYG_SEMAPHORE_ACCESS, &attr,
+  status = NtCreateSemaphore (&sem, SEMAPHORE_ALL_ACCESS, &attr,
 			      lInitialCount, lMaximumCount);
   if (!NT_SUCCESS (status))
     {

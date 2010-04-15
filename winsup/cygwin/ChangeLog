@@ -1,5 +1,13 @@
 2010-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* kernel32.cc (CreateEventW): Create event object with EVENT_ALL_ACCESS
+	access mask.
+	(CreateMutexW): Create mutex object with MUTEX_ALL_ACCESS access mask.
+	(CreateSemaphoreW): Create semaphore object with SEMAPHORE_ALL_ACCESS
+	access mask.
+
+2010-04-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_helper.cc (set_cygwin_privileges): Enable SE_DEBUG_PRIVILEGE, if
 	available.  Add comments.
 
