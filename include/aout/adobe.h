@@ -1,20 +1,21 @@
 /* `a.out.adobe' differences from standard a.out files
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 #ifndef __A_OUT_ADOBE_H__
 #define __A_OUT_ADOBE_H__
@@ -30,7 +31,7 @@ struct external_exec
   bfd_byte e_info[4];		/* magic number and stuff		*/
   bfd_byte e_text[BYTES_IN_WORD]; /* length of text section in bytes	*/
   bfd_byte e_data[BYTES_IN_WORD]; /* length of data section in bytes	*/
-  bfd_byte e_bss[BYTES_IN_WORD]; /* length of bss area in bytes 		*/
+  bfd_byte e_bss[BYTES_IN_WORD]; /* length of bss area in bytes 	*/
   bfd_byte e_syms[BYTES_IN_WORD]; /* length of symbol table in bytes 	*/
   bfd_byte e_entry[BYTES_IN_WORD]; /* start address 			*/
   bfd_byte e_trsize[BYTES_IN_WORD]; /* length of text relocation info	*/

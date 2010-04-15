@@ -1,34 +1,34 @@
 /* NLM (NetWare Loadable Module) support for BFD.
-   Copyright 1993, 1994, 2003, 2005 Free Software Foundation, Inc.
+   Copyright 1993, 1994, 2003, 2005, 2010 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support.
 
-This file is part of BFD, the Binary File Descriptor library.
+   This file is part of BFD, the Binary File Descriptor library.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
-
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 /* This file is part of NLM support for BFD, and contains the portions
    that describe how NLM is represented internally in the BFD library.
    I.E. it describes the in-memory representation of NLM.  It requires
    the nlm/common.h file which contains the portions that are common to
-   both the internal and external representations. */
+   both the internal and external representations.  */
    
 #if 0
 
-/* Types used by various structures, functions, etc. */
+/* Types used by various structures, functions, etc.  */
 
 typedef unsigned long	Nlm32_Addr;	/* Unsigned program address */
 typedef unsigned long	Nlm32_Off;	/* Unsigned file offset */

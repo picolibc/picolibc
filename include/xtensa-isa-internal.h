@@ -1,11 +1,11 @@
 /* Internal definitions for configurable Xtensa ISA support.
-   Copyright 2003, 2004, 2005, 2008 Free Software Foundation, Inc.
+   Copyright 2003, 2004, 2005, 2008, 2010 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,

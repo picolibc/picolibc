@@ -1,3 +1,44 @@
+2010-04-15  Nick Clifton  <nickc@redhat.com>
+
+	* alpha.h: Update copyright notice to use GPLv3.
+	* apollo.h: Likewise.
+	* arm.h: Likewise.
+	* aux-coff.h: Likewise.
+	* ecoff.h: Likewise.
+	* external.h: Likewise.
+	* go32exe.h: Likewise.
+	* h8300.h: Likewise.
+	* h8500.h: Likewise.
+	* i386.h: Likewise.
+	* i860.h: Likewise.
+	* i960.h: Likewise.
+	* ia64.h: Likewise.
+	* internal.h: Likewise.
+	* m68k.h: Likewise.
+	* m88k.h: Likewise.
+	* maxq.h: Likewise.
+	* mcore.h: Likewise.
+	* mips.h: Likewise.
+	* mipspe.h: Likewise.
+	* or32.h: Likewise.
+	* pe.h: Likewise.
+	* powerpc.h: Likewise.
+	* rs6000.h: Likewise.
+	* rs6k64.h: Likewise.
+	* sh.h: Likewise.
+	* sparc.h: Likewise.
+	* ti.h: Likewise.
+	* tic30.h: Likewise.
+	* tic4x.h: Likewise.
+	* tic54x.h: Likewise.
+	* tic80.h: Likewise.
+	* w65.h: Likewise.
+	* we32k.h: Likewise.
+	* x86_64.h: Likewise.
+	* xcoff.h: Likewise.
+	* z80.h: Likewise.
+	* z8k.h: Likewise.
+
 2009-12-02  Jerker Bäck  <jerker.back@gmail.com>
 
 	PR binutils/11017
@@ -7,7 +48,7 @@
 2009-10-17  Arnold Metselaar  <arnold.metselaar@planet.nl>
 
 	* z80.h: Store alignment requirement in section header, to allow
-	ld to preserve alignment. Some code was copied from ti.h. 
+	ld to preserve alignment. Some code was copied from ti.h.
 
 2009-09-05  Martin Thuresson  <martin@mtme.org>
 
@@ -223,7 +264,7 @@
 	internal.h, m68k.h, m88k.h, maxq.h, mcore.h, mips.h, mipspe.h,
 	or32.h, pe.h, powerpc.h, rs6k64.h, sh.h, sparc.h, ti.h, tic30.h,
 	tic4x.h, tic54x.h, tic80.h, w65.h, we32k.h, xcoff.h, z8k.h
-	
+
 2005-02-21  Alan Modra  <amodra@bigpond.net.au>
 
 	* xcoff.h (struct xcoff_loader_info): Warning fix.

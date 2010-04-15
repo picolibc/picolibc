@@ -1,10 +1,10 @@
 /* Oasys object format header file for BFD.
 
-   Copyright 2001 Free Software Foundation, Inc.
-   
+   Copyright 2001, 2010 Free Software Foundation, Inc.
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -16,7 +16,7 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street - Fifth Floor,
    Boston, MA 02110-1301, USA.
-   
+
    Contributed by Cygnus Support.  */
 
 #define OASYS_MAX_SEC_COUNT 16

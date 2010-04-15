@@ -1,5 +1,5 @@
 /* CRX ELF support for BFD.
-   Copyright 2004 Free Software Foundation, Inc.
+   Copyright 2004, 2010 Free Software Foundation, Inc.
    Contributed by Tomer Levi, NSC, Israel.
    Originally written for GAS 2.12 by Tomer Levi, NSC, Israel.
    Updates, BFDizing, GNUifying and ELF support by Tomer Levi.
@@ -8,7 +8,7 @@
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,

@@ -1,12 +1,12 @@
 /* cr16.h -- Header file for CR16 opcode and register tables.
-   Copyright 2007, 2008 Free Software Foundation, Inc.
+   Copyright 2007, 2008, 2010 Free Software Foundation, Inc.
    Contributed by M R Swami Reddy
 
    This file is part of GAS, GDB and the GNU binutils.
 
    GAS, GDB, and GNU binutils is free software; you can redistribute it
    and/or modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2, or (at your
+   published by the Free Software Foundation; either version 3, or (at your
    option) any later version.
 
    GAS, GDB, and GNU binutils are distributed in the hope that they will be

@@ -1,3 +1,19 @@
+2010-04-15  Nick Clifton  <nickc@redhat.com>
+
+	* adobe.h: Update copyright notice to use GPLv3.
+	* aout64.h: Likewise.
+	* ar.h: Likewise.
+	* dynix3.h: Likewise.
+	* encap.h: Likewise.
+	* host.h: Likewise.
+	* hp.h: Likewise.
+	* hp300hpux.h: Likewise.
+	* ranlib.h: Likewise.
+	* reloc.h: Likewise.
+	* stab.def: Likewise.
+	* stab_gnu.h: Likewise.
+	* sun4.h: Likewise.
+
 2009-10-02  Alan Modra  <amodra@bigpond.net.au>
 
 	* aout64.h (N_SHARED_LIB): Define as zero if not already defined.

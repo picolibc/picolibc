@@ -1,10 +1,20 @@
+2010-04-15  Nick Clifton  <nickc@redhat.com>
+
+	* alpha-ext.h: Update copyright notice to use GPLv3.
+	* common.h: Likewise.
+	* external.h: Likewise.
+	* i386-ext.h: Likewise.
+	* internal.h: Likewise.
+	* ppc-ext.h: Likewise.
+	* sparc32-ext.h: Likewise.
+
 2005-05-10  Nick Clifton  <nickc@redhat.com>
 
 	* Update the address and phone number of the FSF organization in
 	the GPL notices in the following files:
 	alpha-ext.h, common.h, external.h, i386-ext.h, internal.h,
 	ppc-ext.h, sparc32-ext.h
-	
+
 2003-08-07  Alan Modra  <amodra@bigpond.net.au>
 
 	* internal.h (Nlm_Internal_Custom_Header): Replace PTR with void *.

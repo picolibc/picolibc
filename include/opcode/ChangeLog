@@ -1,3 +1,56 @@
+2010-04-15  Nick Clifton  <nickc@redhat.com>
+
+	* alpha.h: Update copyright notice to use GPLv3.
+	* arc.h: Likewise.
+	* arm.h: Likewise.
+	* avr.h: Likewise.
+	* bfin.h: Likewise.
+	* cgen.h: Likewise.
+	* convex.h: Likewise.
+	* cr16.h: Likewise.
+	* cris.h: Likewise.
+	* crx.h: Likewise.
+	* d10v.h: Likewise.
+	* d30v.h: Likewise.
+	* dlx.h: Likewise.
+	* h8300.h: Likewise.
+	* hppa.h: Likewise.
+	* i370.h: Likewise.
+	* i386.h: Likewise.
+	* i860.h: Likewise.
+	* i960.h: Likewise.
+	* ia64.h: Likewise.
+	* m68hc11.h: Likewise.
+	* m68k.h: Likewise.
+	* m88k.h: Likewise.
+	* maxq.h: Likewise.
+	* mips.h: Likewise.
+	* mmix.h: Likewise.
+	* mn10200.h: Likewise.
+	* mn10300.h: Likewise.
+	* msp430.h: Likewise.
+	* np1.h: Likewise.
+	* ns32k.h: Likewise.
+	* or32.h: Likewise.
+	* pdp11.h: Likewise.
+	* pj.h: Likewise.
+	* pn.h: Likewise.
+	* ppc.h: Likewise.
+	* pyr.h: Likewise.
+	* rx.h: Likewise.
+	* s390.h: Likewise.
+	* score-datadep.h: Likewise.
+	* score-inst.h: Likewise.
+	* sparc.h: Likewise.
+	* spu-insns.h: Likewise.
+	* spu.h: Likewise.
+	* tic30.h: Likewise.
+	* tic4x.h: Likewise.
+	* tic54x.h: Likewise.
+	* tic80.h: Likewise.
+	* v850.h: Likewise.
+	* vax.h: Likewise.
+
 2010-03-25  Joseph Myers  <joseph@codesourcery.com>
 
 	* tic6x-control-registers.h, tic6x-insn-formats.h,
@@ -226,7 +279,7 @@
 	PR 3134
 	* h8300.h (h8_opcodes): Add an encoding for a mov.l instruction
 	with a 32-bit displacement but without the top bit of the 4th byte
-	set.	
+	set.
 
 2008-02-18  M R Swami Reddy <MR.Swami.Reddy@nsc.com>
 
@@ -376,10 +429,10 @@
 2006-10-24  Andrew Pinski  <andrew_pinski@playstation.sony.com>
 
 	* ppc.h (PPC_OPCODE_CELL): Define.
- 
+
 2006-10-23  Dwarakanath Rajagopal  <dwarak.rajagopal@amd.com>
 
-	* i386.h :  Modify opcode to support for the change in POPCNT opcode 
+	* i386.h :  Modify opcode to support for the change in POPCNT opcode
 	in amdfam10 architecture.
 
 2006-09-28  H.J. Lu  <hongjiu.lu@intel.com>
@@ -425,7 +478,7 @@
 
 2006-06-05  Thiemo Seufer  <ths@mips.com>
 
-	* mips.h: Improve description of MT flags.	
+	* mips.h: Improve description of MT flags.
 
 2006-05-25  Richard Sandiford  <richard@codesourcery.com>
 

@@ -1,24 +1,24 @@
 /* NLM (NetWare Loadable Module) support for BFD.
-   Copyright 1993, 1994, 2005 Free Software Foundation, Inc.
+   Copyright 1993, 1994, 2005, 2010 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support
 
-This file is part of BFD, the Binary File Descriptor library.
+   This file is part of BFD, the Binary File Descriptor library.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
-
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 /* This file is part of NLM support for BFD, and contains the portions
    that describe how NLM is represented externally by the BFD library.
@@ -40,14 +40,12 @@ Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA. 
 
    The exact format of the fixed length header unfortunately varies
    from one NLM target to another, due to padding.  Each target
-   defines the correct external format in a separate header file.
-
-*/
+   defines the correct external format in a separate header file.  */
    
-/* NLM Header */
+/* NLM Header.  */
 
 /* The version header is one of the optional auxiliary headers and
-   follows the fixed length and variable length NLM headers. */
+   follows the fixed length and variable length NLM headers.  */
 
 typedef struct nlmNAME(external_version_header)
 {

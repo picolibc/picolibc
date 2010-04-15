@@ -1,11 +1,11 @@
 /* Opcode table for the Atmel AVR micro controllers.
 
-   Copyright 2000, 2001, 2004, 2006, 2008 Free Software Foundation, Inc.
+   Copyright 2000, 2001, 2004, 2006, 2008, 2010 Free Software Foundation, Inc.
    Contributed by Denis Chertykov <denisc@overta.ru>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -15,7 +15,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 #define AVR_ISA_1200  0x0001 /* In the beginning there was ...  */
 #define AVR_ISA_LPM   0x0002 /* device has LPM */

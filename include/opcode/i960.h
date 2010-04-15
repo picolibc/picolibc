@@ -1,10 +1,10 @@
 /* Basic 80960 instruction formats.
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright 2001, 2010 Free Software Foundation, Inc.
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -15,24 +15,24 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street - Fifth Floor,
-   Boston, MA 02110-1301, USA.
+   Boston, MA 02110-1301, USA.  */
  
-  The 'COJ' instructions are actually COBR instructions with the 'b' in
-  the mnemonic replaced by a 'j';  they are ALWAYS "de-optimized" if necessary:
-  if the displacement will not fit in 13 bits, the assembler will replace them
-  with the corresponding compare and branch instructions.
+/* The 'COJ' instructions are actually COBR instructions with the 'b' in
+   the mnemonic replaced by a 'j';  they are ALWAYS "de-optimized" if
+   necessary: if the displacement will not fit in 13 bits, the assembler will
+   replace them with the corresponding compare and branch instructions.
  
-  All of the 'MEMn' instructions are the same format; the 'n' in the name
-  indicates the default index scale factor (the size of the datum operated on).
+   All of the 'MEMn' instructions are the same format; the 'n' in the name
+   indicates the default index scale factor (the size of the datum operated on).
  
-  The FBRA formats are not actually an instruction format.  They are the
-  "convenience directives" for branching on floating-point comparisons,
-  each of which generates 2 instructions (a 'bno' and one other branch).
+   The FBRA formats are not actually an instruction format.  They are the
+   "convenience directives" for branching on floating-point comparisons,
+   each of which generates 2 instructions (a 'bno' and one other branch).
  
-  The CALLJ format is not actually an instruction format.  It indicates that
-  the instruction generated (a CTRL-format 'call') should have its relocation
-  specially flagged for link-time replacement with a 'bal' or 'calls' if
-  appropriate.  */ 
+   The CALLJ format is not actually an instruction format.  It indicates that
+   the instruction generated (a CTRL-format 'call') should have its relocation
+   specially flagged for link-time replacement with a 'bal' or 'calls' if
+   appropriate.  */ 
 
 #define CTRL	0
 #define COBR	1
