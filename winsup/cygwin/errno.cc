@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009 Red Hat, Inc.
+   2006, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,7 @@ details. */
 #define _sys_errlist FOO_sys_errlist
 #include "winsup.h"
 #include "cygtls.h"
+#include "ntdll.h"
 #undef _sys_nerr
 #undef sys_nerr
 #undef _sys_errlist
@@ -316,7 +317,19 @@ void __stdcall
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
   syscall_printf ("%s:%d windows error %d", file, line, code);
-  set_errno (geterrno_from_win_error (code, EACCES));
+  errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
+}
+
+/* seterrno_from_nt_status: Given a NT status code, set errno
+   as appropriate. */
+void __stdcall
+seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
+{
+  DWORD code = RtlNtStatusToDosError (status);
+  SetLastError (code);
+  syscall_printf ("%s:%d status %p -> windows error %d",
+		  file, line, status, code);
+  errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
 /* seterrno: Set `errno' based on GetLastError (). */

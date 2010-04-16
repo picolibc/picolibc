@@ -1,3 +1,12 @@
+2010-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygerrno.h (seterrno_from_nt_status): Declare.
+	(__seterrno_from_nt_status): Call seterrno_from_nt_status.
+	* errno.cc (seterrno_from_win_error): Set errno without calling
+	set_errno to avoid packing strace output with errno messages.
+	(seterrno_from_nt_status): New function to print NT status as well as
+	resulting Windows error.
+
 2010-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* kernel32.cc (CreateEventW): Create event object with EVENT_ALL_ACCESS
