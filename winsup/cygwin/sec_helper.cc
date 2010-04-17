@@ -444,17 +444,16 @@ set_cygwin_privileges (HANDLE token)
 /* Function to return a common SECURITY_DESCRIPTOR that
    allows all access.  */
 
-
-SECURITY_DESCRIPTOR *__stdcall
+static inline PSECURITY_DESCRIPTOR
 get_null_sd ()
 {
   static NO_COPY SECURITY_DESCRIPTOR sd;
-  static NO_COPY SECURITY_DESCRIPTOR *null_sdp;
+  static NO_COPY PSECURITY_DESCRIPTOR null_sdp;
 
   if (!null_sdp)
     {
       InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      SetSecurityDescriptorDacl (&sd, TRUE, 0, FALSE);
+      SetSecurityDescriptorDacl (&sd, TRUE, NULL, FALSE);
       null_sdp = &sd;
     }
   return null_sdp;
@@ -478,7 +477,7 @@ init_global_security ()
 bool
 sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
-  size_t acl_len = MAX_DACL_LEN(5);
+  size_t acl_len = MAX_DACL_LEN (5);
   LPVOID pAce;
   cygpsid psid;
 

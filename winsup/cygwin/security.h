@@ -427,8 +427,6 @@ void set_cygwin_privileges (HANDLE token);
 #define pop_self_privilege()		   pop_thread_privilege()
 
 /* shared.cc: */
-/* Retrieve a security descriptor that allows all access */
-SECURITY_DESCRIPTOR *__stdcall get_null_sd ();
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;

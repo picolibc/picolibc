@@ -1,3 +1,10 @@
+2010-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_helper.cc (get_null_sd): Make static.  Use PSECURITY_DESCRIPTOR
+	instead of SECURITY_DESCRIPTOR *.
+	(sec_acl): Fix fomratting.
+	* security.h (get_null_sd): Drop declaration.
+
 2010-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygerrno.h (seterrno_from_nt_status): Declare.
