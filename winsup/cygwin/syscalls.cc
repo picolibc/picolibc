@@ -2002,6 +2002,7 @@ rename (const char *oldpath, const char *newpath)
 	  || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
     start_transaction (old_trans, trans);
 
+retry:
   /* DELETE is required to rename a file.  Samba (only some versions?) doesn't
      like the FILE_SHARE_DELETE mode if the file has the R/O attribute set
      and returns STATUS_ACCESS_DENIED in that case. */
@@ -2013,6 +2014,22 @@ rename (const char *oldpath, const char *newpath)
 		     | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0));
   if (!NT_SUCCESS (status))
     {
+      debug_printf ("status %p", status);
+      if (status == STATUS_SHARING_VIOLATION
+	  && WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+	{
+	  /* Typical BLODA problem.  Some virus scanners check newly generated
+	     files and while doing that disallow DELETE access.  That's really
+	     bad because it breaks applications which copy files by creating
+	     a temporary filename and then rename the temp filename to the
+	     target filename.  This renaming fails due to the jealous virus
+	     scanner and the application fails to create the target file.
+	     
+	     This kludge tries to work around that by yielding until the
+	     sharing violation goes away, or a signal arrived. */
+	  yield ();
+	  goto retry;
+	}
       __seterrno_from_nt_status (status);
       goto out;
     }
