@@ -1210,9 +1210,7 @@ fhandler_tty_slave::fch_set_sd (security_descriptor &sd, bool chown)
   security_descriptor sd_old;
 
   get_object_sd (input_available_event, sd_old);
-  if (/*!set_object_sd (get_io_handle (), sd, chown)
-      && !set_object_sd (get_output_handle (), sd, chown)
-      && */ !set_object_sd (input_available_event, sd, chown)
+  if (!set_object_sd (input_available_event, sd, chown)
       && !set_object_sd (output_mutex, sd, chown)
       && !set_object_sd (input_mutex, sd, chown)
       && !set_object_sd (inuse, sd, chown)
@@ -1223,8 +1221,6 @@ fhandler_tty_slave::fch_set_sd (security_descriptor &sd, bool chown)
       && (!ioctl_done_event
 	  || !set_object_sd (ioctl_done_event, sd, chown)))
     return 0;
-  /*set_object_sd (get_io_handle (), sd_old, chown);
-  set_object_sd (get_output_handle (), sd_old, chown);*/
   set_object_sd (input_available_event, sd_old, chown);
   set_object_sd (output_mutex, sd_old, chown);
   set_object_sd (input_mutex, sd_old, chown);

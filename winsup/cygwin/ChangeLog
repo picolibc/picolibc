@@ -1,5 +1,10 @@
 2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_tty_slave::fch_set_sd): Remove commented out
+	code.
+
+2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetNamedPipeClientProcessId): Define.
 	* fhandler.h (fhandler_tty_slave::fch_open_handles): Declare private.
 	(fhandler_tty_slave::fch_close_handles): Ditto.
