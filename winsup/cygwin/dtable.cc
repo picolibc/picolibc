@@ -297,7 +297,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       int rcv = 0, len = sizeof (int);
 
       if (handle_to_fn (handle, name))
-	/* ok */;
+	dev.parse (name);
       else if (strcmp (name, ":sock:") == 0
 	       /* On NT4, NtQueryObject returns STATUS_NOT_IMPLEMENTED when
 	          called for a socket handle. */
@@ -313,8 +313,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev = *piper_dev;
       else
 	dev = *pipew_dev;
-      if (name[0])
-	access = FILE_CREATE_PIPE_INSTANCE;
     }
   else if (GetConsoleScreenBufferInfo (handle, &buf))
     {
@@ -361,8 +359,22 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	    }
 	}
 
+      IO_STATUS_BLOCK io;
+      FILE_ACCESS_INFORMATION fai;
+
+      /* Console windows are not kernel objects, so the access mask returned
+	 by NtQueryInformationFile is meaningless. */
       if (dev == FH_TTY || dev == FH_CONSOLE)
       	access |= GENERIC_READ | GENERIC_WRITE;
+      else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
+						   sizeof fai,
+						   FileAccessInformation)))
+	{
+	  if (fai.AccessFlags & FILE_READ_DATA)
+	    access |= GENERIC_READ;
+	  if (fai.AccessFlags & FILE_WRITE_DATA)
+	    access |= GENERIC_WRITE;
+	}
       else if (fd == 0)
 	access |= GENERIC_READ;
       else

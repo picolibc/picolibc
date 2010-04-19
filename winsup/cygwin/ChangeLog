@@ -1,5 +1,13 @@
 2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::init_std_file_from_handle): Set dev to
+	valid content for ptys.  Remove setting FILE_CREATE_PIPE_INSTANCE
+	in access flags since it's not needed.  Set the access mask for
+	kernel objects according to what's returned by NtQueryInformationFile,
+	info class FileAccessInformation.
+
+2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (rename): On STATUS_ACCESS_VIOLATION, retry to open
 	for DELETE until the STATUS_ACCESS_VIOLATION goes away.  Add comment
 	to explain why.
