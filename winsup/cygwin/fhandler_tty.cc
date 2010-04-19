@@ -19,11 +19,28 @@ details. */
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "ntdll.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "cygserver.h"
 #include "cygthread.h"
 #include "child_info.h"
+
+#define close_maybe(h) \
+  do { \
+    if (h && h != INVALID_HANDLE_VALUE) \
+      CloseHandle (h); \
+  } while (0)
+
+/* pty master control pipe messages */
+struct pipe_request {
+  DWORD pid;
+};
+
+struct pipe_reply {
+  HANDLE from_master;
+  HANDLE to_master;
+  DWORD error;
+};
 
 /* tty master stuff */
 
@@ -490,20 +507,20 @@ fhandler_tty_slave::open (int flags, mode_t)
      pty opened by fhandler_pty_master::open.  In the former case, tty
      output is handled by a separate thread which controls output.  */
   shared_name (buf, OUTPUT_DONE_EVENT, get_unit ());
-  output_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
+  output_done_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf);
 
-  if (!(output_mutex = get_ttyp ()->open_output_mutex ()))
+  if (!(output_mutex = get_ttyp ()->open_output_mutex (MAXIMUM_ALLOWED)))
     {
       errmsg = "open output mutex failed, %E";
       goto err;
     }
-  if (!(input_mutex = get_ttyp ()->open_input_mutex ()))
+  if (!(input_mutex = get_ttyp ()->open_input_mutex (MAXIMUM_ALLOWED)))
     {
       errmsg = "open input mutex failed, %E";
       goto err;
     }
   shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
-  if (!(input_available_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
+  if (!(input_available_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf)))
     {
       errmsg = "open input event failed, %E";
       goto err;
@@ -512,14 +529,23 @@ fhandler_tty_slave::open (int flags, mode_t)
   /* The ioctl events may or may not exist.  See output_done_event,
      above.  */
   shared_name (buf, IOCTL_REQUEST_EVENT, get_unit ());
-  ioctl_request_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
+  ioctl_request_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf);
   shared_name (buf, IOCTL_DONE_EVENT, get_unit ());
-  ioctl_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
+  ioctl_done_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf);
 
   /* FIXME: Needs a method to eliminate tty races */
   {
+    /* Create security attribute.  Default permissions are 0620. */
+    security_descriptor sd;
+    sd.malloc (sizeof (SECURITY_DESCRIPTOR));
+    InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+    SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
+    if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
+					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
+					  sd))
+      sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
     acquire_output_mutex (500);
-    inuse = get_ttyp ()->create_inuse (TTY_SLAVE_ALIVE);
+    inuse = get_ttyp ()->create_inuse (&sa);
     get_ttyp ()->was_opened = true;
     release_output_mutex ();
   }
@@ -531,43 +557,40 @@ fhandler_tty_slave::open (int flags, mode_t)
       goto err_no_errno;
     }
 
-  if (myself->pid == get_ttyp ()->master_pid
-      || cygserver_running == CYGSERVER_UNAVAIL
-      || !cygserver_attach_tty (&from_master_local, &to_master_local))
+  if (get_ttyp ()->master_pid < 0)
     {
-      if (get_ttyp ()->master_pid < 0)
-	{
-	  errmsg = "*** master is closed";
-	  set_errno (EAGAIN);
-	  goto err_no_errno;
-	}
+      errmsg = "*** master is closed";
+      set_errno (EAGAIN);
+      goto err_no_errno;
+    }
+  /* Three case for duplicating the pipe handles:
+     - Either we're the master.  In this case, just duplicate the handles.
+     - Or, we have the right to open the master process for handle duplication.
+       In this case, just duplicate the handles.
+     - Or, we have to ask the master process itself.  In this case, send our
+       pid to the master process and check the reply.  The reply contains
+       either the handles, or an error code which tells us why we didn't
+       get the handles. */
+  if (myself->pid == get_ttyp ()->master_pid)
+    {
+      /* This is the most common case, just calling openpty. */
+      termios_printf ("dup handles within myself.");
+      tty_owner = GetCurrentProcess ();
+    }
+  else
+    {
       pinfo p (get_ttyp ()->master_pid);
       if (!p)
-	{
-	  errmsg = "*** couldn't find tty master";
-	  set_errno (EAGAIN);
-	  goto err_no_errno;
-	}
-      HANDLE tty_owner;
-      if (myself->pid == get_ttyp ()->master_pid)
-	{
-	  /* This is the most common case, just calling openpty. */
-	  termios_printf ("dup handles within myself.");
-	  tty_owner = GetCurrentProcess ();
-	}
+	termios_printf ("*** couldn't find tty master");
       else
 	{
-	  termios_printf ("cannot dup handles via server. using old method.");
 	  tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->dwProcessId);
-	  if (tty_owner == NULL)
-	    {
-	      termios_printf ("can't open tty (%d) handle process %d",
-			      get_unit (), get_ttyp ()->master_pid);
-	      __seterrno ();
-	      goto err_no_msg;
-	    }
+	  if (tty_owner)
+	    termios_printf ("dup handles directly since I'm allmighty.");
 	}
-
+    }
+  if (tty_owner)
+    {
       if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
 			    GetCurrentProcess (), &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
@@ -577,8 +600,6 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  __seterrno ();
 	  goto err_no_msg;
 	}
-
-      VerifyHandle (from_master_local);
       if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master,
 			  GetCurrentProcess (), &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
@@ -586,10 +607,35 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  errmsg = "can't duplicate output, %E";
 	  goto err;
 	}
-      VerifyHandle (to_master_local);
       if (tty_owner != GetCurrentProcess ())
 	CloseHandle (tty_owner);
     }
+  else
+    {
+      pipe_request req = { GetCurrentProcessId () };
+      pipe_reply repl;
+      DWORD len;
+
+      __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
+		       &installation_key, get_unit ());
+      termios_printf ("dup handles via master control pipe %s", buf);
+      if (!CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl,
+			  &len, 500))
+	{
+	  errmsg = "can't call master, %E";
+	  goto err;
+	}
+      from_master_local = repl.from_master;
+      to_master_local = repl.to_master;
+      if (!from_master_local || !to_master_local)
+	{
+	  SetLastError (repl.error);
+	  errmsg = "error duplicating pipes, %E";
+	  goto err;
+	}
+    }
+  VerifyHandle (from_master_local);
+  VerifyHandle (to_master_local);
 
   termios_printf ("duplicated from_master %p->%p from tty_owner",
 		  get_ttyp ()->from_master, from_master_local);
@@ -660,31 +706,7 @@ fhandler_tty_slave::close ()
 }
 
 int
-fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
-					  LPHANDLE to_master_ptr)
-{
-  if (!from_master_ptr || !to_master_ptr)
-    return 0;
-
-  pinfo p (get_ttyp ()->master_pid);
-  if (!p)
-    return 0;
-
-  client_request_attach_tty req (p->dwProcessId,
-				 (HANDLE) get_ttyp ()->from_master,
-				 (HANDLE) get_ttyp ()->to_master);
-
-  if (req.make_request () == -1 || req.error_code ())
-    return 0;
-
-  *from_master_ptr = req.from_master ();
-  *to_master_ptr = req.to_master ();
-
-  return 1;
-}
-
-int
-fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
+fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 {
   int flags = 0;
 
@@ -696,7 +718,12 @@ fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
 
-  return open (flags);
+  int ret = open (flags);
+
+  if (f != INVALID_HANDLE_VALUE)
+    CloseHandle (f);	/* Reopened by open */
+
+  return ret;
 }
 
 ssize_t __stdcall
@@ -1117,6 +1144,177 @@ out:
   return retval;
 }
 
+int __stdcall
+fhandler_tty_slave::fstat (struct __stat64 *st)
+{
+  fhandler_base::fstat (st);
+
+  bool to_close = false;
+  if (!input_available_event)
+    {
+      char buf[MAX_PATH];
+      shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+      input_available_event = OpenEvent (READ_CONTROL, TRUE, buf);
+      if (input_available_event)
+	to_close = true;
+    }
+  if (!input_available_event
+      || get_object_attribute (input_available_event, &st->st_uid, &st->st_gid,
+			       &st->st_mode))
+    {
+      /* If we can't access the ACL, or if the tty doesn't actually exist,
+         then fake uid and gid to strict, system-like values. */
+      st->st_mode = S_IFCHR | S_IRUSR | S_IWUSR;
+      st->st_uid = 18;
+      st->st_gid = 544;
+    }
+  if (to_close)
+    CloseHandle (input_available_event);
+  return 0;
+}
+
+/* Helper function for fchmod and fchown, which just opens all handles
+   and signals success via bool return. */
+bool
+fhandler_tty_slave::fch_open_handles ()
+{
+  char buf[MAX_PATH];
+
+  tc = cygwin_shared->tty[get_unit ()];
+  shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+  input_available_event = OpenEvent (READ_CONTROL | WRITE_DAC | WRITE_OWNER,
+				     TRUE, buf);
+  output_mutex = get_ttyp ()->open_output_mutex (WRITE_DAC | WRITE_OWNER);
+  input_mutex = get_ttyp ()->open_input_mutex (WRITE_DAC | WRITE_OWNER);
+  inuse = get_ttyp ()->open_inuse (WRITE_DAC | WRITE_OWNER);
+  if (!input_available_event || !output_mutex || !input_mutex || !inuse)
+    {
+      __seterrno ();
+      return false;
+    }
+  /* These members are optional, no error checking */
+  shared_name (buf, OUTPUT_DONE_EVENT, get_unit ());
+  output_done_event = OpenEvent (WRITE_DAC | WRITE_OWNER, TRUE, buf);
+  shared_name (buf, IOCTL_REQUEST_EVENT, get_unit ());
+  ioctl_request_event = OpenEvent (WRITE_DAC | WRITE_OWNER, TRUE, buf);
+  shared_name (buf, IOCTL_DONE_EVENT, get_unit ());
+  ioctl_done_event = OpenEvent (WRITE_DAC | WRITE_OWNER, TRUE, buf);
+  return true;
+}
+
+/* Helper function for fchmod and fchown, which sets the new security
+   descriptor on all objects representing the tty. */
+int
+fhandler_tty_slave::fch_set_sd (security_descriptor &sd, bool chown)
+{
+  security_descriptor sd_old;
+
+  get_object_sd (input_available_event, sd_old);
+  if (/*!set_object_sd (get_io_handle (), sd, chown)
+      && !set_object_sd (get_output_handle (), sd, chown)
+      && */ !set_object_sd (input_available_event, sd, chown)
+      && !set_object_sd (output_mutex, sd, chown)
+      && !set_object_sd (input_mutex, sd, chown)
+      && !set_object_sd (inuse, sd, chown)
+      && (!output_done_event
+	  || !set_object_sd (output_done_event, sd, chown))
+      && (!ioctl_request_event
+	  || !set_object_sd (ioctl_request_event, sd, chown))
+      && (!ioctl_done_event
+	  || !set_object_sd (ioctl_done_event, sd, chown)))
+    return 0;
+  /*set_object_sd (get_io_handle (), sd_old, chown);
+  set_object_sd (get_output_handle (), sd_old, chown);*/
+  set_object_sd (input_available_event, sd_old, chown);
+  set_object_sd (output_mutex, sd_old, chown);
+  set_object_sd (input_mutex, sd_old, chown);
+  set_object_sd (inuse, sd_old, chown);
+  if (!output_done_event)
+      set_object_sd (output_done_event, sd_old, chown);
+  if (!ioctl_request_event)
+      set_object_sd (ioctl_request_event, sd_old, chown);
+  if (!ioctl_done_event)
+      set_object_sd (ioctl_done_event, sd_old, chown);
+  return -1;
+}
+
+/* Helper function for fchmod and fchown, which closes all object handles in
+   the tty. */
+void
+fhandler_tty_slave::fch_close_handles ()
+{
+  close_maybe (get_io_handle ());
+  close_maybe (get_output_handle ());
+  close_maybe (output_done_event);
+  close_maybe (ioctl_done_event);
+  close_maybe (ioctl_request_event);
+  close_maybe (input_available_event);
+  close_maybe (output_mutex);
+  close_maybe (input_mutex);
+  close_maybe (inuse);
+}
+
+int __stdcall
+fhandler_tty_slave::fchmod (mode_t mode)
+{
+  int ret = -1;
+  bool to_close = false;
+  security_descriptor sd;
+  __uid32_t uid;
+  __gid32_t gid;
+
+  if (!input_available_event)
+    {
+      to_close = true;
+      if (!fch_open_handles ())
+	goto errout;
+    }
+  sd.malloc (sizeof (SECURITY_DESCRIPTOR));
+  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  if (!get_object_attribute (input_available_event, &uid, &gid, NULL)
+      && !create_object_sd_from_attribute (NULL, uid, gid, S_IFCHR | mode, sd))
+    ret = fch_set_sd (sd, false);
+errout:
+  if (to_close)
+    fch_close_handles ();
+  return ret;
+}
+
+int __stdcall
+fhandler_tty_slave::fchown (__uid32_t uid, __gid32_t gid)
+{
+  int ret = -1;
+  bool to_close = false;
+  mode_t mode;
+  __uid32_t o_uid;
+  __gid32_t o_gid;
+  security_descriptor sd;
+
+  if (uid == ILLEGAL_UID && gid == ILLEGAL_GID)
+    return 0;
+  if (!input_available_event)
+    {
+      to_close = true;
+      if (!fch_open_handles ())
+	goto errout;
+    }
+  sd.malloc (sizeof (SECURITY_DESCRIPTOR));
+  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  if (!get_object_attribute (input_available_event, &o_uid, &o_gid, &mode))
+    {
+      if ((uid == ILLEGAL_UID || uid == o_uid)
+	  && (gid == ILLEGAL_GID || gid == o_gid))
+	ret = 0;
+      else if (!create_object_sd_from_attribute (input_available_event,
+						 uid, gid, S_IFCHR | mode, sd))
+	ret = fch_set_sd (sd, true);
+    }
+errout:
+  if (to_close)
+    fch_close_handles ();
+  return ret;
+}
+
 /*******************************************************
  fhandler_pty_master
 */
@@ -1215,6 +1413,18 @@ fhandler_pty_master::close ()
 		  arch->from_master, arch->to_master, arch->dwProcessId);
   if (cygwin_finished_initializing)
     {
+      if (arch->master_ctl && get_ttyp ()->master_pid == myself->pid)
+	{
+	  char buf[MAX_PATH];
+	  pipe_request req = { (DWORD) -1 };
+	  pipe_reply repl;
+	  DWORD len;
+
+	  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
+			   &installation_key, get_unit ());
+	  CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len, 500);
+	  CloseHandle (arch->master_ctl);
+	}
       if (!ForceCloseHandle (arch->from_master))
 	termios_printf ("error closing from_master %p, %E", arch->from_master);
       if (!ForceCloseHandle (arch->to_master))
@@ -1361,16 +1571,154 @@ fhandler_tty_master::init_console ()
   return 0;
 }
 
-#define close_maybe(h) \
-  do { \
-    if (h && h != INVALID_HANDLE_VALUE) \
-      CloseHandle (h); \
-  } while (0)
+extern "C" BOOL WINAPI GetNamedPipeClientProcessId (HANDLE, PULONG);
+
+/* This thread function handles the master control pipe.  It waits for a
+   client to connect.  Then it checks if the client process has permissions
+   to access the tty handles.  If so, it opens the client process and
+   duplicates the handles into that process.  If that fails, it sends a reply
+   with at least one handle set to NULL and an error code.  Last but not
+   least, the client is disconnected and the thread waits for the next client.
+
+   A special case is when the master side of the tty is about to be closed.
+   The client side is the fhandler_pty_master::close function and it sends
+   a PID -1 in that case.  On Vista and later a check is performed that the
+   request to leave really comes from the master process itself.  On earlier
+   OSes there's no function to check for the PID of the client process so
+   we have to trust the client side.
+
+   Since there's
+   always only one pipe instance, there's a chance that clients have to
+   wait to connect to the master control pipe.  Therefore the client calls
+   to CallNamedPipe should have a big enough timeout value.  For now this
+   is 500ms.  Hope that's enough. */
+
+DWORD
+fhandler_pty_master::pty_master_thread ()
+{
+  bool exit = false;
+  GENERIC_MAPPING map = { EVENT_QUERY_STATE, EVENT_MODIFY_STATE, 0,
+			  EVENT_QUERY_STATE | EVENT_MODIFY_STATE };
+  pipe_request req;
+  DWORD len;
+  security_descriptor sd;
+  HANDLE token;
+  PRIVILEGE_SET ps;
+  BOOL ret;
+  DWORD pid;
+
+  termios_printf ("Entered");
+  while (!exit && ConnectNamedPipe (master_ctl, NULL))
+    {
+      pipe_reply repl = { NULL, NULL, 0 };
+      bool deimp = false;
+      BOOL allow = FALSE;
+      ACCESS_MASK access = EVENT_MODIFY_STATE;
+      HANDLE client = NULL;
+
+      if (!ReadFile (master_ctl, &req, sizeof req, &len, NULL))
+      	{
+	  termios_printf ("ReadFile, %E");
+	  goto reply;
+	}
+      /* This function is only available since Vista, unfortunately.
+	 In earlier OSes we simply have to believe that the client
+	 has no malicious intent (== sends arbitrary PIDs). */
+      if (!GetNamedPipeClientProcessId (master_ctl, &pid))
+	pid = req.pid;
+      if (get_object_sd (input_available_event, sd))
+	{
+	  termios_printf ("get_object_sd, %E");
+	  goto reply;
+	}
+      cygheap->user.deimpersonate ();
+      deimp = true;
+      if (!ImpersonateNamedPipeClient (master_ctl))
+	{
+	  termios_printf ("ImpersonateNamedPipeClient, %E");
+	  goto reply;
+	}
+      if (!OpenThreadToken (GetCurrentThread (), TOKEN_QUERY, TRUE, &token))
+	{
+	  termios_printf ("OpenThreadToken, %E");
+	  goto reply;
+	}
+      len = sizeof ps;
+      ret = AccessCheck (sd, token, access, &map, &ps, &len, &access, &allow);
+      CloseHandle (token);
+      if (!ret)
+	{
+	  termios_printf ("AccessCheck, %E");
+	  goto reply;
+	}
+      if (!RevertToSelf ())
+	{
+	  termios_printf ("RevertToSelf, %E");
+	  goto reply;
+	}
+      if (req.pid == (DWORD) -1)	/* Request to finish thread. */
+	{
+	  /* Pre-Vista: Just believe in the good of the client process.
+	     Post-Vista: Check if the requesting process is the master
+	     process itself. */
+	  if (pid == (DWORD) -1 || pid == GetCurrentProcessId ())
+	    exit = true;
+	  goto reply;
+	}
+      if (allow)
+	{
+	  client = OpenProcess (PROCESS_DUP_HANDLE, FALSE, pid);
+	  if (!client)
+	    {
+	      termios_printf ("OpenProcess, %E");
+	      goto reply;
+	    }
+	  if (!DuplicateHandle (GetCurrentProcess (), from_master,
+			       client, &repl.from_master,
+			       0, TRUE, DUPLICATE_SAME_ACCESS))
+	    {
+	      termios_printf ("DuplicateHandle (from_master), %E");
+	      goto reply;
+	    }
+	  if (!DuplicateHandle (GetCurrentProcess (), to_master,
+				client, &repl.to_master,
+				0, TRUE, DUPLICATE_SAME_ACCESS))
+	    {
+	      termios_printf ("DuplicateHandle (to_master), %E");
+	      goto reply;
+	    }
+	}
+reply:
+      repl.error = GetLastError ();
+      if (client)
+	CloseHandle (client);
+      if (deimp)
+	cygheap->user.reimpersonate ();
+      sd.free ();
+      termios_printf ("Reply: from %p, to %p, error %lu",
+		      repl.from_master, repl.to_master, repl.error );
+      if (!WriteFile (master_ctl, &repl, sizeof repl, &len, NULL))
+	termios_printf ("WriteFile, %E");
+      if (!DisconnectNamedPipe (master_ctl))
+	termios_printf ("DisconnectNamedPipe, %E");
+    }
+  termios_printf ("Leaving");
+  return 0;
+}
+
+static DWORD WINAPI
+pty_master_thread (VOID *arg)           
+{ 
+  return ((fhandler_pty_master *) arg)->pty_master_thread ();
+} 
 
 bool
 fhandler_pty_master::setup (bool ispty)
 {
   int res;
+  security_descriptor sd;
+  SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
+
   tty& t = *cygwin_shared->tty[get_unit ()];
 
   tcinit (&t, true);		/* Set termios information.  Force initialization. */
@@ -1379,22 +1727,14 @@ fhandler_pty_master::setup (bool ispty)
   DWORD pipe_mode = PIPE_NOWAIT;
 
   /* Create communication pipes */
-
   char pipename[sizeof("ttyNNNN-from-master")];
   __small_sprintf (pipename, "tty%d-from-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none_nih, from_master,
-					  get_output_handle (), 128 * 1024,
-					  pipename);
+  res = fhandler_pipe::create_selectable (ispty ? &sec_none : &sec_none_nih,
+					  from_master, get_output_handle (),
+					  128 * 1024, pipename);
   if (res)
     {
       errstr = "input pipe";
-      goto err;
-    }
-  /* Only ptys should create inheritable handles by default.  ttys are
-     parcelled out on an as-needed basis and handle inheritance differently. */
-  if (ispty && !SetHandleInformation (get_output_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
-    {
-      errstr = "inheritable get_output_handle ()";
       goto err;
     }
 
@@ -1403,53 +1743,80 @@ fhandler_pty_master::setup (bool ispty)
 		    get_output_handle ());
 
   __small_sprintf (pipename, "tty%d-to-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none_nih, get_io_handle (),
-					  to_master, 128 * 1024, pipename);
+  res = fhandler_pipe::create_selectable (ispty ? &sec_none : &sec_none_nih,
+					  get_io_handle (), to_master,
+					  128 * 1024, pipename);
   if (res)
     {
       errstr = "output pipe";
       goto err;
     }
-  /* Only ptys should create inheritable handles by default.  ttys are
-     parcelled out on an as-needed basis and handle inheritance differently. */
-  if (ispty && !SetHandleInformation (get_io_handle (), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
-    {
-      errstr = "inheritable get_io_handle ()";
-      goto err;
-    }
 
   need_nl = 0;
 
-  /* We do not allow others to open us (for handle duplication)
-     but rely on cygheap->inherited_ctty for descendant processes.
-     In the future the cygserver may allow access by others. */
-
-  if (cygserver_running == CYGSERVER_UNKNOWN)
-    cygserver_init ();
+  /* Create security attribute.  Default permissions are 0620. */
+  sd.malloc (sizeof (SECURITY_DESCRIPTOR));
+  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
+					S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
+					sd))
+    sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
 
   /* Create synchronisation events */
 
   if (!ispty)
     {
-      if (!(output_done_event = t.get_event (errstr = OUTPUT_DONE_EVENT)))
+      if (!(output_done_event = t.get_event (errstr = OUTPUT_DONE_EVENT, &sa)))
 	goto err;
-      if (!(ioctl_done_event = t.get_event (errstr = IOCTL_DONE_EVENT)))
+      if (!(ioctl_done_event = t.get_event (errstr = IOCTL_DONE_EVENT, &sa)))
 	goto err;
-      if (!(ioctl_request_event = t.get_event (errstr = IOCTL_REQUEST_EVENT)))
+      if (!(ioctl_request_event = t.get_event (errstr = IOCTL_REQUEST_EVENT,
+					       &sa)))
 	goto err;
     }
 
-  if (!(input_available_event = t.get_event (errstr = INPUT_AVAILABLE_EVENT, TRUE)))
+  /* Carefully check that the input_available_event didn't already exist.
+     This is a measure to make sure that the event security descriptor
+     isn't occupied by a malicious process.  We must make sure that the
+     event's security descriptor is what we expect it to be. */
+  if (!(input_available_event = t.get_event (errstr = INPUT_AVAILABLE_EVENT,
+					     &sa, TRUE))
+      || GetLastError () == ERROR_ALREADY_EXISTS)
     goto err;
 
   char buf[MAX_PATH];
   errstr = shared_name (buf, OUTPUT_MUTEX, t.ntty);
-  if (!(output_mutex = CreateMutex (&sec_all, FALSE, buf)))
+  if (!(output_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
   errstr = shared_name (buf, INPUT_MUTEX, t.ntty);
-  if (!(input_mutex = CreateMutex (&sec_all, FALSE, buf)))
+  if (!(input_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
+
+  if (ispty)
+    {
+      /* Create master control pipe which allows the master to duplicate
+	 the pty pipe handles to processes which deserve it. */
+      cygthread *h;
+      __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
+		       &installation_key, get_unit ());
+      master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
+				    PIPE_WAIT | PIPE_TYPE_MESSAGE
+				    | PIPE_READMODE_MESSAGE, 1, 4096, 4096,
+				    0, &sec_all_nih);
+      if (master_ctl == INVALID_HANDLE_VALUE)
+	{
+	  errstr = "pty master control pipe";
+	  goto err;
+	}
+      h = new cygthread (::pty_master_thread, 0, this, "pty_master");
+      if (!h)
+	{
+	  errstr = "pty master control thread";
+	  goto err;
+	}
+      h->zap_h ();
+    }
 
   t.from_master = from_master;
   t.to_master = to_master;
@@ -1475,6 +1842,7 @@ err:
   close_maybe (input_mutex);
   close_maybe (from_master);
   close_maybe (to_master);
+  close_maybe (master_ctl);
   termios_printf ("tty%d open failed - failed to create %s", errstr);
   return false;
 }

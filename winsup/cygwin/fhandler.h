@@ -1089,6 +1089,12 @@ class fhandler_tty_common: public fhandler_termios
 class fhandler_tty_slave: public fhandler_tty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
+
+  /* Helper functions for fchmod and fchown. */
+  bool fch_open_handles ();
+  int fch_set_sd (security_descriptor &sd, bool chown);
+  void fch_close_handles ();
+
  public:
   /* Constructor */
   fhandler_tty_slave ();
@@ -1108,14 +1114,18 @@ class fhandler_tty_slave: public fhandler_tty_common
   void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);
-  int cygserver_attach_tty (HANDLE*, HANDLE*);
   int get_unit ();
   virtual char const *ttyname () { return pc.dev.name; }
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
+  int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
 };
 
 class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
+  HANDLE master_ctl;		// Control socket for handle duplication
+
 public:
   int need_nl;			// Next read should start with \n
   DWORD dwProcessId;		// Owner of master handles
@@ -1123,6 +1133,7 @@ public:
   /* Constructor */
   fhandler_pty_master ();
 
+  DWORD pty_master_thread ();
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();

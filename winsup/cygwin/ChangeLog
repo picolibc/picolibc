@@ -1,5 +1,71 @@
 2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetNamedPipeClientProcessId): Define.
+	* fhandler.h (fhandler_tty_slave::fch_open_handles): Declare private.
+	(fhandler_tty_slave::fch_close_handles): Ditto.
+	(fhandler_tty_slave::cygserver_attach_tty): Drop declaration.
+	(fhandler_tty_slave::fstat): Declare public.
+	(fhandler_tty_slave::fchmod): Declare public.
+	(fhandler_tty_slave::fchown): Declare public.
+	(class fhandler_pty_master): Add master_ctl handle.
+	(fhandler_pty_master::pty_master_thread): Declare public.
+	* fhandler_termios.cc (fhandler_termios::tcinit): If the process
+	is started from a non-Cygwin process, make it tty process group
+	leader.
+	* fhandler_tty.cc: Throughout accommodate additional security related
+	arguments in calls to functions creating or opening objects.
+	(close_maybe): Move to start of file to reuse it
+	in other methods.
+	(struct pipe_request): Define.
+	(struct pipe_reply): Define.
+	(fhandler_tty_slave::open): Throughout, try to open synchronization
+	objects with MAXIMUM_ALLOWED permissions.  Drop call to cygserver.
+	Try to duplicate pipe handles via master_ctl pipe if duplicating
+	directly doesn't work.
+	(fhandler_tty_slave::cygserver_attach_tty): Remove.
+	(fhandler_tty_slave::init): Close unused incoming pipe handle.
+	(fhandler_pty_master::close): Send exit message to master control
+	thread and close master_ctl handle.
+	(fhandler_pty_master::pty_master_thread): New method, implementing the
+	master control thread.
+	(pty_master_thread): Static helper to start master control thread.
+	(fhandler_pty_master::setup): Simplify creating pipe inheritance.
+	Make sure we're the one creating the input_available_event.  Add
+	comment to explain why.  Create master_ctl pipe and start master
+	control thread.  Close master_ctl handle in case of error.
+	* security.cc (alloc_sd): Add code to handle tty objects.  Add comments
+	to explain what exactly is required.
+	(get_object_sd): New function.
+	(get_object_attribute): New function.
+	(create_object_sd_from_attribute): New function.
+	(set_object_sd): New function.
+	(set_object_attribute): New function.
+	(set_file_attribute): Change attribute type to mode_t.
+	* security.h (set_file_attribute): Change attribute type to mode_t.
+	(get_object_sd): Declare.
+	(get_object_attribute): Declare.
+	(create_object_sd_from_attribute): Declare.
+	(set_object_sd): Declare.
+	(set_object_attribute): Declare.
+	* tty.cc (tty::slave_alive): Implement directly instead of via alive.
+	(tty::exists): Open mutex handle with READ_CONTROL access.
+	(tty::alive): Remove.
+	(tty::open_output_mutex): Convert to inline method.
+	(tty::open_input_mutex): Ditto.
+	(tty::open_mutex): Take additional ACCESS_MASK parameter for the
+	mutex open access mask.
+	(tty::open_inuse): New method.
+	(tty::create_inuse): Take PSECURITY_ATTRIBUTES parameter.  Drop fmt
+	name parameter.  Always create TTY_SLAVE_ALIVE event.
+	(tty::get_event): Take additional PSECURITY_ATTRIBUTES parameter for
+	CreateEvent.
+	* tty.h (class tty): Change declarations according to aforementioned
+	changes.
+	(tty::open_output_mutex): Implement as inline method.
+	(tty::open_input_mutex): Ditto.
+
+2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Set dev to
 	valid content for ptys.  Remove setting FILE_CREATE_PIPE_INSTANCE
 	in access flags since it's not needed.  Set the access mask for

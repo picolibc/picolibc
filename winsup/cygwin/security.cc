@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -464,6 +464,10 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   /* From here fill ACL. */
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
+  /* Only used for sync objects (for ttys).  The admins group should
+     always have the right to manipulate the ACL, so we have to make sure
+     that the ACL gives the admins group STANDARD_RIGHTS_ALL access. */
+  bool saw_admins = false;
 
   /* Construct allow attribute for owner.
      Don't set FILE_READ/WRITE_ATTRIBUTES unconditionally on Samba, otherwise
@@ -480,9 +484,12 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   if (S_ISDIR (attribute)
       && (attribute & (S_IWUSR | S_IXUSR)) == (S_IWUSR | S_IXUSR))
     owner_allow |= FILE_DELETE_CHILD;
+  /* For sync objects note that the owner is admin. */
+  if (S_ISCHR (attribute) && owner_sid == well_known_admins_sid)
+    saw_admins = true;
 
   /* Construct allow attribute for group. */
-  DWORD group_allow = STANDARD_RIGHTS_READ
+  DWORD group_allow = STANDARD_RIGHTS_READ | SYNCHRONIZE
 		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
@@ -494,9 +501,15 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
       && (attribute & (S_IWGRP | S_IXGRP)) == (S_IWGRP | S_IXGRP)
       && !(attribute & S_ISVTX))
     group_allow |= FILE_DELETE_CHILD;
+  /* For sync objects, add STANDARD_RIGHTS_ALL for admins group. */
+  if (S_ISCHR (attribute) && group_sid == well_known_admins_sid)
+    {
+      group_allow |= STANDARD_RIGHTS_ALL;
+      saw_admins = true;
+    }
 
   /* Construct allow attribute for everyone. */
-  DWORD other_allow = STANDARD_RIGHTS_READ
+  DWORD other_allow = STANDARD_RIGHTS_READ | SYNCHRONIZE
 		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
   if (attribute & S_IROTH)
     other_allow |= FILE_GENERIC_READ;
@@ -560,6 +573,17 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 				  group_sid, acl_len, NO_INHERITANCE))
     return NULL;
 
+  /* For sync objects, if we didn't see the admins group so far, add entry
+     with STANDARD_RIGHTS_ALL access. */
+  if (S_ISCHR (attribute) && !saw_admins)
+    {
+      if (!add_access_allowed_ace (acl, ace_off++, STANDARD_RIGHTS_ALL,
+				   well_known_admins_sid, acl_len,
+				   NO_INHERITANCE))
+	return NULL;
+      saw_admins = true;
+    }
+
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
 			       well_known_world_sid, acl_len, NO_INHERITANCE))
@@ -582,7 +606,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  cygpsid ace_sid ((PSID) &ace->SidStart);
 
 	  /* Check for related ACEs. */
-	  if (ace_sid == well_known_null_sid)
+	  if (ace_sid == well_known_null_sid
+	      || (S_ISCHR (attribute) && ace_sid == well_known_admins_sid))
 	    continue;
 	  if ((ace_sid == cur_owner_sid)
 	      || (ace_sid == owner_sid)
@@ -717,8 +742,85 @@ set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
 }
 
 int
+get_object_sd (HANDLE handle, security_descriptor &sd)
+{
+  ULONG len = 0;
+  NTSTATUS status;
+
+  status = NtQuerySecurityObject (handle, ALL_SECURITY_INFORMATION,
+				  sd, len, &len);
+  if (status != STATUS_BUFFER_TOO_SMALL)
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  if (!sd.malloc (len))
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+  status = NtQuerySecurityObject (handle, ALL_SECURITY_INFORMATION,
+				  sd, len, &len);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
+}
+
+int
+get_object_attribute (HANDLE handle, __uid32_t *uidret, __gid32_t *gidret,
+		      mode_t *attribute)
+{
+  security_descriptor sd;
+
+  if (get_object_sd (handle, sd))
+    return -1;
+  get_info_from_sd (sd, attribute, uidret, gidret);
+  return 0;
+}
+
+int
+create_object_sd_from_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+				 mode_t attribute, security_descriptor &sd)
+{
+  path_conv pc;
+  if ((handle && get_object_sd (handle, sd))
+      || !alloc_sd (pc, uid, gid, attribute, sd))
+    return -1;
+  return 0;
+}
+
+int
+set_object_sd (HANDLE handle, security_descriptor &sd, bool chown)
+{
+  NTSTATUS status;
+  status = NtSetSecurityObject (handle, chown ? ALL_SECURITY_INFORMATION
+					      : DACL_SECURITY_INFORMATION, sd);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
+}
+
+int
+set_object_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+		      mode_t attribute)
+{
+  security_descriptor sd;
+
+  if (create_object_sd_from_attribute (handle, uid, gid, attribute, sd)
+      || set_object_sd (handle, sd, uid != ILLEGAL_UID || gid != ILLEGAL_GID))
+    return -1;
+  return 0;
+}
+
+int
 set_file_attribute (HANDLE handle, path_conv &pc,
-		    __uid32_t uid, __gid32_t gid, int attribute)
+		    __uid32_t uid, __gid32_t gid, mode_t attribute)
 {
   int ret = -1;
 

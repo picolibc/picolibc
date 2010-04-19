@@ -1,7 +1,7 @@
 /* tty.cc
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009
-   Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009,
+   2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -287,12 +287,6 @@ out:
 }
 
 bool
-tty::slave_alive ()
-{
-  return alive (TTY_SLAVE_ALIVE);
-}
-
-bool
 tty::exists ()
 {
   /* Attempt to open the from-master side of the tty.  If it is accessible
@@ -307,7 +301,7 @@ tty::exists ()
   CloseHandle (r);
   CloseHandle (w);
 
-  HANDLE h = open_output_mutex ();
+  HANDLE h = open_output_mutex (READ_CONTROL);
   if (h)
     {
       CloseHandle (h);
@@ -317,45 +311,38 @@ tty::exists ()
 }
 
 bool
-tty::alive (const char *fmt)
+tty::slave_alive ()
 {
   HANDLE ev;
-  char buf[MAX_PATH];
-
-  shared_name (buf, fmt, ntty);
-  if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
+  if ((ev = open_inuse (READ_CONTROL)))
     CloseHandle (ev);
   return ev != NULL;
 }
 
 HANDLE
-tty::open_output_mutex ()
-{
-  return open_mutex (OUTPUT_MUTEX);
-}
-
-HANDLE
-tty::open_input_mutex ()
-{
-  return open_mutex (INPUT_MUTEX);
-}
-
-HANDLE
-tty::open_mutex (const char *mutex)
+tty::open_mutex (const char *mutex, ACCESS_MASK access)
 {
   char buf[MAX_PATH];
   shared_name (buf, mutex, ntty);
-  return OpenMutex (MUTEX_ALL_ACCESS, TRUE, buf);
+  return OpenMutex (access, TRUE, buf);
 }
 
 HANDLE
-tty::create_inuse (const char *fmt)
+tty::open_inuse (ACCESS_MASK access)
+{
+  char buf[MAX_PATH];
+  shared_name (buf, TTY_SLAVE_ALIVE, ntty);
+  return OpenEvent (access, FALSE, buf);
+}
+
+HANDLE
+tty::create_inuse (PSECURITY_ATTRIBUTES sa)
 {
   HANDLE h;
   char buf[MAX_PATH];
 
-  shared_name (buf, fmt, ntty);
-  h = CreateEvent (&sec_all, TRUE, FALSE, buf);
+  shared_name (buf, TTY_SLAVE_ALIVE, ntty);
+  h = CreateEvent (sa, TRUE, FALSE, buf);
   termios_printf ("%s %p", buf, h);
   if (!h)
     termios_printf ("couldn't open inuse event, %E", buf);
@@ -374,13 +361,15 @@ tty::init ()
 }
 
 HANDLE
-tty::get_event (const char *fmt, BOOL manual_reset)
+tty::get_event (const char *fmt, PSECURITY_ATTRIBUTES sa, BOOL manual_reset)
 {
   HANDLE hev;
   char buf[MAX_PATH];
 
   shared_name (buf, fmt, ntty);
-  if (!(hev = CreateEvent (&sec_all, manual_reset, FALSE, buf)))
+  if (!sa)
+    sa = &sec_all;
+  if (!(hev = CreateEvent (sa, manual_reset, FALSE, buf)))
     {
       termios_printf ("couldn't create %s", buf);
       set_errno (ENOENT);	/* FIXME this can't be the right errno */

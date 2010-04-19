@@ -1,6 +1,6 @@
 /* tty.h: shared tty info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -84,7 +84,8 @@ class fhandler_pty_master;
 
 class tty: public tty_min
 {
-  HANDLE get_event (const char *fmt, BOOL manual_reset = FALSE)
+  HANDLE get_event (const char *fmt, PSECURITY_ATTRIBUTES sa,
+		    BOOL manual_reset = FALSE);
     __attribute__ ((regparm (3)));
 public:
   pid_t master_pid;	/* PID of tty master process */
@@ -95,13 +96,14 @@ public:
   bool was_opened;	/* True if opened at least once. */
 
   void init ();
-  HANDLE create_inuse (const char *);
-  bool alive (const char *fmt);
+  HANDLE open_inuse (ACCESS_MASK access);
+  HANDLE create_inuse (PSECURITY_ATTRIBUTES);
   bool slave_alive ();
-  bool master_alive ();
-  HANDLE open_mutex (const char *mutex);
-  HANDLE open_output_mutex ();
-  HANDLE open_input_mutex ();
+  HANDLE open_mutex (const char *mutex, ACCESS_MASK access);
+  inline HANDLE open_output_mutex (ACCESS_MASK access)
+    { return open_mutex (OUTPUT_MUTEX, access); }
+  inline HANDLE open_input_mutex (ACCESS_MASK access)
+    { return open_mutex (INPUT_MUTEX, access); }
   bool exists ();
   void set_master_closed () {master_pid = -1;}
   static void __stdcall create_master (int);

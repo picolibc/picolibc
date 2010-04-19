@@ -350,7 +350,14 @@ class path_conv;
 int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
 				  __uid32_t *, __gid32_t *);
 int __stdcall set_file_attribute (HANDLE, path_conv &,
-				  __uid32_t, __gid32_t, int);
+				  __uid32_t, __gid32_t, mode_t);
+int __stdcall get_object_sd (HANDLE, security_descriptor &);
+int __stdcall get_object_attribute (HANDLE, __uid32_t *, __gid32_t *, mode_t *);
+int __stdcall set_object_attribute (HANDLE, __uid32_t, __gid32_t, mode_t);
+int __stdcall create_object_sd_from_attribute (HANDLE, __uid32_t, __gid32_t,
+					       mode_t, security_descriptor &);
+int __stdcall set_object_sd (HANDLE, security_descriptor &, bool);
+
 int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *);
 LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
 LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd,
