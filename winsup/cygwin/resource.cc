@@ -1,6 +1,6 @@
 /* resource.cc: getrusage () and friends.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009, 2010 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -21,6 +21,7 @@ details. */
 #include "fhandler.h"
 #include "pinfo.h"
 #include "dtable.h"
+#include "cygheap.h"
 
 /* add timeval values */
 static void
@@ -109,8 +110,6 @@ getrusage (int intwho, struct rusage *rusage_in)
   return res;
 }
 
-unsigned long rlim_core = RLIM_INFINITY;
-
 extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
@@ -146,7 +145,7 @@ getrlimit (int resource, struct rlimit *rlp)
       rlp->rlim_max = OPEN_MAX_MAX;
       break;
     case RLIMIT_CORE:
-      rlp->rlim_cur = rlim_core;
+      rlp->rlim_cur = cygheap->rlim_core;
       break;
     case RLIMIT_AS:
       rlp->rlim_cur = 0x80000000UL;
@@ -182,7 +181,7 @@ setrlimit (int resource, const struct rlimit *rlp)
   switch (resource)
     {
     case RLIMIT_CORE:
-      rlim_core = rlp->rlim_cur;
+      cygheap->rlim_core = rlp->rlim_cur;
       break;
     case RLIMIT_NOFILE:
       if (rlp->rlim_cur != RLIM_INFINITY)

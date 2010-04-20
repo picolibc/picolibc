@@ -1,6 +1,7 @@
 /* cygheap.cc: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -167,6 +168,7 @@ cygheap_init ()
       strcpy (cygheap->locale.charset, "UTF-8");
       /* Set umask to a sane default. */
       cygheap->umask = 022;
+      cygheap->rlim_core = RLIM_INFINITY;
     }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();

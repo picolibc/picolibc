@@ -1,3 +1,16 @@
+2010-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct init_cygheap): Add rlim_core member.
+	* cygheap.cc (cygheap_init): Initialize rlim_core to RLIM_INFINITY.
+	* exceptions.cc (stackdump): Drop extern declaration of rlim_core.
+	Refer to cygheap->rlim_core instead.
+	(exception::handle): Disable stackdumping if cygheap->rlim_core is 0.
+	Don't set WCOREDUMP flag in exit code, if cygheap->rlim_core is 0.
+	(sigpacket::process): Ditto.
+	* resource.cc (rlim_core): Remove.
+	(getrlimit): Fetch RLIMIT_CORE value from cygheap->rlim_core.
+	(setrlimit): Store RLIMIT_CORE value in cygheap->rlim_core.
+
 2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygerrno.h: Nevermind.

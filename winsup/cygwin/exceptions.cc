@@ -286,10 +286,9 @@ stack_info::walk ()
 static void
 stackdump (DWORD ebp, int open_file, bool isexception)
 {
-  extern unsigned long rlim_core;
   static bool already_dumped;
 
-  if (rlim_core == 0UL || (open_file && already_dumped))
+  if (cygheap->rlim_core == 0UL || (open_file && already_dumped))
     return;
 
   if (open_file)
@@ -662,9 +661,12 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	    }
 
 	  rtl_unwind (frame, e);
-	  open_stackdumpfile ();
-	  dump_exception (e, in);
-	  stackdump ((DWORD) ebp, 0, 1);
+	  if (cygheap->rlim_core > 0UL)
+	    {
+	      open_stackdumpfile ();
+	      dump_exception (e, in);
+	      stackdump ((DWORD) ebp, 0, 1);
+	    }
 	}
 
       if (e->ExceptionCode == STATUS_ACCESS_VIOLATION)
@@ -683,7 +685,8 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 			   ? 0 : 4) | (e->ExceptionInformation[0] << 1));
 	}
 
-      me.signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
+      /* Flag signal + core dump */
+      me.signal_exit ((cygheap->rlim_core > 0UL ? 0x80 : 0) | si.si_signo);
     }
 
   si.si_addr =  (si.si_signo == SIGSEGV || si.si_signo == SIGBUS
@@ -1310,7 +1313,8 @@ exit_sig:
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
       use_tls->copy_context (&c);
-      si.si_signo |= 0x80;
+      if (cygheap->rlim_core > 0UL)
+	si.si_signo |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
   use_tls->signal_exit (si.si_signo);	/* never returns */
