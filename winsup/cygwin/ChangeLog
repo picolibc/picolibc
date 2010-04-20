@@ -1,3 +1,7 @@
+2010-04-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (cygwin_create_path): Free memory on error.
+
 2010-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (struct init_cygheap): Add rlim_core member.

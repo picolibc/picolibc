@@ -2812,11 +2812,14 @@ cygwin_create_path (cygwin_conv_path_t what, const void *from)
   void *to;
   ssize_t size = cygwin_conv_path (what, from, NULL, 0);
   if (size <= 0)
-    return NULL;
-  if (!(to = malloc (size)))
-    return NULL;
+    to = NULL;
+  else if (!(to = malloc (size)))
+    to = NULL;
   if (cygwin_conv_path (what, from, to, size) == -1)
-    return NULL;
+    {
+      free (to);
+      to = NULL;
+    }
   return to;
 }
 
