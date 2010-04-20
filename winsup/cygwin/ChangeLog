@@ -1,3 +1,11 @@
+2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygerrno.h: Protect use of NTSTATUS for only when we need it.
+
+2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* lib/_cygwin_crt0_common.cc: Remove unneeded declarations.
+
 2010-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::fch_set_sd): Remove commented out
