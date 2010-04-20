@@ -1,3 +1,7 @@
+2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* transport_pipes.cc: Include ntdef.h to accommodate cygerrno.h.
+
 2009-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygserver.exe): Link with -static to avoid linking

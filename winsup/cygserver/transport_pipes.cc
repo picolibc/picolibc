@@ -13,6 +13,7 @@ details. */
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifdef __OUTSIDE_CYGWIN__
 #include "woutsup.h"
+#include <ntdef.h>
 #else
 #include "winsup.h"
 #endif
