@@ -48,9 +48,6 @@ extern int __dynamically_loaded;
 extern "C"
 {
 char **environ;
-int cygwin_attach_dll (HMODULE, MainFunc);
-int cygwin_attach_noncygwin_dll (HMODULE, MainFunc);
-int main (int, char **, char **);
 int _fmode;
 void _pei386_runtime_relocator ();
 
