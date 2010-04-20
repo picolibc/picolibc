@@ -1,5 +1,9 @@
 2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygerrno.h: Nevermind.
+
+2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygerrno.h: Protect use of NTSTATUS for only when we need it.
 
 2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
