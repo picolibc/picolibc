@@ -124,7 +124,7 @@ FMT(s_branch_nop_cst, 32, 0x120, 0x1ffc,
     CFLDS3(FLD(s, 1, 1), FLD(src1, 13, 3), FLD(src2, 16, 12)))
 FMT(s_branch_nop_reg, 32, 0x800360, 0xf830ffc,
     CFLDS4(FLD(s, 1, 1), FLD(x, 12, 1), FLD(src1, 13, 3), FLD(src2, 18, 5)))
-FMT(s_branch, 32, 0x360, 0xf8feffc,
+FMT(s_branch, 32, 0x360, 0xf83effc,
     CFLDS3(FLD(s, 1, 1), FLD(x, 12, 1), FLD(src2, 18, 5)))
 FMT(s_mvk, 32, 0x28, 0x3c,
     CFLDS4(FLD(s, 1, 1), FLD(h, 6, 1), FLD(cst, 7, 16), FLD(dst, 23, 5)))
