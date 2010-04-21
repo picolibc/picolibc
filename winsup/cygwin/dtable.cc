@@ -363,8 +363,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       FILE_ACCESS_INFORMATION fai;
 
       /* Console windows are not kernel objects, so the access mask returned
-	 by NtQueryInformationFile is meaningless. */
-      if (dev == FH_TTY || dev == FH_CONSOLE)
+	 by NtQueryInformationFile is meaningless.  CMD always hands down
+	 stdin handles as R/O handles, but our tty slave sides are R/W. */
+      if (dev == FH_TTY || dev == FH_CONSOLE || dev.major == DEV_TTYS_MAJOR)
       	access |= GENERIC_READ | GENERIC_WRITE;
       else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
 						   sizeof fai,

@@ -1,3 +1,8 @@
+2010-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Set access mask for
+	the slave side of ttys explicitely.  Explain why.
+
 2010-04-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (cygwin_create_path): Free memory on error.
