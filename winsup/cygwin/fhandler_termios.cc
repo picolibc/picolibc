@@ -1,7 +1,7 @@
 /* fhandler_termios.cc
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009
-   Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009,
+   2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -58,13 +58,6 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
       tc->pgid = myself->pgid;
       tc->initialized (true);
     }
-  else if (myself->ppid == 1 && myself->pid == myself->pgid
-	   && myself->pgid == myself->sid)
-    /* We have been started from a non-Cygwin process. So we just become
-       tty process group leader.
-       TODO: Investigate how SIGTTIN should be handled with pure-windows
-       programs. */
-    tc->pgid = myself->pgid;
 }
 
 int

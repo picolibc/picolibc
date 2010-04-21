@@ -1,4 +1,13 @@
 2010-04-21  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_termios.cc (tcinit): Remove previously applied change.
+	Replace with...
+	* fhandler_tty.cc (fhandler_tty_slave::init): Become process group
+	leader if called from dtable::init_std_file_from_handle.  Add comment
+	to explain.
+
+2010-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Set access mask for
 	the slave side of ttys explicitely.  Explain why.
