@@ -208,9 +208,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
    to Vista.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
-   volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED
-   and FILE_READ_ONLY_VOLUME. */
-#define GETVOLINFO_VALID_MASK (0x003701ffUL)
+   volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED,
+   FILE_READ_ONLY_VOLUME, and FILE_SEQUENTIAL_WRITE_ONCE.  The additional
+   filesystem flags supported since Windows 7 are also ignored for now.
+   They add information, but only on W7 and later, and only for filesystems
+   also supporting these flags, right now only NTFS. */
+#define GETVOLINFO_VALID_MASK (0x002701ffUL)
 #define TEST_GVI(f,m) (((f) & GETVOLINFO_VALID_MASK) == (m))
 
 /* FIXME: This flag twist is getting awkward.  There should really be some
@@ -244,6 +247,11 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 				| FILE_FILE_COMPRESSION)
 #define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
 				    MINIMAL_WIN_NTFS_FLAGS)
+/* These are the exact flags of a real Windows FAT/FAT32 filesystem.
+   Anything else is a filesystem faking to be FAT. */
+#define WIN_FAT_FLAGS (FILE_CASE_PRESERVED_NAMES | FILE_UNICODE_ON_DISK)
+#define FS_IS_WINDOWS_FAT  TEST_GVI(flags (), WIN_FAT_FLAGS)
+
       /* This always fails on NT4. */
       status = NtQueryVolumeInformationFile (vol, &io, &ffoi, sizeof ffoi,
 					     FileFsObjectIdInformation);
@@ -266,6 +274,11 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_netapp (FS_IS_NETAPP_DATAONTAP))
 	/* Any other remote FS faking to be NTFS. */
 	is_cifs (!FS_IS_WINDOWS_NTFS);
+      /* Then check the remote filesystems faking to be FAT.  Right now all
+	 of them are subsumed under the "CIFS" filesystem type. */
+      if (!got_fs ()
+	  && is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE)))
+	is_cifs (!FS_IS_WINDOWS_FAT);
       /* Then check remote filesystems honest about their name. */
       if (!got_fs ()
 	  /* Microsoft NFS needs distinct access methods for metadata. */
@@ -274,6 +287,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     drawbacks, like not supporting DOS attributes other than R/O
 	     and stuff like that. */
 	  && !is_mvfs (RtlEqualUnicodePathPrefix (&fsname, &ro_u_mvfs, FALSE))
+	  /* NWFS == Novell Netware FS.  Broken info class, see below. */
+	  && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
 	  /* Known remote file system which can't handle calls to
 	     NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
@@ -283,18 +298,31 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
 	  has_buggy_open (is_sunwnfs ());
 	}
-      /* Not only UNIXFS is known to choke on FileIdBothDirectoryInformation.
-	 Some other CIFS servers have problems with this call as well.
-	 Know example: EMC NS-702.  We just don't use that info class on
-	 any remote CIFS.  */
       if (got_fs ())
-	has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
+	{
+	  /* UNIXFS is known to choke on FileIdBothDirectoryInformation.
+	     Some other CIFS servers have problems with this call as well.
+	     Know example: EMC NS-702.  We just don't use that info class on
+	     any remote CIFS.  */
+	  has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
+	  /* NWFS is known to have a broken FileBasicInformation info class.
+	     It can't be used to fetch information, only to set information. 
+	     Therefore, for NWFS we have to fallback to the
+	     FileNetworkOpenInformation info class.  Unfortunately we can't
+	     use FileNetworkOpenInformation all the time since that fails on
+	     other filesystems like NFS. */
+	  has_buggy_basic_info (is_nwfs ());
+	  /* Netapp ans NWFS are too dumb to allow non-DOS filesystems
+	     containing trailing dots and spaces when accessed from Windows
+	     clients.  We subsume CIFS into this class of filesystems right
+	     away since at least some of them are not capable either. */
+	  has_dos_filenames_only (is_netapp () || is_nwfs () || is_cifs ());
+	}
     }
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
-      && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
     is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
   if (!got_fs ())
@@ -308,12 +336,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   has_acls (flags () & FS_PERSISTENT_ACLS);
   /* Netapp inode numbers are fly-by-night. */
   hasgood_inode ((has_acls () && !is_netapp ()) || is_nfs ());
-  /* NWFS is known to have a broken FileBasicInformation info class.  It
-     can't be used to fetch information, only to set information.  Therefore,
-     for NWFS we have to fallback to the FileNetworkOpenInformation info
-     class.  Unfortunately we can't use FileNetworkOpenInformation all the
-     time since that fails on other filesystems like NFS. */
-  has_buggy_basic_info (is_nwfs ());
   /* Case sensitivity is supported if FILE_CASE_SENSITIVE_SEARCH is set,
      except on Samba which handles Windows clients case insensitive.
 

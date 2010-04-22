@@ -2170,29 +2170,39 @@ int
 symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 		     fs_info &fs)
 {
-  HANDLE h = NULL;
-  int res = 0;
+  int res;
+  HANDLE h;
+  NTSTATUS status;
+  UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
   suffix_scan suffix;
-  contents[0] = '\0';
 
+  ULONG ci_flag = cygwin_shared->obcaseinsensitive || (pflags & PATH_NOPOSIX)
+		  ? OBJ_CASE_INSENSITIVE : 0;
+  /* TODO: Temporarily do all char->UNICODE conversion here.  This should
+     already be slightly faster than using Ascii functions. */
+  tmp_pathbuf tp;
+  tp.u_get (&upath);
+  InitializeObjectAttributes (&attr, &upath, ci_flag, NULL, NULL);
+
+  /* This label is used in case we encounter a FS which only handles
+     DOS paths.  See below. */
+restart:
+
+  h = NULL;
+  res = 0;
+  contents[0] = '\0';
   issymlink = true;
   isdevice = false;
-  ext_here = suffix.has (path, suffixes);
-  extn = ext_here - path;
   major = 0;
   minor = 0;
   mode = 0;
   pflags &= ~(PATH_SYMLINK | PATH_LNK | PATH_REP);
-  ULONG ci_flag = cygwin_shared->obcaseinsensitive || (pflags & PATH_NOPOSIX)
-		  ? OBJ_CASE_INSENSITIVE : 0;
 
-  /* TODO: Temporarily do all char->UNICODE conversion here.  This should
-     already be slightly faster than using Ascii functions. */
-  tmp_pathbuf tp;
-  UNICODE_STRING upath;
-  OBJECT_ATTRIBUTES attr;
-  tp.u_get (&upath);
-  InitializeObjectAttributes (&attr, &upath, ci_flag, NULL, NULL);
+  ext_here = suffix.has (path, suffixes);
+  extn = ext_here - path;
 
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
@@ -2200,9 +2210,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
-      FILE_BASIC_INFORMATION fbi;
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
       bool no_ea = false;
       bool fs_update_called = false;
 
@@ -2251,28 +2258,66 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
 	  debug_printf ("%p = NtOpenFile (no-EA, %S)", status, &upath);
 	}
-      if (status == STATUS_OBJECT_NAME_NOT_FOUND && ci_flag == 0
-	  && wincap.has_broken_udf ())
-        {
-	  /* On NT 5.x UDF is broken (at least) in terms of case sensitivity.
-	     When trying to open a file case sensitive, the file appears to be
-	     non-existant.  Another bug is described in fs_info::update. */
-	  attr.Attributes = OBJ_CASE_INSENSITIVE;
-	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
-			       &attr, &io, FILE_SHARE_VALID_FLAGS,
-			       FILE_OPEN_REPARSE_POINT
-			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  debug_printf ("%p = NtOpenFile (broken-UDF, %S)", status, &upath);
-	  attr.Attributes = 0;
-	  if (NT_SUCCESS (status))
+      if (status == STATUS_OBJECT_NAME_NOT_FOUND)
+	{
+	  if (ci_flag == 0 && wincap.has_broken_udf ())
 	    {
-	      fs.update (&upath, h);
-	      if (fs.is_udf ())
-		fs_update_called = true;
-	      else
-	      	{
-		  NtClose (h);
-		  status = STATUS_OBJECT_NAME_NOT_FOUND;
+	      /* On NT 5.x UDF is broken (at least) in terms of case
+		 sensitivity.  When trying to open a file case sensitive,
+		 the file appears to be non-existant.  Another bug is
+		 described in fs_info::update. */
+	      attr.Attributes = OBJ_CASE_INSENSITIVE;
+	      status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
+				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_OPEN_REPARSE_POINT
+				   | FILE_OPEN_FOR_BACKUP_INTENT);
+	      debug_printf ("%p = NtOpenFile (broken-UDF, %S)", status, &upath);
+	      attr.Attributes = 0;
+	      if (NT_SUCCESS (status))
+		{
+		  fs.update (&upath, h);
+		  if (fs.is_udf ())
+		    fs_update_called = true;
+		  else
+		    {
+		      NtClose (h);
+		      status = STATUS_OBJECT_NAME_NOT_FOUND;
+		    }
+		}
+	    }
+	  /* There are filesystems out in the wild (Netapp, NWFS, and others)
+	     which are uncapable of generating pathnames outside the Win32
+	     rules.  That means, filenames on these FSes must not have a
+	     leading space or trailing dots and spaces.  This code snippet
+	     manages them.  I really hope it's streamlined enough not to
+	     slow down normal operation.  This extra check only kicks in if
+	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
+	     already attach a suffix *and* the above special case for UDF
+	     on XP didn't succeeed. */
+	  if (!*ext_here && !fs_update_called)
+	    {
+	      /* Check for leading space or trailing dot or space in
+	         last component. */
+	      char *pend = ext_here;
+	      while (pend[-1] == '.' || pend[-1] == ' ')
+		--pend;
+	      char *pbeg = pend;
+	      while (pbeg[-1] != '\\')
+	      	--pbeg;
+	      /* If so, call fs.update to check if the filesystem is one of
+		 the broken ones. */
+	      if ((*pbeg == ' ' || *pend != '\0')
+		  && fs.update (&upath, NULL)
+		  && fs.has_dos_filenames_only ())
+		{
+		  /* If so, strip leading spaces and trailing dots and spaces
+		     from filename and... */
+		  if (pbeg)
+		    while (*pbeg == ' ')
+		      memmove (pbeg, pbeg + 1, --pend - pbeg);
+		  *pend = '\0';
+		  /* ...try again. */
+		  goto restart;
 		}
 	    }
 	}

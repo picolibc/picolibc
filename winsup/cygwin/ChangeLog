@@ -1,5 +1,23 @@
 2010-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (GETVOLINFO_VALID_MASK): Drop FILE_SEQUENTIAL_WRITE_ONCE
+	from mask.  Expand the comment a bit.
+	(WIN_FAT_FLAGS): New define.
+	(FS_IS_WINDOWS_FAT): New macro.
+	(fs_info::update): Handle remote FS faking to be FAT.  Subsume under
+	CIFS.  Check for NWFS and has_buggy_basic_info only for remote
+	filesystems.  Add check for has_dos_filenames_only.
+	* mount.h (class fs_info): Add has_dos_filenames_only status flag.
+	Implement accessors.
+	* path.cc (symlink_info::check): Rearrange variable definitions to
+	clear them up.  Add a restart label to allow a clean restart within
+	the method.  Add a check for broken filesystems only allowing DOS
+	pathnames in case we encounter a STATUS_OBJECT_NAME_NOT_FOUND status.
+	If all checks point to one of that, restart method with tweaked
+	incoming path.  Add lengthy comments to explain what we do.
+
+2010-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Fix a comment.
 
 2010-04-21  Corinna Vinschen  <corinna@vinschen.de>
