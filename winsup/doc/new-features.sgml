@@ -1,5 +1,28 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.6"><title>What's new and what changed from 1.7.5 to 1.7.6</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Ttys and ptys are handled as securable objects using file-like permissions
+and owner/group information.  <command>chmod</command> and
+<command>chown</command> now work on ttys/ptys.  A new mechanism is used
+to propagate pty handles safely to other processes, which does not require
+to use Cygserver.
+</para></listitem>
+
+<listitem><para>
+Pass on coresize settings made with setrlimit(2).  This allows shells to
+disable creating stackdump files in child processes via
+<screen>ulimit -c 0</screen> in bash or <screen>limit coredumpsize 0</screen>
+in tcsh.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.5"><title>What's new and what changed from 1.7.3 to 1.7.5</title>
 
 <itemizedlist mark="bullet">

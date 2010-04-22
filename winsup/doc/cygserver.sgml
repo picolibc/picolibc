@@ -12,8 +12,6 @@
   The implemented services so far are:
 </para>
 <itemizedlist mark="bullet">
-  <listitem><para>Control slave tty/pty handle dispersal from tty owner to other
-    processes without compromising the owner processes' security.</para></listitem>
   <listitem><para>XSI IPC Message Queues.</para></listitem>
   <listitem><para>XSI IPC Semaphores.</para></listitem>
   <listitem><para>XSI IPC Shared Memory.</para></listitem>
@@ -25,6 +23,11 @@
   passwords in <command>set(e)uid</command> does not require running
   Cygserver.  For details, see <xref linkend="ntsec-setuid-overview"></xref>.
   </para></listitem>
+  <listitem><para>This functionality is no longer used since Cygwin 1.7.6,
+  but the interface is still available:  Control slave tty/pty handle dispersal
+  from tty owner to other processes without compromising the owner processes'
+  security.  Starting with Cygwin 1.7.6 another safe mechanism to share tty/pty
+  handles is used.</para></listitem>
 </itemizedlist>
 
 </sect2>
