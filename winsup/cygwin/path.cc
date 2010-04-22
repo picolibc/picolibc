@@ -2435,11 +2435,11 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 	  if (res == -1)
 	    {
 	      /* Volume mount point.  The filesystem information for the top
-		 level directory should be for the volume top level directory
-		 itself, rather than for the reparse point itself.  So we
-		 fetch the filesystem information again, but with a NULL
-		 handle.  This does what we want because fs_info::update opens
-		 the handle without FILE_OPEN_REPARSE_POINT. */
+		 level directory should be for the volume top level directory,
+		 rather than for the reparse point itself.  So we fetch the
+		 filesystem information again, but with a NULL handle.
+		 This does what we want because fs_info::update opens the
+		 handle without FILE_OPEN_REPARSE_POINT. */
 	      fs.update (&upath, NULL);
 	    }
 	  else if (res)
