@@ -1,5 +1,9 @@
 2010-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check): Make sure to restart only once.
+
+2010-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (GETVOLINFO_VALID_MASK): Drop FILE_SEQUENTIAL_WRITE_ONCE
 	from mask.  Expand the comment a bit.
 	(WIN_FAT_FLAGS): New define.

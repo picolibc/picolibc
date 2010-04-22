@@ -2189,6 +2189,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
 
   /* This label is used in case we encounter a FS which only handles
      DOS paths.  See below. */
+  bool restarted = false;
 restart:
 
   h = NULL;
@@ -2294,7 +2295,7 @@ restart:
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
 	     already attach a suffix *and* the above special case for UDF
 	     on XP didn't succeeed. */
-	  if (!*ext_here && !fs_update_called)
+	  if (!restarted && !*ext_here && !fs_update_called)
 	    {
 	      /* Check for leading space or trailing dot or space in
 	         last component. */
@@ -2317,6 +2318,7 @@ restart:
 		      memmove (pbeg, pbeg + 1, --pend - pbeg);
 		  *pend = '\0';
 		  /* ...try again. */
+		  restarted = true;
 		  goto restart;
 		}
 	    }
