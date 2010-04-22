@@ -679,6 +679,7 @@ HAVE_XDR_DIR_FALSE
 HAVE_XDR_DIR_TRUE
 LIBC_XDR_DEF
 LIBC_XDR_LIB
+LIBC_POSIX_DEF
 HAVE_STDIO64_DIR_FALSE
 HAVE_STDIO64_DIR_TRUE
 LIBC_STDIO64_DEF
@@ -12399,7 +12400,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12402 "configure"
+#line 12403 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12505,7 +12506,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12508 "configure"
+#line 12509 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12834,6 +12835,27 @@ fi
 else
   HAVE_STDIO64_DIR_TRUE='#'
   HAVE_STDIO64_DIR_FALSE=
+fi
+
+
+LIBC_POSIX_LIB=
+LIBC_POSIX_DEF=
+if test -n "${posix_dir}"; then
+  if test "${use_libtool}" = "yes"; then
+    LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
+  else
+    LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
+  fi
+  LIBC_POSIX_DEF=${posix_dir}/stmp-def
+fi
+
+
+ if test x${posix_dir} != x; then
+  HAVE_POSIX_DIR_TRUE=
+  HAVE_POSIX_DIR_FALSE='#'
+else
+  HAVE_POSIX_DIR_TRUE='#'
+  HAVE_POSIX_DIR_FALSE=
 fi
 
 
@@ -13213,6 +13235,13 @@ if test -z "${HAVE_STDIO64_DIR_TRUE}" && test -z "${HAVE_STDIO64_DIR_FALSE}"; th
   { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_STDIO64_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"HAVE_STDIO64_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_POSIX_DIR_TRUE}" && test -z "${HAVE_POSIX_DIR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"HAVE_POSIX_DIR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"HAVE_POSIX_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

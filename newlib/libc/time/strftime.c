@@ -57,7 +57,7 @@ The abbreviated weekday name according to the current locale. [tm_wday]
 o %A
 The full weekday name according to the current locale.
 In the default "C" locale, one of `<<Sunday>>', `<<Monday>>', `<<Tuesday>>',
-`<<Wednesday>>', `<Thursday>>', `<<Friday>>', `<<Saturday>>'. [tm_wday]
+`<<Wednesday>>', `<<Thursday>>', `<<Friday>>', `<<Saturday>>'. [tm_wday]
 
 o %b
 The abbreviated month name according to the current locale. [tm_mon]

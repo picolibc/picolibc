@@ -1,3 +1,42 @@
+2010-04-22  DJ Delorie  <dj@redhat.com>
+
+	* libc/Makefile.am (SUBDEFS): Add LIBC_POSIX_DEF.
+	(libc.info): Add posix.texi.
+	(libc.dvi): Likewise.
+	(stmp-posix): New.
+	(posix.texi): New.
+	(libc_TEXINFOS): Add posix.texi.
+	* libc/configure.in (LIBC_POSIX_LIB, LIBC_POSIX_DEF): Add
+	tests.
+	* libc/libc.texinfo: Include posix.texi
+	* libc/locale/locale.c: Fix texinfo typo.
+	* libc/time/strftime.c: Fix texinfo typo.
+
+	* libc/configure: Regenerate.
+	* libc/Makefile.in: Regenerate.
+	* libc/argz/Makefile.in: Regenerate.
+	* libc/ctype/Makefile.in: Regenerate.
+	* libc/errno/Makefile.in: Regenerate.
+	* libc/iconv/Makefile.in: Regenerate.
+	* libc/iconv/ccs/Makefile.in: Regenerate.
+	* libc/iconv/ccs/binary/Makefile.in: Regenerate.
+	* libc/iconv/ces/Makefile.in: Regenerate.
+	* libc/iconv/lib/Makefile.in: Regenerate.
+	* libc/locale/Makefile.in: Regenerate.
+	* libc/misc/Makefile.in: Regenerate.
+	* libc/posix/Makefile.in: Regenerate.
+	* libc/reent/Makefile.in: Regenerate.
+	* libc/search/Makefile.in: Regenerate.
+	* libc/signal/Makefile.in: Regenerate.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio64/Makefile.in: Regenerate.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/syscalls/Makefile.in: Regenerate.
+	* libc/time/Makefile.in: Regenerate.
+	* libc/unix/Makefile.in: Regenerate.
+	* libc/xdr/Makefile.in: Regenerate.
+
 2010-04-06  Dave Korn  <dave.korn.cygwin@googlemail.com>
 
 	* libc/stdlib/__atexit.c (__atexit_lock): Initialise as recursive

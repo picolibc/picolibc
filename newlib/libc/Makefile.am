@@ -132,6 +132,7 @@ SUBDEFS = \
 	ctype/stmp-def \
 	$(LIBC_STDIO_DEF) \
 	$(LIBC_STDIO64_DEF) \
+	$(LIBC_POSIX_DEF) \
 	$(LIBC_XDR_DEF) \
 	string/stmp-def \
 	$(LIBC_SIGNAL_DEF) \
@@ -142,10 +143,10 @@ SUBDEFS = \
 	misc/stmp-def \
 	posix/stmp-def
 
-libc.info: sigset.texi extra.texi stdio64.texi iconvset.texi \
+libc.info: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
-libc.dvi: sigset.texi extra.texi stdio64.texi iconvset.texi \
+libc.dvi: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
@@ -192,6 +193,17 @@ stmp-stdio64: config.status
 
 stdio64.texi: stmp-stdio64 ; @true
 
+stmp-posix: config.status
+	if test -n "$(LIBC_POSIX_LIB)"; then \
+	  echo "@set POSIX" >tmp.texi; \
+	else \
+	  echo "@clear POSIX" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi posix.texi
+	touch $@
+
+posix.texi: stmp-posix ; @true
+
 stmp-targetdep: force
 	rm -f tmp.texi
 	targetdoc=`pwd`/tmp.texi; \
@@ -209,7 +221,7 @@ targetdep.tex: stmp-targetdep ; @true
 $(SUBDEFS): stmp-targetdep ; @true
 
 info_TEXINFOS = libc.texinfo
-libc_TEXINFOS = sigset.texi extra.texi stdio64.texi iconvset.texi \
+libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
 .PHONY: force

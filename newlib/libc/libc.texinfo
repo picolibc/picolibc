@@ -139,6 +139,7 @@ into another language, under the above conditions for modified versions.
 @c signal subdirectory:
 @include sigset.texi
 @include extra.texi
+@include posix.texi
 @include stdio64.texi
 @include iconvset.texi
 
@@ -162,7 +163,9 @@ into another language, under the above conditions for modified versions.
 * Reentrancy::
 
 * Misc::
+@ifset POSIX
 * Posix::
+@end ifset
 * Syscalls::
 * Arglists::
 @ifset ICONV

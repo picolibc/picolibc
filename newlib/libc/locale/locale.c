@@ -74,7 +74,7 @@ The following charsets are recognized:
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
 are equivalent.  Charset names with dashes can also be written without
 dashes, as in <<"UTF8">>, <<"iso88591">> or <<"koi8r">>.  <<"EUCJP">> and
-<<"EUCKR"> are also recognized with dash, <<"EUC-JP">> and <<"EUC-KR">>.
+<<"EUCKR">> are also recognized with dash, <<"EUC-JP">> and <<"EUC-KR">>.
 
 Full support for all of the above charsets requires that newlib has been
 build with multibyte support and support for all ISO and Windows Codepage.
