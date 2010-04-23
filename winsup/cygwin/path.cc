@@ -393,7 +393,7 @@ str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
 }
 
 PUNICODE_STRING
-get_nt_native_path (const char *path, UNICODE_STRING& upath)
+get_nt_native_path (const char *path, UNICODE_STRING& upath, bool dos)
 {
   upath.Length = 0;
   if (path[0] == '/')		/* special path w/o NT path representation. */
@@ -425,6 +425,26 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath)
       RtlAppendUnicodeStringToString (&upath, &ro_u_natp);
       str2uni_cat (upath, path + 4);
     }
+  if (dos)
+    {
+      /* Unfortunately we can't just use transform_chars with the tfx_rev_chars
+         table since only leading and trainlig spaces and dots are affected.
+	 So we step to every backslash and fix surrounding dots and spaces.
+	 That makes these broken filesystems a bit slower, but, hey. */
+      PWCHAR cp = upath.Buffer + 7;
+      PWCHAR cend = upath.Buffer + upath.Length / sizeof (WCHAR);
+      while (++cp < cend)
+	if (*cp == L'\\')
+	  {
+	    PWCHAR ccp = cp - 1;
+	    while (*ccp == L'.' || *ccp == L' ')
+	      *ccp-- |= 0xf000;
+	    while (cp[1] == L' ')
+	      *++cp |= 0xf000;
+	  }
+      while (*--cp == L'.' || *cp == L' ')
+      	*cp |= 0xf000;
+    }
   return &upath;
 }
 
@@ -437,7 +457,7 @@ path_conv::get_nt_native_path ()
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
-      ::get_nt_native_path (path, uni_path);
+      ::get_nt_native_path (path, uni_path, fs.has_dos_filenames_only ());
     }
   return &uni_path;
 }
@@ -501,7 +521,7 @@ getfileattr (const char *path, bool caseinsensitive) /* path has to be always ab
   InitializeObjectAttributes (&attr, &upath,
 			      caseinsensitive ? OBJ_CASE_INSENSITIVE : 0,
 			      NULL, NULL);
-  get_nt_native_path (path, upath);
+  get_nt_native_path (path, upath, false);
 
   status = NtQueryAttributesFile (&attr, &fbi);
   if (NT_SUCCESS (status))
@@ -2178,9 +2198,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
   suffix_scan suffix;
+  bool fs_update_called = false;
 
-  ULONG ci_flag = cygwin_shared->obcaseinsensitive || (pflags & PATH_NOPOSIX)
-		  ? OBJ_CASE_INSENSITIVE : 0;
+  const ULONG ci_flag = cygwin_shared->obcaseinsensitive
+			|| (pflags & PATH_NOPOSIX) ? OBJ_CASE_INSENSITIVE : 0;
   /* TODO: Temporarily do all char->UNICODE conversion here.  This should
      already be slightly faster than using Ascii functions. */
   tmp_pathbuf tp;
@@ -2212,10 +2233,9 @@ restart:
   while (suffix.next ())
     {
       bool no_ea = false;
-      bool fs_update_called = false;
 
       error = 0;
-      get_nt_native_path (suffix.path, upath);
+      get_nt_native_path (suffix.path, upath, fs.has_dos_filenames_only ());
       if (h)
 	{
 	  NtClose (h);
@@ -2261,7 +2281,8 @@ restart:
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
-	  if (ci_flag == 0 && wincap.has_broken_udf ())
+	  if (ci_flag == 0 && wincap.has_broken_udf ()
+	      && (!fs_update_called || fs.is_udf ()))
 	    {
 	      /* On NT 5.x UDF is broken (at least) in terms of case
 		 sensitivity.  When trying to open a file case sensitive,
@@ -2276,10 +2297,9 @@ restart:
 	      attr.Attributes = 0;
 	      if (NT_SUCCESS (status))
 		{
-		  fs.update (&upath, h);
-		  if (fs.is_udf ())
-		    fs_update_called = true;
-		  else
+		  if (!fs_update_called)
+		    fs_update_called = fs.update (&upath, h);
+		  if (!fs.is_udf ())
 		    {
 		      NtClose (h);
 		      status = STATUS_OBJECT_NAME_NOT_FOUND;
@@ -2295,31 +2315,29 @@ restart:
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
 	     already attach a suffix *and* the above special case for UDF
 	     on XP didn't succeeed. */
-	  if (!restarted && !*ext_here && !fs_update_called)
+	  if (!restarted && !*ext_here
+	      && (!fs_update_called || fs.has_dos_filenames_only ()))
 	    {
 	      /* Check for leading space or trailing dot or space in
 	         last component. */
 	      char *pend = ext_here;
-	      while (pend[-1] == '.' || pend[-1] == ' ')
+	      if (pend[-1] == '.' || pend[-1] == ' ')
 		--pend;
 	      char *pbeg = pend;
 	      while (pbeg[-1] != '\\')
 	      	--pbeg;
 	      /* If so, call fs.update to check if the filesystem is one of
 		 the broken ones. */
-	      if ((*pbeg == ' ' || *pend != '\0')
-		  && fs.update (&upath, NULL)
-		  && fs.has_dos_filenames_only ())
+	      if (*pbeg == ' ' || *pend != '\0')
 		{
-		  /* If so, strip leading spaces and trailing dots and spaces
-		     from filename and... */
-		  if (pbeg)
-		    while (*pbeg == ' ')
-		      memmove (pbeg, pbeg + 1, --pend - pbeg);
-		  *pend = '\0';
-		  /* ...try again. */
-		  restarted = true;
-		  goto restart;
+		  if (!fs_update_called)
+		    fs_update_called = fs.update (&upath, NULL);
+		  if (fs.has_dos_filenames_only ())
+		    {
+		      /* If so, try again. */
+		      restarted = true;
+		      goto restart;
+		    }
 		}
 	    }
 	}
@@ -2327,7 +2345,7 @@ restart:
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.
 	     This speeds up path_conv noticably (~10%). */
-	  && (fs_update_called || fs.update (&upath, h))
+	  && (fs_update_called || (fs_update_called = fs.update (&upath, h)))
 	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
 			 ? NtQueryAttributesFile (&attr, &fbi)
 			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
@@ -2397,7 +2415,7 @@ restart:
 						 TRUE, &basename, TRUE);
 		  /* Take the opportunity to check file system while we're
 		     having the handle to the parent dir. */
-		  fs.update (&upath, h);
+		  fs_update_called = fs.update (&upath, h);
 		  NtClose (dir);
 		  if (!NT_SUCCESS (status))
 		    {

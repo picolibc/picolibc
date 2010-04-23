@@ -1470,7 +1470,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   tmp_pathbuf tp;
   UNICODE_STRING unat;
   tp.u_get (&unat);
-  get_nt_native_path (native_path, unat);
+  get_nt_native_path (native_path, unat, false);
   if (append_bs)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);

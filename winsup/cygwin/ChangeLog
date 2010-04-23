@@ -1,3 +1,24 @@
+2010-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (get_nt_native_path): Add third parameter to declaration and
+	declare with regparms.
+	* path.cc (get_nt_native_path): Add third parameter to allow conversion
+	of leading and trailing dots and spaces on filesystems only supporting
+	filenames following DOS rules.
+	(path_conv::get_nt_native_path): Call get_nt_native_path according to
+	fs.has_dos_filenames_only flag.
+	(getfileattr): Accommodate new parameter to get_nt_native_path.
+	(symlink_info::check): Revamp fs_update_called handling to call
+	fs.update only once per call.  Call get_nt_native_path according to
+	fs.has_dos_filenames_only flag.  Streamline filesystem dependent code
+	not to be called more than once unnecessarily.  Drop code tweaking
+	incoming path for broken filesystems only allowing DOS pathnames.
+	Rely on changed get_nt_native_path instead.
+	* mount.cc (fillout_mntent): Accommodate new parameter to
+	get_nt_native_path.
+	* strfuncs.cc (tfx_rev_chars): New conversion table with comment.
+	(sys_cp_wcstombs): Use tfx_rev_chars rather than tfx_chars.
+
 2010-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Make sure to restart only once.
