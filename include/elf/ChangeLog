@@ -1,3 +1,14 @@
+2010-04-23  Alan Modra  <amodra@gmail.com>
+
+	* internal.h (ELF_SECTION_SIZE): Protect macro args with parentheses.
+	Invert logic to clarify test for .tbss.
+	(ELF_IS_SECTION_IN_SEGMENT): Rename to..
+	(ELF_SECTION_IN_SEGMENT_1): ..this.  Add check_vma param.  Protect
+	macro args with parentheses.
+	(ELF_SECTION_IN_SEGMENT): Define.
+	(ELF_IS_SECTION_IN_SEGMENT_FILE): Delete.
+	(ELF_IS_SECTION_IN_SEGMENT_MEMORY): Delete.
+
 2010-04-15  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* arm.h (Tag_FP_arch, Tag_ABI_align_needed, Tag_ABI_align_preserved,
