@@ -97,6 +97,7 @@ class fs_info
   const char *fsname () const { return fsn[0] ? fsn : "unknown"; }
 
   bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
+  bool inited () const { return !!status.flags; }
 };
 
 /* Mount table entry */

@@ -894,8 +894,10 @@ is_virtual_symlink:
 		  add_ext = true;
 		  goto out;
 		}
-	      else
-		break;
+	      /* Following a symlink we can't trust the collected filesystem
+		 information any longer. */
+	      fs.clear ();
+	      break;
 	    }
 	  else if (sym.error && sym.error != ENOENT)
 	    {
@@ -1026,8 +1028,8 @@ out:
 	    }
 	}
 
-      /* FS has been checked already for existing files. */
-      if (exists () || fs.update (get_nt_native_path (), NULL))
+      /* If FS hasn't been checked already in symlink_info::check, do so now. */
+      if (fs.inited ()|| fs.update (get_nt_native_path (), NULL))
 	{
 	  /* Incoming DOS paths are treated like DOS paths in native
 	     Windows applications.  No ACLs, just default settings. */
@@ -2198,7 +2200,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
   suffix_scan suffix;
-  bool fs_update_called = false;
 
   const ULONG ci_flag = cygwin_shared->obcaseinsensitive
 			|| (pflags & PATH_NOPOSIX) ? OBJ_CASE_INSENSITIVE : 0;
@@ -2282,7 +2283,7 @@ restart:
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
 	  if (ci_flag == 0 && wincap.has_broken_udf ()
-	      && (!fs_update_called || fs.is_udf ()))
+	      && (!fs.inited () || fs.is_udf ()))
 	    {
 	      /* On NT 5.x UDF is broken (at least) in terms of case
 		 sensitivity.  When trying to open a file case sensitive,
@@ -2297,8 +2298,8 @@ restart:
 	      attr.Attributes = 0;
 	      if (NT_SUCCESS (status))
 		{
-		  if (!fs_update_called)
-		    fs_update_called = fs.update (&upath, h);
+		  if (!fs.inited ())
+		    fs.update (&upath, h);
 		  if (!fs.is_udf ())
 		    {
 		      NtClose (h);
@@ -2316,25 +2317,29 @@ restart:
 	     already attach a suffix *and* the above special case for UDF
 	     on XP didn't succeeed. */
 	  if (!restarted && !*ext_here
-	      && (!fs_update_called || fs.has_dos_filenames_only ()))
+	      && (!fs.inited () || fs.has_dos_filenames_only ()))
 	    {
-	      /* Check for leading space or trailing dot or space in
+	      /* Check for trailing dot or space or leading space in
 	         last component. */
-	      char *pend = ext_here;
-	      if (pend[-1] == '.' || pend[-1] == ' ')
-		--pend;
-	      char *pbeg = pend;
-	      while (pbeg[-1] != '\\')
-	      	--pbeg;
-	      /* If so, call fs.update to check if the filesystem is one of
-		 the broken ones. */
-	      if (*pbeg == ' ' || *pend != '\0')
+	      char *p = ext_here - 1;
+	      if (*p != '.' && *p != ' ')
 		{
-		  if (!fs_update_called)
-		    fs_update_called = fs.update (&upath, NULL);
+		  while (*--p != '\\')
+		    ;
+		  if (*++p != ' ')
+		    p = NULL;
+		}
+	      if (p)
+		{
+		  /* If so, check if file resides on one of the known broken
+		     FSes only supporting filenames following DOS rules. */
+		  if (!fs.inited ())
+		    fs.update (&upath, NULL);
 		  if (fs.has_dos_filenames_only ())
 		    {
-		      /* If so, try again. */
+		      /* If so, try again.  Since we now know the FS, the
+		         filenames will be tweaked to follow DOS rules via the
+			 third parameter in the call to get_nt_native_path. */
 		      restarted = true;
 		      goto restart;
 		    }
@@ -2345,7 +2350,7 @@ restart:
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.
 	     This speeds up path_conv noticably (~10%). */
-	  && (fs_update_called || (fs_update_called = fs.update (&upath, h)))
+	  && (fs.inited () || (fs.update (&upath, h)))
 	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
 			 ? NtQueryAttributesFile (&attr, &fbi)
 			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
@@ -2415,7 +2420,7 @@ restart:
 						 TRUE, &basename, TRUE);
 		  /* Take the opportunity to check file system while we're
 		     having the handle to the parent dir. */
-		  fs_update_called = fs.update (&upath, h);
+		  fs.update (&upath, h);
 		  NtClose (dir);
 		  if (!NT_SUCCESS (status))
 		    {

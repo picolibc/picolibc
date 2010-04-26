@@ -1,3 +1,13 @@
+2010-04-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.h (fs_info::inited): New inline method.
+	* path.cc (path_conv::check): Clear filesystem info if following a
+	symlink.  Use new fs_info::inited method to check if FS info is already
+	available.
+	(symlink_info::check): Drop fs_update_called.  Use fs_info::inited
+	method instead.  Streamline test for leading space and trailing dot or
+	space.  Add comments.
+
 2010-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (get_nt_native_path): Add third parameter to declaration and
