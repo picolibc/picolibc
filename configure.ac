@@ -1,6 +1,6 @@
 #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-#   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation,
-#   Inc.
+#   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+#   Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ host_libs="intl mmalloc libiberty opcodes bfd readline tcl tk itcl libgui zlib l
 # know that we are building the simulator.
 # binutils, gas and ld appear in that order because it makes sense to run
 # "make check" in that particular order.
-# If --enable-gold is used, "gold" will replace "ld".
+# If --enable-gold is used, "gold" may replace "ld".
 host_tools="texinfo byacc flex bison binutils gas ld fixincludes gcc cgen sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils gettext zip fastjar gnattools"
 
 # libgcj represents the runtime libraries only used by gcj.
@@ -315,36 +315,56 @@ case ${with_newlib} in
 esac
 
 # Handle --enable-gold.
+#   --enable-gold		Build only gold
+#   --disable-gold [default]	Build only ld
+#   --enable-gold=both		Build both gold and ld, ld is default
+#   --enable-gold=both/ld	Same
+#   --enable-gold=both/gold	Build both gold and ld, gold is default, ld is renamed ld.bfd
 
 AC_ARG_ENABLE(gold,
-[  --enable-gold           use gold instead of ld],
+[[  --enable-gold[=ARG]     build gold [ARG={both}[/{gold,ld}]]]],
 ENABLE_GOLD=$enableval,
 ENABLE_GOLD=no)
-if test "${ENABLE_GOLD}" = "yes"; then
-  # Check for ELF target.
-  is_elf=no
-  case "${target}" in
-    *-*-elf* | *-*-sysv4* | *-*-unixware* | *-*-eabi* | hppa*64*-*-hpux* \
-    | *-*-linux* | frv-*-uclinux* | *-*-irix5* | *-*-irix6* \
-    | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2* | *-*-nto*)
+  case "${ENABLE_GOLD}" in
+  yes|both|both/gold|both/ld)
+    # Check for ELF target.
+    is_elf=no
+    case "${target}" in
+      *-*-elf* | *-*-sysv4* | *-*-unixware* | *-*-eabi* | hppa*64*-*-hpux* \
+      | *-*-linux* | frv-*-uclinux* | *-*-irix5* | *-*-irix6* \
+      | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-solaris2* | *-*-nto*)
+        case "${target}" in
+          *-*-linux*aout* | *-*-linux*oldld*)
+            ;;
+          *)
+            is_elf=yes
+            ;;
+        esac
+    esac
+
+    if test "$is_elf" = "yes"; then
+      # Check for target supported by gold.
       case "${target}" in
-        *-*-linux*aout* | *-*-linux*oldld*)
-          ;;
-        *)
-          is_elf=yes
+        i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-* | arm*-*-*)
+	  case "${ENABLE_GOLD}" in 
+	  both*)
+            configdirs="$configdirs gold"
+	    ;;
+	  *)
+            configdirs="`echo " ${configdirs} " | sed -e 's/ ld / gold /'`"
+	    ;;
+	  esac
+	  ENABLE_GOLD=yes
           ;;
       esac
+    fi
+    ;;
+  no)
+    ;;
+  *)
+    AC_MSG_ERROR([invalid --enable-gold argument])
+    ;;
   esac
-
-  if test "$is_elf" = "yes"; then
-    # Check for target supported by gold.
-    case "${target}" in
-      i?86-*-* | x86_64-*-* | sparc*-*-* | powerpc*-*-* | arm*-*-*)
-        configdirs="`echo " ${configdirs} " | sed -e 's/ ld / gold /'`"
-        ;;
-    esac
-  fi
-fi
 
 # Configure extra directories which are host specific
 
@@ -547,7 +567,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs gas ld fileutils target-newlib target-libgloss"
     ;;
   alpha*-*-*vms*)
-    noconfigdirs="$noconfigdirs gdb ld target-newlib target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs gdb target-newlib target-libgloss ${libgcj}"
     ;;
   alpha*-*-linux*)
     # newlib is not 64 bit ready
@@ -939,6 +959,9 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   sparc-*-solaris* | sparc64-*-solaris* | sparcv9-*-solaris*)
+    ;;
+  tic6x-*-*)
+    noconfigdirs="$noconfigdirs gdb sim ${libgcj}"
     ;;
   v810-*-*)
     noconfigdirs="$noconfigdirs bfd binutils gas gcc gdb ld target-libstdc++-v3 opcodes target-libgloss ${libgcj}"
@@ -2405,8 +2428,8 @@ case "${target}" in
     extra_arflags_for_target=" -X32_64"
     extra_nmflags_for_target=" -B -X32_64"
     ;;
-  *-*-darwin*)
-    # ranlib from Darwin requires the -c flag to look at common symbols.
+  *-*-darwin[[3-9]]*)
+    # ranlib before Darwin10 requires the -c flag to look at common symbols.
     extra_ranlibflags_for_target=" -c"
     ;;
   mips*-*-pe | sh*-*-pe | *arm-wince-pe)
@@ -3205,8 +3228,8 @@ NCN_STRICT_CHECK_TOOLS(DLLTOOL, dlltool)
 NCN_STRICT_CHECK_TOOLS(LD, ld)
 NCN_STRICT_CHECK_TOOLS(LIPO, lipo)
 NCN_STRICT_CHECK_TOOLS(NM, nm)
-NCN_STRICT_CHECK_TOOLS(RANLIB, ranlib, :)
-NCN_STRICT_CHECK_TOOLS(STRIP, strip, :)
+NCN_STRICT_CHECK_TOOLS(RANLIB, ranlib, true)
+NCN_STRICT_CHECK_TOOLS(STRIP, strip, true)
 NCN_STRICT_CHECK_TOOLS(WINDRES, windres)
 NCN_STRICT_CHECK_TOOLS(WINDMC, windmc)
 NCN_STRICT_CHECK_TOOLS(OBJCOPY, objcopy)
@@ -3242,7 +3265,7 @@ ACX_CHECK_INSTALLED_TARGET_TOOL(LD_FOR_TARGET, ld)
 ACX_CHECK_INSTALLED_TARGET_TOOL(LIPO_FOR_TARGET, lipo)
 ACX_CHECK_INSTALLED_TARGET_TOOL(NM_FOR_TARGET, nm)
 ACX_CHECK_INSTALLED_TARGET_TOOL(OBJDUMP_FOR_TARGET, objdump)
-ACX_CHECK_INSTALLED_TARGET_TOOL(RANLIB_FOR_TARGET, ranlib, :)
+ACX_CHECK_INSTALLED_TARGET_TOOL(RANLIB_FOR_TARGET, ranlib)
 ACX_CHECK_INSTALLED_TARGET_TOOL(STRIP_FOR_TARGET, strip)
 ACX_CHECK_INSTALLED_TARGET_TOOL(WINDRES_FOR_TARGET, windres)
 ACX_CHECK_INSTALLED_TARGET_TOOL(WINDMC_FOR_TARGET, windmc)
