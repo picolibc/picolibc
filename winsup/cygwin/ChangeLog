@@ -1,3 +1,7 @@
+2010-04-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* spawn.cc (find_exec): Use the first detected errno when lookup fails.
+
 2010-04-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/regex.h: Include _ansi.h to avoid missing out on preprocessor

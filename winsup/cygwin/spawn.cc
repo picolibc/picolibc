@@ -173,7 +173,9 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
       debug_printf ("trying %s", tmp);
 
-      if ((suffix = perhaps_suffix (tmp, buf, err, opt)) != NULL)
+      int err1;
+
+      if ((suffix = perhaps_suffix (tmp, buf, err1, opt)) != NULL)
 	{
 	  if (buf.has_acls () && check_file_access (buf, X_OK, true))
 	    continue;
