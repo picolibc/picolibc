@@ -944,9 +944,20 @@ struct opt
   {"user", MOUNT_SYSTEM, 1}
 };
 
+static int
+compare_flags (const void *a, const void *b)
+{
+  const opt *oa = (const opt *) a;
+  const opt *ob = (const opt *) b;
+
+  return strcmp (oa->name, ob->name);
+}
+
 static bool
 read_flags (char *options, unsigned &flags)
 {
+  opt key;
+
   while (*options)
     {
       char *p = strchr (options, ',');
@@ -954,22 +965,19 @@ read_flags (char *options, unsigned &flags)
 	*p++ = '\0';
       else
 	p = strchr (options, '\0');
-
-      for (opt *o = oopts;
-	   o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
-	   o++)
-	if (strcmp (options, o->name) == 0)
-	  {
-	    if (o->clear)
-	      flags &= ~o->val;
-	    else
-	      flags |= o->val;
-	    goto gotit;
-	  }
-      system_printf ("invalid fstab option - '%s'", options);
-      return false;
-
-    gotit:
+      
+      key.name = options;
+      opt *o = (opt *) bsearch (&key, oopts, sizeof oopts / sizeof (opt),
+				sizeof (opt), compare_flags);
+      if (!o)
+	{
+	  system_printf ("invalid fstab option - '%s'", options);
+	  return false;
+	}
+      if (o->clear)
+	flags &= ~o->val;
+      else
+	flags |= o->val;
       options = p;
     }
   return true;
