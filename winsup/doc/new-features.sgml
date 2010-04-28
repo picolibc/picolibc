@@ -19,6 +19,12 @@ disable creating stackdump files in child processes via
 in tcsh.
 </para></listitem>
 
+<listitem><para>
+Locale categories contain all localization strings additionally as wide-char
+strings.  locale(1) prints these values just as on Linux.  nl_langinfo(3)
+allows to fetch them.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
