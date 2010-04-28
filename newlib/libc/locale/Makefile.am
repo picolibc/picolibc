@@ -17,7 +17,8 @@ ELIX_SOURCES = \
 	lnumeric.c \
 	lmonetary.c \
 	nl_langinfo.c \
-	timelocal.c
+	timelocal.c \
+	lctype.c
 endif
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib

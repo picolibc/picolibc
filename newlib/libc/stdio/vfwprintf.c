@@ -130,6 +130,9 @@ SEEALSO
 #include "local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#include "../locale/lnumeric.h"
+#endif
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the _ldtoa_r code be
@@ -444,6 +447,9 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 
 #ifdef FLOATING_POINT
 #ifdef _MB_CAPABLE
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	decimal_point = *__get_current_numeric_locale ()->wdecimal_point;
+#else
 	{
 	  size_t nconv;
 
@@ -454,6 +460,7 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 	  if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	    decimal_point = L'.';
 	}
+#endif
 #else
 	decimal_point = (wchar_t) *_localeconv_r (data)->decimal_point;
 #endif
@@ -626,6 +633,9 @@ reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case L'\'':
 #ifdef _MB_CAPABLE
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+		  thousands_sep = *__get_current_numeric_locale ()->wthousands_sep;
+#else
 		  {
 		    size_t nconv;
 
@@ -636,6 +646,7 @@ reswitch:	switch (ch) {
 		    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 		      thousands_sep = L'\0';
 		  }
+#endif
 #else
 		  thousands_sep = (wchar_t) *_localeconv_r(data)->thousands_sep;
 #endif

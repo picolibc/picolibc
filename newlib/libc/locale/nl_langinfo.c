@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lctype.h"
 #include "timelocal.h"
 #include "lnumeric.h"
 #include "lmonetary.h"
@@ -40,6 +41,138 @@
 #ifndef __CYGWIN__
 #define TRANSITION_PERIOD_HACK
 #endif
+
+#undef offsetoff
+#define _O(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
+
+#define _NLITEM(cat,memb) { { cat:__get_current_##cat##_locale }, \
+			      _O (struct lc_##cat##_T, memb) }
+
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+static struct _nl_item_t
+{
+  union {
+    struct lc_ctype_T *    (*ctype)(void);
+    struct lc_time_T *     (*time)(void);
+    struct lc_numeric_T *  (*numeric)(void);
+    struct lc_monetary_T * (*monetary)(void);
+    struct lc_messages_T * (*messages)(void);
+    void *		   (*base)(void);
+  };
+  _off_t offset;
+} nl_ext[] =
+{
+  /* First element has an nl_item value of _NL_LOCALE_EXTENDED_FIRST_ENTRY */
+  _NLITEM (ctype, outdigits[0]),
+  _NLITEM (ctype, outdigits[1]),
+  _NLITEM (ctype, outdigits[2]),
+  _NLITEM (ctype, outdigits[3]),
+  _NLITEM (ctype, outdigits[4]),
+  _NLITEM (ctype, outdigits[5]),
+  _NLITEM (ctype, outdigits[6]),
+  _NLITEM (ctype, outdigits[7]),
+  _NLITEM (ctype, outdigits[8]),
+  _NLITEM (ctype, outdigits[9]),
+  _NLITEM (ctype, woutdigits[0]),
+  _NLITEM (ctype, woutdigits[1]),
+  _NLITEM (ctype, woutdigits[2]),
+  _NLITEM (ctype, woutdigits[3]),
+  _NLITEM (ctype, woutdigits[4]),
+  _NLITEM (ctype, woutdigits[5]),
+  _NLITEM (ctype, woutdigits[6]),
+  _NLITEM (ctype, woutdigits[7]),
+  _NLITEM (ctype, woutdigits[8]),
+  _NLITEM (ctype, woutdigits[9]),
+  _NLITEM (time, codeset),
+  _NLITEM (time, wmon[1]),
+  _NLITEM (time, wmon[2]),
+  _NLITEM (time, wmon[3]),
+  _NLITEM (time, wmon[4]),
+  _NLITEM (time, wmon[5]),
+  _NLITEM (time, wmon[6]),
+  _NLITEM (time, wmon[7]),
+  _NLITEM (time, wmon[8]),
+  _NLITEM (time, wmon[9]),
+  _NLITEM (time, wmon[10]),
+  _NLITEM (time, wmon[11]),
+  _NLITEM (time, wmon[12]),
+  _NLITEM (time, wmonth[1]),
+  _NLITEM (time, wmonth[2]),
+  _NLITEM (time, wmonth[3]),
+  _NLITEM (time, wmonth[4]),
+  _NLITEM (time, wmonth[5]),
+  _NLITEM (time, wmonth[6]),
+  _NLITEM (time, wmonth[7]),
+  _NLITEM (time, wmonth[8]),
+  _NLITEM (time, wmonth[9]),
+  _NLITEM (time, wmonth[10]),
+  _NLITEM (time, wmonth[11]),
+  _NLITEM (time, wmonth[12]),
+  _NLITEM (time, wwday[1]),
+  _NLITEM (time, wwday[2]),
+  _NLITEM (time, wwday[3]),
+  _NLITEM (time, wwday[4]),
+  _NLITEM (time, wwday[5]),
+  _NLITEM (time, wwday[6]),
+  _NLITEM (time, wwday[7]),
+  _NLITEM (time, wweekday[1]),
+  _NLITEM (time, wweekday[2]),
+  _NLITEM (time, wweekday[3]),
+  _NLITEM (time, wweekday[4]),
+  _NLITEM (time, wweekday[5]),
+  _NLITEM (time, wweekday[6]),
+  _NLITEM (time, wweekday[7]),
+  _NLITEM (time, wX_fmt),
+  _NLITEM (time, wx_fmt),
+  _NLITEM (time, wc_fmt),
+  _NLITEM (time, wam_pm[0]),
+  _NLITEM (time, wam_pm[1]),
+  _NLITEM (time, wdate_fmt),
+  _NLITEM (time, wampm_fmt),
+  _NLITEM (time, wera),
+  _NLITEM (time, wera_d_fmt),
+  _NLITEM (time, wera_d_t_fmt),
+  _NLITEM (time, wera_t_fmt),
+  _NLITEM (time, walt_digits),
+  _NLITEM (numeric, codeset),
+  _NLITEM (numeric, grouping),
+  _NLITEM (numeric, wdecimal_point),
+  _NLITEM (numeric, wthousands_sep),
+  _NLITEM (monetary, int_curr_symbol),
+  _NLITEM (monetary, currency_symbol),
+  _NLITEM (monetary, mon_decimal_point),
+  _NLITEM (monetary, mon_thousands_sep),
+  _NLITEM (monetary, mon_grouping),
+  _NLITEM (monetary, positive_sign),
+  _NLITEM (monetary, negative_sign),
+  _NLITEM (monetary, int_frac_digits),
+  _NLITEM (monetary, frac_digits),
+  _NLITEM (monetary, p_cs_precedes),
+  _NLITEM (monetary, p_sep_by_space),
+  _NLITEM (monetary, n_cs_precedes),
+  _NLITEM (monetary, n_sep_by_space),
+  _NLITEM (monetary, p_sign_posn),
+  _NLITEM (monetary, n_sign_posn),
+  _NLITEM (monetary, int_p_cs_precedes),
+  _NLITEM (monetary, int_p_sep_by_space),
+  _NLITEM (monetary, int_n_cs_precedes),
+  _NLITEM (monetary, int_n_sep_by_space),
+  _NLITEM (monetary, int_p_sign_posn),
+  _NLITEM (monetary, int_n_sign_posn),
+  _NLITEM (monetary, codeset),
+  _NLITEM (monetary, wint_curr_symbol),
+  _NLITEM (monetary, wcurrency_symbol),
+  _NLITEM (monetary, wmon_decimal_point),
+  _NLITEM (monetary, wmon_thousands_sep),
+  _NLITEM (monetary, wpositive_sign),
+  _NLITEM (monetary, wnegative_sign),
+  _NLITEM (messages, codeset),
+  _NLITEM (messages, wyesexpr),
+  _NLITEM (messages, wnoexpr),
+  _NLITEM (messages, wyesstr),
+  _NLITEM (messages, wnostr),
+};
+#endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
 
 #define _REL(BASE) ((int)item-BASE)
 
@@ -57,9 +190,36 @@ _DEFUN(nl_langinfo, (item),
    char *nptr;
 
    switch (item) {
+#ifdef __HAVE_LOCALE_INFO__
+	case _NL_MESSAGES_CODESET:
+	      	ret = (char *) __get_current_messages_locale ()->codeset;
+		goto do_codeset;
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	case _NL_TIME_CODESET:
+	      	ret = (char *) __get_current_time_locale ()->codeset;
+		goto do_codeset;
+	case _NL_NUMERIC_CODESET:
+	      	ret = (char *) __get_current_numeric_locale ()->codeset;
+		goto do_codeset;
+	case _NL_MONETARY_CODESET:
+	      	ret = (char *) __get_current_monetary_locale ()->codeset;
+		goto do_codeset;
+#ifdef __CYGWIN__
+	case _NL_COLLATE_CODESET:
+		{
+		  extern const char *__get_current_collate_codeset (void);
+		  ret = (char *) __get_current_collate_codeset ();
+		  goto do_codeset;
+		}
+#endif /* __CYGWIN__ */
+#endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
+#endif /* __HAVE_LOCALE_INFO__ */
 	case CODESET:
 #ifdef __CYGWIN__
 		ret = __locale_charset ();
+#endif
+do_codeset:
+#ifdef __CYGWIN__
 		/* Convert charset to Linux compatible codeset string. */
 		if (ret[0] == 'A'/*SCII*/)
 		  ret = "ANSI_X3.4-1968";
@@ -252,7 +412,18 @@ _DEFUN(nl_langinfo, (item),
 	case D_MD_ORDER:        /* local extension */
 		ret = (char *) __get_current_time_locale()->md_order;
 		break;
+	case _NL_CTYPE_MB_CUR_MAX:
+		ret = (char *) __get_current_ctype_locale()->mb_cur_max;
+		break;
 	default:
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+		if (item > _NL_LOCALE_EXTENDED_FIRST_ENTRY
+		    && item < _NL_LOCALE_EXTENDED_LAST_ENTRY) {
+			int idx = item - _NL_LOCALE_EXTENDED_FIRST_ENTRY - 1;
+			return *(char **) ((char *) (*nl_ext[idx].base)()
+					   + nl_ext[idx].offset);
+		}
+#endif
 		ret = "";
    }
    return (ret);

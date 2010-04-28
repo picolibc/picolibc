@@ -24,8 +24,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
 #include <limits.h>
 #include "lnumeric.h"
 #include "ldpart.h"
@@ -38,9 +36,14 @@ extern const char *__fix_locale_grouping_str(const char *);
 static char	numempty[] = { CHAR_MAX, '\0' };
 
 static const struct lc_numeric_T _C_numeric_locale = {
-	".",     	/* decimal_point */
-	"",     	/* thousands_sep */
-	numempty	/* grouping */
+	".",     			/* decimal_point */
+	"",     			/* thousands_sep */
+	numempty			/* grouping */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	, "ASCII",			/* codeset */
+	L".",				/* wdecimal_point */
+	L"",				/* wthousands_sep */
+#endif
 };
 
 static struct lc_numeric_T _numeric_locale;
@@ -54,12 +57,13 @@ __numeric_load_locale(const char *name , void *f_wctomb, const char *charset)
 
 #ifdef __CYGWIN__
 	extern int __set_lc_numeric_from_win (const char *,
+					      const struct lc_numeric_T *,
 					      struct lc_numeric_T *, char **,
 					      void *, const char *);
 	int old_numeric_using_locale = _numeric_using_locale;
 	_numeric_using_locale = 0;
-	ret = __set_lc_numeric_from_win (name, &_numeric_locale,
-					 &_numeric_locale_buf,
+	ret = __set_lc_numeric_from_win (name, &_C_numeric_locale,
+					 &_numeric_locale, &_numeric_locale_buf,
 					 f_wctomb, charset);
 	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
 	if (ret < 0)

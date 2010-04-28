@@ -42,6 +42,13 @@ static const struct lc_messages_T _C_messages_locale = {
 	"^[nN]" ,	/* noexpr */
 	"yes" , 	/* yesstr */
 	"no"		/* nostr */
+	"ASCII"		/* codeset */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	, L"^[yY]" ,	/* wyesexpr */
+	L"^[nN]" ,	/* wnoexpr */
+	L"yes" , 	/* wyesstr */
+	L"no"		/* wnostr */
+#endif
 };
 
 static struct lc_messages_T _messages_locale;
@@ -53,13 +60,15 @@ __messages_load_locale (const char *name, void *f_wctomb, const char *charset)
 {
 #ifdef __CYGWIN__
 	extern int __set_lc_messages_from_win (const char *,
+					       const struct lc_messages_T *,
 					       struct lc_messages_T *, char **,
 					       void *, const char *);
 	int ret;
 
 	int old_messages_using_locale = _messages_using_locale;
 	_messages_using_locale = 0;
-	ret = __set_lc_messages_from_win (name, &_messages_locale,
+	ret = __set_lc_messages_from_win (name, &_C_messages_locale,
+					  &_messages_locale,
 					  &_messages_locale_buf,
 					  f_wctomb, charset);
 	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */

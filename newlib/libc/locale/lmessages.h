@@ -29,7 +29,9 @@
 #ifndef _LMESSAGES_H_
 #define	_LMESSAGES_H_
 
+#include <_ansi.h>
 #include <sys/cdefs.h>
+#include <wchar.h>
 
 __BEGIN_DECLS
 
@@ -38,6 +40,13 @@ struct	lc_messages_T {
 	const char	*noexpr;
 	const char	*yesstr;
 	const char	*nostr;
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	const char	*codeset;	 /* codeset for mbtowc conversion */
+	const wchar_t	*wyesexpr;
+	const wchar_t	*wnoexpr;
+	const wchar_t	*wyesstr;
+	const wchar_t	*wnostr;
+#endif
 };
 
 struct lc_messages_T *__get_current_messages_locale(void);

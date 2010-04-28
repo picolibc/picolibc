@@ -29,7 +29,9 @@
 #ifndef _LMONETARY_H_
 #define	_LMONETARY_H_
 
+#include <_ansi.h>
 #include <sys/cdefs.h>
+#include <wchar.h>
 
 __BEGIN_DECLS
 
@@ -49,6 +51,21 @@ struct lc_monetary_T {
 	const char	*n_sep_by_space;
 	const char	*p_sign_posn;
 	const char	*n_sign_posn;
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	const char	*int_p_cs_precedes;
+	const char	*int_p_sep_by_space;
+	const char	*int_n_cs_precedes;
+	const char	*int_n_sep_by_space;
+	const char	*int_p_sign_posn;
+	const char	*int_n_sign_posn;
+	const char	*codeset;	 /* codeset for mbtowc conversion */
+	const wchar_t	*wint_curr_symbol;
+	const wchar_t	*wcurrency_symbol;
+	const wchar_t	*wmon_decimal_point;
+	const wchar_t	*wmon_thousands_sep;
+	const wchar_t	*wpositive_sign;
+	const wchar_t	*wnegative_sign;
+#endif
 };
 
 struct lc_monetary_T *__get_current_monetary_locale(void);

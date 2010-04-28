@@ -179,8 +179,10 @@ No supporting OS subroutines are required.
 #include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "lmessages.h"
 #include "lmonetary.h"
 #include "lnumeric.h"
+#include "lctype.h"
 #include "../stdlib/local.h"
 
 #define _LC_LAST      7
@@ -457,6 +459,11 @@ loadlocale(struct _reent *p, int category)
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		   const char *, mbstate_t *);
   int cjknarrow = 0;
+
+  /* Avoid doing everything twice if nothing has changed. */
+  if (!strcmp (new_categories[category], current_categories[category]))
+    return current_categories[category];
+
 #ifdef __CYGWIN__
   /* This additional code handles the case that the incoming locale string
      is not valid.  If so, it calls the function __set_locale_from_locale_alias,
@@ -830,8 +837,9 @@ restart:
     default:
       FAIL;
     }
-  if (category == LC_CTYPE)
+  switch (category)
     {
+    case LC_CTYPE:
       strcpy (lc_ctype_charset, charset);
       __mb_cur_max = mbc_max;
       __wctomb = l_wctomb;
@@ -847,27 +855,36 @@ restart:
 			  && ((strncmp (locale, "ja", 2) == 0
 			      || strncmp (locale, "ko", 2) == 0
 			      || strncmp (locale, "zh", 2) == 0));
-    }
-  else if (category == LC_MESSAGES)
-    {
+#ifdef __HAVE_LOCALE_INFO__
+      ret = __ctype_load_locale (locale, (void *) l_wctomb, charset, mbc_max);
+#endif /* __HAVE_LOCALE_INFO__ */
+      break;
+    case LC_MESSAGES:
+      strcpy (lc_message_charset, charset);
 #ifdef __HAVE_LOCALE_INFO__
       ret = __messages_load_locale (locale, (void *) l_wctomb, charset);
       if (!ret)
 #endif /* __HAVE_LOCALE_INFO__ */
-      strcpy (lc_message_charset, charset);
-    }
+      break;
 #ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
   /* Right now only Cygwin supports a __collate_load_locale function at all. */
-  else if (category == LC_COLLATE)
-    ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+    case LC_COLLATE:
+      ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+      break;
 #endif
-  else if (category == LC_MONETARY)
-    ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
-  else if (category == LC_NUMERIC)
-    ret = __numeric_load_locale (locale, (void *) l_wctomb, charset);
-  else if (category == LC_TIME)
-    ret = __time_load_locale (locale, (void *) l_wctomb, charset);
+    case LC_MONETARY:
+      ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+    case LC_NUMERIC:
+      ret = __numeric_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+    case LC_TIME:
+      ret = __time_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+    default:
+      break;
+    }
   if (ret)
     FAIL;
 #endif /* __HAVE_LOCALE_INFO__ */
@@ -901,13 +918,32 @@ __get_locale_env(struct _reent *p, int category)
 char *
 _DEFUN_VOID(__locale_charset)
 {
+#if 0//def __HAVE_LOCALE_INFO__
+  return __get_current_ctype_locale ()->codeset;
+#else
   return lc_ctype_charset;
+#endif
 }
+
+int
+_DEFUN_VOID(__locale_mb_cur_max)
+{
+#if 0//def __HAVE_LOCALE_INFO__
+  return __get_current_ctype_locale ()->mb_cur_max[0];
+#else
+  return __mb_cur_max;
+#endif
+}
+
 
 char *
 _DEFUN_VOID(__locale_msgcharset)
 {
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_current_messages_locale ()->codeset;
+#else
   return lc_message_charset;
+#endif
 }
 
 int
@@ -947,12 +983,21 @@ _DEFUN(_localeconv_r, (data),
       lconv.n_sep_by_space = m->n_sep_by_space[0];
       lconv.p_sign_posn = m->p_sign_posn[0];
       lconv.n_sign_posn = m->n_sign_posn[0];
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+      lconv.int_p_cs_precedes = m->int_p_cs_precedes[0];
+      lconv.int_p_sep_by_space = m->int_p_sep_by_space[0];
+      lconv.int_n_cs_precedes = m->int_n_cs_precedes[0];
+      lconv.int_n_sep_by_space = m->int_n_sep_by_space[0];
+      lconv.int_n_sign_posn = m->int_n_sign_posn[0];
+      lconv.int_p_sign_posn = m->int_p_sign_posn[0];
+#else /* !__HAVE_LOCALE_INFO_EXTENDED__ */
+      lconv.int_p_cs_precedes = m->p_cs_precedes[0];
+      lconv.int_p_sep_by_space = m->p_sep_by_space[0];
       lconv.int_n_cs_precedes = m->n_cs_precedes[0];
       lconv.int_n_sep_by_space = m->n_sep_by_space[0];
       lconv.int_n_sign_posn = m->n_sign_posn[0];
-      lconv.int_p_cs_precedes = m->p_cs_precedes[0];
-      lconv.int_p_sep_by_space = m->p_sep_by_space[0];
       lconv.int_p_sign_posn = m->p_sign_posn[0];
+#endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
       __mlocale_changed = 0;
     }
 #endif /* __HAVE_LOCALE_INFO__ */

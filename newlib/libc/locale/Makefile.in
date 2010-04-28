@@ -62,7 +62,8 @@ am__objects_1 = lib_a-locale.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@	lib_a-lnumeric.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-lmonetary.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-nl_langinfo.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-timelocal.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@	lib_a-timelocal.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-lctype.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -71,7 +72,7 @@ liblocale_la_LIBADD =
 am__objects_3 = locale.lo
 @ELIX_LEVEL_1_FALSE@am__objects_4 = fix_grouping.lo ldpart.lo \
 @ELIX_LEVEL_1_FALSE@	lmessages.lo lnumeric.lo lmonetary.lo \
-@ELIX_LEVEL_1_FALSE@	nl_langinfo.lo timelocal.lo
+@ELIX_LEVEL_1_FALSE@	nl_langinfo.lo timelocal.lo lctype.lo
 @USE_LIBTOOL_TRUE@am_liblocale_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 liblocale_la_OBJECTS = $(am_liblocale_la_OBJECTS)
@@ -168,6 +169,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -247,7 +249,8 @@ GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages
 @ELIX_LEVEL_1_FALSE@	lnumeric.c \
 @ELIX_LEVEL_1_FALSE@	lmonetary.c \
 @ELIX_LEVEL_1_FALSE@	nl_langinfo.c \
-@ELIX_LEVEL_1_FALSE@	timelocal.c
+@ELIX_LEVEL_1_FALSE@	timelocal.c \
+@ELIX_LEVEL_1_FALSE@	lctype.c
 
 @ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
@@ -378,6 +381,12 @@ lib_a-timelocal.o: timelocal.c
 
 lib_a-timelocal.obj: timelocal.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timelocal.obj `if test -f 'timelocal.c'; then $(CYGPATH_W) 'timelocal.c'; else $(CYGPATH_W) '$(srcdir)/timelocal.c'; fi`
+
+lib_a-lctype.o: lctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.o `test -f 'lctype.c' || echo '$(srcdir)/'`lctype.c
+
+lib_a-lctype.obj: lctype.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lctype.obj `if test -f 'lctype.c'; then $(CYGPATH_W) 'lctype.c'; else $(CYGPATH_W) '$(srcdir)/lctype.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

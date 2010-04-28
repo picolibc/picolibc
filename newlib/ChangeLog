@@ -1,3 +1,58 @@
+2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	Extend locale support to maintain wide char values of native strings
+	if __HAVE_LOCALE_INFO_EXTENDED__ is defined.
+	* libc/include/langinfo.h (enum __nl_item): New type.  Define all
+	native values accessible through nl_langinfo.  Define previously
+	existing POSIX-compatible values as macros as well.
+	* libc/include/stdlib.h (__mb_cur_max): Drop declaration.
+	(__locale_mb_cur_max): Declare.
+	(MB_CUR_MAX): Re-define calling __locale_mb_cur_max.
+	* libc/locale/Makefile.am (ELIX_SOURCES): Add lctype.c.
+	* libc/locale/Makefile.in: Regenerate.
+	* libc/locale/lctype.c: New file to define and load LC_CTYPE category.
+	* libc/locale/lctype.h: New file, matching header.
+	* libc/locale/lmessages.c (_C_messages_locale): Add default values for
+	wide char members.
+	(__messages_load_locale): Add _C_messages_locale in call to 
+	__set_lc_messages_from_win.
+	* libc/locale/lmessages.h (struct lc_messages_T): Add wide char members.
+	* libc/locale/lmonetary.c (_C_monetary_locale):  Add default values for
+	wide char members.
+	(__monetary_load_locale): Add _C_monetary_locale in call to
+	__set_lc_monetary_from_win.
+	* libc/locale/lmonetary.h (struct lc_monetary_T): Add wide char members.
+	Add numerical values for international currency formatting per
+	POSIX-1.2008, if __HAVE_LOCALE_INFO_EXTENDED__ is defined.
+	* libc/locale/lnumeric.c (_C_numeric_locale): Add default values for
+	wide char members.
+	(__numeric_load_locale): Add _C_numeric_locale in call to
+	__set_lc_numeric_from_win.
+	* libc/locale/lnumeric.h (struct lc_numeric_T): Add wide char members.
+	* libc/locale/locale.c (loadlocale): Return doing nothing if category
+	locale didn't change.  Convert category if chain to switch statement.
+	Call __ctype_load_locale in LC_CTYPE case.
+	(__locale_charset): Add (but disable for now) returning codeset from
+	__get_current_ctype_locale.
+	(__locale_mb_cur_max): Add (but disable for now) returning mb_cur_max
+	from __get_current_ctype_locale.
+	(__locale_msgcharset): Add returning codeset from
+	__get_current_messages_locale.
+	(_localeconv_r): Accommodate int_XXX values.
+	* libc/locale/nl_langinfo.c (nl_ext): New array to define what is to
+	be returned for non-POSIX values.
+	(nl_Langinfo): Return correct codeset for each locale category.  Return
+	extended values if __HAVE_LOCALE_INFO_EXTENDED__ is defined.
+	* libc/locale/timelocal.c (_C_time_locale): Add default values for
+	wide char members.
+	(__time_load_locale): Add _C_time_locale in call to
+	__set_lc_time_from_win.
+	* libc/locale/timelocal.h (struct lc_time_T): Add wide char members.
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Use wide char decimal point
+	and thousands_sep if __HAVE_LOCALE_INFO_EXTENDED__ is defined.
+	* libc/time/strftime.c: Rework to accommodate availability of wide char
+	strings in LC_TIME category if __HAVE_LOCALE_INFO_EXTENDED__ is defined.
+
 2010-04-22  DJ Delorie  <dj@redhat.com>
 
 	* libc/Makefile.am (SUBDEFS): Add LIBC_POSIX_DEF.

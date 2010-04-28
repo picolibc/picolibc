@@ -119,6 +119,34 @@ static const struct lc_time_T	_C_time_locale = {
 	 * Alternate digits used if %O format prefix is specified
 	 */
 	""
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	, "ASCII",	/* codeset */
+	{
+		L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
+		L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+	}, {
+		L"January", L"February", L"March", L"April", L"May", L"June",
+		L"July", L"August", L"September", L"October", L"November",
+		L"December"
+	}, {
+		L"Sun", L"Mon", L"Tue", L"Wed",
+		L"Thu", L"Fri", L"Sat"
+	}, {
+		L"Sunday", L"Monday", L"Tuesday", L"Wednesday",
+		L"Thursday", L"Friday", L"Saturday"
+	},
+	L"%H:%M:%S",
+	L"%m/%d/%y",
+	L"%a %b %e %H:%M:%S %Y",
+	{ L"AM", L"PM" },
+	L"%a %b %e %H:%M:%S %Z %Y",
+	L"%I:%M:%S %p",
+	L"",
+	L"",
+	L"",
+	L"",
+	L""
+#endif
 };
 
 struct lc_time_T *
@@ -134,12 +162,14 @@ __time_load_locale(const char *name, void *f_wctomb, const char *charset) {
 	int	ret;
 
 #ifdef __CYGWIN__
-	extern int __set_lc_time_from_win (const char *, struct lc_time_T *,
+	extern int __set_lc_time_from_win (const char *,
+					   const struct lc_time_T *,
+					   struct lc_time_T *,
 					   char **, void *, const char *);
 	int old_time_using_locale = _time_using_locale;
 	_time_using_locale = 0;
-	ret = __set_lc_time_from_win (name, &_time_locale, &time_locale_buf,
-				      f_wctomb, charset);
+	ret = __set_lc_time_from_win (name, &_C_time_locale, &_time_locale,
+				      &time_locale_buf, f_wctomb, charset);
 	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
 	if (ret < 0)
 	  _time_using_locale = old_time_using_locale;

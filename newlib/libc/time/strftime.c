@@ -260,6 +260,8 @@ BUGS
 the "C" locale settings.
 */
 
+#include <newlib.h>
+#include <sys/config.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
@@ -300,18 +302,23 @@ the "C" locale settings.
 #  define STRCHR(a,b)	wcschr((a),(b))
 #  define STRLEN(a)	wcslen(a)
 #  define SFLG		"l"		/* %s flag (l for wide char) */
-#  define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
-   const wchar_t *
-   __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
-   {
-     buf[CTLOCBUFLEN - 1] = L'\0';
-     *len_ret = mbstowcs (buf, elem, CTLOCBUFLEN - 1);
-     if (*len_ret == (size_t) -1 )
-       *len_ret = 0;
-     return buf;
-   }
-#  define _ctloc(x) (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x, \
-		     &ctloclen))
+#  ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#   define _ctloc(x) (ctloclen = wcslen (ctloc = _CurrentTimeLocale->w##x), \
+		      ctloc)
+#  else
+#   define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
+    const wchar_t *
+    __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
+    {
+      buf[CTLOCBUFLEN - 1] = L'\0';
+      *len_ret = mbstowcs (buf, elem, CTLOCBUFLEN - 1);
+      if (*len_ret == (size_t) -1 )
+	*len_ret = 0;
+      return buf;
+    }
+#   define _ctloc(x) (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x, \
+		      &ctloclen))
+#  endif
 #endif  /* MAKE_WCSFTIME */
 
 #define CHECK_LENGTH()	if (len < 0 || (count += len) >= maxsize) \
@@ -380,10 +387,25 @@ typedef struct {
 } era_info_t;
 
 static era_info_t *
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+get_era_info (const struct tm *tim_p, const wchar_t *era)
+#else
 get_era_info (const struct tm *tim_p, const char *era)
+#endif
 {
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+  wchar_t *c;
+  const wchar_t *dir;
+# define ERA_STRCHR(a,b)	wcschr((a),(b))
+# define ERA_STRNCPY(a,b,c)	wcsncpy((a),(b),(c))
+# define ERA_STRTOL(a,b,c)	wcstol((a),(b),(c))
+#else
   char *c;
   const char *dir;
+# define ERA_STRCHR(a,b)	strchr((a),(b))
+# define ERA_STRNCPY(a,b,c)	strncpy((a),(b),(c))
+# define ERA_STRTOL(a,b,c)	strtol((a),(b),(c))
+#endif
   long offset;
   struct tm stm, etm;
   era_info_t *ei;
@@ -397,14 +419,14 @@ get_era_info (const struct tm *tim_p, const char *era)
     {
       dir = era;
       era += 2;
-      offset = strtol (era, &c, 10);
+      offset = ERA_STRTOL (era, &c, 10);
       era = c + 1;
-      stm.tm_year = strtol (era, &c, 10) - YEAR_BASE;
+      stm.tm_year = ERA_STRTOL (era, &c, 10) - YEAR_BASE;
       /* Adjust offset for negative gregorian dates. */
       if (stm.tm_year <= -YEAR_BASE)
       	++stm.tm_year;
-      stm.tm_mon = strtol (c + 1, &c, 10);
-      stm.tm_mday = strtol (c + 1, &c, 10);
+      stm.tm_mon = ERA_STRTOL (c + 1, &c, 10);
+      stm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
       stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
       era = c + 1;
       if (era[0] == '-' && era[1] == '*')
@@ -425,12 +447,12 @@ get_era_info (const struct tm *tim_p, const char *era)
 	}
       else
       	{
-	  etm.tm_year = strtol (era, &c, 10) - YEAR_BASE;
+	  etm.tm_year = ERA_STRTOL (era, &c, 10) - YEAR_BASE;
 	  /* Adjust offset for negative gregorian dates. */
 	  if (etm.tm_year <= -YEAR_BASE)
 	    ++etm.tm_year;
-	  etm.tm_mon = strtol (c + 1, &c, 10);
-	  etm.tm_mday = strtol (c + 1, &c, 10);
+	  etm.tm_mon = ERA_STRTOL (c + 1, &c, 10);
+	  etm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
 	  etm.tm_mday = 31;
 	  etm.tm_hour = 23;
 	  etm.tm_min = etm.tm_sec = 59;
@@ -456,8 +478,8 @@ get_era_info (const struct tm *tim_p, const char *era)
 	  else
 	    ei->year = etm.tm_year - tim_p->tm_year + offset;
 	  /* era_C */
-	  c = strchr (era, ':');
-#ifdef MAKE_WCSFTIME
+	  c = ERA_STRCHR (era, ':');
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
 	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
 	  if (len == (size_t) -1)
 	    {
@@ -473,19 +495,19 @@ get_era_info (const struct tm *tim_p, const char *era)
 	      free (ei);
 	      return NULL;
 	    }
-#ifdef MAKE_WCSFTIME
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
 	  len = mbsnrtowcs (ei->era_C, &era, c - era, len + 1, NULL);
 #else
-	  strncpy (ei->era_C, era, len);
+	  ERA_STRNCPY (ei->era_C, era, len);
 	  era += len;
 #endif
 	  ei->era_C[len] = CQ('\0');
 	  /* era_Y */
 	  ++era;
-	  c = strchr (era, ';');
+	  c = ERA_STRCHR (era, ';');
 	  if (!c)
-	    c = strchr (era, '\0');
-#ifdef MAKE_WCSFTIME
+	    c = ERA_STRCHR (era, '\0');
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
 	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
 	  if (len == (size_t) -1)
 	    {
@@ -503,17 +525,17 @@ get_era_info (const struct tm *tim_p, const char *era)
 	      free (ei);
 	      return NULL;
 	    }
-#ifdef MAKE_WCSFTIME
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
 	  len = mbsnrtowcs (ei->era_Y, &era, c - era, len + 1, NULL);
 #else
-	  strncpy (ei->era_Y, era, len);
+	  ERA_STRNCPY (ei->era_Y, era, len);
 	  era += len;
 #endif
 	  ei->era_Y[len] = CQ('\0');
 	  return ei;
 	}
       else
-	era = strchr (era, ';');
+	era = ERA_STRCHR (era, ';');
       if (era)
 	++era;
     }
@@ -535,10 +557,24 @@ typedef struct {
 } alt_digits_t;
 
 static alt_digits_t *
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+get_alt_digits (const wchar_t *alt_digits)
+#else
 get_alt_digits (const char *alt_digits)
+#endif
 {
   alt_digits_t *adi;
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+  const wchar_t *a, *e;
+# define ALT_STRCHR(a,b)	wcschr((a),(b))
+# define ALT_STRCPY(a,b)	wcscpy((a),(b))
+# define ALT_STRLEN(a)		wcslen(a)
+#else
   const char *a, *e;
+# define ALT_STRCHR(a,b)	strchr((a),(b))
+# define ALT_STRCPY(a,b)	strcpy((a),(b))
+# define ALT_STRLEN(a)		strlen(a)
+#endif
   CHAR *aa, *ae;
   size_t len;
 
@@ -548,7 +584,7 @@ get_alt_digits (const char *alt_digits)
 
   /* Compute number of alt_digits. */
   adi->num = 1;
-  for (a = alt_digits; (e = strchr (a, ';')) != NULL; a = e + 1)
+  for (a = alt_digits; (e = ALT_STRCHR (a, ';')) != NULL; a = e + 1)
       ++adi->num;
   /* Allocate the `digit' array, which is an array of `num' pointers into
      `buffer'. */
@@ -559,7 +595,7 @@ get_alt_digits (const char *alt_digits)
       return NULL;
     }
   /* Compute memory required for `buffer'. */
-#ifdef MAKE_WCSFTIME
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   len = mbstowcs (NULL, alt_digits, 0);
   if (len == (size_t) -1)
     {
@@ -568,7 +604,7 @@ get_alt_digits (const char *alt_digits)
       return NULL;
     }
 #else
-  len = strlen (alt_digits);
+  len = ALT_STRLEN (alt_digits);
 #endif
   /* Allocate it. */
   adi->buffer = (CHAR *) malloc ((len + 1) * sizeof (CHAR));
@@ -579,10 +615,10 @@ get_alt_digits (const char *alt_digits)
       return NULL;
     }
   /* Store digits in it. */
-#ifdef MAKE_WCSFTIME
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   mbstowcs (adi->buffer, alt_digits, len + 1);
 #else
-  strcpy (adi->buffer, alt_digits);
+  ALT_STRCPY (adi->buffer, alt_digits);
 #endif
   /* Store the pointers into `buffer' into the appropriate `digit' slot. */
   for (len = 0, aa = adi->buffer; (ae = STRCHR (aa, CQ(';'))) != NULL;
@@ -658,7 +694,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
   size_t count = 0;
   int i, len;
   const CHAR *ctloc;
-#ifdef MAKE_WCSFTIME
+#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   CHAR ctlocbuf[CTLOCBUFLEN];
 #endif
   size_t ctloclen;
@@ -700,16 +736,26 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	{
 	  alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS      
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+	  if (!*era_info && *_CurrentTimeLocale->wera)
+	    *era_info = get_era_info (tim_p, _CurrentTimeLocale->wera);
+#else
 	  if (!*era_info && *_CurrentTimeLocale->era)
 	    *era_info = get_era_info (tim_p, _CurrentTimeLocale->era);
+#endif
 #endif /* _WANT_C99_TIME_FORMATS */
 	}
       else if (*format == CQ('O'))
 	{
 	  alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS      
+#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+	  if (!*alt_digits && *_CurrentTimeLocale->walt_digits)
+	    *alt_digits = get_alt_digits (_CurrentTimeLocale->walt_digits);
+#else
 	  if (!*alt_digits && *_CurrentTimeLocale->alt_digits)
 	    *alt_digits = get_alt_digits (_CurrentTimeLocale->alt_digits);
+#endif
 #endif /* _WANT_C99_TIME_FORMATS */
 	}
 

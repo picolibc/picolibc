@@ -1,7 +1,4 @@
-/*-
- * Copyright (c) 2000, 2001 Alexey Zelkin <phantom@FreeBSD.org>
- * All rights reserved.
- *
+/*
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -22,12 +19,10 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD: src/lib/libc/locale/lnumeric.h,v 1.3 2001/12/20 18:28:52 phantom Exp $
  */
 
-#ifndef _LNUMERIC_H_
-#define	_LNUMERIC_H_
+#ifndef _LCTYPE_H_
+#define	_LCTYPE_H_
 
 #include <_ansi.h>
 #include <sys/cdefs.h>
@@ -35,20 +30,18 @@
 
 __BEGIN_DECLS
 
-struct lc_numeric_T {
-	const char	*decimal_point;
-	const char	*thousands_sep;
-	const char	*grouping;
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+struct lc_ctype_T {
 	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const wchar_t	*wdecimal_point;
-	const wchar_t	*wthousands_sep;
+	const char	*mb_cur_max;
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	const char	*outdigits[10];
+	const wchar_t	*woutdigits[10];
 #endif
 };
 
-struct lc_numeric_T *__get_current_numeric_locale(void);
-int	__numeric_load_locale(const char *, void *, const char *);
+struct lc_ctype_T *__get_current_ctype_locale(void);
+int	__ctype_load_locale(const char *, void *, const char *, int);
 
 __END_DECLS
 
-#endif /* !_LNUMERIC_H_ */
+#endif /* !_LCTYPE_H_ */
