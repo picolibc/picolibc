@@ -511,19 +511,6 @@ print_lc_strings (int key, const char *name, int from, int to)
 }
 
 void
-print_lc_xxx_charset (int key, int lc_cat, const char *name)
-{
-  char lc_ctype_locale[32];
-  char lc_xxx_locale[32];
-
-  strcpy (lc_ctype_locale, setlocale (LC_CTYPE, NULL));
-  strcpy (lc_xxx_locale, setlocale (lc_cat, NULL));
-  setlocale (LC_CTYPE, lc_xxx_locale);
-  print_lc_svalue (key, name, nl_langinfo (CODESET));
-  setlocale (LC_CTYPE, lc_ctype_locale);
-}
-
-void
 print_lc_grouping (int key, const char *name, const char *grouping)
 {
   if (key)
@@ -536,14 +523,12 @@ print_lc_grouping (int key, const char *name, const char *grouping)
 enum type_t
 {
   is_string_fake,
-  is_string_lconv,
-  is_int_lconv,
-  is_grouping_lconv,
-  is_string_linf,
-  is_mstrings_linf,
-  is_sepstrings_linf,
-  is_mb_cur_max,
-  is_codeset,
+  is_grouping,
+  is_string,
+  is_mstrings,
+  is_sepstrings,
+  is_int,
+  is_wchar,
   is_end
 };
 
@@ -555,10 +540,6 @@ struct lc_names_t
   size_t      toval;
 };
 
-#define _O(M)		__builtin_offsetof (struct lconv, M)
-#define _MS(l,lc)	(*(const char **)(((const char *)(l))+(lc)->fromval))
-#define _MI(l,lc)	((int)*(((const char *)(l))+(lc)->fromval))
-
 const char *fake_string[] = {
  "upper;lower;alpha;digit;xdigit;space;print;graph;blank;cntrl;punct;alnum",
  "upper\";\"lower\";\"alpha\";\"digit\";\"xdigit\";\"space\";\"print\";\"graph\";\"blank\";\"cntrl\";\"punct\";\"alnum",
@@ -568,92 +549,114 @@ const char *fake_string[] = {
 
 lc_names_t lc_ctype_names[] =
 {
-  { "ctype-class-names",is_string_fake,	   0,			0 },
-  { "ctype-map-names",	is_string_fake,	   2,			0 },
-  { "charmap",		is_string_linf,	   CODESET,		0 },
-  { "ctype-mb-cur-max", is_mb_cur_max,	   0,			0 },
-  { NULL, 		is_end,		   0,			0 }
+  { "ctype-class-names", 	 is_string_fake, 0,			 0 },
+  { "ctype-map-names",   	 is_string_fake, 2,			 0 },
+  { "ctype-outdigit0_mb",	 is_string,	_NL_CTYPE_OUTDIGITS0_MB, 0 },
+  { "ctype-outdigit1_mb",	 is_string,	_NL_CTYPE_OUTDIGITS1_MB, 0 },
+  { "ctype-outdigit2_mb",	 is_string,	_NL_CTYPE_OUTDIGITS2_MB, 0 },
+  { "ctype-outdigit3_mb",	 is_string,	_NL_CTYPE_OUTDIGITS3_MB, 0 },
+  { "ctype-outdigit4_mb",	 is_string,	_NL_CTYPE_OUTDIGITS4_MB, 0 },
+  { "ctype-outdigit5_mb",	 is_string,	_NL_CTYPE_OUTDIGITS5_MB, 0 },
+  { "ctype-outdigit6_mb",	 is_string,	_NL_CTYPE_OUTDIGITS6_MB, 0 },
+  { "ctype-outdigit7_mb",	 is_string,	_NL_CTYPE_OUTDIGITS7_MB, 0 },
+  { "ctype-outdigit8_mb",	 is_string,	_NL_CTYPE_OUTDIGITS8_MB, 0 },
+  { "ctype-outdigit9_mb",	 is_string,	_NL_CTYPE_OUTDIGITS9_MB, 0 },
+  { "ctype-outdigit0_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS0_WC, 0 },
+  { "ctype-outdigit1_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS1_WC, 0 },
+  { "ctype-outdigit2_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS2_WC, 0 },
+  { "ctype-outdigit3_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS3_WC, 0 },
+  { "ctype-outdigit4_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS4_WC, 0 },
+  { "ctype-outdigit5_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS5_WC, 0 },
+  { "ctype-outdigit6_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS6_WC, 0 },
+  { "ctype-outdigit7_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS7_WC, 0 },
+  { "ctype-outdigit8_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS8_WC, 0 },
+  { "ctype-outdigit9_wc",	 is_wchar, 	_NL_CTYPE_OUTDIGITS9_WC, 0 },
+  { "charmap",			 is_string,	CODESET,		 0 },
+  { "ctype-mb-cur-max",		 is_int,	_NL_CTYPE_MB_CUR_MAX,	 0 },
+  { NULL, 			 is_end,	0,		 	 0 }
 };
 
 lc_names_t lc_numeric_names[] =
 {
-  { "decimal_point",	is_string_lconv,   _O(decimal_point),	0 },
-  { "thousands_sep",	is_string_lconv,   _O(thousands_sep), 	0 },
-  { "grouping",		is_grouping_lconv, _O(grouping),	0 },
-  { "numeric-codeset",	is_codeset,	   LC_NUMERIC,		0 },
-  { NULL, 		is_end,		   0,			0 }
+  { "decimal_point",		 is_string,	RADIXCHAR,		 0 },
+  { "thousands_sep",		 is_string,	THOUSEP, 		 0 },
+  { "grouping",			 is_grouping,	_NL_NUMERIC_GROUPING,	 0 },
+  { "numeric-decimal-point-wc",	 is_wchar,	_NL_NUMERIC_DECIMAL_POINT_WC, 0 },
+  { "numeric-thousands-sep-wc",	 is_wchar,	_NL_NUMERIC_THOUSANDS_SEP_WC, 0 },
+  { "numeric-codeset",		 is_string,	_NL_NUMERIC_CODESET,	 0 },
+  { NULL, 			 is_end,	0,			 0 }
 };
 
 lc_names_t lc_time_names[] =
 {
-  { "abday",		is_mstrings_linf,  ABDAY_1,		ABDAY_7  },
-  { "day",		is_mstrings_linf,  DAY_1,		DAY_7    },
-  { "abmon",		is_mstrings_linf,  ABMON_1,		ABMON_12 },
-  { "mon",		is_mstrings_linf,  MON_1,		MON_12   },
-  { "am_pm",		is_mstrings_linf,  AM_STR,		PM_STR   },
-  { "d_t_fmt",		is_string_linf,    D_T_FMT,		0        },
-  { "d_fmt",		is_string_linf,    D_FMT,		0        },
-  { "t_fmt",		is_string_linf,    T_FMT,		0        },
-  { "t_fmt_ampm",	is_string_linf,    T_FMT_AMPM,		0	 },
-  { "era",		is_sepstrings_linf,ERA,			0	 },
-  { "era_d_fmt",	is_string_linf,    ERA_D_FMT,		0	 },
-  { "alt_digits",	is_sepstrings_linf,ALT_DIGITS,		0	 },
-  { "era_d_t_fmt",	is_string_linf,    ERA_D_T_FMT,		0	 },
-  { "era_t_fmt",	is_string_linf,    ERA_T_FMT,		0	 },
-  { "date_fmt",		is_string_linf,    _DATE_FMT,		0	 },
-  { "time-codeset",	is_codeset,	   LC_TIME,		0	 },
-  { NULL, 		is_end,		   0,			0	 }
+  { "abday",			 is_mstrings,	ABDAY_1,	 ABDAY_7  },
+  { "day",			 is_mstrings,	DAY_1,		 DAY_7    },
+  { "abmon",			 is_mstrings,	ABMON_1,	 ABMON_12 },
+  { "mon",			 is_mstrings,	MON_1,		 MON_12   },
+  { "am_pm",			 is_mstrings,	AM_STR,		 PM_STR   },
+  { "d_t_fmt",			 is_string,	D_T_FMT,		0 },
+  { "d_fmt",			 is_string,	D_FMT,			0 },
+  { "t_fmt",			 is_string,	T_FMT,			0 },
+  { "t_fmt_ampm",		 is_string,	T_FMT_AMPM,		0 },
+  { "era",			 is_sepstrings,	ERA,			0 },
+  { "era_d_fmt",		 is_string,	ERA_D_FMT,		0 },
+  { "alt_digits",		 is_sepstrings,ALT_DIGITS,		0 },
+  { "era_d_t_fmt",		 is_string,	ERA_D_T_FMT,		0 },
+  { "era_t_fmt",		 is_string,	ERA_T_FMT,		0 },
+  { "date_fmt",			 is_string,	_DATE_FMT,		0 },
+  { "time-codeset",		 is_string,	_NL_TIME_CODESET,	0 },
+  { NULL, 			 is_end,	0,			0 }
 };
 
 lc_names_t lc_collate_names[] =
 {
-  { "collate-codeset",	is_codeset,	   LC_COLLATE,		0	 },
-  { NULL, 		is_end,		   0,			0	 }
+  { "collate-codeset",		 is_string,	_NL_COLLATE_CODESET,	0 },
+  { NULL, 			 is_end,	0,			0 }
 };
 
 lc_names_t lc_monetary_names[] =
 {
-  { "int_curr_symbol",	is_string_lconv,   _O(int_curr_symbol),		0 },
-  { "currency_symbol",	is_string_lconv,   _O(currency_symbol),		0 },
-  { "mon_decimal_point",is_string_lconv,   _O(mon_decimal_point), 	0 },
-  { "mon_thousands_sep",is_string_lconv,   _O(mon_thousands_sep),	0 },
-  { "mon_grouping",	is_grouping_lconv, _O(mon_grouping),		0 },
-  { "positive_sign",	is_string_lconv,   _O(positive_sign),		0 },
-  { "negative_sign",	is_string_lconv,   _O(negative_sign),		0 },
-  { "int_frac_digits",	is_int_lconv,      _O(int_frac_digits),		0 },
-  { "frac_digits",	is_int_lconv,	   _O(frac_digits),		0 },
-  { "p_cs_precedes",	is_int_lconv,	   _O(p_cs_precedes),		0 },
-  { "p_sep_by_space",	is_int_lconv,	   _O(p_sep_by_space),		0 },
-  { "n_cs_precedes",	is_int_lconv,	   _O(n_cs_precedes),		0 },
-  { "n_sep_by_space",	is_int_lconv,	   _O(n_sep_by_space),		0 },
-  { "p_sign_posn",	is_int_lconv,	   _O(p_sign_posn),		0 },
-  { "n_sign_posn",	is_int_lconv,	   _O(n_sign_posn),		0 },
-  { "int_p_cs_precedes",is_int_lconv,	   _O(int_p_cs_precedes),	0 },
-  { "int_p_sep_by_space",is_int_lconv,	   _O(int_p_sep_by_space),	0 },
-  { "int_n_cs_precedes",is_int_lconv,	   _O(int_n_cs_precedes),	0 },
-  { "int_n_sep_by_space",is_int_lconv,	   _O(int_n_sep_by_space),	0 },
-  { "int_p_sign_posn",	is_int_lconv,	   _O(int_p_sign_posn),		0 },
-  { "int_n_sign_posn",	is_int_lconv,	   _O(int_n_sign_posn),		0 },
-  { "monetary-codeset",	is_codeset,	   LC_MONETARY,			0 },
-  { NULL, 		is_end,		   0,				0 }
+  { "int_curr_symbol",		 is_string,	_NL_MONETARY_INT_CURR_SYMBOL, 0 },
+  { "currency_symbol",		 is_string,	_NL_MONETARY_CURRENCY_SYMBOL, 0 },
+  { "mon_decimal_point",	 is_string,	_NL_MONETARY_MON_DECIMAL_POINT, 0 },
+  { "mon_thousands_sep",	 is_string,	_NL_MONETARY_MON_THOUSANDS_SEP, 0 },
+  { "mon_grouping",		 is_grouping,	_NL_MONETARY_MON_GROUPING, 0 },
+  { "positive_sign",		 is_string,	_NL_MONETARY_POSITIVE_SIGN, 0 },
+  { "negative_sign",		 is_string,	_NL_MONETARY_NEGATIVE_SIGN, 0 },
+  { "int_frac_digits",		 is_int,	_NL_MONETARY_INT_FRAC_DIGITS, 0 },
+  { "frac_digits",		 is_int,	_NL_MONETARY_FRAC_DIGITS,   0 },
+  { "p_cs_precedes",		 is_int,	_NL_MONETARY_P_CS_PRECEDES, 0 },
+  { "p_sep_by_space",		 is_int,	_NL_MONETARY_P_SEP_BY_SPACE, 0 },
+  { "n_cs_precedes",		 is_int,	_NL_MONETARY_N_CS_PRECEDES, 0 },
+  { "n_sep_by_space",		 is_int,	_NL_MONETARY_N_SEP_BY_SPACE, 0 },
+  { "p_sign_posn",		 is_int,	_NL_MONETARY_P_SIGN_POSN,   0 },
+  { "n_sign_posn",		 is_int,	_NL_MONETARY_N_SIGN_POSN,   0 },
+  { "int_p_cs_precedes",	 is_int,	_NL_MONETARY_INT_P_CS_PRECEDES, 0 },
+  { "int_p_sep_by_space",	 is_int,	_NL_MONETARY_INT_P_SEP_BY_SPACE,0 },
+  { "int_n_cs_precedes",	 is_int,	_NL_MONETARY_INT_N_CS_PRECEDES, 0 },
+  { "int_n_sep_by_space",	 is_int,	_NL_MONETARY_INT_N_SEP_BY_SPACE,0 },
+  { "int_p_sign_posn",		 is_int,	_NL_MONETARY_INT_P_SIGN_POSN, 0 },
+  { "int_n_sign_posn",		 is_int,	_NL_MONETARY_INT_N_SIGN_POSN, 0 },
+  { "monetary-decimal-point-wc", is_wchar,	_NL_MONETARY_WMON_DECIMAL_POINT, 0 },
+  { "monetary-thousands-sep-wc", is_wchar,	_NL_MONETARY_WMON_THOUSANDS_SEP, 0 },
+  { "monetary-codeset",		 is_string,	_NL_MONETARY_CODESET,	   0 },
+  { NULL, 			 is_end,	0,			   0 }
 };
 
 lc_names_t lc_messages_names[] =
 {
-  { "yesexpr",		is_string_linf,	   YESEXPR,			0 },
-  { "noexpr",		is_string_linf,	   NOEXPR,			0 },
-  { "yesstr",		is_string_linf,	   YESSTR,			0 },
-  { "nostr",		is_string_linf,	   NOSTR,			0 },
-  { "messages-codeset",	is_codeset,	   LC_MESSAGES,			0 },
-  { NULL, 		is_end,		   0,				0 }
+  { "yesexpr",			 is_string,	YESEXPR,		0 },
+  { "noexpr",			 is_string,	NOEXPR,			0 },
+  { "yesstr",			 is_string,	YESSTR,			0 },
+  { "nostr",			 is_string,	NOSTR,			0 },
+  { "messages-codeset",		 is_string,	_NL_MESSAGES_CODESET,	0 },
+  { NULL, 			 is_end,	0,			0 }
 };
 
 void
 print_lc (int cat, int key, const char *category, const char *name,
 	  lc_names_t *lc_name)
 {
-  struct lconv *l = localeconv ();
-
   if (cat)
     printf ("%s\n", category);
   for (lc_names_t *lc = lc_name; lc->type != is_end; ++lc)
@@ -663,29 +666,24 @@ print_lc (int cat, int key, const char *category, const char *name,
 	case is_string_fake:
 	  print_lc_svalue (key, lc->name, fake_string[lc->fromval + key]);
 	  break;
-	case is_string_lconv:
-	  print_lc_svalue (key, lc->name, _MS (l, lc));
+	case is_grouping:
+	  print_lc_grouping (key, lc->name, nl_langinfo (lc->fromval));
 	  break;
-	case is_int_lconv:
-	  print_lc_ivalue (key, lc->name, _MI (l, lc));
-	  break;
-	case is_grouping_lconv:
-	  print_lc_grouping (key, lc->name, _MS (l, lc));
-	  break;
-	case is_string_linf:
+	case is_string:
 	  print_lc_svalue (key, lc->name, nl_langinfo (lc->fromval));
 	  break;
-	case is_sepstrings_linf:
+	case is_sepstrings:
 	  print_lc_sepstrings (key, lc->name, nl_langinfo (lc->fromval));
 	  break;
-	case is_mstrings_linf:
+	case is_mstrings:
 	  print_lc_strings (key, lc->name, lc->fromval, lc->toval);
 	  break;
-	case is_mb_cur_max:
-	  print_lc_ivalue (key, lc->name, MB_CUR_MAX);
+	case is_int:
+	  print_lc_ivalue (key, lc->name, (int) *nl_langinfo (lc->fromval));
 	  break;
-	case is_codeset:
-	  print_lc_xxx_charset (key, lc->fromval, lc->name);
+	case is_wchar:
+	  print_lc_ivalue (key, lc->name,
+			   *(wchar_t *) nl_langinfo (lc->fromval));
 	  break;
 	default:
 	  break;

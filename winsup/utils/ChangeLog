@@ -1,3 +1,17 @@
+2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (print_lc_xxx_charset): Remove.
+	(enum type_t): Change according to the fact that nl_langinfo now returns
+	all locale category values.
+	(lc_ctype_names): Add new category members.  Redefine for exclusive
+	nl_langinfo usage.
+	(lc_numeric_names): Ditto.
+	(lc_time_names): Ditto.
+	(lc_collate_names): Ditto.
+	(lc_monetary_names): Ditto.
+	(lc_messages_names): Ditto.
+	(print_lc): Change switch according to new type_t values.
+
 2010-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* locale.cc (print_charmaps): Add EUC-CN and GB2312.
