@@ -1,5 +1,9 @@
 2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h: Bump API minor version.
+
+2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (__locale_mb_cur_max): Export.
 	* nlsfuncs.cc (__getlocaleinfo): Drop conversion to multibyte.
 	(__charfromwchar): New function to convert to multibyte.

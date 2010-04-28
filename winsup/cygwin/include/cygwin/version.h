@@ -379,12 +379,13 @@ details. */
       223: SIGPWR added.
       224: Export xdr* functions.
       225: Export __xdr* functions.
+      226: Export __locale_mb_cur_max.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 225
+#define CYGWIN_VERSION_API_MINOR 226
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
