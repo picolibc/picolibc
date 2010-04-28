@@ -21,6 +21,7 @@ details. */
 #include "tls_pbuf.h"
 /* Internal headers from newlib */
 #include "../locale/timelocal.h"
+#include "../locale/lctype.h"
 #include "../locale/lnumeric.h"
 #include "../locale/lmonetary.h"
 #include "../locale/lmessages.h"
@@ -30,10 +31,13 @@ details. */
 #define _LC(x)	&lc_##x##_ptr,lc_##x##_end-lc_##x##_ptr
 
 #define getlocaleinfo(category,type) \
-	    __getlocaleinfo(lcid,(type),_LC(category),f_wctomb,charset)
+	    __getlocaleinfo(lcid,(type),_LC(category))
 #define eval_datetimefmt(type,flags) \
 	    __eval_datetimefmt(lcid,(type),(flags),&lc_time_ptr,\
-			       lc_time_end-lc_time_ptr,f_wctomb, charset)
+			       lc_time_end-lc_time_ptr)
+#define charfromwchar(category,in) \
+	    __charfromwchar (_##category##_locale->in,_LC(category),\
+			     f_wctomb,charset)
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
 
@@ -340,16 +344,28 @@ rebase_locale_buf (const void *ptrv, const char *newbase, const char *oldbase,
     *ptrs++ += newbase - oldbase;
 }
 
+static wchar_t *
+__getlocaleinfo (LCID lcid, LCTYPE type, char **ptr, size_t size)
+{
+  size_t num;
+  wchar_t *ret;
+
+  if ((uintptr_t) *ptr % 1)
+    ++*ptr;
+  ret = (wchar_t *) *ptr;
+  num = GetLocaleInfoW (lcid, type, ret, size / sizeof (wchar_t));
+  *ptr = (char *) (ret + num);
+  return ret;
+}
+
 static char *
-__getlocaleinfo (LCID lcid, LCTYPE type, char **ptr, size_t size,
+__charfromwchar (const wchar_t *in, char **ptr, size_t size,
 		 wctomb_p f_wctomb, const char *charset)
 {
-  wchar_t wbuf[80];
   size_t num;
   char *ret;
 
-  GetLocaleInfoW (lcid, type, wbuf, 80);
-  num = lc_wcstombs (f_wctomb, charset, ret = *ptr, wbuf, size);
+  num = lc_wcstombs (f_wctomb, charset, ret = *ptr, in, size);
   *ptr += num + 1;
   return ret;
 }
@@ -368,41 +384,34 @@ enum dt_flags {
   DT_ABBREV	= 0x02,	/* Enforce abbreviated month and day names. */
 };
 
-static char *
+static wchar_t *
 __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
-		    size_t size, wctomb_p f_wctomb, const char *charset)
+		    size_t size)
 {
   wchar_t buf[80];
   wchar_t fc;
-  size_t num;
-  mbstate_t mb;
   size_t idx;
-  const char *day_str = "edaA";
-  const char *mon_str = "mmbB";
-  const char *year_str = "yyyY";
-  const char *hour12_str = "lI";
-  const char *hour24_str = "kH";
-  const char *t_str;
-  char *ret = *ptr;
-  char *p = *ptr;
+  const wchar_t *day_str = L"edaA";
+  const wchar_t *mon_str = L"mmbB";
+  const wchar_t *year_str = L"yyyY";
+  const wchar_t *hour12_str = L"lI";
+  const wchar_t *hour24_str = L"kH";
+  const wchar_t *t_str;
 
+  if ((uintptr_t) *ptr % 1)
+    ++*ptr;
+  wchar_t *ret = (wchar_t *) *ptr;
+  wchar_t *p = (wchar_t *) *ptr;
   GetLocaleInfoW (lcid, type, buf, 80);
-  memset (&mb, 0, sizeof mb);
   for (wchar_t *fmt = buf; *fmt; ++fmt)
     switch (fc = *fmt)
       {
       case L'\'':
 	if (fmt[1] == L'\'')
-	  *p++ = '\'';
+	  *p++ = L'\'';
 	else
 	  while (fmt[1] && *++fmt != L'\'')
-	    {
-	      num = f_wctomb (_REENT, p, *fmt, charset, &mb);
-	      if (num == (size_t) -1)
-		memset (&mb, 0, sizeof mb);
-	      else
-		p += num;
-	    }
+	    *p++ = *fmt;
 	break;
       case L'd':
       case L'M':
@@ -413,7 +422,7 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
 	  idx = 3;
 	if ((flags & DT_ABBREV) && fc != L'y' && idx == 3)
 	  idx = 2;
-	*p++ = '%';
+	*p++ = L'%';
 	*p++ = t_str[idx];
 	break;
       case L'g':
@@ -428,7 +437,7 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
 	    ++fmt;
 	    idx = 1;
 	  }
-	*p++ = '%';
+	*p++ = L'%';
 	*p++ = t_str[idx];
 	break;
       case L'm':
@@ -436,25 +445,21 @@ __eval_datetimefmt (LCID lcid, LCTYPE type, dt_flags flags, char **ptr,
       case L't':
 	if (fmt[1] == fc)
 	  ++fmt;
-	*p++ = '%';
-	*p++ = (fc == L'm' ? 'M' : fc == L's' ? 'S' : 'p');
+	*p++ = L'%';
+	*p++ = (fc == L'm' ? L'M' : fc == L's' ? L'S' : L'p');
 	break;
       case L'\t':
       case L'\n':
       case L'%':
-	*p++ = '%';
-	*p++ = (char) fc;
+	*p++ = L'%';
+	*p++ = fc;
 	break;
       default:
-	num = f_wctomb (_REENT, p, *fmt, charset, &mb);
-	if (num == (size_t) -1)
-	  memset (&mb, 0, sizeof mb);
-	else
-	  p += num;
+	*p++ = *fmt;
 	break;
       }
-  *p++ = '\0';
-  *ptr = p;
+  *p++ = L'\0';
+  *ptr = (char *) p;
   return ret;
 }
 
@@ -493,198 +498,237 @@ conv_grouping (LCID lcid, LCTYPE type, char **lc_ptr)
    in the structure pointed to by _time_locale.  This is subsequently
    accessed by functions like nl_langinfo, strftime, strptime. */
 extern "C" int
-__set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
+__set_lc_time_from_win (const char *name,
+			const struct lc_time_T *_C_time_locale,
+			struct lc_time_T *_time_locale,
 			char **lc_time_buf, wctomb_p f_wctomb,
 			const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
-  if (!lcid || lcid == (LCID) -1)
+  if (lcid == (LCID) -1)
     return lcid;
+  if (!lcid && !strcmp (charset, "ASCII"))
+    return 0;
 
-  char *new_lc_time_buf = (char *) malloc (4096);
-  const char *lc_time_end = new_lc_time_buf + 4096;
+# define MAX_TIME_BUFFER_SIZE	4096
+
+  char *new_lc_time_buf = (char *) malloc (MAX_TIME_BUFFER_SIZE);
+  const char *lc_time_end = new_lc_time_buf + MAX_TIME_BUFFER_SIZE;
 
   if (!new_lc_time_buf)
     return -1;
   char *lc_time_ptr = new_lc_time_buf;
 
-  char locale[ENCODING_LEN + 1];
-  strcpy (locale, name);
-  /* Removes the charset from the locale and attach the modifer to the
-     language_TERRITORY part. */
-  char *c = strchr (locale, '.');
-  if (c)
+  /* C.foo is just a copy of "C" with fixed charset. */
+  if (!lcid)
+    memcpy (_time_locale, _C_time_locale, sizeof (struct lc_time_T));
+  /* codeset */
+  _time_locale->codeset = lc_time_ptr;
+  lc_time_ptr = stpcpy (lc_time_ptr, charset) + 1;
+  
+  if (lcid)
     {
-      *c = '\0';
-      char *c2 = strchr (c + 1, '@');
-      /* Ignore @cjknarrow modifier since it's a very personal thing between
-	 Cygwin and newlib... */
-      if (c2 && strcmp (c2, "@cjknarrow"))
-      	memmove (c, c2, strlen (c2) + 1);
-    }
-  /* Now search in the alphabetically order lc_era array for the
-     locale. */
-  lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL ,
-				  NULL, NULL, NULL, NULL, NULL };
-  lc_era_t *era = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
-					sizeof lc_era / sizeof *lc_era,
-					sizeof *lc_era, locale_cmp);
-
-  /* mon */
-  for (int i = 0; i < 12; ++i)
-    _time_locale->mon[i] = getlocaleinfo (time, LOCALE_SABBREVMONTHNAME1 + i);
-  /* month and alt_month */
-  for (int i = 0; i < 12; ++i)
-    _time_locale->month[i] = _time_locale->alt_month[i]
-			   = getlocaleinfo (time, LOCALE_SMONTHNAME1 + i);
-  /* wday */
-  _time_locale->wday[0] = getlocaleinfo (time, LOCALE_SABBREVDAYNAME7);
-  for (int i = 0; i < 6; ++i)
-    _time_locale->wday[i + 1] = getlocaleinfo (time,
-					       LOCALE_SABBREVDAYNAME1 + i);
-  /* weekday */
-  _time_locale->weekday[0] = getlocaleinfo (time, LOCALE_SDAYNAME7);
-  for (int i = 0; i < 6; ++i)
-    _time_locale->weekday[i + 1] = getlocaleinfo (time, LOCALE_SDAYNAME1 + i);
-
-  size_t len;
-  /* X_fmt */
-  if (era && *era->t_fmt)
-    {
-      _time_locale->X_fmt = (const char *) lc_time_ptr;
-      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->t_fmt,
-			 lc_time_end - lc_time_ptr) + 1;
-      lc_time_ptr += len;
-    }
-  else
-    _time_locale->X_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
-  /* x_fmt */
-  if (era && *era->d_fmt)
-    {
-      _time_locale->x_fmt = (const char *) lc_time_ptr;
-      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->d_fmt,
-			 lc_time_end - lc_time_ptr) + 1;
-      lc_time_ptr += len;
-    }
-  else
-    _time_locale->x_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, DT_DEFAULT);
-  /* c_fmt */
-  if (era && *era->d_t_fmt)
-    {
-      _time_locale->c_fmt = (const char *) lc_time_ptr;
-      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->d_t_fmt,
-			 lc_time_end - lc_time_ptr) + 1;
-      lc_time_ptr += len;
-    }
-  else
-    {
-      _time_locale->c_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
-      --lc_time_ptr;
-      *lc_time_ptr++ = ' ';
-      eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
-    }
-  /* AM/PM */
-  _time_locale->am_pm[0] = getlocaleinfo (time, LOCALE_S1159);
-  _time_locale->am_pm[1] = getlocaleinfo (time, LOCALE_S2359);
-  /* date_fmt */
-  if (era && *era->date_fmt)
-    {
-      _time_locale->date_fmt = (const char *) lc_time_ptr;
-      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->date_fmt,
-			 lc_time_end - lc_time_ptr) + 1;
-      lc_time_ptr += len;
-    }
-  else
-    {
-      _time_locale->date_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
-      --lc_time_ptr;
-      *lc_time_ptr++ = ' ';
-      eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
-      --lc_time_ptr;
-      lc_time_ptr = stpcpy (lc_time_ptr, " %Z") + 1;
-    }
-  /* md */
-  {
-    wchar_t buf[80];
-    GetLocaleInfoW (lcid, LOCALE_IDATE, buf, 80);
-    _time_locale->md_order = (const char *) lc_time_ptr;
-    lc_time_ptr = stpcpy (lc_time_ptr, *buf == L'1' ? "dm" : "md") + 1;
-  }
-  /* ampm_fmt */
-  if (era)
-    {
-      _time_locale->ampm_fmt = (const char *) lc_time_ptr;
-      len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->t_fmt_ampm,
-			 lc_time_end - lc_time_ptr) + 1;
-      lc_time_ptr += len;
-    }
-  else
-    _time_locale->ampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
-
-  if (era)
-    {
-      /* Evaluate string length in target charset.  Characters invalid in the
-	 target charset are simply ignored, as on Linux. */
-      len = 0;
-      len += lc_wcstombs (f_wctomb, charset, NULL, era->era, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_t_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, era->era_t_fmt, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, era->alt_digits, 0) + 1;
-
-      /* Make sure data fits into the buffer */
-      if (lc_time_ptr + len > lc_time_end)
+      char locale[ENCODING_LEN + 1];
+      strcpy (locale, name);
+      /* Removes the charset from the locale and attach the modifer to the
+	 language_TERRITORY part. */
+      char *c = strchr (locale, '.');
+      if (c)
 	{
-	  len = lc_time_ptr + len - new_lc_time_buf;
-	  char *tmp = (char *) realloc (new_lc_time_buf, len);
-	  if (!tmp)
-	    era = NULL;
-	  else
-	    {
-	      if (tmp != new_lc_time_buf)
-		rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
-				   _time_locale + 1);
-	      lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
-	      new_lc_time_buf = tmp;
-	      lc_time_end = new_lc_time_buf + len;
-	    }
+	  *c = '\0';
+	  char *c2 = strchr (c + 1, '@');
+	  /* Ignore @cjknarrow modifier since it's a very personal thing between
+	     Cygwin and newlib... */
+	  if (c2 && strcmp (c2, "@cjknarrow"))
+	    memmove (c, c2, strlen (c2) + 1);
 	}
-      /* Copy over */
+      /* Now search in the alphabetically order lc_era array for the
+	 locale. */
+      lc_era_t locale_key = { locale, NULL, NULL, NULL, NULL, NULL ,
+				      NULL, NULL, NULL, NULL, NULL };
+      lc_era_t *era = (lc_era_t *) bsearch ((void *) &locale_key, (void *) lc_era,
+					    sizeof lc_era / sizeof *lc_era,
+					    sizeof *lc_era, locale_cmp);
+
+      /* mon */
+      for (int i = 0; i < 12; ++i)
+	{
+	  _time_locale->wmon[i] = getlocaleinfo (time,
+						 LOCALE_SABBREVMONTHNAME1 + i);
+	  _time_locale->mon[i] = charfromwchar (time, wmon[i]);
+	}
+      /* month and alt_month */
+      for (int i = 0; i < 12; ++i)
+	{
+	  _time_locale->wmonth[i] = getlocaleinfo (time, LOCALE_SMONTHNAME1 + i);
+	  _time_locale->month[i] = _time_locale->alt_month[i]
+				 = charfromwchar (time, wmonth[i]);
+	}
+      /* wday */
+      _time_locale->wwday[0] = getlocaleinfo (time, LOCALE_SABBREVDAYNAME7);
+      _time_locale->wday[0] = charfromwchar (time, wwday[0]);
+      for (int i = 0; i < 6; ++i)
+	{
+	  _time_locale->wwday[i + 1] = getlocaleinfo (time,
+						      LOCALE_SABBREVDAYNAME1 + i);
+	  _time_locale->wday[i + 1] = charfromwchar (time, wwday[i + 1]);
+	}
+      /* weekday */
+      _time_locale->wweekday[0] = getlocaleinfo (time, LOCALE_SDAYNAME7);
+      _time_locale->weekday[0] = charfromwchar (time, wweekday[0]);
+      for (int i = 0; i < 6; ++i)
+	{
+	  _time_locale->wweekday[i + 1] = getlocaleinfo (time,
+							 LOCALE_SDAYNAME1 + i);
+	  _time_locale->weekday[i + 1] = charfromwchar (time, wweekday[i + 1]);
+	}
+      size_t len;
+      /* X_fmt */
+      if (era && *era->t_fmt)
+	{
+	  _time_locale->wX_fmt = (const wchar_t *) lc_time_ptr;
+	  lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wX_fmt,
+					  era->t_fmt) + 1);
+	}
+      else
+	_time_locale->wX_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+      _time_locale->X_fmt = charfromwchar (time, wX_fmt);
+      /* x_fmt */
+      if (era && *era->d_fmt)
+	{
+	  _time_locale->wx_fmt = (const wchar_t *) lc_time_ptr;
+	  lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wx_fmt,
+					  era->d_fmt) + 1);
+	}
+      else
+	_time_locale->wx_fmt = eval_datetimefmt (LOCALE_SSHORTDATE, DT_DEFAULT);
+      _time_locale->x_fmt = charfromwchar (time, wx_fmt);
+      /* c_fmt */
+      if (era && *era->d_t_fmt)
+	{
+	  _time_locale->wc_fmt = (const wchar_t *) lc_time_ptr;
+	  lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wc_fmt,
+					  era->d_t_fmt) + 1);
+	}
+      else
+	{
+	  _time_locale->wc_fmt = eval_datetimefmt (LOCALE_SLONGDATE, DT_ABBREV);
+	  ((wchar_t *) lc_time_ptr)[-1] = L' ';
+	  eval_datetimefmt (LOCALE_STIMEFORMAT, DT_DEFAULT);
+	}
+      _time_locale->c_fmt = charfromwchar (time, wc_fmt);
+      /* AM/PM */
+      _time_locale->wam_pm[0] = getlocaleinfo (time, LOCALE_S1159);
+      _time_locale->wam_pm[1] = getlocaleinfo (time, LOCALE_S2359);
+      _time_locale->am_pm[0] = charfromwchar (time, wam_pm[0]);
+      _time_locale->am_pm[1] = charfromwchar (time, wam_pm[1]);
+      /* date_fmt */
+      if (era && *era->date_fmt)
+	{
+	  _time_locale->wdate_fmt = (const wchar_t *) lc_time_ptr;
+	  lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wdate_fmt,
+					  era->date_fmt) + 1);
+	}
+      else
+	_time_locale->wdate_fmt = _time_locale->wc_fmt;
+      _time_locale->date_fmt = charfromwchar (time, wdate_fmt);
+      /* md */
+      {
+	wchar_t buf[80];
+	GetLocaleInfoW (lcid, LOCALE_IDATE, buf, 80);
+	_time_locale->md_order = (const char *) lc_time_ptr;
+	lc_time_ptr = stpcpy (lc_time_ptr, *buf == L'1' ? "dm" : "md") + 1;
+      }
+      /* ampm_fmt */
       if (era)
 	{
-	  /* era */
-	  _time_locale->era = (const char *) lc_time_ptr;
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era,
-			     lc_time_end - lc_time_ptr) + 1;
-	  /* era_d_fmt */
-	  _time_locale->era_d_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_d_fmt,
-			     lc_time_end - lc_time_ptr) + 1;
-	  /* era_d_t_fmt */
-	  _time_locale->era_d_t_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_d_t_fmt,
-			     lc_time_end - lc_time_ptr) + 1;
-	  /* era_t_fmt */
-	  _time_locale->era_t_fmt = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->era_t_fmt,
-			     lc_time_end - lc_time_ptr) + 1;
-	  /* alt_digits */
-	  _time_locale->alt_digits = (const char *) (lc_time_ptr += len);
-	  len = lc_wcstombs (f_wctomb, charset, lc_time_ptr, era->alt_digits,
-			     lc_time_end - lc_time_ptr) + 1;
-	  lc_time_ptr += len;
+	  _time_locale->wampm_fmt = (const wchar_t *) lc_time_ptr;
+	  lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wampm_fmt,
+					  era->t_fmt_ampm) + 1);
 	}
-    }
-  if (!era)
-    {
-      _time_locale->era =
-      _time_locale->era_d_fmt = 
-      _time_locale->era_d_t_fmt =
-      _time_locale->era_t_fmt =
-      _time_locale->alt_digits = (const char *) lc_time_ptr;
-      /* Twice, to make sure era and alt_strings are correctly terminated
-         with two NULs */
-      *lc_time_ptr++ = '\0';
+      else
+	_time_locale->wampm_fmt = eval_datetimefmt (LOCALE_STIMEFORMAT, DT_AMPM);
+      _time_locale->ampm_fmt = charfromwchar (time, wampm_fmt);
+
+      if (era)
+	{
+	  /* Evaluate string length in target charset.  Characters invalid in the
+	     target charset are simply ignored, as on Linux. */
+	  len = 0;
+	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_t_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_t_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, charset, NULL, era->alt_digits, 0) + 1;
+	  len += (wcslen (era->era) + 1) * sizeof (wchar_t);
+	  len += (wcslen (era->era_d_fmt) + 1) * sizeof (wchar_t);
+	  len += (wcslen (era->era_d_t_fmt) + 1) * sizeof (wchar_t);
+	  len += (wcslen (era->era_t_fmt) + 1) * sizeof (wchar_t);
+	  len += (wcslen (era->alt_digits) + 1) * sizeof (wchar_t);
+
+	  /* Make sure data fits into the buffer */
+	  if (lc_time_ptr + len > lc_time_end)
+	    {
+	      len = lc_time_ptr + len - new_lc_time_buf;
+	      char *tmp = (char *) realloc (new_lc_time_buf, len);
+	      if (!tmp)
+		era = NULL;
+	      else
+		{
+		  if (tmp != new_lc_time_buf)
+		    rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
+				       _time_locale + 1);
+		  lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
+		  new_lc_time_buf = tmp;
+		  lc_time_end = new_lc_time_buf + len;
+		}
+	    }
+	  /* Copy over */
+	  if (era)
+	    {
+	      /* era */
+	      _time_locale->wera = (const wchar_t *) lc_time_ptr;
+	      lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wera,
+					      era->era) + 1);
+	      _time_locale->era = charfromwchar (time, wera);
+	      /* era_d_fmt */
+	      _time_locale->wera_d_fmt = (const wchar_t *) lc_time_ptr;
+	      lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wera_d_fmt,
+					      era->era_d_fmt) + 1);
+	      _time_locale->era_d_fmt = charfromwchar (time, wera_d_fmt);
+	      /* era_d_t_fmt */
+	      _time_locale->wera_d_t_fmt = (const wchar_t *) lc_time_ptr;
+	      lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wera_d_t_fmt,
+					      era->era_d_t_fmt) + 1);
+	      _time_locale->era_d_t_fmt = charfromwchar (time, wera_d_t_fmt);
+	      /* era_t_fmt */
+	      _time_locale->wera_t_fmt = (const wchar_t *) lc_time_ptr;
+	      lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->wera_t_fmt,
+					      era->era_t_fmt) + 1);
+	      _time_locale->era_t_fmt = charfromwchar (time, wera_t_fmt);
+	      /* alt_digits */
+	      _time_locale->walt_digits = (const wchar_t *) lc_time_ptr;
+	      lc_time_ptr = (char *) (wcpcpy ((wchar_t *) _time_locale->walt_digits,
+					      era->alt_digits) + 1);
+	      _time_locale->alt_digits = charfromwchar (time, walt_digits);
+	    }
+	}
+      if (!era)
+	{
+	  _time_locale->wera =
+	  _time_locale->wera_d_fmt = 
+	  _time_locale->wera_d_t_fmt =
+	  _time_locale->wera_t_fmt =
+	  _time_locale->walt_digits = (const wchar_t *) lc_time_ptr;
+	  _time_locale->era =
+	  _time_locale->era_d_fmt = 
+	  _time_locale->era_d_t_fmt =
+	  _time_locale->era_t_fmt =
+	  _time_locale->alt_digits = (const char *) lc_time_ptr;
+	  /* Twice, to make sure wide char strings are correctly terminated. */
+	  *lc_time_ptr++ = '\0';
+	  *lc_time_ptr++ = '\0';
+	}
     }
 
   char *tmp = (char *) realloc (new_lc_time_buf, lc_time_ptr - new_lc_time_buf);
@@ -702,36 +746,125 @@ __set_lc_time_from_win (const char *name, struct lc_time_T *_time_locale,
   return 1;
 }
 
+/* Called from newlib's setlocale() via __ctype_load_locale() if category
+   is LC_CTYPE.  Returns LC_CTYPE values fetched from Windows locale data
+   in the structure pointed to by _ctype_locale.  This is subsequently
+   accessed by functions like nl_langinfo, localeconv, printf, etc. */
+extern "C" int
+__set_lc_ctype_from_win (const char *name,
+			 const struct lc_ctype_T *_C_ctype_locale,
+			 struct lc_ctype_T *_ctype_locale,
+			 char **lc_ctype_buf, wctomb_p f_wctomb,
+			 const char *charset, int mb_cur_max)
+{
+  LCID lcid = __get_lcid_from_locale (name);
+  if (lcid == (LCID) -1)
+    return lcid;
+  if (!lcid && !strcmp (charset, "ASCII"))
+    return 0;
+
+# define MAX_CTYPE_BUFFER_SIZE	256
+
+  char *new_lc_ctype_buf = (char *) malloc (MAX_CTYPE_BUFFER_SIZE);
+
+  if (!new_lc_ctype_buf)
+    return -1;
+  char *lc_ctype_ptr = new_lc_ctype_buf;
+  /* C.foo is just a copy of "C" with fixed charset. */
+  if (!lcid)
+    memcpy (_ctype_locale, _C_ctype_locale, sizeof (struct lc_ctype_T));
+  /* codeset */
+  _ctype_locale->codeset = lc_ctype_ptr;
+  lc_ctype_ptr = stpcpy (lc_ctype_ptr, charset) + 1;
+  /* mb_cur_max */
+  _ctype_locale->mb_cur_max = lc_ctype_ptr;
+  *lc_ctype_ptr++ = mb_cur_max;
+  *lc_ctype_ptr++ = '\0';
+  if (lcid)
+    {
+      /* outdigits and woutdigits */
+      wchar_t digits[11];
+      GetLocaleInfoW (lcid, LOCALE_SNATIVEDIGITS, digits, 11);
+      for (int i = 0; i <= 9; ++i)
+	{
+	  mbstate_t state;
+
+	  /* Make sure the wchar_t's are always 2 byte aligned. */
+	  if ((uintptr_t) lc_ctype_ptr % 2)
+	    ++lc_ctype_ptr;
+	  wchar_t *woutdig = (wchar_t *) lc_ctype_ptr;
+	  _ctype_locale->woutdigits[i] = (const wchar_t *) woutdig;
+	  *woutdig++ = digits[i];
+	  *woutdig++ = L'\0';
+	  lc_ctype_ptr = (char *) woutdig;
+	  _ctype_locale->outdigits[i] = lc_ctype_ptr;
+	  memset (&state, 0, sizeof state);
+	  lc_ctype_ptr += f_wctomb (_REENT, lc_ctype_ptr, digits[i], charset,
+				      &state);
+	  *lc_ctype_ptr++ = '\0';
+	}
+    }
+
+  char *tmp = (char *) realloc (new_lc_ctype_buf,
+  				lc_ctype_ptr - new_lc_ctype_buf);
+  if (!tmp)
+    {
+      free (new_lc_ctype_buf);
+      return -1;
+    }
+  if (tmp != new_lc_ctype_buf)
+    rebase_locale_buf (_ctype_locale, tmp, new_lc_ctype_buf,
+		       _ctype_locale + 1);
+  if (*lc_ctype_buf)
+    free (*lc_ctype_buf);
+  *lc_ctype_buf = tmp;
+  return 1;
+}
+
 /* Called from newlib's setlocale() via __numeric_load_locale() if category
    is LC_NUMERIC.  Returns LC_NUMERIC values fetched from Windows locale data
    in the structure pointed to by _numeric_locale.  This is subsequently
    accessed by functions like nl_langinfo, localeconv, printf, etc. */
 extern "C" int
 __set_lc_numeric_from_win (const char *name,
+			   const struct lc_numeric_T *_C_numeric_locale,
 			   struct lc_numeric_T *_numeric_locale,
 			   char **lc_numeric_buf, wctomb_p f_wctomb,
 			   const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
-  if (!lcid || lcid == (LCID) -1)
+  if (lcid == (LCID) -1)
     return lcid;
+  if (!lcid && !strcmp (charset, "ASCII"))
+    return 0;
 
-  char *new_lc_numeric_buf = (char *) malloc (48);
-  const char *lc_numeric_end = new_lc_numeric_buf + 48;
+# define MAX_NUMERIC_BUFFER_SIZE	256
+
+  char *new_lc_numeric_buf = (char *) malloc (MAX_NUMERIC_BUFFER_SIZE);
+  const char *lc_numeric_end = new_lc_numeric_buf + MAX_NUMERIC_BUFFER_SIZE;
 
   if (!new_lc_numeric_buf)
     return -1;
   char *lc_numeric_ptr = new_lc_numeric_buf;
-  /* decimal_point */
-  _numeric_locale->decimal_point = getlocaleinfo (numeric,
-						  LOCALE_SDECIMAL);
-  /* thousands_sep */
-  _numeric_locale->thousands_sep = getlocaleinfo (numeric,
-						  LOCALE_STHOUSAND);
-  /* grouping */
-  _numeric_locale->grouping = conv_grouping (lcid, LOCALE_SGROUPING,
-					     &lc_numeric_ptr);
-
+  /* C.foo is just a copy of "C" with fixed charset. */
+  if (!lcid)
+    memcpy (_numeric_locale, _C_numeric_locale, sizeof (struct lc_numeric_T));
+  else
+    {
+      /* decimal_point */
+      _numeric_locale->wdecimal_point = getlocaleinfo (numeric, LOCALE_SDECIMAL);
+      _numeric_locale->decimal_point = charfromwchar (numeric, wdecimal_point);
+      /* thousands_sep */
+      _numeric_locale->wthousands_sep = getlocaleinfo (numeric, LOCALE_STHOUSAND);
+      _numeric_locale->thousands_sep = charfromwchar (numeric, wthousands_sep);
+      /* grouping */
+      _numeric_locale->grouping = conv_grouping (lcid, LOCALE_SGROUPING,
+						 &lc_numeric_ptr);
+    }
+  /* codeset */
+  _numeric_locale->codeset = lc_numeric_ptr;
+  lc_numeric_ptr = stpcpy (lc_numeric_ptr, charset) + 1;
+  
   char *tmp = (char *) realloc (new_lc_numeric_buf,
   				lc_numeric_ptr - new_lc_numeric_buf);
   if (!tmp)
@@ -754,85 +887,110 @@ __set_lc_numeric_from_win (const char *name,
    accessed by functions like nl_langinfo, localeconv, printf, etc. */
 extern "C" int
 __set_lc_monetary_from_win (const char *name,
+			    const struct lc_monetary_T *_C_monetary_locale,
 			    struct lc_monetary_T *_monetary_locale,
 			    char **lc_monetary_buf, wctomb_p f_wctomb,
 			    const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
-  if (!lcid || lcid == (LCID) -1)
+  if (lcid == (LCID) -1)
     return lcid;
+  if (!lcid && !strcmp (charset, "ASCII"))
+    return 0;
 
-  char *new_lc_monetary_buf = (char *) malloc (256);
-  const char *lc_monetary_end = new_lc_monetary_buf + 256;
+# define MAX_MONETARY_BUFFER_SIZE	512
+
+  char *new_lc_monetary_buf = (char *) malloc (MAX_MONETARY_BUFFER_SIZE);
+  const char *lc_monetary_end = new_lc_monetary_buf + MAX_MONETARY_BUFFER_SIZE;
 
   if (!new_lc_monetary_buf)
     return -1;
   char *lc_monetary_ptr = new_lc_monetary_buf;
-  /* int_curr_symbol */
-  _monetary_locale->int_curr_symbol = getlocaleinfo (monetary,
-						     LOCALE_SINTLSYMBOL);
-  /* No spacing char means space. */
-  if (!_monetary_locale->int_curr_symbol[3])
+  /* C.foo is just a copy of "C" with fixed charset. */
+  if (!lcid)
+    memcpy (_monetary_locale, _C_monetary_locale, sizeof (struct lc_monetary_T));
+  else
     {
-      lc_monetary_ptr[-1] = ' ';
-      *lc_monetary_ptr++ = '\0';
+      /* int_curr_symbol */
+      _monetary_locale->wint_curr_symbol = getlocaleinfo (monetary,
+							  LOCALE_SINTLSYMBOL);
+      /* No spacing char means space. */
+      if (!_monetary_locale->wint_curr_symbol[3])
+	{
+	  wchar_t *wc = (wchar_t *) _monetary_locale->wint_curr_symbol + 3;
+	  *wc++ = L' ';
+	  *wc++ = L'\0';
+	  lc_monetary_ptr = (char *) wc;
+	}
+      _monetary_locale->int_curr_symbol = charfromwchar (monetary,
+							 wint_curr_symbol);
+      /* currency_symbol */
+      _monetary_locale->wcurrency_symbol = getlocaleinfo (monetary,
+							  LOCALE_SCURRENCY);
+      /* As on Linux:  If the currency_symbol can't be represented in the
+	 given charset, use int_curr_symbol. */
+      if (lc_wcstombs (f_wctomb, charset, NULL,
+		       _monetary_locale->wcurrency_symbol,
+		       0, true) == (size_t) -1)
+	_monetary_locale->currency_symbol = _monetary_locale->int_curr_symbol;
+      else
+	_monetary_locale->currency_symbol = charfromwchar (monetary,
+							   wcurrency_symbol);
+      /* mon_decimal_point */
+      _monetary_locale->wmon_decimal_point = getlocaleinfo (monetary,
+							    LOCALE_SMONDECIMALSEP);
+      _monetary_locale->mon_decimal_point = charfromwchar (monetary,
+							   wmon_decimal_point);
+      /* mon_thousands_sep */
+      _monetary_locale->wmon_thousands_sep = getlocaleinfo (monetary,
+							    LOCALE_SMONTHOUSANDSEP);
+      _monetary_locale->mon_thousands_sep = charfromwchar (monetary,
+							   wmon_thousands_sep);
+      /* mon_grouping */
+      _monetary_locale->mon_grouping = conv_grouping (lcid, LOCALE_SMONGROUPING,
+						      &lc_monetary_ptr);
+      /* positive_sign */
+      _monetary_locale->wpositive_sign = getlocaleinfo (monetary,
+							LOCALE_SPOSITIVESIGN);
+      _monetary_locale->positive_sign = charfromwchar (monetary, wpositive_sign);
+      /* negative_sign */
+      _monetary_locale->wnegative_sign = getlocaleinfo (monetary,
+							LOCALE_SNEGATIVESIGN);
+      _monetary_locale->negative_sign = charfromwchar (monetary, wnegative_sign);
+      /* int_frac_digits */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IINTLCURRDIGITS);
+      _monetary_locale->int_frac_digits = lc_monetary_ptr++;
+      /* frac_digits */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_ICURRDIGITS);
+      _monetary_locale->frac_digits = lc_monetary_ptr++;
+      /* p_cs_precedes and int_p_cs_precedes */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSYMPRECEDES);
+      _monetary_locale->p_cs_precedes
+	    = _monetary_locale->int_p_cs_precedes = lc_monetary_ptr++;
+      /* p_sep_by_space and int_p_sep_by_space */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSEPBYSPACE);
+      _monetary_locale->p_sep_by_space
+	    = _monetary_locale->int_p_sep_by_space = lc_monetary_ptr++;
+      /* n_cs_precedes and int_n_cs_precedes */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSYMPRECEDES);
+      _monetary_locale->n_cs_precedes
+	    = _monetary_locale->int_n_cs_precedes = lc_monetary_ptr++;
+      /* n_sep_by_space and int_n_sep_by_space */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSEPBYSPACE);
+      _monetary_locale->n_sep_by_space
+	    = _monetary_locale->int_n_sep_by_space = lc_monetary_ptr++;
+      /* p_sign_posn and int_p_sign_posn */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSIGNPOSN);
+      _monetary_locale->p_sign_posn
+	    = _monetary_locale->int_p_sign_posn = lc_monetary_ptr++;
+      /* n_sign_posn and int_n_sign_posn */
+      *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSIGNPOSN);
+      _monetary_locale->n_sign_posn
+	    = _monetary_locale->int_n_sign_posn = lc_monetary_ptr++;
     }
-  /* currency_symbol */
-  {
-    /* As on Linux:  If the currency_symbol can't be represented in the
-       given charset, use int_curr_symbol. */
-    wchar_t wbuf[14];
-    GetLocaleInfoW (lcid, LOCALE_SCURRENCY, wbuf, 14);
-    if (lc_wcstombs (f_wctomb, charset, NULL, wbuf, 0, true) == (size_t) -1)
-      {
-	_monetary_locale->currency_symbol = lc_monetary_ptr;
-	lc_monetary_ptr = stpncpy (lc_monetary_ptr,
-				   _monetary_locale->int_curr_symbol, 3);
-	*lc_monetary_ptr++ = '\0';
-      }
-    else
-      _monetary_locale->currency_symbol = getlocaleinfo (monetary,
-							 LOCALE_SCURRENCY);
-  }
-  /* mon_decimal_point */
-  _monetary_locale->mon_decimal_point = getlocaleinfo (monetary,
-						       LOCALE_SMONDECIMALSEP);
-  /* mon_thousands_sep */
-  _monetary_locale->mon_thousands_sep = getlocaleinfo (monetary,
-						       LOCALE_SMONTHOUSANDSEP);
-  /* mon_grouping */
-  _monetary_locale->mon_grouping = conv_grouping (lcid, LOCALE_SMONGROUPING,
-						  &lc_monetary_ptr);
-  /* positive_sign */
-  _monetary_locale->positive_sign = getlocaleinfo (monetary,
-						   LOCALE_SPOSITIVESIGN);
-  /* negative_sign */
-  _monetary_locale->negative_sign = getlocaleinfo (monetary,
-						   LOCALE_SNEGATIVESIGN);
-  /* int_frac_digits */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IINTLCURRDIGITS);
-  _monetary_locale->int_frac_digits = lc_monetary_ptr++;
-  /* frac_digits */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_ICURRDIGITS);
-  _monetary_locale->frac_digits = lc_monetary_ptr++;
-  /* p_cs_precedes */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSYMPRECEDES);
-  _monetary_locale->p_cs_precedes = lc_monetary_ptr++;
-  /* p_sep_by_space */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSEPBYSPACE);
-  _monetary_locale->p_sep_by_space = lc_monetary_ptr++;
-  /* n_cs_precedes */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSYMPRECEDES);
-  _monetary_locale->n_cs_precedes = lc_monetary_ptr++;
-  /* n_sep_by_space */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSEPBYSPACE);
-  _monetary_locale->n_sep_by_space = lc_monetary_ptr++;
-  /* p_sign_posn */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_IPOSSIGNPOSN);
-  _monetary_locale->p_sign_posn = lc_monetary_ptr++;
-  /* p_sign_posn */
-  *lc_monetary_ptr = (char) getlocaleint (lcid, LOCALE_INEGSIGNPOSN);
-  _monetary_locale->n_sign_posn = lc_monetary_ptr++;
+  /* codeset */
+  _monetary_locale->codeset = lc_monetary_ptr;
+  lc_monetary_ptr = stpcpy (lc_monetary_ptr, charset) + 1;
 
   char *tmp = (char *) realloc (new_lc_monetary_buf,
   				lc_monetary_ptr - new_lc_monetary_buf);
@@ -852,46 +1010,66 @@ __set_lc_monetary_from_win (const char *name,
 
 extern "C" int
 __set_lc_messages_from_win (const char *name,
+			    const struct lc_messages_T *_C_messages_locale,
 			    struct lc_messages_T *_messages_locale,
 			    char **lc_messages_buf,
 			    wctomb_p f_wctomb, const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
-  if (!lcid || lcid == (LCID) -1)
+  if (lcid == (LCID) -1)
     return lcid;
+  if (!lcid && !strcmp (charset, "ASCII"))
+    return 0;
 
   char locale[ENCODING_LEN + 1];
   char *c, *c2;
+  lc_msg_t *msg = NULL;
 
-  strcpy (locale, name);
-  /* Removes the charset from the locale and attach the modifer to the
-     language_TERRITORY part. */
-  c = strchr (locale, '.');
-  if (c)
+  /* C.foo is just a copy of "C" with fixed charset. */
+  if (!lcid)
+    memcpy (_messages_locale, _C_messages_locale, sizeof (struct lc_messages_T));
+  else
     {
-      *c = '\0';
-      c2 = strchr (c + 1, '@');
-      /* Ignore @cjknarrow modifier since it's a very personal thing between
-	 Cygwin and newlib... */
-      if (c2 && strcmp (c2, "@cjknarrow"))
-      	memmove (c, c2, strlen (c2) + 1);
+      strcpy (locale, name);
+      /* Removes the charset from the locale and attach the modifer to the
+	 language_TERRITORY part. */
+      c = strchr (locale, '.');
+      if (c)
+	{
+	  *c = '\0';
+	  c2 = strchr (c + 1, '@');
+	  /* Ignore @cjknarrow modifier since it's a very personal thing between
+	     Cygwin and newlib... */
+	  if (c2 && strcmp (c2, "@cjknarrow"))
+	    memmove (c, c2, strlen (c2) + 1);
+	}
+      /* Now search in the alphabetically order lc_msg array for the
+	 locale. */
+      lc_msg_t locale_key = { locale, NULL, NULL, NULL, NULL };
+      msg = (lc_msg_t *) bsearch ((void *) &locale_key, (void *) lc_msg,
+				  sizeof lc_msg / sizeof *lc_msg,
+				  sizeof *lc_msg, locale_cmp);
+      if (!msg)
+	return 0;
     }
-  /* Now search in the alphabetically order lc_msg array for the
-     locale. */
-  lc_msg_t locale_key = { locale, NULL, NULL, NULL, NULL };
-  lc_msg_t *msg = (lc_msg_t *) bsearch ((void *) &locale_key, (void *) lc_msg,
-					sizeof lc_msg / sizeof *lc_msg,
-					sizeof *lc_msg, locale_cmp);
-  if (!msg)
-    return 0;
 
   /* Evaluate string length in target charset.  Characters invalid in the
      target charset are simply ignored, as on Linux. */
   size_t len = 0;
-  len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesexpr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, msg->noexpr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesstr, 0) + 1;
-  len += lc_wcstombs (f_wctomb, charset, NULL, msg->nostr, 0) + 1;
+  len += (strlen (charset) + 1);
+  if (lcid)
+    {
+      len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesexpr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, msg->noexpr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesstr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, charset, NULL, msg->nostr, 0) + 1;
+      len += (wcslen (msg->yesexpr) + 1) * sizeof (wchar_t);
+      len += (wcslen (msg->noexpr) + 1) * sizeof (wchar_t);
+      len += (wcslen (msg->yesstr) + 1) * sizeof (wchar_t);
+      len += (wcslen (msg->nostr) + 1) * sizeof (wchar_t);
+      if (len % 1)
+	++len;
+    }
   /* Allocate. */
   char *new_lc_messages_buf = (char *) malloc (len);
   const char *lc_messages_end = new_lc_messages_buf + len;
@@ -900,14 +1078,32 @@ __set_lc_messages_from_win (const char *name,
     return -1;
   /* Copy over. */
   c = new_lc_messages_buf;
-  _messages_locale->yesexpr = (const char *) c;
-  len = lc_wcstombs (f_wctomb, charset, c, msg->yesexpr, lc_messages_end - c);
-  _messages_locale->noexpr = (const char *) (c += len + 1);
-  len = lc_wcstombs (f_wctomb, charset, c, msg->noexpr, lc_messages_end - c);
-  _messages_locale->yesstr = (const char *) (c += len + 1);
-  len = lc_wcstombs (f_wctomb, charset, c, msg->yesstr, lc_messages_end - c);
-  _messages_locale->nostr = (const char *) (c += len + 1);
-  lc_wcstombs (f_wctomb, charset, c, msg->nostr, lc_messages_end - c);
+  /* codeset */
+  _messages_locale->codeset = c;
+  c = stpcpy (c, charset) + 1;
+  if (lcid)
+    {
+      _messages_locale->yesexpr = (const char *) c;
+      len = lc_wcstombs (f_wctomb, charset, c, msg->yesexpr, lc_messages_end - c);
+      _messages_locale->noexpr = (const char *) (c += len + 1);
+      len = lc_wcstombs (f_wctomb, charset, c, msg->noexpr, lc_messages_end - c);
+      _messages_locale->yesstr = (const char *) (c += len + 1);
+      len = lc_wcstombs (f_wctomb, charset, c, msg->yesstr, lc_messages_end - c);
+      _messages_locale->nostr = (const char *) (c += len + 1);
+      len = lc_wcstombs (f_wctomb, charset, c, msg->nostr, lc_messages_end - c);
+      c += len + 1;
+      if ((uintptr_t) c % 1)
+	++c;
+      wchar_t *wc = (wchar_t *) c;
+      _messages_locale->wyesexpr = (const wchar_t *) wc;
+      wc = wcpcpy (wc, msg->yesexpr) + 1;
+      _messages_locale->wnoexpr = (const wchar_t *) wc;
+      wc = wcpcpy (wc, msg->noexpr) + 1;
+      _messages_locale->wyesstr = (const wchar_t *) wc;
+      wc = wcpcpy (wc, msg->yesstr) + 1;
+      _messages_locale->wnostr = (const wchar_t *) wc;
+      wcpcpy (wc, msg->nostr);
+    }
   /* Aftermath. */
   if (*lc_messages_buf)
     free (*lc_messages_buf);
@@ -932,6 +1128,12 @@ __collate_load_locale (const char *name, mbtowc_p f_mbtowc, const char *charset)
   collate_mbtowc = f_mbtowc;
   stpcpy (collate_charset, charset);
   return 0;
+}
+
+extern "C" const char *
+__get_current_collate_codeset (void)
+{
+  return collate_charset;
 }
 
 /* We use the Windows functions for locale-specific string comparison and

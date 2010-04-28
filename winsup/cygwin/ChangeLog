@@ -1,3 +1,22 @@
+2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (__locale_mb_cur_max): Export.
+	* nlsfuncs.cc (__getlocaleinfo): Drop conversion to multibyte.
+	(__charfromwchar): New function to convert to multibyte.
+	(__eval_datetimefmt): Convert to return wchar_t pointer.  Work on
+	wide char string.
+	(__set_lc_time_from_win): Take additional pointer to "C" category info
+	to accommodate C.foo locales.  Rework to fill wide char members in
+	category info.
+	(__set_lc_ctype_from_win): New function.
+	(__set_lc_numeric_from_win): Take additional pointer to "C" category
+	info to accommodate C.foo locales.  Rework to fill wide char members
+	in category info.
+	(__set_lc_monetary_from_win): Ditto.
+	(__set_lc_messages_from_win): Ditto.
+	(__get_current_collate_codeset): New function, called from nl_langinfo.
+	* include/cygwin/config.h (__HAVE_LOCALE_INFO_EXTENDED__): Define.
+
 2010-04-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* spawn.cc (find_exec): Use the first detected errno when lookup fails.
