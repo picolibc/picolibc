@@ -207,31 +207,11 @@ static struct option longopts[] =
 
 static char opts[] = "acfhmpvo:";
 
-struct opt
-{
-  const char *name;
-  unsigned val;
-  bool clear;
-} oopts[] =
-{
-  {"acl", MOUNT_NOACL, true},
-  {"auto", 0, false},
-  {"binary", MOUNT_BINARY, false},
-  {"cygexec", MOUNT_CYGWIN_EXEC, false},
-  {"exec", MOUNT_EXEC, false},
-  {"noacl", MOUNT_NOACL, false},
-  {"nosuid", 0, false},
-  {"notexec", MOUNT_NOTEXEC, false},
-  {"override", MOUNT_OVERRIDE, true},
-  {"posix=0", MOUNT_NOPOSIX, false},
-  {"posix=1", MOUNT_NOPOSIX, true},
-  {"text", MOUNT_BINARY, true},
-  {"user", MOUNT_SYSTEM, true}
-};
-
 static void
 usage (FILE *where = stderr)
 {
+  char *options;
+
   fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
        %s -a\n\
        %s <posixpath>\n\
@@ -246,12 +226,10 @@ Display information about mounted filesystems, or mount a filesystem\n\
 				and cygdrive prefixes\n\
   -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
-  -v, --version                 output version information and exit\n\
-\n\
-Valid options are:\n\n  ", progname, progname, progname);
-  for (opt *o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
-    fprintf (where, "%s%s", o == oopts ? "" : ",", o->name);
-  fputs ("\n\n", where);
+  -v, --version                 output version information and exit\n\n",
+  progname, progname, progname);
+  if (!cygwin_internal (CW_LST_MNT_OPTS, &options))
+    fprintf (where, "Valid options are: %s\n\n", options);
   exit (where == stderr ? 1 : 0);
 }
 
@@ -273,7 +251,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 Filesystem Utility\n\
-Copyright 1996-2008 Red Hat, Inc.\n\
+Copyright 1996-2010 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", progname, len, v, __DATE__);
 }
@@ -364,28 +342,10 @@ main (int argc, char **argv)
 	usage ();
       }
 
-  while (*options)
+  if (cygwin_internal (CW_CVT_MNT_OPTS, &options, &flags))
     {
-      char *p = strchr (options, ',');
-      if (p)
-	*p++ = '\0';
-      else
-	p = strchr (options, '\0');
-
-      for (opt *o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
-	if (strcmp (options, o->name) == 0)
-	  {
-	    if (o->clear)
-	      flags &= ~o->val;
-	    else
-	      flags |= o->val;
-	    goto gotit;
-	  }
       fprintf (stderr, "%s: invalid option - '%s'\n", progname, options);
       exit (1);
-
-    gotit:
-      options = p;
     }
 
   if (flags & MOUNT_NOTEXEC && flags & (MOUNT_EXEC | MOUNT_CYGWIN_EXEC))
