@@ -1,3 +1,14 @@
+2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add CW_CVT_MNT_OPTS to allow mount
+	flag parsing.  Add CW_LST_MNT_OPTS case to allow mount flag listing.
+	* mount.cc (fstab_read_flags): Rename from read_flags.  Make externally
+	available.  Change input string to char ** to allow returning faulty
+	option.  Add flag for avoiding debug output.
+	(fstab_list_flags): New function to create list of options.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_CVT_MNT_OPTS and
+	CW_LST_MNT_OPTS.
+
 2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (compare_flags): New function.

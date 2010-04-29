@@ -146,7 +146,9 @@ typedef enum
     CW_EXIT_PROCESS,
     CW_SET_EXTERNAL_TOKEN,
     CW_GET_INSTKEY,
-    CW_INT_SETLOCALE
+    CW_INT_SETLOCALE,
+    CW_CVT_MNT_OPTS,
+    CW_LST_MNT_OPTS
   } cygwin_getinfo_types;
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */

@@ -953,34 +953,58 @@ compare_flags (const void *a, const void *b)
   return strcmp (oa->name, ob->name);
 }
 
-static bool
-read_flags (char *options, unsigned &flags)
+extern "C" bool
+fstab_read_flags (char **options, unsigned &flags, bool external)
 {
   opt key;
 
-  while (*options)
+  while (**options)
     {
-      char *p = strchr (options, ',');
+      char *p = strchr (*options, ',');
       if (p)
 	*p++ = '\0';
       else
-	p = strchr (options, '\0');
+	p = strchr (*options, '\0');
       
-      key.name = options;
-      opt *o = (opt *) bsearch (&key, oopts, sizeof oopts / sizeof (opt),
+      key.name = *options;
+      opt *o = (opt *) bsearch (&key, oopts,
+				sizeof oopts / sizeof (opt),
 				sizeof (opt), compare_flags);
       if (!o)
 	{
-	  system_printf ("invalid fstab option - '%s'", options);
+	  if (!external)
+	    system_printf ("invalid fstab option - '%s'", *options);
 	  return false;
 	}
       if (o->clear)
 	flags &= ~o->val;
       else
 	flags |= o->val;
-      options = p;
+      *options = p;
     }
   return true;
+}
+
+extern "C" char *
+fstab_list_flags ()
+{
+  size_t len = 0;
+  opt *o;
+
+  for (o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
+    len += strlen (o->name) + 1;
+  char *buf = (char *) malloc (len);
+  if (buf)
+    {
+      char *bp = buf;
+      for (o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
+      	{
+	  bp = stpcpy (bp, o->name);
+	  *bp++ = ',';
+	}
+      *--bp = '\0';
+    }
+  return buf;
 }
 
 bool
@@ -1021,7 +1045,7 @@ mount_info::from_fstab_line (char *line, bool user)
   unsigned mount_flags = MOUNT_SYSTEM | MOUNT_BINARY;
   if (!strcmp (fs_type, "cygdrive"))
     mount_flags |= MOUNT_NOPOSIX;
-  if (!read_flags (c, mount_flags))
+  if (!fstab_read_flags (&c, mount_flags, false))
     return true;
   if (user)
     mount_flags &= ~MOUNT_SYSTEM;

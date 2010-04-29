@@ -474,6 +474,40 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  internal_setlocale ();
 	  res = 0;
 	}
+	break;
+      case CW_CVT_MNT_OPTS:
+	{
+	  extern bool fstab_read_flags (char **, unsigned &, bool);
+	  char **option_string = va_arg (arg, char **);
+	  if (!option_string || !*option_string)
+	    set_errno (EINVAL);
+	  else
+	    {
+	      unsigned *pflags = va_arg (arg, unsigned *);
+	      unsigned flags = 0;
+	      if (fstab_read_flags (option_string, flags, true))
+		{
+		  if (pflags)
+		    *pflags = flags;
+		  res = 0;
+		}
+	    }
+	}
+	break;
+      case CW_LST_MNT_OPTS:
+	{
+	  extern char *fstab_list_flags ();
+	  char **option_string = va_arg (arg, char **);
+	  if (!option_string)
+	    set_errno (EINVAL);
+	  else
+	    {
+	      *option_string = fstab_list_flags ();
+	      if (*option_string)
+		res = 0;
+	    }
+	}
+	break;
 
       default:
 	set_errno (ENOSYS);
