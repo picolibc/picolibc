@@ -1,5 +1,10 @@
 2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.sgml (mount): Add description for "dos" and "ihash" mount
+	options.
+
+2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc: Include sys/cygwin.h if built for mount(1).
 	(struct opt): Add "dos" and "ihash" options.
 	(from_fstab_line): Call cygwin_internal rather than read_flags if

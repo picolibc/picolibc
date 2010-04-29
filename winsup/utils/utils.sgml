@@ -1020,7 +1020,15 @@ most of the options are duplicates of other mount flags):</para>
                implement real POSIX permissions (default).
   binary     - Files default to binary mode (default).
   cygexec    - Treat all files below mount point as cygwin executables.
+  dos        - Always convert leading spaces and trailing dots and spaces to
+	       characters in the UNICODE private use area.  This allows to use
+	       broken filesystems which only allow DOS filenames, even if they
+	       are not recognized as such by Cygwin.
   exec       - Treat all files below mount point as executable.
+  ihash      - Always fake inode numbers rather than using the ones returned
+	       by the filesystem.  This allows to use broken filesystems which
+	       don't return unambiguous inode numbers, even if they are not
+	       recognized as such by Cygwin.
   noacl      - Ignore ACLs and fake POSIX permissions.
   nosuid     - No suid files are allowed (currently unimplemented)
   notexec    - Treat all files below mount point as not executable.
