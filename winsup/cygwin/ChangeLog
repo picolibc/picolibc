@@ -1,5 +1,27 @@
 2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (struct opt): Add "dos" and "ihash" options.
+	(fillout_mntent): Ditto.
+	* path.cc (path_conv::get_nt_native_path): Use path_conv's
+	has_dos_filenames_only method.
+	(path_conv::check): Add PATH_IHASH flag if FS has unreliable inode
+	numbers.
+	(symlink_info::check_shortcut): Or symlink flags to pflags.
+	(symlink_info::check_sysfile): Ditto.  Change test accordingly.
+	(symlink_info::check_reparse_point): Ditto.
+	(symlink_info::check_nfs_symlink): Ditto.
+	(symlink_info::check): Check PATH_DOS flag in call to get_nt_native_path
+	to utilize mount flag.  Ditto in test for potential restarting.  Set
+	PATH_DOS if FS only allows DOS filename rules.
+	* path.h (enum path_types): Add PATH_DOS and PATH_IHASH.
+	(path_conv::hasgood_inode): Check PATH_IHASH instead of
+	fs.hasgood_inode.
+	(path_conv::has_dos_filenames_only): New method.
+	* include/sys/mount.h (MOUNT_DOS): New mount flag.
+	(MOUNT_IHASH): Ditto.
+
+2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Add CW_CVT_MNT_OPTS to allow mount
 	flag parsing.  Add CW_LST_MNT_OPTS case to allow mount flag listing.
 	* mount.cc (fstab_read_flags): Rename from read_flags.  Make externally

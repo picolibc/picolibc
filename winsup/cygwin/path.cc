@@ -457,7 +457,7 @@ path_conv::get_nt_native_path ()
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
-      ::get_nt_native_path (path, uni_path, fs.has_dos_filenames_only ());
+      ::get_nt_native_path (path, uni_path, has_dos_filenames_only ());
     }
   return &uni_path;
 }
@@ -848,6 +848,10 @@ is_virtual_symlink:
 	    {
 	      fileattr = sym.fileattr;
 	      path_flags = sym.pflags;
+	      /* If the FS has been found to have unrelibale inodes, note
+	         that in path_flags. */
+	      if (!fs.hasgood_inode ())
+		path_flags |= PATH_IHASH;
 	      /* If the OS is caseinsensitive or the FS is caseinsensitive,
 	         don't handle path casesensitive. */
 	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
@@ -1754,7 +1758,7 @@ symlink_info::check_shortcut (HANDLE in_h)
 	}
     }
   if (res) /* It's a symlink.  */
-    pflags = PATH_SYMLINK | PATH_LNK;
+    pflags |= PATH_SYMLINK | PATH_LNK;
 
 out:
   NtClose (h);
@@ -1794,7 +1798,7 @@ symlink_info::check_sysfile (HANDLE in_h)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
     {
       /* It's a symlink.  */
-      pflags = PATH_SYMLINK;
+      pflags |= PATH_SYMLINK;
     }
   else if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
@@ -1804,7 +1808,7 @@ symlink_info::check_sysfile (HANDLE in_h)
 		      sizeof (INTERIX_SYMLINK_COOKIE) - 1) == 0)
     {
       /* It's an Interix symlink.  */
-      pflags = PATH_SYMLINK;
+      pflags |= PATH_SYMLINK;
       interix_symlink = true;
       /* Interix symlink cookies are shorter than Cygwin symlink cookies, so
          in case of an Interix symlink cooky we have read too far into the
@@ -1813,7 +1817,7 @@ symlink_info::check_sysfile (HANDLE in_h)
       fpi.CurrentByteOffset.QuadPart = sizeof (INTERIX_SYMLINK_COOKIE) - 1;
       NtSetInformationFile (h, &io, &fpi, sizeof fpi, FilePositionInformation);
     }
-  if (pflags == PATH_SYMLINK)
+  if (pflags & PATH_SYMLINK)
     {
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
 			   NT_MAX_PATH, NULL, NULL);
@@ -1898,7 +1902,7 @@ symlink_info::check_reparse_point (HANDLE h)
     }
   sys_wcstombs (srcbuf, SYMLINK_MAX + 7, subst.Buffer,
 		subst.Length / sizeof (WCHAR));
-  pflags = PATH_SYMLINK | PATH_REP;
+  pflags |= PATH_SYMLINK | PATH_REP;
   fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
   return posixify (srcbuf);
 }
@@ -1937,7 +1941,7 @@ symlink_info::check_nfs_symlink (HANDLE h)
 		     (pffei->EaName + pffei->EaNameLength + 1);
       res = sys_wcstombs (contents, SYMLINK_MAX + 1,
 		      spath, pffei->EaValueLength);
-      pflags = PATH_SYMLINK;
+      pflags |= PATH_SYMLINK;
     }
   return res;
 }
@@ -2236,7 +2240,7 @@ restart:
       bool no_ea = false;
 
       error = 0;
-      get_nt_native_path (suffix.path, upath, fs.has_dos_filenames_only ());
+      get_nt_native_path (suffix.path, upath, pflags & PATH_DOS);
       if (h)
 	{
 	  NtClose (h);
@@ -2316,8 +2320,7 @@ restart:
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
 	     already attach a suffix *and* the above special case for UDF
 	     on XP didn't succeeed. */
-	  if (!restarted && !*ext_here
-	      && (!fs.inited () || fs.has_dos_filenames_only ()))
+	  if (!restarted && !*ext_here && !(pflags & PATH_DOS) && !fs.inited ())
 	    {
 	      /* Check for trailing dot or space or leading space in
 	         last component. */
@@ -2340,6 +2343,7 @@ restart:
 		      /* If so, try again.  Since we now know the FS, the
 		         filenames will be tweaked to follow DOS rules via the
 			 third parameter in the call to get_nt_native_path. */
+		      pflags |= PATH_DOS;
 		      restarted = true;
 		      goto restart;
 		    }

@@ -932,7 +932,9 @@ struct opt
   {"auto", 0, 0},
   {"binary", MOUNT_BINARY, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"dos", MOUNT_DOS, 0},
   {"exec", MOUNT_EXEC, 0},
+  {"ihash", MOUNT_IHASH, 0},
   {"noacl", MOUNT_NOACL, 0},
   {"nosuid", 0, 0},
   {"notexec", MOUNT_NOTEXEC, 0},
@@ -1552,6 +1554,12 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   if (flags & MOUNT_NOACL)
     strcat (_my_tls.locals.mnt_opts, (char *) ",noacl");
+
+  if (flags & MOUNT_DOS)
+    strcat (_my_tls.locals.mnt_opts, (char *) ",dos");
+
+  if (flags & MOUNT_IHASH)
+    strcat (_my_tls.locals.mnt_opts, (char *) ",ihash");
 
   if (flags & MOUNT_NOPOSIX)
     strcat (_my_tls.locals.mnt_opts, (char *) ",posix=0");

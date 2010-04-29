@@ -75,6 +75,8 @@ enum path_types
   PATH_RO		= MOUNT_RO,
   PATH_NOACL		= MOUNT_NOACL,
   PATH_NOPOSIX		= MOUNT_NOPOSIX,
+  PATH_DOS		= MOUNT_DOS,
+  PATH_IHASH		= MOUNT_IHASH,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_LNK		= 0x01000000,
@@ -106,9 +108,10 @@ class path_conv
   bool isremote () const {return fs.is_remote_drive ();}
   ULONG objcaseinsensitive () const {return caseinsensitive;}
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
-  bool hasgood_inode () const {return fs.hasgood_inode (); }
+  bool hasgood_inode () const {return !(path_flags & PATH_IHASH); }
   bool isgood_inode (__ino64_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
+  int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
   int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}

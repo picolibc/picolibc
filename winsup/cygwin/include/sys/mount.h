@@ -36,7 +36,10 @@ enum
   MOUNT_NOPOSIX =	0x04000,	/* Case insensitve path handling */
   MOUNT_OVERRIDE =	0x08000,	/* Allow overriding of root */
   MOUNT_IMMUTABLE =	0x10000,	/* Mount point can't be changed */
-  MOUNT_AUTOMATIC =	0x20000		/* Mount point was added automatically */
+  MOUNT_AUTOMATIC =	0x20000,	/* Mount point was added automatically */
+  MOUNT_DOS =		0x40000,	/* convert leading spaces and trailing
+					   dots and spaces to private use area */
+  MOUNT_IHASH =		0x80000		/* Enforce hash values for inode numbers */
 };
 
 int mount (const char *, const char *, unsigned __flags);
