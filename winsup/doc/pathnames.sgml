@@ -81,7 +81,15 @@ posix=[0|1].  The meaning of the options is as follows.</para>
   auto      - Ignored.
   binary    - Files default to binary mode (default).
   cygexec   - Treat all files below mount point as cygwin executables.
+  dos       - Always convert leading spaces and trailing dots and spaces to
+	      characters in the UNICODE private use area.  This allows to use
+	      broken filesystems which only allow DOS filenames, even if they
+	      are not recognized as such by Cygwin.
   exec      - Treat all files below mount point as executable.
+  ihash     - Always fake inode numbers rather than using the ones returned
+	      by the filesystem.  This allows to use broken filesystems which
+	      don't return unambiguous inode numbers, even if they are not
+	      recognized as such by Cygwin.
   noacl     - Cygwin ignores filesystem ACLs and only fakes a subset of
 	      permission bits based on the DOS readonly attribute.  This
 	      behaviour is the default on FAT and FAT32.  The flag is
@@ -434,16 +442,10 @@ to use these files with native Win32 applications.</para>
 <sect2 id="pathnames-specialchars">
 <title>Forbidden characters in filenames</title>
 
-<para>Win32 filenames can't contain trailing dots and spaces for backward
-compatibility.  When trying to create files with trailing dots or spaces,
-all of them are removed before the file is created.  This restriction only
-affects native Win32 applications.  Cygwin applications can create and
-access files with trailing dots and spaces without problems.</para>
-
-<para>Additionally, some characters are disallowed in filenames on Windows
-filesystems.  These forbidden characters are the ASCII control characters
-from ASCII value 1 to 31, plus the following characters which have a special
-meaning in the Win32 API:</para>
+<para>Some characters are disallowed in filenames on Windows filesystems.
+These forbidden characters are the ASCII control characters from ASCII
+value 1 to 31, plus the following characters which have a special meaning
+in the Win32 API:</para>
 
 <screen>
   "   *   :   &lt;   &gt;   ?   |   \
@@ -457,6 +459,23 @@ are converted to special UNICODE characters in the range 0xf000 to 0xf0ff
 <para>The backslash has to be exempt from this conversion, because Cygwin
 accepts Win32 filenames including backslashes as path separators on input. 
 Converting backslashes using the above method would make this impossible.</para>
+
+<para>Additionally Win32 filenames can't contain trailing dots and spaces
+for DOS backward compatibility.  When trying to create files with trailing
+dots or spaces, all of them are removed before the file is created.  This
+restriction only affects native Win32 applications.  Cygwin applications
+can create and access files with trailing dots and spaces without problems.
+</para>
+
+<para>An exception from this rule are some network filesystems (NetApp,
+NWFS) which choke on these filenames.  They return with an error like
+"No such file or directory" when trying to create such files.  Starting
+with Cygwin 1.7.6, Cygwin recognizes these filesystems and works around
+this problem by applying the same rule as for the other forbidden characters. 
+Leading spaces and trailing dots and spaces will be converted to UNICODE
+characters in the private use area.  This behaviour can be switched on
+explicitely for a filesystem or a directory tree by using the mount option
+<literal>dos</literal>.</para>
 
 </sect2>
 

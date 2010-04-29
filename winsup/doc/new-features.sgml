@@ -5,6 +5,11 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Add new mount options "dos" and "ihash" to allow overriding Cygwin default
+behaviour on broken filesystems not recognized by Cygwin.
+</para></listitem>
+
+<listitem><para>
 Ttys and ptys are handled as securable objects using file-like permissions
 and owner/group information.  <command>chmod</command> and
 <command>chown</command> now work on ttys/ptys.  A new mechanism is used
