@@ -1,5 +1,12 @@
 2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc: Include sys/cygwin.h if built for mount(1).
+	(struct opt): Add "dos" and "ihash" options.
+	(from_fstab_line): Call cygwin_internal rather than read_flags if
+	built for mount(1).
+
+2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (oopts): Remove entirely.
 	(usage): Call cygwin_internal (CW_LST_MNT_OPTS) to create list of
 	mount options.

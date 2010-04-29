@@ -1,6 +1,6 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -26,6 +26,9 @@ details. */
 #include "cygwin/include/sys/mount.h"
 #include "cygwin/include/mntent.h"
 #include "testsuite.h"
+#ifdef FSTAB_ONLY
+#include <sys/cygwin.h>
+#endif
 
 #ifndef FSTAB_ONLY
 /* Used when treating / and \ as equivalent. */
@@ -306,7 +309,9 @@ static struct opt
   {"auto", 0, 0},
   {"binary", MOUNT_BINARY, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"dos", MOUNT_DOS, 0},
   {"exec", MOUNT_EXEC, 0},
+  {"ihash", MOUNT_IHASH, 0},
   {"noacl", MOUNT_NOACL, 0},
   {"nosuid", 0, 0},
   {"notexec", MOUNT_NOTEXEC, 0},
@@ -381,7 +386,11 @@ from_fstab_line (mnt_t *m, char *line, bool user)
   cend = find_ws (c);
   *cend = '\0';
   unsigned mount_flags = MOUNT_SYSTEM;
+#ifndef FSTAB_ONLY
   if (!read_flags (c, mount_flags))
+#else
+  if (cygwin_internal (CW_CVT_MNT_OPTS, &c, &mount_flags))
+#endif
     return false;
   if (user)
     mount_flags &= ~MOUNT_SYSTEM;
