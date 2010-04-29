@@ -1,5 +1,9 @@
 2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (get_full_path_of_dll): Handle non-existent file.
+
+2010-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (struct opt): Add "dos" and "ihash" options.
 	(fillout_mntent): Ditto.
 	* path.cc (path_conv::get_nt_native_path): Use path_conv's

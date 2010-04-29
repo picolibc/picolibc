@@ -58,10 +58,10 @@ get_full_path_of_dll (const char* str, path_conv &real_filename)
        ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
     real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
 
-  if (!real_filename.error)
+  if (!real_filename.error && real_filename.exists ())
     return true;
 
-  set_errno (real_filename.error);
+  set_errno (real_filename.error ?: ENOENT);
   return false;
 }
 
