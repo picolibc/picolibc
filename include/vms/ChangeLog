@@ -1,5 +1,9 @@
 2010-04-30  Tristan Gingold  <gingold@adacore.com>
 
+	* lbr.h (struct vms_kbn): New structure.
+
+2010-04-30  Tristan Gingold  <gingold@adacore.com>
+
 	* lbr.h (LBR__C_TYP_ISHSTB): Added.
 	(LHD_SANEID4): Renamed to ...
 	(LHD_SANEID6): ...  this.

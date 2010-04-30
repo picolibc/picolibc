@@ -255,6 +255,19 @@ struct vms_datadef
 #define DATA__LENGTH 512
 #define DATA__DATA 6
 
+/* Key name block.  This is used for keys longer than 128 bytes.  */
+
+struct vms_kbn
+{
+  /* Length of the key chunk.  */
+  unsigned char keylen[2];
+
+  /* RFA of the next chunk.  */
+  struct vms_rfa rfa;
+
+  /* Followed by the key chunk.  */
+};
+
 /* Module header.  */
 struct vms_mhd
 {
