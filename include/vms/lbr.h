@@ -25,9 +25,11 @@
 
 /* Libray HeaDer.  */
 
+/* Magic numbers.  Should match the major version.  */
+
 #define LHD_SANEID_DCX 319232342
 #define LHD_SANEID3 233579905
-#define LHD_SANEID4 233579911
+#define LHD_SANEID6 233579911
 
 /* Library type.  */
 #define LBR__C_TYP_UNK    0	/* Unknown / unspecified.  */
@@ -40,6 +42,7 @@
 #define LBR__C_TYP_EOBJ   7	/* Alpha object.  */
 #define LBR__C_TYP_ESHSTB 8	/* Alpha shareable image.  */
 #define LBR__C_TYP_IOBJ   9	/* IA-64 object.  */
+#define LBR__C_TYP_ISHSTB 10	/* IA-64 shareable image.  */
 
 struct vms_lhd
 {
@@ -120,6 +123,10 @@ struct vms_lhd
   unsigned char fill_4[4 * 13];
 };
 
+/* Known major ids.  */
+#define LBR_MAJORID 3		/* Alpha libraries.  */
+#define LBR_ELFMAJORID 6	/* Elf libraries (new index, new data).  */
+
 /* Offset of the first IDD.  */
 #define LHD_IDXDESC 196
 
@@ -158,33 +165,79 @@ struct vms_indexdef
   unsigned char parent[4];
 
   unsigned char fill_1[6];
+
+  /* The key field contains vms_idxdef/vms_idxdef2 structures, which are
+     simply a key (= a string) and a rfa.  */
   unsigned char keys[INDEXDEF__BLKSIZ];
 };
 
-/* Index keys.  */
-struct vms_idxdef
-{
-  unsigned char vbn[4];
-  unsigned char offset[2];
+/* An offset in a file.  */
 
-  unsigned char keylen;
-  unsigned char keyname[256];
+struct vms_rfa
+{
+  /* Logical block number, 1 based.
+     0 means that the field is absent.  Block size is 512.  */
+  unsigned char vbn[4];
+
+  /* Offset within the block.  */
+  unsigned char offset[2];
 };
 
-struct vms_idxdef2
-{
-  unsigned char vbn[4];
+/* Index keys.  For version 3.  */
 
+struct vms_idx
+{
   /* Offset from the start of the vbn, so minimum should be
      DATA__DATA (ie 6).  */
-  unsigned char offset[2];
+  struct vms_rfa rfa;
 
-  unsigned char keylen[2];
-  unsigned char fill_1;
+  unsigned char keylen;
+  /* The length of this field is in fact keylen.  */
   unsigned char keyname[256];
 };
 
+/* Index keys, for version 4 and later.  */
+
+struct vms_elfidx
+{
+  struct vms_rfa rfa;
+
+  unsigned char keylen[2];
+  unsigned char flags;
+  unsigned char keyname[256];
+};
+
+/* Flags of elfidx.  */
+
+#define ELFIDX__WEAK 0x01	/* Weak symbol.  */
+#define ELFIDX__GROUP 0x02	/* Group symbol.  */
+#define ELFIDX__LISTRFA 0x04	/* RFA field points to an LHS.  */
+#define ELFIDX__SYMESC 0x08	/* Long symbol.  */
+
 #define RFADEF__C_INDEX 0xffff
+
+/* List head structure.  That's what is pointed by rfa when LISTRFA flag
+   is set in elfidx.  */
+
+struct vms_lhs
+{
+  struct vms_rfa ng_g_rfa;	/* Non-group global.  */
+  struct vms_rfa ng_wk_rfa;	/* Non-group weak.  */
+  struct vms_rfa g_g_rfa;	/* Group global.  */
+  struct vms_rfa g_wk_rfa;	/* Group weak.  */
+  unsigned char flags;
+};
+
+/* List node structure.  Fields of LHS point to this structure.  */
+
+struct vms_lns
+{
+  /* Next node in the list.  */
+  struct vms_rfa nxtrfa;
+
+  /* Module associated with the key.  */
+  struct vms_rfa modrfa;
+};
 
 struct vms_datadef
 {
@@ -216,9 +269,15 @@ struct vms_mhd
   /* Ident or GSMATCH.  */
   unsigned char objidlng;
   unsigned char objid[31];
+
+  unsigned char pad1[3];
+  unsigned char otherefcnt[4];
+  unsigned char modsize[4];
+  unsigned char pad2[4];
 };
 
 #define MHD__C_MHDID 0xad	/* Value for id.  */
+#define MHD__C_MHDLEN 16	/* Fixed part length.  */
 #define MHD__C_USRDAT 16
 #define MHD__M_SELSRC 0x1
 #define MHD__M_OBJTIR 0x2
