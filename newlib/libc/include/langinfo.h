@@ -303,10 +303,11 @@ enum __nl_item
   /* This MUST be the last entry since it's used to check for an array
      index in nl_langinfo(). */
   _NL_LOCALE_EXTENDED_LAST_ENTRY
-};
 
 #endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
 #endif /* __HAVE_LOCALE_INFO__ */
+
+};
 
 __BEGIN_DECLS
 char	*nl_langinfo(nl_item);

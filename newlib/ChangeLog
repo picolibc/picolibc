@@ -1,3 +1,7 @@
+2010-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/langinfo.h: Fix #endif positioning.
+
 2010-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	Extend locale support to maintain wide char values of native strings
