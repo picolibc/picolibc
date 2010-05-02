@@ -1,3 +1,10 @@
+2010-05-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/wctob.c (wctob): Reorganize and fix WEOF check.  Rename
+	pwc to pmb and convert to array to avoid buffer overflow.  Rename c to
+	wc.  Check wc for WEOF instead of for EOF.  Return first byte of pmb if
+	__wctomb conversion returned exactly one byte, EOF otherwise.
+
 2010-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/langinfo.h: Fix #endif positioning.

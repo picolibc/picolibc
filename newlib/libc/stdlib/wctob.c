@@ -1,26 +1,24 @@
 #include <reent.h>
 #include <wchar.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "local.h"
 
 int
-wctob (wint_t c)
+wctob (wint_t wc)
 {
   mbstate_t mbs;
-  int retval = 0;
-  unsigned char pwc;
+  unsigned char pmb[MB_LEN_MAX];
+
+  if (wc == WEOF)
+    return EOF;
 
   /* Put mbs in initial state. */
   memset (&mbs, '\0', sizeof (mbs));
 
   _REENT_CHECK_MISC(_REENT);
 
-  retval = __wctomb (_REENT, &pwc, c, __locale_charset (), &mbs);
-
-  if (c == EOF || retval != 1)
-    return WEOF;
-  else
-    return (int)pwc;
+  return __wctomb (_REENT, (char *) pmb, wc, __locale_charset (), &mbs) == 1
+	  ? (int) pmb[0] : EOF;
 }
