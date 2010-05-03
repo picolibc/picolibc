@@ -25,10 +25,10 @@
 
 struct vms_dmt_header
 {
-  /* Address of the module.  */
+  /* Offset in the DST of the module.  */
   unsigned char modbeg[4];
 
-  /* Size of the module.  */
+  /* Size of the DST chunk for this module.  */
   unsigned char size[4];
 
   /* Number of psect for this module.  */
@@ -39,7 +39,10 @@ struct vms_dmt_header
 
 struct vms_dmt_psect
 {
+  /* Address of the psect.  */
   unsigned char start[4];
+
+  /* Length of the psect.  */
   unsigned char length[4];
 };
 #endif /* _VMS_DMT_H */
