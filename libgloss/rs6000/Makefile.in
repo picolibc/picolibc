@@ -125,7 +125,7 @@ XIL_SCRIPTS 	= xilinx.ld xilinx440.ld
 XIL_SPECS 	= 
 XIL_CRT0	= xil-crt0.o  xil-pgcrt0.o  xil-sim-crt0.o  xil-sim-pgcrt0.o
 XIL_BSP		= libxil.a
-XIL_OBJS	= open.o close.o lseek.o sbrk.o read.o write.o print.o xil-exit.o
+XIL_OBJS	= open.o close.o lseek.o sbrk.o read.o write.o print.o
 XIL_TEST	= xil-test
 XIL_INSTALL	= install-xil
 
@@ -311,8 +311,6 @@ mbx-exit.o: mbx-exit.c
 mbx-inbyte.o: mbx-inbyte.c
 mbx-outbyte.o: mbx-outbyte.c
 mbx-print.o: mbx-print.c
-
-xil-exit.o: xil-exit.c
 
 xil-crt0.o: xil-crt0.S
 	${CC} -c -o $@ $<
