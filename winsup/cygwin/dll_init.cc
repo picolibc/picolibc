@@ -22,6 +22,7 @@ details. */
 #include "exception.h"
 #include <wchar.h>
 #include <sys/reent.h>
+#include <assert.h>
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -118,29 +119,31 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
-      return d;		/* Return previously allocated pointer. */
     }
+  else
+    {
+      /* FIXME: Change this to new at some point. */
+      d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
 
-  /* FIXME: Change this to new at some point. */
-  d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
-
-  /* Now we've allocated a block of information.  Fill it in with the supplied
-     info about this DLL. */
-  d->count = 1;
-  wcscpy (d->name, name);
-  d->handle = h;
-  d->has_dtors = true;
-  d->p = p;
-  d->type = type;
-  if (end == NULL)
-    end = &start;	/* Point to "end" of dll chain. */
-  end->next = d;	/* Standard linked list stuff. */
-  d->next = NULL;
-  d->prev = end;
-  end = d;
-  tot++;
-  if (type == DLL_LOAD)
-    loaded_dlls++;
+      /* Now we've allocated a block of information.  Fill it in with the supplied
+	 info about this DLL. */
+      d->count = 1;
+      wcscpy (d->name, name);
+      d->handle = h;
+      d->has_dtors = true;
+      d->p = p;
+      d->type = type;
+      if (end == NULL)
+	end = &start;	/* Point to "end" of dll chain. */
+      end->next = d;	/* Standard linked list stuff. */
+      d->next = NULL;
+      d->prev = end;
+      end = d;
+      tot++;
+      if (type == DLL_LOAD)
+	loaded_dlls++;
+    }
+  assert (p->envptr != NULL);
   return d;
 }
 
