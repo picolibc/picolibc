@@ -412,9 +412,11 @@ do_codeset:
 	case D_MD_ORDER:        /* local extension */
 		ret = (char *) __get_current_time_locale()->md_order;
 		break;
+#ifdef __HAVE_LOCALE_INFO__
 	case _NL_CTYPE_MB_CUR_MAX:
 		ret = (char *) __get_current_ctype_locale()->mb_cur_max;
 		break;
+#endif
 	default:
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 		if (item > _NL_LOCALE_EXTENDED_FIRST_ENTRY

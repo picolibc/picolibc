@@ -22,8 +22,10 @@
  */
 
 #include <limits.h>
+#include <string.h>
 #include "lctype.h"
 #include "ldpart.h"
+#include "setlocale.h"
 
 #define LCCTYPE_SIZE (sizeof(struct lc_ctype_T) / sizeof(char *))
 
@@ -33,10 +35,11 @@ static const struct lc_ctype_T _C_ctype_locale = {
 	"ASCII",			/* codeset */
 	numone				/* mb_cur_max */
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	, "0", "1", "2", "3", "4",	/* outdigits */
-	"5", "6", "7", "8", "9",
-	L"0", L"1", L"2", L"3", L"4",	/* woutdigits */
-	L"5", L"6", L"7", L"8", L"9"
+	,
+	{ "0", "1", "2", "3", "4",	/* outdigits */
+	  "5", "6", "7", "8", "9" },
+	{ L"0", L"1", L"2", L"3", L"4",	/* woutdigits */
+	  L"5", L"6", L"7", L"8", L"9" }
 #endif
 };
 
@@ -79,11 +82,11 @@ __ctype_load_locale(const char *name, void *f_wctomb, const char *charset,
 	  _ctype_using_locale = 0;
 	else
 	  {
-	    _ctype_locale.codeset = _ctype_locale_buf;
-	    _ctype_locale.mb_cur_max = _ctype_locale_buf + _CTYPE_BUF_SIZE - 2;
-	    strcpy (_ctype_locale.codeset, charset);
-	    _ctype_locale.mb_cur_max[0] = mb_cur_max;
-	    _ctype_locale.mb_cur_max[1] = '\0';
+	    _ctype_locale.codeset = strcpy (_ctype_locale_buf, charset);
+	    char *mbc = _ctype_locale_buf + _CTYPE_BUF_SIZE - 2;
+	    mbc[0] = mb_cur_max;
+	    mbc[1] = '\0';
+	    _ctype_locale.mb_cur_max = mbc;
 	    _ctype_using_locale = 1;
 	  }
 	ret = 0;

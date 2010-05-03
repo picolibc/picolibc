@@ -1,3 +1,11 @@
+2010-05-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/locale/lctype.c: Include <string.h> and "setlocale.h".
+	(_C_ctype_locale): Add braces to initializer.
+	(__ctype_load_locale): Fix compiler warnings in non-Cygwin case.
+	* libc/locale/nl_langinfo.c (nl_langinfo): Expose _NL_CTYPE_MB_CUR_MAX
+	case only if __HAVE_LOCALE_INFO__ is defined.
+
 2010-05-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/wctob.c (wctob): Reorganize and fix WEOF check.  Rename
