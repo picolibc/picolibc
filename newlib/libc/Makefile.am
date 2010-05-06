@@ -151,69 +151,69 @@ libc.dvi: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
-	  echo "@set SIGNALS" >tmp.texi; \
+	  echo "@set SIGNALS" >tmp-sigset.texi; \
 	else \
-	  echo "@clear SIGNALS" >tmp.texi; \
+	  echo "@clear SIGNALS" >tmp-sigset.texi; \
 	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi sigset.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-sigset.texi sigset.texi
 	touch $@
 
 sigset.texi: stmp-sigset ; @true
 
 stmp-iconvset: config.status
 	if test -n "$(NEWLIB_ICONV_LIBS)"; then \
-	  echo "@set ICONV" >tmp.texi; \
+	  echo "@set ICONV" >tmp-iconvset.texi; \
 	else \
-	  echo "@clear ICONV" >tmp.texi; \
+	  echo "@clear ICONV" >tmp-iconvset.texi; \
 	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi iconvset.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-iconvset.texi iconvset.texi
 	touch $@
 
 iconvset.texi: stmp-iconvset ; @true
 
 stmp-extra: config.status
 	if test -n "$(LIBC_EXTRA_LIB)"; then \
-	  echo "@set EXTRA" >tmp.texi; \
+	  echo "@set EXTRA" >tmp-extra.texi; \
 	else \
-	  echo "@clear EXTRA" >tmp.texi; \
+	  echo "@clear EXTRA" >tmp-extra.texi; \
 	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi extra.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-extra.texi extra.texi
 	touch $@
 
 extra.texi: stmp-extra ; @true
 
 stmp-stdio64: config.status
 	if test -n "$(LIBC_STDIO64_LIB)"; then \
-	  echo "@set STDIO64" >tmp.texi; \
+	  echo "@set STDIO64" >tmp-stdio64.texi; \
 	else \
-	  echo "@clear STDIO64" >tmp.texi; \
+	  echo "@clear STDIO64" >tmp-stdio64.texi; \
 	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi stdio64.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-stdio64.texi stdio64.texi
 	touch $@
 
 stdio64.texi: stmp-stdio64 ; @true
 
 stmp-posix: config.status
 	if test -n "$(LIBC_POSIX_LIB)"; then \
-	  echo "@set POSIX" >tmp.texi; \
+	  echo "@set POSIX" >tmp-posix.texi; \
 	else \
-	  echo "@clear POSIX" >tmp.texi; \
+	  echo "@clear POSIX" >tmp-posix.texi; \
 	fi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi posix.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-posix.texi posix.texi
 	touch $@
 
 posix.texi: stmp-posix ; @true
 
 stmp-targetdep: force
-	rm -f tmp.texi
-	targetdoc=`pwd`/tmp.texi; \
+	rm -f tmp-targetdep.texi
+	targetdoc=`pwd`/tmp-targetdep.texi; \
 	for d in $(SUBDIRS); do \
 	  if test "$$d" != "."; then \
 	    (cd $$d && $(MAKE) TARGETDOC=$${targetdoc} doc) || exit 1; \
 	  fi; \
 	done
-	cat $(srcdir)/sys.tex >>tmp.texi
-	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi targetdep.tex
+	cat $(srcdir)/sys.tex >>tmp-targetdep.texi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp-targetdep.texi targetdep.tex
 	touch $@
 
 targetdep.tex: stmp-targetdep ; @true
@@ -229,7 +229,9 @@ force:
 
 CLEANFILES = $(CRT0) \
 	sigset.texi stmp-sigset extra.texi stmp-extra \
-	stdio64.texi stmp-stdio64 tmp.texi targetdep.tex stmp-targetdep
+	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
+	tmp-sigset.texi tmp-iconvset.texi tmp-extra.texi \
+	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi
 
 ACLOCAL_AMFLAGS = -I .. -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
