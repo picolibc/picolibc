@@ -1,3 +1,11 @@
+2010-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Drop setting sym.pflags before calling
+	mount_info::conv_to_win32_path since the flag value is overwritten by
+	mount_info::conv_to_win32_path anyway.
+	Set flags for DOS paths before calling symlink_info::check so they can
+	be used in that function already.
+
 2010-05-03  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dll_init.cc (dll_list::alloc): Add debugging assertion.

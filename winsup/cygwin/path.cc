@@ -705,13 +705,11 @@ path_conv::check (const char *src, unsigned opt,
 	  if (component)
 	    {
 	      suff = NULL;
-	      sym.pflags = 0;
 	      full_path = pathbuf;
 	    }
 	  else
 	    {
 	      suff = suffixes;
-	      sym.pflags = path_flags;
 	      full_path = THIS_path;
 	    }
 
@@ -818,6 +816,13 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path[3] = '\0';
 	    }
 
+	  /* If the incoming path was given in DOS notation, always treat
+	     it as caseinsensitive,noacl path.  This must be set before
+	     calling sym.check, otherwise the path is potentially treated
+	     casesensitive. */
+	  if (is_msdos)
+	    sym.pflags |= PATH_NOPOSIX | PATH_NOACL;
+
 	  symlen = sym.check (full_path, suff, opt, fs);
 
 is_virtual_symlink:
@@ -856,10 +861,6 @@ is_virtual_symlink:
 	         don't handle path casesensitive. */
 	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
 		path_flags |= PATH_NOPOSIX;
-	      /* If the incoming path was given in DOS notation, always treat
-	         it as caseinsensitive,noacl path. */
-	      else if (is_msdos)
-		path_flags |= PATH_NOPOSIX | PATH_NOACL;
 	      caseinsensitive = (path_flags & PATH_NOPOSIX)
 				? OBJ_CASE_INSENSITIVE : 0;
 	    }
