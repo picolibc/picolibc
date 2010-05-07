@@ -179,6 +179,8 @@ int spawn_guts (const char * prog_arg, const char *const *argv,
 /* dynamically loaded dll initialization */
 extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 
+void _pei386_runtime_relocator (per_process *);
+
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));

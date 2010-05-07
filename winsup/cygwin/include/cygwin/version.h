@@ -62,8 +62,11 @@ details. */
      /* Every version of cygwin <= this uses an old, incorrect method
 	to determine signal masks. */
 
+#define CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED(u) \
+  CYGWIN_VERSION_DLL_MAKE_COMBINED ((u)->api_major, (u)->api_minor)
+
 #define CYGWIN_VERSION_USER_API_VERSION_COMBINED \
-  CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor)
+  CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (user_data)
 
     /* API versions <= this had a termios structure whose members were
        too small to accomodate modern settings. */
@@ -97,6 +100,9 @@ details. */
 
 #define CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE \
   (CYGWIN_VERSION_USER_API_VERSION_COMBINED <= 209)
+
+#define CYGWIN_VERSION_USE_PSEUDO_RELOC_IN_DLL(u) \
+  (CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED (u) >= 227)
 
 #define CYGWIN_VERSION_CYGWIN_CONV 181
 
@@ -380,12 +386,13 @@ details. */
       224: Export xdr* functions.
       225: Export __xdr* functions.
       226: Export __locale_mb_cur_max.
+      227: Add pseudo_reloc_start, pseudo_reloc_end, image_base to per_process
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 226
+#define CYGWIN_VERSION_API_MINOR 227
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

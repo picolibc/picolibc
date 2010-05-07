@@ -75,7 +75,7 @@ dll::init ()
 {
   int ret = 1;
 
-  /* Why didn't we just import this variable? */
+  /* This should be a no-op.  Why didn't we just import this variable? */
   *(p.envptr) = __cygwin_environ;
 
   /* Don't run constructors or the "main" if we've forked. */
@@ -86,7 +86,7 @@ dll::init ()
 
       /* entry point of dll (use main of per_process with null args...) */
       if (p.main)
-	ret = (*(p.main)) (0, 0, 0);
+	ret = p.main (0, 0, 0);
     }
 
   return ret;
@@ -333,7 +333,10 @@ dll_dllcrt0_1 (VOID *x)
   if (p == NULL)
     p = &__cygwin_user_data;
   else
-    *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
+    {
+      *(p->impure_ptr_ptr) = __cygwin_user_data.impure_ptr;
+      _pei386_runtime_relocator (p);
+    }
 
   bool linked = !in_forkee && !cygwin_finished_initializing;
 

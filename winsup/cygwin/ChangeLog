@@ -1,3 +1,38 @@
+2010-05-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in (DLL_OFILES): Add pseudo-reloc.o.
+	* dcrt0.cc (child_info_fork::handle_fork): Call
+	_pei386_runtime_relocator here.
+	(dll_crt0_1): Ditto for non-fork case.
+	* dll_init.cc (dll::init): Complain more in comment.  Clean up
+	slightly.
+	(dll_dllcrt0_1): Call _pei386_runtime_relocator when we know we have
+	a filled-in per_process structure.
+	* globals.cc (__cygwin_user_data): Accommodate new fields for
+	_pei386_runtime_relocator.
+	* pseudo-reloc.cc: New file adapted from old lib/pseudo-reloc.c.
+	Include winsup.h directly.  Collapse #ifdef __CYGWIN__ into one block.
+	Perform minor whitespace code reformatting.
+	(__report_error): Use small_printf to output error.
+	(_pei386_runtime_relocator): Conditionalize for cygwin to take
+	per_process pointer parameter.
+	* winsup.h (_pei386_runtime_relocator): Declare.
+	* include/cygwin/version.h
+	(CYGWIN_VERSION_PER_PROCESS_API_VERSION_COMBINED): New macro.
+	(CYGWIN_VERSION_USER_API_VERSION_COMBINED): Use above macro.
+	(CYGWIN_VERSION_USE_PSEUDO_RELOC_IN_DLL): New macro.
+	(CYGWIN_VERSION_API_MINOR): Bump to 227.
+	* include/sys/cygwin.h: Remove obsolete comment.
+	(per_process::unused2): Shorten.
+	(per_process::pseudo_reloc_start): New field.
+	(per_process::pseudo_reloc_end): Ditto.
+	(per_process::image_base): Ditto.
+	* lib/_cygwin_crt0_common.cc: Declare pseudo runtime externs needed for
+	per_process structure.
+	(_cygwin_crt0_common): Fill in pseudo_reloc runtime constants.
+	* lib/pseudo-reloc-dummy.c: New file.  Dummy function to satisify ld.
+	* lib/pseudo-reloc.c: Delete.
+
 2010-05-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::init): Disable grabbing

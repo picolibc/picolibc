@@ -244,10 +244,6 @@ struct per_process
   /* For future expansion of values set by the app. */
   void (*premain[4]) (int, char **, struct per_process *);
 
-  /* The rest are *internal* to cygwin.dll.
-     Those that are here because we want the child to inherit the value from
-     the parent (which happens when bss is copied) are marked as such. */
-
   /* non-zero of ctors have been run.  Inherited from parent. */
   int run_ctors_p;
 
@@ -262,7 +258,10 @@ struct per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-  DWORD unused2[6];
+  DWORD unused2[3];
+  void *pseudo_reloc_start;
+  void *pseudo_reloc_end;
+  void *image_base;
 
 #if defined (__INSIDE_CYGWIN__) && defined (__cplusplus)
   MTinterface *threadinterface;

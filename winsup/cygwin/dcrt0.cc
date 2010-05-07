@@ -41,7 +41,6 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
-
 extern "C" void cygwin_exit (int) __attribute__ ((noreturn));
 extern "C" void __sinit (_reent *);
 
@@ -592,6 +591,12 @@ child_info_fork::handle_fork ()
 	      "dll bss", dll_bss_start, dll_bss_end,
 	      "user heap", cygheap->user_heap.base, cygheap->user_heap.ptr,
 	      NULL);
+
+  /* Do the relocations here.  These will actually likely be overwritten by the
+     below child_copy but we do them here in case there is a read-only section
+     which does not get copied by fork. */
+  _pei386_runtime_relocator (user_data);
+
   /* step 2 now that the dll has its heap filled in, we can fill in the
      user's data and bss since user_data is now filled out. */
   child_copy (parent, false,
@@ -794,7 +799,10 @@ dll_crt0_1 (void *)
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
   if (!in_forkee)
-    pthread::init_mainthread ();
+    {
+      pthread::init_mainthread ();
+      _pei386_runtime_relocator (user_data);
+    }
 
 #ifdef DEBUGGING
   strace.microseconds ();

@@ -15,24 +15,22 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#include <windows.h>
+#ifndef __CYGWIN__
+# include "windows.h"
+# define NO_COPY
+#else
+# include "winsup.h"
+# include <wchar.h>
+# include <ntdef.h>
+# include <sys/cygwin.h>
+/* custom status code: */
+# define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <memory.h>
-
-#if defined(__CYGWIN__)
-#include <wchar.h>
-#include <ntdef.h>
-#include <sys/cygwin.h>
-/* copied from winsup.h */
-# define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
-/* custom status code: */
-#define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
-#define SHORT_MSG_BUF_SZ 128
-#else
-# define NO_COPY
-#endif
 
 #ifdef __GNUC__
 #define ATTRIBUTE_NORETURN __attribute__ ((noreturn))
@@ -47,8 +45,6 @@
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
 extern char __RUNTIME_PSEUDO_RELOC_LIST_END__;
 extern char __MINGW_LSYMBOL(_image_base__);
-
-void _pei386_runtime_relocator (void);
 
 /* v1 relocation is basically:
  *   *(base + .target) += .addend
@@ -90,55 +86,32 @@ __report_error (const char *msg, ...)
    * normal win32 console IO handles, redirected ones, and
    * cygwin ptys.
    */
-  char buf[SHORT_MSG_BUF_SZ];
+  char buf[128];
   wchar_t module[MAX_PATH];
   char * posix_module = NULL;
-  static const char   UNKNOWN_MODULE[] = "<unknown module>: ";
-  static const size_t UNKNOWN_MODULE_LEN = sizeof (UNKNOWN_MODULE) - 1;
-  static const char   CYGWIN_FAILURE_MSG[] = "Cygwin runtime failure: ";
-  static const size_t CYGWIN_FAILURE_MSG_LEN = sizeof (CYGWIN_FAILURE_MSG) - 1;
-  DWORD len;
-  DWORD done;
-  va_list args;
+  static const char UNKNOWN_MODULE[] = "<unknown module>: ";
+  static const char CYGWIN_FAILURE_MSG[] = "Cygwin runtime failure: ";
   HANDLE errh = GetStdHandle (STD_ERROR_HANDLE);
   ssize_t modulelen = GetModuleFileNameW (NULL, module, sizeof (module));
+  va_list args;
 
+  /* FIXME: cleanup further to avoid old use of cygwin_internal */
   if (errh == INVALID_HANDLE_VALUE)
-    cygwin_internal (CW_EXIT_PROCESS,
-                     STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION,
-                     1);
+    cygwin_internal (CW_EXIT_PROCESS, STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION, 1);
 
   if (modulelen > 0)
-    posix_module = cygwin_create_path (CCP_WIN_W_TO_POSIX, module);
+    posix_module = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, module);
 
   va_start (args, msg);
-  len = (DWORD) vsnprintf (buf, SHORT_MSG_BUF_SZ, msg, args);
+  vsnprintf (buf, sizeof (buf), msg, args);
   va_end (args);
-  buf[SHORT_MSG_BUF_SZ-1] = '\0'; /* paranoia */
+  buf[sizeof (buf) - 1] = '\0'; /* paranoia */
 
+  small_printf ("%s%s: %s\n", CYGWIN_FAILURE_MSG, posix_module ?: UNKNOWN_MODULE, buf);
   if (posix_module)
-    {
-      WriteFile (errh, (PCVOID)CYGWIN_FAILURE_MSG,
-                 CYGWIN_FAILURE_MSG_LEN, &done, NULL);
-      WriteFile (errh, (PCVOID)posix_module,
-                 strlen(posix_module), &done, NULL);
-      WriteFile (errh, (PCVOID)": ", 2, &done, NULL);
-      WriteFile (errh, (PCVOID)buf, len, &done, NULL);
-      free (posix_module);
-    }
-  else
-    {
-      WriteFile (errh, (PCVOID)CYGWIN_FAILURE_MSG,
-                 CYGWIN_FAILURE_MSG_LEN, &done, NULL);
-      WriteFile (errh, (PCVOID)UNKNOWN_MODULE,
-                 UNKNOWN_MODULE_LEN, &done, NULL);
-      WriteFile (errh, (PCVOID)buf, len, &done, NULL);
-    }
-  WriteFile (errh, (PCVOID)"\n", 1, &done, NULL);
+    free (posix_module);
 
-  cygwin_internal (CW_EXIT_PROCESS,
-                   STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION,
-                   1);
+  cygwin_internal (CW_EXIT_PROCESS, STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION, 1);
   /* not reached, but silences noreturn warning */
   abort ();
 #else
@@ -177,10 +150,10 @@ __write_memory (void *addr, const void *src, size_t len)
   if (!len)
     return;
 
-  if (!VirtualQuery (addr, &b, sizeof(b)))
+  if (!VirtualQuery (addr, &b, sizeof (b)))
     {
       __report_error ("  VirtualQuery failed for %d bytes at address %p",
-		      (int) sizeof(b), addr);
+		      (int) sizeof (b), addr);
     }
 
   /* Temporarily allow write access to read-only protected memory.  */
@@ -259,7 +232,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
 	  DWORD newval;
 	  reloc_target = (ptrdiff_t) base + o->target;
 	  newval = (*((DWORD*) reloc_target)) + o->addend;
-	  __write_memory ((void *) reloc_target, &newval, sizeof(DWORD));
+	  __write_memory ((void *) reloc_target, &newval, sizeof (DWORD));
 	}
       return;
     }
@@ -300,33 +273,33 @@ do_pseudo_reloc (void * start, void * end, void * base)
        */
       switch ((r->flags & 0xff))
         {
-          case 8:
-	    reldata = (ptrdiff_t) (*((unsigned char *)reloc_target));
-	    if ((reldata & 0x80) != 0)
-	      reldata |= ~((ptrdiff_t) 0xff);
-	    break;
-	  case 16:
-	    reldata = (ptrdiff_t) (*((unsigned short *)reloc_target));
-	    if ((reldata & 0x8000) != 0)
-	      reldata |= ~((ptrdiff_t) 0xffff);
-	    break;
-	  case 32:
-	    reldata = (ptrdiff_t) (*((unsigned int *)reloc_target));
+	case 8:
+	  reldata = (ptrdiff_t) (*((unsigned char *)reloc_target));
+	  if ((reldata & 0x80) != 0)
+	    reldata |= ~((ptrdiff_t) 0xff);
+	  break;
+	case 16:
+	  reldata = (ptrdiff_t) (*((unsigned short *)reloc_target));
+	  if ((reldata & 0x8000) != 0)
+	    reldata |= ~((ptrdiff_t) 0xffff);
+	  break;
+	case 32:
+	  reldata = (ptrdiff_t) (*((unsigned int *)reloc_target));
 #ifdef _WIN64
-	    if ((reldata & 0x80000000) != 0)
-	      reldata |= ~((ptrdiff_t) 0xffffffff);
+	  if ((reldata & 0x80000000) != 0)
+	    reldata |= ~((ptrdiff_t) 0xffffffff);
 #endif
-	    break;
+	  break;
 #ifdef _WIN64
-	  case 64:
-	    reldata = (ptrdiff_t) (*((unsigned long long *)reloc_target));
-	    break;
+	case 64:
+	  reldata = (ptrdiff_t) (*((unsigned long long *)reloc_target));
+	  break;
 #endif
-	  default:
-	    reldata=0;
-	    __report_error ("  Unknown pseudo relocation bit size %d.\n",
-		    (int) (r->flags & 0xff));
-	    break;
+	default:
+	  reldata=0;
+	  __report_error ("  Unknown pseudo relocation bit size %d.\n",
+		  (int) (r->flags & 0xff));
+	  break;
         }
 
       /* Adjust the relocation value */
@@ -336,25 +309,33 @@ do_pseudo_reloc (void * start, void * end, void * base)
       /* Write the new relocation value back to *reloc_target */
       switch ((r->flags & 0xff))
 	{
-         case 8:
-           __write_memory ((void *) reloc_target, &reldata, 1);
-	   break;
-	 case 16:
-           __write_memory ((void *) reloc_target, &reldata, 2);
-	   break;
-	 case 32:
-           __write_memory ((void *) reloc_target, &reldata, 4);
-	   break;
+	case 8:
+	  __write_memory ((void *) reloc_target, &reldata, 1);
+	  break;
+	case 16:
+	  __write_memory ((void *) reloc_target, &reldata, 2);
+	  break;
+	case 32:
+	  __write_memory ((void *) reloc_target, &reldata, 4);
+	  break;
 #ifdef _WIN64
-	 case 64:
-           __write_memory ((void *) reloc_target, &reldata, 8);
-	   break;
+	case 64:
+	  __write_memory ((void *) reloc_target, &reldata, 8);
+	  break;
 #endif
 	}
      }
 }
 
+#ifdef __CYGWIN__
 void
+_pei386_runtime_relocator (per_process *u)
+{
+  if (CYGWIN_VERSION_USE_PSEUDO_RELOC_IN_DLL (u))
+    do_pseudo_reloc (u->pseudo_reloc_start, u->pseudo_reloc_end, u->image_base);
+}
+#else
+extern "C" void
 _pei386_runtime_relocator (void)
 {
   static NO_COPY int was_init = 0;
@@ -365,3 +346,4 @@ _pei386_runtime_relocator (void)
 		   &__RUNTIME_PSEUDO_RELOC_LIST_END__,
 		   &__MINGW_LSYMBOL(_image_base__));
 }
+#endif
