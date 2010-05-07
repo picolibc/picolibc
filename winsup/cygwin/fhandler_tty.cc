@@ -719,7 +719,7 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
     flags = O_RDWR;
 
   int ret = open (flags);
-  if (ret && !cygwin_finished_initializing)
+  if (ret && !cygwin_finished_initializing && !IsDebuggerPresent ())
     {
       /* This only occurs when called from dtable::init_std_file_from_handle
 	 We have been started from a non-Cygwin process.  So we should become
