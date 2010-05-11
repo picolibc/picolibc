@@ -882,9 +882,11 @@ restart:
     case LC_TIME:
       ret = __time_load_locale (locale, (void *) l_wctomb, charset);
       break;
+#endif /* __HAVE_LOCALE_INFO__ */
     default:
       break;
     }
+#ifdef __HAVE_LOCALE_INFO__
   if (ret)
     FAIL;
 #endif /* __HAVE_LOCALE_INFO__ */

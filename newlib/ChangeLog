@@ -1,3 +1,9 @@
+2010-05-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/locale/locale.c (loadlocale): Fix dangling
+	switch statement caused by __HAVE_LOCALE_INFO__ not being
+	defined.
+
 2010-05-11  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/string/strsignal.c: New file.
