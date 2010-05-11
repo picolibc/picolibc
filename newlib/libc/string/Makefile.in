@@ -71,23 +71,24 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-strncmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
 	lib_a-strnlen.$(OBJEXT) lib_a-strpbrk.$(OBJEXT) \
 	lib_a-strrchr.$(OBJEXT) lib_a-strsep.$(OBJEXT) \
-	lib_a-strspn.$(OBJEXT) lib_a-strtok.$(OBJEXT) \
-	lib_a-strtok_r.$(OBJEXT) lib_a-strupr.$(OBJEXT) \
-	lib_a-strxfrm.$(OBJEXT) lib_a-strstr.$(OBJEXT) \
-	lib_a-swab.$(OBJEXT) lib_a-u_strerr.$(OBJEXT) \
-	lib_a-wcscat.$(OBJEXT) lib_a-wcschr.$(OBJEXT) \
-	lib_a-wcscmp.$(OBJEXT) lib_a-wcscoll.$(OBJEXT) \
-	lib_a-wcscpy.$(OBJEXT) lib_a-wcscspn.$(OBJEXT) \
-	lib_a-wcslcat.$(OBJEXT) lib_a-wcslcpy.$(OBJEXT) \
-	lib_a-wcslen.$(OBJEXT) lib_a-wcsncat.$(OBJEXT) \
-	lib_a-wcsncmp.$(OBJEXT) lib_a-wcsncpy.$(OBJEXT) \
-	lib_a-wcsnlen.$(OBJEXT) lib_a-wcspbrk.$(OBJEXT) \
-	lib_a-wcsrchr.$(OBJEXT) lib_a-wcsspn.$(OBJEXT) \
-	lib_a-wcsstr.$(OBJEXT) lib_a-wcstok.$(OBJEXT) \
-	lib_a-wcswidth.$(OBJEXT) lib_a-wcsxfrm.$(OBJEXT) \
-	lib_a-wcwidth.$(OBJEXT) lib_a-wmemchr.$(OBJEXT) \
-	lib_a-wmemcmp.$(OBJEXT) lib_a-wmemcpy.$(OBJEXT) \
-	lib_a-wmemmove.$(OBJEXT) lib_a-wmemset.$(OBJEXT)
+	lib_a-strsignal.$(OBJEXT) lib_a-strspn.$(OBJEXT) \
+	lib_a-strtok.$(OBJEXT) lib_a-strtok_r.$(OBJEXT) \
+	lib_a-strupr.$(OBJEXT) lib_a-strxfrm.$(OBJEXT) \
+	lib_a-strstr.$(OBJEXT) lib_a-swab.$(OBJEXT) \
+	lib_a-u_strerr.$(OBJEXT) lib_a-wcscat.$(OBJEXT) \
+	lib_a-wcschr.$(OBJEXT) lib_a-wcscmp.$(OBJEXT) \
+	lib_a-wcscoll.$(OBJEXT) lib_a-wcscpy.$(OBJEXT) \
+	lib_a-wcscspn.$(OBJEXT) lib_a-wcslcat.$(OBJEXT) \
+	lib_a-wcslcpy.$(OBJEXT) lib_a-wcslen.$(OBJEXT) \
+	lib_a-wcsncat.$(OBJEXT) lib_a-wcsncmp.$(OBJEXT) \
+	lib_a-wcsncpy.$(OBJEXT) lib_a-wcsnlen.$(OBJEXT) \
+	lib_a-wcspbrk.$(OBJEXT) lib_a-wcsrchr.$(OBJEXT) \
+	lib_a-wcsspn.$(OBJEXT) lib_a-wcsstr.$(OBJEXT) \
+	lib_a-wcstok.$(OBJEXT) lib_a-wcswidth.$(OBJEXT) \
+	lib_a-wcsxfrm.$(OBJEXT) lib_a-wcwidth.$(OBJEXT) \
+	lib_a-wmemchr.$(OBJEXT) lib_a-wmemcmp.$(OBJEXT) \
+	lib_a-wmemcpy.$(OBJEXT) lib_a-wmemmove.$(OBJEXT) \
+	lib_a-wmemset.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
@@ -113,11 +114,11 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	strdup.lo strdup_r.lo strerror.lo strerror_r.lo strlcat.lo \
 	strlcpy.lo strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
 	strncmp.lo strncpy.lo strnlen.lo strpbrk.lo strrchr.lo \
-	strsep.lo strspn.lo strtok.lo strtok_r.lo strupr.lo strxfrm.lo \
-	strstr.lo swab.lo u_strerr.lo wcscat.lo wcschr.lo wcscmp.lo \
-	wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo wcslcpy.lo \
-	wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo wcsnlen.lo \
-	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
+	strsep.lo strsignal.lo strspn.lo strtok.lo strtok_r.lo \
+	strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo wcscat.lo \
+	wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo \
+	wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo \
+	wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
 	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
 	wmemcpy.lo wmemmove.lo wmemset.lo
 @ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
@@ -327,6 +328,7 @@ GENERAL_SOURCES = \
 	strpbrk.c \
 	strrchr.c \
 	strsep.c \
+	strsignal.c \
 	strspn.c \
 	strtok.c \
 	strtok_r.c \
@@ -400,7 +402,7 @@ index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
-memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def \
+memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def strsignal.def \
 wcscasecmp.def	wcscat.def	wcschr.def	wcscmp.def wcscoll.def \
 wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def wcsdup.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncasecmp.def wcsncat.def \
@@ -673,6 +675,12 @@ lib_a-strsep.o: strsep.c
 
 lib_a-strsep.obj: strsep.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strsep.obj `if test -f 'strsep.c'; then $(CYGPATH_W) 'strsep.c'; else $(CYGPATH_W) '$(srcdir)/strsep.c'; fi`
+
+lib_a-strsignal.o: strsignal.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strsignal.o `test -f 'strsignal.c' || echo '$(srcdir)/'`strsignal.c
+
+lib_a-strsignal.obj: strsignal.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strsignal.obj `if test -f 'strsignal.c'; then $(CYGPATH_W) 'strsignal.c'; else $(CYGPATH_W) '$(srcdir)/strsignal.c'; fi`
 
 lib_a-strspn.o: strspn.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strspn.o `test -f 'strspn.c' || echo '$(srcdir)/'`strspn.c

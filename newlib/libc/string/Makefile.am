@@ -37,6 +37,7 @@ GENERAL_SOURCES = \
 	strpbrk.c \
 	strrchr.c \
 	strsep.c \
+	strsignal.c \
 	strspn.c \
 	strtok.c \
 	strtok_r.c \
@@ -129,7 +130,7 @@ index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strcasestr.def	strlwr.def  strupr.def \
-memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def \
+memccpy.def 	mempcpy.def	stpcpy.def	stpncpy.def strsignal.def \
 wcscasecmp.def	wcscat.def	wcschr.def	wcscmp.def wcscoll.def \
 wcscpy.def	wcscspn.def	wcpcpy.def	wcpncpy.def wcsdup.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncasecmp.def wcsncat.def \

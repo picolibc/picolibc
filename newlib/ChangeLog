@@ -1,3 +1,10 @@
+2010-05-11  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/string/strsignal.c: New file.
+	* libc/string/Makefile.am: Add support for strsignal.
+	* libc/string/strings.tex: Ditto.
+	* libc/string/Makefile.in: Regenerated.
+
 2010-05-05  DJ Delorie  <dj@redhat.com>
 
 	* libc/Makefile.am (stmp-sigset, stmp-iconvset, stmp-extra,
