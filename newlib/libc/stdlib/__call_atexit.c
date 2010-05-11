@@ -12,7 +12,7 @@
 void free(void *) _ATTRIBUTE((__weak__));
 
 #ifndef __SINGLE_THREAD__
-extern _LOCK_T __atexit_lock;
+extern _LOCK_RECURSIVE_T __atexit_lock;
 #endif
 
 /*

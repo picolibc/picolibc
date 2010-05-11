@@ -1,5 +1,10 @@
 2010-05-11  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdlib/__call_atexit.c: Fix lock to be of type
+	_LOCK_RECURSIVE_T as recursive usage is needed.
+
+2010-05-11  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/locale/locale.c (loadlocale): Fix dangling
 	switch statement caused by __HAVE_LOCALE_INFO__ not being
 	defined.
