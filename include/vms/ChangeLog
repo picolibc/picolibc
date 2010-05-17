@@ -1,3 +1,8 @@
+2010-05-17  Tristan Gingold  <gingold@adacore.com>
+
+	* eidc.h: New file.
+	* esgps.h: New file.
+
 2010-05-03  Tristan Gingold  <gingold@adacore.com>
 
 	* dmt.h: Improve comments.
