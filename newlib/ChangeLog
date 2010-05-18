@@ -1,3 +1,8 @@
+2010-05-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* libc/string/strsignal.c (strsignal): Avoid duplicate case statement
+	where SIGPWR == SIGLOST.
+
 2010-05-11  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/__call_atexit.c: Fix lock to be of type

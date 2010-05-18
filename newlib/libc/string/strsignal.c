@@ -242,7 +242,7 @@ _DEFUN (strsignal, (signal),
       buffer = "Profiling timer expired";
       break;
 #endif
-#ifdef SIGLOST
+#if defined(SIGLOST) && SIGLOST != SIGPWR
     case SIGLOST:
       buffer = "Resource lost";
       break;
