@@ -51,7 +51,6 @@
 
 /* Section flags.  */
 
-#define SHF_EXCLUDE		0x80000000	/* exclude from linking */
 #define SHF_ORDERED		0x40000000	/* treat sh_link,sh_info specially */
 
 /* Symbol types.  */

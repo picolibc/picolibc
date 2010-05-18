@@ -1,3 +1,13 @@
+2010-05-18  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/11600
+	* common.h (SHF_EXCLUDE): New.
+
+	* i370.h (SHF_EXCLUDE): Removed.
+	* or32.h (SHF_EXCLUDE): Likewise.
+	* ppc.h (SHF_EXCLUDE): Likewise.
+	* sparc.h (SHF_EXCLUDE): Likewise.
+
 2010-04-23  Alan Modra  <amodra@gmail.com>
 
 	* internal.h (ELF_SECTION_SIZE): Protect macro args with parentheses.

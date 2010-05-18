@@ -36,14 +36,6 @@
 
 #define	EF_I370_RELOCATABLE	0x00010000	/* i370 -mrelocatable flag */
 #define	EF_I370_RELOCATABLE_LIB	0x00008000	/* i370 -mrelocatable-lib flag */
-/* Processor specific section flags, sh_flags field */
-
-#define SHF_EXCLUDE		0x80000000	/* Link editor is to exclude \
-						   this section from executable \
-						   and shared objects that it \
-						   builds when those objects \
-						   are not to be furhter \
-						   relocated.  */
 
 /* i370 relocations
    Note that there is really just one relocation that we currently

@@ -502,6 +502,15 @@
 #define SHF_MASKOS	0x0FF00000	/* New value, Oct 4, 1999 Draft */
 #define SHF_MASKPROC	0xF0000000	/* Processor-specific semantics */
 
+/* This used to be implemented as a processor specific section flag.
+   We just make it generic.  */
+#define SHF_EXCLUDE	0x80000000	/* Link editor is to exclude
+					   this section from executable
+					   and shared library that it
+					   builds when those objects
+					   are not to be further
+					   relocated.  */
+
 /* Values of note segment descriptor types for core files.  */
 
 #define NT_PRSTATUS	1		/* Contains copy of prstatus struct */

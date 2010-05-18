@@ -53,11 +53,4 @@ END_RELOC_NUMBERS (R_OR32_max)
 						   specified in the associated \
 						   symbol table entry.  */
 
-/* Processor specific section flags, sh_flags field */
-#define SHF_EXCLUDE		0x80000000	/* Link editor is to exclude \
-						   this section from executable \
-						   and shared objects that it \
-						   builds when those objects \
-						   are not to be furhter \
-						   relocated.  */
 #endif /* _ELF_OR1K_H */
