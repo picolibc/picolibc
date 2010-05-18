@@ -123,7 +123,7 @@ reg_key::get_int (const char *name, int def)
 }
 
 int
-reg_key::get_int (const PWCHAR name, int def)
+reg_key::get_int (const WCHAR *name, int def)
 {
   DWORD type;
   DWORD dst;
@@ -185,7 +185,7 @@ reg_key::get_string (const char *name, char *dst, size_t max, const char *def)
 }
 
 int
-reg_key::get_string (const PWCHAR name, PWCHAR dst, size_t max, const PWCHAR def)
+reg_key::get_string (const WCHAR *name, PWCHAR dst, size_t max, const WCHAR *def)
 {
   DWORD size = max;
   DWORD type;

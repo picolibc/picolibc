@@ -130,24 +130,21 @@ open_stackdumpfile ()
 {
   if (myself->progname[0])
     {
-      const char *p;
+      const WCHAR *p;
       /* write to progname.stackdump if possible */
       if (!myself->progname[0])
-	p = "unknown";
-      else if ((p = strrchr (myself->progname, '\\')))
+	p = L"unknown";
+      else if ((p = wcsrchr (myself->progname, L'\\')))
 	p++;
       else
 	p = myself->progname;
 
-      WCHAR corefile[strlen (p) + sizeof (".stackdump")];
+      WCHAR corefile[wcslen (p) + sizeof (".stackdump")];
+      wcscpy(corefile, p);
       UNICODE_STRING ucore;
       OBJECT_ATTRIBUTES attr;
       /* Create the UNICODE variation of <progname>.stackdump. */
-      RtlInitEmptyUnicodeString (&ucore, corefile,
-				 sizeof corefile - sizeof (WCHAR));
-      ucore.Length = sys_mbstowcs (ucore.Buffer,
-				   ucore.MaximumLength / sizeof (WCHAR),
-				   p, strlen (p)) * sizeof (WCHAR);
+      RtlInitUnicodeString (&ucore, corefile);
       RtlAppendUnicodeToString (&ucore, L".stackdump");
       /* Create an object attribute which refers to <progname>.stackdump
 	 in Cygwin's cwd.  Stick to caseinsensitivity. */

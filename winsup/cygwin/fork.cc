@@ -342,13 +342,8 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  /* FIXME: myself->progname should be converted to WCHAR. */
-  tmp_pathbuf tp;
-  PWCHAR progname = tp.w_get ();
-  sys_mbstowcs (progname, NT_MAX_PATH, myself->progname);
-
   syscall_printf ("CreateProcess (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
-		  progname, progname, c_flags, &si, &pi);
+		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
 
@@ -358,8 +353,8 @@ frok::parent (volatile char * volatile stack_here)
 
   while (1)
     {
-      rc = CreateProcessW (progname, /* image to run */
-			   progname, /* what we send in arg0 */
+      rc = CreateProcessW (myself->progname, /* image to run */
+			   myself->progname, /* what we send in arg0 */
 			   &sec_none_nih,
 			   &sec_none_nih,
 			   TRUE,	  /* inherit handles from parent */
@@ -430,7 +425,7 @@ frok::parent (volatile char * volatile stack_here)
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
-  strcpy (child->progname, myself->progname);
+  wcscpy (child->progname, myself->progname);
 
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;

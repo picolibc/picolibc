@@ -32,9 +32,9 @@ public:
   HKEY get_key ();
 
   int get_int (const char *, int);
-  int get_int (const PWCHAR, int);
+  int get_int (const WCHAR *, int);
   int get_string (const char *, char *, size_t, const char *);
-  int get_string (const PWCHAR, PWCHAR, size_t, const PWCHAR);
+  int get_string (const WCHAR *, PWCHAR, size_t, const WCHAR *);
 
   int set_int (const char *, int);
   int set_int (const PWCHAR, int);

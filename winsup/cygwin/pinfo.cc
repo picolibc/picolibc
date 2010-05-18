@@ -39,7 +39,7 @@ public:
 pinfo_basic::pinfo_basic()
 {
   pid = dwProcessId = GetCurrentProcessId ();
-  GetModuleFileName (NULL, progname, sizeof (progname));
+  GetModuleFileNameW (NULL, progname, sizeof (progname));
 }
 
 pinfo_basic myself_initial NO_COPY;
@@ -62,7 +62,7 @@ pinfo::thisproc (HANDLE h)
   init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
   procinfo->process_state |= PID_IN_USE;
   procinfo->dwProcessId = myself_initial.pid;
-  strcpy (procinfo->progname, myself_initial.progname);
+  wcscpy (procinfo->progname, myself_initial.progname);
   strace.hello ();
   debug_printf ("myself->dwProcessId %u", procinfo->dwProcessId);
   if (h)
@@ -121,7 +121,9 @@ status_exit (DWORD x)
     case STATUS_DLL_NOT_FOUND:
       {
 	char posix_prog[NT_MAX_PATH];
-	path_conv pc (myself->progname, PC_NOWARN);
+	UNICODE_STRING uc;
+	RtlInitUnicodeString(&uc, myself->progname);
+	path_conv pc (&uc, PC_NOWARN);
 	mount_table->conv_to_posix_path (pc.get_win32 (), posix_prog, 1);
 	small_printf ("%s: error while loading shared libraries: %s: cannot open shared object file: No such file or directory\n",
 		      posix_prog, find_first_notloaded_dll (pc));

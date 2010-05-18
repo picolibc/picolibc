@@ -29,6 +29,7 @@ details. */
 #include "registry.h"
 #include "environ.h"
 #include "child_info.h"
+#include "ntdll.h"
 
 extern bool dos_file_warning;
 extern bool ignore_case_with_glob;
@@ -698,18 +699,24 @@ parse_options (char *buf)
 
 /* Set options from the registry. */
 static bool __stdcall
-regopt (const char *name, char *buf)
+regopt (const WCHAR *name, char *buf)
 {
   bool parsed_something = false;
-  char lname[strlen (name) + 1];
-  strlwr (strcpy (lname, name));
+  UNICODE_STRING lname;
+  size_t len = (wcslen(name) + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString(&lname, (PWCHAR) alloca (len), len);
+  wcscpy(lname.Buffer, name);
+  RtlDowncaseUnicodeString(&lname, &lname, FALSE);
 
   for (int i = 0; i < 2; i++)
     {
       reg_key r (i, KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
 
-      if (r.get_string (lname, buf, NT_MAX_PATH, "") == ERROR_SUCCESS)
+      if (r.get_string (lname.Buffer, (PWCHAR) buf, NT_MAX_PATH, L"") == ERROR_SUCCESS)
 	{
+	  char *newp;
+	  sys_wcstombs_alloc(&newp, HEAP_NOTHEAP, (PWCHAR) buf);
+	  strcpy(buf, newp);
 	  parse_options (buf);
 	  parsed_something = true;
 	  break;
@@ -747,7 +754,7 @@ environ_init (char **envp, int envc)
       }
 
   char *tmpbuf = tp.t_get ();
-  got_something_from_registry = regopt ("default", tmpbuf);
+  got_something_from_registry = regopt (L"default", tmpbuf);
   if (myself->progname[0])
     got_something_from_registry = regopt (myself->progname, tmpbuf)
 				  || got_something_from_registry;

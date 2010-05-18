@@ -1,3 +1,29 @@
+2010-05-18  Kazuhiro Fujida  <fujieda@acm.org>
+
+	* environ.cc (regopt): Change the first argument to wide char string.
+	(environ_init): Accommodate change to the first argument of regopt.
+	* exception.cc (open_stackdumpfile): Accommodate change to the type of
+	progname in _pinfo.
+	* external.cc (fillout_pinfo): Ditto.
+	* fhandler_process.cc (format_process_winexename): Ditto.
+	(format_process_stat): Ditto.
+	* fork.cc (fork::parent): Ditto.
+	* pinfo.cc (pinfo_basic::pinfo_basic): Call GetModuleFileNameW instead
+	of GetModuleFileName.
+	(pinfo::thisproc): Accommodate change to the type of progname in
+	_pinfo.
+	(pinfo_init): Ditto.
+	* pinfo.h (_pinfo): Change the type of progname to a wide char array.
+	* registry.h (reg_key::get_int): Change the first argument from
+	constant point to pointer to constant.
+	(reg_key::get_string): Ditto.  Change the last argument likewise.
+	* registry.cc (reg_key::get_int): Accommodate change to the
+	declaration.
+	(reg_key::get_string): Ditto.
+	* strace.cc (strace::hello): Accommodate change to the type of progname
+	in _pinfo.
+	(strace::vsprntf): Ditto.
+
 2010-05-07  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* Makefile.in (DLL_OFILES): Add pseudo-reloc.o.

@@ -52,11 +52,11 @@ strace::hello ()
 	__small_sprintf (pidbuf, "(pid %d, ppid %d)", myself->pid, myself->ppid ?: 1);
       else
 	{
-	  GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
+	  GetModuleFileNameW (NULL, myself->progname, sizeof (myself->progname));
 	  __small_sprintf (pidbuf, "(windows pid %d)", GetCurrentProcessId ());
 	}
       prntf (1, NULL, "**********************************************");
-      prntf (1, NULL, "Program name: %s %s", myself->progname, pidbuf);
+      prntf (1, NULL, "Program name: %W %s", myself->progname, pidbuf);
       prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
 	     user_data->dll_major, user_data->dll_minor,
 	     user_data->api_major, user_data->api_minor);
@@ -135,7 +135,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   int microsec = microseconds ();
   lmicrosec = microsec;
 
-  __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %s%s");
+  __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%W %s%s");
 
   SetLastError (err);
 
@@ -143,34 +143,32 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
     count = 0;
   else
     {
-      char *pn;
+      PWCHAR pn = NULL;
+      WCHAR progname[NT_MAX_PATH];
       if (!cygwin_finished_initializing)
-	pn = myself ? myself->progname : NULL;
+	pn = (myself) ? myself->progname : NULL;
       else if (__progname)
-	pn = __progname;
-      else
-	pn = NULL;
+	sys_mbstowcs(pn = progname, NT_MAX_PATH, __progname);
 
-      char *p;
-      char progname[NT_MAX_PATH];
+      PWCHAR p;
       if (!pn)
-	GetModuleFileName (NULL, pn = progname, sizeof (progname));
+	GetModuleFileNameW (NULL, pn = progname, sizeof (progname));
       if (!pn)
 	/* hmm */;
-      else if ((p = strrchr (pn, '\\')) != NULL)
+      else if ((p = wcsrchr (pn, L'\\')) != NULL)
 	p++;
-      else if ((p = strrchr (pn, '/')) != NULL)
+      else if ((p = wcsrchr (pn, L'/')) != NULL)
 	p++;
       else
 	p = pn;
       if (p != progname)
-	strcpy (progname, p);
-      if ((p = strrchr (progname, '.')) != NULL
-	  && ascii_strcasematch (p, ".exe"))
+	wcscpy (progname, p);
+      if ((p = wcsrchr (progname, '.')) != NULL
+	  && !wcscasecmp (p, L".exe"))
 	*p = '\000';
       p = progname;
       char tmpbuf[20];
-      count = __small_sprintf (buf, fmt, p && *p ? p : "?", mypid (tmpbuf),
+      count = __small_sprintf (buf, fmt, *p ? p : L"?", mypid (tmpbuf),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);

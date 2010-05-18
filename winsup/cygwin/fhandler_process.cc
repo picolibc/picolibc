@@ -537,9 +537,9 @@ static _off64_t
 format_process_winexename (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
-  int len = strlen (p->progname);
-  destbuf = (char *) crealloc_abort (destbuf, len + 2);
-  strcpy (destbuf, p->progname);
+  size_t len = sys_wcstombs (NULL, 0, p->progname);
+  destbuf = (char *) crealloc_abort (destbuf, len + 1);
+  sys_wcstombs (destbuf, len, p->progname);
   destbuf[len] = '\n';
   return len + 1;
 }
@@ -649,6 +649,7 @@ format_process_stat (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
+  WCHAR wcmd[NAME_MAX + 1];
   int state = 'R';
   unsigned long fault_count = 0UL,
 		utime = 0UL, stime = 0UL,
@@ -659,8 +660,9 @@ format_process_stat (void *data, char *&destbuf)
     strcpy (cmd, "<defunct>");
   else
     {
-      char *last_slash = strrchr (p->progname, '\\');
-      strcpy (cmd, last_slash ? last_slash + 1 : p->progname);
+      PWCHAR last_slash = wcsrchr (p->progname, L'\\');
+      wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
+      sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
       int len = strlen (cmd);
       if (len > 4)
 	{
@@ -779,6 +781,7 @@ format_process_status (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
+  WCHAR wcmd[NAME_MAX + 1];
   int state = 'R';
   const char *state_str = "unknown";
   unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,
@@ -787,8 +790,9 @@ format_process_status (void *data, char *&destbuf)
     strcpy (cmd, "<defunct>");
   else
     {
-      char *last_slash = strrchr (p->progname, '\\');
-      strcpy (cmd, last_slash ? last_slash + 1 : p->progname);
+      PWCHAR last_slash = wcsrchr (p->progname, L'\\');
+      wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
+      sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
       int len = strlen (cmd);
       if (len > 4)
 	{

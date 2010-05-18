@@ -89,7 +89,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.rusage_self = p->rusage_self;
 	  ep.rusage_children = p->rusage_children;
 	  ep.progname[0] = '\0';
-	  strncat (ep.progname, p->progname, MAX_PATH - 1);
+	  sys_wcstombs(ep.progname, MAX_PATH, p->progname);
 	  ep.strace_mask = 0;
 	  ep.version = EXTERNAL_PINFO_VERSION;
 
@@ -99,7 +99,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.gid32 = p->gid;
 
 	  ep.progname_long = ep_progname_long_buf;
-	  strcpy (ep.progname_long, p->progname);
+	  sys_wcstombs(ep.progname_long, NT_MAX_PATH, p->progname);
 	  break;
 	}
     }
