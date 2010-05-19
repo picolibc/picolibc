@@ -1,3 +1,7 @@
+2010-04-27 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* mingwex/mb_wc_common.h (get_codepage): Revert change of 2006-09-19.
+
 2010-03-06 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
 	* include/_mingw.h: Increment version to 3.18.
