@@ -86,6 +86,12 @@ int sh_find_elf_flags (unsigned int arch_set);
 /* Convert bfd_mach_* into EF_SH*.  */
 int sh_elf_get_flags_from_mach (unsigned long mach);
 
+/* Other e_flags bits.  */
+
+#define EF_SH_PIC		0x100	/* Segments of an FDPIC binary may
+					   be relocated independently.  */
+#define EF_SH_FDPIC		0x8000	/* Uses the FDPIC ABI.  */
+
 /* Flags for the st_other symbol field.
    Keep away from the STV_ visibility flags (bit 0..1).  */
 
@@ -214,7 +220,17 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_JMP_SLOT64, 195)
   RELOC_NUMBER (R_SH_RELATIVE64, 196)
   FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_5, 197)
-  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_5, 241)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_5, 200)
+  RELOC_NUMBER (R_SH_GOT20, 201)
+  RELOC_NUMBER (R_SH_GOTOFF20, 202)
+  RELOC_NUMBER (R_SH_GOTFUNCDESC, 203)
+  RELOC_NUMBER (R_SH_GOTFUNCDESC20, 204)
+  RELOC_NUMBER (R_SH_GOTOFFFUNCDESC, 205)
+  RELOC_NUMBER (R_SH_GOTOFFFUNCDESC20, 206)
+  RELOC_NUMBER (R_SH_FUNCDESC, 207)
+  RELOC_NUMBER (R_SH_FUNCDESC_VALUE, 208)
+  FAKE_RELOC (R_SH_FIRST_INVALID_RELOC_6, 209)
+  FAKE_RELOC (R_SH_LAST_INVALID_RELOC_6, 241)
   RELOC_NUMBER (R_SH_SHMEDIA_CODE, 242)
   RELOC_NUMBER (R_SH_PT_16, 243)
   RELOC_NUMBER (R_SH_IMMS16, 244)
