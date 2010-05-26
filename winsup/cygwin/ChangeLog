@@ -1,3 +1,10 @@
+2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_registry.cc (multi_wcstombs): New function.
+	(fhandler_registry::fstat): Call multi_wcstombs for strings of type
+	REG_MULTI_SZ.
+	(fhandler_registry::fill_filebuf): Ditto.
+
 2010-05-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* hires.h (hires_base::reset): New function.

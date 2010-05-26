@@ -230,6 +230,37 @@ key_exists (HKEY parent, const wchar_t *name, DWORD wow64)
   return (error == ERROR_SUCCESS || error == ERROR_ACCESS_DENIED);
 }
 
+static size_t
+multi_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc)
+{
+  size_t siz, sum = 0;
+  const wchar_t *nsrc;
+
+  while (nwc)
+    {
+      siz = sys_wcstombs (dst, len, src, nwc);
+      sum += siz;
+      if (dst)
+	{
+	  dst += siz;
+	  len -= siz;
+	}
+      nsrc = wcschr (src, L'\0') + 1;
+      if ((size_t) (nsrc - src) >= nwc)
+	break;
+      nwc -= nsrc - src;
+      src = nsrc;
+      if (*src == L'\0')
+	{
+	  if (dst)
+	    *dst++ = '\0';
+	  ++sum;
+	  break;
+	}
+    }
+  return sum;
+}
+
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
  *
@@ -456,11 +487,16 @@ fhandler_registry::fstat (struct __stat64 *buf)
 					       NULL, NULL, tmpbuf, &dwSize)
 			     != ERROR_SUCCESS)
 			buf->st_size = dwSize / sizeof (wchar_t);
+		      else if (type == REG_MULTI_SZ)
+			buf->st_size = multi_wcstombs (NULL, 0,
+						     (wchar_t *) tmpbuf,
+						     dwSize / sizeof (wchar_t));
 		      else
 			buf->st_size = sys_wcstombs (NULL, 0,
 						     (wchar_t *) tmpbuf,
 						     dwSize / sizeof (wchar_t));
-		      free (tmpbuf);
+		      if (tmpbuf)
+			free (tmpbuf);
 		    }
 		  else
 		    buf->st_size = dwSize;
@@ -848,17 +884,21 @@ fhandler_registry::fill_filebuf ()
 	  seterrno_from_win_error (__FILE__, __LINE__, error);
 	  return true;
 	}
-      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ
-	  || type == REG_LINK)
+      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_LINK)
 	bufalloc = sys_wcstombs (NULL, 0, (wchar_t *) tmpbuf,
 				 size / sizeof (wchar_t));
+      else if (type == REG_MULTI_SZ)
+	bufalloc = multi_wcstombs (NULL, 0, (wchar_t *) tmpbuf,
+				   size / sizeof (wchar_t));
       else
 	bufalloc = size;
       filebuf = (char *) cmalloc_abort (HEAP_BUF, bufalloc);
-      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ
-	  || type == REG_LINK)
+      if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_LINK)
 	sys_wcstombs (filebuf, bufalloc, (wchar_t *) tmpbuf,
 		      size / sizeof (wchar_t));
+      else if (type == REG_MULTI_SZ)
+	multi_wcstombs (filebuf, bufalloc, (wchar_t *) tmpbuf,
+			size / sizeof (wchar_t));
       else
 	memcpy (filebuf, tmpbuf, bufalloc);
       filesize = bufalloc;
