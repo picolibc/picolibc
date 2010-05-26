@@ -1,6 +1,6 @@
 /* inttypes.h - fixed size integer types
 
-   Copyright 2003, 2009 Red Hat, Inc.
+   Copyright 2003, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -33,7 +33,7 @@ details. */
 #define PRIdFAST64 "lld"
 
 #define PRIdMAX "lld"
-#define PRIdPTR "ld"
+#define PRIdPTR "d"
 
 #define PRIi8 "i"
 #define PRIi16 "i"
@@ -51,7 +51,7 @@ details. */
 #define PRIiFAST64 "lli"
 
 #define PRIiMAX "lli"
-#define PRIiPTR "li"
+#define PRIiPTR "i"
 
 /* fprintf() macros for unsigned integers */
 
@@ -71,7 +71,7 @@ details. */
 #define PRIoFAST64 "llo"
 
 #define PRIoMAX "llo"
-#define PRIoPTR "lo"
+#define PRIoPTR "o"
 
 #define PRIu8 "u"
 #define PRIu16 "u"
@@ -89,7 +89,7 @@ details. */
 #define PRIuFAST64 "llu"
 
 #define PRIuMAX "llu"
-#define PRIuPTR "lu"
+#define PRIuPTR "u"
 
 #define PRIx8 "x"
 #define PRIx16 "x"
@@ -107,7 +107,7 @@ details. */
 #define PRIxFAST64 "llx"
 
 #define PRIxMAX "llx"
-#define PRIxPTR "lx"
+#define PRIxPTR "x"
 
 #define PRIX8 "X"
 #define PRIX16 "X"
@@ -125,7 +125,7 @@ details. */
 #define PRIXFAST64 "llX"
 
 #define PRIXMAX "llX"
-#define PRIXPTR "lX"
+#define PRIXPTR "X"
 
 /* fscanf() macros for signed integers */
 
@@ -145,7 +145,7 @@ details. */
 #define SCNdFAST64 "lld"
 
 #define SCNdMAX "lld"
-#define SCNdPTR "ld"
+#define SCNdPTR "d"
 
 #define SCNi8 "hhi"
 #define SCNi16 "hi"
@@ -163,7 +163,7 @@ details. */
 #define SCNiFAST64 "lli"
 
 #define SCNiMAX "lli"
-#define SCNiPTR "li"
+#define SCNiPTR "i"
 
 /* fscanf() macros for unsigned integers */
 
@@ -183,7 +183,7 @@ details. */
 #define SCNoFAST64 "llo"
 
 #define SCNoMAX "llo"
-#define SCNoPTR "lo"
+#define SCNoPTR "o"
 
 #define SCNu8 "hhu"
 #define SCNu16 "hu"
@@ -201,7 +201,7 @@ details. */
 #define SCNuFAST64 "llu"
 
 #define SCNuMAX "llu"
-#define SCNuPTR "lu"
+#define SCNuPTR "u"
 
 #define SCNx8 "hhx"
 #define SCNx16 "hx"
@@ -219,7 +219,7 @@ details. */
 #define SCNxFAST64 "llx"
 
 #define SCNxMAX "llx"
-#define SCNxPTR "lx"
+#define SCNxPTR "x"
 
 #ifdef __cplusplus
 extern "C" {

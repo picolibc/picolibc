@@ -1,5 +1,10 @@
 2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/inttypes.h: Change PTR definitions to int to align with the
+	stdint.h type definitions of intptr_t/uintptr_t.
+
+2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_pty_master): Add master_thread member.
 	* fhandler_tty.cc (fhandler_pty_master::close): Properly detach from
 	master thread.
