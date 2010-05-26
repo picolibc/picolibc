@@ -2503,8 +2503,14 @@ restart:
 	 performed before checking the SYSTEM attribute for sysfile
 	 symlinks, since reparse points can have this flag set, too.
 	 For instance, Vista starts to create a couple of reparse points
-	 with SYSTEM and HIDDEN flags set. */
-      else if (fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
+	 with SYSTEM and HIDDEN flags set.
+	 Also don't check reparse points on remote filesystems.
+	 A reparse point pointing to another file on the remote system will be
+	 mistreated as pointing to a local file on the local system.  This
+	 breaks the way reparse points are transparently handled on remote
+	 systems. */
+      else if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
+	       && !fs.is_remote_drive())
 	{
 	  res = check_reparse_point (h);
 	  if (res == -1)

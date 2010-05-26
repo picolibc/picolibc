@@ -1,5 +1,10 @@
 2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (symlink_info::check): Don't try to handle remote reparse
+	points as symlinks.  Explain why.
+
+2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/inttypes.h: Change PTR definitions to int to align with the
 	stdint.h type definitions of intptr_t/uintptr_t.
 
