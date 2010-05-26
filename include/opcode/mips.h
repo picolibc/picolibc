@@ -555,8 +555,9 @@ static const unsigned int mips_isa_table[] =
 /* DSP ASE */ 
 #define INSN_DSP                  0x00001000
 #define INSN_DSP64                0x00002000
-/* MIPS 16 ASE */
-#define INSN_MIPS16               0x00004000
+
+/* 0x00004000 is unused.  */
+
 /* MIPS-3D ASE */
 #define INSN_MIPS3D               0x00008000
 
