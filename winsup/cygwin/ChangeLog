@@ -1,4 +1,11 @@
-2010-05-18  Kazuhiro Fujida  <fujieda@acm.org>
+2010-05-26  Kazuhiro Fujieda  <fujieda@acm.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (__set_lc_time_from_win): Use LOCALE_SMONTHNAME1
+	instead of LOCALE_SABBREVMONTHNAME1 in Japanese and Korean
+	locales to get abbreviated month names.  Explain why.
+
+2010-05-18  Kazuhiro Fujieda  <fujieda@acm.org>
 
 	* environ.cc (regopt): Change the first argument to wide char string.
 	(environ_init): Accommodate change to the first argument of regopt.

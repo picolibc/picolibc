@@ -551,10 +551,20 @@ __set_lc_time_from_win (const char *name,
 					    sizeof *lc_era, locale_cmp);
 
       /* mon */
+      /* Windows has a bug in Japanese and Korean locales.  In these
+	 locales, strings returned for LOCALE_SABBREVMONTHNAME* are missing
+	 the suffix representing a month.  Unfortunately this is not
+	 documented in English.  A Japanese article describing the problem
+	 is http://msdn.microsoft.com/ja-jp/library/cc422084.aspx
+	 The workaround is to use LOCALE_SMONTHNAME* in these locales,
+	 even for the abbreviated month name. */
+      const LCTYPE mon_base =
+      		lcid == MAKELANGID (LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)
+		|| lcid == MAKELANGID (LANG_KOREAN, SUBLANG_KOREAN)
+		? LOCALE_SMONTHNAME1 : LOCALE_SABBREVMONTHNAME1;
       for (int i = 0; i < 12; ++i)
 	{
-	  _time_locale->wmon[i] = getlocaleinfo (time,
-						 LOCALE_SABBREVMONTHNAME1 + i);
+	  _time_locale->wmon[i] = getlocaleinfo (time, mon_base + i);
 	  _time_locale->mon[i] = charfromwchar (time, wmon[i]);
 	}
       /* month and alt_month */
