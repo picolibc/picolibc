@@ -28,6 +28,8 @@ details. */
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
 
+hires_ms NO_COPY gtod;
+
 static inline LONGLONG
 systime_ns ()
 {
@@ -116,6 +118,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   st.wMilliseconds = tv->tv_usec / 1000;
 
   res = !SetSystemTime (&st);
+  gtod.reset ();
 
   syscall_printf ("%d = settimeofday (%x, %x)", res, tv, tz);
 
@@ -145,8 +148,6 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
   dst->tv_usec = x % (long long) (1e6); /* And split */
   dst->tv_sec = x / (long long) (1e6);
 }
-
-hires_ms NO_COPY gtod;
 
 /* FIXME: Make thread safe */
 extern "C" int
