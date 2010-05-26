@@ -1429,6 +1429,7 @@ fhandler_pty_master::close ()
 			   &installation_key, get_unit ());
 	  CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len, 500);
 	  CloseHandle (arch->master_ctl);
+	  arch->master_thread->detach ();
 	}
       if (!ForceCloseHandle (arch->from_master))
 	termios_printf ("error closing from_master %p, %E", arch->from_master);
@@ -1802,7 +1803,6 @@ fhandler_pty_master::setup (bool ispty)
     {
       /* Create master control pipe which allows the master to duplicate
 	 the pty pipe handles to processes which deserve it. */
-      cygthread *h;
       __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
 		       &installation_key, get_unit ());
       master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
@@ -1814,13 +1814,12 @@ fhandler_pty_master::setup (bool ispty)
 	  errstr = "pty master control pipe";
 	  goto err;
 	}
-      h = new cygthread (::pty_master_thread, 0, this, "pty_master");
-      if (!h)
+      master_thread = new cygthread (::pty_master_thread, 0, this, "pty_master");
+      if (!master_thread)
 	{
 	  errstr = "pty master control thread";
 	  goto err;
 	}
-      h->zap_h ();
     }
 
   t.from_master = from_master;

@@ -1,3 +1,11 @@
+2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_pty_master): Add master_thread member.
+	* fhandler_tty.cc (fhandler_pty_master::close): Properly detach from
+	master thread.
+	(fhandler_pty_master::setup): Store cygthread pointer of pty master
+	control thread in master_thread.  Don't zap thread handle.
+
 2010-05-26  Kazuhiro Fujieda  <fujieda@acm.org>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

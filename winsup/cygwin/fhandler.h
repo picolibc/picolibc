@@ -1125,6 +1125,7 @@ class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
   HANDLE master_ctl;		// Control socket for handle duplication
+  cygthread *master_thread;	// Master control thread
 
 public:
   int need_nl;			// Next read should start with \n
