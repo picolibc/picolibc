@@ -166,7 +166,7 @@ struct vms_indexdef
 
   unsigned char fill_1[6];
 
-  /* The key field contains vms_idxdef/vms_idxdef2 structures, which are
+  /* The key field contains vms_idx/vms_elfidx structures, which are
      simply a key (= a string) and a rfa.  */
   unsigned char keys[INDEXDEF__BLKSIZ];
 };
@@ -292,7 +292,9 @@ struct vms_mhd
 #define MHD__C_MHDID 0xad	/* Value for id.  */
 #define MHD__C_MHDLEN 16	/* Fixed part length.  */
 #define MHD__C_USRDAT 16
-#define MHD__M_SELSRC 0x1
+
+/* Flags for objstat.  */
+#define MHD__M_SELSRC 0x1	/* Selective search.  */
 #define MHD__M_OBJTIR 0x2
 #define MHD__M_WKSYM  0x4
 

@@ -1,3 +1,7 @@
+2010-05-27  Tristan Gingold  <gingold@adacore.com>
+
+	* lbr.h: Improve comments.
+
 2010-05-17  Tristan Gingold  <gingold@adacore.com>
 
 	* eidc.h: New file.
