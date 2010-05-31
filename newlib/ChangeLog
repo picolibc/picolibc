@@ -1,3 +1,8 @@
+2010-05-31  Kazu Hirata  <kazu@codesourcery.com>
+
+	* libc/stdlib/mallocr.c (malloc_extend_top): Backport the
+	difference between versions 2.6.4 and 2.6.5.
+
 2010-05-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* libc/string/strsignal.c (strsignal): Avoid duplicate case statement

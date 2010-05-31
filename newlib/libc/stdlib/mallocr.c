@@ -8,11 +8,16 @@ int _dummy_mallocr = 1;
   public domain.  Send questions/comments/complaints/performance data
   to dl@cs.oswego.edu
 
-* VERSION 2.6.4  Thu Nov 28 07:54:55 1996  Doug Lea  (dl at gee)
+* VERSION 2.6.5  Wed Jun 17 15:55:16 1998  Doug Lea  (dl at gee)
   
    Note: There may be an updated version of this malloc obtainable at
            ftp://g.oswego.edu/pub/misc/malloc.c
          Check before installing!
+
+   Note: This version differs from 2.6.4 only by correcting a
+         statement ordering error that could cause failures only
+         when calls to this malloc are interposed with calls to
+         other memory allocators.
 
 * Why use this malloc?
 
@@ -2223,11 +2228,11 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 
       /* Also keep size a multiple of MALLOC_ALIGNMENT */
       old_top_size = (old_top_size - 3*SIZE_SZ) & ~MALLOC_ALIGN_MASK;
+      set_head_size(old_top, old_top_size);
       chunk_at_offset(old_top, old_top_size          )->size =
         SIZE_SZ|PREV_INUSE;
       chunk_at_offset(old_top, old_top_size + SIZE_SZ)->size =
         SIZE_SZ|PREV_INUSE;
-      set_head_size(old_top, old_top_size);
       /* If possible, release the rest. */
       if (old_top_size >= MINSIZE) 
         fREe(RCALL chunk2mem(old_top));
@@ -3605,6 +3610,9 @@ int mALLOPt(RARG param_number, value) RDECL int param_number; int value;
 /*
 
 History:
+
+    V2.6.5 Wed Jun 17 15:57:31 1998  Doug Lea  (dl at gee)
+      * Fixed ordering problem with boundary-stamping
 
     V2.6.3 Sun May 19 08:17:58 1996  Doug Lea  (dl at gee)
       * Added pvalloc, as recommended by H.J. Liu
