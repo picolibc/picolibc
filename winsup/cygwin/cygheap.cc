@@ -446,7 +446,9 @@ cygheap_user::set_name (const char *new_name)
 
   if (allocated)
     {
-      if (strcasematch (new_name, pname))
+      /* Windows user names are case-insensitive.  Here we want the correct
+         username, though, even if it only differs by case. */
+      if (!strcmp (new_name, pname))
 	return;
       cfree (pname);
     }

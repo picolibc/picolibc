@@ -1,3 +1,8 @@
+2010-05-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_user::set_name): Allow to change the user name
+	if it only differs by case.
+
 2010-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_registry.cc (multi_wcstombs): New function.
