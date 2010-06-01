@@ -1,3 +1,8 @@
+2010-06-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_netdrive.cc (fhandler_netdrive::exists): Always free WNet
+	resource if created.
+
 2010-05-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_user::set_name): Allow to change the user name

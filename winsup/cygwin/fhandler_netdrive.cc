@@ -1,6 +1,6 @@
 /* fhandler_netdrive.cc: fhandler for // and //MACHINE handling
 
-   Copyright 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -164,15 +164,9 @@ fhandler_netdrive::exists ()
   nr.lpRemoteName = namebuf;
   DWORD ret = create_thread_and_wait (GET_RESOURCE_OPENENUM,
 				      &nr, &nh, 0, "WNetOpenEnum");
-  if (ret != NO_ERROR)
-    {
-      if (nh.dom)
-	WNetCloseEnum (nh.dom);
-      if (nh.net)
-	WNetCloseEnum (nh.net);
-      return 0;
-    }
-  return 1;
+  if (nh.dom)
+    WNetCloseEnum (nh.dom);
+  return ret != NO_ERROR ? 0 : 1;
 }
 
 fhandler_netdrive::fhandler_netdrive ():
