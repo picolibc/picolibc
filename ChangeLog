@@ -1,3 +1,36 @@
+2010-06-01  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Sync from GCC:
+
+	2010-05-05  Sebastian Pop  <sebastian.pop@amd.com>
+	* configure.ac: Allow all the versions greater than 0.10 of PPL.
+	* configure: Regenerated.
+
+	2010-04-20  Eric Botcazou  <ebotcazou@adacore.com>
+	* configure.ac (BUILD_CONFIG): Redirect output to /dev/null.
+	* configure: Regenerate.
+
+	2010-04-17  Ralf Cors<E9>pius  <ralf.corsepius@rtems.org>
+	* configure.ac (*-*-rtems*): Add target-libiberty to $skipdirs.
+	* configure: Regenerate.
+
+	2010-04-16  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+	* configure.ac: Check for elf_getshdrstrndx or elf_getshstrndx
+	separately.
+	* configure: Regenerate.
+
+	2010-04-13  Steve Ellcey  <sje@cup.hp.com>
+	* configure: Regenerate after change to elf.m4.
+
+	2010-04-02  Sebastian Pop  <sebastian.pop@amd.com>
+	* configure.ac: Add brackets around AC_TRY_COMPILE alternative.
+	* configure: Regenerated.
+
+	2010-04-02  Sebastian Pop  <sebastian.pop@amd.com>
+	* configure.ac: Print "buggy but acceptable" when CLooG
+	revision is less than 9.
+	* configure: Regenerated.
+
 2010-05-26  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	Merge from gcc:

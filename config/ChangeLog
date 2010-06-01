@@ -1,3 +1,14 @@
+2010-06-01  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Sync from GCC:
+
+	2010-04-13  Steve Ellcey  <sje@cup.hp.com>
+	* elf.m4: Add hppa[12]*-*-hpux* to list of non-elf platforms.
+
+	2010-01-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+	* stdint.m4 (GCC_HEADER_STDINT): Don't typedef uint8_t etc. if
+	corresponding macros already exist.
+
 2010-02-15  Nick Clifton  <nickc@redhat.com>
 
 	* elf.m4: Import from gcc mainline.
