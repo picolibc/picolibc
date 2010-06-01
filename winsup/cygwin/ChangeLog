@@ -1,5 +1,14 @@
 2010-06-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (open_stackdumpfile): Correctly append .stackdump
+	suffix.
+
+	* nlsfuncs.cc (rebase_locale_buf): Reorder arguments.  Accommodate
+	throughout.  Add pointer to end of buffer and avoid changing pointers
+	not pointing into the buffer.
+
+2010-06-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_netdrive.cc (fhandler_netdrive::exists): Always free WNet
 	resource if created.
 

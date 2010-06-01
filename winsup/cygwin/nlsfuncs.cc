@@ -335,13 +335,13 @@ locale_cmp (const void *a, const void *b)
    arrays.  What we do here is just treat the lc_foo pointers as char ** and
    rebase all char * pointers within, up to the given size of the structure. */
 static void
-rebase_locale_buf (const void *ptrv, const char *newbase, const char *oldbase,
-		   const void *ptrvend)
+rebase_locale_buf (const void *ptrv, const void *ptrvend, const char *newbase,
+		   const char *oldbase, const char *oldend)
 {
-  const char **ptrs = (const char **) ptrv;
   const char **ptrsend = (const char **) ptrvend;
-  while (ptrs < ptrsend)
-    *ptrs++ += newbase - oldbase;
+  for (const char **ptrs = (const char **) ptrv; ptrs < ptrsend; ++ptrs)
+    if (*ptrs >= oldbase && *ptrs < oldend)
+      *ptrs += newbase - oldbase;
 }
 
 static wchar_t *
@@ -686,8 +686,8 @@ __set_lc_time_from_win (const char *name,
 	      else
 		{
 		  if (tmp != new_lc_time_buf)
-		    rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
-				       _time_locale + 1);
+		    rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
+				       new_lc_time_buf, lc_time_ptr);
 		  lc_time_ptr = tmp + (lc_time_ptr - new_lc_time_buf);
 		  new_lc_time_buf = tmp;
 		  lc_time_end = new_lc_time_buf + len;
@@ -748,8 +748,8 @@ __set_lc_time_from_win (const char *name,
       return -1;
     }
   if (tmp != new_lc_time_buf)
-    rebase_locale_buf (_time_locale, tmp, new_lc_time_buf,
-		       _time_locale + 1);
+    rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
+		       new_lc_time_buf, lc_time_ptr);
   if (*lc_time_buf)
     free (*lc_time_buf);
   *lc_time_buf = tmp;
@@ -823,8 +823,8 @@ __set_lc_ctype_from_win (const char *name,
       return -1;
     }
   if (tmp != new_lc_ctype_buf)
-    rebase_locale_buf (_ctype_locale, tmp, new_lc_ctype_buf,
-		       _ctype_locale + 1);
+    rebase_locale_buf (_ctype_locale, _ctype_locale + 1, tmp,
+		       new_lc_ctype_buf, lc_ctype_ptr);
   if (*lc_ctype_buf)
     free (*lc_ctype_buf);
   *lc_ctype_buf = tmp;
@@ -883,8 +883,8 @@ __set_lc_numeric_from_win (const char *name,
       return -1;
     }
   if (tmp != new_lc_numeric_buf)
-    rebase_locale_buf (_numeric_locale, tmp, new_lc_numeric_buf,
-		       _numeric_locale + 1);
+    rebase_locale_buf (_numeric_locale, _numeric_locale + 1, tmp,
+		       new_lc_numeric_buf, lc_numeric_ptr);
   if (*lc_numeric_buf)
     free (*lc_numeric_buf);
   *lc_numeric_buf = tmp;
@@ -1010,8 +1010,8 @@ __set_lc_monetary_from_win (const char *name,
       return -1;
     }
   if (tmp != new_lc_monetary_buf)
-    rebase_locale_buf (_monetary_locale, tmp, new_lc_monetary_buf,
-		       _monetary_locale + 1);
+    rebase_locale_buf (_monetary_locale, _monetary_locale + 1, tmp,
+		       new_lc_monetary_buf, lc_monetary_ptr);
   if (*lc_monetary_buf)
     free (*lc_monetary_buf);
   *lc_monetary_buf = tmp;

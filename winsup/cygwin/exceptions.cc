@@ -140,12 +140,11 @@ open_stackdumpfile ()
 	p = myself->progname;
 
       WCHAR corefile[wcslen (p) + sizeof (".stackdump")];
-      wcscpy(corefile, p);
+      wcpcpy (wcpcpy(corefile, p), L".stackdump");
       UNICODE_STRING ucore;
       OBJECT_ATTRIBUTES attr;
       /* Create the UNICODE variation of <progname>.stackdump. */
       RtlInitUnicodeString (&ucore, corefile);
-      RtlAppendUnicodeToString (&ucore, L".stackdump");
       /* Create an object attribute which refers to <progname>.stackdump
 	 in Cygwin's cwd.  Stick to caseinsensitivity. */
       InitializeObjectAttributes (&attr, &ucore, OBJ_CASE_INSENSITIVE,
