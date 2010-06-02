@@ -2379,6 +2379,8 @@ restart:
 	     not tested here unless proved necessary. */
 	  if (status == STATUS_OBJECT_PATH_NOT_FOUND
 	      || status == STATUS_OBJECT_NAME_INVALID
+	      || status == STATUS_BAD_NETWORK_PATH
+	      || status == STATUS_BAD_NETWORK_NAME
 	      || status == STATUS_NO_MEDIA_IN_DEVICE)
 	    {
 	      set_error (ENOENT);
