@@ -15,6 +15,42 @@ void free(void *) _ATTRIBUTE((__weak__));
 extern _LOCK_RECURSIVE_T __atexit_lock;
 #endif
 
+/* If "__libc_fini" is defined, finalizers (either
+   "__libc_fini_array", or "_fini", as appropriate) will be run after
+   all user-specified atexit handlers.  For example, you can define
+   "__libc_fini" to "_fini" in your linker script if you want the C
+   library, rather than startup code, to register finalizers.  If you
+   do that, then your startup code need not contain references to
+   "atexit" or "exit".  As a result, only applications that reference
+   "exit" explicitly will pull in finalization code.
+
+   The choice of whether to register finalizers from libc or from
+   startup code is deferred to link-time, rather than being a
+   configure-time option, so that the same C library binary can be
+   used with multiple BSPs, some of which register finalizers from
+   startup code, while others defer to the C library.  */
+extern char __libc_fini __attribute__((weak));
+
+/* Register the application finalization function with atexit.  These
+   finalizers should run last.  Therefore, we want to call atexit as
+   soon as possible.  */
+static void 
+register_fini(void) __attribute__((constructor (0)));
+
+static void 
+register_fini(void)
+{
+  if (&__libc_fini) {
+#ifdef HAVE_INITFINI_ARRAY
+    extern void __libc_fini_array (void);
+    atexit (__libc_fini_array);
+#else
+    extern void _fini (void);
+    atexit (_fini);
+#endif
+  }
+}
+
 /*
  * Call registered exit handlers.  If D is null then all handlers are called,
  * otherwise only the handlers from that DSO are called.
