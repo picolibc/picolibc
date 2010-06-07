@@ -1,6 +1,6 @@
 /* sys/stdio.h
 
-   Copyright 2004, 2005 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2007, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -34,10 +34,8 @@ details. */
 
 __BEGIN_DECLS
 
-#ifdef _GNU_SOURCE
 ssize_t	_EXFUN(getline, (char **, size_t *, FILE *));
 ssize_t	_EXFUN(getdelim, (char **, size_t *, int, FILE *));
-#endif /* _GNU_SOURCE */
 
 __END_DECLS
 

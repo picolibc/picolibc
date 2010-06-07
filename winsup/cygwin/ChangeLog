@@ -1,3 +1,8 @@
+2010-06-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/stdio.h: Remove _GNU_SOURCE guard around getline
+	and getdelim prototypes since they are SUSv4 now.
+
 2010-06-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (STATUS_BAD_NETWORK_PATH): Define.
