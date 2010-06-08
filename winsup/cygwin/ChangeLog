@@ -1,3 +1,10 @@
+2010-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Set h to NULL after closing handle
+	in udf check.  Remove overagressive bracketing.  Don't set h to NULL
+	without closing the handle.  Fix using wrong handle in checking
+	file system when using parent directory handle.
+
 2010-06-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/stdio.h: Remove _GNU_SOURCE guard around getline

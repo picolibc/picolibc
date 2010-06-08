@@ -2308,6 +2308,7 @@ restart:
 		  if (!fs.is_udf ())
 		    {
 		      NtClose (h);
+		      h = NULL;
 		      status = STATUS_OBJECT_NAME_NOT_FOUND;
 		    }
 		}
@@ -2355,7 +2356,7 @@ restart:
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.
 	     This speeds up path_conv noticably (~10%). */
-	  && (fs.inited () || (fs.update (&upath, h)))
+	  && (fs.inited () || fs.update (&upath, h))
 	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
 			 ? NtQueryAttributesFile (&attr, &fbi)
 			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
@@ -2364,7 +2365,6 @@ restart:
       else
 	{
 	  debug_printf ("%p = NtQueryInformationFile (%S)", status, &upath);
-	  h = NULL;
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 
 	  /* One of the inner path components is invalid, or the path contains
@@ -2427,7 +2427,7 @@ restart:
 						 TRUE, &basename, TRUE);
 		  /* Take the opportunity to check file system while we're
 		     having the handle to the parent dir. */
-		  fs.update (&upath, h);
+		  fs.update (&upath, dir);
 		  NtClose (dir);
 		  if (!NT_SUCCESS (status))
 		    {
