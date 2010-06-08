@@ -1,5 +1,9 @@
 2010-06-08  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/wordexp.h: Add __cplusplus wrapper.
+
+2010-06-08  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* configure.in: Add test for enable-newlib-register-fini
 	to set the _WANT_REGISTER_FINI flag.
 	* configure: Regenerated.

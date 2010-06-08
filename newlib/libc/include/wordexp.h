@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 by  Red Hat, Incorporated. All rights reserved.
+/* Copyright (C) 2002, 2010 by  Red Hat, Incorporated. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software
  * is freely granted, provided that this notice is preserved.
@@ -8,6 +8,10 @@
 #define _WORDEXP_H_
 
 #include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct _wordexp_t
 {
@@ -41,5 +45,9 @@ enum {
    on the system.  It does not support the WRDE_UNDEF flag. */
 int wordexp(const char *, wordexp_t *, int);
 void wordfree(wordexp_t *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _WORDEXP_H_  */
