@@ -1,3 +1,13 @@
+2010-06-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Add test for enable-newlib-register-fini
+	to set the _WANT_REGISTER_FINI flag.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* newlib.hin: Add _WANT_REGISTER_FINI flag.
+	* libc/stdlib/__call_atexit.c: Add test for
+	_WANT_REGISTER_FINI to enable the register_fini function.
+
 2010-06-04  Mark Mitchell  <mark@codesourcery.com>
 
 	* libc/stdlib/__call_atexit.c (__libc_fini): Declare.

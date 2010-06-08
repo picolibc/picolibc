@@ -822,6 +822,7 @@ ac_user_opts='
 enable_option_checking
 enable_newlib_io_pos_args
 enable_newlib_io_c99_formats
+enable_newlib_register_fini
 enable_newlib_io_long_long
 enable_newlib_io_long_double
 enable_newlib_mb
@@ -1495,6 +1496,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-newlib-io-pos-args enable printf-family positional arg support
   --enable-newlib-io-c99-formats   enable C99 support in IO functions like printf/scanf
+  --enable-newlib-register-fini   enable finalization function registration using atexit
   --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
   --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
   --enable-newlib-mb        enable multibyte support
@@ -2049,6 +2051,19 @@ $as_echo "$as_me: error: bad value ${enableval} for newlib-io-c99-formats option
  esac
 else
   newlib_io_c99_formats=
+fi
+
+# Check whether --enable-newlib-register-fini was given.
+if test "${enable_newlib_register_fini+set}" = set; then
+  enableval=$enable_newlib_register_fini; case "${enableval}" in
+  yes) newlib_register_fini=yes;;
+  no)  newlib_register_fini=no ;;
+  *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for newlib-register-fini option" >&5
+$as_echo "$as_me: error: bad value ${enableval} for newlib-register-fini option" >&2;}
+   { (exit 1); exit 1; }; } ;;
+ esac
+else
+  newlib_register_fini=
 fi
 
 # Check whether --enable-newlib-io-long-long was given.
@@ -12590,7 +12605,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12593 "configure"
+#line 12608 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12696,7 +12711,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12699 "configure"
+#line 12714 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13079,6 +13094,13 @@ fi
 if test "${newlib_io_c99_formats}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _WANT_IO_C99_FORMATS 1
+_ACEOF
+
+fi
+
+if test "${newlib_register_fini}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _WANT_REGISTER_FINI 1
 _ACEOF
 
 fi

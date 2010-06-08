@@ -15,6 +15,8 @@ void free(void *) _ATTRIBUTE((__weak__));
 extern _LOCK_RECURSIVE_T __atexit_lock;
 #endif
 
+#ifdef _WANT_REGISTER_FINI
+
 /* If "__libc_fini" is defined, finalizers (either
    "__libc_fini_array", or "_fini", as appropriate) will be run after
    all user-specified atexit handlers.  For example, you can define
@@ -50,6 +52,8 @@ register_fini(void)
 #endif
   }
 }
+
+#endif /* _WANT_REGISTER_FINI  */
 
 /*
  * Call registered exit handlers.  If D is null then all handlers are called,

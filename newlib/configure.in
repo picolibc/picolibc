@@ -29,6 +29,15 @@ AC_ARG_ENABLE(newlib-io-c99-formats,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-c99-formats option) ;;
  esac], [newlib_io_c99_formats=])dnl
 
+dnl Support --enable-newlib-register-fini
+AC_ARG_ENABLE(newlib-register-fini,
+[  --enable-newlib-register-fini   enable finalization function registration using atexit],
+[case "${enableval}" in
+  yes) newlib_register_fini=yes;;
+  no)  newlib_register_fini=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-register-fini option) ;;
+ esac], [newlib_register_fini=])dnl
+
 dnl Support --enable-newlib-io-long-long
 AC_ARG_ENABLE(newlib-io-long-long,
 [  --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf],
@@ -242,6 +251,10 @@ fi
 
 if test "${newlib_io_c99_formats}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WANT_IO_C99_FORMATS)
+fi
+
+if test "${newlib_register_fini}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_REGISTER_FINI)
 fi
 
 if test "${newlib_io_long_long}" = "yes"; then
