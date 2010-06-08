@@ -1,3 +1,8 @@
+2010-06-08  Nick Clifton  <nickc@redhat.com>
+
+	* standards.texi: Relicense under GFDL v1.3.
+	* fdl.texi: Replace with v1.3 text.
+
 2009-08-22  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* configure: Regenerate.
