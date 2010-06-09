@@ -1,3 +1,9 @@
+2010-06-09  Paul Brook  <paul@codesourcery.com>
+
+	* libc/include/sys/reent.h (_reent): Adjust _REENT_SMALL to be
+	binary compatible with normal layout.
+	(_REENT_INIT): Adjust to match struct layout.
+
 2010-06-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/wordexp.h: Add __cplusplus wrapper.
