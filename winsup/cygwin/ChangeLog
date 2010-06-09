@@ -1,3 +1,11 @@
+2010-06-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check_shortcut): Use ro_u_empty rather than
+	local UNICODE_STRING object.
+	(symlink_info::check_sysfile): Ditto.  Return immediately if NtOpenFile
+	failed to avoid closing random handle.  Improve debug output in case
+	NtReadFile failed.
+
 2010-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Set h to NULL after closing handle

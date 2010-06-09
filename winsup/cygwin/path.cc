@@ -1685,14 +1685,13 @@ symlink_info::check_shortcut (HANDLE in_h)
   char *buf, *cp;
   unsigned short len;
   int res = 0;
-  UNICODE_STRING same = { 0, 0, (PWCHAR) L"" };
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
   HANDLE h;
   IO_STATUS_BLOCK io;
   FILE_STANDARD_INFORMATION fsi;
 
-  InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
+  InitializeObjectAttributes (&attr, &ro_u_empty, 0, in_h, NULL);
   status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
 		       &attr, &io, FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT
@@ -1773,25 +1772,24 @@ symlink_info::check_sysfile (HANDLE in_h)
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
   char *srcbuf = tp.c_get ();
   int res = 0;
-  UNICODE_STRING same = { 0, 0, (PWCHAR) L"" };
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
   HANDLE h;
   IO_STATUS_BLOCK io;
   bool interix_symlink = false;
 
-  InitializeObjectAttributes (&attr, &same, 0, in_h, NULL);
+  InitializeObjectAttributes (&attr, &ro_u_empty, 0, in_h, NULL);
   status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
 		       &attr, &io, FILE_SHARE_VALID_FLAGS,
 		       FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
-    ;
+    return 0;
   else if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io,
 					     cookie_buf, sizeof (cookie_buf),
 					     NULL, NULL)))
     {
-      debug_printf ("ReadFile1 failed");
+      debug_printf ("ReadFile1 failed %p", status);
       if (status != STATUS_END_OF_FILE)
 	set_error (EIO);
     }
