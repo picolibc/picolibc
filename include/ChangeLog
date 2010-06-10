@@ -1,3 +1,12 @@
+2010-06-08  Laurynas Biveinis  <laurynas.biveinis@gmail.com>
+
+	* splay-tree.h: Update copyright years.
+	(splay_tree_s): Document fields.
+	(splay_tree_new_typed_alloc): New.
+
+	* hashtab.h: Update copyright years.
+	(htab_create_typed_alloc): New.
+
 2010-06-10  Tristan Gingold  <gingold@adacore.com>
 
 	* dwarf2.h (enum dwarf_tag): Add DW_TAG_HP_Bliss_field and
