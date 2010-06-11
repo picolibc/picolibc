@@ -45,6 +45,14 @@
 /* Not used yet.  */
 #define EF_IA_64_ABSOLUTE	    (1 << 8) /* Load at absolute addresses.  */
 
+/* OpenVMS speficic.  */
+#define EF_IA_64_VMS_COMCOD	    0x03   /* Completion code.  */
+#define EF_IA_64_VMS_COMCOD_SUCCESS 0
+#define EF_IA_64_VMS_COMCOD_WARNING 1
+#define EF_IA_64_VMS_COMCOD_ERROR   2
+#define EF_IA_64_VMS_COMCOD_ABORT   3
+#define EF_IA_64_VMS_LINKAGES	    0x04   /* Contains VMS linkages info.  */
+
 #define ELF_STRING_ia64_archext		".IA_64.archext"
 #define ELF_STRING_ia64_pltoff		".IA_64.pltoff"
 #define ELF_STRING_ia64_unwind		".IA_64.unwind"
@@ -159,6 +167,23 @@
 #define DT_IA_64_VMS_PLTGOT_SEG      (DT_LOOS + 64)
 #define DT_IA_64_VMS_FPMODE          (DT_LOOS + 66)
 
+/* Values for DT_IA_64_LNKFLAGS.  */
+#define VMS_LF_CALL_DEBUG	0x0001	/* Activate and call the debugger.  */
+#define VMS_LF_NOP0BUFS		0x0002	/* RMS use of P0 for i/o disabled.  */
+#define VMS_LF_P0IMAGE		0x0004	/* Image in P0 space only.  */
+#define VMS_LF_MKTHREADS	0x0008	/* Multiple kernel threads enabled.  */
+#define VMS_LF_UPCALLS		0x0010	/* Upcalls enabled.  */
+#define VMS_LF_IMGSTA		0x0020	/* Use SYS$IMGSTA.  */
+#define VMS_LF_INITIALIZE	0x0040	/* Image uses tfradr2.  */
+#define VMS_LF_MAIN		0x0080	/* Image uses tfradr3.  */
+#define VMS_LF_EXE_INIT		0x0200	/* Image uses tfradr4.  */
+#define VMS_LF_TBK_IN_IMG	0x0400	/* Traceback records in image.  */
+#define VMS_LF_DBG_IN_IMG	0x0800	/* Debug records in image.  */
+#define VMS_LF_TBK_IN_DSF	0x1000	/* Traceback records in DSF.  */
+#define VMS_LF_DBG_IN_DSF	0x2000	/* Debug records in DSF.  */
+#define VMS_LF_SIGNATURES	0x4000	/* Signatures present.  */
+#define VMS_LF_REL_SEG_OFF	0x8000	/* Maintain relative pos of seg.  */
+
 /* This section only used by HP-UX, The HP linker gives weak symbols
    precedence over regular common symbols.  We want common to override
    weak.  Using this common instead of SHN_COMMON does that.  */
@@ -167,6 +192,45 @@
 /* This section is only used by OpenVMS.  Symbol is defined in the symbol
    vector (only possible for image files).  */
 #define SHN_IA_64_VMS_SYMVEC SHN_LOOS
+
+/* OpenVMS IA64-specific symbol attributes.  */
+#define VMS_STO_VISIBILITY 3	  /* Alias of the standard field.  */
+#define VMS_ST_VISIBILITY(o) ((o) & VMS_STO_VISIBILITY)
+#define VMS_STO_FUNC_TYPE  0x30	  /* Function type.  */
+#define VMS_ST_FUNC_TYPE(o)  (((o) & VMS_STO_FUNC_TYPE) >> 4)
+# define VMS_SFT_CODE_ADDR 0	  /* Symbol value is a code address.  */
+# define VMS_SFT_SYMV_IDX  1	  /* Symbol value is a symbol vector index.  */
+# define VMS_SFT_FD	   2	  /* Symbol value is a function descriptor.  */
+# define VMS_SFT_RESERVE   3	  /* Reserved.  */
+#define VMS_STO_LINKAGE    0xc0
+#define VMS_ST_LINKAGE(o)  (((o) & VMS_STO_LINKAGE) >> 6)
+# define VMS_STL_IGNORE	   0	  /* No associated linkage.  */
+# define VMS_STL_RESERVE   1
+# define VMS_STL_STD	   2	  /* Standard linkage with return value.  */
+# define VMS_STL_LNK	   3	  /* Explicit represented in .vms_linkages.  */
+
+/* OpenVMS specific fixup and relocation structures.  */
+
+typedef struct
+{
+  unsigned char fixup_offset[8];
+  unsigned char type[4];
+  unsigned char fixup_seg[4];
+  unsigned char addend[8];
+  unsigned char symvec_index[4];
+  unsigned char data_type[4];
+} Elf64_External_VMS_IMAGE_FIXUP;
+
+typedef struct
+{
+  unsigned char rela_offset[8];
+  unsigned char type[4];
+  unsigned char rela_seg[4];
+  unsigned char addend[8];
+  unsigned char sym_offset[8];
+  unsigned char sym_seg[4];
+  unsigned char fill_1[4];
+} Elf64_External_VMS_IMAGE_RELA;
 
 /* IA64-specific relocation types: */
 
@@ -282,6 +346,31 @@ START_RELOC_NUMBERS (elf_ia64_reloc_type)
   RELOC_NUMBER (R_IA64_LTOFF_DTPREL22, 0xba) /* @ltoff(@dtprel(s+a)), imm22 */
 
   FAKE_RELOC (R_IA64_MAX_RELOC_CODE, 0xba)
+
+  /* OpenVMS specific relocs.  */
+  RELOC_NUMBER (R_IA64_VMS_DIR8, 0x70000000)		/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_DIR16LSB, 0x70000001)	/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_CALL_SIGNATURE, 0x70000002)
+  RELOC_NUMBER (R_IA64_VMS_EXECLET_FUNC, 0x70000003)
+  RELOC_NUMBER (R_IA64_VMS_EXECLET_DATA, 0x70000004)
+  RELOC_NUMBER (R_IA64_VMS_FIX8, 0x70000005)		/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_FIX16, 0x70000006)		/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_FIX32, 0x70000007)		/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_FIX64, 0x70000008)		/* S + A */
+  RELOC_NUMBER (R_IA64_VMS_FIXFD, 0x70000009)
+  RELOC_NUMBER (R_IA64_VMS_ACC_LOAD, 0x7000000a)	/* ACC = S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_ADD, 0x7000000b)		/* ACC += S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_SUB, 0x7000000c)		/* ACC -= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_MUL, 0x7000000d)		/* ACC *= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_DIV, 0x7000000e)		/* ACC /= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_AND, 0x7000000f)		/* ACC &= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_IOR, 0x70000010)		/* ACC |= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_EOR, 0x70000011)		/* ACC ^= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_ASH, 0x70000012)		/* ACC >>= S + A */
+  RELOC_NUMBER (R_IA64_VMS_ACC_STO8, 0x70000014)	/* ACC */
+  RELOC_NUMBER (R_IA64_VMS_ACC_STO16LSH, 0x70000015)	/* ACC */
+  RELOC_NUMBER (R_IA64_VMS_ACC_STO32LSH, 0x70000016)	/* ACC */
+  RELOC_NUMBER (R_IA64_VMS_ACC_STO64LSH, 0x70000017)	/* ACC */
 END_RELOC_NUMBERS (R_IA64_max)
 
 #endif /* _ELF_IA64_H */
