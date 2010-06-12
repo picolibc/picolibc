@@ -28,7 +28,13 @@ details. */
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
 
-hires_ms NO_COPY gtod;
+/* TODO: Putting this variable in the shared cygwin region partially solves
+   the problem of cygwin processes not recognizing date changes when other
+   cygwin processes set the date.  There is still an additional problem of
+   long-running cygwin processes becoming confused when a non-cygwin process
+   sets the date.  Unfortunately, it looks like a minor redesign is required
+   to handle that case.  */
+hires_ms gtod __attribute__((section (".cygwin_dll_common"), shared));
 
 static inline LONGLONG
 systime_ns ()

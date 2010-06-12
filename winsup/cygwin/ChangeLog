@@ -1,3 +1,7 @@
+2010-06-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* times.cc (gtod): Move to sharable region.
+
 2010-06-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check_shortcut): Use ro_u_empty rather than
