@@ -829,6 +829,11 @@ is_virtual_symlink:
 
 	  if (sym.isdevice)
 	    {
+	      if (component)
+		{
+		  error = ENOTDIR;
+		  return;
+		}
 	      dev.parse (sym.major, sym.minor);
 	      dev.setfs (1);
 	      dev.mode = sym.mode;

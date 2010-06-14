@@ -1,5 +1,10 @@
 2010-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::check): Return with ENOTDIR if component is a
+	device.
+
+2010-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (get_full_path_of_dll): Revert patch from 2010-04-29.
 
 2010-06-12  Christopher Faylor  <me+cygwin@cgf.cx>
