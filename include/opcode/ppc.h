@@ -177,6 +177,9 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by AppliedMicro Titan core */
 #define PPC_OPCODE_TITAN         0x400000000ULL
 
+/* Opcode which is supported by the e500 family */
+#define PPC_OPCODE_E500		0x800000000ULL
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
 

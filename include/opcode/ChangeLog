@@ -1,3 +1,7 @@
+2010-06-14  Sebastian Andrzej Siewior  <bigeasy@linutronix.de>
+
+	* ppc.h (PPC_OPCODE_E500): Define.
+
 2010-05-26  Catherine Moore  <clm@codesourcery.com>
 
 	* opcode/mips.h (INSN_MIPS16): Remove.
