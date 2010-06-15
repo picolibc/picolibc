@@ -419,7 +419,8 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 	    unsigned fmode)
 {
   int res = -1;
-  fhandler_base *fh = build_fh_name (path, fmode, stat_suffixes);
+  fhandler_base *fh = build_fh_name (path, fmode | PC_KEEP_HANDLE,
+				     stat_suffixes);
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());

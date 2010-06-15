@@ -1,5 +1,59 @@
 2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::dup_worker): Reset path_conv handle in duplicated
+	fhandler.
+	* fhandler.cc (fhandler_base::fstatvfs): Keep handle in created
+	path_conv.
+	* fhandler.h (fhandler_base::get_stat_access): New method.
+	(fhandler_base::get_stat_handle): New method.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Use handle
+	returned by get_stat_handle.  Only request inode from system if it
+	isn't already set in the fhandler, and only for filesystems supporting
+	them.
+	(fhandler_base::fstat_fs): Use handle returned by get_stat_handle.
+	Change the way open_fs is called.  Explain why.
+	(fhandler_base::fstat_helper): Use handle returned by get_stat_handle.
+	Never use 0 inode number.  Simplify executable recognition by re-using
+	get_stat_handle if file could be opened with sufficient rights.
+	(fhandler_disk_file::fstatvfs): Use handle returned by get_stat_handle.
+	(fhandler_disk_file::facl): Use handle returned by get_stat_handle in
+	GETACL and GETACLCNT cases.
+	(fhandler_disk_file::link): Use handle returned by get_stat_handle
+	instead of opening file here again.  Add comment.
+	(readdir_get_ino): Keep handle in created path_conv and drop
+	opening file.
+	* ntdll.h (wait_pending): New helper function.
+	* path.cc (symlink_info::check): Drop unused 'opt' parameter from
+	declaration.  Add path_conv_handle argument.
+	(path_conv::check): Make sure conv_handle is closed.  Keep
+	PC_KEEP_HANDLE flag in pflags_or.  Accommodate call to sym.check to
+	new args.
+	(path_conv::~path_conv): Close conv_handle.
+	(symlink_info::check_shortcut): Don't re-open file here, just use
+	incoming handle.  Drop goto's and label out.
+	(symlink_info::check_sysfile): Don't re-open file here, just use
+	incoming handle.  Keep track of file position to accommodate the fact
+	that file has been opened asynchronously in calling function.
+	(symlink_info::check_nfs_symlink): Don't re-open file here, just use
+	incoming handle.
+	(symlink_info::check): Drop unused 'opt' parameter.  Add
+	path_conv_handle argument.  Always try to open file with GENERIC_READ
+	rights first to allow reading file content w/o having to re-open the
+	file.  Drop back to READ_CONTROL | FILE_READ_ATTRIBUTES otherwise.
+	Call symlink test functions (except for check_reparse_point) only if
+	file could be opened with GENERIC_READ.  Keep file handle open if
+	PC_KEEP_HANDLE is set in pflags.
+	* path.h (enum pathconv_arg): Add PC_KEEP_HANDLE flag.
+	(class path_conv_handle): New class.
+	(class path_conv): Add conv_handle member.
+	(path_conv::operator =): Duplicate conv_handle.
+	(path_conv::handle): New method.
+	(path_conv::access): New method.
+	(path_conv::reset_conv_handle): New method.
+	(path_conv::close_conv_handle): New method.
+
+2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Fix indentation.
 
 2010-06-15  Corinna Vinschen  <corinna@vinschen.de>

@@ -57,6 +57,7 @@ enum pathconv_arg
   PC_CHECK_EA		= 0x0040,
   PC_POSIX		= 0x0080,
   PC_NOWARN		= 0x0100,
+  PC_KEEP_HANDLE	= 0x00400000,
   PC_NO_ACCESS_CHECK	= 0x00800000
 };
 
@@ -86,6 +87,33 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
+class path_conv_handle
+{
+  HANDLE      hdl;
+  ACCESS_MASK acc;
+public:
+  path_conv_handle () : hdl (NULL), acc (0) {}
+  inline void set (HANDLE h, ACCESS_MASK a) { hdl = h; acc = a; }
+  inline void close ()
+  {
+    if (hdl)
+      CloseHandle (hdl);
+    set (NULL, 0);
+  }
+  inline void dup (path_conv_handle &pch)
+  {
+    if (!DuplicateHandle (GetCurrentProcess (), pch.handle (),
+			  GetCurrentProcess (), &hdl,
+			  0, TRUE, DUPLICATE_SAME_ACCESS))
+      {
+	hdl = NULL;
+	acc = 0;
+      }
+  }
+  inline HANDLE handle () const { return hdl; }
+  inline ACCESS_MASK access () const { return acc; }
+};
+
 class symlink_info;
 
 class path_conv
@@ -98,6 +126,7 @@ class path_conv
   void add_ext_from_sym (symlink_info&);
   DWORD symlink_length;
   const char *path;
+  path_conv_handle conv_handle;
  public:
   unsigned path_flags;
   const char *known_suffix;
@@ -220,6 +249,7 @@ class path_conv
   {
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);
+    conv_handle.dup (pc.conv_handle);
     normalized_path = cstrdup(pc.normalized_path);
     wide_path = NULL;
     return *this;
@@ -249,6 +279,11 @@ class path_conv
     return path = new_path;
   }
   bool is_binary ();
+
+  HANDLE handle () const { return conv_handle.handle (); }
+  ACCESS_MASK access () const { return conv_handle.access (); }
+  void reset_conv_handle () { conv_handle.set (NULL, 0); }
+  void close_conv_handle () { conv_handle.close (); }
 
   __ino64_t get_ino_by_handle (HANDLE h);
 #if 0 /* obsolete, method still exists in fhandler_disk_file.cc */

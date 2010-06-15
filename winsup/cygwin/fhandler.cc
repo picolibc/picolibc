@@ -1124,7 +1124,7 @@ fhandler_base::fstatvfs (struct statvfs *sfs)
 {
   /* If we hit this base implementation, it's some device in /dev.
      Just call statvfs on /dev for simplicity. */
-  path_conv pc ("/dev");
+  path_conv pc ("/dev", PC_KEEP_HANDLE);
   fhandler_disk_file fh (pc);
   return fh.fstatvfs (sfs);
 }

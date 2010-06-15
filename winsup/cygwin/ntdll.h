@@ -868,6 +868,16 @@ typedef enum _EVENT_INFORMATION_CLASS
 #define NtCurrentProcess() ((HANDLE) 0xffffffff)
 #define NtCurrentThread()  ((HANDLE) 0xfffffffe)
 
+/* Helper macro for sync I/O with async handle. */
+inline NTSTATUS
+wait_pending (NTSTATUS status, HANDLE h, IO_STATUS_BLOCK &io)
+{
+  if (status != STATUS_PENDING)
+    return status;
+  WaitForSingleObject (h, INFINITE);
+  return io.Status;
+}
+
 extern "C"
 {
   NTSTATUS NTAPI NtAdjustPrivilegesToken (HANDLE, BOOLEAN, PTOKEN_PRIVILEGES,

@@ -1169,7 +1169,8 @@ link (const char *oldpath, const char *newpath)
   int res = -1;
   fhandler_base *fh;
 
-  if (!(fh = build_fh_name (oldpath, PC_SYM_NOFOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (oldpath, PC_SYM_NOFOLLOW | PC_KEEP_HANDLE,
+			    stat_suffixes)))
     goto error;
 
   if (fh->error ())
@@ -1542,7 +1543,7 @@ extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
   syscall_printf ("entering");
-  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE, stat_suffixes);
   return stat_worker (pc, buf);
 }
 
@@ -1581,7 +1582,8 @@ extern "C" int
 lstat64 (const char *name, struct __stat64 *buf)
 {
   syscall_printf ("entering");
-  path_conv pc (name, PC_SYM_NOFOLLOW | PC_POSIX, stat_suffixes);
+  path_conv pc (name, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE,
+		stat_suffixes);
   return stat_worker (pc, buf);
 }
 
@@ -2561,7 +2563,8 @@ statvfs (const char *name, struct statvfs *sfs)
   if (efault.faulted (EFAULT))
     goto error;
 
-  if (!(fh = build_fh_name (name, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (name, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
+			    stat_suffixes)))
     goto error;
 
   if (fh->error ())

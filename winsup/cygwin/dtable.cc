@@ -582,6 +582,7 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
     {
       *newfh = *oldfh;
       newfh->set_io_handle (NULL);
+      newfh->pc.reset_conv_handle ();
       if (oldfh->dup (newfh))
 	{
 	  delete newfh;

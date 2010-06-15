@@ -333,6 +333,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
+  HANDLE h = get_stat_handle ();
 
   if (pc.fs_is_nfs ())
     return fstat_by_nfs_ea (buf);
@@ -351,22 +352,22 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 
   if (pc.has_buggy_basic_info ())
     {
-      status = NtQueryInformationFile (get_handle (), &io, &fi, sizeof fi,
+      status = NtQueryInformationFile (h, &io, &fi, sizeof fi,
 				       FileNetworkOpenInformation);
       /* The timestamps are in the same relative memory location, only
 	 the DOS attributes have to be moved. */
       fi.fbi.FileAttributes = fi.fnoi.FileAttributes;
     }
   else
-    status = NtQueryInformationFile (get_handle (), &io, &fi.fbi, sizeof fi.fbi,
-				     FileBasicInformation);
+    status = NtQueryInformationFile (h, &io, &fi.fbi,
+				     sizeof fi.fbi, FileBasicInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("%p = NtQueryInformationFile(%S, FileBasicInformation)",
 		    status, pc.get_nt_native_path ());
       return -1;
     }
-  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+  status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
 				   FileStandardInformation);
   if (!NT_SUCCESS (status))
     {
@@ -374,13 +375,17 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		    status, pc.get_nt_native_path ());
       return -1;
     }
-  status = NtQueryInformationFile (get_handle (), &io, &fii, sizeof fii,
-				   FileInternalInformation);
-  if (!NT_SUCCESS (status))
+  if (!ino && pc.hasgood_inode ())
     {
-      debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
-		    status, pc.get_nt_native_path ());
-      return -1;
+      status = NtQueryInformationFile (h, &io, &fii, sizeof fii,
+				       FileInternalInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
+			status, pc.get_nt_native_path ());
+	  return -1;
+	}
+      ino = fii.FileId.QuadPart;
     }
   /* If the change time is 0, it's a file system which doesn't
      support a change timestamp.  In that case use the LastWriteTime
@@ -397,7 +402,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 		       get_dev (),
 		       fsi.EndOfFile.QuadPart,
 		       fsi.AllocationSize.QuadPart,
-		       fii.FileId.QuadPart,
+		       ino,
 		       fsi.NumberOfLinks,
 		       fi.fbi.FileAttributes);
 }
@@ -492,7 +497,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   int oret;
   int open_flags = O_RDONLY | O_BINARY;
 
-  if (get_handle ())
+  if (get_stat_handle ())
     {
       if (!nohandle () && !is_fs_special ())
 	res = fstat_by_handle (buf);
@@ -500,8 +505,16 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 	res = fstat_by_name (buf);
       return res;
     }
-  query_open (query_read_attributes);
+  /* First try to open with generic read access.  This allows to read the file
+     in fstat_helper (when checking for executability) without having to
+     re-open it.  Opening a file can take a lot of time on network drives
+     so we try to avoid that. */
   oret = open_fs (open_flags, 0);
+  if (!oret)
+    {
+      query_open (query_read_attributes);
+      oret = open_fs (open_flags, 0);
+    }
   if (oret)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.
@@ -546,6 +559,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
+  HANDLE h = get_stat_handle ();
 
   to_timestruc_t ((PFILETIME) LastAccessTime, &buf->st_atim);
   to_timestruc_t ((PFILETIME) LastWriteTime, &buf->st_mtim);
@@ -563,7 +577,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 #endif
 
   /* Enforce namehash as inode number on untrusted file systems. */
-  if (pc.isgood_inode (nFileIndex))
+  if (nFileIndex && pc.isgood_inode (nFileIndex))
     buf->st_ino = (__ino64_t) nFileIndex;
   else
     buf->st_ino = get_ino ();
@@ -576,9 +590,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
   else if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_COMPRESSED
 					      | FILE_ATTRIBUTE_SPARSE_FILE)
-	   && get_handle () && !is_fs_special ()
-	   && !NtQueryInformationFile (get_handle (), &st, (PVOID) &fci,
-				      sizeof fci, FileCompressionInformation))
+	   && h && !is_fs_special ()
+	   && !NtQueryInformationFile (h, &st, (PVOID) &fci, sizeof fci,
+				       FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
        compressed and sparsed files. */
     buf->st_blocks = (fci.CompressedFileSize.QuadPart + S_BLKSIZE - 1)
@@ -597,15 +611,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       buf->st_size = pc.get_symlink_length ();
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-      get_file_attribute (get_handle (), pc, NULL,
+      get_file_attribute (h, pc, NULL,
 			  &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (is_fs_special () && !pc.issocket ()
-			   ? NULL : get_handle (), pc,
+  if (!get_file_attribute (is_fs_special () && !pc.issocket () ? NULL : h, pc,
 			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
@@ -659,50 +672,26 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	     shebang scripts. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
-	      OBJECT_ATTRIBUTES attr;
+	      LARGE_INTEGER off = { QuadPart:0LL };
+	      char magic[3];
 	      NTSTATUS status;
-	      HANDLE h;
 	      IO_STATUS_BLOCK io;
 
-	      /* The NWFS implementation is frighteningly incomplete.  When
-	         re-opening a file by handle, the subsequent NtReadFile
-		 returns with the weird status STATUS_FILE_IS_A_DIRECTORY.
-		 We're still using the re-open by handle method for all
-		 other filesystems since it's 8-10% faster than opening
-		 by name. */
-	      if (pc.fs_is_nwfs ())
-		InitializeObjectAttributes (&attr, pc.get_nt_native_path (),
-					    OBJ_CASE_INSENSITIVE, NULL, NULL)
-	      else
-		InitializeObjectAttributes (&attr, &ro_u_empty, 0,
-					    get_handle (), NULL);
-	      status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
-				   &attr, &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_SYNCHRONOUS_IO_NONALERT);
-	      if (NT_SUCCESS (status))
+	      if (get_stat_access () & (GENERIC_READ | FILE_READ_DATA))
 		{
-		  LARGE_INTEGER off = { QuadPart:0LL };
-		  char magic[3];
-
-		  status = NtReadFile (h, NULL, NULL, NULL, &io, magic,
-				       3, &off, NULL);
-		  if (NT_SUCCESS (status))
-		    {
-		      if (has_exec_chars (magic, io.Information))
-			{
-			  /* Heureka, it's an executable */
-			  pc.set_exec ();
-			  buf->st_mode |= STD_XBITS;
-			}
-		    }
-		  else
+		  status = NtReadFile (h, NULL, NULL, NULL,
+				       &io, magic, 3, &off, NULL);
+		  status = wait_pending (status, h, io);
+		  if (!NT_SUCCESS (status))
 		    debug_printf ("%p = NtReadFile(%S)", status,
 				  pc.get_nt_native_path ());
-		  NtClose (h);
+		  else if (has_exec_chars (magic, io.Information))
+		    {
+		      /* Heureka, it's an executable */
+		      pc.set_exec ();
+		      buf->st_mode |= STD_XBITS;
+		    }
 		}
-	      else
-		debug_printf ("%p = NtOpenFile(%S)", status,
-			      pc.get_nt_native_path ());
 	    }
 	}
       if (pc.exec_state () == is_executable)
@@ -740,7 +729,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   IO_STATUS_BLOCK io;
   FILE_FS_FULL_SIZE_INFORMATION full_fsi;
   FILE_FS_SIZE_INFORMATION fsi;
-  HANDLE fh = get_handle ();
+  HANDLE fh = get_stat_handle ();
 
   if (!fh)
     {
@@ -1050,7 +1039,8 @@ cant_access_acl:
     }
   else
     {
-      if (!get_handle ())
+      if ((cmd == SETACL && !get_handle ())
+	  || (cmd != SETACL && !get_stat_handle ()))
 	{
 	  query_open (cmd == SETACL ? query_write_control : query_read_control);
 	  if (!(oret = open (O_BINARY, 0)))
@@ -1087,10 +1077,10 @@ cant_access_acl:
 	    if (!aclbufp)
 	      set_errno(EFAULT);
 	    else
-	      res = getacl (get_handle (), pc, nentries, aclbufp);
+	      res = getacl (get_stat_handle (), pc, nentries, aclbufp);
 	    break;
 	  case GETACLCNT:
-	    res = getacl (get_handle (), pc, 0, NULL);
+	    res = getacl (get_stat_handle (), pc, 0, NULL);
 	    break;
 	  default:
 	    set_errno (EINVAL);
@@ -1277,17 +1267,13 @@ fhandler_disk_file::link (const char *newpath)
 	}
     }
 
-  HANDLE fh;
-  NTSTATUS status;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-  status = NtOpenFile (&fh, READ_CONTROL,
-		       pc.get_object_attr (attr, sec_none_nih), &io,
-		       FILE_SHARE_VALID_FLAGS,
-		       FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_REPARSE_POINT);
-  if (!NT_SUCCESS (status))
+  /* We only need READ_CONTROL access so the handle returned in pc is
+     sufficient.  And if the file couldn't be opened with READ_CONTROL
+     access in path_conv, we won't be able to do it here anyway. */
+  HANDLE fh = get_stat_handle ();
+  if (!fh)
     {
-      __seterrno_from_nt_status (status);
+      set_errno (EACCES);
       return -1;
     }
   PUNICODE_STRING tgt = newpc.get_nt_native_path ();
@@ -1296,8 +1282,10 @@ fhandler_disk_file::link (const char *newpath)
   pfli->ReplaceIfExists = FALSE;
   pfli->RootDirectory = NULL;
   memcpy (pfli->FileName, tgt->Buffer, pfli->FileNameLength = tgt->Length);
+
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
   status = NtSetInformationFile (fh, &io, pfli, size, FileLinkInformation);
-  NtClose (fh);
   if (!NT_SUCCESS (status))
     {
       if (status == STATUS_INVALID_DEVICE_REQUEST)
@@ -1764,8 +1752,6 @@ readdir_get_ino (const char *path, bool dot_dot)
   char *fname;
   struct __stat64 st;
   HANDLE hdl;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
   __ino64_t ino = 0;
 
   if (dot_dot)
@@ -1777,7 +1763,7 @@ readdir_get_ino (const char *path, bool dot_dot)
       strcpy (c, "..");
       path = fname;
     }
-  path_conv pc (path, PC_SYM_NOFOLLOW | PC_POSIX | PC_NOWARN);
+  path_conv pc (path, PC_SYM_NOFOLLOW | PC_POSIX | PC_NOWARN | PC_KEEP_HANDLE);
   if (pc.isspecial ())
     {
       if (!stat_worker (pc, &st))
@@ -1785,17 +1771,11 @@ readdir_get_ino (const char *path, bool dot_dot)
     }
   else if (!pc.hasgood_inode ())
     ino = hash_path_name (0, pc.get_nt_native_path ());
-  else if (NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL,
-				   pc.get_object_attr (attr, sec_none_nih),
-				   &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_OPEN_FOR_BACKUP_INTENT
-				   | (pc.is_rep_symlink ()
-				      ? FILE_OPEN_REPARSE_POINT : 0))))
+  else if ((hdl = pc.handle ()) != NULL)
     {
       ino = pc.get_ino_by_handle (hdl);
       if (!ino)
 	ino = hash_path_name (0, pc.get_nt_native_path ());
-      NtClose (hdl);
     }
   return ino;
 }

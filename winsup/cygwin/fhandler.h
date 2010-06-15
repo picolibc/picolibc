@@ -181,6 +181,7 @@ class fhandler_base
 
   int get_access () const { return access; }
   void set_access (int x) { access = x; }
+  int get_stat_access () const { return pc.handle () ? pc.access () : access; }
 
   int get_flags () { return openflags; }
   void set_flags (int x, int supplied_bin = 0);
@@ -355,6 +356,7 @@ class fhandler_base
   virtual HANDLE& get_handle () { return io_handle; }
   virtual HANDLE& get_io_handle () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
+  virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
   virtual bool hit_eof () {return false;}
   virtual select_record *select_read (select_stuff *);
   virtual select_record *select_write (select_stuff *);

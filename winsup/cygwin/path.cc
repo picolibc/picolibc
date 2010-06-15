@@ -96,8 +96,8 @@ struct symlink_info
   _major_t major;
   _minor_t minor;
   _mode_t mode;
-  int check (char *path, const suffix_info *suffixes, unsigned opt,
-	     fs_info &fs);
+  int check (char *path, const suffix_info *suffixes, fs_info &fs,
+	     path_conv_handle &conv_hdl);
   int set (char *path);
   bool parse_device (const char *);
   int check_sysfile (HANDLE h);
@@ -639,6 +639,7 @@ path_conv::check (const char *src, unsigned opt,
       cfree (modifiable_path ());
       path = NULL;
     }
+  close_conv_handle ();
   memset (&dev, 0, sizeof (dev));
   fs.clear ();
   if (normalized_path)
@@ -695,7 +696,9 @@ path_conv::check (const char *src, unsigned opt,
 
       int symlen = 0;
 
-      for (unsigned pflags_or = opt & PC_NO_ACCESS_CHECK; ; pflags_or = 0)
+      for (unsigned pflags_or = opt & (PC_NO_ACCESS_CHECK | PC_KEEP_HANDLE);
+	   ;
+	   pflags_or = 0)
 	{
 	  const suffix_info *suff;
 	  char *full_path;
@@ -823,7 +826,7 @@ path_conv::check (const char *src, unsigned opt,
 	  if (is_msdos)
 	    sym.pflags |= PATH_NOPOSIX | PATH_NOACL;
 
-	  symlen = sym.check (full_path, suff, opt, fs);
+	  symlen = sym.check (full_path, suff, fs, conv_handle);
 
 is_virtual_symlink:
 
@@ -1124,6 +1127,7 @@ path_conv::~path_conv ()
       cfree (wide_path);
       wide_path = NULL;
     }
+  close_conv_handle ();
 }
 
 bool
@@ -1683,55 +1687,50 @@ cmp_shortcut_header (win_shortcut_hdr *file_header)
 }
 
 int
-symlink_info::check_shortcut (HANDLE in_h)
+symlink_info::check_shortcut (HANDLE h)
 {
   tmp_pathbuf tp;
   win_shortcut_hdr *file_header;
   char *buf, *cp;
   unsigned short len;
   int res = 0;
-  OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
-  HANDLE h;
   IO_STATUS_BLOCK io;
   FILE_STANDARD_INFORMATION fsi;
+  LARGE_INTEGER off = { QuadPart:0LL };
 
-  InitializeObjectAttributes (&attr, &ro_u_empty, 0, in_h, NULL);
-  status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
-		       &attr, &io, FILE_SHARE_VALID_FLAGS,
-		       FILE_OPEN_FOR_BACKUP_INTENT
-		       | FILE_SYNCHRONOUS_IO_NONALERT);
-  if (!NT_SUCCESS (status))
-    return 0;
   status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
 				   FileStandardInformation);
   if (!NT_SUCCESS (status))
     {
       set_error (EIO);
-      goto out;
+      return 0;
     }
   if (fsi.EndOfFile.QuadPart <= sizeof (win_shortcut_hdr)
       || fsi.EndOfFile.QuadPart > 4 * 65536)
-    goto out;
+    return 0;
   if (fsi.EndOfFile.LowPart < NT_MAX_PATH * sizeof (WCHAR))
     buf = (char *) tp.w_get ();
   else
     buf = (char *) alloca (fsi.EndOfFile.LowPart + 1);
-  if (!NT_SUCCESS (NtReadFile (h, NULL, NULL, NULL,
-			       &io, buf, fsi.EndOfFile.LowPart, NULL, NULL)))
+  status = NtReadFile (h, NULL, NULL, NULL, &io, buf, fsi.EndOfFile.LowPart,
+		       &off, NULL);
+  status = wait_pending (status, h, io);
+  if (!NT_SUCCESS (status))
     {
-      set_error (EIO);
-      goto out;
+      if (status != STATUS_END_OF_FILE)
+	set_error (EIO);
+      return 0;
     }
   file_header = (win_shortcut_hdr *) buf;
   if (io.Information != fsi.EndOfFile.LowPart
       || !cmp_shortcut_header (file_header))
-    goto out;
+    return 0;
   cp = buf + sizeof (win_shortcut_hdr);
   if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
     cp += *(unsigned short *) cp + 2;
   if (!(len = *(unsigned short *) cp))
-    goto out;
+    return 0;
   cp += 2;
   /* Check if this is a device file - these start with the sequence :\\ */
   if (strncmp (cp, ":\\", 2) == 0)
@@ -1751,11 +1750,11 @@ symlink_info::check_shortcut (HANDLE in_h)
 	  char *tmpbuf = tp.c_get ();
 	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) (cp + 2))
 	      > SYMLINK_MAX + 1)
-	    goto out;
+	    return 0;
 	  res = posixify (tmpbuf);
 	}
       else if (len > SYMLINK_MAX)
-	goto out;
+	return 0;
       else
 	{
 	  cp[len] = '\0';
@@ -1764,41 +1763,33 @@ symlink_info::check_shortcut (HANDLE in_h)
     }
   if (res) /* It's a symlink.  */
     pflags |= PATH_SYMLINK | PATH_LNK;
-
-out:
-  NtClose (h);
   return res;
 }
 
 int
-symlink_info::check_sysfile (HANDLE in_h)
+symlink_info::check_sysfile (HANDLE h)
 {
   tmp_pathbuf tp;
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
   char *srcbuf = tp.c_get ();
   int res = 0;
-  OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
-  HANDLE h;
   IO_STATUS_BLOCK io;
   bool interix_symlink = false;
+  LARGE_INTEGER off = { QuadPart:0LL };
 
-  InitializeObjectAttributes (&attr, &ro_u_empty, 0, in_h, NULL);
-  status = NtOpenFile (&h, FILE_READ_DATA | SYNCHRONIZE,
-		       &attr, &io, FILE_SHARE_VALID_FLAGS,
-		       FILE_OPEN_FOR_BACKUP_INTENT
-		       | FILE_SYNCHRONOUS_IO_NONALERT);
+  status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
+		       sizeof (cookie_buf), &off, NULL);
+  status = wait_pending (status, h, io);
   if (!NT_SUCCESS (status))
-    return 0;
-  else if (!NT_SUCCESS (status = NtReadFile (h, NULL, NULL, NULL, &io,
-					     cookie_buf, sizeof (cookie_buf),
-					     NULL, NULL)))
     {
       debug_printf ("ReadFile1 failed %p", status);
       if (status != STATUS_END_OF_FILE)
 	set_error (EIO);
+      return 0;
     }
-  else if (io.Information == sizeof (cookie_buf)
+  off.QuadPart = io.Information;
+  if (io.Information == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
     {
       /* It's a symlink.  */
@@ -1817,14 +1808,13 @@ symlink_info::check_sysfile (HANDLE in_h)
       /* Interix symlink cookies are shorter than Cygwin symlink cookies, so
          in case of an Interix symlink cooky we have read too far into the
 	 file.  Set file pointer back to the position right after the cookie. */
-      FILE_POSITION_INFORMATION fpi;
-      fpi.CurrentByteOffset.QuadPart = sizeof (INTERIX_SYMLINK_COOKIE) - 1;
-      NtSetInformationFile (h, &io, &fpi, sizeof fpi, FilePositionInformation);
+      off.QuadPart = sizeof (INTERIX_SYMLINK_COOKIE) - 1;
     }
   if (pflags & PATH_SYMLINK)
     {
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
-			   NT_MAX_PATH, NULL, NULL);
+			   NT_MAX_PATH, &off, NULL);
+      status = wait_pending (status, h, io);
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("ReadFile2 failed");
@@ -1852,7 +1842,6 @@ symlink_info::check_sysfile (HANDLE in_h)
       else
 	res = posixify (srcbuf);
     }
-  NtClose (h);
   return res;
 }
 
@@ -1916,7 +1905,6 @@ symlink_info::check_nfs_symlink (HANDLE h)
 {
   tmp_pathbuf tp;
   NTSTATUS status;
-  OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   struct {
     FILE_GET_EA_INFORMATION fgei;
@@ -1925,11 +1913,6 @@ symlink_info::check_nfs_symlink (HANDLE h)
   PFILE_FULL_EA_INFORMATION pffei;
   int res = 0;
 
-  InitializeObjectAttributes (&attr, &ro_u_empty, 0, h, NULL);
-  status = NtOpenFile (&h, FILE_READ_EA, &attr, &io, FILE_SHARE_VALID_FLAGS,
-		       FILE_OPEN_REPARSE_POINT | FILE_OPEN_FOR_BACKUP_INTENT);
-  if (!NT_SUCCESS (status))
-    return 0;
   /* To find out if the file is a symlink and to get the symlink target,
      try to fetch the NfsSymlinkTargetName EA. */
   fgei_buf.fgei.NextEntryOffset = 0;
@@ -1938,13 +1921,12 @@ symlink_info::check_nfs_symlink (HANDLE h)
   pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
   status = NtQueryEaFile (h, &io, pffei, NT_MAX_PATH * sizeof (WCHAR), TRUE,
 			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
-  NtClose (h);
   if (NT_SUCCESS (status) && pffei->EaValueLength > 0)
     {
       PWCHAR spath = (PWCHAR)
 		     (pffei->EaName + pffei->EaNameLength + 1);
       res = sys_wcstombs (contents, SYMLINK_MAX + 1,
-		      spath, pffei->EaValueLength);
+			  spath, pffei->EaValueLength) - 1;
       pflags |= PATH_SYMLINK;
     }
   return res;
@@ -2197,8 +2179,8 @@ symlink_info::parse_device (const char *contents)
    stored into BUF if PATH is a symlink.  */
 
 int
-symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt,
-		     fs_info &fs)
+symlink_info::check (char *path, const suffix_info *suffixes, fs_info &fs,
+		     path_conv_handle &conv_hdl)
 {
   int res;
   HANDLE h;
@@ -2238,6 +2220,10 @@ restart:
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
 
+# define MIN_STAT_ACCESS	(READ_CONTROL | FILE_READ_ATTRIBUTES)
+# define FULL_STAT_ACCESS	(SYNCHRONIZE | GENERIC_READ)
+  ACCESS_MASK access = 0;
+
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
@@ -2255,14 +2241,22 @@ restart:
 	 symlink (which would spoil the task of this method quite a bit).
 	 Fortunately it's ignored on most other file systems so we don't have
 	 to special case NFS too much. */
-      status = NtCreateFile (&h,
-			     READ_CONTROL | FILE_READ_ATTRIBUTES,
-			     &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
-			     FILE_OPEN,
+      status = NtCreateFile (&h, access = FULL_STAT_ACCESS, &attr, &io, NULL,
+			     0, FILE_SHARE_VALID_FLAGS, FILE_OPEN,
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
-      debug_printf ("%p = NtCreateFile (%S)", status, &upath);
+      if (status == STATUS_ACCESS_DENIED)
+	{
+	  status = NtCreateFile (&h, access = MIN_STAT_ACCESS, &attr, &io,
+				 NULL, 0, FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+				 FILE_OPEN_REPARSE_POINT
+				 | FILE_OPEN_FOR_BACKUP_INTENT,
+				 eabuf, easize);
+	  debug_printf ("%p = NtCreateFile (2:%S)", status, &upath);
+	}
+      else
+	debug_printf ("%p = NtCreateFile (1:%S)", status, &upath);
       /* No right to access EAs or EAs not supported? */
       if (!NT_SUCCESS (status)
 	  && (status == STATUS_ACCESS_DENIED
@@ -2282,11 +2276,20 @@ restart:
 	      eabuf = NULL;
 	      easize = 0;
 	    }
-	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
-			       &attr, &io, FILE_SHARE_VALID_FLAGS,
+	  status = NtOpenFile (&h, access = FULL_STAT_ACCESS, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  debug_printf ("%p = NtOpenFile (no-EA, %S)", status, &upath);
+	  if (status == STATUS_ACCESS_DENIED)
+	    {
+	      status = NtOpenFile (&h, access = MIN_STAT_ACCESS, &attr, &io,
+				   FILE_SHARE_VALID_FLAGS,
+				   FILE_OPEN_REPARSE_POINT
+				   | FILE_OPEN_FOR_BACKUP_INTENT);
+	      debug_printf ("%p = NtOpenFile (no-EAs 2:%S)", status, &upath);
+	    }
+	  else
+	    debug_printf ("%p = NtOpenFile (no-EA 1:%S)", status, &upath);
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
@@ -2478,7 +2481,10 @@ restart:
       if ((fileattr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY))
 	  == FILE_ATTRIBUTE_READONLY && suffix.lnk_match ())
 	{
-	  res = check_shortcut (h);
+	  if (!(access & GENERIC_READ))
+	    res = 0;
+	  else
+	    res = check_shortcut (h);
 	  if (!res)
 	    {
 	      /* If searching for `foo' and then finding a `foo.lnk' which is
@@ -2538,17 +2544,23 @@ restart:
       else if ((fileattr & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY))
 	       == FILE_ATTRIBUTE_SYSTEM)
 	{
-	  res = check_sysfile (h);
+	  if (!(access & GENERIC_READ))
+	    res = 0;
+	  else
+	    res = check_sysfile (h);
 	  if (res)
 	    break;
 	}
 
-      /* If the file could be opened with FILE_READ_EA, and if it's on a
-	 NFS share, check if it's a symlink.  Only files can be symlinks
+      /* If the file is on an NFS share and could be opened with extended
+	 attributes, check if it's a symlink.  Only files can be symlinks
 	 (which can be symlinks to directories). */
       else if (fs.is_nfs () && !no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY))
 	{
-	  res = check_nfs_symlink (h);
+	  if (!(access & GENERIC_READ))
+	    res = 0;
+	  else
+	    res = check_nfs_symlink (h);
 	  if (res)
 	    break;
 	}
@@ -2562,7 +2574,12 @@ restart:
     }
 
   if (h)
-    NtClose (h);
+    {
+      if (pflags & PC_KEEP_HANDLE)
+	conv_hdl.set (h, access);
+      else
+	NtClose (h);
+    }
 
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);
