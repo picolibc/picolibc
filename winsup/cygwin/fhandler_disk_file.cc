@@ -746,9 +746,9 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
     {
       OBJECT_ATTRIBUTES attr;
       opened = NT_SUCCESS (NtOpenFile (&fh, READ_CONTROL,
-				     pc.get_object_attr (attr, sec_none_nih),
-				     &io, FILE_SHARE_VALID_FLAGS,
-				     FILE_OPEN_FOR_BACKUP_INTENT));
+				       pc.get_object_attr (attr, sec_none_nih),
+				       &io, FILE_SHARE_VALID_FLAGS,
+				       FILE_OPEN_FOR_BACKUP_INTENT));
       if (!opened)
 	{
 	  /* Can't open file.  Try again with parent dir. */
@@ -756,8 +756,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	  RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, NULL);
 	  attr.ObjectName = &dirname;
 	  opened = NT_SUCCESS (NtOpenFile (&fh, READ_CONTROL, &attr, &io,
-					 FILE_SHARE_VALID_FLAGS,
-					 FILE_OPEN_FOR_BACKUP_INTENT));
+					   FILE_SHARE_VALID_FLAGS,
+					   FILE_OPEN_FOR_BACKUP_INTENT));
 	  if (!opened)
 	    goto out;
 	}
