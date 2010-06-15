@@ -294,7 +294,7 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
   fgei_buf.fgei.NextEntryOffset = 0;
   fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
   stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
-  status = NtQueryEaFile (get_handle (), &io,
+  status = NtQueryEaFile (get_stat_handle (), &io,
 			  &ffei_buf.ffei, sizeof ffei_buf, TRUE,
 			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
   if (NT_SUCCESS (status))
@@ -674,10 +674,34 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	    {
 	      LARGE_INTEGER off = { QuadPart:0LL };
 	      char magic[3];
-	      NTSTATUS status;
+	      NTSTATUS status = 0;
 	      IO_STATUS_BLOCK io;
+	      bool opened = false;
 
-	      if (get_stat_access () & (GENERIC_READ | FILE_READ_DATA))
+	      if (h == get_handle ())
+		{
+		  /* We have been opened via fstat.  We have to re-open the
+		     file.  Either the file is not opened for reading, or the
+		     read will change the file position. */
+		  OBJECT_ATTRIBUTES attr;
+		  if (pc.fs_is_nwfs ())
+		    InitializeObjectAttributes (&attr, pc.get_nt_native_path (),
+						OBJ_CASE_INSENSITIVE,
+						NULL, NULL)
+		  else
+		    InitializeObjectAttributes (&attr, &ro_u_empty, 0,
+						get_handle (), NULL);
+		  status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
+				       &attr, &io, FILE_SHARE_VALID_FLAGS,
+				       FILE_OPEN_FOR_BACKUP_INTENT
+				       | FILE_OPEN_REPARSE_POINT);
+		  if (!NT_SUCCESS (status))
+		    debug_printf ("%p = NtOpenFile(%S)", status,
+				  pc.get_nt_native_path ());
+		  else
+		    opened = true;
+		}
+	      if (NT_SUCCESS (status))
 		{
 		  status = NtReadFile (h, NULL, NULL, NULL,
 				       &io, magic, 3, &off, NULL);
@@ -692,6 +716,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		      buf->st_mode |= STD_XBITS;
 		    }
 		}
+	      if (opened)
+		NtClose (h);
 	    }
 	}
       if (pc.exec_state () == is_executable)

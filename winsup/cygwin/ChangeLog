@@ -1,5 +1,12 @@
 2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Use handle
+	returned by get_stat_handle.
+	(fhandler_base::fstat_helper): Reinstatiate code to re-open the file
+	when checking for executability if called via fstat.  Explain why.
+
+2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::dup_worker): Reset path_conv handle in duplicated
 	fhandler.
 	* fhandler.cc (fhandler_base::fstatvfs): Keep handle in created
