@@ -1,3 +1,11 @@
+2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (path_conv::get_ino_by_handle): Convert from
+	static function to path_conv method.  Accommodate throughout.
+	(path_conv::ndisk_links): Unused, comment out.
+	* path.h (path_conv::get_ino_by_handle): Declare.
+	(path_conv::ndisk_links): Comment out declaration.
+
 2010-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Return with ENOTDIR if component is a

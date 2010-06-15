@@ -178,19 +178,22 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
   return ret;
 }
 
-static inline __ino64_t
-get_ino_by_handle (path_conv &pc, HANDLE hdl)
+inline __ino64_t
+path_conv::get_ino_by_handle (HANDLE hdl)
 {
   IO_STATUS_BLOCK io;
   FILE_INTERNAL_INFORMATION fai;
 
   if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
 					  FileInternalInformation))
-      && pc.isgood_inode (fai.FileId.QuadPart))
+      && isgood_inode (fai.FileId.QuadPart))
     return fai.FileId.QuadPart;
   return 0;
 }
 
+#if 0
+/* This function is obsolete.  We're keeping it in so we don't forget
+   that we already did all that at one point. */
 unsigned __stdcall
 path_conv::ndisk_links (DWORD nNumberOfLinks)
 {
@@ -268,6 +271,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   delete dir;
   return count;
 }
+#endif
 
 /* For files on NFS shares, we request an EA of type NfsV3Attributes.
    This returns the content of a struct fattr3 as defined in RFC 1813.
@@ -549,12 +553,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   to_timestruc_t ((PFILETIME) CreationTime, &buf->st_birthtim);
   buf->st_rdev = buf->st_dev = dwVolumeSerialNumber;
   buf->st_size = (_off64_t) nFileSize;
-  /* The number of links to a directory includes the
-     number of subdirectories in the directory, since all
-     those subdirectories point to it.
-     This is too slow on remote drives, so we do without it.
-     Setting the count to 2 confuses `find (1)' command. So
-     let's try it with `1' as link count. */
+  /* The number of links to a directory includes the number of subdirectories
+     in the directory, since all those subdirectories point to it.  However,
+     this is painfully slow, so we do without it. */
 #if 0
   buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
 #else
@@ -1450,7 +1451,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-    ino = get_ino_by_handle (pc, get_handle ());
+    ino = pc.get_ino_by_handle (get_handle ());
     /* A unique ID is necessary to recognize fhandler entries which are
        duplicated by dup(2) or fork(2). */
     AllocateLocallyUniqueId ((PLUID) &unique_id);
@@ -1791,7 +1792,7 @@ readdir_get_ino (const char *path, bool dot_dot)
 				   | (pc.is_rep_symlink ()
 				      ? FILE_OPEN_REPARSE_POINT : 0))))
     {
-      ino = get_ino_by_handle (pc, hdl);
+      ino = pc.get_ino_by_handle (hdl);
       if (!ino)
 	ino = hash_path_name (0, pc.get_nt_native_path ());
       NtClose (hdl);
@@ -1848,7 +1849,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 				      FILE_SHARE_VALID_FLAGS,
 				      FILE_OPEN_FOR_BACKUP_INTENT))))
 	{
-	  de->d_ino = get_ino_by_handle (pc, reph);
+	  de->d_ino = pc.get_ino_by_handle (reph);
 	  NtClose (reph);
 	}
     }
@@ -2040,14 +2041,14 @@ go_ahead:
 	     filesystems it's no safe bet that "." and ".." entries always
 	     come first. */
 	  if (FileNameLength == sizeof (WCHAR) && FileName[0] == '.')
-	    de->d_ino = get_ino_by_handle (pc, get_handle ());
+	    de->d_ino = pc.get_ino_by_handle (get_handle ());
 	  else if (FileNameLength == 2 * sizeof (WCHAR)
 		   && FileName[0] == L'.' && FileName[1] == L'.')
 	    {
 	      if (!(dir->__flags & dirent_isroot))
 		de->d_ino = readdir_get_ino (get_name (), true);
 	      else
-		de->d_ino = get_ino_by_handle (pc, get_handle ());
+		de->d_ino = pc.get_ino_by_handle (get_handle ());
 	    }
 	  else
 	    {
@@ -2082,7 +2083,7 @@ go_ahead:
 				       | FILE_OPEN_REPARSE_POINT);
 	      if (NT_SUCCESS (f_status))
 		{
-		  de->d_ino = get_ino_by_handle (pc, hdl);
+		  de->d_ino = pc.get_ino_by_handle (hdl);
 		  NtClose (hdl);
 		}
 	    }
@@ -2098,7 +2099,7 @@ go_ahead:
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
-      de->d_ino = get_ino_by_handle (pc, get_handle ());
+      de->d_ino = pc.get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;
@@ -2109,7 +2110,7 @@ go_ahead:
       if (!(dir->__flags & dirent_isroot))
 	de->d_ino = readdir_get_ino (get_name (), true);
       else
-	de->d_ino = get_ino_by_handle (pc, get_handle ());
+	de->d_ino = pc.get_ino_by_handle (get_handle ());
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;
