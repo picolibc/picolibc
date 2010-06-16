@@ -125,4 +125,26 @@ END_RELOC_NUMBERS (R_TIC6X_max)
 /* Segment cannot be further relocated.  */
 #define PHA_READONLY		0x2
 
+/* Build attributes.  */
+enum
+  {
+#define TAG(tag, value) tag = value,
+#include "elf/tic6x-attrs.h"
+#undef TAG
+    Tag_C6XABI_last
+  };
+
+/* Values for Tag_C6XABI_Tag_CPU_arch.  GNU-specific names pending any
+   ABI defining official names associated with the values.  */
+enum
+  {
+    C6XABI_Tag_CPU_arch_none = 0,
+    C6XABI_Tag_CPU_arch_C62X = 1,
+    C6XABI_Tag_CPU_arch_C67X = 3,
+    C6XABI_Tag_CPU_arch_C67XP = 4,
+    C6XABI_Tag_CPU_arch_C64X = 6,
+    C6XABI_Tag_CPU_arch_C64XP = 7,
+    C6XABI_Tag_CPU_arch_C674X = 8
+  };
+
 #endif /* _ELF_TIC6X_H */

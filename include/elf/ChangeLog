@@ -1,3 +1,12 @@
+2010-06-15  Joseph Myers  <joseph@codesourcery.com>
+
+	* tic6x-attrs.h: New.
+	* tic6x.h: Include elf/tic6x-attrs.h for attribute table.
+	(C6XABI_Tag_CPU_arch_none, C6XABI_Tag_CPU_arch_C62X,
+	C6XABI_Tag_CPU_arch_C67X, C6XABI_Tag_CPU_arch_C67XP,
+	C6XABI_Tag_CPU_arch_C64X, C6XABI_Tag_CPU_arch_C64XP,
+	C6XABI_Tag_CPU_arch_C674X): Define.
+
 2010-06-11  Tristan Gingold  <gingold@adacore.com>
 
 	* ia64.h (EF_IA_64_VMS_COMCOD, EF_IA_64_VMS_COMCOD_SUCCESS)
