@@ -1,3 +1,8 @@
+2010-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Fetch stat
+	handle only after checking for NFS.
+
 2010-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Use handle

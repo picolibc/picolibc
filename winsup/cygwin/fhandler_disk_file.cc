@@ -333,7 +333,6 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
-  HANDLE h = get_stat_handle ();
 
   if (pc.fs_is_nfs ())
     return fstat_by_nfs_ea (buf);
@@ -349,6 +348,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   } fi;
   FILE_STANDARD_INFORMATION fsi;
   FILE_INTERNAL_INFORMATION fii;
+
+  HANDLE h = get_stat_handle ();
 
   if (pc.has_buggy_basic_info ())
     {
