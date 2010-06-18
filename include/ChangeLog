@@ -1,3 +1,8 @@
+2010-06-18  Rafael Espindola  <espindola@google.com>
+
+	* plugin.h (ld_plugin_add_input_file, ld_plugin_add_input_library):
+	Make argument const.
+
 2010-06-08  Laurynas Biveinis  <laurynas.biveinis@gmail.com>
 
 	* splay-tree.h: Update copyright years.
