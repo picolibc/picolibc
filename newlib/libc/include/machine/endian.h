@@ -10,7 +10,7 @@
 #endif
 
 #ifndef BYTE_ORDER
-#ifdef __IEEE_LITTLE_ENDIAN
+#if defined(__IEEE_LITTLE_ENDIAN) || defined(__IEEE_BYTES_LITTLE_ENDIAN)
 #define BYTE_ORDER LITTLE_ENDIAN
 #else
 #define BYTE_ORDER BIG_ENDIAN

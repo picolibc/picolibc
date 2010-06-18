@@ -1,3 +1,11 @@
+2010-06-18  Pavel Pisa <ppisa4lists@pikron.com>
+
+	* libc/include/machine/ieeefp.h[__arm__][!__VFP_FP__]: Set to
+	__IEEE_BIG_ENDIAN and set __IEEE_BYTES_LITTLE_ENDIAN appropriately
+	based on __ARMEL flag.
+	* libc/include/machine/endian.h: To set byte order to LITTLE_ENDIAN,
+	check for __IEEE_LITTLE_ENDIAN or __IEEE_BYTES_LITTLE_ENDIAN.
+
 2010-06-09  Paul Brook  <paul@codesourcery.com>
 
 	* libc/include/sys/reent.h (_reent): Adjust _REENT_SMALL to be
