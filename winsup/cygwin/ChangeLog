@@ -1,5 +1,14 @@
 2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* tmpbuf.h: New file.
+	* flock.cc: Include tmpbuf.h for new tmpbuf functionality.
+	(allow_others_to_sync): Use tmpbuf rather than tmp_pathbuf.  Explain
+	why.
+	(lf_setlock): For consistency, use tmpbuf rather than tmp_pathbuf.
+	(lf_getlock): Ditto.
+
+2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* dcrt0.cc (__api_fatal): Temporarily generate a stackdump.
 
 2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>

@@ -105,7 +105,7 @@
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
-#include "tls_pbuf.h"
+#include "tmpbuf.h"
 #include "ntdll.h"
 #include <sys/queue.h>
 #include <wchar.h>
@@ -151,10 +151,11 @@ allow_others_to_sync ()
   LPVOID ace;
   ULONG len;
 
-  /* Get this process DACL.  We use a temporary path buffer in TLS space
-     to avoid having to alloc 64K from the stack. */
-  tmp_pathbuf tp;
-  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) tp.w_get ();
+  /* Get this process DACL.  We use a temporary buffer to avoid having to
+     alloc 64K from the stack.  Can't use tls functions at this point because
+     this gets called during initialization when the tls is not really
+     available.  */
+  tmpbuf sd;
   status = NtQuerySecurityObject (NtCurrentProcess (),
 				  DACL_SECURITY_INFORMATION, sd,
 				  NT_MAX_PATH * sizeof (WCHAR), &len);
@@ -873,7 +874,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
   lockf_t **head = lock->lf_head;
   lockf_t **prev, *overlap;
   int ovcase, priority, old_prio, needtolink;
-  tmp_pathbuf tp;
+  tmpbuf tp;
 
   /*
    * Set the priority
@@ -885,7 +886,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
    * Scan lock list for this file looking for locks that would block us.
    */
   /* Create temporary space for the all locks list. */
-  node->i_all_lf = (lockf_t *) tp.w_get ();
+  node->i_all_lf = (lockf_t *) (void *) tp;
   while ((block = lf_getblock(lock, node)))
     {
       DWORD ret;
@@ -1227,10 +1228,10 @@ static int
 lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
 {
   lockf_t *block;
-  tmp_pathbuf tp;
+  tmpbuf tp;
 
   /* Create temporary space for the all locks list. */
-  node->i_all_lf = (lockf_t *) tp.w_get ();
+  node->i_all_lf = (lockf_t *) (void * ) tp;
   if ((block = lf_getblock (lock, node)))
     {
       if (block->lf_obj)
