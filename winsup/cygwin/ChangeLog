@@ -1,5 +1,9 @@
 2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* dcrt0.cc (__api_fatal): Temporarily generate a stackdump.
+
+2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* tls_pbuf.cc (tmp_pathbuf::w_get): Report what's failing when too many
 	buffers are in use.
 

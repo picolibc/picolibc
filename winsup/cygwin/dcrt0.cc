@@ -1145,6 +1145,8 @@ _exit (int n)
   do_exit (((DWORD) n & 0xff) << 8);
 }
 
+extern "C" void cygwin_stackdump ();
+
 extern "C" void
 __api_fatal (const char *fmt, ...)
 {
@@ -1160,6 +1162,7 @@ __api_fatal (const char *fmt, ...)
 #ifdef DEBUGGING
   try_to_debug ();
 #endif
+  cygwin_stackdump ();
   myself.exit (__api_fatal_exit_val);
 }
 
