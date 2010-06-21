@@ -1,3 +1,8 @@
+2010-06-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* tls_pbuf.cc (tmp_pathbuf::w_get): Report what's failing when too many
+	buffers are in use.
+
 2010-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Fetch stat
