@@ -105,7 +105,7 @@
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
-#include "tmpbuf.h"
+#include "tls_pbuf.h"
 #include "ntdll.h"
 #include <sys/queue.h>
 #include <wchar.h>
@@ -151,20 +151,20 @@ allow_others_to_sync ()
   LPVOID ace;
   ULONG len;
 
-  /* Get this process DACL.  We use a temporary buffer to avoid having to
-     alloc 64K from the stack.  Can't use tls functions at this point because
-     this gets called during initialization when the tls is not really
-     available.  */
-  tmpbuf sd;
+  /* Get this process DACL.  We use a rather small stack buffer here which
+     should be more than sufficient for process ACLs.  Can't use tls functions
+     at this point because this gets called during initialization when the tls
+     is not really available.  */
+  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) alloca (ACL_DEFAULT_SIZE);
   status = NtQuerySecurityObject (NtCurrentProcess (),
 				  DACL_SECURITY_INFORMATION, sd,
-				  NT_MAX_PATH * sizeof (WCHAR), &len);
+				  ACL_DEFAULT_SIZE, &len);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQuerySecurityObject: %p", status);
       return;
     }
-  /* Create a valid dacl pointer and set it's size to be as big as
+  /* Create a valid dacl pointer and set its size to be as big as
      there's room in the temporary buffer.  Note that the descriptor
      is in self-relative format. */
   dacl = (PACL) ((char *) sd + (uintptr_t) sd->Dacl);
@@ -874,7 +874,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
   lockf_t **head = lock->lf_head;
   lockf_t **prev, *overlap;
   int ovcase, priority, old_prio, needtolink;
-  tmpbuf tp;
+  tmp_pathbuf tp;
 
   /*
    * Set the priority
@@ -886,7 +886,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
    * Scan lock list for this file looking for locks that would block us.
    */
   /* Create temporary space for the all locks list. */
-  node->i_all_lf = (lockf_t *) (void *) tp;
+  node->i_all_lf = (lockf_t *) (void *) tp.w_get ();
   while ((block = lf_getblock(lock, node)))
     {
       DWORD ret;
@@ -1228,10 +1228,10 @@ static int
 lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
 {
   lockf_t *block;
-  tmpbuf tp;
+  tmp_pathbuf tp;
 
   /* Create temporary space for the all locks list. */
-  node->i_all_lf = (lockf_t *) (void * ) tp;
+  node->i_all_lf = (lockf_t *) (void * ) tp.w_get ();
   if ((block = lf_getblock (lock, node)))
     {
       if (block->lf_obj)

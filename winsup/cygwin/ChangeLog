@@ -1,5 +1,12 @@
 2010-06-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (allow_others_to_sync): Use small stack buffer rather
+	than big temp buffer.  Fix typo in comment.
+	(lf_setlock): Revert to using tmp_pathbuf.
+	(lf_getlock): Ditto.
+
+2010-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (setacl): Use the long time unused ACL_DEFAULT_SIZE
 	instead of a constant value.
 	* security.cc (alloc_sd): Ditto.
