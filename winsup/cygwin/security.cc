@@ -454,8 +454,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Initialize local access control list. */
-  PACL acl = (PACL) alloca (3072);
-  if (!InitializeAcl (acl, 3072, ACL_REVISION))
+  PACL acl = (PACL) alloca (ACL_DEFAULT_SIZE);
+  if (!InitializeAcl (acl, ACL_DEFAULT_SIZE, ACL_REVISION))
     {
       __seterrno ();
       return NULL;

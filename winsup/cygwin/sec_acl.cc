@@ -83,7 +83,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
     }
 
   /* Fill access control list. */
-  PACL acl = (PACL) alloca (3072);
+  PACL acl = (PACL) alloca (ACL_DEFAULT_SIZE);
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
@@ -92,7 +92,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   struct __group32 *gr;
   int pos;
 
-  if (!InitializeAcl (acl, 3072, ACL_REVISION))
+  if (!InitializeAcl (acl, ACL_DEFAULT_SIZE, ACL_REVISION))
     {
       __seterrno ();
       return -1;
