@@ -1,3 +1,8 @@
+2010-06-24  Kevin Buettner  <kevinb@redhat.com>
+
+	* sim-rx.h (sim_rx_regnum): Add sim_rx_acc_regnum.  Adjust
+	register order.
+
 2010-04-13  Mike Frysinger  <vapier@gentoo.org>
 
 	* callback.h: Strip PARAMS from prototypes.

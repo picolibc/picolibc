@@ -40,15 +40,16 @@ enum sim_rx_regnum
     sim_rx_r13_regnum,
     sim_rx_r14_regnum,
     sim_rx_r15_regnum,
-    sim_rx_isp_regnum,
     sim_rx_usp_regnum,
-    sim_rx_intb_regnum,
-    sim_rx_pc_regnum,
+    sim_rx_isp_regnum,
     sim_rx_ps_regnum,
-    sim_rx_bpc_regnum,
+    sim_rx_pc_regnum,
+    sim_rx_intb_regnum,
     sim_rx_bpsw_regnum,
+    sim_rx_bpc_regnum,
     sim_rx_fintv_regnum,
     sim_rx_fpsw_regnum,
+    sim_rx_acc_regnum,
     sim_rx_num_regs
   };
 
