@@ -1,3 +1,7 @@
+2010-06-25  Alan Modra  <amodra@gmail.com>
+
+	* ppc64.h (R_PPC64_LO_DS_OPT): Define.
+
 2010-06-15  Joseph Myers  <joseph@codesourcery.com>
 
 	* tic6x-attrs.h: New.

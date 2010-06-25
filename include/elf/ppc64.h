@@ -140,6 +140,10 @@ START_RELOC_NUMBERS (elf_ppc64_reloc_type)
   RELOC_NUMBER (R_PPC64_TLSGD,		   107)
   RELOC_NUMBER (R_PPC64_TLSLD,		   108)
 
+#ifndef RELOC_MACROS_GEN_FUNC
+/* Fake relocation only used internally by ld.  */
+  RELOC_NUMBER (R_PPC64_LO_DS_OPT,	   128)
+#endif
 /* Support STT_GNU_IFUNC plt calls.  */
   RELOC_NUMBER (R_PPC64_JMP_IREL,	   247)
   RELOC_NUMBER (R_PPC64_IRELATIVE,	   248)
