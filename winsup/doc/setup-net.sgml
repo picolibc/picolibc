@@ -167,7 +167,8 @@ if you know the name of a package you want to install but not which
 category it is in. 
 Click on the <literal>View</literal> button and it will rotate between 
 <literal>Category</literal> (the default), <literal>Full</literal> (all 
-packages), and <literal>Partial</literal> (only packages to be upgraded).
+packages), and <literal>Partial</literal> (only packages to be
+installed or upgraded).
 If you are familiar with Unix, you will probably want to at least glance 
 through the <literal>Full</literal> listing for your favorite tools.
 </para>
@@ -186,6 +187,12 @@ To <literal>Uninstall</literal>, <literal>Reinstall</literal>, or get the
 Also, to avoid the need to reboot after upgrading, make sure
 to close all Cygwin windows and stop all Cygwin processes before 
 <command>setup.exe</command> begins to install the upgraded package.
+</para>
+<para>
+To avoid unintentionally upgrading, use the <literal>Partial</literal>
+view to see which packages have been marked for upgrading.  If you
+don't want to upgrade a package, click on the new version number to
+toggle it until it says <literal>Keep</literal>.
 </para>
 <para>
 The final feature of the <command>setup.exe</command> chooser is for
