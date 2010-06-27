@@ -17,7 +17,7 @@ CC:=@CC@
 CC_FOR_TARGET:=@CC@
 exeext:=@build_exeext@
 
-XMLTO:=xmlto --skip-validation
+XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
 
@@ -56,7 +56,7 @@ cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
 
 # Some versions of jw hang with the -o option
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.sgml
-	-cd cygwin-ug-net && docbook2pdf ../$<
+	-${XMLTO} pdf -o cygwin-ug-net/ $<
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
@@ -65,7 +65,7 @@ cygwin-api/cygwin-api.html : cygwin-api.sgml
 	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.sgml
-	-cd cygwin-api && docbook2pdf ../$<
+	-${XMLTO} pdf -o cygwin-api/ $<
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<

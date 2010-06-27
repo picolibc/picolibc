@@ -7,8 +7,8 @@ bash
 bzip2
 coreutils
 cygwin
-docbook-utils
-docbook-xml42
+dblatex
+docbook-xml45
 docbook-xsl
 gzip
 make
