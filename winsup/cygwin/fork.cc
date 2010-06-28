@@ -286,7 +286,7 @@ frok::parent (volatile char * volatile stack_here)
   this_errno = 0;
   bool fix_impersonation = false;
   pinfo child;
-  static char errbuf[256];
+  static char errbuf[NT_MAX_PATH + 256];
 
   int c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
@@ -367,7 +367,8 @@ frok::parent (volatile char * volatile stack_here)
       if (!rc)
 	{
 	  this_errno = geterrno_from_win_error ();
-	  error = "CreateProcessW failed";
+	  __small_sprintf (errbuf, "CreatProcessW failed for '%W'", myself->progname);
+	  error = errbuf;
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;
 	}

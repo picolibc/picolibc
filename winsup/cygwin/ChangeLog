@@ -1,3 +1,7 @@
+2010-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fork.cc (frok::parent): Improve error message.
+
 2010-06-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (allow_others_to_sync): Use small stack buffer rather
