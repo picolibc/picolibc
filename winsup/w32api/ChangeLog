@@ -1,3 +1,11 @@
+2010-06-28 Rick Rankin <rrankin1424-mingw@yahoo.com>
+
+	* include/psapi.h (PROCESS_MEMORY_COUNTERS_EX, PERFORMANCE_INFORMATION,
+	GetPerformanceInfo): Define.
+	* lib/psapi.def (GetPerformanceInfo): Define.
+	* include/wincrypt.h (CryptEnumProvidersA, CryptEnumProvidersW,
+	CryptEnumProviders): Define.
+
 2010-02-17  LRN  <lrn1986@gmail.com>
 
 	* include/shlguid.h (IID_IFolderView): Define.

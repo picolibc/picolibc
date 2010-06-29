@@ -15,6 +15,7 @@ GetModuleBaseNameW@16
 GetModuleFileNameExA@16
 GetModuleFileNameExW@16
 GetModuleInformation@16
+GetPerformanceInfo@8
 GetProcessMemoryInfo@12
 GetProcessImageFileNameA@12
 GetProcessImageFileNameW@12

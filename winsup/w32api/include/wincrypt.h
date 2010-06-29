@@ -1218,6 +1218,8 @@ WINADVAPI BOOL WINAPI CryptVerifySignatureA(HCRYPTHASH,PBYTE,DWORD,HCRYPTKEY,LPC
 WINADVAPI BOOL WINAPI CryptVerifySignatureW(HCRYPTHASH,PBYTE,DWORD,HCRYPTKEY,LPCWSTR,DWORD);
 WINADVAPI BOOL WINAPI CryptSetProviderA(LPCSTR,DWORD);
 WINADVAPI BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
+WINADVAPI BOOL WINAPI CryptEnumProvidersA(DWORD,DWORD*,DWORD,DWORD*,LPTSTR,DWORD*);
+WINADVAPI BOOL WINAPI CryptEnumProvidersW(DWORD,DWORD*,DWORD,DWORD*,LPTSTR,DWORD*);
 
 #ifdef UNICODE
 #define CertGetNameString CertGetNameStringW
@@ -1231,6 +1233,7 @@ WINADVAPI BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define CryptSignHash CryptSignHashW
 #define CryptVerifySignature CryptVerifySignatureW
 #define CryptSetProvider CryptSetProviderW
+#define CryptEnumProviders CryptEnumProvidersW
 #define CertOpenSystemStore CertOpenSystemStoreW
 #define CERT_FIND_SUBJECT_STR CERT_FIND_SUBJECT_STR_W
 #define CERT_FIND_ISSUER_STR CERT_FIND_ISSUER_STR_W
@@ -1253,6 +1256,7 @@ WINADVAPI BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define CryptSignHash CryptSignHashA
 #define CryptVerifySignature CryptVerifySignatureA
 #define CryptSetProvider CryptSetProviderA
+#define CryptEnumProviders CryptEnumProvidersA
 #define CertOpenSystemStore CertOpenSystemStoreA
 #define CERT_FIND_SUBJECT_STR CERT_FIND_SUBJECT_STR_A
 #define CERT_FIND_ISSUER_STR CERT_FIND_ISSUER_STR_A
