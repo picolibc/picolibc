@@ -683,7 +683,7 @@ territory | South Africa
 
 ...
 
-locale: ca_ES@euro      archive: /mnt/c/Windows/system32/kernel32.dll
+locale: ca_ES@euro      archive: /cygdrive/c/Windows/system32/kernel32.dll
 -------------------------------------------------------------------------------
  language | Catalan
 territory | Spain
