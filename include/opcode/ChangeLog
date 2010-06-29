@@ -1,3 +1,7 @@
+2010-06-29  Alan Modra  <amodra@gmail.com>
+
+	* maxq.h: Delete file.
+
 2010-06-14  Sebastian Andrzej Siewior  <bigeasy@linutronix.de>
 
 	* ppc.h (PPC_OPCODE_E500): Define.
