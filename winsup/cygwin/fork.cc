@@ -342,7 +342,7 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcess (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
+  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
@@ -367,7 +367,7 @@ frok::parent (volatile char * volatile stack_here)
       if (!rc)
 	{
 	  this_errno = geterrno_from_win_error ();
-	  __small_sprintf (errbuf, "CreatProcessW failed for '%W'", myself->progname);
+	  __small_sprintf (errbuf, "CreateProcessW failed for '%W'", myself->progname);
 	  error = errbuf;
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;

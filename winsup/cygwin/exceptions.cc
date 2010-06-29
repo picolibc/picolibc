@@ -193,7 +193,7 @@ dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
     small_printf ("Signal %d at eip=%08x\r\n", e->ExceptionCode, in->Eip);
   small_printf ("eax=%08x ebx=%08x ecx=%08x edx=%08x esi=%08x edi=%08x\r\n",
 		in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
-  small_printf ("ebp=%08x esp=%08x program=%s, pid %u, thread %s\r\n",
+  small_printf ("ebp=%08x esp=%08x program=%W, pid %u, thread %s\r\n",
 		in->Ebp, in->Esp, myself->progname, myself->pid, cygthread::name ());
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
 		in->SegCs, in->SegDs, in->SegEs, in->SegFs, in->SegGs, in->SegSs);

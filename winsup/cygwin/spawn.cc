@@ -692,8 +692,8 @@ loop:
       myself->dwProcessId = pi.dwProcessId;
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
-      wcscpy (myself->progname, real_path.get_nt_native_path ()->Buffer); // FIXME: race?
-      sigproc_printf ("new process name %S", myself->progname);
+      real_path.get_wide_win32_path (myself->progname);
+      sigproc_printf ("new process name %W", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
 	 dies.  Use our own wait facility to wait for our own pid to exit (there
@@ -733,7 +733,7 @@ loop:
       child->dwProcessId = pi.dwProcessId;
       child.hProcess = pi.hProcess;
 
-      wcscpy (child->progname, real_path.get_nt_native_path ()->Buffer);
+      real_path.get_wide_win32_path (child->progname);
       /* FIXME: This introduces an unreferenced, open handle into the child.
 	 The purpose is to keep the pid shared memory open so that all of
 	 the fields filled out by child.remember do not disappear and so there
