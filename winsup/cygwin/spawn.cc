@@ -692,7 +692,7 @@ loop:
       myself->dwProcessId = pi.dwProcessId;
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
-      real_path.get_wide_win32_path (myself->progname);
+      real_path.get_wide_win32_path (myself->progname); // FIXME: race?
       sigproc_printf ("new process name %W", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"

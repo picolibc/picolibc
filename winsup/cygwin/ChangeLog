@@ -1,10 +1,14 @@
 2010-06-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (spawn_guts): Reinstantiate a FIXME comment.
+
+2010-06-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (dump_exception): Use %W instead of %s for printing
 	progname.
 	* fork.cc (frok::parent): Fix typos in debug output.
 	* spawn.cc (spawn_guts): Copy wide Win32 filename into _pinfo::progname,
-	rather than native NT name.
+	rather than native NT name.  Use %W instead of %S for printing progname.
 
 2010-06-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
