@@ -74,7 +74,7 @@ SECTIONS
     KEEP (*(.dtors))
   } > LOROM
   .eh_frame : { KEEP (*(.eh_frame)) } > LOROM
-  .gcc_except_table : { *(.gcc_except_table) } > LOROM
+  .gcc_except_table : { *(.gcc_except_table) *(.gcc_except_table.*) } > LOROM
   .jcr : { *(.jcr) } > LOROM
   .plt : { *(.plt) } > LOROM
   .text      :

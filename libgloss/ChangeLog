@@ -1,3 +1,11 @@
+2010-06-29  Nick Clifton  <nickc@redhat.com>
+
+	* xstormy16/eva_app.ld (.gcc_except_table): Include sections with
+	the .gcc_except_table. prefix.
+	* xstormy16/eva_stub.ld: Likewise.
+	* xstormy16/sim_high.ld: Likewise.
+	* xstormy16/sim_low.ld: Likewise.
+
 2010-05-03  Michael Eager <eager@eagercon.com>
 
 	* rs6000/Makefile.in: Remove xil-exit.o.
