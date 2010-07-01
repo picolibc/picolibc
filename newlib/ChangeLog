@@ -2,7 +2,7 @@
 
 	* libc/include/signal.h (sighandler_t): Add typedef.
 
-2010-06-29  Antony King  <antony.king@sr.com>
+2010-06-29  Antony King  <antony.king@st.com>
 
 	* libc/ctype/ctype_.c (__ctype_ptr): Reinstate definition (guarded by
 	_NEED_OLD_CTYPE_PTR_DEFINITION) for backwards compatibility with newlib
