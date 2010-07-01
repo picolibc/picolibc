@@ -1,3 +1,13 @@
+2010-06-29  Antony King  <antony.king@sr.com>
+
+	* libc/ctype/ctype_.c (__ctype_ptr): Reinstate definition (guarded by
+	_NEED_OLD_CTYPE_PTR_DEFINITION) for backwards compatibility with newlib
+	1.16.0 and earlier.
+
+2010-06-28  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/stat.h: Add ACCESSPERMS, ALLPERMS, and DEFFILEMODE.
+
 2010-06-18  Pavel Pisa <ppisa4lists@pikron.com>
 
 	* libc/include/machine/ieeefp.h[__arm__][!__VFP_FP__]: Set to

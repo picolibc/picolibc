@@ -122,6 +122,12 @@ struct	stat
 #define		S_IWOTH	0000002	/* write permission, other */
 #define		S_IXOTH 0000001/* execute/search permission, other */
 
+#ifndef _POSIX_SOURCE
+#define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO) /* 0777 */
+#define ALLPERMS (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO) /* 07777 */
+#define DEFFILEMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) /* 0666 */
+#endif
+
 #define	S_ISBLK(m)	(((m)&_IFMT) == _IFBLK)
 #define	S_ISCHR(m)	(((m)&_IFMT) == _IFCHR)
 #define	S_ISDIR(m)	(((m)&_IFMT) == _IFDIR)

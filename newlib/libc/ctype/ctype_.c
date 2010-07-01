@@ -98,6 +98,13 @@ char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+#ifndef _MB_CAPABLE
+_CONST
+#endif
+char __EXPORT *__ctype_ptr = (char *) _ctype_b + 128;
+#endif
+
 #ifndef _MB_CAPABLE
 _CONST
 #endif
@@ -128,6 +135,13 @@ _CONST char _ctype_[1 + 256] = {
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
 };
+
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+#ifndef _MB_CAPABLE
+_CONST
+#endif
+char *__ctype_ptr = (char *) _ctype_ + 1;
+#endif
 
 #ifndef _MB_CAPABLE
 _CONST
@@ -160,8 +174,14 @@ __set_ctype (const char *charset)
       else
         ++idx;
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+      __ctype_ptr = (char *) (__ctype_iso[idx] + 128);
+#endif
       __ctype_ptr__ = (char *) (__ctype_iso[idx] + 127);
 #  else
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+      __ctype_ptr = (char *) __ctype_iso[idx] + 1;
+#endif
       __ctype_ptr__ = (char *) __ctype_iso[idx];
 #  endif
       return;
@@ -172,8 +192,14 @@ __set_ctype (const char *charset)
       if (idx < 0)
         break;
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+      __ctype_ptr = (char *) (__ctype_cp[idx] + 128);
+#endif
       __ctype_ptr__ = (char *) (__ctype_cp[idx] + 127);
 #  else
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+      __ctype_ptr = (char *) __ctype_cp[idx] + 1;
+#endif
       __ctype_ptr__ = (char *) __ctype_cp[idx];
 #  endif
       return;
@@ -182,8 +208,14 @@ __set_ctype (const char *charset)
       break;
     }
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+  __ctype_ptr = (char *) _ctype_b + 128;
+#endif
   __ctype_ptr__ = (char *) _ctype_b + 127;
 #  else
+#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
+  __ctype_ptr = (char *) _ctype_ + 1;
+#endif
   __ctype_ptr__ = (char *) _ctype_;
 #  endif
 }
