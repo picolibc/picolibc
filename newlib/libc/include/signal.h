@@ -7,6 +7,7 @@
 _BEGIN_STD_C
 
 typedef int	sig_atomic_t;		/* Atomic entity type (ANSI) */
+typedef _sig_func_ptr sighandler_t;	/* glibc naming */
 
 #define SIG_DFL ((_sig_func_ptr)0)	/* Default action */
 #define SIG_IGN ((_sig_func_ptr)1)	/* Ignore action */
