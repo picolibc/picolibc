@@ -787,7 +787,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else if (optname == SO_PEERCRED)
+  else if (optname == SO_PEERCRED && level == SOL_SOCKET)
     {
       struct ucred *cred = (struct ucred *) optval;
       res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
@@ -800,6 +800,34 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
 			(int *) optlen);
 
+      if (level == SOL_SOCKET)
+	{
+	  switch (optname)
+	    {
+	    case SO_ERROR:
+	      {
+		int *e = (int *) optval;
+		debug_printf ("WinSock SO_ERROR = %d", *e);
+		*e = find_winsock_errno (*e);
+	      }
+	      break;
+	    case SO_KEEPALIVE:
+	    case SO_DONTROUTE:
+	      /* Regression in Vista and later:  instead of a 4 byte BOOL
+	         value, a 1 byte BOOLEAN value is returned, in contrast
+		 to older systems and the documentation.  Since an int
+		 type is expected by the calling application, we convert
+		 the result here. */
+	      if (*optlen == 1)
+		{
+		  BOOLEAN *in = (BOOLEAN *) optval;
+		  int *out = (int *) optval;
+		  *out = *in;
+		  *optlen = 4;
+		}
+	      break;
+	    }
+	}
       if (optname == SO_ERROR)
 	{
 	  int *e = (int *) optval;

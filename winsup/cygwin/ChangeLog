@@ -1,3 +1,9 @@
+2010-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockopt): Make sure SO_PEERCRED is only handled
+	in level SOL_SOCKET.  Workaround a return value regression in Vista
+	and later.  Add comment to explain.
+
 2010-06-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Reinstantiate a FIXME comment.
