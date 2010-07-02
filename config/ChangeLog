@@ -2,7 +2,7 @@
 
 	* gc++filt.m4: New file.
 
-2010-06-21  Alexandre Oliva  <aoliva@redhat.com>
+2010-06-20  Alexandre Oliva  <aoliva@redhat.com>
 
 	* bootstrap-lto.mk: New.
 
