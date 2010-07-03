@@ -89,7 +89,10 @@ extern const int powerpc_num_opcodes;
 #define PPC_OPCODE_601		      0x20
 
 /* Opcode is supported in both the Power and PowerPC architectures
-   (ie, compiler's -mcpu=common or assembler's -mcom).  */
+   (ie, compiler's -mcpu=common or assembler's -mcom).  More than just
+   the intersection of PPC_OPCODE_PPC with the union of PPC_OPCODE_POWER
+   and PPC_OPCODE_POWER2 because many instructions changed mnemonics
+   between POWER and POWERPC.  */
 #define PPC_OPCODE_COMMON	      0x40
 
 /* Opcode is supported for any Power or PowerPC platform (this is
