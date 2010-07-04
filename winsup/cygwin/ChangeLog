@@ -1,3 +1,14 @@
+2010-07-04  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* path.cc (path_conv::check): Move fs-specific settings to a point
+	where we know that we have filled out the filesystem information.
+	* path.h (path_conv::path_conv): Use consistent initialization for
+	constructors.
+
+	* include/sys/cygwin.h: Define CW_STRERROR.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 228.
+	* include/external.h: Implement CW_STRERROR.
+
 2010-07-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getsockopt): Make sure SO_PEERCRED is only handled

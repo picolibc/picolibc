@@ -861,16 +861,6 @@ is_virtual_symlink:
 	    {
 	      fileattr = sym.fileattr;
 	      path_flags = sym.pflags;
-	      /* If the FS has been found to have unrelibale inodes, note
-	         that in path_flags. */
-	      if (!fs.hasgood_inode ())
-		path_flags |= PATH_IHASH;
-	      /* If the OS is caseinsensitive or the FS is caseinsensitive,
-	         don't handle path casesensitive. */
-	      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
-		path_flags |= PATH_NOPOSIX;
-	      caseinsensitive = (path_flags & PATH_NOPOSIX)
-				? OBJ_CASE_INSENSITIVE : 0;
 	    }
 
 	  /* If symlink.check found an existing non-symlink file, then
@@ -1057,6 +1047,16 @@ out:
 			      but set it to not executable since it will be figured out
 			      later by anything which cares about this. */
 	}
+      /* If the FS has been found to have unrelibale inodes, note
+	 that in path_flags. */
+      if (!fs.hasgood_inode ())
+	path_flags |= PATH_IHASH;
+      /* If the OS is caseinsensitive or the FS is caseinsensitive,
+	 don't handle path casesensitive. */
+      if (cygwin_shared->obcaseinsensitive || fs.caseinsensitive ())
+	path_flags |= PATH_NOPOSIX;
+      caseinsensitive = (path_flags & PATH_NOPOSIX)
+			? OBJ_CASE_INSENSITIVE : 0;
       if (exec_state () != dont_know_if_executable)
 	/* ok */;
       else if (isdir ())

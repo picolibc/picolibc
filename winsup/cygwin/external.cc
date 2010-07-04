@@ -197,7 +197,7 @@ extern "C" unsigned long
 cygwin_internal (cygwin_getinfo_types t, ...)
 {
   va_list arg;
-  unsigned long res = -1;
+  uintptr_t res = (uintptr_t) -1;
   va_start (arg, t);
 
   switch (t)
@@ -506,6 +506,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	      if (*option_string)
 		res = 0;
 	    }
+	}
+	break;
+      case CW_STRERROR:
+	{
+	  int err = va_arg (arg, int);
+	  res = (uintptr_t) strerror (err);
 	}
 	break;
 

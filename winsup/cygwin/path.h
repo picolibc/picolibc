@@ -207,21 +207,24 @@ class path_conv
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), path (NULL), normalized_path (NULL)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
+    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
   {
     check (src, opt, suffixes);
   }
 
   path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), path (NULL), normalized_path (NULL)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
+    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
-  : wide_path (NULL), path (NULL), normalized_path (NULL)
+  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
+    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
