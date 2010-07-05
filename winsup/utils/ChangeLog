@@ -1,3 +1,12 @@
+2010-07-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* ldd.cc: Clean up formatting throughout.
+	(head): Move earlier.
+	(saw_file): Ditto.
+	(print_dlls): Reset head here.  Record seen dll names so they will
+	not potentially be printed later.
+	(process_file): Remove clearing of head here.
+
 2010-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dump_setup.cc (dump_file): Read requested content from setup.rc

@@ -85,6 +85,28 @@ usage (const char *fmt, ...)
 
 static HANDLE hProcess;
 
+static struct filelist
+{
+  struct filelist *next;
+  char *name;
+} *head;
+
+static bool
+saw_file (char *name)
+{
+  filelist *p;
+
+  for (p = head; p; p = p->next)
+    if (strcasecmp (name, p->name) == 0)
+      return true;
+
+  p = (filelist *) malloc(sizeof (struct filelist));
+  p->next = head;
+  p->name = strdup (name);
+  head = p;
+  return false;
+}
+
 static wchar_t *
 get_module_filename (HANDLE hp, HMODULE hm)
 {
@@ -212,6 +234,7 @@ tocyg (wchar_t *win_fn)
 static int
 print_dlls (dlls *dll, const wchar_t *dllfn, const wchar_t *process_fn)
 {
+  head = NULL;			/* FIXME: memory leak */
   while ((dll = dll->next))
     {
       char *fn;
@@ -226,6 +249,7 @@ print_dlls (dlls *dll, const wchar_t *dllfn, const wchar_t *process_fn)
       else
 	{
 	  fn = tocyg (fullpath);
+	  saw_file (basename (fn));
 	  free (fullpath);
 	}
       printf ("\t%s => %s (%p)\n", basename (fn), fn, dll->lpBaseOfDll);
@@ -376,30 +400,7 @@ main (int argc, char **argv)
   exit (ret);
 }
 
-static struct filelist
-{
-  struct filelist *next;
-  char *name;
-} *head;
-
 static bool printing = false;
-
-static bool
-saw_file (char *name)
-{
-
-  struct filelist *p;
-
-  for (p=head; p; p = p->next)
-    if (strcasecmp (name, p->name) == 0)
-      return true;
-
-  p = (filelist *) malloc(sizeof (struct filelist));
-  p->next = head;
-  p->name = strdup (name);
-  head = p;
-  return false;
-}
 
 
 /* dump of import directory
@@ -552,15 +553,12 @@ process_file (const wchar_t *filename)
       DWORD signature;
       IMAGE_FILE_HEADER file_head;
       IMAGE_OPTIONAL_HEADER opt_head;
-      IMAGE_SECTION_HEADER section_header[1];  /* this is an array of unknown length
-					          actual number in file_head.NumberOfSections
-					          if your compiler objects to it length 1 should work */
+      IMAGE_SECTION_HEADER section_header[1];  /* an array of unknown length */
     } *header;
 
   /* revert to regular alignment */
   #include <poppack.h>
 
-  head = NULL;			/* FIXME: memory leak */
   printing = false;
 
   /* first, load file */
@@ -572,7 +570,7 @@ process_file (const wchar_t *filename)
       }
 
   /* get header pointer; validate a little bit */
-  header = (struct tag_header *) skip_dos_stub ((IMAGE_DOS_HEADER *) basepointer);
+  header = (tag_header *) skip_dos_stub ((IMAGE_DOS_HEADER *) basepointer);
   if (!header)
       {
 	puts ("cannot skip DOS stub");
@@ -589,7 +587,7 @@ process_file (const wchar_t *filename)
       }
 
   /* validate PE signature */
-  if (header->signature!=IMAGE_NT_SIGNATURE)
+  if (header->signature != IMAGE_NT_SIGNATURE)
       {
 	puts ("not a PE file");
 	UnmapViewOfFile (basepointer);
@@ -600,7 +598,7 @@ process_file (const wchar_t *filename)
   number_of_sections = header->file_head.NumberOfSections;
 
   /* check there are sections... */
-  if (number_of_sections<1)
+  if (number_of_sections < 1)
       {
 	UnmapViewOfFile (basepointer);
 	return 5;
@@ -629,28 +627,25 @@ process_file (const wchar_t *filename)
   import_index = get_directory_index (import_rva,import_length,number_of_sections,header->section_header);
 
   /* check directory was found */
-  if (import_index <0)
+  if (import_index < 0)
       {
 	puts ("couldn't find import directory in sections");
 	UnmapViewOfFile (basepointer);
 	return 7;
       }
 
-  /* ok, we've found the import directory... action! */
-  {
-      /* The pointer to the start of the import directory's section */
-    const void *section_address = (char*) basepointer + header->section_header[import_index].PointerToRawData;
-    if (dump_import_directory (section_address,
-			     header->section_header[import_index].VirtualAddress,
-				      /* the last parameter is the pointer to the import directory:
-				         section address + (import RVA - section RVA)
-				         The difference is the offset of the import directory in the section */
-			     (const IMAGE_IMPORT_DESCRIPTOR *) ((char *) section_address+import_rva-header->section_header[import_index].VirtualAddress)))
-      {
-	UnmapViewOfFile (basepointer);
-	return 8;
-      }
-  }
+  /* The pointer to the start of the import directory's section */
+  const void *section_address = (char*) basepointer + header->section_header[import_index].PointerToRawData;
+  if (dump_import_directory (section_address,
+			   header->section_header[import_index].VirtualAddress,
+				    /* the last parameter is the pointer to the import directory:
+				       section address + (import RVA - section RVA)
+				       The difference is the offset of the import directory in the section */
+			   (const IMAGE_IMPORT_DESCRIPTOR *) ((char *) section_address+import_rva-header->section_header[import_index].VirtualAddress)))
+    {
+      UnmapViewOfFile (basepointer);
+      return 8;
+    }
   
   UnmapViewOfFile (basepointer);
   return 0;
