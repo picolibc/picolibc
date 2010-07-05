@@ -1441,7 +1441,7 @@ fhandler_base::readdir (DIR *, dirent *)
   return ENOTDIR;
 }
 
-_off64_t
+long
 fhandler_base::telldir (DIR *)
 {
   set_errno (ENOTDIR);
@@ -1449,7 +1449,7 @@ fhandler_base::telldir (DIR *)
 }
 
 void
-fhandler_base::seekdir (DIR *, _off64_t)
+fhandler_base::seekdir (DIR *, long)
 {
   set_errno (ENOTDIR);
 }

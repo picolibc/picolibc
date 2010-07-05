@@ -187,8 +187,9 @@ readdir_r (DIR *dir, dirent *de, dirent **ode)
   return res;
 }
 
-extern "C" _off64_t
-telldir64 (DIR *dir)
+/* telldir */
+extern "C" long
+telldir (DIR *dir)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -199,15 +200,18 @@ telldir64 (DIR *dir)
   return ((fhandler_base *) dir->__fh)->telldir (dir);
 }
 
-/* telldir */
-extern "C" _off_t
-telldir (DIR *dir)
+/* telldir was never defined using off_t in POSIX, only in early versions
+   of glibc.  We have to keep the function in as entry point for backward
+   compatibility. */
+extern "C" _off64_t
+telldir64 (DIR *dir)
 {
-  return telldir64 (dir);
+  return (_off64_t) telldir (dir);
 }
 
+/* seekdir */
 extern "C" void
-seekdir64 (DIR *dir, _off64_t loc)
+seekdir (DIR *dir, long loc)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -219,11 +223,13 @@ seekdir64 (DIR *dir, _off64_t loc)
   return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 
-/* seekdir */
+/* seekdir was never defined using off_t in POSIX, only in early versions
+   of glibc.  We have to keep the function in as entry point for backward
+   compatibility. */
 extern "C" void
-seekdir (DIR *dir, _off_t loc)
+seekdir64 (DIR *dir, _off64_t loc)
 {
-  seekdir64 (dir, (_off64_t)loc);
+  seekdir (dir, (long) loc);
 }
 
 /* rewinddir: POSIX 5.1.2.1 */

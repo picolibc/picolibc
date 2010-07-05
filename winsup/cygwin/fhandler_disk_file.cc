@@ -2128,14 +2128,14 @@ go_ahead:
   return res;
 }
 
-_off64_t
+long
 fhandler_disk_file::telldir (DIR *dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
+fhandler_disk_file::seekdir (DIR *dir, long loc)
 {
   rewinddir (dir);
   while (loc > dir->__d_position)

@@ -643,14 +643,14 @@ out:
   return res;
 }
 
-_off64_t
+long
 fhandler_registry::telldir (DIR * dir)
 {
   return dir->__d_position & REG_POSITION_MASK;
 }
 
 void
-fhandler_registry::seekdir (DIR * dir, _off64_t loc)
+fhandler_registry::seekdir (DIR * dir, long loc)
 {
   /* Unfortunately cannot simply set __d_position due to transition from sub-keys to
    * values.

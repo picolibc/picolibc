@@ -378,8 +378,8 @@ class fhandler_base
   virtual int rmdir ();
   virtual DIR *opendir (int fd) __attribute__ ((regparm (2)));
   virtual int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  virtual _off64_t telldir (DIR *);
-  virtual void seekdir (DIR *, _off64_t);
+  virtual long telldir (DIR *);
+  virtual void seekdir (DIR *, long);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
   virtual bool is_slow () {return false;}
@@ -774,8 +774,8 @@ class fhandler_disk_file: public fhandler_base
   int rmdir ();
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  _off64_t telldir (DIR *);
-  void seekdir (DIR *, _off64_t);
+  long telldir (DIR *);
+  void seekdir (DIR *, long);
   void rewinddir (DIR *);
   int closedir (DIR *);
 
@@ -1333,8 +1333,8 @@ class fhandler_virtual : public fhandler_base
 
   virtual int exists();
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
-  _off64_t telldir (DIR *);
-  void seekdir (DIR *, _off64_t);
+  long telldir (DIR *);
+  void seekdir (DIR *, long);
   void rewinddir (DIR *);
   int closedir (DIR *);
   ssize_t __stdcall write (const void *ptr, size_t len);
@@ -1372,7 +1372,7 @@ class fhandler_netdrive: public fhandler_virtual
   fhandler_netdrive ();
   int exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  void seekdir (DIR *, _off64_t);
+  void seekdir (DIR *, long);
   void rewinddir (DIR *);
   int closedir (DIR *);
   int open (int flags, mode_t mode = 0);
@@ -1390,8 +1390,8 @@ class fhandler_registry: public fhandler_proc
   void set_name (path_conv &pc);
   int exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  _off64_t telldir (DIR *);
-  void seekdir (DIR *, _off64_t);
+  long telldir (DIR *);
+  void seekdir (DIR *, long);
   void rewinddir (DIR *);
   int closedir (DIR *);
 

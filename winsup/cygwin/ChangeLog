@@ -1,3 +1,24 @@
+2010-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	Align seekdir and telldir API to POSIX definition.
+	* Makefile.in (NEW_FUNCTIONS): Remove seekdir and telldir mappings.
+	* dir.cc (telldir): Move functionality from telldir64 here.  Use
+	long, rather than _off_t.
+	(telldir64): Just call telldir.  Only keep for backward compatibility.
+	(seekdir): Move functionality from seekdir64 here.  Use long, rather
+	than _off_t.
+	(seekdir64): Just call seekdir.  Only keep for backward compatibility.
+	* fhandler.h: Throughout, change prototypes of seekdir and telldir
+	methods to use long, rather than _off64_t.
+	* fhandler_disk_file.cc: Change aforementioned methods accordingly.
+	* fhandler_netdrive.cc: Ditto.
+	* fhandler_registry.cc: Ditto.
+	* fhandler_virtual.cc: Ditto.
+	* include/sys/dirent.h (struct __DIR): Change __d_position from
+	_off_t to long to reflect API change.
+	(telldir): Change prototype to use long, rather than off_t.
+	(seekdir): Ditto.
+
 2010-07-04  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* path.cc (path_conv::check): Move fs-specific settings to a point

@@ -97,13 +97,14 @@ fhandler_virtual::opendir (int fd)
   return res;
 }
 
-_off64_t fhandler_virtual::telldir (DIR * dir)
+long
+fhandler_virtual::telldir (DIR * dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_virtual::seekdir (DIR * dir, _off64_t loc)
+fhandler_virtual::seekdir (DIR * dir, long loc)
 {
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   dir->__d_position = loc;

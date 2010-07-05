@@ -259,7 +259,7 @@ out:
 }
 
 void
-fhandler_netdrive::seekdir (DIR *dir, _off64_t pos)
+fhandler_netdrive::seekdir (DIR *dir, long pos)
 {
   rewinddir (dir);
   if (pos < 0)

@@ -210,7 +210,6 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	mknod=_mknod32 \
 	mmap=_mmap64 \
 	open=_open64 \
-	seekdir=_seekdir64 \
 	setegid=_setegid32 \
 	seteuid=_seteuid32 \
 	setgid=_setgid32 \
@@ -219,7 +218,6 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	setreuid=_setreuid32 \
 	setuid=_setuid32 \
 	stat=_stat64 \
-	telldir=_telldir64 \
 	timezone= \
 	tmpfile=_tmpfile64 \
 	truncate=_truncate64 \

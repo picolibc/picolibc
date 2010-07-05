@@ -38,7 +38,7 @@ typedef struct __DIR
   unsigned long __d_cookie;
   struct dirent *__d_dirent;
   char *__d_dirname;			/* directory name with trailing '*' */
-  _off_t __d_position;			/* used by telldir/seekdir */
+  long __d_position;			/* used by telldir/seekdir */
   int __d_fd;
   unsigned __d_internal;
   void *__handle;
@@ -58,8 +58,8 @@ int dirfd (DIR *);
 
 #ifndef _POSIX_SOURCE
 #ifndef __INSIDE_CYGWIN__
-off_t telldir (DIR *);
-void seekdir (DIR *, off_t loc);
+long telldir (DIR *);
+void seekdir (DIR *, long loc);
 #endif
 
 int scandir (const char *__dir,
