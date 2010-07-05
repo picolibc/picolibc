@@ -1,6 +1,6 @@
 /* dump_setup.cc
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2008, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -141,21 +141,34 @@ parse_filename (const char *in_fn, fileparse& f)
 static bool
 dump_file (const char *msg, const char *fn)
 {
-  char *path = cygpath ("/etc/setup/", fn, NULL);
-  FILE *fp = fopen (path, "rt");
-  bool printed;
   char buf[4096];
-  if (!fp)
-    printed = false;
-  else if (!fgets (buf, 4096, fp))
-    printed = false;
-    {
-      char *p = strchr (buf, '\0');
-      printf ("%s%s%s", msg, buf, (p == buf) || p[-1] != '\n' ? "\n" : "");
-      printed = true;
-    }
+  bool printed = false;
+  bool found = false;
+  size_t len = strlen (fn);
+  char *path = cygpath ("/etc/setup/setup.rc", NULL);
+  FILE *fp = fopen (path, "rt");
+
   if (fp)
-    fclose (fp);
+    {
+      while (fgets (buf, 4096, fp))
+      	{
+	  if (found)
+	    {
+	      char *bufp = buf;
+
+	      if (*bufp == '\t')
+	      	++bufp;
+	      char *p = strchr (bufp, '\0');
+	      printf ("%s%s%s", msg, bufp,
+				(p == bufp) || p[-1] != '\n' ? "\n" : "");
+	      printed = true;
+	      break;
+	    }
+	  if (!strncmp (buf, fn, len) && buf[len] == '\n')
+	    found = true;
+	}
+      fclose (fp);
+    }
   return printed;
 }
 
