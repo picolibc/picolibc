@@ -48,7 +48,7 @@ _DEFUN(rewinddir, (dirp),
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	_seekdir((dirp), (off_t)0);
+	_seekdir((dirp), 0L);
 #ifdef HAVE_DD_LOCK
 	__lock_release_recursive(dirp->dd_lock);
 #endif

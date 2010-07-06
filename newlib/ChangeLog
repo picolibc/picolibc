@@ -1,3 +1,10 @@
+2010-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/posix/rewinddir.c (rewinddir): Remove incorrect cast to off_t.
+	* libc/sys/rtems/sys/dirent.h (_seekdir): Add prototype.
+	* libc/sys/linux/sys/dirent.h (_seekdir): Fix prototype to use long
+	rather than off_t.
+
 2010-07-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/signal.h (sighandler_t): Add typedef.

@@ -31,6 +31,10 @@ int closedir(DIR *);
 void seekdir(DIR *dir, long loc);
 long telldir(DIR *dir);
 
+#ifdef _COMPILING_NEWLIB
+void _seekdir(DIR *dir, long offset);
+#endif
+
 #include <sys/types.h>
 
 #include <limits.h>

@@ -40,7 +40,7 @@ void rewinddir(DIR *);
 int closedir(DIR *);
 
 /* internal prototype */
-void _seekdir(DIR *dir,off_t offset);
+void _seekdir(DIR *dir, long offset);
 DIR *_opendir(const char *);
 
 #ifndef _POSIX_SOURCE
