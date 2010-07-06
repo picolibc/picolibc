@@ -1,3 +1,9 @@
+2010-07-06  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (MIPS16_INSN_UNCOND_BRANCH): New macro.
+	(MIPS16_INSN_BRANCH): Rename to...
+	(MIPS16_INSN_COND_BRANCH): ... this.
+
 2010-07-03  Alan Modra  <amodra@gmail.com>
 
 	* ppc.h (PPC_OPCODE_32, PPC_OPCODE_BOOKE64, PPC_OPCODE_CLASSIC): Delete.
