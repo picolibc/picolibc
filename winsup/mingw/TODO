@@ -1,5 +1,0 @@
-Finish the README.
-Timezone variables for msvcrt >= 8.0(now as functions):
- _get_daylight, _get_dstbias, _get_timezone, _get_tzname.
-Functions with _s ("secure") suffix and may be deprecation
-warnings for "non-secure" functions.
