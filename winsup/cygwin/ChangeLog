@@ -1,3 +1,8 @@
+2010-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (unlink_nt): Disable try_to_bin for netapp drives.
+	Explain why.
+
 2010-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	Align seekdir and telldir API to POSIX definition.

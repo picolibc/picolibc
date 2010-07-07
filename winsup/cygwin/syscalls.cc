@@ -554,8 +554,12 @@ unlink_nt (path_conv &pc)
 
          NFS implements its own mechanism to remove in-use files which
 	 looks quite similar to what we do in try_to_bin for remote files.
-	 That's why we don't call try_to_bin on NFS. */
-      if (!pc.fs_is_nfs ())
+	 That's why we don't call try_to_bin on NFS.
+	 
+	 Netapp filesystems don't understand the "move and delete" method
+	 at all and have all kinds of weird effects.  Just setting the delete
+	 dispositon usually works fine, though. */
+      if (!pc.fs_is_nfs () && !pc.fs_is_netapp ())
 	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())
 	status = NtOpenFile (&fh, access, &attr, &io,
