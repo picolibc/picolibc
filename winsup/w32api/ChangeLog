@@ -1,3 +1,39 @@
+2010-07-08  Markus Koenig  <basilo@users.sourceforge.net>
+
+	* include/gdiplus.h: New file.
+	* include/gdiplus/gdiplus.h: New file.
+	* include/gdiplus/gdiplusbase.h: New file.
+	* include/gdiplus/gdiplusbrush.h: New file.
+	* include/gdiplus/gdipluscolor.h: New file.
+	* include/gdiplus/gdipluscolormatrix.h: New file.
+	* include/gdiplus/gdipluseffects.h: New file.
+	* include/gdiplus/gdiplusenums.h: New file.
+	* include/gdiplus/gdiplusflat.h: New file.
+	* include/gdiplus/gdiplusgpstubs.h: New file.
+	* include/gdiplus/gdiplusgraphics.h: New file.
+	* include/gdiplus/gdiplusheaders.h: New file.
+	* include/gdiplus/gdiplusimageattributes.h: New file.
+	* include/gdiplus/gdiplusimagecodec.h: New file.
+	* include/gdiplus/gdiplusimaging.h: New file.
+	* include/gdiplus/gdiplusimpl.h: New file.
+	* include/gdiplus/gdiplusinit.h: New file.
+	* include/gdiplus/gdipluslinecaps.h: New file.
+	* include/gdiplus/gdiplusmatrix.h: New file.
+	* include/gdiplus/gdiplusmem.h: New file.
+	* include/gdiplus/gdiplusmetafile.h: New file.
+	* include/gdiplus/gdiplusmetaheader.h: New file.
+	* include/gdiplus/gdipluspath.h: New file.
+	* include/gdiplus/gdipluspen.h: New file.
+	* include/gdiplus/gdipluspixelformats.h: New file.
+	* include/gdiplus/gdiplusstringformat.h: New file.
+	* include/gdiplus/gdiplustypes.h: New file.
+	* lib/gdiplus.c: New file containing GDI+ variable definitions
+	and GUIDs.
+	* lib/gdiplus.def: New file.
+	* lib/Makefile.in: Add gdiplus.o to EXTRA_OBJS,
+	add gdiplus.c to SOURCES.
+	* lib/test.c: Include gdiplus.h.
+
 2010-06-28 Rick Rankin <rrankin1424-mingw@yahoo.com>
 
 	* include/psapi.h (PROCESS_MEMORY_COUNTERS_EX, PERFORMANCE_INFORMATION,

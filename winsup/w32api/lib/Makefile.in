@@ -112,6 +112,7 @@ FLAGS_TO_PASS = \
 
 HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
 GL_HEADERS = $(notdir $(wildcard $(srcdir)/../include/GL/*.h))
+GDIPLUS_HEADERS = $(notdir $(wildcard $(srcdir)/../include/gdiplus/*.h))
 
 # libraries
 
@@ -127,7 +128,7 @@ UUID_OBJS = mshtml-uuid.o msxml-uuid.o unknwn-uuid.o \
 			exdisp-uuid.o mlang-uuid.o objidl-uuid.o cguid-uuid.o \
 			olectlid-uuid.o ativscp-uuid.o urlmon-uuid.o hlink-uuid.o \
 			hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o
-EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o \
+EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o gdiplus.o \
 	$(UUID_OBJS) ws2_32.o
 UUID_SOURCES = mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
 			   servprov-uuid.c oleidl-uuid.c oleacc-uuid.c ocidl-uuid.c \
@@ -135,7 +136,7 @@ UUID_SOURCES = mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
 			   exdisp-uuid.c mlang-uuid.c objidl-uuid.c cguid-uuid.c \
 			   olectlid-uuid.c ativscp-uuid.c urlmon-uuid.c hlink-uuid.c \
 			   hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c
-SOURCES = scrnsave.c shell32.c  largeint.c $(UUID_SOURCES)\
+SOURCES = scrnsave.c shell32.c  largeint.c gdiplus.c $(UUID_SOURCES) \
 res.rc test.c ws2_32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
@@ -238,6 +239,10 @@ install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/GL
 	for i in $(GL_HEADERS); do \
 		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(DESTDIR)$(inst_includedir)/GL/$$i ; \
+	done
+	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/gdiplus
+	for i in $(GDIPLUS_HEADERS); do \
+		$(INSTALL_DATA) $(srcdir)/../include/gdiplus/$$i $(DESTDIR)$(inst_includedir)/gdiplus/$$i ; \
 	done
 
 install-ddk: install-libraries install-headers

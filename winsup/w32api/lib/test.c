@@ -28,6 +28,7 @@
 #include <mapi.h>
 
 #include <dbt.h>
+#include <gdiplus.h>
 #include <httpext.h>
 #include <icm.h>
 #include <imagehlp.h>
