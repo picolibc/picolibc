@@ -1,3 +1,8 @@
+2010-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/signal.h (sighandler_t): Only define if _POSIX_SOURCE
+	is undefined.
+
 2010-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/posix/rewinddir.c (rewinddir): Remove incorrect cast to off_t.
