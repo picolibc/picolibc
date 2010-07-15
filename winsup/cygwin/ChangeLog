@@ -1,3 +1,7 @@
+2010-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc (wincap_7): Set needs_count_in_si_lpres2 to false.
+
 2010-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink_nt): Disable try_to_bin for netapp drives.

@@ -444,7 +444,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
   needs_logon_sid_in_sid_list:false,
-  needs_count_in_si_lpres2:true,
+  needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:true,
   has_gaa_prefixes:true,
   has_gaa_on_link_prefix:true,
