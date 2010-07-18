@@ -1,3 +1,9 @@
+2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* gendef: Throughout, remove lock from xchgl since it is implied.
+	(__ZN7_cygtls3popEv): Avoid potential (but probably nonexistent) race
+	when clearing element after pop.
+
 2010-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.cc (wincap_7): Set needs_count_in_si_lpres2 to false.

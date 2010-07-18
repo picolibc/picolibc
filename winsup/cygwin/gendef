@@ -122,11 +122,11 @@ __sigfe:
 	pushl	%edx
 	movl	%fs:4,%ebx				# location of bottom of stack
 1:	movl	\$1,%eax				# potential lock value
-	lock	xchgl %eax,$tls::stacklock(%ebx)	# see if we can grab it
+	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	call	_yield			# should be a short-time thing, so
+	call	_yield					# should be a short-time thing, so
 	jmp	1b					# sleep and loop
 2:	movl	\$4,%eax				# have the lock, now increment the
 	xadd	%eax,$tls::stackptr(%ebx)		#  stack pointer and get pointer
@@ -146,11 +146,11 @@ __sigbe:						# return here after cygwin syscall
 	pushl	%eax					# don't clobber
 1:	movl	%fs:4,%ebx				# address of bottom of tls
 	movl	\$1,%eax				# potential lock value
-	lock	xchgl %eax,$tls::stacklock(%ebx)	# see if we can grab it
+	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	call	_yield			# sleep
+	call	_yield					# sleep
 	jmp	1b					#  and loop
 2:	movl	\$-4,%eax				# now decrement aux stack
 	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
@@ -171,7 +171,7 @@ _sigreturn:
 	call	_set_process_mask\@4
 
 1:	movl	\$1,%eax				# potential lock value
-	lock	xchgl %eax,$tls::stacklock(%ebx)	# see if we can grab it
+	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
@@ -237,13 +237,9 @@ _sigdelayed:
 	.global	__ZN7_cygtls3popEv
 __ZN7_cygtls3popEv:
 1:	pushl	%ebx
-	pushl	%edx				# FIXME: needed?
-	movl	%eax,%ebx
-	movl	\$-4,%edx
-	xadd	%edx,$tls::pstackptr(%ebx)
-	xorl	%eax,%eax
-	xchgl	%eax,-4(%edx)
-	popl	%edx				# FIXME: needed?
+	movl	%eax,%ebx			# this
+	movl	\$-4,%eax
+	xadd	%eax,$tls::pstackptr(%ebx)
 	popl	%ebx
 	ret
 
@@ -252,7 +248,7 @@ __ZN7_cygtls4lockEv:
 	pushl	%ebx
 	movl	%eax,%ebx
 1:	movl	\$1,%eax
-	lock	xchgl %eax,$tls::pstacklock(%ebx)
+	xchgl	%eax,$tls::pstacklock(%ebx)
 	testl	%eax,%eax
 	jz	2f
 	call	_yield
@@ -275,7 +271,7 @@ stabilize_sig_stack:
 	movl	%fs:4,%ebx
 	incl	$tls::incyg(%ebx)
 1:	movl	\$1,%eax
-	lock	xchgl %eax,$tls::stacklock(%ebx)
+	xchgl	%eax,$tls::stacklock(%ebx)
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax
 	jz	2f
