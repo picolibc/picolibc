@@ -147,8 +147,8 @@ noload:									\n\
 	movl	(%edx),%eax	# Handle value				\n\
 	pushl	4(%eax)							\n\
 	leal	8(%edx),%eax	# Location of name of function		\n\
-	push	%eax							\n\
-	push	$msg1		# The message				\n\
+	pushl	%eax							\n\
+	pushl	$msg1		# The message				\n\
 	call	___api_fatal	# Print message. Never returns		\n\
 									\n\
 	.globl	dll_func_load						\n\

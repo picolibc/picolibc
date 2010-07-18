@@ -1,5 +1,9 @@
 2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* autoload.cc (noload): Use "pushl" rather than "push".
+
+2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* exceptions.cc (_cygtls::interrupt_now): Avoid nonsensical tests which
 	delay an interrupt.
 	(setup_handler): Remove unneeded DEBUGGING handling.  Ensure that stack
