@@ -778,7 +778,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 {
   bool interrupted;
 
-  if (incyg || spinning || locked () || inside_kernel (cx))
+  if (incyg || inside_kernel (cx))
     interrupted = false;
   else
     {
@@ -861,7 +861,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	  break;
 	}
 
-      tls->unlock ();
       DWORD res;
       HANDLE hth = (HANDLE) *tls;
 
@@ -874,14 +873,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	 If the thread is already suspended (which can occur when a program has called
 	 SuspendThread on itself) then just queue the signal. */
 
-#ifndef DEBUGGING
-      sigproc_printf ("suspending mainthread");
-#else
-      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, &cx))
-	memset (&cx, 0, sizeof cx);
-      sigproc_printf ("suspending mainthread PC %p", cx.Eip);
-#endif
+      sigproc_printf ("suspending thread");
       res = SuspendThread (hth);
       /* Just set pending if thread is already suspended */
       if (res)
@@ -891,10 +883,11 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	}
       cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
       if (!GetThreadContext (hth, &cx))
-	system_printf ("couldn't get context of main thread, %E");
+	system_printf ("couldn't get context of thread, %E");
       else
 	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
+      tls->unlock ();
       res = ResumeThread (hth);
       if (interrupted)
 	break;

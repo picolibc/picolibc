@@ -1,5 +1,12 @@
 2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* exceptions.cc (_cygtls::interrupt_now): Avoid nonsensical tests which
+	delay an interrupt.
+	(setup_handler): Remove unneeded DEBUGGING handling.  Ensure that stack
+	is locked when we are about to do push/pop to it.  Fix debugging output.
+
+2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* gendef: Throughout, remove lock from xchgl since it is implied.
 	(__ZN7_cygtls3popEv): Avoid potential (but probably nonexistent) race
 	when clearing element after pop.
