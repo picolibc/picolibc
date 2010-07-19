@@ -1,3 +1,10 @@
+2010-07-19  Eric Blake  <eblake@redhat.com>
+
+	* textbinary.sgml (textbin-devel): Document temp file behavior.
+	(textbin-issue): Use sed rather than cat as an example of a
+	default-mode application.
+	* new-features.sgml (ov-new1.7.6): Document mkostemp[s].
+
 2010-06-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in: Use "xmlto pdf" instead of docbook2pdf.

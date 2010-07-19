@@ -30,6 +30,10 @@ strings.  locale(1) prints these values just as on Linux.  nl_langinfo(3)
 allows to fetch them.
 </para></listitem>
 
+<listitem><para>
+New interfaces mkostemp(3) and mkostemps(3) are added.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

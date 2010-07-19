@@ -23,7 +23,7 @@ standard input and output) as text.  All other programs (such as
 would use binary mode.  In practice with Cygwin, programs that deal
 explicitly with object files specify binary mode (this is the case of
 <command>od</command>, which is helpful to diagnose CR problems).  Most
-other programs (such as <command>cat</command>, <command>cmp</command>,
+other programs (such as <command>sed</command>, <command>cmp</command>,
 <command>tr</command>) use the default mode.</para>
 
 </sect2>
@@ -112,6 +112,11 @@ your choices.</para>
 specified with the flag <literal>O_BINARY</literal> and text mode with
 <literal>O_TEXT</literal>. These symbols are defined in
 <filename>fcntl.h</filename>.</para>
+
+<para>The <function>mkstemp()</function> and <function>mkstemps()</function>
+calls force binary mode.  Use <function>mkostemp()</function> or
+<function>mkostemps()</function> with the same flags
+as <function>open()</function> for more control on temporary files.</para>
 
 <para>In the <function>fopen()</function> and <function>popen()</function>
 function calls, binary mode can be specified by adding a <literal>b</literal>
