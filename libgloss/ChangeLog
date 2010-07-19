@@ -1,3 +1,8 @@
+2010-07-19  Rafael Campos  <methril@gmail.com>
+
+	* m68k/cf-crt1.c (hardware_init_hook): Accommodate new family
+	__mcf_family_51 since gcc 4.5.1.
+
 2010-06-29  Nick Clifton  <nickc@redhat.com>
 
 	* xstormy16/eva_app.ld (.gcc_except_table): Include sections with
