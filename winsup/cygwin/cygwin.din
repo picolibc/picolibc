@@ -995,6 +995,8 @@ mknod SIGFE
 _mknod = mknod SIGFE
 _mknod32 = mknod32 SIGFE
 mknodat SIGFE
+mkostemp SIGFE
+mkostemps SIGFE
 mkstemp SIGFE
 _mkstemp = mkstemp SIGFE
 mkstemps SIGFE

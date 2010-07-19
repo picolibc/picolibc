@@ -1,3 +1,11 @@
+2010-07-19  Eric Blake  <eblake@redhat.com>
+
+	* mktemp.cc (_gettemp): Add flags argument.  All callers updated.
+	(mkostemp, mkostemps): New functions.
+	* cygwin.din (mkostemp, mkostemps): Export.
+	* posix.sgml: Document them.
+	* include/cygwin/version.h: Bump version.
+
 2010-07-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (noload): Use "pushl" rather than "push".

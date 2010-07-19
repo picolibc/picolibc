@@ -388,12 +388,13 @@ details. */
       226: Export __locale_mb_cur_max.
       227: Add pseudo_reloc_start, pseudo_reloc_end, image_base to per_process.
       228: CW_STRERROR added.
+      229: Add mkostemp, mkostemps.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 228
+#define CYGWIN_VERSION_API_MINOR 229
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

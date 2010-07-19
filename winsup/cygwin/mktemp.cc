@@ -10,7 +10,7 @@ See the copyright at the bottom of this file. */
 #include <sys/stat.h>
 #include <unistd.h>
 
-static int _gettemp(char *, int *, int, size_t);
+static int _gettemp(char *, int *, int, size_t, int);
 static uint32_t arc4random ();
 
 static const char padchar[] =
@@ -20,30 +20,44 @@ extern "C" int
 mkstemp(char *path)
 {
   int fd;
-  return _gettemp(path, &fd, 0, 0) ? fd : -1;
+  return _gettemp(path, &fd, 0, 0, O_BINARY) ? fd : -1;
 }
 
 extern "C" char *
 mkdtemp(char *path)
 {
-  return _gettemp(path, NULL, 1, 0) ? path : NULL;
+  return _gettemp(path, NULL, 1, 0, 0) ? path : NULL;
 }
 
 extern "C" int
 mkstemps(char *path, int len)
 {
   int fd;
-  return _gettemp(path, &fd, 0, len) ? fd : -1;
+  return _gettemp(path, &fd, 0, len, O_BINARY) ? fd : -1;
+}
+
+extern "C" int
+mkostemp(char *path, int flags)
+{
+  int fd;
+  return _gettemp(path, &fd, 0, 0, flags & ~O_ACCMODE) ? fd : -1;
+}
+
+extern "C" int
+mkostemps(char *path, int len, int flags)
+{
+  int fd;
+  return _gettemp(path, &fd, 0, len, flags & ~O_ACCMODE) ? fd : -1;
 }
 
 extern "C" char *
 mktemp(char *path)
 {
-  return _gettemp(path, NULL, 0, 0) ? path : (char *) NULL;
+  return _gettemp(path, NULL, 0, 0, 0) ? path : (char *) NULL;
 }
 
 static int
-_gettemp(char *path, int *doopen, int domkdir, size_t suffixlen)
+_gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
 {
   char *start, *trv, *suffp;
   char *pad;
@@ -105,7 +119,7 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen)
     {
       if (doopen)
 	{
-	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | O_BINARY,
+	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | flags,
 			       S_IRUSR | S_IWUSR)) >= 0)
 	    return 1;
 	  if (errno != EEXIST)

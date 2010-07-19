@@ -1043,6 +1043,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lsetxattr
     memmem
     mempcpy
+    mkostemp
+    mkostemps
     pipe2
     pow10
     pow10f
