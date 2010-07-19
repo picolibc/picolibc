@@ -1,3 +1,12 @@
+2010-07-19  Eric Blake  <eblake@redhat.com>
+
+	* libc/stdio/mktemp.c (_gettemp): Add parameter, all callers
+	changed.
+	(mkostemp, _mkostemp_r, mkostemps, _mkostemps_r): New interfaces,
+	for ELIX level 4.
+	* libc/include/stdlib.h (mktemp): Avoid namespace issues.
+	(mkostemp, mkostemps): Declare.
+
 2010-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/signal.h (sighandler_t): Only define if _POSIX_SOURCE

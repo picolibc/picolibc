@@ -103,14 +103,18 @@ size_t	_EXFUN(_wcstombs_r,(struct _reent *, char *, const wchar_t *, size_t, _mb
 #ifndef __STRICT_ANSI__
 #ifndef _REENT_ONLY
 char *	_EXFUN(mkdtemp,(char *));
+int	_EXFUN(mkostemp,(char *, int));
+int	_EXFUN(mkostemps,(char *, int, int));
 int	_EXFUN(mkstemp,(char *));
 int	_EXFUN(mkstemps,(char *, int));
-char *	_EXFUN(mktemp,(char *) _ATTRIBUTE ((warning ("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
+char *	_EXFUN(mktemp,(char *) _ATTRIBUTE ((__warning__ ("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
 #endif
 char *	_EXFUN(_mkdtemp_r, (struct _reent *, char *));
+int	_EXFUN(_mkostemp_r, (struct _reent *, char *, int));
+int	_EXFUN(_mkostemps_r, (struct _reent *, char *, int, int));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 int	_EXFUN(_mkstemps_r, (struct _reent *, char *, int));
-char *	_EXFUN(_mktemp_r, (struct _reent *, char *) _ATTRIBUTE ((warning ("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
+char *	_EXFUN(_mktemp_r, (struct _reent *, char *) _ATTRIBUTE ((__warning__ ("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
 #endif
 _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
 int	_EXFUN(rand,(_VOID));
