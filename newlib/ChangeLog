@@ -1,3 +1,12 @@
+2010-07-20  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* libm/common/fdlibm.h (SAFE_LEFT_SHIFT): New macro definition.
+	(SAFE_RIGHT_SHIFT): Likewise.
+	* libm/common/s_llround.c (llround): Annotate shift operations with
+	possible shift amount ranges, and use SAFE_RIGHT_SHIFT to avoid
+	undefined behaviour.
+	* libm/common/s_lround.c (lround): Likewise.
+
 2010-07-19  Eric Blake  <eblake@redhat.com>
 
 	* libc/stdio/mktemp.c (_gettemp): Add parameter, all callers

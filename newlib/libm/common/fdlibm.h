@@ -361,3 +361,13 @@ do {								\
   sf_u.word = (i);						\
   (d) = sf_u.value;						\
 } while (0)
+
+/* Macros to avoid undefined behaviour that can arise if the amount
+   of a shift is exactly equal to the size of the shifted operand.  */
+
+#define SAFE_LEFT_SHIFT(op,amt)					\
+  (((amt) < 8 * sizeof(op)) ? ((op) << (amt)) : 0)
+
+#define SAFE_RIGHT_SHIFT(op,amt)				\
+  (((amt) < 8 * sizeof(op)) ? ((op) >> (amt)) : 0)
+

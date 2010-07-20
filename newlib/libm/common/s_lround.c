@@ -71,9 +71,10 @@ ANSI C, POSIX
   exponent_less_1023 = ((msw & 0x7ff00000) >> 20) - 1023;
   msw &= 0x000fffff;
   msw |= 0x00100000;
-
+  /* exponent_less_1023 in [-1024,1023] */
   if (exponent_less_1023 < 20)
     {
+      /* exponent_less_1023 in [-1024,19] */
       if (exponent_less_1023 < 0)
         {
           if (exponent_less_1023 < -1)
@@ -83,20 +84,39 @@ ANSI C, POSIX
         }
       else
         {
+          /* exponent_less_1023 in [0,19] */
+	  /* shift amt in [0,19] */
           msw += 0x80000 >> exponent_less_1023;
+	  /* shift amt in [20,1] */
           result = msw >> (20 - exponent_less_1023);
         }
     }
   else if (exponent_less_1023 < (8 * sizeof (long int)) - 1)
     {
+      /* 32bit long: exponent_less_1023 in [20,30] */
+      /* 64bit long: exponent_less_1023 in [20,62] */
       if (exponent_less_1023 >= 52)
-        result = ((long int) msw << (exponent_less_1023 - 20)) | (lsw << (exponent_less_1023 - 52));
+	/* 64bit long: exponent_less_1023 in [52,62] */
+	/* 64bit long: shift amt in [32,42] */
+        result = ((long int) msw << (exponent_less_1023 - 20))
+		/* 64bit long: shift amt in [0,10] */
+                | (lsw << (exponent_less_1023 - 52));
       else
         {
-          unsigned int tmp = lsw + (0x80000000 >> (exponent_less_1023 - 20));
+	  /* 32bit long: exponent_less_1023 in [20,30] */
+	  /* 64bit long: exponent_less_1023 in [20,51] */
+          unsigned int tmp = lsw
+		    /* 32bit long: shift amt in [0,10] */
+		    /* 64bit long: shift amt in [0,31] */
+                    + (0x80000000 >> (exponent_less_1023 - 20));
           if (tmp < lsw)
             ++msw;
-          result = ((long int) msw << (exponent_less_1023 - 20)) | (tmp >> (52 - exponent_less_1023));
+	  /* 32bit long: shift amt in [0,10] */
+	  /* 64bit long: shift amt in [0,31] */
+          result = ((long int) msw << (exponent_less_1023 - 20))
+		    /* ***32bit long: shift amt in [32,22] */
+		    /* ***64bit long: shift amt in [32,1] */
+                    | SAFE_RIGHT_SHIFT (tmp, (52 - exponent_less_1023));
         }
     }
   else
