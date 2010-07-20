@@ -139,23 +139,6 @@ typedef unsigned long error_status_t;
 #define uuid_t UUID
 typedef unsigned long PROPID;
 
-#ifndef _REFGUID_DEFINED
-#if defined (__cplusplus) && !defined (CINTERFACE)
-#define REFGUID const GUID&
-#define REFIID const IID&
-#define REFCLSID const CLSID&
-#define REFFMTID const FMTID&
-#else
-#define REFGUID const GUID* const
-#define REFIID const IID* const
-#define REFCLSID const CLSID* const
-#define REFFMTID const FMTID* const
-#endif
-#define _REFGUID_DEFINED
-#define _REFIID_DEFINED
-#define _REFCLSID_DEFINED
-#define _REFFMTID_DEFINED
-#endif
 #ifndef GUID_SECTION
 #define GUID_SECTION ".text"
 #endif

@@ -1,3 +1,14 @@
+2010-07-17  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winnt.h (HEAP_MAKE_TAG_FLAGS, VALID_INHERIT_FLAGS): Correct
+	definition.
+	* include/rpcndr.h (NdrUnMarshConfStringHdr, NdrUnMarshCCtxtHdl,
+	NdrMarshSCtxtHdl): Ditto.
+	* include/basetyps.h (REFGUID, REFIID, REFCLSID, REFFMTID): Remove macro
+	definition in favour of typedef definition.
+
+	Thank you to Yuta Tomino for reporting the issues.
+
 2010-07-08  Markus Koenig  <basilo@users.sourceforge.net>
 
 	* include/gdiplus.h: New file.
