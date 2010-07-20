@@ -1055,8 +1055,8 @@ extern "C" {
 #define LVIF_NORECOMPUTE 2048
 #endif
 #if (_WIN32_WINNT >= 0x0501)
-#define LVIF_GROUPID 128
-#define LVIF_COLUMNS 256
+#define LVIF_GROUPID 256
+#define LVIF_COLUMNS 512
 #endif
 #define LVIS_FOCUSED	1
 #define LVIS_SELECTED	2
