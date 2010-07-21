@@ -18,6 +18,8 @@ details. */
 #include <sys/stat.h>
 #include <errno.h>
 #include "path.h"
+#include <ddk/ntapi.h>
+#include <ddk/winddk.h>
 #if 0
 #include "zlib.h"
 #endif
@@ -220,11 +222,111 @@ could_not_access (int verbose, char *filename, char *package, const char *type)
   return false;
 }
 
+static const WCHAR tfx_chars[] = {
+            0, 0xf000 |   1, 0xf000 |   2, 0xf000 |   3,
+ 0xf000 |   4, 0xf000 |   5, 0xf000 |   6, 0xf000 |   7,
+ 0xf000 |   8, 0xf000 |   9, 0xf000 |  10, 0xf000 |  11,
+ 0xf000 |  12, 0xf000 |  13, 0xf000 |  14, 0xf000 |  15,
+ 0xf000 |  16, 0xf000 |  17, 0xf000 |  18, 0xf000 |  19,
+ 0xf000 |  20, 0xf000 |  21, 0xf000 |  22, 0xf000 |  23,
+ 0xf000 |  24, 0xf000 |  25, 0xf000 |  26, 0xf000 |  27,
+ 0xf000 |  28, 0xf000 |  29, 0xf000 |  30, 0xf000 |  31,
+          ' ',          '!', 0xf000 | '"',          '#',
+          '$',          '%',          '&',           39,
+          '(',          ')', 0xf000 | '*',          '+',
+          ',',          '-',          '.',          '\\',
+          '0',          '1',          '2',          '3',
+          '4',          '5',          '6',          '7',
+          '8',          '9', 0xf000 | ':',          ';',
+ 0xf000 | '<',          '=', 0xf000 | '>', 0xf000 | '?',
+          '@',          'A',          'B',          'C',
+          'D',          'E',          'F',          'G',
+          'H',          'I',          'J',          'K',
+          'L',          'M',          'N',          'O',
+          'P',          'Q',          'R',          'S',
+          'T',          'U',          'V',          'W',
+          'X',          'Y',          'Z',          '[',
+          '\\',          ']',          '^',          '_',
+          '`',          'a',          'b',          'c',
+          'd',          'e',          'f',          'g',
+          'h',          'i',          'j',          'k',
+          'l',          'm',          'n',          'o',
+          'p',          'q',          'r',          's',
+          't',          'u',          'v',          'w',
+          'x',          'y',          'z',          '{',
+ 0xf000 | '|',          '}',          '~',          127
+};
+
+static void
+transform_chars (PWCHAR path, PWCHAR path_end)
+{
+  for (; path <= path_end; ++path)
+    if (*path < 128)
+      *path = tfx_chars[*path];
+}
+
+extern "C" NTOSAPI NTAPI NTSTATUS NtQueryAttributesFile(
+			      POBJECT_ATTRIBUTES, PFILE_BASIC_INFORMATION);
+
+/* This function checks for file existance and fills the stat structure
+   with only the required mode info.  We're using a native NT function
+   here, otherwise we wouldn't be able to check for files with special
+   characters not valid in Win32, and espacially not valid using the
+   ANSI API. */
+static int
+simple_nt_stat (const char *filename, struct stat *st)
+{
+  size_t len = mbstowcs (NULL, filename, 0) + 1;
+  WCHAR path[len + 8];	/* Enough space for the NT prefix */
+  PWCHAR p = path;
+  UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
+  FILE_BASIC_INFORMATION fbi;
+  NTSTATUS status;
+
+  wcscpy (p, L"\\??\\");
+  p += 4;
+  if (filename[0] == '\\' && filename[1] == '\\')
+    {
+      wcscpy (p, L"UNC");
+      p += 3;
+      p += mbstowcs (p, filename + 1, len);
+    }
+  else
+    p += mbstowcs (p, filename, len);
+  /* Remove trailing backslashes.  NT functions don't like them. */
+  if (p[-1] == L'\\')
+    *--p = L'\0';
+  /* Skip prefix and drive, otherwise question marks and colons are converted
+     as well. */
+  transform_chars (path + 7, p);
+  RtlInitUnicodeString (&upath, path);
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  status = NtQueryAttributesFile (&attr, &fbi);
+  if (NT_SUCCESS (status))
+    {
+      st->st_mode = (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		    ? S_IFDIR : S_IFREG;
+      return 0;
+    }
+  if (status == STATUS_OBJECT_PATH_NOT_FOUND
+      || status == STATUS_OBJECT_NAME_INVALID
+      || status == STATUS_BAD_NETWORK_PATH
+      || status == STATUS_BAD_NETWORK_NAME
+      || status == STATUS_NO_MEDIA_IN_DEVICE
+      || status == STATUS_OBJECT_NAME_NOT_FOUND
+      || status == STATUS_NO_SUCH_FILE)
+    errno = ENOENT;
+  else
+    errno = EACCES;
+  return -1;
+}
+
 static bool
 directory_exists (int verbose, char *filename, char *package)
 {
   struct stat status;
-  if (stat(cygpath("/", filename, ".", NULL), &status))
+  if (simple_nt_stat(cygpath("/", filename, NULL), &status))
     {
       if (could_not_access (verbose, filename, package, "directory"))
 	return false;
@@ -242,8 +344,8 @@ static bool
 file_exists (int verbose, char *filename, const char *alt, char *package)
 {
   struct stat status;
-  if (stat(cygpath("/", filename, NULL), &status) &&
-      (!alt || stat(cygpath("/", filename, alt, NULL), &status)))
+  if (simple_nt_stat(cygpath("/", filename, NULL), &status) &&
+      (!alt || simple_nt_stat(cygpath("/", filename, alt, NULL), &status)))
     {
       if (could_not_access (verbose, filename, package, "file"))
 	return false;

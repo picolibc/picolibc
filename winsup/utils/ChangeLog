@@ -1,3 +1,12 @@
+2010-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dump_setup.cc (tfx_chars): New WCHAR array, copied from Cygwin.
+	(transform_chars): New function, copied from Cygwin.
+	(simple_nt_stat): New function to check file existance using native
+	NT function.  Explain why.
+	(directory_exists): Call simple_nt_stat.
+	(file_exists): Ditto.
+
 2010-07-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ldd.cc: Clean up formatting throughout.
