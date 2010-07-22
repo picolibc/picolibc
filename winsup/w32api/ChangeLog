@@ -1,3 +1,7 @@
+2010-07-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/kernel32.def: Regenerate using gendef.
+
 2010-07-20  Ozkan Sezer  <sezero@users.sourceforge.net>
 
 	* include/commctrl.h (LVIF_GROUPID): Fix definition.
