@@ -1,3 +1,8 @@
+2010-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/basetyps.h (REFGUID, REFIID, REFCLSID, REFFMTID): Revert change
+	from 2010-07-17 since it breaks several applications.
+
 2010-07-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/kernel32.def: Regenerate using gendef.
