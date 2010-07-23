@@ -290,14 +290,11 @@ fhandler_base::raw_write (const void *ptr, size_t len)
 			NULL);
   if (!NT_SUCCESS (status))
     {
-      if (status == STATUS_DISK_FULL && io.Information > 0)
-	goto written;
       __seterrno_from_nt_status (status);
       if (get_errno () == EPIPE)
 	raise (SIGPIPE);
       return -1;
     }
-written:
   return io.Information;
 }
 

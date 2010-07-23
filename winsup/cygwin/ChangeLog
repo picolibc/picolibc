@@ -1,3 +1,8 @@
+2010-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::raw_write): Remove STATUS_DISK_FULL
+	special handling.
+
 2010-07-19  Eric Blake  <eblake@redhat.com>
 
 	* mktemp.cc (_gettemp): Add flags argument.  All callers updated.
