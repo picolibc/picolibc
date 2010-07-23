@@ -256,11 +256,7 @@ case "${host_cpu}" in
 	;;
   v810)
 	;;
-  v850)
-	machine_dir=v850
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
-	;;
-  v850e)
+  v850*)
 	machine_dir=v850
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
 	;;
@@ -509,14 +505,11 @@ case "${host}" in
   v810-*-*)
 	sys_dir=sysnec810
 	;;
-  v850-*-*)
+  v850*-*-*)
 	sys_dir=sysnecv850
-	;;
-  v850e-*-*)
-	sys_dir=sysnecv850
-	;;
-  v850ea-*-*)
-	sys_dir=sysnecv850
+        if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+          have_crt0="no"
+        fi
 	;;
   w65-*-*)
 	sys_dir=w65
@@ -772,13 +765,7 @@ case "${host}" in
   tic80*)
 	syscall_dir=syscalls
 	;;
-  v850-*-*)
-	syscall_dir=syscalls
-	;;
-  v850e-*-*)
-	syscall_dir=syscalls
-	;;
-  v850ea-*-*)
+  v850*-*-*)
 	syscall_dir=syscalls
 	;;
   w65-*-*)

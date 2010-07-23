@@ -51,22 +51,23 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-_exit.$(OBJEXT) lib_a-access.$(OBJEXT) \
-	lib_a-chmod.$(OBJEXT) lib_a-chown.$(OBJEXT) \
-	lib_a-close.$(OBJEXT) lib_a-creat.$(OBJEXT) \
-	lib_a-crt1.$(OBJEXT) lib_a-execv.$(OBJEXT) \
-	lib_a-execve.$(OBJEXT) lib_a-fork.$(OBJEXT) \
-	lib_a-fstat.$(OBJEXT) lib_a-getpid.$(OBJEXT) \
-	lib_a-isatty.$(OBJEXT) lib_a-kill.$(OBJEXT) \
-	lib_a-lseek.$(OBJEXT) lib_a-open.$(OBJEXT) \
-	lib_a-pipe.$(OBJEXT) lib_a-read.$(OBJEXT) lib_a-link.$(OBJEXT) \
-	lib_a-sbrk.$(OBJEXT) lib_a-stat.$(OBJEXT) lib_a-time.$(OBJEXT) \
-	lib_a-trap.$(OBJEXT) lib_a-unlink.$(OBJEXT) \
-	lib_a-utime.$(OBJEXT) lib_a-wait.$(OBJEXT) \
-	lib_a-write.$(OBJEXT) lib_a-times.$(OBJEXT) \
-	lib_a-gettime.$(OBJEXT)
-lib_a_OBJECTS = $(am_lib_a_OBJECTS)
+@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = $(lpfx)_exit.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)access.o $(lpfx)chmod.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)chown.o $(lpfx)close.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)creat.o $(lpfx)crt1.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)execv.o $(lpfx)execve.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)fork.o $(lpfx)fstat.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)getpid.o $(lpfx)isatty.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)kill.o $(lpfx)lseek.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)open.o $(lpfx)pipe.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)read.o $(lpfx)link.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)sbrk.o $(lpfx)stat.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)time.o $(lpfx)trap.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)wait.o $(lpfx)write.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o
+lib_a_SOURCES = lib.c
+lib_a_OBJECTS = lib_a-lib.$(OBJEXT)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
@@ -76,7 +77,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(lib_a_SOURCES)
+SOURCES = $(EXTRA_lib_a_SOURCES) lib.c
 ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
@@ -184,13 +185,25 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = \
+@MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
+@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = $(lpfx)_exit.o $(lpfx)access.o $(lpfx)chmod.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)chown.o $(lpfx)close.o $(lpfx)creat.o $(lpfx)crt1.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)execv.o $(lpfx)execve.o $(lpfx)fork.o $(lpfx)fstat.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)getpid.o $(lpfx)isatty.o $(lpfx)kill.o $(lpfx)lseek.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)open.o $(lpfx)pipe.o $(lpfx)read.o $(lpfx)link.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)sbrk.o $(lpfx)stat.o $(lpfx)time.o $(lpfx)trap.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o $(lpfx)wait.o $(lpfx)write.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o
+
+lib_a_LIBADD = $(extra_objs)
+EXTRA_lib_a_SOURCES = \
 	_exit.c access.c chmod.c chown.c close.c creat.c crt1.c \
 	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
 	kill.c lseek.c open.c pipe.c read.c link.c \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
 	times.c gettime.c
 
+lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -433,6 +446,12 @@ lib_a-gettime.o: gettime.c
 lib_a-gettime.obj: gettime.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettime.obj `if test -f 'gettime.c'; then $(CYGPATH_W) 'gettime.c'; else $(CYGPATH_W) '$(srcdir)/gettime.c'; fi`
 
+lib_a-lib.o: lib.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lib.o `test -f 'lib.c' || echo '$(srcdir)/'`lib.c
+
+lib_a-lib.obj: lib.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lib.obj `if test -f 'lib.c'; then $(CYGPATH_W) 'lib.c'; else $(CYGPATH_W) '$(srcdir)/lib.c'; fi`
+
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -486,6 +505,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 check-am:
 check: check-am
+@MAY_SUPPLY_SYSCALLS_FALSE@all-local:
 all-am: Makefile $(LIBRARIES) all-local
 installdirs:
 install: install-am
@@ -599,7 +619,7 @@ uninstall-am:
 	uninstall-am
 
 
-all-local: crt0.o
+@MAY_SUPPLY_SYSCALLS_TRUE@all-local: crt0.o
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

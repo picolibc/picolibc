@@ -1,3 +1,12 @@
+2010-07-23  Naveen.H.S  <naveenh1@kpitcummins.com>
+            Gina Verlekar <gina.verlekar@kpitcummins.com>
+
+        * configure.host: Compact v850* support and add
+	check for newlib_may_supply_syscalls.
+        * libc/sys/sysnecv850/Makefile.am: Add support for
+        '--disable-newlib-supplied-syscalls' option.
+        * libc/sys/sysnecv850/Makefile.in: Regenerated.
+
 2010-07-20  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* libm/common/fdlibm.h (SAFE_LEFT_SHIFT): New macro definition.
