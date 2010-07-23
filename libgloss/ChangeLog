@@ -1,47 +1,47 @@
 2010-07-23  Naveen.H.S  <naveenh1@kpitcummins.com>
             Gina Verlekar <gina.verlekar@kpitcummins.com>
 
-        Moving files from libc/sys/sysnecv850 to libgloss/v850
+        Moving files from newlib/libc/sys/sysnecv850 to v850
 
-        * libgloss/libnosys/configure: Regenerated.
-        * libgloss/libnosys/configure.in: Compact v850 support to v850*-*-*.
-        * libgloss/libnosys/configure: Regenerated.
-        * libgloss/configure.in: Add libgloss support for v850.
-        * libgloss/configure: Regenerated.
-        * libgloss/v850/access.c: New file.
-        * libgloss/v850/aclocal.m4: New.
-        * libgloss/v850/chmod.c: New.
-        * libgloss/v850/chown.c: New.
-        * libgloss/v850/close.c: New.
-        * libgloss/v850/configure: New.
-        * libgloss/v850/configure.in: New.
-        * libgloss/v850/crt0.S: New.
-        * libgloss/v850/crt1.c: New.
-        * libgloss/v850/execv.c: New.
-        * libgloss/v850/execve.c: New.
-        * libgloss/v850/_exit.c: New.
-        * libgloss/v850/fork.c: New.
-        * libgloss/v850/fstat.c: New.
-        * libgloss/v850/getpid.c: New.
-        * libgloss/v850/gettime.c: New.
-        * libgloss/v850/isatty.c: New.
-        * libgloss/v850/kill.c: New.
-        * libgloss/v850/link.c: New.
-        * libgloss/v850/lseek.c: New.
-        * libgloss/v850/Makefile.in: New.
-        * libgloss/v850/open.c: New.
-        * libgloss/v850/pipe.c: New.
-        * libgloss/v850/read.c: New.
-        * libgloss/v850/sbrk.c: New.
-        * libgloss/v850/sim.ld: New.
-        * libgloss/v850/stat.c: New.
-        * libgloss/v850/time.c: New.
-        * libgloss/v850/times.c: New.
-        * libgloss/v850/trap.S: New.
-        * libgloss/v850/unlink.c: New.
-        * libgloss/v850/utime.c: New.
-        * libgloss/v850/wait.c: New.
-        * libgloss/v850/write.c: New.
+        * libnosys/configure: Regenerated.
+        * libnosys/configure.in: Compact v850 support to v850*-*-*.
+        * libnosys/configure: Regenerated.
+        * configure.in: Add libgloss support for v850.
+        * configure: Regenerated.
+        * v850/access.c: New file.
+        * v850/aclocal.m4: New.
+        * v850/chmod.c: New.
+        * v850/chown.c: New.
+        * v850/close.c: New.
+        * v850/configure: New.
+        * v850/configure.in: New.
+        * v850/crt0.S: New.
+        * v850/crt1.c: New.
+        * v850/execv.c: New.
+        * v850/execve.c: New.
+        * v850/_exit.c: New.
+        * v850/fork.c: New.
+        * v850/fstat.c: New.
+        * v850/getpid.c: New.
+        * v850/gettime.c: New.
+        * v850/isatty.c: New.
+        * v850/kill.c: New.
+        * v850/link.c: New.
+        * v850/lseek.c: New.
+        * v850/Makefile.in: New.
+        * v850/open.c: New.
+        * v850/pipe.c: New.
+        * v850/read.c: New.
+        * v850/sbrk.c: New.
+        * v850/sim.ld: New.
+        * v850/stat.c: New.
+        * v850/time.c: New.
+        * v850/times.c: New.
+        * v850/trap.S: New.
+        * v850/unlink.c: New.
+        * v850/utime.c: New.
+        * v850/wait.c: New.
+        * v850/write.c: New.
 
 2010-07-19  Rafael Campos  <methril@gmail.com>
 
