@@ -238,13 +238,13 @@ _wfindfirst64i32	definition
 */
 #endif
 #if __MSVCRT_VERSION__ < 0x0800
-_CRTIMP long __cdecl __MINGW_NOTHROW _findfirst (const char*, struct _finddata_t*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _findnext (long, struct _finddata_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst (const char*, struct _finddata_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _findnext (intptr_t, struct _finddata_t*);
 #endif /* __MSVCRT_VERSION__ < 0x0800 */
-_CRTIMP int __cdecl __MINGW_NOTHROW _findclose (long);
+_CRTIMP int __cdecl __MINGW_NOTHROW _findclose (intptr_t);
 #if __MSVCRT_VERSION__ >= 0x0800
-_CRTIMP long __cdecl __MINGW_NOTHROW	_findfirst32 (const char*, struct _finddata32_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_findnext32 (long, struct _finddata32_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst32 (const char*, struct _finddata32_t*);
+_CRTIMP int  __cdecl __MINGW_NOTHROW	_findnext32 (intptr_t, struct _finddata32_t*);
 #endif /* __MSVCRT_VERSION__ >= 0x0800 */
 
 _CRTIMP int __cdecl __MINGW_NOTHROW _chdir (const char*);
@@ -256,32 +256,32 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _chmod (const char*, int);
 #ifdef __MSVCRT__
 _CRTIMP __int64 __cdecl __MINGW_NOTHROW _filelengthi64(int);
 #if __MSVCRT_VERSION__ < 0x0800
-_CRTIMP long __cdecl __MINGW_NOTHROW _findfirsti64(const char*, struct _finddatai64_t*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _findnexti64(long, struct _finddatai64_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirsti64(const char*, struct _finddatai64_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _findnexti64(intptr_t, struct _finddatai64_t*);
 #else
-_CRTIMP long __cdecl __MINGW_NOTHROW	_findfirst32i64 (const char*, struct _finddata32i64_t*);
-_CRTIMP long __cdecl __MINGW_NOTHROW	_findfirst64i32 (const char*, struct _finddata64i32_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_findnext32i64 (long, struct _finddata32i64_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_findnext64i32 (long, struct _finddata64i32_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst32i64 (const char*, struct _finddata32i64_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst64i32 (const char*, struct _finddata64i32_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_findnext32i64 (intptr_t, struct _finddata32i64_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_findnext64i32 (intptr_t, struct _finddata64i32_t*);
 #endif /* __MSVCRT_VERSION__ < 0x0800 */
 _CRTIMP __int64 __cdecl __MINGW_NOTHROW _lseeki64(int, __int64, int);
 _CRTIMP __int64 __cdecl __MINGW_NOTHROW _telli64(int);
 /* These require newer versions of msvcrt.dll (6.1 or higher). */ 
 #if __MSVCRT_VERSION__ >= 0x0601
 _CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findfirst64(const char*, struct __finddata64_t*);
-_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _findnext64(intptr_t, struct __finddata64_t*); 
+_CRTIMP int __cdecl __MINGW_NOTHROW _findnext64(intptr_t, struct __finddata64_t*);
 #endif /* __MSVCRT_VERSION__ >= 0x0601 */
 #if __MSVCRT_VERSION__ >= 0x0800
 #ifndef _USE_32BIT_TIME_T
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_findfirst (const char* _v1, struct _finddata_t* _v2)	    { return(_findfirst64i32 (_v1,(struct _finddata64i32_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_findnext (long _v1, struct _finddata_t* _v2)		    { return(_findnext64i32  (_v1,(struct _finddata64i32_t*)_v2)); }
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_findfirsti64 (const char* _v1, struct _finddatai64_t* _v2) { return(_findfirst64 (_v1,(struct __finddata64_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_findnexti64 (long _v1, struct _finddatai64_t* _v2)	    { return(_findnext64  (_v1,(struct __finddata64_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _findfirst (const char* _v1, struct _finddata_t* _v2)	{ return(_findfirst64i32 (_v1,(struct _finddata64i32_t*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_findnext (intptr_t _v1, struct _finddata_t* _v2)		{ return(_findnext64i32  (_v1,(struct _finddata64i32_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _findfirsti64 (const char* _v1, struct _finddatai64_t* _v2)	{ return(_findfirst64 (_v1,(struct __finddata64_t*)_v2)); }
+_CRTALIAS int  __cdecl __MINGW_NOTHROW	_findnexti64 (intptr_t _v1, struct _finddatai64_t* _v2)		{ return(_findnext64  (_v1,(struct __finddata64_t*)_v2)); }
 #else
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_findfirst (const char* _v1, struct _finddata_t* _v2)	    { return(_findfirst32 (_v1,(struct _finddata32_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_findnext (long _v1, struct _finddata_t* _v2)		    { return(_findnext32  (_v1,(struct _finddata32_t*)_v2)); }
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_findfirsti64 (const char* _v1, struct _finddatai64_t* _v2) { return(_findfirst32i64 (_v1,(struct _finddata32i64_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_findnexti64 (long _v1, struct _finddatai64_t* _v2)	    { return(_findnext32i64  (_v1,(struct _finddata32i64_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _findfirst (const char* _v1, struct _finddata_t* _v2)	{ return(_findfirst32 (_v1,(struct _finddata32_t*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_findnext (intptr_t _v1, struct _finddata_t* _v2)		{ return(_findnext32  (_v1,(struct _finddata32_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _findfirsti64 (const char* _v1, struct _finddatai64_t* _v2)	{ return(_findfirst32i64 (_v1,(struct _finddata32i64_t*)_v2)); }
+_CRTALIAS int __cdecl __MINGW_NOTHROW	_findnexti64 (intptr_t _v1, struct _finddatai64_t* _v2)		{ return(_findnext32i64  (_v1,(struct _finddata32i64_t*)_v2)); }
 #endif /* !_USE_32BIT_TIME_T */
 #endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #ifndef __NO_MINGW_LFS

@@ -1,3 +1,11 @@
+2010-07-22  Ozkan Sezer  <sezero@users.sourceforge.net>
+
+	* include/io.h (_findfirst, _findnext, _findclose, _findfirst32,
+	_findnext32, _findfirsti64, _findnexti64, _findfirst32i64, _findfirst64i32,
+	_findnext32i64, _findnext64i32, _findnext64, _findfirst, _findnext,
+	_findfirsti64, _findnexti64, _findfirst, _findnext, _findfirsti64,
+	_findnexti64): Correct definition.
+
 2010-04-27 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* mingwex/mb_wc_common.h (get_codepage): Revert change of 2006-09-19.
