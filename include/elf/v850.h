@@ -40,6 +40,11 @@
 /* v850e1 code.  */
 #define E_V850E1_ARCH		0x20000000
 
+/* v850e2 code.  */
+#define E_V850E2_ARCH		0x30000000
+
+/* v850e2v3 code.  */
+#define E_V850E2V3_ARCH		0x40000000
 
 /* Flags for the st_other field.  */
 #define V850_OTHER_SDA		0x10	/* Symbol had SDA relocations.  */
@@ -81,6 +86,29 @@ START_RELOC_NUMBERS (v850_reloc_type)
      RELOC_NUMBER (R_V850_ALIGN, 27)
      RELOC_NUMBER (R_V850_REL32, 28)
      RELOC_NUMBER (R_V850_LO16_SPLIT_OFFSET, 29)	/* For ld.bu */
+     RELOC_NUMBER (R_V850_16_PCREL, 30)      		/* For loop */
+     RELOC_NUMBER (R_V850_17_PCREL, 31)      		/* For br */
+     RELOC_NUMBER (R_V850_23, 32)			/* For 23bit ld.[w,h,hu,b,bu],st.[w,h,b] */
+     RELOC_NUMBER (R_V850_32_PCREL, 33)      		/* For jr32, jarl32 */
+     RELOC_NUMBER (R_V850_32_ABS, 34)      		/* For jmp32 */
+     RELOC_NUMBER (R_V850_16_SPLIT_OFFSET, 35)      	/* For ld.bu */
+     RELOC_NUMBER (R_V850_16_S1, 36)      		/* For ld.w, ld.h st.w st.h */
+     RELOC_NUMBER (R_V850_LO16_S1, 37)      		/* For ld.w, ld.h st.w st.h */
+     RELOC_NUMBER (R_V850_CALLT_15_16_OFFSET, 38)	/* For ld.w, ld.h, ld.hu, st.w, st.h */
+     RELOC_NUMBER (R_V850_32_GOTPCREL, 39)		/* GLOBAL_OFFSET_TABLE from pc */
+     RELOC_NUMBER (R_V850_16_GOT, 40)      		/* GOT ENTRY from gp */
+     RELOC_NUMBER (R_V850_32_GOT, 41)      		
+     RELOC_NUMBER (R_V850_22_PLT, 42)			/* For jr */
+     RELOC_NUMBER (R_V850_32_PLT, 43)			/* For jr32 */
+     RELOC_NUMBER (R_V850_COPY, 44)      		
+     RELOC_NUMBER (R_V850_GLOB_DAT, 45)      		
+     RELOC_NUMBER (R_V850_JMP_SLOT, 46)      		
+     RELOC_NUMBER (R_V850_RELATIVE, 47)      		
+     RELOC_NUMBER (R_V850_16_GOTOFF, 48)      		/* From gp */
+     RELOC_NUMBER (R_V850_32_GOTOFF, 49)      		
+     RELOC_NUMBER (R_V850_CODE, 50)      		
+     RELOC_NUMBER (R_V850_DATA, 51)      		/* For loop */
+
 END_RELOC_NUMBERS (R_V850_max)
 
 

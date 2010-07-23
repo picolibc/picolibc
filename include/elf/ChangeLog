@@ -1,3 +1,9 @@
+2010-07-23  Naveen.H.S  <naveen.S@kpitcummins.com>
+	    Ina Pandit  <ina.pandit@kpitcummins.com>
+
+	* v850.h: Add support for V850E2 and V850E2V3.
+	(v850_reloc_type): Update the newly added relocations
+
 2010-07-20  Alan Modra  <amodra@gmail.com>
 
 	* internal.h (ELF_TBSS_SPECIAL): New macro, extracted from..
