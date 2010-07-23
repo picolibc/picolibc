@@ -106,6 +106,9 @@ case "${target}" in
   mt-*-*)
         AC_CONFIG_SUBDIRS([mt])
 	;;
+  v850*-*-*)
+        AC_CONFIG_SUBDIRS([v850])
+        ;;
   xc16x-*-*)
 	AC_CONFIG_SUBDIRS([xc16x])
 	;;
