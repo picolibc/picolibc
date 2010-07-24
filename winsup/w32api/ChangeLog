@@ -1,5 +1,9 @@
 2010-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/kernel32.def(FatalExit): Correct definiton.
+
+2010-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/basetyps.h (REFGUID, REFIID, REFCLSID, REFFMTID): Revert change
 	from 2010-07-17 since it breaks several applications.
 

@@ -197,7 +197,7 @@ ExpungeConsoleCommandHistoryW@4
 ExtendVirtualBuffer@8
 FatalAppExitA@8
 FatalAppExitW@8
-FatalExit@0
+FatalExit@4
 FileTimeToDosDateTime@12
 FileTimeToLocalFileTime@8
 FileTimeToSystemTime@8
