@@ -1,5 +1,7 @@
+#ifndef _MINGW_FLOAT_H_
 /* 
  * float.h
+ *
  * This file has no copyright assigned and is placed in the Public Domain.
  * This file is a part of the mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within the package.
@@ -9,17 +11,31 @@
  * Also included here are some non-ANSI bits for accessing the floating
  * point controller.
  *
- * NOTE: GCC provides float.h, but it doesn't include the non-standard
- *       stuff for accessing the fp controller. We include_next the
- *       GCC-supplied header and just define the MS-specific extensions
- *       here.     
+ */
+#define _MINGW_FLOAT_H_
+/*
+ * NOTE:
+ *
+ * GCC provides float.h, but it doesn't include the non-standard stuff for
+ * accessing the fp controller.  We parse the GCC-supplied header, for its
+ * standard content, and then define the MS-specific extensions here.
+ *
+ * In a MinGW standard Win32 hosted environment, this should be the float.h
+ * found by a system include path search, but this can't be guaranteed; for
+ * a cross-compiler setup, the GCC-supplied header, which is guarded by the
+ * _FLOAT_H___ macro, may be found first, thus...
  *
  */
-
-#include_next<float.h>
-
-#ifndef _MINGW_FLOAT_H_
-#define _MINGW_FLOAT_H_
+#ifndef _FLOAT_H___
+ /*
+  * ...when we didn't find the GCC-supplied header first, we want to pull
+  * it in now; include_next should achieve this, (and we must rely on the
+  * GCC header maintainers to extend us the same courtesy, to get this one
+  * pulled in, when the GCC-supplied header is found first).
+  *
+  */
+# include_next <float.h>
+#endif
 
 /* All the headers include this file. */
 #include <_mingw.h>
@@ -148,5 +164,5 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _isnan (double);
 
 #endif	/* Not __STRICT_ANSI__ */
 
-#endif /* _FLOAT_H_ */
+#endif /* _MINGW_FLOAT_H_ */
 

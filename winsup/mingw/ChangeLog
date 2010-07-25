@@ -1,3 +1,17 @@
+2010-07-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Accept that mingwrt headers are not guaranteed to precede GCC's in the
+	system include search path; (issue reported by Mark Brand).
+
+	* include/float.h: Add multiple inclusion guard around...
+	[! defined _FLOAT_H___]: ...include_next <float.h> for GCC's version,
+	only when this define does not indicate that it has already been seen;
+	update comments to document rationale; move it within the scope of...
+	[! defined _MINGW_FLOAT_H_]: ...this multiple inclusion guard, so that
+	GCC's float.h, after an appropriate complementary modification, need
+	not perform a further include path search when this implementation
+	specific extension has already been processed.
+
 2010-07-22  Ozkan Sezer  <sezero@users.sourceforge.net>
 
 	* include/io.h (_findfirst, _findnext, _findclose, _findfirst32,
