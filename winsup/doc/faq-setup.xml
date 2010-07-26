@@ -222,8 +222,8 @@ to install <emphasis>everything</emphasis>, not just what it thinks you should h
 by default.
 </para>
 </listitem>
-<listitem><para>Now click on the ``View'' button (twice) until you get the
-``Partial'' view.  This shows exactly which packages are about to be
+<listitem><para>Now click on the ``View'' button (twice) until you get to the
+``Pending'' view.  This shows exactly which packages are about to be
 downloaded and installed.
 </para>
 </listitem>
@@ -245,7 +245,7 @@ updates to what you have already installed.  Then...
 </listitem>
 <listitem><para>Run Cygwin Setup again, and apply the above technique to get all
 new packages that would not be installed by default.  You can check
-the list in the Partial View before proceeding, in case there's
+the list in the ``Pending'' view before proceeding, in case there's
 something you really <emphasis>don't</emphasis> want.
 </para>
 </listitem>

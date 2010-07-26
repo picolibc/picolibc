@@ -1,3 +1,8 @@
+2010-07-26  Andy Koppe  <andy.koppe@gmail.com>
+
+	* setup-net.sgml, faq-setup.xml: Rename setup.exe's "Partial"
+	view to "Pending"	
+
 2010-07-19  Eric Blake  <eblake@redhat.com>
 
 	* textbinary.sgml (textbin-devel): Document temp file behavior.
