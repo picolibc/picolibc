@@ -57,7 +57,6 @@ typedef enum
   RXO_movbir,	/* [s,s2] = d (signed) */
   RXO_pushm,	/* s..s2 */
   RXO_popm,	/* s..s2 */
-  RXO_pusha,	/* &s */
   RXO_xchg,	/* s <-> d */
   RXO_stcc,	/* d = s if cond(s2) */
   RXO_rtsd,	/* rtsd, 1=imm, 2-0 = reg if reg type */
@@ -98,6 +97,8 @@ typedef enum
   RXO_jsrrel,	/* pc += d */
   RXO_rts,
   RXO_nop,
+  RXO_nop2,
+  RXO_nop3,
 
   RXO_scmpu,
   RXO_smovu,

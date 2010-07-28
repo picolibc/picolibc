@@ -1,3 +1,7 @@
+2010-07-27  DJ Delorie  <dj@redhat.com>
+
+	* rx.h (RX_Opcode_ID): Add nop2 and nop3 for statistics.
+
 2010-07-23  Naveen.H.S  <naveen.S@kpitcummins.com>
 	    Ina Pandit  <ina.pandit@kpitcummins.com>
 
