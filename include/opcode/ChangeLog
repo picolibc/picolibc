@@ -1,3 +1,8 @@
+2010-07-29  DJ Delorie  <dj@redhat.com>
+
+	* rx.h (RX_Operand_Type): Add TwoReg.
+	(RX_Opcode_ID): Remove ediv and ediv2.
+
 2010-07-27  DJ Delorie  <dj@redhat.com>
 
 	* rx.h (RX_Opcode_ID): Add nop2 and nop3 for statistics.

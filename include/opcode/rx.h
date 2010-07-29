@@ -47,6 +47,7 @@ typedef enum
   RX_Operand_Predec,	/* [-Rn] */
   RX_Operand_Condition,	/* eq, gtu, etc */
   RX_Operand_Flag,	/* [UIOSZC] */
+  RX_Operand_TwoReg,	/* [Rn + scale*R2] */
 } RX_Operand_Type;
 
 typedef enum
@@ -82,8 +83,6 @@ typedef enum
   RXO_min,	/* d = min(d,s) */
   RXO_emul,	/* d:64 = d:32 * s */
   RXO_emulu,	/* d:64 = d:32 * s (unsigned) */
-  RXO_ediv,	/* d:64 / s; d = quot, d+1 = rem */
-  RXO_edivu,	/* d:64 / s; d = quot, d+1 = rem */
 
   RXO_rolc,	/* d <<= 1 through carry */
   RXO_rorc,	/* d >>= 1 through carry*/
