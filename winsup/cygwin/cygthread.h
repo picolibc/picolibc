@@ -1,6 +1,7 @@
 /* cygthread.h
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010
+   Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -8,6 +9,8 @@ details. */
 
 #ifndef _CYGTHREAD_H
 #define _CYGTHREAD_H
+
+typedef void WINAPI (*LPVOID_THREAD_START_ROUTINE) (void *) __attribute__((noreturn));		// Input queue thread
 
 class cygthread
 {
@@ -28,6 +31,7 @@ class cygthread
   bool is_freerange;
   static bool exiting;
   HANDLE notify_detached;
+  void create () __attribute__ ((regparm(1)));
  public:
   bool terminate_thread ();
   static DWORD WINAPI stub (VOID *);
@@ -37,7 +41,20 @@ class cygthread
   void callfunc (bool) __attribute__ ((noinline, regparm (2)));
   void auto_release () {func = NULL;}
   void release (bool);
-  cygthread (LPTHREAD_START_ROUTINE, unsigned, LPVOID, const char *, HANDLE = NULL);
+  cygthread (LPTHREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)
+  : __name (name), func (start), arglen (n), arg (param), notify_detached (notify)
+  {
+    create ();
+  }
+  cygthread (LPVOID_THREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)
+  : __name (name), func ((LPTHREAD_START_ROUTINE) start), arglen (n),
+    arg (param), notify_detached (notify)
+  {
+    create ();
+    /* This is a neverending/high-priority thread */
+    ::SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
+    zap_h ();
+  }
   cygthread () {};
   static void init ();
   bool detach (HANDLE = NULL);

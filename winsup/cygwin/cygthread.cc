@@ -185,9 +185,8 @@ out:
   return info;
 }
 
-cygthread::cygthread (LPTHREAD_START_ROUTINE start, size_t n, void *param,
-		      const char *name, HANDLE notify)
- : __name (name), func (start), arglen (n), arg (param), notify_detached (notify)
+void
+cygthread::create ()
 {
   thread_printf ("name %s, id %p", name, id);
   HANDLE htobe;
@@ -214,7 +213,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, size_t n, void *param,
 #endif
     }
 
-  if (n)
+  if (arglen)
     {
       while (!ev)
 	yield ();

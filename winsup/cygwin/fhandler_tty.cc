@@ -46,9 +46,9 @@ struct pipe_reply {
 
 fhandler_tty_master NO_COPY *tty_master;
 
-static DWORD WINAPI process_input (void *);		// Input queue thread
-static DWORD WINAPI process_output (void *);		// Output queue thread
-static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
+static void WINAPI process_input (void *) __attribute__((noreturn));		// Input queue thread
+static void WINAPI process_output (void *) __attribute__((noreturn));		// Output queue thread
+static void WINAPI process_ioctl (void *) __attribute__((noreturn));		// Ioctl requests thread
 
 fhandler_tty_master::fhandler_tty_master ()
   : fhandler_pty_master (), console (NULL)
@@ -89,18 +89,9 @@ fhandler_tty_master::init ()
 
   set_close_on_exec (true);
 
-  cygthread *h;
-  h = new cygthread (process_input, 0, cygself, "ttyin");
-  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
-  h->zap_h ();
-
-  h = new cygthread (process_ioctl, 0, cygself, "ttyioctl");
-  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
-  h->zap_h ();
-
-  h = new cygthread (process_output, 0, cygself, "ttyout");
-  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
-  h->zap_h ();
+  new cygthread (process_input, 0, cygself, "ttyin");
+  new cygthread (process_ioctl, 0, cygself, "ttyioctl");
+  new cygthread (process_output, 0, cygself, "ttyout");
 
   return 0;
 }
@@ -225,7 +216,7 @@ fhandler_pty_master::accept_input ()
   return ret;
 }
 
-static DWORD WINAPI
+static void WINAPI
 process_input (void *)
 {
   char rawbuf[INP_BUFFER_SIZE];
@@ -414,7 +405,7 @@ out:
   return rc;
 }
 
-static DWORD WINAPI
+static void WINAPI
 process_output (void *)
 {
   char buf[OUT_BUFFER_SIZE * 2];
@@ -436,7 +427,7 @@ process_output (void *)
 
 /* Process tty ioctl requests */
 
-static DWORD WINAPI
+static void WINAPI
 process_ioctl (void *)
 {
   while (1)

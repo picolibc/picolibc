@@ -1,3 +1,18 @@
+2010-07-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygthread.h (LPVOID_THREAD_START_ROUTINE): Define.
+	(cygthread::create): Rename from cygthread::cygthread.
+	(cygthread::cygthread): Define new constructor which accepts
+	LPVOID_THREAD_START_ROUTINE as the first argument.  Call
+	cygthread::create.
+	* cygthread.cc (cygthread::create): Rename from cygthread::cygthread.
+	Use 'arglen' rather than 'n' since 'n' is no longer supplied.
+	* fhandler_tty.cc (process_input): Define as void/noreturn.
+	(process_output): Ditto.
+	(process_ioctl): Ditto.
+	(fhandler_tty_master::init): Don't "zap_h" cygthreads which are
+	noreturn.  It's now implied.
+
 2010-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::raw_write): Remove STATUS_DISK_FULL
