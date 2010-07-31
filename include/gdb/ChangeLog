@@ -1,3 +1,9 @@
+2010-07-31  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* signals.h (enum target_signal): Move the content to signals.def.
+	Include it.
+	* signals.def: New file.
+
 2010-06-24  Kevin Buettner  <kevinb@redhat.com>
 
 	* sim-rx.h (sim_rx_regnum): Add sim_rx_acc_regnum.  Adjust
