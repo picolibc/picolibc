@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+# Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -141,9 +141,8 @@ __sigfe:
 
 	.global	__sigbe
 __sigbe:						# return here after cygwin syscall
-	pushl	%edx
-	pushl	%ebx
 	pushl	%eax					# don't clobber
+	pushl	%ebx					# tls pointer
 1:	movl	%fs:4,%ebx				# address of bottom of tls
 	movl	\$1,%eax				# potential lock value
 	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
@@ -154,12 +153,10 @@ __sigbe:						# return here after cygwin syscall
 	jmp	1b					#  and loop
 2:	movl	\$-4,%eax				# now decrement aux stack
 	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
-	xorl	%edx,%edx
-	xchgl	%edx,-4(%eax)				# get return address from signal stack
-	xchgl	%edx,8(%esp)				# restore edx/real return address
+	movl	-4(%eax),%eax				# get return address from signal stack
+	xchgl	%eax,4(%esp)				# swap return address with saved eax
 	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)			# release lock
-	popl	%eax
 	popl	%ebx
 	ret
 
@@ -175,7 +172,7 @@ _sigreturn:
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
-	call	_yield			# sleep
+	call	_yield					# sleep
 	jmp	1b					#  and loop
 2:	popl	%edx					# saved errno
 	testl	%edx,%edx				# Is it < 0
@@ -211,7 +208,19 @@ _sigdelayed:
 	pushl	%ebx
 	pushl	%eax
 	movl	%fs:4,%ebx
-	incl	$tls::incyg(%ebx)
+1:	movl	\$1,%eax
+	xchgl	%eax,$tls::stacklock(%ebx)
+	movl	%eax,$tls::spinning(%ebx) # flag if we are waiting for lock
+					  # If %eax is 1 then someone else has
+					  # the lock but we want to flag that
+					  # we're waiting for it.  If %eax is 0
+					  # then we're not spinning and 0 will
+					  # reflect that.
+	testl	%eax,%eax
+	jz	2f
+	call	_yield
+	jmp	1b
+2:	incl	$tls::incyg(%ebx)
 	pushl	$tls::saved_errno(%ebx)	# saved errno
 	call	_set_process_mask_delta
 	pushl	%eax
@@ -225,21 +234,23 @@ _sigdelayed:
 
 	call	_reset_signal_arrived\@0
 	pushl	\$_sigreturn		# where to return
-	pushl	$tls::func(%ebx)	# signal func
+	pushl	$tls::func(%ebx)	# user-supplied signal func
 	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
 	jnz	4f			# yes.  callee clears signal number
 	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
 					# flag to the signal handler thread
 					# that it is ok to set up sigsave
 4:	decl	$tls::incyg(%ebx)
-	ret
+	decl	$tls::stacklock(%ebx)
+	ret				# return via signal handler
 
-	.global	__ZN7_cygtls3popEv
+	.global __ZN7_cygtls3popEv
 __ZN7_cygtls3popEv:
 1:	pushl	%ebx
 	movl	%eax,%ebx			# this
 	movl	\$-4,%eax
 	xadd	%eax,$tls::pstackptr(%ebx)
+	movl	-4(%eax),%eax
 	popl	%ebx
 	ret
 
@@ -269,7 +280,6 @@ __ZN7_cygtls6lockedEv:
 	.extern	__ZN7_cygtls19call_signal_handlerEv
 stabilize_sig_stack:
 	movl	%fs:4,%ebx
-	incl	$tls::incyg(%ebx)
 1:	movl	\$1,%eax
 	xchgl	%eax,$tls::stacklock(%ebx)
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
@@ -277,7 +287,8 @@ stabilize_sig_stack:
 	jz	2f
 	call	_yield
 	jmp	1b
-2:	cmpl	\$0,$tls::sig(%ebx)
+2:	incl	$tls::incyg(%ebx)
+	cmpl	\$0,$tls::sig(%ebx)
 	jz	3f
 	decl	$tls::stacklock(%ebx)			# unlock
 	movl	\$-$tls::sizeof__cygtls,%eax		# point to beginning

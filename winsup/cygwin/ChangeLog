@@ -1,3 +1,15 @@
+2010-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (_cygtls::interrupt_now): Revert to checking for
+	"spinning" when choosing to defer signal.
+	(_cygtls::call_signal_handler): Grab func when we have the lock.
+	* gendef: Update copyright.
+	(__sigbe): Simplify slightly.
+	(_sigdelayed): Grab a lock before manipulating stuff.
+	(_cygtls::pop): Properly return popped value.
+	(stabilize_sig_stack): Set incyg when we have the lock.
+	* sigproc.cc: Update copyright.
+
 2010-07-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygthread.h (LPVOID_THREAD_START_ROUTINE): Define.

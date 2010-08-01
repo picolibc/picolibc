@@ -778,7 +778,11 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 {
   bool interrupted;
 
-  if (incyg || inside_kernel (cx))
+  /* Delay the interrupt if we are
+     1) somehow inside the DLL
+     2) in _sigfe (spinning is true) and about to enter cygwin DLL
+     3) in a Windows DLL.  */
+  if (incyg || spinning || inside_kernel (cx))
     interrupted = false;
   else
     {
@@ -1372,6 +1376,7 @@ _cygtls::call_signal_handler ()
       lock ();
       this_sa_flags = sa_flags;
       int thissig = sig;
+      void (*thisfunc) (int) = func;
 
       pop ();
       reset_signal_arrived ();
@@ -1382,13 +1387,13 @@ _cygtls::call_signal_handler ()
       incyg = 0;
       if (!(this_sa_flags & SA_SIGINFO))
 	{
-	  void (*sigfunc) (int) = func;
+	  void (*sigfunc) (int) = thisfunc;
 	  sigfunc (thissig);
 	}
       else
 	{
 	  siginfo_t thissi = infodata;
-	  void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) func;
+	  void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) thisfunc;
 	  /* no ucontext_t information provided yet */
 	  sigact (thissig, &thissi, NULL);
 	}
