@@ -1,3 +1,12 @@
+2010-08-03  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_lrint.c (lrint):  Annotate shift operations with
+	possible shift amount ranges, and use SAFE_RIGHT_SHIFT to avoid
+	undefined behaviour.
+	* libm/common/s_llrint.c (llrint):  Likewise.
+	* libm/common/s_lround.c (lround):  Correct some comments on ranges.
+	* libm/common/s_llround.c (llround):  Likewise.
+
 2010-07-30  Anthony Green  <green@moxielogic.com>
 
 	* libc/sys/rtems/machine/_types.h: Add moxie support.

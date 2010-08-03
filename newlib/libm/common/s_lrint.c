@@ -98,13 +98,17 @@ TWO52[2]={
 
   /* Extract exponent field. */
   j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
+  /* j0 in [-1023,1024] */
   
   if(j0 < 20)
     {
+      /* j0 in [-1023,19] */
       if(j0 < -1)
         return 0;
       else
         {
+          /* j0 in [0,19] */
+	  /* shift amt in [0,19] */
           w = TWO52[sx] + x;
           t = w - TWO52[sx];
           GET_HIGH_WORD(i0, t);
@@ -112,26 +116,43 @@ TWO52[2]={
              minus zero, which fails the calculation below. */
           if ((i0 & ~(1L << 31)) == 0)
               return 0;
+          /* After round:  j0 in [0,20] */
           j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
           i0 &= 0x000fffff;
           i0 |= 0x00100000;
+	  /* shift amt in [20,0] */
           result = i0 >> (20 - j0);
         }
     }
   else if (j0 < (int)(8 * sizeof (long int)) - 1)
     {
+      /* 32bit return: j0 in [20,30] */
+      /* 64bit return: j0 in [20,62] */
       if (j0 >= 52)
+	/* 64bit return: j0 in [52,62] */
+	/* 64bit return: left shift amt in [32,42] */
         result = ((long int) ((i0 & 0x000fffff) | 0x0010000) << (j0 - 20)) | 
+		/* 64bit return: right shift amt in [0,10] */
                    (i1 << (j0 - 52));
       else
         {
+	  /* 32bit return: j0 in [20,30] */
+	  /* 64bit return: j0 in [20,51] */
           w = TWO52[sx] + x;
           t = w - TWO52[sx];
           EXTRACT_WORDS (i0, i1, t);
           j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
           i0 &= 0x000fffff;
           i0 |= 0x00100000;
-          result = ((long int) i0 << (j0 - 20)) | (i1 >> (52 - j0));
+          /* After round:
+	   * 32bit return: j0 in [20,31];
+	   * 64bit return: j0 in [20,52] */
+	  /* 32bit return: left shift amt in [0,11] */
+	  /* 64bit return: left shift amt in [0,32] */
+          /* ***32bit return: right shift amt in [32,21] */
+          /* ***64bit return: right shift amt in [32,0] */
+          result = ((long int) i0 << (j0 - 20))
+			| SAFE_RIGHT_SHIFT (i1, (52 - j0));
         }
     }
   else

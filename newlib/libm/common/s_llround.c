@@ -31,10 +31,10 @@ llround(double x)
   msw &= 0x000fffff;
   msw |= 0x00100000;
 
-  /* exponent_less_1023 in [-1024,1023] */
+  /* exponent_less_1023 in [-1023,1024] */
   if (exponent_less_1023 < 20)
     {
-      /* exponent_less_1023 in [-1024,19] */
+      /* exponent_less_1023 in [-1023,19] */
       if (exponent_less_1023 < 0)
         {
           if (exponent_less_1023 < -1)
