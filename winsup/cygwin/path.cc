@@ -2805,6 +2805,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   path_conv p;
   size_t lsiz = 0;
   char *buf = NULL;
+  PWCHAR path = NULL;
   int error = 0;
   bool relative = !!(what & CCP_RELATIVE);
   what &= ~CCP_RELATIVE;
@@ -2833,11 +2834,11 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	   backslash ".\\" in the Win32 path.  That's a result of the
 	   conversion in normalize_posix_path.  This should not occur
 	   so the below code is just a band-aid. */
-	if (!strcmp ((const char *) from, ".") && relative
+	if (relative && !strcmp ((const char *) from, ".")
 	    && !strcmp (buf, ".\\"))
 	  {
-	    --lsiz;
-	    buf[lsiz - 1] = '\0';
+	    lsiz = 2;
+	    buf[1] = '\0';
 	  }
       }
       break;
@@ -2858,13 +2859,34 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	    return_with_errno (p.error);
 	}
       lsiz = p.get_wide_win32_path_len () + 1;
+      path = p.get_nt_native_path ()->Buffer;
+
+      /* Convert native path to standard DOS path. */
+      if (!wcsncmp (path, L"\\??\\", 4))
+	{
+	  path[1] = L'\\';
+
+	  /* Drop long path prefix for short pathnames.  Unfortunately there's
+	     quite a bunch of Win32 functions, especially in user32.dll,
+	     apparently, which don't grok long path names at all, not even
+	     in the UNICODE API. */
+	  if (lsiz <= MAX_PATH + 4 || (path[5] != L':' && lsiz <= MAX_PATH + 6))
+	    {
+	      path += 4;
+	      lsiz -= 4;
+	      if (path[1] != L':')
+		{
+		  *(path += 2) = '\\';
+		  lsiz -= 2;
+		}
+	    }
+	}
       /* TODO: Same ".\\" band-aid as in CCP_POSIX_TO_WIN_A case. */
-      if (!strcmp ((const char *) from, ".") && relative
-	  && !wcscmp (p.get_nt_native_path ()->Buffer, L".\\"))
+      if (relative && !strcmp ((const char *) from, ".")
+	  && !wcscmp (path, L".\\"))
       	{
-	  --lsiz;
-	  p.get_nt_native_path ()->Length -= sizeof (WCHAR);
-	  p.get_nt_native_path ()->Buffer[lsiz - 1] = L'\0';
+	  lsiz = 2;
+	  path[1] = L'\0';
 	}
       lsiz *= sizeof (WCHAR);
       break;
@@ -2903,7 +2925,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       strcpy ((char *) to, buf);
       break;
     case CCP_POSIX_TO_WIN_W:
-      p.get_wide_win32_path ((PWCHAR) to);
+      wcscpy ((PWCHAR) to, path);
       break;
     }
   return 0;

@@ -1,3 +1,10 @@
+2010-08-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (cygwin_conv_path): Rearrange test for "." in POSIX to
+	relative DOS path conversion.  Simplify fixing the path.
+	In CCP_POSIX_TO_WIN_W conversion, always drop long path prefix if path
+	fits into MAX_PATH.  Explain why.
+
 2010-08-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* exceptions.cc (_cygtls::interrupt_now): Revert to checking for
