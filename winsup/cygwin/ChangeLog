@@ -1,3 +1,7 @@
+2010-08-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/dirent.h (d_fileno): Define as d_ino.
+
 2010-08-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cygwin_conv_path): Rearrange test for "." in POSIX to

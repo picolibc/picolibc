@@ -29,6 +29,8 @@ struct dirent
 };
 #pragma pack(pop)
 
+#define d_fileno d_ino			/* BSD compatible definition */
+
 #define __DIRENT_COOKIE 0xdede4242
 
 #pragma pack(push,4)
