@@ -79,12 +79,13 @@ struct	stat
 
 #define	S_ISUID		0004000	/* set user id on execution */
 #define	S_ISGID		0002000	/* set group id on execution */
-#ifndef	_POSIX_SOURCE
 #define	S_ISVTX		0001000	/* save swapped text even after use */
+#ifndef	_POSIX_SOURCE
 #define	S_IREAD		0000400	/* read permission, owner */
 #define	S_IWRITE 	0000200	/* write permission, owner */
 #define	S_IEXEC		0000100	/* execute/search permission, owner */
 #define	S_ENFMT 	0002000	/* enforcement-mode locking */
+#endif	/* !_POSIX_SOURCE */
 
 #define	S_IFMT		_IFMT
 #define	S_IFDIR		_IFDIR
@@ -94,7 +95,6 @@ struct	stat
 #define	S_IFLNK		_IFLNK
 #define	S_IFSOCK	_IFSOCK
 #define	S_IFIFO		_IFIFO
-#endif	/* !_POSIX_SOURCE */
 
 #ifdef _WIN32
 /* The Windows header files define _S_ forms of these, so we do too
