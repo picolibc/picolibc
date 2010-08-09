@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -28,6 +28,7 @@ details. */
 #include <winioctl.h>
 #include <wchar.h>
 #include "cpuid.h"
+#include "mount.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -41,6 +42,7 @@ static _off64_t format_proc_cpuinfo (void *, char *&);
 static _off64_t format_proc_partitions (void *, char *&);
 static _off64_t format_proc_self (void *, char *&);
 static _off64_t format_proc_mounts (void *, char *&);
+static _off64_t format_proc_filesystems (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
@@ -59,6 +61,7 @@ static const virt_tab_t proc_tab[] = {
   { "registry32", FH_REGISTRY,	virt_directory,	NULL },
   { "registry64", FH_REGISTRY,	virt_directory,	NULL },
   { "net",	  FH_PROCNET,	virt_directory,	NULL },
+  { "filesystems", FH_PROC,	virt_file,	format_proc_filesystems },
   { NULL,	  0,		virt_none,	NULL }
 };
 
@@ -1218,6 +1221,24 @@ format_proc_mounts (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, sizeof ("self/mounts"));
   return __small_sprintf (destbuf, "self/mounts");
+}
+
+static _off64_t
+format_proc_filesystems (void *, char *&destbuf)
+{
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
+
+  /* start at 1 to skip type "none" */
+  for (int i = 1; fs_names[i].name; i++)
+    bufptr += __small_sprintf(bufptr, "%s\t%s\n",
+                              fs_names[i].block_device ? "" : "nodev",
+                              fs_names[i].name);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
 }
 
 #undef print

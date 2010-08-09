@@ -1,5 +1,14 @@
 2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* fhandler_proc.cc: Add /proc/filesystems virtual file.
+	(format_proc_filesystems): New function.
+	* mount.cc (fs_names): Move to global scope. Redefine as array
+	of { "name", block_device? } structs.
+	(fillout_mntent): Use name member of fs_names.
+	* mount.h (fs_names): New prototype.
+
+2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* include/dlfcn.h (RTLD_LOCAL): Define.
 
 2010-08-06  Corinna Vinschen  <corinna@vinschen.de>

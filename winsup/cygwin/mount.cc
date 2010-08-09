@@ -1472,6 +1472,24 @@ mount_info::del_item (const char *path, unsigned flags)
 
 /************************* mount_item class ****************************/
 
+/* Order must be identical to mount.h, enum fs_info_type. */
+fs_names_t fs_names[] = {
+    { "none", false },
+    { "vfat", true },
+    { "ntfs", true },
+    { "smbfs", false },
+    { "nfs", false },
+    { "netapp", false },
+    { "iso9660", true },
+    { "udf", true },
+    { "csc-cache", false },
+    { "sunwnfs", false },
+    { "unixfs", false },
+    { "mvfs", false },
+    { "cifs", false },
+    { "nwfs", false }
+};
+
 static mntent *
 fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 {
@@ -1509,26 +1527,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
 
-  /* Order must be identical to mount.h, enum fs_info_type. */
-  const char *fs_names[] = {
-    "none",
-    "vfat",
-    "ntfs",
-    "smbfs",
-    "nfs",
-    "netapp",
-    "iso9660",
-    "udf",
-    "csc-cache",
-    "sunwnfs",
-    "unixfs",
-    "mvfs",
-    "cifs",
-    "nwfs"
-  };
-
   if (mntinfo.what_fs () > 0 && mntinfo.what_fs () < max_fs_type)
-    strcpy (_my_tls.locals.mnt_type, fs_names[mntinfo.what_fs ()]);
+    strcpy (_my_tls.locals.mnt_type, fs_names[mntinfo.what_fs ()].name);
   else
     strcpy (_my_tls.locals.mnt_type, mntinfo.fsname ());
 

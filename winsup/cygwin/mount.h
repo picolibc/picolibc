@@ -32,6 +32,11 @@ enum fs_info_type
   max_fs_type
 };
 
+extern struct fs_names_t {
+    const char *name;
+    bool block_device;
+} fs_names[];
+
 #define IMPLEMENT_FS_FLAG(func, flag) \
   bool func (bool val) { if (val) status.fs_type = flag; return val; } \
   bool func () const   { return status.fs_type == flag; }
