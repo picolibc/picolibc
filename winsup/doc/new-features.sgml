@@ -34,6 +34,10 @@ allows to fetch them.
 New interfaces mkostemp(3) and mkostemps(3) are added.
 </para></listitem>
 
+<listitem><para>
+New virtual file /proc/filesystems.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
