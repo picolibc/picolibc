@@ -165,7 +165,7 @@ static struct
   {cons, {c:IOV_MAX}},			/*  66, _SC_IOV_MAX */
   {cons, {c:_POSIX_IPV6}},		/*  67, _SC_IPV6 */
   {cons, {c:LINE_MAX}},			/*  68, _SC_LINE_MAX */
-  {cons, {c:-1L}},			/*  69, _SC_MONOTONIC_CLOCK */
+  {cons, {c:_POSIX_MONOTONIC_CLOCK}},	/*  69, _SC_MONOTONIC_CLOCK */
   {cons, {c:_POSIX_RAW_SOCKETS}},	/*  70, _SC_RAW_SOCKETS */
   {cons, {c:_POSIX_READER_WRITER_LOCKS}},	/*  71, _SC_READER_WRITER_LOCKS */
   {cons, {c:_POSIX_REGEXP}},		/*  72, _SC_REGEXP */

@@ -36,6 +36,8 @@ details. */
    to handle that case.  */
 hires_ms gtod __attribute__((section (".cygwin_dll_common"), shared));
 
+hires_ns NO_COPY ntod;
+
 static inline LONGLONG
 systime_ns ()
 {
@@ -46,12 +48,6 @@ systime_ns ()
   x.LowPart = ft.dwLowDateTime;
   x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
   return x.QuadPart;
-}
-
-static inline LONGLONG
-systime ()
-{
-  return systime_ns () / 10;
 }
 
 /* Cygwin internal */
@@ -623,7 +619,7 @@ cygwin_tzset ()
 
 #define stupid_printf if (cygwin_finished_initializing) debug_printf
 void
-hires_us::prime ()
+hires_ns::prime ()
 {
   LARGE_INTEGER ifreq;
   if (!QueryPerformanceFrequency (&ifreq))
@@ -642,14 +638,13 @@ hires_us::prime ()
       return;
     }
 
-  primed_ft.QuadPart = systime ();
-  freq = (double) ((double) 1000000. / (double) ifreq.QuadPart);
+  freq = (double) ((double) 1000000000. / (double) ifreq.QuadPart);
   inited = true;
   SetThreadPriority (GetCurrentThread (), priority);
 }
 
 LONGLONG
-hires_us::usecs (bool justdelta)
+hires_ns::nsecs ()
 {
   if (!inited)
     prime ();
@@ -668,8 +663,7 @@ hires_us::usecs (bool justdelta)
 
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
-  LONGLONG res = justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
-  return res;
+  return now.QuadPart;
 }
 
 void
@@ -706,22 +700,52 @@ hires_ms::nsecs ()
 extern "C" int
 clock_gettime (clockid_t clk_id, struct timespec *tp)
 {
-  if (clk_id != CLOCK_REALTIME)
+  switch (clk_id)
     {
-      set_errno (ENOSYS);
-      return -1;
+      case CLOCK_REALTIME:
+        {
+          LONGLONG now = gtod.nsecs ();
+          if (now == (LONGLONG) -1)
+            return -1;
+          tp->tv_sec = now / NSPERSEC;
+          tp->tv_nsec = (now % NSPERSEC) * (1000000000 / NSPERSEC);
+          break;
+        }
+
+      case CLOCK_MONOTONIC:
+        {
+          LONGLONG now = ntod.nsecs ();
+          if (now == (LONGLONG) -1)
+            return -1;
+
+          tp->tv_sec = now / 1000000000;
+          tp->tv_nsec = (now % 1000000000);
+          break;
+        }
+
+      default:
+        set_errno (EINVAL);
+        return -1;
     }
 
-  LONGLONG now = gtod.nsecs ();
-  if (now == (LONGLONG) -1)
-    return -1;
-
-  tp->tv_sec = now / NSPERSEC;
-  tp->tv_nsec = (now % NSPERSEC) * (1000000000 / NSPERSEC);
   return 0;
 }
 
 static DWORD minperiod;	// FIXME: Maintain period after a fork.
+
+LONGLONG
+hires_ns::resolution()
+{
+  if (!inited)
+    prime ();
+  if (inited < 0)
+    {
+      set_errno (ENOSYS);
+      return (long long) -1;
+    }
+
+  return (LONGLONG) freq;
+}
 
 UINT
 hires_ms::resolution ()
@@ -753,16 +777,28 @@ hires_ms::resolution ()
 extern "C" int
 clock_getres (clockid_t clk_id, struct timespec *tp)
 {
-  if (clk_id != CLOCK_REALTIME)
+  switch (clk_id)
     {
-      set_errno (ENOSYS);
-      return -1;
+      case CLOCK_REALTIME:
+        {
+          DWORD period = gtod.resolution ();
+          tp->tv_sec = period / 1000;
+          tp->tv_nsec = (period % 1000) * 1000000;
+          break;
+        }
+
+      case CLOCK_MONOTONIC:
+        {
+          LONGLONG period = ntod.resolution ();
+          tp->tv_sec = period / 1000000000;
+          tp->tv_nsec = period % 1000000000;
+          break;
+        }
+
+      default:
+        set_errno (EINVAL);
+        return -1;
     }
-
-  DWORD period = gtod.resolution ();
-
-  tp->tv_sec = period / 1000;
-  tp->tv_nsec = (period % 1000) * 1000000;
 
   return 0;
 }
@@ -773,7 +809,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
   static NO_COPY bool period_set;
   if (clk_id != CLOCK_REALTIME)
     {
-      set_errno (ENOSYS);
+      set_errno (EINVAL);
       return -1;
     }
 

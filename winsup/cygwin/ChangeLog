@@ -1,5 +1,29 @@
 2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	Implement POSIX.1-2004 Monotonic Clock.
+	* hires.h: Change hires_us to hires_ns, with nanosecond resolution.
+	(hires_ns::primed_ft): Remove.
+	(hires_ns::nsecs): New prototype.
+	(hires_ns::usecs): Rewrite in terms of nsecs.
+	(hires_ns::resolution): New prototype.
+	* times.cc: Change hires_us to hires_ns.
+	(ntod): Declare.
+	(systime): Remove.
+	(hires_ns::prime): Increase resolution to nanoseconds.
+	(hires_ns::nsecs): Rename usecs to nsecs to reflect increased resolution.
+	Remove justdelta argument.
+	(hires_ns::resolution): New function.
+	(clock_gettime): Accept CLOCK_MONOTONIC.
+	Use EINVAL instead of ENOSYS per POSIX.1-2004.
+	(clock_getres): Ditto.
+	(clock_setres): Use EINVAL instead of ENOSYS to conform with other
+	implementations.
+	* strace.cc (strace::microseconds): Adjust for hires_ns.
+	* sysconf.cc (sca): Set _SC_MONOTONIC_CLOCK to _POSIX_MONOTONIC_CLOCK.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* fhandler_proc.cc: Add /proc/filesystems virtual file.
 	(format_proc_filesystems): New function.
 	* mount.cc (fs_names): Move to global scope. Redefine as array

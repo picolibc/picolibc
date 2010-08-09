@@ -74,8 +74,8 @@ strace::hello ()
 int
 strace::microseconds ()
 {
-  static hires_us now;
-  return (int) now.usecs (true);
+  static hires_ns now;
+  return (int) now.usecs ();
 }
 
 static int __stdcall

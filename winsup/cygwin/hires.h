@@ -29,14 +29,15 @@ class hires_base
   void reset() {inited = false;}
 };
 
-class hires_us : public hires_base
+class hires_ns : public hires_base
 {
-  LARGE_INTEGER primed_ft;
   LARGE_INTEGER primed_pc;
   double freq;
   void prime ();
  public:
-  LONGLONG usecs (bool justdelta);
+  LONGLONG nsecs ();
+  LONGLONG usecs () {return nsecs () / 1000LL;}
+  LONGLONG resolution();
 };
 
 class hires_ms : public hires_base
