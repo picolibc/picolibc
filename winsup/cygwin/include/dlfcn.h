@@ -1,6 +1,6 @@
 /* dlfcn.h
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,6 +31,7 @@ extern void dlfork (int);
 #define RTLD_DEFAULT    NULL
 
 /* valid values for mode argument to dlopen */
+#define RTLD_LOCAL	0	/* symbols in this dlopen'ed obj are not visible to other dlopen'ed objs */
 #define RTLD_LAZY	1	/* lazy function call binding */
 #define RTLD_NOW	2	/* immediate function call binding */
 #define RTLD_GLOBAL	4	/* symbols in this dlopen'ed obj are visible to other dlopen'ed objs */
