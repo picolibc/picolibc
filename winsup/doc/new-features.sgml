@@ -38,6 +38,10 @@ New interfaces mkostemp(3) and mkostemps(3) are added.
 New virtual file /proc/filesystems.
 </para></listitem>
 
+<listitem><para>
+clock_gettime(3) and clock_getres(3) accept CLOCK_MONOTONIC.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
