@@ -314,10 +314,9 @@ class cygheap_fdmanip
 {
  protected:
   int fd;
-  fhandler_base **fh;
   bool locked;
  public:
-  cygheap_fdmanip (): fh (NULL) {}
+  cygheap_fdmanip (): fd (-1), locked (false) {}
   virtual ~cygheap_fdmanip ()
   {
     if (locked)
@@ -328,14 +327,14 @@ class cygheap_fdmanip
     cygheap->fdtab.release (fd);
   }
   operator int &() {return fd;}
-  operator fhandler_base* &() {return *fh;}
-  operator fhandler_socket* () const {return reinterpret_cast<fhandler_socket *> (*fh);}
-  operator fhandler_pipe* () const {return reinterpret_cast<fhandler_pipe *> (*fh);}
-  void operator = (fhandler_base *fh) {*this->fh = fh;}
-  fhandler_base *operator -> () const {return *fh;}
+  operator fhandler_base* &() {return cygheap->fdtab[fd];}
+  operator fhandler_socket* () const {return reinterpret_cast<fhandler_socket *> (cygheap->fdtab[fd]);}
+  operator fhandler_pipe* () const {return reinterpret_cast<fhandler_pipe *> (cygheap->fdtab[fd]);}
+  void operator = (fhandler_base *fh) {cygheap->fdtab[fd] = fh;}
+  fhandler_base *operator -> () const {return cygheap->fdtab[fd];}
   bool isopen () const
   {
-    if (*fh)
+    if (cygheap->fdtab[fd])
       return true;
     set_errno (EBADF);
     return false;
@@ -354,10 +353,7 @@ class cygheap_fdnew : public cygheap_fdmanip
     else
       fd = cygheap->fdtab.find_unused_handle (seed_fd + 1);
     if (fd >= 0)
-      {
-	locked = lockit;
-	fh = cygheap->fdtab + fd;
-      }
+      locked = lockit;
     else
       {
 	set_errno (EMFILE);
@@ -366,7 +362,7 @@ class cygheap_fdnew : public cygheap_fdmanip
 	locked = false;
       }
   }
-  void operator = (fhandler_base *fh) {*this->fh = fh;}
+  void operator = (fhandler_base *fh) {cygheap->fdtab[fd] = fh;}
 };
 
 class cygheap_fdget : public cygheap_fdmanip
@@ -376,8 +372,7 @@ class cygheap_fdget : public cygheap_fdmanip
   {
     if (lockit)
       cygheap->fdtab.lock ();
-    if (fd >= 0 && fd < (int) cygheap->fdtab.size
-	&& *(fh = cygheap->fdtab + fd) != NULL)
+    if (fd >= 0 && fd < (int) cygheap->fdtab.size && cygheap->fdtab[fd] != NULL)
       {
 	this->fd = fd;
 	locked = lockit;
@@ -407,7 +402,7 @@ class cygheap_fdenum : public cygheap_fdmanip
   int next ()
   {
     while (++fd < (int) cygheap->fdtab.size)
-      if (*(fh = cygheap->fdtab + fd) != NULL)
+      if (cygheap->fdtab[fd] != NULL)
 	return fd;
     return -1;
   }

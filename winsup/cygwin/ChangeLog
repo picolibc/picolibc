@@ -1,3 +1,10 @@
+2010-08-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygheap.h (cygheap_fdmanip): Delete fh and use fd index into
+	cygheap->fdtab throughout.
+	(cygheap_fdnew): Replace fh by using fd index into cygheap->fdtab
+	throughout.  (cygheap_fdget): Ditto.  (cygheap_fdenum): Ditto.
+
 2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	Implement POSIX.1-2004 Monotonic Clock.
