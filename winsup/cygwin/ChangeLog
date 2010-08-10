@@ -1,3 +1,7 @@
+2010-08-10  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigproc.cc (init_sig_pipe): Add retry loop.
+
 2010-08-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.h (cygheap_fdmanip): Delete fh and use fd index into

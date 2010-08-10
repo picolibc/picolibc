@@ -1153,15 +1153,16 @@ pending_signals::next ()
 /* Called separately to allow stack space reutilization by wait_sig.
    This function relies on the fact that it will be called after cygheap
    has been set up.  For the case of non-dynamic DLL initialization this
-   means that it relies on the implicit serialization guarantted by being
+   means that it relies on the implicit serialization guaranteed by being
    run as part of DLL_PROCESS_ATTACH. */
 static void __attribute__ ((noinline))
 init_sig_pipe()
 {
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-  if (!CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0))
-    api_fatal ("couldn't create signal pipe, %E");
+  for (int i = 5; i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0); i--)
+    if (i == 1)
+      api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (my_readsig);
 }
 
