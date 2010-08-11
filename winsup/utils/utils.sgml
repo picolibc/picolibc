@@ -964,22 +964,22 @@ will display the current mount table for you.</para>
 <title>Displaying the current set of mount points</title>
 <screen>
 <prompt>$</prompt> <userinput>mount</userinput>
-c:\cygwin\bin on /usr/bin type ntfs (binary)
-c:\cygwin\lib on /usr/lib type ntfs (binary)
-c:\cygwin on / type ntfs (binary)
-c: on /c type ntfs (binary,user,noumount)
-d: on /d type fat (binary,user,noumount)
+C:/cygwin/bin on /usr/bin type ntfs (binary)
+C:/cygwin/lib on /usr/lib type ntfs (binary)
+C:/cygwin on / type ntfs (binary)
+C: on /mnt/c type ntfs (binary,user,noumount)
+D: on /mnt/d type fat (binary,user,noumount)
 </screen>
 </example>
 
-<para>In this example, c:\cygwin is the POSIX root and D drive is mapped to
-<filename>/d</filename>.  Note that in this case, the root mount is a
-system-wide mount point that is visible to all users running Cygwin
-programs, whereas the <filename>/d</filename> mount is only visible
-to the current user.</para>
+<para>In this example, c:/cygwin is the POSIX root and the D drive is
+mapped to <filename>/mnt/d</filename>.  Note that in this case, the root
+mount is a system-wide mount point that is visible to all users running
+Cygwin programs, whereas the <filename>/mnt/d</filename> mount is only
+visible to the current user.</para>
 
 <para>The <command>mount</command> utility is also the mechanism for
-adding new mounts to the mount table.  The following example
+adding new mounts to the mount table in memory.  The following example
 demonstrates how to mount the directory
 <filename>//pollux/home/joe/data</filename> to <filename>/data</filename>
 for the duration of the current session.
@@ -994,11 +994,11 @@ ls: /data: No such file or directory
 mount: warning - /data does not exist!
 <prompt>$</prompt> <userinput>mount</userinput>
 //pollux/home/joe/data on /data type smbfs (binary)
-c:/cygwin/bin on /usr/bin type ntfs (binary)
-c:/cygwin/lib on /usr/lib type ntfs (binary)
-c:/cygwin on / type ntfs (binary)
-c: on /c type ntfs (binary,user,noumount)
-d: on /d type fat (binary,user,noumount)
+C:/cygwin/bin on /usr/bin type ntfs (binary)
+C:/cygwin/lib on /usr/lib type ntfs (binary)
+C:/cygwin on / type ntfs (binary)
+C: on /c type ntfs (binary,user,noumount)
+D: on /d type fat (binary,user,noumount)
 </screen>
 </example>
 
@@ -1019,6 +1019,13 @@ most of the options are duplicates of other mount flags):</para>
   acl        - Use the filesystem's access control lists (ACLs) to
                implement real POSIX permissions (default).
   binary     - Files default to binary mode (default).
+  bind       - Allows to remount part of the file hierarchy somewhere else.
+               Different from other mount calls, the first argument 
+	       specifies an absolute POSIX path, rather than a Win32 path.
+	       This POSIX path is remounted to the POSIX path specified as
+	       the second parameter.  The conversion to a Win32 path is done
+	       within Cygwin immediately at the time of the call.  Note that
+	       symlinks are ignored while performing this path conversion.
   cygexec    - Treat all files below mount point as cygwin executables.
   dos        - Always convert leading spaces and trailing dots and spaces to
 	       characters in the UNICODE private use area.  This allows to use
@@ -1070,6 +1077,16 @@ the mount point first, before you can add it again.  Please note that
 all such added mount points are added as user mount points, and that the
 rule that system mount points can't be removed or replaced in a running
 session still applies.</para>
+
+<para>To bind a POSIX path to another POSIX path, use the
+<literal>bind</literal> mount flag.</para>
+
+<screen>
+<prompt>$</prompt> <userinput>mount -o bind /var /usr/var</userinput>
+</screen>
+
+<para>This command makes the file hirarchy under <filename>/var</filename>
+additionally available under <filename>/usr/var</filename>.</para>
 
 <para>
 The <literal>-m</literal> option causes the <command>mount</command> utility

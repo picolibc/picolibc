@@ -86,7 +86,7 @@ do_mount (const char *dev, const char *where, int flags)
 	fprintf (stderr, "%s: warning: %s is not a directory.\n", progname, where);
     }
 
-  if (!force && !(flags & EXEC_FLAGS) && strlen (dev))
+  if (!force && !(flags & (EXEC_FLAGS | MOUNT_BIND)) && strlen (dev))
     {
       char devtmp[1 + 2 * strlen (dev)];
       strcpy (devtmp, dev);
@@ -426,10 +426,14 @@ mount_entries (void)
 
   // write fstab entries for normal mount points
   while ((p = getmntent (m)) != NULL)
-    // Only list non-cygdrives
+    // Only list non-cygdrives and non-automounts
     if (!strstr (p->mnt_opts, ",noumount") && !strstr (p->mnt_opts, ",auto"))
       {
 	char fsname[NT_MAX_PATH], dirname[NT_MAX_PATH];
+	/* Drop the "bind" option since it can't be reverted. */
+	char *c = strstr (p->mnt_opts, ",bind");
+	if (c)
+	  memmove (c, c + 5, strlen (c + 5) + 1);
 	printf (format_mnt, convert_spaces (fsname, p->mnt_fsname),
 			    convert_spaces (dirname, p->mnt_dir),
 			    p->mnt_type, p->mnt_opts);

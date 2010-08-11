@@ -1,3 +1,10 @@
+2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (do_mount): Don't treat "bind" mount as remote mount.
+	(mount_entries): Drop the "bind" option from output.
+	* utils.sgml (mount): Match examples to actual mount output.  Add
+	"bind" option and add example.
+
 2010-08-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* mingw: Use sysroot, if present, for mingw_dir.
