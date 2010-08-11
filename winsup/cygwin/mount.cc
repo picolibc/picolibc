@@ -931,6 +931,7 @@ struct opt
   {"acl", MOUNT_NOACL, 1},
   {"auto", 0, 0},
   {"binary", MOUNT_BINARY, 0},
+  {"bind", MOUNT_BIND, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"dos", MOUNT_DOS, 0},
   {"exec", MOUNT_EXEC, 0},
@@ -1051,6 +1052,20 @@ mount_info::from_fstab_line (char *line, bool user)
     return true;
   if (user)
     mount_flags &= ~MOUNT_SYSTEM;
+  if (mount_flags & MOUNT_BIND)
+    {
+      /* Prepend root path to bound path. */
+      char *bound_path = native_path;
+      device dev;
+      unsigned flags = 0;
+      native_path = (char *) alloca (PATH_MAX);
+      int error = conv_to_win32_path (bound_path, native_path, dev, &flags);
+      if (error || strlen (native_path) >= MAX_PATH)
+	return true;
+      if ((mount_flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
+	mount_flags = (MOUNT_BIND | flags)
+		      & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
+    }
   if (!strcmp (fs_type, "cygdrive"))
     {
       cygdrive_flags = mount_flags | MOUNT_CYGDRIVE;
@@ -1573,6 +1588,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   if (flags & (MOUNT_AUTOMATIC | MOUNT_CYGDRIVE))
     strcat (_my_tls.locals.mnt_opts, (char *) ",auto");
 
+  if (flags & (MOUNT_BIND))
+    strcat (_my_tls.locals.mnt_opts, (char *) ",bind");
+
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 
   ret.mnt_freq = 1;
@@ -1672,7 +1690,28 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
   else if (!*win32_path)
     set_errno (EINVAL);
   else
-    res = mount_table->add_item (win32_path, posix_path, flags);
+    {
+      char *w32_path = (char *) win32_path;
+      if (flags & MOUNT_BIND)
+	{
+	  /* Prepend root path to bound path. */
+	  tmp_pathbuf tp;
+	  device dev;
+
+	  unsigned conv_flags = 0;
+	  const char *bound_path = w32_path;
+
+	  w32_path = tp.c_get ();
+	  int error = mount_table->conv_to_win32_path (bound_path, w32_path,
+						       dev, &conv_flags);
+	  if (error || strlen (w32_path) >= MAX_PATH)
+	    return true;
+	  if ((flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
+	    flags = (MOUNT_BIND | conv_flags)
+		    & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
+	}
+      res = mount_table->add_item (w32_path, posix_path, flags);
+    }
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
   return res;

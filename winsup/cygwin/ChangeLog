@@ -1,3 +1,11 @@
+2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (struct opt): Add "bind" option.
+	(mount_info::from_fstab_line): Handle "bind" option.
+	(fillout_mntent): Add "bind" option to mnt_opts.
+	(mount): Handle "bind" option.
+	* include/sys/mount.h (MOUNT_BIND): New mount flag.
+
 2010-08-10  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (init_sig_pipe): Add retry loop.
