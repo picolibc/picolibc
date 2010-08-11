@@ -1,3 +1,7 @@
+2010-08-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* mingw: Use sysroot, if present, for mingw_dir.
+
 2010-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dump_setup.cc (tfx_chars): New WCHAR array, copied from Cygwin.

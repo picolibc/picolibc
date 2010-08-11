@@ -18,7 +18,11 @@ for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-ming
          /*-mingw32 /usr/*-mingw32 /*-mingw* /usr/*-mingw*; do
     case "$d" in
 	*\**)	continue ;;
-	*)	mingw_dir=$d; break;
+	*)	if [ -d "$d"/sys-root/mingw ]; then
+		    mingw_dir=$d/sys-root/mingw
+		else
+		    mingw_dir=$d;
+		fi; break;
     esac
 done
 
