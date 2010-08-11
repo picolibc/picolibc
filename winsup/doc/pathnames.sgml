@@ -80,6 +80,15 @@ posix=[0|1].  The meaning of the options is as follows.</para>
 	      otherwise.
   auto      - Ignored.
   binary    - Files default to binary mode (default).
+  bind      - Allows to remount part of the file hierarchy somewhere else.
+              In contrast to other entries, the first field in the fstab
+	      line specifies an absolute POSIX path.  This path is remounted
+	      to the POSIX path specified as the second path.  The conversion
+	      to a Win32 path is done on the fly.  Only the root path and
+	      paths preceding the bind entry in the fstab file are used to
+	      convert the POSIX path in the first field to an absolute Win32
+	      path.  Note that symlinks are ignored while performing this path
+	      conversion.
   cygexec   - Treat all files below mount point as cygwin executables.
   dos       - Always convert leading spaces and trailing dots and spaces to
 	      characters in the UNICODE private use area.  This allows to use
@@ -185,6 +194,15 @@ mount the root dir with special options (for instance, as text mount).</para>
 <listitem>
   <para>Set the cygdrive prefix to /mnt:</para>
   <screen>none /mnt cygdrive binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>Remount /var to /usr/var:</para>
+  <screen>/var /usr/var none bind</screen>
+  <para>Assuming <filename>/var</filename> points to
+  <filename>C:/cygwin/var</filename>, <filename>/usr/var</filename> now
+  also points to <filename>C:/cygwin/var</filename>.  This is equivalent
+  to the Linux <literal>bind</literal> option available since
+  Linux 2.4.0.</para>
 </listitem>
 </itemizedlist>
 

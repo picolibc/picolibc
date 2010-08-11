@@ -10,6 +10,11 @@ behaviour on broken filesystems not recognized by Cygwin.
 </para></listitem>
 
 <listitem><para>
+Add new mount option "bind" to allow remounting parts of the POSIX file
+hirarchy somewhere else.
+</para></listitem>
+
+<listitem><para>
 Ttys and ptys are handled as securable objects using file-like permissions
 and owner/group information.  <command>chmod</command> and
 <command>chown</command> now work on ttys/ptys.  A new mechanism is used

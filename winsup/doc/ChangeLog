@@ -1,3 +1,8 @@
+2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.6): Document "bind" option.
+	* pathnames.sgml (mount-table): Add "bind" option with example.
+
 2010-08-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.6): Document POSIX monotonic clock.
