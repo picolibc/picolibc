@@ -1,3 +1,7 @@
+2010-08-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/dir.h: New BSD-compatibility header.
+
 2010-08-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/features.h: Define _POSIX_MONOTONIC_CLOCK for Cygwin.
