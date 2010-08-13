@@ -1,3 +1,7 @@
+2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (from_fstab): Fix potentially fatal typo.
+
 2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (do_mount): Don't treat "bind" mount as remote mount.

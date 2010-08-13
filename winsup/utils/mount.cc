@@ -130,7 +130,7 @@ from_fstab (bool user)
   while (fgets (buf, 65536, fh))
     {
       char *c = strrchr (buf, '\n');
-      if (*c)
+      if (c)
       	*c = '\0';
       if (from_fstab_line (m, buf, user))
 	++m;
