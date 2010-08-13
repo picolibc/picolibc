@@ -11,7 +11,8 @@ paths and file access might fail in surprising ways.  UNC pathnames
 
 <note><para>The usage of Win32 paths, though possible, is deprecated,
 since it circumvents important internal path handling mechanisms. 
-See <xref linkend="pathnames-win32"></xref> for more information.
+See <xref linkend="pathnames-win32"></xref> and
+<xref linkend="pathnames-win32-api"></xref> for more information.
 </para></note>
 
 <para>POSIX operating systems (such as Linux) do not have the concept
@@ -360,6 +361,38 @@ treated as caseinsensitive, and permissions are just faked as if the
 underlying drive is a FAT drive.  This also applies to NTFS and other
 filesystems which usually are capable of casesensitivity and storing
 permissions.</para>
+
+</sect2>
+
+<sect2 id="pathnames-win32-api"><title>Using the Win32 file API in Cygwin applications</title>
+
+<para>Special care must be taken when your application uses Win32 file API
+functions like <function>CreateFile</function> to access files using relative
+pathnames.</para>
+
+<para>When a Cygwin application is started, the Win32 idea of the current
+working directory (CWD) is set to an invalid directory.  This works around
+the problem that the Win32 CWD is locked in a way which restricts POSIX
+functionality.  However, the side effect is that a call to, say,
+<function>CreateFile ("foo", ...);</function> will fail, since the Win32
+notion of the CWD is <emphasis>not</emphasis> the same as the Cygwin notion
+of the CWD.</para>
+
+<para>So, in general, don't use the Win32 file API in Cygwin applications.
+If you <emphasis>really</emphasis> need to access files using the Win32 API,
+and if you <emphasis>really</emphasis> have to use relative pathnames,
+you have two choices.</para>
+
+<itemizedlist spacing="compact">
+  <listitem>
+    <para>Either you call <function>SetCurrentDirectory</function> before
+    calling <function>CreateFile</function>.</para>
+  </listitem>
+  <listitem>
+    <para>Or you compile your application as native Win32 (mingw) executable,
+    rather than as Cygwin executable.</para>
+  </listitem>
+</itemizedlist>
 
 </sect2>
 

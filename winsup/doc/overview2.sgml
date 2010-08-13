@@ -55,9 +55,8 @@ an easy way to port many UNIX packages, with only minimal source code
 changes.
 </para>
 <para>
-Note that there are some workarounds
-that cause Cygwin to behave differently than most UNIX-like operating
-systems; these are described in more detail in 
+Note that there are some workarounds that cause Cygwin to behave differently
+than most UNIX-like operating systems; these are described in more detail in 
 <xref linkend="using-effectively"></xref>.
 </para>
 <para>
@@ -111,10 +110,14 @@ appropriate.</para>
 
 <para>Because processes run under the standard Win32 subsystem, they
 can access both the UNIX compatibility calls provided by Cygwin as well as
-any of the Win32 API calls.  This gives the programmer complete flexibility in
+any of the Win32 API calls.  This gives the programmer some flexibility in
 designing the structure of their program in terms of the APIs used.  For
 example, they could write a Win32-specific GUI using Win32 API calls on top of
 a UNIX back-end that uses Cygwin.</para>
+
+<note><para>Some restrictions apply for calls to the Win32 API.
+For details, see <xref linkend="setup-env-win32"></xref>,
+as well as <xref linkend="pathnames-win32-api"></xref>.</para></note>
 
 <para>The native NT API is used mainly for speed, as well as to access
 NT capabilities which are useful to implement certain POSIX features, but

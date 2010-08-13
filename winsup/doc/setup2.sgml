@@ -1,5 +1,7 @@
 <sect1 id="setup-env"><title>Environment Variables</title>
 
+<sect2 id="setup-env-ov"><title>Overview</title>
+
 <para>
 You may wish to specify settings of several important environment
 variables that affect Cygwin's operation.  Some of these settings need
@@ -98,6 +100,34 @@ export TMP=/tmp
 export TEMP=/tmp
 </screen>
 </para>
+
+</sect2>
+
+<sect2 id="setup-env-win32"><title>Restricted Win32 environment</title>
+
+<para>There is a restriction when calling Win32 API functions which
+require a fully set up application environment.  Cygwin maintains its own
+environment in POSIX style.  The Win32 environment is usually stripped
+to a bare minimum and not at all kept in sync with the Cygwin POSIX
+environment.</para>
+
+<para>If you need the full Win32 environment set up in a Cygwin process,
+you have to call</para>
+
+<screen>
+#include &lt;sys/cygwin.h&gt;
+
+cygwin_internal (CW_SYNC_WINENV);
+</screen>
+
+<para>to synchronize the Win32 environment with the Cygwin environment.
+Note that this only synchronizes the Win32 environment once with the
+Cygwin environment.  Later changes using the <function>setenv</function>
+or <function>putenv</function> calls are not reflected in the Win32
+environment.  In these cases, you have to call the aforementioned
+<function>cygwin_internal</function> call again.</para>
+
+</sect2>
 
 </sect1>
 

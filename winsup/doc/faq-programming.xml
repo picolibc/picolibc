@@ -172,10 +172,10 @@ gcj --main=Hello Hello.java
 <question><para>How do I use Win32 API calls?</para></question>
 <answer>
 
-<para>It's pretty simple actually.  Cygwin tools require that you explicitly
-link the import libraries for whatever Win32 API functions that you
-are going to use, with the exception of kernel32, which is linked
-automatically (because the startup and/or built-in code uses it).
+<para>Cygwin tools require that you explicitly link the import libraries
+for whatever Win32 API functions that you are going to use, with the exception
+of kernel32, which is linked automatically (because the startup and/or
+built-in code uses it).
 </para>
 <para>For example, to use graphics functions (GDI) you must link
 with gdi32 like this:
@@ -194,6 +194,12 @@ including user32, gdi32 and, IIRC, comdlg32.
 <para>It is a good idea to put import libraries last on your link line,
 or at least after all the object files and static libraries that reference them.
 </para>
+
+<note><para>There are a few restrictions for calls to the Win32 API.
+For details, see the User's Guide section
+<ulink url="http://cygwin.com/cygwin-ug-net/setup-env.html#setup-env-win32">Restricted Win32 environment</ulink>,
+as well as the User's Guide section
+<ulink url="http://cygwin.com/cygwin-ug-net/using.html#pathnames-win32-api">Using the Win32 file API in Cygwin applications</ulink>.</para></note>
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.win32-no-cygwin">

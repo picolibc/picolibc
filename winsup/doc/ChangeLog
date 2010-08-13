@@ -1,3 +1,17 @@
+2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml (faq.programming.win32-api): Remove simplicity.
+	Add note and xrefs to User's Guide chapters explaining restrictions
+	using the Win32 API.
+	* new-features.sgml (ov-new1.7.6): Add note about Win CWD.
+	* overview2.sgml (ov-hi-intro): Add note and xrefs about Win32 API
+	restrictions.  Tone down flexibility.
+	* pathnames.sgml (pathnames-intro): Add xref to pathnames-win32-api
+	section.
+	(pathnames-win32-api): New section describing Win32 CWD restriction.
+	* setup2.sgml (setup-env-ov): New sub-section.
+	(setup-env-win32): Ditto, describing Win32 environment restriction.
+
 2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.6): Document "bind" option.

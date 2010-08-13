@@ -47,6 +47,13 @@ New virtual file /proc/filesystems.
 clock_gettime(3) and clock_getres(3) accept CLOCK_MONOTONIC.
 </para></listitem>
 
+<listitem><para>
+Cygwin handles the current working directory entirely on its own.  The Win32
+current working directory is set to an invalid path to be out of the way.
+This affects calls to the Win32 file API (CreateFile, etc.).  See
+<xref linkend="pathnames-win32-api"></xref> for details.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
