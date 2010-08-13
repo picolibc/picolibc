@@ -380,17 +380,12 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   if (res)
     goto out;
 
-  if (!real_path.iscygexec ()
-      && (cygheap->cwd.drive_length == 0
-	  || cygheap->cwd.win32.Length >= MAX_PATH * sizeof (WCHAR)))
+  if (!real_path.iscygexec () && cygheap->cwd.get_error ())
     {
-      small_printf ("Error: Current working directory is a %s.\n"
+      small_printf ("Error: Current working directory %s.\n"
 		    "Can't start native Windows application from here.\n\n",
-		    cygheap->cwd.drive_length == 0
-		    ? "virtual Cygwin directory"
-		    : "path longer than allowed for a\n"
-		      "Win32 working directory");
-      set_errno (ENAMETOOLONG);
+		    cygheap->cwd.get_error_desc ());
+      set_errno (cygheap->cwd.get_error ());
       res = -1;
       goto out;
     }
@@ -551,6 +546,14 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 loop:
   cygheap->user.deimpersonate ();
 
+  PWCHAR cwd;
+  cwd = NULL;
+  if (!real_path.iscygexec())
+    {
+      cygheap->cwd.cwd_lock.acquire ();
+      cwd = cygheap->cwd.win32.Buffer;
+    }
+
   if (!cygheap->user.issetuid ()
       || (cygheap->user.saved_uid == cygheap->user.real_uid
 	  && cygheap->user.saved_gid == cygheap->user.real_gid
@@ -564,7 +567,7 @@ loop:
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   envblock,	  /* environment */
-			   NULL,
+			   cwd,
 			   &si,
 			   &pi);
     }
@@ -627,7 +630,7 @@ loop:
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   envblock,	  /* environment */
-			   NULL,
+			   cwd,
 			   &si,
 			   &pi);
       if (hwst)
@@ -642,6 +645,9 @@ loop:
 	}
     }
 
+  if (!real_path.iscygexec())
+    cygheap->cwd.cwd_lock.release ();
+    
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY || !rc)

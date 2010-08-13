@@ -2729,7 +2729,6 @@ chdir (const char *in_dir)
     }
 
   int res = -1;
-  bool doit = false;
   const char *posix_cwd = NULL;
   int devn = path.get_devn ();
   if (!path.exists ())
@@ -2746,7 +2745,6 @@ chdir (const char *in_dir)
       if (!isdrive(path.normalized_path))
 	posix_cwd = path.normalized_path;
       res = 0;
-      doit = true;
     }
   else
    {
@@ -2755,7 +2753,7 @@ chdir (const char *in_dir)
    }
 
   if (!res)
-    res = cygheap->cwd.set (path.get_nt_native_path (), posix_cwd, doit);
+    res = cygheap->cwd.set (&path, posix_cwd);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
@@ -3266,179 +3264,193 @@ void
 cwdstuff::init ()
 {
   cwd_lock.init ("cwd_lock");
+
+  /* Cygwin processes inherit the cwd from their parent.  If the win32 path
+     buffer is not NULL, the cwd struct is already set up. */
+  if (win32.Buffer)
+    return;
+
   /* Initially re-open the cwd to allow POSIX semantics. */
-  set (NULL, NULL, true);
+  set (NULL, NULL);
 }
 
 /* Chdir and fill out the elements of a cwdstuff struct. */
 int
-cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
+cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 {
-  int res = 0;
   UNICODE_STRING upath;
-  size_t len = 0;
+  bool virtual_path = false;
+  bool unc_path = false;
+  bool inaccessible_path = false;
+
+  /* Here are the problems with using SetCurrentDirectory:
+     
+     - SetCurrentDirectory only supports paths of up to MAX_PATH - 1 chars,
+       including a trailing backslash.  That's an absolute restriction, even
+       in the UNICODE API.
+
+     - SetCurrentDirectory fails for directories with strict
+       permissions even for processes with the SE_BACKUP_NAME
+       privilege enabled.  The reason is apparently that
+       SetCurrentDirectory calls NtOpenFile without the
+       FILE_OPEN_FOR_BACKUP_INTENT flag set.
+
+     - SetCurrentDirectory does not support case-sensitivity.
+
+     - Unlinking a cwd fails because SetCurrentDirectory seems to
+       open directories so that deleting the directory is disallowed.
+
+     - SetCurrentDirectory can naturally not work on virtual Cygwin paths
+       like /proc or /cygdrive.
+
+     Therefore, we do without SetCurrentDirectory and handle the CWD all
+     by ourselves.  To avoid surprising behaviour in the Win32 API which
+     would stem from the fact that the Win32 CWD is different from the
+     POSIX CWD, we move the Win32 CWD to an invalid directory in which
+     typical relative Win32 path handling fails.  */
 
   cwd_lock.acquire ();
 
   if (nat_cwd)
     {
-      upath = *nat_cwd;
-      if (upath.Buffer[0] == L'/') /* Virtual path.  Never use in PEB. */
-	doit = false;
-      else
-	{
-	  len = upath.Length / sizeof (WCHAR) - 4;
-	  if (RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
-	    len -= 2;
-	}
+      upath = *nat_cwd->get_nt_native_path ();
+      if (nat_cwd->isspecial ())
+	virtual_path = true;
     }
 
-  if (doit)
+  /* Open a directory handle with FILE_OPEN_FOR_BACKUP_INTENT and with all
+     sharing flags set.  The handle is right now used in exceptions.cc only,
+     but that might change in future. */
+  if (!virtual_path)
     {
-      /* We utilize the user parameter block.  The directory is
-	 stored manually there.  Why the hassle?
-
-	 - SetCurrentDirectory fails for directories with strict
-	   permissions even for processes with the SE_BACKUP_NAME
-	   privilege enabled.  The reason is apparently that
-	   SetCurrentDirectory calls NtOpenFile without the
-	   FILE_OPEN_FOR_BACKUP_INTENT flag set.
-
-	 - Unlinking a cwd fails because SetCurrentDirectory seems to
-	   open directories so that deleting the directory is disallowed.
-	   The below code opens with *all* sharing flags set. */
       HANDLE h;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       OBJECT_ATTRIBUTES attr;
-      PHANDLE phdl;
 
-      RtlAcquirePebLock ();
-      phdl = &get_user_proc_parms ()->CurrentDirectoryHandle;
-      if (!nat_cwd) /* On init, just reopen CWD with desired access flags. */
-	RtlInitUnicodeString (&upath, L"");
-      /* This is for Win32 apps only.  No case sensitivity here... */
-      InitializeObjectAttributes (&attr, &upath,
-				  OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-				  nat_cwd ? NULL : *phdl, NULL);
+      if (!nat_cwd)
+	{
+	  /* On init, just reopen Win32 CWD with desired access flags.
+	     We can access the PEB without lock, because no other thread
+	     can change the CWD. */
+	  RtlInitUnicodeString (&upath, L"");
+	  InitializeObjectAttributes (&attr, &upath,
+			OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			get_user_proc_parms ()->CurrentDirectoryHandle, NULL);
+	}
+      else
+	InitializeObjectAttributes (&attr, &upath,
+			nat_cwd->objcaseinsensitive () | OBJ_INHERIT,
+			NULL, NULL);
+      /* First try without FILE_OPEN_FOR_BACKUP_INTENT, to find out if the
+         directory is valid for Win32 apps. */
       status = NtOpenFile (&h, SYNCHRONIZE | FILE_TRAVERSE, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_DIRECTORY_FILE
-			   | FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_FOR_BACKUP_INTENT);
+			   | FILE_SYNCHRONOUS_IO_NONALERT);
+      if (status == STATUS_ACCESS_DENIED)
+      	{
+	  status = NtOpenFile (&h, SYNCHRONIZE | FILE_TRAVERSE, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_DIRECTORY_FILE
+			       | FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  inaccessible_path = true;
+	}
       if (!NT_SUCCESS (status))
 	{
-	  RtlReleasePebLock ();
+	  cwd_lock.release ();
 	  __seterrno_from_nt_status (status);
-	  res = -1;
-	  goto out;
+	  return -1;
 	}
-      /* Workaround a problem in Vista/Longhorn which fails in subsequent
-	 calls to CreateFile with ERROR_INVALID_HANDLE if the handle in
-	 CurrentDirectoryHandle changes without calling SetCurrentDirectory,
-	 and the filename given to CreateFile is a relative path.  It looks
-	 like Vista stores a copy of the CWD handle in some other undocumented
-	 place.  The NtClose/DuplicateHandle reuses the original handle for
-	 the copy of the new handle and the next CreateFile works.
-	 Note that this is not thread-safe (yet?) */
-      NtClose (*phdl);
-      if (DuplicateHandle (GetCurrentProcess (), h, GetCurrentProcess (), phdl,
-			   0, TRUE, DUPLICATE_SAME_ACCESS))
-	NtClose (h);
-      else
-	*phdl = h;
-      dir = *phdl;
+      /* Note that we don't set the dir handle to NULL for virtual paths.
+	 The handle is used to generate a stackdump file.  Since we can't
+	 create a stackdump in a virtual path, we have at least *some*
+	 directory handle to generate the stackdump in.
 
-      /* No need to set path on init. */
-      if (nat_cwd
-	  /* TODO:
-	     Check the length of the new CWD.  Windows can only handle
-	     CWDs of up to MAX_PATH length, including a trailing backslash.
-	     If the path is longer, it's not an error condition for Cygwin,
-	     so we don't fail.  Windows on the other hand has a problem now.
-	     For now, we just don't store the path in the PEB and proceed as
-	     usual. */
-	  && len <= MAX_PATH - (nat_cwd->Buffer[len - 1] == L'\\' ? 1 : 2))
-	{
-	  /* Convert to a Win32 path. */
-	  upath.Buffer += upath.Length / sizeof (WCHAR) - len;
-	  if (upath.Buffer[1] == L'\\') /* UNC path */
-	    upath.Buffer[0] = L'\\';
-	  upath.Length = len * sizeof (WCHAR);
-	  /* Append backslash if necessary. */
-	  if (upath.Buffer[len - 1] != L'\\')
-	    {
-	      upath.Buffer[len] = L'\\';
-	      upath.Length += sizeof (WCHAR);
-	    }
-	  RtlCopyUnicodeString (&get_user_proc_parms ()->CurrentDirectoryName,
-				&upath);
-	}
-
-      RtlReleasePebLock ();
+	 However, note that we have to make sure that we don't use the handle
+	 wrongly as soon as we start to use it in other cases as well. */
+      HANDLE old_dir = dir;
+      dir = h;
+      if (old_dir)
+	NtClose (old_dir);
     }
 
-  if (nat_cwd || !win32.Buffer)
+  if (!nat_cwd)
     {
-      /* If there is no win32 path */
-      if (!nat_cwd)
-	{
-	  PUNICODE_STRING pdir;
+      /* On init, just fetch the Win32 dir from the PEB.  We can access
+	 the PEB without lock, because no other thread can change the CWD
+	 at that time. */
+      PUNICODE_STRING pdir = &get_user_proc_parms ()->CurrentDirectoryName;
+      RtlInitEmptyUnicodeString (&win32,
+				 (PWCHAR) crealloc_abort (win32.Buffer,
+							  pdir->Length + 2),
+				 pdir->Length + 2);
+      RtlCopyUnicodeString (&win32, pdir);
 
-	  RtlAcquirePebLock ();
-	  pdir = &get_user_proc_parms ()->CurrentDirectoryName;
-	  RtlInitEmptyUnicodeString (&win32,
-				     (PWCHAR) crealloc_abort (win32.Buffer,
-							      pdir->Length + 2),
-				     pdir->Length + 2);
-	  RtlCopyUnicodeString (&win32, pdir);
-	  RtlReleasePebLock ();
+      PWSTR eoBuffer = win32.Buffer + (win32.Length / sizeof (WCHAR));
+      /* Remove trailing slash if one exists. */
+      if ((eoBuffer - win32.Buffer) > 3 && eoBuffer[-1] == L'\\')
+	win32.Length -= sizeof (WCHAR);
+      if (eoBuffer[0] == L'\\')
+	unc_path = true;
 
-	  PWSTR eoBuffer = win32.Buffer + (win32.Length / sizeof (WCHAR));
-	  /* Remove trailing slash if one exists.  FIXME: Is there a better way to
-	     do this? */
-	  if ((eoBuffer - win32.Buffer) > 3 && eoBuffer[-1] == L'\\')
-	    win32.Length -= sizeof (WCHAR);
+      posix_cwd = NULL;
 
-	  posix_cwd = NULL;
-	}
+      /* When inited move the actual Win32 CWD out of the way, as explained
+	 above.  Surprisingly, the PIPE filesystem seems to be usable as CWD
+	 on all Windows systems. */
+      if (!SetCurrentDirectoryW (L"\\\\?\\PIPE\\"))
+	system_printf (
+"WARNING: Couldn't set Win32 CWD to //?/PIPE (error %E).  This will\n"
+"probably not affect normal POSIX path operations.  However, please report\n"
+"this problem to the mailing list mailto:cygwin@cygwin.com.  Thank you.");
+    }
+  else
+    {
+      if (virtual_path) /* don't mangle virtual path. */
+	;
       else
 	{
-	  bool unc = false;
+	  /* Compute length on Win32 path. */
+	  size_t len = upath.Length / sizeof (WCHAR) - 4;
+	  if (RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
+	    {
+	      len -= 2;
+	      unc_path = true;
+	    }
+	  /* Convert to a Win32 path. */
+	  upath.Buffer += upath.Length / sizeof (WCHAR) - len;
+	  upath.Length = len * sizeof (WCHAR);
 
-	  if (upath.Buffer[0] == L'/') /* Virtual path, don't mangle. */
-	    ;
-	  else if (!doit)
-	    {
-	      /* Convert to a Win32 path. */
-	      upath.Buffer += upath.Length / sizeof (WCHAR) - len;
-	      if (upath.Buffer[1] == L'\\') /* UNC path */
-		unc = true;
-	      upath.Length = len * sizeof (WCHAR);
-	    }
-	  else
-	    {
-	      PWSTR eoBuffer = upath.Buffer + (upath.Length / sizeof (WCHAR));
-	      /* Remove trailing slash if one exists.  FIXME: Is there a better way to
-		 do this? */
-	      if ((eoBuffer - upath.Buffer) > 3 && eoBuffer[-1] == L'\\')
-		upath.Length -= sizeof (WCHAR);
-	    }
-	  RtlInitEmptyUnicodeString (&win32,
-				     (PWCHAR) crealloc_abort (win32.Buffer,
-							      upath.Length + 2),
-				     upath.Length + 2);
-	  RtlCopyUnicodeString (&win32, &upath);
-	  if (unc)
-	    win32.Buffer[0] = L'\\';
+	  PWSTR eoBuffer = upath.Buffer + (upath.Length / sizeof (WCHAR));
+	  /* Remove trailing slash if one exists. */
+	  if ((eoBuffer - upath.Buffer) > 3 && eoBuffer[-1] == L'\\')
+	    upath.Length -= sizeof (WCHAR);
 	}
-      /* Make sure it's NUL-terminated. */
-      win32.Buffer[win32.Length / sizeof (WCHAR)] = L'\0';
-      if (!doit)			 /* Virtual path */
-	drive_length = 0;
-      else if (win32.Buffer[1] == L':')	 /* X: */
+      RtlInitEmptyUnicodeString (&win32,
+				 (PWCHAR) crealloc_abort (win32.Buffer,
+							  upath.Length + 2),
+				 upath.Length + 2);
+      RtlCopyUnicodeString (&win32, &upath);
+      if (unc_path)
+	win32.Buffer[0] = L'\\';
+    }
+  /* Make sure it's NUL-terminated. */
+  win32.Buffer[win32.Length / sizeof (WCHAR)] = L'\0';
+
+  /* Set drive_length, used in path conversion, and error code, used in
+     spawn_guts to decide whether a native Win32 app can be started or not. */
+  if (virtual_path)
+    {
+      drive_length = 0;
+      error = ENOTDIR;
+    }
+  else
+    {
+      if (!unc_path)
 	drive_length = 2;
-      else if (win32.Buffer[1] == L'\\') /* UNC path */
+      else
 	{
 	  PWCHAR ptr = wcschr (win32.Buffer + 2, L'\\');
 	  if (ptr)
@@ -3448,22 +3460,48 @@ cwdstuff::set (PUNICODE_STRING nat_cwd, const char *posix_cwd, bool doit)
 	  else
 	    drive_length = win32.Length / sizeof (WCHAR);
 	}
-      else				 /* Shouldn't happen */
-	drive_length = 0;
-
-      tmp_pathbuf tp;
-      if (!posix_cwd)
-	{
-	  posix_cwd = (const char *) tp.c_get ();
-	  mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
-	}
-      posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
-      stpcpy (posix, posix_cwd);
+      if (inaccessible_path)
+	error = EACCES;
+      else if (win32.Length > (MAX_PATH - 2) * sizeof (WCHAR))
+	error = ENAMETOOLONG;
+      else
+	error = 0;
     }
 
-out:
+  /* Eventually, create POSIX path if it's not set on entry. */
+  tmp_pathbuf tp;
+  if (!posix_cwd)
+    {
+      posix_cwd = (const char *) tp.c_get ();
+      mount_table->conv_to_posix_path (win32.Buffer, (char *) posix_cwd, 0);
+    }
+  posix = (char *) crealloc_abort (posix, strlen (posix_cwd) + 1);
+  stpcpy (posix, posix_cwd);
+
   cwd_lock.release ();
-  return res;
+  return 0;
+}
+
+const char *
+cwdstuff::get_error_desc () const
+{
+  switch (cygheap->cwd.get_error ())
+    {
+    case EACCES:
+      return "has restricted permissions which render it\n"
+	     "inaccessible as Win32 working directory";
+    case ENOTDIR:
+      return "is a virtual Cygwin directory which does\n"
+	     "not exist for a native Windows application";
+    case ENAMETOOLONG:
+      return "has a path longer than allowed for a\n"
+	     "Win32 working directory";
+    default:
+      break;
+    }
+  /* That shouldn't occur, unless we defined a new error code
+     in cwdstuff::set. */
+  return "is not accessible for some unknown reason";
 }
 
 /* Store incoming wchar_t path as current posix cwd.  This is called from

@@ -211,9 +211,14 @@ class cwdstuff
 private:
   char *posix;
   HANDLE dir;
+  DWORD drive_length;
+  int error;		/* This contains an errno number which corresponds
+			   to the problem with this path when trying to start
+			   a native Win32 application.  See cwdstuff::set for
+			   how it gets set.  See spawn_guts for how it's
+			   evaluated. */
 public:
   UNICODE_STRING win32;
-  DWORD drive_length;
   static muto cwd_lock;
   const char *get_posix () const { return posix; };
   void reset_posix (wchar_t *);
@@ -226,8 +231,10 @@ public:
     cwd_lock.release ();
     return ret;
   }
+  int get_error () const { return error; }
+  const char *get_error_desc () const;
   void init ();
-  int set (PUNICODE_STRING, const char *, bool);
+  int set (path_conv *, const char *);
 };
 
 #ifdef DEBUGGING

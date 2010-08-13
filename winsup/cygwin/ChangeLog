@@ -1,3 +1,29 @@
+2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cwdstuff): Make drive_length private.
+	Add "error" member.
+	(cwdstuff::get_error): New inline method.
+	(cwdstuff::get_error_desc): Declare.
+	(cwdstuff::set): Change first parameter to pointer to path_conv.
+	* path.cc (chdir): Drop doit.  Align call to cwdstuff::set to
+	new arguments.
+	(cwdstuff::init): Only call cwdstuff::set if it's not already
+	initialized.  Add comment.  Drop third parameter in call to
+	cwdstuff::set.
+	(cwdstuff::set): Partially rewrite.  Add lots of comments to explain
+	everything.  Drop "doit" since it's not used anymore.  Always create
+	new handle to CWD if not in a virtual path.  Drop PEB locking when
+	reading PEB values in init phase.  Check for accessibility to set
+	correct error code.  Drop Vista workaround.  Never write back into PEB. 
+	Set Win32 CWD to \\?\PIPE\ on init.  Simplify creation of win32 path. 
+	Set new error member to a meaningful value.
+	(cwdstuff::get_error_desc): New method to generate error message
+	from cwd error code.
+	* spawn.cc (spawn_guts): Call cwdstuff::get_error_desc to create
+	more meaningful error message when not being able to start native
+	Win32 app due to CWD restrictions.  When starting native Win32 app,
+	lock cwd and use in calls to CreateProcessW/CreateProcessAsUserW.
+
 2010-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (struct opt): Add "bind" option.
