@@ -86,6 +86,9 @@ fhandler_pipe::open (int flags, mode_t mode)
 	      set_errno (EACCES);
 	      return 0;
 	    }
+	  *this = *(fhandler_pipe *) cfd;
+	  set_io_handle (NULL);
+	  pc.reset_conv_handle ();
 	  if (!cfd->dup (this))
 	    return 1;
 	  return 0;

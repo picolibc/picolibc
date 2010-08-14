@@ -1,3 +1,8 @@
+2010-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pipe.cc (fhandler_pipe::open): Duplicate content of opened pipe
+	fhandler before calling dup method.
+
 2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (class cwdstuff): Make drive_length private.
