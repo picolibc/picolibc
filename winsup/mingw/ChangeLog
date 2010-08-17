@@ -1,3 +1,8 @@
+2010-08-17  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	* include/limits.h (PATH_MAX): Make it agree with Microsoft's
+	semantically identical MAX_PATH; correct value is 260.
+
 2010-07-25  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Accept that mingwrt headers are not guaranteed to precede GCC's in the

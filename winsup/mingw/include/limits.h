@@ -25,10 +25,11 @@
  *
  * TODO: NAME_MAX and OPEN_MAX are file system limits or not? Are they the
  *       same as FILENAME_MAX and FOPEN_MAX from stdio.h?
- * NOTE: Apparently the actual size of PATH_MAX is 260, but a space is
- *       required for the NUL. TODO: Test?
+ * NOTE: PATH_MAX is the POSIX equivalent for Microsoft's MAX_PATH; the two
+ *       are semantically identical, with a limit of 259 characters for the
+ *       path name, plus one for a terminating NUL, for a total of 260.
  */
-#define PATH_MAX	259
+#define PATH_MAX	260
 
 /*
  * Characteristics of the char data type.
