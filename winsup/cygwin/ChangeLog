@@ -1,3 +1,9 @@
+2010-08-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* external.cc (CW_SETCWD): New option.
+	* include/cygwin/version.h: Bump api minor to 231.
+	* include/sys/cygwin.h (CW_SETCWD): Define.
+
 2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Fix renaming file-based devices.

@@ -515,6 +515,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_SETCWD:
+	{
+	  cygheap->cwd.cwd_lock.acquire ();
+	  PWCHAR cwd = cygheap->cwd.win32.Buffer;
+	  res = !SetCurrentDirectoryW (cwd);
+	}
       default:
 	set_errno (ENOSYS);
     }
