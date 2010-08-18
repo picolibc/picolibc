@@ -373,7 +373,7 @@ pathnames.</para>
 <para>When a Cygwin application is started, the Win32 idea of the current
 working directory (CWD) is set to an invalid directory.  This works around
 the problem that the Win32 CWD is locked in a way which restricts POSIX
-functionality.  However, the side effect is that a call to, say,
+functionality.  However, the side effect is that a call to, for instance,
 <function>CreateFile ("foo", ...);</function> will fail, since the Win32
 notion of the CWD is <emphasis>not</emphasis> the same as the Cygwin notion
 of the CWD.</para>
@@ -386,7 +386,9 @@ you have two choices.</para>
 <itemizedlist spacing="compact">
   <listitem>
     <para>Either you call <function>SetCurrentDirectory</function> before
-    calling <function>CreateFile</function>.</para>
+    calling the Win32 function which requires a valid Win32 CWD
+    (<function>CreateFile</function>, <function>CreateProcess</function>,
+    etc).</para>
   </listitem>
   <listitem>
     <para>Or you compile your application as native Win32 (mingw) executable,

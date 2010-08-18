@@ -1,3 +1,7 @@
+2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml (pathnames-win32-api): Try to use a more clear wording.
+
 2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-programming.xml (faq.programming.win32-api): Remove simplicity.
