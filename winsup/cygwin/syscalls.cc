@@ -1804,8 +1804,9 @@ rename (const char *oldpath, const char *newpath)
       set_errno (ENOENT);
       goto out;
     }
-  if (oldpc.isspecial () && !oldpc.issocket ()) /* No renames from virtual FS */
+  if (oldpc.isspecial () && !oldpc.issocket () && !oldpc.is_fs_special ())
     {
+      /* No renames from virtual FS */
       set_errno (EROFS);
       goto out;
     }
@@ -1930,7 +1931,7 @@ rename (const char *oldpath, const char *newpath)
 	      goto out;
 	    }
 	}
-      else if (oldpc.is_lnk_symlink ()
+      else if (oldpc.is_lnk_special ()
 	       && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					      &ro_u_lnk, TRUE))
 	rename_append_suffix (newpc, newpath, nlen, ".lnk");
@@ -1958,9 +1959,9 @@ rename (const char *oldpath, const char *newpath)
 	      goto out;
 	    }
 	}
-      else if (oldpc.is_lnk_symlink ())
+      else if (oldpc.is_lnk_special ())
 	{
-	  if (!newpc.is_lnk_symlink ()
+	  if (!newpc.is_lnk_special ()
 	      && !RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					     &ro_u_lnk, TRUE))
 	    {
@@ -1992,7 +1993,7 @@ rename (const char *oldpath, const char *newpath)
 	    {
 	      new2pc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
 	      newpc.get_nt_native_path ()->Length -= 4 * sizeof (WCHAR);
-	      if (new2pc.is_binary () || new2pc.is_lnk_symlink ())
+	      if (new2pc.is_binary () || new2pc.is_lnk_special ())
 		removepc = &new2pc;
 	    }
 	}

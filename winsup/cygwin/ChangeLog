@@ -1,5 +1,9 @@
 2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Fix renaming file-based devices.
+
+2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (open_stackdumpfile): Don't try to open file if we
 	have no filesystem based CWD.  Add comment.
 	* path.cc (cwdstuff::set): Set CWD handle to NULL if CWD is a virtual
