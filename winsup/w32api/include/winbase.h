@@ -206,6 +206,7 @@ extern "C" {
 #if (_WIN32_WINNT >= 0x0500)
 #define FILE_FLAG_FIRST_PIPE_INSTANCE	524288
 #endif
+#define SYMBOLIC_LINK_FLAG_DIRECTORY	0x1
 #define CLRDTR 6
 #define CLRRTS 4
 #define SETDTR 5
@@ -1269,6 +1270,10 @@ WINBASEAPI BOOL WINAPI CreateRestrictedToken(HANDLE,DWORD,DWORD,PSID_AND_ATTRIBU
 #endif
 WINBASEAPI HANDLE WINAPI CreateSemaphoreA(LPSECURITY_ATTRIBUTES,LONG,LONG,LPCSTR);
 WINBASEAPI HANDLE WINAPI CreateSemaphoreW(LPSECURITY_ATTRIBUTES,LONG,LONG,LPCWSTR);
+#if (_WIN32_WINNT >= 0x0600)
+WINBASEAPI BOOL WINAPI CreateSymbolicLinkA(LPCSTR,LPCSTR,DWORD);
+WINBASEAPI BOOL WINAPI CreateSymbolicLinkW(LPCWSTR,LPCWSTR,DWORD);
+#endif
 WINBASEAPI DWORD WINAPI CreateTapePartition(HANDLE,DWORD,DWORD,DWORD);
 #if (_WIN32_WINNT >= 0x0500)
 WINBASEAPI HANDLE WINAPI CreateTimerQueue(void);
@@ -2107,6 +2112,9 @@ typedef PCACTCTXW PCACTCTX;
 #define CreateProcess CreateProcessW
 #define CreateProcessAsUser CreateProcessAsUserW
 #define CreateSemaphore CreateSemaphoreW
+#if (_WIN32_WINNT >= 0x0600)
+#define CreateSymbolicLink CreateSymbolicLinkW
+#endif
 #define CreateWaitableTimer CreateWaitableTimerW
 #define DefineDosDevice DefineDosDeviceW
 #define DeleteFile DeleteFileW
@@ -2303,6 +2311,9 @@ typedef PCACTCTXA PCACTCTX;
 #define CreateProcess CreateProcessA
 #define CreateProcessAsUser CreateProcessAsUserA
 #define CreateSemaphore CreateSemaphoreA
+#if (_WIN32_WINNT >= 0x0600)
+#define CreateSymbolicLink CreateSymbolicLinkA
+#endif
 #define CreateWaitableTimer CreateWaitableTimerA
 #define DefineDosDevice DefineDosDeviceA
 #define DeleteFile DeleteFileA

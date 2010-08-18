@@ -1,3 +1,8 @@
+2010-08-18  Ladislav Michl  <ladis@users.sourceforge.net>
+
+	* include/winbase.h (SYMBOLIC_LINK_FLAG_DIRECTORY, CreateSymbolicLinkW,
+	CreateSymbolicLinkA, CreateSymbolicLink): Define
+
 2010-07-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/kernel32.def(FatalExit): Correct definiton.
