@@ -633,7 +633,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	buf->st_mode |= S_IFREG;
       else
 	{
-	  buf->st_dev = dev ();
+	  buf->st_dev = buf->st_rdev = dev ();
 	  buf->st_mode = dev ().mode;
 	  buf->st_size = 0;
 	}
@@ -652,7 +652,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	/* nothing */;
       else if (is_fs_special ())
 	{
-	  buf->st_dev = dev ();
+	  buf->st_dev = buf->st_rdev = dev ();
 	  buf->st_mode = dev ().mode;
 	  buf->st_size = 0;
 	}

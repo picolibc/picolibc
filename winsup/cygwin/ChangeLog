@@ -1,3 +1,8 @@
+2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Set st_rdev
+	to correct device number for fs_special devices.
+
 2010-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 6.
