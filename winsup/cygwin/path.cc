@@ -3321,9 +3321,9 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
   /* Open a directory handle with FILE_OPEN_FOR_BACKUP_INTENT and with all
      sharing flags set.  The handle is right now used in exceptions.cc only,
      but that might change in future. */
+  HANDLE h = NULL;
   if (!virtual_path)
     {
-      HANDLE h;
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       OBJECT_ATTRIBUTES attr;
@@ -3363,18 +3363,11 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-      /* Note that we don't set the dir handle to NULL for virtual paths.
-	 The handle is used to generate a stackdump file.  Since we can't
-	 create a stackdump in a virtual path, we have at least *some*
-	 directory handle to generate the stackdump in.
-
-	 However, note that we have to make sure that we don't use the handle
-	 wrongly as soon as we start to use it in other cases as well. */
-      HANDLE old_dir = dir;
-      dir = h;
-      if (old_dir)
-	NtClose (old_dir);
     }
+  /* Set new handle.  It's only used when creating stackdumps so far. */
+  if (dir)
+    NtClose (dir);
+  dir = h;
 
   if (!nat_cwd)
     {

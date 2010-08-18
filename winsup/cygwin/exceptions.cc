@@ -128,7 +128,10 @@ error_start_init (const char *buf)
 static void
 open_stackdumpfile ()
 {
-  if (myself->progname[0])
+  /* If we have no executable name, or if the CWD handle is NULL,
+     which means, the CWD is a virtual path, don't even try to open
+     a stackdump file. */
+  if (myself->progname[0] && cygheap->cwd.get_handle ())
     {
       const WCHAR *p;
       /* write to progname.stackdump if possible */
