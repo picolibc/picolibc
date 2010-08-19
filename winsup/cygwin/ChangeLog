@@ -1,3 +1,11 @@
+2010-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (sync_wincwd): New function.
+	(cygwin_internal): Rename CW_SETCWD to CW_SYNC_WINCWD.  Call
+	sync_wincwd from here.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Rename CW_SETCWD to
+	CW_SYNC_WINCWD.
+
 2010-08-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* external.cc (CW_SETCWD): New option.
