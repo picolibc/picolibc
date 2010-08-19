@@ -1,3 +1,9 @@
+2010-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h: Define FILE_ATTRIBUTE_VIRTUAL.  Change
+	FILE_ATTRIBUTE_VALID_FLAGS accordingly.
+	* include/ddk/winddk.h: Ditto.
+
 2010-08-18  Ladislav Michl  <ladis@users.sourceforge.net>
 
 	* include/winbase.h (SYMBOLIC_LINK_FLAG_DIRECTORY, CreateSymbolicLinkW,
