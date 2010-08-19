@@ -1,5 +1,18 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.7"><title>What's new and what changed from 1.7.6 to 1.7.7</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Add a new CW_SYNC_WINCWD command to the <function>cygwin_internal</function>
+call, to allow to synchronize the Win32 CWD with the Cygwin CWD.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.6"><title>What's new and what changed from 1.7.5 to 1.7.6</title>
 
 <itemizedlist mark="bullet">

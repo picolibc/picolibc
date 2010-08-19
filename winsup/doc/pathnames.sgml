@@ -174,31 +174,31 @@ mount the root dir with special options (for instance, as text mount).</para>
 <itemizedlist spacing="compact">
 <listitem>
   <para>Just a normal mount point:</para>
-  <screen>c:/foo /bar fat32 binary 0 0</screen>
+  <screen>  c:/foo /bar fat32 binary 0 0</screen>
 </listitem>
 <listitem>
   <para>A mount point for a textmode mount with case sensitivity switched off:</para>
-  <screen>C:/foo /bar/baz ntfs text,posix=0 0 0</screen>
+  <screen>  C:/foo /bar/baz ntfs text,posix=0 0 0</screen>
 </listitem>
 <listitem>
   <para>A mount point for a Windows directory with spaces in it:</para>
-  <screen>C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
+  <screen>  C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
 </listitem>
 <listitem>
   <para>A mount point for a remote directory without ACL support:</para>
-  <screen>//server/share/subdir /srv/subdir smbfs binary,noacl 0 0</screen>
+  <screen>  //server/share/subdir /srv/subdir smbfs binary,noacl 0 0</screen>
 </listitem>
 <listitem>
   <para>This is just a comment:</para>
-  <screen># This is just a comment</screen>
+  <screen>  # This is just a comment</screen>
 </listitem>
 <listitem>
   <para>Set the cygdrive prefix to /mnt:</para>
-  <screen>none /mnt cygdrive binary 0 0</screen>
+  <screen>  none /mnt cygdrive binary 0 0</screen>
 </listitem>
 <listitem>
   <para>Remount /var to /usr/var:</para>
-  <screen>/var /usr/var none bind</screen>
+  <screen>  /var /usr/var none bind</screen>
   <para>Assuming <filename>/var</filename> points to
   <filename>C:/cygwin/var</filename>, <filename>/usr/var</filename> now
   also points to <filename>C:/cygwin/var</filename>.  This is equivalent
@@ -224,13 +224,13 @@ arguments:</para>
 <example id="pathnames-mount-ex">
 <title>Displaying the current set of mount points</title>
 <screen>
-<prompt>bash$</prompt> <userinput>mount</userinput>
-f:/cygwin/bin on /usr/bin type system (binary,auto)
-f:/cygwin/lib on /usr/lib type system (binary,auto)
-f:/cygwin on / type system (binary,auto)
-e:/src on /usr/src type system (binary)
-c: on /cygdrive/c type user (binary,posix=0,user,noumount,auto)
-e: on /cygdrive/e type user (binary,posix=0,user,noumount,auto)
+  <prompt>bash$</prompt> <userinput>mount</userinput>
+  f:/cygwin/bin on /usr/bin type system (binary,auto)
+  f:/cygwin/lib on /usr/lib type system (binary,auto)
+  f:/cygwin on / type system (binary,auto)
+  e:/src on /usr/src type system (binary)
+  c: on /cygdrive/c type user (binary,posix=0,user,noumount,auto)
+  e: on /cygdrive/e type user (binary,posix=0,user,noumount,auto)
 </screen>
 </example>
 
@@ -247,7 +247,8 @@ your old system mount points (stored in the HKEY_LOCAL_MACHINE branch
 of your registry) are read by a script and the <filename>/etc/fstab</filename>
 file is generated from these entries.  Note that entries for
 <filename>/</filename>, <filename>/usr/bin</filename>, and
-<filename>/usr/lib</filename> are <emphasis>never</emphasis> generated.
+<filename>/usr/lib</filename> are <emphasis role='bold'>never</emphasis>
+generated.
 </para>
 
 <para>
@@ -336,22 +337,22 @@ bypass the information given in the Cygwin mount table.</para>
 <itemizedlist spacing="compact">
   <listitem>
     <para>All paths starting with a drive specifier</para>
-    <screen>
-       C:\foo
-       C:/foo
-    </screen>
+<screen>
+  C:\foo
+  C:/foo
+</screen>
   </listitem>
   <listitem>
     <para>All paths containing at least one backslash as path component</para>
-    <screen>
-       C:/foo/bar<emphasis role='bold'>\</emphasis>baz/...
-    </screen>
+<screen>
+  C:/foo/bar<emphasis role='bold'>\</emphasis>baz/...
+</screen>
   </listitem>
   <listitem>
     <para>UNC paths using backslashes</para>
-    <screen>
-       \\server\share\...
-    </screen>
+<screen>
+  \\server\share\...
+</screen>
   </listitem>
 </itemizedlist>
 
@@ -366,33 +367,92 @@ permissions.</para>
 
 <sect2 id="pathnames-win32-api"><title>Using the Win32 file API in Cygwin applications</title>
 
-<para>Special care must be taken when your application uses Win32 file API
-functions like <function>CreateFile</function> to access files using relative
-pathnames.</para>
+<para>Special care must be taken if your application uses Win32 file API
+functions like <function>CreateFile</function> to access files using
+relative pathnames, or if your application uses functions like
+<function>CreateProcess</function> or <function>ShellExecute</function>
+to start other applications.</para>
 
 <para>When a Cygwin application is started, the Win32 idea of the current
-working directory (CWD) is set to an invalid directory.  This works around
-the problem that the Win32 CWD is locked in a way which restricts POSIX
-functionality.  However, the side effect is that a call to, for instance,
-<function>CreateFile ("foo", ...);</function> will fail, since the Win32
-notion of the CWD is <emphasis>not</emphasis> the same as the Cygwin notion
-of the CWD.</para>
+working directory (CWD) is set to an <emphasis role='bold'>invalid</emphasis>
+directory.  This works around the problem that the Win32 CWD is locked
+in a way which restricts certain POSIX functionality.  However, the side
+effect is that a call to, for instance, <function>CreateFile ("foo",
+...);</function> will fail, since the Win32 notion of the CWD is
+not the same as the Cygwin notion of the CWD, and worse, it's a
+directory entirely unsuitable for normal file operations.</para>
 
 <para>So, in general, don't use the Win32 file API in Cygwin applications.
-If you <emphasis>really</emphasis> need to access files using the Win32 API,
-and if you <emphasis>really</emphasis> have to use relative pathnames,
-you have two choices.</para>
+If you <emphasis role='bold'>really</emphasis> need to access files using
+the Win32 API, or if you <emphasis role='bold'>really</emphasis> have to use
+<function>CreateProcess</function> to start applications, rather than
+the POSIX <function>exec(3)</function> familiy of functions, you have to
+make sure that the Win32 CWD is set to some valid directory.  To
+accomplish that, you can choose from several methods.</para>
 
 <itemizedlist spacing="compact">
   <listitem>
-    <para>Either you call <function>SetCurrentDirectory</function> before
-    calling the Win32 function which requires a valid Win32 CWD
-    (<function>CreateFile</function>, <function>CreateProcess</function>,
-    etc).</para>
+    <para>The easiest method is to call</para>
+    
+<screen>
+  #include &lt;sys/cygwin.h&gt;
+
+  cygwin_internal (CW_SYNC_WINCWD);
+</screen>
+
+    <para>prior to calling the Win32 functions which require a valid Win32 CWD.
+    This function synchronizes the Win32 CWD with the Cygwin CWD.</para>
+
+    <para>Note that the <function>cygwin_internal (CW_SYNC_WINCWD)</function>
+    call may fail.  In that case, it returns with a non-zero value and
+    errno is set appropriately:</para>
+
+    <segmentedlist>
+      <?dbhtml list-presentation="table"?>
+      <seglistitem>
+	<seg><emphasis role='bold'>ENOTDIR</emphasis></seg>
+	<seg>The Cygwin CWD is a virtual path, like /proc, or //, which does not
+	     exist as valid directory in the Win32 namespace.</seg>
+      </seglistitem>
+      <seglistitem>
+	<seg><emphasis role='bold'>EACCES</emphasis></seg>
+	<seg>The Cygwin CWD is a directory with restrictive permissions,
+	     which make it unusable as Win32 directory.</seg>
+      </seglistitem>
+      <seglistitem>
+	<seg><emphasis role='bold'>ENAMETOOLONG</emphasis></seg>
+	<seg>The Cygwin CWD is too long to be used as Win32 CWD.
+	     The Win32 CWD is restricted to 258 characters.</seg>
+      </seglistitem>
+    </segmentedlist>
+
+    <para>You should make sure that you test the return value of
+    <function>cygwin_internal (CW_SYNC_WINCWD)</function>, otherwise
+    your application will potentially not work correctly.  If the call
+    failed, you can use the Win32 call <function>SetCurrentDirectory</function>
+    to move to some well-known directory.</para>
+
+    <note><para>After you've synchronized the Win32 CWD with the Cygwin CWD,
+    be aware that the directory is locked, until the process exited, or
+    until the process set the Win32 CWD to some other directory.  During that
+    period it will not be possible to rename or remove the directory from
+    other Cygwin applications.</para></note>
   </listitem>
   <listitem>
-    <para>Or you compile your application as native Win32 (mingw) executable,
-    rather than as Cygwin executable.</para>
+    <para>If you know where to go to, you can also just call the Win32 function
+    <function>SetCurrentDirectory</function> immediately.</para>
+  </listitem>
+  <listitem>
+    <para>If you need a valid Win32 CWD only for a child application started
+    via <function>CreateProcess</function> and friends, you don't have to
+    set your own Win32 CWD.  In that case, just utilize the lpCurrentDirectory
+    parameter.  See the description of the <function>CreateProcess</function>
+    function in the MSDN manual pages.</para>
+  </listitem>
+  <listitem>
+    <para>Last, but not least, if you don't need any POSIX function from
+    Cygwin in your specific applciation, consider to compile your application
+    as native Win32 (mingw) executable, rather than as Cygwin executable.</para>
   </listitem>
 </itemizedlist>
 
@@ -557,9 +617,9 @@ Cygwin replaces the non-convertible character with a special character
 sequence.  The sequence starts with an ASCII CAN character (hex code
 0x18, equivalent Control-X), followed by the UTF-8 representation of the
 character.  The result is a filename containing some ugly looking
-characters.  While it doesn't <emphasis>look</emphasis> nice, it
-<emphasis>is</emphasis> nice, because Cygwin knows how to convert this
-filename back to UTF-16.  The filename will be converted using your
+characters.  While it doesn't <emphasis role='bold'>look</emphasis> nice, it
+<emphasis role='bold'>is</emphasis> nice, because Cygwin knows how to convert
+this filename back to UTF-16.  The filename will be converted using your
 usual character set.  However, when Cygwin recognizes an ASCII CAN
 character, it skips over the ASCII CAN and handles the following bytes as
 a UTF-8 character.  Thus, the filename is symmetrically converted back to

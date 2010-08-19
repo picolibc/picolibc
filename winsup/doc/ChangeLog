@@ -1,3 +1,10 @@
+2010-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.7): New section.
+	* pathnames.sgml: Throughout, align style of screen elements.
+	Throughout, make all emphasis elements bold.
+	(pathnames-win32-api): Rewrite section.
+
 2010-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml (pathnames-win32-api): Try to use a more clear wording.
