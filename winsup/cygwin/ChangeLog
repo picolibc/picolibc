@@ -1,3 +1,7 @@
+2010-08-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygthread.cc: Update copyright.
+
 2010-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Close handle in conv_handle if we're
