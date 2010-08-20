@@ -756,7 +756,11 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   IO_STATUS_BLOCK io;
   FILE_FS_FULL_SIZE_INFORMATION full_fsi;
   FILE_FS_SIZE_INFORMATION fsi;
-  HANDLE fh = get_stat_handle ();
+  /* We must not use the stat handle here, even if it exists.  The handle
+     has been opened with FILE_OPEN_REPARSE_POINT, thus, in case of a volume
+     mount point, it points to the FS of the mount point, rather than to the
+     mounted FS. */
+  HANDLE fh = get_handle ();
 
   if (!fh)
     {

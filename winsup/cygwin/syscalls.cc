@@ -2568,8 +2568,7 @@ statvfs (const char *name, struct statvfs *sfs)
   if (efault.faulted (EFAULT))
     goto error;
 
-  if (!(fh = build_fh_name (name, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
-			    stat_suffixes)))
+  if (!(fh = build_fh_name (name, PC_SYM_FOLLOW, stat_suffixes)))
     goto error;
 
   if (fh->error ())
