@@ -1,3 +1,8 @@
+2010-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Close handle in conv_handle if we're
+	following a symlink.
+
 2010-08-20  Pedro Izecksohn <pedro.izecksohn@gmail.com>
 
 	* endian.h (htobe16, htobe32, htobe64, be16toh, be32toh, be64toh,

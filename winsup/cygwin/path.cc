@@ -900,6 +900,9 @@ is_virtual_symlink:
 	      /* Following a symlink we can't trust the collected filesystem
 		 information any longer. */
 	      fs.clear ();
+	      /* Close handle, if we have any.  Otherwise we're collecting
+	         handles while following symlinks. */
+	      conv_handle.close ();
 	      break;
 	    }
 	  else if (sym.error && sym.error != ENOENT)
