@@ -1,3 +1,8 @@
+2010-08-20  Pedro Izecksohn <pedro.izecksohn@gmail.com>
+
+	* endian.h (htobe16, htobe32, htobe64, be16toh, be32toh, be64toh,
+	htole16, htole32, htole64, le16toh, le32toh, le64toh): Define.
+
 2010-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (readdir_check_reparse_point): Rename from
