@@ -148,10 +148,15 @@ path_conv::isgood_inode (__ino64_t ino) const
   return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
-static inline bool
-is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
+/* Check reparse point for type.  IO_REPARSE_TAG_MOUNT_POINT types are
+   either volume mount points, which are treated as directories, or they
+   are directory mount points, which are treated as symlinks.
+   IO_REPARSE_TAG_SYMLINK types are always symlinks.  We don't know
+   anything about other reparse points, so they are treated as unknown.  */
+static inline int
+readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
 {
-  bool ret = false;
+  DWORD ret = DT_UNKNOWN;
   IO_STATUS_BLOCK io;
   HANDLE reph;
   UNICODE_STRING subst;
@@ -165,15 +170,24 @@ is_volume_mountpoint (POBJECT_ATTRIBUTES attr)
 		  alloca (MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
       if (NT_SUCCESS (NtFsControlFile (reph, NULL, NULL, NULL,
 		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
-		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE))
-	  && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT
-	  && (RtlInitCountedUnicodeString (&subst, 
-		(WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
-			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
-		rp->MountPointReparseBuffer.SubstituteNameLength),
-	      RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE)))
-	ret = true;
-      NtClose (reph);
+		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE)))
+	{
+	  if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+	    {
+	      RtlInitCountedUnicodeString (&subst, 
+		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
+			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
+		  rp->MountPointReparseBuffer.SubstituteNameLength);
+	      /* Only volume mountpoints are treated as directories. */
+	      if (RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
+		ret = DT_DIR;
+	      else
+	      	ret = DT_LNK;
+	    }
+	  else if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
+	    ret = DT_LNK;
+	  NtClose (reph);
+	}
     }
   return ret;
 }
@@ -1783,6 +1797,8 @@ readdir_get_ino (const char *path, bool dot_dot)
   char *fname;
   struct __stat64 st;
   HANDLE hdl;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
   __ino64_t ino = 0;
 
   if (dot_dot)
@@ -1802,7 +1818,14 @@ readdir_get_ino (const char *path, bool dot_dot)
     }
   else if (!pc.hasgood_inode ())
     ino = hash_path_name (0, pc.get_nt_native_path ());
-  else if ((hdl = pc.handle ()) != NULL)
+  else if ((hdl = pc.handle ()) != NULL
+	   || NT_SUCCESS (NtOpenFile (&hdl, READ_CONTROL,
+				      pc.get_object_attr (attr, sec_none_nih),
+				      &io, FILE_SHARE_VALID_FLAGS,
+				      FILE_OPEN_FOR_BACKUP_INTENT
+				      | (pc.is_rep_symlink ()
+				      ? FILE_OPEN_REPARSE_POINT : 0)))
+	  )
     {
       ino = pc.get_ino_by_handle (hdl);
       if (!ino)
@@ -1830,17 +1853,16 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       dir->__flags &= ~dirent_set_d_ino;
     }
 
-  /* Set d_type if type can be determined from file attributes.
-     FILE_ATTRIBUTE_SYSTEM ommitted to leave DT_UNKNOWN for old symlinks.
-     For new symlinks, d_type will be reset to DT_UNKNOWN below.  */
+  /* Set d_type if type can be determined from file attributes.  For .lnk
+     symlinks, d_type will be reset below.  Reparse points can be NTFS
+     symlinks, even if they have the FILE_ATTRIBUTE_DIRECTORY flag set. */
   if (attr &&
-      !(attr & (  ~FILE_ATTRIBUTE_VALID_FLAGS
-		| FILE_ATTRIBUTE_SYSTEM
-		| FILE_ATTRIBUTE_REPARSE_POINT)))
+      !(attr & (~FILE_ATTRIBUTE_VALID_FLAGS | FILE_ATTRIBUTE_REPARSE_POINT)))
     {
       if (attr & FILE_ATTRIBUTE_DIRECTORY)
 	de->d_type = DT_DIR;
-      else
+      /* FILE_ATTRIBUTE_SYSTEM might denote system-bit type symlinks. */
+      else if (!(attr & FILE_ATTRIBUTE_SYSTEM))
 	de->d_type = DT_REG;
     }
 
@@ -1855,19 +1877,29 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 
       InitializeObjectAttributes (&attr, fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
-      if (is_volume_mountpoint (&attr)
-	  && (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
-				      FILE_SHARE_VALID_FLAGS,
-				      FILE_OPEN_FOR_BACKUP_INTENT))))
+      de->d_type = readdir_check_reparse_point (&attr);
+      if (de->d_type == DT_DIR)
 	{
-	  de->d_ino = pc.get_ino_by_handle (reph);
-	  NtClose (reph);
+	  /* Volume mountpoints are treated as directories.  We have to fix
+	     the inode number, otherwise we have the inode number of the
+	     mount point, rather than the inode number of the toplevel
+	     directory of the mounted drive. */
+	  if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
+				      FILE_SHARE_VALID_FLAGS,
+				      FILE_OPEN_FOR_BACKUP_INTENT)))
+	    {
+	      de->d_ino = pc.get_ino_by_handle (reph);
+	      NtClose (reph);
+	    }
 	}
     }
 
-  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
-     symlink, drop the .lnk suffix. */
-  if ((attr & FILE_ATTRIBUTE_READONLY) && fname->Length > 4 * sizeof (WCHAR))
+  /* Check for Windows shortcut. If it's a Cygwin or U/WIN symlink, drop the
+     .lnk suffix and set d_type accordingly. */
+  if ((attr & (FILE_ATTRIBUTE_DIRECTORY
+	       | FILE_ATTRIBUTE_REPARSE_POINT
+	       | FILE_ATTRIBUTE_READONLY)) == FILE_ATTRIBUTE_READONLY
+      && fname->Length > 4 * sizeof (WCHAR))
     {
       UNICODE_STRING uname;
 
@@ -1892,10 +1924,20 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	      fbuf.Length -= 2 * sizeof (WCHAR);
 	    }
 	  path_conv fpath (&fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink () || fpath.is_fs_special ())
+	  if (fpath.issymlink ())
 	    {
 	      fname->Length -= 4 * sizeof (WCHAR);
-	      de->d_type = DT_UNKNOWN;
+	      de->d_type = DT_LNK;
+	    }
+	  else if (fpath.isfifo ())
+	    {
+	      fname->Length -= 4 * sizeof (WCHAR);
+	      de->d_type = DT_FIFO;
+	    }
+	  else if (fpath.is_fs_special ())
+	    {
+	      fname->Length -= 4 * sizeof (WCHAR);
+	      de->d_type = S_ISCHR (fpath.dev.mode) ? DT_CHR : DT_BLK;
 	    }
 	}
     }
@@ -2094,23 +2136,35 @@ go_ahead:
 				       | FILE_OPEN_REPARSE_POINT);
 	      if (NT_SUCCESS (f_status))
 		{
-		  de->d_ino = pc.get_ino_by_handle (hdl);
+		  /* We call NtQueryInformationFile here, rather than
+		     pc.get_ino_by_handle(), otherwise we can't short-circuit
+		     dirent_set_d_ino correctly. */
+		  FILE_INTERNAL_INFORMATION fai;
+		  f_status = NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
+						     FileInternalInformation);
 		  NtClose (hdl);
+		  if (NT_SUCCESS (f_status))
+		    {
+		      if (pc.isgood_inode (fai.FileId.QuadPart))
+			de->d_ino = fai.FileId.QuadPart;
+		      else
+			/* Untrusted file system.  Don't try to fetch inode
+			   number again. */
+			dir->__flags &= ~dirent_set_d_ino;
+		    }
 		}
 	    }
-	  /* Untrusted file system.  Don't try to fetch inode number again. */
-	  if (de->d_ino == 0)
-	    dir->__flags &= ~dirent_set_d_ino;
 	}
     }
 
   if (!(res = readdir_helper (dir, de, RtlNtStatusToDosError (status),
-			      buf ? FileAttributes : 0, &fname)))
+			      FileAttributes, &fname)))
     dir->__d_position++;
   else if (!(dir->__flags & dirent_saw_dot))
     {
       strcpy (de->d_name , ".");
       de->d_ino = pc.get_ino_by_handle (get_handle ());
+      de->d_type = DT_DIR;
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot;
       res = 0;
@@ -2122,13 +2176,15 @@ go_ahead:
 	de->d_ino = readdir_get_ino (get_name (), true);
       else
 	de->d_ino = pc.get_ino_by_handle (get_handle ());
+      de->d_type = DT_DIR;
       dir->__d_position++;
       dir->__flags |= dirent_saw_dot_dot;
       res = 0;
     }
 
-  syscall_printf ("%d = readdir (%p, %p) (L\"%lS\" > \"%ls\")", res, dir, &de,
-		  res ? NULL : &fname, res ? "***" : de->d_name);
+  syscall_printf ("%d = readdir (%p, %p) (L\"%lS\" > \"%ls\") (attr %p > type %d)",
+		  res, dir, &de, res ? NULL : &fname, res ? "***" : de->d_name,
+		  FileAttributes, de->d_type);
   return res;
 }
 

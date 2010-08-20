@@ -2533,6 +2533,11 @@ restart:
 		 This does what we want because fs_info::update opens the
 		 handle without FILE_OPEN_REPARSE_POINT. */
 	      fs.update (&upath, NULL);
+	      /* Make sure the open handle is not used in later stat calls.
+	         The handle has been opened with the FILE_OPEN_REPARSE_POINT
+		 flag, so it's a handle to the reparse point, not a handle
+		 to the volumes root dir. */
+	      pflags &= ~PC_KEEP_HANDLE;
 	    }
 	  else if (res)
 	    break;
