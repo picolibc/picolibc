@@ -55,12 +55,18 @@ struct v850_opcode
 };
 
 /* Values for the processors field in the v850_opcode structure.  */
+#define PROCESSOR_MASK		0x1f
+#define PROCESSOR_OPTION_EXTENSION	(1 << 5)	/* Enable extension opcodes.  */
+#define PROCESSOR_OPTION_ALIAS	(1 << 6)		/* Enable alias opcodes.  */
 #define PROCESSOR_V850		(1 << 0)		/* Just the V850.  */
-#define PROCESSOR_ALL		-1			/* Any processor.  */
-#define PROCESSOR_V850E		(1 << 1)		/* Just the V850E. */
-#define PROCESSOR_NOT_V850	(~ PROCESSOR_V850)	/* Any processor except the V850.  */
-#define PROCESSOR_V850EA	(1 << 2)		/* Just the V850EA. */
-#define PROCESSOR_V850E1	(1 << 3)		/* Just the V850E1. */
+#define PROCESSOR_ALL		PROCESSOR_MASK		/* Any processor.  */
+#define PROCESSOR_V850E		(1 << 1)		/* Just the V850E.  */
+#define PROCESSOR_NOT_V850	(PROCESSOR_ALL & (~ PROCESSOR_V850))	/* Any processor except the V850.  */
+#define PROCESSOR_V850E1	(1 << 2)		/* Just the V850E1.  */
+#define PROCESSOR_V850E2	(1 << 3)		/* Just the V850E2.  */
+#define PROCESSOR_V850E2V3	(1 << 4)		/* Just the V850E2V3.  */
+#define PROCESSOR_V850E2_ALL	(PROCESSOR_V850E2 | PROCESSOR_V850E2V3)	/* V850E2 & V850E2V3.  */
+#define SET_PROCESSOR_MASK(mask,set)	((mask) = ((mask) & ~PROCESSOR_MASK) | (set))
 
 /* The table itself is sorted by major opcode number, and is otherwise
    in the order in which the disassembler should consider
@@ -74,7 +80,8 @@ extern const int v850_num_opcodes;
 struct v850_operand
 {
   /* The number of bits in the operand.  */
-  /* If this value is -1 then the operand's bits are in a discontinous distribution in the instruction. */
+  /* If this value is -1 then the operand's bits are in a discontinous
+     distribution in the instruction. */
   int bits;
 
   /* (bits >= 0):  How far the operand is left shifted in the instruction.  */
@@ -120,6 +127,8 @@ struct v850_operand
 
   /* One bit syntax flags.  */
   int flags;
+
+  int default_reloc;
 };
 
 /* Elements in the table are retrieved by indexing with values from
@@ -129,39 +138,70 @@ extern const struct v850_operand v850_operands[];
 
 /* Values defined for the flags field of a struct v850_operand.  */
 
-/* This operand names a general purpose register */
+/* This operand names a general purpose register.  */
 #define V850_OPERAND_REG	0x01
 
-/* This operand names a system register */
-#define V850_OPERAND_SRG	0x02
-
-/* This operand names a condition code used in the setf instruction */
-#define V850_OPERAND_CC		0x04
-
-/* This operand takes signed values */
-#define V850_OPERAND_SIGNED	0x08
-
 /* This operand is the ep register.  */
-#define V850_OPERAND_EP		0x10
+#define V850_OPERAND_EP		0x02
 
-/* This operand is a PC displacement */
-#define V850_OPERAND_DISP	0x20
+/* This operand names a system register.  */
+#define V850_OPERAND_SRG	0x04
 
-/* This is a relaxable operand.   Only used for D9->D22 branch relaxing
-   right now.  We may need others in the future (or maybe handle them like
-   promoted operands on the mn10300?)  */
-#define V850_OPERAND_RELAX	0x40
+/* Prologue eilogue type instruction, V850E specific.  */
+#define V850E_OPERAND_REG_LIST	0x08
 
-/* The register specified must not be r0 */
-#define V850_NOT_R0	        0x80
+/* This operand names a condition code used in the setf instruction.  */
+#define V850_OPERAND_CC		0x10
 
-/* push/pop type instruction, V850E specific.  */
-#define V850E_PUSH_POP		0x100
+#define V850_OPERAND_FLOAT_CC	0x20
+
+/* This operand names a vector purpose register.  */
+#define V850_OPERAND_VREG	0x40
 
 /* 16 bit immediate follows instruction, V850E specific.  */
-#define V850E_IMMEDIATE16	0x200
+#define V850E_IMMEDIATE16	0x80
+
+/* hi16 bit immediate follows instruction, V850E specific.  */
+#define V850E_IMMEDIATE16HI	0x100
+
+/* 23 bit immediate follows instruction, V850E specific.  */
+#define V850E_IMMEDIATE23	0x200
 
 /* 32 bit immediate follows instruction, V850E specific.  */
 #define V850E_IMMEDIATE32	0x400
+
+/* This is a relaxable operand.   Only used for D9->D22 branch relaxing
+   right now.  We may need others in the future (or maybe handle them like
+   promoted operands on the mn10300?).  */
+#define V850_OPERAND_RELAX	0x800
+
+/* This operand takes signed values.  */
+#define V850_OPERAND_SIGNED	0x1000
+
+/* This operand is a displacement.  */
+#define V850_OPERAND_DISP	0x2000
+
+/* This operand is a PC displacement.  */
+#define V850_PCREL		0x4000
+
+/* The register specified must be even number.  */
+#define V850_REG_EVEN		0x8000
+
+/* The register specified must not be r0.  */
+#define V850_NOT_R0	        0x20000
+
+/* The register specified must not be 0.  */
+#define V850_NOT_IMM0	        0x40000
+
+/* The condition code must not be SA CONDITION.  */
+#define V850_NOT_SA		0x80000
+
+/* The operand has '!' prefix.  */
+#define V850_OPERAND_BANG	0x100000
+
+/* The operand has '%' prefix.  */
+#define V850_OPERAND_PERCENT	0x200000
+
+extern int v850_msg_is_out_of_range (const char * msg);
 
 #endif /* V850_H */
