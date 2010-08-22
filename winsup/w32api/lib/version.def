@@ -8,8 +8,6 @@ VerFindFileA@32
 VerFindFileW@32
 VerInstallFileA@32
 VerInstallFileW@32
-VerLanguageNameA@12
-VerLanguageNameW@12
 VerQueryValueA@16
 VerQueryValueIndexA@24
 VerQueryValueIndexW@24

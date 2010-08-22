@@ -1,5 +1,24 @@
 2010-08-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* lib/kernel32.def (CopyLZFile, GetExpandedNameA, GetExpandedNameW, LZClose,
+	LZCopy, LZInit, LZOpenFileA, LZOpenFileW, LZRead, LZSeek, OpenProcessToken,
+	OpenThreadToken, RegCloseKey, RegCreateKeyExA, RegCreateKeyExW,
+	RegDeleteKeyExA, RegDeleteKeyExW, RegDeleteValueA, RegDeleteValueW,
+	RegEnumKeyExA, RegEnumKeyExW, RegEnumValueA, RegEnumValueW, RegFlushKey,
+	RegGetKeySecurity, RegLoadKeyA, RegLoadKeyW, RegNotifyChangeKeyValue,
+	RegOpenCurrentUser, RegOpenKeyExA, RegOpenKeyExW, RegOpenUserClassesRoot,
+	RegQueryInfoKeyA, RegQueryInfoKeyW, RegQueryValueExA, RegQueryValueExW,
+	RegRestoreKeyA, RegRestoreKeyW, RegSetKeySecurity, RegSetValueExA,
+	RegSetValueW, RegUnLoadKeyA, RegUnLoadKeyW, RtlCaptureStackBackTrace,
+	RtlFillMemory, RtlMoveMemory, RtlZeroMemory, SetThreadToken): Remove
+	conflicting definition.
+	* lib/th32.def: Remove.
+	* lib/ntdll.def (RtlUnwind): Remove conflicting definition.
+	* lib/version.def (VerLanguageNameA, VerLanguageNameW): Remove conflicting
+	definition.
+
+2010-08-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/kernel32.def (CreateProcessAsUserW): Remove definition.
 
 2010-08-20  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>

@@ -642,7 +642,6 @@ RtlUnicodeToMultiByteSize@12
 RtlUnicodeToOemN@20
 RtlUniform@4
 RtlUnlockHeap@4
-RtlUnwind@16
 RtlUpcaseUnicodeChar@4
 RtlUpcaseUnicodeString@12
 RtlUpcaseUnicodeStringToAnsiString@12
