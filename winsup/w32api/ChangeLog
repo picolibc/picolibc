@@ -1,3 +1,7 @@
+2010-08-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/CheckConflicts.sh: New file.
+
 2010-08-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* lib/kernel32.def (CopyLZFile, GetExpandedNameA, GetExpandedNameW, LZClose,
