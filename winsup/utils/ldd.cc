@@ -274,16 +274,9 @@ report (const char *in_fn, bool multiple)
     print_errno_error_and_return (fn);
 
   bool isdll;
-  wchar_t fn_win_buf[len + 1];
-  if (cygwin_conv_path (CCP_POSIX_TO_WIN_W, fn, fn_win_buf, len))
+  wchar_t fn_win[len + 1];
+  if (cygwin_conv_path (CCP_POSIX_TO_WIN_W, fn, fn_win, len))
     print_errno_error_and_return (fn);
-  wchar_t *fn_win = fn_win_buf + 4;
-
-  if (wcsncmp (fn_win_buf, L"\\\\?\\UNC\\", 8) == 0)
-    {
-      fn_win += 2;
-      *fn_win = L'\\';
-    }
 
   if (!fn || start_process (fn_win, isdll))
     print_errno_error_and_return (in_fn);

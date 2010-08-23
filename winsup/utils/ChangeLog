@@ -1,3 +1,8 @@
+2010-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldd.cc (report): Drop long pathname considerations which result in
+	invalid path, now that this is done in cygwin_conv_path.
+
 2010-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (from_fstab): Fix potentially fatal typo.
