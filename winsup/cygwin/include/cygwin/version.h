@@ -390,7 +390,7 @@ details. */
       228: CW_STRERROR added.
       229: Add mkostemp, mkostemps.
       230: Add CLOCK_MONOTONIC.
-      231: CW_SETCWD
+      231: CW_SYNC_WINCWD.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
