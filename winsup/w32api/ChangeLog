@@ -1,5 +1,11 @@
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/exdisp.h (get_RegisterAsBrowser): Fix typo.
+
+	Thank you to cheznonnon for reporting the issue.
+
+2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/ws2_32.def: Regenerate using gendef on a Win7 machine.
 
 2010-08-24  Ozkan Sezer  <sezero@users.sourceforge.net>
