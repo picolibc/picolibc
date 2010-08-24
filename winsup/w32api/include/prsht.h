@@ -4,6 +4,22 @@
 #pragma GCC system_header
 #endif
 
+#ifndef SNDMSG
+#ifdef __cplusplus
+#define SNDMSG ::SNDMSG
+#else
+#define SNDMSG SNDMSG
+#endif
+#endif /* ifndef SNDMSG */
+
+#ifndef POSTMSG
+#ifdef __cplusplus
+#define POSTMSG ::POSTMSG
+#else
+#define POSTMSG POSTMSG
+#endif
+#endif /* ifndef POSTMSG */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -253,24 +269,24 @@ HPROPSHEETPAGE WINAPI CreatePropertySheetPageW(LPCPROPSHEETPAGEW);
 BOOL WINAPI DestroyPropertySheetPage(HPROPSHEETPAGE);
 int WINAPI PropertySheetA(LPCPROPSHEETHEADERA);
 int WINAPI PropertySheetW(LPCPROPSHEETHEADERW);
-#define PropSheet_AddPage(d,p) SendMessage(d,PSM_ADDPAGE,0,(LPARAM)p)
-#define PropSheet_Apply(d) SendMessage(d,PSM_APPLY,0,0)
-#define PropSheet_CancelToClose(d) SendMessage(d,PSM_CANCELTOCLOSE,0,0)
-#define PropSheet_Changed(d,w) SendMessage(d,PSM_CHANGED,(WPARAM)w,0)
-#define PropSheet_GetCurrentPageHwnd(d) (HWND)SendMessage(d,PSM_GETCURRENTPAGEHWND,0,0)
-#define PropSheet_GetTabControl(d) (HWND)SendMessage(d,PSM_GETTABCONTROL,0,0)
-#define PropSheet_IsDialogMessage(d,m) (BOOL)SendMessage(d,PSM_ISDIALOGMESSAGE,0,(LPARAM)m)
-#define PropSheet_PressButton(d,i) SendMessage(d,PSM_PRESSBUTTON,i,0)
-#define PropSheet_QuerySiblings(d,w,l) SendMessage(d,PSM_QUERYSIBLINGS,w,l)
-#define PropSheet_RebootSystem(d) SendMessage(d,PSM_REBOOTSYSTEM,0,0)
-#define PropSheet_RemovePage(d,i,p) SendMessage(d,PSM_REMOVEPAGE,i,(LPARAM)p)
-#define PropSheet_RestartWindows(d) SendMessage(d,PSM_RESTARTWINDOWS,0,0)
-#define PropSheet_SetCurSel(d,p,i) SendMessage(d,PSM_SETCURSEL,i,(LPARAM)p)
-#define PropSheet_SetCurSelByID(d,i) SendMessage(d,PSM_SETCURSELID,0,i)
-#define PropSheet_SetFinishText(d,s) SendMessage(d,PSM_SETFINISHTEXT,0,(LPARAM)s)
-#define PropSheet_SetTitle(d,w,s) SendMessage(d,PSM_SETTITLE,w,(LPARAM)s)
-#define PropSheet_SetWizButtons(d,f) PostMessage(d,PSM_SETWIZBUTTONS,0,(LPARAM)f)
-#define PropSheet_UnChanged(d,w) SendMessage(d,PSM_UNCHANGED,(WPARAM)w,0)
+#define PropSheet_AddPage(d,p) SNDMSG(d,PSM_ADDPAGE,0,(LPARAM)p)
+#define PropSheet_Apply(d) SNDMSG(d,PSM_APPLY,0,0)
+#define PropSheet_CancelToClose(d) POSTMSG(d,PSM_CANCELTOCLOSE,0,0)
+#define PropSheet_Changed(d,w) SNDMSG(d,PSM_CHANGED,(WPARAM)w,0)
+#define PropSheet_GetCurrentPageHwnd(d) (HWND)SNDMSG(d,PSM_GETCURRENTPAGEHWND,0,0)
+#define PropSheet_GetTabControl(d) (HWND)SNDMSG(d,PSM_GETTABCONTROL,0,0)
+#define PropSheet_IsDialogMessage(d,m) (BOOL)SNDMSG(d,PSM_ISDIALOGMESSAGE,0,(LPARAM)m)
+#define PropSheet_PressButton(d,i) POSTMSG(d,PSM_PRESSBUTTON,i,0)
+#define PropSheet_QuerySiblings(d,w,l) SNDMSG(d,PSM_QUERYSIBLINGS,w,l)
+#define PropSheet_RebootSystem(d) SNDMSG(d,PSM_REBOOTSYSTEM,0,0)
+#define PropSheet_RemovePage(d,i,p) SNDMSG(d,PSM_REMOVEPAGE,i,(LPARAM)p)
+#define PropSheet_RestartWindows(d) SNDMSG(d,PSM_RESTARTWINDOWS,0,0)
+#define PropSheet_SetCurSel(d,p,i) SNDMSG(d,PSM_SETCURSEL,i,(LPARAM)p)
+#define PropSheet_SetCurSelByID(d,i) SNDMSG(d,PSM_SETCURSELID,0,i)
+#define PropSheet_SetFinishText(d,s) SNDMSG(d,PSM_SETFINISHTEXT,0,(LPARAM)s)
+#define PropSheet_SetTitle(d,w,s) SNDMSG(d,PSM_SETTITLE,w,(LPARAM)s)
+#define PropSheet_SetWizButtons(d,f) POSTMSG(d,PSM_SETWIZBUTTONS,0,(LPARAM)f)
+#define PropSheet_UnChanged(d,w) SNDMSG(d,PSM_UNCHANGED,(WPARAM)w,0)
 #endif
 
 #ifdef UNICODE

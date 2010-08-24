@@ -1,5 +1,11 @@
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/prsht.h (SNDMSG, POSTMSG): Define macros and use throughout.
+
+	Thank you to Ozkan Sezer for reporting the issue.
+
+2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/windowsx.h (SNDMSG): Define macro and use throughout.
 
 	Thank you to Chris Oldwood for reporting the issue.
