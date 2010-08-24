@@ -1916,6 +1916,10 @@ WINBASEAPI BOOL WINAPI MoveFileA(LPCSTR,LPCSTR);
 WINBASEAPI BOOL WINAPI MoveFileExA(LPCSTR,LPCSTR,DWORD);
 WINBASEAPI BOOL WINAPI MoveFileExW(LPCWSTR,LPCWSTR,DWORD);
 WINBASEAPI BOOL WINAPI MoveFileW(LPCWSTR,LPCWSTR);
+#if (_WIN32_WINNT >= 0x0500)
+WINBASEAPI BOOL WINAPI MoveFileWithProgressA(LPCSTR,LPCSTR,LPPROGRESS_ROUTINE,LPVOID,DWORD);
+WINBASEAPI BOOL WINAPI MoveFileWithProgressW(LPCWSTR,LPCWSTR,LPPROGRESS_ROUTINE,LPVOID,DWORD);
+#endif
 WINBASEAPI int WINAPI MulDiv(int,int,int);
 WINBASEAPI BOOL WINAPI NotifyChangeEventLog(HANDLE,HANDLE);
 WINBASEAPI BOOL WINAPI ObjectCloseAuditAlarmA(LPCSTR,PVOID,BOOL);
@@ -2351,6 +2355,9 @@ typedef PCACTCTXW PCACTCTX;
 #define lstrlen lstrlenW
 #define MoveFile MoveFileW
 #define MoveFileEx MoveFileExW
+#if (_WIN32_WINNT >= 0x0500)
+#define MoveFileWithProgress MoveFileWithProgressW
+#endif
 #define ObjectCloseAuditAlarm ObjectCloseAuditAlarmW
 #define ObjectDeleteAuditAlarm ObjectDeleteAuditAlarmW
 #define ObjectOpenAuditAlarm ObjectOpenAuditAlarmW
@@ -2552,6 +2559,9 @@ typedef PCACTCTXA PCACTCTX;
 #define lstrlen lstrlenA
 #define MoveFile MoveFileA
 #define MoveFileEx MoveFileExA
+#if (_WIN32_WINNT >= 0x0500)
+#define MoveFileWithProgress MoveFileWithProgressA
+#endif
 #define ObjectCloseAuditAlarm ObjectCloseAuditAlarmA
 #define ObjectDeleteAuditAlarm ObjectDeleteAuditAlarmA
 #define ObjectOpenAuditAlarm ObjectOpenAuditAlarmA
