@@ -3046,14 +3046,14 @@ typedef struct _IMAGE_OS2_HEADER {
 #pragma pack(pop)
 #pragma pack(push,4)
 typedef struct _IMAGE_NT_HEADERS {
-	DWORD Signature;
-	IMAGE_FILE_HEADER FileHeader;
-	IMAGE_OPTIONAL_HEADER OptionalHeader;
+DWORD Signature;
+IMAGE_FILE_HEADER FileHeader;
+IMAGE_OPTIONAL_HEADER32 OptionalHeader;
 } IMAGE_NT_HEADERS32,*PIMAGE_NT_HEADERS32;
 typedef struct _IMAGE_NT_HEADERS64 {
-	DWORD Signature;
-	IMAGE_FILE_HEADER FileHeader;
-	IMAGE_OPTIONAL_HEADER OptionalHeader;
+DWORD Signature;
+IMAGE_FILE_HEADER FileHeader;
+IMAGE_OPTIONAL_HEADER64 OptionalHeader;
 } IMAGE_NT_HEADERS64,*PIMAGE_NT_HEADERS64;
 #ifdef _WIN64
 typedef IMAGE_NT_HEADERS64	IMAGE_NT_HEADERS;

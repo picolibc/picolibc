@@ -1,5 +1,12 @@
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/winnt.h (IMAGE_NT_HEADERS32, IMAGE_NT_HEADERS64): Correct
+	definition.
+
+	Thank you to Pasi Ruokola for reporting the issue.
+
+2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/exdisp.h (get_RegisterAsBrowser): Fix typo.
 
 	Thank you to cheznonnon for reporting the issue.
