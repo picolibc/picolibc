@@ -188,7 +188,7 @@ DECLARE_INTERFACE_(IAccessible, IDispatch)
 typedef IAccessible* LPACCESSIBLE;
 
 STDAPI AccessibleChildren(IAccessible*,LONG,LONG,VARIANT*,LONG*);
-STDAPI AccessibleObjectFromEvent(HWND,DWORD,DWORD,IAccessible*,VARIANT*);
+STDAPI AccessibleObjectFromEvent(HWND,DWORD,DWORD,IAccessible**,VARIANT*);
 STDAPI AccessibleObjectFromPoint(POINT,IAccessible**,VARIANT*);
 STDAPI AccessibleObjectFromWindow(HWND,DWORD,REFIID,void**);
 STDAPI CreateStdAccessibleObject(HWND,LONG,REFIID,void**);
