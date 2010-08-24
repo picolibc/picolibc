@@ -1,3 +1,26 @@
+2010-08-24  Ozkan Sezer  <sezero@users.sourceforge.net>
+
+	* winnt.h: Fix several SUBLANG ID errors (ref:
+	http://msdn.microsoft.com/en-us/library/dd318693(VS.85).aspx).
+	(SUBLANG_UI_CUSTOM_DEFAULT): 0x05, not 0x03.
+	(SUBLANG_HAUSA_NIGERIA): Bad ID name, correct one is ...
+	(SUBLANG_HAUSA_NIGERIA_LATIN): ... this.
+	(SUBLANG_INUKTITUT_CANADA_LATIN): 0x02, not 0x01.
+	(SUBLANG_IRISH_IRELAND): 0x02, not 0x01.
+	(SUBLANG_LAO_LAO_PDR): Bad ID name, correct one is ...
+	(SUBLANG_LAO_LAO): ... this.
+	(SUBLANG_LOWER_SORBIAN_GERMANY): 0x02, not 0x01.
+	(SUBLANG_SAMI_SKOLT_FINLAND): 0x08, not 0x03.
+	(SUBLANG_SAMI_INARI_FINLAND): 0x09, not 0x03.
+	(SUBLANG_SYRIAC_SYRIA): define as SUBLANG_SYRIAC (what MSDN mentions).
+	(SUBLANG_TIGRIGNA_ERITREA): 0x02, not 0x01.
+	(SUBLANG_BENGALI_INDIA): 0x01, not 0x00.
+	(SUBLANG_BENGALI_BANGLADESH): 0x02, not 0x01.
+	(SUBLANG_PUNJABI_INDIA): 0x01, not 0x00.
+	(SUBLANG_PUNJABI_PAKISTAN): not defined in MSDN.
+	(SUBLANG_ROMANIAN_ROMANIA): 0x01, not 0x00.
+	(SUBLANG_ROMANIAN_MOLDOVA): not defined in MSDN.
+
 2010-08-24  LRN  <lrn1986@gmail.com>
 
 	* include/mmreg.h (MPEGLAYER3WAVEFORMAT, WAVE_FORMAT_UNKNOWN,
