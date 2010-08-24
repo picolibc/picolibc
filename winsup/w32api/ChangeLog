@@ -1,3 +1,7 @@
+2010-08-24  Vinky  <rabbit_vinky@users.sourceforge.net>
+
+	* include/winbase.h (OVERLAPPED): Correct definition.
+
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winnt.h (IMAGE_NT_HEADERS32, IMAGE_NT_HEADERS64): Correct
