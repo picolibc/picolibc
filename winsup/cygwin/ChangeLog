@@ -1,3 +1,8 @@
+2010-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): In CW_CVT_MNT_OPTS case, initialize
+	flags with *pflags to restore original behaviour.
+
 2010-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_IMPORTS): Link against advapi32.a before kernel32.a.

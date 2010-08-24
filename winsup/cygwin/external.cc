@@ -507,7 +507,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  else
 	    {
 	      unsigned *pflags = va_arg (arg, unsigned *);
-	      unsigned flags = 0;
+	      unsigned flags = pflags ? *pflags : 0;
 	      if (fstab_read_flags (option_string, flags, true))
 		{
 		  if (pflags)
