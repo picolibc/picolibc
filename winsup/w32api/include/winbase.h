@@ -570,6 +570,17 @@ extern "C" {
 #define PROCESS_DEP_ENABLE 1
 #define PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION 2
 #endif
+#if (_WIN32_WINNT >= 0x0600)
+/* http://msdn.microsoft.com/en-us/library/aa363866%28VS.85%29.aspx */
+#define SYMBOLIC_LINK_FLAG_DIRECTORY 0x1
+/* http://msdn.microsoft.com/en-us/library/aa364962%28VS.85%29.aspx */
+#define FILE_NAME_NORMALIZED 0x0
+#define FILE_NAME_OPENED 0x8
+#define VOLUME_NAME_DOS 0x0
+#define VOLUME_NAME_GUID 0x1
+#define VOLUME_NAME_NONE 0x4
+#define VOLUME_NAME_NT 0x2
+#endif /* (_WIN32_WINNT >= 0x0600) */
 
 #ifndef RC_INVOKED
 typedef struct _FILETIME {
@@ -588,6 +599,86 @@ typedef struct _BY_HANDLE_FILE_INFORMATION {
 	DWORD	nFileIndexHigh;
 	DWORD	nFileIndexLow;
 } BY_HANDLE_FILE_INFORMATION,*LPBY_HANDLE_FILE_INFORMATION;
+#if (_WIN32_WINNT >= 0x0600)
+/* http://msdn.microsoft.com/en-us/library/aa364217%28VS.85%29.aspx */
+typedef struct _FILE_BASIC_INFO {
+	LARGE_INTEGER	CreationTime;
+	LARGE_INTEGER	LastAccessTime;
+	LARGE_INTEGER	LastWriteTime;
+	LARGE_INTEGER	ChangeTime;
+	DWORD	FileAttributes;
+} FILE_BASIC_INFO,*PFILE_BASIC_INFO,*LPFILE_BASIC_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364401%28VS.85%29.aspx */
+typedef struct _FILE_STANDARD_INFO {
+	LARGE_INTEGER	AllocationSize;
+	LARGE_INTEGER	EndOfFile;
+	DWORD	NumberOfLinks;
+	BOOL	DeletePending;
+	BOOL	Directory;
+} FILE_STANDARD_INFO,*PFILE_STANDARD_INFO,*LPFILE_STANDARD_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364388%28v=VS.85%29.aspx */
+typedef struct _FILE_NAME_INFO {
+	DWORD	FileNameLength;
+	WCHAR	FileName[1];
+} FILE_NAME_INFO,*PFILE_NAME_INFO,*LPFILE_NAME_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364406%28v=VS.85%29.aspx */
+typedef struct _FILE_STREAM_INFO {
+	DWORD	NextEntryOffset;
+	DWORD	StreamNameLength;
+	LARGE_INTEGER	StreamSize;
+	LARGE_INTEGER	StreamAllocationSize;
+	WCHAR	StreamName[1];
+} FILE_STREAM_INFO,*PFILE_STREAM_INFO,*LPFILE_STREAM_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364220%28v=VS.85%29.aspx */
+typedef struct _FILE_COMPRESSION_INFO {
+	LARGE_INTEGER	CompressedFileSize;
+	WORD	CompressionFormat;
+	UCHAR	CompressionUnitShift;
+	UCHAR	ChunkShift;
+	UCHAR	ClusterShift;
+	UCHAR	Reserved[3];
+} FILE_COMPRESSION_INFO,*PFILE_COMPRESSION_INFO,*LPFILE_COMPRESSION_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364216%28v=VS.85%29.aspx */
+typedef struct _FILE_ATTRIBUTE_TAG_INFO {
+	DWORD	FileAttributes;
+	DWORD	ReparseTag;
+} FILE_ATTRIBUTE_TAG_INFO,*PFILE_ATTRIBUTE_TAG_INFO,*LPFILE_ATTRIBUTE_TAG_INFO;
+/* http://msdn.microsoft.com/en-us/library/aa364226%28v=VS.85%29.aspx */
+typedef struct _FILE_ID_BOTH_DIR_INFO {
+	DWORD	NextEntryOffset;
+	DWORD	FileIndex;
+	LARGE_INTEGER	CreationTime;
+	LARGE_INTEGER	LastAccessTime;
+	LARGE_INTEGER	LastWriteTime;
+	LARGE_INTEGER	ChangeTime;
+	LARGE_INTEGER	EndOfFile;
+	LARGE_INTEGER	AllocationSize;
+	DWORD	FileAttributes;
+	DWORD	FileNameLength;
+	DWORD	EaSize;
+	CCHAR	ShortNameLength;
+	WCHAR	ShortName[12];
+	LARGE_INTEGER	FileId;
+	WCHAR	FileName[1];
+} FILE_ID_BOTH_DIR_INFO,*PFILE_ID_BOTH_DIR_INFO,*LPFILE_ID_BOTH_DIR_INFO;
+/* http://msdn.microsoft.com/en-us/library/dd979524%28v=VS.85%29.aspx */
+typedef struct _FILE_REMOTE_PROTOCOL_INFO {
+	USHORT StructureVersion;
+	USHORT StructureSize;
+	ULONG  Protocol;
+	USHORT ProtocolMajorVersion;
+	USHORT ProtocolMinorVersion;
+	USHORT ProtocolRevision;
+	USHORT Reserved;
+	ULONG  Flags;
+	struct {
+		ULONG	Reserved[8];
+	} GenericReserved;
+	struct {
+		ULONG	Reserved[16];
+	} ProtocolSpecificReserved;
+} FILE_REMOTE_PROTOCOL_INFO,*PFILE_REMOTE_PROTOCOL_INFO,*LPFILE_REMOTE_PROTOCOL_INFO;
+#endif /* (_WIN32_WINNT >= 0x0600) */
 typedef struct _DCB {
 	DWORD DCBlength;
 	DWORD BaudRate;
@@ -1071,6 +1162,24 @@ typedef enum _DEP_SYSTEM_POLICY_TYPE {
 	OptIn,
 	OptOut 
 } DEP_SYSTEM_POLICY_TYPE;
+/* http://msdn.microsoft.com/en-us/library/aa364228%28v=VS.85%29.aspx */
+typedef enum _FILE_INFO_BY_HANDLE_CLASS {
+  FileBasicInfo,
+  FileStandardInfo,
+  FileNameInfo,
+  FileRenameInfo,
+  FileDispositionInfo,
+  FileAllocationInfo,
+  FileEndOfFileInfo,
+  FileStreamInfo,
+  FileCompressionInfo,
+  FileAttributeTagInfo,
+  FileIdBothDirectoryInfo,
+  FileIdBothDirectoryRestartInfo,
+  FileIoPriorityHintInfo,
+  FileRemoteProtocolInfo,
+  MaximumFileInfoByHandlesClass
+} FILE_INFO_BY_HANDLE_CLASS,*PFILE_INFO_BY_HANDLE_CLASS;
 #endif
 
 typedef DWORD(WINAPI *LPPROGRESS_ROUTINE)(LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,DWORD,DWORD,HANDLE,HANDLE,LPVOID);
@@ -1469,6 +1578,10 @@ WINBASEAPI DWORD WINAPI GetFileAttributesW(LPCWSTR);
 WINBASEAPI BOOL WINAPI GetFileAttributesExA(LPCSTR,GET_FILEEX_INFO_LEVELS,PVOID);
 WINBASEAPI BOOL WINAPI GetFileAttributesExW(LPCWSTR,GET_FILEEX_INFO_LEVELS,PVOID);
 WINBASEAPI BOOL WINAPI GetFileInformationByHandle(HANDLE,LPBY_HANDLE_FILE_INFORMATION);
+#if (_WIN32_WINNT >= 0x0600)
+/* http://msdn.microsoft.com/en-us/library/aa364953%28VS.85%29.aspx */
+WINBASEAPI BOOL WINAPI GetFileInformationByHandleEx(HANDLE,FILE_INFO_BY_HANDLE_CLASS,LPVOID,DWORD);
+#endif
 WINBASEAPI BOOL WINAPI GetFileSecurityA(LPCSTR,SECURITY_INFORMATION,PSECURITY_DESCRIPTOR,DWORD,PDWORD);
 WINBASEAPI BOOL WINAPI GetFileSecurityW(LPCWSTR,SECURITY_INFORMATION,PSECURITY_DESCRIPTOR,DWORD,PDWORD);
 WINBASEAPI DWORD WINAPI GetFileSize(HANDLE,PDWORD);
@@ -1477,6 +1590,11 @@ WINBASEAPI BOOL WINAPI GetFileSizeEx(HANDLE,PLARGE_INTEGER);
 #endif
 WINBASEAPI BOOL WINAPI GetFileTime(HANDLE,LPFILETIME,LPFILETIME,LPFILETIME);
 WINBASEAPI DWORD WINAPI GetFileType(HANDLE);
+#if (_WIN32_WINNT >= 0x0600)
+/* http://msdn.microsoft.com/en-us/library/aa364962%28VS.85%29.aspx */
+WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleA(HANDLE,LPSTR,DWORD,DWORD);
+WINBASEAPI DWORD WINAPI GetFinalPathNameByHandleW(HANDLE,LPWSTR,DWORD,DWORD);
+#endif
 #define GetFreeSpace(w) (0x100000L)
 WINBASEAPI DWORD WINAPI GetFullPathNameA(LPCSTR,DWORD,LPSTR,LPSTR*);
 WINBASEAPI DWORD WINAPI GetFullPathNameW(LPCWSTR,DWORD,LPWSTR,LPWSTR*);
@@ -2168,6 +2286,9 @@ typedef PCACTCTXW PCACTCTX;
 #define GetFileAttributes GetFileAttributesW
 #define GetFileSecurity GetFileSecurityW
 #define GetFileAttributesEx GetFileAttributesExW
+#if (_WIN32_WINNT >= 0x0600)
+#define GetFinalPathNameByHandle GetFinalPathNameByHandleW
+#endif
 #define GetFullPathName GetFullPathNameW
 #define GetLogicalDriveStrings GetLogicalDriveStringsW
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
@@ -2366,6 +2487,9 @@ typedef PCACTCTXA PCACTCTX;
 #define GetFileAttributes GetFileAttributesA
 #define GetFileSecurity GetFileSecurityA
 #define GetFileAttributesEx GetFileAttributesExA
+#if (_WIN32_WINNT >= 0x0600)
+#define GetFinalPathNameByHandle GetFinalPathNameByHandleA
+#endif
 #define GetFullPathName GetFullPathNameA
 #define GetLogicalDriveStrings GetLogicalDriveStringsA
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
