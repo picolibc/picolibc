@@ -11,7 +11,18 @@
 extern "C" {
 #endif
 
-typedef HANDLE HACMDRIVERID, HACMDRIVER, *LPHACMDRIVER; /*they're handles, right?*/
+DECLARE_HANDLE(HACMDRIVERID);
+typedef HACMDRIVERID *PHACMDRIVERID;
+typedef HACMDRIVERID *LPHACMDRIVERID;
+DECLARE_HANDLE(HACMDRIVER);
+typedef HACMDRIVER *PHACMDRIVER;
+typedef HACMDRIVER *LPHACMDRIVER;
+DECLARE_HANDLE(HACMSTREAM);
+typedef HACMSTREAM *PHACMSTREAM;
+typedef HACMSTREAM *LPHACMSTREAM;
+DECLARE_HANDLE(HACMOBJ);
+typedef HACMOBJ *PHACMOBJ;
+typedef HACMOBJ *LPHACMOBJ;
 
 /*found through experimentation*/
 #define ACMDRIVERDETAILS_SHORTNAME_CHARS 32
@@ -43,6 +54,30 @@ typedef struct {
 	DWORD          cbwfx;
 	WCHAR szFormat[ACMFORMATDETAILS_FORMAT_CHARS];
 } ACMFORMATDETAILSW, *LPACMFORMATDETAILSW;
+
+/*msdn.microsoft.com/en-us/library/dd742926%28VS.85%29.aspx*/
+typedef struct {
+  DWORD     cbStruct;
+  DWORD     fdwStatus;
+  DWORD_PTR dwUser;
+  LPBYTE    pbSrc;
+  DWORD     cbSrcLength;
+  DWORD     cbSrcLengthUsed;
+  DWORD_PTR dwSrcUser;
+  LPBYTE    pbDst;
+  DWORD     cbDstLength;
+  DWORD     cbDstLengthUsed;
+  DWORD_PTR dwDstUser;
+  DWORD     dwReservedDriver[10];
+} ACMSTREAMHEADER, *LPACMSTREAMHEADER;
+
+/*msdn.microsoft.com/en-us/library/dd757711%28v=VS.85%29.aspx*/
+typedef struct {
+  DWORD cbStruct;
+  DWORD dwFilterTag;
+  DWORD fdwFilter;
+  DWORD dwReserved[5];
+} WAVEFILTER, *LPWAVEFILTER;
 
 /*msdn.microsoft.com/library/default.asp?url=/library/en-us/multimed/htm/_win32_acmformattagdetails_str.asp*/
 typedef struct {
@@ -146,6 +181,14 @@ MMRESULT WINAPI acmDriverEnum(ACMDRIVERENUMCB fnCallback, DWORD_PTR dwInstance, 
 /*msdn.microsoft.com/library/default.asp?url=/library/en-us/multimed/htm/_win32_acmformatenum.asp*/
 MMRESULT WINAPI acmFormatEnumA(HACMDRIVER had, LPACMFORMATDETAILSA pafd, ACMFORMATENUMCBA fnCallback, DWORD_PTR dwInstance, DWORD fdwEnum);
 MMRESULT WINAPI acmFormatEnumW(HACMDRIVER had, LPACMFORMATDETAILSW pafd, ACMFORMATENUMCBW fnCallback, DWORD_PTR dwInstance, DWORD fdwEnum);
+
+/*msdn.microsoft.com/en-us/library/dd742885%28VS.85%29.aspx*/
+MMRESULT WINAPI acmDriverAddA(LPHACMDRIVERID phadid, HINSTANCE hinstModule, LPARAM lParam, DWORD dwPriority, DWORD fdwAdd);
+MMRESULT WINAPI acmDriverAddW(LPHACMDRIVERID phadid, HINSTANCE hinstModule, LPARAM lParam, DWORD dwPriority, DWORD fdwAdd);
+
+/*msdn.microsoft.com/en-us/library/dd742897%28v=VS.85%29.aspx*/
+MMRESULT WINAPI acmDriverRemove(HACMDRIVERID hadid, DWORD fdwRemove);
+
 /*msdn.microsoft.com/library/default.asp?url=/library/en-us/multimed/htm/_win32_acmdriverclose.asp*/
 MMRESULT WINAPI acmDriverClose(HACMDRIVER had, DWORD fdwClose);
 /*msdn.microsoft.com/library/default.asp?url=/library/en-us/multimed/htm/_win32_acmdriverdetails.asp*/
@@ -154,6 +197,30 @@ MMRESULT WINAPI acmDriverDetailsW(HACMDRIVERID hadid, LPACMDRIVERDETAILSW padd, 
 /*msdn.microsoft.com/library/default.asp?url=/library/en-us/multimed/htm/_win32_acmformattagenum.asp*/
 MMRESULT WINAPI acmFormatTagEnumA(HACMDRIVER had, LPACMFORMATTAGDETAILSA paftd, ACMFORMATTAGENUMCBA fnCallback, DWORD_PTR dwInstance, DWORD fdwEnum);
 MMRESULT WINAPI acmFormatTagEnumW(HACMDRIVER had, LPACMFORMATTAGDETAILSW paftd, ACMFORMATTAGENUMCBW fnCallback, DWORD_PTR dwInstance, DWORD fdwEnum);
+
+/*msdn.microsoft.com/en-us/library/dd742922(VS.85).aspx*/
+MMRESULT WINAPI acmMetrics(HACMOBJ hao, UINT uMetric, LPVOID pMetric);
+
+/*msdn.microsoft.com/en-us/library/dd742928%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamOpen(LPHACMSTREAM phas, HACMDRIVER had, LPWAVEFORMATEX pwfxSrc, LPWAVEFORMATEX pwfxDst, LPWAVEFILTER pwfltr, DWORD_PTR dwCallback, DWORD_PTR dwInstance, DWORD fdwOpen);
+
+/*msdn.microsoft.com/en-us/library/dd742931%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamSize(HACMSTREAM has, DWORD cbInput, LPDWORD pdwOutputBytes, DWORD fdwSize);
+
+/*msdn.microsoft.com/en-us/library/dd742929%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamPrepareHeader(HACMSTREAM has, LPACMSTREAMHEADER pash, DWORD fdwPrepare);
+
+/*msdn.microsoft.com/en-us/library/dd742932%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamUnprepareHeader(HACMSTREAM has, LPACMSTREAMHEADER pash, DWORD fdwUnprepare);
+
+/*msdn.microsoft.com/en-us/library/dd742930%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamReset(HACMSTREAM has, DWORD fdwReset);
+
+/*msdn.microsoft.com/en-us/library/dd742923%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamClose(HACMSTREAM has, DWORD fdwClose);
+
+/*msdn.microsoft.com/en-us/library/dd742924%28VS.85%29.aspx*/
+MMRESULT WINAPI acmStreamConvert(HACMSTREAM has, LPACMSTREAMHEADER pash, DWORD fdwConvert);
 
 #ifdef UNICODE
 
@@ -165,6 +232,7 @@ typedef ACMFORMATTAGENUMCBW ACMFORMATTAGENUMCB;
 #define acmFormatEnum acmFormatEnumW
 #define acmDriverDetails acmDriverDetailsW
 #define acmFormatTagEnum acmFormatTagEnumW
+#define acmDriverAdd acmDriverAddW
 
 #else /*ifdef UNICODE*/
 
@@ -176,6 +244,7 @@ typedef ACMFORMATTAGENUMCBA ACMFORMATTAGENUMCB;
 #define acmFormatEnum acmFormatEnumA
 #define acmDriverDetails acmDriverDetailsA
 #define acmFormatTagEnum acmFormatTagEnumA
+#define acmDriverAdd acmDriverAddA
 
 #endif /*ifdef UNICODE*/
 
