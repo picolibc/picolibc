@@ -289,12 +289,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_mvfs (RtlEqualUnicodePathPrefix (&fsname, &ro_u_mvfs, FALSE))
 	  /* NWFS == Novell Netware FS.  Broken info class, see below. */
 	  && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
-	  /* Known remote file system which can't handle calls to
-	     NtQueryDirectoryFile(FileIdBothDirectoryInformation) */
+	  /* UNIXFS == TotalNet Advanced Server (TAS).  Doesn't support
+	     FileIdBothDirectoryInformation.  See below. */
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
-	/* Known remote file system with buggy open calls.  Further
-	   explanation in fhandler.cc (fhandler_disk_file::open). */
 	{
+	  /* Known remote file system with buggy open calls.  Further
+	     explanation in fhandler.cc (fhandler_disk_file::open_fs). */
 	  is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
 	  has_buggy_open (is_sunwnfs ());
 	}
