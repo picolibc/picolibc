@@ -262,6 +262,7 @@ typedef LONG HRESULT;
 #ifndef XFree86Server
 typedef WORD ATOM;
 #endif /* XFree86Server */
+typedef HANDLE HHOOK;
 typedef HANDLE HGLOBAL;
 typedef HANDLE HLOCAL;
 typedef HANDLE GLOBALHANDLE;
