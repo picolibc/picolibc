@@ -6,17 +6,17 @@
 
 #ifndef SNDMSG
 #ifdef __cplusplus
-#define SNDMSG ::SNDMSG
+#define SNDMSG ::SendMessage
 #else
-#define SNDMSG SNDMSG
+#define SNDMSG SendMessage
 #endif
 #endif /* ifndef SNDMSG */
 
 #ifndef POSTMSG
 #ifdef __cplusplus
-#define POSTMSG ::POSTMSG
+#define POSTMSG ::PostMessage
 #else
-#define POSTMSG POSTMSG
+#define POSTMSG PostMessage
 #endif
 #endif /* ifndef POSTMSG */
 

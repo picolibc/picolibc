@@ -6,9 +6,9 @@
 
 #ifndef SNDMSG
 #ifdef __cplusplus
-#define SNDMSG ::SNDMSG
+#define SNDMSG ::SendMessage
 #else
-#define SNDMSG SNDMSG
+#define SNDMSG SendMessage
 #endif
 #endif /* ifndef SNDMSG */
 

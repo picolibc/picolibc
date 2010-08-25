@@ -1,5 +1,10 @@
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/prsht.h (SNDMDG, POSTMSG): Fix typo.
+	* include/windowsx.h (SNDMSG): Ditto.
+
+2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/prsht.h (SNDMSG, POSTMSG): Define macros and use throughout.
 
 	Thank you to Ozkan Sezer for reporting the issue.
