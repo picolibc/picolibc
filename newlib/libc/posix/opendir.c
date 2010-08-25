@@ -74,6 +74,7 @@ _DEFUN(opendir, (name),
 	dirp->dd_len = 512;
 
 	if (dirp->dd_buf == NULL) {
+		free (dirp);
 		close (fd);
 		return NULL;
 	}
