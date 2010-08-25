@@ -1,3 +1,9 @@
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winbase.h (GetEnvironmentStrings, GetEnvironmentStringsA): Per
+	MSDN, change return type to LPCH.
+	(GetEnvironmentStringsW): Per MSDN, change return type to LPWCH.
+
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/prsht.h (SNDMDG, POSTMSG): Fix typo.
