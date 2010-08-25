@@ -3,11 +3,15 @@
 	* include/winuser.h (HHOOK): Move definition from here...
 	* include/windef.h: ...to here, as per MSDN.
 
+	Thank you to Samuel Thibault for reporting the issue.
+
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (GetEnvironmentStrings, GetEnvironmentStringsA): Per
 	MSDN, change return type to LPCH.
 	(GetEnvironmentStringsW): Per MSDN, change return type to LPWCH.
+
+	Thank you to Emmanuel Stapf for reporting the issue.
 
 2010-08-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
