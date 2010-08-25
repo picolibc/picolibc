@@ -2010,10 +2010,13 @@ rename (const char *oldpath, const char *newpath)
     start_transaction (old_trans, trans);
 
 retry:
-  /* DELETE is required to rename a file.  Samba (only some versions?) doesn't
-     like the FILE_SHARE_DELETE mode if the file has the R/O attribute set
-     and returns STATUS_ACCESS_DENIED in that case. */
-  status = NtOpenFile (&fh, DELETE, oldpc.get_object_attr (attr, sec_none_nih),
+  /* DELETE is required to rename a file.  At least one cifs FS (Tru64) needs
+     FILE_READ_ATTRIBUTE, otherwise the FileRenameInformation call fails with
+     STATUS_ACCESS_DENIED.  Samba (only some versions?) doesn't like the
+     FILE_SHARE_DELETE mode if the file has the R/O attribute set and returns
+     STATUS_ACCESS_DENIED in that case. */
+  status = NtOpenFile (&fh, DELETE | FILE_READ_ATTRIBUTES,
+		     oldpc.get_object_attr (attr, sec_none_nih),
 		     &io,
 		     oldpc.fs_is_samba () ? FILE_SHARE_READ | FILE_SHARE_WRITE
 					  : FILE_SHARE_VALID_FLAGS,

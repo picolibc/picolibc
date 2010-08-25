@@ -1,3 +1,7 @@
+2010-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Open file with FILE_READ_ATTRIBUTES.
+
 2010-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Fix comment.
