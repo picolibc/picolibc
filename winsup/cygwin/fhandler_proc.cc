@@ -1097,110 +1097,74 @@ format_proc_partitions (void *, char *&destbuf)
 	  || dbi->ObjectName.Length < 18
 	  || !isdigit (devname[8]))
 	continue;
-      /* Construct path name for partition 0, which is the whole disk,
-	 and try to open. */
-      wcscpy (wpath, dbi->ObjectName.Buffer);
-      wcscpy (wpath + dbi->ObjectName.Length / 2, L"\\Partition0");
-      upath.Length = 22 + dbi->ObjectName.Length;
-      upath.MaximumLength = upath.Length + 2;
-      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-				  dirhdl, NULL);
-      status = NtOpenFile (&devhdl, READ_CONTROL | FILE_READ_DATA, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS, 0);
-      if (!NT_SUCCESS (status))
+      /* Construct path name for partitions, starting with 0, which is the
+	 whole disk, and try to open.  Let's assume we never have more than
+	 99 partitions per disk for now... */
+      for (int part_num = 0; part_num < 99; ++part_num)
 	{
-	  /* Retry with READ_CONTROL only for non-privileged users.  This
-	     at least prints the Partition0 info, but it doesn't allow access
-	     to the drive's layout information.  It beats me, though, why
-	     a non-privileged user shouldn't get read access to the drive
-	     layout information. */
+	  wcscpy (wpath, dbi->ObjectName.Buffer);
+	  __small_swprintf (wpath + dbi->ObjectName.Length / 2,
+			    L"\\Partition%d", part_num);
+	  upath.Length = 22 + dbi->ObjectName.Length;
+	  upath.MaximumLength = upath.Length + 2;
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				      dirhdl, NULL);
 	  status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
 			       FILE_SHARE_VALID_FLAGS, 0);
 	  if (!NT_SUCCESS (status))
 	    {
+	      if (status == STATUS_OBJECT_NAME_NOT_FOUND
+		  || status == STATUS_OBJECT_PATH_NOT_FOUND)
+		break;
 	      debug_printf ("NtOpenFile(%s), status %p", devname, status);
 	      continue;
 	    }
-	}
 
-      /* Use a buffer since some ioctl buffers aren't fixed size. */
-      char buf[256];
-      PARTITION_INFORMATION *pi = NULL;
-      PARTITION_INFORMATION_EX *pix = NULL;
-      DISK_GEOMETRY *dg = NULL;
-      DWORD bytes;
-      unsigned long drive_number = strtoul (devname + 8, NULL, 10);
-      unsigned long long size;
+	  /* Use a buffer since some ioctl buffers aren't fixed size. */
+	  char buf[256];
+	  PARTITION_INFORMATION *pi = NULL;
+	  PARTITION_INFORMATION_EX *pix = NULL;
+	  DISK_GEOMETRY *dg = NULL;
+	  DWORD bytes;
+	  unsigned long drive_number = strtoul (devname + 8, NULL, 10);
+	  unsigned long long size;
 
-      if (wincap.has_disk_ex_ioctls ()
-	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX,
-			      NULL, 0, buf, 256, &bytes, NULL))
-	{
-	  pix = (PARTITION_INFORMATION_EX *) buf;
-	  size = pix->PartitionLength.QuadPart;
-	}
-      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO,
-				NULL, 0, buf, 256, &bytes, NULL))
-	{
-	  pi = (PARTITION_INFORMATION *) buf;
-	  size = pi->PartitionLength.QuadPart;
-	}
-      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_GEOMETRY,
-				NULL, 0, buf, 256, &bytes, NULL))
-	{
-	  dg = (DISK_GEOMETRY *) buf;
-	  size = (unsigned long long) dg->Cylinders.QuadPart
-		       * dg->TracksPerCylinder
-		       * dg->SectorsPerTrack
-		       * dg->BytesPerSector;
-	}
-      else
-	size = 0;
-      if (!pi && !pix && !dg)
-	debug_printf ("DeviceIoControl %E");
-      else
-	{
-	  device dev;
-	  dev.parsedisk (drive_number, 0);
-	  bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-				     dev.major, dev.minor,
-				     size >> 10, dev.name + 5);
-	}
-      size_t buf_size = 8192;
-      while (true)
-	{
-	  char buf[buf_size];
-	  if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT,
-				NULL, 0, (DRIVE_LAYOUT_INFORMATION *) buf,
-				buf_size, &bytes, NULL))
-	    /* fall through */;
-	  else if (GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+	  if (wincap.has_disk_ex_ioctls ()
+	      && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX,
+				  NULL, 0, buf, 256, &bytes, NULL))
 	    {
-	      buf_size *= 2;
-	      continue;
+	      pix = (PARTITION_INFORMATION_EX *) buf;
+	      size = pix->PartitionLength.QuadPart;
+	    }
+	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO,
+				    NULL, 0, buf, 256, &bytes, NULL))
+	    {
+	      pi = (PARTITION_INFORMATION *) buf;
+	      size = pi->PartitionLength.QuadPart;
+	    }
+	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_GEOMETRY,
+				    NULL, 0, buf, 256, &bytes, NULL))
+	    {
+	      dg = (DISK_GEOMETRY *) buf;
+	      size = (unsigned long long) dg->Cylinders.QuadPart
+			   * dg->TracksPerCylinder
+			   * dg->SectorsPerTrack
+			   * dg->BytesPerSector;
 	    }
 	  else
+	    size = 0;
+	  if (!pi && !pix && !dg)
+	    debug_printf ("DeviceIoControl %E");
+	  else
 	    {
-	      debug_printf ("DeviceIoControl %E");
-	      break;
-	    }
-	  DRIVE_LAYOUT_INFORMATION *dli = (DRIVE_LAYOUT_INFORMATION *) buf;
-	  for (unsigned part = 0; part < dli->PartitionCount; part++)
-	    {
-	      if (!dli->PartitionEntry[part].PartitionLength.QuadPart
-		  || !dli->PartitionEntry[part].RecognizedPartition)
-		continue;
 	      device dev;
-	      dev.parsedisk (drive_number,
-			     dli->PartitionEntry[part].PartitionNumber);
-	      size = dli->PartitionEntry[part].PartitionLength.QuadPart >> 10;
+	      dev.parsedisk (drive_number, part_num);
 	      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
 					 dev.major, dev.minor,
-					 size, dev.name + 5);
+					 size >> 10, dev.name + 5);
 	    }
-	  break;
+	  NtClose (devhdl);
 	}
-      NtClose (devhdl);
     }
   NtClose (dirhdl);
 

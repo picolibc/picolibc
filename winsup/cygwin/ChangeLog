@@ -1,3 +1,8 @@
+2010-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_partitions): Simplify code and enable
+	partition layout printing for non-privileged users.
+
 2010-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fs_info::update): Fix comments.
