@@ -264,6 +264,9 @@ SECURITY_STATUS WINAPI QueryContextAttributesA(PCtxtHandle,ULONG,PVOID);
 SECURITY_STATUS WINAPI QueryContextAttributesW(PCtxtHandle,ULONG,PVOID);
 SECURITY_STATUS WINAPI QueryCredentialsAttributesA(PCredHandle,ULONG,PVOID);
 SECURITY_STATUS WINAPI QueryCredentialsAttributesW(PCredHandle,ULONG,PVOID);
+#if (_WIN32_WINNT >= 0x0500)
+SECURITY_STATUS WINAPI QuerySecurityContextToken(PCtxtHandle,HANDLE*);
+#endif
 SECURITY_STATUS WINAPI DecryptMessage(PCtxtHandle,PSecBufferDesc,ULONG,PULONG);
 SECURITY_STATUS WINAPI EncryptMessage(PCtxtHandle,ULONG,PSecBufferDesc,ULONG);
 SECURITY_STATUS WINAPI DeleteSecurityContext(PCtxtHandle);

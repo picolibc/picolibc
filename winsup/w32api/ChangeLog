@@ -1,3 +1,10 @@
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/sspi.h (QuerySecurityContextToken): Define.
+	* lib/secur32.def: Regenerate using gendef on a Win7 machine.
+
+	Thank you to Magnus Hagander for reporting the issue.
+
 2010-08-25  Ali Sabil  <asabil@users.sourceforge.net>
 
 	* include/ocidl.h: Define COBJMACROS for IPropertyBag and IPropertyBag2.
