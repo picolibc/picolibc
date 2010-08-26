@@ -1,3 +1,8 @@
+2010-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (get_device_name): Prefer the \\.\X: DOS device for
+	harddisks, if available.
+
 2010-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldd.cc (report): Drop long pathname considerations which result in

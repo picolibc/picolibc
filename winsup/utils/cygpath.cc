@@ -233,8 +233,18 @@ get_device_name (char *path)
 	      ans.MaximumLength = len;
 	      ans.Buffer = ret + 4;
 	      RtlUnicodeStringToAnsiString (&ans, &odi->ObjectName, FALSE);
-	      ZwClose (dir);
-	      goto out;
+	      /* Special case for local disks:  It's most feasible if the
+		 DOS device name reflects the DOS drive, so we check for this
+		 explicitly and only return prematurely if so. */
+#define	      HARDDISK_PREFIX	L"\\Device\\Harddisk"
+	      if (ntdev.Length < wcslen (HARDDISK_PREFIX)
+		  || wcsncasecmp (ntdev.Buffer, HARDDISK_PREFIX, 8) != 0
+		  || (odi->ObjectName.Length == 2 * sizeof (WCHAR)
+		      && odi->ObjectName.Buffer[1] == L':'))
+		{
+		  ZwClose (dir);
+		  goto out;
+		}
 	    }
 	}
       ZwClose (dir);
