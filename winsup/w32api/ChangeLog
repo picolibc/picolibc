@@ -1,5 +1,11 @@
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/shlwapi (ASSOCDATA): Update definition.
+
+	Thank you to Frederic Deschamps for reporting the issue.
+
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winbase.h (COPY_FILE_OPEN_SOURCE_FOR_WRITE,
 	COPY_FILE_ALLOW_DECRYPTED_DESTINATION, COPY_FILE_COPY_SYMLINK,
 	COPY_FILE_NO_BUFFERING): Define.
