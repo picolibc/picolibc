@@ -1,5 +1,12 @@
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/oleacc.h (STATE_SYSTEM_HASPOPUP, STATE_SYSTEM_NORMAL,
+	STATE_SYSTEM_PROTECTED): Define.
+
+	Thank you to Marcus von Appen for reporting the issue.
+
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winuser.h (CF_DIBV5): Define.
 	(CF_MAX): Adjust accordingly.
 

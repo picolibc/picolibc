@@ -131,6 +131,10 @@ extern "C" {
 #define STATE_SYSTEM_ALERT_MEDIUM 0x08000000
 #define STATE_SYSTEM_ALERT_HIGH 0x10000000
 #define STATE_SYSTEM_VALID 0x1fffffff
+/* http://opensource.adobe.com/wiki/display/flexsdk/Accessibility+for+Spark+Components */
+#define STATE_SYSTEM_NORMAL 0x00000000
+#define STATE_SYSTEM_PROTECTED 0x20000000
+#define STATE_SYSTEM_HASPOPUP 0x40000000
 
 typedef enum tagSELFLAG 
 {
