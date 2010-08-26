@@ -1,3 +1,7 @@
+2010-08-25  Ali Sabil  <asabil@users.sourceforge.net>
+
+	* include/ocidl.h: Define COBJMACROS for IPropertyBag and IPropertyBag2.
+
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/shlwapi (ASSOCDATA): Update definition.

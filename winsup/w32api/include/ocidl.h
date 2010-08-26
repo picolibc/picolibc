@@ -217,6 +217,14 @@ DECLARE_INTERFACE_(IPropertyBag,IUnknown)
 };
 #undef INTERFACE
 
+#ifdef COBJMACROS
+#define IPropertyBag_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IPropertyBag_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IPropertyBag_Release(T) (T)->lpVtbl->Release(T)
+#define IPropertyBag_Read(T,a,b,c) (T)->lpVtbl->Read(T,a,b,c)
+#define IPropertyBag_Write(T,a,b) (T)->lpVtbl->Write(T,a,b)
+#endif
+
 EXTERN_C const IID IID_IPropertyBag2;
 #define INTERFACE IPropertyBag2
 DECLARE_INTERFACE_(IPropertyBag2,IUnknown)
@@ -231,6 +239,17 @@ DECLARE_INTERFACE_(IPropertyBag2,IUnknown)
 	STDMETHOD(LoadObject)(THIS_ LPCOLESTR,DWORD,IUnknown*,LPERRORLOG) PURE;
 };
 #undef INTERFACE
+
+#ifdef COBJMACROS
+#define IPropertyBag2_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IPropertyBag2_AddRef(T) (T)->lpVtbl->AddRef(T)
+#define IPropertyBag2_Release(T) (T)->lpVtbl->Release(T)
+#define IPropertyBag2_Read(T,a,b,c,d,e) (T)->lpVtbl->Read(T,a,b,c,d,e)
+#define IPropertyBag2_Write(T,a,b,c) (T)->lpVtbl->Write(T,a,b,c)
+#define IPropertyBag2_CountProperties(T,a) (T)->lpVtbl->CountProperties(T,a)
+#define IPropertyBag2_GetPropertyInfo(T,a,b,c,d) (T)->lpVtbl->GetPropertyInfo(T,a,b,c,d)
+#define IPropertyBag2_LoadObject(T,a,b,c,d) (T)->lpVtbl->LoadObject(T,a,b,c,d)
+#endif
 
 EXTERN_C const IID IID_IPersistPropertyBag;
 #define INTERFACE IPersistPropertyBag
