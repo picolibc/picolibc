@@ -1,5 +1,13 @@
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/winbase.h (COPY_FILE_OPEN_SOURCE_FOR_WRITE,
+	COPY_FILE_ALLOW_DECRYPTED_DESTINATION, COPY_FILE_COPY_SYMLINK,
+	COPY_FILE_NO_BUFFERING): Define.
+
+	Thank you to Roland Schwingel for reporting the issue.
+
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winuser.h (HHOOK): Move definition from here...
 	* include/windef.h: ...to here, as per MSDN.
 
