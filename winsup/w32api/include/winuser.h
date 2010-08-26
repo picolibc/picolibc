@@ -83,7 +83,12 @@ extern "C" {
 #define CF_ENHMETAFILE	14
 #define CF_HDROP	15
 #define CF_LOCALE	16
+#if (_WIN32_WINNT >= 0x0500)
+#define CF_DIBV5 17
+#define CF_MAX	18
+#else
 #define CF_MAX	17
+#endif
 #define CF_OWNERDISPLAY	128
 #define CF_DSPTEXT	129
 #define CF_DSPBITMAP	130

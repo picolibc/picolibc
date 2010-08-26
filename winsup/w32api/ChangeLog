@@ -1,5 +1,12 @@
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/winuser.h (CF_DIBV5): Define.
+	(CF_MAX): Adjust accordingly.
+
+	Thank you to Lenard Lindstrom for reporting the issue.
+
+2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/sspi.h (QuerySecurityContextToken): Define.
 	* lib/secur32.def: Regenerate using gendef on a Win7 machine.
 
