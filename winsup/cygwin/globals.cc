@@ -109,6 +109,7 @@ UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
 UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
 UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
+UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
 #undef _ROU
 
 /* Cygwin properties are meant to be readonly data placed in the DLL, but

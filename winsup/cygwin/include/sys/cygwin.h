@@ -149,8 +149,7 @@ typedef enum
     CW_INT_SETLOCALE,
     CW_CVT_MNT_OPTS,
     CW_LST_MNT_OPTS,
-    CW_STRERROR,
-    CW_SYNC_WINCWD
+    CW_STRERROR
   } cygwin_getinfo_types;
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */

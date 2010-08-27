@@ -3286,36 +3286,48 @@ cwdstuff::init ()
 int
 cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 {
+  NTSTATUS status;
   UNICODE_STRING upath;
   bool virtual_path = false;
   bool unc_path = false;
   bool inaccessible_path = false;
 
-  /* Here are the problems with using SetCurrentDirectory:
+  /* Here are the problems with using SetCurrentDirectory.  Just skip this
+     comment if you don't like whining.
      
      - SetCurrentDirectory only supports paths of up to MAX_PATH - 1 chars,
        including a trailing backslash.  That's an absolute restriction, even
        in the UNICODE API.
 
-     - SetCurrentDirectory fails for directories with strict
-       permissions even for processes with the SE_BACKUP_NAME
-       privilege enabled.  The reason is apparently that
-       SetCurrentDirectory calls NtOpenFile without the
+     - SetCurrentDirectory fails for directories with strict permissions even
+       for processes with the SE_BACKUP_NAME privilege enabled.  The reason
+       is apparently that SetCurrentDirectory calls NtOpenFile without the
        FILE_OPEN_FOR_BACKUP_INTENT flag set.
 
      - SetCurrentDirectory does not support case-sensitivity.
 
-     - Unlinking a cwd fails because SetCurrentDirectory seems to
-       open directories so that deleting the directory is disallowed.
+     - Unlinking a cwd fails because SetCurrentDirectory seems to open
+       directories so that deleting the directory is disallowed.
 
      - SetCurrentDirectory can naturally not work on virtual Cygwin paths
        like /proc or /cygdrive.
 
-     Therefore, we do without SetCurrentDirectory and handle the CWD all
-     by ourselves.  To avoid surprising behaviour in the Win32 API which
-     would stem from the fact that the Win32 CWD is different from the
-     POSIX CWD, we move the Win32 CWD to an invalid directory in which
-     typical relative Win32 path handling fails.  */
+     Unfortunately, even though we have access to the Win32 process parameter
+     block, we can't just replace the directory handle.  Starting with Vista,
+     the handle is used elsewhere, and just replacing the handle in the process
+     parameter block shows quite surprising results.
+     FIXME: If we ever find a *safe* way to replace the directory handle in
+     the process parameter block, we're back in business.
+
+     Nevertheless, doing entirely without SetCurrentDirectory is not really
+     feasible, because it breaks too many mixed applications using the Win32
+     API.
+
+     Therefore we handle the CWD all by ourselves and just keep the Win32
+     CWD in sync.  However, to avoid surprising behaviour in the Win32 API
+     when we are in a CWD which is inaccessible as Win32 CWD, we set the
+     Win32 CWD to a "weird" directory in which all relative filesystem-related
+     calls fail. */
 
   cwd_lock.acquire ();
 
@@ -3332,7 +3344,6 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
   HANDLE h = NULL;
   if (!virtual_path)
     {
-      NTSTATUS status;
       IO_STATUS_BLOCK io;
       OBJECT_ATTRIBUTES attr;
 
@@ -3351,7 +3362,9 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 			nat_cwd->objcaseinsensitive () | OBJ_INHERIT,
 			NULL, NULL);
       /* First try without FILE_OPEN_FOR_BACKUP_INTENT, to find out if the
-         directory is valid for Win32 apps. */
+         directory is valid for Win32 apps.  And, no, we can't just call
+	 SetCurrentDirectory here, since that would potentially break
+	 case-sensitivity. */
       status = NtOpenFile (&h, SYNCHRONIZE | FILE_TRAVERSE, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_DIRECTORY_FILE
@@ -3397,15 +3410,6 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	unc_path = true;
 
       posix_cwd = NULL;
-
-      /* When inited move the actual Win32 CWD out of the way, as explained
-	 above.  Surprisingly, the PIPE filesystem seems to be usable as CWD
-	 on all Windows systems. */
-      if (!SetCurrentDirectoryW (L"\\\\?\\PIPE\\"))
-	system_printf (
-"WARNING: Couldn't set Win32 CWD to //?/PIPE (error %E).  This will\n"
-"probably not affect normal POSIX path operations.  However, please report\n"
-"this problem to the mailing list mailto:cygwin@cygwin.com.  Thank you.");
     }
   else
     {
@@ -3467,6 +3471,15 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	error = ENAMETOOLONG;
       else
 	error = 0;
+    }
+  /* Keep the Win32 CWD in sync.  Don't check for error, other than for
+     strace output.  Try to keep overhead low. */
+  if (nat_cwd)
+    {
+      status = RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
+      if (!NT_SUCCESS (status))
+	debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %p",
+		      error ? &ro_u_pipedir : &win32, status);
     }
 
   /* Eventually, create POSIX path if it's not set on entry. */

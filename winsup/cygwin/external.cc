@@ -162,29 +162,6 @@ sync_winenv ()
   free (envblock);
 }
 
-/* Synchronize Win32 CWD with Cygwin CWD.  Return -1 and set errno if
-   setting the Win32 CWD fails. */
-static unsigned long
-sync_wincwd ()
-{
-  unsigned long ret = (unsigned long) -1;
-  /* Lock cwd.  We're accessing it directly here. */
-  cygheap->cwd.cwd_lock.acquire ();
-  /* First check if the path can work at all.  Fortunately we already have
-     an error code in the cwd, which was stored there for the sake of
-     spawn_guts. */
-  if (cygheap->cwd.get_error ())
-    set_errno (cygheap->cwd.get_error ());
-  /* Of course, SetCurrentDirectoryW still can fail, for instance, if the
-     CWD has been removed or renamed in the meantime. */
-  else if (!SetCurrentDirectoryW (cygheap->cwd.win32.Buffer))
-    __seterrno ();
-  else
-    ret = 0;
-  cygheap->cwd.cwd_lock.release ();
-  return ret;
-}
-
 /*
  * Cygwin-specific wrapper for win32 ExitProcess and TerminateProcess.
  * It ensures that the correct exit code, derived from the specified
@@ -536,9 +513,6 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  int err = va_arg (arg, int);
 	  res = (uintptr_t) strerror (err);
 	}
-	break;
-      case CW_SYNC_WINCWD:
-	res = sync_wincwd ();
 	break;
 
       default:

@@ -1,5 +1,17 @@
 2010-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (sync_wincwd): Remove.
+	(cygwin_internal): Drop CW_SYNC_WINCWD case.
+	* globals.cc (ro_u_pipedir): New R/O unicode string.
+	* ntdll.h (RtlSetCurrentDirectory_U): Declare.
+	* path.cc (cwdstuff::set): Improve comments.  Drop setting Win32 CWD to
+	\\?\PIPE\ on init.  Keep Win32 CWD in sync, if possible.  Set to
+	\\?\PIPE\ otherwise.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Revert to 230.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Remove CW_SYNC_WINCWD.
+
+2010-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (format_proc_partitions): Improve comment.
 
 2010-08-26  Corinna Vinschen  <corinna@vinschen.de>

@@ -1005,6 +1005,7 @@ extern "C"
 					BOOLEAN);
   VOID NTAPI RtlReleasePebLock ();
   VOID NTAPI RtlSecondsSince1970ToTime (ULONG, PLARGE_INTEGER);
+  NTSTATUS NTAPI RtlSetCurrentDirectory_U (PUNICODE_STRING);
   BOOLEAN NTAPI RtlSetCurrentTransaction (HANDLE);
   NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,
 					       BOOLEAN);

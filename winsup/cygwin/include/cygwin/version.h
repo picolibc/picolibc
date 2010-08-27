@@ -390,13 +390,12 @@ details. */
       228: CW_STRERROR added.
       229: Add mkostemp, mkostemps.
       230: Add CLOCK_MONOTONIC.
-      231: CW_SYNC_WINCWD.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 231
+#define CYGWIN_VERSION_API_MINOR 230
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
