@@ -45,8 +45,8 @@ AR = @AR@
 LD = @LD@
 
 TAR = tar
-TARFLAGS = z
-TARFILEEXT = .tar.gz
+TARFLAGS = --lzma -
+TARFILEEXT = .tar.lzma
 
 FLAGS_TO_PASS = \
 	AS="$(AS)" \
@@ -98,7 +98,7 @@ else
    ifneq (,$(findstring cygwin, $(target_alias)))
       distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)
    else
-      distdir=$(PACKAGE)-$(VERSION)-$(host_os)
+      distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)-$(host_os)
    endif
 endif
 

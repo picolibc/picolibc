@@ -1,3 +1,8 @@
+2010-08-26  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* Makefile.in: Update naming convention and compression format (lzma),
+	leaving existing naming convention and compression format as is for Cygwin.
+
 2010-08-25  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/oleacc.h (STATE_SYSTEM_HASPOPUP, STATE_SYSTEM_NORMAL,
