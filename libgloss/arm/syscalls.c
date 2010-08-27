@@ -770,24 +770,30 @@ int
 _isatty (int fd)
 {
   struct fdent *pfd;
+  int tty;
 
   pfd = findslot (fd);
   if (pfd == NULL)
     {
       errno = EBADF;
-      return -1;
+      return 0;
     }
 
 #ifdef ARM_RDI_MONITOR
-  return checkerror (do_AngelSWI (AngelSWI_Reason_IsTTY, &pfd->handle));
+  tty = do_AngelSWI (AngelSWI_Reason_IsTTY, &pfd->handle);
 #else
   register r0 asm("r0");
   r0 = pfd->handle;
   asm ("swi %a2"
        : "=r" (r0)
        : "0"(r0), "i" (SWI_IsTTY));
-  return checkerror (r0);
+  tty = r0;
 #endif
+
+  if (tty == 1)
+    return 1;
+  errno = get_errno ();
+  return 0;
 }
 
 int

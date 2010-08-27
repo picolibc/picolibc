@@ -1,3 +1,7 @@
+2010-08-27  Christophe Lyon  <christophe.lyon@st.com>
+
+	* syscalls.c (_isatty): Fix return value.
+
 2010-07-23  Naveen.H.S  <naveenh1@kpitcummins.com>
             Gina Verlekar <gina.verlekar@kpitcummins.com>
 
