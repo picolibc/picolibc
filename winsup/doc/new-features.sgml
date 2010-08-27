@@ -5,8 +5,11 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Add a new CW_SYNC_WINCWD command to the <function>cygwin_internal</function>
-call, to allow to synchronize the Win32 CWD with the Cygwin CWD.
+Partially revert the 1.7.6 change to set the Win32 current working directory
+(CWD) always to an invalid directory, since it breaks backward compatibility
+too much.  The Cygwin CWD and the Win32 CWD are now kept in sync again, unless
+the Cygwin CWD is not usable as Win32 CWD.  See the reworked
+<xref linkend="pathnames-win32-api"></xref> for details.
 </para></listitem>
 
 </itemizedlist>
@@ -61,10 +64,9 @@ clock_gettime(3) and clock_getres(3) accept CLOCK_MONOTONIC.
 </para></listitem>
 
 <listitem><para>
-Cygwin handles the current working directory entirely on its own.  The Win32
-current working directory is set to an invalid path to be out of the way.
-This affects calls to the Win32 file API (CreateFile, etc.).  See
-<xref linkend="pathnames-win32-api"></xref> for details.
+DEPRECATED with 1.7.7: Cygwin handles the current working directory entirely
+on its own.  The Win32 current working directory is set to an invalid path to
+be out of the way.  [...]
 </para></listitem>
 
 </itemizedlist>

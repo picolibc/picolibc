@@ -373,88 +373,64 @@ relative pathnames, or if your application uses functions like
 <function>CreateProcess</function> or <function>ShellExecute</function>
 to start other applications.</para>
 
-<para>When a Cygwin application is started, the Win32 idea of the current
-working directory (CWD) is set to an <emphasis role='bold'>invalid</emphasis>
-directory.  This works around the problem that the Win32 CWD is locked
-in a way which restricts certain POSIX functionality.  However, the side
-effect is that a call to, for instance, <function>CreateFile ("foo",
-...);</function> will fail, since the Win32 notion of the CWD is
-not the same as the Cygwin notion of the CWD, and worse, it's a
-directory entirely unsuitable for normal file operations.</para>
+<para>When a Cygwin application is started, the Windows idea of the current
+working directory (CWD) is not necessarily the same as the Cygwin CWD.
+There are a couple of restrictions in the Win32 API, which disallow certain
+directories as Win32 CWD:</para>
+
+<itemizedlist spacing="compact">
+  <listitem>
+    <para>The Windows subsystem only supports CWD paths of up to 258 chars.
+    This restriction doesn't apply for Cygwin processes, at least not as
+    long as they use the POSIX API (chdir, getcwd).  This means, if a Cygwin
+    process has a CWD using an absolute path longer than 258 characters, the
+    Cygwin CWD and the Windows CWD differ.</para>
+  </listitem>
+
+  <listitem>
+    <para>The Win32 API call to set the current directory,
+    <function>SetCurrentDirectory</function>, fails for directories for which
+    the user has no permissions, even if the user is an administrator.  This
+    restriction doesn't apply for Cygwin processes, if they are running under
+    an administrator account.</para>
+  </listitem>
+
+  <listitem>
+    <para><function>SetCurrentDirectory</function> does not support
+    case-sensitive filenames.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>Last, but not least, <function>SetCurrentDirectory</function> can't
+    work on virtual Cygwin paths like /proc or /cygdrive.  These paths only
+    exists in the Cygwin realm so they have no meaning to a native Win32
+    process.</para>
+  </listitem>
+</itemizedlist>
+
+<para>As long as the Cygwin CWD is usable as Windows CWD, the Cygwin and
+Windows CWDs are in sync within a process.  However, if the Cygwin process
+changes its working directory into one of the directories which are
+unusable as Windows CWD, we're in trouble.  If the process uses the
+Win32 API to access a file using a relative pathname, the resulting
+absolute path would not match the expectations of the process.  In the
+worst case, the wrong files are deleted.</para>
+
+<para>To workaround this problem, Cygwin sets the Windows CWD to a special
+directory in this case.  This special directory points to a virtual
+filesystem within the native NT namespace (<filename>\??\PIPE\</filename>).
+Since it's not a real filesystem, the deliberate effect is that a call to,
+for instance, <function>CreateFile ("foo", ...);</function> will fail,
+as long as the processes CWD doesn't work as Windows CWD.</para>
 
 <para>So, in general, don't use the Win32 file API in Cygwin applications.
 If you <emphasis role='bold'>really</emphasis> need to access files using
 the Win32 API, or if you <emphasis role='bold'>really</emphasis> have to use
 <function>CreateProcess</function> to start applications, rather than
-the POSIX <function>exec(3)</function> familiy of functions, you have to
-make sure that the Win32 CWD is set to some valid directory.  To
-accomplish that, you can choose from several methods.</para>
-
-<itemizedlist spacing="compact">
-  <listitem>
-    <para>The easiest method is to call</para>
-    
-<screen>
-  #include &lt;sys/cygwin.h&gt;
-
-  cygwin_internal (CW_SYNC_WINCWD);
-</screen>
-
-    <para>prior to calling the Win32 functions which require a valid Win32 CWD.
-    This function synchronizes the Win32 CWD with the Cygwin CWD.</para>
-
-    <para>Note that the <function>cygwin_internal (CW_SYNC_WINCWD)</function>
-    call may fail.  In that case, it returns with a non-zero value and
-    errno is set appropriately:</para>
-
-    <segmentedlist>
-      <?dbhtml list-presentation="table"?>
-      <seglistitem>
-	<seg><emphasis role='bold'>ENOTDIR</emphasis></seg>
-	<seg>The Cygwin CWD is a virtual path, like /proc, or //, which does not
-	     exist as valid directory in the Win32 namespace.</seg>
-      </seglistitem>
-      <seglistitem>
-	<seg><emphasis role='bold'>EACCES</emphasis></seg>
-	<seg>The Cygwin CWD is a directory with restrictive permissions,
-	     which make it unusable as Win32 directory.</seg>
-      </seglistitem>
-      <seglistitem>
-	<seg><emphasis role='bold'>ENAMETOOLONG</emphasis></seg>
-	<seg>The Cygwin CWD is too long to be used as Win32 CWD.
-	     The Win32 CWD is restricted to 258 characters.</seg>
-      </seglistitem>
-    </segmentedlist>
-
-    <para>You should make sure that you test the return value of
-    <function>cygwin_internal (CW_SYNC_WINCWD)</function>, otherwise
-    your application will potentially not work correctly.  If the call
-    failed, you can use the Win32 call <function>SetCurrentDirectory</function>
-    to move to some well-known directory.</para>
-
-    <note><para>After you've synchronized the Win32 CWD with the Cygwin CWD,
-    be aware that the directory is locked, until the process exited, or
-    until the process set the Win32 CWD to some other directory.  During that
-    period it will not be possible to rename or remove the directory from
-    other Cygwin applications.</para></note>
-  </listitem>
-  <listitem>
-    <para>If you know where to go to, you can also just call the Win32 function
-    <function>SetCurrentDirectory</function> immediately.</para>
-  </listitem>
-  <listitem>
-    <para>If you need a valid Win32 CWD only for a child application started
-    via <function>CreateProcess</function> and friends, you don't have to
-    set your own Win32 CWD.  In that case, just utilize the lpCurrentDirectory
-    parameter.  See the description of the <function>CreateProcess</function>
-    function in the MSDN manual pages.</para>
-  </listitem>
-  <listitem>
-    <para>Last, but not least, if you don't need any POSIX function from
-    Cygwin in your specific applciation, consider to compile your application
-    as native Win32 (mingw) executable, rather than as Cygwin executable.</para>
-  </listitem>
-</itemizedlist>
+the POSIX <function>exec(3)</function> family of functions, you have to
+make sure that the Cygwin CWD is set to some directory which is valid as
+Win32 CWD.</para>
 
 </sect2>
 

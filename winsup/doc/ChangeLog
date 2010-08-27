@@ -1,3 +1,11 @@
+2010-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.7): Change to describe partial
+	reversion to pre-1.7.6 behaviour.
+	(ov-new1.7.6): Deprecate description of CWD handling.
+	* pathnames.sgml (pathnames-win32-api): Rewrite to reflect new CWD
+	behaviour.
+
 2010-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.7): New section.
