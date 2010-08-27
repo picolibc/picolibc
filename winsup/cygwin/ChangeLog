@@ -1,3 +1,7 @@
+2010-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_partitions): Improve comment.
+
 2010-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_partitions): Simplify code and enable

@@ -1098,8 +1098,13 @@ format_proc_partitions (void *, char *&destbuf)
 	  || !isdigit (devname[8]))
 	continue;
       /* Construct path name for partitions, starting with 0, which is the
-	 whole disk, and try to open.  Let's assume we never have more than
-	 99 partitions per disk for now... */
+	 whole disk, and try to open.
+	 Note that the correct way to do this would be to open the HarddiskX
+	 directory and enumerate the Partition entries.  However, while the
+	 partition entries itself are accessible for query by everyone, the
+	 HarddiskX parent directory is only queryable by SYSTEM and Admins.
+	 This way we circumvent this nonsensical restriction.  Let's assume
+	 we never have more than 99 partitions per disk for now... */
       for (int part_num = 0; part_num < 99; ++part_num)
 	{
 	  wcscpy (wpath, dbi->ObjectName.Buffer);
