@@ -12,6 +12,11 @@ the Cygwin CWD is not usable as Win32 CWD.  See the reworked
 <xref linkend="pathnames-win32-api"></xref> for details.
 </para></listitem>
 
+<listitem><para>
+Make sure to follow the Microsoft security advisory concerning DLL hijacking.
+See the <ulink url="http://www.microsoft.com/technet/security/advisory/2269637.mspx">Microsoft Security Advisory (2269637) "Insecure Library Loading Could Allow Remote Code Execution"</ulink> for details.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
