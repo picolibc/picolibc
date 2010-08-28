@@ -1,5 +1,10 @@
 2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldh.cc (WinMain): Change DONT_RESOLVE_DLL_REFERENCES to
+	LOAD_WITH_ALTERED_SEARCH_PATH.
+
+2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* loadlib.h: New header implementing safe LoadLibrary calls.
 	Include throughout files using LoadLibrary function.
 	* cygcheck.cc (dump_sysinfo): Retrieve kernel32.dll handle via
