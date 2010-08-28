@@ -68,7 +68,7 @@ bool NO_COPY wsock_started;
   .long		0					\n\
   .long		-1					\n\
   .long		" #init_also "				\n\
-  .asciz	\"" #dllname "\"			\n\
+  .string16	\"" #dllname ".dll\"			\n\
   .text							\n\
   .set		" #dllname "_primed, 1			\n\
 .endif							\n\
@@ -186,7 +186,7 @@ struct dll_info
   HANDLE handle;
   LONG here;
   void (*init) ();
-  char name[];
+  WCHAR name[];
 };
 
 struct func_info
@@ -211,6 +211,7 @@ std_dll_init ()
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
   retchain ret;
+  WCHAR dll_path[MAX_PATH];
 
   if (InterlockedIncrement (&dll->here))
     do
@@ -223,7 +224,9 @@ std_dll_init ()
     {
       unsigned fpu_control = 0;
       __asm__ __volatile__ ("fnstcw %0": "=m" (fpu_control));
-      if ((h = LoadLibrary (dll->name)) != NULL)
+      /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
+      wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
+      if ((h = LoadLibraryW (dll_path)) != NULL)
 	{
 	  __asm__ __volatile__ ("fldcw %0": : "m" (fpu_control));
 	  dll->handle = h;

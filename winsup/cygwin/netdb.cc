@@ -1,6 +1,6 @@
 /* netdb.cc: network database related routines.
 
-   Copyright 2002, 2003, 2007 Red Hat, Inc.
+   Copyright 2002, 2003, 2007, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,13 +27,11 @@ open_system_file (const char *relative_path)
   /* system dir path is never longer. */
   char win32_name[MAX_PATH];
 
-  if (!GetSystemDirectory (win32_name, MAX_PATH))
-    return NULL;
-  strcat (win32_name, "\\drivers\\etc\\");
+  sys_wcstombs (win32_name, MAX_PATH, windows_system_directory);
+  strcat (win32_name, "drivers\\etc\\");
   strcat (win32_name, relative_path);
-  debug_printf ("netdb file to open %s", win32_name);
   FILE *result = fopen (win32_name, "rt");
-  debug_printf ("handle to netdb file %p", result);
+  debug_printf ("handle to netdb file %s: %p", win32_name, result);
   return result;
 }
 

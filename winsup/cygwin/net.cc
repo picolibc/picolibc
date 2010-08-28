@@ -4419,35 +4419,33 @@ static void
 load_ipv6_funcs ()
 {
   tmp_pathbuf tp;
-  PWCHAR lib_name = tp.w_get ();
-  size_t len;
+  PWCHAR lib_path = tp.w_get ();
+  PWCHAR lib_name;
   HMODULE lib;
 
   load_ipv6_guard.init ("klog_guard")->acquire ();
   if (ipv6_inited)
     goto out;
   WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
-  if (GetSystemDirectoryW (lib_name, NT_MAX_PATH))
+  lib_name = wcpcpy (lib_path, windows_system_directory);
+  wcpcpy (lib_name, L"ws2_32.dll");
+  if ((lib = LoadLibraryW (lib_path)))
     {
-      len = wcslen (lib_name);
-      wcpcpy (lib_name + len, L"\\ws2_32.dll");
-      if ((lib = LoadLibraryW (lib_name)))
-	{
-	  if (get_ipv6_funcs (lib))
-	    goto out;
-	  FreeLibrary (lib);
-	}
-      wcpcpy (lib_name + len, L"\\wship6.dll");
-      if ((lib = LoadLibraryW (lib_name)))
-	{
-	  if (get_ipv6_funcs (lib))
-	    goto out;
-	  FreeLibrary (lib);
-	}
-      freeaddrinfo = NULL;
-      getaddrinfo = NULL;
-      getnameinfo = NULL;
+      if (get_ipv6_funcs (lib))
+	goto out;
+      FreeLibrary (lib);
     }
+  wcpcpy (lib_name, L"wship6.dll");
+  if ((lib = LoadLibraryW (lib_path)))
+    {
+      if (get_ipv6_funcs (lib))
+	goto out;
+      FreeLibrary (lib);
+    }
+  freeaddrinfo = NULL;
+  getaddrinfo = NULL;
+  getnameinfo = NULL;
+
 out:
   ipv6_inited = true;
   load_ipv6_guard.release ();

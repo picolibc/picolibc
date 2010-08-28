@@ -43,8 +43,6 @@ extern void sigdelayed ();
 extern child_info_spawn *chExeced;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
-static WCHAR windows_system_directory[1024];
-static size_t windows_system_directory_length;
 
 /* This is set to indicate that we have already exited.  */
 
@@ -1348,19 +1346,6 @@ void
 events_init ()
 {
   mask_sync.init ("mask_sync");
-  windows_system_directory[0] = L'\0';
-  GetSystemDirectoryW (windows_system_directory, sizeof (windows_system_directory) / sizeof (WCHAR) - 2);
-  PWCHAR end = wcschr (windows_system_directory, L'\0');
-  if (end == windows_system_directory)
-    api_fatal ("can't find windows system directory");
-  if (end[-1] != L'\\')
-    {
-      *end++ = L'\\';
-      *end = L'\0';
-    }
-  windows_system_directory_length = end - windows_system_directory;
-  debug_printf ("windows_system_directory '%W', windows_system_directory_length %d",
-		windows_system_directory, windows_system_directory_length);
 }
 
 void

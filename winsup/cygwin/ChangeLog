@@ -1,3 +1,20 @@
+2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (LoadDLLprime): Change dllname storage to string16.
+	(struct dll_info): Convert name to WCHAR.
+	(std_dll_init): Load DLLs with full path to windows system directory.
+	Add hint to Microsoft security advisory.
+	* dcrt0.cc (init_windows_system_directory): New function.
+	(dll_crt0_0): Call init_windows_system_directory first.
+	* exceptions.cc (windows_system_directory): Move to globals.cc.
+	(windows_system_directory_length): Ditto.
+	(events_init): Drop code fetching windows_system_directory.
+	* globals.cc (windows_system_directory): New global variable.
+	(windows_system_directory_length): Ditto.
+	* net.cc (load_ipv6_funcs): Use windows_system_directory rather than
+	GetSystemDirectoryW.
+	* netdb.cc (open_system_file): Ditto.  Simplify debug output.
+
 2010-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (sync_wincwd): Remove.

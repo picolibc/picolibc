@@ -24,6 +24,8 @@ HANDLE NO_COPY hProcImpToken;
 HMODULE NO_COPY cygwin_hmodule;
 HANDLE hExeced;
 int NO_COPY sigExeced;
+WCHAR NO_COPY windows_system_directory[MAX_PATH];
+UINT NO_COPY windows_system_directory_length;
 
 /* program exit the program */
 
