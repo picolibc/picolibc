@@ -1,3 +1,16 @@
+2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* loadlib.h: New header implementing safe LoadLibrary calls.
+	Include throughout files using LoadLibrary function.
+	* cygcheck.cc (dump_sysinfo): Retrieve kernel32.dll handle via
+	GetModuleHandle, rather than using LoadLibrary.
+	* cygpath.cc (get_long_name): Ditto.
+	(do_sysfolders): Append .dll suffix in LoadLibrary call.
+	* ldh.cc (WinMain): Use LoadLibraryExW with DONT_RESOLVE_DLL_REFERENCES
+	to avoid loading malicious library code.
+	* locale.cc (print_locale_with_codeset): Change way to retrieve
+	kernel32.dll path.
+
 2010-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (get_device_name): Prefer the \\.\X: DOS device for

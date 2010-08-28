@@ -28,6 +28,7 @@ details. */
 #include <ddk/winddk.h>
 #include <ddk/ntifs.h>
 #include "wide_path.h"
+#include "loadlib.h"
 
 static const char version[] = "$Revision$";
 
@@ -452,7 +453,7 @@ get_long_name (const char *filename, DWORD& len)
 {
   char *sbuf;
   wchar_t buf[32768];
-  static HINSTANCE k32 = LoadLibrary ("kernel32.dll");
+  static HINSTANCE k32 = GetModuleHandleW (L"kernel32.dll");
   static DWORD (WINAPI *GetLongPathName) (LPCWSTR, LPWSTR, DWORD) =
     (DWORD (WINAPI *) (LPCWSTR, LPWSTR, DWORD)) GetProcAddress (k32, "GetLongPathNameW");
   if (!GetLongPathName)
@@ -610,7 +611,7 @@ do_sysfolders (char option)
       break;
 
     case 'H':
-      k32 = LoadLibrary ("userenv");
+      k32 = LoadLibrary ("userenv.dll");
       if (k32)
 	GetProfilesDirectoryAPtrW = (BOOL (*) (LPWSTR, LPDWORD))
 	  GetProcAddress (k32, "GetProfilesDirectoryW");

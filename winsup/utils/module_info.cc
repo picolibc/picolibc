@@ -1,6 +1,6 @@
 /* module_info.cc
 
-   Copyright 1999,2000,2001 Red Hat, Inc.
+   Copyright 1999,2000,2001,2010 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <windows.h>
 #include <psapi.h>
+#include "loadlib.h"
 
 static int psapi_loaded = 0;
 static HMODULE psapi_module_handle = NULL;

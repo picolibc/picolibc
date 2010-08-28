@@ -11,7 +11,7 @@ WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	cmd += 4;
 	break;
       }
-  if (!*cmd || !LoadLibraryW (cmd))
+  if (!*cmd || !LoadLibraryExW (cmd, NULL, DONT_RESOLVE_DLL_REFERENCES))
     ExitProcess (0x0100);
   ExitProcess (0x0000);
 }

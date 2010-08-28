@@ -26,6 +26,7 @@ details. */
 #include "cygwin/include/sys/cygwin.h"
 #include "path.h"
 #undef cygwin_internal
+#include "loadlib.h"
 
 /* we *know* we're being built with GCC */
 #define alloca __builtin_alloca

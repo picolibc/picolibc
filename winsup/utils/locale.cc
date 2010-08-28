@@ -126,9 +126,10 @@ print_locale_with_codeset (int verbose, loc_t *locale, bool utf8,
   if (!sysroot)
     {
       char sysbuf[PATH_MAX];
-      stpcpy (stpcpy (sysbuf, getenv ("SYSTEMROOT")),
-	      "\\system32\\kernel32.dll");
-      sysroot = (const char *) cygwin_create_path (CCP_WIN_A_TO_POSIX, sysbuf);
+      HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
+      if (GetModuleFileName (k32, sysbuf, PATH_MAX))
+	sysroot = (const char *) cygwin_create_path (CCP_WIN_A_TO_POSIX,
+						     sysbuf);
       if (!sysroot)
       	sysroot = "kernel32.dll";
     }

@@ -1,7 +1,7 @@
 /* ps.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2008, 2009 Red Hat, Inc.
+   2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,6 +23,7 @@ details. */
 #include <psapi.h>
 #include <ddk/ntapi.h>
 #include <ddk/winddk.h>
+#include "loadlib.h"
 
 /* Maximum possible path length under NT.  There's no official define
    for that value.  Note that PATH_MAX is only 4K. */

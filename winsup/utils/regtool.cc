@@ -1,7 +1,7 @@
 /* regtool.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009 Red Hat Inc.
+   2009, 2010 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -19,6 +19,7 @@ details. */
 #define WINVER 0x0502
 #include <windows.h>
 #include <sys/cygwin.h>
+#include "loadlib.h"
 
 #define DEFAULT_KEY_SEPARATOR '\\'
 
