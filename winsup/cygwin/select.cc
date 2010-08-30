@@ -287,7 +287,17 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       if (!windows_used)
 	wait_ret = WaitForMultipleObjects (m, w4, FALSE, ms);
       else
-	wait_ret = MsgWaitForMultipleObjects (m, w4, FALSE, ms, QS_ALLINPUT);
+	/* Using MWMO_INPUTAVAILABLE is the officially supported solution for
+	   the problem that the call to PeekMessage disarms the queue state 
+	   so that a subsequent MWFMO hangs, even if there are still messages
+	   in the queue.  Unfortunately this flag didn't exist  prior to Win2K,
+	   so for NT4 we fall back to a different usage of PeekMessage in
+	   peek_windows.  See there for more details. */
+	wait_ret =
+	  MsgWaitForMultipleObjectsEx (m, w4, ms,
+				       QS_ALLINPUT | QS_ALLPOSTMESSAGE,
+				       wincap.has_mwmo_inputavailable ()
+				       ? MWMO_INPUTAVAILABLE : 0);
 
       switch (wait_ret)
       {
@@ -296,7 +306,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  set_sig_errno (EINTR);
 	  return -1;
 	case WAIT_FAILED:
-	  select_printf ("WaitForMultipleObjects failed");
+	  system_printf ("WaitForMultipleObjects failed");
+	  s = &start;
 	  s->set_select_errno ();
 	  return -1;
 	case WAIT_TIMEOUT:
@@ -1531,7 +1542,14 @@ peek_windows (select_record *me, bool)
   if (me->read_selected && me->read_ready)
     return 1;
 
-  if (PeekMessage (&m, (HWND) h, 0, 0, PM_NOREMOVE))
+  /* On NT4 we use a filter pattern which allows to use QS_ALLPOSTMESSAGE
+     to keep the queue state as unread.  Note that this only works if the
+     application itself does not call PeekMessage or GetQueueState the wrong
+     way.  But there's no way around it.  On Win2K and later we rather use
+     MsgWaitForMultipleObjectsEx(MWMO_INPUTAVAILABLE). */
+  if (PeekMessage (&m, (HWND) h, 0,
+		   wincap.has_mwmo_inputavailable () ? 0 : UINT_MAX - 1,
+		   PM_NOREMOVE))
     {
       me->read_ready = true;
       select_printf ("window %d(%p) ready", me->fd, me->fh->get_handle ());

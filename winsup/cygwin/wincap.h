@@ -51,6 +51,7 @@ struct wincaps
   unsigned has_broken_alloc_console			: 1;
   unsigned has_always_all_codepages			: 1;
   unsigned has_localenames				: 1;
+  unsigned has_mwmo_inputavailable			: 1;
 };
 
 class wincapc
@@ -107,6 +108,7 @@ public:
   bool	IMPLEMENT (has_broken_alloc_console)
   bool	IMPLEMENT (has_always_all_codepages)
   bool	IMPLEMENT (has_localenames)
+  bool	IMPLEMENT (has_mwmo_inputavailable)
 
 #undef IMPLEMENT
 };

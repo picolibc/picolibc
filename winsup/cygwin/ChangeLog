@@ -1,3 +1,14 @@
+2010-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (MsgWaitForMultipleObjectsEx): Define.
+	(MsgWaitForMultipleObjects): Remove.
+	* select.cc (select_stuff::wait): Use MsgWaitForMultipleObjectsEx with
+	QS_ALLPOSTMESSAGE and, if possible, MWMO_INPUTAVAILABLE flags.  Explain
+	why.  Fix a potential crash due to a NULL pointer in WAIT_FAILED case.
+	(peek_windows): Use filter pattern on NT4.  Explain why.
+	* wincap.h (wincaps::has_mwmo_inputavailable): New element.
+	* wincap.cc: Implement above element throughout.
+
 2010-08-29  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* winlean.h: New file.
