@@ -1428,13 +1428,13 @@ related function calls.  A real chroot functionality is not supported by
 Windows however.</para>
 
 <para><function>clock_getres</function>, <function>clock_gettime</function>
-and <function>clock_setres</function> only support CLOCK_REALTIME for
-now.</para>
+and <function>clock_setres</function> only support CLOCK_REALTIME and
+CLOCK_MONOTONIC for now.</para>
 
 <para>BSD file locks created via <function>flock</function> are not
 propagated to the parent process and sibling processes.  The locks are
 only valid in the creating process and subsequently started child processes
-shaing the same file descriptor.</para>
+sharing the same file descriptor.</para>
 
 <para><function>fpclassify</function>, <function>isfinite</function>,
 <function>isgreater</function>, <function>isgreaterequal</function>,
@@ -1447,9 +1447,8 @@ only support float and double arguments, not long double arguments.</para>
 <para><function>getitimer</function> and <function>setitimer</function>
 only support ITIMER_REAL for now.</para>
 
-<para><function>link</function> will copy the file if it can't implement
-a true hardlink.  This is true at least for FAT and FAT32 filesystems.
-NTFS supports hardlinks.  </para>
+<para><function>link</function> will fail on FAT, FAT32, and other filesystems
+not supporting hardlinks, just as on Linux.</para>
 
 <para><function>lseek</function> only works properly on files opened in
 binary mode.  On files opened in textmode (via mount mode or explicit
@@ -1462,8 +1461,9 @@ processes.</para>
 
 <para><function>vfork</function> just calls <function>fork</function>.</para>
 
-<para><function>vhangup</function> always returns -1 and sets errno to
-ENOSYS.</para>
+<para><function>vhangup</function> and <function>revoke</function> always
+return -1 and set errno to ENOSYS.  <function>grantpt</function> and
+<function>unlockpt</function> always just return 0.</para>
 
 <para>The XSI IPC functions <function>semctl</function>,
 <function>semget</function>, <function>semop</function>,
