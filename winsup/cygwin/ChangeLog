@@ -1,3 +1,9 @@
+2010-08-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_0): Move sigproc_init later, after cygheap
+	initialization since it relies on the cygheap existing (even if
+	it shouldn't matter do to dll initialization serialization).
+
 2010-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml (std-notes): Fix typos and incorrectnesses.

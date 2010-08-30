@@ -702,12 +702,6 @@ dll_crt0_0 ()
 
   SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 
-  /* Initialize signal processing here, early, in the hopes that the creation
-     of a thread early in the process will cause more predictability in memory
-     layout for the main thread. */
-  if (!dynamically_loaded)
-    sigproc_init ();
-
   lock_process::init ();
   _impure_ptr = _GLOBAL_REENT;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
@@ -745,6 +739,12 @@ dll_crt0_0 ()
 	    break;
 	}
     }
+
+  /* Initialize signal processing here, early, in the hopes that the creation
+     of a thread early in the process will cause more predictability in memory
+     layout for the main thread. */
+  if (!dynamically_loaded)
+    sigproc_init ();
 
   user_data->threadinterface->Init ();
 
