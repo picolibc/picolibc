@@ -142,38 +142,46 @@ in your project, like this:</para>
   $ gcc my_tiny_app.c /lib/binmode.o -o my_tiny_app
 </screen>
 
+<para>Starting with Cygwin 1.7.7, you can use the even simpler:</para>
+
+<screen>
+  $ gcc my_tiny_app.c -lbinmode -o my_tiny_app
+</screen>
+
 <para>This adds code which sets the default open mode for all files
 opened by <command>my_tiny_app</command> to binary for reading and
 writing.</para>
 
-<para>Cygwin provides the following object files to set the default open mode
-just by linking an application against them:</para>
+<para>Cygwin provides the following libraries and object files to set the
+default open mode just by linking an application against them:</para>
 
 <itemizedlist mark="bullet">
 
 <listitem>
 <screen>
-/lib/automode.o      -  Open files for reading in textmode
-                        Open files for writing in binary mode
+/lib/libautomode.a      -  Open files for reading in textmode,
+/lib/automode.o            open files for writing in binary mode
 </screen>
 </listitem>
 
 <listitem>
 <screen>
-/lib/binmode.o       -  Open files for reading and writing in binary mode
+/lib/libbinmode.a       -  Open files for reading and writing in binary mode
+/lib/binmode.o
 </screen>
 </listitem>
 
 <listitem>
 <screen>
-/lib/textmode.o      -  Open files for reading and writing in textmode
+/lib/libtextmode.a      -  Open files for reading and writing in textmode
+/lib/textmode.o
 </screen>
 </listitem>
 
 <listitem>
 <screen>
-/lib/textreadmode.o  -  Open files for reading in textmode
-                        Keep default behaviour for writing.
+/lib/libtextreadmode.a  -  Open files for reading in textmode,
+/lib/textreadmode.o        keep default behaviour for writing.
 </screen>
 </listitem>
 
