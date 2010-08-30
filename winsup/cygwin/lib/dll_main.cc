@@ -1,14 +1,13 @@
 /* dll_main.cc: Provide the DllMain stub that the user can override.
 
-   Copyright 1998, 2000, 2001, 2009 Red Hat, Inc.
+   Copyright 1998, 2000, 2001, 2009, 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlean.h"
 
 extern "C"
 BOOL APIENTRY DllMain (HINSTANCE hInst, DWORD reason,

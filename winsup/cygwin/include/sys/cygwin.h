@@ -21,21 +21,6 @@ extern "C" {
 
 #define _CYGWIN_SIGNAL_STRING "cYgSiGw00f"
 
-#if 0 /* ENTIRELY DEPRECATED INTERFACES. */
-extern pid_t cygwin32_winpid_to_pid (int);
-extern void cygwin32_win32_to_posix_path_list (const char *, char *);
-extern int cygwin32_win32_to_posix_path_list_buf_size (const char *);
-extern void cygwin32_posix_to_win32_path_list (const char *, char *);
-extern int cygwin32_posix_to_win32_path_list_buf_size (const char *);
-extern int cygwin32_conv_to_win32_path (const char *, char *);
-extern int cygwin32_conv_to_full_win32_path (const char *, char *);
-extern void cygwin32_conv_to_posix_path (const char *, char *);
-extern void cygwin32_conv_to_full_posix_path (const char *, char *);
-extern int cygwin32_posix_path_list_p (const char *);
-extern void cygwin32_split_path (const char *, char *, char *);
-extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
-#endif
-
 /* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
    Don't use in modern applications. */
 extern int cygwin_win32_to_posix_path_list (const char *, char *)
@@ -273,11 +258,6 @@ struct per_process
 };
 #define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->threadinterface))
 
-extern void cygwin_premain0 (int argc, char **argv, struct per_process *);
-extern void cygwin_premain1 (int argc, char **argv, struct per_process *);
-extern void cygwin_premain2 (int argc, char **argv, struct per_process *);
-extern void cygwin_premain3 (int argc, char **argv, struct per_process *);
-
 #ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
 #endif
@@ -285,6 +265,11 @@ extern void cygwin_set_impersonation_token (const HANDLE);
 
 /* included if <windows.h> is included */
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
+
+extern void cygwin_premain0 (int, char **, struct per_process *);
+extern void cygwin_premain1 (int, char **, struct per_process *);
+extern void cygwin_premain2 (int, char **, struct per_process *);
+extern void cygwin_premain3 (int, char **, struct per_process *);
 
 #ifdef __CYGWIN__
 #include <sys/resource.h>

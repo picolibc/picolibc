@@ -35,13 +35,14 @@
 static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $";
 #endif
 
+#include "winlean.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <gmon.h>
+#include <stdlib.h>
 
 #include <profil.h>
-#include <windows.h>
 
 /* XXX needed? */
 //extern char *minbrk __asm ("minbrk");

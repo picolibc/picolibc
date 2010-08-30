@@ -53,9 +53,11 @@ SYSTEM_INFO system_info;
 /* Set in init.cc.  Used to check if Cygwin DLL is dynamically loaded. */
 int NO_COPY dynamically_loaded;
 
+/* Some CYGWIN environment variable variables. */
 bool display_title;
 bool strip_title_path;
 bool allow_glob = true;
+
 bool NO_COPY in_forkee;
 
 int __argc_safe;

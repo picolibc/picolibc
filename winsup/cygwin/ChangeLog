@@ -1,3 +1,21 @@
+2010-08-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* winlean.h: New file.
+	* automode.c: Use "winlean.h".
+	* binmode.c: Ditto.
+	* gmon.c: Ditto.
+	* textmode.c: Ditto.
+	* textreadmode.c: Ditto.
+	* winsup.h: Ditto.
+	* lib/cygwin_attach_dll.c: Ditto.
+	* lib/dll_main.cc: Ditto.
+	* profile.c: Ditto.
+	* crt0.c: Ditto.  Cleanup ancient cruft.  Add dummy calls to
+	cygwin_premain*.
+	* include/sys/cygwin.h: Remove old stuff.  Move premain declarations
+	nearer to other cygwin-specific function declarations.
+	* globals.cc: Add comment.
+
 2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (LoadDLLprime): Change dllname storage to string16.

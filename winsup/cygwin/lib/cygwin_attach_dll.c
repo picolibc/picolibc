@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #undef __INSIDE_CYGWIN__
-#include <windows.h>
+#include "winlean.h"
 #include <time.h>	/* Needed since call to sys/time.h via sys/cygwin.h
 			   complains otherwise */
 #include <sys/cygwin.h>

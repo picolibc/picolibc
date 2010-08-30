@@ -81,24 +81,7 @@ extern const char case_folded_upper[];
 #define cfree newlib_cfree_dont_use
 #endif
 
-#define WIN32_LEAN_AND_MEAN 1
-#define _WINGDI_H
-#define _WINUSER_H
-#define _WINNLS_H
-#define _WINVER_H
-#define _WINNETWK_H
-#define _WINSVC_H
-#include <windows.h>
-#include <wincrypt.h>
-#include <lmcons.h>
-#include <ntdef.h>
-#undef _WINGDI_H
-#undef _WINUSER_H
-#undef _WINNLS_H
-#undef _WINVER_H
-#undef _WINNETWK_H
-#undef _WINSVC_H
-
+#include "winlean.h"
 #include "wincap.h"
 
 /* The one function we use from winuser.h most of the time */

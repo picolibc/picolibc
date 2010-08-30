@@ -8,7 +8,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#include <windows.h>
+#include "winlean.h"
 #include <sys/types.h>
 #include <errno.h>
 
