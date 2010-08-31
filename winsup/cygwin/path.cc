@@ -267,6 +267,14 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
     {
       *tail++ = *src++;
       ++dst_start;
+      /* Is that a //?/ or //./ prefix into the native NT namespace?
+	 If so, preserve it. */
+      if ((src[1] == '.' || src[1] == '?') && isslash (src[2]))
+	{
+	  *tail++ = *src++;
+	  *tail++ = *src++;
+	  dst_start += 2;
+	}
     }
 
   while (*src)
@@ -818,6 +826,13 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path[2] = '\\';
 	      full_path[3] = '\0';
 	    }
+	  /* Otherwise, if the user requires a directory and explicitely
+	     specified a path into the native NT namespace, add the trailing
+	     backslash.  It's needed to access the root dir. */
+	  else if (need_directory
+		   && full_path[0] == '\\' && full_path[1] == '\\'
+		   && (full_path[2] == '.' || full_path[2] == '?'))
+	    strcat (full_path, "\\");
 
 	  /* If the incoming path was given in DOS notation, always treat
 	     it as caseinsensitive,noacl path.  This must be set before

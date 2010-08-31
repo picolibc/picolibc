@@ -1,5 +1,11 @@
 2010-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (normalize_posix_path): Preserve //./ and //?/ prefixes.
+	(path_conv::check): Allow access to root directory of native NT disk
+	devices.
+
+2010-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h: Bump DLL minor version number to 7.
 
 2010-08-30  Christopher Faylor  <me+cygwin@cgf.cx>
