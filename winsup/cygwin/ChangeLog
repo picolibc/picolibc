@@ -1,3 +1,7 @@
+2010-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 7.
+
 2010-08-30  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Move sigproc_init later, after cygheap
