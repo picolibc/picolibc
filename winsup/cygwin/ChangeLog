@@ -1,3 +1,35 @@
+2010-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygthread.cc (cygthread::create): Fix incorrect use of name rather
+	than __name.
+	* cygthread.h (cygthread::cygthread): Create versions which eliminate
+	'n' parameter.
+	* dcrt0.cc (dll_crt0_1): Remove check for threadfunc_ix.  Remove
+	obsolete comments.  Set process_state to active here.
+	* fhandler_netdrive.cc (create_thread_and_wait): Use shortened
+	cygthread constructor.
+	* timer.cc (timer_tracker::settime): Ditto.
+	* window.cc (HWND): Ditto.
+	* fhandler_tty.cc: Use shortened cygthread constructor, where
+	appropriate, throughout.
+	* select.cc: Ditto.
+	* fork.cc (frok::child): Remove wait_for_sigthread.
+	(fork): Reformat if for slightly better clarity.
+	* init.cc (dll_finished_loading): New variable.
+	(dll_entry): Use dll_finished_loading to determine when we should call
+	merge_threadfunc.
+	* sigproc.cc (no_signals_available): Simplify by using my_readsig.
+	(wait_sig_inited): Delete.
+	(wait_sig): Define as void function.
+	(pending_signals): Accommodate change to wait_sig definition.
+	(wait_for_sigthread): Delete definition.
+	(sigproc_init): Initialize signal pipe here, before wait_sig thread is
+	created.  Use void form of cygthread creation.
+	(init_sig_pipe): Delete.
+	(wait_sig): Return void rather than DWORD.  Assume previous
+	initialization of signal pipe.  Set my_sendsig to NULL when exiting.
+	* sigproc.h (wait_for_sigthread): Delete declaration.
+
 2010-09-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Set d_type.

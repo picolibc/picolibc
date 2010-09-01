@@ -81,7 +81,6 @@ bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));
 int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
 void __stdcall signal_fixup_after_exec ();
-void __stdcall wait_for_sigthread ();
 void __stdcall sigalloc ();
 void __stdcall create_signal_arrived ();
 
@@ -91,8 +90,6 @@ int killsys (pid_t, int);
 extern char myself_nowait_dummy[];
 
 extern struct sigaction *global_sigs;
-
-#define WAIT_SIG_PRIORITY THREAD_PRIORITY_NORMAL
 
 #define myself_nowait ((_pinfo *) myself_nowait_dummy)
 #endif /*_SIGPROC_H*/

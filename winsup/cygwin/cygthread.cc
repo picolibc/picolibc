@@ -188,7 +188,7 @@ out:
 void
 cygthread::create ()
 {
-  thread_printf ("name %s, id %p", name, id);
+  thread_printf ("name %s, id %p, this %p", __name, id, this);
   HANDLE htobe;
   if (h)
     {
@@ -197,7 +197,7 @@ cygthread::create ()
       while (!thread_sync)
 	yield ();
       SetEvent (thread_sync);
-      thread_printf ("activated name '%s', thread_sync %p for thread %p", name, thread_sync, id);
+      thread_printf ("activated name '%s', thread_sync %p for id %p", __name, thread_sync, id);
       htobe = h;
     }
   else
@@ -206,8 +206,8 @@ cygthread::create ()
       htobe = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			    this, 0, &id);
       if (!htobe)
-	api_fatal ("CreateThread failed for %s - %p<%p>, %E", name, h, id);
-      thread_printf ("created name '%s', thread %p, id %p", name, h, id);
+	api_fatal ("CreateThread failed for %s - %p<%p>, %E", __name, h, id);
+      thread_printf ("created name '%s', thread %p, id %p", __name, h, id);
 #ifdef DEBUGGING
       terminated = false;
 #endif

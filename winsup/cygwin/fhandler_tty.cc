@@ -89,9 +89,9 @@ fhandler_tty_master::init ()
 
   set_close_on_exec (true);
 
-  new cygthread (process_input, 0, cygself, "ttyin");
-  new cygthread (process_ioctl, 0, cygself, "ttyioctl");
-  new cygthread (process_output, 0, cygself, "ttyout");
+  new cygthread (process_input, cygself, "ttyin");
+  new cygthread (process_ioctl, cygself, "ttyioctl");
+  new cygthread (process_output, cygself, "ttyout");
 
   return 0;
 }
@@ -1805,7 +1805,7 @@ fhandler_pty_master::setup (bool ispty)
 	  errstr = "pty master control pipe";
 	  goto err;
 	}
-      master_thread = new cygthread (::pty_master_thread, 0, this, "pty_master");
+      master_thread = new cygthread (::pty_master_thread, this, "pty_master");
       if (!master_thread)
 	{
 	  errstr = "pty master control thread";

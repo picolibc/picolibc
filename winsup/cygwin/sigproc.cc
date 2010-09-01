@@ -33,7 +33,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available(x) (!hwait_sig || (hwait_sig == INVALID_HANDLE_VALUE) || ((x) && myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls) || !cygwin_finished_initializing)
+#define no_signals_available(x) (!my_sendsig ||( myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls) || !cygwin_finished_initializing)
 
 #define NPROCS	256
 
@@ -55,9 +55,6 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 
-cygthread NO_COPY *hwait_sig;
-Static HANDLE wait_sig_inited;		// Control synchronization of
-					//  message queue startup
 Static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
@@ -78,7 +75,7 @@ static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ bool get_proc_lock (DWORD, DWORD);
 static bool __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
-static DWORD WINAPI wait_sig (VOID *arg);
+static void WINAPI wait_sig (VOID *arg);
 
 /* wait_sig bookkeeping */
 
@@ -97,7 +94,7 @@ public:
   sigpacket *save () const {return curr;}
   void restore (sigpacket *saved) {curr = saved;}
   friend void __stdcall sig_dispatch_pending (bool);
-  friend DWORD WINAPI wait_sig (VOID *arg);
+  friend void WINAPI wait_sig (VOID *arg);
 };
 
 Static pending_signals sigq;
@@ -125,20 +122,6 @@ signal_fixup_after_exec ()
 	  global_sigs[i].sa_flags &= ~ SA_SIGINFO;
 	}
     }
-}
-
-void __stdcall
-wait_for_sigthread ()
-{
-  sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
-  HANDLE hsig_inited = wait_sig_inited;
-  WaitForSingleObject (hsig_inited, INFINITE);
-  wait_sig_inited = NULL;
-  myself->sendsig = my_sendsig;
-  myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~PID_INITIALIZING;
-  ForceCloseHandle1 (hsig_inited, wait_sig_inited);
-  sigproc_printf ("process/signal handling enabled, state %p", myself->process_state);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -468,23 +451,21 @@ create_signal_arrived ()
 }
 
 /* Signal thread initialization.  Called from dll_crt0_1.
-
-   This routine starts the signal handling thread.  The wait_sig_inited
-   event is used to signal that the thread is ready to handle signals.
-   We don't wait for this during initialization but instead detect it
-   in sig_send to gain a little concurrency.  */
+   This routine starts the signal handling thread.  */
 void __stdcall
 sigproc_init ()
 {
-  wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  ProtectHandle (wait_sig_inited);
-
+  char char_sa_buf[1024];
+  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+  for (int i = 5; i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0); i--)
+    if (i == 1)
+      api_fatal ("couldn't create signal pipe, %E");
+  ProtectHandle (my_readsig);
+  myself->sendsig = my_sendsig;
+  new cygthread (wait_sig, cygself, "sig");
   /* sync_proc_subproc is used by proc_subproc.  It serialises
      access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
-
-  hwait_sig = new cygthread (wait_sig, 0, cygself, "sig");
-  hwait_sig->zap_h ();
 }
 
 /* Called on process termination to terminate signal and process threads.
@@ -566,13 +547,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     {
       if (no_signals_available (si.si_signo != __SIGEXIT))
 	{
-	  sigproc_printf ("my_sendsig %p, myself->sendsig %p, exit_state %d",
-			  my_sendsig, myself->sendsig, exit_state);
 	  set_errno (EAGAIN);
 	  goto out;		// Either exiting or not yet initializing
 	}
-      if (wait_sig_inited)
-	wait_for_sigthread ();
       wait_for_completion = p != myself_nowait && _my_tls.isinitialized () && !exit_state;
       p = myself;
     }
@@ -1150,37 +1127,14 @@ pending_signals::next ()
   return res;
 }
 
-/* Called separately to allow stack space reutilization by wait_sig.
-   This function relies on the fact that it will be called after cygheap
-   has been set up.  For the case of non-dynamic DLL initialization this
-   means that it relies on the implicit serialization guaranteed by being
-   run as part of DLL_PROCESS_ATTACH. */
-static void __attribute__ ((noinline))
-init_sig_pipe()
-{
-  char char_sa_buf[1024];
-  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-  for (int i = 5; i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0); i--)
-    if (i == 1)
-      api_fatal ("couldn't create signal pipe, %E");
-  ProtectHandle (my_readsig);
-}
-
-
 /* Process signals by waiting for signal data to arrive in a pipe.
    Set a completion event if one was specified. */
-static DWORD WINAPI
+static void WINAPI
 wait_sig (VOID *)
 {
-  init_sig_pipe ();
-  /* Initialization */
-  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
-
+  _sig_tls = &_my_tls;
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
-  SetEvent (wait_sig_inited);
-
-  _sig_tls = &_my_tls;
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
 
@@ -1253,7 +1207,7 @@ wait_sig (VOID *)
 	    }
 	  break;
 	case __SIGEXIT:
-	  hwait_sig = (cygthread *) INVALID_HANDLE_VALUE;
+	  my_sendsig = NULL;
 	  sigproc_printf ("saw __SIGEXIT");
 	  break;	/* handle below */
 	default:

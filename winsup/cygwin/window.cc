@@ -111,7 +111,7 @@ HWND ()
   if (!hwnd)
     {
       _lock.upforgrabs ();
-      cygthread *h = new cygthread (::winthread, 0, this, "win");
+      cygthread *h = new cygthread (::winthread, this, "win");
       h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
       h->zap_h ();
       lock ();

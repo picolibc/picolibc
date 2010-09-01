@@ -242,7 +242,6 @@ frok::child (volatile char * volatile here)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
-  wait_for_sigthread ();
   cygwin_finished_initializing = true;
   return 0;
 }
@@ -619,9 +618,9 @@ fork ()
   }
 
   MALLOC_CHECK;
-  if (ischild || res > 0)
-    /* everything is ok */;
-  else
+  if (ischild)
+    /* nothing to do */;
+  else if (res < 0)
     {
       if (!grouped.error)
 	syscall_printf ("fork failed - child pid %d, errno %d", grouped.child_pid, grouped.this_errno);

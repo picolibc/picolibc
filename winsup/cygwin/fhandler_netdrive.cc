@@ -136,7 +136,7 @@ create_thread_and_wait (int what, PVOID in, PVOID out, DWORD outsize,
 {
   netdriveinf ndi = { what, 0, in, out, outsize,
 		      CreateSemaphore (&sec_none_nih, 0, 2, NULL) };
-  cygthread *thr = new cygthread (thread_netdrive, 0, &ndi, name);
+  cygthread *thr = new cygthread (thread_netdrive, &ndi, name);
   if (thr->detach (ndi.sem))
     ndi.ret = ERROR_OPERATION_ABORTED;
   CloseHandle (ndi.sem);

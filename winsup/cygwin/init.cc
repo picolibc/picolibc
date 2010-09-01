@@ -18,8 +18,8 @@ static DWORD _my_oldfunc;
 
 static char NO_COPY *search_for = (char *) cygthread::stub;
 unsigned threadfunc_ix[8] __attribute__((section (".cygwin_dll_common"), shared));
-extern cygthread *hwait_sig;
 
+static bool dll_finished_loading;
 #define OLDFUNC_OFFSET -1
 
 static void WINAPI
@@ -138,17 +138,18 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 
       dll_crt0_0 ();
       _my_oldfunc = TlsAlloc ();
+      dll_finished_loading = true;
       break;
     case DLL_PROCESS_DETACH:
       if (dynamically_loaded)
 	shared_destroy ();
       break;
     case DLL_THREAD_ATTACH:
-      if (hwait_sig)
+      if (dll_finished_loading)
 	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      if (hwait_sig && (void *) &_my_tls > (void *) &wow64_test_stack_marker
+      if (dll_finished_loading && (void *) &_my_tls > (void *) &wow64_test_stack_marker
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
       break;

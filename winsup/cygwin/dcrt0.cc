@@ -715,6 +715,9 @@ dll_crt0_0 ()
 		   GetCurrentProcess (), &hMainThread,
 		   0, false, DUPLICATE_SAME_ACCESS);
 
+  myself->process_state |= PID_ACTIVE;
+  myself->process_state &= ~PID_INITIALIZING;
+
   OpenProcessToken (GetCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
@@ -869,11 +872,6 @@ dll_crt0_1 (void *)
 
   uinfo_init ();	/* initialize user info */
 
-  wait_for_sigthread ();
-  extern DWORD threadfunc_ix;
-  if (!threadfunc_ix)
-    system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
-
   /* Connect to tty. */
   tty::init_session ();
 
@@ -961,9 +959,6 @@ dll_crt0_1 (void *)
   MALLOC_CHECK;
   cygbench (__progname);
 
-  /* Flush signals and ensure that signal thread is up and running. Can't
-     do this for noncygwin case since the signal thread is blocked due to
-     LoadLibrary serialization. */
   ld_preload ();
   /* Per POSIX set the default application locale back to "C". */
   _setlocale_r (_REENT, LC_CTYPE, "C");

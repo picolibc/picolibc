@@ -253,7 +253,7 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       else
 	ResetEvent (syncthread);
-      new cygthread (timer_thread, 0, this, "itimer", syncthread);
+      new cygthread (timer_thread, this, "itimer", syncthread);
     }
 
   return 0;
