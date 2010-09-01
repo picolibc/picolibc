@@ -1,5 +1,13 @@
 2010-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* dcrt0.cc (dll_crt0_0): Remove myself settings.
+	* fork.cc (fork): Set myself process_state
+	* pinfo.cc (pinfo_init): Ditto.
+	(pinfo::thisproc): Make sure any sendsig setting is correctly copied.
+	* pinfo.h: Update copyright.  Remove unused code.
+
+2010-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygthread.cc (cygthread::create): Fix incorrect use of name rather
 	than __name.
 	* cygthread.h (cygthread::cygthread): Create versions which eliminate

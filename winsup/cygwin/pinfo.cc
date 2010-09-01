@@ -62,6 +62,7 @@ pinfo::thisproc (HANDLE h)
   init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
   procinfo->process_state |= PID_IN_USE;
   procinfo->dwProcessId = myself_initial.pid;
+  procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
   strace.hello ();
   debug_printf ("myself->dwProcessId %u", procinfo->dwProcessId);
@@ -109,6 +110,8 @@ pinfo_init (char **envp, int envc)
       debug_printf ("Set nice to %d", myself->nice);
     }
 
+  myself->process_state |= PID_ACTIVE;
+  myself->process_state &= ~(PID_INITIALIZING | PID_EXITED);
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 

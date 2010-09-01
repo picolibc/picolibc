@@ -1,6 +1,7 @@
 /* pinfo.h: process table info
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -165,7 +166,6 @@ public:
   int operator == (char *x) const {return (char *) procinfo == x;}
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
-  // operator bool () const {return (int) h;}
   void preserve () { destroy = false; }
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}

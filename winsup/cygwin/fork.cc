@@ -619,7 +619,10 @@ fork ()
 
   MALLOC_CHECK;
   if (ischild)
-    /* nothing to do */;
+    {
+      myself->process_state |= PID_ACTIVE;
+      myself->process_state &= ~(PID_INITIALIZING | PID_EXITED);
+    }
   else if (res < 0)
     {
       if (!grouped.error)

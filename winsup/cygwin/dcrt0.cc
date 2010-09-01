@@ -715,9 +715,6 @@ dll_crt0_0 ()
 		   GetCurrentProcess (), &hMainThread,
 		   0, false, DUPLICATE_SAME_ACCESS);
 
-  myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~PID_INITIALIZING;
-
   OpenProcessToken (GetCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
