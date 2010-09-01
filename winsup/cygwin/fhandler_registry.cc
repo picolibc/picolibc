@@ -657,7 +657,7 @@ fhandler_registry::seekdir (DIR * dir, long loc)
    */
   rewinddir (dir);
   while (loc > (dir->__d_position & REG_POSITION_MASK))
-    if (!readdir (dir, dir->__d_dirent))
+    if (readdir (dir, dir->__d_dirent))
       break;
 }
 

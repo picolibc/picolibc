@@ -250,6 +250,7 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
 	  if (de->d_ino <= UINT_MAX)
 	    de->d_ino = hash_path_name (0, nro->lpRemoteName);
 	}
+      de->d_type = DT_DIR;
 
       res = 0;
     }
@@ -265,7 +266,7 @@ fhandler_netdrive::seekdir (DIR *dir, long pos)
   if (pos < 0)
     return;
   while (dir->__d_position < pos)
-    if (!readdir (dir, dir->__d_dirent))
+    if (readdir (dir, dir->__d_dirent))
       break;
 }
 

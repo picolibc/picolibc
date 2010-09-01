@@ -1,5 +1,11 @@
 2010-09-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Set d_type.
+	(fhandler_netdrive::seekdir): Fix test for readdir return value.
+	* fhandler_registry.cc (fhandler_registry::seekdir): Ditto.
+
+2010-09-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h: Bump DLL minor version number to 8.
 
 2010-08-31  Corinna Vinschen  <corinna@vinschen.de>
