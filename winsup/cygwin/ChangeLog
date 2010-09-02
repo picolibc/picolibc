@@ -1,3 +1,7 @@
+2010-09-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* sigoproc.cc (sigproc_init): Use American spelling in comment.
+
 2010-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Remove myself settings.

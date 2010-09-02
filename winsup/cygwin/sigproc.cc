@@ -463,7 +463,7 @@ sigproc_init ()
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
   new cygthread (wait_sig, cygself, "sig");
-  /* sync_proc_subproc is used by proc_subproc.  It serialises
+  /* sync_proc_subproc is used by proc_subproc.  It serializes
      access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
 }
