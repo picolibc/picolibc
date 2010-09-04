@@ -1,3 +1,10 @@
+2010-09-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (mount_info::from_fstab_line): Reorder to make sure all
+	mounts from user fstab are user mounts.
+	(mount): Make sure all mounts are user mounts, even those added via
+	mount -a.
+
 2010-09-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigoproc.cc (sigproc_init): Use American spelling in comment.

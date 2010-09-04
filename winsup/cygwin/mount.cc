@@ -1050,8 +1050,6 @@ mount_info::from_fstab_line (char *line, bool user)
     mount_flags |= MOUNT_NOPOSIX;
   if (!fstab_read_flags (&c, mount_flags, false))
     return true;
-  if (user)
-    mount_flags &= ~MOUNT_SYSTEM;
   if (mount_flags & MOUNT_BIND)
     {
       /* Prepend root path to bound path. */
@@ -1066,6 +1064,8 @@ mount_info::from_fstab_line (char *line, bool user)
 	mount_flags = (MOUNT_BIND | flags)
 		      & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
     }
+  if (user)
+    mount_flags &= ~MOUNT_SYSTEM;
   if (!strcmp (fs_type, "cygdrive"))
     {
       cygdrive_flags = mount_flags | MOUNT_CYGDRIVE;
@@ -1710,6 +1710,8 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 	    flags = (MOUNT_BIND | conv_flags)
 		    & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
 	}
+      /* Make sure all mounts are user mounts, even those added via mount -a. */
+      flags &= ~MOUNT_SYSTEM;
       res = mount_table->add_item (w32_path, posix_path, flags);
     }
 
