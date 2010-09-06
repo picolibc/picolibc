@@ -1,3 +1,8 @@
+2010-09-06  Pedro Alves  <pedro@codesourcery.com>
+
+	* signals.def: Replace all ANY uses by SET with specific numbers.
+	* signals.h (ANY): Remove.
+
 2010-07-31  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* signals.h (enum target_signal): Move the content to signals.def.

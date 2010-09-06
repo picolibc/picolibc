@@ -53,10 +53,7 @@ enum target_signal
   {
 #define SET(symbol, constant, name, string) \
     symbol = constant,
-#define ANY(symbol, name, string) \
-    symbol,
 #include "gdb/signals.def"
-#undef ANY
 #undef SET
   };
 
