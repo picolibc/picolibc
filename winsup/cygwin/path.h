@@ -18,7 +18,9 @@ details. */
 
 #define isproc_dev(devn) \
   (devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS || \
-   devn == FH_PROCNET)
+   devn == FH_PROCNET || devn == FH_PROCSYS)
+
+#define isprocsys_dev(devn) (devn == FH_PROCSYS)
 
 #define isvirtual_dev(devn) \
   (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)

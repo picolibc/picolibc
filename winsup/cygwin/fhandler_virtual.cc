@@ -225,10 +225,10 @@ fhandler_virtual::open (int flags, mode_t mode)
   return 1;
 }
 
-int
+virtual_ftype_t
 fhandler_virtual::exists ()
 {
-  return 0;
+  return virt_none;
 }
 
 bool

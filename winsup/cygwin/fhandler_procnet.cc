@@ -39,10 +39,10 @@ static _off64_t format_procnet_ifinet6 (void *, char *&);
 
 static const virt_tab_t procnet_tab[] =
 {
-  { ".",        FH_PROCNET, virt_directory, NULL },
-  { "..",       FH_PROCNET, virt_directory, NULL },
-  { "if_inet6", FH_PROCNET, virt_file,      format_procnet_ifinet6 },
-  { NULL,       0,          virt_none,      NULL }
+  { _VN ("."),        FH_PROCNET, virt_directory, NULL },
+  { _VN (".."),       FH_PROCNET, virt_directory, NULL },
+  { _VN ("if_inet6"), FH_PROCNET, virt_file,      format_procnet_ifinet6 },
+  { NULL, 0,          0,          virt_none,      NULL }
 };
 
 static const int PROCNET_LINK_COUNT =
@@ -52,7 +52,7 @@ static const int PROCNET_LINK_COUNT =
  * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
  * -4 if path is a socket.
  */
-int
+virtual_ftype_t
 fhandler_procnet::exists ()
 {
   const char *path = get_name ();
@@ -61,20 +61,21 @@ fhandler_procnet::exists ()
   while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
-    return 1;
+    return virt_rootdir;
 
-  for (int i = 0; procnet_tab[i].name; i++)
-    if (!strcmp (path + 1, procnet_tab[i].name))
-      {
-	if (procnet_tab[i].type == virt_file)
-	  {
-	    if (!wincap.has_gaa_prefixes ()
-	    	|| !get_adapters_addresses (NULL, AF_INET6))
-	      return virt_none;
-	  }
-	fileid = i;
-	return procnet_tab[i].type;
-      }
+  virt_tab_t *entry = virt_tab_search (path + 1, false, procnet_tab,
+				       PROCNET_LINK_COUNT);
+  if (entry)
+    {
+      if (entry->type == virt_file)
+	{
+	  if (!wincap.has_gaa_prefixes ()
+	      || !get_adapters_addresses (NULL, AF_INET6))
+	    return virt_none;
+	}
+      fileid = entry - procnet_tab;
+      return entry->type;
+    }
   return virt_none;
 }
 
@@ -129,8 +130,6 @@ out:
 int
 fhandler_procnet::open (int flags, mode_t mode)
 {
-  int process_file_no = -1;
-
   int res = fhandler_virtual::open (flags, mode);
   if (!res)
     goto out;
@@ -163,27 +162,13 @@ fhandler_procnet::open (int flags, mode_t mode)
 	}
     }
 
-  process_file_no = -1;
-  for (int i = 0; procnet_tab[i].name; i++)
+  virt_tab_t *entry;
+  entry = virt_tab_search (path + 1, true, procnet_tab, PROCNET_LINK_COUNT);
+  if (!entry)
     {
-      if (path_prefix_p (procnet_tab[i].name, path + 1,
-			 strlen (procnet_tab[i].name), false))
-	process_file_no = i;
-    }
-  if (process_file_no == -1)
-    {
-      if (flags & O_CREAT)
-	{
-	  set_errno (EROFS);
-	  res = 0;
-	  goto out;
-	}
-      else
-	{
-	  set_errno (ENOENT);
-	  res = 0;
-	  goto out;
-	}
+      set_errno ((flags & O_CREAT) ? EROFS : ENOENT);
+      res = 0;
+      goto out;
     }
   if (flags & O_WRONLY)
     {
@@ -192,7 +177,7 @@ fhandler_procnet::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = process_file_no;
+  fileid = entry - procnet_tab;
   if (!fill_filebuf ())
 	{
 	  res = 0;

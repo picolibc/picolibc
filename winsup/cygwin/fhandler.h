@@ -34,7 +34,9 @@ extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
 extern const char proc[];
-extern const int proc_len;
+extern const size_t proc_len;
+extern const char procsys[];
+extern const size_t procsys_len;
 
 class select_record;
 class select_stuff;
@@ -97,6 +99,20 @@ enum del_lock_called_from {
   on_close,
   after_fork,
   after_exec
+};
+
+enum virtual_ftype_t {
+  virt_blk = -7,	/* Block special */
+  virt_chr = -6,	/* Character special */
+  virt_fsfile = -5,	/* FS-based file via /proc/sys */
+  virt_socket = -4,	/* Socket */
+  virt_pipe = -3,	/* Pipe */
+  virt_symlink = -2,	/* Symlink */
+  virt_file = -1,	/* Regular file */
+  virt_none = 0,	/* Invalid, Error */
+  virt_directory = 1,	/* Directory */
+  virt_rootdir = 2,	/* Root directory of virtual FS */
+  virt_fsdir = 3,	/* FS-based directory via /proc/sys */
 };
 
 class fhandler_base
@@ -1331,7 +1347,7 @@ class fhandler_virtual : public fhandler_base
   fhandler_virtual ();
   virtual ~fhandler_virtual();
 
-  virtual int exists();
+  virtual virtual_ftype_t exists();
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
   long telldir (DIR *);
   void seekdir (DIR *, long);
@@ -1357,7 +1373,7 @@ class fhandler_proc: public fhandler_virtual
 {
  public:
   fhandler_proc ();
-  int exists();
+  virtual_ftype_t exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   static DWORD get_proc_fhandler(const char *path);
 
@@ -1366,11 +1382,30 @@ class fhandler_proc: public fhandler_virtual
   bool fill_filebuf ();
 };
 
+class fhandler_procsys: public fhandler_virtual
+{
+ public:
+  fhandler_procsys ();
+  virtual_ftype_t exists(struct __stat64 *buf) __attribute__ ((regparm (2)));
+  virtual_ftype_t exists();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
+  long telldir (DIR *);
+  void seekdir (DIR *, long);
+  int closedir (DIR *);
+  int open (int flags, mode_t mode = 0);
+  int close ();
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  ssize_t __stdcall write (const void *ptr, size_t len);
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  bool fill_filebuf ();
+};
+
 class fhandler_netdrive: public fhandler_virtual
 {
  public:
   fhandler_netdrive ();
-  int exists();
+  virtual_ftype_t exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void seekdir (DIR *, long);
   void rewinddir (DIR *);
@@ -1388,7 +1423,7 @@ class fhandler_registry: public fhandler_proc
  public:
   fhandler_registry ();
   void set_name (path_conv &pc);
-  int exists();
+  virtual_ftype_t exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   long telldir (DIR *);
   void seekdir (DIR *, long);
@@ -1408,7 +1443,7 @@ class fhandler_process: public fhandler_proc
   pid_t pid;
  public:
   fhandler_process ();
-  int exists();
+  virtual_ftype_t exists();
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
@@ -1421,7 +1456,7 @@ class fhandler_procnet: public fhandler_proc
   pid_t pid;
  public:
   fhandler_procnet ();
-  int exists();
+  virtual_ftype_t exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -1462,6 +1497,8 @@ typedef union
   char __pipe[sizeof (fhandler_pipe)];
   char __proc[sizeof (fhandler_proc)];
   char __process[sizeof (fhandler_process)];
+  char __procnet[sizeof (fhandler_procnet)];
+  char __procsys[sizeof (fhandler_procsys)];
   char __pty_master[sizeof (fhandler_pty_master)];
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];

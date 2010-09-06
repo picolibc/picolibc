@@ -145,14 +145,14 @@ create_thread_and_wait (int what, PVOID in, PVOID out, DWORD outsize,
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
-int
+virtual_ftype_t
 fhandler_netdrive::exists ()
 {
   char *to;
   const char *from;
   size_t len = strlen (get_name ());
   if (len == 2)
-    return 1;
+    return virt_rootdir;
   char namebuf[len + 1];
   for (to = namebuf, from = get_name (); *from; to++, from++)
     *to = (*from == '/') ? '\\' : *from;
@@ -166,7 +166,7 @@ fhandler_netdrive::exists ()
 				      &nr, &nh, 0, "WNetOpenEnum");
   if (nh.dom)
     WNetCloseEnum (nh.dom);
-  return ret != NO_ERROR ? 0 : 1;
+  return ret != NO_ERROR ? virt_none : virt_directory;
 }
 
 fhandler_netdrive::fhandler_netdrive ():

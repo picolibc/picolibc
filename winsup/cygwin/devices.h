@@ -1,6 +1,6 @@
 /* devices.h
 
-   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -53,6 +53,7 @@ enum fh_devices
   FH_DEV     = FHDEV (0, 245),
   FH_PROCNET = FHDEV (0, 244),
   FH_PROCESSFD = FHDEV (0, 243),
+  FH_PROCSYS = FHDEV (0, 242),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),

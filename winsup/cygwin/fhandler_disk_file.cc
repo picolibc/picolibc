@@ -118,7 +118,7 @@ public:
 	    {
 	      found[__DIR_PROC] = true;
 	      if (retname)
-		RtlInitUnicodeString (retname, L"proc");
+		*retname = ro_u_proc;
 	      return 2;
 	    }
 	  if (!found[__DIR_CYGDRIVE])
@@ -407,7 +407,9 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
      entry, as in other calls to fstat_helper. */
   if (pc.is_rep_symlink ())
     fi.fbi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  pc.file_attributes (fi.fbi.FileAttributes);
+  /* Only copy attributes if not a device root dir. */
+  if (!(pc.file_attributes () & FILE_ATTRIBUTE_DEVICE))
+    pc.file_attributes (fi.fbi.FileAttributes);
   return fstat_helper (buf,
 		       fi.fbi.ChangeTime.QuadPart ? &fi.fbi.ChangeTime
 						  : &fi.fbi.LastWriteTime,
@@ -474,7 +476,9 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
      entry, as in other calls to fstat_helper. */
   if (pc.is_rep_symlink ())
     fdi_buf.fdi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  pc.file_attributes (fdi_buf.fdi.FileAttributes);
+  /* Only copy attributes if not a device root dir. */
+  if (!(pc.file_attributes () & FILE_ATTRIBUTE_DEVICE))
+    pc.file_attributes (fdi_buf.fdi.FileAttributes);
   return fstat_helper (buf,
 		       fdi_buf.fdi.ChangeTime.QuadPart
 		       ? &fdi_buf.fdi.ChangeTime : &fdi_buf.fdi.LastWriteTime,

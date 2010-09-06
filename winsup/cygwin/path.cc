@@ -761,8 +761,8 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
-	      int file_type = fh->exists ();
-	      if (file_type == -2)
+	      virtual_ftype_t file_type = fh->exists ();
+	      if (file_type == virt_symlink)
 		{
 		  fh->fill_filebuf ();
 		  symlen = sym.set (fh->get_filebuf ());
@@ -770,30 +770,60 @@ path_conv::check (const char *src, unsigned opt,
 	      delete fh;
 	      switch (file_type)
 		{
-		  case 1:
-		  case 2:
+		  case virt_directory:
+		  case virt_rootdir:
 		    if (component == 0)
 		      fileattr = FILE_ATTRIBUTE_DIRECTORY;
 		    break;
-		  case -1:
+		  case virt_file:
 		    if (component == 0)
 		      fileattr = 0;
 		    break;
-		  case -2:	/* /proc/self or /proc/<pid>/symlinks */
+		  case virt_symlink:
 		    goto is_virtual_symlink;
-		  case -3:	/* /proc/<pid>/fd/pipe:[] */
+		  case virt_pipe:
 		    if (component == 0)
 		      {
 			fileattr = 0;
 			dev.parse (FH_PIPE);
 		      }
 		    break;
-		  case -4:	/* /proc/<pid>/fd/socket:[] */
+		  case virt_socket:
 		    if (component == 0)
 		      {
 			fileattr = 0;
 			dev.parse (FH_TCP);
 		      }
+		    break;
+		  case virt_fsdir:
+		  case virt_fsfile:
+		    /* Access to real file or directory via block device
+		       entry in /proc/sys.  Convert to real file and go with
+		       the flow. */
+		    dev.parse (FH_FS);
+		    goto is_fs_via_procsys;
+		  case virt_blk:
+		    /* Block special device.  If the trailing slash has been
+		       requested, the target is the root directory of the
+		       filesystem on this block device.  So we convert this to
+		       a real file and attach the backslash. */
+		    if (component || need_directory)
+		      {
+			dev.parse (FH_FS);
+			if (component == 0)
+			  {
+			    strcat (full_path, "\\");
+			    fileattr = FILE_ATTRIBUTE_DIRECTORY
+				       | FILE_ATTRIBUTE_DEVICE;
+			  }
+			else
+			  fileattr = 0;
+			goto out;
+		      }
+		    /*FALLTHRU*/
+		  case virt_chr:
+		    if (component == 0)
+		      fileattr = FILE_ATTRIBUTE_DEVICE;
 		    break;
 		  default:
 		    if (component == 0)
@@ -840,6 +870,8 @@ path_conv::check (const char *src, unsigned opt,
 	     casesensitive. */
 	  if (is_msdos)
 	    sym.pflags |= PATH_NOPOSIX | PATH_NOACL;
+
+is_fs_via_procsys:
 
 	  symlen = sym.check (full_path, suff, fs, conv_handle);
 
@@ -2850,6 +2882,14 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	    if (buf[1] != ':') /* native UNC path */
 	      *(buf += 2) = '\\';
 	  }
+	else if (*buf == '\\')
+	  {
+	    /* Device name points to somewhere else in the NT namespace. 
+	       Use GLOBALROOT prefix to convert to Win32 path. */
+	    char *p = stpcpy (buf, "\\\\.\\GLOBALROOT");
+	    sys_wcstombs (p, NT_MAX_PATH - (p - buf),
+			  up->Buffer, up->Length / sizeof (WCHAR));
+	  }
 	lsiz = strlen (buf) + 1;
 	/* TODO: Incoming "." is a special case which leads to a trailing
 	   backslash ".\\" in the Win32 path.  That's a result of the
@@ -2891,7 +2931,8 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	     quite a bunch of Win32 functions, especially in user32.dll,
 	     apparently, which don't grok long path names at all, not even
 	     in the UNICODE API. */
-	  if (lsiz <= MAX_PATH + 4 || (path[5] != L':' && lsiz <= MAX_PATH + 6))
+	  if ((path[5] == L':' && lsiz <= MAX_PATH + 4)
+	      || (!wcsncmp (path + 4, L"UNC\\", 4) && lsiz <= MAX_PATH + 6))
 	    {
 	      path += 4;
 	      lsiz -= 4;
@@ -2901,6 +2942,13 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 		  lsiz -= 2;
 		}
 	    }
+	}
+      else if (*path == L'\\')
+	{
+	  /* Device name points to somewhere else in the NT namespace. 
+	     Use GLOBALROOT prefix to convert to Win32 path. */
+	  to = (void *) wcpcpy ((wchar_t *) to, L"\\\\.\\GLOBALROOT");
+	  lsiz += sizeof ("\\\\.\\GLOBALROOT") - 1;
 	}
       /* TODO: Same ".\\" band-aid as in CCP_POSIX_TO_WIN_A case. */
       if (relative && !strcmp ((const char *) from, ".")
@@ -2943,10 +2991,10 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
     case CCP_POSIX_TO_WIN_A:
     case CCP_WIN_A_TO_POSIX:
     case CCP_WIN_W_TO_POSIX:
-      strcpy ((char *) to, buf);
+      stpcpy ((char *) to, buf);
       break;
     case CCP_POSIX_TO_WIN_W:
-      wcscpy ((PWCHAR) to, path);
+      wcpcpy ((PWCHAR) to, path);
       break;
     }
   return 0;

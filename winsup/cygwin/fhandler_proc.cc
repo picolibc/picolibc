@@ -46,23 +46,24 @@ static _off64_t format_proc_filesystems (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
-  { ".",	  FH_PROC,	virt_directory,	NULL },
-  { "..",	  FH_PROC,	virt_directory,	NULL },
-  { "loadavg",	  FH_PROC,	virt_file,	format_proc_loadavg },
-  { "meminfo",	  FH_PROC,	virt_file,	format_proc_meminfo },
-  { "registry",	  FH_REGISTRY,	virt_directory,	NULL  },
-  { "stat",	  FH_PROC,	virt_file,	format_proc_stat },
-  { "version",	  FH_PROC,	virt_file,	format_proc_version },
-  { "uptime",	  FH_PROC,	virt_file,	format_proc_uptime },
-  { "cpuinfo",	  FH_PROC,	virt_file,	format_proc_cpuinfo },
-  { "partitions", FH_PROC,	virt_file,	format_proc_partitions },
-  { "self",	  FH_PROC,	virt_symlink,	format_proc_self },
-  { "mounts",	  FH_PROC,	virt_symlink,	format_proc_mounts },
-  { "registry32", FH_REGISTRY,	virt_directory,	NULL },
-  { "registry64", FH_REGISTRY,	virt_directory,	NULL },
-  { "net",	  FH_PROCNET,	virt_directory,	NULL },
-  { "filesystems", FH_PROC,	virt_file,	format_proc_filesystems },
-  { NULL,	  0,		virt_none,	NULL }
+  { _VN ("."),		 FH_PROC,	virt_directory,	NULL },
+  { _VN (".."),		 FH_PROC,	virt_directory,	NULL },
+  { _VN ("cpuinfo"),	 FH_PROC,	virt_file,	format_proc_cpuinfo },
+  { _VN ("filesystems"), FH_PROC,	virt_file,	format_proc_filesystems },
+  { _VN ("loadavg"),	 FH_PROC,	virt_file,	format_proc_loadavg },
+  { _VN ("meminfo"),	 FH_PROC,	virt_file,	format_proc_meminfo },
+  { _VN ("mounts"),	 FH_PROC,	virt_symlink,	format_proc_mounts },
+  { _VN ("net"),	 FH_PROCNET,	virt_directory,	NULL },
+  { _VN ("partitions"),  FH_PROC,	virt_file,	format_proc_partitions },
+  { _VN ("registry"),	 FH_REGISTRY,	virt_directory,	NULL  },
+  { _VN ("registry32"),  FH_REGISTRY,	virt_directory,	NULL },
+  { _VN ("registry64"),  FH_REGISTRY,	virt_directory,	NULL },
+  { _VN ("self"),	 FH_PROC,	virt_symlink,	format_proc_self },
+  { _VN ("stat"),	 FH_PROC,	virt_file,	format_proc_stat },
+  { _VN ("sys"),	 FH_PROCSYS,	virt_directory,	NULL },
+  { _VN ("uptime"),	 FH_PROC,	virt_file,	format_proc_uptime },
+  { _VN ("version"),	 FH_PROC,	virt_file,	format_proc_version },
+  { NULL, 0,	   	 0,		virt_none,	NULL }
 };
 
 #define PROC_DIR_COUNT 4
@@ -71,11 +72,37 @@ static const int PROC_LINK_COUNT = (sizeof (proc_tab) / sizeof (virt_tab_t)) - 1
 
 /* name of the /proc filesystem */
 const char proc[] = "/proc";
-const int proc_len = sizeof (proc) - 1;
+const size_t proc_len = sizeof (proc) - 1;
 
-/* Auxillary function that returns the fhandler associated with the given path
-   this is where it would be nice to have pattern matching in C - polymorphism
-   just doesn't cut it. */
+/* bsearch compare function. */
+static int
+proc_tab_cmp (const void *key, const void *memb)
+{
+  int ret = strncmp (((virt_tab_t *) key)->name, ((virt_tab_t *) memb)->name,
+		     ((virt_tab_t *) memb)->name_len);
+  if (!ret && ((virt_tab_t *) key)->name[((virt_tab_t *) memb)->name_len] != '\0' && ((virt_tab_t *) key)->name[((virt_tab_t *) memb)->name_len] != '/')
+    return 1;
+  return ret;
+}
+
+/* Helper function to perform a binary search of  the incoming pathname
+   against the alpha-sorted virtual file table. */
+virt_tab_t *
+virt_tab_search (const char *path, bool prefix, const virt_tab_t *table,
+		 size_t nelem)
+{
+  virt_tab_t key = { path, 0, 0, virt_none, NULL };
+  virt_tab_t *entry = (virt_tab_t *) bsearch (&key, table, nelem,
+					      sizeof (virt_tab_t),
+					      proc_tab_cmp);
+  if (entry && (path[entry->name_len] == '\0'
+		|| (prefix && path[entry->name_len] == '/')))
+    return entry;
+  return NULL;
+}
+
+/* Auxillary function that returns the fhandler associated with the given
+   path. */
 DWORD
 fhandler_proc::get_proc_fhandler (const char *path)
 {
@@ -91,12 +118,10 @@ fhandler_proc::get_proc_fhandler (const char *path)
   if (*path == 0)
     return FH_PROC;
 
-  for (int i = 0; proc_tab[i].name; i++)
-    {
-      if (path_prefix_p (proc_tab[i].name, path, strlen (proc_tab[i].name),
-			 false))
-	return proc_tab[i].fhandler;
-    }
+  virt_tab_t *entry = virt_tab_search (path, true, proc_tab,
+				       PROC_LINK_COUNT);
+  if (entry)
+    return entry->fhandler;
 
   if (pinfo (atoi (path)))
     return FH_PROCESS;
@@ -120,7 +145,7 @@ fhandler_proc::get_proc_fhandler (const char *path)
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
-int
+virtual_ftype_t
 fhandler_proc::exists ()
 {
   const char *path = get_name ();
@@ -128,12 +153,13 @@ fhandler_proc::exists ()
   path += proc_len;
   if (*path == 0)
     return virt_rootdir;
-  for (int i = 0; proc_tab[i].name; i++)
-    if (!strcmp (path + 1, proc_tab[i].name))
-      {
-	fileid = i;
-	return proc_tab[i].type;
-      }
+  virt_tab_t *entry = virt_tab_search (path + 1, false, proc_tab,
+				       PROC_LINK_COUNT);
+  if (entry)
+    {
+      fileid = entry - proc_tab;
+      return entry->type;
+    }
   return virt_none;
 }
 
@@ -163,21 +189,21 @@ fhandler_proc::fstat (struct __stat64 *buf)
     }
   else
     {
-      path++;
-      for (int i = 0; proc_tab[i].name; i++)
-	if (!strcmp (path, proc_tab[i].name))
-	  {
-	    if (proc_tab[i].type == virt_directory)
-	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-	    else if (proc_tab[i].type == virt_symlink)
-	      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
-	    else
-	      {
-		buf->st_mode &= NO_X;
-		buf->st_mode |= S_IFREG;
-	      }
-	    return 0;
-	  }
+      virt_tab_t *entry = virt_tab_search (path + 1, false, proc_tab,
+					   PROC_LINK_COUNT);
+      if (entry)
+	{
+	  if (entry->type == virt_directory)
+	    buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+	  else if (entry->type == virt_symlink)
+	    buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
+	  else
+	    {
+	      buf->st_mode &= NO_X;
+	      buf->st_mode |= S_IFREG;
+	    }
+	  return 0;
+	}
     }
   set_errno (ENOENT);
   return -1;

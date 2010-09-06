@@ -1,3 +1,69 @@
+2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add fhandler_procsys.o.
+	* devices.h (enum fh_devices): Add FH_PROCSYS.
+	* devices.in (dev_procsys_storage): New device.
+	* devices.cc: Regenerate.
+	* dtable.cc (build_fh_pc): Add code to allocate fhandler_procsys.
+	* fhandler.h (proc_len): Convert to size_t.
+	(procsys): Declare.
+	(procsys_len): Declare.
+	(enum virtual_ftype_t): Move here from fhandler_virtual.h.
+	Add members supported by fhandler_procsys.
+	(fhandler_virtual::exists): Return virtual_ftype_t.  Change
+	in all derived classes.
+	(class fhandler_procsys): New class.
+	(fhandler_union): Add fhandler_procnet and fhandler_procsys members.
+	* fhandler_disk_file.cc (__DIR_mounts::check_missing_mount): Use
+	ro_u_proc.
+	(fhandler_base::fstat_by_handle): Don't copy attributes if file is an
+	NT device.
+	(fhandler_base::fstat_by_name): Ditto.
+	* fhandler_netdrive.cc (fhandler_netdrive::exists): Return
+	virtual_ftype_t.
+	* fhandler_proc.cc (proc_tab): Sort alphabetically.  Use _VN macro
+	to store length.
+	(proc_len): Change to size_t.
+	(proc_tab_cmp): New static function.
+	(virt_tab_search): New function to search entry in virt_tab_t
+	arrays.  Use throughout in /proc and sibling classes instead of
+	loop.
+	(fhandler_proc::exists): Return virtual_ftype_t.
+	* fhandler_process.cc (process_tab): Sort alphabetically.  Use _VN
+	macro to store length.
+	(fhandler_process::exists): Return virtual_ftype_t.
+	(fhandler_process::open): Simplify code.
+	* fhandler_procnet.cc (procnet_tab): Sort alphabetically.  Use _VN
+	macro to store length.
+	(fhandler_procnet::exists): Return virtual_ftype_t.
+	(fhandler_procnet::open): Simplify.
+	* fhandler_procsys.cc: New file.
+	* fhandler_registry.cc (fhandler_registry::exists): Return
+	virtual_ftype_t.
+	* fhandler_virtual.cc (fhandler_virtual::exists): Ditto.
+	* fhandler_virtual.h (enum virtual_ftype_t): Move to fhandler.h.
+	(virt_tab_t): Add name_len member.
+	(_VN): New macro.
+	(virt_tab_search): Declare.
+	* mount.cc (mount_info::conv_to_win32_path): Fix comment.  Backslashify
+	isprocsys_dev paths.
+	* ntdll.h (STATUS_OBJECT_TYPE_MISMATCH): Define
+	(STATUS_INSTANCE_NOT_AVAILABLE): Define.
+	(STATUS_PIPE_NOT_AVAILABLE): Define.
+	(STATUS_INVALID_PIPE_STATE): Define.
+	(STATUS_PIPE_BUSY): Define.
+	(SYMBOLIC_LINK_QUERY): Define.
+	(NtOpenSymbolicLinkObject): Declare.
+	(NtQuerySymbolicLinkObject): Declare.
+	* path.cc (path_conv::check): Accommodate fact that exists method
+	returns virtual_ftype_t now.  Add cases for new virtual_ftype_t
+	types.
+	(cygwin_conv_path): Add GLOBALROOT prefix to native device paths.
+	Make sure to strip \\?\ prefix only for actual filesystem-based
+	paths, not for all paths.
+	* path.h (isproc_dev): Add FH_PROCSYS.
+	(isprocsys_dev): Define.
+
 2010-09-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::from_fstab_line): Reorder to make sure all

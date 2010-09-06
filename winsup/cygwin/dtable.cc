@@ -540,6 +540,9 @@ build_fh_pc (path_conv& pc, bool set_name)
 	case FH_PROCNET:
 	  fh = cnew (fhandler_procnet) ();
 	  break;
+	case FH_PROCSYS:
+	  fh = cnew (fhandler_procsys) ();
+	  break;
 	case FH_NETDRIVE:
 	  fh = cnew (fhandler_netdrive) ();
 	  break;

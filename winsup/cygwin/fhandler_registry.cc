@@ -268,10 +268,11 @@ multi_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc)
  * final component is there. This gets round the problem of not having security access
  * to the final key in the path.
  */
-int
+virtual_ftype_t
 fhandler_registry::exists ()
 {
-  int file_type = 0, index = 0, pathlen;
+  virtual_ftype_t file_type = virt_none;
+  int index = 0, pathlen;
   DWORD buf_size = NAME_MAX + 1;
   LONG error;
   wchar_t buf[buf_size];
@@ -285,7 +286,7 @@ fhandler_registry::exists ()
     path++;
   else
     {
-      file_type = 2;
+      file_type = virt_rootdir;
       goto out;
     }
   pathlen = strlen (path);
@@ -302,7 +303,7 @@ fhandler_registry::exists ()
 	if (path_prefix_p (registry_listing[i], path,
 			   strlen (registry_listing[i]), true))
 	  {
-	    file_type = 1;
+	    file_type = virt_directory;
 	    break;
 	  }
     }
@@ -317,12 +318,12 @@ fhandler_registry::exists ()
       if (!val_only)
 	hKey = open_key (path, KEY_READ, wow64, false);
       if (hKey != (HKEY) INVALID_HANDLE_VALUE || get_errno () == EACCES)
-	file_type = 1;
+	file_type = virt_directory;
       else
 	{
 	  hKey = open_key (path, KEY_READ, wow64, true);
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
-	    return 0;
+	    return virt_none;
 
 	  if (hKey == HKEY_PERFORMANCE_DATA)
 	    {
@@ -332,13 +333,14 @@ fhandler_registry::exists ()
 	         So allow access to the generic names and to
 	         (blank separated) lists of counter numbers.
 	         Never allow access to "Add", see above comment.  */
-	      for (int i = 0; i < PERF_DATA_FILE_COUNT && file_type == 0; i++)
+	      for (int i = 0; i < PERF_DATA_FILE_COUNT
+			      && file_type == virt_none; i++)
 		{
 		  if (strcasematch (perf_data_files[i], file))
-		    file_type = -1;
+		    file_type = virt_file;
 		}
-	      if (file_type == 0 && !file[strspn (file, " 0123456789")])
-		file_type = -1;
+	      if (file_type == virt_none && !file[strspn (file, " 0123456789")])
+		file_type = virt_file;
 	      goto out;
 	    }
 
@@ -351,7 +353,7 @@ fhandler_registry::exists ()
 		{
 		  if (!wcscasecmp (buf, dec_file))
 		    {
-		      file_type = 1;
+		      file_type = virt_directory;
 		      goto out;
 		    }
 		    buf_size = NAME_MAX + 1;
@@ -372,7 +374,7 @@ fhandler_registry::exists ()
 	    {
 	      if (!wcscasecmp (buf, dec_file))
 		{
-		  file_type = -1;
+		  file_type = virt_file;
 		  goto out;
 		}
 	      buf_size = NAME_MAX + 1;
@@ -418,32 +420,32 @@ fhandler_registry::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_mode &= ~_IFMT & NO_W;
-  int file_type = exists ();
+  virtual_ftype_t file_type = exists ();
   switch (file_type)
     {
-    case 0:
+    case virt_none:
       set_errno (ENOENT);
       return -1;
-    case 1:
+    case virt_directory:
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       break;
-    case 2:
+    case virt_rootdir:
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       buf->st_nlink = ROOT_KEY_COUNT;
       break;
     default:
-    case -1:
+    case virt_file:
       buf->st_mode |= S_IFREG;
       buf->st_mode &= NO_X;
       break;
     }
-  if (file_type != 0 && file_type != 2)
+  if (file_type != virt_none && file_type != virt_rootdir)
     {
       HKEY hKey;
       const char *path = get_name () + proc_len + prefix_len + 2;
       hKey =
 	open_key (path, STANDARD_RIGHTS_READ | KEY_QUERY_VALUE, wow64,
-		  (file_type < 0) ? true : false);
+		  (file_type < virt_none) ? true : false);
 
       if (hKey == HKEY_PERFORMANCE_DATA)
 	/* RegQueryInfoKey () always returns write time 0,
@@ -461,7 +463,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	      to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
 	      buf->st_ctim = buf->st_birthtim = buf->st_mtim;
 	      time_as_timestruc_t (&buf->st_atim);
-	      if (file_type > 0)
+	      if (file_type > virt_none)
 		buf->st_nlink = subkey_count + 2;
 	      else
 		{
@@ -508,7 +510,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		  buf->st_uid = uid;
 		  buf->st_gid = gid;
 		  buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-		  if (file_type > 0)
+		  if (file_type > virt_none)
 		    buf->st_mode |= S_IFDIR;
 		  else
 		    buf->st_mode &= NO_X;

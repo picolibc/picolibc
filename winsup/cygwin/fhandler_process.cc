@@ -53,28 +53,28 @@ static _off64_t format_process_mounts (void *, char *&);
 
 static const virt_tab_t process_tab[] =
 {
-  { ".",          FH_PROCESS,   virt_directory, NULL },
-  { "..",         FH_PROCESS,   virt_directory, NULL },
-  { "ppid",       FH_PROCESS,   virt_file,      format_process_ppid },
-  { "winpid",     FH_PROCESS,   virt_file,	format_process_winpid },
-  { "winexename", FH_PROCESS,   virt_file,      format_process_winexename },
-  { "status",     FH_PROCESS,   virt_file,      format_process_status },
-  { "uid",        FH_PROCESS,   virt_file,      format_process_uid },
-  { "gid",        FH_PROCESS,   virt_file,      format_process_gid },
-  { "pgid",       FH_PROCESS,   virt_file,      format_process_pgid },
-  { "sid",        FH_PROCESS,   virt_file,      format_process_sid },
-  { "ctty",       FH_PROCESS,   virt_file,      format_process_ctty },
-  { "stat",       FH_PROCESS,   virt_file,      format_process_stat },
-  { "statm",      FH_PROCESS,   virt_file,      format_process_statm },
-  { "cmdline",    FH_PROCESS,   virt_file,      format_process_cmdline },
-  { "maps",       FH_PROCESS,   virt_file,      format_process_maps },
-  { "fd",         FH_PROCESSFD, virt_directory, format_process_fd },
-  { "exename",    FH_PROCESS,   virt_file,      format_process_exename },
-  { "root",       FH_PROCESS,   virt_symlink,   format_process_root },
-  { "exe",        FH_PROCESS,   virt_symlink,   format_process_exename },
-  { "cwd",        FH_PROCESS,   virt_symlink,   format_process_cwd },
-  { "mounts",     FH_PROCESS,   virt_file,      format_process_mounts },
-  { NULL,         0,            virt_none,      NULL }
+  { _VN ("."),          FH_PROCESS,   virt_directory, NULL },
+  { _VN (".."),         FH_PROCESS,   virt_directory, NULL },
+  { _VN ("cmdline"),    FH_PROCESS,   virt_file,      format_process_cmdline },
+  { _VN ("ctty"),       FH_PROCESS,   virt_file,      format_process_ctty },
+  { _VN ("cwd"),        FH_PROCESS,   virt_symlink,   format_process_cwd },
+  { _VN ("exe"),        FH_PROCESS,   virt_symlink,   format_process_exename },
+  { _VN ("exename"),    FH_PROCESS,   virt_file,      format_process_exename },
+  { _VN ("fd"),         FH_PROCESSFD, virt_directory, format_process_fd },
+  { _VN ("gid"),        FH_PROCESS,   virt_file,      format_process_gid },
+  { _VN ("maps"),       FH_PROCESS,   virt_file,      format_process_maps },
+  { _VN ("mounts"),     FH_PROCESS,   virt_file,      format_process_mounts },
+  { _VN ("pgid"),       FH_PROCESS,   virt_file,      format_process_pgid },
+  { _VN ("ppid"),       FH_PROCESS,   virt_file,      format_process_ppid },
+  { _VN ("root"),       FH_PROCESS,   virt_symlink,   format_process_root },
+  { _VN ("sid"),        FH_PROCESS,   virt_file,      format_process_sid },
+  { _VN ("stat"),       FH_PROCESS,   virt_file,      format_process_stat },
+  { _VN ("statm"),      FH_PROCESS,   virt_file,      format_process_statm },
+  { _VN ("status"),     FH_PROCESS,   virt_file,      format_process_status },
+  { _VN ("uid"),        FH_PROCESS,   virt_file,      format_process_uid },
+  { _VN ("winexename"), FH_PROCESS,   virt_file,      format_process_winexename },
+  { _VN ("winpid"),     FH_PROCESS,   virt_file,      format_process_winpid },
+  { NULL, 0,	        0,            virt_none,      NULL }
 };
 
 static const int PROCESS_LINK_COUNT =
@@ -90,7 +90,7 @@ static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
  * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
  * -4 if path is a socket.
  */
-int
+virtual_ftype_t
 fhandler_process::exists ()
 {
   const char *path = get_name ();
@@ -99,21 +99,20 @@ fhandler_process::exists ()
   while (*path != 0 && !isdirsep (*path))
     path++;
   if (*path == 0)
-    return 2;
+    return virt_rootdir;
 
-  for (int i = 0; process_tab[i].name; i++)
+  virt_tab_t *entry = virt_tab_search (path + 1, true, process_tab,
+				       PROCESS_LINK_COUNT);
+  if (entry)
     {
-      if (!strcmp (path + 1, process_tab[i].name))
+      if (!path[entry->name_len + 1])
 	{
-	  fileid = i;
-	  return process_tab[i].type;
+	  fileid = entry - process_tab;
+	  return entry->type;
 	}
-      if (process_tab[i].type == virt_directory
-	  && !strncmp (path + 1, process_tab[i].name,
-		       strlen (process_tab[i].name))
-	  && path[1 + strlen (process_tab[i].name)] == '/')
+      if (entry->type == virt_directory)
 	{
-	  fileid = i;
+	  fileid = entry - process_tab;
 	  if (fill_filebuf ())
 	    return virt_symlink;
 	  /* Check for nameless device entries. */
@@ -232,8 +231,6 @@ out:
 int
 fhandler_process::open (int flags, mode_t mode)
 {
-  int process_file_no = -1;
-
   int res = fhandler_virtual::open (flags, mode);
   if (!res)
     goto out;
@@ -267,29 +264,15 @@ fhandler_process::open (int flags, mode_t mode)
 	}
     }
 
-  process_file_no = -1;
-  for (int i = 0; process_tab[i].name; i++)
+  virt_tab_t *entry;
+  entry = virt_tab_search (path + 1, true, process_tab, PROCESS_LINK_COUNT);
+  if (!entry)
     {
-      if (path_prefix_p (process_tab[i].name, path + 1,
-			 strlen (process_tab[i].name), false))
-	process_file_no = i;
+      set_errno ((flags & O_CREAT) ? EROFS : ENOENT);
+      res = 0;
+      goto out;
     }
-  if (process_file_no == -1)
-    {
-      if (flags & O_CREAT)
-	{
-	  set_errno (EROFS);
-	  res = 0;
-	  goto out;
-	}
-      else
-	{
-	  set_errno (ENOENT);
-	  res = 0;
-	  goto out;
-	}
-    }
-  if (process_tab[process_file_no].fhandler == FH_PROCESSFD)
+  if (entry->fhandler == FH_PROCESSFD)
     {
       flags |= O_DIROPEN;
       goto success;
@@ -301,7 +284,7 @@ fhandler_process::open (int flags, mode_t mode)
       goto out;
     }
 
-  fileid = process_file_no;
+  fileid = entry - process_tab;
   if (!fill_filebuf ())
 	{
 	  res = 0;

@@ -520,7 +520,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     }
 
   MALLOC_CHECK;
-  /* If the path is on a network drive or a //./ resp.//?/ path prefix,
+  /* If the path is on a network drive or a //./ resp. //?/ path prefix,
      bypass the mount table.  If it's // or //MACHINE, use the netdrive
      device. */
   if (src_path[1] == '/')
@@ -550,7 +550,16 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       if (dev.devn == FH_BAD)
 	return ENOENT;
       set_flags (flags, PATH_BINARY);
-      strcpy (dst, src_path);
+      if (isprocsys_dev (dev.devn))
+	{
+	  if (src_path[procsys_len])
+	    backslashify (src_path + procsys_len, dst, 0);
+	  else	/* Avoid empty NT path. */
+	    stpcpy (dst, "\\");
+	  set_flags (flags, (unsigned) cygdrive_flags);
+	}
+      else
+	strcpy (dst, src_path);
       goto out;
     }
   /* Check if the cygdrive prefix was specified.  If so, just strip
