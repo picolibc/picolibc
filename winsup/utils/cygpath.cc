@@ -134,10 +134,22 @@ static inline BOOLEAN
 RtlAllocateUnicodeString (PUNICODE_STRING uni, ULONG size)
 {
   uni->Length = 0;
-  uni->MaximumLength = 512;
+  uni->MaximumLength = size / sizeof (WCHAR);
   uni->Buffer = (WCHAR *) malloc (size);
   return uni->Buffer != NULL;
 }
+
+static inline BOOLEAN
+RtlEqualUnicodePathPrefix (PUNICODE_STRING path, PUNICODE_STRING prefix,
+			   BOOLEAN caseinsensitive)
+  {
+    UNICODE_STRING p;
+
+    p.Length = p.MaximumLength = prefix->Length < path->Length
+				 ? prefix->Length : path->Length;
+    p.Buffer = path->Buffer;
+    return RtlEqualUnicodeString (&p, prefix, caseinsensitive);
+  }
 
 static size_t
 my_wcstombs (char *dest, const wchar_t *src, size_t n)
@@ -148,6 +160,9 @@ my_wcstombs (char *dest, const wchar_t *src, size_t n)
     return wcstombs (dest, src, n);
 }
 
+#define	HARDDISK_PREFIX		L"\\Device\\Harddisk"
+#define	GLOBALROOT_PREFIX	"\\\\.\\GLOBALROOT"
+
 static char *
 get_device_name (char *path)
 {
@@ -156,18 +171,21 @@ get_device_name (char *path)
   OBJECT_ATTRIBUTES ntobj;
   NTSTATUS status;
   HANDLE lnk, dir;
+  bool got_one = false;
   char *ret = strdup (path);
   PDIRECTORY_BASIC_INFORMATION odi = (PDIRECTORY_BASIC_INFORMATION)
 				     alloca (4096);
   BOOLEAN restart;
   ULONG cont;
 
+  if (!strncasecmp (path, GLOBALROOT_PREFIX "\\", sizeof (GLOBALROOT_PREFIX)))
+    path += sizeof (GLOBALROOT_PREFIX) - 1;
   if (strncasecmp (path, "\\Device\\", 8))
     return ret;
 
-  if (!RtlAllocateUnicodeString (&ntdev, 65536))
+  if (!RtlAllocateUnicodeString (&ntdev, 65534))
     return ret;
-  if (!RtlAllocateUnicodeString (&tgtdev, 65536))
+  if (!RtlAllocateUnicodeString (&tgtdev, 65534))
     return ret;
   RtlInitAnsiString (&ans, path);
   RtlAnsiStringToUnicodeString (&ntdev, &ans, FALSE);
@@ -185,7 +203,8 @@ get_device_name (char *path)
 	goto out;
       RtlCopyUnicodeString (&ntdev, &tgtdev);
     }
-  else if (status != STATUS_OBJECT_TYPE_MISMATCH)
+  else if (status != STATUS_OBJECT_TYPE_MISMATCH
+	   && status != STATUS_OBJECT_PATH_SYNTAX_BAD)
     goto out;
 
   for (int i = 0; i < 2; ++i)
@@ -221,12 +240,19 @@ get_device_name (char *path)
 	  ZwClose (lnk);
 	  if (!NT_SUCCESS (status))
 	    continue;
-	  if (RtlEqualUnicodeString (&ntdev, &tgtdev, TRUE))
+	  if (tgtdev.Length /* There's actually a symlink pointing to an
+			       empty string: \??\GLOBALROOT -> "" */
+	      && RtlEqualUnicodePathPrefix (&ntdev, &tgtdev, TRUE))
 	    {
 	      /* If the comparison succeeds, the name of the directory entry is
 		 a valid DOS device name, if prepended with "\\.\".  Return that
 		 valid DOS path. */
+	      wchar_t *trailing = NULL;
+	      if (ntdev.Length > tgtdev.Length)
+		trailing = ntdev.Buffer + tgtdev.Length / sizeof (WCHAR);
 	      ULONG len = RtlUnicodeStringToAnsiSize (&odi->ObjectName);
+	      if (trailing)
+		len += my_wcstombs (NULL, trailing, 0);
 	      free (ret);
 	      ret = (char *) malloc (len + 4);
 	      strcpy (ret, "\\\\.\\");
@@ -234,15 +260,30 @@ get_device_name (char *path)
 	      ans.MaximumLength = len;
 	      ans.Buffer = ret + 4;
 	      RtlUnicodeStringToAnsiString (&ans, &odi->ObjectName, FALSE);
+	      if (trailing)
+		my_wcstombs (ans.Buffer + ans.Length, trailing,
+			     ans.MaximumLength - ans.Length);
+	      ans.Buffer[ans.MaximumLength - 1] = '\0';
+	      got_one = true;
 	      /* Special case for local disks:  It's most feasible if the
 		 DOS device name reflects the DOS drive, so we check for this
 		 explicitly and only return prematurely if so. */
-#define	      HARDDISK_PREFIX	L"\\Device\\Harddisk"
 	      if (ntdev.Length < wcslen (HARDDISK_PREFIX)
 		  || wcsncasecmp (ntdev.Buffer, HARDDISK_PREFIX, 8) != 0
 		  || (odi->ObjectName.Length == 2 * sizeof (WCHAR)
 		      && odi->ObjectName.Buffer[1] == L':'))
 		{
+		  if (trailing)
+		    {
+		      /* If there's a trailing path, it's a perfectly valid
+			 DOS pathname without the \\.\ prefix.  Unless it's
+			 longer than MAX_PATH - 1 in which case it needs 
+			 the \\?\ prefix. */
+		      if (len = strlen (ret + 4) >= MAX_PATH)
+			ret[2] = '?';
+		      else
+			memmove (ret, ret + 4, strlen (ret + 4) + 1);
+		    }
 		  ZwClose (dir);
 		  goto out;
 		}
@@ -254,6 +295,13 @@ get_device_name (char *path)
 out:
   free (tgtdev.Buffer);
   free (ntdev.Buffer);
+  if (!got_one)
+    {
+      free (ret);
+      ret = (char *) malloc (sizeof (GLOBALROOT_PREFIX) + strlen (path));
+      if (ret)
+      	stpcpy (stpcpy (ret, GLOBALROOT_PREFIX), path);
+    }
   return ret;
 }
 
@@ -787,10 +835,12 @@ do_pathconv (char *filename)
 	  tmp = buf;
 	  if (strncmp (buf, "\\\\?\\", 4) == 0)
 	    {
-	      len = 4;
-	      if (strncmp (buf + 4, "UNC\\", 4) == 0)
+	      len = 0;
+	      if (buf[5] == ':')
+		len = 4;
+	      else if (!strncmp (buf + 4, "UNC\\", 4))
 		len = 6;
-	      if (strlen (buf) < MAX_PATH + len)
+	      if (len && strlen (buf) < MAX_PATH + len)
 		{
 		  tmp += len;
 		  if (len == 6)
@@ -829,7 +879,7 @@ print_version ()
 cygpath (cygwin) %.*s\n\
 Path Conversion Utility\n\
 Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, \n\
-          2007, 2008 Red Hat, Inc.\n\
+          2007, 2008, 2009, 2010 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", len, v, __DATE__);
 }

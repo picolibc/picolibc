@@ -1,3 +1,16 @@
+2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (RtlEqualUnicodePathPrefix): New helper function.
+	(HARDDISK_PREFIX): Move.
+	(GLOBALROOT_PREFIX): Define.
+	(get_device_name): Take GLOBALROOT_PREFIX into account.
+	Improve check for path to allow filesystem access via block devices.
+	Potentially drop \\.\ prefix if resulting path is a valid DOS
+	pathname.
+	(do_pathconv): Make sure to drop \\?\ prefix only if path is
+	actually a filesystem based path.
+	(print_version): Fix copyright.
+
 2010-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldh.cc (WinMain): Change DONT_RESOLVE_DLL_REFERENCES to
