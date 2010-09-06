@@ -1,5 +1,17 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.8"><title>What's new and what changed from 1.7.7 to 1.7.8</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+/proc/sys allows to access the native NT namespace.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.7"><title>What's new and what changed from 1.7.6 to 1.7.7</title>
 
 <itemizedlist mark="bullet">
