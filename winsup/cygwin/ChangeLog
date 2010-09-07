@@ -1,3 +1,7 @@
+2010-09-07  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* 
+
 2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add fhandler_procsys.o.
@@ -73,12 +77,12 @@
 
 2010-09-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
-	* sigoproc.cc (sigproc_init): Use American spelling in comment.
+	* sigproc.cc (sigproc_init): Use American spelling in comment.
 
 2010-09-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Remove myself settings.
-	* fork.cc (fork): Set myself process_state
+	* fork.cc (fork): Set myself process_state.
 	* pinfo.cc (pinfo_init): Ditto.
 	(pinfo::thisproc): Make sure any sendsig setting is correctly copied.
 	* pinfo.h: Update copyright.  Remove unused code.
