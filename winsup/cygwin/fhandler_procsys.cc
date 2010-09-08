@@ -339,70 +339,32 @@ fhandler_procsys::write (const void *ptr, size_t len)
 int
 fhandler_procsys::open (int flags, mode_t mode)
 {
-  UNICODE_STRING path;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-  NTSTATUS status;
-  HANDLE h;
-  ULONG access;
-  ULONG options = FILE_OPEN_FOR_BACKUP_INTENT;
+  int res = 0;
 
-
-  int res = fhandler_virtual::open (flags, mode);
-  if (!res)
-    goto out;
-
-  if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL) || (flags & O_TRUNC))
-    {
-      set_errno (EINVAL);
-      res = 0;
-      goto out;
-    }
-  mk_unicode_path (&path);
-  InitializeObjectAttributes (&attr, &path, OBJ_INHERIT | OBJ_CASE_INSENSITIVE,
-			      NULL, NULL);
-  switch (exists ())
-    {
-    case virt_directory:
-    case virt_rootdir:
-      if ((flags & O_ACCMODE) != O_RDONLY)
-	{
-	  set_errno (EISDIR);
-	  res = 0;
-	  goto out;
-	}
-      nohandle (true);
-      res = 1;
-      goto out;
-    default:
-      break;
-    }
-  if ((flags & O_ACCMODE) == O_RDONLY)
-    access = GENERIC_READ;
-  else if ((flags & O_ACCMODE) == O_WRONLY)
-    access = GENERIC_WRITE | READ_CONTROL | FILE_READ_ATTRIBUTES;
+  if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+    set_errno (EINVAL);
   else
-    access = GENERIC_READ | GENERIC_WRITE;
-  if (flags & O_SYNC)
-    options |= FILE_WRITE_THROUGH;
-  if (flags & O_DIRECT)
-    options |= FILE_NO_INTERMEDIATE_BUFFERING;
-  if (!(flags & O_NONBLOCK))
     {
-      access |= SYNCHRONIZE;
-      options |= FILE_SYNCHRONOUS_IO_NONALERT;
+      switch (exists ())
+	{
+	case virt_directory:
+	case virt_rootdir:
+	  if ((flags & O_ACCMODE) != O_RDONLY)
+	    set_errno (EISDIR);
+	  else
+	    {
+	      nohandle (true);
+	      res = 1;
+	    }
+	  break;
+	case virt_none:
+	  set_errno (ENOENT);
+	  break;
+	default:
+	  res = fhandler_base::open (flags, mode);
+	  break;
+	}
     }
-  status = NtOpenFile (&h, access, &attr, &io, FILE_SHARE_VALID_FLAGS, options);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      res = 0;
-      goto out;
-    }
-  set_io_handle (h);
-  set_open_status ();
-  res = 1;
-out:
   syscall_printf ("%d = fhandler_procsys::open (%p, %d)", res, flags, mode);
   return res;
 }

@@ -1,6 +1,7 @@
-2010-09-07  Christopher Faylor  <me+cygwin@cgf.cx>
+2010-09-08  Corinna Vinschen  <corinna@vinschen.de>
 
-	* 
+	* fhandler_procsys.cc (fhandler_procsys::open): Simplify by just
+	calling fhandler_base::open.
 
 2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
