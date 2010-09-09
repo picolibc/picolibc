@@ -1,3 +1,9 @@
+2010-09-09  Kevin Buettner  <kevinb@redhat.com>
+
+	* libc/sys/sysnecv850/Makefile.am (lib_a_SOURCES): Provide an
+	empty definition.
+	* libc/sys/sysnecv850/Makefile: Regenerate.
+
 2010-08-25  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/posix/opendir.c (opendir): Fix potential memory leak.

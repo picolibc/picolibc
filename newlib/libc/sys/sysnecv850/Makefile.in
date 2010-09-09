@@ -66,8 +66,8 @@ lib_a_AR = $(AR) $(ARFLAGS)
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)wait.o $(lpfx)write.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o
-lib_a_SOURCES = lib.c
-lib_a_OBJECTS = lib_a-lib.$(OBJEXT)
+am_lib_a_OBJECTS =
+lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
 am__depfiles_maybe =
@@ -77,7 +77,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(EXTRA_lib_a_SOURCES) lib.c
+SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 ACLOCAL = @ACLOCAL@
@@ -117,6 +117,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -203,6 +204,7 @@ EXTRA_lib_a_SOURCES = \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
 	times.c gettime.c
 
+lib_a_SOURCES = 
 lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -445,12 +447,6 @@ lib_a-gettime.o: gettime.c
 
 lib_a-gettime.obj: gettime.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettime.obj `if test -f 'gettime.c'; then $(CYGPATH_W) 'gettime.c'; else $(CYGPATH_W) '$(srcdir)/gettime.c'; fi`
-
-lib_a-lib.o: lib.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lib.o `test -f 'lib.c' || echo '$(srcdir)/'`lib.c
-
-lib_a-lib.obj: lib.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lib.obj `if test -f 'lib.c'; then $(CYGPATH_W) 'lib.c'; else $(CYGPATH_W) '$(srcdir)/lib.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

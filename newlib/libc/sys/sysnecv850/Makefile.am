@@ -28,6 +28,7 @@ EXTRA_lib_a_SOURCES = \
 	kill.c lseek.c open.c pipe.c read.c link.c \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
 	times.c gettime.c
+lib_a_SOURCES =
 lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
