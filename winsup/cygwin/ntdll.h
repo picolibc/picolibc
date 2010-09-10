@@ -751,14 +751,17 @@ typedef struct _FILE_FS_ATTRIBUTE_INFORMATION
   WCHAR FileSystemName[1];
 } FILE_FS_ATTRIBUTE_INFORMATION, *PFILE_FS_ATTRIBUTE_INFORMATION;
 
+#pragma pack(push,4)
 typedef struct _FILE_FS_VOLUME_INFORMATION
 {
   LARGE_INTEGER VolumeCreationTime;
   ULONG VolumeSerialNumber;
   ULONG VolumeLabelLength;
   BOOLEAN SupportsObjects;
+  BOOLEAN __dummy;
   WCHAR VolumeLabel[1];
 } FILE_FS_VOLUME_INFORMATION, *PFILE_FS_VOLUME_INFORMATION;
+#pragma pack(pop)
 
 typedef struct _FILE_FS_SIZE_INFORMATION
 {

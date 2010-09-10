@@ -1,5 +1,17 @@
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (class fs_info_cache): New class to cache filesystem
+	information.
+	(fs_info::update): Check FileFsVolumeInformation against filesystem
+	cache and use it, if filesystem is already available.  Add filesystem
+	to cache, if not.  Only request FileFsObjectIdInformation if
+	FILE_SUPPORTS_OBJECT_IDS is set in filesystem flags.
+	* ntdll.h (struct _FILE_FS_VOLUME_INFORMATION): Add pragma pack so the
+	structure size is matching the OS expectations.  Add __dummy member
+	used in filesystem cache.
+
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (get_file_sd): Add bool parameter justcreated.  Use
 	GetSecurityInfo only if justcreated is true, NtQuerySecurityObject
 	otherwise.  Add comment to explain why.  Don't waste time to call

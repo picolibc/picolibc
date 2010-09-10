@@ -105,6 +105,64 @@ struct smb_extended_info {
 };
 #pragma pack(pop)
 
+#define MAX_FS_INFO_CNT 32
+class fs_info_cache
+{
+  static muto fsi_lock;
+  uint32_t count;
+  struct {
+    fs_info fsi;
+    uint32_t hash;
+  } entry[MAX_FS_INFO_CNT];
+
+  uint32_t genhash (PFILE_FS_VOLUME_INFORMATION);
+
+public:
+  fs_info_cache () : count (0) { fsi_lock.init ("fsi_lock"); }
+  fs_info *search (PFILE_FS_VOLUME_INFORMATION, uint32_t &);
+  void add (uint32_t, fs_info *);
+};
+
+static fs_info_cache fsi_cache;
+muto NO_COPY fs_info_cache::fsi_lock;
+
+uint32_t
+fs_info_cache::genhash (PFILE_FS_VOLUME_INFORMATION pffvi)
+{
+  uint32_t hash = 0;
+  const uint16_t *p = (const uint16_t *) pffvi;
+  const uint16_t *end = (const uint16_t *) 
+		        ((const uint8_t *) p + sizeof *pffvi
+			 + pffvi->VolumeLabelLength  - sizeof (WCHAR));
+  pffvi->__dummy = 0;	/* This member can have random values! */
+  while (p < end)
+    hash = *p++ + (hash << 6) + (hash << 16) - hash;
+  return hash;
+}
+
+fs_info *
+fs_info_cache::search (PFILE_FS_VOLUME_INFORMATION pffvi, uint32_t &hash)
+{
+  hash = genhash (pffvi);
+  for (uint32_t i = 0; i < count; ++i)
+    if (entry[i].hash == hash)
+      return &entry[i].fsi;
+  return NULL;
+}
+
+void
+fs_info_cache::add (uint32_t hashval, fs_info *new_fsi)
+{
+  fsi_lock.acquire ();
+  if (count < MAX_FS_INFO_CNT)
+    {
+      entry[count].fsi = *new_fsi;
+      entry[count].hash = hashval;
+      ++count;
+    }
+  fsi_lock.release ();
+}
+
 bool
 fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 {
@@ -172,11 +230,23 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  return false;
 	}
     }
-
+  sernum = 0;
   status = NtQueryVolumeInformationFile (vol, &io, &ffvi_buf.ffvi,
 					 sizeof ffvi_buf,
 					 FileFsVolumeInformation);
-  sernum = NT_SUCCESS (status) ? ffvi_buf.ffvi.VolumeSerialNumber : 0;
+  uint32_t hash = 0;
+  if (NT_SUCCESS (status))
+    {
+      fs_info *fsi = fsi_cache.search (&ffvi_buf.ffvi, hash);
+      if (fsi)
+	{
+	  *this = *fsi;
+	  if (!in_vol)
+	    NtClose (vol);
+	  return true;
+	}
+      sernum = ffvi_buf.ffvi.VolumeSerialNumber;
+    }
   status = NtQueryVolumeInformationFile (vol, &io, &ffdi, sizeof ffdi,
 					 FileFsDeviceInformation);
   if (!NT_SUCCESS (status))
@@ -253,9 +323,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define FS_IS_WINDOWS_FAT  TEST_GVI(flags (), WIN_FAT_FLAGS)
 
       /* This always fails on NT4. */
-      status = NtQueryVolumeInformationFile (vol, &io, &ffoi, sizeof ffoi,
-					     FileFsObjectIdInformation);
-      if (NT_SUCCESS (status))
+      if ((flags () & FILE_SUPPORTS_OBJECT_IDS)
+	  && NT_SUCCESS (NtQueryVolumeInformationFile (vol, &io, &ffoi,
+						   sizeof ffoi,
+						   FileFsObjectIdInformation)))
 	{
 	  smb_extended_info *extended_info = (smb_extended_info *)
 					     &ffoi.ExtendedInfo;
@@ -355,6 +426,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 
   if (!in_vol)
     NtClose (vol);
+  fsi_cache.add (hash, this);
   return true;
 }
 
