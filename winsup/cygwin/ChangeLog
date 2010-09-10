@@ -1,5 +1,17 @@
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (allow_others_to_sync): Define MAX_PROCESS_SD_SIZE.  Use
+	instead of ACL_DEFAULT_SIZE.
+	* sec_acl.cc (setacl): Use TLS buffer to allow maximum ACL size.
+	* security.h (ACL_DEFAULT_SIZE): Drop definition.
+	(ACL_MAXIMUM_SIZE): Define.
+	(SD_MAXIMUM_SIZE): Define.
+	* security.cc (get_file_sd): Allocate security_decscriptor with size
+	SD_MAXIMUM_SIZE.
+	(alloc_sd): Use TLS buffer to allow maximum ACL size.
+
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (class fs_info_cache): New class to cache filesystem
 	information.
 	(fs_info::update): Check FileFsVolumeInformation against filesystem

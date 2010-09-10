@@ -26,7 +26,8 @@ details. */
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
 		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
 #define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
-#define ACL_DEFAULT_SIZE 3072
+#define ACL_MAXIMUM_SIZE 65532	/* Yeah, right.  64K - sizeof (DWORD). */
+#define SD_MAXIMUM_SIZE 65536
 #define NO_SID ((PSID)NULL)
 
 #ifndef SE_CREATE_TOKEN_PRIVILEGE

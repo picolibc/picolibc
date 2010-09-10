@@ -22,6 +22,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
+#include "tls_pbuf.h"
 
 static int
 searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UID)
@@ -40,6 +41,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 	bool &writable)
 {
   security_descriptor sd_ret;
+  tmp_pathbuf tp;
 
   if (get_file_sd (handle, pc, sd_ret, false))
     return -1;
@@ -83,7 +85,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
     }
 
   /* Fill access control list. */
-  PACL acl = (PACL) alloca (ACL_DEFAULT_SIZE);
+  PACL acl = (PACL) tp.w_get ();
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
@@ -92,7 +94,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   struct __group32 *gr;
   int pos;
 
-  if (!InitializeAcl (acl, ACL_DEFAULT_SIZE, ACL_REVISION))
+  if (!InitializeAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION))
     {
       __seterrno ();
       return -1;

@@ -155,10 +155,11 @@ allow_others_to_sync ()
      should be more than sufficient for process ACLs.  Can't use tls functions
      at this point because this gets called during initialization when the tls
      is not really available.  */
-  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) alloca (ACL_DEFAULT_SIZE);
+#define MAX_PROCESS_SD_SIZE	3072
+  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) alloca (MAX_PROCESS_SD_SIZE);
   status = NtQuerySecurityObject (NtCurrentProcess (),
 				  DACL_SECURITY_INFORMATION, sd,
-				  ACL_DEFAULT_SIZE, &len);
+				  MAX_PROCESS_SD_SIZE, &len);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQuerySecurityObject: %p", status);

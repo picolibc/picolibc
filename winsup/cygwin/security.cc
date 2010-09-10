@@ -24,6 +24,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "pwdgrp.h"
+#include "tls_pbuf.h"
 #include <aclapi.h>
 
 #define ALL_SECURITY_INFORMATION (DACL_SECURITY_INFORMATION \
@@ -68,7 +69,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	  else
 	    {
 	      NTSTATUS status;
-	      ULONG len = 32768;
+	      ULONG len = SD_MAXIMUM_SIZE;
 
 	      if (!sd.malloc (len))
 		{
@@ -413,6 +414,7 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  security_descriptor &sd_ret)
 {
   BOOL dummy;
+  tmp_pathbuf tp;
 
   /* NOTE: If the high bit of attribute is set, we have just created
      a file or directory.  See below for an explanation. */
@@ -483,8 +485,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* Initialize local access control list. */
-  PACL acl = (PACL) alloca (ACL_DEFAULT_SIZE);
-  if (!InitializeAcl (acl, ACL_DEFAULT_SIZE, ACL_REVISION))
+  PACL acl = (PACL) tp.w_get ();
+  if (!InitializeAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION))
     {
       __seterrno ();
       return NULL;
