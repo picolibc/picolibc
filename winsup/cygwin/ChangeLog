@@ -1,5 +1,10 @@
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (rename): Limit retry loop in case of sharing violation
+	to about a second.
+
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (fstatat): Call stat_worker directly from here.
 
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>

@@ -2009,6 +2009,8 @@ rename (const char *oldpath, const char *newpath)
 	  || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
     start_transaction (old_trans, trans);
 
+  int retry_count;
+  retry_count = 0;
 retry:
   /* DELETE is required to rename a file.  At least one cifs FS (Tru64) needs
      FILE_READ_ATTRIBUTE, otherwise the FileRenameInformation call fails with
@@ -2026,7 +2028,7 @@ retry:
     {
       debug_printf ("status %p", status);
       if (status == STATUS_SHARING_VIOLATION
-	  && WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+	  && WaitForSingleObject (signal_arrived, 10L) != WAIT_OBJECT_0)
 	{
 	  /* Typical BLODA problem.  Some virus scanners check newly generated
 	     files and while doing that disallow DELETE access.  That's really
@@ -2036,9 +2038,13 @@ retry:
 	     scanner and the application fails to create the target file.
 	     
 	     This kludge tries to work around that by yielding until the
-	     sharing violation goes away, or a signal arrived. */
-	  yield ();
-	  goto retry;
+	     sharing violation goes away, or a signal arrived, or after
+	     about a second, give or take. */
+	  if (++retry_count < 40)
+	    {
+	      yield ();
+	      goto retry;
+	    }
 	}
       __seterrno_from_nt_status (status);
       goto out;
