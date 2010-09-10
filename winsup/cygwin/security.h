@@ -348,24 +348,37 @@ legal_sid_type (SID_NAME_USE type)
 class path_conv;
 /* File manipulation */
 int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
-				  __uid32_t *, __gid32_t *);
+				  __uid32_t *, __gid32_t *)
+		__attribute__ ((regparm (3)));
 int __stdcall set_file_attribute (HANDLE, path_conv &,
-				  __uid32_t, __gid32_t, mode_t);
-int __stdcall get_object_sd (HANDLE, security_descriptor &);
-int __stdcall get_object_attribute (HANDLE, __uid32_t *, __gid32_t *, mode_t *);
-int __stdcall set_object_attribute (HANDLE, __uid32_t, __gid32_t, mode_t);
+				  __uid32_t, __gid32_t, mode_t)
+		__attribute__ ((regparm (3)));
+int __stdcall get_object_sd (HANDLE, security_descriptor &)
+		__attribute__ ((regparm (2)));
+int __stdcall get_object_attribute (HANDLE, __uid32_t *, __gid32_t *, mode_t *)
+		__attribute__ ((regparm (3)));
+int __stdcall set_object_attribute (HANDLE, __uid32_t, __gid32_t, mode_t)
+		__attribute__ ((regparm (3)));
 int __stdcall create_object_sd_from_attribute (HANDLE, __uid32_t, __gid32_t,
-					       mode_t, security_descriptor &);
-int __stdcall set_object_sd (HANDLE, security_descriptor &, bool);
+					       mode_t, security_descriptor &)
+		__attribute__ ((regparm (3)));
+int __stdcall set_object_sd (HANDLE, security_descriptor &, bool)
+		__attribute__ ((regparm (3)));
 
-int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *);
-LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &sd);
-LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &sd,
-			    bool is_chown);
-bool __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
-bool __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
-int __stdcall check_file_access (path_conv &, int, bool);
-int __stdcall check_registry_access (HANDLE, int, bool);
+int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *)
+		__attribute__ ((regparm (3)));
+LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool)
+		__attribute__ ((regparm (3)));
+LONG __stdcall set_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool)
+		__attribute__ ((regparm (3)));
+bool __stdcall add_access_allowed_ace (PACL, int, DWORD, PSID, size_t &, DWORD)
+		__attribute__ ((regparm (3)));
+bool __stdcall add_access_denied_ace (PACL, int, DWORD, PSID, size_t &, DWORD)
+		__attribute__ ((regparm (3)));
+int __stdcall check_file_access (path_conv &, int, bool)
+		__attribute__ ((regparm (3)));
+int __stdcall check_registry_access (HANDLE, int, bool)
+		__attribute__ ((regparm (3)));
 
 void set_security_attribute (path_conv &pc, int attribute,
 			     PSECURITY_ATTRIBUTES psa,
@@ -437,9 +450,9 @@ void set_cygwin_privileges (HANDLE token);
 
 /* Various types of security attributes for use in Create* functions. */
 extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
-extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid1, PSID sid2,
-						  DWORD access2, BOOL inherit)
-  __attribute__ ((regparm (3)));
+extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID, PSID, PSID,
+						  DWORD, BOOL)
+		__attribute__ ((regparm (3)));
 extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
 #define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
 
@@ -448,10 +461,12 @@ extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
 extern bool sec_acl (PACL acl, bool original, bool admins, PSID sid1 = NO_SID,
 		     PSID sid2 = NO_SID, DWORD access2 = 0);
 
-ssize_t __stdcall read_ea (HANDLE hdl, path_conv &pc, const char *name,
-			   char *value, size_t size);
-int __stdcall write_ea (HANDLE hdl, path_conv &pc, const char *name,
-			const char *value, size_t size, int flags);
+ssize_t __stdcall read_ea (HANDLE, path_conv &, const char *,
+			   char *, size_t)
+		__attribute__ ((regparm (3)));
+int __stdcall write_ea (HANDLE, path_conv &, const char *, const char *,
+			size_t, int)
+		__attribute__ ((regparm (3)));
 
 /* Note: sid1 is usually (read: currently always) the current user's
    effective sid (cygheap->user.sid ()). */

@@ -1,5 +1,20 @@
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (get_file_sd): Add bool parameter justcreated.  Use
+	GetSecurityInfo only if justcreated is true, NtQuerySecurityObject
+	otherwise.  Add comment to explain why.  Don't waste time to call
+	NtQuerySecurityObject twice, just allocate big enough area.
+	(get_file_attribute): Call get_file_sd with justcreated set to false.
+	(set_file_attribute): Call get_file_sd with justcreated depending on
+	S_JUSTCREATED pseudo file attribute.
+	(check_file_access): Call get_file_sd with justcreated set to false.
+	* sec_acl.cc (setacl): Ditto.
+	(getacl): Ditto.
+	* security.h: Convert many functions to regparm functions.
+	(get_file_sd): Declare with extra bool parameter.
+
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procsys.cc (fhandler_procsys::exists): Rearrange to handle
 	dangling symlinks correctly.  Fix comments.
 	(fhandler_procsys::fill_filebuf): Remove useless comment.

@@ -41,7 +41,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 {
   security_descriptor sd_ret;
 
-  if (get_file_sd (handle, pc, sd_ret))
+  if (get_file_sd (handle, pc, sd_ret, false))
     return -1;
 
   BOOL dummy;
@@ -272,7 +272,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 {
   security_descriptor sd;
 
-  if (get_file_sd (handle, pc, sd))
+  if (get_file_sd (handle, pc, sd, false))
     return -1;
 
   cygpsid owner_sid;

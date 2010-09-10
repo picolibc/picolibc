@@ -31,7 +31,8 @@ details. */
 				  | OWNER_SECURITY_INFORMATION)
 
 LONG
-get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
+get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
+	     bool justcreated)
 {
   DWORD error = ERROR_SUCCESS;
   int retry = 0;
@@ -41,19 +42,47 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd)
     {
       if (fh)
 	{
-	  /* Amazing but true.  If you want to know if an ACE is inherited
-	     from the parent object, you can't use the NtQuerySecurityObject
-	     function.  In the DACL returned by this functions, the
-	     INHERITED_ACE flag is never set.  Only by calling GetSecurityInfo
-	     you get this information.  Oh well. */
-	  PSECURITY_DESCRIPTOR psd;
-	  error = GetSecurityInfo (fh, SE_FILE_OBJECT, ALL_SECURITY_INFORMATION,
-				   NULL, NULL, NULL, NULL, &psd);
-	  if (error == ERROR_SUCCESS)
+	  if (justcreated)
 	    {
-	      sd = psd;
-	      res = 0;
-	      break;
+	      /* Amazing but true.  If you want to know if an ACE is inherited
+		 from the parent object, you can't use the NtQuerySecurityObject
+		 function.  In the DACL returned by this functions, the
+		 INHERITED_ACE flag is never set.  Only by calling
+		 GetSecurityInfo you get this information.
+		 
+		 This functionality is slow, and the extra information is only
+		 required when the file has been created and the permissions
+		 are about to be set to POSIX permissions.  Therefore we only
+		 use it in case the file just got created.  In all other cases
+		 we rather call NtQuerySecurityObject directly. */
+	      PSECURITY_DESCRIPTOR psd;
+	      error = GetSecurityInfo (fh, SE_FILE_OBJECT, ALL_SECURITY_INFORMATION,
+				       NULL, NULL, NULL, NULL, &psd);
+	      if (error == ERROR_SUCCESS)
+		{
+		  sd = psd;
+		  res = 0;
+		  break;
+		}
+	    }
+	  else
+	    {
+	      NTSTATUS status;
+	      ULONG len = 32768;
+
+	      if (!sd.malloc (len))
+		{
+		  set_errno (ENOMEM);
+		  break;
+		}
+	      status = NtQuerySecurityObject (fh, ALL_SECURITY_INFORMATION,
+					      sd, len, &len);
+	      if (NT_SUCCESS (status))
+		{
+		  res = 0;
+		  break;
+		}
+	      error = RtlNtStatusToDosError (status);
 	    }
 	}
       if (!retry)
@@ -323,7 +352,7 @@ get_file_attribute (HANDLE handle, path_conv &pc,
     {
       security_descriptor sd;
 
-      if (!get_file_sd (handle, pc, sd))
+      if (!get_file_sd (handle, pc, sd, false))
 	{
 	  get_info_from_sd (sd, attribute, uidret, gidret);
 	  return 0;
@@ -828,7 +857,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     {
       security_descriptor sd;
 
-      if (!get_file_sd (handle, pc, sd)
+      if (!get_file_sd (handle, pc, sd, attribute & S_JUSTCREATED)
 	  && alloc_sd (pc, uid, gid, attribute, sd))
 	ret = set_file_sd (handle, pc, sd,
 			   uid != ILLEGAL_UID || gid != ILLEGAL_GID);
@@ -928,7 +957,7 @@ check_file_access (path_conv &pc, int flags, bool effective)
     desired |= FILE_WRITE_DATA;
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
-  if (!get_file_sd (NULL, pc, sd))
+  if (!get_file_sd (NULL, pc, sd, false))
     ret = check_access (sd, mapping, desired, flags, effective);
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;
