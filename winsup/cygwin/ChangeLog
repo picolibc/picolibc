@@ -1,3 +1,9 @@
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::exists): Rearrange to handle
+	dangling symlinks correctly.  Fix comments.
+	(fhandler_procsys::fill_filebuf): Remove useless comment.
+
 2010-09-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::open): Simplify by just

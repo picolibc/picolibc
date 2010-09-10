@@ -52,6 +52,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
   NTSTATUS status;
   HANDLE h;
   FILE_BASIC_INFORMATION fbi;
+  /* Default device type is character device. */
   virtual_ftype_t file_type = virt_chr;
 
   if (strlen (get_name ()) == procsys_len)
@@ -61,16 +62,17 @@ fhandler_procsys::exists (struct __stat64 *buf)
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-  if (status == STATUS_OBJECT_PATH_NOT_FOUND)
-    return virt_none;
-  /* If the name isn't found, or we get this dreaded sharing violation, let
-     the caller try again as normal file. */
-  if (status == STATUS_OBJECT_NAME_NOT_FOUND
-      || status == STATUS_NO_MEDIA_IN_DEVICE
+  /* If no media is found, or we get this dreaded sharing violation, let
+     the caller immediately try again as normal file. */
+  if (status == STATUS_NO_MEDIA_IN_DEVICE
       || status == STATUS_SHARING_VIOLATION)
     return virt_fsfile;	/* Just try again as normal file. */
+  /* If file or path can't be found, let caller try again as normal file. */
+  if (status == STATUS_OBJECT_PATH_NOT_FOUND
+      || status == STATUS_OBJECT_NAME_NOT_FOUND)
+    file_type = virt_fsfile;
   /* Check for pipe errors, which make a good hint... */
-  if (status >= STATUS_PIPE_NOT_AVAILABLE && status <= STATUS_PIPE_BUSY)
+  else if (status >= STATUS_PIPE_NOT_AVAILABLE && status <= STATUS_PIPE_BUSY)
     file_type = virt_pipe;
   else if (status == STATUS_ACCESS_DENIED)
     {
@@ -134,7 +136,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
     }
   else if (status == STATUS_ACCESS_DENIED)
     return virt_directory;
-  /* Give up.  Just treat as character device. */
+  /* That's it.  Return type we found above. */
   return file_type;
 }
 
@@ -152,7 +154,6 @@ fhandler_procsys::fhandler_procsys ():
 bool
 fhandler_procsys::fill_filebuf ()
 {
-  /* The NT device namespace is ASCII only. */
   char *fnamep;
   UNICODE_STRING path, target;
   OBJECT_ATTRIBUTES attr;
