@@ -1,5 +1,9 @@
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (fstatat): Call stat_worker directly from here.
+
+2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (allow_others_to_sync): Define MAX_PROCESS_SD_SIZE.  Use
 	instead of ACL_DEFAULT_SIZE.
 	* sec_acl.cc (setacl): Use TLS buffer to allow maximum ACL size.

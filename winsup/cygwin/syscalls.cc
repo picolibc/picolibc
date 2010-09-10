@@ -4153,7 +4153,10 @@ fstatat (int dirfd, const char *pathname, struct __stat64 *st, int flags)
   char *path = tp.c_get ();
   if (gen_full_path_at (path, dirfd, pathname))
     return -1;
-  return (flags & AT_SYMLINK_NOFOLLOW) ? lstat64 (path, st) : stat64 (path, st);
+  path_conv pc (path, ((flags & AT_SYMLINK_NOFOLLOW)
+		       ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
+		      | PC_POSIX | PC_KEEP_HANDLE, stat_suffixes);
+  return stat_worker (pc, st);
 }
 
 extern int utimens_worker (path_conv &, const struct timespec *);
