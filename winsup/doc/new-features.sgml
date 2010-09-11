@@ -5,6 +5,17 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Cygwin now ships the C standard library fenv.h header file, and implements the
+related APIs (including GNU/glibc extensions): feclearexcept, fedisableexcept,
+feenableexcept, fegetenv, fegetexcept, fegetexceptflag, fegetprec, fegetround,
+feholdexcept, feraiseexcept, fesetenv, fesetexceptflag, fesetprec, fesetround,
+fetestexcept, feupdateenv, and predefines both default and no-mask FP
+environments.  See the
+<ulink url="http://www.gnu.org/software/libc/manual/html_node/Arithmetic.html">
+GNU C Library manual</ulink> for full details of this functionality.
+</para></listitem>
+
+<listitem><para>
 /proc/sys allows to access the native NT namespace.
 </para></listitem>
 
