@@ -1609,18 +1609,20 @@ fhandler_disk_file::rmdir ()
   /* Check for existence of remote dirs after trying to delete them.
      Two reasons:
      - Sometimes SMB indicates failure when it really succeeds.
-     - Removeing a directory on a samba drive doesn't return an error if the
-       directory can't be removed because it's not empty.  */
+     - Removing a directory on a Samba drive using an old Samba version
+       sometimes doesn't return an error, if the directory can't be removed
+       because it's not empty. */
   if (isremote ())
     {
       OBJECT_ATTRIBUTES attr;
       FILE_BASIC_INFORMATION fbi;
+      NTSTATUS q_status;
 
-      if (NT_SUCCESS (NtQueryAttributesFile
-			    (pc.get_object_attr (attr, sec_none_nih), &fbi)))
-	status = STATUS_DIRECTORY_NOT_EMPTY;
-      else
+      q_status = NtQueryAttributesFile (pc.get_object_attr (attr, sec_none_nih),                                        &fbi);
+      if (!NT_SUCCESS (status) && q_status == STATUS_OBJECT_NAME_NOT_FOUND)
 	status = STATUS_SUCCESS;
+      else if (NT_SUCCESS (status) && NT_SUCCESS (q_status))
+	status = STATUS_DIRECTORY_NOT_EMPTY;
     }
   if (!NT_SUCCESS (status))
     {

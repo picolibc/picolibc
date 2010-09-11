@@ -1,3 +1,8 @@
+2010-09-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): More thoroughly
+	check the existence condition on remote drives.  Enhance comment.
+
 2010-09-11  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* Makefile.in (DLL_OFILES): Add new fenv.o module.
