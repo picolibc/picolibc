@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
+#include "fenv.h"
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 
@@ -222,13 +223,13 @@ std_dll_init ()
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
     {
-      unsigned fpu_control = 0;
-      __asm__ __volatile__ ("fnstcw %0": "=m" (fpu_control));
+      fenv_t fpuenv;
+      fegetenv (&fpuenv);
       /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
       wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
       if ((h = LoadLibraryW (dll_path)) != NULL)
 	{
-	  __asm__ __volatile__ ("fldcw %0": : "m" (fpu_control));
+	  fesetenv (&fpuenv);
 	  dll->handle = h;
 	}
       else if (!(func->decoration & 1))

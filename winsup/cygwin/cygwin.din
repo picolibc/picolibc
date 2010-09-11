@@ -453,10 +453,29 @@ fdopen SIGFE
 _fdopen = fdopen SIGFE
 _fdopen64 = fdopen64 SIGFE
 fdopendir SIGFE
+_fe_dfl_env DATA
+_fe_nomask_env DATA
+feclearexcept NOSIGFE
+fedisableexcept NOSIGFE
+feenableexcept SIGFE
+fegetenv NOSIGFE
+fegetexcept NOSIGFE
+fegetexceptflag NOSIGFE
+fegetprec NOSIGFE
+fegetround NOSIGFE
+feholdexcept SIGFE
+_feinitialise NOSIGFE
 feof SIGFE
 _feof = feof SIGFE
+feraiseexcept SIGFE
 ferror SIGFE
 _ferror = ferror SIGFE
+fesetenv SIGFE
+fesetexceptflag SIGFE
+fesetprec NOSIGFE
+fesetround NOSIGFE
+fetestexcept NOSIGFE
+feupdateenv SIGFE
 fexecve SIGFE
 fflush SIGFE
 _fflush = fflush SIGFE

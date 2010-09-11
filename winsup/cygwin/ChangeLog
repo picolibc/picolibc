@@ -1,3 +1,20 @@
+2010-09-11  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* Makefile.in (DLL_OFILES): Add new fenv.o module.
+	(fenv_CFLAGS): New flags definition for fenv.o compile.
+	* autoload.cc (std_dll_init): Use fenv.h functions instead of direct
+	manipulation of x87 FPU registers.
+	* crt0.c (mainCRTStartup): Likewise.
+	* cygwin.din (feclearexcept, fegetexceptflag, feraiseexcept,
+	fesetexceptflag, fetestexcept, fegetround, fesetround, fegetenv,
+	feholdexcept, fesetenv, feupdateenv, fegetprec, fesetprec,
+	feenableexcept, fedisableexcept, fegetexcept, _feinitialise,
+	_fe_dfl_env, _fe_nomask_env): Export new functions and data items.
+	* fenv.cc: New file.
+	* posix.sgml: Update status of newly-implemented APIs.
+	* include/fenv.h: Likewise related header.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2010-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Limit retry loop in case of sharing violation

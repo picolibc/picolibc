@@ -150,8 +150,19 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fdimf
     fdopen
     fdopendir
+    feclearexcept
+    fegetenv
+    fegetexceptflag
+    fegetround
+    feholdexcept
     feof
+    feraiseexcept
     ferror
+    fesetenv
+    fesetexceptflag
+    fesetround
+    fetestexcept
+    feupdateenv
     fexecve
     fflush
     ffs
@@ -1024,6 +1035,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     exp10f
     fcloseall
     fcloseall_r
+    fegetprec
+    fesetprec
+    feenableexcept
+    fedisableexcept
+    fegetexcept
     fgetxattr
     flistxattr
     fopencookie
@@ -1277,17 +1293,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fabsl
     fattach
     fdiml
-    feclearexcept
-    fegetenv
-    fegetexceptflag
-    fegetround
-    feholdexcept
-    feraiseexcept
-    fesetenv
-    fesetexceptflag
-    fesetround
-    fetestexcept
-    feupdateenv
     floorl
     fmal
     fmaxl

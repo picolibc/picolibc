@@ -13,11 +13,7 @@ details. */
 
 #include "winlean.h"
 #include <sys/cygwin.h>
-#ifdef __i386__
-#define FPU_RESERVED 0xF0C0
-#define FPU_DEFAULT  0x033f
-
-#endif
+#include "fenv.h"
 
 extern int main (int argc, char **argv);
 
@@ -29,19 +25,7 @@ mainCRTStartup ()
 #ifdef __i386__
   (void)__builtin_return_address(1);
   asm volatile ("andl $-16,%%esp" ::: "%esp");
-  {
-    volatile unsigned short cw;
-
-    /* Get Control Word */
-    __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
-
-    /* mask in */
-    cw &= FPU_RESERVED;
-    cw |= FPU_DEFAULT;
-
-    /* set cw */
-    __asm__ volatile ("fldcw %0" :: "m" (cw));
-  }
+  _feinitialise ();
 #endif
 
   cygwin_crt0 (main);

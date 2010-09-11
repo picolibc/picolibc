@@ -137,7 +137,7 @@ MT_SAFE_OBJECTS:=
 #
 DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
 	cygtls.o cygxdr.o dcrt0.o debug.o devices.o dir.o dlfcn.o dll_init.o \
-	dtable.o environ.o errno.o exceptions.o exec.o external.o fcntl.o \
+	dtable.o environ.o errno.o exceptions.o exec.o external.o fcntl.o fenv.o \
 	fhandler.o fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
 	fhandler_mem.o fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o \
@@ -244,6 +244,7 @@ dlfcn_CFLAGS:=-fomit-frame-pointer
 dll_init_CFLAGS:=-fomit-frame-pointer
 dtable_CFLAGS:=-fomit-frame-pointer -fcheck-new
 fcntl_CFLAGS:=-fomit-frame-pointer
+fenv_CFLAGS:=-fomit-frame-pointer
 fhandler_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
 fhandler_console_CFLAGS:=-fomit-frame-pointer
