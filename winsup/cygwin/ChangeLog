@@ -1,3 +1,14 @@
+2010-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygthread.h (cygthread::cygthread): Reorganize slightly.
+	* dcrt0.cc (dll_crt0_0): Move sigproc initialization later to ensure
+	everything we need has been set up.
+	(dll_crt0_1): Streamline some logic slightly.
+	* sigproc.cc (no_signals_available): Add back dropped test for macro
+	parameter.
+	* fhandler_console.cc (fhandler_console::write): Show a little bit of
+	what's being written to the console in debugging output.
+
 2010-09-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (start_transaction): Make inline function.  Move up to be

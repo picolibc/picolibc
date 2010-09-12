@@ -33,7 +33,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available(x) (!my_sendsig ||( myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls) || !cygwin_finished_initializing)
+#define no_signals_available(x) (!my_sendsig || ((x) && myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls))
 
 #define NPROCS	256
 

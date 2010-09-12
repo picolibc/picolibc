@@ -43,7 +43,8 @@ class cygthread
   void auto_release () {func = NULL;}
   void release (bool);
   cygthread (LPTHREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)
-  : __name (name), func (start), arglen (n), arg (param), notify_detached (notify), standalone (false)
+  : __name (name), func (start), arglen (n), arg (param),
+  notify_detached (notify), standalone (false)
   {
     create ();
   }
@@ -57,7 +58,8 @@ class cygthread
     zap_h ();
   }
   cygthread (LPTHREAD_START_ROUTINE start, LPVOID param, const char *name, HANDLE notify = NULL)
-  : __name (name), func (start), arglen (0), arg (param), notify_detached (notify), standalone (false)
+  : __name (name), func (start), arglen (0), arg (param),
+  notify_detached (notify), standalone (false)
   {
     create ();
   }

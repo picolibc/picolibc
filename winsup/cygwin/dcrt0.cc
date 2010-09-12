@@ -740,12 +740,6 @@ dll_crt0_0 ()
 	}
     }
 
-  /* Initialize signal processing here, early, in the hopes that the creation
-     of a thread early in the process will cause more predictability in memory
-     layout for the main thread. */
-  if (!dynamically_loaded)
-    sigproc_init ();
-
   user_data->threadinterface->Init ();
 
   _cygtls::init ();
@@ -776,6 +770,12 @@ dll_crt0_0 ()
   if (wincap.ts_has_dep_problem ())
     disable_dep ();
 #endif
+
+  /* Initialize signal processing here, early, in the hopes that the creation
+     of a thread early in the process will cause more predictability in memory
+     layout for the main thread. */
+  if (!dynamically_loaded)
+    sigproc_init ();
 
   debug_printf ("finished dll_crt0_0 initialization");
 }
@@ -940,18 +940,13 @@ dll_crt0_1 (void *)
     for (unsigned int i = PREMAIN_LEN / 2; i < PREMAIN_LEN; i++)
       user_data->premain[i] (__argc, __argv, user_data);
 
-  debug_printf ("user_data->main %p", user_data->main);
+  set_errno (0);
 
   if (dynamically_loaded)
-    {
-      set_errno (0);
-      return;
-    }
+    return;
 
   /* Disable case-insensitive globbing */
   ignore_case_with_glob = false;
-
-  set_errno (0);
 
   MALLOC_CHECK;
   cygbench (__progname);
@@ -959,6 +954,7 @@ dll_crt0_1 (void *)
   ld_preload ();
   /* Per POSIX set the default application locale back to "C". */
   _setlocale_r (_REENT, LC_CTYPE, "C");
+
   if (user_data->main)
     cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
   __asm__ ("				\n\

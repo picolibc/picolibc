@@ -1987,7 +1987,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	}
     }
 
-  syscall_printf ("%d = fhandler_console::write (,..%d)", len, len);
+  syscall_printf ("%d = fhandler_console::write (\".20s\")", len, vsrc);
 
   return len;
 }
