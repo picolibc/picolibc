@@ -1,5 +1,10 @@
 2010-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* sigproc.cc (sig_dispatch_pending): Remove debugging statement.
+	(sigproc_init): Wrap a long line.
+
+2010-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygthread.h (cygthread::cygthread): Reorganize slightly.
 	* dcrt0.cc (dll_crt0_0): Move sigproc initialization later to ensure
 	everything we need has been set up.

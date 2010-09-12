@@ -433,9 +433,6 @@ sig_dispatch_pending (bool fast)
       return;
     }
 
-#ifdef DEBUGGING
-  sigproc_printf ("flushing");
-#endif
   sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
@@ -457,7 +454,9 @@ sigproc_init ()
 {
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-  for (int i = 5; i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0); i--)
+  for (int i = 5;
+       i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0);
+       i--)
     if (i == 1)
       api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (my_readsig);
