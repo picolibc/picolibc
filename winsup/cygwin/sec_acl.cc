@@ -416,12 +416,12 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
   return pos;
 }
 
-static int
-acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
-	    unsigned fmode)
+extern "C" int
+acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   int res = -1;
-  fhandler_base *fh = build_fh_name (path, fmode | PC_KEEP_HANDLE,
+
+  fhandler_base *fh = build_fh_name (path, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
 				     stat_suffixes);
   if (fh->error ())
     {
@@ -439,15 +439,11 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 }
 
 extern "C" int
-acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
-{
-  return acl_worker (path, cmd, nentries, aclbufp, PC_SYM_FOLLOW);
-}
-
-extern "C" int
 lacl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
-  return acl_worker (path, cmd, nentries, aclbufp, PC_SYM_NOFOLLOW);
+  /* This call was an accident.  Make it absolutely clear. */
+  set_errno (ENOSYS);
+  return -1;
 }
 
 extern "C" int
@@ -935,7 +931,9 @@ facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
 extern "C" int
 lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
 {
-  return lacl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
+  /* This call was an accident.  Make it absolutely clear. */
+  set_errno (ENOSYS);
+  return -1;
 }
 
 extern "C" int

@@ -1,3 +1,11 @@
+2010-09-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (acl_worker): Remove.
+	(acl32): Implement acl_worker functionality here.
+	(lacl32): Just return -1 with errno set to ENOSYS.
+	(lacl): Ditto.
+	* include/cygwin/acl.h (lacl): Remove this call.
+
 2010-09-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* sigproc.cc (sig_dispatch_pending): Remove debugging statement.

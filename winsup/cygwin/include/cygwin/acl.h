@@ -1,6 +1,6 @@
 /* cygwin/acl.h header file for Cygwin.
 
-   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2010 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -80,7 +80,6 @@ typedef struct acl {
 
 #ifndef __INSIDE_CYGWIN__
 int _EXFUN(acl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
-int _EXFUN(lacl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(facl,(int fd, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(aclcheck,(aclent_t *aclbufp, int nentries, int *which));
 int _EXFUN(aclsort,(int nentries, int calclass, aclent_t *aclbufp));
