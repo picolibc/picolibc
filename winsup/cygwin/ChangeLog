@@ -1,3 +1,15 @@
+2010-09-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (start_transaction): Make inline function.  Move up to be
+	more generally available.
+	(stop_transaction): Ditto.
+	(unlink_nt): Potentially start transaction when trying to delete file
+	with DOS R/O attribute set.  If file is .lnk symlink, check for number
+	of hardlinks.  Add "out" label and only return via "out".  Rearrange
+	reversion of DOS R/O attribute and, on success, only revert R/O
+	attribute if file is .lnk symlink with more than one hardlink.  Add
+	length comment to explain why.
+
 2010-09-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): More thoroughly

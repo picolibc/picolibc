@@ -164,6 +164,36 @@ dup3 (int oldfd, int newfd, int flags)
   return cygheap->fdtab.dup3 (oldfd, newfd, flags);
 }
 
+static inline void
+start_transaction (HANDLE &old_trans, HANDLE &trans)
+{
+  NTSTATUS status = NtCreateTransaction (&trans,
+				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
+				NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+  if (NT_SUCCESS (status))
+    {
+      old_trans = RtlGetCurrentTransaction ();
+      RtlSetCurrentTransaction (trans);
+    }
+  else
+    {
+      debug_printf ("NtCreateTransaction failed, %p", status);
+      old_trans = trans = NULL;
+    }
+}
+
+static inline NTSTATUS
+stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
+{
+  RtlSetCurrentTransaction (old_trans);
+  if (NT_SUCCESS (status))
+    status = NtCommitTransaction (trans, TRUE);
+  else
+    status = NtRollbackTransaction (trans, TRUE);
+  NtClose (trans);
+  return status;
+}
+
 static char desktop_ini[] =
   "[.ShellClassInfo]\r\nCLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n";
 static BYTE info2[] =
@@ -503,6 +533,9 @@ unlink_nt (path_conv &pc)
   HANDLE fh, fh_ro = NULL;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
+  HANDLE old_trans = NULL, trans = NULL;
+  ULONG num_links = 1;
+  FILE_DISPOSITION_INFORMATION disp = { TRUE };
 
   bin_status bin_stat = dont_move;
 
@@ -522,7 +555,14 @@ unlink_nt (path_conv &pc)
      attribute, just re-open the file for DELETE and go ahead. */
   if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
     {
-      access |= FILE_WRITE_ATTRIBUTES;
+      FILE_STANDARD_INFORMATION fsi;
+
+      /* If possible, hide the non-atomicity of the "remove R/O flag, remove
+         link to file" operation behind a transaction. */
+      if (wincap.has_transactions ()
+	  && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
+	start_transaction (old_trans, trans);
+
       status = NtOpenFile (&fh_ro, FILE_WRITE_ATTRIBUTES, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, flags);
       if (NT_SUCCESS (status))
@@ -532,6 +572,14 @@ unlink_nt (path_conv &pc)
 	  InitializeObjectAttributes (&attr, &ro_u_empty,
 				      pc.objcaseinsensitive (), fh_ro, NULL);
       	}
+      if (pc.is_lnk_symlink ())
+	{
+	  status = NtQueryInformationFile (fh_ro, &io, &fsi, sizeof fsi,
+					   FileStandardInformation);
+	  if (NT_SUCCESS (status))
+	    num_links = fsi.NumberOfLinks;
+	}
+      access |= FILE_WRITE_ATTRIBUTES;
     }
   /* First try to open the file with only allowing sharing for delete.  If
      the file has an open handle on it, other than just for deletion, this
@@ -589,7 +637,7 @@ unlink_nt (path_conv &pc)
 		  NtClose (fh);
 		  if (fh_ro)
 		    NtClose (fh_ro);
-		  return status;
+		  goto out;
 		}
 	    }
 	}
@@ -601,18 +649,21 @@ unlink_nt (path_conv &pc)
       if (status == STATUS_DELETE_PENDING)
 	{
 	  syscall_printf ("Delete already pending");
-	  return 0;
+	  status = 0;
+	  goto out;
 	}
       syscall_printf ("Opening file for delete failed, status = %p", status);
-      return status;
+      goto out;
     }
   /* Try to move to bin if a sharing violation occured.  If that worked,
      we're done. */
   if (bin_stat == move_to_bin
       && (bin_stat = try_to_bin (pc, fh, access)) == has_been_moved)
-    return 0;
+    {
+      status = 0;
+      goto out;
+    }
   /* Try to set delete disposition. */
-  FILE_DISPOSITION_INFORMATION disp = { TRUE };
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
 				 FileDispositionInformation);
   if (!NT_SUCCESS (status))
@@ -661,14 +712,36 @@ unlink_nt (path_conv &pc)
     }
   if (fh)
     {
-      /* Restore R/O attribute to accommodate hardlinks.  Don't try this
-	 with directories!  For some reason the below NtSetInformationFile
-	 changes the delete disposition back to FALSE, at least on XP. */
-      if ((access & FILE_WRITE_ATTRIBUTES)
-	  && (!NT_SUCCESS (status) || !pc.isdir ()))
-	NtSetAttributesFile (fh, pc.file_attributes ());
+      if (access & FILE_WRITE_ATTRIBUTES)
+      	{
+	  /* Restore R/O attribute if setting the delete dispostion failed. */
+	  if (!NT_SUCCESS (status))
+	    NtSetAttributesFile (fh, pc.file_attributes ());
+	  /* If we succeeded, restore R/O attribute to accommodate hardlinks.
+	     Only ever try to do this for our own winsymlinks, because there's
+	     a problem with setting the delete disposition:
+	     http://msdn.microsoft.com/en-us/library/ff545765%28VS.85%29.aspx
+	     "Subsequently, the only legal operation by such a caller is
+	     to close the open file handle."
+	     
+	     FIXME? On Vista and later, we could use FILE_HARD_LINK_INFORMATION
+	     to find all hardlinks and use one of them to restore the R/O bit,
+	     after the NtClose, but before we stop the transaction.  This
+	     avoids the aforementioned problem entirely . */
+	  else if (pc.is_lnk_symlink () && num_links > 1)
+	    NtSetAttributesFile (fh, pc.file_attributes ());
+	}
+
       NtClose (fh);
+
     }
+out:
+  /* Stop transaction if we started one. */
+  if ((access & FILE_WRITE_ATTRIBUTES)
+      && wincap.has_transactions ()
+      && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
+    stop_transaction (status, old_trans, trans);
+
   return status;
 }
 
@@ -1656,36 +1729,6 @@ rename_append_suffix (path_conv &pc, const char *path, size_t len,
     len -= 4;
   stpcpy (stpncpy (buf, path, len), suffix);
   pc.check (buf, PC_SYM_NOFOLLOW);
-}
-
-static void
-start_transaction (HANDLE &old_trans, HANDLE &trans)
-{
-  NTSTATUS status = NtCreateTransaction (&trans,
-				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
-				NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
-  if (NT_SUCCESS (status))
-    {
-      old_trans = RtlGetCurrentTransaction ();
-      RtlSetCurrentTransaction (trans);
-    }
-  else
-    {
-      debug_printf ("NtCreateTransaction failed, %p", status);
-      old_trans = trans = NULL;
-    }
-}
-
-static NTSTATUS
-stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
-{
-  RtlSetCurrentTransaction (old_trans);
-  if (NT_SUCCESS (status))
-    status = NtCommitTransaction (trans, TRUE);
-  else
-    status = NtRollbackTransaction (trans, TRUE);
-  NtClose (trans);
-  return status;
 }
 
 /* This function tests if a filename has one of the "approved" executable
