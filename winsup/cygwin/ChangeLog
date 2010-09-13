@@ -1,5 +1,11 @@
 2010-09-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (get_mem_values): Simplify code.  Fix
+	NtQueryVirtualMemory loop so it handles memory allocation gracefully.
+	Always set errno to a useful value.
+
+2010-09-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_base): Change inheritance of fstat_helper
 	and fstat_by_...  methods to private.
 	(fhandler_base::fstat_helper): Drop all redundant arguments.

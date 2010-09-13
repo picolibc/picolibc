@@ -999,36 +999,43 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 		unsigned long *vmtext, unsigned long *vmdata,
 		unsigned long *vmlib, unsigned long *vmshare)
 {
-  bool res = true;
+  bool res = false;
   NTSTATUS ret;
   HANDLE hProcess;
   VM_COUNTERS vmc;
   MEMORY_WORKING_SET_LIST *mwsl;
-  ULONG n = 0x1000, length;
-  PULONG p = (PULONG) malloc (sizeof (ULONG) * n);
+  ULONG n = 0x4000, length;
+  PMEMORY_WORKING_SET_LIST p = (PMEMORY_WORKING_SET_LIST) malloc (n);
   unsigned page_size = getsystempagesize ();
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION,
 			  FALSE, dwProcessId);
   if (hProcess == NULL)
     {
-      DWORD error = GetLastError ();
-      __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret %d", error);
+      __seterrno ();
+      debug_printf ("OpenProcess, %E");
       return false;
     }
-  while ((ret = NtQueryVirtualMemory (hProcess, 0,
-				      MemoryWorkingSetList,
-				      (PVOID) p,
-				      n * sizeof *p, &length)),
-	 (ret == STATUS_SUCCESS || ret == STATUS_INFO_LENGTH_MISMATCH) &&
-	 length >= (n * sizeof (*p)))
-      p = (PULONG) realloc (p, n *= (2 * sizeof (ULONG)));
-
-  if (ret != STATUS_SUCCESS)
+  do
     {
-      debug_printf ("NtQueryVirtualMemory: ret %d, Dos(ret) %d",
-		   ret, RtlNtStatusToDosError (ret));
-      res = false;
+      ret = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
+				  (PVOID) p, n, (length = ULONG_MAX, &length));
+      if (ret == STATUS_INFO_LENGTH_MISMATCH
+	  || (!NT_SUCCESS (ret) && length > n))
+      	{
+	  ret = STATUS_INFO_LENGTH_MISMATCH;
+	  n <<= 1;
+	  PMEMORY_WORKING_SET_LIST new_p = (PMEMORY_WORKING_SET_LIST)
+					   realloc (p, n);
+	  if (!new_p)
+	    goto out;
+	  p = new_p;
+	}
+    }
+  while (!NT_SUCCESS (ret));
+  if (!NT_SUCCESS (ret))
+    {
+      debug_printf ("NtQueryVirtualMemory: ret %p", ret);
+      __seterrno_from_nt_status (ret);
       goto out;
     }
   mwsl = (MEMORY_WORKING_SET_LIST *) p;
@@ -1036,7 +1043,8 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       ++*vmrss;
       unsigned flags = mwsl->WorkingSetList[i] & 0x0FFF;
-      if ((flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE)) == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
+      if ((flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
+	  == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
 	++*vmlib;
       else if (flags & WSLE_PAGE_SHAREABLE)
 	++*vmshare;
@@ -1047,14 +1055,14 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     }
   ret = NtQueryInformationProcess (hProcess, ProcessVmCounters, (PVOID) &vmc,
 				   sizeof vmc, NULL);
-  if (ret != STATUS_SUCCESS)
+  if (!NT_SUCCESS (ret))
     {
-      debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %d",
-		    ret, RtlNtStatusToDosError (ret));
-      res = false;
+      debug_printf ("NtQueryInformationProcess: ret %p", ret);
+      __seterrno_from_nt_status (ret);
       goto out;
     }
   *vmsize = vmc.PagefileUsage / page_size;
+  res = true;
 out:
   free (p);
   CloseHandle (hProcess);
