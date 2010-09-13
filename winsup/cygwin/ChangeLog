@@ -1,3 +1,33 @@
+2010-09-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_base): Change inheritance of fstat_helper
+	and fstat_by_...  methods to private.
+	(fhandler_base::fstat_helper): Drop all redundant arguments.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop call
+	to fstat_by_nfs_ea here.  Drop fetching basic file information.
+	Drop setting file attributes.  Accommodate change in fstat_helper call.
+	(fhandler_base::fstat_by_name): Simplify.  Only fetch directory
+	information to get the inode number.  Drop setting file attributes.
+	Accommodate change in fstat_helper call.
+	(fhandler_base::fstat_fs): Call fstat_by_nfs_ea if on NFS.
+	(fhandler_base::fstat_helper): Drop all redundant arguments.  Use
+	information already collected in the fhandler.  Move heading comment
+	into code and drop dwFileAttributes comment.
+	* mmap.cc (mmap64): Call fstat_fs rather than fstat_by_handle.
+	* mount.cc (fs_info::update): Note that has_buggy_basic_info is unused.
+	* path.cc (symlink_info::check_reparse_point): Add comment.
+	(symlink_info::check): Fetch FileNetworkOpenInformation rather than
+	FileBasicInformation throughout, except on NFS.  Explain why.  Store
+	FILE_NETWORK_OPEN_INFORMATION in conv_hdl.  Remove
+	FILE_ATTRIBUTE_DIRECTORY attribute in conv_hdl for reparse point
+	symlinks.
+	* path.h (class path_conv_handle): Add FILE_NETWORK_OPEN_INFORMATION
+	member _fnoi.
+	(path_conv_handle::fnoi): New accessor method for _fnoi.
+	(path_conv::fnoi): New accessor method for cubv_hdl._fnoi.
+
+	* fhandler_tty.cc (fhandler_tty_slave::init): Use tty::setpgid method.
+
 2010-09-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (acl_worker): Remove.

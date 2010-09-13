@@ -89,10 +89,24 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
+class symlink_info;
+struct _FILE_NETWORK_OPEN_INFORMATION;
+
 class path_conv_handle
 {
   HANDLE      hdl;
   ACCESS_MASK acc;
+  /* Identical to FILE_NETWORK_OPEN_INFORMATION.  We don't want to pull in
+     ntdll.h here, though. */
+  struct {
+    LARGE_INTEGER CreationTime;
+    LARGE_INTEGER LastAccessTime;
+    LARGE_INTEGER LastWriteTime;
+    LARGE_INTEGER ChangeTime;
+    LARGE_INTEGER AllocationSize;
+    LARGE_INTEGER EndOfFile;
+    ULONG FileAttributes;
+  } _fnoi;
 public:
   path_conv_handle () : hdl (NULL), acc (0) {}
   inline void set (HANDLE h, ACCESS_MASK a) { hdl = h; acc = a; }
@@ -114,9 +128,9 @@ public:
   }
   inline HANDLE handle () const { return hdl; }
   inline ACCESS_MASK access () const { return acc; }
+  inline struct _FILE_NETWORK_OPEN_INFORMATION *fnoi ()
+  { return (struct _FILE_NETWORK_OPEN_INFORMATION *) &_fnoi; }
 };
-
-class symlink_info;
 
 class path_conv
 {
@@ -287,6 +301,7 @@ class path_conv
 
   HANDLE handle () const { return conv_handle.handle (); }
   ACCESS_MASK access () const { return conv_handle.access (); }
+  struct _FILE_NETWORK_OPEN_INFORMATION *fnoi () { return conv_handle.fnoi (); }
   void reset_conv_handle () { conv_handle.set (NULL, 0); }
   void close_conv_handle () { conv_handle.close (); }
 

@@ -717,7 +717,7 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 	 tty process group leader.
 	 TODO: Investigate how SIGTTIN should be handled with pure-windows
 	 programs. */
-      tc->pgid = myself->pgid;
+      tc->setpgid (myself->pgid);
     }
 
   if (f != INVALID_HANDLE_VALUE)

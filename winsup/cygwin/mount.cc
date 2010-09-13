@@ -381,7 +381,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     Therefore, for NWFS we have to fallback to the
 	     FileNetworkOpenInformation info class.  Unfortunately we can't
 	     use FileNetworkOpenInformation all the time since that fails on
-	     other filesystems like NFS. */
+	     other filesystems like NFS.
+	     UNUSED, but keep in for information purposes. */
 	  has_buggy_basic_info (is_nwfs ());
 	  /* Netapp ans NWFS are too dumb to allow non-DOS filesystems
 	     containing trailing dots and spaces when accessed from Windows

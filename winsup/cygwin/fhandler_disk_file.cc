@@ -345,43 +345,17 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
 int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-
-  if (pc.fs_is_nfs ())
-    return fstat_by_nfs_ea (buf);
-
   /* Don't use FileAllInformation info class.  It returns a pathname rather
      than a filename, so it needs a really big buffer for no good reason
      since we don't need the name anyway.  So we just call the three info
      classes necessary to get all information required by stat(2). */
-
-  union {
-    FILE_BASIC_INFORMATION fbi;
-    FILE_NETWORK_OPEN_INFORMATION fnoi;
-  } fi;
   FILE_STANDARD_INFORMATION fsi;
   FILE_INTERNAL_INFORMATION fii;
 
   HANDLE h = get_stat_handle ();
+  NTSTATUS status = 0;
+  IO_STATUS_BLOCK io;
 
-  if (pc.has_buggy_basic_info ())
-    {
-      status = NtQueryInformationFile (h, &io, &fi, sizeof fi,
-				       FileNetworkOpenInformation);
-      /* The timestamps are in the same relative memory location, only
-	 the DOS attributes have to be moved. */
-      fi.fbi.FileAttributes = fi.fnoi.FileAttributes;
-    }
-  else
-    status = NtQueryInformationFile (h, &io, &fi.fbi,
-				     sizeof fi.fbi, FileBasicInformation);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("%p = NtQueryInformationFile(%S, FileBasicInformation)",
-		    status, pc.get_nt_native_path ());
-      return -1;
-    }
   status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
 				   FileStandardInformation);
   if (!NT_SUCCESS (status))
@@ -402,26 +376,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 	}
       ino = fii.FileId.QuadPart;
     }
-  /* If the change time is 0, it's a file system which doesn't
-     support a change timestamp.  In that case use the LastWriteTime
-     entry, as in other calls to fstat_helper. */
-  if (pc.is_rep_symlink ())
-    fi.fbi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  /* Only copy attributes if not a device root dir. */
-  if (!(pc.file_attributes () & FILE_ATTRIBUTE_DEVICE))
-    pc.file_attributes (fi.fbi.FileAttributes);
-  return fstat_helper (buf,
-		       fi.fbi.ChangeTime.QuadPart ? &fi.fbi.ChangeTime
-						  : &fi.fbi.LastWriteTime,
-		       &fi.fbi.LastAccessTime,
-		       &fi.fbi.LastWriteTime,
-		       &fi.fbi.CreationTime,
-		       get_dev (),
-		       fsi.EndOfFile.QuadPart,
-		       fsi.AllocationSize.QuadPart,
-		       ino,
-		       fsi.NumberOfLinks,
-		       fi.fbi.FileAttributes);
+  return fstat_helper (buf, fsi.NumberOfLinks);
 }
 
 int __stdcall
@@ -437,76 +392,35 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     FILE_ID_BOTH_DIR_INFORMATION fdi;
     WCHAR buf[NAME_MAX + 1];
   } fdi_buf;
-  LARGE_INTEGER FileId;
 
-  RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
-  InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
-			      NULL, NULL);
-  if (!NT_SUCCESS (status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-				       &attr, &io, FILE_SHARE_VALID_FLAGS,
-				       FILE_SYNCHRONOUS_IO_NONALERT
-				       | FILE_OPEN_FOR_BACKUP_INTENT
-				       | FILE_DIRECTORY_FILE)))
+  if (!ino && wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ())
     {
-      debug_printf ("%p = NtOpenFile(%S)", status, pc.get_nt_native_path ());
-      goto too_bad;
+      RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
+      InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
+				  NULL, NULL);
+      status = NtOpenFile (&dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
+			   &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT
+			   | FILE_DIRECTORY_FILE);
+      if (!NT_SUCCESS (status))
+	debug_printf ("%p = NtOpenFile(%S)", status,
+		      pc.get_nt_native_path ());
+      else
+	{
+	  status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
+					 &fdi_buf.fdi, sizeof fdi_buf,
+					 FileIdBothDirectoryInformation,
+					 TRUE, &basename, TRUE);
+	  NtClose (dir);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("%p = NtQueryDirectoryFile(%S)", status,
+			  pc.get_nt_native_path ());
+	  else
+	    ino = fdi_buf.fdi.FileId.QuadPart;
+	}
     }
-  if (wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ()
-      && NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
-						 &fdi_buf.fdi, sizeof fdi_buf,
-						 FileIdBothDirectoryInformation,
-						 TRUE, &basename, TRUE)))
-    FileId = fdi_buf.fdi.FileId;
-  else if (NT_SUCCESS (status = NtQueryDirectoryFile (dir, NULL, NULL, NULL,
-						 &io, &fdi_buf.fdi,
-						 sizeof fdi_buf,
-						 FileBothDirectoryInformation,
-						 TRUE, &basename, TRUE)))
-    FileId.QuadPart = 0; /* get_ino is called in fstat_helper. */
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("%p = NtQueryDirectoryFile(%S)", status,
-		    pc.get_nt_native_path ());
-      NtClose (dir);
-      goto too_bad;
-    }
-  NtClose (dir);
-  /* If the change time is 0, it's a file system which doesn't
-     support a change timestamp.  In that case use the LastWriteTime
-     entry, as in other calls to fstat_helper. */
-  if (pc.is_rep_symlink ())
-    fdi_buf.fdi.FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-  /* Only copy attributes if not a device root dir. */
-  if (!(pc.file_attributes () & FILE_ATTRIBUTE_DEVICE))
-    pc.file_attributes (fdi_buf.fdi.FileAttributes);
-  return fstat_helper (buf,
-		       fdi_buf.fdi.ChangeTime.QuadPart
-		       ? &fdi_buf.fdi.ChangeTime : &fdi_buf.fdi.LastWriteTime,
-		       &fdi_buf.fdi.LastAccessTime,
-		       &fdi_buf.fdi.LastWriteTime,
-		       &fdi_buf.fdi.CreationTime,
-		       pc.fs_serial_number (),
-		       fdi_buf.fdi.EndOfFile.QuadPart,
-		       fdi_buf.fdi.AllocationSize.QuadPart,
-		       FileId.QuadPart,
-		       1,
-		       fdi_buf.fdi.FileAttributes);
-
-too_bad:
-  LARGE_INTEGER ft;
-  /* Arbitrary value: 2006-12-01 */
-  RtlSecondsSince1970ToTime (1164931200L, &ft);
-  return fstat_helper (buf,
-		       &ft,
-		       &ft,
-		       &ft,
-		       &ft,
-		       0,
-		       0ULL,
-		       -1LL,
-		       0ULL,
-		       1,
-		       pc.file_attributes ());
+  return fstat_helper (buf, 1);
 }
 
 int __stdcall
@@ -519,7 +433,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   if (get_stat_handle ())
     {
       if (!nohandle () && !is_fs_special ())
-	res = fstat_by_handle (buf);
+	res = pc.fs_is_nfs () ? fstat_by_nfs_ea (buf) : fstat_by_handle (buf);
       if (res)
 	res = fstat_by_name (buf);
       return res;
@@ -540,7 +454,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 	 Since fhandler_base::open only calls CloseHandle if !nohandle,
 	 we have to set it to false before calling close and restore
 	 the state afterwards. */
-      res = fstat_by_handle (buf);
+      res = pc.fs_is_nfs () ? fstat_by_nfs_ea (buf) : fstat_by_handle (buf);
       bool no_handle = nohandle ();
       nohandle (false);
       close_fs ();
@@ -553,39 +467,26 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   return res;
 }
 
-/* The ChangeTime is taken from the NTFS ChangeTime entry, if reading
-   the file information using NtQueryInformationFile succeeded.  If not,
-   it's faked using the LastWriteTime entry from GetFileInformationByHandle
-   or FindFirstFile.  We're deliberatly not using the creation time anymore
-   to simplify interaction with native Windows applications which choke on
-   creation times >= access or write times.
-
-   Note that the dwFileAttributes member of the file information evaluated
-   in the calling function is used here, not the pc.fileattr member, since
-   the latter might be old and not reflect the actual state of the file. */
 int __stdcall
 fhandler_base::fstat_helper (struct __stat64 *buf,
-			     PLARGE_INTEGER ChangeTime,
-			     PLARGE_INTEGER LastAccessTime,
-			     PLARGE_INTEGER LastWriteTime,
-			     PLARGE_INTEGER CreationTime,
-			     DWORD dwVolumeSerialNumber,
-			     ULONGLONG nFileSize,
-			     LONGLONG nAllocSize,
-			     ULONGLONG nFileIndex,
-			     DWORD nNumberOfLinks,
-			     DWORD dwFileAttributes)
+			     DWORD nNumberOfLinks)
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
   HANDLE h = get_stat_handle ();
+  PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
+  ULONG attributes = pc.file_attributes ();
 
-  to_timestruc_t ((PFILETIME) LastAccessTime, &buf->st_atim);
-  to_timestruc_t ((PFILETIME) LastWriteTime, &buf->st_mtim);
-  to_timestruc_t ((PFILETIME) ChangeTime, &buf->st_ctim);
-  to_timestruc_t ((PFILETIME) CreationTime, &buf->st_birthtim);
-  buf->st_rdev = buf->st_dev = dwVolumeSerialNumber;
-  buf->st_size = (_off64_t) nFileSize;
+  to_timestruc_t ((PFILETIME) &pfnoi->LastAccessTime, &buf->st_atim);
+  to_timestruc_t ((PFILETIME) &pfnoi->LastWriteTime, &buf->st_mtim);
+  /* If the ChangeTime is 0, the underlying FS doesn't support this timestamp
+     (FAT for instance).  If so, it's faked using LastWriteTime. */
+  to_timestruc_t (pfnoi->ChangeTime.QuadPart ? (PFILETIME) &pfnoi->ChangeTime
+					    : (PFILETIME) &pfnoi->LastWriteTime,
+		  &buf->st_ctim);
+  to_timestruc_t ((PFILETIME) &pfnoi->CreationTime, &buf->st_birthtim);
+  buf->st_rdev = buf->st_dev = get_dev ();
+  buf->st_size = (_off64_t) pfnoi->EndOfFile.QuadPart;
   /* The number of links to a directory includes the number of subdirectories
      in the directory, since all those subdirectories point to it.  However,
      this is painfully slow, so we do without it. */
@@ -596,19 +497,20 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 #endif
 
   /* Enforce namehash as inode number on untrusted file systems. */
-  if (nFileIndex && pc.isgood_inode (nFileIndex))
-    buf->st_ino = (__ino64_t) nFileIndex;
+  if (ino && pc.isgood_inode (ino))
+    buf->st_ino = (__ino64_t) ino;
   else
     buf->st_ino = get_ino ();
 
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
-  if (nAllocSize >= 0LL)
+  if (pfnoi->AllocationSize.QuadPart >= 0LL)
     /* A successful NtQueryInformationFile returns the allocation size
        correctly for compressed and sparse files as well. */
-    buf->st_blocks = (nAllocSize + S_BLKSIZE - 1) / S_BLKSIZE;
-  else if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_COMPRESSED
-					      | FILE_ATTRIBUTE_SPARSE_FILE)
+    buf->st_blocks = (pfnoi->AllocationSize.QuadPart + S_BLKSIZE - 1)
+		     / S_BLKSIZE;
+  else if (::has_attribute (attributes, FILE_ATTRIBUTE_COMPRESSED
+					| FILE_ATTRIBUTE_SPARSE_FILE)
 	   && h && !is_fs_special ()
 	   && !NtQueryInformationFile (h, &st, (PVOID) &fci, sizeof fci,
 				       FileCompressionInformation))
@@ -641,7 +543,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if (::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY)
+      if (::has_attribute (attributes, FILE_ATTRIBUTE_READONLY)
 	  && !pc.isdir () && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
@@ -660,7 +562,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!::has_attribute (dwFileAttributes, FILE_ATTRIBUTE_READONLY))
+      if (!::has_attribute (attributes, FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 

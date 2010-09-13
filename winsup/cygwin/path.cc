@@ -1946,6 +1946,7 @@ symlink_info::check_reparse_point (HANDLE h)
   sys_wcstombs (srcbuf, SYMLINK_MAX + 7, subst.Buffer,
 		subst.Length / sizeof (WCHAR));
   pflags |= PATH_SYMLINK | PATH_REP;
+  /* A symlink is never a directory. */
   fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
   return posixify (srcbuf);
 }
@@ -2238,7 +2239,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, fs_info &fs,
   UNICODE_STRING upath;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  FILE_BASIC_INFORMATION fbi;
   suffix_scan suffix;
 
   const ULONG ci_flag = cygwin_shared->obcaseinsensitive
@@ -2409,16 +2409,34 @@ restart:
 	    }
 	}
 
+      FILE_BASIC_INFORMATION fbi;
+      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
+
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.
 	     This speeds up path_conv noticably (~10%). */
-	  && (fs.inited () || fs.update (&upath, h))
-	  && NT_SUCCESS (status = fs.has_buggy_basic_info ()
-			 ? NtQueryAttributesFile (&attr, &fbi)
-			 : NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-						   FileBasicInformation)))
-	fileattr = fbi.FileAttributes;
-      else
+	  && (fs.inited () || fs.update (&upath, h)))
+	{
+	  if (fs.is_nfs ())
+	    {
+	      /* NFS doesn't handle FileNetworkOpenInformation when called
+	         via NtQueryInformationFile (STATUS_INVALID_PARAMETER).
+		 Since we only need FileAttributes for NFS anyway, we just
+		 fetch the FileBasicInformation. */
+	      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+					       FileBasicInformation);
+	      if (NT_SUCCESS (status))
+		fileattr = fbi.FileAttributes;
+	    }
+	  else
+	    {
+	      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
+					       FileNetworkOpenInformation);
+	      if (NT_SUCCESS (status))
+		fileattr = pfnoi->FileAttributes;
+	    }
+	}
+      if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("%p = NtQueryInformationFile (%S)", status, &upath);
 	  fileattr = INVALID_FILE_ATTRIBUTES;
@@ -2504,7 +2522,10 @@ restart:
 		      fileattr = 0;
 		    }
 		  else
-		    fileattr = fdi_buf.fdi.FileAttributes;
+		    {
+		      fileattr = fdi_buf.fdi.FileAttributes;
+		      memcpy (pfnoi, &fdi_buf.fdi.CreationTime, sizeof *pfnoi);
+		    }
 		}
 	      ext_tacked_on = !!*ext_here;
 	      goto file_not_symlink;
@@ -2590,7 +2611,11 @@ restart:
 	      pflags &= ~PC_KEEP_HANDLE;
 	    }
 	  else if (res)
-	    break;
+	    {
+	      /* A symlink is never a directory. */
+	      pfnoi->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+	      break;
+	    }
 	}
 
       /* This is the old Cygwin method creating symlinks.  A symlink will

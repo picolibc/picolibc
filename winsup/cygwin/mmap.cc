@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -865,7 +865,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  goto out;
 	}
 
-      if (fh->fstat_by_handle (&st))
+      if (fh->fstat_fs (&st))
 	{
 	  __seterrno ();
 	  goto out;

@@ -293,21 +293,14 @@ class fhandler_base
   int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
+private:
   int __stdcall fstat_helper (struct __stat64 *buf,
-			      PLARGE_INTEGER ChangeTime,
-			      PLARGE_INTEGER LastAccessTime,
-			      PLARGE_INTEGER LastWriteTime,
-			      PLARGE_INTEGER CreationTime,
-			      DWORD dwVolumeSerialNumber,
-			      ULONGLONG nFileSize,
-			      LONGLONG nAllocSize,
-			      ULONGLONG nFileIndex,
-			      DWORD nNumberOfLinks,
-			      DWORD dwFileAttributes)
-    __attribute__ ((regparm (3)));
+			      DWORD nNumberOfLinks)
+		__attribute__ ((regparm (3)));
   int __stdcall fstat_by_nfs_ea (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
+public:
   virtual int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int utimens_fs (const struct timespec *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
