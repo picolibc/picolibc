@@ -2,7 +2,7 @@
 
 	* libc/sys/sysnecv850/Makefile.am (lib_a_SOURCES): Provide an
 	empty definition.
-	* libc/sys/sysnecv850/Makefile: Regenerate.
+	* libc/sys/sysnecv850/Makefile.in: Regenerate.
 
 2010-08-25  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
