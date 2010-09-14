@@ -1,3 +1,9 @@
+2010-09-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Make sure AllocationSize and EndOfFile
+	are stored in the right order when fetching the info from the
+	NtQueryDirectoryFile result.
+
 2010-09-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (get_mem_values): Simplify code.  Fix

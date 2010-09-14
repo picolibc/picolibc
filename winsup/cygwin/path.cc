@@ -2525,6 +2525,14 @@ restart:
 		    {
 		      fileattr = fdi_buf.fdi.FileAttributes;
 		      memcpy (pfnoi, &fdi_buf.fdi.CreationTime, sizeof *pfnoi);
+		      /* Amazing, but true:  The FILE_NETWORK_OPEN_INFORMATION
+		         structure has the AllocationSize and EndOfFile members
+			 interchanged relative to the directory information
+			 classes. */
+		      pfnoi->AllocationSize.QuadPart
+			= fdi_buf.fdi.AllocationSize.QuadPart;
+		      pfnoi->EndOfFile.QuadPart
+			= fdi_buf.fdi.EndOfFile.QuadPart;
 		    }
 		}
 	      ext_tacked_on = !!*ext_here;
