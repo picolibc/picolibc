@@ -1,3 +1,10 @@
+2010-09-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Fetch number
+	of links and inode number only if path has good inodes.
+	(fhandler_base::fstat_by_name): Fetch inode number only if path has
+	good inodes.
+
 2010-09-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Make sure AllocationSize and EndOfFile

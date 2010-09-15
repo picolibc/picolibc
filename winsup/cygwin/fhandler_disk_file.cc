@@ -356,25 +356,30 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   NTSTATUS status = 0;
   IO_STATUS_BLOCK io;
 
-  status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
-				   FileStandardInformation);
-  if (!NT_SUCCESS (status))
+  if (!pc.hasgood_inode ())
+    fsi.NumberOfLinks = 1;
+  else
     {
-      debug_printf ("%p = NtQueryInformationFile(%S, FileStandardInformation)",
-		    status, pc.get_nt_native_path ());
-      return -1;
-    }
-  if (!ino && pc.hasgood_inode ())
-    {
-      status = NtQueryInformationFile (h, &io, &fii, sizeof fii,
-				       FileInternalInformation);
+      status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
+				       FileStandardInformation);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
+	  debug_printf ("%p = NtQueryInformationFile(%S, FileStandardInformation)",
 			status, pc.get_nt_native_path ());
 	  return -1;
 	}
-      ino = fii.FileId.QuadPart;
+      if (!ino)
+	{
+	  status = NtQueryInformationFile (h, &io, &fii, sizeof fii,
+					   FileInternalInformation);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
+			    status, pc.get_nt_native_path ());
+	      return -1;
+	    }
+	  ino = fii.FileId.QuadPart;
+	}
     }
   return fstat_helper (buf, fsi.NumberOfLinks);
 }
@@ -393,7 +398,8 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     WCHAR buf[NAME_MAX + 1];
   } fdi_buf;
 
-  if (!ino && wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ())
+  if (!ino && pc.hasgood_inode ()
+      && wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ())
     {
       RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
       InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
