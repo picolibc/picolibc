@@ -414,7 +414,7 @@ desktop shortcut.</para>
 </screen>
 
 <note><para>For a list of locales supported by your Windows machine, use the new
-><command>locale -a</command> command, which is part of the Cygwin package.
+<command>locale -a</command> command, which is part of the Cygwin package.
 For a description see <xref linkend="locale"></xref></para></note>
 
 <note><para>For a list of supported character sets, see
