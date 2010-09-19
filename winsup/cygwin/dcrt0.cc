@@ -774,7 +774,7 @@ dll_crt0_0 ()
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
-  if (!dynamically_loaded)
+  if (!wincap.has_buggy_thread_startup () && !dynamically_loaded)
     sigproc_init ();
 
   debug_printf ("finished dll_crt0_0 initialization");
@@ -789,7 +789,7 @@ dll_crt0_1 (void *)
 {
   extern void initial_setlocale ();
 
-  if (dynamically_loaded)
+  if (wincap.has_buggy_thread_startup () || dynamically_loaded)
     sigproc_init ();
   check_sanity_and_sync (user_data);
 
@@ -852,6 +852,8 @@ dll_crt0_1 (void *)
 
       longjmp (fork_info->jmp, true);
     }
+
+  __sinit (_impure_ptr);
 
 #ifdef DEBUGGING
   {
@@ -968,16 +970,9 @@ _dll_crt0 ()
 {
   main_environ = user_data->envptr;
   if (in_forkee)
-    {
-      fork_info->alloc_stack ();
-      _main_tls = &_my_tls;
-    }
-  else
-    {
-      _main_tls = &_my_tls;
-      __sinit (_impure_ptr);
-    }
+    fork_info->alloc_stack ();
 
+  _main_tls = &_my_tls;
   _main_tls->call ((DWORD (*) (void *, void *)) dll_crt0_1, NULL);
 }
 
@@ -1023,12 +1018,16 @@ __main (void)
      queued call to DLL dtors now.  */
   atexit (dll_global_dtors);
   do_global_ctors (user_data->ctors, false);
-  /* Now we have run global ctors, register their dtors.  */
-  atexit (do_global_dtors);
-  /* At exit, global dtors will run first, so the app can still
+  /* Now we have run global ctors, register their dtors.
+
+     At exit, global dtors will run first, so the app can still
      use shared library functions while terminating; then the
      DLLs will be destroyed; finally newlib will shut down stdio
      and terminate itself.  */
+  atexit (do_global_dtors);
+#if 0	/* Don't enable for now.  See if we really need this. */
+  sig_dispatch_pending (true);
+#endif
 }
 
 void __stdcall

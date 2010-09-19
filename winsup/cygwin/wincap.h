@@ -52,6 +52,7 @@ struct wincaps
   unsigned has_always_all_codepages			: 1;
   unsigned has_localenames				: 1;
   unsigned has_mwmo_inputavailable			: 1;
+  unsigned has_buggy_thread_startup			: 1;
 };
 
 class wincapc
@@ -109,6 +110,7 @@ public:
   bool	IMPLEMENT (has_always_all_codepages)
   bool	IMPLEMENT (has_localenames)
   bool	IMPLEMENT (has_mwmo_inputavailable)
+  bool	IMPLEMENT (has_buggy_thread_startup)
 
 #undef IMPLEMENT
 };

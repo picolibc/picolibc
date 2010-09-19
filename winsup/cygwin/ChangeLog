@@ -1,3 +1,19 @@
+2010-09-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* wincap.h (wincaps::has_buggy_thread_startup): Declare.
+	(wincapc::has_buggy_thread_startup): Ditto.
+	* wincap.cc::wincap_*): Accommodate has_buggy_thread_startup. 
+	(wincapc::init): Explicitly turn off has_buggy_thread_startup if not
+	WOW64.
+	* cygthread.h (cygthread::thread_handle): Declare/define new method.
+	* dcrt0.cc (_dll_crt0): Don't call __sinit here.
+	(dll_crt0_0): Don't call sigproc_init during initialization
+	if wincap.has_buggy_thread_startup().
+	(dll_crt0_1): Defer sigproc_init to here when
+	wincap.has_buggy_thread_startup().  Call __sinit after we've determined
+	that we're not forking.
+	(__main): Rework comments.  Add potential future reminder.
+
 2010-09-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Fetch number
