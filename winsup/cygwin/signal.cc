@@ -274,12 +274,6 @@ kill0 (pid_t pid, siginfo_t& si)
       return -1;
     }
 
-  /* Silently ignore stop signals from a member of orphaned process group.
-     FIXME: Why??? */
-  if (ISSTATE (myself, PID_ORPHANED) &&
-      (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU))
-    si.si_signo = 0;
-
   return (pid > 0) ? pinfo (pid)->kill (si) : kill_pgrp (-pid, si);
 }
 

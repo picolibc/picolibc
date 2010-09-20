@@ -711,19 +711,19 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 
   int ret = open (flags);
 
-  /* We should only grab this when the parent process owns the pgid
-  (which could happen when a cygwin process starts a DOS process which
-  starts a cygwin process or when we are being started directly from a
-  windows process, e.g., from the CMD prompt.  */
-  if (ret && !cygwin_finished_initializing && !being_debugged ()
-      && (myself->ppid == 1 || myself->ppid == tc->getpgid ()))
+  if (ret && !cygwin_finished_initializing && !being_debugged ())
     {
       /* This only occurs when called from dtable::init_std_file_from_handle
 	 We have been started from a non-Cygwin process.  So we should become
 	 tty process group leader.
 	 TODO: Investigate how SIGTTIN should be handled with pure-windows
 	 programs. */
-      tc->setpgid (myself->pgid);
+      pinfo p (tc->getpgid ());
+      /* We should only grab this when the process group owner for this
+	 tty is a non-cygwin process or we've been started directly
+	 from a non-Cygwin process with no Cygwin ancestry.  */
+      if (!p || ISSTATE (p, PID_NOTCYGWIN))
+	tc->setpgid (myself->pgid);
     }
 
   if (f != INVALID_HANDLE_VALUE)

@@ -548,8 +548,9 @@ loop:
 
   PWCHAR cwd;
   cwd = NULL;
-  if (!real_path.iscygexec())
+  if (!real_path.iscygexec ())
     {
+      myself->process_state |= PID_NOTCYGWIN;
       cygheap->cwd.cwd_lock.acquire ();
       cwd = cygheap->cwd.win32.Buffer;
     }
@@ -727,7 +728,8 @@ loop:
     {
       myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
-      pinfo child (cygpid, PID_IN_USE);
+      pinfo child (cygpid,
+		   PID_IN_USE | (real_path.iscygexec () ? 0 : PID_NOTCYGWIN));
       if (!child)
 	{
 	  syscall_printf ("pinfo failed");
