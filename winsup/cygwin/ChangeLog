@@ -1,3 +1,10 @@
+2010-09-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_tty_slave::init): Add additional checks to
+	determine when a process should grab control of a tty's pgid.  Use
+	being_debugged() for consistency.
+	* debug.h (being_debugged): Remove vestige of win9x accommodation.
+
 2010-09-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* wincap.h (wincaps::has_buggy_thread_startup): Declare.

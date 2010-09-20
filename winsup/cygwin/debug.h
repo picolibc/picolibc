@@ -20,8 +20,7 @@ details. */
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
 
-#define being_debugged() \
-  (IsDebuggerPresent () /* || GetLastError () == ERROR_PROC_NOT_FOUND*/)
+#define being_debugged() (IsDebuggerPresent ())
 
 #ifndef DEBUGGING
 # define cygbench(s)

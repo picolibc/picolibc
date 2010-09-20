@@ -710,7 +710,13 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
     flags = O_RDWR;
 
   int ret = open (flags);
-  if (ret && !cygwin_finished_initializing && !IsDebuggerPresent ())
+
+  /* We should only grab this when the parent process owns the pgid
+  (which could happen when a cygwin process starts a DOS process which
+  starts a cygwin process or when we are being started directly from a
+  windows process, e.g., from the CMD prompt.  */
+  if (ret && !cygwin_finished_initializing && !being_debugged ()
+      && (myself->ppid == 1 || myself->ppid == tc->getpgid ()))
     {
       /* This only occurs when called from dtable::init_std_file_from_handle
 	 We have been started from a non-Cygwin process.  So we should become
