@@ -1,3 +1,7 @@
+2010-09-21  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin.h: Strip trailing whitespace.
+
 2010-07-29  DJ Delorie  <dj@redhat.com>
 
 	* rx.h (RX_Operand_Type): Add TwoReg.

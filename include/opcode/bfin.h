@@ -39,37 +39,37 @@ typedef struct
   unsigned long opcode;
   int bits_src1;
   int mask_src1;
-  int bits_src0;      
+  int bits_src0;
   int mask_src0;
-  int bits_dst;      
+  int bits_dst;
   int mask_dst;
-  int bits_h10;      
+  int bits_h10;
   int mask_h10;
-  int bits_h00;      
+  int bits_h00;
   int mask_h00;
-  int bits_op0;      
+  int bits_op0;
   int mask_op0;
-  int bits_w0;      
+  int bits_w0;
   int mask_w0;
-  int bits_h11;      
+  int bits_h11;
   int mask_h11;
-  int bits_h01;      
+  int bits_h01;
   int mask_h01;
-  int bits_op1;      
+  int bits_op1;
   int mask_op1;
-  int bits_w1;      
+  int bits_w1;
   int mask_w1;
-  int bits_P;      
+  int bits_P;
   int mask_P;
-  int bits_MM;      
+  int bits_MM;
   int mask_MM;
-  int bits_mmod;      
+  int bits_mmod;
   int mask_mmod;
-  int bits_code2;      
+  int bits_code2;
   int mask_code2;
-  int bits_M;      
+  int bits_M;
   int mask_M;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } DSP32Mac;
 
@@ -98,7 +98,7 @@ typedef struct
 #define DSP32Mac_w1_mask		0x1
 #define DSP32Mac_p_bits			19
 #define DSP32Mac_p_mask			0x1
-#define DSP32Mac_MM_bits		20	
+#define DSP32Mac_MM_bits		20
 #define DSP32Mac_MM_mask		0x1
 #define DSP32Mac_mmod_bits		21
 #define DSP32Mac_mmod_mask		0xf
@@ -204,11 +204,11 @@ typedef struct
 #define DSP32Alu_opcode		0xc4000000
 #define DSP32Alu_src1_bits	0
 #define DSP32Alu_src1_mask	0x7
-#define DSP32Alu_src0_bits	3	
+#define DSP32Alu_src0_bits	3
 #define DSP32Alu_src0_mask	0x7
 #define DSP32Alu_dst1_bits	6
 #define DSP32Alu_dst1_mask	0x7
-#define DSP32Alu_dst0_bits	9	
+#define DSP32Alu_dst0_bits	9
 #define DSP32Alu_dst0_mask	0x7
 #define DSP32Alu_x_bits		12
 #define DSP32Alu_x_mask		0x1
@@ -372,7 +372,7 @@ typedef struct
 #define DSP32ShiftImm_code2_mask	0xf
 #define DSP32ShiftImm_M_bits		27
 #define DSP32ShiftImm_M_mask		0x1
-#define DSP32ShiftImm_code_bits		28	
+#define DSP32ShiftImm_code_bits		28
 #define DSP32ShiftImm_code_mask		0xf
 
 #define init_DSP32ShiftImm					\
@@ -1121,9 +1121,9 @@ typedef struct
 typedef struct
 {
   unsigned long opcode;
-  int bits_framesize;      
+  int bits_framesize;
   int mask_framesize;
-  int bits_R;      
+  int bits_R;
   int mask_R;
   int bits_code;
   int mask_code;
@@ -1156,18 +1156,18 @@ typedef struct
 {
   unsigned long opcode;
   int bits_eoffset;
-  int mask_eoffset; 
-  int bits_dontcare;      
+  int mask_eoffset;
+  int bits_dontcare;
   int mask_dontcare;
-  int bits_reg;      
+  int bits_reg;
   int mask_reg;
-  int bits_soffset;      
+  int bits_soffset;
   int mask_soffset;
-  int bits_c;      
+  int bits_c;
   int mask_c;
-  int bits_rop;      
+  int bits_rop;
   int mask_rop;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } LoopSetup;
 
@@ -1211,17 +1211,17 @@ typedef struct
   unsigned long opcode;
   int bits_hword;
   int mask_hword;
-  int bits_reg;      
+  int bits_reg;
   int mask_reg;
-  int bits_grp;      
+  int bits_grp;
   int mask_grp;
-  int bits_S;      
+  int bits_S;
   int mask_S;
-  int bits_H;      
+  int bits_H;
   int mask_H;
-  int bits_Z;      
+  int bits_Z;
   int mask_Z;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } LDIMMhalf;
 
@@ -1265,9 +1265,9 @@ typedef struct
   unsigned short opcode;
   int bits_reg;
   int mask_reg;
-  int bits_op;      
+  int bits_op;
   int mask_op;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } CC2dreg;
 
@@ -1299,11 +1299,11 @@ typedef struct
   unsigned short opcode;
   int bits_dst;
   int mask_dst;
-  int bits_src;      
+  int bits_src;
   int mask_src;
-  int bits_opc;      
+  int bits_opc;
   int mask_opc;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } PTR2op;
 
@@ -1314,7 +1314,7 @@ typedef struct
 #define PTR2op_src_mask		0x7
 #define PTR2op_opc_bits		6
 #define PTR2op_opc_mask		0x7
-#define PTR2op_code_bits	9	
+#define PTR2op_code_bits	9
 #define PTR2op_code_mask	0x7f
 
 #define init_PTR2op				\
@@ -1338,13 +1338,13 @@ typedef struct
   unsigned short opcode;
   int bits_src0;
   int mask_src0;
-  int bits_src1;      
+  int bits_src1;
   int mask_src1;
-  int bits_dst;      
+  int bits_dst;
   int mask_dst;
-  int bits_opc;      
+  int bits_opc;
   int mask_opc;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } COMP3op;
 
@@ -1381,15 +1381,15 @@ typedef struct
   unsigned short opcode;
   int bits_src;
   int mask_src;
-  int bits_dst;      
+  int bits_dst;
   int mask_dst;
-  int bits_s;      
+  int bits_s;
   int mask_s;
-  int bits_d;      
+  int bits_d;
   int mask_d;
-  int bits_T;      
+  int bits_T;
   int mask_T;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } CCmv;
 
@@ -1400,7 +1400,7 @@ typedef struct
 #define CCmv_dst_mask	0x7
 #define CCmv_s_bits	6
 #define CCmv_s_mask	0x1
-#define CCmv_d_bits	7	
+#define CCmv_d_bits	7
 #define CCmv_d_mask	0x1
 #define CCmv_T_bits	8
 #define CCmv_T_mask	0x1
@@ -1430,15 +1430,15 @@ typedef struct
   unsigned short opcode;
   int bits_x;
   int mask_x;
-  int bits_y;      
+  int bits_y;
   int mask_y;
-  int bits_G;      
+  int bits_G;
   int mask_G;
-  int bits_opc;      
+  int bits_opc;
   int mask_opc;
-  int bits_I;      
+  int bits_I;
   int mask_I;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } CCflag;
 
@@ -1479,11 +1479,11 @@ typedef struct
   unsigned short opcode;
   int bits_cbit;
   int mask_cbit;
-  int bits_op;      
+  int bits_op;
   int mask_op;
-  int bits_D;      
+  int bits_D;
   int mask_D;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } CC2stat;
 
@@ -1518,13 +1518,13 @@ typedef struct
   unsigned short opcode;
   int bits_src;
   int mask_src;
-  int bits_dst;      
+  int bits_dst;
   int mask_dst;
-  int bits_gs;      
+  int bits_gs;
   int mask_gs;
-  int bits_gd;      
+  int bits_gd;
   int mask_gd;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } RegMv;
 
@@ -1562,11 +1562,11 @@ typedef struct
   unsigned short opcode;
   int bits_dst;
   int mask_dst;
-  int bits_src;      
+  int bits_src;
   int mask_src;
-  int bits_op;      
+  int bits_op;
   int mask_op;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } COMPI2opD;
 
@@ -1628,15 +1628,15 @@ typedef struct
   unsigned short opcode;
   int bits_i;
   int mask_i;
-  int bits_m;      
+  int bits_m;
   int mask_m;
-  int bits_op;      
+  int bits_op;
   int mask_op;
-  int bits_code2;      
+  int bits_code2;
   int mask_code2;
-  int bits_br;      
+  int bits_br;
   int mask_br;
-  int bits_code;      
+  int bits_code;
   int mask_code;
 } DagMODim;
 
