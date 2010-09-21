@@ -1,3 +1,15 @@
+2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Always open NFS files with
+	FILE_READ_EA, even when opening with O_WRONLY to allow fstat.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Call
+	FlushFileBuffers if file has been opened for writing.  Explain why.
+	(fhandler_base::fstat_by_handle): Renew content of pc.fnoi if called
+	via fstat.  Explain why.  Fix formatting.
+	* path.cc (symlink_info::check): Try to open file the second time with
+	FILE_READ_EA permissions since it's needed in later calls to
+	fhandler_base::fstat_by_nfs_ea.
+
 2010-09-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/sys/cygwin.h (PID_NOTCYGWIN): New enum.

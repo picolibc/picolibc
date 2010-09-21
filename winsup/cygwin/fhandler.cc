@@ -501,16 +501,19 @@ fhandler_base::open (int flags, mode_t mode)
 	break;
     }
 
-  if (query_open () && pc.fs_is_nfs ())
+  if (pc.fs_is_nfs ())
     {
       /* Make sure we can read EAs of files on an NFS share.  Also make
-	 sure that we're going to act on the file itself, even if it'a
+	 sure that we're going to act on the file itself, even if it's a
 	 a symlink. */
       access |= FILE_READ_EA;
-      if (query_open () >= query_write_control)
-	access |=  FILE_WRITE_EA;
-      plen = sizeof nfs_aol_ffei;
-      p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
+      if (query_open ())
+	{
+	  if (query_open () >= query_write_control)
+	    access |=  FILE_WRITE_EA;
+	  plen = sizeof nfs_aol_ffei;
+	  p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
+	}
     }
 
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))

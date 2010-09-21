@@ -2296,10 +2296,11 @@ restart:
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
-      if (status == STATUS_ACCESS_DENIED)
+      if (status == STATUS_ACCESS_DENIED && eabuf)
 	{
-	  status = NtCreateFile (&h, access = MIN_STAT_ACCESS, &attr, &io,
-				 NULL, 0, FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+	  status = NtCreateFile (&h, access = MIN_STAT_ACCESS | FILE_READ_EA,
+				 &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
+				 FILE_OPEN,
 				 FILE_OPEN_REPARSE_POINT
 				 | FILE_OPEN_FOR_BACKUP_INTENT,
 				 eabuf, easize);

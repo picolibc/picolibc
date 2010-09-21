@@ -305,6 +305,14 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
      char buf[sizeof (NFS_V3_ATTR)];
    } fgei_buf;
 
+  /* NFS stumbles over its own caching.  If you write to the file,
+     a subsequent fstat does not return the actual size of the file,
+     but the size at the time the handle has been opened.  Unless
+     access through another handle invalidates the caching within the
+     NFS client. */
+  if (get_io_handle () && (get_access () & GENERIC_WRITE))
+    FlushFileBuffers (get_io_handle ());
+
   fgei_buf.fgei.NextEntryOffset = 0;
   fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
   stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
@@ -356,6 +364,21 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
   NTSTATUS status = 0;
   IO_STATUS_BLOCK io;
 
+  /* If the file has been opened for other purposes than stat, we can't rely
+     on the information stored in pc.fnoi.  So we overwrite them here. */
+  if (get_io_handle ())
+    {
+      PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
+      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
+                                      FileNetworkOpenInformation);
+      if (!NT_SUCCESS (status))
+       {
+	 debug_printf ("%p = NtQueryInformationFile(%S, "
+		       "FileNetworkOpenInformation)",
+		       status, pc.get_nt_native_path ());
+	 return -1;
+       }
+    }
   if (!pc.hasgood_inode ())
     fsi.NumberOfLinks = 1;
   else
@@ -364,7 +387,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 				       FileStandardInformation);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("%p = NtQueryInformationFile(%S, FileStandardInformation)",
+	  debug_printf ("%p = NtQueryInformationFile(%S, "
+			"FileStandardInformation)",
 			status, pc.get_nt_native_path ());
 	  return -1;
 	}
@@ -374,7 +398,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 					   FileInternalInformation);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("%p = NtQueryInformationFile(%S, FileInternalInformation)",
+	      debug_printf ("%p = NtQueryInformationFile(%S, "
+			    "FileInternalInformation)",
 			    status, pc.get_nt_native_path ());
 	      return -1;
 	    }
