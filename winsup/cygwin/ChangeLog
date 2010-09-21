@@ -1,5 +1,10 @@
 2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (cwdstuff::set): Replace constant 2 with sizeof(WCHAR) where
+	appropriate.
+
+2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.h (class fs_info): Add has_buggy_reopen flag and accessor
 	methods.
 	* mount.cc (fs_info::update): Set has_buggy_reopen flag for NWFS.

@@ -3483,8 +3483,9 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
       PUNICODE_STRING pdir = &get_user_proc_parms ()->CurrentDirectoryName;
       RtlInitEmptyUnicodeString (&win32,
 				 (PWCHAR) crealloc_abort (win32.Buffer,
-							  pdir->Length + 2),
-				 pdir->Length + 2);
+							  pdir->Length
+							  + sizeof (WCHAR)),
+				 pdir->Length + sizeof (WCHAR));
       RtlCopyUnicodeString (&win32, pdir);
 
       PWSTR eoBuffer = win32.Buffer + (win32.Length / sizeof (WCHAR));
@@ -3520,8 +3521,9 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	}
       RtlInitEmptyUnicodeString (&win32,
 				 (PWCHAR) crealloc_abort (win32.Buffer,
-							  upath.Length + 2),
-				 upath.Length + 2);
+							  upath.Length
+							  + sizeof (WCHAR)),
+				 upath.Length + sizeof (WCHAR));
       RtlCopyUnicodeString (&win32, &upath);
       if (unc_path)
 	win32.Buffer[0] = L'\\';
