@@ -1,3 +1,9 @@
+2010-09-21  Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* libc/minires.c (res_nsend): Use the Windows resolver if appropriate.
+	(dn_expand): Only set errno in case of error. Delete old comments.
+	(dn_skipname): Fix typo in comment.
+
 2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cwdstuff::set): Replace constant 2 with sizeof(WCHAR) where

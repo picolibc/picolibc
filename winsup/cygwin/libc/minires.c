@@ -437,6 +437,26 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
   if (((statp->options & RES_INIT) == 0) && (res_ninit(statp) != 0))
     return -1;
 
+  /* If a hook exists to a native implementation, use it */
+  if (statp->os_query) {
+    int len;
+    short int Class, Type;
+    unsigned char DomName[MAXDNAME];
+    unsigned char * ptr = MsgPtr + HFIXEDSZ;
+    len = dn_expand(MsgPtr, MsgPtr + MsgLength, ptr, DomName, sizeof(DomName));
+    if (len > 0) {
+      ptr += len;
+      GETSHORT(Type, ptr);
+      GETSHORT(Class, ptr);
+      return ((os_query_t *) statp->os_query)(statp, DomName, Class, Type, AnsPtr, AnsLength);
+    }
+    else {
+      /* dn_expand sets errno */ 
+      statp->res_h_errno = NETDB_INTERNAL;
+      return -1;
+    }
+  }	  
+
   /* Close the socket if it had been opened before a fork.
      Reuse of pid's cannot hurt */
   if ((statp->sockfd != -1) && (statp->mypid != getpid())) {
@@ -808,9 +828,7 @@ int dn_expand(const unsigned char *msg, const unsigned char *eomorig,
 {
   unsigned int len, complen = 0;
   const unsigned char *comp_dn_orig = comp_dn;
-/*  char * exp_start = exp_dn; */
 
-  errno = EINVAL;
   if (comp_dn >= eomorig)
     goto expand_fail;
   if ((len = *comp_dn++) == 0)       /* Weird case */
@@ -843,7 +861,7 @@ int dn_expand(const unsigned char *msg, const unsigned char *eomorig,
   return complen;
 
 expand_fail:
-/*  fprintf(stderr, "dn_expand fails\n"); */
+  errno = EINVAL;
   return -1;
 }
 
@@ -962,7 +980,7 @@ int dn_skipname(const unsigned char *comp_dn, const unsigned char *eom)
 /*****************************************************************
  * dn_length1    For internal use
 
- Return length of uncompressesed name incl final 0.
+ Return length of uncompressed name incl final 0.
  *****************************************************************/
 
 int dn_length1(const unsigned char *msg, const unsigned char *eomorig,
