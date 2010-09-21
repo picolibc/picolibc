@@ -1,5 +1,22 @@
 2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.h (class fs_info): Add has_buggy_reopen flag and accessor
+	methods.
+	* mount.cc (fs_info::update): Set has_buggy_reopen flag for NWFS.
+	Add comment.
+	* path.h (path_conv::get_object_attr) Make inline method.
+	(path_conv::init_reopen_attr): New inline method.
+	* path.cc (path_conv::get_object_attr): Remove.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Use
+	path_conv::init_reopen_attr method to initialize OBJECT_ATTRIBUTE for
+	reopening file.
+	(fhandler_disk_file::fchmod): Ditto.
+	(fhandler_base::utimens_fs): Ditto.
+	(fhandler_disk_file::rewinddir): Ditto.
+	* syscalls.cc (unlink_nt): Ditto.
+
+2010-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Always open NFS files with
 	FILE_READ_EA, even when opening with O_WRONLY to allow fstat.
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Call

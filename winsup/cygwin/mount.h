@@ -54,6 +54,7 @@ class fs_info
     unsigned hasgood_inode		: 1;
     unsigned caseinsensitive		: 1;
     unsigned has_buggy_open		: 1;
+    unsigned has_buggy_reopen		: 1;
     unsigned has_buggy_fileid_dirinfo	: 1;
     unsigned has_buggy_basic_info	: 1;
     unsigned has_dos_filenames_only	: 1;
@@ -79,6 +80,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, hasgood_inode)
   IMPLEMENT_STATUS_FLAG (bool, caseinsensitive)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_open)
+  IMPLEMENT_STATUS_FLAG (bool, has_buggy_reopen)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)

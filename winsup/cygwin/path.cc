@@ -470,18 +470,6 @@ path_conv::get_nt_native_path ()
   return &uni_path;
 }
 
-POBJECT_ATTRIBUTES
-path_conv::get_object_attr (OBJECT_ATTRIBUTES &attr, SECURITY_ATTRIBUTES &sa)
-{
-  if (!get_nt_native_path ())
-    return NULL;
-  InitializeObjectAttributes (&attr, &uni_path,
-			      objcaseinsensitive ()
-			      | (sa.bInheritHandle ? OBJ_INHERIT : 0),
-			      NULL, sa.lpSecurityDescriptor);
-  return &attr;
-}
-
 PWCHAR
 path_conv::get_wide_win32_path (PWCHAR wc)
 {

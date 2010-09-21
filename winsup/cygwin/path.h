@@ -158,6 +158,7 @@ class path_conv
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
+  int has_buggy_reopen () const {return fs.has_buggy_reopen ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
   int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}
   int binmode () const
@@ -253,8 +254,26 @@ class path_conv
   ~path_conv ();
   inline const char *get_win32 () { return path; }
   PUNICODE_STRING get_nt_native_path ();
-  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
-				      SECURITY_ATTRIBUTES &sa);
+  inline POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
+					     SECURITY_ATTRIBUTES &sa)
+  {
+    if (!get_nt_native_path ())
+      return NULL;
+    InitializeObjectAttributes (&attr, &uni_path,
+				objcaseinsensitive ()
+				| (sa.bInheritHandle ? OBJ_INHERIT : 0),
+				NULL, sa.lpSecurityDescriptor);
+    return &attr;
+  }
+  inline void init_reopen_attr (POBJECT_ATTRIBUTES attr, HANDLE h)
+  {
+    if (has_buggy_reopen ())
+      InitializeObjectAttributes (attr, get_nt_native_path (),
+				  objcaseinsensitive (), NULL, NULL)
+    else
+      InitializeObjectAttributes (attr, &ro_u_empty, objcaseinsensitive (),
+				  h, NULL);
+  }
   inline size_t get_wide_win32_path_len ()
   {
     get_nt_native_path ();

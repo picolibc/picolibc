@@ -389,6 +389,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     clients.  We subsume CIFS into this class of filesystems right
 	     away since at least some of them are not capable either. */
 	  has_dos_filenames_only (is_netapp () || is_nwfs () || is_cifs ());
+	  /* NWFS does not grok re-opening a file by handle.  It only
+	     supports this if the filename is non-null and the handle is
+	     the handle to a directory. */
+	  has_buggy_reopen (is_nwfs ());
 	}
     }
   if (!got_fs ()

@@ -636,13 +636,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		     file.  Either the file is not opened for reading, or the
 		     read will change the file position. */
 		  OBJECT_ATTRIBUTES attr;
-		  if (pc.fs_is_nwfs ())
-		    InitializeObjectAttributes (&attr, pc.get_nt_native_path (),
-						OBJ_CASE_INSENSITIVE,
-						NULL, NULL)
-		  else
-		    InitializeObjectAttributes (&attr, &ro_u_empty, 0,
-						get_handle (), NULL);
+		  pc.init_reopen_attr (&attr, h);
 		  status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
 				       &attr, &io, FILE_SHARE_VALID_FLAGS,
 				       FILE_OPEN_FOR_BACKUP_INTENT
@@ -874,7 +868,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       OBJECT_ATTRIBUTES attr;
       HANDLE fh;
 
-      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (), NULL);
+      pc.init_reopen_attr (&attr, get_handle ());
       if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
 				  FILE_SHARE_VALID_FLAGS,
 				  FILE_OPEN_FOR_BACKUP_INTENT)))
@@ -1353,7 +1347,7 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       OBJECT_ATTRIBUTES attr;
       HANDLE fh;
 
-      InitializeObjectAttributes (&attr, &ro_u_empty, 0, get_handle (), NULL);
+      pc.init_reopen_attr (&attr, get_handle ());
       if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
 				  FILE_SHARE_VALID_FLAGS,
 				  FILE_OPEN_FOR_BACKUP_INTENT)))
@@ -2157,8 +2151,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
       IO_STATUS_BLOCK io;
       HANDLE new_dir;
 
-      InitializeObjectAttributes (&attr, &ro_u_empty, pc.objcaseinsensitive (),
-				  get_handle (), NULL);
+      pc.init_reopen_attr (&attr, get_handle ());
       status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
 			   &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT

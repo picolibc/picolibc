@@ -569,8 +569,7 @@ unlink_nt (path_conv &pc)
 	{
 	  NtSetAttributesFile (fh_ro, pc.file_attributes ()
 				      & ~FILE_ATTRIBUTE_READONLY);
-	  InitializeObjectAttributes (&attr, &ro_u_empty,
-				      pc.objcaseinsensitive (), fh_ro, NULL);
+	  pc.init_reopen_attr (&attr, fh_ro);
       	}
       if (pc.is_lnk_symlink ())
 	{
@@ -688,7 +687,7 @@ unlink_nt (path_conv &pc)
 
 	  /* Re-open from handle so we open the correct file no matter if it
 	     has been moved to the bin or not. */
-	  InitializeObjectAttributes (&attr, &ro_u_empty, 0, fh, NULL);
+	  pc.init_reopen_attr (&attr, fh);
 	  status = NtOpenFile (&fh2, DELETE, &attr, &io,
 			       bin_stat == move_to_bin ? FILE_SHARE_VALID_FLAGS
 						       : FILE_SHARE_DELETE,
