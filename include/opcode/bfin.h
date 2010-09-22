@@ -987,6 +987,34 @@ typedef struct
   PseudoDbg_Assert_code_bits,	 	PseudoDbg_Assert_code_mask	\
 };
 
+/*  pseudoChr
++---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
+| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
++---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
+*/
+
+typedef struct
+{
+  unsigned short opcode;
+  int bits_ch;
+  int mask_ch;
+  int bits_code;
+  int mask_code;
+} PseudoChr;
+
+#define PseudoChr_opcode	0xf900
+#define PseudoChr_ch_bits	0
+#define PseudoChr_ch_mask	0xff
+#define PseudoChr_code_bits	8
+#define PseudoChr_code_mask	0xff
+
+#define init_PseudoChr				\
+{						\
+  PseudoChr_opcode,				\
+  PseudoChr_ch_bits,	PseudoChr_ch_mask,	\
+  PseudoChr_code_bits,	PseudoChr_code_mask	\
+};
+
 /*  CaCTRL
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|

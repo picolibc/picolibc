@@ -1,3 +1,7 @@
+2010-09-22  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin.h: Declare pseudoChr structs/defines.
+
 2010-09-21  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin.h: Strip trailing whitespace.
