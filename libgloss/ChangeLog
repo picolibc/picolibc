@@ -1,3 +1,7 @@
+2010-09-22  Mike Frysinger  <vapier@gentoo.org>
+
+	* README: Add bfin to the list.
+
 2010-08-27  Christophe Lyon  <christophe.lyon@st.com>
 
 	* syscalls.c (_isatty): Fix return value.

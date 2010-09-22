@@ -1,3 +1,4 @@
+bfin	- Analog Devices Blackfin processor.
 sparc	- Fujitsu Sparclite board. Works on the ex930, ex931, ex933
 hp74x	- Hewlett Packard HP742 board. Also some support for the hp743.
 m68hc11 - Motorola 68HC11 or 68HC12 support.
