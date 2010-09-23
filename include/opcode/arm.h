@@ -49,6 +49,7 @@
 #define ARM_EXT_THUMB_MSR 0x02000000	/* Thumb MSR/MRS.	    */
 #define ARM_EXT_V6_DSP 0x04000000	/* ARM v6 (DSP-related),
 					   not in v7-M.  */
+#define ARM_EXT_MP       0x08000000     /* Multiprocessing Extensions.  */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00000001	/* Allow MIA etc.          */
@@ -209,6 +210,7 @@
 #define ARM_ANY		ARM_FEATURE (-1, 0)	/* Any basic core.  */
 #define FPU_ANY_HARD	ARM_FEATURE (0, FPU_FPA | FPU_VFP_HARD | FPU_MAVERICK)
 #define ARM_ARCH_THUMB2 ARM_FEATURE (ARM_EXT_V6T2 | ARM_EXT_V7 | ARM_EXT_V7A | ARM_EXT_V7R | ARM_EXT_V7M | ARM_EXT_DIV, 0)
+#define ARM_ARCH_V7A_MP ARM_FEATURE (ARM_AEXT_V7A | ARM_EXT_MP, 0)
 
 /* There are too many feature bits to fit in a single word, so use a
    structure.  For simplicity we put all core features in one word and
