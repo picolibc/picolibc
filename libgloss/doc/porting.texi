@@ -104,18 +104,18 @@ the final executable image.
 Most of the time a tool chain does only have to support one target
 execution environment. An example of this would be a tool chain for the
 AMD 29k processor family. All of the execution environments for this
-processor are have the same interface, the same memory map, and the same
-I/O code. In this case all of the support code is in newlib/sys/FIXME.
-Libgloss's creation was forced initially be the @code{cpu32} processor
-family. There are many different execution environments for this line,
-and they vary wildly. newlib itself has only has a few dependencies that
-it needs for each target. These are explained later in this doc. The
-hardware dependent part of newlib was reorganized into a separate
-directory structure within newlib called the stub dirs. It was initially
-called this because most of the routines newlib needs for a target were
-simple stubs that do nothing, but return a value to the application. They
-only exist so the linker can produce a final executable image. This work
-was done during the early part of 1993.
+processor have the same interface, the same memory map, and the same
+I/O code. In this case all of the support code is under newlib/libc/sys.
+Libgloss's creation was forced initially because of the @code{cpu32}
+processor family. There are many different execution environments for
+this line, and they vary wildly. newlib itself has only a few
+dependencies that it needs for each target. These are explained later in
+this doc. The hardware dependent part of newlib was reorganized into a
+separate directory structure within newlib called the stub dirs. It was
+initially called this because most of the routines newlib needs for a
+target were simple stubs that do nothing, but return a value to the
+application. They only exist so the linker can produce a final
+executable image. This work was done during the early part of 1993.
 
 After a while it became apparent that this approach of isolating the
 hardware and systems files together made sense. Around this same time

@@ -1,3 +1,8 @@
+2010-09-23  Mike Frysinger  <vapier@gentoo.org>
+	    Corinna Vinschen  <vinschen@redhat.com>
+
+	* doc/porting.texi: Fix typos.
+
 2010-09-22  Mike Frysinger  <vapier@gentoo.org>
 
 	* README: Add bfin to the list.
