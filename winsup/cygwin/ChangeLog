@@ -1,3 +1,8 @@
+2010-09-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (std_dll_init): Use correct format type when displaying
+	dll name in error output.
+
 2010-09-21  Pierre Humblet <Pierre.Humblet@ieee.org>
 
 	* libc/minires.c (res_nsend): Use the Windows resolver if appropriate.

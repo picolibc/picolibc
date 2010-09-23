@@ -233,7 +233,7 @@ std_dll_init ()
 	  dll->handle = h;
 	}
       else if (!(func->decoration & 1))
-	api_fatal ("could not load %s, %E", dll->name);
+	api_fatal ("could not load %W, %E", dll->name);
       else
 	dll->handle = INVALID_HANDLE_VALUE;
     }
