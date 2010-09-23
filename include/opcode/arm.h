@@ -54,6 +54,7 @@
 #define ARM_EXT_OS	 0x20000000	/* OS Extensions.  */
 #define ARM_EXT_ADIV	 0x40000000	/* Integer divide extensions in ARM 
 					   state.  */
+#define ARM_EXT_VIRT	 0x80000000	/* Virtualization extensions.  */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00000001	/* Allow MIA etc.          */
@@ -222,10 +223,11 @@
 #define ARM_ARCH_V7A_MP_SEC \
 			ARM_FEATURE (ARM_AEXT_V7A | ARM_EXT_MP | ARM_EXT_SEC, \
 				     0)
-/* v7-a+idiv+mp+sec.  */
-#define ARM_ARCH_V7A_IDIV_MP_SEC \
+/* v7-a+idiv+mp+sec+virt.  */
+#define ARM_ARCH_V7A_IDIV_MP_SEC_VIRT \
 			ARM_FEATURE (ARM_AEXT_V7A | ARM_EXT_MP | ARM_EXT_SEC \
-				     | ARM_EXT_DIV | ARM_EXT_ADIV, 0)
+				     | ARM_EXT_DIV | ARM_EXT_ADIV \
+				     | ARM_EXT_VIRT, 0)
 
 /* There are too many feature bits to fit in a single word, so use a
    structure.  For simplicity we put all core features in one word and
