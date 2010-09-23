@@ -51,6 +51,7 @@
 					   not in v7-M.  */
 #define ARM_EXT_MP       0x08000000     /* Multiprocessing Extensions.  */
 #define ARM_EXT_SEC	 0x10000000	/* Security extensions.  */
+#define ARM_EXT_OS	 0x20000000	/* OS Extensions.  */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00000001	/* Allow MIA etc.          */
@@ -114,6 +115,7 @@
 #define ARM_AEXT_V6M \
   ((ARM_AEXT_V6K | ARM_EXT_BARRIER | ARM_EXT_V6M | ARM_EXT_THUMB_MSR) \
    & ~(ARM_AEXT_NOTM))
+#define ARM_AEXT_V6SM (ARM_AEXT_V6M | ARM_EXT_OS)
 #define ARM_AEXT_V7M \
   ((ARM_AEXT_V7_ARM | ARM_EXT_V6M | ARM_EXT_V7M | ARM_EXT_DIV) \
    & ~(ARM_AEXT_NOTM))
@@ -199,6 +201,7 @@
 #define ARM_ARCH_V6ZT2	ARM_FEATURE (ARM_AEXT_V6ZT2, 0)
 #define ARM_ARCH_V6ZKT2	ARM_FEATURE (ARM_AEXT_V6ZKT2, 0)
 #define ARM_ARCH_V6M	ARM_FEATURE (ARM_AEXT_V6M, 0)
+#define ARM_ARCH_V6SM	ARM_FEATURE (ARM_AEXT_V6SM, 0)
 #define ARM_ARCH_V7	ARM_FEATURE (ARM_AEXT_V7, 0)
 #define ARM_ARCH_V7A	ARM_FEATURE (ARM_AEXT_V7A, 0)
 #define ARM_ARCH_V7R	ARM_FEATURE (ARM_AEXT_V7R, 0)
