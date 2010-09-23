@@ -1,3 +1,16 @@
+2010-09-23  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* arm.h (ARM_EXT_V6Z): Remove.
+	(ARM_EXT_SEC): New define.
+	(ARM_AEXT_V6Z): Use Security Extensions.
+	(ARM_AEXT_V6ZK): Likeiwse.
+	(ARM_AEXT_V6ZT2): Likewise.
+	(ARM_AEXT_V6ZKT2): Likewise.
+	(ARM_AEXT_V7_ARM): Base v7 does not have Security Extensions.
+	(ARM_ARCH_V7A_SEC): New define.
+	(ARM_ARCH_V7A_MP): Rename...
+	(ARM_ARCH_V7A_MP_SEC): ...to this and add Security Extensions.
+
 2010-09-09  Jakub Jelinek  <jakub@redhat.com>
 
 	* dwarf2.h (DW_OP_GNU_implicit_pointer): New.
