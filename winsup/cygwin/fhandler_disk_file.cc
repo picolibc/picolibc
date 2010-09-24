@@ -799,7 +799,7 @@ fhandler_disk_file::fchmod (mode_t mode)
 
   if (!get_handle ())
     {
-      query_open (query_write_control);
+      query_open (query_write_dac);
       if (!(oret = open (O_BINARY, 0)))
 	{
 	  /* Need WRITE_DAC|WRITE_OWNER to write ACLs. */

@@ -1,5 +1,12 @@
 2010-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Handle query_write_dac flag.
+	* fhandler.h (enum query_state): Add query_write_dac flag.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Open file
+	with query_write_dac instead of query_write_control.
+
+2010-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* errno.cc (errmap): Map ERROR_BAD_NET_RESP to ENOSYS.
 	* fhandler_disk_file.cc (fhandler_disk_file::facl): Handle ENOSYS and
 	point to  the explanation.

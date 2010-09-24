@@ -92,7 +92,8 @@ enum query_state {
   query_read_control = 1,
   query_read_attributes = 2,
   query_write_control = 3,
-  query_write_attributes = 4
+  query_write_dac = 4,
+  query_write_attributes = 5
 };
 
 enum del_lock_called_from {
