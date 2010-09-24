@@ -1,3 +1,10 @@
+2010-09-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (std_dll_init): Move dll_path closer to its use.  Use
+	dll_path in fatal error.  Set ret values under lock control.
+	* lib/minires.c (res_nsend): Fix compilation errors owing to pointer
+	signedness.
+
 2010-09-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Handle query_write_dac flag.

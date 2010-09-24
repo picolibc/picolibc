@@ -441,8 +441,8 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
   if (statp->os_query) {
     int len;
     short int Class, Type;
-    unsigned char DomName[MAXDNAME];
-    unsigned char * ptr = MsgPtr + HFIXEDSZ;
+    char DomName[MAXDNAME];
+    unsigned char * ptr = (unsigned char *) MsgPtr + HFIXEDSZ;
     len = dn_expand(MsgPtr, MsgPtr + MsgLength, ptr, DomName, sizeof(DomName));
     if (len > 0) {
       ptr += len;
