@@ -1,3 +1,15 @@
+2010-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_BAD_NET_RESP to ENOSYS.
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Handle ENOSYS and
+	point to  the explanation.
+	* ntdll.h (STATUS_NOT_IMPLEMENTED): Define.
+	* path.cc (symlink_info::check): Handle the inability of NT4 to use
+	FileNetworkOpenInformation on share root dirs in either direction.
+	* path.h (slash_unc_prefix_p): Remove unused declaration.
+	* security.cc (get_info_from_sd): Handle ENOSYS from get_file_sd.
+	Explain when this happens.
+
 2010-09-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (std_dll_init): Use correct format type when displaying

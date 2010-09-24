@@ -358,7 +358,12 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 	  get_info_from_sd (sd, attribute, uidret, gidret);
 	  return 0;
 	}
-      else
+      /* ENOSYS is returned by get_file_sd if fetching the DACL from a remote
+	 share returns STATUS_INVALID_NETWORK_RESPONSE, which in turn is
+	 converted to ERROR_BAD_NET_RESP.  This potentially occurs when trying
+	 to fetch DACLs from a NT4 machine which is not part of the domain of
+	 the requesting machine. */
+      else if (get_errno () != ENOSYS)
 	{
 	  if (uidret)
 	    *uidret = ILLEGAL_UID;

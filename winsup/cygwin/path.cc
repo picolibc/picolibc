@@ -2421,6 +2421,23 @@ restart:
 	    {
 	      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
 					       FileNetworkOpenInformation);
+	      if ((status == STATUS_INVALID_PARAMETER
+		   || status == STATUS_NOT_IMPLEMENTED)
+		  && RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, FALSE))
+	      	{
+		  /* This occurs when accessing SMB share root dirs hosted on
+		     NT4 (STATUS_INVALID_PARAMETER), or when trying to access
+		     SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
+		  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+						   FileBasicInformation);
+		  if (NT_SUCCESS (status))
+		    {
+		      memcpy (pfnoi, &fbi, 4 * sizeof (LARGE_INTEGER));
+		      pfnoi->EndOfFile.QuadPart
+			= pfnoi->AllocationSize.QuadPart = 0;
+		      pfnoi->FileAttributes = fbi.FileAttributes;
+		    }
+		}
 	      if (NT_SUCCESS (status))
 		fileattr = pfnoi->FileAttributes;
 	    }

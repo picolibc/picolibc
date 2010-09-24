@@ -1054,9 +1054,15 @@ cant_access_acl:
 	      set_errno(EFAULT);
 	    else
 	      res = getacl (get_stat_handle (), pc, nentries, aclbufp);
+	      /* For this ENOSYS case, see security.cc:get_file_attribute(). */
+	      if (res == -1 && get_errno () == ENOSYS)
+	      	goto cant_access_acl;
 	    break;
 	  case GETACLCNT:
 	    res = getacl (get_stat_handle (), pc, 0, NULL);
+	    /* Ditto. */
+	    if (res == -1 && get_errno () == ENOSYS)
+	      goto cant_access_acl;
 	    break;
 	  default:
 	    set_errno (EINVAL);
