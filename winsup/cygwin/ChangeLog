@@ -1,3 +1,11 @@
+2010-09-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Throughout. order entry points alphabetically by DLL
+	and function name.  Make functions which are available on all supported
+	systems non-optional.  Fix return value on entry points imported from
+	secur32.dll.  Add comment.
+	(std_dll_init): Call fesetenv unconditionally.
+
 2010-09-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (std_dll_init): Move dll_path closer to its use.  Use

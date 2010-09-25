@@ -228,14 +228,12 @@ std_dll_init ()
       /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
       wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
       if ((h = LoadLibraryW (dll_path)) != NULL)
-	{
-	  fesetenv (&fpuenv);
-	  dll->handle = h;
-	}
+	dll->handle = h;
       else if (!(func->decoration & 1))
 	api_fatal ("could not load %W, %E", dll_path);
       else
 	dll->handle = INVALID_HANDLE_VALUE;
+      fesetenv (&fpuenv);
     }
 
   /* Set "arguments for dll_chain. */
@@ -307,14 +305,43 @@ wsock_init ()
 
 LoadDLLprime (ws2_32, _wsock_init)
 
+LoadDLLfuncEx2 (DnsQuery_A, 24, dnsapi, 1, 127) // ERROR_PROC_NOT_FOUND
+LoadDLLfuncEx (DnsRecordListFree, 8, dnsapi, 1)
+
+// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
+LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
+LoadDLLfuncEx2 (GetExtendedTcpTable, 24, iphlpapi, 1, 50)
+LoadDLLfunc (GetIfEntry, 4, iphlpapi)
+LoadDLLfunc (GetIpAddrTable, 12, iphlpapi)
+LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
+LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
+LoadDLLfunc (GetTcpTable, 12, iphlpapi)
+LoadDLLfunc (SendARP, 16, iphlpapi)
+
+LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
+LoadDLLfunc (FindFirstVolumeA, 8, kernel32)
+LoadDLLfunc (FindNextVolumeA, 12, kernel32)
+LoadDLLfunc (FindVolumeClose, 4, kernel32)
+LoadDLLfunc (GetConsoleWindow, 0, kernel32)
+LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
+LoadDLLfuncEx (GetSystemWindowsDirectoryW, 8, kernel32, 1)
+LoadDLLfunc (GetVolumeNameForVolumeMountPointA, 12, kernel32)
+LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
+
+LoadDLLfunc (WNetCloseEnum, 4, mpr)
+LoadDLLfunc (WNetEnumResourceA, 16, mpr)
+LoadDLLfunc (WNetGetProviderNameA, 12, mpr)
+LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
+LoadDLLfunc (WNetOpenEnumA, 20, mpr)
+
 /* 127 == ERROR_PROC_NOT_FOUND */
 LoadDLLfuncEx2 (DsGetDcNameW, 24, netapi32, 1, 127)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
-LoadDLLfuncEx (NetGetAnyDCName, 12, netapi32, 1)
-LoadDLLfuncEx (NetGetDCName, 12, netapi32, 1)
-LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
+LoadDLLfunc (NetGetAnyDCName, 12, netapi32)
+LoadDLLfunc (NetGetDCName, 12, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
+LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
 
 /* 0xc000007a == STATUS_PROCEDURE_NOT_FOUND */
 #define LoadDLLfuncNt(name, n, dllname) \
@@ -325,17 +352,25 @@ LoadDLLfuncNt (NtRollbackTransaction, 8, ntdll)
 LoadDLLfuncNt (RtlGetCurrentTransaction, 0, ntdll)
 LoadDLLfuncNt (RtlSetCurrentTransaction, 4, ntdll)
 
+LoadDLLfunc (CoTaskMemFree, 4, ole32)
+
 LoadDLLfuncEx (EnumProcessModules, 16, psapi, 1)
 LoadDLLfuncEx (GetModuleFileNameExW, 16, psapi, 1)
 LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)
 LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)
 
-LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
-LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)
-LoadDLLfuncEx (LsaLogonUser, 56, secur32, 1)
-LoadDLLfuncEx (LsaLookupAuthenticationPackage, 12, secur32, 1)
-LoadDLLfuncEx (LsaRegisterLogonProcess, 12, secur32, 1)
+LoadDLLfunc (UuidCreate, 4, rpcrt4)
+LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
+
+/* secur32 functions return NTSTATUS values. */
+LoadDLLfuncNt (LsaDeregisterLogonProcess, 4, secur32)
+LoadDLLfuncNt (LsaFreeReturnBuffer, 4, secur32)
+LoadDLLfuncNt (LsaLogonUser, 56, secur32)
+LoadDLLfuncNt (LsaLookupAuthenticationPackage, 12, secur32)
+LoadDLLfuncNt (LsaRegisterLogonProcess, 12, secur32)
+
+LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 
 LoadDLLfunc (CharNextExA, 12, user32)
 LoadDLLfunc (CloseClipboard, 0, user32)
@@ -355,8 +390,8 @@ LoadDLLfunc (GetMessageA, 16, user32)
 LoadDLLfunc (GetPriorityClipboardFormat, 8, user32)
 LoadDLLfunc (GetProcessWindowStation, 0, user32)
 LoadDLLfunc (GetThreadDesktop, 4, user32)
-LoadDLLfunc (GetWindowThreadProcessId, 8, user32)
 LoadDLLfunc (GetUserObjectInformationW, 20, user32)
+LoadDLLfunc (GetWindowThreadProcessId, 8, user32)
 LoadDLLfunc (MessageBeep, 4, user32)
 LoadDLLfunc (MessageBoxA, 16, user32)
 LoadDLLfunc (MsgWaitForMultipleObjectsEx, 20, user32)
@@ -369,9 +404,31 @@ LoadDLLfunc (RegisterClipboardFormatA, 4, user32)
 LoadDLLfunc (SendMessageA, 16, user32)
 LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetParent, 8, user32)
-LoadDLLfunc (SetThreadDesktop, 4, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
-LoadDLLfuncEx (ShowWindowAsync, 8, user32, 1)
+LoadDLLfunc (SetThreadDesktop, 4, user32)
+LoadDLLfunc (ShowWindowAsync, 8, user32)
+
+LoadDLLfunc (timeBeginPeriod, 4, winmm)
+LoadDLLfunc (timeEndPeriod, 4, winmm)
+LoadDLLfunc (timeGetDevCaps, 8, winmm)
+LoadDLLfunc (timeGetTime, 0, winmm)
+LoadDLLfunc (waveInAddBuffer, 12, winmm)
+LoadDLLfunc (waveInClose, 4, winmm)
+LoadDLLfunc (waveInGetNumDevs, 0, winmm)
+LoadDLLfunc (waveInOpen, 24, winmm)
+LoadDLLfunc (waveInPrepareHeader, 12, winmm)
+LoadDLLfunc (waveInReset, 4, winmm)
+LoadDLLfunc (waveInStart, 4, winmm)
+LoadDLLfunc (waveInUnprepareHeader, 12, winmm)
+LoadDLLfunc (waveOutClose, 4, winmm)
+LoadDLLfunc (waveOutGetNumDevs, 0, winmm)
+LoadDLLfunc (waveOutGetVolume, 8, winmm)
+LoadDLLfunc (waveOutOpen, 24, winmm)
+LoadDLLfunc (waveOutPrepareHeader, 12, winmm)
+LoadDLLfunc (waveOutReset, 4, winmm)
+LoadDLLfunc (waveOutSetVolume, 8, winmm)
+LoadDLLfunc (waveOutUnprepareHeader, 12, winmm)
+LoadDLLfunc (waveOutWrite, 12, winmm)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)
@@ -379,7 +436,7 @@ LoadDLLfunc (closesocket, 4, ws2_32)
 LoadDLLfunc (connect, 12, ws2_32)
 LoadDLLfunc (gethostbyaddr, 12, ws2_32)
 LoadDLLfunc (gethostbyname, 4, ws2_32)
-LoadDLLfuncEx2 (gethostname, 8, ws2_32, 1, 1)
+LoadDLLfunc (gethostname, 8, ws2_32)
 LoadDLLfunc (getpeername, 12, ws2_32)
 LoadDLLfunc (getprotobyname, 4, ws2_32)
 LoadDLLfunc (getprotobynumber, 4, ws2_32)
@@ -406,66 +463,4 @@ LoadDLLfunc (WSASetLastError, 4, ws2_32)
 LoadDLLfunc (WSASocketW, 24, ws2_32)
 // LoadDLLfunc (WSAStartup, 8, ws2_32)
 LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
-
-// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
-LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetExtendedTcpTable, 24, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetIfEntry, 4, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetIpAddrTable, 12, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetIpForwardTable, 12, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetNetworkParams, 8, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (GetTcpTable, 12, iphlpapi, 1, 50)
-LoadDLLfuncEx2 (SendARP, 16, iphlpapi, 1, 50)
-
-LoadDLLfunc (CoTaskMemFree, 4, ole32)
-
-LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
-LoadDLLfuncEx (FindFirstVolumeA, 8, kernel32, 1)
-LoadDLLfuncEx (FindNextVolumeA, 12, kernel32, 1)
-LoadDLLfuncEx (FindVolumeClose, 4, kernel32, 1)
-LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
-LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
-LoadDLLfuncEx (GetSystemWindowsDirectoryW, 8, kernel32, 1)
-LoadDLLfuncEx (GetVolumeNameForVolumeMountPointA, 12, kernel32, 1)
-LoadDLLfuncEx (GetSystemDEPPolicy, 0, kernel32, 1)
-LoadDLLfuncEx (GetProcessDEPPolicy, 12, kernel32, 1)
-LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
-LoadDLLfuncEx (SetProcessDEPPolicy, 4, kernel32, 1)
-
-LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
-
-LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
-LoadDLLfuncEx (waveOutOpen, 24, winmm, 1)
-LoadDLLfuncEx (waveOutReset, 4, winmm, 1)
-LoadDLLfuncEx (waveOutClose, 4, winmm, 1)
-LoadDLLfuncEx (waveOutGetVolume, 8, winmm, 1)
-LoadDLLfuncEx (waveOutSetVolume, 8, winmm, 1)
-LoadDLLfuncEx (waveOutUnprepareHeader, 12, winmm, 1)
-LoadDLLfuncEx (waveOutPrepareHeader, 12, winmm, 1)
-LoadDLLfuncEx (waveOutWrite, 12, winmm, 1)
-LoadDLLfuncEx (timeGetDevCaps, 8, winmm, 1)
-LoadDLLfuncEx (timeGetTime, 0, winmm, 1)
-LoadDLLfuncEx (timeBeginPeriod, 4, winmm, 1)
-LoadDLLfuncEx (timeEndPeriod, 4, winmm, 1)
-
-LoadDLLfuncEx (waveInGetNumDevs, 0, winmm, 1)
-LoadDLLfuncEx (waveInOpen, 24, winmm, 1)
-LoadDLLfuncEx (waveInUnprepareHeader, 12, winmm, 1)
-LoadDLLfuncEx (waveInPrepareHeader, 12, winmm, 1)
-LoadDLLfuncEx (waveInAddBuffer, 12, winmm, 1)
-LoadDLLfuncEx (waveInStart, 4, winmm, 1)
-LoadDLLfuncEx (waveInReset, 4, winmm, 1)
-LoadDLLfuncEx (waveInClose, 4, winmm, 1)
-
-LoadDLLfunc (WNetGetProviderNameA, 12, mpr)
-LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
-LoadDLLfunc (WNetOpenEnumA, 20, mpr)
-LoadDLLfunc (WNetEnumResourceA, 16, mpr)
-LoadDLLfunc (WNetCloseEnum, 4, mpr)
-
-LoadDLLfuncEx (UuidCreate, 4, rpcrt4, 1)
-LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
-
-LoadDLLfuncEx2 (DnsQuery_A, 24, dnsapi, 1, 127) // ERROR_PROC_NOT_FOUND
-LoadDLLfuncEx (DnsRecordListFree, 8, dnsapi, 1)
 }
