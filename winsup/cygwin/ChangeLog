@@ -1,6 +1,29 @@
 2010-09-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* autoload.cc: Throughout. order entry points alphabetically by DLL
+	* fhandler_socket.cc (fhandler_socket::bind): Drop has_exclusiveaddruse
+	condition.  Fix comment about availability.  Move remaining comment to
+	the right spot.  Drop has_ip_helper_lib condition.
+	* net.cc (cygwin_setsockopt): Drop has_disabled_user_tos_setting
+	condition.  Fix comment.
+	(get_2k_ifs): Fix comment.
+	(get_nt_ifs): Remove.
+	(getifaddrs): Drop call to get_nt_ifs.
+	(get_ifconf): Ditto.
+	* wincap.cc: Throughout, drop has_ip_helper_lib,
+	has_disabled_user_tos_setting, and has_exclusiveaddruse settings from
+	wincaps.
+	(wincap_unknown): Remove.
+	(wincap_nt4): Remove.
+	(wincap_minimal): New macro, set to wincap_nt4sp4 for now.
+	(wincapc::init): Drop test for pre-SP4 NT4.  Just imply at least NT SP4.
+	Replace references to wincap_unknown with references to wincap_minimal.
+	* wincap.h (struct wincaps): Drop has_ip_helper_lib,
+	has_disabled_user_tos_setting, and has_exclusiveaddruse flags and
+	methods.
+
+2010-09-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Throughout, order entry points alphabetically by DLL
 	and function name.  Make functions which are available on all supported
 	systems non-optional.  Fix return value on entry points imported from
 	secur32.dll.  Add comment.

@@ -20,90 +20,8 @@ details. */
    in the same session.  I'm only writing this longish comment because I'm
    puzzled that this has never been noticed before... */
 
-/* Minimal set of capabilities which is equivalent to NT4. */
-wincaps wincap_unknown __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
-  heapslop:0x0,
-  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
-  is_server:false,
-  has_dacl_protect:false,
-  has_ip_helper_lib:false,
-  has_broken_if_oper_status:false,
-  has_physical_mem_access:true,
-  has_process_io_counters:false,
-  has_terminal_services:false,
-  has_create_global_privilege:false,
-  has_ioctl_storage_get_media_types_ex:false,
-  has_extended_priority_class:false,
-  has_guid_volumes:false,
-  has_disk_ex_ioctls:false,
-  has_disabled_user_tos_setting:false,
-  has_fileid_dirinfo:false,
-  has_exclusiveaddruse:false,
-  has_enhanced_socket_security:false,
-  has_buggy_restart_scan:false,
-  has_mandatory_integrity_control:false,
-  needs_logon_sid_in_sid_list:true,
-  needs_count_in_si_lpres2:false,
-  has_recycle_dot_bin:false,
-  has_gaa_prefixes:false,
-  has_gaa_on_link_prefix:false,
-  supports_all_posix_ai_flags:false,
-  has_restricted_stack_args:false,
-  has_transactions:false,
-  ts_has_dep_problem:false,
-  has_recvmsg:false,
-  has_sendmsg:false,
-  has_broken_udf:false,
-  has_console_handle_problem:false,
-  has_broken_alloc_console:false,
-  has_always_all_codepages:false,
-  has_localenames:false,
-  has_mwmo_inputavailable:false,
-  has_buggy_thread_startup:false,
-};
-
-wincaps wincap_nt4 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
-  heapslop:0x0,
-  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
-  is_server:false,
-  has_dacl_protect:false,
-  has_ip_helper_lib:false,
-  has_broken_if_oper_status:false,
-  has_physical_mem_access:true,
-  has_process_io_counters:false,
-  has_terminal_services:false,
-  has_create_global_privilege:false,
-  has_ioctl_storage_get_media_types_ex:false,
-  has_extended_priority_class:false,
-  has_guid_volumes:false,
-  has_disk_ex_ioctls:false,
-  has_disabled_user_tos_setting:false,
-  has_fileid_dirinfo:false,
-  has_exclusiveaddruse:false,
-  has_enhanced_socket_security:false,
-  has_buggy_restart_scan:false,
-  has_mandatory_integrity_control:false,
-  needs_logon_sid_in_sid_list:true,
-  needs_count_in_si_lpres2:false,
-  has_recycle_dot_bin:false,
-  has_gaa_prefixes:false,
-  has_gaa_on_link_prefix:false,
-  supports_all_posix_ai_flags:false,
-  has_restricted_stack_args:false,
-  has_transactions:false,
-  ts_has_dep_problem:false,
-  has_recvmsg:false,
-  has_sendmsg:false,
-  has_broken_udf:false,
-  has_console_handle_problem:false,
-  has_broken_alloc_console:false,
-  has_always_all_codepages:false,
-  has_localenames:false,
-  has_mwmo_inputavailable:false,
-  has_buggy_thread_startup:false,
-};
+/* Minimal set of capabilities required to run Cygwin. */
+#define wincap_minimal wincap_nt4sp4
 
 wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
@@ -111,7 +29,6 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
   is_server:false,
   has_dacl_protect:false,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:true,
   has_physical_mem_access:true,
   has_process_io_counters:false,
@@ -121,9 +38,7 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_extended_priority_class:false,
   has_guid_volumes:false,
   has_disk_ex_ioctls:false,
-  has_disabled_user_tos_setting:false,
   has_fileid_dirinfo:false,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
@@ -153,7 +68,6 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:true,
   has_process_io_counters:true,
@@ -163,9 +77,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:false,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:true,
   has_mandatory_integrity_control:false,
@@ -195,7 +107,6 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:true,
   has_process_io_counters:true,
@@ -205,9 +116,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:false,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:true,
   has_mandatory_integrity_control:false,
@@ -237,7 +146,6 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:true,
   has_process_io_counters:true,
@@ -247,9 +155,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
@@ -279,7 +185,6 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:true,
   has_process_io_counters:true,
@@ -289,9 +194,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
@@ -321,7 +224,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:true,
   has_process_io_counters:true,
@@ -331,9 +233,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:false,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
@@ -363,7 +263,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:true,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:false,
   has_process_io_counters:true,
@@ -373,9 +272,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
@@ -405,7 +302,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:false,
   has_process_io_counters:true,
@@ -415,9 +311,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
@@ -447,7 +341,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_dacl_protect:true,
-  has_ip_helper_lib:true,
   has_broken_if_oper_status:false,
   has_physical_mem_access:false,
   has_process_io_counters:true,
@@ -457,9 +350,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_extended_priority_class:true,
   has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_disabled_user_tos_setting:true,
   has_fileid_dirinfo:true,
-  has_exclusiveaddruse:true,
   has_enhanced_socket_security:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
@@ -510,11 +401,8 @@ wincapc::init ()
 	switch (version.dwMajorVersion)
 	  {
 	    case 4:
-	      if (!has_osversioninfoex
-		  && strcmp (version.szCSDVersion, "Service Pack 4") < 0)
-		caps = &wincap_nt4;
-	      else
-		caps = &wincap_nt4sp4;
+	      /* No mercy.  We require at least NT4 SP4. */
+	      caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
 	      switch (version.dwMinorVersion)
@@ -555,7 +443,7 @@ wincapc::init ()
 		}
 	      break;
 	    default:
-	      caps = &wincap_unknown;
+	      caps = &wincap_minimal;
 	      break;
 	  }
 	break;
@@ -565,7 +453,7 @@ wincapc::init ()
 	api_fatal ("Windows 95/98/Me are not supported.");
 	break;
       default:
-	caps = &wincap_unknown;
+	caps = &wincap_minimal;
 	break;
     }
 

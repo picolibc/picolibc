@@ -19,7 +19,6 @@ struct wincaps
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
   unsigned has_dacl_protect                             : 1;
-  unsigned has_ip_helper_lib                            : 1;
   unsigned has_broken_if_oper_status                    : 1;
   unsigned has_physical_mem_access                      : 1;
   unsigned has_process_io_counters                      : 1;
@@ -29,9 +28,7 @@ struct wincaps
   unsigned has_extended_priority_class			: 1;
   unsigned has_guid_volumes				: 1;
   unsigned has_disk_ex_ioctls				: 1;
-  unsigned has_disabled_user_tos_setting		: 1;
   unsigned has_fileid_dirinfo				: 1;
-  unsigned has_exclusiveaddruse				: 1;
   unsigned has_enhanced_socket_security			: 1;
   unsigned has_buggy_restart_scan			: 1;
   unsigned has_mandatory_integrity_control		: 1;
@@ -77,7 +74,6 @@ public:
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (has_dacl_protect)
-  bool  IMPLEMENT (has_ip_helper_lib)
   bool  IMPLEMENT (has_broken_if_oper_status)
   bool  IMPLEMENT (has_physical_mem_access)
   bool  IMPLEMENT (has_process_io_counters)
@@ -87,9 +83,7 @@ public:
   bool	IMPLEMENT (has_extended_priority_class)
   bool	IMPLEMENT (has_guid_volumes)
   bool	IMPLEMENT (has_disk_ex_ioctls)
-  bool	IMPLEMENT (has_disabled_user_tos_setting)
   bool	IMPLEMENT (has_fileid_dirinfo)
-  bool	IMPLEMENT (has_exclusiveaddruse)
   bool	IMPLEMENT (has_enhanced_socket_security)
   bool	IMPLEMENT (has_buggy_restart_scan)
   bool	IMPLEMENT (has_mandatory_integrity_control)

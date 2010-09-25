@@ -1035,52 +1035,47 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
     }
   else
     {
-      /* If the application didn't explicitely call setsockopt (SO_REUSEADDR),
-	 enforce exclusive local address use using the SO_EXCLUSIVEADDRUSE
-	 socket option, to emulate POSIX socket behaviour more closely.
-
-	 KB 870562: Note that this option is only available since NT4 SP4.
-	 Also note that a bug in Win2K SP1-3 and XP up to SP1 only enables
-	 this option for users in the local administrators group. */
-      if (wincap.has_exclusiveaddruse ())
+      if (!saw_reuseaddr ())
 	{
-	  if (!saw_reuseaddr ())
-	    {
-	      int on = 1;
-	      int ret = ::setsockopt (get_socket (), SOL_SOCKET,
-				      ~(SO_REUSEADDR),
-				      (const char *) &on, sizeof on);
-	      debug_printf ("%d = setsockopt (SO_EXCLUSIVEADDRUSE), %E", ret);
-	    }
-	  else if (!wincap.has_enhanced_socket_security ())
-	    {
-	      debug_printf ("SO_REUSEADDR set");
-	      /* There's a bug in SO_REUSEADDR handling in WinSock.
-		 Per standards, we must not be able to reuse a complete
-		 duplicate of a local TCP address (same IP, same port),
-		 even if SO_REUSEADDR has been set.  That's unfortunately
-		 possible in WinSock.
+	  /* If the application didn't explicitely call setsockopt
+	     (SO_REUSEADDR), enforce exclusive local address use using the
+	     SO_EXCLUSIVEADDRUSE socket option, to emulate POSIX socket
+	     behaviour more closely.
 
-		 So we're testing here if the local address is already in
-		 use and don't bind, if so.  This only works for OSes with
-		 IP Helper support and is, of course, still prone to races.
+	     KB 870562: Note that a bug in Win2K SP1-3 and XP up to SP1 only
+	     enables this option for users in the local administrators group. */
+	  int on = 1;
+	  int ret = ::setsockopt (get_socket (), SOL_SOCKET,
+				  ~(SO_REUSEADDR),
+				  (const char *) &on, sizeof on);
+	  debug_printf ("%d = setsockopt (SO_EXCLUSIVEADDRUSE), %E", ret);
+	}
+      else if (!wincap.has_enhanced_socket_security ())
+	{
+	  debug_printf ("SO_REUSEADDR set");
+	  /* There's a bug in SO_REUSEADDR handling in WinSock.
+	     Per standards, we must not be able to reuse a complete
+	     duplicate of a local TCP address (same IP, same port),
+	     even if SO_REUSEADDR has been set.  That's unfortunately
+	     possible in WinSock.
 
-		 However, we don't have to do this on systems supporting
-		 "enhanced socket security" (2K3 and later).  On these
-		 systems the default binding behaviour is exactly as you'd
-		 expect for SO_REUSEADDR, while setting SO_REUSEADDR re-enables
-		 the wrong behaviour.  So all we have to do on these newer
-		 systems is never to set SO_REUSEADDR but only to note that
-		 it has been set for the above SO_EXCLUSIVEADDRUSE setting.
-		 See setsockopt() in net.cc. */
-	      if (get_socket_type () == SOCK_STREAM
-		  && wincap.has_ip_helper_lib ()
-		  && address_in_use (name))
-		{
-		  debug_printf ("Local address in use, don't bind");
-		  set_errno (EADDRINUSE);
-		  goto out;
-		}
+	     So we're testing here if the local address is already in
+	     use and don't bind, if so.  This only works for OSes with
+	     IP Helper support and is, of course, still prone to races.
+
+	     However, we don't have to do this on systems supporting
+	     "enhanced socket security" (2K3 and later).  On these
+	     systems the default binding behaviour is exactly as you'd
+	     expect for SO_REUSEADDR, while setting SO_REUSEADDR re-enables
+	     the wrong behaviour.  So all we have to do on these newer
+	     systems is never to set SO_REUSEADDR but only to note that
+	     it has been set for the above SO_EXCLUSIVEADDRUSE setting.
+	     See setsockopt() in net.cc. */
+	  if (get_socket_type () == SOCK_STREAM && address_in_use (name))
+	    {
+	      debug_printf ("Local address in use, don't bind");
+	      set_errno (EADDRINUSE);
+	      goto out;
 	    }
 	}
       if (::bind (get_socket (), name, namelen))
