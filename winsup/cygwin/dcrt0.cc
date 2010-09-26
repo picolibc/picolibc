@@ -1025,9 +1025,7 @@ __main (void)
      DLLs will be destroyed; finally newlib will shut down stdio
      and terminate itself.  */
   atexit (do_global_dtors);
-#if 0	/* Don't enable for now.  See if we really need this. */
   sig_dispatch_pending (true);
-#endif
 }
 
 void __stdcall

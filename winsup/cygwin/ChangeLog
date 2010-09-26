@@ -1,3 +1,7 @@
+2010-09-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (__main): Force signal synchronization.
+
 2010-09-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::bind): Drop has_exclusiveaddruse
