@@ -1,3 +1,8 @@
+2010-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_user::init): Call GetUserNameW and convert to
+	multibyte here so as not to rely on the current ANSI page.
+
 2010-09-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (__main): Force signal synchronization.

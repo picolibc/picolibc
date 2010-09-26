@@ -37,10 +37,15 @@ details. */
 void
 cygheap_user::init ()
 {
-  char user_name[UNLEN + 1];
+  WCHAR user_name[UNLEN + 1];
   DWORD user_name_len = UNLEN + 1;
 
-  set_name (GetUserName (user_name, &user_name_len) ? user_name : "unknown");
+  if (!GetUserNameW (user_name, &user_name_len))
+    wcpcpy (user_name, L"unknown");
+
+  char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
+  sys_wcstombs (mb_user_name, user_name_len, user_name);
+  set_name (mb_user_name);
 
   DWORD siz;
   PSECURITY_DESCRIPTOR psd;
