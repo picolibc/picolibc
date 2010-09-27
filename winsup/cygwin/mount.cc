@@ -226,7 +226,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	{
 	  debug_printf ("Cannot access path %S, status %08lx",
 			attr.ObjectName, status);
-	  NtClose (vol);
 	  return false;
 	}
     }

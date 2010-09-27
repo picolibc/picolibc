@@ -1,3 +1,8 @@
+2010-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (fs_info::update): Remove erroneous NtClose on random handle
+	value.
+
 2010-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (cygheap_user::init): Call GetUserNameW and convert to
