@@ -1,3 +1,7 @@
+2010-09-27  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* opcode/s390.h: Add S390_OPCODE_Z196 to enum s390_opcode_cpu_val.
+
 2010-09-23  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* arm.h (ARM_EXT_V6Z): Remove.
