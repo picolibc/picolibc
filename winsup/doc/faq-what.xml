@@ -28,9 +28,9 @@ sad reason.
 
 <para>Cygwin can be expected to run on all modern 32 bit versions of
 Windows, except Windows CE and Windows 95/98/Me.  This includes, as of the
-time of writing this, Windows NT4, Windows 2000, Windows XP, Windows Server
-2003, Windows Vista, Windows Server 2008, Windows 7, as well as the
-WOW64 32 bit environment on released 64 bit versions of Windows
+time of writing this, Windows NT4 SP4 or later, Windows 2000, Windows XP,
+Windows Server 2003, Windows Vista, Windows Server 2008, Windows 7, as well
+as the WOW64 32 bit environment on released 64 bit versions of Windows
 (XP/2003/Vista/2008/7/2008 R2).
 As far as we know no one is working on a native 64 bit version of Cygwin.
 Since Cygwin is a community-supported free software project, patches to

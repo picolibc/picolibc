@@ -19,6 +19,10 @@ GNU C Library manual</ulink> for full details of this functionality.
 /proc/sys allows to access the native NT namespace.
 </para></listitem>
 
+<listitem><para>
+Drop support for Windows NT4 prior to Service Pack 4.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

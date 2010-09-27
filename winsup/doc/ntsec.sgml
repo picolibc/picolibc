@@ -498,7 +498,7 @@ OthersAllow: 110
 </screen>
 
 <para>Again: This works on all existing versions of Windows NT, at the
-time of writing from at least NT4 up to Server 2008.  Only the GUIs
+time of writing from at least NT4 up to Server 2008 R2.  Only the GUIs
 aren't able (or willing) to deal with that order.</para>
 
 </sect2>
