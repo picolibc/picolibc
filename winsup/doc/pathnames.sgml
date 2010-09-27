@@ -225,18 +225,18 @@ arguments:</para>
 <title>Displaying the current set of mount points</title>
 <screen>
   <prompt>bash$</prompt> <userinput>mount</userinput>
-  f:/cygwin/bin on /usr/bin type system (binary,auto)
-  f:/cygwin/lib on /usr/lib type system (binary,auto)
-  f:/cygwin on / type system (binary,auto)
-  e:/src on /usr/src type system (binary)
-  c: on /cygdrive/c type user (binary,posix=0,user,noumount,auto)
-  e: on /cygdrive/e type user (binary,posix=0,user,noumount,auto)
+  f:/cygwin/bin on /usr/bin type ntfs (binary,auto)
+  f:/cygwin/lib on /usr/lib type ntfs (binary,auto)
+  f:/cygwin on / type ntfs (binary,auto)
+  e:/src on /usr/src type vfat (binary)
+  c: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
+  e: on /cygdrive/e type vfat (binary,posix=0,user,noumount,auto)
 </screen>
 </example>
 
 <para>You can also use the <command>mount</command> command to add
 new mount points, and the <command>umount</command> to delete
-them.  However, since they are only noted in memory, these mount
+them.  However, since they are only stored in memory, these mount
 points will disappear as soon as your last Cygwin process ends.
 See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
 information.</para>

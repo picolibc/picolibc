@@ -1,5 +1,10 @@
 2010-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pathnames.sgml (mount-table): Fix pathnames-mount-ex example.  Change
+	an expression.
+
+2010-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.sgml (ov-new1.7.8): Document dropped NT4 pre-SP4 support.
 	* faq-what.xml (faq.what.supported): Change accordingly.
 	* ntsec.sgml (ntsec-mapping): Add 2008 R2.
