@@ -1467,22 +1467,6 @@ getdomainname (char *domain, size_t len)
       strncpy(domain, info->DomainName, len);
       return 0;
     }
-
-  /* This is only used by NT4.
-     The registry names are language independent. */
-  reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
-	     "SYSTEM", "CurrentControlSet", "Services",
-	     "Tcpip", "Parameters", NULL);
-
-  if (!r.error ())
-    {
-      int res1, res2 = 0; /* Suppress compiler warning */
-      res1 = r.get_string ("Domain", domain, len, "");
-      if (res1 != ERROR_SUCCESS || !domain[0])
-	res2 = r.get_string ("DhcpDomain", domain, len, "");
-      if (res1 == ERROR_SUCCESS || res2 == ERROR_SUCCESS)
-	return 0;
-    }
   __seterrno ();
   return -1;
 }

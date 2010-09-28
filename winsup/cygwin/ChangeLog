@@ -1,5 +1,9 @@
 2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (getdomainname): Drop special case for NT4.
+
+2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	Revert accidental previous login.
 
 2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
