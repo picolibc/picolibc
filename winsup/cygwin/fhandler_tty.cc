@@ -1796,27 +1796,24 @@ fhandler_pty_master::setup (bool ispty)
   if (!(input_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
-  if (ispty)
+  /* Create master control pipe which allows the master to duplicate
+     the pty pipe handles to processes which deserve it. */
+  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
+		   &installation_key, get_unit ());
+  master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
+				PIPE_WAIT | PIPE_TYPE_MESSAGE
+				| PIPE_READMODE_MESSAGE, 1, 4096, 4096,
+				0, &sec_all_nih);
+  if (master_ctl == INVALID_HANDLE_VALUE)
     {
-      /* Create master control pipe which allows the master to duplicate
-	 the pty pipe handles to processes which deserve it. */
-      __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
-		       &installation_key, get_unit ());
-      master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
-				    PIPE_WAIT | PIPE_TYPE_MESSAGE
-				    | PIPE_READMODE_MESSAGE, 1, 4096, 4096,
-				    0, &sec_all_nih);
-      if (master_ctl == INVALID_HANDLE_VALUE)
-	{
-	  errstr = "pty master control pipe";
-	  goto err;
-	}
-      master_thread = new cygthread (::pty_master_thread, this, "pty_master");
-      if (!master_thread)
-	{
-	  errstr = "pty master control thread";
-	  goto err;
-	}
+      errstr = "pty master control pipe";
+      goto err;
+    }
+  master_thread = new cygthread (::pty_master_thread, this, "pty_master");
+  if (!master_thread)
+    {
+      errstr = "pty master control thread";
+      goto err;
     }
 
   t.from_master = from_master;
