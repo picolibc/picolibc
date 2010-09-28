@@ -1,3 +1,7 @@
+2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (gethostid): Use correct path to ProductId registry value.
+
 2010-09-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fs_info::update): Remove erroneous NtClose on random handle

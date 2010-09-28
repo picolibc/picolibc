@@ -3772,7 +3772,8 @@ long gethostid (void)
       debug_printf ("no Ethernet card installed");
     }
 
-  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE", "Microsoft", "Windows", "CurrentVersion", NULL);
+  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE", "Microsoft",
+	       "Windows NT", "CurrentVersion", NULL);
   key.get_string ("ProductId", (char *)&data[6], 24, "00000-000-0000000-00000");
   debug_printf ("Windows Product ID: %s", (char *)&data[6]);
 
