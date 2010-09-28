@@ -1,5 +1,9 @@
 2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	Revert accidental previous login.
+
+2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_IMPORTS): Remove libadvapi32.a.
 	* autoload.cc: Add all advapi32 entry points.
 	* mount.cc (mount_info::init): Read user fstab only if we have a

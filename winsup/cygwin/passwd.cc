@@ -66,8 +66,7 @@ pwdgrp::read_passwd ()
   if (!user_shared->cb || myself->uid == ILLEGAL_UID)
     searchentry = !internal_getpwsid (tu);
   if (searchentry
-      && (!cygheap->user.name ()
-	  || !(pw = internal_getpwnam (cygheap->user.name ()))
+      && (!(pw = internal_getpwnam (cygheap->user.name ()))
 	  || !user_shared->cb
 	  || (myself->uid != ILLEGAL_UID
 	      && myself->uid != (__uid32_t) pw->pw_uid
@@ -76,7 +75,7 @@ pwdgrp::read_passwd ()
       static char linebuf[1024];	// must be static and
 					// should not be NO_COPY
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
-		cygheap->user.name () ?: "",
+		cygheap->user.name (),
 		(!user_shared->cb || myself->uid == ILLEGAL_UID)
 		? UNKNOWN_UID : myself->uid,
 		!user_shared->cb ? UNKNOWN_GID : myself->gid,

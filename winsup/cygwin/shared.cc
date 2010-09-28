@@ -312,6 +312,7 @@ user_info::initialize ()
   spinlock sversion (version, CURR_USER_MAGIC);
   if (!sversion)
     {
+      cb =  sizeof (*user_shared);
       cygpsid sid (cygheap->user.sid ());
       struct passwd *pw = internal_getpwsid (sid);
       /* Correct the user name with what's defined in /etc/passwd before
@@ -319,7 +320,6 @@ user_info::initialize ()
       if (pw)
 	cygheap->user.set_name (pw->pw_name);
       mountinfo.init ();	/* Initialize the mount table.  */
-      cb = sizeof (*user_shared);
     }
   else if (sversion != CURR_USER_MAGIC)
     sversion.multiple_cygwin_problem ("user shared memory version", version,
