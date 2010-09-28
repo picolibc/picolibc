@@ -38,14 +38,16 @@ void
 cygheap_user::init ()
 {
   WCHAR user_name[UNLEN + 1];
-  DWORD user_name_len = UNLEN + 1;
+  DWORD user_name_len;
 
-  if (!GetUserNameW (user_name, &user_name_len))
-    wcpcpy (user_name, L"unknown");
-
-  char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
-  sys_wcstombs (mb_user_name, user_name_len, user_name);
-  set_name (mb_user_name);
+  user_name_len = GetEnvironmentVariableW (L"USERNAME", user_name, UNLEN + 1);
+  if (user_name_len)
+    {
+      user_name[UNLEN] = L'\0';
+      char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
+      sys_wcstombs (mb_user_name, user_name_len, user_name);
+      set_name (mb_user_name);
+    }
 
   DWORD siz;
   PSECURITY_DESCRIPTOR psd;
@@ -96,10 +98,29 @@ internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
 
-  cygpsid psid = user.sid ();
-  pw = internal_getpwsid (psid);
+  /* Handle a border case.  If neither $USERNAME, nor /etc/passwd exists,
+     we tryto fetch the username from the system now. */
+  if (!user.name () || !*user.name ())
+    {
+      WCHAR user_name[UNLEN + 1];
+      DWORD user_name_len = UNLEN + 1;
 
-  if (!pw && !(pw = internal_getpwnam (user.name ()))
+      if (GetUserNameW (user_name, &user_name_len))
+	{
+	  char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
+	  sys_wcstombs (mb_user_name, user_name_len, user_name);
+	  user.set_name (mb_user_name);
+	}
+      else
+	user.set_name ("unknown");
+    }
+  else
+    {
+      cygpsid psid = user.sid ();
+      pw = internal_getpwsid (psid);
+    }
+
+  if (!pw && !(pw = internal_getpwnam (user.name (), true))
       && !(pw = internal_getpwuid (DEFAULT_UID)))
     debug_printf ("user not found in augmented /etc/passwd");
   else

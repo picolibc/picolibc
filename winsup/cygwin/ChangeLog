@@ -1,5 +1,18 @@
 2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_IMPORTS): Remove libadvapi32.a.
+	* autoload.cc: Add all advapi32 entry points.
+	* mount.cc (mount_info::init): Read user fstab only if we have a
+	username.
+	* passwd.cc (pwdgrp::read_passwd): Only use username if we have one.
+	* shared.cc (user_info::initialize): Set cb last so as not to override
+	planned behaviour in pwdgrp::read_passwd.
+	* uinfo.cc (cygheap_user::init): Fetch Windows username from environment
+	variable $USERNAME.  Don't set name in cygheap if variable is empty.
+	(internal_getlogin): If we still have no username, try GetUserNameW.
+
+2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_pty_master::setup): Always create master
 	thread.
 

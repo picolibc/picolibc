@@ -467,7 +467,8 @@ mount_info::init ()
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
 
   from_fstab (false, path, pathend);
-  from_fstab (true, path, pathend);
+  if (cygheap->user.name () && *cygheap->user.name ())
+    from_fstab (true, path, pathend);
 
   if (!got_usr_bin || !got_usr_lib)
     {
