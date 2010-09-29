@@ -1,3 +1,11 @@
+2010-09-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_tty_slave::init): Add debugging.  Use
+	tcsetpgrp to potentially set pgid since it is smarter about deciding if
+	a process is in the background.
+	* include/sys/cygwin.h (PID_ORPHANED): Actually delete as planned.
+	(PID_NOTCYGWIN): Correctly define.
+
 2010-09-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (getdomainname): Drop special case for NT4.

@@ -723,7 +723,11 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 	 tty is a non-cygwin process or we've been started directly
 	 from a non-Cygwin process with no Cygwin ancestry.  */
       if (!p || ISSTATE (p, PID_NOTCYGWIN))
-	tc->setpgid (myself->pgid);
+	{
+	  termios_printf ("Setting process group leader to %d since %W(%d) is not a cygwin process",
+			  myself->pgid, p->progname, p->pid);
+	  tcsetpgrp (myself->pgid);
+	}
     }
 
   if (f != INVALID_HANDLE_VALUE)

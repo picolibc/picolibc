@@ -155,8 +155,7 @@ enum
   PID_STOPPED	       = 0x00004, /* Waiting for SIGCONT. */
   PID_TTYIN	       = 0x00008, /* Waiting for terminal input. */
   PID_TTYOU	       = 0x00010, /* Waiting for terminal output. */
-  PID_NOTCYGWIN	       = 0x00080, /* Set if process is not a cygwin app. */
-  PID_ORPHANED	       = 0x00020, /* Member of an orphaned process group. */
+  PID_NOTCYGWIN	       = 0x00020, /* Set if process is not a cygwin app. */
   PID_ACTIVE	       = 0x00040, /* Pid accepts signals. */
   PID_CYGPARENT	       = 0x00080, /* Set if parent was a cygwin app. */
   PID_MAP_RW	       = 0x00100, /* Flag to open map rw. */
