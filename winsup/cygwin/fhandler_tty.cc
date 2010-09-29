@@ -726,7 +726,7 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 	{
 	  termios_printf ("Setting process group leader to %d since %W(%d) is not a cygwin process",
 			  myself->pgid, p->progname, p->pid);
-	  tcsetpgrp (myself->pgid);
+	  tc->setpgid (myself->pgid);
 	}
     }
 

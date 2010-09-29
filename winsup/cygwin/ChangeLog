@@ -1,3 +1,8 @@
+2010-09-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_tty_slave::init): Revert to using
+	tc->setpgid since previous change broke some use cases.
+
 2010-09-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler_tty.cc (fhandler_tty_slave::init): Add debugging.  Use
