@@ -2651,10 +2651,7 @@ restart:
 	 (which can be symlinks to directories). */
       else if (fs.is_nfs () && !no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY))
 	{
-	  if (!(access & GENERIC_READ))
-	    res = 0;
-	  else
-	    res = check_nfs_symlink (h);
+	  res = check_nfs_symlink (h);
 	  if (res)
 	    break;
 	}
