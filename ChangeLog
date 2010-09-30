@@ -1,4 +1,13 @@
-2010-06-27  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+2010-09-30  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Sync from GCC:
+
+	PR bootstrap/45796
+	* Makefile.def (info-gcc, dvi-gcc, pdf-gcc, html-gcc):
+	Depend on all-build-libiberty.
+	* Makefile.in: Regenerate.
+
+2010-09-27  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Sync from GCC:
 
