@@ -12,6 +12,7 @@ details. */
 #include "devices.h"
 #include "mount.h"
 #include "cygheap_malloc.h"
+#include "nfs.h"
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -96,17 +97,21 @@ class path_conv_handle
 {
   HANDLE      hdl;
   ACCESS_MASK acc;
-  /* Identical to FILE_NETWORK_OPEN_INFORMATION.  We don't want to pull in
-     ntdll.h here, though. */
-  struct {
-    LARGE_INTEGER CreationTime;
-    LARGE_INTEGER LastAccessTime;
-    LARGE_INTEGER LastWriteTime;
-    LARGE_INTEGER ChangeTime;
-    LARGE_INTEGER AllocationSize;
-    LARGE_INTEGER EndOfFile;
-    ULONG FileAttributes;
-  } _fnoi;
+  union {
+    /* Identical to FILE_NETWORK_OPEN_INFORMATION.  We don't want to pull in
+       ntdll.h here, though. */
+    struct {
+      LARGE_INTEGER CreationTime;
+      LARGE_INTEGER LastAccessTime;
+      LARGE_INTEGER LastWriteTime;
+      LARGE_INTEGER ChangeTime;
+      LARGE_INTEGER AllocationSize;
+      LARGE_INTEGER EndOfFile;
+      ULONG FileAttributes;
+    } _fnoi;
+    /* For NFS. */
+    fattr3 _fattr3;
+  } attribs;
 public:
   path_conv_handle () : hdl (NULL), acc (0) {}
   inline void set (HANDLE h, ACCESS_MASK a) { hdl = h; acc = a; }
@@ -129,7 +134,9 @@ public:
   inline HANDLE handle () const { return hdl; }
   inline ACCESS_MASK access () const { return acc; }
   inline struct _FILE_NETWORK_OPEN_INFORMATION *fnoi ()
-  { return (struct _FILE_NETWORK_OPEN_INFORMATION *) &_fnoi; }
+  { return (struct _FILE_NETWORK_OPEN_INFORMATION *) &attribs._fnoi; }
+  inline struct fattr3 *nfsattr ()
+  { return (struct fattr3 *) &attribs._fattr3; }
 };
 
 class path_conv
@@ -321,6 +328,7 @@ class path_conv
   HANDLE handle () const { return conv_handle.handle (); }
   ACCESS_MASK access () const { return conv_handle.access (); }
   struct _FILE_NETWORK_OPEN_INFORMATION *fnoi () { return conv_handle.fnoi (); }
+  struct fattr3 *nfsattr () { return conv_handle.nfsattr (); }
   void reset_conv_handle () { conv_handle.set (NULL, 0); }
   void close_conv_handle () { conv_handle.close (); }
 

@@ -1,5 +1,24 @@
 2010-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc: Drop including nfs.h.
+	* fhandler_disk_file.cc: Ditto.
+	(fhandler_base::fstat_by_nfs_ea): Use fattr3 from path_conv member,
+	unless called from fstat.
+	* path.cc: Drop including nfs.h.
+	(symlink_info::check): Rearrange definition of file info buffers.
+	Fetch fattr3 info for files on NFS and store in conv_hdl for later
+	use in fhandler_base::fstat_by_nfs_ea.  Use fattr3 file type to
+	recognize symlink on NFS and try to fetch symlink target only for
+	actual symlinks.
+	* path.h: Include nfs.h.
+	(class path_conv_handle): Change file info storage to union of
+	FILE_NETWORK_OPEN_INFORMATION and fattr3 structures.
+	(path_conv_handle::fnoi): Align to aforementioned change.
+	(path_conv_handle::nfsattr): New method.
+	(path_conv::nfsattr): New method.
+
+2010-09-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Remove erroneous assumption about
 	required permissions when reading NFS symlinks.
 

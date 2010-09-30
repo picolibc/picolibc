@@ -23,7 +23,6 @@ details. */
 #include "pinfo.h"
 #include "ntdll.h"
 #include "tls_pbuf.h"
-#include "nfs.h"
 #include "pwdgrp.h"
 #include <winioctl.h>
 
@@ -303,51 +302,51 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
   struct {
      FILE_GET_EA_INFORMATION fgei;
      char buf[sizeof (NFS_V3_ATTR)];
-   } fgei_buf;
+  } fgei_buf;
+  fattr3 *nfs_attr = pc.nfsattr ();
 
-  /* NFS stumbles over its own caching.  If you write to the file,
-     a subsequent fstat does not return the actual size of the file,
-     but the size at the time the handle has been opened.  Unless
-     access through another handle invalidates the caching within the
-     NFS client. */
-  if (get_io_handle () && (get_access () & GENERIC_WRITE))
-    FlushFileBuffers (get_io_handle ());
-
-  fgei_buf.fgei.NextEntryOffset = 0;
-  fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
-  stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
-  status = NtQueryEaFile (get_stat_handle (), &io,
-			  &ffei_buf.ffei, sizeof ffei_buf, TRUE,
-			  &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
-  if (NT_SUCCESS (status))
+  if (get_io_handle ())
     {
-      fattr3 *nfs_attr = (fattr3 *) (ffei_buf.ffei.EaName
-				     + ffei_buf.ffei.EaNameLength + 1);
-      buf->st_dev = nfs_attr->fsid;
-      buf->st_ino = nfs_attr->fileid;
-      buf->st_mode = (nfs_attr->mode & 0xfff)
-		     | nfs_type_mapping[nfs_attr->type & 7];
-      buf->st_nlink = nfs_attr->nlink;
-      /* FIXME: How to convert UNIX uid/gid to Windows SIDs? */
-#if 0
-      buf->st_uid = nfs_attr->uid;
-      buf->st_gid = nfs_attr->gid;
-#else
-      buf->st_uid = myself->uid;
-      buf->st_gid = myself->gid;
-#endif
-      buf->st_rdev = makedev (nfs_attr->rdev.specdata1,
-			      nfs_attr->rdev.specdata2);
-      buf->st_size = nfs_attr->size;
-      buf->st_blksize = PREFERRED_IO_BLKSIZE;
-      buf->st_blocks = nfs_attr->used / 512;
-      buf->st_atim = nfs_attr->atime;
-      buf->st_mtim = nfs_attr->mtime;
-      buf->st_ctim = nfs_attr->ctime;
-      return 0;
+      /* NFS stumbles over its own caching.  If you write to the file,
+	 a subsequent fstat does not return the actual size of the file,
+	 but the size at the time the handle has been opened.  Unless
+	 access through another handle invalidates the caching within the
+	 NFS client. */
+      if (get_access () & GENERIC_WRITE)
+	FlushFileBuffers (get_io_handle ());
+
+      fgei_buf.fgei.NextEntryOffset = 0;
+      fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+      stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
+      status = NtQueryEaFile (get_io_handle (), &io,
+			      &ffei_buf.ffei, sizeof ffei_buf, TRUE,
+			      &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
+      if (NT_SUCCESS (status))
+	nfs_attr = (fattr3 *) (ffei_buf.ffei.EaName
+			       + ffei_buf.ffei.EaNameLength + 1);
     }
-  debug_printf ("%p = NtQueryEaFile(%S)", status, pc.get_nt_native_path ());
-  return -1;
+  buf->st_dev = nfs_attr->fsid;
+  buf->st_ino = nfs_attr->fileid;
+  buf->st_mode = (nfs_attr->mode & 0xfff)
+		 | nfs_type_mapping[nfs_attr->type & 7];
+  buf->st_nlink = nfs_attr->nlink;
+  /* FIXME: How to convert UNIX uid/gid to Windows SIDs? */
+#if 0
+  buf->st_uid = nfs_attr->uid;
+  buf->st_gid = nfs_attr->gid;
+#else
+  buf->st_uid = myself->uid;
+  buf->st_gid = myself->gid;
+#endif
+  buf->st_rdev = makedev (nfs_attr->rdev.specdata1,
+			  nfs_attr->rdev.specdata2);
+  buf->st_size = nfs_attr->size;
+  buf->st_blksize = PREFERRED_IO_BLKSIZE;
+  buf->st_blocks = nfs_attr->used / 512;
+  buf->st_atim = nfs_attr->atime;
+  buf->st_mtim = nfs_attr->mtime;
+  buf->st_ctim = nfs_attr->ctime;
+  return 0;
 }
 
 int __stdcall

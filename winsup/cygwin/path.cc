@@ -67,7 +67,6 @@
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "environ.h"
-#include "nfs.h"
 #include <assert.h>
 #include <ntdll.h>
 #include <wchar.h>
@@ -2398,9 +2397,6 @@ restart:
 	    }
 	}
 
-      FILE_BASIC_INFORMATION fbi;
-      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
-
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.
 	     This speeds up path_conv noticably (~10%). */
@@ -2408,17 +2404,34 @@ restart:
 	{
 	  if (fs.is_nfs ())
 	    {
-	      /* NFS doesn't handle FileNetworkOpenInformation when called
-	         via NtQueryInformationFile (STATUS_INVALID_PARAMETER).
-		 Since we only need FileAttributes for NFS anyway, we just
-		 fetch the FileBasicInformation. */
-	      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-					       FileBasicInformation);
+	      struct {
+		FILE_FULL_EA_INFORMATION ffei;
+		char buf[sizeof (NFS_V3_ATTR) + sizeof (fattr3)];
+	      } ffei_buf; 
+	      struct {
+		 FILE_GET_EA_INFORMATION fgei;
+		 char buf[sizeof (NFS_V3_ATTR)];
+	      } fgei_buf;
+
+	      fgei_buf.fgei.NextEntryOffset = 0;
+	      fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
+	      stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
+	      status = NtQueryEaFile (h, &io, &ffei_buf.ffei, sizeof ffei_buf,
+				      TRUE, &fgei_buf.fgei, sizeof fgei_buf,
+				      NULL, TRUE);
 	      if (NT_SUCCESS (status))
-		fileattr = fbi.FileAttributes;
+		{
+		  fattr3 *nfs_attr = (fattr3 *)
+			(ffei_buf.ffei.EaName + ffei_buf.ffei.EaNameLength + 1);
+		  memcpy (conv_hdl.nfsattr (), nfs_attr, sizeof (fattr3));
+		  fileattr = ((nfs_attr->type & 7) == NF3DIR)
+			     ? FILE_ATTRIBUTE_DIRECTORY : 0;
+		}
 	    }
 	  else
 	    {
+	      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
+
 	      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
 					       FileNetworkOpenInformation);
 	      if ((status == STATUS_INVALID_PARAMETER
@@ -2428,6 +2441,8 @@ restart:
 		  /* This occurs when accessing SMB share root dirs hosted on
 		     NT4 (STATUS_INVALID_PARAMETER), or when trying to access
 		     SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
+		  FILE_BASIC_INFORMATION fbi;
+
 		  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
 						   FileBasicInformation);
 		  if (NT_SUCCESS (status))
@@ -2529,6 +2544,8 @@ restart:
 		    }
 		  else
 		    {
+		      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
+
 		      fileattr = fdi_buf.fdi.FileAttributes;
 		      memcpy (pfnoi, &fdi_buf.fdi.CreationTime, sizeof *pfnoi);
 		      /* Amazing, but true:  The FILE_NETWORK_OPEN_INFORMATION
@@ -2627,7 +2644,7 @@ restart:
 	  else if (res)
 	    {
 	      /* A symlink is never a directory. */
-	      pfnoi->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+	      conv_hdl.fnoi ()->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
 	      break;
 	    }
 	}
@@ -2649,7 +2666,7 @@ restart:
       /* If the file is on an NFS share and could be opened with extended
 	 attributes, check if it's a symlink.  Only files can be symlinks
 	 (which can be symlinks to directories). */
-      else if (fs.is_nfs () && !no_ea && !(fileattr & FILE_ATTRIBUTE_DIRECTORY))
+      else if (fs.is_nfs () && (conv_hdl.nfsattr ()->type & 7) == NF3LNK)
 	{
 	  res = check_nfs_symlink (h);
 	  if (res)

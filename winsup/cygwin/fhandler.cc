@@ -28,7 +28,6 @@ details. */
 #include "ntdll.h"
 #include "cygtls.h"
 #include "sigproc.h"
-#include "nfs.h"
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
