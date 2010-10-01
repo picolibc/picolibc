@@ -208,7 +208,6 @@ union retchain
 __attribute__ ((used, noinline)) static long long
 std_dll_init ()
 {
-  HANDLE h;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
   retchain ret;
@@ -222,21 +221,31 @@ std_dll_init ()
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
     {
+      HANDLE h;
       fenv_t fpuenv;
       fegetenv (&fpuenv);
       WCHAR dll_path[MAX_PATH];
       /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
       wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
-      if ((h = LoadLibraryW (dll_path)) != NULL)
-	dll->handle = h;
-      else if (!(func->decoration & 1))
-	api_fatal ("could not load %W, %E", dll_path);
-      else
-	dll->handle = INVALID_HANDLE_VALUE;
+      dll->handle = NULL;
+      /* MSDN seems to imply that LoadLibrary can fail mysteriously, so,
+	 since there have been reports of this in the mailing list, retry
+	 several times before giving up.  */
+      for (int i = 1; !dll->handle && i <= 5; i++)
+	if ((h = LoadLibraryW (dll_path)) != NULL)
+	  dll->handle = h;
+        /* FIXME: This isn't quite right.  Probably should check for specific
+	   error codes. */
+	else if ((func->decoration & 1))
+	  dll->handle = INVALID_HANDLE_VALUE;
+	else if (i < 5)
+	  yield ();
+	else
+	  api_fatal ("could not load %W, %E", dll_path);
       fesetenv (&fpuenv);
     }
 
-  /* Set "arguments for dll_chain. */
+  /* Set "arguments" for dll_chain. */
   ret.low = (long) dll->init;
   ret.high = (long) func;
 

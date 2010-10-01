@@ -1,3 +1,7 @@
+2010-10-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (std_dll_init): Add a retry loop.
+
 2010-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc: Drop including nfs.h.
