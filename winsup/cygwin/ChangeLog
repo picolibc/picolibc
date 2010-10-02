@@ -1,3 +1,8 @@
+2010-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::exists): Return virt_none
+	if path is invalid.
+
 2010-10-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (std_dll_init): Add a retry loop.

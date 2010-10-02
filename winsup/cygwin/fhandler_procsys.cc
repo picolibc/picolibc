@@ -62,6 +62,8 @@ fhandler_procsys::exists (struct __stat64 *buf)
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+  if (status == STATUS_OBJECT_NAME_INVALID)
+    return virt_none;
   /* If no media is found, or we get this dreaded sharing violation, let
      the caller immediately try again as normal file. */
   if (status == STATUS_NO_MEDIA_IN_DEVICE
