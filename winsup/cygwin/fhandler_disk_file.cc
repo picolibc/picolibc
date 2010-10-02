@@ -293,16 +293,6 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 int __stdcall
 fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
 {
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-  struct {
-    FILE_FULL_EA_INFORMATION ffei;
-    char buf[sizeof (NFS_V3_ATTR) + sizeof (fattr3)];
-  } ffei_buf;
-  struct {
-     FILE_GET_EA_INFORMATION fgei;
-     char buf[sizeof (NFS_V3_ATTR)];
-  } fgei_buf;
   fattr3 *nfs_attr = pc.nfsattr ();
 
   if (get_io_handle ())
@@ -314,16 +304,7 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
 	 NFS client. */
       if (get_access () & GENERIC_WRITE)
 	FlushFileBuffers (get_io_handle ());
-
-      fgei_buf.fgei.NextEntryOffset = 0;
-      fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
-      stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
-      status = NtQueryEaFile (get_io_handle (), &io,
-			      &ffei_buf.ffei, sizeof ffei_buf, TRUE,
-			      &fgei_buf.fgei, sizeof fgei_buf, NULL, TRUE);
-      if (NT_SUCCESS (status))
-	nfs_attr = (fattr3 *) (ffei_buf.ffei.EaName
-			       + ffei_buf.ffei.EaNameLength + 1);
+      nfs_fetch_fattr3 (get_io_handle (), nfs_attr);
     }
   buf->st_dev = nfs_attr->fsid;
   buf->st_ino = nfs_attr->fileid;

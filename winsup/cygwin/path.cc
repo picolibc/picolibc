@@ -2404,29 +2404,10 @@ restart:
 	{
 	  if (fs.is_nfs ())
 	    {
-	      struct {
-		FILE_FULL_EA_INFORMATION ffei;
-		char buf[sizeof (NFS_V3_ATTR) + sizeof (fattr3)];
-	      } ffei_buf; 
-	      struct {
-		 FILE_GET_EA_INFORMATION fgei;
-		 char buf[sizeof (NFS_V3_ATTR)];
-	      } fgei_buf;
-
-	      fgei_buf.fgei.NextEntryOffset = 0;
-	      fgei_buf.fgei.EaNameLength = sizeof (NFS_V3_ATTR) - 1;
-	      stpcpy (fgei_buf.fgei.EaName, NFS_V3_ATTR);
-	      status = NtQueryEaFile (h, &io, &ffei_buf.ffei, sizeof ffei_buf,
-				      TRUE, &fgei_buf.fgei, sizeof fgei_buf,
-				      NULL, TRUE);
+	      status = nfs_fetch_fattr3 (h, conv_hdl.nfsattr ());
 	      if (NT_SUCCESS (status))
-		{
-		  fattr3 *nfs_attr = (fattr3 *)
-			(ffei_buf.ffei.EaName + ffei_buf.ffei.EaNameLength + 1);
-		  memcpy (conv_hdl.nfsattr (), nfs_attr, sizeof (fattr3));
-		  fileattr = ((nfs_attr->type & 7) == NF3DIR)
-			     ? FILE_ATTRIBUTE_DIRECTORY : 0;
-		}
+		fileattr = ((conv_hdl.nfsattr ()->type & 7) == NF3DIR)
+			    ? FILE_ATTRIBUTE_DIRECTORY : 0;
 	    }
 	  else
 	    {

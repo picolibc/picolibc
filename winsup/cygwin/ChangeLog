@@ -1,5 +1,15 @@
 2010-09-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Simplify.
+	Just call nfs_fetch_fattr3 if called via fstat.
+	* nfs.cc (nfs_fetch_fattr3): New function to fetch NFS fattr3 info from
+	file handle.
+	* nfs.h (nfs_fetch_fattr3): Declare.
+	* path.cc (symlink_info::check): Simplify NFS case.  Just call
+	nfs_fetch_fattr3.
+
+2010-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procsys.cc (fhandler_procsys::exists): Return virt_none
 	if path is invalid.
 

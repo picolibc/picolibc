@@ -1,6 +1,6 @@
 /* nfs.h
 
-   Copyright 2008 Red Hat, Inc.
+   Copyright 2008, 2010 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -53,3 +53,5 @@ struct nfs_aol_ffei_t {
 extern struct nfs_aol_ffei_t nfs_aol_ffei;
 
 extern uint32_t nfs_type_mapping[];
+
+extern NTSTATUS nfs_fetch_fattr3 (HANDLE h, fattr3 *fattr_buf);
