@@ -1,5 +1,14 @@
 2010-10-02  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
+	PR bootstrap/45326
+	PR bootstrap/45174
+	* configure.ac: Honor initial values of $build_configargs,
+	$host_configargs, $target_configargs.  Mark the precious, so
+	environment settings get recorded.
+	* configure: Regenerate.
+
+2010-10-02  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
 	Sync from GCC:
 
 	2010-09-30  Michael Eager  <eager@eagercon.com>
