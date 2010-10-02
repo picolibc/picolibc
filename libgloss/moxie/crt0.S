@@ -19,11 +19,11 @@
 	.type	__start,@function
 __start:
 _start:
-	ldi.l	$sp, _stack	/* load up stack pointer */
-	ldi.l	$fp, 0x0	/* zero fp to allow unwinders to stop */
+	ldi.l	$sp, (_stack-12)/* load up stack pointer with space
+	                           for stack frame. */
+	xor	$fp, $fp	/* zero fp to allow unwinders to stop */
 
 	/* zero the bss area */
-	dec	$sp, 12
 	ldi.l	$r0, __bss_start__
 	ldi.l	$r1, __bss_end__
 	sub.l	$r1, $r0
