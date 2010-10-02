@@ -771,6 +771,8 @@ dll_crt0_0 ()
     disable_dep ();
 #endif
 
+  _main_tls = &_my_tls;
+
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
@@ -970,9 +972,11 @@ _dll_crt0 ()
 {
   main_environ = user_data->envptr;
   if (in_forkee)
-    fork_info->alloc_stack ();
+    {
+      fork_info->alloc_stack ();
+      _main_tls = &_my_tls;
+    }
 
-  _main_tls = &_my_tls;
   _main_tls->call ((DWORD (*) (void *, void *)) dll_crt0_1, NULL);
 }
 
