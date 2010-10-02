@@ -1,5 +1,10 @@
 2010-10-02  Anthony Green  <green@moxielogic.com>
 
+	* moxie/Makefile.in (QEMU_OBJS): Add missing object files to the
+	qemu support library.
+
+2010-10-02  Anthony Green  <green@moxielogic.com>
+
 	* moxie/crt0.S (_start): Minor optimizations to __start.
 
 2010-09-23  Mike Frysinger  <vapier@gentoo.org>

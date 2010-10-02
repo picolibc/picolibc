@@ -1,4 +1,4 @@
-# Copyright (c) 2008 Anthony Green
+# Copyright (c) 2008, 2010 Anthony Green
 #
 # The authors hereby grant permission to use, copy, modify, distribute,
 # and license this software and its documentation for any purpose, provided
@@ -86,7 +86,10 @@ QEMU_OBJS = qemu-write.o \
 	    sbrk.o \
 	    sim-close.o \
 	    fstat.o \
+	    getpid.o \
 	    isatty.o \
+	    kill.o \
+	    putnum.o \
 	    sim-lseek.o \
 	    sim-read.o
 
