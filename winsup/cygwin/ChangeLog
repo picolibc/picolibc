@@ -1,3 +1,7 @@
+2010-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (enum pathconv_arg): Remove PC_CHECK_EA.
+
 2010-10-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Move _main_tls initialization here.
