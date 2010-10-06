@@ -1,26 +1,3 @@
-2010-10-02  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
-
-	Sync from GCC:
-
-	2010-09-10  Jonathan Yong  <jon_y@users.sourceforge.net>
-
-	* dfp.m4: Enable decimal float for i?86 cygwin
-	and mingw, and for x86_64 mingw.
-
-2010-06-27  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
-
-	* po.m4 (AM_PO_SUBDIRS): Fix unportable shell quoting.
-
-2010-09-06  H.J. Lu  <hongjiu.lu@intel.com>
-
-	PR target/45524
-	* dfp.m4: Don't set enable_decimal_float to dpd if DFP is
-	disabled.  Set default_decimal_float.
-
-2010-09-06  Andreas Schwab  <schwab@redhat.com>
-
-	* dfp.m4: Quote argument of AC_MSG_WARN.
-
 2010-09-03  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* dfp.m4: New file.
