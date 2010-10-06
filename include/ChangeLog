@@ -1,3 +1,7 @@
+2010-10-06  Andi Kleen <ak@linux.intel.com>
+
+	* libiberty.h (setproctitle): Add prototype.
+
 2010-09-29  Bernd Schmidt  <bernds@codesourcery.com>
 
 	* opcode/tic6x-control-registers.h (tscl): Now read_write.
