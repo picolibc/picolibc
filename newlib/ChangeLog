@@ -1,3 +1,9 @@
+2010-10-06  Eric Blake  <eblake@redhat.com>
+
+	* lib/str-two-way.h (two_way_long_needle): Avoid bug with long
+	periodic needle having false positive.  Affects memmem, strstr,
+	strcasestr.
+
 2010-09-21  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/string/memcpy.c: Do not assign size_t parameter to int.
