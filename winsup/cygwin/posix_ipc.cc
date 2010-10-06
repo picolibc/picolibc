@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "shared_info.h"
 #include "thread.h"
 #include "path.h"
 #include "cygtls.h"
@@ -95,15 +96,24 @@ check_path (char *res_name, ipc_type_t type, const char *name, size_t len)
 static int
 ipc_mutex_init (HANDLE *pmtx, const char *name)
 {
-  char buf[MAX_PATH];
-  SECURITY_ATTRIBUTES sa = sec_none;
+  WCHAR buf[MAX_PATH];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
 
-  __small_sprintf (buf, "mqueue/mtx_%s", name);
-  sa.lpSecurityDescriptor = everyone_sd (CYG_MUTANT_ACCESS);
-  *pmtx = CreateMutex (&sa, FALSE, buf);
-  if (!*pmtx)
-    debug_printf ("CreateMutex: %E");
-  return *pmtx ? 0 : geterrno_from_win_error ();
+  __small_swprintf (buf, L"mqueue/mtx_%s", name);
+  RtlInitUnicodeString (&uname, buf);
+  InitializeObjectAttributes (&attr, &uname,
+			      OBJ_INHERIT | OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (),
+			      everyone_sd (CYG_MUTANT_ACCESS));
+  status = NtCreateMutant (pmtx, CYG_MUTANT_ACCESS, &attr, FALSE);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtCreateMutant: %p", status);
+      return geterrno_from_win_error (RtlNtStatusToDosError (status));
+    }
+  return 0;
 }
 
 static int
@@ -138,17 +148,27 @@ ipc_mutex_close (HANDLE mtx)
 }
 
 static int
-ipc_cond_init (HANDLE *pevt, const char *name)
+ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 {
-  char buf[MAX_PATH];
-  SECURITY_ATTRIBUTES sa = sec_none;
+  WCHAR buf[MAX_PATH];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
 
-  __small_sprintf (buf, "mqueue/evt_%s", name);
-  sa.lpSecurityDescriptor = everyone_sd (CYG_EVENT_ACCESS);
-  *pevt = CreateEvent (&sa, TRUE, FALSE, buf);
-  if (!*pevt)
-    debug_printf ("CreateEvent: %E");
-  return *pevt ? 0 : geterrno_from_win_error ();
+  __small_swprintf (buf, L"mqueue/evt_%s%c", name, sr);
+  RtlInitUnicodeString (&uname, buf);
+  InitializeObjectAttributes (&attr, &uname,
+			      OBJ_INHERIT | OBJ_OPENIF | OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (),
+			      everyone_sd (CYG_EVENT_ACCESS));
+  status = NtCreateEvent (pevt, CYG_EVENT_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtCreateEvent: %p", status);
+      return geterrno_from_win_error (RtlNtStatusToDosError (status));
+    }
+  return 0;
 }
 
 static int
@@ -175,13 +195,13 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
       timeout = (abstime->tv_sec - tv.tv_sec) * 1000;
       timeout += (abstime->tv_nsec / 1000 - tv.tv_usec) / 1000;
     }
+  ResetEvent (evt);
   if (ipc_mutex_unlock (mtx))
     return -1;
   switch (WaitForMultipleObjects (2, h, TRUE, timeout))
     {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:
-      ResetEvent (evt);
       return 0;
     case WAIT_TIMEOUT:
       ipc_mutex_lock (mtx);
@@ -295,7 +315,8 @@ struct mq_info
   unsigned long   mqi_magic;	 /* magic number if open */
   int             mqi_flags;	 /* flags for this process */
   HANDLE          mqi_lock;	 /* mutex lock */
-  HANDLE          mqi_wait;	 /* and condition variable */
+  HANDLE          mqi_waitsend;	 /* and condition variable for full queue */
+  HANDLE          mqi_waitrecv;	 /* and condition variable for empty queue */
 };
 
 #define MQI_MAGIC	0x98765432UL
@@ -383,7 +404,7 @@ again:
 	goto err;
 
       /* Allocate one mq_info{} for the queue */
-      if (!(mqinfo = (struct mq_info *) malloc (sizeof (struct mq_info))))
+      if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
 	goto err;
       mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
       mqinfo->mqi_magic = MQI_MAGIC;
@@ -417,12 +438,16 @@ again:
       msghdr = (struct msg_hdr *) &mptr[index];
       msghdr->msg_next = 0;		/* end of free list */
 
-      /* Initialize mutex & condition variable */
+      /* Initialize mutex & condition variables */
       i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
       if (i != 0)
 	goto pthreaderr;
 
-      i = ipc_cond_init (&mqinfo->mqi_wait, mqhdr->mqh_uname);
+      i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
+      if (i != 0)
+	goto pthreaderr;
+
+      i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
       if (i != 0)
 	goto pthreaderr;
 
@@ -473,7 +498,7 @@ exists:
   fd = -1;
 
   /* Allocate one mq_info{} for each open */
-  if (!(mqinfo = (struct mq_info *) malloc (sizeof (struct mq_info))))
+  if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
     goto err;
   mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
   mqinfo->mqi_magic = MQI_MAGIC;
@@ -484,7 +509,11 @@ exists:
   if (i != 0)
     goto pthreaderr;
 
-  i = ipc_cond_init (&mqinfo->mqi_wait, mqhdr->mqh_uname);
+  i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
+  if (i != 0)
+    goto pthreaderr;
+
+  i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
   if (i != 0)
     goto pthreaderr;
 
@@ -501,7 +530,15 @@ err:
   if (mptr != (int8_t *) MAP_FAILED)
     munmap((void *) mptr, (size_t) filesize);
   if (mqinfo)
-    free (mqinfo);
+    {
+      if (mqinfo->mqi_lock)
+      	ipc_mutex_close (mqinfo->mqi_lock);
+      if (mqinfo->mqi_waitsend)
+	ipc_cond_close (mqinfo->mqi_waitsend);
+      if (mqinfo->mqi_waitrecv)
+	ipc_cond_close (mqinfo->mqi_waitrecv);
+      free (mqinfo);
+    }
   if (fd >= 0)
     close (fd);
   return (mqd_t) -1;
@@ -696,7 +733,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 	}
       /* Wait for room for one message on the queue */
       while (attr->mq_curmsgs >= attr->mq_maxmsg)
-	ipc_cond_timedwait (mqinfo->mqi_wait, mqinfo->mqi_lock, abstime);
+	ipc_cond_timedwait (mqinfo->mqi_waitsend, mqinfo->mqi_lock, abstime);
     }
 
   /* nmsghdr will point to new message */
@@ -732,7 +769,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
     }
   /* Wake up anyone blocked in mq_receive waiting for a message */
   if (attr->mq_curmsgs == 0)
-    ipc_cond_signal (mqinfo->mqi_wait);
+    ipc_cond_signal (mqinfo->mqi_waitrecv);
   attr->mq_curmsgs++;
 
   ipc_mutex_unlock (mqinfo->mqi_lock);
@@ -803,7 +840,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
       /* Wait for a message to be placed onto queue */
       mqhdr->mqh_nwait++;
       while (attr->mq_curmsgs == 0)
-	ipc_cond_timedwait (mqinfo->mqi_wait, mqinfo->mqi_lock, abstime);
+	ipc_cond_timedwait (mqinfo->mqi_waitrecv, mqinfo->mqi_lock, abstime);
       mqhdr->mqh_nwait--;
     }
 
@@ -823,7 +860,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
 
   /* Wake up anyone blocked in mq_send waiting for room */
   if (attr->mq_curmsgs == attr->mq_maxmsg)
-    ipc_cond_signal (mqinfo->mqi_wait);
+    ipc_cond_signal (mqinfo->mqi_waitsend);
   attr->mq_curmsgs--;
 
   ipc_mutex_unlock (mqinfo->mqi_lock);
@@ -878,7 +915,8 @@ mq_close (mqd_t mqd)
     return -1;
 
   mqinfo->mqi_magic = 0;          /* just in case */
-  ipc_cond_close (mqinfo->mqi_wait);
+  ipc_cond_close (mqinfo->mqi_waitsend);
+  ipc_cond_close (mqinfo->mqi_waitrecv);
   ipc_mutex_close (mqinfo->mqi_lock);
   free (mqinfo);
   return 0;

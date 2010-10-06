@@ -1,3 +1,19 @@
+2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix_ipc.cc (ipc_mutex_init): Call NtCreateMutant to make sure the
+	access mask is correct.
+	(ipc_cond_init): Take additional parameter to differ between send and
+	receive event.  Call NtCreateEvent to make sure the access mask is
+	correct.
+	(ipc_cond_timedwait): Reset Event prior to calling WFMO.
+	(struct mq_info): Split mqi_wait into two events, mqi_waitsend and
+	mqi_waitrecv.
+	(mq_open): Calloc mqinfo.  Create mqi_waitsend and mqi_waitrecv events. 
+	Make sure all synchronization objects are closed in case of an error.
+	(_mq_send): Wait for mqi_waitsend event.  Signal mqi_waitrecv event.
+	(_mq_receive): Wait for mqi_waitrecv event.  Signal mqi_waitsend event.
+	(mq_close): Close mqi_waitsend and mqi_waitrecv events.
+
 2010-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (enum pathconv_arg): Remove PC_CHECK_EA.
