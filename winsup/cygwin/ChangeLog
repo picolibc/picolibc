@@ -1,3 +1,24 @@
+2010-09-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::get_stat_access): Delete.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Always check
+	executable suffix to get x-bits for .exe files also in notexec case.
+	Always reopen file when checking for file header.
+	* ntdll.h (wait_pending): Delete.
+	* path.cc (symlink_info::check_shortcut): Drop call to wait_pending
+	since file is always opened for sync IO.
+	(symlink_info::check_sysfile): Ditto.
+	(MIN_STAT_ACCESS): Remove.
+	(FULL_STAT_ACCESS): Remove.
+	(symlink_info::check): Drop access flag.  Revert to open file with
+	just read attributes access.  Reorder symlink check to check for
+	reparse points first.  Don't check reparse points for anything else,
+	even on remote drives.  Open file for GENERIC_READ when trying to
+	read shortcuts or system-bit symlinks. Accommodate dropped access
+	flag in call to path_conv_handle::set.
+	* path.h (class path_conv_handle): Drop access flag and accommodate
+	all related methods.
+
 2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (ipc_mutex_init): Call NtCreateMutant to make sure the

@@ -198,7 +198,6 @@ class fhandler_base
 
   int get_access () const { return access; }
   void set_access (int x) { access = x; }
-  int get_stat_access () const { return pc.handle () ? pc.access () : access; }
 
   int get_flags () { return openflags; }
   void set_flags (int x, int supplied_bin = 0);

@@ -1752,7 +1752,6 @@ symlink_info::check_shortcut (HANDLE h)
     buf = (char *) alloca (fsi.EndOfFile.LowPart + 1);
   status = NtReadFile (h, NULL, NULL, NULL, &io, buf, fsi.EndOfFile.LowPart,
 		       &off, NULL);
-  status = wait_pending (status, h, io);
   if (!NT_SUCCESS (status))
     {
       if (status != STATUS_END_OF_FILE)
@@ -1817,7 +1816,6 @@ symlink_info::check_sysfile (HANDLE h)
 
   status = NtReadFile (h, NULL, NULL, NULL, &io, cookie_buf,
 		       sizeof (cookie_buf), &off, NULL);
-  status = wait_pending (status, h, io);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("ReadFile1 failed %p", status);
@@ -1851,7 +1849,6 @@ symlink_info::check_sysfile (HANDLE h)
     {
       status = NtReadFile (h, NULL, NULL, NULL, &io, srcbuf,
 			   NT_MAX_PATH, &off, NULL);
-      status = wait_pending (status, h, io);
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("ReadFile2 failed");
@@ -2257,10 +2254,6 @@ restart:
   PVOID eabuf = &nfs_aol_ffei;
   ULONG easize = sizeof nfs_aol_ffei;
 
-# define MIN_STAT_ACCESS	(READ_CONTROL | FILE_READ_ATTRIBUTES)
-# define FULL_STAT_ACCESS	(SYNCHRONIZE | GENERIC_READ)
-  ACCESS_MASK access = 0;
-
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
@@ -2278,23 +2271,14 @@ restart:
 	 symlink (which would spoil the task of this method quite a bit).
 	 Fortunately it's ignored on most other file systems so we don't have
 	 to special case NFS too much. */
-      status = NtCreateFile (&h, access = FULL_STAT_ACCESS, &attr, &io, NULL,
-			     0, FILE_SHARE_VALID_FLAGS, FILE_OPEN,
+      status = NtCreateFile (&h,
+			     READ_CONTROL | FILE_READ_ATTRIBUTES | FILE_READ_EA,
+			     &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
+			     FILE_OPEN,
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
-      if (status == STATUS_ACCESS_DENIED && eabuf)
-	{
-	  status = NtCreateFile (&h, access = MIN_STAT_ACCESS | FILE_READ_EA,
-				 &attr, &io, NULL, 0, FILE_SHARE_VALID_FLAGS,
-				 FILE_OPEN,
-				 FILE_OPEN_REPARSE_POINT
-				 | FILE_OPEN_FOR_BACKUP_INTENT,
-				 eabuf, easize);
-	  debug_printf ("%p = NtCreateFile (2:%S)", status, &upath);
-	}
-      else
-	debug_printf ("%p = NtCreateFile (1:%S)", status, &upath);
+      debug_printf ("%p = NtCreateFile (%S)", status, &upath);
       /* No right to access EAs or EAs not supported? */
       if (!NT_SUCCESS (status)
 	  && (status == STATUS_ACCESS_DENIED
@@ -2314,20 +2298,11 @@ restart:
 	      eabuf = NULL;
 	      easize = 0;
 	    }
-	  status = NtOpenFile (&h, access = FULL_STAT_ACCESS, &attr, &io,
-			       FILE_SHARE_VALID_FLAGS,
+	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  if (status == STATUS_ACCESS_DENIED)
-	    {
-	      status = NtOpenFile (&h, access = MIN_STAT_ACCESS, &attr, &io,
-				   FILE_SHARE_VALID_FLAGS,
-				   FILE_OPEN_REPARSE_POINT
-				   | FILE_OPEN_FOR_BACKUP_INTENT);
-	      debug_printf ("%p = NtOpenFile (no-EAs 2:%S)", status, &upath);
-	    }
-	  else
-	    debug_printf ("%p = NtOpenFile (no-EA 1:%S)", status, &upath);
+	  debug_printf ("%p = NtOpenFile (no-EAs %S)", status, &upath);
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
@@ -2559,54 +2534,21 @@ restart:
 
       res = -1;
 
-      /* Windows shortcuts are potentially treated as symlinks.  Valid Cygwin
-	 & U/WIN shortcuts are R/O, but definitely not directories. */
-      if ((fileattr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY))
-	  == FILE_ATTRIBUTE_READONLY && suffix.lnk_match ())
-	{
-	  if (!(access & GENERIC_READ))
-	    res = 0;
-	  else
-	    res = check_shortcut (h);
-	  if (!res)
-	    {
-	      /* If searching for `foo' and then finding a `foo.lnk' which is
-		 no shortcut, return the same as if file not found. */
-	      if (ext_tacked_on)
-		{
-		  fileattr = INVALID_FILE_ATTRIBUTES;
-		  set_error (ENOENT);
-		  continue;
-		}
-	    }
-	  else if (contents[0] != ':' || contents[1] != '\\'
-		   || !parse_device (contents))
-	    break;
-	}
-
-      /* If searching for `foo' and then finding a `foo.lnk' which is
-	 no shortcut, return the same as if file not found. */
-      else if (suffix.lnk_match () && ext_tacked_on)
-        {
-	  fileattr = INVALID_FILE_ATTRIBUTES;
-	  set_error (ENOENT);
-	  continue;
-	}
-
       /* Reparse points are potentially symlinks.  This check must be
 	 performed before checking the SYSTEM attribute for sysfile
 	 symlinks, since reparse points can have this flag set, too.
 	 For instance, Vista starts to create a couple of reparse points
-	 with SYSTEM and HIDDEN flags set.
-	 Also don't check reparse points on remote filesystems.
-	 A reparse point pointing to another file on the remote system will be
-	 mistreated as pointing to a local file on the local system.  This
-	 breaks the way reparse points are transparently handled on remote
-	 systems. */
-      else if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT)
-	       && !fs.is_remote_drive())
+	 with SYSTEM and HIDDEN flags set. */
+      if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT))
 	{
-	  res = check_reparse_point (h);
+	  /* Don't check reparse points on remote filesystems.  A reparse point
+	     pointing to another file on the remote system will be mistreated
+	     as pointing to a local file on the local system.  This breaks the
+	     way reparse points are transparently handled on remote systems. */
+	  if (fs.is_remote_drive())
+	    res = 0;
+	  else
+	    res = check_reparse_point (h);
 	  if (res == -1)
 	    {
 	      /* Volume mount point.  The filesystem information for the top
@@ -2630,16 +2572,69 @@ restart:
 	    }
 	}
 
+      /* Windows shortcuts are potentially treated as symlinks.  Valid Cygwin
+	 & U/WIN shortcuts are R/O, but definitely not directories. */
+      else if ((fileattr & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_DIRECTORY))
+	  == FILE_ATTRIBUTE_READONLY && suffix.lnk_match ())
+	{
+	  HANDLE sym_h;
+
+	  status = NtOpenFile (&sym_h, SYNCHRONIZE | GENERIC_READ, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_SYNCHRONOUS_IO_NONALERT);
+	  if (!NT_SUCCESS (status))
+	    res = 0;
+	  else
+	    {
+	      res = check_shortcut (sym_h);
+	      NtClose (sym_h);
+	    }
+	  if (!res)
+	    {
+	      /* If searching for `foo' and then finding a `foo.lnk' which
+		 is no shortcut, return the same as if file not found. */
+	      if (ext_tacked_on)
+		{
+		  fileattr = INVALID_FILE_ATTRIBUTES;
+		  set_error (ENOENT);
+		  continue;
+		}
+	    }
+	  else if (contents[0] != ':' || contents[1] != '\\'
+		   || !parse_device (contents))
+	    break;
+	}
+
+      /* If searching for `foo' and then finding a `foo.lnk' which is
+	 no shortcut, return the same as if file not found. */
+      else if (suffix.lnk_match () && ext_tacked_on)
+        {
+	  fileattr = INVALID_FILE_ATTRIBUTES;
+	  set_error (ENOENT);
+	  continue;
+	}
+
       /* This is the old Cygwin method creating symlinks.  A symlink will
 	 have the `system' file attribute.  Only files can be symlinks
 	 (which can be symlinks to directories). */
       else if ((fileattr & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY))
 	       == FILE_ATTRIBUTE_SYSTEM)
 	{
-	  if (!(access & GENERIC_READ))
+	  HANDLE sym_h;
+
+	  status = NtOpenFile (&sym_h, SYNCHRONIZE | GENERIC_READ, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT
+			       | FILE_SYNCHRONOUS_IO_NONALERT);
+
+	  if (!NT_SUCCESS (status))
 	    res = 0;
 	  else
-	    res = check_sysfile (h);
+	    {
+	      res = check_sysfile (sym_h);
+	      NtClose (sym_h);
+	    }
 	  if (res)
 	    break;
 	}
@@ -2665,7 +2660,7 @@ restart:
   if (h)
     {
       if (pflags & PC_KEEP_HANDLE)
-	conv_hdl.set (h, access);
+	conv_hdl.set (h);
       else
 	NtClose (h);
     }

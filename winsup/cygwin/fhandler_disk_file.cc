@@ -591,7 +591,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	{
 	  buf->st_mode |= S_IFREG;
 	  /* Check suffix for executable file. */
-	  if (pc.exec_state () == dont_know_if_executable)
+	  if (pc.exec_state () != is_executable)
 	    {
 	      PUNICODE_STRING path = pc.get_nt_native_path ();
 
@@ -604,34 +604,28 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	     shebang scripts. */
 	  if (pc.exec_state () == dont_know_if_executable)
 	    {
-	      LARGE_INTEGER off = { QuadPart:0LL };
-	      char magic[3];
+	      OBJECT_ATTRIBUTES attr;
 	      NTSTATUS status = 0;
 	      IO_STATUS_BLOCK io;
-	      bool opened = false;
 
-	      if (h == get_handle ())
+	      /* We have to re-open the file.  Either the file is not opened
+	      	 for reading, or the read will change the file position of the
+		 original handle. */
+	      pc.init_reopen_attr (&attr, h);
+	      status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
+				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_OPEN_FOR_BACKUP_INTENT
+				   | FILE_SYNCHRONOUS_IO_NONALERT);
+	      if (!NT_SUCCESS (status))
+		debug_printf ("%p = NtOpenFile(%S)", status,
+			      pc.get_nt_native_path ());
+	      else
 		{
-		  /* We have been opened via fstat.  We have to re-open the
-		     file.  Either the file is not opened for reading, or the
-		     read will change the file position. */
-		  OBJECT_ATTRIBUTES attr;
-		  pc.init_reopen_attr (&attr, h);
-		  status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
-				       &attr, &io, FILE_SHARE_VALID_FLAGS,
-				       FILE_OPEN_FOR_BACKUP_INTENT
-				       | FILE_OPEN_REPARSE_POINT);
-		  if (!NT_SUCCESS (status))
-		    debug_printf ("%p = NtOpenFile(%S)", status,
-				  pc.get_nt_native_path ());
-		  else
-		    opened = true;
-		}
-	      if (NT_SUCCESS (status))
-		{
+		  LARGE_INTEGER off = { QuadPart:0LL };
+		  char magic[3];
+
 		  status = NtReadFile (h, NULL, NULL, NULL,
 				       &io, magic, 3, &off, NULL);
-		  status = wait_pending (status, h, io);
 		  if (!NT_SUCCESS (status))
 		    debug_printf ("%p = NtReadFile(%S)", status,
 				  pc.get_nt_native_path ());
@@ -641,9 +635,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
+		  NtClose (h);
 		}
-	      if (opened)
-		NtClose (h);
 	    }
 	}
       if (pc.exec_state () == is_executable)
