@@ -51,6 +51,11 @@
 	* configure.ac: Fix unportable shell quoting.
 	* configure: Regenerate.
 
+2010-07-26  Naveen.H.S  <naveen.S@kpitcummins.com>
+
+	* configure.ac: Support all v850 targets.
+	* configure: Regenerate.
+
 2010-07-17  Jack Howarth  <howarth@bromo.med.uc.edu>
 
 	PR target/44862
