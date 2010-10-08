@@ -38,7 +38,7 @@
           w &= 0x80000000;
           if (exponent_less_127 == -1)
             /* Result is +1.0 or -1.0. */
-            w |= (127 << 23);
+            w |= ((__uint32_t)127 << 23);
         }
       else
         {

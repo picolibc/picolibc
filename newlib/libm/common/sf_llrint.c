@@ -71,7 +71,7 @@ TWO23[2]={
           GET_FLOAT_WORD (i0, t);
           /* Detect the all-zeros representation of plus and
              minus zero, which fails the calculation below. */
-          if ((i0 & ~(1 << 31)) == 0)
+          if ((i0 & ~((__uint32_t)1 << 31)) == 0)
               return 0;
           j0 = ((i0 >> 23) & 0xff) - 0x7f;
           i0 &= 0x7fffff;
