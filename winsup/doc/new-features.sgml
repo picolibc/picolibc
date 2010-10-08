@@ -16,7 +16,16 @@ GNU C Library manual</ulink> for full details of this functionality.
 </para></listitem>
 
 <listitem><para>
-/proc/sys allows to access the native NT namespace.
+Support for the C99 complex functions, except for the "long double"
+implementations.  New APIs: cacos, cacosf, cacosh, cacoshf, carg, cargf, casin,
+casinf, casinh, casinhf, catan, catanf, catanh, catanhf, ccos, ccosf, ccosh,
+ccoshf, cexp, cexpf, cimag, cimagf, clog, clogf, conj, conjf, cpow, cpowf,
+cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf, csqrt, csqrtf, ctan,
+ctanf, ctanh, ctanhf.
+</para></listitem>
+
+<listitem><para>
+Drop support for Windows NT4 prior to Service Pack 4.
 </para></listitem>
 
 <listitem><para>
