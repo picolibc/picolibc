@@ -8,17 +8,17 @@ else
 MATHDIR = math
 endif
 
-SUBDIRS = $(MATHDIR) common machine
+SUBDIRS = $(MATHDIR) common complex machine 
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
-SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
+SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) complex/libcomplex.$(aext)  $(LIBM_MACHINE_LIB)
 noinst_LTLIBRARIES = libm.la
 libm_la_SOURCES =
 libm_la_LIBADD = $(SUBLIBS)
 else
-SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
+SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) $(LIBM_MACHINE_LIB)
 noinst_LIBRARIES = libm.a
 libm.a: $(SUBLIBS)
 	rm -f $@

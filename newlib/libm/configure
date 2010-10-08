@@ -12774,7 +12774,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile math/Makefile mathfp/Makefile common/Makefile"
+ac_config_files="$ac_config_files Makefile math/Makefile mathfp/Makefile common/Makefile complex/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13765,6 +13765,7 @@ do
     "math/Makefile") CONFIG_FILES="$CONFIG_FILES math/Makefile" ;;
     "mathfp/Makefile") CONFIG_FILES="$CONFIG_FILES mathfp/Makefile" ;;
     "common/Makefile") CONFIG_FILES="$CONFIG_FILES common/Makefile" ;;
+    "complex/Makefile") CONFIG_FILES="$CONFIG_FILES complex/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

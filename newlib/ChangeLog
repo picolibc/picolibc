@@ -1,3 +1,13 @@
+2010-10-08  Marco Atzeri  <marco_atzeri@yahoo.it>
+
+	* libc/include/complex.h: New complex header.
+	* libm/common/fdlibm.h: Added ifdef _COMPLEX_H.
+	* libm/complex/*: New complex functions imported from NetBSD.
+	* libm/Makefile.am: Added complex subdir.
+	* libm/Makefile.in: Regenerate.
+	* libm/configure.in: Added complex subdir.
+	* libm/configure: Regenerate.
+
 2010-10-06  Eric Blake  <eblake@redhat.com>
 
 	* lib/str-two-way.h (two_way_long_needle): Avoid bug with long

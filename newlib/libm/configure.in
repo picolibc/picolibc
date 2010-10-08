@@ -62,5 +62,5 @@ fi
 
 AC_SUBST(LIBM_MACHINE_LIB)
 
-AC_CONFIG_FILES([Makefile math/Makefile mathfp/Makefile common/Makefile])
+AC_CONFIG_FILES([Makefile math/Makefile mathfp/Makefile common/Makefile complex/Makefile])
 AC_OUTPUT

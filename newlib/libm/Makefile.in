@@ -62,10 +62,12 @@ libm_a_OBJECTS = libm.$(OBJEXT)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 @USE_LIBTOOL_FALSE@am__DEPENDENCIES_2 = $(MATHDIR)/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	common/lib.$(aext) $(am__DEPENDENCIES_1)
+@USE_LIBTOOL_FALSE@	common/lib.$(aext) complex/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1)
 @USE_LIBTOOL_TRUE@am__DEPENDENCIES_2 =  \
 @USE_LIBTOOL_TRUE@	$(MATHDIR)/lib$(MATHDIR).$(aext) \
 @USE_LIBTOOL_TRUE@	common/libcommon.$(aext) \
+@USE_LIBTOOL_TRUE@	complex/libcomplex.$(aext) \
 @USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1)
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libm_la_OBJECTS =
@@ -138,7 +140,7 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	$(RECURSIVE_CLEAN_TARGETS:-recursive=) tags TAGS ctags CTAGS
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = math mathfp common machine
+DIST_SUBDIRS = math mathfp common complex machine
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -196,6 +198,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -267,10 +270,10 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 @NEWLIB_HW_FP_FALSE@MATHDIR = math
 @NEWLIB_HW_FP_TRUE@MATHDIR = mathfp
-SUBDIRS = $(MATHDIR) common machine
+SUBDIRS = $(MATHDIR) common complex machine 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_FALSE@SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_TRUE@SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_TRUE@SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) complex/libcomplex.$(aext)  $(LIBM_MACHINE_LIB)
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libm.la
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
