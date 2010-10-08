@@ -1,3 +1,7 @@
+2010-10-08  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libm/complex/complex.tex: Add empty stub.
+
 2010-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libm/math/w_cabs.c: Delete.
