@@ -1,3 +1,11 @@
+2010-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libm/math/w_cabs.c: Delete.
+	* libm/math/wf_cabs.c: Delete.
+	* libm/math/Makefile.am (src): Remove w_cabs.c.
+	(fsrc): Remove wf_cabs.c.
+	* libm/math/Makefile.in: Regenerate.
+
 2010-10-08  Marco Atzeri  <marco_atzeri@yahoo.it>
 
 	* libc/include/complex.h: New complex header.
