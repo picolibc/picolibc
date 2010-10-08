@@ -164,17 +164,37 @@ cabs NOSIGFE
 _cabs = cabs NOSIGFE
 cabsf NOSIGFE
 _cabsf = cabsf NOSIGFE
+cacos NOSIGFE
+cacosf NOSIGFE
+cacosh NOSIGFE
+cacoshf NOSIGFE
 calloc SIGFE
 _calloc = calloc SIGFE
 canonicalize_file_name SIGFE
+carg NOSIGFE
+cargf NOSIGFE
+casin NOSIGFE
+casinf NOSIGFE
+casinh NOSIGFE
+casinhf NOSIGFE
+catan NOSIGFE
+catanf NOSIGFE
+catanh NOSIGFE
+catanhf NOSIGFE
 cbrt NOSIGFE
 _cbrt = cbrt NOSIGFE
 cbrtf NOSIGFE
 _cbrtf = cbrtf NOSIGFE
+ccos NOSIGFE
+ccosf NOSIGFE
+ccosh NOSIGFE
+ccoshf NOSIGFE
 ceil NOSIGFE
 _ceil = ceil NOSIGFE
 ceilf NOSIGFE
 _ceilf = ceilf NOSIGFE
+cexp NOSIGFE
+cexpf NOSIGFE
 cfgetispeed NOSIGFE
 cfgetospeed NOSIGFE
 cfmakeraw NOSIGFE
@@ -189,6 +209,8 @@ _chown = chown SIGFE
 _chown32 = chown32 SIGFE
 chroot SIGFE
 _chroot = chroot SIGFE
+cimag NOSIGFE
+cimagf NOSIGFE
 cleanup_glue NOSIGFE
 clearerr SIGFE
 _clearerr = clearerr SIGFE
@@ -197,12 +219,16 @@ _clock = clock SIGFE
 clock_getres SIGFE
 clock_gettime SIGFE
 clock_setres SIGFE
+clog NOSIGFE
+clogf NOSIGFE
 close SIGFE
 _close = close SIGFE
 closedir SIGFE
 _closedir = closedir SIGFE
 closelog SIGFE
 confstr NOSIGFE
+conj NOSIGFE
+conjf NOSIGFE
 connect = cygwin_connect SIGFE
 copysign NOSIGFE
 _copysign = copysign NOSIGFE
@@ -216,8 +242,24 @@ cosh NOSIGFE
 _cosh = cosh NOSIGFE
 coshf NOSIGFE
 _coshf = coshf NOSIGFE
+cpow NOSIGFE
+cpowf NOSIGFE
+cproj NOSIGFE
+cprojf NOSIGFE
+creal NOSIGFE
+crealf NOSIGFE
 creat SIGFE
 _creat = creat SIGFE
+csin NOSIGFE
+csinf NOSIGFE
+csinh NOSIGFE
+csinhf NOSIGFE
+csqrt NOSIGFE
+csqrtf NOSIGFE
+ctan NOSIGFE
+ctanf NOSIGFE
+ctanh NOSIGFE
+ctanhf NOSIGFE
 ctermid SIGFE
 ctime SIGFE
 _ctime = ctime SIGFE

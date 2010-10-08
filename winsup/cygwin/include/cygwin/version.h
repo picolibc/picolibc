@@ -391,12 +391,17 @@ details. */
       229: Add mkostemp, mkostemps.
       230: Add CLOCK_MONOTONIC.
       231: Add fenv.h functions.
+      232: Export cacos, cacosf, cacosh, cacoshf, carg, cargf, casin, casinf,
+	   casinh, casinhf, catan, catanf, catanh, catanhf, ccos, ccosf, ccosh,
+	   ccoshf, cexp, cexpf, cimag, cimagf, clog, clogf, conj, conjf, cpow,
+	   cpowf, cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf,
+	   csqrt, csqrtf, ctan, ctanf, ctanh, ctanhf.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 231
+#define CYGWIN_VERSION_API_MINOR 232
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,3 +1,11 @@
+2010-09-08  Marco Atzeri  <marco_atzeri@yahoo.it>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export new complex math functions from newlib.
+	* posix.sgml: Move newly exported complex functions to implemented
+	SUSv4 functions.
+	* include/cygwin/version.h: Bump API minor version.
+
 2010-09-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::get_stat_access): Delete.

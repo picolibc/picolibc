@@ -49,14 +49,35 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     btowc
     cabs
     cabsf
+    cacos
+    cacosf
+    cacosh
+    cacoshf
     calloc
+    carg
+    cargf
+    casin
+    casinf
+    casinh
+    casinhf
+    casinhl
+    catan
+    catanf
+    catanh
+    catanhf
     catclose 			(available in external "catgets" library)
     catgets  			(available in external "catgets" library)
     catopen  			(available in external "catgets" library)
     cbrt
     cbrtf
+    ccos
+    ccosf
+    ccosh
+    ccoshf
     ceil
     ceilf
+    cexp
+    cexpf
     cfgetispeed
     cfgetospeed
     cfsetispeed
@@ -65,15 +86,21 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     chmod
     chown
     chroot			(see chapter "Implementation Notes")
+    cimag
+    cimagf
     clearerr
     clock
     clock_getres		(see chapter "Implementation Notes")
     clock_gettime		(see chapter "Implementation Notes")
     clock_setres		(see chapter "Implementation Notes")
+    clog
+    clogf
     close
     closedir
     closelog
     confstr
+    conj
+    conjf
     connect
     copysign
     copysignf
@@ -81,8 +108,24 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     cosf
     cosh
     coshf
+    cpow
+    cpowf
+    cproj
+    cprojf
+    creal
+    crealf
     creat
     crypt			(available in external "crypt" library)
+    csin
+    csinf
+    csinh
+    csinhf
+    csqrt
+    csqrtf
+    ctan
+    ctanf
+    ctanh
+    ctanhf
     ctermid
     ctime
     ctime_r
@@ -1214,73 +1257,30 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     atanl
     bsd_signal
     cabsl
-    cacos
-    cacosf
-    cacosh
-    cacoshf
     cacoshl
     cacosl
-    carg
-    cargf
     cargl
-    casin
-    casinf
-    casinh
-    casinhf
-    casinhl
     casinl
-    catan
-    catanf
-    catanh
-    catanhf
     catanhl
     catanl
     cbrtl
-    ccos
-    ccosf
-    ccosh
-    ccoshf
     ccoshl
     ccosl
     ceill
-    cexp
-    cexpf
     cexpl
-    cimag
-    cimagf
     cimagl
     clock_getcpuclockid
-    clog
-    clogf
     clogl
-    conj
-    conjf
     conjl
     copysignl
     coshl
     cosl
-    cpow
-    cpowf
     cpowl
-    cproj
-    cprojf
     cprojl
-    creal
-    crealf
     creall
-    csin
-    csinf
-    csinh
-    csinhf
     csinhl
     csinl
-    csqrt
-    csqrtf
     csqrtl
-    ctan
-    ctanf
-    ctanh
-    ctanhf
     ctanhl
     ctanl
     duplocale
