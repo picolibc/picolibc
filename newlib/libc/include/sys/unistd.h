@@ -94,7 +94,7 @@ pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__rtems__)
 pid_t   _EXFUN(getsid, (pid_t));
 #endif
 #if !defined(__INSIDE_CYGWIN__)
@@ -146,7 +146,7 @@ int	_EXFUN(ruserok, (const char *rhost, int superuser, const char *ruser, const 
 #endif
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
 #if !defined(__INSIDE_CYGWIN__)
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(setegid, (gid_t __gid ));
 int     _EXFUN(seteuid, (uid_t __uid ));
 #endif

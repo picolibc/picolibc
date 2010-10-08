@@ -1,5 +1,9 @@
 2010-10-08  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
+	* libc/include/sys/unistd.h: Declare getsid, setegid, seteuid for RTEMS.
+
+2010-10-08  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
 	* libm/common/sf_llrint.c, libm/common/sf_round.c: Add explicit casts
 	to __uint32_t to avoid overflows on implicit casts.
 
