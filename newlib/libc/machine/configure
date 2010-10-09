@@ -862,6 +862,7 @@ sh
 sparc
 spu
 tic4x
+tic6x
 tic80
 v850
 w65
@@ -12393,7 +12394,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12396 "configure"
+#line 12397 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12499,7 +12500,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12502 "configure"
+#line 12503 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12811,6 +12812,8 @@ subdirs="$subdirs a29k"
 	spu) subdirs="$subdirs spu"
  ;;
 	tic4x) subdirs="$subdirs tic4x"
+ ;;
+	tic6x) subdirs="$subdirs tic6x"
  ;;
 	tic80) subdirs="$subdirs tic80"
  ;;

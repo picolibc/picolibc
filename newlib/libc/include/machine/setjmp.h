@@ -174,6 +174,10 @@ _BEGIN_STD_C
 #define _JBLEN 9
 #endif
 
+#ifdef __TMS320C6X__
+#define _JBLEN 13
+#endif
+
 #ifdef __TIC80__
 #define _JBLEN 13
 #endif

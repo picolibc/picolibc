@@ -249,6 +249,9 @@ case "${host_cpu}" in
   tic4x|c4x)
 	machine_dir=tic4x
 	;;
+  tic6x)
+	machine_dir=tic6x
+	;;
   tic80*)
 	machine_dir=tic80
 	;;
@@ -495,6 +498,10 @@ case "${host}" in
 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
 	  have_crt0="no"
 	fi
+	;;
+  tic6x*)
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	have_crt0="no"
 	;;
   tic80*)
 	sys_dir=tic80
@@ -761,6 +768,9 @@ case "${host}" in
 #         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
+	;;
+  tic6x*)
+	syscall_dir=
 	;;
   tic80*)
 	syscall_dir=syscalls

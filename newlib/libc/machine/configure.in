@@ -58,6 +58,7 @@ if test -n "${machine_dir}"; then
 	sparc) AC_CONFIG_SUBDIRS(sparc) ;;
 	spu) AC_CONFIG_SUBDIRS(spu) ;;
 	tic4x) AC_CONFIG_SUBDIRS(tic4x) ;;
+	tic6x) AC_CONFIG_SUBDIRS(tic6x) ;;
 	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
 	v850) AC_CONFIG_SUBDIRS(v850) ;;
 	w65) AC_CONFIG_SUBDIRS(w65) ;;

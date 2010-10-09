@@ -166,6 +166,14 @@
 #define _DOUBLE_IS_32BITS
 #endif
 
+#ifdef __TMS320C6X__
+#ifdef _BIG_ENDIAN
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
 #ifdef __TIC80__
 #define __IEEE_LITTLE_ENDIAN
 #endif
