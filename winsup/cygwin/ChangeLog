@@ -1,4 +1,4 @@
-2010-09-08  John Carey  <aeolus@electric-cloud.com>
+2010-09-09  John Carey  <aeolus@electric-cloud.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cwdstuff::override_win32_cwd): Declare.
