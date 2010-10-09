@@ -129,6 +129,10 @@ case "${target}" in
 	config_testsuite=false
 	config_libnosys=false
 	;;
+  tic6x-*-*)
+	AC_CONFIG_SUBDIRS(tic6x)
+	config_testsuite=false
+	;;
   iq2000-*-*)
 	AC_CONFIG_SUBDIRS([iq2000])
 	;;

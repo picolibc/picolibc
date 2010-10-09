@@ -1,3 +1,12 @@
+2010-10-08  Bernd Schmidt  <bernds@codesourcery.com>
+	Joseph Myers  <joseph@codesourcery.com>
+
+	* configure.in: Handle tic6x targets.
+	* configure: Regenerate.
+	* tic6x/Makefile.in, tic6x/configure.in, tic6x/crt0.S,
+	tic6x/getpid.c, tic6x/kill.c, tic6x/sbrk.c, tic6x/syscalls.c: New.
+	* tic6x/configure: New (generated).
+
 2010-10-02  Anthony Green  <green@moxielogic.com>
 
 	* moxie/Makefile.in (QEMU_OBJS): Add missing object files to the
