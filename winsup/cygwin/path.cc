@@ -3353,10 +3353,282 @@ cygwin_split_path (const char *path, char *dir, char *file)
 
 /*****************************************************************************/
 
-static inline PRTL_USER_PROCESS_PARAMETERS
-get_user_proc_parms ()
+/* The find_fast_cwd_pointers function and parts of the
+   cwdstuff::override_win32_cwd method are based on code using the
+   following license:
+
+   Copyright 2010 John Carey. All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+      1. Redistributions of source code must retain the above
+      copyright notice, this list of conditions and the following
+      disclaimer.
+
+      2. Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+   THIS SOFTWARE IS PROVIDED BY JOHN CAREY ``AS IS'' AND ANY EXPRESS
+   OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL JOHN CAREY OR CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+   OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+   BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+   USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE. */
+
+/* This structure is used to store the CWD starting with Windows Vista.
+   The CWD storage in the RTL_USER_PROCESS_PARAMETERS block is only
+   an afterthought now.  The actual CWD storage is a FAST_CWD structure
+   which is allocated on the process heap.  The new method only requires
+   minimal locking and it's much more multi-thread friendly.  Presumably
+   it minimizes contention when accessing the CWD. */
+typedef struct _FAST_CWD {
+  LONG           ReferenceCount;	/* Only release when this is 0. */
+  HANDLE         DirectoryHandle;
+  ULONG          OldDismountCount;	/* Reflects the system DismountCount
+					   at the time the CWD has been set. */
+  UNICODE_STRING Path;			/* Path's Buffer member always refers
+					   to the following Buffer array. */
+  WCHAR          Buffer[MAX_PATH];
+} FAST_CWD, *PFAST_CWD;
+
+/* fast_cwd_ptr is a pointer to the global pointer in ntdll.dll pointing
+   to the FAST_CWD structure which constitutes the CWD.
+
+   We put the pointer into the common shared DLL segment.  This allows to
+   restrict the call to find_fast_cwd_pointers() to once per Cygwin session
+   per user session.  This works, because ASLR randomizes the load address
+   of DLLs only once at boot time. */
+static PFAST_CWD *fast_cwd_ptr
+  __attribute__((section (".cygwin_dll_common"), shared)) = (PFAST_CWD *) -1;
+
+/* This is the mapping of the KUSER_SHARED_DATA structure into the 32 bit
+   user address space.  We need it here to access the current DismountCount. */
+static KUSER_SHARED_DATA &SharedUserData
+			 = *(volatile PKUSER_SHARED_DATA) 0x7ffe0000;
+
+#define peek32(x)	(*(uint32_t *)(x))
+
+/* This function scans the code in ntdll.dll to find the address of the
+   global variable used to access the CWD starting with Vista.  While the
+   pointer is global, it's not exported from the DLL, unfortunately.
+   Therefore we have to use some knowledge to figure out the address.
+
+   This code has been tested on Vista 32/64 bit, Server 2008 32/64 bit,
+   Windows 7 32/64 bit, and Server 2008 R2 (which is only 64 bit anyway).
+   There's some hope that this will still work for Windows 8... */
+static void
+find_fast_cwd_pointers ()
 {
-  return NtCurrentTeb ()->Peb->ProcessParameters;
+  /* Note that we have been called. */
+  fast_cwd_ptr = NULL;
+  /* Fetch entry points of relevant functions in ntdll.dll. */
+  HMODULE ntdll = GetModuleHandle ("ntdll.dll");
+  if (!ntdll)
+    return;
+  const uint8_t *get_dir = (const uint8_t *)
+			   GetProcAddress (ntdll, "RtlGetCurrentDirectory_U");
+  const uint8_t *ent_crit = (const uint8_t *)
+			    GetProcAddress (ntdll, "RtlEnterCriticalSection");
+  if (!get_dir || !ent_crit)
+    return;
+  /* Search first relative call instruction in RtlGetCurrentDirectory_U. */
+  const uint8_t *rcall = (const uint8_t *) memchr (get_dir, 0xe8, 32);
+  if (!rcall)
+    return;
+  /* Fetch offset from instruction and compute address of called function.
+     This function actually fetches the current FAST_CWD instance and
+     performs some other actions, not important to us. */
+  ptrdiff_t offset = (ptrdiff_t) peek32 (rcall + 1);
+  const uint8_t *use_cwd = rcall + 5 + offset;
+  /* Find first "push edi" instruction. */
+  const uint8_t *pushedi = (const uint8_t *) memchr (use_cwd, 0x57, 32);
+  /* ...which should be followed by "mov edi, crit-sect-addr" then
+     "push edi". */
+  const uint8_t *movedi = pushedi + 1;
+  if (movedi[0] != 0xbf || movedi[5] != 0x57)
+    return;
+  /* Compare the address used for the critical section with the known
+     PEB lock as stored in the PEB. */
+  if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
+      != NtCurrentTeb ()->Peb->FastPebLock)
+    return;
+  /* To check we are seeing the right code, we check our expectation that
+     the next instruction is a relative call into RtlEnterCriticalSection. */
+  rcall = movedi + 6;
+  if (rcall[0] != 0xe8)
+    return;
+  /* Check that this is a relative call to RtlEnterCriticalSection. */
+  offset = (ptrdiff_t) peek32 (rcall + 1);
+  if (rcall + 5 + offset != ent_crit)
+    return;
+  /* After locking the critical section, the code should read the global
+     PFAST_CWD * pointer that is guarded by that critical section. */
+  const uint8_t *movesi = rcall + 5;
+  if (movesi[0] != 0x8b)
+    return;
+  fast_cwd_ptr = (PFAST_CWD *) peek32 (movesi + 2);
+#ifdef DEBUGGING
+  system_printf ("fast_cwd_ptr: %p", fast_cwd_ptr);
+#endif
+}
+
+static inline void
+copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
+{
+  RtlCopyUnicodeString (tgt, src);
+  if (tgt->Buffer[tgt->Length / sizeof (WCHAR) - 1] != L'\\')
+    {
+      tgt->Buffer[tgt->Length / sizeof (WCHAR)] = L'\\';
+      tgt->Length += sizeof (WCHAR);
+    }
+}
+
+void
+cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
+{
+  NTSTATUS status;
+  HANDLE h = NULL;
+
+  PEB &peb = *NtCurrentTeb ()->Peb;
+  UNICODE_STRING &upp_cwd_str = peb.ProcessParameters->CurrentDirectoryName;
+  HANDLE &upp_cwd_hdl = peb.ProcessParameters->CurrentDirectoryHandle;
+
+  if (wincap.has_fast_cwd ())
+    {
+      if (fast_cwd_ptr == (PFAST_CWD *) -1)
+	{
+	  find_fast_cwd_pointers ();
+	  if (!fast_cwd_ptr)
+	    system_printf ("WARNING: Couldn't compute FAST_CWD pointer.  "
+			   "Please report this problem to\nthe public mailing "
+			   "list cygwin@cygwin.com");
+	}
+      if (fast_cwd_ptr)
+	{
+	  /* Default method starting with Vista.  If we got a valid value for
+	     fast_cwd_ptr, we can simply replace the RtlSetCurrentDirectory_U
+	     function entirely, just as on pre-Vista. */
+	  PVOID heap = peb.ProcessHeap;
+	  /* First allocate a new FAST_CWD strcuture on the heap. */
+	  PFAST_CWD f_cwd = (PFAST_CWD)
+			    RtlAllocateHeap (heap, 0, sizeof (FAST_CWD));
+	  if (!f_cwd)
+	    {
+	      debug_printf ("RtlAllocateHeap failed");
+	      return;
+	    }
+	  /* Fill in the values. */
+	  f_cwd->ReferenceCount = 1;
+	  f_cwd->DirectoryHandle = dir;
+	  f_cwd->OldDismountCount = old_dismount_count;
+	  RtlInitEmptyUnicodeString (&f_cwd->Path, f_cwd->Buffer,
+				     MAX_PATH * sizeof (WCHAR));
+	  copy_cwd_str (&f_cwd->Path, error ? &ro_u_pipedir : &win32);
+	  /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
+	     structure and writing the CWD to the user process parameter
+	     block.  This is equivalent to calling RtlAcquirePebLock/
+	     RtlReleasePebLock, but without having to go through the FS
+	     selector again. */
+	  RtlEnterCriticalSection (peb.FastPebLock);
+	  PFAST_CWD old_cwd = *fast_cwd_ptr;
+	  *fast_cwd_ptr = f_cwd;
+	  upp_cwd_str = f_cwd->Path;
+	  upp_cwd_hdl = dir;
+	  RtlLeaveCriticalSection (peb.FastPebLock);
+	  /* Decrement the reference count.  If it's down to 0, free structure
+	     from heap. */
+	  if (old_cwd && InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+	    {
+	      /* In contrast to pre-Vista, the handle on init is always a fresh
+		 one and not the handle inherited from the parent process.  So
+		 we always have to close it here.  However, the handle could
+		 be NULL, if we cd'ed into a virtual dir. */
+	      if (old_cwd->DirectoryHandle)
+		NtClose (old_cwd->DirectoryHandle);
+	      RtlFreeHeap (heap, 0, old_cwd);
+	    }
+	}
+      else
+	{
+	  /* This is more a hack, and it's only used on Vista and later if we
+	     failed to find the fast_cwd_ptr value.  What we do here is to call
+	     RtlSetCurrentDirectory_U and let it set up a new FAST_CWD
+	     structure.  Afterwards, compute the address of that structure
+	     utilizing the fact that the buffer address in the user process
+	     parameter block is actually pointing to the buffer in that
+	     FAST_CWD structure.  Then replace the directory handle in that
+	     structure with our own handle and close the original one.
+
+	     Note that the call to RtlSetCurrentDirectory_U also closes our
+	     old dir handle, so there won't be any handle left open.
+
+	     This method is prone to two race conditions:
+
+	     - Due to the way RtlSetCurrentDirectory_U opens the directory
+	       handle, the directory is locked against deletion or renaming
+	       between the RtlSetCurrentDirectory_U and the subsequent NtClose
+	       call.
+	     
+	     - When another thread calls SetCurrentDirectory at exactly the
+	       same time, a crash might occur, or worse, unrelated data could
+	       be overwritten or NtClose could be called on an unrelated handle.
+	     
+	     Therefore, use this *only* as a fallback. */
+	  if (!init)
+	    {
+	      status = RtlSetCurrentDirectory_U (error ? &ro_u_pipedir
+						       : &win32);
+	      if (!NT_SUCCESS (status))
+		{
+		  debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %p",
+				error ? &ro_u_pipedir : &win32, status);
+		  return;
+		}
+	    }
+	  RtlEnterCriticalSection (peb.FastPebLock);
+	  PFAST_CWD f_cwd = (PFAST_CWD)
+			    ((PBYTE) upp_cwd_str.Buffer
+			     - __builtin_offsetof (struct _FAST_CWD, Buffer));
+	  h = upp_cwd_hdl;
+	  f_cwd->DirectoryHandle = upp_cwd_hdl = dir;
+	  RtlLeaveCriticalSection (peb.FastPebLock);
+	  /* In contrast to pre-Vista, the handle on init is always a fresh one
+	     and not the handle inherited from the parent process.  So we always
+	     have to close it here. */
+	  NtClose (h);
+	}
+    }
+  else
+    {
+      /* This method is used for all pre-Vista OSes.  We simply set the values
+         for the CWD in the user process parameter block entirely by ourselves
+	 under PEB lock condition.  This is how RtlSetCurrentDirectory_U worked
+	 in these older OSes, so we're safe.
+	 
+	 Note that we can't just RtlEnterCriticalSection (peb.FastPebLock)
+	 on pre-Vista.  RtlAcquirePebLock was way more complicated back then. */
+      RtlAcquirePebLock ();
+      if (!init)
+	copy_cwd_str (&upp_cwd_str, error ? &ro_u_pipedir : &win32);
+      h = upp_cwd_hdl;
+      upp_cwd_hdl = dir;
+      RtlReleasePebLock ();
+      /* Only on init, the handle is potentially a native handle.  However,
+	 if it's identical to dir, it's the inherited handle from a Cygwin
+	 parent process and must not be closed. */
+      if (h && h != dir)
+	NtClose (h);
+    }
 }
 
 /* Initialize cygcwd 'muto' for serializing access to cwd info. */
@@ -3366,12 +3638,13 @@ cwdstuff::init ()
   cwd_lock.init ("cwd_lock");
 
   /* Cygwin processes inherit the cwd from their parent.  If the win32 path
-     buffer is not NULL, the cwd struct is already set up. */
+     buffer is not NULL, the cwd struct is already set up, and we only
+     have to override the Win32 CWD with ours. */
   if (win32.Buffer)
-    return;
-
-  /* Initially re-open the cwd to allow POSIX semantics. */
-  set (NULL, NULL);
+    override_win32_cwd (true, SharedUserData.DismountCount);
+  else
+    /* Initially re-open the cwd to allow POSIX semantics. */
+    set (NULL, NULL);
 }
 
 /* Chdir and fill out the elements of a cwdstuff struct. */
@@ -3380,6 +3653,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 {
   NTSTATUS status;
   UNICODE_STRING upath;
+  PEB &peb = *NtCurrentTeb ()->Peb;
   bool virtual_path = false;
   bool unc_path = false;
   bool inaccessible_path = false;
@@ -3430,6 +3704,13 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	virtual_path = true;
     }
 
+  /* Memorize old DismountCount before opening the dir.  This value is
+     stored in the FAST_CWD structure on Vista and later.  It would be
+     simpler to fetch the old DismountCount in override_win32_cwd, but
+     Windows also fetches it before opening the directory handle.  It's
+     not quite clear if that's really required, but since we don't know
+     the side effects of this action, we better follow Windows' lead. */
+  ULONG old_dismount_count = SharedUserData.DismountCount;
   /* Open a directory handle with FILE_OPEN_FOR_BACKUP_INTENT and with all
      sharing flags set.  The handle is right now used in exceptions.cc only,
      but that might change in future. */
@@ -3447,7 +3728,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	  RtlInitUnicodeString (&upath, L"");
 	  InitializeObjectAttributes (&attr, &upath,
 			OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			get_user_proc_parms ()->CurrentDirectoryHandle, NULL);
+			peb.ProcessParameters->CurrentDirectoryHandle, NULL);
 	}
       else
 	InitializeObjectAttributes (&attr, &upath,
@@ -3477,9 +3758,10 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	  return -1;
 	}
     }
-  /* Set new handle.  It's only used when creating stackdumps so far. */
-  if (dir)
-    NtClose (dir);
+  /* Set new handle.  Note that we simply overwrite the old handle here
+     without closing it.  The handle is also used as Win32 CWD handle in
+     the user parameter block, and it will be closed in override_win32_cwd,
+     if required. */
   dir = h;
 
   if (!nat_cwd)
@@ -3487,7 +3769,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
       /* On init, just fetch the Win32 dir from the PEB.  We can access
 	 the PEB without lock, because no other thread can change the CWD
 	 at that time. */
-      PUNICODE_STRING pdir = &get_user_proc_parms ()->CurrentDirectoryName;
+      PUNICODE_STRING pdir = &peb.ProcessParameters->CurrentDirectoryName;
       RtlInitEmptyUnicodeString (&win32,
 				 (PWCHAR) crealloc_abort (win32.Buffer,
 							  pdir->Length
@@ -3568,13 +3850,7 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
     }
   /* Keep the Win32 CWD in sync.  Don't check for error, other than for
      strace output.  Try to keep overhead low. */
-  if (nat_cwd)
-    {
-      status = RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
-      if (!NT_SUCCESS (status))
-	debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %p",
-		      error ? &ro_u_pipedir : &win32, status);
-    }
+  override_win32_cwd (!nat_cwd, old_dismount_count);
 
   /* Eventually, create POSIX path if it's not set on entry. */
   tmp_pathbuf tp;

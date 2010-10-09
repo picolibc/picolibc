@@ -584,7 +584,10 @@ typedef struct _PEB
   BYTE Reserved2[9];
   PVOID LoaderData;
   PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
-  BYTE Reserved3[448];
+  BYTE Reserved3[4];
+  PVOID ProcessHeap;
+  PRTL_CRITICAL_SECTION FastPebLock;
+  BYTE Reserved4[436];
   ULONG SessionId;
 } PEB, *PPEB;
 
@@ -595,6 +598,13 @@ typedef struct _TEB
   PPEB                    Peb;
   /* A lot more follows... */
 } TEB, *PTEB;
+
+typedef struct _KUSER_SHARED_DATA
+{
+  BYTE Reserved1[0x2dc];
+  ULONG DismountCount;
+  /* A lot more follows... */
+} KUSER_SHARED_DATA, *PKUSER_SHARED_DATA;
 
 typedef struct _PROCESS_BASIC_INFORMATION
 {
@@ -979,10 +989,11 @@ extern "C"
   NTSTATUS NTAPI NtWriteFile (HANDLE, HANDLE, PIO_APC_ROUTINE, PVOID,
 			      PIO_STATUS_BLOCK, PVOID, ULONG, PLARGE_INTEGER,
 			      PULONG);
+  VOID NTAPI RtlAcquirePebLock ();
+  PVOID NTAPI RtlAllocateHeap (PVOID, ULONG, SIZE_T);
   NTSTATUS NTAPI RtlAppendUnicodeToString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlAppendUnicodeStringToString (PUNICODE_STRING,
 						 PUNICODE_STRING);
-  VOID NTAPI RtlAcquirePebLock ();
   NTSTATUS NTAPI RtlAnsiStringToUnicodeString (PUNICODE_STRING, PANSI_STRING,
 					       BOOLEAN);
   LONG NTAPI RtlCompareUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
@@ -992,9 +1003,11 @@ extern "C"
   BOOLEAN NTAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
   NTSTATUS NTAPI RtlDowncaseUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 					   BOOLEAN);
+  NTSTATUS NTAPI RtlEnterCriticalSection (PRTL_CRITICAL_SECTION);
   BOOLEAN NTAPI RtlEqualUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 				       BOOLEAN);
   VOID NTAPI RtlFreeAnsiString (PANSI_STRING);
+  BOOLEAN NTAPI RtlFreeHeap (PVOID, ULONG, PVOID);
   VOID NTAPI RtlFreeOemString (POEM_STRING);
   VOID NTAPI RtlFreeUnicodeString (PUNICODE_STRING);
   HANDLE NTAPI RtlGetCurrentTransaction ();
@@ -1002,6 +1015,7 @@ extern "C"
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlIntegerToUnicodeString (ULONG, ULONG, PUNICODE_STRING);
   ULONG NTAPI RtlIsDosDeviceName_U (PCWSTR);
+  NTSTATUS NTAPI RtlLeaveCriticalSection (PRTL_CRITICAL_SECTION);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   NTSTATUS NTAPI RtlOemStringToUnicodeString (PUNICODE_STRING, POEM_STRING,
 					       BOOLEAN);

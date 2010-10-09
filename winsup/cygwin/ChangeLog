@@ -1,3 +1,32 @@
+2010-09-08  John Carey  <aeolus@electric-cloud.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cwdstuff::override_win32_cwd): Declare.
+	* ntdll.h (struct _PEB): Add members accessed by the fast cwd method
+	starting with Vista.
+	(struct _KUSER_SHARED_DATA): Define with only the DismountCount.
+	(RtlAllocateHeap): Declare.
+	(RtlEnterCriticalSection): Declare.
+	(RtlFreeHeap): Declare.
+	(RtlLeaveCriticalSection): Declare.
+	* path.cc (get_user_proc_parms): Remove.
+	(struct _FAST_CWD): New structure.
+	(fast_cwd_ptr): Define.
+	(SharedUserData): Define.
+	(peek32): Define.
+	(find_fast_cwd_pointers): New function to find the global pointer
+	to the current FAST_CWD structure.
+	(copy_cwd_str): New helper function.
+	(cwdstuff::override_win32_cwd): New method to set the Win32 CWD.
+	(cwdstuff::init): Just call override_win32_cwd from here when
+	started from native Win32 parent.
+	(cwdstuff::set): Access Win32 CWD via PEB reference instead of using
+	get_user_proc_parms function.  Memorize old DismountCount before
+	opening directory handle.  Call override_win32_cwd to set up Win32 CWD. 
+	Be more verbose in comments.
+	* wincap.h (wincaps::has_fast_cwd): New element.
+	* wincap.cc: Implement has_fast_cwd element throughout.
+
 2010-09-08  Marco Atzeri  <marco_atzeri@yahoo.it>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

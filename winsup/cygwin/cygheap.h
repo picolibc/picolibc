@@ -217,6 +217,8 @@ private:
 			   a native Win32 application.  See cwdstuff::set for
 			   how it gets set.  See spawn_guts for how it's
 			   evaluated. */
+  void override_win32_cwd (bool, ULONG);
+
 public:
   UNICODE_STRING win32;
   static muto cwd_lock;

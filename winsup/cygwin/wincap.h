@@ -50,6 +50,7 @@ struct wincaps
   unsigned has_localenames				: 1;
   unsigned has_mwmo_inputavailable			: 1;
   unsigned has_buggy_thread_startup			: 1;
+  unsigned has_fast_cwd					: 1;
 };
 
 class wincapc
@@ -105,6 +106,7 @@ public:
   bool	IMPLEMENT (has_localenames)
   bool	IMPLEMENT (has_mwmo_inputavailable)
   bool	IMPLEMENT (has_buggy_thread_startup)
+  bool	IMPLEMENT (has_fast_cwd)
 
 #undef IMPLEMENT
 };
