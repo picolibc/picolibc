@@ -1,3 +1,10 @@
+2010-10-08  Bernd Schmidt  <bernds@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+
+	* COPYING.LIBGLOSS: Add National Semiconductor and CodeSourcery
+	notices.
+	* COPYING.NEWLIB: Add Texas Instruments notice.
+
 2010-10-07  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* configure.ac (build_lto_plugin): New shell variable.
