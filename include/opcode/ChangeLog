@@ -1,3 +1,8 @@
+2010-10-09  Matt Rice  <ratmice@gmail.com>
+
+	* cgen.h (CGEN_ATTR, CGEN_ATTR_TYPE): Rename bool attribute to bool_.
+	(CGEN_ATTR_BOOLS, CGEN_ATTR_CGEN_INSN_ALIAS_VALUE): Likewise.
+
 2010-09-23  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* arm.h (ARM_EXT_VIRT): New define.
@@ -6,7 +11,7 @@
 	Extensions.
 
 2010-09-23  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
-	
+
 	* arm.h (ARM_AEXT_ADIV): New define.
 	(ARM_ARCH_V7A_IDIV_MP_SEC): Likewise.
 
