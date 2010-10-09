@@ -5,6 +5,12 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Reinstantiate Cygwin's ability to delete an empty directory which is the
+current working directory of the same or another process.  Same for any
+other empty directory which has been opened by the same or another process.
+</para></listitem>
+
+<listitem><para>
 Cygwin now ships the C standard library fenv.h header file, and implements the
 related APIs (including GNU/glibc extensions): feclearexcept, fedisableexcept,
 feenableexcept, fegetenv, fegetexcept, fegetexceptflag, fegetprec, fegetround,
