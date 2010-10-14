@@ -481,9 +481,11 @@ struct bfd_link_callbacks
   /* A function which is called when an object is added from an
      archive.  ABFD is the archive element being added.  NAME is the
      name of the symbol which caused the archive element to be pulled
-     in.  */
+     in.  This function may set *SUBSBFD to point to an alternative
+     BFD from which symbols should in fact be added in place of the
+     original BFD's symbols.  */
   bfd_boolean (*add_archive_element)
-    (struct bfd_link_info *, bfd *abfd, const char *name);
+    (struct bfd_link_info *, bfd *abfd, const char *name, bfd **subsbfd);
   /* A function which is called when a symbol is found with multiple
      definitions.  NAME is the symbol which is defined multiple times.
      OBFD is the old BFD, OSEC is the old section, OVAL is the old
