@@ -440,7 +440,6 @@ extern _LONG_LONG_TYPE llrintl _PARAMS((_LONG_DOUBLE));
 
 #if !defined (__STRICT_ANSI__) || defined(__cplusplus)
 
-extern double cabs();
 extern double drem _PARAMS((double, double));
 extern void sincos _PARAMS((double, double *, double *));
 extern double gamma_r _PARAMS((double, int *));
@@ -453,7 +452,6 @@ extern double j0 _PARAMS((double));
 extern double j1 _PARAMS((double));
 extern double jn _PARAMS((int, double));
 
-extern float cabsf();
 extern float dremf _PARAMS((float, float));
 extern void sincosf _PARAMS((float, float *, float *));
 extern float gammaf_r _PARAMS((float, int *));
