@@ -1,3 +1,13 @@
+2010-10-15  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/bfin-common-mc.ld: Add .l1.data and .l1.text input sections.
+	* bfin/bfin-common-sc.ld: Likewise.
+
+2010-10-15  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/include/sys/_adi_platform.h: Remove __ADSPBF541__.
+	* bfin/include/cdefBF541.h, bfin/include/defBF541.h: Punt.
+
 2010-10-08  Bernd Schmidt  <bernds@codesourcery.com>
 	Joseph Myers  <joseph@codesourcery.com>
 
