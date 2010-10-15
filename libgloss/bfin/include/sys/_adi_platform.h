@@ -86,7 +86,7 @@
 #include <cdefBF526.h>
 #elif defined (__ADSPBF527__)
 #include <cdefBF527.h>
-#elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
+#elif defined (__ADSPBF542__)
 #include <cdefBF542.h>
 #elif defined (__ADSPBF542M__)
 #include <cdefBF542M.h>
@@ -179,7 +179,7 @@
 #include <defBF526.h>
 #elif defined (__ADSPBF527__)
 #include <defBF527.h>
-#elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
+#elif defined (__ADSPBF542__)
 #include <defBF542.h>
 #elif defined (__ADSPBF542M__)
 #include <defBF542M.h>
