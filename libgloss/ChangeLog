@@ -1,3 +1,14 @@
+2010-10-15  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf504.ld and bf506.ld.
+	* bfin/bf504.ld, bfin/bf506.ld: New linker scripts.
+	* bfin/include/cdefBF504.h, bfin/include/cdefBF504F.h,
+	bfin/include/cdefBF506F.h, bfin/include/cdefBF50x_base.h,
+	bfin/include/defBF504.h, bfin/include/defBF504F.h,
+	bfin/include/defBF506F.h, bfin/include/defBF50x_base.h: New files.
+	* bfin/include/def_LPBlackfin.h: Add DMC_P for __ADSPBF50x__.
+	* bfin/include/sys/_adi_platform.h: Include new bf50x headers.
+
 2010-10-15  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* bfin/bfin-common-mc.ld: Add .l1.data and .l1.text input sections.

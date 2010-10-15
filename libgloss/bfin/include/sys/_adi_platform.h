@@ -12,7 +12,7 @@
 
 /*
 ** Include appropriate header file for platform.
-** Copyright (C) 2008, 2009 Analog Devices, Inc.
+** Copyright (C) 2004-2009 Analog Devices Inc. All Rights Reserved.
 */
 
 #ifndef __ADI_PLATFORM_H
@@ -62,10 +62,10 @@
 #include <cdefMT6906.h>
 #elif defined (__ADSPBF504__)
 #include <cdefBF504.h>
-#elif defined (__ADSPBF505__)
-#include <cdefBF505.h>
-#elif defined (__ADSPBF506__)
-#include <cdefBF506.h>
+#elif defined (__ADSPBF504F__)
+#include <cdefBF504F.h>
+#elif defined (__ADSPBF506__) || defined (__ADSPBF506F__)
+#include <cdefBF506F.h>
 #elif defined (__ADSPBF512__)
 #include <cdefBF512.h>
 #elif defined (__ADSPBF514__)
@@ -155,10 +155,10 @@
 #include <defMT6906.h>
 #elif defined (__ADSPBF504__)
 #include <defBF504.h>
-#elif defined (__ADSPBF505__)
-#include <defBF505.h>
-#elif defined (__ADSPBF506__)
-#include <defBF506.h>
+#elif defined (__ADSPBF504F__)
+#include <defBF504F.h>
+#elif defined (__ADSPBF506__) || defined (__ADSPBF506F__)
+#include <defBF506F.h>
 #elif defined (__ADSPBF512__)
 #include <defBF512.h>
 #elif defined (__ADSPBF514__)

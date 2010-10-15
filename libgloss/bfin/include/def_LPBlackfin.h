@@ -14,7 +14,7 @@
  *
  * def_LPBlackfin.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2001-2009 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 
@@ -351,10 +351,14 @@
 
 #define ENDCPLB_P					 0x01			/* Enable DCPLBS */
 #define DMCTL_ENDCPLB_P			 ENDCPLB_P  /* "" (older define) */
+#if defined(__ADSPBF50x__)
+#define DMC_P						 0x03			/* L1 Data Memory Configure bit   */
+#else
 #define DMC0_P						 0x02			/* L1 Data Memory Configure bit 0 */
-#define DMCTL_DMC0_P				 DMC0_P		/* "" (older define) */
 #define DMC1_P						 0x03			/* L1 Data Memory Configure bit 1 */
+#define DMCTL_DMC0_P				 DMC0_P		/* "" (older define) */
 #define DMCTL_DMC1_P				 DMC1_P		/* "" (older define) */
+#endif
 #define DCBS_P						 0x04			/* L1 Data Cache Bank Select */
 #define PORT_PREF0_P				 0x12			/* DAG0 Port Preference */
 #define PORT_PREF1_P				 0x13			/* DAG1 Port Preference */
