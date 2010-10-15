@@ -76,11 +76,11 @@ SECTIONS
   } >MEM_L2_SHARED =0
   .b.text         :
   {
-    *(.b.text .b.text.*)
+    *(.b.text .b.text.* .b.l1.text .b.l1.text.*)
   } >B_MEM_L1_CODE =0
   .text           :
   {
-    *(.text .stub .text.* .gnu.linkonce.t.*)
+    *(.text .stub .text.* .gnu.linkonce.t.* .l1.text .l1.text.*)
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
@@ -169,11 +169,11 @@ SECTIONS
   .dynamic        : { *(.dynamic) } >MEM_L1_DATA_A
   .b.data         :
   {
-    *(.b.data .b.data.*)
+    *(.b.data .b.data.* .b.l1.data .b.l1.data.*)
   } >B_MEM_L1_DATA_A
   .data           :
   {
-    *(.data .data.* .gnu.linkonce.d.*)
+    *(.data .data.* .gnu.linkonce.d.* .l1.data .l1.data.*)
     KEEP (*(.gnu.linkonce.d.*personality*))
     SORT(CONSTRUCTORS)
   } >MEM_L1_DATA_A
