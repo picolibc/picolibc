@@ -1,4 +1,4 @@
-2010-09-09  John Carey  <aeolus@electric-cloud.com>
+2010-10-09  John Carey  <aeolus@electric-cloud.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cwdstuff::override_win32_cwd): Declare.
@@ -27,7 +27,7 @@
 	* wincap.h (wincaps::has_fast_cwd): New element.
 	* wincap.cc: Implement has_fast_cwd element throughout.
 
-2010-09-08  Marco Atzeri  <marco_atzeri@yahoo.it>
+2010-10-08  Marco Atzeri  <marco_atzeri@yahoo.it>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din: Export new complex math functions from newlib.
@@ -35,7 +35,7 @@
 	SUSv4 functions.
 	* include/cygwin/version.h: Bump API minor version.
 
-2010-09-07  Corinna Vinschen  <corinna@vinschen.de>
+2010-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::get_stat_access): Delete.
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Always check
@@ -56,7 +56,7 @@
 	* path.h (class path_conv_handle): Drop access flag and accommodate
 	all related methods.
 
-2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
+2010-10-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (ipc_mutex_init): Call NtCreateMutant to make sure the
 	access mask is correct.
@@ -72,7 +72,7 @@
 	(_mq_receive): Wait for mqi_waitrecv event.  Signal mqi_waitsend event.
 	(mq_close): Close mqi_waitsend and mqi_waitrecv events.
 
-2010-09-05  Corinna Vinschen  <corinna@vinschen.de>
+2010-10-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (enum pathconv_arg): Remove PC_CHECK_EA.
 
@@ -82,7 +82,7 @@
 	(__dll_crt0): Only initialize _main_tls if it changes.
 	* fhandler_console.cc (fhandler_console::write): Fix debugging output.
 
-2010-09-02  Corinna Vinschen  <corinna@vinschen.de>
+2010-10-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Simplify.
 	Just call nfs_fetch_fattr3 if called via fstat.
@@ -92,7 +92,7 @@
 	* path.cc (symlink_info::check): Simplify NFS case.  Just call
 	nfs_fetch_fattr3.
 
-2010-09-02  Corinna Vinschen  <corinna@vinschen.de>
+2010-10-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::exists): Return virt_none
 	if path is invalid.
