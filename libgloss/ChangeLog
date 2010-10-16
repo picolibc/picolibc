@@ -1,3 +1,11 @@
+2010-10-16  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf592.ld.
+	* bfin/bf592: New linker scripts.
+	* bfin/include/cdefBF592-A.h, bfin/include/cdefBF59x_base.h,
+	bfin/include/defBF592-A.h, bfin/include/defBF59x_base.h: New files.
+	* bfin/include/sys/_adi_platform.h: Include new bf592 headers.
+
 2010-10-15  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf504.ld and bf506.ld.

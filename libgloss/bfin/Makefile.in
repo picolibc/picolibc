@@ -68,7 +68,8 @@ BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
 	bf534.ld bf536.ld bf537.ld \
 	bf538.ld bf539.ld \
 	bf542.ld bf544.ld bf547.ld bf548.ld bf549.ld \
-	bf561.ld bf561a.ld bf561b.ld bf561m.ld
+	bf561.ld bf561a.ld bf561b.ld bf561m.ld \
+	bf592.ld
 BOARD_LDFLAGS	=
 BOARD_BSP	= # We actually use libnosys.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
