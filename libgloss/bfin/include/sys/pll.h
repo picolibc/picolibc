@@ -14,7 +14,7 @@
  *
  * pll.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2003-2004 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 

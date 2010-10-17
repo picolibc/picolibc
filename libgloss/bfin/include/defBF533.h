@@ -14,7 +14,7 @@
  *
  * defBF533.h
  *
- * Copyright (C) 2008 Analog Devices, Inc.
+ * (c) Copyright 2001-2003 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 

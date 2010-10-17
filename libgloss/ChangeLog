@@ -1,3 +1,48 @@
+2010-10-17  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/include/blackfin.h, bfin/include/builtins.h,
+	bfin/include/ccblkfn.h, bfin/include/cdefBF512.h,
+	bfin/include/cdefBF514.h, bfin/include/cdefBF516.h,
+	bfin/include/cdefBF518.h, bfin/include/cdefBF51x_base.h,
+	bfin/include/cdefBF522.h, bfin/include/cdefBF523.h,
+	bfin/include/cdefBF524.h, bfin/include/cdefBF525.h,
+	bfin/include/cdefBF526.h, bfin/include/cdefBF527.h,
+	bfin/include/cdefBF52x_base.h, bfin/include/cdefBF531.h,
+	bfin/include/cdefBF532.h, bfin/include/cdefBF533.h,
+	bfin/include/cdefBF534.h, bfin/include/cdefBF535.h,
+	bfin/include/cdefBF536.h, bfin/include/cdefBF537.h,
+	bfin/include/cdefBF538.h, bfin/include/cdefBF539.h,
+	bfin/include/cdefBF53x.h, bfin/include/cdefBF542.h,
+	bfin/include/cdefBF542M.h, bfin/include/cdefBF544.h,
+	bfin/include/cdefBF544M.h, bfin/include/cdefBF547.h,
+	bfin/include/cdefBF547M.h, bfin/include/cdefBF548.h,
+	bfin/include/cdefBF548M.h, bfin/include/cdefBF549.h,
+	bfin/include/cdefBF549M.h, bfin/include/cdefBF54x_base.h,
+	bfin/include/cdefBF561.h, bfin/include/cdef_LPBlackfin.h,
+	bfin/include/cdefblackfin.h, bfin/include/cplb.h,
+	bfin/include/cplbtab.h, bfin/include/defBF512.h,
+	bfin/include/defBF514.h, bfin/include/defBF516.h,
+	bfin/include/defBF518.h, bfin/include/defBF51x_base.h,
+	bfin/include/defBF522.h, bfin/include/defBF523.h,
+	bfin/include/defBF524.h, bfin/include/defBF525.h,
+	bfin/include/defBF526.h, bfin/include/defBF527.h,
+	bfin/include/defBF52x_base.h, bfin/include/defBF531.h,
+	bfin/include/defBF532.h, bfin/include/defBF533.h,
+	bfin/include/defBF534.h, bfin/include/defBF535.h,
+	bfin/include/defBF536.h, bfin/include/defBF537.h,
+	bfin/include/defBF538.h, bfin/include/defBF539.h,
+	bfin/include/defBF542.h, bfin/include/defBF542M.h,
+	bfin/include/defBF544.h, bfin/include/defBF544M.h,
+	bfin/include/defBF547.h, bfin/include/defBF547M.h,
+	bfin/include/defBF548.h, bfin/include/defBF548M.h,
+	bfin/include/defBF549.h, bfin/include/defBF549M.h,
+	bfin/include/defBF54x_base.h, bfin/include/defBF561.h,
+	bfin/include/defblackfin.h, bfin/include/sysreg.h,
+	bfin/include/sys/anomaly_macros_rtl.h, bfin/include/sys/excause.h,
+	bfin/include/sys/exception.h, bfin/include/sys/mc_typedef.h,
+	bfin/include/sys/platform.h, bfin/include/sys/pll.h:
+	Update to Visual DSP 5.0 Update 8.
+
 2010-10-16  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf592.ld.

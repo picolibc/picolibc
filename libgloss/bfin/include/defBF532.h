@@ -14,7 +14,7 @@
  *
  * defBF532.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2001-2009 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 
@@ -33,6 +33,7 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_19_4)
 #pragma diag(suppress:misra_rule_19_7)
+#include <stdint.h>
 #endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
@@ -85,7 +86,6 @@
 #define UART_LCR             0xFFC0040C  /* Line Control Register */
 #define UART_MCR			 0xFFC00410  /* Modem Control Register */
 #define UART_LSR             0xFFC00414  /* Line Status Register */
-/*#define UART_MSR           0xFFC00418  // Modem Status Register //(UNUSED in ADSP-BF532) */
 #define UART_SCR             0xFFC0041C  /* SCR Scratch Register */
 #define UART_GCTL      	     0xFFC00424  /* Global Control Register */
 
@@ -487,9 +487,9 @@
 
 /* SYSCR Masks																				*/
 #define BMODE_BYPASS  0x0000  /* Bypass boot ROM, execute from 16-bit external memory */
-#define BMODE_FLASH   0x0001  /* Use Boot ROM to load from 8-bit or 16-bit flash */
-#define BMODE_SPIHOST 0x0002  /* Boot from SPI0 host (slave mode) */
-#define BMODE_SPIMEM  0x0003  /* Boot from serial SPI memory */
+#define BMODE_FLASH   0x0002  /* Use Boot ROM to load from 8-bit or 16-bit flash */
+#define BMODE_SPIHOST 0x0004  /* Boot from SPI0 host (slave mode) */
+#define BMODE_SPIMEM  0x0006  /* Boot from serial SPI memory */
 #define BMODE			0x0006	/* Boot Mode - Latched During HW Reset From Mode Pins	*/
 #define	NOBOOT			0x0010	/* Execute From L1 or ASYNC Bank 0 When BMODE = 0		*/
 
@@ -573,27 +573,28 @@
 /* Usage: *pSIC_IAR1 |= PX_IVG(11, 8);	// Sets Peripheral #11 to IVG8 */
 #endif /* _MISRA_RULES */
 
-/* SIC_IMASK Masks																		*/
-#define SIC_UNMASK_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
-#define SIC_MASK_ALL	0xFFFFFFFF					/* Mask all peripheral interrupts	*/
+/* SIC_IMASK Masks*/
+#define SIC_UNMASK_ALL 0x00000000         /* Unmask all peripheral interrupts */
+#define SIC_MASK_ALL   0xFFFFFFFF         /* Mask all peripheral interrupts   */
 #ifdef _MISRA_RULES
-#define SIC_MASK(x)		(1 << ((x)&0x1Fu))					/* Mask Peripheral #x interrupt		*/
-#define SIC_UNMASK(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))	/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
 #else
-#define SIC_MASK(x)		(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
-#define SIC_UNMASK(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK(x) (1 << ((x)&0x1F))     /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
 #endif /* _MISRA_RULES */
 
-/* SIC_IWR Masks																		*/
-#define IWR_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
-#define IWR_ENABLE_ALL	0xFFFFFFFF					/* Wakeup Enable all peripherals	*/
+/* SIC_IWR Masks*/
+#define IWR_DISABLE_ALL 0x00000000        /* Wakeup Disable all peripherals   */
+#define IWR_ENABLE_ALL  0xFFFFFFFF        /* Wakeup Enable all peripherals    */
 #ifdef _MISRA_RULES
-#define IWR_ENABLE(x)	(1 << ((x)&0x1Fu))					/* Wakeup Enable Peripheral #x		*/
-#define IWR_DISABLE(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu))) 	/* Wakeup Disable Peripheral #x		*/
+#define IWR_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Wakeup Disable Peripheral #x */
 #else
-#define IWR_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
-#define IWR_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
+#define IWR_ENABLE(x)   (1 << ((x)&0x1F)) /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Wakeup Disable Peripheral #x  */
 #endif /* _MISRA_RULES */
+
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
 

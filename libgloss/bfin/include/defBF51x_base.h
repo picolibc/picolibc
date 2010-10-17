@@ -13,7 +13,7 @@
 /*
 ** defBF51x_base.h
 **
-** Copyright (C) 2009 Analog Devices, Inc.
+** Copyright (C) 2007-2009 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
@@ -31,6 +31,7 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_19_4)
 #pragma diag(suppress:misra_rule_19_7)
+#include <stdint.h>
 #endif /* _MISRA_RULES */
 
 
@@ -101,7 +102,6 @@
 #define UART0_LCR				0xFFC0040C	/* Line Control Register							*/
 #define UART0_MCR				0xFFC00410	/* Modem Control Register							*/
 #define UART0_LSR				0xFFC00414	/* Line Status Register								*/
-#define UART0_MSR				0xFFC00418	/* Modem Status Register							*/
 #define UART0_SCR				0xFFC0041C	/* SCR Scratch Register								*/
 #define UART0_GCTL			0xFFC00424	/* Global Control Register							*/
 
@@ -567,7 +567,6 @@
 #define UART1_LCR				0xFFC0200C	/* Line Control Register							*/
 #define UART1_MCR				0xFFC02010	/* Modem Control Register							*/
 #define UART1_LSR				0xFFC02014	/* Line Status Register								*/
-#define UART1_MSR				0xFFC02018	/* Modem Status Register							*/
 #define UART1_SCR				0xFFC0201C	/* SCR Scratch Register								*/
 #define UART1_GCTL			0xFFC02024	/* Global Control Register							*/
 
@@ -750,19 +749,15 @@
 #define RESET_SOFTWARE			0x8000	/* SW Reset Occurred Since Last Read Of SWRST				*/
 
 /* SYSCR Masks */
-#define BMODE_BYPASS         		0x0000	/* Bypass boot ROM, execute from 16-bit external memory 		*/
-#define BMODE_FLASH             	0x0001	/* Use Boot ROM to load from 8-bit or 16-bit flash 			*/
-#define BMODE_SPIMEM            	0x0003	/* Boot from serial SPI memory 						*/
-#define BMODE_SPIHOST          	0x0004	/* Boot from SPI0 host (slave mode) 					*/
-#define BMODE_TWIMEM            	0x0005	/* Boot from serial TWI memory 						*/
-#define BMODE_TWIHOST           	0x0006	/* Boot from TWI0 host (slave mode) 					*/
-#define BMODE_UART0HOST        	0x0007	/* Boot from UART0 host 							*/
-#define BMODE_UART1HOST        	0x0008	/* Boot from UART1 host 							*/
-#define BMODE_SDRAMMEM         	0x000A	/* Boot from SDRAM memory (warm boot) 					*/
-#define BMODE_OTPMEM           	0x000B	/* Boot from OTP memory 							*/
-#define BMODE_HOSTDMA_ACK       	0x000E	/* Boot from 16-bit host DMA (ACK mode) 					*/
-#define BMODE_HOSTDMA_INT      	0x000F	/* Boot from 8-bit host DMA (INT mode)	 				*/
-#define BMODE 				0x000F 	/* Boot Mode. Mirror of BMODE Mode Pins 					*/
+#define BMODE_BYPASS        0x0000  /* No boot mode */
+#define BMODE_FLASH         0x0001  /* Use Boot ROM to load from 8-bit or 16-bit flash */
+#define BMODE_SPI0MEM_INT   0x0002  /* Boot from internal SPI0 memory */
+#define BMODE_SPI0MEM_EXT   0x0003  /* Boot from external SPI0 memory */
+#define BMODE_SPI0HOST      0x0004  /* Boot from SPI0 host (slave mode) */
+#define BMODE_OTPMEM        0x0005  /* Boot from OTP memory */
+#define BMODE_SDRAMMEM      0x0006  /* Boot from SDRAM memory (warm boot) */
+#define BMODE_UART0HOST     0x0007  /* Boot from UART0 host */
+#define BMODE               0x0007  /* Boot Mode. Mirror of BMODE Mode Pins */
 
 #define BCODE 				0x00F0
 #define BCODE_NORMAL 			0x0000 	/* normal boot, update PLL/VR, quickboot as by WURESET		*/
@@ -770,11 +765,6 @@
 #define BCODE_QUICKBOOT 		0x0020 	/* quick boot, overrule WURESET, don't update PLL/VR 			*/
 #define BCODE_ALLBOOT			0x0040 	/* no quick boot, overrule WURESET, don't update PLL/VR 		*/
 #define BCODE_FULLBOOT 			0x0060 	/* no quick boot, overrule WURESET, update PLL/VR 			*/
-
-#define DCB1_PRIO 			0x0100 	/* DCB1 requests are urgent 							*/
-#define DCB_ROT_PRIO 			0x0200 	/* enable rotating DCB priority 						*/
-#define DEB1_PRIO 			0x0400 	/* DEB1 requests are urgent							*/
-#define DEB_ROT_PRIO 			0x0800 	/* enable rotating DEB priority 						*/
 
 #define WURESET 				0x1000 	/* wakeup event since last hardware reset			 		*/
 #define DFRESET 				0x2000 	/* recent reset was due to a double fault event 			*/
@@ -861,129 +851,130 @@
 #define _MF7 	7
 #endif /* _MISRA_RULES */
 
+/* SIC_IAR0 Macros */
+#define P0_IVG(x)       (((x)&_MF15)-_MF7)           /* Peripheral #0 assigned IVG #x    */
+#define P1_IVG(x)       ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #1 assigned IVG #x    */
+#define P2_IVG(x)       ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #2 assigned IVG #x    */
+#define P3_IVG(x)       ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #3 assigned IVG #x    */
+#define P4_IVG(x)       ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #4 assigned IVG #x    */
+#define P5_IVG(x)       ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #5 assigned IVG #x    */
+#define P6_IVG(x)       ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #6 assigned IVG #x    */
+#define P7_IVG(x)       ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #7 assigned IVG #x    */
 
-/* SIC_IAR0 Macros*/
-#define P0_IVG(x)		(((x)&_MF15)-_MF7)		/* Peripheral #0 assigned IVG #x 	*/
-#define P1_IVG(x)		(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #1 assigned IVG #x 	*/
-#define P2_IVG(x)		(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #2 assigned IVG #x 	*/
-#define P3_IVG(x)		(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #3 assigned IVG #x	*/
-#define P4_IVG(x)		(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #4 assigned IVG #x	*/
-#define P5_IVG(x)		(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #5 assigned IVG #x	*/
-#define P6_IVG(x)		(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #6 assigned IVG #x	*/
-#define P7_IVG(x)		(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #7 assigned IVG #x	*/
+/* SIC_IAR1 Macros */
+#define P8_IVG(x)       (((x)&_MF15)-_MF7)           /* Peripheral #8 assigned IVG #x    */
+#define P9_IVG(x)       ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #9 assigned IVG #x    */
+#define P10_IVG(x)      ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #10 assigned IVG #x   */
+#define P11_IVG(x)                                   /* Reserved                         */
+#define P12_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #12 assigned IVG #x   */
+#define P13_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #13 assigned IVG #x   */
+#define P14_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #14 assigned IVG #x   */
+#define P15_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #15 assigned IVG #x   */
 
-/* SIC_IAR1 Macros*/
-#define P8_IVG(x)		(((x)&_MF15)-_MF7)		/* Peripheral #8 assigned IVG #x 	*/
-#define P9_IVG(x)		(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #9 assigned IVG #x 	*/
-#define P10_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #10 assigned IVG #x	*/
-#define P11_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #11 assigned IVG #x 	*/
-#define P12_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #12 assigned IVG #x	*/
-#define P13_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #13 assigned IVG #x	*/
+/* SIC_IAR2 Macros */
+#define P16_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #16 assigned IVG #x   */
+#define P17_IVG(x)      ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #17 assigned IVG #x   */
+#define P18_IVG(x)      ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #18 assigned IVG #x   */
+#define P19_IVG(x)      ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #19 assigned IVG #x   */
+#define P20_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #20 assigned IVG #x   */
+#define P21_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #21 assigned IVG #x   */
+#define P22_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #22 assigned IVG #x   */
+#define P23_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #23 assigned IVG #x   */
 
-/* SIC_IAR2 Macros*/
-#define P14_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #14 assigned IVG #x	*/
-#define P15_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #15 assigned IVG #x	*/
-#define P16_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #16 assigned IVG #x	*/
-#define P17_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #17 assigned IVG #x	*/
-#define P18_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #18 assigned IVG #x	*/
-#define P19_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #19 assigned IVG #x	*/
-#define P20_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #20 assigned IVG #x	*/
-#define P21_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #21 assigned IVG #x	*/
+/* SIC_IAR3 Macros */
+#define P24_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #24 assigned IVG #x   */
+#define P25_IVG(x)      ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #25 assigned IVG #x   */
+#define P26_IVG(x)      ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #26 assigned IVG #x   */
+#define P27_IVG(x)      ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #27 assigned IVG #x   */
+#define P28_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #28 assigned IVG #x   */
+#define P29_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #29 assigned IVG #x   */
+#define P30_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #30 assigned IVG #x   */
+#define P31_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #31 assigned IVG #x   */
 
-/* SIC_IAR3 Macros*/
-#define P22_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #22 assigned IVG #x	*/
-#define P23_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #23 assigned IVG #x	*/
-#define P24_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #24 assigned IVG #x	*/
-#define P25_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #25 assigned IVG #x	*/
-#define P26_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #26 assigned IVG #x	*/
-#define P27_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #27 assigned IVG #x	*/
-#define P28_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #28 assigned IVG #x	*/
-#define P29_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #29 assigned IVG #x	*/
+/* SIC_IAR4 Macros */
+#define P32_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #32 assigned IVG #x   */
+#define P33_IVG(x)      ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #33 assigned IVG #x   */
+#define P34_IVG(x)      ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #34 assigned IVG #x   */
+#define P35_IVG(x)      ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #35 assigned IVG #x   */
+#define P36_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #36 assigned IVG #x   */
+#define P37_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #37 assigned IVG #x   */
+#define P38_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #38 assigned IVG #x   */
+#define P39_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #39 assigned IVG #x   */
 
-/* SIC_IAR4 Macros*/
-#define P30_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #30 assigned IVG #x 	*/
-#define P31_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #31 assigned IVG #x 	*/
-#define P32_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #32 assigned IVG #x 	*/
-#define P33_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #33 assigned IVG #x	*/
-#define P34_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #34 assigned IVG #x	*/
-#define P35_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #35 assigned IVG #x	*/
-#define P36_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #36 assigned IVG #x	*/
-#define P37_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #37 assigned IVG #x	*/
+/* SIC_IAR5 Macros */
+#define P40_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #40 assigned IVG #x   */
+#define P41_IVG(x)      ((((x)&_MF15)-_MF7) << 0x4)  /* Peripheral #41 assigned IVG #x   */
+#define P42_IVG(x)      ((((x)&_MF15)-_MF7) << 0x8)  /* Peripheral #42 assigned IVG #x   */
+#define P43_IVG(x)      ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #43 assigned IVG #x   */
+#define P44_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #44 assigned IVG #x   */
+#define P45_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #45 assigned IVG #x   */
+#define P46_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #46 assigned IVG #x   */
+#define P47_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #47 assigned IVG #x   */
 
-/* SIC_IAR5 Macros*/
-#define P38_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #38 assigned IVG #x 	*/
-#define P39_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #39 assigned IVG #x 	*/
-#define P40_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #40 assigned IVG #x	*/
-#define P41_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #41 assigned IVG #x 	*/
-#define P42_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #42 assigned IVG #x	*/
-#define P43_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #43 assigned IVG #x	*/
-#define P44_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #44 assigned IVG #x	*/
-#define P45_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #45 assigned IVG #x	*/
+/* SIC_IAR6 Macros */
+#define P48_IVG(x)      (((x)&_MF15)-_MF7)           /* Peripheral #48 assigned IVG #x   */
+#define P49_IVG(x)                                   /* Reserved                         */
+#define P50_IVG(x)                                   /* Reserved                         */
+#define P51_IVG(x)      ((((x)&_MF15)-_MF7) << 0xC)  /* Peripheral #51 assigned IVG #x   */
+#define P52_IVG(x)      ((((x)&_MF15)-_MF7) << 0x10) /* Peripheral #52 assigned IVG #x   */
+#define P53_IVG(x)      ((((x)&_MF15)-_MF7) << 0x14) /* Peripheral #53 assigned IVG #x   */
+#define P54_IVG(x)      ((((x)&_MF15)-_MF7) << 0x18) /* Peripheral #54 assigned IVG #x   */
+#define P55_IVG(x)      ((((x)&_MF15)-_MF7) << 0x1C) /* Peripheral #55 assigned IVG #x   */
 
-/* SIC_IAR6 Macros*/
-#define P46_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #46 assigned IVG #x	*/
-#define P47_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #47 assigned IVG #x	*/
-#define P48_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #48 assigned IVG #x	*/
-#define P49_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #49 assigned IVG #x	*/
-#define P50_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #50 assigned IVG #x	*/
-#define P51_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #51 assigned IVG #x	*/
-#define P52_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #52 assigned IVG #x	*/
-#define P53_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #53 assigned IVG #x	*/
-
-/* SIC_IAR7 Macros*/
-#define P54_IVG(x)	(((x)&_MF15)-_MF7)		/* Peripheral #54 assigned IVG #x	*/
-#define P55_IVG(x)	(((x)&_MF15)-_MF7) << 0x4	/* Peripheral #55 assigned IVG #x	*/
-#define P56_IVG(x)	(((x)&_MF15)-_MF7) << 0x8	/* Peripheral #56 assigned IVG #x	*/
-#define P57_IVG(x)	(((x)&_MF15)-_MF7) << 0xC	/* Peripheral #57 assigned IVG #x	*/
-#define P58_IVG(x)	(((x)&_MF15)-_MF7) << 0x10	/* Peripheral #58 assigned IVG #x	*/
-#define P59_IVG(x)	(((x)&_MF15)-_MF7) << 0x14	/* Peripheral #59 assigned IVG #x	*/
-#define P60_IVG(x)	(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #60 assigned IVG #x	*/
-#define P61_IVG(x)	(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #61 assigned IVG #x	*/
+/* SIC_IAR7 Macros */
+#define P56_IVG(x)                                   /* Reserved                         */
+#define P57_IVG(x)                                   /* Reserved                         */
+#define P58_IVG(x)                                   /* Reserved                         */
+#define P59_IVG(x)                                   /* Reserved                         */
+#define P60_IVG(x)                                   /* Reserved                         */
+#define P61_IVG(x)                                   /* Reserved                         */
+#define P62_IVG(x)                                   /* Reserved                         */
+#define P63_IVG(x)                                   /* Reserved                         */
 
 
 /* SIC_IMASK0 Masks*/
-#define SIC_UNMASK0_ALL	0x00000000				/* Unmask all peripheral interrupts	*/
-#define SIC_MASK0_ALL	0xFFFFF3FF				/* Mask all peripheral interrupts	*/
+#define SIC_UNMASK0_ALL 0x00000000        /* Unmask all peripheral interrupts */
+#define SIC_MASK0_ALL   0xFFFFF3FF        /* Mask all peripheral interrupts   */
 #ifdef _MISRA_RULES
-#define SIC_MASK0(x)	(1 << ((x)&0x1Fu))		/* Mask Peripheral #x interrupt	*/
-#define SIC_UNMASK0(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))/*Unmask Peripheral #x interrupt*/
+#define SIC_MASK0(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK0(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
 #else
-#define SIC_MASK0(x)	(1 << ((x)&0x1F))			/* Mask Peripheral #x interrupt	*/
-#define SIC_UNMASK0(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK0(x) (1 << ((x)&0x1F))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK0(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
 #endif /* _MISRA_RULES */
 
 /* SIC_IMASK1 Masks*/
-#define SIC_UNMASK1_ALL	0x00000000				/* Unmask all peripheral interrupts	*/
-#define SIC_MASK1_ALL	0xFFFFFF				/* Mask all peripheral interrupts	*/
+#define SIC_UNMASK1_ALL 0x00000000        /* Unmask all peripheral interrupts */
+#define SIC_MASK1_ALL   0xFFFFFF          /* Mask all peripheral interrupts   */
 #ifdef _MISRA_RULES
-#define SIC_MASK1(x)	(1 << ((x)&0x1Fu))		/* Mask Peripheral #x interrupt	*/
-#define SIC_UNMASK1(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))/*Unmask Peripheral #x interrupt*/
+#define SIC_MASK1(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK1(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
 #else
-#define SIC_MASK1(x)	(1 << ((x)&0x1F))			/* Mask Peripheral #x interrupt	*/
-#define SIC_UNMASK1(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK1(x) (1 << ((x)&0x1F))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK1(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
 #endif /* _MISRA_RULES */
 
 
 /* SIC_IWR0 Masks*/
-#define IWR0_DISABLE_ALL 0x00000000				/* Wakeup Disable all peripherals	*/
-#define IWR0_ENABLE_ALL	 0xFFFFF3FF				/* Wakeup Enable all peripherals	*/
+#define IWR0_DISABLE_ALL 0x00000000       /* Wakeup Disable all peripherals   */
+#define IWR0_ENABLE_ALL  0xFFFFF3FF       /* Wakeup Enable all peripherals    */
 #ifdef _MISRA_RULES
-#define IWR0_ENABLE(x)	 (1 << ((x)&0x1Fu))		/* Wakeup Enable Peripheral #x	*/
-#define IWR0_DISABLE(x)	 (0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))/*Wakeup Disable Peripheral #x	*/
+#define IWR0_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR0_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Wakeup Disable Peripheral #x */
 #else
-#define IWR0_ENABLE(x)	 (1 << ((x)&0x1F))		/* Wakeup Enable Peripheral #x	*/
-#define IWR0_DISABLE(x)	 (0xFFFFFFFF ^ (1 << ((x)&0x1F)))/* Wakeup Disable Peripheral #x	*/
+#define IWR0_ENABLE(x)   (1 << ((x)&0x1F))  /* Wakeup Enable Peripheral #x   */
+#define IWR0_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Wakeup Disable Peripheral #x  */
 #endif /* _MISRA_RULES */
 
 /* SIC_IWR1 Masks*/
-#define IWR1_DISABLE_ALL 0x00000000				/* Wakeup Disable all peripherals	*/
-#define IWR1_ENABLE_ALL	 0xFFFFFF				/* Wakeup Enable all peripherals	*/
+#define IWR1_DISABLE_ALL 0x00000000       /* Wakeup Disable all peripherals   */
+#define IWR1_ENABLE_ALL  0xFFFFFF         /* Wakeup Enable all peripherals    */
 #ifdef _MISRA_RULES
-#define IWR1_ENABLE(x)	 (1 << ((x)&0x1Fu))		/* Wakeup Enable Peripheral #x	*/
-#define IWR1_DISABLE(x)	 (0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))/* Wakeup Disable Peripheral #x*/
+#define IWR1_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR1_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /* Wakeup Disable Peripheral #x*/
 #else
-#define IWR1_ENABLE(x)	 (1 << ((x)&0x1F))		/* Wakeup Enable Peripheral #x	*/
-#define IWR1_DISABLE(x)	 (0xFFFFFFFF ^ (1 << ((x)&0x1F)))/* Wakeup Disable Peripheral #x	*/
+#define IWR1_ENABLE(x)   (1 << ((x)&0x1F))  /* Wakeup Enable Peripheral #x   */
+#define IWR1_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))/* Wakeup Disable Peripheral #x  */
 #endif /* _MISRA_RULES */
 
 
@@ -1844,8 +1835,6 @@
 #define _BOOTROM_GET_DXE_ADDRESS_TWI 	0xEF000014
 
 /* Alternate Deprecated Macros Provided For Backwards Code Compatibility */
-#define PGDE_UART   				PFDE_UART
-#define PGDE_DMA    				PFDE_DMA
 #define CKELOW					SCKELOW
 
 

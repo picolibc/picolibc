@@ -11,7 +11,7 @@
  */
 
 /*
-** Copyright (C) 2008, 2009 Analog Devices, Inc.
+** Copyright (C) 2004-2009 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
@@ -29,7 +29,7 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_19_4:"ADI header allows any substitution")
 #pragma diag(suppress:misra_rule_19_7:"ADI header allows function macros")
-
+#include <stdint.h>
 #endif /* _MISRA_RULES */
 
 /************************************************************************************
@@ -82,7 +82,6 @@
 #define UART0_LCR			0xFFC0040C	/* Line Control Register					*/
 #define UART0_MCR			0xFFC00410	/* Modem Control Register					*/
 #define UART0_LSR			0xFFC00414	/* Line Status Register						*/
-#define UART0_MSR			0xFFC00418	/* Modem Status Register					*/
 #define UART0_SCR			0xFFC0041C	/* SCR Scratch Register						*/
 #define UART0_GCTL			0xFFC00424	/* Global Control Register					*/
 
@@ -534,7 +533,6 @@
 #define UART1_LCR			0xFFC0200C	/* Line Control Register				*/
 #define UART1_MCR			0xFFC02010	/* Modem Control Register				*/
 #define UART1_LSR			0xFFC02014	/* Line Status Register					*/
-#define UART1_MSR			0xFFC02018	/* Modem Status Register				*/
 #define UART1_SCR			0xFFC0201C	/* SCR Scratch Register					*/
 #define UART1_GCTL			0xFFC02024	/* Global Control Register				*/
 
@@ -1178,27 +1176,26 @@
 #define P30_IVG(x)		(((x)&_MF15)-_MF7) << 0x18	/* Peripheral #30 assigned IVG #x	*/
 #define P31_IVG(x)		(((x)&_MF15)-_MF7) << 0x1C	/* Peripheral #31 assigned IVG #x	*/
 
-
-/* SIC_IMASK Masks																		*/
-#define SIC_UNMASK_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
-#define SIC_MASK_ALL	0xFFFFFFFF					/* Mask all peripheral interrupts	*/
+/* SIC_IMASK Masks*/
+#define SIC_UNMASK_ALL 0x00000000         /* Unmask all peripheral interrupts */
+#define SIC_MASK_ALL   0xFFFFFFFF         /* Mask all peripheral interrupts   */
 #ifdef _MISRA_RULES
-#define SIC_MASK(x)		(1 << ((x)&0x1Fu))					/* Mask Peripheral #x interrupt		*/
-#define SIC_UNMASK(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu)))	/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
 #else
-#define SIC_MASK(x)		(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
-#define SIC_UNMASK(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
+#define SIC_MASK(x) (1 << ((x)&0x1F))     /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
 #endif /* _MISRA_RULES */
 
-/* SIC_IWR Masks																		*/
-#define IWR_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
-#define IWR_ENABLE_ALL	0xFFFFFFFF					/* Wakeup Enable all peripherals	*/
+/* SIC_IWR Masks*/
+#define IWR_DISABLE_ALL 0x00000000        /* Wakeup Disable all peripherals   */
+#define IWR_ENABLE_ALL  0xFFFFFFFF        /* Wakeup Enable all peripherals    */
 #ifdef _MISRA_RULES
-#define IWR_ENABLE(x)	(1 << ((x)&0x1Fu))					/* Wakeup Enable Peripheral #x		*/
-#define IWR_DISABLE(x)	(0xFFFFFFFFu ^ (1 << ((x)&0x1Fu))) 	/* Wakeup Disable Peripheral #x		*/
+#define IWR_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Wakeup Disable Peripheral #x */
 #else
-#define IWR_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
-#define IWR_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
+#define IWR_ENABLE(x)   (1 << ((x)&0x1F)) /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Wakeup Disable Peripheral #x  */
 #endif /* _MISRA_RULES */
 
 

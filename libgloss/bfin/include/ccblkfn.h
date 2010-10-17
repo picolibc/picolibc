@@ -10,5 +10,14 @@
  * they apply.
  */
 
-/* For now, a dummy header file, fill in with gcc-specific items later.
-   Header files from VisualDSP require that this exists.  */
+#ifndef _CCBLKFN_H
+#define _CCBLKFN_H
+
+#include <stdlib.h>
+
+#include <builtins.h>
+#include <sys/anomaly_macros_rtl.h>
+
+#include <sys/mc_typedef.h>
+
+#endif

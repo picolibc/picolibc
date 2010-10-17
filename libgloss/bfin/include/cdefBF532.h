@@ -14,7 +14,7 @@
  *
  * cdefBF532.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2001-2009 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 
@@ -87,7 +87,6 @@
 #define pUART_LCR 		((volatile unsigned short *)UART_LCR)
 #define pUART_MCR 		((volatile unsigned short *)UART_MCR)
 #define pUART_LSR 		((volatile unsigned short *)UART_LSR)
-/* #define UART_MSR */
 #define pUART_SCR 		((volatile unsigned short *)UART_SCR)
 #define pUART_GCTL 		((volatile unsigned short *)UART_GCTL)
 

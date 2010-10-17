@@ -13,7 +13,7 @@
 /*
 ** cdefBF549M.h
 **
-** Copyright (C) 2009 Analog Devices, Inc.
+** Copyright (C) 2008-2009 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
@@ -22,4 +22,9 @@
 **
 ************************************************************************************/
 
+#ifndef _CDEF_BF549M_H
+#define _CDEF_BF549M_H
+
 #include <cdefBF549.h>
+
+#endif /* _CDEF_BF549M_H */

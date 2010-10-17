@@ -11,7 +11,7 @@
  */
 
 /*
-** Copyright (C) 2008 Analog Devices, Inc.
+** Copyright (C) 2004 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **

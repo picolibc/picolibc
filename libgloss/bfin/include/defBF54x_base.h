@@ -13,7 +13,7 @@
 /*
 ** defBF54x_base.h
 **
-** Copyright (C) 2008, 2009 Analog Devices, Inc.
+** Copyright (C) 2006-2009 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
@@ -29,8 +29,10 @@
 
 #ifdef _MISRA_RULES
 #pragma diag(push)
-#pragma diag(suppress:misra_rule_19_4)
-#pragma diag(suppress:misra_rule_19_7)
+#pragma diag(suppress:misra_rule_5_1:"ADI Header allows long identifiers")
+#pragma diag(suppress:misra_rule_19_4:"ADI header allows any substitution text")
+#pragma diag(suppress:misra_rule_19_7:"ADI header allows function macros")
+#include <stdint.h>
 #endif /* _MISRA_RULES */
 
 
@@ -4637,11 +4639,23 @@
 /* ******************************************* */
 
 /* SYSCR Masks */
+#define BMODE             0x000F /* Boot Mode. Mirror of BMODE Mode Pins */
+#define BMODE_NOBOOT      0x0000 /* The processor does not boot. Rather, the boot kernel executes an IDLE instruction. */
+#define BMODE_FLASH       0x0001 /* Boot from 8-bit or 16-bit external flash memory */
+#define BMODE_FIFO        0x0002 /* Boot from 16-bit asynchronous FIFO */
+#define BMODE_SPIMEM      0x0003 /* Boot from serial SPI memory */
+#define BMODE_SPIHOST     0x0004 /* Boot from SPI0 host (slave mode) */
+#define BMODE_TWIMEM      0x0005 /* Boot from serial TWI memory */
+#define BMODE_TWIHOST     0x0006 /* Boot from TWI0 host (slave mode) */
+#define BMODE_UARTHOST    0x0007 /* Boot from UART host */
+#define BMODE_UART1HOST   0x0007 /* Boot from UART1 host */
+#define BMODE_SDRAMMEM    0x000A /* Boot from SDRAM memory (warm boot) */
+#define BMODE_OTPMEM      0x000B /* Boot from OTP memory */
+#define BMODE_NAND        0x000D /* Boot from 8- and 16-bit NAND flash */
+#define BMODE_HOSTDMA_ACK 0x000E /* Boot from 16-bit host DMA (ACK mode) */
+#define BMODE_HOSTDMA_INT 0x000F /* Boot from 8-bit host DMA (INT mode) */
 
-#define BMODE 0x000F /* Boot Mode. Mirror of BMODE Mode Pins */
 #define NOBOOT 0x0030 /* Execute From L1 or ASYNC Bank 0 When BMODE = 0 */
-
-
 #define BCODE 0x00F0
 #define BCODE_NORMAL 0x0000 /* normal boot, update PLL/VR, quickboot as by WURESET */
 #define BCODE_NOBOOT 0x0010 /* bypass boot, don't update PLL/VR */
@@ -5429,30 +5443,30 @@ PORTJ_DIR_CLEAR, PORTJ_INEN, PORTJ_FER */
 
 /* SIC_IMASKx Masks */
 /* masks are 32 bit wide, so two writes reguired for "64 bit" wide registers */
-#define SIC_UNMASK_ALL  0x00000000  /* Unmask all peripheral interrupts */
-#define SIC_MASK_ALL    0xFFFFFFFF  /* Mask all peripheral interrupts */
+#define SIC_UNMASK_ALL 0x00000000         /* Unmask all peripheral interrupts */
+#define SIC_MASK_ALL   0xFFFFFFFF         /* Mask all peripheral interrupts   */
 
 /* SIC_IMASKx Macros */
 #ifdef _MISRA_RULES
-#define SIC_MASK(x)     (1 << (x))  /* Mask Peripheral #x interrupt */
-#define SIC_UNMASK(x)   (0xFFFFFFFFu ^ (1 << (x))) /* Unmask Peripheral #x interrupt */
+#define SIC_MASK(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
 #else
-#define SIC_MASK(x)     (1 << (x))  /* Mask Peripheral #x interrupt */
-#define SIC_UNMASK(x)   (0xFFFFFFFF ^ (1 << (x))) /* Unmask Peripheral #x interrupt */
+#define SIC_MASK(x) (1 << ((x)&0x1F))     /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
 #endif /* _MISRA_RULES */
 
 /* SIC_IWR Masks */
-#define IWR_DISABLE_ALL 0x00000000          /* Wakeup Disable all peripherals */
-#define IWR_ENABLE_ALL  0xFFFFFFFF          /* Wakeup Enable all peripherals */
+#define IWR_DISABLE_ALL 0x00000000        /* Wakeup Disable all peripherals   */
+#define IWR_ENABLE_ALL  0xFFFFFFFF        /* Wakeup Enable all peripherals    */
 
 /* SIC_IWR Macros */
 /* x = pos 0 to 31, for 32-63 use value-32 */
 #ifdef _MISRA_RULES
-#define IWR_ENABLE(x)   (1 << (x))          /* Wakeup Enable Peripheral #x */
-#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
+#define IWR_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Wakeup Disable Peripheral #x */
 #else
-#define IWR_ENABLE(x)   (1 << (x))          /* Wakeup Enable Peripheral #x */
-#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
+#define IWR_ENABLE(x)   (1 << ((x)&0x1F)) /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Wakeup Disable Peripheral #x  */
 #endif /* _MISRA_RULES */
 
 #define PIVG(PNr, IVGNr) ( (IVGNr) - 7) << ( ((PNr)%8) * 4) /* Peripheral #PNr assigned IVG #IVGNr  */

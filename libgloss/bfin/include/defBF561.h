@@ -14,7 +14,7 @@
  *
  * defBF561.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2001-2009 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 
@@ -33,6 +33,7 @@
 #pragma diag(push)
 #pragma diag(suppress:misra_rule_19_4)
 #pragma diag(suppress:misra_rule_19_7)
+#include <stdint.h>
 #endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
@@ -111,7 +112,6 @@
 #define UART_LCR              	0xFFC0040C  /* Line Control Register */
 #define UART_MCR			 	0xFFC00410  /* Modem Control Register */
 #define UART_LSR              	0xFFC00414  /* Line Status Register */
-#define UART_MSR            	0xFFC00418  /* Modem Status Register */
 #define UART_SCR              	0xFFC0041C  /* SCR Scratch Register */
 #define UART_GCTL      	      	0xFFC00424  /* Global Control Register */
 
@@ -969,20 +969,33 @@
 																   /*        r0.h = hi(Peripheral_IVG(62, 10)); */
 
 
-
 /* SICx_IMASKw Masks */
 /* masks are 32 bit wide, so two writes reguired for "64 bit" wide registers  */
-#define SIC_UNMASK_ALL         0x00000000  /* Unmask all peripheral interrupts */
-#define SIC_MASK_ALL           0xFFFFFFFF  /* Mask all peripheral interrupts */
-#define SIC_MASK(x)	       (1 << (x))    /* Mask Peripheral #x interrupt */
-#define SIC_UNMASK(x) (0xFFFFFFFF ^ (1 << (x))) /* Unmask Peripheral #x interrupt */
+#define SIC_UNMASK_ALL 0x00000000         /* Unmask all peripheral interrupts */
+#define SIC_MASK_ALL   0xFFFFFFFF         /* Mask all peripheral interrupts   */
+
+/* SIC_IMASKx Macros */
+#ifdef _MISRA_RULES
+#define SIC_MASK(x) ((int32_t)1 << ((x)&0x1Fu))  /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Unmask Peripheral #x interrupt*/
+#else
+#define SIC_MASK(x) (1 << ((x)&0x1F))     /* Mask Peripheral #x interrupt  */
+#define SIC_UNMASK(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Unmask Peripheral #x interrupt */
+#endif /* _MISRA_RULES */
 
 /* SIC_IWR Masks */
-#define IWR_DISABLE_ALL        0x00000000  /* Wakeup Disable all peripherals */
-#define IWR_ENABLE_ALL         0xFFFFFFFF  /* Wakeup Enable all peripherals */
+#define IWR_DISABLE_ALL 0x00000000        /* Wakeup Disable all peripherals   */
+#define IWR_ENABLE_ALL  0xFFFFFFFF        /* Wakeup Enable all peripherals    */
+
+/* SIC_IWR Macros */
 /* x = pos 0 to 31, for 32-63 use value-32 */
-#define IWR_ENABLE(x)	       (1 << (x))    /* Wakeup Enable Peripheral #x */
-#define IWR_DISABLE(x) (0xFFFFFFFF ^ (1 << (x))) /* Wakeup Disable Peripheral #x */
+#ifdef _MISRA_RULES
+#define IWR_ENABLE(x)   ((int32_t)1 << ((x)&0x1Fu))  /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFFu ^ ((uint32_t)1 << ((x)&0x1Fu)))  /*Wakeup Disable Peripheral #x */
+#else
+#define IWR_ENABLE(x)   (1 << ((x)&0x1F)) /* Wakeup Enable Peripheral #x   */
+#define IWR_DISABLE(x)  (0xFFFFFFFF ^ (1 << ((x)&0x1F)))  /* Wakeup Disable Peripheral #x  */
+#endif /* _MISRA_RULES */
 
 /* Peripheral Masks For SIC_ISR, SIC_IWR, SIC_IMASK */
 #define PLL_WAKEUP_IRQ      0x00000001      /* PLL Wakeup Interrupt Request */

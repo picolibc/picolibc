@@ -14,7 +14,7 @@
  *
  * anomaly_macros_rtl.h : $Revision$
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2005-2009 Analog Devices, Inc.  All rights reserved.
  *
  * This file defines macros used within the run-time libraries to enable
  * certain anomaly workarounds for the appropriate chips and silicon
@@ -314,6 +314,72 @@
     (__SILICON_REVISION__ == 0x0 || __SILICON_REVISION__ == 0xffff)))
 
 
+/* 050000244 - "If I-Cache Is On, CSYNC/SSYNC/IDLE Around Change of Control
+**              Causes Failures"
+**
+** When instruction cache is enabled, a CSYNC/SSYNC/IDLE around a
+** change of control (including asynchronous exceptions/interrupts)
+** can cause unpredictable results.
+**
+** This macro is used by System Services/Device Drivers.
+**
+** Impacted:
+**
+** BF531/2/3 - 0.0-0.4 (fixed 0.5)
+** BF534/6/7 - 0.0-0.2 (fixed 0.3)
+** BF534/8/9 - 0.0-0.1 (fixed 0.2)
+** BF561 - 0.0-0.3 (fixed 0.5)
+*/
+
+#define WA_05000244 \
+  (defined(__SILICON_REVISION__) && \
+   ((defined(__ADSPBF533_FAMILY__) &&  \
+     (__SILICON_REVISION__ <= 0x4 || __SILICON_REVISION__ == 0xffff)) || \
+    (defined(__ADSPBF537_FAMILY__) &&  \
+     (__SILICON_REVISION__ <= 0x2 || __SILICON_REVISION__ == 0xffff)) || \
+    (defined(__ADSPBF538_FAMILY__) &&  \
+     (__SILICON_REVISION__ <= 0x1 || __SILICON_REVISION__ == 0xffff)) || \
+    (defined(__ADSPBF561_FAMILY__) &&  \
+     (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))))
+
+
+/* 050000245 - "False Hardware Error from an Access in the Shadow of a
+**              Conditional Branch"
+**
+** If a load accesses reserved or illegal memory on the opposite control
+** flow of a conditional jump to the taken path, a false hardware error
+** will occur.
+**
+** This macro is used by System Services/Device Drivers.
+**
+** This is for all Blackfin LP parts.
+*/
+
+#define WA_05000245 \
+  (defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__))
+
+
+/* 050000248 - "TESTSET Operation Forces Stall on the Other Core "
+**
+** Use by System Services/Device Drivers.
+**
+** Succeed any testset to L2 with a write to L2 to avoid the other core
+** stalling. This must be atomic, as an interrupt between the two would
+** cause the lockout to occur until the interrupt is fully serviced.
+**
+** This macro is used by System Services/Device Drivers.
+**
+** Impacted:
+**
+** BF561 - 0.0-0.3 (fixed 0.5)
+**
+*/
+
+#define WA_05000248 \
+  (defined (__SILICON_REVISION__) && defined(__ADSPBF561_FAMILY__) &&  \
+   (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff))
+
+
 /* 05-00-0258 - "Instruction Cache is corrupted when bit 9 and 12 of
  * the ICPLB Data registers differ"
  *
@@ -354,18 +420,6 @@
    (__SILICON_REVISION__ <= 0x1 || \
     __SILICON_REVISION__ == 0xffff))) || \
   (!defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__)))
-
-
-/* 05-00-0259 - "Non-deterministic ICPLB descriptors delivered to
- * hardware". Whenever ICPLBs are disabled via an MMR write, immediately
- * follow this write with a CSYNC, and locate the MMR write and CSYNC
- * within the same aligned 64 bit word.
- *
- * This problem impacts all revisions of Blackfins.
- */
-
-#define WA_05000259 \
-	(defined(__ADSPBLACKFIN__) && defined(__SILICON_REVISION__))
 
 
 /* 05-00-0261 - "DCPLB_FAULT_ADDR MMR may be corrupted".
@@ -486,6 +540,31 @@
     (__SILICON_REVISION__ <= 0x5 || __SILICON_REVISION__ == 0xffff)))
 
 
+/* 05-00-0312 - Errors when SSYNC, CSYNC, or Loads to LT, LB and LC Registers
+
+**              Are Interrupted
+**
+**  Impacted:
+**     ADSP-BF53[123]   - 0.0-0.5 (fixed in 0.6)
+**     ADSP-BF53[467]   - all supported revisions
+**     ADSP-BF53[89]    - 0.0-0.4 (fixed in 0.5)
+**     ADSP-BF561       - all supported revisions
+**     ADSP-BF54[24789] - 0.0 (fixed in 0.1)
+**
+** Used by VDK
+*/
+#define WA_05000312 \
+        (defined(__SILICON_REVISION__) && \
+         (defined(__ADSPBF533_FAMILY__) &&  \
+          (__SILICON_REVISION__ <= 0x5 || __SILICON_REVISION__ == 0xffff)) || \
+         (defined(__ADSPBF537_FAMILY__)) ||  \
+         (defined(__ADSPBF538_FAMILY__) &&  \
+          (__SILICON_REVISION__ <= 0x4 || __SILICON_REVISION__ == 0xffff)) || \
+         (defined(__ADSPBF548_FAMILY__) && \
+          (__SILICON_REVISION__ == 0x0 || __SILICON_REVISION__ == 0xffff)) || \
+         (defined(__ADSPBF561_FAMILY__)))
+
+
 /* 05-00-0323 - Erroneous Flag (GPIO) Pin Operations under Specific Sequences
 **
 **  Impacted:
@@ -509,6 +588,34 @@
 #define WA_05000365 \
   ((defined(__ADSPBF548_FAMILY__) || defined(__ADSPBF548M_FAMILY__)) && \
    defined(__SILICON_REVISION__))
+
+
+/* 05-00-0371 - Possible RETS Register Corruption when Subroutine Is under
+**              5 Cycles in Duration
+**
+** This problem impacts:
+** BF531/2/3 - 0.0-0.5 (fixed in 0.6)
+** BF534/6/7 - 0.0-0.3
+** BF538/9   - 0.0-0.4 (fixed in 0.5)
+** BF561     - 0.0-0.5
+** BF542/4/7/8/9  - 0.0-0.1 (fixed in 0.2)
+** BF523/5/7 - 0.0-0.1 (fixed in 0.2)
+**
+*/
+
+#define WA_05000371 \
+  (defined(__SILICON_REVISION__) && \
+   (defined(__ADSPBF533_FAMILY__) && \
+    (__SILICON_REVISION__ <= 0x5 || __SILICON_REVISION__ == 0xffff)) || \
+   (defined(__ADSPBF537_FAMILY__) && \
+    (__SILICON_REVISION__ <= 0x3 || __SILICON_REVISION__ == 0xffff)) || \
+   (defined(__ADSPBF538_FAMILY__) && \
+    (__SILICON_REVISION__ <= 0x4 || __SILICON_REVISION__ == 0xffff)) || \
+   (defined(__ADSPBF548_FAMILY__) && \
+    (__SILICON_REVISION__ <= 0x1 || __SILICON_REVISION__ == 0xffff)) || \
+   (defined(__ADSPBF527_FAMILY__) && \
+    (__SILICON_REVISION__ <= 0x1 || __SILICON_REVISION__ == 0xffff)) || \
+   (defined(__ADSPBF561__) || defined(__ADSPBF566__)))
 
 
 /* 05-00-0380 - Data Read From L3 Memory by USB DMA May be Corrupted
@@ -550,6 +657,31 @@
 
 #define WA_05000412 \
         (defined (__SILICON_REVISION__) && defined(__ADSPBF561__))
+
+
+/* 05-00-0426 - Speculative Fetches of Indirect-Pointer Instructions Can
+**              Cause False Hardware Errors
+**
+**
+** A false hardware error is generated if there is an indirect jump or
+** call through a pointer which may point to reserved or illegal memory
+** on the opposite control flow of a conditional jump to the taken path.
+** This commonly occurs when using function pointers, which can be
+** invalid (e.g., set to -1).
+**
+** Workaround: If instruction cache is on or the ICPLBs are enabled,
+** this anomaly does not apply. If instruction cache is off and ICPLBs
+** are disabled, the indirect pointer instructions must be 2 instructions
+** away from the branch instruction, which can be implemented using NOPs:
+**
+**
+**  Impacted:
+**     All parts and revisions other than BF535 based parts.
+**
+** Used by System Services/Device Drivers.
+*/
+#define WA_05000426 \
+   (defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__))
 
 
 /* 05-00-0428 - "Lost/Corrupted Write to L2 Memory Following Speculative Read
@@ -607,6 +739,16 @@
           (__SILICON_REVISION__ == 0x4)    || \
           (__SILICON_REVISION__ == 0x5)))
 
+
+/* 05-00-0443 - IFLUSH Instruction at End of Hardware Loop Causes Infinite Stall
+**
+**  Impacted:
+**     All parts and revisions other than BF535 based parts.
+**
+** Used by System Services/Device Drivers.
+*/
+#define WA_05000443 \
+   (defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__))
 
 #ifdef _MISRA_RULES
 #pragma diag(pop)

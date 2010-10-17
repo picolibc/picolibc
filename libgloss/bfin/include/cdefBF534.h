@@ -11,7 +11,7 @@
  */
 
 /*
-** Copyright (C) 2008, 2009 Analog Devices, Inc.
+** Copyright (C) 2005-2009 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
@@ -94,7 +94,6 @@
 #define pUART0_LCR 		((volatile unsigned short *)UART0_LCR)
 #define pUART0_MCR 		((volatile unsigned short *)UART0_MCR)
 #define pUART0_LSR 		((volatile unsigned short *)UART0_LSR)
-#define pUART0_MSR		((volatile unsigned short *)UART0_LSR)
 #define pUART0_SCR 		((volatile unsigned short *)UART0_SCR)
 #define pUART0_GCTL 		((volatile unsigned short *)UART0_GCTL)
 
@@ -554,7 +553,6 @@
 #define pUART1_LCR 		((volatile unsigned short *)UART1_LCR)
 #define pUART1_MCR 		((volatile unsigned short *)UART1_MCR)
 #define pUART1_LSR 		((volatile unsigned short *)UART1_LSR)
-#define pUART1_MSR		((volatile unsigned short *)UART1_LSR)
 #define pUART1_SCR 		((volatile unsigned short *)UART1_SCR)
 #define pUART1_GCTL 		((volatile unsigned short *)UART1_GCTL)
 

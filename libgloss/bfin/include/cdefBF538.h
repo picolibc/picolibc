@@ -14,7 +14,7 @@
  *
  * cdefBF538.h
  *
- * Copyright (C) 2008, 2009 Analog Devices, Inc.
+ * (c) Copyright 2006-2009 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 

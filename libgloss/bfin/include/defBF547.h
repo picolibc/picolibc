@@ -13,7 +13,7 @@
 /*
 ** defBF547.h
 **
-** Copyright (C) 2008, 2009 Analog Devices, Inc.
+** Copyright (C) 2007-2008 Analog Devices Inc., All Rights Reserved.
 **
 ************************************************************************************
 **
