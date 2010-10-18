@@ -960,6 +960,8 @@ llistxattr SIGFE
 llrint = _f_llrint NOSIGFE
 llrintf = _f_llrintf NOSIGFE
 llrintl = _f_llrintl NOSIGFE
+llround NOSIGFE
+llroundf NOSIGFE
 __locale_mb_cur_max NOSIGFE
 localeconv NOSIGFE
 _localeconv = localeconv NOSIGFE

@@ -1,3 +1,7 @@
+2010-10-18   Marco Atzeri  <marco_atzeri@yahoo.it>
+
+	* winsup/cygwin/cygwin.din: Add llround and llroundf.
+
 2010-10-09  John Carey  <aeolus@electric-cloud.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
