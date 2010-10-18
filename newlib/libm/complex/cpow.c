@@ -32,6 +32,48 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<cpow>>, <<cpowf>>---complex power
+
+INDEX
+        cpow
+INDEX
+        cpowf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex cpow(double complex <[x]>, double complex <[y]>);
+       float complex cpowf(float complex <[x]>, float complex <[y]>);
+
+
+DESCRIPTION
+        @ifnottex
+        The cpow functions compute the complex power function x^y 
+        power, with a branch cut for the first parameter along the 
+        negative real axis.
+        @end ifnottex
+        @tex
+        The cpow functions compute the complex power function $x^y$ 
+        power, with a branch cut for the first parameter along the 
+        negative real axis.
+        @end tex
+
+        <<cpowf>> is identical to <<cpow>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        The cpow functions return the complex power function value.
+
+PORTABILITY
+        <<cpow>> and <<cpowf>> are ISO C99
+
+QUICKREF
+        <<cpow>> and <<cpowf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include <math.h>
 

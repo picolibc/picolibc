@@ -93,6 +93,7 @@ into another language, under the above conditions for modified versions.
 
 @menu
 * Math::           The mathematical functions (`math.h').
+* Complex::        The mathematical complex functions (`complex.h').
 * Reentrancy::     The functions in libm are not reentrant by default.
 * Long Double Functions:: The long double function support of libm.
 * Index::

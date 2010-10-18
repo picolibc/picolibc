@@ -32,6 +32,48 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<cacos>>, <<cacosf>>---complex arc cosine
+
+INDEX
+        cacos
+INDEX
+        cacosf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex cacos(double complex <[z]>);
+       float complex cacosf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex arc cosine of <[z]>,
+        with branch cuts outside the interval [-1, +1] along the real axis.
+
+        <<cacosf>> is identical to <<cacos>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        @ifnottex
+        These functions return the complex arc cosine value, in the range
+        of a strip mathematically  unbounded  along the imaginary axis
+        and in the interval [0, pi] along the real axis.
+        @end ifnottex
+        @tex
+        These functions return the complex arc cosine value, in the range
+        of a strip mathematically  unbounded  along the imaginary axis
+        and in the interval [<<0>>, $\pi$] along the real axis.
+        @end tex
+
+PORTABILITY
+        <<cacos>> and <<cacosf>> are ISO C99
+
+QUICKREF
+        <<cacos>> and <<cacosf>> are ISO C99
+
+*/
+
 #include <complex.h>
 #include <math.h>
 

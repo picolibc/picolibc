@@ -32,6 +32,39 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<ctanh>>, <<ctanf>>---complex hyperbolic tangent
+
+INDEX
+        ctanh
+INDEX
+        ctanhf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex ctanh(double complex <[z]>);
+       float complex ctanhf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex hyperbolic tangent of <[z]>.
+
+        <<ctanhf>> is identical to <<ctanh>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        These functions return the complex hyperbolic tangent value.
+
+PORTABILITY
+        <<ctanh>> and <<ctanhf>> are ISO C99
+
+QUICKREF
+        <<ctanh>> and <<ctanhf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include <math.h>
 

@@ -32,6 +32,39 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<ccosh>>, <<ccoshf>>---complex hyperbolic cosine
+
+INDEX
+        ccosh
+INDEX
+        ccoshf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex ccosh(double complex <[z]>);
+       float complex ccoshf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex hyperbolic cosine of <[z]>.
+
+        <<ccoshf>> is identical to <<ccosh>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        These functions return the complex hyperbolic cosine value.
+
+PORTABILITY
+        <<ccosh>> and <<ccoshf>> are ISO C99
+
+QUICKREF
+        <<ccosh>> and <<ccoshf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include <math.h>
 

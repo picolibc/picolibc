@@ -32,7 +32,12 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj =	
+chobj =	cabs.def cacos.def cacosh.def carg.def \
+        casin.def casinh.def catan.def catanh.def \
+        ccos.def ccosh.def cexp.def cimag.def clog.def \
+        conj.def cpow.def cproj.def creal.def \
+        csin.def csinh.def csqrt.def ctan.def ctanh.def
+
 
 SUFFIXES = .def
 

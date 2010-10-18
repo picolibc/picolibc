@@ -32,6 +32,39 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<ccos>>, <<ccosf>>---complex cosine
+
+INDEX
+        ccos
+INDEX
+        ccosf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex ccos(double complex <[z]>);
+       float complex ccosf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex cosine of <[z]>.
+
+        <<ccosf>> is identical to <<ccos>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        These functions return the complex cosine value.
+
+PORTABILITY
+        <<ccos>> and <<ccosf>> are ISO C99
+
+QUICKREF
+        <<ccos>> and <<ccosf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include <math.h>
 #include "cephes_subr.h"

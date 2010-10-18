@@ -32,6 +32,38 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<csinh>>, <<csinhf>>---complex hyperbolic sine
+
+INDEX
+        csinh
+INDEX
+        csinhf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex csinh(double complex <[z]>);
+       float complex csinhf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex hyperbolic sine of <[z]>.
+
+        <<ccoshf>> is identical to <<ccosh>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        These functions return the complex hyperbolic sine value.
+
+PORTABILITY
+        <<csinh>> and <<csinhf>> are ISO C99
+
+QUICKREF
+        <<csinh>> and <<csinhf>> are ISO C99
+
+*/
+
 #include <complex.h>
 #include <math.h>
 

@@ -264,7 +264,12 @@ libcomplex_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-chobj = 
+chobj = cabs.def cacos.def cacosh.def carg.def \
+        casin.def casinh.def catan.def catanh.def \
+        ccos.def ccosh.def cexp.def cimag.def clog.def \
+        conj.def cpow.def cproj.def creal.def \
+        csin.def csinh.def csqrt.def ctan.def ctanh.def
+
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi

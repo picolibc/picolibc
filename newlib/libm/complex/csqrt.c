@@ -32,6 +32,41 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<csqrt>>, <<csqrtf>>---complex square root
+
+INDEX
+        csqrt
+INDEX
+        csqrtf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex csqrt(double complex <[z]>);
+       float complex csqrtf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex square root of <[z]>, with 
+        a branch cut along the negative real axis. 
+
+        <<csqrtf>> is identical to <<csqrt>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        The csqrt functions return the complex square root value, in 
+        the range of the right halfplane (including the imaginary axis).
+
+PORTABILITY
+        <<csqrt>> and <<csqrtf>> are ISO C99
+
+QUICKREF
+        <<csqrt>> and <<csqrtf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include <math.h>
 

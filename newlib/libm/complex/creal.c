@@ -8,6 +8,39 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<creal>>, <<crealf>>---real part
+
+INDEX
+        creal
+INDEX
+        crealf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double creal(double complex <[z]>);
+       float crealf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the real part of <[z]>.
+
+        <<crealf>> is identical to <<creal>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        The creal functions return the real part value.
+
+PORTABILITY
+        <<creal>> and <<crealf>> are ISO C99
+
+QUICKREF
+        <<creal>> and <<crealf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 #include "../common/fdlibm.h"
 

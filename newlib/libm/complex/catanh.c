@@ -32,6 +32,52 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<catanh>>, <<catanhf>>---complex arc hyperbolic tangent
+
+INDEX
+        catanh
+INDEX
+        catanhf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double complex catanh(double complex <[z]>);
+       float complex catanhf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the complex arc hyperbolic tan of <[z]>,
+        with branch cuts outside the interval [-1, +1] along the
+        real axis.
+
+        <<catanhf>> is identical to <<catanh>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        @ifnottex
+        These functions return the complex arc hyperbolic tangent value,
+        in the range of a strip mathematically unbounded along the
+        real axis and in the interval [-i*p/2, +i*p/2] along the
+        imaginary axis.
+        @end ifnottex
+        @tex
+        These functions return the complex arc hyperbolic tangent value,
+        in the range of a strip mathematically unbounded along the
+        real axis and in the interval [$-i\pi/2$, $+i\pi/2$] along the
+        imaginary axis.
+        @end tex
+
+PORTABILITY
+        <<catanh>> and <<catanhf>> are ISO C99
+
+QUICKREF
+        <<catanh>> and <<catanhf>> are ISO C99
+
+*/
+
+
 #include <complex.h>
 
 double complex

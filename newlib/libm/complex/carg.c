@@ -8,6 +8,46 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+/*
+FUNCTION
+        <<carg>>, <<cargf>>---argument (phase angle)
+
+INDEX
+        carg
+INDEX
+        cargf
+
+ANSI_SYNOPSIS
+       #include <complex.h>
+       double carg(double complex <[z]>);
+       float cargf(float complex <[z]>);
+
+
+DESCRIPTION
+        These functions compute the argument (also called phase angle) 
+        of <[z]>, with a branch cut along the negative real axis.
+
+        <<cargf>> is identical to <<carg>>, except that it performs
+        its calculations on <<floats complex>>.
+
+RETURNS
+        @ifnottex
+        The carg functions return the value of the argument in the 
+        interval [-pi, +pi]
+        @end ifnottex
+        @tex
+        The carg functions return the value of the argument in the 
+        interval [$-\pi$, $+\pi$]
+        @end tex
+
+PORTABILITY
+        <<carg>> and <<cargf>> are ISO C99
+
+QUICKREF
+        <<carg>> and <<cargf>> are ISO C99
+
+*/
+
 #include <complex.h>
 #include <math.h>
 

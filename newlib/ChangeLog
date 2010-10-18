@@ -1,3 +1,16 @@
+2010-10-18  Marco Atzeri  <marco_atzeri@yahoo.it>
+
+	* libm/Makefile.am: added complex functions documentation
+	* libm/libm.texinfo: ditto
+	* libm/complex/Makefile.am: Ditto
+	* libm/complex/complex.tex: Ditto
+	* libm/complex/(cabs.c, cacos.c, cacosh.c, carg.c,
+     	casin.c, casinh.c, catan.c, catanh.c, ccos.c, ccosh.c,
+     	cexp.c, cimag.c, clog.c, conj.c, cpow.c, cproj.c, creal.c,
+     	csin.c, csinh.c, csqrt.c, ctan.c, ctanh.c): Ditto
+	* libm/Makefile.in: Regenerate
+	* libm/complex/Makefile.in: Ditto 
+
 2010-10-14  Craig Howland <howland@LGSInnovations.com>
 
 	* libc/include/math.h:  Delete cabs() and cabs() prototypes

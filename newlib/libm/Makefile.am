@@ -39,7 +39,7 @@ info_TEXINFOS = libm.texinfo
 
 libm_TEXINFOS = targetdep.tex
 
-libm.dvi: targetdep.tex math/stmp-def
+libm.dvi: targetdep.tex math/stmp-def complex/stmp-def
 
 stmp-targetdep: force
 	rm -f tmp.texi
@@ -55,6 +55,8 @@ stmp-targetdep: force
 targetdep.tex: stmp-targetdep ; @true
 
 math/stmp-def: stmp-targetdep ; @true
+
+complex/stmp-def: stmp-targetdep ; @true
 
 .PHONY: force
 force:
