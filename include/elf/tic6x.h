@@ -134,17 +134,17 @@ enum
     Tag_C6XABI_last
   };
 
-/* Values for Tag_C6XABI_Tag_CPU_arch.  GNU-specific names pending any
-   ABI defining official names associated with the values.  */
+/* Values for Tag_ISA.  GNU-specific names; the ABI does not specify
+   names for these values.  */
 enum
   {
-    C6XABI_Tag_CPU_arch_none = 0,
-    C6XABI_Tag_CPU_arch_C62X = 1,
-    C6XABI_Tag_CPU_arch_C67X = 3,
-    C6XABI_Tag_CPU_arch_C67XP = 4,
-    C6XABI_Tag_CPU_arch_C64X = 6,
-    C6XABI_Tag_CPU_arch_C64XP = 7,
-    C6XABI_Tag_CPU_arch_C674X = 8
+    C6XABI_Tag_ISA_none = 0,
+    C6XABI_Tag_ISA_C62X = 1,
+    C6XABI_Tag_ISA_C67X = 3,
+    C6XABI_Tag_ISA_C67XP = 4,
+    C6XABI_Tag_ISA_C64X = 6,
+    C6XABI_Tag_ISA_C64XP = 7,
+    C6XABI_Tag_ISA_C674X = 8
   };
 
 #endif /* _ELF_TIC6X_H */

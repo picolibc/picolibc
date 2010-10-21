@@ -22,4 +22,4 @@
 /* Define the TAG macro before including this file; it takes a tag
    name and value.  */
 
-TAG(Tag_C6XABI_Tag_CPU_arch, 2)
+TAG(Tag_ISA, 4)
