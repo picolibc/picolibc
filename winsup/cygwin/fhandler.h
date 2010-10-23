@@ -885,7 +885,7 @@ class fhandler_termios: public fhandler_base
   HANDLE& get_output_handle () { return output_handle; }
   line_edit_status line_edit (const char *rptr, int nread, termios&);
   void set_output_handle (HANDLE h) { output_handle = h; }
-  void tcinit (tty_min *this_tc, bool force = false);
+  void tcinit (tty_min *this_tc, bool force);
   bool is_tty () const { return true; }
   int tcgetpgrp ();
   int tcsetpgrp (int pid);

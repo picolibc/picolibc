@@ -695,7 +695,7 @@ fhandler_console::open (int flags, mode_t)
 {
   HANDLE h;
 
-  tcinit (get_tty_stuff (flags));
+  tcinit (get_tty_stuff (flags), false);
 
   set_io_handle (NULL);
   set_output_handle (NULL);

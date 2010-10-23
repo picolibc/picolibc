@@ -23,13 +23,13 @@ details. */
 /* Common functions shared by tty/console */
 
 void
-fhandler_termios::tcinit (tty_min *this_tc, bool force)
+fhandler_termios::tcinit (tty_min *this_tc, bool is_pty_master)
 {
   /* Initial termios values */
 
   tc = this_tc;
 
-  if (force || !tc->initialized ())
+  if (is_pty_master || !tc->initialized ())
     {
       tc->ti.c_iflag = BRKINT | ICRNL | IXON;
       tc->ti.c_oflag = OPOST | ONLCR;
@@ -55,7 +55,7 @@ fhandler_termios::tcinit (tty_min *this_tc, bool force)
       tc->ti.c_cc[VWERASE]	= CWERASE;
 
       tc->ti.c_ispeed = tc->ti.c_ospeed = B38400;
-      tc->pgid = myself->pgid;
+      tc->pgid = is_pty_master ? 0 : myself->pgid;
       tc->initialized (true);
     }
 }
@@ -108,7 +108,7 @@ fhandler_termios::tcgetpgrp ()
 int
 fhandler_pty_master::tcgetpgrp ()
 {
-  return myself->ctty != -1 && myself->ctty == tc->ntty ? tc->pgid : 0;
+  return tc->pgid;
 }
 
 void

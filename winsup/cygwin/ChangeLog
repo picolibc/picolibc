@@ -1,3 +1,21 @@
+2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.h (fhandler_termios::tcinit): Make second argument
+	non-optional.
+	* fhandler_console.cc (fhandler_console::open): Specify second argument
+	to tcinit.
+	* fhandler_termios.cc (fhandler_termios::tcinit): Rename second
+	argument.  Set pgid to 0 if this is a pty master.
+	(fhandler_termios::tcgetpgrp): Just return value of pgid.  It will be
+	zero if not initialized.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Specify second argument
+	to tcinit.
+	(fhandler_tty_slave::ioctl): Implement TIOCGPRP/TIOCSPGRP.  Fix switch
+	indentation.
+	(fhandler_tty_master::ioctl): Implement TIOCGPRP/TIOCSPGRP.
+	* include/sys/termios.h (TIOCGPGRP): Define similarly to Linux.
+	(TIOCSPGRP): Ditto.
+
 2010-10-18   Marco Atzeri  <marco_atzeri@yahoo.it>
 
 	* winsup/cygwin/cygwin.din: Add llround and llroundf.

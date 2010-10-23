@@ -484,7 +484,7 @@ fhandler_tty_slave::open (int flags, mode_t)
       goto out;
     }
 
-  tcinit (cygwin_shared->tty[get_unit ()]);
+  tcinit (cygwin_shared->tty[get_unit ()], false);
 
   cygwin_shared->tty.attach (get_unit ());
 
@@ -1065,6 +1065,21 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       set_nonblocking (*(int *) arg);
       retval = 0;
       goto out;
+    case TIOCGPGRP:
+      {
+	pid_t pid = this->tcgetpgrp ();
+	if (pid < 0)
+	  retval = -1;
+	else
+	  {
+	    *((pid_t *) arg) = pid;
+	    retval = 0;
+	  }
+      }
+      goto out;
+    case TIOCSPGRP:
+      retval = this->tcsetpgrp ((pid_t) arg);
+      goto out;
     default:
       set_errno (EINVAL);
       return -1;
@@ -1349,6 +1364,7 @@ fhandler_pty_master::open (int flags, mode_t)
   //
   // FIXME: Do this better someday
   fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
+small_printf ("tty%d myself->sid %d myself->pid %d this->tcgetpgrp %d\n", get_unit (), myself->sid, myself->pid, this->tcgetpgrp ());
   *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;
   *arch = *this;
@@ -1510,26 +1526,31 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 {
   switch (cmd)
     {
-      case TIOCPKT:
-	pktmode = *(int *) arg;
-	break;
-      case TIOCGWINSZ:
-	*(struct winsize *) arg = get_ttyp ()->winsize;
-	break;
-      case TIOCSWINSZ:
-	if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
-	    || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
-	  {
-	    get_ttyp ()->winsize = *(struct winsize *) arg;
-	    killsys (-get_ttyp ()->getpgid (), SIGWINCH);
-	  }
-	break;
-      case FIONBIO:
-	set_nonblocking (*(int *) arg);
-	break;
-      default:
-	set_errno (EINVAL);
-	return -1;
+    case TIOCPKT:
+      pktmode = *(int *) arg;
+      break;
+    case TIOCGWINSZ:
+      *(struct winsize *) arg = get_ttyp ()->winsize;
+      break;
+    case TIOCSWINSZ:
+      if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
+	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
+	{
+	  get_ttyp ()->winsize = *(struct winsize *) arg;
+	  killsys (-get_ttyp ()->getpgid (), SIGWINCH);
+	}
+      break;
+    case TIOCGPGRP:
+      *((pid_t *) arg) = this->tcgetpgrp ();
+      break;
+    case TIOCSPGRP:
+      return this->tcsetpgrp ((pid_t) arg);
+    case FIONBIO:
+      set_nonblocking (*(int *) arg);
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
     }
   return 0;
 }
