@@ -186,6 +186,12 @@ pinfo::exit (DWORD n)
     }
 
   sigproc_terminate (ES_FINAL);
+  if (myself->ctty >= 0 && myself->ctty != TTY_CONSOLE)
+    {
+      tty *t = cygwin_shared->tty[myself->ctty];
+      if (!t->slave_alive ())
+	t->setpgid (0);
+    }
 
   /* FIXME:  There is a potential race between an execed process and its
      parent here.  I hated to add a mutex just for that, though.  */
@@ -390,9 +396,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
       else
 	sid = tc->getsid ();
       if (tc->getpgid () == 0)
-{debug_printf ("setting pgid to %d", pgid);
 	  tc->setpgid (pgid);
-}
       if (cygheap->ctty != arch)
 	{
 	  debug_printf ("cygheap->ctty %p, arch %p", cygheap->ctty, arch);
