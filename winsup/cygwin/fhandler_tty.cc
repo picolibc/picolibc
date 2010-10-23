@@ -1364,7 +1364,6 @@ fhandler_pty_master::open (int flags, mode_t)
   //
   // FIXME: Do this better someday
   fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
-small_printf ("tty%d myself->sid %d myself->pid %d this->tcgetpgrp %d\n", get_unit (), myself->sid, myself->pid, this->tcgetpgrp ());
   *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;
   *arch = *this;

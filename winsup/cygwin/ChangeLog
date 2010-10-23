@@ -1,5 +1,9 @@
 2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* fhandler_tty.cc (fhandler_pty_master::open): Remove debugging printf.
+
+2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* fhandler.h (fhandler_termios::tcinit): Make second argument
 	non-optional.
 	* fhandler_console.cc (fhandler_console::open): Specify second argument
