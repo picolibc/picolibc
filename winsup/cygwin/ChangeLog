@@ -1,5 +1,9 @@
 2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* pinfo.cc (pinfo::exit): Grab a tty lock before setting pgid.
+
+2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* pinfo.cc (pinfo::exit): Reset tty pgrp to zero if no more handles open.
 	(_pinfo::set_ctty): Remove debugging stuff.
 

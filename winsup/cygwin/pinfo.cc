@@ -188,6 +188,7 @@ pinfo::exit (DWORD n)
   sigproc_terminate (ES_FINAL);
   if (myself->ctty >= 0 && myself->ctty != TTY_CONSOLE)
     {
+      lock_ttys here;
       tty *t = cygwin_shared->tty[myself->ctty];
       if (!t->slave_alive ())
 	t->setpgid (0);
