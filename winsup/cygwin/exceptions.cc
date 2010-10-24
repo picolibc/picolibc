@@ -390,8 +390,9 @@ try_to_debug (bool waitloop)
      suspend_all_threads_except (current_thread_id);
   */
 
-  /* if any of these mutexes is owned, we will fail to start any cygwin app
-     until trapped app exits */
+  /* If the tty mutex is owned, we will fail to start any cygwin app
+     until the trapped app exits.  However, this will only release any
+     the mutex if it is owned by this thread so that may be problematic. */
 
   lock_ttys::release ();
 

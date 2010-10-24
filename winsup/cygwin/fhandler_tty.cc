@@ -1347,8 +1347,8 @@ fhandler_pty_master::fhandler_pty_master ()
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
-  int ntty;
-  ntty = cygwin_shared->tty.allocate (false);
+  /* Note that allocate returns with the tty lock set if it was successful. */
+  int ntty = cygwin_shared->tty.allocate (false);
   if (ntty < 0)
     return 0;
 
@@ -1361,8 +1361,8 @@ fhandler_pty_master::open (int flags, mode_t)
   lock_ttys::release ();
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
-  //
-  // FIXME: Do this better someday
+
+  /* FIXME: Do this better someday */
   fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
   *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
   archetype = arch;

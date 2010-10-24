@@ -1,3 +1,9 @@
+2010-10-24  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exceptions.cc (try_to_debug): Improve comment.
+	* fhandler_tty.cc (fhandler_pty_master::fhandler_pty_master): Add a
+	comment.
+
 2010-10-23  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* pinfo.cc (pinfo::exit): Grab a tty lock before setting pgid.
