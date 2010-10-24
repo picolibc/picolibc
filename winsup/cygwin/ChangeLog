@@ -3,8 +3,8 @@
 	* dcrt0.cc (do_exit): Don't set thread termination until all fds have
 	been closed since an fd may rely on a thread.
 	* fhandler_tty.cc: Reformat comment.
-	(fhandler_pty_master::pty_master_thread): Refuse ERROR_PIPE_CONNECTED
-	state as an error.
+	(fhandler_pty_master::pty_master_thread): Don't treat
+	ERROR_PIPE_CONNECTED state as an error.
 	* globals.cc (exit_states): Reorder ES_THREADTERM.
 
 	* path.cc (find_fast_cwd_pointers): Remove excessively wordy DEBUGGING output.
