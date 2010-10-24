@@ -3477,9 +3477,6 @@ find_fast_cwd_pointers ()
   if (movesi[0] != 0x8b)
     return;
   fast_cwd_ptr = (PFAST_CWD *) peek32 (movesi + 2);
-#ifdef DEBUGGING
-  system_printf ("fast_cwd_ptr: %p", fast_cwd_ptr);
-#endif
 }
 
 static inline void

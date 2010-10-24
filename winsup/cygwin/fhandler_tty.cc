@@ -1614,10 +1614,9 @@ extern "C" BOOL WINAPI GetNamedPipeClientProcessId (HANDLE, PULONG);
    OSes there's no function to check for the PID of the client process so
    we have to trust the client side.
 
-   Since there's
-   always only one pipe instance, there's a chance that clients have to
-   wait to connect to the master control pipe.  Therefore the client calls
-   to CallNamedPipe should have a big enough timeout value.  For now this
+   Since there's always only one pipe instance, there's a chance that clients
+   have to wait to connect to the master control pipe.  Therefore the client
+   calls to CallNamedPipe should have a big enough timeout value.  For now this
    is 500ms.  Hope that's enough. */
 
 DWORD
@@ -1635,7 +1634,7 @@ fhandler_pty_master::pty_master_thread ()
   DWORD pid;
 
   termios_printf ("Entered");
-  while (!exit && ConnectNamedPipe (master_ctl, NULL))
+  while (!exit && (ConnectNamedPipe (master_ctl, NULL) || GetLastError () == ERROR_PIPE_CONNECTED))
     {
       pipe_reply repl = { NULL, NULL, 0 };
       bool deimp = false;

@@ -1054,13 +1054,6 @@ do_exit (int status)
       events_terminate ();
     }
 
-  UINT n = (UINT) status;
-  if (exit_state < ES_THREADTERM)
-    {
-      exit_state = ES_THREADTERM;
-      cygthread::terminate ();
-    }
-
   if (exit_state < ES_SIGNAL)
     {
       exit_state = ES_SIGNAL;
@@ -1074,6 +1067,13 @@ do_exit (int status)
     {
       exit_state = ES_CLOSEALL;
       close_all_files ();
+    }
+
+  UINT n = (UINT) status;
+  if (exit_state < ES_THREADTERM)
+    {
+      exit_state = ES_THREADTERM;
+      cygthread::terminate ();
     }
 
   myself->stopsig = 0;
