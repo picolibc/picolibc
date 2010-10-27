@@ -63,7 +63,7 @@ _DEFUN (_strtoull_r, (rptr, nptr, endptr, base),
 	char **endptr _AND
 	int base)
 {
-	register const char *s = nptr;
+	register const unsigned char *s = (const unsigned char *)nptr;
 	register unsigned long long acc;
 	register int c;
 	register unsigned long long cutoff;
@@ -113,7 +113,7 @@ _DEFUN (_strtoull_r, (rptr, nptr, endptr, base),
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
-		*endptr = (char *) (any ? s - 1 : nptr);
+		*endptr = (char *) (any ? (char *)s - 1 : nptr);
 	return (acc);
 }
 

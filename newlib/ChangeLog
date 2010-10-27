@@ -1,3 +1,11 @@
+2010-10-27  Maurice Baijens  <maurice.baijens@ellips.nl>
+
+	* libc/stdlib/strtol.c: Make sure signed characters are not
+	sign-extended when converted to int and passed to ctype macros.
+	* libc/stdlib/strtoul.c: Ditto.
+	* libc/stdlib/strtoll_r.c: Ditto.
+	* libc/stdlib/strtoull_r.c: Ditto.
+
 2010-10-18  Marco Atzeri  <marco_atzeri@yahoo.it>
 
 	* libm/Makefile.am: added complex functions documentation
