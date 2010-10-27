@@ -396,12 +396,13 @@ details. */
 	   ccoshf, cexp, cexpf, cimag, cimagf, clog, clogf, conj, conjf, cpow,
 	   cpowf, cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf,
 	   csqrt, csqrtf, ctan, ctanf, ctanh, ctanhf.
+      233: Add TIOCGPGRP, TIOCSPGRP.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 232
+#define CYGWIN_VERSION_API_MINOR 233
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

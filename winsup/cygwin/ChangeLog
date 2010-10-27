@@ -1,3 +1,7 @@
+2010-10-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 233.
+
 2010-10-24  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (do_exit): Don't set thread termination until all fds have
