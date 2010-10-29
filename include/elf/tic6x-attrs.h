@@ -24,3 +24,4 @@
 
 TAG(Tag_ISA, 4)
 TAG(Tag_ABI_DSBT, 12)
+TAG(Tag_ABI_compatibility, 32)
