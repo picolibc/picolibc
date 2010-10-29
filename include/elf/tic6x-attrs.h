@@ -23,3 +23,4 @@
    name and value.  */
 
 TAG(Tag_ISA, 4)
+TAG(Tag_ABI_DSBT, 12)
