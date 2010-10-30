@@ -7,6 +7,7 @@
 #include "winsup.h"
 #include "cygerrno.h"
 #include "sync.h"
+#include <ctype.h>
 #define STD_INSPIRED
 #define lint
 
@@ -595,7 +596,13 @@ static struct state	gmtmem;
 #endif /* !defined TZ_STRLEN_MAX */
 
 static char		lcl_TZname[TZ_STRLEN_MAX + 1];
-static int		lcl_is_set;
+static enum lcl_states
+{
+  lcl_setting = -1,
+  lcl_unset = 0,
+  lcl_from_environment = 1,
+  lcl_from_default = 2
+} lcl_is_set;
 static int		gmt_is_set;
 
 #define tzname _tzname
@@ -1374,9 +1381,9 @@ static
 void
 tzsetwall P((void))
 {
-	if (lcl_is_set < 0)
+	if (lcl_is_set == lcl_setting)
 		return;
-	lcl_is_set = -1;
+	lcl_is_set = lcl_setting;
 
 #ifdef ALL_STATE
 	if (lclptr == NULL) {
@@ -1387,8 +1394,7 @@ tzsetwall P((void))
 		}
 	}
 #endif /* defined ALL_STATE */
-#if defined (_WIN32) || defined (__CYGWIN__)
-#define is_upper(c) ((unsigned)(c) - 'A' <= 26)
+#if defined (__CYGWIN__)
 	{
 	    TIME_ZONE_INFORMATION tz;
 	    char buf[BUFSIZ];
@@ -1398,7 +1404,7 @@ tzsetwall P((void))
 	    GetTimeZoneInformation(&tz);
 	    dst = cp = buf;
 	    for (src = tz.StandardName; *src; src++)
-	      if (is_upper(*src)) *dst++ = *src;
+	      if (isupper(*src)) *dst++ = *src;
 	    if ((dst - cp) < 3)
 	      {
 		/* In non-english Windows, converted tz.StandardName
@@ -1416,7 +1422,7 @@ tzsetwall P((void))
 		cp = strchr(cp, 0);
 		dst = cp;
 		for (src = tz.DaylightName; *src; src++)
-		  if (is_upper(*src)) *dst++ = *src;
+		  if (isupper(*src)) *dst++ = *src;
 		if ((dst - cp) < 3)
 		  {
 		    /* In non-english Windows, converted tz.DaylightName
@@ -1454,7 +1460,7 @@ tzsetwall P((void))
 	    /* printf("TZ deduced as `%s'\n", buf); */
 	    if (tzparse(buf, lclptr, false) == 0) {
 		settzname();
-		lcl_is_set = 1;
+		lcl_is_set = lcl_from_default;
 		strlcpy(lcl_TZname, buf, sizeof (lcl_TZname));
 #if 0
 		/* Huh?  POSIX doesn't mention anywhere that tzset should
@@ -1479,16 +1485,16 @@ tzset P((void))
 	const char *	name = getenv("TZ");
 
 	if (name == NULL) {
-		if (!lcl_is_set)
+		if (lcl_is_set != lcl_from_default)
 			tzsetwall();
 		goto out;
 	}
 
-	if (lcl_is_set > 0  &&  strcmp(lcl_TZname, name) == 0)
+	if (lcl_is_set > 0 && strncmp(lcl_TZname, name, sizeof(lcl_TZname) - 1) == 0)
 		goto out;
-	lcl_is_set = (strlen(name) < sizeof (lcl_TZname));
-	if (lcl_is_set)
-		strcpy(lcl_TZname, name);
+	lcl_is_set = (strlen(name) < sizeof (lcl_TZname)) ? lcl_from_environment : lcl_unset;
+	if (lcl_is_set != lcl_unset)
+		strlcpy(lcl_TZname, name, sizeof (lcl_TZname));
 
 #ifdef ALL_STATE
 	if (lclptr == NULL) {

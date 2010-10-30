@@ -1,3 +1,11 @@
+2010-10-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* localtime.cc (is_upper): Rename to isupper and include ctype.h to
+	pull in standard macro.
+	(lcl_is_set): Define as an enum.
+	(tzsetwall): Assign lcl_is_set to correct enum values.
+	(tzset): Ditto.  Copy as much of TZ as will fit to TZ buffer.
+
 2010-10-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 233.
