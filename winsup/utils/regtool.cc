@@ -711,7 +711,7 @@ cmd_set ()
 	n += mbstowcs ((wchar_t *) data + n, argv[i], max_n - n) + 1;
       ((wchar_t *)data)[n] = L'\0';
       rv = RegSetValueExW (key, value, 0, REG_MULTI_SZ, (const BYTE *) data,
-			   (max_n + 1) * sizeof (wchar_t));
+			   (n + 1) * sizeof (wchar_t));
       break;
     case REG_AUTO:
       rv = ERROR_SUCCESS;

@@ -1,3 +1,8 @@
+2010-10-30  Dmitry Potapov  <dpotapov@gmail.com>
+
+	* regtool.c (cmd_set): Write correct number of bytes for REG_MULTI_SZ
+	case.
+
 2010-09-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (RtlEqualUnicodePathPrefix): New helper function.
@@ -1370,7 +1375,7 @@
 
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
-	* regtool.cc (KEY_WOW64_64KEY): Drop definition.  Instead define 
+	* regtool.cc (KEY_WOW64_64KEY): Drop definition.  Instead define
 	WINVER to 0x0502 before including windows.h.
 
 2006-10-16  Corinna Vinschen  <corinna@vinschen.de>
