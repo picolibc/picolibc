@@ -26,6 +26,7 @@ details. */
 #define _PATH_TTY	"/dev/tty"
 #define _PATH_UTMP	"/var/run/utmp"
 #define _PATH_VARRUN	"/var/run/"
+#define _PATH_VARTMP	"/var/tmp/"
 #define _PATH_VI        "/bin/vi"
 #define _PATH_WTMP	"/var/log/wtmp"
 
