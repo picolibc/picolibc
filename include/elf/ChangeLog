@@ -1,3 +1,10 @@
+2010-11-02  Joseph Myers  <joseph@codesourcery.com>
+
+	* tic6x-attrs.h (Tag_ABI_wchar_t, Tag_ABI_stack_align_needed,
+	Tag_ABI_stack_align_preserved, Tag_ABI_PID, Tag_ABI_PIC,
+	Tag_ABI_array_object_alignment,
+	Tag_ABI_array_object_align_expected, Tag_ABI_conformance): Define.
+
 2010-10-29  Joseph Myers  <joseph@codesourcery.com>
 
 	* tic6x-attrs.h (Tag_ABI_compatibility): Define.
