@@ -1,76 +1,3 @@
-2010-11-03  Ian Lance Taylor  <iant@google.com>
-	    Dave Korn  <dave.korn.cygwin@gmail.com>
-
-	PR lto/46273
-	* configure.ac: Remove libelf tests.  Build lto-plugin on ELF always
-	and on other supported platforms whenever LTO is enabled.
-	* configure: Rebuild.
-
-2010-11-02  Alan Modra  <amodra@gmail.com>
-
-	PR binutils/12110
-	* configure.ac: Error when source path contains spaces.
-	* configure: Regenerate.
-
-2010-10-20  Ian Lance Taylor  <iant@google.com>
-
-	* Makefile.def (target_modules): Set lib_path to src/.libs for
-	libstdc++-v3 module.
-	* Makefile.tpl: Fix typo in TARGET_LIB_PATH comment.
-	* Makefile.in: Rebuild.
-
-2010-10-08  Bernd Schmidt  <bernds@codesourcery.com>
-	    Joseph Myers  <joseph@codesourcery.com>
-
-	* COPYING.LIBGLOSS: Add National Semiconductor and CodeSourcery
-	notices.
-	* COPYING.NEWLIB: Add Texas Instruments notice.
-
-2010-10-07  Dave Korn  <dave.korn.cygwin@gmail.com>
-
-	* configure.ac (build_lto_plugin): New shell variable.
-	(--enable-lto): Turn on by default for all non-ELF platforms that
-	have had LTO support added so far.  Set build_lto_plugin appropriately
-	for both ELF and non-ELF.
-	(configdirs): Add lto-plugin or not based on build_lto_plugin.
-	* configure: Regenerate.
-
-2010-10-02  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
-
-	PR bootstrap/45326
-	PR bootstrap/45174
-	* configure.ac: Honor initial values of $build_configargs,
-	$host_configargs, $target_configargs.  Mark the precious, so
-	environment settings get recorded.
-	* configure: Regenerate.
-
-2010-10-02  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
-
-	Sync from GCC:
-
-	2010-09-30  Michael Eager  <eager@eagercon.com>
-
-	* configure.ac (microblaze): Add target-libssp to noconfigdirs.
-	* configure: Regenerate.
-
-	2010-09-21  Iain Sandoe  <iains@gcc.gnu.org>
-
-	* configure.ac (enable-lto): Add Darwin to the list of supported lto
-	targets and amend comment.
-	* configure: Regenerate.
-
-	2010-09-03  Jack Howarth <howarth@bromo.med.uc.edu>
-
-	* configure.ac: Enable LTO by default on Darwin.
-	* configure: Regenerate.
-
-	2010-07-23  Marc Glisse <marc.glisse@normalesup.org>
-
-	PR bootstrap/44455
-	* configure.ac (extra_mpfr_configure_flags): Copy from
-	extra_mpc_gmp_configure_flags.
-	* configure: Re-generated.
-
 2010-09-30  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Sync from GCC:
@@ -86,11 +13,6 @@
 
 	PR bootstrap/44621
 	* configure.ac: Fix unportable shell quoting.
-	* configure: Regenerate.
-
-2010-07-26  Naveen.H.S  <naveen.S@kpitcummins.com>
-
-	* configure.ac: Support all v850 targets.
 	* configure: Regenerate.
 
 2010-07-17  Jack Howarth  <howarth@bromo.med.uc.edu>
