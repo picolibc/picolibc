@@ -221,14 +221,7 @@ target_configdirs=`echo ${target_libraries} ${target_tools}`
 build_configdirs=`echo ${build_libs} ${build_tools}`
 
 m4_divert_text([PARSE_ARGS],
-[case $srcdir in
-  *" "*)
-m4_pushdef([AS_MESSAGE_LOG_FD], [])dnl
-    AC_MSG_ERROR([path to source, $srcdir, contains spaces])
-m4_popdef([AS_MESSAGE_LOG_FD])dnl
-    ;;
-esac
-ac_subdirs_all=`cd $srcdir && echo */configure | sed 's,/configure,,g'`
+[ac_subdirs_all=`cd $srcdir && echo */configure | sed 's,/configure,,g'`
 ])
 
 ################################################################################
@@ -894,7 +887,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ld binutils gprof target-libgloss ${libgcj}"
     ;;
   microblaze*)
-    noconfigdirs="$noconfigdirs gprof target-libssp ${libgcj}"
+    noconfigdirs="$noconfigdirs gprof ${libgcj}"
     ;;
   mips*-sde-elf*)
     skipdirs="$skipdirs target-libiberty"
@@ -1355,7 +1348,7 @@ fi
 if test "x$with_gmp$with_gmp_include$with_gmp_lib" = x && test -d ${srcdir}/gmp; then
   gmplibs='-L$$r/$(HOST_SUBDIR)/gmp/'"$lt_cv_objdir $gmplibs"
   gmpinc='-I$$r/$(HOST_SUBDIR)/gmp -I$$s/gmp '"$gmpinc"
-  extra_mpfr_configure_flags='--with-gmp-include=$$r/$(HOST_SUBDIR)/gmp --with-gmp-lib=$$r/$(HOST_SUBDIR)/gmp/'"$lt_cv_objdir"
+  extra_mpfr_configure_flags='--with-gmp-build=$$r/$(HOST_SUBDIR)/gmp'
   extra_mpc_gmp_configure_flags='--with-gmp-include=$$r/$(HOST_SUBDIR)/gmp --with-gmp-lib=$$r/$(HOST_SUBDIR)/gmp/'"$lt_cv_objdir"
   # Do not test the gmp version.  Assume that it is sufficient, since
   # it is in the source tree, and the library has not been built yet
@@ -1656,35 +1649,162 @@ AC_ARG_ENABLE(lto,
 enable_lto=$enableval,
 enable_lto=yes; default_enable_lto=yes)
 
-ACX_ELF_TARGET_IFELSE([# ELF platforms build the lto-plugin always.
-  build_lto_plugin=yes
-],[if test x"$default_enable_lto" = x"yes" ; then
-    case $target in
-      *-apple-darwin* | *-cygwin* | *-mingw*) ;;
-      # On other non-ELF platforms, LTO has yet to be validated.
-      *) enable_lto=no ;;
-    esac
+
+ACX_ELF_TARGET_IFELSE([if test x"$enable_lto" = x"yes" ; then
+  # Make sure that libelf.h and gelf.h are available.
+  AC_ARG_WITH(libelf, [  --with-libelf=PATH       Specify prefix directory for the installed libelf package
+                          Equivalent to --with-libelf-include=PATH/include
+                          plus --with-libelf-lib=PATH/lib])
+
+  AC_ARG_WITH(libelf_include, [  --with-libelf-include=PATH Specify directory for installed libelf include files])
+
+  AC_ARG_WITH(libelf_lib, [  --with-libelf-lib=PATH   Specify the directory for the installed libelf library])
+
+  saved_CFLAGS="$CFLAGS"
+  saved_CPPFLAGS="$CPPFLAGS"
+  saved_LIBS="$LIBS"
+
+  case $with_libelf in 
+    "")
+      libelflibs="-lelf"
+      libelfinc="-I/usr/include/libelf"
+      ;;
+    *)
+      libelflibs="-L$with_libelf/lib -lelf"
+      libelfinc="-I$with_libelf/include -I$with_libelf/include/libelf"
+      LIBS="$libelflibs $LIBS"
+      ;;
+  esac
+
+  if test "x$with_libelf_include" != x; then
+    libelfinc="-I$with_libelf_include"
+  fi
+
+  if test "x$with_libelf_lib" != x; then
+    libelflibs="-L$with_libelf_lib -lelf"
+    LIBS="$libelflibs $LIBS"
+  fi
+
+  if test "x$with_libelf$with_libelf_include$with_libelf_lib" = x \
+     && test -d ${srcdir}/libelf; then
+    libelflibs='-L$$r/$(HOST_SUBDIR)/libelf/lib -lelf '
+    libelfinc='-D__LIBELF_INTERNAL__ -I$$r/$(HOST_SUBDIR)/libelf/lib -I$$s/libelf/lib'
+    LIBS="$libelflibs $LIBS"
+
+ else
+
+  CFLAGS="$CFLAGS $libelfinc"
+  CPPFLAGS="$CPPFLAGS $libelfinc"
+  LIBS="$LIBS $libelflibs"
+
+  AC_CHECK_HEADERS(libelf.h, [have_libelf_h=yes])
+  AC_CHECK_HEADERS(gelf.h, [have_gelf_h=yes])
+
+  AC_CHECK_HEADERS(libelf/libelf.h, [have_libelf_libelf_h=yes])
+  AC_CHECK_HEADERS(libelf/gelf.h, [have_libelf_gelf_h=yes])
+
+  # If we couldn't find libelf.h and the user forced it, emit an error.
+  if test x"$have_libelf_h" != x"yes" \
+     && test x"$have_libelf_libelf_h" != x"yes" ; then
+    if test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([LTO support requires libelf.h or libelf/libelf.h.])
+    else
+      enable_lto=no
+      libelflibs=
+      libelfinc=
+    fi
+  fi
+
+  # If we couldn't find gelf.h and the user forced it, emit an error.
+  if test x"$have_gelf_h" != x"yes" \
+     && test x"$have_libelf_gelf_h" != x"yes" ; then
+    if test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([LTO support requires gelf.h or libelf/gelf.h.])
+    else
+      enable_lto=no
+      libelflibs=
+      libelfinc=
+    fi
+  fi
+
+  # Check that the detected libelf has the functions we need.  We cannot
+  # rely on just detecting the headers since they do not include 
+  # versioning information.  Add functions, if needed.
+  if test x"$enable_lto" = x"yes" ; then
+    AC_MSG_CHECKING([for the correct version of libelf])
+    AC_TRY_LINK(
+      [#include <libelf.h>],[
+      elf_errmsg (0);
+      elf_getscn (0, 0);
+      elf_nextscn (0, 0);
+      elf_strptr (0, 0, 0);
+      elf_getident (0, 0);
+      elf_begin (0, 0, 0);
+      elf_ndxscn (0);
+      elf_end (0);
+      ],
+      [AC_MSG_RESULT([yes]);],
+      [AC_MSG_RESULT([no]); enable_lto=no; libelflibs= ; libelfinc= ]
+    )
+
+    # Check for elf_getshdrstrndx or elf_getshstrndx.  The latter's flavor
+    # is determined in gcc/configure.ac.
+    if test x"$enable_lto" = x"yes" ; then
+      AC_MSG_CHECKING([for elf_getshdrstrndx])
+      AC_TRY_LINK(
+        [#include <libelf.h>],[
+	elf_getshdrstrndx (0, 0);
+        ],
+        [AC_MSG_RESULT([yes]);],
+        [AC_MSG_RESULT([no]);
+	 AC_MSG_CHECKING([for elf_getshstrndx])
+         AC_TRY_LINK(
+           [#include <libelf.h>],[
+	   elf_getshstrndx (0, 0);
+           ],
+           [AC_MSG_RESULT([yes]);],
+           [AC_MSG_RESULT([no]); enable_lto=no; libelflibs= ; libelfinc= ]
+         )]
+      )
+    fi
+
+    # If we couldn't enable LTO and the user forced it, emit an error.
+    if test x"$enable_lto" = x"no" \
+       && test x"$default_enable_lto" != x"yes" ; then
+      AC_MSG_ERROR([To enable LTO, GCC requires libelf v0.8.12+.
+Try the --with-libelf, --with-libelf-include and --with-libelf-lib options
+to specify its location.])
+    fi
+  fi
+
+  CFLAGS="$saved_CFLAGS"
+  CPPFLAGS="$saved_CPPFLAGS"
+  LIBS="$saved_LIBS"
+
+ fi
+
+  # Flags needed for libelf.
+  AC_SUBST(libelflibs)
+  AC_SUBST(libelfinc)
+fi],[if test x"$default_enable_lto" = x"yes" ; then
+    # On non-ELF platforms, LTO must be explicitly enabled.
+    enable_lto=no
   else
-  # Apart from ELF platforms, only Windows and Darwin support LTO so far.
-  # It would also be nice to check the binutils support, but we don't
+  # Apart from ELF platforms, only Windows supports LTO so far.  It
+  # would also be nice to check the binutils support, but we don't
   # have gcc_GAS_CHECK_FEATURE available here.  For now, we'll just
   # warn during gcc/ subconfigure; unless you're bootstrapping with
   # -flto it won't be needed until after installation anyway.
     case $target in
-      *-cygwin* | *-mingw* | *-apple-darwin*) ;;
+      *-cygwin*|*-mingw*) ;;
+      *-apple-darwin*) ;;
       *) if test x"$enable_lto" = x"yes"; then
 	AC_MSG_ERROR([LTO support is not enabled for this target.])
         fi
       ;;
     esac
   fi
-  # Among non-ELF, only Windows platforms support the lto-plugin so far.
-  # Build it unless LTO was explicitly disabled.
-  case $target in
-    *-cygwin* | *-mingw*) build_lto_plugin=$enable_lto ;;
-    *) ;;
-  esac
-])
+  default_enable_lto=no])
 
 
 # By default, C is the only stage 1 language.
@@ -1762,7 +1882,7 @@ if test -d ${srcdir}/gcc; then
       *,lto,*) ;;
       *) enable_languages="${enable_languages},lto" ;;
     esac
-    if test "${build_lto_plugin}" = "yes" ; then
+    if test "${ENABLE_GOLD}" = "yes" ; then
       configdirs="$configdirs lto-plugin"
       extra_host_libiberty_configure_flags=--enable-shared
     fi
@@ -2847,18 +2967,10 @@ if test "$silent" = yes; then
 fi
 baseargs="$baseargs --disable-option-checking"
 
-# Record and document user additions to sub configure arguments.
-AC_ARG_VAR([build_configargs],
-	   [additional configure arguments for build directories])
-AC_ARG_VAR([host_configargs],
-	   [additional configure arguments for host directories])
-AC_ARG_VAR([target_configargs],
-	   [additional configure arguments for target directories])
-
 # For the build-side libraries, we just need to pretend we're native,
 # and not use the same cache file.  Multilibs are neither needed nor
 # desired.
-build_configargs="$build_configargs --cache-file=../config.cache ${baseargs}"
+build_configargs="--cache-file=../config.cache ${baseargs}"
 
 # For host modules, accept cache file option, or specification as blank.
 case "${cache_file}" in
@@ -2872,9 +2984,9 @@ esac
 
 # Host dirs don't like to share a cache file either, horribly enough.
 # This seems to be due to autoconf 2.5x stupidity.
-host_configargs="$host_configargs --cache-file=./config.cache ${extra_host_args} ${baseargs}"
+host_configargs="--cache-file=./config.cache ${extra_host_args} ${baseargs}"
 
-target_configargs="$target_configargs ${baseargs}"
+target_configargs=${baseargs}
 
 # Passing a --with-cross-host argument lets the target libraries know
 # whether they are being built with a cross-compiler or being built
