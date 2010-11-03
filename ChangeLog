@@ -1,17 +1,3 @@
-2010-11-03  Ian Lance Taylor  <iant@google.com>
-	    Dave Korn  <dave.korn.cygwin@gmail.com>
-
-	PR lto/46273
-	* configure.ac: Remove libelf tests.  Build lto-plugin on ELF always
-	and on other supported platforms whenever LTO is enabled.
-	* configure: Rebuild.
-
-2010-11-02  Alan Modra  <amodra@gmail.com>
-
-	PR binutils/12110
-	* configure.ac: Error when source path contains spaces.
-	* configure: Regenerate.
-
 2010-10-20  Ian Lance Taylor  <iant@google.com>
 
 	* Makefile.def (target_modules): Set lib_path to src/.libs for
