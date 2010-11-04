@@ -83,6 +83,7 @@ cacos(double complex z)
 	double complex w;
 
 	w = casin(z);
-	w = (M_PI_2 - creal(w)) - cimag(w) * I;
+	w = M_PI_2 - creal(w);
+	w -= (cimag(w) * I);
 	return w;
 }

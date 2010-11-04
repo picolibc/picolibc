@@ -1,3 +1,8 @@
+2010-11-04  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libm/complex/cacos.c: Reorder function calls to work around ICE
+	in arm/thumb-gcc.
+
 2010-10-27  Maurice Baijens  <maurice.baijens@ellips.nl>
 
 	* libc/stdlib/strtol.c: Make sure signed characters are not
