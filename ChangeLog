@@ -1,3 +1,8 @@
+2010-11-05  Michael Eager  <eager@eagercon.com>
+
+	* COPYING.LIBGLOSS: Correct typo in microblaze.
+	* COPYING.NEWLIB: Same.
+
 2010-11-03  Ian Lance Taylor  <iant@google.com>
 	    Dave Korn  <dave.korn.cygwin@gmail.com>
 
