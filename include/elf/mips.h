@@ -222,6 +222,7 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 #define E_MIPS_MACH_9000	0x00990000
 #define E_MIPS_MACH_LS2E        0x00A00000
 #define E_MIPS_MACH_LS2F        0x00A10000
+#define E_MIPS_MACH_LS3A        0x00A20000
 
 /* Processor specific section indices.  These sections do not actually
    exist.  Symbols with a st_shndx field corresponding to one of these

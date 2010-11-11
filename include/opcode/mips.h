@@ -594,6 +594,8 @@ static const unsigned int mips_isa_table[] =
 #define INSN_LOONGSON_2E          0x40000000
 /* ST Microelectronics Loongson 2F.  */
 #define INSN_LOONGSON_2F          0x80000000
+/* Loongson 3A.  */
+#define INSN_LOONGSON_3A          0x80000400
 /* RMI Xlr instruction */
 #define INSN_XLR              	  0x00000020
 
@@ -647,6 +649,7 @@ static const unsigned int mips_isa_table[] =
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
 #define CPU_LOONGSON_2E 3001
 #define CPU_LOONGSON_2F 3002
+#define CPU_LOONGSON_3A 3003
 #define CPU_OCTEON	6501
 #define CPU_XLR     	887682   	/* decimal 'XLR'   */
 
@@ -680,6 +683,8 @@ static const unsigned int mips_isa_table[] =
          && ((insn)->membership & INSN_LOONGSON_2E) != 0)               \
      || (cpu == CPU_LOONGSON_2F                                         \
          && ((insn)->membership & INSN_LOONGSON_2F) != 0)               \
+     || (cpu == CPU_LOONGSON_3A                                         \
+         && ((insn)->membership & INSN_LOONGSON_3A) != 0)               \
      || (cpu == CPU_OCTEON						\
 	 && ((insn)->membership & INSN_OCTEON) != 0)			\
      || (cpu == CPU_XLR && ((insn)->membership & INSN_XLR) != 0)        \

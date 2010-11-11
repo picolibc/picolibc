@@ -1,3 +1,9 @@
+2010-11-11  Mingming Sun  <mingm.sun@gmail.com>
+
+	* mips.h (INSN_LOONGSON_3A): Defined.
+	(CPU_LOONGSON_3A): Defined.
+	(OPCODE_IS_MEMBER): Add LOONGSON_3A.
+
 2010-10-09  Matt Rice  <ratmice@gmail.com>
 
 	* cgen.h (CGEN_ATTR, CGEN_ATTR_TYPE): Rename bool attribute to bool_.
