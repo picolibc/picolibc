@@ -1,3 +1,10 @@
+2010-11-15  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	PR gas/12198
+	* arm.h (ARM_AEXT_V6M_ONLY): New define.
+	(ARM_AEXT_V6M): Rewrite in terms of ARM_AEXT_V6M_ONLY.
+	(ARM_ARCH_V6M_ONLY): New define.
+
 2010-10-09  Matt Rice  <ratmice@gmail.com>
 
 	* cgen.h (CGEN_ATTR, CGEN_ATTR_TYPE): Rename bool attribute to bool_.
