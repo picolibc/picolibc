@@ -115,9 +115,10 @@
 #define ARM_AEXT_NOTM \
   (ARM_AEXT_V4 | ARM_EXT_V5ExP | ARM_EXT_V5J | ARM_EXT_V6_NOTM \
    | ARM_EXT_V6_DSP )
+#define ARM_AEXT_V6M_ONLY \
+  ((ARM_EXT_BARRIER | ARM_EXT_V6M | ARM_EXT_THUMB_MSR) & ~(ARM_AEXT_NOTM))
 #define ARM_AEXT_V6M \
-  ((ARM_AEXT_V6K | ARM_EXT_BARRIER | ARM_EXT_V6M | ARM_EXT_THUMB_MSR) \
-   & ~(ARM_AEXT_NOTM))
+  ((ARM_AEXT_V6K | ARM_AEXT_V6M_ONLY) & ~(ARM_AEXT_NOTM))
 #define ARM_AEXT_V6SM (ARM_AEXT_V6M | ARM_EXT_OS)
 #define ARM_AEXT_V7M \
   ((ARM_AEXT_V7_ARM | ARM_EXT_V6M | ARM_EXT_V7M | ARM_EXT_DIV) \
@@ -228,6 +229,8 @@
 			ARM_FEATURE (ARM_AEXT_V7A | ARM_EXT_MP | ARM_EXT_SEC \
 				     | ARM_EXT_DIV | ARM_EXT_ADIV \
 				     | ARM_EXT_VIRT, 0)
+/* Features that are present in v6M and v6S-M but not other v6 cores.  */
+#define ARM_ARCH_V6M_ONLY ARM_FEATURE (ARM_AEXT_V6M_ONLY, 0)
 
 /* There are too many feature bits to fit in a single word, so use a
    structure.  For simplicity we put all core features in one word and

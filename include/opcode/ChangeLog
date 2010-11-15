@@ -1,3 +1,10 @@
+2010-11-15  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	PR gas/12198
+	* arm.h (ARM_AEXT_V6M_ONLY): New define.
+	(ARM_AEXT_V6M): Rewrite in terms of ARM_AEXT_V6M_ONLY.
+	(ARM_ARCH_V6M_ONLY): New define.
+
 2010-11-11  Mingming Sun  <mingm.sun@gmail.com>
 
 	* mips.h (INSN_LOONGSON_3A): Defined.
