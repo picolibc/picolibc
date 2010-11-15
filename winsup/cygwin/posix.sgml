@@ -414,6 +414,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     llrint
     llrintf
     llrintl
+    llround
+    llroundf
     localeconv
     localtime
     localtime_r
@@ -1340,8 +1342,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ldexpl
     lgammal
     lio_listio
-    llround
-    llroundf
     llroundl
     log10l
     log1pl

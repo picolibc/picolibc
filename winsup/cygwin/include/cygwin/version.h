@@ -396,7 +396,7 @@ details. */
 	   ccoshf, cexp, cexpf, cimag, cimagf, clog, clogf, conj, conjf, cpow,
 	   cpowf, cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf,
 	   csqrt, csqrtf, ctan, ctanf, ctanh, ctanhf.
-      233: Add TIOCGPGRP, TIOCSPGRP.
+      233: Add TIOCGPGRP, TIOCSPGRP.  Export llround, llroundf.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */

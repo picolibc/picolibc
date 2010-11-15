@@ -1,3 +1,9 @@
+2010-11-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.sgml: Move llround and llroundf to implemented SUSv4 functions.
+	* include/cygwin/version.h: Add llround and llroundf to the comment for
+	the 233 CYGWIN_VERSION_API_MINOR bump.
+
 2010-11-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/paths.h (_PATH_VARTMP): Define.
