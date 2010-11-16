@@ -20,6 +20,9 @@ typedef signed int _ssize_t;
 typedef long signed int _ssize_t;
 #endif
 #define __ssize_t_defined 1
+#elif defined(__sparc__) && defined(__LP64__)
+typedef long signed int _ssize_t;
+#define __ssize_t_defined 1
 #elif defined(__AVR__) || defined(__lm32__) || defined(__m32c__) || defined(__mips__) || defined(__moxie__) || defined(__PPC__) || defined(__sparc__) || defined(__sh__)
 typedef signed int _ssize_t;
 #define __ssize_t_defined 1
@@ -31,4 +34,24 @@ typedef signed int _ssize_t;
 
 typedef __int32_t blksize_t;
 typedef __int32_t blkcnt_t;
+
+#if defined(__arm__) || defined(__i386__) || defined(__m68k__) || defined(__mips__) || defined(__PPC__) || defined(__sparc__)
+/* Use 64bit types */
+typedef __int64_t _off_t;
+#define __off_t_defined 1
+
+typedef __int64_t _fpos_t;
+#define __fpos_t_defined 1
+#else
+/* Use 32bit types */
+typedef __int32_t _off_t;
+#define __off_t_defined 1
+
+typedef __int32_t _fpos_t;
+#define __fpos_t_defined 1
+#endif
+
+typedef __uint32_t _mode_t;
+#define __mode_t_defined 1
+
 #endif

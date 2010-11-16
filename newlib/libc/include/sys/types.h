@@ -171,12 +171,16 @@ typedef signed char pid_t;
 typedef int pid_t;
 #endif
 
+#if defined(__rtems__)
+typedef _mode_t mode_t;
+#endif
+
 #ifndef __CYGWIN__
 typedef	long key_t;
 #endif
 typedef _ssize_t ssize_t;
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__rtems__)
 #ifdef __MS_types__
 typedef	char *	addr_t;
 typedef int mode_t;

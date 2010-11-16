@@ -1,5 +1,12 @@
 2010-11-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
+	* libc/include/sys/types.h: Add _mode_t for __rtems__.
+	* libc/sys/rtems/machine/_types.h: Provide _mode_t, _fpos_t, _off_t.
+	Add _ssize_t for 64bit sparc.
+	Let arm, i386, m68k, mips, PPC, sparc use 64bit _off_t, _fpos_t.
+
+2010-11-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
 	* configure.host: Add -D_COMPILING_NEWLIB to newlib_cflags.
 
 2010-11-04  Ralf Corsépius  <ralf.corsepius@rtems.org>
