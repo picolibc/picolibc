@@ -1,3 +1,8 @@
+2010-11-16  Andrew Makhorin <mao@gnu.org>
+
+	* libc/machine/i386/setjmp.S (longjmp): Per POSIX, return 1 if second
+	argument is 0.
+
 2010-11-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/include/sys/types.h: Add _mode_t for __rtems__.

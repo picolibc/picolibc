@@ -67,6 +67,10 @@ SYM (longjmp):
 
 	movl	8(ebp),edi	/* get jmp_buf */
 	movl	12(ebp),eax	/* store retval in j->eax */
+	testl	eax,eax
+	jne	0f
+	incl	eax
+0:
 	movl	eax,0(edi)
 
 	movl	24(edi),ebp
