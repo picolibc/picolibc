@@ -1,3 +1,7 @@
+2010-11-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* configure.host: Add -D_COMPILING_NEWLIB to newlib_cflags.
+
 2010-11-04  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libm/complex/cacos.c: Reorder function calls to work around ICE
