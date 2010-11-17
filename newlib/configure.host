@@ -772,6 +772,7 @@ case "${host}" in
 	;;
   tic6x*)
 	syscall_dir=
+	newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED"
 	;;
   tic80*)
 	syscall_dir=syscalls
