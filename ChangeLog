@@ -1,3 +1,7 @@
+2010-11-17  Mike Frysinger  <vapier@gentoo.org>
+
+	* .gitignore: New file.
+
 2010-11-05  Michael Eager  <eager@eagercon.com>
 
 	* COPYING.LIBGLOSS: Correct typo in microblaze.
