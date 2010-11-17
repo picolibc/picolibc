@@ -149,6 +149,17 @@ struct __attribute__((packed)) cio_gettime_from_host
   int time;
 };
 
+struct __attribute__((packed)) cio_getclk_to_host
+{
+  /* Empty.  */
+};
+
+struct __attribute__((packed)) cio_getclk_from_host
+{
+  /* Clock cycles (little endian).  */
+  int result;
+};
+
 struct __attribute__((packed)) cio_to_host
 {
   /* Data length (target endian).  */
@@ -167,6 +178,7 @@ struct __attribute__((packed)) cio_to_host
     struct cio_unlink_to_host unlink;
     struct cio_rename_to_host rename;
     struct cio_gettime_to_host gettime;
+    struct cio_getclk_to_host getclk;
   } parms;
   /* Variable-length data.  */
   unsigned char data[];
@@ -188,6 +200,7 @@ struct __attribute__((packed)) cio_from_host
     struct cio_unlink_from_host unlink;
     struct cio_rename_from_host rename;
     struct cio_gettime_from_host gettime;
+    struct cio_getclk_from_host getclk;
   } parms;
   /* Data.  */
   unsigned char data[];
@@ -343,6 +356,14 @@ gettimeofday (struct timeval *tp, void *tzvp)
 
   return 0;
 }
+
+clock_t
+clock (void)
+{
+  semi_call_wrapper (_DTGETCLK, NULL, 0);
+  return SWAPINT (_CIOBUF_.u.from_host.parms.getclk.result);
+}
+
 
 int
 isatty (int file __attribute__((unused)))

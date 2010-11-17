@@ -1,3 +1,10 @@
+2010-11-17  Bernd Schmidt  <bernds@codesourcery.com>
+
+	* tic6x/syscalls.c (cio_getclk_to_host, cio_getclk_from_host): New
+	structs.
+	(cio_to_host, cio_from_host): Use them.
+	(clock): New function.
+
 2010-10-17  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/include/blackfin.h, bfin/include/builtins.h,
