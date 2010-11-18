@@ -1,3 +1,9 @@
+2010-11-18  Andy Koppe <andy.koppe@gmail.com>
+
+	* libc/locale/locale.c (loadlocale): Fix width of CJK ambigous
+	characters to 1 for singlebyte charsets and 2 for non-Unicode
+	multibyte charsets. Change documentation accordingly.
+
 2010-11-17  Bernd Schmidt  <bernds@codesourcery.com>
 
 	* configure.host (newlib_cflags): For tic6x, add -DCLOCK_PROVIDED.
