@@ -1,3 +1,7 @@
+2010-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::fchown): Initialize mode to 0.
+
 2010-11-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml: Move llround and llroundf to implemented SUSv4 functions.

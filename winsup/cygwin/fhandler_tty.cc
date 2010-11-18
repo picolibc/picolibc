@@ -1306,7 +1306,7 @@ fhandler_tty_slave::fchown (__uid32_t uid, __gid32_t gid)
 {
   int ret = -1;
   bool to_close = false;
-  mode_t mode;
+  mode_t mode = 0;
   __uid32_t o_uid;
   __gid32_t o_gid;
   security_descriptor sd;
