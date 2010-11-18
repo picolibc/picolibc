@@ -35,7 +35,10 @@ Drop support for Windows NT4 prior to Service Pack 4.
 </para></listitem>
 
 <listitem><para>
-Drop support for Windows NT4 prior to Service Pack 4.
+Fix the width of "CJK Ambiguous Width" characters to 1 for singlebyte charsets
+and 2 for East Asian multibyte charsets. (For UTF-8, it remains dependent on
+the specified language, and the "@cjknarrow" locale modifier can still be used
+to force width 1.)
 </para></listitem>
 
 </itemizedlist>
