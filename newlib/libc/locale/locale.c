@@ -452,7 +452,7 @@ loadlocale(struct _reent *p, int category)
   char *locale = NULL;
   char charset[ENCODING_LEN + 1];
   unsigned long val;
-  char *end, *c;
+  char *end, *c = NULL;
   int mbc_max;
   int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
@@ -507,7 +507,16 @@ restart:
 					   sticking to the C locale in terms
 					   of sort order, etc.  Proposed in
 					   the Debian project. */
-    strcpy (charset, locale + 2);
+    {
+      char *chp;
+
+      c = locale + 2;
+      strcpy (charset, c);
+      if ((chp = strchr (charset, '@')))
+        /* Strip off modifier */
+        *chp = '\0';
+      c += strlen (charset);
+    }
   else							/* POSIX style */
     {
       c = locale;
@@ -558,15 +567,15 @@ restart:
       else
 	/* Invalid string */
       	FAIL;
-      if (c[0] == '@')
-	{
-	  /* Modifier */
-	  /* Only one modifier is recognized right now.  "cjknarrow" is used
-	     to modify the behaviour of wcwidth() for East Asian languages.
-	     For details see the comment at the end of this function. */
-	  if (!strcmp (c + 1, "cjknarrow"))
-	    cjknarrow = 1;
-	}
+    }
+  if (c && c[0] == '@')
+    {
+      /* Modifier */
+      /* Only one modifier is recognized right now.  "cjknarrow" is used
+         to modify the behaviour of wcwidth() for East Asian languages.
+         For details see the comment at the end of this function. */
+      if (!strcmp (c + 1, "cjknarrow"))
+	cjknarrow = 1;
     }
   /* We only support this subset of charsets. */
   switch (charset[0])
