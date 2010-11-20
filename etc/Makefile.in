@@ -64,7 +64,7 @@ PDFFILES = standards.pdf configure.pdf
 HTMLFILES = standards.html configure.html
 
 all: info
-install: install-info
+install install-strip: install-info
 
 uninstall:
 

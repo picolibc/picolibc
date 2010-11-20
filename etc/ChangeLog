@@ -1,3 +1,7 @@
+2010-11-20  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* Makefile.in (install-strip): New target.
+
 2010-06-08  Nick Clifton  <nickc@redhat.com>
 
 	* standards.texi: Import current version from gnustandards
