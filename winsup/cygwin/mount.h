@@ -37,9 +37,9 @@ extern struct fs_names_t {
     bool block_device;
 } fs_names[];
 
-#define IMPLEMENT_FS_FLAG(func, flag) \
-  bool func (bool val) { if (val) status.fs_type = flag; return val; } \
-  bool func () const   { return status.fs_type == flag; }
+#define IMPLEMENT_FS_FLAG(type) \
+  bool is_##type (bool val) { if (val) status.fs_type = type; return val; } \
+  bool is_##type () const   { return status.fs_type == type; }
 
 class fs_info
 {
@@ -84,19 +84,19 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
-  IMPLEMENT_FS_FLAG (is_fat, fat)
-  IMPLEMENT_FS_FLAG (is_ntfs, ntfs)
-  IMPLEMENT_FS_FLAG (is_samba, samba)
-  IMPLEMENT_FS_FLAG (is_nfs, nfs)
-  IMPLEMENT_FS_FLAG (is_netapp, netapp)
-  IMPLEMENT_FS_FLAG (is_cdrom, cdrom)
-  IMPLEMENT_FS_FLAG (is_udf, udf)
-  IMPLEMENT_FS_FLAG (is_csc_cache, csc_cache)
-  IMPLEMENT_FS_FLAG (is_sunwnfs, sunwnfs)
-  IMPLEMENT_FS_FLAG (is_unixfs, unixfs)
-  IMPLEMENT_FS_FLAG (is_mvfs, mvfs)
-  IMPLEMENT_FS_FLAG (is_cifs, cifs)
-  IMPLEMENT_FS_FLAG (is_nwfs, nwfs)
+  IMPLEMENT_FS_FLAG (fat)
+  IMPLEMENT_FS_FLAG (ntfs)
+  IMPLEMENT_FS_FLAG (samba)
+  IMPLEMENT_FS_FLAG (nfs)
+  IMPLEMENT_FS_FLAG (netapp)
+  IMPLEMENT_FS_FLAG (cdrom)
+  IMPLEMENT_FS_FLAG (udf)
+  IMPLEMENT_FS_FLAG (csc_cache)
+  IMPLEMENT_FS_FLAG (sunwnfs)
+  IMPLEMENT_FS_FLAG (unixfs)
+  IMPLEMENT_FS_FLAG (mvfs)
+  IMPLEMENT_FS_FLAG (cifs)
+  IMPLEMENT_FS_FLAG (nwfs)
   fs_info_type what_fs () const { return status.fs_type; }
 
   ULONG serial_number () const { return sernum; }

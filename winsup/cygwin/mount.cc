@@ -299,12 +299,12 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_PERSISTENT_ACLS)
 /* Netapp DataOnTap. */
-#define NETAPP_IGNORE FILE_SUPPORTS_SPARSE_FILES
+#define NETAPP_IGNORE (FILE_SUPPORTS_SPARSE_FILES \
+		       | FILE_PERSISTENT_ACLS)
 #define FS_IS_NETAPP_DATAONTAP TEST_GVI(flags () & ~NETAPP_IGNORE, \
 			     FILE_CASE_SENSITIVE_SEARCH \
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
-			     | FILE_PERSISTENT_ACLS \
 			     | FILE_NAMED_STREAMS)
 /* These are the minimal flags supported by NTFS since NT4.  Every filesystem
    not supporting these flags is not a native NTFS.  We subsume them under
@@ -335,19 +335,23 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	      samba_version (extended_info->samba_version);
 	    }
 	}
-      /* First check the remote filesystems faking to be NTFS. */
-      if (!got_fs () && RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE)
+      /* First check the remote filesystems claiming to be NTFS. */
+      if (!got_fs ()
+	  && is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
 	  /* Test for Samba on NT4 or for older Samba releases not supporting
 	     extended info. */
 	  && !is_samba (FS_IS_SAMBA)
-	  /* Netapp inode info is unusable. */
+	  /* Netapp inode info is unusable, can't handle trailing dots and
+	     spaces, has a bug in "move and delete" semantics. */
 	  && !is_netapp (FS_IS_NETAPP_DATAONTAP))
 	/* Any other remote FS faking to be NTFS. */
 	is_cifs (!FS_IS_WINDOWS_NTFS);
-      /* Then check the remote filesystems faking to be FAT.  Right now all
-	 of them are subsumed under the "CIFS" filesystem type. */
+      /* Then check remote filesystems claiming to be FAT.  Except for real
+	 FAT and Netapp, all of them are subsumed under the "CIFS" filesystem
+	 type for now. */
       if (!got_fs ()
-	  && is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE)))
+	  && is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
+	  && !is_netapp (FS_IS_NETAPP_DATAONTAP))
 	is_cifs (!FS_IS_WINDOWS_FAT);
       /* Then check remote filesystems honest about their name. */
       if (!got_fs ()
@@ -383,7 +387,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     other filesystems like NFS.
 	     UNUSED, but keep in for information purposes. */
 	  has_buggy_basic_info (is_nwfs ());
-	  /* Netapp ans NWFS are too dumb to allow non-DOS filesystems
+	  /* Netapp and NWFS are too dumb to allow non-DOS filenames
 	     containing trailing dots and spaces when accessed from Windows
 	     clients.  We subsume CIFS into this class of filesystems right
 	     away since at least some of them are not capable either. */

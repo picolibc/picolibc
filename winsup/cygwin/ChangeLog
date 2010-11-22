@@ -1,5 +1,14 @@
 2010-11-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (NETAPP_IGNORE): Add FILE_PERSISTENT_ACLS.
+	(FS_IS_NETAPP_DATAONTAP): Drop test for FILE_PERSISTENT_ACLS.
+	(fs_info::update): Set filetype to ntfs in remote case, too.  Fix a
+	couple of comments.  Add test for Netapps faking to be FAT.
+
+	* mount.h (IMPLEMENT_FS_FLAG): Simplify definition and usage.
+
+2010-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (get_ipv4fromreg_ipcnt): Fix debug output.  Only create debug
 	output if error is not ERROR_FILE_NOT_FOUND.
 	(get_ipv4fromreg): Ditto.
