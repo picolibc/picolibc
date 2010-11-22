@@ -1720,7 +1720,8 @@ get_ipv4fromreg_ipcnt (const char *name)
   if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ,
 			   &key)) != ERROR_SUCCESS)
     {
-      debug_printf ("RegOpenKeyEx(%s), win32 error %ld", ret);
+      if (ret != ERROR_FILE_NOT_FOUND)
+	debug_printf ("RegOpenKeyEx(%s), win32 error %ld", regkey, ret);
       return 0;
     }
   /* If DHCP is used, we have only one address. */
@@ -1754,7 +1755,8 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
   if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ, &key))
       != ERROR_SUCCESS)
     {
-      debug_printf ("RegOpenKeyEx(%s), win32 error %ld", ret);
+      if (ret != ERROR_FILE_NOT_FOUND)
+	debug_printf ("RegOpenKeyEx(%s), win32 error %ld", regkey, ret);
       return;
     }
   /* If DHCP is used, we have only one address. */

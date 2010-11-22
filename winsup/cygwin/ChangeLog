@@ -1,3 +1,9 @@
+2010-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (get_ipv4fromreg_ipcnt): Fix debug output.  Only create debug
+	output if error is not ERROR_FILE_NOT_FOUND.
+	(get_ipv4fromreg): Ditto.
+
 2010-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::fchown): Initialize mode to 0.
