@@ -2388,24 +2388,37 @@ restart:
 	    {
 	      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
 
-	      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
-					       FileNetworkOpenInformation);
-	      if ((status == STATUS_INVALID_PARAMETER
-		   || status == STATUS_NOT_IMPLEMENTED)
-		  && RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, FALSE))
-	      	{
-		  /* This occurs when accessing SMB share root dirs hosted on
-		     NT4 (STATUS_INVALID_PARAMETER), or when trying to access
+	      /* Netapps don't implement FileNetworkOpenInformation. */
+	      status = fs.is_netapp ()
+		       ? STATUS_INVALID_PARAMETER
+		       : NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
+						 FileNetworkOpenInformation);
+	      if (status == STATUS_INVALID_PARAMETER
+		  || status == STATUS_NOT_IMPLEMENTED)
+		{
+		  /* Apart from accessing Netapps, this also occurs when
+		     accessing SMB share root dirs hosted on NT4
+		     (STATUS_INVALID_PARAMETER), or when trying to access
 		     SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
 		  FILE_BASIC_INFORMATION fbi;
+		  FILE_STANDARD_INFORMATION fsi;
 
 		  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
 						   FileBasicInformation);
 		  if (NT_SUCCESS (status))
 		    {
 		      memcpy (pfnoi, &fbi, 4 * sizeof (LARGE_INTEGER));
-		      pfnoi->EndOfFile.QuadPart
-			= pfnoi->AllocationSize.QuadPart = 0;
+		      if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fsi,
+						     sizeof fsi,
+						     FileStandardInformation)))
+			{
+			  pfnoi->EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
+			  pfnoi->AllocationSize.QuadPart
+			    = fsi.AllocationSize.QuadPart;
+			}
+		      else
+			pfnoi->EndOfFile.QuadPart
+			  = pfnoi->AllocationSize.QuadPart = 0;
 		      pfnoi->FileAttributes = fbi.FileAttributes;
 		    }
 		}

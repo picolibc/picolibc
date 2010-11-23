@@ -1,3 +1,9 @@
+2010-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Don't use FileNetworkOpenInformation
+	on Netapps.  Relax condition for workaround.  Always request size
+	information via FileStandardInformation info class in workaround.
+
 2010-11-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (NETAPP_IGNORE): Add FILE_PERSISTENT_ACLS.
