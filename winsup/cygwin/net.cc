@@ -1691,8 +1691,9 @@ get_flags (PIP_ADAPTER_ADDRESSES pap)
   unsigned int flags = IFF_UP;
   if (pap->IfType == IF_TYPE_SOFTWARE_LOOPBACK)
     flags |= IFF_LOOPBACK;
-  else if (pap->IfType == IF_TYPE_PPP)
-    flags |= IFF_POINTOPOINT;
+  else if (pap->IfType == IF_TYPE_PPP
+	   || pap->IfType == IF_TYPE_SLIP)
+    flags |= IFF_POINTOPOINT | IFF_NOARP;
   if (!(pap->Flags & IP_ADAPTER_NO_MULTICAST))
     flags |= IFF_MULTICAST;
   if (pap->OperStatus == IfOperStatusUp
@@ -1879,7 +1880,8 @@ get_xp_ifs (ULONG family)
 	    ifp->ifa_ifa.ifa_name = ifp->ifa_name;
 	    /* Flags */
 	    ifp->ifa_ifa.ifa_flags = get_flags (pap);
-	    if (pap->IfType != IF_TYPE_PPP)
+	    if (pap->IfType != IF_TYPE_PPP
+		&& pap->IfType != IF_TYPE_SOFTWARE_LOOPBACK)
 	      ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
 	    /* Address */
 	    ifp->ifa_addr.ss_family = AF_INET;
@@ -1927,12 +1929,6 @@ get_xp_ifs (ULONG family)
 		&& pap->IfType != IF_TYPE_SOFTWARE_LOOPBACK
 		&& pap->IfType != IF_TYPE_PPP)
 	      ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
-	    if (sa->sa_family == AF_INET)
-	      {
-		ULONG hwaddr[2], hwlen = 6;
-		if (SendARP (sin->sin_addr.s_addr, 0, hwaddr, &hwlen))
-		  ifp->ifa_ifa.ifa_flags |= IFF_NOARP;
-	      }
 	    /* Address */
 	    memcpy (&ifp->ifa_addr, sa, sa_size);
 	    ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;

@@ -1,5 +1,12 @@
 2010-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (SendARP): Remove.
+	* net.cc (get_flags): Set IFF_NOARP flag for PPP and SLIP devices.
+	(get_xp_ifs): Unify IFF_BROADCAST setting.  Drop calling SendARP to
+	set IFF_NOARP flag.
+
+2010-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check): Don't use FileNetworkOpenInformation
 	on Netapps.  Relax condition for workaround.  Always request size
 	information via FileStandardInformation info class in workaround.
