@@ -1,8 +1,3 @@
-2010-11-22  Joel Brobecker  <brobecker@adacore.com>
-
-	* ravenscar-sparc-thread.c (supply_register_at_address):
-	Fix passing of buf in call to regcache_raw_supply.
-
 2010-11-20  Ian Lance Taylor  <iant@google.com>
 
 	* configure.ac: Only disable a language library if no language needs
