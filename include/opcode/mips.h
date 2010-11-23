@@ -544,7 +544,7 @@ static const unsigned int mips_isa_table[] =
   { 0x0001, 0x0003, 0x0607, 0x1e0f, 0x3e1f, 0x0a23, 0x3e63, 0x3ebf, 0x3fff };
 
 /* Masks used for Chip specific instructions.  */
-#define INSN_CHIP_MASK		  0xc3ff0820
+#define INSN_CHIP_MASK		  0xc3ff0c20
 
 /* Cavium Networks Octeon instructions.  */
 #define INSN_OCTEON		  0x00000800
@@ -593,7 +593,7 @@ static const unsigned int mips_isa_table[] =
 /* ST Microelectronics Loongson 2E.  */
 #define INSN_LOONGSON_2E          0x40000000
 /* ST Microelectronics Loongson 2F.  */
-#define INSN_LOONGSON_2F          0x80000000
+#define INSN_LOONGSON_3A          0x00000400
 /* Loongson 3A.  */
 #define INSN_LOONGSON_3A          0x80000400
 /* RMI Xlr instruction */
