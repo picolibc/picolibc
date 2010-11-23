@@ -593,9 +593,9 @@ static const unsigned int mips_isa_table[] =
 /* ST Microelectronics Loongson 2E.  */
 #define INSN_LOONGSON_2E          0x40000000
 /* ST Microelectronics Loongson 2F.  */
-#define INSN_LOONGSON_3A          0x00000400
+#define INSN_LOONGSON_2F          0x80000000
 /* Loongson 3A.  */
-#define INSN_LOONGSON_3A          0x80000400
+#define INSN_LOONGSON_3A          0x00000400
 /* RMI Xlr instruction */
 #define INSN_XLR              	  0x00000020
 
