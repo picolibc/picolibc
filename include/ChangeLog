@@ -1,3 +1,7 @@
+2010-11-25  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* opcode/s390.h (enum s390_opcode_cpu_val): Add S390_OPCODE_MAXCPU.
+
 2010-11-16  Ian Lance Taylor  <iant@google.com>
 
 	* simple-object.h (simple_object_attributes_merge): Declare,
