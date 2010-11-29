@@ -979,6 +979,18 @@ int
 fhandler_tty_slave::dup (fhandler_base *child)
 {
   fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
+  /* In dtable::dup_worker, the path_conv member has already been assigned
+     from "this" to "child".  Part of this assigment (path_conv::operator=)
+     is to allocate memory for the strings "path" and "normalized_path from
+     cygheap.  The below `child = *arch' statement will overwrite child's
+     path_conv again, this time from "*arch".  By doing that, it will allocate
+     new strings from cygheap, overwriting the old pointer values.  Thus, the
+     old allocated strings are lost, and we're leaking memory for each tty dup,
+     unless we free the strings here.
+     FIXME: We can't redefine path_conv::operator= so that it frees the old
+     strings.  Probably it would be most helpful to copy only the required
+     members from *arch, rather than copying everything. */
+  child->pc.free_strings ();
   *(fhandler_tty_slave *) child = *arch;
   child->set_flags (get_flags ());
   child->usecount = 0;
@@ -992,6 +1004,8 @@ int
 fhandler_pty_master::dup (fhandler_base *child)
 {
   fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
+  /* See comment in fhandler_tty_slave::dup. */
+  child->pc.free_strings ();
   *(fhandler_tty_master *) child = *arch;
   child->set_flags (get_flags ());
   child->usecount = 0;

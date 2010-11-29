@@ -1,3 +1,10 @@
+2010-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_tty_slave::dup): Free path_conv strings
+	to avoid memory leak.  Add comment.
+	(fhandler_pty_master::dup): Ditto.
+	* path.h (path_conv::free_strings): New method.
+
 2010-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (SendARP): Remove.

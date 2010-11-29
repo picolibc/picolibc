@@ -293,6 +293,11 @@ class path_conv
     wide_path = NULL;
     return *this;
   }
+  void free_strings ()
+  {
+    cfree (modifiable_path ());
+    cfree ((char *) normalized_path);
+  }
   DWORD get_devn () const {return dev.devn;}
   short get_unitn () const {return dev.minor;}
   DWORD file_attributes () const {return fileattr;}
