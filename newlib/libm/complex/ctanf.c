@@ -36,8 +36,6 @@
 #include <math.h>
 #include "cephes_subrf.h"
 
-#define MAXNUMF 1.0e38f
-
 float complex
 ctanf(float complex z)
 {
@@ -51,7 +49,7 @@ ctanf(float complex z)
 
 	if (d == 0.0f) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = MAXNUMF + MAXNUMF * I;
+		w = HUGE_VALF + HUGE_VALF * I;
 		return w;
 	}
 

@@ -69,8 +69,6 @@ QUICKREF
 #include <math.h>
 #include "cephes_subr.h"
 
-#define MAXNUM 1.0e308
-
 double complex
 ctan(double complex z)
 {
@@ -84,7 +82,7 @@ ctan(double complex z)
 
 	if (d == 0.0) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = MAXNUM + MAXNUM * I;
+		w = HUGE_VAL + HUGE_VAL * I;
 		return w;
 	}
 

@@ -40,8 +40,6 @@
 __weak_alias(catanf, _catanf)
 #endif
 
-#define MAXNUMF 1.0e38F
-
 float complex
 catanf(float complex z)
 {
@@ -76,6 +74,6 @@ ovrf:
 #if 0
 	mtherr ("catan", OVERFLOW);
 #endif
-	w = MAXNUMF + MAXNUMF * I;
+	w = HUGE_VALF + HUGE_VALF * I;
 	return w;
 }

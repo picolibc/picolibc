@@ -1,3 +1,9 @@
+2010-11-29  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libm/complex/catan.c, libm/complex/catanf.c,
+	libm/complex/ctan.c, libm/complex/ctanf.c:
+	Use HUGE_VAL instead of MAXNUM.
+
 2010-11-25  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libm/complex/cargf.c: Use crealf instead of creal.

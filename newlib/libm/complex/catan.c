@@ -91,8 +91,6 @@ QUICKREF
 __weak_alias(catan, _catan)
 #endif
 
-#define MAXNUM 1.0e308
-
 double complex
 catan(double complex z)
 {
@@ -127,6 +125,6 @@ ovrf:
 #if 0
 	mtherr ("catan", OVERFLOW);
 #endif
-	w = MAXNUM + MAXNUM * I;
+	w = HUGE_VAL + HUGE_VAL * I;
 	return w;
 }
