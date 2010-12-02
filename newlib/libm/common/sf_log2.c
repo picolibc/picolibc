@@ -30,7 +30,7 @@
 	float x;
 #endif
 {
-  return (logf(x) / (float) M_LOG2_E);
+  return (logf(x) / (float_t) M_LN2);
 }
 
 #ifdef _DOUBLE_IS_32BITS

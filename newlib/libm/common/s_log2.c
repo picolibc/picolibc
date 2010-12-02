@@ -34,8 +34,8 @@ The Newlib implementations are not full, intrinisic calculations, but
 rather are derivatives based on <<log>>.  (Accuracy might be slightly off from
 a direct calculation.)  In addition to functions, they are also implemented as
 macros defined in math.h:
-. #define log2(x) (log (x) / _M_LOG2_E)
-. #define log2f(x) (logf (x) / (float) _M_LOG2_E)
+. #define log2(x) (log (x) / _M_LN2)
+. #define log2f(x) (logf (x) / (float) _M_LN2)
 To use the functions instead, just undefine the macros first.
 
 You can use the (non-ANSI) function <<matherr>> to specify error
@@ -79,7 +79,7 @@ C99, POSIX, System V Interface Definition (Issue 6).
 	double x;
 #endif
 {
-  return (log(x) / M_LOG2_E);
+  return (log(x) / M_LN2);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

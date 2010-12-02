@@ -1,3 +1,11 @@
+2010-12-02  Craig Howland <howland@LGSInnovations.com>
+
+	* libm/common/s_log2.c:  Change from using M_LOG2_E to M_LN2 define
+	(from math.h--the latter is POSIX, the former non-standard).
+	* libm/common/sf_log2.c:  Ditto.  Change cast for M_LN2 from float to
+	float_t (in case all math not done in float).
+	* libc/include/math.h:  Ditto (same 2 things as sf_log2.c).
+
 2010-12-02  Jayant Sonar  jayant.sonar@kpitcummins.com
 	    Kaushik Phatak  kaushik.phatak@kpitcummins.com
 
