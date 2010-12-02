@@ -1907,8 +1907,7 @@ get_xp_ifs (ULONG family)
 	    ++ifp;
 	  }
       else
-	for (idx = 0, pua = pap->FirstUnicastAddress; pua;
-	     ++idx, pua = pua->Next)
+	for (idx = 0, pua = pap->FirstUnicastAddress; pua; pua = pua->Next)
 	  {
 	    struct sockaddr *sa = (struct sockaddr *) pua->Address.lpSockaddr;
 #         define sin	((struct sockaddr_in *) sa)
@@ -1918,10 +1917,12 @@ get_xp_ifs (ULONG family)
 	    /* Next in chain */
 	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
 	    /* Interface name */
-	    if (idx && sa->sa_family == AF_INET)
+	    if (sa->sa_family == AF_INET && idx)
 	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
 	      strcpy (ifp->ifa_name, pap->AdapterName);
+	    if (sa->sa_family == AF_INET)
+	      ++idx;
 	    ifp->ifa_ifa.ifa_name = ifp->ifa_name;
 	    /* Flags */
 	    ifp->ifa_ifa.ifa_flags = get_flags (pap);

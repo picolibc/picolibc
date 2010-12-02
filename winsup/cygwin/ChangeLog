@@ -1,3 +1,8 @@
+2010-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (get_xp_ifs): Fix counting of idx to return stable interface
+	alias names for interfaces with multiple IPv4 addresses.
+
 2010-11-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_tty_slave::dup): Free path_conv strings
