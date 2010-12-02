@@ -1,3 +1,40 @@
+2010-12-02  Jayant Sonar  jayant.sonar@kpitcummins.com
+	    Kaushik Phatak  kaushik.phatak@kpitcummins.com
+
+	* configure.in: Add CR16 support.
+	* configure: Regenerated.
+	* cr16/aclocal.m4: New.
+	* cr16/close.c: New.
+	* cr16/configure: New.
+	* cr16/configure.in: New.
+	* cr16/crt1.S: New.
+	* cr16/crti.S: New.
+	* cr16/crtn.S: New.
+	* cr16/dvz_hndl.c: New.
+	* cr16/_exit.c: New.
+	* cr16/flg_hndl.c: New.
+	* cr16/fstat.c: New.
+	* cr16/_getenv.c: New.
+	* cr16/getpid.c: New.
+	* cr16/iad_hndl.c: New.
+	* cr16/intable.c: New.
+	* cr16/isatty.c: New.
+	* cr16/kill.c: New.
+	* cr16/lseek.c: New.
+	* cr16/Makefile.in: New.
+	* cr16/open.c: New.
+	* cr16/putnum.c: New.
+	* cr16/read.c: New.
+	* cr16/_rename.c: New.
+	* cr16/sbrk.c: New.
+	* cr16/sim.ld: New.
+	* cr16/stat.c: New.
+	* cr16/svc_hndl.c: New.
+	* cr16/time.c: New.
+	* cr16/und_hndl.c: New.
+	* cr16/unlink.c: New.
+	* cr16/write.c: New.
+
 2010-11-17  Bernd Schmidt  <bernds@codesourcery.com>
 
 	* tic6x/syscalls.c (cio_getclk_to_host, cio_getclk_from_host): New

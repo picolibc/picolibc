@@ -73,6 +73,9 @@ case "${target}" in
   bfin-*-*)
 	AC_CONFIG_SUBDIRS([bfin])
 	;;
+  cr16-*-*)
+        AC_CONFIG_SUBDIRS([cr16])
+        ;;
   cris-*-* | crisv32-*-*)
 	AC_CONFIG_SUBDIRS([cris])
 	;;
