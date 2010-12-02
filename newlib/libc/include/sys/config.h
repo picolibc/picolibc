@@ -30,6 +30,22 @@
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif
 
+#if (defined(__CR16__) || defined(__CR16C__) ||defined(__CR16CP__))
+#ifndef __INT32__
+#define __SMALL_BITFIELDS      
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX 32767
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#else /* INT32 */
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX 2147483647
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#endif /* INT32 */
+
+#endif /* CR16C */
+
 #if defined (__xc16x__) || defined (__xc16xL__) || defined (__xc16xS__)
 #define __SMALL_BITFIELDS
 #endif

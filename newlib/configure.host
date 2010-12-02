@@ -105,6 +105,9 @@ case "${host_cpu}" in
   bfin)
 	machine_dir=bfin
 	;;
+  cr16*)
+	machine_dir=cr16
+       ;;
   cris | crisv32)
 	machine_dir=cris
 	;;
@@ -376,6 +379,9 @@ case "${host}" in
   bfin-*-*)
 	sys_dir=
 	;;
+  cr16-*-*)
+	sys_dir=
+	;;
   crx*)
 	sys_dir=
 	;;
@@ -606,6 +612,9 @@ case "${host}" in
   cris-*-* | crisv32-*-*)
 	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -D_USE_WRITE -DCOMPACT_CTYPE"
+	syscall_dir=syscalls
+	;;
+  cr16-*-*)
 	syscall_dir=syscalls
 	;;
   crx-*-*)

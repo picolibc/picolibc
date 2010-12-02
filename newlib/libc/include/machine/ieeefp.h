@@ -360,6 +360,11 @@
 
 #endif
 
+#if (defined(__CR16__) || defined(__CR16C__) ||defined(__CR16CP__))
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS	/* 16 Bit INT */
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

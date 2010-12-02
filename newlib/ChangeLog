@@ -1,3 +1,23 @@
+2010-12-02  Jayant Sonar  jayant.sonar@kpitcummins.com
+	    Kaushik Phatak  kaushik.phatak@kpitcummins.com
+
+	* configure.host: Add CR16 support.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/include/sys/config.h: Ditto.
+	* libc/machine/configure.in: Ditto
+	* libc/machine/configure: Regenerated
+	* libc/machine/cr16/aclocal.m4: New.
+	* libc/machine/cr16/configure.in: New
+	* libc/machine/cr16/configure: New
+	* libc/machine/cr16/getenv.c: New
+	* libc/machine/cr16/Makefile.am: New
+	* libc/machine/cr16/Makefile.in: New
+	* libc/machine/cr16/setjmp.S: New
+	* libc/machine/cr16/sys/asm.h: New
+	* libc/machine/cr16/sys/libh.h: New
+	* libc/machine/cr16/sys/syscall.h: New
+
 2010-11-29  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libm/complex/catan.c, libm/complex/catanf.c,
