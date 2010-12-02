@@ -1,3 +1,7 @@
+2010-12-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Add National Semiconductor notice.
+
 2010-11-29  Andreas Schwab  <schwab@redhat.com>
 
 	* configure.ac: Move comment to remove extra space in last argument
