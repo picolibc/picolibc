@@ -279,7 +279,7 @@ get_device_name (char *path)
 			 DOS pathname without the \\.\ prefix.  Unless it's
 			 longer than MAX_PATH - 1 in which case it needs 
 			 the \\?\ prefix. */
-		      if (len = strlen (ret + 4) >= MAX_PATH)
+		      if ((len = strlen (ret + 4)) >= MAX_PATH)
 			ret[2] = '?';
 		      else
 			memmove (ret, ret + 4, strlen (ret + 4) + 1);
