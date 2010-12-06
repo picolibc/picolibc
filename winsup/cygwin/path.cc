@@ -1035,8 +1035,15 @@ out:
 	 is used on it. */
       dev.parse (FH_FS);
     }
-  else if (isvirtual_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
+  else if (isproc_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
     {
+      /* FIXME: Usually we don't set error to ENOENT if a file doesn't
+         exist.  This is typically indicated by the fileattr content.
+	 So, why here?  The downside is that cygwin_conv_path just gets
+	 an error for these paths so it reports the error back to the
+	 application.  Unlike in all other cases of non-existant files,
+	 for which check doesn't set error, so cygwin_conv_path just
+	 returns the path, as intended. */
       error = ENOENT;
       return;
     }

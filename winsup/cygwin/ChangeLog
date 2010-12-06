@@ -1,3 +1,8 @@
+2010-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Don't generate ENOENT for non-existant
+	CYGDRIVE and NETDRIVE paths.  Add comment.
+
 2010-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (get_xp_ifs): Fix counting of idx to return stable interface
