@@ -299,11 +299,14 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		}
 	s0 = s;
 	y = z = 0;
-	for(nd = nf = 0; (c = *s) >= '0' && c <= '9'; nd++, s++)
-		if (nd < 9)
-			y = 10*y + c - '0';
-		else if (nd < 16)
-			z = 10*z + c - '0';
+	for(nd = nf = 0; (c = *s) >= '0' && c <= '9'; nd++, s++) {
+		if (nd < DBL_DIG + 1) {
+			if (nd < 9)
+				y = 10*y + c - '0';
+			else
+				z = 10*z + c - '0';
+		}
+        }
 	nd0 = nd;
 	if (strncmp (s, _localeconv_r (ptr)->decimal_point,
 		     strlen (_localeconv_r (ptr)->decimal_point)) == 0)
@@ -326,15 +329,20 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			nz++;
 			if (c -= '0') {
 				nf += nz;
-				for(i = 1; i < nz; i++)
-					if (nd++ < 9)
-						y *= 10;
-					else if (nd <= DBL_DIG + 1)
-						z *= 10;
-				if (nd++ < 9)
-					y = 10*y + c;
-				else if (nd <= DBL_DIG + 1)
-					z = 10*z + c;
+				for(i = 1; i < nz; i++) {
+					if (nd++ <= DBL_DIG + 1) {
+						if (nd < 10)
+							y *= 10;
+						else
+							z *= 10;
+					}
+				}
+				if (nd++ <= DBL_DIG + 1) {
+					if (nd < 10)
+						y = 10*y + c;
+					else
+						z = 10*z + c;
+				}
 				nz = 0;
 				}
 			}

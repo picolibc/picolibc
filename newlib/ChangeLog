@@ -1,3 +1,8 @@
+2010-12-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/strtod.c(_strtod_r): Fix code to handle case whereby
+	_DOUBLE_IS_32BITS is set and DBL_DIGS is 6 instead of 15.
+
 2010-12-07  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/include/strings.h: New (split-out from string.h).
