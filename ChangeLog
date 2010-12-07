@@ -4,6 +4,11 @@
 	* configure.ac (cris-*-elf, crisv32-*-elf): Disable target-libffi.
 	* configure: Regenerate.
 
+2010-12-02  Ian Lance Taylor  <iant@google.com>
+
+	* configure.ac: Always set default for poststage1_ldflags to
+	-static-libstdc++ -static-libgcc.
+
 2010-12-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Add National Semiconductor notice.
