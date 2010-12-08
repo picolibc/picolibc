@@ -49,7 +49,7 @@ _DEFUN (logarithmf, (float, int),
       errno = EDOM;
       return (z_notanum_f.f);
     }
-  else if (!isfinitef(x))
+  else if (!isfinite(x))
     {
       if (isnanf(x)) 
         return (z_notanum_f.f);

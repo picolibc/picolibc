@@ -1,3 +1,7 @@
+2010-12-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libm/mathfp/sf_logarithm.c: Change isfinitef reference to isfinite.
+
 2010-12-08      Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* include/sys/types.h: Add #if defined(__rtems__) around
