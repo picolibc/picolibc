@@ -394,7 +394,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 	{
 	  lacl[pos].a_type = DEF_CLASS_OBJ;
 	  lacl[pos].a_id = ILLEGAL_GID;
-	  lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+	  lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
 	}
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)

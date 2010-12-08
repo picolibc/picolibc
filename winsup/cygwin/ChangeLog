@@ -1,3 +1,8 @@
+2010-12-08  Christian Franke  <franke@computer.org>
+
+	* sec_acl.cc (getacl): Set DEF_CLASS_OBJ permissions to 07 instead
+	of 0777.
+
 2010-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Don't generate ENOENT for non-existant
