@@ -1,3 +1,8 @@
+2010-12-07  Eric Blake  <eblake@redhat.com>
+
+	* libc/include/strings.h: Don't declare removed functions when
+	requesting POSIX 2008 compliance.
+
 2010-12-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/strtod.c (_strtod_r): Fix code to handle case whereby

@@ -15,7 +15,7 @@
 
 _BEGIN_STD_C
 
-#ifndef __STRICT_ANSI__
+#if !defined __STRICT_ANSI__ && _POSIX_VERSION < 200809L
 /* 
  * Marked LEGACY in Open Group Base Specifications Issue 6/IEEE Std 1003.1-2004
  * Removed from Open Group Base Specifications Issue 7/IEEE Std 1003.1-2008
