@@ -2,7 +2,7 @@
  *
  *  Written by Joel Sherrill <joel@OARcorp.com>.
  *
- *  COPYRIGHT (c) 1989-2000.
+ *  COPYRIGHT (c) 1989-2010.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  Permission to use, copy, modify, and distribute this software for any
@@ -185,10 +185,14 @@ int	_EXFUN(pthread_mutex_getprioceiling,
 
 int	_EXFUN(pthread_attr_init, (pthread_attr_t *__attr));
 int	_EXFUN(pthread_attr_destroy, (pthread_attr_t *__attr));
+int	_EXFUN(pthread_attr_setstack, (pthread_attr_t *attr,
+	void *__stackaddr, size_t __stacksize));
+int	_EXFUN(pthread_attr_getstack, (_CONST pthread_attr_t *attr,
+	void **__stackaddr, size_t *__stacksize));
 int	_EXFUN(pthread_attr_getstacksize,
 	(_CONST pthread_attr_t *__attr, size_t *__stacksize));
 int	_EXFUN(pthread_attr_setstacksize,
-	(pthread_attr_t *__attr, size_t stacksize));
+	(pthread_attr_t *__attr, size_t __stacksize));
 int	_EXFUN(pthread_attr_getstackaddr,
 	(_CONST pthread_attr_t *__attr, void **__stackaddr));
 int	_EXFUN(pthread_attr_setstackaddr,
@@ -197,6 +201,10 @@ int	_EXFUN(pthread_attr_getdetachstate,
 	(_CONST pthread_attr_t *__attr, int *__detachstate));
 int	_EXFUN(pthread_attr_setdetachstate,
 	(pthread_attr_t *__attr, int __detachstate));
+int	_EXFUN(pthread_attr_getguardsize,
+	(_CONST pthread_attr_t *__attr, size_t *__guardsize));
+int	_EXFUN(pthread_attr_setguardsize,
+	(pthread_attr_t *__attr, size_t __guardsize));
 
 /* Thread Creation, P1003.1c/Draft 10, p. 144 */
 

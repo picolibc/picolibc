@@ -353,6 +353,9 @@ typedef struct {
   int inheritsched;
   int schedpolicy;
   struct sched_param schedparam;
+#if defined(__rtems__)
+  size_t guardsize;
+#endif
 
   /* P1003.4b/D8, p. 54 adds cputime_clock_allowed attribute.  */
 #if defined(_POSIX_THREAD_CPUTIME)
