@@ -1,3 +1,7 @@
+2010-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/strings.h: Don't include locale.h.
+
 2010-12-07  Eric Blake  <eblake@redhat.com>
 
 	* libc/include/strings.h: Don't declare removed functions when

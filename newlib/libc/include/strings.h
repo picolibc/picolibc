@@ -11,7 +11,6 @@
 #include <sys/reent.h>
 
 #include <sys/types.h> /* for size_t */
-#include <locale.h> /* for locale_t */
 
 _BEGIN_STD_C
 
