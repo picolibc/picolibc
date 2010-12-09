@@ -204,6 +204,8 @@ union retchain
   long long ll;
 };
 
+#define RETRY_COUNT 10
+
 /* The standard DLL initialization routine. */
 __attribute__ ((used, noinline)) static long long
 std_dll_init ()
@@ -221,27 +223,43 @@ std_dll_init ()
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
     {
-      HANDLE h;
       fenv_t fpuenv;
       fegetenv (&fpuenv);
       WCHAR dll_path[MAX_PATH];
+      DWORD err = ERROR_SUCCESS;
       /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
       wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
-      dll->handle = NULL;
       /* MSDN seems to imply that LoadLibrary can fail mysteriously, so,
 	 since there have been reports of this in the mailing list, retry
-	 several times before giving up.  */
-      for (int i = 1; !dll->handle && i <= 5; i++)
-	if ((h = LoadLibraryW (dll_path)) != NULL)
-	  dll->handle = h;
-        /* FIXME: This isn't quite right.  Probably should check for specific
-	   error codes. */
-	else if ((func->decoration & 1))
-	  dll->handle = INVALID_HANDLE_VALUE;
-	else if (i < 5)
-	  yield ();
-	else
-	  api_fatal ("could not load %W, %E", dll_path);
+	 several times before giving up. */
+      for (int i = 1; i <= RETRY_COUNT; i++)
+	{
+	  /* If loading the library succeeds, just leave the loop. */
+	  if ((dll->handle = LoadLibraryW (dll_path)) != NULL)
+	    break;
+	  /* Otherwise check error code returned by LoadLibrary.  If the
+	     error code is neither NOACCESS nor DLL_INIT_FAILED, break out
+	     of the loop. */
+	  err = GetLastError ();
+	  if (err != ERROR_NOACCESS && err != ERROR_DLL_INIT_FAILED)
+	    break;
+	  if (i < RETRY_COUNT)
+	    yield ();
+	}
+      if (!dll->handle)
+	{
+	  /* If LoadLibrary with full path returns one of the weird errors
+	     reported on the Cygwin mailing list, retry with only the DLL
+	     name.  Checking the error codes allows to restrict loading
+	     with just the DLL name to this specific problem. */
+	  if ((err == ERROR_NOACCESS || err == ERROR_DLL_INIT_FAILED)
+	      && (dll->handle = LoadLibraryW (dll->name)) != NULL)
+	    ;
+	  else if ((func->decoration & 1))
+	    dll->handle = INVALID_HANDLE_VALUE;
+	  else
+	    api_fatal ("could not load %W, %E", dll_path);
+	}
       fesetenv (&fpuenv);
     }
 

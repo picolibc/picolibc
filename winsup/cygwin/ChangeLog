@@ -1,3 +1,10 @@
+2010-12-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (RETRY_COUNT): New define.
+	(std_dll_init): Restructure loop to retry loading a DLL only if
+	specific errors occur.  If these errors persist, try to load DLL
+	with name only.
+
 2010-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/strings.h: Remove in favor of equivalent newlib file.
