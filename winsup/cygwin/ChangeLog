@@ -764,7 +764,7 @@
 
 	* dcrt0.cc (dll_crt0_0): Move sigproc_init later, after cygheap
 	initialization since it relies on the cygheap existing (even if
-	it shouldn't matter do to dll initialization serialization).
+	it shouldn't matter due to dll initialization serialization).
 
 2010-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
