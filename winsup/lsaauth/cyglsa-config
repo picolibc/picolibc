@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# cyglsa-config, Copyright 2006 Red Hat Inc.
+# cyglsa-config, Copyright 2006, 2010 Red Hat Inc.
 #
 #     This program is free software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ fi
 old=`regtool get "${value}"`
 new=`for i in ${old}
 do
-  echo $i | grep -v cyglsa
+  echo $i | GREP_OPTIONS="" grep -v cyglsa
 done`
 if ! regtool set "${value}" ${new} "${bindir}\\cyglsa\\${dll}"
 then
