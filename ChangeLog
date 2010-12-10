@@ -1,3 +1,10 @@
+2010-12-10  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/46540
+	* configure.ac: Add --disable-libquadmath and
+	--disable-libquadmath-support.
+	* configure: Regenerate.
+
 2010-12-10  Tristan Gingold  <gingold@adacore.com>
 
 	* src-release (ETC_SUPPORT): add gnu-oids.texi
