@@ -57,7 +57,7 @@ DEVO_SUPPORT= README Makefile.in configure configure.ac \
 # Files in devo/etc used in any net release.
 ETC_SUPPORT= Makefile.in configure configure.in standards.texi \
 	make-stds.texi standards.info* configure.texi configure.info* \
-	ChangeLog configbuild.* configdev.* fdl.texi texi2pod.pl
+	ChangeLog configbuild.* configdev.* fdl.texi texi2pod.pl gnu-oids.texi
 
 
 # When you use `make setup-dirs' or `make taz' you should always redefine
