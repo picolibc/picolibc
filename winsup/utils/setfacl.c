@@ -1,6 +1,6 @@
 /* setfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -71,72 +71,74 @@ mode_t getperm (char *in)
          | (in[2] == 'x' ? S_IXOTH : 0);
 }
 
+/* GNU extension.  Like strchr except that if c is not found, return pointer
+   to the trailing \0, rather than NULL. */
+static char *
+strchrnul (const char *s, int c)
+{
+  while (*s && *s != c)
+    ++s;
+  return (char *) s;
+}
+
 BOOL
 getaclentry (action_t action, char *c, aclent_t *ace)
 {
   char *c2;
 
   ace->a_type = 0;
-  ace->a_id = -1;
+  ace->a_id = (uid_t) -1;
   ace->a_perm = 0;
 
-  if (!strncmp (c, "default:", 8)
-      || !strncmp (c, "d:", 2))
+  /* First, check if we're handling a default entry. */
+  if (!strncmp (c, "default:", 8) || !strncmp (c, "d:", 2))
     {
       ace->a_type = ACL_DEFAULT;
       c = strchr (c, ':') + 1;
     }
-  if (!strncmp (c, "user:", 5)
-      || !strncmp (c, "u:", 2))
-    {
+  /* c now points to the type.  Check for next colon.  If we find a colon,
+     NUL it.  Otherwise the string is invalid, except when deleting. */
+  c2 = strchrnul (c, ':');
+  if (*c2 == ':')
+    *c2++ = '\0';
+  else if (action != Delete)
+    return FALSE;
+  /* Fetch the type. */
+  if (!strcmp (c, "u") || !strcmp (c, "user"))
       ace->a_type |= USER_OBJ;
-      c = strchr (c, ':') + 1;
-    }
-  else if (!strncmp (c, "group:", 6)
-           || !strncmp (c, "g:", 2))
-    {
+  else if (!strcmp (c, "g") || !strcmp (c, "group"))
       ace->a_type |= GROUP_OBJ;
-      c = strchr (c, ':') + 1;
-    }
-  else if (!strncmp (c, "mask:", 5)
-           || !strncmp (c, "m:", 2))
-    {
+  else if (!strcmp (c, "m") || !strcmp (c, "mask"))
       ace->a_type |= CLASS_OBJ;
-      c = strchr (c, ':') + 1;
-    }
-  else if (!strncmp (c, "other:", 6)
-           || !strncmp (c, "o:", 2))
-    {
+  else if (!strcmp (c, "o") || !strcmp (c, "other"))
       ace->a_type |= OTHER_OBJ;
-      c = strchr (c, ':') + 1;
-    }
   else
     return FALSE;
-  if (ace->a_type & (USER_OBJ | GROUP_OBJ))
+  /* Skip to next field. */
+  c = c2;
+  if (!*c && action != Delete)
+    return FALSE;
+  /* If this is a user or group entry, check if next char is a colon char.
+     If so, skip it, otherwise it's the name of a user or group. */
+  if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
+    ;
+  else if (*c == ':')
+    ++c;
+  else if (*c)
     {
-      if ((c2 = strchr (c, ':')))
-        {
-          if (action == Delete)
-            return FALSE;
-          *c2 = '\0';
-        }
-      else if (action == Delete)
-	{
-	  /* Only default ugo entries are allowed to be removed, not the 
-	     standard ugo entries. */
-	  if (!(ace->a_type & ACL_DEFAULT))
-	    return FALSE;
-	}
-      else
-        return FALSE;
-      if (!c2 && !*c) /* Deleting a default ug entry is allowed. */
-	;
-      else if (c2 == c)
-        {
-          if (action == Delete)
-            return FALSE;
-        }
-      else if (isdigit ((unsigned char) *c))
+      /* c now points to the id.  Check for next colon.  If we find a colon,
+	 NUL it.  Otherwise the string is invalid, except when deleting.
+	 If we delete, it must be a default entry since standard ugo entries
+	 can't be deleted. */
+      c2 = strchrnul (c + 1, ':');
+      if (*c2 == ':')
+      	*c2++ = '\0';
+      else if (action != Delete)
+	return FALSE;
+      else if (!(ace->a_type & ACL_DEFAULT))
+	return FALSE;
+      /* Fetch user/group id. */
+      if (isdigit ((unsigned char) *c))
         {
           char *c3;
 
@@ -158,33 +160,29 @@ getaclentry (action_t action, char *c, aclent_t *ace)
             return FALSE;
           ace->a_id = gr->gr_gid;
         }
-      if (c2 && c2 != c)
-        {
-	  if (ace->a_type & USER_OBJ)
-	    {
-	      ace->a_type &= ~USER_OBJ;
-	      ace->a_type |= USER;
-	    }
-	  else
-	    {
-	      ace->a_type &= ~GROUP_OBJ;
-	      ace->a_type |= GROUP;
-	    }
+      if (ace->a_type & USER_OBJ)
+	{
+	  ace->a_type &= ~USER_OBJ;
+	  ace->a_type |= USER;
 	}
-      if (c2)
-        c = c2 + 1;
+      else
+	{
+	  ace->a_type &= ~GROUP_OBJ;
+	  ace->a_type |= GROUP;
+	}
+      /* Skip to next field. */
+      c = c2;
     }
-  /* FIXME: currently allow both :: and : */
-  else if (*c == ':')
-    c++;
   if (action == Delete)
     {
-      if ((ace->a_type & (CLASS_OBJ | OTHER_OBJ))
-          && *c)
-        return FALSE;
+      /* Trailing garbage? */
+      if (*c)
+	return FALSE;
+      /* No, we're good. */
       ace->a_perm = ILLEGAL_MODE;
       return TRUE;
     }
+  /* Check perms. */
   if ((ace->a_perm = getperm (c)) == ILLEGAL_MODE)
     return FALSE;
   return TRUE;
