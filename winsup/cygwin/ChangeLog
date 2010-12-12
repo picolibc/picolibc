@@ -1,3 +1,8 @@
+2010-12-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (check_dir_not_empty): Never count more than 3 directory
+	entries.
+
 2010-12-12  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* init.cc (search_for): Put this in shared section or suffer subtle

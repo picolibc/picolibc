@@ -514,14 +514,13 @@ check_dir_not_empty (HANDLE dir)
   int cnt = 1;
   while (pfni->NextEntryOffset)
     {
+      if (++cnt > 2)
+	{
+	  syscall_printf ("Directory not empty");
+	  return STATUS_DIRECTORY_NOT_EMPTY;
+	}
       pfni = (PFILE_NAMES_INFORMATION)
 	     ((caddr_t) pfni + pfni->NextEntryOffset);
-      ++cnt;
-    }
-  if (cnt > 2)
-    {
-      syscall_printf ("Directory not empty");
-      return STATUS_DIRECTORY_NOT_EMPTY;
     }
   return STATUS_SUCCESS;
 }
