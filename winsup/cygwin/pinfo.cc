@@ -138,6 +138,7 @@ status_exit (DWORD x)
       x = 127;
       break;
     default:
+      debug_printf ("*** STATUS_%p\n", x);
       x = 127;
     }
   return x;

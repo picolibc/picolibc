@@ -16,7 +16,7 @@ details. */
 
 static DWORD _my_oldfunc;
 
-static char NO_COPY *search_for = (char *) cygthread::stub;
+static char *search_for  __attribute__((section (".cygwin_dll_common"), shared)) = (char *) cygthread::stub;
 unsigned threadfunc_ix[8] __attribute__((section (".cygwin_dll_common"), shared));
 
 static bool dll_finished_loading;
