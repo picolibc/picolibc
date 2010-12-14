@@ -1,10 +1,3 @@
-2010-12-14  Ken Werner  <ken.werner@de.ibm.com>
-
-	* valops.c (value_one): Use get_array_bounds to compute the number
-	of array elements instead of dividing the length of the array by the
-	length of the element types.
-	* valarith.c (value_complement, value_neg): Likewise.
-
 2010-12-10  Ian Lance Taylor  <iant@google.com>
 
 	PR bootstrap/46819
