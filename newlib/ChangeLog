@@ -1,3 +1,9 @@
+2010-12-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Add support to copy all sub-directories of the
+	sys/SYS_DIR/include directory, if they contain header files.
+	* Makefile.in: Regenerated.
+
 2010-12-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libm/mathfp/sf_logarithm.c: Change isfinitef reference to isfinite.

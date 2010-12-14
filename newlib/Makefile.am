@@ -218,6 +218,14 @@ stmp-targ-include: config.status
 	      cp $$i targ-include/`basename $$i`; \
 	    else true; fi ; \
 	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+		    -mkdir targ-include/`basename $$i`; \
+	      	    cp $$j targ-include/`basename $$i`/`basename $$j`; \
+		done \
+	    else true; fi ; \
+	  done
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
@@ -306,6 +314,13 @@ endif
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
+	    else true; fi ; \
+	  done ; \
+	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/`basename $$i`/`basename $$j`; \
+		done ; \
 	    else true; fi ; \
 	  done ; \
 	  for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/include/*.h; do \
