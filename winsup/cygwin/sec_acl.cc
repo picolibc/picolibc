@@ -357,11 +357,13 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 	  else if (ace_sid == well_known_creator_group_sid)
 	    {
 	      type = GROUP_OBJ | ACL_DEFAULT;
+	      types_def |= type;
 	      id = ILLEGAL_GID;
 	    }
 	  else if (ace_sid == well_known_creator_owner_sid)
 	    {
 	      type = USER_OBJ | ACL_DEFAULT;
+	      types_def |= type;
 	      id = ILLEGAL_GID;
 	    }
 	  else
@@ -388,13 +390,38 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 	    }
 	}
-      /* Include DEF_CLASS_OBJ if any default ace exists */
-      if ((types_def & (USER|GROUP))
-	  && ((pos = searchace (lacl, MAX_ACL_ENTRIES, DEF_CLASS_OBJ)) >= 0))
+      if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
 	{
-	  lacl[pos].a_type = DEF_CLASS_OBJ;
-	  lacl[pos].a_id = ILLEGAL_GID;
-	  lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
+	  /* Ensure that the default acl contains at
+	     least DEF_(USER|GROUP|OTHER)_OBJ entries.  */
+	  if (!(types_def & USER_OBJ))
+	    {
+	      lacl[pos].a_type = DEF_USER_OBJ;
+	      lacl[pos].a_id = uid;
+	      lacl[pos].a_perm = lacl[0].a_perm;
+	      pos++;
+	    }
+	  if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
+	    {
+	      lacl[pos].a_type = DEF_GROUP_OBJ;
+	      lacl[pos].a_id = gid;
+	      lacl[pos].a_perm = lacl[1].a_perm;
+	      pos++;
+	    }
+	  if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
+	    {
+	      lacl[pos].a_type = DEF_OTHER_OBJ;
+	      lacl[pos].a_id = ILLEGAL_GID;
+	      lacl[pos].a_perm = lacl[2].a_perm;
+	      pos++;
+	    }
+	  /* Include DEF_CLASS_OBJ if any named default ace exists.  */
+	  if ((types_def & (USER|GROUP)) && pos < MAX_ACL_ENTRIES)
+	    {
+	      lacl[pos].a_type = DEF_CLASS_OBJ;
+	      lacl[pos].a_id = ILLEGAL_GID;
+	      lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
+	    }
 	}
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
