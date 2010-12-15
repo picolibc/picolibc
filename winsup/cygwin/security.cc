@@ -648,8 +648,7 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  if ((ace_sid == cur_owner_sid)
 	      || (ace_sid == owner_sid)
 	      || (ace_sid == cur_group_sid)
-	      || (ace_sid == group_sid)
-	      || (ace_sid == well_known_world_sid))
+	      || (ace_sid == group_sid))
 	    {
 	      if (ace->Header.AceFlags
 		  & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
@@ -657,7 +656,11 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	      else
 		continue;
 	    }
-	  else if (attribute & S_JUSTCREATED)
+	  else if ((ace_sid == well_known_creator_owner_sid)
+		   || (ace_sid == well_known_creator_group_sid)
+		   || (ace_sid == well_known_world_sid))
+	    continue;
+	  if (attribute & S_JUSTCREATED)
 	    {
 	      /* Since files and dirs are created with a NULL descriptor,
 		 inheritence rules kick in.  If no inheritable entries exist
