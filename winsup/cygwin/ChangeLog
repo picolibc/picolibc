@@ -1,3 +1,8 @@
+2010-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Really fix erroneous inheritence entry
+	duplication now.  Add more comments for clarity.
+
 2010-12-15  Christian Franke  <franke@computer.org>
 
 	* sec_acl.cc (getacl): Ensure that the default acl contains at least

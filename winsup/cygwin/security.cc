@@ -641,25 +641,32 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	{
 	  cygpsid ace_sid ((PSID) &ace->SidStart);
 
-	  /* Check for related ACEs. */
+	  /* Always skip NULL SID as well as admins SID on virtual device files
+	     in /proc/sys. */
 	  if (ace_sid == well_known_null_sid
 	      || (S_ISCHR (attribute) && ace_sid == well_known_admins_sid))
 	    continue;
+	  /* Check for ACEs which are always created in the preceding code
+	     and check for the default inheritence ACEs which will be created
+	     for just created directories.  Skip them for just created
+	     directories or if they are not inherited.  If they are inherited,
+	     make sure they are *only* inherited, so they don't collide with
+	     the permissions set in this function. */
 	  if ((ace_sid == cur_owner_sid)
 	      || (ace_sid == owner_sid)
 	      || (ace_sid == cur_group_sid)
-	      || (ace_sid == group_sid))
+	      || (ace_sid == group_sid)
+	      || (ace_sid == well_known_creator_owner_sid)
+	      || (ace_sid == well_known_creator_group_sid)
+	      || (ace_sid == well_known_world_sid))
 	    {
-	      if (ace->Header.AceFlags
-		  & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
-		ace->Header.AceFlags |= INHERIT_ONLY_ACE;
-	      else
+	      if ((S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
+		  || (ace->Header.AceFlags
+		      & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE)) == 0)
 		continue;
+	      else
+		ace->Header.AceFlags |= INHERIT_ONLY_ACE;
 	    }
-	  else if ((ace_sid == well_known_creator_owner_sid)
-		   || (ace_sid == well_known_creator_group_sid)
-		   || (ace_sid == well_known_world_sid))
-	    continue;
 	  if (attribute & S_JUSTCREATED)
 	    {
 	      /* Since files and dirs are created with a NULL descriptor,
@@ -693,7 +700,9 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  acl_len += ace->Header.AceSize;
 	}
 
-  /* Construct appropriate inherit attribute for new directories */
+  /* Construct appropriate inherit attribute for new directories.  Keep in
+     mind that we do this only for the sake of non-Cygwin applications.
+     Cygwin applications don't need this. */
   if (S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
     {
       const DWORD inherit = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
