@@ -1,3 +1,15 @@
+*** Major changes in newlib version 1.19.0:
+
+* complex math functions
+* locale support extended to maintain wide char values of native strings
+* eXtensible Data Record (XDR) support for Cygwin
+* wide char functions updated to Unicode 5.2
+* additional locale charsets
+* POSIX standard adherence improvements
+* tic6x platform support contributed
+* cr16 platform support contributed
+* various bug fixes
+
 *** Major changes in newlib version 1.18.0:
 
 * wide-char enhancements

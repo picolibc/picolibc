@@ -221,7 +221,9 @@ stmp-targ-include: config.status
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/*; do \
 	    if [ -d $$i ]; then \
 		for j in $$i/*.h; do \
-		    -mkdir targ-include/`basename $$i`; \
+		    if [ ! -d targ-include/`basename $$i` ]; then \
+		    	mkdir targ-include/`basename $$i`; \
+		    fi; \
 	      	    cp $$j targ-include/`basename $$i`/`basename $$j`; \
 		done \
 	    else true; fi ; \

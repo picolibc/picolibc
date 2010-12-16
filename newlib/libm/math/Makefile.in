@@ -80,15 +80,14 @@ am__objects_1 = lib_a-k_standard.$(OBJEXT) lib_a-k_rem_pio2.$(OBJEXT) \
 	lib_a-w_pow.$(OBJEXT) lib_a-w_remainder.$(OBJEXT) \
 	lib_a-w_scalb.$(OBJEXT) lib_a-w_sinh.$(OBJEXT) \
 	lib_a-w_sqrt.$(OBJEXT) lib_a-w_sincos.$(OBJEXT) \
-	lib_a-w_drem.$(OBJEXT) \
-	lib_a-s_asinh.$(OBJEXT) lib_a-s_atan.$(OBJEXT) \
-	lib_a-s_ceil.$(OBJEXT) lib_a-s_cos.$(OBJEXT) \
-	lib_a-s_erf.$(OBJEXT) lib_a-s_fabs.$(OBJEXT) \
-	lib_a-s_floor.$(OBJEXT) lib_a-s_frexp.$(OBJEXT) \
-	lib_a-s_ldexp.$(OBJEXT) lib_a-s_signif.$(OBJEXT) \
-	lib_a-s_sin.$(OBJEXT) lib_a-s_tan.$(OBJEXT) \
-	lib_a-s_tanh.$(OBJEXT) lib_a-w_exp2.$(OBJEXT) \
-	lib_a-w_tgamma.$(OBJEXT)
+	lib_a-w_drem.$(OBJEXT) lib_a-s_asinh.$(OBJEXT) \
+	lib_a-s_atan.$(OBJEXT) lib_a-s_ceil.$(OBJEXT) \
+	lib_a-s_cos.$(OBJEXT) lib_a-s_erf.$(OBJEXT) \
+	lib_a-s_fabs.$(OBJEXT) lib_a-s_floor.$(OBJEXT) \
+	lib_a-s_frexp.$(OBJEXT) lib_a-s_ldexp.$(OBJEXT) \
+	lib_a-s_signif.$(OBJEXT) lib_a-s_sin.$(OBJEXT) \
+	lib_a-s_tan.$(OBJEXT) lib_a-s_tanh.$(OBJEXT) \
+	lib_a-w_exp2.$(OBJEXT) lib_a-w_tgamma.$(OBJEXT)
 am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-kf_sin.$(OBJEXT) lib_a-kf_tan.$(OBJEXT) \
 	lib_a-ef_acos.$(OBJEXT) lib_a-ef_acosh.$(OBJEXT) \
@@ -114,15 +113,14 @@ am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-wf_pow.$(OBJEXT) lib_a-wf_remainder.$(OBJEXT) \
 	lib_a-wf_scalb.$(OBJEXT) lib_a-wf_sinh.$(OBJEXT) \
 	lib_a-wf_sqrt.$(OBJEXT) lib_a-wf_sincos.$(OBJEXT) \
-	lib_a-wf_drem.$(OBJEXT) \
-	lib_a-sf_asinh.$(OBJEXT) lib_a-sf_atan.$(OBJEXT) \
-	lib_a-sf_ceil.$(OBJEXT) lib_a-sf_cos.$(OBJEXT) \
-	lib_a-sf_erf.$(OBJEXT) lib_a-sf_fabs.$(OBJEXT) \
-	lib_a-sf_floor.$(OBJEXT) lib_a-sf_frexp.$(OBJEXT) \
-	lib_a-sf_ldexp.$(OBJEXT) lib_a-sf_signif.$(OBJEXT) \
-	lib_a-sf_sin.$(OBJEXT) lib_a-sf_tan.$(OBJEXT) \
-	lib_a-sf_tanh.$(OBJEXT) lib_a-wf_exp2.$(OBJEXT) \
-	lib_a-wf_tgamma.$(OBJEXT)
+	lib_a-wf_drem.$(OBJEXT) lib_a-sf_asinh.$(OBJEXT) \
+	lib_a-sf_atan.$(OBJEXT) lib_a-sf_ceil.$(OBJEXT) \
+	lib_a-sf_cos.$(OBJEXT) lib_a-sf_erf.$(OBJEXT) \
+	lib_a-sf_fabs.$(OBJEXT) lib_a-sf_floor.$(OBJEXT) \
+	lib_a-sf_frexp.$(OBJEXT) lib_a-sf_ldexp.$(OBJEXT) \
+	lib_a-sf_signif.$(OBJEXT) lib_a-sf_sin.$(OBJEXT) \
+	lib_a-sf_tan.$(OBJEXT) lib_a-sf_tanh.$(OBJEXT) \
+	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_tgamma.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -137,8 +135,8 @@ am__objects_3 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
 	w_exp.lo w_fmod.lo w_gamma.lo wr_gamma.lo w_hypot.lo w_j0.lo \
 	w_j1.lo w_jn.lo w_lgamma.lo wr_lgamma.lo w_log.lo w_log10.lo \
 	w_pow.lo w_remainder.lo w_scalb.lo w_sinh.lo w_sqrt.lo \
-	w_sincos.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo \
-	s_cos.lo s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo s_ldexp.lo \
+	w_sincos.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo s_cos.lo \
+	s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo s_ldexp.lo \
 	s_signif.lo s_sin.lo s_tan.lo s_tanh.lo w_exp2.lo w_tgamma.lo
 am__objects_4 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	ef_acos.lo ef_acosh.lo ef_asin.lo ef_atan2.lo ef_atanh.lo \
@@ -150,10 +148,10 @@ am__objects_4 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	wf_gamma.lo wrf_gamma.lo wf_hypot.lo wf_j0.lo wf_j1.lo \
 	wf_jn.lo wf_lgamma.lo wrf_lgamma.lo wf_log.lo wf_log10.lo \
 	wf_pow.lo wf_remainder.lo wf_scalb.lo wf_sinh.lo wf_sqrt.lo \
-	wf_sincos.lo wf_drem.lo sf_asinh.lo sf_atan.lo \
-	sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo \
-	sf_frexp.lo sf_ldexp.lo sf_signif.lo sf_sin.lo sf_tan.lo \
-	sf_tanh.lo wf_exp2.lo wf_tgamma.lo
+	wf_sincos.lo wf_drem.lo sf_asinh.lo sf_atan.lo sf_ceil.lo \
+	sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo sf_frexp.lo \
+	sf_ldexp.lo sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
+	wf_exp2.lo wf_tgamma.lo
 @USE_LIBTOOL_TRUE@am_libmath_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libmath_la_OBJECTS = $(am_libmath_la_OBJECTS)
@@ -234,6 +232,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
