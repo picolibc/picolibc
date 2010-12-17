@@ -1,3 +1,7 @@
+2010-12-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.LIBGLOSS: Remove the GPL for fr30 target.
+
 2010-12-10  Ian Lance Taylor  <iant@google.com>
 
 	PR bootstrap/46819
