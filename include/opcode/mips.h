@@ -408,6 +408,13 @@ struct mips_opcode
 	pos + lenm1 < 32 or pos + lenm1 < 64 depending whether previous
 	position field is "+p" or "+P".
 
+   Loongson-3A:
+   "+a" 8-bit signed offset in bit 6 (OP_*_OFFSET_A)
+   "+b" 8-bit signed offset in bit 3 (OP_*_OFFSET_B)
+   "+c" 9-bit signed offset in bit 6 (OP_*_OFFSET_C)
+   "+z" 5-bit rz register (OP_*_RZ)
+   "+Z" 5-bit fz register (OP_*_FZ)
+
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -423,8 +430,8 @@ struct mips_opcode
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
    "1234"
-   "ABCDEFGHIPQSTX"
-   "pstx"
+   "ABCDEFGHIPQSTXZ"
+   "abcpstxz"
 */
 
 /* These are the bits which may be set in the pinfo field of an
