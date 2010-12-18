@@ -1,3 +1,9 @@
+2010-12-18  Mingjie Xing  <mingjie.xing@gmail.com>
+
+	* mips.h (OP_*_OFFSET_A, OP_*_OFFSET_B, OP_*_OFFSET_C)
+	(OP_*_RZ, OP_*_FZ, INSN2_M_FP_D, INSN2_WRITE_GPR_Z, INSN2_WRITE_FPR_Z)
+	(INSN2_READ_GPR_Z, INSN2_READ_FPR_Z, INSN2_READ_GPR_D): Define.
+
 2010-11-23  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h: Fix previous commit.

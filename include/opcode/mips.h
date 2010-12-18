@@ -226,6 +226,18 @@
 #define OP_SH_SEQI		6
 #define OP_MASK_SEQI		0x3ff
 
+/* Loongson */
+#define OP_SH_OFFSET_A		6
+#define OP_MASK_OFFSET_A	0xff
+#define OP_SH_OFFSET_B		3
+#define OP_MASK_OFFSET_B	0xff
+#define OP_SH_OFFSET_C		6
+#define OP_MASK_OFFSET_C	0x1ff
+#define OP_SH_RZ		0
+#define OP_MASK_RZ		0x1f
+#define OP_SH_FZ		0
+#define OP_MASK_FZ		0x1f
+
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -503,6 +515,17 @@ struct mips_opcode
    only be set for macros.  For instructions, FP_D in pinfo carries the
    same information.  */
 #define INSN2_M_FP_D		    0x00000010
+/* Modifies the general purpose register in OP_*_RZ.  */
+#define INSN2_WRITE_GPR_Z	    0x00000020
+/* Modifies the floating point register in OP_*_FZ.  */
+#define INSN2_WRITE_FPR_Z	    0x00000040
+/* Reads the general purpose register in OP_*_RZ.  */
+#define INSN2_READ_GPR_Z	    0x00000080
+/* Reads the floating point register in OP_*_FZ.  */
+#define INSN2_READ_FPR_Z	    0x00000100
+/* Reads the general purpose register in OP_*_RD.  */
+#define INSN2_READ_GPR_D	    0x00000200
+
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that
