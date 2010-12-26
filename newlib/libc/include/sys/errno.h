@@ -22,6 +22,8 @@ extern __IMPORT int _sys_nerr;
 #ifdef __CYGWIN__
 extern __IMPORT const char * const sys_errlist[];
 extern __IMPORT int sys_nerr;
+extern __IMPORT char *program_invocation_name;
+extern __IMPORT char *program_invocation_short_name;
 #endif
 
 #define __errno_r(ptr) ((ptr)->_errno)

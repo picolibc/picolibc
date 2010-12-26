@@ -915,6 +915,8 @@ dll_crt0_1 (void *)
     ++__progname;
   else
     __progname = __argv[0];
+  program_invocation_name = __argv[0];
+  program_invocation_short_name = __progname;
   if (__progname)
     {
       char *cp = strchr (__progname, '\0') - 4;

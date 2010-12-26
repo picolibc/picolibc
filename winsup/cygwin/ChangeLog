@@ -1,3 +1,11 @@
+2010-12-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin.din: Export program_invocation_name and program_invocation_short_name.
+	* dcrt0.cc: Set program_invocation*name to correct values, based on
+	argv[0].
+	* globals.cc (program_invocation_name): Define.
+	(program_invocation_short_name): Ditto.
+
 2010-12-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Really fix erroneous inheritence entry

@@ -138,6 +138,8 @@ extern "C"
   char ***main_environ = &__cygwin_environ;
   /* __progname used in getopt error message */
   char *__progname;
+  char *program_invocation_name;
+  char *program_invocation_short_name;
   static MTinterface _mtinterf;
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,

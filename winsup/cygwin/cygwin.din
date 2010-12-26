@@ -1161,6 +1161,8 @@ powf NOSIGFE
 _powf = powf NOSIGFE
 pread SIGFE
 printf SIGFE
+program_invocation_name DATA
+program_invocation_short_name DATA
 _printf = printf SIGFE
 pselect SIGFE
 pthread_atfork SIGFE
