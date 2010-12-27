@@ -1,4 +1,8 @@
-2010-09-22  Ryan Lortie  <desrt@desrt.ca>
+2010-12-27  Seth Jackson  <sethj@users.sourceforge.net>
+
+	* include/winbase.h (GetComputerNameEx): Define.
+
+2010-12-27  Ryan Lortie  <desrt@desrt.ca>
 
 	* include/winbase.h (TzSpecificLocalTimeToSystemTime): Define.
 
