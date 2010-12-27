@@ -3750,7 +3750,8 @@ typedef struct _SYSTEM_POWER_CAPABILITIES {
 	BOOLEAN  ProcessorThrottle;
 	UCHAR  ProcessorMinThrottle;
 	UCHAR  ProcessorMaxThrottle;
-	UCHAR  spare2[4];
+	BOOLEAN  FastSystemS4;
+	UCHAR  spare2[3];
 	BOOLEAN  DiskSpinDown;
 	UCHAR  spare3[8];
 	BOOLEAN  SystemBatteriesPresent;

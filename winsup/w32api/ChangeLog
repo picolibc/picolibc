@@ -1,3 +1,12 @@
+2010-12-27  Johann Hanne  <jonnyh33@users.sourceforge.net>
+
+	* include/oaidl.h (GetTypeComp, GetTypeComp, IsMatchingType): Fix defintion.
+	* include/objidl.h (AddConnection, ReleaseConnection): Ditto.
+	* include/winbase.h (EnumResourceLanguagesA, EnumResourceLanguagesW,
+	EnumResourceNamesA, EnumResourceNamesW, EnumResourceTypesA,
+	EnumResourceTypesW): Ditto.
+	* include/winnt.h (_SYSTEM_POWER_CAPABILITIES): Ditto.
+
 2010-12-27  Seth Jackson  <sethj@users.sourceforge.net>
 
 	* include/basetsd.h: (INT8, UINT8, INT16, UINT16): Define.
