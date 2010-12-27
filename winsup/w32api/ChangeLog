@@ -1,3 +1,7 @@
+2010-12-27  Seth Jackson  <sethj@users.sourceforge.net>
+
+	* include/basetsd.h: (INT8, UINT8, INT16, UINT16): Define.
+
 2010-12-27  Paul Sokolovsky  <pfalcon@users.sf.net>
 
 	* include/bdatypes.h: Add missing semicolons.
