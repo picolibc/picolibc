@@ -1,3 +1,8 @@
+2010-11-08 Rodrigo Rivas Costa <rodrigorivascosta@gmail.com>
+
+	* tlssup.c (__dyn_tls_init): Use an integer variable to iterate between
+	__xd_a and __xd_z.
+
 2010-08-17  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	* include/limits.h (PATH_MAX): Make it agree with Microsoft's

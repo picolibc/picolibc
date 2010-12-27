@@ -94,6 +94,7 @@ BOOL WINAPI
 __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
 {
   _PVFV *pfunc;
+  int nfuncs, ifunc;
 
 #ifndef _WIN64
   if (_winmajor < 4)
@@ -107,13 +108,13 @@ __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
     }
     if (__mingw_mthread_hdll == NULL || !__mingw_gMTRemoveKeyDtor || !__mingw_gMTKeyDtor)
       {
-	__mingw_gMTKeyDtor = NULL;
-	__mingw_gMTRemoveKeyDtor = NULL;
-	if (__mingw_mthread_hdll)
-	  FreeLibrary (__mingw_mthread_hdll);
-	__mingw_mthread_hdll = NULL;
-	_CRT_MT = 0;
-	return TRUE;
+  __mingw_gMTKeyDtor = NULL;
+  __mingw_gMTRemoveKeyDtor = NULL;
+  if (__mingw_mthread_hdll)
+    FreeLibrary (__mingw_mthread_hdll);
+  __mingw_mthread_hdll = NULL;
+  _CRT_MT = 0;
+  return TRUE;
       }
     _CRT_MT = 1;
     return TRUE;
@@ -130,10 +131,12 @@ __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
       return TRUE;
     }
 
-  for (pfunc = &__xd_a + 1; pfunc != &__xd_z; ++pfunc)
+  nfuncs = &__xd_z - (&__xd_a + 1);
+  for (ifunc = 0; ifunc < nfuncs; ++ifunc)
     {
+      pfunc = (&__xd_a + 1) + ifunc;
       if (*pfunc != NULL)
-	(*pfunc)();
+        (*pfunc)();
     }
   return TRUE;
 }
