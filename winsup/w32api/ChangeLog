@@ -1,3 +1,7 @@
+2010-12-27  David Byron  <dbyron0@users.sourceforge.net>
+
+	* include/winioctl.h (STORAGE_BUS_TYPE): Define.
+
 2010-12-27  Seth Jackson  <sethj@users.sourceforge.net>
 
 	* include/winbase.h (GetComputerNameEx): Define.

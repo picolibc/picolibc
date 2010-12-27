@@ -549,6 +549,23 @@ typedef struct {
 	((t&PARTITION_NTFT)&&((t&~VALID_NTFT)==PARTITION_XINT13_EXTENDED))||\
 	((t&~PARTITION_NTFT)==PARTITION_EXTENDED)||\
 	((t&~PARTITION_NTFT)==PARTITION_XINT13_EXTENDED))
+
+typedef enum _STORAGE_BUS_TYPE {
+  BusTypeUnknown       = 0x00,
+  BusTypeScsi          = 0x01,
+  BusTypeAtapi         = 0x02,
+  BusTypeAta           = 0x03,
+  BusType1394          = 0x04,
+  BusTypeSsa           = 0x05,
+  BusTypeFibre         = 0x06,
+  BusTypeUsb           = 0x07,
+  BusTypeRAID          = 0x08,
+  BusTypeiSCSI         = 0x09,
+  BusTypeSas           = 0x0A,
+  BusTypeSata          = 0x0B,
+  BusTypeMaxReserved   = 0x7F 
+} STORAGE_BUS_TYPE, *PSTORAGE_BUS_TYPE;
+
 #ifdef __cplusplus
 }
 #endif
