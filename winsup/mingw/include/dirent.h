@@ -43,10 +43,10 @@ typedef struct
 	struct dirent		dd_dir;
 
 	/* _findnext handle */
-	long			dd_handle;
+	intptr_t		dd_handle;
 
 	/*
-         * Status of search:
+	 * Status of search:
 	 *   0 = not started yet (next entry to read is first entry)
 	 *  -1 = off the end
 	 *   positive = 0 based index of next entry
@@ -90,10 +90,10 @@ typedef struct
 	struct _wdirent		dd_dir;
 
 	/* _findnext handle */
-	long			dd_handle;
+	intptr_t		dd_handle;
 
 	/*
-         * Status of search:
+	 * Status of search:
 	 *   0 = not started yet (next entry to read is first entry)
 	 *  -1 = off the end
 	 *   positive = 0 based index of next entry
@@ -103,8 +103,6 @@ typedef struct
 	/* given path for dir with search pattern (struct is extended) */
 	wchar_t			dd_name[1];
 } _WDIR;
-
-
 
 _WDIR* __cdecl __MINGW_NOTHROW _wopendir (const wchar_t*);
 struct _wdirent*  __cdecl __MINGW_NOTHROW _wreaddir (_WDIR*);

@@ -1,4 +1,8 @@
-2010-11-08 Rodrigo Rivas Costa <rodrigorivascosta@gmail.com>
+2010-12-27  Ozkan Sezer  <sezero@users.sourceforge.net>
+
+	* include/dirent.h (dd_handle): Define as intptr_t.
+
+2010-11-08  Rodrigo Rivas Costa  <rodrigorivascosta@gmail.com>
 
 	* tlssup.c (__dyn_tls_init): Use an integer variable to iterate between
 	__xd_a and __xd_z.
