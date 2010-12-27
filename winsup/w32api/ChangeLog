@@ -1,3 +1,7 @@
+2010-09-22  Ryan Lortie  <desrt@desrt.ca>
+
+	* include/winbase.h (TzSpecificLocalTimeToSystemTime): Define.
+
 2010-12-27  Markus Koenig  <basilo@users.sourceforge.net>
 
 	* include/gdiplus/gdipluspixelformats.h (PixelFormatIndexed,
