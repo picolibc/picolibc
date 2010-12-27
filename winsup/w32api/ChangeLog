@@ -1,3 +1,8 @@
+2010-10-20  Seth Jackson  <sethj@users.sourceforge.net>
+
+	* include/commctrl.h (TC_ITEMHEADER[AW]): Rename to TCITEMHEADER[AW].
+	Add defines for backward compatibility.
+
 2010-12-27  Johann Hanne  <jonnyh33@users.sourceforge.net>
 
 	* include/oaidl.h (GetTypeComp, GetTypeComp, IsMatchingType): Fix defintion.
