@@ -1,3 +1,7 @@
+2010-12-27  Paul Sokolovsky  <pfalcon@users.sf.net>
+
+	* include/bdatypes.h: Add missing semicolons.
+
 2010-08-26  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/w32api.h: Increment version to 3.15.

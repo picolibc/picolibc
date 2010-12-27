@@ -17,9 +17,9 @@ typedef enum {
 } MEDIA_SAMPLE_CONTENT;
 /*--- DirectShow Reference - DirectShow Structures */
 typedef struct {
-	DWORD dwOffset
-	DWORD dwPacketLength
-	DWORD dwStride
+	DWORD dwOffset;
+	DWORD dwPacketLength;
+	DWORD dwStride;
 } MPEG2_TRANSPORT_STRIDE;
 typedef struct {
 	ULONG ulPID;
