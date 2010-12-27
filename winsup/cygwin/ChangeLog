@@ -1,3 +1,7 @@
+2010-12-27  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 234.
+
 2010-12-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin.din: Export program_invocation_name and program_invocation_short_name.

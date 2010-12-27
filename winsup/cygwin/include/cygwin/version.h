@@ -397,12 +397,13 @@ details. */
 	   cpowf, cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf,
 	   csqrt, csqrtf, ctan, ctanf, ctanh, ctanhf.
       233: Add TIOCGPGRP, TIOCSPGRP.  Export llround, llroundf.
+      234: Export program_invocation_name, program_invocation_short_name
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 233
+#define CYGWIN_VERSION_API_MINOR 234
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
