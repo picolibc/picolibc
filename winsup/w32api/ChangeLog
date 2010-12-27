@@ -1,3 +1,15 @@
+2010-12-27  Markus Koenig  <basilo@users.sourceforge.net>
+
+	* include/gdiplus/gdipluspixelformats.h (PixelFormatIndexed,
+	PixelFormatGDI, PixelFormatAlpha, PixelFormatPAlpha,
+	PixelFormatExtended, PixelFormatCanonical, PixelFormatUndefined,
+	PixelFormatDontCare, PixelFormat1bppIndexed, PixelFormat4bppIndexed,
+	PixelFormat8bppIndexed, PixelFormat16bppGrayScale,
+	PixelFormat16bppRGB555, PixelFormat16bppRGB565, PixelFormat16bpp1555,
+	PixelFormat24bppRGB, PixelFormat32bppRGB, PixelFormat32bppARGB,
+	PixelFormat32bppPARGB, PixelFormat48bppRGB, PixelFormat64bppARGB,
+	PixelFormat64bppPARGB, PixelFormatMax): Fix definition.
+
 2010-10-20  Seth Jackson  <sethj@users.sourceforge.net>
 
 	* include/commctrl.h (TC_ITEMHEADER[AW]): Rename to TCITEMHEADER[AW].
