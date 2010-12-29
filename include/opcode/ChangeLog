@@ -1,3 +1,8 @@
+2010-12-26  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR gas/11395
+	* hppa.h: Clear "d" bit in "add" and "sub" patterns.
+
 2010-12-18  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h: Update commentary after last commit.
