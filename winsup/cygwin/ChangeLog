@@ -1,3 +1,9 @@
+2010-12-29  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygtls.cc: Include stdlib.h.
+	(_cygtls::init_thread): Seed random number generator on a per-thread
+	basis.
+
 2010-12-27  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 234.

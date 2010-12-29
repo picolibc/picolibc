@@ -10,6 +10,7 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #include "cygtls.h"
 #include <syslog.h>
+#include <stdlib.h>
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -93,6 +94,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	}
       local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
+      srand48 ((long int) &x);
     }
 
   thread_id = GetCurrentThreadId ();
