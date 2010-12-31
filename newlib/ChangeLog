@@ -1,3 +1,7 @@
+2010-12-31  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
+	* MAINTAINERS: Change corinna@vinchen.de to corinna@vinschen.de.
+
 2010-12-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* libc/include/sys/errno.h (program_invocation_name): Declare.
