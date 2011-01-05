@@ -41,17 +41,6 @@ dnl For each directory which we may or may not want, we define a name
 dnl for the library and an automake conditional for whether we should
 dnl build the library.
 
-LIBC_POSIX_LIB=
-if test -n "${posix_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
-  else
-    LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
-  fi
-fi
-AC_SUBST(LIBC_POSIX_LIB)
-AM_CONDITIONAL(HAVE_POSIX_DIR, test x${posix_dir} != x)
-
 LIBC_SIGNAL_LIB=
 LIBC_SIGNAL_DEF=
 if test -n "${signal_dir}"; then

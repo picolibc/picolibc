@@ -625,7 +625,10 @@ HAVE_XDR_DIR_FALSE
 HAVE_XDR_DIR_TRUE
 LIBC_XDR_DEF
 LIBC_XDR_LIB
+HAVE_POSIX_DIR_FALSE
+HAVE_POSIX_DIR_TRUE
 LIBC_POSIX_DEF
+LIBC_POSIX_LIB
 HAVE_STDIO64_DIR_FALSE
 HAVE_STDIO64_DIR_TRUE
 LIBC_STDIO64_DEF
@@ -638,9 +641,6 @@ HAVE_SIGNAL_DIR_FALSE
 HAVE_SIGNAL_DIR_TRUE
 LIBC_SIGNAL_DEF
 LIBC_SIGNAL_LIB
-HAVE_POSIX_DIR_FALSE
-HAVE_POSIX_DIR_TRUE
-LIBC_POSIX_LIB
 CRT0
 subdirs
 CPP
@@ -11805,24 +11805,6 @@ fi
 
 
 
-LIBC_POSIX_LIB=
-if test -n "${posix_dir}"; then
-  if test "${use_libtool}" = "yes"; then
-    LIBC_POSIX_LIB=${posix_dir}/lib${posix_dir}.${aext}
-  else
-    LIBC_POSIX_LIB=${posix_dir}/lib.${aext}
-  fi
-fi
-
- if test x${posix_dir} != x; then
-  HAVE_POSIX_DIR_TRUE=
-  HAVE_POSIX_DIR_FALSE='#'
-else
-  HAVE_POSIX_DIR_TRUE='#'
-  HAVE_POSIX_DIR_FALSE=
-fi
-
-
 LIBC_SIGNAL_LIB=
 LIBC_SIGNAL_DEF=
 if test -n "${signal_dir}"; then
@@ -12223,10 +12205,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error "conditional \"am__fastdepCC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_POSIX_DIR_TRUE}" && test -z "${HAVE_POSIX_DIR_FALSE}"; then
-  as_fn_error "conditional \"HAVE_POSIX_DIR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_SIGNAL_DIR_TRUE}" && test -z "${HAVE_SIGNAL_DIR_FALSE}"; then

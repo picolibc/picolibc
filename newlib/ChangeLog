@@ -1,3 +1,8 @@
+2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
+	* libc/configure.in: Remove redundant posix_dir processing.
+	* libc/configure: Regenerate.
+
 2010-12-31  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* MAINTAINERS: Change corinna@vinchen.de to corinna@vinschen.de.
@@ -37,12 +42,12 @@
 
 	* libm/mathfp/sf_logarithm.c: Change isfinitef reference to isfinite.
 
-2010-12-08      Ralf Corsepius <ralf.corsepius@rtems.org>
+2010-12-08  Ralf Corsepius <ralf.corsepius@rtems.org>
 
 	* include/sys/types.h: Add #if defined(__rtems__) around
 	pthread_attr_t.guardsize.
 
-2010-12-08      Joel Sherrill <joel@OARcorp.com>
+2010-12-08  Joel Sherrill <joel@OARcorp.com>
 
 	* include/pthread.h: Add pthread_attr_setstack, pthread_attr_getstack,
 	pthread_attr_getguardsize, pthread_attr_setguardsize.
