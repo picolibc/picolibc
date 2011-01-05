@@ -51,6 +51,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <rpc/types.h>
 #include <rpc/xdr.h>

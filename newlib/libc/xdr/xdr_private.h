@@ -25,6 +25,7 @@
 
 #include <_ansi.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <sys/param.h>
 
 /* avoid including stdio header here */

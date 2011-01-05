@@ -1,5 +1,10 @@
 2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/xdr/xdr_private.h: Include <stdint.h>
+	* libc/xdr/xdr_rec.c: Include limits.h
+
+2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/Makefile.am (SUBDEFS): Remove redundant posix/stmp-def.
 	* libc/Makefile.in: Regenerate.
 
