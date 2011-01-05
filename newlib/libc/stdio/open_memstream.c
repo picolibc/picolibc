@@ -330,8 +330,10 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
     c->max *= sizeof(wchar_t);
   if (c->max < 64)
     c->max = 64;
+#if (SIZE_MAX >= 64 * 1024)
   else if (c->max > 64 * 1024)
     c->max = 64 * 1024;
+#endif
   *size = 0;
   *buf = _malloc_r (ptr, c->max);
   if (!*buf)

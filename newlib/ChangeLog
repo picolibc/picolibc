@@ -1,5 +1,10 @@
 2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/stdio/open_memstream.c (internal_open_memstream_r):
+	Don't limit c->max to 64*1024 on targets with SIZE_MAX < 64*1024.
+
+2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/xdr/xdr.c: Fix typos in #errors.
 
 2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
