@@ -113,7 +113,7 @@ _DEFUN (xdr_int, (xdrs, ip),
 #elif INT_MAX == LONG_MAX
   return xdr_long (xdrs, (long *) ip);
 #else
-# error Unexpeced integer sizes in xdr_int()
+# error Unexpected integer sizes in xdr_int()
 #endif
 }
 
@@ -148,7 +148,7 @@ _DEFUN (xdr_u_int, (xdrs, up),
 #elif UINT_MAX == ULONG_MAX
   return xdr_u_long (xdrs, (u_long *) up);
 #else
-# error Unexpeced integer sizes in xdr_int()
+# error Unexpected integer sizes in xdr_int()
 #endif
 }
 

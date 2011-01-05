@@ -1,5 +1,9 @@
 2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/xdr/xdr.c: Fix typos in #errors.
+
+2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/xdr/xdr_private.h: Include <stdint.h>
 	* libc/xdr/xdr_rec.c: Include limits.h
 
