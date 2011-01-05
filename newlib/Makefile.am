@@ -255,7 +255,7 @@ stmp-targ-include: config.status
 	  done
 	touch $@
 
-CLEANFILES = targ-include stmp-targ-include
+CLEANFILES = stmp-targ-include
 
 install-data-local:	install-toollibLIBRARIES
 if USE_LIBTOOL
@@ -430,3 +430,6 @@ check-DEJAGNU: site.exp
 	else \
 	   echo "WARNING: could not find \`runtest'" 1>&2 ; \
 	fi
+
+clean-local:
+	-rm -rf targ-include

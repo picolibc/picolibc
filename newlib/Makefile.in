@@ -405,7 +405,7 @@ libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-unde
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = libm-libtool-objectlist
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = libc-libtool-objectlist
-CLEANFILES = targ-include stmp-targ-include
+CLEANFILES = stmp-targ-include
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MAKEOVERRIDES = 
 
@@ -760,8 +760,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool clean-toollibLIBRARIES \
-	clean-toollibLTLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local \
+	clean-toollibLIBRARIES clean-toollibLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -838,7 +838,7 @@ uninstall-am: uninstall-toollibDATA uninstall-toollibLIBRARIES \
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-DEJAGNU check-am clean \
-	clean-generic clean-libtool clean-toollibLIBRARIES \
+	clean-generic clean-libtool clean-local clean-toollibLIBRARIES \
 	clean-toollibLTLIBRARIES ctags ctags-recursive distclean \
 	distclean-DEJAGNU distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags dvi dvi-am html \
@@ -1128,6 +1128,9 @@ check-DEJAGNU: site.exp
 	else \
 	   echo "WARNING: could not find \`runtest'" 1>&2 ; \
 	fi
+
+clean-local:
+	-rm -rf targ-include
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
