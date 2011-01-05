@@ -1,3 +1,7 @@
+2011-01-05  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* faq-setup.xml (faq.setup.cli): Correct description of -pubkey option
+
 2010-10-18  Andy Koppe <andy.koppe@gmail.com>
 
 	* setup2.sgml (setup-locale-ov): Document CJK ambiguous width change
