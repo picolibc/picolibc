@@ -1,5 +1,10 @@
 2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
+	* libc/Makefile.am (SUBDEFS): Remove redundant posix/stmp-def.
+	* libc/Makefile.in: Regenerate.
+
+2011-01-05  Ralf Corsepius  <ralf.corsepius@rtems.org>
+
 	* libc/configure.in: Remove redundant posix_dir processing.
 	* libc/configure: Regenerate.
 

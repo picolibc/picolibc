@@ -396,8 +396,7 @@ SUBDEFS = \
 	locale/stmp-def \
 	reent/stmp-def \
 	$(LIBC_EXTRA_DEF) \
-	misc/stmp-def \
-	posix/stmp-def
+	misc/stmp-def
 
 info_TEXINFOS = libc.texinfo
 libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \

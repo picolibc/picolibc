@@ -140,8 +140,7 @@ SUBDEFS = \
 	locale/stmp-def \
 	reent/stmp-def \
 	$(LIBC_EXTRA_DEF) \
-	misc/stmp-def \
-	posix/stmp-def
+	misc/stmp-def
 
 libc.info: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
