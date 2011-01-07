@@ -1,3 +1,12 @@
+2011-01-07  Jacky Lai  <crazyjacky@users.sourceforge.net>
+
+	Correct hexadecimal formatting of double and long double values.
+
+	* mingwex/stdio/pformat.c (__pformat_xdouble): Delete function.
+	(__pformat) [A format]: Cast double values to long double, and use...
+	(__pformat_xldouble): ...this instead, with corrected adjustment of
+	exponent and alignment of mantissa, when formatting subnormals.
+
 2010-12-27  Ozkan Sezer  <sezero@users.sourceforge.net>
 
 	* include/dirent.h (dd_handle): Define as intptr_t.

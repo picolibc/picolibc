@@ -1661,74 +1661,6 @@ void __pformat_emit_xfloat( __pformat_fpreg_t value, __pformat_t *stream )
 }
 
 static
-void __pformat_xdouble( double x, __pformat_t *stream )
-{
-  /* Handler for `%a' and `%A' format specifiers, (with argument
-   * value specified as `double' type).
-   */
-  unsigned sign_bit = 0;
-  __pformat_fpreg_t z; z.__pformat_fpreg_double_t = x;
-
-  /* First check for NaN; it is emitted unsigned...
-   */
-  if( isnan( x ) )
-    __pformat_emit_inf_or_nan( sign_bit, "NaN", stream );
-
-  else
-  { /* Capture the sign bit up-front, so we can show it correctly
-     * even when the argument value is zero or infinite.
-     */
-    if( (sign_bit = (z.__pformat_fpreg_bitmap[3] & 0x8000)) != 0 )
-      stream->flags |= PFORMAT_NEGATIVE;
-
-    /* Check for infinity, (positive or negative)...
-     */
-    if( isinf( x ) )
-      /*
-       * displaying the appropriately signed indicator,
-       * when appropriate.
-       */
-      __pformat_emit_inf_or_nan( sign_bit, "Inf", stream );
-
-    else
-    { /* The argument value is a representable number...
-       * first move its exponent into the appropriate field...
-       */
-      z.__pformat_fpreg_bitmap[4] = (z.__pformat_fpreg_bitmap[3] >> 4) & 0x7FF;
-
-      /* Realign the mantissa, leaving space for a
-       * normalised most significant digit...
-       */
-      z.__pformat_fpreg_mantissa <<= 8;
-      z.__pformat_fpreg_bitmap[3] = (z.__pformat_fpreg_bitmap[3] & 0x0FFF);
-
-      /* Check for zero value...
-       */
-      if( z.__pformat_fpreg_exponent || z.__pformat_fpreg_mantissa )
-      {
-	/* and only when the value is non-zero,
-	 * eliminate the bias from the exponent...
-	 */
-        z.__pformat_fpreg_exponent -= 0x3FF;
-
-	/* Check for a possible denormalised value...
-	 */
-	if( z.__pformat_fpreg_exponent > -126 )
-	  /*
-	   * and normalise when it isn't.
-	   */
-	  z.__pformat_fpreg_bitmap[3] += 0x1000;
-      }
-
-      /* Finally, hand the adjusted representation off to the generalised
-       * hexadecimal floating point format handler...
-       */
-      __pformat_emit_xfloat( z, stream );
-    }
-  }
-}
-
-static
 void __pformat_xldouble( long double x, __pformat_t *stream )
 {
   /* Handler for `%La' and `%LA' format specifiers, (with argument
@@ -1763,9 +1695,28 @@ void __pformat_xldouble( long double x, __pformat_t *stream )
        * extract the effective value of the biased exponent...
        */
       z.__pformat_fpreg_exponent &= 0x7FFF;
-      if( z.__pformat_fpreg_exponent || z.__pformat_fpreg_mantissa )
-	/*
-	 * and if the argument value itself is non-zero,
+      if( z.__pformat_fpreg_exponent == 0 )
+      {
+	/* A biased exponent value of zero means either a
+	 * true zero value, if the mantissa field also has
+	 * a zero value, otherwise...
+	 */
+	if( z.__pformat_fpreg_mantissa != 0 )
+	{
+	  /* ...this mantissa represents a subnormal value;
+	   * adjust the exponent, while shifting the mantissa
+	   * to the left, until its leading bit is 1.
+	   */
+	  z.__pformat_fpreg_exponent = 1-0x3FFF;
+	  while( (z.__pformat_fpreg_mantissa & (LLONG_MAX + 1ULL)) == 0 )
+	  {
+	    z.__pformat_fpreg_mantissa <<= 1;
+	    --z.__pformat_fpreg_exponent;
+	  }
+	}
+      }
+      else
+	/* This argument represents a non-zero normal number;
 	 * eliminate the bias from the exponent...
 	 */
 	z.__pformat_fpreg_exponent -= 0x3FFF;
@@ -2147,7 +2098,7 @@ int __pformat( int flags, void *dest, int max, const char *fmt, va_list argv )
 	    else
 	      /* or just a `double'.
 	       */
-	      __pformat_xdouble( va_arg( argv, double ), &stream );
+	      __pformat_xldouble( (long double)(va_arg( argv, double )), &stream );
 
 	    goto format_scan;
 
