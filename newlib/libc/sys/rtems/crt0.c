@@ -24,8 +24,8 @@ ret func
 /* RTEMS provides some of its own routines including a Malloc family */
 RTEMS_STUB(void *,malloc(size_t s)) { return 0; }
 RTEMS_STUB(void *,realloc(void* p, size_t s)) { return 0; }
-RTEMS_STUB(void, free(void)) { ; }
-RTEMS_STUB(_PTR, calloc(struct _reent *r, size_t s1, size_t s2)) {}
+RTEMS_STUB(void, free(void* ptr)) { ; }
+RTEMS_STUB(_PTR, calloc(size_t s1, size_t s2)) {}
 
 #if defined(__GNUC__)
 /*
