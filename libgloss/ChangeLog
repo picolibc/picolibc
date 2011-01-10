@@ -1,3 +1,8 @@
+2011-01-10  Mike Frysinger  <vapier@gentoo.org>
+
+	* Makefile.in (stmp-bsp): Exit when subdirs fail.
+	(install): Likewise.
+
 2010-12-02  Jayant Sonar  jayant.sonar@kpitcummins.com
 	    Kaushik Phatak  kaushik.phatak@kpitcummins.com
 
