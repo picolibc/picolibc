@@ -1,3 +1,7 @@
+2011-01-08  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/string.h: Make strsignal() available unconditionally.
+
 2011-01-07  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/crt0.c: Adjust free() and calloc() to match their
