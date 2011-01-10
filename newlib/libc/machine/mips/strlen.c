@@ -60,6 +60,9 @@ __asm__(""			/* 32-bit MIPS targets */
 	"	addiu	$2,$4,1\n"
 	"\n"
 	"1:	lbu	$3,0($4)\n"
+#if defined(_R3000)
+	"	nop	\n"
+#endif
 	"	bnez	$3,1b\n"
 	"	addiu	$4,$4,1\n"
 	"\n"
