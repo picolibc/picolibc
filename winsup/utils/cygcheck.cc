@@ -2180,7 +2180,7 @@ At least one command option or a PROGRAM is required, as shown above.\n\
   -c, --check-setup    show installed version of PACKAGE and verify integrity\n\
                        (or for all installed packages if none specified)\n\
   -d, --dump-only      just list packages, do not verify (with -c)\n\
-  -s, --sysinfo        produce diagnostic system information (implies -c -d)\n\
+  -s, --sysinfo        produce diagnostic system information (implies -c)\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
                        plain console only, not from a pty/rxvt/xterm)\n\
@@ -2406,7 +2406,7 @@ main (int argc, char **argv)
       && unique_object_name_opt)
     usage (stderr, 1);
 
-  if (dump_only && !check_setup)
+  if (dump_only && !check_setup && !sysinfo)
     usage (stderr, 1);
 
   if (find_package + list_package + grep_packages > 1)
@@ -2454,7 +2454,7 @@ main (int argc, char **argv)
       if (!check_setup)
 	{
 	  puts ("");
-	  dump_setup (verbose, NULL, false);
+	  dump_setup (verbose, NULL, !dump_only);
 	}
 
       if (!givehelp)

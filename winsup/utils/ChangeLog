@@ -1,3 +1,7 @@
+2011-01-10  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* cygcheck.cc (main): don't imply -d from -s option to cygcheck
+
 2010-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (strchrnul): New function.
