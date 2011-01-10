@@ -123,7 +123,7 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_THM_CALL,        	 10)
   RELOC_NUMBER (R_ARM_THM_PC8,         	 11)
   RELOC_NUMBER (R_ARM_BREL_ADJ,	       	 12)
-  RELOC_NUMBER (R_ARM_SWI24,           	 13)   /* obsolete */
+  RELOC_NUMBER (R_ARM_TLS_DESC,          13)
   RELOC_NUMBER (R_ARM_THM_SWI8,        	 14)   /* obsolete */
   RELOC_NUMBER (R_ARM_XPC25,           	 15)   /* obsolete */
   RELOC_NUMBER (R_ARM_THM_XPC22,       	 16)   /* obsolete */
@@ -200,7 +200,10 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_THM_MOVW_BREL_NC,	 87)
   RELOC_NUMBER (R_ARM_THM_MOVT_BREL,   	 88)
   RELOC_NUMBER (R_ARM_THM_MOVW_BREL,   	 89)
-  /* 90-93 unallocated */
+  RELOC_NUMBER (R_ARM_TLS_GOTDESC,       90)
+  RELOC_NUMBER (R_ARM_TLS_CALL,          91)
+  RELOC_NUMBER (R_ARM_TLS_DESCSEQ,       92)
+  RELOC_NUMBER (R_ARM_THM_TLS_CALL,      93)
   RELOC_NUMBER (R_ARM_PLT32_ABS,       	 94)
   RELOC_NUMBER (R_ARM_GOT_ABS,	       	 95)
   RELOC_NUMBER (R_ARM_GOT_PREL,	       	 96)
@@ -221,6 +224,7 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_TLS_IE12GP,     	111)
   /* 112 - 127 private range */
   RELOC_NUMBER (R_ARM_ME_TOO,	        128)   /* obsolete */
+  RELOC_NUMBER (R_ARM_THM_TLS_DESCSEQ  ,129)
 
   /* Extensions?  R=read-only?  */
   RELOC_NUMBER (R_ARM_RXPC25,         	249)

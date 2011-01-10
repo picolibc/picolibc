@@ -1,3 +1,10 @@
+2011-01-10  Nathan Sidwell  <nathan@codesourcery.com>
+	    Glauber de Oliveira Costa  <glommer@gmail.com>
+
+	* arm.h (R_ARM_TLS_DESC, R_ARM_TLS_GOTDESC, R_ARM_TLS_CALL,
+	R_ARM_TLS_DESCSEQ, T_ARM_THM_TLS_CALL, R_ARM_THM_TLS_DESCSEQ): New
+	relocations.
+
 2010-11-11  Mingming Sun  <mingm.sun@gmail.com>
 
 	* mips.h (E_MIPS_MACH_LS3A): Defined.
