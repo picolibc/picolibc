@@ -232,14 +232,14 @@ tcsetpgrp (int fd, pid_t pgid)
 
 /* cfgetospeed: POSIX96 7.1.3.1 */
 extern "C" speed_t
-cfgetospeed (struct termios *tp)
+cfgetospeed (const struct termios *tp)
 {
   return __tonew_termios (tp)->c_ospeed;
 }
 
 /* cfgetispeed: POSIX96 7.1.3.1 */
 extern "C" speed_t
-cfgetispeed (struct termios *tp)
+cfgetispeed (const struct termios *tp)
 {
   return __tonew_termios (tp)->c_ispeed;
 }

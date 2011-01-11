@@ -1,3 +1,9 @@
+2011-01-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* termios.cc (cfgetospeed, cfgetispeed): Constify argument per POSIX.
+	* include/sys/termios.h (cfgetospeed, cfgetispeed): Declare functions.
+	Move macros after declarations and make conditional on !__cplusplus.
+
 2011-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::init_thread): Call _REENT_INIT_PTR.  Drop setting

@@ -317,9 +317,6 @@ struct termios
 
 #define termio termios
 
-#define cfgetospeed(tp)		((tp)->c_ospeed)
-#define cfgetispeed(tp)		((tp)->c_ispeed)
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -331,11 +328,18 @@ int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
 void cfmakeraw (struct termios *);
+speed_t cfgetispeed(const struct termios *);
+speed_t cfgetospeed(const struct termios *);
 int cfsetispeed (struct termios *, speed_t);
 int cfsetospeed (struct termios *, speed_t);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifndef __cplusplus
+#define cfgetispeed(tp)		((tp)->c_ispeed)
+#define cfgetospeed(tp)		((tp)->c_ospeed)
 #endif
 
 /* Extra stuff to make porting stuff easier.  */
