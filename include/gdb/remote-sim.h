@@ -191,13 +191,15 @@ int sim_fetch_register (SIM_DESC sd, int regno, unsigned char *buf, int length);
 
 
 /* Store register REGNO from the raw (target endian) value in BUF.
-   Return the actual size of the register or zero if REGNO is not
-   applicable.
 
-   Legacy implementations ignore LENGTH and always return -1.
+   Return the actual size of the register, any size not equal to
+   LENGTH indicates the register was not updated correctly.
 
-   If LENGTH does not match the size of REGNO no data is transfered
-   (the actual register size is still returned). */
+   Return a LENGTH of -1 to indicate the register was not updated
+   and an error has occurred.
+
+   Return a LENGTH of 0 to indicate the register was not updated
+   but no error has occurred. */
 
 int sim_store_register (SIM_DESC sd, int regno, unsigned char *buf, int length);
 

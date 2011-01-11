@@ -1,3 +1,8 @@
+2011-01-11  Andrew Burgess  <aburgess@broadcom.com>
+
+	* remote-sim.h (sim_store_register): Update the API
+	documentation for this function.
+
 2010-09-06  Pedro Alves  <pedro@codesourcery.com>
 
 	* signals.def: Replace all ANY uses by SET with specific numbers.
