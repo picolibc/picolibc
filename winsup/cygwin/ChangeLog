@@ -1,3 +1,8 @@
+2011-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::init_thread): Call _REENT_INIT_PTR.  Drop setting
+	current locale and calling srand48.
+
 2011-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ChangeLog-2010: Create from ChangeLog.

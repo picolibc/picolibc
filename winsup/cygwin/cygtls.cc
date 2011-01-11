@@ -1,6 +1,6 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -81,6 +81,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
   if (x)
     {
       memset (this, 0, sizeof (*this));
+      _REENT_INIT_PTR (&local_clib);
       stackptr = stack;
       if (_GLOBAL_REENT)
 	{
@@ -92,9 +93,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	  local_clib.__sglue._niobs = 3;
 	  local_clib.__sglue._iobs = &_GLOBAL_REENT->__sf[0];
 	}
-      local_clib._current_locale = "C";
       locals.process_logmask = LOG_UPTO (LOG_DEBUG);
-      srand48 ((long int) &x);
     }
 
   thread_id = GetCurrentThreadId ();
