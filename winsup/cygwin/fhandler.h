@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -687,11 +687,14 @@ class fhandler_dev_raw: public fhandler_base
   void fixup_after_exec ();
 };
 
+#define MAX_PARTITIONS 15
+
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
  private:
   _off64_t drive_size;
   unsigned long bytes_per_sector;
+  HANDLE partitions[MAX_PARTITIONS];
   struct status_flags
   {
     unsigned eom_detected    : 1;
@@ -711,6 +714,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   fhandler_dev_floppy ();
 
   int open (int flags, mode_t mode = 0);
+  int close ();
   int dup (fhandler_base *child);
   void __stdcall raw_read (void *ptr, size_t& ulen);
   ssize_t __stdcall raw_write (const void *ptr, size_t ulen);

@@ -2,7 +2,7 @@
    fhandler classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009 Red Hat, Inc.
+   2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,6 +32,7 @@ details. */
 fhandler_dev_floppy::fhandler_dev_floppy ()
   : fhandler_dev_raw (), status ()
 {
+  memset (partitions, 0, sizeof partitions);
 }
 
 int
@@ -221,12 +222,71 @@ fhandler_dev_floppy::open (int flags, mode_t)
          make sure we're actually allowed to read *all* of the device.
 	 This is actually documented in the MSDN CreateFile man page. */
       if (get_major () != DEV_FLOPPY_MAJOR
-	  && (get_major () == DEV_CDROM_MAJOR || get_minor () == 0)
+	  && (get_major () == DEV_CDROM_MAJOR || get_minor () % 16 == 0)
 	  && !DeviceIoControl (get_handle (), FSCTL_ALLOW_EXTENDED_DASD_IO,
 			       NULL, 0, NULL, 0, &bytes_read, NULL))
 	debug_printf ("DeviceIoControl (FSCTL_ALLOW_EXTENDED_DASD_IO) "
 		      "failed, %E");
+      /* If we're trying to write to a disk partition, lock the partition,
+	 otherwise we will get "Access denied" starting with Vista. */
+      if (wincap.has_restricted_raw_disk_access ()
+	  && get_major () != DEV_FLOPPY_MAJOR
+	  && get_major () != DEV_CDROM_MAJOR
+	  && (flags & O_ACCMODE) != O_RDONLY)
+	{
+	  /* Special case: If we try to write to the entire disk, we have to
+	     lock all partitions, otherwise writing fails as soon as we cross
+	     a partition boundary. */
+	  if (get_minor () % 16 == 0)
+	    {
+	      WCHAR part[MAX_PATH], *p;
+
+	      sys_mbstowcs (part, MAX_PATH, get_win32_name ());
+	      p = wcschr (part, L'\0') - 1;
+	      for (int i = 0; i < MAX_PARTITIONS; ++i)
+	      	{
+		  NTSTATUS status;
+		  UNICODE_STRING upart;
+		  OBJECT_ATTRIBUTES attr;
+		  IO_STATUS_BLOCK io;
+
+		  __small_swprintf (p, L"%d", i + 1);
+		  RtlInitUnicodeString (&upart, part);
+		  InitializeObjectAttributes (&attr, &upart,
+					      OBJ_INHERIT|OBJ_CASE_INSENSITIVE,
+					      NULL, NULL);
+		  status = NtOpenFile (&partitions[i], GENERIC_WRITE, &attr,
+				       &io, FILE_SHARE_VALID_FLAGS, 0);
+		  if (status == STATUS_OBJECT_NAME_NOT_FOUND ||
+		      status == STATUS_OBJECT_PATH_NOT_FOUND)
+		    break;
+		  else if (!NT_SUCCESS (status))
+		    debug_printf ("NtCreateFile(%W): status %p", part, status);
+		  else if (!DeviceIoControl (partitions[i], FSCTL_LOCK_VOLUME,
+					     NULL, 0, NULL, 0,
+					     &bytes_read, NULL))
+		    debug_printf ("DeviceIoControl (%W, FSCTL_LOCK_VOLUME) "
+				  "failed, %E", part);
+		}
+	    }
+	  else if (!DeviceIoControl (get_handle (), FSCTL_LOCK_VOLUME,
+				     NULL, 0, NULL, 0, &bytes_read, NULL))
+	    debug_printf ("DeviceIoControl (FSCTL_LOCK_VOLUME) failed, %E");
+	}
     }
+
+  return ret;
+}
+
+int
+fhandler_dev_floppy::close ()
+{
+  int ret = fhandler_dev_raw::close ();
+
+  /* See "Special case" comment in fhandler_dev_floppy::open. */
+  if (wincap.has_restricted_raw_disk_access ())
+    for (int i = 0; i < MAX_PARTITIONS && partitions[i]; ++i)
+      NtClose (partitions[i]);
 
   return ret;
 }
@@ -234,12 +294,26 @@ fhandler_dev_floppy::open (int flags, mode_t)
 int
 fhandler_dev_floppy::dup (fhandler_base *child)
 {
+  fhandler_dev_floppy *fhc = (fhandler_dev_floppy *) child;
+
+  /* See "Special case" comment in fhandler_dev_floppy::open. */
+  memset (fhc->partitions, 0, sizeof fhc->partitions);
+  if (wincap.has_restricted_raw_disk_access ())
+    for (int i = 0; i < MAX_PARTITIONS && partitions[i]; ++i)
+      if (!DuplicateHandle (GetCurrentProcess (), partitions[i],
+			    GetCurrentProcess (), &fhc->partitions[i],
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
+	{
+	  __seterrno ();
+	  while (--i >= 0)
+	    NtClose (partitions[i]);
+	  return -1;
+	}
+
   int ret = fhandler_dev_raw::dup (child);
 
   if (!ret)
     {
-      fhandler_dev_floppy *fhc = (fhandler_dev_floppy *) child;
-
       fhc->drive_size = drive_size;
       fhc->bytes_per_sector = bytes_per_sector;
       fhc->eom_detected (eom_detected ());

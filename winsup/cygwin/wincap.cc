@@ -2,7 +2,7 @@
 		capability class to the appropriate values.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -61,6 +61,7 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_mwmo_inputavailable:false,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -101,6 +102,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -141,6 +143,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -181,6 +184,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -221,6 +225,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -261,6 +266,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -301,6 +307,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
+  has_restricted_raw_disk_access:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -341,6 +348,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:true,
   has_fast_cwd:true,
+  has_restricted_raw_disk_access:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -381,6 +389,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:true,
+  has_restricted_raw_disk_access:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

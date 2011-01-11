@@ -1,3 +1,19 @@
+2011-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (MAX_PARTITIONS): New definition.
+	(class fhandler_dev_floppy): Add partitions array member.  Add close
+	method.
+	* fhandler_floppy.cc (fhandler_dev_floppy::fhandler_dev_floppy): Zero
+	out partitions array.
+	(fhandler_dev_floppy::open): Fix "entire disk" condition for call to 
+	DeviceIoControl (FSCTL_ALLOW_EXTENDED_DASD_IO).
+	When opening disks for writing, call DeviceIoControl (FSCTL_LOCK_VOLUME)
+	on all affected disk partitions starting with Vista.
+	(fhandler_dev_floppy::close): New method.
+	(fhandler_dev_floppy::dup): Duplicate handles in partitions, if any.
+	* wincap.h (wincaps::has_restricted_raw_disk_access): New element.
+	* wincap.cc: Implement above element throughout.
+
 2011-01-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* termios.cc (cfgetospeed, cfgetispeed): Constify argument per POSIX.

@@ -1,7 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -51,6 +51,7 @@ struct wincaps
   unsigned has_mwmo_inputavailable			: 1;
   unsigned has_buggy_thread_startup			: 1;
   unsigned has_fast_cwd					: 1;
+  unsigned has_restricted_raw_disk_access		: 1;
 };
 
 class wincapc
@@ -107,6 +108,7 @@ public:
   bool	IMPLEMENT (has_mwmo_inputavailable)
   bool	IMPLEMENT (has_buggy_thread_startup)
   bool	IMPLEMENT (has_fast_cwd)
+  bool	IMPLEMENT (has_restricted_raw_disk_access)
 
 #undef IMPLEMENT
 };
