@@ -50,7 +50,6 @@ int 	_EXFUN(sigpause, (int));
 
 #ifndef _POSIX_SOURCE
 extern const char *const sys_siglist[];
-typedef __sighandler_t sig_t; /* BSDism */
 #endif
 
 #endif

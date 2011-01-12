@@ -8,6 +8,7 @@ _BEGIN_STD_C
 
 typedef int	sig_atomic_t;		/* Atomic entity type (ANSI) */
 #ifndef _POSIX_SOURCE
+typedef _sig_func_ptr sig_t;		/* BSD naming */
 typedef _sig_func_ptr sighandler_t;	/* glibc naming */
 #endif /* !_POSIX_SOURCE */
 
