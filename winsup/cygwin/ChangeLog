@@ -1,5 +1,13 @@
 2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (madvise): Export posix_madvise as madvise.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR.
+	* include/sys/mman.h: Define madvise constants, keep Linux-specific
+	constants undefined.
+	(madvise): Declare.
+
+2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (struct part_t): New type.
 	(class fhandler_dev_floppy): Convert partitions to part_t pointer.
 	Add lock_partition method.

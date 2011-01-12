@@ -1,7 +1,7 @@
 /* version.h -- Cygwin version numbers and accompanying documentation.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -397,13 +397,14 @@ details. */
 	   cpowf, cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf,
 	   csqrt, csqrtf, ctan, ctanf, ctanh, ctanhf.
       233: Add TIOCGPGRP, TIOCSPGRP.  Export llround, llroundf.
-      234: Export program_invocation_name, program_invocation_short_name
+      234: Export program_invocation_name, program_invocation_short_name.
+      235: Export madvise.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 234
+#define CYGWIN_VERSION_API_MINOR 235
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

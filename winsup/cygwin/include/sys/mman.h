@@ -1,6 +1,6 @@
 /* sys/mman.h
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2003, 2005, 2007 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2003, 2005, 2007, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -56,6 +56,26 @@ extern "C" {
 #define POSIX_MADV_WILLNEED 3
 #define POSIX_MADV_DONTNEED 4
 
+/*
+ * Flags for madvise.  BSD/Linux-specific.
+ */
+#define MADV_NORMAL 0
+#define MADV_SEQUENTIAL 1
+#define MADV_RANDOM 2
+#define MADV_WILLNEED 3
+#define MADV_DONTNEED 4
+/* Deliberately don't define these Linux-specific flags.  An application
+   expecting them to behave as defined would be in for a surprise. */
+#if 0
+#define MADV_REMOVE 5
+#define MADV_DONTFORK 6
+#define MADV_DOFORK 7
+#define MADV_HWPOISON 8
+#define MADV_SOFT_OFFLINE 9
+#define MADV_MERGEABLE 10
+#define MADV_UNMERGEABLE 11
+#endif
+
 #ifndef __INSIDE_CYGWIN__
 extern void *mmap (void *__addr, size_t __len, int __prot, int __flags, int __fd, off_t __off);
 #endif
@@ -66,6 +86,7 @@ extern int mlock (const void *__addr, size_t __len);
 extern int munlock (const void *__addr, size_t __len);
 
 extern int posix_madvise (void *__addr, size_t __len, int __advice);
+extern int madvise (void *__addr, size_t __len, int __advice);
 
 extern int shm_open (const char *__name, int __oflag, mode_t __mode);
 extern int shm_unlink (const char *__name);
