@@ -1,3 +1,7 @@
+2011-01-12  Iain Sandoe  <iains@gcc.gnu.org>
+
+	* dwarf2.h: Update value for DW_AT_hi_user.
+
 2010-11-25  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* opcode/s390.h (enum s390_opcode_cpu_val): Add S390_OPCODE_MAXCPU.
