@@ -1,3 +1,8 @@
+2011-01-12  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libm/math/w_tgamma.c: Only build ifndef _DOUBLE_IS_32BITS.
+	* libm/math/wf_tgamma.c: Map tgamma to tgammaf, ifdef _DOUBLE_IS_32BITS.
+
 2011-01-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Add noinclude variable to allow specification

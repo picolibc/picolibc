@@ -17,6 +17,8 @@
 
 #include "fdlibm.h"
 
+#ifndef _DOUBLE_IS_32BITS
+
 #ifdef __STDC__
 	double tgamma(double x)
 #else
@@ -42,3 +44,5 @@
 	return y;
 #endif
 }
+
+#endif /* defined(_DOUBLE_IS_32BITS) */

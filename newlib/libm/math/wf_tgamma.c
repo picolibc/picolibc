@@ -43,3 +43,17 @@
 	return y;
 #endif
 }
+
+#ifdef _DOUBLE_IS_32BITS
+
+#ifdef __STDC__
+	double tgamma(double x)
+#else
+	double tgamma(x)
+	double x;
+#endif
+{
+	return (double) tgammaf((float) x);
+}
+
+#endif /* defined(_DOUBLE_IS_32BITS) */
