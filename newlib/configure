@@ -672,6 +672,7 @@ ELIX_LEVEL_1_TRUE
 ELIX_LEVEL_0_FALSE
 ELIX_LEVEL_0_TRUE
 LDFLAGS
+NO_INCLUDE_LIST
 NEWLIB_CFLAGS
 CCASFLAGS
 CCAS
@@ -3836,6 +3837,9 @@ fi
 newlib_cflags="${newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
+
+
+NO_INCLUDE_LIST=${noinclude}
 
 
 LDFLAGS=${ldflags}
@@ -11631,7 +11635,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11634 "configure"
+#line 11638 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11737,7 +11741,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11740 "configure"
+#line 11744 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

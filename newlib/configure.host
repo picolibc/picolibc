@@ -46,6 +46,7 @@
 #   crt1_dir            directory where crt1 object is found
 #   have_crt0		"yes"/"no" if crt0 is/isn't provided.
 #			"" if crt0 is provided when sys_dir is set
+#   noinclude		list of include files to not install
 
 newlib_cflags=
 libm_machine_dir=
@@ -58,6 +59,7 @@ stdio64_dir=
 xdr_dir=
 syscall_dir=
 unix_dir=
+noinclude=
 mach_add_setjmp=
 crt1=
 crt1_dir=
@@ -850,6 +852,11 @@ if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
 	if [ ${default_newlib_atexit_dynamic_alloc} = "yes" ]; then
 		newlib_atexit_dynamic_alloc="yes"; 
 	fi
+fi
+
+# Remove rpc headers if xdr_dir not specified
+if [ "x${xdir_dir}" = "x" ]; then
+	noinclude="${noinclude} rpc/types.h rpc/xdr.h"
 fi
 
 if test -z "${have_crt0}" && test -n "${sys_dir}"; then

@@ -1,3 +1,13 @@
+2011-01-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Add noinclude variable to allow specification
+	of header files to remove from installation.
+	* acinclude.m4: Provide NO_INCLUDE_LIST variable based on
+	noinclude variable in configure.host.
+	* configure: Regenerated.
+	* Makefile.am: Remove all header files in NO_INCLUDE_LIST.
+	* Makefile.in: Regenerated.
+
 2011-01-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/linux/sys/signal.h (sig_t): Move from here...

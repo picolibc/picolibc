@@ -205,6 +205,9 @@ newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 NEWLIB_CFLAGS=${newlib_cflags}
 AC_SUBST(NEWLIB_CFLAGS)
 
+NO_INCLUDE_LIST=${noinclude}
+AC_SUBST(NO_INCLUDE_LIST)
+
 LDFLAGS=${ldflags}
 AC_SUBST(LDFLAGS)
 

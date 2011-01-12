@@ -330,6 +330,11 @@ endif
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done ; \
+	  for i in $(NO_INCLUDE_LIST); do \
+	    if [ -f $(DESTDIR)$(tooldir)/include/$$i]; then \
+		-rm $(DESTDIR)$(tooldir)/include/$$i; \
+	    else true; fi ; \
+	  done ; \
 	else true; fi
 
 # Force makedoc to be built before building info files.
