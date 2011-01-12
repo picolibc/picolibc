@@ -1,3 +1,7 @@
+2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.8): Add "new API" paragraph.
+
 2011-01-05  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* faq-setup.xml (faq.setup.cli): Correct description of -pubkey option

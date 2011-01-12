@@ -41,6 +41,11 @@ the specified language, and the "@cjknarrow" locale modifier can still be used
 to force width 1.)
 </para></listitem>
 
+<listitem><para>
+Other new APIs: llround, llroundf, madvise.  Export program_invocation_name,
+program_invocation_short_name.  Support TIOCGPGRP, TIOCSPGRP ioctls.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
