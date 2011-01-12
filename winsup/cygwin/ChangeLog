@@ -1,3 +1,19 @@
+2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (struct part_t): New type.
+	(class fhandler_dev_floppy): Convert partitions to part_t pointer.
+	Add lock_partition method.
+	* fhandler_floppy.cc (fhandler_dev_floppy::lock_partition): New method
+	to implement ondemand partition locking.
+	(fhandler_dev_floppy::write_file): Call lock_partition from here if
+	writing failed due to a potential write restriction on a disk
+	partition.  
+	(fhandler_dev_floppy::open): Don't lock partitions here.
+	(fhandler_dev_floppy::close): Keep track of partition handle reference
+	count.  Close handles and remove partitions pointer ony if count is 0.
+	(fhandler_dev_floppy::dup): Just copy partitions pointer and increment
+	reference count.
+
 2011-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (MAX_PARTITIONS): New definition.

@@ -11,6 +11,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <alloca.h>
 #include <unistd.h>
 #include <winioctl.h>
 #include <cygwin/rdevio.h>
@@ -32,7 +33,6 @@ details. */
 fhandler_dev_floppy::fhandler_dev_floppy ()
   : fhandler_dev_raw (), status ()
 {
-  memset (partitions, 0, sizeof partitions);
 }
 
 int
@@ -180,6 +180,143 @@ fhandler_dev_floppy::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
   return ret;
 }
 
+/* See comment in write_file below. */
+BOOL
+fhandler_dev_floppy::lock_partition (DWORD to_write)
+{
+  DWORD bytes_read;
+
+  /* The simple case.  We have only a single partition open anyway. 
+     Try to lock the partition so that a subsequent write succeeds.
+     If there's some file handle open on one of the affected partitions,
+     this fails, but that's how it works on Vista and later... */
+  if (get_minor () % 16 != 0)
+    {
+      if (!DeviceIoControl (get_handle (), FSCTL_LOCK_VOLUME,
+			   NULL, 0, NULL, 0, &bytes_read, NULL))
+	{
+	  debug_printf ("DeviceIoControl (FSCTL_LOCK_VOLUME) failed, %E");
+	  return FALSE;
+	}
+      return TRUE;
+    }
+
+  /* The tricky case.  We're writing to the entire disk.  What this code
+     basically does is to find out if the current write operation affects
+     one or more partitions on the disk.  If so, it tries to lock all these
+     partitions and stores the handles for a subsequent close(). */
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi;
+  /* Allocate space for 4 times the maximum partition count we can handle.
+     The reason is that for *every* single logical drive in an extended
+     partition on an MBR drive, 3 filler entries with partition number set
+     to 0 are added into the partition table returned by
+     IOCTL_DISK_GET_DRIVE_LAYOUT_EX.  The first of them reproduces the data
+     of the next partition entry, if any, except for the partiton number.
+     Then two entries with everything set to 0 follow.  Well, the
+     documentation states that for MBR drives the number of partition entries
+     in the PARTITION_INFORMATION_EX array is always a multiple of 4, but,
+     nevertheless, how crappy is that layout? */
+  const DWORD size = sizeof (DRIVE_LAYOUT_INFORMATION_EX)
+		     + 4 * MAX_PARTITIONS * sizeof (PARTITION_INFORMATION_EX);
+  PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
+				       alloca (size);
+  BOOL found = FALSE;
+  
+  /* Fetch current file pointer position on disk. */
+  status = NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				   FilePositionInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQueryInformationFile(FilePositionInformation): %p",
+		    status);
+      return FALSE;
+    }
+  /* Fetch drive layout to get start and end positions of partitions on disk. */
+  if (!DeviceIoControl (get_handle (), IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0,
+  			pdlix, size, &bytes_read, NULL))
+    {
+      debug_printf ("DeviceIoControl(IOCTL_DISK_GET_DRIVE_LAYOUT_EX): %E");
+      return FALSE;
+    }
+  /* Scan through partition info to find the partition(s) into which we're
+     currently trying to write. */
+  PARTITION_INFORMATION_EX *ppie = pdlix->PartitionEntry;
+  for (DWORD i = 0; i < pdlix->PartitionCount; ++i, ++ppie)
+    {
+      /* A partition number of 0 denotes an extended partition or one of the
+	 aforementioned filler entries.  Just skip. */
+      if (ppie->PartitionNumber == 0)
+      	continue;
+      /* Check if our writing range affects this partition. */
+      if (fpi.CurrentByteOffset.QuadPart   < ppie->StartingOffset.QuadPart
+					     + ppie->PartitionLength.QuadPart
+	  && ppie->StartingOffset.QuadPart < fpi.CurrentByteOffset.QuadPart
+					     + to_write)
+	{
+	  /* Yes.  Now check if we can handle it.  We can only handle
+	     up to MAX_PARTITIONS partitions.  The partition numbering is
+	     one-based, so we decrement the partition number by 1 when using
+	     as index into the partition array. */
+	  DWORD &part_no = ppie->PartitionNumber;
+	  if (part_no >= MAX_PARTITIONS)
+	    return FALSE;
+	  found = TRUE;
+	  debug_printf ("%d %D->%D : %D->%D", part_no,
+			ppie->StartingOffset.QuadPart,
+			ppie->StartingOffset.QuadPart
+			+ ppie->PartitionLength.QuadPart,
+			fpi.CurrentByteOffset.QuadPart,
+			fpi.CurrentByteOffset.QuadPart + to_write);
+	  /* Do we already have partitions?  If not, create it. */
+	  if (!partitions)
+	    {
+	      partitions = (part_t *) ccalloc_abort (HEAP_FHANDLER, 1,
+						     sizeof (part_t));
+	      partitions->refcnt = 1;
+	    }
+	  /* Next, check if the partition is already open.  If so, skip it. */
+	  if (partitions->hdl[part_no - 1])
+	    continue;
+	  /* Now open the partition and lock it. */
+	  WCHAR part[MAX_PATH], *p;
+	  NTSTATUS status;
+	  UNICODE_STRING upart;
+	  OBJECT_ATTRIBUTES attr;
+	  IO_STATUS_BLOCK io;
+
+	  sys_mbstowcs (part, MAX_PATH, get_win32_name ());
+	  p = wcschr (part, L'\0') - 1;
+	  __small_swprintf (p, L"%d", part_no);
+	  RtlInitUnicodeString (&upart, part);
+	  InitializeObjectAttributes (&attr, &upart,
+				      OBJ_CASE_INSENSITIVE
+				      | ((get_flags () & O_CLOEXEC)
+					 ? 0 : OBJ_INHERIT),
+				      NULL, NULL);
+	  status = NtOpenFile (&partitions->hdl[part_no - 1],
+			       GENERIC_READ | GENERIC_WRITE, &attr,
+			       &io, FILE_SHARE_READ | FILE_SHARE_WRITE, 0);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("NtCreateFile(%W): %p", part, status);
+	      return FALSE;
+	    }
+	  if (!DeviceIoControl (partitions->hdl[part_no - 1], FSCTL_LOCK_VOLUME,
+				NULL, 0, NULL, 0, &bytes_read, NULL))
+	    {
+	      debug_printf ("DeviceIoControl (%W, FSCTL_LOCK_VOLUME) "
+			    "failed, %E", part);
+	      return FALSE;
+	    }
+	}
+    }
+  /* If we didn't find a single matching partition, the "Access denied"
+     had another reason, so return FALSE in that case. */
+  return found;
+}
+
 BOOL
 fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
 				 DWORD *written, int *err)
@@ -189,6 +326,24 @@ fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
   *err = 0;
   if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
     *err = GetLastError ();
+  /* When writing to a disk or partition on Vista, an "Access denied" error
+     is potentially a result of the raw disk write restriction.  See
+     http://support.microsoft.com/kb/942448 for details.  What we have to
+     do here is to lock the partition and retry.  The previous solution
+     locked one or all partitions immediately in open.  Which is overly
+     wasteful, given that the user might only want to change, say, the boot
+     sector. */
+  if (*err == ERROR_ACCESS_DENIED
+      && wincap.has_restricted_raw_disk_access ()
+      && get_major () != DEV_FLOPPY_MAJOR
+      && get_major () != DEV_CDROM_MAJOR
+      && (get_flags () & O_ACCMODE) != O_RDONLY
+      && lock_partition (to_write))
+    {
+      *err = 0;
+      if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
+	*err = GetLastError ();
+    }
   syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
 		  ret, *err, get_handle (), buf, to_write, *written);
   return ret;
@@ -227,52 +382,6 @@ fhandler_dev_floppy::open (int flags, mode_t)
 			       NULL, 0, NULL, 0, &bytes_read, NULL))
 	debug_printf ("DeviceIoControl (FSCTL_ALLOW_EXTENDED_DASD_IO) "
 		      "failed, %E");
-      /* If we're trying to write to a disk partition, lock the partition,
-	 otherwise we will get "Access denied" starting with Vista. */
-      if (wincap.has_restricted_raw_disk_access ()
-	  && get_major () != DEV_FLOPPY_MAJOR
-	  && get_major () != DEV_CDROM_MAJOR
-	  && (flags & O_ACCMODE) != O_RDONLY)
-	{
-	  /* Special case: If we try to write to the entire disk, we have to
-	     lock all partitions, otherwise writing fails as soon as we cross
-	     a partition boundary. */
-	  if (get_minor () % 16 == 0)
-	    {
-	      WCHAR part[MAX_PATH], *p;
-
-	      sys_mbstowcs (part, MAX_PATH, get_win32_name ());
-	      p = wcschr (part, L'\0') - 1;
-	      for (int i = 0; i < MAX_PARTITIONS; ++i)
-	      	{
-		  NTSTATUS status;
-		  UNICODE_STRING upart;
-		  OBJECT_ATTRIBUTES attr;
-		  IO_STATUS_BLOCK io;
-
-		  __small_swprintf (p, L"%d", i + 1);
-		  RtlInitUnicodeString (&upart, part);
-		  InitializeObjectAttributes (&attr, &upart,
-					      OBJ_INHERIT|OBJ_CASE_INSENSITIVE,
-					      NULL, NULL);
-		  status = NtOpenFile (&partitions[i], GENERIC_WRITE, &attr,
-				       &io, FILE_SHARE_VALID_FLAGS, 0);
-		  if (status == STATUS_OBJECT_NAME_NOT_FOUND ||
-		      status == STATUS_OBJECT_PATH_NOT_FOUND)
-		    break;
-		  else if (!NT_SUCCESS (status))
-		    debug_printf ("NtCreateFile(%W): status %p", part, status);
-		  else if (!DeviceIoControl (partitions[i], FSCTL_LOCK_VOLUME,
-					     NULL, 0, NULL, 0,
-					     &bytes_read, NULL))
-		    debug_printf ("DeviceIoControl (%W, FSCTL_LOCK_VOLUME) "
-				  "failed, %E", part);
-		}
-	    }
-	  else if (!DeviceIoControl (get_handle (), FSCTL_LOCK_VOLUME,
-				     NULL, 0, NULL, 0, &bytes_read, NULL))
-	    debug_printf ("DeviceIoControl (FSCTL_LOCK_VOLUME) failed, %E");
-	}
     }
 
   return ret;
@@ -283,11 +392,13 @@ fhandler_dev_floppy::close ()
 {
   int ret = fhandler_dev_raw::close ();
 
-  /* See "Special case" comment in fhandler_dev_floppy::open. */
-  if (wincap.has_restricted_raw_disk_access ())
-    for (int i = 0; i < MAX_PARTITIONS && partitions[i]; ++i)
-      NtClose (partitions[i]);
-
+  if (partitions && InterlockedDecrement (&partitions->refcnt) == 0)
+    {
+      for (int i = 0; i < MAX_PARTITIONS; ++i)
+	if (partitions->hdl[i])
+	  NtClose (partitions->hdl[i]);
+      cfree (partitions);
+    }
   return ret;
 }
 
@@ -296,26 +407,17 @@ fhandler_dev_floppy::dup (fhandler_base *child)
 {
   fhandler_dev_floppy *fhc = (fhandler_dev_floppy *) child;
 
-  /* See "Special case" comment in fhandler_dev_floppy::open. */
-  memset (fhc->partitions, 0, sizeof fhc->partitions);
-  if (wincap.has_restricted_raw_disk_access ())
-    for (int i = 0; i < MAX_PARTITIONS && partitions[i]; ++i)
-      if (!DuplicateHandle (GetCurrentProcess (), partitions[i],
-			    GetCurrentProcess (), &fhc->partitions[i],
-			    0, TRUE, DUPLICATE_SAME_ACCESS))
-	{
-	  __seterrno ();
-	  while (--i >= 0)
-	    NtClose (partitions[i]);
-	  return -1;
-	}
-
   int ret = fhandler_dev_raw::dup (child);
 
   if (!ret)
     {
       fhc->drive_size = drive_size;
       fhc->bytes_per_sector = bytes_per_sector;
+      if (partitions)
+	{
+	  InterlockedIncrement (&partitions->refcnt);
+	  fhc->partitions = partitions;
+	}
       fhc->eom_detected (eom_detected ());
     }
   return ret;

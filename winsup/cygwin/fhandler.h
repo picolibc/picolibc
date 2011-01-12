@@ -689,12 +689,18 @@ class fhandler_dev_raw: public fhandler_base
 
 #define MAX_PARTITIONS 15
 
+struct part_t
+{
+  LONG refcnt;
+  HANDLE hdl[MAX_PARTITIONS];
+};
+
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
  private:
   _off64_t drive_size;
   unsigned long bytes_per_sector;
-  HANDLE partitions[MAX_PARTITIONS];
+  part_t *partitions;
   struct status_flags
   {
     unsigned eom_detected    : 1;
@@ -706,6 +712,8 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 
   inline _off64_t get_current_position ();
   int get_drive_info (struct hd_geometry *geo);
+
+  int lock_partition (DWORD to_write);
 
   BOOL write_file (const void *buf, DWORD to_write, DWORD *written, int *err);
   BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
