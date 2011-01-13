@@ -1,6 +1,6 @@
 2011-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
-	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Alwasy set
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Always set
 	st_size of directories to 0.  Explain why.
 
 2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
