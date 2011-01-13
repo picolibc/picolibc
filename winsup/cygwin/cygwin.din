@@ -1012,6 +1012,7 @@ _lstat = lstat SIGFE
 _lstat64 = lstat64 SIGFE
 lutimes SIGFE
 __main NOSIGFE
+madvise = posix_madvise SIGFE
 mallinfo SIGFE
 malloc SIGFE
 _malloc = malloc SIGFE
