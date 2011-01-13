@@ -15,7 +15,7 @@
 
 2011-01-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
-	* libc/include/linux/sys/signal.h (sig_t): Move from here...
+	* libc/sys/linux/sys/signal.h (sig_t): Move from here...
 	* libc/include/signal.h (sig_t): ...to here.
 
 2011-01-10  Corinna Vinschen  <vinschen@redhat.com>
