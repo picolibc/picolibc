@@ -497,7 +497,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		  &buf->st_ctim);
   to_timestruc_t ((PFILETIME) &pfnoi->CreationTime, &buf->st_birthtim);
   buf->st_rdev = buf->st_dev = get_dev ();
-  buf->st_size = (_off64_t) pfnoi->EndOfFile.QuadPart;
+  /* CV 2011-01-13: Observations on the Cygwin mailing list point to an
+     interesting behaviour in some Windows versions.  Apparently the size of
+     a directory is computed at the time the directory is first scanned.  This
+     can result in two subsequent NtQueryInformationFile calls to return size
+     0 in the first call and size > 0 in the second call.  This in turn can
+     affect applications like newer tar.
+     FIXME: Is the allocation size affected as well? */
+  buf->st_size = pc.isdir () ? 0 : (_off64_t) pfnoi->EndOfFile.QuadPart;
   /* The number of links to a directory includes the number of subdirectories
      in the directory, since all those subdirectories point to it.  However,
      this is painfully slow, so we do without it. */
