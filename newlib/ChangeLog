@@ -1,3 +1,7 @@
+2011-01-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/types.h (ulong): Add typedef.
+
 2011-01-12  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libm/math/w_tgamma.c: Only build ifndef _DOUBLE_IS_32BITS.

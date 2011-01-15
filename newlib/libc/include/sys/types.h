@@ -98,6 +98,7 @@ typedef	unsigned long	u_long;
 
 typedef	unsigned short	ushort;		/* System V compatibility */
 typedef	unsigned int	uint;		/* System V compatibility */
+typedef	unsigned long	ulong;		/* System V compatibility */
 # endif	/*!_POSIX_SOURCE */
 
 #ifndef __clock_t_defined
