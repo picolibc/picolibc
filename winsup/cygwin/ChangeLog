@@ -1,5 +1,9 @@
 2011-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_partitions): Fix compiler warning.
+
+2011-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::check): Don't follow reparse point symlinks if
 	PC_SYM_NOFOLLOW_REP flag is set.
 	(cygwin_conv_path): Set PC_SYM_NOFOLLOW_REP flag when converting from

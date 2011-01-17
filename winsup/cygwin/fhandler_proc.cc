@@ -1124,7 +1124,7 @@ format_proc_partitions (void *, char *&destbuf)
       PARTITION_INFORMATION_EX *pix = NULL;
       PARTITION_INFORMATION *pi = NULL;
       DWORD bytes_read;
-      DWORD part_cnt;
+      DWORD part_cnt = 0;
       unsigned long long size;
       device dev;
 
