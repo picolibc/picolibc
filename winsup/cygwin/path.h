@@ -1,7 +1,7 @@
 /* path.h: path data structures
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -54,6 +54,7 @@ enum pathconv_arg
 {
   PC_SYM_FOLLOW		= 0x0001,
   PC_SYM_NOFOLLOW	= 0x0002,
+  PC_SYM_NOFOLLOW_REP	= 0x0004,
   PC_SYM_CONTENTS	= 0x0008,
   PC_NOFULL		= 0x0010,
   PC_NULLEMPTY		= 0x0020,

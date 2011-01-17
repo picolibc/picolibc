@@ -1,7 +1,7 @@
 /* path.cc: path support.
 
      Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+     2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -920,7 +920,9 @@ is_virtual_symlink:
 	  else if (symlen > 0)
 	    {
 	      saw_symlinks = 1;
-	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
+	      if (component == 0 && !need_directory
+		  && (!(opt & PC_SYM_FOLLOW)
+		      || (is_rep_symlink () && (opt & PC_SYM_NOFOLLOW_REP))))
 		{
 		  set_symlink (symlen); // last component of path is a symlink.
 		  if (opt & PC_SYM_CONTENTS)
@@ -2917,8 +2919,8 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
     case CCP_POSIX_TO_WIN_A:
       {
 	p.check ((const char *) from,
-		 PC_POSIX | PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK | PC_NOWARN
-		 | (relative ? PC_NOFULL : 0));
+		 PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
+		 | PC_NO_ACCESS_CHECK | PC_NOWARN | (relative ? PC_NOFULL : 0));
 	if (p.error)
 	  return_with_errno (p.error);
 	PUNICODE_STRING up = p.get_nt_native_path ();
@@ -2953,9 +2955,9 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       }
       break;
     case CCP_POSIX_TO_WIN_W:
-      p.check ((const char *) from, PC_POSIX | PC_SYM_FOLLOW
-				    | PC_NO_ACCESS_CHECK | PC_NOWARN
-				    | (relative ? PC_NOFULL : 0));
+      p.check ((const char *) from,
+	       PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
+	       | PC_NO_ACCESS_CHECK | PC_NOWARN | (relative ? PC_NOFULL : 0));
       if (p.error)
 	return_with_errno (p.error);
       /* Relative Windows paths are always restricted to MAX_PATH chars. */
