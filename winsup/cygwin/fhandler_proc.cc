@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,9 +24,9 @@ details. */
 #include <sys/utsname.h>
 #include <sys/param.h>
 #include "ntdll.h"
-#include <ctype.h>
 #include <winioctl.h>
 #include <wchar.h>
+#include <wctype.h>
 #include "cpuid.h"
 #include "mount.h"
 
@@ -85,7 +85,7 @@ proc_tab_cmp (const void *key, const void *memb)
   return ret;
 }
 
-/* Helper function to perform a binary search of  the incoming pathname
+/* Helper function to perform a binary search of the incoming pathname
    against the alpha-sorted virtual file table. */
 virt_tab_t *
 virt_tab_search (const char *path, bool prefix, const virt_tab_t *table,
@@ -351,7 +351,8 @@ fhandler_proc::fill_filebuf ()
   if (fileid < PROC_LINK_COUNT && proc_tab[fileid].format_func)
     {
       filesize = proc_tab[fileid].format_func (NULL, filebuf);
-      return true;
+      if (filesize > 0)
+	return true;
     }
   return false;
 }
@@ -550,7 +551,10 @@ format_proc_stat (void *, char *&destbuf)
 		      "status %p", ret);
     }
   if (!NT_SUCCESS (ret))
-    return 0;
+    {
+      __seterrno_from_nt_status (ret);
+      return 0;
+    }
 
   pages_in = spi->PagesRead;
   pages_out = spi->PagefilePagesWritten + spi->MappedFilePagesWritten;
@@ -1085,15 +1089,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 static _off64_t
 format_proc_partitions (void *, char *&destbuf)
 {
-  char devname[NAME_MAX + 1];
   OBJECT_ATTRIBUTES attr;
-  HANDLE dirhdl, devhdl;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
+  HANDLE dirhdl;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
   char *bufptr = buf;
+  char *ioctl_buf = tp.c_get ();
 
   /* Open \Device object directory. */
   wchar_t wpath[MAX_PATH] = L"\\Device";
@@ -1103,101 +1107,156 @@ format_proc_partitions (void *, char *&destbuf)
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtOpenDirectoryObject, status %p", status);
+      __seterrno_from_nt_status (status);
       return 0;
     }
 
-  print ("major minor  #blocks  name\n\n");
   /* Traverse \Device directory ... */
   PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
 				     alloca (640);
   BOOLEAN restart = TRUE;
+  bool got_one = false;
   ULONG context = 0;
   while (NT_SUCCESS (NtQueryDirectoryObject (dirhdl, dbi, 640, TRUE, restart,
 					     &context, NULL)))
     {
+      HANDLE devhdl;
+      PARTITION_INFORMATION_EX *pix = NULL;
+      PARTITION_INFORMATION *pi = NULL;
+      DWORD bytes_read;
+      DWORD part_cnt;
+      unsigned long long size;
+      device dev;
+
       restart = FALSE;
-      sys_wcstombs (devname, NAME_MAX + 1, dbi->ObjectName.Buffer,
-		    dbi->ObjectName.Length / 2);
       /* ... and check for a "Harddisk[0-9]*" entry. */
-      if (!strncasematch (devname, "Harddisk", 8)
-	  || dbi->ObjectName.Length < 18
-	  || !isdigit (devname[8]))
+      if (dbi->ObjectName.Length < 18
+	  || wcsncasecmp (dbi->ObjectName.Buffer, L"Harddisk", 8) != 0
+	  || !iswdigit (dbi->ObjectName.Buffer[8]))
 	continue;
-      /* Construct path name for partitions, starting with 0, which is the
-	 whole disk, and try to open.
-	 Note that the correct way to do this would be to open the HarddiskX
-	 directory and enumerate the Partition entries.  However, while the
-	 partition entries itself are accessible for query by everyone, the
-	 HarddiskX parent directory is only queryable by SYSTEM and Admins.
-	 This way we circumvent this nonsensical restriction.  Let's assume
-	 we never have more than 99 partitions per disk for now... */
-      for (int part_num = 0; part_num < 99; ++part_num)
+      /* Got it.  Now construct the path to the entire disk, which is
+	 "\\Device\\HarddiskX\\Partition0", and open the disk with
+	 minimum permssions. */
+      unsigned long drive_num = wcstoul (dbi->ObjectName.Buffer + 8, NULL, 10);
+      wcscpy (wpath, dbi->ObjectName.Buffer);
+      PWCHAR wpart = wpath + dbi->ObjectName.Length / sizeof (WCHAR);
+      __small_swprintf (wpart, L"\\Partition0");
+      upath.Length = dbi->ObjectName.Length
+		     + wcslen (wpart) * sizeof (WCHAR);
+      upath.MaximumLength = upath.Length + sizeof (WCHAR);
+      InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				  dirhdl, NULL);
+      /* Up to W2K the handle needs read access to fetch the partition info. */
+      status = NtOpenFile (&devhdl, wincap.has_disk_ex_ioctls ()
+				    ? READ_CONTROL
+				    : READ_CONTROL | FILE_READ_DATA,
+			   &attr, &io, FILE_SHARE_VALID_FLAGS, 0);
+      if (!NT_SUCCESS (status))
 	{
-	  wcscpy (wpath, dbi->ObjectName.Buffer);
-	  __small_swprintf (wpath + dbi->ObjectName.Length / 2,
-			    L"\\Partition%d", part_num);
-	  upath.Length = 22 + dbi->ObjectName.Length;
-	  upath.MaximumLength = upath.Length + 2;
-	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-				      dirhdl, NULL);
-	  status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
-			       FILE_SHARE_VALID_FLAGS, 0);
-	  if (!NT_SUCCESS (status))
-	    {
-	      if (status == STATUS_OBJECT_NAME_NOT_FOUND
-		  || status == STATUS_OBJECT_PATH_NOT_FOUND)
-		break;
-	      debug_printf ("NtOpenFile(%s), status %p", devname, status);
-	      continue;
-	    }
-
-	  /* Use a buffer since some ioctl buffers aren't fixed size. */
-	  char buf[256];
-	  PARTITION_INFORMATION *pi = NULL;
-	  PARTITION_INFORMATION_EX *pix = NULL;
-	  DISK_GEOMETRY *dg = NULL;
-	  DWORD bytes;
-	  unsigned long drive_number = strtoul (devname + 8, NULL, 10);
-	  unsigned long long size;
-
-	  if (wincap.has_disk_ex_ioctls ()
-	      && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX,
-				  NULL, 0, buf, 256, &bytes, NULL))
-	    {
-	      pix = (PARTITION_INFORMATION_EX *) buf;
-	      size = pix->PartitionLength.QuadPart;
-	    }
-	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO,
-				    NULL, 0, buf, 256, &bytes, NULL))
-	    {
-	      pi = (PARTITION_INFORMATION *) buf;
-	      size = pi->PartitionLength.QuadPart;
-	    }
-	  else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_GEOMETRY,
-				    NULL, 0, buf, 256, &bytes, NULL))
-	    {
-	      dg = (DISK_GEOMETRY *) buf;
-	      size = (unsigned long long) dg->Cylinders.QuadPart
-			   * dg->TracksPerCylinder
-			   * dg->SectorsPerTrack
-			   * dg->BytesPerSector;
-	    }
-	  else
-	    size = 0;
-	  if (!pi && !pix && !dg)
-	    debug_printf ("DeviceIoControl %E");
-	  else
-	    {
-	      device dev;
-	      dev.parsedisk (drive_number, part_num);
-	      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-					 dev.major, dev.minor,
-					 size >> 10, dev.name + 5);
-	    }
-	  NtClose (devhdl);
+	  debug_printf ("NtOpenFile(%S), status %p", &upath, status);
+	  __seterrno_from_nt_status (status);
+	  continue;
 	}
+      if (!got_one)
+	{
+	  print ("major minor  #blocks  name\n\n");
+	  got_one = true;
+	}
+      /* Fetch partition info for the entire disk to get its size. */
+      if (wincap.has_disk_ex_ioctls ()
+	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+			      ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	{
+	  pix = (PARTITION_INFORMATION_EX *) ioctl_buf;
+	  size = pix->PartitionLength.QuadPart;
+	}
+      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
+				ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	{
+	  pi = (PARTITION_INFORMATION *) ioctl_buf;
+	  size = pi->PartitionLength.QuadPart;
+	}
+      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
+				ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	{
+	  /* NT4 doesn't support to call IOCTL_DISK_GET_PARTITION_INFO for the
+	     entire drive. */
+	  DISK_GEOMETRY *dg = (DISK_GEOMETRY *) ioctl_buf;
+	  size = (unsigned long long) dg->Cylinders.QuadPart
+				      * dg->TracksPerCylinder
+				      * dg->SectorsPerTrack
+				      * dg->BytesPerSector;
+	}
+      else
+	{
+	  debug_printf ("DeviceIoControl (%S, "
+			 "IOCTL_DISK_GET_PARTITION_INFO{_EX}) %E", &upath);
+	  size = 0;
+	}
+      dev.parsedisk (drive_num, 0);
+      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+				 dev.major, dev.minor,
+				 size >> 10, dev.name + 5);
+      /* Fetch drive layout info to get size of all partitions on the disk. */
+      if (wincap.has_disk_ex_ioctls ()
+	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
+			      NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	{
+	  PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
+					       ioctl_buf;
+	  part_cnt = pdlix->PartitionCount;
+	  pix = pdlix->PartitionEntry;
+	}
+      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT,
+				NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+	{
+	  PDRIVE_LAYOUT_INFORMATION pdli = (PDRIVE_LAYOUT_INFORMATION) ioctl_buf;
+	  part_cnt = pdli->PartitionCount;
+	  pi = pdli->PartitionEntry;
+	}
+      else
+	debug_printf ("DeviceIoControl(%S, "
+		      "IOCTL_DISK_GET_DRIVE_LAYOUT{_EX}): %E", &upath);
+      /* Loop over partitions. */
+      if (pix || pi)
+	for (DWORD i = 0; i < part_cnt; ++i)
+	  {
+	    DWORD part_num;
+
+	    if (pix)
+	      {
+		size = pix->PartitionLength.QuadPart;
+		part_num = pix->PartitionNumber;
+		++pix;
+	      }
+	    else
+	      {
+		size = pi->PartitionLength.QuadPart;
+		/* Pre-W2K you can't rely on the partition number info for
+		   unused partitions. */
+		if (pi->PartitionType == PARTITION_ENTRY_UNUSED
+		    || pi->PartitionType == PARTITION_EXTENDED)
+		  part_num = 0;
+		else
+		  part_num = pi->PartitionNumber;
+		++pi;
+	      }
+	    /* A partition number of 0 denotes an extended partition or a
+	       filler entry as described in fhandler_dev_floppy::lock_partition.
+	       Just skip. */
+	    if (part_num == 0)
+	      continue;
+	    dev.parsedisk (drive_num, part_num);
+	    bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+				       dev.major, dev.minor,
+				       size >> 10, dev.name + 5);
+	  }
+      NtClose (devhdl);
     }
   NtClose (dirhdl);
+
+  if (!got_one)
+    return 0;
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);
