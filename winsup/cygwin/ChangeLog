@@ -1,5 +1,11 @@
 2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (av::fixup): Reenable #! handling for all exec functions.
+	Return ENOEXEC in !p_type_exec case only for unrecognized files.
+	Fix comment formatting.
+
+2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exec.cc (execlp): Add missing _P_PATH_TYPE_EXEC flag in call to
 	spawnve.
 

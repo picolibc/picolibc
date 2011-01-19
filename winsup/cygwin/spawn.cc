@@ -1066,13 +1066,6 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  /* ERROR_FILE_INVALID indicates very likely an empty file. */
 	  if (GetLastError () == ERROR_FILE_INVALID)
 	    {
-	      if (!p_type_exec)
-		{
-		  /* Not called from exec[lv]p.  Just leave. */
-		  debug_printf ("zero length file.");
-		  set_errno (ENOEXEC);
-		  return -1;
-		}
 	      debug_printf ("zero length file, treat as script.");
 	      goto just_shell;
 	    }
@@ -1105,14 +1098,6 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  }
       }
 
-      if (!p_type_exec)
-	{
-	  /* Not called from exec[lv]p.  Don't try to treat as script. */
-	  debug_printf ("%s is not a valid executable", real_path.get_win32 ());
-	  set_errno (ENOEXEC);
-	  return -1;
-	}
-
       debug_printf ("%s is possibly a script", real_path.get_win32 ());
 
       ptr = buf;
@@ -1128,10 +1113,11 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	      for (ptr = pgm = namebuf; *ptr; ptr++)
 		if (!arg1 && (*ptr == ' ' || *ptr == '\t'))
 		  {
-		    /* Null terminate the initial command and step over any additional white
-		       space.  If we've hit the end of the line, exit the loop.  Otherwise,
-		       we've found the first argument. Position the current pointer on the
-		       last known white space. */
+		    /* Null terminate the initial command and step over any
+		       additional white space.  If we've hit the end of the
+		       line, exit the loop.  Otherwise, we've found the first
+		       argument. Position the current pointer on the last known
+		       white space. */
 		    *ptr = '\0';
 		    char *newptr = ptr + 1;
 		    newptr += strspn (newptr, " \t");
@@ -1146,6 +1132,14 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 just_shell:
       if (!pgm)
 	{
+	  if (!p_type_exec)
+	    {
+	      /* Not called from exec[lv]p.  Don't try to treat as script. */
+	      debug_printf ("%s is not a valid executable",
+			    real_path.get_win32 ());
+	      set_errno (ENOEXEC);
+	      return -1;
+	    }
 	  if (ascii_strcasematch (ext, ".com"))
 	    break;
 	  pgm = (char *) "/bin/sh";
