@@ -1,6 +1,6 @@
 /* exec.cc: exec system call support.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,6 +18,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "winf.h"
 #undef _execve
 
 /* This is called _execve and not execve because the real execve is defined
@@ -86,14 +87,22 @@ extern "C" int
 execvp (const char *path, char * const *argv)
 {
   path_conv buf;
-  return execv (find_exec (path, buf, "PATH=", FE_NNF) ?: "", argv);
+  return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
+		  find_exec (path, buf, "PATH=", FE_NNF) ?: "",
+		  argv, cur_environ ());
 }
 
 extern "C" int
 execvpe (const char *path, char * const *argv, char *const *envp)
 {
+  static char *const empty_env[] = { 0 };
+  MALLOC_CHECK;
+  if (!envp)
+    envp = empty_env;
   path_conv buf;
-  return execve (find_exec (path, buf, "PATH=", FE_NNF) ?: "", argv, envp);
+  return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
+		  find_exec (path, buf, "PATH=", FE_NNF) ?: "",
+		  argv, envp);
 }
 
 extern "C" int

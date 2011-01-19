@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -280,6 +280,11 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   pid_t cygpid;
   int res = -1;
 
+  /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
+     mode to keep only the spawn mode. */
+  bool p_type_exec = !!(mode & _P_PATH_TYPE_EXEC);
+  mode = _P_MODE (mode);
+
   if (prog_arg == NULL)
     {
       syscall_printf ("prog_arg is NULL");
@@ -375,7 +380,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
 
   wascygexec = real_path.iscygexec ();
-  res = newargv.fixup (prog_arg, real_path, ext);
+  res = newargv.fixup (prog_arg, real_path, ext, p_type_exec);
 
   if (res)
     goto out;
@@ -861,7 +866,7 @@ spawnve (int mode, const char *path, const char *const *argv,
 
   syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
-  switch (mode)
+  switch (_P_MODE (mode))
     {
     case _P_OVERLAY:
       /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
@@ -1002,11 +1007,12 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 					   const char * const *envp)
 {
   path_conv buf;
-  return spawnve (mode, find_exec (file, buf), argv, envp);
+  return spawnve (mode | _P_PATH_TYPE_EXEC, find_exec (file, buf), argv, envp);
 }
 
 int
-av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
+av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
+	   bool p_type_exec)
 {
   const char *p;
   bool exeext = ascii_strcasematch (ext, ".exe");
@@ -1053,6 +1059,13 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 	  /* ERROR_FILE_INVALID indicates very likely an empty file. */
 	  if (GetLastError () == ERROR_FILE_INVALID)
 	    {
+	      if (!p_type_exec)
+		{
+		  /* Not called from exec[lv]p.  Just leave. */
+		  debug_printf ("zero length file.");
+		  set_errno (ENOEXEC);
+		  return -1;
+		}
 	      debug_printf ("zero length file, treat as script.");
 	      goto just_shell;
 	    }
@@ -1084,6 +1097,14 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext)
 	    break;
 	  }
       }
+
+      if (!p_type_exec)
+	{
+	  /* Not called from exec[lv]p.  Don't try to treat as script. */
+	  debug_printf ("%s is not a valid executable", real_path.get_win32 ());
+	  set_errno (ENOEXEC);
+	  return -1;
+	}
 
       debug_printf ("%s is possibly a script", real_path.get_win32 ());
 

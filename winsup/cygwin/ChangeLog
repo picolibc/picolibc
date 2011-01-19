@@ -1,3 +1,20 @@
+2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Add error codes for invalid binaries.
+	* exec.cc (execvp): Call spawnve with _P_PATH_TYPE_EXEC flag
+	from here.
+	(execvpe): Ditto.
+	* spawn.cc (spawn_guts): Filter _P_PATH_TYPE_EXEC from mode and
+	store in p_type_exec.  Call av::fixup with addtional p_type_exec
+	argument.
+	(spawnve): Check for filtered mode.
+	(spawnvpe): Add _P_PATH_TYPE_EXEC flag when calling spawnve.
+	(av::fixup): Accept additional bool parameter p_type_exec.  Only check
+	for script if p_type_exec is true.
+	* winf.h (_P_PATH_TYPE_EXEC): Define.
+	(_P_MODE): Define.
+	(av::fixup): Declare with additional bool parameter.
+
 2011-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_partitions): Fix compiler warning.

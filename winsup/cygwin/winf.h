@@ -1,6 +1,6 @@
 /* winf.h
 
-   Copyright 2006, 2007 Red Hat, Inc.
+   Copyright 2006, 2007, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -19,6 +19,16 @@ details. */
 
 #define MAXWINCMDLEN 32767
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
+
+/* Add this flag in calls to spawn_guts if the calling function is one of
+   'p' type functions: execlp, execvp, spawnlp, spawnvp.  Per POSIX, only
+   these p-type functions fall back to call /bin/sh if the file is not a
+   binary.  The setting of _P_PATH_TYPE_EXEC is used as a bool value in
+   av::fixup to decide if the file should be evaluated as a script, or if
+   ENOEXEC should be returned. */
+#define _P_PATH_TYPE_EXEC	0x100
+/* Helper macro to mask actual mode and drop additional flags defined above. */
+#define _P_MODE(x)		((x) & 0xff)
 
 class av
 {
@@ -67,7 +77,7 @@ class av
     for (int i = calloced; i < argc; i++)
       argv[i] = cstrdup1 (argv[i]);
   }
-  int fixup (const char *, path_conv&, const char *);
+  int fixup (const char *, path_conv&, const char *, bool);
 };
 
 class linebuf
