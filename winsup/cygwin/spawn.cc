@@ -854,6 +854,8 @@ extern "C" int
 spawnve (int mode, const char *path, const char *const *argv,
        const char *const *envp)
 {
+  static char *const empty_env[] = { NULL };
+
   int ret;
 #ifdef NEWVFORK
   vfork_save *vf = vfork_storage.val ();
@@ -866,11 +868,12 @@ spawnve (int mode, const char *path, const char *const *argv,
 
   syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
+  if (!envp)
+    envp = empty_env;
+
   switch (_P_MODE (mode))
     {
     case _P_OVERLAY:
-      /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
-      /* Just act as an exec if _P_OVERLAY set. */
       spawn_guts (path, argv, envp, mode);
       /* Errno should be set by spawn_guts.  */
       ret = -1;
@@ -949,11 +952,12 @@ spawnle (int mode, const char *path, const char *arg0, ...)
 }
 
 extern "C" int
-spawnlp (int mode, const char *path, const char *arg0, ...)
+spawnlp (int mode, const char *file, const char *arg0, ...)
 {
   int i;
   va_list args;
   const char *argv[256];
+  path_conv buf;
 
   va_start (args, arg0);
   argv[0] = arg0;
@@ -965,16 +969,18 @@ spawnlp (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
+  return spawnve (mode, find_exec (file, buf), (char * const *) argv,
+		  cur_environ ());
 }
 
 extern "C" int
-spawnlpe (int mode, const char *path, const char *arg0, ...)
+spawnlpe (int mode, const char *file, const char *arg0, ...)
 {
   int i;
   va_list args;
   const char * const *envp;
   const char *argv[256];
+  path_conv buf;
 
   va_start (args, arg0);
   argv[0] = arg0;
@@ -987,7 +993,7 @@ spawnlpe (int mode, const char *path, const char *arg0, ...)
   envp = va_arg (args, const char * const *);
   va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, envp);
+  return spawnve (mode, find_exec (file, buf), (char * const *) argv, envp);
 }
 
 extern "C" int
@@ -997,14 +1003,15 @@ spawnv (int mode, const char *path, const char * const *argv)
 }
 
 extern "C" int
-spawnvp (int mode, const char *path, const char * const *argv)
+spawnvp (int mode, const char *file, const char * const *argv)
 {
-  return spawnvpe (mode, path, argv, cur_environ ());
+  path_conv buf;
+  return spawnve (mode, find_exec (file, buf), argv, cur_environ ());
 }
 
 extern "C" int
 spawnvpe (int mode, const char *file, const char * const *argv,
-					   const char * const *envp)
+	  const char * const *envp)
 {
   path_conv buf;
   return spawnve (mode | _P_PATH_TYPE_EXEC, find_exec (file, buf), argv, envp);

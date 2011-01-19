@@ -8,7 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define _execve __FOO_execve_
 #include "winsup.h"
 #include <process.h>
 #include "cygerrno.h"
@@ -19,22 +18,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "winf.h"
-#undef _execve
-
-/* This is called _execve and not execve because the real execve is defined
-   in libc/posix/execve.c.  It calls us.  */
-
-extern "C" int
-execve (const char *path, char *const argv[], char *const envp[])
-{
-  static char *const empty_env[] = { 0 };
-  MALLOC_CHECK;
-  if (!envp)
-    envp = empty_env;
-  return spawnve (_P_OVERLAY, path, argv, envp);
-}
-
-EXPORT_ALIAS (execve, _execve)
 
 extern "C" int
 execl (const char *path, const char *arg0, ...)
@@ -51,42 +34,82 @@ execl (const char *path, const char *arg0, ...)
   while (argv[i++] != NULL);
   va_end (args);
   MALLOC_CHECK;
-  return execve (path, (char * const  *) argv, cur_environ ());
+  return spawnve (_P_OVERLAY, path, (char * const  *) argv, cur_environ ());
+}
+
+extern "C" int
+execle (const char *path, const char *arg0, ...)
+{
+  int i;
+  va_list args;
+  const char *argv[1024];
+  const char * const *envp;
+
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
+  do
+      argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
+  envp = va_arg (args, const char * const *);
+  va_end (args);
+  MALLOC_CHECK;
+  return spawnve (_P_OVERLAY, path, (char * const  *) argv, envp);
+}
+
+extern "C" int
+execlp (const char *file, const char *arg0, ...)
+{
+  int i;
+  va_list args;
+  const char *argv[1024];
+  path_conv buf;
+
+  va_start (args, arg0);
+  argv[0] = arg0;
+  i = 1;
+  do
+      argv[i] = va_arg (args, const char *);
+  while (argv[i++] != NULL);
+  va_end (args);
+  MALLOC_CHECK;
+  return spawnve (_P_OVERLAY, find_exec (file, buf, "PATH=", FE_NNF) ?: "",
+		  (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
 execv (const char *path, char * const *argv)
 {
   MALLOC_CHECK;
-  return execve (path, (char * const *) argv, cur_environ ());
-}
-
-extern "C" pid_t
-sexecve_is_bad ()
-{
-  set_errno (ENOSYS);
-  return 0;
+  return spawnve (_P_OVERLAY, path, argv, cur_environ ());
 }
 
 extern "C" int
-execvp (const char *path, char * const *argv)
+execve (const char *path, char *const argv[], char *const envp[])
+{
+  MALLOC_CHECK;
+  return spawnve (_P_OVERLAY, path, argv, envp);
+}
+
+extern "C" int
+execvp (const char *file, char * const *argv)
 {
   path_conv buf;
+
+  MALLOC_CHECK;
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
-		  find_exec (path, buf, "PATH=", FE_NNF) ?: "",
+		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
 		  argv, cur_environ ());
 }
 
 extern "C" int
-execvpe (const char *path, char * const *argv, char *const *envp)
+execvpe (const char *file, char * const *argv, char *const *envp)
 {
-  static char *const empty_env[] = { 0 };
-  MALLOC_CHECK;
-  if (!envp)
-    envp = empty_env;
   path_conv buf;
+
+  MALLOC_CHECK;
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
-		  find_exec (path, buf, "PATH=", FE_NNF) ?: "",
+		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
 		  argv, envp);
 }
 
@@ -99,5 +122,14 @@ fexecve (int fd, char * const *argv, char *const *envp)
       syscall_printf ("-1 = fexecve (%d, %p, %p)", fd, argv, envp);
       return -1;
     }
-  return execve (cfd->pc.get_win32 (), argv, envp);
+
+  MALLOC_CHECK;
+  return spawnve (_P_OVERLAY, cfd->pc.get_win32 (), argv, envp);
+}
+
+extern "C" pid_t
+sexecve_is_bad ()
+{
+  set_errno (ENOSYS);
+  return 0;
 }

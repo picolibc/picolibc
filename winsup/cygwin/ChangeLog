@@ -1,5 +1,24 @@
 2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exec.cc: Rearrange functions in alphabetical order.
+	(_execve): Drop temporary define and drop export alias.
+	(execl): Call spawnve.
+	(execle): New function.
+	(execlp): New function.
+	(execv): Call spawnve.
+	(execve): Drop converting NULL envp to emtpy envp.
+	(execvp): Call spawnve.
+	(execvpe): Drop converting NULL envp to emtpy envp.  Call spawnve.
+	(fexecve): Call spawnve.
+	* spawn.cc (spawnve): Convert NULL envp to emtpy envp.  Remove outdated
+	comment.
+	(spawnlp): Call spawnve.
+	(spawnlpe): Ditto.
+	(spawnvp): Ditto.
+	(spawnvpe): Fix formatting.
+
+2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exec.cc (strccpy): Move function from here...
 	* strfuncs.cc (strccpy): ...to here.
 	* string.h (strccpy): Declare.
