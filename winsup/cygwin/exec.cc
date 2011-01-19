@@ -73,7 +73,8 @@ execlp (const char *file, const char *arg0, ...)
   while (argv[i++] != NULL);
   va_end (args);
   MALLOC_CHECK;
-  return spawnve (_P_OVERLAY, find_exec (file, buf, "PATH=", FE_NNF) ?: "",
+  return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
+		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
 		  (char * const  *) argv, cur_environ ());
 }
 

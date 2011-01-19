@@ -1,5 +1,10 @@
 2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exec.cc (execlp): Add missing _P_PATH_TYPE_EXEC flag in call to
+	spawnve.
+
+2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exec.cc: Rearrange functions in alphabetical order.
 	(_execve): Drop temporary define and drop export alias.
 	(execl): Call spawnve.
