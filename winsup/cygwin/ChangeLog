@@ -1,5 +1,12 @@
 2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exec.cc (strccpy): Move function from here...
+	* strfuncs.cc (strccpy): ...to here.
+	* string.h (strccpy): Declare.
+	* winsup.h (strccpy): Drop declaration.
+
+2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* errno.cc (errmap): Add error codes for invalid binaries.
 	* exec.cc (execvp): Call spawnve with _P_PATH_TYPE_EXEC flag
 	from here.

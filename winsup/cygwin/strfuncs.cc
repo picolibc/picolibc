@@ -1,7 +1,7 @@
 /* strfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -661,6 +661,20 @@ sys_mbstowcs_alloc (wchar_t **dst_p, int type, const char *src, size_t nms)
       ret = sys_mbstowcs (*dst_p, dlen, src, nms);
     }
   return ret;
+}
+
+/* Copy string, until c or <nul> is encountered.
+   NUL-terminate the destination string (s1).
+   Return pointer to terminating byte in dst string.  */
+char * __stdcall
+strccpy (char *s1, const char **s2, char c)
+{
+  while (**s2 && **s2 != c)
+    *s1++ = *((*s2)++);
+  *s1 = 0;
+
+  MALLOC_CHECK;
+  return s1;
 }
 
 static WCHAR hex_wchars[] = L"0123456789abcdef";

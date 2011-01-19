@@ -68,21 +68,6 @@ sexecve_is_bad ()
   return 0;
 }
 
-/* Copy string, until c or <nul> is encountered.
-   NUL-terminate the destination string (s1).
-   Return pointer to terminating byte in dst string.  */
-
-char * __stdcall
-strccpy (char *s1, const char **s2, char c)
-{
-  while (**s2 && **s2 != c)
-    *s1++ = *((*s2)++);
-  *s1 = 0;
-
-  MALLOC_CHECK;
-  return s1;
-}
-
 extern "C" int
 execvp (const char *path, char * const *argv)
 {
