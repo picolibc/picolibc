@@ -1,3 +1,14 @@
+2011-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exec.cc: Include pinfo.h.
+	* winf.h: Move definitions of _P_PATH_TYPE_EXEC and _P_MODE from here...
+	* pinfo.h: ...to here.
+	(_P_PATH_TYPE_EXEC): Redefine to be bigger than _P_SYSTEM.
+	(_P_MODE): Redefine so as not to mask out _P_SYSTEM.
+	* spawn.cc (spawnlp): Add _P_PATH_TYPE_EXEC flag in call to spawnve.
+	(spawnlpe): Ditto.
+	(spawnvp): Ditto.
+
 2011-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (av::fixup): Reenable #! handling for all exec functions.

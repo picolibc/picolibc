@@ -20,16 +20,6 @@ details. */
 #define MAXWINCMDLEN 32767
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 
-/* Add this flag in calls to spawn_guts if the calling function is one of
-   'p' type functions: execlp, execvp, spawnlp, spawnvp.  Per POSIX, only
-   these p-type functions fall back to call /bin/sh if the file is not a
-   binary.  The setting of _P_PATH_TYPE_EXEC is used as a bool value in
-   av::fixup to decide if the file should be evaluated as a script, or if
-   ENOEXEC should be returned. */
-#define _P_PATH_TYPE_EXEC	0x100
-/* Helper macro to mask actual mode and drop additional flags defined above. */
-#define _P_MODE(x)		((x) & 0xff)
-
 class av
 {
   char **argv;

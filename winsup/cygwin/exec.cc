@@ -16,6 +16,7 @@ details. */
 #include "sync.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "pinfo.h"
 #include "cygheap.h"
 #include "winf.h"
 

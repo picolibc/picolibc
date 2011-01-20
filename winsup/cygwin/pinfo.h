@@ -1,7 +1,7 @@
 /* pinfo.h: process table info
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -226,6 +226,16 @@ extern pinfo myself;
 
 #define _P_VFORK 0
 #define _P_SYSTEM 512
+/* Add this flag in calls to spawn_guts if the calling function is one of
+   'p' type functions: execlp, execvp, spawnlp, spawnvp.  Per POSIX, only
+   these p-type functions fall back to call /bin/sh if the file is not a
+   binary.  The setting of _P_PATH_TYPE_EXEC is used as a bool value in
+   av::fixup to decide if the file should be evaluated as a script, or if
+   ENOEXEC should be returned. */
+#define _P_PATH_TYPE_EXEC	0x1000
+
+/* Helper macro to mask actual mode and drop additional flags defined above. */
+#define _P_MODE(x)		((x) & 0xfff)
 
 #define __ctty() _ctty ((char *) alloca (sizeof ("ctty /dev/tty") + 20))
 #define myctty() myself->__ctty ()
