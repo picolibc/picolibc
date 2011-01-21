@@ -2053,18 +2053,25 @@ rename (const char *oldpath, const char *newpath)
   int retry_count;
   retry_count = 0;
 retry:
-  /* DELETE is required to rename a file.  At least one cifs FS (Tru64) needs
-     FILE_READ_ATTRIBUTE, otherwise the FileRenameInformation call fails with
-     STATUS_ACCESS_DENIED.  Samba (only some versions?) doesn't like the
-     FILE_SHARE_DELETE mode if the file has the R/O attribute set and returns
-     STATUS_ACCESS_DENIED in that case. */
-  status = NtOpenFile (&fh, DELETE | FILE_READ_ATTRIBUTES,
-		     oldpc.get_object_attr (attr, sec_none_nih),
-		     &io,
-		     oldpc.fs_is_samba () ? FILE_SHARE_READ | FILE_SHARE_WRITE
-					  : FILE_SHARE_VALID_FLAGS,
-		     FILE_OPEN_FOR_BACKUP_INTENT
-		     | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0));
+  /* Talking about inconsistent behaviour...
+     - DELETE is required to rename a file.  So far, so good.
+     - At least one cifs FS (Tru64) needs FILE_READ_ATTRIBUTE, otherwise the
+       FileRenameInformation call fails with STATUS_ACCESS_DENIED.  However,
+       on NFS we get a STATUS_ACCESS_DENIED if FILE_READ_ATTRIBUTE is used
+       and the file we try to rename is a symlink.  Urgh.
+     - Samba (only some versions?) doesn't like the FILE_SHARE_DELETE mode if
+       the file has the R/O attribute set and returns STATUS_ACCESS_DENIED in
+       that case. */
+  {
+    ULONG access = DELETE | (oldpc.fs_is_cifs () ? FILE_READ_ATTRIBUTES : 0);
+    ULONG sharing = FILE_SHARE_READ | FILE_SHARE_WRITE
+		    | (oldpc.fs_is_samba () ? 0 : FILE_SHARE_DELETE);
+    ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT
+		  | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0);
+    status = NtOpenFile (&fh, access,
+			 oldpc.get_object_attr (attr, sec_none_nih),
+			 &io, sharing, flags);
+  }
   if (!NT_SUCCESS (status))
     {
       debug_printf ("status %p", status);

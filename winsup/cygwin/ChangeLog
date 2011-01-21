@@ -1,3 +1,9 @@
+2011-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Fix permission problem with symlinks on NFS.
+	Rework how NtOpenFile gets called to make it more readable.  Change
+	comment.
+
 2011-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exec.cc: Include pinfo.h.
