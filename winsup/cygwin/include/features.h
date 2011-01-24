@@ -1,6 +1,6 @@
 /* features.h
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,5 +31,10 @@ details. */
 		   used in application or library headers.  This option
 		   includes _BSD_SOURCE, _XOPEN_SOURCE and _POSIX_SOURCE.
 */
+
+/* The value corresponds to UNICODE version 4.0, which is the version
+   supported by XP.  Newlib supports 5.2 (2011) but so far we need the
+   MS conversions for double-byte charsets. */
+#define __STDC_ISO_10646__ 200305L
 
 #endif /* _FEATURES_H */
