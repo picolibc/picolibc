@@ -1,3 +1,9 @@
+2011-01-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Fix
+	computation of st_blocks.
+	(fhandler_base::fstat_helper): Fix formatting.
+
 2011-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/features.h (__STDC_ISO_10646__): Define.  Add comment.

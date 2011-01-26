@@ -323,7 +323,7 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
 			  nfs_attr->rdev.specdata2);
   buf->st_size = nfs_attr->size;
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
-  buf->st_blocks = nfs_attr->used / 512;
+  buf->st_blocks = (nfs_attr->used + S_BLKSIZE - 1) / S_BLKSIZE;
   buf->st_atim = nfs_attr->atime;
   buf->st_mtim = nfs_attr->mtime;
   buf->st_ctim = nfs_attr->ctime;
@@ -538,7 +538,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		     / S_BLKSIZE;
   else
     /* Otherwise compute no. of blocks from file size. */
-    buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
+    buf->st_blocks = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
   /* Using a side effect: get_file_attributes checks for directory.
