@@ -178,6 +178,12 @@ extern "C" {
 /* #define _XOPEN_UNIX				    -1 */
 
 #endif /* !__STRICT_ANSI__ || __cplusplus || __STDC_VERSION__ >= 199901L */
+
+/* The value corresponds to UNICODE version 4.0, which is the version
+   supported by XP.  Newlib supports 5.2 (2011) but so far Cygwin needs
+   the MS conversions for double-byte charsets. */
+#define __STDC_ISO_10646__ 200305L
+
 #endif /* __CYGWIN__ */
 
 /* Per the permission given in POSIX.1-2008 section 2.2.1, define

@@ -1,3 +1,8 @@
+2011-01-27  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/features.h: Define __STDC_ISO_10646__ for Cygwin.
+	* libc/include/wchar.h: Include features.h.
+
 2011-01-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/types.h (ulong): Add typedef.

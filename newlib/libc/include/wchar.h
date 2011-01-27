@@ -16,6 +16,9 @@
 /* For _mbstate_t definition. */
 #include <sys/_types.h>
 
+/* For __STDC_ISO_10646__ */
+#include <sys/features.h>
+
 #ifndef NULL
 #define NULL	0
 #endif
