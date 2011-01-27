@@ -32,9 +32,4 @@ details. */
 		   includes _BSD_SOURCE, _XOPEN_SOURCE and _POSIX_SOURCE.
 */
 
-/* The value corresponds to UNICODE version 4.0, which is the version
-   supported by XP.  Newlib supports 5.2 (2011) but so far we need the
-   MS conversions for double-byte charsets. */
-#define __STDC_ISO_10646__ 200305L
-
 #endif /* _FEATURES_H */
