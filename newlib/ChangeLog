@@ -1,3 +1,34 @@
+2011-01-28  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/fclose.c: Only use sfp lock to guard non-atomic
+	changes of flags and fp lock.
+	* libc/stdio/freopen.c: Ditto.
+	* libc/stdio/freopen64.c: Ditto.
+	* libc/stdio/fgetc.c: Revert change from 2009-04-24, remove sfp locks
+	which guard entire function to avoid potential deadlocks when using
+	stdio functions in multiple thraeds.
+	* libc/stdio/fgets.c: Ditto.
+	* libc/stdio/fgetwc.c: Ditto.
+	* libc/stdio/fgetws.c: Ditto.
+	* libc/stdio/fread.c: Ditto.
+	* libc/stdio/fseek.c: Ditto.
+	* libc/stdio/getc.c: Ditto.
+	* libc/stdio/getdelim.c: Ditto.
+	* libc/stdio/gets.c: Ditto.
+	* libc/stdio/vfscanf.c: Ditto.
+	* libc/stdio/vfwscanf.c: Ditto.
+
+	* libc/stdio/fflush.c (_fflush_r): Split out core functionality into
+	new function __sflush_r.  Just lock file and call __sflush_r from here.
+	* libc/stdio/fwalk.c (_fwalk): Remove static helper function and move
+	functionality back into main function. Don't walk a file with flags
+	value of 1.  Add comment.
+	(_fwalk_reent): Ditto.
+	* libc/stdio/local.h (__sflush_r): Declare.
+	* libc/stdio/refill.c (__srefill): Before calling fwalk, set flags
+	value to 1 so this file pointer isn't walked.  Revert flags afterwards
+	and call __sflush_r for this fp if necessary.  Add comments.
+
 2011-01-27  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/features.h: Define __STDC_ISO_10646__ for Cygwin.

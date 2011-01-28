@@ -102,9 +102,19 @@ _DEFUN(__srefill_r, (ptr, fp),
    * flush all line buffered output files, per the ANSI C
    * standard.
    */
-
   if (fp->_flags & (__SLBF | __SNBF))
-    _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
+    {
+      /* Ignore this file in _fwalk to avoid potential deadlock. */
+      short orig_flags = fp->_flags;
+      fp->_flags = 1;
+      _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
+      fp->_flags = orig_flags;
+
+      /* Now flush this file without locking it. */
+      if ((fp->_flags & (__SLBF|__SWR)) == (__SLBF|__SWR))
+	__sflush_r (ptr, fp);
+    }
+
   fp->_p = fp->_bf._base;
   fp->_r = fp->_read (ptr, fp->_cookie, (char *) fp->_p, fp->_bf._size);
 #ifndef __CYGWIN__

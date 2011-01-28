@@ -67,36 +67,15 @@ No supporting OS subroutines are required.
 
 /* Flush a single file, or (if fp is NULL) all files.  */
 
+/* Core function which does not lock file pointer.  This gets called
+   directly from __srefill. */
 int
-_DEFUN(_fflush_r, (ptr, fp),
+_DEFUN(__sflush_r, (ptr, fp),
        struct _reent *ptr _AND
        register FILE * fp)
 {
   register unsigned char *p;
   register int n, t;
-
-#ifdef _REENT_SMALL
-  /* For REENT_SMALL platforms, it is possible we are being
-     called for the first time on a std stream.  This std
-     stream can belong to a reentrant struct that is not
-     _REENT.  If CHECK_INIT gets called below based on _REENT,
-     we will end up changing said file pointers to the equivalent
-     std stream off of _REENT.  This causes unexpected behavior if
-     there is any data to flush on the _REENT std stream.  There
-     are two alternatives to fix this:  1) make a reentrant fflush
-     or 2) simply recognize that this file has nothing to flush
-     and return immediately before performing a CHECK_INIT.  Choice
-     2 is implemented here due to its simplicity.  */
-  if (fp->_bf._base == NULL)
-    return 0;
-#endif /* _REENT_SMALL  */
-
-  CHECK_INIT (ptr, fp);
-
-  if (!fp->_flags)
-    return 0;
-
-  _flockfile (fp);
 
   t = fp->_flags;
   if ((t & __SWR) == 0)
@@ -150,7 +129,6 @@ _DEFUN(_fflush_r, (ptr, fp),
 		    }
 		  else
 		    fp->_flags |= __SERR;
-		  _funlockfile (fp);
 		  return result;
 		}
             }
@@ -186,17 +164,14 @@ _DEFUN(_fflush_r, (ptr, fp),
 	  else
 	    {
 	      fp->_flags |= __SERR;
-	      _funlockfile (fp);
 	      return EOF;
 	    }
 	}
-      _funlockfile (fp);
       return 0;
     }
   if ((p = fp->_bf._base) == NULL)
     {
       /* Nothing to flush.  */
-      _funlockfile (fp);
       return 0;
     }
   n = fp->_p - p;		/* write this much */
@@ -215,14 +190,46 @@ _DEFUN(_fflush_r, (ptr, fp),
       if (t <= 0)
 	{
           fp->_flags |= __SERR;
-          _funlockfile (fp);
           return EOF;
 	}
       p += t;
       n -= t;
     }
-  _funlockfile (fp);
   return 0;
+}
+
+int
+_DEFUN(_fflush_r, (ptr, fp),
+       struct _reent *ptr _AND
+       register FILE * fp)
+{
+  int ret;
+
+#ifdef _REENT_SMALL
+  /* For REENT_SMALL platforms, it is possible we are being
+     called for the first time on a std stream.  This std
+     stream can belong to a reentrant struct that is not
+     _REENT.  If CHECK_INIT gets called below based on _REENT,
+     we will end up changing said file pointers to the equivalent
+     std stream off of _REENT.  This causes unexpected behavior if
+     there is any data to flush on the _REENT std stream.  There
+     are two alternatives to fix this:  1) make a reentrant fflush
+     or 2) simply recognize that this file has nothing to flush
+     and return immediately before performing a CHECK_INIT.  Choice
+     2 is implemented here due to its simplicity.  */
+  if (fp->_bf._base == NULL)
+    return 0;
+#endif /* _REENT_SMALL  */
+
+  CHECK_INIT (ptr, fp);
+
+  if (!fp->_flags)
+    return 0;
+
+  _flockfile (fp);
+  ret = __sflush_r (ptr, fp);
+  _funlockfile (fp);
+  return ret;
 }
 
 #ifndef _REENT_ONLY

@@ -434,7 +434,6 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
 
-  __sfp_lock_acquire ();
   _flockfile (fp);
 
   ORIENT (fp, 1);
@@ -714,7 +713,6 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	   */
 	case L'\0':		/* compat */
 	  _funlockfile (fp);
-	  __sfp_lock_release ();
 	  return EOF;
 
 	default:		/* compat */
@@ -1443,13 +1441,11 @@ input_failure:
      invalid format string), return EOF if no matches yet, else number
      of matches made prior to failure.  */
   _funlockfile (fp);
-  __sfp_lock_release ();
   return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _funlockfile (fp);
-  __sfp_lock_release ();
   return nassigned;
 }
 

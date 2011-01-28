@@ -138,7 +138,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 
   CHECK_INIT (ptr, fp);
 
-  __sfp_lock_acquire ();
   _flockfile (fp);
 
   /* If we've been doing some writing, and we're in append mode
@@ -156,7 +155,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
     {
       ptr->_errno = ESPIPE;	/* ??? */
       _funlockfile (fp);
-      __sfp_lock_release ();
       return EOF;
     }
 
@@ -182,7 +180,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	  if (curoff == -1L)
 	    {
 	      _funlockfile (fp);
-	      __sfp_lock_release ();
 	      return EOF;
 	    }
 	}
@@ -208,7 +205,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
     default:
       ptr->_errno = EINVAL;
       _funlockfile (fp);
-      __sfp_lock_release ();
       return (EOF);
     }
 
@@ -268,7 +264,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
     {
       ptr->_errno = EOVERFLOW;
       _funlockfile (fp);
-      __sfp_lock_release ();
       return EOF;
     }
 
@@ -325,7 +320,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       fp->_flags &= ~__SEOF;
       memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
       _funlockfile (fp);
-      __sfp_lock_release ();
       return 0;
     }
 
@@ -356,7 +350,6 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
     }
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   _funlockfile (fp);
-  __sfp_lock_release ();
   return 0;
 
   /*
@@ -369,7 +362,6 @@ dumb:
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
       _funlockfile (fp);
-      __sfp_lock_release ();
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
@@ -388,7 +380,6 @@ dumb:
   fp->_flags &= ~__SNPT;
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
   _funlockfile (fp);
-  __sfp_lock_release ();
   return 0;
 }
 

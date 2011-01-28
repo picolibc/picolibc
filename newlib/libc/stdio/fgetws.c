@@ -93,7 +93,6 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
   const char *src;
   unsigned char *nl;
 
-  __sfp_lock_acquire ();
   _flockfile (fp);
   ORIENT (fp, 1);
 
@@ -144,12 +143,10 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
     goto error;
   *wsp++ = L'\0';
   _funlockfile (fp);
-  __sfp_lock_release ();
   return ws;
 
 error:
   _funlockfile (fp);
-  __sfp_lock_release ();
   return NULL;
 }
 

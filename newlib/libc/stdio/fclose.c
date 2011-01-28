@@ -74,8 +74,6 @@ _DEFUN(_fclose_r, (rptr, fp),
   if (fp == NULL)
     return (0);			/* on NULL */
 
-  __sfp_lock_acquire ();
-
   CHECK_INIT (rptr, fp);
 
   _flockfile (fp);
@@ -83,7 +81,6 @@ _DEFUN(_fclose_r, (rptr, fp),
   if (fp->_flags == 0)		/* not open! */
     {
       _funlockfile (fp);
-      __sfp_lock_release ();
       return (0);
     }
   /* Unconditionally flush to allow special handling for seekable read
@@ -98,6 +95,7 @@ _DEFUN(_fclose_r, (rptr, fp),
     FREEUB (rptr, fp);
   if (HASLB (fp))
     FREELB (rptr, fp);
+  __sfp_lock_acquire ();
   fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile (fp);
 #ifndef __SINGLE_THREAD__

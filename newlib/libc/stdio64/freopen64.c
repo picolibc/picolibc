@@ -97,7 +97,6 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   int flags, oflags;
   int e = 0;
 
-  __sfp_lock_acquire ();
 
   CHECK_INIT (ptr, fp);
 
@@ -107,7 +106,6 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
     {
       _funlockfile(fp);
       _fclose_r (ptr, fp);
-      __sfp_lock_release ();
       return NULL;
     }
 
@@ -204,6 +202,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
   if (f < 0)
     {				/* did not get it after all */
+      __sfp_lock_acquire ();
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
@@ -231,7 +230,6 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   fp->_flags |= __SL64;
 
   _funlockfile(fp);
-  __sfp_lock_release ();
   return fp;
 }
 

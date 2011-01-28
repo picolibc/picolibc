@@ -27,8 +27,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <errno.h>
 #include "local.h"
 
-static int
-_DEFUN(__fwalk, (ptr, function),
+int
+_DEFUN(_fwalk, (ptr, function),
        struct _reent *ptr _AND
        register int (*function) (FILE *))
 {
@@ -36,11 +36,19 @@ _DEFUN(__fwalk, (ptr, function),
   register int n, ret = 0;
   register struct _glue *g;
 
+  /*
+   * It should be safe to walk the list without locking it;
+   * new nodes are only added to the end and none are ever
+   * removed.
+   *
+   * Avoid locking this list while walking it or else you will
+   * introduce a potential deadlock in [at least] refill.c.
+   */
   for (g = &ptr->__sglue; g != NULL; g = g->_next)
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
         {
-          if (fp->_flags != 0 && fp->_file != -1)
+          if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
             ret |= (*function) (fp);
         }
 
@@ -49,8 +57,8 @@ _DEFUN(__fwalk, (ptr, function),
 
 /* Special version of __fwalk where the function pointer is a reentrant
    I/O function (e.g. _fclose_r).  */
-static int
-_DEFUN(__fwalk_reent, (ptr, reent_function),
+int
+_DEFUN(_fwalk_reent, (ptr, reent_function),
        struct _reent *ptr _AND
        register int (*reent_function) (struct _reent *, FILE *))
 {
@@ -58,51 +66,21 @@ _DEFUN(__fwalk_reent, (ptr, reent_function),
   register int n, ret = 0;
   register struct _glue *g;
 
+  /*
+   * It should be safe to walk the list without locking it;
+   * new nodes are only added to the end and none are ever
+   * removed.
+   *
+   * Avoid locking this list while walking it or else you will
+   * introduce a potential deadlock in [at least] refill.c.
+   */
   for (g = &ptr->__sglue; g != NULL; g = g->_next)
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
         {
-          if (fp->_flags != 0 && fp->_file != -1)
+          if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
             ret |= (*reent_function) (ptr, fp);
         }
-
-  return ret;
-}
-
-int
-_DEFUN(_fwalk, (ptr, function),
-       struct _reent *ptr _AND
-       register int (*function)(FILE *))
-{
-  register int ret = 0;
-
-  __sfp_lock_acquire ();
-
-  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
-     only walked once in exit().  */
-  ret |= __fwalk (ptr, function);
-
-  __sfp_lock_release ();
-
-  return ret;
-}
-
-/* Special version of _fwalk which handles a function pointer to a
-   reentrant I/O function (e.g. _fclose_r).  */
-int
-_DEFUN(_fwalk_reent, (ptr, reent_function),
-       struct _reent *ptr _AND
-       register int (*reent_function) (struct _reent *, FILE *))
-{
-  register int ret = 0;
-
-  __sfp_lock_acquire ();
-
-  /* Must traverse given list for streams.  Note that _GLOBAL_REENT
-     only walked once in exit().  */
-  ret |= __fwalk_reent (ptr, reent_function);
-
-  __sfp_lock_release ();
 
   return ret;
 }

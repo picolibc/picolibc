@@ -164,12 +164,10 @@ _DEFUN(_fgetwc_r, (ptr, fp),
 {
   wint_t r;
 
-  __sfp_lock_acquire ();
   _flockfile (fp);
   ORIENT(fp, 1);
   r = __fgetwc (ptr, fp);
   _funlockfile (fp);
-  __sfp_lock_release ();
   return r;
 }
 

@@ -54,6 +54,7 @@ int	      _EXFUN(_svfiwprintf_r,(struct _reent *, FILE *, const wchar_t *,
 				  va_list));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
+extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
 					       int));
