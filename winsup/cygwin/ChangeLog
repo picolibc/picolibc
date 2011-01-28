@@ -1,3 +1,9 @@
+2011-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::wait_for_events): Call
+	pthread_testcancel in case of timeout to enable pthread_cancel
+	on waiting thread.
+
 2011-01-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/features.h (__STDC_ISO_10646__): Move to newlib's

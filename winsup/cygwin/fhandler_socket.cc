@@ -626,6 +626,8 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
       switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
+	    pthread_testcancel ();
+	    /*FALLTHRU*/
 	  case WSA_WAIT_EVENT_0:
 	    break;
 
