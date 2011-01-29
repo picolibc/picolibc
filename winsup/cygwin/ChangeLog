@@ -1,3 +1,8 @@
+2011-01-28 Peter Foley <jpfoley2@verizon.net>
+
+	* configure.in: Define LIBSERVER regardless of cross_host.
+	* configure: Regenerate.
+
 2011-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::wait_for_events): Call

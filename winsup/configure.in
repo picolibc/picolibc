@@ -45,7 +45,7 @@ esac
 if test -d $srcdir/mingw; then
   AC_CONFIG_SUBDIRS(mingw)
 fi
-AC_CONFIG_SUBDIRS(w32api)
+AC_CONFIG_SUBDIRS(w32api cygserver)
 
 case "$with_cross_host" in
   ""|*cygwin*)
@@ -58,7 +58,7 @@ case "$with_cross_host" in
     if test -d $srcdir/lsaauth; then
       AC_CONFIG_SUBDIRS(lsaauth)
     fi
-    AC_CONFIG_SUBDIRS(cygserver utils doc)
+    AC_CONFIG_SUBDIRS(utils doc)
     ;;
 esac
 
