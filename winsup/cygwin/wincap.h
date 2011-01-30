@@ -29,7 +29,6 @@ struct wincaps
   unsigned has_guid_volumes				: 1;
   unsigned has_disk_ex_ioctls				: 1;
   unsigned has_fileid_dirinfo				: 1;
-  unsigned has_enhanced_socket_security			: 1;
   unsigned has_buggy_restart_scan			: 1;
   unsigned has_mandatory_integrity_control		: 1;
   unsigned needs_logon_sid_in_sid_list			: 1;
@@ -86,7 +85,6 @@ public:
   bool	IMPLEMENT (has_guid_volumes)
   bool	IMPLEMENT (has_disk_ex_ioctls)
   bool	IMPLEMENT (has_fileid_dirinfo)
-  bool	IMPLEMENT (has_enhanced_socket_security)
   bool	IMPLEMENT (has_buggy_restart_scan)
   bool	IMPLEMENT (has_mandatory_integrity_control)
   bool	IMPLEMENT (needs_logon_sid_in_sid_list)

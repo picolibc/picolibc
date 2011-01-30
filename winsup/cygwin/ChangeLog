@@ -1,3 +1,15 @@
+2011-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (address_in_use): Disable.  Add comment.
+	(fhandler_socket::bind): Change comment to explain setting the
+	SO_EXCLUSIVEADDRUSE socket option.  Remove code which checks for
+	address in use.
+	* net.cc (cygwin_setsockopt): Never set SO_REUSEADDR option.  Improve
+	comment to compensate for the deleted comment in fhandler_socket::bind.
+	* wincap.cc: Throughout, drop has_enhanced_socket_security from wincaps.
+	* wincap.h (struct wincaps): Drop has_enhanced_socket_security flags
+	and method.
+
 2011-01-28 Peter Foley <jpfoley2@verizon.net>
 
 	* configure.in: Define LIBSERVER regardless of cross_host.

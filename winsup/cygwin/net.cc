@@ -706,12 +706,21 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
 
-      /* On systems supporting "enhanced socket security (2K3 and later),
-	 the default behaviour of stream socket binding is equivalent to the
-	 POSIX behaviour with SO_REUSEADDR.  Setting SO_REUSEADDR would only
-	 result in wrong behaviour.  See also fhandler_socket::bind(). */
+      /* Per POSIX we must not be able to reuse a complete duplicate of a
+         local TCP address (same IP, same port), even if SO_REUSEADDR has been
+	 set.  That's unfortunately possible in WinSock, and this has never
+	 been changed to maintain backward compatibility.  Instead, the
+	 SO_EXCLUSIVEADDRUSE option has been added to allow an application to
+	 request POSIX standard behaviour in the non-SO_REUSEADDR case.
+
+	 However, the WinSock standard behaviour of stream socket binding
+	 is equivalent to the POSIX behaviour as if SO_REUSEADDR has been set.
+	 So what we do here is to note that SO_REUSEADDR has been set, but not
+	 actually hand over the request to WinSock.  This is tested in
+	 fhandler_socket::bind(), so that SO_EXCLUSIVEADDRUSE can be set if
+	 the application did not set SO_REUSEADDR.  This should reflect the
+	 POSIX socket binding behaviour as close as possible with WinSock. */
       if (level == SOL_SOCKET && optname == SO_REUSEADDR
-	  && wincap.has_enhanced_socket_security ()
 	  && fh->get_socket_type () == SOCK_STREAM)
 	res = 0;
       else
