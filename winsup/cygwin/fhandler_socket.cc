@@ -873,9 +873,10 @@ fhandler_socket::link (const char *newpath)
 }
 
 #if 0
-/* This doesn't work correctly.  It has been called in bind to check if a
-   loca address is still in use, but it disables bind in the SO_REUSEADDR
-   case even if only an accepted socket is still using the local address.
+/* This function doesn't work correctly.  It has been called in bind to check
+   if a local address is still in use, but it disables to bind in the
+   SO_REUSEADDR case even if only an accepted socket is still using the
+   local address, and even if said accepted socket is already in CLOSE_WAIT.
    I keep this function in the code for later reference only. */
 static inline bool
 address_in_use (const struct sockaddr *addr)
