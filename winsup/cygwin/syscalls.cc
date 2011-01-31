@@ -3508,7 +3508,7 @@ static struct utmp utmp_data_buf[16];
 static unsigned utix = 0;
 #define nutdbuf (sizeof (utmp_data_buf) / sizeof (utmp_data_buf[0]))
 #define utmp_data ({ \
-  if (utix > nutdbuf) \
+  if (utix >= nutdbuf) \
     utix = 0; \
   utmp_data_buf + utix++; \
 })

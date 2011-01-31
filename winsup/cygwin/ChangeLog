@@ -1,5 +1,9 @@
 2011-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (utmp_data): Fix potential buffer overflow.
+
+2011-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (address_in_use): Improve comment readability.
 
 2011-01-30  Corinna Vinschen  <corinna@vinschen.de>
