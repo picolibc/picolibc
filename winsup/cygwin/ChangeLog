@@ -1,3 +1,8 @@
+2011-02-01  Christian Franke  <franke@computer.org>
+
+	* fhandler.cc (fhandler_base::fsync): Ignore ERROR_INVALID_FUNCTION
+	error from FlushFileBuffers().
+
 2011-01-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (utmp_data): Fix potential buffer overflow.

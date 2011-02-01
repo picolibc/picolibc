@@ -1588,7 +1588,14 @@ fhandler_base::fsync ()
     return 0;
   if (FlushFileBuffers (get_handle ()))
     return 0;
-  __seterrno ();
+
+  /* Ignore ERROR_INVALID_FUNCTION because FlushFileBuffers() always fails
+     with this code on raw devices which are unbuffered by default.  */
+  DWORD errcode = GetLastError();
+  if (errcode == ERROR_INVALID_FUNCTION)
+    return 0;
+
+  __seterrno_from_win_error (errcode);
   return -1;
 }
 
