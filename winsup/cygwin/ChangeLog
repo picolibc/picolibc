@@ -1,5 +1,12 @@
 2011-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/err.h (err): Add noreturn attribute.
+	(errx): Ditto.
+	(verr): Ditto.
+	(verrx): Ditto.
+
+2011-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (conv_path_list): Remove enclosing quotes and trailing
 	backslashes from Win32 environment path lists.
 
