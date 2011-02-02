@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <err.h>
 #include "cygtls.h"
 
 extern "C" int

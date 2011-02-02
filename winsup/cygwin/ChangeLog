@@ -1,3 +1,7 @@
+2011-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/bsdlib.cc: Include err.h.
+
 2011-02-02  Eric Blake  <eblake@redhat.com>
 
 	* include/err.h: Fix loss of semicolons in previous patch.
