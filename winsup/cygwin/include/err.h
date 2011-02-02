@@ -16,8 +16,8 @@ details. */
 
 __BEGIN_DECLS
 
-extern void warn (const char *fmt, ...)
-extern void warnx (const char *fmt, ...)
+extern void warn (const char *fmt, ...);
+extern void warnx (const char *fmt, ...);
 
 extern void err (int eval, const char *fmt, ...) __attribute__ ((__noreturn__));
 extern void errx (int eval, const char *fmt, ...) __attribute__ ((__noreturn__));
