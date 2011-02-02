@@ -1,3 +1,8 @@
+2011-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (conv_path_list): Remove enclosing quotes and trailing
+	backslashes from Win32 environment path lists.
+
 2011-02-01  Christian Franke  <franke@computer.org>
 
 	* fhandler.cc (fhandler_base::fsync): Ignore ERROR_INVALID_FUNCTION

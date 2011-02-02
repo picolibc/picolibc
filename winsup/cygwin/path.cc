@@ -1351,17 +1351,35 @@ conv_path_list (const char *src, char *dst, size_t size, int to_posix)
   bool saw_empty = false;
   do
     {
-      char *s = strccpy (srcbuf, &src, src_delim);
-      size_t len = s - srcbuf;
+      char *srcpath = srcbuf;
+      char *s = strccpy (srcpath, &src, src_delim);
+      size_t len = s - srcpath;
       if (len >= NT_MAX_PATH)
 	{
 	  err = ENAMETOOLONG;
 	  break;
 	}
+      /* Paths in Win32 path lists in the environment (%Path%), are often
+	 enclosed in quotes (usually paths with spaces).  Trailing backslashes
+	 are common, too.  Remove them. */
+      if (to_posix == ENV_CVT && len)
+	{
+	  if (*srcpath == '"')
+	    {
+	      ++srcpath;
+	      *--s = '\0';
+	      len -= 2;
+	    }
+	  while (len && s[-1] == '\\')
+	    {
+	      *--s = '\0';
+	      --len;
+	    }
+	}
       if (len)
 	{
 	  ++d;
-	  err = cygwin_conv_path (conv_fn, srcbuf, d, size - (d - dst));
+	  err = cygwin_conv_path (conv_fn, srcpath, d, size - (d - dst));
 	}
       else if (!to_posix)
 	{
