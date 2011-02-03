@@ -8543,16 +8543,16 @@
 	* configure.host (newlib_cflags) <cris-*-*, crisv32-*-*>: Add
 	-DCOMPACT_CTYPE.
 
-2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-03-06  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/include/inttypes.h: New file.
 	* libc/sys/rtems/include/stdint.h: Ditto.
 
-2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-03-06  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/string/memcmp.c: Fix to avoid pointer signedness warning.
 
-2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-03-06  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/include/machine/_types.h: New file.
 	* libc/include/sys/types.h: Do not check for __rtems__
@@ -8561,7 +8561,7 @@
 	* libc/sys/rtems/machine/_types.h: Removed.  Replaced with
 	shared header file.
 
-2005-02-25  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-02-25  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libm/common/fdlibm.h (FLT_UWORD_MAX, FLT_UWORD_HALF_MAX): Add
 	L qualifier for these long constants.
@@ -8577,13 +8577,13 @@
 	* libc/time/strftime.c (strftime): Fix '%x' to deal with negative
 	years.  Fix '%z' to use long, not int.
 
-2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-02-24  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libm/common/s_fpclassify.c: Use __uint32_t instead of int to
 	manipulate float values in integer form.
 	* libm/common/sf_round.c: Ditto.
 
-2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
+2005-02-24  Ralf Corsepius  <ralf.corsepius@rtems.org>
 
 	* libc/include/sys/types.h [__rtems__]: Include new
 	header file machine/_types.h.
