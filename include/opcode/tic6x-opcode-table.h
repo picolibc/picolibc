@@ -1,5 +1,5 @@
 /* TI C6X opcode table.
-   Copyright 2010
+   Copyright 2010, 2011
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -791,7 +791,7 @@ INSN(cmpyr1, m, 1_or_2_src, 4cycle, C64XP, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
-INSN(cmtl, d, 1_or_2_src, load, ATOMIC,
+INSN(cmtl, d, 1_or_2_src, load, C64XP,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_SIDE_B_ONLY|TIC6X_FLAG_SIDE_T2_ONLY|TIC6X_FLAG_NO_CROSS,
      FIX3(FIX(s, 1), FIX(op, 0xe), FIX(src1, 0)),
      OP2(ORMEMDW, OWDREG5),
@@ -1089,7 +1089,7 @@ INSN(ldw, d, load_store_long, load, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_word, 0),
 	  ENC(dst, reg, 1)))
 
-INSN(ll, d, 1_or_2_src, load, ATOMIC,
+INSN(ll, d, 1_or_2_src, load, C64XP,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_SIDE_B_ONLY|TIC6X_FLAG_SIDE_T2_ONLY|TIC6X_FLAG_NO_CROSS,
      FIX3(FIX(s, 1), FIX(op, 0xc), FIX(src1, 0)),
      OP2(ORMEMDW, OWDREG5),
@@ -1894,7 +1894,7 @@ INSNE(shru2, s_xu2_u5_u2, s, 1_or_2_src, 1cycle, C64X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	   ENC(src1, ucst, 1), ENC(dst, reg, 2)))
 
-INSN(sl, d, 1_or_2_src, store, ATOMIC,
+INSN(sl, d, 1_or_2_src, store, C64XP,
      TIC6X_FLAG_STORE|TIC6X_FLAG_SIDE_B_ONLY|TIC6X_FLAG_SIDE_T2_ONLY|TIC6X_FLAG_NO_CROSS,
      FIX3(FIX(s, 1), FIX(op, 0xd), FIX(src1, 0)),
      OP2(ORDREG1, OWMEMDW),

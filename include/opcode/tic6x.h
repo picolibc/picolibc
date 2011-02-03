@@ -1,5 +1,5 @@
 /* TI C6X opcode information.
-   Copyright 2010
+   Copyright 2010, 2011
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -132,7 +132,6 @@ typedef struct
 #define TIC6X_INSN_C67X		0x0008
 #define TIC6X_INSN_C67XP	0x0010
 #define TIC6X_INSN_C674X	0x0020
-#define TIC6X_INSN_ATOMIC	0x0040
 
 /* Flags with further information about an opcode table entry.  */
 

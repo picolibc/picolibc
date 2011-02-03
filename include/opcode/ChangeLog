@@ -1,3 +1,8 @@
+2011-02-04  Bernd Schmidt  <bernds@codesourcery.com>
+
+	* tic6x-opcode-table.h (cmtl, ll, sl): Available on C64XP.
+	* tic6x.h (TIC6X_INSN_ATOMIC): Remove.
+
 2010-12-31  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	PR gas/11395
