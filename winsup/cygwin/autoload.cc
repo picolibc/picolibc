@@ -294,10 +294,10 @@ wsock_init ()
 
   if (!wsock_started)
     {
-      int (*wsastartup) (int, WSADATA *);
+      int __stdcall (*wsastartup) (int, WSADATA *);
 
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
-      wsastartup = (int (*)(int, WSADATA *))
+      wsastartup = (int __stdcall (*)(int, WSADATA *))
 		   GetProcAddress ((HMODULE) (dll->handle), "WSAStartup");
       if (wsastartup)
 	{

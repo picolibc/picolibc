@@ -1,3 +1,8 @@
+2011-02-05  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (wsock_init): Properly define WSAStartup function pointer
+	to avoid stack damage.
+
 2011-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/bsdlib.cc: Include err.h.
