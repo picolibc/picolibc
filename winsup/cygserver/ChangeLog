@@ -1,3 +1,8 @@
+2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Remove AC_ALLOCA test and test for __builtin_memset.
+	* configure: Regenerate.
+
 2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* transport_pipes.cc: Include ntdef.h to accommodate cygerrno.h.

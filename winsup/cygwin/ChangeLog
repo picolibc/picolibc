@@ -1,5 +1,10 @@
 2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* configure.in: Remove AC_ALLOCA test and test for __builtin_memset.
+	* configure: Regenerate.
+
+2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::write_normal): Remove
 	erroneous premature return after collecting truncated multibyte
 	sequence in trunc_buf.  Rather fall through to printing routine.
