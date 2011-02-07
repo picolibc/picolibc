@@ -1679,6 +1679,9 @@ fhandler_console::write_normal (const unsigned char *src,
 	}
     }
 
+  /* Loop over src buffer as long as we have just simple characters.  Stop
+     as soon as we reach the conversion limit, or if we encounter a control
+     character or a truncated or invalid mutibyte sequence. */
   memset (&ps, 0, sizeof ps);
   while (found < end
 	 && found - src < CONVERT_LIMIT
@@ -1687,13 +1690,12 @@ fhandler_console::write_normal (const unsigned char *src,
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
 			       end - found, charset, &ps))
 	{
-	case -2:
-	  /* Truncated multibyte sequence.  Stick to it until the next write. */
+	case -2: /* Truncated multibyte sequence.  Store for next write. */
 	  trunc_buf.len = end - found;
 	  memcpy (trunc_buf.buf, found, trunc_buf.len);
-	  return end;
-	case -1:
-	  break;
+	  goto do_print;
+	case -1: /* Invalid multibyte sequence. Handled below. */
+	  goto do_print;
 	case 0:
 	  found++;
 	  break;
@@ -1701,11 +1703,11 @@ fhandler_console::write_normal (const unsigned char *src,
 	  found += ret;
 	  break;
 	}
-      if (ret == (size_t) -1)		/* Invalid multibyte sequence. */
-	break;
     }
 
-  /* Print all the base ones out */
+do_print:
+
+  /* Print all the base characters out */
   if (found != src)
     {
       DWORD len = found - src;
@@ -1731,11 +1733,14 @@ fhandler_console::write_normal (const unsigned char *src,
 	  debug_printf ("write failed, handle %p", get_output_handle ());
 	  return 0;
 	}
+      /* Stop here if we reached the conversion limit. */
       if (len >= CONVERT_LIMIT)
-	return found;
+	return found + trunc_buf.len;
     }
-
-  if (found < end)
+  /* If there's still something in the src buffer, but it's not a truncated
+     multibyte sequence, then we stumbled over a control character or an
+     invalid multibyte sequence.  Print it. */
+  if (found < end && trunc_buf.len == 0)
     {
       int x, y;
       switch (base_chars[*found])
@@ -1807,7 +1812,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	}
       found++;
     }
-  return found;
+  return found + trunc_buf.len;
 }
 
 ssize_t __stdcall

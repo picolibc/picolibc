@@ -1,3 +1,11 @@
+2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::write_normal): Remove
+	erroneous premature return after collecting truncated multibyte
+	sequence in trunc_buf.  Rather fall through to printing routine.
+	Fix return value to take trunc_buf content into account.  Improve
+	comments.
+
 2011-02-05  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (wsock_init): Properly define WSAStartup function pointer
