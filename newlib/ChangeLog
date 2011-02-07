@@ -3,7 +3,7 @@
 	* libc/stdio/fclose.c: Only use sfp lock to guard non-atomic
 	changes of flags and fp lock.
 	* libc/stdio/freopen.c: Ditto.
-	* libc/stdio/freopen64.c: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
 	* libc/stdio/fgetc.c: Revert change from 2009-04-24, remove sfp locks
 	which guard entire function to avoid potential deadlocks when using
 	stdio functions in multiple thraeds.
