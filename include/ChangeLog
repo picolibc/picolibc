@@ -1,3 +1,7 @@
+2011-02-08  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* dwarf2.h (enum dwarf_calling_convention): Add DW_CC_GDB_IBM_OpenCL.
+
 2011-01-12  Iain Sandoe  <iains@gcc.gnu.org>
 
 	* dwarf2.h: Update value for DW_AT_hi_user.
