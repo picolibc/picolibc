@@ -267,7 +267,7 @@ dll_list::load_after_fork (HANDLE parent)
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.
 	     It stinks that we can't invert the order of the initial LoadLibrary
-	     and FreeLibrar  since Microsoft documentation seems to imply that
+	     and FreeLibrary since Microsoft documentation seems to imply that
 	     should do what we want.  However, once a library is loaded as
 	     above, the second LoadLibrary will not execute its startup code
 	     unless it is first unloaded. */
