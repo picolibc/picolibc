@@ -1,6 +1,6 @@
 /* exception.h
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -19,10 +19,6 @@ class exception
   exception_list *save;
   static int handle (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
 public:
-#ifdef DEBUG_EXCEPTION
-  exception ();
-  ~exception ();
-#else
   exception () __attribute__ ((always_inline))
   {
     save = _except_list;
@@ -31,7 +27,6 @@ public:
     _except_list = &el;
   };
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
-#endif
 };
 
 #endif /*_EXCEPTION_H*/

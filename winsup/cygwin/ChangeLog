@@ -1,3 +1,11 @@
+2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* exception.h: Remove DEBUG_EXCEPTION left over debugging ifdef.
+
+2011-02-08  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dll_init.cc: Fix typo in comment.
+
 2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Remove AC_ALLOCA test and test for __builtin_memset.
