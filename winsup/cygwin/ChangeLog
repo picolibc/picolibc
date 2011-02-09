@@ -1,5 +1,10 @@
 2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* hookapi.cc (hook_or_detect_cygwin): Prevent i from being considered
+	uninitialized by gcc.
+
+2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* exception.h: Remove DEBUG_EXCEPTION left over debugging ifdef.
 
 2011-02-08  Christopher Faylor  <me+cygwin@cgf.cx>
