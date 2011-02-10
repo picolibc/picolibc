@@ -1225,6 +1225,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_continue		(XPG2)
     pthread_getsequence_np	(Tru64)
     pthread_suspend		(XPG2)
+    pthread_yield		(POSIX.1c drafts)
     pututline			(XPG2)
     putw			(SVID)
     rindex			(SUSv3)

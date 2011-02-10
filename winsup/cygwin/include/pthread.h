@@ -194,6 +194,7 @@ void pthread_testcancel (void);
 
 int pthread_suspend (pthread_t);
 int pthread_continue (pthread_t);
+int pthread_yield (void);
 
 #ifdef __cplusplus
 }

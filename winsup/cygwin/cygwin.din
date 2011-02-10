@@ -1245,6 +1245,7 @@ pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
 pthread_testcancel SIGFE
+pthread_yield = sched_yield SIGFE
 ptsname SIGFE
 putc SIGFE
 _putc = putc SIGFE

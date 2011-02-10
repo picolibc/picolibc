@@ -1,3 +1,10 @@
+2011-02-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (pthread_yield): Export as alias to sched_yield.
+	* include/pthread.h (pthread_yield): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* posix.sgml (std-deprec): Add pthread_yield.
+
 2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygheap.cc: Add some __stdcall decoration where appropriate.
