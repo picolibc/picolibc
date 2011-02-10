@@ -12,12 +12,14 @@ details. */
 #define _sys_nerr FOO_sys_nerr
 #define sys_nerr FOOsys_nerr
 #define _sys_errlist FOO_sys_errlist
+#define strerror_r FOO_strerror_r
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
 #undef _sys_nerr
 #undef sys_nerr
 #undef _sys_errlist
+#undef strerror_r
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change

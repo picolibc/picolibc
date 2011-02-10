@@ -1,5 +1,8 @@
 2011-02-10  Eric Blake  <eblake@redhat.com>
 
+	* errno.cc (includes): Avoid compilation failure if <string.h>
+	settles on wrong strerror_r signature.
+
 	* errno.cc (__xpg_strerror_r): New function.
 	(strerror_r): Update to copy newlib's fixes.
 	(strerror): Set errno on failure.
