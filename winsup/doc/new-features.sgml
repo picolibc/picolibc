@@ -42,6 +42,13 @@ to force width 1.)
 </para></listitem>
 
 <listitem><para>
+The strerror_r interface now has two flavors; if _GNU_SOURCE is
+defined, it retains the previous behavior of returning char *
+(but the result is now guaranteed to be NUL-terminated); otherwise
+it now obeys POSIX semantics of returning int.
+</para></listitem>
+
+<listitem><para>
 Other new APIs: llround, llroundf, madvise, pthread_yield.
 Export program_invocation_name, program_invocation_short_name.
 Support TIOCGPGRP, TIOCSPGRP ioctls.

@@ -1,3 +1,7 @@
+2011-02-10  Eric Blake  <eblake@redhat.com>
+
+	* new-features.sgml (ov-new1.7.8): Document strerror_r fixes.
+
 2011-02-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.8): Document pthread_yield.
