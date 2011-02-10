@@ -1,3 +1,14 @@
+2011-02-09  Eric Blake  <eblake@redhat.com>
+
+	* libc/include/string.h (strerror_r): Update declaration.
+	* libc/string/strerror.c (strerror): Update documentation.
+	* libc/string/strerror_r.c (strerror_r): Always return
+	NUL-terminated string; don't overwrite too-short buf.
+	* libc/string/xpg_strerror_r.c (__xpg_strerror_r): Implement POSIX
+	variant.
+	* libc/string/Makefile.am (GENERAL_SOURCES): Build new file.
+	* libc/string/Makefile.in: Regenerate.
+
 2011-01-28  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/fclose.c: Only use sfp lock to guard non-atomic

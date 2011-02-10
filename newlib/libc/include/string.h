@@ -66,7 +66,20 @@ char 	*_EXFUN(strdup,(const char *));
 char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
 char 	*_EXFUN(strndup,(const char *, size_t));
 char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
-char 	*_EXFUN(strerror_r,(int, char *, size_t));
+/* There are two common strerror_r variants.  If you request
+   _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
+   version.  POSIX requires that #undef strerror_r will still let you
+   invoke the underlying function, but that requires gcc support.  */
+#ifdef _GNU_SOURCE
+char    *_EXFUN(strerror_r,(int, char *, size_t));
+#else
+# ifdef __GNUC__
+int      _EXFUN(strerror_r,(int, char *, size_t)) __asm__ ("__xpg_strerror_r");
+# else
+int      _EXFUN(__xpg_strerror_r,(int, char *, size_t));
+#  define strerror_r __xpg_strerror_r
+# endif
+#endif
 size_t	 _EXFUN(strlcat,(char *, const char *, size_t));
 size_t	 _EXFUN(strlcpy,(char *, const char *, size_t));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));

@@ -301,6 +301,17 @@ declares that subsequent calls to <<strerror>> may overwrite the
 result string; therefore portable code cannot depend on the reentrancy
 of this subroutine.
 
+Although this implementation of <<strerror>> guarantees a non-null
+result with a NUL-terminator, some implementations return <<NULL>>
+on failure.  Although POSIX allows <<strerror>> to set <<errno>>
+to EINVAL on failure, this implementation does not do so (unless
+you provide <<_user_strerror>>).
+
+POSIX recommends that unknown <[errnum]> result in a message
+including that value, however it is not a requirement and this
+implementation does not provide that information (unless you
+provide <<_user_strerror>>).
+
 This implementation of <<strerror>> provides for user-defined
 extensibility.  <<errno.h>> defines <[__ELASTERROR]>, which can be
 used as a base for user-defined error values.  If the user supplies a
@@ -312,6 +323,9 @@ routine named <<_user_strerror>>, and <[errnum]> passed to
 character pointer.  If <[errnum]> is unknown to <<_user_strerror>>,
 <<_user_strerror>> returns <[NULL]>.  The default <<_user_strerror>>
 returns <[NULL]> for all input values.
+
+Note that <<_user_sterror>> must be thread-safe and not alter <<errno>>
+if <<strerror_r>> is to comply with POSIX.
 
 <<strerror>> requires no supporting OS subroutines.
 

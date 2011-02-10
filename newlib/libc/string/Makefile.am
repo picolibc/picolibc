@@ -71,7 +71,8 @@ GENERAL_SOURCES = \
 	wmemcmp.c \
 	wmemcpy.c \
 	wmemmove.c \
-	wmemset.c
+	wmemset.c \
+	xpg_strerror_r.c
 
 if ELIX_LEVEL_1
 ELIX_2_SOURCES =

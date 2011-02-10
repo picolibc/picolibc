@@ -88,7 +88,7 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-wcsxfrm.$(OBJEXT) lib_a-wcwidth.$(OBJEXT) \
 	lib_a-wmemchr.$(OBJEXT) lib_a-wmemcmp.$(OBJEXT) \
 	lib_a-wmemcpy.$(OBJEXT) lib_a-wmemmove.$(OBJEXT) \
-	lib_a-wmemset.$(OBJEXT)
+	lib_a-wmemset.$(OBJEXT) lib_a-xpg_strerror_r.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
@@ -120,7 +120,7 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo \
 	wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
 	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
-	wmemcpy.lo wmemmove.lo wmemset.lo
+	wmemcpy.lo wmemmove.lo wmemset.lo xpg_strerror_r.lo
 @ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo wcpcpy.lo \
@@ -215,6 +215,7 @@ MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 NM = @NM@
 NMEDIT = @NMEDIT@
+NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
@@ -363,7 +364,8 @@ GENERAL_SOURCES = \
 	wmemcmp.c \
 	wmemcpy.c \
 	wmemmove.c \
-	wmemset.c
+	wmemset.c \
+	xpg_strerror_r.c
 
 @ELIX_LEVEL_1_FALSE@ELIX_2_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	bcmp.c \
@@ -886,6 +888,12 @@ lib_a-wmemset.o: wmemset.c
 
 lib_a-wmemset.obj: wmemset.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wmemset.obj `if test -f 'wmemset.c'; then $(CYGPATH_W) 'wmemset.c'; else $(CYGPATH_W) '$(srcdir)/wmemset.c'; fi`
+
+lib_a-xpg_strerror_r.o: xpg_strerror_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xpg_strerror_r.o `test -f 'xpg_strerror_r.c' || echo '$(srcdir)/'`xpg_strerror_r.c
+
+lib_a-xpg_strerror_r.obj: xpg_strerror_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-xpg_strerror_r.obj `if test -f 'xpg_strerror_r.c'; then $(CYGPATH_W) 'xpg_strerror_r.c'; else $(CYGPATH_W) '$(srcdir)/xpg_strerror_r.c'; fi`
 
 lib_a-bcmp.o: bcmp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bcmp.o `test -f 'bcmp.c' || echo '$(srcdir)/'`bcmp.c
