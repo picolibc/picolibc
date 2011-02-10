@@ -399,7 +399,7 @@ details. */
       233: Add TIOCGPGRP, TIOCSPGRP.  Export llround, llroundf.
       234: Export program_invocation_name, program_invocation_short_name.
       235: Export madvise.
-      236: Export pthread_yield.
+      236: Export pthread_yield, __xpg_strerror_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */

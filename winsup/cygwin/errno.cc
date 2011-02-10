@@ -199,9 +199,9 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* EL2HLT 44 */		  "Level 2 halted",
 /* EDEADLK 45 */	  "Resource deadlock avoided",
 /* ENOLCK 46 */		  "No locks available",
-			  "error 47",
-			  "error 48",
-			  "error 49",
+			  NULL,
+			  NULL,
+			  NULL,
 /* EBADE 50 */		  "Invalid exchange",
 /* EBADR 51 */		  "Invalid request descriptor",
 /* EXFULL 52 */		  "Exchange full",
@@ -210,8 +210,8 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* EBADSLT 55 */	  "Invalid slot",
 /* EDEADLOCK 56 */	  "File locking deadlock error",
 /* EBFONT 57 */		  "Bad font file format",
-			  "error 58",
-			  "error 59",
+			  NULL,
+			  NULL,
 /* ENOSTR 60 */		  "Device not a stream",
 /* ENODATA 61 */	  "No data available",
 /* ETIME 62 */		  "Timer expired",
@@ -224,13 +224,13 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* ESRMNT 69 */		  "Srmount error",
 /* ECOMM 70 */		  "Communication error on send",
 /* EPROTO 71 */		  "Protocol error",
-			  "error 72",
-			  "error 73",
+			  NULL,
+			  NULL,
 /* EMULTIHOP 74 */	  "Multihop attempted",
 /* ELBIN 75 */		  "Inode is remote (not really error)",
 /* EDOTDOT 76 */	  "RFS specific error",
 /* EBADMSG 77 */	  "Bad message",
-			  "error 78",
+			  NULL,
 /* EFTYPE 79 */		  "Inappropriate file type or format",
 /* ENOTUNIQ 80 */	  "Name not unique on network",
 /* EBADFD 81 */		  "File descriptor in bad state",
@@ -245,17 +245,17 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* ENOTEMPTY 90	*/	  "Directory not empty",
 /* ENAMETOOLONG 91 */	  "File name too long",
 /* ELOOP 92 */		  "Too many levels of symbolic links",
-			  "error 93",
-			  "error 94",
+			  NULL,
+			  NULL,
 /* EOPNOTSUPP 95 */	  "Operation not supported",
 /* EPFNOSUPPORT 96 */	  "Protocol family not supported",
-			  "error 97",
-			  "error 98",
-			  "error 99",
-			  "error 100",
-			  "error 101",
-			  "error 102",
-			  "error 103",
+			  NULL,
+			  NULL,
+			  NULL,
+			  NULL,
+			  NULL,
+			  NULL,
+			  NULL,
 /* ECONNRESET 104 */	  "Connection reset by peer",
 /* ENOBUFS 105 */	  "No buffer space available",
 /* EAFNOSUPPORT 106 */	  "Address family not supported by protocol",
@@ -357,27 +357,53 @@ strerror_worker (int errnum)
   return res;
 }
 
-/* strerror: convert from errno values to error strings */
+/* strerror: convert from errno values to error strings.  Newlib's
+   strerror_r returns "" for unknown values, so we override it to
+   provide a nicer thread-safe result string and set errno.  */
 extern "C" char *
 strerror (int errnum)
 {
   char *errstr = strerror_worker (errnum);
   if (!errstr)
-    __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %u",
-		     (unsigned) errnum);
+    {
+      __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %u",
+		       (unsigned) errnum);
+      errno = _impure_ptr->_errno = EINVAL;
+    }
   return errstr;
 }
 
-#if 0
-extern "C" int
+/* Newlib's <string.h> provides declarations for two strerror_r
+   variants, according to preprocessor feature macros.  However, it
+   returns "" instead of "Unknown error ...", so we override both
+   versions.  */
+extern "C" char *
 strerror_r (int errnum, char *buf, size_t n)
 {
-  char *errstr = strerror_worker (errnum);
-  if (!errstr)
-    return EINVAL;
-  if (strlen (errstr) >= n)
-    return ERANGE;
-  strcpy (buf, errstr);
-  return 0;
+  char *error = strerror (errnum);
+  if (strlen (error) >= n)
+    return error;
+  return strcpy (buf, error);
 }
-#endif
+
+extern "C" int
+__xpg_strerror_r (int errnum, char *buf, size_t n)
+{
+  if (!n)
+    return ERANGE;
+  int result = 0;
+  char *error = strerror_worker (errnum);
+    {
+      __small_sprintf (error = _my_tls.locals.strerror_buf, "Unknown error %u",
+		       (unsigned) errnum);
+      result = EINVAL;
+    }
+  if (strlen (error) >= n)
+    {
+      memcpy (buf, error, n - 1);
+      buf[n - 1] = '\0';
+      return ERANGE;
+    }
+  strcpy (buf, error);
+  return result;
+}

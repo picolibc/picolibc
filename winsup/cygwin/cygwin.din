@@ -1934,6 +1934,7 @@ xdrrec_skiprecord SIGFE
 __xdrrec_getrec SIGFE
 __xdrrec_setnonblock SIGFE
 xdrstdio_create SIGFE
+__xpg_strerror_r SIGFE
 y0 NOSIGFE
 y0f NOSIGFE
 y1 NOSIGFE
