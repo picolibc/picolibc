@@ -1,5 +1,10 @@
 2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygheap.cc: Add some __stdcall decoration where appropriate.
+	* lib/cygwin_crt0.c: __attribute -> __attribute__.
+
+2011-02-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* hookapi.cc (hook_or_detect_cygwin): Prevent i from being considered
 	uninitialized by gcc.
 

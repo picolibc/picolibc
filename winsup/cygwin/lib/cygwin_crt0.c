@@ -12,7 +12,7 @@ details. */
 #include "crt0.h"
 
 extern void __stdcall _dll_crt0 ()
-  __declspec (dllimport) __attribute ((noreturn));
+  __declspec (dllimport) __attribute__ ((noreturn));
 
 /* for main module */
 void
