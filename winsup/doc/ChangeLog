@@ -1,3 +1,7 @@
+2011-02-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.8): Document pthread_yield.
+
 2011-01-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.8): Add "new API" paragraph.
