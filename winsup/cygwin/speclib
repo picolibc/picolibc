@@ -76,3 +76,7 @@ $res = system $ar, 'crus', $lib, sort keys %extract;
 unlink keys %extract;
 die "$0: ar creation of $lib exited with non-zero status\n" if $res;
 exit 0;
+
+END {
+    chdir '/tmp';	# Allow $dir directory removal on Windows
+}

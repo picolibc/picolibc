@@ -80,5 +80,8 @@ for my $f (keys %text) {
 unlink $libdll;
 system $ar, 'crus', $libdll, glob('*.o'), @ARGV;
 unlink glob('*.o');
-chdir '/tmp';	# Allow $dir directory removal on Windows
 exit 1 if $?;
+
+END {
+    chdir '/tmp';	# Allow $dir directory removal on Windows
+}
