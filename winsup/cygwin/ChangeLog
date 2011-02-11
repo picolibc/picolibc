@@ -1,5 +1,10 @@
 2011-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.sc: Raise default cygheap size to 1 Meg.  Set alignment to
+	standard 64K.
+
+2011-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/endian.h: Move definitions of __BIG_ENDIAN, __LITTLE_ENDIAN,
 	and __BYTE_ORDER into ...
 	* include/bits/endian.h: New file.
