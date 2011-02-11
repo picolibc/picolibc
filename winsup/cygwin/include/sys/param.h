@@ -1,6 +1,6 @@
 /* sys/param.h
 
-   Copyright 2001, 2003, 2007 Red Hat, Inc.
+   Copyright 2001, 2003, 2007,2 2011 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -36,19 +36,6 @@
    It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the
    BSD variant of this constant. */
 #define DEV_BSIZE	1024
-
-#if 0	/* defined in endian.h */
-/* Some autoconf'd packages check for endianness.  When cross-building we
-   can't run programs on the target.  Fortunately, autoconf supports the
-   definition of byte order in sys/param.h (that's us!).
-   The values here are the same as used in gdb/defs.h (are the more
-   appropriate values?).  */
-#define BIG_ENDIAN	4321
-#define LITTLE_ENDIAN	1234
-
-/* All known win32 systems are little endian.  */
-#define BYTE_ORDER	LITTLE_ENDIAN
-#endif
 
 #ifndef NULL
 #define NULL            0L

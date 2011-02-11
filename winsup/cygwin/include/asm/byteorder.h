@@ -1,6 +1,6 @@
 /* asm/byteorder.h
 
-   Copyright 1996, 1998, 2001, 2006, 2009 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2006, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,13 +13,10 @@ details. */
 
 #include <_ansi.h>
 #include <stdint.h>
+#include <bits/endian.h>
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef __LITTLE_ENDIAN
-#define __LITTLE_ENDIAN 1234
 #endif
 
 #ifndef __LITTLE_ENDIAN_BITFIELD

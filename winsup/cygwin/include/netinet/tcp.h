@@ -37,14 +37,7 @@
 #ifndef _NETINET_TCP_H
 #define _NETINET_TCP_H
 
-/* Added by Wu Yongwei */
-#ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN   1234
-#define BIG_ENDIAN      4321
-#endif
-#ifndef BYTE_ORDER
-#define BYTE_ORDER     LITTLE_ENDIAN
-#endif
+#include <bits/endian.h>
 
 typedef u_int32_t tcp_seq;
 typedef u_int32_t tcp_cc;               /* connection count per rfc1644 */
@@ -61,11 +54,11 @@ struct tcphdr {
 	u_short th_dport;               /* destination port */
 	tcp_seq th_seq;                 /* sequence number */
 	tcp_seq th_ack;                 /* acknowledgement number */
-#if BYTE_ORDER == LITTLE_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 	u_int   th_x2:4,                /* (unused) */
 		th_off:4;               /* data offset */
 #endif
-#if BYTE_ORDER == BIG_ENDIAN
+#if __BYTE_ORDER == __BIG_ENDIAN
 	u_int   th_off:4,               /* data offset */
 		th_x2:4;                /* (unused) */
 #endif

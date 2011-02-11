@@ -1,6 +1,6 @@
 /* endian.h
 
-   Copyright 2005, 2010 Red Hat, Inc.
+   Copyright 2005, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,17 +12,7 @@ details. */
 #define _ENDIAN_H_
 
 #include <sys/config.h>
-
-#ifndef __BIG_ENDIAN
-#define __BIG_ENDIAN 4321
-#endif
-#ifndef __LITTLE_ENDIAN
-#define __LITTLE_ENDIAN 1234
-#endif
-
-#ifndef __BYTE_ORDER
-# define __BYTE_ORDER __LITTLE_ENDIAN
-#endif
+#include <bits/endian.h>
 
 /*#ifdef  __USE_BSD*/
 # define LITTLE_ENDIAN  __LITTLE_ENDIAN
