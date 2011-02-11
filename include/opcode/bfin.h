@@ -1,5 +1,5 @@
 /* bfin.h -- Header file for ADI Blackfin opcode table
-   Copyright 2005, 2010 Free Software Foundation, Inc.
+   Copyright 2005, 2010, 2011 Free Software Foundation, Inc.
 
    This file is part of GDB, GAS, and the GNU binutils.
 
@@ -17,6 +17,9 @@
    along with this file; see the file COPYING3.  If not, write to the Free
    Software Foundation, 51 Franklin Street - Fifth Floor, Boston,
    MA 02110-1301, USA.  */
+
+#ifndef OPCODE_BFIN_H
+#define OPCODE_BFIN_H
 
 /* Common to all DSP32 instructions.  */
 #define BIT_MULTI_INS 0x0800
@@ -1725,3 +1728,5 @@ typedef struct
   DagMODik_op_bits,	DagMODik_op_mask,	\
   DagMODik_code_bits,	DagMODik_code_mask	\
 };
+
+#endif
