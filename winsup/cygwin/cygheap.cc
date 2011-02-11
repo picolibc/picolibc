@@ -33,7 +33,6 @@ static mini_cygheap NO_COPY cygheap_at_start =
 init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_at_start;
 void NO_COPY *cygheap_max;
 
-extern "C" char  _cygheap_mid[];
 extern "C" char  _cygheap_end[];
 
 static NO_COPY muto cygheap_protect;

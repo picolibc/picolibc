@@ -1,5 +1,10 @@
 2011-02-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* cygwin.sc: Eliminate __cygheap_mid.
+	* cygheap.cc: Ditto.
+
+2011-02-11  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* cygheap.cc (_cygheap_mid): Drop unneeded section attribute.
 	(cygheap_init): Just zero cygheap structure.
 	* cygwin.sc: Keep 16 byte alignment but drop all other alignments
