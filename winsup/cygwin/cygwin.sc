@@ -100,17 +100,13 @@ SECTIONS
     SORT(*)(.idata$7)
     . = ALIGN(16);
     __cygheap_start = ABSOLUTE(.);
-    . = ALIGN(0x10000);
   }
   .cygheap ALIGN(__section_alignment__) :
   {
     __cygheap_mid = .;
-    *(.cygheap)
     . = . + (1024 * 1024);
-    . = ALIGN(0x10000);
+    __cygheap_end = ABSOLUTE(.);
   }
-  __cygheap_end = ABSOLUTE(.);
-  __cygheap_end1 = __cygheap_mid + SIZEOF(.cygheap);
   /DISCARD/ :
   {
     *(.debug$S)
