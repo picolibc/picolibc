@@ -1668,9 +1668,9 @@ ENABLE_PPL_CHECK=yes)
 if test "x$with_ppl" != "xno" -a "${ENABLE_PPL_CHECK}" = "yes"; then
   saved_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS $pplinc $gmpinc"
-  AC_MSG_CHECKING([for version 0.10 (or later revision) of PPL])
+  AC_MSG_CHECKING([for version 0.11 (or later revision) of PPL])
   AC_TRY_COMPILE([#include "ppl_c.h"],[
-  #if PPL_VERSION_MAJOR != 0 || PPL_VERSION_MINOR < 10
+  #if PPL_VERSION_MAJOR != 0 || PPL_VERSION_MINOR < 11
   choke me
   #endif
   ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no]); ppllibs= ; pplinc= ; with_ppl=no ])
@@ -1688,6 +1688,11 @@ dnl Provide configure switches and initialize clooginc & clooglibs
 dnl with user input.
 CLOOG_INIT_FLAGS
 if test "x$with_ppl" = "xno"; then
+  dnl Only execute fail-action, if CLooG has been requested.
+  CLOOG_REQUESTED([graphite_requested=yes], [graphite_requested=no])
+  if test "${graphite_requested}" = yes; then
+    AC_MSG_ERROR([Unable to find a usable PPL.  See config.log for details.])
+  fi
   with_cloog=no
 fi
 if test "x${with_cloog}" = x && test "x${with_cloog_include}" = x \
@@ -1696,24 +1701,15 @@ if test "x${with_cloog}" = x && test "x${with_cloog_include}" = x \
   clooginc='-I$$r/$(HOST_SUBDIR)/cloog/include -I$$s/cloog/include '
 fi
 if test "x$with_cloog" != "xno"; then
-  dnl Version check for CLooG-Org
-  dnl As long as there is no new release of CLooG,
-  dnl we will check for 0.14.0.
+  dnl The minimal version of CLooG required for Graphite.
   dnl
-  dnl The first git revision that will work with
-  dnl GCC is: bd91b845a65805c290d43fc1bef8139864a163fb
-  dnl This is enforced implictly, as this is the commit that
-  dnl introduced the versioning information used within our
-  dnl checks.
-  dnl
-  dnl If we're using CLooG-Legacy, the provided version information
-  dnl will be ignored.
-  CLOOG_CHECK_VERSION(0,14,0)
+  dnl If we use CLooG-Legacy, the provided version information is
+  dnl ignored.
+  CLOOG_CHECK_VERSION(0,16,1)
 
-  dnl Only execute fail-action, if CLooG has been
-  dnl requested.
+  dnl Only execute fail-action, if CLooG has been requested.
   CLOOG_IF_FAILED([
-    AC_MSG_ERROR([Unable to find a usable CLooG. See config.log for details.])])
+    AC_MSG_ERROR([Unable to find a usable CLooG.  See config.log for details.])])
 fi
 
 # Check for LTO support.
