@@ -38,7 +38,7 @@ config.guess; config.sub; readline/support/config.{sub,guess}
 		binutils@sourceware.org
 		gdb-patches@sourceware.org
 
-depcomp
+depcomp; mkinstalldirs
         Send bug reports and patches to bug-automake@gnu.org.
 
 gdb/; readline/; sim/; GDB's part of include/
@@ -69,12 +69,8 @@ ltconfig; ltmain.sh; ltcf-*.sh
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-mkinstalldirs; move-if-change
-	autoconf: http://gnu.org
-	Patches to autoconf-patches@gnu.org.
-	Changes need to be done in tandem with the official AUTOCONF
-	sources or submitted to the master file maintainer and brought
-	in via a merge.
+move-if-change
+	Send bug reports and patches to bug-gnulib@gnu.org.
 
 symlink-tree
 	gcc: http://gcc.gnu.org
