@@ -1,8 +1,0 @@
-LIBRARY dplayx.dll
-EXPORTS
-DirectPlayCreate@12
-DirectPlayEnumerate@8
-DirectPlayEnumerateA@8
-DirectPlayEnumerateW@8
-DirectPlayLobbyCreateA@20
-DirectPlayLobbyCreateW@20
