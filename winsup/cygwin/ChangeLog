@@ -1,3 +1,11 @@
+2011-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (struct _FAST_CWD): Redefine to new layout used since patch
+	for KB 2393802.  Adjust comments throughout.
+	(struct _FAST_CWD_OLD): Rename former definition.
+	(cwdstuff::override_win32_cwd): Check if the OS is using the old or the
+	new FAST_CWD structure layout and handle accordingly.
+
 2011-02-11  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* mkstatic: Make sure that we are not cd'ed to temporary directory on

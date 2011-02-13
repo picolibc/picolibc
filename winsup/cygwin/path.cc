@@ -3432,6 +3432,20 @@ cygwin_split_path (const char *path, char *dir, char *file)
    minimal locking and it's much more multi-thread friendly.  Presumably
    it minimizes contention when accessing the CWD. */
 typedef struct _FAST_CWD {
+  UNICODE_STRING Path;			/* Path's Buffer member always refers
+					   to the following Buffer array. */
+  HANDLE         DirectoryHandle;
+  LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
+  LONG           ReferenceCount;	/* Only release when this is 0. */
+  ULONG          OldDismountCount;	/* Reflects the system DismountCount
+					   at the time the CWD has been set. */
+  WCHAR          Buffer[MAX_PATH];
+} FAST_CWD, *PFAST_CWD;
+
+/* This is the old FAST_CWD structure up to the patch from KB 2393802,
+   release in February 2011.  Hopefully it's not used for long anymore,
+   but for quite some time we can't rely on this fact. */
+typedef struct _FAST_CWD_OLD {
   LONG           ReferenceCount;	/* Only release when this is 0. */
   HANDLE         DirectoryHandle;
   ULONG          OldDismountCount;	/* Reflects the system DismountCount
@@ -3439,7 +3453,7 @@ typedef struct _FAST_CWD {
   UNICODE_STRING Path;			/* Path's Buffer member always refers
 					   to the following Buffer array. */
   WCHAR          Buffer[MAX_PATH];
-} FAST_CWD, *PFAST_CWD;
+} FAST_CWD_OLD, *PFAST_CWD_OLD;
 
 /* fast_cwd_ptr is a pointer to the global pointer in ntdll.dll pointing
    to the FAST_CWD structure which constitutes the CWD.
@@ -3556,7 +3570,10 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	     fast_cwd_ptr, we can simply replace the RtlSetCurrentDirectory_U
 	     function entirely, just as on pre-Vista. */
 	  PVOID heap = peb.ProcessHeap;
-	  /* First allocate a new FAST_CWD strcuture on the heap. */
+	  /* First allocate a new FAST_CWD structure on the heap.
+	     The new FAST_CWD structure is 4 byte bigger than the old one,
+	     but we simply don't care, so we allocate always room for the
+	     new one. */
 	  PFAST_CWD f_cwd = (PFAST_CWD)
 			    RtlAllocateHeap (heap, 0, sizeof (FAST_CWD));
 	  if (!f_cwd)
@@ -3564,35 +3581,82 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	      debug_printf ("RtlAllocateHeap failed");
 	      return;
 	    }
-	  /* Fill in the values. */
-	  f_cwd->ReferenceCount = 1;
-	  f_cwd->DirectoryHandle = dir;
-	  f_cwd->OldDismountCount = old_dismount_count;
-	  RtlInitEmptyUnicodeString (&f_cwd->Path, f_cwd->Buffer,
-				     MAX_PATH * sizeof (WCHAR));
-	  copy_cwd_str (&f_cwd->Path, error ? &ro_u_pipedir : &win32);
-	  /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
-	     structure and writing the CWD to the user process parameter
-	     block.  This is equivalent to calling RtlAcquirePebLock/
-	     RtlReleasePebLock, but without having to go through the FS
-	     selector again. */
-	  RtlEnterCriticalSection (peb.FastPebLock);
-	  PFAST_CWD old_cwd = *fast_cwd_ptr;
-	  *fast_cwd_ptr = f_cwd;
-	  upp_cwd_str = f_cwd->Path;
-	  upp_cwd_hdl = dir;
-	  RtlLeaveCriticalSection (peb.FastPebLock);
-	  /* Decrement the reference count.  If it's down to 0, free structure
-	     from heap. */
-	  if (old_cwd && InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+	  /* Fill in the values.  Fortunately it's simple to check for the
+	     new structure.  Path.MaximumLength takes the same space as the
+	     high word of the old ReferenceCount.  We know that MaximumLength
+	     is always MAX_PATH.  For the ref count this would account for a
+	     pratically impossible value between 34078720 and 34079240. */
+	  if ((*fast_cwd_ptr)->Path.MaximumLength == MAX_PATH * sizeof (WCHAR))
 	    {
-	      /* In contrast to pre-Vista, the handle on init is always a fresh
-		 one and not the handle inherited from the parent process.  So
-		 we always have to close it here.  However, the handle could
-		 be NULL, if we cd'ed into a virtual dir. */
-	      if (old_cwd->DirectoryHandle)
-		NtClose (old_cwd->DirectoryHandle);
-	      RtlFreeHeap (heap, 0, old_cwd);
+	      /* New FAST_CWD structure. */
+	      IO_STATUS_BLOCK io;
+	      FILE_FS_DEVICE_INFORMATION ffdi;
+
+	      RtlInitEmptyUnicodeString (&f_cwd->Path, f_cwd->Buffer,
+					 MAX_PATH * sizeof (WCHAR));
+	      f_cwd->DirectoryHandle = dir;
+	      /* The new structure stores the device characteristics of the
+		 volume holding the dir.  RtlGetCurrentDirectory_U checks
+		 if the FILE_REMOVABLE_MEDIA flag is set and, if so, checks if
+		 the volume is still the same as the one used when opening
+		 the directory handle.
+		 We don't call NtQueryVolumeInformationFile for the \\?\PIPE,
+		 though.  It just returns STATUS_INVALID_HANDLE anyway. */
+	      f_cwd->FSCharacteristics = 
+		(!error
+		 && NT_SUCCESS (NtQueryVolumeInformationFile (dir, &io, &ffdi,
+				       sizeof ffdi, FileFsDeviceInformation)))
+		? ffdi.Characteristics : 0;
+	      f_cwd->ReferenceCount = 1;
+	      f_cwd->OldDismountCount = old_dismount_count;
+	      copy_cwd_str (&f_cwd->Path, error ? &ro_u_pipedir : &win32);
+	      /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
+		 structure and writing the CWD to the user process parameter
+		 block.  This is equivalent to calling RtlAcquirePebLock/
+		 RtlReleasePebLock, but without having to go through the FS
+		 selector again. */
+	      RtlEnterCriticalSection (peb.FastPebLock);
+	      PFAST_CWD old_cwd = *fast_cwd_ptr;
+	      *fast_cwd_ptr = f_cwd;
+	      upp_cwd_str = f_cwd->Path;
+	      upp_cwd_hdl = dir;
+	      RtlLeaveCriticalSection (peb.FastPebLock);
+	      /* Decrement the reference count.  If it's down to 0, free
+		 structure from heap. */
+	      if (InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+		{
+		  /* In contrast to pre-Vista, the handle on init is always a
+		     fresh one and not the handle inherited from the parent
+		     process.  So we always have to close it here.  However, the
+		     handle could be NULL, if we cd'ed into a virtual dir. */
+		  if (old_cwd->DirectoryHandle)
+		    NtClose (old_cwd->DirectoryHandle);
+		  RtlFreeHeap (heap, 0, old_cwd);
+		}
+	    }
+	  else
+	    {
+	      /* Old FAST_CWD structure.  Otherwise same procedure as above,
+	         except for the non-existant FSCharacteristics member. */
+	      PFAST_CWD_OLD f_cwd_old = (PFAST_CWD_OLD) f_cwd;
+	      f_cwd_old->ReferenceCount = 1;
+	      f_cwd_old->DirectoryHandle = dir;
+	      f_cwd_old->OldDismountCount = old_dismount_count;
+	      RtlInitEmptyUnicodeString (&f_cwd_old->Path, f_cwd_old->Buffer,
+					 MAX_PATH * sizeof (WCHAR));
+	      copy_cwd_str (&f_cwd_old->Path, error ? &ro_u_pipedir : &win32);
+	      RtlEnterCriticalSection (peb.FastPebLock);
+	      PFAST_CWD_OLD old_cwd = (PFAST_CWD_OLD) *fast_cwd_ptr;
+	      *fast_cwd_ptr = (PFAST_CWD) f_cwd_old;
+	      upp_cwd_str = f_cwd_old->Path;
+	      upp_cwd_hdl = dir;
+	      RtlLeaveCriticalSection (peb.FastPebLock);
+	      if (InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+		{
+		  if (old_cwd->DirectoryHandle)
+		    NtClose (old_cwd->DirectoryHandle);
+		  RtlFreeHeap (heap, 0, old_cwd);
+		}
 	    }
 	}
       else
@@ -3636,8 +3700,12 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	  PFAST_CWD f_cwd = (PFAST_CWD)
 			    ((PBYTE) upp_cwd_str.Buffer
 			     - __builtin_offsetof (struct _FAST_CWD, Buffer));
+	  if (f_cwd->Path.MaximumLength == MAX_PATH * sizeof (WCHAR))
+	    f_cwd->DirectoryHandle = dir;
+	  else
+	    ((PFAST_CWD_OLD) f_cwd)->DirectoryHandle = dir;
 	  h = upp_cwd_hdl;
-	  f_cwd->DirectoryHandle = upp_cwd_hdl = dir;
+	  upp_cwd_hdl = dir;
 	  RtlLeaveCriticalSection (peb.FastPebLock);
 	  /* In contrast to pre-Vista, the handle on init is always a fresh one
 	     and not the handle inherited from the parent process.  So we always
