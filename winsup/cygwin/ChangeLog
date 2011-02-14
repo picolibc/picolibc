@@ -1,3 +1,7 @@
+2011-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* config/i386/profile.h: Sync with Mingw.
+
 2011-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (struct _FAST_CWD): Redefine to new layout used since patch
