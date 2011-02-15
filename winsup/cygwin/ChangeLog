@@ -1,5 +1,11 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procsys.cc (fhandler_procsys::opendir): Avoid SEGV if
+	opening object directory fails.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Don't leak memory.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Don't
 	append slash if there is one already.
 

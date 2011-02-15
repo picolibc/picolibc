@@ -1,6 +1,6 @@
 /* fhandler_virtual.cc: base fhandler class for virtual filesystems
 
-   Copyright 2002, 2003, 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,6 +59,7 @@ fhandler_virtual::opendir (int fd)
   else if ((dir->__d_dirent =
       (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
     {
+      free (dir->__d_dirname);
       free (dir);
       set_errno (ENOMEM);
     }

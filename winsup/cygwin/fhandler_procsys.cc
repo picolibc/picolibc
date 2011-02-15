@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -245,18 +245,20 @@ fhandler_procsys::opendir (int fd)
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
   HANDLE h;
-  DIR *dir = fhandler_virtual::opendir (fd);
+  DIR *dir;
 
   mk_unicode_path (&path);
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenDirectoryObject (&h, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
-      free (dir);
       __seterrno_from_nt_status (status);
       return NULL;
     }
-  dir->__handle = h;
+  if (!(dir = fhandler_virtual::opendir (fd)))
+    NtClose (h);
+  else
+    dir->__handle = h;
   return dir;
 }
 
