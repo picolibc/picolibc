@@ -49,6 +49,16 @@ it now obeys POSIX semantics of returning int.
 </para></listitem>
 
 <listitem><para>
+/proc/sys now allows unfiltered access to the native NT namespace.  Access
+restrictions still apply.  Direct device access via /proc/sys is not yet
+supported.  File system access via block devices works.  For instance
+(note the trailing backslash!)
+<screen>
+bash$ cd /proc/sys/Device/HarddiskVolumeShadowCopy1/
+</screen>
+</para></listitem>
+
+<listitem><para>
 Other new APIs: llround, llroundf, madvise, pthread_yield.
 Export program_invocation_name, program_invocation_short_name.
 Support TIOCGPGRP, TIOCSPGRP ioctls.
