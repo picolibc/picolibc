@@ -1,7 +1,7 @@
 /* globals.cc - Define global variables here.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -99,7 +99,7 @@ UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
 UNICODE_STRING _RDATA ro_u_scr = _ROU (L".scr");
 UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
 UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
-UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\device\\physicalmemory");
+UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\Device\\PhysicalMemory");
 UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
 UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");
 UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");
@@ -114,6 +114,7 @@ UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
 UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
 UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
 UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
+UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");
 #undef _ROU
 
 /* Cygwin properties are meant to be readonly data placed in the DLL, but

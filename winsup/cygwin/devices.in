@@ -59,28 +59,28 @@ const device dev_bad_storage =
 %storage_here
 }
 %%
-"/dev/tty", BRACK(FH_TTY), "\\dev\\tty"
-"/dev/tty%(0-63)d", BRACK(FHDEV(DEV_TTYS_MAJOR, {$1})), "\\dev\\tty{$1}", ttys_dev
-"/dev/console", BRACK(FH_CONSOLE), "\\dev\\console", console_dev
-"/dev/ttym", BRACK(FH_TTYM), "\\dev\\ttym", ttym_dev
-"/dev/ptmx", BRACK(FH_PTYM), "\\dev\\ptmx"
-"/dev/windows", BRACK(FH_WINDOWS), "\\dev\\windows"
-"/dev/dsp", BRACK(FH_OSS_DSP), "\\dev\\dsp"
-"/dev/conin", BRACK(FH_CONIN), "conin"
-"/dev/conout", BRACK(FH_CONOUT), "conout"
+"/dev/tty", BRACK(FH_TTY), "/dev/tty"
+"/dev/tty%(0-63)d", BRACK(FHDEV(DEV_TTYS_MAJOR, {$1})), "/dev/tty{$1}", ttys_dev
+"/dev/console", BRACK(FH_CONSOLE), "/dev/console", console_dev
+"/dev/ttym", BRACK(FH_TTYM), "/dev/ttym", ttym_dev
+"/dev/ptmx", BRACK(FH_PTYM), "/dev/ptmx"
+"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows"
+"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp"
+"/dev/conin", BRACK(FH_CONIN), "/dev/conin"
+"/dev/conout", BRACK(FH_CONOUT), "/dev/conout"
 "/dev/null", BRACK(FH_NULL), "\\Device\\Null"
-"/dev/zero", BRACK(FH_ZERO), "\\dev\\zero"
-"/dev/full", BRACK(FH_FULL), "\\dev\\full"
-"/dev/random", BRACK(FH_RANDOM), "\\dev\\random"
-"/dev/urandom", BRACK(FH_URANDOM), "\\dev\\urandom", urandom_dev
-"/dev/mem", BRACK(FH_MEM), "\\dev\\mem"
-"/dev/kmem", BRACK(FH_KMEM), "\\dev\\mem"
-"/dev/clipboard", BRACK(FH_CLIPBOARD), "\\dev\\clipboard"
-"/dev/port", BRACK(FH_PORT), "\\dev\\port"
+"/dev/zero", BRACK(FH_ZERO), "/dev/zero"
+"/dev/full", BRACK(FH_FULL), "/dev/full"
+"/dev/random", BRACK(FH_RANDOM), "/dev/random"
+"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", urandom_dev
+"/dev/mem", BRACK(FH_MEM), "/dev/mem"
+"/dev/kmem", BRACK(FH_KMEM), "/dev/mem"
+"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard"
+"/dev/port", BRACK(FH_PORT), "/dev/port"
 "/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}"
 "/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}"
-"/dev/pipe", BRACK(FH_PIPE), "\\dev\\pipe"
-"/dev/fifo", BRACK(FH_FIFO), "\\dev\\fifo"
+"/dev/pipe", BRACK(FH_PIPE), "/dev/pipe"
+"/dev/fifo", BRACK(FH_FIFO), "/dev/fifo"
 "/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}"
 "/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}"
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}"

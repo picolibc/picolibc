@@ -1,5 +1,31 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.in: Throughout use slashes instead of backslashes in the
+	native path of devices not backed by native NT devices.
+	* devices.cc: Regenerate.
+	* globals.cc (ro_u_pmem): Use correct case.
+	(ro_u_globalroot): New R/O unicode string.
+	* path.cc (path_conv::check): Fix incorrect handling of /proc/sys
+	block devices if they are just visited due to a component check.
+	(symlink_info::posixify): Fix typo in comment.
+	(cygwin_conv_path): Use ro_u_globalroot instead of string constant.
+	(fast_cwd_version): New shared variable to store FAST_CWD version
+	used on the system.
+	(find_fast_cwd_pointer): Rename from find_fast_cwd_pointers.  Don't
+	set global fast_cwd_ptr pointer here.  Return pointer value instead.
+	(find_fast_cwd): New function to set fast_cwd_ptr and fast_cwd_version.
+	(cwdstuff::override_win32_cwd): Call find_fast_cwd from here.
+	Check for fast_cwd_version to differ between old and new FAST_CWD
+	structure.  Check old_cwd for NULL to avoid SEGV.  Don't set CWD if
+	we have neitehr a valid fast_cwd_ptr, nor a valid CWD handle in the
+	process parameter block.
+	(cwdstuff::set): Create Win32 path taking /proc/sys paths into account.
+	* spawn.cc (spawn_guts): Recode creating runpath.  Also take /proc/sys
+	paths into account.  Drop special CWD handling when starting non-Cygwin
+	processes.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procsys.cc (fhandler_procsys::opendir): Avoid SEGV if
 	opening object directory fails.
 	* fhandler_virtual.cc (fhandler_virtual::opendir): Don't leak memory.

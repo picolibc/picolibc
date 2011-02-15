@@ -786,17 +786,12 @@ path_conv::check (const char *src, unsigned opt,
 		       requested, the target is the root directory of the
 		       filesystem on this block device.  So we convert this to
 		       a real file and attach the backslash. */
-		    if (component || need_directory)
+		    if (component == 0 && need_directory)
 		      {
 			dev.parse (FH_FS);
-			if (component == 0)
-			  {
-			    strcat (full_path, "\\");
-			    fileattr = FILE_ATTRIBUTE_DIRECTORY
-				       | FILE_ATTRIBUTE_DEVICE;
-			  }
-			else
-			  fileattr = 0;
+			strcat (full_path, "\\");
+			fileattr = FILE_ATTRIBUTE_DIRECTORY
+				   | FILE_ATTRIBUTE_DEVICE;
 			goto out;
 		      }
 		    /*FALLTHRU*/
@@ -1996,7 +1991,7 @@ symlink_info::posixify (char *srcbuf)
      A path starting with two slashes(!) or backslashes is converted into an
      NT UNC path.  Unfortunately, in contrast to POSIX rules, paths starting
      with three or more (back)slashes are also converted into UNC paths,
-     just incorrectly sticking to one redundant leading backslashe.  We go
+     just incorrectly sticking to one redundant leading backslash.  We go
      along with this behaviour to avoid scenarios in which native tools access
      other files than Cygwin.
      The above rules are used exactly the same way on Cygwin specific symlinks
@@ -2940,7 +2935,10 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  {
 	    /* Device name points to somewhere else in the NT namespace. 
 	       Use GLOBALROOT prefix to convert to Win32 path. */
-	    char *p = stpcpy (buf, "\\\\.\\GLOBALROOT");
+	    char *p = buf + sys_wcstombs (buf, NT_MAX_PATH,
+					  ro_u_globalroot.Buffer,
+					  ro_u_globalroot.Length
+					  / sizeof (WCHAR));
 	    sys_wcstombs (p, NT_MAX_PATH - (p - buf),
 			  up->Buffer, up->Length / sizeof (WCHAR));
 	  }
@@ -3001,8 +2999,8 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	{
 	  /* Device name points to somewhere else in the NT namespace. 
 	     Use GLOBALROOT prefix to convert to Win32 path. */
-	  to = (void *) wcpcpy ((wchar_t *) to, L"\\\\.\\GLOBALROOT");
-	  lsiz += sizeof ("\\\\.\\GLOBALROOT") - 1;
+	  to = (void *) wcpcpy ((wchar_t *) to, ro_u_globalroot.Buffer);
+	  lsiz += ro_u_globalroot.Length / sizeof (WCHAR);
 	}
       /* TODO: Same ".\\" band-aid as in CCP_POSIX_TO_WIN_A case. */
       if (relative && !strcmp ((const char *) from, ".")
@@ -3378,7 +3376,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
 
 /*****************************************************************************/
 
-/* The find_fast_cwd_pointers function and parts of the
+/* The find_fast_cwd_pointer function and parts of the
    cwdstuff::override_win32_cwd method are based on code using the
    following license:
 
@@ -3444,11 +3442,16 @@ typedef struct _FAST_CWD_OLD {
    to the FAST_CWD structure which constitutes the CWD.
 
    We put the pointer into the common shared DLL segment.  This allows to
-   restrict the call to find_fast_cwd_pointers() to once per Cygwin session
+   restrict the call to find_fast_cwd_pointer() to once per Cygwin session
    per user session.  This works, because ASLR randomizes the load address
    of DLLs only once at boot time. */
 static PFAST_CWD *fast_cwd_ptr
   __attribute__((section (".cygwin_dll_common"), shared)) = (PFAST_CWD *) -1;
+/* Type of FAST_CWD used on this system.  Keeping this information available
+   in shared memory avoids to test for the version every time around. 
+   Default to new version. */
+static int fast_cwd_version
+  __attribute__((section (".cygwin_dll_common"), shared)) = 1;
 
 /* This is the mapping of the KUSER_SHARED_DATA structure into the 32 bit
    user address space.  We need it here to access the current DismountCount. */
@@ -3465,25 +3468,23 @@ static KUSER_SHARED_DATA &SharedUserData
    This code has been tested on Vista 32/64 bit, Server 2008 32/64 bit,
    Windows 7 32/64 bit, and Server 2008 R2 (which is only 64 bit anyway).
    There's some hope that this will still work for Windows 8... */
-static void
-find_fast_cwd_pointers ()
+static PFAST_CWD *
+find_fast_cwd_pointer ()
 {
-  /* Note that we have been called. */
-  fast_cwd_ptr = NULL;
   /* Fetch entry points of relevant functions in ntdll.dll. */
   HMODULE ntdll = GetModuleHandle ("ntdll.dll");
   if (!ntdll)
-    return;
+    return NULL;
   const uint8_t *get_dir = (const uint8_t *)
 			   GetProcAddress (ntdll, "RtlGetCurrentDirectory_U");
   const uint8_t *ent_crit = (const uint8_t *)
 			    GetProcAddress (ntdll, "RtlEnterCriticalSection");
   if (!get_dir || !ent_crit)
-    return;
+    return NULL;
   /* Search first relative call instruction in RtlGetCurrentDirectory_U. */
   const uint8_t *rcall = (const uint8_t *) memchr (get_dir, 0xe8, 32);
   if (!rcall)
-    return;
+    return NULL;
   /* Fetch offset from instruction and compute address of called function.
      This function actually fetches the current FAST_CWD instance and
      performs some other actions, not important to us. */
@@ -3495,27 +3496,27 @@ find_fast_cwd_pointers ()
      "push edi". */
   const uint8_t *movedi = pushedi + 1;
   if (movedi[0] != 0xbf || movedi[5] != 0x57)
-    return;
+    return NULL;
   /* Compare the address used for the critical section with the known
      PEB lock as stored in the PEB. */
   if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
       != NtCurrentTeb ()->Peb->FastPebLock)
-    return;
+    return NULL;
   /* To check we are seeing the right code, we check our expectation that
      the next instruction is a relative call into RtlEnterCriticalSection. */
   rcall = movedi + 6;
   if (rcall[0] != 0xe8)
-    return;
+    return NULL;
   /* Check that this is a relative call to RtlEnterCriticalSection. */
   offset = (ptrdiff_t) peek32 (rcall + 1);
   if (rcall + 5 + offset != ent_crit)
-    return;
+    return NULL;
   /* After locking the critical section, the code should read the global
      PFAST_CWD * pointer that is guarded by that critical section. */
   const uint8_t *movesi = rcall + 5;
   if (movesi[0] != 0x8b)
-    return;
-  fast_cwd_ptr = (PFAST_CWD *) peek32 (movesi + 2);
+    return NULL;
+  return (PFAST_CWD *) peek32 (movesi + 2);
 }
 
 static inline void
@@ -3529,10 +3530,66 @@ copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
     }
 }
 
+static PFAST_CWD *
+find_fast_cwd ()
+{
+  /* Fetch the pointer but don't set the global fast_cwd_ptr yet.  First
+     we have to make sure we know the version of the FAST_CWD structure
+     used on the system. */
+  PFAST_CWD *f_cwd_ptr = find_fast_cwd_pointer ();
+  if (!f_cwd_ptr)
+    system_printf ("WARNING: Couldn't compute FAST_CWD pointer.  "
+		   "Please report this problem to\nthe public mailing "
+		   "list cygwin@cygwin.com");
+  if (f_cwd_ptr && *f_cwd_ptr)
+    {
+      /* Fortunately it's simple to check for the new structure.
+	 Path.MaximumLength takes the same space as the high word of
+	 the old ReferenceCount.  We know that MaximumLength is always
+	 MAX_PATH.  For the ref count this would account for a
+	 pratically impossible value between 34078720 and 34079240. */
+      fast_cwd_version = ((*f_cwd_ptr)->Path.MaximumLength
+			  == MAX_PATH * sizeof (WCHAR)) ? 1 : 0;
+    }
+  else
+    {
+      /* If we couldn't fetch fast_cwd_ptr, or if fast_cwd_ptr is
+	 NULL(*) we have to figure out the version from the Buffer
+	 pointer in the ProcessParameters.  We must make sure not
+	 to access memory outside of the structure.  Therefore we
+	 check the Path.Buffer pointer,
+	 which would be the ReferenceCount in the old structure.
+
+	 (*) This is very unlikely to happen when starting the first
+	 Cygwin process, since it only happens when starting the
+	 process in a directory which can't be used as CWD by Win32, or
+	 if the directory doesn't exist.  But *if* it happens, we have
+	 no valid FAST_CWD structure, even though upp_cwd_str.Buffer is
+	 not NULL in that case.  So we let the OS create a valid
+	 FAST_CWD structure temporarily to have something to work with. 
+	 We know the pipe FS works. */
+      PEB &peb = *NtCurrentTeb ()->Peb;
+
+      if (f_cwd_ptr	/* so *f_cwd_ptr == NULL */
+	  && !NT_SUCCESS (RtlSetCurrentDirectory_U (&ro_u_pipedir))) 
+	api_fatal ("Couldn't set directory to %S temporarily.\n"
+		   "Cannot continue.", &ro_u_pipedir);
+      RtlEnterCriticalSection (peb.FastPebLock);
+      PFAST_CWD f_cwd = (PFAST_CWD)
+		((PBYTE) peb.ProcessParameters->CurrentDirectoryName.Buffer
+		 - __builtin_offsetof (struct _FAST_CWD, Buffer));
+      fast_cwd_version = (f_cwd->Path.Buffer == f_cwd->Buffer) ? 1 : 0;
+      RtlLeaveCriticalSection (peb.FastPebLock);
+    }
+  /* Eventually, after we set the version as well, set fast_cwd_ptr. */
+  return f_cwd_ptr;
+}
+
 void
 cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 {
   NTSTATUS status;
+  IO_STATUS_BLOCK io;
   HANDLE h = NULL;
 
   PEB &peb = *NtCurrentTeb ()->Peb;
@@ -3542,13 +3599,7 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
   if (wincap.has_fast_cwd ())
     {
       if (fast_cwd_ptr == (PFAST_CWD *) -1)
-	{
-	  find_fast_cwd_pointers ();
-	  if (!fast_cwd_ptr)
-	    system_printf ("WARNING: Couldn't compute FAST_CWD pointer.  "
-			   "Please report this problem to\nthe public mailing "
-			   "list cygwin@cygwin.com");
-	}
+	fast_cwd_ptr = find_fast_cwd ();
       if (fast_cwd_ptr)
 	{
 	  /* Default method starting with Vista.  If we got a valid value for
@@ -3566,15 +3617,10 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	      debug_printf ("RtlAllocateHeap failed");
 	      return;
 	    }
-	  /* Fill in the values.  Fortunately it's simple to check for the
-	     new structure.  Path.MaximumLength takes the same space as the
-	     high word of the old ReferenceCount.  We know that MaximumLength
-	     is always MAX_PATH.  For the ref count this would account for a
-	     pratically impossible value between 34078720 and 34079240. */
-	  if ((*fast_cwd_ptr)->Path.MaximumLength == MAX_PATH * sizeof (WCHAR))
+	  /* Fill in the values. */
+	  if (fast_cwd_version)
 	    {
 	      /* New FAST_CWD structure. */
-	      IO_STATUS_BLOCK io;
 	      FILE_FS_DEVICE_INFORMATION ffdi;
 
 	      RtlInitEmptyUnicodeString (&f_cwd->Path, f_cwd->Buffer,
@@ -3608,7 +3654,8 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	      RtlLeaveCriticalSection (peb.FastPebLock);
 	      /* Decrement the reference count.  If it's down to 0, free
 		 structure from heap. */
-	      if (InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+	      if (old_cwd
+		  && InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
 		{
 		  /* In contrast to pre-Vista, the handle on init is always a
 		     fresh one and not the handle inherited from the parent
@@ -3621,8 +3668,8 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	    }
 	  else
 	    {
-	      /* Old FAST_CWD structure.  Otherwise same procedure as above,
-	         except for the non-existant FSCharacteristics member. */
+	      /* Old FAST_CWD structure.  Same procedure as above, except for
+		 the non-existant FSCharacteristics member. */
 	      PFAST_CWD_OLD f_cwd_old = (PFAST_CWD_OLD) f_cwd;
 	      f_cwd_old->ReferenceCount = 1;
 	      f_cwd_old->DirectoryHandle = dir;
@@ -3636,7 +3683,8 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	      upp_cwd_str = f_cwd_old->Path;
 	      upp_cwd_hdl = dir;
 	      RtlLeaveCriticalSection (peb.FastPebLock);
-	      if (InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
+	      if (old_cwd
+		  && InterlockedDecrement (&old_cwd->ReferenceCount) == 0)
 		{
 		  if (old_cwd->DirectoryHandle)
 		    NtClose (old_cwd->DirectoryHandle);
@@ -3681,14 +3729,23 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 		  return;
 		}
 	    }
+	  else if (upp_cwd_hdl == NULL)
+	    return;
 	  RtlEnterCriticalSection (peb.FastPebLock);
-	  PFAST_CWD f_cwd = (PFAST_CWD)
-			    ((PBYTE) upp_cwd_str.Buffer
-			     - __builtin_offsetof (struct _FAST_CWD, Buffer));
-	  if (f_cwd->Path.MaximumLength == MAX_PATH * sizeof (WCHAR))
-	    f_cwd->DirectoryHandle = dir;
+	  if (fast_cwd_version)
+	    {
+	      PFAST_CWD f_cwd = (PFAST_CWD)
+			((PBYTE) upp_cwd_str.Buffer
+			 - __builtin_offsetof (struct _FAST_CWD, Buffer));
+	      f_cwd->DirectoryHandle = dir;
+	    }
 	  else
-	    ((PFAST_CWD_OLD) f_cwd)->DirectoryHandle = dir;
+	    {
+	      PFAST_CWD_OLD f_cwd_old = (PFAST_CWD_OLD)
+			((PBYTE) upp_cwd_str.Buffer
+			 - __builtin_offsetof (struct _FAST_CWD_OLD, Buffer));
+	      f_cwd_old->DirectoryHandle = dir;
+	    }
 	  h = upp_cwd_hdl;
 	  upp_cwd_hdl = dir;
 	  RtlLeaveCriticalSection (peb.FastPebLock);
@@ -3878,21 +3935,32 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
     }
   else
     {
-      if (virtual_path) /* don't mangle virtual path. */
-	;
-      else
+      if (!virtual_path) /* don't mangle virtual path. */
 	{
-	  /* Compute length on Win32 path. */
-	  size_t len = upath.Length / sizeof (WCHAR) - 4;
-	  if (RtlEqualUnicodePathPrefix (&upath, &ro_u_uncp, TRUE))
+	  /* Convert into Win32 path and compute length. */
+	  if (upath.Buffer[1] == L'?')
 	    {
-	      len -= 2;
-	      unc_path = true;
+	      upath.Buffer += 4;
+	      upath.Length -= 4 * sizeof (WCHAR);
+	      if (upath.Buffer[1] != L':')
+		{
+		  /* UNC path */
+		  upath.Buffer += 2;
+		  upath.Length -= 2 * sizeof (WCHAR);
+		  unc_path = true;
+		}
 	    }
-	  /* Convert to a Win32 path. */
-	  upath.Buffer += upath.Length / sizeof (WCHAR) - len;
-	  upath.Length = len * sizeof (WCHAR);
-
+	  else
+	    {
+	      /* Path via native NT namespace.  Prepend GLOBALROOT prefix
+	         to create a valid Win32 path. */
+	      PWCHAR buf = (PWCHAR) alloca (upath.Length
+					    + ro_u_globalroot.Length
+					    + sizeof (WCHAR));
+	      wcpcpy (wcpcpy (buf, ro_u_globalroot.Buffer), upath.Buffer);
+	      upath.Buffer = buf;
+	      upath.Length += ro_u_globalroot.Length;
+	    }
 	  PWSTR eoBuffer = upath.Buffer + (upath.Length / sizeof (WCHAR));
 	  /* Remove trailing slash if one exists. */
 	  if ((eoBuffer - upath.Buffer) > 3 && eoBuffer[-1] == L'\\')

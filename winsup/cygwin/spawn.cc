@@ -490,26 +490,43 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 	system_printf ("duplicate to pid_handle failed, %E");
     }
 
-  runpath = null_app_name ? NULL : real_path.get_wide_win32_path (runpath);
-  if (runpath)
-    { /* If the executable path length is < MAX_PATH, make sure the long path
-	 win32 prefix is removed from the path to make subsequent native Win32
-	 child processes happy which are not long path aware. */
-      USHORT len = real_path.get_nt_native_path ()->Length;
-      if (len < (MAX_PATH + 4) * sizeof (WCHAR)
-	  || (runpath[5] != L':'				/* UNC path */
-	      && len < (MAX_PATH + 6) * sizeof (WCHAR)))
+  if (null_app_name)
+    runpath = NULL;
+  else
+    {
+      USHORT len = real_path.get_nt_native_path ()->Length / sizeof (WCHAR);
+      if (RtlEqualUnicodePathPrefix (real_path.get_nt_native_path (),
+				     &ro_u_natp, FALSE))
 	{
-	  PWCHAR r = runpath + 4;
-	  if (r[1] != L':') /* UNC path */
-	    *(r += 2) = L'\\';
-	  if (!RtlIsDosDeviceName_U (r))
-	    runpath = r;
-	  else if (*r == L'\\')
-	    *r = L'C';
+	  runpath = real_path.get_wide_win32_path (runpath);
+	  /* If the executable path length is < MAX_PATH, make sure the long
+	     path win32 prefix is removed from the path to make subsequent
+	     not long path aware native Win32 child processes happy. */
+	  if (len < MAX_PATH + 4)
+	    {
+	      if (runpath[5] == ':')
+		runpath += 4;
+	      else if (len < MAX_PATH + 6)
+		*(runpath += 6) = L'\\';
+	    }
+	}
+      else if (len < NT_MAX_PATH - ro_u_globalroot.Length / sizeof (WCHAR))
+	{
+	  UNICODE_STRING rpath;
+
+	  RtlInitEmptyUnicodeString (&rpath, runpath,
+				     (NT_MAX_PATH - 1) * sizeof (WCHAR));
+	  RtlCopyUnicodeString (&rpath, &ro_u_globalroot);
+	  RtlAppendUnicodeStringToString (&rpath,
+					  real_path.get_nt_native_path ());
+	}
+      else
+      	{
+	  set_errno (ENAMETOOLONG);
+	  res = -1;
+	  goto out;
 	}
     }
-
   syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
 		  runpath, wone_line);
 
@@ -551,14 +568,8 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 loop:
   cygheap->user.deimpersonate ();
 
-  PWCHAR cwd;
-  cwd = NULL;
   if (!real_path.iscygexec ())
-    {
-      myself->process_state |= PID_NOTCYGWIN;
-      cygheap->cwd.cwd_lock.acquire ();
-      cwd = cygheap->cwd.win32.Buffer;
-    }
+    myself->process_state |= PID_NOTCYGWIN;
 
   if (!cygheap->user.issetuid ()
       || (cygheap->user.saved_uid == cygheap->user.real_uid
@@ -573,7 +584,7 @@ loop:
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   envblock,	  /* environment */
-			   cwd,
+			   NULL,
 			   &si,
 			   &pi);
     }
@@ -636,7 +647,7 @@ loop:
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   envblock,	  /* environment */
-			   cwd,
+			   NULL,
 			   &si,
 			   &pi);
       if (hwst)
@@ -651,9 +662,6 @@ loop:
 	}
     }
 
-  if (!real_path.iscygexec())
-    cygheap->cwd.cwd_lock.release ();
-    
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY || !rc)
