@@ -1,5 +1,9 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Throughout fix copyright dates.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in: Throughout use slashes instead of backslashes in the
 	native path of devices not backed by native NT devices.
 	* devices.cc: Regenerate.

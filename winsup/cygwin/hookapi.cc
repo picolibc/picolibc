@@ -1,6 +1,6 @@
 /* hookapi.cc
 
-   Copyright 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
