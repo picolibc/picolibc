@@ -1,5 +1,12 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	Revert change from 2010-08-31:
+	* path.cc (normalize_posix_path): Drop support for //./ and //?/
+	prefixes.
+	(path_conv::check): Ditto.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Use POSIX
 	path to check for symlink.
 
