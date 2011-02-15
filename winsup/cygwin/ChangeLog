@@ -1,5 +1,10 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (spawn_guts): Only set PID_NOTCYGWIN in _P_OVERLAY mode.
+	Drop flag if creating new process failed.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Throughout fix copyright dates.
 
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>

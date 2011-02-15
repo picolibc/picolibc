@@ -568,7 +568,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 loop:
   cygheap->user.deimpersonate ();
 
-  if (!real_path.iscygexec ())
+  if (!real_path.iscygexec () && mode == _P_OVERLAY)
     myself->process_state |= PID_NOTCYGWIN;
 
   if (!cygheap->user.issetuid ()
@@ -680,6 +680,7 @@ loop:
 	  myself->sendsig = myself->exec_sendsig;
 	  myself->exec_sendsig = NULL;
 	}
+      myself->process_state &= ~PID_NOTCYGWIN;
       res = -1;
       goto out;
     }
