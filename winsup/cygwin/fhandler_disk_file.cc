@@ -1829,20 +1829,12 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
       if (RtlEqualUnicodeString (&uname, &ro_u_lnk, TRUE))
 	{
 	  tmp_pathbuf tp;
-	  UNICODE_STRING fbuf;
-
-	  tp.u_get (&fbuf);
-	  RtlCopyUnicodeString (&fbuf, pc.get_nt_native_path ());
-	  RtlAppendUnicodeToString (&fbuf, L"\\");
-	  RtlAppendUnicodeStringToString (&fbuf, fname);
-	  fbuf.Buffer += 4; /* Skip leading \??\ */
-	  fbuf.Length -= 4 * sizeof (WCHAR);
-	  if (fbuf.Buffer[1] != L':') /* UNC path */
-	    {
-	      *(fbuf.Buffer += 2) = L'\\';
-	      fbuf.Length -= 2 * sizeof (WCHAR);
-	    }
-	  path_conv fpath (&fbuf, PC_SYM_NOFOLLOW);
+	  char *file = tp.c_get ();
+	  char *p = stpcpy (file, pc.normalized_path);
+	  *p++ = '/';
+	  sys_wcstombs (p, NT_MAX_PATH - (p - file),
+			fname->Buffer, fname->Length / sizeof (WCHAR));
+	  path_conv fpath (file, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink ())
 	    {
 	      fname->Length -= 4 * sizeof (WCHAR);

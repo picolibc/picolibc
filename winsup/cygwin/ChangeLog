@@ -1,3 +1,8 @@
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Use POSIX
+	path to check for symlink.
+
 2011-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* config/i386/profile.h: Sync with Mingw.
