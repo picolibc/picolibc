@@ -1,5 +1,10 @@
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Don't
+	append slash if there is one already.
+
+2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	Revert change from 2010-08-31:
 	* path.cc (normalize_posix_path): Drop support for //./ and //?/
 	prefixes.

@@ -1831,7 +1831,8 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	  tmp_pathbuf tp;
 	  char *file = tp.c_get ();
 	  char *p = stpcpy (file, pc.normalized_path);
-	  *p++ = '/';
+	  if (p[-1] != '/')
+	    *p++ = '/';
 	  sys_wcstombs (p, NT_MAX_PATH - (p - file),
 			fname->Buffer, fname->Length / sizeof (WCHAR));
 	  path_conv fpath (file, PC_SYM_NOFOLLOW);
