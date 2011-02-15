@@ -52,7 +52,7 @@ it now obeys POSIX semantics of returning int.
 /proc/sys now allows unfiltered access to the native NT namespace.  Access
 restrictions still apply.  Direct device access via /proc/sys is not yet
 supported.  File system access via block devices works.  For instance
-(note the trailing backslash!)
+(note the trailing slash!)
 <screen>
 bash$ cd /proc/sys/Device/HarddiskVolumeShadowCopy1/
 </screen>
