@@ -5,6 +5,10 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Drop support for Windows NT4 prior to Service Pack 4.
+</para></listitem>
+
+<listitem><para>
 Reinstantiate Cygwin's ability to delete an empty directory which is the
 current working directory of the same or another process.  Same for any
 other empty directory which has been opened by the same or another process.
@@ -28,10 +32,6 @@ casinf, casinh, casinhf, catan, catanf, catanh, catanhf, ccos, ccosf, ccosh,
 ccoshf, cexp, cexpf, cimag, cimagf, clog, clogf, conj, conjf, cpow, cpowf,
 cproj, cprojf, creal, crealf, csin, csinf, csinh, csinhf, csqrt, csqrtf, ctan,
 ctanf, ctanh, ctanhf.
-</para></listitem>
-
-<listitem><para>
-Drop support for Windows NT4 prior to Service Pack 4.
 </para></listitem>
 
 <listitem><para>
