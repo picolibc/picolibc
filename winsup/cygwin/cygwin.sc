@@ -104,6 +104,7 @@ SECTIONS
   .cygheap ALIGN(__section_alignment__) :
   {
     . = . + (1024 * 1024);
+    . = ALIGN(0x10000);
     __cygheap_end = ABSOLUTE(.);
   }
   /DISCARD/ :

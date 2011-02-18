@@ -1,3 +1,7 @@
+2011-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc: Set alignment of .cygheap section to 64K.
+
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Only set PID_NOTCYGWIN in _P_OVERLAY mode.
