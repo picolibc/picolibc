@@ -1,3 +1,8 @@
+2011-02-18  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Add a CYGHEAP_DEBUG conditional for debugging
+	which allocates a lot of space at startup.
+
 2011-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc: Set alignment of .cygheap section to 64K.

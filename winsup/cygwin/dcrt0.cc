@@ -802,11 +802,20 @@ dll_crt0_1 (void *)
   malloc_init ();
   user_shared->initialize ();
 
-#ifdef CGF
+#ifdef CYGHEAP_DEBUG
   int i = 0;
   const int n = 2 * 1024 * 1024;
   while (i--)
-    small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
+    {
+      void *p = cmalloc (HEAP_STR, n);
+      if (p)
+	small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
+      else
+	{
+	  small_printf ("total allocated %p\n", (i - 1) * n);
+	  break;
+	}
+    }
 #endif
 
   ProtectHandle (hMainThread);
