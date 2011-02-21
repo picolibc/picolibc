@@ -1368,18 +1368,16 @@ int
 fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 			ssize_t tot)
 {
-  struct msghdr msg =
+  WSABUF wsabuf[iovcnt];
+  WSABUF *wsaptr = wsabuf + iovcnt;
+  const struct iovec *iovptr = iov + iovcnt;
+  while (--wsaptr >= wsabuf)
     {
-      msg_name:		NULL,
-      msg_namelen:	0,
-      msg_iov:		(struct iovec *) iov, // const_cast
-      msg_iovlen:	iovcnt,
-      msg_control:	NULL,
-      msg_controllen:	0,
-      msg_flags:	0
-    };
-
-  return recvmsg (&msg, 0);
+      wsaptr->len = (--iovptr)->iov_len;
+      wsaptr->buf = (char *) iovptr->iov_base;
+    }
+  WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0,  NULL}, 0 };
+  return recv_internal (&wsamsg);
 }
 
 extern "C" {
@@ -1580,18 +1578,16 @@ int
 fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
 			 ssize_t tot)
 {
-  struct msghdr msg =
+  WSABUF wsabuf[iovcnt];
+  WSABUF *wsaptr = wsabuf;
+  const struct iovec *iovptr = iov;
+  for (int i = 0; i < iovcnt; ++i)
     {
-      msg_name:		NULL,
-      msg_namelen:	0,
-      msg_iov:		(struct iovec *) iov, // const_cast
-      msg_iovlen:	iovcnt,
-      msg_control:	NULL,
-      msg_controllen:	0,
-      msg_flags:	0
-    };
-
-  return sendmsg (&msg, 0);
+      wsaptr->len = iovptr->iov_len;
+      (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
+    }
+  WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0, NULL}, 0 };
+  return send_internal (&wsamsg, 0);
 }
 
 inline ssize_t

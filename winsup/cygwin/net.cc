@@ -643,7 +643,6 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 
   syscall_printf ("%d = sendto (%d, %p, %d, %x, %p, %d)",
 		  res, fd, buf, len, flags, to, tolen);
-
   return res;
 }
 
@@ -664,7 +663,6 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 
   syscall_printf ("%d = recvfrom (%d, %p, %d, %x, %p, %p)",
 		  res, fd, buf, len, flags, from, fromlen);
-
   return res;
 }
 
@@ -1448,14 +1446,36 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 extern "C" int
 cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
-  return cygwin_recvfrom (fd, buf, len, flags, NULL, NULL);
+  int res;
+
+  fhandler_socket *fh = get (fd);
+
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
+    res = -1;
+  else if ((res = len) != 0)
+    res = fh->recvfrom (buf, len, flags, NULL, NULL);
+
+  syscall_printf ("%d = recv (%d, %p, %d, %x)", res, fd, buf, len, flags);
+  return res;
 }
 
 /* exported as send: standards? */
 extern "C" int
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
-  return cygwin_sendto (fd, buf, len, flags, NULL, 0);
+  int res;
+
+  fhandler_socket *fh = get (fd);
+
+  myfault efault;
+  if (efault.faulted (EFAULT) || !fh)
+    res = -1;
+  else
+    res = fh->sendto (buf, len, flags, NULL, 0);
+
+  syscall_printf ("%d = send (%d, %p, %d, %x)", res, fd, buf, len, flags);
+  return res;
 }
 
 /* getdomainname: standards? */
