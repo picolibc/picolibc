@@ -1046,6 +1046,12 @@ fhandler_base::close ()
 int
 fhandler_base_overlapped::close ()
 {
+  if (is_nonblocking () && io_pending)
+    {
+      DWORD bytes;
+      set_nonblocking (false);
+      wait_overlapped (1, !!(get_access () & GENERIC_WRITE), &bytes);
+    }
   destroy_overlapped ();
   return fhandler_base::close ();
 }
@@ -1749,6 +1755,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       DWORD wfres = WaitForMultipleObjects (n, w4, false, INFINITE);
       if (wfres != WAIT_OBJECT_0)
 	CancelIo (h);
+      *bytes = 0;
       BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
       bool signalled = !wores && (wfres == WAIT_OBJECT_0 + 1);
       if (signalled)
@@ -1762,7 +1769,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       else if (!wores)
 	{
 	  err = GetLastError ();
-	  debug_printf ("GetOverLappedResult failed");
+	  debug_printf ("GetOverLappedResult failed, bytes %u", *bytes);
 	}
       else
 	{

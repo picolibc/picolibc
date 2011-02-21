@@ -1,3 +1,10 @@
+2011-02-20  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::close): Finish any pending I/O
+	before closing.
+	(fhandler_base_overlapped::wait_overlapped): Defensively zero bytes
+	read.  Add more info to debugging output.
+
 2011-02-18  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_1): Add a CYGHEAP_DEBUG conditional for debugging
