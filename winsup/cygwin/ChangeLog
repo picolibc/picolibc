@@ -1,3 +1,14 @@
+2011-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket (fhandler_socket::readv): Call recv_internal directly,
+	rather than recvmsg.
+	(fhandler_socket::writev): Call send_internal directly, rather than
+	sendmsg.
+	* net.cc (cygwin_recv): Call fhandler_socket::recvfrom directly, rather
+	than cygwin_recvfrom.
+	(cygwin_send): Call fhandler_socket::sendto directly, rather than
+	cygwin_sendto.
+
 2011-02-20  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base_overlapped::close): Finish any pending I/O
