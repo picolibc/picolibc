@@ -1,3 +1,9 @@
+2011-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc: Fix copyright dates.
+	* winsup.h: Ditto.
+	* syscalls.cc (_read): Move EXPORT_ALIAS to its rightful place.
+
 2011-02-21  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* cygwin.din: Mark __assert* and _abort as NOSIGFE.

@@ -907,6 +907,8 @@ read (int fd, void *ptr, size_t len)
   return readv (fd, &iov, 1);
 }
 
+EXPORT_ALIAS (read, _read)
+
 extern "C" ssize_t
 pread (int fd, void *ptr, size_t len, _off64_t off)
 {
@@ -936,8 +938,6 @@ pwrite (int fd, void *ptr, size_t len, _off64_t off)
 		  res, fd, ptr, len, off, get_errno ());
   return res;
 }
-
-EXPORT_ALIAS (read, _read)
 
 extern "C" ssize_t
 write (int fd, const void *ptr, size_t len)
@@ -3501,6 +3501,7 @@ utmpname (const char *file)
   utmp_file = strdup (file);
   debug_printf ("New UTMP file: %s", utmp_file);
 }
+
 EXPORT_ALIAS (utmpname, utmpxname)
 
 /* Note: do not make NO_COPY */
