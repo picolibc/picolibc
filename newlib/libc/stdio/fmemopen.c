@@ -281,7 +281,7 @@ _DEFUN(_fmemopen_r, (ptr, buf, size, mode),
 
   if ((flags = __sflags (ptr, mode, &dummy)) == 0)
     return NULL;
-  if (!size || !(buf || flags & __SAPP))
+  if (!size || !(buf || flags & __SRW))
     {
       ptr->_errno = EINVAL;
       return NULL;
@@ -310,7 +310,7 @@ _DEFUN(_fmemopen_r, (ptr, buf, size, mode),
     {
       /* r+/w+/a+, and no buf: file starts empty.  */
       c->buf = (char *) (c + 1);
-      *(char *) buf = '\0';
+      c->buf[0] = '\0';
       c->pos = c->eof = 0;
       c->append = (flags & __SAPP) != 0;
     }
