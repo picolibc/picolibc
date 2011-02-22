@@ -33,7 +33,7 @@ _tzname DATA
 _Exit SIGFE
 a64l NOSIGFE
 abort NOSIGFE
-_abort = abort SIGFE
+_abort = abort NOSIGFE
 abs NOSIGFE
 _abs = abs NOSIGFE
 accept = cygwin_accept SIGFE
@@ -121,9 +121,9 @@ asprintf SIGFE
 _asprintf = asprintf SIGFE
 asprintf_r = _asprintf_r SIGFE
 _asprintf_r SIGFE
-__assert SIGFE
-__assert_func SIGFE
-__assertfail SIGFE
+__assert NOSIGFE
+__assert_func NOSIGFE
+__assertfail NOSIGFE
 atan NOSIGFE
 _atan = atan NOSIGFE
 atan2 NOSIGFE

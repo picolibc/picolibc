@@ -1,3 +1,7 @@
+2011-02-21  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* cygwin.din: Mark __assert* and _abort as NOSIGFE.
+
 2011-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket (fhandler_socket::readv): Call recv_internal directly,
