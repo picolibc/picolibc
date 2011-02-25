@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1998, 2000, 2001, 2002,
-   2003, 2006, 2007, 2008, 2010 Free Software Foundation, Inc.
+   2003, 2006, 2007, 2008, 2010, 2011 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -302,7 +302,9 @@ struct elf_segment_map
 /* Decide if the section SEC_HDR is in SEGMENT.  If CHECK_VMA, then
    VMAs are checked for alloc sections.  If STRICT, then a zero size
    section won't match at the end of a segment, unless the segment
-   is also zero size.  */
+   is also zero size.  Regardless of STRICT and CHECK_VMA, zero size
+   sections won't match at the start or end of PT_DYNAMIC, unless
+   PT_DYNAMIC is itself zero sized.  */
 #define ELF_SECTION_IN_SEGMENT_1(sec_hdr, segment, check_vma, strict)	\
   ((/* Only PT_LOAD, PT_GNU_RELRO and PT_TLS segments can contain	\
        SHF_TLS sections.  */						\
@@ -334,7 +336,19 @@ struct elf_segment_map
 		   <= (segment)->p_memsz - 1))				\
 	   && (((sec_hdr)->sh_addr - (segment)->p_vaddr			\
 		+ ELF_SECTION_SIZE(sec_hdr, segment))			\
-	       <= (segment)->p_memsz))))
+	       <= (segment)->p_memsz)))					\
+   /* No zero size sections at start or end of PT_DYNAMIC.  */		\
+   && ((segment)->p_type != PT_DYNAMIC					\
+       || (sec_hdr)->sh_size != 0					\
+       || (segment)->p_memsz == 0					\
+       || (((sec_hdr)->sh_type == SHT_NOBITS				\
+	    || ((bfd_vma) (sec_hdr)->sh_offset > (segment)->p_offset	\
+	        && ((sec_hdr)->sh_offset - (segment)->p_offset		\
+		    < (segment)->p_filesz)))				\
+	   && (((sec_hdr)->sh_flags & SHF_ALLOC) == 0			\
+	       || ((sec_hdr)->sh_addr > (segment)->p_vaddr		\
+		   && ((sec_hdr)->sh_addr - (segment)->p_vaddr		\
+		       < (segment)->p_memsz))))))
 
 #define ELF_SECTION_IN_SEGMENT(sec_hdr, segment)			\
   (ELF_SECTION_IN_SEGMENT_1 (sec_hdr, segment, 1, 0))
