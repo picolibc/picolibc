@@ -1,6 +1,6 @@
 2011-02-25  Alan Modra  <amodra@gmail.com>
 
-	PR 12519
+	PR 12516
 	* internal.h (ELF_SECTION_IN_SEGMENT_1): Don't match zero size
 	sections at start or end of PT_DYNAMIC.
 
