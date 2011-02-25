@@ -1,3 +1,9 @@
+2011-02-25  Alan Modra  <amodra@gmail.com>
+
+	PR 12519
+	* internal.h (ELF_SECTION_IN_SEGMENT_1): Don't match zero size
+	sections at start or end of PT_DYNAMIC.
+
 2010-11-02  Joseph Myers  <joseph@codesourcery.com>
 
 	* tic6x-attrs.h (Tag_ABI_wchar_t, Tag_ABI_stack_align_needed,
