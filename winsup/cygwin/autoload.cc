@@ -60,13 +60,13 @@ bool NO_COPY wsock_started;
 /* LoadDLLprime is used to prime the DLL info information, providing an
    additional initialization routine to call prior to calling the first
    function.  */
-#define LoadDLLprime(dllname, init_also) __asm__ ("	\n\
+#define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
 .ifndef " #dllname "_primed				\n\
   .section	.data_cygwin_nocopy,\"w\"		\n\
   .align	4					\n\
 ."#dllname "_info:					\n\
   .long		_std_dll_init				\n\
-  .long		0					\n\
+  .long		" #no_resolve_on_fork "			\n\
   .long		-1					\n\
   .long		" #init_also "				\n\
   .string16	\"" #dllname ".dll\"			\n\
@@ -88,8 +88,8 @@ bool NO_COPY wsock_started;
   LoadDLLfuncEx3(name, n, dllname, notimp, err, 0)
 
 /* Main DLL setup stuff. */
-#define LoadDLLfuncEx3(name, n, dllname, notimp, err, fn) \
-  LoadDLLprime (dllname, dll_func_load)			\
+#define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
+  LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
   __asm__ ("						\n\
   .section	." #dllname "_autoload_text,\"wx\"	\n\
   .global	_" mangle (name, n) "			\n\
@@ -102,9 +102,9 @@ _win32_" mangle (name, n) ":				\n\
 1:movl		(2f),%eax				\n\
    call		*(%eax)					\n\
 2:.long		." #dllname "_info			\n\
-   .long		(" #n "+" #notimp ") | (((" #err ") & 0xff) <<16) | (((" #fn ") & 0xff) << 24)	\n\
-   .asciz	\"" #name "\"				\n\
-   .text							\n\
+  .long		(" #n "+" #notimp ") | (((" #err ") & 0xff) <<16) \n\
+  .asciz	\"" #name "\"				\n\
+  .text							\n\
 ");
 
 /* DLL loader helper functions used during initialization. */
@@ -204,6 +204,21 @@ union retchain
   long long ll;
 };
 
+
+/* This function is a workaround for the problem reported here:
+  http://cygwin.com/ml/cygwin/2011-02/msg00552.html
+  and discussed here:
+  http://cygwin.com/ml/cygwin-developers/2011-02/threads.html#00007
+
+  To wit: winmm.dll calls FreeLibrary in its DllMain and that can result
+  in LoadLibraryExW returning an ERROR_INVALID_ADDRESS.  */
+static bool
+dll_load (HANDLE& handle, WCHAR *name)
+{
+  HANDLE h = LoadLibraryExW (name, NULL, (in_forkee && handle) ? DONT_RESOLVE_DLL_REFERENCES : 0);
+  return h ? (handle = h) : 0;
+}
+
 #define RETRY_COUNT 10
 
 /* The standard DLL initialization routine. */
@@ -221,21 +236,22 @@ std_dll_init ()
 	yield ();
       }
     while (InterlockedIncrement (&dll->here));
-  else if (!dll->handle)
+  else if ((uintptr_t) dll->handle <= 1)
     {
       fenv_t fpuenv;
       fegetenv (&fpuenv);
       WCHAR dll_path[MAX_PATH];
       DWORD err = ERROR_SUCCESS;
+      int i;
       /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
       wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
       /* MSDN seems to imply that LoadLibrary can fail mysteriously, so,
 	 since there have been reports of this in the mailing list, retry
 	 several times before giving up. */
-      for (int i = 1; i <= RETRY_COUNT; i++)
+      for (i = 1; i <= RETRY_COUNT; i++)
 	{
 	  /* If loading the library succeeds, just leave the loop. */
-	  if ((dll->handle = LoadLibraryW (dll_path)) != NULL)
+	  if (!dll_load (dll->handle, dll_path))
 	    break;
 	  /* Otherwise check error code returned by LoadLibrary.  If the
 	     error code is neither NOACCESS nor DLL_INIT_FAILED, break out
@@ -246,15 +262,13 @@ std_dll_init ()
 	  if (i < RETRY_COUNT)
 	    yield ();
 	}
-      if (!dll->handle)
+      if ((uintptr_t) dll->handle <= 1)
 	{
 	  /* If LoadLibrary with full path returns one of the weird errors
 	     reported on the Cygwin mailing list, retry with only the DLL
-	     name.  Checking the error codes allows to restrict loading
-	     with just the DLL name to this specific problem. */
-	  if ((err == ERROR_NOACCESS || err == ERROR_DLL_INIT_FAILED)
-	      && (dll->handle = LoadLibraryW (dll->name)) != NULL)
-	    ;
+	     name.  Only do this when the above retry loop has been exhausted. */
+	  if (i > RETRY_COUNT && dll_load (dll->handle, dll->name))
+	    /* got it with the fallback */;
 	  else if ((func->decoration & 1))
 	    dll->handle = INVALID_HANDLE_VALUE;
 	  else
@@ -330,7 +344,7 @@ wsock_init ()
   return ret.ll;
 }
 
-LoadDLLprime (ws2_32, _wsock_init)
+LoadDLLprime (ws2_32, _wsock_init, 0)
 
 LoadDLLfuncEx2 (DnsQuery_A, 24, dnsapi, 1, 127) // ERROR_PROC_NOT_FOUND
 LoadDLLfuncEx (DnsRecordListFree, 8, dnsapi, 1)
@@ -435,27 +449,27 @@ LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetThreadDesktop, 4, user32)
 LoadDLLfunc (ShowWindowAsync, 8, user32)
 
-LoadDLLfunc (timeBeginPeriod, 4, winmm)
-LoadDLLfunc (timeEndPeriod, 4, winmm)
-LoadDLLfunc (timeGetDevCaps, 8, winmm)
-LoadDLLfunc (timeGetTime, 0, winmm)
-LoadDLLfunc (waveInAddBuffer, 12, winmm)
-LoadDLLfunc (waveInClose, 4, winmm)
-LoadDLLfunc (waveInGetNumDevs, 0, winmm)
-LoadDLLfunc (waveInOpen, 24, winmm)
-LoadDLLfunc (waveInPrepareHeader, 12, winmm)
-LoadDLLfunc (waveInReset, 4, winmm)
-LoadDLLfunc (waveInStart, 4, winmm)
-LoadDLLfunc (waveInUnprepareHeader, 12, winmm)
-LoadDLLfunc (waveOutClose, 4, winmm)
-LoadDLLfunc (waveOutGetNumDevs, 0, winmm)
-LoadDLLfunc (waveOutGetVolume, 8, winmm)
-LoadDLLfunc (waveOutOpen, 24, winmm)
-LoadDLLfunc (waveOutPrepareHeader, 12, winmm)
-LoadDLLfunc (waveOutReset, 4, winmm)
-LoadDLLfunc (waveOutSetVolume, 8, winmm)
-LoadDLLfunc (waveOutUnprepareHeader, 12, winmm)
-LoadDLLfunc (waveOutWrite, 12, winmm)
+LoadDLLfuncEx3 (timeBeginPeriod, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (timeEndPeriod, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (timeGetDevCaps, 8, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (timeGetTime, 0, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInAddBuffer, 12, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInClose, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInGetNumDevs, 0, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInOpen, 24, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInPrepareHeader, 12, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInReset, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInStart, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveInUnprepareHeader, 12, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutClose, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutGetNumDevs, 0, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutGetVolume, 8, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutOpen, 24, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutPrepareHeader, 12, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutReset, 4, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutSetVolume, 8, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutUnprepareHeader, 12, winmm, 0, 0, 1)
+LoadDLLfuncEx3 (waveOutWrite, 12, winmm, 0, 0, 1)
 
 LoadDLLfunc (accept, 12, ws2_32)
 LoadDLLfunc (bind, 12, ws2_32)

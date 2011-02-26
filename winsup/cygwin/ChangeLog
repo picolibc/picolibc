@@ -1,3 +1,16 @@
+2011-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc: Use LoadDLLfuncEx3 for all winmm functions.  Accommodate
+	changes to LoadDLLprime.
+	(LoadDLLprime): Take an extra argument indicating whether this dll
+	needs special handling on fork.  Place this information in the "handle"
+	location.
+	(LoadDLLfuncEx3): Eliminate "func" handling.  Pass new
+	no_resolve_on_fork argument to LoadDLLprime.
+	(dll_load): New function.
+	(std_dll_init): Accommodate changes to dll_info::handle.  Use dll_load
+	to load DLL in both cases where it is used.
+
 2011-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Make autoloaded ntdll function non-optional.  Ditto for
