@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -967,7 +967,8 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %p", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      __seterrno_from_win_error (ret == ERROR_PROC_NOT_FOUND
+				 ? ret : LsaNtStatusToWinError (ret));
       goto out;
     }
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)

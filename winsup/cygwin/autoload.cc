@@ -369,14 +369,11 @@ LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
 
-/* 0xc000007a == STATUS_PROCEDURE_NOT_FOUND */
-#define LoadDLLfuncNt(name, n, dllname) \
-  LoadDLLfuncEx2(name, n, dllname, 1, 0xc000007a)
-LoadDLLfuncNt (NtCommitTransaction, 8, ntdll)
-LoadDLLfuncNt (NtCreateTransaction, 40, ntdll)
-LoadDLLfuncNt (NtRollbackTransaction, 8, ntdll)
-LoadDLLfuncNt (RtlGetCurrentTransaction, 0, ntdll)
-LoadDLLfuncNt (RtlSetCurrentTransaction, 4, ntdll)
+LoadDLLfunc (NtCommitTransaction, 8, ntdll)
+LoadDLLfunc (NtCreateTransaction, 40, ntdll)
+LoadDLLfunc (NtRollbackTransaction, 8, ntdll)
+LoadDLLfunc (RtlGetCurrentTransaction, 0, ntdll)
+LoadDLLfunc (RtlSetCurrentTransaction, 4, ntdll)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
@@ -389,12 +386,16 @@ LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)
 LoadDLLfunc (UuidCreate, 4, rpcrt4)
 LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
 
-/* secur32 functions return NTSTATUS values. */
-LoadDLLfuncNt (LsaDeregisterLogonProcess, 4, secur32)
-LoadDLLfuncNt (LsaFreeReturnBuffer, 4, secur32)
-LoadDLLfuncNt (LsaLogonUser, 56, secur32)
-LoadDLLfuncNt (LsaLookupAuthenticationPackage, 12, secur32)
-LoadDLLfuncNt (LsaRegisterLogonProcess, 12, secur32)
+LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
+LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
+LoadDLLfunc (LsaLogonUser, 56, secur32)
+LoadDLLfunc (LsaLookupAuthenticationPackage, 12, secur32)
+/* secur32 functions return NTSTATUS values.  However, the error code must
+   fit in a single byte, see LoadDLLprime.
+   The calling function, lsaauth(), checks for STATUS_SUCCESS (0), so we
+   simply return some arbitrary non-0 value (127 == ERROR_PROC_NOT_FOUND)
+   from here, if the function can't be loaded. */
+LoadDLLfuncEx2 (LsaRegisterLogonProcess, 12, secur32, 1, 127)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 
