@@ -1,3 +1,10 @@
+2011-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (dll_load): Only call LoadLibraryExW with
+	DONT_RESOLVE_DLL_REFERENCES if a normal LoadLibrary call failed with
+	ERROR_INVALID_ADDRESS.
+	(LsaRegisterLogonProcess): Align comment to previous change.
+
 2011-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc: Use LoadDLLfuncEx3 for all winmm functions.  Accommodate

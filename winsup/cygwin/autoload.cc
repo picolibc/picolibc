@@ -215,7 +215,9 @@ union retchain
 static bool
 dll_load (HANDLE& handle, WCHAR *name)
 {
-  HANDLE h = LoadLibraryExW (name, NULL, (in_forkee && handle) ? DONT_RESOLVE_DLL_REFERENCES : 0);
+  HANDLE h = LoadLibraryW (name);
+  if (!h && in_forkee && handle && GetLastError () == ERROR_INVALID_ADDRESS)
+    h = LoadLibraryExW (name, NULL, DONT_RESOLVE_DLL_REFERENCES);
   return h ? (handle = h) : 0;
 }
 
@@ -405,7 +407,7 @@ LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)
 LoadDLLfunc (LsaLookupAuthenticationPackage, 12, secur32)
 /* secur32 functions return NTSTATUS values.  However, the error code must
-   fit in a single byte, see LoadDLLprime.
+   fit in a single word, see LoadDLLprime.
    The calling function, lsaauth(), checks for STATUS_SUCCESS (0), so we
    simply return some arbitrary non-0 value (127 == ERROR_PROC_NOT_FOUND)
    from here, if the function can't be loaded. */
