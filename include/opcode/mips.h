@@ -864,6 +864,7 @@ enum
   M_MULOU_I,
   M_NOR_I,
   M_OR_I,
+  M_PREF_AB,
   M_REM_3,
   M_REM_3I,
   M_REMU_3,

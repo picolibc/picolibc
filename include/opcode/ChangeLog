@@ -1,3 +1,7 @@
+2011-02-28  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (M_PREF_AB): New enum value.
+
 2011-02-12  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin.h (M_S2RND, M_T, M_W32, M_FU, M_TFU, M_IS, M_ISS2, M_IH,
