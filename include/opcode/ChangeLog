@@ -1,7 +1,8 @@
 2011-02-12  Mike Frysinger  <vapier@gentoo.org>
 
-	* bfin-dis.c (M_S2RND, M_T, M_W32, M_FU, M_TFU, M_IS, M_ISS2,
-	M_IH, M_IU): Delete.
+	* bfin.h (M_S2RND, M_T, M_W32, M_FU, M_TFU, M_IS, M_ISS2, M_IH,
+	M_IU): Define.
+	(is_macmod_pmove, is_macmod_hmove): New functions.
 
 2011-02-11  Mike Frysinger  <vapier@gentoo.org>
 
