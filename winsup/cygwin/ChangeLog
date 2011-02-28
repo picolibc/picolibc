@@ -1,3 +1,7 @@
+2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (dll_load): Make inline.  Clarify logic.
+
 2011-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (dll_load): Only call LoadLibraryExW with
