@@ -61,6 +61,7 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:false,
 };
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -101,6 +102,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -141,6 +143,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -181,6 +184,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:true,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -221,6 +225,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:true,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -261,6 +266,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:true,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -301,6 +307,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
+  use_dont_resolve_hack:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -341,6 +348,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:true,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
+  use_dont_resolve_hack:false,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -381,6 +389,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
+  use_dont_resolve_hack:false,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

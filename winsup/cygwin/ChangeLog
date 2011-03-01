@@ -1,3 +1,34 @@
+2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (dll_load): Only perform DONT_RESOLVE_DLL_REFERENCES hack
+	on systems which need it.
+	* wincap.cc (use_dont_resolve_hack): Set as appropriate.
+	* wincap.h (use_dont_resolve_hack): Define.
+
+2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc (dll_load): Make inline.  Clarify logic.
+
+2011-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (dll_load): Only call LoadLibraryExW with
+	DONT_RESOLVE_DLL_REFERENCES if a normal LoadLibrary call failed with
+	ERROR_INVALID_ADDRESS.
+	(LsaRegisterLogonProcess): Align comment to previous change.
+
+2011-02-26  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* autoload.cc: Use LoadDLLfuncEx3 for all winmm functions.  Accommodate
+	changes to LoadDLLprime.
+	(LoadDLLprime): Take an extra argument indicating whether this dll
+	needs special handling on fork.  Place this information in the "handle"
+	location.
+	(LoadDLLfuncEx3): Eliminate "func" handling.  Pass new
+	no_resolve_on_fork argument to LoadDLLprime.
+	(dll_load): New function.
+	(std_dll_init): Accommodate changes to dll_info::handle.  Use dll_load
+	to load DLL in both cases where it is used.
+
 2011-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Make autoloaded ntdll function non-optional.  Ditto for
