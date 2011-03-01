@@ -93,7 +93,7 @@ cproj(double complex z)
 {
 	double_complex w = { .z = z };
 
-	if (isinf(creal(z) || isinf(cimag(z)))) {
+	if (isinf(creal(z)) || isinf(cimag(z))) {
 #ifdef __INFINITY
 		REAL_PART(w) = __INFINITY;
 #else

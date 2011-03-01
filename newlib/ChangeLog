@@ -1,3 +1,8 @@
+2011-03-01  Aaron Landwehr <snaphat@gmail.com>
+
+	* libm/complex/cproj.c: Fix typo.
+	* libm/complex/cprojf.c: Ditto.
+
 2011-02-22  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/fmemopen.c (fmemopen): Fix EINVAL condition.  Avoid SEGV

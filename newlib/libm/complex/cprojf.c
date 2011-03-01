@@ -55,7 +55,7 @@ cprojf(float complex z)
 {
 	float_complex w = { .z = z };
 
-	if (isinf(crealf(z) || isinf(cimagf(z)))) {
+	if (isinf(crealf(z)) || isinf(cimagf(z))) {
 #ifdef __INFINITY
 		REAL_PART(w) = __INFINITY;
 #else
