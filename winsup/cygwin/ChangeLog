@@ -1,5 +1,12 @@
 2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
+	* autoload.cc (dll_load): Only perform DONT_RESOLVE_DLL_REFERENCES hack
+	on systems which need it.
+	* wincap.cc (use_dont_resolve_hack): Set as appropriate.
+	* wincap.h (use_dont_resolve_hack): Define.
+
+2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
+
 	* autoload.cc (dll_load): Make inline.  Clarify logic.
 
 2011-02-27  Corinna Vinschen  <corinna@vinschen.de>
