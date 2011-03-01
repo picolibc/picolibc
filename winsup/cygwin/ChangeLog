@@ -1,3 +1,7 @@
+2011-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_DLL_MINOR to 9.
+
 2011-02-28  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (dll_load): Only perform DONT_RESOLVE_DLL_REFERENCES hack
