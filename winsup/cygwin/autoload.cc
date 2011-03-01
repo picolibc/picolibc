@@ -216,8 +216,8 @@ static __inline bool
 dll_load (HANDLE& handle, WCHAR *name)
 {
   HANDLE h = LoadLibraryW (name);
-  if (!h && in_forkee && handle && GetLastError () == ERROR_INVALID_ADDRESS
-      && wincap.use_dont_resolve_hack ())
+  if (!h && handle && wincap.use_dont_resolve_hack ()
+      && GetLastError () == ERROR_INVALID_ADDRESS)
     h = LoadLibraryExW (name, NULL, DONT_RESOLVE_DLL_REFERENCES);
   if (!h)
     return false;
