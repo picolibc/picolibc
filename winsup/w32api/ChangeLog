@@ -1,3 +1,10 @@
+2011-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/ddk/winddk.h (TIMER_INFORMATION_CLASS): Define.
+	(TIMER_BASIC_INFORMATION): Define.
+	(NtQueryTimer): Define.
+	(ZwQueryTimer): Define.
+
 2010-12-27  David Byron  <dbyron0@users.sourceforge.net>
 
 	* include/winioctl.h (STORAGE_BUS_TYPE): Define.

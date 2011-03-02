@@ -946,6 +946,15 @@ typedef enum _TIMER_TYPE {
   SynchronizationTimer
 } TIMER_TYPE;
 
+typedef enum _TIMER_INFORMATION_CLASS {
+  TimerBasicInformation
+} TIMER_INFORMATION_CLASS;
+
+typedef struct _TIMER_BASIC_INFORMATION {
+  LARGE_INTEGER TimeRemaining;
+  BOOLEAN SignalState;
+} TIMER_BASIC_INFORMATION, *PTIMER_BASIC_INFORMATION;
+
 #define EVENT_INCREMENT                   1
 #define IO_NO_INCREMENT                   0
 #define IO_CD_ROM_INCREMENT               1
@@ -9004,6 +9013,26 @@ DDKAPI
 ZwQuerySymbolicLinkObject(
   /*IN*/ HANDLE  LinkHandle,
   /*IN OUT*/ PUNICODE_STRING  LinkTarget,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+NtQueryTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ TIMER_INFORMATION_CLASS TimerInformationClass,
+  /*OUT*/ PVOID TimerInformation,
+  /*IN*/ ULONG TimerInformationLength,
+  /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
+
+NTOSAPI
+NTSTATUS
+DDKAPI
+ZwQueryTimer(
+  /*IN*/ HANDLE  TimerHandle,
+  /*IN*/ TIMER_INFORMATION_CLASS TimerInformationClass,
+  /*OUT*/ PVOID TimerInformation,
+  /*IN*/ ULONG TimerInformationLength,
   /*OUT*/ PULONG  ReturnedLength  /*OPTIONAL*/);
 
 NTOSAPI
