@@ -350,7 +350,7 @@ fhandler_procsys::open (int flags, mode_t mode)
     set_errno (EINVAL);
   else
     {
-      switch (exists ())
+      switch (exists (NULL))
 	{
 	case virt_directory:
 	case virt_rootdir:

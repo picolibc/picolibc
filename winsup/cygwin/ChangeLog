@@ -1,3 +1,8 @@
+2011-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::open): Call worker exists
+	method, rather than wrapper.
+
 2011-03-01  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* autoload.cc (dll_load): Avoid in_forkee test since this apparently
