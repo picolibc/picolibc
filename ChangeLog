@@ -1,3 +1,9 @@
+2011-03-02  Sebastian Pop  <sebastian.pop@amd.com>
+
+	* configure.ac: Add -lpwl to ppllibs.
+	* config/cloog.m4: Add -lisl to clooglibs.
+	* configure: Regenerated.
+
 2011-02-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Import from Libtool and gnulib:
