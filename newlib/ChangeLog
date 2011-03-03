@@ -1,5 +1,9 @@
 2011-03-03  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/include/string.h: Include sys/cdefs.h.
+
+2011-03-03  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/include/sys/cdefs.h (__CONCAT1): Define.
 	(__CONCAT): Define.
 	(__STRING): Define.
