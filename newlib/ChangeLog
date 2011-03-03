@@ -1,3 +1,13 @@
+2011-03-03  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/cdefs.h (__CONCAT1): Define.
+	(__CONCAT): Define.
+	(__STRING): Define.
+	(__XSTRING): Define.
+	(__ASMNAME): Define.
+	* libc/include/string.h (strerror_r): Use __ASMNAME to take target
+	specific label prefixes into account.
+
 2011-03-01  Aaron Landwehr <snaphat@gmail.com>
 
 	* libm/complex/cproj.c: Fix typo.

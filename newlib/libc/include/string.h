@@ -74,7 +74,7 @@ char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
 char    *_EXFUN(strerror_r,(int, char *, size_t));
 #else
 # ifdef __GNUC__
-int      _EXFUN(strerror_r,(int, char *, size_t)) __asm__ ("__xpg_strerror_r");
+int      _EXFUN(strerror_r,(int, char *, size_t)) __asm__ (__ASMNAME ("__xpg_strerror_r"));
 # else
 int      _EXFUN(__xpg_strerror_r,(int, char *, size_t));
 #  define strerror_r __xpg_strerror_r
