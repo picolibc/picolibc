@@ -1,5 +1,12 @@
 2011-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc (ipc_cond_timedwait): If ipc_mutex_unlock fails, return
+	actual error number.
+	(_mq_send): Break loop if ipc_cond_timedwait returns with error.
+	(_mq_receive): Ditto.
+
+2011-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* errno.cc (__xpg_strerror_r): Add accidentally missing condition.
 
 2011-03-02  Corinna Vinschen  <corinna@vinschen.de>

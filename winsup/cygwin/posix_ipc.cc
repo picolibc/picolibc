@@ -1,6 +1,6 @@
 /* posix_ipc.cc: POSIX IPC API for Cygwin.
 
-   Copyright 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -177,6 +177,7 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
   struct timeval tv;
   DWORD timeout;
   HANDLE h[2] = { mtx, evt };
+  int err;
 
   if (!abstime)
     timeout = INFINITE;
@@ -196,8 +197,8 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
       timeout += (abstime->tv_nsec / 1000 - tv.tv_usec) / 1000;
     }
   ResetEvent (evt);
-  if (ipc_mutex_unlock (mtx))
-    return -1;
+  if ((err = ipc_mutex_unlock (mtx)) != 0)
+    return err;
   switch (WaitForMultipleObjects (2, h, TRUE, timeout))
     {
     case WAIT_OBJECT_0:
@@ -733,7 +734,15 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 	}
       /* Wait for room for one message on the queue */
       while (attr->mq_curmsgs >= attr->mq_maxmsg)
-	ipc_cond_timedwait (mqinfo->mqi_waitsend, mqinfo->mqi_lock, abstime);
+	{
+	  int ret = ipc_cond_timedwait (mqinfo->mqi_waitsend, mqinfo->mqi_lock,
+					abstime);
+	  if (ret != 0)
+	    {
+	      set_errno (ret);
+	      goto err;
+	    }
+	}
     }
 
   /* nmsghdr will point to new message */
@@ -840,7 +849,15 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
       /* Wait for a message to be placed onto queue */
       mqhdr->mqh_nwait++;
       while (attr->mq_curmsgs == 0)
-	ipc_cond_timedwait (mqinfo->mqi_waitrecv, mqinfo->mqi_lock, abstime);
+	{
+	  int ret = ipc_cond_timedwait (mqinfo->mqi_waitrecv, mqinfo->mqi_lock,
+					abstime);
+	  if (ret != 0)
+	    {
+	      set_errno (ret);
+	      goto err;
+	    }
+	}
       mqhdr->mqh_nwait--;
     }
 
