@@ -1,3 +1,7 @@
+2011-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (__xpg_strerror_r): Add accidentally missing condition.
+
 2011-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::open): Call worker exists
