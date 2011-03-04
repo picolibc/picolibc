@@ -46,78 +46,46 @@ const size_t procsys_len = sizeof (procsys) - 1;
 virtual_ftype_t
 fhandler_procsys::exists (struct __stat64 *buf)
 {
-  UNICODE_STRING path; \
+  UNICODE_STRING path;
+  UNICODE_STRING dir;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
   HANDLE h;
   FILE_BASIC_INFORMATION fbi;
+  bool internal = false;
+  bool desperate_parent_check = false;
   /* Default device type is character device. */
   virtual_ftype_t file_type = virt_chr;
 
   if (strlen (get_name ()) == procsys_len)
     return virt_rootdir;
   mk_unicode_path (&path);
-  /* First try to open as file/device to get more info. */
-  InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
-		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-  if (status == STATUS_OBJECT_NAME_INVALID)
-    return virt_none;
-  /* If no media is found, or we get this dreaded sharing violation, let
-     the caller immediately try again as normal file. */
-  if (status == STATUS_NO_MEDIA_IN_DEVICE
-      || status == STATUS_SHARING_VIOLATION)
-    return virt_fsfile;	/* Just try again as normal file. */
-  /* If file or path can't be found, let caller try again as normal file. */
-  if (status == STATUS_OBJECT_PATH_NOT_FOUND
-      || status == STATUS_OBJECT_NAME_NOT_FOUND)
-    file_type = virt_fsfile;
-  /* Check for pipe errors, which make a good hint... */
-  else if (status >= STATUS_PIPE_NOT_AVAILABLE && status <= STATUS_PIPE_BUSY)
-    file_type = virt_pipe;
-  else if (status == STATUS_ACCESS_DENIED)
-    {
-      /* Check if this is just some file or dir on a real FS to circumvent
-         most permission problems. */
-      status = NtQueryAttributesFile (&attr, &fbi);
-      if (NT_SUCCESS (status))
-	return (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-	       ? virt_fsdir : virt_fsfile;
-    }
-  else if (NT_SUCCESS (status))
-    {
-      NTSTATUS dev_stat;
-      FILE_FS_DEVICE_INFORMATION ffdi;
 
-      /* If requested, check permissions. */
-      if (buf)
-      	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
-      /* Check for the device type. */
-      dev_stat = NtQueryVolumeInformationFile (h, &io, &ffdi, sizeof ffdi,
-					       FileFsDeviceInformation);
-      /* And check for file attributes.  If we get them, we peeked into
-	 a real FS through /proc/sys. */
-      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-				       FileBasicInformation);
+  /* Try to open parent dir.  If it works, the object is definitely
+     an object within the internal namespace.  We don't need to test
+     it for being a file or dir on the filesystem anymore.  If the
+     error is STATUS_OBJECT_TYPE_MISMATCH, we know that the file
+     itself is external.  Otherwise we don't know. */
+  RtlSplitUnicodePath (&path, &dir, NULL);
+  /* RtlSplitUnicodePath preserves the trailing backslash in dir.  Don't
+     preserve it to open the dir, unless it's the object root. */
+  if (dir.Length > sizeof (WCHAR))
+    dir.Length -= sizeof (WCHAR);
+  InitializeObjectAttributes (&attr, &dir, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  status = NtOpenDirectoryObject (&h, DIRECTORY_QUERY, &attr);
+  debug_printf ("NtOpenDirectoryObject: %p", status);
+  if (NT_SUCCESS (status))
+    {
+      internal = true;
       NtClose (h);
-      if (NT_SUCCESS (dev_stat))
-	{
-	  if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
-	    file_type = NT_SUCCESS (status) ? virt_pipe : virt_blk;
-	  else if (NT_SUCCESS (status))
-	    file_type = (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			? virt_fsdir : virt_fsfile;
-	  else if (ffdi.DeviceType == FILE_DEVICE_DISK
-		   || ffdi.DeviceType == FILE_DEVICE_CD_ROM
-		   || ffdi.DeviceType == FILE_DEVICE_DFS
-		   || ffdi.DeviceType == FILE_DEVICE_VIRTUAL_DISK)
-	    file_type = virt_blk;
-	}
     }
-  /* Then check if it's a symlink. */
+
+  /* First check if the object is a symlink. */
+  InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenSymbolicLinkObject (&h, READ_CONTROL | SYMBOLIC_LINK_QUERY,
 				     &attr);
+  debug_printf ("NtOpenSymbolicLinkObject: %p", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -126,8 +94,11 @@ fhandler_procsys::exists (struct __stat64 *buf)
       NtClose (h);
       return virt_symlink;
     }
-  /* Eventually, test if it's an object directory. */
+  else if (status == STATUS_ACCESS_DENIED)
+    return virt_symlink;
+  /* Then check if it's an object directory. */
   status = NtOpenDirectoryObject (&h, READ_CONTROL | DIRECTORY_QUERY, &attr);
+  debug_printf ("NtOpenDirectoryObject: %p", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -138,6 +109,101 @@ fhandler_procsys::exists (struct __stat64 *buf)
     }
   else if (status == STATUS_ACCESS_DENIED)
     return virt_directory;
+  /* Next try to open as file/device. */
+  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+  debug_printf ("NtOpenFile: %p", status);
+  /* Name is invalid, that's nothing. */
+  if (status == STATUS_OBJECT_NAME_INVALID)
+    return virt_none;
+  /* If no media is found, or we get this dreaded sharing violation, let
+     the caller immediately try again as normal file. */
+  if (status == STATUS_NO_MEDIA_IN_DEVICE
+      || status == STATUS_SHARING_VIOLATION)
+    return virt_fsfile;	/* Just try again as normal file. */
+  /* If file or path can't be found, let caller try again as normal file. */
+  if (status == STATUS_OBJECT_PATH_NOT_FOUND
+      || status == STATUS_OBJECT_NAME_NOT_FOUND)
+    return virt_fsfile;
+  /* Check for pipe errors, which make a good hint... */
+  if (status >= STATUS_PIPE_NOT_AVAILABLE && status <= STATUS_PIPE_BUSY)
+    return virt_pipe;
+  if (status == STATUS_ACCESS_DENIED && !internal)
+    {
+      /* Check if this is just some file or dir on a real FS to circumvent
+	 most permission problems.  Don't try that on internal objects,
+	 since NtQueryAttributesFile might crash the machine if the underlying
+	 driver is badly written. */
+      status = NtQueryAttributesFile (&attr, &fbi);
+      debug_printf ("NtQueryAttributesFile: %p", status);
+      if (NT_SUCCESS (status))
+	return (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	       ? virt_fsdir : virt_fsfile;
+      /* Ok, so we're desperate and the file still maybe on some filesystem.
+	 To check this, we now split the path until we can finally access any
+	 of the parent's.  Then we fall through to check the parent type.  In
+	 contrast to the first parent check, we now check explicitely with
+	 trailing backslash.  This will fail for directories in the internal
+	 namespace, so we won't accidentally test those. */
+      dir = path;
+      InitializeObjectAttributes (&attr, &dir, OBJ_CASE_INSENSITIVE,
+				  NULL, NULL);
+      do
+	{
+	  RtlSplitUnicodePath (&dir, &dir, NULL);
+	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
+			       FILE_OPEN_FOR_BACKUP_INTENT);
+	  debug_printf ("NtOpenDirectoryObject: %p", status);
+	  if (dir.Length > sizeof (WCHAR))
+	    dir.Length -= sizeof (WCHAR);
+	}
+      while (dir.Length > sizeof (WCHAR) && !NT_SUCCESS (status));
+      desperate_parent_check = true;
+    }
+  if (NT_SUCCESS (status))
+    {
+      FILE_FS_DEVICE_INFORMATION ffdi;
+
+      /* If requested, check permissions.  If this is a parent handle from
+	 the above desperate parent check, skip. */
+      if (buf && !desperate_parent_check)
+      	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
+
+      /* Check for the device type. */
+      status = NtQueryVolumeInformationFile (h, &io, &ffdi, sizeof ffdi,
+					     FileFsDeviceInformation);
+      debug_printf ("NtQueryVolumeInformationFile: %p", status);
+      /* Don't call NtQueryInformationFile unless we know it's a safe type.
+	 The call is known to crash machines, if the underlying driver is
+	 badly written. */
+      if (!NT_SUCCESS (status))
+	{
+	  NtClose (h);
+	  return file_type;
+	}
+      if (ffdi.DeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM)
+	file_type = virt_blk;
+      else if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
+	file_type = internal ? virt_blk : virt_pipe;
+      else if (ffdi.DeviceType == FILE_DEVICE_DISK
+	       || ffdi.DeviceType == FILE_DEVICE_CD_ROM
+	       || ffdi.DeviceType == FILE_DEVICE_DFS
+	       || ffdi.DeviceType == FILE_DEVICE_VIRTUAL_DISK)
+	{
+	  /* Check for file attributes.  If we get them, we peeked
+	     into a real FS through /proc/sys. */
+	  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+					   FileBasicInformation);
+	  debug_printf ("NtQueryInformationFile: %p", status);
+	  if (!NT_SUCCESS (status))
+	    file_type = virt_blk;
+	  else
+	    file_type = (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			? virt_fsdir : virt_fsfile;
+	}
+      NtClose (h);
+    }
   /* That's it.  Return type we found above. */
   return file_type;
 }
@@ -153,6 +219,8 @@ fhandler_procsys::fhandler_procsys ():
 {
 }
 
+#define UNREADABLE_SYMLINK_CONTENT "<access denied>"
+
 bool
 fhandler_procsys::fill_filebuf ()
 {
@@ -162,6 +230,7 @@ fhandler_procsys::fill_filebuf ()
   NTSTATUS status;
   HANDLE h;
   tmp_pathbuf tp;
+  size_t len;
 
   mk_unicode_path (&path);
   if (path.Buffer[path.Length / sizeof (WCHAR) - 1] == L'\\')
@@ -169,21 +238,26 @@ fhandler_procsys::fill_filebuf ()
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY, &attr);
   if (!NT_SUCCESS (status))
-    return false;
+    goto unreadable;
   RtlInitEmptyUnicodeString (&target, tp.w_get (),
 			     (NT_MAX_PATH - 1) * sizeof (WCHAR));
   status = NtQuerySymbolicLinkObject (h, &target, NULL);
   NtClose (h);
   if (!NT_SUCCESS (status))
-    return false;
-  size_t len = sys_wcstombs (NULL, 0, target.Buffer,
-			     target.Length / sizeof (WCHAR));
+    goto unreadable;
+  len = sys_wcstombs (NULL, 0, target.Buffer, target.Length / sizeof (WCHAR));
   filebuf = (char *) crealloc_abort (filebuf, procsys_len + len + 1);
   sys_wcstombs (fnamep = stpcpy (filebuf, procsys), len + 1, target.Buffer,
 		target.Length / sizeof (WCHAR));
   while ((fnamep = strchr (fnamep, '\\')))
     *fnamep = '/';
   return true;
+
+unreadable:
+  filebuf = (char *) crealloc_abort (filebuf,
+				     sizeof (UNREADABLE_SYMLINK_CONTENT));
+  strcpy (filebuf, UNREADABLE_SYMLINK_CONTENT);
+  return false;
 }
 
 int

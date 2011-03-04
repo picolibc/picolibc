@@ -1,3 +1,9 @@
+2011-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::exists): Rewrite.
+	(fhandler_procsys::fill_filebuf): Fill buffer with valid string even if
+	reading the symlink fails.
+
 2011-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc (ipc_cond_timedwait): If ipc_mutex_unlock fails, return
