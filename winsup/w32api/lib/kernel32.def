@@ -359,7 +359,7 @@ FreeConsole@0
 FreeEnvironmentStringsA@4
 FreeEnvironmentStringsW@4
 FreeLibrary@4
-FreeLibraryAndExitThread@28
+FreeLibraryAndExitThread@8
 FreeLibraryWhenCallbackReturns@8
 FreeResource@4
 FreeUserPhysicalPages@12

@@ -1,3 +1,7 @@
+2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* lib/kernel32.def (FreeLibraryAndExitThread): Fix definition.
+
 2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (FILE_ENCRYPTABLE, FILE_IS_ENCRYPTED, FILE_READ_ONLY,
