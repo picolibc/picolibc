@@ -4,6 +4,12 @@
 #pragma GCC system_header
 #endif
 
+#ifdef __GNUC__
+#define __MINGW_EXTENSION __extension__
+#else
+#define __MINGW_EXTENSION
+#endif
+
 #ifndef WINBASEAPI
 #ifdef __W32API_USE_DLLIMPORT__
 #define WINBASEAPI DECLSPEC_IMPORT
@@ -833,8 +839,8 @@ typedef struct _DEBUG_EVENT {
 typedef struct _OVERLAPPED {
 	ULONG_PTR Internal;
 	ULONG_PTR InternalHigh;
-	union {
-		struct {
+	__MINGW_EXTENSION union {
+		__MINGW_EXTENSION struct {
 	DWORD Offset;
 	DWORD OffsetHigh;
 	};

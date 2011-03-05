@@ -1,3 +1,9 @@
+2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winbase.h (__MINGW_EXTENSION): Define.
+	(OVERLAPPED): Add __MINGW_EXTENSION around nameless union /
+	struct to correct issue with -std=c99.
+
 2011-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/ddk/winddk.h (TIMER_INFORMATION_CLASS): Define.
