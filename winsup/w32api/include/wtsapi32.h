@@ -136,6 +136,38 @@ void WINAPI WTSFreeMemory(PVOID pMemory);
 #define WTSQuerySessionInformation WTSQuerySessionInformationA
 #endif
 
+BOOL WTSSendMessageA(
+  HANDLE hServer,
+  DWORD SessionId,
+  LPSTR pTitle,
+  DWORD TitleLength,
+  LPSTR pMessage,
+  DWORD MessageLength,
+  DWORD Style,
+  DWORD Timeout,
+  DWORD *pResponse,
+  BOOL bWait
+);
+
+BOOL WTSSendMessageW(
+  HANDLE hServer,
+  DWORD SessionId,
+  LPWSTR pTitle,
+  DWORD TitleLength,
+  LPWSTR pMessage,
+  DWORD MessageLength,
+  DWORD Style,
+  DWORD Timeout,
+  DWORD *pResponse,
+  BOOL bWait
+);
+
+#ifdef UNICODE
+#define WTSSendMessage WTSSendMessageW
+#else
+#define WTSSendMessage WTSSendMessageA
+#endif
+
 #endif /* _WIN32_WINNT >= 0x0500 */
 
 #ifdef __cplusplus

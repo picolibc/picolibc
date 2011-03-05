@@ -1,5 +1,10 @@
 2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/wtsapi32.h (WTSSendMessageA, WTSSendMessageW, WTSSendMessage):
+	Define.
+
+2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winbase.h (PSAPI_WORKING_SET_BLOCK,
 	PSAPI_WORKING_SET_INFORMATION): Define.
 
