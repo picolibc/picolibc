@@ -1,5 +1,11 @@
 2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/winbase.h (FILE_ENCRYPTABLE, FILE_IS_ENCRYPTED, FILE_READ_ONLY,
+	FILE_ROOT_DIR, FILE_SYSTEM_ATTR, FILE_SYSTEM_DIR, FILE_SYSTEM_NOT_SUPPORT,
+	FILE_UNKNOWN, FILE_USER_DISALLOWED): Define.
+
+2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/winioctl.h (_DRIVE_LAYOUT_INFORMATION_MBR): Add
 	_DRIVE_LAYOUT_INFORMATION_MBR_DEFINED guard.
 	* include/ddk/winddk.h (_DRIVE_LAYOUT_INFORMATION_MBR): Ditto.
