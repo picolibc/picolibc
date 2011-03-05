@@ -1,3 +1,9 @@
+2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/winioctl.h (_DRIVE_LAYOUT_INFORMATION_MBR): Add
+	_DRIVE_LAYOUT_INFORMATION_MBR_DEFINED guard.
+	* include/ddk/winddk.h (_DRIVE_LAYOUT_INFORMATION_MBR): Ditto.
+
 2011-03-04  Seth Jackson  <sethj@users.sourceforge.net>
 
 	* include/winnt.h (PAGE_WRITECOMBINE): Define.
