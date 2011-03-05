@@ -1861,6 +1861,12 @@ extern "C" {
 #define L_MAX_URL_LENGTH	2084
 #endif
 
+typedef struct tagNMTCKEYDOWN {
+  NMHDR hdr;
+  WORD  wVKey;
+  UINT  flags;
+} NMTCKEYDOWN;
+
 #ifndef RC_INVOKED
 typedef struct tagCOMBOBOXEXITEMA{
 	UINT mask;

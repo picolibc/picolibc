@@ -1,5 +1,9 @@
 2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/commctrl.h (NMTCKEYDOWN): Define.
+
+2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/wtsapi32.h (WTSSendMessageA, WTSSendMessageW, WTSSendMessage):
 	Define.
 
