@@ -1,3 +1,8 @@
+2011-03-04  Seth Jackson  <sethj@users.sourceforge.net>
+
+	* include/winnt.h (PAGE_WRITECOMBINE): Define.
+	* include/winbase.h (THREAD_MODE_BACKGROUND_BEGIN, THREAD_MODE_BACKGROUND_END): Define.
+
 2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/winbase.h (__MINGW_EXTENSION): Define.

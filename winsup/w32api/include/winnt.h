@@ -1041,6 +1041,7 @@ typedef DWORD FLONG;
 #define PAGE_EXECUTE_WRITECOPY	0x0080
 #define PAGE_GUARD		0x0100
 #define PAGE_NOCACHE		0x0200
+#define PAGE_WRITECOMBINE 0x0400
 #define MEM_COMMIT           0x1000
 #define MEM_RESERVE          0x2000
 #define MEM_DECOMMIT         0x4000
