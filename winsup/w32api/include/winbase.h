@@ -5,9 +5,9 @@
 #endif
 
 #ifdef __GNUC__
-#define __MINGW_EXTENSION __extension__
+#define __GNUC_EXTENSION __extension__
 #else
-#define __MINGW_EXTENSION
+#define __GNUC_EXTENSION
 #endif
 
 #ifndef WINBASEAPI
@@ -852,8 +852,8 @@ typedef struct _DEBUG_EVENT {
 typedef struct _OVERLAPPED {
 	ULONG_PTR Internal;
 	ULONG_PTR InternalHigh;
-	__MINGW_EXTENSION union {
-		__MINGW_EXTENSION struct {
+	__GNUC_EXTENSION union {
+		__GNUC_EXTENSION struct {
 	DWORD Offset;
 	DWORD OffsetHigh;
 	};

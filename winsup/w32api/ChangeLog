@@ -1,5 +1,9 @@
 2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/winbase.h (__GNUC_EXTENSION): Define, replacing __MINGW_EXTENSION.
+
+2011-03-05  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* lib/kernel32.def (FreeLibraryAndExitThread): Fix definition.
 
 2011-03-04  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
