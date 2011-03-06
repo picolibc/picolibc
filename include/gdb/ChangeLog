@@ -1,3 +1,7 @@
+2011-03-05  Mike Frysinger  <vapier@gentoo.org>
+
+	* sim-bfin.h: New file.
+
 2011-01-11  Andrew Burgess  <aburgess@broadcom.com>
 
 	* remote-sim.h (sim_store_register): Update the API
