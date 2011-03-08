@@ -81,6 +81,22 @@ typedef struct _PERFORMANCE_INFORMATION {
   DWORD ThreadCount;
 } PERFORMANCE_INFORMATION, *PPERFORMANCE_INFORMATION;
 
+typedef union _PSAPI_WORKING_SET_BLOCK {
+  ULONG_PTR Flags;
+  struct {
+    ULONG_PTR Protection  :5;
+    ULONG_PTR ShareCount  :3;
+    ULONG_PTR Shared  :1;
+    ULONG_PTR Reserved  :3;
+    ULONG_PTR VirtualPage  :20;
+  } ;
+} PSAPI_WORKING_SET_BLOCK, *PPSAPI_WORKING_SET_BLOCK;
+
+typedef struct _PSAPI_WORKING_SET_INFORMATION {
+  ULONG_PTR               NumberOfEntries;
+  PSAPI_WORKING_SET_BLOCK WorkingSetInfo[1];
+} PSAPI_WORKING_SET_INFORMATION, *PPSAPI_WORKING_SET_INFORMATION;
+
 /* Grouped by application,not in alphabetical order. */
 BOOL WINAPI EnumProcesses(DWORD *,DWORD,DWORD *);
 BOOL WINAPI EnumProcessModules(HANDLE,HMODULE *,DWORD,LPDWORD);
