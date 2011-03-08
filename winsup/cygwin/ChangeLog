@@ -1,4 +1,8 @@
-2011-03-07  Corinna Vinschen  <corinna@vinschen.de>
+2011-03-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc: Fix copyright dates.
+
+2011-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): When creating a file on a
 	filesystem supporting ACLs, create the file with WRITE_DAC access.
