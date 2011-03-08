@@ -577,6 +577,13 @@ fhandler_base::open (int flags, mode_t mode)
 	    /* If mode has no write bits set, and ACLs are not used, we set
 	       the DOS R/O attribute. */
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
+	  else if (!exists () && has_acls ())
+	    /* If we are about to create the file and the filesystem supports
+	       ACLs, we will overwrite the DACL after the call to NtCreateFile.
+	       This requires a handle with additional WRITE_DAC access,
+	       otherwise set_file_sd has to open the file again. */
+	    access |= WRITE_DAC;
+
 	  /* The file attributes are needed for later use in, e.g. fchmod. */
 	  pc.file_attributes (file_attributes);
 	}

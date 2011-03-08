@@ -43,21 +43,31 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
     {
       if (fh)
 	{
-	  if (justcreated)
+	  /* Amazing but true.  If you want to know if an ACE is inherited
+	     from the parent object, you can't use the NtQuerySecurityObject
+	     function.  In the DACL returned by this functions, the
+	     INHERITED_ACE flag is never set.  Only by calling GetSecurityInfo
+	     you get this information.
+	     
+	     However, this functionality is slow, and the extra information is
+	     only required when the file has been created and the permissions
+	     are about to be set to POSIX permissions.  Therefore we only use
+	     it in case the file just got created.  In all other cases we
+	     rather call NtQuerySecurityObject directly...
+	     
+	     ...except that there's a problem on 5.1 and 5.2 kernels.  The
+	     GetSecurityInfo call on a file sometimes returns with
+	     ERROR_INVALID_ADDRESS if a former request for the SD of the
+	     parent directory (or one of the parent directories?) used the
+	     NtQuerySecurityObject call, rather than GetSecurityInfo as well.
+	     As soon as all directory SDs are fetched using GetSecurityInfo,
+	     the problem disappears. */
+	  if (justcreated
+	      || (pc.isdir () && wincap.use_get_sec_info_on_dirs ()))
 	    {
-	      /* Amazing but true.  If you want to know if an ACE is inherited
-		 from the parent object, you can't use the NtQuerySecurityObject
-		 function.  In the DACL returned by this functions, the
-		 INHERITED_ACE flag is never set.  Only by calling
-		 GetSecurityInfo you get this information.
-		 
-		 This functionality is slow, and the extra information is only
-		 required when the file has been created and the permissions
-		 are about to be set to POSIX permissions.  Therefore we only
-		 use it in case the file just got created.  In all other cases
-		 we rather call NtQuerySecurityObject directly. */
 	      PSECURITY_DESCRIPTOR psd;
-	      error = GetSecurityInfo (fh, SE_FILE_OBJECT, ALL_SECURITY_INFORMATION,
+	      error = GetSecurityInfo (fh, SE_FILE_OBJECT,
+				       ALL_SECURITY_INFORMATION,
 				       NULL, NULL, NULL, NULL, &psd);
 	      if (error == ERROR_SUCCESS)
 		{
@@ -876,7 +886,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     {
       security_descriptor sd;
 
-      if (!get_file_sd (handle, pc, sd, attribute & S_JUSTCREATED)
+      if (!get_file_sd (handle, pc, sd, (bool)(attribute & S_JUSTCREATED))
 	  && alloc_sd (pc, uid, gid, attribute, sd))
 	ret = set_file_sd (handle, pc, sd,
 			   uid != ILLEGAL_UID || gid != ILLEGAL_GID);

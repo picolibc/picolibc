@@ -1415,6 +1415,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   IO_STATUS_BLOCK io;
   NTSTATUS status;
   HANDLE fh;
+  ULONG access = DELETE | FILE_GENERIC_WRITE;
   tmp_pathbuf tp;
   unsigned check_opt;
   bool mk_winsym = use_winsym;
@@ -1671,8 +1672,14 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  goto done;
 	}
     }
-  status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
-			 win32_newpath.get_object_attr (attr, sa),
+  else if (!isdevice && win32_newpath.has_acls ())
+    /* If the filesystem supports ACLs, we will overwrite the DACL after the
+       call to NtCreateFile.  This requires a handle with READ_CONTROL and
+       WRITE_DAC access, otherwise get_file_sd and set_file_sd both have to
+       open the file again. */
+    access |= READ_CONTROL | WRITE_DAC;
+
+  status = NtCreateFile (&fh, access, win32_newpath.get_object_attr (attr, sa),
 			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
 			 FILE_SHARE_VALID_FLAGS,
 			 isdevice ? FILE_OVERWRITE_IF : FILE_CREATE,

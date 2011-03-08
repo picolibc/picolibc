@@ -1,3 +1,19 @@
+2011-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): When creating a file on a
+	filesystem supporting ACLs, create the file with WRITE_DAC access.
+	Explain why.
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Ditto for
+	directories.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto for sockets.
+	* path.cc (symlink_worker): Ditto for symlinks.
+	* security.cc (get_file_sd): Always call GetSecurityInfo for directories
+	on XP and Server 2003.  Improve comment to explain why.
+	(set_file_attribute): Explicitely cast mode_t value to bool in call to
+	get_file_sd.
+	* wincap.h (wincaps::use_get_sec_info_on_dirs): New element.
+	* wincap.cc: Implement above element throughout.
+
 2011-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::exists): Rewrite.

@@ -996,10 +996,17 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       HANDLE fh;
       OBJECT_ATTRIBUTES attr;
       IO_STATUS_BLOCK io;
+      ULONG access = DELETE | FILE_GENERIC_WRITE;
 
-      status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
-			     pc.get_object_attr (attr, sa), &io, NULL, fattr,
-			     0, FILE_CREATE,
+      /* If the filesystem supports ACLs, we will overwrite the DACL after the
+	 call to NtCreateFile.  This requires a handle with READ_CONTROL and
+	 WRITE_DAC access, otherwise get_file_sd and set_file_sd both have to
+	 open the file again. */
+      if (pc.has_acls ())
+	access |= READ_CONTROL | WRITE_DAC;
+
+      status = NtCreateFile (&fh, access, pc.get_object_attr (attr, sa), &io,
+			     NULL, fattr, 0, FILE_CREATE,
 			     FILE_NON_DIRECTORY_FILE
 			     | FILE_SYNCHRONOUS_IO_NONALERT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,

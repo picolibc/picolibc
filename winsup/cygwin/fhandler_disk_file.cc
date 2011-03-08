@@ -1460,6 +1460,7 @@ fhandler_disk_file::mkdir (mode_t mode)
   IO_STATUS_BLOCK io;
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
+  ULONG access = FILE_LIST_DIRECTORY | SYNCHRONIZE;
 
   if (pc.fs_is_nfs ())
     {
@@ -1479,8 +1480,13 @@ fhandler_disk_file::mkdir (mode_t mode)
       nfs_attr->type = NF3DIR;
       nfs_attr->mode = (mode & 07777) & ~cygheap->umask;
     }
-  status = NtCreateFile (&dir, FILE_LIST_DIRECTORY | SYNCHRONIZE,
-			 pc.get_object_attr (attr, sa), &io, NULL,
+  else if (has_acls ())
+    /* If the filesystem supports ACLs, we will overwrite the DACL after the
+       call to NtCreateFile.  This requires a handle with READ_CONTROL and
+       WRITE_DAC access, otherwise get_file_sd and set_file_sd both have to
+       open the file again. */
+    access |= READ_CONTROL | WRITE_DAC;
+  status = NtCreateFile (&dir, access, pc.get_object_attr (attr, sa), &io, NULL,
 			 FILE_ATTRIBUTE_DIRECTORY, FILE_SHARE_VALID_FLAGS,
 			 FILE_CREATE,
 			 FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT
