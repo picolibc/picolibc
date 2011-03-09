@@ -1,3 +1,15 @@
+2011-03-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Handle
+	overlapped_fallback error condition like other error conditions.  Set
+	res carefully and specifically for each condition rather than resorting
+	to a default.
+	(fhandler_base_overlapped::write_overlapped): Preserve errno in
+	overlapped_fallback condition.  Correct write_overlapped_fallback to
+	avoid inappropriate looping.
+	(fhandler_base_overlapped::write_overlapped_fallback): Add some more
+	comments.
+
 2011-03-09  Christopher Faylor  <me.cygwin@cgf.cx>
 
 	* fhandler.cc (fhandler_base_overlapped::write_overlapp): Oops!

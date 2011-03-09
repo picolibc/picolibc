@@ -1731,14 +1731,15 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   if (!get_overlapped ())
     return inres ? overlapped_success : overlapped_error;
 
+  wait_return res;
   DWORD err = GetLastError ();
   if (err == ERROR_NO_SYSTEM_RESOURCES)
-    return overlapped_fallback;
-
-  wait_return res = overlapped_error;
-  if (nonblocking)
+    res = overlapped_fallback;
+  else if (nonblocking)
     {
-      if (inres || err == ERROR_IO_PENDING)
+      if (!inres && err != ERROR_IO_PENDING)
+	res = overlapped_error;
+      else
 	{
 	  io_pending = err == ERROR_IO_PENDING;
 	  if (writing && !inres)
@@ -1747,7 +1748,9 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	  err = 0;
 	}
     }
-  else if (inres || err == ERROR_IO_PENDING)
+  else if (!inres && err != ERROR_IO_PENDING)
+    res = overlapped_error;
+  else
     {
 #ifdef DEBUGGING
       if (!get_overlapped ()->hEvent)
@@ -1768,10 +1771,13 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       if (signalled)
 	{
 	  debug_printf ("got a signal");
-	  if (!_my_tls.call_signal_handler ())
-	    set_errno (EINTR);
-	  else
+	  if (_my_tls.call_signal_handler ())
 	    res = overlapped_signal;
+	  else
+	    {
+	      set_errno (EINTR);
+	      res = overlapped_error;
+	    }
 	  *bytes = (DWORD) -1;
 	  err = 0;
 	}
@@ -1779,29 +1785,29 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	{
 	  err = GetLastError ();
 	  debug_printf ("GetOverLappedResult failed, bytes %u", *bytes);
+	  res = overlapped_error;
 	}
       else
 	{
+	  err = 0;
 	  debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
 	  res = overlapped_success;
-	  err = 0;
 	}
     }
 
   if (!err)
     /* nothing to do */;
-  else if (err != ERROR_HANDLE_EOF && err != ERROR_BROKEN_PIPE)
-    {
-      debug_printf ("err %u", err);
-      __seterrno_from_win_error (err);
-      *bytes = (DWORD) -1;
-      res = overlapped_error;
-    }
-  else
+  else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
     {
       debug_printf ("EOF");
       *bytes = 0;
       res = overlapped_success;
+    }
+  else
+    {
+      debug_printf ("err %u", err);
+      __seterrno_from_win_error (err);
+      *bytes = (DWORD) -1;
     }
 
   if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
@@ -1848,6 +1854,7 @@ fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
     nbytes = (DWORD) -1;
   else
     {
+      int last_errno = get_errno ();
       bool keep_looping;
       if (is_nonblocking () && max_atomic_write && len > max_atomic_write)
 	len = max_atomic_write;
@@ -1857,12 +1864,13 @@ fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
 				get_overlapped ());
 	  switch (wait_overlapped (res, true, &nbytes, is_nonblocking (), (size_t) len))
 	    {
-	    case overlapped_fallback:
-	      nbytes = write_overlapped_fallback (ptr, len);
-	      /* fall through intentionally */;
 	    case overlapped_signal:
 	      keep_looping = true;
 	      break;
+	    case overlapped_fallback:
+	      set_errno (last_errno);	/* Avoid setting a random EFBIG errno */
+	      nbytes = write_overlapped_fallback (ptr, len);
+	      /* fall through intentionally */;
 	    default:	/* Added to quiet gcc */
 	    case overlapped_success:
 	    case overlapped_error:
@@ -1885,6 +1893,7 @@ ssize_t __stdcall __attribute__ ((regparm (3)))
 fhandler_base_overlapped::write_overlapped_fallback (const void *ptr, size_t orig_len)
 {
   size_t chunk;
+  /* So far, in testing, only the first if test has been necessary */
   if (orig_len > MAX_OVERLAPPED_WRITE_LEN)
     chunk = MAX_OVERLAPPED_WRITE_LEN;
   else if (orig_len > MIN_OVERLAPPED_WRITE_LEN)
@@ -1893,6 +1902,10 @@ fhandler_base_overlapped::write_overlapped_fallback (const void *ptr, size_t ori
     chunk = orig_len / 4;
   ssize_t nbytes = 0;
   DWORD nbytes_now = 0;
+  /* Write to fd in smaller chunks, accumlating a total.
+     If there's an error, just return the accumulated total
+     unless the first write fails, in which case return value
+     from wait_overlapped(). */
   while ((size_t) nbytes < orig_len)
     {
       size_t left = orig_len - nbytes;
@@ -1913,11 +1926,11 @@ fhandler_base_overlapped::write_overlapped_fallback (const void *ptr, size_t ori
 	  nbytes += nbytes_now;
 	  /* fall through intentionally */
 	case overlapped_signal:
-	  break;	/* keep looping */
+	  break;			/* keep looping */
 	case overlapped_error:
-	case overlapped_fallback:	/* Could make this more adaptive
+	case overlapped_fallback:	/* XXX Could make this more adaptive
 					   if needed */
-	  orig_len = 0;	/* terminate loop */
+	  orig_len = 0;			/* terminate loop */
 	  break;
 	}
     }
