@@ -29,6 +29,9 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 
+#define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
+#define MIN_OVERLAPPED_WRITE_LEN (1 * 1024 * 1024)
+
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
@@ -1056,8 +1059,7 @@ fhandler_base_overlapped::close ()
   if (is_nonblocking () && io_pending)
     {
       DWORD bytes;
-      set_nonblocking (false);
-      wait_overlapped (1, !!(get_access () & GENERIC_WRITE), &bytes);
+      wait_overlapped (1, !!(get_access () & GENERIC_WRITE), &bytes, false);
     }
   destroy_overlapped ();
   return fhandler_base::close ();
@@ -1686,7 +1688,7 @@ fhandler_base::fpathconf (int v)
 
 /* Overlapped I/O */
 
-int
+int __stdcall __attribute__ ((regparm (1)))
 fhandler_base_overlapped::setup_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped_buffer ();
@@ -1696,7 +1698,7 @@ fhandler_base_overlapped::setup_overlapped ()
   return ov->hEvent ? 0 : -1;
 }
 
-void
+void __stdcall __attribute__ ((regparm (1)))
 fhandler_base_overlapped::destroy_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped ();
@@ -1709,7 +1711,7 @@ fhandler_base_overlapped::destroy_overlapped ()
   get_overlapped () = NULL;
 }
 
-bool
+bool __stdcall __attribute__ ((regparm (1)))
 fhandler_base_overlapped::has_ongoing_io ()
 {
   if (!io_pending)
@@ -1723,27 +1725,25 @@ fhandler_base_overlapped::has_ongoing_io ()
   return false;
 }
 
-int
-fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *bytes, DWORD len)
+fhandler_base_overlapped::wait_return __stdcall __attribute__ ((regparm (3)))
+fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *bytes, bool nonblocking, DWORD len)
 {
   if (!get_overlapped ())
-    return inres;
-
-  int res = 0;
+    return inres ? overlapped_success : overlapped_error;
 
   DWORD err = GetLastError ();
-  if (is_nonblocking ())
+  if (err == ERROR_NO_SYSTEM_RESOURCES)
+    return overlapped_fallback;
+
+  wait_return res = overlapped_error;
+  if (nonblocking)
     {
       if (inres || err == ERROR_IO_PENDING)
 	{
 	  io_pending = err == ERROR_IO_PENDING;
 	  if (writing && !inres)
-	    *bytes = len;	/* This really isn't true but it seems like
-				   this is a corner-case for linux's
-				   non-blocking I/O implementation.  How can
-				   you know how many bytes were written until
-				   the I/O operation really completes? */
-	  res = 1;
+	    *bytes = len;
+	  res = overlapped_success;
 	  err = 0;
 	}
     }
@@ -1768,9 +1768,11 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       if (signalled)
 	{
 	  debug_printf ("got a signal");
-	  set_errno (EINTR);
+	  if (!_my_tls.call_signal_handler ())
+	    set_errno (EINTR);
+	  else
+	    res = overlapped_signal;
 	  *bytes = (DWORD) -1;
-	  res = 0;
 	  err = 0;
 	}
       else if (!wores)
@@ -1781,7 +1783,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       else
 	{
 	  debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
-	  res = 1;
+	  res = overlapped_success;
 	  err = 0;
 	}
     }
@@ -1793,14 +1795,13 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       debug_printf ("err %u", err);
       __seterrno_from_win_error (err);
       *bytes = (DWORD) -1;
-      res = 0;
+      res = overlapped_error;
     }
   else
     {
-      res = 1;
-      *bytes = 0;
-      err = 0;
       debug_printf ("EOF");
+      *bytes = 0;
+      res = overlapped_success;
     }
 
   if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
@@ -1808,39 +1809,119 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   return res;
 }
 
-void __stdcall
+void __stdcall __attribute__ ((regparm (3)))
 fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
 {
   DWORD nbytes;
   if (has_ongoing_io ())
     nbytes = (DWORD) -1;
   else
-    while (1)
-      {
-	bool res = ReadFile (get_handle (), ptr, len, &nbytes,
-			     get_overlapped ());
-	int wres = wait_overlapped (res, false, &nbytes);
-	if (wres || !_my_tls.call_signal_handler ())
-	  break;
-      }
+    {
+      bool keep_looping;
+      do
+	{
+	  bool res = ReadFile (get_handle (), ptr, len, &nbytes,
+			       get_overlapped ());
+	  switch (wait_overlapped (res, false, &nbytes, is_nonblocking ()))
+	    {
+	    case overlapped_signal:
+	      keep_looping = true;
+	      break;
+	    default:	/* Added to quiet gcc */
+	    case overlapped_success:
+	    case overlapped_error:
+	    case overlapped_fallback:
+	      keep_looping = false;
+	      break;
+	    }
+	}
+      while (keep_looping);
+    }
   len = (size_t) nbytes;
 }
 
-ssize_t __stdcall
+ssize_t __stdcall __attribute__ ((regparm (3)))
 fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
 {
   DWORD nbytes;
   if (has_ongoing_io ())
     nbytes = (DWORD) -1;
   else
-    while (1)
-      {
-	bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
-			      get_overlapped ());
-	int wres = wait_overlapped (res, true, &nbytes, (size_t) len);
-	if (wres || !_my_tls.call_signal_handler ())
-	  break;
-      }
+    {
+      bool keep_looping;
+      if (is_nonblocking () && max_atomic_write && len > max_atomic_write)
+	len = max_atomic_write;
+      do
+	{
+	  bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
+				get_overlapped ());
+	  switch (wait_overlapped (res, true, &nbytes, (size_t) len))
+	    {
+	    case overlapped_fallback:
+	      nbytes = write_overlapped_fallback (ptr, len);
+	      /* fall through intentionally */;
+	    case overlapped_signal:
+	      keep_looping = true;
+	      break;
+	    default:	/* Added to quiet gcc */
+	    case overlapped_success:
+	    case overlapped_error:
+	      keep_looping = false;
+	      break;
+	    }
+	}
+      while (keep_looping);
+    }
   debug_printf ("returning %u", nbytes);
+  return nbytes;
+}
+
+/* On XP (at least) the size of the buffer that can be used to write to a pipe
+   (pipes are currently the only thing using the overlapped methods) is
+   limited.  This function is a fallback for when that problem is detected.
+   It writes to the pipe using smaller buffers but masks this behavior
+   to the caller.  */
+ssize_t __stdcall __attribute__ ((regparm (3)))
+fhandler_base_overlapped::write_overlapped_fallback (const void *ptr, size_t orig_len)
+{
+  size_t chunk;
+  if (orig_len > MAX_OVERLAPPED_WRITE_LEN)
+    chunk = MAX_OVERLAPPED_WRITE_LEN;
+  else if (orig_len > MIN_OVERLAPPED_WRITE_LEN)
+    chunk = MIN_OVERLAPPED_WRITE_LEN;
+  else
+    chunk = orig_len / 4;
+  ssize_t nbytes = 0;
+  DWORD nbytes_now = 0;
+  while ((size_t) nbytes < orig_len)
+    {
+      size_t left = orig_len - nbytes;
+      size_t len;
+      if (left > chunk)
+	len = chunk;
+      else
+	len = left;
+      bool res = WriteFile (get_output_handle (), ptr, len, &nbytes_now,
+			    get_overlapped ());
+      /* The nonblocking case is not going to be used currently and may
+	 eventually disappear. */
+      switch (wait_overlapped (res, true, &nbytes_now,
+			       left <= chunk ? is_nonblocking () : false,
+			       (size_t) len))
+	{
+	case overlapped_success:
+	  nbytes += nbytes_now;
+	  /* fall through intentionally */
+	case overlapped_signal:
+	  break;	/* keep looping */
+	case overlapped_error:
+	case overlapped_fallback:	/* Could make this more adaptive
+					   if needed */
+	  orig_len = 0;	/* terminate loop */
+	  break;
+	}
+    }
+  if (!nbytes)
+    nbytes = nbytes_now;
   return nbytes;
 }

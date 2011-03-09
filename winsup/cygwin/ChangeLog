@@ -1,3 +1,46 @@
+2011-03-09  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* errno.cc (errmap): Change mapping of NO_SYSTEM_RESOURCES to EFBIG.
+	* fhandler.cc (MAX_OVERLAPPED_WRITE_LEN): New constant.
+	(MIN_OVERLAPPED_WRITE_LEN): Ditto.
+	(fhandler_base_overlapped::close): Accommodate change in arguments to
+	wait_overlapped.
+	(fhandler_base_overlapped::setup_overlapped): Add __stdcall and regparm
+	modifiers.
+	(fhandler_base_overlapped::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped::has_ongoing_io): Ditto.
+	(fhandler_base_overlapped::wait_overlapped): Modify to return an enum
+	returning various states.  Accept nonblocking parameter.
+	(fhandler_base_overlapped::read_overlapped): Add __stdcall and regparm
+	modifiers.  Rework to attempt to be smarter about reacting to states
+	returned by wait_overlapped.
+	(fhandler_base_overlapped::write_overlapped): Ditto.  Add fallback
+	option for when wait_overlapped detects that smaller chunks must be
+	written.
+	(fhandler_base_overlapped::write_overlapped_fallback): Ditto.
+	* fhandler.h (DEFAULT_PIPEBUFSIZE): Move definition here from pipe.cc.
+	(fhandler_base::has_ongoing_io): Define with __stdcall and regparm
+	modifiers.
+	(fhandler_base_overlapped::wait_return): New enum.
+	(fhandler_base_overlapped::max_atomic_write): New variable.
+	(fhandler_base_overlapped:: wait_overlapped): Accommodate changes
+	mentioned above to arguments and modifiers.
+	(fhandler_base_overlapped::setup_overlapped): Ditto for modifiers.
+	(fhandler_base_overlapped::read_overlapped): Ditto.
+	(fhandler_base_overlapped::write_overlapped): Ditto.
+	(fhandler_base_overlapped::destroy_overlapped): Ditto.
+	(fhandler_base_overlapped::has_ongoing_io): Ditto.
+	(fhandler_base_overlapped::fhandler_base_overlapped): Zero
+	max_atomic_write.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Set max_atomic_write
+	to the size of the DEFAULT_PIPEBUFSIZE.
+	(fhandler_fifo::wait): Accommodate change in arguments to
+	wait_overlapped.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Set max_atomic_write to the
+	size of the DEFAULT_PIPEBUFSIZE.
+	(fhandler_pipe::create_selectable): Allow minimum size of DEFAULT_PIPEBUFSIZE.
+	(DEFAULT_PIPEBUFSIZE): Delete here, move to fhandler.h.
+
 2011-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc: Fix copyright dates.

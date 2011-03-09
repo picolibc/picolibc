@@ -1,6 +1,7 @@
 /* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -24,6 +25,7 @@
 fhandler_fifo::fhandler_fifo ():
   fhandler_base_overlapped (), wait_state (fifo_unknown), dummy_client (NULL)
 {
+  max_atomic_write = DEFAULT_PIPEBUFSIZE;
   need_fork_fixup (true);
 }
 
@@ -188,7 +190,7 @@ fhandler_fifo::wait (bool iswrite)
 	    int res = ConnectNamedPipe (get_handle (), get_overlapped ());
 	    if (GetLastError () != ERROR_NO_DATA && GetLastError () != ERROR_PIPE_CONNECTED)
 	      {
-		res = wait_overlapped (res, iswrite, &dummy_bytes);
+		res = wait_overlapped (res, iswrite, &dummy_bytes, false);
 		if (!res)
 		  {
 		    if (get_errno () != EINTR)

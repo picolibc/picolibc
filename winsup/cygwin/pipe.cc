@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010 Hat, Inc.
+   2008, 2009, 2010, 2011 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -26,6 +26,7 @@ details. */
 fhandler_pipe::fhandler_pipe ()
   : fhandler_base_overlapped (), popen_pid (0)
 {
+  max_atomic_write = DEFAULT_PIPEBUFSIZE;
   need_fork_fixup (true);
   uninterruptible_io (true);
 }
@@ -217,8 +218,8 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   r = w = INVALID_HANDLE_VALUE;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
-  if (psize < PIPE_BUF)
-    psize = PIPE_BUF;
+  if (psize < DEFAULT_PIPEBUFSIZE)
+    psize = DEFAULT_PIPEBUFSIZE;
 
   char pipename[MAX_PATH];
   const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
@@ -372,8 +373,6 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
   set_errno (EBADF);
   return -1;
 }
-
-#define DEFAULT_PIPEBUFSIZE 65536
 
 extern "C" int
 pipe (int filedes[2])
