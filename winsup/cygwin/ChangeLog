@@ -1,3 +1,8 @@
+2011-03-09  Christopher Faylor  <me.cygwin@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::write_overlapp): Oops!
+	Accommodate change in arguments to wait_overlapped.
+
 2011-03-09  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* errno.cc (errmap): Change mapping of NO_SYSTEM_RESOURCES to EFBIG.

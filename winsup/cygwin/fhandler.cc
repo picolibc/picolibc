@@ -1855,7 +1855,7 @@ fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
 	{
 	  bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
 				get_overlapped ());
-	  switch (wait_overlapped (res, true, &nbytes, (size_t) len))
+	  switch (wait_overlapped (res, true, &nbytes, is_nonblocking (), (size_t) len))
 	    {
 	    case overlapped_fallback:
 	      nbytes = write_overlapped_fallback (ptr, len);
