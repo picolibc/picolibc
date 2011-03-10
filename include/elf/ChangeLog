@@ -1,3 +1,7 @@
+2011-03-10  Nick Clifton  <nickc@redhat.com>
+
+	* common.h (EM_V850): V850s now supplied by Renesas.
+
 2011-02-25  Alan Modra  <amodra@gmail.com>
 
 	PR 12516
