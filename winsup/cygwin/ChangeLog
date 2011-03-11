@@ -1,5 +1,26 @@
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (winmm): Remove time functions.  Don't treat
+	unloadable wave functions as fatal.
+	* hires.h (hires_ms::timeGetTime_ns): New private method.
+	(hires_ms::dmsecs): Call timeGetTime_ns here.
+	* ntdll.h (struct _KSYSTEM_TIME): Define.
+	(KUSER_SHARED_DATA): Redefine to allow access to InterruptTime.
+	(SharedUserData): Define here.
+	(NtQueryTimerResolution): Declare.
+	(NtSetTimerResolution): Declare.
+	* path.cc (SharedUserData): Move to ntdll.h.
+	* times.cc (hires_ms::timeGetTime_ns): New private method.
+	Use throughout instead of timeGetTime.
+	(hires_ms::resolution): Try a call to NtQueryTimerResolution
+	to fetch current period.  Fall back to heuristic if that fails.
+	(clock_setres): Align period to possible values per a call to
+	NtQueryTimerResolution.  Explain why.  Replace calls to
+	timeBeginPeriod and timeEndPeriod with underlying call to
+	NtSetTimerResolution.
+
+2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (SIO_BASE_HANDLE): Define.
 	(fdsock): If we got an LSP handle, try to try to create a copy of the
 	base handle instead.  Change comment to explain.
