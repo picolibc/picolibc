@@ -480,6 +480,10 @@ cygwin_getprotobynumber (int number)
   return dup_ent (getprotobynumber (number));
 }
 
+#ifndef SIO_BASE_HANDLE
+#define SIO_BASE_HANDLE _WSAIOR(IOC_WS2,34)
+#endif
+
 bool
 fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 {
@@ -488,50 +492,69 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   fd = build_fh_dev (*dev);
   if (!fd.isopen ())
     return false;
-  fd->set_io_handle ((HANDLE) soc);
-  if (!((fhandler_socket *) fd)->init_events ())
-    return false;
-  fd->set_flags (O_RDWR | O_BINARY);
-  fd->uninterruptible_io (true);
-  debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
 
   /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
      scanners or other network-oriented software replace normal sockets
-     with their own kind, which is running through a filter driver.
+     with their own kind, which is running through a filter driver called
+     "layered service provider" (LSP).
      
-     The result is that these new sockets are not normal kernel objects
-     anymore.  They are typically not marked as inheritable, nor are they
-     IFS handles, as normal OS sockets are.  They are in fact not inheritable
-     to child processes, and subsequent socket calls in the child process
-     will fail with error 10038, WSAENOTSOCK.  And worse, while DuplicateHandle
-     on these sockets mostly works in the process which created the socket,
-     DuplicateHandle does quite often not work anymore in a child process.
-     It does not help to mark them inheritable via SetHandleInformation.
+     LSP sockets are not kernel objects.  They are typically not marked as
+     inheritable, nor are they IFS handles.  They are in fact not inheritable
+     to child processes, and it does not help to mark them inheritable via
+     SetHandleInformation.  Subsequent socket calls in the child process fail
+     with error 10038, WSAENOTSOCK. 
 
-     The only way to make these sockets usable in child processes is to
-     duplicate them via WSADuplicateSocket/WSASocket calls.  This requires
-     to start the child process in SUSPENDED state so we only do this on
-     affected systems.  If we recognize a non-inheritable socket, or if
-     the XP1_IFS_HANDLES flag is not set in a call to WSADuplicateSocket,
-     we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
-     that socket. */
+     The only way up to Windows Server 2003 to make these sockets usable in
+     child processes is to duplicate them via WSADuplicateSocket/WSASocket
+     calls.  This requires to start the child process in SUSPENDED state so
+     we only do this on affected systems.  If we recognize a non-inheritable
+     socket we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
+     that socket.
+     
+     Starting with Vista there's another neat way to workaround these annoying
+     LSP sockets.  WSAIoctl allows to fetch the underlying base socket, which
+     is a normal, inheritable IFS handle.  So we fetch the base socket,
+     duplicate it, and close the original socket.  Now we have a standard IFS
+     socket which (hopefully) works as expected. */
   DWORD flags;
-#if 0
-  /* Disable checking for IFS handle for now.  In theory, checking the fact
-     that the socket handle is not inheritable should be sufficient. */
-  WSAPROTOCOL_INFOW wpi;
-#endif
+  bool fixup = false;
   if (!GetHandleInformation ((HANDLE) soc, &flags)
       || !(flags & HANDLE_FLAG_INHERIT))
-#if 0
-      || WSADuplicateSocketW (soc, GetCurrentProcessId (), &wpi)
-      /* dwProviderReserved contains the actual SOCKET value of the duplicated
-	 socket.  Close it or suffer a handle leak.  Worse, one socket for each
-	 connection remains in CLOSE_WAIT state. */
-      || (closesocket ((SOCKET) wpi.dwProviderReserved), FALSE)
-      || !(wpi.dwServiceFlags1 & XP1_IFS_HANDLES))
-#endif
+    {
+      int ret;
+      SOCKET base_soc;
+      DWORD bret;
+
+      fixup = true;
+      debug_printf ("LSP handle: %p", soc);
+      ret = WSAIoctl (soc, SIO_BASE_HANDLE, NULL, 0, (void *) &base_soc,
+		      sizeof (base_soc), &bret, NULL, NULL);
+      if (ret)
+      	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
+      else if (base_soc != soc
+	       && GetHandleInformation ((HANDLE) base_soc, &flags)
+	       && (flags & HANDLE_FLAG_INHERIT))
+	{
+	  if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_soc,
+				GetCurrentProcess (), (PHANDLE) &base_soc,
+				0, TRUE, DUPLICATE_SAME_ACCESS))
+	    debug_printf ("DuplicateHandle failed, %E");
+	  else
+	    {
+	      closesocket (soc);
+	      soc = base_soc;
+	      fixup = false;
+	    }
+	}
+    }
+  fd->set_io_handle ((HANDLE) soc);
+  if (!((fhandler_socket *) fd)->init_events ())
+    return false;
+  if (fixup)
     ((fhandler_socket *) fd)->init_fixup_before ();
+  fd->set_flags (O_RDWR | O_BINARY);
+  fd->uninterruptible_io (true);
+  debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
 
   /* Raise default buffer sizes (instead of WinSock default 8K).
 
