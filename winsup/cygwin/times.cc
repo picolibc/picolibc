@@ -666,6 +666,27 @@ hires_ns::nsecs ()
   return now.QuadPart;
 }
 
+LONGLONG
+hires_ms::timeGetTime_ns ()
+{
+  LARGE_INTEGER t;
+
+  /* This is how timeGetTime is implemented in winmm.dll.
+     The real timeGetTime subtracts and adds some values which are constant
+     over the lifetime of the process.  Since we don't need absolute accuracy
+     of the value returned by timeGetTime, only relative accuracy, we can skip
+     this step. */
+  do
+    {
+      t.HighPart = SharedUserData.InterruptTime.High1Time;
+      t.LowPart = SharedUserData.InterruptTime.LowPart;
+    }
+  while (t.HighPart != SharedUserData.InterruptTime.High2Time);
+  /* We use the value in full 100ns resolution in the calling functions
+     anyway, so we can skip dividing by 10000 here. */
+  return t.QuadPart;
+}
+
 void
 hires_ms::prime ()
 {
@@ -673,7 +694,7 @@ hires_ms::prime ()
     {
       int priority = GetThreadPriority (GetCurrentThread ());
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-      initime_ns = systime_ns () - (((LONGLONG) timeGetTime ()) * 10000LL);
+      initime_ns = systime_ns () - timeGetTime_ns ();
       inited = true;
       SetThreadPriority (GetCurrentThread (), priority);
     }
@@ -687,12 +708,12 @@ hires_ms::nsecs ()
     prime ();
 
   LONGLONG t = systime_ns ();
-  LONGLONG res = initime_ns + (((LONGLONG) timeGetTime ()) * 10000LL);
+  LONGLONG res = initime_ns + timeGetTime_ns ();
   if (res < (t - 40 * 10000LL))
     {
       inited = false;
       prime ();
-      res = initime_ns + (((LONGLONG) timeGetTime ()) * 10000LL);
+      res = initime_ns + timeGetTime_ns ();
     }
   return res;
 }
@@ -752,24 +773,34 @@ hires_ms::resolution ()
 {
   if (!minperiod)
     {
-      /* Try to empirically determine current timer resolution */
-      int priority = GetThreadPriority (GetCurrentThread ());
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-      DWORD period = 0;
-      for (int i = 0; i < 4; i++)
+      NTSTATUS status;
+      ULONG coarsest, finest, actual;
+
+      status = NtQueryTimerResolution (&coarsest, &finest, &actual);
+      if (NT_SUCCESS (status))
+	minperiod = (UINT) actual / 10000L;
+      else
 	{
-	  DWORD now;
-	  DWORD then = timeGetTime ();
-	  while ((now = timeGetTime ()) == then)
-	    continue;
-	  then = now;
-	  while ((now = timeGetTime ()) == then)
-	    continue;
-	  period += now - then;
+	  /* Try to empirically determine current timer resolution */
+	  int priority = GetThreadPriority (GetCurrentThread ());
+	  SetThreadPriority (GetCurrentThread (),
+			     THREAD_PRIORITY_TIME_CRITICAL);
+	  LONGLONG period = 0;
+	  for (int i = 0; i < 4; i++)
+	    {
+	      LONGLONG now;
+	      LONGLONG then = timeGetTime_ns ();
+	      while ((now = timeGetTime_ns ()) == then)
+		continue;
+	      then = now;
+	      while ((now = timeGetTime_ns ()) == then)
+		continue;
+	      period += now - then;
+	    }
+	  SetThreadPriority (GetCurrentThread (), priority);
+	  period /= 40000L;
+	  minperiod = (UINT) period;
 	}
-      SetThreadPriority (GetCurrentThread (), priority);
-      period /= 4;
-      minperiod = period;
     }
   return minperiod;
 }
@@ -807,28 +838,36 @@ extern "C" int
 clock_setres (clockid_t clk_id, struct timespec *tp)
 {
   static NO_COPY bool period_set;
+
   if (clk_id != CLOCK_REALTIME)
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  if (period_set)
-    timeEndPeriod (minperiod);
-
   DWORD period = (tp->tv_sec * 1000) + ((tp->tv_nsec) / 1000000);
 
-  if (timeBeginPeriod (period))
+  /* clock_setres is non-POSIX/non-Linux.  On QNX, the function always
+     rounds the incoming value to the nearest supported value. */
+  ULONG coarsest, finest, actual;
+  if (NT_SUCCESS (NtQueryTimerResolution (&coarsest, &finest, &actual)))
     {
-      minperiod = period;
-      period_set = true;
-    }
-  else
-    {
-      __seterrno ();
-      timeBeginPeriod (minperiod);
-      return -1;
+      if (period > coarsest / 10000L)
+	period = coarsest / 10000L;
+      else if (finest / 10000L > period)
+	period = finest / 10000L;
     }
 
+  if (period_set
+      && NT_SUCCESS (NtSetTimerResolution (minperiod * 10000L, FALSE, &actual)))
+    period_set = false;
+
+  if (!NT_SUCCESS (NtSetTimerResolution (period * 10000L, TRUE, &actual)))
+    {
+      __seterrno ();
+      return -1;
+    }
+  minperiod = actual / 10000L;
+  period_set = true;
   return 0;
 }

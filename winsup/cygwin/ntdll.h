@@ -599,9 +599,18 @@ typedef struct _TEB
   /* A lot more follows... */
 } TEB, *PTEB;
 
+typedef struct _KSYSTEM_TIME
+{
+  ULONG LowPart;
+  LONG High1Time;
+  LONG High2Time;
+} KSYSTEM_TIME, *PKSYSTEM_TIME;
+
 typedef struct _KUSER_SHARED_DATA
 {
-  BYTE Reserved1[0x2dc];
+  BYTE Reserved1[0x08];
+  KSYSTEM_TIME InterruptTime;
+  BYTE Reserved2[0x2c8];
   ULONG DismountCount;
   /* A lot more follows... */
 } KUSER_SHARED_DATA, *PKUSER_SHARED_DATA;
@@ -889,6 +898,11 @@ typedef enum _EVENT_INFORMATION_CLASS
 #define NtCurrentProcess() ((HANDLE) 0xffffffff)
 #define NtCurrentThread()  ((HANDLE) 0xfffffffe)
 
+/* This is the mapping of the KUSER_SHARED_DATA structure into the 32 bit
+   user address space.  We need it here to access the current DismountCount. */
+static KUSER_SHARED_DATA &SharedUserData
+			 = *(volatile PKUSER_SHARED_DATA) 0x7ffe0000;
+
 extern "C"
 {
   NTSTATUS NTAPI NtAdjustPrivilegesToken (HANDLE, BOOLEAN, PTOKEN_PRIVILEGES,
@@ -970,6 +984,7 @@ extern "C"
   NTSTATUS NTAPI NtQuerySecurityObject (HANDLE, SECURITY_INFORMATION,
 					PSECURITY_DESCRIPTOR, ULONG, PULONG);
   NTSTATUS NTAPI NtQuerySymbolicLinkObject (HANDLE, PUNICODE_STRING, PULONG);
+  NTSTATUS NTAPI NtQueryTimerResolution (PULONG, PULONG, PULONG);
   NTSTATUS NTAPI NtQueryVirtualMemory (HANDLE, PVOID, MEMORY_INFORMATION_CLASS,
 				       PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryVolumeInformationFile (HANDLE, IO_STATUS_BLOCK *,
@@ -984,6 +999,7 @@ extern "C"
 				       FILE_INFORMATION_CLASS);
   NTSTATUS NTAPI NtSetSecurityObject (HANDLE, SECURITY_INFORMATION,
 				      PSECURITY_DESCRIPTOR);
+  NTSTATUS NTAPI NtSetTimerResolution (ULONG, BOOLEAN, PULONG);
   NTSTATUS NTAPI NtUnlockVirtualMemory (HANDLE, PVOID *, ULONG *, ULONG);
   NTSTATUS NTAPI NtUnmapViewOfSection (HANDLE, PVOID);
   NTSTATUS NTAPI NtWriteFile (HANDLE, HANDLE, PIO_APC_ROUTINE, PVOID,
