@@ -1,7 +1,7 @@
 /* thread.cc: Locking and threading module functions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -169,6 +169,14 @@ inline bool
 pthread_key::is_good_object (pthread_key_t const *key)
 {
   if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_spinlock::is_good_object (pthread_spinlock_t const *mutex)
+{
+  if (verifyable_object_isvalid (mutex, PTHREAD_SPINLOCK_MAGIC) != VALID_OBJECT)
     return false;
   return true;
 }
@@ -1547,11 +1555,11 @@ pthread_mutex::init_mutex ()
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   verifyable_object (0),	/* set magic to zero initially */
   lock_counter (0),
-  win32_obj_id (NULL), recursion_counter (0),
-  condwaits (0), owner (_new_mutex),
+  win32_obj_id (NULL), owner (_new_mutex),
 #ifdef DEBUGGING
   tid (0),
 #endif
+  recursion_counter (0), condwaits (0),
   type (PTHREAD_MUTEX_ERRORCHECK),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
@@ -1699,6 +1707,65 @@ pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
 
 pthread_mutexattr::~pthread_mutexattr ()
 {
+}
+
+/* pshared spinlocks
+
+   The infrastructure is provided by the underlying pthread_mutex class.
+   The rest is a simplification implementing spin locking. */
+
+pthread_spinlock::pthread_spinlock (int pshared) :
+  pthread_mutex (NULL)
+{
+  magic = PTHREAD_SPINLOCK_MAGIC;
+  set_type (PTHREAD_MUTEX_NORMAL);
+  set_shared (pshared);
+}
+
+int
+pthread_spinlock::lock ()
+{
+  pthread_t self = ::pthread_self ();
+  int result = -1;
+
+  do
+    {
+      if (InterlockedExchange ((long *) &lock_counter, 1) == 0)
+	{
+	  set_owner (self);
+	  result = 0;
+	}
+      else if (pthread::equal (owner, self))
+	result = EDEADLK;
+      else /* Minimal timeout to minimize CPU usage while still spinning. */
+	cancelable_wait (win32_obj_id, 1L, cw_no_cancel, cw_sig_resume);
+    }
+  while (result == -1);
+  pthread_printf ("spinlock %p, self %p, owner %p", this, self, owner);
+  return result;
+}
+
+int
+pthread_spinlock::unlock ()
+{
+  pthread_t self = ::pthread_self ();
+  int result = 0;
+
+  if (!pthread::equal (owner, self))
+    result = EPERM;
+  else
+    {
+      owner = (pthread_t) _unlocked_mutex;
+#ifdef DEBUGGING
+      tid = 0;
+#endif
+      InterlockedExchange ((long *) &lock_counter, 0);
+      ::SetEvent (win32_obj_id);
+      result = 0;
+    }
+  pthread_printf ("spinlock %p, owner %p, self %p, res %d",
+		  this, owner, self, result);
+  return result;
 }
 
 DWORD WINAPI
@@ -2766,6 +2833,63 @@ pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
 				int *old_ceiling)
 {
   return ENOSYS;
+}
+
+/* Spinlocks  */
+
+int
+pthread_spinlock::init (pthread_spinlock_t *spinlock, int pshared)
+{
+  pthread_spinlock_t new_spinlock = new pthread_spinlock (pshared);
+  if (!is_good_object (&new_spinlock))
+    {
+      delete new_spinlock;
+      return EAGAIN;
+    }
+
+  myfault efault;
+  if (efault.faulted ())
+    {
+      delete new_spinlock;
+      return EINVAL;
+    }
+
+  *spinlock = new_spinlock;
+  pthread_printf ("*spinlock %p, pshared %d", *spinlock, pshared);
+
+  return 0;
+}
+
+extern "C" int
+pthread_spin_lock (pthread_spinlock_t *spinlock)
+{
+  if (!pthread_spinlock::is_good_object (spinlock))
+    return EINVAL;
+  return (*spinlock)->lock ();
+}
+
+extern "C" int
+pthread_spin_trylock (pthread_spinlock_t *spinlock)
+{
+  if (!pthread_spinlock::is_good_object (spinlock))
+    return EINVAL;
+  return (*spinlock)->trylock ();
+}
+
+extern "C" int
+pthread_spin_unlock (pthread_spinlock_t *spinlock)
+{
+  if (!pthread_spinlock::is_good_object (spinlock))
+    return EINVAL;
+  return (*spinlock)->unlock ();
+}
+
+extern "C" int
+pthread_spin_destroy (pthread_spinlock_t *spinlock)
+{
+  if (!pthread_spinlock::is_good_object (spinlock))
+    return EINVAL;
+  return (*spinlock)->destroy ();
 }
 
 /* Win32 doesn't support mutex priorities - see __pthread_mutex_getprioceiling

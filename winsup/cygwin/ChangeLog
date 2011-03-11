@@ -1,5 +1,40 @@
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (pthread_spin_destroy): Export.
+	(pthread_spin_init): Export.
+	(pthread_spin_lock): Export.
+	(pthread_spin_trylock): Export.
+	(pthread_spin_unlock): Export.
+	* posix.sgml (std-susv4): Add pthread_spin_destroy, pthread_spin_init,
+	pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
+	(std-notimpl): Remove pthread_spin_[...].
+	* pthread.cc (pthread_spin_init): New function.
+	* thread.cc (pthread_spinlock::is_good_object): New function.
+	(pthread_mutex::pthread_mutex): Rearrange initializers to accommodate
+	protected data in pthread_mutex.
+	(pthread_spinlock::pthread_spinlock): New constructor.
+	(pthread_spinlock::lock): New method.
+	(pthread_spinlock::unlock): New method.
+	(pthread_spinlock::init): New method.
+	(pthread_spin_lock): New function.
+	(pthread_spin_trylock): New function.
+	(pthread_spin_unlock): New function.
+	(pthread_spin_destroy): New function.
+	* thread.h (PTHREAD_SPINLOCK_MAGIC): Define.
+	(class pthread_mutex): Change access level of members shared with
+	derived classes to protected.
+	(pthread_mutex::set_shared): New protected method.
+	(class pthread_spinlock): New class, derived class of pthread_mutex.
+	* include/pthread.h (pthread_spin_destroy): Declare.
+	(pthread_spin_init): Declare.
+	(pthread_spin_lock): Declare.
+	(pthread_spin_trylock): Declare.
+	(pthread_spin_unlock): Declare.
+	* include/cygwin/types.h (pthread_spinlock_t): New typedef.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (hires_ms::timeGetTime_ns): Fix typo in comment.
 
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
