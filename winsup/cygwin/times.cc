@@ -697,7 +697,7 @@ hires_ms::timeGetTime_ns ()
       - timeGetTime computes its return value in the loop as below, but then:
 
         t.QuadPart -= int_time_start.QuadPart;
-	t.Loawart /= 10000;
+	t.LowPart /= 10000;
 	t.LowPart += tick_count_start;
 	return t.LowPart;
   */

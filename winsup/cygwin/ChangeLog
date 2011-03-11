@@ -1,5 +1,9 @@
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* times.cc (hires_ms::timeGetTime_ns): Fix typo in comment.
+
+2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (hires_ms::timeGetTime_ns): Document entire functionality
 	of timeGetTime in case we need it.
 
