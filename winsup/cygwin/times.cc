@@ -675,7 +675,32 @@ hires_ms::timeGetTime_ns ()
      The real timeGetTime subtracts and adds some values which are constant
      over the lifetime of the process.  Since we don't need absolute accuracy
      of the value returned by timeGetTime, only relative accuracy, we can skip
-     this step. */
+     this step.  However, if we ever find out that we need absolute accuracy,
+     here's how it works in it's full beauty:
+     
+     - At process startup, winmm initializes two calibration values:
+
+       DWORD tick_count_start;
+       LARGE_INTEGER int_time_start;
+       do {
+         tick_count_start = GetTickCount ()
+	  do
+	    {
+	      int_time_start.HighPart = SharedUserData.InterruptTime.High1Time;
+	      int_time_start.LowPart = SharedUserData.InterruptTime.LowPart;
+	    }
+	  while (int_time_start.HighPart
+		 != SharedUserData.InterruptTime.High2Time);
+	  }
+	while (tick_count_start != GetTickCount ();
+
+      - timeGetTime computes its return value in the loop as below, but then:
+
+        t.QuadPart -= int_time_start.QuadPart;
+	t.Loawart /= 10000;
+	t.LowPart += tick_count_start;
+	return t.LowPart;
+  */
   do
     {
       t.HighPart = SharedUserData.InterruptTime.High1Time;
