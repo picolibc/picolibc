@@ -863,6 +863,7 @@ extern "C" int
 clock_setres (clockid_t clk_id, struct timespec *tp)
 {
   static NO_COPY bool period_set;
+  int status;
 
   if (clk_id != CLOCK_REALTIME)
     {
@@ -887,9 +888,10 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       && NT_SUCCESS (NtSetTimerResolution (minperiod * 10000L, FALSE, &actual)))
     period_set = false;
 
-  if (!NT_SUCCESS (NtSetTimerResolution (period * 10000L, TRUE, &actual)))
+  status = NtSetTimerResolution (period * 10000L, TRUE, &actual);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   minperiod = actual / 10000L;

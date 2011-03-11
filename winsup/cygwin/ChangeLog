@@ -1,5 +1,10 @@
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* times.cc (clock_setres): Use status code from NtSetTimerResolution
+	to compute errno.
+
+2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (pthread_spin_destroy): Export.
 	(pthread_spin_init): Export.
 	(pthread_spin_lock): Export.
