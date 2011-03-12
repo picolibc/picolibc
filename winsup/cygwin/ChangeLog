@@ -1,3 +1,10 @@
+2011-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (hires_ms::timeGetTime_ns): Fix formatting in comment.
+	(hires_ms::resolution): Cast to DWORD in assignments to minperiod.
+	(clock_setres): Improve comment.  Convert period to ULONGLONG and
+	store 100ns value to simplify code.
+
 2011-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (clock_setres): Use status code from NtSetTimerResolution

@@ -682,24 +682,25 @@ hires_ms::timeGetTime_ns ()
 
        DWORD tick_count_start;
        LARGE_INTEGER int_time_start;
-       do {
-         tick_count_start = GetTickCount ()
-	  do
-	    {
-	      int_time_start.HighPart = SharedUserData.InterruptTime.High1Time;
-	      int_time_start.LowPart = SharedUserData.InterruptTime.LowPart;
-	    }
-	  while (int_time_start.HighPart
-		 != SharedUserData.InterruptTime.High2Time);
-	  }
-	while (tick_count_start != GetTickCount ();
+       do
+	 {
+	   tick_count_start = GetTickCount ()
+	   do
+	     {
+	       int_time_start.HighPart = SharedUserData.InterruptTime.High1Time;
+	       int_time_start.LowPart = SharedUserData.InterruptTime.LowPart;
+	     }
+	   while (int_time_start.HighPart
+		  != SharedUserData.InterruptTime.High2Time);
+	 }
+       while (tick_count_start != GetTickCount ();
 
-      - timeGetTime computes its return value in the loop as below, but then:
+     - timeGetTime computes its return value in the loop as below, and then:
 
-        t.QuadPart -= int_time_start.QuadPart;
-	t.QuadPart /= 10000;
-	t.LowPart += tick_count_start;
-	return t.LowPart;
+       t.QuadPart -= int_time_start.QuadPart;
+       t.QuadPart /= 10000;
+       t.LowPart += tick_count_start;
+       return t.LowPart;
   */
   do
     {
@@ -780,7 +781,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 static DWORD minperiod;	// FIXME: Maintain period after a fork.
 
 LONGLONG
-hires_ns::resolution()
+hires_ns::resolution ()
 {
   if (!inited)
     prime ();
@@ -803,7 +804,7 @@ hires_ms::resolution ()
 
       status = NtQueryTimerResolution (&coarsest, &finest, &actual);
       if (NT_SUCCESS (status))
-	minperiod = (UINT) actual / 10000L;
+	minperiod = (DWORD) actual / 10000L;
       else
 	{
 	  /* Try to empirically determine current timer resolution */
@@ -824,7 +825,7 @@ hires_ms::resolution ()
 	    }
 	  SetThreadPriority (GetCurrentThread (), priority);
 	  period /= 40000L;
-	  minperiod = (UINT) period;
+	  minperiod = (DWORD) period;
 	}
     }
   return minperiod;
@@ -871,24 +872,29 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       return -1;
     }
 
-  DWORD period = (tp->tv_sec * 1000) + ((tp->tv_nsec) / 1000000);
+  /* Convert to 100ns to match OS resolution.  The OS uses ULONG values
+     to express resolution in 100ns units, so the coarsest timer resolution
+     is < 430 secs.  Actually the coarsest timer resolution is only slightly
+     beyond 15ms, but this might change in future OS versions, so we play nice
+     here. */
+  ULONGLONG period = (tp->tv_sec * 10000000ULL) + ((tp->tv_nsec) / 100ULL);
 
   /* clock_setres is non-POSIX/non-Linux.  On QNX, the function always
      rounds the incoming value to the nearest supported value. */
   ULONG coarsest, finest, actual;
   if (NT_SUCCESS (NtQueryTimerResolution (&coarsest, &finest, &actual)))
     {
-      if (period > coarsest / 10000L)
-	period = coarsest / 10000L;
-      else if (finest / 10000L > period)
-	period = finest / 10000L;
+      if (period > coarsest)
+	period = coarsest;
+      else if (finest > period)
+	period = finest;
     }
 
   if (period_set
       && NT_SUCCESS (NtSetTimerResolution (minperiod * 10000L, FALSE, &actual)))
     period_set = false;
 
-  status = NtSetTimerResolution (period * 10000L, TRUE, &actual);
+  status = NtSetTimerResolution (period, TRUE, &actual);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
