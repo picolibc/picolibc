@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -259,8 +259,8 @@ class mmap_record
     _off64_t offset;
     DWORD len;
     caddr_t base_address;
-    DWORD *page_map;
     device dev;
+    DWORD page_map[0];
 
   public:
     mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, _off64_t o, DWORD l,
@@ -272,8 +272,7 @@ class mmap_record
        flags (f),
        offset (o),
        len (l),
-       base_address (b),
-       page_map (NULL)
+       base_address (b)
       {
 	dev.devn = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
@@ -299,8 +298,7 @@ class mmap_record
     DWORD get_len () const { return len; }
     caddr_t get_address () const { return base_address; }
 
-    bool alloc_page_map ();
-    void free_page_map () { if (page_map) cfree (page_map); }
+    void init_page_map (mmap_record &r);
 
     DWORD find_unused_pages (DWORD pages) const;
     bool match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len);
@@ -335,7 +333,7 @@ class mmap_list
 
     bool anonymous () const { return fd == -1; }
     void set (int nfd, struct __stat64 *st);
-    mmap_record *add_record (mmap_record r);
+    mmap_record *add_record (mmap_record &r);
     bool del_record (mmap_record *rec);
     caddr_t try_map (void *addr, size_t len, int flags, _off64_t off);
 };
@@ -400,15 +398,10 @@ mmap_record::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len)
   return false;
 }
 
-bool
-mmap_record::alloc_page_map ()
+void
+mmap_record::init_page_map (mmap_record &r)
 {
-  /* Allocate one bit per page */
-  if (!(page_map = (DWORD *) ccalloc (HEAP_MMAP,
-				      MAPSIZE (PAGE_CNT (get_len ())),
-				      sizeof (DWORD))))
-    return false;
-
+  *this = r;
   DWORD start_protect = gen_create_protect ();
   DWORD real_protect = gen_protect ();
   if (real_protect != start_protect && !noreserve ()
@@ -421,7 +414,6 @@ mmap_record::alloc_page_map ()
   DWORD len = PAGE_CNT (get_len ());
   while (len-- > 0)
     MAP_SET (len);
-  return true;
 }
 
 _off64_t
@@ -430,7 +422,7 @@ mmap_record::map_pages (_off64_t off, DWORD len)
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
 
-     Otherwise it's job is now done by alloc_page_map(). */
+     Otherwise it's job is now done by init_page_map(). */
   DWORD old_prot;
   debug_printf ("map_pages (fd=%d, off=%D, len=%u)", get_fd (), off, len);
   len = PAGE_CNT (len);
@@ -540,17 +532,15 @@ mmap_record::free_fh (fhandler_base *fh)
 }
 
 mmap_record *
-mmap_list::add_record (mmap_record r)
+mmap_list::add_record (mmap_record &r)
 {
-  mmap_record *rec = (mmap_record *) cmalloc (HEAP_MMAP, sizeof (mmap_record));
+  mmap_record *rec = (mmap_record *) ccalloc (HEAP_MMAP,
+		      sizeof (mmap_record)
+		      + MAPSIZE (PAGE_CNT (r.get_len ())) * sizeof (DWORD), 1);
   if (!rec)
     return NULL;
-  *rec = r;
-  if (!rec->alloc_page_map ())
-    {
-      cfree (rec);
-      return NULL;
-    }
+  rec->init_page_map (r);
+
   LIST_INSERT_HEAD (&recs, rec, mr_next);
   return rec;
 }
@@ -572,7 +562,6 @@ mmap_list::set (int nfd, struct __stat64 *st)
 bool
 mmap_list::del_record (mmap_record *rec)
 {
-  rec->free_page_map ();
   LIST_REMOVE (rec, mr_next);
   cfree (rec);
   /* Return true if the list is empty which allows the caller to remove

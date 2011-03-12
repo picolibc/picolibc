@@ -1,5 +1,19 @@
 2011-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (mmap_record::page_map): Define as variable array rather than
+	as pointer.
+	(mmap_record::alloc_page_map): Remove.
+	(mmap_record::free_page_map): Remove.
+	(mmap_record::init_page_map): New method.
+	(mmap_record::add_record): Take mmap_record parameter by reference
+	rather than by value.
+	(mmap_record::map_pages): Fix comment.
+	(mmap_list::add_record): Allocate space for mmap_record including the
+	page_map in a single ccalloc call.  Call init_page_map afterwards.
+	(mmap_list::del_record): Remove call to mmap_record::free_page_map.
+
+2011-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (hires_ms::timeGetTime_ns): Fix formatting in comment.
 	(hires_ms::resolution): Cast to DWORD in assignments to minperiod.
 	(clock_setres): Improve comment.  Convert period to ULONGLONG and
