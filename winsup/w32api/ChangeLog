@@ -1,3 +1,8 @@
+2011-03-11  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/w32api.h: Increment version to 3.17.
+	* Makefile.in: Ditto.
+
 2011-03-07  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/winbase.h (PSAPI_WORKING_SET_BLOCK,
