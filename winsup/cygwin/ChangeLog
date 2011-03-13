@@ -1,3 +1,10 @@
+2011-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (internal_getpwsid): Avoid a strict-aliasing compiler
+	error with gcc 4.5.1.
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Ditto.
+	* syscalls.cc (gethostid): Ditto.
+
 2011-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::page_map): Define as variable array rather than

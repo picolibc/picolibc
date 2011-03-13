@@ -3766,8 +3766,12 @@ long gethostid (void)
     status = UuidCreate (&Uuid);
   if (status == RPC_S_OK)
     {
-      data[4] = *(unsigned *)&Uuid.Data4[2];
-      data[5] = *(unsigned short *)&Uuid.Data4[6];
+      unsigned *ud;
+
+      ud = (unsigned *) &Uuid.Data4[2];
+      data[4] = *ud;
+      ud = (unsigned *) &Uuid.Data4[6];
+      data[5] = *ud;
       // Unfortunately Windows will sometimes pick a virtual Ethernet card
       // e.g. VMWare Virtual Ethernet Adaptor
       debug_printf ("MAC address of first Ethernet card: %02x:%02x:%02x:%02x:%02x:%02x",

@@ -98,11 +98,14 @@ internal_getpwsid (cygpsid &sid)
     {
       endptr = strchr (sid_string + 2, 0) - 1;
       for (int i = 0; i < pr.curr_lines; i++)
-	if ((pw = passwd_buf + i)->pw_dir > pw->pw_gecos + 8)
-	  for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
-	       *ptr1 == *ptr2; ptr2--)
-	    if (!*--ptr1)
-	      return pw;
+	{
+	  pw = passwd_buf + i;
+	  if (pw->pw_dir > pw->pw_gecos + 8)
+	    for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
+		 *ptr1 == *ptr2; ptr2--)
+	      if (!*--ptr1)
+		return pw;
+	}
     }
   return NULL;
 }

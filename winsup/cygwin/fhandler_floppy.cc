@@ -41,6 +41,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   char dbuf[256];
   char pbuf[256];
 
+  DISK_GEOMETRY_EX *dix = NULL;
   DISK_GEOMETRY *di = NULL;
   PARTITION_INFORMATION_EX *pix = NULL;
   PARTITION_INFORMATION *pi = NULL;
@@ -57,7 +58,8 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	__seterrno ();
       else
 	{
-	  di = &((DISK_GEOMETRY_EX *) dbuf)->Geometry;
+	  dix = (DISK_GEOMETRY_EX *) dbuf;
+	  di = &dix->Geometry;
 	  if (!DeviceIoControl (get_handle (),
 				IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
 				pbuf, 256, &bytes_read, NULL))
