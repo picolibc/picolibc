@@ -1,5 +1,13 @@
 2011-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (UuidCreate): Remove.
+	(UuidCreateSequential): Remove.
+	* ntdll.h (NtAllocateUuids): Declare.
+	* syscalls.cc (gethostid): Use NtAllocateUuids function rather than
+	UuidCreateSequential/UuidCreate to get rid of rpcrt4 dependency.
+
+2011-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.cc (internal_getpwsid): Avoid a strict-aliasing compiler
 	error with gcc 4.5.1.
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Ditto.

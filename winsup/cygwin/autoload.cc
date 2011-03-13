@@ -403,9 +403,6 @@ LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)
 LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)
 
-LoadDLLfunc (UuidCreate, 4, rpcrt4)
-LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
-
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)

@@ -3760,28 +3760,29 @@ long gethostid (void)
 	}
     }
 
-  UUID Uuid;
-  RPC_STATUS status = UuidCreateSequential (&Uuid);
-  if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    status = UuidCreate (&Uuid);
-  if (status == RPC_S_OK)
+  LARGE_INTEGER u1;
+  ULONG u2, u3;
+  union {
+    UCHAR mac[6];
+    struct {
+      ULONG m1;
+      USHORT m2;
+    };
+  } u4;
+  NTSTATUS status = NtAllocateUuids (&u1, &u2, &u3, u4.mac);
+  if (NT_SUCCESS (status))
     {
-      unsigned *ud;
-
-      ud = (unsigned *) &Uuid.Data4[2];
-      data[4] = *ud;
-      ud = (unsigned *) &Uuid.Data4[6];
-      data[5] = *ud;
+      data[4] = u4.m1;
+      data[5] = u4.m2;
       // Unfortunately Windows will sometimes pick a virtual Ethernet card
       // e.g. VMWare Virtual Ethernet Adaptor
-      debug_printf ("MAC address of first Ethernet card: %02x:%02x:%02x:%02x:%02x:%02x",
-		    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
-		    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
+      debug_printf ("MAC address of first Ethernet card: "
+		    "%02x:%02x:%02x:%02x:%02x:%02x",
+		    u4.mac[0], u4.mac[1], u4.mac[2],
+		    u4.mac[3], u4.mac[4], u4.mac[5]);
     }
   else
-    {
-      debug_printf ("no Ethernet card installed");
-    }
+    debug_printf ("no Ethernet card installed");
 
   reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE", "Microsoft",
 	       "Windows NT", "CurrentVersion", NULL);
