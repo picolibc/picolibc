@@ -1,5 +1,11 @@
 2011-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_user::env_domain): Use LookupAccountSidW and
+	convert user and domain to multibyte strings to make sure to use
+	correct codeset.
+
+2011-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Only use
 	file id as inode number if it masters the isgood_inode check.
 

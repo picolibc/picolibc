@@ -382,21 +382,21 @@ cygheap_user::env_domain (const char *name, size_t namelen)
   if (pwinname && test_uid (pdomain, name, namelen))
     return pdomain;
 
-  char username[UNLEN + 1];
-  DWORD ulen = sizeof (username);
-  char userdomain[DNLEN + 1];
-  DWORD dlen = sizeof (userdomain);
+  DWORD ulen = UNLEN + 1;
+  WCHAR username[ulen];
+  DWORD dlen = DNLEN + 1;
+  WCHAR userdomain[dlen];
   SID_NAME_USE use;
 
   cfree_and_set (pwinname, almost_null);
   cfree_and_set (pdomain, almost_null);
-  if (!LookupAccountSid (NULL, sid (), username, &ulen,
-			 userdomain, &dlen, &use))
+  if (!LookupAccountSidW (NULL, sid (), username, &ulen,
+			  userdomain, &dlen, &use))
     __seterrno ();
   else
     {
-      pwinname = cstrdup (username);
-      pdomain = cstrdup (userdomain);
+      sys_wcstombs_alloc (&pwinname, HEAP_STR, username);
+      sys_wcstombs_alloc (&pdomain, HEAP_STR, userdomain);
     }
   return pdomain;
 }
