@@ -383,7 +383,8 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 			    status, pc.get_nt_native_path ());
 	      return -1;
 	    }
-	  ino = fii.FileId.QuadPart;
+	  else if (pc.isgood_inode (fii.FileId.QuadPart))
+	    ino = fii.FileId.QuadPart;
 	}
     }
   return fstat_helper (buf, fsi.NumberOfLinks);
