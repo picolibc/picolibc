@@ -1,5 +1,9 @@
 2011-03-14  Richard Sandiford  <richard.sandiford@linaro.org>
 
+	* arm.h (R_ARM_IRELATIVE): New relocation.
+
+2011-03-14  Richard Sandiford  <richard.sandiford@linaro.org>
+
 	* internal.h (elf_internal_sym): Add st_target_internal.
 	* arm.h (arm_st_branch_type): New enum.
 	(ARM_SYM_BRANCH_TYPE): New macro.
