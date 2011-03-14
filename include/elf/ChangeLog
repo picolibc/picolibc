@@ -1,3 +1,9 @@
+2011-03-14  Richard Sandiford  <richard.sandiford@linaro.org>
+
+	* internal.h (elf_internal_sym): Add st_target_internal.
+	* arm.h (arm_st_branch_type): New enum.
+	(ARM_SYM_BRANCH_TYPE): New macro.
+
 2011-03-10  Nick Clifton  <nickc@redhat.com>
 
 	* common.h (EM_V850): V850s now supplied by Renesas.

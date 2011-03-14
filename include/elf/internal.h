@@ -124,6 +124,7 @@ struct elf_internal_sym {
   unsigned long	st_name;		/* Symbol name, index in string tbl */
   unsigned char	st_info;		/* Type and binding attributes */
   unsigned char	st_other;		/* Visibilty, and target specific */
+  unsigned char st_target_internal;	/* Internal-only information */
   unsigned int  st_shndx;		/* Associated section index */
 };
 

@@ -323,4 +323,13 @@ enum
 #define ELF_STRING_ARM_unwind_once      ".gnu.linkonce.armexidx."
 #define ELF_STRING_ARM_unwind_info_once ".gnu.linkonce.armextab."
 
+enum arm_st_branch_type {
+  ST_BRANCH_TO_ARM,
+  ST_BRANCH_TO_THUMB,
+  ST_BRANCH_LONG
+};
+
+#define ARM_SYM_BRANCH_TYPE(SYM) \
+  ((enum arm_st_branch_type) (SYM)->st_target_internal)
+
 #endif /* _ELF_ARM_H */
