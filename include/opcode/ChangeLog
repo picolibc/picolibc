@@ -1,3 +1,11 @@
+2011-03-14  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	Backport from mainline:
+	2010-12-31  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR gas/11395
+	* hppa.h (pa_opcodes): Exchange 32 and 64-bit "bb" entries.
+
 2010-11-15  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	PR gas/12198
