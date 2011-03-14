@@ -1,3 +1,19 @@
+2011-03-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Remove
+	special treatment for ERROR_NO_SYSTEM_RESOURCES.  Cancel I/O and reset
+	the overlapped handle on error.
+	(fhandler_base_overlapped::write_overlapped): Limit writes to
+	max_atomic_write bytes in blocking case.  Incorporate code from
+	now-defunct write_overlapped_fallback.  Fix serious oversight where ptr
+	was not advanced as buffer was written.
+	(fhandler_base_overlapped::write_overlapped_fallback): Eliminate.
+	* fhandler.h (fhandler_base_overlapped::write_overlapped_fallback):
+	Ditto for declaration.
+	(DEFAULT_PIPEBUFSIZE): Lower size to slightly less than documented
+	worst-case atomic write size.
+	(fhandler_overlapped::wait_return): Remove unused element.
+
 2011-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (UuidCreate): Remove.
@@ -122,7 +138,7 @@
 	(fhandler_base_overlapped::write_overlapped_fallback): Add some more
 	comments.
 
-2011-03-09  Christopher Faylor  <me.cygwin@cgf.cx>
+2011-03-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_base_overlapped::write_overlapp): Oops!
 	Accommodate change in arguments to wait_overlapped.

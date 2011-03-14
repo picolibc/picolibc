@@ -29,7 +29,7 @@ details. */
    Using this blocksize in read/write calls in the application results
    in a much better performance than using smaller values. */
 #define PREFERRED_IO_BLKSIZE ((blksize_t) 65536)
-#define DEFAULT_PIPEBUFSIZE PREFERRED_IO_BLKSIZE
+#define DEFAULT_PIPEBUFSIZE (31 * 1024 * 1024)
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
@@ -570,8 +570,7 @@ protected:
   {
     overlapped_success = 0,
     overlapped_signal,
-    overlapped_error,
-    overlapped_fallback
+    overlapped_error
   };
   bool io_pending;
   OVERLAPPED io_status;
@@ -583,7 +582,6 @@ public:
   void __stdcall destroy_overlapped () __attribute__ ((regparm (1)));
   void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall write_overlapped (const void *ptr, size_t len) __attribute__ ((regparm (3)));
-  ssize_t __stdcall write_overlapped_fallback (const void *ptr, size_t orig_len)
     __attribute__ ((regparm (3)));
   OVERLAPPED *&get_overlapped () {return overlapped;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}

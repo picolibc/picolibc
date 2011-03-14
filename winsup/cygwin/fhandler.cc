@@ -1733,9 +1733,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 
   wait_return res;
   DWORD err = GetLastError ();
-  if (err == ERROR_NO_SYSTEM_RESOURCES)
-    res = overlapped_fallback;
-  else if (nonblocking)
+  if (nonblocking)
     {
       if (!inres && err != ERROR_IO_PENDING)
 	res = overlapped_error;
@@ -1806,6 +1804,9 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   else
     {
       debug_printf ("err %u", err);
+      HANDLE h = writing ? get_output_handle () : get_handle ();
+      CancelIo (h);
+      ResetEvent (get_overlapped ());
       __seterrno_from_win_error (err);
       *bytes = (DWORD) -1;
     }
@@ -1836,7 +1837,6 @@ fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
 	    default:	/* Added to quiet gcc */
 	    case overlapped_success:
 	    case overlapped_error:
-	    case overlapped_fallback:
 	      keep_looping = false;
 	      break;
 	    }
@@ -1849,92 +1849,51 @@ fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
 ssize_t __stdcall __attribute__ ((regparm (3)))
 fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
 {
-  DWORD nbytes;
+  size_t nbytes;
   if (has_ongoing_io ())
     nbytes = (DWORD) -1;
   else
     {
-      int last_errno = get_errno ();
-      bool keep_looping;
-      if (is_nonblocking () && max_atomic_write && len > max_atomic_write)
-	len = max_atomic_write;
-      do
+      size_t chunk;
+      if (!max_atomic_write || len < max_atomic_write)
+	chunk = len;
+      else if (is_nonblocking ())
+	chunk = len = max_atomic_write;
+      else
+	chunk = max_atomic_write;
+
+      nbytes = 0;
+      DWORD nbytes_now = 0;
+      /* Write to fd in smaller chunks, accumlating a total.
+	 If there's an error, just return the accumulated total
+	 unless the first write fails, in which case return value
+	 from wait_overlapped(). */
+      while (nbytes < len)
 	{
-	  bool res = WriteFile (get_output_handle (), ptr, len, &nbytes,
+	  size_t left = len - nbytes;
+	  size_t len1;
+	  if (left > chunk)
+	    len1 = chunk;
+	  else
+	    len1 = left;
+	  bool res = WriteFile (get_output_handle (), ptr, len1, &nbytes_now,
 				get_overlapped ());
-	  switch (wait_overlapped (res, true, &nbytes, is_nonblocking (), (size_t) len))
+	  switch (wait_overlapped (res, true, &nbytes_now,
+				   is_nonblocking (), len1))
 	    {
-	    case overlapped_signal:
-	      keep_looping = true;
-	      break;
-	    case overlapped_fallback:
-	      set_errno (last_errno);	/* Avoid setting a random EFBIG errno */
-	      nbytes = write_overlapped_fallback (ptr, len);
-	      /* fall through intentionally */;
-	    default:	/* Added to quiet gcc */
 	    case overlapped_success:
+	      ptr = ((char *) ptr) + chunk;
+	      nbytes += nbytes_now;
+	      /* fall through intentionally */
+	    case overlapped_signal:
+	      break;			/* keep looping */
 	    case overlapped_error:
-	      keep_looping = false;
+	      len = 0;		/* terminate loop */
 	      break;
 	    }
 	}
-      while (keep_looping);
+      if (!nbytes)
+	nbytes = nbytes_now;
     }
-  debug_printf ("returning %u", nbytes);
-  return nbytes;
-}
-
-/* On XP (at least) the size of the buffer that can be used to write to a pipe
-   (pipes are currently the only thing using the overlapped methods) is
-   limited.  This function is a fallback for when that problem is detected.
-   It writes to the pipe using smaller buffers but masks this behavior
-   to the caller.  */
-ssize_t __stdcall __attribute__ ((regparm (3)))
-fhandler_base_overlapped::write_overlapped_fallback (const void *ptr, size_t orig_len)
-{
-  size_t chunk;
-  /* So far, in testing, only the first if test has been necessary */
-  if (orig_len > MAX_OVERLAPPED_WRITE_LEN)
-    chunk = MAX_OVERLAPPED_WRITE_LEN;
-  else if (orig_len > MIN_OVERLAPPED_WRITE_LEN)
-    chunk = MIN_OVERLAPPED_WRITE_LEN;
-  else
-    chunk = orig_len / 4;
-  ssize_t nbytes = 0;
-  DWORD nbytes_now = 0;
-  /* Write to fd in smaller chunks, accumlating a total.
-     If there's an error, just return the accumulated total
-     unless the first write fails, in which case return value
-     from wait_overlapped(). */
-  while ((size_t) nbytes < orig_len)
-    {
-      size_t left = orig_len - nbytes;
-      size_t len;
-      if (left > chunk)
-	len = chunk;
-      else
-	len = left;
-      bool res = WriteFile (get_output_handle (), ptr, len, &nbytes_now,
-			    get_overlapped ());
-      /* The nonblocking case is not going to be used currently and may
-	 eventually disappear. */
-      switch (wait_overlapped (res, true, &nbytes_now,
-			       left <= chunk ? is_nonblocking () : false,
-			       (size_t) len))
-	{
-	case overlapped_success:
-	  nbytes += nbytes_now;
-	  /* fall through intentionally */
-	case overlapped_signal:
-	  break;			/* keep looping */
-	case overlapped_error:
-	case overlapped_fallback:	/* XXX Could make this more adaptive
-					   if needed */
-	  orig_len = 0;			/* terminate loop */
-	  break;
-	}
-    }
-  if (!nbytes)
-    nbytes = nbytes_now;
   return nbytes;
 }
