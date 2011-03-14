@@ -1,3 +1,8 @@
+2011-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Only use
+	file id as inode number if it masters the isgood_inode check.
+
 2011-03-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Remove
