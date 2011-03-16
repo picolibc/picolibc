@@ -1,3 +1,14 @@
+2011-03-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (struct _local_storage): Redefine process_ident as wchar_t
+	pointer.
+	* syslog.cc (CYGWIN_LOG_NAME): Convert to wide char constant.
+	(openlog): Convert incoming ident string to wide char.  Fix formatting.
+	(vsyslog): Print ident string as wide char string.  Convert message
+	string to wide char and call UNICODE Win32 Event functions to make sure
+	to use correct codeset.
+	* tlsoffset.h: Regenerate.
+
 2011-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (cygheap_user::env_domain): Use LookupAccountSidW and
