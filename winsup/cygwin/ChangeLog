@@ -1,5 +1,9 @@
 2011-03-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winver.rc: Fix copyright dates.
+
+2011-03-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (struct _local_storage): Redefine process_ident as wchar_t
 	pointer.
 	* syslog.cc (CYGWIN_LOG_NAME): Convert to wide char constant.
