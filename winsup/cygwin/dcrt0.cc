@@ -35,6 +35,7 @@ details. */
 #include "tls_pbuf.h"
 #include "exception.h"
 #include "cygxdr.h"
+#include "fenv.h"
 #include "ntdll.h"
 
 #define MAX_AT_FILE_LEVEL 10
@@ -980,6 +981,9 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+#ifdef __i386__
+  _feinitialise ();
+#endif
   main_environ = user_data->envptr;
   if (in_forkee)
     {
