@@ -1,7 +1,7 @@
 /* syslog.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2009 Red Hat, Inc.
+   2006, 2007, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +17,8 @@ details. */
 #include <syslog.h>
 #include <unistd.h>
 #include <sys/un.h>
+#include <netinet/in.h>
+#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -177,45 +179,63 @@ static enum {
 static int syslogd_sock = -1;
 extern "C" int cygwin_socket (int, int, int);
 extern "C" int cygwin_connect (int, const struct sockaddr *, int);
+extern int get_inet_addr (const struct sockaddr *, int,
+			  struct sockaddr_storage *, int *,
+			  int * = NULL, int * = NULL);
 
 static void
 connect_syslogd ()
 {
-  struct __stat64 st;
   int fd;
   struct sockaddr_un sun;
+  struct sockaddr_storage sst;
+  int len, type;
 
   if (syslogd_inited != not_inited && syslogd_sock >= 0)
     close (syslogd_sock);
   syslogd_inited = inited_failed;
   syslogd_sock = -1;
-  if (stat64 (_PATH_LOG, &st) || !S_ISSOCK (st.st_mode))
-    return;
-  if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM, 0)) < 0)
-    return;
   sun.sun_family = AF_LOCAL;
   strncpy (sun.sun_path, _PATH_LOG, sizeof sun.sun_path);
-  if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun))
+  if (!get_inet_addr ((struct sockaddr *) &sun, sizeof sun, &sst, &len, &type))
+    return;
+  if ((fd = cygwin_socket (AF_LOCAL, type, 0)) < 0)
+    return;
+  if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun) == 0)
     {
-      if (get_errno () != EPROTOTYPE)
+      /* connect on a dgram socket always succeeds.  We still don't know
+	 if syslogd is actually listening. */
+      if (type == SOCK_DGRAM)
 	{
-	  close (fd);
-	  return;
+	  tmp_pathbuf tp;
+	  PMIB_UDPTABLE tab = (PMIB_UDPTABLE) tp.w_get ();
+	  DWORD size = 65536;
+	  bool found = false;
+	  struct sockaddr_in *sa = (struct sockaddr_in *) &sst;
+
+	  if (GetUdpTable (tab, &size, FALSE) == NO_ERROR)
+	    {
+	      for (DWORD i = 0; i < tab->dwNumEntries; ++i)
+		if (tab->table[i].dwLocalAddr == sa->sin_addr.s_addr
+		    && tab->table[i].dwLocalPort == sa->sin_port)
+		  {
+		    found = true;
+		    break;
+		  }
+	      if (!found)
+		{
+		  /* No syslogd is listening. */
+		  close (fd);
+		  return;
+		}
+	    }
 	}
-      /* Retry with SOCK_STREAM. */
-      if ((fd = cygwin_socket (AF_LOCAL, SOCK_STREAM, 0)) < 0)
-	return;
-      if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun))
-	{
-	  close (fd);
-	  return;
-	}
-      syslogd_inited = inited_stream;
+      syslogd_inited = type == SOCK_DGRAM ? inited_dgram : inited_stream;
     }
-  else
-    syslogd_inited = inited_dgram;
   syslogd_sock = fd;
   fcntl64 (syslogd_sock, F_SETFD, FD_CLOEXEC);
+  debug_printf ("found /dev/log, fd = %d, type = %s",
+		fd, syslogd_inited == inited_stream ? "STREAM" : "DGRAM");
   return;
 }
 
@@ -227,7 +247,7 @@ try_connect_syslogd (int priority, const char *msg, int len)
   try_connect_guard.init ("try_connect_guard")->acquire ();
   if (syslogd_inited == not_inited)
     connect_syslogd ();
-  if (syslogd_sock >= 0)
+  if (syslogd_inited != inited_failed)
     {
       char pribuf[16];
       sprintf (pribuf, "<%d>", priority);

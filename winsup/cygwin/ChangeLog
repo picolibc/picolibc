@@ -1,3 +1,14 @@
+2011-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Make externally available.
+	* autoload.cc (GetUdpTable): Define.
+	* syslog.cc (connect_syslogd): Use get_inet_addr rather than _stat64
+	to check for local socket file.  Create socket with type returned by
+	get_inet_addr.  If connect on UDP socket works, test if there's
+	really a listening peer, otherwise fall back to Windows event log.
+	(try_connect_syslogd): Use syslogd_inited flag to check if syslogd
+	is available.
+
 2011-03-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* crt0.c (mainCRTStartup): Move call to _feinitialise from here...

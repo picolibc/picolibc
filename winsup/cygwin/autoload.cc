@@ -363,6 +363,7 @@ LoadDLLfunc (GetIpAddrTable, 12, iphlpapi)
 LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
 LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetTcpTable, 12, iphlpapi)
+LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
 LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
 LoadDLLfunc (FindFirstVolumeA, 8, kernel32)
