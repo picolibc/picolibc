@@ -1,6 +1,6 @@
 /* crt0.c
 
-   Copyright 2001, 2005, 2010 Red Hat, Inc.
+   Copyright 2001, 2005, 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -13,7 +13,6 @@ details. */
 
 #include "winlean.h"
 #include <sys/cygwin.h>
-#include "fenv.h"
 
 extern int main (int argc, char **argv);
 
@@ -25,7 +24,6 @@ mainCRTStartup ()
 #ifdef __i386__
   (void)__builtin_return_address(1);
   asm volatile ("andl $-16,%%esp" ::: "%esp");
-  _feinitialise ();
 #endif
 
   cygwin_crt0 (main);
