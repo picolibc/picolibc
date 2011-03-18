@@ -1,5 +1,12 @@
 2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (class mmap_record): Pack 4 byte-aligned.  Convert member dev
+	to plain int.
+	(mmap_record::alloc_fh): Create temporary device from dev and use in
+	call to build_fh_dev.
+
+2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap_record::page_map): Define as variable array rather than
 	as pointer.
 	(mmap_record::alloc_page_map): Remove.
