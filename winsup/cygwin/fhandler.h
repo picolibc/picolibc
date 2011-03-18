@@ -29,7 +29,11 @@ details. */
    Using this blocksize in read/write calls in the application results
    in a much better performance than using smaller values. */
 #define PREFERRED_IO_BLKSIZE ((blksize_t) 65536)
-#define DEFAULT_PIPEBUFSIZE (31 * 1024 * 1024)
+
+/* It also appears that this may be the only acceptable block size for
+   atomic writes to a pipe.  It is a shame that we have to make this
+   so small.  http://cygwin.com/ml/cygwin/2011-03/msg00541.html  */
+#define DEFAULT_PIPEBUFSIZE PREFERRED_IO_BLKSIZE
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
