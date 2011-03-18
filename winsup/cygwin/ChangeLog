@@ -1,3 +1,20 @@
+2011-03-18  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.h (DEFAULT_PIPEBUFSIZE): Reset to 64K.
+
+2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::alloc_fh): Initialize name strings in fdev to
+	empty strings or suffer a SEGV.  Drop second parameter in call to
+	build_fh_dev.
+
+2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (class mmap_record): Pack 4 byte-aligned.  Convert member dev
+	to plain int.
+	(mmap_record::alloc_fh): Create temporary device from dev and use in
+	call to build_fh_dev.
+
 2011-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (get_inet_addr): Make externally available.

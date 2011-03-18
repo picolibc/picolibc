@@ -245,6 +245,7 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
    per mapped memory page.  The bit is set if the page is accessible,
    unset otherwise. */
 
+#pragma pack(push, 4)
 class mmap_record
 {
   public:
@@ -259,7 +260,7 @@ class mmap_record
     _off64_t offset;
     DWORD len;
     caddr_t base_address;
-    device dev;
+    int dev;
     DWORD page_map[0];
 
   public:
@@ -274,16 +275,16 @@ class mmap_record
        len (l),
        base_address (b)
       {
-	dev.devn = 0;
+	dev = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
 	  dev = cygheap->fdtab[fd]->dev ();
 	else if (fd == -1)
-	  dev.parse (FH_ZERO);
+	  dev = FH_ZERO;
       }
 
     int get_fd () const { return fd; }
     HANDLE get_handle () const { return mapping_hdl; }
-    device& get_device () { return dev; }
+    int get_device () { return dev; }
     int get_prot () const { return prot; }
     int get_openflags () const { return openflags; }
     int get_flags () const { return flags; }
@@ -316,6 +317,7 @@ class mmap_record
       { return ::gen_protect (get_prot (), get_flags ()); }
     bool compatible_flags (int fl) const;
 };
+#pragma pack(pop)
 
 class mmap_list
 {
@@ -519,7 +521,10 @@ mmap_record::alloc_fh ()
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  fhandler_base *fh = build_fh_dev (get_device ());
+  device fdev;
+  fdev.name = fdev.native = "";
+  fdev.parse (get_device ());
+  fhandler_base *fh = build_fh_dev (fdev);
   fh->set_access (get_openflags ());
   return fh;
 }
