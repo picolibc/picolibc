@@ -1,3 +1,7 @@
+2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc: Raise default cygheap size to 2 Megs.
+
 2011-03-18  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.h (DEFAULT_PIPEBUFSIZE): Reset to 64K.
