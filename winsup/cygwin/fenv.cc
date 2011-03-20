@@ -1,6 +1,6 @@
 /* fenv.cc
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,9 +8,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <string.h>
+#include "winsup.h"
 #include "fenv.h"
 #include "errno.h"
+#include "wincap.h"
+#include <string.h>
 
 /*  Mask and shift amount for rounding bits.  */
 #define FE_CW_ROUND_MASK	(0x0c00)
@@ -419,8 +421,9 @@ _feinitialise (void)
   /* Check for presence of SSE: invoke CPUID #1, check EDX bit 25.  */
   eax = 1;
   __asm__ volatile ("cpuid" : "=d" (edx), "+a" (eax) :: "%ecx", "%ebx");
-  /* If this flag isn't set, we'll avoid trying to execute any SSE.  */
-  if (edx & (1 << 25))
+  /* If this flag isn't set, or if the OS doesn't support SSE (NT4, at least
+     up to SP4) we'll avoid trying to execute any SSE.  */
+  if ((edx & (1 << 25)) != 0 && wincap.supports_sse ())
     use_sse = true;
 
   /* Reset FPU: extended prec, all exceptions cleared and masked off.  */

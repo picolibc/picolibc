@@ -1,3 +1,10 @@
+2011-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fenv.cc (_feinitialise): Don't use SSE instructions on systems not
+	supporting them.
+	* wincap.h (wincaps::supports_sse): New element.
+	* wincap.cc: Implement above element throughout.
+
 2011-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc: Raise default cygheap size to 2 Megs.
