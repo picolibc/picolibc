@@ -53,6 +53,7 @@ struct wincaps
   unsigned has_restricted_raw_disk_access		: 1;
   unsigned use_dont_resolve_hack			: 1;
   unsigned use_get_sec_info_on_dirs			: 1;
+  unsigned supports_sse					: 1;
 };
 
 class wincapc
@@ -111,6 +112,7 @@ public:
   bool	IMPLEMENT (has_restricted_raw_disk_access)
   bool	IMPLEMENT (use_dont_resolve_hack)
   bool	IMPLEMENT (use_get_sec_info_on_dirs)
+  bool	IMPLEMENT (supports_sse)
 
 #undef IMPLEMENT
 };
