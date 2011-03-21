@@ -16,7 +16,7 @@ extra_objs = $(lpfx)_exit.o $(lpfx)access.o $(lpfx)chmod.o \
 	$(lpfx)open.o $(lpfx)pipe.o $(lpfx)read.o $(lpfx)link.o \
 	$(lpfx)sbrk.o $(lpfx)stat.o $(lpfx)time.o $(lpfx)trap.o \
 	$(lpfx)unlink.o $(lpfx)utime.o $(lpfx)wait.o $(lpfx)write.o \
-	$(lpfx)times.o $(lpfx)gettime.o
+	$(lpfx)times.o $(lpfx)gettime.o $(lpfx)rename.o
 else
 extra_objs =
 endif
@@ -27,7 +27,7 @@ EXTRA_lib_a_SOURCES = \
 	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
 	kill.c lseek.c open.c pipe.c read.c link.c \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
-	times.c gettime.c
+	times.c gettime.c rename.c
 lib_a_SOURCES =
 lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)

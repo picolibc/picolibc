@@ -65,7 +65,8 @@ lib_a_AR = $(AR) $(ARFLAGS)
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)time.o $(lpfx)trap.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)wait.o $(lpfx)write.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o \
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)rename.o
 am_lib_a_OBJECTS =
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -111,6 +112,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NO_INCLUDE_LIST = @NO_INCLUDE_LIST@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -194,7 +196,7 @@ noinst_LIBRARIES = lib.a
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)open.o $(lpfx)pipe.o $(lpfx)read.o $(lpfx)link.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)sbrk.o $(lpfx)stat.o $(lpfx)time.o $(lpfx)trap.o \
 @MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)unlink.o $(lpfx)utime.o $(lpfx)wait.o $(lpfx)write.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o
+@MAY_SUPPLY_SYSCALLS_TRUE@	$(lpfx)times.o $(lpfx)gettime.o $(lpfx)rename.o
 
 lib_a_LIBADD = $(extra_objs)
 EXTRA_lib_a_SOURCES = \
@@ -202,7 +204,7 @@ EXTRA_lib_a_SOURCES = \
 	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
 	kill.c lseek.c open.c pipe.c read.c link.c \
 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
-	times.c gettime.c
+	times.c gettime.c rename.c
 
 lib_a_SOURCES = 
 lib_a_DEPENDENCIES = $(extra_objs)
@@ -447,6 +449,12 @@ lib_a-gettime.o: gettime.c
 
 lib_a-gettime.obj: gettime.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gettime.obj `if test -f 'gettime.c'; then $(CYGPATH_W) 'gettime.c'; else $(CYGPATH_W) '$(srcdir)/gettime.c'; fi`
+
+lib_a-rename.o: rename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rename.o `test -f 'rename.c' || echo '$(srcdir)/'`rename.c
+
+lib_a-rename.obj: rename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rename.obj `if test -f 'rename.c'; then $(CYGPATH_W) 'rename.c'; else $(CYGPATH_W) '$(srcdir)/rename.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

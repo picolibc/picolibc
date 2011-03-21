@@ -1,3 +1,12 @@
+2011-03-21  Kevin Buettner  <kevinb@redhat.com>
+
+	* libc/sys/sysnecv850/trap.S (___trap0): Fix errno handling.
+	* libc/sys/sysnecv850/rename.c: New file.
+	* libc/sys/sysnecv850/Makefile.am (lib_a_SOURCES): Add rename.c
+	* libc/sys/sysnecv850/Makefile.in: Regenerate.
+	* libc/sys/sysnecv850/fstat.c (_fstat): Invoke trap for SYS_fstat.
+	* libc/sys/sysnecv850/unlink.c (_unlink): Invoke trap for SYS_unlink.
+
 2011-03-03  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/string.h: Include sys/cdefs.h.

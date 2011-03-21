@@ -10,7 +10,8 @@ int __trap0 (int function, int p1, int p2, int p3);
 #define TRAP0(f, p1, p2, p3) __trap0(f, (int)(p1), (int)(p2), (int)(p3))
 
 int
-_unlink (const char *path)
+rename (const char *oldpath,
+	 const char *newpath)
 {
-  return TRAP0 (SYS_unlink, path, 0, 0);
+  return TRAP0 (SYS_rename, oldpath, newpath, 0);
 }
