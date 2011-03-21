@@ -1,3 +1,7 @@
+2011-03-21  Kevin Buettner  <kevinb@redhat.com> 
+
+	* v850/sys/syscall.h (SYS_rename): Define.
+
 2011-01-10  Mike Frysinger  <vapier@gentoo.org>
 
 	* Makefile.in (stmp-bsp): Exit when subdirs fail.

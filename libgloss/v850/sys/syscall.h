@@ -34,6 +34,7 @@
 #define SYS_execve      59
 #define   SYS_times       43
 #define SYS_gettimeofday 116
+#define SYS_rename	134
 
 #define SYS_utime       201 /* not really a system call */
 #define SYS_wait        202 /* nor is this */
