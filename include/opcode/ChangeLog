@@ -1,3 +1,9 @@
+2011-03-22  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* avr.h (AVR_ISA_SPMX,AVR_ISA_DES,AVR_ISA_M256,AVR_ISA_XMEGA):
+	New instruction set flags.
+	(AVR_INSN): Add new instructions for SPM Z+, DES for XMEGA.
+
 2011-02-28  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (M_PREF_AB): New enum value.

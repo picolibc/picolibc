@@ -40,6 +40,13 @@
 #define E_AVR_MACH_AVR5 5
 #define E_AVR_MACH_AVR51 51
 #define E_AVR_MACH_AVR6 6 
+#define E_AVR_MACH_XMEGA1 101
+#define E_AVR_MACH_XMEGA2 102
+#define E_AVR_MACH_XMEGA3 103
+#define E_AVR_MACH_XMEGA4 104
+#define E_AVR_MACH_XMEGA5 105
+#define E_AVR_MACH_XMEGA6 106
+#define E_AVR_MACH_XMEGA7 107
 
 /* Relocations.  */
 START_RELOC_NUMBERS (elf_avr_reloc_type)

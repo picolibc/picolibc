@@ -31,6 +31,8 @@
 #define AVR_ISA_BRK   0x0400 /* device has BREAK (on-chip debug) */
 #define AVR_ISA_EIND  0x0800 /* device has >128K program memory (none yet) */
 #define AVR_ISA_MOVW  0x1000 /* device has MOVW */
+#define AVR_ISA_SPMX  0x2000 /* device has SPM Z[+] */
+#define AVR_ISA_DES   0x4000 /* device has DES */
 
 #define AVR_ISA_TINY1 (AVR_ISA_1200 | AVR_ISA_LPM)
 #define AVR_ISA_2xxx  (AVR_ISA_TINY1 | AVR_ISA_SRAM)
@@ -49,6 +51,8 @@
 #define AVR_ISA_94K   (AVR_ISA_M603 | AVR_ISA_MUL | AVR_ISA_MOVW | AVR_ISA_LPMX)
 #define AVR_ISA_M323  (AVR_ISA_M161 | AVR_ISA_BRK)
 #define AVR_ISA_M128  (AVR_ISA_M323 | AVR_ISA_ELPM | AVR_ISA_ELPMX)
+#define AVR_ISA_M256  (AVR_ISA_M128 | AVR_ISA_EIND)
+#define AVR_ISA_XMEGA (AVR_ISA_M256 | AVR_ISA_SPMX | AVR_ISA_DES)
 
 #define AVR_ISA_AVR1   AVR_ISA_TINY1
 #define AVR_ISA_AVR2   AVR_ISA_2xxx
@@ -109,6 +113,7 @@
    L - signed pc relative offset from -2048 to 2047
    h - absolute code address (call, jmp)
    S - immediate value from 0 to 7 (S = s << 4)
+   E - immediate value from 0 to 15, shifted left by 4 (des)
    ? - use this opcode entry if no parameters, else use next opcode entry
 
    Order is important - some binary opcodes have more than one name,
@@ -169,7 +174,8 @@ AVR_INSN (reti, "",    "1001010100011000", 1, AVR_ISA_1200, 0x9518)
 AVR_INSN (sleep,"",    "1001010110001000", 1, AVR_ISA_1200, 0x9588)
 AVR_INSN (break,"",    "1001010110011000", 1, AVR_ISA_BRK,  0x9598)
 AVR_INSN (wdr,  "",    "1001010110101000", 1, AVR_ISA_1200, 0x95a8)
-AVR_INSN (spm,  "",    "1001010111101000", 1, AVR_ISA_SPM,  0x95e8)
+AVR_INSN (spm,  "?",   "1001010111101000", 1, AVR_ISA_SPM,  0x95e8)
+AVR_INSN (spm,  "z",   "10010101111+1000", 1, AVR_ISA_SPMX, 0x95e8)
 
 AVR_INSN (adc,  "r,r", "000111rdddddrrrr", 1, AVR_ISA_1200, 0x1c00)
 AVR_INSN (add,  "r,r", "000011rdddddrrrr", 1, AVR_ISA_1200, 0x0c00)
@@ -282,4 +288,7 @@ AVR_INSN (st,   "e,r", "100!001rrrrree-+", 1, AVR_ISA_1200, 0x8200)
       (>128K program memory, PC = EIND:Z).  */
 AVR_INSN (eicall, "",  "1001010100011001", 1, AVR_ISA_EIND, 0x9519)
 AVR_INSN (eijmp, "",   "1001010000011001", 1, AVR_ISA_EIND, 0x9419)
+
+/* DES instruction for encryption and decryption */
+AVR_INSN (des,  "E",   "10010100EEEE1011", 1, AVR_ISA_DES,  0x940B)
 
