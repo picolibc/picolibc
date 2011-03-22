@@ -1,5 +1,12 @@
 2011-03-22  Joseph Myers  <joseph@codesourcery.com>
 
+	* configure.ac (arm-semi-aof, crx-*-*, parisc*-*-linux*,
+	i370-*-opened*, i[[3456789]]86-moss-msdos | i[[3456789]]86-*-moss*
+	| i[[3456789]]86-*-uwin*, mcore-*-pe*): Remove empty cases.
+	* configure: Regenerate.
+
+2011-03-22  Joseph Myers  <joseph@codesourcery.com>
+
 	* config-ml.in: Don't handle arc-*-elf*.
 	* configure.ac (arc-*-*, crx-*-*, i[[3456789]]86-*-pe,
 	m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*, mcore-*-pe*): Don't
