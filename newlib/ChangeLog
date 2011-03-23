@@ -1,3 +1,7 @@
+2011-03-23  Nick Clifton  <nickc@redhat.com>
+
+	* libc/machine/frv/setjmp.S: Fix typo in .size directive.
+
 2011-03-21  Kevin Buettner  <kevinb@redhat.com>
 
 	* libc/sys/sysnecv850/trap.S (___trap0): Fix errno handling.

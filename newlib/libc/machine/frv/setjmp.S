@@ -123,4 +123,4 @@ EXT(longjmp):
 	cmov	gr9, gr8, cc4, 1
 	ret
 .Lend2:
-	.size	EXT(longjmp),.Lend2-EXT(longjmp2)
+	.size	EXT(longjmp),.Lend2-EXT(longjmp)
