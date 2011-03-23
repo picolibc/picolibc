@@ -1,3 +1,8 @@
+2011-03-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* autoload.cc (dll_load): Change error message to make it clear if a
+	newer DLL is being run.
+
 2011-03-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fenv.cc (_feinitialise): Don't use SSE instructions on systems not
