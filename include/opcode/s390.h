@@ -39,7 +39,8 @@ enum s390_opcode_cpu_val
     S390_OPCODE_Z9_109,
     S390_OPCODE_Z9_EC,
     S390_OPCODE_Z10,
-    S390_OPCODE_Z196
+    S390_OPCODE_Z196,
+    S390_OPCODE_MAXCPU
   };
 
 /* The opcode table is an array of struct s390_opcode.  */
