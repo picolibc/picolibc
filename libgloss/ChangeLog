@@ -1,5 +1,7 @@
 2011-03-24  Nick Clifton  <nickc@redhat.com>
 
+	* xstormy16/crt0.s (_hwint): Fix .size directive.
+
 	* frv/crt0.S (__frv_fix_usrptrs): Fix .size directive.
 
 2011-03-21  Kevin Buettner  <kevinb@redhat.com>

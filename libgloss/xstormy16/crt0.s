@@ -104,7 +104,7 @@ _int_basetimer:
 	.weak _hwinit
 _hwinit:
 	ret
-1:	.size _int_hwinit,1b-_int_hwinit
+1:	.size _hwinit,1b-_hwinit
 
 # The first word in .data has address 0, so it's not a good
 # idea to use it as its address conflicts with NULL.
