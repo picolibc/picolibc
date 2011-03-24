@@ -1,4 +1,8 @@
-2011-03-21  Kevin Buettner  <kevinb@redhat.com> 
+2011-03-24  Nick Clifton  <nickc@redhat.com>
+
+	* frv/crt0.S (__frv_fix_usrptrs): Fix .size directive.
+
+2011-03-21  Kevin Buettner  <kevinb@redhat.com>
 
 	* v850/sys/syscall.h (SYS_rename): Define.
 
