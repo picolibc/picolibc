@@ -1,3 +1,8 @@
+2011-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Add a cheat to let a certain autoconf test succeed
+	on 64 bit systems.  Explain why.
+
 2011-03-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* wincap.cc (wincap_2003): Set use_dont_resolve_hack to true.
