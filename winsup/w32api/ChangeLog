@@ -1,5 +1,9 @@
 2011-03-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
+	* Makefile.in: Increment CYGRELEASE to 2.
+
+2011-03-25  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
 	* lib/Makefile.in: Include GDIPLUS_HEADERS in dist target.
 
 2011-03-11  Chris Sutcliffe  <ir0nh34d@users.sf.net>

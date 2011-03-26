@@ -69,7 +69,7 @@ SUBDIRS = lib
 
 PACKAGE = w32api
 VERSION = 3.17
-CYGRELEASE = 1
+CYGRELEASE = 2
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
 aclocal.m4 install-sh README.w32api ChangeLog TODO CONTRIBUTIONS
