@@ -282,6 +282,10 @@ dist:
 	@for i in $(GL_HEADERS); do \
 		cp -p $(srcdir)/../include/GL/$$i $(distdir)/include/GL/$$i ; \
 	done
+	mkdir $(distdir)/include/gdiplus
+	@for i in $(GDIPLUS_HEADERS); do \
+		cp -p $(srcdir)/../include/gdiplus/$$i $(distdir)/include/gdiplus/$$i ; \
+	done
 	mkdir $(distdir)/lib
 	chmod 755 $(distdir)/lib
 	@for i in $(DISTFILES); do \
