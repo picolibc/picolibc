@@ -1,3 +1,8 @@
+2011-03-27  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (dll::init): Accommodate ill-behaved dlls who don't fill
+	out p.envptr.
+
 2011-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Add a cheat to let a certain autoconf test succeed
