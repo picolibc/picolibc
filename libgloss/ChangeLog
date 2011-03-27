@@ -1,5 +1,10 @@
 2011-03-26  Mike Frysinger  <vapier@gentoo.org>
 
+	* bfin/include/builtins.h (__builtin_raise): Change constraint to i.
+	(__builtin_excpt): Likewise.
+
+2011-03-26  Mike Frysinger  <vapier@gentoo.org>
+
 	* bfin/Makefile.in (install-sim): Exit when install fails.
 	(install-board): Likewise.
 
