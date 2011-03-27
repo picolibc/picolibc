@@ -146,12 +146,12 @@ install: ${SIM_INSTALL} ${BOARD_INSTALL}
 
 install-sim:
 	for x in ${SIM_CRT0} ${SIM_BSP} ${SIM_SCRIPTS}; do \
-	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x || exit $$?; \
 	done
 
 install-board:
 	for x in ${BOARD_CRT0S} ${BOARD_BSP}; do \
-	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+	 ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x || exit $$?; \
 	done
 	-if [ -z "${MULTISUBDIR}" ]; then \
 	  for x in ${BOARD_SCRIPTS}; do \
