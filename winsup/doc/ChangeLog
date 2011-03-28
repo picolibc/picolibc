@@ -1,3 +1,7 @@
+2011-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.9): Add "new API" paragraph.
+
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.8): Fix typo.
