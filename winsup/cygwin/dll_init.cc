@@ -76,7 +76,10 @@ dll::init ()
   int ret = 1;
 
   /* This should be a no-op.  Why didn't we just import this variable? */
-  *(p.envptr) = __cygwin_environ;
+  if (!p.envptr)
+    p.envptr = &__cygwin_environ;
+  else
+    *(p.envptr) = __cygwin_environ;
 
   /* Don't run constructors or the "main" if we've forked. */
   if (!in_forkee)

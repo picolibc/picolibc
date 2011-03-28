@@ -319,7 +319,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
-  use_dont_resolve_hack:false,
+  use_dont_resolve_hack:true,
   use_get_sec_info_on_dirs:true,
   supports_sse:true,
 };

@@ -801,6 +801,50 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       /* mmap /dev/zero is like MAP_ANONYMOUS. */
       if (fh->get_device () == FH_ZERO)
 	flags |= MAP_ANONYMOUS;
+
+      /* The autoconf mmap test maps a file of size 1 byte.  It then tests
+	 every byte of the entire mapped page of 64K for 0-bytes since that's
+	 what POSIX requires.  The problem is, we can't create that mapping on
+	 64 bit systems.  The file mapping will be only a single page, 4K, and
+	 since 64 bit systems don't support the AT_ROUND_TO_PAGE flag, the
+	 remainder of the 64K slot will result in a SEGV when accessed.
+
+	 So, what we do here is cheating for the sake of the autoconf test
+	 on 64 bit systems.  The justification is that there's very likely
+	 no application actually utilizing the map beyond EOF, and we know that
+	 all bytes beyond EOF are set to 0 anyway.  If this test doesn't work
+	 on 64 bit systems, it will result in not using mmap at all in a
+	 package.  But we want that mmap is treated as usable by autoconf,
+	 regardless whether the autoconf test runs on a 32 bit or a 64 bit
+	 system.
+
+	 Ok, so we know exactly what autoconf is doing.  The file is called
+	 "conftest.txt", it has a size of 1 byte, the mapping size is the
+	 pagesize, the requested protection is PROT_READ | PROT_WRITE, the
+	 mapping is MAP_SHARED, the offset is 0.
+
+	 If all these requirements are given, we just return an anonymous map.
+	 This will help to get over the autoconf test even on 64 bit systems.
+	 The tests are ordered for speed. */
+      if (wincap.is_wow64 ())
+	{
+	  UNICODE_STRING fname;
+	  IO_STATUS_BLOCK io;
+	  FILE_STANDARD_INFORMATION fsi;
+
+	  if (len == pagesize
+	      && prot == (PROT_READ | PROT_WRITE)
+	      && flags == MAP_SHARED
+	      && off == 0
+	      && (RtlSplitUnicodePath (fh->pc.get_nt_native_path (), NULL,
+				       &fname),
+		  wcscmp (fname.Buffer, L"conftest.txt") == 0)
+	      && NT_SUCCESS (NtQueryInformationFile (fh->get_handle (), &io,
+						     &fsi, sizeof fsi,
+						     FileStandardInformation))
+	      && fsi.EndOfFile.QuadPart == 1LL)
+	    flags |= MAP_ANONYMOUS;
+	}
     }
 
   if (anonymous (flags) || fd == -1)

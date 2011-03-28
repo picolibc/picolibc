@@ -1,3 +1,28 @@
+2011-03-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (strchrnul): Export.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* posix.sgml (std-gnu): Add strchrnul.
+
+2011-03-27  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (dll::init): Accommodate ill-behaved dlls who don't fill
+	out p.envptr.
+
+2011-03-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Add a cheat to let a certain autoconf test succeed
+	on 64 bit systems.  Explain why.
+
+2011-03-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* wincap.cc (wincap_2003): Set use_dont_resolve_hack to true.
+
+2011-03-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* autoload.cc (dll_load): Change error message to make it clear if a
+	newer DLL is being run.
+
 2011-03-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fenv.cc (_feinitialise): Don't use SSE instructions on systems not

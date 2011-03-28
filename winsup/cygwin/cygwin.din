@@ -1588,6 +1588,7 @@ strcat NOSIGFE
 _strcat = strcat NOSIGFE
 strchr NOSIGFE
 _strchr = strchr NOSIGFE
+strchrnul NOSIGFE
 strcmp NOSIGFE
 _strcmp = strcmp NOSIGFE
 strcoll NOSIGFE
