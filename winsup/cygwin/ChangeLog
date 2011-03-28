@@ -1,3 +1,9 @@
+2011-03-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (strchrnul): Export.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* posix.sgml (std-gnu): Add strchrnul.
+
 2011-03-27  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dll_init.cc (dll::init): Accommodate ill-behaved dlls who don't fill

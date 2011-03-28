@@ -400,12 +400,13 @@ details. */
       234: Export program_invocation_name, program_invocation_short_name.
       235: Export madvise.
       236: Export pthread_yield, __xpg_strerror_r.
+      237: Export strchrnul.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 236
+#define CYGWIN_VERSION_API_MINOR 237
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
