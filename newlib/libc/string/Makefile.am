@@ -85,6 +85,7 @@ ELIX_2_SOURCES = \
 	stpncpy.c \
 	strndup.c \
 	strcasestr.c \
+	strchrnul.c \
 	strndup_r.c \
 	wcpcpy.c \
 	wcpncpy.c \

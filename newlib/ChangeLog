@@ -1,3 +1,10 @@
+2011-03-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/string.h (strchrnul): Declare.
+	* libc/string/strchrnul.c: New file.
+	* libc/string/Makefile.am (ELIX_2_SOURCES): Add strchrnul.c.
+	* libc/string/Makefile.in: Regenerate.
+
 2011-03-23  Nick Clifton  <nickc@redhat.com>
 
 	* libc/machine/frv/setjmp.S: Fix typo in .size directive.

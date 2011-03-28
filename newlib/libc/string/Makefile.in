@@ -96,6 +96,7 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-stpncpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strcasestr.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-strchrnul.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-strndup_r.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpcpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpncpy.$(OBJEXT) \
@@ -123,8 +124,8 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 	wmemcpy.lo wmemmove.lo wmemset.lo xpg_strerror_r.lo
 @ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
-@ELIX_LEVEL_1_FALSE@	strcasestr.lo strndup_r.lo wcpcpy.lo \
-@ELIX_LEVEL_1_FALSE@	wcpncpy.lo wcsdup.lo
+@ELIX_LEVEL_1_FALSE@	strcasestr.lo strchrnul.lo strndup_r.lo \
+@ELIX_LEVEL_1_FALSE@	wcpcpy.lo wcpncpy.lo wcsdup.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = memmem.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcsncasecmp.lo
@@ -375,6 +376,7 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	stpncpy.c \
 @ELIX_LEVEL_1_FALSE@	strndup.c \
 @ELIX_LEVEL_1_FALSE@	strcasestr.c \
+@ELIX_LEVEL_1_FALSE@	strchrnul.c \
 @ELIX_LEVEL_1_FALSE@	strndup_r.c \
 @ELIX_LEVEL_1_FALSE@	wcpcpy.c \
 @ELIX_LEVEL_1_FALSE@	wcpncpy.c \
@@ -936,6 +938,12 @@ lib_a-strcasestr.o: strcasestr.c
 
 lib_a-strcasestr.obj: strcasestr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcasestr.obj `if test -f 'strcasestr.c'; then $(CYGPATH_W) 'strcasestr.c'; else $(CYGPATH_W) '$(srcdir)/strcasestr.c'; fi`
+
+lib_a-strchrnul.o: strchrnul.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchrnul.o `test -f 'strchrnul.c' || echo '$(srcdir)/'`strchrnul.c
+
+lib_a-strchrnul.obj: strchrnul.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchrnul.obj `if test -f 'strchrnul.c'; then $(CYGPATH_W) 'strchrnul.c'; else $(CYGPATH_W) '$(srcdir)/strchrnul.c'; fi`
 
 lib_a-strndup_r.o: strndup_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strndup_r.o `test -f 'strndup_r.c' || echo '$(srcdir)/'`strndup_r.c
