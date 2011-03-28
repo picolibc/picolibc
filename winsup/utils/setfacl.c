@@ -1,6 +1,6 @@
 /* setfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -69,16 +69,6 @@ mode_t getperm (char *in)
   return (in[0] == 'r' ? S_IROTH : 0)
          | (in[1] == 'w' ? S_IWOTH : 0)
          | (in[2] == 'x' ? S_IXOTH : 0);
-}
-
-/* GNU extension.  Like strchr except that if c is not found, return pointer
-   to the trailing \0, rather than NULL. */
-static char *
-strchrnul (const char *s, int c)
-{
-  while (*s && *s != c)
-    ++s;
-  return (char *) s;
 }
 
 BOOL

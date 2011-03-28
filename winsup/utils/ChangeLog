@@ -1,3 +1,7 @@
+2011-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (strchrnul): Drop local implementation.
+
 2011-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc: Fix copyright dates.
