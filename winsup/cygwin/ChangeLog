@@ -1,3 +1,8 @@
+2011-03-29  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/xattr.h: New file.
+
 2011-03-28  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* thread.cc (semaphore::init, destroy, close): Standards conformance
