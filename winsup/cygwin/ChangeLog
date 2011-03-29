@@ -1,5 +1,11 @@
 2011-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_user::env_domain): Use LookupAccountSidW and
+	convert user and domain to multibyte strings to make sure to use
+	correct codeset.
+
+2011-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (UuidCreate): Remove.
 	(UuidCreateSequential): Remove.
 	* passwd.cc (internal_getpwsid): Avoid a strict-aliasing compiler
