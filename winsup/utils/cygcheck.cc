@@ -1304,7 +1304,7 @@ int
 handle_unique_object_name (int opt, char *path)
 {
   HANDLE fh, fm;
-  void *haystack;
+  void *haystack = NULL;
 
   if (!path || !*path)
     usage (stderr, 1);
@@ -1758,7 +1758,7 @@ dump_sysinfo ()
 	continue;
       char drive[4], name[200], fsname[200];
       DWORD serno = 0, maxnamelen = 0, flags = 0;
-      name[0] = name[0] = fsname[0] = 0;
+      name[0] = fsname[0] = 0;
       sprintf (drive, "%c:\\", i + 'a');
       /* Report all errors, except if the Volume is ERROR_NOT_READY.
 	 ERROR_NOT_READY is returned when removeable media drives are empty

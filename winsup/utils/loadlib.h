@@ -1,6 +1,6 @@
 /* loadlib.h
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -18,6 +18,8 @@
    full path.  This doesn't work for loadling cygwin1.dll.  For this case,
    instead of prepending the path, make sure that the CWD is removed from
    the DLL search path, if possible (XP SP1++, Vista++). */
+static HMODULE _load_sys_library (const wchar_t *dll) __attribute__ ((used));
+
 static HMODULE
 _load_sys_library (const wchar_t *dll)
 {

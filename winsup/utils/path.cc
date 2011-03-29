@@ -1,6 +1,7 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -299,6 +300,7 @@ conv_fstab_spaces (char *field)
   return field;
 }
 
+#ifndef FSTAB_ONLY
 static struct opt
 {
   const char *name;
@@ -353,6 +355,7 @@ read_flags (char *options, unsigned &flags)
     }
   return true;
 }
+#endif
 
 bool
 from_fstab_line (mnt_t *m, char *line, bool user)
@@ -579,7 +582,6 @@ read_mounts ()
   DWORD len;
   WCHAR path[32768];
   PWCHAR path_end;
-  HMODULE h;
 
   for (mnt_t *m1 = mount_table; m1->posix; m1++)
     {

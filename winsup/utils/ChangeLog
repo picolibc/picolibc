@@ -1,3 +1,12 @@
+2011-02-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (handle_unique_object_name): Avoid a compiler warning.
+	(dump_sysinfo): Ditto.
+	* loadlib.h (_load_sys_library): Mark as used, to avoid a compiler
+	warning.
+	* path.cc (oopt): Gurad with !FSTAB_ONLY to avoid a compiler warning.
+	(read_flags): Ditto.
+
 2011-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (strchrnul): Drop local implementation.
