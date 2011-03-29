@@ -1,5 +1,18 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.10"><title>What's new and what changed from 1.7.9 to 1.7.10</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Pthread spinlocks.  New APIs: pthread_spin_destroy, pthread_spin_init,
+pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.9"><title>What's new and what changed from 1.7.8 to 1.7.9</title>
 
 <itemizedlist mark="bullet">
