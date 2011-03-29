@@ -3076,10 +3076,16 @@ semaphore::init (sem_t *sem, int pshared, unsigned int value)
 {
   /* opengroup calls this undefined */
   if (is_good_object (sem))
-    return EBUSY;
+    {
+      set_errno(EBUSY);
+      return -1;
+    }
 
   if (value > SEM_VALUE_MAX)
-    return EINVAL;
+    {
+      set_errno(EINVAL);
+      return -1;
+    }
 
   *sem = new semaphore (pshared, value);
 
@@ -3087,7 +3093,8 @@ semaphore::init (sem_t *sem, int pshared, unsigned int value)
     {
       delete (*sem);
       *sem = NULL;
-      return EAGAIN;
+      set_errno(EAGAIN);
+      return -1;
     }
   return 0;
 }
@@ -3096,11 +3103,17 @@ int
 semaphore::destroy (sem_t *sem)
 {
   if (!is_good_object (sem))
-    return EINVAL;
+    {
+      set_errno(EINVAL);
+      return -1;
+    }
 
   /* It's invalid to destroy a semaphore not opened with sem_init. */
   if ((*sem)->fd != -1)
-    return EINVAL;
+    {
+      set_errno(EINVAL);
+      return -1;
+    }
 
   /* FIXME - new feature - test for busy against threads... */
 
@@ -3113,11 +3126,17 @@ int
 semaphore::close (sem_t *sem)
 {
   if (!is_good_object (sem))
-    return EINVAL;
+    {
+      set_errno(EINVAL);
+      return -1;
+    }
 
   /* It's invalid to close a semaphore not opened with sem_open. */
   if ((*sem)->fd == -1)
-    return EINVAL;
+    {
+      set_errno(EINVAL);
+      return -1;
+    }
 
   delete (*sem);
   delete sem;

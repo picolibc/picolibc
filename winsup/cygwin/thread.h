@@ -21,6 +21,7 @@ details. */
 #include <limits.h>
 #include "security.h"
 #include <errno.h>
+#include "cygerrno.h"
 
 enum cw_sig_wait
 {
@@ -641,6 +642,7 @@ public:
   }
   static void terminate ()
   {
+    save_errno save;
     semaphores.for_each (&semaphore::_terminate);
   }
 

@@ -1,3 +1,10 @@
+2011-03-28  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* thread.cc (semaphore::init, destroy, close): Standards conformance
+	fix.  On a failure, return -1 and set errno.
+	* thread.h (semaphore::terminate): Save errno since semaphore::close()
+	may now modify it.
+
 2011-03-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (strchrnul): Export.
