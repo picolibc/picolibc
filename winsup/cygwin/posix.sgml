@@ -600,6 +600,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_setschedparam
     pthread_setspecific
     pthread_sigmask
+    pthread_spin_destroy
+    pthread_spin_init
+    pthread_spin_lock
+    pthread_spin_trylock
+    pthread_spin_unlock
     pthread_testcancel
     ptsname
     putc
@@ -1384,7 +1389,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_rwlock_timedrdlock
     pthread_rwlock_timedwrlock
     pthread_setschedprio
-    pthread_spin_[...]
     putmsg
     reminderl
     remquol

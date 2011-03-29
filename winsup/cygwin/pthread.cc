@@ -1,6 +1,6 @@
 /* pthread.cc: posix pthread interface for Cygwin
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2011 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
 
@@ -90,6 +90,14 @@ pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t * attr)
 {
   return pthread_mutex::init (mutex, attr, NULL);
 }
+
+/* Spinlocks */
+int
+pthread_spin_init (pthread_spinlock_t *spinlock, int pshared)
+{
+  return pthread_spinlock::init (spinlock, pshared);
+}
+
 
 /* Synchronisation */
 int

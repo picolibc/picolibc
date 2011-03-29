@@ -1,7 +1,7 @@
 /* thread.h: Locking and threading module definitions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
-   2008, 2009, 2010 Red Hat, Inc.
+   2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -98,6 +98,7 @@ class pinfo;
 #define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8
 #define PTHREAD_RWLOCK_MAGIC PTHREAD_MAGIC+9
 #define PTHREAD_RWLOCKATTR_MAGIC PTHREAD_MAGIC+10
+#define PTHREAD_SPINLOCK_MAGIC PTHREAD_MAGIC+11
 
 #define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
@@ -303,18 +304,15 @@ public:
     mutexes.for_each (&pthread_mutex::_fixup_after_fork);
   }
 
-private:
+protected:
   unsigned long lock_counter;
   HANDLE win32_obj_id;
-  unsigned int recursion_counter;
-  LONG condwaits;
   pthread_t owner;
 #ifdef DEBUGGING
   DWORD tid;		/* the thread id of the owner */
 #endif
-  int type;
-  int pshared;
 
+  void set_shared (int in_shared) { pshared = in_shared; }
   void set_owner (pthread_t self)
   {
     recursion_counter = 1;
@@ -323,9 +321,16 @@ private:
     tid = GetCurrentThreadId ();
 #endif
   }
+
   static const pthread_t _new_mutex;
   static const pthread_t _unlocked_mutex;
   static const pthread_t _destroyed_mutex;
+
+private:
+  unsigned int recursion_counter;
+  LONG condwaits;
+  int type;
+  int pshared;
 
   bool no_owner ();
   void _fixup_after_fork ();
@@ -333,6 +338,18 @@ private:
   static List<pthread_mutex> mutexes;
   static fast_mutex mutex_initialization_lock;
   friend class pthread_cond;
+};
+
+class pthread_spinlock: public pthread_mutex
+{
+public:
+  static bool is_good_object (pthread_spinlock_t const *);
+  static int init (pthread_spinlock_t *, int);
+
+  int lock ();
+  int unlock ();
+
+  pthread_spinlock (int);
 };
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)

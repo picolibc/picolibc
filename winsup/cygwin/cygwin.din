@@ -1244,6 +1244,11 @@ pthread_setschedparam SIGFE
 pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
+pthread_spin_destroy SIGFE
+pthread_spin_init SIGFE
+pthread_spin_lock SIGFE
+pthread_spin_trylock SIGFE
+pthread_spin_unlock SIGFE
 pthread_testcancel SIGFE
 pthread_yield = sched_yield SIGFE
 ptsname SIGFE

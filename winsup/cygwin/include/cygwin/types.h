@@ -1,6 +1,6 @@
 /* types.h
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2010 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2010, 2011 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -195,6 +195,7 @@ typedef struct
   int state;
 }
 pthread_once_t;
+typedef struct __pthread_spinlock_t {char __dummy;} *pthread_spinlock_t;
 typedef struct __pthread_rwlock_t {char __dummy;} *pthread_rwlock_t;
 typedef struct __pthread_rwlockattr_t {char __dummy;} *pthread_rwlockattr_t;
 
@@ -210,6 +211,7 @@ typedef class pthread_mutexattr *pthread_mutexattr_t;
 typedef class pthread_condattr *pthread_condattr_t;
 typedef class pthread_cond *pthread_cond_t;
 typedef class pthread_once pthread_once_t;
+typedef class pthread_spinlock *pthread_spinlock_t;
 typedef class pthread_rwlock *pthread_rwlock_t;
 typedef class pthread_rwlockattr *pthread_rwlockattr_t;
 
