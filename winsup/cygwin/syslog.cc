@@ -28,7 +28,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 
-#define CYGWIN_LOG_NAME "Cygwin"
+#define CYGWIN_LOG_NAME L"Cygwin"
 
 /* openlog: save the passed args. Don't open the system log or /dev/log yet.  */
 extern "C" void
@@ -44,13 +44,13 @@ openlog (const char *ident, int logopt, int facility)
       }
     if (ident)
       {
-	_my_tls.locals.process_ident = (char *) malloc (strlen (ident) + 1);
+	sys_mbstowcs_alloc (&_my_tls.locals.process_ident, HEAP_NOTHEAP, ident);
 	if (!_my_tls.locals.process_ident)
 	  {
-	    debug_printf ("failed to allocate memory for _my_tls.locals.process_ident");
+	    debug_printf ("failed to allocate memory for "
+			  "_my_tls.locals.process_ident");
 	    return;
 	  }
-	strcpy (_my_tls.locals.process_ident, ident);
       }
     _my_tls.locals.process_logopt = logopt;
     _my_tls.locals.process_facility = facility;
@@ -378,7 +378,7 @@ vsyslog (int priority, const char *message, va_list ap)
       /* Deal with ident_string */
       if (_my_tls.locals.process_ident != NULL)
 	{
-	  if (pass.print ("%s: ", _my_tls.locals.process_ident) == -1)
+	  if (pass.print ("%ls: ", _my_tls.locals.process_ident) == -1)
 	    return;
 	}
       if (_my_tls.locals.process_logopt & LOG_PID)
@@ -392,13 +392,10 @@ vsyslog (int priority, const char *message, va_list ap)
 	return;
 
     }
-  const char *msg_strings[1];
   char *total_msg = pass.get_message ();
   int len = strlen (total_msg);
   if (len != 0 && (total_msg[len - 1] == '\n'))
     total_msg[--len] = '\0';
-
-  msg_strings[0] = total_msg;
 
   if (_my_tls.locals.process_logopt & LOG_PERROR)
     {
@@ -410,17 +407,23 @@ vsyslog (int priority, const char *message, va_list ap)
   if ((fd = try_connect_syslogd (priority, total_msg, len + 1)) < 0)
     {
       /* If syslogd isn't present, open the event log and send the message */
-      HANDLE hEventSrc = RegisterEventSourceA (NULL, (_my_tls.locals.process_ident != NULL) ?
-				       _my_tls.locals.process_ident : CYGWIN_LOG_NAME);
-      if (hEventSrc == NULL)
+      HANDLE hEventSrc;
+
+      hEventSrc = RegisterEventSourceW (NULL, _my_tls.locals.process_ident
+					      ?: CYGWIN_LOG_NAME);
+      if (!hEventSrc)
+	debug_printf ("RegisterEventSourceW, %E");
+      else
 	{
-	  debug_printf ("RegisterEventSourceA failed with %E");
-	  return;
+	  wchar_t *msg_strings[1];
+	  tmp_pathbuf tp;
+	  msg_strings[0] = tp.w_get ();
+	  sys_mbstowcs (msg_strings[0], NT_MAX_PATH, total_msg);
+	  if (!ReportEventW (hEventSrc, eventType, 0, 0, cygheap->user.sid (),
+			     1, 0, (const wchar_t **) msg_strings, NULL))
+	    debug_printf ("ReportEventW, %E");
+	  DeregisterEventSource (hEventSrc);
 	}
-      if (!ReportEventA (hEventSrc, eventType, 0, 0,
-			 cygheap->user.sid (), 1, 0, msg_strings, NULL))
-	debug_printf ("ReportEventA failed with %E");
-      DeregisterEventSource (hEventSrc);
     }
 }
 

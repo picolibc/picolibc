@@ -1,5 +1,16 @@
 2011-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (struct _local_storage): Redefine process_ident as wchar_t
+	pointer.
+	* syslog.cc (CYGWIN_LOG_NAME): Convert to wide char constant.
+	(openlog): Convert incoming ident string to wide char.  Fix formatting.
+	(vsyslog): Print ident string as wide char string.  Convert message
+	string to wide char and call UNICODE Win32 Event functions to make sure
+	to use correct codeset.
+	* tlsoffset.h: Regenerate.
+
+2011-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (get_inet_addr): Make externally available.
 	* autoload.cc (GetUdpTable): Define.
 	* syslog.cc (connect_syslogd): Use get_inet_addr rather than _stat64
