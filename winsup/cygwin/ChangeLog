@@ -1,3 +1,27 @@
+2011-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (winmm): Remove time functions.  Don't treat
+	unloadable wave functions as fatal.
+	* hires.h (hires_ms::timeGetTime_ns): New private method.
+	(hires_ms::dmsecs): Call timeGetTime_ns here.
+	* ntdll.h (struct _KSYSTEM_TIME): Define.
+	(KUSER_SHARED_DATA): Redefine to allow access to InterruptTime.
+	(SharedUserData): Define here.
+	(NtQueryTimerResolution): Declare.
+	(NtSetTimerResolution): Declare.
+	* path.cc (SharedUserData): Move to ntdll.h.
+	* times.cc (hires_ms::timeGetTime_ns): New private method.
+	Use throughout instead of timeGetTime.  Document entire functionality
+	of timeGetTime in case we need it.
+	(hires_ms::resolution): Try a call to NtQueryTimerResolution
+	to fetch current period.  Fall back to heuristic if that fails.
+	Cast to DWORD in assignments to minperiod.
+	(clock_setres): Align period to possible values per a call to
+	NtQueryTimerResolution.  Explain why.  Replace calls to timeBeginPeriod
+	and timeEndPeriod with underlying call to NtSetTimerResolution.  Use
+	status code from NtSetTimerResolution to compute errno.
+	Convert period to ULONGLONG and store 100ns value to simplify code.
+
 2011-03-29  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

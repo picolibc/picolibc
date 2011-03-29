@@ -43,12 +43,13 @@ class hires_ns : public hires_base
 class hires_ms : public hires_base
 {
   LONGLONG initime_ns;
+  LONGLONG timeGetTime_ns ();
   void prime ();
  public:
   LONGLONG nsecs ();
   LONGLONG usecs () {return nsecs () / 10LL;}
   LONGLONG msecs () {return nsecs () / 10000LL;}
-  UINT dmsecs () { return timeGetTime (); }
+  UINT dmsecs () { return timeGetTime_ns () / 10000LL; }
   UINT resolution ();
   LONGLONG uptime () {return (nsecs () - initime_ns) / 10000LL;}
 };

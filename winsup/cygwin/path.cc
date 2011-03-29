@@ -3460,11 +3460,6 @@ static PFAST_CWD *fast_cwd_ptr
 static int fast_cwd_version
   __attribute__((section (".cygwin_dll_common"), shared)) = 1;
 
-/* This is the mapping of the KUSER_SHARED_DATA structure into the 32 bit
-   user address space.  We need it here to access the current DismountCount. */
-static KUSER_SHARED_DATA &SharedUserData
-			 = *(volatile PKUSER_SHARED_DATA) 0x7ffe0000;
-
 #define peek32(x)	(*(uint32_t *)(x))
 
 /* This function scans the code in ntdll.dll to find the address of the
