@@ -2,7 +2,6 @@
 
 	* hires.h: Fix copyright.
 	* times.cc: Ditto.
-	localtime, gmtime).
 	(FACTOR): Add comment.
 	(NSPERSEC): Ditto.
 	(JITTER): New definition.  Comment.
