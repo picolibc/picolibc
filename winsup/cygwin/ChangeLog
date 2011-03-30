@@ -1,5 +1,21 @@
 2011-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hires.h: Fix copyright.
+	* times.cc: Ditto.
+	localtime, gmtime).
+	(FACTOR): Add comment.
+	(NSPERSEC): Ditto.
+	(JITTER): New definition.  Comment.
+	(systime_ns): Avoid gratuitous copying of the value returned by
+	GetSystemTimeAsFileTime.
+	(corelocaltime, localtime, gmtime): Remove very old, unused code block.
+	(cygwin_tzset): Remove.
+	(hires_ms::timeGetTime_ns): Add missing semicolon in comment.
+	(hires_ms::nsecs): Redefine check for difference between internal
+	timer value and system time.
+
+2011-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (hires_ms::resolution): Make sure resolution is never 0.
 	(clock_setres): Ditto.
 

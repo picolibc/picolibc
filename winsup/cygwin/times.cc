@@ -1,7 +1,7 @@
 /* times.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -25,8 +25,13 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 
+/* 100ns difference between WIndows and UNIX timebase. */
 #define FACTOR (0x19db1ded53e8000LL)
+/* # of 100ns intervals per second. */
 #define NSPERSEC 10000000LL
+/* Max allowed diversion in 100ns of internal timer from system time.  If
+   this difference is exceeded, the internal timer gets re-primed. */
+#define JITTER (40 * 10000LL)
 
 /* TODO: Putting this variable in the shared cygwin region partially solves
    the problem of cygwin processes not recognizing date changes when other
@@ -42,10 +47,7 @@ static inline LONGLONG
 systime_ns ()
 {
   LARGE_INTEGER x;
-  FILETIME ft;
-  GetSystemTimeAsFileTime (&ft);
-  x.HighPart = ft.dwHighDateTime;
-  x.LowPart = ft.dwLowDateTime;
+  GetSystemTimeAsFileTime ((LPFILETIME) &x);
   x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
   return x.QuadPart;
 }
@@ -326,166 +328,6 @@ time (time_t * ptr)
   return res;
 }
 
-/*
- * localtime_r.c
- * Original Author:	Adapted from tzcode maintained by Arthur David Olson.
- *
- * Converts the calendar time pointed to by tim_p into a broken-down time
- * expressed as local time. Returns a pointer to a structure containing the
- * broken-down time.
- */
-
-#define SECSPERMIN	60
-#define MINSPERHOUR	60
-#define HOURSPERDAY	24
-#define SECSPERHOUR	(SECSPERMIN * MINSPERHOUR)
-#define SECSPERDAY	(SECSPERHOUR * HOURSPERDAY)
-#define DAYSPERWEEK	7
-#define MONSPERYEAR	12
-
-#define YEAR_BASE	1900
-#define EPOCH_YEAR      1970
-#define EPOCH_WDAY      4
-
-#define isleap(y) ((((y) % 4) == 0 && ((y) % 100) != 0) || ((y) % 400) == 0)
-
-#if 0 /* POSIX_LOCALTIME */
-
-static _CONST int mon_lengths[2][MONSPERYEAR] = {
-  {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
-  {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-};
-
-static _CONST int year_lengths[2] = {
-  365,
-  366
-};
-
-/*
- * Convert a time_t into a struct tm *.
- * Does NO timezone conversion.
- */
-
-/* Cygwin internal */
-static struct tm * __stdcall
-corelocaltime (const time_t * tim_p)
-{
-  long days, rem;
-  int y;
-  int yleap;
-  _CONST int *ip;
-  struct tm &localtime_buf=_my_tls.locals.localtime_buf;
-
-  time_t tim = *tim_p;
-  struct tm *res = &localtime_buf;
-
-  days = ((long) tim) / SECSPERDAY;
-  rem = ((long) tim) % SECSPERDAY;
-
-  while (rem < 0)
-    {
-      rem += SECSPERDAY;
-      --days;
-    }
-  while (rem >= SECSPERDAY)
-    {
-      rem -= SECSPERDAY;
-      ++days;
-    }
-
-  /* compute hour, min, and sec */
-  res->tm_hour = (int) (rem / SECSPERHOUR);
-  rem %= SECSPERHOUR;
-  res->tm_min = (int) (rem / SECSPERMIN);
-  res->tm_sec = (int) (rem % SECSPERMIN);
-
-  /* compute day of week */
-  if ((res->tm_wday = ((EPOCH_WDAY + days) % DAYSPERWEEK)) < 0)
-    res->tm_wday += DAYSPERWEEK;
-
-  /* compute year & day of year */
-  y = EPOCH_YEAR;
-  if (days >= 0)
-    {
-      for (;;)
-	{
-	  yleap = isleap (y);
-	  if (days < year_lengths[yleap])
-	    break;
-	  y++;
-	  days -= year_lengths[yleap];
-	}
-    }
-  else
-    {
-      do
-	{
-	  --y;
-	  yleap = isleap (y);
-	  days += year_lengths[yleap];
-	} while (days < 0);
-    }
-
-  res->tm_year = y - YEAR_BASE;
-  res->tm_yday = days;
-  ip = mon_lengths[yleap];
-  for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
-    days -= ip[res->tm_mon];
-  res->tm_mday = days + 1;
-
-  /* set daylight saving time flag */
-  res->tm_isdst = -1;
-
-  syscall_printf ("%d = corelocaltime (%x)", res, tim_p);
-
-  return (res);
-}
-
-/* localtime: POSIX 8.1.1, C 4.12.3.4 */
-/*
- * localtime takes a time_t (which is in UTC)
- * and formats it into a struct tm as a local time.
- */
-extern "C" struct tm *
-localtime (const time_t *tim_p)
-{
-  time_t tim = *tim_p;
-  struct tm *rtm;
-
-  tzset ();
-
-  tim -= _timezone;
-
-  rtm = corelocaltime (&tim);
-
-  rtm->tm_isdst = _daylight;
-
-  syscall_printf ("%x = localtime (%x)", rtm, tim_p);
-
-  return rtm;
-}
-
-/* gmtime: C 4.12.3.3 */
-/*
- * gmtime takes a time_t (which is already in UTC)
- * and just puts it into a struct tm.
- */
-extern "C" struct tm *
-gmtime (const time_t *tim_p)
-{
-  time_t tim = *tim_p;
-
-  struct tm *rtm = corelocaltime (&tim);
-  /* UTC has no daylight savings time */
-  rtm->tm_isdst = 0;
-
-  syscall_printf ("%x = gmtime (%x)", rtm, tim_p);
-
-  return rtm;
-}
-
-#endif /* POSIX_LOCALTIME */
-
 int
 utimens_worker (path_conv &win32, const struct timespec *tvp)
 {
@@ -611,12 +453,6 @@ ftime (struct timeb *tp)
   return 0;
 }
 
-/* obsolete, changed to cygwin_tzset when localtime.c was added - dj */
-extern "C" void
-cygwin_tzset ()
-{
-}
-
 #define stupid_printf if (cygwin_finished_initializing) debug_printf
 void
 hires_ns::prime ()
@@ -684,7 +520,7 @@ hires_ms::timeGetTime_ns ()
        LARGE_INTEGER int_time_start;
        do
 	 {
-	   tick_count_start = GetTickCount ()
+	   tick_count_start = GetTickCount ();
 	   do
 	     {
 	       int_time_start.HighPart = SharedUserData.InterruptTime.High1Time;
@@ -735,7 +571,7 @@ hires_ms::nsecs ()
 
   LONGLONG t = systime_ns ();
   LONGLONG res = initime_ns + timeGetTime_ns ();
-  if (res < (t - 40 * 10000LL))
+  if (llabs (res - t) > JITTER)
     {
       inited = false;
       prime ();
