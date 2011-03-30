@@ -697,11 +697,13 @@ cmd_set ()
       break;
     case REG_SZ:
     case REG_EXPAND_SZ:
-      n = mbstowcs (NULL, a, 0);
-      wchar_t w[n + 1];
-      mbstowcs (w, a, n + 1);
-      rv = RegSetValueExW (key, value, 0, value_type,
-			   (const BYTE *) w, (n + 1) * sizeof (wchar_t));
+      {
+	n = mbstowcs (NULL, a, 0);
+	wchar_t w[n + 1];
+	mbstowcs (w, a, n + 1);
+	rv = RegSetValueExW (key, value, 0, value_type,
+			     (const BYTE *) w, (n + 1) * sizeof (wchar_t));
+      }
       break;
     case REG_MULTI_SZ:
       for (i = 1, max_n = 1; argv[i]; i++)

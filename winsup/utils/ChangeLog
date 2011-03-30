@@ -1,5 +1,9 @@
 2011-02-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regtool.cc (cmd_set): Avoid a compiler warning.
+
+2011-02-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (handle_unique_object_name): Avoid a compiler warning.
 	(dump_sysinfo): Ditto.
 	* loadlib.h (_load_sys_library): Mark as used, to avoid a compiler
