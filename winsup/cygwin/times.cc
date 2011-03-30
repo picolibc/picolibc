@@ -827,6 +827,10 @@ hires_ms::resolution ()
 	  period /= 40000L;
 	  minperiod = (DWORD) period;
 	}
+      /* The resolution can be as low as 5000 100ns intervals on recent OSes.
+	 We have to make sure that the resolution in ms is never 0. */
+      if (!minperiod)
+	minperiod = 1L;
     }
   return minperiod;
 }
@@ -901,6 +905,10 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       return -1;
     }
   minperiod = actual / 10000L;
+  /* The resolution can be as low as 5000 100ns intervals on recent OSes.
+     We have to make sure that the resolution in ms is never 0. */
+  if (!minperiod)
+    minperiod = 1L;
   period_set = true;
   return 0;
 }
