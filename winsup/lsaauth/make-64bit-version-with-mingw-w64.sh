@@ -20,6 +20,6 @@ set -e
 CC="x86_64-w64-mingw32-gcc"
 CFLAGS="-fno-exceptions -O0 -Wall -Werror"
 LDFLAGS="-s -nostdlib -Wl,--entry,DllMain,--major-os-version,5,--minor-os-version,2"
-LIBS="-ladvapi32 -lkernel32 -lntdll"
+LIBS="-lkernel32 -lntdll"
 
-$CC $CFLAGS $LDFLAGS -shared -o cyglsa64.dll cyglsa.c mslsa.def $LIBS
+$CC $CFLAGS $LDFLAGS -shared -o cyglsa64.dll cyglsa.c cyglsa64.def $LIBS

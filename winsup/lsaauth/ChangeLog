@@ -1,4 +1,18 @@
-2011-03-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+2011-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (LIBS): Remove advapi32.dll.
+	(clean): Remove cyglsa.def.
+	* cyglsa.c: Drop definitions required for VC++.  Don't include ntddk.h.
+	Declare functions from NTDLL here.  Explain why.  Use NTDLL functions
+	in place of ADVAPI32 functions.
+	* cyglsa64.def: New file.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-mingw-w64.sh (LIBS): Remove advapi32.dll.
+	Reference cyglsa64.def instead of mslsa.def.
+	* make-64bit-version-with-visual-c.bat: Remove.
+	* mslsa.def: Remove.
+
+2011-03-31  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cyglsa.c: Fix compilation with MinGW-w64 toolchains.
 	* make-64bit-version-with-mingw-w64.sh: New file.

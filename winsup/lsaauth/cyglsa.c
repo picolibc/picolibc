@@ -10,18 +10,13 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 
 #define WINVER 0x0600
-#define _CRT_SECURE_NO_DEPRECATE
 #include <ntstatus.h>
-#define WIN32_NO_STATUS
 #include <wchar.h>
 #include <windows.h>
 #include <wininet.h>
 #include <lmcons.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
-#if defined(__MINGW32__) && !defined(_W64)
-#include <ntddk.h>
-#endif
 #include "../cygwin/cyglsa.h"
 #include "../cygwin/include/cygwin/version.h"
 
@@ -41,6 +36,19 @@ DllMain (HINSTANCE inst, DWORD reason, LPVOID res)
     }
   return TRUE;
 }
+
+/* Declare NTDLL functions here to avoid problems with different
+   header file layout in different compiler environments. */
+#ifndef NT_SUCCESS
+#define NT_SUCCESS(s)	((s) >= 0)
+#endif
+NTSTATUS NTAPI NtAllocateLocallyUniqueId (PLUID);
+NTSTATUS NTAPI RtlCopySid (ULONG, PSID, PSID);
+NTSTATUS NTAPI RtlGetAce (PACL, ULONG, PVOID *);
+ULONG NTAPI RtlLengthSid (PSID);
+PULONG NTAPI RtlSubAuthoritySid (PSID, ULONG);
+PUCHAR NTAPI RtlSubAuthorityCountSid (PSID);
+BOOLEAN NTAPI RtlValidSid (PSID);
 
 #ifndef RtlInitEmptyUnicodeString
 __inline VOID NTAPI
@@ -111,7 +119,7 @@ print_sid (const char *prefix, int idx, PISID sid)
     cyglsa_printf ("NULL\n");
   else if (IsBadReadPtr (sid, 8))
     cyglsa_printf ("INVALID POINTER\n");
-  else if (!IsValidSid ((PSID) sid))
+  else if (!RtlValidSid ((PSID) sid))
     cyglsa_printf ("INVALID SID\n");
   else if (IsBadReadPtr (sid, 8 + sizeof (DWORD) * sid->SubAuthorityCount))
     cyglsa_printf ("INVALID POINTER SPACE\n");
@@ -191,9 +199,11 @@ print_dacl (PACL dacl)
         {
 	  PVOID vace;
 	  PACCESS_ALLOWED_ACE ace;
+	  NTSTATUS stat;
 
-	  if (!GetAce (dacl, i, &vace))
-	    cyglsa_printf ("[%lu] GetAce error %lu\n", i, GetLastError ());
+	  stat = RtlGetAce (dacl, i, &vace);
+	  if (!NT_SUCCESS (stat))
+	    cyglsa_printf ("[%lu] RtlGetAce status 0x%08lx\n", i, stat);
 	  else
 	    {
 	      ace = (PACCESS_ALLOWED_ACE) vace;
@@ -489,8 +499,8 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       tokinf->ExpirationTime = authinf->inf.ExpirationTime;
       /* User SID */
       src_sid = (PSID) (base + authinf->inf.User.User.Sid);
-      size = GetLengthSid (src_sid);
-      CopySid (size, (PSID) tptr, src_sid);
+      size = RtlLengthSid (src_sid);
+      RtlCopySid (size, (PSID) tptr, src_sid);
       tokinf->User.User.Sid = (PSID) tptr;
       tptr += size;
       tokinf->User.User.Attributes = authinf->inf.User.User.Attributes;
@@ -504,16 +514,16 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       for (i = 0; i < src_grps->GroupCount; ++i)
 	{
 	  src_sid = (PSID) (base + src_grps->Groups[i].Sid);
-	  size = GetLengthSid (src_sid);
-	  CopySid (size, (PSID) tptr, src_sid);
+	  size = RtlLengthSid (src_sid);
+	  RtlCopySid (size, (PSID) tptr, src_sid);
 	  tokinf->Groups->Groups[i].Sid = (PSID) tptr;
 	  tptr += size;
 	  tokinf->Groups->Groups[i].Attributes = src_grps->Groups[i].Attributes;
 	}
       /* Primary Group SID */
       src_sid = (PSID) (base + authinf->inf.PrimaryGroup.PrimaryGroup);
-      size = GetLengthSid (src_sid);
-      CopySid (size, (PSID) tptr, src_sid);
+      size = RtlLengthSid (src_sid);
+      RtlCopySid (size, (PSID) tptr, src_sid);
       tokinf->PrimaryGroup.PrimaryGroup = (PSID) tptr;
       tptr += size;
       /* Privileges */
@@ -540,7 +550,8 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 	 not done in the 64 bit code above for hopefully obvious reasons... */
       LUID logon_sid_id;
 
-      if (must_create_logon_sid && !AllocateLocallyUniqueId (&logon_sid_id))
+      if (must_create_logon_sid
+	  && !NT_SUCCESS (NtAllocateLocallyUniqueId (&logon_sid_id)))
 	return STATUS_INSUFFICIENT_RESOURCES;
 
       if (!(tokinf = funcs->AllocateLsaHeap (authinf->inf_size)))
@@ -560,13 +571,13 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 		((PBYTE) tokinf + (LONG_PTR) tokinf->Groups->Groups[i].Sid);
 	  if (must_create_logon_sid
 	      && tokinf->Groups->Groups[i].Attributes & SE_GROUP_LOGON_ID
-	      && *GetSidSubAuthorityCount (tokinf->Groups->Groups[i].Sid) == 3
-	      && *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 0)
+	      && *RtlSubAuthorityCountSid (tokinf->Groups->Groups[i].Sid) == 3
+	      && *RtlSubAuthoritySid (tokinf->Groups->Groups[i].Sid, 0)
 		 == SECURITY_LOGON_IDS_RID)
 	    {
-	      *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 1)
+	      *RtlSubAuthoritySid (tokinf->Groups->Groups[i].Sid, 1)
 	      = logon_sid_id.HighPart;
-	      *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 2)
+	      *RtlSubAuthoritySid (tokinf->Groups->Groups[i].Sid, 2)
 	      = logon_sid_id.LowPart;
 	    }
 	}
@@ -593,12 +604,12 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 		(PVOID)((LONG_PTR) &authinf->inf + authinf->inf_size));
 
   /* Create logon session. */
-  if (!AllocateLocallyUniqueId (logon_id))
+  stat = NtAllocateLocallyUniqueId (logon_id);
+  if (!NT_SUCCESS (stat))
     {
       funcs->FreeLsaHeap (*tok);
       *tok = NULL;
-      cyglsa_printf ("AllocateLocallyUniqueId failed: Win32 error %lu\n",
-	      GetLastError ());
+      cyglsa_printf ("NtAllocateLocallyUniqueId status 0x%08lx\n", stat);
       return STATUS_INSUFFICIENT_RESOURCES;
     }
   stat = funcs->CreateLogonSession (logon_id);
