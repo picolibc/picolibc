@@ -1,5 +1,58 @@
 2011-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h: Allow usage from plain C code.
+	(FSCTL_PIPE_IMPERSONATE): Define.
+	(enum _THREAD_INFORMATION_CLASS): Define.
+	(RTL_QUERY_REGISTRY_xxx): Define.
+	(RTL_REGISTRY_xxx): Define.
+	(PRTL_QUERY_REGISTRY_ROUTINE): Define.
+	(struct _RTL_QUERY_REGISTRY_TABLE): Define.
+	(enum _KEY_VALUE_INFORMATION_CLASS): Define.
+	(struct _KEY_VALUE_PARTIAL_INFORMATION): Define.
+	(NtAccessCheck): Declare.
+	(NtAllocateLocallyUniqueId): Declare.
+	(NtCreateKey): Declare.
+	(NtDuplicateToken): Declare.
+	(NtLoadKey): Declare.
+	(NtOpenKey): Declare.
+	(NtOpenProcessToken): Declare.
+	(NtOpenThreadToken): Declare.
+	(NtPrivilegeCheck): Declare.
+	(NtQueryInformationToken): Declare.
+	(NtQueryValueKey): Declare.
+	(NtSetInformationThread): Declare.
+	(NtSetInformationToken): Declare.
+	(NtSetValueKey): Declare.
+	(RtlAbsoluteToSelfRelativeSD): Declare.
+	(RtlAddAccessAllowedAce): Declare.
+	(RtlAddAccessDeniedAce): Declare.
+	(RtlAddAce): Declare.
+	(RtlCheckRegistryKey): Declare.
+	(RtlCopySid): Declare.
+	(RtlCreateAcl): Declare.
+	(RtlCreateRegistryKey): Declare.
+	(RtlCreateSecurityDescriptor): Declare.
+	(RtlEqualPrefixSid): Declare.
+	(RtlEqualSid): Declare.
+	(RtlFirstFreeAce): Declare.
+	(RtlGetAce): Declare.
+	(RtlGetDaclSecurityDescriptor): Declare.
+	(RtlGetGroupSecurityDescriptor): Declare.
+	(RtlGetOwnerSecurityDescriptor): Declare.
+	(RtlIdentifierAuthoritySid): Declare.
+	(RtlInitializeSid): Declare.
+	(RtlLengthSid): Declare.
+	(RtlQueryRegistryValues): Declare.
+	(RtlSetControlSecurityDescriptor): Declare.
+	(RtlSetDaclSecurityDescriptor): Declare.
+	(RtlSetGroupSecurityDescriptor): Declare.
+	(RtlSetOwnerSecurityDescriptor): Declare.
+	(RtlSubAuthorityCountSid): Declare.
+	(RtlSubAuthoritySid): Declare.
+	(RtlWriteRegistryValue): Declare.
+
+2011-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::init): Don't call GetUserName.  Fetch username
 	from Windows environment instead.  Explain why.
 	(cygheap_user::env_domain): Use MAX_DOMAIN_NAME_LEN rather than DNLEN
