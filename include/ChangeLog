@@ -2,12 +2,6 @@
 
 	* dwarf2.h (dwarf_line_number_hp_sfc_ops): New enum.
 
-2011-03-31  Bernd Schmidt  <bernds@codesourcery.com>
-
-	* tic6x.h (R_C6000_JUMP_SPLOT, R_C6000_EHTYPE,
-	R_C6000_PCR_H16, R_C6000_PCR_L16): New relocs.
-	(SHN_TIC6X_SCOMMON): Define.
-
 2011-03-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf2.h (dwarf_form): Remove deprecated DW_FORM_sig8 define.
