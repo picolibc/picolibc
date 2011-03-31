@@ -40,12 +40,24 @@ cygheap_user::init ()
   WCHAR user_name[UNLEN + 1];
   DWORD user_name_len = UNLEN + 1;
 
-  if (!GetUserNameW (user_name, &user_name_len))
-    wcpcpy (user_name, L"unknown");
-
-  char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
-  sys_wcstombs (mb_user_name, user_name_len, user_name);
-  set_name (mb_user_name);
+  /* This code is only run if a Cygwin process gets started by a native
+     Win32 process.  We try to get the username from the environment,
+     first USERNAME (Win32), then USER (POSIX).  If that fails (which is
+     very unlikely), it only has an impact if we don't have an entry in
+     /etc/passwd for this user either.  In that case the username sticks
+     to "unknown".  Since this is called early in initialization, and
+     since we don't want pull in a dependency to any other DLL except
+     ntdll and kernel32 at this early stage, don't call GetUserName,
+     GetUserNameEx, NetWkstaUserGetInfo, etc. */
+  if (GetEnvironmentVariableW (L"USERNAME", user_name, user_name_len)
+      || GetEnvironmentVariableW (L"USER", user_name, user_name_len))
+    {
+      char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
+      sys_wcstombs (mb_user_name, user_name_len, user_name);
+      set_name (mb_user_name);
+    }
+  else
+    set_name ("unknown");
 
   DWORD siz;
   PSECURITY_DESCRIPTOR psd;
@@ -384,7 +396,7 @@ cygheap_user::env_domain (const char *name, size_t namelen)
 
   DWORD ulen = UNLEN + 1;
   WCHAR username[ulen];
-  DWORD dlen = DNLEN + 1;
+  DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   WCHAR userdomain[dlen];
   SID_NAME_USE use;
 
