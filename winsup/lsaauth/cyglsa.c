@@ -1,6 +1,6 @@
 /* cyglsa.c: LSA authentication module for Cygwin
 
-   Copyright 2006, 2008, 2010 Red Hat, Inc.
+   Copyright 2006, 2008, 2010, 2011 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -19,7 +19,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include <lmcons.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(_W64)
 #include <ntddk.h>
 #endif
 #include "../cygwin/cyglsa.h"

@@ -1,3 +1,9 @@
+2011-03-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cyglsa.c: Fix compilation with MinGW-w64 toolchains.
+	* make-64bit-version-with-mingw-w64.sh: New file.
+	* cyglsa64.dll: Regenerate with MinGW-w64-gc.
+
 2010-12-10  Illia Bobyr <Illia.Bobyr@ronin-capital.com>
 
 	* cyglsa-config: Unset GREP_OPTIONS when calling grep.
