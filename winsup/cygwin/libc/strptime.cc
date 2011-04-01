@@ -54,10 +54,6 @@ __weak_alias(strptime,_strptime)
 
 #define	_ctloc(x)		(_CurrentTimeLocale->x)
 
-/*
- * We do not implement alternate representations. However, we always
- * check whether a given modifier is allowed for a certain conversion.
- */
 #define ALT_E			0x01
 #define ALT_O			0x02
 #define	LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
