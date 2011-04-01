@@ -1419,6 +1419,18 @@ class fhandler_procsys: public fhandler_virtual
   bool fill_filebuf ();
 };
 
+class fhandler_procsysvipc: public fhandler_proc
+{
+  pid_t pid;
+ public:
+  fhandler_procsysvipc ();
+  virtual_ftype_t exists();
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
+  int open (int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  bool fill_filebuf ();
+};
+
 class fhandler_netdrive: public fhandler_virtual
 {
  public:
@@ -1517,6 +1529,7 @@ typedef union
   char __process[sizeof (fhandler_process)];
   char __procnet[sizeof (fhandler_procnet)];
   char __procsys[sizeof (fhandler_procsys)];
+  char __procsysvipc[sizeof (fhandler_procsysvipc)];
   char __pty_master[sizeof (fhandler_pty_master)];
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];

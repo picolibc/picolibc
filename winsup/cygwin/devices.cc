@@ -27,6 +27,9 @@ const device dev_procnet_storage =
 const device dev_procsys_storage =
   {"", {FH_PROCSYS}, ""};
 
+const device dev_procsysvipc_storage =
+  {"", {FH_PROCSYSVIPC}, ""};
+
 const device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, ""};
 

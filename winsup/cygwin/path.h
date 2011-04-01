@@ -19,7 +19,7 @@ details. */
 
 #define isproc_dev(devn) \
   (devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS || \
-   devn == FH_PROCNET || devn == FH_PROCSYS)
+   devn == FH_PROCNET || devn == FH_PROCSYS || devn == FH_PROCSYSVIPC)
 
 #define isprocsys_dev(devn) (devn == FH_PROCSYS)
 

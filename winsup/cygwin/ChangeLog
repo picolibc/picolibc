@@ -1,3 +1,17 @@
+2011-04-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Implement /proc/sysvipc/*
+	* devices.in (dev_procsysvipc_storage): Add.
+	* devices.cc: Regenerate.
+	* devices.h (fh_devices): Add FH_PROCSYSVIPC.
+	* dtable.cc (build_fh_pc): Add case FH_PROCSYSVIPC.
+	* fhandler.h (class fhandler_procsysvipc): Declare.
+	(fhandler_union): Add __procsysvipc.
+	* fhandler_proc.cc (proc_tab): Add sysvipc virt_directory.
+	* fhandler_procsysvipc.cc: New file.
+	* Makefile.in (DLL_OFILES): Add fhandler_procsysvipc.o.
+	* path.h (isproc_dev): Add FH_PROCSYSVIPC to conditional.
+
 2011-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add avapi32.o.

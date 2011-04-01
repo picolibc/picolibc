@@ -61,6 +61,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("self"),	 FH_PROC,	virt_symlink,	format_proc_self },
   { _VN ("stat"),	 FH_PROC,	virt_file,	format_proc_stat },
   { _VN ("sys"),	 FH_PROCSYS,	virt_directory,	NULL },
+  { _VN ("sysvipc"),	 FH_PROCSYSVIPC,	virt_directory,	NULL },
   { _VN ("uptime"),	 FH_PROC,	virt_file,	format_proc_uptime },
   { _VN ("version"),	 FH_PROC,	virt_file,	format_proc_version },
   { NULL, 0,	   	 0,		virt_none,	NULL }
