@@ -135,18 +135,18 @@ DLL_IMPORTS:=$(w32api_lib)/libadvapi32.a $(w32api_lib)/libkernel32.a $(w32api_li
 MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 86 col line
 #
-DLL_OFILES:=assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o cygthread.o \
-	cygtls.o cygxdr.o dcrt0.o debug.o devices.o dir.o dlfcn.o dll_init.o \
-	dtable.o environ.o errno.o exceptions.o exec.o external.o fcntl.o fenv.o \
-	fhandler.o fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
-	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
-	fhandler_mem.o fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o \
-	fhandler_process.o fhandler_procnet.o fhandler_procsys.o fhandler_random.o \
-	fhandler_raw.o fhandler_registry.o fhandler_serial.o fhandler_socket.o \
-	fhandler_tape.o fhandler_termios.o fhandler_tty.o fhandler_virtual.o \
-	fhandler_windows.o fhandler_zero.o flock.o fnmatch.o fork.o fts.o ftw.o \
-	getopt.o glob.o glob_pattern_p.o globals.o grp.o heap.o hookapi.o \
-	inet_addr.o inet_network.o init.o ioctl.o ipc.o kernel32.o \
+DLL_OFILES:=advapi32.o assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o \
+	cygthread.o cygtls.o cygxdr.o dcrt0.o debug.o devices.o dir.o dlfcn.o \
+	dll_init.o dtable.o environ.o errno.o exceptions.o exec.o external.o \
+	fcntl.o fenv.o fhandler.o fhandler_clipboard.o fhandler_console.o \
+	fhandler_disk_file.o fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o \
+	fhandler_mailslot.o fhandler_mem.o fhandler_netdrive.o fhandler_nodevice.o \
+	fhandler_proc.o fhandler_process.o fhandler_procnet.o fhandler_procsys.o \
+	fhandler_random.o fhandler_raw.o fhandler_registry.o fhandler_serial.o \
+	fhandler_socket.o fhandler_tape.o fhandler_termios.o fhandler_tty.o \
+	fhandler_virtual.o fhandler_windows.o fhandler_zero.o flock.o fnmatch.o \
+	fork.o fts.o ftw.o getopt.o glob.o glob_pattern_p.o globals.o grp.o heap.o \
+	hookapi.o inet_addr.o inet_network.o init.o ioctl.o ipc.o kernel32.o \
 	libstdcxx_wrapper.o localtime.o lsearch.o malloc_wrapper.o \
 	minires-os-if.o minires.o miscfuncs.o mktemp.o mmap.o msg.o \
 	mount.o net.o netdb.o nfs.o nftw.o nlsfuncs.o ntea.o passwd.o path.o \

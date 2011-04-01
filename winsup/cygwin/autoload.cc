@@ -352,6 +352,37 @@ wsock_init ()
 
 LoadDLLprime (ws2_32, _wsock_init, 0)
 
+#if 0
+/* Don't enable until libadvapi32.a has been removed from DLL_IMPORTS,
+   otherwise mintty will stop working on pre-Vista for some reason. */
+LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
+LoadDLLfunc (CryptAcquireContextW, 20, advapi32)
+LoadDLLfunc (CryptGenRandom, 12, advapi32)
+LoadDLLfunc (CryptReleaseContext, 8, advapi32)
+LoadDLLfunc (DeregisterEventSource, 4, advapi32)
+LoadDLLfunc (GetSecurityInfo, 32, advapi32)
+LoadDLLfunc (LogonUserW, 24, advapi32)
+LoadDLLfunc (LookupAccountNameW, 28, advapi32)
+LoadDLLfunc (LookupAccountSidW, 28, advapi32)
+LoadDLLfunc (LsaClose, 4, advapi32)
+LoadDLLfunc (LsaEnumerateAccountRights, 16, advapi32)
+LoadDLLfunc (LsaFreeMemory, 4, advapi32)
+LoadDLLfunc (LsaOpenPolicy, 16, advapi32)
+LoadDLLfunc (LsaQueryInformationPolicy, 12, advapi32)
+LoadDLLfunc (LsaRetrievePrivateData, 12, advapi32)
+LoadDLLfunc (LsaStorePrivateData, 12, advapi32)
+LoadDLLfunc (RegCloseKey, 4, advapi32)
+LoadDLLfunc (RegCreateKeyExW, 36, advapi32)
+LoadDLLfunc (RegEnumKeyExW, 32, advapi32)
+LoadDLLfunc (RegEnumValueW, 32, advapi32)
+LoadDLLfunc (RegGetKeySecurity, 16, advapi32)
+LoadDLLfunc (RegOpenKeyExW, 20, advapi32)
+LoadDLLfunc (RegQueryInfoKeyW, 48, advapi32)
+LoadDLLfunc (RegQueryValueExW, 24, advapi32)
+LoadDLLfunc (RegisterEventSourceW, 8, advapi32)
+LoadDLLfunc (ReportEventW, 36, advapi32)
+#endif
+
 LoadDLLfuncEx2 (DnsQuery_A, 24, dnsapi, 1, 127) // ERROR_PROC_NOT_FOUND
 LoadDLLfuncEx (DnsRecordListFree, 8, dnsapi, 1)
 
