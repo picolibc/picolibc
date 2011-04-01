@@ -1,5 +1,9 @@
 2011-04-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* new-features.sgml (ov-new1.7.10): Document /proc/sysvipc/.
+
+2011-04-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* new-features.sgml (ov-new1.7.10): /proc/loadavg now shows
 	current running/total processes count.
 

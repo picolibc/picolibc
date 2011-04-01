@@ -14,6 +14,12 @@ pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
 total number of processes.
 </para></listitem>
 
+<listitem><para>
+Added /proc/sysvipc/msg, /proc/sysvipc/sem, and /proc/sysvipc/shm which
+provide information about System V IPC message queues, semaphores, and
+shared memory.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
