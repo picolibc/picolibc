@@ -1,5 +1,18 @@
 2011-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_random.cc (fhandler_dev_random::crypt_gen_random):
+	Use CryptAcquireContextW.
+	* ntdll.h (STATUS_PROCEDURE_NOT_FOUND): Define.
+	* sec_auth.cc (open_local_policy): Rename NTSTATUS variable ret to
+	status.  Drop usage of LsaNtStatusToWinError.
+	(verify_token): Call NtQuerySecurityObject instead of
+	GetKernelObjectSecurity.
+	(create_token): Rename NTSTATUS variable ret to status.  Rename ret2 to
+	sub_status.  Drop usage of LsaNtStatusToWinError.  In case LsaLogonUser
+	fails, report the sub_status as well.
+
+2011-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/strptime.c: Remove misleading comment.
 
 2011-03-31  Corinna Vinschen  <corinna@vinschen.de>

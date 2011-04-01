@@ -1,7 +1,6 @@
 /* fhandler_random.cc: code to access /dev/random and /dev/urandom
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2011 Red Hat, Inc.
 
    Written by Corinna Vinschen (vinschen@cygnus.com)
 
@@ -42,11 +41,11 @@ bool
 fhandler_dev_random::crypt_gen_random (void *ptr, size_t len)
 {
   if (!crypt_prov
-      && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-			       CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
-      && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-			       CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
-			       | CRYPT_NEWKEYSET))
+      && !CryptAcquireContextW (&crypt_prov, NULL, MS_DEF_PROV_W, PROV_RSA_FULL,
+				CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
+      && !CryptAcquireContextW (&crypt_prov, NULL, MS_DEF_PROV_W, PROV_RSA_FULL,
+				CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
+				| CRYPT_NEWKEYSET))
     {
       debug_printf ("%E = CryptAquireContext()");
       return false;

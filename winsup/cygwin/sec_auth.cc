@@ -194,10 +194,10 @@ open_local_policy (ACCESS_MASK access)
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
   HANDLE lsa = INVALID_HANDLE_VALUE;
 
-  NTSTATUS ret = LsaOpenPolicy (NULL, &oa, access, &lsa);
-  if (ret != STATUS_SUCCESS)
+  NTSTATUS status = LsaOpenPolicy (NULL, &oa, access, &lsa);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      __seterrno_from_nt_status (status);
       /* Some versions of Windows set the lsa handle to NULL when
          LsaOpenPolicy fails. */
       lsa = INVALID_HANDLE_VALUE;
@@ -699,9 +699,11 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
       const DWORD sd_buf_siz = MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR);
       PSECURITY_DESCRIPTOR sd_buf = (PSECURITY_DESCRIPTOR) alloca (sd_buf_siz);
       cygpsid gsid (NO_SID);
-      if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
-				    sd_buf, sd_buf_siz, &size))
-	debug_printf ("GetKernelObjectSecurity(), %E");
+      NTSTATUS status;
+      status = NtQuerySecurityObject (token, GROUP_SECURITY_INFORMATION,
+				      sd_buf, sd_buf_siz, &size);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQuerySecurityObject(), %p", status);
       else if (!GetSecurityDescriptorGroup (sd_buf, (PSID *) &gsid,
 					    (BOOL *) &size))
 	debug_printf ("GetSecurityDescriptorGroup(), %E");
@@ -774,7 +776,7 @@ done:
 HANDLE
 create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 {
-  NTSTATUS ret;
+  NTSTATUS status;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
 
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
@@ -894,11 +896,11 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     goto out;
 
   /* Let's be heroic... */
-  ret = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,
-		       &auth_luid, &exp, &user, new_tok_gsids, privs, &owner,
-		       &pgrp, &dacl, &source);
-  if (ret)
-    __seterrno_from_nt_status (ret);
+  status = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,
+			  &auth_luid, &exp, &user, new_tok_gsids, privs, &owner,
+			  &pgrp, &dacl, &source);
+  if (status)
+    __seterrno_from_nt_status (status);
   else
     {
       /* Convert to primary token. */
@@ -933,7 +935,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   LSA_STRING name;
   HANDLE lsa_hdl = NULL, lsa = INVALID_HANDLE_VALUE;
   LSA_OPERATIONAL_MODE sec_mode;
-  NTSTATUS ret, ret2;
+  NTSTATUS status, sub_status;
   ULONG package_id, size;
   LUID auth_luid = SYSTEM_LUID;
   struct {
@@ -963,12 +965,12 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* Register as logon process. */
   str2lsa (name, "Cygwin");
   SetLastError (0);
-  ret = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
-  if (ret != STATUS_SUCCESS)
+  status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+  if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaRegisterLogonProcess: %p", ret);
-      __seterrno_from_win_error (ret == ERROR_PROC_NOT_FOUND
-				 ? ret : LsaNtStatusToWinError (ret));
+      debug_printf ("LsaRegisterLogonProcess: %p", status);
+      __seterrno_from_nt_status (status == ERROR_PROC_NOT_FOUND
+				 ? STATUS_PROCEDURE_NOT_FOUND : status);
       goto out;
     }
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
@@ -978,11 +980,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
   /* Get handle to our own LSA package. */
   str2lsa (name, CYG_LSA_PKGNAME);
-  ret = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
-  if (ret != STATUS_SUCCESS)
+  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLookupAuthenticationPackage: %p", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      debug_printf ("LsaLookupAuthenticationPackage: %p", status);
+      __seterrno_from_nt_status (status);
       goto out;
     }
 
@@ -1135,13 +1137,14 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     authinf->checksum += *csp++;
 
   /* Try to logon... */
-  ret = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Interactive, package_id,
-		      authinf, authinf_size, NULL, &ts, &profile, &size, &luid,
-		      &user_token, &quota, &ret2);
-  if (ret != STATUS_SUCCESS)
+  status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Interactive,
+			 package_id, authinf, authinf_size, NULL, &ts,
+			 &profile, &size, &luid, &user_token, &quota,
+			 &sub_status);
+  if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLogonUser: %p", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      debug_printf ("LsaLogonUser: %p (sub-status %p)", status, sub_status);
+      __seterrno_from_nt_status (status);
       goto out;
     }
   if (profile)
