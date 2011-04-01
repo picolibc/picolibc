@@ -9,6 +9,11 @@ Pthread spinlocks.  New APIs: pthread_spin_destroy, pthread_spin_init,
 pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
 </para></listitem>
 
+<listitem><para>
+/proc/loadavg now shows the number of currently running processes and the
+total number of processes.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
