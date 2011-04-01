@@ -374,9 +374,21 @@ format_proc_version (void *, char *&destbuf)
 static _off64_t
 format_proc_loadavg (void *, char *&destbuf)
 {
+  extern int get_process_state (DWORD dwProcessId);
+  unsigned running = 0;
+  winpids pids ((DWORD) 0);
+
+  for (unsigned i = 0; i < pids.npids; i++)
+    switch (get_process_state (i)) {
+      case 'O':
+      case 'R':
+        running++;
+        break;
+    }
+
   destbuf = (char *) crealloc_abort (destbuf, 16);
-  return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u\n",
-				    0, 0, 0, 0, 0, 0);
+  return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u %u/%u\n",
+				    0, 0, 0, 0, 0, 0, running, pids.npids);
 }
 
 static _off64_t

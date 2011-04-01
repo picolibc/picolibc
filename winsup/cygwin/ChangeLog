@@ -1,3 +1,10 @@
+2011-04-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* fhandler_proc.cc (format_proc_loadavg): Add running/total
+	processes as fourth component of output.
+	* fhandler_process.cc (get_process_state): Make non-static.
+	Add FIXME about generating an 'O' flag.
+
 2011-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_random.cc (fhandler_dev_random::crypt_gen_random):

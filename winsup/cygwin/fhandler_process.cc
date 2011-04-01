@@ -79,8 +79,7 @@ static const virt_tab_t process_tab[] =
 
 static const int PROCESS_LINK_COUNT =
   (sizeof (process_tab) / sizeof (virt_tab_t)) - 1;
-
-static int get_process_state (DWORD dwProcessId);
+int get_process_state (DWORD dwProcessId);
 static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
 			    unsigned long *vmrss, unsigned long *vmtext,
 			    unsigned long *vmdata, unsigned long *vmlib,
@@ -928,7 +927,7 @@ format_process_mounts (void *data, char *&destbuf)
   return len;
 }
 
-static int
+int
 get_process_state (DWORD dwProcessId)
 {
   /*
@@ -975,6 +974,7 @@ get_process_state (DWORD dwProcessId)
 	  state = 'S';
 	  for (unsigned i = 0; i < sp->ThreadCount; i++)
 	    {
+              /* FIXME: at some point we should consider generating 'O' */
 	      if (st->State == StateRunning ||
 		  st->State == StateReady)
 		{
