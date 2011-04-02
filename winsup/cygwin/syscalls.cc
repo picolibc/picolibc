@@ -36,9 +36,9 @@ details. */
 #include <utmpx.h>
 #include <sys/uio.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <rpc.h>
 #include "ntdll.h"
 
 #undef fstat
@@ -1492,80 +1492,62 @@ fsync (int fd)
 EXPORT_ALIAS (fsync, fdatasync)
 
 static void
-sync_worker (const char *vol)
+sync_worker (HANDLE dir, USHORT len, LPCWSTR vol)
 {
-  HANDLE fh = CreateFileA (vol, GENERIC_WRITE, FILE_SHARE_VALID_FLAGS,
-			   &sec_none_nih, OPEN_EXISTING, 0, NULL);
-  if (fh != INVALID_HANDLE_VALUE)
-    {
-      FlushFileBuffers (fh);
-      CloseHandle (fh);
-    }
+  NTSTATUS status;
+  HANDLE fh;
+  IO_STATUS_BLOCK io;
+  OBJECT_ATTRIBUTES attr;
+  UNICODE_STRING uvol = { len, len, (WCHAR *) vol };
+
+  InitializeObjectAttributes (&attr, &uvol, OBJ_CASE_INSENSITIVE, dir, NULL);
+  status = NtOpenFile (&fh, GENERIC_WRITE, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, 0);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtOpenFile (%S), status %p", &uvol, status);
   else
-    debug_printf ("Open failed with %E");
+    {
+      status = NtFlushBuffersFile (fh, &io);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtFlushBuffersFile (%S), status %p", &uvol, status);
+      NtClose (fh);
+    }
 }
 
 /* sync: SUSv3 */
 extern "C" void
 sync ()
 {
-  /* Per MSDN, 50 bytes should be enough here. */
-  char vol[MAX_PATH];
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  HANDLE devhdl;
+  UNICODE_STRING device;
 
-  if (wincap.has_guid_volumes ()) /* Win2k and newer */
+  /* Open \Device object directory. */
+  RtlInitUnicodeString (&device, L"\\Device");
+  InitializeObjectAttributes (&attr, &device, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  status = NtOpenDirectoryObject (&devhdl, DIRECTORY_QUERY, &attr);
+  if (!NT_SUCCESS (status))
     {
-      char a_drive[MAX_PATH] = {0};
-      char b_drive[MAX_PATH] = {0};
-
-      if (is_floppy ("A:"))
-	GetVolumeNameForVolumeMountPointA ("A:\\", a_drive, MAX_PATH);
-      if (is_floppy ("B:"))
-	GetVolumeNameForVolumeMountPointA ("B:\\", b_drive, MAX_PATH);
-
-      HANDLE sh = FindFirstVolumeA (vol, MAX_PATH);
-      if (sh != INVALID_HANDLE_VALUE)
-	{
-	  do
-	    {
-	      debug_printf ("Try volume %s", vol);
-
-	      /* Check vol for being a floppy on A: or B:.  Skip them. */
-	      if (strcasematch (vol, a_drive) || strcasematch (vol, b_drive))
-		{
-		  debug_printf ("Is floppy, don't sync");
-		  continue;
-		}
-
-	      /* Eliminate trailing backslash. */
-	      vol[strlen (vol) - 1] = '\0';
-	      sync_worker (vol);
-	    }
-	  while (FindNextVolumeA (sh, vol, MAX_PATH));
-	  FindVolumeClose (sh);
-	}
+      debug_printf ("NtOpenDirectoryObject, status %p", status);
+      return;
     }
-  else
+  /* Traverse \Device directory ... */
+  PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
+                                     alloca (640);
+  BOOLEAN restart = TRUE;
+  ULONG context = 0;
+  while (NT_SUCCESS (NtQueryDirectoryObject (devhdl, dbi, 640, TRUE, restart,
+                                             &context, NULL)))
     {
-      DWORD drives = GetLogicalDrives ();
-      DWORD mask = 1;
-      /* Skip floppies on A: and B: as in setmntent. */
-      if ((drives & 1) && is_floppy ("A:"))
-	drives &= ~1;
-      if ((drives & 2) && is_floppy ("B:"))
-	drives &= ~2;
-      strcpy (vol, "\\\\.\\A:");
-      do
-	{
-	  /* Geeh.  Try to sync only non-floppy drives. */
-	  if (drives & mask)
-	    {
-	      debug_printf ("Try volume %s", vol);
-	      sync_worker (vol);
-	    }
-	  vol[4]++;
-	}
-      while ((mask <<= 1) <= 1 << 25);
+      restart = FALSE;
+      /* ... and call sync_worker for each HarddiskVolumeX entry. */
+      if (dbi->ObjectName.Length >= 15 * sizeof (WCHAR)
+	  && !wcsncasecmp (dbi->ObjectName.Buffer, L"HarddiskVolume", 14)
+	  && iswdigit (dbi->ObjectName.Buffer[14]))
+	sync_worker (devhdl, dbi->ObjectName.Length, dbi->ObjectName.Buffer);
     }
+  NtClose (devhdl);
 }
 
 /* Cygwin internal */
