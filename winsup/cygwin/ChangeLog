@@ -1,5 +1,10 @@
 2011-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_partitions): Express length in WCHAR
+	size.
+
+2011-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetExtendedTcpTable): Remove.
 	(GetTcpTable): Remove.
 	(CharNextExA): Remove.

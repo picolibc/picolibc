@@ -1143,7 +1143,7 @@ format_proc_partitions (void *, char *&destbuf)
 
       restart = FALSE;
       /* ... and check for a "Harddisk[0-9]*" entry. */
-      if (dbi->ObjectName.Length < 18
+      if (dbi->ObjectName.Length < 9 * sizeof (WCHAR)
 	  || wcsncasecmp (dbi->ObjectName.Buffer, L"Harddisk", 8) != 0
 	  || !iswdigit (dbi->ObjectName.Buffer[8]))
 	continue;
