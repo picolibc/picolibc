@@ -49,7 +49,6 @@ wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = 
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:false,
@@ -92,7 +91,6 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -135,7 +133,6 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:false,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -178,7 +175,6 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -221,7 +217,6 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -264,7 +259,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:false,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -307,7 +301,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:false,
   has_restricted_stack_args:true,
   has_transactions:false,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -350,7 +343,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:true,
   has_restricted_stack_args:false,
   has_transactions:true,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -393,7 +385,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   supports_all_posix_ai_flags:true,
   has_restricted_stack_args:false,
   has_transactions:true,
-  ts_has_dep_problem:false,
   has_recvmsg:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -494,14 +485,7 @@ wincapc::init ()
     }
 
   if (has_osversioninfoex && version.wProductType != VER_NT_WORKSTATION)
-    {
-      ((wincaps *)caps)->is_server = true;
-      if (version.dwMajorVersion >= 6
-	  && (version.wSuiteMask
-	      & (VER_SUITE_TERMINAL | VER_SUITE_SINGLEUSERTS))
-	     == VER_SUITE_TERMINAL)
-	((wincaps *)caps)->ts_has_dep_problem = true;
-    }
+    ((wincaps *)caps)->is_server = true;
   if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,
 					     &wow64, sizeof wow64, NULL))

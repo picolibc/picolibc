@@ -1,3 +1,17 @@
+2011-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetExtendedTcpTable): Remove.
+	(GetTcpTable): Remove.
+	(CharNextExA): Remove.
+	(FindWindowA): Remove.
+	(ShowWindowAsync): Remove.
+	* dcrt0.cc (disable_dep): Remove unused function.
+	(dll_crt0_0): Drop comment babbling about TS & DEP.
+	* fhandler_socket.cc (address_in_use): Remove unused function.
+	* wincap.cc: Throughout, drop ts_has_dep_problem from wincaps.
+	(wincapc::init): Drop code setting ts_has_dep_problem flag.
+	* wincap.h (struct wincaps): Drop ts_has_dep_problem flags and method.
+
 2011-04-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	Implement /proc/sysvipc/*
