@@ -1,3 +1,12 @@
+2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_user_groups): Mark well-known groups as well-known.
+	(get_user_local_groups): Ditto.
+	(verify_token): Drop useless label.
+	* sec_helper.cc (cygsid::get_sid): Check for well-known SID if
+	well_known isn't set.
+	* security.h (well_known_sid_type): New inline function.
+
 2011-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (FindFirstVolumeA): Remove.
