@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2009,
-   2010 Red Hat, Inc.
+   2010, 2011 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -150,7 +150,8 @@ PSID
 cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
 {
   DWORD i;
-  SID_IDENTIFIER_AUTHORITY sid_auth = {{0,0,0,0,0,0}};
+  SID_IDENTIFIER_AUTHORITY sid_auth = { SECURITY_NULL_SID_AUTHORITY };
+# define SECURITY_NT_AUTH 5
 
   if (s > 255 || cnt < 1 || cnt > 8)
     {
@@ -162,7 +163,17 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   InitializeSid (psid, &sid_auth, cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
-  well_known_sid = well_known;
+  /* If the well_known flag isn't set explicitely, we check the SID
+     for being a well-known SID ourselves. That's necessary because this
+     cygsid is created from a SID string, usually from /etc/passwd or
+     /etc/group.  The calling code just doesn't know if the SID is well-known
+     or not.  All SIDs are well-known SIDs, except those in the non-unique NT
+     authority range. */
+  if (well_known)
+    well_known_sid = well_known;
+  else
+    well_known_sid = (s != SECURITY_NT_AUTH
+		      || r[0] != SECURITY_NT_NON_UNIQUE_RID);
   return psid;
 }
 

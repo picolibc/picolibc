@@ -292,6 +292,8 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
       wcscpy (dgroup + len, buf[i].grui0_name);
       if (!LookupAccountNameW (NULL, dgroup, gsid, &glen, dom, &dlen, &use))
 	debug_printf ("LookupAccountName(%W), %E", dgroup);
+      else if (well_known_sid_type (use))
+	grp_list *= gsid;
       else if (legal_sid_type (use))
 	grp_list += gsid;
       else
@@ -339,10 +341,12 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
       if (LookupAccountNameW (NULL, domlocal_grp, gsid, &glen,
 			      dom, &domlen, &use))
 	{
-	  if (!legal_sid_type (use))
-	    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
-	  else
+	  if (well_known_sid_type (use))
+	    grp_list *= gsid;
+	  else if (legal_sid_type (use))
 	    grp_list += gsid;
+	  else
+	    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
 	}
       else if (GetLastError () == ERROR_NONE_MAPPED)
 	{
@@ -762,14 +766,13 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	    if (!saw[gidx]
 	    	&& !groups.sgsids.sids[gidx].is_well_known_sid ()
 		&& !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
-	      goto done;
+	      return false;
 	}
       /* The primary group must be in the token */
       ret = sawpg
 	|| sid_in_token_groups (my_grps, groups.pgsid)
 	|| groups.pgsid == usersid;
     }
-done:
   return ret;
 }
 
