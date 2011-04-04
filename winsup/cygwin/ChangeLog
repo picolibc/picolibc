@@ -1,5 +1,54 @@
 2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	Drop NT4 support.
+	* autoload.cc (DnsQuery_A): Fatal if not available.
+	(DnsRecordListFree): Ditto.
+	(DsGetDcNameW): Ditto.
+	(NetGetAnyDCName): Remove.
+	(NetGetDCName): Remove.
+	(EnumProcessModules): Fatal if not available.
+	(GetModuleFileNameExW): Ditto.
+	(GetModuleInformation): Ditto.
+	(GetProcessMemoryInfo): Ditto.
+	(QueryWorkingSet): Ditto.
+	(LsaRegisterLogonProcess): Ditto.
+	* fenv.cc (_feinitialise): Drop supports_sse condition.
+	* fhandler_disk_file.cc (path_conv::isgood_inode): Fix comment.
+	(fhandler_base::fstat_by_name): Drop has_fileid_dirinfo condition.
+	(fhandler_disk_file::opendir): Ditto.
+	* fhandler_netdrive.cc (fhandler_netdrive::readdir): Fix comment.
+	* fhandler_proc.cc (format_proc_partitions): Drop NT4-only code.
+	* fhandler_process.cc (get_process_state): Ditto.
+	* kernel32.cc (GetWindowsDirectoryW): Remove.
+	(GetWindowsDirectoryA): Remove.
+	* miscfuncs.cc (nice_to_winprio): Drop NT4-only code.
+	* mount.cc (fs_info::update): Fix comments.
+	* net.cc (get_2k_ifs): Drop NT4-only code.
+	* sec_auth.cc (get_logon_server): Ditto.
+	(lsaauth): Drop NT4-specific error handling.
+	* security.cc (alloc_sd): Set SE_DACL_PROTECTED unconditionally.
+	* select.cc (select_stuff::wait): Always use MWMO_INPUTAVAILABLE.
+	(peek_windows): Drop NT4-only condition in call to PeekMessage.
+	* syscalls.cc (gethostid): Remove NT4-only workaround.
+	* wincap.cc: Througout, drop has_dacl_protect,
+	has_broken_if_oper_status, has_process_io_counters,
+	has_terminal_services, has_extended_priority_class, has_guid_volumes,
+	has_fileid_dirinfo, has_mwmo_inputavailable and supports_sse from
+	wincaps.
+	(wincap_nt4sp4): Remove.
+	(wincap_minimal): Set to wincap_2000.
+	(wincapc::init): Rely on availability of OSVERSIONINFOEX structure.
+	Treat error from GetVersionEx as fatal.  Treat NT4 as fatal.
+	* wincap.h (struct wincaps): Drop has_dacl_protect,
+	has_broken_if_oper_status, has_process_io_counters,
+	has_terminal_services, has_extended_priority_class, has_guid_volumes,
+	has_fileid_dirinfo, has_mwmo_inputavailable and supports_sse flags
+	and methods.
+	* winlean.h (GetWindowsDirectoryW) Define as GetSystemWindowsDirectoryW.
+	(GetWindowsDirectoryA): Define as GetSystemWindowsDirectoryA.
+
+2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Fix a comment to
 	reflect the current state.
 

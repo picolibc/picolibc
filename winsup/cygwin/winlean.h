@@ -1,6 +1,6 @@
 /* winlean.h - Standard "lean" windows include
 
-   Copyright 2010  Red Hat, Inc.
+   Copyright 2010, 2011  Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,4 +27,11 @@ details. */
 #undef _WINVER_H
 #undef _WINNETWK_H
 #undef _WINSVC_H
+/* When Terminal Services are installed, the GetWindowsDirectory function
+   does not return the system installation dir, but a user specific directory
+   instead.  That's not what we have in mind when calling GetWindowsDirectory
+   from within Cygwin.  So we redefine GetWindowsDirectory to call the
+   GetSystemWindowsDirectory function here. */
+#define GetWindowsDirectoryW GetSystemWindowsDirectoryW
+#define GetWindowsDirectoryA GetSystemWindowsDirectoryA
 #endif /*_WINLEAN_H*/

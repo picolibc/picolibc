@@ -1,6 +1,6 @@
 /* fhandler_netdrive.cc: fhandler for // and //MACHINE handling
 
-   Copyright 2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -245,7 +245,6 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
 	{
 	  de->d_ino = readdir_get_ino (nro->lpRemoteName, false);
 	  /* We can't trust remote inode numbers of only 32 bit.  That means,
-	     all remote inode numbers when running under NT4, as well as
 	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
 	  if (de->d_ino <= UINT_MAX)
 	    de->d_ino = hash_path_name (0, nro->lpRemoteName);

@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -290,14 +290,11 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	/* Using MWMO_INPUTAVAILABLE is the officially supported solution for
 	   the problem that the call to PeekMessage disarms the queue state 
 	   so that a subsequent MWFMO hangs, even if there are still messages
-	   in the queue.  Unfortunately this flag didn't exist  prior to Win2K,
-	   so for NT4 we fall back to a different usage of PeekMessage in
-	   peek_windows.  See there for more details. */
+	   in the queue. */
 	wait_ret =
 	  MsgWaitForMultipleObjectsEx (m, w4, ms,
 				       QS_ALLINPUT | QS_ALLPOSTMESSAGE,
-				       wincap.has_mwmo_inputavailable ()
-				       ? MWMO_INPUTAVAILABLE : 0);
+				       MWMO_INPUTAVAILABLE);
 
       switch (wait_ret)
       {
@@ -1542,14 +1539,7 @@ peek_windows (select_record *me, bool)
   if (me->read_selected && me->read_ready)
     return 1;
 
-  /* On NT4 we use a filter pattern which allows to use QS_ALLPOSTMESSAGE
-     to keep the queue state as unread.  Note that this only works if the
-     application itself does not call PeekMessage or GetQueueState the wrong
-     way.  But there's no way around it.  On Win2K and later we rather use
-     MsgWaitForMultipleObjectsEx(MWMO_INPUTAVAILABLE). */
-  if (PeekMessage (&m, (HWND) h, 0,
-		   wincap.has_mwmo_inputavailable () ? 0 : UINT_MAX - 1,
-		   PM_NOREMOVE))
+  if (PeekMessage (&m, (HWND) h, 0, 0, PM_NOREMOVE))
     {
       me->read_ready = true;
       select_printf ("window %d(%p) ready", me->fd, me->fh->get_handle ());

@@ -216,9 +216,8 @@ close_local_policy (LSA_HANDLE &lsa)
 bool
 get_logon_server (PWCHAR domain, WCHAR *server, bool rediscovery)
 {
-  DWORD dret;
+  DWORD ret;
   PDOMAIN_CONTROLLER_INFOW pci;
-  WCHAR *buf;
   DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
 
   /* Empty domain is interpreted as local system */
@@ -230,31 +229,16 @@ get_logon_server (PWCHAR domain, WCHAR *server, bool rediscovery)
     }
 
   /* Try to get any available domain controller for this domain */
-  dret = DsGetDcNameW (NULL, domain, NULL, NULL,
-		       rediscovery ? DS_FORCE_REDISCOVERY : 0, &pci);
-  if (dret == ERROR_SUCCESS)
+  ret = DsGetDcNameW (NULL, domain, NULL, NULL,
+		      rediscovery ? DS_FORCE_REDISCOVERY : 0, &pci);
+  if (ret == ERROR_SUCCESS)
     {
       wcscpy (server, pci->DomainControllerName);
       NetApiBufferFree (pci);
       debug_printf ("DC: rediscovery: %d, server: %W", rediscovery, server);
       return true;
     }
-  else if (dret == ERROR_PROC_NOT_FOUND)
-    {
-      /* NT4 w/o DSClient */
-      if (rediscovery)
-	dret = NetGetAnyDCName (NULL, domain, (LPBYTE *) &buf);
-      else
-	dret = NetGetDCName (NULL, domain, (LPBYTE *) &buf);
-      if (dret == NERR_Success)
-	{
-	  wcscpy (server, buf);
-	  NetApiBufferFree (buf);
-	  debug_printf ("NT: rediscovery: %d, server: %W", rediscovery, server);
-	  return true;
-	}
-    }
-  __seterrno_from_win_error (dret);
+  __seterrno_from_win_error (ret);
   return false;
 }
 
@@ -972,8 +956,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   if (status != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %p", status);
-      __seterrno_from_nt_status (status == ERROR_PROC_NOT_FOUND
-				 ? STATUS_PROCEDURE_NOT_FOUND : status);
+      __seterrno_from_nt_status (status);
       goto out;
     }
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)

@@ -1,6 +1,6 @@
 /* kernel32.cc: Win32 replacement functions.
 
-   Copyright 2008, 2010 Red Hat, Inc.
+   Copyright 2008, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -402,38 +402,4 @@ OpenFileMappingA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
       return NULL;
     }
   return OpenFileMappingW (dwDesiredAccess, bInheritHandle, lpName ? name : NULL);
-}
-
-/* When Terminal Services are installed, the GetWindowsDirectory function
-   does not return the system installation dir, but a user specific directory
-   instead.  That's not what we have in mind when calling GetWindowsDirectory
-   from within Cygwin.  So we're calling GetSystemWindowsDirectory from here,
-   except on NT4 where we use the method as described in KB186498. */
-
-#define SYSTEM32	(sizeof ("\\System32") - 1)
-
-UINT WINAPI
-GetWindowsDirectoryW (LPWSTR buf, UINT size)
-{
-  if (wincap.has_terminal_services ())
-    return GetSystemWindowsDirectoryW (buf, size);
-  /* NT4 */
-  WCHAR name [size + SYSTEM32];
-  UINT ret = GetSystemDirectoryW (name, size + SYSTEM32);
-  if (ret < size + SYSTEM32)
-    {
-      name[ret - SYSTEM32] = L'\0';
-      wcscpy (buf, name);
-    }
-  return ret - SYSTEM32;
-}
-
-UINT WINAPI
-GetWindowsDirectoryA (LPSTR buf, UINT size)
-{
-  WCHAR name[MAX_PATH];
-  UINT ret = GetWindowsDirectoryW (name, min (size, MAX_PATH));
-  if (ret < size)
-    sys_wcstombs (buf, size, name);
-  return ret;
 }

@@ -140,8 +140,7 @@ inline bool
 path_conv::isgood_inode (__ino64_t ino) const
 {
   /* We can't trust remote inode numbers of only 32 bit.  That means,
-     all remote inode numbers when running under NT4, as well as remote NT4
-     NTFS, as well as shares of Samba version < 3.0.
+     remote NT4 NTFS, as well as shares of Samba version < 3.0.
      The known exception are SFU NFS shares, which return the valid 32 bit
      inode number from the remote file system unchanged. */
   return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
@@ -404,8 +403,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
     WCHAR buf[NAME_MAX + 1];
   } fdi_buf;
 
-  if (!ino && pc.hasgood_inode ()
-      && wincap.has_fileid_dirinfo () && !pc.has_buggy_fileid_dirinfo ())
+  if (!ino && pc.hasgood_inode () && !pc.has_buggy_fileid_dirinfo ())
     {
       RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, &basename);
       InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
@@ -1679,8 +1677,7 @@ fhandler_disk_file::opendir (int fd)
 	      dir->__flags |= dirent_set_d_ino;
 	      if (pc.fs_is_nfs ())
 		dir->__flags |= dirent_nfs_d_ino;
-	      else if (wincap.has_fileid_dirinfo ()
-		       && !pc.has_buggy_fileid_dirinfo ())
+	      else if (!pc.has_buggy_fileid_dirinfo ())
 		dir->__flags |= dirent_get_d_ino;
 	    }
 	}

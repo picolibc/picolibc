@@ -2194,10 +2194,7 @@ get_2k_ifs ()
 	  if (ifrow->dwAdminStatus == IF_ADMIN_STATUS_UP)
 	    {
 	      ifp->ifa_ifa.ifa_flags |= IFF_UP | IFF_LOWER_UP;
-	      /* Bug in NT4's IP Helper lib.  The dwOperStatus has just
-		 two values, 0 or 1, non operational, operational. */
-	      if (ifrow->dwOperStatus >= (wincap.has_broken_if_oper_status ()
-					  ? 1 : IF_OPER_STATUS_CONNECTED))
+	      if (ifrow->dwOperStatus >= IF_OPER_STATUS_CONNECTED)
 		ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
 	    }
 	  /* Address */

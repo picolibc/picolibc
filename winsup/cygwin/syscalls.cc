@@ -3771,10 +3771,7 @@ long gethostid (void)
   key.get_string ("ProductId", (char *)&data[6], 24, "00000-000-0000000-00000");
   debug_printf ("Windows Product ID: %s", (char *)&data[6]);
 
-  /* Contrary to MSDN, NT4 requires the second argument
-     or a STATUS_ACCESS_VIOLATION is generated */
-  ULARGE_INTEGER availb;
-  GetDiskFreeSpaceEx ("C:\\", &availb, (PULARGE_INTEGER) &data[11], NULL);
+  GetDiskFreeSpaceEx ("C:\\", NULL, (PULARGE_INTEGER) &data[11], NULL);
 
   debug_printf ("hostid entropy: %08x %08x %08x %08x "
 				"%08x %08x %08x %08x "

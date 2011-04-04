@@ -1,6 +1,7 @@
 /* fhandler_process.cc: fhandler for /proc/<pid> virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -958,19 +959,7 @@ get_process_state (DWORD dwProcessId)
       if (sp->ProcessId == dwProcessId)
 	{
 	  SYSTEM_THREADS *st;
-	  if (wincap.has_process_io_counters ())
-	    /*
-	     * Windows 2000 and XP have an extra member in SYSTEM_PROCESSES
-	     * which means the offset of the first SYSTEM_THREADS entry is
-	     * different on these operating systems compared to NT 4.
-	     */
-	    st = &sp->Threads[0];
-	  else
-	    /*
-	     * 136 is the offset of the first SYSTEM_THREADS entry on
-	     * Windows NT 4.
-	     */
-	    st = (SYSTEM_THREADS *) ((char *) sp + 136);
+	  st = &sp->Threads[0];
 	  state = 'S';
 	  for (unsigned i = 0; i < sp->ThreadCount; i++)
 	    {

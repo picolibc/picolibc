@@ -21,66 +21,17 @@ details. */
    puzzled that this has never been noticed before... */
 
 /* Minimal set of capabilities required to run Cygwin. */
-#define wincap_minimal wincap_nt4sp4
-
-wincaps wincap_nt4sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
-  heapslop:0x0,
-  max_sys_priv:SE_CHANGE_NOTIFY_PRIVILEGE,
-  is_server:false,
-  has_dacl_protect:false,
-  has_broken_if_oper_status:true,
-  has_physical_mem_access:true,
-  has_process_io_counters:false,
-  has_terminal_services:false,
-  has_create_global_privilege:false,
-  has_ioctl_storage_get_media_types_ex:false,
-  has_extended_priority_class:false,
-  has_guid_volumes:false,
-  has_disk_ex_ioctls:false,
-  has_fileid_dirinfo:false,
-  has_buggy_restart_scan:false,
-  has_mandatory_integrity_control:false,
-  needs_logon_sid_in_sid_list:true,
-  needs_count_in_si_lpres2:false,
-  has_recycle_dot_bin:false,
-  has_gaa_prefixes:false,
-  has_gaa_on_link_prefix:false,
-  supports_all_posix_ai_flags:false,
-  has_restricted_stack_args:false,
-  has_transactions:false,
-  has_recvmsg:false,
-  has_sendmsg:false,
-  has_broken_udf:false,
-  has_console_handle_problem:false,
-  has_broken_alloc_console:false,
-  has_always_all_codepages:false,
-  has_localenames:false,
-  has_mwmo_inputavailable:false,
-  has_buggy_thread_startup:false,
-  has_fast_cwd:false,
-  has_restricted_raw_disk_access:false,
-  use_dont_resolve_hack:false,
-  use_get_sec_info_on_dirs:false,
-  supports_sse:false,
-};
+#define wincap_minimal wincap_2000
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:true,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:false,
   has_ioctl_storage_get_media_types_ex:false,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:false,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:true,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
@@ -98,13 +49,11 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
   use_get_sec_info_on_dirs:false,
-  supports_sse:true,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -112,17 +61,10 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:true,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:false,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:false,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:true,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:true,
@@ -140,13 +82,11 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
   use_get_sec_info_on_dirs:false,
-  supports_sse:true,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -154,17 +94,10 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:true,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:false,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
@@ -182,13 +115,11 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   use_get_sec_info_on_dirs:true,
-  supports_sse:true,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -196,17 +127,10 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:true,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:false,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
@@ -224,13 +148,11 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   use_get_sec_info_on_dirs:true,
-  supports_sse:true,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -238,17 +160,10 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:true,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
@@ -266,13 +181,11 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   use_get_sec_info_on_dirs:true,
-  supports_sse:true,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -280,17 +193,10 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x4,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:true,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:false,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:false,
   needs_logon_sid_in_sid_list:false,
@@ -308,13 +214,11 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   use_get_sec_info_on_dirs:true,
-  supports_sse:true,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -322,17 +226,10 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:false,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
   needs_logon_sid_in_sid_list:false,
@@ -350,13 +247,11 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:true,
   has_localenames:true,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:true,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
   use_get_sec_info_on_dirs:false,
-  supports_sse:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -364,17 +259,10 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
-  has_dacl_protect:true,
-  has_broken_if_oper_status:false,
   has_physical_mem_access:false,
-  has_process_io_counters:true,
-  has_terminal_services:true,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:true,
-  has_extended_priority_class:true,
-  has_guid_volumes:true,
   has_disk_ex_ioctls:true,
-  has_fileid_dirinfo:true,
   has_buggy_restart_scan:false,
   has_mandatory_integrity_control:true,
   needs_logon_sid_in_sid_list:false,
@@ -392,13 +280,11 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:true,
   has_always_all_codepages:true,
   has_localenames:true,
-  has_mwmo_inputavailable:true,
   has_buggy_thread_startup:false,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
   use_get_sec_info_on_dirs:false,
-  supports_sse:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -406,21 +292,13 @@ wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
 void
 wincapc::init ()
 {
-  bool has_osversioninfoex = true;
-
   if (caps)
     return;		// already initialized
 
   memset (&version, 0, sizeof version);
-  /* Request versionex info first, which is available on all systems since
-     NT4 SP6 anyway.  If that fails, call the simple version. */
   version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
   if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version)))
-    {
-      has_osversioninfoex = false;
-      version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-      GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
-    }
+    api_fatal ("Cygwin requires at least Windows 2000.");
 
   switch (version.dwPlatformId)
     {
@@ -428,8 +306,9 @@ wincapc::init ()
 	switch (version.dwMajorVersion)
 	  {
 	    case 4:
-	      /* No mercy.  We require at least NT4 SP4. */
-	      caps = &wincap_nt4sp4;
+	      /* I'd be very surprised if this code is ever hit, but it doesn't
+		 hurt to keep it. */
+	      api_fatal ("Cygwin requires at least Windows 2000.");
 	      break;
 	    case 5:
 	      switch (version.dwMinorVersion)
@@ -484,7 +363,7 @@ wincapc::init ()
 	break;
     }
 
-  if (has_osversioninfoex && version.wProductType != VER_NT_WORKSTATION)
+  if (version.wProductType != VER_NT_WORKSTATION)
     ((wincaps *)caps)->is_server = true;
   if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,

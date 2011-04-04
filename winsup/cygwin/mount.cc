@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -321,7 +321,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define WIN_FAT_FLAGS (FILE_CASE_PRESERVED_NAMES | FILE_UNICODE_ON_DISK)
 #define FS_IS_WINDOWS_FAT  TEST_GVI(flags (), WIN_FAT_FLAGS)
 
-      /* This always fails on NT4. */
       if ((flags () & FILE_SUPPORTS_OBJECT_IDS)
 	  && NT_SUCCESS (NtQueryVolumeInformationFile (vol, &io, &ffoi,
 						   sizeof ffoi,
@@ -338,8 +337,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       /* First check the remote filesystems claiming to be NTFS. */
       if (!got_fs ()
 	  && is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
-	  /* Test for Samba on NT4 or for older Samba releases not supporting
-	     extended info. */
+	  /* Test for older Samba releases not supporting extended info. */
 	  && !is_samba (FS_IS_SAMBA)
 	  /* Netapp inode info is unusable, can't handle trailing dots and
 	     spaces, has a bug in "move and delete" semantics. */

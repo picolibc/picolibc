@@ -1193,17 +1193,6 @@ format_proc_partitions (void *, char *&destbuf)
 	  pi = (PARTITION_INFORMATION *) ioctl_buf;
 	  size = pi->PartitionLength.QuadPart;
 	}
-      else if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
-				ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
-	{
-	  /* NT4 doesn't support to call IOCTL_DISK_GET_PARTITION_INFO for the
-	     entire drive. */
-	  DISK_GEOMETRY *dg = (DISK_GEOMETRY *) ioctl_buf;
-	  size = (unsigned long long) dg->Cylinders.QuadPart
-				      * dg->TracksPerCylinder
-				      * dg->SectorsPerTrack
-				      * dg->BytesPerSector;
-	}
       else
 	{
 	  debug_printf ("DeviceIoControl (%S, "

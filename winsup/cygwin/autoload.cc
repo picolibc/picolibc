@@ -383,8 +383,8 @@ LoadDLLfunc (RegisterEventSourceW, 8, advapi32)
 LoadDLLfunc (ReportEventW, 36, advapi32)
 #endif
 
-LoadDLLfuncEx2 (DnsQuery_A, 24, dnsapi, 1, 127) // ERROR_PROC_NOT_FOUND
-LoadDLLfuncEx (DnsRecordListFree, 8, dnsapi, 1)
+LoadDLLfunc (DnsQuery_A, 24, dnsapi)
+LoadDLLfunc (DnsRecordListFree, 8, dnsapi)
 
 // 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
 LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
@@ -407,10 +407,8 @@ LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
 LoadDLLfunc (WNetOpenEnumA, 20, mpr)
 
 /* 127 == ERROR_PROC_NOT_FOUND */
-LoadDLLfuncEx2 (DsGetDcNameW, 24, netapi32, 1, 127)
+LoadDLLfunc (DsGetDcNameW, 24, netapi32)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
-LoadDLLfunc (NetGetAnyDCName, 12, netapi32)
-LoadDLLfunc (NetGetDCName, 12, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
@@ -423,22 +421,17 @@ LoadDLLfunc (RtlSetCurrentTransaction, 4, ntdll)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
-LoadDLLfuncEx (EnumProcessModules, 16, psapi, 1)
-LoadDLLfuncEx (GetModuleFileNameExW, 16, psapi, 1)
-LoadDLLfuncEx (GetModuleInformation, 16, psapi, 1)
-LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
-LoadDLLfuncEx (QueryWorkingSet, 12, psapi, 1)
+LoadDLLfunc (EnumProcessModules, 16, psapi)
+LoadDLLfunc (GetModuleFileNameExW, 16, psapi)
+LoadDLLfunc (GetModuleInformation, 16, psapi)
+LoadDLLfunc (GetProcessMemoryInfo, 12, psapi)
+LoadDLLfunc (QueryWorkingSet, 12, psapi)
 
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)
 LoadDLLfunc (LsaLookupAuthenticationPackage, 12, secur32)
-/* secur32 functions return NTSTATUS values.  However, the error code must
-   fit in 16 bits , see LoadDLLprime.
-   The calling function, lsaauth(), checks for STATUS_SUCCESS (0), so we
-   simply return some arbitrary non-0 value (127 == ERROR_PROC_NOT_FOUND)
-   from here, if the function can't be loaded. */
-LoadDLLfuncEx2 (LsaRegisterLogonProcess, 12, secur32, 1, 127)
+LoadDLLfunc (LsaRegisterLogonProcess, 12, secur32)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 

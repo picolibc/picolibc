@@ -481,9 +481,8 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
     }
 
   /* We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
-   * modified by inheritable ACEs.  This flag is available since Win2K.  */
-  if (wincap.has_dacl_protect ())
-    sd.Control |= SE_DACL_PROTECTED;
+     modified by inheritable ACEs. */
+  sd.Control |= SE_DACL_PROTECTED;
 
   /* Create owner for local security descriptor. */
   if (!SetSecurityDescriptorOwner (&sd, owner_sid, FALSE))
