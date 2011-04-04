@@ -299,8 +299,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       if (handle_to_fn (handle, name))
 	dev.parse (name);
       else if (strcmp (name, ":sock:") == 0
-	       /* On NT4, NtQueryObject returns STATUS_NOT_IMPLEMENTED when
-	          called for a socket handle. */
+	       /* NtQueryObject returns an error when called on an LSP socket
+		  handle.  While fdsock now tries to fetch the underlying
+		  base socket, this only works on Vista and later. */
 	       || (strcmp (name, unknown_file) == 0
 		   && !::getsockopt ((SOCKET) handle, SOL_SOCKET, SO_RCVBUF,
 				     (char *) &rcv, &len)))

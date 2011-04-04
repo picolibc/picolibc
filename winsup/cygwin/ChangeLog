@@ -1,3 +1,8 @@
+2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Fix a comment to
+	reflect the current state.
+
 2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in (fhandler_proc_CFLAGS): Define USERNAME, HOSTNAME,
