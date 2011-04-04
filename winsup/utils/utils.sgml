@@ -1307,12 +1307,14 @@ drawbacks security-wise.  This is explained in more detail in
 
 <para>Please note that storing passwords in that registry area is a
 privileged operation which only administrative accounts are allowed to
-do.  If normal, non-admin users should be allowed to enter their
-passwords using <command>passwd -R</command>, it's required to run
-<command>cygserver</command> as a service under the LocalSystem account
-before running <command>passwd -R</command>.  This only affects storing
-passwords.  Using passwords in privileged processes does not require
-<command>cygserver</command> to run.</para>
+do.  Administrators can enter the password for other user accounts into
+the registry by specifying the username on the commandline.  If normal,
+non-admin users should be allowed to enter their passwords using
+<command>passwd -R</command>, it's required to run <command>cygserver</command>
+as a service under the LocalSystem account before running
+<command>passwd -R</command>.  This only affects storing passwords.  Using
+passwords in privileged processes does not require <command>cygserver</command>
+to run.</para>
 
 <para>Limitations: Users may not be able to change their password on
 some systems.</para>

@@ -1,3 +1,9 @@
+2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (main): Add the ability to specify a username for the -R
+	command.
+	* utils.sgml: Document the aforementioned change.
+
 2011-02-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (cmd_set): Avoid a compiler warning.

@@ -1,6 +1,6 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2008, 2009 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2008, 2009, 2011 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -544,8 +544,26 @@ main (int argc, char **argv)
 
   if (Ropt)
     {
+      const char *username = NULL;
       if (optind < argc)
-        usage (stderr, 1);
+	{
+	  username = argv[optind++];
+	  if (!strcmp (username, getlogin ()))
+	    username = NULL;
+	  else if (!caller_is_admin ())
+	    return eprint (0, "You may not change the password for %s.", user);
+
+	  if (optind < argc)
+	    usage (stderr, 1);
+	}
+      char *text1 = (char *) alloca ((username ? strlen (username) + 2 : 4)
+				     + sizeof ("Enter  current password: "));
+      char *text2 = (char *) alloca ((username ? strlen (username) + 2 : 4)
+				     + sizeof ("Re-enter  current password: "));
+      sprintf (text1, "Enter %s%s current password: ",
+	       username ?: "your", username ? "'s" : "");
+      sprintf (text2, "Re-enter %s%s current password: ",
+	       username ?: "your", username ? "'s" : "");
       printf (
 "This functionality stores a password in the registry for usage by services\n"
 "which need to change the user context and require network access.  Typical\n"
@@ -556,11 +574,11 @@ main (int argc, char **argv)
 "secure.  Use this feature only if the machine is adequately locked down.\n"
 "Don't use this feature if you don't need network access within a remote\n"
 "session.\n\n"
-"You can delete your stored password by specifying an empty password.\n\n");
-      strcpy (newpwd, getpass ("Enter your current password: "));
-      if (strcmp (newpwd, getpass ("Re-enter your current password: ")))
+"You can delete the stored password by specifying an empty password.\n\n");
+      strcpy (newpwd, getpass (text1));
+      if (strcmp (newpwd, getpass (text2)))
         eprint (0, "Password is not identical.");
-      else if (cygwin_internal (CW_SET_PRIV_KEY, newpwd))
+      else if (cygwin_internal (CW_SET_PRIV_KEY, newpwd, username))
 	return eprint (0, "Storing password failed: %s", strerror (errno));
       return 0;
     }
