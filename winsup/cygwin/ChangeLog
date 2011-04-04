@@ -1,4 +1,11 @@
 2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in (fhandler_proc_CFLAGS): Define USERNAME, HOSTNAME,
+	and GCC_VERSION.
+	* fhandler_proc.cc (format_proc_version):  Add build machine and GCC
+	version information as on Linux.
+
+2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.h (fh_devices): Define FH_PROC_MIN_MINOR.

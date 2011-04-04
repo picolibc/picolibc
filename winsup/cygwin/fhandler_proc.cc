@@ -361,15 +361,19 @@ fhandler_proc::fill_filebuf ()
 static _off64_t
 format_proc_version (void *, char *&destbuf)
 {
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
   struct utsname uts_name;
 
   uname (&uts_name);
-  destbuf = (char *) crealloc_abort (destbuf, strlen (uts_name.sysname)
-					      + strlen (uts_name.release)
-					      + strlen (uts_name.version)
-					      + 4);
-  return __small_sprintf (destbuf, "%s %s %s\n",
-			  uts_name.sysname, uts_name.release, uts_name.version);
+  bufptr += __small_sprintf (bufptr, "%s version %s (%s@%s) (%s) %s\n",
+			  uts_name.sysname, uts_name.release, USERNAME, HOSTNAME,
+			  GCC_VERSION, uts_name.version);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
 }
 
 static _off64_t

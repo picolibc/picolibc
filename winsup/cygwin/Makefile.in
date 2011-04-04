@@ -287,6 +287,9 @@ sysconf_CFLAGS:=-fomit-frame-pointer
 uinfo_CFLAGS:=-fomit-frame-pointer
 endif
 
+fhandler_proc_CFLAGS+=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\""
+fhandler_proc_CFLAGS+=-DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
+
 _cygwin_crt0_common_STDINCFLAGS:=yes
 libstdcxx_wrapper_STDINCFLAGS:=yes
 cxx_STDINCFLAGS:=yes
