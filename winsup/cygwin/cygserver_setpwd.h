@@ -1,6 +1,6 @@
 /* cygserver_setpwd.h: Set LSA private data password for current user.
 
-   Copyright 2008 Red Hat, Inc.
+   Copyright 2008, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -47,7 +47,7 @@ public:
 };
 
 #ifdef __INSIDE_CYGWIN__
-unsigned long setlsapwd (const char *passwd);
+unsigned long setlsapwd (const char *passwd, const char *username);
 #endif
 
 #endif /* __CYGSERVER_SETPWD_H__ */

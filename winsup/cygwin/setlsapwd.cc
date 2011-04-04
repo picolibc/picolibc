@@ -1,6 +1,6 @@
 /* setlsapwd.cc: Set LSA private data password for current user.
 
-   Copyright 2008, 2009 Red Hat, Inc.
+   Copyright 2008, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +17,7 @@ details. */
 #include "cygheap.h"
 #include "security.h"
 #include "cygserver_setpwd.h"
+#include "pwdgrp.h"
 #include "ntdll.h"
 #include <ntsecapi.h>
 #include <stdlib.h>
@@ -37,7 +38,7 @@ client_request_setpwd::client_request_setpwd (PUNICODE_STRING passwd)
 }
 
 unsigned long
-setlsapwd (const char *passwd)
+setlsapwd (const char *passwd, const char *username)
 {
   unsigned long ret = (unsigned long) -1;
   HANDLE lsa = INVALID_HANDLE_VALUE;
@@ -47,8 +48,21 @@ setlsapwd (const char *passwd)
   UNICODE_STRING key;
   UNICODE_STRING data;
 
-  wcpcpy (wcpcpy (key_name, CYGWIN_LSA_KEY_PREFIX),
-	  cygheap->user.get_windows_id (sid));
+  if (username)
+    {
+      cygsid psid;
+      struct passwd *pw = internal_getpwnam (username, false);
+
+      if (!pw || !psid.getfrompw (pw))
+	{
+	  set_errno (ENOENT);
+	  return ret;
+	}
+      wcpcpy (wcpcpy (key_name, CYGWIN_LSA_KEY_PREFIX), psid.string (sid));
+    }
+  else
+    wcpcpy (wcpcpy (key_name, CYGWIN_LSA_KEY_PREFIX),
+	    cygheap->user.get_windows_id (sid));
   RtlInitUnicodeString (&key, key_name);
   if (!passwd || ! *passwd
       || sys_mbstowcs_alloc (&data_buf, HEAP_NOTHEAP, passwd))
@@ -71,7 +85,7 @@ setlsapwd (const char *passwd)
 	    __seterrno_from_nt_status (status);
 	  LsaClose (lsa);
 	}
-      else if (ret)
+      else if (ret && !username)
 	{
 	  client_request_setpwd request (&data);
 	  if (request.make_request () == -1 || request.error_code ())

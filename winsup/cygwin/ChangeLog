@@ -1,5 +1,13 @@
 2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver_setpwd.h (setlsapwd): Add username parameter to declaration.
+	* external.cc (cygwin_internal): In the CW_SET_PRIV_KEY case, fetch
+	additional username parameter.
+	* setlsapwd.cc (setlsapwd): Add username parameter.  Allow admin to
+	set the hidden password for other users.
+
+2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_user_groups): Mark well-known groups as well-known.
 	(get_user_local_groups): Ditto.
 	(verify_token): Drop useless label.

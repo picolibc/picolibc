@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -435,7 +435,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_SET_PRIV_KEY:
 	{
 	  const char *passwd = va_arg (arg, const char *);
-	  res = setlsapwd (passwd);
+	  const char *username = va_arg (arg, const char *);
+	  res = setlsapwd (passwd, username);
 	}
 	break;
       case CW_SETERRNO:
