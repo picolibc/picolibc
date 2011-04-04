@@ -18,8 +18,7 @@ details. */
 #include <fcntl.h>
 
 #define isproc_dev(devn) \
-  (devn == FH_PROC || devn == FH_REGISTRY || devn == FH_PROCESS || \
-   devn == FH_PROCNET || devn == FH_PROCSYS || devn == FH_PROCSYSVIPC)
+  (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC)
 
 #define isprocsys_dev(devn) (devn == FH_PROCSYS)
 

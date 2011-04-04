@@ -1,3 +1,11 @@
+2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h (fh_devices): Define FH_PROC_MIN_MINOR.
+	Reorder major-0 devices so that all /proc directories fall
+	between FH_PROC and FH_PROC_MIN_MINOR.
+	* path.h (isproc_dev): Redefine accordingly.
+
 2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_setpwd.h (setlsapwd): Add username parameter to declaration.
