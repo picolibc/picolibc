@@ -20,6 +20,11 @@ provide information about System V IPC message queues, semaphores, and
 shared memory.
 </para></listitem>
 
+<listitem><para>
+/proc/version now shows the username of whomever compiled the Cygwin DLL
+as well as the version of GCC used when compiling.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
