@@ -9,13 +9,13 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _CYGWIN_TYPES_H
+#define _CYGWIN_TYPES_H
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#ifndef _CYGWIN_TYPES_H
-#define _CYGWIN_TYPES_H
 
 #include <sys/sysmacros.h>
 #include <stdint.h>
@@ -218,8 +218,9 @@ typedef class pthread_rwlockattr *pthread_rwlockattr_t;
 /* semaphores types */
 typedef class semaphore *sem_t;
 #endif /* __INSIDE_CYGWIN__ */
-#endif /* _CYGWIN_TYPES_H */
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _CYGWIN_TYPES_H */

@@ -1,3 +1,8 @@
+2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/cygwin/types.h: Move multiple inclusion guards to
+	beginning and end of header.
+
 2011-04-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* Makefile.in: Move Makefile.common include earlier to fix problems with
