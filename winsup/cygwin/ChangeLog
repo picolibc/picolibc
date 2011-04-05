@@ -1,5 +1,13 @@
 2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* include/cygwin/types.h: Move #include <sys/sysmacros.h> to
+	end of header so that it gets the dev_t typedef.
+	* include/sys/sysmacros.h (gnu_dev_major, gnu_dev_minor,
+	gnu_dev_makedev): Prototype and define as inline functions.
+	(major, minor, makedev): Redefine in terms of gnu_dev_*.
+
+2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* include/cygwin/types.h: Move multiple inclusion guards to
 	beginning and end of header.
 

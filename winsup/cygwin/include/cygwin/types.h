@@ -17,7 +17,6 @@ extern "C"
 {
 #endif
 
-#include <sys/sysmacros.h>
 #include <stdint.h>
 #include <endian.h>
 
@@ -218,6 +217,9 @@ typedef class pthread_rwlockattr *pthread_rwlockattr_t;
 /* semaphores types */
 typedef class semaphore *sem_t;
 #endif /* __INSIDE_CYGWIN__ */
+
+/* this header needs the dev_t typedef */
+#include <sys/sysmacros.h>
 
 #ifdef __cplusplus
 }
