@@ -1,3 +1,10 @@
+2011-04-06  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* dll_init.cc (reserve_at, release_at): New functions.
+	(load_after_fork): If the DLL was loaded higher than the required
+	address, assume that it loaded at it's base address and also reserve
+	memory there to force it to be relocated.
+
 2011-04-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/cygwin/types.h: Move #include <sys/sysmacros.h> to

@@ -78,7 +78,7 @@ dll::init ()
   /* This should be a no-op.  Why didn't we just import this variable? */
   if (!p.envptr)
     p.envptr = &__cygwin_environ;
-  else
+  else if (*(p.envptr) != __cygwin_environ)
     *(p.envptr) = __cygwin_environ;
 
   /* Don't run constructors or the "main" if we've forked. */
@@ -257,12 +257,44 @@ release_upto (const PWCHAR name, DWORD here)
       }
 }
 
+/* Mark one page at "here" as reserved.  This may force
+   Windows NT to load a DLL elsewhere. */
+static DWORD
+reserve_at (const PWCHAR name, DWORD here)
+{
+  DWORD size;
+  MEMORY_BASIC_INFORMATION mb;
+
+  if (!VirtualQuery ((void *) here, &mb, sizeof (mb)))
+    size = 64 * 1024;
+
+  if (mb.State != MEM_FREE)
+    return 0;
+
+  size = mb.RegionSize;
+  if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
+    api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
+               here, size, name);
+  return here;
+}
+
+/* Release the memory previously allocated by "reserve_at" above. */
+static void
+release_at (const PWCHAR name, DWORD here)
+{
+  if (!VirtualFree ((void *) here, 0, MEM_RELEASE))
+    api_fatal ("couldn't release memory %p for '%W' alignment, %E\n",
+               here, name);
+}
+
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
    DLLs and attempts to load them in the same place as they were loaded in the
    parent. */
 void
 dll_list::load_after_fork (HANDLE parent)
 {
+  DWORD preferred_block = 0;
+
   for (dll *d = &dlls.start; (d = d->next) != NULL; )
     if (d->type == DLL_LOAD)
       for (int i = 0; i < 2; i++)
@@ -284,10 +316,18 @@ dll_list::load_after_fork (HANDLE parent)
 	      if (h == d->handle)
 		h = LoadLibraryW (d->name);
 	    }
+
 	  /* If we reached here on the second iteration of the for loop
 	     then there is a lot of memory to release. */
 	  if (i > 0)
-	    release_upto (d->name, (DWORD) d->handle);
+            {
+              release_upto (d->name, (DWORD) d->handle);
+
+              if (preferred_block)
+                release_at (d->name, preferred_block);
+              preferred_block = 0;
+            }
+
 	  if (h == d->handle)
 	    break;		/* Success */
 
@@ -297,11 +337,20 @@ dll_list::load_after_fork (HANDLE parent)
 		       d->name, d->handle, h);
 
 	  /* Dll loaded in the wrong place.  Dunno why this happens but it
-	     always seems to happen when there are multiple DLLs attempting to
-	     load into the same address space.  In the "forked" process, the
-	     second DLL always loads into a different location. So, block all
-	     of the memory up to the new load address and try again. */
+             always seems to happen when there are multiple DLLs with the
+             same base address.  In the "forked" process, the relocated DLL
+             may load at a different address. So, block all of the memory up
+             to the relocated load address and try again. */
 	  reserve_upto (d->name, (DWORD) d->handle);
+
+          /* Also, if the DLL loaded at a higher address than wanted (probably
+             it's base address), reserve the memory at that address. This can
+             happen if it couldn't load at the preferred base in the parent, but
+             can in the child, due to differences in the load ordering.
+             Block memory at it's preferred address and try again. */
+          if ((DWORD) h > (DWORD) d->handle)
+            preferred_block = reserve_at (d->name, (DWORD) h);
+
 	}
   in_forkee = false;
 }
@@ -311,7 +360,7 @@ struct dllcrt0_info
   HMODULE h;
   per_process *p;
   int res;
-  dllcrt0_info (HMODULE h0, per_process *p0): h(h0), p(p0) {}
+  dllcrt0_info (HMODULE h0, per_process *p0): h (h0), p (p0) {}
 };
 
 extern "C" int
@@ -329,9 +378,9 @@ dll_dllcrt0 (HMODULE h, per_process *p)
 void
 dll_dllcrt0_1 (VOID *x)
 {
-  HMODULE& h = ((dllcrt0_info *)x)->h;
-  per_process*& p = ((dllcrt0_info *)x)->p;
-  int& res = ((dllcrt0_info *)x)->res;
+  HMODULE& h = ((dllcrt0_info *) x)->h;
+  per_process*& p = ((dllcrt0_info *) x)->p;
+  int& res = ((dllcrt0_info *) x)->res;
 
   if (p == NULL)
     p = &__cygwin_user_data;
@@ -431,6 +480,7 @@ void __stdcall
 update_envptrs ()
 {
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
-    *(d->p.envptr) = __cygwin_environ;
+    if (*(d->p.envptr) != __cygwin_environ)
+      *(d->p.envptr) = __cygwin_environ;
   *main_environ = __cygwin_environ;
 }
