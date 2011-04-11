@@ -1,5 +1,5 @@
 /* ARM assembler/disassembler support.
-   Copyright 2004, 2010 Free Software Foundation, Inc.
+   Copyright 2004, 2010, 2011 Free Software Foundation, Inc.
 
    This file is part of GDB and GAS.
 
@@ -109,7 +109,8 @@
 #define ARM_AEXT_V6KT2  (ARM_AEXT_V6T2 | ARM_EXT_V6K)
 #define ARM_AEXT_V6ZT2  (ARM_AEXT_V6T2 | ARM_EXT_SEC)
 #define ARM_AEXT_V6ZKT2 (ARM_AEXT_V6T2 | ARM_EXT_V6K | ARM_EXT_SEC)
-#define ARM_AEXT_V7_ARM	(ARM_AEXT_V6KT2 | ARM_EXT_V7 | ARM_EXT_BARRIER)
+#define ARM_AEXT_V7_ARM	(ARM_AEXT_V6KT2 | ARM_EXT_V7 | ARM_EXT_BARRIER \
+    | ARM_EXT_OS)
 #define ARM_AEXT_V7A	(ARM_AEXT_V7_ARM | ARM_EXT_V7A)
 #define ARM_AEXT_V7R	(ARM_AEXT_V7_ARM | ARM_EXT_V7R | ARM_EXT_DIV)
 #define ARM_AEXT_NOTM \
@@ -148,7 +149,7 @@
                          | FPU_VFP_EXT_V3 | FPU_NEON_EXT_V1 | FPU_VFP_EXT_D32)
 #define FPU_FPA		(FPU_FPA_EXT_V1 | FPU_FPA_EXT_V2)
 
-/* Deprecated */
+/* Deprecated.  */
 #define FPU_ARCH_VFP	ARM_FEATURE (0, FPU_ENDIAN_PURE)
 
 #define FPU_ARCH_FPE	ARM_FEATURE (0, FPU_FPA_EXT_V1)

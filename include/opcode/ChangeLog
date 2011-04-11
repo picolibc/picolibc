@@ -1,3 +1,8 @@
+2011-04-11  Dan McDonald  <dan@wellkeeper.com>
+
+	PR gas/12296
+	* arm.h (ARM_AEXT_V7_ARM): Add ARM_EXT_OS.
+
 2011-03-22  Eric B. Weddington  <eric.weddington@atmel.com>
 
 	* avr.h (AVR_ISA_SPMX,AVR_ISA_DES,AVR_ISA_M256,AVR_ISA_XMEGA):
