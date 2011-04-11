@@ -19,6 +19,10 @@ total number of processes.
 </para></listitem>
 
 <listitem><para>
+Added /proc/swaps, which shows the location and size of Windows paging file(s).
+</para></listitem>
+
+<listitem><para>
 Added /proc/sysvipc/msg, /proc/sysvipc/sem, and /proc/sysvipc/shm which
 provide information about System V IPC message queues, semaphores, and
 shared memory.
