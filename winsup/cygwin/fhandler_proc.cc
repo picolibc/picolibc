@@ -12,6 +12,7 @@ details. */
 #include "miscfuncs.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -43,6 +44,7 @@ static _off64_t format_proc_partitions (void *, char *&);
 static _off64_t format_proc_self (void *, char *&);
 static _off64_t format_proc_mounts (void *, char *&);
 static _off64_t format_proc_filesystems (void *, char *&);
+static _off64_t format_proc_swaps (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
@@ -60,6 +62,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("registry64"),  FH_REGISTRY,	virt_directory,	NULL },
   { _VN ("self"),	 FH_PROC,	virt_symlink,	format_proc_self },
   { _VN ("stat"),	 FH_PROC,	virt_file,	format_proc_stat },
+  { _VN ("swaps"),	 FH_PROC,	virt_file,	format_proc_swaps },
   { _VN ("sys"),	 FH_PROCSYS,	virt_directory,	NULL },
   { _VN ("sysvipc"),	 FH_PROCSYSVIPC,	virt_directory,	NULL },
   { _VN ("uptime"),	 FH_PROC,	virt_file,	format_proc_uptime },
@@ -1295,6 +1298,66 @@ format_proc_filesystems (void *, char *&destbuf)
     bufptr += __small_sprintf(bufptr, "%s\t%s\n",
                               fs_names[i].block_device ? "" : "nodev",
                               fs_names[i].name);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
+}
+
+static _off64_t
+format_proc_swaps (void *, char *&destbuf)
+{
+  unsigned long total = 0UL, used = 0UL;
+  char *filename = NULL;
+  ssize_t filename_len;
+  PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
+  ULONG size = 512;
+  NTSTATUS ret = STATUS_SUCCESS;
+
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
+
+  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
+  if (spi)
+    {
+      ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
+				      size, &size);
+      if (ret == STATUS_INFO_LENGTH_MISMATCH)
+	{
+	  free (spi);
+	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
+	  if (spi)
+	    ret = NtQuerySystemInformation (SystemPagefileInformation,
+					    (PVOID) spi, size, &size);
+	}
+    }
+
+  bufptr += __small_sprintf (bufptr,
+                             "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
+
+  if (spi && !ret && GetLastError () != ERROR_PROC_NOT_FOUND)
+    {
+      PSYSTEM_PAGEFILE_INFORMATION spp = spi;
+      do
+	{
+	  total = spp->CurrentSize * getsystempagesize ();
+	  used = spp->TotalUsed * getsystempagesize ();
+
+	  filename_len = cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, 0);
+	  filename = (char *) malloc (filename_len);
+	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, filename_len);
+
+	  bufptr += sprintf (bufptr, "%-40s%-16s%-8ld%-8ld%-8d\n",
+	                     filename, "file", total >> 10, used >> 10, 0);
+	}
+      while (spp->NextEntryOffset
+	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)
+			   ((char *) spp + spp->NextEntryOffset)));
+    }
+
+  if (spi)
+    free (spi);
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);

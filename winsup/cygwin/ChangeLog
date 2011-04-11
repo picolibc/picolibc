@@ -1,3 +1,8 @@
+2011-04-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* fhandler_proc.cc (proc_tab): Add /proc/swaps virtual file.
+	(format_proc_swaps): New function.
+
 2011-04-06  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in: Move srcdir definition before others which uses it.
