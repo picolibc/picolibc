@@ -1,3 +1,7 @@
+2011-04-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+        * utils.sgml (strace): Fix a pair of exchanged lines in usage text.
+
 2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.c (main): Add the ability to specify a username for the -R

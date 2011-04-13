@@ -1915,8 +1915,8 @@ Trace system calls and signals
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
                                the default microsecond timestamp.  Implies -d
   -T, --toggle                 toggle tracing in a process already being
-  -u, --usecs                  toggle printing of microseconds timestamp
                                traced. Requires -p &lt;pid&gt;
+  -u, --usecs                  toggle printing of microseconds timestamp
   -v, --version                output version information and exit
   -w, --new-window             spawn program under test in a new window
 
