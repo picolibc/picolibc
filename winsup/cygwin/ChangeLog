@@ -1,3 +1,12 @@
+2011-04-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* thread.cc (pthread_setschedprio): New function.
+	* include/pthread.h (pthread_setschedprio): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* cygwin.din (pthread_setschedprio): Export.
+	* posix.sgml (std-notimpl) Move pthread_setschedprio from here...
+	(std-susv4) ...to here.
+
 2011-04-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* fhandler_proc.cc (proc_tab): Add /proc/swaps virtual file.

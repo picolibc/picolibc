@@ -2306,6 +2306,17 @@ pthread_setschedparam (pthread_t thread, int policy,
   return rv;
 }
 
+extern "C" int
+pthread_setschedprio (pthread_t thread, int priority)
+{
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+  int rv =
+    sched_set_thread_priority (thread->win32_obj_id, priority);
+  if (!rv)
+    thread->attr.schedparam.sched_priority = priority;
+  return rv;
+}
 
 extern "C" int
 pthread_setspecific (pthread_key_t key, const void *value)

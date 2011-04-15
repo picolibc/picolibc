@@ -403,12 +403,13 @@ details. */
       237: Export strchrnul.
       238: Export pthread_spin_destroy, pthread_spin_init, pthread_spin_lock,
 	   pthread_spin_trylock, pthread_spin_unlock.
+      239: Export pthread_setschedprio.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 238
+#define CYGWIN_VERSION_API_MINOR 239
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

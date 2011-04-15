@@ -598,6 +598,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_setcanceltype
     pthread_setconcurrency
     pthread_setschedparam
+    pthread_setschedprio
     pthread_setspecific
     pthread_sigmask
     pthread_spin_destroy
@@ -1388,7 +1389,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_mutex_timedlock
     pthread_rwlock_timedrdlock
     pthread_rwlock_timedwrlock
-    pthread_setschedprio
     putmsg
     reminderl
     remquol

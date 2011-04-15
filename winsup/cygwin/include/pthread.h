@@ -194,6 +194,7 @@ pthread_t pthread_self (void);
 int pthread_setcancelstate (int, int *);
 int pthread_setcanceltype (int, int *);
 int pthread_setschedparam (pthread_t, int, const struct sched_param *);
+int pthread_setschedprio (pthread_t, int);
 int pthread_setspecific (pthread_key_t, const void *);
 void pthread_testcancel (void);
 

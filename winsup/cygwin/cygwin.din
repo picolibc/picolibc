@@ -1241,6 +1241,7 @@ pthread_setcancelstate SIGFE
 pthread_setcanceltype SIGFE
 pthread_setconcurrency SIGFE
 pthread_setschedparam SIGFE
+pthread_setschedprio SIGFE
 pthread_setspecific SIGFE
 pthread_sigmask SIGFE
 pthread_suspend SIGFE
