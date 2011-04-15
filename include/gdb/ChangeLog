@@ -1,3 +1,7 @@
+2011-04-14  Mike Frysinger  <vapier@gentoo.org>
+
+	* remote-sim.h (sim_complete_command): New prototype.
+
 2011-03-05  Mike Frysinger  <vapier@gentoo.org>
 
 	* sim-bfin.h: New file.
