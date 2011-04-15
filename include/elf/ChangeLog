@@ -1,3 +1,7 @@
+2011-04-15  Sergio Durigan Junior  <sergiodj@redhat.com>
+
+	* common.h (NT_STAPSDT): New define.
+
 2011-03-31  Bernd Schmidt  <bernds@codesourcery.com>
 
 	* tic6x.h (R_C6000_JUMP_SPLOT, R_C6000_EHTYPE,
