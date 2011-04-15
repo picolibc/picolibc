@@ -1,3 +1,7 @@
+2011-04-15  Eric Blake  <eblake@redhat.com>
+
+	* libc/string/strchrnul.c (strchrnul): Fix strchrnul.
+
 2011-03-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/string.h (strchrnul): Declare.

@@ -43,7 +43,5 @@ _DEFUN (strchrnul, (s1, i),
 {
   char *s = strchr(s1, i);
 
-  if (*s != NULL)
-    return s;
-  return (char *)s1 + strlen(s1);
+  return s ? s : (char *)s1 + strlen(s1);
 }
