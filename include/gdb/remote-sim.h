@@ -278,6 +278,7 @@ void sim_do_command (SIM_DESC sd, char *cmd);
 
 /* Complete a command based on the available sim commands.  Returns an
    array of possible matches.  */
+
 char **sim_complete_command (SIM_DESC sd, char *text, char *word);
 
 #ifdef __cplusplus
