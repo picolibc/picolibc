@@ -1,7 +1,7 @@
 /* exceptions.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -712,12 +712,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
-  if (&_my_tls != _main_tls)
-    {
-      cancelable_wait (signal_arrived, INFINITE, cw_cancel_self);
-      return -1;
-    }
-
   sigset_t oldmask = _my_tls.sigmask;	// Remember for restoration
 
   set_signal_mask (tempmask, _my_tls.sigmask);
@@ -1172,6 +1166,19 @@ sigpacket::process ()
       sig_clear (SIGTSTP);
       sig_clear (SIGTTIN);
       sig_clear (SIGTTOU);
+    }
+
+  switch (si.si_signo)
+    {
+    case SIGINT:
+    case SIGQUIT:
+    case SIGSTOP:
+    case SIGTSTP:
+      if (cygheap->ctty)
+	cygheap->ctty->sigflush ();
+      break;
+    default:
+      break;
     }
 
   int rc = 1;

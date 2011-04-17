@@ -105,7 +105,7 @@ public:
   char *root (size_t &);
   char *cwd (size_t &);
   char *cmdline (size_t &);
-  void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
+  void set_ctty (class tty_min *, int, class fhandler_termios *);
   HANDLE dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
   void sync_proc_pipe ();
   bool alert_parent (char);

@@ -367,3 +367,10 @@ fhandler_termios::lseek (_off64_t, int)
   set_errno (ESPIPE);
   return -1;
 }
+
+void
+fhandler_termios::sigflush ()
+{
+  if (!(get_ttyp ()->ti.c_lflag & NOFLSH))
+    tcflush (TCIFLUSH);
+}

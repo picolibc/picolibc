@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -147,7 +147,6 @@ dtable::get_debugger_info ()
 void
 dtable::stdio_init ()
 {
-  extern void set_console_ctty ();
   /* Set these before trying to output anything from strace.
      Also, always set them even if we're to pick up our parent's fds
      in case they're missed.  */
@@ -189,11 +188,6 @@ dtable::stdio_init ()
 
   init_std_file_from_handle (1, out);
   init_std_file_from_handle (2, err);
-
-  /* Assign the console as the controlling tty for this process if we actually
-     have a console and no other controlling tty has been assigned. */
-  if (!fhandler_console::need_invisible () && myself->ctty < 0)
-    set_console_ctty ();
 }
 
 const int dtable::initial_archetype_size;

@@ -1,3 +1,33 @@
+2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygheap.h (init_cygheap::ctty): Use base class so that console can
+	join in the fun.
+	* dtable.cc (dtable::stdio_init): Remove special-case call to
+	set_console_ctty ().
+	* exceptions.cc (sigpacket::process): Conditionally flush terminal
+	input on certain signals.
+	* fhandler.h (fhandler_console::get_tty_stuff): Make non-static.
+	(fhandler_termios::get_ttyp): Move here.
+	(fhandler_termios::sigflush): Declare.
+	(fhandler_tty_common::get_ttyp): Delete.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Pass this as
+	"arch" argument.
+	(set_console_ctty): Delete.
+	(tty_list::get_tty): Just return pointer to shared console region,
+	delaying get_tty_stuff until open().
+	(fhandler_console::init): Treat NULL handle as signifying that console
+	should be opened with O_NOCTTY flag.  Rename handle argument to the
+	more common 'h'.
+	* fhandler_termios.cc (fhandler_termios::sigflush): Define.
+	* fhandler_tty.cc (handler_tty_master::init_console): Pass NULL as
+	first argument to fhandler_console::init.
+	* pinfo.cc (_pinfo::set_ctty): Change third parameter to
+	fhandler_termios *.  Add extra debugging.
+	* pinfo.h (_pinfo::set_ctty): Change third parameter to
+	fhandler_termios *.
+
+	* sigproc.cc (handle_sigsuspend): Don't special-case non-main threads.
+
 2011-04-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* thread.cc (pthread_setschedprio): New function.

@@ -293,7 +293,7 @@ struct init_cygheap: public mini_cygheap
 #endif
   struct sigaction *sigs;
 
-  fhandler_tty_slave *ctty;	/* Current tty */
+  fhandler_termios *ctty;	/* Current tty */
 #ifdef NEWVFORK
   fhandler_tty_slave *ctty_on_hold;
 #endif

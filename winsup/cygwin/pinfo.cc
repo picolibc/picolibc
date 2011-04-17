@@ -371,7 +371,7 @@ _pinfo::_ctty (char *buf)
 }
 
 void
-_pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
+_pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *arch)
 {
   debug_printf ("old %s", __ctty ());
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
@@ -420,6 +420,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	    }
 	}
     }
+    debug_printf ("cygheap->ctty now %p, arch %p", cygheap->ctty, arch);
 }
 
 /* Test to determine if a process really exists and is processing signals.

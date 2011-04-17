@@ -1606,7 +1606,7 @@ fhandler_tty_master::init_console ()
   if (console == NULL)
     return -1;
 
-  console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
+  console->init (NULL, GENERIC_READ | GENERIC_WRITE, O_BINARY);
   cygheap->manage_console_count ("fhandler_tty_master::init_console", -1, true);
   console->uninterruptible_io (true);
   return 0;

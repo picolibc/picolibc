@@ -94,7 +94,7 @@ fhandler_console::get_tty_stuff (int flags = 0)
     {
       shared_console_info->tty_min_state.setntty (TTY_CONSOLE);
       shared_console_info->tty_min_state.setsid (myself->sid);
-      myself->set_ctty (&shared_console_info->tty_min_state, flags, NULL);
+      myself->set_ctty (&shared_console_info->tty_min_state, flags, this);
 
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;
@@ -125,12 +125,6 @@ fhandler_console::get_tty_stuff (int flags = 0)
   return &shared_console_info->tty_min_state;
 }
 
-void
-set_console_ctty ()
-{
-  fhandler_console::get_tty_stuff ();
-}
-
 /* Return the tty structure associated with a given tty number.  If the
    tty number is < 0, just return a dummy record. */
 tty_min *
@@ -138,7 +132,7 @@ tty_list::get_tty (int n)
 {
   static tty_min nada;
   if (n == TTY_CONSOLE)
-    return fhandler_console::get_tty_stuff ();
+    return &shared_console_info->tty_min_state;
   else if (n >= 0)
     return &cygwin_shared->tty.ttys[n];
   else
@@ -2076,9 +2070,9 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 }
 
 int
-fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
+fhandler_console::init (HANDLE h, DWORD a, mode_t bin)
 {
-  // this->fhandler_termios::init (f, mode, bin);
+  // this->fhandler_termios::init (h, mode, bin);
   /* Ensure both input and output console handles are open */
   int flags = 0;
 
@@ -2089,9 +2083,9 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
     flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
-  open (flags | O_BINARY);
-  if (f != INVALID_HANDLE_VALUE)
-    CloseHandle (f);	/* Reopened by open */
+  open (flags | O_BINARY | (h ? 0 : O_NOCTTY));
+  if (h && h != INVALID_HANDLE_VALUE)
+    CloseHandle (h);	/* Reopened by open */
 
   return !tcsetattr (0, &tc->ti);
 }

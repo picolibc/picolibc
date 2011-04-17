@@ -912,6 +912,8 @@ class fhandler_termios: public fhandler_base
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (tty_min *this_tc, bool force);
   bool is_tty () const { return true; }
+  tty *get_ttyp () { return (tty *) tc; }
+  void sigflush ();
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
   bg_check_types bg_check (int sig);
@@ -1083,7 +1085,7 @@ class fhandler_console: public fhandler_termios
   void set_close_on_exec (bool val);
   void set_input_state ();
   void send_winch_maybe ();
-  static tty_min *get_tty_stuff (int);
+  tty_min *get_tty_stuff (int);
   bool is_slow () {return true;}
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}
@@ -1110,8 +1112,6 @@ class fhandler_tty_common: public fhandler_termios
 
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
-
-  tty *get_ttyp () { return (tty *) tc; }
 
   int close ();
   _off64_t lseek (_off64_t, int);
