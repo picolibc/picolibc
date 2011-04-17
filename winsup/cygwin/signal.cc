@@ -221,34 +221,42 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
 int __stdcall
 _pinfo::kill (siginfo_t& si)
 {
+  int res;
+  DWORD this_process_state;
+
   sig_dispatch_pending ();
 
-  int res = 0;
-  bool sendSIGCONT;
+  if (exists ())
+    {
+      bool sendSIGCONT;
+      if ((sendSIGCONT = (si.si_signo < 0)))
+	si.si_signo = -si.si_signo;
 
-  if (!exists ())
+      if (si.si_signo == 0)
+	res = 0;
+      else if ((res = sig_send (this, si)))
+	{
+	  sigproc_printf ("%d = sig_send, %E ", res);
+	  res = -1;
+	}
+      else if (sendSIGCONT)
+	{
+	  siginfo_t si2 = {0};
+	  si2.si_signo = SIGCONT;
+	  si2.si_code = SI_KERNEL;
+	  sig_send (this, si2);
+	}
+    }
+  else if (si.si_signo == 0 && this)
+    {
+      this_process_state = process_state;
+      res = 0;
+    }
+  else
     {
       set_errno (ESRCH);
-      return -1;
-    }
-
-  if ((sendSIGCONT = (si.si_signo < 0)))
-    si.si_signo = -si.si_signo;
-
-  DWORD this_process_state = process_state;
-  if (si.si_signo == 0)
-    /* ok */;
-  else if ((res = sig_send (this, si)))
-    {
-      sigproc_printf ("%d = sig_send, %E ", res);
+      this_process_state = 0;
       res = -1;
-    }
-  else if (sendSIGCONT)
-    {
-      siginfo_t si2 = {0};
-      si2.si_signo = SIGCONT;
-      si2.si_code = SI_KERNEL;
-      sig_send (this, si2);
     }
 
   syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, pid,

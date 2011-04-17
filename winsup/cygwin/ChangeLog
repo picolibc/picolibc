@@ -1,5 +1,10 @@
 2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* signal.cc (_pinfo::kill): Return 0 when attempting to test for
+	existence of an existed process which has not yet been reaped.
+
+2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* cygheap.h (init_cygheap::ctty): Use base class so that console can
 	join in the fun.
 	* dtable.cc (dtable::stdio_init): Remove special-case call to
