@@ -111,7 +111,11 @@ getaclentry (action_t action, char *c, aclent_t *ace)
   /* If this is a user or group entry, check if next char is a colon char.
      If so, skip it, otherwise it's the name of a user or group. */
   if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
-    ;
+    {
+      /* Mask and other entries may contain an extra colon. */
+      if (*c == ':')
+	++c;
+    }
   else if (*c == ':')
     ++c;
   else if (*c)

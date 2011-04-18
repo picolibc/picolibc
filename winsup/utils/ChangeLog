@@ -1,3 +1,7 @@
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (getaclentry): Allow extra colon in mask and other entries.
+
 2011-04-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
         * utils.sgml (strace): Fix a pair of exchanged lines in usage text.
