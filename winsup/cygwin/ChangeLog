@@ -1,5 +1,13 @@
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (ppoll): Export.
+	* poll.cc (ppoll): Implement.
+	* posix.sgml (std-gnu): Add ppoll.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/poll.h (ppoll): Declare.
+
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Handle the
 	FD_CLOSE event specially when called from accept.  Explain why.
 	(fhandler_socket::shutdown): Fake success on not-connected socket and

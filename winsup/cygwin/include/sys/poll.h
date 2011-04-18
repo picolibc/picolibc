@@ -1,6 +1,6 @@
 /* sys/poll.h
 
-   Copyright 2000, 2001, 2006 Red Hat, Inc.
+   Copyright 2000, 2001, 2006, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -12,6 +12,7 @@
 #define _SYS_POLL_H
 
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 __BEGIN_DECLS
 
@@ -39,6 +40,9 @@ struct pollfd {
 typedef unsigned int nfds_t;
 
 extern int poll __P ((struct pollfd *fds, nfds_t nfds, int timeout));
+extern int ppoll __P ((struct pollfd *fds, nfds_t nfds,
+		       const struct timespec *timeout_ts,
+		       const sigset_t *sigmask));
 
 __END_DECLS
 

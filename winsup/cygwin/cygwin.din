@@ -1160,6 +1160,7 @@ pow10 NOSIGFE
 pow10f NOSIGFE
 powf NOSIGFE
 _powf = powf NOSIGFE
+ppoll SIGFE
 pread SIGFE
 printf SIGFE
 program_invocation_name DATA

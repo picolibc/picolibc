@@ -21,6 +21,8 @@
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "pinfo.h"
+#include "sigproc.h"
 
 extern "C" int
 poll (struct pollfd *fds, nfds_t nfds, int timeout)
@@ -122,5 +124,26 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
 	}
     }
 
+  return ret;
+}
+
+extern "C" int
+ppoll (struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts,
+       const sigset_t *sigmask)
+{
+  int timeout;
+  sigset_t oldset = _my_tls.sigmask;
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  timeout = (timeout_ts == NULL)
+	    ? -1
+	    : (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
+  if (sigmask)
+    set_signal_mask (*sigmask, _my_tls.sigmask);
+  int ret = poll (fds, nfds, timeout);
+  if (sigmask)
+    set_signal_mask (oldset, _my_tls.sigmask);
   return ret;
 }
