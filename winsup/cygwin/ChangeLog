@@ -1,5 +1,15 @@
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::evaluate_events): Handle the
+	FD_CLOSE event specially when called from accept.  Explain why.
+	(fhandler_socket::shutdown): Fake success on not-connected socket and
+	trigger socket event if the read side of a socket is affected.  Explain
+	why.
+	* poll.cc (poll): Check for saw_shutdown_read on sockets to generate
+	POLLHUP as well.
+
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Fix various copyrights.
 
 2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>

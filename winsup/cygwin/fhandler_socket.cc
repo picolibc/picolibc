@@ -596,6 +596,15 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  wsock_events->events &= ~FD_CONNECT;
 	  wsock_events->connect_errorcode = 0;
 	}
+      /* This test makes the accept function behave as on Linux when
+	 accept is called on a socket for which shutdown for the read side
+	 has been called.  The second half of this code is in the shutdown
+	 method.  See there for more info. */
+      if ((event_mask & FD_ACCEPT) && (events & FD_CLOSE))
+	{
+	  WSASetLastError (WSAEINVAL);
+	  ret = SOCKET_ERROR;
+	}
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
     }
@@ -1659,22 +1668,37 @@ fhandler_socket::shutdown (int how)
 {
   int res = ::shutdown (get_socket (), how);
 
-  if (res)
+  /* Linux allows to call shutdown for any socket, even if it's not connected.
+     This also disables to call accept on this socket, if shutdown has been
+     called with the SHUT_RD or SHUT_RDWR parameter.  In contrast, Winsock
+     only allows to call shutdown on a connected socket.  The accept function
+     is in no way affected.  So, what we do here is to fake success, and to
+     change the event settings so that an FD_CLOSE event is triggered for the
+     calling Cygwin function.  The evaluate_events method handles the call
+     from accept specially to generate a Linux-compatible behaviour. */
+  if (res && WSAGetLastError () != WSAENOTCONN)
     set_winsock_errno ();
   else
-    switch (how)
-      {
-      case SHUT_RD:
-	saw_shutdown_read (true);
-	break;
-      case SHUT_WR:
-	saw_shutdown_write (true);
-	break;
-      case SHUT_RDWR:
-	saw_shutdown_read (true);
-	saw_shutdown_write (true);
-	break;
-      }
+    {
+      res = 0;
+      switch (how)
+	{
+	case SHUT_RD:
+	  saw_shutdown_read (true);
+	  wsock_events->events |= FD_CLOSE;
+	  SetEvent (wsock_evt);
+	  break;
+	case SHUT_WR:
+	  saw_shutdown_write (true);
+	  break;
+	case SHUT_RDWR:
+	  saw_shutdown_read (true);
+	  saw_shutdown_write (true);
+	  wsock_events->events |= FD_CLOSE;
+	  SetEvent (wsock_evt);
+	  break;
+	}
+    }
   return res;
 }
 

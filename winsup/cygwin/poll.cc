@@ -1,7 +1,7 @@
 /* poll.cc. Implements poll(2) via usage of select(2) call.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -84,12 +84,16 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
     {
       if (fds[i].fd >= 0)
 	{
-	  if (cygheap->fdtab.not_open (fds[i].fd))
+	  fhandler_socket *sock;
+
+	  /* Check if the descriptor has been closed, or if shutdown for the
+	     read side has been called on a socket. */
+	  if (cygheap->fdtab.not_open (fds[i].fd)
+	      || ((sock = cygheap->fdtab[fds[i].fd]->is_socket ())
+		  && sock->saw_shutdown_read ()))
 	    fds[i].revents = POLLHUP;
 	  else
 	    {
-	      fhandler_socket *sock;
-
 	      if (FD_ISSET(fds[i].fd, read_fds))
 		/* This should be sufficient for sockets, too.  Using
 		   MSG_PEEK, as before, can be considered dangerous at
