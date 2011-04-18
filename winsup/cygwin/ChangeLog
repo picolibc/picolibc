@@ -1,5 +1,10 @@
 2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* * signal.cc (_pinfo::kill): Set this_process_state when process
+	exists.
+
+2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* signal.cc (_pinfo::kill): Return 0 when attempting to test for
 	existence of an existed process which has not yet been reaped.
 

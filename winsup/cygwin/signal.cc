@@ -229,6 +229,7 @@ _pinfo::kill (siginfo_t& si)
   if (exists ())
     {
       bool sendSIGCONT;
+      this_process_state = process_state;
       if ((sendSIGCONT = (si.si_signo < 0)))
 	si.si_signo = -si.si_signo;
 
