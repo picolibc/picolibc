@@ -22,7 +22,7 @@
 
 2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* * signal.cc (_pinfo::kill): Set this_process_state when process
+	* signal.cc (_pinfo::kill): Set this_process_state when process
 	exists.
 
 2011-04-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
