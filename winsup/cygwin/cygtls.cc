@@ -146,13 +146,14 @@ _cygtls::remove (DWORD wait)
     return;
 
   debug_printf ("wait %p", wait);
+  if (locals.select.sockevt)
+      CloseHandle (locals.select.sockevt);
   if (wait)
     {
       /* FIXME: Need some sort of atthreadexit function to allow things like
 	 select to control this themselves. */
       if (locals.select.sockevt)
 	{
-	  CloseHandle (locals.select.sockevt);
 	  locals.select.sockevt = NULL;
 	  free_local (select.ser_num);
 	  free_local (select.w4);

@@ -1,5 +1,9 @@
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.cc (_cygtls::remove): Always close sockevt handle.
+
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (ppoll): Export.
 	* poll.cc (ppoll): Implement.
 	* posix.sgml (std-gnu): Add ppoll.
