@@ -866,10 +866,13 @@ tzload(const char *name, struct state *sp)
 			}
 		}
 	}
-	__gettzinfo ()->__tzrule[0].offset
-				= -sp->ttis[1].tt_gmtoff;
-	__gettzinfo ()->__tzrule[1].offset
-				= -sp->ttis[0].tt_gmtoff;
+	if (sp == lclptr)
+	  {
+	    __gettzinfo ()->__tzrule[0].offset
+				    = -sp->ttis[1].tt_gmtoff;
+	    __gettzinfo ()->__tzrule[1].offset
+				    = -sp->ttis[0].tt_gmtoff;
+	  }
 	return 0;
 }
 
@@ -1243,10 +1246,13 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 				janfirst += year_lengths[isleap(year)] *
 					SECSPERDAY;
 			}
-			__gettzinfo ()->__tzrule[0].offset
-						= -sp->ttis[1].tt_gmtoff;
-			__gettzinfo ()->__tzrule[1].offset
-						= -sp->ttis[0].tt_gmtoff;
+			if (sp == lclptr)
+			  {
+			    __gettzinfo ()->__tzrule[0].offset
+						    = -sp->ttis[1].tt_gmtoff;
+			    __gettzinfo ()->__tzrule[1].offset
+						    = -sp->ttis[0].tt_gmtoff;
+			  }
 		} else {
 			register long	theirstdoffset;
 			register long	theirdstoffset;
@@ -1333,10 +1339,13 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 			sp->ttis[1].tt_isdst = true;
 			sp->ttis[1].tt_abbrind = stdlen + 1;
 			sp->typecnt = 2;
-			__gettzinfo ()->__tzrule[0].offset
-						= -sp->ttis[0].tt_gmtoff;
-			__gettzinfo ()->__tzrule[1].offset
-						= -sp->ttis[1].tt_gmtoff;
+			if (sp == lclptr)
+			  {
+			    __gettzinfo ()->__tzrule[0].offset
+						    = -sp->ttis[0].tt_gmtoff;
+			    __gettzinfo ()->__tzrule[1].offset
+						    = -sp->ttis[1].tt_gmtoff;
+			  }
 		}
 	} else {
 		dstlen = 0;
@@ -1345,8 +1354,11 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 		sp->ttis[0].tt_gmtoff = -stdoffset;
 		sp->ttis[0].tt_isdst = 0;
 		sp->ttis[0].tt_abbrind = 0;
-		__gettzinfo ()->__tzrule[0].offset = -sp->ttis[0].tt_gmtoff;
-		__gettzinfo ()->__tzrule[1].offset = -sp->ttis[0].tt_gmtoff;
+		if (sp == lclptr)
+		  {
+		    __gettzinfo ()->__tzrule[0].offset = -sp->ttis[0].tt_gmtoff;
+		    __gettzinfo ()->__tzrule[1].offset = -sp->ttis[0].tt_gmtoff;
+		  }
 	}
 	sp->charcnt = stdlen + 1;
 	if (dstlen != 0)

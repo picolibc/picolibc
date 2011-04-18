@@ -1,5 +1,11 @@
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* localtime.cc (tzload): Don't change global timezone information
+	when called from gmtime or gmtime_r.
+	(tzparse): Ditto.
+
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.cc (_cygtls::remove): Always close sockevt handle.
 
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
