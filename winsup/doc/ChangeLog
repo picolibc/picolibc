@@ -1,3 +1,7 @@
+2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.10): Document ppoll.
+
 2011-04-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document /proc/swaps.

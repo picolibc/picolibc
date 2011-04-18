@@ -33,6 +33,10 @@ shared memory.
 as well as the version of GCC used when compiling.
 </para></listitem>
 
+<listitem><para>
+Other new API: ppoll.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
