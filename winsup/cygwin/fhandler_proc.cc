@@ -605,41 +605,19 @@ format_proc_stat (void *, char *&destbuf)
   return eobuf - buf;
 }
 
-#define read_value(x,y) \
-      do {\
-	dwCount = BUFSIZE; \
-	if ((dwError = RegQueryValueEx (hKey, x, NULL, &dwType, in_buf.b, &dwCount)), \
-	    (dwError != ERROR_SUCCESS && dwError != ERROR_MORE_DATA)) \
-	  { \
-	    debug_printf ("RegQueryValueEx failed retcode %d", dwError); \
-	    return 0; \
-	  } \
-	if (dwType != y) \
-	  { \
-	    debug_printf ("Value %s had an unexpected type (expected %d, found %d)", y, dwType); \
-	    return 0; \
-	  }\
-      } while (0)
-
-#define print(x) \
-	do { \
-	  strcpy (bufptr, x), \
-	  bufptr += sizeof (x) - 1; \
-	} while (0)
+#define print(x) { bufptr = stpcpy (bufptr, (x)); }
 
 static _off64_t
 format_proc_cpuinfo (void *, char *&destbuf)
 {
-  SYSTEM_INFO siSystemInfo;
-  HKEY hKey;
-  DWORD dwError, dwCount, dwType;
-  DWORD dwOldThreadAffinityMask;
+  DWORD orig_affinity_mask;
   int cpu_number;
   const int BUFSIZE = 256;
   union
   {
     BYTE b[BUFSIZE];
     char s[BUFSIZE];
+    WCHAR w[BUFSIZE / sizeof (WCHAR)];
     DWORD d;
     unsigned m[13];
   } in_buf;
@@ -648,27 +626,23 @@ format_proc_cpuinfo (void *, char *&destbuf)
   char *buf = tp.c_get ();
   char *bufptr = buf;
 
-  GetSystemInfo (&siSystemInfo);
   for (cpu_number = 0; ; cpu_number++)
     {
+      WCHAR cpu_key[128];
+      __small_swprintf (cpu_key, L"\\Registry\\Machine\\HARDWARE\\DESCRIPTION"
+				  "\\System\\CentralProcessor\\%d", cpu_number);
+      if (!NT_SUCCESS (RtlCheckRegistryKey (RTL_REGISTRY_ABSOLUTE, cpu_key)))
+	break;
       if (cpu_number)
 	print ("\n");
 
-      __small_sprintf (in_buf.s, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
-
-      if ((dwError = RegOpenKeyEx (HKEY_LOCAL_MACHINE, in_buf.s, 0, KEY_QUERY_VALUE, &hKey)) != ERROR_SUCCESS)
-	{
-	  if (dwError == ERROR_FILE_NOT_FOUND)
-	    break;
-	  debug_printf ("RegOpenKeyEx failed retcode %d", dwError);
-	  return 0;
-	}
-
-      dwOldThreadAffinityMask = SetThreadAffinityMask (GetCurrentThread (), 1 << cpu_number);
-      if (dwOldThreadAffinityMask == 0)
+      orig_affinity_mask = SetThreadAffinityMask (GetCurrentThread (),
+						  1 << cpu_number);
+      if (orig_affinity_mask == 0)
 	debug_printf ("SetThreadAffinityMask failed %E");
-      // I'm not sure whether the thread changes processor immediately
-      // and I'm not sure whether this function will cause the thread to be rescheduled
+      /* I'm not sure whether the thread changes processor immediately
+	 and I'm not sure whether this function will cause the thread
+	 to be rescheduled */
       yield ();
 
       bool has_cpuid = false;
@@ -687,17 +661,31 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	    debug_printf ("processor does not support CPUID instruction");
 	}
 
-
       if (!has_cpuid)
 	{
-	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
-	  read_value ("VendorIdentifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", in_buf.s);
-	  read_value ("Identifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", in_buf.s);
-	  read_value ("~Mhz", REG_DWORD);
-	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", in_buf.d);
+	  WCHAR vendor[64], id[64];
+	  UNICODE_STRING uvendor, uid;
+	  RtlInitEmptyUnicodeString (&uvendor, vendor, sizeof (vendor));
+	  RtlInitEmptyUnicodeString (&uid, id, sizeof (id));
+	  DWORD cpu_mhz = 0;
+	  RTL_QUERY_REGISTRY_TABLE tab[4] = {
+	   { NULL, RTL_QUERY_REGISTRY_NOEXPAND | RTL_QUERY_REGISTRY_DIRECT,
+	     L"VendorIdentifier", &uvendor, REG_NONE, NULL, 0 },
+	   { NULL, RTL_QUERY_REGISTRY_NOEXPAND | RTL_QUERY_REGISTRY_DIRECT,
+	     L"Identifier", &uid, REG_NONE, NULL, 0 },
+	   { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	     L"~Mhz", &cpu_mhz, REG_NONE, NULL, 0 },
+	   { NULL, 0, NULL, NULL, 0, NULL, 0 }
+	  };
 
+	  RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
+				  NULL, NULL);
+	  bufptr += __small_sprintf (bufptr,
+				     "processor       : %d\n"
+				     "vendor_id       : %S\n"
+				     "identifier      : %S\n"
+				     "cpu MHz         : %u\n",
+				     cpu_number, &uvendor, &uid, cpu_mhz);
 	  print ("flags           :");
 	  if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
 	    print (" 3dnow");
@@ -718,6 +706,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	}
       else
 	{
+	  DWORD cpu_mhz = 0;
+	  RTL_QUERY_REGISTRY_TABLE tab[2] = {
+	    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	      L"~Mhz", &cpu_mhz, REG_NONE, NULL, 0 },
+	    { NULL, 0, NULL, NULL, 0, NULL, 0 }
+	  };
+
+	  RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
+				  NULL, NULL);
 	  bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
 	  unsigned maxf, vendor_id[4], unused;
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
@@ -733,8 +730,6 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  bufptr += __small_sprintf (bufptr, "vendor_id\t: %s\n",
 				     (char *)vendor_id);
-	  read_value ("~Mhz", REG_DWORD);
-	  unsigned cpu_mhz = in_buf.d;
 	  if (maxf >= 1)
 	    {
 	      unsigned features2, features1, extra_info, cpuid_sig;
@@ -1092,19 +1087,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 						 IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED) ? "no" : "yes");
 	    }
 	}
-      if (dwOldThreadAffinityMask != 0)
-	SetThreadAffinityMask (GetCurrentThread (), dwOldThreadAffinityMask);
-
-      RegCloseKey (hKey);
-      bufptr += __small_sprintf (bufptr, "\n");
-  }
+      if (orig_affinity_mask != 0)
+	SetThreadAffinityMask (GetCurrentThread (), orig_affinity_mask);
+      print ("\n");
+    }
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);
   return bufptr - buf;
 }
-
-#undef read_value
 
 static _off64_t
 format_proc_partitions (void *, char *&destbuf)

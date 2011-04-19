@@ -1,3 +1,11 @@
+2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (read_value): Remove definition.
+	(print): Simplify.
+	(format_proc_cpuinfo): Drop useless call to GetSystemInfo.  Rearrange
+	to use Rtl registry functions.  Rename dwOldThreadAffinityMask to
+	orig_affinity_mask.
+
 2011-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* localtime.cc (tzload): Don't change global timezone information
