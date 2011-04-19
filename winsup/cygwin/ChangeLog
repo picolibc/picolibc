@@ -1,5 +1,11 @@
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (get_ipv4fromreg_ipcnt): Rearrange to fetch all registry
+	values at once using RtlQueryRegistryValues.
+	(get_ipv4fromreg): Ditto.
+
+2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_registry.cc (fhandler_registry::fstat): Use RegQueryInfoKeyW.
 
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>

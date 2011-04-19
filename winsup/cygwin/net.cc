@@ -49,6 +49,7 @@ details. */
 #include "cygwin/in6.h"
 #include "ifaddrs.h"
 #include "tls_pbuf.h"
+#include "ntdll.h"
 #define _CYGWIN_IN_H
 #include <resolv.h>
 
@@ -1761,96 +1762,104 @@ get_flags (PIP_ADAPTER_ADDRESSES pap)
 static ULONG
 get_ipv4fromreg_ipcnt (const char *name)
 {
-  HKEY key;
-  LONG ret;
-  char regkey[256], *c;
-  ULONG ifs = 1;
-  DWORD dhcp, size;
+  WCHAR regkey[256], *c;
 
-  c = stpcpy (regkey, "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\"
-		      "Parameters\\Interfaces\\");
-  stpcpy (c, name);
-  if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ,
-			   &key)) != ERROR_SUCCESS)
-    {
-      if (ret != ERROR_FILE_NOT_FOUND)
-	debug_printf ("RegOpenKeyEx(%s), win32 error %ld", regkey, ret);
-      return 0;
-    }
+  c = wcpcpy (regkey, L"Tcpip\\Parameters\\Interfaces\\");
+  sys_mbstowcs (c, 220, name);
+  if (!NT_SUCCESS (RtlCheckRegistryKey (RTL_REGISTRY_SERVICES, regkey)))
+    return 0;
+
+  ULONG ifs = 1;
+  DWORD dhcp = 0;
+  UNICODE_STRING uipa = { 0, 0, NULL };
+  RTL_QUERY_REGISTRY_TABLE tab[3] = {
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+      L"EnableDHCP", &dhcp, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"IPAddress", &uipa, REG_NONE, NULL, 0 },
+    { NULL, 0, NULL, NULL, 0, NULL, 0 }
+  };
+
   /* If DHCP is used, we have only one address. */
-  if ((ret = RegQueryValueEx (key, "EnableDHCP", NULL, NULL, (PBYTE) &dhcp,
-			      (size = sizeof dhcp, &size))) == ERROR_SUCCESS
-      && dhcp == 0
-      && (ret = RegQueryValueEx (key, "IPAddress", NULL, NULL, NULL,
-				 &size)) == ERROR_SUCCESS)
+  if (NT_SUCCESS (RtlQueryRegistryValues (RTL_REGISTRY_SERVICES, regkey, tab,
+					  NULL, NULL))
+      && uipa.Buffer)
     {
-      char *ipa = (char *) alloca (size);
-      RegQueryValueEx (key, "IPAddress", NULL, NULL, (PBYTE) ipa, &size);
-      for (ifs = 0, c = ipa; *c; c += strlen (c) + 1)
+      if (dhcp == 0)
+      for (ifs = 0, c = uipa.Buffer; *c; c += wcslen (c) + 1)
 	ifs++;
+      RtlFreeUnicodeString (&uipa);
     }
-  RegCloseKey (key);
   return ifs;
 }
 
 static void
 get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 {
-  HKEY key;
-  LONG ret;
-  char regkey[256], *c;
-  DWORD ifs;
-  DWORD dhcp, size;
+  WCHAR regkey[256], *c;
 
-  c = stpcpy (regkey, "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\"
-		      "Parameters\\Interfaces\\");
-  stpcpy (c, name);
-  if ((ret = RegOpenKeyEx (HKEY_LOCAL_MACHINE, regkey, 0, KEY_READ, &key))
-      != ERROR_SUCCESS)
+  c = wcpcpy (regkey, L"Tcpip\\Parameters\\Interfaces\\");
+  sys_mbstowcs (c, 220, name);
+  if (!NT_SUCCESS (RtlCheckRegistryKey (RTL_REGISTRY_SERVICES, regkey)))
+    return;
+
+  ULONG ifs;
+  DWORD dhcp = 0;
+  UNICODE_STRING udipa = { 0, 0, NULL };
+  UNICODE_STRING udsub = { 0, 0, NULL };
+  UNICODE_STRING uipa = { 0, 0, NULL };
+  UNICODE_STRING usub = { 0, 0, NULL };
+  RTL_QUERY_REGISTRY_TABLE tab[6] = {
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+      L"EnableDHCP", &dhcp, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"DhcpIPAddress", &udipa, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"DhcpSubnetMask", &udsub, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"IPAddress", &uipa, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"SubnetMask", &usub, REG_NONE, NULL, 0 },
+    { NULL, 0, NULL, NULL, 0, NULL, 0 }
+  };
+
+  if (NT_SUCCESS (RtlQueryRegistryValues (RTL_REGISTRY_SERVICES, regkey, tab,
+					  NULL, NULL)))
     {
-      if (ret != ERROR_FILE_NOT_FOUND)
-	debug_printf ("RegOpenKeyEx(%s), win32 error %ld", regkey, ret);
-      return;
-    }
-  /* If DHCP is used, we have only one address. */
-  if ((ret = RegQueryValueEx (key, "EnableDHCP", NULL, NULL, (PBYTE) &dhcp,
-			      (size = sizeof dhcp, &size))) == ERROR_SUCCESS)
-    {
-#define addr ((struct sockaddr_in *) &ifp->ifa_addr)
-#define mask ((struct sockaddr_in *) &ifp->ifa_netmask)
-#define brdc ((struct sockaddr_in *) &ifp->ifa_brddstaddr)
+#     define addr ((struct sockaddr_in *) &ifp->ifa_addr)
+#     define mask ((struct sockaddr_in *) &ifp->ifa_netmask)
+#     define brdc ((struct sockaddr_in *) &ifp->ifa_brddstaddr)
+#     define inet_uton(u, a) \
+	{ \
+	  char t[64]; \
+	  sys_wcstombs (t, 64, (u)); \
+	  cygwin_inet_aton (t, (a)); \
+	}
+      /* If DHCP is used, we have only one address. */
       if (dhcp)
 	{
-	  if ((ret = RegQueryValueEx (key, "DhcpIPAddress", NULL, NULL,
-				      (PBYTE) regkey, (size = 256, &size)))
-	      == ERROR_SUCCESS)
-	    cygwin_inet_aton (regkey, &addr->sin_addr);
-	  if ((ret = RegQueryValueEx (key, "DhcpSubnetMask", NULL, NULL,
-				      (PBYTE) regkey, (size = 256, &size)))
-	      == ERROR_SUCCESS)
-	    cygwin_inet_aton (regkey, &mask->sin_addr);
+	  if (udipa.Buffer)
+	    inet_uton (udipa.Buffer, &addr->sin_addr);
+	  if (udsub.Buffer)
+	    inet_uton (udsub.Buffer, &mask->sin_addr);
 	}
       else
 	{
-	  if ((ret = RegQueryValueEx (key, "IPAddress", NULL, NULL, NULL,
-				     &size)) == ERROR_SUCCESS)
+	  if (uipa.Buffer)
 	    {
-	      char *ipa = (char *) alloca (size);
-	      RegQueryValueEx (key, "IPAddress", NULL, NULL, (PBYTE) ipa, &size);
-	      for (ifs = 0, c = ipa; *c && ifs < idx; c += strlen (c) + 1)
+	      for (ifs = 0, c = uipa.Buffer; *c && ifs < idx;
+		   c += wcslen (c) + 1)
 		ifs++;
 	      if (*c)
-		cygwin_inet_aton (c, &addr->sin_addr);
+		inet_uton (c, &addr->sin_addr);
 	    }
-	  if ((ret = RegQueryValueEx (key, "SubnetMask", NULL, NULL, NULL,
-				     &size)) == ERROR_SUCCESS)
+	  if (usub.Buffer)
 	    {
-	      char *ipa = (char *) alloca (size);
-	      RegQueryValueEx (key, "SubnetMask", NULL, NULL, (PBYTE) ipa, &size);
-	      for (ifs = 0, c = ipa; *c && ifs < idx; c += strlen (c) + 1)
+	      for (ifs = 0, c = usub.Buffer; *c && ifs < idx;
+		   c += wcslen (c) + 1)
 		ifs++;
 	      if (*c)
-		cygwin_inet_aton (c, &mask->sin_addr);
+		inet_uton (c, &mask->sin_addr);
 	    }
 	}
       if (ifp->ifa_ifa.ifa_flags & IFF_BROADCAST)
@@ -1860,8 +1869,16 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 #undef addr
 #undef mask
 #undef brdc
+#undef inet_uton
+      if (udipa.Buffer)
+	RtlFreeUnicodeString (&udipa);
+      if (udsub.Buffer)
+	RtlFreeUnicodeString (&udsub);
+      if (uipa.Buffer)
+	RtlFreeUnicodeString (&uipa);
+      if (usub.Buffer)
+	RtlFreeUnicodeString (&usub);
     }
-  RegCloseKey (key);
 }
 
 static void
