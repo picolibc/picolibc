@@ -1,5 +1,16 @@
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetConsoleWindow): Drop.
+	(GetSystemWindowsDirectoryW): Drop.
+	* fhandler_console.cc (beep): Call GetSystemWindowsDirectoryW instead of
+	GetWindowsDirectoryW.
+	* uinfo.cc (cygheap_user::env_systemroot): Call
+	GetSystemWindowsDirectoryW and convert to multibyte on the fly.
+	* winlean.h (GetWindowsDirectoryW): Redefine to something invalid.
+	Explain why.
+
+2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_IMPORTS): Drop advapi32.dll.
 	* autoload.cc: Enable autoloading advapi32 functions.
 	* environ.cc (regopt): Use wide char arguments in reg_key functions.

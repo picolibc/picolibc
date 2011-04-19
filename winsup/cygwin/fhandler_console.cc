@@ -67,9 +67,9 @@ beep ()
   if (r.created ())
     {
       PWCHAR buf = NULL;
-      UINT len = GetWindowsDirectoryW (buf, 0) * sizeof (WCHAR);
+      UINT len = GetSystemWindowsDirectoryW (buf, 0) * sizeof (WCHAR);
       buf = (PWCHAR) alloca (len += sizeof (ding));
-      UINT res = GetWindowsDirectoryW (buf, len);
+      UINT res = GetSystemWindowsDirectoryW (buf, len);
       if (res && res <= len)
 	r.set_string (L"", wcscat (buf, ding));
     }

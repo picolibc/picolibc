@@ -30,8 +30,9 @@ details. */
 /* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory
    instead.  That's not what we have in mind when calling GetWindowsDirectory
-   from within Cygwin.  So we redefine GetWindowsDirectory to call the
-   GetSystemWindowsDirectory function here. */
-#define GetWindowsDirectoryW GetSystemWindowsDirectoryW
-#define GetWindowsDirectoryA GetSystemWindowsDirectoryA
+   from within Cygwin.  So we redefine GetWindowsDirectory to something
+   invalid here to avoid that it's called accidentally in Cygwin.  Don't
+   use this function.  Use GetSystemWindowsDirectoryW. */
+#define GetWindowsDirectoryW dont_use_GetWindowsDirectory
+#define GetWindowsDirectoryA dont_use_GetWindowsDirectory
 #endif /*_WINLEAN_H*/

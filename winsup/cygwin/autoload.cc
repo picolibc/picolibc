@@ -391,9 +391,7 @@ LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
 LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
-LoadDLLfunc (GetConsoleWindow, 0, kernel32)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
-LoadDLLfuncEx (GetSystemWindowsDirectoryW, 8, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)
