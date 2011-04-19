@@ -3209,11 +3209,14 @@ semaphore::_terminate ()
 int
 semaphore::init (sem_t *sem, int pshared, unsigned int value)
 {
-  /* opengroup calls this undefined */
+  /*
+     We can't tell the difference between reinitialising an
+     existing semaphore and initialising a semaphore who's
+     contents happen to be a valid pointer
+   */
   if (is_good_object (sem))
     {
-      set_errno(EBUSY);
-      return -1;
+      paranoid_printf ("potential attempt to reinitialise a semaphore");
     }
 
   if (value > SEM_VALUE_MAX)
