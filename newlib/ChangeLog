@@ -1,3 +1,8 @@
+2011-04-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/signal.h (_sig_func_ptr): Define with int parameter
+	per POSIX.  Explain in comment.
+
 2011-04-15  Eric Blake  <eblake@redhat.com>
 
 	* libc/string/strchrnul.c (strchrnul): Fix strchrnul.
