@@ -1,3 +1,7 @@
+2011-04-18  Julian Brown  <julian@codesourcery.com>
+
+	* arm.h (ARM_AEXT_V7_ARM): Remove ARM_EXT_OS from bitmask.
+
 2011-04-11  Dan McDonald  <dan@wellkeeper.com>
 
 	PR gas/12296
