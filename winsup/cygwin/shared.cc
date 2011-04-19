@@ -1,7 +1,7 @@
 /* shared.cc: shared data area support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -109,7 +109,8 @@ init_installation_root ()
 
       for (int i = 1; i >= 0; --i)
 	{
-	  reg_key r (i, KEY_WRITE, CYGWIN_INFO_INSTALLATIONS_NAME, NULL);
+	  reg_key r (i, KEY_WRITE, _WIDE (CYGWIN_INFO_INSTALLATIONS_NAME),
+		     NULL);
 	  if (r.set_string (installation_key_buf, installation_root)
 	      == ERROR_SUCCESS)
 	    break;
@@ -370,19 +371,19 @@ shared_destroy ()
 void
 shared_info::init_obcaseinsensitive ()
 {
-  HKEY key;
-  DWORD size = sizeof (DWORD);
-
-  obcaseinsensitive = 1;
-  if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
-		  "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
-		  0, KEY_READ, &key) == ERROR_SUCCESS)
-    {
-      RegQueryValueEx (key, "obcaseinsensitive", NULL, NULL,
-		       (LPBYTE) &obcaseinsensitive, &size);
-      RegCloseKey (key);
-    }
-  debug_printf ("obcaseinsensitive set to %d", obcaseinsensitive);
+  NTSTATUS status;
+  DWORD def_obcaseinsensitive = 1;
+ 
+  obcaseinsensitive = def_obcaseinsensitive;
+  RTL_QUERY_REGISTRY_TABLE tab[2] = {
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+      L"obcaseinsensitive", &obcaseinsensitive, REG_DWORD,
+      &def_obcaseinsensitive, sizeof (DWORD) },
+    { NULL, 0, NULL, NULL, 0, NULL, 0 }
+  };
+  status = RtlQueryRegistryValues (RTL_REGISTRY_CONTROL,
+				   L"Session Manager\\kernel",
+				   tab, NULL, NULL);
 }
 
 void inline
@@ -449,7 +450,7 @@ shared_info::heap_slop_size ()
 	{
 	  reg_key reg (i, KEY_READ, NULL);
 
-	  if ((heap_slop = reg.get_int ("heap_slop_in_mb", 0)))
+	  if ((heap_slop = reg.get_int (L"heap_slop_in_mb", 0)))
 	    break;
 	  heap_slop = wincap.heapslop ();
 	}
@@ -475,7 +476,7 @@ shared_info::heap_chunk_size ()
 	  /* FIXME: We should not be restricted to a fixed size heap no matter
 	     what the fixed size is. */
 
-	  if ((heap_chunk = reg.get_int ("heap_chunk_in_mb", 0)))
+	  if ((heap_chunk = reg.get_int (L"heap_chunk_in_mb", 0)))
 	    break;
 	  heap_chunk = 384; /* Default */
 	}

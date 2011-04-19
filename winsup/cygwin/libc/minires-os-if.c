@@ -1,6 +1,6 @@
 /* minires-os-if.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2006, 2007, 2008, 2009, 2011 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
@@ -27,6 +27,9 @@ details. */
 #include <windows.h>
 #include <iphlpapi.h>
 #include <windns.h>
+#include <ntdef.h>
+#include "ntdll.h"
+#include <wchar.h>
 
 /***********************************************************************
  * write_record: Translates a Windows DNS record into a compressed record
@@ -291,36 +294,25 @@ done:
  *
  get_registry_items: returns dns items from the registry
 
- kHey: Handle to registry key
- KeyValue: key value to read
+ in: Unicode representation of registry value "value".
  what: 0 addresses ; 1 search list
 
 ***********************************************************************/
-static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
-				   res_state statp, int what)
+static void get_registry_dns_items(PUNICODE_STRING in, res_state statp,
+				   int what)
 {
-  DWORD size = 0;
-  LONG res;
-  LPBYTE list;
   int debug = statp->options & RES_DEBUG;
 
-  res = RegQueryValueEx( hKey, KeyValue, NULL, NULL, NULL, &size);
-  DPRINTF(debug, "value %s, error %lu (Windows), size %lu\n",
-	  KeyValue, res, size);
-  if ((res == ERROR_SUCCESS) && (size > 1)) {
-    if (!(list = (LPBYTE) alloca(size))) {
-      DPRINTF(debug, "alloca: %s\n", strerror(errno));
-    }
-    else if ((res = RegQueryValueEx( hKey, KeyValue, NULL, NULL, list,
-				     &size )) != ERROR_SUCCESS) {
-      DPRINTF(debug, "RegQueryValueEx: error %lu (Windows)\n", res);
-    }
-    else if (what == 0) { /* Get the addresses */
-      BYTE *ap, *srch;
+  if (in->Length) {
+    char list[in->Length];
+    size_t size = wcstombs (list, in->Buffer, in->Length);
+    if (what == 0) { /* Get the addresses */
+      char *ap, *srch;
       int numAddresses = 0;
       for (ap = list; ap < list + size && *ap; ap = srch) {
 	/* The separation character can be 0, ' ', or ','. */
-	for (srch = ap; *srch && (isdigit(*srch) || *srch == '.' ); srch++);
+	for (srch = ap; *srch && (isdigit((unsigned) *srch) || *srch == '.' );
+	     srch++);
 	*srch++ = 0;
 	if (numAddresses < DIM(statp->nsaddr_list)) {
 	  DPRINTF(debug, "server \"%s\"\n", ap);
@@ -334,7 +326,7 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
       statp->nscount = numAddresses;
     }
     else /* Parse the search line */
-      minires_get_search((char *) list, statp);
+      minires_get_search(list, statp);
   }
   return;
 }
@@ -351,25 +343,52 @@ static void get_registry_dns_items(HKEY hKey, LPCTSTR KeyValue,
 
 static void get_registry_dns(res_state statp)
 {
-  HKEY hKey;
-  DWORD  res;
-  const char *keyName = "SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters";
+  NTSTATUS status;
+  const PCWSTR keyName = L"Tcpip\\Parameters";
 
   DPRINTF(statp->options & RES_DEBUG, "key %s\n", keyName);
-  if ((res = RegOpenKeyEx( HKEY_LOCAL_MACHINE, keyName, 0,
-			   KEY_QUERY_VALUE | KEY_READ, &hKey)) != ERROR_SUCCESS) {
-    DPRINTF(statp->options & RES_DEBUG, "RegOpenKeyEx: error %lu (Windows)\n", res);
-    return;
-  }
+  status = RtlCheckRegistryKey (RTL_REGISTRY_SERVICES, keyName);
+  if (!NT_SUCCESS (status))
+    {
+      DPRINTF (statp->options & RES_DEBUG, "RtlCheckRegistryKey: status %p\n",
+	       status);
+      return;
+    }
+
+  UNICODE_STRING uns = { 0, 0, NULL };
+  UNICODE_STRING udns = { 0, 0, NULL };
+  UNICODE_STRING usl = { 0, 0, NULL };
+  RTL_QUERY_REGISTRY_TABLE tab[4] = {
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"NameServer", &uns, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"DhcpNameServer", &udns, REG_NONE, NULL, 0 },
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOEXPAND,
+      L"SearchList", &usl, REG_NONE, NULL, 0 },
+  };
+
+  status = RtlQueryRegistryValues (RTL_REGISTRY_SERVICES, keyName, tab,
+				   NULL, NULL);
+  if (!NT_SUCCESS (status))
+    {
+      DPRINTF (statp->options & RES_DEBUG,
+	       "RtlQueryRegistryValues: status %p\n", status);
+      return;
+    }
 
   if (statp->nscount == 0)
-    get_registry_dns_items(hKey, "NameServer", statp, 0);
+    get_registry_dns_items(&uns, statp, 0);
   if (statp->nscount == 0)
-    get_registry_dns_items(hKey, "DhcpNameServer", statp, 0);
+    get_registry_dns_items(&udns, statp, 0);
   if (statp->dnsrch[0] == NULL)
-    get_registry_dns_items(hKey, "SearchList", statp, 1);
+    get_registry_dns_items(&usl, statp, 1);
 
-  RegCloseKey(hKey);
+  if (uns.Buffer)
+    RtlFreeUnicodeString (&uns);
+  if (udns.Buffer)
+    RtlFreeUnicodeString (&udns);
+  if (usl.Buffer)
+    RtlFreeUnicodeString (&usl);
 
   return;
 }

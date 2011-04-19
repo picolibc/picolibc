@@ -3682,8 +3682,8 @@ updwtmpx (const char *wtmpx_file, const struct utmpx *utmpx)
   updwtmp (wtmpx_file, (const struct utmp *) utmpx);
 }
 
-extern "C"
-long gethostid (void)
+extern "C" long
+gethostid (void)
 {
   unsigned data[13] = {0x92895012,
 		       0x10293412,
@@ -3766,9 +3766,11 @@ long gethostid (void)
   else
     debug_printf ("no Ethernet card installed");
 
-  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE", "Microsoft",
-	       "Windows NT", "CurrentVersion", NULL);
-  key.get_string ("ProductId", (char *)&data[6], 24, "00000-000-0000000-00000");
+  WCHAR wdata[24];
+  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, L"SOFTWARE", L"Microsoft",
+	       L"Windows NT", L"CurrentVersion", NULL);
+  key.get_string (L"ProductId", wdata, 24, L"00000-000-0000000-00000");
+  sys_wcstombs ((char *)&data[6], 24, wdata, 24);
   debug_printf ("Windows Product ID: %s", (char *)&data[6]);
 
   GetDiskFreeSpaceEx ("C:\\", NULL, (PULARGE_INTEGER) &data[11], NULL);

@@ -130,7 +130,7 @@ EXTRA_OFILES:=
 
 MALLOC_OFILES:=@MALLOC_OFILES@
 
-DLL_IMPORTS:=$(w32api_lib)/libadvapi32.a $(w32api_lib)/libkernel32.a $(w32api_lib)/libntdll.a
+DLL_IMPORTS:=$(w32api_lib)/libkernel32.a $(w32api_lib)/libntdll.a
 
 MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 86 col line

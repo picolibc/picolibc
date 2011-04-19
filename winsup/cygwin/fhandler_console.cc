@@ -61,16 +61,17 @@ dev_console NO_COPY *fhandler_console::dev_state;
 static void
 beep ()
 {
-  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, "AppEvents", "Schemes", "Apps",
-	     ".Default", ".Default", ".Current", NULL);
+  const WCHAR ding[] = L"\\media\\ding.wav";
+  reg_key r (HKEY_CURRENT_USER, KEY_ALL_ACCESS, L"AppEvents", L"Schemes",
+	     L"Apps", L".Default", L".Default", L".Current", NULL);
   if (r.created ())
     {
-      char *buf = NULL;
-      UINT len = GetWindowsDirectory (buf, 0);
-      buf = (char *) alloca (len += sizeof ("\\media\\ding.wav"));
-      UINT res = GetWindowsDirectory (buf, len);
+      PWCHAR buf = NULL;
+      UINT len = GetWindowsDirectoryW (buf, 0) * sizeof (WCHAR);
+      buf = (PWCHAR) alloca (len += sizeof (ding));
+      UINT res = GetWindowsDirectoryW (buf, len);
       if (res && res <= len)
-	r.set_string ("", strcat (buf, "\\media\\ding.wav"));
+	r.set_string (L"", wcscat (buf, ding));
     }
   MessageBeep (MB_OK);
 }

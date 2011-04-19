@@ -352,9 +352,6 @@ wsock_init ()
 
 LoadDLLprime (ws2_32, _wsock_init, 0)
 
-#if 0
-/* Don't enable until libadvapi32.a has been removed from DLL_IMPORTS,
-   otherwise mintty will stop working on pre-Vista for some reason. */
 LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
 LoadDLLfunc (CryptAcquireContextW, 20, advapi32)
 LoadDLLfunc (CryptGenRandom, 12, advapi32)
@@ -381,7 +378,6 @@ LoadDLLfunc (RegQueryInfoKeyW, 48, advapi32)
 LoadDLLfunc (RegQueryValueExW, 24, advapi32)
 LoadDLLfunc (RegisterEventSourceW, 8, advapi32)
 LoadDLLfunc (ReportEventW, 36, advapi32)
-#endif
 
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
 LoadDLLfunc (DnsRecordListFree, 8, dnsapi)

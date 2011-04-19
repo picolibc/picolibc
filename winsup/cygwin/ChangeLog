@@ -1,5 +1,36 @@
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_IMPORTS): Drop advapi32.dll.
+	* autoload.cc: Enable autoloading advapi32 functions.
+	* environ.cc (regopt): Use wide char arguments in reg_key functions.
+	* fhandler_console.cc (beep): Ditto.  Use WCHAR throughout.
+	* registry.cc (reg_key): Rewrite reg_key class to use native NT registry
+	functions.  Use WCHAR string parameters throughout.  Use PCWSTR rather
+	than const WCHAR.  Drop multibyte char functionality.  Drop unused
+	methods.
+	(get_registry_hive_path): Use RtlQueryRegistryValues to fetch path from
+	registry.
+	(load_registry_hive): Drop useless check for user hive being available.
+	Load hive using NtLoadKey. 
+	* registry.h: Accommodate above changes.
+	* sched.cc (sched_rr_get_interval): Use wide char arguments in reg_key
+	functions.
+	* shared.cc (init_installation_root): Ditto.
+	(shared_info::init_obcaseinsensitive): Use RtlQueryRegistryValues to
+	fetch obcaseinsensitive value.
+	(shared_info::heap_slop_size): Use wide char arguments in reg_key
+	functions.
+	(shared_info::heap_chunk_size): Ditto.
+	* syscalls.cc (gethostid): Ditto.
+	* winsup.h (__WIDE): Define.
+	(_WIDE): Define.
+	* libc/minires-os-if.c (get_registry_dns_items): Don't fetch values
+	from registry.  Just extract them from given UNICODE_STRING parameter.
+	(get_registry_dns): Fetch all registry values at once using
+	RtlQueryRegistryValues.
+
+2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (get_ipv4fromreg_ipcnt): Rearrange to fetch all registry
 	values at once using RtlQueryRegistryValues.
 	(get_ipv4fromreg): Ditto.

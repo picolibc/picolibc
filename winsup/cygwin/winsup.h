@@ -70,6 +70,12 @@ int fcntl64 (int fd, int cmd, ...);
    application provided path strings we handle. */
 #define NT_MAX_PATH 32768
 
+/* This definition allows to define wide char strings using macros as
+   parameters.  See the definition of __CONCAT in newlib's sys/cdefs.h
+   and accompanying comment. */
+#define __WIDE(a) L ## a
+#define _WIDE(a) __WIDE(a)
+
 #ifdef __cplusplus
 
 extern const char case_folded_lower[];
