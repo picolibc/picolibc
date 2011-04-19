@@ -1,7 +1,7 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
    Copyright 2002, 2003, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010 Red Hat, Inc.
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -456,9 +456,8 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	  FILETIME ftLastWriteTime;
 	  DWORD subkey_count;
 	  if (ERROR_SUCCESS ==
-	      RegQueryInfoKey (hKey, NULL, NULL, NULL, &subkey_count, NULL,
-			       NULL, NULL, NULL, NULL, NULL,
-			       &ftLastWriteTime))
+	      RegQueryInfoKeyW (hKey, NULL, NULL, NULL, &subkey_count, NULL,
+				NULL, NULL, NULL, NULL, NULL, &ftLastWriteTime))
 	    {
 	      to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
 	      buf->st_ctim = buf->st_birthtim = buf->st_mtim;
