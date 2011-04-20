@@ -1,10 +1,17 @@
+2011-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h: Renumber internal devices so that FH_PROCESS is part of
+	the /proc family of virtual devices.
+	(FH_PROC_MAX_MINOR): Define.
+	* path.h (isproc_dev): Use FH_PROC_MAX_MINOR rather than FH_PROC.
+
 2011-04-19  Peter Rosin  <peda@lysator.liu.se>
 	
 	* select.cc (pipe_cleanup): Make sure that device_specific_pipe is
 	always deleted regardless of whether it has a unique thread associated
 	with it.
 
-2011-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
+2011-04-19  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* thread.cc (semaphore::init): We cannot reliably infer anything from
 	the existing contents of sem, so merely warn rather than return EBUSY

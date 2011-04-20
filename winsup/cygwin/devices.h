@@ -40,24 +40,26 @@ enum fh_devices
   FH_CLIPBOARD=FHDEV (13, 254),
 
   /* begin /proc directories */
-  FH_PROC    = FHDEV (0, 255),
-  FH_REGISTRY= FHDEV (0, 254),
-  FH_PROCNET = FHDEV (0, 253),
-  FH_PROCESSFD = FHDEV (0, 252),
-  FH_PROCSYS = FHDEV (0, 251),
-  FH_PROCSYSVIPC = FHDEV (0,250),
+  FH_PROC_MAX_MINOR = FHDEV (0, 255),
 
-  FH_PROC_MIN_MINOR = FHDEV (0,200),
+  FH_PROC    = FHDEV (0, 255),
+  FH_PROCESS = FHDEV (0, 254),
+  FH_REGISTRY= FHDEV (0, 253),
+  FH_PROCNET = FHDEV (0, 252),
+  FH_PROCESSFD = FHDEV (0, 251),
+  FH_PROCSYS = FHDEV (0, 250),
+  FH_PROCSYSVIPC = FHDEV (0, 249),
+
+  FH_PROC_MIN_MINOR = FHDEV (0, 200),
   /* end /proc directories */
 
   FH_PIPE    = FHDEV (0, 199),
   FH_PIPER   = FHDEV (0, 198),
   FH_PIPEW   = FHDEV (0, 197),
   FH_FIFO    = FHDEV (0, 196),
-  FH_PROCESS = FHDEV (0, 195),
-  FH_FS      = FHDEV (0, 194),  /* filesystem based device */
-  FH_NETDRIVE= FHDEV (0, 193),
-  FH_DEV     = FHDEV (0, 192),
+  FH_FS      = FHDEV (0, 195),  /* filesystem based device */
+  FH_NETDRIVE= FHDEV (0, 194),
+  FH_DEV     = FHDEV (0, 193),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
