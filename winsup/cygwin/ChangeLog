@@ -1,3 +1,11 @@
+2011-04-20  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* select.cc (serial_cleanup): Make sure that device_specific_pipe is
+	always deleted regardless of whether it has a unique thread associated
+	with it
+	(socket_cleanup): Ditto.
+	(mailslot_cleanup): Ditto.
+
 2011-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.h: Renumber internal devices so that FH_PROCESS is part of

@@ -1150,13 +1150,15 @@ static void
 serial_cleanup (select_record *, select_stuff *stuff)
 {
   select_serial_info *si = (select_serial_info *) stuff->device_specific_serial;
-  if (si && si->thread)
+  if (!si)
+    return;
+  if (si->thread)
     {
       si->stop_thread = true;
       si->thread->detach ();
-      delete si;
-      stuff->device_specific_serial = NULL;
     }
+  delete si;
+  stuff->device_specific_serial = NULL;
 }
 
 select_record *
@@ -1465,15 +1467,17 @@ socket_cleanup (select_record *, select_stuff *stuff)
 {
   select_socket_info *si = (select_socket_info *) stuff->device_specific_socket;
   select_printf ("si %p si->thread %p", si, si ? si->thread : NULL);
-  if (si && si->thread)
+  if (!si)
+    return;
+  if (si->thread)
     {
       SetEvent (si->w4[0]);
       /* Wait for thread to go away */
       si->thread->detach ();
       ResetEvent (si->w4[0]);
-      stuff->device_specific_socket = NULL;
-      delete si;
     }
+  delete si;
+  stuff->device_specific_socket = NULL;
   select_printf ("returning");
 }
 
@@ -1703,13 +1707,15 @@ static void
 mailslot_cleanup (select_record *, select_stuff *stuff)
 {
   select_mailslot_info *mi = (select_mailslot_info *) stuff->device_specific_mailslot;
-  if (mi && mi->thread)
+  if (!mi)
+    return;
+  if (mi->thread)
     {
       mi->stop_thread = true;
       mi->thread->detach ();
-      delete mi;
-      stuff->device_specific_mailslot = NULL;
     }
+  delete mi;
+  stuff->device_specific_mailslot = NULL;
 }
 
 select_record *
