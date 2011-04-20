@@ -6,9 +6,9 @@
 
 2011-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
-        * thread.cc (semaphore::init): We cannot reliably infer anything from
-        the existing contents of sem, so merely warn rather than return EBUSY
-        if it looks like we are reinitialising a semaphore.
+	* thread.cc (semaphore::init): We cannot reliably infer anything from
+	the existing contents of sem, so merely warn rather than return EBUSY
+	if it looks like we are reinitialising a semaphore.
 
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
