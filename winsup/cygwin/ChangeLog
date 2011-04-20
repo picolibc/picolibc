@@ -1,3 +1,9 @@
+2011-04-19  Peter Rosin  <peda@lysator.liu.se>
+	
+	* select.cc (pipe_cleanup): Make sure that device_specific_pipe is
+	always deleted regardless of whether it has a unique thread associated
+	with it.
+
 2011-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
         * thread.cc (semaphore::init): We cannot reliably infer anything from

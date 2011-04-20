@@ -644,13 +644,15 @@ static void
 pipe_cleanup (select_record *, select_stuff *stuff)
 {
   select_pipe_info *pi = (select_pipe_info *) stuff->device_specific_pipe;
-  if (pi && pi->thread)
+  if (!pi)
+    return;
+  if (pi->thread)
     {
       pi->stop_thread = true;
       pi->thread->detach ();
-      delete pi;
-      stuff->device_specific_pipe = NULL;
     }
+  delete pi;
+  stuff->device_specific_pipe = NULL;
 }
 
 int
