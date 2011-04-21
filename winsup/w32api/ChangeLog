@@ -1,3 +1,9 @@
+2011-04-21  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/imagehlp.h (PREAD_PROCESS_MEMORY_ROUTINE): Correct definition.
+
+	Thanks to Safety0ff for the report.
+
 2011-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (DOMAIN_ALIAS_RID_REMOTE_DESKTOP_USERS): Add.
