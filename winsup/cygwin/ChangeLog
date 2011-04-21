@@ -1,3 +1,14 @@
+2011-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::init_thread): Drop setting locals.process_logmask.
+	* cygtls.cc (_cygtls::remove): Always free mallocated TLS storage on
+	thread exit.  Drop freeing locals.process_ident.
+	* cygtls.h (struct _local_storage): Remove syslog-related members.
+	* syslog.cc (syslog_globals): New static storage for global syslog
+	settings.  Use throughout instead of _my_tls.locals.
+	(openlog): Set new syslog_globals.process_ident value more carefully.
+	* tlsoffsets.h: Regenerate.
+
 2011-04-21  Thomas Stalder <cygwinml@gmail.com>
 
 	* include/sys/poll.h: Include signal.h to get definition of sigset_t.

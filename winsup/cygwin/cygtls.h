@@ -114,12 +114,6 @@ struct _local_storage
   /* strerror */
   char strerror_buf[sizeof ("Unknown error 4294967295")];
 
-  /* sysloc.cc */
-  wchar_t *process_ident;		// note: malloced
-  int process_logopt;
-  int process_facility;
-  int process_logmask;
-
   /* times.cc */
   char timezone_buf[20];
   struct tm _localtime_buf;

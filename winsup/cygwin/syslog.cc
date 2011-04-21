@@ -30,30 +30,39 @@ details. */
 
 #define CYGWIN_LOG_NAME L"Cygwin"
 
+static struct
+{
+  wchar_t *process_ident;
+  int process_logopt;
+  int process_facility;
+  int process_logmask;
+} syslog_globals = { NULL, 0, 0, LOG_UPTO (LOG_DEBUG) };
+
 /* openlog: save the passed args. Don't open the system log or /dev/log yet.  */
 extern "C" void
 openlog (const char *ident, int logopt, int facility)
 {
+    wchar_t *new_ident = NULL;
+
     debug_printf ("openlog called with (%s, %d, %d)",
 		       ident ? ident : "<NULL>", logopt, facility);
 
-    if (_my_tls.locals.process_ident != NULL)
-      {
-	free (_my_tls.locals.process_ident);
-	_my_tls.locals.process_ident = NULL;
-      }
     if (ident)
       {
-	sys_mbstowcs_alloc (&_my_tls.locals.process_ident, HEAP_NOTHEAP, ident);
-	if (!_my_tls.locals.process_ident)
-	  {
+	sys_mbstowcs_alloc (&new_ident, HEAP_NOTHEAP, ident);
+	if (!new_ident)
 	    debug_printf ("failed to allocate memory for "
-			  "_my_tls.locals.process_ident");
-	    return;
+			  "syslog_globals.process_ident");
+	else
+	  {
+	    wchar_t *old_ident = syslog_globals.process_ident;
+	    syslog_globals.process_ident = new_ident;
+	    if (old_ident)
+	      free (old_ident);
 	  }
       }
-    _my_tls.locals.process_logopt = logopt;
-    _my_tls.locals.process_facility = facility;
+    syslog_globals.process_logopt = logopt;
+    syslog_globals.process_facility = facility;
 }
 
 /* setlogmask: set the log priority mask and return previous mask.
@@ -62,10 +71,10 @@ int
 setlogmask (int maskpri)
 {
   if (maskpri == 0)
-    return _my_tls.locals.process_logmask;
+    return syslog_globals.process_logmask;
 
-  int old_mask = _my_tls.locals.process_logmask;
-  _my_tls.locals.process_logmask = maskpri;
+  int old_mask = syslog_globals.process_logmask;
+  syslog_globals.process_logmask = maskpri;
 
   return old_mask;
 }
@@ -269,7 +278,7 @@ try_connect_syslogd (int priority, const char *msg, int len)
 	}
       /* If write fails and LOG_CONS is set, return failure to vsyslog so
 	 it falls back to the usual logging method for this OS. */
-      if (ret >= 0 || !(_my_tls.locals.process_logopt & LOG_CONS))
+      if (ret >= 0 || !(syslog_globals.process_logopt & LOG_CONS))
 	ret = syslogd_sock;
     }
   try_connect_guard.release ();
@@ -289,20 +298,20 @@ vsyslog (int priority, const char *message, va_list ap)
 {
   debug_printf ("%x %s", priority, message);
   /* If the priority fails the current mask, reject */
-  if ((LOG_MASK (LOG_PRI (priority)) & _my_tls.locals.process_logmask) == 0)
+  if ((LOG_MASK (LOG_PRI (priority)) & syslog_globals.process_logmask) == 0)
     {
       debug_printf ("failing message %x due to priority mask %x",
-		    priority, _my_tls.locals.process_logmask);
+		    priority, syslog_globals.process_logmask);
       return;
     }
 
   /* Set default facility to LOG_USER if not yet set via openlog. */
-  if (!_my_tls.locals.process_facility)
-    _my_tls.locals.process_facility = LOG_USER;
+  if (!syslog_globals.process_facility)
+    syslog_globals.process_facility = LOG_USER;
 
   /* Add default facility if not in the given priority. */
   if (!(priority & LOG_FACMASK))
-    priority |= _my_tls.locals.process_facility;
+    priority |= syslog_globals.process_facility;
 
   /* Translate %m in the message to error text */
   char *errtext = strerror (get_errno ());
@@ -376,12 +385,12 @@ vsyslog (int priority, const char *message, va_list ap)
 	pass.set_message ((char *) alloca (n));
 
       /* Deal with ident_string */
-      if (_my_tls.locals.process_ident != NULL)
+      if (syslog_globals.process_ident != NULL)
 	{
-	  if (pass.print ("%ls: ", _my_tls.locals.process_ident) == -1)
+	  if (pass.print ("%ls: ", syslog_globals.process_ident) == -1)
 	    return;
 	}
-      if (_my_tls.locals.process_logopt & LOG_PID)
+      if (syslog_globals.process_logopt & LOG_PID)
 	{
 	  if (pass.print ("PID %u: ", getpid ()) == -1)
 	    return;
@@ -397,7 +406,7 @@ vsyslog (int priority, const char *message, va_list ap)
   if (len != 0 && (total_msg[len - 1] == '\n'))
     total_msg[--len] = '\0';
 
-  if (_my_tls.locals.process_logopt & LOG_PERROR)
+  if (syslog_globals.process_logopt & LOG_PERROR)
     {
       write (STDERR_FILENO, total_msg, len);
       write (STDERR_FILENO, "\n", 1);
@@ -409,7 +418,7 @@ vsyslog (int priority, const char *message, va_list ap)
       /* If syslogd isn't present, open the event log and send the message */
       HANDLE hEventSrc;
 
-      hEventSrc = RegisterEventSourceW (NULL, _my_tls.locals.process_ident
+      hEventSrc = RegisterEventSourceW (NULL, syslog_globals.process_ident
 					      ?: CYGWIN_LOG_NAME);
       if (!hEventSrc)
 	debug_printf ("RegisterEventSourceW, %E");

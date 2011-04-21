@@ -93,7 +93,6 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 	  local_clib.__sglue._niobs = 3;
 	  local_clib.__sglue._iobs = &_GLOBAL_REENT->__sf[0];
 	}
-      locals.process_logmask = LOG_UPTO (LOG_DEBUG);
     }
 
   thread_id = GetCurrentThreadId ();
@@ -146,25 +145,23 @@ _cygtls::remove (DWORD wait)
     return;
 
   debug_printf ("wait %p", wait);
-  if (locals.select.sockevt)
-      CloseHandle (locals.select.sockevt);
-  if (wait)
-    {
-      /* FIXME: Need some sort of atthreadexit function to allow things like
-	 select to control this themselves. */
-      if (locals.select.sockevt)
-	{
-	  locals.select.sockevt = NULL;
-	  free_local (select.ser_num);
-	  free_local (select.w4);
-	}
-      free_local (process_ident);
-      free_local (ntoa_buf);
-      free_local (protoent_buf);
-      free_local (servent_buf);
-      free_local (hostent_buf);
-    }
 
+  /* FIXME: Need some sort of atthreadexit function to allow things like
+     select to control this themselves. */
+
+  /* Close handle and free memory used by select. */
+  if (locals.select.sockevt)
+    {
+      CloseHandle (locals.select.sockevt);
+      locals.select.sockevt = NULL;
+      free_local (select.ser_num);
+      free_local (select.w4);
+    }
+  /* Free memory used by network functions. */
+  free_local (ntoa_buf);
+  free_local (protoent_buf);
+  free_local (servent_buf);
+  free_local (hostent_buf);
   /* Free temporary TLS path buffers. */
   locals.pathbufs.destroy ();
 
