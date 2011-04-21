@@ -10,6 +10,7 @@ details. */
 #include "winsup.h"
 #include "cygerrno.h"
 #include "perprocess.h"
+#include "sync.h"
 #include "dll_init.h"
 #include "environ.h"
 #include "security.h"
@@ -27,6 +28,8 @@ details. */
 extern void __stdcall check_sanity_and_sync (per_process *);
 
 dll_list dlls;
+
+muto dll_list::protect;
 
 static bool dll_global_dtors_recorded;
 
@@ -116,6 +119,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   WCHAR name[NT_MAX_PATH];
   DWORD namelen = GetModuleFileNameW (h, name, sizeof (name));
 
+  guard (true);
   /* Already loaded? */
   dll *d = dlls[name];
   if (d)
@@ -146,6 +150,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       if (type == DLL_LOAD)
 	loaded_dlls++;
     }
+  guard (false);
   assert (p->envptr != NULL);
   return d;
 }
@@ -170,27 +175,32 @@ void
 dll_list::detach (void *retaddr)
 {
   dll *d;
-  if (!myself || !(d = find (retaddr)))
+  if (!myself)
     return;
-  if (d->count <= 0)
-    system_printf ("WARNING: trying to detach an already detached dll ...");
-  if (--d->count == 0)
+  guard (true);
+  if ((d = find (retaddr)))
     {
-      /* Ensure our exception handler is enabled for destructors */
-      exception protect;
-      /* Call finalize function if we are not already exiting */
-      if (!exit_state)
-	__cxa_finalize (d);
-      d->run_dtors ();
-      d->prev->next = d->next;
-      if (d->next)
-	d->next->prev = d->prev;
-      if (d->type == DLL_LOAD)
-	loaded_dlls--;
-      if (end == d)
-	end = d->prev;
-      cfree (d);
+      if (d->count <= 0)
+	system_printf ("WARNING: trying to detach an already detached dll ...");
+      if (--d->count == 0)
+	{
+	  /* Ensure our exception handler is enabled for destructors */
+	  exception protect;
+	  /* Call finalize function if we are not already exiting */
+	  if (!exit_state)
+	    __cxa_finalize (d);
+	  d->run_dtors ();
+	  d->prev->next = d->next;
+	  if (d->next)
+	    d->next->prev = d->prev;
+	  if (d->type == DLL_LOAD)
+	    loaded_dlls--;
+	  if (end == d)
+	    end = d->prev;
+	  cfree (d);
+	}
     }
+  guard (false);
 }
 
 /* Initialization for all linked DLLs, called by dll_crt0_1. */

@@ -72,6 +72,7 @@ class dll_list
   dll *end;
   dll *hold;
   dll_type hold_type;
+  static muto protect;
 public:
   dll start;
   int tot;
@@ -90,13 +91,22 @@ public:
 	break;
     return hold;
   }
+
   dll *istart (dll_type t)
   {
     hold_type = t;
     hold = &start;
     return inext ();
   }
+  void guard(bool lockit)
+  {
+    if (lockit)
+      protect.acquire ();
+    else
+      protect.release ();
+  }
   friend void dll_global_dtors ();
+  dll_list () { protect.init ("dll_list"); }
 };
 
 extern dll_list dlls;

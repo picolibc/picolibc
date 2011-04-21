@@ -371,6 +371,9 @@ fhandler_termios::lseek (_off64_t, int)
 void
 fhandler_termios::sigflush ()
 {
-  if (!(get_ttyp ()->ti.c_lflag & NOFLSH))
+  /* FIXME: Checking get_ttyp() for NULL is not right since it should not
+     be NULL while this is alive.  However, we can conceivably close a
+     ctty while exiting and that will zero this. */
+  if (get_ttyp () && !(get_ttyp ()->ti.c_lflag & NOFLSH))
     tcflush (TCIFLUSH);
 }
