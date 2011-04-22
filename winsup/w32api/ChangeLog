@@ -1,5 +1,12 @@
 2011-04-21  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
+	* include/windef.h (PACKED): Remove macro.
+	* include/wincon.h: Replace PACKED macro with __attribute__((packed)).
+
+	Thanks to Keith Marshall for the fix.
+
+2011-04-21  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
 	* include/imagehlp.h (PREAD_PROCESS_MEMORY_ROUTINE): Correct definition.
 
 	Thanks to Safety0ff for the report.

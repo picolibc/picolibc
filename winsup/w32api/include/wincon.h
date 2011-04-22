@@ -105,7 +105,7 @@ typedef struct _KEY_EVENT_RECORD {
 }
 #ifdef __GNUC__
 /* gcc's alignment is not what win32 expects */
- PACKED
+ __attribute__((packed))
 #endif
 KEY_EVENT_RECORD;
 
