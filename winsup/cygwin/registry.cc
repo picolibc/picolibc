@@ -121,11 +121,11 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
     }
 }
 
-/* Given the current registry key, return the specific int value
+/* Given the current registry key, return the specific DWORD value
    requested.  Return def on failure. */
 
-int
-reg_key::get_int (PCWSTR name, int def)
+DWORD
+reg_key::get_dword (PCWSTR name, DWORD def)
 {
   if (key_is_invalid)
     return def;
@@ -142,14 +142,14 @@ reg_key::get_int (PCWSTR name, int def)
 			    size, &rsize);
   if (status != STATUS_SUCCESS || vbuf->Type != REG_DWORD)
     return def;
-  DWORD dst = *(DWORD *) vbuf->Data;
-  return (int) dst;
+  DWORD *dst = (DWORD *) vbuf->Data;
+  return *dst;
 }
 
-/* Given the current registry key, set a specific int value. */
+/* Given the current registry key, set a specific DWORD value. */
 
-int
-reg_key::set_int (PCWSTR name, int val)
+NTSTATUS
+reg_key::set_dword (PCWSTR name, DWORD val)
 {
   if (key_is_invalid)
     return key_is_invalid;
@@ -157,15 +157,13 @@ reg_key::set_int (PCWSTR name, int val)
   DWORD value = (DWORD) val;
   UNICODE_STRING uname;
   RtlInitUnicodeString (&uname, name);
-  NTSTATUS status = NtSetValueKey (key, &uname, 0, REG_DWORD, 
-				   &value, sizeof (value));
-  return (int) status;
+  return NtSetValueKey (key, &uname, 0, REG_DWORD, &value, sizeof (value));
 }
 
 /* Given the current registry key, return the specific string value
    requested.  Return zero on success, non-zero on failure. */
 
-int
+NTSTATUS
 reg_key::get_string (PCWSTR name, PWCHAR dst, size_t max, PCWSTR def)
 {
   NTSTATUS status;
@@ -193,12 +191,12 @@ reg_key::get_string (PCWSTR name, PWCHAR dst, size_t max, PCWSTR def)
 	wcpncpy (dst, (PWCHAR) vbuf->Data, max);
       
     }
-  return (int) status;
+  return status;
 }
 
 /* Given the current registry key, set a specific string value. */
 
-int
+NTSTATUS
 reg_key::set_string (PCWSTR name, PCWSTR src)
 {
   if (key_is_invalid)
@@ -206,9 +204,8 @@ reg_key::set_string (PCWSTR name, PCWSTR src)
 
   UNICODE_STRING uname;
   RtlInitUnicodeString (&uname, name);
-  NTSTATUS status = NtSetValueKey (key, &uname, 0, REG_SZ, (PVOID) src,
-				   (wcslen (src) + 1) * sizeof (WCHAR));
-  return (int) status;
+  return NtSetValueKey (key, &uname, 0, REG_SZ, (PVOID) src,
+			(wcslen (src) + 1) * sizeof (WCHAR));
 }
 
 reg_key::~reg_key ()

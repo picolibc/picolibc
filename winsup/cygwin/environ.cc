@@ -712,7 +712,8 @@ regopt (const WCHAR *name, char *buf)
     {
       reg_key r (i, KEY_READ, _WIDE (CYGWIN_INFO_PROGRAM_OPTIONS_NAME), NULL);
 
-      if (r.get_string (lname.Buffer, (PWCHAR) buf, NT_MAX_PATH, L"") == ERROR_SUCCESS)
+      if (NT_SUCCESS (r.get_string (lname.Buffer, (PWCHAR) buf,
+				    NT_MAX_PATH, L"")))
 	{
 	  char *newp;
 	  sys_wcstombs_alloc(&newp, HEAP_NOTHEAP, (PWCHAR) buf);

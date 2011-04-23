@@ -262,7 +262,7 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
 
   HWND forwin;
   DWORD forprocid;
-  int vfindex, slindex, qindex, prisep;
+  DWORD vfindex, slindex, qindex, prisep;
   long nsec;
 
   forwin = GetForegroundWindow ();
@@ -278,7 +278,7 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
       set_errno (ESRCH);
       return -1;
     }
-  prisep = reg.get_int (L"Win32PrioritySeparation", 2);
+  prisep = reg.get_dword (L"Win32PrioritySeparation", 2);
   pinfo pi (pid ? pid : myself->pid);
   if (!pi)
     {

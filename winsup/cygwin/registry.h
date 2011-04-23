@@ -25,13 +25,13 @@ public:
   void *operator new (size_t, void *p) {return p;}
   void build_reg (HKEY key, REGSAM access, va_list av);
 
-  int error () {return key == NULL;}
+  bool error () {return key == NULL;}
 
-  int get_int (PCWSTR, int);
-  int get_string (PCWSTR, PWCHAR, size_t, PCWSTR);
+  DWORD get_dword (PCWSTR, DWORD);
+  NTSTATUS get_string (PCWSTR, PWCHAR, size_t, PCWSTR);
 
-  int set_int (PCWSTR, int);
-  int set_string (PCWSTR, PCWSTR);
+  NTSTATUS set_dword (PCWSTR, DWORD);
+  NTSTATUS set_string (PCWSTR, PCWSTR);
 
   bool created () const {return _disposition & REG_CREATED_NEW_KEY;}
 

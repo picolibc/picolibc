@@ -111,8 +111,8 @@ init_installation_root ()
 	{
 	  reg_key r (i, KEY_WRITE, _WIDE (CYGWIN_INFO_INSTALLATIONS_NAME),
 		     NULL);
-	  if (r.set_string (installation_key_buf, installation_root)
-	      == ERROR_SUCCESS)
+	  if (NT_SUCCESS (r.set_string (installation_key_buf,
+					installation_root)))
 	    break;
 	}
 
@@ -450,7 +450,7 @@ shared_info::heap_slop_size ()
 	{
 	  reg_key reg (i, KEY_READ, NULL);
 
-	  if ((heap_slop = reg.get_int (L"heap_slop_in_mb", 0)))
+	  if ((heap_slop = reg.get_dword (L"heap_slop_in_mb", 0)))
 	    break;
 	  heap_slop = wincap.heapslop ();
 	}
@@ -476,7 +476,7 @@ shared_info::heap_chunk_size ()
 	  /* FIXME: We should not be restricted to a fixed size heap no matter
 	     what the fixed size is. */
 
-	  if ((heap_chunk = reg.get_int (L"heap_chunk_in_mb", 0)))
+	  if ((heap_chunk = reg.get_dword (L"heap_chunk_in_mb", 0)))
 	    break;
 	  heap_chunk = 384; /* Default */
 	}

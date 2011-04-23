@@ -1,6 +1,7 @@
 /* shared_info.h: shared info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009,
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -29,7 +30,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0xcebb78fcU
+#define CURR_SHARED_MAGIC 0x7f4db5d3U
 
 #define USER_VERSION   1
 #define CURR_USER_MAGIC 0x6112afb3U
@@ -42,9 +43,9 @@ class shared_info
   LONG version;
   DWORD cb;
  public:
-  unsigned heap_chunk;
+  DWORD heap_chunk;
   bool heap_slop_inited;
-  unsigned heap_slop;
+  DWORD heap_slop;
   DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;

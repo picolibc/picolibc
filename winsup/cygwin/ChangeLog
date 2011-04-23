@@ -1,3 +1,24 @@
+2011-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* registry.cc (reg_key::get_dword): Rename from get_int, use DWORD
+	rather than int type.  Avoid compiler warning.
+	(reg_key::set_dword): Rename from set_int, use DWORD rather than int
+	type.  Change return type to NTSTATUS.
+	(reg_key::get_string): Change return type to NTSTATUS.
+	(reg_key::set_string): Ditto.
+	* registry.h: Accommodate above changes.
+	* environ.cc (regopt): Test return value of reg_key::get_string as
+	NTSTATUS.
+	* sched.cc (sched_rr_get_interval): Change local int vars to DWORD.
+	Call reg_key::get_dword instead of reg_key::get_int.
+	* shared.cc (init_installation_root): Test return value of
+	reg_key::get_string as NTSTATUS.
+	(shared_info::heap_slop_size): Call reg_key::get_dword rather than
+	reg_key::get_int.
+	(shared_info::heap_chunk_size): Ditto.
+	* shared_info.h (CURR_SHARED_MAGIC): Update.
+	(class shared_info): Change heap_chunk and heap_slop to DWORD  values.
+
 2011-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::init_thread): Drop setting locals.process_logmask.
