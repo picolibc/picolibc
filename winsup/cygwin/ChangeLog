@@ -1,3 +1,7 @@
+2011-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/fenv.h: Add missing _FENV_H_ define.
+
 2011-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* registry.cc (reg_key::get_dword): Rename from get_int, use DWORD

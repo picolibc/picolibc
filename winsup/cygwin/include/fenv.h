@@ -1,6 +1,6 @@
 /* fenv.h
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #ifndef _FENV_H_
+#define _FENV_H_
 
 #ifdef __cplusplus
 extern "C" {
