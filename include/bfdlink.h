@@ -24,6 +24,12 @@
 #ifndef BFDLINK_H
 #define BFDLINK_H
 
+#if (__GNUC__ * 1000 + __GNUC_MINOR__ > 2000)
+#define ENUM_BITFIELD(TYPE) __extension__ enum TYPE
+#else
+#define ENUM_BITFIELD(TYPE) unsigned int
+#endif
+
 /* Which symbols to strip during a link.  */
 enum bfd_link_strip
 {
@@ -91,7 +97,9 @@ struct bfd_link_hash_entry
   struct bfd_hash_entry root;
 
   /* Type of this entry.  */
-  enum bfd_link_hash_type type;
+  ENUM_BITFIELD (bfd_link_hash_type) type : 8;
+
+  unsigned int non_ir_ref : 1;
 
   /* A union of information depending upon the type.  */
   union
@@ -570,11 +578,11 @@ struct bfd_link_callbacks
     (struct bfd_link_info *, const char *name,
      bfd *abfd, asection *section, bfd_vma address);
   /* A function which is called when a symbol in notice_hash is
-     defined or referenced.  NAME is the symbol.  ABFD, SECTION and
-     ADDRESS are the value of the symbol.  If SECTION is
+     defined or referenced.  H is the symbol.  ABFD, SECTION and
+     ADDRESS are the (new) value of the symbol.  If SECTION is
      bfd_und_section, this is a reference.  */
   bfd_boolean (*notice)
-    (struct bfd_link_info *, const char *name,
+    (struct bfd_link_info *, struct bfd_link_hash_entry *h,
      bfd *abfd, asection *section, bfd_vma address);
   /* Error or warning link info message.  */
   void (*einfo)
