@@ -24,12 +24,6 @@
 #ifndef BFDLINK_H
 #define BFDLINK_H
 
-#if (__GNUC__ * 1000 + __GNUC_MINOR__ > 2000)
-#define ENUM_BITFIELD(TYPE) __extension__ enum TYPE
-#else
-#define ENUM_BITFIELD(TYPE) unsigned int
-#endif
-
 /* Which symbols to strip during a link.  */
 enum bfd_link_strip
 {
