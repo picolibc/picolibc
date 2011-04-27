@@ -1,3 +1,13 @@
+2011-04-27  Tristan Gingold  <gingold@adacore.com>
+
+	* xcoff.h (F_FDPR_PROF, F_FDPR_OPTI, F_DSA, F_VARPG)
+	(STYP_DWARF, SSUBTYP_DWINFO)
+	(SSUBTYP_DWLINE, SSUBTYP_DWPBNMS, SSUBTYP_DWPBTYP)
+	(SSUBTYP_DWARNGE, SSUBTYP_DWABREV, SSUBTYP_DWSTR)
+	(SSUBTYP_DWRNGES, STYP_TDATA, STYP_TBSS, R_TLS, R_TLS_IE)
+	(R_TLS_LD, R_TLS_LE, R_TLSM, R_TLSML, R_TOCU, R_TOCL, C_DWARF):
+	New macros.
+
 2011-03-31  Tristan Gingold  <gingold@adacore.com>
 
 	* internal.h (C_NULL_VALUE): Define.
