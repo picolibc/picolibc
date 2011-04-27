@@ -1,3 +1,20 @@
+2011-04-27  Alan Modra  <amodra@gmail.com>
+
+	Backport from mainline.
+	2011-04-24  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	PR ld/12696
+	* bfdlink.h (ENUM_BITFIELD): Define.
+	(struct bfd_link_hash_entry): Make "type" a bitfield.  Add "non_ir_ref".
+	(struct bfd_link_callbacks <notice>): Pass bfd_link_hash_entry pointer
+	rather than "name".
+
+	2011-04-20  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	* bfdlink.h (struct bfd_link_callbacks): Modify multiple_definition
+	and multiple_common parameters to pass in a bfd_link_hash_entry
+	pointer rather than name,bfd etc. found in the hash entry.
+
 2010-11-25  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* opcode/s390.h (enum s390_opcode_cpu_val): Add S390_OPCODE_MAXCPU.
@@ -6,19 +23,19 @@
 
 	* simple-object.h: New file.
 
-2010-10-15  Dave Korn  <dave.korn.cygwin@gmail.com> 
+2010-10-15  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	Sync LD plugin patch series (part 1/6) with src/include/.
 	* plugin-api.h (LDPT_GNU_LD_VERSION): New ld_plugin_tag enum member.
 
-2010-10-14  Dave Korn  <dave.korn.cygwin@gmail.com> 
+2010-10-14  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	Apply LD plugin patch series (part 6/6).
 	* bfdlink.h (struct_bfd_link_callbacks): Document new argument
 	to add_archive_element callback used to return a replacement bfd which
 	is to be added to the hash table in place of the original element.
 
-2010-10-14  Dave Korn  <dave.korn.cygwin@gmail.com> 
+2010-10-14  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	Apply LD plugin patch series (part 1/6).
 	* plugin-api.h (LDPT_GNU_LD_VERSION): New ld_plugin_tag enum member.
