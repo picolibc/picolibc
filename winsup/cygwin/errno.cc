@@ -327,6 +327,12 @@ seterrno_from_win_error (const char *file, int line, DWORD code)
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
+int __stdcall
+geterrno_from_nt_status (NTSTATUS status, int deferrno)
+{
+  return geterrno_from_win_error (RtlNtStatusToDosError (status));
+}
+
 /* seterrno_from_nt_status: Given a NT status code, set errno
    as appropriate. */
 void __stdcall

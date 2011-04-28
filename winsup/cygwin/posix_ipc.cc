@@ -174,55 +174,104 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 static int
 ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
 {
-  struct timeval tv;
-  DWORD timeout;
-  HANDLE h[2] = { mtx, evt };
-  int err;
+  HANDLE w4[3] = { evt, signal_arrived, NULL };
+  DWORD cnt = 2;
+  int ret = 0;
 
-  if (!abstime)
-    timeout = INFINITE;
-  else if (abstime->tv_sec < 0
-	   || abstime->tv_nsec < 0
-	   || abstime->tv_nsec > 999999999)
-    return EINVAL;
-  else
+  if (abstime)
     {
-      gettimeofday (&tv, NULL);
-      /* Check for immediate timeout. */
-      if (tv.tv_sec > abstime->tv_sec
-	  || (tv.tv_sec == abstime->tv_sec
-	      && tv.tv_usec > abstime->tv_nsec / 1000))
-	return ETIMEDOUT;
-      timeout = (abstime->tv_sec - tv.tv_sec) * 1000;
-      timeout += (abstime->tv_nsec / 1000 - tv.tv_usec) / 1000;
+      if (abstime->tv_sec < 0
+	       || abstime->tv_nsec < 0
+	       || abstime->tv_nsec > 999999999)
+	return EINVAL;
+
+      /* If a timeout is set, we create a waitable timer to wait for.
+	 This is the easiest way to handle the absolute timeout value, given
+	 that NtSetTimer also takes absolute times and given the double
+	 dependency on evt *and* mtx, which requires to call WFMO twice. */
+      NTSTATUS status;
+      LARGE_INTEGER duetime;
+
+      status = NtCreateTimer (&w4[2], TIMER_ALL_ACCESS, NULL,
+			      NotificationTimer);
+      if (!NT_SUCCESS (status))
+	return geterrno_from_nt_status (status);
+      timespec_to_filetime (abstime, (FILETIME *) &duetime);
+      status = NtSetTimer (w4[2], &duetime, NULL, NULL, FALSE, 0, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  NtClose (w4[2]);
+	  return geterrno_from_nt_status (status);
+	}
+      cnt = 3;
     }
   ResetEvent (evt);
-  if ((err = ipc_mutex_unlock (mtx)) != 0)
-    return err;
-  switch (WaitForMultipleObjects (2, h, TRUE, timeout))
+  if ((ret = ipc_mutex_unlock (mtx)) != 0)
+    return ret;
+  /* Everything's set up, so now wait for the event to be signalled. */
+restart1:
+  switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
     {
     case WAIT_OBJECT_0:
-    case WAIT_ABANDONED_0:
-      return 0;
-    case WAIT_TIMEOUT:
-      ipc_mutex_lock (mtx);
-      return ETIMEDOUT;
+      break;
+    case WAIT_OBJECT_0 + 1:
+      if (_my_tls.call_signal_handler ())
+	goto restart1;
+      ret = EINTR;
+      break;
+    case WAIT_OBJECT_0 + 2:
+      pthread_testcancel ();
+      ret = ETIMEDOUT;
+      break;
     default:
+      ret = geterrno_from_win_error ();
       break;
     }
-  return geterrno_from_win_error ();
+  if (ret == 0)
+    {
+      /* At this point we need to lock the mutex.  The wait is practically
+	 the same as before, just that we now wait on the mutex instead of the
+	 event. */
+    restart2:
+      w4[0] = mtx;
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
+	{
+	case WAIT_OBJECT_0:
+	case WAIT_ABANDONED_0:
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  if (_my_tls.call_signal_handler ())
+	    goto restart2;
+	  ret = EINTR;
+	  break;
+	case WAIT_OBJECT_0 + 2:
+	  pthread_testcancel ();
+	  ret = ETIMEDOUT;
+	  break;
+	default:
+	  ret = geterrno_from_win_error ();
+	  break;
+	}
+    }
+  if (w4[2])
+    {
+      if (ret != ETIMEDOUT)
+	NtCancelTimer (w4[2], NULL);
+      NtClose (w4[2]);
+    }
+  return ret;
 }
 
-static inline int
+static inline void
 ipc_cond_signal (HANDLE evt)
 {
-  return SetEvent (evt) ? 0 : geterrno_from_win_error ();
+  SetEvent (evt);
 }
 
-static inline int
+static inline void
 ipc_cond_close (HANDLE evt)
 {
-  return CloseHandle (evt) ? 0 : geterrno_from_win_error ();
+  CloseHandle (evt);
 }
 
 class ipc_flock
@@ -736,7 +785,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 	  if (ret != 0)
 	    {
 	      set_errno (ret);
-	      goto err;
+	      return -1;
 	    }
 	}
     }
@@ -851,7 +900,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
 	  if (ret != 0)
 	    {
 	      set_errno (ret);
-	      goto err;
+	      return -1;
 	    }
 	}
       mqhdr->mqh_nwait--;

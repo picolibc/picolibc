@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008, 2009 Red Hat, Inc.
+   Copyright 2003, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 

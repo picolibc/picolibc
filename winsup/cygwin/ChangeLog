@@ -1,5 +1,27 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygerrno.h (geterrno_from_nt_status): Declare.
+	* errno.cc (geterrno_from_nt_status): Define.
+	* flock.cc: Fix copyright dates.
+	* ntdll.h (enum _TIMER_TYPE): Define.
+	(PTIMER_APC_ROUTINE): Define.
+	(NtCancelTimer): Declare.
+	(NtCreateTimer): Declare.
+	(NtSetTimer): Declare.
+	* posix_ipc.cc (ipc_cond_timedwait): Rewrite to make interruptible and
+	restartable.  Call pthread_testcancel in case of timeout to enable
+	pthread_cancel on waiting thread.  Replace WFMO timeout with waiting
+	for a waitable timer.  Explain why.  Replace single call to WFMO with
+	two calls, one for the event, one for the mutex.  Don't lock mutex in
+	case of error.
+	(ipc_cond_signal): Make void function.
+	(ipc_cond_close): Ditto.
+	(_mq_send): Immediately return -1 in case of error from
+	ipc_cond_timedwait.
+	(_mq_receive): Ditto.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc (GetSecurityDescriptorDacl): Remove.
 	(GetSecurityDescriptorGroup): Remove.
 	(GetSecurityDescriptorOwner): Remove.
