@@ -220,7 +220,6 @@ restart1:
       ret = EINTR;
       break;
     case WAIT_OBJECT_0 + 2:
-      pthread_testcancel ();
       ret = ETIMEDOUT;
       break;
     default:
@@ -245,7 +244,6 @@ restart1:
 	  ret = EINTR;
 	  break;
 	case WAIT_OBJECT_0 + 2:
-	  pthread_testcancel ();
 	  ret = ETIMEDOUT;
 	  break;
 	default:
@@ -729,6 +727,8 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
   struct msg_hdr *msghdr, *nmsghdr, *pmsghdr;
   struct mq_info *mqinfo;
 
+  pthread_testcancel ();
+
   myfault efault;
   if (efault.faulted (EBADF))
       return -1;
@@ -859,6 +859,8 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   struct mq_attr *attr;
   struct msg_hdr *msghdr;
   struct mq_info *mqinfo;
+
+  pthread_testcancel ();
 
   myfault efault;
   if (efault.faulted (EBADF))
