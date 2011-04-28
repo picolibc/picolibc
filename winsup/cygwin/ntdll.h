@@ -1,7 +1,7 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1105,12 +1105,18 @@ extern "C"
   LONG NTAPI RtlCompareUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 				      BOOLEAN);
   NTSTATUS NTAPI RtlConvertSidToUnicodeString (PUNICODE_STRING, PSID, BOOLEAN);
-  VOID NTAPI RtlCopyUnicodeString (PUNICODE_STRING, PUNICODE_STRING);
+  NTSTATUS NTAPI RtlConvertToAutoInheritSecurityObject (PSECURITY_DESCRIPTOR,
+  							PSECURITY_DESCRIPTOR,
+							PSECURITY_DESCRIPTOR *,
+							GUID *, BOOLEAN,
+							PGENERIC_MAPPING);
   NTSTATUS NTAPI RtlCopySid (ULONG, PSID, PSID);
+  VOID NTAPI RtlCopyUnicodeString (PUNICODE_STRING, PUNICODE_STRING);
   NTSTATUS NTAPI RtlCreateAcl (PACL, ULONG, ULONG);
   NTSTATUS NTAPI RtlCreateRegistryKey (ULONG, PCWSTR);
   NTSTATUS NTAPI RtlCreateSecurityDescriptor (PSECURITY_DESCRIPTOR, ULONG);
   BOOLEAN NTAPI RtlCreateUnicodeStringFromAsciiz (PUNICODE_STRING, PCSTR);
+  NTSTATUS NTAPI RtlDeleteSecurityObject (PSECURITY_DESCRIPTOR *);
   NTSTATUS NTAPI RtlDowncaseUnicodeString (PUNICODE_STRING, PUNICODE_STRING,
 					   BOOLEAN);
   NTSTATUS NTAPI RtlEnterCriticalSection (PRTL_CRITICAL_SECTION);
@@ -1124,6 +1130,9 @@ extern "C"
   VOID NTAPI RtlFreeUnicodeString (PUNICODE_STRING);
   BOOLEAN NTAPI RtlFirstFreeAce (PACL, PVOID *);
   NTSTATUS NTAPI RtlGetAce (PACL, ULONG, PVOID);
+  NTSTATUS NTAPI RtlGetControlSecurityDescriptor (PSECURITY_DESCRIPTOR,
+						  PSECURITY_DESCRIPTOR_CONTROL,
+						  PULONG);
   HANDLE NTAPI RtlGetCurrentTransaction ();
   NTSTATUS NTAPI RtlGetDaclSecurityDescriptor (PSECURITY_DESCRIPTOR, PBOOLEAN,
 					       PACL *, PBOOLEAN);
@@ -1138,6 +1147,7 @@ extern "C"
   NTSTATUS NTAPI RtlIntegerToUnicodeString (ULONG, ULONG, PUNICODE_STRING);
   ULONG NTAPI RtlIsDosDeviceName_U (PCWSTR);
   NTSTATUS NTAPI RtlLeaveCriticalSection (PRTL_CRITICAL_SECTION);
+  ULONG NTAPI RtlLengthSecurityDescriptor (PSECURITY_DESCRIPTOR);
   ULONG NTAPI RtlLengthSid (PSID);
   ULONG NTAPI RtlNtStatusToDosError (NTSTATUS);
   NTSTATUS NTAPI RtlOemStringToUnicodeString (PUNICODE_STRING, POEM_STRING,

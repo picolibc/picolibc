@@ -1,3 +1,20 @@
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetSecurityInfo): Remove.
+	* ntdll.h (RtlConvertToAutoInheritSecurityObject): Declare.
+	(RtlDeleteSecurityObject): Declare.
+	(RtlGetControlSecurityDescriptor): Declare.
+	(RtlLengthSecurityDescriptor): Declare.
+	* security.cc (file_mapping): New global variable.
+	(get_file_sd): Rewrite.  Clean up code.  Get rid of GetSecurityInfo
+	call.
+	(alloc_sd): Call RtlSetControlSecurityDescriptor to set
+	SE_DACL_PROTECTED flag.
+	(check_file_access): Remove mapping.  Use file_mapping instead.
+	(check_registry_access): Rename mapping to reg_mapping.
+	* wincap.cc: Througout, drop use_get_sec_info_on_dirs,
+	* wincap.h (struct wincaps): Drop use_get_sec_info_on_dirs.
+
 2011-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/fenv.h: Add missing _FENV_H_ define.

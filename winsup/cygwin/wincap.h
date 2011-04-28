@@ -43,7 +43,6 @@ struct wincaps
   unsigned has_fast_cwd					: 1;
   unsigned has_restricted_raw_disk_access		: 1;
   unsigned use_dont_resolve_hack			: 1;
-  unsigned use_get_sec_info_on_dirs			: 1;
 };
 
 class wincapc
@@ -92,7 +91,6 @@ public:
   bool	IMPLEMENT (has_fast_cwd)
   bool	IMPLEMENT (has_restricted_raw_disk_access)
   bool	IMPLEMENT (use_dont_resolve_hack)
-  bool	IMPLEMENT (use_get_sec_info_on_dirs)
 
 #undef IMPLEMENT
 };
