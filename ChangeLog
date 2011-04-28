@@ -1,5 +1,15 @@
 2011-04-28  Joseph Myers  <joseph@codesourcery.com>
 
+	Merge from GCC:
+
+	2011-04-18  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	PR lto/48086
+	* configure.ac: Re-enable LTO on *-apple-darwin9*.
+	* configure: Regenerate.
+
+2011-04-28  Joseph Myers  <joseph@codesourcery.com>
+
 	* configure.ac: Separate cases disabling Java and Java libraries
 	from general case over targets.
 	* configure: Regenerate.
