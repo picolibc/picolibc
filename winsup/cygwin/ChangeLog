@@ -1,5 +1,11 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc (ipc_cond_timedwait): Also wait for pthread's
+	cancel_event, if any.  Call pthread_testcancel if cancel_event has been
+	signalled.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix_ipc.cc (ipc_cond_timedwait): Remove pthread_testcancel calls.
 	(_mq_send): Add pthread_testcancel call at start of function.
 	(_mq_receive): Ditto.

@@ -174,10 +174,15 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 static int
 ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
 {
-  HANDLE w4[3] = { evt, signal_arrived, NULL };
+  pthread_t thread;
+  HANDLE w4[4] = { evt, signal_arrived, NULL, NULL };
   DWORD cnt = 2;
+  DWORD timer_idx = 0;
   int ret = 0;
 
+  thread = pthread::self ();
+  if (thread && thread->cancel_event)
+    w4[cnt++] = thread->cancel_event;
   if (abstime)
     {
       if (abstime->tv_sec < 0
@@ -192,18 +197,18 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
       NTSTATUS status;
       LARGE_INTEGER duetime;
 
-      status = NtCreateTimer (&w4[2], TIMER_ALL_ACCESS, NULL,
+      timer_idx = cnt++;
+      status = NtCreateTimer (&w4[timer_idx], TIMER_ALL_ACCESS, NULL,
 			      NotificationTimer);
       if (!NT_SUCCESS (status))
 	return geterrno_from_nt_status (status);
       timespec_to_filetime (abstime, (FILETIME *) &duetime);
-      status = NtSetTimer (w4[2], &duetime, NULL, NULL, FALSE, 0, NULL);
+      status = NtSetTimer (w4[timer_idx], &duetime, NULL, NULL, FALSE, 0, NULL);
       if (!NT_SUCCESS (status))
 	{
-	  NtClose (w4[2]);
+	  NtClose (w4[timer_idx]);
 	  return geterrno_from_nt_status (status);
 	}
-      cnt = 3;
     }
   ResetEvent (evt);
   if ((ret = ipc_mutex_unlock (mtx)) != 0)
@@ -220,6 +225,10 @@ restart1:
       ret = EINTR;
       break;
     case WAIT_OBJECT_0 + 2:
+      if (timer_idx != 2)
+      	pthread_testcancel ();
+      /*FALLTHRU*/
+    case WAIT_OBJECT_0 + 3:
       ret = ETIMEDOUT;
       break;
     default:
@@ -244,6 +253,10 @@ restart1:
 	  ret = EINTR;
 	  break;
 	case WAIT_OBJECT_0 + 2:
+	  if (timer_idx != 2)
+	    pthread_testcancel ();
+	  /*FALLTHRU*/
+	case WAIT_OBJECT_0 + 3:
 	  ret = ETIMEDOUT;
 	  break;
 	default:
@@ -251,11 +264,11 @@ restart1:
 	  break;
 	}
     }
-  if (w4[2])
+  if (timer_idx)
     {
       if (ret != ETIMEDOUT)
-	NtCancelTimer (w4[2], NULL);
-      NtClose (w4[2]);
+	NtCancelTimer (w4[timer_idx], NULL);
+      NtClose (w4[timer_idx]);
     }
   return ret;
 }
