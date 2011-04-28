@@ -41,22 +41,9 @@ PrivilegeCheck (HANDLE tok, PPRIVILEGE_SET pset, LPBOOL res)
 }
 
 BOOL WINAPI
-InitializeSid (PSID sid, PSID_IDENTIFIER_AUTHORITY auth, BYTE count)
-{
-  NTSTATUS status = RtlInitializeSid (sid, auth, count);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 EqualSid (PSID sid1, PSID sid2)
 {
   return !!RtlEqualSid (sid1, sid2);
-}
-
-BOOL WINAPI
-EqualPrefixSid (PSID sid1, PSID sid2)
-{
-  return !!RtlEqualPrefixSid (sid1, sid2);
 }
 
 BOOL WINAPI
@@ -64,30 +51,6 @@ CopySid (DWORD len, PSID dest, PSID src)
 {
   NTSTATUS status = RtlCopySid (len, dest, src);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-DWORD WINAPI
-GetLengthSid (PSID sid)
-{
-  return RtlLengthSid (sid);
-}
-
-PDWORD WINAPI
-GetSidSubAuthority (PSID sid, DWORD subauth)
-{
-  return RtlSubAuthoritySid (sid, subauth);
-}
-
-PUCHAR WINAPI
-GetSidSubAuthorityCount (PSID sid)
-{
-  return RtlSubAuthorityCountSid (sid);
-}
-
-PSID_IDENTIFIER_AUTHORITY WINAPI
-GetSidIdentifierAuthority (PSID sid)
-{
-  return RtlIdentifierAuthoritySid (sid);
 }
 
 BOOL WINAPI

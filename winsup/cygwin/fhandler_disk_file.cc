@@ -926,7 +926,8 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 
 	  if (old_uid == ILLEGAL_UID
 	      || (sid.getfrompw (internal_getpwuid (old_uid))
-		  && EqualPrefixSid (sid, well_known_samba_unix_user_fake_sid)))
+		  && RtlEqualPrefixSid (sid,
+					well_known_samba_unix_user_fake_sid)))
 	    {
 	      debug_printf ("Faking chown worked on standalone Samba");
 	      res = 0;

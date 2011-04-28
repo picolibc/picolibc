@@ -1007,7 +1007,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   tmpidx = -1;
   for (int i = 0; i < non_well_known_cnt; ++i)
     if ((tmpidx = tmp_gsids.next_non_well_known_sid (tmpidx)) >= 0)
-      gsize += GetLengthSid (tmp_gsids.sids[tmpidx]);
+      gsize += RtlLengthSid (tmp_gsids.sids[tmpidx]);
 
   /* Retrieve list of privileges of that user. */
   if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
@@ -1015,9 +1015,9 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   /* Create DefaultDacl. */
   dsize = sizeof (ACL) + 3 * sizeof (ACCESS_ALLOWED_ACE)
-	  + GetLengthSid (usersid)
-	  + GetLengthSid (well_known_admins_sid)
-	  + GetLengthSid (well_known_system_sid);
+	  + RtlLengthSid (usersid)
+	  + RtlLengthSid (well_known_admins_sid)
+	  + RtlLengthSid (well_known_system_sid);
   dacl = (PACL) alloca (dsize);
   if (!InitializeAcl (dacl, dsize, ACL_REVISION))
     goto out;
@@ -1032,7 +1032,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 
   /* Evaluate authinf size and allocate authinf. */
   authinf_size = (authinf->data - (PBYTE) authinf);
-  authinf_size += GetLengthSid (usersid);	    /* User SID */
+  authinf_size += RtlLengthSid (usersid);	    /* User SID */
   authinf_size += gsize;			    /* Groups + Group SIDs */
   /* When trying to define the admins group as primary group on Vista,
      LsaLogonUser fails with error STATUS_INVALID_OWNER.  As workaround
@@ -1043,7 +1043,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   else
     pgrpsid = new_groups.pgsid;
 
-  authinf_size += GetLengthSid (pgrpsid);	    /* Primary Group SID */
+  authinf_size += RtlLengthSid (pgrpsid);	    /* Primary Group SID */
 
   authinf_size += psize;			    /* Privileges */
   authinf_size += 0;				    /* Owner SID */
@@ -1070,9 +1070,9 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* User SID */
   authinf->inf.User.User.Sid = offset;
   authinf->inf.User.User.Attributes = 0;
-  CopySid (GetLengthSid (usersid), (PSID) ((PBYTE) &authinf->inf + offset),
+  CopySid (RtlLengthSid (usersid), (PSID) ((PBYTE) &authinf->inf + offset),
 	   usersid);
-  offset += GetLengthSid (usersid);
+  offset += RtlLengthSid (usersid);
   /* Groups */
   authinf->inf.Groups = offset;
   gsids = (PCYG_TOKEN_GROUPS) ((PBYTE) &authinf->inf + offset);
@@ -1093,17 +1093,17 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       if (wincap.needs_logon_sid_in_sid_list ()
 	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
 	gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
-      CopySid (GetLengthSid (tmp_gsids.sids[tmpidx]),
+      CopySid (RtlLengthSid (tmp_gsids.sids[tmpidx]),
 	       (PSID) ((PBYTE) &authinf->inf + sids_offset),
 	       tmp_gsids.sids[tmpidx]);
-      sids_offset += GetLengthSid (tmp_gsids.sids[tmpidx]);
+      sids_offset += RtlLengthSid (tmp_gsids.sids[tmpidx]);
     }
   offset += gsize;
   /* Primary Group SID */
   authinf->inf.PrimaryGroup.PrimaryGroup = offset;
-  CopySid (GetLengthSid (pgrpsid), (PSID) ((PBYTE) &authinf->inf + offset),
+  CopySid (RtlLengthSid (pgrpsid), (PSID) ((PBYTE) &authinf->inf + offset),
 	   pgrpsid);
-  offset += GetLengthSid (pgrpsid);
+  offset += RtlLengthSid (pgrpsid);
   /* Privileges */
   authinf->inf.Privileges = offset;
   memcpy ((PBYTE) &authinf->inf + offset, privs, psize);

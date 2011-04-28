@@ -474,7 +474,7 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
   ACCESS_ALLOWED_ACE *ace;
   if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
-  len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
+  len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
 }
 
@@ -490,7 +490,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
   ACCESS_DENIED_ACE *ace;
   if (inherit && GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
-  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + GetLengthSid (sid);
+  len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
 }
 

@@ -140,9 +140,9 @@ cygpsid::string (char *nsidstr) const
     return NULL;
   strcpy (nsidstr, "S-1-");
   t = nsidstr + sizeof ("S-1-") - 1;
-  t += __small_sprintf (t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
-  for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
-    t += __small_sprintf (t, "-%lu", *GetSidSubAuthority (psid, i));
+  t += __small_sprintf (t, "%u", RtlIdentifierAuthoritySid (psid)->Value[5]);
+  for (i = 0; i < *RtlSubAuthorityCountSid (psid); ++i)
+    t += __small_sprintf (t, "-%lu", *RtlSubAuthoritySid (psid, i));
   return nsidstr;
 }
 
@@ -160,7 +160,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
     }
   sid_auth.Value[5] = s;
   set ();
-  InitializeSid (psid, &sid_auth, cnt);
+  RtlInitializeSid (psid, &sid_auth, cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   /* If the well_known flag isn't set explicitely, we check the SID
