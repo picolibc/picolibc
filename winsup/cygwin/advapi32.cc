@@ -76,29 +76,6 @@ MakeSelfRelativeSD (PSECURITY_DESCRIPTOR abs_sd, PSECURITY_DESCRIPTOR rel_sd,
 }
 
 BOOL WINAPI
-SetSecurityDescriptorDacl (PSECURITY_DESCRIPTOR sd, BOOL present, PACL dacl,
-			   BOOL def)
-{
-  NTSTATUS status = RtlSetDaclSecurityDescriptor (sd, (BOOLEAN) !!present, dacl,
-						  (BOOLEAN) !!def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-SetSecurityDescriptorGroup (PSECURITY_DESCRIPTOR sd, PSID sid, BOOL def)
-{
-  NTSTATUS status = RtlSetGroupSecurityDescriptor (sd, sid, (BOOLEAN) !!def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-SetSecurityDescriptorOwner (PSECURITY_DESCRIPTOR sd, PSID sid, BOOL def)
-{
-  NTSTATUS status = RtlSetOwnerSecurityDescriptor (sd, sid, (BOOLEAN) !!def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 OpenThreadToken (HANDLE thread, DWORD access, BOOL as_self, PHANDLE tok)
 {
   NTSTATUS status = NtOpenThreadToken (thread, access, as_self, tok);

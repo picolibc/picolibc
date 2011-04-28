@@ -557,16 +557,18 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 
   /* Create owner for local security descriptor. */
-  if (!SetSecurityDescriptorOwner (&sd, owner_sid, FALSE))
+  status = RtlSetOwnerSecurityDescriptor (&sd, owner_sid, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return NULL;
     }
 
   /* Create group for local security descriptor. */
-  if (!SetSecurityDescriptorGroup (&sd, group_sid, FALSE))
+  status = RtlSetGroupSecurityDescriptor (&sd, group_sid, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return NULL;
     }
 
@@ -828,9 +830,10 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   debug_printf ("ACL-Size: %d", acl_len);
 
   /* Create DACL for local security descriptor. */
-  if (!SetSecurityDescriptorDacl (&sd, TRUE, acl, FALSE))
+  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return NULL;
     }
 

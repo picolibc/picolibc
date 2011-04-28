@@ -1,5 +1,18 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* advapi32.cc (SetSecurityDescriptorDacl): Remove.
+	(SetSecurityDescriptorGroup): Remove.
+	(SetSecurityDescriptorOwner): Remove.
+	* pinfo.cc: Replace above functions throughout with their ntdll.dll
+	equivalent.
+	* sec_acl.cc: Ditto.
+	* sec_helper.cc: Ditto.
+	* security.cc: Ditto.
+
+	* sec_helper.cc (__sec_user): Remove old comment.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix_ipc.cc (ipc_cond_timedwait): Also wait for pthread's
 	cancel_event, if any.  Call pthread_testcancel if cancel_event has been
 	signalled.

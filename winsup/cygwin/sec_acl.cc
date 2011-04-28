@@ -73,14 +73,16 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!SetSecurityDescriptorOwner (&sd, owner, FALSE))
+  status = RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
-  if (!SetSecurityDescriptorGroup (&sd, group, FALSE))
+  status = RtlSetGroupSecurityDescriptor (&sd, group, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
 
@@ -201,9 +203,10 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   acl->AclSize = acl_len;
   debug_printf ("ACL-Size: %d", acl_len);
   /* Create DACL for local security descriptor. */
-  if (!SetSecurityDescriptorDacl (&sd, TRUE, acl, FALSE))
+  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   /* Make self relative security descriptor in sd_ret. */

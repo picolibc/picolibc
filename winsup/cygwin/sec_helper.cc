@@ -464,7 +464,7 @@ get_null_sd ()
   if (!null_sdp)
     {
       RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      SetSecurityDescriptorDacl (&sd, TRUE, NULL, FALSE);
+      RtlSetDaclSecurityDescriptor (&sd, TRUE, NULL, FALSE);
       null_sdp = &sd;
     }
   return null_sdp;
@@ -539,6 +539,7 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
 			     ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
+  NTSTATUS status;
 
 #ifdef DEBUGGING
   if ((unsigned long) sa_buf % 4)
@@ -548,19 +549,9 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
     return inherit ? &sec_none : &sec_none_nih;
 
   RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
-
-/*
- * Setting the owner lets the created security attribute not work
- * on NT4 SP3 Server. Don't know why, but the function still does
- * what it should do also if the owner isn't set.
-*/
-#if 0
-  if (!SetSecurityDescriptorOwner (psd, sid, FALSE))
-    debug_printf ("SetSecurityDescriptorOwner %E");
-#endif
-
-  if (!SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
-    debug_printf ("SetSecurityDescriptorDacl %E");
+  status = RtlSetDaclSecurityDescriptor (psd, TRUE, acl, FALSE);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
 
   psa->nLength = sizeof (SECURITY_ATTRIBUTES);
   psa->lpSecurityDescriptor = psd;
@@ -597,7 +588,7 @@ _everyone_sd (void *buf, ACCESS_MASK access)
 	  return NULL;
 	}
       dacl->AclSize = (char *) ace - (char *) dacl;
-      SetSecurityDescriptorDacl (psd, TRUE, dacl, FALSE);
+      RtlSetDaclSecurityDescriptor (psd, TRUE, dacl, FALSE);
     }
   return psd;
 }

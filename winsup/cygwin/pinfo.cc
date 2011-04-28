@@ -351,10 +351,11 @@ pinfo::set_acl()
   sec_acl (acl_buf, true, true, cygheap->user.sid (),
 	   well_known_world_sid, FILE_MAP_READ);
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!SetSecurityDescriptorDacl (&sd, TRUE, acl_buf, FALSE))
-    debug_printf ("SetSecurityDescriptorDacl %E");
+  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl_buf, FALSE);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
   else if ((status = NtSetSecurityObject (h, DACL_SECURITY_INFORMATION, &sd)))
-    debug_printf ("NtSetSecurityObject %lx", status);
+    debug_printf ("NtSetSecurityObject %p", status);
 }
 
 const char *
