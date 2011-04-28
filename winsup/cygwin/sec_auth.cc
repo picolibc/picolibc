@@ -692,9 +692,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 				      sd_buf, sd_buf_siz, &size);
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQuerySecurityObject(), %p", status);
-      else if (!GetSecurityDescriptorGroup (sd_buf, (PSID *) &gsid,
-					    (BOOL *) &size))
-	debug_printf ("GetSecurityDescriptorGroup(), %E");
+      else
+	{
+	  BOOLEAN dummy;
+	  status = RtlGetGroupSecurityDescriptor (sd_buf, (PSID *) &gsid,
+						  &dummy);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("RtlGetGroupSecurityDescriptor(), %p", status);
+	}
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
     }

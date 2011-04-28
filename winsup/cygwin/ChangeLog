@@ -1,5 +1,16 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* advapi32.cc (GetSecurityDescriptorDacl): Remove.
+	(GetSecurityDescriptorGroup): Remove.
+	(GetSecurityDescriptorOwner): Remove.
+	* sec_acl.cc: Replace above functions throughout with their ntdll.dll
+	equivalent.  Remove redundant debug output.
+	* sec_auth.cc: Ditto.
+	* security.cc: Ditto.
+	* uinfo.cc: Ditto.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc (InitializeAcl): Remove.
 	(AddAce): Remove.
 	(FindFirstFreeAce): Remove.

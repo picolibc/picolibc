@@ -76,15 +76,6 @@ MakeSelfRelativeSD (PSECURITY_DESCRIPTOR abs_sd, PSECURITY_DESCRIPTOR rel_sd,
 }
 
 BOOL WINAPI
-GetSecurityDescriptorDacl (PSECURITY_DESCRIPTOR sd, LPBOOL present, PACL *dacl,
-			   LPBOOL def)
-{
-  NTSTATUS status = RtlGetDaclSecurityDescriptor (sd, (PBOOLEAN) present, dacl,
-						  (PBOOLEAN) def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 SetSecurityDescriptorDacl (PSECURITY_DESCRIPTOR sd, BOOL present, PACL dacl,
 			   BOOL def)
 {
@@ -94,23 +85,9 @@ SetSecurityDescriptorDacl (PSECURITY_DESCRIPTOR sd, BOOL present, PACL dacl,
 }
 
 BOOL WINAPI
-GetSecurityDescriptorGroup (PSECURITY_DESCRIPTOR sd, PSID *sid, LPBOOL def)
-{
-  NTSTATUS status = RtlGetGroupSecurityDescriptor (sd, sid, (PBOOLEAN) def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 SetSecurityDescriptorGroup (PSECURITY_DESCRIPTOR sd, PSID sid, BOOL def)
 {
   NTSTATUS status = RtlSetGroupSecurityDescriptor (sd, sid, (BOOLEAN) !!def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-GetSecurityDescriptorOwner (PSECURITY_DESCRIPTOR sd, PSID *sid, LPBOOL def)
-{
-  NTSTATUS status = RtlGetOwnerSecurityDescriptor (sd, sid, (PBOOLEAN) def);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 

@@ -47,22 +47,25 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   if (get_file_sd (handle, pc, sd_ret, false))
     return -1;
 
-  BOOL dummy;
+  NTSTATUS status;
+  BOOLEAN dummy;
 
   /* Get owner SID. */
   PSID owner_sid;
-  if (!GetSecurityDescriptorOwner (sd_ret, &owner_sid, &dummy))
+  status = RtlGetOwnerSecurityDescriptor (sd_ret, &owner_sid, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   cygsid owner (owner_sid);
 
   /* Get group SID. */
   PSID group_sid;
-  if (!GetSecurityDescriptorGroup (sd_ret, &group_sid, &dummy))
+  status = RtlGetGroupSecurityDescriptor (sd_ret, &group_sid, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   cygsid group (group_sid);
@@ -272,22 +275,23 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 
   cygpsid owner_sid;
   cygpsid group_sid;
-  BOOL dummy;
+  NTSTATUS status;
+  BOOLEAN dummy;
   __uid32_t uid;
   __gid32_t gid;
 
-  if (!GetSecurityDescriptorOwner (sd, (PSID *) &owner_sid, &dummy))
+  status = RtlGetOwnerSecurityDescriptor (sd, (PSID *) &owner_sid, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("GetSecurityDescriptorOwner %E");
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   uid = owner_sid.get_uid ();
 
-  if (!GetSecurityDescriptorGroup (sd, (PSID *) &group_sid, &dummy))
+  status = RtlGetGroupSecurityDescriptor (sd, (PSID *) &group_sid, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("GetSecurityDescriptorGroup %E");
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   gid = group_sid.get_gid ();
@@ -305,12 +309,12 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
   lacl[3].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
 
   PACL acl;
-  BOOL acl_exists;
+  BOOLEAN acl_exists;
 
-  if (!GetSecurityDescriptorDacl (sd, &acl_exists, &acl, &dummy))
+  status = RtlGetDaclSecurityDescriptor (sd, &acl_exists, &acl, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
-      debug_printf ("GetSecurityDescriptorDacl %E");
+      __seterrno_from_nt_status (status);
       return -1;
     }
 

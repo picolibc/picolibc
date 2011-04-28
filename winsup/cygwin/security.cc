@@ -347,12 +347,15 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 
   cygpsid owner_sid;
   cygpsid group_sid;
-  BOOL dummy;
+  NTSTATUS status;
+  BOOLEAN dummy;
 
-  if (!GetSecurityDescriptorOwner (psd, (PSID *) &owner_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorOwner %E");
-  if (!GetSecurityDescriptorGroup (psd, (PSID *) &group_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorGroup %E");
+  status = RtlGetOwnerSecurityDescriptor (psd, (PSID *) &owner_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlGetOwnerSecurityDescriptor: %p", status);
+  status = RtlGetGroupSecurityDescriptor (psd, (PSID *) &group_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlGetGroupSecurityDescriptor: %p", status);
 
   __uid32_t uid;
   __gid32_t gid;
@@ -369,12 +372,12 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
     }
 
   PACL acl;
-  BOOL acl_exists;
+  BOOLEAN acl_exists;
 
-  if (!GetSecurityDescriptorDacl (psd, &acl_exists, &acl, &dummy))
+  status = RtlGetDaclSecurityDescriptor (psd, &acl_exists, &acl, &dummy);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
-      debug_printf ("GetSecurityDescriptorDacl %E");
+      __seterrno_from_nt_status (status);
       *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
     }
   else if (!acl_exists || !acl)
@@ -498,7 +501,8 @@ static PSECURITY_DESCRIPTOR
 alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	  security_descriptor &sd_ret)
 {
-  BOOL dummy;
+  NTSTATUS status;
+  BOOLEAN dummy;
   tmp_pathbuf tp;
 
   /* NOTE: If the high bit of attribute is set, we have just created
@@ -509,10 +513,12 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
   PSID cur_group_sid = NULL;
-  if (!GetSecurityDescriptorOwner (sd_ret, &cur_owner_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorOwner %E");
-  if (!GetSecurityDescriptorGroup (sd_ret, &cur_group_sid, &dummy))
-    debug_printf ("GetSecurityDescriptorGroup %E");
+  status = RtlGetOwnerSecurityDescriptor (sd_ret, &cur_owner_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlGetOwnerSecurityDescriptor: %p", status);
+  status = RtlGetGroupSecurityDescriptor (sd_ret, &cur_group_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlGetGroupSecurityDescriptor: %p", status);
 
   /* Get SID of owner. */
   cygsid owner_sid;
@@ -703,12 +709,11 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 
   /* Fill ACL with unrelated ACEs from current security descriptor. */
   PACL oacl;
-  BOOL acl_exists = FALSE;
+  BOOLEAN acl_exists = FALSE;
   ACCESS_ALLOWED_ACE *ace;
-  NTSTATUS status;
 
-  if (GetSecurityDescriptorDacl (sd_ret, &acl_exists, &oacl, &dummy)
-      && acl_exists && oacl)
+  status = RtlGetDaclSecurityDescriptor (sd_ret, &acl_exists, &oacl, &dummy);
+  if (NT_SUCCESS (status) && acl_exists && oacl)
     for (DWORD i = 0; i < oacl->AceCount; ++i)
       if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
 	{

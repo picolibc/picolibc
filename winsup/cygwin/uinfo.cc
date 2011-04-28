@@ -84,12 +84,14 @@ cygheap_user::init ()
   psd = (PSECURITY_DESCRIPTOR)
   		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
-  BOOL acl_exists, dummy;
+  NTSTATUS status;
+  BOOLEAN acl_exists, dummy;
   TOKEN_DEFAULT_DACL dacl;
-  if (GetSecurityDescriptorDacl (psd, &acl_exists, &dacl.DefaultDacl, &dummy)
-      && acl_exists && dacl.DefaultDacl)
+
+  status = RtlGetDaclSecurityDescriptor (psd, &acl_exists, &dacl.DefaultDacl,
+					 &dummy);
+  if (NT_SUCCESS (status) && acl_exists && dacl.DefaultDacl)
     {
-      NTSTATUS status;
 
       /* Set the default DACL and the process DACL */
       if (!SetTokenInformation (hProcToken, TokenDefaultDacl, &dacl,
