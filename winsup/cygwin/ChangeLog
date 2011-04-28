@@ -1,5 +1,13 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* advapi32.cc (AllocateLocallyUniqueId): Remove.
+	* fhandler_disk_file.cc (fhandler_base::open_fs): Replace call to
+	AllocateLocallyUniqueId with call to NtAllocateLocallyUniqueId;
+	* posix_ipc.cc (mq_open): Ditto.  Drop error handling for that call.
+	(sem_open): Ditto.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetSecurityInfo): Remove.
 	* ntdll.h (RtlConvertToAutoInheritSecurityObject): Declare.
 	(RtlDeleteSecurityObject): Declare.

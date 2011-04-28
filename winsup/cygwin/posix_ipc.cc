@@ -419,11 +419,7 @@ again:
       mqhdr->mqh_attr.mq_curmsgs = 0;
       mqhdr->mqh_nwait = 0;
       mqhdr->mqh_pid = 0;
-      if (!AllocateLocallyUniqueId (&luid))
-	{
-	  __seterrno ();
-	  goto err;
-	}
+      NtAllocateLocallyUniqueId (&luid);
       __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
 		       hash_path_name (0,mqname),
 		       luid.HighPart, luid.LowPart);
@@ -1008,11 +1004,7 @@ again:
 	}
       created = 1;
       /* First one to create the file initializes it. */
-      if (!AllocateLocallyUniqueId (&sf.luid))
-	{
-	  __seterrno ();
-	  goto err;
-	}
+      NtAllocateLocallyUniqueId (&sf.luid);
       sf.value = value;
       sf.hash = hash_path_name (0, semname);
       if (write (fd, &sf, sizeof sf) != sizeof sf)

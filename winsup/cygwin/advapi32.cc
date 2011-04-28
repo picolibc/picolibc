@@ -20,13 +20,6 @@ details. */
   return NT_SUCCESS (status);
 
 BOOL WINAPI
-AllocateLocallyUniqueId (PLUID luid)
-{
-  NTSTATUS status = NtAllocateLocallyUniqueId (luid);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 AccessCheck (PSECURITY_DESCRIPTOR sd, HANDLE tok, DWORD access,
 	     PGENERIC_MAPPING mapping, PPRIVILEGE_SET pset, LPDWORD psetlen,
 	     LPDWORD granted, LPBOOL allowed)
