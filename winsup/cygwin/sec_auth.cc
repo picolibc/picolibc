@@ -1019,7 +1019,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	  + RtlLengthSid (well_known_admins_sid)
 	  + RtlLengthSid (well_known_system_sid);
   dacl = (PACL) alloca (dsize);
-  if (!InitializeAcl (dacl, dsize, ACL_REVISION))
+  if (!NT_SUCCESS (RtlCreateAcl (dacl, dsize, ACL_REVISION)))
     goto out;
   if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL, usersid))
     goto out;

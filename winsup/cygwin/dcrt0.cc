@@ -685,7 +685,7 @@ dll_crt0_0 ()
 		   GetCurrentProcess (), &hMainThread,
 		   0, false, DUPLICATE_SAME_ACCESS);
 
-  OpenProcessToken (GetCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
+  NtOpenProcessToken (NtCurrentProcess (), MAXIMUM_ALLOWED, &hProcToken);
   set_cygwin_privileges (hProcToken);
 
   device::init ();

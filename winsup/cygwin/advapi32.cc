@@ -54,13 +54,6 @@ CopySid (DWORD len, PSID dest, PSID src)
 }
 
 BOOL WINAPI
-InitializeAcl (PACL acl, DWORD len, DWORD revision)
-{
-  NTSTATUS status = RtlCreateAcl (acl, len, revision);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 AddAccessAllowedAce (PACL acl, DWORD revision, DWORD mask, PSID sid)
 {
   NTSTATUS status = RtlAddAccessAllowedAce (acl, revision, mask, sid);
@@ -71,34 +64,6 @@ BOOL WINAPI
 AddAccessDeniedAce (PACL acl, DWORD revision, DWORD mask, PSID sid)
 {
   NTSTATUS status = RtlAddAccessDeniedAce (acl, revision, mask, sid);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-AddAce (PACL acl, DWORD revision, DWORD index, LPVOID ace_list, DWORD len)
-{
-  NTSTATUS status = RtlAddAce (acl, revision, index, ace_list, len);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-FindFirstFreeAce (PACL acl, LPVOID *ace)
-{
-  NTSTATUS status = RtlFirstFreeAce (acl, ace);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-GetAce (PACL acl, DWORD index, LPVOID *ace)
-{
-  NTSTATUS status = RtlGetAce (acl, index, ace);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-InitializeSecurityDescriptor (PSECURITY_DESCRIPTOR sd, DWORD revision)
-{
-  NTSTATUS status = RtlCreateSecurityDescriptor (sd, revision);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 
@@ -153,13 +118,6 @@ BOOL WINAPI
 SetSecurityDescriptorOwner (PSECURITY_DESCRIPTOR sd, PSID sid, BOOL def)
 {
   NTSTATUS status = RtlSetOwnerSecurityDescriptor (sd, sid, (BOOLEAN) !!def);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-OpenProcessToken (HANDLE process, DWORD access, PHANDLE tok)
-{
-  NTSTATUS status = NtOpenProcessToken (process, access, tok);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 

@@ -21,6 +21,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 #include "pwdgrp.h"
 #include "tls_pbuf.h"
 
@@ -68,11 +69,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
 
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
-  if (!InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
-    {
-      __seterrno ();
-      return -1;
-    }
+  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
   if (!SetSecurityDescriptorOwner (&sd, owner, FALSE))
     {
       __seterrno ();
@@ -94,11 +91,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
   struct __group32 *gr;
   int pos;
 
-  if (!InitializeAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION))
-    {
-      __seterrno ();
-      return -1;
-    }
+  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
 
   writable = false;
 
@@ -332,7 +325,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
 	{
 	  ACCESS_ALLOWED_ACE *ace;
 
-	  if (!GetAce (acl, i, (PVOID *) &ace))
+	  if (!NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
 	    continue;
 
 	  cygpsid ace_sid ((PSID) &ace->SidStart);

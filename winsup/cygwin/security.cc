@@ -139,7 +139,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
       if (NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd, &exists, &dacl, &def))
 	  && exists && dacl)
 	for (ULONG idx = 0; idx < dacl->AceCount; ++idx)
-	  if (RtlGetAce (dacl, idx, (PVOID *) &ace)
+	  if (NT_SUCCESS (RtlGetAce (dacl, idx, (PVOID *) &ace))
 	      && (ace->Header.AceFlags & INHERITED_ACE))
 	    return 0;
       /* Otherwise, open the parent directory with READ_CONTROL... */
@@ -245,7 +245,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
-      if (!GetAce (acl, i, (PVOID *) &ace))
+      if (!NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
 	continue;
       if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
 	continue;
@@ -472,7 +472,7 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
       return false;
     }
   ACCESS_ALLOWED_ACE *ace;
-  if (inherit && GetAce (acl, offset, (PVOID *) &ace))
+  if (inherit && NT_SUCCESS (RtlGetAce (acl, offset, (PVOID *) &ace)))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
@@ -488,7 +488,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
       return false;
     }
   ACCESS_DENIED_ACE *ace;
-  if (inherit && GetAce (acl, offset, (PVOID *) &ace))
+  if (inherit && NT_SUCCESS (RtlGetAce (acl, offset, (PVOID *) &ace)))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
@@ -544,11 +544,7 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
-  if (!InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
-    {
-      __seterrno ();
-      return NULL;
-    }
+  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
 
   /* We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
      modified by inheritable ACEs. */
@@ -570,11 +566,7 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 
   /* Initialize local access control list. */
   PACL acl = (PACL) tp.w_get ();
-  if (!InitializeAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION))
-    {
-      __seterrno ();
-      return NULL;
-    }
+  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
 
   /* From here fill ACL. */
   size_t acl_len = sizeof (ACL);
@@ -713,10 +705,12 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   PACL oacl;
   BOOL acl_exists = FALSE;
   ACCESS_ALLOWED_ACE *ace;
+  NTSTATUS status;
+
   if (GetSecurityDescriptorDacl (sd_ret, &acl_exists, &oacl, &dummy)
       && acl_exists && oacl)
     for (DWORD i = 0; i < oacl->AceCount; ++i)
-      if (GetAce (oacl, i, (PVOID *) &ace))
+      if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
 	{
 	  cygpsid ace_sid ((PSID) &ace->SidStart);
 
@@ -767,12 +761,13 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
 	   * FIXME: this would break the order of the inherit-only ACEs
 	   */
-	  if (!AddAce (acl, ACL_REVISION,
-		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
-		       ?  (owner_deny ? 1 : 0) : MAXDWORD,
-		       (LPVOID) ace, ace->Header.AceSize))
+	  status = RtlAddAce (acl, ACL_REVISION,
+			      ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
+			      ?  (owner_deny ? 1 : 0) : MAXDWORD,
+			      (LPVOID) ace, ace->Header.AceSize);
+	  if (!NT_SUCCESS (status))
 	    {
-	      __seterrno ();
+	      __seterrno_from_nt_status (status);
 	      return NULL;
 	    }
 	  ace_off++;
@@ -862,7 +857,7 @@ set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
 			security_descriptor &sd)
 {
   psa->lpSecurityDescriptor = sd.malloc (SECURITY_DESCRIPTOR_MIN_LENGTH);
-  InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)psa->lpSecurityDescriptor,
+  RtlCreateSecurityDescriptor ((PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
   psa->lpSecurityDescriptor = alloc_sd (pc, geteuid32 (), getegid32 (),
 					attribute, sd);

@@ -178,9 +178,10 @@ allow_others_to_sync ()
       return;
     }
   /* Set the size of the DACL correctly. */
-  if (!FindFirstFreeAce (dacl, &ace))
+  status = RtlFirstFreeAce (dacl, &ace);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("FindFirstFreeAce: %lu", GetLastError ());
+      debug_printf ("RtlFirstFreeAce: %p", status);
       return;
     }
   dacl->AclSize = (char *) ace - (char *) dacl;

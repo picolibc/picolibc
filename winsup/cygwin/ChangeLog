@@ -1,12 +1,30 @@
 2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* advapi32.cc (InitializeAcl): Remove.
+	(AddAce): Remove.
+	(FindFirstFreeAce): Remove.
+	(GetAce): Remove.
+	(InitializeSecurityDescriptor): Remove.
+	(OpenProcessToken): Remove.
+	* dcrt0.cc: Replace above functions throughout with their ntdll.dll
+	equivalent.
+	* fhandler_tty.cc: Ditto.
+	* flock.cc: Ditto.
+	* pinfo.cc: Ditto.  Drop unnecessary error handling.
+	* sec_acl.cc: Ditto.
+	* sec_auth.cc: Ditto.
+	* sec_helper.cc: Ditto.
+	* security.cc: Ditto.
+
+2011-04-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc (InitializeSid): Remove.
 	(EqualPrefixSid): Remove.
 	(GetLengthSid): Remove.
 	(GetSidSubAuthority): Remove.
 	(GetSidSubAuthorityCount): Remove.
 	(GetSidIdentifierAuthority): Remove.
-	* fhandler_disk_file.cc: Remove above functions throughout with their
+	* fhandler_disk_file.cc: Replace above functions throughout with their
 	ntdll.dll equivalent.
 	* sec_auth.cc: Ditto.
 	* sec_helper.cc: Ditto.

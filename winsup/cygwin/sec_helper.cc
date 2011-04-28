@@ -463,7 +463,7 @@ get_null_sd ()
 
   if (!null_sdp)
     {
-      InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+      RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
       SetSecurityDescriptorDacl (&sd, TRUE, NULL, FALSE);
       null_sdp = &sd;
     }
@@ -488,6 +488,7 @@ init_global_security ()
 bool
 sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD access2)
 {
+  NTSTATUS status;
   size_t acl_len = MAX_DACL_LEN (5);
   LPVOID pAce;
   cygpsid psid;
@@ -496,9 +497,10 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   if ((unsigned long) acl % 4)
     api_fatal ("Incorrectly aligned incoming ACL buffer!");
 #endif
-  if (!InitializeAcl (acl, acl_len, ACL_REVISION))
+  status = RtlCreateAcl (acl, acl_len, ACL_REVISION);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("InitializeAcl %E");
+      debug_printf ("RtlCreateAcl: %p", status);
       return false;
     }
   if (sid1)
@@ -521,11 +523,11 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   if (!AddAccessAllowedAce (acl, ACL_REVISION,
 			    GENERIC_ALL, well_known_system_sid))
     debug_printf ("AddAccessAllowedAce(system) %E");
-  FindFirstFreeAce (acl, &pAce);
-  if (pAce)
+  status = RtlFirstFreeAce (acl, &pAce);
+  if (NT_SUCCESS (status) && pAce)
     acl->AclSize = (char *) pAce - (char *) acl;
   else
-    debug_printf ("FindFirstFreeAce %E");
+    debug_printf ("RtlFirstFreeAce: %p", status);
 
   return true;
 }
@@ -545,8 +547,7 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   if (!sec_acl (acl, true, true, sid1, sid2, access2))
     return inherit ? &sec_none : &sec_none_nih;
 
-  if (!InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION))
-    debug_printf ("InitializeSecurityDescriptor %E");
+  RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
 
 /*
  * Setting the owner lets the created security attribute not work
@@ -574,13 +575,14 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
 PSECURITY_DESCRIPTOR
 _everyone_sd (void *buf, ACCESS_MASK access)
 {
+  NTSTATUS status;
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) buf;
 
   if (psd)
     {
-      InitializeSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
+      RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
       PACL dacl = (PACL) (psd + 1);
-      InitializeAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
+      RtlCreateAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
       if (!AddAccessAllowedAce (dacl, ACL_REVISION, access,
 				well_known_world_sid))
 	{
@@ -588,9 +590,10 @@ _everyone_sd (void *buf, ACCESS_MASK access)
 	  return NULL;
 	}
       LPVOID ace;
-      if (!FindFirstFreeAce (dacl, &ace))
+      status = RtlFirstFreeAce (dacl, &ace);
+      if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("FindFirstFreeAce: %lu", GetLastError ());
+	  debug_printf ("RtlFirstFreeAce: %p", status);
 	  return NULL;
 	}
       dacl->AclSize = (char *) ace - (char *) dacl;

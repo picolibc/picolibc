@@ -529,7 +529,7 @@ fhandler_tty_slave::open (int flags, mode_t)
     /* Create security attribute.  Default permissions are 0620. */
     security_descriptor sd;
     sd.malloc (sizeof (SECURITY_DESCRIPTOR));
-    InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+    RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
     SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
     if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
 					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
@@ -1305,7 +1305,7 @@ fhandler_tty_slave::fchmod (mode_t mode)
 	goto errout;
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
-  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!get_object_attribute (input_available_event, &uid, &gid, NULL)
       && !create_object_sd_from_attribute (NULL, uid, gid, S_IFCHR | mode, sd))
     ret = fch_set_sd (sd, false);
@@ -1334,7 +1334,7 @@ fhandler_tty_slave::fchown (__uid32_t uid, __gid32_t gid)
 	goto errout;
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
-  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!get_object_attribute (input_available_event, &o_uid, &o_gid, &mode))
     {
       if ((uid == ILLEGAL_UID || uid == o_uid)
@@ -1796,7 +1796,7 @@ fhandler_pty_master::setup (bool ispty)
 
   /* Create security attribute.  Default permissions are 0620. */
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
-  InitializeSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
+  RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
 					S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
 					sd))
