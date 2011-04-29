@@ -181,7 +181,8 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
   int ret = 0;
 
   thread = pthread::self ();
-  if (thread && thread->cancel_event)
+  if (thread && thread->cancel_event
+      && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
     w4[cnt++] = thread->cancel_event;
   if (abstime)
     {
