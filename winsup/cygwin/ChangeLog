@@ -1,5 +1,10 @@
 2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* errno.cc (errmap): Sort.  Map ERROR_EXE_MACHINE_TYPE_MISMATCH to
+	ENOEXEC.
+
+2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc: Update comment listing cancellation points per POSIX.
 
 2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
