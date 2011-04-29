@@ -1,5 +1,9 @@
 2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc: Update comment listing cancellation points per POSIX.
+
+2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc: Add comment.
 	(EqualSid): Remove.
 	(CopySid): Remove.
