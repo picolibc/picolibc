@@ -37,6 +37,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
@@ -742,7 +743,7 @@ pthread::testcancel ()
   if (cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
 
-  if (WaitForSingleObject (cancel_event, 0) == WAIT_OBJECT_0)
+  if (IsEventSignalled (cancel_event))
     cancel_self ();
 }
 

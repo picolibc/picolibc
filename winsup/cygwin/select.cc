@@ -934,7 +934,7 @@ static int
 verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds)
 {
-  if (WaitForSingleObject (me->h, 0) == WAIT_OBJECT_0)
+  if (IsEventSignalled (me->h))
     me->read_ready = true;
   return set_bits (me, readfds, writefds, exceptfds);
 }

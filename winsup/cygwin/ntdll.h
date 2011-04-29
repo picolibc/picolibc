@@ -1292,6 +1292,18 @@ extern "C"
     fbi.FileAttributes = attr ?: FILE_ATTRIBUTE_NORMAL;
     return NtSetInformationFile(h, &io, &fbi, sizeof fbi, FileBasicInformation);
   }
+
+  /* This test for a signalled event is twice as fast as calling
+     WaitForSingleObject (event, 0). */
+  inline
+  BOOL NTAPI IsEventSignalled (HANDLE event)
+  {
+    EVENT_BASIC_INFORMATION ebi;
+    return NT_SUCCESS (NtQueryEvent (event, EventBasicInformation,
+				     &ebi, sizeof ebi, NULL))
+	   && ebi.SignalState != 0;
+
+  }
 }
 #endif
 #endif /*_NTDLL_H*/

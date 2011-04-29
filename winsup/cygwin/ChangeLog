@@ -1,5 +1,17 @@
 2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (IsEventSignalled): New inline function.
+	* cygthread.cc (cygthread::terminate_thread): Use IsEventSignalled in
+	place of WaitForSingleObject on event with 0 timeout.
+	* fhandler.cc (fhandler_base_overlapped::has_ongoing_io): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::open_nonserver): Ditto.
+	(fhandler_fifo::wait): Ditto.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Ditto.
+	* select.cc (verify_tty_slave): Ditto.
+	* thread.cc (pthread::testcancel): Ditto.
+
+2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc (GetTokenInformation): Remove.
 	(SetTokenInformation): Remove.
 	* grp.cc: Replace above functions throughout with their ntdll.dll

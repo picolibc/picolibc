@@ -21,6 +21,7 @@
 #include "sigproc.h"
 #include "cygtls.h"
 #include "shared_info.h"
+#include "ntdll.h"
 
 fhandler_fifo::fhandler_fifo ():
   fhandler_base_overlapped (), wait_state (fifo_unknown), dummy_client (NULL)
@@ -48,7 +49,7 @@ fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
 	return h;
       if (&_my_tls != _main_tls)
 	yield ();
-      else if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
+      else if (IsEventSignalled (signal_arrived))
 	{
 	  set_errno (EINTR);
 	  return NULL;
@@ -224,7 +225,7 @@ fhandler_fifo::wait (bool iswrite)
 	      __seterrno ();
 	      return false;
 	    }
-	  else if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+	  else if (!IsEventSignalled (signal_arrived))
 	    continue;
 	  else if (_my_tls.call_signal_handler ())
 	    continue;

@@ -19,6 +19,7 @@ details. */
 #include "pinfo.h"
 #include "tty.h"
 #include "cygtls.h"
+#include "ntdll.h"
 
 /* Common functions shared by tty/console */
 
@@ -175,7 +176,7 @@ fhandler_termios::bg_check (int sig)
 
   /* Don't raise a SIGTT* signal if we have already been interrupted
      by another signal. */
-  if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+  if (!IsEventSignalled (signal_arrived))
     {
       siginfo_t si = {0};
       si.si_signo = sig;

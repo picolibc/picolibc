@@ -1716,7 +1716,7 @@ fhandler_base_overlapped::has_ongoing_io ()
 {
   if (!io_pending)
     return false;
-  if (WaitForSingleObject (get_overlapped ()->hEvent, 0) != WAIT_OBJECT_0)
+  if (!IsEventSignalled (get_overlapped ()->hEvent))
     {
       set_errno (EAGAIN);
       return true;
