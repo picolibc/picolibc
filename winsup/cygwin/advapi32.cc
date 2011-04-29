@@ -20,27 +20,6 @@ details. */
   return NT_SUCCESS (status);
 
 BOOL WINAPI
-AccessCheck (PSECURITY_DESCRIPTOR sd, HANDLE tok, DWORD access,
-	     PGENERIC_MAPPING mapping, PPRIVILEGE_SET pset, LPDWORD psetlen,
-	     LPDWORD granted, LPBOOL allowed)
-{
-  NTSTATUS status, astatus;
-
-  status = NtAccessCheck (sd, tok, access, mapping, pset, psetlen, granted,
-			  &astatus);
-  if (NT_SUCCESS (status))
-    *allowed = NT_SUCCESS (astatus);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-PrivilegeCheck (HANDLE tok, PPRIVILEGE_SET pset, LPBOOL res)
-{
-  NTSTATUS status = NtPrivilegeCheck (tok, pset, (PBOOLEAN) res);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 EqualSid (PSID sid1, PSID sid2)
 {
   return !!RtlEqualSid (sid1, sid2);
@@ -72,13 +51,6 @@ MakeSelfRelativeSD (PSECURITY_DESCRIPTOR abs_sd, PSECURITY_DESCRIPTOR rel_sd,
 		    LPDWORD len)
 {
   NTSTATUS status = RtlAbsoluteToSelfRelativeSD (abs_sd, rel_sd, len);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-OpenThreadToken (HANDLE thread, DWORD access, BOOL as_self, PHANDLE tok)
-{
-  NTSTATUS status = NtOpenThreadToken (thread, access, as_self, tok);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 

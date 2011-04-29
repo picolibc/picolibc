@@ -1644,15 +1644,16 @@ fhandler_pty_master::pty_master_thread ()
   security_descriptor sd;
   HANDLE token;
   PRIVILEGE_SET ps;
-  BOOL ret;
   DWORD pid;
+  NTSTATUS status;
 
   termios_printf ("Entered");
-  while (!exit && (ConnectNamedPipe (master_ctl, NULL) || GetLastError () == ERROR_PIPE_CONNECTED))
+  while (!exit && (ConnectNamedPipe (master_ctl, NULL)
+		   || GetLastError () == ERROR_PIPE_CONNECTED))
     {
       pipe_reply repl = { NULL, NULL, 0 };
       bool deimp = false;
-      BOOL allow = FALSE;
+      NTSTATUS allow = STATUS_ACCESS_DENIED;
       ACCESS_MASK access = EVENT_MODIFY_STATE;
       HANDLE client = NULL;
 
@@ -1678,17 +1679,22 @@ fhandler_pty_master::pty_master_thread ()
 	  termios_printf ("ImpersonateNamedPipeClient, %E");
 	  goto reply;
 	}
-      if (!OpenThreadToken (GetCurrentThread (), TOKEN_QUERY, TRUE, &token))
+      status = NtOpenThreadToken (GetCurrentThread (), TOKEN_QUERY, TRUE,
+				  &token);
+      if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("OpenThreadToken, %E");
+	  termios_printf ("NtOpenThreadToken, %p", status);
+	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
       len = sizeof ps;
-      ret = AccessCheck (sd, token, access, &map, &ps, &len, &access, &allow);
-      CloseHandle (token);
-      if (!ret)
+      status = NtAccessCheck (sd, token, access, &map, &ps, &len, &access,
+			      &allow);
+      NtClose (token);
+      if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("AccessCheck, %E");
+	  termios_printf ("NtAccessCheck, %p", status);
+	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
       if (!RevertToSelf ())
@@ -1705,7 +1711,7 @@ fhandler_pty_master::pty_master_thread ()
 	    exit = true;
 	  goto reply;
 	}
-      if (allow)
+      if (NT_SUCCESS (allow))
 	{
 	  client = OpenProcess (PROCESS_DUP_HANDLE, FALSE, pid);
 	  if (!client)

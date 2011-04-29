@@ -972,11 +972,11 @@ set_file_attribute (HANDLE handle, path_conv &pc,
 
 static int
 check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
-	      DWORD desired, int flags, bool effective)
+	      ACCESS_MASK desired, int flags, bool effective)
 {
   int ret = -1;
-  BOOL status;
-  DWORD granted;
+  NTSTATUS status, allow;
+  ACCESS_MASK granted;
   DWORD plen = sizeof (PRIVILEGE_SET) + 3 * sizeof (LUID_AND_ATTRIBUTES);
   PPRIVILEGE_SET pset = (PPRIVILEGE_SET) alloca (plen);
   HANDLE tok = ((effective && cygheap->user.issetuid ())
@@ -995,9 +995,11 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
       tok = hProcImpToken;
     } 
 
-  if (!AccessCheck (sd, tok, desired, &mapping, pset, &plen, &granted, &status))
+  status = NtAccessCheck (sd, tok, desired, &mapping, pset, &plen, &granted,
+			  &allow);
+  if (!NT_SUCCESS (status))
     __seterrno ();
-  else if (!status)
+  else if (!NT_SUCCESS (allow))
     {
       /* CV, 2006-10-16: Now, that's really weird.  Imagine a user who has no
 	 standard access to a file, but who has backup and restore privileges
@@ -1006,12 +1008,14 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 	 when returning the access status.  Otherwise, why bother with the
 	 pset parameter, right?
 	 But not so.  AccessCheck actually returns a status of "false" here,
-	 even though opening a file with backup resp.  restore intent
+	 even though opening a file with backup resp. restore intent
 	 naturally succeeds for this user.  This definitely spoils the results
 	 of access(2) for administrative users or the SYSTEM account.  So, in
 	 case the access check fails, another check against the user's
 	 backup/restore privileges has to be made.  Sigh. */
       int granted_flags = 0;
+      BOOLEAN has_priv;
+
       if (flags & R_OK)
 	{
 	  pset->PrivilegeCount = 1;
@@ -1019,7 +1023,8 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 	  pset->Privilege[0].Luid.HighPart = 0L;
 	  pset->Privilege[0].Luid.LowPart = SE_BACKUP_PRIVILEGE;
 	  pset->Privilege[0].Attributes = 0;
-	  if (PrivilegeCheck (tok, pset, &status) && status)
+	  status = NtPrivilegeCheck (tok, pset, &has_priv);
+	  if (NT_SUCCESS (status) && has_priv)
 	    granted_flags |= R_OK;
 	}
       if (flags & W_OK)
@@ -1029,7 +1034,8 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 	  pset->Privilege[0].Luid.HighPart = 0L;
 	  pset->Privilege[0].Luid.LowPart = SE_RESTORE_PRIVILEGE;
 	  pset->Privilege[0].Attributes = 0;
-	  if (PrivilegeCheck (tok, pset, &status) && status)
+	  status = NtPrivilegeCheck (tok, pset, &has_priv);
+	  if (NT_SUCCESS (status) && has_priv)
 	    granted_flags |= W_OK;
 	}
       if (granted_flags == flags)
@@ -1047,7 +1053,7 @@ check_file_access (path_conv &pc, int flags, bool effective)
 {
   security_descriptor sd;
   int ret = -1;
-  DWORD desired = 0;
+  ACCESS_MASK desired = 0;
   if (flags & R_OK)
     desired |= FILE_READ_DATA;
   if (flags & W_OK)
@@ -1069,7 +1075,7 @@ check_registry_access (HANDLE hdl, int flags, bool effective)
 						 KEY_WRITE,
 						 KEY_EXECUTE,
 						 KEY_ALL_ACCESS };
-  DWORD desired = 0;
+  ACCESS_MASK desired = 0;
   if (flags & R_OK)
     desired |= KEY_ENUMERATE_SUB_KEYS;
   if (flags & W_OK)
