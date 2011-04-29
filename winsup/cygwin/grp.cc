@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009 Red Hat, Inc.
+   2007, 2008, 2009, 2011 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -21,6 +21,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 #include "pwdgrp.h"
 
 static __group32 *group_buf;
@@ -314,8 +315,9 @@ internal_getgrent (int pos)
 int
 internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 {
+  NTSTATUS status;
   HANDLE hToken = NULL;
-  DWORD size;
+  ULONG size;
   int cnt = 0;
   struct __group32 *gr;
 
@@ -344,13 +346,15 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
     hToken = cygheap->user.primary_token ();
   else
     hToken = hProcToken;
-
-  if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
-      || GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+  
+  status = NtQueryInformationToken (hToken, TokenGroups, NULL, 0, &size);
+  if (NT_SUCCESS (status) || status == STATUS_BUFFER_TOO_SMALL)
     {
       PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
 
-      if (GetTokenInformation (hToken, TokenGroups, groups, size, &size))
+      status = NtQueryInformationToken (hToken, TokenGroups, groups,
+					size, &size);
+      if (NT_SUCCESS (status))
 	{
 	  cygsid sid;
 
@@ -379,7 +383,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 	}
     }
   else
-    debug_printf ("%d = GetTokenInformation(NULL) %E", size);
+    debug_printf ("%lu = NtQueryInformationToken(NULL) %p", size, status);
   return cnt;
 
 error:

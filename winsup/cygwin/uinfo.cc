@@ -59,32 +59,35 @@ cygheap_user::init ()
   else
     set_name ("unknown");
 
-  DWORD siz;
+  NTSTATUS status;
+  ULONG size;
   PSECURITY_DESCRIPTOR psd;
 
-  if (!GetTokenInformation (hProcToken, TokenPrimaryGroup,
-			    &groups.pgsid, sizeof (cygsid), &siz))
-    system_printf ("GetTokenInformation (TokenPrimaryGroup), %E");
+  status = NtQueryInformationToken (hProcToken, TokenPrimaryGroup,
+				    &groups.pgsid, sizeof (cygsid), &size);
+  if (!NT_SUCCESS (status))
+    system_printf ("NtQueryInformationToken (TokenPrimaryGroup), %p", status);
 
   /* Get the SID from current process and store it in effec_cygsid */
-  if (!GetTokenInformation (hProcToken, TokenUser, &effec_cygsid,
-			    sizeof (cygsid), &siz))
+  status = NtQueryInformationToken (hProcToken, TokenUser, &effec_cygsid,
+				    sizeof (cygsid), &size);
+  if (!NT_SUCCESS (status))
     {
-      system_printf ("GetTokenInformation (TokenUser), %E");
+      system_printf ("NtQueryInformationToken (TokenUser), %p", status);
       return;
     }
 
   /* Set token owner to the same value as token user */
-  if (!SetTokenInformation (hProcToken, TokenOwner, &effec_cygsid,
-			    sizeof (cygsid)))
-    debug_printf ("SetTokenInformation(TokenOwner), %E");
+  status = NtSetInformationToken (hProcToken, TokenOwner, &effec_cygsid,
+				  sizeof (cygsid));
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtSetInformationToken(TokenOwner), %p", status);
 
   /* Standard way to build a security descriptor with the usual DACL */
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
   psd = (PSECURITY_DESCRIPTOR)
   		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
-  NTSTATUS status;
   BOOLEAN acl_exists, dummy;
   TOKEN_DEFAULT_DACL dacl;
 
@@ -94,9 +97,10 @@ cygheap_user::init ()
     {
 
       /* Set the default DACL and the process DACL */
-      if (!SetTokenInformation (hProcToken, TokenDefaultDacl, &dacl,
-      				sizeof (dacl)))
-	system_printf ("SetTokenInformation (TokenDefaultDacl), %E");
+      status = NtSetInformationToken (hProcToken, TokenDefaultDacl, &dacl,
+				      sizeof (dacl));
+      if (!NT_SUCCESS (status))
+	system_printf ("NtSetInformationToken (TokenDefaultDacl), %p", status);
       if ((status = NtSetSecurityObject (NtCurrentProcess (),
 					 DACL_SECURITY_INFORMATION, psd)))
 	system_printf ("NtSetSecurityObject, %lx", status);
@@ -128,9 +132,12 @@ internal_getlogin (cygheap_user &user)
 	  if (gsid != user.groups.pgsid)
 	    {
 	      /* Set primary group to the group in /etc/passwd. */
-	      if (!SetTokenInformation (hProcToken, TokenPrimaryGroup,
-					&gsid, sizeof gsid))
-		debug_printf ("SetTokenInformation(TokenPrimaryGroup), %E");
+	      NTSTATUS status = NtSetInformationToken (hProcToken,
+						       TokenPrimaryGroup,
+						       &gsid, sizeof gsid);
+	      if (!NT_SUCCESS (status))
+		debug_printf ("NtSetInformationToken (TokenPrimaryGroup), %p",
+			      status);
 	      else
 		user.groups.pgsid = gsid;
 	      clear_procimptoken ();

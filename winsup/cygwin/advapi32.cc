@@ -83,22 +83,6 @@ OpenThreadToken (HANDLE thread, DWORD access, BOOL as_self, PHANDLE tok)
 }
 
 BOOL WINAPI
-GetTokenInformation(HANDLE tok, TOKEN_INFORMATION_CLASS infoclass, LPVOID buf,
-		    DWORD len, PDWORD retlen)
-{
-  NTSTATUS status = NtQueryInformationToken (tok, infoclass, buf, len, retlen);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-SetTokenInformation (HANDLE tok, TOKEN_INFORMATION_CLASS infoclass, PVOID buf,
-		     ULONG len)
-{
-  NTSTATUS status = NtSetInformationToken (tok, infoclass, buf, len);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
 RevertToSelf ()
 {
   HANDLE tok = NULL;

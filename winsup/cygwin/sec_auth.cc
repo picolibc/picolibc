@@ -32,7 +32,7 @@ details. */
 
 /* Starting with Windows Vista, the token returned by system functions
    is a restricted token.  The full admin token is linked to it and can
-   be fetched with GetTokenInformation.  This function returns the original
+   be fetched with NtQueryInformationToken.  This function returns the original
    token on pre-Vista, and the elevated token on Vista++ if it's available,
    the original token otherwise.  The token handle is also made inheritable
    since that's necessary anyway. */
@@ -42,7 +42,7 @@ get_full_privileged_inheritable_token (HANDLE token)
   if (wincap.has_mandatory_integrity_control ())
     {
       TOKEN_LINKED_TOKEN linked;
-      DWORD size;
+      ULONG size;
 
       /* When fetching the linked token without TCB privs, then the linked
 	 token is not a primary token, only an impersonation token, which is
@@ -50,8 +50,9 @@ get_full_privileged_inheritable_token (HANDLE token)
 	 token using DuplicateTokenEx does NOT work for the linked token in
 	 this case.  So we have to switch on TCB privs to get a primary token.
 	 This is generally performed in the calling functions.  */
-      if (GetTokenInformation (token, TokenLinkedToken,
-			       (PVOID) &linked, sizeof linked, &size))
+      if (NT_SUCCESS (NtQueryInformationToken (token, TokenLinkedToken,
+					       (PVOID) &linked, sizeof linked,
+					       &size)))
 	{
 	  debug_printf ("Linked Token: %p", linked.LinkedToken);
 	  if (linked.LinkedToken)
@@ -61,8 +62,9 @@ get_full_privileged_inheritable_token (HANDLE token)
 	      /* At this point we don't know if the user actually had TCB
 		 privileges.  Check if the linked token is a primary token.
 		 If not, just return the original token. */
-	      if (GetTokenInformation (linked.LinkedToken, TokenType,
-				       (PVOID) &type, sizeof type, &size)
+	      if (NT_SUCCESS (NtQueryInformationToken (linked.LinkedToken,
+						       TokenType, (PVOID) &type,
+						       sizeof type, &size))
 		  && type != TokenPrimary)
 		debug_printf ("Linked Token is not a primary token!");
 	      else
@@ -660,23 +662,26 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 bool
 verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 {
-  DWORD size;
+  NTSTATUS status;
+  ULONG size;
   bool intern = false;
 
   if (pintern)
     {
       TOKEN_SOURCE ts;
-      if (!GetTokenInformation (token, TokenSource,
-				&ts, sizeof ts, &size))
-	debug_printf ("GetTokenInformation(), %E");
+      status = NtQueryInformationToken (token, TokenSource, &ts, sizeof ts,
+					&size);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationToken(), %p", status);
       else
 	*pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
   /* Verify usersid */
   cygsid tok_usersid = NO_SID;
-  if (!GetTokenInformation (token, TokenUser,
-			    &tok_usersid, sizeof tok_usersid, &size))
-    debug_printf ("GetTokenInformation(), %E");
+  status = NtQueryInformationToken (token, TokenUser, &tok_usersid,
+				    sizeof tok_usersid, &size);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryInformationToken(), %p", status);
   if (usersid != tok_usersid)
     return false;
 
@@ -705,64 +710,69 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
     }
 
   PTOKEN_GROUPS my_grps;
-  bool sawpg = false, ret = false;
 
-  if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
-      GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-    debug_printf ("GetTokenInformation(token, TokenGroups), %E");
-  else if (!(my_grps = (PTOKEN_GROUPS) alloca (size)))
-    debug_printf ("alloca (my_grps) failed.");
-  else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
-    debug_printf ("GetTokenInformation(my_token, TokenGroups), %E");
-  else
+  status = NtQueryInformationToken (token, TokenGroups, NULL, 0, &size);
+  if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
     {
-      if (groups.issetgroups ()) /* setgroups was called */
-	{
-	  cygsid gsid;
-	  struct __group32 *gr;
-	  bool saw[groups.sgsids.count ()];
-	  memset (saw, 0, sizeof(saw));
-
-	  /* token groups found in /etc/group match the user.gsids ? */
-	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	    if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
-	      {
-		int pos = groups.sgsids.position (gsid);
-		if (pos >= 0)
-		  saw[pos] = true;
-		else if (groups.pgsid == gsid)
-		  sawpg = true;
-#if 0
-		/* With this `else', verify_token returns false if we find
-		   groups in the token, which are not in the group list set
-		   with setgroups().  That's rather dangerous.  What we're
-		   really interested in is that all groups in the setgroups()
-		   list are in the token.  A token created through ADVAPI
-		   should be allowed to contain more groups than requested
-		   through setgroups(), esecially since Vista and the
-		   addition of integrity groups. So we disable this statement
-		   for now. */
-		else if (gsid != well_known_world_sid
-			 && gsid != usersid)
-		  goto done;
-#endif
-	      }
-	  /* user.sgsids groups must be in the token, except for builtin groups.
-	     These can be different on domain member machines compared to
-	     domain controllers, so these builtin groups may be validly missing
-	     from a token created through password or lsaauth logon. */
-	  for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
-	    if (!saw[gidx]
-	    	&& !groups.sgsids.sids[gidx].is_well_known_sid ()
-		&& !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
-	      return false;
-	}
-      /* The primary group must be in the token */
-      ret = sawpg
-	|| sid_in_token_groups (my_grps, groups.pgsid)
-	|| groups.pgsid == usersid;
+      debug_printf ("NtQueryInformationToken(token, TokenGroups), %p", status);
+      return false;
     }
-  return ret;
+  my_grps = (PTOKEN_GROUPS) alloca (size);
+  status = NtQueryInformationToken (token, TokenGroups, my_grps, size, &size);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQueryInformationToken(my_token, TokenGroups), %p",
+		    status);
+      return false;
+    }
+
+  bool sawpg = false;
+
+  if (groups.issetgroups ()) /* setgroups was called */
+    {
+      cygsid gsid;
+      struct __group32 *gr;
+      bool saw[groups.sgsids.count ()];
+      memset (saw, 0, sizeof(saw));
+
+      /* token groups found in /etc/group match the user.gsids ? */
+      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+	if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
+	  {
+	    int pos = groups.sgsids.position (gsid);
+	    if (pos >= 0)
+	      saw[pos] = true;
+	    else if (groups.pgsid == gsid)
+	      sawpg = true;
+#if 0
+	    /* With this `else', verify_token returns false if we find
+	       groups in the token, which are not in the group list set
+	       with setgroups().  That's rather dangerous.  What we're
+	       really interested in is that all groups in the setgroups()
+	       list are in the token.  A token created through ADVAPI
+	       should be allowed to contain more groups than requested
+	       through setgroups(), esecially since Vista and the
+	       addition of integrity groups. So we disable this statement
+	       for now. */
+	    else if (gsid != well_known_world_sid
+		     && gsid != usersid)
+	      goto done;
+#endif
+	  }
+      /* user.sgsids groups must be in the token, except for builtin groups.
+	 These can be different on domain member machines compared to
+	 domain controllers, so these builtin groups may be validly missing
+	 from a token created through password or lsaauth logon. */
+      for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
+	if (!saw[gidx]
+	    && !groups.sgsids.sids[gidx].is_well_known_sid ()
+	    && !sid_in_token_groups (my_grps, groups.sgsids.sids[gidx]))
+	  return false;
+    }
+  /* The primary group must be in the token */
+  return sawpg
+	 || sid_in_token_groups (my_grps, groups.pgsid)
+	 || groups.pgsid == usersid;
 }
 
 HANDLE
@@ -795,7 +805,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
   PTOKEN_GROUPS my_tok_gsids = NULL;
-  DWORD size;
+  ULONG size;
   size_t psize = 0;
 
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
@@ -817,26 +827,37 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	 id of the user account running current process. */
       if (usersid == well_known_system_sid)
 	/* nothing to do */;
-      else if (!GetTokenInformation (hProcToken, TokenStatistics,
-				     &stats, sizeof stats, &size))
-	debug_printf
-	  ("GetTokenInformation(hProcToken, TokenStatistics), %E");
       else
-	auth_luid = stats.AuthenticationId;
+	{
+	  status = NtQueryInformationToken (hProcToken, TokenStatistics,
+					    &stats, sizeof stats, &size);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("NtQueryInformationToken(hProcToken, "
+			  "TokenStatistics), %p", status);
+	  else
+	    auth_luid = stats.AuthenticationId;
+	}
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      if (!GetTokenInformation (hProcToken, TokenGroups, NULL, 0, &size)
-	  && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
+      status = NtQueryInformationToken (hProcToken, TokenGroups, NULL, 0,
+					&size);
+      if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
+	debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), %p",
+		      status);
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
-      else if (!GetTokenInformation (hProcToken, TokenGroups, my_tok_gsids,
-				     size, &size))
+      else
 	{
-	  debug_printf ("GetTokenInformation(hProcToken, TokenGroups), %E");
-	  free (my_tok_gsids);
-	  my_tok_gsids = NULL;
+	  status = NtQueryInformationToken (hProcToken, TokenGroups,
+					    my_tok_gsids, size, &size);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), "
+			    "%p", status);
+	      free (my_tok_gsids);
+	      my_tok_gsids = NULL;
+	    }
 	}
     }
 

@@ -2961,6 +2961,8 @@ seteuid32 (__uid32_t uid)
 
   if (new_token != hProcToken)
     {
+      NTSTATUS status;
+
       if (!request_restricted_uid_switch)
 	{
 	  /* Avoid having HKCU use default user */
@@ -2969,21 +2971,27 @@ seteuid32 (__uid32_t uid)
 	}
 
       /* Try setting owner to same value as user. */
-      if (!SetTokenInformation (new_token, TokenOwner,
-				&usersid, sizeof usersid))
-	debug_printf ("SetTokenInformation(user.token, TokenOwner), %E");
+      status = NtSetInformationToken (new_token, TokenOwner,
+				      &usersid, sizeof usersid);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtSetInformationToken (user.token, TokenOwner), %p",
+		      status);
       /* Try setting primary group in token to current group */
-      if (!SetTokenInformation (new_token, TokenPrimaryGroup,
-				&groups.pgsid, sizeof (cygsid)))
-	debug_printf ("SetTokenInformation(user.token, TokenPrimaryGroup), %E");
+      status = NtSetInformationToken (new_token, TokenPrimaryGroup,
+				      &groups.pgsid, sizeof (cygsid));
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtSetInformationToken (user.token, TokenPrimaryGroup),"
+		      "%p", status);
       /* Try setting default DACL */
       PACL dacl_buf = (PACL) alloca (MAX_DACL_LEN (5));
       if (sec_acl (dacl_buf, true, true, usersid))
 	{
 	  TOKEN_DEFAULT_DACL tdacl = { dacl_buf };
-	  if (!SetTokenInformation (new_token, TokenDefaultDacl,
-				    &tdacl, sizeof (tdacl)))
-	    debug_printf ("SetTokenInformation (TokenDefaultDacl), %E");
+	  status = NtSetInformationToken (new_token, TokenDefaultDacl,
+					  &tdacl, sizeof (tdacl));
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("NtSetInformationToken (TokenDefaultDacl), %p",
+			  status);
 	}
     }
 
@@ -3095,6 +3103,7 @@ setegid32 (__gid32_t gid)
       return 0;
     }
 
+  NTSTATUS status;
   user_groups * groups = &cygheap->user.groups;
   cygsid gsid;
   struct __group32 * gr = internal_getgrgid (gid);
@@ -3110,17 +3119,23 @@ setegid32 (__gid32_t gid)
   if (cygheap->user.issetuid ())
     {
       /* If impersonated, update impersonation token... */
-      if (!SetTokenInformation (cygheap->user.primary_token (),
-				TokenPrimaryGroup, &gsid, sizeof gsid))
-	debug_printf ("SetTokenInformation(primary_token, "
-		      "TokenPrimaryGroup), %E");
-      if (!SetTokenInformation (cygheap->user.imp_token (), TokenPrimaryGroup,
-				&gsid, sizeof gsid))
-	debug_printf ("SetTokenInformation(token, TokenPrimaryGroup), %E");
+      status = NtSetInformationToken (cygheap->user.primary_token (),
+				      TokenPrimaryGroup, &gsid, sizeof gsid);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtSetInformationToken (primary_token, "
+		      "TokenPrimaryGroup), %p", status);
+      status = NtSetInformationToken (cygheap->user.imp_token (),
+				      TokenPrimaryGroup, &gsid, sizeof gsid);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtSetInformationToken (token, TokenPrimaryGroup), %p",
+		      status);
     }
   cygheap->user.deimpersonate ();
-  if (!SetTokenInformation (hProcToken, TokenPrimaryGroup, &gsid, sizeof gsid))
-    debug_printf ("SetTokenInformation(hProcToken, TokenPrimaryGroup), %E");
+  status = NtSetInformationToken (hProcToken, TokenPrimaryGroup,
+				  &gsid, sizeof gsid);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtSetInformationToken (hProcToken, TokenPrimaryGroup), %p",
+		  status);
   clear_procimptoken ();
   cygheap->user.reimpersonate ();
   return 0;
