@@ -1047,13 +1047,14 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   dacl = (PACL) alloca (dsize);
   if (!NT_SUCCESS (RtlCreateAcl (dacl, dsize, ACL_REVISION)))
     goto out;
-  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL, usersid))
+  if (!NT_SUCCESS (RtlAddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
+					   usersid)))
     goto out;
-  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
-			    well_known_admins_sid))
+  if (!NT_SUCCESS (RtlAddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
+					   well_known_admins_sid)))
     goto out;
-  if (!AddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
-			    well_known_system_sid))
+  if (!NT_SUCCESS (RtlAddAccessAllowedAce (dacl, ACL_REVISION, GENERIC_ALL,
+					   well_known_system_sid)))
     goto out;
 
   /* Evaluate authinf size and allocate authinf. */
@@ -1096,8 +1097,8 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* User SID */
   authinf->inf.User.User.Sid = offset;
   authinf->inf.User.User.Attributes = 0;
-  CopySid (RtlLengthSid (usersid), (PSID) ((PBYTE) &authinf->inf + offset),
-	   usersid);
+  RtlCopySid (RtlLengthSid (usersid), (PSID) ((PBYTE) &authinf->inf + offset),
+	      usersid);
   offset += RtlLengthSid (usersid);
   /* Groups */
   authinf->inf.Groups = offset;
@@ -1119,16 +1120,16 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       if (wincap.needs_logon_sid_in_sid_list ()
 	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
 	gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
-      CopySid (RtlLengthSid (tmp_gsids.sids[tmpidx]),
-	       (PSID) ((PBYTE) &authinf->inf + sids_offset),
-	       tmp_gsids.sids[tmpidx]);
+      RtlCopySid (RtlLengthSid (tmp_gsids.sids[tmpidx]),
+		  (PSID) ((PBYTE) &authinf->inf + sids_offset),
+		  tmp_gsids.sids[tmpidx]);
       sids_offset += RtlLengthSid (tmp_gsids.sids[tmpidx]);
     }
   offset += gsize;
   /* Primary Group SID */
   authinf->inf.PrimaryGroup.PrimaryGroup = offset;
-  CopySid (RtlLengthSid (pgrpsid), (PSID) ((PBYTE) &authinf->inf + offset),
-	   pgrpsid);
+  RtlCopySid (RtlLengthSid (pgrpsid), (PSID) ((PBYTE) &authinf->inf + offset),
+	      pgrpsid);
   offset += RtlLengthSid (pgrpsid);
   /* Privileges */
   authinf->inf.Privileges = offset;

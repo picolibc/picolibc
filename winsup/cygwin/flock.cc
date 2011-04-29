@@ -171,10 +171,11 @@ allow_others_to_sync ()
   dacl = (PACL) ((char *) sd + (uintptr_t) sd->Dacl);
   dacl->AclSize = NT_MAX_PATH * sizeof (WCHAR) - ((char *) dacl - (char *) sd);
   /* Allow everyone to SYNCHRONIZE with this process. */
-  if (!AddAccessAllowedAce (dacl, ACL_REVISION, SYNCHRONIZE,
-			    well_known_world_sid))
+  status = RtlAddAccessAllowedAce (dacl, ACL_REVISION, SYNCHRONIZE,
+				   well_known_world_sid);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());
+      debug_printf ("RtlAddAccessAllowedAce: %p", status);
       return;
     }
   /* Set the size of the DACL correctly. */

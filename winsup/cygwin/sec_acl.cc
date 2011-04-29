@@ -211,7 +211,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
     }
   /* Make self relative security descriptor in sd_ret. */
   DWORD sd_size = 0;
-  MakeSelfRelativeSD (&sd, sd_ret, &sd_size);
+  RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
   if (sd_size <= 0)
     {
       __seterrno ();
@@ -222,9 +222,10 @@ setacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp,
       set_errno (ENOMEM);
       return -1;
     }
-  if (!MakeSelfRelativeSD (&sd, sd_ret, &sd_size))
+  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_ret.size ());

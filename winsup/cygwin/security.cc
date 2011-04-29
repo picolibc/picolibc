@@ -316,7 +316,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
-  if (owner_sid && group_sid && EqualSid (owner_sid, group_sid)
+  if (owner_sid && group_sid && RtlEqualSid (owner_sid, group_sid)
       /* FIXME: temporary exception for /var/empty */
       && well_known_system_sid != group_sid)
     {
@@ -469,9 +469,10 @@ bool
 add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
 			PSID sid, size_t &len_add, DWORD inherit)
 {
-  if (!AddAccessAllowedAce (acl, ACL_REVISION, attributes, sid))
+  NTSTATUS status = RtlAddAccessAllowedAce (acl, ACL_REVISION, attributes, sid);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return false;
     }
   ACCESS_ALLOWED_ACE *ace;
@@ -485,9 +486,10 @@ bool
 add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 		       PSID sid, size_t &len_add, DWORD inherit)
 {
-  if (!AddAccessDeniedAce (acl, ACL_REVISION, attributes, sid))
+  NTSTATUS status = RtlAddAccessDeniedAce (acl, ACL_REVISION, attributes, sid);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return false;
     }
   ACCESS_DENIED_ACE *ace;
@@ -839,7 +841,7 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
 
   /* Make self relative security descriptor. */
   DWORD sd_size = 0;
-  MakeSelfRelativeSD (&sd, sd_ret, &sd_size);
+  RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
   if (sd_size <= 0)
     {
       __seterrno ();
@@ -850,9 +852,10 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
       set_errno (ENOMEM);
       return NULL;
     }
-  if (!MakeSelfRelativeSD (&sd, sd_ret, &sd_size))
+  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno ();
+      __seterrno_from_nt_status (status);
       return NULL;
     }
   debug_printf ("Created SD-Size: %u", sd_ret.size ());

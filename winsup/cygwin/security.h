@@ -95,6 +95,18 @@ cygpsid NO_COPY name = (PSID) &name##_struct;
 #define FILE_WRITE_BITS  (FILE_WRITE_DATA | GENERIC_WRITE | GENERIC_ALL)
 #define FILE_EXEC_BITS   (FILE_EXECUTE | GENERIC_EXECUTE | GENERIC_ALL)
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+  /* We need these declarations, otherwise g++ complains that the below
+     inline methods use an undefined function, if ntdll.h isn't included. */
+  BOOLEAN NTAPI RtlEqualSid (PSID, PSID);
+  NTSTATUS NTAPI RtlCopySid (ULONG, PSID, PSID);
+#ifdef __cplusplus
+}
+#endif
+
 class cygpsid {
 protected:
   PSID psid;
@@ -114,7 +126,7 @@ public:
     {
       if (!psid || !nsid)
 	return nsid == psid;
-      return EqualSid (psid, nsid);
+      return RtlEqualSid (psid, nsid);
     }
   bool operator!= (const PSID nsid) const
     { return !(*this == nsid); }
@@ -143,7 +155,7 @@ class cygsid : public cygpsid {
       else
 	{
 	  psid = (PSID) sbuf;
-	  CopySid (MAX_SID_LEN, psid, nsid);
+	  RtlCopySid (MAX_SID_LEN, psid, nsid);
 	  well_known_sid = well_known;
 	}
       return psid;

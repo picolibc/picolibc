@@ -504,25 +504,35 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
       return false;
     }
   if (sid1)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, sid1))
-      debug_printf ("AddAccessAllowedAce(sid1) %E");
+    {
+      status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, sid1);
+      if (!NT_SUCCESS (status))
+	debug_printf ("RtlAddAccessAllowedAce(sid1) %p", status);
+    }
   if (original && (psid = cygheap->user.saved_sid ())
       && psid != sid1 && psid != well_known_system_sid)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, psid))
-      debug_printf ("AddAccessAllowedAce(original) %E");
+    {
+      status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, psid);
+      if (!NT_SUCCESS (status))
+	debug_printf ("RtlAddAccessAllowedAce(original) %p", status);
+    }
   if (sid2)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      access2, sid2))
-      debug_printf ("AddAccessAllowedAce(sid2) %E");
+    {
+      status = RtlAddAccessAllowedAce (acl, ACL_REVISION, access2, sid2);
+      if (!NT_SUCCESS (status))
+	debug_printf ("RtlAddAccessAllowedAce(sid2) %p", status);
+    }
   if (admins)
-    if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			      GENERIC_ALL, well_known_admins_sid))
-      debug_printf ("AddAccessAllowedAce(admin) %E");
-  if (!AddAccessAllowedAce (acl, ACL_REVISION,
-			    GENERIC_ALL, well_known_system_sid))
-    debug_printf ("AddAccessAllowedAce(system) %E");
+    {
+      status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
+				       well_known_admins_sid);
+      if (!NT_SUCCESS (status))
+	debug_printf ("RtlAddAccessAllowedAce(admin) %p", status);
+    }
+  status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
+				   well_known_system_sid);
+  if (!NT_SUCCESS (status))
+    debug_printf ("RtlAddAccessAllowedAce(system) %p", status);
   status = RtlFirstFreeAce (acl, &pAce);
   if (NT_SUCCESS (status) && pAce)
     acl->AclSize = (char *) pAce - (char *) acl;
@@ -574,10 +584,11 @@ _everyone_sd (void *buf, ACCESS_MASK access)
       RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
       PACL dacl = (PACL) (psd + 1);
       RtlCreateAcl (dacl, MAX_DACL_LEN (1), ACL_REVISION);
-      if (!AddAccessAllowedAce (dacl, ACL_REVISION, access,
-				well_known_world_sid))
+      status = RtlAddAccessAllowedAce (dacl, ACL_REVISION, access,
+				       well_known_world_sid);
+      if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("AddAccessAllowedAce: %lu", GetLastError ());
+	  debug_printf ("RtlAddAccessAllowedAce: %p", status);
 	  return NULL;
 	}
       LPVOID ace;

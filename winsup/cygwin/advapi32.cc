@@ -19,40 +19,10 @@ details. */
     SetLastError (RtlNtStatusToDosError (status)); \
   return NT_SUCCESS (status);
 
-BOOL WINAPI
-EqualSid (PSID sid1, PSID sid2)
-{
-  return !!RtlEqualSid (sid1, sid2);
-}
-
-BOOL WINAPI
-CopySid (DWORD len, PSID dest, PSID src)
-{
-  NTSTATUS status = RtlCopySid (len, dest, src);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-AddAccessAllowedAce (PACL acl, DWORD revision, DWORD mask, PSID sid)
-{
-  NTSTATUS status = RtlAddAccessAllowedAce (acl, revision, mask, sid);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-AddAccessDeniedAce (PACL acl, DWORD revision, DWORD mask, PSID sid)
-{
-  NTSTATUS status = RtlAddAccessDeniedAce (acl, revision, mask, sid);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
-
-BOOL WINAPI
-MakeSelfRelativeSD (PSECURITY_DESCRIPTOR abs_sd, PSECURITY_DESCRIPTOR rel_sd,
-		    LPDWORD len)
-{
-  NTSTATUS status = RtlAbsoluteToSelfRelativeSD (abs_sd, rel_sd, len);
-  DEFAULT_NTSTATUS_TO_BOOL_RETURN
-}
+/* This file should only contain non-trivial implementations of advapi32
+   functions, or advapi32 functions for which the ntdll.dll equivalent
+   is not easy to understand.  In all other case, use the ntdll.dll
+   equivalent. */
 
 BOOL WINAPI
 RevertToSelf ()
