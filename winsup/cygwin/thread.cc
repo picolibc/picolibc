@@ -378,7 +378,7 @@ List<pthread> pthread::threads;
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-		    valid (false), suspended (false),
+		    valid (false), suspended (false), canceled (false),
 		    cancelstate (0), canceltype (0), cancel_event (0),
 		    joiner (NULL), next (NULL), cleanup_stack (NULL)
 {
@@ -538,6 +538,7 @@ pthread::cancel ()
     {
       // cancel deferred
       mutex.unlock ();
+      canceled = true;
       SetEvent (cancel_event);
       return 0;
     }
@@ -871,8 +872,16 @@ pthread::testcancel ()
   if (cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
 
-  if (IsEventSignalled (cancel_event))
-    cancel_self ();
+  /* We check for the canceled flag first.  This allows to use the
+     pthread_testcancel function a lot without adding the overhead of
+     an OS call.  Only if the thread is marked as canceled, we wait for
+     cancel_event being really set, on the off-chance that pthread_cancel
+     gets interrupted before calling SetEvent. */
+  if (canceled)
+    {
+      WaitForSingleObject (cancel_event, INFINITE);
+      cancel_self ();
+    }
 }
 
 void
@@ -1039,6 +1048,7 @@ pthread::_fixup_after_fork ()
       magic = 0;
       valid = false;
       win32_obj_id = NULL;
+      canceled = false;
       cancel_event = NULL;
     }
 }

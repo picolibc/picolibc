@@ -1,3 +1,12 @@
+2011-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.h (class pthread): Add bool member canceled.
+	* thread.cc (pthread::pthread): Initialize canceled to false.
+	(pthread::cancel): Set canceled before setting cancel_event.
+	(pthread::testcancel): Check for canceled.  Only wait for cancel_event
+	if canceled is true.  Explain why.
+	(pthread::_fixup_after_fork): Set canceled to false.
+
 2011-04-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Sort.  Map ERROR_EXE_MACHINE_TYPE_MISMATCH to

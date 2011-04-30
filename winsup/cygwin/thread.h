@@ -366,6 +366,7 @@ public:
   void *return_ptr;
   bool valid;
   bool suspended;
+  bool canceled;
   int cancelstate, canceltype;
   _cygtls *cygtls;
   HANDLE cancel_event;
