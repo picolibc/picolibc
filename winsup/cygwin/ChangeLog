@@ -1,5 +1,35 @@
 2011-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fcntl.cc (fcntl64): Call pthread_testcancel.
+	* fhandler_socket.cc (fhandler_socket::connect): Ditto.
+	(fhandler_socket::accept4): Ditto.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	* flock.cc (lf_setlock): Allow to cancel thread running blocking
+	file lock.  Try to make code more readable.
+	(lockf): Call pthread_testcancel.
+	* mmap.cc (msync): Ditto.
+	* posix_ipc.cc (ipc_cond_timedwait): Call pthread::static_cancel_self
+	rather than pthread_testcancel.
+	* select.cc (cygwin_select): Call pthread_testcancel.
+	* syscalls.cc (pread): Ditto.
+	(pwrite): Ditto.
+	(readv): Ditto.
+	(writev): Ditto.
+	(open): Ditto.
+	(close): Ditto.
+	(fsync): Ditto.
+	* termios.cc (tcdrain): Ditto.
+	* thread.cc: Align list of cancellation points with above changes. 
+	Mark not-implemented functions, too.
+	(cancelable_wait): Don't set unused object indices to WAIT_FAILED
+	since that could result in wrong behaviour.  Set them to the invalid
+	value WAIT_TIMEOUT + 1 instead.
+
+2011-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.h (class pthread): Add bool member canceled.
 	* thread.cc (pthread::pthread): Initialize canceled to false.
 	(pthread::cancel): Set canceled before setting cancel_event.

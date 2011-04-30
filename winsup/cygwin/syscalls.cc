@@ -912,6 +912,8 @@ EXPORT_ALIAS (read, _read)
 extern "C" ssize_t
 pread (int fd, void *ptr, size_t len, _off64_t off)
 {
+  pthread_testcancel ();
+
   ssize_t res;
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -927,6 +929,8 @@ pread (int fd, void *ptr, size_t len, _off64_t off)
 extern "C" ssize_t
 pwrite (int fd, void *ptr, size_t len, _off64_t off)
 {
+  pthread_testcancel ();
+
   ssize_t res;
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -956,6 +960,8 @@ EXPORT_ALIAS (write, _write)
 extern "C" ssize_t
 readv (int fd, const struct iovec *const iov, const int iovcnt)
 {
+  pthread_testcancel ();
+
   extern int sigcatchers;
   const int e = get_errno ();
 
@@ -1039,6 +1045,8 @@ done:
 extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
+  pthread_testcancel ();
+
   int res = -1;
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
@@ -1096,6 +1104,7 @@ open (const char *unix_path, int flags, ...)
   mode_t mode = 0;
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
+  pthread_testcancel ();
   myfault efault;
   if (efault.faulted (EFAULT))
     /* errno already set */;
@@ -1205,6 +1214,8 @@ close (int fd)
   int res;
 
   syscall_printf ("close (%d)", fd);
+
+  pthread_testcancel ();
 
   MALLOC_CHECK;
   cygheap_fdget cfd (fd, true);
@@ -1480,6 +1491,7 @@ _fstat_r (struct _reent *ptr, int fd, struct __stat32 *buf)
 extern "C" int
 fsync (int fd)
 {
+  pthread_testcancel ();
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     {

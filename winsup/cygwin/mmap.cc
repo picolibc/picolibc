@@ -1169,6 +1169,8 @@ msync (void *addr, size_t len, int flags)
 
   syscall_printf ("msync (addr: %p, len %u, flags %x)", addr, len, flags);
 
+  pthread_testcancel ();
+
   LIST_LOCK ();
 
   if (((uintptr_t) addr % getpagesize ())

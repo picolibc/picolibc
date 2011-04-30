@@ -48,6 +48,8 @@ out:
 extern "C" int
 tcdrain (int fd)
 {
+  pthread_testcancel ();
+
   int res = -1;
 
   termios_printf ("tcdrain");

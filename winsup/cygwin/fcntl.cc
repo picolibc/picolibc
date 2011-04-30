@@ -1,7 +1,7 @@
 /* fcntl.cc: fcntl syscall
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2008,
-   2009, 2010 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -25,6 +25,8 @@ fcntl64 (int fd, int cmd, ...)
   int res = -1;
   void *arg = NULL;
   va_list args;
+
+  pthread_testcancel ();
 
   myfault efault;
   if (efault.faulted (EFAULT))

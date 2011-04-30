@@ -1026,6 +1026,8 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   DWORD err;
   int type;
 
+  pthread_testcancel ();
+
   if (!get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret))
     return -1;
 
@@ -1139,6 +1141,8 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
   /* Allows NULL peer and len parameters. */
   struct sockaddr_storage lpeer;
   int llen = sizeof (struct sockaddr_storage);
+
+  pthread_testcancel ();
 
   int res = 0;
   while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, 0))
@@ -1473,6 +1477,8 @@ ssize_t
 fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
+  pthread_testcancel ();
+
   WSABUF wsabuf = { len, (char *) ptr };
   WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
 		    &wsabuf, 1,
@@ -1487,6 +1493,8 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 ssize_t
 fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 {
+  pthread_testcancel ();
+
   /* TODO: Descriptor passing on AF_LOCAL sockets. */
 
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
@@ -1626,6 +1634,8 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 {
   struct sockaddr_storage sst;
 
+  pthread_testcancel ();
+
   if (to && !get_inet_addr (to, tolen, &sst, &tolen))
     return SOCKET_ERROR;
 
@@ -1640,6 +1650,8 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 int
 fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 {
+  pthread_testcancel ();
+
   /* TODO: Descriptor passing on AF_LOCAL sockets. */
 
   WSABUF wsabuf[msg->msg_iovlen];

@@ -96,6 +96,8 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   select_printf ("%d, %p, %p, %p, %p", maxfds, readfds, writefds, exceptfds, to);
 
+  pthread_testcancel ();
+
   if (!readfds)
     readfds = dummy_readfds;
   if (!writefds)

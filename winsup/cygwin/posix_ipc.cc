@@ -227,7 +227,7 @@ restart1:
       break;
     case WAIT_OBJECT_0 + 2:
       if (timer_idx != 2)
-      	pthread_testcancel ();
+      	pthread::static_cancel_self ();
       /*FALLTHRU*/
     case WAIT_OBJECT_0 + 3:
       ret = ETIMEDOUT;

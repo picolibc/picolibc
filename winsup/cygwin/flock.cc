@@ -957,6 +957,20 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 			 "Win32 pid %lu: %E", block->lf_wid);
 	  return EDEADLK;
 	}
+
+      pthread_t thread = pthread::self ();
+      HANDLE cancel_event = (thread && thread->cancel_event
+			     && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
+			    ? thread->cancel_event : NULL;
+
+      int wait_count = 0;
+      /* The lock is always the first object. */
+      const DWORD WAIT_UNLOCKED = WAIT_OBJECT_0;
+      /* All other wait objects are variable.  */
+      DWORD WAIT_PROC_EXITED = WAIT_TIMEOUT + 1;
+      DWORD WAIT_SIGNAL_ARRIVED = WAIT_TIMEOUT + 1;
+      DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
+
       SetThreadPriority (GetCurrentThread (), priority);
       if (lock->lf_flags & F_POSIX)
 	{
@@ -971,15 +985,32 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	      NtClose (obj);
 	      return EDEADLK;
 	    }
-	  HANDLE w4[3] = { obj, proc, signal_arrived };
+
+	  HANDLE w4[4] = { obj, proc, signal_arrived, cancel_event };
+	  wait_count = 3;
+	  WAIT_PROC_EXITED = WAIT_OBJECT_0 + 1;
+	  WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + 2;
+	  if (cancel_event)
+	    {
+	      wait_count = 4;
+	      WAIT_THREAD_CANCELED = WAIT_OBJECT_0 + 3;
+	    }
 	  node->wait ();
 	  node->UNLOCK ();
-	  ret = WaitForMultipleObjects (3, w4, FALSE, INFINITE);
+	  ret = WaitForMultipleObjects (wait_count, w4, FALSE, INFINITE);
 	  CloseHandle (proc);
 	}
       else
 	{
-	  HANDLE w4[2] = { obj, signal_arrived };
+	  HANDLE w4[3] = { obj, signal_arrived, cancel_event };
+	  wait_count = 2;
+	  WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + 1;
+	  if (cancel_event)
+	    {
+	      wait_count = 3;
+	      WAIT_THREAD_CANCELED = WAIT_OBJECT_0 + 2;
+	    }
+
 	  node->wait ();
 	  node->UNLOCK ();
 	  /* Unfortunately, since BSD flock locks are not attached to a
@@ -988,7 +1019,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	     process left accessing this event object. */
 	  do
 	    {
-	      ret = WaitForMultipleObjects (2, w4, FALSE, 100L);
+	      ret = WaitForMultipleObjects (wait_count, w4, FALSE, 100L);
 	    }
 	  while (ret == WAIT_TIMEOUT && get_obj_handle_count (obj) > 1);
 	  /* There's a good chance that the above loop is left with
@@ -1002,21 +1033,23 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       node->unwait ();
       NtClose (obj);
       SetThreadPriority (GetCurrentThread (), old_prio);
-      switch (ret)
+      if (ret == WAIT_UNLOCKED)
+	; /* The lock object has been set to signalled. */
+      else if (ret == WAIT_PROC_EXITED)
+	; /* For POSIX locks, the process holding the lock has exited. */
+      else if (ret == WAIT_SIGNAL_ARRIVED)
 	{
-	case WAIT_OBJECT_0:
-	  /* The lock object has been set to signalled. */
-	  break;
-	case WAIT_OBJECT_0 + 1:
-	  /* For POSIX locks, the process holding the lock has exited. */
-	  if (lock->lf_flags & F_POSIX)
-	    break;
-	  /*FALLTHRU*/
-	case WAIT_OBJECT_0 + 2:
 	  /* A signal came in. */
-	  _my_tls.call_signal_handler ();
-	  return EINTR;
-	default:
+	  if (!_my_tls.call_signal_handler ())
+	    return EINTR;
+	}
+      else if (ret == WAIT_THREAD_CANCELED)
+	{
+	  /* The thread has been sent a cancellation request. */
+	  pthread::static_cancel_self ();
+	}
+      else
+	{
 	  system_printf ("Shouldn't happen! ret = %lu, error: %lu\n",
 			 ret, GetLastError ());
 	  return geterrno_from_win_error ();
@@ -1489,6 +1522,8 @@ lockf (int filedes, int function, _off64_t size)
   int res = -1;
   int cmd;
   struct __flock64 fl;
+
+  pthread_testcancel ();
 
   myfault efault;
   if (efault.faulted (EFAULT))
