@@ -564,7 +564,6 @@ class fhandler_socket: public fhandler_base
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
-  bool is_slow () {return true;}
 };
 
 class fhandler_base_overlapped: public fhandler_base
