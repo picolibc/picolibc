@@ -1,5 +1,10 @@
 2011-05-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/minires-os-if.c (get_dns_info): Remove unnecessary test for
+	existence of DnsQuery_A.
+
+2011-05-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout, use user32 UNICODE functions rather than ANSI functions.
 	* autoload.cc: Convert all definitions for ANSI user32 functions to
 	definitions for the corresponding UNICODE function.

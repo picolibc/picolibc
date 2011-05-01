@@ -419,8 +419,7 @@ void get_dns_info(res_state statp)
   FIXED_INFO * pFixedInfo;
   int numAddresses = 0;
 
-  if (statp->use_os
-      && ((dwRetVal = DnsQuery_A(NULL, 0, 0, NULL, NULL, NULL)) != ERROR_PROC_NOT_FOUND))
+  if (statp->use_os)
   {
     DPRINTF(debug, "using dnsapi.dll %d\n", dwRetVal);
     statp->os_query = (typeof(statp->os_query)) cygwin_query;
