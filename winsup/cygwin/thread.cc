@@ -885,6 +885,19 @@ pthread::testcancel ()
     }
 }
 
+/* Return cancel event handle if it exists *and* cancel is not disabled.
+   This function is supposed to be used from other functions which are
+   cancelable and need the cancel event in a WFMO call. */
+HANDLE
+pthread::get_cancel_event ()
+{
+  pthread_t thread = pthread::self ();
+
+  return (thread && thread->cancel_event
+	  && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
+	  ? thread->cancel_event : NULL;
+}
+
 void
 pthread::static_cancel_self ()
 {

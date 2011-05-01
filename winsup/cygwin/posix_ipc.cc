@@ -174,16 +174,13 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 static int
 ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
 {
-  pthread_t thread;
   HANDLE w4[4] = { evt, signal_arrived, NULL, NULL };
   DWORD cnt = 2;
   DWORD timer_idx = 0;
   int ret = 0;
 
-  thread = pthread::self ();
-  if (thread && thread->cancel_event
-      && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
-    w4[cnt++] = thread->cancel_event;
+  if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
+    ++cnt;
   if (abstime)
     {
       if (abstime->tv_sec < 0

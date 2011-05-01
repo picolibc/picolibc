@@ -958,10 +958,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  return EDEADLK;
 	}
 
-      pthread_t thread = pthread::self ();
-      HANDLE cancel_event = (thread && thread->cancel_event
-			     && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
-			    ? thread->cancel_event : NULL;
+      HANDLE cancel_event = pthread::get_cancel_event ();
 
       int wait_count = 0;
       /* The lock is always the first object. */

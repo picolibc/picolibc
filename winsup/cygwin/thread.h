@@ -399,6 +399,7 @@ public:
   virtual int cancel ();
 
   virtual void testcancel ();
+  static HANDLE get_cancel_event ();
   static void static_cancel_self ();
 
   virtual int setcancelstate (int state, int *oldstate);

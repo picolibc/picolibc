@@ -98,10 +98,8 @@ fhandler_windows::read (void *buf, size_t& len)
 
   HANDLE w4[3] = { get_handle (), signal_arrived, NULL };
   DWORD cnt = 2;
-  pthread_t thread = pthread::self ();
-  if (thread && thread->cancel_event
-      && thread->cancelstate != PTHREAD_CANCEL_DISABLE)
-    w4[cnt++] = thread->cancel_event;
+  if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
+    ++cnt;
 restart:
   switch (MsgWaitForMultipleObjectsEx (cnt, w4,
 				       is_nonblocking () ? 0 : INFINITE,

@@ -1,5 +1,14 @@
 2011-05-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_windows.cc (fhandler_windows::read): Use
+	pthread::get_cancel_event to fetch thread's cancel event.
+	* flock.cc (lf_setlock): Ditto.
+	* posix_ipc.cc (ipc_cond_timedwait): Ditto.
+	* thread.cc (pthread::get_cancel_event): New static method.
+	* thread.h (pthread::get_cancel_event): Declare.
+
+2011-05-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/minires-os-if.c (get_dns_info): Remove unnecessary test for
 	existence of DnsQuery_A.
 
