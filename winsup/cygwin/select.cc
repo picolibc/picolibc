@@ -1055,14 +1055,7 @@ peek_serial (select_record *s, bool)
 	}
     }
 
-  HANDLE w4[2];
-  DWORD to;
-
-  w4[0] = fh->io_status.hEvent;
-  w4[1] = signal_arrived;
-  to = 10;
-
-  switch (WaitForMultipleObjects (2, w4, FALSE, to))
+  switch (WaitForSingleObject (fh->io_status.hEvent, 10L))
     {
     case WAIT_OBJECT_0:
       if (!ClearCommError (h, &fh->ev, &st))
@@ -1071,17 +1064,12 @@ peek_serial (select_record *s, bool)
 	  goto err;
 	}
       else if (!st.cbInQue)
-	Sleep (to);
+	Sleep (10L);
       else
 	{
 	  return s->read_ready = true;
 	  select_printf ("got something");
 	}
-      break;
-    case WAIT_OBJECT_0 + 1:
-      select_printf ("interrupt");
-      set_sig_errno (EINTR);
-      ready = -1;
       break;
     case WAIT_TIMEOUT:
       break;
@@ -1547,7 +1535,7 @@ peek_windows (select_record *me, bool)
   if (me->read_selected && me->read_ready)
     return 1;
 
-  if (PeekMessage (&m, (HWND) h, 0, 0, PM_NOREMOVE))
+  if (PeekMessageW (&m, (HWND) h, 0, 0, PM_NOREMOVE))
     {
       me->read_ready = true;
       select_printf ("window %d(%p) ready", me->fd, me->fh->get_handle ());

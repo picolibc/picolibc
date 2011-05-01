@@ -1,6 +1,7 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2010,
+   2011 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
@@ -45,7 +46,7 @@ wininfo::process (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	raise (SIGIO);
       return 0;
     default:
-      return DefWindowProc (hwnd, uMsg, wParam, lParam);
+      return DefWindowProcW (hwnd, uMsg, wParam, lParam);
     }
 }
 
@@ -60,8 +61,8 @@ DWORD WINAPI
 wininfo::winthread ()
 {
   MSG msg;
-  WNDCLASS wc;
-  static NO_COPY char classname[] = "CygwinWndClass";
+  WNDCLASSW wc;
+  static NO_COPY WCHAR classname[] = L"CygwinWndClass";
 
   _lock.grab ();
   /* Register the window class for the main window. */
@@ -77,20 +78,21 @@ wininfo::winthread ()
   wc.lpszMenuName = NULL;
   wc.lpszClassName = classname;
 
-  if (!RegisterClass (&wc))
+  if (!RegisterClassW (&wc))
     api_fatal ("cannot register window class, %E");
 
   /* Create hidden window. */
-  hwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT,
-			   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			   (HWND) NULL, (HMENU) NULL, user_data->hmodule,
-			   (LPVOID) NULL);
+  hwnd = CreateWindowExW (0, classname, classname, WS_POPUP, CW_USEDEFAULT,
+			  CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			  (HWND) NULL, (HMENU) NULL, user_data->hmodule,
+			  (LPVOID) NULL);
   if (!hwnd)
     api_fatal ("couldn't create window, %E");
   release ();
 
-  while (GetMessage (&msg, hwnd, 0, 0) == TRUE)
-    DispatchMessage (&msg);
+  int ret;
+  while ((ret = (int) GetMessageW (&msg, hwnd, 0, 0)) > 0)
+    DispatchMessageW (&msg);
 
   return 0;
 }

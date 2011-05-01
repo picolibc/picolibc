@@ -1319,7 +1319,6 @@ class fhandler_windows: public fhandler_base
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
-  bool is_slow () {return true;}
 };
 
 class fhandler_dev_dsp: public fhandler_base
