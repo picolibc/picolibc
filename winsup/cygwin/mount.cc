@@ -131,7 +131,7 @@ fs_info_cache::genhash (PFILE_FS_VOLUME_INFORMATION pffvi)
 {
   uint32_t hash = 0;
   const uint16_t *p = (const uint16_t *) pffvi;
-  const uint16_t *end = (const uint16_t *) 
+  const uint16_t *end = (const uint16_t *)
 		        ((const uint8_t *) p + sizeof *pffvi
 			 + pffvi->VolumeLabelLength  - sizeof (WCHAR));
   pffvi->__dummy = 0;	/* This member can have random values! */
@@ -378,7 +378,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     any remote CIFS.  */
 	  has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
 	  /* NWFS is known to have a broken FileBasicInformation info class.
-	     It can't be used to fetch information, only to set information. 
+	     It can't be used to fetch information, only to set information.
 	     Therefore, for NWFS we have to fallback to the
 	     FileNetworkOpenInformation info class.  Unfortunately we can't
 	     use FileNetworkOpenInformation all the time since that fails on
@@ -1055,7 +1055,7 @@ fstab_read_flags (char **options, unsigned &flags, bool external)
 	*p++ = '\0';
       else
 	p = strchr (*options, '\0');
-      
+
       key.name = *options;
       opt *o = (opt *) bsearch (&key, oopts,
 				sizeof oopts / sizeof (opt),

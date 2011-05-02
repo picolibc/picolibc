@@ -600,7 +600,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 
 	     Invalid bytes in a multibyte secuence are converted to
 	     the private use area which is already used to store ASCII
-	     chars invalid in Windows filenames.  This technque allows 
+	     chars invalid in Windows filenames.  This technque allows
 	     to store them in a symmetric way. */
 	  bytes = 1;
 	  if (dst)

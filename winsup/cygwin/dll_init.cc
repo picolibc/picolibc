@@ -126,6 +126,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
+      d->p = p;
     }
   else
     {

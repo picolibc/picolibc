@@ -50,12 +50,12 @@ static LONG installation_root_inited __attribute__((section (".cygwin_dll_common
    used when generating shared object names.  Thus, different Cygwin
    installations generate different object names and so are isolated from
    each other.
-   
+
    Having this information, the installation key together with the
    installation root path is written to the registry.  The idea is that
    cygcheck can print the paths into which the Cygwin DLL has been
    installed for debugging purposes.
-   
+
    Last but not least, the new cygwin properties datastrcuture is checked
    for the "disabled_key" value, which is used to determine whether the
    installation key is actually added to all object names or not.  This is
@@ -373,7 +373,7 @@ shared_info::init_obcaseinsensitive ()
 {
   NTSTATUS status;
   DWORD def_obcaseinsensitive = 1;
- 
+
   obcaseinsensitive = def_obcaseinsensitive;
   RTL_QUERY_REGISTRY_TABLE tab[2] = {
     { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,

@@ -1,3 +1,10 @@
+2011-05-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (dll_list::alloc): Reset 'p' in forked process.
+
+	* select.cc (select_stuff::wait): Move cleanup() closer to WFMO to
+	minimize unavoidable (?) race.
+
 2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc (fhandler_serial::raw_read): Add restartability

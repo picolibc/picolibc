@@ -146,7 +146,6 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   else if ((timeout = sel.wait (r, w, e, ms) < 0))
     return -1;	/* some kind of error */
 
-  sel.cleanup ();
   copyfd_set (readfds, r, maxfds);
   copyfd_set (writefds, w, maxfds);
   copyfd_set (exceptfds, e, maxfds);
@@ -290,7 +289,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	wait_ret = WaitForMultipleObjects (m, w4, FALSE, ms);
       else
 	/* Using MWMO_INPUTAVAILABLE is the officially supported solution for
-	   the problem that the call to PeekMessage disarms the queue state 
+	   the problem that the call to PeekMessage disarms the queue state
 	   so that a subsequent MWFMO hangs, even if there are still messages
 	   in the queue. */
 	wait_ret =
@@ -301,15 +300,18 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       switch (wait_ret)
       {
 	case WAIT_OBJECT_0:
+	  cleanup ();
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
 	  return -1;
 	case WAIT_FAILED:
+	  cleanup ();
 	  system_printf ("WaitForMultipleObjects failed");
 	  s = &start;
 	  s->set_select_errno ();
 	  return -1;
 	case WAIT_TIMEOUT:
+	  cleanup ();
 	  select_printf ("timed out");
 	  res = 1;
 	  goto out;
@@ -325,6 +327,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       while ((s = s->next))
 	if (s->saw_error ())
 	  {
+	    cleanup ();
 	    set_errno (s->saw_error ());
 	    return -1;		/* Somebody detected an error */
 	  }
@@ -334,7 +337,10 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
       select_printf ("gotone %d", gotone);
       if (gotone)
-	goto out;
+	{
+	  cleanup ();
+	  goto out;
+	}
 
       if (ms == INFINITE)
 	{
@@ -346,6 +352,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       LONGLONG now = gtod.msecs ();
       if (now > (start_time + ms))
 	{
+	  cleanup ();
 	  select_printf ("timed out after verification");
 	  goto out;
 	}

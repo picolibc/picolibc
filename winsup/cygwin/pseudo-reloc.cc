@@ -1,9 +1,9 @@
-/* pseudo-reloc.c
+/* pseudo-reloc.cc
 
    Contributed by Egor Duda  <deo@logos-m.ru>
    Modified by addition of runtime_pseudo_reloc version 2
    by Kai Tietz  <kai.tietz@onevision.com>
-	
+
    THIS SOFTWARE IS NOT COPYRIGHTED
 
    This source code is offered for use in the public domain. You may

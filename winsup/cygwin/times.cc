@@ -513,7 +513,7 @@ hires_ms::timeGetTime_ns ()
      of the value returned by timeGetTime, only relative accuracy, we can skip
      this step.  However, if we ever find out that we need absolute accuracy,
      here's how it works in it's full beauty:
-     
+
      - At process startup, winmm initializes two calibration values:
 
        DWORD tick_count_start;
