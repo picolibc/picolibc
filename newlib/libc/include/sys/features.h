@@ -125,7 +125,7 @@ extern "C" {
 #define _POSIX_SHARED_MEMORY_OBJECTS		200112L 
 #define _POSIX_SHELL				     1
 /* #define _POSIX_SPAWN				    -1 */
-/* #define _POSIX_SPIN_LOCKS			    -1 */
+#define _POSIX_SPIN_LOCKS			    200112L
 /* #define _POSIX_SPORADIC_SERVER		    -1 */
 #define _POSIX_SYNCHRONIZED_IO			200112L
 /* #define _POSIX_THREAD_ATTR_STACKADDR		    -1 */

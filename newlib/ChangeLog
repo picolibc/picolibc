@@ -1,3 +1,9 @@
+2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/features.h [__CYGWIN__] (_POSIX_SPIN_LOCKS): Define.
+	* libc/include/sys/types.h: Cygwin provides its own pthread_spinlock_t
+	typedef.
+
 2011-04-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/signal.h (_sig_func_ptr): Define with int parameter
