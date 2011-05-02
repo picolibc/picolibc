@@ -436,11 +436,10 @@ deny ACEs.  The second rule is not modified to get the ACEs in the
 preferred order.</para>
 
 <para>Unfortunately the security tab in the file properties dialog of
-the Windows NT4 explorer is completely unable to deal with access denied ACEs
-while the Windows 2000 and later properties dialog rearranges the order of the
-ACEs to canonical order before you can read them. Thank God, the sort
-order remains unchanged if one presses the Cancel button.  But don't
-even <emphasis role='bold'>think</emphasis> of pressing OK...</para>
+the Windows Explorer insists to rearrange the order of the ACEs to
+canonical order before you can read them. Thank God, the sort order
+remains unchanged if one presses the Cancel button.  But don't even
+<emphasis role='bold'>think</emphasis> of pressing OK...</para>
 
 <para>Canonical ACLs are unable to reflect each possible combination
 of POSIX permissions. Example:</para>
@@ -498,8 +497,8 @@ OthersAllow: 110
 </screen>
 
 <para>Again: This works on all existing versions of Windows NT, at the
-time of writing from at least NT4 up to Server 2008 R2.  Only the GUIs
-aren't able (or willing) to deal with that order.</para>
+time of writing from at least Windows 2000 up to Server 2008 R2.  Only
+the GUIs aren't able (or willing) to deal with that order.</para>
 
 </sect2>
 
@@ -702,10 +701,6 @@ bash$ grep foo //server/share/foofile
 </sect2>
 
 <sect2 id="ntsec-nopasswd2"><title id="ntsec-nopasswd2.title">Switching the user context without password, Method 2: LSA authentication package</title>
-
-<para>Caveat: The method described in this chapter only works starting
-with Windows 2000.  Windows NT4 users have to use one of the other
-methods described in this document.</para>
 
 <para>We're looking for another way to switch the user context without
 having to provide the password.  Another technique is to create an

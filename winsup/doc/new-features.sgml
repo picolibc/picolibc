@@ -9,6 +9,11 @@ Drop support for Windows NT4.
 </para></listitem>
 
 <listitem><para>
+The passwd command now allows an administrator to use the -R command for
+other user accounts:  passwd -R username.
+</para></listitem>
+
+<listitem><para>
 Pthread spinlocks.  New APIs: pthread_spin_destroy, pthread_spin_init,
 pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
 </para></listitem>

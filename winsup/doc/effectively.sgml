@@ -18,13 +18,12 @@ support the <literal>/?</literal> switch to display usage information.
 <para>
 Unfortunately, no standard set of tools included with all versions of 
 Windows exists.  If you are unfamiliar with the tools available 
-on your system, here is a general guide.  Windows NT 4.0 has only a basic 
-set of tools, which later versions of Windows expanded. 
-Microsoft also provides free downloads for Windows NT 4.0 (the Resource Kit 
-Support Tools), Windows 2000 (the Resource Kit Tools), and XP (the 
-Windows Support Tools).  Generally, the younger the Windows version, the
-more complete are the on-board tools.  Additionally, many independent sites
-such as 
+on your system, here is a general guide.  Windows 2000 has only a basic 
+set of tools, which later versions of Windows expanded.  Microsoft also
+provides free downloads for Windows 2000 (the Resource Kit Tools), and XP
+(the Windows Support Tools).  Generally, the younger the Windows version,
+the more complete are the on-board tools.  Additionally, many independent
+sites such as 
 <ulink url="http://download.com">download.com</ulink>, 
 <ulink url="http://simtel.net">simtel.net</ulink>, 
 and Microsoft's own
