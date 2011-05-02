@@ -262,18 +262,10 @@ fhandler_console::read (void *pv, size_t& buflen)
       return;
     }
 
-  HANDLE w4[2];
-  DWORD nwait;
+  HANDLE w4[3] = { h, signal_arrived, pthread::get_cancel_event () };
+  DWORD nwait = w4[2] ? 3 : 2;
+  DWORD timeout = is_nonblocking () ? 0 : INFINITE;
   char tmp[60];
-
-  w4[0] = h;
-  if (&_my_tls != _main_tls)
-    nwait = 1;
-  else
-    {
-      w4[1] = signal_arrived;
-      nwait = 2;
-    }
 
   termios ti = tc->ti;
   for (;;)
@@ -286,12 +278,22 @@ fhandler_console::read (void *pv, size_t& buflen)
 	}
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
-      switch (WaitForMultipleObjects (nwait, w4, FALSE, INFINITE))
+restart:
+      switch (WaitForMultipleObjects (nwait, w4, FALSE, timeout))
 	{
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
+	  if (_my_tls.call_signal_handler ())
+	    goto restart;
 	  goto sig_exit;
+	case WAIT_OBJECT_0 + 2:
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	case WAIT_TIMEOUT:
+	  set_sig_errno (EAGAIN);
+	  buflen = (size_t) -1;
+	  return;
 	default:
 	  goto err;
 	}
