@@ -1,5 +1,10 @@
 2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhndler_tty.cc (andler_pty_master::process_slave_output): Make
+	interruptible and cancelable.  Fix nonblocking case.
+
+2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::read): Make restartable and
 	cancelable.
 

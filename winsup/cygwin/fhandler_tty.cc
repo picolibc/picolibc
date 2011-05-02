@@ -305,16 +305,23 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      if (hit_eof ())
 		goto out;
 	      /* DISCARD (FLUSHO) and tcflush can finish here. */
-	      if (n == 0 && (get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
+	      if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
 		goto out;
-	      if (n == 0 && is_nonblocking ())
+	      if (is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
 		  rc = -1;
-		  break;
+		  goto out;
 		}
-
-	      Sleep (10);
+	      pthread_testcancel ();
+	      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0
+		  && !_my_tls.call_signal_handler ())
+		{
+		  set_errno (EINTR);
+		  rc = -1;
+		  goto out;
+		}
+		
 	    }
 
 	  if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
