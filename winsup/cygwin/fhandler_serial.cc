@@ -1,7 +1,7 @@
 /* fhandler_serial.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -42,11 +42,8 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   int tot;
   DWORD n;
-  HANDLE w4[2];
-  size_t minchars = vmin_ ? min (vmin_, ulen) : ulen;
 
-  w4[0] = io_status.hEvent;
-  w4[1] = signal_arrived;
+  size_t minchars = vmin_ ? min (vmin_, ulen) : ulen;
 
   debug_printf ("ulen %d, vmin_ %d, vtime_ %d, hEvent %p", ulen, vmin_, vtime_,
 		io_status.hEvent);
@@ -84,10 +81,14 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    }
 	  else if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
-	  else
+	  else if (!is_nonblocking ())
 	    {
+	      HANDLE w4[3] = { io_status.hEvent, signal_arrived,
+			       pthread::get_cancel_event () };
+	      DWORD cnt = w4[2] ? 3 : 2;
 	      overlapped_armed = 1;
-	      switch (WaitForMultipleObjects (2, w4, FALSE, INFINITE))
+restart:
+	      switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
 		{
 		case WAIT_OBJECT_0:
 		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
@@ -96,11 +97,18 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		  debug_printf ("n %d, ev %x", n, ev);
 		  break;
 		case WAIT_OBJECT_0 + 1:
+		  if (_my_tls.call_signal_handler ())
+		    goto restart;
 		  tot = -1;
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
 		  set_sig_errno (EINTR);
 		  goto out;
+		case WAIT_OBJECT_0 + 2:
+		  PurgeComm (get_handle (), PURGE_RXABORT);
+		  overlapped_armed = 0;
+		  pthread::static_cancel_self ();
+		  /*NOTREACHED*/
 		default:
 		  goto err;
 		}
@@ -174,6 +182,31 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 	  goto err;
 	}
 
+      if (!is_nonblocking ())
+	{
+	  HANDLE w4[3] = { write_status.hEvent, signal_arrived,
+			   pthread::get_cancel_event () };
+	  DWORD cnt = w4[2] ? 3 : 2;
+    restart:
+	  switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
+	    {
+	    case WAIT_OBJECT_0:
+	      break;
+	    case WAIT_OBJECT_0 + 1:
+	      if (_my_tls.call_signal_handler ())
+		goto restart;
+	      PurgeComm (get_handle (), PURGE_TXABORT);
+	      set_sig_errno (EINTR);
+	      ForceCloseHandle (write_status.hEvent);
+	      return -1;
+	    case WAIT_OBJECT_0 + 2:
+	      PurgeComm (get_handle (), PURGE_TXABORT);
+	      pthread::static_cancel_self ();
+	      /*NOTREACHED*/
+	    default:
+	      goto err;
+	    }
+	}
       if (!GetOverlappedResult (get_handle (), &write_status, &bytes_written, TRUE))
 	goto err;
 
