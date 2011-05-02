@@ -1,3 +1,7 @@
+2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* sysconf.cc (sca): Set _SC_SPIN_LOCKS to _POSIX_SPIN_LOCKS.
+
 2011-05-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dll_init.cc (dll_list::alloc): Reset 'p' in forked process.
