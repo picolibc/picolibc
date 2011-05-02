@@ -1,3 +1,7 @@
+2011-05-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* strace.cc (strace::vprntf): Avoid closing unopened handle.
+
 2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* sysconf.cc (sca): Set _SC_SPIN_LOCKS to _POSIX_SPIN_LOCKS.

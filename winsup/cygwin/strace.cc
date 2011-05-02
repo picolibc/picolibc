@@ -254,8 +254,10 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
 				 FILE_SHARE_WRITE | FILE_SHARE_WRITE,
 				 &sec_none, OPEN_EXISTING, 0, 0);
 	  if (h != INVALID_HANDLE_VALUE)
-	    WriteFile (h, buf, len, &done, 0);
-	  CloseHandle (h);
+	    {
+	      WriteFile (h, buf, len, &done, 0);
+	      CloseHandle (h);
+	    }
 	}
     }
 
