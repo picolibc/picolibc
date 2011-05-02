@@ -47,9 +47,7 @@ fhandler_fifo::open_nonserver (const char *npname, unsigned low_flags,
 			     FILE_FLAG_OVERLAPPED, NULL);
       if (h != INVALID_HANDLE_VALUE || GetLastError () != ERROR_PIPE_NOT_CONNECTED)
 	return h;
-      if (&_my_tls != _main_tls)
-	yield ();
-      else if (IsEventSignalled (signal_arrived))
+      if (IsEventSignalled (signal_arrived))
 	{
 	  set_errno (EINTR);
 	  return NULL;

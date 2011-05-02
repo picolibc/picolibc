@@ -1,5 +1,10 @@
 2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (cancelable_wait): Remove test for main thread.
+	* fhandler_fifo.cc (fhandler_fifo::open_nonserver): Ditto.
+
+2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhndler_tty.cc (andler_pty_master::process_slave_output): Make
 	interruptible and cancelable.  Fix nonblocking case.
 

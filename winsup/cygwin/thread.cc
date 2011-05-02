@@ -930,7 +930,7 @@ cancelable_wait (HANDLE object, DWORD timeout,
     }
 
   DWORD sig_n;
-  if (sig_wait == cw_sig_nosig || &_my_tls != _main_tls)
+  if (sig_wait == cw_sig_nosig)
     sig_n = WAIT_TIMEOUT + 1;
   else
     {
