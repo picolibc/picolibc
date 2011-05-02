@@ -1,3 +1,7 @@
+2011-05-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* Makefile.in: Allow CFLAGS to be overridden from the environment.
+
 2011-05-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (cancelable_wait): Remove test for main thread.

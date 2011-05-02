@@ -58,7 +58,7 @@ override INSTALL_DATA:=@INSTALL_DATA@
 MT_SAFE:=@MT_SAFE@
 DEFS:=@DEFS@
 CCEXTRA:=
-CFLAGS=@CFLAGS@
+CFLAGS?=@CFLAGS@
 override CFLAGS+=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer \
   -mno-use-libstdc-wrappers $(CCEXTRA)
 CXX=@CXX@
