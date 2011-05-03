@@ -250,6 +250,7 @@ public:
   int contentionscope;
   int inheritsched;
   struct sched_param schedparam;
+  void *stackaddr;
   size_t stacksize;
 
   pthread_attr ();

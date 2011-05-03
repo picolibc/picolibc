@@ -1,3 +1,29 @@
+2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (pthread_attr_getstack): Export.
+	(pthread_attr_getstackaddr): Export.
+	(pthread_getattr_np): Export.
+	* ntdll.h (enum _THREAD_INFORMATION_CLASS): Add ThreadBasicInformation.
+	(struct _THREAD_BASIC_INFORMATION): Define.
+	(NtQueryInformationThread): Declare.
+	* posix.sgml (std-susv4): Add pthread_attr_getstack.
+	(std-gnu): Add pthread_getattr_np.
+	(std-deprec): Add pthread_attr_getstackaddr.
+	(std-notimpl): Remove pthread_attr_[gs]etstackaddr, as they were
+	removed from SUSv4.
+	* thread.cc (pthread_attr::pthread_attr): Initialize stackaddr.
+	(pthread_attr_getstack): New function.
+	(pthread_attr_getstackaddr): New function.
+	(pthread_attr_setstacksize): Return EINVAL if passed size less than
+	PTHREAD_STACK_MIN, as required by POSIX.
+	(pthread_getattr_np): New function.
+	* thread.h (class pthread_attr): Add stackaddr member.
+	* include/pthread.h (pthread_attr_getstack): Declare.
+	(pthread_attr_getstackaddr): Declare unconditionally.
+	(pthread_attr_setstack): Declare inside false conditional for reference.
+	(pthread_getattr_np): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-05-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* Makefile.in: Allow CFLAGS to be overridden from the environment.

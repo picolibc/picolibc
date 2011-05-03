@@ -534,6 +534,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_attr_getschedparam
     pthread_attr_getschedpolicy
     pthread_attr_getscope
+    pthread_attr_getstack
     pthread_attr_getstacksize
     pthread_attr_init
     pthread_attr_setdetachstate
@@ -1117,6 +1118,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pow10
     pow10f
     ppoll
+    pthread_getattr_np
     removexattr
     setxattr
     strchrnul
@@ -1230,6 +1232,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     mallopt			(SVID)
     mktemp			(SUSv3)
     on_exit			(SunOS)
+    pthread_attr_getstackaddr	(SUSv3)
     pthread_continue		(XPG2)
     pthread_getsequence_np	(Tru64)
     pthread_suspend		(XPG2)
@@ -1375,11 +1378,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     psiginfo
     psignal
     pthread_attr_getguardsize
-    pthread_attr_getstack
-    pthread_attr_getstackaddr
     pthread_attr_setguardsize
     pthread_attr_setstack
-    pthread_attr_setstackaddr
     pthread_barrier[...]
     pthread_condattr_getclock
     pthread_condattr_setclock

@@ -405,12 +405,14 @@ details. */
 	   pthread_spin_trylock, pthread_spin_unlock.
       239: Export pthread_setschedprio.
       240: Export ppoll.
+      241: Export pthread_attr_getstack, pthread_attr_getstackaddr,
+	   pthread_getattr_np.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 240
+#define CYGWIN_VERSION_API_MINOR 241
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -76,6 +76,8 @@ int pthread_attr_getinheritsched (const pthread_attr_t *, int *);
 int pthread_attr_getschedparam (const pthread_attr_t *, struct sched_param *);
 int pthread_attr_getschedpolicy (const pthread_attr_t *, int *);
 int pthread_attr_getscope (const pthread_attr_t *, int *);
+int pthread_attr_getstack (const pthread_attr_t *, void **, size_t *);
+int pthread_attr_getstackaddr (const pthread_attr_t *, void **);
 int pthread_attr_init (pthread_attr_t *);
 int pthread_attr_setdetachstate (pthread_attr_t *, int);
 int pthread_attr_setinheritsched (pthread_attr_t *, int);
@@ -88,7 +90,7 @@ int pthread_attr_setscope (pthread_attr_t *, int);
  * Not supported or implemented. The prototypes are here so if someone greps the
  * source they will see these comments
  */
-int pthread_attr_getstackaddr (const pthread_attr_t *, void **);
+int pthread_attr_setstack (pthread_attr_t *, void *, size_t);
 int pthread_attr_setstackaddr (pthread_attr_t *, void *);
 #endif
 
@@ -200,6 +202,7 @@ void pthread_testcancel (void);
 
 /* Non posix calls */
 
+int pthread_getattr_np (pthread_t, pthread_attr_t *);
 int pthread_suspend (pthread_t);
 int pthread_continue (pthread_t);
 int pthread_yield (void);

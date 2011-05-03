@@ -1174,6 +1174,8 @@ pthread_attr_getinheritsched SIGFE
 pthread_attr_getschedparam SIGFE
 pthread_attr_getschedpolicy SIGFE
 pthread_attr_getscope SIGFE
+pthread_attr_getstack SIGFE
+pthread_attr_getstackaddr SIGFE
 pthread_attr_getstacksize SIGFE
 pthread_attr_init SIGFE
 pthread_attr_setdetachstate SIGFE
@@ -1200,6 +1202,7 @@ pthread_create SIGFE
 pthread_detach SIGFE
 pthread_equal SIGFE
 pthread_exit SIGFE
+pthread_getattr_np SIGFE
 pthread_getconcurrency SIGFE
 pthread_getschedparam SIGFE
 pthread_getsequence_np SIGFE

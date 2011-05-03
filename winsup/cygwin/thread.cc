@@ -1085,7 +1085,7 @@ pthread::resume ()
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
-inheritsched (PTHREAD_INHERIT_SCHED), stacksize (0)
+inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0)
 {
   schedparam.sched_priority = 0;
 }
@@ -2238,10 +2238,34 @@ pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 }
 
 extern "C" int
+pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  /* uses lowest address of stack on all platforms */
+  *addr = (void *)((int)(*attr)->stackaddr - (*attr)->stacksize);
+  *size = (*attr)->stacksize;
+  return 0;
+}
+
+extern "C" int
+pthread_attr_getstackaddr (const pthread_attr_t *attr, void **addr)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  /* uses stack address, which is the higher address on platforms
+     where the stack grows downwards, such as x86 */
+  *addr = (*attr)->stackaddr;
+  return 0;
+}
+
+extern "C" int
 pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
+  if (size < PTHREAD_STACK_MIN)
+    return EINVAL;    
   (*attr)->stacksize = size;
   return 0;
 }
@@ -2377,6 +2401,51 @@ pthread::resume (pthread_t *thread)
   if ((*thread)->suspended == true)
     ResumeThread ((*thread)->win32_obj_id);
   (*thread)->suspended = false;
+
+  return 0;
+}
+
+extern "C" int
+pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
+{
+  const size_t sizeof_tbi = sizeof (THREAD_BASIC_INFORMATION);
+  PTHREAD_BASIC_INFORMATION tbi;
+  NTSTATUS ret;
+
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  /* attr may not be pre-initialized */
+  if (!pthread_attr::is_good_object (attr))
+  {
+    int rv = pthread_attr_init (attr);
+    if (rv != 0)
+      return rv;
+  }
+
+  (*attr)->joinable = thread->attr.joinable;
+  (*attr)->contentionscope = thread->attr.contentionscope;
+  (*attr)->inheritsched = thread->attr.inheritsched;
+  (*attr)->schedparam = thread->attr.schedparam;
+
+  tbi = (PTHREAD_BASIC_INFORMATION) malloc (sizeof_tbi);
+  ret = NtQueryInformationThread (thread->win32_obj_id, ThreadBasicInformation,
+                                  tbi, sizeof_tbi, NULL);
+
+  if (NT_SUCCESS (ret))
+    {
+      PNT_TIB tib = tbi->TebBaseAddress;
+      (*attr)->stackaddr = tib->StackBase;
+      /* stack grows downwards on x86 systems */
+      (*attr)->stacksize = (int)tib->StackBase - (int)tib->StackLimit;
+    }
+  else
+    {
+      debug_printf ("NtQueryInformationThread(ThreadBasicInformation), "
+                    "status %p", ret);
+      (*attr)->stackaddr = thread->attr.stackaddr;
+      (*attr)->stacksize = thread->attr.stacksize;
+    }
 
   return 0;
 }
