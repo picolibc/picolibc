@@ -1,3 +1,8 @@
+2011-05-03  Tristan Gingold  <gingold@adacore.com>
+
+	* rs6000.h (struct external_ldsym): Use E_SYMNMLEN instead of
+	SYMNMLEN.
+
 2011-04-27  Tristan Gingold  <gingold@adacore.com>
 
 	* xcoff.h (F_FDPR_PROF, F_FDPR_OPTI, F_DSA, F_VARPG)

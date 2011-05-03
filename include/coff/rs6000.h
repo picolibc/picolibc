@@ -250,7 +250,7 @@ struct external_ldsym
 {
   union
     {
-      bfd_byte _l_name[SYMNMLEN];
+      bfd_byte _l_name[E_SYMNMLEN];
       struct
 	{
 	  bfd_byte _l_zeroes[4];
