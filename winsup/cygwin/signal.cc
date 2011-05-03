@@ -223,6 +223,7 @@ _pinfo::kill (siginfo_t& si)
 {
   int res;
   DWORD this_process_state;
+  pid_t this_pid;
 
   sig_dispatch_pending ();
 
@@ -247,20 +248,23 @@ _pinfo::kill (siginfo_t& si)
 	  si2.si_code = SI_KERNEL;
 	  sig_send (this, si2);
 	}
+      this_pid = pid;
     }
   else if (si.si_signo == 0 && this)
     {
       this_process_state = process_state;
+      this_pid = pid;
       res = 0;
     }
   else
     {
       set_errno (ESRCH);
       this_process_state = 0;
+      this_pid = -1;
       res = -1;
     }
 
-  syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, pid,
+  syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, this_pid,
 		  si.si_signo, this_process_state);
   return res;
 }
