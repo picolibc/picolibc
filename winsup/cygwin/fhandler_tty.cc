@@ -808,12 +808,10 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
   char buf[INP_BUFFER_SIZE];
   char peek_buf[INP_BUFFER_SIZE];
   DWORD time_to_wait;
-  DWORD rc;
-  HANDLE w4[2];
 
   termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
 
-  if (!ptr) /* Indicating tcflush(). */
+  if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
     time_to_wait = 0;
   else if ((get_ttyp ()->ti.c_lflag & ICANON))
     time_to_wait = INFINITE;
@@ -833,47 +831,88 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	time_to_wait = !vtime ? INFINITE : 100 * vtime;
     }
 
-  w4[0] = signal_arrived;
-  w4[1] = input_available_event;
-
-  DWORD waiter = time_to_wait;
   while (len)
     {
-      rc = WaitForMultipleObjects (2, w4, FALSE, waiter);
-
-      if (rc == WAIT_TIMEOUT)
+      HANDLE w4[3] = { input_available_event, signal_arrived,
+		       pthread::get_cancel_event () };
+      DWORD cnt = w4[2] ? 3 : 2;
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, time_to_wait))
 	{
-	  termios_printf ("wait timed out, waiter %u", waiter);
+	case WAIT_OBJECT_0:
 	  break;
-	}
-
-      if (rc == WAIT_FAILED)
-	{
-	  termios_printf ("wait for input event failed, %E");
-	  break;
-	}
-
-      if (rc == WAIT_OBJECT_0)
-	{
-	  /* if we've received signal after successfully reading some data,
-	     just return all data successfully read */
+	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
-	    break;
+	    goto out;
+	  if (_my_tls.call_signal_handler ())
+	    continue;
+	  termios_printf ("wait catched signal");
 	  set_sig_errno (EINTR);
-	  len = (size_t) -1;
-	  return;
+	  totalread = -1;
+	  goto out;
+	case WAIT_OBJECT_0 + 2:
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	case WAIT_TIMEOUT:
+	  termios_printf ("wait timed out, time_to_wait %u", time_to_wait);
+	  if (!totalread)
+	    {
+	      set_sig_errno (EAGAIN);
+	      totalread = -1;
+	    }
+	  goto out;
+	default:
+	  termios_printf ("wait for input event failed, %E");
+	  if (!totalread)
+	    {
+	      __seterrno ();
+	      totalread = -1;
+	    }
+	  goto out;
 	}
-
-      rc = WaitForSingleObject (input_mutex, 1000);
-      if (rc == WAIT_FAILED)
+      /* Now that we know that input is available we have to grab the
+	 input mutex. */
+      w4[0] = input_mutex;
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, 1000))
 	{
+	case WAIT_OBJECT_0:
+	case WAIT_ABANDONED_0:
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  if (totalread > 0)
+	    goto out;
+	  if (_my_tls.call_signal_handler ())
+	    continue;
+	  termios_printf ("wait for mutex catched signal");
+	  set_sig_errno (EINTR);
+	  totalread = -1;
+	  goto out;
+	case WAIT_OBJECT_0 + 2:
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	case WAIT_TIMEOUT:
+	  termios_printf ("failed to acquire input mutex after input event "
+			  "arrived");
+	  /* If we have a timeout, we can simply handle this failure to
+	     grab the mutex as an EAGAIN situation.  Otherwise, if this
+	     is an infinitely blocking read, restart the loop. */
+	  if (time_to_wait != INFINITE)
+	    {
+	      if (!totalread)
+		{
+		  set_sig_errno (EAGAIN);
+		  totalread = -1;
+		}
+	      goto out;
+	    }
+	  continue;
+	default:
 	  termios_printf ("wait for input mutex failed, %E");
-	  break;
-	}
-      else if (rc == WAIT_TIMEOUT)
-	{
-	  termios_printf ("failed to acquire input mutex after input event arrived");
-	  break;
+	  if (!totalread)
+	    {
+	      __seterrno ();
+	      totalread = -1;
+	    }
+	  goto out;
 	}
       if (!PeekNamedPipe (get_handle (), peek_buf, sizeof (peek_buf), &bytes_in_pipe, NULL, NULL))
 	{
@@ -974,10 +1013,8 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 
       if (vmin == 0)
 	break;
-
-      if (n)
-	waiter = time_to_wait;
     }
+out:
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
   len = (size_t) totalread;
 }
