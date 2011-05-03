@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Corinna Vinschen
+ * Copyright (c) 2010, 2011 Corinna Vinschen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -137,17 +137,18 @@ print_locale_with_codeset (int verbose, loc_t *locale, bool utf8,
 				     modifier ? "@" : "", modifier ?: "");
   if (verbose)
     fputs ("locale: ", stdout);
-  printf ("%-15s ", locname);
   if (verbose)
     {
+      printf ("%-15s ", locname);
       printf ("archive: %s\n",
       locale->alias ? LOCALE_ALIAS : sysroot);
       puts ("-------------------------------------------------------------------------------");
       printf (" language | %ls\n", locale->language);
       printf ("territory | %ls\n", locale->territory);
-      printf ("  codeset | %s\n", utf8 ? "UTF-8" : locale->codeset);
+      printf ("  codeset | %s\n\n", utf8 ? "UTF-8" : locale->codeset);
     }
-  putc ('\n', stdout);
+  else
+    printf ("%s\n", locname);
 }
 
 void
