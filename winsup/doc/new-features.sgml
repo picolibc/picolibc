@@ -39,7 +39,8 @@ as well as the version of GCC used when compiling.
 </para></listitem>
 
 <listitem><para>
-Other new API: ppoll.
+Other new API: ppoll, pthread_attr_getstack, pthread_attr_getstackaddr,
+pthread_getattr_np, pthread_setschedprio.
 </para></listitem>
 
 </itemizedlist>
