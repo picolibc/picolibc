@@ -1,5 +1,11 @@
 2011-05-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Make
+	cancelable.  Remove test for main thread, always add signal_arrived
+	to waited objects.
+
+2011-05-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_tty_slave::read): Set WFMO timeout to 0 for
 	nonblocking case.  Drop useless waiter variable.  Rewrite wait for
 	input_available_event to use a switch statement.  Handle timeout and

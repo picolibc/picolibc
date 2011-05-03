@@ -1754,11 +1754,9 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       if (!get_overlapped ()->hEvent)
 	system_printf ("hEvent is zero?");
 #endif
-      DWORD n = 1;
-      HANDLE w4[2];
-      w4[0] = get_overlapped ()->hEvent;
-      if (&_my_tls == _main_tls)
-	w4[n++] = signal_arrived;
+      HANDLE w4[3] = { get_overlapped ()->hEvent, signal_arrived,
+		       pthread::get_cancel_event () };
+      DWORD n = w4[2] ? 3 : 2;
       HANDLE h = writing ? get_output_handle () : get_handle ();
       DWORD wfres = WaitForMultipleObjects (n, w4, false, INFINITE);
       if (wfres != WAIT_OBJECT_0)
@@ -1766,6 +1764,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       *bytes = 0;
       BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
       bool signalled = !wores && (wfres == WAIT_OBJECT_0 + 1);
+      bool canceled = !wores && (wfres == WAIT_OBJECT_0 + 2);
       if (signalled)
 	{
 	  debug_printf ("got a signal");
@@ -1779,6 +1778,8 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	  *bytes = (DWORD) -1;
 	  err = 0;
 	}
+      else if (canceled)
+	pthread::static_cancel_self ();
       else if (!wores)
 	{
 	  err = GetLastError ();
